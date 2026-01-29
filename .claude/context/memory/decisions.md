@@ -440,3 +440,148 @@
 - **Related ADRs**: ADR-058 (Prioritization Strategy), ADR-054-057 (P1 feature decisions)
 
 ---
+
+## [ADR-060] Upgrade Analysis Plan - Plugin Marketplace vs Enterprise Framework (2026-01-29)
+
+**Context:**
+
+- Archived codebase is a Claude Code Plugins marketplace (72 plugins, 108 agents, 129 skills, three-tier model strategy)
+- Current codebase is Agent-Studio Enterprise Framework (multi-agent orchestrator, router-first architecture)
+- Different architectures serve different purposes but share agent/skill concepts
+
+**Decision:**
+Execute comprehensive upgrade analysis following Phase 0 research protocol (ADR-045):
+
+1. Research plugin architecture patterns (minimum 3 external sources)
+2. Create detailed inventories of both systems
+3. Extract valuable patterns (progressive disclosure, three-tier model strategy, plugin granularity)
+4. Identify gaps and prioritize enhancements (P1/P2/P3)
+5. Create implementation roadmap with quick wins
+
+**Rationale:**
+
+- Plugin marketplace has proven patterns for agent organization and skill delivery
+- Progressive disclosure pattern could reduce token usage in our Skill() tool
+- Three-tier model strategy (Opus/Sonnet/Haiku) aligns with our spawning protocol
+- Gap analysis will reveal missing domain agents and skills
+- Systematic approach ensures no valuable patterns are missed
+
+**Alternatives Considered:**
+
+1. ❌ Direct port of plugin architecture → Incompatible with router-first orchestration
+2. ❌ Cherry-pick features without research → Risks missing integration dependencies
+3. ✅ Systematic research → Plan → Validate → Implement (EVOLVE workflow)
+
+**Consequences:**
+
+- **Positive**: Comprehensive understanding of both architectures, prioritized roadmap, validated patterns
+- **Negative**: 21-29 hours research before implementation (mitigated by preventing failed integrations)
+- **Risks**: Plugin patterns may not translate directly (mitigated by Phase 0 technical feasibility gate)
+
+**Implementation Plan:**
+
+- Phase 0: Research (6-8 hours) - MANDATORY research with constitution checkpoint
+- Phase 1: Inventory & Gap Analysis (4-6 hours) - Parallel execution
+- Phase 2: Pattern Extraction (5-7 hours) - Extract 3+ valuable patterns
+- Phase 3: Prioritization (3-4 hours) - Create P1/P2/P3 roadmap
+- Phase 4: Recommendations (2-3 hours) - Executive summary + quick wins
+
+**Success Metrics:**
+
+- Constitution checkpoint passed (all 4 gates)
+- > =10 missing capabilities identified
+- > =3 valuable patterns extracted
+- P1/P2/P3 roadmap created
+- > =3 quick wins identified (<4 hours each)
+
+**Status:** Plan created, ready for Phase 0 research execution
+
+---
+
+## [ADR-061] Transformation Strategy - Plugin Capabilities to Framework Artifacts (2026-01-29)
+
+**Context:**
+
+- User requested upgrade analysis comparing archived Claude Code Plugins marketplace (72 plugins, 108 agents, 129 skills) with our Agent-Studio Enterprise Framework
+- Initial plan focused on "gap analysis" and potential "adoption" of plugin patterns
+- User provided critical architectural constraints: Transform (not install), Update (not duplicate), Keep current architecture, Integration focus
+
+**Problem:**
+
+- Plugin marketplace uses granular, user-installable architecture (marketplace model)
+- Our system uses centralized, router-first architecture (enterprise orchestration model)
+- Direct adoption of plugin architecture conflicts with our governance model
+- Need strategy to extract VALUE without adopting incompatible architecture
+
+**Decision:**
+Adopt **Transformation Strategy** for upgrade analysis:
+
+1. **Transform, Don't Install**: Extract capabilities from plugins → transform into our artifact types (skills/agents/hooks/workflows/schemas)
+2. **Update, Don't Duplicate**: Prioritize enhancing EXISTING artifacts (>=60% overlap) over creating parallel systems
+3. **No Plugin Architecture**: Do NOT adopt plugin installation/isolation model unless proven significantly better
+4. **Keep Current Architecture**: Router-first, centralized governance, lazy-load MCP unchanged
+5. **Integration Focus**: Mine PATTERNS and CAPABILITIES, transform into OUR artifact types
+
+**Transformation Mapping Decision Tree:**
+
+```
+Plugin Component → Framework Artifact:
+├─ Capability/tool → UPDATE existing SKILL (>=60% overlap) OR CREATE new skill (unique domain)
+├─ Agent pattern → UPDATE existing AGENT (same role) OR CREATE new agent (distinct specialization)
+├─ Validation logic → EXTRACT to HOOK (.claude/hooks/)
+├─ Orchestration → EXTRACT to WORKFLOW (.claude/workflows/)
+├─ Data structure → EXTRACT to SCHEMA (.claude/schemas/)
+└─ Utility code → EXTRACT to LIB/TOOLS (.claude/lib/, .claude/tools/)
+```
+
+**Update vs Create Criteria:**
+
+- UPDATE if existing artifact covers >=60% of capability (maintain cohesion)
+- CREATE if new domain/specialization (clear separation of concerns)
+- EXTRACT if cross-cutting concern (hooks/workflows/schemas/utilities)
+
+**Alternatives Considered:**
+
+1. ❌ **Direct Plugin Port**: Copy plugin structure to our codebase → Incompatible with router-first governance
+2. ❌ **Plugin Installation Architecture**: Add plugin loader/isolation → Conflicts with centralized control model
+3. ❌ **Hybrid Plugin+Framework**: Support both models → Excessive complexity, governance confusion
+4. ✅ **Transformation Strategy** (CHOSEN): Extract capabilities, transform to our artifacts, preserve architecture
+
+**Consequences:**
+
+**Positive:**
+
+- Preserves router-first, centralized governance architecture
+- Enhances existing artifacts (maintains cohesion, avoids duplication)
+- Enables capability extraction without architectural changes
+- Clear prioritization: Updates (P1) → Creation (P2) → Patterns (P3)
+- Respects user's architectural constraints explicitly
+
+**Negative:**
+
+- Cannot adopt plugin granularity benefits (token efficiency from small plugins)
+- Transformation requires more effort than direct port (analysis + mapping + integration)
+- Some plugin patterns may not translate (if tightly coupled to marketplace architecture)
+
+**Risks:**
+
+- Risk: Transformation may miss valuable plugin patterns
+  - Mitigation: Phase 2 pattern extraction with transformation guidance
+- Risk: Updates to existing artifacts may introduce complexity
+  - Mitigation: 60% overlap threshold ensures updates are cohesive
+- Risk: Plugin architecture may prove superior for our use case
+  - Mitigation: "unless proven significantly better" escape clause allows re-evaluation
+
+**Implementation:**
+
+- Phase 0: Research transformation patterns (not plugin adoption)
+- Phase 1: Map capabilities to artifact types (skill/agent/hook/workflow/schema)
+- Phase 2: Extract patterns WITH transformation guidance
+- Phase 3: Prioritize: P1 (updates) → P2 (creation) → P3 (patterns)
+- Phase 4: Concrete transformation examples + quick wins
+
+**Status:** Accepted (plan refined with transformation strategy)
+**Date:** 2026-01-29
+**Supersedes:** ADR-060 (upgrade analysis plan) - refined with transformation focus
+
+---
