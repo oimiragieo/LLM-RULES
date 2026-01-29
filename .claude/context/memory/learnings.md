@@ -1,3 +1,50 @@
+## AI Slop File Prevention & Cleanup (2026-01-29)
+
+**Problem:** 4 malformed files created in root directory due to agents using absolute Windows paths
+
+**Root Cause:**
+- Agents used absolute paths like `C:\dev\projects\agent-studio\.claude\...`
+- File system mangled paths (removed colons, backslashes) → concatenated filenames
+- Result: Files like `C:devprojectsagent-studio.claudecontextartifactslint-fix-output.txt`
+
+**Files Removed:**
+1. `C:devprojectsagent-studio.claudecontextartifactslint-fix-output.txt`
+2. `C:devprojectsagent-studio.claudecontextartifactslint-report-final.txt`
+3. `C:devprojectsagent-studio.claudecontextartifactslint-report-initial.txt`
+4. `C:devprojectsagent-studio.claudecontextmemorylearnings.md`
+
+**Prevention Mechanisms Implemented:**
+
+1. **`.gitignore` Updates:**
+   - Added AI slop patterns: `C:*`, `C\:*`, `*devprojectsagent-studio*`
+   - Catches malformed absolute paths before they're committed
+
+2. **`CLAUDE.md` Enhancements:**
+   - Added clear examples in PROJECT CONTEXT section
+   - ✅ CORRECT: `.claude/context/artifacts/report.txt`
+   - ❌ WRONG: `C:\dev\projects\agent-studio\.claude\context\artifacts\report.txt`
+   - Emphasized: "DO NOT use absolute paths. ALWAYS use relative paths from PROJECT_ROOT."
+
+3. **`file-path-guard.cjs` Hook:**
+   - Location: `.claude/hooks/safety/file-path-guard.cjs`
+   - Blocks Write/Edit operations with absolute paths
+   - Detects AI slop patterns (drive letters, concatenated paths, URL-encoded colons)
+   - Validates relative path patterns (`.claude/`, `src/`, etc.)
+   - Enforcement: `block` (default), override via `FILE_PATH_GUARD=warn|off`
+
+**Lessons Learned:**
+- Agents should NEVER receive absolute paths in spawn prompts
+- Use relative paths from PROJECT_ROOT for all file operations
+- Hook enforcement prevents future occurrences at the tool use level
+- .gitignore provides second layer of defense (catch files before commit)
+
+**Pattern for Future:**
+- When spawning agents, always use relative paths in PROJECT_ROOT context
+- If agent creates unexpected files in root, check for absolute path usage
+- Use `FILE_PATH_GUARD=off` only in emergencies (not recommended)
+
+---
+
 ## ESLint Cleanup & Linting Issues Resolution (2026-01-29)
 
 **Task:** Run ESLint and fix all 1,415 linting issues reported in git status
