@@ -60,7 +60,7 @@ function startAgentSpan(agentId, operation, metadata = {}) {
   }
 
   // Set custom attributes from metadata (exclude taskId to avoid duplication)
-  Object.keys(metadata).forEach((key) => {
+  Object.keys(metadata).forEach(key => {
     if (key !== 'taskId') {
       span.setAttribute(key, metadata[key]);
     }

@@ -240,9 +240,7 @@ function executeTimeoutAction(agentId, limitType, action) {
 
     case 'terminate':
       // Log error (actual termination would be handled by caller)
-      console.error(
-        `[execution-limit-monitor] Agent ${agentId} terminated: ${limitType} exceeded`
-      );
+      console.error(`[execution-limit-monitor] Agent ${agentId} terminated: ${limitType} exceeded`);
       break;
 
     case 'pause':

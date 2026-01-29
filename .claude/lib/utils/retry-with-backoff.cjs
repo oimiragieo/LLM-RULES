@@ -33,11 +33,7 @@ const TRANSIENT_ERROR_CODES = new Set([
  * - TypeError: Type mismatch (programming error)
  * - ReferenceError: Undefined variable (programming error)
  */
-const PERMANENT_ERROR_TYPES = new Set([
-  'SyntaxError',
-  'TypeError',
-  'ReferenceError',
-]);
+const PERMANENT_ERROR_TYPES = new Set(['SyntaxError', 'TypeError', 'ReferenceError']);
 
 /**
  * Check if an error is transient (should be retried)
@@ -89,11 +85,7 @@ function isTransientError(error) {
  * );
  */
 async function retryWithBackoff(operation, options = {}) {
-  const {
-    maxRetries = 5,
-    baseDelay = 1000,
-    onRetry = null,
-  } = options;
+  const { maxRetries = 5, baseDelay = 1000, onRetry = null } = options;
 
   let lastError;
 
@@ -138,7 +130,7 @@ async function retryWithBackoff(operation, options = {}) {
  * @returns {Promise<void>}
  */
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 module.exports = {

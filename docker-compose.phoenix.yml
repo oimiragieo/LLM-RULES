@@ -39,20 +39,20 @@ services:
 
     ports:
       # Phoenix UI (web interface for trace visualization)
-      - "6006:6006"
+      - '6006:6006'
 
       # OTLP gRPC endpoint (primary telemetry ingestion)
-      - "4317:4317"
+      - '4317:4317'
 
       # OTLP HTTP endpoint (alternative telemetry ingestion)
-      - "4318:4318"
+      - '4318:4318'
 
     environment:
       # Phoenix server configuration
-      PHOENIX_PORT: "6006"
+      PHOENIX_PORT: '6006'
 
       # Enable OTLP receivers
-      PHOENIX_ENABLE_OTLP: "true"
+      PHOENIX_ENABLE_OTLP: 'true'
 
       # Data persistence path inside container
       PHOENIX_WORKING_DIR: /data
@@ -61,14 +61,14 @@ services:
       PHOENIX_LOG_LEVEL: info
 
       # Allow cross-origin requests for development
-      PHOENIX_ENABLE_CORS: "true"
+      PHOENIX_ENABLE_CORS: 'true'
 
     volumes:
       # Persist Phoenix data (traces, spans, metrics)
       - phoenix_data:/data
 
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:6006/healthz"]
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:6006/healthz']
       interval: 30s
       timeout: 10s
       retries: 3

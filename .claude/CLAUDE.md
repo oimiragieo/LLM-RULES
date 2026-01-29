@@ -296,10 +296,22 @@ Task({
 
 ## PROJECT CONTEXT (CRITICAL)
 PROJECT_ROOT: <absolute-path-to-project>
-All file operations MUST be relative to PROJECT_ROOT.
-- Agents: PROJECT_ROOT/.claude/agents/
-- Skills: PROJECT_ROOT/.claude/skills/
-- Context: PROJECT_ROOT/.claude/context/
+
+All file operations MUST use relative paths from PROJECT_ROOT.
+- Agents: .claude/agents/
+- Skills: .claude/skills/
+- Context: .claude/context/
+
+**Path Usage Rules:**
+✅ CORRECT: .claude/context/artifacts/report.txt
+✅ CORRECT: .claude/context/memory/learnings.md
+✅ CORRECT: src/components/Button.tsx
+
+❌ WRONG: C:\dev\projects\agent-studio\.claude\context\artifacts\report.txt
+❌ WRONG: C:/dev/projects/agent-studio/.claude/context/artifacts/report.txt
+❌ WRONG: /home/user/agent-studio/.claude/context/memory/learnings.md
+
+DO NOT use absolute paths. ALWAYS use relative paths from PROJECT_ROOT.
 DO NOT create files outside PROJECT_ROOT.
 
 ## Your Assigned Task

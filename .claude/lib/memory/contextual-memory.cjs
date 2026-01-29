@@ -148,7 +148,7 @@ class ContextualMemory {
       });
 
       // Format results with source metadata
-      return results.map((result) => ({
+      return results.map(result => ({
         content: result.content,
         metadata: result.metadata,
         similarity: result.similarity,

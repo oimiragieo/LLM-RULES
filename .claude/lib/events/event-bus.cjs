@@ -97,12 +97,10 @@ class EventBus {
    * @returns {Subscription}
    */
   once(eventType, handler) {
-    let subscription;
-    const wrapper = (payload) => {
+    const subscription = this.on(eventType, payload => {
       handler(payload);
       this.off(subscription);
-    };
-    subscription = this.on(eventType, wrapper);
+    });
     return subscription;
   }
 
@@ -130,7 +128,7 @@ class EventBus {
         reject(new Error(`Timeout waiting for ${eventType}`));
       }, timeout);
 
-      const subscription = this.once(eventType, (payload) => {
+      const subscription = this.once(eventType, payload => {
         clearTimeout(timer);
         resolve(payload);
       });

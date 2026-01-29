@@ -99,7 +99,9 @@ async function migrateMemory(options = {}) {
     console.log('\n[DRY RUN] No changes were saved to the database.');
     console.log('Run without --dry-run to perform actual migration.');
   } else {
-    console.log(`\nMigrated ${totalEntities} entities and ${totalRelationships} relationships to SQLite.`);
+    console.log(
+      `\nMigrated ${totalEntities} entities and ${totalRelationships} relationships to SQLite.`
+    );
   }
 
   results.entities = totalEntities;

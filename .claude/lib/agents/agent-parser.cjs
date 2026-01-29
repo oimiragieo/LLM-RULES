@@ -32,9 +32,9 @@ class AgentParser {
 
     // Initialize AJV validator
     this.ajv = new Ajv({
-      allErrors: true,   // Collect all errors
-      verbose: true,     // Include schema and data in errors
-      strict: false,     // Allow non-standard keywords like "version"
+      allErrors: true, // Collect all errors
+      verbose: true, // Include schema and data in errors
+      strict: false, // Allow non-standard keywords like "version"
     });
     this.validateIdentityFn = this.ajv.compile(this.identitySchema);
   }

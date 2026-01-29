@@ -157,7 +157,9 @@ async function processFile(filePath, options, vectorStore) {
   const chunks = chunkByHeaders(content, filePath);
 
   if (options.dryRun) {
-    console.log(`  [DRY RUN] Would process ${chunks.length} chunks from ${path.basename(filePath)}`);
+    console.log(
+      `  [DRY RUN] Would process ${chunks.length} chunks from ${path.basename(filePath)}`
+    );
     return chunks.length;
   }
 
@@ -273,7 +275,7 @@ module.exports = {
 
 // Run if executed directly
 if (require.main === module) {
-  main().catch((error) => {
+  main().catch(error => {
     console.error('ERROR:', error.message);
     process.exit(1);
   });

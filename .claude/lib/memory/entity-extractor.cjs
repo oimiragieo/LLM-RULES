@@ -168,7 +168,7 @@ class EntityExtractor {
         entity.content || null,
         entity.source_file,
         entity.line_number || null,
-        entity.id, // For COALESCE to preserve created_at
+        entity.id // For COALESCE to preserve created_at
       );
     }
   }
@@ -439,7 +439,7 @@ class EntityExtractor {
       let taskDesc = '';
       const descPattern = new RegExp(
         `Task #?${taskNumber}(?:\\s+\\([^)]+\\))?[:\\s-]+([^\\n]+?)(?:\\n|$)`,
-        'i',
+        'i'
       );
       const descMatch = fullContent.match(descPattern);
       if (descMatch) {

@@ -143,6 +143,7 @@ const SAFE_COMMANDS_ALLOWLIST = [
 
   // Development tools (essential for agent operations)
   'git',
+  'gh', // GitHub CLI (approved for PR creation)
   'npm',
   'pnpm',
   'yarn',

@@ -113,12 +113,7 @@ const MEMORY_EVENTS = [
   'MEMORY_INDEXED',
 ];
 
-const LLM_EVENTS = [
-  'LLM_CALLED',
-  'LLM_COMPLETED',
-  'LLM_FAILED',
-  'LLM_CACHED',
-];
+const LLM_EVENTS = ['LLM_CALLED', 'LLM_COMPLETED', 'LLM_FAILED', 'LLM_CACHED'];
 
 const MCP_EVENTS = [
   'MCP_TOOL_DISCOVERED',
@@ -143,6 +138,7 @@ const MCP_EVENTS = [
  * @param {object} payload - Event payload
  * @returns {{valid: boolean, errors?: array}} Validation result
  */
+// eslint-disable-next-line complexity
 function validateEvent(eventType, payload) {
   try {
     // Validate event type is known
@@ -183,13 +179,18 @@ function validateEvent(eventType, payload) {
 
     // Agent events
     if (AGENT_EVENTS.includes(eventType)) {
-      if (!payload.agentId) errors.push({ path: '/agentId', message: 'agentId is required for agent events' });
-      if (!payload.agentType) errors.push({ path: '/agentType', message: 'agentType is required for agent events' });
-      if (!payload.taskId) errors.push({ path: '/taskId', message: 'taskId is required for agent events' });
+      if (!payload.agentId)
+        errors.push({ path: '/agentId', message: 'agentId is required for agent events' });
+      if (!payload.agentType)
+        errors.push({ path: '/agentType', message: 'agentType is required for agent events' });
+      if (!payload.taskId)
+        errors.push({ path: '/taskId', message: 'taskId is required for agent events' });
 
       if (eventType === 'AGENT_COMPLETED') {
-        if (payload.duration === undefined) errors.push({ path: '/duration', message: 'duration is required' });
-        if (payload.result === undefined) errors.push({ path: '/result', message: 'result is required' });
+        if (payload.duration === undefined)
+          errors.push({ path: '/duration', message: 'duration is required' });
+        if (payload.result === undefined)
+          errors.push({ path: '/result', message: 'result is required' });
       }
 
       if (eventType === 'AGENT_FAILED') {
@@ -199,11 +200,13 @@ function validateEvent(eventType, payload) {
 
     // Task events
     if (TASK_EVENTS.includes(eventType)) {
-      if (!payload.taskId) errors.push({ path: '/taskId', message: 'taskId is required for task events' });
+      if (!payload.taskId)
+        errors.push({ path: '/taskId', message: 'taskId is required for task events' });
 
       if (eventType === 'TASK_CREATED') {
         if (!payload.subject) errors.push({ path: '/subject', message: 'subject is required' });
-        if (!payload.description) errors.push({ path: '/description', message: 'description is required' });
+        if (!payload.description)
+          errors.push({ path: '/description', message: 'description is required' });
       }
 
       if (eventType === 'TASK_UPDATED') {
@@ -211,24 +214,30 @@ function validateEvent(eventType, payload) {
       }
 
       if (eventType === 'TASK_COMPLETED') {
-        if (payload.result === undefined) errors.push({ path: '/result', message: 'result is required' });
-        if (payload.duration === undefined) errors.push({ path: '/duration', message: 'duration is required' });
+        if (payload.result === undefined)
+          errors.push({ path: '/result', message: 'result is required' });
+        if (payload.duration === undefined)
+          errors.push({ path: '/duration', message: 'duration is required' });
       }
     }
 
     // Tool events
     if (TOOL_EVENTS.includes(eventType)) {
-      if (!payload.toolName) errors.push({ path: '/toolName', message: 'toolName is required for tool events' });
+      if (!payload.toolName)
+        errors.push({ path: '/toolName', message: 'toolName is required for tool events' });
 
       if (eventType === 'TOOL_INVOKED') {
-        if (payload.input === undefined) errors.push({ path: '/input', message: 'input is required' });
+        if (payload.input === undefined)
+          errors.push({ path: '/input', message: 'input is required' });
         if (!payload.agentId) errors.push({ path: '/agentId', message: 'agentId is required' });
         if (!payload.taskId) errors.push({ path: '/taskId', message: 'taskId is required' });
       }
 
       if (eventType === 'TOOL_COMPLETED') {
-        if (payload.output === undefined) errors.push({ path: '/output', message: 'output is required' });
-        if (payload.duration === undefined) errors.push({ path: '/duration', message: 'duration is required' });
+        if (payload.output === undefined)
+          errors.push({ path: '/output', message: 'output is required' });
+        if (payload.duration === undefined)
+          errors.push({ path: '/duration', message: 'duration is required' });
       }
 
       if (eventType === 'TOOL_FAILED') {
@@ -240,36 +249,45 @@ function validateEvent(eventType, payload) {
     if (MEMORY_EVENTS.includes(eventType)) {
       if (eventType === 'MEMORY_SAVED') {
         if (!payload.key) errors.push({ path: '/key', message: 'key is required' });
-        if (payload.value === undefined) errors.push({ path: '/value', message: 'value is required' });
+        if (payload.value === undefined)
+          errors.push({ path: '/value', message: 'value is required' });
         if (!payload.source) errors.push({ path: '/source', message: 'source is required' });
       }
 
       if (eventType === 'MEMORY_QUERIED') {
         if (!payload.query) errors.push({ path: '/query', message: 'query is required' });
-        if (payload.results === undefined) errors.push({ path: '/results', message: 'results is required' });
-        if (payload.latency === undefined) errors.push({ path: '/latency', message: 'latency is required' });
+        if (payload.results === undefined)
+          errors.push({ path: '/results', message: 'results is required' });
+        if (payload.latency === undefined)
+          errors.push({ path: '/latency', message: 'latency is required' });
       }
     }
 
     // LLM events
     if (LLM_EVENTS.includes(eventType)) {
-      if (!payload.model) errors.push({ path: '/model', message: 'model is required for LLM events' });
+      if (!payload.model)
+        errors.push({ path: '/model', message: 'model is required for LLM events' });
 
       if (eventType === 'LLM_CALLED') {
-        if (payload.promptTokens === undefined) errors.push({ path: '/promptTokens', message: 'promptTokens is required' });
+        if (payload.promptTokens === undefined)
+          errors.push({ path: '/promptTokens', message: 'promptTokens is required' });
       }
 
       if (eventType === 'LLM_COMPLETED') {
-        if (payload.completionTokens === undefined) errors.push({ path: '/completionTokens', message: 'completionTokens is required' });
-        if (payload.totalTokens === undefined) errors.push({ path: '/totalTokens', message: 'totalTokens is required' });
-        if (payload.latency === undefined) errors.push({ path: '/latency', message: 'latency is required' });
+        if (payload.completionTokens === undefined)
+          errors.push({ path: '/completionTokens', message: 'completionTokens is required' });
+        if (payload.totalTokens === undefined)
+          errors.push({ path: '/totalTokens', message: 'totalTokens is required' });
+        if (payload.latency === undefined)
+          errors.push({ path: '/latency', message: 'latency is required' });
         if (payload.cost === undefined) errors.push({ path: '/cost', message: 'cost is required' });
       }
     }
 
     // MCP events
     if (MCP_EVENTS.includes(eventType)) {
-      if (!payload.server) errors.push({ path: '/server', message: 'server is required for MCP events' });
+      if (!payload.server)
+        errors.push({ path: '/server', message: 'server is required for MCP events' });
 
       if (eventType === 'MCP_TOOL_DISCOVERED') {
         if (!payload.toolName) errors.push({ path: '/toolName', message: 'toolName is required' });
@@ -277,7 +295,8 @@ function validateEvent(eventType, payload) {
 
       if (eventType === 'MCP_TOOL_INVOKED') {
         if (!payload.toolName) errors.push({ path: '/toolName', message: 'toolName is required' });
-        if (payload.input === undefined) errors.push({ path: '/input', message: 'input is required' });
+        if (payload.input === undefined)
+          errors.push({ path: '/input', message: 'input is required' });
         if (!payload.agentId) errors.push({ path: '/agentId', message: 'agentId is required' });
       }
     }

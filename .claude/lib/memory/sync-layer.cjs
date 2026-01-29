@@ -102,7 +102,7 @@ class SyncLayer extends EventEmitter {
       }
 
       // Start watching
-      const watcher = fs.watch(filePath, (eventType) => {
+      const watcher = fs.watch(filePath, eventType => {
         if (eventType === 'change') {
           this._handleFileChange(filePath);
         }

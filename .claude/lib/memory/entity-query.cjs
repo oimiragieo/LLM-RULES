@@ -243,7 +243,7 @@ class EntityQuery {
     const rows = stmt.all(...params);
 
     // Format results: {entity, relationship_type, weight}
-    const results = rows.map((row) => {
+    const results = rows.map(row => {
       const { relationship_type, weight, ...entityFields } = row;
       return {
         entity: entityFields,
@@ -394,7 +394,7 @@ class EntityQuery {
     const rows = stmt.all(entityId, entityId);
 
     // Format: {to_entity: {id, type, name}, type, weight}
-    const relationships = rows.map((row) => ({
+    const relationships = rows.map(row => ({
       to_entity: {
         id: row.to_entity_id,
         type: row.to_entity_type,

@@ -53,9 +53,7 @@ class FeatureFlags {
    */
   _registerFeature(name, enabled, rolloutPercentage) {
     if (rolloutPercentage < 0 || rolloutPercentage > 100) {
-      throw new Error(
-        `Rollout percentage must be between 0 and 100, got ${rolloutPercentage}`
-      );
+      throw new Error(`Rollout percentage must be between 0 and 100, got ${rolloutPercentage}`);
     }
 
     this.flags.set(name, enabled);
@@ -75,9 +73,7 @@ class FeatureFlags {
 
     const parsed = parseInt(value, 10);
     if (isNaN(parsed)) {
-      console.warn(
-        `Invalid percentage value "${value}", defaulting to ${defaultValue}`
-      );
+      console.warn(`Invalid percentage value "${value}", defaulting to ${defaultValue}`);
       return defaultValue;
     }
 
@@ -160,9 +156,7 @@ class FeatureFlags {
    * @param {string} reason - Reason for rollback
    */
   rollback(featureName, reason) {
-    console.warn(
-      `[ROLLBACK] Disabling feature "${featureName}": ${reason}`
-    );
+    console.warn(`[ROLLBACK] Disabling feature "${featureName}": ${reason}`);
 
     // Disable feature
     this.flags.set(featureName, false);

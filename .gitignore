@@ -152,3 +152,9 @@ yarn.lock
 
 # Archive folder (old .claude backup)
 .claude.archive/
+
+# AI slop files (malformed absolute paths from agents)
+# Agents using absolute paths like C:\dev\... create concatenated filenames
+C:*
+C\:*
+*devprojectsagent-studio*

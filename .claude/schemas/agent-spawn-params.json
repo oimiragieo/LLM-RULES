@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft-07/schema#",
   "title": "Agent Spawn Parameters Schema",
   "description": "JSON Schema for validating agent spawn parameters including execution limits for Task() invocations",
   "type": "object",
@@ -33,9 +33,7 @@
       "items": {
         "type": "string"
       },
-      "examples": [
-        ["Read", "Write", "Edit", "Bash", "TaskUpdate", "TaskList", "Skill"]
-      ]
+      "examples": [["Read", "Write", "Edit", "Bash", "TaskUpdate", "TaskList", "Skill"]]
     },
     "prompt": {
       "type": "string",

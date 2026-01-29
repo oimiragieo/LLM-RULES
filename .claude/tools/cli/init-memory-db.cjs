@@ -13,8 +13,7 @@ const fs = require('fs');
  */
 function initializeDatabase(dbOrPath) {
   // Handle both database instance and path
-  const db =
-    typeof dbOrPath === 'string' ? new Database(dbOrPath) : dbOrPath;
+  const db = typeof dbOrPath === 'string' ? new Database(dbOrPath) : dbOrPath;
 
   // Enable foreign key constraints
   db.pragma('foreign_keys = ON');
@@ -26,7 +25,7 @@ function initializeDatabase(dbOrPath) {
       `
     SELECT name FROM sqlite_master
     WHERE type='table' AND name='schema_version'
-  `,
+  `
     )
     .get();
 
@@ -116,11 +115,8 @@ function initializeDatabase(dbOrPath) {
       `
       INSERT INTO schema_version (version, description)
       VALUES (?, ?)
-    `,
-    ).run(
-      1,
-      'Initial entity schema with entities, relationships, and attributes',
-    );
+    `
+    ).run(1, 'Initial entity schema with entities, relationships, and attributes');
   });
 
   // Run the transaction
@@ -187,16 +183,14 @@ Examples:
       SELECT name FROM sqlite_master
       WHERE type='table'
       ORDER BY name
-    `,
+    `
       )
       .all();
 
     console.log('\nVerification:');
-    console.log('Tables:', tables.map((t) => t.name).join(', '));
+    console.log('Tables:', tables.map(t => t.name).join(', '));
 
-    const version = db
-      .prepare('SELECT version, description FROM schema_version')
-      .get();
+    const version = db.prepare('SELECT version, description FROM schema_version').get();
     console.log(`Schema version: ${version.version}`);
     console.log(`Description: ${version.description}`);
 

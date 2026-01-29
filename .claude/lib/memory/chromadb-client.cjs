@@ -49,10 +49,12 @@ class MemoryVectorStore {
   constructor(config = {}) {
     // Merge config with environment variables
     this.config = {
-      persistDirectory: config.persistDirectory || process.env.CHROMADB_PERSIST_DIR || '.claude/data/chromadb',
-      collectionName: config.collectionName || process.env.CHROMADB_COLLECTION || 'agent-studio-memory',
+      persistDirectory:
+        config.persistDirectory || process.env.CHROMADB_PERSIST_DIR || '.claude/data/chromadb',
+      collectionName:
+        config.collectionName || process.env.CHROMADB_COLLECTION || 'agent-studio-memory',
       host: config.host || process.env.CHROMADB_HOST,
-      port: config.port || process.env.CHROMADB_PORT
+      port: config.port || process.env.CHROMADB_PORT,
     };
 
     this.client = null;
@@ -104,7 +106,7 @@ class MemoryVectorStore {
       //
       // For production (Task #27), configure with proper endpoint
       this.client = new ChromaClient({
-        path: this.config.host || undefined // Use undefined for default localhost
+        path: this.config.host || undefined, // Use undefined for default localhost
       });
 
       // Create embedding function for collection
@@ -144,7 +146,7 @@ class MemoryVectorStore {
       // For testing, we use default embedding function (cosine similarity)
       // In production (Task #27), we'll add proper OpenAI embedding function
       const collectionConfig = {
-        name: this.config.collectionName
+        name: this.config.collectionName,
       };
 
       // Add embedding function if available
@@ -207,11 +209,7 @@ class MemoryVectorStore {
     }
 
     // Default options
-    const {
-      limit = 10,
-      minScore = 0.5,
-      filters = null
-    } = options;
+    const { limit = 10, minScore = 0.5, filters = null } = options;
 
     try {
       // Get collection
@@ -220,7 +218,7 @@ class MemoryVectorStore {
       // Prepare query parameters
       const queryParams = {
         queryTexts: [query],
-        nResults: limit
+        nResults: limit,
       };
 
       // Add metadata filters if provided
@@ -248,7 +246,7 @@ class MemoryVectorStore {
               id: results.ids[0][i],
               content: results.documents[0][i],
               metadata: results.metadatas[0][i],
-              similarity: similarity
+              similarity: similarity,
             });
           }
         }
