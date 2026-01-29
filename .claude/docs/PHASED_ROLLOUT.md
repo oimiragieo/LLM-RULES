@@ -30,17 +30,20 @@ This document describes the phased rollout system for the hybrid memory system (
 **Objective**: Validate production stability with limited exposure
 
 **Configuration**:
+
 ```bash
 MEMORY_SYSTEM_ENABLED=true
 MEMORY_ROLLOUT_PERCENTAGE=10
 ```
 
 **Expected Behavior**:
+
 - ~10% of sessions use hybrid memory system
 - ~90% of sessions use legacy file-based system
 - Assignment is stable per session (same session = same result)
 
 **Validation**:
+
 - Monitor error rates (target: <0.1%)
 - Check latency (p50 <10ms, p99 <50ms)
 - Verify no data loss
@@ -49,12 +52,14 @@ MEMORY_ROLLOUT_PERCENTAGE=10
 **Duration**: 1-2 days minimum
 
 **Success Criteria**:
+
 - Zero data loss incidents
 - Error rate within acceptable limits (<0.1%)
 - Latency targets met
 - No critical bugs
 
 **Rollback**:
+
 ```javascript
 const { FeatureFlags } = require('./.claude/lib/utils/feature-flags.cjs');
 const flags = new FeatureFlags();
@@ -66,17 +71,20 @@ flags.rollback('memory_system', 'Critical bug: <description>');
 **Objective**: Validate at scale, stress-test infrastructure
 
 **Configuration**:
+
 ```bash
 MEMORY_SYSTEM_ENABLED=true
 MEMORY_ROLLOUT_PERCENTAGE=50
 ```
 
 **Expected Behavior**:
+
 - ~50% of sessions use hybrid memory system
 - ~50% of sessions use legacy system (control group)
 - Assignment remains stable per session
 
 **Validation**:
+
 - Monitor performance under load
 - Compare metrics between hybrid and legacy (A/B test)
 - Verify ChromaDB handles concurrent queries
@@ -85,12 +93,14 @@ MEMORY_ROLLOUT_PERCENTAGE=50
 **Duration**: 3-5 days minimum
 
 **Success Criteria**:
+
 - Performance equal or better than legacy
 - ChromaDB stable under load
 - SQLite scaling acceptable
 - Positive user feedback
 
 **Rollback**:
+
 ```bash
 # Emergency disable (environment variable)
 MEMORY_ROLLOUT_PERCENTAGE=0
@@ -104,21 +114,25 @@ flags.rollback('memory_system', 'Performance degradation detected');
 **Objective**: Full production deployment
 
 **Configuration**:
+
 ```bash
 MEMORY_SYSTEM_ENABLED=true
 MEMORY_ROLLOUT_PERCENTAGE=100
 ```
 
 **Expected Behavior**:
+
 - All sessions use hybrid memory system
 - Legacy system deprecated (but available for rollback)
 
 **Validation**:
+
 - Monitor for 1-2 weeks
 - Gradual legacy system deprecation
 - Document migration complete
 
 **Success Criteria**:
+
 - All users migrated successfully
 - Performance targets maintained at 100%
 - Zero rollbacks needed
@@ -216,11 +230,13 @@ The rollout uses consistent hashing to ensure stable assignment:
 6. **Assign**: If hash < rollout percentage, enable feature
 
 **Properties**:
+
 - Same session ID always gets same assignment
 - Distribution is uniform across 0-99 range
 - No sudden changes when percentage increases
 
 **Example**:
+
 ```javascript
 // Session: "user-123", Feature: "memory_system"
 // Input: "memory_system:user-123"
@@ -240,6 +256,7 @@ npm test -- tests/unit/utils/feature-flags.test.mjs
 ```
 
 **Coverage**:
+
 - Construction and configuration (6 tests)
 - Phased rollout logic (8 tests)
 - Rollback procedure (3 tests)
@@ -294,6 +311,7 @@ done | grep true | wc -l
 ### Dashboards
 
 **Feature Flag Status**:
+
 ```bash
 node -e "
   const { FeatureFlags } = require('./.claude/lib/utils/feature-flags.cjs');
@@ -303,6 +321,7 @@ node -e "
 ```
 
 **Rollout Distribution**:
+
 ```bash
 # Check how many sessions are enabled (sample 1000)
 node .claude/tools/cli/rollout-distribution.cjs --feature memory_system --samples 1000
@@ -318,6 +337,7 @@ node .claude/tools/cli/rollout-distribution.cjs --feature memory_system --sample
 **When**: Critical bug, data loss, or production incident
 
 **Action**:
+
 ```bash
 # 1. Disable via environment variable (fastest)
 export MEMORY_ROLLOUT_PERCENTAGE=0
@@ -340,6 +360,7 @@ node -e "
 **When**: Performance degradation affects subset of users
 
 **Action**:
+
 ```bash
 # Reduce rollout percentage
 export MEMORY_ROLLOUT_PERCENTAGE=10  # Down from 50%
@@ -350,6 +371,7 @@ export MEMORY_ROLLOUT_PERCENTAGE=10  # Down from 50%
 ### Gradual Re-Enable
 
 **After fix deployed**:
+
 ```bash
 # Day 1: Test fix with 1%
 export MEMORY_ROLLOUT_PERCENTAGE=1

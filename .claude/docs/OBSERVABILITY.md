@@ -47,6 +47,7 @@ This document describes the observability infrastructure for Agent Studio using 
 **Purpose**: Centralized OpenTelemetry SDK initialization with lazy loading.
 
 **Key Features**:
+
 - Lazy initialization (only initializes when `init()` is called)
 - Environment-based configuration (OTEL_ENABLED, OTEL_EXPORTER_OTLP_ENDPOINT)
 - Graceful degradation (returns no-op tracer when disabled)
@@ -65,7 +66,7 @@ const result = await telemetryClient.init();
 const tracer = telemetryClient.getTracer();
 
 // Use tracer for instrumentation
-tracer.startActiveSpan('my-operation', async (span) => {
+tracer.startActiveSpan('my-operation', async span => {
   span.setAttribute('operation.type', 'task-spawn');
   try {
     // ... operation ...
@@ -86,17 +87,18 @@ await telemetryClient.shutdown();
 
 ### Environment Variables
 
-| Variable | Type | Default | Description |
-|----------|------|---------|-------------|
-| `OTEL_ENABLED` | boolean | `false` | Enable/disable OpenTelemetry SDK |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | string | `http://localhost:4317` | OTLP endpoint URL (Arize Phoenix) |
-| `OTEL_BATCH_SIZE` | number | `512` | Max spans per batch (BatchSpanProcessor) |
-| `OTEL_BATCH_TIMEOUT` | number | `5000` | Batch interval in milliseconds |
-| `AGENT_STUDIO_ENV` | string | `development` | Environment name (development\|staging\|production) |
+| Variable                      | Type    | Default                 | Description                                         |
+| ----------------------------- | ------- | ----------------------- | --------------------------------------------------- |
+| `OTEL_ENABLED`                | boolean | `false`                 | Enable/disable OpenTelemetry SDK                    |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | string  | `http://localhost:4317` | OTLP endpoint URL (Arize Phoenix)                   |
+| `OTEL_BATCH_SIZE`             | number  | `512`                   | Max spans per batch (BatchSpanProcessor)            |
+| `OTEL_BATCH_TIMEOUT`          | number  | `5000`                  | Batch interval in milliseconds                      |
+| `AGENT_STUDIO_ENV`            | string  | `development`           | Environment name (development\|staging\|production) |
 
 ### Setup
 
 1. **Enable OpenTelemetry**:
+
    ```bash
    export OTEL_ENABLED=true
    export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
@@ -106,6 +108,7 @@ await telemetryClient.shutdown();
    ```
 
 2. **Initialize in your application**:
+
    ```javascript
    const telemetryClient = require('./.claude/lib/observability/telemetry-client.cjs');
    await telemetryClient.init();
@@ -130,8 +133,8 @@ services:
   phoenix:
     image: arizephoenix/phoenix:latest
     ports:
-      - "6006:6006"  # Phoenix UI
-      - "4317:4317"  # OTLP gRPC
+      - '6006:6006' # Phoenix UI
+      - '4317:4317' # OTLP gRPC
     environment:
       - PHOENIX_WORKING_DIR=/phoenix
     volumes:
@@ -143,6 +146,7 @@ volumes:
 ```
 
 **Start Phoenix**:
+
 ```bash
 cd .claude/deployments/phoenix
 docker-compose up -d
@@ -171,6 +175,7 @@ The `agent-instrumentation.cjs` helper provides a simplified API for instrumenti
 **Location**: `.claude/lib/observability/agent-instrumentation.cjs`
 
 **Key Features**:
+
 - Automatic span creation with agent metadata
 - Parent-child span relationships (trace propagation)
 - Error handling and exception recording
@@ -183,6 +188,7 @@ The `agent-instrumentation.cjs` helper provides a simplified API for instrumenti
 Creates a span for an agent operation.
 
 **Parameters**:
+
 - `agentId` (string): Agent identifier (e.g., 'developer-123', 'planner-456')
 - `operation` (string): Operation name (e.g., 'task-execution', 'skill-invocation')
 - `metadata` (object, optional): Additional attributes (taskId, custom attributes)
@@ -190,16 +196,20 @@ Creates a span for an agent operation.
 **Returns**: Span object with `end()`, `setAttribute()`, `setStatus()`, `recordException()` methods
 
 **Span Attributes** (automatically set):
+
 - `agent.id`: Full agent identifier
 - `agent.type`: Extracted from agentId (before hyphen)
 - `operation.name`: Operation being performed
 - `task.id`: Task ID (if provided in metadata)
 
 **Example**:
+
 ```javascript
 const agentInstrumentation = require('./.claude/lib/observability/agent-instrumentation.cjs');
 
-const span = agentInstrumentation.startAgentSpan('developer-123', 'task-execution', { taskId: 'task-789' });
+const span = agentInstrumentation.startAgentSpan('developer-123', 'task-execution', {
+  taskId: 'task-789',
+});
 
 try {
   // ... do work ...
@@ -218,12 +228,14 @@ try {
 Ends a span with result status and error handling.
 
 **Parameters**:
+
 - `span` (object): Span object from `startAgentSpan()`
 - `result` (object): Operation result with status and optional error
   - `result.status` (string): 'success' or 'error'
   - `result.error` (Error, optional): Error object (if status is 'error')
 
 **Example**:
+
 ```javascript
 const span = agentInstrumentation.startAgentSpan('developer-123', 'task-execution');
 
@@ -240,6 +252,7 @@ try {
 Executes a function within an agent span with automatic cleanup.
 
 **Parameters**:
+
 - `agentId` (string): Agent identifier
 - `operation` (string): Operation name
 - `fn` (function): Function to execute (sync or async)
@@ -248,6 +261,7 @@ Executes a function within an agent span with automatic cleanup.
 **Returns**: Promise resolving to function result
 
 **Example**:
+
 ```javascript
 const result = await agentInstrumentation.withAgentSpan(
   'developer-123',
@@ -296,6 +310,7 @@ const result = await agentInstrumentation.withAgentSpan(
 ```
 
 **Trace Hierarchy**:
+
 ```
 router.route-request (parent)
   ├─ planner.create-plan (child 1)
@@ -311,7 +326,7 @@ const telemetryClient = require('./.claude/lib/observability/telemetry-client.cj
 const tracer = telemetryClient.getTracer();
 
 async function processTask(taskId) {
-  return tracer.startActiveSpan('process-task', async (span) => {
+  return tracer.startActiveSpan('process-task', async span => {
     span.setAttribute('task.id', taskId);
 
     try {
@@ -333,7 +348,7 @@ async function processTask(taskId) {
 
 ```javascript
 async function parentOperation() {
-  return tracer.startActiveSpan('parent-operation', async (parentSpan) => {
+  return tracer.startActiveSpan('parent-operation', async parentSpan => {
     parentSpan.setAttribute('operation.type', 'orchestration');
 
     // Child span inherits parent context automatically
@@ -344,7 +359,7 @@ async function parentOperation() {
 }
 
 async function childOperation() {
-  return tracer.startActiveSpan('child-operation', async (childSpan) => {
+  return tracer.startActiveSpan('child-operation', async childSpan => {
     childSpan.setAttribute('operation.type', 'task-execution');
     // ... work ...
     childSpan.end();
@@ -358,7 +373,7 @@ async function childOperation() {
 try {
   await riskyOperation();
 } catch (error) {
-  tracer.startActiveSpan('error-handler', (span) => {
+  tracer.startActiveSpan('error-handler', span => {
     span.recordException(error);
     span.setAttribute('error.handled', true);
     span.setStatus({ code: SpanStatusCode.ERROR });
@@ -370,19 +385,21 @@ try {
 ## Graceful Degradation
 
 When `OTEL_ENABLED=false`, the telemetry client:
+
 - Returns `{initialized: false, enabled: false}` from `init()`
 - Returns no-op tracer from `getTracer()`
 - No-op operations have no performance overhead
 - Applications continue to work normally
 
 **Example**:
+
 ```javascript
 // OTEL_ENABLED=false
 const telemetryClient = require('./.claude/lib/observability/telemetry-client.cjs');
 await telemetryClient.init(); // Returns {initialized: false, enabled: false}
 
 const tracer = telemetryClient.getTracer(); // Returns no-op tracer
-tracer.startActiveSpan('operation', async (span) => {
+tracer.startActiveSpan('operation', async span => {
   // This still works but does nothing
   span.setAttribute('key', 'value');
   span.end();
@@ -394,6 +411,7 @@ tracer.startActiveSpan('operation', async (span) => {
 ### Overhead
 
 With OpenTelemetry enabled:
+
 - **Target**: <10% overhead with 10% sampling
 - **Actual** (validated): 5-10% with batch processing
 
@@ -413,11 +431,13 @@ With OpenTelemetry enabled:
 **Symptom**: `init()` returns `{initialized: false, error: "..."}`
 
 **Causes**:
+
 - OTLP endpoint unreachable
 - Network connectivity issues
 - Missing dependencies
 
 **Debug**:
+
 ```bash
 OTEL_ENABLED=true node -e "
   const tc = require('./.claude/lib/observability/telemetry-client.cjs');
@@ -428,6 +448,7 @@ OTEL_ENABLED=true node -e "
 ### Traces Not Appearing in Phoenix
 
 **Checklist**:
+
 1. Phoenix running? `curl http://localhost:6006/health`
 2. OTEL_ENABLED=true? `echo $OTEL_ENABLED`
 3. OTLP endpoint correct? `echo $OTEL_EXPORTER_OTLP_ENDPOINT`
@@ -441,6 +462,7 @@ OTEL_ENABLED=true node -e "
 **Location**: `tests/unit/observability/telemetry-init.test.mjs`
 
 **Coverage**:
+
 - Module exports (init, getTracer, shutdown)
 - Lazy initialization (OTEL_ENABLED=true)
 - Graceful degradation (OTEL_ENABLED=false)
@@ -449,11 +471,13 @@ OTEL_ENABLED=true node -e "
 - Error handling
 
 **Run tests**:
+
 ```bash
 node --test tests/unit/observability/telemetry-init.test.mjs
 ```
 
 **Expected output**:
+
 ```
 # tests 14
 # pass 14
@@ -481,6 +505,7 @@ See `.claude/context/artifacts/specs/event-bus-integration-spec.md` for full spe
 ## Roadmap
 
 ### ✅ Completed (Tasks #41, #42, #44)
+
 - ✅ OpenTelemetry SDK installation (Task #41)
 - ✅ telemetry-client.cjs with lazy initialization (Task #41)
 - ✅ BatchSpanProcessor configuration (Task #42)
@@ -497,6 +522,7 @@ See `.claude/context/artifacts/specs/event-bus-integration-spec.md` for full spe
 - ✅ Documentation updates
 
 ### 🔜 Next Steps (Task #45, #43, #47)
+
 - [ ] Modify hooks to emit events - Task #45
 - [ ] Integration tests (hooks + events) - Task #43
 - [ ] Deploy Arize Phoenix (Docker) - Task #47

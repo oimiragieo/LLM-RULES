@@ -96,12 +96,12 @@ Agent(
 
 **Trade-offs:**
 
-| Approach | Pros | Cons | Decision |
-|----------|------|------|----------|
-| **Required fields** (crewAI-style) | Enforced consistency | Breaking change for 45+ agents | ❌ Rejected |
-| **Optional fields** (recommended) | Backward compatible, gradual adoption | Some agents won't have identity | ✅ Adopted |
-| **Separate identity file** | Clean separation | More files to manage | ❌ Rejected |
-| **YAML frontmatter** | Extends existing format | Limited validation in YAML | ✅ Adopted |
+| Approach                           | Pros                                  | Cons                            | Decision    |
+| ---------------------------------- | ------------------------------------- | ------------------------------- | ----------- |
+| **Required fields** (crewAI-style) | Enforced consistency                  | Breaking change for 45+ agents  | ❌ Rejected |
+| **Optional fields** (recommended)  | Backward compatible, gradual adoption | Some agents won't have identity | ✅ Adopted  |
+| **Separate identity file**         | Clean separation                      | More files to manage            | ❌ Rejected |
+| **YAML frontmatter**               | Extends existing format               | Limited validation in YAML      | ✅ Adopted  |
 
 **Decision:** Optional YAML frontmatter fields with JSON Schema validation.
 
@@ -118,10 +118,12 @@ Agent(
 **Type:** String (required in schema, optional in practice)
 **Description:** Professional role or title the agent embodies
 **Constraints:**
+
 - 5-100 characters
 - Should be a noun phrase (not a verb phrase)
 
 **Examples:**
+
 - ✅ "Senior Software Engineer"
 - ✅ "Strategic Project Manager"
 - ✅ "Quality Gatekeeper"
@@ -135,11 +137,13 @@ Agent(
 **Type:** String (required in schema, optional in practice)
 **Description:** Primary objective the agent pursues
 **Constraints:**
+
 - 10-300 characters
 - Present tense, imperative style
 - Action-oriented and outcome-focused
 
 **Examples:**
+
 - ✅ "Write clean, tested, efficient code following TDD principles"
 - ✅ "Create robust implementation plans that any developer can follow"
 - ✅ "Break the code before users do through comprehensive testing"
@@ -153,11 +157,13 @@ Agent(
 **Type:** String (required in schema, optional in practice)
 **Description:** Professional history and experience informing expertise
 **Constraints:**
+
 - 20-1000 characters
 - Second person ("You are...", "You've spent...")
 - Establishes credibility and context
 
 **Examples:**
+
 - ✅ "You've spent 15 years mastering software craftsmanship, with deep expertise in test-driven development and clean code principles."
 - ✅ "You're a veteran project manager who has planned and executed dozens of complex software initiatives."
 - ❌ "The agent is experienced" (third person, not second person)
@@ -172,24 +178,29 @@ Agent(
 Optional object with sub-fields for personality traits:
 
 **Sub-field: `traits`**
+
 - Type: Array of strings (enum)
 - Allowed values: thorough, pragmatic, skeptical, detail-oriented, methodical, creative, analytical, collaborative, direct, diplomatic, quality-focused, security-conscious, performance-focused
 - Min: 1 trait, Max: 5 traits
 - Unique items only
 
 **Sub-field: `communication_style`**
+
 - Type: String (enum)
 - Allowed values: direct, diplomatic, technical, conversational, formal
 
 **Sub-field: `risk_tolerance`**
+
 - Type: String (enum)
 - Allowed values: low, medium, high
 
 **Sub-field: `decision_making`**
+
 - Type: String (enum)
 - Allowed values: data-driven, intuitive, collaborative, systematic
 
 **Example:**
+
 ```yaml
 personality:
   traits: [thorough, pragmatic, quality-focused]
@@ -203,10 +214,12 @@ personality:
 #### Field: `motto` (String)
 
 Optional short phrase capturing agent philosophy:
+
 - Max 100 characters
 - Memorable and action-oriented
 
 **Examples:**
+
 - "No code without a failing test"
 - "Break it before users do"
 - "Plan twice, code once"
@@ -338,7 +351,6 @@ identity:
     decision_making: systematic
   motto: Plan twice, code once
 ---
-
 # Planner Agent
 
 [Rest of agent definition...]
@@ -367,7 +379,6 @@ identity:
     decision_making: systematic
   motto: Break it before users do
 ---
-
 # QA Agent
 
 [Rest of agent definition...]
@@ -389,7 +400,7 @@ Task({
 ## Your Assigned Task
 Task ID: 123
 Subject: Fix authentication bug
-...`
+...`,
 });
 ```
 
@@ -415,7 +426,7 @@ You embody this identity in all your actions and communications.
 
 Task({
   subagent_type: 'developer',
-  prompt: prompt
+  prompt: prompt,
 });
 ```
 
@@ -465,11 +476,13 @@ Apply these traits when evaluating options and communicating results.
 **Example impact:**
 
 **Developer (risk_tolerance: low):**
+
 - Prefers well-tested approaches over experimental patterns
 - Suggests additional validation before deployment
 - Recommends rollback plans for risky changes
 
 **Planner (risk_tolerance: medium):**
+
 - Balances innovation with safety
 - Includes contingency plans for moderate risks
 - Allocates buffer time for unknowns
@@ -564,26 +577,31 @@ node .claude/tools/cli/validate-agents.js --check-identity || exit 1
 ### 7.1 Phased Migration (P1-7.3: Task #48)
 
 **Phase 1: Schema & Documentation** (Task #49 - THIS TASK)
+
 - ✅ Design identity schema
 - ✅ Document design rationale
 - ✅ Provide 3+ examples
 
 **Phase 2: Validation Infrastructure** (Task #46)
+
 - Update agent definition schema to include `identity` field
 - Add JSON Schema validation to agent parser
 - Create validation CLI tool
 
 **Phase 3: Spawn Template Update** (Task #50)
+
 - Modify Router spawn template to generate identity-based prompts
 - Add personality-based decision framing
 - Test with existing agents (should be no-op for agents without identity)
 
 **Phase 4: Example Agent Migration** (Task #48)
+
 - Migrate 3+ core agents: developer, planner, qa
 - Test consistency improvements
 - Document lessons learned
 
 **Phase 5: Gradual Rollout** (Post-P1)
+
 - Migrate remaining core agents (5-10 agents)
 - Migrate specialized agents (domain experts)
 - Migrate orchestrators (party-orchestrator, etc.)
@@ -605,6 +623,7 @@ For each agent being migrated:
 **Example migration (developer):**
 
 **Before (current):**
+
 ```yaml
 ---
 name: developer
@@ -618,6 +637,7 @@ description: TDD-focused implementer
 ```
 
 **After (migrated):**
+
 ```yaml
 ---
 name: developer
@@ -641,6 +661,7 @@ identity:
 ```
 
 **Validation:**
+
 ```bash
 node .claude/tools/cli/validate-agents.js --agent developer
 # ✅ developer: Identity valid
@@ -659,7 +680,7 @@ identity:
   role: Senior Engineer
   goal: Write clean code
   backstory: ...
-  execution_limits:  # NEW (P1-8)
+  execution_limits: # NEW (P1-8)
     max_iter: 25
     max_execution_time: 600
     max_retry: 2
@@ -674,7 +695,7 @@ Identity enables self-organizing delegation:
 ```yaml
 identity:
   role: Lead Developer
-  delegation_rules:  # NEW (P2-1)
+  delegation_rules: # NEW (P2-1)
     can_delegate_to: [developer, qa]
     requires_approval_for: [security-architect, devops]
 ```
@@ -688,7 +709,7 @@ Identity provides foundation for capability discovery:
 ```yaml
 identity:
   role: Full-Stack Engineer
-  capabilities:  # NEW (P3-2)
+  capabilities: # NEW (P3-2)
     - code_writing: expert
     - testing: expert
     - documentation: intermediate
@@ -793,4 +814,4 @@ A: Future enhancement (P3-2: Capability Matrix). Not in P1.
 3. Update Task #48 (Migrate 3+ example agents)
 4. Update Task #50 (Spawn template modification)
 
-**Sign-off Date:** _____________________
+**Sign-off Date:** ****\*\*****\_****\*\*****

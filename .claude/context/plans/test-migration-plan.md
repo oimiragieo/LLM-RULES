@@ -7,6 +7,7 @@ Migrate 3 test files from `.claude\tests\integration\` to root `tests\` director
 ## Context
 
 **Files to Migrate**:
+
 1. `.claude\tests\integration\template-system-e2e.test.cjs`
 2. `.claude\tests\integration\template-system-e2e-happy.test.cjs`
 3. `.claude\tests\integration\e2e\phase1a-e2e.test.cjs`
@@ -14,6 +15,7 @@ Migrate 3 test files from `.claude\tests\integration\` to root `tests\` director
 **Path Depth Change**: From 3-level deep (`.claude\tests\integration\`) to 2-level deep (`tests\integration\`) = 1 fewer directory level = 1 less `..` needed in relative imports.
 
 **Example**:
+
 ```javascript
 // OLD (from .claude/tests/integration/file.test.cjs):
 const PROJECT_ROOT = path.resolve(__dirname, '../../..'); // Up 3 levels
@@ -132,6 +134,7 @@ dir tests\integration && dir tests\integration\e2e && dir tests\integration\outp
 #### Phase 2 Error Handling
 
 If any test fails after migration:
+
 1. Run rollback command for that file
 2. Document error: `echo "Phase 2.X failed: [error]" >> .claude\context\memory\issues.md`
 3. Do NOT proceed to Phase 3 until error resolved
@@ -257,6 +260,7 @@ grep -q "Moved to root" .claude\CLAUDE.md
 #### Phase 4 Error Handling
 
 If directory removal fails (not empty):
+
 1. Run: `dir .claude\tests /s /b` to list remaining files
 2. Document: `echo "Cleanup incomplete: [files]" >> .claude\context\memory\issues.md`
 3. Manual review required (do not force delete)
@@ -318,15 +322,18 @@ npm test && echo "✓ Migration complete"
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Spawn Command**:
+
 ```javascript
 Task({
-  subagent_type: "reflection-agent",
-  description: "Session reflection and learning extraction",
-  prompt: "You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
-})
+  subagent_type: 'reflection-agent',
+  description: 'Session reflection and learning extraction',
+  prompt:
+    'You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created).',
+});
 ```
 
 **Success Criteria**:
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
@@ -335,36 +342,36 @@ Task({
 
 ## Risks
 
-| Risk | Impact | Mitigation | Rollback |
-|------|--------|------------|----------|
-| Tests fail after path updates | Medium | Validate each file individually in Phase 2 | `git checkout tests\` + restore old structure |
-| npm test breaks | High | Test script validation in Phase 5.3 | Update package.json test script |
-| Old files not cleaned up | Low | Manual verification in Phase 4 | `git clean -fd .claude\tests\` (if safe) |
-| Documentation drift | Low | Update docs in Phase 3 (parallel safe) | `git checkout .claude\docs\TESTING.md .claude\CLAUDE.md` |
+| Risk                          | Impact | Mitigation                                 | Rollback                                                 |
+| ----------------------------- | ------ | ------------------------------------------ | -------------------------------------------------------- |
+| Tests fail after path updates | Medium | Validate each file individually in Phase 2 | `git checkout tests\` + restore old structure            |
+| npm test breaks               | High   | Test script validation in Phase 5.3        | Update package.json test script                          |
+| Old files not cleaned up      | Low    | Manual verification in Phase 4             | `git clean -fd .claude\tests\` (if safe)                 |
+| Documentation drift           | Low    | Update docs in Phase 3 (parallel safe)     | `git checkout .claude\docs\TESTING.md .claude\CLAUDE.md` |
 
 ---
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Parallel? |
-|-------|-------|-----------|-----------|
-| 0 | 2 | 7 min | No |
-| 1 | 3 | 3 min | No |
-| 2 | 3 | 30 min | No |
-| 3 | 2 | 10 min | Yes |
-| 4 | 3 | 4 min | No |
-| 5 | 3 | 37 min | No |
-| **Total** | **16** | **~91 min** | |
+| Phase     | Tasks  | Est. Time   | Parallel? |
+| --------- | ------ | ----------- | --------- |
+| 0         | 2      | 7 min       | No        |
+| 1         | 3      | 3 min       | No        |
+| 2         | 3      | 30 min      | No        |
+| 3         | 2      | 10 min      | Yes       |
+| 4         | 3      | 4 min       | No        |
+| 5         | 3      | 37 min      | No        |
+| **Total** | **16** | **~91 min** |           |
 
 ---
 
 ## Key Path Changes Reference
 
-| File | Old PROJECT_ROOT | New PROJECT_ROOT | Change |
-|------|-----------------|------------------|--------|
-| template-system-e2e.test.cjs | `../../..` (3 levels) | `../..` (2 levels) | -1 level |
-| template-system-e2e-happy.test.cjs | `../../..` (3 levels) | `../..` (2 levels) | -1 level |
-| phase1a-e2e.test.cjs | `../../../..` (4 levels) | `../../..` (3 levels) | -1 level |
+| File                               | Old PROJECT_ROOT         | New PROJECT_ROOT      | Change   |
+| ---------------------------------- | ------------------------ | --------------------- | -------- |
+| template-system-e2e.test.cjs       | `../../..` (3 levels)    | `../..` (2 levels)    | -1 level |
+| template-system-e2e-happy.test.cjs | `../../..` (3 levels)    | `../..` (2 levels)    | -1 level |
+| phase1a-e2e.test.cjs               | `../../../..` (4 levels) | `../../..` (3 levels) | -1 level |
 
 ---
 
