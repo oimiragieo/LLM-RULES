@@ -47,6 +47,7 @@
 **Current Blocker:** Docker Desktop not running
 
 **Error:**
+
 ```
 unable to get image 'arizephoenix/phoenix:latest':
 error during connect: open //./pipe/dockerDesktopLinuxEngine:
@@ -54,6 +55,7 @@ The system cannot find the file specified.
 ```
 
 **Resolution Required:**
+
 1. Start Docker Desktop
 2. Wait for Docker Engine to initialize
 3. Run: `docker-compose -f docker-compose.phoenix.yml up -d`
@@ -65,6 +67,7 @@ The system cannot find the file specified.
 Windows: Open Docker Desktop from Start Menu
 
 Verify:
+
 ```bash
 docker info
 ```
@@ -79,6 +82,7 @@ docker-compose -f docker-compose.phoenix.yml up -d
 ```
 
 Expected output:
+
 ```
 [+] Running 3/3
  ✔ Network agent-studio-observability  Created
@@ -117,6 +121,7 @@ node --test tests/performance/phoenix-benchmark.test.mjs
 ```
 
 Expected:
+
 - All tests pass
 - Traces generated (100+ spans)
 - Performance metrics printed
@@ -142,13 +147,13 @@ When Docker Desktop is available:
 
 ## Files Created
 
-| File                                                 | Purpose                              | Size    |
-| ---------------------------------------------------- | ------------------------------------ | ------- |
-| `docker-compose.phoenix.yml`                         | Phoenix container configuration      | ~2.5KB  |
-| `.env.example` (updated)                             | Environment variable documentation   | ~11KB   |
-| `tests/performance/phoenix-benchmark.test.mjs`       | Performance benchmark test suite     | ~8KB    |
-| `.claude/docs/PHOENIX_SETUP.md`                      | Comprehensive setup guide            | ~15KB   |
-| `.claude/docs/PHOENIX_DEPLOYMENT_NOTES.md` (this)   | Deployment status and blockers       | ~3KB    |
+| File                                              | Purpose                            | Size   |
+| ------------------------------------------------- | ---------------------------------- | ------ |
+| `docker-compose.phoenix.yml`                      | Phoenix container configuration    | ~2.5KB |
+| `.env.example` (updated)                          | Environment variable documentation | ~11KB  |
+| `tests/performance/phoenix-benchmark.test.mjs`    | Performance benchmark test suite   | ~8KB   |
+| `.claude/docs/PHOENIX_SETUP.md`                   | Comprehensive setup guide          | ~15KB  |
+| `.claude/docs/PHOENIX_DEPLOYMENT_NOTES.md` (this) | Deployment status and blockers     | ~3KB   |
 
 Total: 5 files (3 new, 1 updated, 1 notes)
 
@@ -160,9 +165,9 @@ Total: 5 files (3 new, 1 updated, 1 notes)
 Image: arizephoenix/phoenix:latest
 Restart: unless-stopped
 Ports:
-  - 6006:6006  # UI
-  - 4317:4317  # OTLP gRPC
-  - 4318:4318  # OTLP HTTP
+  - 6006:6006 # UI
+  - 4317:4317 # OTLP gRPC
+  - 4318:4318 # OTLP HTTP
 Environment:
   PHOENIX_PORT: 6006
   PHOENIX_ENABLE_OTLP: true
@@ -195,37 +200,38 @@ Resource:
 
 ### Trace Generation
 
-| Operation                  | Expected Latency | Benchmark Target |
-| -------------------------- | ---------------- | ---------------- |
-| Span creation              | <1ms             | <1ms avg         |
-| Span end                   | <0.5ms           | <0.5ms avg       |
-| Trace generation (100)     | 200-300ms        | <500ms           |
-| Nested spans (210 total)   | 400-600ms        | <1000ms          |
-| Batch export               | 1000-1500ms      | <2000ms          |
+| Operation                | Expected Latency | Benchmark Target |
+| ------------------------ | ---------------- | ---------------- |
+| Span creation            | <1ms             | <1ms avg         |
+| Span end                 | <0.5ms           | <0.5ms avg       |
+| Trace generation (100)   | 200-300ms        | <500ms           |
+| Nested spans (210 total) | 400-600ms        | <1000ms          |
+| Batch export             | 1000-1500ms      | <2000ms          |
 
 ### Throughput
 
-| Metric                     | Expected         | Minimum Acceptable |
-| -------------------------- | ---------------- | ------------------ |
-| Spans/second               | 200-500          | >100               |
-| Traces/second              | 20-50            | >10                |
-| Concurrent agents          | 10+              | 5+                 |
+| Metric            | Expected | Minimum Acceptable |
+| ----------------- | -------- | ------------------ |
+| Spans/second      | 200-500  | >100               |
+| Traces/second     | 20-50    | >10                |
+| Concurrent agents | 10+      | 5+                 |
 
 ### Resource Usage (Phoenix Container)
 
-| Metric                     | Expected         | Maximum Limit      |
-| -------------------------- | ---------------- | ------------------ |
-| Memory (idle)              | 100-200MB        | 1GB                |
-| Memory (active)            | 200-500MB        | 1GB                |
-| CPU (idle)                 | <1%              | 10%                |
-| CPU (active)               | 5-15%            | 50%                |
-| Disk (traces)              | 10-100MB/day     | 10GB total         |
+| Metric          | Expected     | Maximum Limit |
+| --------------- | ------------ | ------------- |
+| Memory (idle)   | 100-200MB    | 1GB           |
+| Memory (active) | 200-500MB    | 1GB           |
+| CPU (idle)      | <1%          | 10%           |
+| CPU (active)    | 5-15%        | 50%           |
+| Disk (traces)   | 10-100MB/day | 10GB total    |
 
 ## Integration Points
 
 ### 1. Telemetry Client (`telemetry-client.cjs`)
 
 Already integrated and ready:
+
 - Lazy initialization (OTEL_ENABLED=true required)
 - gRPC exporter to localhost:4317
 - BatchSpanProcessor configured
@@ -234,6 +240,7 @@ Already integrated and ready:
 ### 2. Agent Operations
 
 Instrumentation points (when implemented):
+
 - Agent spawns → Root span
 - Tool calls → Child spans
 - Hook executions → Child spans
@@ -242,6 +249,7 @@ Instrumentation points (when implemented):
 ### 3. EventBus Correlation
 
 Future integration:
+
 - Add traceId/spanId to EventBus events
 - Correlate events with OpenTelemetry traces
 - Unified observability (events + traces)
@@ -277,6 +285,7 @@ Future integration:
 ### Issue: Phoenix UI Not Accessible
 
 **Solution:**
+
 ```bash
 # Check container logs
 docker-compose -f docker-compose.phoenix.yml logs phoenix
@@ -291,6 +300,7 @@ netstat -an | findstr "6006"
 ### Issue: No Traces in Phoenix
 
 **Solution:**
+
 ```bash
 # Verify telemetry enabled
 node -e "console.log(process.env.OTEL_ENABLED)"  # Should output: true
@@ -308,6 +318,7 @@ start http://localhost:6006
 ### Issue: Connection Refused (ECONNREFUSED)
 
 **Solution:**
+
 ```bash
 # Verify Phoenix running
 docker-compose -f docker-compose.phoenix.yml ps

@@ -67,16 +67,16 @@ CREATE TABLE entities (
 
 **Entity Types:**
 
-| Type       | Description                        | Example                             |
-| ---------- | ---------------------------------- | ----------------------------------- |
-| `agent`    | Developer, planner, QA, etc.       | "developer-agent"                   |
-| `task`     | TaskCreate entries                 | "task-123-implement-auth"           |
-| `skill`    | Invoked skills                     | "skill-tdd-red-green-refactor"      |
-| `concept`  | Abstract ideas                     | "concept-hybrid-memory-architecture |
-| `file`     | Key project files                  | "file-auth-ts"                      |
-| `pattern`  | Reusable solutions                 | "pattern-write-ahead-log"           |
-| `decision` | ADRs from decisions.md             | "adr-054-memory-enhancement"        |
-| `issue`    | Problems/blockers from issues.md   | "issue-chromadb-server-startup"     |
+| Type       | Description                      | Example                             |
+| ---------- | -------------------------------- | ----------------------------------- |
+| `agent`    | Developer, planner, QA, etc.     | "developer-agent"                   |
+| `task`     | TaskCreate entries               | "task-123-implement-auth"           |
+| `skill`    | Invoked skills                   | "skill-tdd-red-green-refactor"      |
+| `concept`  | Abstract ideas                   | "concept-hybrid-memory-architecture |
+| `file`     | Key project files                | "file-auth-ts"                      |
+| `pattern`  | Reusable solutions               | "pattern-write-ahead-log"           |
+| `decision` | ADRs from decisions.md           | "adr-054-memory-enhancement"        |
+| `issue`    | Problems/blockers from issues.md | "issue-chromadb-server-startup"     |
 
 **Example Inserts:**
 
@@ -148,18 +148,18 @@ CREATE TABLE entity_relationships (
 
 **Relationship Types:**
 
-| Type             | Description                            | Example                                          |
-| ---------------- | -------------------------------------- | ------------------------------------------------ |
-| `relates_to`     | Generic association                    | concept-auth `relates_to` pattern-jwt            |
-| `blocks`         | Task dependency (blocking)             | task-22 `blocks` task-23                         |
-| `blocked_by`     | Task dependency (inverse)              | task-23 `blocked_by` task-22                     |
-| `implements`     | Implementation relationship            | pattern-wal `implements` decision-memory-sync    |
-| `conflicts_with` | Conflicting decisions/patterns         | decision-054 `conflicts_with` decision-002       |
-| `assigned_to`    | Task to agent assignment               | task-25 `assigned_to` agent-developer            |
-| `depends_on`     | Code/feature dependency                | file-auth-ts `depends_on` concept-jwt            |
-| `supersedes`     | Replacement relationship               | decision-054 `supersedes` decision-053           |
-| `references`     | Citation/mention                       | decision-054 `references` concept-hybrid-memory  |
-| `resolves`       | Issue resolution                       | task-25 `resolves` issue-schema-missing          |
+| Type             | Description                    | Example                                         |
+| ---------------- | ------------------------------ | ----------------------------------------------- |
+| `relates_to`     | Generic association            | concept-auth `relates_to` pattern-jwt           |
+| `blocks`         | Task dependency (blocking)     | task-22 `blocks` task-23                        |
+| `blocked_by`     | Task dependency (inverse)      | task-23 `blocked_by` task-22                    |
+| `implements`     | Implementation relationship    | pattern-wal `implements` decision-memory-sync   |
+| `conflicts_with` | Conflicting decisions/patterns | decision-054 `conflicts_with` decision-002      |
+| `assigned_to`    | Task to agent assignment       | task-25 `assigned_to` agent-developer           |
+| `depends_on`     | Code/feature dependency        | file-auth-ts `depends_on` concept-jwt           |
+| `supersedes`     | Replacement relationship       | decision-054 `supersedes` decision-053          |
+| `references`     | Citation/mention               | decision-054 `references` concept-hybrid-memory |
+| `resolves`       | Issue resolution               | task-25 `resolves` issue-schema-missing         |
 
 **Example Inserts:**
 

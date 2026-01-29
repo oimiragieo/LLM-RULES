@@ -27,9 +27,9 @@ Execution limits are defined in `.claude/schemas/agent-spawn-params.json`:
 ```json
 {
   "execution_limits": {
-    "max_turns": 25,           // Max tool call iterations (1-100)
+    "max_turns": 25, // Max tool call iterations (1-100)
     "max_duration_ms": 600000, // Max execution time in ms (1s-1hr)
-    "max_cost_usd": 1.0,       // Max cost in USD (0.01-100.0)
+    "max_cost_usd": 1.0, // Max cost in USD (0.01-100.0)
     "timeout_action": "terminate" // "terminate" | "pause" | "warn"
   }
 }
@@ -37,20 +37,20 @@ Execution limits are defined in `.claude/schemas/agent-spawn-params.json`:
 
 ### Field Descriptions
 
-| Field               | Type    | Default      | Range              | Description                                             |
-| ------------------- | ------- | ------------ | ------------------ | ------------------------------------------------------- |
-| `max_turns`         | integer | 25           | 1-100              | Max tool call iterations (like crewAI's `max_iter`)     |
-| `max_duration_ms`   | integer | 600000 (10m) | 1000-3600000 (1hr) | Max execution time in milliseconds                      |
-| `max_cost_usd`      | number  | 1.0          | 0.01-100.0         | Max LLM cost in USD before stopping                     |
-| `timeout_action`    | string  | "terminate"  | enum (see below)   | Action to take when limit reached                       |
+| Field             | Type    | Default      | Range              | Description                                         |
+| ----------------- | ------- | ------------ | ------------------ | --------------------------------------------------- |
+| `max_turns`       | integer | 25           | 1-100              | Max tool call iterations (like crewAI's `max_iter`) |
+| `max_duration_ms` | integer | 600000 (10m) | 1000-3600000 (1hr) | Max execution time in milliseconds                  |
+| `max_cost_usd`    | number  | 1.0          | 0.01-100.0         | Max LLM cost in USD before stopping                 |
+| `timeout_action`  | string  | "terminate"  | enum (see below)   | Action to take when limit reached                   |
 
 ### Timeout Actions
 
-| Action       | Behavior                                                                                      |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| `terminate`  | Stop agent immediately, mark task as incomplete, log error                                    |
-| `pause`      | Pause agent execution, wait for manual resume (future: TaskUpdate resume support)            |
-| `warn`       | Log warning but continue execution (use for non-critical agents, debugging)                   |
+| Action      | Behavior                                                                          |
+| ----------- | --------------------------------------------------------------------------------- |
+| `terminate` | Stop agent immediately, mark task as incomplete, log error                        |
+| `pause`     | Pause agent execution, wait for manual resume (future: TaskUpdate resume support) |
+| `warn`      | Log warning but continue execution (use for non-critical agents, debugging)       |
 
 ---
 
@@ -67,12 +67,12 @@ Task({
   description: 'Developer implementing authentication feature',
   allowed_tools: ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'Skill'],
   execution_limits: {
-    max_turns: 25,          // Allow up to 25 tool calls (read, write, edit, test cycles)
+    max_turns: 25, // Allow up to 25 tool calls (read, write, edit, test cycles)
     max_duration_ms: 600000, // 10 minutes max execution
-    max_cost_usd: 1.0,       // Stop if cost exceeds $1.00
-    timeout_action: 'terminate'
+    max_cost_usd: 1.0, // Stop if cost exceeds $1.00
+    timeout_action: 'terminate',
   },
-  prompt: `You are DEVELOPER. Task ID: #42...`
+  prompt: `You are DEVELOPER. Task ID: #42...`,
 });
 ```
 
@@ -94,12 +94,12 @@ Task({
   description: 'QA validating test suite passes',
   allowed_tools: ['Read', 'Bash', 'TaskUpdate'],
   execution_limits: {
-    max_turns: 10,           // Simple task: read test files (1-2), run tests (1), report (1) = ~5 turns
+    max_turns: 10, // Simple task: read test files (1-2), run tests (1), report (1) = ~5 turns
     max_duration_ms: 120000, // 2 minutes max
-    max_cost_usd: 0.5,       // Haiku is cheap (~$0.00025/1K tokens), $0.5 is generous
-    timeout_action: 'terminate'
+    max_cost_usd: 0.5, // Haiku is cheap (~$0.00025/1K tokens), $0.5 is generous
+    timeout_action: 'terminate',
   },
-  prompt: `You are QA. Run all tests and report results. Task ID: #55...`
+  prompt: `You are QA. Run all tests and report results. Task ID: #55...`,
 });
 ```
 
@@ -121,12 +121,12 @@ Task({
   description: 'Researcher investigating authentication patterns',
   allowed_tools: ['Read', 'Grep', 'WebSearch', 'Write', 'TaskUpdate', 'Skill'],
   execution_limits: {
-    max_turns: 50,            // Research is exploratory: many reads, greps, web searches
+    max_turns: 50, // Research is exploratory: many reads, greps, web searches
     max_duration_ms: 1200000, // 20 minutes for thorough research
-    max_cost_usd: 5.0,        // Opus is expensive (~$0.015/1K tokens), research generates many tokens
-    timeout_action: 'warn'    // Research may legitimately take long - warn but don't stop
+    max_cost_usd: 5.0, // Opus is expensive (~$0.015/1K tokens), research generates many tokens
+    timeout_action: 'warn', // Research may legitimately take long - warn but don't stop
   },
-  prompt: `You are RESEARCHER. Investigate authentication patterns. Task ID: #60...`
+  prompt: `You are RESEARCHER. Investigate authentication patterns. Task ID: #60...`,
 });
 ```
 
@@ -149,12 +149,12 @@ Task({
   allowed_tools: ['Read', 'Glob', 'Grep', 'Write', 'TaskCreate', 'Skill'],
   run_in_background: true,
   execution_limits: {
-    max_turns: 100,           // Architecture analysis: read many files, create diagrams, write docs
+    max_turns: 100, // Architecture analysis: read many files, create diagrams, write docs
     max_duration_ms: 3600000, // 1 hour max (background task, not urgent)
-    max_cost_usd: 10.0,       // Opus + long analysis = expensive, but worth it for architecture
-    timeout_action: 'pause'   // If timeout, pause for manual review (don't lose work)
+    max_cost_usd: 10.0, // Opus + long analysis = expensive, but worth it for architecture
+    timeout_action: 'pause', // If timeout, pause for manual review (don't lose work)
   },
-  prompt: `You are ARCHITECT. Analyze codebase architecture. Task ID: #70...`
+  prompt: `You are ARCHITECT. Analyze codebase architecture. Task ID: #70...`,
 });
 ```
 
@@ -171,16 +171,16 @@ Task({
 
 Recommended defaults based on agent role:
 
-| Agent Type          | max_turns | max_duration_ms | max_cost_usd | timeout_action |
-| ------------------- | --------- | --------------- | ------------ | -------------- |
-| **developer**       | 25        | 600000 (10m)    | 1.0          | terminate      |
-| **qa**              | 10        | 120000 (2m)     | 0.5          | terminate      |
-| **planner**         | 15        | 300000 (5m)     | 2.0          | terminate      |
-| **architect**       | 50        | 1800000 (30m)   | 5.0          | warn           |
-| **researcher**      | 50        | 1200000 (20m)   | 5.0          | warn           |
-| **security-architect** | 30     | 900000 (15m)    | 3.0          | terminate      |
-| **code-reviewer**   | 20        | 600000 (10m)    | 1.5          | warn           |
-| **devops**          | 30        | 900000 (15m)    | 2.0          | terminate      |
+| Agent Type             | max_turns | max_duration_ms | max_cost_usd | timeout_action |
+| ---------------------- | --------- | --------------- | ------------ | -------------- |
+| **developer**          | 25        | 600000 (10m)    | 1.0          | terminate      |
+| **qa**                 | 10        | 120000 (2m)     | 0.5          | terminate      |
+| **planner**            | 15        | 300000 (5m)     | 2.0          | terminate      |
+| **architect**          | 50        | 1800000 (30m)   | 5.0          | warn           |
+| **researcher**         | 50        | 1200000 (20m)   | 5.0          | warn           |
+| **security-architect** | 30        | 900000 (15m)    | 3.0          | terminate      |
+| **code-reviewer**      | 20        | 600000 (10m)    | 1.5          | warn           |
+| **devops**             | 30        | 900000 (15m)    | 2.0          | terminate      |
 
 ### Rationale for Defaults
 
@@ -209,18 +209,18 @@ Recommended defaults based on agent role:
 
 ```javascript
 // Sonnet pricing
-const SONNET_PROMPT_COST = 0.003 / 1000;    // $0.003 per 1K tokens
+const SONNET_PROMPT_COST = 0.003 / 1000; // $0.003 per 1K tokens
 const SONNET_COMPLETION_COST = 0.015 / 1000; // $0.015 per 1K tokens
 
 // Agent makes 5 calls
 let accumulated_cost = 0;
 
 // Call 1: 2K prompt, 1K completion
-accumulated_cost += (2000 * SONNET_PROMPT_COST) + (1000 * SONNET_COMPLETION_COST);
+accumulated_cost += 2000 * SONNET_PROMPT_COST + 1000 * SONNET_COMPLETION_COST;
 // = $0.006 + $0.015 = $0.021
 
 // Call 2: 3K prompt, 2K completion
-accumulated_cost += (3000 * SONNET_PROMPT_COST) + (2000 * SONNET_COMPLETION_COST);
+accumulated_cost += 3000 * SONNET_PROMPT_COST + 2000 * SONNET_COMPLETION_COST;
 // = $0.009 + $0.030 = $0.039, total = $0.060
 
 // ... continue until accumulated_cost > max_cost_usd
@@ -450,7 +450,7 @@ execution_limits: {
 **Implementation:**
 
 ```javascript
-timeout_action: 'request_increase' // Ask user for approval to continue
+timeout_action: 'request_increase'; // Ask user for approval to continue
 ```
 
 ---
@@ -493,7 +493,7 @@ describe('Execution Limits', () => {
 
   it('should warn but continue when timeout_action=warn', async () => {
     const agent = spawnAgent({
-      execution_limits: { max_turns: 5, timeout_action: 'warn' }
+      execution_limits: { max_turns: 5, timeout_action: 'warn' },
     });
     for (let i = 0; i < 6; i++) {
       await agent.executeTurn();
@@ -516,7 +516,7 @@ describe('Execution Limits Integration', () => {
     await Task({
       subagent_type: 'developer',
       execution_limits: { max_turns: 25 },
-      prompt: 'Loop infinitely calling Read tool'
+      prompt: 'Loop infinitely calling Read tool',
     });
 
     // Wait for agent to hit limit

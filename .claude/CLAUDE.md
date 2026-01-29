@@ -334,6 +334,7 @@ Subject: <SUBJECT>
 When spawning agents with identity fields (see `.claude/docs/AGENT_IDENTITY.md`), you can enhance prompts with structured personality:
 
 **Pattern:**
+
 ```javascript
 // 1. Read and parse agent file
 const fs = require('fs');
@@ -376,7 +377,17 @@ Task({
   subagent_type: agentData.name,
   model: agentData.model,
   description: `${agentData.identity?.role || agentData.name} doing <TASK>`,
-  allowed_tools: agentData.tools || ['Read','Write','Edit','Bash','TaskUpdate','TaskList','TaskCreate','TaskGet','Skill'],
+  allowed_tools: agentData.tools || [
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+  ],
   prompt: `You are the ${agentData.name} agent.
 
 +======================================================================+
@@ -399,12 +410,14 @@ PROJECT_ROOT: <absolute-path-to-project>
 ```
 
 **Benefits:**
+
 - **Consistent personality** - Identity fields reduce agent drift across invocations (+20-30% consistency)
 - **LLM expertise alignment** - Backstory establishes credibility and decision-making context
 - **Trait-based decisions** - Risk tolerance and personality influence recommendations
 - **Clear communication** - Communication style matches agent's defined personality
 
 **Example Output (Developer with Identity):**
+
 ```
 You are the developer agent.
 
@@ -434,11 +447,13 @@ Apply these traits when evaluating options and communicating results.
 ```
 
 **Backward Compatibility:**
+
 - Agents without `identity` fields work unchanged (identitySection = '')
 - Identity is optional - no breaking changes to existing spawns
 - Validation via AgentParser ensures identity fields are schema-compliant
 
 **See also:**
+
 - `.claude/docs/AGENT_IDENTITY.md` - Full design specification
 - `.claude/schemas/agent-identity.json` - JSON Schema for identity validation
 - `.claude/lib/agents/agent-parser.cjs` - Parser with identity validation

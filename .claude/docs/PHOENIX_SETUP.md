@@ -113,13 +113,13 @@ You should see:
 
 ### Environment Variables
 
-| Variable                       | Description                                    | Default                   |
-| ------------------------------ | ---------------------------------------------- | ------------------------- |
-| `OTEL_ENABLED`                 | Enable/disable OpenTelemetry                   | `false`                   |
-| `OTEL_EXPORTER_OTLP_ENDPOINT`  | Phoenix OTLP endpoint (gRPC recommended)       | `http://localhost:4317`   |
-| `OTEL_BATCH_SIZE`              | Max spans per batch                            | `512`                     |
-| `OTEL_BATCH_TIMEOUT`           | Batch export interval (ms)                     | `5000` (5 seconds)        |
-| `AGENT_STUDIO_ENV`             | Environment name (shown in Phoenix)            | `development`             |
+| Variable                      | Description                              | Default                 |
+| ----------------------------- | ---------------------------------------- | ----------------------- |
+| `OTEL_ENABLED`                | Enable/disable OpenTelemetry             | `false`                 |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Phoenix OTLP endpoint (gRPC recommended) | `http://localhost:4317` |
+| `OTEL_BATCH_SIZE`             | Max spans per batch                      | `512`                   |
+| `OTEL_BATCH_TIMEOUT`          | Batch export interval (ms)               | `5000` (5 seconds)      |
+| `AGENT_STUDIO_ENV`            | Environment name (shown in Phoenix)      | `development`           |
 
 ### Phoenix Configuration
 
@@ -127,20 +127,20 @@ Phoenix is configured via `docker-compose.phoenix.yml`:
 
 ```yaml
 environment:
-  PHOENIX_PORT: "6006"             # UI port
-  PHOENIX_ENABLE_OTLP: "true"      # Enable OTLP receivers
-  PHOENIX_WORKING_DIR: /data       # Data persistence path
-  PHOENIX_LOG_LEVEL: info          # Log level
-  PHOENIX_ENABLE_CORS: "true"      # Allow cross-origin requests
+  PHOENIX_PORT: '6006' # UI port
+  PHOENIX_ENABLE_OTLP: 'true' # Enable OTLP receivers
+  PHOENIX_WORKING_DIR: /data # Data persistence path
+  PHOENIX_LOG_LEVEL: info # Log level
+  PHOENIX_ENABLE_CORS: 'true' # Allow cross-origin requests
 ```
 
 ### Ports
 
-| Port | Protocol | Purpose                              |
-| ---- | -------- | ------------------------------------ |
-| 6006 | HTTP     | Phoenix UI (web interface)           |
-| 4317 | gRPC     | OTLP ingestion (primary, recommended)|
-| 4318 | HTTP     | OTLP ingestion (alternative)         |
+| Port | Protocol | Purpose                               |
+| ---- | -------- | ------------------------------------- |
+| 6006 | HTTP     | Phoenix UI (web interface)            |
+| 4317 | gRPC     | OTLP ingestion (primary, recommended) |
+| 4318 | HTTP     | OTLP ingestion (alternative)          |
 
 **Why gRPC (4317)?**
 
@@ -197,12 +197,12 @@ node --test tests/performance/phoenix-benchmark.test.mjs
 
 ### Expected Performance
 
-| Metric                     | Target        | Actual (Benchmark) |
-| -------------------------- | ------------- | ------------------ |
-| Span creation latency      | <1ms          | ~0.5ms avg         |
-| Trace generation (100)     | <500ms        | ~200-300ms         |
-| Nested spans (210 total)   | <1000ms       | ~400-600ms         |
-| Batch export               | <2000ms       | ~1500ms            |
+| Metric                   | Target  | Actual (Benchmark) |
+| ------------------------ | ------- | ------------------ |
+| Span creation latency    | <1ms    | ~0.5ms avg         |
+| Trace generation (100)   | <500ms  | ~200-300ms         |
+| Nested spans (210 total) | <1000ms | ~400-600ms         |
+| Batch export             | <2000ms | ~1500ms            |
 
 ## Phoenix UI Guide
 
@@ -249,16 +249,19 @@ status = "error"
 **Solutions:**
 
 1. Check Docker is running:
+
    ```bash
    docker info
    ```
 
 2. Check port conflicts:
+
    ```bash
    netstat -an | findstr "6006 4317 4318"
    ```
 
 3. View container logs:
+
    ```bash
    docker-compose -f docker-compose.phoenix.yml logs phoenix
    ```
@@ -275,23 +278,27 @@ status = "error"
 **Solutions:**
 
 1. Verify telemetry initialization:
+
    ```javascript
    const result = await telemetryClient.init();
    console.log(result); // Should show initialized: true
    ```
 
 2. Check endpoint configuration:
+
    ```bash
    echo $OTEL_EXPORTER_OTLP_ENDPOINT
    # Should output: http://localhost:4317
    ```
 
 3. Generate test traces:
+
    ```bash
    node --test tests/performance/phoenix-benchmark.test.mjs
    ```
 
 4. Check Phoenix health:
+
    ```bash
    curl http://localhost:6006/healthz
    # Should return 200 OK
@@ -306,16 +313,19 @@ status = "error"
 **Solutions:**
 
 1. Verify Phoenix is running:
+
    ```bash
    docker-compose -f docker-compose.phoenix.yml ps
    ```
 
 2. Check Docker network:
+
    ```bash
    docker network inspect agent-studio-observability
    ```
 
 3. Use correct endpoint (gRPC not HTTP):
+
    ```bash
    # CORRECT
    OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
@@ -336,11 +346,13 @@ status = "error"
 **Solutions:**
 
 1. Reduce batch timeout:
+
    ```bash
    OTEL_BATCH_TIMEOUT=1000  # 1 second (default: 5000)
    ```
 
 2. Reduce batch size:
+
    ```bash
    OTEL_BATCH_SIZE=100  # Smaller batches (default: 512)
    ```
@@ -357,6 +369,7 @@ status = "error"
 **Solutions:**
 
 1. Limit Phoenix memory:
+
    ```yaml
    # Add to docker-compose.phoenix.yml
    deploy:
@@ -366,6 +379,7 @@ status = "error"
    ```
 
 2. Clear old traces:
+
    ```bash
    docker-compose -f docker-compose.phoenix.yml down -v  # Removes data volume
    docker-compose -f docker-compose.phoenix.yml up -d
