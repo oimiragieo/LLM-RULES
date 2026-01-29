@@ -13,22 +13,22 @@ import assert from 'node:assert/strict';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { setTimeout } from 'timers/promises';
 import Database from 'better-sqlite3';
 import { ContextualMemory } from '../../.claude/lib/memory/contextual-memory.cjs';
-import { SyncLayer } from '../../.claude/lib/memory/sync-layer.cjs';
-import { EntityExtractor } from '../../.claude/lib/memory/entity-extractor.cjs';
 import { MemoryVectorStore } from '../../.claude/lib/memory/chromadb-client.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
-const TEMP_DIR = path.join(PROJECT_ROOT, '.claude/staging/performance-benchmarks', `test-${Date.now()}`);
+const TEMP_DIR = path.join(
+  PROJECT_ROOT,
+  '.claude/staging/performance-benchmarks',
+  `test-${Date.now()}`
+);
 
 describe('Performance Benchmarks - Hybrid Memory System', () => {
   let memory;
   let db;
-  let syncLayer;
   let chromaDbPath;
   let vectorStore;
 
@@ -82,7 +82,7 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
       chromaConfig: {
         persistDirectory: chromaDbPath,
         collectionName: 'benchmark-memory',
-      }
+      },
     });
 
     // Create memory directory
@@ -124,14 +124,14 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
         entries.push({
           id: `doc-${i}`,
           content: `Test document ${i}: This is a learning about hybrid memory systems and semantic search patterns`,
-          metadata: { source: 'test.md', line: i }
+          metadata: { source: 'test.md', line: i },
         });
       }
 
       for (const entry of entries) {
         try {
           await vectorStore.index(entry.id, entry.content, entry.metadata);
-        } catch (err) {
+        } catch (_err) {
           // Ignore indexing errors for this benchmark
         }
       }
@@ -144,7 +144,7 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
         const start = Date.now();
         try {
           await vectorStore.search('memory patterns semantic search', { limit: 5, minScore: 0.7 });
-        } catch (err) {
+        } catch (_err) {
           // Ignore search errors
         }
         const elapsed = Date.now() - start;
@@ -171,14 +171,14 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
         entries.push({
           id: `doc-${i}`,
           content: `Test document ${i}: This is a learning about hybrid memory systems and semantic search patterns`,
-          metadata: { source: 'test.md', line: i }
+          metadata: { source: 'test.md', line: i },
         });
       }
 
       for (const entry of entries) {
         try {
           await vectorStore.index(entry.id, entry.content, entry.metadata);
-        } catch (err) {
+        } catch (_err) {
           // Ignore indexing errors
         }
       }
@@ -191,7 +191,7 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
         const start = Date.now();
         try {
           await vectorStore.search('memory patterns semantic search', { limit: 5, minScore: 0.7 });
-        } catch (err) {
+        } catch (_err) {
           // Ignore search errors
         }
         const elapsed = Date.now() - start;
@@ -212,10 +212,12 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
       // Insert test entities
       const numEntities = 100;
       for (let i = 0; i < numEntities; i++) {
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO entities (id, type, name, description, quality_score)
           VALUES (?, ?, ?, ?, ?)
-        `).run(`entity-${i}`, 'concept', `Concept ${i}`, `Test concept ${i}`, 0.8);
+        `
+        ).run(`entity-${i}`, 'concept', `Concept ${i}`, `Test concept ${i}`, 0.8);
       }
 
       // Measure query latency
@@ -241,10 +243,12 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
       // Insert test entities
       const numEntities = 100;
       for (let i = 0; i < numEntities; i++) {
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO entities (id, type, name, description, quality_score)
           VALUES (?, ?, ?, ?, ?)
-        `).run(`entity-${i}`, 'concept', `Concept ${i}`, `Test concept ${i}`, 0.8);
+        `
+        ).run(`entity-${i}`, 'concept', `Concept ${i}`, `Test concept ${i}`, 0.8);
       }
 
       // Measure query latency
@@ -271,23 +275,29 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
     it('should traverse graph (depth 2) in <100ms (p50)', async () => {
       // Insert test entities and relationships
       for (let i = 0; i < 50; i++) {
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO entities (id, type, name)
           VALUES (?, ?, ?)
-        `).run(`entity-${i}`, 'concept', `Concept ${i}`);
+        `
+        ).run(`entity-${i}`, 'concept', `Concept ${i}`);
       }
 
       // Create relationships (chain: 0->1->2, 1->3->4, etc.)
       for (let i = 0; i < 25; i++) {
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type, weight)
           VALUES (?, ?, ?, ?)
-        `).run(`entity-${i}`, `entity-${i + 1}`, 'relates_to', 1.0);
+        `
+        ).run(`entity-${i}`, `entity-${i + 1}`, 'relates_to', 1.0);
 
-        db.prepare(`
+        db.prepare(
+          `
           INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type, weight)
           VALUES (?, ?, ?, ?)
-        `).run(`entity-${i + 1}`, `entity-${i + 2}`, 'relates_to', 1.0);
+        `
+        ).run(`entity-${i + 1}`, `entity-${i + 2}`, 'relates_to', 1.0);
       }
 
       // Measure traversal latency
@@ -296,7 +306,8 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
 
       for (let i = 0; i < iterations; i++) {
         const start = Date.now();
-        db.prepare(`
+        db.prepare(
+          `
           WITH RECURSIVE related AS (
             SELECT to_entity_id, 1 as level
             FROM entity_relationships
@@ -308,7 +319,8 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
             WHERE related.level < 2
           )
           SELECT DISTINCT * FROM related
-        `).all('entity-0');
+        `
+        ).all('entity-0');
         const elapsed = Date.now() - start;
         latencies.push(elapsed);
       }
@@ -329,8 +341,12 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
       // Create test memory files
       const files = ['learnings.md', 'decisions.md', 'issues.md'];
       for (const file of files) {
-        const content = `# ${file}\n\n` +
-          Array(100).fill(0).map((_, i) => `## Entry ${i}\n\nTest content ${i}`).join('\n\n');
+        const content =
+          `# ${file}\n\n` +
+          Array(100)
+            .fill(0)
+            .map((_, i) => `## Entry ${i}\n\nTest content ${i}`)
+            .join('\n\n');
         fs.writeFileSync(path.join(memoryDir, file), content);
       }
 
@@ -364,7 +380,7 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
         data.push({
           id: `doc-${i}`,
           content: `Test document ${i} with substantial content to measure memory usage`,
-          metadata: { index: i }
+          metadata: { index: i },
         });
       }
 

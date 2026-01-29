@@ -90,7 +90,7 @@ describe('Hybrid Memory System - End-to-End Integration', () => {
 
     // Setup event capture
     capturedEvents = [];
-    eventListener = (event) => {
+    eventListener = event => {
       capturedEvents.push(event);
     };
     EventBus.on('MEMORY_SAVED', eventListener);
@@ -169,7 +169,7 @@ This enables finding connected concepts and dependencies.
 
       // If entities were extracted, verify they have proper structure
       if (entities.length > 0) {
-        entities.forEach((entity) => {
+        entities.forEach(entity => {
           assert.ok(entity.id, 'Entity should have id');
           assert.ok(entity.type, 'Entity should have type');
           assert.ok(entity.name, 'Entity should have name');
@@ -188,8 +188,22 @@ This enables finding connected concepts and dependencies.
       `);
 
       // Insert known test patterns
-      insertStmt.run('vector-search-pattern', 'pattern', 'Vector Search Pattern', 'ChromaDB semantic search', 'learnings.md', 0.9);
-      insertStmt.run('entity-relationship-pattern', 'pattern', 'Entity Relationship Pattern', 'SQLite graph traversal', 'learnings.md', 0.85);
+      insertStmt.run(
+        'vector-search-pattern',
+        'pattern',
+        'Vector Search Pattern',
+        'ChromaDB semantic search',
+        'learnings.md',
+        0.9
+      );
+      insertStmt.run(
+        'entity-relationship-pattern',
+        'pattern',
+        'Entity Relationship Pattern',
+        'SQLite graph traversal',
+        'learnings.md',
+        0.85
+      );
 
       db.close();
 
@@ -198,9 +212,9 @@ This enables finding connected concepts and dependencies.
       assert.ok(queriedPatterns.length >= 2, 'Should query patterns from database');
 
       // Verify entity content
-      const patternNames = queriedPatterns.map((p) => p.name);
-      assert.ok(patternNames.some((n) => n.includes('Vector Search')));
-      assert.ok(patternNames.some((n) => n.includes('Entity Relationship')));
+      const patternNames = queriedPatterns.map(p => p.name);
+      assert.ok(patternNames.some(n => n.includes('Vector Search')));
+      assert.ok(patternNames.some(n => n.includes('Entity Relationship')));
 
       // 5. Read file content (backward compatibility)
       const fileContent = await memory.readFile('learnings.md');
@@ -246,11 +260,41 @@ This enables finding connected concepts and dependencies.
 
       // Insert entities
       const entities = [
-        { id: 'task-123', type: 'task', name: 'Implement Auth', description: 'User authentication', quality: 0.9 },
-        { id: 'agent-dev', type: 'agent', name: 'Developer', description: 'Development agent', quality: 0.95 },
-        { id: 'skill-tdd', type: 'skill', name: 'TDD', description: 'Test-driven development', quality: 0.92 },
-        { id: 'concept-auth', type: 'concept', name: 'Authentication', description: 'Auth concept', quality: 0.88 },
-        { id: 'pattern-jwt', type: 'pattern', name: 'JWT Pattern', description: 'JWT authentication', quality: 0.85 },
+        {
+          id: 'task-123',
+          type: 'task',
+          name: 'Implement Auth',
+          description: 'User authentication',
+          quality: 0.9,
+        },
+        {
+          id: 'agent-dev',
+          type: 'agent',
+          name: 'Developer',
+          description: 'Development agent',
+          quality: 0.95,
+        },
+        {
+          id: 'skill-tdd',
+          type: 'skill',
+          name: 'TDD',
+          description: 'Test-driven development',
+          quality: 0.92,
+        },
+        {
+          id: 'concept-auth',
+          type: 'concept',
+          name: 'Authentication',
+          description: 'Auth concept',
+          quality: 0.88,
+        },
+        {
+          id: 'pattern-jwt',
+          type: 'pattern',
+          name: 'JWT Pattern',
+          description: 'JWT authentication',
+          quality: 0.85,
+        },
       ];
 
       const insertEntity = db.prepare(`
@@ -284,7 +328,7 @@ This enables finding connected concepts and dependencies.
       const directRelated = await memory.getRelated('task-123', { depth: 1 });
       assert.ok(directRelated.length >= 2, 'Should find at least 2 direct relationships');
 
-      const directIds = directRelated.map((r) => r.entity.id);
+      const directIds = directRelated.map(r => r.entity.id);
       assert.ok(directIds.includes('agent-dev'), 'Should include agent-dev');
       assert.ok(directIds.includes('concept-auth'), 'Should include concept-auth');
 
@@ -292,7 +336,7 @@ This enables finding connected concepts and dependencies.
       const deepRelated = await memory.getRelated('task-123', { depth: 2 });
       assert.ok(deepRelated.length >= 3, 'Should find more entities at depth 2');
 
-      const deepIds = deepRelated.map((r) => r.entity.id);
+      const deepIds = deepRelated.map(r => r.entity.id);
       // Should reach skill-tdd (task-123 → agent-dev → skill-tdd)
       assert.ok(deepIds.includes('skill-tdd'), 'Should reach skill-tdd at depth 2');
       // Should reach pattern-jwt (task-123 → concept-auth → pattern-jwt)
@@ -309,7 +353,7 @@ This enables finding connected concepts and dependencies.
       // 4. Find high-quality entities
       const highQuality = await memory.findEntities('agent', { quality_score: 0.9 });
       assert.ok(highQuality.length > 0, 'Should find high-quality agents');
-      highQuality.forEach((e) => {
+      highQuality.forEach(e => {
         assert.ok(e.quality_score >= 0.9, 'Quality score should be >= 0.9');
       });
     });
@@ -319,27 +363,35 @@ This enables finding connected concepts and dependencies.
       const db = new Database(testDbPath);
 
       // Insert entities
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO entities (id, type, name, description)
         VALUES (?, ?, ?, ?)
-      `).run('entity-a', 'concept', 'Entity A', 'Test entity A');
+      `
+      ).run('entity-a', 'concept', 'Entity A', 'Test entity A');
 
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO entities (id, type, name, description)
         VALUES (?, ?, ?, ?)
-      `).run('entity-b', 'concept', 'Entity B', 'Test entity B');
+      `
+      ).run('entity-b', 'concept', 'Entity B', 'Test entity B');
 
       // Create relationship A → B
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type)
         VALUES (?, ?, ?)
-      `).run('entity-a', 'entity-b', 'relates_to');
+      `
+      ).run('entity-a', 'entity-b', 'relates_to');
 
       // Create relationship B → A (circular)
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type)
         VALUES (?, ?, ?)
-      `).run('entity-b', 'entity-a', 'relates_to');
+      `
+      ).run('entity-b', 'entity-a', 'relates_to');
 
       db.close();
 
@@ -357,9 +409,9 @@ This enables finding connected concepts and dependencies.
       // Let's verify events from the SyncLayer's internal EventEmitter
       const localEvents = [];
 
-      syncLayer.on('sync', (data) => localEvents.push({ type: 'sync', ...data }));
-      syncLayer.on('sync-complete', (data) => localEvents.push({ type: 'sync-complete', ...data }));
-      syncLayer.on('sync-error', (data) => localEvents.push({ type: 'sync-error', ...data }));
+      syncLayer.on('sync', data => localEvents.push({ type: 'sync', ...data }));
+      syncLayer.on('sync-complete', data => localEvents.push({ type: 'sync-complete', ...data }));
+      syncLayer.on('sync-error', data => localEvents.push({ type: 'sync-error', ...data }));
 
       // Start sync layer
       await syncLayer.start();
@@ -387,7 +439,7 @@ Testing event emission during sync operations.
 
         // Check event structure (either from captured or local events)
         const allEvents = [...capturedEvents, ...localEvents];
-        allEvents.forEach((event) => {
+        allEvents.forEach(event => {
           assert.ok(event.type || event.timestamp, 'Event should have type or timestamp');
         });
       } else {
@@ -453,8 +505,22 @@ Testing event emission during sync operations.
         VALUES (?, ?, ?, ?, ?, ?)
       `);
 
-      insertEntity.run('test-pattern', 'pattern', 'Test Pattern', 'Test description', 'learnings.md', 0.9);
-      insertEntity.run('test-concept', 'concept', 'Test Concept', 'Test concept', 'learnings.md', 0.85);
+      insertEntity.run(
+        'test-pattern',
+        'pattern',
+        'Test Pattern',
+        'Test description',
+        'learnings.md',
+        0.9
+      );
+      insertEntity.run(
+        'test-concept',
+        'concept',
+        'Test Concept',
+        'Test concept',
+        'learnings.md',
+        0.85
+      );
       insertEntity.run('test-task', 'task', 'Test Task', 'Test task', 'decisions.md', 0.8);
 
       const insertRel = db.prepare(`
@@ -504,7 +570,7 @@ Testing event emission during sync operations.
 
       const tasks = await memory.findEntities('task', { quality_score: 0.7 });
       assert.ok(tasks.length > 0, 'findEntities() should filter by quality score');
-      tasks.forEach((t) => {
+      tasks.forEach(t => {
         assert.ok(t.quality_score >= 0.7, 'Quality score should match filter');
       });
 
@@ -512,7 +578,7 @@ Testing event emission during sync operations.
       const related = await memory.getRelated('test-task', { depth: 1 });
       assert.ok(related.length > 0, 'getRelated() should return related entities');
 
-      const relatedIds = related.map((r) => r.entity.id);
+      const relatedIds = related.map(r => r.entity.id);
       assert.ok(relatedIds.includes('test-pattern'), 'Should find related pattern');
 
       const deepRelated = await memory.getRelated('test-task', { depth: 2 });
@@ -607,10 +673,12 @@ Testing event emission during sync operations.
     it('should handle concurrent entity modifications safely', async () => {
       // Setup: Insert initial entity
       const db = new Database(testDbPath);
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO entities (id, type, name, description)
         VALUES (?, ?, ?, ?)
-      `).run('concurrent-test', 'pattern', 'Concurrent Test', 'Initial description');
+      `
+      ).run('concurrent-test', 'pattern', 'Concurrent Test', 'Initial description');
       db.close();
 
       // Attempt concurrent updates (simulates race condition)
@@ -618,11 +686,13 @@ Testing event emission during sync operations.
         (async () => {
           const db = new Database(testDbPath);
           try {
-            db.prepare(`
+            db.prepare(
+              `
               UPDATE entities
               SET description = ?
               WHERE id = ?
-            `).run(`Updated ${i}`, 'concurrent-test');
+            `
+            ).run(`Updated ${i}`, 'concurrent-test');
           } finally {
             db.close();
           }
@@ -633,7 +703,7 @@ Testing event emission during sync operations.
 
       // Verify entity exists (some update should have succeeded)
       const entities = await memory.findEntities('pattern');
-      const testEntity = entities.find((e) => e.id === 'concurrent-test');
+      const testEntity = entities.find(e => e.id === 'concurrent-test');
       assert.ok(testEntity, 'Entity should still exist after concurrent updates');
       assert.match(testEntity.description, /Updated \d+/, 'Description should be updated');
     });
@@ -657,7 +727,7 @@ Testing event emission during sync operations.
 
         // Sync layer should still be running (not crashed)
         assert.ok(syncLayer.isWatching(), 'Sync layer should still be watching');
-      } catch (error) {
+      } catch (_error) {
         // Expected behavior: sync may fail but should not crash
         assert.ok(true, 'Sync failure handled gracefully');
       }

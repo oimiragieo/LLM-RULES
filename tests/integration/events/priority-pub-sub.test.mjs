@@ -24,7 +24,6 @@ const require = createRequire(import.meta.url);
 
 // Import CommonJS modules
 const eventBus = require(path.join(projectRoot, '.claude/lib/events/event-bus.cjs'));
-const { EventTypes, validateEvent } = require(path.join(projectRoot, '.claude/lib/events/event-types.cjs'));
 
 describe('EventBus Pub/Sub with Priority', () => {
   beforeEach(() => {
@@ -35,7 +34,7 @@ describe('EventBus Pub/Sub with Priority', () => {
   describe('Event Validation Integration', () => {
     it('should emit valid AGENT_STARTED events', async () => {
       let received = null;
-      eventBus.on('AGENT_STARTED', (payload) => {
+      eventBus.on('AGENT_STARTED', payload => {
         received = payload;
       });
 
@@ -59,7 +58,9 @@ describe('EventBus Pub/Sub with Priority', () => {
     it('should reject invalid events (missing required fields)', async () => {
       let errorLogged = false;
       const originalError = console.error;
-      console.error = () => { errorLogged = true; };
+      console.error = () => {
+        errorLogged = true;
+      };
 
       try {
         await eventBus.emit('AGENT_STARTED', {
@@ -81,7 +82,9 @@ describe('EventBus Pub/Sub with Priority', () => {
     it('should validate event type exists', async () => {
       let errorLogged = false;
       const originalError = console.error;
-      console.error = () => { errorLogged = true; };
+      console.error = () => {
+        errorLogged = true;
+      };
 
       try {
         await eventBus.emit('INVALID_EVENT_TYPE', {
@@ -154,15 +157,23 @@ describe('EventBus Pub/Sub with Priority', () => {
       const executionOrder = [];
 
       // Async handlers
-      eventBus.on('AGENT_STARTED', async () => {
-        await new Promise(resolve => setTimeout(resolve, 10));
-        executionOrder.push('low');
-      }, 10);
+      eventBus.on(
+        'AGENT_STARTED',
+        async () => {
+          await new Promise(resolve => setTimeout(resolve, 10));
+          executionOrder.push('low');
+        },
+        10
+      );
 
-      eventBus.on('AGENT_STARTED', async () => {
-        await new Promise(resolve => setTimeout(resolve, 5));
-        executionOrder.push('high');
-      }, 90);
+      eventBus.on(
+        'AGENT_STARTED',
+        async () => {
+          await new Promise(resolve => setTimeout(resolve, 5));
+          executionOrder.push('high');
+        },
+        90
+      );
 
       await eventBus.emit('AGENT_STARTED', {
         type: 'AGENT_STARTED',
@@ -263,7 +274,9 @@ describe('EventBus Pub/Sub with Priority', () => {
       let errorLogged = false;
 
       const originalError = console.error;
-      console.error = () => { errorLogged = true; };
+      console.error = () => {
+        errorLogged = true;
+      };
 
       try {
         eventBus.on('AGENT_STARTED', async () => {
@@ -307,10 +320,7 @@ describe('EventBus Pub/Sub with Priority', () => {
       const elapsed = Date.now() - start;
 
       // emit() should return immediately (<50ms, not wait for 100ms handler)
-      assert.ok(
-        elapsed < 50,
-        `emit() should return immediately, took ${elapsed}ms`
-      );
+      assert.ok(elapsed < 50, `emit() should return immediately, took ${elapsed}ms`);
     });
 
     it('should execute handlers asynchronously', async () => {
@@ -342,7 +352,7 @@ describe('EventBus Pub/Sub with Priority', () => {
     it('should handle TASK_CREATED events', async () => {
       let received = null;
 
-      eventBus.on('TASK_CREATED', (payload) => {
+      eventBus.on('TASK_CREATED', payload => {
         received = payload;
       });
 
@@ -364,7 +374,7 @@ describe('EventBus Pub/Sub with Priority', () => {
     it('should handle TOOL_INVOKED events', async () => {
       let received = null;
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         received = payload;
       });
 
@@ -387,7 +397,7 @@ describe('EventBus Pub/Sub with Priority', () => {
     it('should handle LLM_COMPLETED events', async () => {
       let received = null;
 
-      eventBus.on('LLM_COMPLETED', (payload) => {
+      eventBus.on('LLM_COMPLETED', payload => {
         received = payload;
       });
 

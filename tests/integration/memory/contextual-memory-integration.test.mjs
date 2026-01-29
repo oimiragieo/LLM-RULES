@@ -20,8 +20,14 @@ describe('ContextualMemory - Integration Tests', () => {
   beforeEach(async () => {
     // Create unique test paths
     const timestamp = Date.now();
-    testDbPath = path.join(projectRoot, `.claude/data/test-contextual-memory-integration-${timestamp}.db`);
-    testMemoryDir = path.join(projectRoot, `.claude/context/test-contextual-memory-integration-${timestamp}`);
+    testDbPath = path.join(
+      projectRoot,
+      `.claude/data/test-contextual-memory-integration-${timestamp}.db`
+    );
+    testMemoryDir = path.join(
+      projectRoot,
+      `.claude/context/test-contextual-memory-integration-${timestamp}`
+    );
 
     // Ensure directories exist
     fs.mkdirSync(path.dirname(testDbPath), { recursive: true });
@@ -106,44 +112,79 @@ Test-Driven Development requires writing failing tests FIRST before implementati
     `);
 
     // Insert test entities (realistic data)
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entities (id, type, name, description, source_file, quality_score)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run('hybrid-memory-pattern', 'pattern', 'Hybrid Memory Pattern', 'Combining file-based and database storage', 'learnings.md', 0.95);
+    `
+    ).run(
+      'hybrid-memory-pattern',
+      'pattern',
+      'Hybrid Memory Pattern',
+      'Combining file-based and database storage',
+      'learnings.md',
+      0.95
+    );
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entities (id, type, name, description, source_file, quality_score)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run('chromadb', 'concept', 'ChromaDB', 'Vector database for semantic search', 'learnings.md', 0.9);
+    `
+    ).run(
+      'chromadb',
+      'concept',
+      'ChromaDB',
+      'Vector database for semantic search',
+      'learnings.md',
+      0.9
+    );
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entities (id, type, name, description, source_file, quality_score)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run('sqlite', 'concept', 'SQLite', 'Embedded relational database', 'learnings.md', 0.85);
+    `
+    ).run('sqlite', 'concept', 'SQLite', 'Embedded relational database', 'learnings.md', 0.85);
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entities (id, type, name, description, source_file, quality_score)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run('adr-054', 'decision', 'Memory System Enhancement', 'Hybrid memory architecture decision', 'decisions.md', 0.92);
+    `
+    ).run(
+      'adr-054',
+      'decision',
+      'Memory System Enhancement',
+      'Hybrid memory architecture decision',
+      'decisions.md',
+      0.92
+    );
 
     // Enable foreign keys
     db.pragma('foreign_keys = ON');
 
     // Add relationships
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type, weight)
       VALUES (?, ?, ?, ?)
-    `).run('hybrid-memory-pattern', 'chromadb', 'relates_to', 0.9);
+    `
+    ).run('hybrid-memory-pattern', 'chromadb', 'relates_to', 0.9);
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type, weight)
       VALUES (?, ?, ?, ?)
-    `).run('hybrid-memory-pattern', 'sqlite', 'relates_to', 0.85);
+    `
+    ).run('hybrid-memory-pattern', 'sqlite', 'relates_to', 0.85);
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type, weight)
       VALUES (?, ?, ?, ?)
-    `).run('adr-054', 'hybrid-memory-pattern', 'implements', 0.95);
+    `
+    ).run('adr-054', 'hybrid-memory-pattern', 'implements', 0.95);
 
     db.close();
 
@@ -190,7 +231,7 @@ Test-Driven Development requires writing failing tests FIRST before implementati
       assert.ok(related.length >= 2, 'Should find at least 2 related entities');
 
       // Verify related entities are ChromaDB and SQLite
-      const relatedIds = related.map((r) => r.entity.id);
+      const relatedIds = related.map(r => r.entity.id);
       assert.ok(relatedIds.includes('chromadb'), 'Should include ChromaDB');
       assert.ok(relatedIds.includes('sqlite'), 'Should include SQLite');
     });
@@ -201,7 +242,7 @@ Test-Driven Development requires writing failing tests FIRST before implementati
         quality_score: 0.9,
       });
       assert.ok(highQuality.length > 0, 'Should find high-quality patterns');
-      highQuality.forEach((entity) => {
+      highQuality.forEach(entity => {
         assert.ok(entity.quality_score >= 0.9, 'Quality score should be >= 0.9');
       });
     });
@@ -224,9 +265,12 @@ Test-Driven Development requires writing failing tests FIRST before implementati
 
       // ADR-054 → implements → hybrid-memory-pattern → relates_to → chromadb/sqlite
       // So depth 2 should reach chromadb and sqlite through hybrid-memory-pattern
-      const foundIds = deepRelated.map((r) => r.entity.id);
+      const foundIds = deepRelated.map(r => r.entity.id);
       // At minimum, should find hybrid-memory-pattern (depth 1)
-      assert.ok(foundIds.includes('hybrid-memory-pattern'), 'Should find hybrid-memory-pattern at depth 1');
+      assert.ok(
+        foundIds.includes('hybrid-memory-pattern'),
+        'Should find hybrid-memory-pattern at depth 1'
+      );
     });
 
     it('should filter relationships by type', async () => {
@@ -235,7 +279,7 @@ Test-Driven Development requires writing failing tests FIRST before implementati
         relationshipType: 'implements',
       });
       assert.ok(implementsRels.length > 0, 'Should find implements relationships');
-      implementsRels.forEach((rel) => {
+      implementsRels.forEach(rel => {
         assert.strictEqual(rel.relationship_type, 'implements');
       });
 
@@ -244,7 +288,7 @@ Test-Driven Development requires writing failing tests FIRST before implementati
         relationshipType: 'relates_to',
       });
       assert.ok(relatesTo.length > 0, 'Should find relates_to relationships');
-      relatesTo.forEach((rel) => {
+      relatesTo.forEach(rel => {
         assert.strictEqual(rel.relationship_type, 'relates_to');
       });
     });

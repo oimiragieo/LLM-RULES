@@ -9,8 +9,6 @@
 'use strict';
 
 const path = require('path');
-const { fileURLToPath } = require('url');
-const { dirname } = require('path');
 
 // Test utilities
 let passCount = 0;
@@ -69,7 +67,9 @@ async function runTests() {
     eventBus = require('../../../.claude/lib/events/event-bus.cjs');
   } catch (error) {
     console.error('Failed to load EventBus module:', error.message);
-    console.error('This is expected for RED phase of TDD - implement the module to make tests pass');
+    console.error(
+      'This is expected for RED phase of TDD - implement the module to make tests pass'
+    );
     process.exit(1);
   }
 
@@ -103,7 +103,7 @@ async function runTests() {
   await describe('Event Emission', async () => {
     await test('should emit events to subscribers', async () => {
       let received = null;
-      const subscription = eventBus.on('TEST_EVENT', (payload) => {
+      const subscription = eventBus.on('TEST_EVENT', payload => {
         received = payload;
       });
 
@@ -121,7 +121,7 @@ async function runTests() {
 
     await test('should add timestamp to emitted events', async () => {
       let received = null;
-      const subscription = eventBus.on('TIMESTAMP_TEST', (payload) => {
+      const subscription = eventBus.on('TIMESTAMP_TEST', payload => {
         received = payload;
       });
 
@@ -137,10 +137,10 @@ async function runTests() {
 
     await test('should handle multiple subscribers for same event', async () => {
       const received = [];
-      const sub1 = eventBus.on('MULTI_TEST', (payload) => {
+      const sub1 = eventBus.on('MULTI_TEST', _payload => {
         received.push('handler1');
       });
-      const sub2 = eventBus.on('MULTI_TEST', (payload) => {
+      const sub2 = eventBus.on('MULTI_TEST', _payload => {
         received.push('handler2');
       });
 
@@ -168,7 +168,11 @@ async function runTests() {
 
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      assertDeepEqual(order, ['high', 'medium', 'low'], 'handlers should execute high to low priority');
+      assertDeepEqual(
+        order,
+        ['high', 'medium', 'low'],
+        'handlers should execute high to low priority'
+      );
 
       eventBus.off(sub1);
       eventBus.off(sub2);
@@ -213,7 +217,7 @@ async function runTests() {
 
     await test('should support once subscription', async () => {
       let callCount = 0;
-      const subscription = eventBus.once('ONCE_TEST', () => callCount++);
+      eventBus.once('ONCE_TEST', () => callCount++);
 
       await eventBus.emit('ONCE_TEST', {});
       await new Promise(resolve => setTimeout(resolve, 10));

@@ -21,8 +21,10 @@ let telemetryClient;
 describe('Span Hierarchy Integration Tests', () => {
   before(async () => {
     // Import modules
-    const instrumentationPath = 'C:\\dev\\projects\\agent-studio\\.claude\\lib\\observability\\agent-instrumentation.cjs';
-    const telemetryPath = 'C:\\dev\\projects\\agent-studio\\.claude\\lib\\observability\\telemetry-client.cjs';
+    const instrumentationPath =
+      'C:\\dev\\projects\\agent-studio\\.claude\\lib\\observability\\agent-instrumentation.cjs';
+    const telemetryPath =
+      'C:\\dev\\projects\\agent-studio\\.claude\\lib\\observability\\telemetry-client.cjs';
 
     agentInstrumentation = require(instrumentationPath);
     telemetryClient = require(telemetryPath);
@@ -59,7 +61,11 @@ describe('Span Hierarchy Integration Tests', () => {
         }
       );
 
-      assert.strictEqual(parentResult, 'parent-completed: child-completed', 'Nested result should propagate');
+      assert.strictEqual(
+        parentResult,
+        'parent-completed: child-completed',
+        'Nested result should propagate'
+      );
     });
 
     it('maintains trace relationship across multiple child spans', async () => {
@@ -89,7 +95,11 @@ describe('Span Hierarchy Integration Tests', () => {
         }
       );
 
-      assert.deepStrictEqual(result, ['plan-complete', 'impl-complete', 'test-complete'], 'All child results should be collected');
+      assert.deepStrictEqual(
+        result,
+        ['plan-complete', 'impl-complete', 'test-complete'],
+        'All child results should be collected'
+      );
     });
 
     it('supports deeply nested spans (3+ levels)', async () => {
@@ -97,25 +107,13 @@ describe('Span Hierarchy Integration Tests', () => {
         'level-1',
         'operation-1',
         async () => {
-          return agentInstrumentation.withAgentSpan(
-            'level-2',
-            'operation-2',
-            async () => {
-              return agentInstrumentation.withAgentSpan(
-                'level-3',
-                'operation-3',
-                async () => {
-                  return agentInstrumentation.withAgentSpan(
-                    'level-4',
-                    'operation-4',
-                    async () => {
-                      return 'deepest-level';
-                    }
-                  );
-                }
-              );
-            }
-          );
+          return agentInstrumentation.withAgentSpan('level-2', 'operation-2', async () => {
+            return agentInstrumentation.withAgentSpan('level-3', 'operation-3', async () => {
+              return agentInstrumentation.withAgentSpan('level-4', 'operation-4', async () => {
+                return 'deepest-level';
+              });
+            });
+          });
         }
       );
 
@@ -127,19 +125,11 @@ describe('Span Hierarchy Integration Tests', () => {
     it('propagates error from child to parent', async () => {
       await assert.rejects(
         async () => {
-          await agentInstrumentation.withAgentSpan(
-            'parent-agent',
-            'parent-operation',
-            async () => {
-              await agentInstrumentation.withAgentSpan(
-                'child-agent',
-                'child-operation',
-                async () => {
-                  throw new Error('Child error');
-                }
-              );
-            }
-          );
+          await agentInstrumentation.withAgentSpan('parent-agent', 'parent-operation', async () => {
+            await agentInstrumentation.withAgentSpan('child-agent', 'child-operation', async () => {
+              throw new Error('Child error');
+            });
+          });
         },
         { message: 'Child error' },
         'Child error should propagate to parent'
@@ -167,13 +157,9 @@ describe('Span Hierarchy Integration Tests', () => {
 
           // Child 2: Error
           try {
-            await agentInstrumentation.withAgentSpan(
-              'child-2',
-              'task-2',
-              async () => {
-                throw new Error('Task 2 failed');
-              }
-            );
+            await agentInstrumentation.withAgentSpan('child-2', 'task-2', async () => {
+              throw new Error('Task 2 failed');
+            });
           } catch (error) {
             results.push(`error-2: ${error.message}`);
           }

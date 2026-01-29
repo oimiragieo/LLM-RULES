@@ -72,23 +72,43 @@ describe('ContextualMemory - Unit Tests', () => {
     `);
 
     // Insert test entities
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entities (id, type, name, description, source_file, quality_score)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run('test-concept-1', 'concept', 'Vector Database', 'A database optimized for vector search', 'learnings.md', 0.9);
+    `
+    ).run(
+      'test-concept-1',
+      'concept',
+      'Vector Database',
+      'A database optimized for vector search',
+      'learnings.md',
+      0.9
+    );
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entities (id, type, name, description, source_file, quality_score)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run('test-pattern-1', 'pattern', 'Hybrid Memory', 'Combining file-based and database storage', 'learnings.md', 0.85);
+    `
+    ).run(
+      'test-pattern-1',
+      'pattern',
+      'Hybrid Memory',
+      'Combining file-based and database storage',
+      'learnings.md',
+      0.85
+    );
 
     // Enable foreign keys before inserting relationships
     db.pragma('foreign_keys = ON');
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type, weight)
       VALUES (?, ?, ?, ?)
-    `).run('test-concept-1', 'test-pattern-1', 'relates_to', 0.8);
+    `
+    ).run('test-concept-1', 'test-pattern-1', 'relates_to', 0.8);
 
     db.close();
 
@@ -156,7 +176,7 @@ describe('ContextualMemory - Unit Tests', () => {
         quality_score: 0.85,
       });
       assert.ok(Array.isArray(results), 'Results should be an array');
-      results.forEach((entity) => {
+      results.forEach(entity => {
         assert.ok(entity.quality_score >= 0.85, 'Should filter by quality score');
       });
     });
@@ -182,7 +202,7 @@ describe('ContextualMemory - Unit Tests', () => {
         relationshipType: 'relates_to',
       });
       assert.ok(Array.isArray(results), 'Results should be an array');
-      results.forEach((result) => {
+      results.forEach(result => {
         assert.strictEqual(result.relationship_type, 'relates_to');
       });
     });

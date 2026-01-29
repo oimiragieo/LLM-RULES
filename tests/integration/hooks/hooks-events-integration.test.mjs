@@ -63,19 +63,19 @@ async function runHook(hookPath, toolInput, env = {}) {
     hookProcess.stdin.write(JSON.stringify(toolInput));
     hookProcess.stdin.end();
 
-    hookProcess.stdout.on('data', (data) => {
+    hookProcess.stdout.on('data', data => {
       stdout += data.toString();
     });
 
-    hookProcess.stderr.on('data', (data) => {
+    hookProcess.stderr.on('data', data => {
       stderr += data.toString();
     });
 
-    hookProcess.on('close', (exitCode) => {
+    hookProcess.on('close', exitCode => {
       resolve({ exitCode, stdout, stderr });
     });
 
-    hookProcess.on('error', (err) => {
+    hookProcess.on('error', err => {
       reject(err);
     });
   });
@@ -97,7 +97,10 @@ async function waitForEvents(ms = 100) {
 
 describe('Hooks + Events Integration', () => {
   const routingGuardPath = path.join(projectRoot, '.claude/hooks/routing/routing-guard.cjs');
-  const creatorGuardPath = path.join(projectRoot, '.claude/hooks/routing/unified-creator-guard.cjs');
+  const creatorGuardPath = path.join(
+    projectRoot,
+    '.claude/hooks/routing/unified-creator-guard.cjs'
+  );
 
   beforeEach(() => {
     // Clear all subscriptions before each test
@@ -118,7 +121,7 @@ describe('Hooks + Events Integration', () => {
       const capturedEvents = [];
 
       // Subscribe to TOOL_INVOKED
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push({ type: 'TOOL_INVOKED', payload });
       });
 
@@ -147,7 +150,7 @@ describe('Hooks + Events Integration', () => {
     it('routing-guard emits AGENT_STARTED when spawning agent', async () => {
       const capturedEvents = [];
 
-      eventBus.on('AGENT_STARTED', (payload) => {
+      eventBus.on('AGENT_STARTED', payload => {
         capturedEvents.push({ type: 'AGENT_STARTED', payload });
       });
 
@@ -172,7 +175,7 @@ describe('Hooks + Events Integration', () => {
     it('unified-creator-guard emits TOOL_INVOKED with metadata', async () => {
       const capturedEvents = [];
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push({ type: 'TOOL_INVOKED', payload });
       });
 
@@ -210,7 +213,7 @@ describe('Hooks + Events Integration', () => {
     it('should emit separate events for each hook invocation', async () => {
       const capturedEvents = [];
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push({ type: 'TOOL_INVOKED', payload });
       });
 
@@ -253,7 +256,7 @@ describe('Hooks + Events Integration', () => {
     it('should handle rapid successive events without loss', async () => {
       const capturedEvents = [];
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push(payload.taskId);
       });
 
@@ -291,7 +294,7 @@ describe('Hooks + Events Integration', () => {
     it('should emit TOOL_INVOKED even when hook blocks operation', async () => {
       const capturedEvents = [];
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push({ type: 'TOOL_INVOKED', payload });
       });
 
@@ -308,7 +311,11 @@ describe('Hooks + Events Integration', () => {
 
       await waitForEvents();
 
-      assert.strictEqual(capturedEvents.length, 1, 'Event should be emitted even if hook would block');
+      assert.strictEqual(
+        capturedEvents.length,
+        1,
+        'Event should be emitted even if hook would block'
+      );
       assert.strictEqual(capturedEvents[0].payload.toolName, 'Glob');
     });
 
@@ -321,7 +328,7 @@ describe('Hooks + Events Integration', () => {
       });
 
       // Add handler that works
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push(payload.taskId);
       });
 
@@ -338,7 +345,11 @@ describe('Hooks + Events Integration', () => {
       await waitForEvents();
 
       // Second handler should still execute despite first handler error
-      assert.strictEqual(capturedEvents.length, 1, 'Working handler should execute despite error in another');
+      assert.strictEqual(
+        capturedEvents.length,
+        1,
+        'Working handler should execute despite error in another'
+      );
       assert.strictEqual(capturedEvents[0], 'task-resilient');
     });
   });
@@ -400,7 +411,10 @@ describe('Hooks + Events Integration', () => {
       const validation = validateEvent('TOOL_INVOKED', validPayload);
 
       assert.ok(validation.valid, 'Valid TOOL_INVOKED payload should pass validation');
-      assert.ok(!validation.errors || validation.errors.length === 0, 'Should have no validation errors');
+      assert.ok(
+        !validation.errors || validation.errors.length === 0,
+        'Should have no validation errors'
+      );
     });
 
     it('AGENT_STARTED events should validate against schema', async () => {
@@ -415,7 +429,10 @@ describe('Hooks + Events Integration', () => {
       const validation = validateEvent('AGENT_STARTED', validPayload);
 
       assert.ok(validation.valid, 'Valid AGENT_STARTED payload should pass validation');
-      assert.ok(!validation.errors || validation.errors.length === 0, 'Should have no validation errors');
+      assert.ok(
+        !validation.errors || validation.errors.length === 0,
+        'Should have no validation errors'
+      );
     });
 
     it('should reject invalid event payloads', async () => {
@@ -434,7 +451,7 @@ describe('Hooks + Events Integration', () => {
     it('EventBus should not emit invalid events', async () => {
       const capturedEvents = [];
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push(payload);
       });
 
@@ -460,7 +477,7 @@ describe('Hooks + Events Integration', () => {
     it('should auto-add timestamp if not provided', async () => {
       const capturedEvents = [];
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push(payload);
       });
 
@@ -488,7 +505,7 @@ describe('Hooks + Events Integration', () => {
       const capturedEvents = [];
       const userTimestamp = '2026-01-29T10:30:00.000Z';
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push(payload);
       });
 
@@ -503,7 +520,11 @@ describe('Hooks + Events Integration', () => {
 
       await waitForEvents();
 
-      assert.strictEqual(capturedEvents[0].timestamp, userTimestamp, 'User timestamp should be preserved');
+      assert.strictEqual(
+        capturedEvents[0].timestamp,
+        userTimestamp,
+        'User timestamp should be preserved'
+      );
     });
   });
 
@@ -516,17 +537,29 @@ describe('Hooks + Events Integration', () => {
       const executionOrder = [];
 
       // Subscribe with different priorities
-      eventBus.on('TOOL_INVOKED', () => {
-        executionOrder.push('low');
-      }, 10); // Low priority
+      eventBus.on(
+        'TOOL_INVOKED',
+        () => {
+          executionOrder.push('low');
+        },
+        10
+      ); // Low priority
 
-      eventBus.on('TOOL_INVOKED', () => {
-        executionOrder.push('high');
-      }, 90); // High priority
+      eventBus.on(
+        'TOOL_INVOKED',
+        () => {
+          executionOrder.push('high');
+        },
+        90
+      ); // High priority
 
-      eventBus.on('TOOL_INVOKED', () => {
-        executionOrder.push('medium');
-      }, 50); // Medium priority (default)
+      eventBus.on(
+        'TOOL_INVOKED',
+        () => {
+          executionOrder.push('medium');
+        },
+        50
+      ); // Medium priority (default)
 
       await eventBus.emit('TOOL_INVOKED', {
         type: 'TOOL_INVOKED',

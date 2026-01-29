@@ -7,7 +7,10 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 // Import retry utility
-const { retryWithBackoff, isTransientError } = require('../../../.claude/lib/utils/retry-with-backoff.cjs');
+const {
+  retryWithBackoff,
+  isTransientError,
+} = require('../../../.claude/lib/utils/retry-with-backoff.cjs');
 
 describe('Retry with Exponential Backoff', () => {
   describe('retryWithBackoff()', () => {
@@ -43,7 +46,6 @@ describe('Retry with Exponential Backoff', () => {
     });
 
     it('should use exponential backoff delays: 1s, 2s, 4s, 8s, 16s', async () => {
-      const delays = [];
       let attempts = 0;
 
       const operation = async () => {
@@ -117,12 +119,9 @@ describe('Retry with Exponential Backoff', () => {
         throw new SyntaxError('Unexpected token');
       };
 
-      await assert.rejects(
-        async () => {
-          await retryWithBackoff(operation);
-        },
-        SyntaxError
-      );
+      await assert.rejects(async () => {
+        await retryWithBackoff(operation);
+      }, SyntaxError);
 
       assert.strictEqual(attempts, 1, 'Should not retry on syntax error');
     });
@@ -193,7 +192,7 @@ describe('Retry with Exponential Backoff', () => {
 
       assert.strictEqual(retryAttempts.length, 2, 'Should call onRetry twice');
       assert.deepStrictEqual(
-        retryAttempts.map((r) => r.attempt),
+        retryAttempts.map(r => r.attempt),
         [1, 2],
         'Should have correct attempt numbers'
       );

@@ -37,9 +37,8 @@ describe('Execution Limit Monitor Hook', () => {
     mockEventBus = new MockEventBus();
 
     // Clear require cache to get fresh instance
-    const modulePath = require.resolve(
-      '../../../.claude/hooks/monitoring/execution-limit-monitor.cjs'
-    );
+    const modulePath =
+      require.resolve('../../../.claude/hooks/monitoring/execution-limit-monitor.cjs');
     delete require.cache[modulePath];
 
     // Mock the event bus module before requiring the monitor
@@ -86,7 +85,7 @@ describe('Execution Limit Monitor Hook', () => {
       };
 
       // Listen for warning event
-      mockEventBus.once('AGENT_LIMIT_WARNING', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_WARNING', payload => {
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_turns');
         assert.equal(payload.current, 8);
@@ -110,7 +109,7 @@ describe('Execution Limit Monitor Hook', () => {
       };
 
       // Listen for exceeded event
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_turns');
         assert.equal(payload.current, 5); // Turn 5 triggers the exceeded event
@@ -154,7 +153,7 @@ describe('Execution Limit Monitor Hook', () => {
       };
 
       // Listen for warning event
-      mockEventBus.once('AGENT_LIMIT_WARNING', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_WARNING', payload => {
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_duration_ms');
         assert.ok(payload.current >= 80, 'Should warn at 80% duration');
@@ -177,7 +176,7 @@ describe('Execution Limit Monitor Hook', () => {
       };
 
       // Listen for exceeded event
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_duration_ms');
         assert.ok(payload.current >= 100, 'Should exceed at 100ms');
@@ -204,12 +203,12 @@ describe('Execution Limit Monitor Hook', () => {
       executionMonitor.startMonitoring(agentId, limits);
 
       // Simulate LLM calls with costs
-      executionMonitor.recordTurn(agentId, { cost: 0.10 });
+      executionMonitor.recordTurn(agentId, { cost: 0.1 });
       executionMonitor.recordTurn(agentId, { cost: 0.25 });
       executionMonitor.recordTurn(agentId, { cost: 0.15 });
 
       const status = executionMonitor.getStatus(agentId);
-      assert.equal(status.cost, 0.50, 'Should accumulate $0.50 in costs');
+      assert.equal(status.cost, 0.5, 'Should accumulate $0.50 in costs');
     });
 
     it('should emit warning at 80% of max_cost_usd', (t, done) => {
@@ -220,10 +219,10 @@ describe('Execution Limit Monitor Hook', () => {
       };
 
       // Listen for warning event
-      mockEventBus.once('AGENT_LIMIT_WARNING', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_WARNING', payload => {
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_cost_usd');
-        assert.equal(payload.current, 0.80);
+        assert.equal(payload.current, 0.8);
         assert.equal(payload.max, 1.0);
         done();
       });
@@ -231,7 +230,7 @@ describe('Execution Limit Monitor Hook', () => {
       executionMonitor.startMonitoring(agentId, limits);
 
       // Accumulate $0.80 (80% of $1.00)
-      executionMonitor.recordTurn(agentId, { cost: 0.80 });
+      executionMonitor.recordTurn(agentId, { cost: 0.8 });
     });
 
     it('should emit exceeded event at 100% of max_cost_usd', (t, done) => {
@@ -242,10 +241,10 @@ describe('Execution Limit Monitor Hook', () => {
       };
 
       // Listen for exceeded event
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_cost_usd');
-        assert.equal(payload.current, 1.10);
+        assert.equal(payload.current, 1.1);
         assert.equal(payload.max, 1.0);
         assert.equal(payload.action, 'terminate');
         done();
@@ -254,7 +253,7 @@ describe('Execution Limit Monitor Hook', () => {
       executionMonitor.startMonitoring(agentId, limits);
 
       // Accumulate $1.10 (exceeds $1.00)
-      executionMonitor.recordTurn(agentId, { cost: 1.10 });
+      executionMonitor.recordTurn(agentId, { cost: 1.1 });
     });
   });
 
@@ -267,7 +266,7 @@ describe('Execution Limit Monitor Hook', () => {
       };
 
       // Listen for exceeded event
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         assert.equal(payload.action, 'warn');
         // Verify agent continues (no error thrown)
         assert.ok(true, 'Warning logged but agent continues');
@@ -290,7 +289,7 @@ describe('Execution Limit Monitor Hook', () => {
       };
 
       // Listen for exceeded event
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         assert.equal(payload.action, 'terminate');
         assert.throws(
           () => {

@@ -3,12 +3,10 @@
 
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
-const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Will import SyncLayer after we create it
@@ -56,11 +54,11 @@ describe('SyncLayer', () => {
     }
 
     // Clean up test files (best effort - ignore errors on Windows)
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise(resolve => setTimeout(resolve, 200));
     if (fs.existsSync(testMemoryDir)) {
       try {
         fs.rmSync(testMemoryDir, { recursive: true, force: true });
-      } catch (error) {
+      } catch (_error) {
         // Ignore cleanup errors (Windows file locking is expected)
         // Files will be cleaned up when process exits
       }
@@ -84,7 +82,7 @@ describe('SyncLayer', () => {
       fs.writeFileSync(testFile, '### Pattern: Test\nContent here');
 
       // Wait for debounce + processing
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       assert.ok(syncTriggered, 'Sync should be triggered on file change');
     });
@@ -99,20 +97,23 @@ describe('SyncLayer', () => {
       await syncLayer.start();
 
       const syncEvents = [];
-      syncLayer.on('sync', (data) => {
+      syncLayer.on('sync', data => {
         syncEvents.push(data);
       });
 
       // Write to all files with longer delays between writes
       for (const file of files) {
         fs.writeFileSync(file, `# Test content for ${path.basename(file)}`);
-        await new Promise((resolve) => setTimeout(resolve, 500)); // Increased from 150ms to 500ms
+        await new Promise(resolve => setTimeout(resolve, 500)); // Increased from 150ms to 500ms
       }
 
       // Wait for all debounce timers + processing
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      assert.ok(syncEvents.length >= 3, `Should trigger sync for all three files (got ${syncEvents.length})`);
+      assert.ok(
+        syncEvents.length >= 3,
+        `Should trigger sync for all three files (got ${syncEvents.length})`
+      );
     });
 
     it('should debounce rapid file changes', async () => {
@@ -127,13 +128,13 @@ describe('SyncLayer', () => {
 
       // Rapid writes (should debounce)
       fs.writeFileSync(testFile, 'Content 1');
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 50));
       fs.writeFileSync(testFile, 'Content 2');
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 50));
       fs.writeFileSync(testFile, 'Content 3');
 
       // Wait for all debounce timers (300ms) + extra buffer for Windows
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       // Windows fs.watch() emits multiple events per file write (known limitation)
       // 3 writes can generate 6+ events (2 per write: "change" events)
@@ -141,7 +142,7 @@ describe('SyncLayer', () => {
       // Acceptance: syncCount < 3 writes * 3 (worst case without debounce)
       assert.ok(
         syncCount < 9,
-        `Debouncing should reduce event count (got ${syncCount} syncs, expected <9 without debounce would be higher)`,
+        `Debouncing should reduce event count (got ${syncCount} syncs, expected <9 without debounce would be higher)`
       );
     });
   });
@@ -153,23 +154,20 @@ describe('SyncLayer', () => {
       await syncLayer.start();
 
       let extractedEntities = null;
-      syncLayer.on('entities-extracted', (data) => {
+      syncLayer.on('entities-extracted', data => {
         extractedEntities = data.entities;
       });
 
       // Write content with pattern
-      fs.writeFileSync(
-        testFile,
-        '### Pattern: WAL Sync\nWrite-ahead log pattern for reliability',
-      );
+      fs.writeFileSync(testFile, '### Pattern: WAL Sync\nWrite-ahead log pattern for reliability');
 
       // Wait for sync + extraction
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       assert.ok(extractedEntities, 'Should extract entities from file');
       assert.ok(
-        extractedEntities.some((e) => e.type === 'pattern'),
-        'Should extract pattern entity',
+        extractedEntities.some(e => e.type === 'pattern'),
+        'Should extract pattern entity'
       );
     });
 
@@ -179,7 +177,7 @@ describe('SyncLayer', () => {
       await syncLayer.start();
 
       let extractedEntities = null;
-      syncLayer.on('entities-extracted', (data) => {
+      syncLayer.on('entities-extracted', data => {
         extractedEntities = data.entities;
       });
 
@@ -187,12 +185,12 @@ describe('SyncLayer', () => {
       fs.writeFileSync(testFile, '## [ADR-001] Use SQLite for entity storage\nContext: ...');
 
       // Wait for sync + extraction
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       assert.ok(extractedEntities, 'Should extract entities from decisions');
       assert.ok(
-        extractedEntities.some((e) => e.type === 'decision'),
-        'Should extract decision entity',
+        extractedEntities.some(e => e.type === 'decision'),
+        'Should extract decision entity'
       );
     });
 
@@ -202,7 +200,7 @@ describe('SyncLayer', () => {
       await syncLayer.start();
 
       let extractedEntities = null;
-      syncLayer.on('entities-extracted', (data) => {
+      syncLayer.on('entities-extracted', data => {
         extractedEntities = data.entities;
       });
 
@@ -210,12 +208,12 @@ describe('SyncLayer', () => {
       fs.writeFileSync(testFile, '### Issue: File locking on Windows\nDescription: ...');
 
       // Wait for sync + extraction
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       assert.ok(extractedEntities, 'Should extract entities from issues');
       assert.ok(
-        extractedEntities.some((e) => e.type === 'issue'),
-        'Should extract issue entity',
+        extractedEntities.some(e => e.type === 'issue'),
+        'Should extract issue entity'
       );
     });
   });
@@ -227,14 +225,14 @@ describe('SyncLayer', () => {
       await syncLayer.start();
 
       // Wait for sync completion
-      const syncPromise = new Promise((resolve) => {
+      const syncPromise = new Promise(resolve => {
         syncLayer.on('sync-complete', resolve);
       });
 
       // Write content
       fs.writeFileSync(
         testFile,
-        '### Pattern: Debounce Pattern\nDelay execution until quiet period',
+        '### Pattern: Debounce Pattern\nDelay execution until quiet period'
       );
 
       // Wait for sync
@@ -256,7 +254,7 @@ describe('SyncLayer', () => {
       await invalidSync.start();
 
       let errorEmitted = false;
-      invalidSync.on('sync-error', (error) => {
+      invalidSync.on('sync-error', _error => {
         errorEmitted = true;
       });
 
@@ -264,7 +262,7 @@ describe('SyncLayer', () => {
       fs.writeFileSync(testFile, '### Pattern: Test\nContent');
 
       // Wait for sync attempt
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       assert.ok(errorEmitted, 'Should emit sync-error on database failure');
 
@@ -278,16 +276,15 @@ describe('SyncLayer', () => {
 
       await syncLayer.start();
 
-      let vectorsUpdated = false;
       syncLayer.on('vectors-updated', () => {
-        vectorsUpdated = true;
+        // Vector update handled
       });
 
       // Write content
       fs.writeFileSync(testFile, '### Pattern: Vector Search\nSemantic similarity search');
 
       // Wait for sync
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // For now, this will fail until we integrate ChromaDB
       // assert.ok(vectorsUpdated, 'Should update ChromaDB vectors');
@@ -336,7 +333,7 @@ describe('SyncLayer', () => {
       });
 
       fs.writeFileSync(testFile, 'Updated content');
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       assert.ok(!syncAfterStop, 'Should not sync after stop');
     });

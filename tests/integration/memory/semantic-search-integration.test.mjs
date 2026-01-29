@@ -36,7 +36,7 @@ describe('Semantic Search Integration Tests', () => {
     vectorStore = new MemoryVectorStore({
       persistDirectory: '.test-data/chromadb-integration',
       collectionName: TEST_COLLECTION,
-      host: 'http://localhost:8000'
+      host: 'http://localhost:8000',
     });
 
     try {
@@ -44,7 +44,9 @@ describe('Semantic Search Integration Tests', () => {
       collection = await vectorStore.getCollection();
     } catch (error) {
       if (error.message.includes('ECONNREFUSED') || error.message.includes('Failed to connect')) {
-        console.error('\n⚠️  ChromaDB server not running. Start with: docker run -p 8000:8000 chromadb/chroma\n');
+        console.error(
+          '\n⚠️  ChromaDB server not running. Start with: docker run -p 8000:8000 chromadb/chroma\n'
+        );
         throw new Error('ChromaDB server unavailable. Skipping integration tests.');
       }
       throw error;
@@ -56,7 +58,7 @@ describe('Semantic Search Integration Tests', () => {
     if (vectorStore && vectorStore.client && collection) {
       try {
         await vectorStore.client.deleteCollection({ name: TEST_COLLECTION });
-      } catch (error) {
+      } catch (_error) {
         // Ignore cleanup errors
       }
     }
@@ -68,7 +70,7 @@ describe('Semantic Search Integration Tests', () => {
       try {
         await vectorStore.client.deleteCollection({ name: TEST_COLLECTION });
         collection = await vectorStore.client.getOrCreateCollection({
-          name: TEST_COLLECTION
+          name: TEST_COLLECTION,
         });
         vectorStore.collection = collection;
       } catch (error) {
@@ -85,19 +87,19 @@ describe('Semantic Search Integration Tests', () => {
         documents: [
           'ChromaDB is a vector database for AI applications',
           'SQLite is a relational database for structured data',
-          'PostgreSQL is an advanced relational database'
+          'PostgreSQL is an advanced relational database',
         ],
         metadatas: [
           { type: 'learning', source: 'learnings.md', line: 10 },
           { type: 'learning', source: 'learnings.md', line: 20 },
-          { type: 'decision', source: 'decisions.md', line: 30 }
-        ]
+          { type: 'decision', source: 'decisions.md', line: 30 },
+        ],
       });
 
       // Search for vector database
       const results = await vectorStore.search('vector database for AI', {
         limit: 5,
-        minScore: 0.5
+        minScore: 0.5,
       });
 
       assert.ok(Array.isArray(results), 'Results should be an array');
@@ -111,7 +113,7 @@ describe('Semantic Search Integration Tests', () => {
       await collection.add({
         ids: ['test-1'],
         documents: ['Test document for structure validation'],
-        metadatas: [{ type: 'learning', tag: 'test' }]
+        metadatas: [{ type: 'learning', tag: 'test' }],
       });
 
       const results = await vectorStore.search('test document', { limit: 1 });
@@ -120,9 +122,18 @@ describe('Semantic Search Integration Tests', () => {
       const result = results[0];
 
       assert.ok(Object.prototype.hasOwnProperty.call(result, 'id'), 'Result should have id');
-      assert.ok(Object.prototype.hasOwnProperty.call(result, 'content'), 'Result should have content');
-      assert.ok(Object.prototype.hasOwnProperty.call(result, 'metadata'), 'Result should have metadata');
-      assert.ok(Object.prototype.hasOwnProperty.call(result, 'similarity'), 'Result should have similarity score');
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(result, 'content'),
+        'Result should have content'
+      );
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(result, 'metadata'),
+        'Result should have metadata'
+      );
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(result, 'similarity'),
+        'Result should have similarity score'
+      );
 
       assert.strictEqual(typeof result.id, 'string', 'ID should be string');
       assert.strictEqual(typeof result.content, 'string', 'Content should be string');
@@ -140,39 +151,41 @@ describe('Semantic Search Integration Tests', () => {
           'ChromaDB vector database provides semantic search capabilities for AI',
           'Semantic search uses embeddings to find similar documents by meaning',
           'The weather forecast predicts rain tomorrow afternoon',
-          'Cooking pasta requires boiling water and salt'
+          'Cooking pasta requires boiling water and salt',
         ],
         metadatas: [
           { type: 'learning', relevance: 'high' },
           { type: 'learning', relevance: 'high' },
           { type: 'learning', relevance: 'low' },
-          { type: 'learning', relevance: 'low' }
-        ]
+          { type: 'learning', relevance: 'low' },
+        ],
       });
     });
 
     it('should rank relevant documents higher than irrelevant ones', async () => {
       const results = await vectorStore.search('vector database semantic search', {
         limit: 10,
-        minScore: 0.0 // Get all results for comparison
+        minScore: 0.0, // Get all results for comparison
       });
 
       assert.ok(results.length >= 4, 'Should return all documents');
 
       // Top 2 results should be relevant (rel-1 or rel-2)
-      const top2Ids = results.slice(0, 2).map((r) => r.id);
+      const top2Ids = results.slice(0, 2).map(r => r.id);
       assert.ok(
         top2Ids.includes('rel-1') || top2Ids.includes('rel-2'),
         'Top 2 should include relevant documents'
       );
 
       // Relevant docs should have higher similarity than irrelevant
-      const relevant = results.filter((r) => r.id.startsWith('rel-'));
-      const irrelevant = results.filter((r) => r.id.startsWith('irrel-'));
+      const relevant = results.filter(r => r.id.startsWith('rel-'));
+      const irrelevant = results.filter(r => r.id.startsWith('irrel-'));
 
       if (relevant.length > 0 && irrelevant.length > 0) {
-        const avgRelevantScore = relevant.reduce((sum, r) => sum + r.similarity, 0) / relevant.length;
-        const avgIrrelevantScore = irrelevant.reduce((sum, r) => sum + r.similarity, 0) / irrelevant.length;
+        const avgRelevantScore =
+          relevant.reduce((sum, r) => sum + r.similarity, 0) / relevant.length;
+        const avgIrrelevantScore =
+          irrelevant.reduce((sum, r) => sum + r.similarity, 0) / irrelevant.length;
 
         assert.ok(
           avgRelevantScore > avgIrrelevantScore,
@@ -184,11 +197,11 @@ describe('Semantic Search Integration Tests', () => {
     it('should filter out low-similarity results with minScore', async () => {
       const results = await vectorStore.search('vector database', {
         limit: 10,
-        minScore: 0.6 // Higher threshold
+        minScore: 0.6, // Higher threshold
       });
 
       // All results should meet minScore
-      results.forEach((result) => {
+      results.forEach(result => {
         assert.ok(
           result.similarity >= 0.6,
           `Result "${result.content.substring(0, 50)}..." has similarity ${result.similarity.toFixed(2)}, expected >= 0.6`
@@ -196,7 +209,7 @@ describe('Semantic Search Integration Tests', () => {
       });
 
       // Should exclude irrelevant documents
-      const irrelevantIds = results.filter((r) => r.id.startsWith('irrel-'));
+      const irrelevantIds = results.filter(r => r.id.startsWith('irrel-'));
       assert.ok(
         irrelevantIds.length === 0 || irrelevantIds[0].similarity >= 0.6,
         'Irrelevant documents should be filtered out or have high similarity'
@@ -214,22 +227,22 @@ describe('Semantic Search Integration Tests', () => {
           'Pattern: Write-Ahead Log ensures reliable sync',
           'Decision: Use ChromaDB for semantic search',
           'Decision: Use SQLite for structured entity storage',
-          'Issue: ChromaDB connection timeout on slow networks'
+          'Issue: ChromaDB connection timeout on slow networks',
         ],
         metadatas: [
           { type: 'learning', category: 'pattern' },
           { type: 'learning', category: 'pattern' },
           { type: 'decision', category: 'architecture' },
           { type: 'decision', category: 'architecture' },
-          { type: 'issue', category: 'infrastructure' }
-        ]
+          { type: 'issue', category: 'infrastructure' },
+        ],
       });
     });
 
     it('should respect limit parameter', async () => {
       const results = await vectorStore.search('memory database', {
         limit: 2,
-        minScore: 0.0
+        minScore: 0.0,
       });
 
       assert.ok(results.length <= 2, `Should return at most 2 results, got ${results.length}`);
@@ -239,12 +252,16 @@ describe('Semantic Search Integration Tests', () => {
       const results = await vectorStore.search('database', {
         limit: 10,
         minScore: 0.0,
-        filters: { type: 'learning' }
+        filters: { type: 'learning' },
       });
 
       assert.ok(results.length > 0, 'Should return learning results');
-      results.forEach((result) => {
-        assert.strictEqual(result.metadata.type, 'learning', 'All results should have type=learning');
+      results.forEach(result => {
+        assert.strictEqual(
+          result.metadata.type,
+          'learning',
+          'All results should have type=learning'
+        );
       });
     });
 
@@ -252,12 +269,16 @@ describe('Semantic Search Integration Tests', () => {
       const results = await vectorStore.search('database', {
         limit: 10,
         minScore: 0.0,
-        filters: { type: 'decision' }
+        filters: { type: 'decision' },
       });
 
       assert.ok(results.length > 0, 'Should return decision results');
-      results.forEach((result) => {
-        assert.strictEqual(result.metadata.type, 'decision', 'All results should have type=decision');
+      results.forEach(result => {
+        assert.strictEqual(
+          result.metadata.type,
+          'decision',
+          'All results should have type=decision'
+        );
       });
     });
 
@@ -265,7 +286,7 @@ describe('Semantic Search Integration Tests', () => {
       const results = await vectorStore.search('database', {
         limit: 1,
         minScore: 0.0,
-        filters: { type: 'learning' }
+        filters: { type: 'learning' },
       });
 
       assert.ok(results.length <= 1, 'Should respect limit with filters');
@@ -278,10 +299,10 @@ describe('Semantic Search Integration Tests', () => {
       const results = await vectorStore.search('ChromaDB memory', {
         limit: 10,
         minScore: 0.5,
-        filters: { type: 'learning' }
+        filters: { type: 'learning' },
       });
 
-      results.forEach((result) => {
+      results.forEach(result => {
         assert.ok(result.similarity >= 0.5, 'Should meet minScore threshold');
         assert.strictEqual(result.metadata.type, 'learning', 'Should match metadata filter');
       });
@@ -298,25 +319,37 @@ describe('Semantic Search Integration Tests', () => {
           'The QA agent generates test cases and validates code quality using checklist-generator skill',
           'The planner agent breaks down features into Epic→Story→Task hierarchy for execution',
           'The architect agent designs system architecture using C4 model and ADRs',
-          'The technical-writer agent creates documentation from code comments and specifications'
+          'The technical-writer agent creates documentation from code comments and specifications',
         ],
         metadatas: [
           { agent: 'developer', skill: 'tdd' },
           { agent: 'qa', skill: 'checklist-generator' },
           { agent: 'planner', skill: 'task-breakdown' },
           { agent: 'architect', skill: 'c4-context' },
-          { agent: 'technical-writer', skill: 'documentation' }
-        ]
+          { agent: 'technical-writer', skill: 'documentation' },
+        ],
       });
     });
 
     it('should accurately retrieve agent information by role', async () => {
       const testCases = [
-        { query: 'who writes tests and validates quality', expectedAgent: 'qa', minSimilarity: 0.5 },
-        { query: 'who designs system architecture', expectedAgent: 'architect', minSimilarity: 0.5 },
+        {
+          query: 'who writes tests and validates quality',
+          expectedAgent: 'qa',
+          minSimilarity: 0.5,
+        },
+        {
+          query: 'who designs system architecture',
+          expectedAgent: 'architect',
+          minSimilarity: 0.5,
+        },
         { query: 'who writes code using TDD', expectedAgent: 'developer', minSimilarity: 0.5 },
-        { query: 'who creates documentation', expectedAgent: 'technical-writer', minSimilarity: 0.5 },
-        { query: 'who breaks down tasks', expectedAgent: 'planner', minSimilarity: 0.5 }
+        {
+          query: 'who creates documentation',
+          expectedAgent: 'technical-writer',
+          minSimilarity: 0.5,
+        },
+        { query: 'who breaks down tasks', expectedAgent: 'planner', minSimilarity: 0.5 },
       ];
 
       let correctMatches = 0;
@@ -327,8 +360,9 @@ describe('Semantic Search Integration Tests', () => {
 
         if (searchResults.length > 0) {
           const topResult = searchResults[0];
-          const isCorrect = topResult.metadata.agent === testCase.expectedAgent &&
-                           topResult.similarity >= testCase.minSimilarity;
+          const isCorrect =
+            topResult.metadata.agent === testCase.expectedAgent &&
+            topResult.similarity >= testCase.minSimilarity;
 
           if (isCorrect) {
             correctMatches++;
@@ -339,7 +373,7 @@ describe('Semantic Search Integration Tests', () => {
             expected: testCase.expectedAgent,
             actual: topResult.metadata.agent,
             similarity: topResult.similarity.toFixed(2),
-            correct: isCorrect
+            correct: isCorrect,
           });
         } else {
           results.push({
@@ -347,7 +381,7 @@ describe('Semantic Search Integration Tests', () => {
             expected: testCase.expectedAgent,
             actual: 'NO_RESULTS',
             similarity: 0,
-            correct: false
+            correct: false,
           });
         }
       }
@@ -355,24 +389,21 @@ describe('Semantic Search Integration Tests', () => {
       const accuracy = (correctMatches / testCases.length) * 100;
 
       console.log('\n=== Accuracy Test Results ===');
-      results.forEach((r) => {
+      results.forEach(r => {
         console.log(
           `${r.correct ? '✓' : '✗'} "${r.query}" → ${r.actual} (${r.similarity}) [expected: ${r.expected}]`
         );
       });
       console.log(`\nAccuracy: ${correctMatches}/${testCases.length} (${accuracy.toFixed(1)}%)\n`);
 
-      assert.ok(
-        accuracy >= 85,
-        `Accuracy ${accuracy.toFixed(1)}% should be >= 85% target`
-      );
+      assert.ok(accuracy >= 85, `Accuracy ${accuracy.toFixed(1)}% should be >= 85% target`);
     });
 
     it('should retrieve relevant skills by description', async () => {
       const skillQueries = [
         { query: 'test-driven development practice', expectedSkill: 'tdd' },
         { query: 'quality validation checklist', expectedSkill: 'checklist-generator' },
-        { query: 'system context diagrams', expectedSkill: 'c4-context' }
+        { query: 'system context diagrams', expectedSkill: 'c4-context' },
       ];
 
       let correctMatches = 0;
@@ -400,7 +431,7 @@ describe('Semantic Search Integration Tests', () => {
       const invalidStore = new MemoryVectorStore({
         persistDirectory: '.test-data/chromadb-invalid',
         collectionName: 'test-invalid',
-        host: 'http://localhost:9999' // Invalid port
+        host: 'http://localhost:9999', // Invalid port
       });
 
       await assert.rejects(
@@ -409,7 +440,7 @@ describe('Semantic Search Integration Tests', () => {
           await invalidStore.getCollection();
           await invalidStore.search('test query');
         },
-        (error) => {
+        error => {
           return (
             error.message.includes('Failed to initialize') ||
             error.message.includes('Failed to get or create collection') ||
@@ -428,7 +459,7 @@ describe('Semantic Search Integration Tests', () => {
 
       // Check invalid server
       const invalidStore = new MemoryVectorStore({
-        host: 'http://localhost:9999'
+        host: 'http://localhost:9999',
       });
 
       await invalidStore.initialize().catch(() => {}); // Ignore initialization errors
@@ -439,7 +470,7 @@ describe('Semantic Search Integration Tests', () => {
 
     it('should throw error when searching without initialization', async () => {
       const uninitializedStore = new MemoryVectorStore({
-        collectionName: 'test-uninitialized'
+        collectionName: 'test-uninitialized',
       });
 
       await assert.rejects(

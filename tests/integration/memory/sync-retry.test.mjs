@@ -16,7 +16,9 @@ const projectRoot = path.resolve(__dirname, '../../..');
 
 // Import SyncLayer and database initialization
 const { SyncLayer } = require(path.join(projectRoot, '.claude/lib/memory/sync-layer.cjs'));
-const { initializeDatabase } = require(path.join(projectRoot, '.claude/tools/cli/init-memory-db.cjs'));
+const { initializeDatabase } = require(
+  path.join(projectRoot, '.claude/tools/cli/init-memory-db.cjs')
+);
 
 describe('SyncLayer Retry Logic (Integration)', () => {
   let testCounter = 0;
@@ -45,7 +47,7 @@ describe('SyncLayer Retry Logic (Integration)', () => {
       if (syncLayer) {
         await syncLayer.stop();
       }
-    } catch (error) {
+    } catch (_error) {
       // Ignore cleanup errors
     }
   });
@@ -90,10 +92,8 @@ describe('SyncLayer Retry Logic (Integration)', () => {
 
     // Mock extractor to fail first 2 attempts
     let attempts = 0;
-    const originalExtractFromFile = syncLayer.extractor.extractFromFile.bind(
-      syncLayer.extractor
-    );
-    syncLayer.extractor.extractFromFile = async (filePath) => {
+    const originalExtractFromFile = syncLayer.extractor.extractFromFile.bind(syncLayer.extractor);
+    syncLayer.extractor.extractFromFile = async filePath => {
       attempts++;
       if (attempts < 3) {
         const error = new Error('Database locked');
@@ -142,7 +142,7 @@ describe('SyncLayer Retry Logic (Integration)', () => {
     // Call syncChanges
     let syncErrorEmitted = false;
     let errorMessage;
-    syncLayer.once('sync-error', (data) => {
+    syncLayer.once('sync-error', data => {
       syncErrorEmitted = true;
       errorMessage = data.error;
     });
@@ -205,10 +205,8 @@ describe('SyncLayer Retry Logic (Integration)', () => {
 
     // Mock extractor to fail 3 times
     let attempts = 0;
-    const originalExtractFromFile = syncLayer.extractor.extractFromFile.bind(
-      syncLayer.extractor
-    );
-    syncLayer.extractor.extractFromFile = async (filePath) => {
+    const originalExtractFromFile = syncLayer.extractor.extractFromFile.bind(syncLayer.extractor);
+    syncLayer.extractor.extractFromFile = async filePath => {
       attempts++;
       if (attempts < 4) {
         const error = new Error('EAGAIN');
@@ -223,7 +221,10 @@ describe('SyncLayer Retry Logic (Integration)', () => {
     const totalTime = Date.now() - startTime;
 
     // With default baseDelay 1000ms: 1000 + 2000 + 4000 = 7000ms minimum
-    assert.ok(totalTime >= 7000, `Total time ${totalTime}ms should be >= 7000ms for exponential backoff`);
+    assert.ok(
+      totalTime >= 7000,
+      `Total time ${totalTime}ms should be >= 7000ms for exponential backoff`
+    );
     assert.strictEqual(attempts, 4, 'Should have 4 attempts (1 + 3 retries)');
   });
 });

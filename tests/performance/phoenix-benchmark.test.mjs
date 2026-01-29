@@ -30,7 +30,7 @@ const telemetryClient = require('../../.claude/lib/observability/telemetry-clien
 
 // Helper: Wait for async operations
 function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Helper: Check if Phoenix is available
@@ -51,9 +51,7 @@ describe('Phoenix Performance Benchmark', () => {
     phoenixAvailable = await isPhoenixAvailable();
 
     if (!phoenixAvailable) {
-      console.warn(
-        '\n⚠️  Phoenix not available at http://localhost:6006'
-      );
+      console.warn('\n⚠️  Phoenix not available at http://localhost:6006');
       console.warn('Start Phoenix: docker-compose -f docker-compose.phoenix.yml up -d\n');
       return;
     }
@@ -124,7 +122,10 @@ Trace Generation Performance:
       `);
 
       // Assertions
-      assert.ok(avgLatency < 1, `Average latency should be <1ms (actual: ${avgLatency.toFixed(2)}ms)`);
+      assert.ok(
+        avgLatency < 1,
+        `Average latency should be <1ms (actual: ${avgLatency.toFixed(2)}ms)`
+      );
       assert.ok(maxLatency < 5, `Max latency should be <5ms (actual: ${maxLatency}ms)`);
       assert.ok(totalTime < 500, `Total time should be <500ms (actual: ${totalTime}ms)`);
     });
@@ -178,7 +179,10 @@ Nested Span Performance:
   Throughput: ${(totalSpans / (totalTime / 1000)).toFixed(2)} spans/sec
       `);
 
-      assert.ok(totalTime < 1000, `Nested span generation should complete <1000ms (actual: ${totalTime}ms)`);
+      assert.ok(
+        totalTime < 1000,
+        `Nested span generation should complete <1000ms (actual: ${totalTime}ms)`
+      );
     });
   });
 
@@ -213,7 +217,10 @@ Batch Export Performance:
   Export rate: ${(batchSize / (exportTime / 1000)).toFixed(2)} spans/sec
       `);
 
-      assert.ok(exportTime < 2000, `Batch export should complete <2000ms (actual: ${exportTime}ms)`);
+      assert.ok(
+        exportTime < 2000,
+        `Batch export should complete <2000ms (actual: ${exportTime}ms)`
+      );
     });
   });
 
@@ -276,7 +283,7 @@ Phoenix UI Verification:
       // Phase 1: Planning (50ms simulation)
       const planSpan = tracer.startSpan('planning-phase', {
         attributes: {
-          'phase': 'planning',
+          phase: 'planning',
         },
       });
       await wait(50);
@@ -285,14 +292,23 @@ Phoenix UI Verification:
       // Phase 2: Execution (multiple tool calls)
       const execSpan = tracer.startSpan('execution-phase', {
         attributes: {
-          'phase': 'execution',
+          phase: 'execution',
         },
       });
 
       for (let i = 0; i < 5; i++) {
         const toolSpan = tracer.startSpan(`tool-call-${i}`, {
           attributes: {
-            'tool.name': i === 0 ? 'Write' : i === 1 ? 'Edit' : i === 2 ? 'Bash' : i === 3 ? 'Read' : 'TaskUpdate',
+            'tool.name':
+              i === 0
+                ? 'Write'
+                : i === 1
+                  ? 'Edit'
+                  : i === 2
+                    ? 'Bash'
+                    : i === 3
+                      ? 'Read'
+                      : 'TaskUpdate',
           },
         });
         await wait(20);
@@ -304,7 +320,7 @@ Phoenix UI Verification:
       // Phase 3: Reporting (30ms simulation)
       const reportSpan = tracer.startSpan('reporting-phase', {
         attributes: {
-          'phase': 'reporting',
+          phase: 'reporting',
         },
       });
       await wait(30);
@@ -326,7 +342,10 @@ Real-World Workflow Simulation:
   Check Phoenix UI for workflow trace
       `);
 
-      assert.ok(totalTime < 500, `Workflow simulation should complete <500ms (actual: ${totalTime}ms)`);
+      assert.ok(
+        totalTime < 500,
+        `Workflow simulation should complete <500ms (actual: ${totalTime}ms)`
+      );
     });
   });
 });

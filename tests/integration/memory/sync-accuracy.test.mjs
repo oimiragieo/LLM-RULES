@@ -69,11 +69,11 @@ describe('SyncLayer Integration - Accuracy', () => {
     }
 
     // Clean up test files (best effort)
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
     if (fs.existsSync(TEST_ROOT)) {
       try {
         fs.rmSync(TEST_ROOT, { recursive: true, force: true });
-      } catch (error) {
+      } catch (_error) {
         // Ignore cleanup errors
       }
     }
@@ -85,11 +85,11 @@ describe('SyncLayer Integration - Accuracy', () => {
     // Write content with pattern
     fs.writeFileSync(
       learningsFile,
-      `### Pattern: Write-Ahead Log Sync\nReliable sync pattern for file monitoring\n\n### Pattern: Debounce\nDelay execution until quiet period`,
+      `### Pattern: Write-Ahead Log Sync\nReliable sync pattern for file monitoring\n\n### Pattern: Debounce\nDelay execution until quiet period`
     );
 
     // Wait for sync (debounce + processing)
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       syncLayer.once('sync-complete', resolve);
     });
 
@@ -98,12 +98,12 @@ describe('SyncLayer Integration - Accuracy', () => {
 
     assert.ok(patterns.length >= 2, 'Should have extracted both patterns');
     assert.ok(
-      patterns.some((p) => p.name.toLowerCase().includes('write-ahead')),
-      'Should include Write-Ahead Log pattern',
+      patterns.some(p => p.name.toLowerCase().includes('write-ahead')),
+      'Should include Write-Ahead Log pattern'
     );
     assert.ok(
-      patterns.some((p) => p.name.toLowerCase().includes('debounce')),
-      'Should include Debounce pattern',
+      patterns.some(p => p.name.toLowerCase().includes('debounce')),
+      'Should include Debounce pattern'
     );
   });
 
@@ -113,11 +113,11 @@ describe('SyncLayer Integration - Accuracy', () => {
     // Write ADR content
     fs.writeFileSync(
       decisionsFile,
-      `## [ADR-100] Use file watching for real-time sync\n\nContext: Need to detect file changes immediately\n\nDecision: Use fs.watch() with debouncing`,
+      `## [ADR-100] Use file watching for real-time sync\n\nContext: Need to detect file changes immediately\n\nDecision: Use fs.watch() with debouncing`
     );
 
     // Wait for sync
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       syncLayer.once('sync-complete', resolve);
     });
 
@@ -126,8 +126,8 @@ describe('SyncLayer Integration - Accuracy', () => {
 
     assert.ok(decisions.length >= 1, 'Should have extracted decision');
     assert.ok(
-      decisions.some((d) => d.id === 'adr-100'),
-      'Should have correct ADR ID',
+      decisions.some(d => d.id === 'adr-100'),
+      'Should have correct ADR ID'
     );
   });
 
@@ -137,11 +137,11 @@ describe('SyncLayer Integration - Accuracy', () => {
     // Write issue content
     fs.writeFileSync(
       issuesFile,
-      `### Issue: Windows file locking\n\nSQLite database remains locked briefly after close on Windows\n\n### Issue: Debounce timing\n\nNeed to tune debounce delay for optimal performance`,
+      `### Issue: Windows file locking\n\nSQLite database remains locked briefly after close on Windows\n\n### Issue: Debounce timing\n\nNeed to tune debounce delay for optimal performance`
     );
 
     // Wait for sync
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       syncLayer.once('sync-complete', resolve);
     });
 
@@ -150,8 +150,8 @@ describe('SyncLayer Integration - Accuracy', () => {
 
     assert.ok(issues.length >= 2, 'Should have extracted both issues');
     assert.ok(
-      issues.some((i) => i.name.toLowerCase().includes('file locking')),
-      'Should include file locking issue',
+      issues.some(i => i.name.toLowerCase().includes('file locking')),
+      'Should include file locking issue'
     );
   });
 
@@ -166,18 +166,18 @@ describe('SyncLayer Integration - Accuracy', () => {
 
     // Rapid edits
     fs.writeFileSync(learningsFile, '### Pattern: Test 1\nContent');
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 100));
     fs.writeFileSync(learningsFile, '### Pattern: Test 2\nContent');
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 100));
     fs.writeFileSync(learningsFile, '### Pattern: Test 3\nContent');
 
     // Wait for debounce + sync
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Should have debounced to 1-2 syncs (not 3)
     assert.ok(
       syncCount <= 2,
-      `Should debounce rapid changes (got ${syncCount} syncs, expected ≤2)`,
+      `Should debounce rapid changes (got ${syncCount} syncs, expected ≤2)`
     );
   });
 
@@ -192,8 +192,8 @@ describe('SyncLayer Integration - Accuracy', () => {
     await invalidSync.start();
 
     // Wait for error event
-    const errorPromise = new Promise((resolve) => {
-      invalidSync.once('sync-error', (data) => {
+    const errorPromise = new Promise(resolve => {
+      invalidSync.once('sync-error', data => {
         resolve(data);
       });
     });

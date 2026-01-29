@@ -33,7 +33,6 @@ const require = createRequire(import.meta.url);
 
 // Import EventBus
 const eventBus = require(path.join(projectRoot, '.claude/lib/events/event-bus.cjs'));
-const { EventTypes } = require(path.join(projectRoot, '.claude/lib/events/event-types.cjs'));
 
 /**
  * Helper to run a hook with input
@@ -55,15 +54,15 @@ async function runHook(hookPath, toolInput) {
     hookProcess.stdin.write(JSON.stringify(toolInput));
     hookProcess.stdin.end();
 
-    hookProcess.stdout.on('data', (data) => {
+    hookProcess.stdout.on('data', data => {
       stdout += data.toString();
     });
 
-    hookProcess.stderr.on('data', (data) => {
+    hookProcess.stderr.on('data', data => {
       stderr += data.toString();
     });
 
-    hookProcess.on('close', (exitCode) => {
+    hookProcess.on('close', exitCode => {
       resolve({
         exitCode,
         stdout,
@@ -71,7 +70,7 @@ async function runHook(hookPath, toolInput) {
       });
     });
 
-    hookProcess.on('error', (err) => {
+    hookProcess.on('error', err => {
       reject(err);
     });
   });
@@ -85,7 +84,7 @@ async function runHook(hookPath, toolInput) {
  * @param {string[]} eventTypes - Expected event types
  * @returns {Promise<{events: object[]}>}
  */
-async function testEventEmissionDirect(hookPath, toolName, toolInput, eventTypes) {
+async function _testEventEmissionDirect(hookPath, toolName, toolInput, eventTypes) {
   // Clear subscriptions
   eventBus.subscriptions = [];
 
@@ -93,14 +92,14 @@ async function testEventEmissionDirect(hookPath, toolName, toolInput, eventTypes
 
   // Subscribe to events
   eventTypes.forEach(eventType => {
-    eventBus.on(eventType, (payload) => {
+    eventBus.on(eventType, payload => {
       capturedEvents.push({ type: eventType, payload });
     });
   });
 
   // Dynamically import hook module (reset cache first)
   delete require.cache[require.resolve(hookPath)];
-  const hook = require(hookPath);
+  require(hookPath);
 
   // Call the function that would emit events (if exported)
   // For routing-guard, we test via the EventBus directly after requiring
@@ -141,46 +140,31 @@ describe('Hooks Event Emission', () => {
       assert.strictEqual(exitCode, 0, 'routing-guard should allow Task tool');
 
       // Should not have event emission errors
-      assert.ok(
-        !stderr.includes('Event emission failed'),
-        'Should not have event emission errors'
-      );
+      assert.ok(!stderr.includes('Event emission failed'), 'Should not have event emission errors');
     });
 
     it('should have EventBus integration code', async () => {
       // Verify hook module has EventBus import
       const hookSource = fs.readFileSync(routingGuardPath, 'utf-8');
 
-      assert.ok(
-        hookSource.includes('event-bus.cjs'),
-        'Hook should import EventBus'
-      );
+      assert.ok(hookSource.includes('event-bus.cjs'), 'Hook should import EventBus');
 
-      assert.ok(
-        hookSource.includes('TOOL_INVOKED'),
-        'Hook should reference TOOL_INVOKED event'
-      );
+      assert.ok(hookSource.includes('TOOL_INVOKED'), 'Hook should reference TOOL_INVOKED event');
 
-      assert.ok(
-        hookSource.includes('AGENT_STARTED'),
-        'Hook should reference AGENT_STARTED event'
-      );
+      assert.ok(hookSource.includes('AGENT_STARTED'), 'Hook should reference AGENT_STARTED event');
 
-      assert.ok(
-        hookSource.includes('eventBus.emit'),
-        'Hook should call eventBus.emit()'
-      );
+      assert.ok(hookSource.includes('eventBus.emit'), 'Hook should call eventBus.emit()');
     });
 
     it('should emit events with valid structure (unit test)', async () => {
       // Test event emission directly via EventBus
       const capturedEvents = [];
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push({ type: 'TOOL_INVOKED', payload });
       });
 
-      eventBus.on('AGENT_STARTED', (payload) => {
+      eventBus.on('AGENT_STARTED', payload => {
         capturedEvents.push({ type: 'AGENT_STARTED', payload });
       });
 
@@ -231,7 +215,10 @@ describe('Hooks Event Emission', () => {
   });
 
   describe('unified-creator-guard.cjs Event Emission', () => {
-    const creatorGuardPath = path.join(projectRoot, '.claude/hooks/routing/unified-creator-guard.cjs');
+    const creatorGuardPath = path.join(
+      projectRoot,
+      '.claude/hooks/routing/unified-creator-guard.cjs'
+    );
 
     it('should not break hook execution when emitting events', async () => {
       const toolInput = {
@@ -249,36 +236,24 @@ describe('Hooks Event Emission', () => {
       assert.strictEqual(exitCode, 0, 'unified-creator-guard should allow non-artifact writes');
 
       // Should not have event emission errors
-      assert.ok(
-        !stderr.includes('Event emission failed'),
-        'Should not have event emission errors'
-      );
+      assert.ok(!stderr.includes('Event emission failed'), 'Should not have event emission errors');
     });
 
     it('should have EventBus integration code', async () => {
       // Verify hook module has EventBus import
       const hookSource = fs.readFileSync(creatorGuardPath, 'utf-8');
 
-      assert.ok(
-        hookSource.includes('event-bus.cjs'),
-        'Hook should import EventBus'
-      );
+      assert.ok(hookSource.includes('event-bus.cjs'), 'Hook should import EventBus');
 
-      assert.ok(
-        hookSource.includes('TOOL_INVOKED'),
-        'Hook should reference TOOL_INVOKED event'
-      );
+      assert.ok(hookSource.includes('TOOL_INVOKED'), 'Hook should reference TOOL_INVOKED event');
 
-      assert.ok(
-        hookSource.includes('eventBus.emit'),
-        'Hook should call eventBus.emit()'
-      );
+      assert.ok(hookSource.includes('eventBus.emit'), 'Hook should call eventBus.emit()');
     });
 
     it('should emit TOOL_INVOKED for Write operations (unit test)', async () => {
       const capturedEvents = [];
 
-      eventBus.on('TOOL_INVOKED', (payload) => {
+      eventBus.on('TOOL_INVOKED', payload => {
         capturedEvents.push({ type: 'TOOL_INVOKED', payload });
       });
 

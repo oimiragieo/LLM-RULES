@@ -47,14 +47,22 @@ describe('OpenTelemetry SDK Initialization', () => {
       process.env.OTEL_ENABLED = 'false';
       telemetryClient = require(`${PROJECT_ROOT}/.claude/lib/observability/telemetry-client.cjs`);
 
-      assert.strictEqual(typeof telemetryClient.getTracer, 'function', 'Should export getTracer() method');
+      assert.strictEqual(
+        typeof telemetryClient.getTracer,
+        'function',
+        'Should export getTracer() method'
+      );
     });
 
     it('should export shutdown() method', async () => {
       process.env.OTEL_ENABLED = 'false';
       telemetryClient = require(`${PROJECT_ROOT}/.claude/lib/observability/telemetry-client.cjs`);
 
-      assert.strictEqual(typeof telemetryClient.shutdown, 'function', 'Should export shutdown() method');
+      assert.strictEqual(
+        typeof telemetryClient.shutdown,
+        'function',
+        'Should export shutdown() method'
+      );
     });
   });
 
@@ -79,7 +87,11 @@ describe('OpenTelemetry SDK Initialization', () => {
 
       const tracer = telemetryClient.getTracer();
       assert.notStrictEqual(tracer, null, 'Should return a tracer');
-      assert.strictEqual(typeof tracer.startActiveSpan, 'function', 'Tracer should have startActiveSpan method');
+      assert.strictEqual(
+        typeof tracer.startActiveSpan,
+        'function',
+        'Tracer should have startActiveSpan method'
+      );
     });
 
     it('should use OTEL_EXPORTER_OTLP_ENDPOINT environment variable', async () => {
@@ -147,7 +159,11 @@ describe('OpenTelemetry SDK Initialization', () => {
 
       const tracer = telemetryClient.getTracer();
       assert.notStrictEqual(tracer, null, 'Should return a tracer');
-      assert.strictEqual(typeof tracer.startActiveSpan, 'function', 'Should have startActiveSpan method (no-op)');
+      assert.strictEqual(
+        typeof tracer.startActiveSpan,
+        'function',
+        'Should have startActiveSpan method (no-op)'
+      );
     });
   });
 
@@ -182,7 +198,11 @@ describe('OpenTelemetry SDK Initialization', () => {
       const result = await telemetryClient.init();
 
       // Should still initialize but log warning
-      assert.strictEqual(typeof result.initialized, 'boolean', 'Should return initialization status');
+      assert.strictEqual(
+        typeof result.initialized,
+        'boolean',
+        'Should return initialization status'
+      );
     });
   });
 });

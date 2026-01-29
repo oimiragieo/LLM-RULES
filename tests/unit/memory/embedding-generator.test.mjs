@@ -19,10 +19,7 @@ const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
 // Import the module to test
-const embeddingGeneratorPath = path.join(
-  PROJECT_ROOT,
-  '.claude/tools/cli/generate-embeddings.cjs'
-);
+const embeddingGeneratorPath = path.join(PROJECT_ROOT, '.claude/tools/cli/generate-embeddings.cjs');
 
 describe('EmbeddingGenerator', () => {
   let tempDir;
@@ -79,7 +76,9 @@ This is another learning about ChromaDB integration.
 
   it('should chunk markdown by section headers', async () => {
     // Dynamic import for CommonJS module
-    const embeddingGenerator = await import(`file:///${embeddingGeneratorPath.replace(/\\/g, '/')}`);
+    const embeddingGenerator = await import(
+      `file:///${embeddingGeneratorPath.replace(/\\/g, '/')}`
+    );
     const { chunkByHeaders } = embeddingGenerator;
 
     const content = `## Section 1
@@ -106,7 +105,9 @@ Content 2`;
 
   it('should extract metadata from markdown files', async () => {
     // Dynamic import for CommonJS module
-    const embeddingGenerator = await import(`file:///${embeddingGeneratorPath.replace(/\\/g, '/')}`);
+    const embeddingGenerator = await import(
+      `file:///${embeddingGeneratorPath.replace(/\\/g, '/')}`
+    );
     const { extractMetadata } = embeddingGenerator;
 
     const filePath = 'learnings.md';
@@ -122,7 +123,9 @@ Content 2`;
 
   it('should handle archived memory files', async () => {
     // Dynamic import for CommonJS module
-    const embeddingGenerator = await import(`file:///${embeddingGeneratorPath.replace(/\\/g, '/')}`);
+    const embeddingGenerator = await import(
+      `file:///${embeddingGeneratorPath.replace(/\\/g, '/')}`
+    );
     const { findMemoryFiles } = embeddingGenerator;
 
     // Create archived directory
@@ -141,13 +144,15 @@ Content 2`;
     assert.equal(files.length, 4, 'Should find 4 files (3 main + 1 archived)');
 
     // Verify archived file is included
-    const archivedFile = files.find((f) => f.includes('learnings-2026-01.md'));
+    const archivedFile = files.find(f => f.includes('learnings-2026-01.md'));
     assert.ok(archivedFile, 'Should include archived file');
   });
 
   it('should successfully process all memory files in dry-run mode', async () => {
     // Dynamic import for CommonJS module
-    const embeddingGenerator = await import(`file:///${embeddingGeneratorPath.replace(/\\/g, '/')}`);
+    const embeddingGenerator = await import(
+      `file:///${embeddingGeneratorPath.replace(/\\/g, '/')}`
+    );
     const { findMemoryFiles, processFile } = embeddingGenerator;
 
     // Find all files

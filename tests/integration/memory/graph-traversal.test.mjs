@@ -153,12 +153,12 @@ describe('EntityQuery Graph Traversal Integration Tests', () => {
     // Clean up test database file (Windows file locking delay)
     try {
       fs.unlinkSync(testDbPath.replace(/^\/([A-Z]):/, '$1:'));
-    } catch (err) {
+    } catch (_err) {
       // Retry after delay (Windows file locking)
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 100));
       try {
         fs.unlinkSync(testDbPath.replace(/^\/([A-Z]):/, '$1:'));
-      } catch (retryErr) {
+      } catch (_retryErr) {
         // Ignore cleanup errors in tests
       }
     }
@@ -174,15 +174,15 @@ describe('EntityQuery Graph Traversal Integration Tests', () => {
       assert.strictEqual(
         path[path.length - 1].to_entity.id,
         'task-22',
-        'Path should end at task-22',
+        'Path should end at task-22'
       );
 
       // Verify all hops use 'blocked_by' relationship
-      path.forEach((hop) => {
+      path.forEach(hop => {
         assert.strictEqual(
           hop.relationship_type,
           'blocked_by',
-          'All hops should be blocked_by relationships',
+          'All hops should be blocked_by relationships'
         );
       });
     });
@@ -216,12 +216,12 @@ describe('EntityQuery Graph Traversal Integration Tests', () => {
       // Developer 1 assigned to 7 tasks (22, 24, 23, 25, 31, 29, 28)
       assert.ok(related.length >= 7, `Should find 7+ assigned tasks, found ${related.length}`);
 
-      related.forEach((rel) => {
+      related.forEach(rel => {
         assert.strictEqual(rel.entity.type, 'task', 'All related entities should be tasks');
         assert.strictEqual(
           rel.relationship_type,
           'assigned_to',
-          'All relationships should be assigned_to',
+          'All relationships should be assigned_to'
         );
       });
     });
@@ -232,15 +232,15 @@ describe('EntityQuery Graph Traversal Integration Tests', () => {
         depth: 1,
       });
 
-      const skills = related.filter((rel) => rel.entity.type === 'skill');
+      const skills = related.filter(rel => rel.entity.type === 'skill');
       assert.ok(skills.length >= 2, 'Should find 2+ related skills');
       assert.ok(
-        skills.some((s) => s.entity.id === 'skill-tdd'),
-        'Should find TDD skill',
+        skills.some(s => s.entity.id === 'skill-tdd'),
+        'Should find TDD skill'
       );
       assert.ok(
-        skills.some((s) => s.entity.id === 'skill-debugging'),
-        'Should find Debugging skill',
+        skills.some(s => s.entity.id === 'skill-debugging'),
+        'Should find Debugging skill'
       );
     });
   });
@@ -252,26 +252,19 @@ describe('EntityQuery Graph Traversal Integration Tests', () => {
         depth: 1,
       });
 
-      const patterns = related.filter((rel) => rel.entity.type === 'pattern');
+      const patterns = related.filter(rel => rel.entity.type === 'pattern');
       assert.ok(patterns.length >= 1, 'Should find 1+ implementing patterns');
       assert.ok(
-        patterns.some((p) => p.entity.id === 'pattern-wal'),
-        'Should find WAL pattern',
+        patterns.some(p => p.entity.id === 'pattern-wal'),
+        'Should find WAL pattern'
       );
     });
 
     it('should trace concept → ADR lineage', async () => {
-      const path = await entityQuery.getRelationshipPath(
-        'concept-hybrid-memory',
-        'adr-054',
-      );
+      const path = await entityQuery.getRelationshipPath('concept-hybrid-memory', 'adr-054');
 
       assert.ok(path.length > 0, 'Should find path from concept to ADR');
-      assert.strictEqual(
-        path[0].relationship_type,
-        'references',
-        'Concept should reference ADR',
-      );
+      assert.strictEqual(path[0].relationship_type, 'references', 'Concept should reference ADR');
     });
 
     it('should find implementations across entities (2-hop traversal)', async () => {
@@ -292,10 +285,10 @@ describe('EntityQuery Graph Traversal Integration Tests', () => {
       });
 
       assert.ok(tasks.length >= 5, 'Should find 5+ high-quality tasks');
-      tasks.forEach((task) => {
+      tasks.forEach(task => {
         assert.ok(
           task.quality_score >= 0.85,
-          `Task ${task.id} quality score ${task.quality_score} should be >= 0.85`,
+          `Task ${task.id} quality score ${task.quality_score} should be >= 0.85`
         );
       });
     });
@@ -331,10 +324,7 @@ describe('EntityQuery Graph Traversal Integration Tests', () => {
       const elapsed = Date.now() - start;
 
       // Should complete in < 500ms for 8 tasks with 3-hop traversal
-      assert.ok(
-        elapsed < 500,
-        `Query should complete in <500ms, took ${elapsed}ms`,
-      );
+      assert.ok(elapsed < 500, `Query should complete in <500ms, took ${elapsed}ms`);
     });
 
     it('should handle deep traversals without infinite loops', async () => {

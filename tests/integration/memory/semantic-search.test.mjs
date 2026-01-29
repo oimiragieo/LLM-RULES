@@ -22,7 +22,9 @@ const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
 // Dynamically import CommonJS module
-const { MemoryVectorStore } = await import(`file:///${path.join(PROJECT_ROOT, '.claude/lib/memory/chromadb-client.cjs').replace(/\\/g, '/')}`);
+const { MemoryVectorStore } = await import(
+  `file:///${path.join(PROJECT_ROOT, '.claude/lib/memory/chromadb-client.cjs').replace(/\\/g, '/')}`
+);
 
 /**
  * Test fixture: Sample documents for semantic search testing
@@ -30,29 +32,34 @@ const { MemoryVectorStore } = await import(`file:///${path.join(PROJECT_ROOT, '.
 const SAMPLE_DOCUMENTS = [
   {
     id: 'doc-1',
-    content: 'ChromaDB is a vector database for semantic search. It uses embeddings to find similar documents.',
-    metadata: { type: 'learning', source: 'learnings.md', line: 10 }
+    content:
+      'ChromaDB is a vector database for semantic search. It uses embeddings to find similar documents.',
+    metadata: { type: 'learning', source: 'learnings.md', line: 10 },
   },
   {
     id: 'doc-2',
-    content: 'SQLite is a relational database for structured data. It supports SQL queries and transactions.',
-    metadata: { type: 'decision', source: 'decisions.md', line: 25 }
+    content:
+      'SQLite is a relational database for structured data. It supports SQL queries and transactions.',
+    metadata: { type: 'decision', source: 'decisions.md', line: 25 },
   },
   {
     id: 'doc-3',
-    content: 'Vector embeddings represent text as numerical arrays. Similar text has similar embeddings.',
-    metadata: { type: 'learning', source: 'learnings.md', line: 45 }
+    content:
+      'Vector embeddings represent text as numerical arrays. Similar text has similar embeddings.',
+    metadata: { type: 'learning', source: 'learnings.md', line: 45 },
   },
   {
     id: 'doc-4',
-    content: 'Semantic search uses embeddings to find relevant documents. It understands meaning, not just keywords.',
-    metadata: { type: 'learning', source: 'learnings.md', line: 67 }
+    content:
+      'Semantic search uses embeddings to find relevant documents. It understands meaning, not just keywords.',
+    metadata: { type: 'learning', source: 'learnings.md', line: 67 },
   },
   {
     id: 'doc-5',
-    content: 'The agent-studio framework uses a hybrid memory system. It combines files with vector and relational databases.',
-    metadata: { type: 'decision', source: 'decisions.md', line: 102 }
-  }
+    content:
+      'The agent-studio framework uses a hybrid memory system. It combines files with vector and relational databases.',
+    metadata: { type: 'decision', source: 'decisions.md', line: 102 },
+  },
 ];
 
 describe('Semantic Search API Integration Tests', () => {
@@ -63,7 +70,7 @@ describe('Semantic Search API Integration Tests', () => {
     // Initialize vector store with test configuration
     vectorStore = new MemoryVectorStore({
       persistDirectory: path.join(PROJECT_ROOT, '.claude/data/chromadb-test'),
-      collectionName: 'test-semantic-search'
+      collectionName: 'test-semantic-search',
     });
 
     await vectorStore.initialize();
@@ -82,7 +89,7 @@ describe('Semantic Search API Integration Tests', () => {
     if (collection) {
       try {
         await vectorStore.client.deleteCollection({ name: 'test-semantic-search' });
-      } catch (error) {
+      } catch (_error) {
         // Ignore errors during cleanup
       }
     }
@@ -105,7 +112,10 @@ describe('Semantic Search API Integration Tests', () => {
 
       // First result should be most relevant (doc-1 or doc-4)
       const firstResult = results[0];
-      assert.ok(['doc-1', 'doc-4'].includes(firstResult.id), 'First result should be about vector database or semantic search');
+      assert.ok(
+        ['doc-1', 'doc-4'].includes(firstResult.id),
+        'First result should be about vector database or semantic search'
+      );
     });
 
     it('should return results with correct structure', async () => {
@@ -115,9 +125,18 @@ describe('Semantic Search API Integration Tests', () => {
       assert.ok(results.length > 0, 'Should return results');
 
       const result = results[0];
-      assert.ok(Object.prototype.hasOwnProperty.call(result, 'content'), 'Result should have content');
-      assert.ok(Object.prototype.hasOwnProperty.call(result, 'metadata'), 'Result should have metadata');
-      assert.ok(Object.prototype.hasOwnProperty.call(result, 'similarity'), 'Result should have similarity score');
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(result, 'content'),
+        'Result should have content'
+      );
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(result, 'metadata'),
+        'Result should have metadata'
+      );
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(result, 'similarity'),
+        'Result should have similarity score'
+      );
 
       // Check types
       assert.strictEqual(typeof result.content, 'string', 'Content should be string');
@@ -125,7 +144,10 @@ describe('Semantic Search API Integration Tests', () => {
       assert.strictEqual(typeof result.similarity, 'number', 'Similarity should be number');
 
       // Similarity should be between 0 and 1
-      assert.ok(result.similarity >= 0 && result.similarity <= 1, 'Similarity should be between 0 and 1');
+      assert.ok(
+        result.similarity >= 0 && result.similarity <= 1,
+        'Similarity should be between 0 and 1'
+      );
     });
   });
 
@@ -142,7 +164,10 @@ describe('Semantic Search API Integration Tests', () => {
 
       // All results should have similarity >= 0.8
       for (const result of results) {
-        assert.ok(result.similarity >= 0.8, `Result similarity ${result.similarity} should be >= 0.8`);
+        assert.ok(
+          result.similarity >= 0.8,
+          `Result similarity ${result.similarity} should be >= 0.8`
+        );
       }
     });
 
@@ -150,7 +175,7 @@ describe('Semantic Search API Integration Tests', () => {
       // Filter for only 'learning' type documents
       const results = await vectorStore.search('database', {
         limit: 10,
-        filters: { type: 'learning' }
+        filters: { type: 'learning' },
       });
 
       // All results should have type 'learning'
@@ -163,7 +188,7 @@ describe('Semantic Search API Integration Tests', () => {
       const results = await vectorStore.search('vector', {
         limit: 2,
         minScore: 0.5,
-        filters: { type: 'learning' }
+        filters: { type: 'learning' },
       });
 
       // Check all constraints
@@ -187,33 +212,32 @@ describe('Semantic Search API Integration Tests', () => {
       {
         query: 'vector database semantic search',
         relevant: ['doc-1', 'doc-4'], // ChromaDB and semantic search
-        description: 'Vector database concepts'
+        description: 'Vector database concepts',
       },
       {
         query: 'embeddings numerical representation',
         relevant: ['doc-3', 'doc-4'], // Embeddings
-        description: 'Embedding concepts'
+        description: 'Embedding concepts',
       },
       {
         query: 'relational database SQL',
         relevant: ['doc-2'], // SQLite
-        description: 'Relational database concepts'
+        description: 'Relational database concepts',
       },
       {
         query: 'hybrid memory system',
         relevant: ['doc-5'], // Hybrid memory
-        description: 'Hybrid architecture'
+        description: 'Hybrid architecture',
       },
       {
         query: 'semantic understanding meaning',
         relevant: ['doc-4'], // Semantic search understands meaning
-        description: 'Semantic understanding'
-      }
+        description: 'Semantic understanding',
+      },
     ];
 
     it('should achieve >85% retrieval accuracy', async () => {
       let totalRelevant = 0;
-      let totalRetrieved = 0;
       let totalCorrect = 0;
 
       for (const testCase of GROUND_TRUTH_QUERIES) {
@@ -222,7 +246,7 @@ describe('Semantic Search API Integration Tests', () => {
         // Search with moderate threshold (not too strict)
         const results = await vectorStore.search(query, {
           limit: 3, // Get top 3 results
-          minScore: 0.3 // Low threshold to allow recall measurement
+          minScore: 0.3, // Low threshold to allow recall measurement
         });
 
         const retrievedIds = results.map(r => r.id);
@@ -231,7 +255,6 @@ describe('Semantic Search API Integration Tests', () => {
         const correctlyRetrieved = retrievedIds.filter(id => relevant.includes(id));
 
         totalRelevant += relevant.length;
-        totalRetrieved += retrievedIds.length;
         totalCorrect += correctlyRetrieved.length;
       }
 
@@ -271,7 +294,7 @@ describe('Semantic Search API Integration Tests', () => {
     it('should handle query with no matches above threshold', async () => {
       // Search for completely unrelated content with high threshold
       const results = await vectorStore.search('quantum physics astronomy', {
-        minScore: 0.95 // Very high threshold
+        minScore: 0.95, // Very high threshold
       });
 
       // Should return empty array or low-similarity results

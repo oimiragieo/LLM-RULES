@@ -15,7 +15,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../../../');
 
 // Test fixtures
-const testMemoryDir = path.join(projectRoot, '.claude/context/memory');
 const testDbPath = path.join(projectRoot, '.claude/data/memory.db');
 const migrateTool = path.join(projectRoot, '.claude/tools/cli/migrate-memory.cjs');
 
@@ -27,8 +26,10 @@ describe('Memory Migration Tool (Integration)', () => {
     try {
       db = new Database(testDbPath);
       db.pragma('foreign_keys = ON');
-    } catch (error) {
-      throw new Error(`Database not found at ${testDbPath}. Run 'node .claude/tools/cli/init-memory-db.cjs' first.`);
+    } catch (_error) {
+      throw new Error(
+        `Database not found at ${testDbPath}. Run 'node .claude/tools/cli/init-memory-db.cjs' first.`
+      );
     }
   });
 
@@ -74,10 +75,14 @@ describe('Memory Migration Tool (Integration)', () => {
     assert.match(stdout, /Relationships extracted: \d+/);
 
     // Verify learnings.md entities were stored
-    const patternEntities = db.prepare(`
+    const patternEntities = db
+      .prepare(
+        `
       SELECT * FROM entities
       WHERE type = 'pattern' AND source_file LIKE '%learnings.md%'
-    `).all();
+    `
+      )
+      .all();
 
     assert.ok(patternEntities.length > 0, 'Should have pattern entities from learnings.md');
 
@@ -94,10 +99,14 @@ describe('Memory Migration Tool (Integration)', () => {
     assert.match(stdout, /Migrating decisions\.md/);
 
     // Check ADR entities were stored
-    const adrEntities = db.prepare(`
+    const adrEntities = db
+      .prepare(
+        `
       SELECT * FROM entities
       WHERE type = 'decision' AND source_file LIKE '%decisions.md%'
-    `).all();
+    `
+      )
+      .all();
 
     assert.ok(adrEntities.length > 0, 'Should have ADR entities from decisions.md');
 
@@ -115,10 +124,14 @@ describe('Memory Migration Tool (Integration)', () => {
     assert.match(stdout, /Migrating issues\.md/);
 
     // Check issue entities were stored
-    const issueEntities = db.prepare(`
+    const issueEntities = db
+      .prepare(
+        `
       SELECT * FROM entities
       WHERE type = 'issue' AND source_file LIKE '%issues.md%'
-    `).all();
+    `
+      )
+      .all();
 
     // Note: issues.md might be empty or have no Issue: headers
     // Migration should still succeed even with 0 issues
@@ -130,10 +143,14 @@ describe('Memory Migration Tool (Integration)', () => {
     await execAsync(`node "${migrateTool}"`);
 
     // Check for task relationships
-    const relationships = db.prepare(`
+    const relationships = db
+      .prepare(
+        `
       SELECT * FROM entity_relationships
       WHERE relationship_type IN ('blocks', 'depends_on')
-    `).all();
+    `
+      )
+      .all();
 
     // Note: Relationships depend on content having "Task X blocks Task Y" patterns
     // Migration should succeed even if no relationships found
@@ -143,7 +160,10 @@ describe('Memory Migration Tool (Integration)', () => {
       const sampleRel = relationships[0];
       assert.ok(sampleRel.from_entity_id, 'Relationship should have from_entity_id');
       assert.ok(sampleRel.to_entity_id, 'Relationship should have to_entity_id');
-      assert.ok(['blocks', 'depends_on'].includes(sampleRel.relationship_type), 'Should be valid relationship type');
+      assert.ok(
+        ['blocks', 'depends_on'].includes(sampleRel.relationship_type),
+        'Should be valid relationship type'
+      );
     }
   });
 

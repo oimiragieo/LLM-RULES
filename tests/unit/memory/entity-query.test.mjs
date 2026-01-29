@@ -5,16 +5,14 @@ import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Import EntityQuery (will fail initially)
-const { EntityQuery } = await import(
-  '../../../.claude/lib/memory/entity-query.cjs'
-);
+const { EntityQuery } = await import('../../../.claude/lib/memory/entity-query.cjs');
 
 describe('EntityQuery', () => {
   let db;
@@ -145,7 +143,7 @@ describe('EntityQuery', () => {
 
       assert.ok(Array.isArray(tasks), 'Should return array');
       assert.strictEqual(tasks.length, 3, 'Should find 3 tasks');
-      tasks.forEach((task) => {
+      tasks.forEach(task => {
         assert.strictEqual(task.type, 'task');
       });
     });
@@ -162,10 +160,10 @@ describe('EntityQuery', () => {
       });
 
       assert.ok(highQuality.length > 0, 'Should find high-quality tasks');
-      highQuality.forEach((entity) => {
+      highQuality.forEach(entity => {
         assert.ok(
           entity.quality_score >= 0.75,
-          `Quality score ${entity.quality_score} should be >= 0.75`,
+          `Quality score ${entity.quality_score} should be >= 0.75`
         );
       });
     });
@@ -182,7 +180,7 @@ describe('EntityQuery', () => {
       });
 
       assert.ok(entities.length > 0, 'Should find entities from learnings.md');
-      entities.forEach((entity) => {
+      entities.forEach(entity => {
         assert.strictEqual(entity.source_file, 'learnings.md');
       });
     });
@@ -223,11 +221,11 @@ describe('EntityQuery', () => {
       });
 
       assert.ok(assigned.length > 0, 'Should find assigned entities');
-      assigned.forEach((rel) => {
+      assigned.forEach(rel => {
         assert.strictEqual(
           rel.relationship_type,
           'assigned_to',
-          'Should only return assigned_to relationships',
+          'Should only return assigned_to relationships'
         );
       });
     });
@@ -278,7 +276,7 @@ describe('EntityQuery', () => {
       assert.strictEqual(
         path[path.length - 1].to_entity.id,
         'task-25',
-        'Path should end at task-25',
+        'Path should end at task-25'
       );
     });
 
@@ -316,10 +314,7 @@ describe('EntityQuery', () => {
       const path = await entityQuery.getRelationshipPath('task-27', 'task-25');
 
       // Should find shortest path (2 hops) not longest (4 hops)
-      assert.ok(
-        path.length <= 2,
-        `Should find shortest path, found path with ${path.length} hops`,
-      );
+      assert.ok(path.length <= 2, `Should find shortest path, found path with ${path.length} hops`);
     });
   });
 

@@ -81,7 +81,10 @@ describe('Event Types', () => {
       ];
 
       const actualTypes = Object.keys(eventTypes.EventTypes);
-      assert.ok(actualTypes.length >= 32, `Should have at least 32 event types, got ${actualTypes.length}`);
+      assert.ok(
+        actualTypes.length >= 32,
+        `Should have at least 32 event types, got ${actualTypes.length}`
+      );
 
       expectedTypes.forEach(type => {
         assert.ok(actualTypes.includes(type), `Missing event type: ${type}`);
@@ -114,7 +117,14 @@ describe('Event Types', () => {
     });
 
     it('should define all event categories', () => {
-      const categories = ['agentEvent', 'taskEvent', 'toolEvent', 'memoryEvent', 'llmEvent', 'mcpEvent'];
+      const categories = [
+        'agentEvent',
+        'taskEvent',
+        'toolEvent',
+        'memoryEvent',
+        'llmEvent',
+        'mcpEvent',
+      ];
       categories.forEach(category => {
         assert.ok(eventSchema.definitions[category], `Should define ${category}`);
       });
@@ -237,9 +247,30 @@ describe('Event Types', () => {
 
     it('should validate all AGENT_EVENTS', () => {
       const agentEvents = [
-        { type: 'AGENT_STARTED', agentId: 'a1', agentType: 'dev', taskId: 't1', timestamp: new Date().toISOString() },
-        { type: 'AGENT_COMPLETED', agentId: 'a1', agentType: 'dev', taskId: 't1', duration: 1000, result: {}, timestamp: new Date().toISOString() },
-        { type: 'AGENT_FAILED', agentId: 'a1', agentType: 'dev', taskId: 't1', error: { message: 'Error' }, timestamp: new Date().toISOString() },
+        {
+          type: 'AGENT_STARTED',
+          agentId: 'a1',
+          agentType: 'dev',
+          taskId: 't1',
+          timestamp: new Date().toISOString(),
+        },
+        {
+          type: 'AGENT_COMPLETED',
+          agentId: 'a1',
+          agentType: 'dev',
+          taskId: 't1',
+          duration: 1000,
+          result: {},
+          timestamp: new Date().toISOString(),
+        },
+        {
+          type: 'AGENT_FAILED',
+          agentId: 'a1',
+          agentType: 'dev',
+          taskId: 't1',
+          error: { message: 'Error' },
+          timestamp: new Date().toISOString(),
+        },
       ];
 
       agentEvents.forEach(event => {
@@ -250,9 +281,26 @@ describe('Event Types', () => {
 
     it('should validate all TASK_EVENTS', () => {
       const taskEvents = [
-        { type: 'TASK_CREATED', taskId: 't1', subject: 'Test', description: 'Desc', timestamp: new Date().toISOString() },
-        { type: 'TASK_UPDATED', taskId: 't1', status: 'in_progress', timestamp: new Date().toISOString() },
-        { type: 'TASK_COMPLETED', taskId: 't1', result: {}, duration: 1000, timestamp: new Date().toISOString() },
+        {
+          type: 'TASK_CREATED',
+          taskId: 't1',
+          subject: 'Test',
+          description: 'Desc',
+          timestamp: new Date().toISOString(),
+        },
+        {
+          type: 'TASK_UPDATED',
+          taskId: 't1',
+          status: 'in_progress',
+          timestamp: new Date().toISOString(),
+        },
+        {
+          type: 'TASK_COMPLETED',
+          taskId: 't1',
+          result: {},
+          duration: 1000,
+          timestamp: new Date().toISOString(),
+        },
       ];
 
       taskEvents.forEach(event => {

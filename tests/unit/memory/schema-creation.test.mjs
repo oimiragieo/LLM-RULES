@@ -10,15 +10,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
 // Import the migration script (will create this)
-const MIGRATION_SCRIPT_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude/tools/cli/init-memory-db.cjs',
-);
+const MIGRATION_SCRIPT_PATH = path.join(PROJECT_ROOT, '.claude/tools/cli/init-memory-db.cjs');
 
 // Convert Windows path to file:// URL for ESM import
-const MIGRATION_SCRIPT_URL = new URL(
-  `file:///${MIGRATION_SCRIPT_PATH.replace(/\\/g, '/')}`,
-).href;
+const MIGRATION_SCRIPT_URL = new URL(`file:///${MIGRATION_SCRIPT_PATH.replace(/\\/g, '/')}`).href;
 
 describe('SQLite Entity Schema Creation', () => {
   let db;
@@ -37,13 +32,13 @@ describe('SQLite Entity Schema Creation', () => {
     }
     try {
       await fs.unlink(tempDbPath);
-    } catch (err) {
+    } catch (_err) {
       // Ignore if file doesn't exist
     }
   });
 
   describe('Schema Structure', () => {
-    it('should create entities table with correct columns', async (t) => {
+    it('should create entities table with correct columns', async _t => {
       // Import and run migration
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
@@ -54,7 +49,7 @@ describe('SQLite Entity Schema Creation', () => {
         SELECT name, type
         FROM pragma_table_info('entities')
         ORDER BY cid
-      `,
+      `
         )
         .all();
 
@@ -72,27 +67,23 @@ describe('SQLite Entity Schema Creation', () => {
         { name: 'quality_score', type: 'REAL' },
       ];
 
-      assert.equal(
-        result.length,
-        expectedColumns.length,
-        'Should have correct number of columns',
-      );
+      assert.equal(result.length, expectedColumns.length, 'Should have correct number of columns');
 
       expectedColumns.forEach((expected, index) => {
         assert.equal(
           result[index].name,
           expected.name,
-          `Column ${index} should be named ${expected.name}`,
+          `Column ${index} should be named ${expected.name}`
         );
         assert.equal(
           result[index].type,
           expected.type,
-          `Column ${expected.name} should have type ${expected.type}`,
+          `Column ${expected.name} should have type ${expected.type}`
         );
       });
     });
 
-    it('should create relationships table with correct columns', async (t) => {
+    it('should create relationships table with correct columns', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -102,7 +93,7 @@ describe('SQLite Entity Schema Creation', () => {
         SELECT name, type
         FROM pragma_table_info('entity_relationships')
         ORDER BY cid
-      `,
+      `
         )
         .all();
 
@@ -116,27 +107,23 @@ describe('SQLite Entity Schema Creation', () => {
         { name: 'created_at', type: 'TIMESTAMP' },
       ];
 
-      assert.equal(
-        result.length,
-        expectedColumns.length,
-        'Should have correct number of columns',
-      );
+      assert.equal(result.length, expectedColumns.length, 'Should have correct number of columns');
 
       expectedColumns.forEach((expected, index) => {
         assert.equal(
           result[index].name,
           expected.name,
-          `Column ${index} should be named ${expected.name}`,
+          `Column ${index} should be named ${expected.name}`
         );
         assert.equal(
           result[index].type,
           expected.type,
-          `Column ${expected.name} should have type ${expected.type}`,
+          `Column ${expected.name} should have type ${expected.type}`
         );
       });
     });
 
-    it('should create entity_attributes table with correct columns', async (t) => {
+    it('should create entity_attributes table with correct columns', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -146,7 +133,7 @@ describe('SQLite Entity Schema Creation', () => {
         SELECT name, type
         FROM pragma_table_info('entity_attributes')
         ORDER BY cid
-      `,
+      `
         )
         .all();
 
@@ -157,27 +144,23 @@ describe('SQLite Entity Schema Creation', () => {
         { name: 'created_at', type: 'TIMESTAMP' },
       ];
 
-      assert.equal(
-        result.length,
-        expectedColumns.length,
-        'Should have correct number of columns',
-      );
+      assert.equal(result.length, expectedColumns.length, 'Should have correct number of columns');
 
       expectedColumns.forEach((expected, index) => {
         assert.equal(
           result[index].name,
           expected.name,
-          `Column ${index} should be named ${expected.name}`,
+          `Column ${index} should be named ${expected.name}`
         );
         assert.equal(
           result[index].type,
           expected.type,
-          `Column ${expected.name} should have type ${expected.type}`,
+          `Column ${expected.name} should have type ${expected.type}`
         );
       });
     });
 
-    it('should create schema_version table', async (t) => {
+    it('should create schema_version table', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -187,7 +170,7 @@ describe('SQLite Entity Schema Creation', () => {
         SELECT name, type
         FROM pragma_table_info('schema_version')
         ORDER BY cid
-      `,
+      `
         )
         .all();
 
@@ -206,7 +189,7 @@ describe('SQLite Entity Schema Creation', () => {
   });
 
   describe('Indexes', () => {
-    it('should create idx_entities_type index', async (t) => {
+    it('should create idx_entities_type index', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -215,14 +198,14 @@ describe('SQLite Entity Schema Creation', () => {
           `
         SELECT name FROM sqlite_master
         WHERE type='index' AND name='idx_entities_type'
-      `,
+      `
         )
         .get();
 
       assert.ok(result, 'idx_entities_type index should exist');
     });
 
-    it('should create idx_entities_name index', async (t) => {
+    it('should create idx_entities_name index', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -231,14 +214,14 @@ describe('SQLite Entity Schema Creation', () => {
           `
         SELECT name FROM sqlite_master
         WHERE type='index' AND name='idx_entities_name'
-      `,
+      `
         )
         .get();
 
       assert.ok(result, 'idx_entities_name index should exist');
     });
 
-    it('should create idx_entities_source_file index', async (t) => {
+    it('should create idx_entities_source_file index', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -247,22 +230,18 @@ describe('SQLite Entity Schema Creation', () => {
           `
         SELECT name FROM sqlite_master
         WHERE type='index' AND name='idx_entities_source_file'
-      `,
+      `
         )
         .get();
 
       assert.ok(result, 'idx_entities_source_file index should exist');
     });
 
-    it('should create relationship indexes', async (t) => {
+    it('should create relationship indexes', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
-      const indexes = [
-        'idx_relationships_from',
-        'idx_relationships_to',
-        'idx_relationships_type',
-      ];
+      const indexes = ['idx_relationships_from', 'idx_relationships_to', 'idx_relationships_type'];
 
       for (const indexName of indexes) {
         const result = db
@@ -270,7 +249,7 @@ describe('SQLite Entity Schema Creation', () => {
             `
           SELECT name FROM sqlite_master
           WHERE type='index' AND name=?
-        `,
+        `
           )
           .get(indexName);
 
@@ -280,7 +259,7 @@ describe('SQLite Entity Schema Creation', () => {
   });
 
   describe('Constraints', () => {
-    it('should enforce PRIMARY KEY on entities.id', async (t) => {
+    it('should enforce PRIMARY KEY on entities.id', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -289,7 +268,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entities (id, type, name)
         VALUES ('test-1', 'agent', 'Test Agent')
-      `,
+      `
       ).run();
 
       // Try to insert duplicate id
@@ -299,15 +278,15 @@ describe('SQLite Entity Schema Creation', () => {
             `
           INSERT INTO entities (id, type, name)
           VALUES ('test-1', 'task', 'Another Entity')
-        `,
+        `
           ).run();
         },
         { name: 'SqliteError' },
-        'Should reject duplicate primary key',
+        'Should reject duplicate primary key'
       );
     });
 
-    it('should enforce CHECK constraint on entity type', async (t) => {
+    it('should enforce CHECK constraint on entity type', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -316,7 +295,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entities (id, type, name)
         VALUES ('test-1', 'agent', 'Test Agent')
-      `,
+      `
       ).run();
 
       // Invalid type should fail
@@ -326,15 +305,15 @@ describe('SQLite Entity Schema Creation', () => {
             `
           INSERT INTO entities (id, type, name)
           VALUES ('test-2', 'invalid_type', 'Bad Entity')
-        `,
+        `
           ).run();
         },
         { name: 'SqliteError' },
-        'Should reject invalid entity type',
+        'Should reject invalid entity type'
       );
     });
 
-    it('should enforce CHECK constraint on relationship type', async (t) => {
+    it('should enforce CHECK constraint on relationship type', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -343,7 +322,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entities (id, type, name)
         VALUES ('entity-1', 'agent', 'Agent 1'), ('entity-2', 'task', 'Task 1')
-      `,
+      `
       ).run();
 
       // Valid relationship type should work
@@ -351,7 +330,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type)
         VALUES ('entity-1', 'entity-2', 'assigned_to')
-      `,
+      `
       ).run();
 
       // Invalid relationship type should fail
@@ -361,15 +340,15 @@ describe('SQLite Entity Schema Creation', () => {
             `
           INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type)
           VALUES ('entity-1', 'entity-2', 'invalid_rel')
-        `,
+        `
           ).run();
         },
         { name: 'SqliteError' },
-        'Should reject invalid relationship type',
+        'Should reject invalid relationship type'
       );
     });
 
-    it('should enforce FOREIGN KEY constraints', async (t) => {
+    it('should enforce FOREIGN KEY constraints', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -381,7 +360,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entities (id, type, name)
         VALUES ('entity-1', 'agent', 'Agent 1')
-      `,
+      `
       ).run();
 
       // Try to create relationship to non-existent entity
@@ -391,17 +370,17 @@ describe('SQLite Entity Schema Creation', () => {
             `
           INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type)
           VALUES ('entity-1', 'non-existent', 'assigned_to')
-        `,
+        `
           ).run();
         },
         { name: 'SqliteError' },
-        'Should reject relationship to non-existent entity',
+        'Should reject relationship to non-existent entity'
       );
     });
   });
 
   describe('Default Values', () => {
-    it('should set default created_at timestamp on entities', async (t) => {
+    it('should set default created_at timestamp on entities', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -409,25 +388,22 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entities (id, type, name)
         VALUES ('test-1', 'agent', 'Test Agent')
-      `,
+      `
       ).run();
 
       const result = db
         .prepare(
           `
         SELECT created_at FROM entities WHERE id='test-1'
-      `,
+      `
         )
         .get();
 
       assert.ok(result.created_at, 'Should have created_at timestamp');
-      assert.ok(
-        new Date(result.created_at).getTime() > 0,
-        'Should be valid ISO 8601 timestamp',
-      );
+      assert.ok(new Date(result.created_at).getTime() > 0, 'Should be valid ISO 8601 timestamp');
     });
 
-    it('should set default access_count to 0', async (t) => {
+    it('should set default access_count to 0', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -435,21 +411,21 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entities (id, type, name)
         VALUES ('test-1', 'agent', 'Test Agent')
-      `,
+      `
       ).run();
 
       const result = db
         .prepare(
           `
         SELECT access_count FROM entities WHERE id='test-1'
-      `,
+      `
         )
         .get();
 
       assert.equal(result.access_count, 0, 'Should default access_count to 0');
     });
 
-    it('should set default quality_score to 0.5', async (t) => {
+    it('should set default quality_score to 0.5', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -457,21 +433,21 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entities (id, type, name)
         VALUES ('test-1', 'agent', 'Test Agent')
-      `,
+      `
       ).run();
 
       const result = db
         .prepare(
           `
         SELECT quality_score FROM entities WHERE id='test-1'
-      `,
+      `
         )
         .get();
 
       assert.equal(result.quality_score, 0.5, 'Should default quality_score to 0.5');
     });
 
-    it('should set default weight to 1.0 on relationships', async (t) => {
+    it('should set default weight to 1.0 on relationships', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -480,7 +456,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entities (id, type, name)
         VALUES ('entity-1', 'agent', 'Agent 1'), ('entity-2', 'task', 'Task 1')
-      `,
+      `
       ).run();
 
       // Create relationship without weight
@@ -488,7 +464,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
         INSERT INTO entity_relationships (from_entity_id, to_entity_id, relationship_type)
         VALUES ('entity-1', 'entity-2', 'assigned_to')
-      `,
+      `
       ).run();
 
       const result = db
@@ -496,7 +472,7 @@ describe('SQLite Entity Schema Creation', () => {
           `
         SELECT weight FROM entity_relationships
         WHERE from_entity_id='entity-1'
-      `,
+      `
         )
         .get();
 
@@ -505,7 +481,7 @@ describe('SQLite Entity Schema Creation', () => {
   });
 
   describe('Schema Version Tracking', () => {
-    it('should insert initial schema version', async (t) => {
+    it('should insert initial schema version', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
       await initializeDatabase(db);
 
@@ -513,7 +489,7 @@ describe('SQLite Entity Schema Creation', () => {
         .prepare(
           `
         SELECT version, description FROM schema_version ORDER BY version DESC LIMIT 1
-      `,
+      `
         )
         .get();
 
@@ -521,7 +497,7 @@ describe('SQLite Entity Schema Creation', () => {
       assert.ok(result.description, 'Should have description');
     });
 
-    it('should prevent duplicate schema initialization', async (t) => {
+    it('should prevent duplicate schema initialization', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
 
       // Initialize once
@@ -534,7 +510,7 @@ describe('SQLite Entity Schema Creation', () => {
         .prepare(
           `
         SELECT COUNT(*) as count FROM schema_version
-      `,
+      `
         )
         .get();
 
@@ -543,18 +519,14 @@ describe('SQLite Entity Schema Creation', () => {
   });
 
   describe('CLI Tool', () => {
-    it('should export initializeDatabase function', async (t) => {
+    it('should export initializeDatabase function', async _t => {
       const module = await import(MIGRATION_SCRIPT_URL);
 
       assert.ok(module.initializeDatabase, 'Should export initializeDatabase');
-      assert.equal(
-        typeof module.initializeDatabase,
-        'function',
-        'Should be a function',
-      );
+      assert.equal(typeof module.initializeDatabase, 'function', 'Should be a function');
     });
 
-    it('should accept database path as parameter', async (t) => {
+    it('should accept database path as parameter', async _t => {
       const { initializeDatabase } = await import(MIGRATION_SCRIPT_URL);
 
       // Should not throw with valid database instance

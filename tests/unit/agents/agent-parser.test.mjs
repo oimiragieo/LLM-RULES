@@ -7,12 +7,10 @@
 
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 
-const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -88,7 +86,10 @@ identity:
 
     assert.ok(result.identity, 'Should have identity field');
     assert.equal(result.identity.role, 'Senior Software Engineer');
-    assert.equal(result.identity.goal, 'Write clean, tested, efficient code following TDD principles');
+    assert.equal(
+      result.identity.goal,
+      'Write clean, tested, efficient code following TDD principles'
+    );
     assert.ok(result.identity.backstory.includes('15 years'));
     assert.ok(Array.isArray(result.identity.personality.traits));
     assert.equal(result.identity.personality.communication_style, 'direct');
@@ -226,7 +227,7 @@ describe('Agent Parser - Validation Methods', () => {
     const validIdentity = {
       role: 'Senior Engineer',
       goal: 'Build reliable software',
-      backstory: 'You have extensive experience in software development'
+      backstory: 'You have extensive experience in software development',
     };
 
     const result = parser.validateIdentity(validIdentity);
@@ -241,7 +242,7 @@ describe('Agent Parser - Validation Methods', () => {
     const invalidIdentity = {
       role: 'X', // Too short
       goal: 'Code', // Too short
-      backstory: 'Dev' // Too short
+      backstory: 'Dev', // Too short
     };
 
     const result = parser.validateIdentity(invalidIdentity);

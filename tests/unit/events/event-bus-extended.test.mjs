@@ -28,7 +28,6 @@ const require = createRequire(import.meta.url);
 
 // Import CommonJS modules
 const eventBus = require(path.join(projectRoot, '.claude/lib/events/event-bus.cjs'));
-const { EventTypes } = require(path.join(projectRoot, '.claude/lib/events/event-types.cjs'));
 
 describe('EventBus Extended Unit Tests', () => {
   beforeEach(() => {
@@ -40,7 +39,9 @@ describe('EventBus Extended Unit Tests', () => {
     it('should reject events with invalid type', async () => {
       let errorMessage = '';
       const originalError = console.error;
-      console.error = (msg) => { errorMessage = msg; };
+      console.error = msg => {
+        errorMessage = msg;
+      };
 
       try {
         await eventBus.emit('INVALID_TYPE', {
@@ -59,7 +60,9 @@ describe('EventBus Extended Unit Tests', () => {
     it('should reject AGENT_STARTED without required fields', async () => {
       let errorMessage = '';
       const originalError = console.error;
-      console.error = (msg) => { errorMessage = msg; };
+      console.error = msg => {
+        errorMessage = msg;
+      };
 
       try {
         await eventBus.emit('AGENT_STARTED', {
@@ -80,7 +83,9 @@ describe('EventBus Extended Unit Tests', () => {
     it('should reject AGENT_STARTED with invalid timestamp format', async () => {
       let errorMessage = '';
       const originalError = console.error;
-      console.error = (msg) => { errorMessage = msg; };
+      console.error = msg => {
+        errorMessage = msg;
+      };
 
       try {
         await eventBus.emit('AGENT_STARTED', {
@@ -127,7 +132,9 @@ describe('EventBus Extended Unit Tests', () => {
     it('should validate TASK_CREATED with required fields', async () => {
       let errorMessage = '';
       const originalError = console.error;
-      console.error = (msg) => { errorMessage = msg; };
+      console.error = msg => {
+        errorMessage = msg;
+      };
 
       try {
         await eventBus.emit('TASK_CREATED', {
@@ -159,7 +166,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -185,7 +192,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -209,7 +216,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -233,7 +240,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -258,7 +265,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -284,7 +291,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -296,7 +303,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -316,12 +323,16 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
       const afterEmitCount = eventBus.subscriptions.length;
-      assert.strictEqual(afterEmitCount, initialCount, 'Should remove subscription after execution');
+      assert.strictEqual(
+        afterEmitCount,
+        initialCount,
+        'Should remove subscription after execution'
+      );
     });
 
     it('should not leak memory with multiple once() subscriptions', async () => {
@@ -332,7 +343,11 @@ describe('EventBus Extended Unit Tests', () => {
         eventBus.once('AGENT_STARTED', () => {});
       }
 
-      assert.strictEqual(eventBus.subscriptions.length, initialCount + 100, 'Should add all subscriptions');
+      assert.strictEqual(
+        eventBus.subscriptions.length,
+        initialCount + 100,
+        'Should add all subscriptions'
+      );
 
       // Emit event
       await eventBus.emit('AGENT_STARTED', {
@@ -340,11 +355,15 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      assert.strictEqual(eventBus.subscriptions.length, initialCount, 'Should remove all once() subscriptions');
+      assert.strictEqual(
+        eventBus.subscriptions.length,
+        initialCount,
+        'Should remove all once() subscriptions'
+      );
     });
 
     it('should support once() with async handler', async () => {
@@ -360,7 +379,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -372,7 +391,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -394,12 +413,16 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
       assert.strictEqual(handlerExecuted, true, 'Handler should execute');
-      assert.strictEqual(subscriptionRemovedDuringHandler, false, 'Subscription should exist during handler execution');
+      assert.strictEqual(
+        subscriptionRemovedDuringHandler,
+        false,
+        'Subscription should exist during handler execution'
+      );
     });
   });
 
@@ -416,7 +439,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -429,7 +452,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -460,7 +483,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -476,7 +499,11 @@ describe('EventBus Extended Unit Tests', () => {
 
       const subscription = eventBus.on('AGENT_STARTED', () => {});
 
-      assert.strictEqual(eventBus.subscriptions.length, initialCount + 1, 'Should add subscription');
+      assert.strictEqual(
+        eventBus.subscriptions.length,
+        initialCount + 1,
+        'Should add subscription'
+      );
 
       eventBus.off(subscription);
 
@@ -499,7 +526,9 @@ describe('EventBus Extended Unit Tests', () => {
   describe('Edge Cases: Duplicate Subscriptions', () => {
     it('should allow duplicate subscriptions with same handler', async () => {
       let callCount = 0;
-      const handler = () => { callCount++; };
+      const handler = () => {
+        callCount++;
+      };
 
       eventBus.on('AGENT_STARTED', handler);
       eventBus.on('AGENT_STARTED', handler); // Duplicate
@@ -509,7 +538,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -527,7 +556,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -536,7 +565,9 @@ describe('EventBus Extended Unit Tests', () => {
 
     it('should handle removing one duplicate subscription', async () => {
       let callCount = 0;
-      const handler = () => { callCount++; };
+      const handler = () => {
+        callCount++;
+      };
 
       const sub1 = eventBus.on('AGENT_STARTED', handler);
       const sub2 = eventBus.on('AGENT_STARTED', handler); // Duplicate
@@ -549,7 +580,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -579,7 +610,7 @@ describe('EventBus Extended Unit Tests', () => {
           agentId: 'test-123',
           agentType: 'developer',
           taskId: 'task-456',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
         await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -611,7 +642,7 @@ describe('EventBus Extended Unit Tests', () => {
           agentId: 'test-123',
           agentType: 'developer',
           taskId: 'task-456',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
         await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -635,7 +666,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -655,7 +686,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -668,7 +699,9 @@ describe('EventBus Extended Unit Tests', () => {
       let errorLogged = false;
 
       const originalError = console.error;
-      console.error = () => { errorLogged = true; };
+      console.error = () => {
+        errorLogged = true;
+      };
 
       try {
         eventBus.on('AGENT_STARTED', async () => {
@@ -680,7 +713,7 @@ describe('EventBus Extended Unit Tests', () => {
           agentId: 'test-123',
           agentType: 'developer',
           taskId: 'task-456',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
         await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -693,25 +726,37 @@ describe('EventBus Extended Unit Tests', () => {
     it('should wait for async handlers to complete before next in priority', async () => {
       const executionOrder = [];
 
-      eventBus.on('AGENT_STARTED', async () => {
-        await new Promise(resolve => setTimeout(resolve, 50));
-        executionOrder.push('high');
-      }, 90);
+      eventBus.on(
+        'AGENT_STARTED',
+        async () => {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          executionOrder.push('high');
+        },
+        90
+      );
 
-      eventBus.on('AGENT_STARTED', () => {
-        executionOrder.push('low');
-      }, 10);
+      eventBus.on(
+        'AGENT_STARTED',
+        () => {
+          executionOrder.push('low');
+        },
+        10
+      );
 
       await eventBus.emit('AGENT_STARTED', {
         type: 'AGENT_STARTED',
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 150));
 
-      assert.deepStrictEqual(executionOrder, ['high', 'low'], 'Should execute in priority order even with async');
+      assert.deepStrictEqual(
+        executionOrder,
+        ['high', 'low'],
+        'Should execute in priority order even with async'
+      );
     });
 
     it('should handle mix of sync and async handlers', async () => {
@@ -729,7 +774,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -752,7 +797,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       const elapsed = Date.now() - start;
@@ -770,7 +815,7 @@ describe('EventBus Extended Unit Tests', () => {
           agentId: 'test-123',
           agentType: 'developer',
           taskId: 'task-456',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       });
     });
@@ -778,7 +823,7 @@ describe('EventBus Extended Unit Tests', () => {
     it('should handle event with minimal payload', async () => {
       let received = null;
 
-      eventBus.on('AGENT_STARTED', (payload) => {
+      eventBus.on('AGENT_STARTED', payload => {
         received = payload;
       });
 
@@ -786,7 +831,7 @@ describe('EventBus Extended Unit Tests', () => {
         type: 'AGENT_STARTED',
         agentId: 'test-123',
         agentType: 'developer',
-        taskId: 'task-456'
+        taskId: 'task-456',
       });
 
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -798,7 +843,7 @@ describe('EventBus Extended Unit Tests', () => {
     it('should add timestamp if missing from payload', async () => {
       let received = null;
 
-      eventBus.on('AGENT_STARTED', (payload) => {
+      eventBus.on('AGENT_STARTED', payload => {
         received = payload;
       });
 
@@ -806,7 +851,7 @@ describe('EventBus Extended Unit Tests', () => {
         type: 'AGENT_STARTED',
         agentId: 'test-123',
         agentType: 'developer',
-        taskId: 'task-456'
+        taskId: 'task-456',
       }); // No timestamp
 
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -820,7 +865,7 @@ describe('EventBus Extended Unit Tests', () => {
       let received = null;
       const customTimestamp = '2026-01-28T10:00:00.000Z';
 
-      eventBus.on('AGENT_STARTED', (payload) => {
+      eventBus.on('AGENT_STARTED', payload => {
         received = payload;
       });
 
@@ -829,7 +874,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: customTimestamp
+        timestamp: customTimestamp,
       });
 
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -868,7 +913,7 @@ describe('EventBus Extended Unit Tests', () => {
         agentId: 'test-123',
         agentType: 'developer',
         taskId: 'task-456',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -922,7 +967,7 @@ describe('EventBus Extended Unit Tests', () => {
           agentType: 'developer',
           taskId: 'task-456',
           data: 'test',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }, 50);
 
@@ -941,7 +986,7 @@ describe('EventBus Extended Unit Tests', () => {
           agentId: 'test-123',
           agentType: 'developer',
           taskId: 'task-456',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }, 50);
 

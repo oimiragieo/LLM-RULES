@@ -18,7 +18,9 @@ const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
 // Dynamically import CommonJS module
-const { MemoryVectorStore } = await import(`file:///${path.join(PROJECT_ROOT, '.claude/lib/memory/chromadb-client.cjs').replace(/\\/g, '/')}`);
+const { MemoryVectorStore } = await import(
+  `file:///${path.join(PROJECT_ROOT, '.claude/lib/memory/chromadb-client.cjs').replace(/\\/g, '/')}`
+);
 
 describe('Semantic Search API Unit Tests', () => {
   let vectorStore;
@@ -28,30 +30,32 @@ describe('Semantic Search API Unit Tests', () => {
     // Create vector store instance
     vectorStore = new MemoryVectorStore({
       persistDirectory: '.claude/data/chromadb-test',
-      collectionName: 'test-semantic-search'
+      collectionName: 'test-semantic-search',
     });
 
     // Mock the client and collection
     vectorStore.client = {
       heartbeat: mock.fn(async () => true),
-      getOrCreateCollection: mock.fn(async () => mockCollection)
+      getOrCreateCollection: mock.fn(async () => mockCollection),
     };
 
     vectorStore.isInitialized = true;
 
     // Create mock collection with query method
     mockCollection = {
-      query: mock.fn(async (params) => {
+      query: mock.fn(async params => {
         // Return mock results based on query
         if (params.queryTexts[0] === 'vector database') {
           return {
             ids: [['doc-1', 'doc-2']],
             documents: [['ChromaDB is a vector database', 'SQLite is a relational database']],
-            metadatas: [[
-              { type: 'learning', source: 'learnings.md', line: 10 },
-              { type: 'decision', source: 'decisions.md', line: 25 }
-            ]],
-            distances: [[0.1, 0.3]] // Lower distance = higher similarity
+            metadatas: [
+              [
+                { type: 'learning', source: 'learnings.md', line: 10 },
+                { type: 'decision', source: 'decisions.md', line: 25 },
+              ],
+            ],
+            distances: [[0.1, 0.3]], // Lower distance = higher similarity
           };
         }
 
@@ -60,9 +64,9 @@ describe('Semantic Search API Unit Tests', () => {
           ids: [[]],
           documents: [[]],
           metadatas: [[]],
-          distances: [[]]
+          distances: [[]],
         };
-      })
+      }),
     };
 
     // Set collection directly (skip getOrCreateCollection for unit tests)
@@ -83,9 +87,18 @@ describe('Semantic Search API Unit Tests', () => {
 
       const result = results[0];
       assert.ok(Object.prototype.hasOwnProperty.call(result, 'id'), 'Result should have id');
-      assert.ok(Object.prototype.hasOwnProperty.call(result, 'content'), 'Result should have content');
-      assert.ok(Object.prototype.hasOwnProperty.call(result, 'metadata'), 'Result should have metadata');
-      assert.ok(Object.prototype.hasOwnProperty.call(result, 'similarity'), 'Result should have similarity score');
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(result, 'content'),
+        'Result should have content'
+      );
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(result, 'metadata'),
+        'Result should have metadata'
+      );
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(result, 'similarity'),
+        'Result should have similarity score'
+      );
     });
 
     it('should convert ChromaDB distance to similarity score', async () => {
@@ -111,13 +124,13 @@ describe('Semantic Search API Unit Tests', () => {
       assert.deepStrictEqual(results[0].metadata, {
         type: 'learning',
         source: 'learnings.md',
-        line: 10
+        line: 10,
       });
 
       assert.deepStrictEqual(results[1].metadata, {
         type: 'decision',
         source: 'decisions.md',
-        line: 25
+        line: 25,
       });
     });
   });
@@ -136,7 +149,7 @@ describe('Semantic Search API Unit Tests', () => {
         ids: [['doc-1', 'doc-2', 'doc-3']],
         documents: [['Result 1', 'Result 2', 'Result 3']],
         metadatas: [[{}, {}, {}]],
-        distances: [[0.1, 0.4, 0.7]] // Similarities: 0.9, 0.6, 0.3
+        distances: [[0.1, 0.4, 0.7]], // Similarities: 0.9, 0.6, 0.3
       }));
 
       const results = await vectorStore.search('test', { minScore: 0.5 });
@@ -149,18 +162,26 @@ describe('Semantic Search API Unit Tests', () => {
 
     it('should pass metadata filters to ChromaDB', async () => {
       await vectorStore.search('test', {
-        filters: { type: 'learning' }
+        filters: { type: 'learning' },
       });
 
       const call = mockCollection.query.mock.calls[0];
-      assert.deepStrictEqual(call.arguments[0].where, { type: 'learning' }, 'Should pass filters as where clause');
+      assert.deepStrictEqual(
+        call.arguments[0].where,
+        { type: 'learning' },
+        'Should pass filters as where clause'
+      );
     });
 
     it('should handle no filters gracefully', async () => {
       await vectorStore.search('test');
 
       const call = mockCollection.query.mock.calls[0];
-      assert.strictEqual(call.arguments[0].where, undefined, 'Should not include where clause if no filters');
+      assert.strictEqual(
+        call.arguments[0].where,
+        undefined,
+        'Should not include where clause if no filters'
+      );
     });
   });
 
@@ -171,7 +192,7 @@ describe('Semantic Search API Unit Tests', () => {
         ids: [[]],
         documents: [[]],
         metadatas: [[]],
-        distances: [[]]
+        distances: [[]],
       }));
 
       const results = await vectorStore.search('nonexistent query');
@@ -208,7 +229,7 @@ describe('Semantic Search API Unit Tests', () => {
         ids: [['doc-1']],
         documents: [['Result']],
         metadatas: [[{}]],
-        distances: [[undefined]]
+        distances: [[undefined]],
       }));
 
       const results = await vectorStore.search('test');
@@ -225,7 +246,7 @@ describe('Semantic Search API Unit Tests', () => {
         ids: [['doc-1', 'doc-2', 'doc-3']],
         documents: [['Best match', 'Good match', 'Weak match']],
         metadatas: [[{}, {}, {}]],
-        distances: [[0.1, 0.3, 0.4]] // Already ordered: best → worst, all above default minScore (0.5)
+        distances: [[0.1, 0.3, 0.4]], // Already ordered: best → worst, all above default minScore (0.5)
       }));
 
       const results = await vectorStore.search('test', { minScore: 0 }); // Set minScore to 0 to get all results

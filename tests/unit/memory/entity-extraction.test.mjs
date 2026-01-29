@@ -6,22 +6,16 @@ import assert from 'node:assert';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'node:fs';
-import { createRequire } from 'node:module';
 
-const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Import EntityExtractor (CommonJS module)
 const projectRoot = path.resolve(__dirname, '../../../');
-const extractorPath = path.join(
-  projectRoot,
-  '.claude/lib/memory/entity-extractor.cjs',
-);
+const extractorPath = path.join(projectRoot, '.claude/lib/memory/entity-extractor.cjs');
 
 // Convert Windows path to file:// URL
-const extractorUrl = new URL('file:///' + extractorPath.replace(/\\/g, '/'))
-  .href;
+const extractorUrl = new URL('file:///' + extractorPath.replace(/\\/g, '/')).href;
 
 describe('EntityExtractor', () => {
   let EntityExtractor;
@@ -66,7 +60,7 @@ describe('EntityExtractor', () => {
       assert.ok(Array.isArray(entities));
       assert.ok(entities.length > 0);
 
-      const pattern = entities.find((e) => e.type === 'pattern');
+      const pattern = entities.find(e => e.type === 'pattern');
       assert.ok(pattern);
       assert.strictEqual(pattern.name, 'TDD Red-Green-Refactor');
       assert.ok(pattern.content.includes('RED phase'));
@@ -83,7 +77,7 @@ describe('EntityExtractor', () => {
 
       const entities = await extractor.extract(content, 'learnings.md');
 
-      const concept = entities.find((e) => e.type === 'concept');
+      const concept = entities.find(e => e.type === 'concept');
       assert.ok(concept);
       assert.strictEqual(concept.name, 'Hybrid Memory Architecture');
     });
@@ -98,14 +92,14 @@ describe('EntityExtractor', () => {
 
       const entities = await extractor.extract(content, 'learnings.md');
 
-      const tasks = entities.filter((e) => e.type === 'task');
+      const tasks = entities.filter(e => e.type === 'task');
       assert.ok(tasks.length >= 2);
 
-      const task25 = tasks.find((t) => t.name.includes('Task #25'));
+      const task25 = tasks.find(t => t.name.includes('Task #25'));
       assert.ok(task25);
       assert.ok(task25.content.includes('Design SQLite entity schema'));
 
-      const task31 = tasks.find((t) => t.name.includes('Task #31'));
+      const task31 = tasks.find(t => t.name.includes('Task #31'));
       assert.ok(task31);
     });
 
@@ -119,7 +113,7 @@ Content here
 
       const entities = await extractor.extract(content, 'learnings.md');
 
-      const pattern = entities.find((e) => e.type === 'pattern');
+      const pattern = entities.find(e => e.type === 'pattern');
       assert.ok(pattern);
       assert.strictEqual(pattern.line_number, 3); // "### Pattern:" is on line 3
     });
@@ -138,7 +132,7 @@ Content here
 
       const entities = await extractor.extract(content, 'decisions.md');
 
-      const decision = entities.find((e) => e.type === 'decision');
+      const decision = entities.find(e => e.type === 'decision');
       assert.ok(decision);
       assert.strictEqual(decision.name, 'ADR-054: Memory System Enhancement Strategy');
       assert.ok(decision.content.includes('APPROVED'));
@@ -158,7 +152,7 @@ Content 2
 
       const entities = await extractor.extract(content, 'decisions.md');
 
-      const decisions = entities.filter((e) => e.type === 'decision');
+      const decisions = entities.filter(e => e.type === 'decision');
       assert.strictEqual(decisions.length, 2);
       assert.strictEqual(decisions[0].name, 'ADR-001: First Decision');
       assert.strictEqual(decisions[1].name, 'ADR-002: Second Decision');
@@ -177,7 +171,7 @@ Content 2
 
       const entities = await extractor.extract(content, 'issues.md');
 
-      const issue = entities.find((e) => e.type === 'issue');
+      const issue = entities.find(e => e.type === 'issue');
       assert.ok(issue);
       assert.strictEqual(issue.name, 'ChromaDB Server Startup Fails');
       assert.ok(issue.content.includes('Port already in use'));
@@ -196,7 +190,7 @@ Content 2
 
       const entities = await extractor.extract(content, 'issues.md');
 
-      const issues = entities.filter((e) => e.type === 'issue');
+      const issues = entities.filter(e => e.type === 'issue');
       assert.strictEqual(issues.length, 2);
     });
   });
@@ -208,14 +202,11 @@ Task #25 blocks Task #31
 Task #31 depends on Task #25
 `;
 
-      const relationships = await extractor.extractRelationships(
-        content,
-        'learnings.md',
-      );
+      const relationships = await extractor.extractRelationships(content, 'learnings.md');
 
       assert.ok(Array.isArray(relationships));
 
-      const blocksRel = relationships.find((r) => r.type === 'blocks');
+      const blocksRel = relationships.find(r => r.type === 'blocks');
       assert.ok(blocksRel);
       assert.strictEqual(blocksRel.from, 'task-25');
       assert.strictEqual(blocksRel.to, 'task-31');
@@ -226,12 +217,9 @@ Task #31 depends on Task #25
 Pattern WAL implements Decision ADR-054
 `;
 
-      const relationships = await extractor.extractRelationships(
-        content,
-        'learnings.md',
-      );
+      const relationships = await extractor.extractRelationships(content, 'learnings.md');
 
-      const implRel = relationships.find((r) => r.type === 'implements');
+      const implRel = relationships.find(r => r.type === 'implements');
       assert.ok(implRel);
       assert.ok(implRel.from.includes('wal'));
       assert.ok(implRel.to.includes('adr-054'));
@@ -242,12 +230,9 @@ Pattern WAL implements Decision ADR-054
 **Related Specifications:** memory-system-enhancement-spec.md (Section 6.3)
 `;
 
-      const relationships = await extractor.extractRelationships(
-        content,
-        'learnings.md',
-      );
+      const relationships = await extractor.extractRelationships(content, 'learnings.md');
 
-      const refRel = relationships.find((r) => r.type === 'references');
+      const refRel = relationships.find(r => r.type === 'references');
       assert.ok(refRel);
     });
   });
@@ -265,13 +250,11 @@ Content for testing storage
 
       // Verify entities were stored
       const db = extractor.db;
-      const stored = db
-        .prepare('SELECT * FROM entities WHERE type = ?')
-        .all('pattern');
+      const stored = db.prepare('SELECT * FROM entities WHERE type = ?').all('pattern');
 
       assert.ok(stored.length > 0);
 
-      const pattern = stored.find((e) => e.name === 'Test Pattern');
+      const pattern = stored.find(e => e.name === 'Test Pattern');
       assert.ok(pattern);
       assert.strictEqual(pattern.type, 'pattern');
       assert.strictEqual(pattern.source_file, 'learnings.md');
@@ -305,10 +288,7 @@ Task #100 blocks Task #101
       await extractor.storeEntities(entities);
 
       // Then extract and store relationships
-      const relationships = await extractor.extractRelationships(
-        content,
-        'test.md',
-      );
+      const relationships = await extractor.extractRelationships(content, 'test.md');
       await extractor.storeRelationships(relationships);
 
       // Verify relationships were stored
@@ -320,7 +300,7 @@ Task #100 blocks Task #101
       assert.ok(stored.length > 0);
 
       const blocksRel = stored.find(
-        (r) => r.from_entity_id === 'task-100' && r.to_entity_id === 'task-101',
+        r => r.from_entity_id === 'task-100' && r.to_entity_id === 'task-101'
       );
       assert.ok(blocksRel);
       assert.strictEqual(blocksRel.relationship_type, 'blocks');
@@ -345,9 +325,7 @@ Task #100 blocks Task #101
       await extractor.storeEntities(entities);
 
       const db = extractor.db;
-      const stored = db
-        .prepare('SELECT * FROM entities WHERE id = ?')
-        .all('test-duplicate');
+      const stored = db.prepare('SELECT * FROM entities WHERE id = ?').all('test-duplicate');
 
       // Should only have one record
       assert.strictEqual(stored.length, 1);
@@ -373,7 +351,7 @@ Content from file
         assert.ok(result.entities);
         assert.ok(result.relationships);
 
-        const pattern = result.entities.find((e) => e.type === 'pattern');
+        const pattern = result.entities.find(e => e.type === 'pattern');
         assert.ok(pattern);
         assert.strictEqual(pattern.name, 'File-Based Pattern');
       } finally {
@@ -393,7 +371,7 @@ Content from file
         },
         {
           message: /ENOENT|no such file/,
-        },
+        }
       );
     });
   });
@@ -422,17 +400,14 @@ Pattern WAL implements ADR-056
 `;
 
       const entities = await extractor.extract(sampleContent, 'learnings.md');
-      const relationships = await extractor.extractRelationships(
-        sampleContent,
-        'learnings.md',
-      );
+      const relationships = await extractor.extractRelationships(sampleContent, 'learnings.md');
 
       // Expected: 1 pattern, 1 concept, 1 decision, 1 issue, 2 tasks
-      const patterns = entities.filter((e) => e.type === 'pattern');
-      const concepts = entities.filter((e) => e.type === 'concept');
-      const issues = entities.filter((e) => e.type === 'issue');
-      const decisions = entities.filter((e) => e.type === 'decision');
-      const tasks = entities.filter((e) => e.type === 'task');
+      const patterns = entities.filter(e => e.type === 'pattern');
+      const concepts = entities.filter(e => e.type === 'concept');
+      const issues = entities.filter(e => e.type === 'issue');
+      const decisions = entities.filter(e => e.type === 'decision');
+      const tasks = entities.filter(e => e.type === 'task');
 
       console.log(`  Extracted breakdown:`);
       console.log(`    Patterns: ${patterns.length}/1`);
@@ -446,7 +421,7 @@ Pattern WAL implements ADR-056
       const accuracy = (actualEntities / expectedEntities) * 100;
 
       console.log(
-        `  Extraction accuracy: ${accuracy.toFixed(1)}% (${actualEntities}/${expectedEntities})`,
+        `  Extraction accuracy: ${accuracy.toFixed(1)}% (${actualEntities}/${expectedEntities})`
       );
 
       // Should extract at least 90% of expected entities
@@ -458,13 +433,10 @@ Pattern WAL implements ADR-056
       const relAccuracy = (actualRelationships / expectedRelationships) * 100;
 
       console.log(
-        `  Relationship accuracy: ${relAccuracy.toFixed(1)}% (${actualRelationships}/${expectedRelationships})`,
+        `  Relationship accuracy: ${relAccuracy.toFixed(1)}% (${actualRelationships}/${expectedRelationships})`
       );
 
-      assert.ok(
-        relAccuracy >= 90,
-        `Relationship accuracy ${relAccuracy}% is below 90% threshold`,
-      );
+      assert.ok(relAccuracy >= 90, `Relationship accuracy ${relAccuracy}% is below 90% threshold`);
     });
   });
 });

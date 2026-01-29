@@ -27,7 +27,8 @@ describe('BatchSpanProcessor Configuration', () => {
     originalEnv = { ...process.env };
 
     // Reset module cache to force re-initialization
-    const telemetryPath = require.resolve('../../../.claude/lib/observability/telemetry-client.cjs');
+    const telemetryPath =
+      require.resolve('../../../.claude/lib/observability/telemetry-client.cjs');
     delete require.cache[telemetryPath];
   });
 

@@ -54,10 +54,7 @@ describe('Feature Flags System', () => {
 
     it('should validate percentage is 0-100', () => {
       process.env.MEMORY_ROLLOUT_PERCENTAGE = '150';
-      assert.throws(
-        () => new FeatureFlags(),
-        /Rollout percentage must be between 0 and 100/
-      );
+      assert.throws(() => new FeatureFlags(), /Rollout percentage must be between 0 and 100/);
     });
 
     it('should handle invalid percentage gracefully', () => {
@@ -178,13 +175,13 @@ describe('Feature Flags System', () => {
 
       const logs = [];
       const originalWarn = console.warn;
-      console.warn = (msg) => logs.push(msg);
+      console.warn = msg => logs.push(msg);
 
       flags.rollback('memory_system', 'Test rollback');
 
       console.warn = originalWarn;
       assert.ok(
-        logs.some((log) => log.includes('Test rollback')),
+        logs.some(log => log.includes('Test rollback')),
         'Should log rollback reason'
       );
     });

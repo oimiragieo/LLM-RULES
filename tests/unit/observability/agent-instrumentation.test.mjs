@@ -10,7 +10,6 @@
 
 import { describe, it, before, after, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { trace, SpanStatusCode } from '@opentelemetry/api';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -22,8 +21,10 @@ let telemetryClient;
 describe('AgentInstrumentation', () => {
   before(async () => {
     // Import modules
-    const instrumentationPath = 'C:\\dev\\projects\\agent-studio\\.claude\\lib\\observability\\agent-instrumentation.cjs';
-    const telemetryPath = 'C:\\dev\\projects\\agent-studio\\.claude\\lib\\observability\\telemetry-client.cjs';
+    const instrumentationPath =
+      'C:\\dev\\projects\\agent-studio\\.claude\\lib\\observability\\agent-instrumentation.cjs';
+    const telemetryPath =
+      'C:\\dev\\projects\\agent-studio\\.claude\\lib\\observability\\telemetry-client.cjs';
 
     agentInstrumentation = require(instrumentationPath);
     telemetryClient = require(telemetryPath);
@@ -81,9 +82,17 @@ describe('AgentInstrumentation', () => {
       const span = agentInstrumentation.startAgentSpan('agent-123', 'task-execution');
       assert.ok(span, 'Span should be created');
       assert.strictEqual(typeof span.end, 'function', 'Span should have end() method');
-      assert.strictEqual(typeof span.setAttribute, 'function', 'Span should have setAttribute() method');
+      assert.strictEqual(
+        typeof span.setAttribute,
+        'function',
+        'Span should have setAttribute() method'
+      );
       assert.strictEqual(typeof span.setStatus, 'function', 'Span should have setStatus() method');
-      assert.strictEqual(typeof span.recordException, 'function', 'Span should have recordException() method');
+      assert.strictEqual(
+        typeof span.recordException,
+        'function',
+        'Span should have recordException() method'
+      );
       span.end();
     });
   });
@@ -165,7 +174,12 @@ describe('AgentInstrumentation', () => {
       const metadata = { taskId: 'task-789' };
       const fn = async () => 'success';
 
-      const result = await agentInstrumentation.withAgentSpan('agent-123', 'task-execution', fn, metadata);
+      const result = await agentInstrumentation.withAgentSpan(
+        'agent-123',
+        'task-execution',
+        fn,
+        metadata
+      );
       assert.strictEqual(result, 'success', 'Result should be returned');
     });
 
@@ -221,7 +235,11 @@ describe('AgentInstrumentation', () => {
         return agentInstrumentation.withAgentSpan('agent-child', 'child-operation', childFn);
       };
 
-      const result = await agentInstrumentation.withAgentSpan('agent-parent', 'parent-operation', parentFn);
+      const result = await agentInstrumentation.withAgentSpan(
+        'agent-parent',
+        'parent-operation',
+        parentFn
+      );
       assert.strictEqual(result, 'child-result', 'Nested result should be returned');
     });
 
@@ -235,7 +253,11 @@ describe('AgentInstrumentation', () => {
         return agentInstrumentation.withAgentSpan('agent-child', 'child-op', childFn);
       };
 
-      const result = await agentInstrumentation.withAgentSpan('agent-parent', 'parent-op', parentFn);
+      const result = await agentInstrumentation.withAgentSpan(
+        'agent-parent',
+        'parent-op',
+        parentFn
+      );
       assert.strictEqual(childExecuted, true, 'Child should have executed');
       assert.strictEqual(result, 'child', 'Child result should propagate');
     });

@@ -36,7 +36,7 @@ describe('ChromaDB Connection', () => {
   it('should create MemoryVectorStore instance', () => {
     const store = new MemoryVectorStore({
       persistDirectory: testPersistDir,
-      collectionName: 'test-collection'
+      collectionName: 'test-collection',
     });
 
     assert.ok(store, 'MemoryVectorStore instance should be created');
@@ -46,7 +46,7 @@ describe('ChromaDB Connection', () => {
   it('should initialize ChromaDB connection', async () => {
     const store = new MemoryVectorStore({
       persistDirectory: testPersistDir,
-      collectionName: 'test-init-collection'
+      collectionName: 'test-init-collection',
     });
 
     await store.initialize();
@@ -58,11 +58,19 @@ describe('ChromaDB Connection', () => {
       persistDirectory: testPersistDir,
       collectionName: 'test-config-collection',
       host: 'localhost',
-      port: 8000
+      port: 8000,
     });
 
-    assert.strictEqual(store.config.persistDirectory, testPersistDir, 'Persist directory should be set');
-    assert.strictEqual(store.config.collectionName, 'test-config-collection', 'Collection name should be set');
+    assert.strictEqual(
+      store.config.persistDirectory,
+      testPersistDir,
+      'Persist directory should be set'
+    );
+    assert.strictEqual(
+      store.config.collectionName,
+      'test-config-collection',
+      'Collection name should be set'
+    );
     assert.strictEqual(store.config.host, 'localhost', 'Host should be set');
     assert.strictEqual(store.config.port, 8000, 'Port should be set');
   });

@@ -5,13 +5,11 @@ import { describe, it, before, after, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'path';
 import fs from 'fs';
-import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 
 // Convert import.meta.url to file path (Windows-safe)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const require = createRequire(import.meta.url);
 
 // Project root
 const PROJECT_ROOT = path.resolve(__dirname, '../../../');
@@ -59,7 +57,7 @@ describe('BackgroundSyncWorker - Lifecycle', () => {
       if (fs.existsSync(testMemoryDir)) {
         fs.rmSync(testMemoryDir, { recursive: true, force: true });
       }
-    } catch (error) {
+    } catch (_error) {
       // Ignore cleanup errors (Windows file locking)
     }
   });
@@ -130,7 +128,7 @@ describe('BackgroundSyncWorker - Periodic Sync', () => {
       if (fs.existsSync(testMemoryDir)) {
         fs.rmSync(testMemoryDir, { recursive: true, force: true });
       }
-    } catch (error) {
+    } catch (_error) {
       // Ignore cleanup errors
     }
   });
@@ -138,7 +136,7 @@ describe('BackgroundSyncWorker - Periodic Sync', () => {
   it('should run periodic syncs at configured interval', async () => {
     // Track sync events
     const syncEvents = [];
-    worker.on('periodic-sync', (event) => {
+    worker.on('periodic-sync', event => {
       syncEvents.push(event);
     });
 
@@ -146,28 +144,25 @@ describe('BackgroundSyncWorker - Periodic Sync', () => {
     await worker.start();
 
     // Wait for 3+ sync cycles (100ms * 3 = 300ms + buffer)
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Stop worker
     await worker.stop();
 
     // Should have at least 3 sync events
-    assert.ok(
-      syncEvents.length >= 3,
-      `Expected >= 3 syncs, got ${syncEvents.length}`
-    );
+    assert.ok(syncEvents.length >= 3, `Expected >= 3 syncs, got ${syncEvents.length}`);
   });
 
   it('should emit sync events with timestamp', async () => {
     let syncEvent;
-    worker.on('periodic-sync', (event) => {
+    worker.on('periodic-sync', event => {
       syncEvent = event;
     });
 
     await worker.start();
 
     // Wait for at least one sync
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise(resolve => setTimeout(resolve, 200));
 
     await worker.stop();
 
@@ -206,7 +201,7 @@ describe('BackgroundSyncWorker - Process Signals', () => {
       if (fs.existsSync(testMemoryDir)) {
         fs.rmSync(testMemoryDir, { recursive: true, force: true });
       }
-    } catch (error) {
+    } catch (_error) {
       // Ignore
     }
   });
@@ -269,7 +264,7 @@ describe('BackgroundSyncWorker - Environment Variable', () => {
       if (fs.existsSync(testMemoryDir)) {
         fs.rmSync(testMemoryDir, { recursive: true, force: true });
       }
-    } catch (error) {
+    } catch (_error) {
       // Ignore
     }
   });
@@ -325,10 +320,7 @@ describe('BackgroundSyncWorker - Integration with SyncLayer', () => {
 
     // Create memory files
     const learningsPath = path.join(testMemoryDir, 'learnings.md');
-    fs.writeFileSync(
-      learningsPath,
-      '# Learnings\n\n## Pattern: Test Pattern\n\nTest content.\n'
-    );
+    fs.writeFileSync(learningsPath, '# Learnings\n\n## Pattern: Test Pattern\n\nTest content.\n');
 
     worker = new BackgroundSyncWorker({
       memoryDir: testMemoryDir,
@@ -346,7 +338,7 @@ describe('BackgroundSyncWorker - Integration with SyncLayer', () => {
       if (fs.existsSync(testMemoryDir)) {
         fs.rmSync(testMemoryDir, { recursive: true, force: true });
       }
-    } catch (error) {
+    } catch (_error) {
       // Ignore
     }
   });

@@ -38,9 +38,8 @@ describe('Execution Limit Monitor Integration Tests', () => {
     mockEventBus = new MockEventBus();
 
     // Clear require cache to get fresh instance
-    const modulePath = require.resolve(
-      '../../../.claude/hooks/monitoring/execution-limit-monitor.cjs'
-    );
+    const modulePath =
+      require.resolve('../../../.claude/hooks/monitoring/execution-limit-monitor.cjs');
     delete require.cache[modulePath];
 
     // Mock the event bus module before requiring the monitor
@@ -72,7 +71,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
       let exceededEmitted = false;
 
       // Listen for warning at 80%
-      mockEventBus.once('AGENT_LIMIT_WARNING', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_WARNING', payload => {
         warningEmitted = true;
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_turns');
@@ -83,7 +82,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
       });
 
       // Listen for exceeded at 100%
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         exceededEmitted = true;
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_turns');
@@ -151,7 +150,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
       let warningEmitted = false;
       let exceededEmitted = false;
 
-      mockEventBus.once('AGENT_LIMIT_WARNING', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_WARNING', payload => {
         warningEmitted = true;
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_duration_ms');
@@ -159,7 +158,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
         assert.equal(payload.max, 200);
       });
 
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         exceededEmitted = true;
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_duration_ms');
@@ -197,7 +196,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
       let warningEmitted = false;
       let exceededEmitted = false;
 
-      mockEventBus.once('AGENT_LIMIT_WARNING', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_WARNING', payload => {
         warningEmitted = true;
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_cost_usd');
@@ -206,7 +205,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
         assert.equal(payload.percentage, '80.0');
       });
 
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         exceededEmitted = true;
         assert.equal(payload.agentId, agentId);
         assert.equal(payload.limitType, 'max_cost_usd');
@@ -239,7 +238,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
       let firstExceeded = null;
 
-      mockEventBus.on('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.on('AGENT_LIMIT_EXCEEDED', payload => {
         if (!firstExceeded) {
           firstExceeded = payload.limitType;
         }
@@ -268,7 +267,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
       let firstExceeded = null;
 
-      mockEventBus.on('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.on('AGENT_LIMIT_EXCEEDED', payload => {
         if (!firstExceeded) {
           firstExceeded = payload.limitType;
         }
@@ -296,7 +295,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
       const exceededTypes = [];
 
-      mockEventBus.on('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.on('AGENT_LIMIT_EXCEEDED', payload => {
         exceededTypes.push(payload.limitType);
       });
 
@@ -332,7 +331,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
       let exceededEmitted = false;
 
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         exceededEmitted = true;
         assert.equal(payload.action, 'warn');
       });
@@ -365,13 +364,13 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
       // Capture console.error
       const originalError = console.error;
-      console.error = (message) => {
+      console.error = message => {
         if (message.includes('terminated') && message.includes(agentId)) {
           terminationLogged = true;
         }
       };
 
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         assert.equal(payload.action, 'terminate');
       });
 
@@ -398,13 +397,13 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
       // Capture console.warn
       const originalWarn = console.warn;
-      console.warn = (message) => {
+      console.warn = message => {
         if (message.includes('paused') && message.includes(agentId)) {
           pauseLogged = true;
         }
       };
 
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         assert.equal(payload.action, 'pause');
       });
 
@@ -472,7 +471,10 @@ describe('Execution Limit Monitor Integration Tests', () => {
         // Verify workflow completed within limits (well under 80% threshold)
         assert.equal(status.turns, 19, 'Should track 19 turns');
         // Use approximate comparison for floating point (within 0.01 tolerance)
-        assert.ok(Math.abs(status.cost - 0.60) < 0.01, `Should track ~$0.60 cost (actual: ${status.cost})`);
+        assert.ok(
+          Math.abs(status.cost - 0.6) < 0.01,
+          `Should track ~$0.60 cost (actual: ${status.cost})`
+        );
         assert.equal(warningsEmitted, 0, 'No warnings should be emitted (19/30 = 63% < 80%)');
         assert.equal(exceededEmitted, false, 'No exceeded events should be emitted');
         done();
@@ -490,7 +492,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
       let terminationEmitted = false;
 
-      mockEventBus.once('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.once('AGENT_LIMIT_EXCEEDED', payload => {
         terminationEmitted = true;
         assert.equal(payload.limitType, 'max_turns');
       });
@@ -539,7 +541,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
       executionMonitor.startMonitoring(agentId, limits);
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       const status = executionMonitor.getStatus(agentId);
       assert.ok(status.elapsed >= 50);
@@ -616,7 +618,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
         executionMonitor.recordTurn(agent2, { cost: 0.05 });
       }
       for (let i = 0; i < 30; i++) {
-        executionMonitor.recordTurn(agent3, { cost: 0.10 });
+        executionMonitor.recordTurn(agent3, { cost: 0.1 });
       }
 
       setTimeout(() => {
@@ -626,13 +628,22 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
         assert.equal(status1.turns, 15);
         // Use approximate comparison for floating point (within 0.01 tolerance)
-        assert.ok(Math.abs(status1.cost - 0.45) < 0.01, `Agent1 cost ~$0.45 (actual: ${status1.cost})`);
+        assert.ok(
+          Math.abs(status1.cost - 0.45) < 0.01,
+          `Agent1 cost ~$0.45 (actual: ${status1.cost})`
+        );
 
         assert.equal(status2.turns, 8);
-        assert.ok(Math.abs(status2.cost - 0.40) < 0.01, `Agent2 cost ~$0.40 (actual: ${status2.cost})`);
+        assert.ok(
+          Math.abs(status2.cost - 0.4) < 0.01,
+          `Agent2 cost ~$0.40 (actual: ${status2.cost})`
+        );
 
         assert.equal(status3.turns, 30);
-        assert.ok(Math.abs(status3.cost - 3.0) < 0.01, `Agent3 cost ~$3.00 (actual: ${status3.cost})`);
+        assert.ok(
+          Math.abs(status3.cost - 3.0) < 0.01,
+          `Agent3 cost ~$3.00 (actual: ${status3.cost})`
+        );
 
         // Verify all agents tracked
         const activeAgents = executionMonitor.getActiveAgents();
@@ -651,7 +662,7 @@ describe('Execution Limit Monitor Integration Tests', () => {
 
       const exceededAgents = [];
 
-      mockEventBus.on('AGENT_LIMIT_EXCEEDED', (payload) => {
+      mockEventBus.on('AGENT_LIMIT_EXCEEDED', payload => {
         exceededAgents.push(payload.agentId);
       });
 
