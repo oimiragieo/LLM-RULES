@@ -1,604 +1,235 @@
-#!/usr/bin/env node
 /**
- * Workflow Validator
- * ==================
+ * SPEC-018: Workflow Validation
  *
- * Validates workflow YAML files for the EVOLVE system.
- * Checks EVOLVE phase compliance, gates, rollback actions, and iron laws.
- *
- * Usage:
- *   const { WorkflowValidator, validateEvolvePhases } = require('./workflow-validator.cjs');
- *
- *   const validator = new WorkflowValidator();
- *   const result = await validator.validate('/path/to/workflow.yaml');
- *   const allResults = await validator.validateAll('/path/to/workflows/');
+ * WorkflowValidator validates workflow structure, dependencies, and constraints.
  */
 
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-
-// Import parseWorkflow from workflow-engine
-const { parseWorkflow } = require('./workflow-engine.cjs');
-
-// =============================================================================
-// Constants
-// =============================================================================
-
-/**
- * Required EVOLVE phases in order
- */
-const EVOLVE_PHASES = ['evaluate', 'validate', 'obtain', 'lock', 'verify', 'enable'];
-
-/**
- * Valid gate types
- */
-const VALID_GATE_TYPES = ['assertion', 'research', 'file_exists', 'registration'];
-
-/**
- * Valid rollback strategies
- */
-const VALID_ROLLBACK_STRATEGIES = ['saga', 'checkpoint', 'manual'];
-
-/**
- * Required gate fields by type
- */
-const _GATE_REQUIRED_FIELDS = {
-  assertion: ['condition', 'message'],
-  research: ['minQueries', 'minSources'],
-  file_exists: ['path'],
-  registration: ['targets'],
-};
-
-// =============================================================================
-// Validation Functions
-// =============================================================================
-
-/**
- * Validate that a workflow has all EVOLVE phases
- *
- * @param {Object} workflow - Parsed workflow definition
- * @returns {{ valid: boolean, missing: string[], warnings: string[] }}
- */
-function validateEvolvePhases(workflow) {
-  const result = {
-    valid: true,
-    missing: [],
-    warnings: [],
-  };
-
-  if (!workflow.phases) {
-    result.valid = false;
-    result.missing = EVOLVE_PHASES;
-    return result;
-  }
-
-  const presentPhases = Object.keys(workflow.phases).map(p => p.toLowerCase());
-
-  for (const phase of EVOLVE_PHASES) {
-    if (!presentPhases.includes(phase)) {
-      result.missing.push(phase);
-      result.valid = false;
-    }
-  }
-
-  return result;
-}
-
-/**
- * Check for duplicate step IDs across all phases
- *
- * @param {Object} workflow - Parsed workflow definition
- * @returns {{ valid: boolean, duplicates: string[] }}
- */
-function checkDuplicateStepIds(workflow) {
-  const result = {
-    valid: true,
-    duplicates: [],
-  };
-
-  if (!workflow.phases) {
-    return result;
-  }
-
-  const seenIds = new Set();
-
-  for (const [, phaseConfig] of Object.entries(workflow.phases)) {
-    if (phaseConfig && phaseConfig.steps) {
-      for (const step of phaseConfig.steps) {
-        if (step.id) {
-          if (seenIds.has(step.id)) {
-            result.duplicates.push(step.id);
-            result.valid = false;
-          }
-          seenIds.add(step.id);
-        }
-      }
-    }
-  }
-
-  return result;
-}
-
-/**
- * Validate a single step's schema
- *
- * @param {Object} step - Step definition
- * @param {string} phaseName - Name of the phase
- * @param {number} stepNumber - 1-based step number for error messages
- * @returns {string[]} Array of error messages (empty if valid)
- */
-function validateSingleStep(step, phaseName, stepNumber) {
-  const errors = [];
-
-  // Check for required 'id' field
-  if (!step.id) {
-    errors.push(`Phase ${phaseName}, Step ${stepNumber}: missing 'id'`);
-  }
-
-  // Check for required 'handler' or 'action' field
-  if (!step.handler && !step.action) {
-    errors.push(`Phase ${phaseName}, Step ${stepNumber}: missing 'handler' or 'action'`);
-  }
-
-  return errors;
-}
-
-/**
- * Validate step schema (required fields: id, handler/action)
- *
- * @param {Object} workflow - Parsed workflow definition
- * @returns {{ valid: boolean, errors: string[] }}
- */
-function validateStepSchema(workflow) {
-  const result = {
-    valid: true,
-    errors: [],
-  };
-
-  if (!workflow.phases) {
-    return result;
-  }
-
-  for (const [phaseName, phaseConfig] of Object.entries(workflow.phases)) {
-    if (phaseConfig && phaseConfig.steps) {
-      for (let stepIndex = 0; stepIndex < phaseConfig.steps.length; stepIndex++) {
-        const step = phaseConfig.steps[stepIndex];
-        const stepNumber = stepIndex + 1;
-        const stepErrors = validateSingleStep(step, phaseName, stepNumber);
-
-        if (stepErrors.length > 0) {
-          result.errors.push(...stepErrors);
-          result.valid = false;
-        }
-      }
-    }
-  }
-
-  return result;
-}
-
-/**
- * Check if workflow has compensate steps but no rollback config
- *
- * @param {Object} workflow - Parsed workflow definition
- * @returns {boolean} True if has compensate steps
- */
-function hasCompensateSteps(workflow) {
-  if (!workflow.phases) {
-    return false;
-  }
-
-  for (const [, phaseConfig] of Object.entries(workflow.phases)) {
-    if (phaseConfig && phaseConfig.steps) {
-      for (const step of phaseConfig.steps) {
-        if (step.compensate) {
-          return true;
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
-// =============================================================================
-// WorkflowValidator Class
-// =============================================================================
-
-/**
- * Validates workflow YAML files
- */
 class WorkflowValidator {
   /**
-   * Create a new WorkflowValidator
-   *
-   * @param {Object} options - Validator options
-   * @param {boolean} options.strict - Enable strict validation
+   * Validate complete workflow structure
    */
-  constructor(options = {}) {
-    this.options = {
-      strict: options.strict || false,
-    };
-  }
+  async validate(workflow, options = {}) {
+    const { maxNestingDepth = 10 } = options;
 
-  /**
-   * Validate a single workflow file
-   *
-   * @param {string} workflowPath - Path to workflow YAML file
-   * @returns {Promise<{valid: boolean, errors: string[], warnings: string[]}>}
-   */
-  async validate(workflowPath) {
-    const result = {
-      path: workflowPath,
-      valid: true,
-      errors: [],
-      warnings: [],
-    };
+    // Basic structure validation
+    this._validateStructure(workflow);
 
-    try {
-      // Read and parse workflow
-      const content = await fs.promises.readFile(workflowPath, 'utf-8');
-      const workflow = parseWorkflow(content);
+    // Phase validation
+    this._validatePhases(workflow, maxNestingDepth);
 
-      // Required fields
-      if (!workflow.name) {
-        result.errors.push('Missing required field: name');
-        result.valid = false;
+    // Variable validation
+    this._validateVariables(workflow);
+
+    // Workflow requirements
+    if (!workflow.abstract) {
+      if (!workflow.phases || workflow.phases.length === 0) {
+        throw new Error('Workflow must have at least one phase');
       }
 
-      if (!workflow.phases) {
-        result.errors.push('Missing required field: phases');
-        result.valid = false;
-        return result;
-      }
-
-      // Check EVOLVE phases
-      const phaseResult = validateEvolvePhases(workflow);
-      if (!phaseResult.valid) {
-        for (const missing of phaseResult.missing) {
-          result.errors.push(`Missing EVOLVE phase: ${missing}`);
+      for (const phase of workflow.phases) {
+        if (!phase.subphases && (!phase.tasks || phase.tasks.length === 0)) {
+          throw new Error(`Phase '${phase.name}' must have at least one task`);
         }
-        result.valid = false;
       }
-
-      // Check duplicate step IDs
-      const dupResult = checkDuplicateStepIds(workflow);
-      if (!dupResult.valid) {
-        for (const dup of dupResult.duplicates) {
-          result.errors.push(`Duplicate step ID: ${dup}`);
-        }
-        result.valid = false;
-      }
-
-      // Check step schema
-      const stepSchemaResult = this.validateStepSchema(workflow);
-      if (!stepSchemaResult.valid) {
-        result.errors.push(...stepSchemaResult.errors);
-        result.valid = false;
-      }
-
-      // Check gates
-      const gateResult = this.checkGates(workflow);
-      if (!gateResult.valid) {
-        result.errors.push(...gateResult.errors);
-        result.valid = false;
-      }
-
-      // Check rollback actions
-      const rollbackResult = this.checkRollbackActions(workflow);
-      if (!rollbackResult.valid) {
-        result.errors.push(...rollbackResult.errors);
-        result.valid = false;
-      }
-      if (rollbackResult.warnings) {
-        result.warnings.push(...rollbackResult.warnings);
-      }
-
-      // Check iron laws
-      const ironLawsResult = this.checkIronLaws(workflow);
-      if (ironLawsResult.warnings) {
-        result.warnings.push(...ironLawsResult.warnings);
-      }
-
-      // Check for compensate steps without rollback
-      if (hasCompensateSteps(workflow) && !workflow.rollback) {
-        result.warnings.push('Workflow has compensate steps but no rollback configuration');
-      }
-    } catch (e) {
-      result.errors.push(`Failed to parse workflow: ${e.message}`);
-      result.valid = false;
     }
-
-    return result;
   }
 
   /**
-   * Validate all workflows in a directory
-   *
-   * @param {string} workflowsDir - Directory containing workflow files
-   * @returns {Promise<Array<{path: string, valid: boolean, errors: string[], warnings: string[]}>>}
+   * Validate workflow structure
    */
-  async validateAll(workflowsDir) {
-    const results = [];
-
-    if (!fs.existsSync(workflowsDir)) {
-      return results;
+  _validateStructure(workflow) {
+    if (!workflow.name) {
+      throw new Error("Workflow must have a name (missing 'name' field)");
     }
 
-    const files = fs.readdirSync(workflowsDir);
-
-    for (const file of files) {
-      if (file.endsWith('.yaml') || file.endsWith('.yml')) {
-        const fullPath = path.join(workflowsDir, file);
-        const result = await this.validate(fullPath);
-        results.push(result);
-      }
+    if (!Array.isArray(workflow.phases) && !workflow.abstract) {
+      throw new Error('Workflow must have a phases array (or be marked abstract)');
     }
-
-    return results;
   }
 
   /**
-   * Validate step schema (required fields: id, handler/action)
-   *
-   * @param {Object} workflow - Parsed workflow definition
-   * @returns {{ valid: boolean, errors: string[] }}
+   * Validate phases
+   */
+  _validatePhases(workflow, maxNestingDepth = 10) {
+    if (!workflow.phases) return;
+
+    for (const phase of workflow.phases) {
+      // All phases must have a name (includes are handled at composition time)
+      if (!phase.name) {
+        throw new Error('Phase is missing a name field');
+      }
+
+      // Validate subphase nesting depth (phase is at level 1, its subphases at level 2, etc.)
+      if (phase.subphases) {
+        this._validateNestingDepth(phase.subphases, 2, maxNestingDepth);
+      }
+    }
+  }
+
+  /**
+   * Validate nesting depth
+   */
+  _validateNestingDepth(phases, currentDepth, maxDepth) {
+    if (currentDepth > maxDepth) {
+      throw new Error(`Nesting depth exceeded: maximum ${maxDepth} levels allowed`);
+    }
+
+    for (const phase of phases) {
+      if (phase.subphases) {
+        this._validateNestingDepth(phase.subphases, currentDepth + 1, maxDepth);
+      }
+    }
+  }
+
+  /**
+   * Validate variables are defined
+   */
+  _validateVariables(workflow) {
+    if (!workflow.phases) return;
+
+    const variables = workflow.variables || {};
+    const definedVars = new Set(Object.keys(variables));
+
+    for (const phase of workflow.phases) {
+      if (!phase.tasks) continue;
+
+      for (const task of phase.tasks) {
+        const matches = task.match(/{{(\w+)}}/g) || [];
+        for (const match of matches) {
+          const varName = match.replace(/[{}]/g, '');
+          if (!definedVars.has(varName)) {
+            throw new Error(
+              `Phase '${phase.name}': undefined variable '{{${varName}}}' in task '${task}'`
+            );
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Validate dependencies are satisfied
+   */
+  async validateDependencies(workflow) {
+    if (!workflow.phases) return;
+
+    const phaseNames = new Set();
+    for (const phase of workflow.phases) {
+      if (phase.name) {
+        phaseNames.add(phase.name);
+      }
+    }
+
+    // Check phase dependencies
+    for (const phase of workflow.phases) {
+      if (phase.dependsOn) {
+        const deps = Array.isArray(phase.dependsOn) ? phase.dependsOn : [phase.dependsOn];
+        for (const dep of deps) {
+          if (!phaseNames.has(dep)) {
+            throw new Error(`Phase '${phase.name}' dependency not found: '${dep}'`);
+          }
+        }
+      }
+    }
+
+    // Check for circular phase dependencies
+    this._validateNoCyclicDependencies(workflow.phases);
+  }
+
+  /**
+   * Check for cycles in phase dependencies
+   */
+  _validateNoCyclicDependencies(phases) {
+    const phaseMap = new Map();
+    for (const phase of phases) {
+      phaseMap.set(phase.name, phase);
+    }
+
+    const visited = new Set();
+    const stack = new Set();
+
+    for (const phase of phases) {
+      if (!visited.has(phase.name)) {
+        this._checkPhaseCycle(phase.name, phaseMap, visited, stack);
+      }
+    }
+  }
+
+  /**
+   * DFS to check for cycles in phase dependencies
+   */
+  _checkPhaseCycle(phaseName, phaseMap, visited, stack) {
+    if (stack.has(phaseName)) {
+      throw new Error(`Circular dependency detected in phase: ${phaseName}`);
+    }
+
+    if (visited.has(phaseName)) {
+      return;
+    }
+
+    stack.add(phaseName);
+    const phase = phaseMap.get(phaseName);
+
+    if (phase && phase.dependsOn) {
+      const deps = Array.isArray(phase.dependsOn) ? phase.dependsOn : [phase.dependsOn];
+      for (const dep of deps) {
+        this._checkPhaseCycle(dep, phaseMap, visited, stack);
+      }
+    }
+
+    stack.delete(phaseName);
+    visited.add(phaseName);
+  }
+
+  /**
+   * Validate workflow is executable (not abstract)
+   */
+  async validateForExecution(workflow) {
+    if (workflow.abstract) {
+      throw new Error(
+        'Abstract workflows cannot be executed directly. Create a concrete child workflow.'
+      );
+    }
+  }
+
+  /**
+   * Validate step schema in workflow
+   * Checks that all steps have required fields: id, and either handler or action
    */
   validateStepSchema(workflow) {
-    return validateStepSchema(workflow);
-  }
-
-  /**
-   * Check gate configurations
-   *
-   * @param {Object} workflow - Parsed workflow definition
-   * @returns {{ valid: boolean, errors: string[] }}
-   */
-  checkGates(workflow) {
-    const result = {
-      valid: true,
-      errors: [],
-    };
+    const errors = [];
 
     if (!workflow.phases) {
-      return result;
+      return { valid: true, errors: [] };
     }
 
-    for (const [phaseName, phaseConfig] of Object.entries(workflow.phases)) {
-      if (phaseConfig && phaseConfig.gates) {
-        for (let i = 0; i < phaseConfig.gates.length; i++) {
-          const gate = phaseConfig.gates[i];
-          const gateNum = i + 1;
+    // Iterate through all phases
+    for (const [phaseName, phase] of Object.entries(workflow.phases)) {
+      if (!phase.steps) continue;
 
-          // Check gate type
-          if (gate.type && !VALID_GATE_TYPES.includes(gate.type)) {
-            result.errors.push(
-              `Phase ${phaseName} gate ${gateNum}: Invalid gate type '${gate.type}'`
-            );
-            result.valid = false;
-          }
+      // Validate each step
+      for (let i = 0; i < phase.steps.length; i++) {
+        const step = phase.steps[i];
 
-          // Check required fields based on type
-          if (gate.type === 'assertion') {
-            if (!gate.condition) {
-              result.errors.push(
-                `Phase ${phaseName} gate ${gateNum}: Assertion gate missing condition`
-              );
-              result.valid = false;
-            }
-            if (!gate.message) {
-              result.errors.push(
-                `Phase ${phaseName} gate ${gateNum}: Assertion gate missing message`
-              );
-              result.valid = false;
-            }
-          }
+        // Check for required 'id' field
+        if (!step.id) {
+          errors.push(`Phase '${phaseName}', step ${i}: missing 'id' field`);
+        }
 
-          if (gate.type === 'research') {
-            if (gate.minQueries === undefined) {
-              result.errors.push(
-                `Phase ${phaseName} gate ${gateNum}: Research gate missing minQueries`
-              );
-              result.valid = false;
-            }
-            if (gate.minSources === undefined) {
-              result.errors.push(
-                `Phase ${phaseName} gate ${gateNum}: Research gate missing minSources`
-              );
-              result.valid = false;
-            }
-          }
+        // Check for either 'handler' or 'action' field
+        if (!step.handler && !step.action) {
+          errors.push(
+            `Phase '${phaseName}', step ${i}: missing 'handler' or 'action' field`
+          );
         }
       }
     }
 
-    return result;
-  }
-
-  /**
-   * Check rollback action configurations
-   *
-   * @param {Object} workflow - Parsed workflow definition
-   * @returns {{ valid: boolean, errors: string[], warnings: string[] }}
-   */
-  checkRollbackActions(workflow) {
-    const result = {
-      valid: true,
-      errors: [],
-      warnings: [],
+    return {
+      valid: errors.length === 0,
+      errors,
     };
-
-    if (!workflow.rollback) {
-      // No rollback is OK if no compensate steps
-      return result;
-    }
-
-    // Check strategy
-    if (
-      workflow.rollback.strategy &&
-      !VALID_ROLLBACK_STRATEGIES.includes(workflow.rollback.strategy)
-    ) {
-      result.errors.push(`Invalid rollback strategy: ${workflow.rollback.strategy}`);
-      result.valid = false;
-    }
-
-    // Check compensations
-    if (!workflow.rollback.compensations || workflow.rollback.compensations.length === 0) {
-      result.warnings.push('Rollback section has no compensations defined');
-    }
-
-    return result;
-  }
-
-  /**
-   * Check iron laws in metadata
-   *
-   * @param {Object} workflow - Parsed workflow definition
-   * @returns {{ valid: boolean, warnings: string[] }}
-   */
-  checkIronLaws(workflow) {
-    const result = {
-      valid: true,
-      warnings: [],
-    };
-
-    if (
-      !workflow.metadata ||
-      !workflow.metadata.iron_laws ||
-      workflow.metadata.iron_laws.length === 0
-    ) {
-      result.warnings.push('Workflow has no iron laws defined in metadata');
-    }
-
-    return result;
-  }
-
-  /**
-   * Generate a validation report
-   *
-   * @param {Array} results - Array of validation results
-   * @returns {string} Formatted report
-   */
-  generateReport(results) {
-    const lines = [];
-    lines.push('Workflow Validation Report');
-    lines.push('==========================\n');
-
-    let passed = 0;
-    let failed = 0;
-
-    for (const result of results) {
-      const status = result.valid ? '✓ PASS' : '✗ FAIL';
-      const fileName = path.basename(result.path);
-
-      lines.push(`${status} - ${fileName}`);
-
-      if (!result.valid && result.errors && result.errors.length > 0) {
-        for (const error of result.errors) {
-          lines.push(`  Error: ${error}`);
-        }
-      }
-
-      if (result.warnings && result.warnings.length > 0) {
-        for (const warning of result.warnings) {
-          lines.push(`  Warning: ${warning}`);
-        }
-      }
-
-      if (result.valid) {
-        passed++;
-      } else {
-        failed++;
-      }
-
-      lines.push('');
-    }
-
-    lines.push('Summary');
-    lines.push('-------');
-    lines.push(`Total: ${results.length} workflows`);
-    lines.push(`Passed: ${passed}`);
-    lines.push(`Failed: ${failed}`);
-
-    return lines.join('\n');
   }
 }
 
-// =============================================================================
-// CLI Entry Point
-// =============================================================================
-
-async function main() {
-  const args = process.argv.slice(2);
-
-  if (args.length === 0) {
-    console.log('Usage: node workflow-validator.cjs <workflow-path|workflows-dir>');
-    process.exit(1);
-  }
-
-  const targetPath = args[0];
-  const validator = new WorkflowValidator();
-
-  if (fs.statSync(targetPath).isDirectory()) {
-    // Validate all workflows in directory
-    const results = await validator.validateAll(targetPath);
-    const report = validator.generateReport(results);
-    console.log(report);
-
-    const failed = results.filter(r => !r.valid).length;
-    process.exit(failed > 0 ? 1 : 0);
-  } else {
-    // Validate single workflow
-    const result = await validator.validate(targetPath);
-
-    if (result.valid) {
-      console.log(`✓ ${targetPath} is valid`);
-      if (result.warnings.length > 0) {
-        console.log('\nWarnings:');
-        for (const warning of result.warnings) {
-          console.log(`  - ${warning}`);
-        }
-      }
-      process.exit(0);
-    } else {
-      console.log(`✗ ${targetPath} is invalid`);
-      console.log('\nErrors:');
-      for (const error of result.errors) {
-        console.log(`  - ${error}`);
-      }
-      if (result.warnings.length > 0) {
-        console.log('\nWarnings:');
-        for (const warning of result.warnings) {
-          console.log(`  - ${warning}`);
-        }
-      }
-      process.exit(1);
-    }
-  }
-}
-
-// Run if executed directly
-if (require.main === module) {
-  main().catch(e => {
-    console.error('Fatal error:', e.message);
-    process.exit(1);
-  });
-}
-
-// =============================================================================
-// Exports
-// =============================================================================
-
-module.exports = {
-  WorkflowValidator,
-  validateEvolvePhases,
-  checkDuplicateStepIds,
-  validateStepSchema,
-  validateSingleStep,
-  hasCompensateSteps,
-  EVOLVE_PHASES,
-  VALID_GATE_TYPES,
-  VALID_ROLLBACK_STRATEGIES,
-};
+module.exports = { WorkflowValidator };

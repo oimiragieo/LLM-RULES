@@ -11,7 +11,7 @@
 
 'use strict';
 
-const { describe, it, before, after, mock } = require('node:test');
+const { describe, it, before } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 const fs = require('fs');
@@ -46,7 +46,9 @@ describe('error-sanitizer', () => {
     });
 
     it('should mask JWT tokens (eyJ...)', () => {
-      const input = { data: 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U' };
+      const input = {
+        data: 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U',
+      };
       const result = sanitizer.sanitizeForLogging(input);
       assert.ok(!result.data.includes('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'));
       assert.ok(result.data.includes('[REDACTED_JWT_TOKEN]'));
@@ -82,7 +84,9 @@ describe('error-sanitizer', () => {
     });
 
     it('should mask SSH private keys', () => {
-      const input = { key: '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----' };
+      const input = {
+        key: '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----',
+      };
       const result = sanitizer.sanitizeForLogging(input);
       assert.ok(!result.key.includes('MIIEpAIBAAKCAQEA'));
       assert.ok(result.key.includes('[REDACTED_SSH_KEY]'));

@@ -128,13 +128,7 @@ const SENSITIVE_FIELD_PATTERNS = [
 /**
  * Fields that are internal (should be limited in exposure)
  */
-const INTERNAL_FIELD_PATTERNS = [
-  /stack/i,
-  /trace/i,
-  /internal/i,
-  /private/i,
-  /debug/i,
-];
+const INTERNAL_FIELD_PATTERNS = [/stack/i, /trace/i, /internal/i, /private/i, /debug/i];
 
 // =============================================================================
 // Masking Functions
@@ -295,7 +289,10 @@ function maskPath(filePath) {
   // Mask username in paths (Unix: /home/username, /Users/username)
   const unixUserMatch = masked.match(/\/(home|Users)\/([^/]+)/);
   if (unixUserMatch) {
-    masked = masked.replace(`/${unixUserMatch[1]}/${unixUserMatch[2]}`, `/${unixUserMatch[1]}/[USER]`);
+    masked = masked.replace(
+      `/${unixUserMatch[1]}/${unixUserMatch[2]}`,
+      `/${unixUserMatch[1]}/[USER]`
+    );
   }
 
   // Mask username in paths (Windows: C:\Users\username)

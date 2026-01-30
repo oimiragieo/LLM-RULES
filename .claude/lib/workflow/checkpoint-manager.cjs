@@ -399,12 +399,172 @@ class CheckpointManager {
 }
 
 // =============================================================================
+// Simple Functional API (SPEC-003)
+// =============================================================================
+
+/**
+ * Simplified functional API for SPEC-003 compatibility
+ * Stores checkpoints at: .claude/context/workflows/checkpoints/
+ */
+
+const SPEC003_CHECKPOINT_DIR = path.join(__dirname, '../../context/workflows/checkpoints');
+
+// Track step numbers for workflows
+const workflowStepCounters = new Map();
+
+function getStepNumber(workflowId, stepId) {
+  const match = stepId.match(/(\d+)/);
+  if (match) {
+    return parseInt(match[1], 10);
+  }
+  const currentCount = workflowStepCounters.get(workflowId) || 0;
+  const nextCount = currentCount + 1;
+  workflowStepCounters.set(workflowId, nextCount);
+  return nextCount;
+}
+
+function getNextStepId(stepId) {
+  const match = stepId.match(/^(.*?)(\d+)$/);
+  if (match) {
+    const prefix = match[1];
+    const number = parseInt(match[2], 10);
+    return `${prefix}${number + 1}`;
+  }
+  return 'next-step';
+}
+
+function generateChecksum(data) {
+  const crypto = require('crypto');
+  return crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex');
+}
+
+/**
+ * Save checkpoint (simple API)
+ */
+async function save(workflowId, stepId, state, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+  await fs.promises.mkdir(checkpointDir, { recursive: true });
+
+  const timestamp = new Date().toISOString();
+  const stepNumber = getStepNumber(workflowId, stepId);
+
+  const checkpoint = {
+    workflowId,
+    stepId,
+    stepNumber,
+    state,
+    timestamp,
+    checksum: generateChecksum(state),
+  };
+
+  const checkpointPath = path.join(checkpointDir, `${workflowId}.json`);
+  await fs.promises.writeFile(checkpointPath, JSON.stringify(checkpoint, null, 2), 'utf8');
+}
+
+/**
+ * Load checkpoint (simple API)
+ */
+async function load(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+  const checkpointPath = path.join(checkpointDir, `${workflowId}.json`);
+
+  try {
+    const content = await fs.promises.readFile(checkpointPath, 'utf8');
+    return JSON.parse(content);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      return null;
+    }
+    throw err;
+  }
+}
+
+/**
+ * Check if checkpoint exists (simple API)
+ */
+async function exists(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+  const checkpointPath = path.join(checkpointDir, `${workflowId}.json`);
+
+  try {
+    await fs.promises.access(checkpointPath);
+    return true;
+  } catch (_err) {
+    return false;
+  }
+}
+
+/**
+ * Verify checkpoint integrity (simple API)
+ */
+async function verify(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+  const checkpoint = await load(workflowId, checkpointDir);
+
+  if (!checkpoint) {
+    return false;
+  }
+
+  const expectedChecksum = generateChecksum(checkpoint.state);
+  return checkpoint.checksum === expectedChecksum;
+}
+
+/**
+ * Clear checkpoint (simple API)
+ */
+async function clear(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+  const checkpointPath = path.join(checkpointDir, `${workflowId}.json`);
+
+  try {
+    await fs.promises.unlink(checkpointPath);
+    workflowStepCounters.delete(workflowId);
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
+}
+
+/**
+ * Recover workflow from checkpoint (simple API)
+ */
+async function recover(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+  const checkpoint = await load(workflowId, checkpointDir);
+
+  if (!checkpoint) {
+    return null;
+  }
+
+  const isValid = await verify(workflowId, checkpointDir);
+
+  if (!isValid) {
+    throw new Error(`Checkpoint for workflow ${workflowId} is corrupted. Cannot recover.`);
+  }
+
+  const nextStep = getNextStepId(checkpoint.stepId);
+
+  return {
+    workflowId: checkpoint.workflowId,
+    stepId: checkpoint.stepId,
+    stepNumber: checkpoint.stepNumber,
+    state: checkpoint.state,
+    timestamp: checkpoint.timestamp,
+    nextStep,
+    recovered: true,
+  };
+}
+
+// =============================================================================
 // Exports
 // =============================================================================
 
 module.exports = {
+  // Class-based API (existing)
   CheckpointManager,
   createCheckpointId,
   compressState,
   decompressState,
+  // Simple functional API (SPEC-003)
+  save,
+  load,
+  exists,
+  verify,
+  clear,
+  recover,
 };

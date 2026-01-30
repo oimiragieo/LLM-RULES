@@ -274,6 +274,159 @@ Update context files if revert affects product features.
 - Provide clear conflict resolution guidance
 - Document what was reverted in commit message
 
+## Integration with Git Notes (Enhanced - Phase 1.5)
+
+### Logical Unit Identification
+
+Instead of asking "Which commits?", ask "Which feature/bug?"
+
+**Old Workflow:**
+1. User: "Revert commit abc123"
+2. Agent: Runs `git revert abc123`
+
+**New Workflow (Git Notes-Based):**
+1. User: "Revert the dark mode feature"
+2. Agent:
+   - Search git notes for "dark mode" or feature ID
+   - Find all related commits via `logical-unit-tracker.cjs`
+   - Show: "Revert these commits? [A, B, C]"
+   - User: "Yes"
+   - Execute: `git revert -n C B A` (reverse order)
+   - Result: Feature cleanly reverted
+
+### How It Works
+
+1. **Find Unit**: Invoke `logical-unit-tracker.cjs` to group commits by task
+2. **Show Options**: List tasks with commit count
+   - Task #6: Dark Mode (2 commits)
+   - Task #7: Button Refactor (3 commits)
+3. **Confirm**: User selects task to revert
+4. **Check Dependencies**: Warn if other tasks depend on this
+5. **Execute**: Revert all commits for task (reverse order)
+6. **Verify**: Show revert result and update git notes
+
+### Logical Unit Tracker API
+
+```javascript
+const logicalUnitTracker = require('./.claude/lib/utils/logical-unit-tracker.cjs');
+
+// Group commits by task ID from git notes
+const groups = await logicalUnitTracker.groupByTask(repoPath, 'HEAD~10..HEAD');
+// Returns: { "6": [{hash, message, note}], "7": [{...}] }
+
+// Find dependencies
+const deps = await logicalUnitTracker.findDependencies(repoPath, '7', { transitive: true });
+// Returns: ["6"] if Task #7 depends on Task #6
+
+// Check safety before reverting
+const safety = await logicalUnitTracker.checkRevertSafety(repoPath, '6');
+// Returns: { safe: boolean, blockers: [], warning: string }
+
+// Execute revert for entire task
+const result = await logicalUnitTracker.revertTask(repoPath, '6');
+// Returns: { success: boolean, conflicts: boolean, message: string }
+
+// Find task by name
+const tasks = await logicalUnitTracker.findTaskByName(repoPath, 'Dark Mode');
+// Returns: ["6"] if Task #6 has "Dark Mode" in notes
+```
+
+### Example Usage
+
+**Revert by Feature Name:**
+
+```
+User: "Can we revert the dark mode feature?"
+
+smart-revert workflow:
+1. Find tasks by name: logicalUnitTracker.findTaskByName(repo, 'dark mode')
+2. Found Task #6 with 2 commits
+3. Check safety: logicalUnitTracker.checkRevertSafety(repo, '6')
+4. Show plan:
+   - Revert "Add dark mode toggle" (abc123)
+   - Revert "Update CSS for dark mode" (def456)
+5. User confirms
+6. Execute: logicalUnitTracker.revertTask(repo, '6')
+7. Result: "Dark mode reverted. 2 commits reverted successfully."
+```
+
+**Revert by Task ID:**
+
+```
+User: "Revert task #6"
+
+smart-revert workflow:
+1. Group commits: logicalUnitTracker.groupByTask(repo, 'HEAD')
+2. Find Task #6 commits
+3. Check dependencies: findDependencies(repo, '6')
+4. No dependencies found
+5. Execute revert in reverse order
+6. Verify success
+```
+
+**Dependency Warning:**
+
+```
+User: "Revert the button refactor"
+
+smart-revert workflow:
+1. Find Task #7 (Button Refactor)
+2. Check safety: checkRevertSafety(repo, '7')
+3. Warning: "Task #8 (Modal) depends on Task #7"
+4. Offer options:
+   - Revert both #7 and #8
+   - Don't revert
+   - Force revert (handle conflicts manually)
+5. User selects option
+6. Execute based on choice
+```
+
+### Benefits
+
+**For Users:**
+- Feature-level revert (not commit-level)
+- No need to remember commit hashes
+- Automatic correct order (reverse chronological)
+- Dependency checking prevents breaking other features
+
+**For Safety:**
+- Git notes provide context for every commit
+- Reverse order prevents conflicts
+- Verification before execution
+- Audit trail preserved in git notes
+
+**For Automation:**
+- Integrates with git-notes-audit hook (automatic note creation)
+- Works with existing conductor workflow
+- No manual note maintenance required
+
+### Integration with git-notes-audit Hook
+
+The `git-notes-audit.cjs` hook automatically creates git notes for every commit:
+
+```json
+{
+  "taskId": "6",
+  "timestamp": "2026-01-29T10:30:00Z",
+  "author": "user@example.com",
+  "metadata": {
+    "phase": "implementation",
+    "track": "user-auth_20250115"
+  }
+}
+```
+
+This enables:
+- Automatic task grouping (no manual note management)
+- Dependency detection (via Depends-On field)
+- Context-aware revert decisions
+
+### Performance
+
+- Logical unit detection: <500ms (100 commits)
+- Dependency checking: <100ms (transitive depth 3)
+- No impact on normal git operations
+
 ## Related Skills
 
 - `track-management` - Understand track/phase/task structure

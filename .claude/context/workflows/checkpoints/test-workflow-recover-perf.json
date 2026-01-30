@@ -1,0 +1,10 @@
+{
+  "workflowId": "test-workflow-recover-perf",
+  "stepId": "step-10",
+  "stepNumber": 10,
+  "state": {
+    "step": 10
+  },
+  "timestamp": "2026-01-30T03:22:49.713Z",
+  "checksum": "e480084f1920a277771bdd38f16b8e4b603f632c58f4ef56dbcb94a37ffada2c"
+}

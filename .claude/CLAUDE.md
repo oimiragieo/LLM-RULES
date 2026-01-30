@@ -956,13 +956,14 @@ All spawned agents:
 | `summarize-changes`                  | after non-trivial coding                 |
 | `session-handoff`                    | before ending long sessions              |
 | `interactive-requirements-gathering` | structured user input                    |
-| `smart-revert`                       | revert logical work units                |
+| `smart-revert`                       | revert logical work units (git notes-based, feature-level) |
 | `codebase-integration`               | integrating external codebases           |
 | `artifact-lifecycle`                 | manage artifact updates/deprecation      |
 | `workflow-creator`                   | create multi-agent workflows             |
 | `template-creator`                   | create templates                         |
 | `schema-creator`                     | create JSON schemas                      |
 | `hook-creator`                       | create safety/validation hooks           |
+| `spec-init`                          | unified spec creation (progressive disclosure) |
 | `spec-gathering`                     | start new features                       |
 | `spec-writing`                       | formal specs                             |
 | `spec-critique`                      | validate specs                           |
@@ -1100,6 +1101,8 @@ context/
 
 ```
 hooks/
+├── audit/
+│   └── git-notes-audit.cjs (tamper-proof commit metadata)
 ├── evolution/
 ├── memory/
 ├── reflection/
@@ -1133,7 +1136,8 @@ lib/
 │   ├── project-root.cjs
 │   ├── safe-json.cjs
 │   ├── atomic-write.cjs
-│   └── state-cache.cjs
+│   ├── state-cache.cjs
+│   └── logical-unit-tracker.cjs (Phase 1.5 - git notes-based revert)
 └── integration/
     └── system-registration-handler.cjs
 ```
@@ -1150,6 +1154,7 @@ tools/
 │   ├── cost-report.js
 │   ├── monitoring-dashboard.cjs
 │   ├── init-staging.cjs
+│   ├── git-notes-verify.cjs (audit trail verification and reporting)
 │   └── ...
 ├── integrations/
 │   ├── aws/
@@ -1184,6 +1189,24 @@ workflows/
 └── operations/
     └── incident-response.md
 ```
+
+### 9.7 schemas/
+
+Key schemas for validation:
+
+```
+schemas/
+├── track-metadata.schema.json (track management, task metadata)
+├── skill-diagram-generator-output.schema.json
+└── skill-repo-rag-output.schema.json
+```
+
+**Track Metadata Schema** (SPEC-007):
+- **Path**: `.claude/schemas/track-metadata.schema.json`
+- **Documentation**: `.claude/docs/TRACK_METADATA.md`
+- **Purpose**: Consistent structure for task/track metadata
+- **Features**: Effort estimation, phase tracking, dependency management
+- **Integration**: TaskCreate, workflow state, reporting
 
 ### 9.8 Output Locations by Creator
 

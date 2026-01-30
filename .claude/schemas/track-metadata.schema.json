@@ -1,0 +1,399 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/track-metadata.schema.json",
+  "title": "Track Metadata Schema",
+  "description": "Schema for enriched task/track metadata enabling spec-driven development with comprehensive tracking, effort estimation, and phase management",
+  "type": "object",
+  "required": [
+    "trackId",
+    "type",
+    "status"
+  ],
+  "properties": {
+    "trackId": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+_[0-9]{8}$",
+      "description": "Unique track identifier in format: shortname_YYYYMMDD (e.g., user-auth_20260129)",
+      "examples": [
+        "user-auth_20260129",
+        "api-cache_20260130",
+        "login-crash_20260201"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "feature",
+        "bug",
+        "chore",
+        "refactor",
+        "docs"
+      ],
+      "description": "Type of work being tracked",
+      "examples": [
+        "feature"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "in_progress",
+        "review",
+        "completed",
+        "cancelled"
+      ],
+      "description": "Current status of the track",
+      "examples": [
+        "in_progress"
+      ]
+    },
+    "phaseState": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "spec_review",
+        "plan_ready",
+        "implementation",
+        "qa",
+        "deployed"
+      ],
+      "description": "Current phase in spec-driven workflow (Context -> Spec -> Plan -> Implement -> Verify flow)",
+      "examples": [
+        "implementation"
+      ]
+    },
+    "estimatedEffort": {
+      "type": "object",
+      "description": "Estimated effort for completing this track",
+      "properties": {
+        "days": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total estimated effort in days"
+        },
+        "breakdown": {
+          "type": "object",
+          "description": "Effort breakdown by activity type",
+          "properties": {
+            "design": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Design and architecture effort in days"
+            },
+            "implementation": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Implementation effort in days"
+            },
+            "testing": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Testing effort in days"
+            },
+            "documentation": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Documentation effort in days"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "actualEffort": {
+      "type": "object",
+      "description": "Actual effort spent on this track (for tracking estimates vs actuals)",
+      "properties": {
+        "days": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total actual effort in days"
+        },
+        "breakdown": {
+          "type": "object",
+          "description": "Actual effort breakdown by activity type",
+          "properties": {
+            "design": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Actual design effort in days"
+            },
+            "implementation": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Actual implementation effort in days"
+            },
+            "testing": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Actual testing effort in days"
+            },
+            "documentation": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Actual documentation effort in days"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "description": "Business priority of this track",
+      "examples": [
+        "high"
+      ]
+    },
+    "classification": {
+      "type": "array",
+      "description": "Tags for categorizing the track (multiple classifications allowed)",
+      "items": {
+        "type": "string",
+        "enum": [
+          "security",
+          "performance",
+          "ux",
+          "dx",
+          "testing",
+          "documentation",
+          "technical-debt"
+        ]
+      },
+      "uniqueItems": true,
+      "examples": [
+        [
+          "security",
+          "performance"
+        ]
+      ]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "description": "User-friendly description of what this track accomplishes",
+      "examples": [
+        "Implement user authentication with JWT tokens"
+      ]
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "description": "List of acceptance criteria that define when this track is complete",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "examples": [
+        [
+          "API response time reduced by 50%",
+          "Cache hit rate > 80%",
+          "All tests passing"
+        ]
+      ]
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "Other track IDs that this track depends on (must be completed first)",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_-]+_[0-9]{8}$"
+      },
+      "examples": [
+        [
+          "redis-setup_20260128",
+          "db-migration_20260127"
+        ]
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when track was created",
+      "examples": [
+        "2026-01-29T10:00:00Z"
+      ]
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when track was last updated",
+      "examples": [
+        "2026-01-29T15:30:00Z"
+      ]
+    },
+    "assignee": {
+      "type": "string",
+      "description": "Agent or person assigned to this track",
+      "examples": [
+        "developer",
+        "qa",
+        "planner"
+      ]
+    },
+    "blocked_by": {
+      "type": "array",
+      "description": "Track IDs that are blocking this track from progressing",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_-]+_[0-9]{8}$"
+      },
+      "examples": [
+        [
+          "api-design_20260128"
+        ]
+      ]
+    },
+    "blocks": {
+      "type": "array",
+      "description": "Track IDs that are blocked by this track (cannot start until this completes)",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_-]+_[0-9]{8}$"
+      },
+      "examples": [
+        [
+          "api-docs_20260130",
+          "integration-tests_20260131"
+        ]
+      ]
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Analytics metrics for tracking performance and effort accuracy",
+      "properties": {
+        "elapsedTimeMs": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Elapsed time in milliseconds from track start to completion"
+        },
+        "effortMultiplier": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 5,
+          "description": "Ratio of actual to estimated effort (1.0 = perfect estimate, <1.0 = faster, >1.0 = slower)"
+        },
+        "riskScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Risk assessment score (0 = low risk, 100 = high risk)"
+        },
+        "completionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of acceptance criteria completed (0-100)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "reporting": {
+      "type": "object",
+      "description": "Reporting metadata for generated analytics reports",
+      "properties": {
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when last report was generated"
+        },
+        "lastReportPath": {
+          "type": "string",
+          "description": "File path to the most recent analytics report"
+        },
+        "insights": {
+          "type": "array",
+          "description": "Auto-generated insights about track performance",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "trackId": "user-auth_20260129",
+      "type": "feature",
+      "status": "in_progress",
+      "phaseState": "implementation",
+      "description": "Implement user authentication with JWT tokens",
+      "priority": "high",
+      "classification": [
+        "security",
+        "ux"
+      ],
+      "estimatedEffort": {
+        "days": 5,
+        "breakdown": {
+          "design": 1,
+          "implementation": 2.5,
+          "testing": 1,
+          "documentation": 0.5
+        }
+      },
+      "actualEffort": {
+        "days": 3.5,
+        "breakdown": {
+          "design": 0.5,
+          "implementation": 2,
+          "testing": 0.8,
+          "documentation": 0.2
+        }
+      },
+      "acceptance_criteria": [
+        "Users can login with email/password",
+        "JWT tokens expire after 1 hour",
+        "Refresh tokens work correctly",
+        "All authentication tests pass"
+      ],
+      "dependencies": [
+        "db-schema_20260128"
+      ],
+      "created_at": "2026-01-29T10:00:00Z",
+      "updated_at": "2026-01-29T15:30:00Z",
+      "assignee": "developer",
+      "blocked_by": [],
+      "blocks": [
+        "api-docs_20260130"
+      ]
+    },
+    {
+      "trackId": "login-crash_20260129",
+      "type": "bug",
+      "status": "review",
+      "phaseState": "qa",
+      "description": "Fix crash when user enters invalid email format",
+      "priority": "critical",
+      "classification": [
+        "security",
+        "ux"
+      ],
+      "acceptance_criteria": [
+        "No crashes on invalid email input",
+        "User-friendly error messages displayed",
+        "Email validation regex covers edge cases"
+      ]
+    },
+    {
+      "trackId": "deps-update_20260129",
+      "type": "chore",
+      "status": "new",
+      "description": "Update dependencies to latest stable versions",
+      "priority": "low",
+      "classification": [
+        "technical-debt"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "workflowId": "test-workflow-concurrent",
+  "stepId": "step-2",
+  "stepNumber": 2,
+  "state": {
+    "value": 2
+  },
+  "timestamp": "2026-01-30T03:22:49.764Z",
+  "checksum": "49c987621f206f09e5fbe23b516b55a36f838cb14867961f1d84a554d3a35b6b"
+}

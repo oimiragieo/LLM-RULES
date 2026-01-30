@@ -1,0 +1,10 @@
+{
+  "workflowId": "test-workflow-corrupt",
+  "stepId": "step-1",
+  "stepNumber": 1,
+  "state": {
+    "count": 1
+  },
+  "timestamp": "2026-01-30T03:22:49.621Z",
+  "checksum": "6aea6dfe6561984cdc5c54ead84d47d2cf29e48253ae282aef237404adad4661"
+}
