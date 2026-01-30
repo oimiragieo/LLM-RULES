@@ -1,13 +1,152 @@
+## Spawn Template Extraction Implementation (2026-01-29)
+
+**Task:** Extract spawn templates from CLAUDE.md Section 2 to reduce file size
+
+**Implementation Completed:**
+
+✅ **Created 3 Template Files:**
+
+1. `.claude/templates/spawn/universal-agent-spawn.md` (4.6k) - Standard agent spawn template
+2. `.claude/templates/spawn/agent-identity-integration.md` (5.1k) - Optional identity enhancement pattern
+3. `.claude/templates/spawn/orchestrator-spawn.md` (4.4k) - Orchestrator spawn template
+
+✅ **Updated CLAUDE.md Section 2:**
+
+- Replaced verbose inline templates with file references
+- Kept Golden-Path Example (concrete learning example)
+- Maintained Tool Selection Notes
+- Total reduction: 9,526 chars (18.6%)
+
+**Results:**
+
+- **Before**: 51,327 chars (27.8% over 40k target)
+- **After**: 41,801 chars (4.5% over 40k target)
+- **Reduction**: 9,526 chars (18.6%)
+
+**Analysis:**
+
+The actual reduction (9.5k chars) differs from design estimate (18.5k chars) because:
+
+1. Original file size was 51,327 chars (not 51,085 as estimated)
+2. Some content in Section 2 was more concise than estimated
+
+However, this is still a significant improvement:
+
+- CLAUDE.md is now 41.8k chars (vs 51.3k before)
+- Only 4.5% over the 40k target (vs 27.8% before)
+- Templates are now maintainable in separate files (single source of truth)
+
+**Benefits Achieved:**
+
+1. **Size Reduction**: Brought CLAUDE.md from 28% over target to 5% over target
+2. **Maintainability**: Spawn templates are now in separate, versioned files
+3. **Reusability**: Templates can be referenced by other documentation
+4. **Backward Compatible**: Router can still read template files via Read tool
+5. **No Breaking Changes**: All agent spawning continues to work
+
+**Files Modified:**
+
+- `.claude/CLAUDE.md` (Section 2 rewritten)
+- `.claude/templates/spawn/universal-agent-spawn.md` (created)
+- `.claude/templates/spawn/agent-identity-integration.md` (created)
+- `.claude/templates/spawn/orchestrator-spawn.md` (created)
+
+**Next Steps:**
+
+If further size reduction is needed (to get below 40k), consider:
+
+1. Extract Section 9 (Directory Structure) to `.claude/docs/DIRECTORY_STRUCTURE.md` (saves ~6k chars)
+2. Compress Agent Routing Table (Section 3) by removing file paths (saves ~3k chars)
+3. Extract model selection guide to separate file (saves ~1k chars)
+
+**Key Learnings:**
+
+1. **@ File References Scale Well**: Templates average 4-5k chars each, making them loadable by Router's Read tool without hitting context limits
+2. **Design Estimates vs Reality**: Always measure actual file sizes before implementation, as estimates can drift
+3. **Preserve Concrete Examples**: Golden-Path Example was kept in CLAUDE.md because it's a concrete routing scenario (not a template)
+4. **Template Metadata Headers**: Added YAML frontmatter to templates for future discoverability/automation
+
+---
+
+## Registration Audit & CLAUDE.md Size Analysis (2026-01-29)
+
+**Task:** Audit all artifacts in `.claude/` directories to identify missing registrations and gaps
+
+**Findings:**
+
+✅ **Registration Health: EXCELLENT (98.5% coverage)**
+
+- **Agents**: 50 files, ALL 50 registered in CLAUDE.md Section 3 routing table (100%)
+- **Skills**: 433 files, ALL 433 documented in skill-catalog.md (100%)
+- **Workflows**: 20 files, 17/20 registered in CLAUDE.md Section 8.6 (85%)
+- **Hooks**: 61 implementation files (registered in settings.json by design, not CLAUDE.md)
+- **Templates**: 25 files (self-documenting via template-creator skill by design)
+- **Schemas**: 18 files (self-documenting via schema-creator skill by design)
+
+**Missing Registrations (3 workflows):**
+
+1. `architecture-review-skill-workflow.md` - Architecture review orchestration
+2. `chrome-browser-skill-workflow.md` - Browser automation orchestration
+3. `progressive-disclosure-skill-workflow.md` - Requirements gathering orchestration
+
+**Impact**: MEDIUM (skills are registered, workflows provide orchestration patterns)
+
+**Critical Issue**: CLAUDE.md size is 51,085 chars (27% over 40k target / 13.1k tokens vs 10k target)
+
+**Size Breakdown:**
+
+- Section 2 (Spawn Templates): ~15k chars (29%) - LARGEST
+- Section 3 (Agent Routing Table): ~10k chars (20%)
+- Section 9 (Directory Structure): ~6k chars (12%)
+
+**Recommended Fix: Extract spawn templates to separate files**
+
+Priority 1 (Saves 18.5k chars, 36% reduction → 32.5k chars total, 19% below target):
+
+1. Extract Universal Spawn Template → `.claude/templates/spawn/universal-agent-spawn.md` (saves 11.7k chars)
+2. Extract Orchestrator Spawn Template → `.claude/templates/spawn/orchestrator-spawn.md` (saves 2.9k chars)
+3. Reference existing AGENT_IDENTITY.md instead of repeating examples (saves 3.9k chars)
+
+**Estimated Effort**: 2 hours (create 3 template files, update CLAUDE.md references)
+
+**Key Patterns Learned:**
+
+1. **Two-Tier Documentation Strategy Works**: CLAUDE.md has critical routing tables (agents, creator skills), skill-catalog.md has complete skill inventory (433 skills). This prevents CLAUDE.md bloat.
+
+2. **By-Design Non-Registration Is Correct**: Hooks (settings.json), templates (template-creator), and schemas (schema-creator) are NOT individually registered in CLAUDE.md by design. They are self-documenting.
+
+3. **Spawn Templates Are Size Culprit**: The 70-line warning box + full spawn examples in CLAUDE.md cost 15k chars (30% of file). Extracting to templates/ solves both size and reusability.
+
+4. **No Orphaned Registrations**: All 50 agent paths, 17 workflow paths, and 7 creator skill paths in CLAUDE.md reference existing files. No cleanup needed.
+
+5. **Registration Audit Should Be Periodic**: Recommend quarterly audits to catch drift early (use this report as template).
+
+**Verification Commands:**
+
+```bash
+# Quick registration check
+find .claude/agents -name "*.md" | wc -l    # Expected: 50
+find .claude/skills -name "SKILL.md" | wc -l  # Expected: 433
+find .claude/workflows -name "*.md" ! -name "README.md" | wc -l  # Expected: 20
+wc -c .claude/CLAUDE.md  # Expected: 51085 (target: <40000)
+```
+
+**Deliverable**: `.claude/context/artifacts/registration-audit-2026-01-29.md` (comprehensive 400-line report)
+
+---
+
 ## AI Slop File Prevention & Cleanup (2026-01-29)
 
 **Problem:** 4 malformed files created in root directory due to agents using absolute Windows paths
 
 **Root Cause:**
+
 - Agents used absolute paths like `C:\dev\projects\agent-studio\.claude\...`
 - File system mangled paths (removed colons, backslashes) → concatenated filenames
 - Result: Files like `C:devprojectsagent-studio.claudecontextartifactslint-fix-output.txt`
 
 **Files Removed:**
+
 1. `C:devprojectsagent-studio.claudecontextartifactslint-fix-output.txt`
 2. `C:devprojectsagent-studio.claudecontextartifactslint-report-final.txt`
 3. `C:devprojectsagent-studio.claudecontextartifactslint-report-initial.txt`
@@ -33,12 +172,14 @@
    - Enforcement: `block` (default), override via `FILE_PATH_GUARD=warn|off`
 
 **Lessons Learned:**
+
 - Agents should NEVER receive absolute paths in spawn prompts
 - Use relative paths from PROJECT_ROOT for all file operations
 - Hook enforcement prevents future occurrences at the tool use level
 - .gitignore provides second layer of defense (catch files before commit)
 
 **Pattern for Future:**
+
 - When spawning agents, always use relative paths in PROJECT_ROOT context
 - If agent creates unexpected files in root, check for absolute path usage
 - Use `FILE_PATH_GUARD=off` only in emergencies (not recommended)
@@ -355,3 +496,259 @@ These are NOT competing systems but complementary approaches:
 5. Begin P1 transformation roadmap (updates to existing artifacts)
 
 **Status**: Plan refinement complete, ready for Phase 0 research execution
+
+---
+
+## Spawn Template Extraction Design (2026-01-29)
+
+**Task:** Design lazy loading strategy for CLAUDE.md spawn templates (Task #4)
+
+**Context:** CLAUDE.md is 51k chars (27% over 40k target). Section 2 (SPAWNING AGENTS) contains 18.5k chars (36%) due to verbose spawn templates with 70-line warning boxes.
+
+**Design Completed:**
+
+**Strategy:** Extract 3 spawn templates to `.claude/templates/spawn/` using @ file references
+
+**Templates:**
+
+1. **Universal Agent Spawn** (11.7k chars) → `.claude/templates/spawn/universal-agent-spawn.md`
+2. **Agent Identity Integration** (2.8k chars) → `.claude/templates/spawn/agent-identity-integration.md`
+3. **Orchestrator Spawn** (2.9k chars) → `.claude/templates/spawn/orchestrator-spawn.md`
+
+**Character Reduction:**
+
+- Section 2: 18.5k → 3.5k chars (15k char reduction, 81% reduction)
+- CLAUDE.md: 51k → 32.5k chars (18.5k char reduction, 36% reduction)
+- Target delta: +27% over target → **-19% below target** ✅
+
+**@ File References (Chosen Over TOON):**
+
+- **Why:** Research (Task #3) showed @ references are optimal for static spawn templates
+- **Router Compatible:** Router has Read tool whitelisted, can load template files
+- **Maintainability:** Single source of truth, no abstraction layer overhead
+- **Performance:** Zero runtime overhead (direct file load)
+
+**Key Design Decisions:**
+
+1. **Keep Golden-Path Example:** 1.8k char example stays in CLAUDE.md (Router learning value)
+2. **Metadata Headers:** All templates have YAML metadata (use_cases, model_selection, requires)
+3. **Backward Compatible:** Agents without templates still work (Read tool whitelisted)
+4. **Rollback Plan:** `git checkout HEAD -- .claude/CLAUDE.md` if issues
+
+**Implementation Phases:**
+
+1. Phase 1 (1h): Create 3 template files
+2. Phase 2 (30m): Update CLAUDE.md Section 2 with @ references
+3. Phase 3 (30m): Test Router compatibility (Read tool, spawn test)
+4. Phase 4 (15m): Update documentation references
+5. Phase 5 (15m): Validation and rollback readiness
+
+**Success Metrics:**
+
+- CLAUDE.md size: 32.5k chars ±500 (19% below 40k target)
+- Section 2 size: 3.5k chars (down from 18.5k)
+- Router compatibility: 100% (manual spawn test)
+- Template files: 3 created in `.claude/templates/spawn/`
+
+**Patterns Learned:**
+
+1. **@ File References for Static Content:** For spawn templates (static content), @ file references are superior to TOON (abstract object notation). TOON adds lookup overhead without benefits for static templates.
+
+2. **Template Extraction Hierarchy:** Extract by frequency of change and size:
+   - HIGH priority: Large, static content (spawn templates: 18.5k chars)
+   - MEDIUM priority: Moderate, occasionally updated (routing tables: 10k chars)
+   - LOW priority: Small, frequently referenced (tool lists: 400 chars)
+
+3. **Keep Examples In-Context:** Golden-Path Example (1.8k chars) stays in CLAUDE.md because it teaches Router by example. Templates are reference documentation; examples are learning tools.
+
+4. **Metadata Headers Critical:** All templates need YAML frontmatter with:
+   - `template_type`: Classification (spawn_template, spawn_enhancement)
+   - `use_cases`: When to use this template
+   - `model_selection`: Model recommendations (haiku/sonnet/opus)
+   - `requires`: Dependencies (tools, agent fields)
+
+5. **Rollback Simplicity Matters:** Complex extractions need simple rollbacks. File-based extraction (git revert) is simpler than logic changes (code rollback + testing).
+
+**Related ADRs:** ADR-062 (Spawn Template Extraction Strategy) - to be created
+
+**Files Modified:**
+
+- `.claude/context/artifacts/plans/spawn-template-extraction-design-2026-01-29.md` (comprehensive design document)
+
+**Next Steps:**
+
+- Task #5: Developer implements extraction (create template files, update CLAUDE.md)
+- Task #6: QA validates character reduction + Router compatibility
+- Task #7: Technical Writer updates documentation references
+
+**Status:** Design complete, ready for implementation
+
+## Spawn Template Validation Implementation (2026-01-29)
+
+**Task:** Implement spawn-prompt-validator.cjs hook with all security mitigations from Task #8 security review
+
+✅ **Implementation Complete** (6.5 hours total)
+
+**Security Mitigations Implemented:**
+
+- VULN-001: Unicode normalization (24-char homoglyph map)
+- VULN-002: ReDoS-safe regex (bounded quantifiers)
+- VULN-003: 500KB prompt length limit
+- VULN-004: Full audit context on exceptions
+- VULN-005: Environment override auditing
+- VULN-006: Required flags on critical rules
+- VULN-007: Enhanced audit logging
+
+**Test Results:**
+
+- 48 test cases created
+- 48/48 passing (100%)
+- Performance: <5ms validation overhead
+- Coverage: 100% of exported functions
+
+**Key Learnings:**
+
+1. Unicode normalization prevents homoglyph bypass (Cyrillic/Greek → ASCII)
+2. Bounded quantifiers prevent ReDoS ({0,100} instead of \*)
+3. Required flags prevent weighted scoring bypass
+4. Fail-open default correct for development (warn mode)
+5. Hook order matters (structural validation first)
+
+**Files Created:**
+
+- .claude/hooks/safety/spawn-prompt-validator.cjs (500 lines)
+- .claude/hooks/safety/spawn-prompt-validator.test.cjs (550 lines)
+
+**Files Modified:**
+
+- .claude/settings.json (hook registration)
+- .claude/context/memory/decisions.md (ADR-063)
+
+**Related:** ADR-063, Task #8 security review
+
+---
+
+## Spawn Template Safeguards: Options C+D (2026-01-29)
+
+**Task:** Complete remaining safeguards (Options C+D) from spawn validation implementation plan
+
+**Implementation Completed:**
+
+✅ **Option C: Fallback Mechanism** (CLAUDE.md Section 2)
+
+Added fallback mechanism for when template files fail to load:
+
+- Detection pattern (try/catch with fallback trigger)
+- Inline fallback template (minimum viable spawn template)
+- When to use fallback (404, permission denied, corrupted, network issues)
+- Audit logging specification
+- Recovery actions (restore from git, verify permissions)
+
+**Location:** `.claude/CLAUDE.md` Section 2, after "Golden-Path Example"
+**Content:** ~160 lines added
+**Purpose:** Graceful degradation when template files unavailable
+
+✅ **Option D: Router Documentation** (CLAUDE.md Section 0 + router-decision.md)
+
+**Part 1: CLAUDE.md Section 0 Template Loading Protocol**
+
+Added documentation after "Hard Stop:" paragraph:
+
+- Template availability checking (pre-spawn verification)
+- Template reference usage (no inlining)
+- Failure handling (graceful fallback)
+- Complete template loading sequence (flow diagram)
+- Validation enforcement note (spawn-prompt-validator.cjs)
+
+**Location:** `.claude/CLAUDE.md` Section 0
+**Content:** ~60 lines added
+**Purpose:** Protocol clarity for router behavior
+
+**Part 2: router-decision.md Step 9.5 Template Loading and Validation**
+
+Added comprehensive new step (9.5) between model selection and post-spawn:
+
+- 9.5.1: Template selection table (standard vs orchestrator vs identity)
+- 9.5.2: Template load logic (fallback trigger point)
+- 9.5.3: Placeholder substitution table (<ROLE>, <TASK>, <ID>, etc.)
+- 9.5.4: Validation check (spawn-prompt-validator.cjs requirements)
+- 9.5.5: Execute spawn code example
+
+**Location:** `.claude/workflows/core/router-decision.md` (after Step 9.3)
+**Content:** ~70 lines added
+**Purpose:** Detailed workflow steps for router implementation
+
+**Complete Defense-in-Depth Coverage:**
+
+1. **Option B (Task #11, Security Review Task #8):**
+   - spawn-prompt-validator.cjs hook (pre-spawn validation)
+   - 5 validation rules with weighted scoring
+   - Unicode normalization + ReDoS-safe regex
+   - 100% test coverage (48 tests passing)
+
+2. **Option C (This Task):**
+   - Inline fallback template when file load fails
+   - Audit logging on fallback trigger
+   - Recovery procedures documented
+
+3. **Option D (This Task):**
+   - Router protocol documentation
+   - Template loading workflow steps
+   - Placeholder substitution rules
+   - Validation gate explanation
+
+**Impact Assessment:**
+
+| Aspect                         | Before    | After                 | Improvement               |
+| ------------------------------ | --------- | --------------------- | ------------------------- |
+| Template availability handling | None      | Fallback mechanism    | No more spawn failures    |
+| Router template documentation  | Implicit  | Step 9.5 explicit     | Protocol clarity          |
+| Validation protocol clarity    | Scattered | Sections 0 + 9.5      | Single source of truth    |
+| Template loading sequence      | Unclear   | Detailed flow diagram | Clear mental model        |
+| Placeholder substitution       | Assumed   | Table with examples   | Consistent implementation |
+
+**Key Learnings:**
+
+1. **Layered Safeguards Work Better Than Single Point:** Three-layer approach (hook + fallback + documentation) provides defense-in-depth better than any single mechanism.
+
+2. **Documentation Location Matters:** Putting template protocol in BOTH CLAUDE.md Section 0 (policy) AND router-decision.md Step 9.5 (implementation) ensures both strategic intent and tactical guidance are available.
+
+3. **Fallback Must Be Minimal:** Inline fallback template is bare minimum (removes all optional features but keeps TaskUpdate protocol). This prevents cascade failures.
+
+4. **Audit Logging on Fallback Is Critical:** When fallback triggers, must log reason (404 vs permission denied vs corrupted). Enables monitoring for systematic issues.
+
+5. **Validation Hook Must Come BEFORE Fallback:** The spawn-prompt-validator.cjs hook (Option B) validates on the way IN. The fallback (Option C) only triggers if file load fails. Order prevents validate-then-fallback race conditions.
+
+**Files Modified:**
+
+1. `.claude/CLAUDE.md` (2 edits)
+   - Section 0: Added "Template Loading Protocol (Option D)" after "Hard Stop:"
+   - Section 2: Added "Spawn Template Fallback Mechanism (Option C)" after "Golden-Path Example"
+
+2. `.claude/workflows/core/router-decision.md` (1 edit)
+   - Step 9.5: Added complete template loading and validation workflow
+
+3. `.claude/context/memory/learnings.md` (this entry)
+
+**Related ADRs:**
+
+- ADR-062: Spawn Template Extraction Strategy
+- ADR-063: Spawn Template Validation Safeguards (security review from Task #8)
+
+**Completion Checklist:**
+
+- [x] Option C: Fallback mechanism added to CLAUDE.md
+- [x] Option D Part 1: Template protocol added to CLAUDE.md Section 0
+- [x] Option D Part 2: Step 9.5 added to router-decision.md
+- [x] All three options verified for correct formatting
+- [x] Cross-references checked (fallback → CLAUDE.md Section 2, protocol → spawn-prompt-validator)
+- [x] Learnings entry created in memory/learnings.md
+
+**Next Steps (For Future Tasks):**
+
+- Implement Option B validation hook (if not already done in Task #11)
+- Register hook in settings.json
+- Create integration tests verifying all three safeguards work together
+- Monitor spawn-fallback logs in production for systematic issues
+
+**Status:** Options C+D implementation complete, ready for integration testing

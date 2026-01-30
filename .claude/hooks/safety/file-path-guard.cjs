@@ -124,7 +124,9 @@ function validate() {
   // Check for valid relative path patterns
   if (!isValidRelativePath(filePath)) {
     console.error(`[FILE-PATH-GUARD] WARNING: Path may be outside PROJECT_ROOT: ${filePath}`);
-    console.error(`[FILE-PATH-GUARD] Ensure path starts with .claude/, src/, tests/, or other known directories`);
+    console.error(
+      `[FILE-PATH-GUARD] Ensure path starts with .claude/, src/, tests/, or other known directories`
+    );
     // Allow but warn (could be legitimate)
   }
 

@@ -873,6 +873,69 @@ TaskList(); // Check for metadata updates from agents
 TaskList();
 ```
 
+## Step 9.5: Template Loading and Validation
+
+**After selecting model, before spawning:**
+
+### 9.5.1 Select Appropriate Template
+
+| Agent Type                               | Template File                                                           |
+| ---------------------------------------- | ----------------------------------------------------------------------- |
+| Standard (developer, qa, planner, etc.)  | `.claude/templates/spawn/universal-agent-spawn.md`                      |
+| Orchestrators (master, swarm, evolution) | `.claude/templates/spawn/orchestrator-spawn.md`                         |
+| Agents with identity fields              | `.claude/templates/spawn/agent-identity-integration.md` + base template |
+
+### 9.5.2 Load Template
+
+```javascript
+// Load template file
+const template = Read({ file_path: '.claude/templates/spawn/universal-agent-spawn.md' });
+
+// If load fails, use inline fallback (see CLAUDE.md Section 2)
+if (!template) {
+  console.warn('[ROUTER] Template load failed, using inline fallback');
+  // Use fallback template
+}
+```
+
+### 9.5.3 Populate Template Placeholders
+
+Replace these placeholders in template:
+
+| Placeholder                  | Replacement                                 |
+| ---------------------------- | ------------------------------------------- |
+| `<ROLE>`                     | Agent type (e.g., "developer", "qa")        |
+| `<TASK>`                     | Task description from Step 2 classification |
+| `<ID>`                       | Task ID from TaskCreate or existing task    |
+| `<absolute-path-to-project>` | PROJECT_ROOT path                           |
+| `<agent-file-path>`          | Path to agent definition file               |
+| `<SUBJECT>`                  | Task subject from TaskGet                   |
+
+### 9.5.4 Validation Check
+
+Spawn prompt will be validated by `spawn-prompt-validator.cjs` hook.
+Ensure prompt contains:
+
+- [ ] TaskUpdate warning box
+- [ ] Task ID reference
+- [ ] PROJECT_ROOT context
+- [ ] Memory Protocol section
+- [ ] TaskUpdate call instructions
+
+**If validation fails in 'block' mode, spawn will be rejected.**
+
+### 9.5.5 Execute Spawn
+
+```javascript
+Task({
+  subagent_type: agentType,
+  model: selectedModel,
+  description: `${agentType} ${taskDescription}`,
+  allowed_tools: [...],
+  prompt: populatedTemplate,
+});
+```
+
 ## Router Whitelist vs Blacklist (Reference)
 
 ### WHITELIST (Router MAY use)

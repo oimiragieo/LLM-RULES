@@ -15,6 +15,53 @@
 
 **Hard Stop:** If you are about to respond without `TaskList()` + at least one `Task(...)`, STOP and do it.
 
+### Template Loading Protocol (Option D)
+
+**When Spawning Agents, Router MUST:**
+
+1. **Check Template Availability** (before spawning)
+
+   ```javascript
+   // Verify template exists
+   const templateExists = Read({ file_path: '.claude/templates/spawn/universal-agent-spawn.md' });
+   ```
+
+2. **Use Template Reference** (in spawn prompt)
+   - Reference template file path in spawn
+   - Do NOT inline full template content (causes bloat)
+
+3. **Handle Template Failures** (gracefully)
+   - If template load fails, use Section 2 fallback
+   - Log fallback usage for monitoring
+   - Do NOT block spawn due to template issues
+
+**Template Loading Sequence:**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ 1. Router receives request                              │
+│ 2. Router determines agent type (developer, qa, etc.)   │
+│ 3. Router selects template:                             │
+│    - Standard agent → universal-agent-spawn.md          │
+│    - Orchestrator → orchestrator-spawn.md               │
+│    - With identity → agent-identity-integration.md      │
+│ 4. Router loads template via Read tool                  │
+│ 5. Router substitutes placeholders:                     │
+│    - <ROLE> → agent type                                │
+│    - <TASK> → task description                          │
+│    - <ID> → task ID                                     │
+│    - <absolute-path> → PROJECT_ROOT                     │
+│ 6. Router spawns agent with populated template          │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Template Validation Enforcement:**
+
+- spawn-prompt-validator.cjs hook validates spawn prompts
+- Default mode: `warn` (logs issues but allows spawn)
+- Production mode: `block` (blocks invalid spawns)
+- Environment: `SPAWN_PROMPT_VALIDATOR=block|warn|off`
+
 ---
 
 ## 1) PRIME DIRECTIVE (ROUTER-FIRST)
@@ -254,314 +301,74 @@ ROUTER_WRITE_GUARD=off claude
 
 > **CRITICAL:** Subagents MUST call TaskUpdate. Without it: router can't track progress; tasks appear stuck; work duplicates.
 
-### Universal Spawn Template (use for ALL agents)
+### Universal Spawn Template
+
+For standard agents (developer, qa, planner, architect, etc.), use:
+
+**Template:** `.claude/templates/spawn/universal-agent-spawn.md`
+
+**Quick Reference:**
+
+- Use for: Bug fixes, features, testing, documentation
+- Model: `haiku` (simple), `sonnet` (standard), `opus` (complex)
+- Critical: 70-line warning box enforces TaskUpdate protocol
+- Tools: Read, Write, Edit, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
+
+**Example:**
 
 ```javascript
-// Step 1: Always check tasks first
 TaskList();
-
-// Step 2: Spawn agent (parallel spawns = multiple Task(...) in same response)
 Task({
   subagent_type: 'general-purpose',
-  // model: 'haiku' | 'sonnet' | 'opus' (see Section 5)
-  description: '<ROLE> doing <TASK>',
-  allowed_tools: [
-    'Read','Write','Edit','Bash',
-    'TaskUpdate','TaskList','TaskCreate','TaskGet',
-    'Skill',
-    // NOTE: For sequential thinking, use Skill({ skill: 'sequential-thinking' })
-    // MCP tools require server configuration in settings.json
-  ],
-  prompt: `You are the <ROLE> agent.
-
-+======================================================================+
-|  WARNING: TASK TRACKING REQUIRED - READ THIS FIRST                   |
-+======================================================================+
-|  Your Task ID: <ID>                                                  |
-|                                                                      |
-|  BEFORE doing ANY work, run:                                         |
-|  TaskUpdate({ taskId: "<ID>", status: "in_progress" });              |
-|                                                                      |
-|  AFTER completing work, run:                                         |
-|  TaskUpdate({ taskId: "<ID>", status: "completed",                   |
-|    metadata: { summary: "...", filesModified: [...] }                |
-|  });                                                                 |
-|                                                                      |
-|  THEN check for more work:                                           |
-|  TaskList();                                                         |
-|                                                                      |
-|  FAILURE TO UPDATE TASK STATUS BREAKS THE ENTIRE SYSTEM              |
-|  YOU WILL BE EVALUATED ON: Task status updates, not just output      |
-+======================================================================+
-
-## PROJECT CONTEXT (CRITICAL)
-PROJECT_ROOT: <absolute-path-to-project>
-
-All file operations MUST use relative paths from PROJECT_ROOT.
-- Agents: .claude/agents/
-- Skills: .claude/skills/
-- Context: .claude/context/
-
-**Path Usage Rules:**
-✅ CORRECT: .claude/context/artifacts/report.txt
-✅ CORRECT: .claude/context/memory/learnings.md
-✅ CORRECT: src/components/Button.tsx
-
-❌ WRONG: C:\dev\projects\agent-studio\.claude\context\artifacts\report.txt
-❌ WRONG: C:/dev/projects/agent-studio/.claude/context/artifacts/report.txt
-❌ WRONG: /home/user/agent-studio/.claude/context/memory/learnings.md
-
-DO NOT use absolute paths. ALWAYS use relative paths from PROJECT_ROOT.
-DO NOT create files outside PROJECT_ROOT.
-
-## Your Assigned Task
-Task ID: <ID>
-Subject: <SUBJECT>
-
-## Instructions
-1) FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" })
-2) Read your agent definition: <agent-file-path>
-3) Invoke required skills via Skill({ skill: "<skill>" }) as applicable (default for coding: `tdd` → `debugging`)
-4) Execute task
-5) LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: { summary: "...", filesModified: [...] } })
-6) THEN: TaskList()
-
-## Task Synchronization
-- discoveries/keyFiles: TaskUpdate({ taskId: "<ID>", metadata: { discoveries: [...], keyFiles: [...] } })
-
-## Critical: Use These Tools
-- Skill() - invoke skills (don't just read them)
-- TaskUpdate() - track progress (MANDATORY)
-- TaskList() - find next work
-
-## Memory Protocol
-1) Read: .claude/context/memory/learnings.md (before starting)
-2) Write: decisions/issues/learnings to appropriate memory files
-`,
+  description: 'Developer implementing feature X',
+  allowed_tools: ['Read','Write','Edit','Bash','TaskUpdate','TaskList','TaskCreate','TaskGet','Skill'],
+  prompt: // See .claude/templates/spawn/universal-agent-spawn.md for full template
 });
 ```
 
-### Identity Integration (Optional Enhancement)
+### Agent Identity Integration (Optional)
 
-When spawning agents with identity fields (see `.claude/docs/AGENT_IDENTITY.md`), you can enhance prompts with structured personality:
+For agents with structured personality (identity fields), enhance spawns with:
 
-**Pattern:**
+**Template:** `.claude/templates/spawn/agent-identity-integration.md`
 
-```javascript
-// 1. Read and parse agent file
-const fs = require('fs');
-const { AgentParser } = require('./.claude/lib/agents/agent-parser.cjs');
+**When to Use:**
 
-const agentFilePath = '.claude/agents/core/developer.md';
-const parser = new AgentParser();
-const agentData = parser.parseAgentFile(agentFilePath);
+- Agent has `identity` frontmatter (role, goal, backstory, motto, personality)
+- Consistent personality needed (+20-30% consistency improvement)
 
-// 2. Generate identity prompt section (if identity exists)
-let identitySection = '';
-if (agentData.identity) {
-  identitySection = `
-## Your Identity
-**Role**: ${agentData.identity.role}
-**Goal**: ${agentData.identity.goal}
-**Backstory**: ${agentData.identity.backstory}
-${agentData.identity.motto ? `**Motto**: "${agentData.identity.motto}"` : ''}
+**Quick Reference:**
 
-You embody this identity in all your actions and communications.
-`;
+- Use AgentParser to extract identity fields
+- Inject identity section after warning box, before PROJECT CONTEXT
+- Backward compatible (agents without identity work unchanged)
 
-  // Add personality guidance if present
-  if (agentData.identity.personality) {
-    const p = agentData.identity.personality;
-    identitySection += `
-## Decision-Making Style
-- **Traits**: ${p.traits?.join(', ') || 'N/A'}
-- **Communication**: ${p.communication_style || 'N/A'}
-- **Risk Tolerance**: ${p.risk_tolerance || 'N/A'}
-- **Decision Making**: ${p.decision_making || 'N/A'}
+### Orchestrator Spawn Template
 
-Apply these traits when evaluating options and communicating results.
-`;
-  }
-}
+For orchestrators that coordinate multiple subagents:
 
-// 3. Inject identity section into prompt (after task warning, before PROJECT CONTEXT)
-Task({
-  subagent_type: agentData.name,
-  model: agentData.model,
-  description: `${agentData.identity?.role || agentData.name} doing <TASK>`,
-  allowed_tools: agentData.tools || [
-    'Read',
-    'Write',
-    'Edit',
-    'Bash',
-    'TaskUpdate',
-    'TaskList',
-    'TaskCreate',
-    'TaskGet',
-    'Skill',
-  ],
-  prompt: `You are the ${agentData.name} agent.
+**Template:** `.claude/templates/spawn/orchestrator-spawn.md`
 
-+======================================================================+
-|  WARNING: TASK TRACKING REQUIRED - READ THIS FIRST                   |
-+======================================================================+
-|  Your Task ID: <ID>                                                  |
-|  BEFORE doing ANY work, run:                                         |
-|  TaskUpdate({ taskId: "<ID>", status: "in_progress" });              |
-|  AFTER completing work, run:                                         |
-|  TaskUpdate({ taskId: "<ID>", status: "completed", ... });           |
-|  THEN check for more work: TaskList();                               |
-|  FAILURE TO UPDATE TASK STATUS BREAKS THE ENTIRE SYSTEM              |
-+======================================================================+
-${identitySection}
-## PROJECT CONTEXT (CRITICAL)
-PROJECT_ROOT: <absolute-path-to-project>
-...
-`,
-});
-```
+**When to Use:**
 
-**Benefits:**
+- master-orchestrator, swarm-coordinator, evolution-orchestrator, party-orchestrator
+- Any agent that spawns subagents
 
-- **Consistent personality** - Identity fields reduce agent drift across invocations (+20-30% consistency)
-- **LLM expertise alignment** - Backstory establishes credibility and decision-making context
-- **Trait-based decisions** - Risk tolerance and personality influence recommendations
-- **Clear communication** - Communication style matches agent's defined personality
+**Critical Differences:**
 
-**Example Output (Developer with Identity):**
+- **MUST** include `Task` tool in allowed_tools (orchestrators spawn subagents)
+- **MUST** use `opus` model (orchestration requires complex reasoning)
+- May include MCP tools for research (e.g., Exa for evolution-orchestrator)
 
-```
-You are the developer agent.
-
-+======================================================================+
-|  WARNING: TASK TRACKING REQUIRED - READ THIS FIRST                   |
-+======================================================================+
-...
-
-## Your Identity
-**Role**: Senior Software Engineer
-**Goal**: Write clean, tested, efficient code following TDD principles
-**Backstory**: You've spent 15 years mastering software craftsmanship, with deep expertise in test-driven development and clean code principles. You've seen countless projects succeed through discipline and fail through shortcuts.
-**Motto**: "No code without a failing test"
-
-You embody this identity in all your actions and communications.
-
-## Decision-Making Style
-- **Traits**: thorough, pragmatic, quality-focused
-- **Communication**: direct
-- **Risk Tolerance**: low
-- **Decision Making**: data-driven
-
-Apply these traits when evaluating options and communicating results.
-
-## PROJECT CONTEXT (CRITICAL)
-...
-```
-
-**Backward Compatibility:**
-
-- Agents without `identity` fields work unchanged (identitySection = '')
-- Identity is optional - no breaking changes to existing spawns
-- Validation via AgentParser ensures identity fields are schema-compliant
-
-**See also:**
-
-- `.claude/docs/AGENT_IDENTITY.md` - Full design specification
-- `.claude/schemas/agent-identity.json` - JSON Schema for identity validation
-- `.claude/lib/agents/agent-parser.cjs` - Parser with identity validation
-
-### Orchestrator Spawn Template (for master-orchestrator, swarm-coordinator, evolution-orchestrator)
-
-Orchestrators need `Task` tool to spawn subagents:
+**Example:**
 
 ```javascript
+TaskList();
 Task({
-  subagent_type: 'evolution-orchestrator', // or master-orchestrator, swarm-coordinator
+  subagent_type: 'evolution-orchestrator',
   model: 'opus',
-  description: '<ORCHESTRATOR> coordinating <TASK>',
-  allowed_tools: [
-    'Read',
-    'Write',
-    'Edit',
-    'Bash',
-    'Task', // CRITICAL: Orchestrators spawn subagents
-    'TaskUpdate',
-    'TaskList',
-    'TaskCreate',
-    'TaskGet',
-    'Skill',
-    // NOTE: For sequential thinking, use Skill({ skill: 'sequential-thinking' })
-    // MCP tools require server configuration in settings.json
-    'mcp__Exa__web_search_exa',
-    'mcp__Exa__get_code_context_exa', // For research
-  ],
-  prompt: `You are the <ORCHESTRATOR> agent.
-
-+======================================================================+
-|  WARNING: TASK TRACKING REQUIRED - READ THIS FIRST                   |
-+======================================================================+
-|  Your Task ID: <ID>                                                  |
-|                                                                      |
-|  BEFORE doing ANY work, run:                                         |
-|  TaskUpdate({ taskId: "<ID>", status: "in_progress" });              |
-|                                                                      |
-|  AFTER completing work, run:                                         |
-|  TaskUpdate({ taskId: "<ID>", status: "completed",                   |
-|    metadata: { summary: "...", filesModified: [...] }                |
-|  });                                                                 |
-|                                                                      |
-|  THEN check for more work:                                           |
-|  TaskList();                                                         |
-|                                                                      |
-|  FAILURE TO UPDATE TASK STATUS BREAKS THE ENTIRE SYSTEM              |
-|  YOU WILL BE EVALUATED ON: Task status updates, not just output      |
-+======================================================================+
-
-## PROJECT CONTEXT (CRITICAL)
-PROJECT_ROOT: <absolute-path-to-project>
-All file operations MUST be relative to PROJECT_ROOT.
-
-## Your Assigned Task
-Task ID: <ID>
-Subject: <SUBJECT>
-
-## Instructions
-1) FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" })
-2) Read your orchestrator definition: <orchestrator-file-path>
-3) Invoke required skills via Skill({ skill: "<skill>" })
-4) Spawn subagents via Task(...) as needed
-5) LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: { summary: "...", filesModified: [...] } })
-6) THEN: TaskList()
-
-## Memory Protocol
-1) Read: .claude/context/memory/learnings.md (before starting)
-2) Write: decisions/issues/learnings to appropriate memory files
-`,
-});
-```
-
-**Parallel Spawn (rule)**
-For multi-perspective tasks: include multiple `Task(...)` calls in ONE response (parallel execution).
-
-**Background Spawn (supported)**
-
-```javascript
-Task({
-  subagent_type: 'general-purpose',
-  run_in_background: true,
-  description: 'QA running test suite',
-  allowed_tools: [
-    'Read',
-    'Write',
-    'Edit',
-    'Bash',
-    'TaskUpdate',
-    'TaskList',
-    'TaskCreate',
-    'TaskGet',
-    'Skill',
-  ],
-  prompt: 'You are QA. Read .claude/agents/core/qa.md and run full test suite...',
+  allowed_tools: ['Read','Write','Edit','Bash','Task','TaskUpdate','TaskList','TaskCreate','TaskGet','Skill','mcp__Exa__web_search_exa'],
+  prompt: // See .claude/templates/spawn/orchestrator-spawn.md for full template
 });
 ```
 
@@ -631,6 +438,94 @@ Task({
 Read: .claude/agents/specialized/security-architect.md`,
 });
 ```
+
+### Spawn Template Fallback Mechanism (Option C)
+
+**When Template Files Fail to Load:**
+
+If the Router cannot load a spawn template file (file missing, permission denied, corrupt), use this inline fallback pattern:
+
+**Fallback Detection:**
+
+```javascript
+// Attempt to load template
+try {
+  const template = Read({ file_path: '.claude/templates/spawn/universal-agent-spawn.md' });
+  // Use template content
+} catch (error) {
+  // Template load failed - use inline fallback
+  console.warn('[SPAWN-FALLBACK] Template load failed, using inline fallback');
+}
+```
+
+**Inline Fallback Template (Minimum Viable):**
+
+```javascript
+Task({
+  subagent_type: 'general-purpose',
+  description: '<ROLE> doing <TASK>',
+  allowed_tools: [
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+  ],
+  prompt: `You are the <ROLE> agent.
+
++======================================================================+
+|  WARNING: TASK TRACKING REQUIRED                                     |
++======================================================================+
+|  Task ID: <ID>                                                       |
+|  FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" });       |
+|  LAST: TaskUpdate({ taskId: "<ID>", status: "completed", ... });     |
++======================================================================+
+
+## PROJECT CONTEXT
+PROJECT_ROOT: <absolute-path>
+Use relative paths from PROJECT_ROOT.
+
+## Instructions
+1) TaskUpdate in_progress
+2) Read agent definition
+3) Execute task
+4) TaskUpdate completed with summary
+5) TaskList()
+
+## Memory Protocol
+Read .claude/context/memory/learnings.md before starting.
+`,
+});
+```
+
+**When to Use Fallback:**
+
+- Template file not found (404)
+- Permission denied reading template
+- Template file corrupted (parse error)
+- Network issues (if templates stored remotely in future)
+
+**Fallback Audit:**
+When fallback is triggered, emit audit log:
+
+```json
+{
+  "hook": "spawn-fallback",
+  "event": "fallback-triggered",
+  "reason": "<reason>",
+  "timestamp": "..."
+}
+```
+
+**Recovery Actions:**
+
+1. Check template file exists: `ls -la .claude/templates/spawn/`
+2. Verify permissions: Template files should be readable
+3. Restore from git: `git checkout HEAD -- .claude/templates/spawn/`
 
 ---
 
@@ -938,12 +833,14 @@ All spawned agents:
 | Reflection Workflow  | `.claude/workflows/core/reflection-workflow.md`                     | quality + learnings     |
 | Security Audit       | `.claude/workflows/security-architect-skill-workflow.md`            | security audit          |
 | Architecture Review  | `.claude/workflows/architecture-review-skill-workflow.md`           | arch review             |
+| Chrome Browser       | `.claude/workflows/chrome-browser-skill-workflow.md`                | browser automation      |
 | Consensus Voting     | `.claude/workflows/consensus-voting-skill-workflow.md`              | consensus               |
 | Swarm Coordination   | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md` | swarm patterns          |
 | Database Design      | `.claude/workflows/database-architect-skill-workflow.md`            | schema workflows        |
 | Context Compression  | `.claude/workflows/context-compressor-skill-workflow.md`            | summarization           |
 | Hook Consolidation   | `.claude/workflows/operations/hook-consolidation.md`                | hook consolidation      |
 | Post-Creation Valid. | `.claude/workflows/core/post-creation-validation.md`                | artifact integration    |
+| Progressive Disclos. | `.claude/workflows/progressive-disclosure-skill-workflow.md`        | requirements gathering  |
 
 ---
 

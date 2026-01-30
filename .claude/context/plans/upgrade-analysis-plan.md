@@ -7,6 +7,7 @@
 **Key Insight**: Archived codebase is a **marketplace architecture** (72 plugins, granular, user-installable) while our system is an **enterprise orchestration framework** (monolithic, router-first, multi-agent coordination). Different architectures offer complementary strengths.
 
 **User Constraints (IRON LAWS)**:
+
 1. **Transform, Don't Install**: Convert plugins → skills (with tools/workflows/hooks/schemas)
 2. **Update, Don't Duplicate**: Enhance existing skills/agents rather than create parallel systems
 3. **No Plugin Architecture**: Do NOT install plugins unless proven significantly better for our design
@@ -35,17 +36,18 @@ Plugin Component Analysis:
 
 ### Update vs Create Matrix
 
-| Scenario | Action | Rationale | Example |
-|----------|--------|-----------|---------|
-| Existing skill covers 60%+ | **UPDATE existing** | Maintain cohesion, avoid duplication | kubernetes-ops plugin → UPDATE devops skill |
-| New domain/specialization | **CREATE new** | Clear separation of concerns | ai-ml plugin → CREATE ai-ml-specialist agent |
-| Cross-cutting pattern | **EXTRACT to hook/workflow** | Reusable across agents | rate-limiter plugin → EXTRACT to hook |
-| Validation structure | **EXTRACT to schema** | Enforce consistency | api-contract plugin → EXTRACT to schema |
-| Utility function | **EXTRACT to lib/tools** | Shared infrastructure | kubectl-wrapper → EXTRACT to tools/integrations/ |
+| Scenario                   | Action                       | Rationale                            | Example                                          |
+| -------------------------- | ---------------------------- | ------------------------------------ | ------------------------------------------------ |
+| Existing skill covers 60%+ | **UPDATE existing**          | Maintain cohesion, avoid duplication | kubernetes-ops plugin → UPDATE devops skill      |
+| New domain/specialization  | **CREATE new**               | Clear separation of concerns         | ai-ml plugin → CREATE ai-ml-specialist agent     |
+| Cross-cutting pattern      | **EXTRACT to hook/workflow** | Reusable across agents               | rate-limiter plugin → EXTRACT to hook            |
+| Validation structure       | **EXTRACT to schema**        | Enforce consistency                  | api-contract plugin → EXTRACT to schema          |
+| Utility function           | **EXTRACT to lib/tools**     | Shared infrastructure                | kubectl-wrapper → EXTRACT to tools/integrations/ |
 
 ### Transformation Examples (Concrete)
 
 #### Example 1: Plugin with Agent + Skill → UPDATE Existing
+
 ```
 Plugin: "kubernetes-ops" (agent + skill + tools)
 Analysis:
@@ -63,6 +65,7 @@ Rationale: devops agent already covers infrastructure, adding kubernetes is enha
 ```
 
 #### Example 2: Plugin with Workflow Pattern → EXTRACT to Workflow
+
 ```
 Plugin: "full-stack-orchestrator" (orchestration pattern for frontend+backend+db)
 Analysis:
@@ -78,6 +81,7 @@ Rationale: Orchestration is workflow, not agent. Reuse existing agents, add coor
 ```
 
 #### Example 3: Plugin with Safety Logic → EXTRACT to Hook
+
 ```
 Plugin: "api-rate-limiter" (safety validation for API calls)
 Analysis:
@@ -95,6 +99,7 @@ Rationale: Safety logic is hook, not skill. Enforce at framework level, not agen
 ## Executive Summary
 
 **Archived System ("Plugins Marketplace")**:
+
 - 72 focused, single-purpose plugins
 - 108 specialized agents across 23 categories
 - 129 agent skills with progressive disclosure
@@ -102,6 +107,7 @@ Rationale: Safety logic is hook, not skill. Enforce at framework level, not agen
 - Designed for Claude Code users installing specific capabilities
 
 **Current System ("Agent-Studio Enterprise")**:
+
 - Unified multi-agent orchestrator
 - Router-first architecture with spawning protocol
 - Comprehensive memory system (3-tier: active, archived, embedded)
@@ -111,22 +117,26 @@ Rationale: Safety logic is hook, not skill. Enforce at framework level, not agen
 ## Constitution Checkpoint Status
 
 ### Gate 1: Research Completeness
+
 - [ ] Research plugin architecture patterns (3+ sources)
 - [ ] Research progressive disclosure implementations
 - [ ] Research three-tier model strategies
 - [ ] Document comparison findings in research report
 
 ### Gate 2: Technical Feasibility
+
 - [ ] Validate plugin concepts can integrate with router-first architecture
 - [ ] Verify skill progressive disclosure compatible with our Skill() tool
 - [ ] Check model strategy aligns with our spawning protocol
 
 ### Gate 3: Security Review
+
 - [ ] Assess security implications of plugin isolation patterns
 - [ ] Review access control differences between architectures
 - [ ] Evaluate risks of adopting external patterns
 
 ### Gate 4: Specification Quality
+
 - [ ] Acceptance criteria: Clear gap analysis with measurable improvements
 - [ ] Success criteria: Prioritized roadmap with effort estimates
 - [ ] Edge cases: Identify breaking changes vs additive enhancements
@@ -246,7 +256,7 @@ echo "✓ Phase 1 complete"
   - **Command**: Analyze skill structure (metadata → instructions → resources tiers)
   - **Output**: `.claude/context/artifacts/patterns/progressive-disclosure-transformation.md`
   - **Verify**: Document includes: Pattern description, HOW to adapt to Skill() tool, token savings, transformation steps
-  - **Transformation Example**: "Add tiered metadata to .claude/skills/**/SKILL.md frontmatter, update Skill() tool to lazy-load tiers"
+  - **Transformation Example**: "Add tiered metadata to .claude/skills/\*\*/SKILL.md frontmatter, update Skill() tool to lazy-load tiers"
 
 - [ ] **2.2** Extract three-tier model strategy WITH transformation guidance (~2 hours)
   - **Command**: Parse model assignments (Opus/Sonnet/Haiku), map to our spawning protocol
@@ -384,15 +394,18 @@ echo "✓ Phase 4 complete"
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Spawn Command**:
+
 ```javascript
 Task({
-  subagent_type: "reflection-agent",
-  description: "Session reflection and learning extraction",
-  prompt: "You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed upgrade analysis work, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
-})
+  subagent_type: 'reflection-agent',
+  description: 'Session reflection and learning extraction',
+  prompt:
+    'You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed upgrade analysis work, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created).',
+});
 ```
 
 **Success Criteria**:
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
@@ -401,24 +414,24 @@ Task({
 
 ## Risks
 
-| Risk | Impact | Mitigation | Rollback |
-|------|--------|------------|----------|
-| Plugin architecture incompatible with router-first | High | Phase 0 research validates compatibility before implementation | N/A (research only) |
-| Progressive disclosure conflicts with Skill() tool | Medium | Design adapter pattern to bridge architectures | Revert skill metadata changes |
-| Three-tier model strategy breaks spawning protocol | Medium | Test model selection in isolated environment first | Revert to current single-model approach |
-| Missing context: Archived codebase has undocumented features | Low | Focus on documented patterns only | Defer undocumented features to future research |
+| Risk                                                         | Impact | Mitigation                                                     | Rollback                                       |
+| ------------------------------------------------------------ | ------ | -------------------------------------------------------------- | ---------------------------------------------- |
+| Plugin architecture incompatible with router-first           | High   | Phase 0 research validates compatibility before implementation | N/A (research only)                            |
+| Progressive disclosure conflicts with Skill() tool           | Medium | Design adapter pattern to bridge architectures                 | Revert skill metadata changes                  |
+| Three-tier model strategy breaks spawning protocol           | Medium | Test model selection in isolated environment first             | Revert to current single-model approach        |
+| Missing context: Archived codebase has undocumented features | Low    | Focus on documented patterns only                              | Defer undocumented features to future research |
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Parallel? | Focus |
-|-------|-------|-----------|-----------|-------|
-| 0     | 4     | 6-8 hours | Partial   | Transformation patterns research |
-| 1     | 5     | 4-6 hours | Yes       | Capability mapping to artifacts |
-| 2     | 5     | 5-7 hours | Partial   | Pattern extraction + transformation guidance |
-| 3     | 4     | 3-4 hours | No        | Transformation roadmap (updates → creation → patterns) |
-| 4     | 3     | 2-3 hours | Partial   | Concrete examples + quick wins |
-| FINAL | 3     | 1 hour    | No        | Reflection + learning extraction |
-| **Total** | **24** | **~21-29 hours** | | |
+| Phase     | Tasks  | Est. Time        | Parallel? | Focus                                                  |
+| --------- | ------ | ---------------- | --------- | ------------------------------------------------------ |
+| 0         | 4      | 6-8 hours        | Partial   | Transformation patterns research                       |
+| 1         | 5      | 4-6 hours        | Yes       | Capability mapping to artifacts                        |
+| 2         | 5      | 5-7 hours        | Partial   | Pattern extraction + transformation guidance           |
+| 3         | 4      | 3-4 hours        | No        | Transformation roadmap (updates → creation → patterns) |
+| 4         | 3      | 2-3 hours        | Partial   | Concrete examples + quick wins                         |
+| FINAL     | 3      | 1 hour           | No        | Reflection + learning extraction                       |
+| **Total** | **24** | **~21-29 hours** |           |                                                        |
 
 **Estimated Calendar Time**: 3-4 days (with parallelization)
 
@@ -427,11 +440,13 @@ Task({
 ## Key Deliverables
 
 ### Research Phase (Phase 0)
+
 - Research report with 3+ external sources
 - Architectural differences ADR
 - Security assessment
 
 ### Inventory Phase (Phase 1)
+
 - Archived agents inventory (108 agents)
 - Current agents inventory
 - Archived skills inventory (129 skills)
@@ -439,6 +454,7 @@ Task({
 - Missing capabilities gap analysis
 
 ### Pattern Extraction (Phase 2)
+
 - Progressive disclosure pattern
 - Three-tier model strategy
 - Plugin granularity principles
@@ -446,12 +462,14 @@ Task({
 - Integration opportunities synthesis
 
 ### Roadmap (Phase 3)
+
 - P1 critical upgrades list
 - P2 high-value features list
 - P3 polish enhancements list
 - Implementation roadmap 2026
 
 ### Recommendations (Phase 4)
+
 - Executive summary
 - Integration risks and mitigations
 - Quick wins recommendations
@@ -459,18 +477,21 @@ Task({
 ## Success Metrics
 
 ### Transformation Quality
+
 - [ ] Transformation decision tree created (Plugin X → Artifact Y mapping criteria)
-- [ ] >=15 plugin capabilities mapped to artifact types (skill/agent/hook/workflow/schema)
+- [ ] > =15 plugin capabilities mapped to artifact types (skill/agent/hook/workflow/schema)
 - [ ] Update vs Create matrix shows >=60% UPDATE actions (preserve existing architecture)
-- [ ] >=3 concrete transformation examples documented (before/after with steps)
+- [ ] > =3 concrete transformation examples documented (before/after with steps)
 
 ### Deliverable Quality
+
 - [ ] P1 roadmap contains ONLY updates to existing artifacts (<8 items)
 - [ ] P2 roadmap contains ONLY justified new artifacts (<10 items, each with "why not UPDATE?" rationale)
 - [ ] P3 roadmap contains ONLY pattern-level enhancements (<5 items, optional)
-- [ ] >=3 quick wins identified (single artifact updates, <4 hours each)
+- [ ] > =3 quick wins identified (single artifact updates, <4 hours each)
 
 ### Architectural Preservation
+
 - [ ] Transformation strategy ADR documents WHY transform (not adopt)
 - [ ] Architectural preservation document explains HOW router-first stays unchanged
 - [ ] No plugin installation recommendations (unless proven significantly better)
