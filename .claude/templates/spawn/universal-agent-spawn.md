@@ -30,7 +30,7 @@ Task({
   description: '<ROLE> doing <TASK>',
   allowed_tools: [
     'Read','Write','Edit','Bash',
-    'TaskUpdate','TaskList','TaskCreate','TaskGet',
+    'TaskUpdate','TaskList','TaskCreate','TaskGet','TaskOutput',
     'Skill',
     // NOTE: For sequential thinking, use Skill({ skill: 'sequential-thinking' })
     // MCP tools require server configuration in settings.json

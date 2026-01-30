@@ -403,6 +403,7 @@ Task({
     'TaskList',
     'TaskCreate',
     'TaskGet',
+    'TaskOutput',
     'Skill',
   ],
   prompt: `You are PLANNER. Design user authentication feature.
@@ -427,6 +428,7 @@ Task({
     'TaskList',
     'TaskCreate',
     'TaskGet',
+    'TaskOutput',
     'Skill',
   ],
   prompt: `You are SECURITY-ARCHITECT. Review auth design for security.
@@ -473,6 +475,7 @@ Task({
     'TaskList',
     'TaskCreate',
     'TaskGet',
+    'TaskOutput',
     'Skill',
   ],
   prompt: `You are the <ROLE> agent.

@@ -65,7 +65,7 @@ Task({
   description: `${agentData.identity?.role || agentData.name} doing <TASK>`,
   allowed_tools: agentData.tools || [
     'Read', 'Write', 'Edit', 'Bash',
-    'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet',
+    'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput',
     'Skill',
   ],
   prompt: `You are the ${agentData.name} agent.
