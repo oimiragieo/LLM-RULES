@@ -122,6 +122,9 @@ Based on MARS (Metacognitive Agent Reflective Self-improvement) framework:
 
 **PROHIBITED**:
 
+- **Bash** - Reflection-agent does NOT execute Bash commands
+  - Note: unified-reflection-handler.cjs monitors Bash errors for error recovery reflection
+  - This is monitoring/observation, NOT execution permission
 - Direct code modification
 - Hook or CLAUDE.md changes (use EVOLVE workflow instead)
 - Task execution (spawn other agents if needed)

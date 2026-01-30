@@ -1,0 +1,212 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.ai/schemas/agent-tools.json",
+  "title": "Agent Tools Schema",
+  "description": "JSON Schema for validating agent tool definitions in frontmatter",
+  "version": "1.0.0",
+  "definitions": {
+    "coreTools": {
+      "type": "string",
+      "enum": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "Task",
+        "TaskCreate",
+        "TaskUpdate",
+        "TaskList",
+        "TaskGet",
+        "TaskOutput",
+        "TaskStop",
+        "Skill",
+        "AskUserQuestion",
+        "EnterPlanMode",
+        "ExitPlanMode",
+        "WebSearch",
+        "WebFetch",
+        "NotebookEdit"
+      ],
+      "description": "Built-in tools available to all agents"
+    },
+    "mcpToolPattern": {
+      "type": "string",
+      "pattern": "^mcp__[a-zA-Z0-9_-]+__[a-zA-Z0-9_-]+$",
+      "description": "MCP tools follow pattern: mcp__<server>__<tool>"
+    },
+    "approvedMcpTools": {
+      "type": "string",
+      "enum": [
+        "mcp__filesystem__*",
+        "mcp__chrome-devtools__*",
+        "mcp__claude-in-chrome__*",
+        "mcp__memory__*",
+        "mcp__sequential-thinking__sequentialthinking",
+        "mcp__Ref__ref_search_documentation",
+        "mcp__Ref__ref_read_url",
+        "mcp__Exa__web_search_exa",
+        "mcp__Exa__get_code_context_exa",
+        "mcp__Exa__company_research_exa",
+        "mcp__shadcn__getComponents",
+        "mcp__shadcn__getComponent",
+        "mcp__claude-in-chrome__computer",
+        "mcp__claude-in-chrome__navigate",
+        "mcp__claude-in-chrome__read_page",
+        "mcp__claude-in-chrome__find",
+        "mcp__claude-in-chrome__form_input",
+        "mcp__claude-in-chrome__fill_form",
+        "mcp__claude-in-chrome__javascript_tool",
+        "mcp__claude-in-chrome__take_screenshot",
+        "mcp__claude-in-chrome__gif_creator",
+        "mcp__claude-in-chrome__tabs_context_mcp",
+        "mcp__claude-in-chrome__tabs_create_mcp",
+        "mcp__claude-in-chrome__read_console_messages",
+        "mcp__claude-in-chrome__read_network_requests"
+      ],
+      "description": "Pre-approved MCP tools and wildcard patterns (require server configuration)"
+    },
+    "legacyDeprecatedTools": {
+      "type": "string",
+      "enum": [
+        "Search",
+        "Git",
+        "SequentialThinking",
+        "MCP Tools"
+      ],
+      "description": "Legacy tools that should be replaced (Search->Grep, Git->Bash, SequentialThinking->Skill, MCP Tools->specific tools)"
+    },
+    "agentCategory": {
+      "type": "string",
+      "enum": [
+        "core",
+        "domain",
+        "specialized",
+        "orchestrator"
+      ],
+      "description": "Agent category determines tool profile"
+    },
+    "modelDefault": {
+      "type": "string",
+      "enum": [
+        "haiku",
+        "sonnet",
+        "opus"
+      ],
+      "description": "Default model for agent spawning"
+    }
+  },
+  "type": "object",
+  "properties": {
+    "tools": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 30,
+      "items": {
+        "anyOf": [
+          { "$ref": "#/definitions/coreTools" },
+          { "$ref": "#/definitions/approvedMcpTools" },
+          { "$ref": "#/definitions/legacyDeprecatedTools" },
+          { "$ref": "#/definitions/mcpToolPattern" }
+        ]
+      },
+      "description": "Array of approved tool names"
+    },
+    "category": {
+      "$ref": "#/definitions/agentCategory"
+    },
+    "modelDefault": {
+      "$ref": "#/definitions/modelDefault"
+    }
+  },
+  "required": ["tools"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "category": { "const": "orchestrator" }
+        }
+      },
+      "then": {
+        "properties": {
+          "tools": {
+            "contains": { "const": "Task" }
+          }
+        },
+        "errorMessage": "Orchestrators MUST have Task tool for spawning subagents"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "category": { "const": "core" }
+        }
+      },
+      "then": {
+        "properties": {
+          "tools": {
+            "contains": { "const": "TaskUpdate" },
+            "allOf": [
+              { "contains": { "const": "TaskList" } },
+              { "contains": { "const": "TaskCreate" } },
+              { "contains": { "const": "TaskGet" } },
+              { "contains": { "const": "Skill" } }
+            ]
+          }
+        },
+        "errorMessage": "Core agents MUST have task tracking tools (TaskUpdate, TaskList, TaskCreate, TaskGet, Skill)"
+      }
+    }
+  ],
+  "additionalProperties": true,
+  "$comment": "Agent-specific validation rules",
+  "examples": [
+    {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ],
+      "category": "domain",
+      "modelDefault": "sonnet"
+    },
+    {
+      "tools": [
+        "Read",
+        "Task",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill",
+        "mcp__Exa__web_search_exa"
+      ],
+      "category": "orchestrator",
+      "modelDefault": "opus"
+    },
+    {
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ],
+      "category": "specialized",
+      "modelDefault": "sonnet",
+      "$comment": "code-reviewer: read-only agent, no Write/Edit"
+    }
+  ]
+}

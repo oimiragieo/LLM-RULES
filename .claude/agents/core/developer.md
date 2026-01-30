@@ -14,14 +14,13 @@ tools:
     Glob,
     Grep,
     Bash,
-    Git,
-    MCP Tools,
     TaskUpdate,
     TaskList,
     TaskCreate,
     TaskGet,
     Skill,
   ]
+# Note: Git operations use Bash tool (git commands); MCP tools optional (agents use Skill fallbacks)
 skills:
   - tdd
   - debugging

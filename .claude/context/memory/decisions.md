@@ -866,3 +866,58 @@ _Negative:_
 **Security Review:** Task #8 (APPROVED WITH CONDITIONS - all conditions met)
 
 ---
+
+## [ADR-065] Error Logging and Reporting System Architecture
+
+- **Date**: 2026-01-29
+- **Status**: Accepted (Design Complete)
+- **Context**: Agent-Studio needed a comprehensive error logging and reporting infrastructure to:
+  1. Capture agent failures with full debugging context
+  2. Integrate with the reflection workflow for learning from errors
+  3. Prevent sensitive data leakage while maintaining debuggability
+  4. Support error pattern detection and correlation across parallel agents
+  5. Build on existing infrastructure (error-tracker.cjs, error-recovery-reflection.cjs, EventBus)
+
+- **Decision**: Implement a multi-layered error logging system with the following architecture:
+  1. **Error Capture Layer**: PostToolUse hooks capture errors at all critical points (hooks, tools, tasks, memory operations)
+  2. **Error Processing Layer**: Classification, severity evaluation, context enrichment, sensitive data masking, correlation ID generation
+  3. **Error Storage Layer**: JSON Lines format (errors.jsonl) for real-time append, daily JSON reports for aggregation, pattern tracking
+  4. **Consumer Integration**: Reflection workflow, anomaly detector, CLI dashboard, self-healing triggers
+
+  **Key Design Choices:**
+  - **Centralized vs Per-Agent Logs**: Centralized `errors.jsonl` for cross-agent correlation, with filtering by `context.agentName`
+  - **Context Depth**: Full task metadata, masked tool input, 10-line stack trace (balance of utility and security)
+  - **Correlation Strategy**: Session ID + Trace ID + 5-second temporal window for grouping related errors
+  - **Retention Policy**: 7 days active, 30 days archived (compressed), configurable for critical errors (90 days)
+  - **Fail-Safe**: Fail-open with circuit breaker to never block agent execution; fallback to stderr
+
+- **Consequences**:
+  - **Positive**:
+    - Comprehensive error capture with debugging context
+    - Secure handling of sensitive data (PII/credential masking)
+    - Integration with existing reflection and event systems
+    - Pattern detection enables self-healing triggers
+    - Cross-agent correlation for parallel execution debugging
+  - **Negative**:
+    - Additional storage requirements (~50MB/month estimated)
+    - Slight performance overhead (target <5ms per error)
+    - Complexity increase (new components to maintain)
+  - **Trade-offs**:
+    - Centralized log vs. per-agent: Chose centralized for correlation capability
+    - Full context vs. minimal: Chose full context (masked) for debuggability
+    - JSON Lines vs. structured DB: Chose JSON Lines for simplicity and streaming
+
+- **Implementation Plan**:
+  - Phase 1 (Week 1-2): Core infrastructure (schema, capture hook, masker, log writer)
+  - Phase 2 (Week 2-3): Integration with existing components
+  - Phase 3 (Week 3-4): Reporting CLI and pattern detection
+  - Phase 4 (Week 4): Testing and documentation
+
+- **Related Files**:
+  - Design Document: `.claude/context/artifacts/error-logging-system-design.md`
+  - Architecture Diagrams: `.claude/context/artifacts/diagrams/error-logging-architecture.md`
+  - Existing Components: `error-tracker.cjs`, `error-recovery-reflection.cjs`, `unified-reflection-handler.cjs`
+
+- **Related ADRs**: ADR-055 (Event-Driven Orchestration), ADR-056 (Observability)
+
+---

@@ -48,6 +48,14 @@ const {
 // PERF-003 #2: Import router-state for TaskUpdate tracking (consolidated from task-update-tracker.cjs)
 const routerState = require('../routing/router-state.cjs');
 
+// Phase 4 Integration: Error summary extractor for reflection workflow
+let errorSummaryExtractor = null;
+try {
+  errorSummaryExtractor = require('./error-summary-extractor.cjs');
+} catch (_e) {
+  // Error summary extractor not available - graceful degradation
+}
+
 // Configuration
 let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue.jsonl');
 
@@ -206,6 +214,7 @@ function handleTaskUpdate(input) {
 
 /**
  * Handle error recovery - create reflection queue entry for error analysis
+ * Phase 4: Enhanced with error logging system integration
  * @param {object} input - The hook input
  * @returns {object} Reflection entry for the queue
  */
@@ -214,12 +223,26 @@ function handleErrorRecovery(input) {
   const toolInput = getToolInput(input);
   const toolResult = getToolOutput(input) || {};
 
+  // Determine severity based on error type
+  let severity = 'MEDIUM';
+  if (toolResult.error?.includes('CRITICAL') || toolResult.error?.includes('SECURITY')) {
+    severity = 'CRITICAL';
+  } else if (toolResult.error?.includes('permission denied') || toolResult.error?.includes('not found')) {
+    severity = 'HIGH';
+  }
+
+  // Determine priority based on severity
+  const priority = severity === 'CRITICAL' ? 'high' : severity === 'HIGH' ? 'medium' : 'low';
+
   const entry = {
     context: 'error_recovery',
     trigger: 'error',
     tool: toolName,
     timestamp: new Date().toISOString(),
-    priority: 'medium',
+    priority,
+    // Phase 4: Enhanced error context
+    severity,
+    category: toolName === 'Bash' ? 'TOOL_FAILURE' : 'EXECUTION_ERROR',
   };
 
   // Add Bash-specific fields
@@ -235,7 +258,9 @@ function handleErrorRecovery(input) {
 
   // Add error from tool result
   if (toolResult.error) {
-    entry.error = toolResult.error;
+    entry.error = typeof toolResult.error === 'string'
+      ? toolResult.error
+      : JSON.stringify(toolResult.error);
   }
 
   // Include relevant tool input for context
@@ -243,7 +268,47 @@ function handleErrorRecovery(input) {
     entry.filePath = toolInput.file_path;
   }
 
+  // Add correlation IDs if available
+  entry.correlation = {
+    sessionId: process.env.CLAUDE_SESSION_ID,
+    traceId: process.env.TRACE_ID,
+  };
+
   return entry;
+}
+
+/**
+ * Get error summary for reflection (Phase 4 Integration)
+ * @returns {object|null} Error summary context or null if not available
+ */
+function getErrorSummaryForReflection() {
+  if (!errorSummaryExtractor) {
+    return null;
+  }
+
+  try {
+    const result = errorSummaryExtractor.extractSummaryForReflection({ hours: 24 });
+
+    // Only include if there are errors to review
+    if (result.errorCount === 0) {
+      return null;
+    }
+
+    return {
+      errorCount: result.errorCount,
+      summaryPath: result.summaryPath,
+      reflectionWeight: result.reflectionWeight,
+      actionItems: result.actionItems,
+      criticalIssues: result.summary?.criticalErrors?.length || 0,
+      patterns: {
+        repeated: result.summary?.patterns?.repeatedErrors?.length || 0,
+        cascades: result.summary?.patterns?.cascades?.length || 0,
+      },
+    };
+  } catch (err) {
+    debugLog('unified-reflection', 'Error getting error summary for reflection', err);
+    return null;
+  }
 }
 
 /**
@@ -255,6 +320,19 @@ function handleSessionEnd(input) {
   const sessionId = input.session_id || input.sessionId || process.env.CLAUDE_SESSION_ID;
   const stats = getSessionStats(input);
 
+  // Phase 4 Integration: Get error summary for reflection
+  const errorSummary = getErrorSummaryForReflection();
+
+  // Determine reflection priority based on error summary
+  let reflectionPriority = 'low';
+  if (errorSummary) {
+    if (errorSummary.criticalIssues > 0 || errorSummary.reflectionWeight >= 0.7) {
+      reflectionPriority = 'high';
+    } else if (errorSummary.reflectionWeight >= 0.4) {
+      reflectionPriority = 'medium';
+    }
+  }
+
   // Create reflection entry
   const reflection = {
     context: 'session_end',
@@ -262,8 +340,10 @@ function handleSessionEnd(input) {
     sessionId: sessionId,
     scope: 'all_unreflected_tasks',
     timestamp: new Date().toISOString(),
-    priority: 'low',
+    priority: reflectionPriority,
     stats: stats,
+    // Phase 4: Include error review context
+    errorReview: errorSummary,
   };
 
   // Create session data for memory recording (formerly from session-end-recorder.cjs)

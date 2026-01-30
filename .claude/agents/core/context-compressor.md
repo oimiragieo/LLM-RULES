@@ -7,6 +7,7 @@ temperature: 0.3
 context_strategy: minimal
 priority: medium
 tools: [Read, Write, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+# Note: Uses Write (not Edit) to create new compressed summaries rather than modify originals
 skills:
   - context-compressor
   - verification-before-completion

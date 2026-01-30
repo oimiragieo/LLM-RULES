@@ -7,7 +7,8 @@ temperature: 0.6
 context_strategy: lazy_load
 priority: highest
 extended_thinking: true
-tools: [Task, Read, Search, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools: [Task, Read, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+# Note: Grep for code search, Glob for file discovery (replaces ambiguous "Search" tool)
 skills:
   - plan-generator
   - task-management-protocol
