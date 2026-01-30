@@ -903,8 +903,109 @@ node .claude/tools/cli/error-report.cjs --category SECURITY_VIOLATION --severity
 
 **Next Steps:**
 1. Task #11 (completed): Lint/format code
-2. Task #14: Git commit and push to main
-3. Task #13: Enable error logging hooks in dev environment
-4. Task #12: Final lint, format, and push to main
+2. Task #14 (completed): Git commit and push to main
+3. Task #13 (completed): Enable error logging hooks in dev environment
+4. Task #12 (pending): Final lint, format, and push to main
+
+---
+
+## 2026-01-30: Error Logging Hooks Enablement (Task #13 - COMPLETED)
+
+**Context:** Phase 4 - Enable error logging hooks in development environment
+
+### Summary
+
+Successfully enabled and verified all 3 error logging hooks in development environment:
+
+1. **error-capture-post-tool.cjs** - PostToolUse hook for capturing tool failures
+2. **error-summary-extractor.cjs** - Reflection hook for error summary extraction
+3. **agent-tools-validator.cjs** - PreFileWrite hook for agent tool validation
+
+### Key Learnings
+
+**1. ESM Tests Cannot Use require() Directly**
+- **Problem:** `.mjs` test files cannot use `require()` for CJS modules
+- **Solution:** Use `createRequire(import.meta.url)` to create require function
+- **Pattern:**
+  ```javascript
+  import { createRequire } from 'node:module';
+  const require = createRequire(import.meta.url);
+  const sanitizer = require('./path/to/cjs-module.cjs');
+  ```
+
+**2. Schema Structure Awareness**
+- **Problem:** Test assumed `schema.coreTools` but actual schema uses `schema.definitions.coreTools`
+- **Solution:** Read schema structure before writing tests
+- **Pattern:** Use JSON Schema `definitions` section for reusable type definitions
+
+**3. Sensitive vs Forbidden Field Patterns**
+- **Sensitive Fields:** Email, phone, address - logged but marked for review
+- **Forbidden Fields:** Password, secret, credential, apiKey - always redacted as `[REDACTED]`
+- **Pattern:** Forbidden fields trigger immediate redaction, sensitive fields are logged but flagged
+- **Insight:** Test expectations must match actual sanitizer behavior, not assumptions
+
+**4. Error Writer Verification**
+- **Pattern:** Test error logging by writing test error, then reading log file
+- **JSONL format:** Each line is independent JSON, easy to verify last entry
+- **Log rotation:** Daily files (`errors-YYYY-MM-DD.jsonl`) - test with correct date
+
+**5. Hook Enablement Testing Strategy**
+- **Phase 1:** Verify hooks exist and have valid syntax (`node -c`)
+- **Phase 2:** Verify library dependencies are accessible (file exists + can require)
+- **Phase 3:** Verify schemas are valid JSON with expected structure
+- **Phase 4:** Verify configuration (.env) has required variables
+- **Phase 5:** Verify functional behavior (write test error, verify log)
+
+### Files Created
+
+- `.env` - Development environment configuration (gitignored)
+- `tests/integration/hooks-enabled.test.mjs` - 10 hook verification tests
+- `tests/integration/sample-error-capture.test.mjs` - 2 error capture tests
+- `.claude/context/artifacts/reports/hooks-enablement-report.md` - Enablement report
+
+### Environment Configuration
+
+```bash
+# Error Logging Configuration
+ERROR_LOGGING_ENABLED=true
+ERROR_CAPTURE_HOOK=block
+AGENT_TOOLS_VALIDATOR=block
+REFLECT_ERROR_SUMMARY=true
+ERROR_RETENTION_DAYS=7
+ERROR_ARCHIVE_RETENTION_DAYS=30
+ERROR_LOG_LOCATION=.claude/context/artifacts/error-reports/
+```
+
+### Test Results
+
+| Test Suite | Tests | Passed | Status |
+|------------|-------|--------|--------|
+| hooks-enabled.test.mjs | 10 | 10 | PASS |
+| sample-error-capture.test.mjs | 2 | 2 | PASS |
+| **Total** | **12** | **12** | **100%** |
+
+### Verification Commands
+
+```bash
+# Hook syntax verification
+node -c .claude/hooks/safety/error-capture-post-tool.cjs
+node -c .claude/hooks/reflection/error-summary-extractor.cjs
+node -c .claude/hooks/validation/agent-tools-validator.cjs
+
+# Run verification tests
+node --test tests/integration/hooks-enabled.test.mjs
+node --test tests/integration/sample-error-capture.test.mjs
+
+# View error logs
+tail -5 .claude/context/artifacts/error-reports/errors-*.jsonl
+```
+
+### Recommendations for Future Hook Enablement
+
+1. **Always verify hook syntax first** with `node -c` before testing functionality
+2. **Create .env with defaults** for development environment (gitignored)
+3. **Test library imports** using createRequire for ESM test files
+4. **Verify schema structure** before writing assertions
+5. **Log test errors** to verify end-to-end flow works
 
 ---
