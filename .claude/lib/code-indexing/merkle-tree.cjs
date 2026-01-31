@@ -1,13 +1,13 @@
 /**
  * Merkle Tree for Efficient Change Detection
- * 
+ *
  * Builds a tree structure where each node contains:
  * - Hash of its children (for directories)
  * - Hash of file content (for files)
- * 
+ *
  * Enables O(log n) change detection by comparing tree hashes instead of
  * checking every file individually.
- * 
+ *
  * @module code-indexing/merkle-tree
  */
 
@@ -55,7 +55,7 @@ class MerkleNode {
    */
   static fromJSON(data) {
     const node = new MerkleNode(data.type, data.name, data.hash, null, data.metadata || {});
-    
+
     if (data.children) {
       node.children = {};
       for (const [name, childData] of Object.entries(data.children)) {
@@ -84,14 +84,14 @@ class MerkleTree {
     try {
       const content = await fs.readFile(filePath);
       const stats = await fs.stat(filePath);
-      
+
       // Include content + metadata in hash
       const hashInput = JSON.stringify({
         content: content.toString('base64').slice(0, 1000), // First 1KB for speed
         size: stats.size,
         mtime: stats.mtimeMs,
       });
-      
+
       return crypto.createHash('sha256').update(hashInput).digest('hex');
     } catch (_err) {
       // File might not exist or be unreadable
@@ -107,7 +107,7 @@ class MerkleTree {
       .map(child => child.hash)
       .sort()
       .join('');
-    
+
     return crypto.createHash('sha256').update(childHashes).digest('hex');
   }
 
@@ -223,10 +223,7 @@ class MerkleTree {
       // Compare children
       const oldChildren = oldTree.children || {};
       const newChildren = newTree.children || {};
-      const allNames = new Set([
-        ...Object.keys(oldChildren),
-        ...Object.keys(newChildren),
-      ]);
+      const allNames = new Set([...Object.keys(oldChildren), ...Object.keys(newChildren)]);
 
       for (const name of allNames) {
         const childPath = path.join(basePath, name).replace(/\\/g, '/');

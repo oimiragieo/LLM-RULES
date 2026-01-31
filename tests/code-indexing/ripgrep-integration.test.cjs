@@ -146,7 +146,11 @@ describe('Ripgrep integration', () => {
         assert.ok(true, 'Skipped: ripgrep not available');
         return;
       }
-      const results = await memory._searchWithRipgrep('contextual', ['learnings.md', 'decisions.md'], 2);
+      const results = await memory._searchWithRipgrep(
+        'contextual',
+        ['learnings.md', 'decisions.md'],
+        2
+      );
       assert.ok(results.length <= 2, 'Results should not exceed limit');
     });
   });
@@ -186,7 +190,9 @@ describe('Ripgrep integration', () => {
         stdio: ['ignore', 'pipe', 'pipe'],
       });
       let stderr = '';
-      child.stderr.on('data', d => { stderr += d.toString(); });
+      child.stderr.on('data', d => {
+        stderr += d.toString();
+      });
       child.on('close', code => {
         if (code === 1 && /@vscode\/ripgrep/.test(stderr)) {
           assert.ok(true, 'Script correctly reports missing package');
@@ -218,7 +224,9 @@ describe('Ripgrep integration', () => {
         stdio: ['ignore', 'pipe', 'pipe'],
       });
       let stderr = '';
-      child.stderr.on('data', d => { stderr += d.toString(); });
+      child.stderr.on('data', d => {
+        stderr += d.toString();
+      });
       child.on('close', code => {
         if (code === 1 && /@vscode\/ripgrep/.test(stderr)) {
           assert.ok(true, 'Script correctly reports missing package');
@@ -239,7 +247,10 @@ describe('Ripgrep integration', () => {
       const memory = new ContextualMemory({ memoryDir: MEMORY_FIXTURE_DIR });
       const rgPath = memory._getRipgrepPath();
       if (rgPath && rgPath.includes('bin')) {
-        assert.ok(rgPath.endsWith('.exe') || rgPath.includes('rg.exe'), 'Windows fallback should use .exe');
+        assert.ok(
+          rgPath.endsWith('.exe') || rgPath.includes('rg.exe'),
+          'Windows fallback should use .exe'
+        );
       }
     });
   });
