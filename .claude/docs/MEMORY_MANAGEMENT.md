@@ -639,6 +639,146 @@ manager.start();
 
 ---
 
+## Token Budget & Memory Stats Dashboard
+
+**CLI Tool**: `.claude/tools/cli/memory-dashboard.cjs`
+
+The memory stats dashboard provides visual monitoring of token usage, compression events, and budget status across all agents.
+
+### Features
+
+1. **Overall Metrics**: Active agents, average token usage, total compressions
+2. **Per-Agent Breakdown**: Token usage, budget percentage, compression count, status
+3. **Compression Timeline**: Recent compression events with reasons and bytes freed
+4. **Alerts**: Warnings for agents approaching token limits
+
+### Usage
+
+```bash
+# Show latest summary (ASCII dashboard)
+node .claude/tools/cli/memory-dashboard.cjs
+
+# Export as JSON
+node .claude/tools/cli/memory-dashboard.cjs --json
+
+# Filter by specific agent
+node .claude/tools/cli/memory-dashboard.cjs --agent researcher
+
+# Time period filter (7 days)
+node .claude/tools/cli/memory-dashboard.cjs --period 7d
+
+# Export full report to file
+node .claude/tools/cli/memory-dashboard.cjs --export memory-report.txt
+```
+
+### Example Output
+
+```
+╔════════════════════════════════════════════════════════════════╗
+║                    MEMORY DASHBOARD SUMMARY                    ║
+╚════════════════════════════════════════════════════════════════╝
+
+📊 OVERALL METRICS
+├─ Active Agents: 3
+├─ Avg Token Usage: 45,000 / 200,000 (22.5%)
+├─ Total Compressions: 2
+└─ Memory Status: ✅ HEALTHY
+
+🤖 PER-AGENT BREAKDOWN
+├─ researcher
+│  ├─ Tokens: 95,000 / 200,000 (47.5%)
+│  ├─ Status: ⚠️  WARNING
+│  ├─ Compressions: 2
+│  └─ Last operation: Read
+└─ developer
+   ├─ Tokens: 42,000 / 200,000 (21.0%)
+   ├─ Status: ✅ OK
+   ├─ Compressions: 0
+   └─ Last operation: Read
+
+📈 COMPRESSION TIMELINE
+├─ 2026-01-30 14:35 → Budget > 90% (freed: 45 KB)
+└─ 2026-01-30 12:10 → Read > 10KB (10.5KB) (freed: 11 KB)
+
+⚠️  ALERTS
+└─ researcher token usage at 47.5% (approaching 50% threshold)
+```
+
+### Data Sources
+
+The dashboard reads from three JSONL log files:
+
+1. **Token Usage**: `.claude/context/token-usage.jsonl`
+   - Tracks token consumption per agent
+   - Event types: spawn, tool_result, prompt, compression, completion
+
+2. **Compression Stats**: `.claude/context/compression-stats.jsonl`
+   - Records compression events (reason, urgency, bytes freed, success)
+
+3. **Compression Triggers**: `.claude/context/compression-triggers.jsonl`
+   - Logs compression trigger events per agent
+
+### JSON Export Format
+
+```json
+{
+  "activeAgents": 3,
+  "avgTokenUsage": 45000,
+  "totalCompressions": 2,
+  "status": "HEALTHY",
+  "agents": {
+    "researcher": {
+      "totalTokens": 95000,
+      "budget": 200000,
+      "budgetPercent": 47.5,
+      "status": "WARNING",
+      "compressionCount": 2,
+      "eventCount": 15
+    }
+  },
+  "compressions": [
+    {
+      "timestamp": "2026-01-30T14:35:00.000Z",
+      "reason": "Budget > 90%",
+      "urgency": "high",
+      "bytesFreed": 45000,
+      "success": true
+    }
+  ]
+}
+```
+
+### Best Practices
+
+**1. Regular Monitoring**
+
+```bash
+# Daily review
+node .claude/tools/cli/memory-dashboard.cjs --period 1d
+
+# Weekly summary
+node .claude/tools/cli/memory-dashboard.cjs --period 7d --export weekly-report.txt
+```
+
+**2. Pre-Deployment Checks**
+
+```bash
+# Before spawning complex workflows
+node .claude/tools/cli/memory-dashboard.cjs --json | jq '.activeAgents'
+
+# Check for high-usage agents
+node .claude/tools/cli/memory-dashboard.cjs --json | jq '.agents | to_entries | map(select(.value.budgetPercent > 80))'
+```
+
+**3. Alert Monitoring**
+
+```bash
+# Check if any agents need attention
+node .claude/tools/cli/memory-dashboard.cjs | grep "ALERTS"
+```
+
+---
+
 ## Related Documentation
 
 - **Performance Budgets**: `.claude/docs/PERFORMANCE_BUDGETS.md`
@@ -647,6 +787,7 @@ manager.start();
 - **Agent Spawn Template**: `.claude/templates/spawn/universal-agent-spawn.md`
 - **MemoryMonitor Tests**: `tests/memory-monitor.test.cjs`
 - **TaskCleanupManager Tests**: `tests/task-cleanup-manager.test.cjs`
+- **Memory Dashboard Tests**: `tests/cli/memory-dashboard.test.cjs`
 
 ---
 

@@ -44,6 +44,19 @@ Works immediately - no MCP server, no restart needed.
 - No API key required - uses public arXiv API
 </capabilities>
 
+## Result Limits (Memory Safeguard)
+
+arxiv-mcp returns academic papers. To prevent memory exhaustion:
+- **max_results: 20 (HARD LIMIT)**
+- Each paper metadata ~300 bytes
+- 20 papers × 300 bytes = ~6 KB metadata
+- Papers can be 100+ KB each if fetched - DON'T fetch full papers
+
+**Why the limit?**
+- Previous limit: 100 results → 30 KB+ metadata → context explosion
+- New limit: 20 results → 6 KB metadata → memory safe
+- 20 papers is usually enough to find your target
+
 <instructions>
 <execution_process>
 
@@ -51,11 +64,39 @@ Works immediately - no MCP server, no restart needed.
 
 The arXiv API is publicly accessible at `http://export.arxiv.org/api/query`.
 
+### Recommended Pattern
+
+```javascript
+// ✓ GOOD: Limit results to 20
+WebFetch({
+  url: 'http://export.arxiv.org/api/query?search_query=all:transformer+attention&max_results=20&sortBy=relevance',
+  prompt: 'Extract paper titles, authors, abstracts, arXiv IDs, and PDF links from these results',
+});
+
+// ✓ GOOD: Use specific filters to reduce result set
+WebFetch({
+  url: 'http://export.arxiv.org/api/query?search_query=all:transformer+attention+2025&max_results=20&sortBy=submittedDate',
+  prompt: 'Extract recent papers on transformer attention',
+});
+
+// ✗ BAD: Old behavior - unlimited or >20 results
+WebFetch({
+  url: 'http://export.arxiv.org/api/query?search_query=all:neural+networks',
+  // Too broad - will get 100s of results
+});
+
+// ✗ BAD: Exceeds memory limit
+WebFetch({
+  url: 'http://export.arxiv.org/api/query?search_query=all:deep+learning&max_results=100',
+  // Over limit - memory risk
+});
+```
+
 ### Search by Keywords
 
 ```javascript
 WebFetch({
-  url: 'http://export.arxiv.org/api/query?search_query=all:transformer+attention&max_results=10&sortBy=relevance',
+  url: 'http://export.arxiv.org/api/query?search_query=all:transformer+attention&max_results=20&sortBy=relevance',
   prompt: 'Extract paper titles, authors, abstracts, arXiv IDs, and PDF links from these results',
 });
 ```
@@ -119,6 +160,19 @@ search_query=ti:transformer+AND+abs:attention
 search_query=au:LeCun+OR+au:Bengio
 search_query=cat:cs.LG+ANDNOT+ti:survey
 ```
+
+### When NOT to Use arxiv-mcp
+
+- General web research → Use WebSearch/WebFetch instead
+- Implementation examples → Use Grep/Glob on codebase
+- Product research → Use WebSearch with news filter
+- Community discussions → Use WebSearch for forums/Stack Overflow
+
+**arxiv-mcp is best for:**
+- Finding academic papers on specific topics
+- Understanding theoretical foundations
+- Citing research in documentation
+- Quick literature review (20 papers max)
 
 ---
 

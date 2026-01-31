@@ -30,6 +30,24 @@ Diagram Generator Skill - Generates architecture, database, and system diagrams 
 - Generating system overviews
 </capabilities>
 
+## Processing Limits (Memory Safeguard)
+
+Diagram generator can analyze large codebases. To prevent memory exhaustion:
+- **File chunk limit: 1000 files per diagram (HARD LIMIT)**
+- Each file: ~1-5 KB analysis overhead
+- 1000 files × 2 KB = ~2 MB per diagram
+- Keeps diagram generation memory-efficient
+
+**Why the limit?**
+- Analyzing 5000+ files → 10+ MB memory → context explosion
+- Diagrams for 5000+ files → impossible to visualize
+- Visual limit: ~100-200 nodes per diagram (human readable)
+
+**Recommend:**
+- 1000 files: OK, generates ~100-150 component nodes
+- 2000 files: Consider splitting into 2 diagrams
+- 5000+ files: MUST split into 5+ diagrams by module/subsystem
+
 <instructions>
 <execution_process>
 
@@ -53,6 +71,33 @@ Analyze code and documentation (Use Parallel Read/Grep/Glob):
 - Identify relationships
 - Understand data flows
 
+### Chunking Large Codebases
+
+If codebase has >1000 files:
+
+**Option 1: Split by subsystem**
+```javascript
+// Generate diagram for each major subsystem
+generateDiagram({ files: "src/auth/**", title: "Authentication Module" });
+generateDiagram({ files: "src/api/**", title: "API Module" });
+generateDiagram({ files: "src/ui/**", title: "UI Module" });
+```
+
+**Option 2: Split by layer**
+```javascript
+generateDiagram({ files: "src/models/**", title: "Data Models" });
+generateDiagram({ files: "src/services/**", title: "Business Logic" });
+generateDiagram({ files: "src/controllers/**", title: "API Controllers" });
+```
+
+**Option 3: Generate overview first, then details**
+```javascript
+// 1. High-level architecture (10-20 files)
+generateDiagram({ files: ["src/index.ts", "src/app.ts", ...], title: "Architecture" });
+// 2. Detailed subsystems (500-1000 files each)
+generateDiagram({ files: "src/auth/**", title: "Authentication Details" });
+```
+
 ### Step 3: Generate Mermaid Diagram
 
 Create diagram using Mermaid syntax:
@@ -69,7 +114,20 @@ Embed diagram in markdown:
 - Use mermaid code blocks
 - Add diagram description
 - Reference in documentation
-  </execution_process>
+
+### Timeout Management
+
+- Default timeout: 30 seconds per diagram
+- 1000 files analysis: ~20 seconds (OK)
+- 2000 files analysis: ~40 seconds (EXCEEDS TIMEOUT)
+- If approaching timeout: Reduce file count or increase timeout
+
+**Pattern for large codebases:**
+- Split into 6-8 focused diagrams
+- Each <1000 files, <30 seconds
+- Total analysis time: 3-4 minutes
+
+</execution_process>
 
 <integration>
 **Integration with Architect Agent**:

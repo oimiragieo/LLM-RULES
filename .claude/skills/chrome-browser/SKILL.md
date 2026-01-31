@@ -79,9 +79,23 @@ Chrome Browser Skill - Unified browser automation using TWO integrations: Chrome
 | **Performance tracing**  | ✅ Full Core Web Vitals         | ❌ Not available               |
 | **Network inspection**   | ✅ Detailed with body access    | ✅ Basic                       |
 | **Device emulation**     | ✅ Mobile, geolocation, CPU     | ❌ Limited                     |
-| **GIF recording**        | ❌ No                           | ✅ Yes                         |
+| **GIF recording**        | ❌ No                           | ✅ Yes (100 frame limit)       |
 | **Page text extraction** | Via snapshot                    | ✅ Dedicated tool              |
 | **Best for**             | Testing, debugging, performance | Authenticated workflows, demos |
+
+## Performance Limits (Memory Safeguard)
+
+Chrome browser automation can record GIF videos. To prevent memory exhaustion:
+- **GIF frame limit: 100 frames (HARD LIMIT)**
+- Each frame: 5-20 KB (depends on complexity)
+- 100 frames × 10 KB avg = ~1 MB per recording
+- Keeps browser session memory-efficient
+
+**Frame tracking:**
+- Typical actions per frame: 1-2 (click, scroll, type)
+- 50 frames = 25-50 actions
+- 100 frames = 50-100 actions
+- For longer workflows, use multiple recordings
 
 ### Decision Guide
 
@@ -317,6 +331,33 @@ mcp__claude-in-chrome__gif_creator({
   tabId: 123
 })
 ```
+
+### Recording Best Practices
+
+✓ GOOD patterns:
+- Login flow: 15-20 frames (5-10 actions)
+- Form filling: 10-15 frames (5-8 actions)
+- Navigation demo: 20-30 frames (10-15 actions)
+- Full workflow: 2-3 recordings of 30-50 frames each
+
+✗ BAD patterns:
+- Single recording with 200+ frames
+- Waiting for loading (adds 10+ empty frames per second)
+- Continuous scrolling (can reach 100+ frames quickly)
+- Multiple simultaneous recordings
+
+**If you hit 100 frames:**
+1. Stop recording
+2. Export current GIF
+3. Start new recording for next part
+4. Link recordings together in documentation
+
+### Timeout Management
+
+- Default timeout: 30 seconds per recording
+- If recording >100 frames: Use multiple 30-second recordings
+- Don't wait for slow loading (screenshot instead)
+- Keep actions fast (minimize waits)
 
 </execution_process>
 

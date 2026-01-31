@@ -68,34 +68,109 @@ NO ARTIFACT CREATION WITHOUT RESEARCH FIRST
 
 If you haven't executed the research protocol, you cannot proceed with artifact creation.
 
+## Query Limits (IRON LAW)
+
+```
+3-5 QUERIES MAXIMUM PER RESEARCH TASK
+```
+
+Exceeding this limit causes:
+- Memory exhaustion (reports >10 KB → context window overflow)
+- Information overload (can't process 10+ sources effectively)
+- Diminishing returns (quality > quantity)
+
+**Query Budget by Complexity:**
+- **Simple research** (fact-checking, version checking): 3 queries
+- **Medium research** (feature comparison, implementation patterns): 4 queries
+- **Complex research** (comprehensive best practices, ecosystem overview): 5 queries
+
+**NEVER:**
+- Execute >5 queries in a single research session
+- Execute unbounded "research everything" queries
+- Combine multiple unrelated research topics in one session
+
+**Multi-Phase Pattern:** If research requires >5 queries, split into multiple research sessions (see "Multi-Phase Research Pattern" below).
+
+---
+
+## Report Size Limit (IRON LAW)
+
+```
+10 KB MAXIMUM PER RESEARCH REPORT
+```
+
+**Why 10 KB?**
+- Context efficiency (10 KB = ~2500 words = readable in one context window)
+- Forces prioritization (include only essential findings)
+- Prevents "encyclopedia syndrome" (copying entire articles)
+
+**Format Requirements:**
+- Use bullet points (compact)
+- Reference URLs instead of copying content
+- Summarize findings in <3 sentences per source
+- Remove noise, keep essentials
+
+**When approaching 10 KB:**
+1. Stop adding new sources
+2. Consolidate duplicates
+3. Remove redundant details
+4. Focus on unique insights
+
+**For complex topics:**
+- Split into 2-3 mini-reports (each <10 KB)
+- Each focused on one aspect
+- Link reports together in summary
+
+---
+
 ## MANDATORY Research Protocol
 
-### Step 1: Define Research Scope
+### Step 1: Define Research Scope & Plan Queries
 
-Before executing queries, clearly define:
+Before executing queries, define scope AND plan query budget:
 
 ```markdown
 ## Research Scope Definition
 
 **Artifact Type**: [agent | skill | workflow | hook | schema | template]
 **Domain/Capability**: [What this artifact will do]
-**Key Questions**:
 
+**Complexity Assessment**:
+- [ ] Simple (fact-checking, version checking) → 3 queries
+- [ ] Medium (feature comparison, implementation patterns) → 4 queries
+- [ ] Complex (comprehensive best practices, ecosystem overview) → 5 queries
+
+**Planned Queries** (list 3-5 BEFORE executing):
+1. [Query 1: Best practices - specific question]
+2. [Query 2: Implementation patterns - specific question]
+3. [Query 3: Framework/AI-specific - specific question]
+4. [Optional Query 4: Security/performance - specific question]
+5. [Optional Query 5: Trade-offs/alternatives - specific question]
+
+**Key Questions**:
 1. What are the best practices for this domain?
 2. What implementation patterns exist?
 3. What tools/frameworks should be used?
 4. What are the common pitfalls?
 
 **Existing Patterns to Examine**:
-
 - .claude/[category]/ - Similar artifacts
 - .claude/templates/ - Relevant templates
 - .claude/schemas/ - Validation patterns
 ```
 
-### Step 2: Execute Research Queries (Minimum 3)
+**Pre-Research Checklist:**
+```
+[ ] Complexity assessed (3, 4, or 5 queries planned)
+[ ] Queries planned BEFORE executing (prevents scope creep)
+[ ] Each query is specific (not "research everything about X")
+[ ] Report size target set (<10 KB)
+[ ] Multi-phase split considered (if >5 queries needed)
+```
 
-Execute at least 3 research queries using available tools.
+### Step 2: Execute Research Queries (3-5 Maximum)
+
+Execute **exactly 3-5** research queries (no more). More queries = memory exhaustion and context loss.
 
 **Query 1: Best Practices**
 
@@ -142,18 +217,11 @@ WebSearch({
 });
 ```
 
-**Additional Queries (As Needed)**
-
-```javascript
-// Security considerations
-WebSearch({ query: '{domain} security vulnerabilities mitigations' });
-
-// Performance patterns
-WebSearch({ query: '{domain} performance optimization techniques' });
-
-// Error handling
-WebSearch({ query: '{domain} error handling best practices' });
-```
+**Query Efficiency Tips:**
+- Prefer 2-3 high-quality queries over 10 generic ones
+- Combine related questions in one query ("X best practices + implementation patterns")
+- Use WebFetch for known authoritative sources (faster, more focused)
+- Stop when you have enough unique insights (quality > quantity)
 
 ### Step 3: Analyze Existing Codebase
 
@@ -344,18 +412,87 @@ After completing research, provide this handoff to the creator skill:
 **Confidence Level**: High/Medium/Low
 ```
 
+## Multi-Phase Research Pattern (for complex topics)
+
+When research complexity **exceeds 5 queries**, split into phases:
+
+**Phase 1: Scope & Definition (2 queries)**
+- What is the topic/technology?
+- What are the key concepts?
+
+**Phase 2: Implementation (2 queries)**
+- How do experts implement this?
+- Common patterns & best practices?
+
+**Phase 3: Comparison & Trade-offs (1 query)**
+- How does this compare to alternatives?
+- Trade-offs & gotchas?
+
+**Benefits:**
+- Each phase is independent (less context bleed)
+- Can be done in separate skill invocations
+- Clearer organization
+- Easier to reuse findings
+
+**Example:**
+```
+Session 1: Research "Rust async/await" (Phase 1: 2 queries)
+Session 2: Research "Tokio patterns" (Phase 2: 2 queries)
+Session 3: Research "async-trait vs manual impl" (Phase 3: 1 query)
+```
+
+---
+
+## Memory-Aware Chunking Examples
+
+**GOOD - Focused query + chunked report:**
+```
+Query: "Rust async/await best practices 2026"
+Report structure:
+- Definition (100 words)
+- Pattern 1: Tokio (200 words)
+- Pattern 2: async-trait (150 words)
+- Gotchas (100 words)
+- Links (10 sources)
+---Total: ~550 words, ~3 KB
+```
+
+**BAD - Unbounded research:**
+```
+Query: "everything about Rust ecosystem 2026"
+Report: 50 sources, 15 KB (truncated by context limit)
+---Can't use findings without context loss
+```
+
+**GOOD - Phased approach:**
+```
+Phase 1 Report: Rust async fundamentals (3 KB)
+Phase 2 Report: Tokio implementation patterns (4 KB)
+Phase 3 Report: Performance comparison (2 KB)
+---Total: 9 KB across 3 sessions (all usable)
+```
+
+**BAD - Single massive report:**
+```
+Single Report: Comprehensive Rust async guide (25 KB)
+---Truncated to 10 KB, missing critical sections
+```
+
+---
+
 ## Quality Gate
 
 Research is complete when ALL items pass:
 
 ```
-[ ] Minimum 3 research queries executed
+[ ] 3-5 research queries executed (NO MORE THAN 5)
 [ ] At least 3 external sources consulted (URLs or authoritative names)
 [ ] Existing codebase patterns documented (at least 2 similar artifacts)
 [ ] ALL design decisions have rationale AND source
 [ ] Risk assessment completed (at least 3 risks with mitigations)
 [ ] Recommended implementation path documented
 [ ] Report saved to output location
+[ ] Report size <10 KB (check file size before saving)
 ```
 
 **BLOCKING**: If any item fails, research is INCOMPLETE. Do not proceed to artifact creation.
@@ -501,19 +638,25 @@ This skill integrates with the Creator Ecosystem:
    - Skip research = uninformed decisions = bugs and rework
    - Research ALWAYS precedes creation
 
-2. NO RESEARCH WITHOUT QUERIES
-   - Minimum 3 queries from different angles
-   - Thinking != research. Execute the queries.
+2. NO MORE THAN 5 QUERIES PER RESEARCH SESSION
+   - Execute exactly 3-5 queries (no more)
+   - >5 queries = memory exhaustion, context loss
+   - If need more → split into multi-phase research
 
-3. NO SYNTHESIS WITHOUT CODEBASE ANALYSIS
+3. NO RESEARCH REPORTS >10 KB
+   - Maximum 10 KB per report (~2500 words)
+   - Exceeding limit → context window overflow
+   - Use bullet points, reference URLs, summarize findings
+
+4. NO SYNTHESIS WITHOUT CODEBASE ANALYSIS
    - External research is necessary but not sufficient
    - MUST examine existing patterns for consistency
 
-4. NO DECISIONS WITHOUT RATIONALE
+5. NO DECISIONS WITHOUT RATIONALE
    - Every decision needs a source
    - "I think" is not a source. Link to evidence.
 
-5. NO PROCEEDING WITHOUT QUALITY GATE
-   - All checklist items must pass
+6. NO PROCEEDING WITHOUT QUALITY GATE
+   - All checklist items must pass (including query/size limits)
    - BLOCKING: Incomplete research = no creation
 ```

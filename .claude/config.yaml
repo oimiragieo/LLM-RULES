@@ -77,6 +77,34 @@ features:
     costBudget: 10.0 # Budget for elicitation queries (USD)
     minConfidence: 0.7 # Skip if confidence below threshold
 
+# --- Memory Management (Token Budget Framework) ---
+memory_management:
+  # Token budget defaults per model
+  token_budgets:
+    haiku: 200000    # Max tokens per haiku-based agent
+    sonnet: 200000   # Max tokens per sonnet-based agent
+    opus: 200000     # Max tokens per opus-based agent
+
+  # Token tracking config
+  token_tracking:
+    enabled: true
+    char_to_token_ratio: 0.75  # 1 char ≈ 0.75 tokens
+    warn_threshold: 0.90        # Warn at 90% budget
+    warn_message: "Agent approaching token limit - consider compression"
+    log_format: "jsonl"         # Save to .claude/context/token-usage.jsonl
+
+  # Budget calculation config
+  budget_calculation:
+    include_prompt: true        # Count prompt tokens
+    include_tool_results: true  # Count tool result tokens
+    include_context: true       # Count context tokens
+
+  # Auto-compression config (Phase 3)
+  auto_compression:
+    enabled: false              # Phase 3: Enable after testing
+    trigger_threshold: 0.90     # Compress at 90% budget
+    max_compressions_per_session: 5
+
 # --- Core Agents Definition (Pointers) ---
 agents:
   planner:

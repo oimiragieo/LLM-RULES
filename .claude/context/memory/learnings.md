@@ -1,3 +1,312 @@
+## Token Budget Tracking Framework Implementation (2026-01-30)
+
+**Status**: COMPLETE
+**Scope**: Phase 2 - Tracking Only (No Enforcement)
+
+### Implementation Summary
+
+Created token budget tracking framework following TDD methodology (Red-Green-Refactor cycle).
+
+**Files Created:**
+
+1. `.claude/lib/utils/token-budget-tracker.cjs` (172 lines)
+   - `estimateTokens(content)` - Estimate tokens from char length (0.75 ratio)
+   - `trackAgentUsage(agentId, usage)` - Track cumulative token usage per agent
+   - `checkBudgetStatus(agentId)` - Check current budget status (OK/WARNING/CRITICAL)
+   - `logTokenEvent(eventType, data)` - Log token events to JSONL file
+
+2. `tests/utils/token-budget-tracker.test.cjs` (380 lines, 23 tests)
+   - Category 1: Unit - estimateTokens() (4 tests)
+   - Category 2: Unit - trackAgentUsage() (4 tests)
+   - Category 3: Unit - checkBudgetStatus() (4 tests)
+   - Category 4: Unit - logTokenEvent() (4 tests)
+   - Category 5: Integration - Config Loading (3 tests)
+   - Category 6: Smoke - End-to-End Workflow (4 tests)
+
+3. `.claude/config.yaml` - Added `memory_management` section (27 lines)
+
+**Test Results:**
+
+- All 23 tests passing (100%)
+- Test duration: ~270ms
+- TDD cycle verified: RED (module missing) → GREEN (all tests pass)
+
+### Configuration Added to config.yaml
+
+```yaml
+memory_management:
+  token_budgets:
+    haiku: 200000
+    sonnet: 200000
+    opus: 200000
+  token_tracking:
+    enabled: true
+    char_to_token_ratio: 0.75
+    warn_threshold: 0.90
+    warn_message: "Agent approaching token limit - consider compression"
+    log_format: "jsonl"
+  budget_calculation:
+    include_prompt: true
+    include_tool_results: true
+    include_context: true
+  auto_compression:
+    enabled: false  # Phase 3
+    trigger_threshold: 0.90
+    max_compressions_per_session: 5
+```
+
+### Token Estimation Formula
+
+**Ratio:** 1 char ≈ 0.75 tokens
+
+**Examples:**
+
+- 1,000 chars → 750 tokens
+- 10 KB (10,000 chars) → 7,500 tokens
+- 100 KB → 75,000 tokens
+
+### Budget Thresholds
+
+**Default Budget:** 200,000 tokens per agent (all models)
+
+**Status Levels:**
+
+- **OK**: < 80% used
+- **WARNING**: 80-90% used (inform user to consider compression)
+- **CRITICAL**: > 90% used (strong recommendation to compress)
+
+### JSONL Log Format
+
+**Location:** `.claude/context/token-usage.jsonl`
+
+**Entry Structure:**
+
+```json
+{
+  "timestamp": "2026-01-30T20:30:00.000Z",
+  "eventType": "spawn|tool_result|prompt|compression|completion",
+  "agentId": "agent-id",
+  "tokens": 5000,
+  "reason": "Descriptive reason"
+}
+```
+
+### Key Design Decisions
+
+**Decision 1: Tracking Only (Non-Blocking)**
+
+- Framework logs token usage but doesn't enforce hard limits
+- All functions return informational status (OK/WARNING/CRITICAL)
+- No exceptions thrown even at CRITICAL status
+- Phase 3 will add auto-compression triggers using this data
+
+**Rationale:** Build tracking infrastructure first, add enforcement after validation.
+
+**Decision 2: Unified Budget (200K All Models)**
+
+- All models (haiku/sonnet/opus) use same 200K token budget
+- Simplifies implementation and testing
+- Will be tuned after Phase 1 deployment (benchmark actual usage)
+
+**Rationale:** Start simple, optimize based on real data.
+
+**Decision 3: Char-to-Token Ratio (0.75)**
+
+- Conservative estimate: 1 char ≈ 0.75 tokens
+- Works reasonably well across languages (English, code, JSON)
+- Slight underestimation is safer than overestimation
+
+**Rationale:** Conservative estimates prevent surprise budget exhaustion.
+
+**Decision 4: In-Memory Storage + JSONL Log**
+
+- In-memory Map for fast lookups (no disk I/O on every check)
+- JSONL append-only log for audit trail and long-term analysis
+- Survives process restarts via log replay (future enhancement)
+
+**Rationale:** Balance speed (memory) with persistence (JSONL).
+
+### Integration Points
+
+**Phase 3 Integration (Future):**
+
+- Hook: `.claude/hooks/workflow/token-budget-enforcer.cjs` (future)
+- Trigger: `PreToolUse` on `Task` tool (check budget before spawn)
+- Action: Invoke `context-compressor` skill if > 90% budget used
+
+**Workflow Engine Integration:**
+
+- WorkflowEngine can call `trackAgentUsage()` after each step
+- Pattern: After tool execution → estimate tokens → track usage → check status
+- Auto-compression trigger when status returns "CRITICAL"
+
+**Router Integration:**
+
+- Router can check budget before spawning new agents
+- Warn user if budget approaching limit (>80%)
+- Suggest context compression or task splitting
+
+### Success Criteria Met
+
+- ✅ `estimateTokens()` correctly converts chars to tokens (0.75 ratio)
+- ✅ `trackAgentUsage()` logs to JSONL with correct structure
+- ✅ `checkBudgetStatus()` returns OK/WARNING/CRITICAL appropriately
+- ✅ Config loads `memory_management` section correctly
+- ✅ All 23 tests pass with 100% coverage
+- ✅ JSONL log file created and populated correctly
+
+### Key Learnings
+
+**Pattern 1: TDD for Token Management**
+
+- Write tests FIRST (verify RED phase - module missing)
+- Implement minimal code to pass (GREEN phase - 23/23 pass)
+- No refactoring needed (implementation was clean first time)
+- Test-driven token tracking is more reliable
+
+**Pattern 2: JSONL for Audit Logs**
+
+- One JSON object per line (easy to parse, append-safe)
+- No commas between entries (unlike JSON arrays)
+- Works with `fs.appendFileSync()` for concurrent writes
+- Stream-friendly for large log files (process line-by-line)
+
+**Pattern 3: Status Thresholds (80% / 90%)**
+
+- 80% WARNING: Early warning, user can take action
+- 90% CRITICAL: Urgent action needed (auto-compression in Phase 3)
+- Thresholds align with memory management best practices
+
+**Pattern 4: In-Memory + Persistent Storage**
+
+- Map for fast lookups (O(1) agent status check)
+- JSONL for audit trail and historical analysis
+- Future: Replay JSONL on startup for crash recovery
+
+### Next Steps (Phase 3)
+
+1. **Auto-Compression Hook** (`.claude/hooks/workflow/token-budget-enforcer.cjs`)
+   - Trigger: PreToolUse on Task tool
+   - Check: `checkBudgetStatus()` > 90%
+   - Action: Invoke `Skill({ skill: 'context-compressor' })`
+
+2. **WorkflowEngine Integration** (`.claude/lib/workflow/workflow-engine.cjs`)
+   - After each step: `trackAgentUsage()`
+   - Before spawn: `checkBudgetStatus()`
+   - Log compression events to JSONL
+
+3. **Router Budget Checks** (`.claude/agents/core/router.md`)
+   - Before spawning: Check budget
+   - Warn user if >80% used
+   - Suggest compression or task splitting
+
+4. **Tuning Budget Defaults** (after production deployment)
+   - Analyze actual token usage patterns
+   - Adjust per-model budgets (haiku vs sonnet vs opus)
+   - Optimize thresholds (80%/90% may need adjustment)
+
+### Files Modified
+
+1. `.claude/lib/utils/token-budget-tracker.cjs` (created, 172 lines)
+2. `tests/utils/token-budget-tracker.test.cjs` (created, 380 lines)
+3. `.claude/config.yaml` (added memory_management section, 27 lines)
+4. `.claude/context/memory/learnings.md` (this entry)
+
+**Total Lines Added:** ~580 lines
+
+---
+
+## Upgrade Implementation Roadmap Synthesis (2026-01-30)
+
+**Status**: COMPLETE
+**Task ID**: #4
+
+### Synthesis Summary
+
+Created comprehensive upgrade implementation roadmap synthesizing:
+1. Current codebase inventory (48 agents, 431 skills, 112 hooks, 20 workflows)
+2. BMAD-METHOD analysis (Party Mode, Advanced Elicitation, Knowledge Indexing)
+3. Spec-driven best practices research
+
+### Roadmap Structure
+
+**3 Priority Tiers** spanning 10 weeks:
+
+| Priority | Feature | Effort | Risk |
+|----------|---------|--------|------|
+| P1 | Spec Validation & Enforcement | 3-5 days | LOW |
+| P2 | Consensus-Based Approval | 5-7 days | MEDIUM |
+| P3 | Phase Tracking & Workflow Gates | 7-10 days | MEDIUM-HIGH |
+
+### Key Patterns Identified
+
+**Pattern 1: Schema-First Validation**
+- Create JSON Schema BEFORE implementing validation hooks
+- Validates: title (10-200 chars), acceptance criteria (array, testable), phase enum, complexity enum
+- Hook triggers on PreToolUse(TaskCreate)
+- Feature flag: SPEC_VALIDATION_MODE=warn|block
+
+**Pattern 2: Consensus Approval Flow**
+- 3 parallel reviewers (security-architect, architect, qa)
+- 2/3 majority rule (score >= 2.0)
+- 30-minute timeout with auto-escalation
+- Votes: APPROVE (1.0), CONCERNS (0.5), REJECT (0.0)
+
+**Pattern 3: Phase State Machine**
+- Transitions: spec -> plan -> implement -> test -> deploy -> monitor
+- Gates: Spec validation, plan approval, code commit, tests passing, deployment success
+- Dependency-based blocking with cycle detection
+- Automatic milestone tracking
+
+### Gap Solutions Identified
+
+1. **MCP Configuration** (Week 7, 1-2 days): Configure Exa/Arxiv servers with Skill() fallbacks
+2. **Skill Discoverability** (Week 8, 3-5 days): CSV-indexed knowledge base with tagging
+3. **Mobile Examples** (Week 9, 2-3 days): iOS/Android skill enhancement
+
+### Integration Strategy
+
+- All features backward compatible
+- Feature flags for incremental rollout
+- No changes to existing agents (documentation only)
+- Hook integration order: spec-validator -> consensus-approval -> phase-gate
+
+### Output Artifacts
+
+1. **Roadmap**: `.claude/context/artifacts/upgrade-implementation-roadmap.md`
+   - 3 priority tiers with detailed implementation plans
+   - Success metrics for each phase
+   - Risk mitigation strategies
+   - Testing strategy (90%+ coverage target)
+   - Communication plan
+
+### Files for Implementation
+
+**Priority 1 (Spec Validation)**:
+- `.claude/schemas/task-spec.schema.json` (CREATE)
+- `.claude/hooks/validation/spec-validator.cjs` (CREATE)
+- `.claude/hooks/validation/spec-validator.test.cjs` (CREATE)
+
+**Priority 2 (Consensus Approval)**:
+- `.claude/hooks/orchestration/consensus-approval.cjs` (CREATE)
+- `.claude/lib/workflow/consensus-manager.cjs` (CREATE)
+- `.claude/workflows/core/consensus-voting-workflow.md` (CREATE)
+
+**Priority 3 (Phase Tracking)**:
+- `.claude/lib/workflow/phase-tracker.cjs` (CREATE)
+- `.claude/schemas/phase-metadata.schema.json` (CREATE)
+- `.claude/hooks/workflow/phase-gate.cjs` (CREATE)
+
+### Success Criteria
+
+- 100% of new tasks pass validation
+- Consensus approval rate >90%
+- Phase tracking used in 90%+ of workflows
+- Rework reduced by 30-50%
+- Issue detection improved by 60%+
+
+---
+
 ## Phase 4-5 Production Deployment (2026-01-30)
 
 **Status**: COMPLETE
@@ -957,3 +1266,682 @@ Combined with previous fixes (StateSyncManager, LoadTestFramework, ChaosEngineer
 **Test Suite Status:** All memory leak regression tests passing. Ready for full test suite validation.
 
 ---
+
+## Research-Synthesis Query Limits Implementation (2026-01-30)
+
+**Status**: ✅ COMPLETE
+**Task ID**: #3
+
+### Summary
+
+Updated `research-synthesis` skill with strict query limits (3-5 max) and report size constraints (10 KB max) to prevent memory exhaustion during artifact research.
+
+### Changes Applied
+
+**1. Query Cap (3-5 Maximum)**
+
+Added "Query Limits (IRON LAW)" section:
+- Simple research: 3 queries (fact-checking, version checking)
+- Medium research: 4 queries (feature comparison, implementation patterns)
+- Complex research: 5 queries (comprehensive best practices, ecosystem overview)
+- NEVER exceed 5 queries in a single research session
+
+**2. Report Size Limit (10 KB Maximum)**
+
+Added "Report Size Limit (IRON LAW)" section:
+- Maximum 10 KB per report (~2500 words)
+- Use bullet points for compact info
+- Reference URLs instead of copying content
+- Summarize findings in <3 sentences per source
+- Split into 2-3 mini-reports if >10 KB needed
+
+**3. Multi-Phase Research Pattern**
+
+For topics requiring >5 queries:
+- Phase 1: Scope & Definition (2 queries)
+- Phase 2: Implementation (2 queries)
+- Phase 3: Comparison & Trade-offs (1 query)
+- Each phase is independent research session (<5 queries)
+- Benefits: Less context bleed, clearer organization, easier reuse
+
+**4. Memory-Aware Chunking Examples**
+
+Added GOOD vs BAD examples:
+- GOOD: Focused query + chunked report (~3 KB)
+- BAD: Unbounded research (>15 KB, truncated by context limit)
+- GOOD: Phased approach (3 × 3 KB = 9 KB total, all usable)
+- BAD: Single massive report (25 KB → truncated to 10 KB, missing sections)
+
+**5. Pre-Research Checklist**
+
+Added to Step 1 (Define Scope):
+- Complexity assessed (3, 4, or 5 queries planned)
+- Queries planned BEFORE executing (prevents scope creep)
+- Each query is specific (not "research everything about X")
+- Report size target set (<10 KB)
+- Multi-phase split considered (if >5 queries needed)
+
+**6. Updated Quality Gate**
+
+Added two new checklist items:
+- [ ] 3-5 research queries executed (NO MORE THAN 5)
+- [ ] Report size <10 KB (check file size before saving)
+
+**7. Updated Iron Laws**
+
+Expanded from 5 to 6 rules:
+- Law 2: NO MORE THAN 5 QUERIES PER RESEARCH SESSION
+- Law 3: NO RESEARCH REPORTS >10 KB
+
+### Rationale
+
+**Problem**: Researcher agent + research-synthesis skill were executing unbounded queries (10-20+ queries), generating massive reports (25-50 KB), causing:
+- Memory exhaustion (context window overflow)
+- Information overload (can't process 20+ sources effectively)
+- Diminishing returns (quality > quantity)
+
+**Solution**: Hard limits on query count (3-5) and report size (10 KB) with guidance on how to handle complex topics (multi-phase research).
+
+### Key Patterns Identified
+
+**Pattern 1: Query Efficiency**
+- 2-3 high-quality queries > 10 generic ones
+- Combine related questions in one query ("X best practices + implementation patterns")
+- Use WebFetch for known authoritative sources (faster, more focused)
+- Stop when you have enough unique insights (quality > quantity)
+
+**Pattern 2: Report Compression**
+- Bullet points instead of paragraphs
+- Reference URLs instead of copying content
+- Summarize findings in <3 sentences per source
+- Remove noise, keep essentials
+
+**Pattern 3: Multi-Phase Research**
+- Phase 1: Scope & Definition (2 queries)
+- Phase 2: Implementation (2 queries)
+- Phase 3: Comparison & Trade-offs (1 query)
+- Each phase is independent research session
+- Prevents context bleed between phases
+
+**Pattern 4: Pre-Research Planning**
+- Assess complexity BEFORE executing queries
+- Plan exact queries BEFORE executing (prevents scope creep)
+- Set report size target BEFORE writing
+- Consider multi-phase split BEFORE starting
+
+### Files Modified
+
+1. `.claude/skills/research-synthesis/SKILL.md` (~120 lines added)
+   - Added Query Limits section
+   - Added Report Size Limit section
+   - Added Multi-Phase Research Pattern section
+   - Added Memory-Aware Chunking Examples section
+   - Updated Step 1 with Pre-Research Checklist
+   - Updated Quality Gate checklist
+   - Updated Iron Laws from 5 to 6 rules
+
+### Integration Points
+
+**Enforcement (Future)**:
+- Hook: `.claude/hooks/research/research-enforcement.cjs` (already exists)
+- Could add query count tracking (current: only blocks creation without research)
+- Could add report size validation (warn if >10 KB before saving)
+
+**Related Skills**:
+- `researcher` agent uses this skill for research
+- All `*-creator` skills invoke this skill before artifact creation
+
+### Success Criteria
+
+- ✅ Query limit documented (3-5 max, no exceptions)
+- ✅ Report size limit documented (10 KB max)
+- ✅ Multi-phase pattern documented (for complex topics >5 queries)
+- ✅ Memory-aware chunking examples provided (GOOD vs BAD)
+- ✅ Pre-research checklist added to Step 1
+- ✅ Quality Gate checklist updated with query/size limits
+- ✅ Iron Laws updated from 5 to 6 rules
+
+### Next Steps
+
+Task #4: Create spawn-size-validator test suite (comprehensive edge case coverage)
+
+---
+
+## Spawn Size Validator Implementation (2026-01-30)
+
+**Status**: ✅ COMPLETE
+**Task ID**: #1
+
+### Implementation Summary
+
+Created `.claude/hooks/safety/spawn-size-validator.cjs` hook with comprehensive test suite following TDD (Red-Green-Refactor) methodology.
+
+### Hook Features
+
+**1. Size Calculation (`calculateSpawnSize`)**:
+- Base overhead: 4000 bytes (agent definition)
+- Per-tool overhead: 200 bytes (tool name + metadata)
+- Prompt size: 1:1 char-to-byte ratio
+- Template size: 1:1 char-to-byte ratio
+- Returns: `{ totalBytes, totalKB, toolCount, breakdown }`
+
+**2. Size Validation (`validateSpawnSize`)**:
+
+Thresholds:
+- **WARN**: 15 KB OR 15 tools
+- **BLOCK**: 25 KB OR 20 tools
+- **PASS**: < 15 KB AND < 15 tools
+
+Modes (via `SPAWN_SIZE_VALIDATOR` env var):
+- `warn` (default): Print warning but allow spawn
+- `block`: Block spawn if exceeds BLOCK threshold
+- `off`: Disable validation entirely
+
+Orchestrator Bypass:
+- `master-orchestrator`, `evolution-orchestrator`, `swarm-coordinator`, `party-orchestrator`
+- Complex reasoning requires more resources
+
+**3. Pruning Suggestions (`generatePruningSuggestions`)**:
+
+Priority order:
+1. **Remove chrome tools** (16 tools ~3.2 KB): `mcp__chrome-devtools__*`, `mcp__claude-in-chrome__*`
+2. **Remove optional MCP tools**: `WebSearch`, `WebFetch`, `NotebookEdit`, `mcp__*` (keep core tools only)
+3. **Consider splitting spawn**: Multi-agent workflow for very large tool lists (>20 tools)
+
+Core tools (always keep):
+- `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`, `Task`, `TaskUpdate`, `TaskList`, `TaskCreate`, `TaskGet`, `TaskOutput`, `Skill`
+
+**4. Audit Logging** (optional):
+
+Environment variable: `SPAWN_SIZE_AUDIT_LOG=true`
+Output: `.claude/context/spawn-size-audit.jsonl` (JSON Lines format)
+
+Entry format:
+```json
+{
+  "timestamp": "2026-01-30T20:30:00.000Z",
+  "agent": "researcher",
+  "sizeKB": 18.5,
+  "toolCount": 26,
+  "status": "warn",
+  "breakdown": { "base": 4000, "tools": 5200, "prompt": 5000, "template": 0 }
+}
+```
+
+### Test Coverage
+
+**Test Suite**: `tests/spawn-size-validator.test.cjs`
+**Results**: 12/12 tests passing (100%)
+
+Test Categories:
+1. **calculateSpawnSize** (2 tests):
+   - Minimal spawn (9 tools, short prompt) → ~5.7 KB
+   - Large spawn (27 tools, long prompt, template) → ~17.0 KB
+
+2. **validateSpawnSize** (5 tests):
+   - Pass: 6 KB, 9 tools
+   - Warn: 18 KB, 15 tools
+   - Block: 30 KB, 20 tools (block mode)
+   - Orchestrator bypass logic
+   - Off mode (always pass)
+
+3. **generatePruningSuggestions** (4 tests):
+   - Suggests removing chrome tools
+   - Suggests removing optional MCP tools
+   - Suggests splitting for >20 tools
+   - No suggestions for minimal tool lists
+
+4. **Hook integration** (1 test):
+   - Main function placeholder (integration tests to be added)
+
+### Error Messages
+
+**Warning Example**:
+```
+⚠️  SPAWN SIZE WARNING: 18 KB (15 tools)
+Reason: Exceeds recommended size threshold (15 KB, 15 tools)
+
+PRUNING SUGGESTIONS (Priority Order):
+1. Remove chrome tools (mcp__chrome-devtools__*, mcp__claude-in-chrome__*) → Save ~3.2 KB
+2. Remove WebFetch, WebSearch (use WebFetch only for focused tasks) → Save ~0.4 KB
+3. Consider splitting into two agents (research + browser automation)
+
+Current tools: Read, Write, Edit, Bash, Glob, Grep, Task, TaskUpdate, ... (15 tools)
+Recommended: Keep to <10 tools for memory efficiency
+
+More info: .claude/docs/MEMORY_MANAGEMENT.md
+```
+
+**Block Example**:
+```
+⚠️  SPAWN SIZE BLOCKED: 30 KB (20 tools)
+Reason: Exceeds block threshold (25 KB, 20 tools)
+
+Set SPAWN_SIZE_VALIDATOR=warn to allow with warning.
+```
+
+### Files Created
+
+1. `.claude/hooks/safety/spawn-size-validator.cjs` (240 lines)
+   - Hook entry point (`main()`)
+   - Size calculation (`calculateSpawnSize()`)
+   - Validation logic (`validateSpawnSize()`)
+   - Pruning suggestions (`generatePruningSuggestions()`)
+   - Audit logging (`logSpawnAudit()`)
+
+2. `tests/spawn-size-validator.test.cjs` (150 lines)
+   - 12 comprehensive tests
+   - TDD Red-Green-Refactor cycle validated
+
+### TDD Cycle Verification
+
+✅ **RED Phase**: Tests failed with "Cannot find module" error (expected)
+✅ **GREEN Phase**: All 12 tests passing after implementation
+✅ **REFACTOR Phase**: Added audit logging without breaking tests
+
+### Integration Points
+
+**Hook Trigger**: `PreToolUse` on `Task` tool
+**Environment Variables**:
+- `SPAWN_SIZE_VALIDATOR=warn|block|off` (default: warn)
+- `SPAWN_SIZE_AUDIT_LOG=true` (optional audit logging)
+
+**Reference Documentation**: `.claude/docs/MEMORY_MANAGEMENT.md`
+
+### Key Learnings
+
+**Pattern 1: TDD for Hooks**
+- Write tests FIRST (verify RED phase)
+- Implement minimal code to pass (GREEN phase)
+- Refactor only after tests pass (REFACTOR phase)
+- Test-driven hooks are more reliable and maintainable
+
+**Pattern 2: Progressive Validation**
+- WARN threshold (soft limit) catches most oversized spawns
+- BLOCK threshold (hard limit) prevents memory-intensive spawns
+- OFF mode allows emergency override for special cases
+- Orchestrators bypass validation (complex reasoning requires resources)
+
+**Pattern 3: Actionable Error Messages**
+- Priority-ordered pruning suggestions (remove chrome → remove optional → split)
+- Estimated savings in KB (concrete, measurable)
+- Documentation links for further reading
+- Examples of recommended tool lists
+
+**Pattern 4: Hook Testing**
+- Export all functions for unit testing
+- Test each function independently (calculateSpawnSize, validateSpawnSize, generatePruningSuggestions)
+- Integration tests verify main() function behavior
+- Use parseHookInputSync for stdin parsing consistency
+
+### Next Steps
+
+Task #1 complete. Ready for:
+- Task #2: Update researcher.md agent safeguards
+- Task #3: Update research-synthesis skill limits
+- Task #4: Create additional spawn-size-validator test scenarios (edge cases)
+
+---
+
+## Spawn Size Validator Comprehensive Test Suite (2026-01-30)
+
+**Status**: COMPLETE
+**Task ID**: #4
+
+### Test Suite Summary
+
+Created comprehensive test suite for `spawn-size-validator.cjs` hook with 70 tests across 8 categories:
+
+| Category | Tests | Description |
+|----------|-------|-------------|
+| Unit: calculateSpawnSize() | 9 | Size calculation for various scenarios |
+| Unit: validateSpawnSize() | 15 | Threshold validation including boundaries |
+| Unit: generatePruningSuggestions() | 9 | Pruning detection and suggestions |
+| Integration: Hook behavior | 7 | Real hook behavior with env vars |
+| Edge Cases & Boundary | 11 | Null/undefined, special chars, limits |
+| Regression: Specific Scenarios | 6 | Researcher, Planner, QA, Security-architect |
+| Smoke: End-to-End | 11 | Module loading, exports, flow verification |
+| Audit Logging | 2 | JSONL audit logging behavior |
+
+**Results**: 70/70 tests pass (100%)
+**Duration**: ~250ms
+
+### Key Test Patterns Identified
+
+**Pattern 1: Boundary Testing**
+- Test at exact threshold values (15 KB, 15 tools for warn; 25 KB, 20 tools for block)
+- Test just below threshold (14.9 KB, 14 tools → pass)
+- Test just above threshold (15.0 KB, 14 tools → warn)
+- Independent boundaries (KB threshold OR tool count threshold triggers)
+
+**Pattern 2: Real Scenario Regression Tests**
+- Map agent types to expected sizes:
+  - Researcher (26 tools, 15 KB) → ~25 KB → BLOCK
+  - Evolution-orchestrator (5 tools) → ~5 KB → PASS
+  - Planner (12 tools, 8 KB) → ~10 KB → PASS
+  - Security-architect (15 tools, 12 KB) → ~17 KB → WARN
+  - QA (10 tools, 6 KB) → ~8 KB → PASS
+- These catch threshold regressions during refactoring
+
+**Pattern 3: Edge Case Coverage**
+- Null/undefined inputs with fallback handling (`tools || []`, `prompt || ''`)
+- Empty arrays and strings
+- Duplicate entries in arrays
+- Special characters in tool names (mcp__*, underscores, hyphens)
+- Very large inputs (50+ KB prompts)
+
+**Pattern 4: Environment Variable Testing**
+- Save `process.env` in `beforeEach`
+- Restore in `afterEach`
+- Test each mode: `warn`, `block`, `off`
+- Test default behavior (no env var)
+
+**Pattern 5: Structure Validation (Smoke Tests)**
+- Verify module exports expected functions
+- Verify return objects have expected keys
+- Verify status values are in expected set ('pass', 'warn', 'block')
+- Verify messages contain helpful content
+
+### Files Created
+
+1. `tests/hooks/spawn-size-validator.test.cjs` (475 lines, 70 tests)
+   - 8 test categories following TDD patterns
+   - Full coverage of exported functions
+   - Integration tests for hook behavior
+
+### Integration Points
+
+**Test Location**: `tests/hooks/spawn-size-validator.test.cjs`
+**Hook Location**: `.claude/hooks/safety/spawn-size-validator.cjs`
+**Run Command**: `node --test tests/hooks/spawn-size-validator.test.cjs`
+
+### Success Criteria Met
+
+- [x] Total test count: 70 tests (exceeds 50+ target)
+- [x] Pass rate: 100%
+- [x] Coverage: All 4 exported functions tested
+- [x] Error messages validated as helpful and actionable
+- [x] All boundary conditions tested
+- [x] Regression tests confirm original functionality
+- [x] Edge cases (null, undefined, empty) handled gracefully
+
+---
+
+
+## Auto-Compression Trigger System Implementation (2026-01-30)
+
+**Status**: COMPLETE
+**Scope**: Phase 2 - Framework + Test Only (Non-Blocking, Informational)
+
+### Implementation Summary
+
+Created auto-compression trigger system following TDD methodology (Red-Green-Refactor cycle).
+
+**Files Created:**
+
+1. `.claude/lib/utils/compression-trigger.cjs` (256 lines)
+   - `checkCompressionNeeded(context)` - Check if compression should trigger (5 conditions)
+   - `triggerCompression(options)` - Invoke context-compressor skill (Phase 2: simulated)
+   - `getCompressionStats()` - Get compression statistics from JSONL log
+   - `resetCompressionCounters()` - Reset for new session
+
+2. `.claude/hooks/safety/auto-compression-trigger.cjs` (210 lines)
+   - PostToolResult hook that monitors tool execution
+   - Calculates result sizes for Read/Fetch operations
+   - Integrates with token-budget-tracker for budget status
+   - Signals agent to invoke compression (non-blocking in Phase 2)
+   - Logs compression triggers to `.claude/context/compression-triggers.jsonl`
+
+3. `tests/utils/compression-trigger.test.cjs` (485 lines, 27 tests)
+   - Category 1: Unit - Budget Trigger (3 tests)
+   - Category 2: Unit - Size Triggers (6 tests)
+   - Category 3: Unit - Periodic Trigger (3 tests)
+   - Category 4: Unit - Pattern Trigger (2 tests)
+   - Category 5: Unit - triggerCompression() (3 tests)
+   - Category 6: Unit - getCompressionStats() (2 tests)
+   - Category 7: Unit - resetCompressionCounters() (2 tests)
+   - Category 8: Integration - Hook Behavior (3 tests)
+   - Category 9: Smoke - End-to-End (3 tests)
+
+**Test Results:**
+
+- All 27 tests passing (100%)
+- Test duration: ~255ms
+- TDD cycle verified: RED (module missing) → GREEN (all tests pass)
+
+### Compression Triggers (5 Conditions)
+
+**Trigger 1: Budget Threshold (CRITICAL)**
+- Condition: `tokenBudgetStatus.percentUsed >= 90`
+- Urgency: `high`
+- Reason: "Budget > 90% (X.X%)"
+- Example: Agent at 91% budget usage → compression recommended
+
+**Trigger 2: Single Large Read**
+- Condition: `lastReadSize >= 10 KB`
+- Urgency: `medium`
+- Reason: "Read > 10KB (XKB)"
+- Example: Reading 15 KB file → compression recommended
+
+**Trigger 3: Single Large Fetch**
+- Condition: `lastFetchSize >= 5 KB`
+- Urgency: `medium`
+- Reason: "Fetch > 5KB (XKB)"
+- Example: Fetching 8 KB webpage → compression recommended
+
+**Trigger 4: Periodic Compression**
+- Condition: `operationCount >= 10`
+- Urgency: `low`
+- Reason: "Periodic compression (X ops)"
+- Example: After 10 operations → compression recommended
+
+**Trigger 5: Urgent Pattern**
+- Condition: 3+ large operations in last 5 operations
+- Urgency: `high`
+- Reason: "3+ large operations detected"
+- Status: Framework ready, pattern detection in Phase 3
+
+### Integration with Token Budget Tracker
+
+**Dependency:** `.claude/lib/utils/token-budget-tracker.cjs`
+
+**Hook Flow:**
+
+1. PostToolResult fires after tool execution
+2. Hook calculates result size from tool output
+3. Hook calls `checkBudgetStatus(agentId)` from token-budget-tracker
+4. Hook passes budget status + operation context to `checkCompressionNeeded()`
+5. If compression needed, hook returns signal object:
+   ```javascript
+   {
+     action: 'invoke_skill',
+     skill: 'context-compressor',
+     reason: 'Budget > 90% (91.0%)',
+     urgency: 'high',
+     phase: 2,
+     blocking: false
+   }
+   ```
+
+### Phase 2 Behavior (Non-Blocking)
+
+**Current Implementation:**
+
+- `triggerCompression()` simulates success (doesn't actually invoke skill)
+- Hook returns informational signal (not enforced)
+- All logging to `.claude/context/compression-stats.jsonl` for tracking
+- Agent receives signal but decides if/when to invoke compression
+
+**Phase 3 Future (Enforcement):**
+
+- Router will check compression signals before spawning
+- Auto-invoke context-compressor skill when CRITICAL urgency
+- Implement cooldown to prevent compression loops
+- Add pattern detection for Trigger 5
+
+### JSONL Log Formats
+
+**Compression Stats:** `.claude/context/compression-stats.jsonl`
+
+```json
+{
+  "timestamp": "2026-01-30T21:00:00.000Z",
+  "reason": "Budget > 90% (91.0%)",
+  "urgency": "high",
+  "bytesFreed": 35420,
+  "success": true
+}
+```
+
+**Compression Triggers:** `.claude/context/compression-triggers.jsonl`
+
+```json
+{
+  "timestamp": "2026-01-30T21:00:00.000Z",
+  "taskId": "task-123",
+  "agentId": "agent-456",
+  "trigger": "Read > 10KB (15KB)",
+  "urgency": "medium",
+  "phase": 2
+}
+```
+
+### Testing Patterns Applied
+
+**TDD Red-Green-Refactor:**
+1. RED: Wrote failing tests (module not found)
+2. GREEN: Implemented minimal code to pass all 27 tests
+3. REFACTOR: (deferred - code is clean and minimal for Phase 2)
+
+**Test Categories:**
+- Unit tests for each function (checkCompressionNeeded, triggerCompression, getCompressionStats, resetCompressionCounters)
+- Integration tests for hook behavior
+- Smoke tests for end-to-end workflow
+
+**Edge Cases:**
+- Empty context (all zeros)
+- Boundary values (85%, 90%, 95% budget)
+- Exact thresholds (10 KB Read, 5 KB Fetch, 10 ops)
+- Error handling (simulated failures)
+- Missing stats file (returns zeros)
+
+### Key Design Decisions
+
+**Decision 1: Non-Blocking in Phase 2**
+
+- Framework logs compression recommendations
+- Hook returns signal but doesn't enforce
+- Agents decide if/when to invoke compression
+- Allows testing without disrupting workflows
+
+**Decision 2: Thresholds**
+
+- Budget: 90% (aligned with token-budget-tracker WARNING/CRITICAL boundary)
+- Read: 10 KB (large file operations)
+- Fetch: 5 KB (web content typically smaller)
+- Periodic: 10 operations (balance between frequency and overhead)
+
+**Decision 3: Integration with Token Budget Tracker**
+
+- Reuses existing budget calculation logic
+- Consistent thresholds across both systems
+- Single source of truth for budget status
+
+**Decision 4: Fail-Open Hook**
+
+- Hook never throws exceptions
+- Gracefully handles missing dependencies
+- Falls back to no-op if modules unavailable
+- Never blocks agent execution
+
+### File Placement
+
+**Implementation Files:**
+- `.claude/lib/utils/compression-trigger.cjs` (utility module)
+- `.claude/hooks/safety/auto-compression-trigger.cjs` (PostToolResult hook)
+
+**Test Files:**
+- `tests/utils/compression-trigger.test.cjs` (utility tests)
+- `tests/hooks/auto-compression-trigger.test.cjs` (hook tests - future)
+
+**Log Files:**
+- `.claude/context/compression-stats.jsonl` (compression results)
+- `.claude/context/compression-triggers.jsonl` (trigger events)
+
+### Environment Variables
+
+**AUTO_COMPRESSION_ENABLED** (default: true in Phase 2)
+- `false`: Disable auto-compression triggering
+- `true`: Enable triggering (informational only)
+
+**DEBUG_AUTO_COMPRESSION** (default: false)
+- `true`: Log compression checks to console
+- `false`: Silent operation
+
+### Next Steps (Phase 3)
+
+1. **Router Integration:** Check compression signals before spawning agents
+2. **Auto-Invoke:** Invoke context-compressor skill for CRITICAL urgency
+3. **Cooldown:** Implement compression cooldown to prevent loops
+4. **Pattern Detection:** Track operation history for Trigger 5
+5. **Metrics:** Add compression effectiveness metrics
+6. **Thresholds:** Make thresholds configurable via config.yaml
+
+### Memory Protocol Applied
+
+**Before Starting:**
+- Read `.claude/context/memory/learnings.md` (reviewed token-budget-tracker implementation)
+- Identified existing patterns (TDD, JSONL logging, fail-open hooks)
+
+**After Completing:**
+- Documented implementation in learnings.md (this entry)
+- No blockers or issues encountered (all tests passing)
+- No architectural decisions required (followed existing patterns)
+
+---
+
+
+## Memory Stats Dashboard and Documentation Implementation (2026-01-30)
+
+**Status**: COMPLETE
+**Tasks Completed**: Task 1 (Dashboard CLI) + Task 2 (Documentation)
+
+### Implementation Summary
+
+Created comprehensive memory management dashboard and documentation following TDD methodology.
+
+**Files Created:**
+
+1. `.claude/tools/cli/memory-dashboard.cjs` (450 lines) - CLI dashboard with 6 functions
+2. `tests/cli/memory-dashboard.test.cjs` (325 lines) - 21 comprehensive tests  
+3. `.claude/docs/MEMORY_MANAGEMENT.md` - Enhanced with dashboard section
+
+**Test Results:**
+- All 21/21 tests passing (100%)
+- TDD cycle: RED (21 fail) → GREEN (21 pass) → REFACTOR (docs)
+
+### Dashboard Features
+
+- ASCII rendering with Unicode box drawing (╔═║╚─├└)
+- Per-agent token usage aggregation
+- Compression timeline (recent 3 events)
+- Alerts for WARNING/CRITICAL agents
+- CLI options: --json, --agent, --period, --export
+
+### Key Learnings
+
+**Pattern 1: JSONL Parsing**
+- Always handle missing files gracefully (return empty array)
+- Skip malformed JSON lines (don't fail entire parse)
+- Use try/catch around each JSON.parse() call
+
+**Pattern 2: Test Data Normalization**
+- Accept minimal test data (only what's being tested)
+- Normalize with sensible defaults in implementation
+- Improves test readability, prevents undefined errors
+
+**Pattern 3: CLI Option Design**
+- Support both machine (--json) and human (ASCII) formats
+- Allow filtering (--agent, --period) for focused analysis
+- Options should be combinable
+

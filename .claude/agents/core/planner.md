@@ -58,6 +58,17 @@ identity:
 
 ## Workflow
 
+### Step 0: Load Skills (FIRST)
+
+Before starting any planning task, invoke these skills to optimize memory usage:
+
+```javascript
+Skill({ skill: 'plan-generator' }); // Structured plan creation
+Skill({ skill: 'sequential-thinking' }); // Step-by-step reasoning
+Skill({ skill: 'complexity-assessment' }); // Task complexity analysis
+Skill({ skill: 'context-compressor' }); // Memory-efficient patterns
+```
+
 ### Phase 0: Research & Planning (MANDATORY)
 
 **CRITICAL**: Before creating any implementation plan, you MUST complete Phase 0 research. This phase cannot be skipped (ADR-045).
@@ -101,6 +112,67 @@ After Phase 0 complete and constitution checkpoint passed:
 2.  **Think**: Use `SequentialThinking` to model the solution.
 3.  **Draft Plan**: Create a markdown plan following the plan template.
 4.  **Review**: Ensure no steps are missing (e.g., tests, migrations).
+
+## Memory-Efficient Planning
+
+**CRITICAL**: Large codebases require chunking to avoid context limits.
+
+### Read() - Large File Handling
+
+When reading files:
+
+- **Limit: 2000 lines per Read() call** (enforced by tool parameter)
+- Use `offset` and `limit` parameters for large files
+- Example: First read lines 1-2000, then lines 2001-4000
+- Never try to read entire 10,000+ line files in one call
+
+Pattern for large files:
+
+```javascript
+// Read first chunk
+Read({ file_path: 'path/to/large.js', offset: 1, limit: 2000 });
+// Read second chunk
+Read({ file_path: 'path/to/large.js', offset: 2001, limit: 2000 });
+```
+
+### Grep() - Result Limiting
+
+When searching:
+
+- Use `head_limit: 100` to limit results
+- Default can return 1000+ matches
+- Example: Find first 100 occurrences of error handler
+
+Pattern:
+
+```javascript
+Grep({ pattern: 'catch', glob: '**/*.ts', head_limit: 100 });
+```
+
+### Multi-Agent Planning (for large codebases)
+
+If planning a large feature across many files (50+ files):
+
+- Phase 1: Spawn architect agent to review system design
+- Phase 2: Create specialized sub-plans for each module
+- Phase 3: Synthesize into unified plan
+
+This reduces context usage per agent:
+
+- Architect: 20-30 files for context (architecture level)
+- Each sub-planner: 5-10 files (specific subsystem)
+- Total: Shared context < single agent reading all 50+ files
+
+### Memory Efficiency Principles
+
+1. **Read strategically** - Don't read files you don't need
+2. **Chunk early** - Use offset/limit for large files
+3. **Search instead of read** - Use Grep to find code before reading
+4. **Plan in phases** - Break large plans into smaller, focused plans
+5. **Delegate when needed** - Spawn specialist agents for complex areas
+
+Example: Don't "read all API endpoints" (50+ files)
+Instead: Grep for "router\." → read top 10 → ask if more needed
 
 ## Output
 

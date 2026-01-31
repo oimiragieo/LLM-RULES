@@ -191,7 +191,7 @@ Glob('.claude/agents/**/*.md');
 Skill({ skill: 'research-synthesis' });
 
 // The skill will execute:
-// 1. Minimum 3 Exa/WebSearch queries
+// 1. Minimum 3 Exa/WebSearch queries (CAPPED at 3-5 max)
 // 2. Analysis of existing codebase patterns
 // 3. Structured research report output
 ```
@@ -203,6 +203,58 @@ Skill({ skill: 'research-synthesis' });
 3. **Query 3**: Claude/AI agent specific patterns
 4. **Codebase Analysis**: Examine 2+ similar artifacts in ecosystem
 
+### Query Budget for Phase O
+
+Research in Phase O is CAPPED at 3-5 queries total:
+
+- **Simple evolution** (new skill, no complex context): 3 queries
+- **Medium evolution** (new agent, new workflow): 4 queries
+- **Complex evolution** (system changes, cross-domain): 5 queries
+
+NEVER exceed 5 queries in Phase O, even if research feels incomplete.
+
+**Why the cap?**
+
+- Each query accumulates ~5-50 KB in context
+- 5 queries × avg 20 KB = 100 KB research data
+- Plus evolution orchestrator context + artifacts = memory pressure
+- Evolution is iterative - Phase E (Enable & Monitor) validates assumptions
+
+**If research isn't enough:**
+
+- Phase O is not meant for comprehensive research
+- Use queries to validate top 1-2 hypotheses only
+- Return to future evolution cycles if more research needed
+- Document unknowns in Phase E (Enable & Monitor)
+
+### Research Budget Tracking
+
+Document your query count:
+
+```markdown
+Phase O Research Budget
+
+- Query 1: [topic] → Result: [1-sentence summary]
+- Query 2: [topic] → Result: [1-sentence summary]
+- Query 3: [topic] → Result: [1-sentence summary]
+
+Total: 3/5 queries used
+Status: WITHIN BUDGET ✓
+```
+
+If you've used all 5 queries, STOP researching and move to Phase L.
+
+### When to Split Research Into Phases
+
+If you need >5 queries for one aspect:
+
+- Split evolution into multiple cycles
+- Each cycle: 5 queries → 1 artifact
+- Example: "Add authentication" could split into:
+  - Cycle 1: Auth architecture (5 queries) → Design doc
+  - Cycle 2: Implementation patterns (5 queries) → Patterns doc
+  - Cycle 3: Security hardening (5 queries) → Security doc
+
 **Gate Criteria**:
 
 - [ ] Minimum 3 research queries executed (with evidence)
@@ -210,6 +262,7 @@ Skill({ skill: 'research-synthesis' });
 - [ ] Existing codebase patterns documented (2+ similar artifacts)
 - [ ] Research report generated at `.claude/context/artifacts/research-reports/`
 - [ ] Design decisions documented with rationale and source
+- [ ] Query budget NOT exceeded (3-5 queries max)
 
 **Research Report Location**: `.claude/context/artifacts/research-reports/<artifact-name>-research.md`
 
