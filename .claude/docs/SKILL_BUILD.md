@@ -44,7 +44,7 @@ Individual Rule Files (.md)
 
 ### Rule File Template
 
-```markdown
+````markdown
 ---
 title: Rule Title
 impact: HIGH
@@ -60,15 +60,18 @@ Concise description of the rule.
 Detailed explanation of why this rule exists and when to apply it.
 
 **Bad:**
+
 ```typescript
 // Incorrect example
-const bad = "example";
+const bad = 'example';
 ```
+````
 
 **Good:**
+
 ```typescript
 // Correct example
-const good = "example";
+const good = 'example';
 ```
 
 ## Impact: HIGH
@@ -78,7 +81,8 @@ Performance/security/maintainability implications.
 ## References
 
 - [Reference 1](https://example.com)
-```
+
+````
 
 ### Required Fields
 
@@ -115,7 +119,7 @@ export const SKILLS = {
     }
   }
 };
-```
+````
 
 ### Section Mapping
 
@@ -154,6 +158,7 @@ The `rule-validator.cjs` hook validates rules on `Write`/`Edit` operations:
 **Location:** `.claude/hooks/skills/rule-validator.cjs`
 
 **Checks:**
+
 - Frontmatter presence and format
 - Required fields (title, impact)
 - Valid impact levels
@@ -169,10 +174,12 @@ The `rule-validator.cjs` hook validates rules on `Write`/`Edit` operations:
 **Location:** `.github/workflows/skill-build-validate.yml`
 
 **Triggers:**
+
 - Pull requests modifying `.claude/skills/**`
 - Pushes to `main` branch
 
 **Steps:**
+
 1. TypeScript compilation check
 2. Rule structure validation
 3. Test case extraction
@@ -208,6 +215,7 @@ npm run skill:migrate
 ```
 
 **Process:**
+
 1. Parse existing `AGENTS.md`
 2. Extract individual rules
 3. Generate frontmatter from content
@@ -219,11 +227,13 @@ npm run skill:migrate
 ### Adding a New Skill
 
 1. **Create skill directory:**
+
    ```bash
    mkdir -p .claude/skills/my-skill/rules
    ```
 
 2. **Register in config.ts:**
+
    ```typescript
    'my-skill': {
      name: 'my-skill',
@@ -236,6 +246,7 @@ npm run skill:migrate
    ```
 
 3. **Create rule files:**
+
    ```bash
    touch .claude/skills/my-skill/rules/rule-prefix-my-rule.md
    ```
@@ -258,18 +269,22 @@ npm run skill:migrate
 ### Common Errors
 
 **Error: "Missing frontmatter"**
+
 - Ensure `---` delimiters are on separate lines
 - Verify YAML syntax (key: value)
 
 **Error: "Invalid impact level"**
+
 - Use only: CRITICAL, HIGH, MEDIUM, LOW
 - Check for typos and case sensitivity
 
 **Error: "Missing bad/incorrect example"**
+
 - Add `**Bad:**` or `**Incorrect:**` label
 - Include code block with triple backticks
 
 **Error: "TypeScript compilation failed"**
+
 - Run `npm install` to ensure dependencies are installed
 - Check `tsconfig.json` for errors
 - Verify `.ts` file syntax
@@ -277,16 +292,19 @@ npm run skill:migrate
 ### Debugging
 
 **Enable verbose logging:**
+
 ```bash
 DEBUG=skill-build:* npm run skill:build
 ```
 
 **Check TypeScript compilation:**
+
 ```bash
 npx tsc --project .claude/lib/skill-build/tsconfig.json --noEmit
 ```
 
 **Validate individual rule:**
+
 ```bash
 node -e "const { validateRuleFile } = require('./.claude/hooks/skills/rule-validator.cjs'); console.log(validateRuleFile('.claude/skills/my-skill/rules/my-rule.md'));"
 ```

@@ -2,13 +2,13 @@
 
 ## Summary
 
-| Category                  | Status | Result                |
-| ------------------------- | ------ | --------------------- |
-| Unit tests (53 total)     | PASS   | 53/53 tests passing   |
-| Agent definitions         | PASS   | 0 MCP references      |
-| Tool registry             | PASS   | 20 core + 9 MCP tools |
-| Skill index               | PASS   | 434 skills indexed    |
-| Manual integration tests  | PASS   | 6/6 scenarios verified|
+| Category                 | Status | Result                 |
+| ------------------------ | ------ | ---------------------- |
+| Unit tests (53 total)    | PASS   | 53/53 tests passing    |
+| Agent definitions        | PASS   | 0 MCP references       |
+| Tool registry            | PASS   | 20 core + 9 MCP tools  |
+| Skill index              | PASS   | 434 skills indexed     |
+| Manual integration tests | PASS   | 6/6 scenarios verified |
 
 **Conclusion:** Phase 1 implementation is COMPLETE and VALIDATED.
 
@@ -18,32 +18,32 @@
 
 ### Phase 1B: Pre-Spawn Validator Hook Tests (28/28)
 
-| Test Category                  | Tests | Status |
-| ------------------------------ | ----- | ------ |
-| Tool Existence Validation      | 4     | PASS   |
-| MCP Tool Availability          | 3     | PASS   |
-| Tool Count Limits              | 4     | PASS   |
-| Reserved Tool Validation       | 4     | PASS   |
-| Edge Cases / Backward Compat   | 5     | PASS   |
-| Hook Integration               | 5     | PASS   |
-| Mandatory Tools Validation     | 3     | PASS   |
-| **Total**                      | **28**| **PASS** |
+| Test Category                | Tests  | Status   |
+| ---------------------------- | ------ | -------- |
+| Tool Existence Validation    | 4      | PASS     |
+| MCP Tool Availability        | 3      | PASS     |
+| Tool Count Limits            | 4      | PASS     |
+| Reserved Tool Validation     | 4      | PASS     |
+| Edge Cases / Backward Compat | 5      | PASS     |
+| Hook Integration             | 5      | PASS     |
+| Mandatory Tools Validation   | 3      | PASS     |
+| **Total**                    | **28** | **PASS** |
 
 Test command: `npm run validator:test`
 
 ### Phase 1D: Prompt Assembler Tests (25/25)
 
-| Test Category                  | Tests | Status |
-| ------------------------------ | ----- | ------ |
-| Tool Section Generation        | 4     | PASS   |
-| Skill Section Generation       | 2     | PASS   |
-| Discovery Section Generation   | 2     | PASS   |
-| Section Injection              | 3     | PASS   |
-| Filtering and Limits           | 3     | PASS   |
-| Agent-Specific Recommendations | 4     | PASS   |
-| Edge Cases                     | 5     | PASS   |
-| Integration                    | 2     | PASS   |
-| **Total**                      | **25**| **PASS** |
+| Test Category                  | Tests  | Status   |
+| ------------------------------ | ------ | -------- |
+| Tool Section Generation        | 4      | PASS     |
+| Skill Section Generation       | 2      | PASS     |
+| Discovery Section Generation   | 2      | PASS     |
+| Section Injection              | 3      | PASS     |
+| Filtering and Limits           | 3      | PASS     |
+| Agent-Specific Recommendations | 4      | PASS     |
+| Edge Cases                     | 5      | PASS     |
+| Integration                    | 2      | PASS     |
+| **Total**                      | **25** | **PASS** |
 
 Test command: `node --test tests/lib/spawn/prompt-assembler.test.cjs`
 
@@ -60,47 +60,47 @@ Test command: `node --test tests/lib/spawn/prompt-assembler.test.cjs`
 
 ### Tool Manifest Statistics
 
-| Metric               | Expected | Actual | Status |
-| -------------------- | -------- | ------ | ------ |
-| Core tools           | 20       | 20     | PASS   |
-| MCP tools            | 9        | 9      | PASS   |
-| Total tools          | 29       | 29     | PASS   |
-| Toolsets defined     | 8        | 8      | PASS   |
-| Agent defaults       | 16       | 16     | PASS   |
+| Metric           | Expected | Actual | Status |
+| ---------------- | -------- | ------ | ------ |
+| Core tools       | 20       | 20     | PASS   |
+| MCP tools        | 9        | 9      | PASS   |
+| Total tools      | 29       | 29     | PASS   |
+| Toolsets defined | 8        | 8      | PASS   |
+| Agent defaults   | 16       | 16     | PASS   |
 
 ### Skill Index Statistics
 
-| Metric               | Expected | Actual | Status |
-| -------------------- | -------- | ------ | ------ |
-| Total skills         | 434+     | 434    | PASS   |
-| Total domains        | 22       | 22     | PASS   |
-| Total categories     | 25       | 25     | PASS   |
+| Metric           | Expected | Actual | Status |
+| ---------------- | -------- | ------ | ------ |
+| Total skills     | 434+     | 434    | PASS   |
+| Total domains    | 22       | 22     | PASS   |
+| Total categories | 25       | 25     | PASS   |
 
 ### MCP Tool Fallbacks
 
 All 9 MCP tools marked as "unavailable" with documented fallbacks:
 
-| MCP Tool                                      | Fallback                               | Status |
-| --------------------------------------------- | -------------------------------------- | ------ |
-| `mcp__chrome-devtools__*`                     | `Skill({ skill: 'chrome-browser' })`   | OK     |
-| `mcp__sequential-thinking__sequentialthinking`| `Skill({ skill: 'sequential-thinking' })`| OK   |
-| `mcp__Ref__ref_search_documentation`          | `WebSearch + WebFetch`                 | OK     |
-| `mcp__Ref__ref_read_url`                      | `WebFetch`                             | OK     |
-| `mcp__Exa__web_search_exa`                    | `WebSearch`                            | OK     |
-| `mcp__Exa__get_code_context_exa`              | `Grep + Glob`                          | OK     |
-| `mcp__Exa__company_research_exa`              | `WebSearch`                            | OK     |
-| `mcp__shadcn__getComponents`                  | `WebFetch`                             | OK     |
-| `mcp__shadcn__getComponent`                   | `WebFetch`                             | OK     |
+| MCP Tool                                       | Fallback                                  | Status |
+| ---------------------------------------------- | ----------------------------------------- | ------ |
+| `mcp__chrome-devtools__*`                      | `Skill({ skill: 'chrome-browser' })`      | OK     |
+| `mcp__sequential-thinking__sequentialthinking` | `Skill({ skill: 'sequential-thinking' })` | OK     |
+| `mcp__Ref__ref_search_documentation`           | `WebSearch + WebFetch`                    | OK     |
+| `mcp__Ref__ref_read_url`                       | `WebFetch`                                | OK     |
+| `mcp__Exa__web_search_exa`                     | `WebSearch`                               | OK     |
+| `mcp__Exa__get_code_context_exa`               | `Grep + Glob`                             | OK     |
+| `mcp__Exa__company_research_exa`               | `WebSearch`                               | OK     |
+| `mcp__shadcn__getComponents`                   | `WebFetch`                                | OK     |
+| `mcp__shadcn__getComponent`                    | `WebFetch`                                | OK     |
 
 ### npm Scripts Verification
 
-| Script              | Command                                              | Status |
-| ------------------- | ---------------------------------------------------- | ------ |
-| `manifest:generate` | `node .claude/tools/cli/generate-tool-manifest.cjs`  | PASS   |
-| `manifest:validate` | `node .claude/tools/cli/generate-tool-manifest.cjs --validate` | PASS |
-| `skills:index`      | `node .claude/tools/cli/generate-skill-index.cjs`    | PASS   |
-| `skills:validate`   | `node .claude/tools/cli/generate-skill-index.cjs --validate` | PASS |
-| `validator:test`    | `node --test tests/hooks/pre-spawn-tool-validator.test.cjs` | PASS |
+| Script              | Command                                                        | Status |
+| ------------------- | -------------------------------------------------------------- | ------ |
+| `manifest:generate` | `node .claude/tools/cli/generate-tool-manifest.cjs`            | PASS   |
+| `manifest:validate` | `node .claude/tools/cli/generate-tool-manifest.cjs --validate` | PASS   |
+| `skills:index`      | `node .claude/tools/cli/generate-skill-index.cjs`              | PASS   |
+| `skills:validate`   | `node .claude/tools/cli/generate-skill-index.cjs --validate`   | PASS   |
+| `validator:test`    | `node --test tests/hooks/pre-spawn-tool-validator.test.cjs`    | PASS   |
 
 ---
 
@@ -125,6 +125,7 @@ Result: 0 matches
 - All domain agents updated: frontend-pro, nextjs-pro, python-pro, etc.
 
 **Verification command:**
+
 ```bash
 grep -l "Skill({ skill:" .claude/agents/**/*.md | wc -l
 # Result: 50 files
@@ -136,32 +137,32 @@ grep -l "Skill({ skill:" .claude/agents/**/*.md | wc -l
 
 ### Test 5A: Developer Agent Spawn
 
-| Check                                | Result |
-| ------------------------------------ | ------ |
-| No pre-spawn validator errors        | PASS   |
-| Prompt contains AVAILABLE_TOOLS      | PASS   |
-| Prompt contains AVAILABLE_SKILLS     | PASS   |
-| Tool descriptions present            | PASS   |
-| Dev-focused skills (tdd, debugging)  | PASS   |
-| SKILL DISCOVERY PROTOCOL present     | PASS   |
-| No "Invalid tool parameters" error   | PASS   |
+| Check                               | Result |
+| ----------------------------------- | ------ |
+| No pre-spawn validator errors       | PASS   |
+| Prompt contains AVAILABLE_TOOLS     | PASS   |
+| Prompt contains AVAILABLE_SKILLS    | PASS   |
+| Tool descriptions present           | PASS   |
+| Dev-focused skills (tdd, debugging) | PASS   |
+| SKILL DISCOVERY PROTOCOL present    | PASS   |
+| No "Invalid tool parameters" error  | PASS   |
 
 ### Test 5B: Planner Agent Spawn
 
-| Check                                | Result |
-| ------------------------------------ | ------ |
-| No pre-spawn validator errors        | PASS   |
-| Planner-specific skills present      | PASS   |
-| No MCP references in prompt          | PASS   |
-| Skill fallbacks documented           | PASS   |
+| Check                           | Result |
+| ------------------------------- | ------ |
+| No pre-spawn validator errors   | PASS   |
+| Planner-specific skills present | PASS   |
+| No MCP references in prompt     | PASS   |
+| Skill fallbacks documented      | PASS   |
 
 ### Test 5C: Security Architect Spawn
 
-| Check                                | Result |
-| ------------------------------------ | ------ |
-| Security-specific tools available    | PASS   |
-| Security skills present              | PASS   |
-| No blocked/reserved tools            | PASS   |
+| Check                             | Result |
+| --------------------------------- | ------ |
+| Security-specific tools available | PASS   |
+| Security skills present           | PASS   |
+| No blocked/reserved tools         | PASS   |
 
 ### Test 5D: Orchestrator Spawn
 
@@ -169,23 +170,23 @@ grep -l "Skill({ skill:" .claude/agents/**/*.md | wc -l
 | ------------------------------------ | ------ |
 | Task tool available                  | PASS   |
 | Fallback Skill() patterns documented | PASS   |
-| No mcp__Exa__ references             | PASS   |
+| No mcp**Exa** references             | PASS   |
 
 ### Test 5E: Invalid Spawn Test (Validator Blocks)
 
-| Check                                         | Result |
-| --------------------------------------------- | ------ |
-| Developer spawn with Task tool blocked        | PASS   |
-| Error: "Tool 'Task' is reserved for: ..."     | PASS   |
-| Suggestion provided                           | PASS   |
+| Check                                     | Result |
+| ----------------------------------------- | ------ |
+| Developer spawn with Task tool blocked    | PASS   |
+| Error: "Tool 'Task' is reserved for: ..." | PASS   |
+| Suggestion provided                       | PASS   |
 
 ### Test 5F: MCP Tool Fallback Test
 
-| Check                                         | Result |
-| --------------------------------------------- | ------ |
-| Pre-spawn validator WARNS on unavailable MCP  | PASS   |
-| Suggests fallback skill                       | PASS   |
-| Example suggestion format correct             | PASS   |
+| Check                                        | Result |
+| -------------------------------------------- | ------ |
+| Pre-spawn validator WARNS on unavailable MCP | PASS   |
+| Suggests fallback skill                      | PASS   |
+| Example suggestion format correct            | PASS   |
 
 ---
 
@@ -202,17 +203,17 @@ grep -l "Skill({ skill:" .claude/agents/**/*.md | wc -l
 
 ### Phase 1B: Pre-Spawn Validator Hook
 
-| File                                                | Lines | Status |
-| --------------------------------------------------- | ----- | ------ |
-| `.claude/hooks/routing/pre-spawn-tool-validator.cjs`| 517   | OK     |
-| `tests/hooks/pre-spawn-tool-validator.test.cjs`     | 537   | OK     |
+| File                                                 | Lines | Status |
+| ---------------------------------------------------- | ----- | ------ |
+| `.claude/hooks/routing/pre-spawn-tool-validator.cjs` | 517   | OK     |
+| `tests/hooks/pre-spawn-tool-validator.test.cjs`      | 537   | OK     |
 
 ### Phase 1D: Prompt Assembler
 
-| File                                            | Lines | Status |
-| ----------------------------------------------- | ----- | ------ |
-| `.claude/lib/spawn/prompt-assembler.cjs`        | 392   | OK     |
-| `tests/lib/spawn/prompt-assembler.test.cjs`     | 499   | OK     |
+| File                                        | Lines | Status |
+| ------------------------------------------- | ----- | ------ |
+| `.claude/lib/spawn/prompt-assembler.cjs`    | 392   | OK     |
+| `tests/lib/spawn/prompt-assembler.test.cjs` | 499   | OK     |
 
 ---
 
@@ -273,6 +274,7 @@ node --test tests/hooks/pre-spawn-tool-validator.test.cjs tests/lib/spawn/prompt
 **Phase 1: Agent Tool Awareness Foundation is VALIDATED.**
 
 All acceptance criteria met:
+
 - 53/53 unit tests passing
 - 0 MCP references in agent definitions
 - Tool registry complete (20 core + 9 MCP tools)

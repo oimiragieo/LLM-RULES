@@ -22,7 +22,7 @@ const { EntityQuery } = require(entityQueryPath);
 const { initializeDatabase } = require(initDbPath);
 
 // Test setup
-const TEST_ROOT = path.resolve(PROJECT_ROOT, '.test-data/sync-accuracy');
+const TEST_ROOT = path.resolve(PROJECT_ROOT, 'tests/data/sync-accuracy');
 const TEST_MEMORY_DIR = path.join(TEST_ROOT, 'memory');
 const TEST_DB_PATH = path.join(TEST_ROOT, 'memory.db');
 

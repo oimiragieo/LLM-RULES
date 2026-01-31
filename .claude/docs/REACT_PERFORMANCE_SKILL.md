@@ -51,19 +51,16 @@ The skill performs automated code analysis to identify performance issues in Rea
 Invoke this skill when:
 
 1. **Code Review**
-
    - "Review this React component for performance"
    - "Check this code for optimization opportunities"
    - "Can you analyze this Next.js page for performance issues"
 
 2. **Performance Problems**
-
    - "My component re-renders too often"
    - "The app feels slow, how do I optimize"
    - "Performance is degrading, help me fix it"
 
 3. **Bundle Size Issues**
-
    - "How do I reduce my Next.js bundle size"
    - "My JavaScript bundle is too large"
    - "Lighthouse shows poor performance score"
@@ -111,12 +108,12 @@ For each violation, the skill provides:
 
 ### 3. Severity Levels
 
-| Severity   | Impact                           | Fix Priority |
-| ---------- | -------------------------------- | ------------ |
-| CRITICAL   | Major performance degradation    | Immediate    |
-| HIGH       | Significant slowdown             | Soon         |
-| MEDIUM     | Noticeable impact under load     | When time    |
-| LOW        | Marginal gains, advanced pattern | Nice-to-have |
+| Severity | Impact                           | Fix Priority |
+| -------- | -------------------------------- | ------------ |
+| CRITICAL | Major performance degradation    | Immediate    |
+| HIGH     | Significant slowdown             | Soon         |
+| MEDIUM   | Noticeable impact under load     | When time    |
+| LOW      | Marginal gains, advanced pattern | Nice-to-have |
 
 ---
 
@@ -469,16 +466,16 @@ async function loadData() {
 
 ## Performance Impact Estimates
 
-| Category                       | Rules | Expected Improvement          |
-| ------------------------------ | ----- | ----------------------------- |
-| Eliminating Waterfalls         | 5     | 50-80% faster page loads      |
-| Bundle Size Optimization       | 5     | 30-60% smaller bundles        |
-| Server-Side Performance        | 7     | 40-70% fewer server requests  |
-| Client-Side Data Fetching      | 4     | 50-90% fewer duplicate fetches|
-| Re-render Optimization         | 12    | 60-95% fewer re-renders       |
-| Rendering Performance          | 9     | 20-50% faster initial render  |
-| JavaScript Micro-Optimizations | 8     | 5-15% faster execution        |
-| Advanced Patterns              | 9     | 10-30% edge case improvements |
+| Category                       | Rules | Expected Improvement           |
+| ------------------------------ | ----- | ------------------------------ |
+| Eliminating Waterfalls         | 5     | 50-80% faster page loads       |
+| Bundle Size Optimization       | 5     | 30-60% smaller bundles         |
+| Server-Side Performance        | 7     | 40-70% fewer server requests   |
+| Client-Side Data Fetching      | 4     | 50-90% fewer duplicate fetches |
+| Re-render Optimization         | 12    | 60-95% fewer re-renders        |
+| Rendering Performance          | 9     | 20-50% faster initial render   |
+| JavaScript Micro-Optimizations | 8     | 5-15% faster execution         |
+| Advanced Patterns              | 9     | 10-30% edge case improvements  |
 
 **Note:** Improvements vary based on application complexity and existing optimization level.
 

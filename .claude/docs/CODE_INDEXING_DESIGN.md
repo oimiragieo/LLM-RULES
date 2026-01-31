@@ -5,6 +5,7 @@
 **Author:** Architect Agent (Task #35)
 **Date:** 2026-01-31
 **References:**
+
 - Cursor Architecture: https://towardsdatascience.com/how-cursor-actually-indexes-your-codebase/
 - Greb MCP: https://grebmcp.com/
 - ADR-054: Memory System Enhancement Strategy
@@ -23,13 +24,13 @@ This specification defines a Code Indexing and Semantic Search System for Agent-
 
 ### 1.2 Business Value
 
-| Metric | Current | Target | Improvement |
-|--------|---------|--------|-------------|
-| Query Accuracy | ~40% (grep false positives) | 80%+ (top-5 results) | +100% |
-| Query Latency | 2-5s (ripgrep full scan) | <500ms (vector lookup) | 4-10x faster |
-| Developer Experience | Regex patterns required | Natural language | Qualitative |
-| Context Relevance | Line-based matches | Semantic chunks | Function-level |
-| Cost | $0 (grep) | $0 (local embeddings) | No increase |
+| Metric               | Current                     | Target                 | Improvement    |
+| -------------------- | --------------------------- | ---------------------- | -------------- |
+| Query Accuracy       | ~40% (grep false positives) | 80%+ (top-5 results)   | +100%          |
+| Query Latency        | 2-5s (ripgrep full scan)    | <500ms (vector lookup) | 4-10x faster   |
+| Developer Experience | Regex patterns required     | Natural language       | Qualitative    |
+| Context Relevance    | Line-based matches          | Semantic chunks        | Function-level |
+| Cost                 | $0 (grep)                   | $0 (local embeddings)  | No increase    |
 
 ### 1.3 Key Design Principles
 
@@ -155,14 +156,15 @@ Following the Cursor architecture, our pipeline consists of 7 distinct stages:
 
 **Technology Choice: tree-sitter**
 
-| Alternative | Pros | Cons | Decision |
-|-------------|------|------|----------|
-| tree-sitter | 40+ languages, incremental parsing, battle-tested | Node.js bindings via node-tree-sitter | **SELECTED** |
-| Babel (JS/TS) | Deep JS/TS support | JS/TS only | Too limited |
-| esprima | Fast, pure JS | JS only | Too limited |
-| Language-specific | Optimized per language | N different parsers | Maintenance burden |
+| Alternative       | Pros                                              | Cons                                  | Decision           |
+| ----------------- | ------------------------------------------------- | ------------------------------------- | ------------------ |
+| tree-sitter       | 40+ languages, incremental parsing, battle-tested | Node.js bindings via node-tree-sitter | **SELECTED**       |
+| Babel (JS/TS)     | Deep JS/TS support                                | JS/TS only                            | Too limited        |
+| esprima           | Fast, pure JS                                     | JS only                               | Too limited        |
+| Language-specific | Optimized per language                            | N different parsers                   | Maintenance burden |
 
 **Interface:**
+
 ```javascript
 class CodeParser {
   /**
@@ -197,19 +199,20 @@ class CodeParser {
 
 **Supported Languages (Phase 1):**
 
-| Language | Extension | Grammar Package |
-|----------|-----------|-----------------|
-| JavaScript | .js, .mjs, .cjs | tree-sitter-javascript |
+| Language   | Extension             | Grammar Package        |
+| ---------- | --------------------- | ---------------------- |
+| JavaScript | .js, .mjs, .cjs       | tree-sitter-javascript |
 | TypeScript | .ts, .tsx, .mts, .cts | tree-sitter-typescript |
-| Python | .py | tree-sitter-python |
-| Go | .go | tree-sitter-go |
-| Rust | .rs | tree-sitter-rust |
-| Java | .java | tree-sitter-java |
-| C# | .cs | tree-sitter-c-sharp |
-| JSON | .json | tree-sitter-json |
-| Markdown | .md | tree-sitter-markdown |
+| Python     | .py                   | tree-sitter-python     |
+| Go         | .go                   | tree-sitter-go         |
+| Rust       | .rs                   | tree-sitter-rust       |
+| Java       | .java                 | tree-sitter-java       |
+| C#         | .cs                   | tree-sitter-c-sharp    |
+| JSON       | .json                 | tree-sitter-json       |
+| Markdown   | .md                   | tree-sitter-markdown   |
 
 **Phase 2 Languages:**
+
 - Ruby, PHP, Swift, Kotlin, C, C++, Shell, SQL, HTML, CSS
 
 ### 3.2 Semantic Chunker
@@ -220,24 +223,25 @@ class CodeParser {
 
 **Chunking Strategy:**
 
-| Code Type | Chunk Boundary | Rationale |
-|-----------|----------------|-----------|
+| Code Type       | Chunk Boundary           | Rationale                 |
+| --------------- | ------------------------ | ------------------------- |
 | Function/Method | Start to end of function | Self-contained logic unit |
-| Class | Start to end of class | May split if >2048 tokens |
-| Interface/Type | Full type definition | Typically small |
-| Module | Export section | Group related exports |
-| Comments/Docs | JSDoc/docstring blocks | Semantic context |
-| Imports | Import block | Dependency information |
+| Class           | Start to end of class    | May split if >2048 tokens |
+| Interface/Type  | Full type definition     | Typically small           |
+| Module          | Export section           | Group related exports     |
+| Comments/Docs   | JSDoc/docstring blocks   | Semantic context          |
+| Imports         | Import block             | Dependency information    |
 
 **Size Limits:**
 
-| Metric | Min | Max | Default |
-|--------|-----|-----|---------|
-| Tokens | 50 | 2048 | 512 |
-| Lines | 3 | 200 | 50 |
-| Overlap | 0 | 100 tokens | 50 tokens |
+| Metric  | Min | Max        | Default   |
+| ------- | --- | ---------- | --------- |
+| Tokens  | 50  | 2048       | 512       |
+| Lines   | 3   | 200        | 50        |
+| Overlap | 0   | 100 tokens | 50 tokens |
 
 **Interface:**
+
 ```javascript
 class SemanticChunker {
   /**
@@ -318,13 +322,13 @@ ALGORITHM: SemanticChunking(AST)
 
 **Model Selection:**
 
-| Model | Dimensions | Speed | Quality | Cost | Decision |
-|-------|------------|-------|---------|------|----------|
-| OpenAI text-embedding-3-small | 1536 | Fast | High | $0.02/1M tokens | API dependency |
-| OpenAI text-embedding-3-large | 3072 | Medium | Highest | $0.13/1M tokens | Expensive |
-| sentence-transformers/all-MiniLM-L6-v2 | 384 | Very Fast | Good | $0 (local) | **SELECTED (Primary)** |
-| sentence-transformers/all-mpnet-base-v2 | 768 | Fast | Better | $0 (local) | Alternative |
-| Ollama (nomic-embed-text) | 768 | Fast | Good | $0 (local) | Alternative |
+| Model                                   | Dimensions | Speed     | Quality | Cost            | Decision               |
+| --------------------------------------- | ---------- | --------- | ------- | --------------- | ---------------------- |
+| OpenAI text-embedding-3-small           | 1536       | Fast      | High    | $0.02/1M tokens | API dependency         |
+| OpenAI text-embedding-3-large           | 3072       | Medium    | Highest | $0.13/1M tokens | Expensive              |
+| sentence-transformers/all-MiniLM-L6-v2  | 384        | Very Fast | Good    | $0 (local)      | **SELECTED (Primary)** |
+| sentence-transformers/all-mpnet-base-v2 | 768        | Fast      | Better  | $0 (local)      | Alternative            |
+| Ollama (nomic-embed-text)               | 768        | Fast      | Good    | $0 (local)      | Alternative            |
 
 **Recommendation: Local-First with Optional Cloud Enhancement**
 
@@ -332,6 +336,7 @@ ALGORITHM: SemanticChunking(AST)
 - **Optional:** OpenAI text-embedding-3-small (cloud, higher quality for critical searches)
 
 **Interface:**
+
 ```javascript
 class EmbeddingGenerator {
   /**
@@ -395,6 +400,7 @@ function prepareForEmbedding(chunk) {
 **Purpose:** Attach rich metadata to code chunks for filtering and context
 
 **Metadata Schema:**
+
 ```javascript
 interface ChunkMetadata {
   // Required fields
@@ -447,7 +453,8 @@ class PathObfuscator {
   obfuscate(path) {
     // Hash the full path, keep extension
     const ext = path.split('.').pop();
-    const hash = crypto.createHash('sha256')
+    const hash = crypto
+      .createHash('sha256')
       .update(path + this.key)
       .digest('hex')
       .substring(0, 16);
@@ -466,23 +473,25 @@ class PathObfuscator {
 **Purpose:** Store and query code embeddings
 
 **Configuration:**
+
 ```javascript
 const CONFIG = {
   persistDirectory: '.claude/data/code-index',
   collectionName: 'agent-studio-code',
-  embeddingDimensions: 384,          // all-MiniLM-L6-v2
+  embeddingDimensions: 384, // all-MiniLM-L6-v2
   distanceFunction: 'cosine',
   indexType: 'HNSW',
   hnswConfig: {
     space: 'cosine',
-    efConstruction: 100,             // Build-time accuracy/speed tradeoff
-    efSearch: 50,                    // Query-time accuracy/speed tradeoff
-    M: 16                            // Max connections per node
-  }
+    efConstruction: 100, // Build-time accuracy/speed tradeoff
+    efSearch: 50, // Query-time accuracy/speed tradeoff
+    M: 16, // Max connections per node
+  },
 };
 ```
 
 **Interface:**
+
 ```javascript
 class CodeVectorStore {
   /**
@@ -588,6 +597,7 @@ User Query: "find authentication middleware"
 ```
 
 **Interface:**
+
 ```javascript
 class QueryProcessor {
   /**
@@ -654,11 +664,13 @@ Project Root (hash: abc123)
 ```
 
 **Merkle Tree Benefits:**
+
 - O(log n) change detection (only compare hashes that differ)
 - Can quickly identify which subdirectories changed
 - Hash includes content + metadata for comprehensive tracking
 
 **Interface:**
+
 ```javascript
 class IndexMaintainer {
   /**
@@ -719,6 +731,7 @@ interface UpdateResult {
 ```
 
 **Exclusion Patterns (Default):**
+
 ```javascript
 const DEFAULT_EXCLUDES = [
   '**/node_modules/**',
@@ -733,7 +746,7 @@ const DEFAULT_EXCLUDES = [
   '**/package-lock.json',
   '**/yarn.lock',
   '**/pnpm-lock.yaml',
-  '**/.claude/data/**'
+  '**/.claude/data/**',
 ];
 ```
 
@@ -747,7 +760,7 @@ const DEFAULT_EXCLUDES = [
 
 **Purpose:** Agent-accessible interface for semantic code search
 
-```markdown
+````markdown
 # Code Semantic Search Skill
 
 <identity>
@@ -767,31 +780,36 @@ across the indexed codebase using vector similarity and semantic understanding.
 ## Usage
 
 ### Basic Search
+
 ```javascript
 // Find authentication-related code
-const results = await codeSearch.query("authentication middleware");
+const results = await codeSearch.query('authentication middleware');
 ```
+````
 
 ### Filtered Search
+
 ```javascript
 // Find TypeScript functions only
-const results = await codeSearch.query("error handling", {
-  filters: { language: ['typescript'], type: ['function'] }
+const results = await codeSearch.query('error handling', {
+  filters: { language: ['typescript'], type: ['function'] },
 });
 ```
 
 ### With Context
+
 ```javascript
 // Get 10 lines of surrounding context
-const results = await codeSearch.query("database connection", {
+const results = await codeSearch.query('database connection', {
   includeContext: true,
-  contextLines: 10
+  contextLines: 10,
 });
 ```
 
 ## Output Format
 
 Results include:
+
 - `code`: The matched code snippet
 - `filePath`: Relative path to source file
 - `lineStart` / `lineEnd`: Line range
@@ -810,7 +828,8 @@ Results include:
 
 If index is unavailable, falls back to Grep/Glob search.
 </instructions>
-```
+
+````
 
 ### 4.2 Agent Integration
 
@@ -831,7 +850,7 @@ for (const result of results.results) {
   console.log(`${result.metadata.filePath}:${result.metadata.lineStart}`);
   console.log(result.chunk.content);
 }
-```
+````
 
 ---
 
@@ -881,18 +900,8 @@ for (const result of results.results) {
   "indexing": {
     "enabled": true,
     "projectRoot": ".",
-    "excludePatterns": [
-      "**/node_modules/**",
-      "**/.git/**",
-      "**/dist/**",
-      "**/build/**"
-    ],
-    "includePatterns": [
-      "**/*.js",
-      "**/*.ts",
-      "**/*.py",
-      "**/*.go"
-    ],
+    "excludePatterns": ["**/node_modules/**", "**/.git/**", "**/dist/**", "**/build/**"],
+    "includePatterns": ["**/*.js", "**/*.ts", "**/*.py", "**/*.go"],
     "maxFileSize": 1048576,
     "batchSize": 50,
     "concurrency": 4
@@ -955,6 +964,7 @@ CODE_INDEX_DEBUG=true
 ### Phase 1: Foundation (Week 1-2)
 
 **Deliverables:**
+
 - [ ] tree-sitter integration with JS/TS/Python support
 - [ ] Semantic chunker with basic chunking strategies
 - [ ] Local embedding generator (sentence-transformers)
@@ -963,6 +973,7 @@ CODE_INDEX_DEBUG=true
 - [ ] CLI indexing tool
 
 **Success Criteria:**
+
 - Can index 1000 files in <60 seconds
 - Query latency <500ms
 - 70%+ accuracy on sample queries
@@ -970,6 +981,7 @@ CODE_INDEX_DEBUG=true
 ### Phase 2: Enhancement (Week 3-4)
 
 **Deliverables:**
+
 - [ ] Merkle tree change detection
 - [ ] Incremental index updates
 - [ ] Metadata enrichment
@@ -978,6 +990,7 @@ CODE_INDEX_DEBUG=true
 - [ ] Skill wrapper
 
 **Success Criteria:**
+
 - Incremental updates in <5 seconds
 - 80%+ accuracy on diverse queries
 - Skill integration working
@@ -985,6 +998,7 @@ CODE_INDEX_DEBUG=true
 ### Phase 3: Optimization (Week 5-6)
 
 **Deliverables:**
+
 - [ ] Additional language support (Go, Rust, Java)
 - [ ] Query caching
 - [ ] Batch optimization
@@ -992,6 +1006,7 @@ CODE_INDEX_DEBUG=true
 - [ ] Performance tuning
 
 **Success Criteria:**
+
 - Support 6+ languages
 - Query latency <200ms (cached)
 - 90%+ test coverage
@@ -1000,43 +1015,43 @@ CODE_INDEX_DEBUG=true
 
 ## 8. Success Metrics
 
-| Metric | Target | Measurement Method |
-|--------|--------|-------------------|
-| Query Accuracy | 80%+ relevant in top-5 | Manual evaluation on test queries |
-| Query Latency | <500ms (cold), <200ms (cached) | Timing instrumentation |
-| Indexing Speed | >100 files/second | Benchmark on sample codebases |
-| Index Freshness | <30 seconds after file change | File watcher + update timing |
-| Memory Usage | <500MB for 10K files | Memory profiling |
-| Disk Usage | <1GB for 10K files | Disk measurement |
-| Agent Adoption | Used in 50%+ of code exploration tasks | Usage analytics |
+| Metric          | Target                                 | Measurement Method                |
+| --------------- | -------------------------------------- | --------------------------------- |
+| Query Accuracy  | 80%+ relevant in top-5                 | Manual evaluation on test queries |
+| Query Latency   | <500ms (cold), <200ms (cached)         | Timing instrumentation            |
+| Indexing Speed  | >100 files/second                      | Benchmark on sample codebases     |
+| Index Freshness | <30 seconds after file change          | File watcher + update timing      |
+| Memory Usage    | <500MB for 10K files                   | Memory profiling                  |
+| Disk Usage      | <1GB for 10K files                     | Disk measurement                  |
+| Agent Adoption  | Used in 50%+ of code exploration tasks | Usage analytics                   |
 
 ---
 
 ## 9. Risks and Mitigations
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| tree-sitter Node bindings unstable | Medium | High | Use well-tested grammars, pin versions |
-| Embedding quality insufficient | Low | High | Allow OpenAI fallback, tune prompts |
-| Large codebase performance | Medium | Medium | Batch processing, incremental updates |
-| ChromaDB memory usage | Low | Medium | Configure HNSW parameters, use persistence |
-| False negatives in search | Medium | Medium | Combine with keyword fallback |
-| Language grammar missing | Low | Low | Graceful degradation, log unsupported |
+| Risk                               | Probability | Impact | Mitigation                                 |
+| ---------------------------------- | ----------- | ------ | ------------------------------------------ |
+| tree-sitter Node bindings unstable | Medium      | High   | Use well-tested grammars, pin versions     |
+| Embedding quality insufficient     | Low         | High   | Allow OpenAI fallback, tune prompts        |
+| Large codebase performance         | Medium      | Medium | Batch processing, incremental updates      |
+| ChromaDB memory usage              | Low         | Medium | Configure HNSW parameters, use persistence |
+| False negatives in search          | Medium      | Medium | Combine with keyword fallback              |
+| Language grammar missing           | Low         | Low    | Graceful degradation, log unsupported      |
 
 ---
 
 ## 10. Comparison to Alternatives
 
-| Capability | Our System | Grep/Glob | Greb | Cursor |
-|------------|-----------|-----------|------|--------|
-| Semantic Search | Yes | No | Yes | Yes |
-| Natural Language | Yes | No | Yes | Yes |
-| Local Processing | Yes | Yes | No | No |
-| Free | Yes | Yes | Paid | Paid |
-| Language Support | 10+ | All | All | All |
-| Agent Integration | Native | Manual | MCP | IDE |
-| Incremental Updates | Yes | N/A | Yes | Yes |
-| Open Source | Yes | Yes | No | No |
+| Capability          | Our System | Grep/Glob | Greb | Cursor |
+| ------------------- | ---------- | --------- | ---- | ------ |
+| Semantic Search     | Yes        | No        | Yes  | Yes    |
+| Natural Language    | Yes        | No        | Yes  | Yes    |
+| Local Processing    | Yes        | Yes       | No   | No     |
+| Free                | Yes        | Yes       | Paid | Paid   |
+| Language Support    | 10+        | All       | All  | All    |
+| Agent Integration   | Native     | Manual    | MCP  | IDE    |
+| Incremental Updates | Yes        | N/A       | Yes  | Yes    |
+| Open Source         | Yes        | Yes       | No   | No     |
 
 ---
 
@@ -1052,23 +1067,23 @@ CODE_INDEX_DEBUG=true
 
 ### A. Sample Queries and Expected Results
 
-| Query | Expected Match Type | Example File |
-|-------|---------------------|--------------|
-| "authentication middleware" | Function | src/middleware/auth.ts |
-| "database connection pool" | Class/Config | lib/db/pool.ts |
-| "error handling for API" | Function | api/error-handler.ts |
-| "user validation schema" | Type/Schema | types/user.ts |
-| "async file operations" | Function | utils/file-async.ts |
+| Query                       | Expected Match Type | Example File           |
+| --------------------------- | ------------------- | ---------------------- |
+| "authentication middleware" | Function            | src/middleware/auth.ts |
+| "database connection pool"  | Class/Config        | lib/db/pool.ts         |
+| "error handling for API"    | Function            | api/error-handler.ts   |
+| "user validation schema"    | Type/Schema         | types/user.ts          |
+| "async file operations"     | Function            | utils/file-async.ts    |
 
 ### B. Embedding Model Benchmarks
 
-| Model | Index Time (1K files) | Query Time | RAM Usage | Quality Score |
-|-------|----------------------|------------|-----------|---------------|
-| all-MiniLM-L6-v2 | 45s | 15ms | 200MB | 0.82 |
-| all-mpnet-base-v2 | 90s | 25ms | 400MB | 0.88 |
-| OpenAI ada-002 | 120s | 5ms | 50MB | 0.91 |
+| Model             | Index Time (1K files) | Query Time | RAM Usage | Quality Score |
+| ----------------- | --------------------- | ---------- | --------- | ------------- |
+| all-MiniLM-L6-v2  | 45s                   | 15ms       | 200MB     | 0.82          |
+| all-mpnet-base-v2 | 90s                   | 25ms       | 400MB     | 0.88          |
+| OpenAI ada-002    | 120s                  | 5ms        | 50MB      | 0.91          |
 
-*Quality Score: Average cosine similarity on semantic similarity benchmark*
+_Quality Score: Average cosine similarity on semantic similarity benchmark_
 
 ### C. ChromaDB Performance Tuning
 
@@ -1079,19 +1094,19 @@ const CONFIGURATIONS = {
   speed: {
     efConstruction: 50,
     efSearch: 20,
-    M: 8
+    M: 8,
   },
   // Balanced (recommended)
   balanced: {
     efConstruction: 100,
     efSearch: 50,
-    M: 16
+    M: 16,
   },
   // High accuracy, slower queries
   accuracy: {
     efConstruction: 200,
     efSearch: 100,
-    M: 32
-  }
+    M: 32,
+  },
 };
 ```

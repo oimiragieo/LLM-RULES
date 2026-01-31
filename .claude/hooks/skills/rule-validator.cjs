@@ -61,7 +61,9 @@ function validateRuleFile(filePath) {
       // Validate impact level
       const validImpacts = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
       if (frontmatter.impact && !validImpacts.includes(frontmatter.impact.toUpperCase())) {
-        errors.push(`Invalid impact level: ${frontmatter.impact}. Must be one of: ${validImpacts.join(', ')}`);
+        errors.push(
+          `Invalid impact level: ${frontmatter.impact}. Must be one of: ${validImpacts.join(', ')}`
+        );
       }
     }
 
@@ -85,14 +87,13 @@ function validateRuleFile(filePath) {
     if (!hasGoodExample) {
       errors.push('Missing good/correct example');
     }
-
   } catch (err) {
     errors.push(`Failed to read file: ${err.message}`);
   }
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -116,8 +117,10 @@ function preToolUse(hookInput) {
 
   // Only validate files in skills/*/rules/ directories
   const normalizedPath = path.normalize(filePath);
-  if (!normalizedPath.includes(path.join('.claude', 'skills')) ||
-      !normalizedPath.includes(path.join('rules'))) {
+  if (
+    !normalizedPath.includes(path.join('.claude', 'skills')) ||
+    !normalizedPath.includes(path.join('rules'))
+  ) {
     return { allowed: true };
   }
 
@@ -144,7 +147,7 @@ function preToolUse(hookInput) {
     if (!result.valid) {
       return {
         allowed: false,
-        reason: `Rule validation failed for ${path.basename(filePath)}:\n${result.errors.map(e => `  - ${e}`).join('\n')}`
+        reason: `Rule validation failed for ${path.basename(filePath)}:\n${result.errors.map(e => `  - ${e}`).join('\n')}`,
       };
     }
   } catch (err) {
@@ -158,5 +161,5 @@ function preToolUse(hookInput) {
 module.exports = {
   preToolUse,
   validateRuleFile,
-  parseFrontmatter
+  parseFrontmatter,
 };

@@ -10,12 +10,14 @@ Optimized all 50 agent files to use `@` prefix for lazy-loading file references 
 ### The Three Rules
 
 1. **✅ Markdown Documentation**: References to `.claude/` files in markdown text get `@` prefix
+
    ```markdown
    - Read: `@.claude/skills/tdd/SKILL.md`
    - Location: `@.claude/context/memory/decisions.md`
    ```
 
 2. **✅ Context Files Array**: Files listed in YAML frontmatter `context_files:` get `@` prefix
+
    ```yaml
    context_files:
      - @.claude/context/memory/learnings.md
@@ -23,6 +25,7 @@ Optimized all 50 agent files to use `@` prefix for lazy-loading file references 
    ```
 
 3. **❌ Bash Commands**: Commands inside `Bash()` calls or code blocks do NOT get `@` prefix
+
    ```javascript
    // WRONG: Bash("node @.claude/tools/validate.mjs")
    // RIGHT: Bash("node .claude/tools/validate.mjs")
@@ -34,6 +37,7 @@ Optimized all 50 agent files to use `@` prefix for lazy-loading file references 
 ## Implementation Details
 
 **Scripts Used**:
+
 - `scripts/add-lazy-load-prefixes.cjs` - Smart lazy-load prefix addition (context-aware)
 - `scripts/fix-bash-prefix-errors.cjs` - Removes incorrect `@` from bash commands
 
@@ -47,6 +51,7 @@ Optimized all 50 agent files to use `@` prefix for lazy-loading file references 
 ## What Each Script Does
 
 ### add-lazy-load-prefixes.cjs (Smart Mode)
+
 - Tracks code blocks (skips content between ```)
 - Detects Bash() function calls and removes `@` if present
 - Ensures context_files array has `@` prefixes
@@ -54,6 +59,7 @@ Optimized all 50 agent files to use `@` prefix for lazy-loading file references 
 - Line-by-line context-aware processing
 
 ### fix-bash-prefix-errors.cjs
+
 - Finds Bash() calls with incorrect `@` prefixes
 - Removes `@` from bash command patterns (cat, grep, node, npm, etc.)
 - Removes `@` from command chains with pipes/redirects
@@ -75,21 +81,24 @@ All categories now properly use lazy-load prefixes where appropriate:
 ## Verification Checklist
 
 ✅ Bash commands have NO @ prefix
-  - `Bash("node .claude/tools/validate.mjs")`
-  - `grep '<pattern>' .claude/CLAUDE.md`
-  - `cat .claude/context/memory/learnings.md`
+
+- `Bash("node .claude/tools/validate.mjs")`
+- `grep '<pattern>' .claude/CLAUDE.md`
+- `cat .claude/context/memory/learnings.md`
 
 ✅ Markdown documentation has @ prefix
-  - `Read: @.claude/skills/tdd/SKILL.md`
-  - Reference: `@.claude/docs/FILE_PLACEMENT_RULES.md`
-  - Location: `@.claude/context/memory/decisions.md`
+
+- `Read: @.claude/skills/tdd/SKILL.md`
+- Reference: `@.claude/docs/FILE_PLACEMENT_RULES.md`
+- Location: `@.claude/context/memory/decisions.md`
 
 ✅ Context_files array has @ prefix
-  ```yaml
-  context_files:
-    - @.claude/context/memory/learnings.md
-    - @.claude/context/evolution-state.json
-  ```
+
+```yaml
+context_files:
+  - @.claude/context/memory/learnings.md
+  - @.claude/context/evolution-state.json
+```
 
 ## Context Benefits
 
@@ -101,6 +110,7 @@ All categories now properly use lazy-load prefixes where appropriate:
 ## Files Modified
 
 All 50 agent files across:
+
 - `.claude/agents/core/` (9 files)
 - `.claude/agents/domain/` (22 files)
 - `.claude/agents/specialized/` (12 files)
@@ -110,6 +120,7 @@ All 50 agent files across:
 ## Testing
 
 Run this verification:
+
 ```bash
 # Check bash commands have NO @
 grep -r "Bash(.*@\.claude" .claude/agents/ | wc -l

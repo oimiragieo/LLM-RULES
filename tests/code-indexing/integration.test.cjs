@@ -59,7 +59,7 @@ suite('End-to-End Integration Tests (43.1)', () => {
         'export class AuthService {',
         '  async login(username: string, password: string): Promise<User> {',
         '    const valid = await this.verifyPassword(username, password);',
-        '    if (!valid) { throw new Error(\'Invalid credentials\'); }',
+        "    if (!valid) { throw new Error('Invalid credentials'); }",
         '    return this.getUserByUsername(username);',
         '  }',
         '',
@@ -68,15 +68,15 @@ suite('End-to-End Integration Tests (43.1)', () => {
         '  }',
         '',
         '  private async getUserByUsername(username: string): Promise<User> {',
-        '    return { id: 1, username, email: username + \'@example.com\' };',
+        "    return { id: 1, username, email: username + '@example.com' };",
         '  }',
-        '}'
+        '}',
       ].join('\n'),
 
       'utils/helpers.py': [
         'def calculate_total(items):',
         '    """Calculate total price of items"""',
-        '    return sum(item[\'price\'] for item in items)',
+        "    return sum(item['price'] for item in items)",
         '',
         'def format_currency(amount):',
         '    """Format amount as currency"""',
@@ -92,17 +92,17 @@ suite('End-to-End Integration Tests (43.1)', () => {
         '        return self.transform_data(filtered)',
         '',
         '    def filter_data(self, data):',
-        '        return [d for d in data if d.get(\'active\')]',
+        "        return [d for d in data if d.get('active')]",
         '',
         '    def transform_data(self, data):',
         '        return [self.transform_item(d) for d in data]',
         '',
         '    def transform_item(self, item):',
         '        return {',
-        '            \'id\': item[\'id\'],',
-        '            \'value\': item[\'value\'] * 2',
+        "            'id': item['id'],",
+        "            'value': item['value'] * 2",
         '        }',
-      ].join('\n')
+      ].join('\n'),
     };
 
     // Create files
@@ -117,13 +117,13 @@ suite('End-to-End Integration Tests (43.1)', () => {
   }
 
   // Setup: Create temp directory and index manager
-  test('setup - create test environment', (_t) => {
+  test('setup - create test environment', _t => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'code-index-test-'));
     testFiles = createTestProject(tempDir);
 
     manager = new IndexManager({
       projectRoot: tempDir,
-      metadataPath: path.join(tempDir, '.metadata.json')
+      metadataPath: path.join(tempDir, '.metadata.json'),
     });
 
     assert.ok(tempDir);
@@ -171,8 +171,10 @@ suite('End-to-End Integration Tests (43.1)', () => {
     // Top result should be from auth/login.ts
     const topResult = authResults[0];
     assert.ok(topResult.filePath.includes('login'), 'Top result should be from login file');
-    assert.ok(topResult.content.includes('login') || topResult.content.includes('auth'),
-      'Top result content should mention login or auth');
+    assert.ok(
+      topResult.content.includes('login') || topResult.content.includes('auth'),
+      'Top result content should mention login or auth'
+    );
 
     // Search for data processing code
     const dataResults = await manager.semanticSearch('process data transform items', 5);
@@ -180,8 +182,11 @@ suite('End-to-End Integration Tests (43.1)', () => {
     assert.ok(dataResults.length > 0, 'Should return results for data processing query');
 
     // Results should include relevant code
-    const hasRelevant = dataResults.some(r =>
-      r.content.includes('process') || r.content.includes('transform') || r.content.includes('data')
+    const hasRelevant = dataResults.some(
+      r =>
+        r.content.includes('process') ||
+        r.content.includes('transform') ||
+        r.content.includes('data')
     );
     assert.ok(hasRelevant, 'Results should contain relevant code');
   });
@@ -219,8 +224,10 @@ suite('End-to-End Integration Tests (43.1)', () => {
 
     // Results should be sorted by score (descending)
     for (let i = 1; i < results.length; i++) {
-      assert.ok(results[i - 1].score >= results[i].score,
-        'Results should be sorted by score descending');
+      assert.ok(
+        results[i - 1].score >= results[i].score,
+        'Results should be sorted by score descending'
+      );
     }
   });
 
@@ -245,7 +252,7 @@ suite('Multi-Language Support Tests (43.2)', () => {
       'test.ts': 'function tsFunc(): number { return 42; }',
       'test.py': 'def py_func():\n    return 42',
       'test.go': 'package main\nfunc goFunc() int {\n    return 42\n}',
-      'test.rs': 'fn rust_func() -> i32 {\n    42\n}'
+      'test.rs': 'fn rust_func() -> i32 {\n    42\n}',
     };
 
     for (const [file, content] of Object.entries(files)) {
@@ -254,7 +261,7 @@ suite('Multi-Language Support Tests (43.2)', () => {
 
     manager = new IndexManager({
       projectRoot: tempDir,
-      metadataPath: path.join(tempDir, '.metadata.json')
+      metadataPath: path.join(tempDir, '.metadata.json'),
     });
 
     assert.ok(tempDir);

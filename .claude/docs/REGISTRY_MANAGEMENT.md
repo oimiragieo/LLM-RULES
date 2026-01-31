@@ -9,11 +9,11 @@ This guide explains how to manage the Phase 1-3 infrastructure registries used f
 
 The agent-studio framework uses three interconnected JSON registries for runtime discovery:
 
-| Registry | Purpose | File | Tool |
-|----------|---------|------|------|
-| **Phase 1: Tool Manifest** | Toolset definitions, tool availability | `.claude/config/tool-manifest.json` | `gen:tool-manifest` |
-| **Phase 2: Skill Index** | Skill discovery, metadata, agent assignments | `.claude/config/skill-index.json` | `gen:skill-index` |
-| **Phase 3: Agent Registry** | Agent capabilities, health tracking | `.claude/context/agent-registry.json` | `gen:agent-registry` |
+| Registry                    | Purpose                                      | File                                  | Tool                 |
+| --------------------------- | -------------------------------------------- | ------------------------------------- | -------------------- |
+| **Phase 1: Tool Manifest**  | Toolset definitions, tool availability       | `.claude/config/tool-manifest.json`   | `gen:tool-manifest`  |
+| **Phase 2: Skill Index**    | Skill discovery, metadata, agent assignments | `.claude/config/skill-index.json`     | `gen:skill-index`    |
+| **Phase 3: Agent Registry** | Agent capabilities, health tracking          | `.claude/context/agent-registry.json` | `gen:agent-registry` |
 
 ## Quick Reference
 
@@ -24,11 +24,13 @@ npm run gen:all-registries
 ```
 
 This runs all three generators in sequence:
+
 1. `generate-tool-manifest.cjs` (Phase 1)
 2. `generate-skill-index.cjs` (Phase 2)
 3. `generate-agent-registry.cjs` (Phase 3)
 
 **Use when:**
+
 - Creating new agents, skills, or tools
 - After manual artifact creation
 - As part of CI/CD validation
@@ -57,23 +59,29 @@ npm run agents:registry:validate
 Creator skills automatically call these generators as part of their post-creation workflow:
 
 ### Agent Creator (Phase 3)
+
 After creating a new agent, automatically runs:
+
 ```bash
 node .claude/tools/cli/generate-agent-registry.cjs
 ```
 
 This ensures:
+
 - New agent appears in `agent-registry.json`
 - Capability card is generated
 - Health tracking is initialized
 
 ### Skill Creator (Phase 2)
+
 After creating a new skill, automatically runs:
+
 ```bash
 node .claude/tools/cli/generate-skill-index.cjs
 ```
 
 This ensures:
+
 - New skill appears in `skill-index.json`
 - Metadata is properly registered
 - Agent assignments are updated
@@ -102,6 +110,7 @@ This ensures:
 ```
 
 **Purpose:**
+
 - Define which tools exist
 - Group tools into toolsets
 - Validate tool availability
@@ -132,6 +141,7 @@ This ensures:
 ```
 
 **Purpose:**
+
 - Enable SkillCatalog() tool to discover skills
 - Provide skill metadata (tools, agents, tags)
 - Filter by domain, category, agent type
@@ -167,6 +177,7 @@ This ensures:
 ```
 
 **Purpose:**
+
 - Enable AvailableAgents() tool to discover agents
 - Provide agent metadata and capabilities
 - Track agent health and success rates
@@ -219,6 +230,7 @@ SkillCatalog() can discover
 ### When to Regenerate Manually
 
 **Regenerate all registries when:**
+
 - Making batch updates (multiple artifacts)
 - Running CI/CD validation
 - Troubleshooting discovery issues
@@ -226,6 +238,7 @@ SkillCatalog() can discover
 - Before deployment
 
 **Command:**
+
 ```bash
 npm run gen:all-registries
 ```
@@ -233,6 +246,7 @@ npm run gen:all-registries
 ### Validating Registries
 
 **Check if registries are valid:**
+
 ```bash
 # All registries
 npm run manifest:validate && npm run skills:validate && npm run agents:registry:validate
@@ -248,16 +262,19 @@ npm run agents:registry:validate
 After regenerating registries, verify:
 
 1. **No errors in console output**
+
    ```bash
    npm run gen:all-registries 2>&1 | grep -i error || echo "✓ No errors"
    ```
 
 2. **Registries are valid JSON**
+
    ```bash
    node -e "require('fs').readFileSync('.claude/config/tool-manifest.json')" && echo "✓ Valid"
    ```
 
 3. **New artifacts appear in registries**
+
    ```bash
    # Check for new agent
    grep "agent-name" .claude/context/agent-registry.json
@@ -273,11 +290,13 @@ After regenerating registries, verify:
 **Symptom:** Agent cannot discover a newly created skill
 
 **Causes:**
+
 1. Skill index is stale
 2. Skill metadata incomplete
 3. Agent assignment missing
 
 **Fix:**
+
 ```bash
 # Regenerate skill index
 npm run gen:skill-index
@@ -294,11 +313,13 @@ node -e "console.log(JSON.parse(require('fs').readFileSync('.claude/config/skill
 **Symptom:** Router cannot discover a newly created agent
 
 **Causes:**
+
 1. Agent registry is stale
 2. Agent capability card incomplete
 3. Agent health not initialized
 
 **Fix:**
+
 ```bash
 # Regenerate agent registry
 npm run gen:agent-registry
@@ -315,11 +336,13 @@ node -e "console.log(JSON.parse(require('fs').readFileSync('.claude/context/agen
 **Symptom:** Registry validation fails
 
 **Causes:**
+
 1. Artifact has invalid structure
 2. Required fields missing
 3. Data type mismatches
 
 **Fix:**
+
 ```bash
 # Run validation with verbose output
 npm run manifest:validate -- --verbose
@@ -364,6 +387,7 @@ npm run agents:registry:validate
 ### 1. Always Run Post-Creation
 
 Creator skills **automatically** run registry generators:
+
 - **Agent Creator** → runs `gen:agent-registry`
 - **Skill Creator** → runs `gen:skill-index`
 
@@ -372,6 +396,7 @@ Do NOT skip these steps manually.
 ### 2. Batch Updates
 
 When creating multiple artifacts:
+
 ```bash
 # Create 5 new agents and 3 new skills
 # Then regenerate all at once
@@ -381,6 +406,7 @@ npm run gen:all-registries
 ### 3. Verify After Generation
 
 Always verify new artifacts appear:
+
 ```bash
 npm run gen:all-registries
 
@@ -394,10 +420,12 @@ grep "new-skill" .claude/config/skill-index.json
 ### 4. Document Registry Updates
 
 Record registry changes in memory:
+
 ```markdown
 **learnings.md**
 
 ## Registry Management
+
 - 2026-01-31: Added 5 new domain experts via agent-creator
   - Agents registered in agent-registry.json
   - Verified with AvailableAgents() tool
@@ -410,6 +438,7 @@ Record registry changes in memory:
 ### 5. Monitor Registry Size
 
 Large registries can impact startup time:
+
 ```bash
 # Check registry size
 ls -lh .claude/config/tool-manifest.json .claude/config/skill-index.json .claude/context/agent-registry.json
@@ -430,6 +459,7 @@ A: Creator skills handle post-creation automatically. Manually regenerate for ba
 
 **Q: Why are there three registries?**
 A: Each supports different discovery patterns:
+
 - Tool Manifest: Validate tool availability before spawning
 - Skill Index: Discover skills by domain/category for agents
 - Agent Registry: Track agent health and capabilities for routing
@@ -442,4 +472,3 @@ A: This means an artifact file has invalid structure. Check the artifact's YAML 
 
 **Q: How do I know if registries are out of sync?**
 A: An artifact exists in the filesystem but not in the registry. Solution: `npm run gen:all-registries`
-

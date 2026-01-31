@@ -34,7 +34,7 @@ function getToolManifest() {
       // Fallback to empty manifest
       TOOL_MANIFEST = {
         tools: { core: [], mcp: [] },
-        validation: { agentDefaults: {} }
+        validation: { agentDefaults: {} },
       };
     }
   }
@@ -75,14 +75,14 @@ function filterAndDescribeTools(allowedTools) {
         name: coreTool.name,
         description: coreTool.description || `${coreTool.name} tool`,
         status: 'available',
-        category: coreTool.category || 'General'
+        category: coreTool.category || 'General',
       });
       continue;
     }
 
     // Check MCP tools
-    const mcpTool = manifest.tools?.mcp?.find(t =>
-      t.name === toolName || t.name.startsWith(toolName.split('__')[0] + '__')
+    const mcpTool = manifest.tools?.mcp?.find(
+      t => t.name === toolName || t.name.startsWith(toolName.split('__')[0] + '__')
     );
     if (mcpTool) {
       result.push({
@@ -90,7 +90,7 @@ function filterAndDescribeTools(allowedTools) {
         description: mcpTool.description || `${toolName} MCP tool`,
         status: mcpTool.status || 'unavailable',
         fallback: mcpTool.fallback || null,
-        category: mcpTool.category || 'MCP'
+        category: mcpTool.category || 'MCP',
       });
       continue;
     }
@@ -100,7 +100,7 @@ function filterAndDescribeTools(allowedTools) {
       name: toolName,
       description: `${toolName} tool`,
       status: 'unknown',
-      category: 'Unknown'
+      category: 'Unknown',
     });
   }
 
@@ -126,9 +126,8 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
   for (const [skillName, skillData] of Object.entries(skills)) {
     if (result.length >= maxSkills) break;
 
-    const isPrimary = skillData.agentPrimary?.some(a =>
-      a.toLowerCase() === normalizedType ||
-      normalizedType.includes(a.toLowerCase())
+    const isPrimary = skillData.agentPrimary?.some(
+      a => a.toLowerCase() === normalizedType || normalizedType.includes(a.toLowerCase())
     );
 
     if (isPrimary) {
@@ -136,7 +135,7 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
         name: skillName,
         description: skillData.description || `${skillData.displayName || skillName} skill`,
         category: skillData.category || 'General',
-        requiredTools: skillData.requiredTools || []
+        requiredTools: skillData.requiredTools || [],
       });
     }
   }
@@ -147,9 +146,8 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
       if (result.length >= maxSkills) break;
       if (result.some(s => s.name === skillName)) continue; // Already added
 
-      const isSupporting = skillData.agentSupporting?.some(a =>
-        a.toLowerCase() === normalizedType ||
-        normalizedType.includes(a.toLowerCase())
+      const isSupporting = skillData.agentSupporting?.some(
+        a => a.toLowerCase() === normalizedType || normalizedType.includes(a.toLowerCase())
       );
 
       if (isSupporting) {
@@ -157,7 +155,7 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
           name: skillName,
           description: skillData.description || `${skillData.displayName || skillName} skill`,
           category: skillData.category || 'General',
-          requiredTools: skillData.requiredTools || []
+          requiredTools: skillData.requiredTools || [],
         });
       }
     }
@@ -165,7 +163,13 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
 
   // If still not enough, add generic high-priority skills
   if (result.length < maxSkills) {
-    const genericSkills = ['tdd', 'debugging', 'code-quality-expert', 'git-expert', 'verification-before-completion'];
+    const genericSkills = [
+      'tdd',
+      'debugging',
+      'code-quality-expert',
+      'git-expert',
+      'verification-before-completion',
+    ];
     for (const skillName of genericSkills) {
       if (result.length >= maxSkills) break;
       if (result.some(s => s.name === skillName)) continue;
@@ -176,7 +180,7 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
           name: skillName,
           description: skillData.description || `${skillData.displayName || skillName} skill`,
           category: skillData.category || 'General',
-          requiredTools: skillData.requiredTools || []
+          requiredTools: skillData.requiredTools || [],
         });
       }
     }
@@ -193,9 +197,8 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
  */
 function buildToolsSection(tools) {
   // If raw tool names, convert to described tools
-  const describedTools = Array.isArray(tools) && typeof tools[0] === 'string'
-    ? filterAndDescribeTools(tools)
-    : tools;
+  const describedTools =
+    Array.isArray(tools) && typeof tools[0] === 'string' ? filterAndDescribeTools(tools) : tools;
 
   const totalTools = describedTools.length;
   const availableCount = describedTools.filter(t => t.status === 'available').length;
@@ -204,8 +207,12 @@ function buildToolsSection(tools) {
   section += `Tools your agent can use directly:\n\n`;
 
   for (const tool of describedTools) {
-    const statusIcon = tool.status === 'available' ? 'Available' :
-                       tool.status === 'unavailable' ? 'Unavailable' : 'Unknown';
+    const statusIcon =
+      tool.status === 'available'
+        ? 'Available'
+        : tool.status === 'unavailable'
+          ? 'Unavailable'
+          : 'Unknown';
     section += `- **${tool.name}**: ${tool.description}\n`;
     section += `  Status: ${statusIcon}\n`;
 
@@ -295,13 +302,20 @@ function injectSections(basePrompt, sections) {
   const instructionsMatch = basePrompt.match(/## Instructions/i);
 
   // Find the warning box end (look for the closing line of the box)
-  const warningBoxEnd = basePrompt.indexOf('+======================================================================+');
+  const warningBoxEnd = basePrompt.indexOf(
+    '+======================================================================+'
+  );
   let lastWarningBoxEnd = warningBoxEnd;
   if (warningBoxEnd !== -1) {
     // Find the second occurrence (end of box)
-    const secondBox = basePrompt.indexOf('+======================================================================+', warningBoxEnd + 1);
+    const secondBox = basePrompt.indexOf(
+      '+======================================================================+',
+      warningBoxEnd + 1
+    );
     if (secondBox !== -1) {
-      lastWarningBoxEnd = secondBox + '+======================================================================+'.length;
+      lastWarningBoxEnd =
+        secondBox +
+        '+======================================================================+'.length;
     }
   }
 
@@ -351,7 +365,7 @@ function assembleSpawnPrompt({
   allowedTools = [],
   basePrompt = '',
   maxToolsInPrompt = 15,
-  maxSkillsInPrompt = 20
+  maxSkillsInPrompt = 20,
 } = {}) {
   // 1. Filter and describe tools (respecting limit)
   const toolsToShow = allowedTools.slice(0, maxToolsInPrompt);
@@ -369,7 +383,7 @@ function assembleSpawnPrompt({
   const enhancedPrompt = injectSections(basePrompt, {
     toolsSection,
     skillsSection,
-    discoverySection
+    discoverySection,
   });
 
   return enhancedPrompt;
@@ -388,5 +402,5 @@ module.exports = {
   _clearCache: () => {
     TOOL_MANIFEST = null;
     SKILL_INDEX = null;
-  }
+  },
 };

@@ -20,7 +20,7 @@ const CHUNK_TYPES = {
   IMPORT: 'import',
   EXPORT: 'export',
   COMMENT: 'comment',
-  OTHER: 'other'
+  OTHER: 'other',
 };
 
 // Default chunking options
@@ -28,7 +28,7 @@ const DEFAULT_OPTIONS = {
   minTokens: 50,
   maxTokens: 2048,
   targetTokens: 512,
-  overlapTokens: 50
+  overlapTokens: 50,
 };
 
 // Node type to chunk type mapping by language
@@ -41,7 +41,7 @@ const NODE_TYPE_MAP = {
     export_statement: CHUNK_TYPES.EXPORT,
     import_statement: CHUNK_TYPES.IMPORT,
     lexical_declaration: CHUNK_TYPES.OTHER,
-    variable_declaration: CHUNK_TYPES.OTHER
+    variable_declaration: CHUNK_TYPES.OTHER,
   },
   typescript: {
     function_declaration: CHUNK_TYPES.FUNCTION,
@@ -51,26 +51,26 @@ const NODE_TYPE_MAP = {
     interface_declaration: CHUNK_TYPES.INTERFACE,
     type_alias_declaration: CHUNK_TYPES.TYPE,
     export_statement: CHUNK_TYPES.EXPORT,
-    import_statement: CHUNK_TYPES.IMPORT
+    import_statement: CHUNK_TYPES.IMPORT,
   },
   python: {
     function_definition: CHUNK_TYPES.FUNCTION,
     class_definition: CHUNK_TYPES.CLASS,
     import_statement: CHUNK_TYPES.IMPORT,
-    import_from_statement: CHUNK_TYPES.IMPORT
+    import_from_statement: CHUNK_TYPES.IMPORT,
   },
   go: {
     function_declaration: CHUNK_TYPES.FUNCTION,
     method_declaration: CHUNK_TYPES.METHOD,
-    type_declaration: CHUNK_TYPES.TYPE
+    type_declaration: CHUNK_TYPES.TYPE,
   },
   rust: {
     function_item: CHUNK_TYPES.FUNCTION,
     impl_item: CHUNK_TYPES.CLASS,
     struct_item: CHUNK_TYPES.TYPE,
     enum_item: CHUNK_TYPES.TYPE,
-    trait_item: CHUNK_TYPES.INTERFACE
-  }
+    trait_item: CHUNK_TYPES.INTERFACE,
+  },
 };
 
 class SemanticChunker {
@@ -104,7 +104,7 @@ class SemanticChunker {
       tokens,
       tooSmall: tokens < this.options.minTokens,
       tooLarge: tokens > this.options.maxTokens,
-      valid: tokens >= this.options.minTokens && tokens <= this.options.maxTokens
+      valid: tokens >= this.options.minTokens && tokens <= this.options.maxTokens,
     };
   }
 
@@ -116,7 +116,8 @@ class SemanticChunker {
    * @returns {string} Unique chunk ID
    */
   generateChunkId(filePath, lineStart, content) {
-    const hash = crypto.createHash('sha256')
+    const hash = crypto
+      .createHash('sha256')
       .update(`${filePath}:${lineStart}:${content.substring(0, 100)}`)
       .digest('hex')
       .substring(0, 16);
@@ -210,7 +211,10 @@ class SemanticChunker {
       const chunkType = this.getChunkType(node.type, language);
 
       // Skip trivial nodes
-      if (chunkType === CHUNK_TYPES.OTHER && this.estimateTokens(node.text) < this.options.minTokens) {
+      if (
+        chunkType === CHUNK_TYPES.OTHER &&
+        this.estimateTokens(node.text) < this.options.minTokens
+      ) {
         continue;
       }
 
@@ -262,7 +266,7 @@ class SemanticChunker {
       signature: [CHUNK_TYPES.FUNCTION, CHUNK_TYPES.METHOD].includes(chunkType)
         ? this.extractSignature(node, content)
         : null,
-      parentChunk: parentId
+      parentChunk: parentId,
     };
   }
 
@@ -284,7 +288,11 @@ class SemanticChunker {
 
     // Create class header chunk
     const className = this.extractName(classNode, language);
-    const classId = this.generateChunkId(filePath, classNode.startPosition.row + 1, className || 'class');
+    const classId = this.generateChunkId(
+      filePath,
+      classNode.startPosition.row + 1,
+      className || 'class'
+    );
 
     // Extract class header (everything before first method)
     const headerChunk = this.extractClassHeader(classNode, language, filePath, content, classId);
@@ -381,7 +389,7 @@ class SemanticChunker {
       tokenCount: this.estimateTokens(headerContent),
       name: this.extractName(classNode, language),
       signature: null,
-      parentChunk: null
+      parentChunk: null,
     };
   }
 
@@ -419,7 +427,7 @@ class SemanticChunker {
           tokenCount,
           name: chunk.name ? `${chunk.name} (part ${partIndex + 1})` : null,
           signature: partIndex === 0 ? chunk.signature : null,
-          parentChunk: chunk.parentChunk
+          parentChunk: chunk.parentChunk,
         });
         partIndex++;
       }

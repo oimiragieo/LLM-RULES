@@ -13,6 +13,148 @@
 
 ---
 
+## [ADR-076] File Placement Architecture Redesign
+
+- **Date**: 2026-01-31
+- **Status**: Accepted
+- **Context**: Tests, documentation, utilities, and artifacts were scattered across inconsistent locations, causing organizational chaos. Tests appeared in both `.claude/hooks/*.test.cjs` AND `tests/hooks/`, utilities in `.claude/lib/` had tests co-located despite FORBIDDEN_PATHS blocking writes, and agents were confused about where to place files. The existing `FILE_PLACEMENT_RULES.md` allowed co-located tests in hooks but `file-placement-guard.cjs` had conflicting rules.
+- **Decision**: Implement unified file placement architecture with strict enforcement:
+  1. **Single Test Location**: ALL tests MUST go in `tests/` directory, NOT in `.claude/`
+     - Hook tests: `tests/hooks/`
+     - Utility tests: `tests/unit/{category}/`
+     - Integration tests: `tests/integration/`
+     - CLI tests: `tests/cli/`
+  2. **Clear Code Homes**:
+     - Hooks: `.claude/hooks/{category}/` (code only, no tests)
+     - Utilities: `.claude/lib/{category}/` (code only, no tests)
+     - CLI tools: `.claude/tools/cli/` (code only, no tests)
+  3. **Artifact Categories**:
+     - Plans: `.claude/context/artifacts/plans/`
+     - Reports: `.claude/context/artifacts/reports/`
+     - Architecture: `.claude/context/artifacts/architecture/`
+     - Diagrams: `.claude/context/artifacts/diagrams/`
+  4. **Enforcement**: Update `file-placement-guard.cjs` to BLOCK test files in `.claude/`
+  5. **Migration**: Migrate ~45 test files from `.claude/` to `tests/`
+  6. **Education**: Add file placement checklist to spawn templates
+- **Consequences**:
+  - **Benefits**:
+    - Single source of truth for file placement
+    - CI/CD test discovery simplified (all in `tests/`)
+    - Clear separation of code and tests
+    - Consistent enforcement via hook
+    - Agent confusion eliminated
+  - **Trade-offs**:
+    - Migration effort required (~45 files)
+    - Import paths need updating in migrated tests
+    - Agents must learn new placement rules
+    - Slight increase in directory depth for tests
+  - **Rollback**: `git checkout HEAD -- .claude/ tests/`
+- **Architecture Document**: `.claude/context/artifacts/architecture/FILE-PLACEMENT-ARCHITECTURE.md`
+- **Implementation**:
+  - Phase 1: Create architecture document (DONE)
+  - Phase 2: Create migration script (DONE - `scripts/testing/migrate-test-files.cjs`)
+  - Phase 3: Execute migration (DONE - 147 test files migrated)
+  - Phase 4: Update `file-placement-guard.cjs` to enforce (DONE - TEST_FILE_PATTERNS blocking)
+  - Phase 5: Fix import paths (DONE - `scripts/testing/fix-all-test-imports.cjs`)
+- **Implementation Date**: 2026-01-31
+- **Estimated Effort**: 8-12 hours across 5 phases
+- **Migration Summary**:
+  - 147 test files migrated from `.claude/` to `tests/`
+  - 48 test files had import paths fixed
+  - 2 audit files moved from `plans/` to `audits/`
+  - `file-placement-guard.cjs` updated to block test files in `.claude/`
+  - New subdirectories added to VALID_PATHS: audits, audit-logs, error-reports
+
+---
+
+## [ADR-075] Router Model Selection from Configuration
+
+- **Date**: 2026-01-31
+- **Status**: Proposed
+- **Context**: Router (CLAUDE.md) hardcodes model values (`'sonnet'`, `'opus'`, `'haiku'`) in spawn examples and documentation, completely ignoring agent configuration in `.claude/config.yaml`. This causes model misallocation (planner configured for opus in config.yaml may be spawned with sonnet), wasting compute and degrading performance.
+- **Decision**: Implement model selection precedence system:
+  1. **Explicit Task() parameter** (highest priority)
+  2. **Agent frontmatter** (`model:` field in agent definition)
+  3. **config.yaml agent entry** (`agents.{type}.model`)
+  4. **Complexity-based default** (trivial→haiku, medium→sonnet, high→opus)
+  5. **Fallback**: sonnet
+- **Implementation**:
+  1. Create `agent-config-reader.cjs` utility for config lookup
+  2. Create `pre-spawn-model-selector.cjs` hook (advisory, logs model selection)
+  3. Update CLAUDE.md Section 5, router-decision.md Step 8, @MODEL_SELECTION.md
+  4. Add `model_aliases` section to config.yaml for shorthand→full ID mapping
+  5. Update orchestrators to read config before spawning subagents
+- **Consequences**:
+  - **Benefits**:
+    - Centralized model control via config.yaml
+    - Cost optimization (right model for right task)
+    - Consistent behavior across spawns
+    - config.yaml becomes source of truth (not dead documentation)
+  - **Trade-offs**:
+    - Config read overhead per spawn (~1ms, negligible)
+    - Additional complexity in spawning workflow
+    - Requires orchestrator updates
+  - **Rollback**: Disable pre-spawn hook, revert documentation changes
+- **Related Files**:
+  - `.claude/context/artifacts/plans/ROUTER-CONFIG-INTEGRATION-AUDIT.md` (full design)
+  - `.claude/config.yaml` (source of truth for agent models)
+  - `.claude/workflows/core/router-decision.md` (routing workflow)
+- **Estimated Effort**: 19 hours across 6 phases
+
+---
+
+## [ADR-074] CLAUDE.md Compression Strategy
+
+- **Date**: 2026-01-31
+- **Status**: Accepted
+- **Context**: CLAUDE.md was 1327 lines, approaching Read tool limits and causing context bloat in router spawns. Need compression while preserving 100% router-first enforcement.
+- **Decision**: Extract 11 reference sections to @files in `.claude/docs/`, keep enforcement-critical sections inline (Sections 0-2, 1.1-1.3, 5.6, 6-8).
+- **Consequences**:
+  - **Benefits**: 68% size reduction (1327 → 429 lines), improved maintainability, single-source-of-truth for reference material, @files enable progressive disclosure
+  - **Trade-offs**: Router must load @files explicitly via Read() tool (minimal overhead ~50 tokens/file), @files are additional files to maintain
+  - **Rollback**: `git checkout HEAD -- .claude/CLAUDE.md && rm .claude/docs/@*.md`
+- **Files Created**:
+  - @AGENT_ROUTING_TABLE.md (complete agent routing matrix)
+  - @CREATOR_SKILLS_TABLE.md (creator skill mapping)
+  - @TOOL_REFERENCE.md (complete tool catalog)
+  - @MODEL_SELECTION.md (model selection guidelines)
+  - @SKILL_CATALOG_TABLE.md (workflow enhancement skills)
+  - @ENTERPRISE_WORKFLOWS.md (enterprise workflow paths)
+  - @ENVIRONMENT_CONFIG.md (environment variable reference)
+  - @DIRECTORY_STRUCTURE.md (directory layout reference)
+  - @ENFORCEMENT_HOOKS.md (hook enforcement details)
+  - @TASK_TRACKING_GUIDE.md (TaskUpdate best practices)
+  - @EVOLUTION_WORKFLOW.md (EVOLVE workflow details)
+- **Navigation**: All @files include "BACK TO MAIN" link to CLAUDE.md section, "RELATED REFERENCES" to cross-referenced files
+- **Verification**: All 4 self-check gates inline and functional, router spawns agents successfully, all @files load without errors, no broken links
+
+---
+
+## [ADR-070] Router Agent Mode Lifecycle - Keep Active Until Session End
+
+- **Date**: 2026-01-31
+- **Status**: Accepted (Emergency Fix)
+- **Context**: Router orchestration broke after PERF-003 hook consolidation. post-task-unified.cjs was immediately exiting agent mode after Task() spawned subagents asynchronously. This caused router to stop monitoring spawned agents, resulting in tasks stuck forever and duplicate spawning.
+- **Decision**: Removed `exitAgentMode()` call from post-task-unified.cjs (line 127). Router now remains in agent mode after Task() and only exits when SessionEnd hook fires.
+- **Consequences**:
+  - **Benefits**:
+    - Router monitors subagents throughout their lifecycle
+    - TaskUpdate completion properly tracked
+    - Multi-agent workflows function correctly
+    - Projects continue instead of appearing abandoned
+  - **Trade-offs**:
+    - Agent mode is held slightly longer (until session end vs immediate exit)
+    - No performance impact (hooks are already running)
+  - **Risk Mitigations**:
+    - SessionEnd hook ensures proper cleanup
+    - router-state tracks mode transitions
+    - Debug logging available via ROUTER_DEBUG=true
+- **Implementation**: File modified: `.claude/hooks/routing/post-task-unified.cjs`
+- **Related Issues**: ROUTER-MONITORING-001, PERF-003
+- **Verification**: Use `ROUTER_DEBUG=true` to confirm agent mode stays active during execution
+
+---
+
 ## [ADR-069] Tool Manifest and Pre-Spawn Validation Architecture
 
 - **Date**: 2026-01-30
@@ -1232,5 +1374,59 @@ _Negative:_
   - `.claude/docs/CODE_INDEXING_TECH_STACK.md` (technology rationale)
   - `.claude/context/artifacts/diagrams/code-indexing-architecture.md` (visual diagrams)
 - **Related ADRs**: ADR-054 (Memory System Enhancement - ChromaDB infrastructure), ADR-070 (SkillCatalog)
+
+---
+
+## [ADR-075] Router Config-Aware Model Selection Architecture
+
+- **Date**: 2026-01-31
+- **Status**: Accepted (Phase 1-2 Implemented)
+- **Context**: Router hardcodes model selection in CLAUDE.md and spawn templates, completely ignoring agent configurations defined in `config.yaml`. This creates trust, cost, governance, and auditability gaps. Audit AUDIT-2026-01-31-001 identified that config.yaml defines models for 4 core agents (planner, developer, qa, architect) but these are never read by the router.
+- **Decision**: Implement config-aware model selection with the following architecture:
+  1. **Agent Config Resolver** (`.claude/lib/utils/agent-config-resolver.cjs`): Resolves agent model from multiple sources with correct precedence
+  2. **Model Precedence Order**: Task override (P1) > Agent frontmatter (P2) > config.yaml (P3) > Complexity default (P4)
+  3. **Pre-Spawn Validation Hook** (`.claude/hooks/routing/config-model-validator.cjs`): Validates spawn model matches config, warns/blocks on mismatch
+  4. **Router Protocol Update**: CLAUDE.md and router-decision.md updated to call resolver before Task()
+  5. **Orchestrator Update**: All 5 orchestrators updated to use config-aware spawning
+  6. **Audit Trail**: Model source logged in TaskUpdate metadata
+- **Consequences**:
+  - **Benefits**:
+    - Config.yaml becomes source-of-truth for agent models (administrators can control)
+    - Audit trail shows configured vs deployed model (auditability)
+    - Pre-spawn hook detects mismatches (enforcement)
+    - Cost variance visible and controllable (governance)
+    - Backward compatible (complexity default as fallback)
+  - **Trade-offs**:
+    - Additional config lookup on every spawn (~1ms overhead)
+    - New hook in spawn chain (warn mode default for gradual rollout)
+    - Existing spawn templates require update
+    - Orchestrators require code changes
+  - **Risk Mitigations**:
+    - Hook default to warn mode (doesn't break existing spawns)
+    - Config loader is cached (performance)
+    - Fallback to complexity default if config missing
+- **Implementation Plan**:
+  - Phase 1 (DONE): Created `.claude/lib/utils/agent-config-reader.cjs` (model resolution utility)
+  - Phase 2 (DONE): Created `.claude/hooks/routing/config-model-validator.cjs` (pre-spawn validation hook)
+  - Phase 3 (DONE): Updated CLAUDE.md Section 5 with config-reading step
+  - Phase 4 (DONE): Updated `.claude/docs/@MODEL_SELECTION.md` with precedence documentation
+  - Phase 5 (DONE 2026-01-31): Updated all 5 orchestrators to use config-aware spawning
+    - master-orchestrator.md: Added resolveAgentModel() to AvailableAgents example
+    - swarm-coordinator.md: Added Model Selection Protocol section with swarm worker loop
+    - evolution-orchestrator.md: Added model resolution to capability-based spawn pattern
+    - party-orchestrator.md: Added model resolution to Step 4 agent spawn loop
+    - router.md: Updated Model Selection section with ADR-075 precedence
+  - Phase 6 (PENDING): Full routing integration tests
+- **Files Created**:
+  - `.claude/lib/utils/agent-config-reader.cjs` (utility, 37 tests passing)
+  - `.claude/lib/utils/agent-config-reader.test.cjs` (TDD tests)
+  - `.claude/hooks/routing/config-model-validator.cjs` (hook, 31 tests passing)
+  - `.claude/hooks/routing/config-model-validator.test.cjs` (TDD tests)
+- **Files Updated**:
+  - `.claude/CLAUDE.md` (Section 1 Router Protocol, Section 5 Model Selection)
+  - `.claude/docs/@MODEL_SELECTION.md` (comprehensive precedence documentation)
+- **Audit Document**: `.claude/context/artifacts/plans/ROUTER-CONFIG-INTEGRATION-AUDIT.md`
+- **Related Issues**: CONFIG-001 (Router Ignores config.yaml)
+- **Related ADRs**: ADR-069 (Tool Manifest), ADR-070 (SkillCatalog), ADR-071 (Agent Capability Cards), ADR-074 (CLAUDE.md Compression)
 
 ---

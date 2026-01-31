@@ -4,7 +4,10 @@ const { test, describe, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs').promises;
 const path = require('path');
-const { EmbeddingGenerator, DEFAULT_OPTIONS } = require('../../.claude/lib/code-indexing/embedding-generator.cjs');
+const {
+  EmbeddingGenerator,
+  DEFAULT_OPTIONS,
+} = require('../../.claude/lib/code-indexing/embedding-generator.cjs');
 
 describe('Embedding Generator Tests', () => {
   let generator;
@@ -41,7 +44,7 @@ describe('Embedding Generator Tests', () => {
     test('EmbeddingGenerator accepts custom options', () => {
       const customGen = new EmbeddingGenerator({
         batchSize: 50,
-        cacheEnabled: false
+        cacheEnabled: false,
       });
       assert.equal(customGen.options.batchSize, 50);
       assert.equal(customGen.options.cacheEnabled, false);
@@ -60,7 +63,7 @@ describe('Embedding Generator Tests', () => {
   describe('39.2: Initialization', () => {
     test('initialize loads model (slow first time)', { timeout: 60000 }, async () => {
       generator = new EmbeddingGenerator({
-        cacheEnabled: false
+        cacheEnabled: false,
       });
 
       assert.equal(generator.isInitialized(), false);
@@ -97,7 +100,10 @@ describe('Embedding Generator Tests', () => {
 
       assert.ok(Array.isArray(embedding), 'Should return array');
       assert.equal(embedding.length, 384, 'Should be 384 dimensions');
-      assert.ok(embedding.every(v => typeof v === 'number'), 'All values should be numbers');
+      assert.ok(
+        embedding.every(v => typeof v === 'number'),
+        'All values should be numbers'
+      );
     });
 
     test('embed handles empty string', { timeout: 60000 }, async () => {
@@ -131,14 +137,10 @@ describe('Embedding Generator Tests', () => {
     test('batchEmbed processes multiple texts', { timeout: 60000 }, async () => {
       generator = new EmbeddingGenerator({
         batchSize: 2,
-        cacheEnabled: false
+        cacheEnabled: false,
       });
 
-      const texts = [
-        'function foo() {}',
-        'function bar() {}',
-        'class MyClass {}'
-      ];
+      const texts = ['function foo() {}', 'function bar() {}', 'class MyClass {}'];
 
       const embeddings = await generator.batchEmbed(texts);
 
@@ -171,7 +173,7 @@ describe('Embedding Generator Tests', () => {
           language: 'javascript',
           name: 'hello',
           content: 'function hello() { return 42; }',
-          signature: 'hello()'
+          signature: 'hello()',
         },
         {
           id: 'test:class:1',
@@ -179,8 +181,8 @@ describe('Embedding Generator Tests', () => {
           language: 'javascript',
           name: 'MyClass',
           content: 'class MyClass {}',
-          signature: 'class MyClass'
-        }
+          signature: 'class MyClass',
+        },
       ];
 
       const result = await gen.embedChunks(chunks);
@@ -200,7 +202,7 @@ describe('Embedding Generator Tests', () => {
         language: 'javascript',
         name: 'hello',
         signature: 'hello()',
-        content: 'function hello() { return 42; }'
+        content: 'function hello() { return 42; }',
       };
 
       const prepared = gen.prepareForEmbedding(chunk);
@@ -228,7 +230,7 @@ describe('Embedding Generator Tests', () => {
     test('cache stores and retrieves embeddings', { timeout: 60000 }, async () => {
       const gen = new EmbeddingGenerator({
         cacheEnabled: true,
-        cachePath: cachePath
+        cachePath: cachePath,
       });
 
       const text = 'function test() {}';
@@ -259,7 +261,7 @@ describe('Embedding Generator Tests', () => {
     test('saveCache persists to disk', { timeout: 60000 }, async () => {
       const gen = new EmbeddingGenerator({
         cacheEnabled: true,
-        cachePath: cachePath
+        cachePath: cachePath,
       });
 
       await gen.embed('test1');
@@ -276,7 +278,7 @@ describe('Embedding Generator Tests', () => {
       // First generator saves cache
       const gen1 = new EmbeddingGenerator({
         cacheEnabled: true,
-        cachePath: cachePath
+        cachePath: cachePath,
       });
       await gen1.embed('cached_text');
       await gen1.saveCache();
@@ -284,7 +286,7 @@ describe('Embedding Generator Tests', () => {
       // Second generator loads cache
       const gen2 = new EmbeddingGenerator({
         cacheEnabled: true,
-        cachePath: cachePath
+        cachePath: cachePath,
       });
       await gen2.loadCache();
 
@@ -305,7 +307,7 @@ describe('Embedding Generator Tests', () => {
     test('getCacheStats returns stats', { timeout: 60000 }, async () => {
       const gen = new EmbeddingGenerator({
         cacheEnabled: true,
-        cachePath: cachePath
+        cachePath: cachePath,
       });
       await gen.embed('test');
 
@@ -337,7 +339,7 @@ describe('Embedding Generator Tests', () => {
 
       const gen = new EmbeddingGenerator({
         cacheEnabled: true,
-        cachePath: cachePath
+        cachePath: cachePath,
       });
 
       // Should not throw
@@ -351,7 +353,7 @@ describe('Embedding Generator Tests', () => {
     test('processes 100 chunks in <30 seconds', { timeout: 60000 }, async () => {
       const gen = new EmbeddingGenerator({
         batchSize: 100,
-        cacheEnabled: false
+        cacheEnabled: false,
       });
 
       // Generate 100 simple chunks
@@ -360,7 +362,7 @@ describe('Embedding Generator Tests', () => {
         type: 'function',
         language: 'javascript',
         name: `func${i}`,
-        content: `function func${i}() { return ${i}; }`
+        content: `function func${i}() { return ${i}; }`,
       }));
 
       const start = Date.now();
@@ -370,7 +372,9 @@ describe('Embedding Generator Tests', () => {
       assert.equal(result.length, 100);
       assert.ok(elapsed < 30000, `Should complete in <30s, took ${elapsed}ms`);
 
-      console.log(`      [PERF] 100 chunks in ${elapsed}ms (${(elapsed / 100).toFixed(1)}ms/chunk)`);
+      console.log(
+        `      [PERF] 100 chunks in ${elapsed}ms (${(elapsed / 100).toFixed(1)}ms/chunk)`
+      );
     });
   });
 });

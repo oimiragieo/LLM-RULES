@@ -44,9 +44,9 @@ const VALID_PATHS = {
   skills:
     /^\.claude[/\\]skills[/\\][a-z0-9-]+[/\\](SKILL\.md|metadata\.json|examples[/\\]|tests[/\\])/i,
 
-  // Hooks (categorized by function)
+  // Hooks (categorized by function) - NO TEST FILES (tests go in tests/hooks/)
   hooks:
-    /^\.claude[/\\]hooks[/\\](routing|safety|memory|evolution|session|validation|reflection|self-healing)[/\\][a-z0-9-]+\.(cjs|test\.cjs)$/i,
+    /^\.claude[/\\]hooks[/\\](routing|safety|memory|evolution|session|validation|reflection|self-healing|audit|cost-tracking|monitoring)[/\\][a-z0-9-]+\.cjs$/i,
 
   // Workflows (categorized)
   workflows:
@@ -63,6 +63,15 @@ const VALID_PATHS = {
 
   // Context artifacts - diagrams
   context_diagrams: /^\.claude[/\\]context[/\\]artifacts[/\\]diagrams[/\\]/i,
+
+  // Context artifacts - audits (ADR-076)
+  context_audits: /^\.claude[/\\]context[/\\]artifacts[/\\]audits[/\\]/i,
+
+  // Context artifacts - audit-logs
+  context_audit_logs: /^\.claude[/\\]context[/\\]artifacts[/\\]audit-logs[/\\]/i,
+
+  // Context artifacts - error-reports
+  context_error_reports: /^\.claude[/\\]context[/\\]artifacts[/\\]error-reports[/\\]/i,
 
   // Context memory
   context_memory: /^\.claude[/\\]context[/\\]memory[/\\]/i,
@@ -111,6 +120,10 @@ const FORBIDDEN_PATHS = [
   /^\.claude[/\\]lib[/\\]/i, // Internal libraries - framework only
   /^\.claude[/\\]tools[/\\]/i, // CLI tools - should not be auto-generated
 ];
+
+// ADR-076: Test file patterns that are ALWAYS blocked in .claude/
+// All tests must go in the root tests/ directory
+const TEST_FILE_PATTERNS = [/\.test\.cjs$/i, /\.test\.mjs$/i, /\.spec\.cjs$/i, /\.spec\.mjs$/i];
 
 // Files that are always allowed (framework internal operations)
 const ALWAYS_ALLOWED_PATTERNS = [
@@ -632,6 +645,18 @@ function isValidPath(filePath) {
       return {
         valid: false,
         reason: `Forbidden path - framework internal: ${relativePath.substring(8, 30)}...`,
+      };
+    }
+  }
+
+  // ADR-076: Block test files in .claude/ - all tests must go in root tests/ directory
+  // This check comes before valid patterns to ensure no test files are ever allowed in .claude/
+  const fileName = path.basename(relativePath);
+  for (const pattern of TEST_FILE_PATTERNS) {
+    if (pattern.test(fileName)) {
+      return {
+        valid: false,
+        reason: `Test files are forbidden in .claude/ - use tests/ directory instead`,
       };
     }
   }
@@ -1336,6 +1361,8 @@ module.exports = {
   getEnforcementMode,
   VALID_PATHS,
   FORBIDDEN_PATHS,
+  // ADR-076: Test file patterns for blocking
+  TEST_FILE_PATTERNS,
   ARTIFACT_DIRECTORIES,
   getEvolutionState,
   isNewArtifactCreation,

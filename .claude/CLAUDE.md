@@ -15,52 +15,12 @@
 
 **Hard Stop:** If you are about to respond without `TaskList()` + at least one `Task(...)`, STOP and do it.
 
-### Template Loading Protocol (Option D)
+### Template Loading Protocol
 
-**When Spawning Agents, Router MUST:**
-
-1. **Check Template Availability** (before spawning)
-
-   ```javascript
-   // Verify template exists
-   const templateExists = Read({ file_path: '.claude/templates/spawn/universal-agent-spawn.md' });
-   ```
-
-2. **Use Template Reference** (in spawn prompt)
-   - Reference template file path in spawn
-   - Do NOT inline full template content (causes bloat)
-
-3. **Handle Template Failures** (gracefully)
-   - If template load fails, use Section 2 fallback
-   - Log fallback usage for monitoring
-   - Do NOT block spawn due to template issues
-
-**Template Loading Sequence:**
-
-```
-┌─────────────────────────────────────────────────────────┐
-│ 1. Router receives request                              │
-│ 2. Router determines agent type (developer, qa, etc.)   │
-│ 3. Router selects template:                             │
-│    - Standard agent → universal-agent-spawn.md          │
-│    - Orchestrator → orchestrator-spawn.md               │
-│    - With identity → agent-identity-integration.md      │
-│ 4. Router loads template via Read tool                  │
-│ 5. Router substitutes placeholders:                     │
-│    - <ROLE> → agent type                                │
-│    - <TASK> → task description                          │
-│    - <ID> → task ID                                     │
-│    - <absolute-path> → PROJECT_ROOT                     │
-│ 6. Router spawns agent with populated template          │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Template Validation Enforcement:**
-
-- spawn-prompt-validator.cjs hook validates spawn prompts
-- Default mode: `warn` (logs issues but allows spawn)
-- Production mode: `block` (blocks invalid spawns)
-- Environment: `SPAWN_PROMPT_VALIDATOR=block|warn|off`
+**Templates:** universal-agent-spawn.md (standard) | orchestrator-spawn.md (orchestrators) | agent-identity-integration.md (with personality)
+**Process:** Read template → Substitute placeholders (<ROLE>, <TASK>, <ID>, PROJECT_ROOT) → Spawn
+**Fallback:** If load fails, use Section 2 inline fallback
+**Validation:** spawn-prompt-validator.cjs (default: warn, override: `SPAWN_PROMPT_VALIDATOR=block|warn|off`)
 
 ---
 
@@ -71,8 +31,8 @@
 1. **CHECK TASKS FIRST:** `TaskList()`
 2. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
 3. **Check:** scan `.claude/agents/` for best agent match
-4. **Select:** pick agent(s) + model (haiku/sonnet/opus)
-5. **SPAWN:** use **Task tool** with task ID(s)
+4. **Select:** pick agent(s) + **resolve model from config.yaml** (see Section 5)
+5. **SPAWN:** use **Task tool** with task ID(s) and **configured model**
 
 **CRITICAL**
 
@@ -271,266 +231,35 @@ Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesi
 
 ## 1.3 ENFORCEMENT HOOKS
 
-Router-first protocol is enforced by blocking hooks:
+> **REFERENCE:** See **@ENFORCEMENT_HOOKS.md** for detailed hook enforcement logic.
 
-| Hook                | Location                 | Trigger          | Default | Env       |
-| ------------------- | ------------------------ | ---------------- | ------- | --------- |
-| `routing-guard.cjs` | `.claude/hooks/routing/` | PreToolUse(Task) | block   | see below |
+**Primary Hooks:**
 
-`routing-guard.cjs` consolidates:
+- `routing-guard.cjs` - Enforces planner-first, security review, router self-check (PreToolUse Task, default: block)
+- `unified-creator-guard.cjs` - Enforces Gate 4 creator workflow (PreToolUse Write/Edit, default: block)
 
-- Planner-first enforcement (`PLANNER_FIRST_ENFORCEMENT`)
-- Task-create complexity guard (`PLANNER_FIRST_ENFORCEMENT`)
-- Security review guard (`SECURITY_REVIEW_ENFORCEMENT`)
-- Router self-check
-- Documentation routing guard
-
-`unified-creator-guard.cjs` enforces Gate 4 for all artifact types above. Override: `CREATOR_GUARD=warn|off`.
-
-**Enforcement Modes:** `block` (default), `warn`, `off`
-**Override Examples**
-
-```bash
-PLANNER_FIRST_ENFORCEMENT=warn claude
-ROUTER_WRITE_GUARD=off claude
-```
+**Enforcement Modes:** block (default) | warn | off
+**Override:** `PLANNER_FIRST_ENFORCEMENT=warn`, `CREATOR_GUARD=off`, `SECURITY_REVIEW_ENFORCEMENT=off`
 
 ---
 
 ## 1.4 TOOLS REFERENCE
 
-Comprehensive guide to all available tools in the agent-studio framework.
+> **REFERENCE:** See **@TOOL_REFERENCE.md** for comprehensive tool catalog.
 
-### Core Tools (Always Available - No Configuration Required)
+22 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, SkillCatalog, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit).
 
-These tools are built into Claude Code and work immediately:
+**Router Toolset (Whitelist):**
 
-| Tool                | Category        | Purpose                                     | Availability                   |
-| ------------------- | --------------- | ------------------------------------------- | ------------------------------ |
-| **Read**            | File I/O        | Read files from filesystem                  | ✅ All agents                  |
-| **Write**           | File I/O        | Create/overwrite files                      | ✅ All agents                  |
-| **Edit**            | File I/O        | Make precise edits to files                 | ✅ All agents                  |
-| **Bash**            | Shell           | Execute shell commands                      | ✅ All agents (restricted)     |
-| **Glob**            | Search          | Pattern-based file discovery                | ✅ All agents                  |
-| **Grep**            | Search          | Content search in files                     | ✅ All agents                  |
-| **Task**            | Orchestration   | Spawn subagents                             | ✅ Router + Orchestrators ONLY |
-| **TaskCreate**      | Task Management | Create trackable tasks                      | ✅ All agents                  |
-| **TaskUpdate**      | Task Management | Update task status/metadata                 | ✅ All agents (MANDATORY)      |
-| **TaskList**        | Task Management | List all tasks                              | ✅ All agents                  |
-| **TaskGet**         | Task Management | Get task details                            | ✅ All agents                  |
-| **TaskOutput**      | Task Management | Read task output                            | ✅ All agents                  |
-| **TaskStop**        | Task Management | Stop running task                           | ✅ All agents                  |
-| **Skill**           | Capability      | Invoke skill workflows                      | ✅ All agents (MANDATORY)      |
-| **SkillCatalog**    | Capability      | Query available skills at runtime           | ✅ All agents                  |
-| **AvailableAgents** | Capability      | Query available agents by capability/domain | ✅ Router + Orchestrators      |
-| **AskUserQuestion** | Interaction     | Get user input                              | ✅ Router ONLY                 |
-| **EnterPlanMode**   | Planning        | Switch to planning mode                     | ✅ All agents                  |
-| **ExitPlanMode**    | Planning        | Exit planning mode                          | ✅ All agents                  |
-| **WebSearch**       | Research        | Search the web                              | ✅ All agents                  |
-| **WebFetch**        | Research        | Fetch webpage content                       | ✅ All agents                  |
-| **NotebookEdit**    | Jupyter         | Edit notebook cells                         | ✅ All agents                  |
+- Task, TaskList, TaskCreate, TaskUpdate, TaskGet
+- Read (agent files / routing docs only)
+- AskUserQuestion
 
-**Total Core Tools:** 22
+**Router Blacklist (must spawn agent):**
 
-**SkillCatalog**: Agents can query available skills dynamically at runtime:
+- Edit, Write, Bash (implementation), Glob, Grep, WebSearch, mcp\_\_\*
 
-- Example: `SkillCatalog({ domain: 'testing' })`
-- Filters: domain, category, agentType, tags, limit
-- Returns: Matching skills with descriptions and recommendations
-- Use when: Agent needs to discover skills for current task (more flexible than pre-injected AVAILABLE_SKILLS)
-
-Example usage in agent code:
-
-```javascript
-const skills = SkillCatalog({ domain: 'testing', agentType: 'developer' });
-const best = skills.skills.find(s => s.recommended);
-Skill({ skill: best.name });
-```
-
-**AvailableAgents** (Phase 3): Router and orchestrators can query available agents at runtime:
-
-- Example: `AvailableAgents({ capability: 'code-review' })`
-- Filters: capability, domain, category, excludeFailed, minSuccessRate, limit
-- Returns: Available agents with health status, sorted by success rate
-- Use when: Router selects best agent for task dynamically
-
-Example usage in router:
-
-```javascript
-const agents = AvailableAgents({
-  capability: 'code-review',
-  excludeFailed: true,
-  minSuccessRate: 0.7
-});
-const best = agents.agents[0] || agents.agents.find(a => a.recommendedAgents?.includes('code-reviewer'));
-Task({ subagent_type: best.id, prompt: ... });
-```
-
-**Capability Routing**: Router uses `.claude/config/capability-routing.json` to map request patterns to capabilities:
-
-- `"review"` -> `code-review` capability -> `code-reviewer` agent
-- `"implement"` -> `implementation` capability -> `developer` agent
-- `"security"` -> `security-review` capability -> `security-architect` agent
-
-### MCP Tools (Require Server Configuration)
-
-MCP (Model Context Protocol) tools require server configuration in `.claude/settings.json`. Currently **NO MCP servers are configured** (mcpServers: {}).
-
-**Tool Pattern:** `mcp__<server>__<tool>`
-
-| Tool                                   | Server              | Purpose              | Configured? | Agent References |
-| -------------------------------------- | ------------------- | -------------------- | ----------- | ---------------- |
-| **mcp**chrome-devtools**\***           | chrome-devtools     | Browser automation   | ❌ No       | 0 agents         |
-| **mcp**sequential-thinking**\***       | sequential-thinking | Structured reasoning | ❌ No       | Use Skill()      |
-| **mcp**Ref**ref_search_documentation** | Ref                 | Documentation search | ❌ No       | 0 agents         |
-| **mcp**Ref**ref_read_url**             | Ref                 | Read URL content     | ❌ No       | 0 agents         |
-| **mcp**Exa**web_search_exa**           | Exa                 | Enhanced web search  | ❌ No       | evolution-orch   |
-| **mcp**Exa**get_code_context_exa**     | Exa                 | Code context search  | ❌ No       | evolution-orch   |
-| **mcp**Exa**company_research_exa**     | Exa                 | Company research     | ❌ No       | 0 agents         |
-| **mcp**shadcn**getComponents**         | shadcn              | shadcn/ui components | ❌ No       | 0 agents         |
-| **mcp**shadcn**getComponent**          | shadcn              | Component details    | ❌ No       | 0 agents         |
-
-**Fallback Strategy:** Use `Skill({ skill: '<skill-name>' })` instead of MCP tools when servers are not configured.
-
-**Example:** Instead of `mcp__sequential-thinking__sequentialthinking`, use `Skill({ skill: 'sequential-thinking' })`
-
-### Tool Categories and Usage
-
-**Always Available (No restrictions):**
-
-- File I/O: Read, Write, Edit
-- Search: Glob, Grep
-- Task Management: TaskCreate, TaskUpdate, TaskList, TaskGet, TaskOutput, TaskStop
-- Capability: Skill, SkillCatalog, AvailableAgents
-- Research: WebSearch, WebFetch
-- Planning: EnterPlanMode, ExitPlanMode
-- Jupyter: NotebookEdit
-
-**Restricted (Special permissions):**
-
-- **Task**: Only Router and Orchestrators (for spawning subagents)
-- **AskUserQuestion**: Only Router (for user interaction)
-- **Bash**: All agents have access, but Router limited to read-only git commands
-
-### Agent Tool Mapping
-
-**Standard Agent Toolset** (developer, planner, qa, architect, pm, technical-writer):
-
-```yaml
-tools:
-  [
-    Read,
-    Write,
-    Edit,
-    Bash,
-    Glob,
-    Grep,
-    TaskUpdate,
-    TaskList,
-    TaskCreate,
-    TaskGet,
-    TaskOutput,
-    Skill,
-    SkillCatalog,
-  ]
-```
-
-**Orchestrator Toolset** (master-orchestrator, swarm-coordinator, evolution-orchestrator, party-orchestrator):
-
-```yaml
-tools: [
-    Read,
-    Write,
-    Edit,
-    Bash,
-    Glob,
-    Grep,
-    Task, # MANDATORY for spawning subagents
-    TaskUpdate,
-    TaskList,
-    TaskCreate,
-    TaskGet,
-    TaskOutput,
-    Skill,
-    SkillCatalog,
-  ]
-```
-
-**Router Toolset** (router.md):
-
-```yaml
-tools: [
-    Read, # agent files / routing docs
-    Task,
-    TaskList,
-    TaskCreate,
-    TaskUpdate,
-    TaskGet,
-    AskUserQuestion, # user interaction
-  ]
-# Router CANNOT use: Edit, Write, Bash (implementation), Glob, Grep, WebSearch, mcp__*
-```
-
-**Read-Only Agents** (intentional security constraint):
-
-- **code-reviewer**: No Write, No Edit (read-only code analysis)
-- **researcher**: Read, Glob, Grep, WebSearch, WebFetch (prevents data exfiltration)
-
-**Write-Only Agents:**
-
-- **context-compressor**: No Edit (write-only mode)
-
-**Monitoring-Only Agents:**
-
-- **reflection-agent**: No Bash (read-only, monitors Bash errors for reflection)
-
-### Router Tool Restrictions (Section 1.1)
-
-**Router Whitelist** (ONLY these tools allowed):
-
-- `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet`
-- `Read` (agent files / routing docs)
-- `AskUserQuestion`
-
-**Router Blacklist** (must spawn agent instead):
-
-- `Edit`, `Write`, `Bash` (implementation), `Glob`, `Grep`, `WebSearch`, `mcp__*`
-
-**Bash Exception (Router only):** Read-only git commands:
-
-- `git status -s`
-- `git log --oneline -5`
-
-### Tool Validation and Enforcement
-
-**Hook:** `.claude/hooks/routing/tool-availability-validator.cjs`
-
-**Purpose:**
-
-- Validates tool availability before agent spawning
-- Blocks spawn if required tools (core tools) are unavailable
-- Warns but allows spawn if optional tools (MCP) are missing
-
-**Related ADR:** ADR-051 Tool Availability Validation Hook
-
-### Legacy Tool References (RESOLVED)
-
-**Status:** All legacy tool references cleaned up (2026-01-29)
-
-**Completed Actions:**
-
-- ✅ Replaced "Search" in master-orchestrator.md with Grep/Glob (code search + file discovery)
-- ✅ Removed "Git" from developer.md (use Bash for git commands)
-- ✅ Removed generic "MCP Tools" from developer.md (agents use Skill fallbacks)
-- ✅ Added clarifying comments to all affected agent files
-
-**Files Modified:**
-
-- `.claude/agents/orchestrators/master-orchestrator.md`
-- `.claude/agents/core/developer.md`
-- `.claude/agents/core/context-compressor.md`
-
-**Reference:** See `.claude/context/artifacts/tool-audit-report.md` for full audit details.
+See Section 1.1 for Router Tool Restrictions enforcement.
 
 ---
 
@@ -538,312 +267,36 @@ tools: [
 
 > **CRITICAL:** Subagents MUST call TaskUpdate. Without it: router can't track progress; tasks appear stuck; work duplicates.
 
-### Universal Spawn Template
+### Spawn Templates
 
-For standard agents (developer, qa, planner, architect, etc.), use:
+**Universal:** `.claude/templates/spawn/universal-agent-spawn.md` (haiku/sonnet/opus, 70-line TaskUpdate warning box)
+**Orchestrator:** `.claude/templates/spawn/orchestrator-spawn.md` (MUST have `Task` tool + `opus` model)
+**Identity:** `.claude/templates/spawn/agent-identity-integration.md` (agents with personality frontmatter)
+**Core Tools:** Read, Write, Edit, Bash, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
 
-**Template:** `.claude/templates/spawn/universal-agent-spawn.md`
+### Golden-Path Example
 
-**Quick Reference:**
+"Add user authentication" → High complexity + Security → Spawn PLANNER (sonnet) + SECURITY-ARCHITECT (opus) in parallel
+Both spawn prompts MUST include 70-line TaskUpdate warning box + task ID + agent file reference.
 
-- Use for: Bug fixes, features, testing, documentation
-- Model: `haiku` (simple), `sonnet` (standard), `opus` (complex)
-- Critical: 70-line warning box enforces TaskUpdate protocol
-- Tools: Read, Write, Edit, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
+### Spawn Template Fallback (if template load fails)
 
-**Example:**
-
-```javascript
-TaskList();
-Task({
-  subagent_type: 'general-purpose',
-  description: 'Developer implementing feature X',
-  allowed_tools: ['Read','Write','Edit','Bash','TaskUpdate','TaskList','TaskCreate','TaskGet','Skill'],
-  prompt: // See .claude/templates/spawn/universal-agent-spawn.md for full template
-});
-```
-
-### Agent Identity Integration (Optional)
-
-For agents with structured personality (identity fields), enhance spawns with:
-
-**Template:** `.claude/templates/spawn/agent-identity-integration.md`
-
-**When to Use:**
-
-- Agent has `identity` frontmatter (role, goal, backstory, motto, personality)
-- Consistent personality needed (+20-30% consistency improvement)
-
-**Quick Reference:**
-
-- Use AgentParser to extract identity fields
-- Inject identity section after warning box, before PROJECT CONTEXT
-- Backward compatible (agents without identity work unchanged)
-
-### Orchestrator Spawn Template
-
-For orchestrators that coordinate multiple subagents:
-
-**Template:** `.claude/templates/spawn/orchestrator-spawn.md`
-
-**When to Use:**
-
-- master-orchestrator, swarm-coordinator, evolution-orchestrator, party-orchestrator
-- Any agent that spawns subagents
-
-**Critical Differences:**
-
-- **MUST** include `Task` tool in allowed_tools (orchestrators spawn subagents)
-- **MUST** use `opus` model (orchestration requires complex reasoning)
-- May include MCP tools for research (e.g., Exa for evolution-orchestrator)
-
-**Example:**
-
-```javascript
-TaskList();
-Task({
-  subagent_type: 'evolution-orchestrator',
-  model: 'opus',
-  allowed_tools: ['Read','Write','Edit','Bash','Task','TaskUpdate','TaskList','TaskCreate','TaskGet','Skill','mcp__Exa__web_search_exa'],
-  prompt: // See .claude/templates/spawn/orchestrator-spawn.md for full template
-});
-```
-
-### Tool Selection Notes
-
-**MCP Tools**: Require server configuration in `.claude/settings.json`. If MCP server is not configured:
-
-- Use `Skill()` tool as fallback: `Skill({ skill: 'sequential-thinking' })`
-- Check available skills: `.claude/skills/*/SKILL.md`
-
-**Core Tools**: Always available - Read, Write, Edit, Bash, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
-
-### Golden-Path Example: High Complexity + Security
-
-For a request like "Add user authentication to the app":
-
-```javascript
-// Router analysis: High complexity + Security-sensitive → PLANNER + SECURITY-ARCHITECT in parallel
-TaskList();
-
-// Spawn BOTH in same response for parallel execution
-Task({
-  subagent_type: 'planner',
-  model: 'sonnet',
-  description: 'Planner designing auth feature',
-  allowed_tools: [
-    'Read',
-    'Write',
-    'Edit',
-    'Bash',
-    'TaskUpdate',
-    'TaskList',
-    'TaskCreate',
-    'TaskGet',
-    'TaskOutput',
-    'Skill',
-  ],
-  prompt: `You are PLANNER. Design user authentication feature.
-+======================================================================+
-|  Your Task ID: <ID>                                                  |
-|  FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" });       |
-|  LAST: TaskUpdate({ taskId: "<ID>", status: "completed", ... });     |
-+======================================================================+
-Read: .claude/agents/core/planner.md`,
-});
-
-Task({
-  subagent_type: 'security-architect',
-  model: 'opus', // Use opus for security review
-  description: 'Security reviewing auth design',
-  allowed_tools: [
-    'Read',
-    'Write',
-    'Edit',
-    'Bash',
-    'TaskUpdate',
-    'TaskList',
-    'TaskCreate',
-    'TaskGet',
-    'TaskOutput',
-    'Skill',
-  ],
-  prompt: `You are SECURITY-ARCHITECT. Review auth design for security.
-+======================================================================+
-|  Your Task ID: <ID>                                                  |
-|  FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" });       |
-|  LAST: TaskUpdate({ taskId: "<ID>", status: "completed", ... });     |
-+======================================================================+
-Read: .claude/agents/specialized/security-architect.md`,
-});
-```
-
-### Spawn Template Fallback Mechanism (Option C)
-
-**When Template Files Fail to Load:**
-
-If the Router cannot load a spawn template file (file missing, permission denied, corrupt), use this inline fallback pattern:
-
-**Fallback Detection:**
-
-```javascript
-// Attempt to load template
-try {
-  const template = Read({ file_path: '.claude/templates/spawn/universal-agent-spawn.md' });
-  // Use template content
-} catch (error) {
-  // Template load failed - use inline fallback
-  console.warn('[SPAWN-FALLBACK] Template load failed, using inline fallback');
-}
-```
-
-**Inline Fallback Template (Minimum Viable):**
-
-```javascript
-Task({
-  subagent_type: 'general-purpose',
-  description: '<ROLE> doing <TASK>',
-  allowed_tools: [
-    'Read',
-    'Write',
-    'Edit',
-    'Bash',
-    'TaskUpdate',
-    'TaskList',
-    'TaskCreate',
-    'TaskGet',
-    'TaskOutput',
-    'Skill',
-  ],
-  prompt: `You are the <ROLE> agent.
-
-+======================================================================+
-|  WARNING: TASK TRACKING REQUIRED                                     |
-+======================================================================+
-|  Task ID: <ID>                                                       |
-|  FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" });       |
-|  LAST: TaskUpdate({ taskId: "<ID>", status: "completed", ... });     |
-+======================================================================+
-
-## PROJECT CONTEXT
-PROJECT_ROOT: <absolute-path>
-Use relative paths from PROJECT_ROOT.
-
-## Instructions
-1) TaskUpdate in_progress
-2) Read agent definition
-3) Execute task
-4) TaskUpdate completed with summary
-5) TaskList()
-
-## Memory Protocol
-Read .claude/context/memory/learnings.md before starting.
-`,
-});
-```
-
-**When to Use Fallback:**
-
-- Template file not found (404)
-- Permission denied reading template
-- Template file corrupted (parse error)
-- Network issues (if templates stored remotely in future)
-
-**Fallback Audit:**
-When fallback is triggered, emit audit log:
-
-```json
-{
-  "hook": "spawn-fallback",
-  "event": "fallback-triggered",
-  "reason": "<reason>",
-  "timestamp": "..."
-}
-```
-
-**Recovery Actions:**
-
-1. Check template file exists: `ls -la .claude/templates/spawn/`
-2. Verify permissions: Template files should be readable
-3. Restore from git: `git checkout HEAD -- .claude/templates/spawn/`
+See Section 0 Template Loading Protocol for inline fallback pattern.
 
 ---
 
 ## 3) AGENT ROUTING TABLE
 
-| Request Type                                                               | Agent                        | File                                                     |
-| -------------------------------------------------------------------------- | ---------------------------- | -------------------------------------------------------- |
-| Bug fixes, coding                                                          | `developer`                  | `.claude/agents/core/developer.md`                       |
-| New features, planning                                                     | `planner`                    | `.claude/agents/core/planner.md`                         |
-| System design                                                              | `architect`                  | `.claude/agents/core/architect.md`                       |
-| Testing, QA                                                                | `qa`                         | `.claude/agents/core/qa.md`                              |
-| Documentation, docs                                                        | `technical-writer`           | `.claude/agents/core/technical-writer.md`                |
-| Code review, PR review                                                     | `code-reviewer`              | `.claude/agents/specialized/code-reviewer.md`            |
-| Code simplification, refactoring                                           | `code-simplifier`            | `.claude/agents/specialized/code-simplifier.md`          |
-| Security review                                                            | `security-architect`         | `.claude/agents/specialized/security-architect.md`       |
-| Infrastructure                                                             | `devops`                     | `.claude/agents/specialized/devops.md`                   |
-| Debugging                                                                  | `devops-troubleshooter`      | `.claude/agents/specialized/devops-troubleshooter.md`    |
-| Incidents                                                                  | `incident-responder`         | `.claude/agents/specialized/incident-responder.md`       |
-| C4 System Context                                                          | `c4-context`                 | `.claude/agents/specialized/c4-context.md`               |
-| C4 Containers                                                              | `c4-container`               | `.claude/agents/specialized/c4-container.md`             |
-| C4 Components                                                              | `c4-component`               | `.claude/agents/specialized/c4-component.md`             |
-| C4 Code level                                                              | `c4-code`                    | `.claude/agents/specialized/c4-code.md`                  |
-| Context-driven dev                                                         | `conductor-validator`        | `.claude/agents/specialized/conductor-validator.md`      |
-| Reverse engineering                                                        | `reverse-engineer`           | `.claude/agents/specialized/reverse-engineer.md`         |
-| Research, fact-finding                                                     | `researcher`                 | `.claude/agents/specialized/researcher.md`               |
-| Python expert                                                              | `python-pro`                 | `.claude/agents/domain/python-pro.md`                    |
-| Rust expert                                                                | `rust-pro`                   | `.claude/agents/domain/rust-pro.md`                      |
-| Go expert                                                                  | `golang-pro`                 | `.claude/agents/domain/golang-pro.md`                    |
-| TypeScript expert                                                          | `typescript-pro`             | `.claude/agents/domain/typescript-pro.md`                |
-| FastAPI expert                                                             | `fastapi-pro`                | `.claude/agents/domain/fastapi-pro.md`                   |
-| Product management                                                         | `pm`                         | `.claude/agents/core/pm.md`                              |
-| Quality reflection                                                         | `reflection-agent`           | `.claude/agents/core/reflection-agent.md`                |
-| Frontend/React/Vue                                                         | `frontend-pro`               | `.claude/agents/domain/frontend-pro.md`                  |
-| Node.js/Express/NestJS                                                     | `nodejs-pro`                 | `.claude/agents/domain/nodejs-pro.md`                    |
-| iOS/Swift development                                                      | `ios-pro`                    | `.claude/agents/domain/ios-pro.md`                       |
-| Android/Kotlin                                                             | `android-pro`                | `.claude/agents/domain/android-pro.md`                   |
-| Java/Spring Boot                                                           | `java-pro`                   | `.claude/agents/domain/java-pro.md`                      |
-| Next.js App Router                                                         | `nextjs-pro`                 | `.claude/agents/domain/nextjs-pro.md`                    |
-| PHP/Laravel                                                                | `php-pro`                    | `.claude/agents/domain/php-pro.md`                       |
-| SvelteKit/Svelte 5                                                         | `sveltekit-expert`           | `.claude/agents/domain/sveltekit-expert.md`              |
-| Tauri desktop apps                                                         | `tauri-desktop-developer`    | `.claude/agents/domain/tauri-desktop-developer.md`       |
-| Expo/React Native                                                          | `expo-mobile-developer`      | `.claude/agents/domain/expo-mobile-developer.md`         |
-| Data engineering/ETL                                                       | `data-engineer`              | `.claude/agents/domain/data-engineer.md`                 |
-| Database design                                                            | `database-architect`         | `.claude/agents/specialized/database-architect.md`       |
-| GraphQL APIs                                                               | `graphql-pro`                | `.claude/agents/domain/graphql-pro.md`                   |
-| Mobile UX review                                                           | `mobile-ux-reviewer`         | `.claude/agents/domain/mobile-ux-reviewer.md`            |
-| Scientific research                                                        | `scientific-research-expert` | `.claude/agents/domain/scientific-research-expert.md`    |
-| Session analysis                                                           | `reflection-agent`           | `.claude/agents/core/reflection-agent.md`                |
-| AI/ML/Deep Learning                                                        | `ai-ml-specialist`           | `.claude/agents/domain/ai-ml-specialist.md`              |
-| Web3/Blockchain/DeFi                                                       | `web3-blockchain-expert`     | `.claude/agents/domain/web3-blockchain-expert.md`        |
-| Game development                                                           | `gamedev-pro`                | `.claude/agents/domain/gamedev-pro.md`                   |
-| Project orchestration                                                      | `master-orchestrator`        | `.claude/agents/orchestrators/master-orchestrator.md`    |
-| Swarm coordination                                                         | `swarm-coordinator`          | `.claude/agents/orchestrators/swarm-coordinator.md`      |
-| Self-evolution                                                             | `evolution-orchestrator`     | `.claude/agents/orchestrators/evolution-orchestrator.md` |
-| Multi-agent collaboration (party mode, consensus, debate, team discussion) | `party-orchestrator`         | `.claude/agents/orchestrators/party-orchestrator.md`     |
-| Context compression                                                        | `context-compressor`         | `.claude/agents/core/context-compressor.md`              |
-| System routing                                                             | `router`                     | `.claude/agents/core/router.md` (Meta)                   |
+> **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for complete agent routing matrix.
 
-**Domain Agents:** `.claude/agents/domain/`
-**Multi-Agent Workflows:** `.claude/workflows/enterprise/`
-**Routing logic source of truth:** `.claude/hooks/routing/router-enforcer.cjs` (intentKeywords, INTENT_TO_AGENT, DISAMBIGUATION_RULES)
-**Reference:** `.claude/docs/ROUTER_KEYWORD_GUIDE.md`
+**Quick:** Bug fixes → developer | Security → security-architect | Multi-agent → master-orchestrator | Creators → @CREATOR_SKILLS_TABLE.md
+**Source of Truth:** `.claude/hooks/routing/router-enforcer.cjs`
 
-### Creator Skills (invoked via `Skill()`, not standalone agents)
+### Creator Skills
 
-| Request Type            | Creator Skill\*        | Skill File                                   |
-| ----------------------- | ---------------------- | -------------------------------------------- |
-| **Before ANY creation** | `research-synthesis`\* | `.claude/skills/research-synthesis/SKILL.md` |
-| **No matching agent**   | `agent-creator`\*      | `.claude/skills/agent-creator/SKILL.md`      |
-| **New tool/capability** | `skill-creator`\*      | `.claude/skills/skill-creator/SKILL.md`      |
-| **New workflow**        | `workflow-creator`\*   | `.claude/skills/workflow-creator/SKILL.md`   |
-| **New hook**            | `hook-creator`\*       | `.claude/skills/hook-creator/SKILL.md`       |
-| **New template**        | `template-creator`\*   | `.claude/skills/template-creator/SKILL.md`   |
-| **New schema**          | `schema-creator`\*     | `.claude/skills/schema-creator/SKILL.md`     |
+> **REFERENCE:** See **@CREATOR_SKILLS_TABLE.md** for creator skill invocation patterns.
 
-\*Spawn a general-purpose agent that invokes the skill via `Skill({ skill: "..." })`.
-
-**CRITICAL:** Always invoke `research-synthesis` BEFORE any other creator skill.
+**CRITICAL:** Always invoke `research-synthesis` BEFORE any other creator skill (agent-creator, skill-creator, workflow-creator, hook-creator, template-creator, schema-creator).
 
 ---
 
@@ -856,139 +309,63 @@ See `router-decision.md` Step 7.3 Planning Orchestration Matrix.
 
 ## 4) SELF-EVOLUTION (EVOLVE WORKFLOW)
 
-**When triggers:**
+> **REFERENCE:** See **@EVOLUTION_WORKFLOW.md** for complete EVOLVE process.
 
-- user requests missing capability
-- router detects "no matching agent"
-- pattern analyzer suggests evolution
-- explicit create agent/skill/workflow/hook/template/schema
+**When Triggers:**
 
-### EVOLVE (mandatory)
+- User requests missing capability / Router detects "no matching agent" / Pattern analyzer suggests evolution
 
-```
-E -> V -> O -> L -> V -> E
-Evaluate -> Validate -> Obtain (Research) -> Lock -> Verify -> Enable & Monitor
-```
+**EVOLVE:** E→V→O→L→V→E
 
-**Research Requirement (Phase O cannot be skipped)**
-Before creating ANY artifact:
+- **Phase O (Obtain/Research) MANDATORY:** Minimum 3 Exa queries, 3 sources, research report
 
-- minimum 3 Exa/WebSearch queries executed
-- minimum 3 external sources consulted
-- research report generated + saved
-- design decisions have documented rationale
+**Spawn:** `evolution-orchestrator` (opus model) with Skill({ skill: "research-synthesis" })
 
-### Enforcement Hooks
-
-| Hook                        | Purpose                          |
-| --------------------------- | -------------------------------- |
-| `research-enforcement.cjs`  | blocks creation without research |
-| `evolution-state-guard.cjs` | enforces state transitions       |
-| `conflict-detector.cjs`     | prevents naming conflicts        |
-| `evolution-audit.cjs`       | logs evolutions                  |
-
-**State Tracking:** `.claude/context/evolution-state.json` tracks phase, research entries, history, patterns, suggestions queue.
-
-### Spawning Evolution (concrete recipe)
-
-When router detects "no matching agent" or user requests new capability:
-
-```javascript
-Task({
-  subagent_type: 'evolution-orchestrator',
-  model: 'opus',
-  description: 'Creating new agent/skill via EVOLVE workflow',
-  allowed_tools: [
-    'Read',
-    'Write',
-    'Edit',
-    'Task',
-    'Skill',
-    'mcp__Exa__web_search_exa',
-    'mcp__Exa__get_code_context_exa',
-    'TaskUpdate',
-    'TaskList',
-    'TaskCreate',
-    'TaskGet',
-  ],
-  prompt: `You are EVOLUTION-ORCHESTRATOR. Follow the EVOLVE workflow.
-
-Requested capability: <DESCRIBE WHAT USER NEEDS>
-
-1. Read: .claude/agents/orchestrators/evolution-orchestrator.md
-2. Follow: .claude/workflows/core/evolution-workflow.md
-3. CRITICAL: Phase O (Obtain/Research) is MANDATORY - minimum 3 Exa queries before creating artifact.
-4. Use Skill({ skill: "research-synthesis" }) then appropriate creator skill.`,
-});
-```
+````
 
 ---
 
 ## 5) MODEL SELECTION FOR SUBAGENTS
 
-| Model    | Use For                                  | Cost   |
-| -------- | ---------------------------------------- | ------ |
-| `haiku`  | simple validation, quick fixes           | low    |
-| `sonnet` | standard agent work (default)            | medium |
-| `opus`   | complex reasoning, architecture/security | high   |
+> **REFERENCE:** See **@MODEL_SELECTION.md** for detailed model selection guidelines and config.yaml precedence.
 
-### 5.5 TASK TRACKING (IRON LAWS)
+### 5.1 Model Resolution from config.yaml (ADR-075)
 
-Use `TaskCreate`/`TaskList`/`TaskUpdate` for trackable progress.
-
-**Iron Laws:**
-
-- never complete without summary
-- always update on discovery
-- always TaskList after completion
+**Before spawning ANY agent, Router MUST resolve model from configuration:**
 
 ```javascript
-TaskCreate({ subject: 'Phase 1.1: Backup tdd skill', description: 'Copy .claude/skills/tdd to .claude.archive/', activeForm: 'Backing up tdd skill' });
-TaskUpdate({ taskId: '2', addBlockedBy: ['1'] });
-TaskList();
-TaskUpdate({ taskId: '1', status: 'in_progress' });
-// ... work ...
-TaskUpdate({ taskId: '1', status: 'completed', metadata: { summary: '...', filesModified: [...] } });
-```
+const { resolveAgentModel } = require('.claude/lib/utils/agent-config-reader.cjs');
+const result = resolveAgentModel('planner', PROJECT_ROOT);
+// result: { model: 'claude-opus-4-5-20251101', shorthand: 'opus', source: 'config.yaml' }
+````
 
-### 5.6 AGENT SPAWNING VERIFICATION (PROC-005)
+**Precedence Order (highest to lowest):**
 
-**Why TaskUpdate is MANDATORY:**
+1. Explicit `model:` in Task() call (override)
+2. Agent frontmatter `model:` field
+3. **config.yaml `agents.{type}.model`** (RECOMMENDED - source of truth)
+4. Complexity-based default (opus for planners, haiku for compressors)
+5. Fallback: sonnet
 
-Spawned agents MUST call `TaskUpdate({ status: "completed" })` when finished. Without this:
+**Current config.yaml Agent Models:**
+| Agent | Configured Model | Extended Thinking |
+|-------|------------------|-------------------|
+| planner | claude-opus-4-5-20251101 | ✅ Yes |
+| developer | claude-sonnet-4-5 | ❌ No |
+| qa | claude-opus-4-5-20251101 | ❌ No |
+| architect | claude-opus-4-5-20251101 | ❌ No |
 
-| Symptom                           | Root Cause                   | Impact                       |
-| --------------------------------- | ---------------------------- | ---------------------------- |
-| Tasks stuck "in_progress" forever | Agent didn't call TaskUpdate | Router can't track progress  |
-| Duplicate work assigned           | Task appears available       | Wasted compute, conflicts    |
-| Progress invisible to user        | No completion metadata       | User cannot verify work done |
-| Blocked tasks never unblock       | Dependencies never resolve   | Workflow stalls              |
+**Validation:** `config-model-validator.cjs` hook validates spawn model matches config (default: warn mode)
 
-**Verification Pattern:**
+**Quick Reference:** haiku (simple/low) | sonnet (standard/default) | opus (complex/security/high)
 
-After spawning agents, Router should:
+### 5.5-5.6 TASK TRACKING & AGENT SPAWNING VERIFICATION
 
-1. Wait for agent completion (context returns)
-2. Run `TaskList()` to check task status
-3. If task still "in_progress" after agent context closed, log warning
-4. Consider re-spawning or escalating stuck tasks
+> **REFERENCE:** See **@TASK_TRACKING_GUIDE.md** for complete TaskUpdate protocol.
 
-**Agent Responsibility Checklist:**
-
-```
-[ ] FIRST action: TaskUpdate({ taskId: "X", status: "in_progress" })
-[ ] LAST action before completion: TaskUpdate({ taskId: "X", status: "completed", metadata: {...} })
-[ ] THEN: TaskList() to check for more work
-```
-
-**Common Failures:**
-
-1. **Agent exits early on error** - No completion update
-   - Fix: Wrap in try/catch, update with error status
-2. **Agent forgets TaskUpdate** - Focus on work, forgot protocol
-   - Fix: Warning box in spawn template, checklist reminder
-3. **Agent context limit reached** - Truncated before TaskUpdate
-   - Fix: Summarize sooner, use context-compressor skill
+**Iron Laws:** FIRST `TaskUpdate(in_progress)` → Work → LAST `TaskUpdate(completed)` → THEN `TaskList()`
+**Why MANDATORY:** Without TaskUpdate → tasks stuck forever, duplicate work, invisible progress, workflow stalls
+**Common Failures:** Agent exits on error (wrap try/catch), forgets TaskUpdate (warning box in spawn), context limit (compress sooner)
 
 ---
 
@@ -1029,298 +406,58 @@ All spawned agents:
 
 ### 8.5 WORKFLOW ENHANCEMENT SKILLS
 
-| Skill                                | When to Use                                                |
-| ------------------------------------ | ---------------------------------------------------------- |
-| `project-onboarding`                 | unfamiliar codebase                                        |
-| `thinking-tools`                     | self-reflection at critical phases                         |
-| `operational-modes`                  | regulate tool usage                                        |
-| `summarize-changes`                  | after non-trivial coding                                   |
-| `session-handoff`                    | before ending long sessions                                |
-| `interactive-requirements-gathering` | structured user input                                      |
-| `smart-revert`                       | revert logical work units (git notes-based, feature-level) |
-| `codebase-integration`               | integrating external codebases                             |
-| `artifact-lifecycle`                 | manage artifact updates/deprecation                        |
-| `workflow-creator`                   | create multi-agent workflows                               |
-| `template-creator`                   | create templates                                           |
-| `schema-creator`                     | create JSON schemas                                        |
-| `hook-creator`                       | create safety/validation hooks                             |
-| `spec-init`                          | unified spec creation (progressive disclosure)             |
-| `spec-gathering`                     | start new features                                         |
-| `spec-writing`                       | formal specs                                               |
-| `spec-critique`                      | validate specs                                             |
-| `complexity-assessment`              | analyze complexity                                         |
-| `insight-extraction`                 | capture learnings                                          |
-| `qa-workflow`                        | systematic test/fix loops                                  |
-| `ripgrep`                            | enhanced search for .mjs/.cjs/.mts/.cts                    |
-| `chrome-browser`                     | browser automation/testing                                 |
-| `arxiv-mcp`                          | arXiv search/retrieve                                      |
-| `checklist-generator`                | quality checklists (IEEE + contextual)                     |
-| `progressive-disclosure`             | gather requirements (3-5 clarifications)                   |
-| `template-renderer`                  | render templates with token replacement                    |
-| `task-breakdown`                     | break plans into Epic→Story→Task lists                     |
+> **REFERENCE:** See **@SKILL_CATALOG_TABLE.md** for complete skill catalog.
+
+**Most Used:** tdd, debugging, progressive-disclosure, task-breakdown
 
 ### 8.6 ENTERPRISE WORKFLOWS
 
-| Workflow             | Path                                                                | Purpose                 |
-| -------------------- | ------------------------------------------------------------------- | ----------------------- |
-| Router Decision      | `.claude/workflows/core/router-decision.md`                         | master routing          |
-| External Integration | `.claude/workflows/core/external-integration.md`                    | safe integration        |
-| Artifact Lifecycle   | `.claude/workflows/core/skill-lifecycle.md`                         | create/update/deprecate |
-| Feature Development  | `.claude/workflows/enterprise/feature-development-workflow.md`      | end-to-end              |
-| C4 Architecture      | `.claude/workflows/enterprise/c4-architecture-workflow.md`          | C4 docs                 |
-| Conductor Setup      | `.claude/workflows/conductor-setup-workflow.md`                     | CDD setup               |
-| Incident Response    | `.claude/workflows/operations/incident-response.md`                 | prod incidents          |
-| Evolution Workflow   | `.claude/workflows/core/evolution-workflow.md`                      | EVOLVE process          |
-| Reflection Workflow  | `.claude/workflows/core/reflection-workflow.md`                     | quality + learnings     |
-| Security Audit       | `.claude/workflows/security-architect-skill-workflow.md`            | security audit          |
-| Architecture Review  | `.claude/workflows/architecture-review-skill-workflow.md`           | arch review             |
-| Chrome Browser       | `.claude/workflows/chrome-browser-skill-workflow.md`                | browser automation      |
-| Consensus Voting     | `.claude/workflows/consensus-voting-skill-workflow.md`              | consensus               |
-| Swarm Coordination   | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md` | swarm patterns          |
-| Database Design      | `.claude/workflows/database-architect-skill-workflow.md`            | schema workflows        |
-| Context Compression  | `.claude/workflows/context-compressor-skill-workflow.md`            | summarization           |
-| Hook Consolidation   | `.claude/workflows/operations/hook-consolidation.md`                | hook consolidation      |
-| Post-Creation Valid. | `.claude/workflows/core/post-creation-validation.md`                | artifact integration    |
-| Progressive Disclos. | `.claude/workflows/progressive-disclosure-skill-workflow.md`        | requirements gathering  |
+> **REFERENCE:** See **@ENTERPRISE_WORKFLOWS.md** for complete workflow catalog.
+
+**Core:** router-decision.md (master routing) | evolution-workflow.md (EVOLVE) | feature-development-workflow.md
 
 ---
 
 ## 8.7 CONFIGURATION (ENVIRONMENT VARIABLES)
 
-All environment-specific settings are managed through the `.env` file located at the project root. This file is **never committed** (see `.gitignore`) to protect sensitive data and allow per-developer customization.
+> **REFERENCE:** See **@ENVIRONMENT_CONFIG.md** for complete environment variable reference.
 
-### Environment Variables Reference
-
-**File:** `.env.example` (template with all available variables and descriptions)
-
-**Setup:**
-
-1. Copy template: `cp .env.example .env`
-2. Customize: Edit `.env` for your local environment
-3. Use: Environment variables are automatically loaded
-
-### Key Configuration Categories
-
-| Category        | Variables                                           | Purpose                                      |
-| --------------- | --------------------------------------------------- | -------------------------------------------- |
-| **Environment** | `AGENT_STUDIO_ENV` (development/staging/production) | Selects configuration profile and data paths |
-| **Features**    | `PARTY_MODE_ENABLED`, `ELICITATION_ENABLED`         | Control feature availability                 |
-| **Hooks**       | `REFLECTION_ENABLED`, `REFLECTION_HOOK_MODE`        | Quality and learning controls                |
-| **Safety**      | `LOOP_PREVENTION_MODE`, `ANOMALY_DETECTION_ENABLED` | Loop/anomaly thresholds                      |
-| **Routing**     | `REROUTER_MODE`, `PLAN_EVOLUTION_GUARD`             | Orchestration behavior                       |
-| **Debug**       | `DEBUG_HOOKS`, `CLAUDE_SESSION_ID`                  | Troubleshooting aids                         |
-| **Integration** | `WEBHOOK_SECRET`, `API_URL`                         | External service integration                 |
-
-### Staging Environment
-
-For isolated testing, use `AGENT_STUDIO_ENV=staging`:
-
-- Configuration: `.claude/config.staging.yaml` (separate from production)
-- Data paths: `.claude/staging/*` (isolated workspace)
-- Features: All enabled by default (for testing)
-- Documentation: See `.claude/docs/STAGING_ENVIRONMENT.md`
-
-**Initialization:**
-
-```bash
-# Initialize staging environment
-node .claude/tools/cli/init-staging.cjs
-
-# Verify setup
-node --test tests/staging-smoke.test.mjs
-```
+**Setup:** `cp .env.example .env` → Edit `.env` → Variables auto-loaded
+**Key Variables:** `PLANNER_FIRST_ENFORCEMENT`, `CREATOR_GUARD`, `SPAWN_PROMPT_VALIDATOR` (block/warn/off)
 
 ---
 
 ## 9) DIRECTORY STRUCTURE (REFERENCE)
 
-### 9.1 Top-Level
+> **REFERENCE:** See **@DIRECTORY_STRUCTURE.md** for complete directory layout.
 
-```
-.claude/
-├── agents/
-├── context/
-├── docs/
-├── hooks/
-├── lib/
-├── schemas/
-├── skills/
-├── templates/
-├── tools/
-├── workflows/
-├── CLAUDE.md
-├── config.yaml
-└── settings.json
-```
+**Key:** `.claude/agents/` (core/domain/specialized/orchestrators), `.claude/context/memory/` (learnings/decisions/issues), `.claude/hooks/` (routing/safety/validation), `.claude/skills/` (SKILL.md files)
 
-### 9.2 agents/
+---
 
-```
-agents/
-├── core/
-├── domain/
-├── specialized/
-└── orchestrators/
-```
+## REFERENCE INDEX
 
-### 9.3 context/
+All external reference files are located in `.claude/docs/`:
 
-```
-context/
-├── artifacts/
-│   ├── plans/
-│   ├── research-reports/
-│   └── .gitkeep
-├── memory/
-│   ├── learnings.md
-│   ├── decisions.md
-│   └── issues.md
-└── evolution-state.json
-```
+| @File Name                   | Section                | Purpose                        |
+| ---------------------------- | ---------------------- | ------------------------------ |
+| **@AGENT_ROUTING_TABLE.md**  | Section 3              | Complete agent routing matrix  |
+| **@CREATOR_SKILLS_TABLE.md** | Section 3 (subsection) | Creator skill mapping          |
+| **@TOOL_REFERENCE.md**       | Section 1.4            | Complete tool catalog          |
+| **@MODEL_SELECTION.md**      | Section 5              | Model selection guidelines     |
+| **@SKILL_CATALOG_TABLE.md**  | Section 8.5            | Workflow enhancement skills    |
+| **@ENTERPRISE_WORKFLOWS.md** | Section 8.6            | Enterprise workflow paths      |
+| **@ENVIRONMENT_CONFIG.md**   | Section 8.7            | Environment variable reference |
+| **@DIRECTORY_STRUCTURE.md**  | Section 9              | Directory layout reference     |
+| **@ENFORCEMENT_HOOKS.md**    | Section 1.3            | Hook enforcement details       |
+| **@TASK_TRACKING_GUIDE.md**  | Sections 5.5-5.6       | TaskUpdate best practices      |
+| **@EVOLUTION_WORKFLOW.md**   | Section 4              | EVOLVE workflow details        |
 
-### 9.4 hooks/
+**Navigation:**
 
-```
-hooks/
-├── audit/
-│   └── git-notes-audit.cjs (tamper-proof commit metadata)
-├── evolution/
-├── memory/
-├── reflection/
-├── routing/
-├── safety/
-│   └── validators/
-├── self-healing/
-├── session/
-└── validation/
-```
-
-### 9.5 lib/
-
-```
-lib/
-├── workflow/
-│   ├── workflow-engine.cjs
-│   ├── workflow-validator.cjs
-│   └── checkpoint-manager.cjs
-├── memory/
-│   ├── memory-manager.cjs
-│   ├── memory-scheduler.cjs
-│   ├── memory-tiers.cjs
-│   └── smart-pruner.cjs
-├── self-healing/
-│   ├── dashboard.cjs
-│   ├── rollback-manager.cjs
-│   └── validator.cjs
-├── utils/
-│   ├── hook-input.cjs
-│   ├── project-root.cjs
-│   ├── safe-json.cjs
-│   ├── atomic-write.cjs
-│   ├── state-cache.cjs
-│   └── logical-unit-tracker.cjs (Phase 1.5 - git notes-based revert)
-└── integration/
-    └── system-registration-handler.cjs
-```
-
-### 9.6 tools/
-
-```
-tools/
-├── cli/
-│   ├── doctor.js
-│   ├── validate-agents.js
-│   ├── validate-integration.cjs
-│   ├── kb-search.cjs
-│   ├── cost-report.js
-│   ├── monitoring-dashboard.cjs
-│   ├── init-staging.cjs
-│   ├── git-notes-verify.cjs (audit trail verification and reporting)
-│   └── ...
-├── integrations/
-│   ├── aws/
-│   ├── github/
-│   └── kubernetes/
-├── analysis/
-│   ├── project-analyzer.js
-│   └── ecosystem-assessor.js
-├── visualization/
-│   ├── diagram-generator.js
-│   └── render-graphs.js
-├── optimization/
-│   ├── token-optimizer.js
-│   └── sequential-thinking.js
-└── runtime/
-    ├── skills-core.js
-    └── swarm-coordination.js
-```
-
-### 9.7 workflows/
-
-```
-workflows/
-├── core/
-│   ├── router-decision.md
-│   ├── skill-lifecycle.md
-│   ├── external-integration.md
-│   └── evolution-workflow.md
-├── enterprise/
-│   ├── feature-development-workflow.md
-│   └── c4-architecture-workflow.md
-└── operations/
-    └── incident-response.md
-```
-
-### 9.7 schemas/
-
-Key schemas for validation:
-
-```
-schemas/
-├── track-metadata.schema.json (track management, task metadata)
-├── skill-diagram-generator-output.schema.json
-└── skill-repo-rag-output.schema.json
-```
-
-**Track Metadata Schema** (SPEC-007):
-
-- **Path**: `.claude/schemas/track-metadata.schema.json`
-- **Documentation**: `.claude/docs/TRACK_METADATA.md`
-- **Purpose**: Consistent structure for task/track metadata
-- **Features**: Effort estimation, phase tracking, dependency management
-- **Integration**: TaskCreate, workflow state, reporting
-
-### 9.8 Output Locations by Creator
-
-| Creator              | Output Location                               |
-| -------------------- | --------------------------------------------- |
-| `research-synthesis` | `.claude/context/artifacts/research-reports/` |
-| `plan-generator`     | `.claude/context/plans/`                      |
-| `agent-creator`      | `.claude/agents/<category>/`                  |
-| `skill-creator`      | `.claude/skills/<skill-name>/`                |
-| `hook-creator`       | `.claude/hooks/<category>/`                   |
-| `workflow-creator`   | `.claude/workflows/<category>/`               |
-| `template-creator`   | `.claude/templates/`                          |
-| `schema-creator`     | `.claude/schemas/`                            |
-| `diagram-generator`  | `.claude/context/artifacts/diagrams/`         |
-
-### 9.9 Deleted/Deprecated Directories
-
-| Old Path            | Status                                        |
-| ------------------- | --------------------------------------------- |
-| `.claude/commands/` | Deleted (was empty)                           |
-| `.claude/temp/`     | Deleted (was empty)                           |
-| `.claude/tests/`    | Moved to root `tests/` directory (2026-01-28) |
-| `.claude/scripts/`  | Consolidated into `.claude/lib/workflow/`     |
-
-### 9.10 File Placement Enforcement
-
-Enforced by `file-placement-guard.cjs`:
-
-- `block` (production), `warn` (default), `off`
-
-**Override:** `FILE_PLACEMENT_OVERRIDE=true`
-**Rules:** `.claude/docs/FILE_PLACEMENT_RULES.md`
+- All @files include "BACK TO MAIN" link to CLAUDE.md section
+- All @files include "RELATED REFERENCES" to cross-referenced files
+- CLAUDE.md sections include inline summaries with @file references
 
 ---
 

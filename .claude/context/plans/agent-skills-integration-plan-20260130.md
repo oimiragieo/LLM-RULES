@@ -1,4 +1,5 @@
 # Agent Skills Integration Plan
+
 **Created**: 2026-01-30
 **Project**: Restore and integrate agent-skills-main into agent-studio
 **Target**: Full integration with validation and CI/CD support
@@ -27,11 +28,13 @@ Phase 5: Documentation (1 week)      [Guides + Examples]
 ## Phase 1: Foundation Setup (Weeks 1-2)
 
 ### Goal
+
 Import skills and build system with minimal modifications.
 
 ### Tasks
 
 #### 1.1: Import React Best Practices Skill
+
 **Effort**: 3 days (Low-Medium)
 **Status**: Not started
 
@@ -39,6 +42,7 @@ Import skills and build system with minimal modifications.
 Copy `react-best-practices` skill into agent-studio ecosystem.
 
 **Subtasks**:
+
 1. Create `.claude/skills/react-best-practices-vercel/` directory
 2. Copy all rule files from archived project
 3. Copy SKILL.md and metadata.json
@@ -48,17 +52,20 @@ Copy `react-best-practices` skill into agent-studio ecosystem.
 7. Add to skill catalog
 
 **Files to Create**:
+
 - `.claude/skills/react-best-practices-vercel/SKILL.md`
 - `.claude/skills/react-best-practices-vercel/metadata.json`
 - `.claude/skills/react-best-practices-vercel/rules/` (59 rule files)
 
 **Tests**:
+
 - Skill parsing succeeds
 - All 59 rules present
 - Frontmatter metadata valid
 - No broken cross-references
 
 **Acceptance Criteria**:
+
 - [x] Skill directory created with all files
 - [x] Rule files copied without corruption
 - [x] Skill loads in Skill() tool
@@ -68,6 +75,7 @@ Copy `react-best-practices` skill into agent-studio ecosystem.
 ---
 
 #### 1.2: Import React Native Skills
+
 **Effort**: 2 days (Low)
 **Status**: Not started
 **Depends on**: 1.1
@@ -76,6 +84,7 @@ Copy `react-best-practices` skill into agent-studio ecosystem.
 Import React Native/Expo best practices skill.
 
 **Subtasks**:
+
 1. Create `.claude/skills/react-native-skills-vercel/` directory
 2. Copy all 38 rule files
 3. Copy SKILL.md and metadata.json
@@ -84,16 +93,19 @@ Import React Native/Expo best practices skill.
 6. Add to catalog
 
 **Files to Create**:
+
 - `.claude/skills/react-native-skills-vercel/SKILL.md`
 - `.claude/skills/react-native-skills-vercel/metadata.json`
 - `.claude/skills/react-native-skills-vercel/rules/` (38 files)
 
 **Tests**:
+
 - All 38 rules present
 - Categories balanced
 - No duplicate prefixes
 
 **Acceptance Criteria**:
+
 - [x] 38 rules imported
 - [x] Skill loads successfully
 - [x] Catalog updated
@@ -101,6 +113,7 @@ Import React Native/Expo best practices skill.
 ---
 
 #### 1.3: Import Composition Patterns Skill
+
 **Effort**: 1 day (Low)
 **Status**: Not started
 **Depends on**: 1.1
@@ -109,6 +122,7 @@ Import React Native/Expo best practices skill.
 Import React composition patterns skill.
 
 **Subtasks**:
+
 1. Create `.claude/skills/composition-patterns-vercel/` directory
 2. Copy 10 rule files
 3. Copy SKILL.md and metadata.json
@@ -117,16 +131,19 @@ Import React composition patterns skill.
 6. Add to catalog
 
 **Files to Create**:
+
 - `.claude/skills/composition-patterns-vercel/SKILL.md`
 - `.claude/skills/composition-patterns-vercel/metadata.json`
 - `.claude/skills/composition-patterns-vercel/rules/` (10 files)
 
 **Tests**:
+
 - All 10 rules present
 - React 19 rules included
 - Frontmatter valid
 
 **Acceptance Criteria**:
+
 - [x] 10 rules imported
 - [x] React 19 rules present
 - [x] Skill loads
@@ -134,6 +151,7 @@ Import React composition patterns skill.
 ---
 
 #### 1.4: Import Web Design Guidelines Skill
+
 **Effort**: 1 day (Low)
 **Status**: Not started
 **Depends on**: 1.1
@@ -142,6 +160,7 @@ Import React composition patterns skill.
 Import web design/accessibility audit skill (dynamic content).
 
 **Subtasks**:
+
 1. Create `.claude/skills/web-design-guidelines-vercel/` directory
 2. Copy SKILL.md (contains fetch logic for external guidelines)
 3. Copy metadata.json
@@ -150,15 +169,18 @@ Import web design/accessibility audit skill (dynamic content).
 6. Add to catalog
 
 **Files to Create**:
+
 - `.claude/skills/web-design-guidelines-vercel/SKILL.md`
 - `.claude/skills/web-design-guidelines-vercel/metadata.json`
 
 **Tests**:
+
 - Skill loads
 - External fetch logic works
 - Fallback handling correct
 
 **Acceptance Criteria**:
+
 - [x] Skill loads
 - [x] Fetch logic verified
 - [x] Catalog updated
@@ -166,6 +188,7 @@ Import web design/accessibility audit skill (dynamic content).
 ---
 
 #### 1.5: Import Build System Tooling
+
 **Effort**: 2 days (Low-Medium)
 **Status**: Not started
 
@@ -173,6 +196,7 @@ Import web design/accessibility audit skill (dynamic content).
 Copy build system for compiling skill rules.
 
 **Subtasks**:
+
 1. Create `.claude/lib/skill-build/` directory structure
 2. Copy TypeScript source files:
    - `build.ts` - Compilation engine
@@ -195,6 +219,7 @@ Copy build system for compiling skill rules.
 6. Test build runs without errors
 
 **Files to Create**:
+
 - `.claude/lib/skill-build/src/build.ts`
 - `.claude/lib/skill-build/src/parser.ts`
 - `.claude/lib/skill-build/src/config.ts`
@@ -205,11 +230,13 @@ Copy build system for compiling skill rules.
 - `.claude/lib/skill-build/tsconfig.json`
 
 **Tests**:
+
 - TypeScript compiles
 - Build script runs
 - Output is valid markdown
 
 **Acceptance Criteria**:
+
 - [x] All source files copied
 - [x] Build runs successfully
 - [x] npm scripts configured
@@ -218,6 +245,7 @@ Copy build system for compiling skill rules.
 ---
 
 #### 1.6: Set Up Build Infrastructure
+
 **Effort**: 2 days (Medium)
 **Status**: Not started
 **Depends on**: 1.5
@@ -226,8 +254,9 @@ Copy build system for compiling skill rules.
 Create CI/CD pipeline for skill validation and compilation.
 
 **Subtasks**:
+
 1. Create `.github/workflows/skill-build-validate.yml`
-   - Trigger on skills/* changes
+   - Trigger on skills/\* changes
    - Run TypeScript compilation
    - Run rule validation
    - Extract test cases
@@ -242,16 +271,19 @@ Create CI/CD pipeline for skill validation and compilation.
 5. Test workflow runs successfully
 
 **Files to Create**:
+
 - `.github/workflows/skill-build-validate.yml`
 - `.claude/hooks/skills/rule-validator.cjs`
 - `.claude/docs/SKILL_BUILD.md`
 
 **Tests**:
+
 - Workflow triggers correctly
 - Validation catches errors
 - Hook runs on commits
 
 **Acceptance Criteria**:
+
 - [x] Workflow created
 - [x] Validation hook works
 - [x] Documentation complete
@@ -273,11 +305,13 @@ Create CI/CD pipeline for skill validation and compilation.
 ## Phase 2: Integration & Validation (Weeks 2-4)
 
 ### Goal
+
 Integrate skills with existing agent-studio infrastructure and validation systems.
 
 ### Tasks
 
 #### 2.1: Create Skill Validation Hooks
+
 **Effort**: 3 days (Medium)
 **Status**: Not started
 **Depends on**: 1.5, 1.6
@@ -286,6 +320,7 @@ Integrate skills with existing agent-studio infrastructure and validation system
 Build validation system to enforce skill standards.
 
 **Subtasks**:
+
 1. Create `.claude/hooks/skills/metadata-validator.cjs`
    - Validate frontmatter format
    - Check required fields: name, description, author, version
@@ -304,17 +339,20 @@ Build validation system to enforce skill standards.
 5. Add configuration for error levels (block/warn/info)
 
 **Files to Create**:
+
 - `.claude/hooks/skills/metadata-validator.cjs`
 - `.claude/hooks/skills/rule-structure-validator.cjs`
 - `.claude/hooks/skills/duplicate-detector.cjs`
 
 **Tests**:
+
 - Validation catches missing fields
 - Duplicate detection works
 - Hook runs in CI/CD
 - Error levels configurable
 
 **Acceptance Criteria**:
+
 - [x] Validators created
 - [x] All checks pass
 - [x] False positives: 0
@@ -323,6 +361,7 @@ Build validation system to enforce skill standards.
 ---
 
 #### 2.2: Update Skill Catalog
+
 **Effort**: 2 days (Low-Medium)
 **Status**: Not started
 **Depends on**: 1.1-1.4
@@ -331,6 +370,7 @@ Build validation system to enforce skill standards.
 Update and expand skill catalog with new skills.
 
 **Subtasks**:
+
 1. Read `.claude/context/artifacts/skill-catalog.md`
 2. Add new skills to inventory:
    - vercel-react-best-practices (59 rules)
@@ -348,16 +388,19 @@ Update and expand skill catalog with new skills.
 6. Update indexing for search
 
 **Files to Modify**:
+
 - `.claude/context/artifacts/skill-catalog.md` - Add 5 new entries
 - `.claude/context/artifacts/skill-index.json` - Update index
 
 **Tests**:
+
 - Catalog reads correctly
 - All skills indexed
 - Search queries work
 - No duplicate entries
 
 **Acceptance Criteria**:
+
 - [x] 5 new skills added
 - [x] Catalog complete
 - [x] Index updated
@@ -366,6 +409,7 @@ Update and expand skill catalog with new skills.
 ---
 
 #### 2.3: Integrate with Agent Routing
+
 **Effort**: 3 days (Medium)
 **Status**: Not started
 **Depends on**: 2.2
@@ -374,8 +418,10 @@ Update and expand skill catalog with new skills.
 Add skills to agent routing system for automatic skill activation.
 
 **Subtasks**:
+
 1. Read `.claude/hooks/routing/router-enforcer.cjs`
 2. Add trigger phrase mappings in `INTENT_TO_AGENT`:
+
    ```javascript
    // React Performance
    'react performance|next.js optimization|bundle size|code review|performance issues':
@@ -397,22 +443,26 @@ Add skills to agent routing system for automatic skill activation.
    'deploy my app|push live|deployment':
      { agent: 'devops', skills: ['vercel-deploy'] }
    ```
+
 3. Update `DISAMBIGUATION_RULES` for overlapping intents
 4. Add skill preference ordering
 5. Test routing with example prompts
 6. Document in `.claude/docs/ROUTER_SKILL_MAPPING.md`
 
 **Files to Modify**:
+
 - `.claude/hooks/routing/router-enforcer.cjs` - Add mappings
 - `.claude/docs/ROUTER_KEYWORD_GUIDE.md` - Document new keywords
 
 **Tests**:
+
 - Routing detects React performance queries
 - Mobile skills activate on React Native
 - Multiple skill activation works
 - Ambiguous queries disambiguate correctly
 
 **Acceptance Criteria**:
+
 - [x] All trigger phrases mapped
 - [x] Routing tests pass
 - [x] 0 false positives
@@ -421,6 +471,7 @@ Add skills to agent routing system for automatic skill activation.
 ---
 
 #### 2.4: Create Skill Usage Documentation
+
 **Effort**: 2 days (Low-Medium)
 **Status**: Not started
 **Depends on**: 1.1-1.4
@@ -429,6 +480,7 @@ Add skills to agent routing system for automatic skill activation.
 Document how agents should use the new skills.
 
 **Subtasks**:
+
 1. Create `.claude/docs/SKILL_USAGE_GUIDE.md`
    - When to invoke each skill
    - Example trigger scenarios
@@ -445,6 +497,7 @@ Document how agents should use the new skills.
 5. Add troubleshooting section
 
 **Files to Create**:
+
 - `.claude/docs/SKILL_USAGE_GUIDE.md`
 - `.claude/docs/REACT_PERFORMANCE_SKILL.md`
 - `.claude/docs/REACT_NATIVE_SKILL.md`
@@ -453,11 +506,13 @@ Document how agents should use the new skills.
 - `.claude/docs/VERCEL_DEPLOY_SKILL.md`
 
 **Tests**:
+
 - Documentation is complete
 - Examples are accurate
 - No broken references
 
 **Acceptance Criteria**:
+
 - [x] All guides created
 - [x] Examples verified
 - [x] Links working
@@ -466,6 +521,7 @@ Document how agents should use the new skills.
 ---
 
 #### 2.5: Integrate with Agent Definition
+
 **Effort**: 2 days (Medium)
 **Status**: Not started
 **Depends on**: 2.3, 2.4
@@ -474,6 +530,7 @@ Document how agents should use the new skills.
 Add skills to agent personality files.
 
 **Subtasks**:
+
 1. Update `.claude/agents/domain/frontend-pro.md`
    - Add skills section
    - Reference react-best-practices-vercel
@@ -490,17 +547,20 @@ Add skills to agent personality files.
 5. Test agent definitions load correctly
 
 **Files to Modify**:
+
 - `.claude/agents/domain/frontend-pro.md` - Add 3 skills
 - `.claude/agents/domain/expo-mobile-developer.md` - Add 1 skill
 - `.claude/agents/specialized/devops.md` - Add 1 skill
 - `.claude/agents/domain/nextjs-pro.md` - Add reference
 
 **Tests**:
+
 - Agent files parse correctly
 - Skills referenced correctly
 - No syntax errors
 
 **Acceptance Criteria**:
+
 - [x] All agent files updated
 - [x] Skill references correct
 - [x] No parsing errors
@@ -522,11 +582,13 @@ Add skills to agent personality files.
 ## Phase 3: Validation & Testing (Week 4-5)
 
 ### Goal
+
 Comprehensive testing and validation of integrated skills.
 
 ### Tasks
 
 #### 3.1: Create Skill Unit Tests
+
 **Effort**: 3 days (Medium)
 **Status**: Not started
 **Depends on**: 2.1
@@ -535,6 +597,7 @@ Comprehensive testing and validation of integrated skills.
 Create unit tests for skill loading and parsing.
 
 **Subtasks**:
+
 1. Create `tests/skills/` directory
 2. Create test suite `tests/skills/skill-loading.test.mjs`
    - Test each skill loads without errors
@@ -553,12 +616,14 @@ Create unit tests for skill loading and parsing.
 5. Run test suite in CI/CD
 
 **Files to Create**:
+
 - `tests/skills/skill-loading.test.mjs`
 - `tests/skills/rule-validation.test.mjs`
 - `tests/skills/routing-integration.test.mjs`
 - `tests/skills/fixtures/` - Test data
 
 **Tests**:
+
 - All 107 rules load
 - No parsing errors
 - Metadata valid
@@ -566,6 +631,7 @@ Create unit tests for skill loading and parsing.
 - Routing decisions correct
 
 **Acceptance Criteria**:
+
 - [x] 100+ tests created
 - [x] All tests passing
 - [x] Code coverage > 80%
@@ -574,6 +640,7 @@ Create unit tests for skill loading and parsing.
 ---
 
 #### 3.2: Create Integration Test Scenarios
+
 **Effort**: 2 days (Medium)
 **Status**: Not started
 **Depends on**: 3.1
@@ -582,6 +649,7 @@ Create unit tests for skill loading and parsing.
 Test realistic skill usage scenarios.
 
 **Subtasks**:
+
 1. Create scenario: "Review React component for performance"
    - Trigger: "Review this React component"
    - Expected skill: react-best-practices-vercel
@@ -605,6 +673,7 @@ Test realistic skill usage scenarios.
    - Verify rule application
 
 **Files to Create**:
+
 - `tests/skills/scenarios/` directory
 - `tests/skills/scenarios/react-performance.test.mjs`
 - `tests/skills/scenarios/react-native.test.mjs`
@@ -613,12 +682,14 @@ Test realistic skill usage scenarios.
 - `tests/skills/scenarios/composition.test.mjs`
 
 **Tests**:
+
 - Scenarios execute without errors
 - Correct skills activated
 - Correct agents selected
 - Output quality verified
 
 **Acceptance Criteria**:
+
 - [x] 5+ scenarios created
 - [x] All passing
 - [x] Agent behavior verified
@@ -627,6 +698,7 @@ Test realistic skill usage scenarios.
 ---
 
 #### 3.3: Performance & Load Testing
+
 **Effort**: 2 days (Medium)
 **Status**: Not started
 **Depends on**: 3.2
@@ -635,6 +707,7 @@ Test realistic skill usage scenarios.
 Test skill system performance under load.
 
 **Subtasks**:
+
 1. Create benchmark suite for skill loading
    - Measure load time for each skill
    - Measure memory usage
@@ -658,6 +731,7 @@ Test skill system performance under load.
    - Document performance characteristics
 
 **Files to Create**:
+
 - `tests/performance/skill-loading-benchmark.mjs`
 - `tests/performance/rule-search-benchmark.mjs`
 - `tests/performance/load-test.mjs`
@@ -665,12 +739,14 @@ Test skill system performance under load.
 - `.claude/docs/SKILL_PERFORMANCE.md`
 
 **Tests**:
+
 - Load time < 100ms
 - Memory usage < 5MB
 - Search time < 50ms
 - Concurrent access works
 
 **Acceptance Criteria**:
+
 - [x] All benchmarks created
 - [x] Performance targets met
 - [x] No bottlenecks found
@@ -679,6 +755,7 @@ Test skill system performance under load.
 ---
 
 #### 3.4: CI/CD Validation
+
 **Effort**: 1 day (Low)
 **Status**: Not started
 **Depends on**: 3.1, 3.2, 3.3
@@ -687,6 +764,7 @@ Test skill system performance under load.
 Ensure all tests run in CI/CD pipeline.
 
 **Subtasks**:
+
 1. Verify `skill-build-validate.yml` workflow runs on PRs
 2. Verify all unit tests execute
 3. Verify integration tests pass
@@ -696,16 +774,19 @@ Ensure all tests run in CI/CD pipeline.
 7. Document CI/CD in `.claude/docs/CI_CD_PIPELINE.md`
 
 **Files to Modify**:
+
 - `.github/workflows/skill-build-validate.yml` - Verify configuration
 - `README.md` - Add test badges
 
 **Tests**:
+
 - Workflow triggers correctly
 - All tests run
 - Reports generated
 - Badges display
 
 **Acceptance Criteria**:
+
 - [x] CI/CD pipeline complete
 - [x] All tests automated
 - [x] Reports visible
@@ -727,11 +808,13 @@ Ensure all tests run in CI/CD pipeline.
 ## Phase 4: Enhancement & Capabilities (Weeks 4-7)
 
 ### Goal
+
 Add advanced features and expand agent capabilities.
 
 ### Tasks
 
 #### 4.1: Create Multi-Skill Composition System
+
 **Effort**: 3 days (Medium-High)
 **Status**: Not started
 **Depends on**: 2.5
@@ -740,6 +823,7 @@ Add advanced features and expand agent capabilities.
 Enable agents to compose multiple skills for complex tasks.
 
 **Subtasks**:
+
 1. Create skill composition engine in `.claude/lib/skill-composition.cjs`
    - Load multiple skills for single task
    - Merge rule sets intelligently
@@ -757,16 +841,19 @@ Enable agents to compose multiple skills for complex tasks.
 5. Document in `.claude/docs/SKILL_COMPOSITION.md`
 
 **Files to Create**:
+
 - `.claude/lib/skill-composition.cjs`
 - `.claude/docs/SKILL_COMPOSITION.md`
 
 **Tests**:
+
 - Composition loads skills
 - Rules merged correctly
 - No conflicts
 - Agent context reasonable
 
 **Acceptance Criteria**:
+
 - [x] Composition engine created
 - [x] Multiple examples working
 - [x] Conflict resolution working
@@ -775,6 +862,7 @@ Enable agents to compose multiple skills for complex tasks.
 ---
 
 #### 4.2: Create Skill Recommendation Engine
+
 **Effort**: 2 days (Medium)
 **Status**: Not started
 **Depends on**: 2.3
@@ -783,6 +871,7 @@ Enable agents to compose multiple skills for complex tasks.
 Recommend relevant skills based on codebase context.
 
 **Subtasks**:
+
 1. Create recommendation engine in `.claude/lib/skill-recommender.cjs`
    - Analyze package.json dependencies
    - Detect React, React Native, Next.js usage
@@ -799,10 +888,12 @@ Recommend relevant skills based on codebase context.
 5. Document in `.claude/docs/SKILL_RECOMMENDATIONS.md`
 
 **Files to Create**:
+
 - `.claude/lib/skill-recommender.cjs`
 - `.claude/docs/SKILL_RECOMMENDATIONS.md`
 
 **Tests**:
+
 - React projects → react skills
 - Native projects → native skills
 - Next.js projects → all React skills
@@ -810,6 +901,7 @@ Recommend relevant skills based on codebase context.
 - Recommendations accurate
 
 **Acceptance Criteria**:
+
 - [x] Recommender created
 - [x] Scoring system working
 - [x] Tests passing
@@ -818,6 +910,7 @@ Recommend relevant skills based on codebase context.
 ---
 
 #### 4.3: Create Skill Coverage Report
+
 **Effort**: 2 days (Medium)
 **Status**: Not started
 **Depends on**: 4.2
@@ -826,6 +919,7 @@ Recommend relevant skills based on codebase context.
 Generate coverage reports showing which rules apply to codebase.
 
 **Subtasks**:
+
 1. Create report generator in `.claude/lib/skill-coverage-report.cjs`
    - Analyze codebase against all rules
    - Identify violations
@@ -849,16 +943,19 @@ Generate coverage reports showing which rules apply to codebase.
 6. Add to documentation
 
 **Files to Create**:
+
 - `.claude/lib/skill-coverage-report.cjs`
 - `.claude/tools/cli/skill-coverage.js`
 
 **Tests**:
+
 - Report generates without errors
 - Violations detected accurately
 - Recommendations relevant
 - Scores reasonable
 
 **Acceptance Criteria**:
+
 - [x] Report generator created
 - [x] CLI tool working
 - [x] Example reports generated
@@ -867,6 +964,7 @@ Generate coverage reports showing which rules apply to codebase.
 ---
 
 #### 4.4: Integrate with Code Review Agent
+
 **Effort**: 2 days (Medium)
 **Status**: Not started
 **Depends on**: 3.2, 4.3
@@ -875,6 +973,7 @@ Generate coverage reports showing which rules apply to codebase.
 Enhance code-reviewer agent to use skills.
 
 **Subtasks**:
+
 1. Update `.claude/agents/specialized/code-reviewer.md`
    - Add skill loading logic
    - Add rule application section
@@ -891,18 +990,22 @@ Enhance code-reviewer agent to use skills.
 5. Document in `.claude/docs/CODE_REVIEW_WITH_SKILLS.md`
 
 **Files to Modify**:
+
 - `.claude/agents/specialized/code-reviewer.md`
 
 **Files to Create**:
+
 - `.claude/docs/CODE_REVIEW_WITH_SKILLS.md`
 
 **Tests**:
+
 - Reviews include skill checks
 - Violations detected
 - Recommendations relevant
 - Output quality good
 
 **Acceptance Criteria**:
+
 - [x] Agent updated
 - [x] Skill integration working
 - [x] Example reviews complete
@@ -911,6 +1014,7 @@ Enhance code-reviewer agent to use skills.
 ---
 
 #### 4.5: Create Skill Learning Module
+
 **Effort**: 3 days (Medium-High)
 **Status**: Not started
 **Depends on**: 2.4
@@ -919,6 +1023,7 @@ Enhance code-reviewer agent to use skills.
 Create learning resources for agents about skills.
 
 **Subtasks**:
+
 1. Create skill learning guide in `.claude/docs/LEARNING_SKILLS.md`
    - How to learn from skills
    - How to apply rules effectively
@@ -940,6 +1045,7 @@ Create learning resources for agents about skills.
 5. Integrate with agent onboarding
 
 **Files to Create**:
+
 - `.claude/docs/LEARNING_SKILLS.md`
 - `.claude/docs/tutorials/react-performance-tutorial.md`
 - `.claude/docs/tutorials/react-native-tutorial.md`
@@ -948,12 +1054,14 @@ Create learning resources for agents about skills.
 - `.claude/tools/assessment/skill-assessment.js`
 
 **Tests**:
+
 - Learning materials are clear
 - Examples are correct
 - Assessment tool works
 - Exercises are solvable
 
 **Acceptance Criteria**:
+
 - [x] Learning guide created
 - [x] 4 tutorials completed
 - [x] Assessment tool working
@@ -975,11 +1083,13 @@ Create learning resources for agents about skills.
 ## Phase 5: Documentation & Polish (Weeks 7-8)
 
 ### Goal
+
 Complete documentation and prepare for production.
 
 ### Tasks
 
 #### 5.1: Create Comprehensive User Guide
+
 **Effort**: 2 days (Medium)
 **Status**: Not started
 **Depends on**: 4.5
@@ -988,6 +1098,7 @@ Complete documentation and prepare for production.
 Create user-facing documentation.
 
 **Subtasks**:
+
 1. Create `.claude/docs/USER_GUIDE_SKILLS.md`
    - Overview of all skills
    - When to use each skill
@@ -1005,18 +1116,21 @@ Create user-facing documentation.
 5. Add navigation links to existing guides
 
 **Files to Create**:
+
 - `.claude/docs/USER_GUIDE_SKILLS.md`
 - `.claude/docs/SKILL_QUICKSTART.md`
 - `.claude/docs/SKILL_TROUBLESHOOTING.md`
 - `.claude/docs/SKILL_FAQ.md`
 
 **Tests**:
+
 - Guides are complete
 - Examples work
 - Links correct
 - Tone appropriate
 
 **Acceptance Criteria**:
+
 - [x] User guide complete
 - [x] All common scenarios covered
 - [x] Examples verified
@@ -1025,6 +1139,7 @@ Create user-facing documentation.
 ---
 
 #### 5.2: Create Developer Integration Guide
+
 **Effort**: 1.5 days (Medium)
 **Status**: Not started
 **Depends on**: 4.5
@@ -1033,6 +1148,7 @@ Create user-facing documentation.
 Document how to integrate skills into custom agents.
 
 **Subtasks**:
+
 1. Create `.claude/docs/DEVELOPER_SKILL_INTEGRATION.md`
    - Loading skills programmatically
    - Accessing rule information
@@ -1053,15 +1169,18 @@ Document how to integrate skills into custom agents.
    - Submitting back to project
 
 **Files to Create**:
+
 - `.claude/docs/DEVELOPER_SKILL_INTEGRATION.md`
 
 **Tests**:
+
 - Examples work
 - API documented
 - Extensions possible
 - Integration straightforward
 
 **Acceptance Criteria**:
+
 - [x] Integration guide complete
 - [x] Code examples working
 - [x] API documented
@@ -1070,6 +1189,7 @@ Document how to integrate skills into custom agents.
 ---
 
 #### 5.3: Create Attribution & Credits Document
+
 **Effort**: 1 day (Low)
 **Status**: Not started
 
@@ -1077,6 +1197,7 @@ Document how to integrate skills into custom agents.
 Document sources and attributions.
 
 **Subtasks**:
+
 1. Create `.claude/docs/SKILL_ATTRIBUTIONS.md`
    - Vercel Labs attribution
    - Original project links
@@ -1088,9 +1209,11 @@ Document sources and attributions.
 5. Document how to cite skills in projects
 
 **Files to Create**:
+
 - `.claude/docs/SKILL_ATTRIBUTIONS.md`
 
 **Files to Modify**:
+
 - `.claude/skills/react-best-practices-vercel/SKILL.md` - Add attribution
 - `.claude/skills/react-native-skills-vercel/SKILL.md` - Add attribution
 - `.claude/skills/composition-patterns-vercel/SKILL.md` - Add attribution
@@ -1098,12 +1221,14 @@ Document sources and attributions.
 - `.claude/skills/vercel-deploy/SKILL.md` - Add attribution
 
 **Tests**:
+
 - All skills credited
 - Links working
 - License clear
 - Format consistent
 
 **Acceptance Criteria**:
+
 - [x] Attribution document complete
 - [x] All skills credited
 - [x] Links verified
@@ -1112,6 +1237,7 @@ Document sources and attributions.
 ---
 
 #### 5.4: Update Main README
+
 **Effort**: 1 day (Low)
 **Status**: Not started
 **Depends on**: 5.1-5.3
@@ -1120,6 +1246,7 @@ Document sources and attributions.
 Update project README with skills information.
 
 **Subtasks**:
+
 1. Add Skills section to README
    - List of available skills
    - Quick links to documentation
@@ -1131,15 +1258,18 @@ Update project README with skills information.
 6. Update table of contents
 
 **Files to Modify**:
+
 - `README.md`
 
 **Tests**:
+
 - README renders correctly
 - Links working
 - Examples accurate
 - Format consistent
 
 **Acceptance Criteria**:
+
 - [x] README updated
 - [x] All sections added
 - [x] Links verified
@@ -1148,6 +1278,7 @@ Update project README with skills information.
 ---
 
 #### 5.5: Create Migration Guide
+
 **Effort**: 1.5 days (Medium)
 **Status**: Not started
 **Depends on**: 5.1
@@ -1156,6 +1287,7 @@ Update project README with skills information.
 Help users migrate to using skills.
 
 **Subtasks**:
+
 1. Create `.claude/docs/MIGRATION_GUIDE.md`
    - For agents: How to use new skills
    - For developers: How to integrate
@@ -1166,15 +1298,18 @@ Help users migrate to using skills.
 5. Document breaking changes (if any)
 
 **Files to Create**:
+
 - `.claude/docs/MIGRATION_GUIDE.md`
 
 **Tests**:
+
 - Guide is clear
 - Examples accurate
 - Checklist complete
 - No gaps in coverage
 
 **Acceptance Criteria**:
+
 - [x] Migration guide complete
 - [x] Examples working
 - [x] Checklist functional
@@ -1196,6 +1331,7 @@ Help users migrate to using skills.
 ## Risk Assessment
 
 ### High-Risk Items
+
 1. **Build System Integration**
    - Risk: TypeScript compilation issues
    - Mitigation: Extensive testing, CI/CD validation
@@ -1212,6 +1348,7 @@ Help users migrate to using skills.
    - Owner: Platform Lead
 
 ### Medium-Risk Items
+
 1. **Skill Routing Accuracy**
    - Risk: Wrong skill activated
    - Mitigation: Extensive trigger phrase testing
@@ -1223,6 +1360,7 @@ Help users migrate to using skills.
    - Owner: Performance Engineer
 
 ### Low-Risk Items
+
 1. **Documentation**
    - Risk: Incomplete or unclear
    - Mitigation: Review, examples, testing
@@ -1239,14 +1377,14 @@ Help users migrate to using skills.
 
 ### Recommended Team
 
-| Role | Hours/Week | Responsibilities |
-|------|-----------|-----------------|
-| Integration Lead (Senior Dev) | 10 | Architecture, integration, reviews |
-| Frontend Developer | 15 | React/React Native skills, agents |
-| DevOps Engineer | 10 | Build system, CI/CD, tooling |
-| QA Engineer | 10 | Testing, validation, benchmarks |
-| Technical Writer | 8 | Documentation, guides |
-| **Total** | **53 hours** | **7-10 week timeline** |
+| Role                          | Hours/Week   | Responsibilities                   |
+| ----------------------------- | ------------ | ---------------------------------- |
+| Integration Lead (Senior Dev) | 10           | Architecture, integration, reviews |
+| Frontend Developer            | 15           | React/React Native skills, agents  |
+| DevOps Engineer               | 10           | Build system, CI/CD, tooling       |
+| QA Engineer                   | 10           | Testing, validation, benchmarks    |
+| Technical Writer              | 8            | Documentation, guides              |
+| **Total**                     | **53 hours** | **7-10 week timeline**             |
 
 ### Skills Distribution
 
@@ -1261,30 +1399,35 @@ Help users migrate to using skills.
 ## Success Metrics
 
 ### Phase 1
+
 - [ ] All 5 skills imported
 - [ ] Build system functional
 - [ ] CI/CD pipeline running
 - [ ] 0 critical errors
 
 ### Phase 2
+
 - [ ] Validation hooks working
 - [ ] Catalog updated
 - [ ] Routing configured
 - [ ] Documentation complete
 
 ### Phase 3
+
 - [ ] 100% test coverage for core
 - [ ] 5+ integration scenarios
 - [ ] Performance benchmarks pass
 - [ ] All CI/CD tests green
 
 ### Phase 4
+
 - [ ] Multi-skill composition working
 - [ ] Recommender accuracy > 90%
 - [ ] Coverage reports generating
 - [ ] Code review enhanced
 
 ### Phase 5
+
 - [ ] Documentation complete
 - [ ] User guide comprehensive
 - [ ] Developer guide clear
@@ -1328,6 +1471,7 @@ LAUNCH:    Ready for production
 ## Go/No-Go Criteria
 
 ### Go Criteria
+
 - [ ] All phases complete
 - [ ] All tests passing
 - [ ] Documentation reviewed
@@ -1336,6 +1480,7 @@ LAUNCH:    Ready for production
 - [ ] Performance acceptable
 
 ### No-Go Criteria
+
 - [ ] Critical test failures
 - [ ] Performance degradation
 - [ ] Security vulnerabilities
@@ -1348,18 +1493,21 @@ LAUNCH:    Ready for production
 ## Post-Launch Activities
 
 ### Week 1 Post-Launch
+
 - [ ] Monitor agent usage of skills
 - [ ] Collect user feedback
 - [ ] Fix any critical issues
 - [ ] Publish feedback summary
 
 ### Month 1 Post-Launch
+
 - [ ] Analyze usage patterns
 - [ ] Optimize frequently-used paths
 - [ ] Create additional examples
 - [ ] Plan next iteration
 
 ### Ongoing
+
 - [ ] Monitor Vercel Labs for updates
 - [ ] Update skills as needed
 - [ ] Gather community feedback
@@ -1370,6 +1518,7 @@ LAUNCH:    Ready for production
 ## Appendix: File Checklist
 
 ### Phase 1 Files to Create
+
 - [ ] `.claude/skills/react-best-practices-vercel/` (59 rule files)
 - [ ] `.claude/skills/react-native-skills-vercel/` (38 rule files)
 - [ ] `.claude/skills/composition-patterns-vercel/` (10 rule files)
@@ -1379,6 +1528,7 @@ LAUNCH:    Ready for production
 - [ ] `.claude/docs/SKILL_BUILD.md`
 
 ### Phase 2 Files to Create/Modify
+
 - [ ] `.claude/hooks/skills/` (3 validator hooks)
 - [ ] `.claude/context/artifacts/skill-catalog.md` (update)
 - [ ] `.claude/hooks/routing/router-enforcer.cjs` (update)
@@ -1391,6 +1541,7 @@ LAUNCH:    Ready for production
 - [ ] `.claude/agents/domain/` (3 agent files - update)
 
 ### Phase 3 Files to Create
+
 - [ ] `tests/skills/skill-loading.test.mjs`
 - [ ] `tests/skills/rule-validation.test.mjs`
 - [ ] `tests/skills/routing-integration.test.mjs`
@@ -1400,6 +1551,7 @@ LAUNCH:    Ready for production
 - [ ] `.claude/docs/CI_CD_PIPELINE.md`
 
 ### Phase 4 Files to Create
+
 - [ ] `.claude/lib/skill-composition.cjs`
 - [ ] `.claude/docs/SKILL_COMPOSITION.md`
 - [ ] `.claude/lib/skill-recommender.cjs`
@@ -1413,6 +1565,7 @@ LAUNCH:    Ready for production
 - [ ] `.claude/tools/assessment/skill-assessment.js`
 
 ### Phase 5 Files to Create
+
 - [ ] `.claude/docs/USER_GUIDE_SKILLS.md`
 - [ ] `.claude/docs/SKILL_QUICKSTART.md`
 - [ ] `.claude/docs/SKILL_TROUBLESHOOTING.md`

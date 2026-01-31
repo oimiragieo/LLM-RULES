@@ -163,8 +163,8 @@ describe('QueryAnalyzer', () => {
 
       assert.ok(
         result.concepts.includes('authentication') ||
-        result.concepts.includes('login') ||
-        result.concepts.includes('signin')
+          result.concepts.includes('login') ||
+          result.concepts.includes('signin')
       );
     });
 
@@ -240,7 +240,10 @@ describe('QueryAnalyzer', () => {
 
     test('handles very long queries', () => {
       const analyzer = new QueryAnalyzer();
-      const longQuery = 'find async authentication handler functions that validate user credentials using bcrypt and return JWT tokens'.repeat(5);
+      const longQuery =
+        'find async authentication handler functions that validate user credentials using bcrypt and return JWT tokens'.repeat(
+          5
+        );
       const result = analyzer.analyze(longQuery);
 
       assert.ok(result.type !== undefined);

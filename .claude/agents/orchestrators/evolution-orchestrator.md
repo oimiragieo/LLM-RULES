@@ -820,6 +820,18 @@ if (!best) {
     suggestions: AvailableAgents({ domain: 'code' }).agents.slice(0, 3),
   };
 }
+
+// Resolve model from config.yaml (ADR-075)
+const { resolveAgentModel } = require('./.claude/lib/utils/agent-config-reader.cjs');
+const modelResult = resolveAgentModel(best.id, PROJECT_ROOT);
+
+// Spawn with config-resolved model
+Task({
+  subagent_type: best.id,
+  model: modelResult.model, // Use config-resolved model (ADR-075)
+  description: task.description,
+  prompt: assembleEvolutionPrompt(best.id, task),
+});
 ```
 
 ### Benefits for Evolution

@@ -54,19 +54,16 @@ The skill performs automated code analysis to identify performance issues specif
 Invoke this skill when:
 
 1. **List Performance Issues**
-
    - "My FlatList is slow, how do I optimize"
    - "SectionList is laggy when scrolling"
    - "Long lists cause performance issues"
 
 2. **Animation Problems**
-
    - "Animations are janky on Android"
    - "60 FPS animations not working"
    - "React Native Reanimated performance"
 
 3. **Memory Issues**
-
    - "App crashes with large datasets"
    - "Memory usage keeps increasing"
    - "Images not releasing memory"
@@ -115,11 +112,11 @@ For each violation, the skill provides:
 
 ### 3. Platform-Specific Guidance
 
-| Platform | Specific Issues                  | Recommendations                    |
-| -------- | -------------------------------- | ---------------------------------- |
-| iOS      | Memory warnings, animations      | Use native driver, reduce memory   |
-| Android  | Overdraw, large lists            | Optimize layouts, virtualize lists |
-| Expo     | Bundle size, native modules      | Use Expo modules, optimize assets  |
+| Platform | Specific Issues             | Recommendations                    |
+| -------- | --------------------------- | ---------------------------------- |
+| iOS      | Memory warnings, animations | Use native driver, reduce memory   |
+| Android  | Overdraw, large lists       | Optimize layouts, virtualize lists |
+| Expo     | Bundle size, native modules | Use Expo modules, optimize assets  |
 
 ---
 

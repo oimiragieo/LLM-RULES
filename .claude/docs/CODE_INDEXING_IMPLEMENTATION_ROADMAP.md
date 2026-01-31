@@ -35,11 +35,13 @@ This document provides a phased implementation plan for the Code Indexing and Se
 | P1.1.5 | Write unit tests (15+ tests) | 3 | P1.1.2-4 |
 
 **Acceptance Criteria:**
+
 - [ ] Parse JS/TS/Python files successfully
 - [ ] Handle malformed files gracefully
 - [ ] 100% test coverage on parser class
 
 **Risks:**
+
 - tree-sitter Node bindings may have platform-specific issues (Windows)
 - Mitigation: Test on Windows early, document any workarounds
 
@@ -62,6 +64,7 @@ This document provides a phased implementation plan for the Code Indexing and Se
 | P1.2.6 | Write unit tests (20+ tests) | 2 | P1.2.1-5 |
 
 **Acceptance Criteria:**
+
 - [ ] Correctly chunk functions, classes, methods
 - [ ] Respect 2048 token limit per chunk
 - [ ] Handle nested structures (class > method)
@@ -85,11 +88,13 @@ This document provides a phased implementation plan for the Code Indexing and Se
 | P1.3.5 | Write unit tests (10+ tests) | 1 | P1.3.2-4 |
 
 **Model Choice:** `Xenova/all-MiniLM-L6-v2`
+
 - 384 dimensions
 - ~25MB model size
 - Runs entirely in Node.js via ONNX
 
 **Acceptance Criteria:**
+
 - [ ] Generate 384-dim embeddings locally
 - [ ] Batch 100 texts in <10 seconds
 - [ ] Cache prevents redundant computation
@@ -112,6 +117,7 @@ This document provides a phased implementation plan for the Code Indexing and Se
 | P1.4.5 | Write integration tests (10+ tests) | 1 | P1.4.2-4 |
 
 **Acceptance Criteria:**
+
 - [ ] Store chunks with embeddings and metadata
 - [ ] Query returns ranked results
 - [ ] Filters work (language, type, path)
@@ -134,6 +140,7 @@ This document provides a phased implementation plan for the Code Indexing and Se
 | P1.5.5 | Write integration tests (10+ tests) | 1 | P1.5.1-4 |
 
 **Acceptance Criteria:**
+
 - [ ] Natural language query returns relevant code
 - [ ] Results include file path and line numbers
 - [ ] Keyword matches boost relevance
@@ -155,6 +162,7 @@ This document provides a phased implementation plan for the Code Indexing and Se
 | P1.6.4 | Add --dry-run and --force flags | 1 | P1.6.2 |
 
 **CLI Interface:**
+
 ```bash
 # Index current project
 node .claude/tools/cli/index-codebase.cjs
@@ -170,6 +178,7 @@ node .claude/tools/cli/index-codebase.cjs --force
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Index 1000 files in <60 seconds
 - [ ] Progress bar shows completion percentage
 - [ ] Dry run shows what would be indexed
@@ -181,6 +190,7 @@ node .claude/tools/cli/index-codebase.cjs --force
 **Total Effort:** 60 hours (~1.5 weeks)
 
 **Verification:**
+
 ```bash
 # Run indexing
 node .claude/tools/cli/index-codebase.cjs
@@ -224,6 +234,7 @@ console.log(results);
 | P2.1.5 | Write unit tests (15+ tests) | 1 | P2.1.1-4 |
 
 **Algorithm:**
+
 ```
 Node Hash = SHA256(
   children.map(c => c.hash).sort().join('') +
@@ -232,6 +243,7 @@ Node Hash = SHA256(
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Build Merkle tree for project in <5 seconds
 - [ ] Detect file changes via tree diff
 - [ ] Persist/restore tree state
@@ -254,6 +266,7 @@ Node Hash = SHA256(
 | P2.2.5 | Write integration tests (10+ tests) | 1 | P2.2.1-4 |
 
 **Acceptance Criteria:**
+
 - [ ] Incremental update in <5 seconds for 10 changed files
 - [ ] Correctly handle add/modify/delete
 - [ ] File watcher triggers updates (optional)
@@ -276,6 +289,7 @@ Node Hash = SHA256(
 | P2.3.5 | Write unit tests (10+ tests) | 1 | P2.3.1-4 |
 
 **Acceptance Criteria:**
+
 - [ ] Extract imports for dependency tracking
 - [ ] Extract function signatures for display
 - [ ] Complexity score (optional but nice to have)
@@ -298,17 +312,19 @@ Node Hash = SHA256(
 | P2.4.5 | Write unit tests (10+ tests) | 1 | P2.4.1-4 |
 
 **Synonym Map (examples):**
+
 ```javascript
 const SYNONYMS = {
-  'auth': ['authentication', 'login', 'signin', 'authorize'],
-  'db': ['database', 'sql', 'query', 'repository'],
-  'api': ['endpoint', 'route', 'handler', 'controller'],
-  'error': ['exception', 'catch', 'throw', 'fault'],
-  'config': ['configuration', 'settings', 'options', 'env']
+  auth: ['authentication', 'login', 'signin', 'authorize'],
+  db: ['database', 'sql', 'query', 'repository'],
+  api: ['endpoint', 'route', 'handler', 'controller'],
+  error: ['exception', 'catch', 'throw', 'fault'],
+  config: ['configuration', 'settings', 'options', 'env'],
 };
 ```
 
 **Acceptance Criteria:**
+
 - [ ] "auth" query finds "authentication" code
 - [ ] Results are diverse (not 5 similar functions)
 - [ ] Recent code ranks higher
@@ -331,15 +347,17 @@ const SYNONYMS = {
 | P2.5.5 | Write integration tests (5+ tests) | 1 | P2.5.2-4 |
 
 **Skill Usage:**
+
 ```javascript
 // Agent invokes skill
 Skill({ skill: 'code-semantic-search' });
 
 // Skill provides query interface
-const results = await codeSearch.query("find JWT validation");
+const results = await codeSearch.query('find JWT validation');
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Skill appears in skill catalog
 - [ ] Agents can invoke via Skill()
 - [ ] Fallback to Grep works
@@ -351,6 +369,7 @@ const results = await codeSearch.query("find JWT validation");
 **Total Effort:** 46 hours (~1 week)
 
 **Verification:**
+
 ```bash
 # Test incremental update
 touch src/test-file.ts
@@ -391,6 +410,7 @@ console.log(results);
 | P3.1.3 | Write per-language tests | 4 | P3.1.2 |
 
 **Acceptance Criteria:**
+
 - [ ] All 6 additional languages parse correctly
 - [ ] Chunking respects language-specific structures
 
@@ -409,15 +429,17 @@ console.log(results);
 | P3.2.4 | Write unit tests | 1 | P3.2.1-3 |
 
 **Cache Configuration:**
+
 ```javascript
 const CACHE_CONFIG = {
-  maxSize: 100,           // Max cached queries
-  ttlMs: 5 * 60 * 1000,   // 5 minute TTL
-  invalidateOnUpdate: true
+  maxSize: 100, // Max cached queries
+  ttlMs: 5 * 60 * 1000, // 5 minute TTL
+  invalidateOnUpdate: true,
 };
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Cache hit reduces query time to <50ms
 - [ ] Cache invalidates on index update
 - [ ] Hit rate >50% for typical usage
@@ -437,10 +459,12 @@ const CACHE_CONFIG = {
 | P3.3.4 | Add progress streaming | 1 | P3.3.2 |
 
 **Target Performance:**
+
 - Index 1000 files: <30 seconds (2x improvement)
 - Batch embedding: 500 chunks in <15 seconds
 
 **Acceptance Criteria:**
+
 - [ ] 2x improvement in indexing speed
 - [ ] Memory usage stable under 500MB
 
@@ -462,6 +486,7 @@ const CACHE_CONFIG = {
 **Test Coverage Target:** 90%+
 
 **Acceptance Criteria:**
+
 - [ ] All public methods documented
 - [ ] User guide covers common use cases
 - [ ] 90%+ test coverage
@@ -490,6 +515,7 @@ const CACHE_CONFIG = {
 | >50K files | 200 | 100 | 32 |
 
 **Acceptance Criteria:**
+
 - [ ] Query latency <200ms (P95)
 - [ ] Index size <100MB per 10K files
 - [ ] Performance guide published
@@ -501,6 +527,7 @@ const CACHE_CONFIG = {
 **Total Effort:** 44 hours (~1 week)
 
 **Final Verification:**
+
 ```bash
 # Run full test suite
 npm test -- tests/code-indexing/**/*.test.cjs
@@ -521,12 +548,12 @@ done
 
 ### Total Effort
 
-| Phase | Weeks | Hours | Deliverables |
-|-------|-------|-------|--------------|
-| Phase 1: Foundation | 1.5 | 60 | Core pipeline, CLI |
-| Phase 2: Enhancement | 1 | 46 | Change detection, Skill |
-| Phase 3: Optimization | 1 | 44 | Languages, Performance |
-| **Total** | **3.5** | **150** | **Full system** |
+| Phase                 | Weeks   | Hours   | Deliverables            |
+| --------------------- | ------- | ------- | ----------------------- |
+| Phase 1: Foundation   | 1.5     | 60      | Core pipeline, CLI      |
+| Phase 2: Enhancement  | 1       | 46      | Change detection, Skill |
+| Phase 3: Optimization | 1       | 44      | Languages, Performance  |
+| **Total**             | **3.5** | **150** | **Full system**         |
 
 ### Dependencies
 
@@ -557,26 +584,26 @@ graph TD
 
 ### Milestones
 
-| Milestone | Week | Criteria |
-|-----------|------|----------|
-| M1: MVP | 1.5 | Index JS/TS/Python, basic queries |
-| M2: Production-Ready | 2.5 | Incremental updates, Skill integration |
-| M3: Complete | 3.5 | 6+ languages, optimized, documented |
+| Milestone            | Week | Criteria                               |
+| -------------------- | ---- | -------------------------------------- |
+| M1: MVP              | 1.5  | Index JS/TS/Python, basic queries      |
+| M2: Production-Ready | 2.5  | Incremental updates, Skill integration |
+| M3: Complete         | 3.5  | 6+ languages, optimized, documented    |
 
 ### Go/No-Go Checkpoints
 
-| Week | Checkpoint | No-Go Criteria |
-|------|------------|----------------|
-| 1 | tree-sitter working? | Node bindings fail on Windows |
-| 2 | Query accuracy >60%? | Embeddings not capturing code semantics |
-| 3 | Incremental <5s? | Merkle tree too slow for large codebases |
-| 4 | Skill working? | Integration issues with skill loader |
+| Week | Checkpoint           | No-Go Criteria                           |
+| ---- | -------------------- | ---------------------------------------- |
+| 1    | tree-sitter working? | Node bindings fail on Windows            |
+| 2    | Query accuracy >60%? | Embeddings not capturing code semantics  |
+| 3    | Incremental <5s?     | Merkle tree too slow for large codebases |
+| 4    | Skill working?       | Integration issues with skill loader     |
 
 ### Risk Register
 
-| Risk | Probability | Impact | Mitigation | Owner |
-|------|-------------|--------|------------|-------|
-| tree-sitter Windows issues | Medium | High | Test early, document workarounds | Developer |
-| Embedding quality | Low | High | Allow OpenAI fallback | Architect |
-| ChromaDB memory issues | Low | Medium | Tune HNSW, add persistence | Developer |
-| Large codebase performance | Medium | Medium | Batch processing, streaming | Developer |
+| Risk                       | Probability | Impact | Mitigation                       | Owner     |
+| -------------------------- | ----------- | ------ | -------------------------------- | --------- |
+| tree-sitter Windows issues | Medium      | High   | Test early, document workarounds | Developer |
+| Embedding quality          | Low         | High   | Allow OpenAI fallback            | Architect |
+| ChromaDB memory issues     | Low         | Medium | Tune HNSW, add persistence       | Developer |
+| Large codebase performance | Medium      | Medium | Batch processing, streaming      | Developer |

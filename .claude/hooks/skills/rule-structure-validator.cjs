@@ -104,10 +104,11 @@ function validateRuleStructure(filePath) {
     }
 
     // Check for Wrong/Bad example
-    const hasWrongExample = sections.some(s =>
-      s.toLowerCase().includes('wrong') ||
-      s.toLowerCase().includes('bad') ||
-      s.toLowerCase().includes('incorrect')
+    const hasWrongExample = sections.some(
+      s =>
+        s.toLowerCase().includes('wrong') ||
+        s.toLowerCase().includes('bad') ||
+        s.toLowerCase().includes('incorrect')
     );
 
     if (!hasWrongExample) {
@@ -115,10 +116,11 @@ function validateRuleStructure(filePath) {
     }
 
     // Check for Right/Good example
-    const hasRightExample = sections.some(s =>
-      s.toLowerCase().includes('right') ||
-      s.toLowerCase().includes('good') ||
-      s.toLowerCase().includes('correct')
+    const hasRightExample = sections.some(
+      s =>
+        s.toLowerCase().includes('right') ||
+        s.toLowerCase().includes('good') ||
+        s.toLowerCase().includes('correct')
     );
 
     if (!hasRightExample) {
@@ -130,14 +132,13 @@ function validateRuleStructure(filePath) {
     if (codeBlocks.length < 2) {
       errors.push('Missing code examples (need at least 2 code blocks with ``` fences)');
     }
-
   } catch (err) {
     errors.push(`Failed to read file: ${err.message}`);
   }
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -161,8 +162,10 @@ function preToolUse(hookInput) {
 
   // Only validate files in skills/*/rules/ directories
   const normalizedPath = path.normalize(filePath);
-  if (!normalizedPath.includes(path.join('.claude', 'skills')) ||
-      !normalizedPath.includes(path.join('rules'))) {
+  if (
+    !normalizedPath.includes(path.join('.claude', 'skills')) ||
+    !normalizedPath.includes(path.join('rules'))
+  ) {
     return { allowed: true };
   }
 
@@ -190,7 +193,7 @@ function preToolUse(hookInput) {
     if (!result.valid) {
       return {
         allowed: false,
-        reason: `Rule structure validation failed for ${path.basename(filePath)}:\n${result.errors.map(e => `  - ${e}`).join('\n')}`
+        reason: `Rule structure validation failed for ${path.basename(filePath)}:\n${result.errors.map(e => `  - ${e}`).join('\n')}`,
       };
     }
   } catch (err) {
@@ -204,5 +207,5 @@ function preToolUse(hookInput) {
 module.exports = {
   preToolUse,
   validateRuleStructure,
-  parseSections
+  parseSections,
 };

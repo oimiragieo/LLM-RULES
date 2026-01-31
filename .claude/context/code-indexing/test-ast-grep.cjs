@@ -15,13 +15,15 @@ const args = process.argv.slice(2);
 const astGrepCmd = process.platform === 'win32' ? 'ast-grep.cmd' : 'ast-grep';
 
 // Properly quote arguments for shell
-const quotedArgs = args.map(arg => {
-  // If arg contains spaces or special chars, wrap in quotes
-  if (arg.includes(' ') || arg.includes('$') || arg.includes('(') || arg.includes(')')) {
-    return `"${arg.replace(/"/g, '\\"')}"`;
-  }
-  return arg;
-}).join(' ');
+const quotedArgs = args
+  .map(arg => {
+    // If arg contains spaces or special chars, wrap in quotes
+    if (arg.includes(' ') || arg.includes('$') || arg.includes('(') || arg.includes(')')) {
+      return `"${arg.replace(/"/g, '\\"')}"`;
+    }
+    return arg;
+  })
+  .join(' ');
 
 try {
   // Run ast-grep with provided arguments

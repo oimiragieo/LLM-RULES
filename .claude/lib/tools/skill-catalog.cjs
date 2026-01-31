@@ -29,8 +29,7 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 class SkillCatalogQuery {
   constructor(options = {}) {
     this.skillIndexPath =
-      options.skillIndexPath ||
-      path.join(PROJECT_ROOT, '.claude/config/skill-index.json');
+      options.skillIndexPath || path.join(PROJECT_ROOT, '.claude/config/skill-index.json');
     this.skillIndex = null;
     this.cache = new Map();
     this.cacheTimeouts = new Map();
@@ -96,26 +95,25 @@ class SkillCatalogQuery {
 
     // 5. Apply filters
     if (options.domain) {
-      results = results.filter((s) => s.domain === options.domain);
+      results = results.filter(s => s.domain === options.domain);
     }
 
     if (options.category) {
-      results = results.filter((s) => s.category === options.category);
+      results = results.filter(s => s.category === options.category);
     }
 
     if (options.tags && options.tags.length > 0) {
-      results = results.filter((skill) =>
-        options.tags.every((tag) => skill.tags && skill.tags.includes(tag))
+      results = results.filter(skill =>
+        options.tags.every(tag => skill.tags && skill.tags.includes(tag))
       );
     }
 
     if (options.agentType) {
       // Get recommended skills for this agent type
-      const recommendedList =
-        skillIndex.discovery?.recommendedForAgent?.[options.agentType] || [];
+      const recommendedList = skillIndex.discovery?.recommendedForAgent?.[options.agentType] || [];
 
       // Mark recommended skills
-      results = results.map((skill) => ({
+      results = results.map(skill => ({
         ...skill,
         recommended:
           recommendedList.includes(skill.name) ||
@@ -197,7 +195,7 @@ class SkillCatalogQuery {
     }
 
     // Strategy 4: Try first available domain
-    if (availableDomains.length > 0 && !suggestions.some((s) => s.domain === availableDomains[0])) {
+    if (availableDomains.length > 0 && !suggestions.some(s => s.domain === availableDomains[0])) {
       suggestions.push({
         domain: availableDomains[0],
         message: `Try domain: '${availableDomains[0]}'`,
@@ -226,9 +224,9 @@ class SkillCatalogQuery {
    */
   extractAllTags(skillIndex) {
     const tagsSet = new Set();
-    Object.values(skillIndex.skills || {}).forEach((skill) => {
+    Object.values(skillIndex.skills || {}).forEach(skill => {
       if (skill.tags && Array.isArray(skill.tags)) {
-        skill.tags.forEach((tag) => tagsSet.add(tag));
+        skill.tags.forEach(tag => tagsSet.add(tag));
       }
     });
     return Array.from(tagsSet).sort();
@@ -254,7 +252,7 @@ class SkillCatalogQuery {
       if (!Array.isArray(options.tags)) {
         return 'tags must be an array of strings';
       }
-      if (!options.tags.every((t) => typeof t === 'string')) {
+      if (!options.tags.every(t => typeof t === 'string')) {
         return 'all tags must be strings';
       }
     }

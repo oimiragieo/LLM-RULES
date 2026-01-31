@@ -20,9 +20,11 @@ const { describe, it, before, after, beforeEach } = require('node:test');
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
 // Modules under test
-const { AvailableAgents: _AvailableAgents, AvailableAgentsQuery, getInstance: _getInstance } = require(
-  path.join(PROJECT_ROOT, '.claude/lib/tools/available-agents.cjs')
-);
+const {
+  AvailableAgents: _AvailableAgents,
+  AvailableAgentsQuery,
+  getInstance: _getInstance,
+} = require(path.join(PROJECT_ROOT, '.claude/lib/tools/available-agents.cjs'));
 
 // Test fixtures path
 const FIXTURES_DIR = path.join(PROJECT_ROOT, 'tests/fixtures');
@@ -36,20 +38,20 @@ function createTestRegistry(agents, overrides = {}) {
     metadata: {
       generatedAt: new Date().toISOString(),
       totalAgents: Object.keys(agents).length,
-      healthyAgents: Object.values(agents).filter(a => a.health?.status === 'healthy').length
+      healthyAgents: Object.values(agents).filter(a => a.health?.status === 'healthy').length,
     },
     agents: agents,
     index: {
       byCapability: {},
       byDomain: {},
-      byCategory: {}
+      byCategory: {},
     },
     health: {
       healthy: [],
       degraded: [],
-      unavailable: []
+      unavailable: [],
     },
-    ...overrides
+    ...overrides,
   };
 
   // Build indices
@@ -97,7 +99,9 @@ function createMockAgent(id, options = {}) {
     name: options.name || id,
     description: options.description || `Mock ${id} agent`,
     category: options.category || 'core',
-    capabilities: options.capabilities || [{ name: 'implementation', description: 'Basic implementation' }],
+    capabilities: options.capabilities || [
+      { name: 'implementation', description: 'Basic implementation' },
+    ],
     domains: options.domains || ['code'],
     tools: options.tools || ['Read', 'Write', 'Edit', 'Bash'],
     skills: options.skills || ['tdd', 'debugging'],
@@ -114,8 +118,8 @@ function createMockAgent(id, options = {}) {
       lastSuccess: new Date().toISOString(),
       lastFailure: null,
       isolatedAt: null,
-      isolatedReason: null
-    }
+      isolatedReason: null,
+    },
   };
 }
 
@@ -137,7 +141,7 @@ describe('Router Capability Discovery Integration', () => {
   beforeEach(() => {
     // Create fresh query engine with test registry
     queryEngine = new AvailableAgentsQuery({
-      registryPath: testRegistryPath
+      registryPath: testRegistryPath,
     });
   });
 
@@ -156,12 +160,12 @@ describe('Router Capability Discovery Integration', () => {
           capabilities: [{ name: 'code-review', description: 'Review code for quality' }],
           domains: ['code'],
           category: 'specialized',
-          successRate: 0.98
+          successRate: 0.98,
         }),
-        'developer': createMockAgent('developer', {
+        developer: createMockAgent('developer', {
           capabilities: [{ name: 'implementation', description: 'Implement features' }],
-          domains: ['code']
-        })
+          domains: ['code'],
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -178,16 +182,16 @@ describe('Router Capability Discovery Integration', () => {
 
     it('should classify implementation requests to implementation capability', () => {
       const agents = {
-        'developer': createMockAgent('developer', {
+        developer: createMockAgent('developer', {
           capabilities: [
             { name: 'implementation', description: 'Implement features' },
-            { name: 'bug-fixing', description: 'Fix bugs' }
+            { name: 'bug-fixing', description: 'Fix bugs' },
           ],
-          successRate: 0.95
+          successRate: 0.95,
         }),
-        'architect': createMockAgent('architect', {
-          capabilities: [{ name: 'architecture-design', description: 'Design systems' }]
-        })
+        architect: createMockAgent('architect', {
+          capabilities: [{ name: 'architecture-design', description: 'Design systems' }],
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -202,14 +206,14 @@ describe('Router Capability Discovery Integration', () => {
 
     it('should classify testing requests to testing capability', () => {
       const agents = {
-        'qa': createMockAgent('qa', {
+        qa: createMockAgent('qa', {
           capabilities: [{ name: 'testing', description: 'Write and run tests' }],
           domains: ['testing'],
-          successRate: 0.92
+          successRate: 0.92,
         }),
-        'developer': createMockAgent('developer', {
-          capabilities: [{ name: 'implementation', description: 'Implement features' }]
-        })
+        developer: createMockAgent('developer', {
+          capabilities: [{ name: 'implementation', description: 'Implement features' }],
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -229,11 +233,11 @@ describe('Router Capability Discovery Integration', () => {
         'security-architect': createMockAgent('security-architect', {
           capabilities: [
             { name: 'security-review', description: 'Security audits' },
-            { name: 'threat-modeling', description: 'Threat analysis' }
+            { name: 'threat-modeling', description: 'Threat analysis' },
           ],
           domains: ['security'],
-          category: 'specialized'
-        })
+          category: 'specialized',
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -248,11 +252,11 @@ describe('Router Capability Discovery Integration', () => {
 
     it('should return agents for architecture-design capability', () => {
       const agents = {
-        'architect': createMockAgent('architect', {
+        architect: createMockAgent('architect', {
           capabilities: [{ name: 'architecture-design', description: 'System design' }],
           domains: ['architecture'],
-          category: 'core'
-        })
+          category: 'core',
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -269,8 +273,8 @@ describe('Router Capability Discovery Integration', () => {
         'technical-writer': createMockAgent('technical-writer', {
           capabilities: [{ name: 'documentation', description: 'Write docs' }],
           domains: ['documentation'],
-          category: 'core'
-        })
+          category: 'core',
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -288,16 +292,16 @@ describe('Router Capability Discovery Integration', () => {
       const agents = {
         'developer-1': createMockAgent('developer-1', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          successRate: 0.85
+          successRate: 0.85,
         }),
         'developer-2': createMockAgent('developer-2', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          successRate: 0.98
+          successRate: 0.98,
         }),
         'developer-3': createMockAgent('developer-3', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          successRate: 0.90
-        })
+          successRate: 0.9,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -306,7 +310,11 @@ describe('Router Capability Discovery Integration', () => {
       const result = queryEngine.query({ capability: 'implementation' });
 
       assert.strictEqual(result.success, true);
-      assert.strictEqual(result.agents[0].id, 'developer-2', 'Should return highest success rate first');
+      assert.strictEqual(
+        result.agents[0].id,
+        'developer-2',
+        'Should return highest success rate first'
+      );
       assert.strictEqual(result.agents[1].id, 'developer-3', 'Second highest should be second');
       assert.strictEqual(result.agents[2].id, 'developer-1', 'Lowest should be last');
     });
@@ -316,13 +324,13 @@ describe('Router Capability Discovery Integration', () => {
         'fast-agent': createMockAgent('fast-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           successRate: 0.95,
-          averageExecutionMs: 500
+          averageExecutionMs: 500,
         }),
         'slow-agent': createMockAgent('slow-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           successRate: 0.95,
-          averageExecutionMs: 5000
-        })
+          averageExecutionMs: 5000,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -331,7 +339,11 @@ describe('Router Capability Discovery Integration', () => {
       const result = queryEngine.query({ capability: 'implementation' });
 
       assert.strictEqual(result.success, true);
-      assert.strictEqual(result.agents[0].id, 'fast-agent', 'Faster agent should be first when rates equal');
+      assert.strictEqual(
+        result.agents[0].id,
+        'fast-agent',
+        'Faster agent should be first when rates equal'
+      );
     });
   });
 
@@ -341,13 +353,13 @@ describe('Router Capability Discovery Integration', () => {
         'healthy-agent': createMockAgent('healthy-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'healthy',
-          successRate: 0.90
+          successRate: 0.9,
         }),
         'unavailable-agent': createMockAgent('unavailable-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'unavailable',
-          successRate: 0.99
-        })
+          successRate: 0.99,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -365,13 +377,13 @@ describe('Router Capability Discovery Integration', () => {
         'healthy-agent': createMockAgent('healthy-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'healthy',
-          successRate: 0.90
+          successRate: 0.9,
         }),
         'unavailable-agent': createMockAgent('unavailable-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'unavailable',
-          successRate: 0.99
-        })
+          successRate: 0.99,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -380,7 +392,7 @@ describe('Router Capability Discovery Integration', () => {
       const result = queryEngine.query({
         capability: 'implementation',
         excludeFailed: false,
-        minSuccessRate: 0.5
+        minSuccessRate: 0.5,
       });
 
       assert.strictEqual(result.success, true);
@@ -394,13 +406,13 @@ describe('Router Capability Discovery Integration', () => {
         'degraded-agent': createMockAgent('degraded-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'degraded',
-          successRate: 0.65
+          successRate: 0.65,
         }),
         'healthy-agent': createMockAgent('healthy-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'healthy',
-          successRate: 0.85
-        })
+          successRate: 0.85,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -408,7 +420,7 @@ describe('Router Capability Discovery Integration', () => {
 
       const result = queryEngine.query({
         capability: 'implementation',
-        minSuccessRate: 0.5 // Lower threshold to include degraded
+        minSuccessRate: 0.5, // Lower threshold to include degraded
       });
 
       assert.strictEqual(result.success, true);
@@ -422,13 +434,13 @@ describe('Router Capability Discovery Integration', () => {
         'degraded-agent': createMockAgent('degraded-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'degraded',
-          successRate: 0.60
+          successRate: 0.6,
         }),
         'healthy-agent': createMockAgent('healthy-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'healthy',
-          successRate: 0.90
-        })
+          successRate: 0.9,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -436,7 +448,7 @@ describe('Router Capability Discovery Integration', () => {
 
       const result = queryEngine.query({
         capability: 'implementation',
-        minSuccessRate: 0.7
+        minSuccessRate: 0.7,
       });
 
       assert.strictEqual(result.success, true);
@@ -450,12 +462,12 @@ describe('Router Capability Discovery Integration', () => {
       const agents = {
         'high-rate-agent': createMockAgent('high-rate-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          successRate: 0.85
+          successRate: 0.85,
         }),
         'low-rate-agent': createMockAgent('low-rate-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          successRate: 0.50
-        })
+          successRate: 0.5,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -472,12 +484,12 @@ describe('Router Capability Discovery Integration', () => {
       const agents = {
         'excellent-agent': createMockAgent('excellent-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          successRate: 0.99
+          successRate: 0.99,
         }),
         'good-agent': createMockAgent('good-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          successRate: 0.85
-        })
+          successRate: 0.85,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -485,7 +497,7 @@ describe('Router Capability Discovery Integration', () => {
 
       const result = queryEngine.query({
         capability: 'implementation',
-        minSuccessRate: 0.90
+        minSuccessRate: 0.9,
       });
 
       assert.strictEqual(result.success, true);
@@ -497,9 +509,9 @@ describe('Router Capability Discovery Integration', () => {
   describe('7. Fallback to Hardcoded Agent', () => {
     it('should return empty results when capability has no agents', () => {
       const agents = {
-        'developer': createMockAgent('developer', {
-          capabilities: [{ name: 'implementation', description: 'Implement' }]
-        })
+        developer: createMockAgent('developer', {
+          capabilities: [{ name: 'implementation', description: 'Implement' }],
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -513,12 +525,12 @@ describe('Router Capability Discovery Integration', () => {
 
     it('should return all agents when no capability filter applied', () => {
       const agents = {
-        'developer': createMockAgent('developer', {
-          capabilities: [{ name: 'implementation', description: 'Implement' }]
+        developer: createMockAgent('developer', {
+          capabilities: [{ name: 'implementation', description: 'Implement' }],
         }),
-        'qa': createMockAgent('qa', {
-          capabilities: [{ name: 'testing', description: 'Test' }]
-        })
+        qa: createMockAgent('qa', {
+          capabilities: [{ name: 'testing', description: 'Test' }],
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -577,8 +589,8 @@ describe('Router Capability Discovery Integration', () => {
       const agents = {
         'unavailable-agent': createMockAgent('unavailable-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          healthStatus: 'unavailable'
-        })
+          healthStatus: 'unavailable',
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -607,20 +619,20 @@ describe('Router Capability Discovery Integration', () => {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'healthy',
           successRate: 0.95,
-          consecutiveFailures: 0
+          consecutiveFailures: 0,
         }),
         'agent-2': createMockAgent('agent-2', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'degraded',
           successRate: 0.65,
-          consecutiveFailures: 1
+          consecutiveFailures: 1,
         }),
         'agent-3': createMockAgent('agent-3', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'unavailable',
-          successRate: 0.30,
-          consecutiveFailures: 3
-        })
+          successRate: 0.3,
+          consecutiveFailures: 3,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -630,7 +642,7 @@ describe('Router Capability Discovery Integration', () => {
       const result = queryEngine.query({
         capability: 'implementation',
         excludeFailed: false,
-        minSuccessRate: 0.0
+        minSuccessRate: 0.0,
       });
 
       assert.strictEqual(result.success, true);
@@ -652,8 +664,8 @@ describe('Router Capability Discovery Integration', () => {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           healthStatus: 'degraded',
           consecutiveFailures: 2,
-          successRate: 0.70
-        })
+          successRate: 0.7,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -670,9 +682,9 @@ describe('Router Capability Discovery Integration', () => {
   describe('11. Helper Methods', () => {
     it('getAgent should return specific agent by ID', () => {
       const agents = {
-        'developer': createMockAgent('developer', {
-          capabilities: [{ name: 'implementation', description: 'Implement' }]
-        })
+        developer: createMockAgent('developer', {
+          capabilities: [{ name: 'implementation', description: 'Implement' }],
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -688,12 +700,12 @@ describe('Router Capability Discovery Integration', () => {
       const agents = {
         'healthy-agent': createMockAgent('healthy-agent', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          healthStatus: 'healthy'
+          healthStatus: 'healthy',
         }),
         'unavailable-agent': createMockAgent('unavailable-agent', {
           capabilities: [{ name: 'testing', description: 'Test' }],
-          healthStatus: 'unavailable'
-        })
+          healthStatus: 'unavailable',
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -706,10 +718,10 @@ describe('Router Capability Discovery Integration', () => {
 
     it('isAvailable should check capability when provided', () => {
       const agents = {
-        'developer': createMockAgent('developer', {
+        developer: createMockAgent('developer', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          healthStatus: 'healthy'
-        })
+          healthStatus: 'healthy',
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -723,12 +735,12 @@ describe('Router Capability Discovery Integration', () => {
       const agents = {
         'agent-1': createMockAgent('agent-1', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          successRate: 0.80
+          successRate: 0.8,
         }),
         'agent-2': createMockAgent('agent-2', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          successRate: 0.95
-        })
+          successRate: 0.95,
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -742,16 +754,16 @@ describe('Router Capability Discovery Integration', () => {
 
     it('getAvailableFilters should return filter metadata', () => {
       const agents = {
-        'developer': createMockAgent('developer', {
+        developer: createMockAgent('developer', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
           domains: ['code'],
-          category: 'core'
+          category: 'core',
         }),
-        'qa': createMockAgent('qa', {
+        qa: createMockAgent('qa', {
           capabilities: [{ name: 'testing', description: 'Test' }],
           domains: ['testing'],
-          category: 'core'
-        })
+          category: 'core',
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -771,14 +783,14 @@ describe('Router Capability Discovery Integration', () => {
   describe('12. Domain-Based Fallback', () => {
     it('should find agents by domain when capability not found', () => {
       const agents = {
-        'developer': createMockAgent('developer', {
+        developer: createMockAgent('developer', {
           capabilities: [{ name: 'implementation', description: 'Implement' }],
-          domains: ['code', 'backend']
+          domains: ['code', 'backend'],
         }),
         'frontend-pro': createMockAgent('frontend-pro', {
           capabilities: [{ name: 'ui-development', description: 'Build UIs' }],
-          domains: ['code', 'frontend']
-        })
+          domains: ['code', 'frontend'],
+        }),
       };
 
       fs.writeFileSync(testRegistryPath, JSON.stringify(createTestRegistry(agents)));
@@ -805,10 +817,7 @@ describe('Capability Routing Configuration', () => {
     // Common capability mappings
     const requiredMappings = ['review', 'implement', 'test', 'security', 'document'];
     for (const mapping of requiredMappings) {
-      assert.ok(
-        config.capabilityMap[mapping],
-        `Should have mapping for '${mapping}'`
-      );
+      assert.ok(config.capabilityMap[mapping], `Should have mapping for '${mapping}'`);
     }
   });
 });

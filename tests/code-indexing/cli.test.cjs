@@ -43,7 +43,10 @@ suite('CLI - index-codebase', () => {
 
     // Check metadata file exists
     const metadataPath = path.join(INDEX_DIR, 'metadata.json');
-    const exists = await fs.access(metadataPath).then(() => true).catch(() => false);
+    const exists = await fs
+      .access(metadataPath)
+      .then(() => true)
+      .catch(() => false);
     assert.ok(exists, 'Metadata file should be created');
 
     const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf8'));
@@ -54,9 +57,15 @@ suite('CLI - index-codebase', () => {
   test('42.3: search command displays results', () => {
     // Note: VectorDB is in-memory only for Phase 1, so search won't find results
     // This test confirms the command runs without error (Phase 1 limitation)
-    const output = execSync(`node "${CLI_PATH}" search "hello" --topK 5`, { encoding: 'utf8', cwd: TEST_PROJECT });
+    const output = execSync(`node "${CLI_PATH}" search "hello" --topK 5`, {
+      encoding: 'utf8',
+      cwd: TEST_PROJECT,
+    });
     // Accept both "Found X results" and "No results found" as valid
-    assert.ok(output.includes('Found') || output.includes('No results'), 'Output should show search results or no results message');
+    assert.ok(
+      output.includes('Found') || output.includes('No results'),
+      'Output should show search results or no results message'
+    );
   });
 
   test('42.4: status command shows statistics', async () => {
@@ -70,7 +79,10 @@ suite('CLI - index-codebase', () => {
     execSync(`node "${CLI_PATH}" clear --confirm`, { encoding: 'utf8', cwd: TEST_PROJECT });
 
     const metadataPath = path.join(INDEX_DIR, 'metadata.json');
-    const exists = await fs.access(metadataPath).then(() => true).catch(() => false);
+    const exists = await fs
+      .access(metadataPath)
+      .then(() => true)
+      .catch(() => false);
     assert.ok(!exists, 'Metadata file should be deleted');
   });
 });

@@ -150,6 +150,17 @@ yarn.lock
 *.old
 .claude/lib/_test-fixtures/backups/
 
+# Consolidated test directories (data/temp generated during tests)
+tests/data/
+tests/temp/
+# Keep fixtures directory structure  (contains static test data)
+!tests/fixtures/.gitkeep
+
+# Old fragmented test directories (DEPRECATED - moved to tests/)
+.test-data/
+.test-temp/
+test-fixtures/
+
 # Archive folder (old .claude backup)
 .claude.archive/
 

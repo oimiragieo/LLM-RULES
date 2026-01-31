@@ -13,7 +13,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 suite('Hybrid Search CLI', () => {
-  const testRoot = path.join(__dirname, '../../test-fixtures/hybrid-search-cli');
+  const testRoot = path.join(__dirname, '../fixtures/hybrid-search-cli');
   const cliPath = path.join(__dirname, '../../.claude/tools/cli/index-codebase.cjs');
 
   before(async () => {
@@ -45,7 +45,7 @@ async function fetchUserData(userId: string): Promise<User> {
     try {
       execSync(`node "${cliPath}" index "${testRoot}"`, {
         encoding: 'utf8',
-        stdio: 'ignore'
+        stdio: 'ignore',
       });
     } catch (_error) {
       // Ignore indexing errors during setup
@@ -79,7 +79,10 @@ async function fetchUserData(userId: string): Promise<User> {
       );
 
       assert.ok(output.includes('Hybrid Search:'), 'Should show "Hybrid Search:" header');
-      assert.ok(output.includes('Semantic') || output.includes('Stage'), 'Should show stage information');
+      assert.ok(
+        output.includes('Semantic') || output.includes('Stage'),
+        'Should show stage information'
+      );
       // Note: VectorDB is in-memory only (Phase 1), so no results expected
       assert.ok(
         output.includes('Results:') || output.includes('No results found'),
@@ -146,7 +149,7 @@ async function fetchUserData(userId: string): Promise<User> {
     try {
       execSync(`node "${cliPath}" hybrid-search "function"`, {
         encoding: 'utf8',
-        cwd: testRoot
+        cwd: testRoot,
       });
     } catch (error) {
       assert.ok(
@@ -175,10 +178,10 @@ async function fetchUserData(userId: string): Promise<User> {
 
   test('hybrid-search shows top results with scores', () => {
     try {
-      const output = execSync(
-        `node "${cliPath}" hybrid-search "function" --file "${testRoot}"`,
-        { encoding: 'utf8', cwd: testRoot }
-      );
+      const output = execSync(`node "${cliPath}" hybrid-search "function" --file "${testRoot}"`, {
+        encoding: 'utf8',
+        cwd: testRoot,
+      });
 
       assert.ok(
         output.includes('1.') || output.includes('No results'),

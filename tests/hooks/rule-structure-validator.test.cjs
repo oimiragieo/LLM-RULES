@@ -10,7 +10,11 @@ const fs = require('fs');
 const os = require('os');
 
 // Import validator
-const { preToolUse, validateRuleStructure, parseSections } = require('../../.claude/hooks/skills/rule-structure-validator.cjs');
+const {
+  preToolUse,
+  validateRuleStructure,
+  parseSections,
+} = require('../../.claude/hooks/skills/rule-structure-validator.cjs');
 
 test('parseSections - extracts markdown sections', () => {
   const content = `## Problem
@@ -221,7 +225,7 @@ Good example (no code fence)`;
 test('preToolUse - allows non-Write/Edit operations', () => {
   const hookInput = {
     tool: 'Read',
-    params: { file_path: '.claude/skills/test/rules/test-rule.md' }
+    params: { file_path: '.claude/skills/test/rules/test-rule.md' },
   };
 
   const result = preToolUse(hookInput);
@@ -233,8 +237,8 @@ test('preToolUse - allows writes to non-rule files', () => {
     tool: 'Write',
     params: {
       file_path: '.claude/skills/test/README.md',
-      content: '# README'
-    }
+      content: '# README',
+    },
   };
 
   const result = preToolUse(hookInput);
@@ -246,8 +250,8 @@ test('preToolUse - blocks invalid rule file', () => {
     tool: 'Write',
     params: {
       file_path: '.claude/skills/test/rules/bad-rule.md',
-      content: '# No frontmatter or structure'
-    }
+      content: '# No frontmatter or structure',
+    },
   };
 
   const result = preToolUse(hookInput);
@@ -285,8 +289,8 @@ good
 
 ## Impact
 
-High`
-    }
+High`,
+    },
   };
 
   const result = preToolUse(hookInput);
@@ -298,8 +302,8 @@ test('preToolUse - skips _template.md files', () => {
     tool: 'Write',
     params: {
       file_path: '.claude/skills/test/rules/_template.md',
-      content: '# Template content (incomplete)'
-    }
+      content: '# Template content (incomplete)',
+    },
   };
 
   const result = preToolUse(hookInput);

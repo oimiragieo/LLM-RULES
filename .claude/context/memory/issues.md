@@ -1,14 +1,14 @@
 # Known Issues and Blockers
 
-## Summary (as of 2026-01-28)
+## Summary (as of 2026-01-31)
 
-| Status Category | Count | Notes                                                                   |
-| --------------- | ----- | ----------------------------------------------------------------------- |
-| **OPEN**        | 7     | Active issues requiring attention (includes 1 META issue, 1 TOOL issue) |
-| **DEFERRED**    | 1     | HOOK-PERF-001 (remaining 20% consolidation opportunities)               |
-| **RESOLVED**    | 106   | Archived in issues-archive.md (includes 2 META issues, 1 PROC issue)    |
-| **Won't Fix**   | 4     | Documented as not requiring remediation                                 |
-| **Total**       | 119   | All tracked issues                                                      |
+| Status Category | Count | Notes                                                                      |
+| --------------- | ----- | -------------------------------------------------------------------------- |
+| **OPEN**        | 8     | Active issues (includes 1 CRITICAL: ROUTER-MONITORING-001, 1 META, 1 TOOL) |
+| **DEFERRED**    | 1     | HOOK-PERF-001 (remaining 20% consolidation opportunities)                  |
+| **RESOLVED**    | 106   | Archived in issues-archive.md (includes 2 META issues, 1 PROC issue)       |
+| **Won't Fix**   | 4     | Documented as not requiring remediation                                    |
+| **Total**       | 120   | All tracked issues including ROUTER-MONITORING-001                         |
 
 **Historical issues**: See `issues-archive.md` for 60 resolved issues archived on 2026-01-27.
 **Recent fixes**: 30 issues resolved on 2026-01-28 (ROUTING-003, PROC-001, PROC-002, PROC-003, PROC-004, PROC-005, PROC-009, MED-001, SEC-AUDIT-020, DOC-001, SEC-AUDIT-017, ENFORCEMENT-003, SEC-REMEDIATION-002, DOC-003, STRUCT-002, ENFORCEMENT-002, TESTING-002, ARCH-002, PROC-006, PROC-007, TESTING-003, POINTER-003, POINTER-001, SEC-AUDIT-013, SEC-AUDIT-014, ENFORCEMENT-001, WORKFLOW-VIOLATION-001, PERF-006, HOOK-TEST-001, HOOK-TEST-002).
@@ -36,6 +36,134 @@
 ---
 
 <!-- OPEN ISSUES BELOW THIS LINE -->
+
+## [LINT-001] ADR-076 Migration - Linting Errors Remaining (HIGH) 🟡 OPEN
+
+- **Date**: 2026-01-31
+- **Severity**: HIGH
+- **Status**: OPEN
+- **Category**: quality_gate_blocker
+- **Discovery**: ADR-076 Migration Verification Report
+- **Description**: Post-migration linting errors prevent completion claim. 1 error + 4 warnings found after 147-file test migration.
+- **Evidence**:
+  - `scripts/testing/fix-test-imports.cjs:16:7` - `'TESTS_DIR'` assigned but never used (ERROR)
+  - `tests/skills/elicitation.test.mjs:37:11` - `'method'` assigned but never used (WARNING)
+  - `tests/skills/elicitation.test.mjs:122:11` - `'method'` assigned but never used (WARNING)
+  - `tests/hooks/memory-reminder.test.cjs:25:17` - Unused eslint-disable directive (WARNING)
+  - `tests/hooks/post-task-unified.test.cjs:25:22` - Unused eslint-disable directive (WARNING)
+- **Impact**: Blocks ADR-076 completion (linting gate must pass)
+- **Root Cause**: Migration scripts and test files have unused variables/directives
+- **Fix**:
+  1. `scripts/testing/fix-test-imports.cjs` line 16: Remove `TESTS_DIR` or use it
+  2. `tests/skills/elicitation.test.mjs` lines 37, 122: Prefix `method` with `_`
+  3. Auto-fix unused directives: `pnpm lint --fix`
+- **Verification**: Run `pnpm lint` after fixes (must return 0 errors, 0 warnings)
+- **Report**: `.claude/context/artifacts/reports/ADR-076-MIGRATION-VERIFICATION.md`
+
+---
+
+## [MIGRATION-001] ADR-076 File Count Discrepancy (LOW) ℹ️ OPEN
+
+- **Date**: 2026-01-31
+- **Severity**: LOW
+- **Status**: OPEN
+- **Category**: documentation_accuracy
+- **Discovery**: ADR-076 Migration Verification Report
+- **Description**: ADR-076 claims 147 test files migrated, but Glob verification found only 143 test files in `tests/` directory.
+- **Evidence**:
+  - decisions.md line 56: "147 test files migrated"
+  - learnings.md line 22: "147 test files migrated"
+  - Actual count (Glob): 98 .cjs + 45 .mjs = 143 total
+  - **Discrepancy:** -4 files
+- **Impact**: Minor documentation accuracy issue (no functional impact)
+- **Possible Explanations**:
+  1. Files consolidated after migration
+  2. Files deleted after counting
+  3. Files moved to non-test locations
+  4. Original count included non-test files
+- **Required Action**: Document explanation for -4 file variance in learnings.md
+- **Workaround**: Migration is functionally complete (0 test files in `.claude/`, all in `tests/`)
+
+---
+
+## [CONFIG-001] Router Ignores config.yaml Agent Model Configuration (CRITICAL) 🔴 OPEN
+
+- **Date**: 2026-01-31
+- **Severity**: CRITICAL
+- **Status**: OPEN
+- **Category**: routing_config_governance
+- **Discovery**: Architecture Audit AUDIT-2026-01-31-001
+- **Description**: Router hardcodes model selection in CLAUDE.md and spawn templates, completely ignoring agent configurations defined in `config.yaml`. This creates trust, cost, governance, and auditability gaps.
+- **Evidence**:
+  - config.yaml defines: `agents.planner.model: claude-opus-4-5-20251101`
+  - router-decision.md Step 8 uses complexity-based hardcodes
+  - spawn templates use `model: 'sonnet'` hardcoded
+  - config-loader.cjs exists but is NOT used by router for model selection
+- **Impact**:
+  - **Cost Drift**: Opus agents forced to Sonnet = incorrect billing
+  - **Quality Degradation**: Opus agents running on Sonnet = reduced performance
+  - **Silent Misconfiguration**: No alerts when config.yaml is ignored
+  - **Governance Gap**: Administrators cannot control model assignment
+  - **Audit Failure**: No trail of configured vs deployed model
+- **Related ADRs**: ADR-069, ADR-070, ADR-071, ADR-074
+- **Resolution Plan**: See `ROUTER-ARCHITECTURE-SECURITY-AUDIT.md` Section 5
+  1. Create `agent-config-resolver.cjs`
+  2. Create `config-model-validator.cjs` hook
+  3. Update CLAUDE.md model selection section
+  4. Update router-decision.md Step 8
+  5. Update all orchestrators
+  6. Add audit trail logging
+- **Estimated Fix**: 6.5 days
+
+---
+
+## [ROUTER-MONITORING-001] Router Stops Monitoring Subagents Mid-Project (CRITICAL) 🔴 OPEN
+
+- **Date**: 2026-01-31
+- **Severity**: CRITICAL
+- **Status**: OPEN
+- **Category**: routing_orchestration
+- **Description**: Router spawns subagents but exits agent mode immediately, losing track of progress. Task completion is never verified, causing projects to appear abandoned mid-stream.
+
+**Root Cause**: post-task-unified.cjs (line 127) exits agent mode IMMEDIATELY after Task() returns, without waiting for subagent context completion.
+
+```javascript
+const _state = routerState.exitAgentMode(); // <-- Exits too early!
+```
+
+When Task() is spawned:
+
+1. Task() returns immediately (spawn is async)
+2. post-task-unified.cjs PostToolUse hook fires
+3. Hook exits agent mode (line 127)
+4. Router returns to Router mode
+5. Subagent is still running but Router has given up monitoring
+
+**Missing Hooks**: Two critical monitoring hooks never registered in settings.json:
+
+1. **agent-context-tracker.cjs** - Should keep router in "agent mode" until subagent completes
+2. **post-spawn-task-updater.cjs** - Should verify task completion after spawn finishes
+
+**Evidence**:
+
+- settings.json PostToolUse.Task only has: spawn-prompt-validator, pre-spawn-tool-validator, tool-availability-validator, pre-task-unified
+- agent-context-tracker.cjs exists but NOT registered
+- post-spawn-task-updater.cjs exists but NOT registered
+- post-task-unified.cjs immediately calls exitAgentMode() (line 127)
+
+**Workaround**: Set `ROUTER_DEBUG=true` to see agent mode transitions, but this doesn't fix the underlying issue
+
+**Impact**:
+
+- Tasks stuck in "in_progress" state forever
+- Router spawns duplicate agents because it thinks no work is in progress
+- Subagents run invisibly - users can't see they're working
+- Orchestration completely breaks for multi-agent workflows
+- Feature development and complex tasks appear to fail
+
+**Related ADRs**: ADR-069 (Tool Awareness), PERF-003 (Hook Consolidation)
+
+---
 
 ## [TOOL-001] Tool Availability Documentation Drift (HIGH) 🔴 OPEN
 

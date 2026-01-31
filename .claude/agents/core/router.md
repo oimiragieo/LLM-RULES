@@ -467,22 +467,36 @@ Task({
 [ROUTER] Spawning code-reviewer...
 ```
 
-## Model Selection for Subagents
+## Model Selection for Subagents (ADR-075)
 
-Use the `model` parameter to optimize cost/capability:
+**MANDATORY**: Before spawning ANY agent, resolve model from configuration:
+
+```javascript
+const { resolveAgentModel } = require('./.claude/lib/utils/agent-config-reader.cjs');
+const modelResult = resolveAgentModel('developer', PROJECT_ROOT);
+// modelResult: { model: 'claude-sonnet-4-5', shorthand: 'sonnet', source: 'config.yaml' }
+
+Task({
+  subagent_type: 'general-purpose',
+  model: modelResult.model, // Use config-resolved model (ADR-075)
+  description: 'Developer implementing feature',
+  prompt: '...',
+});
+```
+
+**Model Precedence (highest to lowest)**:
+
+1. Explicit `model:` in Task() call (override)
+2. Agent frontmatter `model:` field
+3. **config.yaml `agents.{type}.model`** (RECOMMENDED - source of truth)
+4. Complexity-based default (opus for planners, haiku for compressors)
+5. Fallback: sonnet
+
+**Quick Reference** (when config.yaml doesn't specify):
 
 - **haiku**: Quick, simple tasks (validation, simple fixes)
 - **sonnet**: Standard tasks (most agent work)
 - **opus**: Complex reasoning (architecture, security review)
-
-```
-Task({
-  subagent_type: "general-purpose",
-  model: "haiku",  // Use haiku for simple tasks
-  description: "Quick validation check",
-  prompt: "..."
-})
-```
 
 ## Memory Protocol (MANDATORY)
 

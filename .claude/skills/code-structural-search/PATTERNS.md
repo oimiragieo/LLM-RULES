@@ -4,12 +4,12 @@ Comprehensive pattern reference for all supported languages.
 
 ## Pattern Syntax Reference
 
-| Symbol     | Meaning                         | Example                          |
-| ---------- | ------------------------------- | -------------------------------- |
-| `$NAME`    | Single identifier/node          | `function $NAME() {}`            |
-| `$$$`      | Zero or more statements/nodes   | `class $NAME { $$$ }`            |
-| `$$`       | Zero or more statements (block) | `if ($COND) { $$ }`              |
-| `$_`       | Anonymous wildcard (discard)    | `console.log($_)`                |
+| Symbol     | Meaning                         | Example                           |
+| ---------- | ------------------------------- | --------------------------------- |
+| `$NAME`    | Single identifier/node          | `function $NAME() {}`             |
+| `$$$`      | Zero or more statements/nodes   | `class $NAME { $$$ }`             |
+| `$$`       | Zero or more statements (block) | `if ($COND) { $$ }`               |
+| `$_`       | Anonymous wildcard (discard)    | `console.log($_)`                 |
 | `$...REST` | Rest parameters/arguments       | `function $NAME($...ARGS) { $$ }` |
 
 ## JavaScript/TypeScript Patterns

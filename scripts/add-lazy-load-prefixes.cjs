@@ -80,7 +80,10 @@ function addLazyLoadPrefixes(content) {
 
     // For regular markdown lines: add @ to `.claude/` paths
     // But skip if it looks like a command (cat, grep, node, npm, etc.)
-    if (line.includes('.claude/') && !line.match(/^\s*(cat|grep|ls|find|rm|mkdir|cp|mv|node|npm|yarn|chmod|chown)\s/)) {
+    if (
+      line.includes('.claude/') &&
+      !line.match(/^\s*(cat|grep|ls|find|rm|mkdir|cp|mv|node|npm|yarn|chmod|chown)\s/)
+    ) {
       // Check if it's not already prefixed
       if (!line.includes('@.claude/')) {
         // Replace `.claude/` with `@.claude/` but only in non-code contexts

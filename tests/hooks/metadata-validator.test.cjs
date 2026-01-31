@@ -10,7 +10,11 @@ const fs = require('fs');
 const os = require('os');
 
 // Import validator
-const { preToolUse, validateSkillMetadata, parseFrontmatter } = require('../../.claude/hooks/skills/metadata-validator.cjs');
+const {
+  preToolUse,
+  validateSkillMetadata,
+  parseFrontmatter,
+} = require('../../.claude/hooks/skills/metadata-validator.cjs');
 
 test('parseFrontmatter - extracts YAML frontmatter', () => {
   const content = `---
@@ -159,7 +163,7 @@ license: INVALID
 test('preToolUse - allows non-Write/Edit operations', () => {
   const hookInput = {
     tool: 'Read',
-    params: { file_path: '.claude/skills/test/SKILL.md' }
+    params: { file_path: '.claude/skills/test/SKILL.md' },
   };
 
   const result = preToolUse(hookInput);
@@ -171,8 +175,8 @@ test('preToolUse - allows writes to non-SKILL.md files', () => {
     tool: 'Write',
     params: {
       file_path: '.claude/skills/test/README.md',
-      content: '# README'
-    }
+      content: '# README',
+    },
   };
 
   const result = preToolUse(hookInput);
@@ -184,8 +188,8 @@ test('preToolUse - blocks invalid SKILL.md', () => {
     tool: 'Write',
     params: {
       file_path: '.claude/skills/test/SKILL.md',
-      content: '# No frontmatter'
-    }
+      content: '# No frontmatter',
+    },
   };
 
   const result = preToolUse(hookInput);
@@ -209,8 +213,8 @@ metadata:
   version: "1.0.0"
 ---
 
-# Test Skill`
-    }
+# Test Skill`,
+    },
   };
 
   const result = preToolUse(hookInput);

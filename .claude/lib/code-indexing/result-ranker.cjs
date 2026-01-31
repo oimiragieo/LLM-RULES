@@ -20,7 +20,7 @@ const DEFAULT_WEIGHTS = {
   semantic: 0.7,
   structural: 0.3,
   recency: 0.05,
-  keyword: 0.1
+  keyword: 0.1,
 };
 
 /**
@@ -42,7 +42,7 @@ class ResultRanker {
       semantic: weights.semantic ?? DEFAULT_WEIGHTS.semantic,
       structural: weights.structural ?? DEFAULT_WEIGHTS.structural,
       recency: weights.recency ?? DEFAULT_WEIGHTS.recency,
-      keyword: weights.keyword ?? DEFAULT_WEIGHTS.keyword
+      keyword: weights.keyword ?? DEFAULT_WEIGHTS.keyword,
     };
 
     this.confidenceThreshold = weights.confidenceThreshold ?? 0.3;
@@ -55,10 +55,8 @@ class ResultRanker {
    * @returns {number} Combined score (0-1)
    */
   calculateScore(semanticScore, structuralScore) {
-    const baseScore = (
-      this.weights.semantic * semanticScore +
-      this.weights.structural * structuralScore
-    );
+    const baseScore =
+      this.weights.semantic * semanticScore + this.weights.structural * structuralScore;
 
     // Normalize to 0-1 range
     const maxPossible = this.weights.semantic + this.weights.structural;
@@ -79,7 +77,7 @@ class ResultRanker {
 
     // Create lookup map for structural matches
     const structuralMap = new Map();
-    for (const sr of (structuralResults || [])) {
+    for (const sr of structuralResults || []) {
       const key = `${sr.filePath}:${sr.lineStart}-${sr.lineEnd}`;
       structuralMap.set(key, sr);
     }
@@ -112,7 +110,7 @@ class ResultRanker {
         structuralScore: structuralScore,
         sources: sources,
         metadata: semResult.metadata || {},
-        matches: matches
+        matches: matches,
       };
     });
 
@@ -192,7 +190,7 @@ class ResultRanker {
       if (hasKeyword) {
         return {
           ...result,
-          score: Math.min(1.0, result.score + this.weights.keyword)
+          score: Math.min(1.0, result.score + this.weights.keyword),
         };
       }
 
@@ -211,9 +209,7 @@ class ResultRanker {
     }
 
     // Find newest file timestamp
-    const timestamps = results
-      .map(r => r.metadata?.mtime || 0)
-      .filter(t => t > 0);
+    const timestamps = results.map(r => r.metadata?.mtime || 0).filter(t => t > 0);
 
     if (timestamps.length === 0) {
       return results;
@@ -238,7 +234,7 @@ class ResultRanker {
 
       return {
         ...result,
-        score: Math.min(1.0, result.score + boost)
+        score: Math.min(1.0, result.score + boost),
       };
     });
   }

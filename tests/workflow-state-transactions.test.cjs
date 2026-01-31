@@ -23,7 +23,7 @@ const fs = require('fs');
 const { performance } = require('perf_hooks');
 
 // Test fixtures
-const TEST_DIR = path.join(__dirname, '../.test-temp/workflow-transactions');
+const TEST_DIR = path.join(__dirname, 'temp/workflow-transactions');
 const JOURNAL_PATH = path.join(TEST_DIR, 'transaction-journal.jsonl');
 
 // Import modules (will fail initially - expected in RED phase)

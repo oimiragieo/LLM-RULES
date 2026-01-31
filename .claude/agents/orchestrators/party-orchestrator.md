@@ -138,11 +138,17 @@ for (const agentDef of team.agents) {
 ### Step 4: Coordinate Agent Execution
 
 ```javascript
+// Model resolution import (ADR-075)
+const { resolveAgentModel } = require('./.claude/lib/utils/agent-config-reader.cjs');
+
 // Spawn agents via Task tool (parallel execution)
 for (const agent of spawnedAgents) {
+  // Resolve model from config.yaml (ADR-075)
+  const modelResult = resolveAgentModel(agent.agentType, PROJECT_ROOT);
+
   Task({
     subagent_type: 'general-purpose',
-    model: agent.model,
+    model: modelResult.model, // Use config-resolved model (ADR-075)
     description: `${agent.role} agent responding to: ${userInput.slice(0, 50)}...`,
     allowed_tools: agent.tools.concat(['TaskUpdate', 'TaskList', 'Skill']),
     prompt: `You are the ${agent.agentType} agent (role: ${agent.role}).

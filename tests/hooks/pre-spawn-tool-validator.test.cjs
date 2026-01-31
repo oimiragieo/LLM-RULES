@@ -30,13 +30,34 @@ const HOOK_PATH = path.join(__dirname, '../../.claude/hooks/routing/pre-spawn-to
 
 // Test data
 const VALID_DEVELOPER_TOOLS = [
-  'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-  'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill'
+  'Read',
+  'Write',
+  'Edit',
+  'Bash',
+  'Glob',
+  'Grep',
+  'TaskUpdate',
+  'TaskList',
+  'TaskCreate',
+  'TaskGet',
+  'TaskOutput',
+  'Skill',
 ];
 
 const VALID_ORCHESTRATOR_TOOLS = [
-  'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task',
-  'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill'
+  'Read',
+  'Write',
+  'Edit',
+  'Bash',
+  'Glob',
+  'Grep',
+  'Task',
+  'TaskUpdate',
+  'TaskList',
+  'TaskCreate',
+  'TaskGet',
+  'TaskOutput',
+  'Skill',
 ];
 
 const _ROUTER_RESERVED_TOOLS = ['Task', 'AskUserQuestion'];
@@ -67,7 +88,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: VALID_DEVELOPER_TOOLS,
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, true);
@@ -81,7 +102,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: VALID_ORCHESTRATOR_TOOLS,
-        agentType: 'master-orchestrator'
+        agentType: 'master-orchestrator',
       });
 
       assert.strictEqual(result.valid, true);
@@ -95,7 +116,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'FakeTool123'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, false);
@@ -110,7 +131,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'FakeA', 'FakeB', 'FakeC'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, false);
@@ -130,7 +151,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'mcp__unknown_server__unknown_tool'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, false);
@@ -145,7 +166,7 @@ describe('pre-spawn-tool-validator', () => {
       // Known MCP tools with fallbacks should warn, not block
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'mcp__sequential-thinking__sequentialthinking'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       // Should allow but with warning
@@ -161,7 +182,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'mcp__Exa__web_search_exa'],
-        agentType: 'researcher'
+        agentType: 'researcher',
       });
 
       // Should suggest using WebSearch as fallback
@@ -183,15 +204,31 @@ describe('pre-spawn-tool-validator', () => {
 
       // Generate 20 tools (over the 15 limit)
       const tooManyTools = [
-        'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-        'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'TaskStop',
-        'Skill', 'WebSearch', 'WebFetch', 'NotebookEdit',
-        'EnterPlanMode', 'ExitPlanMode', 'AskUserQuestion', 'Task'
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'Glob',
+        'Grep',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
+        'TaskOutput',
+        'TaskStop',
+        'Skill',
+        'WebSearch',
+        'WebFetch',
+        'NotebookEdit',
+        'EnterPlanMode',
+        'ExitPlanMode',
+        'AskUserQuestion',
+        'Task',
       ];
 
       const result = validator.validateToolConfig({
         tools: tooManyTools,
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, false);
@@ -205,14 +242,27 @@ describe('pre-spawn-tool-validator', () => {
 
       // 16 tools - over limit for agent (15) but under for orchestrator (18)
       const sixteenTools = [
-        'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task',
-        'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'TaskStop',
-        'Skill', 'WebSearch', 'WebFetch'
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'Glob',
+        'Grep',
+        'Task',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
+        'TaskOutput',
+        'TaskStop',
+        'Skill',
+        'WebSearch',
+        'WebFetch',
       ];
 
       const result = validator.validateToolConfig({
         tools: sixteenTools,
-        agentType: 'master-orchestrator'
+        agentType: 'master-orchestrator',
       });
 
       // Should be valid for orchestrator (under 18 limit)
@@ -226,15 +276,31 @@ describe('pre-spawn-tool-validator', () => {
 
       // 20 tools - over limit even for orchestrator
       const tooManyTools = [
-        'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task',
-        'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'TaskStop',
-        'Skill', 'WebSearch', 'WebFetch', 'NotebookEdit',
-        'EnterPlanMode', 'ExitPlanMode', 'AskUserQuestion'
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'Glob',
+        'Grep',
+        'Task',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
+        'TaskOutput',
+        'TaskStop',
+        'Skill',
+        'WebSearch',
+        'WebFetch',
+        'NotebookEdit',
+        'EnterPlanMode',
+        'ExitPlanMode',
+        'AskUserQuestion',
       ];
 
       const result = validator.validateToolConfig({
         tools: tooManyTools,
-        agentType: 'evolution-orchestrator'
+        agentType: 'evolution-orchestrator',
       });
 
       assert.strictEqual(result.valid, false);
@@ -247,14 +313,26 @@ describe('pre-spawn-tool-validator', () => {
       }
 
       const exactlyFifteen = [
-        'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-        'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput',
-        'Skill', 'WebSearch', 'WebFetch', 'NotebookEdit'
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'Glob',
+        'Grep',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
+        'TaskOutput',
+        'Skill',
+        'WebSearch',
+        'WebFetch',
+        'NotebookEdit',
       ];
 
       const result = validator.validateToolConfig({
         tools: exactlyFifteen,
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, true);
@@ -273,7 +351,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'Task'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, false);
@@ -287,7 +365,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'AskUserQuestion'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, false);
@@ -301,7 +379,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'Task', 'TaskUpdate', 'Skill'],
-        agentType: 'master-orchestrator'
+        agentType: 'master-orchestrator',
       });
 
       assert.strictEqual(result.valid, true);
@@ -314,16 +392,16 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Task'],
-        agentType: 'qa'
+        agentType: 'qa',
       });
 
       assert.strictEqual(result.valid, false);
       // Error should mention which agents CAN use Task
-      assert.ok(result.errors.some(e =>
-        e.includes('router') ||
-        e.includes('orchestrator') ||
-        e.includes('reserved for')
-      ));
+      assert.ok(
+        result.errors.some(
+          e => e.includes('router') || e.includes('orchestrator') || e.includes('reserved for')
+        )
+      );
     });
   });
 
@@ -339,7 +417,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: null,
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, true);
@@ -352,7 +430,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: [],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, true);
@@ -365,7 +443,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: undefined,
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, true);
@@ -379,7 +457,7 @@ describe('pre-spawn-tool-validator', () => {
       // Unknown agent type should use maxToolsPerAgent (15)
       const result = validator.validateToolConfig({
         tools: VALID_DEVELOPER_TOOLS,
-        agentType: 'custom-unknown-agent'
+        agentType: 'custom-unknown-agent',
       });
 
       assert.strictEqual(result.valid, true);
@@ -392,7 +470,7 @@ describe('pre-spawn-tool-validator', () => {
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'InvalidTool', 'Edit'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, false);
@@ -439,18 +517,16 @@ subagent_type: developer`;
         assert.fail('Module not implemented yet');
       }
 
-      const errors = [
-        "Tool 'mcp__sequential-thinking__sequentialthinking' unavailable"
-      ];
+      const errors = ["Tool 'mcp__sequential-thinking__sequentialthinking' unavailable"];
 
       const suggestions = validator.generateSuggestions(errors);
 
       assert.ok(suggestions.length > 0);
-      assert.ok(suggestions.some(s =>
-        s.includes('Skill') ||
-        s.includes('fallback') ||
-        s.includes('sequential-thinking')
-      ));
+      assert.ok(
+        suggestions.some(
+          s => s.includes('Skill') || s.includes('fallback') || s.includes('sequential-thinking')
+        )
+      );
     });
 
     it('should return proper structure on validation success', () => {
@@ -460,7 +536,7 @@ subagent_type: developer`;
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(typeof result.valid, 'boolean');
@@ -475,7 +551,7 @@ subagent_type: developer`;
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'FakeTool'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       assert.strictEqual(result.valid, false);
@@ -496,7 +572,7 @@ subagent_type: developer`;
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'Edit'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       // Should warn about missing mandatory tool
@@ -510,7 +586,7 @@ subagent_type: developer`;
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'TaskUpdate'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       // Should warn about missing mandatory tool
@@ -524,12 +600,12 @@ subagent_type: developer`;
 
       const result = validator.validateToolConfig({
         tools: ['Read', 'Write', 'TaskUpdate', 'Skill'],
-        agentType: 'developer'
+        agentType: 'developer',
       });
 
       // Should not have mandatory tool warnings
-      const mandatoryWarnings = result.warnings.filter(w =>
-        w.includes('TaskUpdate') || w.includes('Skill') && w.includes('missing')
+      const mandatoryWarnings = result.warnings.filter(
+        w => w.includes('TaskUpdate') || (w.includes('Skill') && w.includes('missing'))
       );
       assert.strictEqual(mandatoryWarnings.length, 0);
     });

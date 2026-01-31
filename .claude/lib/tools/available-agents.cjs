@@ -35,8 +35,8 @@ class AvailableAgentsQuery {
    * @param {number} options.cacheMaxSize - Maximum cache entries (default: 50)
    */
   constructor(options = {}) {
-    this.registryPath = options.registryPath ||
-      path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
+    this.registryPath =
+      options.registryPath || path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
     this.registry = null;
     this.cache = new Map();
     this.cacheTimeouts = new Map();
@@ -105,23 +105,17 @@ class AvailableAgentsQuery {
     // 4. Filter by capability (using index for O(1) lookup)
     if (options.capability) {
       const capAgentIds = registry.index?.byCapability?.[options.capability] || [];
-      agents = capAgentIds
-        .map(id => registry.agents[id])
-        .filter(Boolean);
+      agents = capAgentIds.map(id => registry.agents[id]).filter(Boolean);
     }
     // 5. Filter by domain (using index)
     else if (options.domain) {
       const domainAgentIds = registry.index?.byDomain?.[options.domain] || [];
-      agents = domainAgentIds
-        .map(id => registry.agents[id])
-        .filter(Boolean);
+      agents = domainAgentIds.map(id => registry.agents[id]).filter(Boolean);
     }
     // 6. Filter by category (using index)
     else if (options.category) {
       const categoryAgentIds = registry.index?.byCategory?.[options.category] || [];
-      agents = categoryAgentIds
-        .map(id => registry.agents[id])
-        .filter(Boolean);
+      agents = categoryAgentIds.map(id => registry.agents[id]).filter(Boolean);
     }
     // 7. Default: all agents
     else {
@@ -160,7 +154,7 @@ class AvailableAgentsQuery {
       success: true,
       agents: agents,
       count: agents.length,
-      query: options
+      query: options,
     };
 
     this.setCache(cacheKey, response);
@@ -209,7 +203,7 @@ class AvailableAgentsQuery {
       capability,
       excludeFailed: true,
       minSuccessRate: 0.7,
-      limit: 1
+      limit: 1,
     });
 
     return result.success && result.count > 0 ? result.agents[0] : null;
@@ -228,7 +222,7 @@ class AvailableAgentsQuery {
         domains: Object.keys(registry.index?.byDomain || {}),
         categories: Object.keys(registry.index?.byCategory || {}),
         totalAgents: registry.metadata?.totalAgents || Object.keys(registry.agents || {}).length,
-        healthyAgents: registry.metadata?.healthyAgents || registry.health?.healthy?.length || 0
+        healthyAgents: registry.metadata?.healthyAgents || registry.health?.healthy?.length || 0,
       };
     } catch {
       return {
@@ -236,7 +230,7 @@ class AvailableAgentsQuery {
         domains: [],
         categories: [],
         totalAgents: 0,
-        healthyAgents: 0
+        healthyAgents: 0,
       };
     }
   }
@@ -276,8 +270,11 @@ class AvailableAgentsQuery {
     }
 
     if (options.minSuccessRate !== undefined) {
-      if (typeof options.minSuccessRate !== 'number' ||
-          options.minSuccessRate < 0 || options.minSuccessRate > 1) {
+      if (
+        typeof options.minSuccessRate !== 'number' ||
+        options.minSuccessRate < 0 ||
+        options.minSuccessRate > 1
+      ) {
         return 'minSuccessRate must be a number between 0 and 1';
       }
     }
@@ -295,7 +292,7 @@ class AvailableAgentsQuery {
       success: false,
       error: error,
       agents: [],
-      count: 0
+      count: 0,
     };
   }
 
@@ -314,11 +311,8 @@ class AvailableAgentsQuery {
       error: `No agents found matching: ${this.describeQuery(options)}`,
       suggestions: {
         message: 'Try domain filtering instead',
-        alternatives: [
-          { domain: filters.domains[0] || 'code' },
-          { category: 'core' }
-        ]
-      }
+        alternatives: [{ domain: filters.domains[0] || 'code' }, { category: 'core' }],
+      },
     };
   }
 
@@ -421,5 +415,5 @@ function AvailableAgents(options) {
 module.exports = {
   AvailableAgents,
   AvailableAgentsQuery,
-  getInstance: () => queryEngine
+  getInstance: () => queryEngine,
 };

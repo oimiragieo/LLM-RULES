@@ -765,7 +765,7 @@ suite('IntegrationTestFramework Tests', () => {
       const result = framework.verifyCrossFeatureState(['nonexistent-feature']);
 
       assert.equal(result.valid, false);
-      assert.ok(result.errors.some((e) => e.includes('not found')));
+      assert.ok(result.errors.some(e => e.includes('not found')));
 
       framework.cleanup();
     });
@@ -777,7 +777,7 @@ suite('IntegrationTestFramework Tests', () => {
       await framework.initialize();
 
       const { result, duration } = await framework.measurePerformance('test-op', async () => {
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        await new Promise(resolve => setTimeout(resolve, 10));
         return 'success';
       });
 
@@ -826,7 +826,7 @@ suite('IntegrationTestFramework Tests', () => {
       await framework.initialize();
 
       await framework.measurePerformance('slow-op', async () => {
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 50));
         return 'done';
       });
 
@@ -860,7 +860,7 @@ suite('IntegrationTestFramework Tests', () => {
 
       framework.generateSpecInitData({ id: 'SPEC-001', title: 'Test' });
 
-      bridge.connect('spec-init', 'track-metadata', (sourceState) => {
+      bridge.connect('spec-init', 'track-metadata', sourceState => {
         return { specId: sourceState.specs[0].id };
       });
 

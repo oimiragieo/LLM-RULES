@@ -26,7 +26,7 @@ describe('IndexManager', () => {
       const manager = new IndexManager({
         maxFileSize: 2 * 1024 * 1024, // 2MB
         batchSize: 10,
-        verbose: true
+        verbose: true,
       });
       assert.ok(manager, 'Manager created with options');
     });
@@ -39,7 +39,9 @@ describe('IndexManager', () => {
 
       // Create sample files
       await fs.mkdir(testDir, { recursive: true });
-      await fs.writeFile(path.join(testDir, 'sample.js'), `
+      await fs.writeFile(
+        path.join(testDir, 'sample.js'),
+        `
 function hello(name) {
   // This is a greeting function that logs a personalized hello message
   const message = "Hello, " + name + "! Welcome to the code indexing system.";
@@ -58,7 +60,8 @@ class Greeter {
     return 'Hi, ' + actualName + '! Nice to meet you.';
   }
 }
-      `);
+      `
+      );
 
       const result = await manager.indexDirectory(testDir);
 

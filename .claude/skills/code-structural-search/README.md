@@ -61,26 +61,26 @@ sg -p 'oldAPI.deprecatedMethod($$$)' --lang js
 
 ## Pattern Syntax
 
-| Symbol     | Meaning                         | Example                  |
-| ---------- | ------------------------------- | ------------------------ |
-| `$NAME`    | Single node/identifier          | `function $NAME() {}`    |
-| `$$$`      | Zero or more statements/nodes   | `class $NAME { $$$ }`    |
-| `$$`       | Zero or more statements (block) | `if ($COND) { $$ }`      |
-| `$_`       | Anonymous wildcard (discard)    | `console.log($_)`        |
+| Symbol  | Meaning                         | Example               |
+| ------- | ------------------------------- | --------------------- |
+| `$NAME` | Single node/identifier          | `function $NAME() {}` |
+| `$$$`   | Zero or more statements/nodes   | `class $NAME { $$$ }` |
+| `$$`    | Zero or more statements (block) | `if ($COND) { $$ }`   |
+| `$_`    | Anonymous wildcard (discard)    | `console.log($_)`     |
 
 ## Supported Languages
 
-| Language   | Flag        | Extensions        |
-| ---------- | ----------- | ----------------- |
-| JavaScript | `--lang js` | .js, .jsx         |
-| TypeScript | `--lang ts` | .ts, .tsx         |
-| Python     | `--lang py` | .py, .pyi         |
-| Go         | `--lang go` | .go               |
-| Rust       | `--lang rs` | .rs               |
+| Language   | Flag          | Extensions      |
+| ---------- | ------------- | --------------- |
+| JavaScript | `--lang js`   | .js, .jsx       |
+| TypeScript | `--lang ts`   | .ts, .tsx       |
+| Python     | `--lang py`   | .py, .pyi       |
+| Go         | `--lang go`   | .go             |
+| Rust       | `--lang rs`   | .rs             |
 | Java       | `--lang java` | .java           |
-| C          | `--lang c`  | .c, .h            |
-| C++        | `--lang cpp` | .cpp, .cc, .hpp |
-| C#         | `--lang cs` | .cs               |
+| C          | `--lang c`    | .c, .h          |
+| C++        | `--lang cpp`  | .cpp, .cc, .hpp |
+| C#         | `--lang cs`   | .cs             |
 
 **Full language support:** See PATTERNS.md for complete list.
 
@@ -130,7 +130,7 @@ sg -p '$ELEM.innerHTML = $DATA' --lang js
 
 ```javascript
 // Use the skill
-Skill({ skill: 'code-structural-search', args: 'function authenticate($$$) { $$ } --lang ts' })
+Skill({ skill: 'code-structural-search', args: 'function authenticate($$$) { $$ } --lang ts' });
 ```
 
 ### From CLI
@@ -148,18 +148,20 @@ sg -p 'pattern-here' --lang ts
 Combine with other skills for best results:
 
 1. **Broad search** (ripgrep):
+
    ```javascript
-   Skill({ skill: 'ripgrep', args: 'authenticate --type ts' })
+   Skill({ skill: 'ripgrep', args: 'authenticate --type ts' });
    ```
 
 2. **Structural refinement** (ast-grep):
+
    ```javascript
-   Skill({ skill: 'code-structural-search', args: 'function authenticate($$$) { $$ } --lang ts' })
+   Skill({ skill: 'code-structural-search', args: 'function authenticate($$$) { $$ } --lang ts' });
    ```
 
 3. **Semantic understanding** (Phase 1):
    ```javascript
-   Skill({ skill: 'code-semantic-search', args: 'authentication logic' })
+   Skill({ skill: 'code-semantic-search', args: 'authentication logic' });
    ```
 
 ## Output Formats

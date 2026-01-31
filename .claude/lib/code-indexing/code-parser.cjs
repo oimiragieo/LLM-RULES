@@ -18,7 +18,7 @@ const LANGUAGE_GRAMMARS = {
   tsx: 'tree-sitter-typescript/tsx',
   python: 'tree-sitter-python',
   go: 'tree-sitter-go',
-  rust: 'tree-sitter-rust'
+  rust: 'tree-sitter-rust',
 };
 
 // File extension to language mapping
@@ -32,7 +32,7 @@ const EXTENSION_MAP = {
   '.tsx': 'tsx',
   '.py': 'python',
   '.go': 'go',
-  '.rs': 'rust'
+  '.rs': 'rust',
 };
 
 class CodeParser {

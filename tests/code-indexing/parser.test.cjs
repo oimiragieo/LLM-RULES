@@ -8,7 +8,11 @@
 
 const { test, suite } = require('node:test');
 const assert = require('node:assert/strict');
-const { CodeParser, LANGUAGE_GRAMMARS, EXTENSION_MAP } = require('../../.claude/lib/code-indexing/code-parser.cjs');
+const {
+  CodeParser,
+  LANGUAGE_GRAMMARS,
+  EXTENSION_MAP,
+} = require('../../.claude/lib/code-indexing/code-parser.cjs');
 
 suite('CodeParser', () => {
   suite('37.1: Class skeleton', () => {

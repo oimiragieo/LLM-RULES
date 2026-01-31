@@ -15,22 +15,24 @@ Updated the **agent-creator** skill to enforce the lazy-load `@` prefix rule whe
 
 **Content**: Comprehensive table and guidelines explaining when to use `@` prefix:
 
-| Location | Pattern | Rule |
-|----------|---------|------|
+| Location               | Pattern        | Rule            |
+| ---------------------- | -------------- | --------------- |
 | Markdown documentation | `@.claude/...` | ✅ Add @ prefix |
-| context_files array | `@.claude/...` | ✅ Add @ prefix |
-| Bash commands | `.claude/...` | ❌ NO @ prefix |
-| Bash examples | `.claude/...` | ❌ NO @ prefix |
+| context_files array    | `@.claude/...` | ✅ Add @ prefix |
+| Bash commands          | `.claude/...`  | ❌ NO @ prefix  |
+| Bash examples          | `.claude/...`  | ❌ NO @ prefix  |
 
 ### 2. Updated Agent Template
 
 **Before**:
+
 ```yaml
 context_files:
   - .claude/context/memory/learnings.md
 ```
 
 **After**:
+
 ```yaml
 context_files:
   - @.claude/context/memory/learnings.md
@@ -39,6 +41,7 @@ context_files:
 ### 3. Updated Output Locations Section
 
 **Added guidance**:
+
 - Deliverables: `@.claude/context/artifacts/`
 - Reports: `@.claude/context/reports/`
 - Temporary files: `@.claude/context/tmp/`
@@ -49,6 +52,7 @@ Plus note: (No `@` prefix in bash commands)
 ### 4. Updated Mandatory References
 
 **Added**:
+
 - Lazy-Load Rule: All new agents should use `@.claude/` prefix in documentation
 
 ## Examples for New Agents
@@ -56,6 +60,7 @@ Plus note: (No `@` prefix in bash commands)
 When agent-creator generates new agents, they will now include:
 
 ### ✅ Correct Documentation Pattern
+
 ```markdown
 Read: @.claude/skills/tdd/SKILL.md
 Location: @.claude/context/memory/decisions.md
@@ -63,6 +68,7 @@ See: @.claude/docs/FILE_PLACEMENT_RULES.md
 ```
 
 ### ✅ Correct Frontmatter Pattern
+
 ```yaml
 context_files:
   - @.claude/context/memory/learnings.md
@@ -70,6 +76,7 @@ context_files:
 ```
 
 ### ✅ Correct Bash Commands (NO @ prefix)
+
 ```bash
 cat .claude/context/memory/learnings.md
 grep 'pattern' .claude/CLAUDE.md
@@ -90,6 +97,7 @@ Bash("node .claude/tools/validate.mjs")
 ## Enforcement
 
 The agent-creator skill will now:
+
 1. Show the LAZY-LOAD CONTEXT RULE when agent creator reads the skill
 2. Include proper examples in the agent template
 3. Document the rule in mandatory references
@@ -99,6 +107,7 @@ Any agent created via agent-creator from now on will automatically use correct l
 ## Next: skill-creator and Other Creators
 
 Similar updates should be applied to:
+
 - `skill-creator` - when creating new skills
 - `workflow-creator` - when creating workflows
 - `hook-creator` - when creating hooks

@@ -44,19 +44,16 @@ The skill automates the entire deployment process:
 Invoke this skill when:
 
 1. **Production Deployment**
-
    - "Deploy my app to production"
    - "How do I push this to Vercel"
    - "Deploy to production now"
 
 2. **CI/CD Setup**
-
    - "Set up CI/CD deployment"
    - "Automate deployments with GitHub Actions"
    - "Configure automatic deployments"
 
 3. **Preview Deployments**
-
    - "Deploy a preview for this PR"
    - "Create a staging deployment"
    - "Preview deployment for testing"
@@ -113,65 +110,65 @@ Reports deployment progress:
 
 ### Frontend Frameworks
 
-| Framework         | Detection                 | Build Command            | Output Dir   |
-| ----------------- | ------------------------- | ------------------------ | ------------ |
-| Next.js           | next in dependencies      | next build               | .next        |
-| React (CRA)       | react-scripts             | react-scripts build      | build        |
-| React (Vite)      | vite + react              | vite build               | dist         |
-| Vue (Vue CLI)     | @vue/cli-service          | vue-cli-service build    | dist         |
-| Vue (Vite)        | vite + vue                | vite build               | dist         |
-| Angular           | @angular/cli              | ng build                 | dist/app     |
-| Svelte (Vite)     | vite + svelte             | vite build               | dist         |
-| SvelteKit         | @sveltejs/kit             | vite build               | build        |
-| Solid (Vite)      | vite + solid              | vite build               | dist         |
-| Qwik              | @builder.io/qwik          | qwik build               | dist         |
-| Astro             | astro                     | astro build              | dist         |
-| Remix             | @remix-run/dev            | remix build              | build        |
-| Gatsby            | gatsby                    | gatsby build             | public       |
-| Nuxt              | nuxt                      | nuxt build               | .output      |
-| Preact            | preact-cli                | preact build             | build        |
-| Lit               | @lit/react                | npm run build            | dist         |
+| Framework     | Detection            | Build Command         | Output Dir |
+| ------------- | -------------------- | --------------------- | ---------- |
+| Next.js       | next in dependencies | next build            | .next      |
+| React (CRA)   | react-scripts        | react-scripts build   | build      |
+| React (Vite)  | vite + react         | vite build            | dist       |
+| Vue (Vue CLI) | @vue/cli-service     | vue-cli-service build | dist       |
+| Vue (Vite)    | vite + vue           | vite build            | dist       |
+| Angular       | @angular/cli         | ng build              | dist/app   |
+| Svelte (Vite) | vite + svelte        | vite build            | dist       |
+| SvelteKit     | @sveltejs/kit        | vite build            | build      |
+| Solid (Vite)  | vite + solid         | vite build            | dist       |
+| Qwik          | @builder.io/qwik     | qwik build            | dist       |
+| Astro         | astro                | astro build           | dist       |
+| Remix         | @remix-run/dev       | remix build           | build      |
+| Gatsby        | gatsby               | gatsby build          | public     |
+| Nuxt          | nuxt                 | nuxt build            | .output    |
+| Preact        | preact-cli           | preact build          | build      |
+| Lit           | @lit/react           | npm run build         | dist       |
 
 ### Backend Frameworks
 
-| Framework         | Detection                 | Build Command            | Output Dir   |
-| ----------------- | ------------------------- | ------------------------ | ------------ |
-| Express           | express                   | npm run build            | dist         |
-| Fastify           | fastify                   | npm run build            | dist         |
-| Koa               | koa                       | npm run build            | dist         |
-| Hono              | hono                      | npm run build            | dist         |
+| Framework | Detection | Build Command | Output Dir |
+| --------- | --------- | ------------- | ---------- |
+| Express   | express   | npm run build | dist       |
+| Fastify   | fastify   | npm run build | dist       |
+| Koa       | koa       | npm run build | dist       |
+| Hono      | hono      | npm run build | dist       |
 
 ### Meta Frameworks
 
-| Framework         | Detection                 | Build Command            | Output Dir   |
-| ----------------- | ------------------------- | ------------------------ | ------------ |
-| Next.js           | next                      | next build               | .next        |
-| SvelteKit         | @sveltejs/kit             | vite build               | build        |
-| Nuxt              | nuxt                      | nuxt build               | .output      |
-| Remix             | @remix-run/dev            | remix build              | build        |
-| Astro             | astro                     | astro build              | dist         |
-| SolidStart        | solid-start               | solid-start build        | .output      |
-| Analog (Angular)  | @analogjs/platform        | analog build             | dist         |
+| Framework        | Detection          | Build Command     | Output Dir |
+| ---------------- | ------------------ | ----------------- | ---------- |
+| Next.js          | next               | next build        | .next      |
+| SvelteKit        | @sveltejs/kit      | vite build        | build      |
+| Nuxt             | nuxt               | nuxt build        | .output    |
+| Remix            | @remix-run/dev     | remix build       | build      |
+| Astro            | astro              | astro build       | dist       |
+| SolidStart       | solid-start        | solid-start build | .output    |
+| Analog (Angular) | @analogjs/platform | analog build      | dist       |
 
 ### Static Site Generators
 
-| Framework         | Detection                 | Build Command            | Output Dir   |
-| ----------------- | ------------------------- | ------------------------ | ------------ |
-| Gatsby            | gatsby                    | gatsby build             | public       |
-| Hugo              | hugo.toml                 | hugo                     | public       |
-| Jekyll            | _config.yml               | jekyll build             | _site        |
-| Eleventy (11ty)   | @11ty/eleventy            | eleventy                 | _site        |
-| VuePress          | vuepress                  | vuepress build           | .vuepress    |
-| Docusaurus        | @docusaurus/core          | docusaurus build         | build        |
-| Hexo              | hexo                      | hexo generate            | public       |
+| Framework       | Detection        | Build Command    | Output Dir |
+| --------------- | ---------------- | ---------------- | ---------- |
+| Gatsby          | gatsby           | gatsby build     | public     |
+| Hugo            | hugo.toml        | hugo             | public     |
+| Jekyll          | \_config.yml     | jekyll build     | \_site     |
+| Eleventy (11ty) | @11ty/eleventy   | eleventy         | \_site     |
+| VuePress        | vuepress         | vuepress build   | .vuepress  |
+| Docusaurus      | @docusaurus/core | docusaurus build | build      |
+| Hexo            | hexo             | hexo generate    | public     |
 
 ### Specialized Frameworks
 
-| Framework         | Detection                 | Build Command            | Output Dir   |
-| ----------------- | ------------------------- | ------------------------ | ------------ |
-| Redwood           | @redwoodjs/core           | redwood build            | web/dist     |
-| Blitz             | blitz                     | blitz build              | .next        |
-| Hydrogen (Shopify)| @shopify/hydrogen         | shopify hydrogen build   | dist         |
+| Framework          | Detection         | Build Command          | Output Dir |
+| ------------------ | ----------------- | ---------------------- | ---------- |
+| Redwood            | @redwoodjs/core   | redwood build          | web/dist   |
+| Blitz              | blitz             | blitz build            | .next      |
+| Hydrogen (Shopify) | @shopify/hydrogen | shopify hydrogen build | dist       |
 
 **Total:** 40+ frameworks supported
 
@@ -237,9 +234,7 @@ if (packageJson.dependencies?.next) confidence.nextjs += 0.8;
 if (fs.existsSync('next.config.js')) confidence.nextjs += 0.2;
 
 // Select framework with highest confidence
-const framework = Object.keys(confidence).reduce((a, b) =>
-  confidence[a] > confidence[b] ? a : b
-);
+const framework = Object.keys(confidence).reduce((a, b) => (confidence[a] > confidence[b] ? a : b));
 ```
 
 ---
@@ -613,12 +608,12 @@ Skill({ skill: 'vercel-deploy' });
    ```
 
 3. **Verify variable scope:**
-
    - Production variables only available in production
    - Preview variables only in preview deployments
    - Development variables only in local development
 
 4. **Use correct syntax:**
+
    ```typescript
    // Server-side (Next.js)
    const apiUrl = process.env.API_URL;

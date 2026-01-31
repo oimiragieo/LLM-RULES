@@ -24,7 +24,7 @@ const fs = require('fs');
 const { performance } = require('perf_hooks');
 
 // Test fixtures
-const TEST_DIR = path.join(__dirname, '../../.test-temp/state-machine-advanced');
+const TEST_DIR = path.join(__dirname, '../temp/state-machine-advanced');
 const STATE_FILE = path.join(TEST_DIR, 'workflow-state.json');
 
 // Import modules (will fail initially - expected in RED phase)

@@ -56,7 +56,10 @@ test('SKILL.md has code examples for all modes', () => {
 test('SKILL.md references hybrid-search.cjs implementation', () => {
   const content = fs.readFileSync(SKILL_FILE, 'utf-8');
 
-  assert.ok(content.includes('.claude/lib/code-indexing/hybrid-search.cjs'), 'Should reference hybrid-search.cjs');
+  assert.ok(
+    content.includes('.claude/lib/code-indexing/hybrid-search.cjs'),
+    'Should reference hybrid-search.cjs'
+  );
 });
 
 test('SKILL.md has Memory Protocol section', () => {

@@ -262,11 +262,7 @@
         "mcp_server": "chrome-devtools",
         "fallback": "Skill({ skill: 'chrome-browser' })",
         "fallback_status": "available",
-        "fallback_tools": [
-          "Read",
-          "Write",
-          "WebFetch"
-        ]
+        "fallback_tools": ["Read", "Write", "WebFetch"]
       },
       {
         "name": "mcp__sequential-thinking__sequentialthinking",
@@ -277,11 +273,7 @@
         "mcp_server": "sequential-thinking",
         "fallback": "Skill({ skill: 'sequential-thinking' })",
         "fallback_status": "available",
-        "fallback_tools": [
-          "Read",
-          "Write",
-          "Bash"
-        ]
+        "fallback_tools": ["Read", "Write", "Bash"]
       },
       {
         "name": "mcp__Ref__ref_search_documentation",
@@ -292,10 +284,7 @@
         "mcp_server": "Ref",
         "fallback": "WebSearch + WebFetch",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebSearch",
-          "WebFetch"
-        ]
+        "fallback_tools": ["WebSearch", "WebFetch"]
       },
       {
         "name": "mcp__Ref__ref_read_url",
@@ -306,9 +295,7 @@
         "mcp_server": "Ref",
         "fallback": "WebFetch",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebFetch"
-        ]
+        "fallback_tools": ["WebFetch"]
       },
       {
         "name": "mcp__Exa__web_search_exa",
@@ -319,9 +306,7 @@
         "mcp_server": "Exa",
         "fallback": "WebSearch",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebSearch"
-        ]
+        "fallback_tools": ["WebSearch"]
       },
       {
         "name": "mcp__Exa__get_code_context_exa",
@@ -332,10 +317,7 @@
         "mcp_server": "Exa",
         "fallback": "Grep + Glob",
         "fallback_status": "available",
-        "fallback_tools": [
-          "Grep",
-          "Glob"
-        ]
+        "fallback_tools": ["Grep", "Glob"]
       },
       {
         "name": "mcp__Exa__company_research_exa",
@@ -346,9 +328,7 @@
         "mcp_server": "Exa",
         "fallback": "WebSearch",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebSearch"
-        ]
+        "fallback_tools": ["WebSearch"]
       },
       {
         "name": "mcp__shadcn__getComponents",
@@ -359,9 +339,7 @@
         "mcp_server": "shadcn",
         "fallback": "WebFetch('https://ui.shadcn.com/...')",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebFetch"
-        ]
+        "fallback_tools": ["WebFetch"]
       },
       {
         "name": "mcp__shadcn__getComponent",
@@ -372,9 +350,7 @@
         "mcp_server": "shadcn",
         "fallback": "WebFetch('https://ui.shadcn.com/...')",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebFetch"
-        ]
+        "fallback_tools": ["WebFetch"]
       }
     ],
     "toolsets": {
@@ -419,10 +395,7 @@
           "TaskOutput",
           "Skill"
         ],
-        "mandatory": [
-          "TaskUpdate",
-          "Skill"
-        ]
+        "mandatory": ["TaskUpdate", "Skill"]
       },
       "PLANNER": {
         "description": "Planning agent toolset with planning mode",
@@ -442,10 +415,7 @@
           "EnterPlanMode",
           "ExitPlanMode"
         ],
-        "mandatory": [
-          "TaskUpdate",
-          "Skill"
-        ]
+        "mandatory": ["TaskUpdate", "Skill"]
       },
       "ORCHESTRATOR": {
         "description": "Agent orchestration toolset (can spawn subagents)",
@@ -464,11 +434,7 @@
           "TaskOutput",
           "Skill"
         ],
-        "mandatory": [
-          "Task",
-          "TaskUpdate",
-          "Skill"
-        ]
+        "mandatory": ["Task", "TaskUpdate", "Skill"]
       },
       "ROUTER": {
         "description": "Router-only toolset (restricted)",
@@ -481,10 +447,7 @@
           "TaskGet",
           "AskUserQuestion"
         ],
-        "mandatory": [
-          "Task",
-          "TaskList"
-        ]
+        "mandatory": ["Task", "TaskList"]
       },
       "RESEARCHER": {
         "description": "Research agent toolset with web access",
@@ -500,25 +463,12 @@
           "TaskGet",
           "Skill"
         ],
-        "mandatory": [
-          "TaskUpdate",
-          "Skill"
-        ]
+        "mandatory": ["TaskUpdate", "Skill"]
       },
       "READ_ONLY": {
         "description": "Read-only agent toolset (e.g., code-reviewer)",
-        "tools": [
-          "Read",
-          "Glob",
-          "Grep",
-          "TaskUpdate",
-          "TaskList",
-          "Skill"
-        ],
-        "mandatory": [
-          "TaskUpdate",
-          "Skill"
-        ]
+        "tools": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill"],
+        "mandatory": ["TaskUpdate", "Skill"]
       },
       "DATA_SCIENCE": {
         "description": "Data science and ML toolset with Jupyter support",
@@ -536,10 +486,7 @@
           "TaskGet",
           "Skill"
         ],
-        "mandatory": [
-          "TaskUpdate",
-          "Skill"
-        ]
+        "mandatory": ["TaskUpdate", "Skill"]
       }
     }
   },
@@ -687,14 +634,7 @@
       },
       "code-reviewer": {
         "toolset": "READ_ONLY",
-        "tools": [
-          "Read",
-          "Glob",
-          "Grep",
-          "TaskUpdate",
-          "TaskList",
-          "Skill"
-        ],
+        "tools": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill"],
         "maxTools": 6
       },
       "researcher": {
@@ -852,14 +792,9 @@
         "swarm-coordinator",
         "party-orchestrator"
       ],
-      "AskUserQuestion": [
-        "router"
-      ]
+      "AskUserQuestion": ["router"]
     },
-    "mandatoryTools": [
-      "TaskUpdate",
-      "Skill"
-    ],
+    "mandatoryTools": ["TaskUpdate", "Skill"],
     "blockOnMissingMandatory": true,
     "warnOnMCPWithoutServer": true,
     "blockOnUnknownTool": true

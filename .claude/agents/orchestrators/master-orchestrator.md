@@ -117,8 +117,13 @@ const agents = AvailableAgents({
 // Pick best agent (sorted by success rate)
 const reviewer = agents.agents[0]; // code-reviewer (best success rate)
 
+// Resolve model from config.yaml (ADR-075)
+const { resolveAgentModel } = require('./.claude/lib/utils/agent-config-reader.cjs');
+const modelResult = resolveAgentModel(reviewer.id, PROJECT_ROOT);
+
 Task({
   subagent_type: reviewer.id,
+  model: modelResult.model,  // Use config-resolved model
   description: 'Code review task',
   prompt: ...
 });

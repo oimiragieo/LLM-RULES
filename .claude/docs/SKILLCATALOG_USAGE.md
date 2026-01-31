@@ -7,12 +7,14 @@ SkillCatalog is a runtime skill discovery tool. Instead of agents receiving a fi
 ## When to Use SkillCatalog
 
 ### Use Pre-Injected AVAILABLE_SKILLS (Phase 1) When:
+
 - Agent has a clear role (developer, researcher, etc)
 - Skills are domain-specific and predictable
 - Agent doesn't need flexibility
 - Spawning quickly is priority
 
 ### Use SkillCatalog() (Phase 2) When:
+
 - Agent needs to discover skills for a specific task
 - Task domain is unknown at spawn time
 - Agent should pick the best skill from options
@@ -21,6 +23,7 @@ SkillCatalog is a runtime skill discovery tool. Instead of agents receiving a fi
 ## How to Use SkillCatalog
 
 ### Basic Query - Find Skills by Domain
+
 ```javascript
 const result = SkillCatalog({ domain: 'testing' });
 
@@ -35,11 +38,12 @@ if (result.success) {
 ```
 
 ### Advanced Query - Find Best Skill for Agent
+
 ```javascript
 const result = SkillCatalog({
   domain: 'testing',
   agentType: 'developer',
-  limit: 3
+  limit: 3,
 });
 
 const recommended = result.skills.find(s => s.recommended);
@@ -47,15 +51,17 @@ Skill({ skill: recommended.name });
 ```
 
 ### Query by Tags
+
 ```javascript
 // Find skills tagged with 'async' AND 'performance'
 const result = SkillCatalog({
   tags: ['async', 'performance'],
-  limit: 5
+  limit: 5,
 });
 ```
 
 ### Handle No Matches with Suggestions
+
 ```javascript
 const result = SkillCatalog({ domain: 'nonexistent' });
 
@@ -69,13 +75,13 @@ if (!result.success) {
 
 ## Query Options
 
-| Option | Type | Description | Example |
-|--------|------|-------------|---------|
-| domain | string | Filter by skill domain | 'testing', 'security', 'devops' |
-| category | string | Filter by category | 'code-quality', 'architecture' |
-| agentType | string | Filter by recommended agent type | 'developer', 'qa', 'researcher' |
-| tags | string[] | Filter by tags (all must match) | ['tdd', 'async'] |
-| limit | number | Max results (1-50) | 5 (default: 10) |
+| Option    | Type     | Description                      | Example                         |
+| --------- | -------- | -------------------------------- | ------------------------------- |
+| domain    | string   | Filter by skill domain           | 'testing', 'security', 'devops' |
+| category  | string   | Filter by category               | 'code-quality', 'architecture'  |
+| agentType | string   | Filter by recommended agent type | 'developer', 'qa', 'researcher' |
+| tags      | string[] | Filter by tags (all must match)  | ['tdd', 'async']                |
+| limit     | number   | Max results (1-50)               | 5 (default: 10)                 |
 
 ## Response Format
 
@@ -101,11 +107,13 @@ if (!result.success) {
 ## Available Domains
 
 Common domains for skill queries:
+
 - testing, security, devops, code, research, data
 - frontend, backend, mobile, database, ai-ml
 - architecture, performance, documentation
 
 Get complete list:
+
 ```javascript
 const query = require('./.claude/lib/tools/skill-catalog.cjs').getInstance();
 const filters = query.getAvailableFilters();
@@ -123,45 +131,52 @@ console.log(filters.domains);
 ## Examples by Agent Type
 
 ### Developer Agent
+
 ```javascript
 // Find testing skills
-SkillCatalog({ domain: 'testing', agentType: 'developer' })
+SkillCatalog({ domain: 'testing', agentType: 'developer' });
 
 // Find code quality skills
-SkillCatalog({ tags: ['code-quality'], limit: 3 })
+SkillCatalog({ tags: ['code-quality'], limit: 3 });
 ```
 
 ### Researcher Agent
+
 ```javascript
 // Find research skills
-SkillCatalog({ domain: 'research', agentType: 'researcher' })
+SkillCatalog({ domain: 'research', agentType: 'researcher' });
 
 // Find synthesis skills
-SkillCatalog({ tags: ['synthesis', 'analysis'] })
+SkillCatalog({ tags: ['synthesis', 'analysis'] });
 ```
 
 ### Architect Agent
+
 ```javascript
 // Find architecture skills
-SkillCatalog({ domain: 'architecture', agentType: 'architect' })
+SkillCatalog({ domain: 'architecture', agentType: 'architect' });
 
 // Find C4 model skills
-SkillCatalog({ tags: ['c4'] })
+SkillCatalog({ tags: ['c4'] });
 ```
 
 ## Troubleshooting
 
 ### "No skills found" Error
+
 Try these alternatives:
+
 1. Remove the most specific filter (e.g., remove domain)
 2. Check available domains: `getInstance().getAvailableFilters()`
 3. Use broader tag search
 
 ### Query Too Slow
+
 - Caching is automatic (first query <500ms, subsequent <50ms)
 - If still slow, reduce limit or check system load
 
 ### Skill Doesn't Appear
+
 - Check it's in `.claude/context/artifacts/skill-catalog.md`
 - Regenerate index: `npm run skills:index`
 - Clear cache: `getInstance().clearCache()`
@@ -172,24 +187,24 @@ Try these alternatives:
 const { SkillCatalog, getInstance } = require('./.claude/lib/tools/skill-catalog.cjs');
 
 // Query skills
-SkillCatalog(options)
+SkillCatalog(options);
 
 // Get filter metadata
-getInstance().getAvailableFilters()
+getInstance().getAvailableFilters();
 
 // Clear cache (for testing/debugging)
-getInstance().clearCache()
+getInstance().clearCache();
 ```
 
 ## Phase 1 vs Phase 2 Comparison
 
-| Aspect | Phase 1 (Static) | Phase 2 (Dynamic) |
-|--------|-----------------|------------------|
-| Skills available | 15-20 pre-injected | Query all 434+ |
-| When decided | At spawn time | At task time |
-| Flexibility | Fixed | Agent chooses |
-| New skills | Require respin | Instant |
-| Use case | General agents | Task-specific |
+| Aspect           | Phase 1 (Static)   | Phase 2 (Dynamic) |
+| ---------------- | ------------------ | ----------------- |
+| Skills available | 15-20 pre-injected | Query all 434+    |
+| When decided     | At spawn time      | At task time      |
+| Flexibility      | Fixed              | Agent chooses     |
+| New skills       | Require respin     | Instant           |
+| Use case         | General agents     | Task-specific     |
 
 ## Related Documentation
 
@@ -203,11 +218,13 @@ getInstance().clearCache()
 When using SkillCatalog, follow the memory protocol:
 
 **Before starting:**
+
 ```bash
 cat .claude/context/memory/learnings.md
 ```
 
 **After discovering new skill patterns:**
+
 - Document useful skill combinations in learnings.md
 - Note domain/agentType mappings that work well
 - Record any edge cases or issues found

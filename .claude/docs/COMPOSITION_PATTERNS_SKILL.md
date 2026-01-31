@@ -50,19 +50,16 @@ The skill provides architectural recommendations for structuring React component
 Invoke this skill when:
 
 1. **Component Refactoring**
-
    - "Help me refactor my component"
    - "How should I structure this component"
    - "Component is too complex, how do I simplify"
 
 2. **Architecture Planning**
-
    - "Component composition best practices"
    - "How do I build a design system"
    - "Scalable component architecture"
 
 3. **React 19 Migration**
-
    - "React 19 API changes"
    - "How do I migrate to React 19"
    - "What's new in React 19"
@@ -103,15 +100,15 @@ For each pattern, the skill provides:
 
 ### 3. React 19 Migration Guidance
 
-| API Change               | React 18                | React 19                        |
-| ------------------------ | ----------------------- | ------------------------------- |
-| `ReactDOM.render()`      | Deprecated              | Use `createRoot()`              |
-| `useId()`                | Optional                | Recommended for SSR-safe IDs    |
-| `useTransition()`        | Optional                | Better support                  |
-| `useDeferredValue()`     | Optional                | Better support                  |
-| `<Suspense>`             | Limited                 | Full support                    |
-| Server Components        | Not available           | Available (Next.js 13+)         |
-| `use()` hook             | Not available           | New hook for promises/context   |
+| API Change           | React 18      | React 19                      |
+| -------------------- | ------------- | ----------------------------- |
+| `ReactDOM.render()`  | Deprecated    | Use `createRoot()`            |
+| `useId()`            | Optional      | Recommended for SSR-safe IDs  |
+| `useTransition()`    | Optional      | Better support                |
+| `useDeferredValue()` | Optional      | Better support                |
+| `<Suspense>`         | Limited       | Full support                  |
+| Server Components    | Not available | Available (Next.js 13+)       |
+| `use()` hook         | Not available | New hook for promises/context |
 
 ---
 
@@ -271,7 +268,7 @@ function Component2() {
 ```typescript
 function useToggle(initialValue = false) {
   const [value, setValue] = useState(initialValue);
-  const toggle = useCallback(() => setValue((v) => !v), []);
+  const toggle = useCallback(() => setValue(v => !v), []);
   return [value, toggle];
 }
 
@@ -560,16 +557,16 @@ function CardHeader({ children }) {
 
 ### Key API Changes
 
-| Feature                 | Status      | Description                                  |
-| ----------------------- | ----------- | -------------------------------------------- |
-| `use()` hook            | New         | Read promises and context                    |
-| Server Components       | Stable      | Data fetching on server                      |
-| `<Suspense>`            | Improved    | Better fallback handling                     |
-| `useTransition()`       | Improved    | Better concurrent rendering                  |
-| `useDeferredValue()`    | Improved    | Better deferred updates                      |
-| `useId()`               | Recommended | SSR-safe unique IDs                          |
-| `ReactDOM.render()`     | Removed     | Use `createRoot()` instead                   |
-| `ReactDOM.hydrate()`    | Removed     | Use `hydrateRoot()` instead                  |
+| Feature              | Status      | Description                 |
+| -------------------- | ----------- | --------------------------- |
+| `use()` hook         | New         | Read promises and context   |
+| Server Components    | Stable      | Data fetching on server     |
+| `<Suspense>`         | Improved    | Better fallback handling    |
+| `useTransition()`    | Improved    | Better concurrent rendering |
+| `useDeferredValue()` | Improved    | Better deferred updates     |
+| `useId()`            | Recommended | SSR-safe unique IDs         |
+| `ReactDOM.render()`  | Removed     | Use `createRoot()` instead  |
+| `ReactDOM.hydrate()` | Removed     | Use `hydrateRoot()` instead |
 
 ### Migration Guide
 
@@ -639,15 +636,15 @@ async function Page() {
 
 ## Performance Impact
 
-| Pattern                  | Performance Impact                     |
-| ------------------------ | -------------------------------------- |
-| Compound Components      | Neutral (architecture benefit)         |
-| Context-based Composition| Can cause re-renders (optimize context)|
-| Hooks-based Patterns     | Positive (reduces duplication)         |
-| Render Props             | Negative (use hooks instead)           |
-| HOCs                     | Negative (use hooks instead)           |
-| Server Components        | Positive (faster initial load)         |
-| `use()` hook             | Positive (simpler suspense)            |
+| Pattern                   | Performance Impact                      |
+| ------------------------- | --------------------------------------- |
+| Compound Components       | Neutral (architecture benefit)          |
+| Context-based Composition | Can cause re-renders (optimize context) |
+| Hooks-based Patterns      | Positive (reduces duplication)          |
+| Render Props              | Negative (use hooks instead)            |
+| HOCs                      | Negative (use hooks instead)            |
+| Server Components         | Positive (faster initial load)          |
+| `use()` hook              | Positive (simpler suspense)             |
 
 **Recommendation:** Use modern patterns (hooks, server components) for best performance.
 

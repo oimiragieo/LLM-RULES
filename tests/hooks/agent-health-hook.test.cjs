@@ -361,7 +361,11 @@ describe('AgentHealthHook', () => {
 
       // Verify health was recorded
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.successCount, 1, 'Should increment successCount');
+      assert.strictEqual(
+        registry.agents.developer.health.successCount,
+        1,
+        'Should increment successCount'
+      );
     });
 
     it('should record failure for Task tool with error result', async () => {
@@ -373,11 +377,19 @@ describe('AgentHealthHook', () => {
         toolResult: { error: { message: 'Spawn failed' } },
       };
       const result = await hook.postToolUse(context);
-      assert.strictEqual(result.decision, 'allow', 'Should allow (failure is recorded, not blocked)');
+      assert.strictEqual(
+        result.decision,
+        'allow',
+        'Should allow (failure is recorded, not blocked)'
+      );
 
       // Verify failure was recorded
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.failureCount, 1, 'Should increment failureCount');
+      assert.strictEqual(
+        registry.agents.developer.health.failureCount,
+        1,
+        'Should increment failureCount'
+      );
     });
 
     it('should record failure for Task tool with status=error', async () => {
@@ -393,7 +405,11 @@ describe('AgentHealthHook', () => {
 
       // Verify failure was recorded
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.qa.health.failureCount, 1, 'Should increment failureCount');
+      assert.strictEqual(
+        registry.agents.qa.health.failureCount,
+        1,
+        'Should increment failureCount'
+      );
     });
 
     it('should not track unknown agents', async () => {
@@ -409,7 +425,11 @@ describe('AgentHealthHook', () => {
 
       // Registry should be unchanged
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.successCount, 0, 'Should not change developer');
+      assert.strictEqual(
+        registry.agents.developer.health.successCount,
+        0,
+        'Should not change developer'
+      );
       assert.strictEqual(registry.agents.qa.health.successCount, 0, 'Should not change qa');
     });
   });
@@ -457,7 +477,7 @@ describe('AgentHealthHook', () => {
       registry.agents.developer.health.isolatedAt = new Date().toISOString();
       registry.agents.developer.health.isolationReason = '3 consecutive failures: Timeout';
       registry.agents.developer.health.consecutiveFailures = 3;
-      registry.health.healthy = registry.health.healthy.filter((id) => id !== 'developer');
+      registry.health.healthy = registry.health.healthy.filter(id => id !== 'developer');
       registry.health.unavailable.push('developer');
       fs.writeFileSync(testEnv.registryPath, JSON.stringify(registry, null, 2));
 
@@ -480,7 +500,7 @@ describe('AgentHealthHook', () => {
       registry.agents.developer.health.isolatedAt = sixMinutesAgo.toISOString();
       registry.agents.developer.health.isolationReason = '3 consecutive failures: Timeout';
       registry.agents.developer.health.consecutiveFailures = 3;
-      registry.health.healthy = registry.health.healthy.filter((id) => id !== 'developer');
+      registry.health.healthy = registry.health.healthy.filter(id => id !== 'developer');
       registry.health.unavailable.push('developer');
       fs.writeFileSync(testEnv.registryPath, JSON.stringify(registry, null, 2));
 
@@ -495,7 +515,11 @@ describe('AgentHealthHook', () => {
 
       // Verify recovery was attempted
       const updatedRegistry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(updatedRegistry.agents.developer.health.status, 'degraded', 'Should be degraded after recovery');
+      assert.strictEqual(
+        updatedRegistry.agents.developer.health.status,
+        'degraded',
+        'Should be degraded after recovery'
+      );
     });
 
     it('should warn for degraded agents but allow spawn', async () => {
@@ -503,7 +527,7 @@ describe('AgentHealthHook', () => {
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
       registry.agents.developer.health.status = 'degraded';
       registry.agents.developer.health.successRate = 0.65;
-      registry.health.healthy = registry.health.healthy.filter((id) => id !== 'developer');
+      registry.health.healthy = registry.health.healthy.filter(id => id !== 'developer');
       registry.health.degraded.push('developer');
       fs.writeFileSync(testEnv.registryPath, JSON.stringify(registry, null, 2));
 
@@ -558,7 +582,11 @@ describe('AgentHealthHook', () => {
 
       // Verify health was NOT recorded
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.successCount, 0, 'Should not track when disabled');
+      assert.strictEqual(
+        registry.agents.developer.health.successCount,
+        0,
+        'Should not track when disabled'
+      );
 
       // Cleanup
       delete process.env.AGENT_HEALTH_HOOK;

@@ -41,7 +41,11 @@ describe('VectorDatabase', () => {
     it('should initialize ChromaDB connection', async () => {
       const collection = await db.getCollection();
       assert.ok(collection, 'should return collection');
-      assert.strictEqual(collection.name, 'code-embeddings', 'collection should be named code-embeddings');
+      assert.strictEqual(
+        collection.name,
+        'code-embeddings',
+        'collection should be named code-embeddings'
+      );
     });
 
     it('should create database directory', () => {
@@ -53,12 +57,12 @@ describe('VectorDatabase', () => {
     it('should add chunks with embeddings to database', async () => {
       const chunks = [
         { code: 'function hello() { return "world"; }', type: 'function' },
-        { code: 'const PI = 3.14159;', type: 'constant' }
+        { code: 'const PI = 3.14159;', type: 'constant' },
       ];
 
       const embeddings = [
         new Array(384).fill(0).map(() => Math.random()), // Random 384-dim embedding
-        new Array(384).fill(0).map(() => Math.random())
+        new Array(384).fill(0).map(() => Math.random()),
       ];
 
       const metadata = [
@@ -69,7 +73,7 @@ describe('VectorDatabase', () => {
           lineEnd: 3,
           codeType: 'function',
           name: 'hello',
-          language: 'javascript'
+          language: 'javascript',
         },
         {
           id: 'file1.js:const:5',
@@ -78,8 +82,8 @@ describe('VectorDatabase', () => {
           lineEnd: 5,
           codeType: 'constant',
           name: 'PI',
-          language: 'javascript'
-        }
+          language: 'javascript',
+        },
       ];
 
       await db.addChunks(chunks, embeddings, metadata);
@@ -92,12 +96,14 @@ describe('VectorDatabase', () => {
       // Add initial chunk
       const chunks1 = [{ code: 'function test() {}', type: 'function' }];
       const embeddings1 = [new Array(384).fill(0).map(() => 0.1)];
-      const metadata1 = [{
-        id: 'file2.js:func:1',
-        filePath: 'file2.js',
-        codeType: 'function',
-        language: 'javascript'
-      }];
+      const metadata1 = [
+        {
+          id: 'file2.js:func:1',
+          filePath: 'file2.js',
+          codeType: 'function',
+          language: 'javascript',
+        },
+      ];
 
       await db.addChunks(chunks1, embeddings1, metadata1);
       let stats = await db.getStats();
@@ -106,13 +112,15 @@ describe('VectorDatabase', () => {
       // Update same chunk (upsert)
       const chunks2 = [{ code: 'function test() { return 42; }', type: 'function' }];
       const embeddings2 = [new Array(384).fill(0).map(() => 0.2)];
-      const metadata2 = [{
-        id: 'file2.js:func:1', // Same ID
-        filePath: 'file2.js',
-        codeType: 'function',
-        language: 'javascript',
-        updated: true
-      }];
+      const metadata2 = [
+        {
+          id: 'file2.js:func:1', // Same ID
+          filePath: 'file2.js',
+          codeType: 'function',
+          language: 'javascript',
+          updated: true,
+        },
+      ];
 
       await db.addChunks(chunks2, embeddings2, metadata2);
       stats = await db.getStats();
@@ -127,17 +135,19 @@ describe('VectorDatabase', () => {
     it('should store metadata alongside embeddings', async () => {
       const chunks = [{ code: 'class MyClass {}', type: 'class' }];
       const embeddings = [new Array(384).fill(0).map(() => 0.5)];
-      const metadata = [{
-        id: 'file3.js:class:1',
-        filePath: 'file3.js',
-        lineStart: 1,
-        lineEnd: 10,
-        codeType: 'class',
-        name: 'MyClass',
-        language: 'javascript',
-        isExported: true,
-        tags: ['ui', 'component']
-      }];
+      const metadata = [
+        {
+          id: 'file3.js:class:1',
+          filePath: 'file3.js',
+          lineStart: 1,
+          lineEnd: 10,
+          codeType: 'class',
+          name: 'MyClass',
+          language: 'javascript',
+          isExported: true,
+          tags: ['ui', 'component'],
+        },
+      ];
 
       await db.addChunks(chunks, embeddings, metadata);
 
@@ -158,7 +168,7 @@ describe('VectorDatabase', () => {
         { code: 'function login(user, pass) {}', type: 'function' },
         { code: 'function logout() {}', type: 'function' },
         { code: 'class UserService {}', type: 'class' },
-        { code: 'const API_URL = "https://api.com";', type: 'constant' }
+        { code: 'const API_URL = "https://api.com";', type: 'constant' },
       ];
 
       // Create embeddings with known similarities
@@ -166,17 +176,41 @@ describe('VectorDatabase', () => {
       // UserService is somewhat similar
       // API_URL is different
       const embeddings = [
-        new Array(384).fill(0).map((_, i) => i < 100 ? 0.8 : 0.1), // login
-        new Array(384).fill(0).map((_, i) => i < 100 ? 0.7 : 0.1), // logout (similar to login)
-        new Array(384).fill(0).map((_, i) => i < 50 ? 0.6 : 0.1),  // UserService (moderately similar)
-        new Array(384).fill(0).map((_, i) => i < 10 ? 0.9 : 0.05)  // API_URL (different)
+        new Array(384).fill(0).map((_, i) => (i < 100 ? 0.8 : 0.1)), // login
+        new Array(384).fill(0).map((_, i) => (i < 100 ? 0.7 : 0.1)), // logout (similar to login)
+        new Array(384).fill(0).map((_, i) => (i < 50 ? 0.6 : 0.1)), // UserService (moderately similar)
+        new Array(384).fill(0).map((_, i) => (i < 10 ? 0.9 : 0.05)), // API_URL (different)
       ];
 
       const metadata = [
-        { id: 'auth.js:func:1', filePath: 'auth.js', codeType: 'function', name: 'login', language: 'javascript' },
-        { id: 'auth.js:func:10', filePath: 'auth.js', codeType: 'function', name: 'logout', language: 'javascript' },
-        { id: 'services.js:class:1', filePath: 'services.js', codeType: 'class', name: 'UserService', language: 'javascript' },
-        { id: 'config.js:const:1', filePath: 'config.js', codeType: 'constant', name: 'API_URL', language: 'javascript' }
+        {
+          id: 'auth.js:func:1',
+          filePath: 'auth.js',
+          codeType: 'function',
+          name: 'login',
+          language: 'javascript',
+        },
+        {
+          id: 'auth.js:func:10',
+          filePath: 'auth.js',
+          codeType: 'function',
+          name: 'logout',
+          language: 'javascript',
+        },
+        {
+          id: 'services.js:class:1',
+          filePath: 'services.js',
+          codeType: 'class',
+          name: 'UserService',
+          language: 'javascript',
+        },
+        {
+          id: 'config.js:const:1',
+          filePath: 'config.js',
+          codeType: 'constant',
+          name: 'API_URL',
+          language: 'javascript',
+        },
       ];
 
       await db.addChunks(chunks, embeddings, metadata);
@@ -184,7 +218,7 @@ describe('VectorDatabase', () => {
 
     it('should find semantically similar chunks', async () => {
       // Query similar to login function
-      const queryEmbedding = new Array(384).fill(0).map((_, i) => i < 100 ? 0.75 : 0.1);
+      const queryEmbedding = new Array(384).fill(0).map((_, i) => (i < 100 ? 0.75 : 0.1));
 
       const results = await db.search(queryEmbedding, { topK: 10 });
 
@@ -196,11 +230,15 @@ describe('VectorDatabase', () => {
       // Results should be sorted by similarity (distance ascending)
       // Most similar should be login, then logout, then UserService, then API_URL
       assert.strictEqual(results.ids[0][0], 'auth.js:func:1', 'most similar should be login');
-      assert.strictEqual(results.ids[0][1], 'auth.js:func:10', 'second most similar should be logout');
+      assert.strictEqual(
+        results.ids[0][1],
+        'auth.js:func:10',
+        'second most similar should be logout'
+      );
     });
 
     it('should return top K results', async () => {
-      const queryEmbedding = new Array(384).fill(0).map((_, i) => i < 100 ? 0.75 : 0.1);
+      const queryEmbedding = new Array(384).fill(0).map((_, i) => (i < 100 ? 0.75 : 0.1));
 
       const results = await db.search(queryEmbedding, { topK: 2 });
 
@@ -210,7 +248,7 @@ describe('VectorDatabase', () => {
     });
 
     it('should rank results by similarity', async () => {
-      const queryEmbedding = new Array(384).fill(0).map((_, i) => i < 100 ? 0.75 : 0.1);
+      const queryEmbedding = new Array(384).fill(0).map((_, i) => (i < 100 ? 0.75 : 0.1));
 
       const results = await db.search(queryEmbedding, { topK: 10 });
 
@@ -230,7 +268,7 @@ describe('VectorDatabase', () => {
 
       const results = await db.search(queryEmbedding, {
         topK: 10,
-        filters: { filePath: 'auth.js' }
+        filters: { filePath: 'auth.js' },
       });
 
       assert.ok(results.ids[0].length > 0, 'should return results');
@@ -246,7 +284,7 @@ describe('VectorDatabase', () => {
 
       const results = await db.search(queryEmbedding, {
         topK: 10,
-        filters: { codeType: 'function' }
+        filters: { codeType: 'function' },
       });
 
       assert.ok(results.ids[0].length > 0, 'should return results');
@@ -262,7 +300,7 @@ describe('VectorDatabase', () => {
 
       const results = await db.search(queryEmbedding, {
         topK: 10,
-        filters: { filePath: 'auth.js', codeType: 'function' }
+        filters: { filePath: 'auth.js', codeType: 'function' },
       });
 
       assert.ok(results.ids[0].length > 0, 'should return results');
@@ -279,7 +317,7 @@ describe('VectorDatabase', () => {
 
       const results = await db.search(queryEmbedding, {
         topK: 10,
-        filters: { filePath: 'nonexistent.js' }
+        filters: { filePath: 'nonexistent.js' },
       });
 
       assert.strictEqual(results.ids[0].length, 0, 'should return empty results');
@@ -296,7 +334,7 @@ describe('VectorDatabase', () => {
         { code: 'function b() {}', type: 'function' },
         { code: 'function c() {}', type: 'function' },
         { code: 'function d() {}', type: 'function' },
-        { code: 'function e() {}', type: 'function' }
+        { code: 'function e() {}', type: 'function' },
       ];
 
       const embeddings = chunks.map(() => new Array(384).fill(0).map(() => Math.random()));
@@ -306,7 +344,7 @@ describe('VectorDatabase', () => {
         { id: 'file1.js:2', filePath: 'file1.js', codeType: 'function', language: 'javascript' },
         { id: 'file1.js:3', filePath: 'file1.js', codeType: 'function', language: 'javascript' },
         { id: 'file2.js:1', filePath: 'file2.js', codeType: 'function', language: 'javascript' },
-        { id: 'file3.js:1', filePath: 'file3.js', codeType: 'function', language: 'javascript' }
+        { id: 'file3.js:1', filePath: 'file3.js', codeType: 'function', language: 'javascript' },
       ];
 
       await db.addChunks(chunks, embeddings, metadata);
@@ -319,7 +357,11 @@ describe('VectorDatabase', () => {
       await db.deleteFile('file1.js');
 
       const statsAfter = await db.getStats();
-      assert.strictEqual(statsAfter.count, 2, 'should have 2 chunks after deleting file1.js (had 3 chunks)');
+      assert.strictEqual(
+        statsAfter.count,
+        2,
+        'should have 2 chunks after deleting file1.js (had 3 chunks)'
+      );
     });
 
     it('should verify deletion', async () => {
@@ -348,19 +390,19 @@ describe('VectorDatabase', () => {
       assert.strictEqual(stats.count, 1, 'should have 1 chunk after deleting file2.js');
 
       // Re-add file with updated content
-      const chunks = [
-        { code: 'function newFunc() {}', type: 'function' }
-      ];
+      const chunks = [{ code: 'function newFunc() {}', type: 'function' }];
 
       const embeddings = [new Array(384).fill(0).map(() => Math.random())];
 
-      const metadata = [{
-        id: 'file2.js:1',
-        filePath: 'file2.js',
-        codeType: 'function',
-        language: 'javascript',
-        updated: true
-      }];
+      const metadata = [
+        {
+          id: 'file2.js:1',
+          filePath: 'file2.js',
+          codeType: 'function',
+          language: 'javascript',
+          updated: true,
+        },
+      ];
 
       await db.addChunks(chunks, embeddings, metadata);
 
@@ -381,7 +423,7 @@ describe('VectorDatabase', () => {
         { code: 'function jsFunc() {}', type: 'function' },
         { code: 'class JsClass {}', type: 'class' },
         { code: 'function tsFunc(): void {}', type: 'function' },
-        { code: 'interface TsInterface {}', type: 'interface' }
+        { code: 'interface TsInterface {}', type: 'interface' },
       ];
 
       const embeddings = chunks.map(() => new Array(384).fill(0).map(() => Math.random()));
@@ -390,7 +432,7 @@ describe('VectorDatabase', () => {
         { id: 'file1.js:1', filePath: 'file1.js', codeType: 'function', language: 'javascript' },
         { id: 'file1.js:2', filePath: 'file1.js', codeType: 'class', language: 'javascript' },
         { id: 'file2.ts:1', filePath: 'file2.ts', codeType: 'function', language: 'typescript' },
-        { id: 'file3.ts:1', filePath: 'file3.ts', codeType: 'interface', language: 'typescript' }
+        { id: 'file3.ts:1', filePath: 'file3.ts', codeType: 'interface', language: 'typescript' },
       ];
 
       await db.addChunks(chunks, embeddings, metadata);
@@ -420,7 +462,11 @@ describe('VectorDatabase', () => {
     it('should return collection name and path', async () => {
       const stats = await db.getStats();
 
-      assert.strictEqual(stats.collectionName, 'code-embeddings', 'should have correct collection name');
+      assert.strictEqual(
+        stats.collectionName,
+        'code-embeddings',
+        'should have correct collection name'
+      );
       assert.ok(stats.dbPath, 'should have db path');
     });
 
@@ -444,7 +490,7 @@ describe('VectorDatabase', () => {
       // Generate 1000 chunks
       const chunks = Array.from({ length: 1000 }, (_, i) => ({
         code: `function func${i}() { return ${i}; }`,
-        type: 'function'
+        type: 'function',
       }));
 
       const embeddings = chunks.map(() => new Array(384).fill(0).map(() => Math.random()));
@@ -456,7 +502,7 @@ describe('VectorDatabase', () => {
         lineEnd: i * 3 + 2,
         codeType: 'function',
         name: `func${i}`,
-        language: 'javascript'
+        language: 'javascript',
       }));
 
       const startTime = Date.now();
@@ -486,7 +532,7 @@ describe('VectorDatabase', () => {
       const startTime = Date.now();
       const results = await db.search(queryEmbedding, {
         topK: 10,
-        filters: { filePath: 'perf-test.js', codeType: 'function' }
+        filters: { filePath: 'perf-test.js', codeType: 'function' },
       });
       const duration = Date.now() - startTime;
 
@@ -509,14 +555,14 @@ describe('VectorDatabase', () => {
       // Re-add some data
       const chunks = Array.from({ length: 100 }, (_, i) => ({
         code: `function f${i}() {}`,
-        type: 'function'
+        type: 'function',
       }));
       const embeddings = chunks.map(() => new Array(384).fill(0).map(() => Math.random()));
       const metadata = chunks.map((_, i) => ({
         id: `test.js:${i}`,
         filePath: 'test.js',
         codeType: 'function',
-        language: 'javascript'
+        language: 'javascript',
       }));
       await db.addChunks(chunks, embeddings, metadata);
 
@@ -587,7 +633,9 @@ describe('VectorDatabase', () => {
       // CREATE
       const chunks = [{ code: 'function test() {}', type: 'function' }];
       const embeddings = [new Array(384).fill(0).map(() => 0.5)];
-      const metadata = [{ id: 'crud:1', filePath: 'crud.js', name: 'test', language: 'javascript' }];
+      const metadata = [
+        { id: 'crud:1', filePath: 'crud.js', name: 'test', language: 'javascript' },
+      ];
 
       await db.addChunks(chunks, embeddings, metadata);
 
@@ -599,7 +647,9 @@ describe('VectorDatabase', () => {
       assert.strictEqual(meta.name, 'test', 'should retrieve metadata');
 
       // UPDATE (via upsert)
-      const updatedMetadata = [{ id: 'crud:1', filePath: 'crud.js', name: 'testUpdated', language: 'javascript' }];
+      const updatedMetadata = [
+        { id: 'crud:1', filePath: 'crud.js', name: 'testUpdated', language: 'javascript' },
+      ];
       await db.addChunks(chunks, embeddings, updatedMetadata);
 
       stats = await db.getStats();
@@ -622,7 +672,9 @@ describe('VectorDatabase', () => {
       const promises = Array.from({ length: 10 }, (_, i) => {
         const chunks = [{ code: `function f${i}() {}`, type: 'function' }];
         const embeddings = [new Array(384).fill(0).map(() => Math.random())];
-        const metadata = [{ id: `concurrent:${i}`, filePath: `file${i}.js`, language: 'javascript' }];
+        const metadata = [
+          { id: `concurrent:${i}`, filePath: `file${i}.js`, language: 'javascript' },
+        ];
 
         return db.addChunks(chunks, embeddings, metadata);
       });
@@ -639,17 +691,19 @@ describe('VectorDatabase', () => {
       // Add two embeddings: identical and orthogonal
       const chunks = [
         { code: 'function a() {}', type: 'function' },
-        { code: 'function b() {}', type: 'function' }
+        { code: 'function b() {}', type: 'function' },
       ];
 
-      const identicalEmbedding = new Array(384).fill(0).map((_, i) => i < 100 ? 1 : 0);
-      const orthogonalEmbedding = new Array(384).fill(0).map((_, i) => i >= 100 && i < 200 ? 1 : 0);
+      const identicalEmbedding = new Array(384).fill(0).map((_, i) => (i < 100 ? 1 : 0));
+      const orthogonalEmbedding = new Array(384)
+        .fill(0)
+        .map((_, i) => (i >= 100 && i < 200 ? 1 : 0));
 
       const embeddings = [identicalEmbedding, orthogonalEmbedding];
 
       const metadata = [
         { id: 'sim:1', filePath: 'sim.js', language: 'javascript' },
-        { id: 'sim:2', filePath: 'sim.js', language: 'javascript' }
+        { id: 'sim:2', filePath: 'sim.js', language: 'javascript' },
       ];
 
       await db.addChunks(chunks, embeddings, metadata);
@@ -659,11 +713,21 @@ describe('VectorDatabase', () => {
 
       // Most similar should be sim:1 (distance ~0)
       assert.strictEqual(results.ids[0][0], 'sim:1', 'most similar should be identical embedding');
-      assert.ok(results.distances[0][0] < 0.01, `distance should be near 0 (got ${results.distances[0][0]})`);
+      assert.ok(
+        results.distances[0][0] < 0.01,
+        `distance should be near 0 (got ${results.distances[0][0]})`
+      );
 
       // Least similar should be sim:2 (distance ~1 for orthogonal vectors)
-      assert.strictEqual(results.ids[0][1], 'sim:2', 'least similar should be orthogonal embedding');
-      assert.ok(results.distances[0][1] > 0.99, `distance should be near 1 (got ${results.distances[0][1]})`);
+      assert.strictEqual(
+        results.ids[0][1],
+        'sim:2',
+        'least similar should be orthogonal embedding'
+      );
+      assert.ok(
+        results.distances[0][1] > 0.99,
+        `distance should be near 1 (got ${results.distances[0][1]})`
+      );
     });
   });
 });

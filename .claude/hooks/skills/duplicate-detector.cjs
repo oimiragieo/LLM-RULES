@@ -65,9 +65,7 @@ function scanSkillsDirectory(skillsDir) {
 
     if (!fs.existsSync(rulesDir)) continue;
 
-    const ruleFiles = fs.readdirSync(rulesDir).filter(f =>
-      f.endsWith('.md') && !f.startsWith('_')
-    );
+    const ruleFiles = fs.readdirSync(rulesDir).filter(f => f.endsWith('.md') && !f.startsWith('_'));
 
     for (const ruleFile of ruleFiles) {
       const rulePath = path.join(rulesDir, ruleFile);
@@ -86,7 +84,7 @@ function scanSkillsDirectory(skillsDir) {
           index.rulesByTitle[title].push({
             skill: skillName,
             file: ruleFile,
-            path: rulePath
+            path: rulePath,
           });
 
           // Track by filename
@@ -96,7 +94,7 @@ function scanSkillsDirectory(skillsDir) {
           index.rulesByFilename[ruleFile].push({
             skill: skillName,
             title: title,
-            path: rulePath
+            path: rulePath,
           });
         }
       } catch (_err) {
@@ -124,8 +122,8 @@ function detectDuplicates(skillsDir, newTitle, newFilePath) {
     const existingRules = index.rulesByTitle[newTitle];
 
     // Filter out the new file itself (when editing)
-    const otherRules = existingRules.filter(r =>
-      path.normalize(r.path) !== path.normalize(newFilePath)
+    const otherRules = existingRules.filter(
+      r => path.normalize(r.path) !== path.normalize(newFilePath)
     );
 
     if (otherRules.length > 0) {
@@ -140,8 +138,8 @@ function detectDuplicates(skillsDir, newTitle, newFilePath) {
     const existingFiles = index.rulesByFilename[newFilename];
 
     // Filter out the new file itself
-    const otherFiles = existingFiles.filter(f =>
-      path.normalize(f.path) !== path.normalize(newFilePath)
+    const otherFiles = existingFiles.filter(
+      f => path.normalize(f.path) !== path.normalize(newFilePath)
     );
 
     if (otherFiles.length > 0) {
@@ -152,7 +150,7 @@ function detectDuplicates(skillsDir, newTitle, newFilePath) {
 
   return {
     hasDuplicates: conflicts.length > 0,
-    conflicts
+    conflicts,
   };
 }
 
@@ -176,8 +174,10 @@ function preToolUse(hookInput) {
 
   // Only validate files in skills/*/rules/ directories
   const normalizedPath = path.normalize(filePath);
-  if (!normalizedPath.includes(path.join('.claude', 'skills')) ||
-      !normalizedPath.includes(path.join('rules'))) {
+  if (
+    !normalizedPath.includes(path.join('.claude', 'skills')) ||
+    !normalizedPath.includes(path.join('rules'))
+  ) {
     return { allowed: true };
   }
 
@@ -209,7 +209,7 @@ function preToolUse(hookInput) {
     if (result.hasDuplicates) {
       return {
         allowed: false,
-        reason: `Duplicate rule detected:\n${result.conflicts.map(c => `  - ${c}`).join('\n')}`
+        reason: `Duplicate rule detected:\n${result.conflicts.map(c => `  - ${c}`).join('\n')}`,
       };
     }
   } catch (err) {
@@ -223,5 +223,5 @@ function preToolUse(hookInput) {
 module.exports = {
   preToolUse,
   detectDuplicates,
-  scanSkillsDirectory
+  scanSkillsDirectory,
 };

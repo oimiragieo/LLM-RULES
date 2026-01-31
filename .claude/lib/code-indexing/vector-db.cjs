@@ -36,7 +36,7 @@ class VectorDatabase {
     return {
       name: this.collectionName,
       metadata: { description: 'Code embeddings for semantic search' },
-      count: this.embeddings.length
+      count: this.embeddings.length,
     };
   }
 
@@ -105,7 +105,7 @@ class VectorDatabase {
       ids: [topResults.map(r => this.ids[r.idx])],
       distances: [topResults.map(r => 1 - r.similarity)], // Convert similarity to distance
       metadatas: [topResults.map(r => this.metadata[r.idx])],
-      documents: [topResults.map(() => null)] // No documents stored
+      documents: [topResults.map(() => null)], // No documents stored
     };
   }
 
@@ -177,7 +177,7 @@ class VectorDatabase {
       fileCount: filePaths.size,
       languages: Array.from(languages),
       collectionName: this.collectionName,
-      dbPath: this.dbPath
+      dbPath: this.dbPath,
     };
   }
 

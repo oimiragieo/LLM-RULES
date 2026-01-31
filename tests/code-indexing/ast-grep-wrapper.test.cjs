@@ -45,7 +45,7 @@ def hello(name):
 
 def goodbye(name):
     return f"Bye, {name}"
-`
+`,
 };
 
 describe('AstGrepSearch', () => {
@@ -159,10 +159,13 @@ describe('AstGrepSearch', () => {
       }
 
       const results = await sg.search('function $NAME($$$) { $$$ }', 'javascript', {
-        include: ['test.js']
+        include: ['test.js'],
       });
 
-      assert.ok(results.every(r => r.filePath.endsWith('test.js')), 'All results should be from test.js');
+      assert.ok(
+        results.every(r => r.filePath.endsWith('test.js')),
+        'All results should be from test.js'
+      );
     });
 
     test('should throw on empty pattern', async () => {
@@ -207,21 +210,17 @@ describe('AstGrepSearch', () => {
           filePath: path.join(TEST_DIR, 'test.js'),
           lineRange: [2, 4],
           code: 'function hello(name) { return "Hello, " + name; }',
-          semanticScore: 0.9
+          semanticScore: 0.9,
         },
         {
           filePath: path.join(TEST_DIR, 'test.js'),
           lineRange: [6, 8],
           code: 'function goodbye(name) { return "Bye, " + name; }',
-          semanticScore: 0.8
-        }
+          semanticScore: 0.8,
+        },
       ];
 
-      const refined = await sg.refine(
-        semanticResults,
-        'function hello($$$) { $$$ }',
-        'javascript'
-      );
+      const refined = await sg.refine(semanticResults, 'function hello($$$) { $$$ }', 'javascript');
 
       assert.strictEqual(refined.length, 2, 'Should have 2 refined results');
 

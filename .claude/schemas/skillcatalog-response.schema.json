@@ -215,9 +215,7 @@
       "code": "INVALID_LIMIT",
       "suggestions": {
         "message": "Adjust your query parameters",
-        "alternatives": [
-          { "limit": 50 }
-        ]
+        "alternatives": [{ "limit": 50 }]
       }
     }
   ]

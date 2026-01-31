@@ -21,24 +21,21 @@ const { IndexManager } = require('../../lib/code-indexing/index-manager.cjs');
 
 // Chalk 5.x is ESM-only, so we use a simple fallback for CommonJS
 const chalk = {
-  blue: (text) => `\x1b[34m${text}\x1b[0m`,
-  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
-  green: (text) => `\x1b[32m${text}\x1b[0m`,
-  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
-  red: (text) => `\x1b[31m${text}\x1b[0m`,
-  gray: (text) => `\x1b[90m${text}\x1b[0m`,
-  bold: (text) => `\x1b[1m${text}\x1b[0m`,
+  blue: text => `\x1b[34m${text}\x1b[0m`,
+  cyan: text => `\x1b[36m${text}\x1b[0m`,
+  green: text => `\x1b[32m${text}\x1b[0m`,
+  yellow: text => `\x1b[33m${text}\x1b[0m`,
+  red: text => `\x1b[31m${text}\x1b[0m`,
+  gray: text => `\x1b[90m${text}\x1b[0m`,
+  bold: text => `\x1b[1m${text}\x1b[0m`,
 };
-chalk.green.bold = (text) => chalk.bold(chalk.green(text));
-chalk.blue.bold = (text) => chalk.bold(chalk.blue(text));
+chalk.green.bold = text => chalk.bold(chalk.green(text));
+chalk.blue.bold = text => chalk.bold(chalk.blue(text));
 
 // Create CLI program
 const program = new Command();
 
-program
-  .name('index-codebase')
-  .description('Code indexing and semantic search')
-  .version('1.0.0');
+program.name('index-codebase').description('Code indexing and semantic search').version('1.0.0');
 
 /**
  * Index command - Index source code directory
@@ -54,11 +51,14 @@ program
       console.log(chalk.blue(`Indexing: ${targetPath}`));
 
       // Progress bars
-      const multibar = new cliProgress.MultiBar({
-        clearOnComplete: false,
-        hideCursor: true,
-        format: '{stage} [{bar}] {percentage}% | {value}/{total}'
-      }, cliProgress.Presets.shades_classic);
+      const multibar = new cliProgress.MultiBar(
+        {
+          clearOnComplete: false,
+          hideCursor: true,
+          format: '{stage} [{bar}] {percentage}% | {value}/{total}',
+        },
+        cliProgress.Presets.shades_classic
+      );
 
       const scanBar = multibar.create(100, 0, { stage: chalk.cyan('✓ Scanning files...  ') });
       const parseBar = multibar.create(100, 0, { stage: chalk.cyan('✓ Parsing...         ') });
@@ -89,7 +89,7 @@ program
             indexBar.setTotal(total);
             indexBar.update(current);
           }
-        }
+        },
       });
 
       // Complete progress bars
@@ -142,7 +142,11 @@ program
 
       results.forEach((result, index) => {
         const [lineStart, lineEnd] = result.lineRange;
-        console.log(chalk.bold(`${index + 1}. ${result.type} - ${result.filePath}:${lineStart}-${lineEnd} (${Math.round(result.similarity * 100)}% match)`));
+        console.log(
+          chalk.bold(
+            `${index + 1}. ${result.type} - ${result.filePath}:${lineStart}-${lineEnd} (${Math.round(result.similarity * 100)}% match)`
+          )
+        );
 
         // Show snippet (first 150 chars)
         if (result.code) {
@@ -219,13 +223,19 @@ program
         const analysis = analyzer.analyze(query);
 
         if (!analysis.astPattern) {
-          console.log(chalk.yellow('Warning: No structural pattern detected, falling back to semantic search'));
+          console.log(
+            chalk.yellow('Warning: No structural pattern detected, falling back to semantic search')
+          );
           results = await hybridSearch.semanticStage(query, topK, language);
           results = results.map(r => ({ ...r, score: r.similarity }));
         } else {
           // Get semantic results first for structural refinement
           const semanticResults = await manager.semanticSearch(query, { limit: topK * 2 });
-          results = await hybridSearch.structuralStage(semanticResults, analysis.astPattern, language);
+          results = await hybridSearch.structuralStage(
+            semanticResults,
+            analysis.astPattern,
+            language
+          );
         }
       } else {
         // Full hybrid search
@@ -249,7 +259,9 @@ program
           if (searchResult.timing.combine) {
             console.log(chalk.gray(`  Combine: ${searchResult.timing.combine}ms`));
           }
-          console.log(chalk.gray(`  Total: ${searchResult.timing.total || (Date.now() - startTime)}ms`));
+          console.log(
+            chalk.gray(`  Total: ${searchResult.timing.total || Date.now() - startTime}ms`)
+          );
         }
       }
 
@@ -272,16 +284,21 @@ program
         const filePath = result.filePath || result.file || 'unknown';
         const type = result.type || 'code';
 
-        console.log(chalk.bold(`${index + 1}. ${type} - ${filePath}:${lineStart}-${lineEnd} (${scorePercent}% score)`));
+        console.log(
+          chalk.bold(
+            `${index + 1}. ${type} - ${filePath}:${lineStart}-${lineEnd} (${scorePercent}% score)`
+          )
+        );
 
         // Show code snippet
         if (result.code || result.text) {
           const snippet = (result.code || result.text).substring(0, 150).trim();
-          console.log(chalk.gray(`   ${snippet}${(result.code || result.text).length > 150 ? '...' : ''}`));
+          console.log(
+            chalk.gray(`   ${snippet}${(result.code || result.text).length > 150 ? '...' : ''}`)
+          );
         }
         console.log('');
       });
-
     } catch (error) {
       console.error(chalk.red('Error in hybrid search:'), error.message);
       if (error.stack) {
@@ -302,7 +319,10 @@ program
       const metadataPath = path.join(process.cwd(), '.claude/context/code-index/metadata.json');
 
       // Check if index exists
-      const exists = await fs.access(metadataPath).then(() => true).catch(() => false);
+      const exists = await fs
+        .access(metadataPath)
+        .then(() => true)
+        .catch(() => false);
       if (!exists) {
         console.log(chalk.yellow('No index found. Run "index" command first.'));
         return;
@@ -323,7 +343,11 @@ program
 
       // Show language breakdown
       if (metadata.stats.byLanguage) {
-        console.log(`  Languages: ${Object.entries(metadata.stats.byLanguage).map(([lang, count]) => `${lang} (${count})`).join(', ')}`);
+        console.log(
+          `  Languages: ${Object.entries(metadata.stats.byLanguage)
+            .map(([lang, count]) => `${lang} (${count})`)
+            .join(', ')}`
+        );
       }
 
       // Check hybrid search availability
@@ -333,7 +357,9 @@ program
         const available = await astGrep.isAvailable();
         console.log(`\nHybrid Search:`);
         console.log(`  Semantic: ${chalk.green('✓ Available')}`);
-        console.log(`  Structural (ast-grep): ${available ? chalk.green('✓ Available') : chalk.yellow('○ Not available')}`);
+        console.log(
+          `  Structural (ast-grep): ${available ? chalk.green('✓ Available') : chalk.yellow('○ Not available')}`
+        );
         if (available) {
           const version = await astGrep.getVersion();
           console.log(`  ast-grep version: ${version}`);
@@ -354,12 +380,15 @@ program
   .command('clear')
   .description('Clear the index')
   .option('--confirm', 'Skip confirmation prompt')
-  .action(async (options) => {
+  .action(async options => {
     try {
       const indexDir = path.join(process.cwd(), '.claude/context/code-index');
 
       // Check if index exists
-      const exists = await fs.access(indexDir).then(() => true).catch(() => false);
+      const exists = await fs
+        .access(indexDir)
+        .then(() => true)
+        .catch(() => false);
       if (!exists) {
         console.log(chalk.yellow('No index found.'));
         return;

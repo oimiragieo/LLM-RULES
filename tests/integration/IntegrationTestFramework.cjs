@@ -60,7 +60,7 @@ class IntegrationTestFramework {
       id,
       steps,
       expected,
-      status: 'pending'
+      status: 'pending',
     });
   }
 
@@ -89,7 +89,7 @@ class IntegrationTestFramework {
             name: step.name,
             status: 'passed',
             duration: Date.now() - stepStart,
-            result
+            result,
           });
         } catch (error) {
           failedStep = index;
@@ -98,7 +98,7 @@ class IntegrationTestFramework {
             name: step.name,
             status: 'failed',
             duration: Date.now() - stepStart,
-            error: error.message
+            error: error.message,
           });
           break;
         }
@@ -109,7 +109,7 @@ class IntegrationTestFramework {
         status: failedStep === null ? 'passed' : 'failed',
         duration: Date.now() - startTime,
         steps: stepResults,
-        failedStep
+        failedStep,
       };
 
       this.results.push(result);
@@ -120,7 +120,7 @@ class IntegrationTestFramework {
         status: 'error',
         duration: Date.now() - startTime,
         steps: stepResults,
-        error: error.message
+        error: error.message,
       };
       this.results.push(result);
       throw error;
@@ -133,11 +133,13 @@ class IntegrationTestFramework {
    * @returns {Promise<Array<Object>>} Execution results
    */
   async executeParallel(ids) {
-    const promises = ids.map(id => this.executeSequential(id).catch(err => ({
-      scenarioId: id,
-      status: 'error',
-      error: err.message
-    })));
+    const promises = ids.map(id =>
+      this.executeSequential(id).catch(err => ({
+        scenarioId: id,
+        status: 'error',
+        error: err.message,
+      }))
+    );
     return Promise.all(promises);
   }
 
@@ -162,7 +164,7 @@ class IntegrationTestFramework {
   validateOutcome(result, expected) {
     const validation = {
       passed: true,
-      mismatches: []
+      mismatches: [],
     };
 
     // Validate status
@@ -171,7 +173,7 @@ class IntegrationTestFramework {
       validation.mismatches.push({
         field: 'status',
         expected: expected.status,
-        actual: result.status
+        actual: result.status,
       });
     }
 
@@ -184,7 +186,7 @@ class IntegrationTestFramework {
           validation.mismatches.push({
             field: key,
             expected: shouldExist ? 'exists' : 'not exists',
-            actual: exists ? 'exists' : 'not exists'
+            actual: exists ? 'exists' : 'not exists',
           });
         }
       }
@@ -196,7 +198,7 @@ class IntegrationTestFramework {
       validation.mismatches.push({
         field: 'stepCount',
         expected: expected.stepCount,
-        actual: result.steps?.length || 0
+        actual: result.steps?.length || 0,
       });
     }
 
@@ -213,7 +215,7 @@ class IntegrationTestFramework {
       succeeded: results.filter(r => r.status === 'passed'),
       failed: results.filter(r => r.status === 'failed' || r.status === 'error'),
       total: results.length,
-      passRate: results.filter(r => r.status === 'passed').length / results.length
+      passRate: results.filter(r => r.status === 'passed').length / results.length,
     };
   }
 

@@ -30,26 +30,96 @@ const SETTINGS_PATH = path.join(PROJECT_ROOT, '.claude', 'settings.json');
 
 // Core tools definition (from CLAUDE.md Section 1.4)
 const CORE_TOOLS = [
-  { name: 'Read', category: 'File I/O', description: 'Read files from filesystem', mandatory: false },
+  {
+    name: 'Read',
+    category: 'File I/O',
+    description: 'Read files from filesystem',
+    mandatory: false,
+  },
   { name: 'Write', category: 'File I/O', description: 'Create/overwrite files', mandatory: false },
-  { name: 'Edit', category: 'File I/O', description: 'Make precise edits to files', mandatory: false },
+  {
+    name: 'Edit',
+    category: 'File I/O',
+    description: 'Make precise edits to files',
+    mandatory: false,
+  },
   { name: 'Bash', category: 'Shell', description: 'Execute shell commands', mandatory: false },
-  { name: 'Glob', category: 'Search', description: 'Pattern-based file discovery', mandatory: false },
+  {
+    name: 'Glob',
+    category: 'Search',
+    description: 'Pattern-based file discovery',
+    mandatory: false,
+  },
   { name: 'Grep', category: 'Search', description: 'Content search in files', mandatory: false },
   { name: 'Task', category: 'Orchestration', description: 'Spawn subagents', mandatory: false },
-  { name: 'TaskCreate', category: 'Task Management', description: 'Create trackable tasks', mandatory: false },
-  { name: 'TaskUpdate', category: 'Task Management', description: 'Update task status/metadata', mandatory: true },
-  { name: 'TaskList', category: 'Task Management', description: 'List all tasks', mandatory: false },
-  { name: 'TaskGet', category: 'Task Management', description: 'Get task details', mandatory: false },
-  { name: 'TaskOutput', category: 'Task Management', description: 'Read task output', mandatory: false },
-  { name: 'TaskStop', category: 'Task Management', description: 'Stop running task', mandatory: false },
+  {
+    name: 'TaskCreate',
+    category: 'Task Management',
+    description: 'Create trackable tasks',
+    mandatory: false,
+  },
+  {
+    name: 'TaskUpdate',
+    category: 'Task Management',
+    description: 'Update task status/metadata',
+    mandatory: true,
+  },
+  {
+    name: 'TaskList',
+    category: 'Task Management',
+    description: 'List all tasks',
+    mandatory: false,
+  },
+  {
+    name: 'TaskGet',
+    category: 'Task Management',
+    description: 'Get task details',
+    mandatory: false,
+  },
+  {
+    name: 'TaskOutput',
+    category: 'Task Management',
+    description: 'Read task output',
+    mandatory: false,
+  },
+  {
+    name: 'TaskStop',
+    category: 'Task Management',
+    description: 'Stop running task',
+    mandatory: false,
+  },
   { name: 'Skill', category: 'Capability', description: 'Invoke skill workflows', mandatory: true },
-  { name: 'AskUserQuestion', category: 'Interaction', description: 'Get user input', mandatory: false },
-  { name: 'EnterPlanMode', category: 'Planning', description: 'Switch to planning mode', mandatory: false },
-  { name: 'ExitPlanMode', category: 'Planning', description: 'Exit planning mode', mandatory: false },
+  {
+    name: 'AskUserQuestion',
+    category: 'Interaction',
+    description: 'Get user input',
+    mandatory: false,
+  },
+  {
+    name: 'EnterPlanMode',
+    category: 'Planning',
+    description: 'Switch to planning mode',
+    mandatory: false,
+  },
+  {
+    name: 'ExitPlanMode',
+    category: 'Planning',
+    description: 'Exit planning mode',
+    mandatory: false,
+  },
   { name: 'WebSearch', category: 'Research', description: 'Search the web', mandatory: false },
-  { name: 'WebFetch', category: 'Research', description: 'Fetch webpage content', mandatory: false },
-  { name: 'NotebookEdit', category: 'Jupyter', description: 'Edit notebook cells', mandatory: false }
+  {
+    name: 'WebFetch',
+    category: 'Research',
+    description: 'Fetch webpage content',
+    mandatory: false,
+  },
+  {
+    name: 'NotebookEdit',
+    category: 'Jupyter',
+    description: 'Edit notebook cells',
+    mandatory: false,
+  },
 ];
 
 // MCP tools definition (from CLAUDE.md Section 1.4)
@@ -59,127 +129,193 @@ const MCP_TOOLS = [
     server: 'chrome-devtools',
     description: 'Browser automation via Chrome DevTools Protocol',
     fallback: "Skill({ skill: 'chrome-browser' })",
-    fallbackTools: ['Read', 'Write', 'WebFetch']
+    fallbackTools: ['Read', 'Write', 'WebFetch'],
   },
   {
     name: 'mcp__sequential-thinking__sequentialthinking',
     server: 'sequential-thinking',
     description: 'Structured thinking and analysis',
     fallback: "Skill({ skill: 'sequential-thinking' })",
-    fallbackTools: ['Read', 'Write', 'Bash']
+    fallbackTools: ['Read', 'Write', 'Bash'],
   },
   {
     name: 'mcp__Ref__ref_search_documentation',
     server: 'Ref',
     description: 'Documentation search',
     fallback: 'WebSearch + WebFetch',
-    fallbackTools: ['WebSearch', 'WebFetch']
+    fallbackTools: ['WebSearch', 'WebFetch'],
   },
   {
     name: 'mcp__Ref__ref_read_url',
     server: 'Ref',
     description: 'Read URL content via Ref',
     fallback: 'WebFetch',
-    fallbackTools: ['WebFetch']
+    fallbackTools: ['WebFetch'],
   },
   {
     name: 'mcp__Exa__web_search_exa',
     server: 'Exa',
     description: 'Enhanced web search via Exa',
     fallback: 'WebSearch',
-    fallbackTools: ['WebSearch']
+    fallbackTools: ['WebSearch'],
   },
   {
     name: 'mcp__Exa__get_code_context_exa',
     server: 'Exa',
     description: 'Code context search via Exa',
     fallback: 'Grep + Glob',
-    fallbackTools: ['Grep', 'Glob']
+    fallbackTools: ['Grep', 'Glob'],
   },
   {
     name: 'mcp__Exa__company_research_exa',
     server: 'Exa',
     description: 'Company research via Exa',
     fallback: 'WebSearch',
-    fallbackTools: ['WebSearch']
+    fallbackTools: ['WebSearch'],
   },
   {
     name: 'mcp__shadcn__getComponents',
     server: 'shadcn',
     description: 'Get shadcn/ui components list',
     fallback: "WebFetch('https://ui.shadcn.com/...')",
-    fallbackTools: ['WebFetch']
+    fallbackTools: ['WebFetch'],
   },
   {
     name: 'mcp__shadcn__getComponent',
     server: 'shadcn',
     description: 'Get specific shadcn/ui component',
     fallback: "WebFetch('https://ui.shadcn.com/...')",
-    fallbackTools: ['WebFetch']
-  }
+    fallbackTools: ['WebFetch'],
+  },
 ];
 
 // Toolset definitions (from CLAUDE.md Section 1.4)
 const TOOLSETS = {
   CORE_TOOLS: {
     description: 'All 20 core tools built into Claude Code',
-    tools: CORE_TOOLS.map(t => t.name)
+    tools: CORE_TOOLS.map(t => t.name),
   },
   DEVELOPER: {
     description: 'Standard development agent toolset',
-    tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill'],
-    mandatory: ['TaskUpdate', 'Skill']
+    tools: [
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+    ],
+    mandatory: ['TaskUpdate', 'Skill'],
   },
   PLANNER: {
     description: 'Planning agent toolset with planning mode',
-    tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill', 'EnterPlanMode', 'ExitPlanMode'],
-    mandatory: ['TaskUpdate', 'Skill']
+    tools: [
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+      'EnterPlanMode',
+      'ExitPlanMode',
+    ],
+    mandatory: ['TaskUpdate', 'Skill'],
   },
   ORCHESTRATOR: {
     description: 'Agent orchestration toolset (can spawn subagents)',
-    tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill'],
-    mandatory: ['Task', 'TaskUpdate', 'Skill']
+    tools: [
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'Task',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+    ],
+    mandatory: ['Task', 'TaskUpdate', 'Skill'],
   },
   ROUTER: {
     description: 'Router-only toolset (restricted)',
     tools: ['Read', 'Task', 'TaskList', 'TaskCreate', 'TaskUpdate', 'TaskGet', 'AskUserQuestion'],
-    mandatory: ['Task', 'TaskList']
+    mandatory: ['Task', 'TaskList'],
   },
   RESEARCHER: {
     description: 'Research agent toolset with web access',
-    tools: ['Read', 'Glob', 'Grep', 'WebSearch', 'WebFetch', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'],
-    mandatory: ['TaskUpdate', 'Skill']
+    tools: [
+      'Read',
+      'Glob',
+      'Grep',
+      'WebSearch',
+      'WebFetch',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
+    ],
+    mandatory: ['TaskUpdate', 'Skill'],
   },
   READ_ONLY: {
     description: 'Read-only agent toolset (e.g., code-reviewer)',
     tools: ['Read', 'Glob', 'Grep', 'TaskUpdate', 'TaskList', 'Skill'],
-    mandatory: ['TaskUpdate', 'Skill']
+    mandatory: ['TaskUpdate', 'Skill'],
   },
   DATA_SCIENCE: {
     description: 'Data science and ML toolset with Jupyter support',
-    tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'NotebookEdit', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'],
-    mandatory: ['TaskUpdate', 'Skill']
-  }
+    tools: [
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'NotebookEdit',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
+    ],
+    mandatory: ['TaskUpdate', 'Skill'],
+  },
 };
 
 // Agent defaults (from CLAUDE.md Section 1.4)
 const AGENT_DEFAULTS = {
-  'developer': { toolset: 'DEVELOPER', maxTools: 12 },
-  'qa': { toolset: 'DEVELOPER', maxTools: 12 },
-  'planner': { toolset: 'PLANNER', maxTools: 14 },
-  'architect': { toolset: 'PLANNER', maxTools: 14 },
+  developer: { toolset: 'DEVELOPER', maxTools: 12 },
+  qa: { toolset: 'DEVELOPER', maxTools: 12 },
+  planner: { toolset: 'PLANNER', maxTools: 14 },
+  architect: { toolset: 'PLANNER', maxTools: 14 },
   'security-architect': { toolset: 'DEVELOPER', maxTools: 12 },
   'technical-writer': { toolset: 'DEVELOPER', maxTools: 12 },
-  'devops': { toolset: 'DEVELOPER', maxTools: 12 },
+  devops: { toolset: 'DEVELOPER', maxTools: 12 },
   'code-reviewer': { toolset: 'READ_ONLY', maxTools: 6 },
-  'researcher': { toolset: 'RESEARCHER', maxTools: 10 },
+  researcher: { toolset: 'RESEARCHER', maxTools: 10 },
   'master-orchestrator': { toolset: 'ORCHESTRATOR', maxTools: 13 },
   'swarm-coordinator': { toolset: 'ORCHESTRATOR', maxTools: 13 },
   'evolution-orchestrator': { toolset: 'ORCHESTRATOR', maxTools: 13 },
   'party-orchestrator': { toolset: 'ORCHESTRATOR', maxTools: 13 },
   'context-compressor': { toolset: 'DEVELOPER', maxTools: 5 },
   'data-engineer': { toolset: 'DATA_SCIENCE', maxTools: 12 },
-  'ai-ml-specialist': { toolset: 'DATA_SCIENCE', maxTools: 12 }
+  'ai-ml-specialist': { toolset: 'DATA_SCIENCE', maxTools: 12 },
 };
 
 /**
@@ -219,10 +355,20 @@ function generateManifest(options = {}) {
     status: 'available',
     mandatory: tool.mandatory,
     availability: {
-      agents: tool.name === 'AskUserQuestion' ? 'no' : (tool.name === 'Task' ? 'no' : 'all'),
+      agents: tool.name === 'AskUserQuestion' ? 'no' : tool.name === 'Task' ? 'no' : 'all',
       orchestrators: tool.name === 'AskUserQuestion' ? 'no' : 'all',
-      router: ['Read', 'Task', 'TaskList', 'TaskCreate', 'TaskUpdate', 'TaskGet', 'AskUserQuestion'].includes(tool.name) ? 'yes' : 'no'
-    }
+      router: [
+        'Read',
+        'Task',
+        'TaskList',
+        'TaskCreate',
+        'TaskUpdate',
+        'TaskGet',
+        'AskUserQuestion',
+      ].includes(tool.name)
+        ? 'yes'
+        : 'no',
+    },
   }));
 
   // Build MCP tools array
@@ -237,7 +383,7 @@ function generateManifest(options = {}) {
       mcp_server: tool.server,
       fallback: tool.fallback,
       fallback_status: 'available',
-      fallback_tools: tool.fallbackTools
+      fallback_tools: tool.fallbackTools,
     };
   });
 
@@ -248,7 +394,7 @@ function generateManifest(options = {}) {
     agentDefaults[agent] = {
       toolset: config.toolset,
       tools: toolset.tools,
-      maxTools: config.maxTools
+      maxTools: config.maxTools,
     };
   }
 
@@ -261,12 +407,12 @@ function generateManifest(options = {}) {
       totalMcpTools: MCP_TOOLS.length,
       totalAgents: Object.keys(agentDefaults).length,
       lastValidated: new Date().toISOString(),
-      source: '.claude/CLAUDE.md sections 1.1-1.4'
+      source: '.claude/CLAUDE.md sections 1.1-1.4',
     },
     tools: {
       core: coreToolsArray,
       mcp: mcpToolsArray,
-      toolsets: TOOLSETS
+      toolsets: TOOLSETS,
     },
     constraints: {
       maxToolsPerAgent: 15,
@@ -275,20 +421,26 @@ function generateManifest(options = {}) {
         coreTools: CORE_TOOLS.length,
         mcpTools: MCP_TOOLS.length,
         totalAvailable: CORE_TOOLS.length,
-        totalUnavailable: mcpToolsArray.filter(t => t.status === 'unavailable').length
-      }
+        totalUnavailable: mcpToolsArray.filter(t => t.status === 'unavailable').length,
+      },
     },
     validation: {
       agentDefaults,
       reservedTools: {
-        Task: ['router', 'master-orchestrator', 'evolution-orchestrator', 'swarm-coordinator', 'party-orchestrator'],
-        AskUserQuestion: ['router']
+        Task: [
+          'router',
+          'master-orchestrator',
+          'evolution-orchestrator',
+          'swarm-coordinator',
+          'party-orchestrator',
+        ],
+        AskUserQuestion: ['router'],
       },
       mandatoryTools: ['TaskUpdate', 'Skill'],
       blockOnMissingMandatory: true,
       warnOnMCPWithoutServer: true,
-      blockOnUnknownTool: true
-    }
+      blockOnUnknownTool: true,
+    },
   };
 
   if (verbose) {
@@ -297,8 +449,12 @@ function generateManifest(options = {}) {
     console.log(`  - ${MCP_TOOLS.length} MCP tools`);
     console.log(`  - ${Object.keys(TOOLSETS).length} toolsets`);
     console.log(`  - ${Object.keys(agentDefaults).length} agent defaults`);
-    console.log(`  - ${mcpToolsArray.filter(t => t.status === 'available').length} MCP tools available`);
-    console.log(`  - ${mcpToolsArray.filter(t => t.status === 'unavailable').length} MCP tools unavailable`);
+    console.log(
+      `  - ${mcpToolsArray.filter(t => t.status === 'available').length} MCP tools available`
+    );
+    console.log(
+      `  - ${mcpToolsArray.filter(t => t.status === 'unavailable').length} MCP tools unavailable`
+    );
   }
 
   return manifest;

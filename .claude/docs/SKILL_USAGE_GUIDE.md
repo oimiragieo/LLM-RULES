@@ -50,13 +50,13 @@ Skill({ skill: 'vercel-deploy' });
 
 ### When to Use Each Skill
 
-| Skill                              | Trigger Scenarios                                                              |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| **React Performance**              | Code review, optimization, performance issues, bundle size problems            |
-| **React Native**                   | Mobile optimization, FlatList slow, animation issues, Expo performance         |
-| **Composition Patterns**           | Component architecture, refactoring, design systems, React 19 API changes      |
-| **Web Design**                     | Accessibility audits, UI review, WCAG compliance, dark mode, internationalized |
-| **Vercel Deploy**                  | Deployment automation, CI/CD setup, framework detection, production deploys    |
+| Skill                    | Trigger Scenarios                                                              |
+| ------------------------ | ------------------------------------------------------------------------------ |
+| **React Performance**    | Code review, optimization, performance issues, bundle size problems            |
+| **React Native**         | Mobile optimization, FlatList slow, animation issues, Expo performance         |
+| **Composition Patterns** | Component architecture, refactoring, design systems, React 19 API changes      |
+| **Web Design**           | Accessibility audits, UI review, WCAG compliance, dark mode, internationalized |
+| **Vercel Deploy**        | Deployment automation, CI/CD setup, framework detection, production deploys    |
 
 ---
 
@@ -263,13 +263,13 @@ Skill({ skill: 'vercel-deploy' });
 
 ## Performance Impact
 
-| Skill                  | Execution Time | Network Required | Blocking? |
-| ---------------------- | -------------- | ---------------- | --------- |
-| React Performance      | 500-1000ms     | No               | No        |
-| React Native           | 300-500ms      | No               | No        |
-| Composition Patterns   | 200-300ms      | No               | No        |
-| Web Design             | 1000-2000ms    | Yes              | No        |
-| Vercel Deploy          | 1000-3000ms    | Yes              | Yes       |
+| Skill                | Execution Time | Network Required | Blocking? |
+| -------------------- | -------------- | ---------------- | --------- |
+| React Performance    | 500-1000ms     | No               | No        |
+| React Native         | 300-500ms      | No               | No        |
+| Composition Patterns | 200-300ms      | No               | No        |
+| Web Design           | 1000-2000ms    | Yes              | No        |
+| Vercel Deploy        | 1000-3000ms    | Yes              | Yes       |
 
 **Note:** Execution times are estimates. Actual time depends on code size and network conditions.
 

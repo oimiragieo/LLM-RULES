@@ -6,7 +6,10 @@
 
 const { test, suite } = require('node:test');
 const assert = require('node:assert');
-const { SemanticChunker, CHUNK_TYPES } = require('../../.claude/lib/code-indexing/semantic-chunker.cjs');
+const {
+  SemanticChunker,
+  CHUNK_TYPES,
+} = require('../../.claude/lib/code-indexing/semantic-chunker.cjs');
 
 suite('SemanticChunker', () => {
   suite('Constructor and Defaults', () => {
@@ -89,20 +92,38 @@ suite('SemanticChunker', () => {
   suite('Node Type Mapping (38.4)', () => {
     test('maps JavaScript node types', () => {
       const chunker = new SemanticChunker();
-      assert.strictEqual(chunker.getChunkType('function_declaration', 'javascript'), CHUNK_TYPES.FUNCTION);
-      assert.strictEqual(chunker.getChunkType('class_declaration', 'javascript'), CHUNK_TYPES.CLASS);
-      assert.strictEqual(chunker.getChunkType('method_definition', 'javascript'), CHUNK_TYPES.METHOD);
+      assert.strictEqual(
+        chunker.getChunkType('function_declaration', 'javascript'),
+        CHUNK_TYPES.FUNCTION
+      );
+      assert.strictEqual(
+        chunker.getChunkType('class_declaration', 'javascript'),
+        CHUNK_TYPES.CLASS
+      );
+      assert.strictEqual(
+        chunker.getChunkType('method_definition', 'javascript'),
+        CHUNK_TYPES.METHOD
+      );
     });
 
     test('maps TypeScript node types', () => {
       const chunker = new SemanticChunker();
-      assert.strictEqual(chunker.getChunkType('interface_declaration', 'typescript'), CHUNK_TYPES.INTERFACE);
-      assert.strictEqual(chunker.getChunkType('type_alias_declaration', 'typescript'), CHUNK_TYPES.TYPE);
+      assert.strictEqual(
+        chunker.getChunkType('interface_declaration', 'typescript'),
+        CHUNK_TYPES.INTERFACE
+      );
+      assert.strictEqual(
+        chunker.getChunkType('type_alias_declaration', 'typescript'),
+        CHUNK_TYPES.TYPE
+      );
     });
 
     test('maps Python node types', () => {
       const chunker = new SemanticChunker();
-      assert.strictEqual(chunker.getChunkType('function_definition', 'python'), CHUNK_TYPES.FUNCTION);
+      assert.strictEqual(
+        chunker.getChunkType('function_definition', 'python'),
+        CHUNK_TYPES.FUNCTION
+      );
       assert.strictEqual(chunker.getChunkType('class_definition', 'python'), CHUNK_TYPES.CLASS);
     });
 
@@ -119,8 +140,8 @@ suite('SemanticChunker', () => {
         type: 'function_declaration',
         children: [
           { type: 'keyword', text: 'function' },
-          { type: 'identifier', text: 'myFunction' }
-        ]
+          { type: 'identifier', text: 'myFunction' },
+        ],
       };
       assert.strictEqual(chunker.extractName(mockNode, 'javascript'), 'myFunction');
     });
@@ -129,7 +150,7 @@ suite('SemanticChunker', () => {
       const chunker = new SemanticChunker();
       const mockNode = {
         type: 'expression_statement',
-        children: []
+        children: [],
       };
       assert.strictEqual(chunker.extractName(mockNode, 'javascript'), null);
     });
@@ -141,7 +162,7 @@ suite('SemanticChunker', () => {
 }`;
       const mockNode = {
         startPosition: { row: 0, column: 0 },
-        text: content
+        text: content,
       };
       const signature = chunker.extractSignature(mockNode, content);
       assert.ok(signature.includes('function myFunction'));
@@ -164,11 +185,11 @@ suite('SemanticChunker', () => {
               endPosition: { row: 2, column: 1 },
               children: [
                 { type: 'function', text: 'function' },
-                { type: 'identifier', text: 'hello' }
-              ]
-            }
-          ]
-        }
+                { type: 'identifier', text: 'hello' },
+              ],
+            },
+          ],
+        },
       };
 
       const chunks = chunker.chunk(parseResult, 'test.js');
@@ -190,10 +211,10 @@ suite('SemanticChunker', () => {
               text: 'x',
               startPosition: { row: 0, column: 0 },
               endPosition: { row: 0, column: 1 },
-              children: []
-            }
-          ]
-        }
+              children: [],
+            },
+          ],
+        },
       };
 
       const chunks = chunker.chunk(parseResult, 'test.js');
@@ -215,8 +236,8 @@ suite('SemanticChunker', () => {
               endPosition: { row: 0, column: 28 },
               children: [
                 { type: 'function', text: 'function' },
-                { type: 'identifier', text: 'foo' }
-              ]
+                { type: 'identifier', text: 'foo' },
+              ],
             },
             {
               type: 'function_declaration',
@@ -225,11 +246,11 @@ suite('SemanticChunker', () => {
               endPosition: { row: 1, column: 28 },
               children: [
                 { type: 'function', text: 'function' },
-                { type: 'identifier', text: 'bar' }
-              ]
-            }
-          ]
-        }
+                { type: 'identifier', text: 'bar' },
+              ],
+            },
+          ],
+        },
       };
 
       const chunks = chunker.chunk(parseResult, 'test.js');
@@ -248,11 +269,17 @@ suite('SemanticChunker', () => {
         endPosition: { row: 0, column: content.length },
         children: [
           { type: 'function', text: 'function' },
-          { type: 'identifier', text: 'test' }
-        ]
+          { type: 'identifier', text: 'test' },
+        ],
       };
 
-      const chunk = chunker.createChunk(mockNode, CHUNK_TYPES.FUNCTION, 'javascript', 'test.js', content);
+      const chunk = chunker.createChunk(
+        mockNode,
+        CHUNK_TYPES.FUNCTION,
+        'javascript',
+        'test.js',
+        content
+      );
       assert.ok(chunk.id);
       assert.strictEqual(chunk.type, CHUNK_TYPES.FUNCTION);
       assert.strictEqual(chunk.language, 'javascript');
@@ -298,31 +325,25 @@ suite('SemanticChunker', () => {
                 text: '  constructor() {\n    this.value = 0;\n  }',
                 startPosition: { row: 1, column: 2 },
                 endPosition: { row: 3, column: 3 },
-                children: [
-                  { type: 'property_identifier', text: 'constructor' }
-                ]
+                children: [{ type: 'property_identifier', text: 'constructor' }],
               },
               {
                 type: 'method_definition',
                 text: '  add(x) {\n    this.value += x;\n    return this.value;\n  }',
                 startPosition: { row: 5, column: 2 },
                 endPosition: { row: 8, column: 3 },
-                children: [
-                  { type: 'property_identifier', text: 'add' }
-                ]
+                children: [{ type: 'property_identifier', text: 'add' }],
               },
               {
                 type: 'method_definition',
                 text: '  subtract(x) {\n    this.value -= x;\n    return this.value;\n  }',
                 startPosition: { row: 10, column: 2 },
                 endPosition: { row: 13, column: 3 },
-                children: [
-                  { type: 'property_identifier', text: 'subtract' }
-                ]
-              }
-            ]
-          }
-        ]
+                children: [{ type: 'property_identifier', text: 'subtract' }],
+              },
+            ],
+          },
+        ],
       };
 
       const chunks = chunker.chunkClass(mockClassNode, 'javascript', 'Calculator.js', content);
@@ -349,7 +370,7 @@ suite('SemanticChunker', () => {
         tokenCount: 150,
         name: 'largeFunc',
         signature: 'function largeFunc()',
-        parentChunk: null
+        parentChunk: null,
       };
 
       const chunks = chunker.splitLargeChunk(largeChunk);
@@ -383,7 +404,7 @@ suite('SemanticChunker', () => {
         tokenCount: 10,
         name: 'small',
         signature: 'function small()',
-        parentChunk: null
+        parentChunk: null,
       };
 
       const chunks = chunker.splitLargeChunk(smallChunk);

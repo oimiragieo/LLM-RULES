@@ -371,39 +371,73 @@ This document provides the complete architectural specification for fixing agent
     "DEVELOPER": {
       "description": "Standard development agent toolset",
       "tools": [
-        "Read", "Write", "Edit", "Bash", "Glob", "Grep",
-        "TaskUpdate", "TaskList", "TaskCreate", "TaskGet", "TaskOutput", "Skill"
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
       ],
       "mandatory": ["TaskUpdate", "Skill"]
     },
     "ORCHESTRATOR": {
       "description": "Agent orchestration toolset (can spawn subagents)",
       "tools": [
-        "Read", "Write", "Edit", "Bash", "Glob", "Grep", "Task",
-        "TaskUpdate", "TaskList", "TaskCreate", "TaskGet", "TaskOutput", "Skill"
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "Task",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
       ],
       "mandatory": ["Task", "TaskUpdate", "Skill"]
     },
     "ROUTER": {
       "description": "Router-only toolset (restricted)",
       "tools": [
-        "Read", "Task", "TaskList", "TaskCreate", "TaskUpdate", "TaskGet", "AskUserQuestion"
+        "Read",
+        "Task",
+        "TaskList",
+        "TaskCreate",
+        "TaskUpdate",
+        "TaskGet",
+        "AskUserQuestion"
       ],
       "mandatory": ["Task", "TaskList"]
     },
     "READ_ONLY": {
       "description": "Read-only agent toolset (e.g., code-reviewer, researcher)",
-      "tools": [
-        "Read", "Glob", "Grep", "WebSearch", "WebFetch",
-        "TaskUpdate", "TaskList", "Skill"
-      ],
+      "tools": ["Read", "Glob", "Grep", "WebSearch", "WebFetch", "TaskUpdate", "TaskList", "Skill"],
       "mandatory": ["TaskUpdate", "Skill"]
     },
     "DATA_SCIENCE": {
       "description": "Data science and ML toolset",
       "tools": [
-        "Read", "Write", "Edit", "Bash", "Glob", "Grep",
-        "NotebookEdit", "TaskUpdate", "TaskList", "TaskCreate", "TaskGet", "Skill"
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "NotebookEdit",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
       ],
       "mandatory": ["TaskUpdate", "Skill"]
     }
@@ -642,7 +676,9 @@ function validateSpawnRequest(spawnRequest) {
 
   // 3. Check tool count limit
   if (allowedTools.length > manifest.validation.maxToolsPerAgent) {
-    warnings.push(`Tool count (${allowedTools.length}) exceeds recommended max (${manifest.validation.maxToolsPerAgent})`);
+    warnings.push(
+      `Tool count (${allowedTools.length}) exceeds recommended max (${manifest.validation.maxToolsPerAgent})`
+    );
     suggestions.push('Reduce tool count to domain-relevant tools only');
   }
 
@@ -665,7 +701,9 @@ function validateSpawnRequest(spawnRequest) {
         const missingTools = skill.requiredTools.filter(t => !allowedTools.includes(t));
         if (missingTools.length > 0) {
           warnings.push(`Skill ${skillName} requires tools: ${missingTools.join(', ')}`);
-          suggestions.push(`Add ${missingTools.join(', ')} to allowed_tools for skill ${skillName}`);
+          suggestions.push(
+            `Add ${missingTools.join(', ')} to allowed_tools for skill ${skillName}`
+          );
         }
       }
     }
@@ -678,7 +716,7 @@ function validateSpawnRequest(spawnRequest) {
     suggestions,
     toolCount: allowedTools.length,
     agentType,
-    validatedAt: new Date().toISOString()
+    validatedAt: new Date().toISOString(),
   };
 }
 
@@ -689,8 +727,16 @@ function extractAgentType(spawnRequest) {
   }
   // Try to extract from description
   const description = (spawnRequest.description || '').toLowerCase();
-  const agentTypes = ['developer', 'planner', 'architect', 'qa', 'security-architect',
-                      'devops', 'researcher', 'master-orchestrator'];
+  const agentTypes = [
+    'developer',
+    'planner',
+    'architect',
+    'qa',
+    'security-architect',
+    'devops',
+    'researcher',
+    'master-orchestrator',
+  ];
   for (const type of agentTypes) {
     if (description.includes(type)) return type;
   }
@@ -699,10 +745,12 @@ function extractAgentType(spawnRequest) {
 
 function extractSkillsFromPrompt(prompt) {
   const skillMatches = prompt.match(/Skill\s*\(\s*\{\s*skill\s*:\s*['"]([^'"]+)['"]/g) || [];
-  return skillMatches.map(m => {
-    const match = m.match(/skill\s*:\s*['"]([^'"]+)['"]/);
-    return match ? match[1] : null;
-  }).filter(Boolean);
+  return skillMatches
+    .map(m => {
+      const match = m.match(/skill\s*:\s*['"]([^'"]+)['"]/);
+      return match ? match[1] : null;
+    })
+    .filter(Boolean);
 }
 
 module.exports = { validateSpawnRequest, loadManifest, loadSkillIndex };
@@ -741,14 +789,15 @@ SUGGESTION: Add Bash, Glob to allowed_tools for skill tdd
 You are the {{ROLE}} agent.
 
 +======================================================================+
-|  WARNING: TASK TRACKING REQUIRED                                     |
+| WARNING: TASK TRACKING REQUIRED |
 +======================================================================+
-|  Task ID: {{ID}}                                                     |
-|  FIRST: TaskUpdate({ taskId: "{{ID}}", status: "in_progress" });     |
-|  LAST: TaskUpdate({ taskId: "{{ID}}", status: "completed", ... });   |
+| Task ID: {{ID}} |
+| FIRST: TaskUpdate({ taskId: "{{ID}}", status: "in_progress" }); |
+| LAST: TaskUpdate({ taskId: "{{ID}}", status: "completed", ... }); |
 +======================================================================+
 
 ## PROJECT CONTEXT
+
 PROJECT_ROOT: {{PROJECT_ROOT}}
 Use relative paths from PROJECT_ROOT.
 
@@ -759,6 +808,7 @@ You have access to ONLY the following tools. Attempting to use unlisted tools wi
 {{TOOL_LIST}}
 
 **Tool Usage Rules:**
+
 - Use ONLY these tools
 - TaskUpdate is MANDATORY for task tracking
 - Skill() invokes skills (reading skill files does NOT invoke them)
@@ -768,46 +818,49 @@ You have access to ONLY the following tools. Attempting to use unlisted tools wi
 {{SKILL_LIST}}
 
 **Skill Discovery Protocol:**
+
 1. Full catalog: .claude/context/artifacts/skill-catalog.md
 2. Search by category or keyword
 3. Invoke with: Skill({ skill: "skill-name" })
 
 ## Instructions
+
 {{TASK_INSTRUCTIONS}}
 
 ## Memory Protocol
+
 Read .claude/context/memory/learnings.md before starting.
 ```
 
 ### 4.2 Tool List Format
 
 ```markdown
-| Tool | Description |
-|------|-------------|
-| Read | Read files from filesystem |
-| Write | Create/overwrite files |
-| Edit | Make precise edits to files |
-| Bash | Execute shell commands |
-| Glob | Pattern-based file discovery |
-| Grep | Content search in files |
+| Tool       | Description                             |
+| ---------- | --------------------------------------- |
+| Read       | Read files from filesystem              |
+| Write      | Create/overwrite files                  |
+| Edit       | Make precise edits to files             |
+| Bash       | Execute shell commands                  |
+| Glob       | Pattern-based file discovery            |
+| Grep       | Content search in files                 |
 | TaskUpdate | Update task status/metadata [MANDATORY] |
-| TaskList | List all tasks |
-| TaskCreate | Create trackable tasks |
-| TaskGet | Get task details |
-| TaskOutput | Read task output |
-| Skill | Invoke skill workflows [MANDATORY] |
+| TaskList   | List all tasks                          |
+| TaskCreate | Create trackable tasks                  |
+| TaskGet    | Get task details                        |
+| TaskOutput | Read task output                        |
+| Skill      | Invoke skill workflows [MANDATORY]      |
 ```
 
 ### 4.3 Skill List Format
 
 ```markdown
-| Skill | Description | Category |
-|-------|-------------|----------|
-| tdd | Test-Driven Development with Iron Laws | testing |
-| debugging | Systematic 4-phase debugging | troubleshooting |
-| code-quality-expert | Clean code patterns | quality |
-| plan-generator | Creates implementation plans | planning |
-| security-architect | OWASP Top 10, threat modeling | security |
+| Skill               | Description                            | Category        |
+| ------------------- | -------------------------------------- | --------------- |
+| tdd                 | Test-Driven Development with Iron Laws | testing         |
+| debugging           | Systematic 4-phase debugging           | troubleshooting |
+| code-quality-expert | Clean code patterns                    | quality         |
+| plan-generator      | Creates implementation plans           | planning        |
+| security-architect  | OWASP Top 10, threat modeling          | security        |
 ```
 
 ---
@@ -890,14 +943,14 @@ Request → Gate 3 → tool-availability-validator → pre-spawn-tool-validator 
 
 ### 6.2 Validation Checks
 
-| Check | Purpose | Action on Fail |
-|-------|---------|----------------|
-| Tool exists in manifest | Prevent unknown tool errors | BLOCK |
-| Tool count <= 15 | Keep context lean | WARN |
-| Mandatory tools present | Ensure task tracking | BLOCK |
-| MCP tools have fallbacks | Prevent unavailable tool errors | WARN + suggest fallback |
-| Skills have required tools | Ensure skills can execute | WARN + suggest tools |
-| Agent type maps to toolset | Consistent configuration | WARN |
+| Check                      | Purpose                         | Action on Fail          |
+| -------------------------- | ------------------------------- | ----------------------- |
+| Tool exists in manifest    | Prevent unknown tool errors     | BLOCK                   |
+| Tool count <= 15           | Keep context lean               | WARN                    |
+| Mandatory tools present    | Ensure task tracking            | BLOCK                   |
+| MCP tools have fallbacks   | Prevent unavailable tool errors | WARN + suggest fallback |
+| Skills have required tools | Ensure skills can execute       | WARN + suggest tools    |
+| Agent type maps to toolset | Consistent configuration        | WARN                    |
 
 ### 6.3 Validation Error Handling
 
@@ -922,16 +975,16 @@ Request → Gate 3 → tool-availability-validator → pre-spawn-tool-validator 
 
 ## 7. Success Metrics
 
-| Metric | Current | Target | Measurement |
-|--------|---------|--------|-------------|
-| Tool parameter errors | >5 per day | 0 | Error log analysis |
-| Agent spawn success rate | ~80% | 100% | Task completion tracking |
-| Tool validation latency | N/A | <50ms | Hook execution time |
-| Agents aware of tools | 0% (via prompts) | 100% | Prompt inspection |
-| Agents aware of skills | 0% (via prompts) | 100% | Prompt inspection |
-| MCP fallback usage | 0% | 100% (when needed) | Audit log |
-| Manifest coverage | N/A | 100% core tools | Manifest validation |
-| Skill index coverage | N/A | 100% (435 skills) | Index validation |
+| Metric                   | Current          | Target             | Measurement              |
+| ------------------------ | ---------------- | ------------------ | ------------------------ |
+| Tool parameter errors    | >5 per day       | 0                  | Error log analysis       |
+| Agent spawn success rate | ~80%             | 100%               | Task completion tracking |
+| Tool validation latency  | N/A              | <50ms              | Hook execution time      |
+| Agents aware of tools    | 0% (via prompts) | 100%               | Prompt inspection        |
+| Agents aware of skills   | 0% (via prompts) | 100%               | Prompt inspection        |
+| MCP fallback usage       | 0%               | 100% (when needed) | Audit log                |
+| Manifest coverage        | N/A              | 100% core tools    | Manifest validation      |
+| Skill index coverage     | N/A              | 100% (435 skills)  | Index validation         |
 
 ### 7.1 Monitoring Dashboard
 
@@ -953,18 +1006,21 @@ Add to `.claude/tools/cli/spawn-health-dashboard.cjs`:
 ### Phase 1A: Foundation (2 days)
 
 **Tasks**:
+
 1. Create `tool-manifest.json` with all 20 core tools + 9 MCP tools
 2. Create `skill-index-generator.cjs` utility
 3. Generate `skill-index.json` from catalog (435 skills)
 4. Create `pre-spawn-tool-validator.cjs` hook
 
 **Deliverables**:
+
 - `.claude/config/tool-manifest.json`
 - `.claude/config/skill-index.json`
 - `.claude/lib/utils/skill-index-generator.cjs`
 - `.claude/hooks/routing/pre-spawn-tool-validator.cjs`
 
 **Verification**:
+
 ```bash
 cat .claude/config/tool-manifest.json | jq '.version'
 cat .claude/config/skill-index.json | jq '.totalSkills'
@@ -974,18 +1030,21 @@ node .claude/hooks/routing/pre-spawn-tool-validator.cjs --test
 ### Phase 1B: Integration (1 day)
 
 **Tasks**:
+
 1. Update `router-decision.md` to use manifest-driven toolsets
 2. Add tool/skill injection to spawn prompt assembly
 3. Register new hook in `settings.json`
 4. Add CI validation for manifest
 
 **Deliverables**:
+
 - Updated `.claude/workflows/core/router-decision.md`
 - Updated `.claude/templates/spawn/universal-agent-spawn.md`
 - Hook registration in `.claude/settings.json`
 - CI job in `.github/workflows/tool-manifest-validate.yml`
 
 **Verification**:
+
 ```bash
 grep "AVAILABLE_TOOLS" .claude/templates/spawn/universal-agent-spawn.md
 grep "pre-spawn-tool-validator" .claude/settings.json
@@ -994,26 +1053,29 @@ grep "pre-spawn-tool-validator" .claude/settings.json
 ### Phase 1C: Agent Cleanup (1 day)
 
 **Tasks**:
+
 1. Fix 11+ agents with unavailable MCP tool references
 2. Add fallback comments to affected agent files
 3. Validate all agents against manifest
 4. Document in agent prompts
 
 **Affected Agents**:
-- `evolution-orchestrator.md` (mcp__Exa__*)
-- `database-architect.md` (mcp__memory__*)
-- `pm.md` (mcp__memory__*)
-- `planner.md` (mcp__memory__*)
-- `java-pro.md` (mcp__filesystem__*)
-- `frontend-pro.md` (mcp__memory__*, mcp__chrome-devtools__*)
-- `ios-pro.md` (mcp__filesystem__*)
-- `nodejs-pro.md` (mcp__memory__*)
-- `php-pro.md` (mcp__memory__*)
-- `nextjs-pro.md` (mcp__filesystem__*)
-- `scientific-research-expert.md` (mcp__Exa__*)
-- `sveltekit-expert.md` (mcp__memory__*)
+
+- `evolution-orchestrator.md` (mcp**Exa**\*)
+- `database-architect.md` (mcp**memory**\*)
+- `pm.md` (mcp**memory**\*)
+- `planner.md` (mcp**memory**\*)
+- `java-pro.md` (mcp**filesystem**\*)
+- `frontend-pro.md` (mcp**memory**_, mcp**chrome-devtools**_)
+- `ios-pro.md` (mcp**filesystem**\*)
+- `nodejs-pro.md` (mcp**memory**\*)
+- `php-pro.md` (mcp**memory**\*)
+- `nextjs-pro.md` (mcp**filesystem**\*)
+- `scientific-research-expert.md` (mcp**Exa**\*)
+- `sveltekit-expert.md` (mcp**memory**\*)
 
 **Verification**:
+
 ```bash
 node .claude/lib/utils/agent-definition-validator.cjs --all --strict
 # Expected: 0 errors
@@ -1022,12 +1084,14 @@ node .claude/lib/utils/agent-definition-validator.cjs --all --strict
 ### Phase 1D: Agent Updates (optional, 1 day)
 
 **Tasks**:
+
 1. Add AVAILABLE_SKILLS section to all agent prompts
 2. Update `router.md` with enhanced Gate 3 logic
 3. Create ADR-066 for Tool Manifest decision
 4. Update memory files with learnings
 
 **Deliverables**:
+
 - Updated agent prompts with skill sections
 - ADR-066 in `.claude/context/memory/decisions.md`
 - Learnings in `.claude/context/memory/learnings.md`
@@ -1036,16 +1100,16 @@ node .claude/lib/utils/agent-definition-validator.cjs --all --strict
 
 ## 9. Risk Mitigation
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| **Stale manifest** | Medium | High | CI validates on every commit; version control |
-| **Performance overhead** | Low | Medium | Cache manifest in memory; <50ms target |
-| **Agent confusion** | Low | Medium | Limit tools to domain-relevant (max 15) |
-| **Backward compatibility** | Low | High | Pre-spawn validation only; no prompt changes to existing agents |
-| **Hook order dependency** | Medium | Medium | Document hook order; test integration |
-| **Skill index staleness** | Medium | Low | Generate from catalog on build; CI validation |
-| **MCP fallback gaps** | Low | Medium | Audit all MCP tools; document fallbacks |
-| **Manifest sync with CLAUDE.md** | Medium | High | Single source of truth; CLAUDE.md references manifest |
+| Risk                             | Probability | Impact | Mitigation                                                      |
+| -------------------------------- | ----------- | ------ | --------------------------------------------------------------- |
+| **Stale manifest**               | Medium      | High   | CI validates on every commit; version control                   |
+| **Performance overhead**         | Low         | Medium | Cache manifest in memory; <50ms target                          |
+| **Agent confusion**              | Low         | Medium | Limit tools to domain-relevant (max 15)                         |
+| **Backward compatibility**       | Low         | High   | Pre-spawn validation only; no prompt changes to existing agents |
+| **Hook order dependency**        | Medium      | Medium | Document hook order; test integration                           |
+| **Skill index staleness**        | Medium      | Low    | Generate from catalog on build; CI validation                   |
+| **MCP fallback gaps**            | Low         | Medium | Audit all MCP tools; document fallbacks                         |
+| **Manifest sync with CLAUDE.md** | Medium      | High   | Single source of truth; CLAUDE.md references manifest           |
 
 ### 9.1 Rollback Plan
 
@@ -1094,6 +1158,7 @@ Implementation checklist:
 **Decision**: Create a single source of truth for tool definitions instead of distributed definitions across agent files and CLAUDE.md.
 
 **Rationale**:
+
 1. **Consistency**: All agents use same tool definitions
 2. **Validation**: Easy to validate against known tools
 3. **Maintenance**: One file to update when tools change
@@ -1105,6 +1170,7 @@ Implementation checklist:
 **Decision**: Validate tools BEFORE spawning, not after tool use fails.
 
 **Rationale**:
+
 1. **Fail Fast**: Catch errors before wasting compute on spawn
 2. **Clear Messages**: Specific error with fix suggestion
 3. **Research Backing**: Microsoft AutoGen, AgentSpec use this pattern
@@ -1115,6 +1181,7 @@ Implementation checklist:
 **Decision**: Add AVAILABLE_TOOLS and AVAILABLE_SKILLS sections to spawn prompts.
 
 **Rationale**:
+
 1. **Awareness**: Agent knows exactly what it can do
 2. **No Guessing**: Agent won't try invalid tools
 3. **Skill Discovery**: Agent knows how to find more skills
@@ -1125,6 +1192,7 @@ Implementation checklist:
 **Decision**: Limit tools per agent to 15 maximum.
 
 **Rationale**:
+
 1. **Context Efficiency**: "Keep tool context lean" (research finding)
 2. **Focus**: Domain-relevant tools only
 3. **LLM Performance**: More tools = more confusion
@@ -1135,6 +1203,7 @@ Implementation checklist:
 **Decision**: Create searchable index from skill catalog.
 
 **Rationale**:
+
 1. **Discovery**: Agents can find skills by domain/category
 2. **Validation**: Verify skill requirements at spawn time
 3. **Performance**: JSON index faster than parsing markdown catalog
@@ -1164,6 +1233,6 @@ Implementation checklist:
 
 ---
 
-*Architecture designed by Architect Agent*
-*Constitution checkpoint passed: IEEE 1028 architecture principles applied*
-*Ready for implementation by Developer Agent*
+_Architecture designed by Architect Agent_
+_Constitution checkpoint passed: IEEE 1028 architecture principles applied_
+_Ready for implementation by Developer Agent_

@@ -29,7 +29,7 @@ describe('HybridSearch', () => {
               lineEnd: 20,
               content: 'function authenticate(user, pass) { return jwt.sign(user); }',
               semanticScore: 0.89,
-              metadata: {}
+              metadata: {},
             },
             {
               filePath: 'src/auth/validator.js',
@@ -37,12 +37,12 @@ describe('HybridSearch', () => {
               lineEnd: 60,
               content: 'function validatePassword(pass) { return pass.length >= 8; }',
               semanticScore: 0.72,
-              metadata: {}
-            }
+              metadata: {},
+            },
           ];
         }
         return [];
-      }
+      },
     };
 
     // Mock AstGrepSearch
@@ -58,31 +58,31 @@ describe('HybridSearch', () => {
             colEnd: 50,
             code: 'function authenticate(user, pass) { return jwt.sign(user); }',
             matches: { NAME: 'authenticate', ARGS: 'user, pass' },
-            language: 'javascript'
-          }
+            language: 'javascript',
+          },
         ];
       },
       refine: async (semanticResults, _pattern, _lang) => {
         return semanticResults.map(r => ({
           ...r,
           structuralScore: r.filePath.includes('login') ? 1.0 : 0.0,
-          structuralMatch: r.filePath.includes('login') ? { matches: {} } : null
+          structuralMatch: r.filePath.includes('login') ? { matches: {} } : null,
         }));
-      }
+      },
     };
 
     // Mock QueryAnalyzer
     mockQueryAnalyzer = {
-      analyze: (_query) => {
+      analyze: _query => {
         return {
           type: 'function',
           keywords: ['auth', 'function'],
           astPattern: 'function $NAME($$$) { $$$ }',
           language: 'javascript',
           concepts: ['auth', 'authentication', 'login'],
-          confidence: 0.85
+          confidence: 0.85,
         };
-      }
+      },
     };
 
     // Mock ResultRanker
@@ -98,13 +98,13 @@ describe('HybridSearch', () => {
           structuralScore: s.structuralScore || 0,
           sources: s.structuralScore ? ['semantic', 'structural'] : ['semantic'],
           metadata: s.metadata || {},
-          matches: s.structuralMatch?.matches || null
+          matches: s.structuralMatch?.matches || null,
         }));
       },
-      deduplicate: (results) => results,
-      sort: (results) => [...results].sort((a, b) => b.score - a.score),
+      deduplicate: results => results,
+      sort: results => [...results].sort((a, b) => b.score - a.score),
       topK: (results, k) => results.slice(0, k),
-      filterByConfidence: (results) => results.filter(r => r.score >= 0.3)
+      filterByConfidence: results => results.filter(r => r.score >= 0.3),
     };
   });
 
@@ -118,7 +118,7 @@ describe('HybridSearch', () => {
     it('accepts custom weights', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         semanticWeight: 0.8,
-        structuralWeight: 0.2
+        structuralWeight: 0.2,
       });
       assert.strictEqual(hybrid.options.semanticWeight, 0.8);
       assert.strictEqual(hybrid.options.structuralWeight, 0.2);
@@ -140,7 +140,7 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: null, // No ast-grep available
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       const results = await hybrid.search('authentication functions');
@@ -156,7 +156,7 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       const results = await hybrid.search('authentication functions');
@@ -172,7 +172,7 @@ describe('HybridSearch', () => {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
         ranker: mockRanker,
-        topK: 10
+        topK: 10,
       });
 
       const results = await hybrid.search('auth functions');
@@ -185,7 +185,7 @@ describe('HybridSearch', () => {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
         ranker: mockRanker,
-        topK: 3
+        topK: 3,
       });
 
       const results = await hybrid.search('auth functions', { limit: 3 });
@@ -199,7 +199,7 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       const results = await hybrid.search('auth functions');
@@ -219,7 +219,7 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       await hybrid.search('test', { pattern: 'async function $NAME($$$) { $$$ }' });
@@ -237,7 +237,7 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       await hybrid.search('test', { language: 'python' });
@@ -255,7 +255,7 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       await hybrid.search('test', { language: 'typescript' });
@@ -344,7 +344,7 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, { ranker: mockRanker });
 
       const semantic = [
-        { filePath: 'test.js', lineStart: 1, lineEnd: 5, semanticScore: 0.8, content: 'test' }
+        { filePath: 'test.js', lineStart: 1, lineEnd: 5, semanticScore: 0.8, content: 'test' },
       ];
       const structural = [];
 
@@ -359,7 +359,7 @@ describe('HybridSearch', () => {
 
       const semantic = [
         { filePath: 'test.js', lineStart: 1, lineEnd: 5, semanticScore: 0.8, content: 'test' },
-        { filePath: 'test.js', lineStart: 1, lineEnd: 5, semanticScore: 0.8, content: 'test' }
+        { filePath: 'test.js', lineStart: 1, lineEnd: 5, semanticScore: 0.8, content: 'test' },
       ];
 
       const combined = hybrid.combineResults(semantic, []);
@@ -373,7 +373,7 @@ describe('HybridSearch', () => {
 
       const semantic = [
         { filePath: 'test1.js', lineStart: 1, lineEnd: 5, semanticScore: 0.5, content: 'test' },
-        { filePath: 'test2.js', lineStart: 1, lineEnd: 5, semanticScore: 0.9, content: 'test' }
+        { filePath: 'test2.js', lineStart: 1, lineEnd: 5, semanticScore: 0.9, content: 'test' },
       ];
 
       const combined = hybrid.combineResults(semantic, []);
@@ -388,7 +388,7 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       const results = await hybrid.search('auth functions');
@@ -403,14 +403,15 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       const results = await hybrid.search('auth functions');
 
-      const sumStages = (results.timing.semantic || 0) +
-                        (results.timing.astGrep || 0) +
-                        (results.timing.combine || 0);
+      const sumStages =
+        (results.timing.semantic || 0) +
+        (results.timing.astGrep || 0) +
+        (results.timing.combine || 0);
 
       assert.ok(results.timing.total >= sumStages);
     });
@@ -420,7 +421,7 @@ describe('HybridSearch', () => {
     it('handles empty query', async () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       const results = await hybrid.search('');
@@ -436,13 +437,12 @@ describe('HybridSearch', () => {
 
       const hybrid = new HybridSearch(mockIndexManager, {
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
-      await assert.rejects(
-        async () => hybrid.search('test'),
-        { message: /Semantic search failed/ }
-      );
+      await assert.rejects(async () => hybrid.search('test'), {
+        message: /Semantic search failed/,
+      });
     });
 
     it('handles ast-grep errors gracefully', async () => {
@@ -453,14 +453,11 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       // Should not throw - gracefully fallback to semantic only
-      await assert.rejects(
-        async () => hybrid.search('test'),
-        { message: /ast-grep failed/ }
-      );
+      await assert.rejects(async () => hybrid.search('test'), { message: /ast-grep failed/ });
     });
   });
 
@@ -468,7 +465,7 @@ describe('HybridSearch', () => {
     it('integrates with IndexManager', async () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       const results = await hybrid.search('auth');
@@ -482,7 +479,7 @@ describe('HybridSearch', () => {
       const hybrid = new HybridSearch(mockIndexManager, {
         astGrep: mockAstGrep,
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       const results = await hybrid.search('auth functions');
@@ -493,7 +490,7 @@ describe('HybridSearch', () => {
 
     it('integrates with QueryAnalyzer', async () => {
       let analyzerCalled = false;
-      mockQueryAnalyzer.analyze = (_query) => {
+      mockQueryAnalyzer.analyze = _query => {
         analyzerCalled = true;
         return {
           type: 'function',
@@ -501,13 +498,13 @@ describe('HybridSearch', () => {
           astPattern: null,
           language: null,
           concepts: ['test'],
-          confidence: 0.5
+          confidence: 0.5,
         };
       };
 
       const hybrid = new HybridSearch(mockIndexManager, {
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       await hybrid.search('test');
@@ -524,7 +521,7 @@ describe('HybridSearch', () => {
 
       const hybrid = new HybridSearch(mockIndexManager, {
         queryAnalyzer: mockQueryAnalyzer,
-        ranker: mockRanker
+        ranker: mockRanker,
       });
 
       await hybrid.search('test');

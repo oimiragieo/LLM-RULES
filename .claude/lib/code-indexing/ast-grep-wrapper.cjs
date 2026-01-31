@@ -16,25 +16,25 @@ const path = require('path');
 // Language mapping from Phase 1 names to ast-grep names
 const LANGUAGE_MAP = {
   // Phase 1 names -> ast-grep names
-  'javascript': 'javascript',
-  'js': 'javascript',
-  'typescript': 'typescript',
-  'ts': 'typescript',
-  'python': 'python',
-  'py': 'python',
-  'go': 'go',
-  'rust': 'rust',
-  'rs': 'rust',
-  'java': 'java',
-  'c': 'c',
-  'cpp': 'cpp',
-  'csharp': 'c-sharp',
-  'cs': 'c-sharp',
-  'ruby': 'ruby',
-  'rb': 'ruby',
-  'kotlin': 'kotlin',
-  'kt': 'kotlin',
-  'swift': 'swift',
+  javascript: 'javascript',
+  js: 'javascript',
+  typescript: 'typescript',
+  ts: 'typescript',
+  python: 'python',
+  py: 'python',
+  go: 'go',
+  rust: 'rust',
+  rs: 'rust',
+  java: 'java',
+  c: 'c',
+  cpp: 'cpp',
+  csharp: 'c-sharp',
+  cs: 'c-sharp',
+  ruby: 'ruby',
+  rb: 'ruby',
+  kotlin: 'kotlin',
+  kt: 'kotlin',
+  swift: 'swift',
 };
 
 // File extension to language mapping
@@ -81,13 +81,13 @@ class AstGrepSearch {
    * @returns {Promise<boolean>} True if ast-grep is installed and working
    */
   async isAvailable() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const proc = spawn(this.binPath, ['--version'], {
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
       });
 
       proc.on('error', () => resolve(false));
-      proc.on('close', (code) => resolve(code === 0));
+      proc.on('close', code => resolve(code === 0));
 
       // Timeout after 5 seconds
       setTimeout(() => {
@@ -104,20 +104,24 @@ class AstGrepSearch {
   async getVersion() {
     return new Promise((resolve, reject) => {
       const proc = spawn(this.binPath, ['--version'], {
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
       });
 
       let stdout = '';
       let stderr = '';
 
-      proc.stdout.on('data', (data) => { stdout += data.toString(); });
-      proc.stderr.on('data', (data) => { stderr += data.toString(); });
+      proc.stdout.on('data', data => {
+        stdout += data.toString();
+      });
+      proc.stderr.on('data', data => {
+        stderr += data.toString();
+      });
 
-      proc.on('error', (err) => {
+      proc.on('error', err => {
         reject(new Error(`ast-grep binary not found: ${err.message}`));
       });
 
-      proc.on('close', (code) => {
+      proc.on('close', code => {
         if (code === 0) {
           // Try to extract version number from output
           const match = stdout.match(/ast-grep (\d+\.\d+\.\d+)/);
@@ -163,11 +167,7 @@ class AstGrepSearch {
     const mappedLang = this.mapLanguage(language);
 
     // Build command arguments
-    const args = [
-      '-p', pattern,
-      '--lang', mappedLang,
-      '--json'
-    ];
+    const args = ['-p', pattern, '--lang', mappedLang, '--json'];
 
     // Add include patterns
     if (options.include && options.include.length > 0) {
@@ -189,16 +189,20 @@ class AstGrepSearch {
     // Execute ast-grep
     return new Promise((resolve, reject) => {
       const proc = spawn(this.binPath, args, {
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
       });
 
       let stdout = '';
       let stderr = '';
 
-      proc.stdout.on('data', (data) => { stdout += data.toString(); });
-      proc.stderr.on('data', (data) => { stderr += data.toString(); });
+      proc.stdout.on('data', data => {
+        stdout += data.toString();
+      });
+      proc.stderr.on('data', data => {
+        stderr += data.toString();
+      });
 
-      proc.on('error', (err) => {
+      proc.on('error', err => {
         reject(new Error(`ast-grep execution failed: ${err.message}`));
       });
 
@@ -208,7 +212,7 @@ class AstGrepSearch {
         reject(new Error(`ast-grep search timed out after ${this.timeout}ms`));
       }, this.timeout);
 
-      proc.on('close', (code) => {
+      proc.on('close', code => {
         clearTimeout(timeoutId);
 
         // ast-grep returns 0 if matches found, 1 if no matches (not an error)
@@ -247,7 +251,7 @@ class AstGrepSearch {
       include: filePaths.map(f => {
         // Convert absolute path to relative for glob matching
         return path.relative(this.projectRoot, f);
-      })
+      }),
     });
 
     // Create lookup map for structural matches
@@ -267,7 +271,7 @@ class AstGrepSearch {
         return {
           ...semResult,
           structuralScore: 1.0,
-          structuralMatch: exactMatch
+          structuralMatch: exactMatch,
         };
       }
 
@@ -285,7 +289,7 @@ class AstGrepSearch {
       return {
         ...semResult,
         structuralScore: overlaps ? 0.5 : 0.0,
-        structuralMatch: null
+        structuralMatch: null,
       };
     });
   }
@@ -322,7 +326,7 @@ class AstGrepSearch {
       colEnd: r.range.end.column,
       code: r.text,
       matches: r.metaVariables || {},
-      language: r.language || 'unknown'
+      language: r.language || 'unknown',
     }));
   }
 

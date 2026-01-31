@@ -79,7 +79,7 @@ suite('ResultRanker', () => {
         lineStart: 10,
         lineEnd: 20,
         content: 'function authenticate() {}',
-        semanticScore: 0.8
+        semanticScore: 0.8,
       },
     ];
 
@@ -97,7 +97,10 @@ suite('ResultRanker', () => {
     assert.strictEqual(combined.length, 1);
     assert.strictEqual(combined[0].semanticScore, 0.8);
     assert.strictEqual(combined[0].structuralScore, 1.0);
-    assert.ok(Math.abs(combined[0].score - 0.86) < 0.001, `Expected ~0.86, got ${combined[0].score}`); // (0.8*0.7 + 1.0*0.3)
+    assert.ok(
+      Math.abs(combined[0].score - 0.86) < 0.001,
+      `Expected ~0.86, got ${combined[0].score}`
+    ); // (0.8*0.7 + 1.0*0.3)
     assert.deepStrictEqual(combined[0].sources, ['semantic', 'structural']);
   });
 
@@ -110,7 +113,7 @@ suite('ResultRanker', () => {
         lineStart: 5,
         lineEnd: 15,
         content: 'function helper() {}',
-        semanticScore: 0.7
+        semanticScore: 0.7,
       },
     ];
 
@@ -119,7 +122,10 @@ suite('ResultRanker', () => {
     assert.strictEqual(combined.length, 1);
     assert.strictEqual(combined[0].semanticScore, 0.7);
     assert.strictEqual(combined[0].structuralScore, 0.0);
-    assert.ok(Math.abs(combined[0].score - 0.49) < 0.001, `Expected ~0.49, got ${combined[0].score}`); // (0.7*0.7 + 0.0*0.3)
+    assert.ok(
+      Math.abs(combined[0].score - 0.49) < 0.001,
+      `Expected ~0.49, got ${combined[0].score}`
+    ); // (0.7*0.7 + 0.0*0.3)
     assert.deepStrictEqual(combined[0].sources, ['semantic']);
   });
 
@@ -168,7 +174,7 @@ suite('ResultRanker', () => {
         lineStart: 1,
         lineEnd: 10,
         content: 'function authenticate(user, pass) {}',
-        score: 0.7
+        score: 0.7,
       },
     ];
 
@@ -188,14 +194,14 @@ suite('ResultRanker', () => {
         lineStart: 1,
         lineEnd: 10,
         score: 0.7,
-        metadata: { mtime: new Date('2020-01-01').getTime() }
+        metadata: { mtime: new Date('2020-01-01').getTime() },
       },
       {
         filePath: 'new.js',
         lineStart: 1,
         lineEnd: 10,
         score: 0.7,
-        metadata: { mtime: new Date().getTime() }
+        metadata: { mtime: new Date().getTime() },
       },
     ];
 
@@ -274,7 +280,7 @@ suite('ResultRanker', () => {
         filePath: `file${i}.js`,
         lineStart: 1,
         lineEnd: 10,
-        score: Math.random()
+        score: Math.random(),
       });
     }
 
@@ -302,7 +308,7 @@ suite('ResultRanker', () => {
         lineEnd: 20,
         content: 'function test() {}',
         semanticScore: 0.8,
-        metadata: { type: 'function', language: 'javascript' }
+        metadata: { type: 'function', language: 'javascript' },
       },
     ];
 
@@ -312,7 +318,7 @@ suite('ResultRanker', () => {
         lineStart: 10,
         lineEnd: 20,
         code: 'function test() {}',
-        matches: { NAME: 'test' }
+        matches: { NAME: 'test' },
       },
     ];
 

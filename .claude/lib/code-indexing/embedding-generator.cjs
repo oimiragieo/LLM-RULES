@@ -17,7 +17,7 @@ const DEFAULT_OPTIONS = {
   dimensions: 384,
   batchSize: 100,
   cacheEnabled: true,
-  cachePath: '.claude/data/code-index/embedding-cache.json'
+  cachePath: '.claude/data/code-index/embedding-cache.json',
 };
 
 /**
@@ -59,7 +59,7 @@ class EmbeddingGenerator {
 
     console.log(`Loading embedding model: ${this.options.model}...`);
     this.pipeline = await pipeline('feature-extraction', this.options.model, {
-      quantized: true // Use quantized model for faster inference
+      quantized: true, // Use quantized model for faster inference
     });
 
     this.initialized = true;
@@ -107,7 +107,7 @@ class EmbeddingGenerator {
     // Generate embedding
     const output = await this.pipeline(text, {
       pooling: 'mean',
-      normalize: true
+      normalize: true,
     });
 
     // Convert to array
@@ -138,9 +138,7 @@ class EmbeddingGenerator {
 
     for (let i = 0; i < total; i += batchSize) {
       const batch = texts.slice(i, Math.min(i + batchSize, total));
-      const batchEmbeddings = await Promise.all(
-        batch.map(text => this.embed(text))
-      );
+      const batchEmbeddings = await Promise.all(batch.map(text => this.embed(text)));
       embeddings.push(...batchEmbeddings);
 
       if (onProgress) {
@@ -163,7 +161,7 @@ class EmbeddingGenerator {
 
     return chunks.map((chunk, i) => ({
       chunk,
-      embedding: embeddings[i]
+      embedding: embeddings[i],
     }));
   }
 
@@ -221,11 +219,7 @@ class EmbeddingGenerator {
     await fs.mkdir(cacheDir, { recursive: true });
 
     const cacheData = Object.fromEntries(this.cache);
-    await fs.writeFile(
-      this.options.cachePath,
-      JSON.stringify(cacheData),
-      'utf-8'
-    );
+    await fs.writeFile(this.options.cachePath, JSON.stringify(cacheData), 'utf-8');
   }
 
   /**
@@ -261,7 +255,7 @@ class EmbeddingGenerator {
     return {
       size: this.cache.size,
       enabled: this.options.cacheEnabled,
-      path: this.options.cachePath
+      path: this.options.cachePath,
     };
   }
 }

@@ -32,12 +32,12 @@ This skill now supports three search modes:
 
 ### Performance Comparison
 
-| Mode | Speed | Accuracy | Best For |
-|------|-------|----------|----------|
-| Hybrid | <150ms | 95% | General search |
-| Semantic-only | <50ms | 85% | Concepts |
-| Structural-only | <50ms | 100% | Exact patterns |
-| Phase 1 only | <50ms | 80% | Legacy (fallback) |
+| Mode            | Speed  | Accuracy | Best For          |
+| --------------- | ------ | -------- | ----------------- |
+| Hybrid          | <150ms | 95%      | General search    |
+| Semantic-only   | <50ms  | 85%      | Concepts          |
+| Structural-only | <50ms  | 100%     | Exact patterns    |
+| Phase 1 only    | <50ms  | 80%      | Legacy (fallback) |
 
 ## When to Use
 
@@ -61,7 +61,7 @@ This skill now supports three search modes:
 
 ```javascript
 // Basic hybrid search
-Skill({ skill: 'code-semantic-search', args: 'find authentication logic' })
+Skill({ skill: 'code-semantic-search', args: 'find authentication logic' });
 
 // With options
 Skill({
@@ -70,9 +70,9 @@ Skill({
   options: {
     mode: 'hybrid',
     language: 'javascript',
-    limit: 10
-  }
-})
+    limit: 10,
+  },
+});
 ```
 
 ### Semantic-Only Search
@@ -82,8 +82,8 @@ Skill({
 Skill({
   skill: 'code-semantic-search',
   args: 'find authentication',
-  options: { mode: 'semantic-only' }
-})
+  options: { mode: 'semantic-only' },
+});
 ```
 
 ### Structural-Only Search
@@ -93,8 +93,8 @@ Skill({
 Skill({
   skill: 'code-semantic-search',
   args: 'find function authenticate',
-  options: { mode: 'structural-only' }
-})
+  options: { mode: 'structural-only' },
+});
 ```
 
 ## Implementation Reference

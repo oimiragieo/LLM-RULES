@@ -169,7 +169,7 @@ async function main() {
 
 // Run if called directly
 if (require.main === module) {
-  main().catch((error) => {
+  main().catch(error => {
     console.error('Error:', error.message);
     process.exit(1);
   });

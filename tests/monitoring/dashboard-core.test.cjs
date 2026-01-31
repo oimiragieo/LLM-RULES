@@ -46,11 +46,9 @@ const {
   formatPercent,
 } = require(path.join(PROJECT_ROOT, '.claude/lib/monitoring/dashboard-renderer.cjs'));
 
-const {
-  _displayDashboard,
-  _displayAlerts,
-  _displayTrends,
-} = require(path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs'));
+const { _displayDashboard, _displayAlerts, _displayTrends } = require(
+  path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs')
+);
 
 // Test data paths
 const TEST_DIR = path.join(PROJECT_ROOT, '.claude/context/test-metrics-dashboard');
@@ -102,9 +100,24 @@ describe('Monitoring Dashboard Core', () => {
     it('should read multiple metric entries from JSONL', async () => {
       const testFile = path.join(TEST_DIR, 'multiple.jsonl');
       const metrics = [
-        { timestamp: new Date().toISOString(), hook: 'hook1', executionTimeMs: 3, status: 'success' },
-        { timestamp: new Date().toISOString(), hook: 'hook2', executionTimeMs: 7, status: 'success' },
-        { timestamp: new Date().toISOString(), hook: 'hook3', executionTimeMs: 2, status: 'failure' },
+        {
+          timestamp: new Date().toISOString(),
+          hook: 'hook1',
+          executionTimeMs: 3,
+          status: 'success',
+        },
+        {
+          timestamp: new Date().toISOString(),
+          hook: 'hook2',
+          executionTimeMs: 7,
+          status: 'success',
+        },
+        {
+          timestamp: new Date().toISOString(),
+          hook: 'hook3',
+          executionTimeMs: 2,
+          status: 'failure',
+        },
       ];
       fs.writeFileSync(testFile, metrics.map(m => JSON.stringify(m)).join('\n'));
 
@@ -118,8 +131,18 @@ describe('Monitoring Dashboard Core', () => {
       const testFile = path.join(TEST_DIR, 'timefilter.jsonl');
       const now = Date.now();
       const metrics = [
-        { timestamp: new Date(now - 1 * 60 * 60 * 1000).toISOString(), hook: 'recent', executionTimeMs: 3, status: 'success' },
-        { timestamp: new Date(now - 25 * 60 * 60 * 1000).toISOString(), hook: 'old', executionTimeMs: 5, status: 'success' },
+        {
+          timestamp: new Date(now - 1 * 60 * 60 * 1000).toISOString(),
+          hook: 'recent',
+          executionTimeMs: 3,
+          status: 'success',
+        },
+        {
+          timestamp: new Date(now - 25 * 60 * 60 * 1000).toISOString(),
+          hook: 'old',
+          executionTimeMs: 5,
+          status: 'success',
+        },
       ];
       fs.writeFileSync(testFile, metrics.map(m => JSON.stringify(m)).join('\n'));
 
@@ -132,8 +155,18 @@ describe('Monitoring Dashboard Core', () => {
       const testFile = path.join(TEST_DIR, 'sincefilter.jsonl');
       const cutoff = new Date(Date.now() - 12 * 60 * 60 * 1000);
       const metrics = [
-        { timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), hook: 'after', executionTimeMs: 3, status: 'success' },
-        { timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(), hook: 'before', executionTimeMs: 5, status: 'success' },
+        {
+          timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+          hook: 'after',
+          executionTimeMs: 3,
+          status: 'success',
+        },
+        {
+          timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
+          hook: 'before',
+          executionTimeMs: 5,
+          status: 'success',
+        },
       ];
       fs.writeFileSync(testFile, metrics.map(m => JSON.stringify(m)).join('\n'));
 
@@ -145,9 +178,13 @@ describe('Monitoring Dashboard Core', () => {
     it('should skip invalid JSON lines without crashing', async () => {
       const testFile = path.join(TEST_DIR, 'invalid.jsonl');
       const content = [
-        '{ "valid": true, "timestamp": "' + new Date().toISOString() + '", "hook": "test", "executionTimeMs": 1, "status": "success" }',
+        '{ "valid": true, "timestamp": "' +
+          new Date().toISOString() +
+          '", "hook": "test", "executionTimeMs": 1, "status": "success" }',
         'invalid json line',
-        '{ "valid": true, "timestamp": "' + new Date().toISOString() + '", "hook": "test2", "executionTimeMs": 2, "status": "success" }',
+        '{ "valid": true, "timestamp": "' +
+          new Date().toISOString() +
+          '", "hook": "test2", "executionTimeMs": 2, "status": "success" }',
       ].join('\n');
       fs.writeFileSync(testFile, content);
 
@@ -166,9 +203,13 @@ describe('Monitoring Dashboard Core', () => {
     it('should skip empty lines in JSONL file', async () => {
       const testFile = path.join(TEST_DIR, 'emptylines.jsonl');
       const content = [
-        '{ "timestamp": "' + new Date().toISOString() + '", "hook": "test1", "executionTimeMs": 1, "status": "success" }',
+        '{ "timestamp": "' +
+          new Date().toISOString() +
+          '", "hook": "test1", "executionTimeMs": 1, "status": "success" }',
         '',
-        '{ "timestamp": "' + new Date().toISOString() + '", "hook": "test2", "executionTimeMs": 2, "status": "success" }',
+        '{ "timestamp": "' +
+          new Date().toISOString() +
+          '", "hook": "test2", "executionTimeMs": 2, "status": "success" }',
         '   ',
       ].join('\n');
       fs.writeFileSync(testFile, content);
@@ -256,9 +297,12 @@ describe('Monitoring Dashboard Core', () => {
     it('should identify top 5 error types', () => {
       const metrics = [];
       // Create errors with different frequencies
-      for (let i = 0; i < 10; i++) metrics.push({ errorType: 'TypeError', severity: 'HIGH', source: 'hook1' });
-      for (let i = 0; i < 7; i++) metrics.push({ errorType: 'ReferenceError', severity: 'MEDIUM', source: 'hook2' });
-      for (let i = 0; i < 5; i++) metrics.push({ errorType: 'ValidationError', severity: 'LOW', source: 'hook3' });
+      for (let i = 0; i < 10; i++)
+        metrics.push({ errorType: 'TypeError', severity: 'HIGH', source: 'hook1' });
+      for (let i = 0; i < 7; i++)
+        metrics.push({ errorType: 'ReferenceError', severity: 'MEDIUM', source: 'hook2' });
+      for (let i = 0; i < 5; i++)
+        metrics.push({ errorType: 'ValidationError', severity: 'LOW', source: 'hook3' });
 
       const stats = calculateErrorStats(metrics);
       assert.strictEqual(stats.topErrors.length, 3);
@@ -270,8 +314,10 @@ describe('Monitoring Dashboard Core', () => {
 
     it('should identify top 5 error sources', () => {
       const metrics = [];
-      for (let i = 0; i < 8; i++) metrics.push({ errorType: 'Error', severity: 'HIGH', source: 'routing-guard.cjs' });
-      for (let i = 0; i < 4; i++) metrics.push({ errorType: 'Error', severity: 'MEDIUM', source: 'memory-manager.cjs' });
+      for (let i = 0; i < 8; i++)
+        metrics.push({ errorType: 'Error', severity: 'HIGH', source: 'routing-guard.cjs' });
+      for (let i = 0; i < 4; i++)
+        metrics.push({ errorType: 'Error', severity: 'MEDIUM', source: 'memory-manager.cjs' });
 
       const stats = calculateErrorStats(metrics);
       assert.strictEqual(stats.topSources.length, 2);
@@ -454,8 +500,8 @@ describe('Monitoring Dashboard Core', () => {
           avgTime: 7.5,
           failureRate: 2.1,
           byHook: {
-            'hook1': { count: 500, avgTime: 5.2, p95: 10, successRate: 98, failures: 10 },
-            'hook2': { count: 300, avgTime: 8.7, p95: 15, successRate: 97, failures: 9 },
+            hook1: { count: 500, avgTime: 5.2, p95: 10, successRate: 98, failures: 10 },
+            hook2: { count: 300, avgTime: 8.7, p95: 15, successRate: 97, failures: 9 },
           },
         },
       };
@@ -499,7 +545,7 @@ describe('Monitoring Dashboard Core', () => {
           avgTime: 6.2,
           failureRate: 1.5,
           byHook: {
-            'hook1': { count: 300, avgTime: 5, p95: 10, successRate: 99, failures: 3 },
+            hook1: { count: 300, avgTime: 5, p95: 10, successRate: 99, failures: 3 },
           },
         },
         errors: {
@@ -508,9 +554,7 @@ describe('Monitoring Dashboard Core', () => {
           topErrors: [{ type: 'TypeError', count: 10 }],
         },
       };
-      const alerts = [
-        { severity: 'MEDIUM', type: 'Test', message: 'Test alert' },
-      ];
+      const alerts = [{ severity: 'MEDIUM', type: 'Test', message: 'Test alert' }];
 
       const dashboard = renderDashboard(summary, alerts);
       assert.ok(dashboard.includes('Agent Studio Monitoring Dashboard'));
@@ -571,17 +615,23 @@ describe('Monitoring Dashboard Core', () => {
 
     it('should recognize live mode flag', () => {
       // Verify parseArgs function exists in module
-      const dashboardModule = require(path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs'));
+      const dashboardModule = require(
+        path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs')
+      );
       assert.ok(typeof dashboardModule.displayDashboard === 'function');
     });
 
     it('should recognize alerts mode flag', () => {
-      const dashboardModule = require(path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs'));
+      const dashboardModule = require(
+        path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs')
+      );
       assert.ok(typeof dashboardModule.displayAlerts === 'function');
     });
 
     it('should recognize trends mode flag', () => {
-      const dashboardModule = require(path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs'));
+      const dashboardModule = require(
+        path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs')
+      );
       assert.ok(typeof dashboardModule.displayTrends === 'function');
     });
   });
@@ -594,24 +644,32 @@ describe('Monitoring Dashboard Core', () => {
     // Full integration tests would mock console.log and fs operations
 
     it('should export displayDashboard function', () => {
-      const dashboardModule = require(path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs'));
+      const dashboardModule = require(
+        path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs')
+      );
       assert.strictEqual(typeof dashboardModule.displayDashboard, 'function');
     });
 
     it('should export displayAlerts function', () => {
-      const dashboardModule = require(path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs'));
+      const dashboardModule = require(
+        path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs')
+      );
       assert.strictEqual(typeof dashboardModule.displayAlerts, 'function');
     });
 
     it('should export displayTrends function', () => {
-      const dashboardModule = require(path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs'));
+      const dashboardModule = require(
+        path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs')
+      );
       assert.strictEqual(typeof dashboardModule.displayTrends, 'function');
     });
 
     it('should handle errors gracefully in display functions', async () => {
       // Verify error handling exists
       // This is a smoke test - full test would mock getMetricsSummary to throw
-      const dashboardModule = require(path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs'));
+      const dashboardModule = require(
+        path.join(PROJECT_ROOT, '.claude/tools/cli/monitoring-dashboard.cjs')
+      );
       assert.strictEqual(typeof dashboardModule.displayDashboard, 'function');
       assert.strictEqual(typeof dashboardModule.displayAlerts, 'function');
       assert.strictEqual(typeof dashboardModule.displayTrends, 'function');

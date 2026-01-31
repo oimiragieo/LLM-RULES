@@ -257,13 +257,13 @@ This schema defines the structure for publishing agent capabilities, enabling dy
 
 ### Schema Design Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Required fields | `id`, `capabilities`, `health` | Minimal required for routing; others can be inferred |
-| Domain enum | 15 predefined domains | Consistent categorization; extensible via schema update |
-| Health status | 3 states | Simple state machine: healthy -> degraded -> unavailable |
-| Success rate | 0-1 float | Normalized for comparison across agents |
-| Isolation fields | Nullable | Only populated when agent is isolated |
+| Decision         | Choice                         | Rationale                                                |
+| ---------------- | ------------------------------ | -------------------------------------------------------- |
+| Required fields  | `id`, `capabilities`, `health` | Minimal required for routing; others can be inferred     |
+| Domain enum      | 15 predefined domains          | Consistent categorization; extensible via schema update  |
+| Health status    | 3 states                       | Simple state machine: healthy -> degraded -> unavailable |
+| Success rate     | 0-1 float                      | Normalized for comparison across agents                  |
+| Isolation fields | Nullable                       | Only populated when agent is isolated                    |
 
 ---
 
@@ -365,7 +365,14 @@ The registry is auto-generated from agent definitions and provides fast lookup f
   },
   "index": {
     "byCapability": {
-      "implementation": ["developer", "java-pro", "python-pro", "typescript-pro", "nodejs-pro", "frontend-pro"],
+      "implementation": [
+        "developer",
+        "java-pro",
+        "python-pro",
+        "typescript-pro",
+        "nodejs-pro",
+        "frontend-pro"
+      ],
       "bug-fix": ["developer", "devops-troubleshooter"],
       "code-review": ["code-reviewer", "code-simplifier"],
       "testing": ["qa", "developer"],
@@ -373,10 +380,22 @@ The registry is auto-generated from agent definitions and provides fast lookup f
       "research": ["researcher", "scientific-research-expert"],
       "documentation": ["technical-writer"],
       "architecture": ["architect", "c4-context", "c4-container", "c4-component"],
-      "orchestration": ["master-orchestrator", "swarm-coordinator", "evolution-orchestrator", "party-orchestrator"]
+      "orchestration": [
+        "master-orchestrator",
+        "swarm-coordinator",
+        "evolution-orchestrator",
+        "party-orchestrator"
+      ]
     },
     "byDomain": {
-      "code": ["developer", "code-reviewer", "code-simplifier", "java-pro", "python-pro", "typescript-pro"],
+      "code": [
+        "developer",
+        "code-reviewer",
+        "code-simplifier",
+        "java-pro",
+        "python-pro",
+        "typescript-pro"
+      ],
       "testing": ["qa", "developer"],
       "security": ["security-architect"],
       "devops": ["devops", "devops-troubleshooter", "incident-responder"],
@@ -385,18 +404,84 @@ The registry is auto-generated from agent definitions and provides fast lookup f
       "architecture": ["architect", "c4-context", "c4-container", "c4-component", "c4-code"],
       "database": ["database-architect", "data-engineer"],
       "frontend": ["frontend-pro", "nextjs-pro", "sveltekit-expert"],
-      "backend": ["nodejs-pro", "java-pro", "python-pro", "fastapi-pro", "php-pro", "golang-pro", "rust-pro"],
+      "backend": [
+        "nodejs-pro",
+        "java-pro",
+        "python-pro",
+        "fastapi-pro",
+        "php-pro",
+        "golang-pro",
+        "rust-pro"
+      ],
       "mobile": ["ios-pro", "android-pro", "expo-mobile-developer", "mobile-ux-reviewer"],
       "ai-ml": ["ai-ml-specialist"],
       "blockchain": ["web3-blockchain-expert"],
-      "orchestration": ["master-orchestrator", "swarm-coordinator", "evolution-orchestrator", "party-orchestrator"],
+      "orchestration": [
+        "master-orchestrator",
+        "swarm-coordinator",
+        "evolution-orchestrator",
+        "party-orchestrator"
+      ],
       "planning": ["planner", "pm"]
     },
     "byCategory": {
-      "core": ["developer", "planner", "architect", "qa", "pm", "technical-writer", "context-compressor", "reflection-agent", "router"],
-      "specialized": ["code-reviewer", "code-simplifier", "security-architect", "devops", "devops-troubleshooter", "incident-responder", "researcher", "reverse-engineer", "conductor-validator", "database-architect", "c4-context", "c4-container", "c4-component", "c4-code"],
-      "domain": ["python-pro", "java-pro", "typescript-pro", "rust-pro", "golang-pro", "fastapi-pro", "nodejs-pro", "frontend-pro", "nextjs-pro", "sveltekit-expert", "php-pro", "ios-pro", "android-pro", "expo-mobile-developer", "tauri-desktop-developer", "graphql-pro", "data-engineer", "mobile-ux-reviewer", "scientific-research-expert", "ai-ml-specialist", "web3-blockchain-expert", "gamedev-pro"],
-      "orchestrator": ["master-orchestrator", "swarm-coordinator", "evolution-orchestrator", "party-orchestrator"]
+      "core": [
+        "developer",
+        "planner",
+        "architect",
+        "qa",
+        "pm",
+        "technical-writer",
+        "context-compressor",
+        "reflection-agent",
+        "router"
+      ],
+      "specialized": [
+        "code-reviewer",
+        "code-simplifier",
+        "security-architect",
+        "devops",
+        "devops-troubleshooter",
+        "incident-responder",
+        "researcher",
+        "reverse-engineer",
+        "conductor-validator",
+        "database-architect",
+        "c4-context",
+        "c4-container",
+        "c4-component",
+        "c4-code"
+      ],
+      "domain": [
+        "python-pro",
+        "java-pro",
+        "typescript-pro",
+        "rust-pro",
+        "golang-pro",
+        "fastapi-pro",
+        "nodejs-pro",
+        "frontend-pro",
+        "nextjs-pro",
+        "sveltekit-expert",
+        "php-pro",
+        "ios-pro",
+        "android-pro",
+        "expo-mobile-developer",
+        "tauri-desktop-developer",
+        "graphql-pro",
+        "data-engineer",
+        "mobile-ux-reviewer",
+        "scientific-research-expert",
+        "ai-ml-specialist",
+        "web3-blockchain-expert",
+        "gamedev-pro"
+      ],
+      "orchestrator": [
+        "master-orchestrator",
+        "swarm-coordinator",
+        "evolution-orchestrator",
+        "party-orchestrator"
+      ]
     }
   },
   "health": {
@@ -409,12 +494,12 @@ The registry is auto-generated from agent definitions and provides fast lookup f
 
 ### Registry Design Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Index structure | 3 indices (capability, domain, category) | O(1) lookup for common routing queries |
-| Health arrays | Separate arrays by status | Fast health-aware filtering |
-| Agent embedding | Full capability card per agent | Avoid N+1 lookups during routing |
-| File format | JSON | Native parsing, schema validation, readable |
+| Decision        | Choice                                   | Rationale                                   |
+| --------------- | ---------------------------------------- | ------------------------------------------- |
+| Index structure | 3 indices (capability, domain, category) | O(1) lookup for common routing queries      |
+| Health arrays   | Separate arrays by status                | Fast health-aware filtering                 |
+| Agent embedding | Full capability card per agent           | Avoid N+1 lookups during routing            |
+| File format     | JSON                                     | Native parsing, schema validation, readable |
 
 ---
 
@@ -452,90 +537,90 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
  */
 const DOMAIN_MAPPING = {
   // Code domains
-  'tdd': 'code',
-  'debugging': 'code',
-  'implementation': 'code',
-  'refactoring': 'code',
+  tdd: 'code',
+  debugging: 'code',
+  implementation: 'code',
+  refactoring: 'code',
   'code-review': 'code',
 
   // Testing
   'qa-workflow': 'testing',
-  'testing': 'testing',
-  'test': 'testing',
+  testing: 'testing',
+  test: 'testing',
 
   // Security
   'security-architect': 'security',
-  'owasp': 'security',
+  owasp: 'security',
   'threat-modeling': 'security',
 
   // DevOps
-  'devops': 'devops',
-  'infrastructure': 'devops',
+  devops: 'devops',
+  infrastructure: 'devops',
   'ci-cd': 'devops',
-  'deployment': 'devops',
+  deployment: 'devops',
 
   // Research
-  'research': 'research',
+  research: 'research',
   'fact-finding': 'research',
 
   // Documentation
-  'documentation': 'documentation',
+  documentation: 'documentation',
   'technical-writing': 'documentation',
 
   // Architecture
-  'architecture': 'architecture',
+  architecture: 'architecture',
   'system-design': 'architecture',
-  'c4': 'architecture',
+  c4: 'architecture',
 
   // Database
-  'database': 'database',
-  'schema': 'database',
-  'sql': 'database',
+  database: 'database',
+  schema: 'database',
+  sql: 'database',
 
   // Frontend
-  'react': 'frontend',
-  'vue': 'frontend',
-  'angular': 'frontend',
-  'frontend': 'frontend',
-  'nextjs': 'frontend',
-  'svelte': 'frontend',
+  react: 'frontend',
+  vue: 'frontend',
+  angular: 'frontend',
+  frontend: 'frontend',
+  nextjs: 'frontend',
+  svelte: 'frontend',
 
   // Backend
-  'nodejs': 'backend',
-  'express': 'backend',
-  'fastapi': 'backend',
-  'django': 'backend',
-  'spring': 'backend',
-  'laravel': 'backend',
+  nodejs: 'backend',
+  express: 'backend',
+  fastapi: 'backend',
+  django: 'backend',
+  spring: 'backend',
+  laravel: 'backend',
 
   // Mobile
-  'ios': 'mobile',
-  'android': 'mobile',
+  ios: 'mobile',
+  android: 'mobile',
   'react-native': 'mobile',
-  'expo': 'mobile',
-  'mobile': 'mobile',
+  expo: 'mobile',
+  mobile: 'mobile',
 
   // AI/ML
-  'ai': 'ai-ml',
-  'ml': 'ai-ml',
+  ai: 'ai-ml',
+  ml: 'ai-ml',
   'machine-learning': 'ai-ml',
   'deep-learning': 'ai-ml',
 
   // Blockchain
-  'web3': 'blockchain',
-  'blockchain': 'blockchain',
-  'defi': 'blockchain',
+  web3: 'blockchain',
+  blockchain: 'blockchain',
+  defi: 'blockchain',
   'smart-contracts': 'blockchain',
 
   // Orchestration
-  'orchestration': 'orchestration',
-  'swarm': 'orchestration',
+  orchestration: 'orchestration',
+  swarm: 'orchestration',
   'multi-agent': 'orchestration',
 
   // Planning
-  'planning': 'planning',
-  'roadmap': 'planning',
-  'project-management': 'planning'
+  planning: 'planning',
+  roadmap: 'planning',
+  'project-management': 'planning',
 };
 
 /**
@@ -551,7 +636,10 @@ function extractTriggerPhrases(agentDef, agentId) {
   // From description
   if (agentDef.description) {
     // Extract key action words
-    const actionWords = agentDef.description.match(/\b(implement|review|test|debug|design|analyze|fix|build|create|deploy|optimize|refactor)\w*/gi) || [];
+    const actionWords =
+      agentDef.description.match(
+        /\b(implement|review|test|debug|design|analyze|fix|build|create|deploy|optimize|refactor)\w*/gi
+      ) || [];
     phrases.push(...actionWords.map(w => w.toLowerCase()));
   }
 
@@ -583,10 +671,10 @@ function inferDomain(agentDef, agentId, category) {
 
   // Fallback by category
   const categoryDomains = {
-    'core': 'code',
-    'specialized': 'code',
-    'domain': 'code',
-    'orchestrator': 'orchestration'
+    core: 'code',
+    specialized: 'code',
+    domain: 'code',
+    orchestrator: 'orchestration',
   };
 
   return categoryDomains[category] || 'code';
@@ -624,20 +712,23 @@ function generateCapabilityCard(agentDef, agentId, category, filePath) {
     description: agentDef.description || `${agentId} capability`,
     triggerPhrases: triggerPhrases.slice(0, 10),
     requiredTools: agentDef.tools || ['Read', 'Write', 'Edit', 'Bash'],
-    skills: agentDef.skills || []
+    skills: agentDef.skills || [],
   });
 
   return {
     id: agentId,
-    displayName: agentDef.name || agentId.split('-').map(w =>
-      w.charAt(0).toUpperCase() + w.slice(1)
-    ).join(' '),
+    displayName:
+      agentDef.name ||
+      agentId
+        .split('-')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' '),
     category: category,
     filePath: filePath.replace(PROJECT_ROOT, '.').replace(/\\/g, '/'),
     capabilities: capabilities,
     constraints: {
       maxConcurrentTasks: 5,
-      preferredModel: agentDef.model || 'sonnet'
+      preferredModel: agentDef.model || 'sonnet',
     },
     health: {
       status: 'healthy',
@@ -647,13 +738,13 @@ function generateCapabilityCard(agentDef, agentId, category, filePath) {
       successRate: 1.0,
       lastUpdate: new Date().toISOString(),
       isolatedAt: null,
-      isolationReason: null
+      isolationReason: null,
     },
     metadata: {
       version: agentDef.version || '1.0.0',
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
+      updatedAt: new Date().toISOString(),
+    },
   };
 }
 
@@ -671,13 +762,13 @@ class AgentRegistryGenerator {
       index: {
         byCapability: {},
         byDomain: {},
-        byCategory: {}
+        byCategory: {},
       },
       health: {
         healthy: [],
         degraded: [],
-        unavailable: []
-      }
+        unavailable: [],
+      },
     };
   }
 
@@ -713,7 +804,7 @@ class AgentRegistryGenerator {
         agents.set(agentId, {
           definition: agentDef,
           category: normalizedCategory,
-          filePath: filePath
+          filePath: filePath,
         });
       }
     }
@@ -803,7 +894,7 @@ class AgentRegistryGenerator {
       degradedAgents: this.registry.health.degraded.length,
       unavailableAgents: this.registry.health.unavailable.length,
       lastHealthCheck: new Date().toISOString(),
-      lastFullScan: new Date().toISOString()
+      lastFullScan: new Date().toISOString(),
     };
 
     return this.registry;
@@ -831,14 +922,14 @@ class AgentRegistryGenerator {
       if (!validate(card)) {
         errors.push({
           agentId,
-          errors: validate.errors
+          errors: validate.errors,
         });
       }
     }
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -888,21 +979,21 @@ module.exports = {
   generateCapabilityCard,
   parseAgentFrontmatter,
   inferDomain,
-  extractTriggerPhrases
+  extractTriggerPhrases,
 };
 ```
 
 ### Implementation Notes
 
-| Component | Purpose | Lines |
-|-----------|---------|-------|
-| `DOMAIN_MAPPING` | Map skills/keywords to domains | ~80 lines |
-| `extractTriggerPhrases()` | Generate routing keywords | ~20 lines |
-| `inferDomain()` | Determine primary domain | ~25 lines |
-| `parseAgentFrontmatter()` | YAML frontmatter parsing | ~15 lines |
-| `generateCapabilityCard()` | Build capability card | ~50 lines |
-| `AgentRegistryGenerator` class | Full registry generation | ~150 lines |
-| CLI entry | `npm run agents:registry` | ~30 lines |
+| Component                      | Purpose                        | Lines      |
+| ------------------------------ | ------------------------------ | ---------- |
+| `DOMAIN_MAPPING`               | Map skills/keywords to domains | ~80 lines  |
+| `extractTriggerPhrases()`      | Generate routing keywords      | ~20 lines  |
+| `inferDomain()`                | Determine primary domain       | ~25 lines  |
+| `parseAgentFrontmatter()`      | YAML frontmatter parsing       | ~15 lines  |
+| `generateCapabilityCard()`     | Build capability card          | ~50 lines  |
+| `AgentRegistryGenerator` class | Full registry generation       | ~150 lines |
+| CLI entry                      | `npm run agents:registry`      | ~30 lines  |
 
 **Total: ~400 lines**
 
@@ -936,8 +1027,8 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
  */
 class AvailableAgentsQuery {
   constructor(options = {}) {
-    this.registryPath = options.registryPath ||
-      path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
+    this.registryPath =
+      options.registryPath || path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
     this.registry = null;
     this.cache = new Map();
     this.cacheTimeouts = new Map();
@@ -1047,7 +1138,7 @@ class AvailableAgentsQuery {
       success: true,
       agents: agents,
       count: agents.length,
-      query: options
+      query: options,
     };
 
     this.setCache(cacheKey, response);
@@ -1085,7 +1176,7 @@ class AvailableAgentsQuery {
       capability,
       excludeFailed: true,
       minSuccessRate: 0.7,
-      limit: 1
+      limit: 1,
     });
 
     return result.success && result.count > 0 ? result.agents[0] : null;
@@ -1102,7 +1193,7 @@ class AvailableAgentsQuery {
       domains: Object.keys(registry.index.byDomain),
       categories: Object.keys(registry.index.byCategory),
       totalAgents: registry.metadata.totalAgents,
-      healthyAgents: registry.metadata.healthyAgents
+      healthyAgents: registry.metadata.healthyAgents,
     };
   }
 
@@ -1121,8 +1212,11 @@ class AvailableAgentsQuery {
     }
 
     if (options.minSuccessRate !== undefined) {
-      if (typeof options.minSuccessRate !== 'number' ||
-          options.minSuccessRate < 0 || options.minSuccessRate > 1) {
+      if (
+        typeof options.minSuccessRate !== 'number' ||
+        options.minSuccessRate < 0 ||
+        options.minSuccessRate > 1
+      ) {
         return 'minSuccessRate must be a number between 0 and 1';
       }
     }
@@ -1138,7 +1232,7 @@ class AvailableAgentsQuery {
       success: false,
       error: error,
       agents: [],
-      count: 0
+      count: 0,
     };
   }
 
@@ -1202,7 +1296,7 @@ function AvailableAgents(options) {
 module.exports = {
   AvailableAgents,
   AvailableAgentsQuery,
-  getInstance: () => queryEngine
+  getInstance: () => queryEngine,
 };
 ```
 
@@ -1210,15 +1304,15 @@ module.exports = {
 
 ```javascript
 // Example 1: Find agents for code review
-AvailableAgents({ capability: 'code-review' })
+AvailableAgents({ capability: 'code-review' });
 // Returns: [code-reviewer, code-simplifier]
 
 // Example 2: Find healthy frontend agents
-AvailableAgents({ domain: 'frontend', excludeFailed: true })
+AvailableAgents({ domain: 'frontend', excludeFailed: true });
 // Returns: [frontend-pro, nextjs-pro, sveltekit-expert]
 
 // Example 3: Find core agents with high success rate
-AvailableAgents({ category: 'core', minSuccessRate: 0.9 })
+AvailableAgents({ category: 'core', minSuccessRate: 0.9 });
 // Returns: [developer, planner, architect, qa, ...]
 
 // Example 4: Get best agent for security review
@@ -1226,7 +1320,7 @@ const best = AvailableAgents({ capability: 'security-review', limit: 1 });
 // Returns: { agents: [security-architect], ... }
 
 // Example 5: Get all orchestrators
-AvailableAgents({ category: 'orchestrator' })
+AvailableAgents({ category: 'orchestrator' });
 // Returns: [master-orchestrator, swarm-coordinator, evolution-orchestrator, party-orchestrator]
 ```
 
@@ -1278,8 +1372,8 @@ const RECOVERY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
 class AgentHealthTracker {
   constructor(options = {}) {
-    this.registryPath = options.registryPath ||
-      path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
+    this.registryPath =
+      options.registryPath || path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
     this.failureThreshold = options.failureThreshold || FAILURE_THRESHOLD;
     this.recoveryWindow = options.recoveryWindow || RECOVERY_WINDOW_MS;
   }
@@ -1320,8 +1414,7 @@ class AgentHealthTracker {
     if (executionMs !== null) {
       const total = agent.health.successCount + agent.health.failureCount;
       const currentAvg = agent.health.averageExecutionMs || 0;
-      agent.health.averageExecutionMs =
-        (currentAvg * (total - 1) + executionMs) / total;
+      agent.health.averageExecutionMs = (currentAvg * (total - 1) + executionMs) / total;
     }
 
     // Update success rate
@@ -1400,7 +1493,7 @@ class AgentHealthTracker {
       const remainingMs = this.recoveryWindow - (now - isolatedAt);
       return {
         success: false,
-        reason: `Recovery cooldown active (${Math.ceil(remainingMs / 1000)}s remaining)`
+        reason: `Recovery cooldown active (${Math.ceil(remainingMs / 1000)}s remaining)`,
       };
     }
 
@@ -1430,19 +1523,19 @@ class AgentHealthTracker {
         healthy: registry.health.healthy.length,
         degraded: registry.health.degraded.length,
         unavailable: registry.health.unavailable.length,
-        lastCheck: new Date().toISOString()
+        lastCheck: new Date().toISOString(),
       },
       healthy: registry.health.healthy,
       degraded: registry.health.degraded.map(id => ({
         id,
         successRate: registry.agents[id]?.health.successRate,
-        consecutiveFailures: registry.agents[id]?.health.consecutiveFailures
+        consecutiveFailures: registry.agents[id]?.health.consecutiveFailures,
       })),
       unavailable: registry.health.unavailable.map(id => ({
         id,
         isolatedAt: registry.agents[id]?.health.isolatedAt,
-        reason: registry.agents[id]?.health.isolationReason
-      }))
+        reason: registry.agents[id]?.health.isolationReason,
+      })),
     };
   }
 
@@ -1466,7 +1559,7 @@ class AgentHealthTracker {
       isolatedAt: null,
       isolationReason: null,
       lastSuccessAt: null,
-      lastFailureAt: null
+      lastFailureAt: null,
     };
 
     this.updateHealthArrays(registry);
@@ -1533,7 +1626,7 @@ module.exports = {
   FAILURE_THRESHOLD,
   DEGRADED_THRESHOLD,
   RECOVERY_THRESHOLD,
-  RECOVERY_WINDOW_MS
+  RECOVERY_WINDOW_MS,
 };
 ```
 
@@ -1637,7 +1730,7 @@ function extractAgentFromInput(toolInput) {
     // Common patterns in description
     const agentPatterns = [
       /^(developer|planner|architect|qa|security-architect|devops|code-reviewer|frontend-pro|researcher)\b/,
-      /(developer|planner|architect|qa|security|devops|reviewer|frontend)\s+(implementing|designing|reviewing|testing)/i
+      /(developer|planner|architect|qa|security|devops|reviewer|frontend)\s+(implementing|designing|reviewing|testing)/i,
     ];
 
     for (const pattern of agentPatterns) {
@@ -1657,7 +1750,7 @@ const hookConfig = {
   description: 'Track agent spawn success/failure for health-aware routing',
   triggers: ['Task'],
   phase: 'PostToolUse',
-  mode: process.env.AGENT_HEALTH_HOOK || 'enabled'
+  mode: process.env.AGENT_HEALTH_HOOK || 'enabled',
 };
 
 /**
@@ -1725,14 +1818,16 @@ async function preSpawnHealthCheck(context) {
       return {
         decision: 'block',
         message: `Agent ${agentId} is currently unavailable: ${agent.health.isolationReason}. ${recovery.reason}`,
-        suggestion: `Try alternative agents: ${await suggestAlternatives(agentId)}`
+        suggestion: `Try alternative agents: ${await suggestAlternatives(agentId)}`,
       };
     }
   }
 
   // Warn for degraded agents
   if (agent.health.status === 'degraded') {
-    console.warn(`[agent-health] Agent ${agentId} is degraded (success rate: ${(agent.health.successRate * 100).toFixed(1)}%)`);
+    console.warn(
+      `[agent-health] Agent ${agentId} is degraded (success rate: ${(agent.health.successRate * 100).toFixed(1)}%)`
+    );
   }
 
   return { decision: 'allow' };
@@ -1754,7 +1849,7 @@ async function suggestAlternatives(agentId) {
   const alternatives = agentQuery.query({
     capability,
     excludeFailed: true,
-    limit: 3
+    limit: 3,
   });
 
   if (alternatives.count === 0) {
@@ -1773,7 +1868,7 @@ module.exports = {
   postToolUse: agentHealthHook,
   preToolUse: preSpawnHealthCheck,
   extractAgentId,
-  extractAgentFromInput
+  extractAgentFromInput,
 };
 ```
 
@@ -1784,9 +1879,7 @@ Add to `.claude/settings.json`:
 ```json
 {
   "hooks": {
-    "Task": [
-      ".claude/hooks/routing/agent-health-hook.cjs"
-    ]
+    "Task": [".claude/hooks/routing/agent-health-hook.cjs"]
   }
 }
 ```
@@ -1799,7 +1892,7 @@ Add to `.claude/settings.json`:
 
 Add to Gate 3 (Tool Check):
 
-```markdown
+````markdown
 ## Gate 3: Capability-Aware Agent Selection (Phase 3)
 
 Before spawning an agent, check available capabilities:
@@ -1807,6 +1900,7 @@ Before spawning an agent, check available capabilities:
 ### Step 1: Identify Required Capability
 
 Analyze the request to determine needed capability:
+
 - Code review -> `code-review` capability
 - Bug fix -> `bug-fix` capability
 - Architecture design -> `architecture` capability
@@ -1818,21 +1912,23 @@ Analyze the request to determine needed capability:
 const result = AvailableAgents({
   capability: 'code-review',
   excludeFailed: true,
-  minSuccessRate: 0.7
+  minSuccessRate: 0.7,
 });
 
 if (result.count === 0) {
   // Fallback: try by domain
   const fallback = AvailableAgents({
     domain: 'code',
-    excludeFailed: true
+    excludeFailed: true,
   });
 }
 ```
+````
 
 ### Step 3: Select Best Agent
 
 Pick the agent with:
+
 1. Highest success rate
 2. Fastest average execution time
 3. Capacity available (< maxConcurrentTasks)
@@ -1858,7 +1954,8 @@ If no agents are available for the capability:
   ]
 }
 ```
-```
+
+````
 
 ---
 
@@ -2002,7 +2099,7 @@ Add to `package.json`:
     "agents:query": "node -e \"console.log(JSON.stringify(require('./.claude/lib/tools/available-agents.cjs').AvailableAgents(JSON.parse(process.argv[1])), null, 2))\""
   }
 }
-```
+````
 
 ---
 

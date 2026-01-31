@@ -22,14 +22,14 @@ This document provides detailed reasoning for each technology choice in the Code
 
 ### Alternatives Considered
 
-| Option | Description | Pros | Cons |
-|--------|-------------|------|------|
-| **tree-sitter** | Incremental parsing library by GitHub | 40+ languages, battle-tested, incremental parsing, mature ecosystem | Native bindings, ~50MB per grammar, learning curve |
-| **Babel** | JavaScript/TypeScript parser | Excellent JS/TS support, pure JS, no native deps | JS/TS only, no other languages |
-| **esprima** | Fast JavaScript parser | Very fast, pure JS, lightweight | JavaScript only, dated |
-| **@typescript-eslint/parser** | TypeScript-aware ESLint parser | Deep TypeScript understanding | TypeScript only, ESLint-focused |
-| **Language-specific parsers** | Multiple parsers per language | Optimized for each language | N different APIs, N maintenance burdens |
-| **Regex-based** | Pattern matching | Simple, no dependencies | Fragile, misses edge cases, no AST |
+| Option                        | Description                           | Pros                                                                | Cons                                               |
+| ----------------------------- | ------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------- |
+| **tree-sitter**               | Incremental parsing library by GitHub | 40+ languages, battle-tested, incremental parsing, mature ecosystem | Native bindings, ~50MB per grammar, learning curve |
+| **Babel**                     | JavaScript/TypeScript parser          | Excellent JS/TS support, pure JS, no native deps                    | JS/TS only, no other languages                     |
+| **esprima**                   | Fast JavaScript parser                | Very fast, pure JS, lightweight                                     | JavaScript only, dated                             |
+| **@typescript-eslint/parser** | TypeScript-aware ESLint parser        | Deep TypeScript understanding                                       | TypeScript only, ESLint-focused                    |
+| **Language-specific parsers** | Multiple parsers per language         | Optimized for each language                                         | N different APIs, N maintenance burdens            |
+| **Regex-based**               | Pattern matching                      | Simple, no dependencies                                             | Fragile, misses edge cases, no AST                 |
 
 ### Rationale
 
@@ -87,17 +87,17 @@ class CodeParser {
 
 ### Alternatives Considered
 
-| Option | Dimensions | Speed | Quality | Cost | Privacy |
-|--------|------------|-------|---------|------|---------|
-| **Xenova/all-MiniLM-L6-v2** | 384 | Very Fast | Good (0.82) | $0 | Local |
-| **Xenova/all-mpnet-base-v2** | 768 | Fast | Better (0.88) | $0 | Local |
-| **Ollama (nomic-embed-text)** | 768 | Fast | Good | $0 | Local |
-| **OpenAI text-embedding-3-small** | 1536 | Fast | High (0.91) | $0.02/1M tokens | Cloud |
-| **OpenAI text-embedding-3-large** | 3072 | Medium | Highest (0.95) | $0.13/1M tokens | Cloud |
-| **Cohere embed-english-v3.0** | 1024 | Fast | High | $0.10/1M tokens | Cloud |
-| **Voyage AI voyage-code-2** | 1536 | Fast | Best for code | $0.10/1M tokens | Cloud |
+| Option                            | Dimensions | Speed     | Quality        | Cost            | Privacy |
+| --------------------------------- | ---------- | --------- | -------------- | --------------- | ------- |
+| **Xenova/all-MiniLM-L6-v2**       | 384        | Very Fast | Good (0.82)    | $0              | Local   |
+| **Xenova/all-mpnet-base-v2**      | 768        | Fast      | Better (0.88)  | $0              | Local   |
+| **Ollama (nomic-embed-text)**     | 768        | Fast      | Good           | $0              | Local   |
+| **OpenAI text-embedding-3-small** | 1536       | Fast      | High (0.91)    | $0.02/1M tokens | Cloud   |
+| **OpenAI text-embedding-3-large** | 3072       | Medium    | Highest (0.95) | $0.13/1M tokens | Cloud   |
+| **Cohere embed-english-v3.0**     | 1024       | Fast      | High           | $0.10/1M tokens | Cloud   |
+| **Voyage AI voyage-code-2**       | 1536       | Fast      | Best for code  | $0.10/1M tokens | Cloud   |
 
-*Quality scores based on MTEB benchmark similarity tasks*
+_Quality scores based on MTEB benchmark similarity tasks_
 
 ### Rationale
 
@@ -136,16 +136,13 @@ class LocalEmbedder {
   #embedder = null;
 
   async initialize() {
-    this.#embedder = await pipeline(
-      'feature-extraction',
-      'Xenova/all-MiniLM-L6-v2'
-    );
+    this.#embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
   }
 
   async embed(text) {
     const output = await this.#embedder(text, {
       pooling: 'mean',
-      normalize: true
+      normalize: true,
     });
     return Array.from(output.data);
   }
@@ -162,15 +159,15 @@ class LocalEmbedder {
 
 ### Alternatives Considered
 
-| Option | Type | Cost | Performance | Complexity | Integration |
-|--------|------|------|-------------|------------|-------------|
-| **ChromaDB** | In-process | $0 | <10ms queries | Low | Existing in codebase |
-| **Qdrant** | Server-based | $0 | <5ms queries | Medium | New dependency |
-| **Milvus** | Server-based | $0 | <5ms queries | High | Heavy infrastructure |
-| **Weaviate** | Server-based | $0 | <5ms queries | Medium | GraphQL-based |
-| **Pinecone** | Cloud SaaS | $70+/month | <5ms queries | Low | External service |
-| **pgvector** | PostgreSQL extension | $0 | 10-50ms | Medium | Requires PostgreSQL |
-| **LanceDB** | Embedded | $0 | <10ms | Low | Newer, less mature |
+| Option       | Type                 | Cost       | Performance   | Complexity | Integration          |
+| ------------ | -------------------- | ---------- | ------------- | ---------- | -------------------- |
+| **ChromaDB** | In-process           | $0         | <10ms queries | Low        | Existing in codebase |
+| **Qdrant**   | Server-based         | $0         | <5ms queries  | Medium     | New dependency       |
+| **Milvus**   | Server-based         | $0         | <5ms queries  | High       | Heavy infrastructure |
+| **Weaviate** | Server-based         | $0         | <5ms queries  | Medium     | GraphQL-based        |
+| **Pinecone** | Cloud SaaS           | $70+/month | <5ms queries  | Low        | External service     |
+| **pgvector** | PostgreSQL extension | $0         | 10-50ms       | Medium     | Requires PostgreSQL  |
+| **LanceDB**  | Embedded             | $0         | <10ms         | Low        | Newer, less mature   |
 
 ### Rationale
 
@@ -208,7 +205,7 @@ const { ChromaClient } = require('chromadb');
 class CodeVectorStore {
   constructor() {
     this.client = new ChromaClient({
-      path: '.claude/data/code-index/chromadb'
+      path: '.claude/data/code-index/chromadb',
     });
     this.collectionName = 'agent-studio-code';
   }
@@ -216,7 +213,7 @@ class CodeVectorStore {
   async initialize() {
     this.collection = await this.client.getOrCreateCollection({
       name: this.collectionName,
-      metadata: { 'hnsw:space': 'cosine' }
+      metadata: { 'hnsw:space': 'cosine' },
     });
   }
 }
@@ -232,14 +229,14 @@ class CodeVectorStore {
 
 ### Alternatives Considered
 
-| Option | Detection Speed | Accuracy | Complexity | Storage |
-|--------|-----------------|----------|------------|---------|
-| **Merkle trees** | O(log n) diff | 100% | Medium | Tree JSON |
-| **File modification time (mtime)** | O(n) | 99% (clock skew issues) | Low | Timestamp map |
-| **Git status** | O(n) | 100% (for git-tracked) | Low | None |
-| **File content hash** | O(n) | 100% | Low | Hash map |
-| **inotify/fs.watch** | Real-time | 100% | Medium | Event buffer |
-| **Polling** | O(n) per poll | 100% | Low | None |
+| Option                             | Detection Speed | Accuracy                | Complexity | Storage       |
+| ---------------------------------- | --------------- | ----------------------- | ---------- | ------------- |
+| **Merkle trees**                   | O(log n) diff   | 100%                    | Medium     | Tree JSON     |
+| **File modification time (mtime)** | O(n)            | 99% (clock skew issues) | Low        | Timestamp map |
+| **Git status**                     | O(n)            | 100% (for git-tracked)  | Low        | None          |
+| **File content hash**              | O(n)            | 100%                    | Low        | Hash map      |
+| **inotify/fs.watch**               | Real-time       | 100%                    | Medium     | Event buffer  |
+| **Polling**                        | O(n) per poll   | 100%                    | Low        | None          |
 
 ### Rationale
 
@@ -310,12 +307,12 @@ function diff(oldTree, newTree) {
 
 ### Alternatives Considered
 
-| Option | Ecosystem Fit | Performance | Tooling | Maintenance |
-|--------|---------------|-------------|---------|-------------|
-| **Node.js/JavaScript** | Native | Good | Excellent | Same as codebase |
-| **Python** | Separate | Better for ML | Good | Separate runtime |
-| **Rust** | Separate | Best | Moderate | Different expertise |
-| **Go** | Separate | Good | Good | Different expertise |
+| Option                 | Ecosystem Fit | Performance   | Tooling   | Maintenance         |
+| ---------------------- | ------------- | ------------- | --------- | ------------------- |
+| **Node.js/JavaScript** | Native        | Good          | Excellent | Same as codebase    |
+| **Python**             | Separate      | Better for ML | Good      | Separate runtime    |
+| **Rust**               | Separate      | Best          | Moderate  | Different expertise |
+| **Go**                 | Separate      | Good          | Good      | Different expertise |
 
 ### Rationale
 
@@ -363,12 +360,12 @@ module.exports = { CodeParser, SemanticChunker, ... };
 
 ### Alternatives Considered
 
-| Option | Integration | Complexity | Discoverability | Flexibility |
-|--------|-------------|------------|-----------------|-------------|
-| **Native Skill** | Seamless | Low | Via SkillCatalog | High |
-| **MCP Server** | Separate process | High | Via MCP tools | Medium |
-| **Hook** | Automatic | Medium | Hidden | Low |
-| **CLI Tool** | Manual | Low | Via docs | Low |
+| Option           | Integration      | Complexity | Discoverability  | Flexibility |
+| ---------------- | ---------------- | ---------- | ---------------- | ----------- |
+| **Native Skill** | Seamless         | Low        | Via SkillCatalog | High        |
+| **MCP Server**   | Separate process | High       | Via MCP tools    | Medium      |
+| **Hook**         | Automatic        | Medium     | Hidden           | Low         |
+| **CLI Tool**     | Manual           | Low        | Via docs         | Low         |
 
 ### Rationale
 
@@ -418,14 +415,14 @@ module.exports = { handleSearch };
 
 ## Summary
 
-| Component | Selected | Primary Reason |
-|-----------|----------|----------------|
-| Code Parser | tree-sitter | 40+ languages, battle-tested |
-| Embedding Model | all-MiniLM-L6-v2 (local) | Free, private, offline |
-| Vector Database | ChromaDB | Existing infrastructure |
-| Change Detection | Merkle trees | O(log n) diffing, Cursor precedent |
-| Language | Node.js/JavaScript | Ecosystem alignment |
-| Integration | Native Skill | Agent-native, discoverable |
+| Component        | Selected                 | Primary Reason                     |
+| ---------------- | ------------------------ | ---------------------------------- |
+| Code Parser      | tree-sitter              | 40+ languages, battle-tested       |
+| Embedding Model  | all-MiniLM-L6-v2 (local) | Free, private, offline             |
+| Vector Database  | ChromaDB                 | Existing infrastructure            |
+| Change Detection | Merkle trees             | O(log n) diffing, Cursor precedent |
+| Language         | Node.js/JavaScript       | Ecosystem alignment                |
+| Integration      | Native Skill             | Agent-native, discoverable         |
 
 ### Technology Stack Diagram
 

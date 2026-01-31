@@ -31,7 +31,7 @@ function MessageList({ messages }: { messages: Message[] }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 ```
 

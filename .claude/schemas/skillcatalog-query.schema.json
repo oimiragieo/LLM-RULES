@@ -8,14 +8,7 @@
     "domain": {
       "type": "string",
       "description": "Filter by skill domain (e.g., 'testing', 'security', 'devops')",
-      "examples": [
-        "testing",
-        "security",
-        "devops",
-        "documentation",
-        "planning",
-        "architecture"
-      ]
+      "examples": ["testing", "security", "devops", "documentation", "planning", "architecture"]
     },
     "category": {
       "type": "string",

@@ -24,7 +24,9 @@ const { IndexManager } = require('../../.claude/lib/code-indexing/index.cjs');
 const { HybridSearch } = require('../../.claude/lib/code-indexing/hybrid-search.cjs');
 const { QueryAnalyzer } = require('../../.claude/lib/code-indexing/query-analyzer.cjs');
 const { ResultRanker } = require('../../.claude/lib/code-indexing/result-ranker.cjs');
-const { AstGrepSearch: _AstGrepSearch } = require('../../.claude/lib/code-indexing/ast-grep-wrapper.cjs');
+const {
+  AstGrepSearch: _AstGrepSearch,
+} = require('../../.claude/lib/code-indexing/ast-grep-wrapper.cjs');
 
 suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
   let tempDir;
@@ -59,7 +61,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
         '  return { user: username, token: generateToken() };',
         '}',
         '',
-        'module.exports = { login, authenticateUser };'
+        'module.exports = { login, authenticateUser };',
       ].join('\n'),
 
       // TypeScript files
@@ -87,7 +89,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
         '      email: data.email',
         '    };',
         '  }',
-        '}'
+        '}',
       ].join('\n'),
 
       // Python files
@@ -132,7 +134,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
         '',
         'func fetchUserFromDB(id int) (*User, error) {',
         '    return &User{ID: id, Username: "test"}, nil',
-        '}'
+        '}',
       ].join('\n'),
 
       // Rust files
@@ -154,8 +156,8 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
         '',
         'pub fn create_user(id: u32, name: &str) -> User {',
         '    User::new(id, name.to_string())',
-        '}'
-      ].join('\n')
+        '}',
+      ].join('\n'),
     };
 
     for (const [filePath, content] of Object.entries(files)) {
@@ -174,7 +176,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
 
     indexManager = new IndexManager({
       projectRoot: tempDir,
-      metadataPath: path.join(tempDir, '.metadata.json')
+      metadataPath: path.join(tempDir, '.metadata.json'),
     });
 
     // Initialize hybrid search (ast-grep will be mocked/optional)
@@ -182,7 +184,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
       astGrep: null, // Will test with/without ast-grep
       semanticWeight: 0.7,
       structuralWeight: 0.3,
-      topK: 10
+      topK: 10,
     });
 
     assert.ok(tempDir);
@@ -223,7 +225,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
       await indexManager.indexDirectory(tempDir);
 
       const results = await hybridSearch.search('find login functions', {
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(Array.isArray(results.results), 'Should return results array');
@@ -236,7 +238,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
       await indexManager.indexDirectory(tempDir);
 
       const results = await hybridSearch.search('find async functions in TypeScript', {
-        limit: 5
+        limit: 5,
       });
 
       // Query analyzer should detect "typescript" language
@@ -253,7 +255,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
 
       // Phase 2 hybrid (semantic only, no ast-grep)
       const hybridResults = await hybridSearch.search('authentication login', {
-        limit: 5
+        limit: 5,
       });
 
       // Both should return result structures
@@ -289,7 +291,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('1.8: Test result ranking', async () => {
       const ranker = new ResultRanker({
         semantic: 0.7,
-        structural: 0.3
+        structural: 0.3,
       });
 
       const semanticResults = [
@@ -299,7 +301,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
           lineEnd: 10,
           content: 'login',
           similarity: 0.9,
-          language: 'javascript'
+          language: 'javascript',
         },
         {
           filePath: 'test2.js',
@@ -307,8 +309,8 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
           lineEnd: 10,
           content: 'auth',
           similarity: 0.7,
-          language: 'javascript'
-        }
+          language: 'javascript',
+        },
       ];
 
       const combined = ranker.combine(semanticResults, []);
@@ -332,14 +334,14 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('1.10: Test language filter in hybrid search', async () => {
       const results = await hybridSearch.search('function', {
         language: 'javascript',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
       // If results exist, they should be JavaScript
       if (results.results.length > 0) {
-        const _hasJS = results.results.some(r =>
-          r.language === 'javascript' || r.filePath.endsWith('.js')
+        const _hasJS = results.results.some(
+          r => r.language === 'javascript' || r.filePath.endsWith('.js')
         );
         // Note: language filter may not work without proper indexing
         assert.ok(true, 'Language filter attempted');
@@ -367,7 +369,9 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
       assert.ok(duration < 500, `Hybrid search took ${duration}ms (should be <500ms)`);
       assert.ok(results.timing.total > 0, 'Should track total timing');
       console.log(`  Phase 2 hybrid (no ast-grep): ${duration}ms`);
-      console.log(`  Breakdown: semantic=${results.timing.semantic}ms, combine=${results.timing.combine}ms`);
+      console.log(
+        `  Breakdown: semantic=${results.timing.semantic}ms, combine=${results.timing.combine}ms`
+      );
     });
 
     test('2.3: Compare Phase 1 vs Phase 2 performance', async () => {
@@ -391,12 +395,16 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
       const results = await hybridSearch.search('authentication', { limit: 10 });
 
       // Phase 2 target: <150ms total (cached)
-      assert.ok(results.timing.total < 500,
-        `Total time ${results.timing.total}ms should be <500ms`);
+      assert.ok(
+        results.timing.total < 500,
+        `Total time ${results.timing.total}ms should be <500ms`
+      );
 
       // Semantic stage should be fast
-      assert.ok(results.timing.semantic < 200,
-        `Semantic time ${results.timing.semantic}ms should be <200ms`);
+      assert.ok(
+        results.timing.semantic < 200,
+        `Semantic time ${results.timing.semantic}ms should be <200ms`
+      );
 
       console.log(`  Performance: ${results.timing.total}ms total`);
     });
@@ -407,7 +415,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
         phase1Semantic: '<150ms (cached)',
         phase2Hybrid: '<200ms (cached, no ast-grep)',
         phase2WithAstGrep: '<300ms (target)',
-        overhead: '<2x baseline'
+        overhead: '<2x baseline',
       };
 
       assert.ok(metrics, 'Performance metrics documented');
@@ -419,14 +427,12 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.1: JavaScript - function search', async () => {
       const results = await hybridSearch.search('find login function in JavaScript', {
         language: 'javascript',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
       // Verify at least one JS file
-      const hasJS = results.results.some(r =>
-        r.filePath && r.filePath.endsWith('.js')
-      );
+      const hasJS = results.results.some(r => r.filePath && r.filePath.endsWith('.js'));
       if (results.results.length > 0) {
         assert.ok(hasJS || results.results.length > 0, 'Should find JS files');
       }
@@ -435,7 +441,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.2: JavaScript - class search', async () => {
       const results = await hybridSearch.search('JavaScript class', {
         language: 'javascript',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
@@ -444,13 +450,11 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.3: TypeScript - type-aware search', async () => {
       const results = await hybridSearch.search('TypeScript interface User', {
         language: 'typescript',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
-      const hasTS = results.results.some(r =>
-        r.filePath && r.filePath.endsWith('.ts')
-      );
+      const hasTS = results.results.some(r => r.filePath && r.filePath.endsWith('.ts'));
       if (results.results.length > 0) {
         assert.ok(hasTS || results.results.length > 0, 'Should find TS files');
       }
@@ -459,7 +463,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.4: TypeScript - async function search', async () => {
       const results = await hybridSearch.search('async function TypeScript', {
         language: 'typescript',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
@@ -468,13 +472,11 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.5: Python - function search', async () => {
       const results = await hybridSearch.search('Python function calculate', {
         language: 'python',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
-      const hasPy = results.results.some(r =>
-        r.filePath && r.filePath.endsWith('.py')
-      );
+      const hasPy = results.results.some(r => r.filePath && r.filePath.endsWith('.py'));
       if (results.results.length > 0) {
         assert.ok(hasPy || results.results.length > 0, 'Should find Python files');
       }
@@ -483,7 +485,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.6: Python - class method search', async () => {
       const results = await hybridSearch.search('Python class DataProcessor', {
         language: 'python',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
@@ -492,13 +494,11 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.7: Go - struct search', async () => {
       const results = await hybridSearch.search('Go struct User', {
         language: 'go',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
-      const hasGo = results.results.some(r =>
-        r.filePath && r.filePath.endsWith('.go')
-      );
+      const hasGo = results.results.some(r => r.filePath && r.filePath.endsWith('.go'));
       if (results.results.length > 0) {
         assert.ok(hasGo || results.results.length > 0, 'Should find Go files');
       }
@@ -507,7 +507,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.8: Go - function search', async () => {
       const results = await hybridSearch.search('Go function GetUser', {
         language: 'go',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
@@ -516,13 +516,11 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.9: Rust - struct and impl search', async () => {
       const results = await hybridSearch.search('Rust struct User', {
         language: 'rust',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
-      const hasRust = results.results.some(r =>
-        r.filePath && r.filePath.endsWith('.rs')
-      );
+      const hasRust = results.results.some(r => r.filePath && r.filePath.endsWith('.rs'));
       if (results.results.length > 0) {
         assert.ok(hasRust || results.results.length > 0, 'Should find Rust files');
       }
@@ -531,7 +529,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     test('3.10: Rust - trait search', async () => {
       const results = await hybridSearch.search('Rust function validate', {
         language: 'rust',
-        limit: 5
+        limit: 5,
       });
 
       assert.ok(results.results, 'Should return results');
@@ -568,7 +566,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
 
       const largeIndexManager = new IndexManager({
         projectRoot: largeTempDir,
-        metadataPath: path.join(largeTempDir, '.metadata.json')
+        metadataPath: path.join(largeTempDir, '.metadata.json'),
       });
 
       const start = Date.now();
@@ -648,11 +646,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
     });
 
     test('5.4: Verify agents get helpful search results', async () => {
-      const queries = [
-        'login authentication',
-        'user data processing',
-        'async functions'
-      ];
+      const queries = ['login authentication', 'user data processing', 'async functions'];
 
       for (const query of queries) {
         const results = await hybridSearch.search(query, { limit: 3 });
@@ -718,13 +712,17 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
       // Phase 2 performance targets
       const targets = {
         total: 500, // <500ms for cached
-        semantic: 200 // <200ms semantic
+        semantic: 200, // <200ms semantic
       };
 
-      assert.ok(results.timing.total < targets.total,
-        `Total ${results.timing.total}ms meets target <${targets.total}ms`);
-      assert.ok(results.timing.semantic < targets.semantic,
-        `Semantic ${results.timing.semantic}ms meets target <${targets.semantic}ms`);
+      assert.ok(
+        results.timing.total < targets.total,
+        `Total ${results.timing.total}ms meets target <${targets.total}ms`
+      );
+      assert.ok(
+        results.timing.semantic < targets.semantic,
+        `Semantic ${results.timing.semantic}ms meets target <${targets.semantic}ms`
+      );
 
       console.log(`  Performance targets: PASS (${results.timing.total}ms total)`);
     });
@@ -745,8 +743,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
       const heapUsedMB = Math.round(used.heapUsed / 1024 / 1024);
 
       // Should not exceed 500MB for this test
-      assert.ok(heapUsedMB < 500,
-        `Heap usage ${heapUsedMB}MB should be <500MB`);
+      assert.ok(heapUsedMB < 500, `Heap usage ${heapUsedMB}MB should be <500MB`);
 
       console.log(`  Memory usage: ${heapUsedMB}MB (acceptable)`);
     });
@@ -759,7 +756,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
         regressions: 'NONE',
         memoryUsage: 'ACCEPTABLE',
         agentVerification: 'COMPLETE',
-        readyForProduction: true
+        readyForProduction: true,
       };
 
       console.log('\n  === Phase 2 Integration Test Summary ===');

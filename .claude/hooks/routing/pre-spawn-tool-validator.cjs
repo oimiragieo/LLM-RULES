@@ -113,7 +113,13 @@ function loadManifest() {
     },
     validation: {
       reservedTools: {
-        Task: ['router', 'master-orchestrator', 'evolution-orchestrator', 'swarm-coordinator', 'party-orchestrator'],
+        Task: [
+          'router',
+          'master-orchestrator',
+          'evolution-orchestrator',
+          'swarm-coordinator',
+          'party-orchestrator',
+        ],
         AskUserQuestion: ['router'],
       },
       mandatoryTools: ['TaskUpdate', 'Skill'],
@@ -219,8 +225,8 @@ function validateToolConfig({ tools, agentType }) {
   // Determine max tools limit
   const isOrch = isOrchestrator(agentType);
   const maxTools = isOrch
-    ? (constraints.maxToolsPerOrchestrator || 18)
-    : (constraints.maxToolsPerAgent || 15);
+    ? constraints.maxToolsPerOrchestrator || 18
+    : constraints.maxToolsPerAgent || 15;
 
   // 1. Check tool count
   if (tools.length > maxTools) {
@@ -246,17 +252,13 @@ function validateToolConfig({ tools, agentType }) {
           // Has fallback - warn
           result.warnings.push(
             `Tool '${tool}' unavailable (${mcpInfo.reason || 'MCP server not configured'}). ` +
-            `Suggestion: Use ${mcpInfo.fallback || 'core tools'} instead`
+              `Suggestion: Use ${mcpInfo.fallback || 'core tools'} instead`
           );
-          result.suggestions.push(
-            `Use ${mcpInfo.fallback} instead of ${tool}`
-          );
+          result.suggestions.push(`Use ${mcpInfo.fallback} instead of ${tool}`);
         } else {
           // No fallback - block
           result.valid = false;
-          result.errors.push(
-            `Tool '${tool}' unavailable and no fallback available`
-          );
+          result.errors.push(`Tool '${tool}' unavailable and no fallback available`);
         }
       }
       continue;
@@ -275,16 +277,16 @@ function validateToolConfig({ tools, agentType }) {
       const agentLower = (agentType || '').toLowerCase();
 
       // Check if this agent is allowed to use the reserved tool
-      const isAllowed = allowedAgents.some(allowed =>
-        agentLower.includes(allowed.toLowerCase()) ||
-        allowed.toLowerCase() === agentLower
+      const isAllowed = allowedAgents.some(
+        allowed =>
+          agentLower.includes(allowed.toLowerCase()) || allowed.toLowerCase() === agentLower
       );
 
       if (!isAllowed) {
         result.valid = false;
         result.errors.push(
           `Tool '${tool}' is reserved for: ${allowedAgents.join(', ')}. ` +
-          `Agent type '${agentType}' cannot use this tool.`
+            `Agent type '${agentType}' cannot use this tool.`
         );
       }
     }
@@ -295,7 +297,7 @@ function validateToolConfig({ tools, agentType }) {
     if (!tools.includes(mandatory)) {
       result.warnings.push(
         `Mandatory tool '${mandatory}' is missing from allowed_tools. ` +
-        `Agents should include ${mandatory} for proper operation.`
+          `Agents should include ${mandatory} for proper operation.`
       );
     }
   }
@@ -381,7 +383,7 @@ function generateSuggestions(errors) {
         } else if (mcpTool.includes('sequential-thinking')) {
           suggestions.push("Use Skill({ skill: 'sequential-thinking' }) instead");
         } else if (mcpTool.includes('Exa')) {
-          suggestions.push("Use WebSearch as fallback for Exa tools");
+          suggestions.push('Use WebSearch as fallback for Exa tools');
         }
       }
     }
@@ -400,7 +402,7 @@ function generateSuggestions(errors) {
     if (error.includes('maximum')) {
       suggestions.push(
         'Remove optional tools like EnterPlanMode, ExitPlanMode, or WebSearch/WebFetch ' +
-        'if not needed for this agent.'
+          'if not needed for this agent.'
       );
     }
 
@@ -457,7 +459,8 @@ async function main() {
     // Handle validation result
     if (!validation.valid) {
       const suggestions = generateSuggestions(validation.errors);
-      const message = `[PRE-SPAWN-VALIDATOR] Tool validation failed:\n` +
+      const message =
+        `[PRE-SPAWN-VALIDATOR] Tool validation failed:\n` +
         `  Errors: ${validation.errors.join('; ')}\n` +
         `  Suggestions: ${suggestions.join('; ')}`;
 

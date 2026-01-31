@@ -21,5 +21,5 @@ module.exports = {
   CHUNK_TYPES,
   EmbeddingGenerator,
   VectorDatabase,
-  IndexManager
+  IndexManager,
 };

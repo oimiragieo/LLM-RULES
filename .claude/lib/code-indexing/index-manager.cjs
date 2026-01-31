@@ -11,7 +11,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { CodeParser } = require('./code-parser.cjs');
-const { SemanticChunker} = require('./semantic-chunker.cjs');
+const { SemanticChunker } = require('./semantic-chunker.cjs');
 const { EmbeddingGenerator } = require('./embedding-generator.cjs');
 const VectorDatabase = require('./vector-db.cjs');
 
@@ -27,11 +27,11 @@ const DEFAULT_OPTIONS = {
     '**/coverage/**',
     '**/*.min.js',
     '**/*.bundle.js',
-    '**/*.map'
+    '**/*.map',
   ],
   maxFileSize: 1 * 1024 * 1024, // 1MB
   batchSize: 50,
-  verbose: false
+  verbose: false,
 };
 
 /**
@@ -73,7 +73,9 @@ class IndexManager {
       await this.embedder.initialize();
     }
     if (!this.vectorDb) {
-      this.vectorDb = new VectorDatabase({ path: path.join(this.options.projectRoot, '.claude/context/code-index/chroma') });
+      this.vectorDb = new VectorDatabase({
+        path: path.join(this.options.projectRoot, '.claude/context/code-index/chroma'),
+      });
     }
   }
 
@@ -99,7 +101,7 @@ class IndexManager {
       if (excluded) continue;
 
       if (entry.isDirectory()) {
-        files.push(...await this._discoverFiles(fullPath));
+        files.push(...(await this._discoverFiles(fullPath)));
       } else if (entry.isFile()) {
         const language = this.parser.detectLanguage(fullPath);
         if (language) {
@@ -179,7 +181,10 @@ class IndexManager {
               for (let j = i; j < lines.length; j++) {
                 const chars = lines[j];
                 for (const char of chars) {
-                  if (char === '{') { braceCount++; foundOpen = true; }
+                  if (char === '{') {
+                    braceCount++;
+                    foundOpen = true;
+                  }
                   if (char === '}') braceCount--;
                   if (foundOpen && braceCount === 0) {
                     endLine = j;
@@ -196,7 +201,7 @@ class IndexManager {
                   text: functionContent,
                   startPosition: { row: i },
                   endPosition: { row: endLine },
-                  children: [{ type: 'identifier', text: name || 'anonymous' }]
+                  children: [{ type: 'identifier', text: name || 'anonymous' }],
                 });
               }
               i = endLine + 1;
@@ -212,7 +217,10 @@ class IndexManager {
               for (let j = i; j < lines.length; j++) {
                 const chars = lines[j];
                 for (const char of chars) {
-                  if (char === '{') { braceCount++; foundOpen = true; }
+                  if (char === '{') {
+                    braceCount++;
+                    foundOpen = true;
+                  }
                   if (char === '}') braceCount--;
                   if (foundOpen && braceCount === 0) {
                     endLine = j;
@@ -229,7 +237,7 @@ class IndexManager {
                   text: classContent,
                   startPosition: { row: i },
                   endPosition: { row: endLine },
-                  children: [{ type: 'identifier', text: className || 'Unknown' }]
+                  children: [{ type: 'identifier', text: className || 'Unknown' }],
                 });
               }
               i = endLine + 1;
@@ -241,7 +249,7 @@ class IndexManager {
           const parseResult = {
             content,
             language,
-            rootNode: { children: mockNodes }
+            rootNode: { children: mockNodes },
           };
 
           // Report parse progress
@@ -272,7 +280,7 @@ class IndexManager {
             language: ec.chunk.language,
             type: ec.chunk.type,
             lineStart: ec.chunk.lineStart,
-            lineEnd: ec.chunk.lineEnd
+            lineEnd: ec.chunk.lineEnd,
           }));
 
           await this.vectorDb.addChunks(chunkData, embeddings, metadata);
@@ -310,13 +318,16 @@ class IndexManager {
         files: files.length,
         chunks: totalChunks,
         embeddings: totalEmbeddings,
-        byLanguage
+        byLanguage,
       },
-      files: fileHashes
+      files: fileHashes,
     };
 
     // Save metadata (use projectRoot for path)
-    const metadataPath = path.join(this.options.projectRoot, '.claude/context/code-index/metadata.json');
+    const metadataPath = path.join(
+      this.options.projectRoot,
+      '.claude/context/code-index/metadata.json'
+    );
     const metadataDir = path.dirname(metadataPath);
     await fs.mkdir(metadataDir, { recursive: true });
     await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
@@ -325,7 +336,7 @@ class IndexManager {
       filesIndexed: files.length,
       chunksCreated: totalChunks,
       embeddingsGenerated: totalEmbeddings,
-      timeMs: Date.now() - startTime
+      timeMs: Date.now() - startTime,
     };
   }
 
@@ -350,7 +361,7 @@ class IndexManager {
     // Search vector DB
     const searchResults = await this.vectorDb.search(queryEmbedding, {
       topK: limit,
-      filters: options.filters || {}
+      filters: options.filters || {},
     });
 
     // Format results
@@ -383,7 +394,7 @@ class IndexManager {
           type: metadata.type,
           lineRange: [metadata.lineStart, metadata.lineEnd],
           similarity,
-          metadata
+          metadata,
         });
       }
     }

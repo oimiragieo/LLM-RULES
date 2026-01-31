@@ -73,8 +73,7 @@ function extractAgentId(prompt) {
   }
 
   // Pattern 2: "Read: .claude/agents/core/developer.md"
-  const pattern2 =
-    /\.claude\/agents\/(?:core|specialized|domain|orchestrators)\/([a-z0-9-]+)\.md/i;
+  const pattern2 = /\.claude\/agents\/(?:core|specialized|domain|orchestrators)\/([a-z0-9-]+)\.md/i;
   const match2 = prompt.match(pattern2);
   if (match2) {
     return match2[1].toLowerCase();

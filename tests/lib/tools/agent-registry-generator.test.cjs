@@ -158,18 +158,32 @@ describe('Agent Capability Card Schema', () => {
 
     it('should validate capability domain enum', () => {
       const validDomains = [
-        'code', 'testing', 'security', 'devops', 'research',
-        'documentation', 'architecture', 'database', 'frontend',
-        'backend', 'mobile', 'ai-ml', 'blockchain', 'orchestration', 'planning'
+        'code',
+        'testing',
+        'security',
+        'devops',
+        'research',
+        'documentation',
+        'architecture',
+        'database',
+        'frontend',
+        'backend',
+        'mobile',
+        'ai-ml',
+        'blockchain',
+        'orchestration',
+        'planning',
       ];
 
       for (const domain of validDomains) {
         const valid = createValidCard({
-          capabilities: [{
-            name: 'test-cap',
-            domain,
-            description: 'Test capability'
-          }]
+          capabilities: [
+            {
+              name: 'test-cap',
+              domain,
+              description: 'Test capability',
+            },
+          ],
         });
         assert.strictEqual(validate(valid), true, `Domain ${domain} should be valid`);
       }
@@ -177,11 +191,13 @@ describe('Agent Capability Card Schema', () => {
 
     it('should reject invalid capability domain', () => {
       const invalid = createValidCard({
-        capabilities: [{
-          name: 'test-cap',
-          domain: 'invalid-domain',
-          description: 'Test capability'
-        }]
+        capabilities: [
+          {
+            name: 'test-cap',
+            domain: 'invalid-domain',
+            description: 'Test capability',
+          },
+        ],
       });
       const result = validate(invalid);
       assert.strictEqual(result, false, 'Invalid capability domain should be rejected');
@@ -191,14 +207,14 @@ describe('Agent Capability Card Schema', () => {
   describe('Constraints Validation', () => {
     it('should accept valid maxConcurrentTasks', () => {
       const valid = createValidCard({
-        constraints: { maxConcurrentTasks: 5 }
+        constraints: { maxConcurrentTasks: 5 },
       });
       assert.strictEqual(validate(valid), true, 'Valid maxConcurrentTasks should pass');
     });
 
     it('should reject maxConcurrentTasks less than 1', () => {
       const invalid = createValidCard({
-        constraints: { maxConcurrentTasks: 0 }
+        constraints: { maxConcurrentTasks: 0 },
       });
       const result = validate(invalid);
       assert.strictEqual(result, false, 'maxConcurrentTasks < 1 should be rejected');
@@ -207,7 +223,7 @@ describe('Agent Capability Card Schema', () => {
     it('should validate preferredModel enum', () => {
       for (const model of ['haiku', 'sonnet', 'opus']) {
         const valid = createValidCard({
-          constraints: { preferredModel: model }
+          constraints: { preferredModel: model },
         });
         assert.strictEqual(validate(valid), true, `Model ${model} should be valid`);
       }
@@ -220,8 +236,8 @@ describe('Agent Capability Card Schema', () => {
         metadata: {
           version: '1.0.0',
           createdAt: '2026-01-31T12:00:00.000Z',
-          author: 'anthropic'
-        }
+          author: 'anthropic',
+        },
       });
       assert.strictEqual(validate(valid), true, 'Valid metadata should pass');
     });
@@ -229,8 +245,8 @@ describe('Agent Capability Card Schema', () => {
     it('should validate version pattern', () => {
       const invalid = createValidCard({
         metadata: {
-          version: 'v1.0'  // Invalid - missing patch version
-        }
+          version: 'v1.0', // Invalid - missing patch version
+        },
       });
       const result = validate(invalid);
       assert.strictEqual(result, false, 'Invalid version pattern should be rejected');
@@ -335,7 +351,9 @@ describe('AgentRegistryGenerator', () => {
       const developerInfo = agents.get('developer');
       assert.ok(developerInfo, 'Developer agent should exist');
 
-      const { generateCapabilityCard } = require(path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs'));
+      const { generateCapabilityCard } = require(
+        path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs')
+      );
       const card = generateCapabilityCard(
         developerInfo.definition,
         'developer',
@@ -356,7 +374,9 @@ describe('AgentRegistryGenerator', () => {
         return;
       }
 
-      const { generateCapabilityCard } = require(path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs'));
+      const { generateCapabilityCard } = require(
+        path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs')
+      );
       const card = generateCapabilityCard(
         { description: 'Test agent' },
         'code-reviewer',
@@ -373,7 +393,9 @@ describe('AgentRegistryGenerator', () => {
         return;
       }
 
-      const { generateCapabilityCard } = require(path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs'));
+      const { generateCapabilityCard } = require(
+        path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs')
+      );
       const card = generateCapabilityCard(
         { name: 'Custom Name', description: 'Test agent' },
         'code-reviewer',
@@ -394,7 +416,10 @@ describe('AgentRegistryGenerator', () => {
 
       const registry = await generator.generate(AGENTS_DIR);
       assert.ok(registry.index.byCapability, 'byCapability index should exist');
-      assert.ok(Object.keys(registry.index.byCapability).length > 0, 'byCapability should have entries');
+      assert.ok(
+        Object.keys(registry.index.byCapability).length > 0,
+        'byCapability should have entries'
+      );
     });
 
     it('should build byDomain index', async () => {
@@ -509,7 +534,11 @@ describe('AgentRegistryGenerator', () => {
       const registry = await generator.generate(AGENTS_DIR);
       const validation = generator.validate(registry);
 
-      assert.strictEqual(validation.valid, true, `Validation failed: ${JSON.stringify(validation.errors)}`);
+      assert.strictEqual(
+        validation.valid,
+        true,
+        `Validation failed: ${JSON.stringify(validation.errors)}`
+      );
     });
   });
 });
@@ -517,7 +546,10 @@ describe('AgentRegistryGenerator', () => {
 describe('Edge Cases', () => {
   describe('Missing Agent Frontmatter', () => {
     it('should handle agent without frontmatter gracefully', () => {
-      const generatorPath = path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs');
+      const generatorPath = path.join(
+        PROJECT_ROOT,
+        '.claude/lib/tools/agent-registry-generator.cjs'
+      );
       if (!fs.existsSync(generatorPath)) {
         console.log('Skipping: Generator not yet implemented');
         return;
@@ -533,7 +565,10 @@ describe('Edge Cases', () => {
 
   describe('Invalid YAML Frontmatter', () => {
     it('should handle malformed YAML gracefully', () => {
-      const generatorPath = path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs');
+      const generatorPath = path.join(
+        PROJECT_ROOT,
+        '.claude/lib/tools/agent-registry-generator.cjs'
+      );
       if (!fs.existsSync(generatorPath)) {
         console.log('Skipping: Generator not yet implemented');
         return;
@@ -550,7 +585,10 @@ describe('Edge Cases', () => {
 
   describe('Domain Inference', () => {
     it('should infer domain from agent skills', () => {
-      const generatorPath = path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs');
+      const generatorPath = path.join(
+        PROJECT_ROOT,
+        '.claude/lib/tools/agent-registry-generator.cjs'
+      );
       if (!fs.existsSync(generatorPath)) {
         console.log('Skipping: Generator not yet implemented');
         return;
@@ -564,7 +602,10 @@ describe('Edge Cases', () => {
     });
 
     it('should infer domain from agent id', () => {
-      const generatorPath = path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs');
+      const generatorPath = path.join(
+        PROJECT_ROOT,
+        '.claude/lib/tools/agent-registry-generator.cjs'
+      );
       if (!fs.existsSync(generatorPath)) {
         console.log('Skipping: Generator not yet implemented');
         return;
@@ -577,7 +618,10 @@ describe('Edge Cases', () => {
     });
 
     it('should fallback to category-based domain', () => {
-      const generatorPath = path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs');
+      const generatorPath = path.join(
+        PROJECT_ROOT,
+        '.claude/lib/tools/agent-registry-generator.cjs'
+      );
       if (!fs.existsSync(generatorPath)) {
         console.log('Skipping: Generator not yet implemented');
         return;
@@ -586,13 +630,20 @@ describe('Edge Cases', () => {
       const { inferDomain } = require(generatorPath);
       const domain = inferDomain({}, 'unknown-agent', 'orchestrator');
 
-      assert.strictEqual(domain, 'orchestration', 'orchestrator category should infer orchestration domain');
+      assert.strictEqual(
+        domain,
+        'orchestration',
+        'orchestrator category should infer orchestration domain'
+      );
     });
   });
 
   describe('Trigger Phrase Extraction', () => {
     it('should extract phrases from agent id', () => {
-      const generatorPath = path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs');
+      const generatorPath = path.join(
+        PROJECT_ROOT,
+        '.claude/lib/tools/agent-registry-generator.cjs'
+      );
       if (!fs.existsSync(generatorPath)) {
         console.log('Skipping: Generator not yet implemented');
         return;
@@ -606,16 +657,22 @@ describe('Edge Cases', () => {
     });
 
     it('should extract action words from description', () => {
-      const generatorPath = path.join(PROJECT_ROOT, '.claude/lib/tools/agent-registry-generator.cjs');
+      const generatorPath = path.join(
+        PROJECT_ROOT,
+        '.claude/lib/tools/agent-registry-generator.cjs'
+      );
       if (!fs.existsSync(generatorPath)) {
         console.log('Skipping: Generator not yet implemented');
         return;
       }
 
       const { extractTriggerPhrases } = require(generatorPath);
-      const phrases = extractTriggerPhrases({
-        description: 'This agent can implement features and debug issues'
-      }, 'developer');
+      const phrases = extractTriggerPhrases(
+        {
+          description: 'This agent can implement features and debug issues',
+        },
+        'developer'
+      );
 
       assert.ok(phrases.includes('implement'), 'Should extract implement');
       assert.ok(phrases.includes('debug'), 'Should extract debug');
@@ -637,12 +694,12 @@ function createValidCard(overrides = {}) {
         description: 'Test capability for validation',
         triggerPhrases: ['test'],
         requiredTools: ['Read'],
-        skills: []
-      }
+        skills: [],
+      },
     ],
     constraints: {
       maxConcurrentTasks: 5,
-      preferredModel: 'sonnet'
+      preferredModel: 'sonnet',
     },
     health: {
       status: 'healthy',
@@ -652,13 +709,13 @@ function createValidCard(overrides = {}) {
       successRate: 1.0,
       lastUpdate: '2026-01-31T12:00:00.000Z',
       isolatedAt: null,
-      isolationReason: null
+      isolationReason: null,
     },
     metadata: {
       version: '1.0.0',
       createdAt: '2026-01-31T12:00:00.000Z',
-      updatedAt: '2026-01-31T12:00:00.000Z'
-    }
+      updatedAt: '2026-01-31T12:00:00.000Z',
+    },
   };
 
   // Deep merge overrides

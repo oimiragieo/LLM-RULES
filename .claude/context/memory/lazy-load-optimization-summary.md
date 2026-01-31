@@ -13,6 +13,7 @@ Added `@` prefix to all `.claude/` file path references in agent files to enable
 **Script**: `scripts/add-lazy-load-prefixes.cjs`
 
 **Pattern Transformation**:
+
 ```
 Before:  `.claude/skills/tdd/SKILL.md`
 After:   `@.claude/skills/tdd/SKILL.md`
@@ -26,15 +27,16 @@ After:   `@.claude/context/memory/decisions.md`
 
 ## Results
 
-| Metric | Count |
-|--------|-------|
-| Files Modified | 50/50 (100%) |
-| Path Prefixes Added | 598 |
-| Avg Paths per File | 11.96 |
+| Metric              | Count        |
+| ------------------- | ------------ |
+| Files Modified      | 50/50 (100%) |
+| Path Prefixes Added | 598          |
+| Avg Paths per File  | 11.96        |
 
 ### Files by Category
 
 **Core Agents** (9 files):
+
 - architect.md: 17 paths
 - context-compressor.md: 4 paths
 - developer.md: 11 paths
@@ -46,19 +48,23 @@ After:   `@.claude/context/memory/decisions.md`
 - technical-writer.md: 11 paths
 
 **Domain Agents** (22 files):
+
 - Total: 270 paths across all domain specialists
 
 **Specialized Agents** (12 files):
+
 - Total: 139 paths including security, devops, reverse engineering
 
 **Orchestrators** (5 files):
+
 - evolution-orchestrator.md: 50 paths (highest)
 - party-orchestrator.md: 15 paths
 - swarm-coordinator.md: 6 paths
 - master-orchestrator.md: 8 paths
 
 **Other** (2 files):
-- __tests__/README.md: 9 paths
+
+- **tests**/README.md: 9 paths
 
 ## Context Optimization Benefits
 
@@ -83,6 +89,7 @@ All of the following now use lazy-load prefixes:
 ## Verification
 
 Spot-checked files:
+
 - ✅ `.claude/agents/core/developer.md` - All skill references prefixed
 - ✅ `.claude/agents/core/architect.md` - All doc/context references prefixed
 - ✅ `.claude/agents/orchestrators/evolution-orchestrator.md` - Context files prefixed
@@ -90,6 +97,7 @@ Spot-checked files:
 ## Impact on Phase 1-3 Integration
 
 This optimization complements Phase 1 (Tool Awareness) infrastructure:
+
 - **Phase 1**: Agents receive tool/skill awareness in spawn prompts
 - **Optimization**: File references use lazy-loading to reduce context
 - **Result**: Better token usage without sacrificing agent capability awareness
@@ -103,6 +111,7 @@ This optimization complements Phase 1 (Tool Awareness) infrastructure:
 ## Files Modified
 
 All 50 agent files in:
+
 - `.claude/agents/core/` (9 files)
 - `.claude/agents/domain/` (22 files)
 - `.claude/agents/specialized/` (12 files)

@@ -251,7 +251,7 @@ function parseSimpleYaml(yamlContent) {
           const arrayContent = value.slice(1, -1);
           result[key] = arrayContent
             .split(',')
-            .map((s) => s.trim())
+            .map(s => s.trim())
             .filter(Boolean);
           inArray = false;
           currentKey = null;
@@ -284,7 +284,10 @@ function parseYamlValue(value) {
   if (/^-?\d+$/.test(value)) return parseInt(value, 10);
   if (/^-?\d+\.\d+$/.test(value)) return parseFloat(value);
   // Remove quotes
-  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
     return value.slice(1, -1);
   }
   return value;
@@ -300,7 +303,7 @@ function extractTriggerPhrases(agentDef, agentId) {
   const phrases = [];
 
   // From agent name (split by hyphens, filter short parts)
-  const namePhrases = agentId.split('-').filter((p) => p.length > 2);
+  const namePhrases = agentId.split('-').filter(p => p.length > 2);
   phrases.push(...namePhrases);
 
   // From description
@@ -310,12 +313,12 @@ function extractTriggerPhrases(agentDef, agentId) {
       agentDef.description.match(
         /\b(implement|review|test|debug|design|analyze|fix|build|create|deploy|optimize|refactor|validate|audit|plan|coordinate|orchestrate)\w*/gi
       ) || [];
-    phrases.push(...actionWords.map((w) => w.toLowerCase()));
+    phrases.push(...actionWords.map(w => w.toLowerCase()));
   }
 
   // From skills
   if (agentDef.skills && Array.isArray(agentDef.skills)) {
-    phrases.push(...agentDef.skills.filter((s) => s.length > 2));
+    phrases.push(...agentDef.skills.filter(s => s.length > 2));
   }
 
   // Dedupe and return
@@ -374,7 +377,7 @@ function generateCapabilityCard(agentDef, agentId, category, filePath) {
     if (Array.isArray(agentDef.tools)) {
       tools = agentDef.tools;
     } else if (typeof agentDef.tools === 'string') {
-      tools = agentDef.tools.split(',').map((t) => t.trim());
+      tools = agentDef.tools.split(',').map(t => t.trim());
     }
   }
 
@@ -386,7 +389,7 @@ function generateCapabilityCard(agentDef, agentId, category, filePath) {
   if (!displayName) {
     displayName = agentId
       .split('-')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
       .join(' ');
   }
 
@@ -492,7 +495,7 @@ class AgentRegistryGenerator {
 
       if (!fs.existsSync(categoryDir)) continue;
 
-      const files = fs.readdirSync(categoryDir).filter((f) => f.endsWith('.md'));
+      const files = fs.readdirSync(categoryDir).filter(f => f.endsWith('.md'));
 
       for (const file of files) {
         // Skip README files
@@ -587,7 +590,12 @@ class AgentRegistryGenerator {
     const agents = await this.scanAgents(agentsDir);
 
     for (const [agentId, agentInfo] of agents) {
-      const card = generateCapabilityCard(agentInfo.definition, agentId, agentInfo.category, agentInfo.filePath);
+      const card = generateCapabilityCard(
+        agentInfo.definition,
+        agentId,
+        agentInfo.category,
+        agentInfo.filePath
+      );
       this.registry.agents[agentId] = card;
     }
 

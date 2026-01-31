@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let SyncLayer;
 
 // Test setup
-const TEST_ROOT = path.resolve(__dirname, '../../../.test-data/sync-layer');
+const TEST_ROOT = path.resolve(__dirname, '../../data/sync-layer');
 let testCounter = 0;
 
 describe('SyncLayer', () => {

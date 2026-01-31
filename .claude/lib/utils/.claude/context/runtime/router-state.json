@@ -1,0 +1,18 @@
+{
+  "mode": "router",
+  "lastReset": "2026-01-31T16:32:04.990Z",
+  "taskSpawned": false,
+  "taskSpawnedAt": null,
+  "taskDescription": null,
+  "sessionId": null,
+  "complexity": "trivial",
+  "requiresPlannerFirst": false,
+  "plannerSpawned": false,
+  "requiresSecurityReview": false,
+  "securitySpawned": false,
+  "lastTaskUpdateCall": null,
+  "lastTaskUpdateTaskId": null,
+  "lastTaskUpdateStatus": null,
+  "taskUpdatesThisSession": 0,
+  "version": 4968
+}

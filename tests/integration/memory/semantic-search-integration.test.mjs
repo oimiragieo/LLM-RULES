@@ -34,7 +34,7 @@ describe('Semantic Search Integration Tests', () => {
   before(async () => {
     // Initialize vector store with test collection
     vectorStore = new MemoryVectorStore({
-      persistDirectory: '.test-data/chromadb-integration',
+      persistDirectory: 'tests/data/chromadb-integration',
       collectionName: TEST_COLLECTION,
       host: 'http://localhost:8000',
     });
@@ -429,7 +429,7 @@ describe('Semantic Search Integration Tests', () => {
     it('should throw descriptive error when server is unavailable', async () => {
       // Create vector store pointing to invalid server
       const invalidStore = new MemoryVectorStore({
-        persistDirectory: '.test-data/chromadb-invalid',
+        persistDirectory: 'tests/data/chromadb-invalid',
         collectionName: 'test-invalid',
         host: 'http://localhost:9999', // Invalid port
       });

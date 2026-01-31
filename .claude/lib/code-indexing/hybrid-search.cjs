@@ -23,7 +23,7 @@ const DEFAULT_OPTIONS = {
   structuralWeight: 0.3,
   topK: 10,
   useRipgrep: true,
-  ripgrepTimeout: 100
+  ripgrepTimeout: 100,
 };
 
 /**
@@ -50,10 +50,12 @@ class HybridSearch {
     // Initialize components (provided or create defaults)
     this.astGrep = options.astGrep || null;
     this.queryAnalyzer = options.queryAnalyzer || new QueryAnalyzer();
-    this.ranker = options.ranker || new ResultRanker({
-      semantic: this.options.semanticWeight,
-      structural: this.options.structuralWeight
-    });
+    this.ranker =
+      options.ranker ||
+      new ResultRanker({
+        semantic: this.options.semanticWeight,
+        structural: this.options.structuralWeight,
+      });
   }
 
   /**
@@ -84,13 +86,9 @@ class HybridSearch {
     const pattern = options.pattern || analysis.astPattern;
     const astGrepLanguage = language || 'javascript';
 
-    if (pattern && this.astGrep && await this.astGrep.isAvailable()) {
+    if (pattern && this.astGrep && (await this.astGrep.isAvailable())) {
       const astGrepStart = Date.now();
-      structuralResults = await this.structuralStage(
-        semanticResults,
-        pattern,
-        astGrepLanguage
-      );
+      structuralResults = await this.structuralStage(semanticResults, pattern, astGrepLanguage);
       timing.astGrep = Date.now() - astGrepStart;
     }
 
@@ -106,7 +104,7 @@ class HybridSearch {
       pattern,
       results: combinedResults.slice(0, limit),
       totalMatches: combinedResults.length,
-      timing
+      timing,
     };
   }
 

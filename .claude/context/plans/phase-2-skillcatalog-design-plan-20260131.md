@@ -38,6 +38,7 @@ Phase 1 implemented **static skill pre-injection**:
 ```
 
 **Limitations of Phase 1**:
+
 - Skills hardcoded in agent spawn prompts
 - New skills require agent prompt regeneration
 - Agents cannot discover skills outside pre-selected list
@@ -58,6 +59,7 @@ Skill({ skill: bestSkill.name });
 ```
 
 **Benefits**:
+
 - ✅ Agents discover skills dynamically (not hardcoded)
 - ✅ New skills instantly available (no agent changes)
 - ✅ Task-specific skill selection (agent picks best fit)
@@ -82,6 +84,7 @@ Before implementing SkillCatalog:
 - [ ] Design decisions documented with rationale (ADR-070)
 
 **Research Topics**:
+
 1. **Tool Discovery Patterns**: How do IDEs/frameworks enable runtime capability discovery?
    - VS Code extension marketplace API
    - npm package discovery patterns
@@ -238,20 +241,22 @@ grep -E "(SkillCatalog|SkillResult|error handling)" .claude/context/plans/phase-
 
 - [ ] **2B.5** Implement agentType filter with recommendation flag (~2 hours)
   - **Logic**:
+
     ```javascript
     // Map agentType to recommended skills
     const recommendations = {
       developer: ['tdd', 'code-reviewer', 'debugging'],
       qa: ['qa-workflow', 'tdd', 'comprehensive-unit-testing-with-pytest'],
-      researcher: ['research-synthesis', 'arxiv-mcp']
+      researcher: ['research-synthesis', 'arxiv-mcp'],
     };
 
     // Filter and mark recommended
     skills.map(s => ({
       ...s,
-      recommended: recommendations[options.agentType]?.includes(s.name) || false
+      recommended: recommendations[options.agentType]?.includes(s.name) || false,
     }));
     ```
+
   - **Verify**: Unit test passes for agentType filter + recommendation flag
 
 - [ ] **2B.6** Add in-memory caching and cache invalidation (~1 hour)
@@ -406,20 +411,24 @@ echo "✓ All tests passing"
 
 - [ ] **2E.2** Update learnings.md with Phase 2 patterns (~1 hour) [⚡ parallel OK]
   - **Entry**:
+
     ```markdown
     ## Phase 2: Runtime Skill Discovery (2026-01-31)
 
     ### Pattern: SkillCatalog() for dynamic skill queries
+
     - Agents can discover skills at runtime without pre-injection
     - Query filters: domain, category, tags, agentType
     - In-memory caching ensures <100ms query performance
     - Backward compatible with Phase 1 pre-injection
 
     ### Key Learnings
+
     - Exact match queries preferred over fuzzy search (simplicity + predictability)
     - In-memory caching critical for <100ms target
     - AgentType filter with recommendation flag guides skill selection
     ```
+
   - **Verify**: `grep "Phase 2: Runtime Skill Discovery" .claude/context/memory/learnings.md`
 
 - [ ] **2E.3** Create usage examples in SKILL_CATALOG_GUIDE.md (~1 hour) [⚡ parallel OK]
@@ -455,15 +464,18 @@ echo "✓ Documentation complete"
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Spawn Command**:
+
 ```javascript
 Task({
-  subagent_type: "reflection-agent",
-  description: "Session reflection and learning extraction",
-  prompt: "You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan (Phase 2: Runtime Skill Discovery), extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
-})
+  subagent_type: 'reflection-agent',
+  description: 'Session reflection and learning extraction',
+  prompt:
+    'You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan (Phase 2: Runtime Skill Discovery), extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created).',
+});
 ```
 
 **Success Criteria**:
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
@@ -472,29 +484,29 @@ Task({
 
 ## Risks
 
-| Risk | Impact | Mitigation | Rollback |
-|------|--------|-----------|----------|
-| Query performance <100ms | High | In-memory caching, lazy loading | Revert to Phase 1 pre-injection only |
-| Stale skill data (new skills not discovered) | Medium | Auto-regenerate skill-index.json on Skill creation | Manual cache invalidation |
-| Query overload (too many agent queries) | Low | Monitor query frequency, add rate limiting if needed (Phase 3) | N/A |
-| Complex queries confuse agents | Medium | Simple API (3-4 common filters), clear documentation | N/A |
-| Tool not available (skill-catalog.cjs missing) | High | Graceful error with suggestion, fallback to pre-injection | git checkout HEAD -- .claude/lib/tools/ |
-| Backward compatibility break | High | Validate Phase 1 pre-injection still works | Revert all Phase 2 changes |
+| Risk                                           | Impact | Mitigation                                                     | Rollback                                |
+| ---------------------------------------------- | ------ | -------------------------------------------------------------- | --------------------------------------- |
+| Query performance <100ms                       | High   | In-memory caching, lazy loading                                | Revert to Phase 1 pre-injection only    |
+| Stale skill data (new skills not discovered)   | Medium | Auto-regenerate skill-index.json on Skill creation             | Manual cache invalidation               |
+| Query overload (too many agent queries)        | Low    | Monitor query frequency, add rate limiting if needed (Phase 3) | N/A                                     |
+| Complex queries confuse agents                 | Medium | Simple API (3-4 common filters), clear documentation           | N/A                                     |
+| Tool not available (skill-catalog.cjs missing) | High   | Graceful error with suggestion, fallback to pre-injection      | git checkout HEAD -- .claude/lib/tools/ |
+| Backward compatibility break                   | High   | Validate Phase 1 pre-injection still works                     | Revert all Phase 2 changes              |
 
 ---
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Parallel? |
-|-------|-------|-----------|-----------|
-| 0 (Research) | 3 | 6-8 hours | No |
-| 2A (Spec) | 3 | 4-6 hours | No |
-| 2B (Implementation) | 6 | 8-10 hours | No |
-| 2C (Integration) | 4 | 4-6 hours | Partial |
-| 2D (Testing) | 3 | 6-8 hours | Partial |
-| 2E (Documentation) | 3 | 3-4 hours | Yes |
-| FINAL (Reflection) | 1 | 1-2 hours | No |
-| **Total** | **23** | **~33-44 hours** | |
+| Phase               | Tasks  | Est. Time        | Parallel? |
+| ------------------- | ------ | ---------------- | --------- |
+| 0 (Research)        | 3      | 6-8 hours        | No        |
+| 2A (Spec)           | 3      | 4-6 hours        | No        |
+| 2B (Implementation) | 6      | 8-10 hours       | No        |
+| 2C (Integration)    | 4      | 4-6 hours        | Partial   |
+| 2D (Testing)        | 3      | 6-8 hours        | Partial   |
+| 2E (Documentation)  | 3      | 3-4 hours        | Yes       |
+| FINAL (Reflection)  | 1      | 1-2 hours        | No        |
+| **Total**           | **23** | **~33-44 hours** |           |
 
 ---
 
@@ -537,6 +549,7 @@ function SkillCatalog(options = {}) {
 ### Query Examples (Concrete)
 
 **Example 1: Find testing skills**
+
 ```javascript
 const skills = SkillCatalog({ domain: 'testing' });
 // Returns: [
@@ -547,6 +560,7 @@ const skills = SkillCatalog({ domain: 'testing' });
 ```
 
 **Example 2: Find skills for code review**
+
 ```javascript
 const skills = SkillCatalog({ domain: 'code', tags: ['review'] });
 // Returns: [
@@ -556,6 +570,7 @@ const skills = SkillCatalog({ domain: 'code', tags: ['review'] });
 ```
 
 **Example 3: Find recommended skills for developer**
+
 ```javascript
 const skills = SkillCatalog({ agentType: 'developer', limit: 5 });
 // Returns: [
@@ -568,6 +583,7 @@ const skills = SkillCatalog({ agentType: 'developer', limit: 5 });
 ```
 
 **Example 4: Find security skills**
+
 ```javascript
 const skills = SkillCatalog({ tags: ['security'] });
 // Returns: [
@@ -593,15 +609,15 @@ Skill({ skill: bestSkill.name });
 
 ### Comparison to Phase 1
 
-| Aspect | Phase 1 (Pre-Injection) | Phase 2 (Runtime Discovery) |
-|--------|--------------------------|------------------------------|
-| Skill discovery | Static (at spawn) | **Dynamic (at runtime)** |
-| When skills available | After spawn | **Immediately (any time)** |
-| Agent flexibility | Pre-selected (15-20 skills) | **Agent chooses from all skills** |
-| New skills | Require agent respin | **Instant availability** |
-| Complexity | Simple | **Medium** |
-| When to use | Most cases (80%) | Advanced use cases (20%) |
-| Query overhead | None | <100ms per query |
+| Aspect                | Phase 1 (Pre-Injection)     | Phase 2 (Runtime Discovery)       |
+| --------------------- | --------------------------- | --------------------------------- |
+| Skill discovery       | Static (at spawn)           | **Dynamic (at runtime)**          |
+| When skills available | After spawn                 | **Immediately (any time)**        |
+| Agent flexibility     | Pre-selected (15-20 skills) | **Agent chooses from all skills** |
+| New skills            | Require agent respin        | **Instant availability**          |
+| Complexity            | Simple                      | **Medium**                        |
+| When to use           | Most cases (80%)            | Advanced use cases (20%)          |
+| Query overhead        | None                        | <100ms per query                  |
 
 ### Integration Architecture
 
@@ -625,20 +641,21 @@ Skill({ skill: bestSkill.name });
 
 ### Files Modified Summary
 
-| File | Change | Phase |
-|------|--------|-------|
-| `.claude/lib/tools/skill-catalog.cjs` | Create (new query engine) | 2B |
-| `.claude/CLAUDE.md` (Section 1.4) | Add SkillCatalog to Core Tools table | 2C |
-| `.claude/agents/core/router.md` | Add SkillCatalog usage section | 2C |
-| `.claude/docs/SKILL_CATALOG_GUIDE.md` | Create (usage guide) | 2C |
-| `.claude/lib/tools/index.cjs` | Export SkillCatalog | 2C |
-| `tests/lib/tools/skill-catalog.test.cjs` | Create (unit tests) | 2D |
-| `tests/integration/skill-catalog-usage.test.cjs` | Create (integration tests) | 2D |
-| `tests/performance/skill-catalog-performance.test.cjs` | Create (performance tests) | 2D |
-| `.claude/context/memory/decisions.md` | Add ADR-070 | 2E |
-| `.claude/context/memory/learnings.md` | Add Phase 2 learnings | 2E |
+| File                                                   | Change                               | Phase |
+| ------------------------------------------------------ | ------------------------------------ | ----- |
+| `.claude/lib/tools/skill-catalog.cjs`                  | Create (new query engine)            | 2B    |
+| `.claude/CLAUDE.md` (Section 1.4)                      | Add SkillCatalog to Core Tools table | 2C    |
+| `.claude/agents/core/router.md`                        | Add SkillCatalog usage section       | 2C    |
+| `.claude/docs/SKILL_CATALOG_GUIDE.md`                  | Create (usage guide)                 | 2C    |
+| `.claude/lib/tools/index.cjs`                          | Export SkillCatalog                  | 2C    |
+| `tests/lib/tools/skill-catalog.test.cjs`               | Create (unit tests)                  | 2D    |
+| `tests/integration/skill-catalog-usage.test.cjs`       | Create (integration tests)           | 2D    |
+| `tests/performance/skill-catalog-performance.test.cjs` | Create (performance tests)           | 2D    |
+| `.claude/context/memory/decisions.md`                  | Add ADR-070                          | 2E    |
+| `.claude/context/memory/learnings.md`                  | Add Phase 2 learnings                | 2E    |
 
 **Files NOT Modified** (Phase 1 remains unchanged):
+
 - `.claude/lib/skill-build/skill-index-generator.cjs` (Phase 1A)
 - `.claude/hooks/skills/pre-spawn-skill-validator.cjs` (Phase 1B)
 - `.claude/lib/skill-build/skill-injector.cjs` (Phase 1D)
@@ -649,6 +666,7 @@ Skill({ skill: bestSkill.name });
 ## Next Steps After Phase 2
 
 **Phase 3: Agent Capability Cards** (future - not in this plan):
+
 - Agents publish what they can do (capabilities registry)
 - Orchestrators discover agent capabilities dynamically
 - Self-healing: isolation of failed agents based on capability loss

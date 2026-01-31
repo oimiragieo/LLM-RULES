@@ -31,7 +31,10 @@ function fixBashPrefixErrors(content) {
   // Fix bash code blocks - remove @ from commands
   // Pattern: cat @.claude/ or grep @.claude/ or node @.claude/
   // Match lines with common bash commands that have @.claude/
-  modified = modified.replace(/(cat|grep|ls|find|rm|mkdir|cp|mv|node|npm|yarn|chmod|chown)\s+@\.claude\//g, '$1 .claude/');
+  modified = modified.replace(
+    /(cat|grep|ls|find|rm|mkdir|cp|mv|node|npm|yarn|chmod|chown)\s+@\.claude\//g,
+    '$1 .claude/'
+  );
 
   // Fix command examples with pipes and redirects
   // Pattern: command @.claude/path | other
@@ -65,7 +68,9 @@ function processFile(filePath) {
 
       // Count how many fixes were made
       const bashPatterns = (originalContent.match(/Bash\("([^"]*)@\.claude\//g) || []).length;
-      const cmdPatterns = (originalContent.match(/(cat|grep|ls|node|npm|yarn)\s+@\.claude\//g) || []).length;
+      const cmdPatterns = (
+        originalContent.match(/(cat|grep|ls|node|npm|yarn)\s+@\.claude\//g) || []
+      ).length;
       const totalFixes = bashPatterns + cmdPatterns;
 
       return { filePath, changed: true, fixes: totalFixes };

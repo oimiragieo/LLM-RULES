@@ -56,19 +56,16 @@ The skill performs automated accessibility and design audits by fetching the lat
 Invoke this skill when:
 
 1. **Accessibility Audits**
-
    - "Audit my website for accessibility"
    - "Is my site WCAG compliant"
    - "Check for accessibility issues"
 
 2. **UI Review**
-
    - "Check my UI for design issues"
    - "Design review for this component"
    - "UI best practices check"
 
 3. **Dark Mode Support**
-
    - "Design review for dark mode support"
    - "How do I implement dark mode"
    - "Dark theme best practices"
@@ -113,12 +110,12 @@ For each violation, the skill provides:
 
 ### 3. Severity Levels
 
-| Severity | Impact                           | Fix Priority |
-| -------- | -------------------------------- | ------------ |
-| CRITICAL | Prevents access for some users   | Immediate    |
-| HIGH     | Significant usability barrier    | Soon         |
-| MEDIUM   | Minor usability issue            | When time    |
-| LOW      | Enhancement, not blocking        | Nice-to-have |
+| Severity | Impact                         | Fix Priority |
+| -------- | ------------------------------ | ------------ |
+| CRITICAL | Prevents access for some users | Immediate    |
+| HIGH     | Significant usability barrier  | Soon         |
+| MEDIUM   | Minor usability issue          | When time    |
+| LOW      | Enhancement, not blocking      | Nice-to-have |
 
 ---
 

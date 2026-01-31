@@ -7,6 +7,7 @@ Design and implement an Agent Capability Card system that enables orchestrators 
 **Core Value Proposition**: Orchestrators transition from "which agent do I spawn?" (hardcoded lookup) to "which agents can handle this capability?" (dynamic discovery with health awareness).
 
 **Phase Summary**:
+
 - **Phase 1** (53 tests): Agents know their tools (static pre-spawn injection)
 - **Phase 2** (50 tests): Agents discover skills (dynamic runtime queries)
 - **Phase 3** (this plan): Orchestrators discover agents (capability-based routing with health tracking)
@@ -654,14 +655,30 @@ npx ajv validate -s .claude/schemas/agent-capability-card.schema.json -d example
     "lastUpdated": "2026-01-31T00:00:00Z"
   },
   "agents": {
-    "code-reviewer": { /* capability card */ },
-    "developer": { /* capability card */ },
-    "researcher": { /* capability card */ },
-    "security-architect": { /* capability card */ },
-    "qa": { /* capability card */ },
-    "architect": { /* capability card */ },
-    "planner": { /* capability card */ },
-    "technical-writer": { /* capability card */ },
+    "code-reviewer": {
+      /* capability card */
+    },
+    "developer": {
+      /* capability card */
+    },
+    "researcher": {
+      /* capability card */
+    },
+    "security-architect": {
+      /* capability card */
+    },
+    "qa": {
+      /* capability card */
+    },
+    "architect": {
+      /* capability card */
+    },
+    "planner": {
+      /* capability card */
+    },
+    "technical-writer": {
+      /* capability card */
+    }
     /* ... 48 total agents ... */
   },
   "indexes": {
@@ -688,14 +705,41 @@ npx ajv validate -s .claude/schemas/agent-capability-card.schema.json -d example
       "mobile": ["ios-pro", "android-pro", "expo-mobile-developer"]
     },
     "byCategory": {
-      "core": ["developer", "qa", "architect", "planner", "technical-writer", "pm", "reflection-agent", "context-compressor"],
-      "specialized": ["code-reviewer", "code-simplifier", "security-architect", "devops", "researcher"],
-      "domain": ["python-pro", "rust-pro", "golang-pro", "typescript-pro", "frontend-pro", "nodejs-pro"],
-      "orchestrator": ["master-orchestrator", "swarm-coordinator", "evolution-orchestrator", "party-orchestrator"]
+      "core": [
+        "developer",
+        "qa",
+        "architect",
+        "planner",
+        "technical-writer",
+        "pm",
+        "reflection-agent",
+        "context-compressor"
+      ],
+      "specialized": [
+        "code-reviewer",
+        "code-simplifier",
+        "security-architect",
+        "devops",
+        "researcher"
+      ],
+      "domain": [
+        "python-pro",
+        "rust-pro",
+        "golang-pro",
+        "typescript-pro",
+        "frontend-pro",
+        "nodejs-pro"
+      ],
+      "orchestrator": [
+        "master-orchestrator",
+        "swarm-coordinator",
+        "evolution-orchestrator",
+        "party-orchestrator"
+      ]
     }
   },
   "health": {
-    "healthy": ["code-reviewer", "developer", "qa", "architect", /* ... */],
+    "healthy": ["code-reviewer", "developer", "qa", "architect" /* ... */],
     "degraded": ["security-architect"],
     "unavailable": ["scientific-research-expert"]
   }
@@ -814,14 +858,14 @@ Update router to use AvailableAgents() for agent selection:
 const agentTable = {
   'code review': 'code-reviewer',
   'bug fix': 'developer',
-  'research': 'researcher'
+  research: 'researcher',
 };
 const agent = agentTable[intent];
 
 // Phase 3 approach (capability discovery)
 const agents = AvailableAgents({
-  capability: intent,     // e.g., 'code-review'
-  excludeFailed: true     // Skip unhealthy agents
+  capability: intent, // e.g., 'code-review'
+  excludeFailed: true, // Skip unhealthy agents
 });
 
 // Select best agent (recommended flag or first healthy)
@@ -914,8 +958,8 @@ echo "✓ Orchestrator integration complete"
 ```javascript
 // .claude/lib/tools/agent-health-tracker.cjs
 
-const FAILURE_THRESHOLD = 3;  // Consecutive failures to trigger isolation
-const RECOVERY_COOLDOWN = 300000;  // 5 minutes before re-enabling isolated agent
+const FAILURE_THRESHOLD = 3; // Consecutive failures to trigger isolation
+const RECOVERY_COOLDOWN = 300000; // 5 minutes before re-enabling isolated agent
 
 /**
  * Track agent spawn success/failure
@@ -925,7 +969,7 @@ function trackAgentHealth(agentId, success, error = null) {
   const registry = loadRegistry();
   const agent = registry.agents[agentId];
 
-  if (!agent) return;  // Unknown agent, skip
+  if (!agent) return; // Unknown agent, skip
 
   // Update statistics
   agent.health.totalSpawns++;
@@ -960,9 +1004,8 @@ function trackAgentHealth(agentId, success, error = null) {
   }
 
   // Calculate success rate
-  agent.health.successRate = agent.health.totalSpawns > 0
-    ? agent.health.successfulSpawns / agent.health.totalSpawns
-    : 1;
+  agent.health.successRate =
+    agent.health.totalSpawns > 0 ? agent.health.successfulSpawns / agent.health.totalSpawns : 1;
 
   agent.health.lastHealthCheck = new Date().toISOString();
 
@@ -1024,7 +1067,7 @@ module.exports = async function agentHealthHook(input) {
   const { trackAgentHealth } = require('../../../lib/tools/agent-health-tracker.cjs');
   trackAgentHealth(agentId, success, error?.message);
 
-  return { allow: true };  // Always allow (we're just tracking)
+  return { allow: true }; // Always allow (we're just tracking)
 };
 ```
 
@@ -1169,20 +1212,24 @@ npm test 2>&1 | grep -E "pass.*103" && echo "✓ Phase 1-2 tests still passing"
 
 - [ ] **3F.2** Update learnings.md with Phase 3 patterns (~1 hour) [⚡ parallel OK]
   - **Entry**:
+
     ```markdown
     ## Phase 3: Agent Capability Cards (2026-01-31)
 
     ### Pattern: Capability-based agent discovery for orchestrators
+
     - Agents publish capability cards with health status
     - Orchestrators query agents by capability/domain/health
     - Failed agents automatically isolated after 3 consecutive failures
     - Recovery mechanism with 5-minute cooldown
 
     ### Key Learnings
+
     - Centralized registry preferred over distributed (simplicity + consistency)
     - Health tracking critical for self-healing
     - Backward compatible with Phase 1-2 (layered architecture)
     ```
+
   - **Verify**: `grep "Phase 3: Agent Capability Cards" .claude/context/memory/learnings.md`
 
 - [ ] **3F.3** Create AGENT_CAPABILITY_CARDS_GUIDE.md (~2 hours) [⚡ parallel OK]
@@ -1230,10 +1277,11 @@ echo "✓ Documentation complete"
 
 ```javascript
 Task({
-  subagent_type: "reflection-agent",
-  description: "Session reflection and learning extraction",
-  prompt: "You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan (Phase 3: Agent Capability Cards), extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
-})
+  subagent_type: 'reflection-agent',
+  description: 'Session reflection and learning extraction',
+  prompt:
+    'You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan (Phase 3: Agent Capability Cards), extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created).',
+});
 ```
 
 **Success Criteria**:
@@ -1246,32 +1294,32 @@ Task({
 
 ## Key Design Decisions
 
-| Decision | Options | Recommendation | Rationale |
-|----------|---------|----------------|-----------|
-| **Registry Location** | Centralized vs Distributed | **Centralized** (`.claude/context/agent-registry.json`) | Single source of truth, simpler consistency, easier debugging |
-| **Capability Definition** | Static (JSON) vs Dynamic (Code) | **Static (JSON)** | Versioned, human-readable, git-trackable |
-| **Health Tracking** | In-memory vs File-based | **Both** | In-memory for speed, periodic disk writes for persistence |
-| **Update Frequency** | Real-time vs Periodic | **Real-time** (on spawn/failure) | Immediate isolation of failed agents |
-| **Failure Threshold** | 3 vs 5 vs 10 | **3 consecutive failures** | Balance between tolerance and quick isolation |
-| **Recovery Cooldown** | 1min vs 5min vs 15min | **5 minutes** | Enough time for transient issues to resolve |
-| **Capability Matching** | Exact match vs Fuzzy | **Exact match** | Predictable, no false positives |
-| **Index Structure** | Single index vs Multiple indexes | **Multiple** (byCapability, byDomain, byCategory) | Fast queries for different use cases |
+| Decision                  | Options                          | Recommendation                                          | Rationale                                                     |
+| ------------------------- | -------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------- |
+| **Registry Location**     | Centralized vs Distributed       | **Centralized** (`.claude/context/agent-registry.json`) | Single source of truth, simpler consistency, easier debugging |
+| **Capability Definition** | Static (JSON) vs Dynamic (Code)  | **Static (JSON)**                                       | Versioned, human-readable, git-trackable                      |
+| **Health Tracking**       | In-memory vs File-based          | **Both**                                                | In-memory for speed, periodic disk writes for persistence     |
+| **Update Frequency**      | Real-time vs Periodic            | **Real-time** (on spawn/failure)                        | Immediate isolation of failed agents                          |
+| **Failure Threshold**     | 3 vs 5 vs 10                     | **3 consecutive failures**                              | Balance between tolerance and quick isolation                 |
+| **Recovery Cooldown**     | 1min vs 5min vs 15min            | **5 minutes**                                           | Enough time for transient issues to resolve                   |
+| **Capability Matching**   | Exact match vs Fuzzy             | **Exact match**                                         | Predictable, no false positives                               |
+| **Index Structure**       | Single index vs Multiple indexes | **Multiple** (byCapability, byDomain, byCategory)       | Fast queries for different use cases                          |
 
 ---
 
 ## Comparison: Phase 1 vs 2 vs 3
 
-| Aspect | Phase 1 | Phase 2 | Phase 3 |
-|--------|---------|---------|---------|
-| **Who discovers** | Router (hardcoded) | Agents (runtime) | **Orchestrators (capability-based)** |
-| **What discovers** | Tools | Skills | **Agents** |
-| **Discovery method** | Static pre-injection | Query (SkillCatalog) | **Query (AvailableAgents) + health** |
-| **Data source** | tool-manifest.json | skill-index.json | **agent-registry.json** |
-| **Scaling** | Limited (hardcoded) | Good (query-based) | **Excellent (capability + health)** |
-| **Hot-swapping** | No | N/A | **Yes (discover alternative agents)** |
-| **Self-healing** | No | N/A | **Yes (isolate failed agents)** |
-| **When needed** | Always (tool awareness) | Medium complexity (skill discovery) | **High complexity (orchestration)** |
-| **Target user** | All agents | All agents | **Orchestrators only** |
+| Aspect               | Phase 1                 | Phase 2                             | Phase 3                               |
+| -------------------- | ----------------------- | ----------------------------------- | ------------------------------------- |
+| **Who discovers**    | Router (hardcoded)      | Agents (runtime)                    | **Orchestrators (capability-based)**  |
+| **What discovers**   | Tools                   | Skills                              | **Agents**                            |
+| **Discovery method** | Static pre-injection    | Query (SkillCatalog)                | **Query (AvailableAgents) + health**  |
+| **Data source**      | tool-manifest.json      | skill-index.json                    | **agent-registry.json**               |
+| **Scaling**          | Limited (hardcoded)     | Good (query-based)                  | **Excellent (capability + health)**   |
+| **Hot-swapping**     | No                      | N/A                                 | **Yes (discover alternative agents)** |
+| **Self-healing**     | No                      | N/A                                 | **Yes (isolate failed agents)**       |
+| **When needed**      | Always (tool awareness) | Medium complexity (skill discovery) | **High complexity (orchestration)**   |
+| **Target user**      | All agents              | All agents                          | **Orchestrators only**                |
 
 ---
 
@@ -1300,30 +1348,30 @@ Task({
 
 ## Risks
 
-| Risk | Impact | Mitigation | Rollback |
-|------|--------|-----------|----------|
-| Registry out of sync with agent definitions | High | Auto-regenerate on agent changes + CI validation | Manual registry regeneration |
-| Health tracking overhead | Medium | Async file writes, batched updates | Disable health hook |
-| False positive isolations | High | 3-failure threshold + 5-min cooldown + manual recovery | Manual agent recovery |
-| Circular dependencies in discovery | Medium | Detect cycles, fail safely | Fallback to routing table |
-| Registry file corruption | High | Atomic writes, backup on regeneration | Regenerate from agent definitions |
-| Performance degradation | Low | In-memory caching, lazy index loading | Revert to hardcoded routing |
+| Risk                                        | Impact | Mitigation                                             | Rollback                          |
+| ------------------------------------------- | ------ | ------------------------------------------------------ | --------------------------------- |
+| Registry out of sync with agent definitions | High   | Auto-regenerate on agent changes + CI validation       | Manual registry regeneration      |
+| Health tracking overhead                    | Medium | Async file writes, batched updates                     | Disable health hook               |
+| False positive isolations                   | High   | 3-failure threshold + 5-min cooldown + manual recovery | Manual agent recovery             |
+| Circular dependencies in discovery          | Medium | Detect cycles, fail safely                             | Fallback to routing table         |
+| Registry file corruption                    | High   | Atomic writes, backup on regeneration                  | Regenerate from agent definitions |
+| Performance degradation                     | Low    | In-memory caching, lazy index loading                  | Revert to hardcoded routing       |
 
 ---
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Parallel? |
-|-------|-------|-----------|-----------|
-| 0 (Research) | 3 | 6-8 hours | No |
-| 3A (Schema) | 3 | 8-12 hours | No |
-| 3B (Registry) | 4 | 10-14 hours | No |
-| 3C (Integration) | 4 | 6-8 hours | Partial |
-| 3D (Health) | 4 | 6-8 hours | No |
-| 3E (Testing) | 4 | 6-8 hours | Partial |
-| 3F (Documentation) | 4 | 4-6 hours | Yes |
-| FINAL (Reflection) | 1 | 1-2 hours | No |
-| **Total** | **27** | **~48-66 hours** | |
+| Phase              | Tasks  | Est. Time        | Parallel? |
+| ------------------ | ------ | ---------------- | --------- |
+| 0 (Research)       | 3      | 6-8 hours        | No        |
+| 3A (Schema)        | 3      | 8-12 hours       | No        |
+| 3B (Registry)      | 4      | 10-14 hours      | No        |
+| 3C (Integration)   | 4      | 6-8 hours        | Partial   |
+| 3D (Health)        | 4      | 6-8 hours        | No        |
+| 3E (Testing)       | 4      | 6-8 hours        | Partial   |
+| 3F (Documentation) | 4      | 4-6 hours        | Yes       |
+| FINAL (Reflection) | 1      | 1-2 hours        | No        |
+| **Total**          | **27** | **~48-66 hours** |           |
 
 **Calendar Time**: ~8-10 days (1 developer) or ~4-5 days (2 developers)
 
@@ -1333,31 +1381,31 @@ Task({
 
 ### New Files
 
-| File | Purpose | Phase |
-|------|---------|-------|
-| `.claude/schemas/agent-capability-card.schema.json` | Capability card JSON schema | 3A |
-| `.claude/lib/tools/agent-registry-generator.cjs` | Registry generation script | 3B |
-| `.claude/context/agent-registry.json` | Agent capability registry | 3B |
-| `.claude/lib/tools/available-agents.cjs` | AvailableAgents() query tool | 3B |
-| `.claude/lib/tools/agent-health-tracker.cjs` | Health tracking module | 3D |
-| `.claude/hooks/routing/agent-health-hook.cjs` | PostToolUse health hook | 3D |
-| `.claude/docs/AGENT_CAPABILITY_CARDS_GUIDE.md` | Usage guide | 3F |
-| `tests/lib/tools/agent-registry-generator.test.cjs` | Unit tests | 3E |
-| `tests/lib/tools/available-agents.test.cjs` | Unit tests | 3E |
-| `tests/lib/tools/agent-health-tracker.test.cjs` | Unit tests | 3E |
-| `tests/integration/phase-3-capability-cards.test.cjs` | Integration tests | 3E |
+| File                                                  | Purpose                      | Phase |
+| ----------------------------------------------------- | ---------------------------- | ----- |
+| `.claude/schemas/agent-capability-card.schema.json`   | Capability card JSON schema  | 3A    |
+| `.claude/lib/tools/agent-registry-generator.cjs`      | Registry generation script   | 3B    |
+| `.claude/context/agent-registry.json`                 | Agent capability registry    | 3B    |
+| `.claude/lib/tools/available-agents.cjs`              | AvailableAgents() query tool | 3B    |
+| `.claude/lib/tools/agent-health-tracker.cjs`          | Health tracking module       | 3D    |
+| `.claude/hooks/routing/agent-health-hook.cjs`         | PostToolUse health hook      | 3D    |
+| `.claude/docs/AGENT_CAPABILITY_CARDS_GUIDE.md`        | Usage guide                  | 3F    |
+| `tests/lib/tools/agent-registry-generator.test.cjs`   | Unit tests                   | 3E    |
+| `tests/lib/tools/available-agents.test.cjs`           | Unit tests                   | 3E    |
+| `tests/lib/tools/agent-health-tracker.test.cjs`       | Unit tests                   | 3E    |
+| `tests/integration/phase-3-capability-cards.test.cjs` | Integration tests            | 3E    |
 
 ### Modified Files
 
-| File | Change | Phase |
-|------|--------|-------|
-| `.claude/CLAUDE.md` | Add AvailableAgents to Section 1.4 | 3C |
-| `.claude/workflows/core/router-decision.md` | Add capability-based selection | 3C |
-| `.claude/agents/orchestrators/master-orchestrator.md` | Add AvailableAgents usage | 3C |
-| `.claude/agents/orchestrators/evolution-orchestrator.md` | Add AvailableAgents usage | 3C |
-| `.claude/context/memory/decisions.md` | Add ADR-071 | 3F |
-| `.claude/context/memory/learnings.md` | Add Phase 3 learnings | 3F |
-| `package.json` | Add agents:registry, agents:health CLI commands | 3B |
+| File                                                     | Change                                          | Phase |
+| -------------------------------------------------------- | ----------------------------------------------- | ----- |
+| `.claude/CLAUDE.md`                                      | Add AvailableAgents to Section 1.4              | 3C    |
+| `.claude/workflows/core/router-decision.md`              | Add capability-based selection                  | 3C    |
+| `.claude/agents/orchestrators/master-orchestrator.md`    | Add AvailableAgents usage                       | 3C    |
+| `.claude/agents/orchestrators/evolution-orchestrator.md` | Add AvailableAgents usage                       | 3C    |
+| `.claude/context/memory/decisions.md`                    | Add ADR-071                                     | 3F    |
+| `.claude/context/memory/learnings.md`                    | Add Phase 3 learnings                           | 3F    |
+| `package.json`                                           | Add agents:registry, agents:health CLI commands | 3B    |
 
 ---
 

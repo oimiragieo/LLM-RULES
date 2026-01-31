@@ -12,38 +12,89 @@
 
 // Common stop words to filter out
 const STOP_WORDS = new Set([
-  'find', 'search', 'get', 'show', 'list', 'all', 'any', 'the', 'a', 'an',
-  'in', 'on', 'at', 'to', 'for', 'with', 'from', 'by', 'of', 'and', 'or',
-  'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
-  'do', 'does', 'did', 'will', 'would', 'should', 'could', 'can', 'that',
-  'this', 'these', 'those', 'what', 'which', 'where', 'when', 'how', 'why'
+  'find',
+  'search',
+  'get',
+  'show',
+  'list',
+  'all',
+  'any',
+  'the',
+  'a',
+  'an',
+  'in',
+  'on',
+  'at',
+  'to',
+  'for',
+  'with',
+  'from',
+  'by',
+  'of',
+  'and',
+  'or',
+  'is',
+  'are',
+  'was',
+  'were',
+  'be',
+  'been',
+  'being',
+  'have',
+  'has',
+  'had',
+  'do',
+  'does',
+  'did',
+  'will',
+  'would',
+  'should',
+  'could',
+  'can',
+  'that',
+  'this',
+  'these',
+  'those',
+  'what',
+  'which',
+  'where',
+  'when',
+  'how',
+  'why',
 ]);
 
 // Query type keywords
 const FUNCTION_KEYWORDS = ['function', 'functions', 'func', 'method', 'methods'];
 const CLASS_KEYWORDS = ['class', 'classes', 'interface', 'interfaces'];
-const SECURITY_KEYWORDS = ['sql', 'xss', 'injection', 'vulnerability', 'vulnerabilities', 'security'];
+const SECURITY_KEYWORDS = [
+  'sql',
+  'xss',
+  'injection',
+  'vulnerability',
+  'vulnerabilities',
+  'security',
+];
 const PERFORMANCE_KEYWORDS = ['performance', 'bottleneck', 'bottlenecks', 'slow', 'optimization'];
 
 // Synonym expansion map
 const SYNONYMS = {
-  'auth': ['authentication', 'login', 'signin', 'authorize'],
-  'db': ['database', 'data', 'storage'],
-  'config': ['configuration', 'settings', 'options'],
-  'util': ['utility', 'helper', 'utils', 'helpers'],
-  'error': ['exception', 'failure', 'errors'],
-  'test': ['spec', 'tests', 'testing'],
-  'doc': ['documentation', 'docs', 'comment', 'comments']
+  auth: ['authentication', 'login', 'signin', 'authorize'],
+  db: ['database', 'data', 'storage'],
+  config: ['configuration', 'settings', 'options'],
+  util: ['utility', 'helper', 'utils', 'helpers'],
+  error: ['exception', 'failure', 'errors'],
+  test: ['spec', 'tests', 'testing'],
+  doc: ['documentation', 'docs', 'comment', 'comments'],
 };
 
 // Language detection patterns
 const LANGUAGE_PATTERNS = {
-  'javascript': /\b(javascript|js)\b/i,
-  'typescript': /\b(typescript|ts)\b/i,
-  'python': /\b(python|py)\b/i,
-  'go': /\b(go|golang)\b/i,
-  'rust': /\b(rust|rs)\b/i,
-  'java': /\b(java)\b/i
+  javascript: /\b(javascript|js)\b/i,
+  typescript: /\b(typescript|ts)\b/i,
+  python: /\b(python|py)\b/i,
+  go: /\b(go|golang)\b/i,
+  rust: /\b(rust|rs)\b/i,
+  java: /\b(java)\b/i,
 };
 
 // AST pattern templates by language
@@ -55,7 +106,7 @@ const PATTERNS = {
     class: 'class $NAME { $$$ }',
     sqlInjection: '$DB.query($SQL)',
     xss: '$ELEM.innerHTML = $DATA',
-    eval: 'eval($$$)'
+    eval: 'eval($$$)',
   },
   typescript: {
     function: 'function $NAME($$$): $TYPE { $$$ }',
@@ -64,24 +115,24 @@ const PATTERNS = {
     class: 'class $NAME { $$$ }',
     sqlInjection: '$DB.query($SQL)',
     xss: '$ELEM.innerHTML = $DATA',
-    eval: 'eval($$$)'
+    eval: 'eval($$$)',
   },
   python: {
     function: 'def $NAME($$$): $$$',
     asyncFunction: 'async def $NAME($$$): $$$',
     class: 'class $NAME: $$$',
     sqlInjection: '$DB.execute($SQL)',
-    eval: 'eval($$$)'
+    eval: 'eval($$$)',
   },
   go: {
     function: 'func $NAME($$$) $RETURN { $$$ }',
-    struct: 'type $NAME struct { $$$ }'
+    struct: 'type $NAME struct { $$$ }',
   },
   rust: {
     function: 'fn $NAME($$$) -> $TYPE { $$$ }',
     asyncFunction: 'async fn $NAME($$$) -> $TYPE { $$$ }',
-    struct: 'struct $NAME { $$$ }'
-  }
+    struct: 'struct $NAME { $$$ }',
+  },
 };
 
 /**
@@ -113,7 +164,7 @@ class QueryAnalyzer {
       astPattern,
       language,
       concepts,
-      confidence
+      confidence,
     };
   }
 
@@ -128,9 +179,7 @@ class QueryAnalyzer {
     }
 
     // Split on whitespace and punctuation, preserving original case
-    const words = query
-      .split(/[\s.,;:!?(){}[\]<>]+/)
-      .filter(word => word.length > 0);
+    const words = query.split(/[\s.,;:!?(){}[\]<>]+/).filter(word => word.length > 0);
 
     // Remove stop words (case-insensitive comparison)
     const filtered = words.filter(word => !STOP_WORDS.has(word.toLowerCase()));
@@ -155,7 +204,10 @@ class QueryAnalyzer {
     const templates = PATTERNS[lang] || PATTERNS.javascript;
 
     // Check for async function
-    if (normalized.includes('async') && (normalized.includes('function') || normalized.includes('func'))) {
+    if (
+      normalized.includes('async') &&
+      (normalized.includes('function') || normalized.includes('func'))
+    ) {
       return templates.asyncFunction || templates.function;
     }
 
@@ -288,7 +340,7 @@ class QueryAnalyzer {
       astPattern: null,
       language: null,
       concepts: [],
-      confidence: 0.0
+      confidence: 0.0,
     };
   }
 }

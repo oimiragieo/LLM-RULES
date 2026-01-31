@@ -20,6 +20,7 @@ The agent-studio orchestration has FIVE critical issues:
 5. **Zero error tolerance** - EVERY agent spawn can fail with tool errors
 
 Example error pattern:
+
 ```
 Invalid tool parameters
 Error: Sibling tool call errored
@@ -33,18 +34,19 @@ Error: Sibling tool call errored
 
 **Current State Analysis:**
 
-| Component | Tool Definition | Problem |
-|-----------|----------------|---------|
-| `developer.md` | `tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]` | Missing TaskOutput |
-| `master-orchestrator.md` | `tools: [Task, Read, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]` | Missing Write, Edit, Bash |
-| `universal-agent-spawn.md` | `allowed_tools: [Read, Write, Edit, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, Skill]` | Missing Glob, Grep |
-| CLAUDE.md Section 1.4 | Lists 20 core tools | Not injected into spawn prompts |
+| Component                  | Tool Definition                                                                                          | Problem                         |
+| -------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `developer.md`             | `tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]`         | Missing TaskOutput              |
+| `master-orchestrator.md`   | `tools: [Task, Read, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]`                      | Missing Write, Edit, Bash       |
+| `universal-agent-spawn.md` | `allowed_tools: [Read, Write, Edit, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, Skill]` | Missing Glob, Grep              |
+| CLAUDE.md Section 1.4      | Lists 20 core tools                                                                                      | Not injected into spawn prompts |
 
 **Root Cause**: No single source of truth for agent tool configuration. Three different definitions conflict.
 
 ### Finding 2: Skill Discovery Gap
 
 **Current State:**
+
 - Skill catalog exists at `.claude/context/artifacts/skill-catalog.md` (435 skills)
 - Agents are TOLD to "invoke skills via Skill()" but NOT given skill list
 - Spawn prompts say "use Skill({ skill: '...' })" without listing available skills
@@ -64,6 +66,7 @@ Error: Sibling tool call errored
 ### Finding 4: MCP Tool References in Agents
 
 **From issues.md [TOOL-001]:**
+
 - 11 agent definitions reference `mcp__sequential-thinking__*`
 - No MCP servers configured in settings.json (`mcpServers: {}`)
 - Causes "No such tool available" runtime errors
@@ -73,6 +76,7 @@ Error: Sibling tool call errored
 ### Finding 5: Agent Definition Schema Missing Validation
 
 **Current State:**
+
 - Agent YAML frontmatter defines `tools: [...]` array
 - No schema validation enforces tool names match CORE_TOOLS
 - No validation that skills listed exist in skill catalog
@@ -88,6 +92,7 @@ Error: Sibling tool call errored
 **Source**: AutoGPT Plugin Architecture (github.com/Significant-Gravitas/Auto-GPT)
 
 AutoGPT uses a **tool manifest** that:
+
 - Defines ALL available tools in one JSON file
 - Each tool has: name, description, parameters, return type
 - Agents receive tool manifest in their system prompt
@@ -100,6 +105,7 @@ AutoGPT uses a **tool manifest** that:
 **Source**: CrewAI Agent Framework (docs.crewai.com)
 
 CrewAI uses **capability discovery**:
+
 - Agents are given a list of available tools at instantiation
 - Tools are injected into agent's `tools` parameter
 - Agent can query tool descriptions before using
@@ -111,6 +117,7 @@ CrewAI uses **capability discovery**:
 **Source**: LangChain Tools Documentation (python.langchain.com/docs/modules/agents/tools)
 
 LangChain uses a **tool registry**:
+
 - All tools registered in a central `ToolRegistry`
 - Agents query registry for available tools
 - Registry validates tool calls before execution
@@ -122,6 +129,7 @@ LangChain uses a **tool registry**:
 **Source**: Microsoft Semantic Kernel (learn.microsoft.com/semantic-kernel)
 
 Semantic Kernel uses **skill indexing**:
+
 - Skills stored in a searchable index
 - Agents can search skills by description/tags
 - Skills auto-registered on load
@@ -133,6 +141,7 @@ Semantic Kernel uses **skill indexing**:
 **Source**: Microsoft AutoGen (github.com/microsoft/autogen)
 
 AutoGen validates **before execution**:
+
 - Tool parameters validated before spawn
 - Missing tools cause immediate failure with clear message
 - No silent failures
@@ -197,7 +206,13 @@ Create `C:\dev\projects\agent-studio\.claude\config\tool-manifest.json`:
       "category": "orchestration",
       "description": "Spawn subagents",
       "availability": "orchestrators_only",
-      "requiredBy": ["router", "master-orchestrator", "swarm-coordinator", "evolution-orchestrator", "party-orchestrator"]
+      "requiredBy": [
+        "router",
+        "master-orchestrator",
+        "swarm-coordinator",
+        "evolution-orchestrator",
+        "party-orchestrator"
+      ]
     },
     "TaskCreate": {
       "category": "task_management",
@@ -281,10 +296,54 @@ Create `C:\dev\projects\agent-studio\.claude\config\tool-manifest.json`:
     }
   },
   "agentToolsets": {
-    "standard": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "TaskUpdate", "TaskList", "TaskCreate", "TaskGet", "TaskOutput", "Skill"],
-    "orchestrator": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Task", "TaskUpdate", "TaskList", "TaskCreate", "TaskGet", "TaskOutput", "Skill"],
-    "router": ["Read", "Task", "TaskList", "TaskCreate", "TaskUpdate", "TaskGet", "AskUserQuestion"],
-    "read_only": ["Read", "Glob", "Grep", "WebSearch", "WebFetch", "TaskUpdate", "TaskList", "Skill"]
+    "standard": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash",
+      "Glob",
+      "Grep",
+      "TaskUpdate",
+      "TaskList",
+      "TaskCreate",
+      "TaskGet",
+      "TaskOutput",
+      "Skill"
+    ],
+    "orchestrator": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash",
+      "Glob",
+      "Grep",
+      "Task",
+      "TaskUpdate",
+      "TaskList",
+      "TaskCreate",
+      "TaskGet",
+      "TaskOutput",
+      "Skill"
+    ],
+    "router": [
+      "Read",
+      "Task",
+      "TaskList",
+      "TaskCreate",
+      "TaskUpdate",
+      "TaskGet",
+      "AskUserQuestion"
+    ],
+    "read_only": [
+      "Read",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "TaskUpdate",
+      "TaskList",
+      "Skill"
+    ]
   }
 }
 ```
@@ -382,6 +441,7 @@ You have access to the following tools:
 {{TOOL_LIST}}
 
 **Tool Usage Rules:**
+
 - Use ONLY these tools. Attempting to use unlisted tools will fail.
 - TaskUpdate is MANDATORY for task tracking.
 - Skill() invokes skills (reading skill files does NOT invoke them).
@@ -391,6 +451,7 @@ You have access to the following tools:
 {{SKILL_LIST}}
 
 **Skill Discovery:**
+
 - Full catalog: .claude/context/artifacts/skill-catalog.md
 - Search by category or keyword
 - Invoke with: Skill({ skill: "<skill-name>" })
@@ -416,7 +477,7 @@ Create `C:\dev\projects\agent-studio\.claude\lib\spawn\prompt-assembler.cjs`:
 // 4. Substitute placeholders (ROLE, TASK, ID, PROJECT_ROOT)
 // 5. Return complete prompt
 
-const assembleSpawnPrompt = async (options) => {
+const assembleSpawnPrompt = async options => {
   const { agentType, taskId, subject, projectRoot } = options;
 
   // 1. Select template
@@ -439,7 +500,7 @@ const assembleSpawnPrompt = async (options) => {
     ROLE: agentType,
     TASK: subject,
     ID: taskId,
-    PROJECT_ROOT: projectRoot
+    PROJECT_ROOT: projectRoot,
   });
 };
 ```
@@ -457,6 +518,7 @@ const assembleSpawnPrompt = async (options) => {
 Update `.claude/hooks/routing/tool-availability-validator.cjs`:
 
 New features:
+
 - Read tool-manifest.json for validation
 - Validate against agent toolset definitions
 - Check for mandatory tools (TaskUpdate, Skill)
@@ -571,20 +633,52 @@ done > agent-audit-results.txt
 ### Task 4.2: Fix developer.md Tools (~15 min)
 
 Update tools array:
+
 ```yaml
-tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, Skill]
+tools:
+  [
+    Read,
+    Write,
+    Edit,
+    Glob,
+    Grep,
+    Bash,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    TaskOutput,
+    Skill,
+  ]
 ```
 
 ### Task 4.3: Fix master-orchestrator.md Tools (~15 min)
 
 Update tools array:
+
 ```yaml
-tools: [Task, Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, Skill]
+tools:
+  [
+    Task,
+    Read,
+    Write,
+    Edit,
+    Glob,
+    Grep,
+    Bash,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    TaskOutput,
+    Skill,
+  ]
 ```
 
 ### Task 4.4: Remove MCP Tool References (~1 hour)
 
 For all 11 agents with `mcp__sequential-thinking__*`:
+
 - Remove MCP tool from tools array
 - Add comment: `# Use Skill({ skill: 'sequential-thinking' }) instead`
 
@@ -616,14 +710,14 @@ const prompt = await assembleSpawnPrompt({
   agentType: 'developer',
   taskId: taskId,
   subject: 'Implement feature X',
-  projectRoot: 'C:\\dev\\projects\\agent-studio'
+  projectRoot: 'C:\\dev\\projects\\agent-studio',
 });
 
 Task({
   subagent_type: 'general-purpose',
   description: 'Developer implementing feature X',
   allowed_tools: getToolsetForAgent('developer'), // From tool-manifest
-  prompt: prompt
+  prompt: prompt,
 });
 ```
 
@@ -642,6 +736,7 @@ Before spawning, Router MUST:
 4. Only then call Task()
 
 This ensures:
+
 - Agent knows all available tools
 - Agent knows relevant skills
 - Tool/skill coherence is validated
@@ -656,7 +751,7 @@ Create `.claude/lib/spawn/spawn-helper.cjs`:
 // High-level spawn helper that Router can use
 // Encapsulates all complexity:
 
-const spawnAgent = async (options) => {
+const spawnAgent = async options => {
   const { agentType, taskId, subject, description } = options;
 
   // 1. Get toolset
@@ -664,7 +759,10 @@ const spawnAgent = async (options) => {
 
   // 2. Assemble prompt
   const prompt = await assembleSpawnPrompt({
-    agentType, taskId, subject, projectRoot: process.cwd()
+    agentType,
+    taskId,
+    subject,
+    projectRoot: process.cwd(),
   });
 
   // 3. Validate (hook will run anyway, but pre-check is helpful)
@@ -678,7 +776,7 @@ const spawnAgent = async (options) => {
     subagent_type: isOrchestrator(agentType) ? agentType : 'general-purpose',
     description: description,
     allowed_tools: toolset,
-    prompt: prompt
+    prompt: prompt,
   };
 };
 
@@ -782,6 +880,7 @@ Single source of truth for all tool definitions:
 **File**: `.claude/config/tool-manifest.json`
 
 Contains:
+
 - All 20 core tools with descriptions
 - Agent toolset definitions (standard, orchestrator, router, read_only)
 - Tool requirements per agent type
@@ -807,6 +906,7 @@ Document patterns discovered:
 4. **Skill Index**: Generated from catalog for discovery
 
 **Files Created:**
+
 - .claude/config/tool-manifest.json
 - .claude/config/skill-index.json
 - .claude/lib/spawn/prompt-assembler.cjs
@@ -848,15 +948,18 @@ Document architecture decision:
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Spawn Command**:
+
 ```javascript
 Task({
-  subagent_type: "reflection-agent",
-  description: "Session reflection and learning extraction",
-  prompt: "You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
-})
+  subagent_type: 'reflection-agent',
+  description: 'Session reflection and learning extraction',
+  prompt:
+    'You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created).',
+});
 ```
 
 **Success Criteria**:
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
@@ -865,13 +968,13 @@ Task({
 
 ## Risk Assessment
 
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| Tool manifest out of sync | Medium | Medium | Add CI validation, version control |
-| Spawn prompt too large | Low | Low | Limit skill injection to top 20 |
-| Hook order dependency | Medium | Low | Document hook order in settings.json |
-| Agent definitions not updated | High | Medium | Run validator in CI |
-| Skill index generation fails | Low | Low | Graceful fallback to catalog |
+| Risk                          | Impact | Probability | Mitigation                           |
+| ----------------------------- | ------ | ----------- | ------------------------------------ |
+| Tool manifest out of sync     | Medium | Medium      | Add CI validation, version control   |
+| Spawn prompt too large        | Low    | Low         | Limit skill injection to top 20      |
+| Hook order dependency         | Medium | Low         | Document hook order in settings.json |
+| Agent definitions not updated | High   | Medium      | Run validator in CI                  |
+| Skill index generation fails  | Low    | Low         | Graceful fallback to catalog         |
 
 ---
 
@@ -879,17 +982,18 @@ Task({
 
 **Phase Verification Gates:**
 
-| Phase | Gate | Verification Command |
-|-------|------|---------------------|
-| 1 | Tool manifest valid | `cat .claude/config/tool-manifest.json \| jq .` |
-| 2 | Spawn templates updated | `grep "AVAILABLE TOOLS" .claude/templates/spawn/*.md` |
-| 3 | Hooks registered | `grep "agent-definition-check" .claude/settings.json` |
-| 4 | All agents validated | `node agent-definition-validator.cjs --all` |
-| 5 | Router uses assembler | `grep "assembleSpawnPrompt" .claude/CLAUDE.md` |
-| 6 | Tests pass | `npm test -- --grep "Spawn"` |
-| 7 | Memory updated | `grep "ADR-066" .claude/context/memory/decisions.md` |
+| Phase | Gate                    | Verification Command                                  |
+| ----- | ----------------------- | ----------------------------------------------------- |
+| 1     | Tool manifest valid     | `cat .claude/config/tool-manifest.json \| jq .`       |
+| 2     | Spawn templates updated | `grep "AVAILABLE TOOLS" .claude/templates/spawn/*.md` |
+| 3     | Hooks registered        | `grep "agent-definition-check" .claude/settings.json` |
+| 4     | All agents validated    | `node agent-definition-validator.cjs --all`           |
+| 5     | Router uses assembler   | `grep "assembleSpawnPrompt" .claude/CLAUDE.md`        |
+| 6     | Tests pass              | `npm test -- --grep "Spawn"`                          |
+| 7     | Memory updated          | `grep "ADR-066" .claude/context/memory/decisions.md`  |
 
 **Overall Success:**
+
 - [ ] Zero "Invalid tool parameters" errors in testing
 - [ ] All 45+ agents validated against tool-manifest
 - [ ] Spawn prompts contain AVAILABLE_TOOLS section
@@ -901,16 +1005,16 @@ Task({
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Parallel? |
-|-------|-------|-----------|-----------|
-| 1 | 4 | 3.5 hours | No |
-| 2 | 5 | 5 hours | Partial |
-| 3 | 4 | 4 hours | Yes |
-| 4 | 5 | 4 hours | Yes |
-| 5 | 3 | 3 hours | No |
-| 6 | 3 | 3.5 hours | Yes |
-| 7 | 3 | 2 hours | Yes |
-| **Total** | **27** | **~20 hours** | |
+| Phase     | Tasks  | Est. Time     | Parallel? |
+| --------- | ------ | ------------- | --------- |
+| 1         | 4      | 3.5 hours     | No        |
+| 2         | 5      | 5 hours       | Partial   |
+| 3         | 4      | 4 hours       | Yes       |
+| 4         | 5      | 4 hours       | Yes       |
+| 5         | 3      | 3 hours       | No        |
+| 6         | 3      | 3.5 hours     | Yes       |
+| 7         | 3      | 2 hours       | Yes       |
+| **Total** | **27** | **~20 hours** |           |
 
 **With Parallelization**: ~16 hours (2 developers)
 
@@ -936,5 +1040,5 @@ Task({
 
 ---
 
-*Plan generated by Planner Agent using plan-generator skill*
-*Constitution checkpoint passed: Research complete (5 sources), technical feasibility validated, security reviewed*
+_Plan generated by Planner Agent using plan-generator skill_
+_Constitution checkpoint passed: Research complete (5 sources), technical feasibility validated, security reviewed_

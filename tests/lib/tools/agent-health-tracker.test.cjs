@@ -228,8 +228,16 @@ describe('AgentHealthTracker', () => {
     it('should create tracker with default options', () => {
       const tracker = new AgentHealthTracker({ registryPath: testEnv.registryPath });
       assert.ok(tracker, 'Tracker should be created');
-      assert.strictEqual(tracker.failureThreshold, FAILURE_THRESHOLD, 'Should use default failure threshold');
-      assert.strictEqual(tracker.recoveryWindow, RECOVERY_WINDOW_MS, 'Should use default recovery window');
+      assert.strictEqual(
+        tracker.failureThreshold,
+        FAILURE_THRESHOLD,
+        'Should use default failure threshold'
+      );
+      assert.strictEqual(
+        tracker.recoveryWindow,
+        RECOVERY_WINDOW_MS,
+        'Should use default recovery window'
+      );
     });
 
     it('should accept custom failure threshold', () => {
@@ -245,7 +253,11 @@ describe('AgentHealthTracker', () => {
         registryPath: testEnv.registryPath,
         recoveryWindow: 10 * 60 * 1000, // 10 minutes
       });
-      assert.strictEqual(tracker.recoveryWindow, 10 * 60 * 1000, 'Should use custom recovery window');
+      assert.strictEqual(
+        tracker.recoveryWindow,
+        10 * 60 * 1000,
+        'Should use custom recovery window'
+      );
     });
   });
 
@@ -258,7 +270,11 @@ describe('AgentHealthTracker', () => {
       const tracker = new AgentHealthTracker({ registryPath: testEnv.registryPath });
       tracker.recordSuccess('developer');
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.successCount, 1, 'Should increment successCount');
+      assert.strictEqual(
+        registry.agents.developer.health.successCount,
+        1,
+        'Should increment successCount'
+      );
     });
 
     it('should reset consecutiveFailures to 0', () => {
@@ -290,7 +306,11 @@ describe('AgentHealthTracker', () => {
       tracker.recordSuccess('developer');
 
       const updatedRegistry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(updatedRegistry.agents.developer.health.status, 'healthy', 'Should recover to healthy');
+      assert.strictEqual(
+        updatedRegistry.agents.developer.health.status,
+        'healthy',
+        'Should recover to healthy'
+      );
     });
 
     it('should update lastSuccessAt timestamp', () => {
@@ -364,7 +384,11 @@ describe('AgentHealthTracker', () => {
       const tracker = new AgentHealthTracker({ registryPath: testEnv.registryPath });
       tracker.recordFailure('developer', 'Test failure');
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.failureCount, 1, 'Should increment failureCount');
+      assert.strictEqual(
+        registry.agents.developer.health.failureCount,
+        1,
+        'Should increment failureCount'
+      );
     });
 
     it('should increment consecutiveFailures', () => {
@@ -382,7 +406,11 @@ describe('AgentHealthTracker', () => {
       const tracker = new AgentHealthTracker({ registryPath: testEnv.registryPath });
       tracker.recordFailure('developer', 'Test failure');
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.status, 'healthy', 'Should remain healthy after 1st failure');
+      assert.strictEqual(
+        registry.agents.developer.health.status,
+        'healthy',
+        'Should remain healthy after 1st failure'
+      );
     });
 
     it('should not isolate on 2nd failure', () => {
@@ -390,7 +418,11 @@ describe('AgentHealthTracker', () => {
       tracker.recordFailure('developer', 'Test failure 1');
       tracker.recordFailure('developer', 'Test failure 2');
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.status, 'healthy', 'Should remain healthy after 2nd failure');
+      assert.strictEqual(
+        registry.agents.developer.health.status,
+        'healthy',
+        'Should remain healthy after 2nd failure'
+      );
     });
 
     it('should isolate (status=unavailable) on 3rd consecutive failure', () => {
@@ -468,7 +500,11 @@ describe('AgentHealthTracker', () => {
 
       const updatedRegistry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
       // New rate = 6/10 = 0.6 < 0.7
-      assert.strictEqual(updatedRegistry.agents.developer.health.status, 'degraded', 'Should be degraded');
+      assert.strictEqual(
+        updatedRegistry.agents.developer.health.status,
+        'degraded',
+        'Should be degraded'
+      );
     });
 
     it('should return false for unknown agent', () => {
@@ -483,7 +519,10 @@ describe('AgentHealthTracker', () => {
       tracker.recordFailure('developer', 'Test failure 2');
       tracker.recordFailure('developer', 'Test failure 3');
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.ok(registry.health.unavailable.includes('developer'), 'Should be in unavailable array');
+      assert.ok(
+        registry.health.unavailable.includes('developer'),
+        'Should be in unavailable array'
+      );
       assert.ok(!registry.health.healthy.includes('developer'), 'Should not be in healthy array');
     });
   });
@@ -529,7 +568,11 @@ describe('AgentHealthTracker', () => {
       assert.strictEqual(result.success, true, 'Should recover after window passes');
 
       const updatedRegistry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(updatedRegistry.agents.developer.health.status, 'degraded', 'Should be degraded after recovery');
+      assert.strictEqual(
+        updatedRegistry.agents.developer.health.status,
+        'degraded',
+        'Should be degraded after recovery'
+      );
     });
 
     it('should reset consecutiveFailures on recovery', () => {
@@ -545,7 +588,11 @@ describe('AgentHealthTracker', () => {
       tracker.attemptRecovery('developer');
 
       const updatedRegistry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(updatedRegistry.agents.developer.health.consecutiveFailures, 0, 'Should reset consecutiveFailures');
+      assert.strictEqual(
+        updatedRegistry.agents.developer.health.consecutiveFailures,
+        0,
+        'Should reset consecutiveFailures'
+      );
     });
 
     it('should return failure for unknown agent', () => {
@@ -585,7 +632,7 @@ describe('AgentHealthTracker', () => {
       registry.agents.developer.health.status = 'degraded';
       registry.agents.developer.health.successRate = 0.65;
       registry.agents.developer.health.consecutiveFailures = 1;
-      registry.health.healthy = registry.health.healthy.filter((id) => id !== 'developer');
+      registry.health.healthy = registry.health.healthy.filter(id => id !== 'developer');
       registry.health.degraded.push('developer');
       registry.metadata.healthyAgents = 2;
       registry.metadata.degradedAgents = 1;
@@ -604,7 +651,7 @@ describe('AgentHealthTracker', () => {
       registry.agents.developer.health.status = 'unavailable';
       registry.agents.developer.health.isolatedAt = new Date().toISOString();
       registry.agents.developer.health.isolationReason = 'Test isolation';
-      registry.health.healthy = registry.health.healthy.filter((id) => id !== 'developer');
+      registry.health.healthy = registry.health.healthy.filter(id => id !== 'developer');
       registry.health.unavailable.push('developer');
       registry.metadata.healthyAgents = 2;
       registry.metadata.unavailableAgents = 1;
@@ -667,7 +714,7 @@ describe('AgentHealthTracker', () => {
       // Set up unavailable agent
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
       registry.agents.developer.health.status = 'unavailable';
-      registry.health.healthy = registry.health.healthy.filter((id) => id !== 'developer');
+      registry.health.healthy = registry.health.healthy.filter(id => id !== 'developer');
       registry.health.unavailable.push('developer');
       fs.writeFileSync(testEnv.registryPath, JSON.stringify(registry, null, 2));
 
@@ -676,7 +723,10 @@ describe('AgentHealthTracker', () => {
 
       const updatedRegistry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
       assert.ok(updatedRegistry.health.healthy.includes('developer'), 'Should be in healthy array');
-      assert.ok(!updatedRegistry.health.unavailable.includes('developer'), 'Should not be in unavailable array');
+      assert.ok(
+        !updatedRegistry.health.unavailable.includes('developer'),
+        'Should not be in unavailable array'
+      );
     });
   });
 
@@ -689,7 +739,11 @@ describe('AgentHealthTracker', () => {
       const tracker = new AgentHealthTracker({ registryPath: testEnv.registryPath });
       tracker.recordSuccess('developer');
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.successRate, 1.0, 'Should have 100% success rate');
+      assert.strictEqual(
+        registry.agents.developer.health.successRate,
+        1.0,
+        'Should have 100% success rate'
+      );
     });
 
     it('should handle multiple agents independently', () => {
@@ -699,7 +753,11 @@ describe('AgentHealthTracker', () => {
       tracker.recordSuccess('qa');
 
       const registry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(registry.agents.developer.health.consecutiveFailures, 2, 'Developer should have 2 failures');
+      assert.strictEqual(
+        registry.agents.developer.health.consecutiveFailures,
+        2,
+        'Developer should have 2 failures'
+      );
       assert.strictEqual(registry.agents.qa.health.successCount, 1, 'QA should have 1 success');
     });
 
@@ -722,8 +780,16 @@ describe('AgentHealthTracker', () => {
       // Note: Success rate is below 0.7, so agent becomes degraded
       // This test verifies that consecutive failure reset works (not isolation trigger)
       const updatedRegistry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(updatedRegistry.agents.developer.health.consecutiveFailures, 2, 'Should have 2 consecutive failures');
-      assert.notStrictEqual(updatedRegistry.agents.developer.health.status, 'unavailable', 'Should NOT be unavailable (only 2 consecutive)');
+      assert.strictEqual(
+        updatedRegistry.agents.developer.health.consecutiveFailures,
+        2,
+        'Should have 2 consecutive failures'
+      );
+      assert.notStrictEqual(
+        updatedRegistry.agents.developer.health.status,
+        'unavailable',
+        'Should NOT be unavailable (only 2 consecutive)'
+      );
     });
 
     it('should handle re-isolation after recovery and more failures', () => {
@@ -746,7 +812,11 @@ describe('AgentHealthTracker', () => {
       tracker.recordFailure('developer', 'New failure 3');
 
       const updatedRegistry = JSON.parse(fs.readFileSync(testEnv.registryPath, 'utf-8'));
-      assert.strictEqual(updatedRegistry.agents.developer.health.status, 'unavailable', 'Should be re-isolated');
+      assert.strictEqual(
+        updatedRegistry.agents.developer.health.status,
+        'unavailable',
+        'Should be re-isolated'
+      );
     });
   });
 
@@ -768,7 +838,11 @@ describe('AgentHealthTracker', () => {
     });
 
     it('should export RECOVERY_WINDOW_MS as 5 minutes', () => {
-      assert.strictEqual(RECOVERY_WINDOW_MS, 5 * 60 * 1000, 'RECOVERY_WINDOW_MS should be 5 minutes');
+      assert.strictEqual(
+        RECOVERY_WINDOW_MS,
+        5 * 60 * 1000,
+        'RECOVERY_WINDOW_MS should be 5 minutes'
+      );
     });
   });
 });

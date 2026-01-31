@@ -16,7 +16,15 @@ const PROJECT_ROOT = projectRootUtils.PROJECT_ROOT;
 const _SKILLS_DIR = path.join(PROJECT_ROOT, '.claude', 'skills');
 
 // Valid licenses (common open-source licenses)
-const VALID_LICENSES = ['MIT', 'Apache-2.0', 'ISC', 'BSD-3-Clause', 'GPL-3.0', 'LGPL-3.0', 'MPL-2.0'];
+const VALID_LICENSES = [
+  'MIT',
+  'Apache-2.0',
+  'ISC',
+  'BSD-3-Clause',
+  'GPL-3.0',
+  'LGPL-3.0',
+  'MPL-2.0',
+];
 
 /**
  * Parse frontmatter from markdown content
@@ -73,21 +81,22 @@ function validateSkillMetadata(filePath) {
 
     // Validate license
     if (frontmatter.license && !VALID_LICENSES.includes(frontmatter.license)) {
-      errors.push(`Invalid license: ${frontmatter.license}. Must be one of: ${VALID_LICENSES.join(', ')}`);
+      errors.push(
+        `Invalid license: ${frontmatter.license}. Must be one of: ${VALID_LICENSES.join(', ')}`
+      );
     }
 
     // Check for metadata section (nested YAML)
     if (!content.includes('metadata:')) {
       errors.push('Missing metadata section (should include author and version)');
     }
-
   } catch (err) {
     errors.push(`Failed to read file: ${err.message}`);
   }
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -135,7 +144,7 @@ function preToolUse(hookInput) {
     if (!result.valid) {
       return {
         allowed: false,
-        reason: `Skill metadata validation failed for ${path.basename(path.dirname(filePath))}:\n${result.errors.map(e => `  - ${e}`).join('\n')}`
+        reason: `Skill metadata validation failed for ${path.basename(path.dirname(filePath))}:\n${result.errors.map(e => `  - ${e}`).join('\n')}`,
       };
     }
   } catch (err) {
@@ -149,5 +158,5 @@ function preToolUse(hookInput) {
 module.exports = {
   preToolUse,
   validateSkillMetadata,
-  parseFrontmatter
+  parseFrontmatter,
 };

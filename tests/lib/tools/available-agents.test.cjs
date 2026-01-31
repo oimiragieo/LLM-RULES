@@ -26,10 +26,10 @@ const mockRegistry = {
     degradedAgents: 1,
     unavailableAgents: 0,
     lastHealthCheck: '2026-01-31T12:00:00.000Z',
-    lastFullScan: '2026-01-31T12:00:00.000Z'
+    lastFullScan: '2026-01-31T12:00:00.000Z',
   },
   agents: {
-    'developer': {
+    developer: {
       id: 'developer',
       displayName: 'Developer Agent',
       category: 'core',
@@ -41,7 +41,7 @@ const mockRegistry = {
           description: 'TDD-focused code implementation',
           triggerPhrases: ['implement', 'code', 'develop'],
           requiredTools: ['Read', 'Write', 'Edit', 'Bash'],
-          skills: ['tdd', 'debugging']
+          skills: ['tdd', 'debugging'],
         },
         {
           name: 'bug-fix',
@@ -49,12 +49,12 @@ const mockRegistry = {
           description: 'Fix bugs using systematic debugging',
           triggerPhrases: ['fix bug', 'debug'],
           requiredTools: ['Read', 'Write', 'Edit'],
-          skills: ['debugging', 'tdd']
-        }
+          skills: ['debugging', 'tdd'],
+        },
       ],
       constraints: {
         maxConcurrentTasks: 5,
-        preferredModel: 'sonnet'
+        preferredModel: 'sonnet',
       },
       health: {
         status: 'healthy',
@@ -64,11 +64,11 @@ const mockRegistry = {
         successRate: 0.96,
         lastUpdate: '2026-01-31T12:00:00.000Z',
         isolatedAt: null,
-        isolationReason: null
+        isolationReason: null,
       },
       metadata: {
-        version: '1.1.0'
-      }
+        version: '1.1.0',
+      },
     },
     'code-reviewer': {
       id: 'code-reviewer',
@@ -82,12 +82,12 @@ const mockRegistry = {
           description: 'Read-only code analysis and review',
           triggerPhrases: ['review code', 'PR review'],
           requiredTools: ['Read', 'Grep', 'Glob'],
-          skills: ['code-reviewer']
-        }
+          skills: ['code-reviewer'],
+        },
       ],
       constraints: {
         maxConcurrentTasks: 10,
-        preferredModel: 'sonnet'
+        preferredModel: 'sonnet',
       },
       health: {
         status: 'healthy',
@@ -97,13 +97,13 @@ const mockRegistry = {
         successRate: 1.0,
         lastUpdate: '2026-01-31T12:00:00.000Z',
         isolatedAt: null,
-        isolationReason: null
+        isolationReason: null,
       },
       metadata: {
-        version: '1.0.0'
-      }
+        version: '1.0.0',
+      },
     },
-    'qa': {
+    qa: {
       id: 'qa',
       displayName: 'QA Agent',
       category: 'core',
@@ -115,12 +115,12 @@ const mockRegistry = {
           description: 'Comprehensive testing and validation',
           triggerPhrases: ['test', 'qa', 'validate'],
           requiredTools: ['Read', 'Write', 'Bash'],
-          skills: ['tdd', 'qa-workflow']
-        }
+          skills: ['tdd', 'qa-workflow'],
+        },
       ],
       constraints: {
         maxConcurrentTasks: 5,
-        preferredModel: 'sonnet'
+        preferredModel: 'sonnet',
       },
       health: {
         status: 'healthy',
@@ -130,11 +130,11 @@ const mockRegistry = {
         successRate: 0.94,
         lastUpdate: '2026-01-31T12:00:00.000Z',
         isolatedAt: null,
-        isolationReason: null
+        isolationReason: null,
       },
       metadata: {
-        version: '1.0.0'
-      }
+        version: '1.0.0',
+      },
     },
     'security-architect': {
       id: 'security-architect',
@@ -148,12 +148,12 @@ const mockRegistry = {
           description: 'Security analysis and threat modeling',
           triggerPhrases: ['security', 'threat', 'owasp'],
           requiredTools: ['Read', 'Grep'],
-          skills: ['security-architect']
-        }
+          skills: ['security-architect'],
+        },
       ],
       constraints: {
         maxConcurrentTasks: 3,
-        preferredModel: 'opus'
+        preferredModel: 'opus',
       },
       health: {
         status: 'degraded',
@@ -163,11 +163,11 @@ const mockRegistry = {
         successRate: 0.71,
         lastUpdate: '2026-01-31T12:00:00.000Z',
         isolatedAt: null,
-        isolationReason: null
+        isolationReason: null,
       },
       metadata: {
-        version: '1.0.0'
-      }
+        version: '1.0.0',
+      },
     },
     'frontend-pro': {
       id: 'frontend-pro',
@@ -181,12 +181,12 @@ const mockRegistry = {
           description: 'React/Vue/Angular implementation',
           triggerPhrases: ['react', 'vue', 'frontend'],
           requiredTools: ['Read', 'Write', 'Edit', 'Bash'],
-          skills: ['frontend-pro']
-        }
+          skills: ['frontend-pro'],
+        },
       ],
       constraints: {
         maxConcurrentTasks: 5,
-        preferredModel: 'sonnet'
+        preferredModel: 'sonnet',
       },
       health: {
         status: 'healthy',
@@ -196,11 +196,11 @@ const mockRegistry = {
         successRate: 0.97,
         lastUpdate: '2026-01-31T12:00:00.000Z',
         isolatedAt: null,
-        isolationReason: null
+        isolationReason: null,
       },
       metadata: {
-        version: '1.0.0'
-      }
+        version: '1.0.0',
+      },
     },
     'master-orchestrator': {
       id: 'master-orchestrator',
@@ -214,12 +214,12 @@ const mockRegistry = {
           description: 'Coordinate multi-agent workflows',
           triggerPhrases: ['orchestrate', 'coordinate'],
           requiredTools: ['Read', 'Write', 'Task'],
-          skills: ['swarm-coordination']
-        }
+          skills: ['swarm-coordination'],
+        },
       ],
       constraints: {
         maxConcurrentTasks: 1,
-        preferredModel: 'opus'
+        preferredModel: 'opus',
       },
       health: {
         status: 'healthy',
@@ -229,41 +229,41 @@ const mockRegistry = {
         successRate: 1.0,
         lastUpdate: '2026-01-31T12:00:00.000Z',
         isolatedAt: null,
-        isolationReason: null
+        isolationReason: null,
       },
       metadata: {
-        version: '1.0.0'
-      }
-    }
+        version: '1.0.0',
+      },
+    },
   },
   index: {
     byCapability: {
-      'implementation': ['developer', 'frontend-pro'],
+      implementation: ['developer', 'frontend-pro'],
       'bug-fix': ['developer'],
       'code-review': ['code-reviewer'],
-      'testing': ['qa'],
+      testing: ['qa'],
       'security-review': ['security-architect'],
-      'orchestration': ['master-orchestrator']
+      orchestration: ['master-orchestrator'],
     },
     byDomain: {
-      'code': ['developer', 'code-reviewer'],
-      'testing': ['qa'],
-      'security': ['security-architect'],
-      'frontend': ['frontend-pro'],
-      'orchestration': ['master-orchestrator']
+      code: ['developer', 'code-reviewer'],
+      testing: ['qa'],
+      security: ['security-architect'],
+      frontend: ['frontend-pro'],
+      orchestration: ['master-orchestrator'],
     },
     byCategory: {
-      'core': ['developer', 'qa'],
-      'specialized': ['code-reviewer', 'security-architect'],
-      'domain': ['frontend-pro'],
-      'orchestrator': ['master-orchestrator']
-    }
+      core: ['developer', 'qa'],
+      specialized: ['code-reviewer', 'security-architect'],
+      domain: ['frontend-pro'],
+      orchestrator: ['master-orchestrator'],
+    },
   },
   health: {
     healthy: ['developer', 'code-reviewer', 'qa', 'frontend-pro', 'master-orchestrator'],
     degraded: ['security-architect'],
-    unavailable: []
-  }
+    unavailable: [],
+  },
 };
 
 // Test fixture path
@@ -312,7 +312,10 @@ describe('AvailableAgents Tool', () => {
       const result = query.query({ capability: 'code-review' });
       assert.strictEqual(result.success, true);
       assert.ok(result.agents.length > 0, 'Should find code-review agents');
-      assert.ok(result.agents.some(a => a.id === 'code-reviewer'), 'Should include code-reviewer');
+      assert.ok(
+        result.agents.some(a => a.id === 'code-reviewer'),
+        'Should include code-reviewer'
+      );
     });
 
     it('filters by domain', () => {
@@ -335,7 +338,10 @@ describe('AvailableAgents Tool', () => {
     it('returns agents by domain when no capability match', () => {
       const result = query.query({ domain: 'testing' });
       assert.strictEqual(result.success, true);
-      assert.ok(result.agents.some(a => a.id === 'qa'), 'Should include qa agent for testing domain');
+      assert.ok(
+        result.agents.some(a => a.id === 'qa'),
+        'Should include qa agent for testing domain'
+      );
     });
   });
 
@@ -364,8 +370,8 @@ describe('AvailableAgents Tool', () => {
           failureCount: 3,
           successRate: 0.0,
           isolatedAt: '2026-01-31T12:00:00.000Z',
-          isolationReason: '3 consecutive failures'
-        }
+          isolationReason: '3 consecutive failures',
+        },
       };
       registryWithUnavailable.health.unavailable = ['broken-agent'];
 
@@ -376,7 +382,10 @@ describe('AvailableAgents Tool', () => {
       const result = q.query({ excludeFailed: false, minSuccessRate: 0 });
 
       assert.strictEqual(result.success, true);
-      assert.ok(result.agents.some(a => a.id === 'broken-agent'), 'Should include broken agent when excludeFailed is false and minSuccessRate is 0');
+      assert.ok(
+        result.agents.some(a => a.id === 'broken-agent'),
+        'Should include broken agent when excludeFailed is false and minSuccessRate is 0'
+      );
 
       fs.unlinkSync(tempPath);
     });
@@ -385,8 +394,10 @@ describe('AvailableAgents Tool', () => {
       const result = query.query({ minSuccessRate: 0.95 });
       assert.strictEqual(result.success, true);
       result.agents.forEach(agent => {
-        assert.ok(agent.health.successRate >= 0.95,
-          `Agent ${agent.id} should have success rate >= 0.95, got ${agent.health.successRate}`);
+        assert.ok(
+          agent.health.successRate >= 0.95,
+          `Agent ${agent.id} should have success rate >= 0.95, got ${agent.health.successRate}`
+        );
       });
     });
 
@@ -395,7 +406,11 @@ describe('AvailableAgents Tool', () => {
       assert.strictEqual(result.success, true);
       // security-architect has 0.71 success rate, should be excluded
       const hasSecurityArchitect = result.agents.some(a => a.id === 'security-architect');
-      assert.strictEqual(hasSecurityArchitect, false, 'Should exclude security-architect with 0.71 success rate');
+      assert.strictEqual(
+        hasSecurityArchitect,
+        false,
+        'Should exclude security-architect with 0.71 success rate'
+      );
     });
   });
 
@@ -406,7 +421,10 @@ describe('AvailableAgents Tool', () => {
       for (let i = 0; i < result.agents.length - 1; i++) {
         const current = result.agents[i].health.successRate;
         const next = result.agents[i + 1].health.successRate;
-        assert.ok(current >= next, `Agents should be sorted by success rate DESC: ${current} >= ${next}`);
+        assert.ok(
+          current >= next,
+          `Agents should be sorted by success rate DESC: ${current} >= ${next}`
+        );
       }
     });
 
@@ -469,7 +487,11 @@ describe('AvailableAgents Tool', () => {
     it('different queries have different cache entries', () => {
       const result1 = query.query({ capability: 'code-review' });
       const result2 = query.query({ domain: 'testing' });
-      assert.notDeepStrictEqual(result1.agents, result2.agents, 'Different queries should return different results');
+      assert.notDeepStrictEqual(
+        result1.agents,
+        result2.agents,
+        'Different queries should return different results'
+      );
     });
   });
 
@@ -555,7 +577,11 @@ describe('AvailableAgents Tool', () => {
       assert.strictEqual(hasCapability, true, 'Developer should have implementation capability');
 
       const noCapability = query.isAvailable('developer', 'security-review');
-      assert.strictEqual(noCapability, false, 'Developer should not have security-review capability');
+      assert.strictEqual(
+        noCapability,
+        false,
+        'Developer should not have security-review capability'
+      );
     });
 
     it('getAvailableFilters returns metadata', () => {
@@ -570,7 +596,7 @@ describe('AvailableAgents Tool', () => {
   describe('No Match Handling', () => {
     it('returns suggestions when no agents match capability', () => {
       const result = query.query({ capability: 'nonexistent-capability' });
-      assert.strictEqual(result.success, true);  // Still success, just empty
+      assert.strictEqual(result.success, true); // Still success, just empty
       assert.strictEqual(result.count, 0);
     });
 
@@ -586,7 +612,10 @@ describe('AvailableAgents Tool', () => {
       // This test uses the global AvailableAgents with its default path
       // Since we can't override the singleton's path easily, we just verify it works
       const instance = getInstance();
-      assert.ok(instance instanceof AvailableAgentsQuery, 'getInstance should return AvailableAgentsQuery instance');
+      assert.ok(
+        instance instanceof AvailableAgentsQuery,
+        'getInstance should return AvailableAgentsQuery instance'
+      );
     });
   });
 
@@ -624,7 +653,7 @@ describe('AvailableAgents Tool', () => {
         filePath: '.claude/agents/core/empty.md',
         capabilities: [],
         constraints: {},
-        health: { status: 'healthy', successRate: 1.0, consecutiveFailures: 0 }
+        health: { status: 'healthy', successRate: 1.0, consecutiveFailures: 0 },
       };
 
       const tempPath = path.join(FIXTURE_DIR, 'test-registry-empty-agent.json');
@@ -644,7 +673,7 @@ describe('AvailableAgents Tool', () => {
         domain: 'code',
         minSuccessRate: 0.95,
         excludeFailed: true,
-        limit: 5
+        limit: 5,
       });
       assert.strictEqual(result.success, true);
       result.agents.forEach(agent => {
@@ -660,7 +689,7 @@ describe('AvailableAgents Tool', () => {
         metadata: { totalAgents: 0 },
         agents: {},
         index: { byCapability: {}, byDomain: {}, byCategory: {} },
-        health: { healthy: [], degraded: [], unavailable: [] }
+        health: { healthy: [], degraded: [], unavailable: [] },
       };
 
       const tempPath = path.join(FIXTURE_DIR, 'test-empty-registry.json');
@@ -695,7 +724,7 @@ describe('AvailableAgents Tool', () => {
         displayName: 'Unavailable Agent',
         category: 'core',
         capabilities: [{ name: 'test', domain: 'code' }],
-        health: { status: 'unavailable', successRate: 0 }
+        health: { status: 'unavailable', successRate: 0 },
       };
 
       const tempPath = path.join(FIXTURE_DIR, 'test-unavailable-agent.json');
@@ -717,7 +746,10 @@ describe('AvailableAgents Tool', () => {
     it('getBestAgent returns best agent for capability', () => {
       const best = query.getBestAgent('implementation');
       assert.ok(best, 'Should find best agent for implementation');
-      assert.ok(['developer', 'frontend-pro'].includes(best.id), 'Best agent should be developer or frontend-pro');
+      assert.ok(
+        ['developer', 'frontend-pro'].includes(best.id),
+        'Best agent should be developer or frontend-pro'
+      );
     });
 
     it('getBestAgent returns null when no agents match', () => {
@@ -752,13 +784,20 @@ describe('AvailableAgents Tool', () => {
       assert.strictEqual(result.success, true);
       result.agents.forEach(agent => {
         assert.ok(typeof agent.id === 'string', `${agent.id}: id should be string`);
-        assert.ok(typeof agent.displayName === 'string', `${agent.id}: displayName should be string`);
-        assert.ok(['core', 'specialized', 'domain', 'orchestrator'].includes(agent.category),
-          `${agent.id}: category should be valid`);
+        assert.ok(
+          typeof agent.displayName === 'string',
+          `${agent.id}: displayName should be string`
+        );
+        assert.ok(
+          ['core', 'specialized', 'domain', 'orchestrator'].includes(agent.category),
+          `${agent.id}: category should be valid`
+        );
         assert.ok(Array.isArray(agent.capabilities), `${agent.id}: capabilities should be array`);
         assert.ok(typeof agent.health === 'object', `${agent.id}: health should be object`);
-        assert.ok(['healthy', 'degraded', 'unavailable'].includes(agent.health.status),
-          `${agent.id}: health.status should be valid`);
+        assert.ok(
+          ['healthy', 'degraded', 'unavailable'].includes(agent.health.status),
+          `${agent.id}: health.status should be valid`
+        );
       });
     });
 
@@ -767,7 +806,7 @@ describe('AvailableAgents Tool', () => {
         capability: 'implementation',
         excludeFailed: true,
         minSuccessRate: 0.5,
-        limit: 3
+        limit: 3,
       });
 
       assert.ok('success' in result);
@@ -800,8 +839,10 @@ describe('AvailableAgents Tool', () => {
       assert.strictEqual(result.success, true);
       // security-architect has 0.71, should be excluded
       result.agents.forEach(agent => {
-        assert.ok(agent.health.successRate >= 0.9,
-          `Agent ${agent.id} should have successRate >= 0.9`);
+        assert.ok(
+          agent.health.successRate >= 0.9,
+          `Agent ${agent.id} should have successRate >= 0.9`
+        );
       });
     });
   });

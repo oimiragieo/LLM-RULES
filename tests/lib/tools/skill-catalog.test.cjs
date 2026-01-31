@@ -38,23 +38,31 @@ describe('SkillCatalog Tool', () => {
       const result = SkillCatalog({ domain: 'development' });
       assert.strictEqual(result.success, true);
       assert.ok(result.skills.length > 0, 'Should return skills for development domain');
-      result.skills.forEach((skill) => {
-        assert.strictEqual(skill.domain, 'development', `Skill ${skill.name} should be in development domain`);
+      result.skills.forEach(skill => {
+        assert.strictEqual(
+          skill.domain,
+          'development',
+          `Skill ${skill.name} should be in development domain`
+        );
       });
     });
 
     it('filters by category', () => {
       const result = SkillCatalog({ category: 'Testing' });
       assert.strictEqual(result.success, true);
-      result.skills.forEach((skill) => {
-        assert.strictEqual(skill.category, 'Testing', `Skill ${skill.name} should be in Testing category`);
+      result.skills.forEach(skill => {
+        assert.strictEqual(
+          skill.category,
+          'Testing',
+          `Skill ${skill.name} should be in Testing category`
+        );
       });
     });
 
     it('filters by tags (AND logic)', () => {
       const result = SkillCatalog({ tags: ['development', 'testing'] });
       assert.strictEqual(result.success, true);
-      result.skills.forEach((skill) => {
+      result.skills.forEach(skill => {
         assert.ok(
           skill.tags.includes('development') && skill.tags.includes('testing'),
           `Skill ${skill.name} should have both tags`
@@ -87,7 +95,7 @@ describe('SkillCatalog Tool', () => {
         limit: 10,
       });
       assert.strictEqual(result.success, true);
-      result.skills.forEach((skill) => {
+      result.skills.forEach(skill => {
         assert.strictEqual(skill.domain, 'development');
         assert.ok(skill.tags.includes('testing'));
       });
@@ -99,7 +107,7 @@ describe('SkillCatalog Tool', () => {
         domain: 'development',
       });
       assert.strictEqual(result.success, true);
-      result.skills.forEach((skill) => {
+      result.skills.forEach(skill => {
         assert.strictEqual(skill.domain, 'development');
       });
     });
@@ -110,7 +118,7 @@ describe('SkillCatalog Tool', () => {
         category: 'Testing',
       });
       assert.strictEqual(result.success, true);
-      result.skills.forEach((skill) => {
+      result.skills.forEach(skill => {
         assert.strictEqual(skill.domain, 'development');
         assert.strictEqual(skill.category, 'Testing');
       });
@@ -235,7 +243,10 @@ describe('SkillCatalog Tool', () => {
 
     it('recommended flag set correctly for agentType query', () => {
       const result = SkillCatalog({ agentType: 'developer' });
-      assert.ok(result.skills.some((s) => s.recommended === true), 'Some skills should be recommended');
+      assert.ok(
+        result.skills.some(s => s.recommended === true),
+        'Some skills should be recommended'
+      );
     });
 
     it('query is echoed in response', () => {
@@ -346,7 +357,7 @@ describe('SkillCatalog Tool', () => {
     it('filters by multiple tags correctly', () => {
       const result = SkillCatalog({ tags: ['development'] });
       assert.strictEqual(result.success, true);
-      result.skills.forEach((skill) => {
+      result.skills.forEach(skill => {
         assert.ok(skill.tags.includes('development'));
       });
     });
@@ -357,7 +368,7 @@ describe('SkillCatalog Tool', () => {
 
       // Find first non-recommended skill
       let foundNonRecommended = false;
-      result.skills.forEach((skill) => {
+      result.skills.forEach(skill => {
         if (foundNonRecommended && skill.recommended) {
           assert.fail('Recommended skill found after non-recommended');
         }
@@ -371,7 +382,7 @@ describe('SkillCatalog Tool', () => {
       const result = SkillCatalog({ domain: 'development', limit: 3 });
       assert.strictEqual(result.success, true);
 
-      result.skills.forEach((skill) => {
+      result.skills.forEach(skill => {
         assert.ok(typeof skill.name === 'string', 'name should be string');
         assert.ok(typeof skill.domain === 'string', 'domain should be string');
         assert.ok(typeof skill.category === 'string', 'category should be string');
@@ -405,13 +416,19 @@ describe('SkillCatalog Tool', () => {
     it('error message for invalid limit includes context', () => {
       const result = SkillCatalog({ limit: 999 });
       assert.strictEqual(result.success, false);
-      assert.ok(result.error.includes('1') || result.error.includes('50'), 'Error should mention valid range');
+      assert.ok(
+        result.error.includes('1') || result.error.includes('50'),
+        'Error should mention valid range'
+      );
     });
 
     it('suggestions message describes the failed query', () => {
       const result = SkillCatalog({ domain: 'nonexistent', category: 'also-nonexistent' });
       assert.strictEqual(result.success, false);
-      assert.ok(result.suggestions.message.includes('nonexistent'), 'Message should include failed filter');
+      assert.ok(
+        result.suggestions.message.includes('nonexistent'),
+        'Message should include failed filter'
+      );
     });
   });
 
@@ -419,7 +436,10 @@ describe('SkillCatalog Tool', () => {
     it('can find tdd skill', () => {
       const result = SkillCatalog({ tags: ['tdd'] });
       assert.strictEqual(result.success, true);
-      assert.ok(result.skills.some((s) => s.name === 'tdd'), 'Should find tdd skill');
+      assert.ok(
+        result.skills.some(s => s.name === 'tdd'),
+        'Should find tdd skill'
+      );
     });
 
     it('can find security domain skills', () => {
@@ -431,7 +451,7 @@ describe('SkillCatalog Tool', () => {
     it('developer recommended skills include tdd', () => {
       const result = SkillCatalog({ agentType: 'developer', limit: 20 });
       assert.strictEqual(result.success, true);
-      const tddSkill = result.skills.find((s) => s.name === 'tdd');
+      const tddSkill = result.skills.find(s => s.name === 'tdd');
       assert.ok(tddSkill, 'Should include tdd skill');
       assert.strictEqual(tddSkill.recommended, true, 'tdd should be recommended for developer');
     });

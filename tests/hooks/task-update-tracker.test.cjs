@@ -1,0 +1,139 @@
+#!/usr/bin/env node
+/**
+ * Tests for task-update-tracker.cjs
+ *
+ * Run with: node .claude/hooks/routing/task-update-tracker.test.cjs
+ */
+
+'use strict';
+
+const _assert = require('assert');
+const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+
+// Test utilities
+let testsPassed = 0;
+let testsFailed = 0;
+
+function test(name, fn) {
+  try {
+    // Reset state before each test
+    routerState.resetToRouterMode();
+    routerState.resetTaskUpdateTracking();
+
+    fn();
+    console.log(`  PASS: ${name}`);
+    testsPassed++;
+  } catch (err) {
+    console.log(`  FAIL: ${name}`);
+    console.log(`        ${err.message}`);
+    testsFailed++;
+  }
+}
+
+function assertEqual(actual, expected, message = '') {
+  if (actual !== expected) {
+    throw new Error(
+      `${message} Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`
+    );
+  }
+}
+
+function assertTrue(value, message = '') {
+  if (!value) {
+    throw new Error(`${message} Expected truthy value, got ${JSON.stringify(value)}`);
+  }
+}
+
+function _assertFalse(value, message = '') {
+  if (value) {
+    throw new Error(`${message} Expected falsy value, got ${JSON.stringify(value)}`);
+  }
+}
+
+// ===========================================
+// Module Import Tests
+// ===========================================
+
+console.log('\n=== Module Import Tests ===\n');
+
+test('can require task-update-tracker module', () => {
+  const tracker = require('../../.claude/hooks/routing/task-update-tracker.cjs');
+  assertTrue(tracker, 'Module should export something');
+  assertTrue(typeof tracker.main === 'function', 'Module should export main function');
+  // parseHookInput is now imported from shared utilities (hook-input.cjs)
+  // No longer exported directly from this hook
+});
+
+// ===========================================
+// recordTaskUpdate Integration Tests
+// ===========================================
+
+console.log('\n=== recordTaskUpdate Integration Tests ===\n');
+
+test('recordTaskUpdate stores taskId and status', () => {
+  const result = routerState.recordTaskUpdate('5', 'in_progress');
+  assertEqual(result.lastTaskUpdateTaskId, '5', 'Should store taskId');
+  assertEqual(result.lastTaskUpdateStatus, 'in_progress', 'Should store status');
+});
+
+test('recordTaskUpdate increments session counter', () => {
+  routerState.recordTaskUpdate('1', 'in_progress');
+  routerState.recordTaskUpdate('1', 'completed');
+  const info = routerState.getLastTaskUpdate();
+  assertEqual(info.count, 2, 'Should increment counter');
+});
+
+test('wasTaskUpdateCalledRecently returns true after recordTaskUpdate', () => {
+  routerState.recordTaskUpdate('3', 'completed');
+  assertTrue(
+    routerState.wasTaskUpdateCalledRecently(),
+    'Should return true immediately after call'
+  );
+});
+
+test('getLastTaskUpdate returns correct info', () => {
+  routerState.recordTaskUpdate('7', 'blocked');
+  const info = routerState.getLastTaskUpdate();
+  assertEqual(info.taskId, '7', 'Should return correct taskId');
+  assertEqual(info.status, 'blocked', 'Should return correct status');
+  assertTrue(info.timestamp > 0, 'Should have timestamp');
+});
+
+test('resetTaskUpdateTracking clears all tracking fields', () => {
+  routerState.recordTaskUpdate('9', 'in_progress');
+  routerState.resetTaskUpdateTracking();
+  const info = routerState.getLastTaskUpdate();
+  assertEqual(info.taskId, null, 'TaskId should be null after reset');
+  assertEqual(info.status, null, 'Status should be null after reset');
+  assertEqual(info.count, 0, 'Count should be 0 after reset');
+});
+
+// ===========================================
+// Hook Behavior Tests
+// ===========================================
+
+console.log('\n=== Hook Behavior Tests ===\n');
+
+test('hook always exits 0 (non-blocking)', () => {
+  // The tracker is a PostToolUse hook that only tracks, never blocks
+  // This is tested via the module structure - main() should always exit 0
+  const tracker = require('../../.claude/hooks/routing/task-update-tracker.cjs');
+  assertTrue(typeof tracker.main === 'function', 'Should have main function for execution');
+});
+
+// ===========================================
+// Summary
+// ===========================================
+
+console.log('\n===========================================');
+console.log(`Tests completed: ${testsPassed + testsFailed}`);
+console.log(`  Passed: ${testsPassed}`);
+console.log(`  Failed: ${testsFailed}`);
+console.log('===========================================\n');
+
+// Clean up state
+routerState.resetToRouterMode();
+routerState.resetTaskUpdateTracking();
+
+// Exit with appropriate code
+process.exit(testsFailed > 0 ? 1 : 0);

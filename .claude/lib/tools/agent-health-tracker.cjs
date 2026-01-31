@@ -278,12 +278,12 @@ class AgentHealthTracker {
         lastCheck: new Date().toISOString(),
       },
       healthy: registry.health.healthy,
-      degraded: registry.health.degraded.map((id) => ({
+      degraded: registry.health.degraded.map(id => ({
         id,
         successRate: registry.agents[id]?.health.successRate,
         consecutiveFailures: registry.agents[id]?.health.consecutiveFailures,
       })),
-      unavailable: registry.health.unavailable.map((id) => ({
+      unavailable: registry.health.unavailable.map(id => ({
         id,
         isolatedAt: registry.agents[id]?.health.isolatedAt,
         reason: registry.agents[id]?.health.isolationReason,

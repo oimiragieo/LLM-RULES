@@ -121,10 +121,19 @@ function isSecuritySpawn(toolInput) {
 function runAgentContextTracker(toolInput) {
   const description = extractTaskDescription(toolInput);
 
-  // ROUTING-002 FIX: Exit agent mode after task completes
-  // This allows Router-First Protocol enforcement to re-engage
-  // while preserving plannerSpawned/securitySpawned tracking
-  const _state = routerState.exitAgentMode();
+  // FIX-ROUTER-MONITORING-001 (2026-01-31):
+  // DO NOT exit agent mode here. Task() spawns subagent asynchronously.
+  // Router must remain in agent mode until:
+  //   1. Subagent completes work
+  //   2. SessionEnd hook fires to clean up agent mode
+  //
+  // Previous code caused immediate exit, losing monitoring of spawned agents.
+  // Subagents were running invisible to router, causing:
+  //   - Tasks stuck in in_progress forever
+  //   - Duplicate agent spawning
+  //   - Projects appearing abandoned mid-stream
+  //
+  // const _state = routerState.exitAgentMode(); // ❌ REMOVED - was breaking monitoring
 
   // Detect and mark special agent spawns
   if (isPlannerSpawn(toolInput)) {
@@ -142,8 +151,10 @@ function runAgentContextTracker(toolInput) {
   }
 
   if (process.env.ROUTER_DEBUG === 'true') {
-    console.error('[post-task-unified] Exited agent mode (back to router)');
-    console.error(`[post-task-unified] Task description was: ${description}`);
+    console.error(
+      '[post-task-unified] Agent mode KEPT ACTIVE (router waiting for subagent completion)'
+    );
+    console.error(`[post-task-unified] Task description: ${description}`);
   }
 }
 

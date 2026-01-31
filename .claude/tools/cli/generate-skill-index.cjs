@@ -34,10 +34,10 @@ const SKILLS_DIR = path.join(PROJECT_ROOT, '.claude', 'skills');
 // Domain mappings
 const DOMAIN_MAP = {
   // Core Development
-  'tdd': 'development',
-  'debugging': 'development',
+  tdd: 'development',
+  debugging: 'development',
   'code-quality-expert': 'development',
-  'ripgrep': 'development',
+  ripgrep: 'development',
   'code-analyzer': 'development',
   'code-style-validator': 'development',
   'async-operations': 'development',
@@ -58,7 +58,7 @@ const DOMAIN_MAP = {
   // Planning
   'plan-generator': 'planning',
   'task-breakdown': 'planning',
-  'brainstorming': 'planning',
+  brainstorming: 'planning',
   'complexity-assessment': 'planning',
   'strategic-planning-with-pseudocode': 'planning',
 
@@ -74,7 +74,7 @@ const DOMAIN_MAP = {
   'context-compressor': 'memory',
   'session-handoff': 'memory',
   'operational-modes': 'memory',
-  'recovery': 'memory',
+  recovery: 'memory',
   'project-onboarding': 'memory',
   'project-analyzer': 'memory',
   'context-driven-development': 'memory',
@@ -94,7 +94,7 @@ const DOMAIN_MAP = {
 
   // Git
   'git-expert': 'git',
-  'gitflow': 'git',
+  gitflow: 'git',
   'commit-validator': 'git',
   'smart-revert': 'git',
   'commit-message-guidelines': 'git',
@@ -144,7 +144,7 @@ const DOMAIN_MAP = {
   'php-expert': 'languages',
   'nodejs-expert': 'languages',
   'elixir-expert': 'languages',
-  'cpp': 'languages',
+  cpp: 'languages',
   'prioritize-python-3-10-features': 'languages',
   'comprehensive-type-annotations': 'languages',
   'type-hinting-rule': 'languages',
@@ -180,7 +180,7 @@ const DOMAIN_MAP = {
   'android-expert': 'mobile',
   'expo-mobile-app-rule': 'mobile',
   'expo-framework-rule': 'mobile',
-  'nativescript': 'mobile',
+  nativescript: 'mobile',
   'mobile-first-design-rules': 'mobile',
   'mobile-ui-development-rule': 'mobile',
 
@@ -203,7 +203,7 @@ const DOMAIN_MAP = {
   // Documentation
   'doc-generator': 'documentation',
   'writing-skills': 'documentation',
-  'readme': 'documentation',
+  readme: 'documentation',
   'detailed-docstrings': 'documentation',
   'technical-accuracy-and-usability-rules': 'documentation',
   'metadata-and-seo-rules': 'documentation',
@@ -252,7 +252,7 @@ const DOMAIN_MAP = {
   'skill-discovery': 'specialized',
   'tool-search': 'specialized',
   'dependency-analyzer': 'specialized',
-  'filesystem': 'specialized',
+  filesystem: 'specialized',
 
   // Styling
   'web-design-guidelines-vercel': 'styling',
@@ -267,7 +267,7 @@ const DOMAIN_MAP = {
   'visual-and-observational-rules': 'styling',
   'pyqt6-ui-development-rules': 'styling',
   'alpine-js-usage-rules': 'styling',
-  'accessibility': 'styling',
+  accessibility: 'styling',
   'mobile-ux-reviewer': 'styling',
   'aceternity-ui-configuration': 'styling',
 
@@ -275,13 +275,13 @@ const DOMAIN_MAP = {
   'scientific-skills': 'scientific',
 
   // Other
-  'gamedev-expert': 'other'
+  'gamedev-expert': 'other',
 };
 
 // Category mappings
 const CATEGORY_MAP = {
-  'tdd': 'Testing',
-  'debugging': 'Troubleshooting',
+  tdd: 'Testing',
+  debugging: 'Troubleshooting',
   'code-quality-expert': 'Code Quality',
   'security-architect': 'Security',
   'auth-security-expert': 'Security',
@@ -297,7 +297,7 @@ const CATEGORY_MAP = {
   'verification-before-completion': 'Quality',
   'checklist-generator': 'Quality',
   'git-expert': 'Version Control',
-  'gitflow': 'Version Control',
+  gitflow: 'Version Control',
   'github-mcp': 'Integration',
   'chrome-browser': 'Integration',
   'aws-cloud-ops': 'DevOps',
@@ -328,36 +328,82 @@ const CATEGORY_MAP = {
   'consensus-voting': 'Orchestration',
   'web-design-guidelines-vercel': 'Styling',
   'styling-expert': 'Styling',
-  'scientific-skills': 'Scientific'
+  'scientific-skills': 'Scientific',
 };
 
 // Agent assignments
 const AGENT_SKILLS = {
-  'developer': ['tdd', 'debugging', 'code-quality-expert', 'git-expert', 'ripgrep', 'verification-before-completion'],
-  'qa': ['tdd', 'qa-workflow', 'verification-before-completion', 'checklist-generator'],
-  'planner': ['plan-generator', 'task-breakdown', 'brainstorming', 'complexity-assessment', 'thinking-tools', 'progressive-disclosure'],
-  'architect': ['architecture-review', 'diagram-generator', 'security-architect', 'database-architect'],
+  developer: [
+    'tdd',
+    'debugging',
+    'code-quality-expert',
+    'git-expert',
+    'ripgrep',
+    'verification-before-completion',
+  ],
+  qa: ['tdd', 'qa-workflow', 'verification-before-completion', 'checklist-generator'],
+  planner: [
+    'plan-generator',
+    'task-breakdown',
+    'brainstorming',
+    'complexity-assessment',
+    'thinking-tools',
+    'progressive-disclosure',
+  ],
+  architect: [
+    'architecture-review',
+    'diagram-generator',
+    'security-architect',
+    'database-architect',
+  ],
   'security-architect': ['security-architect', 'auth-security-expert', 'memory-forensics'],
   'technical-writer': ['doc-generator', 'writing-skills', 'readme'],
-  'devops': ['aws-cloud-ops', 'docker-compose', 'kubernetes-flux', 'terraform-infra', 'container-expert'],
-  'researcher': ['research-synthesis', 'arxiv-mcp'],
+  devops: [
+    'aws-cloud-ops',
+    'docker-compose',
+    'kubernetes-flux',
+    'terraform-infra',
+    'container-expert',
+  ],
+  researcher: ['research-synthesis', 'arxiv-mcp'],
   'code-reviewer': ['code-quality-expert', 'code-analyzer', 'code-style-validator'],
-  'frontend-pro': ['react-expert', 'react-best-practices-vercel', 'composition-patterns-vercel', 'web-design-guidelines-vercel', 'nextjs-expert'],
+  'frontend-pro': [
+    'react-expert',
+    'react-best-practices-vercel',
+    'composition-patterns-vercel',
+    'web-design-guidelines-vercel',
+    'nextjs-expert',
+  ],
   'master-orchestrator': ['swarm-coordination', 'consensus-voting'],
-  'evolution-orchestrator': ['agent-creator', 'skill-creator', 'hook-creator', 'workflow-creator', 'research-synthesis'],
+  'evolution-orchestrator': [
+    'agent-creator',
+    'skill-creator',
+    'hook-creator',
+    'workflow-creator',
+    'research-synthesis',
+  ],
   'data-engineer': ['database-architect', 'ai-ml-expert', 'scientific-skills'],
-  'ai-ml-specialist': ['ai-ml-expert', 'scientific-skills']
+  'ai-ml-specialist': ['ai-ml-expert', 'scientific-skills'],
 };
 
 // Tool requirements for key skills
 const SKILL_TOOLS = {
-  'tdd': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  'debugging': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
+  tdd: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
+  debugging: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
   'code-quality-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
   'security-architect': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
   'auth-security-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
   'plan-generator': ['Read', 'Write'],
-  'task-breakdown': ['Read', 'Write', 'Skill', 'TaskCreate', 'TaskUpdate', 'TaskList', 'Grep', 'Glob'],
+  'task-breakdown': [
+    'Read',
+    'Write',
+    'Skill',
+    'TaskCreate',
+    'TaskUpdate',
+    'TaskList',
+    'Grep',
+    'Glob',
+  ],
   'architecture-review': ['Read', 'Write', 'Edit', 'Glob', 'Grep'],
   'diagram-generator': ['Read', 'Write', 'Edit', 'Bash'],
   'research-synthesis': ['WebSearch', 'WebFetch', 'Read', 'Write', 'Glob', 'Grep'],
@@ -367,7 +413,7 @@ const SKILL_TOOLS = {
   'verification-before-completion': ['Read', 'Bash'],
   'checklist-generator': ['Read', 'Write', 'Edit', 'Glob', 'Grep'],
   'git-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'gitflow': ['Read', 'Write', 'Edit'],
+  gitflow: ['Read', 'Write', 'Edit'],
   'github-mcp': ['Read', 'Bash'],
   'chrome-browser': ['Read', 'Write', 'WebFetch'],
   'arxiv-mcp': ['WebSearch', 'WebFetch', 'Read'],
@@ -384,7 +430,17 @@ const SKILL_TOOLS = {
   'composition-patterns-vercel': ['Read', 'Write', 'Edit'],
   'web-design-guidelines-vercel': ['Read', 'WebFetch'],
   'nextjs-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'agent-creator': ['Read', 'Write', 'Edit', 'Glob', 'Grep', 'WebSearch', 'WebFetch', 'Bash', 'Task'],
+  'agent-creator': [
+    'Read',
+    'Write',
+    'Edit',
+    'Glob',
+    'Grep',
+    'WebSearch',
+    'WebFetch',
+    'Bash',
+    'Task',
+  ],
   'skill-creator': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'WebSearch', 'WebFetch'],
   'hook-creator': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
   'workflow-creator': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
@@ -392,17 +448,25 @@ const SKILL_TOOLS = {
   'writing-skills': ['Read', 'Write', 'Edit', 'Bash', 'Task'],
   'thinking-tools': ['Read', 'Glob', 'Grep'],
   'sequential-thinking': ['Read', 'Write', 'Bash'],
-  'progressive-disclosure': ['Read', 'Write', 'AskUserQuestion', 'TaskUpdate', 'TaskList', 'Grep', 'Glob'],
+  'progressive-disclosure': [
+    'Read',
+    'Write',
+    'AskUserQuestion',
+    'TaskUpdate',
+    'TaskList',
+    'Grep',
+    'Glob',
+  ],
   'database-architect': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
   'ai-ml-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob', 'WebSearch'],
   'scientific-skills': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob', 'WebSearch', 'WebFetch'],
   'swarm-coordination': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
   'consensus-voting': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  'ripgrep': ['Bash'],
+  ripgrep: ['Bash'],
   'code-analyzer': ['Bash', 'Read', 'Glob', 'Grep'],
   'code-style-validator': ['Read', 'Grep', 'Bash', 'Glob'],
   'commit-validator': ['Read', 'Grep', 'Bash'],
-  'smart-revert': ['Read', 'Bash', 'Glob', 'Grep', 'Write', 'Edit']
+  'smart-revert': ['Read', 'Bash', 'Glob', 'Grep', 'Write', 'Edit'],
 };
 
 /**
@@ -459,7 +523,7 @@ function scanSkillFiles() {
           skills[entry.name] = {
             name: entry.name,
             hasSkillFile: true,
-            hasFrontmatter: !!frontmatterMatch
+            hasFrontmatter: !!frontmatterMatch,
           };
         }
       }
@@ -488,7 +552,11 @@ function generateIndex(options = {}) {
 
   // Build skills object
   const skills = {};
-  const allSkillNames = new Set([...catalogSkills, ...Object.keys(scannedSkills), ...Object.keys(DOMAIN_MAP)]);
+  const allSkillNames = new Set([
+    ...catalogSkills,
+    ...Object.keys(scannedSkills),
+    ...Object.keys(DOMAIN_MAP),
+  ]);
 
   for (const name of allSkillNames) {
     const domain = DOMAIN_MAP[name] || 'other';
@@ -511,7 +579,10 @@ function generateIndex(options = {}) {
 
     skills[name] = {
       name,
-      displayName: name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+      displayName: name
+        .split('-')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' '),
       category,
       domain,
       description: `${category} - ${name}`,
@@ -519,7 +590,7 @@ function generateIndex(options = {}) {
       agentPrimary: agentPrimary.length > 0 ? agentPrimary : ['developer'],
       agentSupporting,
       tags: [domain, category.toLowerCase().replace(/\s+/g, '-'), name],
-      priority: agentPrimary.length > 0 ? 1 : 3
+      priority: agentPrimary.length > 0 ? 1 : 3,
     };
   }
 
@@ -564,20 +635,20 @@ function generateIndex(options = {}) {
       totalDomains: Object.keys(byDomain).length,
       totalCategories: Object.keys(byCategory).length,
       lastValidated: new Date().toISOString(),
-      source: '.claude/context/artifacts/skill-catalog.md'
+      source: '.claude/context/artifacts/skill-catalog.md',
     },
     skills,
     index: {
       byDomain,
       byCategory,
       byTool,
-      byAgent
+      byAgent,
     },
     discovery: {
       maxSkillsPerDomain: 50,
       maxSkillsInPrompt: 20,
-      recommendedForAgent: AGENT_SKILLS
-    }
+      recommendedForAgent: AGENT_SKILLS,
+    },
   };
 
   if (verbose) {

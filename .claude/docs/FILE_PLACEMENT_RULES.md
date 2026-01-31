@@ -1,10 +1,42 @@
 # File Placement Rules
 
-**Version**: 1.0.0
-**Last Updated**: 2026-01-25
+**Version**: 2.0.0
+**Last Updated**: 2026-01-31
 **Enforced By**: `file-placement-guard.cjs`
+**Architecture**: `.claude/context/artifacts/architecture/FILE-PLACEMENT-ARCHITECTURE.md`
+**ADR**: ADR-076 (File Placement Architecture Redesign)
 
 This document defines the MANDATORY rules for where agents must place files they create. These rules ensure consistent organization, predictable artifact locations, and maintainable codebase structure.
+
+> **CRITICAL CHANGE (v2.0)**: ALL test files (`*.test.cjs`, `*.test.mjs`) MUST go in the root `tests/` directory, NOT in `.claude/`. This is a breaking change from v1.0 which allowed co-located tests.
+
+---
+
+## QUICK REFERENCE (Agent Checklist)
+
+**Before writing ANY file, check this table:**
+
+| What You're Creating | Where It Goes                                 |
+| -------------------- | --------------------------------------------- |
+| Hook code            | `.claude/hooks/{category}/`                   |
+| Hook test            | `tests/hooks/`                                |
+| Utility code         | `.claude/lib/{category}/`                     |
+| Utility test         | `tests/unit/{category}/`                      |
+| CLI tool code        | `.claude/tools/cli/`                          |
+| CLI tool test        | `tests/cli/`                                  |
+| Integration test     | `tests/integration/`                          |
+| E2E test             | `tests/e2e/`                                  |
+| Agent definition     | `.claude/agents/{category}/`                  |
+| Skill definition     | `.claude/skills/{name}/SKILL.md`              |
+| Workflow definition  | `.claude/workflows/{category}/`               |
+| Plan                 | `.claude/context/artifacts/plans/`            |
+| Report               | `.claude/context/artifacts/reports/`          |
+| Research report      | `.claude/context/artifacts/research-reports/` |
+| Architecture doc     | `.claude/context/artifacts/architecture/`     |
+| Schema               | `.claude/schemas/`                            |
+| Framework doc        | `.claude/docs/`                               |
+
+**TEST FILES RULE**: If the file ends with `.test.cjs`, `.test.mjs`, `.spec.cjs`, or `.spec.mjs`, it MUST go in `tests/` - NEVER in `.claude/`.
 
 ---
 
@@ -83,13 +115,14 @@ This document defines the MANDATORY rules for where agents must place files they
 
 ### .claude/hooks/
 
-**Purpose**: Pre/post tool execution hooks
+**Purpose**: Pre/post tool execution hooks (CODE ONLY - NO TESTS)
 
-| Attribute     | Value                                                                                                     |
-| ------------- | --------------------------------------------------------------------------------------------------------- |
-| Allowed files | `*.cjs`, `*.test.cjs`                                                                                     |
-| Structure     | `routing/`, `safety/`, `memory/`, `evolution/`, `session/`, `validation/`, `reflection/`, `self-healing/` |
-| Naming        | `{hook-name}.cjs` (kebab-case)                                                                            |
+| Attribute     | Value                                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Allowed files | `*.cjs` (hook code ONLY)                                                                                            |
+| NOT allowed   | `*.test.cjs`, `*.test.mjs` (tests go in `tests/hooks/`)                                                             |
+| Structure     | `routing/`, `safety/`, `memory/`, `evolution/`, `session/`, `validation/`, `reflection/`, `self-healing/`, `audit/` |
+| Naming        | `{hook-name}.cjs` (kebab-case)                                                                                      |
 
 **Subdirectory Categories**:
 
@@ -101,13 +134,16 @@ This document defines the MANDATORY rules for where agents must place files they
 - `validation/` - Input/output validation
 - `reflection/` - Self-reflection triggers
 - `self-healing/` - Anomaly detection, recovery
+- `audit/` - Audit trail management
 
 **Example**:
 
 ```
-.claude/hooks/safety/my-guard.cjs
-.claude/hooks/safety/my-guard.test.cjs  # Co-located test
+.claude/hooks/safety/my-guard.cjs       # Hook code
+tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 ```
+
+> **IMPORTANT**: Tests for hooks MUST be placed in `tests/hooks/`, NOT in `.claude/hooks/`. This ensures consistent CI/CD test discovery.
 
 ---
 
@@ -220,13 +256,21 @@ This document defines the MANDATORY rules for where agents must place files they
 
 ### .claude/lib/
 
-**Purpose**: Shared library code (INTERNAL framework only)
+**Purpose**: Shared library code (INTERNAL framework only - CODE ONLY, NO TESTS)
 
-| Attribute     | Value                                                   |
-| ------------- | ------------------------------------------------------- |
-| Allowed files | `*.cjs`, `*.mjs`, `*.test.cjs`                          |
-| Structure     | `workflow/`, `memory/`, `integration/`, `self-healing/` |
-| Access        | Framework internals ONLY - agents should NOT write here |
+| Attribute     | Value                                                             |
+| ------------- | ----------------------------------------------------------------- |
+| Allowed files | `*.cjs`, `*.mjs` (code ONLY)                                      |
+| NOT allowed   | `*.test.cjs`, `*.test.mjs` (tests go in `tests/unit/{category}/`) |
+| Structure     | `workflow/`, `memory/`, `integration/`, `self-healing/`, `utils/` |
+| Access        | Framework internals ONLY - agents should NOT write here           |
+
+**Example**:
+
+```
+.claude/lib/utils/hook-input.cjs          # Library code
+tests/unit/utils/hook-input.test.cjs      # Library test (in tests/ directory!)
+```
 
 **Note**: This directory is for framework internals. Agent outputs should go to `context/artifacts/` instead.
 
@@ -234,32 +278,91 @@ This document defines the MANDATORY rules for where agents must place files they
 
 ### .claude/tools/
 
-**Purpose**: CLI utilities and integrations
+**Purpose**: CLI utilities and integrations (CODE ONLY, NO TESTS)
 
-| Attribute | Value                                                                                                                |
-| --------- | -------------------------------------------------------------------------------------------------------------------- |
-| Structure | `cli/`, `integrations/`, `analysis/`, `visualization/`, `optimization/`, `runtime/`, `utils/`, `mcp/`, `validation/` |
-| Note      | For standalone utilities, not agent outputs                                                                          |
+| Attribute     | Value                                                                                                                |
+| ------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Allowed files | `*.cjs`, `*.mjs`, `*.js` (code ONLY)                                                                                 |
+| NOT allowed   | `*.test.cjs`, `*.test.mjs` (tests go in `tests/cli/`)                                                                |
+| Structure     | `cli/`, `integrations/`, `analysis/`, `visualization/`, `optimization/`, `runtime/`, `utils/`, `mcp/`, `validation/` |
+| Note          | For standalone utilities, not agent outputs                                                                          |
+
+**Example**:
+
+```
+.claude/tools/cli/doctor.js               # CLI tool code
+tests/cli/doctor.test.cjs                 # CLI tool test (in tests/ directory!)
+```
+
+---
+
+### tests/ (ROOT DIRECTORY)
+
+**Purpose**: ALL tests go here - SINGLE SOURCE OF TRUTH for tests
+
+| Attribute     | Value                                                      |
+| ------------- | ---------------------------------------------------------- |
+| Allowed files | `*.test.cjs`, `*.test.mjs`, `*.spec.cjs`, `*.spec.mjs`     |
+| Structure     | `unit/`, `integration/`, `e2e/`, `hooks/`, `cli/`, etc.    |
+| Naming        | `{component-name}.test.cjs` or `{component-name}.test.mjs` |
+
+**Subdirectory Categories**:
+
+- `unit/` - Unit tests for isolated components
+  - `unit/memory/` - Memory system unit tests
+  - `unit/events/` - Event bus unit tests
+  - `unit/hooks/` - Hook unit tests
+  - `unit/utils/` - Utility unit tests
+- `integration/` - Integration tests across components
+  - `integration/hooks/` - Hook integration tests
+  - `integration/memory/` - Memory integration tests
+  - `integration/events/` - Event integration tests
+- `e2e/` - End-to-end workflow tests
+- `hooks/` - Hook-specific tests (shorthand for `unit/hooks/`)
+- `cli/` - CLI tool tests
+- `workflows/` - Workflow tests
+- `code-indexing/` - Code indexing system tests
+- `performance/` - Performance benchmarks
+- `fixtures/` - Test data and fixtures
+
+**Examples**:
+
+```
+tests/hooks/routing-guard.test.cjs        # Test for .claude/hooks/routing/routing-guard.cjs
+tests/unit/utils/hook-input.test.cjs      # Test for .claude/lib/utils/hook-input.cjs
+tests/cli/doctor.test.cjs                 # Test for .claude/tools/cli/doctor.js
+tests/integration/memory/sync.test.mjs    # Memory sync integration test
+tests/e2e/full-workflow.test.mjs          # End-to-end test
+tests/fixtures/sample-agent.md            # Test fixture data
+```
+
+> **CRITICAL**: Tests MUST NOT be placed in `.claude/` directory. All tests go in the root `tests/` directory.
 
 ---
 
 ## File Type Rules
 
-| File Type                    | Allowed Locations                     | Naming Convention                           |
-| ---------------------------- | ------------------------------------- | ------------------------------------------- |
-| Agent definitions (`*.md`)   | `agents/{category}/`                  | `{agent-name}.md`                           |
-| Skill definitions            | `skills/{name}/`                      | `SKILL.md`                                  |
-| Hooks (`*.cjs`)              | `hooks/{category}/`                   | `{hook-name}.cjs`                           |
-| Hook tests                   | `hooks/{category}/`                   | `{hook-name}.test.cjs`                      |
-| Workflows (`*.md`, `*.yaml`) | `workflows/{category}/`               | `{workflow-name}.md`                        |
-| Plans                        | `context/plans/`                      | `{feature}-plan.md`                         |
-| Reports                      | `context/artifacts/reports/`          | `{task}-report.md`                          |
-| Research                     | `context/artifacts/research-reports/` | `{topic}-research.md`                       |
-| Memory                       | `context/memory/`                     | `learnings.md`, `decisions.md`, `issues.md` |
-| Config                       | `context/config/`                     | `{config-name}.json`                        |
-| Schemas                      | `schemas/`                            | `{entity}.schema.json`                      |
-| Documentation                | `docs/`                               | `{TOPIC}.md`                                |
-| Templates                    | `templates/{category}/`               | `{name}-template.md`                        |
+| File Type                    | Allowed Locations                             | Naming Convention                           |
+| ---------------------------- | --------------------------------------------- | ------------------------------------------- |
+| Agent definitions (`*.md`)   | `.claude/agents/{category}/`                  | `{agent-name}.md`                           |
+| Skill definitions            | `.claude/skills/{name}/`                      | `SKILL.md`                                  |
+| Hooks (`*.cjs`)              | `.claude/hooks/{category}/`                   | `{hook-name}.cjs`                           |
+| Hook tests                   | `tests/hooks/`                                | `{hook-name}.test.cjs`                      |
+| Utility tests                | `tests/unit/{category}/`                      | `{util-name}.test.cjs`                      |
+| CLI tool tests               | `tests/cli/`                                  | `{tool-name}.test.cjs`                      |
+| Integration tests            | `tests/integration/{category}/`               | `{feature}.test.mjs`                        |
+| E2E tests                    | `tests/e2e/`                                  | `{workflow}.test.mjs`                       |
+| Test fixtures                | `tests/fixtures/`                             | Any                                         |
+| Workflows (`*.md`, `*.yaml`) | `.claude/workflows/{category}/`               | `{workflow-name}.md`                        |
+| Plans                        | `.claude/context/artifacts/plans/`            | `{feature}-plan.md`                         |
+| Reports                      | `.claude/context/artifacts/reports/`          | `{task}-report.md`                          |
+| Research                     | `.claude/context/artifacts/research-reports/` | `{topic}-research.md`                       |
+| Architecture docs            | `.claude/context/artifacts/architecture/`     | `{topic}-ARCHITECTURE.md`                   |
+| Memory                       | `.claude/context/memory/`                     | `learnings.md`, `decisions.md`, `issues.md` |
+| Config                       | `.claude/context/config/`                     | `{config-name}.json`                        |
+| Schemas                      | `.claude/schemas/`                            | `{entity}.schema.json`                      |
+| Documentation                | `.claude/docs/`                               | `{TOPIC}.md`                                |
+| Templates                    | `.claude/templates/{category}/`               | `{name}-template.md`                        |
 
 ---
 
@@ -267,13 +370,24 @@ This document defines the MANDATORY rules for where agents must place files they
 
 Agents must **NEVER** create files in:
 
-| Location                     | Reason                                    |
-| ---------------------------- | ----------------------------------------- |
-| Root of `.claude/`           | Only CLAUDE.md and settings files allowed |
-| `.claude/lib/`               | Framework internal code only              |
-| Outside `.claude/` directory | Project isolation                         |
-| Directly in `context/`       | Must use subdirectories                   |
-| Directly in `artifacts/`     | Must use category subdirectories          |
+| Location                     | Reason                                       | Where to Put Instead                 |
+| ---------------------------- | -------------------------------------------- | ------------------------------------ |
+| Root of `.claude/`           | Only CLAUDE.md and settings files allowed    | Use appropriate subdirectory         |
+| `.claude/lib/` (for tests)   | Tests not allowed in framework internal code | `tests/unit/{category}/`             |
+| `.claude/hooks/` (for tests) | Tests not allowed in hooks directory         | `tests/hooks/`                       |
+| `.claude/tools/` (for tests) | Tests not allowed in tools directory         | `tests/cli/`                         |
+| Outside `.claude/` directory | Project isolation (except tests/)            | `.claude/` or `tests/`               |
+| Directly in `context/`       | Must use subdirectories                      | `context/artifacts/` or subdir       |
+| Directly in `artifacts/`     | Must use category subdirectories             | `artifacts/plans/`, `reports/`, etc. |
+
+### Test Files - Explicitly Forbidden in .claude/
+
+| Forbidden Location      | Correct Location                |
+| ----------------------- | ------------------------------- |
+| `.claude/**/*.test.cjs` | `tests/hooks/` or `tests/unit/` |
+| `.claude/**/*.test.mjs` | `tests/hooks/` or `tests/unit/` |
+| `.claude/**/*.spec.cjs` | `tests/hooks/` or `tests/unit/` |
+| `.claude/**/*.spec.mjs` | `tests/hooks/` or `tests/unit/` |
 
 ---
 
@@ -333,8 +447,29 @@ Incorrect: .claude/context/research/oauth-research.md (wrong path)
 
 ```
 Correct:   .claude/hooks/safety/my-hook.cjs
-Correct:   .claude/hooks/safety/my-hook.test.cjs (co-located test)
+Incorrect: .claude/hooks/safety/my-hook.test.cjs (tests go in tests/hooks/)
 Incorrect: .claude/hooks/my-hook.cjs (missing category)
+```
+
+### Creating a Hook Test
+
+```
+Correct:   tests/hooks/my-hook.test.cjs
+Incorrect: .claude/hooks/safety/my-hook.test.cjs (DO NOT co-locate tests!)
+```
+
+### Creating a Utility Test
+
+```
+Correct:   tests/unit/utils/my-util.test.cjs
+Incorrect: .claude/lib/utils/my-util.test.cjs (tests not allowed in .claude/lib/)
+```
+
+### Creating a CLI Tool Test
+
+```
+Correct:   tests/cli/doctor.test.cjs
+Incorrect: .claude/tools/cli/doctor.test.cjs (tests not allowed in .claude/tools/)
 ```
 
 ### Creating a Skill

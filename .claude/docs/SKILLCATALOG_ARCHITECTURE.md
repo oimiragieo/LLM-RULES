@@ -50,13 +50,13 @@ SkillCatalog provides:
 
 ### 1.4 Design Principles
 
-| Principle | Implementation |
-|-----------|----------------|
-| **Single Source of Truth** | Uses skill-index.json from Phase 1A |
-| **Fail-Safe** | Returns empty results with suggestions, never throws |
-| **Performance-First** | In-memory cache with <100ms target |
-| **Type-Safe** | JSON Schema validation for queries and responses |
-| **Agent-Friendly** | Clear error messages with actionable suggestions |
+| Principle                  | Implementation                                       |
+| -------------------------- | ---------------------------------------------------- |
+| **Single Source of Truth** | Uses skill-index.json from Phase 1A                  |
+| **Fail-Safe**              | Returns empty results with suggestions, never throws |
+| **Performance-First**      | In-memory cache with <100ms target                   |
+| **Type-Safe**              | JSON Schema validation for queries and responses     |
+| **Agent-Friendly**         | Clear error messages with actionable suggestions     |
 
 ---
 
@@ -124,8 +124,7 @@ tests/lib/tools/
  */
 class SkillCatalogQuery {
   constructor(options = {}) {
-    this.skillIndexPath = options.skillIndexPath ||
-      '.claude/context/artifacts/skill-index.json';
+    this.skillIndexPath = options.skillIndexPath || '.claude/context/artifacts/skill-index.json';
     this.skillIndex = null;
     this.queryCache = new Map();
     this.cacheMaxSize = options.cacheMaxSize || 100;
@@ -385,7 +384,7 @@ const VALID_AGENT_TYPES = [
   'backend-pro',
   'python-pro',
   'typescript-pro',
-  'nodejs-pro'
+  'nodejs-pro',
 ];
 
 /**
@@ -393,7 +392,7 @@ const VALID_AGENT_TYPES = [
  */
 const DEFAULT_OPTIONS = {
   limit: 10,
-  includeRecommended: true
+  includeRecommended: true,
 };
 
 /**
@@ -401,7 +400,7 @@ const DEFAULT_OPTIONS = {
  */
 const QUERY_LIMITS = {
   MIN_LIMIT: 1,
-  MAX_LIMIT: 50
+  MAX_LIMIT: 50,
 };
 ```
 
@@ -414,46 +413,47 @@ const QUERY_LIMITS = {
 ```typescript
 // Query interface
 interface SkillCatalogQuery {
-  domain?: string;        // Filter by domain
-  category?: string;      // Filter by category
-  agentType?: string;     // Filter by agent type
-  tags?: string[];        // Filter by tags (AND logic)
-  limit?: number;         // Max results (1-50, default: 10)
+  domain?: string; // Filter by domain
+  category?: string; // Filter by category
+  agentType?: string; // Filter by agent type
+  tags?: string[]; // Filter by tags (AND logic)
+  limit?: number; // Max results (1-50, default: 10)
 }
 
 // Skill result interface
 interface SkillCatalogResult {
-  name: string;           // Skill name (e.g., 'tdd')
-  domain: string;         // Skill domain (e.g., 'testing')
-  category: string;       // Skill category (e.g., 'core-development')
-  description: string;    // Brief description
+  name: string; // Skill name (e.g., 'tdd')
+  domain: string; // Skill domain (e.g., 'testing')
+  category: string; // Skill category (e.g., 'core-development')
+  description: string; // Brief description
   requiredTools: string[]; // Tools this skill needs
-  tags: string[];         // Categorization tags
-  recommended: boolean;   // Recommended for requesting agent?
-  references: string[];   // Related skill references
+  tags: string[]; // Categorization tags
+  recommended: boolean; // Recommended for requesting agent?
+  references: string[]; // Related skill references
 }
 
 // Response interface
 interface SkillCatalogResponse {
-  success: boolean;       // Query succeeded (even if 0 results)
+  success: boolean; // Query succeeded (even if 0 results)
   skills: SkillCatalogResult[];
-  count: number;          // Number of results
+  count: number; // Number of results
   query: SkillCatalogQuery; // Echo of original query
-  suggestions?: {         // Only if count === 0
+  suggestions?: {
+    // Only if count === 0
     message: string;
     alternatives: SkillCatalogQuery[];
   };
   metadata?: {
-    fromCache: boolean;   // Was result from cache?
-    queryTimeMs: number;  // Query execution time
+    fromCache: boolean; // Was result from cache?
+    queryTimeMs: number; // Query execution time
   };
 }
 
 // Error response interface
 interface SkillCatalogError {
   success: false;
-  error: string;          // Error message
-  code: string;           // Error code (INVALID_DOMAIN, INVALID_LIMIT, etc.)
+  error: string; // Error message
+  code: string; // Error code (INVALID_DOMAIN, INVALID_LIMIT, etc.)
   suggestions?: {
     message: string;
     alternatives: SkillCatalogQuery[];
@@ -513,10 +513,20 @@ if (response.success) {
     "agentType": {
       "type": "string",
       "enum": [
-        "developer", "qa", "architect", "planner", "researcher",
-        "technical-writer", "code-reviewer", "security-architect",
-        "devops", "frontend-pro", "backend-pro", "python-pro",
-        "typescript-pro", "nodejs-pro"
+        "developer",
+        "qa",
+        "architect",
+        "planner",
+        "researcher",
+        "technical-writer",
+        "code-reviewer",
+        "security-architect",
+        "devops",
+        "frontend-pro",
+        "backend-pro",
+        "python-pro",
+        "typescript-pro",
+        "nodejs-pro"
       ],
       "description": "Filter by recommended agent type"
     },
@@ -761,14 +771,14 @@ Return suggestions object
 
 ### 6.1 Error Types
 
-| Error Code | Scenario | Response |
-|------------|----------|----------|
-| `INVALID_DOMAIN` | Domain not in skill-index | Error + similar domains |
-| `INVALID_CATEGORY` | Category not in skill-index | Error + valid categories |
-| `INVALID_LIMIT` | Limit < 1 or > 50 | Error + valid range |
-| `INVALID_AGENT_TYPE` | AgentType not in VALID_AGENT_TYPES | Error + valid types |
-| `INVALID_TAGS` | Tags not an array | Error + expected format |
-| `SKILL_INDEX_ERROR` | Failed to load skill-index.json | Error + recovery steps |
+| Error Code           | Scenario                           | Response                 |
+| -------------------- | ---------------------------------- | ------------------------ |
+| `INVALID_DOMAIN`     | Domain not in skill-index          | Error + similar domains  |
+| `INVALID_CATEGORY`   | Category not in skill-index        | Error + valid categories |
+| `INVALID_LIMIT`      | Limit < 1 or > 50                  | Error + valid range      |
+| `INVALID_AGENT_TYPE` | AgentType not in VALID_AGENT_TYPES | Error + valid types      |
+| `INVALID_TAGS`       | Tags not an array                  | Error + expected format  |
+| `SKILL_INDEX_ERROR`  | Failed to load skill-index.json    | Error + recovery steps   |
 
 ### 6.2 Error Response Examples
 
@@ -853,14 +863,14 @@ Skill({ skill: skill.name });
 
 ### 7.1 Target Metrics
 
-| Operation | Target | Method |
-|-----------|--------|--------|
-| First query | <500ms | Load skill-index.json once |
-| Subsequent queries | <50ms | In-memory cache |
-| Cache lookup | <1ms | Map.get() |
-| Max query time | <100ms | Timeout/abort if exceeded |
-| Cache size | <10MB | JSON in memory (100 entries) |
-| Cache TTL | 5 minutes | Stale data acceptable |
+| Operation          | Target    | Method                       |
+| ------------------ | --------- | ---------------------------- |
+| First query        | <500ms    | Load skill-index.json once   |
+| Subsequent queries | <50ms     | In-memory cache              |
+| Cache lookup       | <1ms      | Map.get()                    |
+| Max query time     | <100ms    | Timeout/abort if exceeded    |
+| Cache size         | <10MB     | JSON in memory (100 entries) |
+| Cache TTL          | 5 minutes | Stale data acceptable        |
 
 ### 7.2 Optimization Strategies
 
@@ -1044,88 +1054,88 @@ Agent spawns
 
 **Filter Tests (20 tests)**
 
-| Test | Description |
-|------|-------------|
-| Filter by single domain | Returns only skills in domain |
-| Filter by multiple domains | Returns union of domains |
-| Filter by invalid domain | Returns error with suggestions |
-| Filter by empty domain | Ignores filter, returns all |
-| Filter by single category | Returns only skills in category |
-| Filter by invalid category | Returns error with suggestions |
-| Filter by single tag | Returns skills with tag |
-| Filter by multiple tags (AND) | Returns skills with ALL tags |
-| Filter by invalid tag | Returns empty with suggestions |
-| Filter by agentType | Returns recommended skills |
-| Filter by invalid agentType | Returns error |
-| Combine domain + category | Returns intersection |
-| Combine domain + tags | Returns intersection |
-| Combine all filters | Returns intersection of all |
-| Filter returns empty | Success=true, count=0, suggestions |
-| Filter with includeRecommended=false | No sorting |
-| Filter respects limit | Returns max N results |
-| Limit = 1 | Returns exactly 1 |
-| Limit = 50 | Returns up to 50 |
-| Limit > 50 | Returns error |
+| Test                                 | Description                        |
+| ------------------------------------ | ---------------------------------- |
+| Filter by single domain              | Returns only skills in domain      |
+| Filter by multiple domains           | Returns union of domains           |
+| Filter by invalid domain             | Returns error with suggestions     |
+| Filter by empty domain               | Ignores filter, returns all        |
+| Filter by single category            | Returns only skills in category    |
+| Filter by invalid category           | Returns error with suggestions     |
+| Filter by single tag                 | Returns skills with tag            |
+| Filter by multiple tags (AND)        | Returns skills with ALL tags       |
+| Filter by invalid tag                | Returns empty with suggestions     |
+| Filter by agentType                  | Returns recommended skills         |
+| Filter by invalid agentType          | Returns error                      |
+| Combine domain + category            | Returns intersection               |
+| Combine domain + tags                | Returns intersection               |
+| Combine all filters                  | Returns intersection of all        |
+| Filter returns empty                 | Success=true, count=0, suggestions |
+| Filter with includeRecommended=false | No sorting                         |
+| Filter respects limit                | Returns max N results              |
+| Limit = 1                            | Returns exactly 1                  |
+| Limit = 50                           | Returns up to 50                   |
+| Limit > 50                           | Returns error                      |
 
 **Cache Tests (8 tests)**
 
-| Test | Description |
-|------|-------------|
-| First query loads index | skillIndex not null after query |
-| Same query hits cache | Second call returns fromCache=true |
-| Different query misses cache | New query executes fully |
-| Cache expires after TTL | Old entries return fromCache=false |
-| Cache eviction at max size | Oldest entry removed |
-| Cache key is deterministic | Same options = same key |
-| clearCache() works | All cache cleared |
-| Cache survives invalid queries | Errors don't corrupt cache |
+| Test                           | Description                        |
+| ------------------------------ | ---------------------------------- |
+| First query loads index        | skillIndex not null after query    |
+| Same query hits cache          | Second call returns fromCache=true |
+| Different query misses cache   | New query executes fully           |
+| Cache expires after TTL        | Old entries return fromCache=false |
+| Cache eviction at max size     | Oldest entry removed               |
+| Cache key is deterministic     | Same options = same key            |
+| clearCache() works             | All cache cleared                  |
+| Cache survives invalid queries | Errors don't corrupt cache         |
 
 **Suggestions Tests (8 tests)**
 
-| Test | Description |
-|------|-------------|
-| Suggests similar domains | Typo 'tesing' -> 'testing' |
-| Suggests similar categories | Typo detection |
-| Suggests broader filters | domain+category -> domain only |
-| Returns max 3 alternatives | No more than 3 |
-| Alternatives are valid queries | Can be passed back to query() |
-| Message explains failure | Human-readable error |
-| No suggestions for valid empty | Valid query, just no matches |
-| Suggestions for unknown agentType | Lists valid types |
+| Test                              | Description                    |
+| --------------------------------- | ------------------------------ |
+| Suggests similar domains          | Typo 'tesing' -> 'testing'     |
+| Suggests similar categories       | Typo detection                 |
+| Suggests broader filters          | domain+category -> domain only |
+| Returns max 3 alternatives        | No more than 3                 |
+| Alternatives are valid queries    | Can be passed back to query()  |
+| Message explains failure          | Human-readable error           |
+| No suggestions for valid empty    | Valid query, just no matches   |
+| Suggestions for unknown agentType | Lists valid types              |
 
 **Validation Tests (4 tests)**
 
-| Test | Description |
-|------|-------------|
-| Validates limit bounds | Rejects <1 and >50 |
+| Test                     | Description           |
+| ------------------------ | --------------------- |
+| Validates limit bounds   | Rejects <1 and >50    |
 | Validates agentType enum | Rejects invalid types |
-| Validates tags array | Rejects non-array |
-| Validates options type | Rejects non-object |
+| Validates tags array     | Rejects non-array     |
+| Validates options type   | Rejects non-object    |
 
 ### 9.2 Integration Tests (10+ required)
 
-| Test | Description |
-|------|-------------|
-| Load real skill-index.json | Works with actual data |
-| Query returns real skills | Results match skill-catalog.md |
-| Agent workflow simulation | spawn -> query -> invoke |
-| Skill index regeneration | Cache cleared after regen |
-| Performance < 100ms | Measured query time |
-| Performance with cache < 10ms | Cached query time |
-| Large result set (limit=50) | Handles max results |
-| Concurrent queries | Thread safety |
-| Missing skill-index.json | Graceful error |
-| Corrupt skill-index.json | Graceful error |
+| Test                          | Description                    |
+| ----------------------------- | ------------------------------ |
+| Load real skill-index.json    | Works with actual data         |
+| Query returns real skills     | Results match skill-catalog.md |
+| Agent workflow simulation     | spawn -> query -> invoke       |
+| Skill index regeneration      | Cache cleared after regen      |
+| Performance < 100ms           | Measured query time            |
+| Performance with cache < 10ms | Cached query time              |
+| Large result set (limit=50)   | Handles max results            |
+| Concurrent queries            | Thread safety                  |
+| Missing skill-index.json      | Graceful error                 |
+| Corrupt skill-index.json      | Graceful error                 |
 
 ### 9.3 Schema Validation Tests (5+ required)
 
-| Test | Description |
-|------|-------------|
-| Query schema validates | Valid queries pass |
-| Query schema rejects invalid | Invalid queries fail |
-| Response schema validates | Valid responses pass |
-| Response schema rejects invalid | Invalid responses fail |
-| Suggestions schema validates | Suggestion format correct |
+| Test                            | Description               |
+| ------------------------------- | ------------------------- |
+| Query schema validates          | Valid queries pass        |
+| Query schema rejects invalid    | Invalid queries fail      |
+| Response schema validates       | Valid responses pass      |
+| Response schema rejects invalid | Invalid responses fail    |
+| Suggestions schema validates    | Suggestion format correct |
 
 ### 9.4 Test File Structure
 
@@ -1141,7 +1151,7 @@ describe('SkillCatalogQuery', () => {
 
   beforeEach(() => {
     catalog = new SkillCatalogQuery({
-      skillIndexPath: './fixtures/skill-index.json'
+      skillIndexPath: './fixtures/skill-index.json',
     });
   });
 
@@ -1189,7 +1199,7 @@ describe('SkillCatalogQuery', () => {
 
 **Structure:**
 
-```markdown
+````markdown
 # SkillCatalog Usage Guide
 
 ## When to Use SkillCatalog
@@ -1208,28 +1218,33 @@ describe('SkillCatalogQuery', () => {
 ## Query Examples
 
 ### Example 1: Find testing skills
+
 ```javascript
 const result = SkillCatalog({ domain: 'testing' });
 ```
+````
 
 ### Example 2: Find skills for security review
+
 ```javascript
 const result = SkillCatalog({
   domain: 'security',
-  agentType: 'security-architect'
+  agentType: 'security-architect',
 });
 ```
 
 ### Example 3: Find async-related skills
+
 ```javascript
 const result = SkillCatalog({ tags: ['async', 'performance'] });
 ```
 
 ### Example 4: Get architecture skills (limited)
+
 ```javascript
 const result = SkillCatalog({
   category: 'planning-architecture',
-  limit: 3
+  limit: 3,
 });
 ```
 
@@ -1243,6 +1258,7 @@ const result = SkillCatalog({
 ## Common Patterns
 
 ### Pattern: Fallback Discovery
+
 ```javascript
 // Try specific first, then broaden
 let result = SkillCatalog({ domain: 'testing', tags: ['async'] });
@@ -1252,11 +1268,13 @@ if (result.count === 0) {
 ```
 
 ### Pattern: Agent-Type Filtering
+
 ```javascript
 // Get skills recommended for my type
 const result = SkillCatalog({ agentType: 'developer' });
 ```
-```
+
+````
 
 ### 10.2 Developer Documentation (in skill-catalog.cjs)
 
@@ -1282,7 +1300,7 @@ const result = SkillCatalog({ agentType: 'developer' });
  * @see {@link file://.claude/docs/SKILLCATALOG_ARCHITECTURE.md} Architecture
  * @see {@link file://.claude/context/artifacts/skill-index.json} Data source
  */
-```
+````
 
 ### 10.3 Maintainer Documentation
 
@@ -1321,45 +1339,45 @@ const result = SkillCatalog({ agentType: 'developer' });
 
 ### 11.1 Implementation Checklist
 
-| Criterion | Description | Verified |
-|-----------|-------------|----------|
-| SkillCatalogQuery class | ~400 lines implementation | [ ] |
-| query() method | All filters working | [ ] |
-| getSuggestions() method | Returns actionable alternatives | [ ] |
-| validateOptions() method | Rejects invalid inputs | [ ] |
-| getAvailableFilters() method | Returns valid filter values | [ ] |
-| In-memory cache | <50ms repeated queries | [ ] |
-| Cache eviction | LRU at 100 entries | [ ] |
-| Cache TTL | 5 minute expiration | [ ] |
+| Criterion                    | Description                     | Verified |
+| ---------------------------- | ------------------------------- | -------- |
+| SkillCatalogQuery class      | ~400 lines implementation       | [ ]      |
+| query() method               | All filters working             | [ ]      |
+| getSuggestions() method      | Returns actionable alternatives | [ ]      |
+| validateOptions() method     | Rejects invalid inputs          | [ ]      |
+| getAvailableFilters() method | Returns valid filter values     | [ ]      |
+| In-memory cache              | <50ms repeated queries          | [ ]      |
+| Cache eviction               | LRU at 100 entries              | [ ]      |
+| Cache TTL                    | 5 minute expiration             | [ ]      |
 
 ### 11.2 Test Coverage
 
-| Criterion | Target | Verified |
-|-----------|--------|----------|
-| Unit tests | 40+ passing | [ ] |
-| Integration tests | 10+ passing | [ ] |
-| Schema validation tests | 5+ passing | [ ] |
-| Test coverage | >80% lines | [ ] |
-| Performance tests | <100ms average | [ ] |
+| Criterion               | Target         | Verified |
+| ----------------------- | -------------- | -------- |
+| Unit tests              | 40+ passing    | [ ]      |
+| Integration tests       | 10+ passing    | [ ]      |
+| Schema validation tests | 5+ passing     | [ ]      |
+| Test coverage           | >80% lines     | [ ]      |
+| Performance tests       | <100ms average | [ ]      |
 
 ### 11.3 Documentation
 
-| Criterion | Description | Verified |
-|-----------|-------------|----------|
-| Agent usage guide | SKILLCATALOG_USAGE.md complete | [ ] |
-| API reference | JSDoc comments complete | [ ] |
-| Architecture doc | This document reviewed | [ ] |
-| Query schema | skillcatalog-query.schema.json valid | [ ] |
-| Response schema | skillcatalog-response.schema.json valid | [ ] |
+| Criterion         | Description                             | Verified |
+| ----------------- | --------------------------------------- | -------- |
+| Agent usage guide | SKILLCATALOG_USAGE.md complete          | [ ]      |
+| API reference     | JSDoc comments complete                 | [ ]      |
+| Architecture doc  | This document reviewed                  | [ ]      |
+| Query schema      | skillcatalog-query.schema.json valid    | [ ]      |
+| Response schema   | skillcatalog-response.schema.json valid | [ ]      |
 
 ### 11.4 Integration
 
-| Criterion | Description | Verified |
-|-----------|-------------|----------|
-| CLAUDE.md updated | Tool added to Section 1.4 | [ ] |
-| skill-catalog.md updated | SkillCatalog referenced | [ ] |
-| Works with skill-index.json | Real data tested | [ ] |
-| Cache invalidation hook | Connected to skill regen | [ ] |
+| Criterion                   | Description               | Verified |
+| --------------------------- | ------------------------- | -------- |
+| CLAUDE.md updated           | Tool added to Section 1.4 | [ ]      |
+| skill-catalog.md updated    | SkillCatalog referenced   | [ ]      |
+| Works with skill-index.json | Real data tested          | [ ]      |
+| Cache invalidation hook     | Connected to skill regen  | [ ]      |
 
 ---
 

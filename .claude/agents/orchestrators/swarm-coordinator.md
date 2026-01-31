@@ -28,7 +28,7 @@ skills:
 ## Responsibilities
 
 1.  **Topology**: Define the swarm structure (Hierarchical, Mesh, Ring).
-2.  **Dispatch**: Spawn worker agents in parallel or sequence.
+2.  **Dispatch**: Spawn worker agents in parallel or sequence with config-resolved models (ADR-075).
 3.  **Consensus**: Aggregate results and resolve conflicts (Byzantine Fault Tolerance).
 4.  **Memory**: Manage shared swarm memory in `.claude/context/sessions/`.
 
@@ -41,8 +41,35 @@ skills:
 ## Execution Rules
 
 - **Parallelism**: Use multiple `Task` calls to run workers concurrently (where platform allows).
+- **Model Resolution**: Always resolve worker models from config.yaml before spawning (ADR-075).
 - **Monitoring**: Check worker outputs for failure/drift.
 - **Synthesis**: Combine worker outputs into a single coherent result.
+
+## Model Selection Protocol (ADR-075)
+
+When spawning worker agents in a swarm, resolve each worker's model from configuration:
+
+```javascript
+const { resolveAgentModel } = require('./.claude/lib/utils/agent-config-reader.cjs');
+
+// For each worker in swarm:
+for (const worker of swarmWorkers) {
+  const modelResult = resolveAgentModel(worker.type, PROJECT_ROOT);
+
+  Task({
+    subagent_type: worker.type,
+    model: modelResult.model, // Config-resolved model (ADR-075)
+    description: worker.task,
+    prompt: assembleWorkerPrompt(worker),
+  });
+}
+```
+
+This ensures:
+
+- Swarm respects config.yaml model settings
+- Cost control via centralized configuration
+- Audit trail of model sources (config, frontmatter, complexity default)
 
 ## Skill Invocation Protocol (MANDATORY)
 

@@ -10,7 +10,11 @@ const fs = require('fs');
 const os = require('os');
 
 // Import detector
-const { preToolUse, detectDuplicates, scanSkillsDirectory } = require('../../.claude/hooks/skills/duplicate-detector.cjs');
+const {
+  preToolUse,
+  detectDuplicates,
+  scanSkillsDirectory,
+} = require('../../.claude/hooks/skills/duplicate-detector.cjs');
 
 test('scanSkillsDirectory - scans skill rules', () => {
   // Create temporary skill structure
@@ -21,19 +25,25 @@ test('scanSkillsDirectory - scans skill rules', () => {
   fs.mkdirSync(skill1Dir, { recursive: true });
   fs.mkdirSync(skill2Dir, { recursive: true });
 
-  fs.writeFileSync(path.join(skill1Dir, 'rule1.md'), `---
+  fs.writeFileSync(
+    path.join(skill1Dir, 'rule1.md'),
+    `---
 title: Rule 1
 impact: HIGH
 ---
 
-## Rule 1`);
+## Rule 1`
+  );
 
-  fs.writeFileSync(path.join(skill2Dir, 'rule2.md'), `---
+  fs.writeFileSync(
+    path.join(skill2Dir, 'rule2.md'),
+    `---
 title: Rule 2
 impact: MEDIUM
 ---
 
-## Rule 2`);
+## Rule 2`
+  );
 
   const index = scanSkillsDirectory(tempDir);
 
@@ -52,19 +62,25 @@ test('detectDuplicates - detects duplicate rule titles', () => {
   fs.mkdirSync(skill1Dir, { recursive: true });
   fs.mkdirSync(skill2Dir, { recursive: true });
 
-  fs.writeFileSync(path.join(skill1Dir, 'rule1.md'), `---
+  fs.writeFileSync(
+    path.join(skill1Dir, 'rule1.md'),
+    `---
 title: Duplicate Title
 impact: HIGH
 ---
 
-## Duplicate Title`);
+## Duplicate Title`
+  );
 
-  fs.writeFileSync(path.join(skill2Dir, 'rule2.md'), `---
+  fs.writeFileSync(
+    path.join(skill2Dir, 'rule2.md'),
+    `---
 title: Duplicate Title
 impact: MEDIUM
 ---
 
-## Duplicate Title`);
+## Duplicate Title`
+  );
 
   const result = detectDuplicates(tempDir, 'Duplicate Title', '');
 
@@ -83,19 +99,25 @@ test('detectDuplicates - detects duplicate file names', () => {
   fs.mkdirSync(skill1Dir, { recursive: true });
   fs.mkdirSync(skill2Dir, { recursive: true });
 
-  fs.writeFileSync(path.join(skill1Dir, 'same-file.md'), `---
+  fs.writeFileSync(
+    path.join(skill1Dir, 'same-file.md'),
+    `---
 title: Rule 1
 impact: HIGH
 ---
 
-## Rule 1`);
+## Rule 1`
+  );
 
-  fs.writeFileSync(path.join(skill2Dir, 'same-file.md'), `---
+  fs.writeFileSync(
+    path.join(skill2Dir, 'same-file.md'),
+    `---
 title: Rule 2
 impact: MEDIUM
 ---
 
-## Rule 2`);
+## Rule 2`
+  );
 
   const result = detectDuplicates(tempDir, 'Rule 3', path.join(skill2Dir, 'same-file.md'));
 
@@ -112,12 +134,15 @@ test('detectDuplicates - no conflicts returns valid', () => {
 
   fs.mkdirSync(skillDir, { recursive: true });
 
-  fs.writeFileSync(path.join(skillDir, 'rule1.md'), `---
+  fs.writeFileSync(
+    path.join(skillDir, 'rule1.md'),
+    `---
 title: Unique Rule
 impact: HIGH
 ---
 
-## Unique Rule`);
+## Unique Rule`
+  );
 
   const result = detectDuplicates(tempDir, 'Another Unique Rule', path.join(skillDir, 'rule2.md'));
 
@@ -131,7 +156,7 @@ impact: HIGH
 test('preToolUse - allows non-Write/Edit operations', () => {
   const hookInput = {
     tool: 'Read',
-    params: { file_path: '.claude/skills/test/rules/test-rule.md' }
+    params: { file_path: '.claude/skills/test/rules/test-rule.md' },
   };
 
   const result = preToolUse(hookInput);
@@ -143,8 +168,8 @@ test('preToolUse - allows writes to non-rule files', () => {
     tool: 'Write',
     params: {
       file_path: '.claude/skills/test/README.md',
-      content: '# README'
-    }
+      content: '# README',
+    },
   };
 
   const result = preToolUse(hookInput);
@@ -156,8 +181,8 @@ test('preToolUse - skips _template.md files', () => {
     tool: 'Write',
     params: {
       file_path: '.claude/skills/test/rules/_template.md',
-      content: '# Template'
-    }
+      content: '# Template',
+    },
   };
 
   const result = preToolUse(hookInput);

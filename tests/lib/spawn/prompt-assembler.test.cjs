@@ -32,13 +32,34 @@ const MODULE_PATH = path.join(__dirname, '../../../.claude/lib/spawn/prompt-asse
 
 // Test data
 const VALID_DEVELOPER_TOOLS = [
-  'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-  'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill'
+  'Read',
+  'Write',
+  'Edit',
+  'Bash',
+  'Glob',
+  'Grep',
+  'TaskUpdate',
+  'TaskList',
+  'TaskCreate',
+  'TaskGet',
+  'TaskOutput',
+  'Skill',
 ];
 
 const _VALID_ORCHESTRATOR_TOOLS = [
-  'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task',
-  'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill'
+  'Read',
+  'Write',
+  'Edit',
+  'Bash',
+  'Glob',
+  'Grep',
+  'Task',
+  'TaskUpdate',
+  'TaskList',
+  'TaskCreate',
+  'TaskGet',
+  'TaskOutput',
+  'Skill',
 ];
 
 const SAMPLE_BASE_PROMPT = `You are DEVELOPER.
@@ -117,7 +138,10 @@ describe('prompt-assembler', () => {
       const section = assembler.buildToolsSection(tools);
 
       assert.ok(section.includes('TaskUpdate'), 'Should mention TaskUpdate');
-      assert.ok(section.includes('MANDATORY') || section.includes('CRITICAL'), 'Should emphasize importance');
+      assert.ok(
+        section.includes('MANDATORY') || section.includes('CRITICAL'),
+        'Should emphasize importance'
+      );
     });
   });
 
@@ -133,7 +157,11 @@ describe('prompt-assembler', () => {
 
       const skills = [
         { name: 'tdd', description: 'Test-driven development workflow', category: 'Testing' },
-        { name: 'debugging', description: 'Systematic debugging process', category: 'Troubleshooting' }
+        {
+          name: 'debugging',
+          description: 'Systematic debugging process',
+          category: 'Troubleshooting',
+        },
       ];
       const section = assembler.buildSkillsSection(skills);
 
@@ -147,12 +175,13 @@ describe('prompt-assembler', () => {
         assert.fail('Module not implemented yet');
       }
 
-      const skills = [
-        { name: 'tdd', description: 'TDD workflow', category: 'Testing' }
-      ];
+      const skills = [{ name: 'tdd', description: 'TDD workflow', category: 'Testing' }];
       const section = assembler.buildSkillsSection(skills);
 
-      assert.ok(section.includes("Skill({") || section.includes('skill:'), 'Should include usage example');
+      assert.ok(
+        section.includes('Skill({') || section.includes('skill:'),
+        'Should include usage example'
+      );
     });
   });
 
@@ -179,8 +208,10 @@ describe('prompt-assembler', () => {
 
       const section = assembler.buildDiscoverySection();
 
-      assert.ok(section.includes('skill-catalog') || section.includes('artifacts'),
-        'Should reference catalog location');
+      assert.ok(
+        section.includes('skill-catalog') || section.includes('artifacts'),
+        'Should reference catalog location'
+      );
     });
   });
 
@@ -197,7 +228,7 @@ describe('prompt-assembler', () => {
       const enhanced = assembler.assembleSpawnPrompt({
         agentType: 'developer',
         allowedTools: VALID_DEVELOPER_TOOLS,
-        basePrompt: SAMPLE_BASE_PROMPT
+        basePrompt: SAMPLE_BASE_PROMPT,
       });
 
       assert.ok(enhanced.includes('AVAILABLE_TOOLS'), 'Should inject AVAILABLE_TOOLS section');
@@ -213,7 +244,7 @@ describe('prompt-assembler', () => {
       const enhanced = assembler.assembleSpawnPrompt({
         agentType: 'developer',
         allowedTools: VALID_DEVELOPER_TOOLS,
-        basePrompt: SAMPLE_BASE_PROMPT
+        basePrompt: SAMPLE_BASE_PROMPT,
       });
 
       assert.ok(enhanced.includes('PROJECT CONTEXT'), 'Should preserve PROJECT CONTEXT');
@@ -228,7 +259,7 @@ describe('prompt-assembler', () => {
       const enhanced = assembler.assembleSpawnPrompt({
         agentType: 'developer',
         allowedTools: VALID_DEVELOPER_TOOLS,
-        basePrompt: SAMPLE_BASE_PROMPT
+        basePrompt: SAMPLE_BASE_PROMPT,
       });
 
       // AVAILABLE_TOOLS should appear after warning box, before PROJECT CONTEXT
@@ -252,17 +283,31 @@ describe('prompt-assembler', () => {
       }
 
       const manyTools = [
-        'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-        'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet',
-        'TaskOutput', 'TaskStop', 'Skill', 'WebSearch',
-        'WebFetch', 'NotebookEdit', 'EnterPlanMode', 'ExitPlanMode'
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'Glob',
+        'Grep',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
+        'TaskOutput',
+        'TaskStop',
+        'Skill',
+        'WebSearch',
+        'WebFetch',
+        'NotebookEdit',
+        'EnterPlanMode',
+        'ExitPlanMode',
       ];
 
       const enhanced = assembler.assembleSpawnPrompt({
         agentType: 'developer',
         allowedTools: manyTools,
         basePrompt: SAMPLE_BASE_PROMPT,
-        maxToolsInPrompt: 15
+        maxToolsInPrompt: 15,
       });
 
       // Count tool mentions - should be limited
@@ -279,7 +324,7 @@ describe('prompt-assembler', () => {
         agentType: 'developer',
         allowedTools: VALID_DEVELOPER_TOOLS,
         basePrompt: SAMPLE_BASE_PROMPT,
-        maxSkillsInPrompt: 5
+        maxSkillsInPrompt: 5,
       });
 
       // Should limit skills shown
@@ -295,7 +340,7 @@ describe('prompt-assembler', () => {
         agentType: 'developer',
         allowedTools: VALID_DEVELOPER_TOOLS,
         basePrompt: SAMPLE_BASE_PROMPT,
-        maxToolsInPrompt: 5
+        maxToolsInPrompt: 5,
       });
 
       // Count the tools in the section
@@ -373,7 +418,7 @@ describe('prompt-assembler', () => {
       const enhanced = assembler.assembleSpawnPrompt({
         agentType: 'developer',
         allowedTools: [],
-        basePrompt: SAMPLE_BASE_PROMPT
+        basePrompt: SAMPLE_BASE_PROMPT,
       });
 
       assert.ok(enhanced.includes('You are DEVELOPER'), 'Should preserve base prompt');
@@ -386,7 +431,7 @@ describe('prompt-assembler', () => {
 
       const enhanced = assembler.assembleSpawnPrompt({
         allowedTools: VALID_DEVELOPER_TOOLS,
-        basePrompt: SAMPLE_BASE_PROMPT
+        basePrompt: SAMPLE_BASE_PROMPT,
       });
 
       // Should use generic skills
@@ -405,7 +450,7 @@ Complete the task.`;
       const enhanced = assembler.assembleSpawnPrompt({
         agentType: 'developer',
         allowedTools: VALID_DEVELOPER_TOOLS,
-        basePrompt: simplePrompt
+        basePrompt: simplePrompt,
       });
 
       assert.ok(enhanced.includes('AVAILABLE_TOOLS'), 'Should inject tools section');
@@ -423,13 +468,15 @@ Complete the task.`;
         enhanced = assembler.assembleSpawnPrompt({
           agentType: 'developer',
           allowedTools: VALID_DEVELOPER_TOOLS,
-          basePrompt: null
+          basePrompt: null,
         });
         assert.ok(typeof enhanced === 'string', 'Should return a string');
       } catch (e) {
         // Acceptable to throw for null input
-        assert.ok(e.message.includes('basePrompt') || e.message.includes('prompt'),
-          'Error should mention the issue');
+        assert.ok(
+          e.message.includes('basePrompt') || e.message.includes('prompt'),
+          'Error should mention the issue'
+        );
       }
     });
 
@@ -445,8 +492,10 @@ Complete the task.`;
       // MCP tool should be noted as unavailable with fallback
       const mcpTool = filtered.find(t => t.name.includes('mcp__'));
       if (mcpTool) {
-        assert.ok(mcpTool.status === 'unavailable' || mcpTool.fallback,
-          'MCP tool should show unavailability or fallback');
+        assert.ok(
+          mcpTool.status === 'unavailable' || mcpTool.fallback,
+          'MCP tool should show unavailability or fallback'
+        );
       }
     });
   });
@@ -467,13 +516,11 @@ Complete the task.`;
         const enhanced = assembler.assembleSpawnPrompt({
           agentType,
           allowedTools: VALID_DEVELOPER_TOOLS,
-          basePrompt: `You are ${agentType.toUpperCase()}.`
+          basePrompt: `You are ${agentType.toUpperCase()}.`,
         });
 
-        assert.ok(enhanced.includes('AVAILABLE_TOOLS'),
-          `${agentType} should have tools section`);
-        assert.ok(enhanced.includes('AVAILABLE_SKILLS'),
-          `${agentType} should have skills section`);
+        assert.ok(enhanced.includes('AVAILABLE_TOOLS'), `${agentType} should have tools section`);
+        assert.ok(enhanced.includes('AVAILABLE_SKILLS'), `${agentType} should have skills section`);
       }
     });
 
@@ -483,8 +530,16 @@ Complete the task.`;
       }
 
       const coreTools = [
-        'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-        'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet'
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'Glob',
+        'Grep',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
       ];
 
       const filtered = assembler.filterAndDescribeTools(coreTools);
