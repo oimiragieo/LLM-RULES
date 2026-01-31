@@ -16,8 +16,8 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 
 Router-first protocol is enforced by blocking hooks:
 
-| Hook                | Location                 | Trigger          | Default | Env Variables                              |
-| ------------------- | ------------------------ | ---------------- | ------- | ------------------------------------------ |
+| Hook                | Location                 | Trigger          | Default | Env Variables                                              |
+| ------------------- | ------------------------ | ---------------- | ------- | ---------------------------------------------------------- |
 | `routing-guard.cjs` | `.claude/hooks/routing/` | PreToolUse(Task) | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT` |
 
 ### routing-guard.cjs
@@ -56,6 +56,7 @@ Enforces Gate 4 (Creator Workflow) for all artifact types:
 **Override:** `CREATOR_GUARD=warn|off`
 
 **Blocked Paths:**
+
 - `.claude/skills/**/SKILL.md` → skill-creator required
 - `.claude/agents/**/*.md` → agent-creator required
 - `.claude/hooks/**/*.cjs` → hook-creator required
@@ -65,6 +66,7 @@ Enforces Gate 4 (Creator Workflow) for all artifact types:
 
 **Why Enforcement Matters:**
 Direct writes bypass post-creation steps:
+
 - CLAUDE.md routing updates
 - Catalog/registry updates
 - Agent assignments
@@ -72,6 +74,7 @@ Direct writes bypass post-creation steps:
 - Memory recording
 
 **Override Example:**
+
 ```bash
 # Disable for emergency fixes (dangerous)
 CREATOR_GUARD=off claude
@@ -82,11 +85,11 @@ CREATOR_GUARD=warn claude
 
 ### Enforcement Modes
 
-| Mode    | Behavior                                | Use Case                          |
-| ------- | --------------------------------------- | --------------------------------- |
-| `block` | Prevents action, throws error          | Production (default)              |
-| `warn`  | Logs warning but allows action         | Development, debugging            |
-| `off`   | Disables enforcement completely        | Emergency fixes only (dangerous)  |
+| Mode    | Behavior                        | Use Case                         |
+| ------- | ------------------------------- | -------------------------------- |
+| `block` | Prevents action, throws error   | Production (default)             |
+| `warn`  | Logs warning but allows action  | Development, debugging           |
+| `off`   | Disables enforcement completely | Emergency fixes only (dangerous) |
 
 ### Override Environment Variables
 

@@ -53,15 +53,15 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 
 | Tool                                   | Server              | Purpose              | Configured? | Agent References |
 | -------------------------------------- | ------------------- | -------------------- | ----------- | ---------------- |
-| **mcp__chrome-devtools__\***           | chrome-devtools     | Browser automation   | ❌ No       | 0 agents         |
-| **mcp__sequential-thinking__\***       | sequential-thinking | Structured reasoning | ❌ No       | Use Skill()      |
-| **mcp__Ref__ref_search_documentation** | Ref                 | Documentation search | ❌ No       | 0 agents         |
-| **mcp__Ref__ref_read_url**             | Ref                 | Read URL content     | ❌ No       | 0 agents         |
-| **mcp__Exa__web_search_exa**           | Exa                 | Enhanced web search  | ❌ No       | evolution-orch   |
-| **mcp__Exa__get_code_context_exa**     | Exa                 | Code context search  | ❌ No       | evolution-orch   |
-| **mcp__Exa__company_research_exa**     | Exa                 | Company research     | ❌ No       | 0 agents         |
-| **mcp__shadcn__getComponents**         | shadcn              | shadcn/ui components | ❌ No       | 0 agents         |
-| **mcp__shadcn__getComponent**          | shadcn              | Component details    | ❌ No       | 0 agents         |
+| **mcp**chrome-devtools**\***           | chrome-devtools     | Browser automation   | ❌ No       | 0 agents         |
+| **mcp**sequential-thinking**\***       | sequential-thinking | Structured reasoning | ❌ No       | Use Skill()      |
+| **mcp**Ref**ref_search_documentation** | Ref                 | Documentation search | ❌ No       | 0 agents         |
+| **mcp**Ref**ref_read_url**             | Ref                 | Read URL content     | ❌ No       | 0 agents         |
+| **mcp**Exa**web_search_exa**           | Exa                 | Enhanced web search  | ❌ No       | evolution-orch   |
+| **mcp**Exa**get_code_context_exa**     | Exa                 | Code context search  | ❌ No       | evolution-orch   |
+| **mcp**Exa**company_research_exa**     | Exa                 | Company research     | ❌ No       | 0 agents         |
+| **mcp**shadcn**getComponents**         | shadcn              | shadcn/ui components | ❌ No       | 0 agents         |
+| **mcp**shadcn**getComponent**          | shadcn              | Component details    | ❌ No       | 0 agents         |
 
 **Fallback Strategy:** Use `Skill({ skill: '<skill-name>' })` instead of MCP tools when servers are not configured.
 
@@ -70,6 +70,7 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 ### Tool Categories and Usage
 
 **Always Available (No restrictions):**
+
 - File I/O: Read, Write, Edit
 - Search: Glob, Grep
 - Task Management: TaskCreate, TaskUpdate, TaskList, TaskGet, TaskOutput, TaskStop
@@ -79,6 +80,7 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 - Jupyter: NotebookEdit
 
 **Restricted (Special permissions):**
+
 - **Task**: Only Router and Orchestrators (for spawning subagents)
 - **AskUserQuestion**: Only Router (for user interaction)
 - **Bash**: All agents have access, but Router limited to read-only git commands
@@ -143,13 +145,16 @@ tools: [
 ```
 
 **Read-Only Agents** (intentional security constraint):
+
 - **code-reviewer**: No Write, No Edit (read-only code analysis)
 - **researcher**: Read, Glob, Grep, WebSearch, WebFetch (prevents data exfiltration)
 
 **Write-Only Agents:**
+
 - **context-compressor**: No Edit (write-only mode)
 
 **Monitoring-Only Agents:**
+
 - **reflection-agent**: No Bash (read-only, monitors Bash errors for reflection)
 
 ### SkillCatalog Tool
@@ -195,6 +200,7 @@ Task({ subagent_type: best.id, prompt: ... });
 **Hook:** `.claude/hooks/routing/tool-availability-validator.cjs`
 
 **Purpose:**
+
 - Validates tool availability before agent spawning
 - Blocks spawn if required tools (core tools) are unavailable
 - Warns but allows spawn if optional tools (MCP) are missing

@@ -59,6 +59,7 @@ Complete catalog of 30+ workflow enhancement skills available via `Skill()` tool
 **Skill Catalog Location:** `.claude/context/artifacts/skill-catalog.md`
 
 **Discovery Process:**
+
 1. Read catalog
 2. Search by category or keyword
 3. Invoke with: `Skill({ skill: "<skill-name>" })`

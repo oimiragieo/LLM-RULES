@@ -43,10 +43,9 @@ const {
   COMPLEXITY_DEFAULTS,
 } = require(path.join(PROJECT_ROOT, '.claude/lib/utils/agent-config-reader.cjs'));
 
-const {
-  validateModelConfig,
-  formatAuditEntry,
-} = require(path.join(PROJECT_ROOT, '.claude/hooks/routing/config-model-validator.cjs'));
+const { validateModelConfig, formatAuditEntry } = require(
+  path.join(PROJECT_ROOT, '.claude/hooks/routing/config-model-validator.cjs')
+);
 
 // Test fixtures directory
 const FIXTURES_DIR = path.join(PROJECT_ROOT, 'tests/fixtures');
@@ -330,7 +329,11 @@ describe('Router Config Selection Integration', () => {
       const result = resolveAgentModel('unknown-agent-xyz', PROJECT_ROOT);
 
       assert.strictEqual(result.shorthand, 'sonnet', 'Unknown agent should use sonnet default');
-      assert.strictEqual(result.source, 'complexity-default', 'Source should be complexity-default');
+      assert.strictEqual(
+        result.source,
+        'complexity-default',
+        'Source should be complexity-default'
+      );
       assert.strictEqual(result.model, 'claude-sonnet-4-5', 'Full model ID should be sonnet');
     });
 
@@ -405,11 +408,7 @@ describe('Router Config Selection Integration', () => {
       ];
 
       for (const agent of highComplexityAgents) {
-        assert.strictEqual(
-          COMPLEXITY_DEFAULTS[agent],
-          'opus',
-          `${agent} should default to opus`
-        );
+        assert.strictEqual(COMPLEXITY_DEFAULTS[agent], 'opus', `${agent} should default to opus`);
       }
     });
 

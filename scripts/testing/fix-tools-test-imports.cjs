@@ -29,7 +29,10 @@ function findTestFiles(dir, files = []) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       findTestFiles(fullPath, files);
-    } else if (entry.isFile() && (entry.name.endsWith('.test.cjs') || entry.name.endsWith('.test.mjs'))) {
+    } else if (
+      entry.isFile() &&
+      (entry.name.endsWith('.test.cjs') || entry.name.endsWith('.test.mjs'))
+    ) {
       files.push(fullPath);
     }
   }
@@ -37,7 +40,9 @@ function findTestFiles(dir, files = []) {
 }
 
 function getDepthFromTestsTools(filePath) {
-  const rel = path.relative(path.join(PROJECT_ROOT, 'tests', 'tools'), filePath).replace(/\\/g, '/');
+  const rel = path
+    .relative(path.join(PROJECT_ROOT, 'tests', 'tools'), filePath)
+    .replace(/\\/g, '/');
   return rel.split('/').length - 1;
 }
 
@@ -65,20 +70,23 @@ function fixFileImports(filePath) {
     return match;
   });
 
-  content = content.replace(/require\.resolve\(['"]\.\/([a-z0-9-]+\.cjs)['"]\)/g, (match, filename) => {
-    const parts = relFromRoot.split('/');
-    if (parts.length >= 3) {
-      const category = parts.slice(2, -1).join('/');
-      const baseName = filename.replace('.cjs', '');
-      const key = `${category}/${baseName}`;
+  content = content.replace(
+    /require\.resolve\(['"]\.\/([a-z0-9-]+\.cjs)['"]\)/g,
+    (match, filename) => {
+      const parts = relFromRoot.split('/');
+      if (parts.length >= 3) {
+        const category = parts.slice(2, -1).join('/');
+        const baseName = filename.replace('.cjs', '');
+        const key = `${category}/${baseName}`;
 
-      if (TOOLS_MAPPINGS[key]) {
-        modified = true;
-        return `require.resolve('${backToRoot}${TOOLS_MAPPINGS[key]}')`;
+        if (TOOLS_MAPPINGS[key]) {
+          modified = true;
+          return `require.resolve('${backToRoot}${TOOLS_MAPPINGS[key]}')`;
+        }
       }
+      return match;
     }
-    return match;
-  });
+  );
 
   if (modified && !DRY_RUN) {
     fs.writeFileSync(filePath, content, 'utf8');

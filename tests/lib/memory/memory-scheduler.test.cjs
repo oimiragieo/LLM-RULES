@@ -194,7 +194,9 @@ if (require.main === module) {
         createTestMemoryData();
 
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runWeeklyMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+        const {
+          runWeeklyMaintenance,
+        } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
         const result = runWeeklyMaintenance(TEST_PROJECT_ROOT);
 
         assert(result, 'Should return a result');
@@ -222,7 +224,9 @@ if (require.main === module) {
         createTestMemoryData();
 
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runWeeklyMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+        const {
+          runWeeklyMaintenance,
+        } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
         const result = runWeeklyMaintenance(TEST_PROJECT_ROOT);
 
         assert(result.weeklyReport, 'Should have weeklyReport');
@@ -295,7 +299,10 @@ if (require.main === module) {
         createTestMemoryData();
 
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { getMaintenanceStatus, runDailyMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+        const {
+          getMaintenanceStatus,
+          runDailyMaintenance,
+        } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
 
         // Run maintenance first
         runDailyMaintenance(TEST_PROJECT_ROOT);

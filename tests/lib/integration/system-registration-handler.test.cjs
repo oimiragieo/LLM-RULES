@@ -11,7 +11,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const { SystemRegistrationHandler } = require('../../../.claude/lib/integration/system-registration-handler.cjs');
+const {
+  SystemRegistrationHandler,
+} = require('../../../.claude/lib/integration/system-registration-handler.cjs');
 
 // =============================================================================
 // Test Framework

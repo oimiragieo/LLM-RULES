@@ -215,7 +215,9 @@ if (require.main === module) {
         );
 
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
-        const { calculateHealthScore } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
+        const {
+          calculateHealthScore,
+        } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
         const score = calculateHealthScore({
           learningsSizeKB: 5,
@@ -235,7 +237,9 @@ if (require.main === module) {
       setupTestDir();
       try {
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
-        const { calculateHealthScore } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
+        const {
+          calculateHealthScore,
+        } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
         // Near threshold values
         const score = calculateHealthScore({
@@ -256,7 +260,9 @@ if (require.main === module) {
       setupTestDir();
       try {
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
-        const { calculateHealthScore } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
+        const {
+          calculateHealthScore,
+        } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
         // Over threshold values
         const score = calculateHealthScore({
@@ -280,7 +286,9 @@ if (require.main === module) {
       setupTestDir();
       try {
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
-        const { generateRecommendations } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
+        const {
+          generateRecommendations,
+        } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
         const recommendations = generateRecommendations({
           learningsSizeKB: 10,
@@ -300,7 +308,9 @@ if (require.main === module) {
       setupTestDir();
       try {
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
-        const { generateRecommendations } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
+        const {
+          generateRecommendations,
+        } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
         const recommendations = generateRecommendations({
           learningsSizeKB: 38, // Near threshold
@@ -325,7 +335,9 @@ if (require.main === module) {
       setupTestDir();
       try {
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
-        const { generateRecommendations } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
+        const {
+          generateRecommendations,
+        } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
         const recommendations = generateRecommendations({
           learningsSizeKB: 10,
@@ -353,7 +365,9 @@ if (require.main === module) {
       setupTestDir();
       try {
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
-        const { generateRecommendations } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
+        const {
+          generateRecommendations,
+        } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
         const recommendations = generateRecommendations({
           learningsSizeKB: 10,
@@ -383,7 +397,10 @@ if (require.main === module) {
         createTestMemoryData();
 
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
-        const { saveMetrics, collectMetrics } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
+        const {
+          saveMetrics,
+          collectMetrics,
+        } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
         const metrics = collectMetrics(TEST_PROJECT_ROOT);
         saveMetrics(metrics, TEST_PROJECT_ROOT);

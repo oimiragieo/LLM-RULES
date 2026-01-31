@@ -9,7 +9,7 @@ if (require.main === module) {
     'should have valid YAML frontmatter',
     'should have usage tracking metadata for each template',
     'should have discovery keywords for each template',
-    'should have last_used dates in YYYY-MM-DD format'
+    'should have last_used dates in YYYY-MM-DD format',
   ];
 
   console.log('Running Template Catalog Tests...\n');
@@ -44,7 +44,9 @@ if (require.main === module) {
         passed++;
       } else {
         console.log(`✗ ${tests[1]}`);
-        console.log(`  Missing: ${!hasSpec ? 'spec ' : ''}${!hasPlan ? 'plan ' : ''}${!hasTasks ? 'tasks ' : ''}${!hasADR ? 'ADR' : ''}`);
+        console.log(
+          `  Missing: ${!hasSpec ? 'spec ' : ''}${!hasPlan ? 'plan ' : ''}${!hasTasks ? 'tasks ' : ''}${!hasADR ? 'ADR' : ''}`
+        );
         failed++;
       }
 
@@ -58,9 +60,8 @@ if (require.main === module) {
 
           // Test 4: Usage tracking metadata
           if (frontmatter.templates && Array.isArray(frontmatter.templates)) {
-            const hasUsageTracking = frontmatter.templates.every(t =>
-              Object.hasOwn(t, 'created_count') &&
-              Object.hasOwn(t, 'last_used')
+            const hasUsageTracking = frontmatter.templates.every(
+              t => Object.hasOwn(t, 'created_count') && Object.hasOwn(t, 'last_used')
             );
 
             if (hasUsageTracking) {
@@ -68,13 +69,16 @@ if (require.main === module) {
               passed++;
             } else {
               console.log(`✗ ${tests[3]}`);
-              console.log('  Error: Some templates missing usage tracking (created_count, last_used)');
+              console.log(
+                '  Error: Some templates missing usage tracking (created_count, last_used)'
+              );
               failed++;
             }
 
             // Test 5: Discovery keywords
-            const hasKeywords = frontmatter.templates.every(t =>
-              Object.hasOwn(t, 'keywords') && Array.isArray(t.keywords) && t.keywords.length > 0
+            const hasKeywords = frontmatter.templates.every(
+              t =>
+                Object.hasOwn(t, 'keywords') && Array.isArray(t.keywords) && t.keywords.length > 0
             );
 
             if (hasKeywords) {
@@ -88,8 +92,8 @@ if (require.main === module) {
 
             // Test 6: Date format validation
             const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-            const validDates = frontmatter.templates.every(t =>
-              !t.last_used || datePattern.test(t.last_used)
+            const validDates = frontmatter.templates.every(
+              t => !t.last_used || datePattern.test(t.last_used)
             );
 
             if (validDates) {
@@ -133,7 +137,6 @@ if (require.main === module) {
         console.log(`✗ ${tests[5]}`);
         failed++;
       }
-
     } catch (error) {
       console.error('Error reading catalog:', error.message);
       // Mark remaining tests as failed

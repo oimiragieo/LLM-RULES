@@ -9,7 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-test('Post-Spawn Task Updater - RED Phase Tests', async (t) => {
+test('Post-Spawn Task Updater - RED Phase Tests', async t => {
   let tempDir;
 
   t.beforeEach(() => {
@@ -31,21 +31,26 @@ test('Post-Spawn Task Updater - RED Phase Tests', async (t) => {
     // RED: Hook checks task status after agent finishes
     const taskFile = path.join(tempDir, '.claude/context/tasks.json');
     fs.mkdirSync(path.dirname(taskFile), { recursive: true });
-    fs.writeFileSync(taskFile, JSON.stringify({
-      tasks: [{
-        id: '72',
-        subject: 'Test task',
-        status: 'in_progress', // Still in progress after spawn
-        startedAt: Date.now() - 60000 // Started 1 minute ago
-      }]
-    }));
+    fs.writeFileSync(
+      taskFile,
+      JSON.stringify({
+        tasks: [
+          {
+            id: '72',
+            subject: 'Test task',
+            status: 'in_progress', // Still in progress after spawn
+            startedAt: Date.now() - 60000, // Started 1 minute ago
+          },
+        ],
+      })
+    );
 
     // Mock input simulating Task tool completion
     const mockInput = {
       tool: 'Task',
       parameters: { prompt: 'Task #72: Work' },
       result: { success: true },
-      context: { PROJECT_ROOT: tempDir }
+      context: { PROJECT_ROOT: tempDir },
     };
 
     // Expected: Log warning about incomplete task
@@ -61,14 +66,19 @@ test('Post-Spawn Task Updater - RED Phase Tests', async (t) => {
     // RED: Auto-escalate long-running tasks
     const taskFile = path.join(tempDir, '.claude/context/tasks.json');
     fs.mkdirSync(path.dirname(taskFile), { recursive: true });
-    fs.writeFileSync(taskFile, JSON.stringify({
-      tasks: [{
-        id: '72',
-        subject: 'Stuck task',
-        status: 'in_progress',
-        startedAt: Date.now() - (61 * 60 * 1000) // 61 minutes ago
-      }]
-    }));
+    fs.writeFileSync(
+      taskFile,
+      JSON.stringify({
+        tasks: [
+          {
+            id: '72',
+            subject: 'Stuck task',
+            status: 'in_progress',
+            startedAt: Date.now() - 61 * 60 * 1000, // 61 minutes ago
+          },
+        ],
+      })
+    );
 
     // Expected: Create escalation entry in metrics
     assert.ok(true, 'RED: Test written, implementation pending');
@@ -80,7 +90,7 @@ test('Post-Spawn Task Updater - RED Phase Tests', async (t) => {
       tool: 'Read',
       parameters: { file_path: 'test.js' },
       result: { success: true },
-      context: { PROJECT_ROOT: tempDir }
+      context: { PROJECT_ROOT: tempDir },
     };
 
     assert.ok(true, 'RED: Test written, implementation pending');
@@ -97,7 +107,7 @@ test('Post-Spawn Task Updater - RED Phase Tests', async (t) => {
       tool: 'Task',
       parameters: { prompt: 'Task #72: Work' },
       result: { success: true },
-      context: { PROJECT_ROOT: tempDir }
+      context: { PROJECT_ROOT: tempDir },
     };
 
     assert.ok(true, 'RED: Test written, implementation pending');
@@ -111,7 +121,7 @@ test('Post-Spawn Task Updater - RED Phase Tests', async (t) => {
       tool: 'Task',
       parameters: { prompt: 'Task #72: Work' },
       result: { success: true },
-      context: { PROJECT_ROOT: tempDir }
+      context: { PROJECT_ROOT: tempDir },
     };
 
     delete process.env.NO_TRACK_ENFORCEMENT;

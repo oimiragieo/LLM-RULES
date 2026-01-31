@@ -65,7 +65,8 @@ const LIB_MAPPINGS = {
   'self-healing/validator': '.claude/lib/self-healing/validator.cjs',
 
   // lib/integration/
-  'integration/system-registration-handler': '.claude/lib/integration/system-registration-handler.cjs',
+  'integration/system-registration-handler':
+    '.claude/lib/integration/system-registration-handler.cjs',
 };
 
 // Find all test files recursively
@@ -77,7 +78,10 @@ function findTestFiles(dir, files = []) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       findTestFiles(fullPath, files);
-    } else if (entry.isFile() && (entry.name.endsWith('.test.cjs') || entry.name.endsWith('.test.mjs'))) {
+    } else if (
+      entry.isFile() &&
+      (entry.name.endsWith('.test.cjs') || entry.name.endsWith('.test.mjs'))
+    ) {
       files.push(fullPath);
     }
   }
@@ -123,20 +127,23 @@ function fixFileImports(filePath) {
   });
 
   // Also fix require.resolve patterns
-  content = content.replace(/require\.resolve\(['"]\.\/([a-z0-9-]+\.cjs)['"]\)/g, (match, filename) => {
-    const parts = relFromRoot.split('/');
-    if (parts.length >= 3) {
-      const category = parts[2];
-      const baseName = filename.replace('.cjs', '');
-      const key = `${category}/${baseName}`;
+  content = content.replace(
+    /require\.resolve\(['"]\.\/([a-z0-9-]+\.cjs)['"]\)/g,
+    (match, filename) => {
+      const parts = relFromRoot.split('/');
+      if (parts.length >= 3) {
+        const category = parts[2];
+        const baseName = filename.replace('.cjs', '');
+        const key = `${category}/${baseName}`;
 
-      if (LIB_MAPPINGS[key]) {
-        modified = true;
-        return `require.resolve('${backToRoot}${LIB_MAPPINGS[key]}')`;
+        if (LIB_MAPPINGS[key]) {
+          modified = true;
+          return `require.resolve('${backToRoot}${LIB_MAPPINGS[key]}')`;
+        }
       }
+      return match;
     }
-    return match;
-  });
+  );
 
   if (modified && !DRY_RUN) {
     fs.writeFileSync(filePath, content, 'utf8');

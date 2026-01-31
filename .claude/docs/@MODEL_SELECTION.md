@@ -17,13 +17,13 @@ Guidelines for selecting the appropriate Claude model (haiku, sonnet, opus) when
 
 **CRITICAL:** Router must use this precedence when selecting models:
 
-| Priority | Source | Description | When Used |
-|----------|--------|-------------|-----------|
-| **P1** | Task() parameter | Explicit `model:` in spawn call | Override for specific needs |
-| **P2** | Agent frontmatter | `model:` field in agent .md file | Agent-level default |
-| **P3** | config.yaml | `agents.{type}.model` entry | **RECOMMENDED** - centralized control |
-| **P4** | Complexity default | Based on agent type | Fallback for unconfigured agents |
-| **P5** | Hardcoded fallback | `sonnet` | Last resort |
+| Priority | Source             | Description                      | When Used                             |
+| -------- | ------------------ | -------------------------------- | ------------------------------------- |
+| **P1**   | Task() parameter   | Explicit `model:` in spawn call  | Override for specific needs           |
+| **P2**   | Agent frontmatter  | `model:` field in agent .md file | Agent-level default                   |
+| **P3**   | config.yaml        | `agents.{type}.model` entry      | **RECOMMENDED** - centralized control |
+| **P4**   | Complexity default | Based on agent type              | Fallback for unconfigured agents      |
+| **P5**   | Hardcoded fallback | `sonnet`                         | Last resort                           |
 
 ### How Router Reads Agent Models
 
@@ -59,41 +59,41 @@ Task({
 agents:
   planner:
     path: agents/core/planner.md
-    model: claude-opus-4-5-20251101    # OPUS for complex planning
+    model: claude-opus-4-5-20251101 # OPUS for complex planning
     extended_thinking: true
   developer:
     path: agents/core/developer.md
-    model: claude-sonnet-4-5           # SONNET for standard work
+    model: claude-sonnet-4-5 # SONNET for standard work
   qa:
     path: agents/core/qa.md
-    model: claude-opus-4-5-20251101    # OPUS for thorough testing
+    model: claude-opus-4-5-20251101 # OPUS for thorough testing
   architect:
     path: agents/core/architect.md
-    model: claude-opus-4-5-20251101    # OPUS for architecture decisions
+    model: claude-opus-4-5-20251101 # OPUS for architecture decisions
 ```
 
 ### Current Configured Agents
 
-| Agent | config.yaml Model | Shorthand | Extended Thinking |
-|-------|-------------------|-----------|-------------------|
-| planner | claude-opus-4-5-20251101 | opus | Yes |
-| developer | claude-sonnet-4-5 | sonnet | No |
-| qa | claude-opus-4-5-20251101 | opus | No |
-| architect | claude-opus-4-5-20251101 | opus | No |
+| Agent     | config.yaml Model        | Shorthand | Extended Thinking |
+| --------- | ------------------------ | --------- | ----------------- |
+| planner   | claude-opus-4-5-20251101 | opus      | Yes               |
+| developer | claude-sonnet-4-5        | sonnet    | No                |
+| qa        | claude-opus-4-5-20251101 | opus      | No                |
+| architect | claude-opus-4-5-20251101 | opus      | No                |
 
 ### Agents Using Complexity Defaults
 
 Agents not in config.yaml use complexity-based defaults:
 
-| Agent Type | Default Model | Reason |
-|------------|---------------|--------|
-| security-architect | opus | Security requires deep analysis |
-| evolution-orchestrator | opus | Creates system artifacts |
-| master-orchestrator | opus | Coordinates multiple agents |
-| party-orchestrator | opus | Multi-agent collaboration |
-| swarm-coordinator | opus | Parallel coordination |
-| context-compressor | haiku | Simple summarization |
-| *all others* | sonnet | Standard development work |
+| Agent Type             | Default Model | Reason                          |
+| ---------------------- | ------------- | ------------------------------- |
+| security-architect     | opus          | Security requires deep analysis |
+| evolution-orchestrator | opus          | Creates system artifacts        |
+| master-orchestrator    | opus          | Coordinates multiple agents     |
+| party-orchestrator     | opus          | Multi-agent collaboration       |
+| swarm-coordinator      | opus          | Parallel coordination           |
+| context-compressor     | haiku         | Simple summarization            |
+| _all others_           | sonnet        | Standard development work       |
 
 ---
 
@@ -117,9 +117,9 @@ When config.yaml lookup fails:
 // From agent-config-reader.cjs
 const COMPLEXITY_DEFAULTS = {
   // Opus agents (high complexity)
-  'planner': 'opus',
-  'architect': 'opus',
-  'qa': 'opus',
+  planner: 'opus',
+  architect: 'opus',
+  qa: 'opus',
   'security-architect': 'opus',
   'evolution-orchestrator': 'opus',
   'master-orchestrator': 'opus',
@@ -129,7 +129,7 @@ const COMPLEXITY_DEFAULTS = {
   'context-compressor': 'haiku',
 
   // Default for everything else
-  'default': 'sonnet'
+  default: 'sonnet',
 };
 ```
 
@@ -139,20 +139,20 @@ const COMPLEXITY_DEFAULTS = {
 
 Both shorthand and full IDs are supported:
 
-| Shorthand | Full Model ID |
-|-----------|---------------|
-| `opus` | `claude-opus-4-5-20251101` |
-| `sonnet` | `claude-sonnet-4-5` |
-| `haiku` | `claude-haiku-4-5` |
+| Shorthand | Full Model ID              |
+| --------- | -------------------------- |
+| `opus`    | `claude-opus-4-5-20251101` |
+| `sonnet`  | `claude-sonnet-4-5`        |
+| `haiku`   | `claude-haiku-4-5`         |
 
 ```javascript
 const { normalizeModel, getShorthand } = require('.claude/lib/utils/agent-config-reader.cjs');
 
-normalizeModel('opus');  // 'claude-opus-4-5-20251101'
-normalizeModel('claude-sonnet-4-5');  // 'claude-sonnet-4-5' (unchanged)
+normalizeModel('opus'); // 'claude-opus-4-5-20251101'
+normalizeModel('claude-sonnet-4-5'); // 'claude-sonnet-4-5' (unchanged)
 
-getShorthand('claude-opus-4-5-20251101');  // 'opus'
-getShorthand('sonnet');  // 'sonnet' (unchanged)
+getShorthand('claude-opus-4-5-20251101'); // 'opus'
+getShorthand('sonnet'); // 'sonnet' (unchanged)
 ```
 
 ---
@@ -168,6 +168,7 @@ getShorthand('sonnet');  // 'sonnet' (unchanged)
 ### Model Selection Guidelines
 
 **haiku (low cost):**
+
 - Simple validation tasks
 - Quick bug fixes
 - Straightforward refactoring
@@ -176,6 +177,7 @@ getShorthand('sonnet');  // 'sonnet' (unchanged)
 - Low-complexity testing
 
 **sonnet (medium cost, default):**
+
 - Standard development work
 - Feature implementation
 - Most planning tasks
@@ -185,6 +187,7 @@ getShorthand('sonnet');  // 'sonnet' (unchanged)
 - Most agent work (recommended default)
 
 **opus (high cost):**
+
 - Complex architectural decisions
 - Security reviews and threat modeling
 - Multi-step orchestration
@@ -196,18 +199,21 @@ getShorthand('sonnet');  // 'sonnet' (unchanged)
 ### Cost-Benefit Trade-offs
 
 **When to prefer haiku:**
+
 - Task is well-defined with clear acceptance criteria
 - Low risk of failure
 - Fast turnaround more important than perfect output
 - Budget constraints
 
 **When to prefer sonnet (default):**
+
 - Most standard development tasks
 - Balanced cost/quality trade-off
 - Task complexity is moderate
 - Recommended for 80% of agent spawns
 
 **When to prefer opus:**
+
 - Task failure would be costly
 - Requires deep reasoning or multi-step planning
 - Security-critical operations
@@ -221,11 +227,13 @@ getShorthand('sonnet');  // 'sonnet' (unchanged)
 `config-model-validator.cjs` validates spawn model matches config.yaml:
 
 **Modes:**
+
 - `CONFIG_MODEL_VALIDATOR=block` - Block spawn if mismatch
 - `CONFIG_MODEL_VALIDATOR=warn` - Log warning (DEFAULT)
 - `CONFIG_MODEL_VALIDATOR=off` - Disable validation
 
 **What it validates:**
+
 1. Extracts agent type from spawn prompt
 2. Resolves configured model from config.yaml
 3. Compares spawn model vs configured model
@@ -245,12 +253,12 @@ getShorthand('sonnet');  // 'sonnet' (unchanged)
 
 ## FILES
 
-| File | Purpose |
-|------|---------|
-| `.claude/lib/utils/agent-config-reader.cjs` | Model resolution utility |
-| `.claude/hooks/routing/config-model-validator.cjs` | Pre-spawn validation hook |
-| `.claude/config.yaml` | Source of truth for agent models |
-| `.claude/agents/*/*.md` | Agent definitions with frontmatter |
+| File                                               | Purpose                            |
+| -------------------------------------------------- | ---------------------------------- |
+| `.claude/lib/utils/agent-config-reader.cjs`        | Model resolution utility           |
+| `.claude/hooks/routing/config-model-validator.cjs` | Pre-spawn validation hook          |
+| `.claude/config.yaml`                              | Source of truth for agent models   |
+| `.claude/agents/*/*.md`                            | Agent definitions with frontmatter |
 
 ---
 

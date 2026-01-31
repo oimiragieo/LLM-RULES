@@ -65,7 +65,9 @@ function extractAgentTypeFromPrompt(prompt) {
 
   // Pattern 2: Agent file path reference
   // Matches: ".claude/agents/core/planner.md", ".claude/agents/specialized/security-architect.md"
-  const pathMatch = prompt.match(/\.claude\/agents\/(?:core|specialized|domain|orchestrators)\/([^/.]+)\.md/i);
+  const pathMatch = prompt.match(
+    /\.claude\/agents\/(?:core|specialized|domain|orchestrators)\/([^/.]+)\.md/i
+  );
   if (pathMatch) {
     return pathMatch[1].toLowerCase();
   }

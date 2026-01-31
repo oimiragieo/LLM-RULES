@@ -329,7 +329,9 @@ describe('Full Workflow Execution', () => {
 
 describe('Cross-Workflow Triggering', () => {
   it('should trigger another workflow synchronously', async () => {
-    const { CrossWorkflowTrigger } = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
+    const {
+      CrossWorkflowTrigger,
+    } = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
 
     const trigger = new CrossWorkflowTrigger(null); // No engine, use handlers
 
@@ -355,7 +357,9 @@ describe('Cross-Workflow Triggering', () => {
   });
 
   it('should detect circular triggers', async () => {
-    const { CrossWorkflowTrigger } = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
+    const {
+      CrossWorkflowTrigger,
+    } = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
 
     const trigger = new CrossWorkflowTrigger(null);
 
@@ -367,7 +371,9 @@ describe('Cross-Workflow Triggering', () => {
   });
 
   it('should track trigger history', async () => {
-    const { CrossWorkflowTrigger } = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
+    const {
+      CrossWorkflowTrigger,
+    } = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
 
     const trigger = new CrossWorkflowTrigger(null);
 
@@ -384,7 +390,9 @@ describe('Cross-Workflow Triggering', () => {
   });
 
   it('should trigger multiple workflows in parallel', async () => {
-    const { CrossWorkflowTrigger } = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
+    const {
+      CrossWorkflowTrigger,
+    } = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
 
     const trigger = new CrossWorkflowTrigger(null);
     const completionTimes = {};

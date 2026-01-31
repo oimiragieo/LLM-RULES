@@ -9,7 +9,9 @@
 
 'use strict';
 
-const { CrossWorkflowTrigger } = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
+const {
+  CrossWorkflowTrigger,
+} = require('../../../.claude/lib/workflow/cross-workflow-trigger.cjs');
 
 // =============================================================================
 // Test Framework

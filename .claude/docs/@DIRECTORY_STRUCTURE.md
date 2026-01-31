@@ -163,6 +163,7 @@ schemas/
 ```
 
 **Track Metadata Schema** (SPEC-007):
+
 - **Path**: `.claude/schemas/track-metadata.schema.json`
 - **Documentation**: `.claude/docs/TRACK_METADATA.md`
 - **Purpose**: Consistent structure for task/track metadata

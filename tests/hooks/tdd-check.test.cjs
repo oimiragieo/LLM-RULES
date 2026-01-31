@@ -67,7 +67,12 @@ function assertFalse(value, message) {
 console.log('\n=== tdd-check.cjs tests ===\n');
 
 // Import the module under test
-const { isTestFile, shouldIgnore, findTestFile, parseHookInput } = require('../../.claude/hooks/safety/tdd-check.cjs');
+const {
+  isTestFile,
+  shouldIgnore,
+  findTestFile,
+  parseHookInput,
+} = require('../../.claude/hooks/safety/tdd-check.cjs');
 
 // ============================================================
 // Module Exports Tests

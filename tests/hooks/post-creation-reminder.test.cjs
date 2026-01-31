@@ -7,7 +7,10 @@
 
 'use strict';
 
-const { getRecentEvolutions, quickValidate } = require('../../.claude/hooks/session/post-creation-reminder.cjs');
+const {
+  getRecentEvolutions,
+  quickValidate,
+} = require('../../.claude/hooks/session/post-creation-reminder.cjs');
 
 describe('post-creation-reminder', () => {
   describe('getRecentEvolutions', () => {

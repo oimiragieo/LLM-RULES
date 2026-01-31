@@ -300,7 +300,9 @@ describe('WorkflowValidator Module', () => {
   });
 
   it('should export validateEvolvePhases function', () => {
-    const { validateEvolvePhases } = require('../../../.claude/lib/workflow/workflow-validator.cjs');
+    const {
+      validateEvolvePhases,
+    } = require('../../../.claude/lib/workflow/workflow-validator.cjs');
     assert(validateEvolvePhases, 'validateEvolvePhases should be exported');
     assert(typeof validateEvolvePhases === 'function', 'validateEvolvePhases should be a function');
   });
@@ -375,7 +377,9 @@ describe('WorkflowValidator Basic Validation', () => {
 
 describe('EVOLVE Phase Validation', () => {
   it('should check for all EVOLVE phases', () => {
-    const { validateEvolvePhases } = require('../../../.claude/lib/workflow/workflow-validator.cjs');
+    const {
+      validateEvolvePhases,
+    } = require('../../../.claude/lib/workflow/workflow-validator.cjs');
     const workflow = {
       phases: {
         evaluate: {},
@@ -392,7 +396,9 @@ describe('EVOLVE Phase Validation', () => {
   });
 
   it('should detect missing OBTAIN phase', () => {
-    const { validateEvolvePhases } = require('../../../.claude/lib/workflow/workflow-validator.cjs');
+    const {
+      validateEvolvePhases,
+    } = require('../../../.claude/lib/workflow/workflow-validator.cjs');
     const workflow = {
       phases: {
         evaluate: {},
@@ -409,7 +415,9 @@ describe('EVOLVE Phase Validation', () => {
   });
 
   it('should warn about missing EVALUATE phase', () => {
-    const { validateEvolvePhases } = require('../../../.claude/lib/workflow/workflow-validator.cjs');
+    const {
+      validateEvolvePhases,
+    } = require('../../../.claude/lib/workflow/workflow-validator.cjs');
     const workflow = {
       phases: {
         validate: {},

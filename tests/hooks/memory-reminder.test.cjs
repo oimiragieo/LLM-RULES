@@ -22,7 +22,7 @@ describe('memory-reminder', () => {
   let testDir;
   let memoryDir;
   let originalExit;
-  let exitCode;  
+  let exitCode;
   let consoleOutput;
   let originalLog;
 

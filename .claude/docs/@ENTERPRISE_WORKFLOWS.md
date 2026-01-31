@@ -39,6 +39,7 @@ Complete catalog of 15+ enterprise workflows for multi-agent orchestration, secu
 ### Workflow Categories
 
 **Core Workflows** (`.claude/workflows/core/`):
+
 - `router-decision.md` - Master routing logic (source of truth)
 - `evolution-workflow.md` - EVOLVE process (E→V→O→L→V→E)
 - `external-integration.md` - Safe integration of external systems
@@ -46,11 +47,13 @@ Complete catalog of 15+ enterprise workflows for multi-agent orchestration, secu
 - `reflection-workflow.md` - Quality reflection and learning capture
 
 **Enterprise Workflows** (`.claude/workflows/enterprise/`):
+
 - `feature-development-workflow.md` - End-to-end feature development
 - `c4-architecture-workflow.md` - C4 model documentation
 - `swarm-coordination-skill-workflow.md` - Multi-agent swarm patterns
 
 **Operations Workflows** (`.claude/workflows/operations/`):
+
 - `incident-response.md` - Production incident handling
 - `hook-consolidation.md` - Hook management and consolidation
 

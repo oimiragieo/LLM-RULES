@@ -9,7 +9,10 @@
 'use strict';
 
 // Import the module under test
-const { detectsCompletion, COMPLETION_INDICATORS } = require('../../.claude/hooks/routing/task-completion-guard.cjs');
+const {
+  detectsCompletion,
+  COMPLETION_INDICATORS,
+} = require('../../.claude/hooks/routing/task-completion-guard.cjs');
 
 let passed = 0;
 let failed = 0;

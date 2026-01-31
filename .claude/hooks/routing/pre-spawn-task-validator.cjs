@@ -12,10 +12,10 @@ const path = require('path');
  * Task ID extraction patterns
  */
 const TASK_ID_PATTERNS = [
-  /Task\s+#(\d+)/i,           // "Task #72"
+  /Task\s+#(\d+)/i, // "Task #72"
   /Your\s+Task\s+ID:\s*(\d+)/i, // "Your Task ID: 72"
-  /task\s+#(\d+)/i,           // "task #72"
-  /taskId[:\s]+["']?(\d+)/i,  // "taskId: 72"
+  /task\s+#(\d+)/i, // "task #72"
+  /taskId[:\s]+["']?(\d+)/i, // "taskId: 72"
 ];
 
 /**
@@ -96,7 +96,8 @@ function matchTaskByDescription(tasks, description) {
       }
     }
 
-    if (score > bestScore && score >= 2) { // Require at least 2 keyword matches
+    if (score > bestScore && score >= 2) {
+      // Require at least 2 keyword matches
       bestScore = score;
       bestMatch = task;
     }
@@ -120,7 +121,7 @@ function logSpawnAttempt(projectRoot, entry) {
 
   const line = JSON.stringify({
     timestamp: new Date().toISOString(),
-    ...entry
+    ...entry,
   });
 
   fs.appendFileSync(auditLog, line + '\n', 'utf8');
@@ -163,7 +164,7 @@ async function PreToolUse(input) {
       taskId: taskId || 'none',
       allowed: false,
       reason,
-      agentType: subagent_type
+      agentType: subagent_type,
     });
     return { allowed: false, reason };
   }
@@ -190,7 +191,7 @@ async function PreToolUse(input) {
       allowed: false,
       reason,
       agentType: subagent_type,
-      attemptedMatch: description.substring(0, 100)
+      attemptedMatch: description.substring(0, 100),
     });
 
     return { allowed: false, reason };
@@ -202,7 +203,7 @@ async function PreToolUse(input) {
     taskId: matchedTask.id,
     allowed: true,
     reason: `Matched task #${matchedTask.id}: ${matchedTask.subject}`,
-    agentType: subagent_type
+    agentType: subagent_type,
   });
 
   return { allowed: true };

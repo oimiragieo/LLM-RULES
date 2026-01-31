@@ -38,6 +38,7 @@ Before creating ANY artifact:
 - Design decisions have documented rationale
 
 **Why Phase O is mandatory:**
+
 - Prevents reinventing the wheel
 - Ensures industry best practices
 - Documents design decisions
@@ -45,18 +46,19 @@ Before creating ANY artifact:
 
 ### Enforcement Hooks
 
-| Hook                        | Purpose                          | Location                           |
-| --------------------------- | -------------------------------- | ---------------------------------- |
-| `research-enforcement.cjs`  | Blocks creation without research | `.claude/hooks/evolution/`         |
-| `evolution-state-guard.cjs` | Enforces state transitions       | `.claude/hooks/evolution/`         |
-| `conflict-detector.cjs`     | Prevents naming conflicts        | `.claude/hooks/evolution/`         |
-| `evolution-audit.cjs`       | Logs evolutions                  | `.claude/hooks/audit/`             |
+| Hook                        | Purpose                          | Location                   |
+| --------------------------- | -------------------------------- | -------------------------- |
+| `research-enforcement.cjs`  | Blocks creation without research | `.claude/hooks/evolution/` |
+| `evolution-state-guard.cjs` | Enforces state transitions       | `.claude/hooks/evolution/` |
+| `conflict-detector.cjs`     | Prevents naming conflicts        | `.claude/hooks/evolution/` |
+| `evolution-audit.cjs`       | Logs evolutions                  | `.claude/hooks/audit/`     |
 
 ### State Tracking
 
 **File:** `.claude/context/evolution-state.json`
 
 **Tracks:**
+
 - Current phase (E/V/O/L/V/E)
 - Research entries (queries, sources, reports)
 - Evolution history
@@ -70,7 +72,7 @@ When router detects "no matching agent" or user requests new capability:
 ```javascript
 Task({
   subagent_type: 'evolution-orchestrator',
-  model: 'opus',  // MUST use opus for complex reasoning
+  model: 'opus', // MUST use opus for complex reasoning
   description: 'Creating new agent/skill via EVOLVE workflow',
   allowed_tools: [
     'Read',
@@ -78,8 +80,8 @@ Task({
     'Edit',
     'Task',
     'Skill',
-    'mcp__Exa__web_search_exa',        // Research Phase O
-    'mcp__Exa__get_code_context_exa',  // Research Phase O
+    'mcp__Exa__web_search_exa', // Research Phase O
+    'mcp__Exa__get_code_context_exa', // Research Phase O
     'TaskUpdate',
     'TaskList',
     'TaskCreate',
@@ -103,16 +105,19 @@ LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: {...} });`,
 ### EVOLVE Phase Details
 
 **E - Evaluate:**
+
 - Assess user request
 - Determine artifact type (agent/skill/workflow/hook/template/schema)
 - Check if capability already exists
 
 **V - Validate:**
+
 - Confirm request is legitimate
 - Check for duplicate/conflicting artifacts
 - Verify naming conventions
 
 **O - Obtain (Research):**
+
 - **MANDATORY:** Execute minimum 3 Exa/WebSearch queries
 - Consult minimum 3 external sources
 - Generate research report
@@ -120,18 +125,21 @@ LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: {...} });`,
 - **Enforced by:** `research-enforcement.cjs`
 
 **L - Lock:**
+
 - Create artifact files
 - Update CLAUDE.md routing references
 - Update catalogs/registries
 - Assign artifact to relevant agents
 
 **V - Verify:**
+
 - Validate artifact structure
 - Run schema validation
 - Test artifact functionality
 - Verify integration
 
 **E - Enable & Monitor:**
+
 - Enable artifact for production use
 - Monitor usage and errors
 - Record learnings in memory
@@ -166,10 +174,10 @@ LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: {...} });`,
 
 ## Design Decisions
 
-| Decision | Rationale | Alternatives Considered |
-|----------|-----------|-------------------------|
-| <decision 1> | <why> | <alternatives> |
-| <decision 2> | <why> | <alternatives> |
+| Decision     | Rationale | Alternatives Considered |
+| ------------ | --------- | ----------------------- |
+| <decision 1> | <why>     | <alternatives>          |
+| <decision 2> | <why>     | <alternatives>          |
 
 ## Recommendations
 

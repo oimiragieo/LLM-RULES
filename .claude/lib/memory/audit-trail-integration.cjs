@@ -192,7 +192,9 @@ function logModelSelection(agentId, configuredModel, actualModel, source, option
   const { projectRoot = process.cwd(), tokens = DEFAULT_TOKENS_PER_SPAWN } = options;
 
   const mismatch = configuredModel !== actualModel;
-  const costDifference = mismatch ? calculateCostDifference(configuredModel, actualModel, tokens) : null;
+  const costDifference = mismatch
+    ? calculateCostDifference(configuredModel, actualModel, tokens)
+    : null;
 
   const event = {
     event: 'ConfigModelSelection',
@@ -213,11 +215,13 @@ function logModelSelection(agentId, configuredModel, actualModel, source, option
     fs.appendFileSync(logPath, JSON.stringify(event) + '\n');
   } catch (_e) {
     // Best effort - don't fail if logging fails
-    process.stderr.write(JSON.stringify({
-      hook: 'audit-trail-integration',
-      event: 'log_error',
-      error: _e.message,
-    }) + '\n');
+    process.stderr.write(
+      JSON.stringify({
+        hook: 'audit-trail-integration',
+        event: 'log_error',
+        error: _e.message,
+      }) + '\n'
+    );
   }
 
   // Also write to stderr for immediate visibility
@@ -324,9 +328,10 @@ function generateDriftReport(options = {}) {
   } = options;
 
   const allEvents = parseAuditLog(projectRoot);
-  const todayEvents = date === new Date().toISOString().split('T')[0]
-    ? filterToday(allEvents)
-    : allEvents.filter(e => e.timestamp && e.timestamp.startsWith(date));
+  const todayEvents =
+    date === new Date().toISOString().split('T')[0]
+      ? filterToday(allEvents)
+      : allEvents.filter(e => e.timestamp && e.timestamp.startsWith(date));
 
   const mismatches = todayEvents.filter(e => e.mismatch);
   const totalCostImpact = calculateTotalCostImpact(mismatches);
@@ -337,9 +342,10 @@ function generateDriftReport(options = {}) {
     summary: {
       totalSpawns: todayEvents.length,
       mismatches: mismatches.length,
-      mismatchRate: todayEvents.length > 0
-        ? (mismatches.length / todayEvents.length * 100).toFixed(2) + '%'
-        : '0%',
+      mismatchRate:
+        todayEvents.length > 0
+          ? ((mismatches.length / todayEvents.length) * 100).toFixed(2) + '%'
+          : '0%',
       totalCostImpact: '$' + totalCostImpact.toFixed(4),
       alertTriggered: Math.abs(totalCostImpact) > alertThreshold,
     },
@@ -350,9 +356,10 @@ function generateDriftReport(options = {}) {
       configured_model: e.configured_model,
       actual_model: e.actual_model,
       source: e.source,
-      cost_difference: e.cost_difference !== null && e.cost_difference !== undefined
-        ? '$' + e.cost_difference.toFixed(4)
-        : 'N/A',
+      cost_difference:
+        e.cost_difference !== null && e.cost_difference !== undefined
+          ? '$' + e.cost_difference.toFixed(4)
+          : 'N/A',
     })),
   };
 

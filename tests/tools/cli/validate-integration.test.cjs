@@ -7,7 +7,10 @@
 
 'use strict';
 
-const { validateArtifact, getRecentArtifacts } = require('../../../.claude/tools/cli/validate-integration.cjs');
+const {
+  validateArtifact,
+  getRecentArtifacts,
+} = require('../../../.claude/tools/cli/validate-integration.cjs');
 
 describe('validate-integration', () => {
   describe('validateArtifact', () => {

@@ -19,6 +19,7 @@ Complete guide to TaskUpdate protocol, iron laws, verification patterns, agent r
 Use `TaskCreate`/`TaskList`/`TaskUpdate` for trackable progress.
 
 **Iron Laws:**
+
 - Never complete without summary
 - Always update on discovery
 - Always TaskList after completion
@@ -29,7 +30,7 @@ Use `TaskCreate`/`TaskList`/`TaskUpdate` for trackable progress.
 TaskCreate({
   subject: 'Phase 1.1: Backup tdd skill',
   description: 'Copy .claude/skills/tdd to .claude.archive/',
-  activeForm: 'Backing up tdd skill'
+  activeForm: 'Backing up tdd skill',
 });
 
 TaskUpdate({ taskId: '2', addBlockedBy: ['1'] });
@@ -43,8 +44,8 @@ TaskUpdate({
   status: 'completed',
   metadata: {
     summary: 'Backed up tdd skill successfully',
-    filesModified: ['.claude.archive/skills/tdd/SKILL.md']
-  }
+    filesModified: ['.claude.archive/skills/tdd/SKILL.md'],
+  },
 });
 ```
 
@@ -111,11 +112,13 @@ After spawning agents, Router should:
 ### Enforcement Hooks
 
 **Pre-spawn hook:** `.claude/hooks/routing/pre-spawn-task-validator.cjs`
+
 - Blocks spawn without TaskCreate
 - Validates task ID in spawn prompt
 - Default: `block`
 
 **Post-spawn hook:** `.claude/hooks/routing/post-spawn-task-updater.cjs`
+
 - Detects tasks not updated after 1 hour
 - Auto-escalates stuck tasks
 - Logs to audit trail

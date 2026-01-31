@@ -130,10 +130,7 @@ function parseAgentFromConfig(content, agentType) {
 
     // Find the specific agent block
     // Pattern: "  agentType:\n    key: value\n    key: value\n"
-    const agentPattern = new RegExp(
-      `^[ \\t]*${agentType}:\\s*\\n((?:[ \\t]+[^\\n]+\\n)+)`,
-      'm'
-    );
+    const agentPattern = new RegExp(`^[ \\t]*${agentType}:\\s*\\n((?:[ \\t]+[^\\n]+\\n)+)`, 'm');
     const agentMatch = agentsSection.match(agentPattern);
 
     if (!agentMatch) {
@@ -227,13 +224,7 @@ function getModelFromFrontmatter(agentType, projectRoot) {
   try {
     // Search all agent categories
     for (const category of AGENT_CATEGORIES) {
-      const agentPath = path.join(
-        projectRoot,
-        '.claude',
-        'agents',
-        category,
-        `${agentType}.md`
-      );
+      const agentPath = path.join(projectRoot, '.claude', 'agents', category, `${agentType}.md`);
 
       if (fs.existsSync(agentPath)) {
         const content = fs.readFileSync(agentPath, 'utf8');

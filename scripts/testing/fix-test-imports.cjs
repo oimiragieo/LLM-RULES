@@ -37,7 +37,10 @@ const IMPORT_FIXES = [
       // ../../lib/X -> ../../.claude/lib/X (for tests that moved from .claude/lib/X to tests/lib/X)
       { from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" },
       // ../X (sibling in .claude/lib/) -> ../../../.claude/lib/X
-      { from: /require\(['"]\.\.\/([a-z0-9-]+\.cjs)['"](?=[),;\s])/g, to: "require('../../../.claude/lib/$1'" },
+      {
+        from: /require\(['"]\.\.\/([a-z0-9-]+\.cjs)['"](?=[),;\s])/g,
+        to: "require('../../../.claude/lib/$1'",
+      },
       // ./X (same dir in .claude/lib/category/) -> ../../../.claude/lib/category/X
       // This needs to be context-aware, handled separately
     ],
@@ -45,9 +48,7 @@ const IMPORT_FIXES = [
   // tests/workflows/**/*.test.cjs
   {
     testDir: 'tests/workflows',
-    patterns: [
-      { from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" },
-    ],
+    patterns: [{ from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" }],
   },
   // tests/tools/**/*.test.cjs
   {
@@ -60,45 +61,43 @@ const IMPORT_FIXES = [
   // tests/agents/**/*.test.cjs
   {
     testDir: 'tests/agents',
-    patterns: [
-      { from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" },
-    ],
+    patterns: [{ from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" }],
   },
   // tests/schemas/*.test.cjs
   {
     testDir: 'tests/schemas',
     patterns: [
       { from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" },
-      { from: /require\(['"]\.\.\/([a-z0-9-]+\.schema\.json)/g, to: "require('../../.claude/schemas/$1" },
+      {
+        from: /require\(['"]\.\.\/([a-z0-9-]+\.schema\.json)/g,
+        to: "require('../../.claude/schemas/$1",
+      },
     ],
   },
   // tests/skills/*.test.cjs
   {
     testDir: 'tests/skills',
-    patterns: [
-      { from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" },
-    ],
+    patterns: [{ from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" }],
   },
   // tests/templates/*.test.cjs
   {
     testDir: 'tests/templates',
-    patterns: [
-      { from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" },
-    ],
+    patterns: [{ from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" }],
   },
   // tests/artifacts/*.test.cjs
   {
     testDir: 'tests/artifacts',
-    patterns: [
-      { from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" },
-    ],
+    patterns: [{ from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" }],
   },
   // tests/misc/*.test.cjs
   {
     testDir: 'tests/misc',
     patterns: [
       { from: /require\(['"]\.\.\/\.\.\/lib\//g, to: "require('../../.claude/lib/" },
-      { from: /require\(['"]\.\.\/([a-z0-9-]+\.cjs)['"](?=[),;\s])/g, to: "require('../../.claude/lib/$1'" },
+      {
+        from: /require\(['"]\.\.\/([a-z0-9-]+\.cjs)['"](?=[),;\s])/g,
+        to: "require('../../.claude/lib/$1'",
+      },
     ],
   },
 ];
@@ -112,7 +111,10 @@ function findTestFiles(dir, files = []) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       findTestFiles(fullPath, files);
-    } else if (entry.isFile() && (entry.name.endsWith('.test.cjs') || entry.name.endsWith('.test.mjs'))) {
+    } else if (
+      entry.isFile() &&
+      (entry.name.endsWith('.test.cjs') || entry.name.endsWith('.test.mjs'))
+    ) {
       files.push(fullPath);
     }
   }

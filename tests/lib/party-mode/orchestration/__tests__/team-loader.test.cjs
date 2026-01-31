@@ -18,7 +18,11 @@ const TEAMS_DIR = path.join(PROJECT_ROOT, '.claude', 'teams');
 const TEST_TEAM_PATH = path.join(TEAMS_DIR, 'test-team-loader.csv');
 
 // Import module under test (will fail initially - expected for RED phase)
-const { loadTeam, validateTeamDefinition, getTeamList } = require('../../../.claude/lib/team-loader.cjs');
+const {
+  loadTeam,
+  validateTeamDefinition,
+  getTeamList,
+} = require('../../../.claude/lib/team-loader.cjs');
 
 describe('Team Loader', () => {
   // Setup: Create test team CSV

@@ -67,7 +67,10 @@ function assertFalse(value, message) {
 console.log('\n=== bash-command-validator.cjs tests ===\n');
 
 // Import the module under test
-const { extractCommand, formatBlockedMessage } = require('../../.claude/hooks/safety/bash-command-validator.cjs');
+const {
+  extractCommand,
+  formatBlockedMessage,
+} = require('../../.claude/hooks/safety/bash-command-validator.cjs');
 
 // Import the registry for integration tests
 const {

@@ -69,7 +69,9 @@ if (require.main === module) {
           fs.writeFileSync(learningsPath, content);
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { checkAndArchiveLearnings } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            checkAndArchiveLearnings,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
           const result = checkAndArchiveLearnings(TEST_PROJECT_ROOT);
 
           assert.strictEqual(result.archived, false, 'Should not archive under threshold');
@@ -93,7 +95,9 @@ if (require.main === module) {
           fs.writeFileSync(learningsPath, content);
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { checkAndArchiveLearnings } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            checkAndArchiveLearnings,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
           const result = checkAndArchiveLearnings(TEST_PROJECT_ROOT);
 
           assert.strictEqual(result.archived, true, 'Should archive over threshold');
@@ -122,7 +126,9 @@ if (require.main === module) {
           fs.writeFileSync(learningsPath, content);
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { checkAndArchiveLearnings } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            checkAndArchiveLearnings,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
           checkAndArchiveLearnings(TEST_PROJECT_ROOT);
 
           const newContent = fs.readFileSync(learningsPath, 'utf8');
@@ -148,7 +154,9 @@ if (require.main === module) {
           fs.writeFileSync(learningsPath, lines.join('\n'));
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { checkAndArchiveLearnings } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            checkAndArchiveLearnings,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
           const result = checkAndArchiveLearnings(TEST_PROJECT_ROOT);
 
           assert(result.archivedBytes > 0, 'Should report archived bytes');
@@ -682,7 +690,9 @@ if (require.main === module) {
           );
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { loadMemoryForContextAsync } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            loadMemoryForContextAsync,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
           const memory = await loadMemoryForContextAsync(TEST_PROJECT_ROOT);
 
@@ -697,7 +707,9 @@ if (require.main === module) {
         setupTestDir();
         try {
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { loadMemoryForContextAsync } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            loadMemoryForContextAsync,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
           // Memory dir exists but no files
           const memory = await loadMemoryForContextAsync(TEST_PROJECT_ROOT);
@@ -829,7 +841,10 @@ if (require.main === module) {
         setupTestDir();
         try {
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { recordGotchaAsync, recordPatternAsync } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            recordGotchaAsync,
+            recordPatternAsync,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
           // Path clearly outside PROJECT_ROOT
           const outsidePath = process.platform === 'win32' ? 'C:\\Windows\\Temp' : '/tmp';
@@ -861,7 +876,9 @@ if (require.main === module) {
           fs.writeFileSync(gotchasFile, '{ invalid json content');
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { loadMemoryForContext } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            loadMemoryForContext,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
           // Should not throw, should return empty gotchas
           const memory = loadMemoryForContext(TEST_PROJECT_ROOT);
@@ -883,7 +900,9 @@ if (require.main === module) {
           fs.writeFileSync(patternsFile, 'not valid json [');
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { loadMemoryForContext } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            loadMemoryForContext,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
           // Should not throw, should return empty patterns
           const memory = loadMemoryForContext(TEST_PROJECT_ROOT);
@@ -905,7 +924,9 @@ if (require.main === module) {
           fs.writeFileSync(mapFile, '{ "discovered_files": ');
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { loadMemoryForContext } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            loadMemoryForContext,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
           // Should not throw, should return empty discoveries
           const memory = loadMemoryForContext(TEST_PROJECT_ROOT);
@@ -927,7 +948,9 @@ if (require.main === module) {
           fs.writeFileSync(sessionFile, '{ broken json');
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { loadMemoryForContext } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            loadMemoryForContext,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
           // Should not throw, should return empty sessions
           const memory = loadMemoryForContext(TEST_PROJECT_ROOT);
@@ -1096,7 +1119,9 @@ if (require.main === module) {
           fs.writeFileSync(path.join(MEMORY_DIR, 'codebase_map.json'), 'not json');
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { loadMemoryForContextAsync } = require('../../../.claude/lib/memory/memory-manager.cjs');
+          const {
+            loadMemoryForContextAsync,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
           // Should not throw, should return empty arrays
           const memory = await loadMemoryForContextAsync(TEST_PROJECT_ROOT);

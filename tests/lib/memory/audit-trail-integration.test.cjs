@@ -206,7 +206,7 @@ describe('audit-trail-integration', () => {
     beforeEach(() => {
       stderrOutput = '';
       originalStderr = process.stderr.write;
-      process.stderr.write = (chunk) => {
+      process.stderr.write = chunk => {
         stderrOutput += chunk;
         return true;
       };
@@ -224,7 +224,9 @@ describe('audit-trail-integration', () => {
     });
 
     it('should return complete event object', () => {
-      const event = logModelSelection('planner', 'opus', 'sonnet', 'config.yaml', { projectRoot: PROJECT_ROOT });
+      const event = logModelSelection('planner', 'opus', 'sonnet', 'config.yaml', {
+        projectRoot: PROJECT_ROOT,
+      });
 
       assert.strictEqual(event.event, 'ConfigModelSelection');
       assert.strictEqual(event.agent_id, 'planner');
@@ -237,17 +239,23 @@ describe('audit-trail-integration', () => {
     });
 
     it('should set mismatch false when models match', () => {
-      const event = logModelSelection('developer', 'sonnet', 'sonnet', 'config.yaml', { projectRoot: PROJECT_ROOT });
+      const event = logModelSelection('developer', 'sonnet', 'sonnet', 'config.yaml', {
+        projectRoot: PROJECT_ROOT,
+      });
 
       assert.strictEqual(event.mismatch, false);
       assert.strictEqual(event.cost_difference, null);
     });
 
     it('should include complexity in event', () => {
-      const event = logModelSelection('planner', 'opus', 'opus', 'config.yaml', { projectRoot: PROJECT_ROOT });
+      const event = logModelSelection('planner', 'opus', 'opus', 'config.yaml', {
+        projectRoot: PROJECT_ROOT,
+      });
       assert.strictEqual(event.complexity, 'high');
 
-      const event2 = logModelSelection('developer', 'sonnet', 'sonnet', 'config.yaml', { projectRoot: PROJECT_ROOT });
+      const event2 = logModelSelection('developer', 'sonnet', 'sonnet', 'config.yaml', {
+        projectRoot: PROJECT_ROOT,
+      });
       assert.strictEqual(event2.complexity, 'medium');
     });
   });
@@ -292,10 +300,11 @@ describe('audit-trail-integration', () => {
         fs.mkdirSync(TEST_LOG_DIR, { recursive: true });
       }
 
-      const lines = [
-        JSON.stringify({ event: 'ConfigModelSelection', agent_id: 'planner' }),
-        JSON.stringify({ event: 'OtherEvent', agent_id: 'developer' }),
-      ].join('\n') + '\n';
+      const lines =
+        [
+          JSON.stringify({ event: 'ConfigModelSelection', agent_id: 'planner' }),
+          JSON.stringify({ event: 'OtherEvent', agent_id: 'developer' }),
+        ].join('\n') + '\n';
 
       fs.writeFileSync(TEST_LOG_FILE, lines);
 
@@ -328,10 +337,30 @@ describe('audit-trail-integration', () => {
       const today = new Date().toISOString().split('T')[0];
 
       const events = [
-        { event: 'ConfigModelSelection', timestamp: `${today}T10:00:00Z`, agent_id: 'planner', mismatch: true },
-        { event: 'ConfigModelSelection', timestamp: `${today}T11:00:00Z`, agent_id: 'developer', mismatch: false },
-        { event: 'ConfigModelSelection', timestamp: `${today}T12:00:00Z`, agent_id: 'qa', mismatch: false },
-        { event: 'ConfigModelSelection', timestamp: `${today}T13:00:00Z`, agent_id: 'architect', mismatch: true },
+        {
+          event: 'ConfigModelSelection',
+          timestamp: `${today}T10:00:00Z`,
+          agent_id: 'planner',
+          mismatch: true,
+        },
+        {
+          event: 'ConfigModelSelection',
+          timestamp: `${today}T11:00:00Z`,
+          agent_id: 'developer',
+          mismatch: false,
+        },
+        {
+          event: 'ConfigModelSelection',
+          timestamp: `${today}T12:00:00Z`,
+          agent_id: 'qa',
+          mismatch: false,
+        },
+        {
+          event: 'ConfigModelSelection',
+          timestamp: `${today}T13:00:00Z`,
+          agent_id: 'architect',
+          mismatch: true,
+        },
       ];
 
       fs.writeFileSync(TEST_LOG_FILE, events.map(e => JSON.stringify(e)).join('\n') + '\n');
@@ -347,9 +376,30 @@ describe('audit-trail-integration', () => {
       const today = new Date().toISOString().split('T')[0];
 
       const events = [
-        { event: 'ConfigModelSelection', timestamp: `${today}T10:00:00Z`, agent_id: 'planner', configured_model: 'opus', source: 'config.yaml', mismatch: false },
-        { event: 'ConfigModelSelection', timestamp: `${today}T11:00:00Z`, agent_id: 'planner', configured_model: 'opus', source: 'config.yaml', mismatch: true },
-        { event: 'ConfigModelSelection', timestamp: `${today}T12:00:00Z`, agent_id: 'developer', configured_model: 'sonnet', source: 'frontmatter', mismatch: false },
+        {
+          event: 'ConfigModelSelection',
+          timestamp: `${today}T10:00:00Z`,
+          agent_id: 'planner',
+          configured_model: 'opus',
+          source: 'config.yaml',
+          mismatch: false,
+        },
+        {
+          event: 'ConfigModelSelection',
+          timestamp: `${today}T11:00:00Z`,
+          agent_id: 'planner',
+          configured_model: 'opus',
+          source: 'config.yaml',
+          mismatch: true,
+        },
+        {
+          event: 'ConfigModelSelection',
+          timestamp: `${today}T12:00:00Z`,
+          agent_id: 'developer',
+          configured_model: 'sonnet',
+          source: 'frontmatter',
+          mismatch: false,
+        },
       ];
 
       fs.writeFileSync(TEST_LOG_FILE, events.map(e => JSON.stringify(e)).join('\n') + '\n');
@@ -424,9 +474,7 @@ describe('audit-trail-integration', () => {
 
     it('should keep recent entries', () => {
       const today = new Date().toISOString();
-      const events = [
-        { event: 'ConfigModelSelection', timestamp: today, agent_id: 'planner' },
-      ];
+      const events = [{ event: 'ConfigModelSelection', timestamp: today, agent_id: 'planner' }];
 
       fs.writeFileSync(TEST_LOG_FILE, events.map(e => JSON.stringify(e)).join('\n') + '\n');
 

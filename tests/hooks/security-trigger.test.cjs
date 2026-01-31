@@ -836,7 +836,9 @@ test('exports SECURITY_CONTENT_PATTERNS array', () => {
 // These tests will FAIL until content pattern checking is implemented
 
 test('detects AWS_ACCESS_KEY in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   if (!detectSecuritySensitivityWithContent) {
     throw new Error('detectSecuritySensitivityWithContent not exported');
   }
@@ -845,7 +847,9 @@ test('detects AWS_ACCESS_KEY in content', () => {
 });
 
 test('detects AWS_SECRET in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent(
     'config.js',
     'const secret = AWS_SECRET_ACCESS_KEY'
@@ -854,7 +858,9 @@ test('detects AWS_SECRET in content', () => {
 });
 
 test('detects STRIPE_SECRET in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent(
     'payment.js',
     'const stripe = STRIPE_SECRET_KEY'
@@ -863,37 +869,49 @@ test('detects STRIPE_SECRET in content', () => {
 });
 
 test('detects OPENAI_API_KEY in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent('ai.js', 'process.env.OPENAI_API_KEY');
   assertTrue(result.isSensitive, 'Should detect OPENAI_API_KEY');
 });
 
 test('detects ANTHROPIC_API_KEY in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent('claude.js', 'ANTHROPIC_API_KEY = "sk-"');
   assertTrue(result.isSensitive, 'Should detect ANTHROPIC_API_KEY');
 });
 
 test('detects /webhook/ endpoint in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent('routes.js', 'app.post("/webhook/stripe")');
   assertTrue(result.isSensitive, 'Should detect /webhook/ endpoint');
 });
 
 test('detects /callback/ endpoint in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent('auth.js', 'router.get("/callback/oauth")');
   assertTrue(result.isSensitive, 'Should detect /callback/ endpoint');
 });
 
 test('detects /notify/ endpoint in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent('api.js', 'fetch("/notify/user")');
   assertTrue(result.isSensitive, 'Should detect /notify/ endpoint');
 });
 
 test('detects process.env. in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent(
     'config.js',
     'const dbUrl = process.env.DATABASE_URL'
@@ -902,7 +920,9 @@ test('detects process.env. in content', () => {
 });
 
 test('detects jwt.sign in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent(
     'auth.js',
     'const token = jwt.sign(payload, secret)'
@@ -911,7 +931,9 @@ test('detects jwt.sign in content', () => {
 });
 
 test('detects jwt.verify in content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent(
     'middleware.js',
     'const decoded = jwt.verify(token, secret)'
@@ -920,7 +942,9 @@ test('detects jwt.verify in content', () => {
 });
 
 test('does not detect safe content', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent(
     'util.js',
     'function formatDate(date) { return date.toISOString(); }'
@@ -929,7 +953,9 @@ test('does not detect safe content', () => {
 });
 
 test('content check combines with file path check', () => {
-  const { detectSecuritySensitivityWithContent } = require('../../.claude/hooks/safety/security-trigger.cjs');
+  const {
+    detectSecuritySensitivityWithContent,
+  } = require('../../.claude/hooks/safety/security-trigger.cjs');
   const result = detectSecuritySensitivityWithContent('auth.js', 'const key = AWS_ACCESS_KEY_ID');
   assertTrue(result.isSensitive, 'Should detect both file and content');
   assertGreaterThan(result.reasons.length, 1, 'Should have multiple reasons');

@@ -521,7 +521,9 @@ describe('module exports', () => {
 describe('MED-001: PROJECT_ROOT from shared utility', () => {
   it('exports PROJECT_ROOT that matches shared utility', () => {
     const { PROJECT_ROOT } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
-    const { PROJECT_ROOT: SHARED_PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
+    const {
+      PROJECT_ROOT: SHARED_PROJECT_ROOT,
+    } = require('../../.claude/lib/utils/project-root.cjs');
 
     assert.ok(PROJECT_ROOT, 'Should export PROJECT_ROOT');
     assert.strictEqual(

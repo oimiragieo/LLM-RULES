@@ -40,16 +40,17 @@ All environment-specific settings are managed through the `.env` file located at
 
 ### Enforcement Mode Variables
 
-| Variable                       | Values          | Default | Purpose                          |
-| ------------------------------ | --------------- | ------- | -------------------------------- |
-| `PLANNER_FIRST_ENFORCEMENT`    | block/warn/off  | block   | Enforce planner-first routing    |
-| `CREATOR_GUARD`                | block/warn/off  | block   | Enforce creator workflow (Gate 4)|
-| `SPAWN_PROMPT_VALIDATOR`       | block/warn/off  | warn    | Validate spawn prompts           |
-| `ROUTER_WRITE_GUARD`           | block/warn/off  | block   | Block router writes              |
-| `SECURITY_REVIEW_ENFORCEMENT`  | block/warn/off  | block   | Enforce security reviews         |
-| `RESEARCH_ENFORCEMENT`         | block/warn/off  | block   | Enforce research before creation |
+| Variable                      | Values         | Default | Purpose                           |
+| ----------------------------- | -------------- | ------- | --------------------------------- |
+| `PLANNER_FIRST_ENFORCEMENT`   | block/warn/off | block   | Enforce planner-first routing     |
+| `CREATOR_GUARD`               | block/warn/off | block   | Enforce creator workflow (Gate 4) |
+| `SPAWN_PROMPT_VALIDATOR`      | block/warn/off | warn    | Validate spawn prompts            |
+| `ROUTER_WRITE_GUARD`          | block/warn/off | block   | Block router writes               |
+| `SECURITY_REVIEW_ENFORCEMENT` | block/warn/off | block   | Enforce security reviews          |
+| `RESEARCH_ENFORCEMENT`        | block/warn/off | block   | Enforce research before creation  |
 
 **Enforcement Modes:**
+
 - `block` - Prevents action, throws error (production default)
 - `warn` - Logs warning but allows action (development)
 - `off` - Disables enforcement (dangerous, use sparingly)

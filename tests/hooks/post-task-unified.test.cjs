@@ -22,7 +22,7 @@ const originalExit = process.exit;
 const originalArgv = [...process.argv];
 
 // Mock process.exit to prevent test termination
-let exitCode = null;  
+let exitCode = null;
 process.exit = code => {
   exitCode = code;
 };

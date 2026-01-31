@@ -11,7 +11,7 @@ const os = require('os');
 
 // Hook will be implemented at: .claude/hooks/routing/pre-spawn-task-validator.cjs
 
-test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
+test('Pre-Spawn Task Validator - RED Phase Tests', async t => {
   let hookPath;
   let tempDir;
 
@@ -43,11 +43,11 @@ test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
       parameters: {
         subagent_type: 'developer',
         prompt: 'Implement feature X',
-        description: 'Developer implementing feature X'
+        description: 'Developer implementing feature X',
       },
       context: {
-        PROJECT_ROOT: tempDir
-      }
+        PROJECT_ROOT: tempDir,
+      },
     };
 
     const result = await hook.PreToolUse(mockInput);
@@ -60,25 +60,30 @@ test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
     const hook = require(hookPath);
     const taskFile = path.join(tempDir, '.claude/context/tasks.json');
     fs.mkdirSync(path.dirname(taskFile), { recursive: true });
-    fs.writeFileSync(taskFile, JSON.stringify({
-      tasks: [{
-        id: '72',
-        subject: 'Implement feature X',
-        status: 'pending',
-        description: 'Implement feature X with TDD'
-      }]
-    }));
+    fs.writeFileSync(
+      taskFile,
+      JSON.stringify({
+        tasks: [
+          {
+            id: '72',
+            subject: 'Implement feature X',
+            status: 'pending',
+            description: 'Implement feature X with TDD',
+          },
+        ],
+      })
+    );
 
     const mockInput = {
       tool: 'Task',
       parameters: {
         subagent_type: 'developer',
         prompt: 'You are implementing Task #72: Implement feature X',
-        description: 'Developer implementing feature X'
+        description: 'Developer implementing feature X',
       },
       context: {
-        PROJECT_ROOT: tempDir
-      }
+        PROJECT_ROOT: tempDir,
+      },
     };
 
     const result = await hook.PreToolUse(mockInput);
@@ -92,26 +97,29 @@ test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
     // Create tasks file for testing
     const taskFile = path.join(tempDir, '.claude/context/tasks.json');
     fs.mkdirSync(path.dirname(taskFile), { recursive: true });
-    fs.writeFileSync(taskFile, JSON.stringify({
-      tasks: [
-        { id: '72', subject: 'Test 1', status: 'pending' },
-        { id: '123', subject: 'Test 2', status: 'pending' },
-        { id: '456', subject: 'Test 3', status: 'pending' }
-      ]
-    }));
+    fs.writeFileSync(
+      taskFile,
+      JSON.stringify({
+        tasks: [
+          { id: '72', subject: 'Test 1', status: 'pending' },
+          { id: '123', subject: 'Test 2', status: 'pending' },
+          { id: '456', subject: 'Test 3', status: 'pending' },
+        ],
+      })
+    );
 
     const testCases = [
       { prompt: 'You are implementing Task #72', expectedId: '72', shouldPass: true },
       { prompt: 'Your Task ID: 123', expectedId: '123', shouldPass: true },
       { prompt: 'Working on task #456', expectedId: '456', shouldPass: true },
-      { prompt: 'No task ID here', expectedId: null, shouldPass: false }
+      { prompt: 'No task ID here', expectedId: null, shouldPass: false },
     ];
 
     for (const testCase of testCases) {
       const result = await hook.PreToolUse({
         tool: 'Task',
         parameters: { prompt: testCase.prompt },
-        context: { PROJECT_ROOT: tempDir }
+        context: { PROJECT_ROOT: tempDir },
       });
 
       if (testCase.shouldPass) {
@@ -130,11 +138,11 @@ test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
       parameters: {
         subagent_type: 'developer',
         prompt: 'Do some work',
-        description: 'Generic work'
+        description: 'Generic work',
       },
       context: {
-        PROJECT_ROOT: tempDir
-      }
+        PROJECT_ROOT: tempDir,
+      },
     };
 
     const result = await hook.PreToolUse(mockInput);
@@ -153,11 +161,11 @@ test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
       parameters: {
         subagent_type: 'developer',
         prompt: 'Task #72: Implement X',
-        description: 'Developer work'
+        description: 'Developer work',
       },
       context: {
-        PROJECT_ROOT: tempDir
-      }
+        PROJECT_ROOT: tempDir,
+      },
     };
 
     await hook.PreToolUse(mockInput);
@@ -182,11 +190,11 @@ test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
       parameters: {
         subagent_type: 'developer',
         prompt: 'Task #72: Work',
-        description: 'Work'
+        description: 'Work',
       },
       context: {
-        PROJECT_ROOT: tempDir
-      }
+        PROJECT_ROOT: tempDir,
+      },
     };
 
     const result = await hook.PreToolUse(mockInput);
@@ -204,11 +212,11 @@ test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
       parameters: {
         subagent_type: 'developer',
         prompt: 'Work without task',
-        description: 'Emergency work'
+        description: 'Emergency work',
       },
       context: {
-        PROJECT_ROOT: tempDir
-      }
+        PROJECT_ROOT: tempDir,
+      },
     };
 
     const result = await hook.PreToolUse(mockInput);
@@ -225,13 +233,13 @@ test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
       { tool: 'Read', parameters: { file_path: 'test.js' } },
       { tool: 'Write', parameters: { file_path: 'test.js', content: 'x' } },
       { tool: 'Bash', parameters: { command: 'ls' } },
-      { tool: 'TaskCreate', parameters: { subject: 'New task' } }
+      { tool: 'TaskCreate', parameters: { subject: 'New task' } },
     ];
 
     for (const toolCall of nonTaskTools) {
       const result = await hook.PreToolUse({
         ...toolCall,
-        context: { PROJECT_ROOT: tempDir }
+        context: { PROJECT_ROOT: tempDir },
       });
       assert.strictEqual(result.allowed, true, `${toolCall.tool} should be allowed immediately`);
     }
@@ -242,24 +250,29 @@ test('Pre-Spawn Task Validator - RED Phase Tests', async (t) => {
     const hook = require(hookPath);
     const taskFile = path.join(tempDir, '.claude/context/tasks.json');
     fs.mkdirSync(path.dirname(taskFile), { recursive: true });
-    fs.writeFileSync(taskFile, JSON.stringify({
-      tasks: [{
-        id: '72',
-        subject: 'Implement authentication feature',
-        status: 'pending',
-        description: 'Add JWT auth to API'
-      }]
-    }));
+    fs.writeFileSync(
+      taskFile,
+      JSON.stringify({
+        tasks: [
+          {
+            id: '72',
+            subject: 'Implement authentication feature',
+            status: 'pending',
+            description: 'Add JWT auth to API',
+          },
+        ],
+      })
+    );
 
     const mockInput = {
       tool: 'Task',
       parameters: {
         prompt: 'You are implementing authentication with JWT for the API',
-        description: 'Implement authentication feature with JWT for API' // Better keyword match
+        description: 'Implement authentication feature with JWT for API', // Better keyword match
       },
       context: {
-        PROJECT_ROOT: tempDir
-      }
+        PROJECT_ROOT: tempDir,
+      },
     };
 
     const result = await hook.PreToolUse(mockInput);

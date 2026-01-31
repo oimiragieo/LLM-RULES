@@ -27,7 +27,9 @@ describe('error-summary-extractor', () => {
     fs.mkdirSync(errorSummariesDir, { recursive: true });
 
     // Clear module cache
-    delete require.cache[require.resolve('../../.claude/hooks/reflection/error-summary-extractor.cjs')];
+    delete require.cache[
+      require.resolve('../../.claude/hooks/reflection/error-summary-extractor.cjs')
+    ];
     extractor = require('../../.claude/hooks/reflection/error-summary-extractor.cjs');
 
     // Set test directories

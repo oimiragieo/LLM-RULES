@@ -68,12 +68,14 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | System routing                                                             | `router`                     | `.claude/agents/core/router.md` (Meta)                   |
 
 **Agent Categories:**
+
 - **Core agents:** `.claude/agents/core/`
 - **Specialized agents:** `.claude/agents/specialized/`
 - **Domain agents:** `.claude/agents/domain/`
 - **Orchestrators:** `.claude/agents/orchestrators/`
 
 **Routing Logic Source of Truth:**
+
 - `.claude/hooks/routing/router-enforcer.cjs` (intentKeywords, INTENT_TO_AGENT, DISAMBIGUATION_RULES)
 
 ---

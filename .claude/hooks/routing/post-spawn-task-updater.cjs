@@ -71,7 +71,7 @@ function logPostSpawnCheck(projectRoot, entry) {
   const line = JSON.stringify({
     timestamp: new Date().toISOString(),
     hook: 'post-spawn-task-updater',
-    ...entry
+    ...entry,
   });
 
   fs.appendFileSync(auditLog, line + '\n', 'utf8');
@@ -92,7 +92,7 @@ function logEscalation(projectRoot, escalation) {
 
   const line = JSON.stringify({
     timestamp: new Date().toISOString(),
-    ...escalation
+    ...escalation,
   });
 
   fs.appendFileSync(escalationLog, line + '\n', 'utf8');
@@ -130,7 +130,7 @@ async function PostToolUse(input) {
     logPostSpawnCheck(projectRoot, {
       event: 'no-task-id',
       prompt: prompt.substring(0, 100),
-      warning: 'Spawn completed without task ID in prompt'
+      warning: 'Spawn completed without task ID in prompt',
     });
     return { allowed: true, warnings: ['Spawn without task ID'] };
   }
@@ -148,7 +148,7 @@ async function PostToolUse(input) {
     logPostSpawnCheck(projectRoot, {
       event: 'task-not-found',
       taskId,
-      warning: `Task #${taskId} not found after spawn`
+      warning: `Task #${taskId} not found after spawn`,
     });
     return { allowed: true, warnings: [`Task #${taskId} not found`] };
   }
@@ -173,7 +173,7 @@ async function PostToolUse(input) {
         status: task.status,
         durationMs: duration,
         durationMinutes,
-        reason: 'Task in_progress for >1 hour without completion'
+        reason: 'Task in_progress for >1 hour without completion',
       });
       warnings.push(`ESCALATED: Task #${taskId} >1 hour without completion`);
     }
@@ -184,7 +184,7 @@ async function PostToolUse(input) {
       subject: task.subject,
       status: task.status,
       durationMinutes,
-      warning
+      warning,
     });
 
     return { allowed: true, warnings };
@@ -195,7 +195,7 @@ async function PostToolUse(input) {
     event: 'task-completed',
     taskId: task.id,
     status: task.status,
-    result: 'Task properly updated'
+    result: 'Task properly updated',
   });
 
   return { allowed: true };

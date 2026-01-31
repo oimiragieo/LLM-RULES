@@ -116,7 +116,10 @@ function findTestFiles(dir, files = []) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       findTestFiles(fullPath, files);
-    } else if (entry.isFile() && (entry.name.endsWith('.test.cjs') || entry.name.endsWith('.test.mjs'))) {
+    } else if (
+      entry.isFile() &&
+      (entry.name.endsWith('.test.cjs') || entry.name.endsWith('.test.mjs'))
+    ) {
       files.push(fullPath);
     }
   }
@@ -145,23 +148,29 @@ function fixFileImports(filePath) {
     });
 
     // Fix require('./validators/xxx.cjs') patterns
-    content = content.replace(/require\(['"]\.\/validators\/([a-z0-9-]+\.cjs)['"]\)/g, (match, filename) => {
-      const key = `validators/${filename}`;
-      if (mapping[key]) {
-        modified = true;
-        return `require('../../${mapping[key]}')`;
+    content = content.replace(
+      /require\(['"]\.\/validators\/([a-z0-9-]+\.cjs)['"]\)/g,
+      (match, filename) => {
+        const key = `validators/${filename}`;
+        if (mapping[key]) {
+          modified = true;
+          return `require('../../${mapping[key]}')`;
+        }
+        return match;
       }
-      return match;
-    });
+    );
 
     // Fix require.resolve('./xxx.cjs') patterns
-    content = content.replace(/require\.resolve\(['"]\.\/([a-z0-9-]+\.cjs)['"]\)/g, (match, filename) => {
-      if (mapping[filename]) {
-        modified = true;
-        return `require.resolve('../../${mapping[filename]}')`;
+    content = content.replace(
+      /require\.resolve\(['"]\.\/([a-z0-9-]+\.cjs)['"]\)/g,
+      (match, filename) => {
+        if (mapping[filename]) {
+          modified = true;
+          return `require.resolve('../../${mapping[filename]}')`;
+        }
+        return match;
       }
-      return match;
-    });
+    );
   }
 
   if (modified && !DRY_RUN) {

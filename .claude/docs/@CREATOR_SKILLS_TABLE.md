@@ -33,6 +33,7 @@ Complete mapping of creator skills invoked via `Skill()` tool for creating new a
 **ALWAYS invoke `research-synthesis` BEFORE any other creator skill.**
 
 This ensures:
+
 - Minimum 3 Exa/WebSearch queries executed
 - Minimum 3 external sources consulted
 - Research report generated + saved
@@ -47,7 +48,7 @@ Skill({ skill: 'research-synthesis' });
 Skill({ skill: 'skill-creator' });
 
 // WRONG: Direct creator invocation
-Skill({ skill: 'skill-creator' });  // Missing research phase
+Skill({ skill: 'skill-creator' }); // Missing research phase
 ```
 
 ### Enforcement

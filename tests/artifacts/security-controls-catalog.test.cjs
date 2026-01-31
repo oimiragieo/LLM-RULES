@@ -93,7 +93,8 @@ try {
 
   assert.ok(content.includes('SEC-REGISTRY-002'), 'Should document SEC-REGISTRY-002');
   assert.ok(
-    content.toLowerCase().includes('security-architect') || content.toLowerCase().includes('security review'),
+    content.toLowerCase().includes('security-architect') ||
+      content.toLowerCase().includes('security review'),
     'Should describe security-architect review requirement'
   );
 
@@ -138,8 +139,10 @@ try {
 
   // At least one example of input/expected output
   assert.ok(
-    content.includes('input:') || content.includes('Input:') ||
-    content.includes('expect') || content.includes('Expect'),
+    content.includes('input:') ||
+      content.includes('Input:') ||
+      content.includes('expect') ||
+      content.includes('Expect'),
     'Should have test input/expected output examples'
   );
 
@@ -156,7 +159,9 @@ try {
 
   // Check for file references
   assert.ok(
-    content.includes('.claude/') || content.includes('template-renderer') || content.includes('checklist-generator'),
+    content.includes('.claude/') ||
+      content.includes('template-renderer') ||
+      content.includes('checklist-generator'),
     'Should reference file locations where controls are implemented'
   );
 

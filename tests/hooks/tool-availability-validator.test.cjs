@@ -14,7 +14,11 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
-const { validateTools, checkMCPServers, CORE_TOOLS } = require('../../.claude/hooks/routing/tool-availability-validator.cjs');
+const {
+  validateTools,
+  checkMCPServers,
+  CORE_TOOLS,
+} = require('../../.claude/hooks/routing/tool-availability-validator.cjs');
 
 // Test 1: Core tools should be allowed
 test('validateTools: core tools are allowed', () => {
