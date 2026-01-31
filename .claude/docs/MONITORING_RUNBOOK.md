@@ -23,11 +23,13 @@
 This runbook provides operational procedures for monitoring and responding to alerts in the Phase 4-5 production environment.
 
 **Monitoring Scope:**
+
 - Phase 5 ML Features (Pattern Detection, Cost Prediction, Adaptive Execution)
 - Phase 4 Advanced Workflows (SPEC-017 through SPEC-022)
 - System Health (Memory, Concurrency, Error Rate)
 
 **Alert Levels:**
+
 - **INFO:** Informational, no action required
 - **WARNING:** Potential issue, monitor closely
 - **CRITICAL:** Immediate action required
@@ -41,11 +43,13 @@ This runbook provides operational procedures for monitoring and responding to al
 #### 1.1 Heap Usage WARNING (70% threshold)
 
 **Alert:**
+
 ```
 Heap usage WARNING: 72.3% (2890 MB / 4000 MB)
 ```
 
 **Cause:**
+
 - High concurrent workflow count
 - Memory leak in long-running process
 - Large workflow state accumulation
@@ -53,6 +57,7 @@ Heap usage WARNING: 72.3% (2890 MB / 4000 MB)
 **Response Procedure:**
 
 1. **Check current load** (30 seconds)
+
    ```bash
    # Check concurrent workflow count
    curl http://localhost:3000/api/health/concurrency
@@ -77,11 +82,13 @@ Heap usage WARNING: 72.3% (2890 MB / 4000 MB)
 #### 1.2 Heap Usage CRITICAL (85% threshold)
 
 **Alert:**
+
 ```
 Heap usage CRITICAL: 87.1% (3484 MB / 4000 MB)
 ```
 
 **Cause:**
+
 - Memory leak reached critical levels
 - Sustained high load exceeding capacity
 - Bounded collections not working
@@ -89,6 +96,7 @@ Heap usage CRITICAL: 87.1% (3484 MB / 4000 MB)
 **Response Procedure:**
 
 1. **Immediate action** (0-2 minutes)
+
    ```bash
    # Scale horizontally (add worker)
    pm2 scale agent-studio +1
@@ -98,6 +106,7 @@ Heap usage CRITICAL: 87.1% (3484 MB / 4000 MB)
    ```
 
 2. **Capture heap snapshot** (before restart)
+
    ```bash
    # Save heap dump for analysis
    kill -USR2 <pid>
@@ -105,6 +114,7 @@ Heap usage CRITICAL: 87.1% (3484 MB / 4000 MB)
    ```
 
 3. **Verify recovery** (2-5 minutes)
+
    ```bash
    # Check heap after restart
    curl http://localhost:3000/api/health/memory
@@ -124,11 +134,13 @@ Heap usage CRITICAL: 87.1% (3484 MB / 4000 MB)
 #### 2.1 Pattern Detection Latency WARNING (>10ms)
 
 **Alert:**
+
 ```
 patternDetection latency WARNING: 12ms (threshold: 10ms)
 ```
 
 **Cause:**
+
 - Large workflow history (>1000 workflows)
 - Combinatorial explosion (too many patterns)
 - Disk I/O bottleneck (pattern library persistence)
@@ -136,6 +148,7 @@ patternDetection latency WARNING: 12ms (threshold: 10ms)
 **Response Procedure:**
 
 1. **Check pattern library size** (1 minute)
+
    ```bash
    # Check pattern file size
    ls -lh .claude/lib/ml/patterns.json
@@ -162,11 +175,13 @@ patternDetection latency WARNING: 12ms (threshold: 10ms)
 #### 2.2 Pattern Detection Latency CRITICAL (>100ms)
 
 **Alert:**
+
 ```
 patternDetection latency CRITICAL: 127ms (threshold: 100ms)
 ```
 
 **Cause:**
+
 - Pattern library corrupted
 - Disk I/O failure
 - CPU overload
@@ -174,12 +189,14 @@ patternDetection latency CRITICAL: 127ms (threshold: 100ms)
 **Response Procedure:**
 
 1. **Disable feature immediately** (30 seconds)
+
    ```bash
    export PATTERN_DETECTION_ENABLED=false
    pm2 restart agent-studio
    ```
 
 2. **Verify degradation** (1 minute)
+
    ```bash
    # System should work without pattern detection
    curl http://localhost:3000/api/health/features | jq '.ml.patternDetection'
@@ -200,11 +217,13 @@ patternDetection latency CRITICAL: 127ms (threshold: 100ms)
 #### 3.1 Error Rate WARNING (>0.1%)
 
 **Alert:**
+
 ```
 Error rate WARNING: 0.15% (15/10000 in 60s)
 ```
 
 **Cause:**
+
 - Transient network issues
 - Flaky tests in production (edge case)
 - External dependency failure
@@ -212,6 +231,7 @@ Error rate WARNING: 0.15% (15/10000 in 60s)
 **Response Procedure:**
 
 1. **Check error logs** (2 minutes)
+
    ```bash
    # Recent errors
    tail -n 100 /var/log/agent-studio/app.log | grep ERROR
@@ -232,11 +252,13 @@ Error rate WARNING: 0.15% (15/10000 in 60s)
 #### 3.2 Error Rate CRITICAL (>1%)
 
 **Alert:**
+
 ```
 Error rate CRITICAL: 2.34% (234/10000 in 60s)
 ```
 
 **Cause:**
+
 - Recent deployment introduced bug
 - External dependency failed
 - Database connection issues
@@ -244,6 +266,7 @@ Error rate CRITICAL: 2.34% (234/10000 in 60s)
 **Response Procedure:**
 
 1. **Immediate rollback decision** (2 minutes)
+
    ```bash
    # Check deployment timestamp
    git log --oneline -1
@@ -253,6 +276,7 @@ Error rate CRITICAL: 2.34% (234/10000 in 60s)
    ```
 
 2. **Execute rollback** (if recent deployment)
+
    ```bash
    # Rollback to previous version
    git revert HEAD
@@ -260,6 +284,7 @@ Error rate CRITICAL: 2.34% (234/10000 in 60s)
    ```
 
 3. **Disable failing feature** (if specific feature)
+
    ```bash
    # Example: Disable Phase 4 SPEC-019 if that's failing
    export SPEC_019_ENABLED=false
@@ -280,11 +305,13 @@ Error rate CRITICAL: 2.34% (234/10000 in 60s)
 #### 4.1 Concurrent Workflows WARNING (>150)
 
 **Alert:**
+
 ```
 Concurrent workflows WARNING: 163 (threshold: 150)
 ```
 
 **Cause:**
+
 - Traffic spike (legitimate)
 - Slow workflow execution (backlog building)
 - Stuck workflows (not completing)
@@ -292,6 +319,7 @@ Concurrent workflows WARNING: 163 (threshold: 150)
 **Response Procedure:**
 
 1. **Check workflow completion rate** (2 minutes)
+
    ```bash
    # Check active workflows
    curl http://localhost:3000/api/health/workflows | jq '.active'
@@ -301,6 +329,7 @@ Concurrent workflows WARNING: 163 (threshold: 150)
    ```
 
 2. **Identify stuck workflows** (3 minutes)
+
    ```bash
    # Workflows in_progress for >1 hour
    grep "in_progress" .claude/context/workflow-state.json | jq '.duration'
@@ -317,11 +346,13 @@ Concurrent workflows WARNING: 163 (threshold: 150)
 #### 4.2 Concurrent Workflows CRITICAL (>200)
 
 **Alert:**
+
 ```
 Concurrent workflows CRITICAL: 237 (threshold: 200)
 ```
 
 **Cause:**
+
 - Sustained high traffic
 - Workflows not completing (deadlock)
 - System overload
@@ -329,12 +360,14 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 **Response Procedure:**
 
 1. **Scale horizontally immediately** (2 minutes)
+
    ```bash
    # Add 2 workers
    pm2 scale agent-studio +2
    ```
 
 2. **Enable load shedding** (if approaching 500)
+
    ```bash
    # Reject new workflows at 500 concurrent
    export LOAD_SHEDDING_ENABLED=true
@@ -358,18 +391,21 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 ### Key Metrics to Display
 
 **System Health Panel:**
+
 - Heap Usage (% of limit)
 - Concurrent Workflows (count)
 - Error Rate (% in last 5 minutes)
 - Request Throughput (requests/second)
 
 **ML Features Panel:**
+
 - Pattern Detection Latency (ms)
 - Cost Prediction Latency (ms)
 - Adaptive Executor Latency (ms)
 - ML Memory Overhead (MB)
 
 **Phase 4 Workflows Panel:**
+
 - Fan-Out Execution Latency (ms)
 - Workflow Composition Latency (ms)
 - Hybrid Execution Overhead (ms)
@@ -387,11 +423,11 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 
 ### Severity Levels
 
-| Severity   | Response Time | Escalation   | Example                        |
-|------------|---------------|--------------|--------------------------------|
-| **INFO**   | No SLA        | None         | Workflow completed in 2s       |
-| **WARNING**| 15 minutes    | On-call      | Heap 72% (approaching 85%)     |
-| **CRITICAL**| 5 minutes    | Immediate    | Heap 87%, error rate 2.3%      |
+| Severity     | Response Time | Escalation | Example                    |
+| ------------ | ------------- | ---------- | -------------------------- |
+| **INFO**     | No SLA        | None       | Workflow completed in 2s   |
+| **WARNING**  | 15 minutes    | On-call    | Heap 72% (approaching 85%) |
+| **CRITICAL** | 5 minutes     | Immediate  | Heap 87%, error rate 2.3%  |
 
 ### Incident Workflow
 
@@ -430,16 +466,19 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 ### Level 1: On-Call Engineer (Initial Response)
 
 **Responsibility:**
+
 - Acknowledge alert within 5 minutes
 - Execute runbook procedure
 - Attempt initial mitigation
 
 **Contact:**
+
 - Pagerduty: rotation schedule
 - Slack: #operations
 - Phone: +1-555-ON-CALL
 
 **Escalate If:**
+
 - Mitigation fails after 15 minutes
 - Multiple CRITICAL alerts simultaneously
 - Unclear root cause
@@ -449,16 +488,19 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 ### Level 2: Senior DevOps Engineer
 
 **Responsibility:**
+
 - Deep dive diagnostics
 - Complex mitigation (scaling, infrastructure changes)
 - Coordinate with other teams
 
 **Contact:**
+
 - Pagerduty: escalation policy
 - Slack: @devops-senior
 - Phone: +1-555-DEVOPS
 
 **Escalate If:**
+
 - Incident impacts >50% of users
 - Data integrity concerns
 - Security incident suspected
@@ -468,15 +510,18 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 ### Level 3: Engineering Manager + CTO
 
 **Responsibility:**
+
 - Executive decision-making
 - Stakeholder communication
 - Resource allocation
 
 **Contact:**
+
 - Phone: +1-555-EXEC
 - Email: leadership@company.com
 
 **Escalate If:**
+
 - Major outage (>1 hour)
 - Data loss/corruption
 - Security breach
@@ -488,6 +533,7 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 ### `/api/health` - Overall System Health
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -506,6 +552,7 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 ### `/api/health/ml` - ML Feature Health
 
 **Response:**
+
 ```json
 {
   "patternDetection": {
@@ -529,6 +576,7 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 ### `/api/metrics` - Prometheus Metrics
 
 **Metrics Exposed:**
+
 - `agent_studio_heap_used_bytes` - Heap usage
 - `agent_studio_concurrent_workflows` - Active workflow count
 - `agent_studio_error_rate` - Error rate (%)
@@ -557,6 +605,7 @@ See: `.claude/context/artifacts/monitoring/grafana-dashboard.json`
 ### CloudWatch Alarms
 
 **Heap Usage Alarm:**
+
 ```bash
 aws cloudwatch put-metric-alarm \
   --alarm-name agent-studio-heap-warning \
@@ -582,6 +631,7 @@ aws cloudwatch put-metric-alarm \
 **Severity:** [INFO/WARNING/CRITICAL]
 
 **Timeline:**
+
 - [HH:MM] - Alert triggered
 - [HH:MM] - Investigation started
 - [HH:MM] - Mitigation applied
@@ -591,6 +641,7 @@ aws cloudwatch put-metric-alarm \
 [Detailed explanation]
 
 **Contributing Factors:**
+
 - [Factor 1]
 - [Factor 2]
 
@@ -598,10 +649,12 @@ aws cloudwatch put-metric-alarm \
 [What fixed it]
 
 **Action Items:**
+
 - [ ] [Action 1 - Owner - Due Date]
 - [ ] [Action 2 - Owner - Due Date]
 
 **Lessons Learned:**
+
 - [Learning 1]
 - [Learning 2]
 
@@ -610,11 +663,13 @@ aws cloudwatch put-metric-alarm \
 ### 2. Runbook Updates
 
 After each incident, update this runbook if:
+
 - New alert type encountered
 - Existing procedure failed
 - Better mitigation discovered
 
 **Update Process:**
+
 1. Create branch: `runbook/update-YYYY-MM-DD`
 2. Update `.claude/docs/MONITORING_RUNBOOK.md`
 3. Test updated procedure

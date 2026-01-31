@@ -113,7 +113,7 @@ describe('ACID: Atomicity', () => {
     try {
       await manager.setState(txId, 'key2', null); // Should be rejected immediately
       assert.fail('Should have thrown on invalid value');
-    } catch (err) {
+    } catch (_err) {
       // Verify rollback happened automatically after failed setState
       await manager.rollback(txId);
       const history = await manager.getTransactionHistory('workflow-1');
@@ -427,7 +427,7 @@ describe('Rollback: Partial Failure Recovery', () => {
     try {
       await manager.setState(txId, 'invalid-key', undefined); // Invalid value
       assert.fail('Should have thrown on invalid value');
-    } catch (err) {
+    } catch (_err) {
       // Verify transaction can be explicitly rolled back
       await manager.rollback(txId);
       const history = await manager.getTransactionHistory('workflow-1');
@@ -444,7 +444,7 @@ describe('Rollback: Partial Failure Recovery', () => {
     try {
       await manager.setState(txId, 'stepIndex', -1); // Invalid step index
       assert.fail('Should have thrown on validation');
-    } catch (err) {
+    } catch (_err) {
       await manager.rollback(txId);
       const history = await manager.getTransactionHistory('workflow-1');
       assert.strictEqual(history.filter(e => e.status === 'committed').length, 0);
@@ -465,7 +465,7 @@ describe('Rollback: Partial Failure Recovery', () => {
     try {
       await manager.setState(tx2, 'phase', 'phase-3'); // Should be phase-2
       assert.fail('Should detect constraint violation');
-    } catch (err) {
+    } catch (_err) {
       await manager.rollback(tx2);
       const history = await manager.getTransactionHistory('workflow-1');
       const lastCommitted = history.filter(e => e.status === 'committed');
@@ -481,7 +481,7 @@ describe('Rollback: Savepoints', () => {
     const txId = await manager.beginTransaction('workflow-1');
 
     await manager.setState(txId, 'key1', 'value1');
-    const savepoint = await manager.savepoint(txId, 'sp1');
+    const _savepoint = await manager.savepoint(txId, 'sp1');
     await manager.setState(txId, 'key2', 'value2');
 
     // Rollback to savepoint
@@ -1006,7 +1006,7 @@ describe('Conflict Detection: Race Conditions', () => {
     await manager.commit(tx2);
 
     // Transaction 1 re-reads tasks (should see phantom)
-    const tasks2 = await manager.getState(tx1, 'tasks');
+    const _tasks2 = await manager.getState(tx1, 'tasks');
 
     // Conflict detection should catch this
     await manager.setState(tx1, 'tasks', [...tasks1, 'task-4']);
@@ -1128,7 +1128,7 @@ describe('Conflict Detection: Performance', () => {
     const start = performance.now();
     try {
       await manager.commit(tx2);
-    } catch (err) {
+    } catch (_err) {
       const elapsed = performance.now() - start;
       assert.ok(elapsed < 10, `Conflict detection took ${elapsed}ms (target: <10ms)`);
     }
@@ -1518,7 +1518,7 @@ describe('Integration: Full Workflow', () => {
     try {
       await executor.execute('workflow-1');
       assert.fail('Should propagate failure');
-    } catch (err) {
+    } catch (_err) {
       // Verify automatic rollback
       const history = await manager.getTransactionHistory('workflow-1');
       const committedAfterFailure = history.filter(

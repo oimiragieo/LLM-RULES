@@ -85,7 +85,7 @@ function extractFrontmatter(content) {
 
   try {
     return yaml.parse(match[1]);
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }

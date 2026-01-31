@@ -14,7 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const yaml = require('yaml');
+const _yaml = require('yaml');
 
 // Import validator logic
 const validator = require('../../hooks/validation/agent-tools-validator.cjs');

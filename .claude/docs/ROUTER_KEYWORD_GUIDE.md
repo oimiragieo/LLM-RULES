@@ -407,6 +407,70 @@ The Router uses a three-layer system for agent selection:
 - accessibility audit, voiceover, talkback, touch targets
 - mobile accessibility, app design, user testing, design feedback
 
+### Vercel Skills (5)
+
+#### react_performance
+
+**Primary Agent**: `frontend-pro`
+**Primary Skill**: `react-best-practices-vercel`
+**When to Use**: React performance optimization, Next.js optimization, bundle size reduction
+
+**Keywords**:
+
+- Performance: react performance, next.js optimization, nextjs optimization, bundle size, performance, waterfalls
+- Rendering: re-render, render optimization, server-side rendering, client-side optimization, ssr performance, csr performance, hydration
+- Optimization: lazy loading, code splitting, tree shaking, image optimization, prefetching
+- Metrics: lighthouse, core web vitals, lcp, fcp, cls, fid
+- Code Review: code review (in React/Next.js context)
+
+#### react_native
+
+**Primary Agent**: `expo-mobile-developer`
+**Primary Skill**: `react-native-skills-vercel`
+**When to Use**: React Native performance, Expo optimization, mobile app performance
+
+**Keywords**:
+
+- Platforms: react native, expo, mobile, ios, android
+- Performance: list performance, flatlist, animation, mobile optimization, mobile performance, react native performance
+- Features: native module, gesture, navigation, hermes, metro, fast refresh, reanimated
+
+#### composition_patterns
+
+**Primary Agent**: `frontend-pro`
+**Primary Skill**: `composition-patterns-vercel`
+**When to Use**: Component architecture, design systems, React patterns
+
+**Keywords**:
+
+- Patterns: boolean prop, compound component, composition, component pattern, react patterns
+- Architecture: component library, component architecture, design system, react 19
+- Advanced: render props, higher-order component, hoc, children prop, context api, hooks pattern
+
+#### web_design
+
+**Primary Agent**: `frontend-pro`
+**Primary Skill**: `web-design-guidelines-vercel`
+**When to Use**: Accessibility audits, UI/UX review, design system validation
+
+**Keywords**:
+
+- Accessibility: accessibility, audit, wcag, aria, a11y, semantic html, keyboard navigation, screen reader
+- Design: ux, ui review, design review, dark mode, typography, form design, color contrast, focus management
+- Responsive: responsive design, mobile-first
+
+#### vercel_deploy
+
+**Primary Agent**: `devops`
+**Primary Skill**: `vercel-deploy-claimable`
+**When to Use**: Vercel deployments, Next.js production deployments, edge functions
+
+**Keywords**:
+
+- Deployment: deploy, vercel, production, deployment, push live, go live, release
+- CI/CD: cicd, ci-cd, deployment automation
+- Vercel-specific: vercel deploy, next.js deploy, edge functions, serverless, preview deployment, production deployment
+
 ### Specialized Agents (12)
 
 #### c4_code
@@ -757,6 +821,13 @@ const INTENT_TO_AGENT = {
   data_engineer: 'data-engineer',
   mobile_ux: 'mobile-ux-reviewer',
 
+  // Vercel skills (5 skills integrated from Vercel)
+  react_performance: 'frontend-pro', // Uses react-best-practices-vercel skill
+  react_native: 'expo-mobile-developer', // Uses react-native-skills-vercel skill
+  composition_patterns: 'frontend-pro', // Uses composition-patterns-vercel skill
+  web_design: 'frontend-pro', // Uses web-design-guidelines-vercel skill
+  vercel_deploy: 'devops', // Uses vercel-deploy-claimable skill
+
   // Specialized
   c4_code: 'c4-code',
   c4_component: 'c4-component',
@@ -1006,6 +1077,54 @@ When multiple agents score similarly, disambiguation rules use contextual keywor
 2. Context: etl, pipeline, warehouse, bigquery, snowflake
    - **Prefer**: data-engineer
    - **Deprioritize**: database-architect
+
+### React Intent (Vercel Skills)
+
+**Keyword**: "react"
+
+**Could Be**: frontend-pro (web) OR expo-mobile-developer (mobile)
+
+**Rules**:
+
+1. Context: mobile, native, ios, android, expo, flatlist
+   - **Prefer**: expo-mobile-developer
+   - **Deprioritize**: frontend-pro
+
+2. Context: web, browser, next, performance, bundle
+   - **Prefer**: frontend-pro
+   - **Deprioritize**: expo-mobile-developer
+
+### Component Intent (Vercel Skills)
+
+**Keyword**: "component"
+
+**Could Be**: composition-patterns-vercel OR react-best-practices-vercel
+
+**Rules**:
+
+1. Context: boolean, compound, pattern, architecture
+   - **Prefer**: composition-patterns-vercel (skill routing hint)
+   - **Deprioritize**: react-best-practices-vercel
+
+2. Context: performance, optimize, re-render
+   - **Prefer**: react-best-practices-vercel (skill routing hint)
+   - **Deprioritize**: composition-patterns-vercel
+
+### Design Intent (Vercel Skills)
+
+**Keyword**: "design"
+
+**Could Be**: web-design-guidelines-vercel OR react-best-practices-vercel
+
+**Rules**:
+
+1. Context: accessibility, wcag, aria, contrast
+   - **Prefer**: web-design-guidelines-vercel (skill routing hint)
+   - **Deprioritize**: react-best-practices-vercel
+
+2. Context: performance, speed, optimization
+   - **Prefer**: react-best-practices-vercel (skill routing hint)
+   - **Deprioritize**: web-design-guidelines-vercel
 
 ## Scoring Algorithm
 

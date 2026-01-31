@@ -29,7 +29,7 @@ const TEST_ROOT = path.join(__dirname, '../.claude/context/workflows/checkpoints
 async function setupTest() {
   try {
     await fs.rm(TEST_ROOT, { recursive: true, force: true });
-  } catch (err) {
+  } catch (_err) {
     // Ignore
   }
   await fs.mkdir(TEST_ROOT, { recursive: true });

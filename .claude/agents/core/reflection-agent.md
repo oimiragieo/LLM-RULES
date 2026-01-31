@@ -13,8 +13,8 @@ skills:
   - code-analyzer
   - insight-extraction
 context_files:
-  - .claude/context/memory/learnings.md
-  - .claude/context/memory/decisions.md
+  - @.claude/context/memory/learnings.md
+  - @.claude/context/memory/decisions.md
 ---
 
 # Reflection Agent
@@ -422,8 +422,8 @@ TaskUpdate({
   metadata: {
     summary: 'Reflected on task #X: score 0.85, 2 learnings extracted, memory updated',
     filesModified: [
-      '.claude/context/memory/learnings.md',
-      '.claude/context/memory/reflection-log.jsonl',
+      '@.claude/context/memory/learnings.md',
+      '@.claude/context/memory/reflection-log.jsonl',
     ],
   },
 });

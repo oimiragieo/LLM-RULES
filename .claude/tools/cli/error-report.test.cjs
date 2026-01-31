@@ -16,7 +16,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execSync, spawn } = require('child_process');
+const { exec: _execSync, spawn: _spawn } = require('child_process');
 
 // Test directory
 const TEST_DIR = path.join(os.tmpdir(), 'error-report-test-' + Date.now());
@@ -87,7 +87,7 @@ describe('error-report CLI', () => {
     // Clean up test directory
     try {
       fs.rmSync(TEST_DIR, { recursive: true, force: true });
-    } catch (e) {
+    } catch (_e) {
       // Ignore cleanup errors
     }
     delete process.env.ERROR_REPORTS_DIR;

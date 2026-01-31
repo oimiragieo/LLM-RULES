@@ -14,7 +14,7 @@ skills:
   - dry-principle
   - debugging
 context_files:
-  - .claude/context/memory/learnings.md
+  - @.claude/context/memory/learnings.md
 ---
 
 # Code Simplifier Agent

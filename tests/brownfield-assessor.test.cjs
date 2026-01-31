@@ -14,7 +14,7 @@ const os = require('os');
 let assessor;
 try {
   assessor = require('../.claude/lib/utils/brownfield-assessor.cjs');
-} catch (err) {
+} catch (_err) {
   assessor = null;
 }
 

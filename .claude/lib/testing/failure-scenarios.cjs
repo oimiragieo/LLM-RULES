@@ -161,7 +161,7 @@ async function executeFailureScenario(scenarioName, testData = {}) {
  * Execute memory exhaustion scenario
  */
 async function executeMemoryExhaustion(result, config) {
-  const targetMemoryMB = config.targetMemoryMB || 300;
+  const _targetMemoryMB = config.targetMemoryMB || 300;
   const workloadSize = config.workloadSize || 100;
 
   // In testing, always simulate approaching memory limit
@@ -195,7 +195,7 @@ async function executeMemoryExhaustion(result, config) {
 /**
  * Execute long-running timeout scenario
  */
-async function executeLongRunningTimeout(result, config) {
+async function executeLongRunningTimeout(result, _config) {
   // Simulate timeout detection - in testing, we always simulate a timeout occurred
   // (since we can't actually wait 1 hour)
 
@@ -240,7 +240,7 @@ async function executeConcurrentConflicts(result, config) {
  * Execute tool failure recovery scenario
  */
 async function executeToolFailureRecovery(result, config) {
-  const tool = config.tool || 'Write';
+  const _tool = config.tool || 'Write';
   // const failureRate = config.failureRate || 0.3; // Not used in simulation
 
   // In testing, always simulate failures with recovery

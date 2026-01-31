@@ -30,7 +30,11 @@ try {
 } catch (_e) {
   // Fallback (no-op)
   compressionTrigger = {
-    checkCompressionNeeded: () => ({ needed: false, reason: 'Module not available', urgency: 'low' }),
+    checkCompressionNeeded: () => ({
+      needed: false,
+      reason: 'Module not available',
+      urgency: 'low',
+    }),
     resetCompressionCounters: () => {},
   };
 }
@@ -112,7 +116,7 @@ function postToolResult(hookInput) {
       tokenBudgetStatus: budgetStatus,
       lastReadSize,
       lastFetchSize,
-      operationCount
+      operationCount,
     });
 
     // If compression needed, signal agent
@@ -123,7 +127,7 @@ function postToolResult(hookInput) {
           reason: compressionCheck.reason,
           urgency: compressionCheck.urgency,
           taskId,
-          agentId
+          agentId,
         });
       }
 
@@ -132,7 +136,7 @@ function postToolResult(hookInput) {
         taskId,
         agentId,
         trigger: compressionCheck.reason,
-        urgency: compressionCheck.urgency
+        urgency: compressionCheck.urgency,
       });
 
       // Return signal for agent to invoke compression
@@ -143,7 +147,7 @@ function postToolResult(hookInput) {
         reason: compressionCheck.reason,
         urgency: compressionCheck.urgency,
         phase: 2, // Framework + test only
-        blocking: false // Non-blocking
+        blocking: false, // Non-blocking
       };
     }
   } catch (error) {
@@ -178,7 +182,7 @@ function logCompressionTrigger(event) {
       agentId: event.agentId,
       trigger: event.trigger,
       urgency: event.urgency,
-      phase: 2 // Framework + test only
+      phase: 2, // Framework + test only
     };
 
     // Ensure directory exists
@@ -206,5 +210,5 @@ module.exports = {
   getOperationCount,
   resetOperationCount,
   // Internal for testing
-  logCompressionTrigger
+  logCompressionTrigger,
 };

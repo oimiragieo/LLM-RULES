@@ -138,7 +138,7 @@ class Workflow {
 // ❌ REJECT: Promise holds reference indefinitely
 class Cache {
   get(key) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.waiters[key] = resolve; // Never removed
     });
   }
@@ -147,8 +147,8 @@ class Cache {
 // ✅ APPROVE: Promise resolved and cleaned
 class Cache {
   get(key) {
-    return new Promise((resolve) => {
-      const handler = (value) => {
+    return new Promise(resolve => {
+      const handler = value => {
         delete this.waiters[key]; // Cleanup
         resolve(value);
       };
@@ -374,7 +374,7 @@ For **Medium Risk** changes:
 
 **Template for critical issues:**
 
-```markdown
+````markdown
 **Memory Leak Risk**: Unbounded array growth detected
 
 **Location**: `StateSyncManager.sync()` (line 45)
@@ -382,6 +382,7 @@ For **Medium Risk** changes:
 **Issue**: `this.syncHistory.push(...)` accumulates without limit
 
 **Required Fix**:
+
 1. Add `this.maxHistorySize = 1000` in constructor
 2. Add trimming after push:
    ```javascript
@@ -389,10 +390,13 @@ For **Medium Risk** changes:
      this.syncHistory.shift();
    }
    ```
+````
+
 3. Add regression test verifying bounded growth
 
 **Reference**: See `.claude/docs/MEMORY_MANAGEMENT.md` Pattern 1
-```
+
+````
 
 **Template for advisory suggestions:**
 
@@ -409,7 +413,7 @@ For **Medium Risk** changes:
 **Impact**: Prevents memory leaks in test suites
 
 **Reference**: See `.claude/docs/CODE_REVIEW_MEMORY_CHECKLIST.md` Advisory Checks
-```
+````
 
 ---
 

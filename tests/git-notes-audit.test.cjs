@@ -46,7 +46,7 @@ describe('Git Notes Audit Hook', () => {
     // Load hook (will fail initially until we implement it)
     try {
       gitNotesAudit = require('../.claude/hooks/audit/git-notes-audit.cjs');
-    } catch (e) {
+    } catch (_e) {
       // Expected to fail on first run (RED phase)
       gitNotesAudit = null;
     }

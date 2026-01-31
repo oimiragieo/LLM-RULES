@@ -153,7 +153,7 @@ Always produce a structured validation report:
 - Issues found: Y
 
 ### Setup Validation
-- [x] .claude/context/ directory exists
+- [x] @.claude/context/ directory exists
 - [x] product.md exists and valid
 - [x] product-guidelines.md exists and valid
 - [x] tech-stack.md exists and valid
@@ -272,7 +272,7 @@ Skill({ skill: 'workflow-patterns' }); // Workflow validation
 **Before starting:**
 
 ```bash
-cat C:\dev\projects\agent-studio\.claude\context\memory\learnings.md
+cat C:/dev/projects/agent-studio/@.claude/context\memory\learnings.md
 ```
 
 **After completing:**

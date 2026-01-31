@@ -40,7 +40,7 @@
  * Default configuration values
  */
 const DEFAULTS = {
-  warningThreshold: 0.70,
+  warningThreshold: 0.7,
   criticalThreshold: 0.85,
   shutdownThreshold: 0.95,
   interval: 5000,
@@ -53,9 +53,12 @@ const DEFAULTS = {
  */
 function getConfigFromEnv() {
   return {
-    warningThreshold: parseFloat(process.env.HEAP_WARNING_THRESHOLD || DEFAULTS.warningThreshold * 100) / 100,
-    criticalThreshold: parseFloat(process.env.HEAP_CRITICAL_THRESHOLD || DEFAULTS.criticalThreshold * 100) / 100,
-    shutdownThreshold: parseFloat(process.env.HEAP_SHUTDOWN_THRESHOLD || DEFAULTS.shutdownThreshold * 100) / 100,
+    warningThreshold:
+      parseFloat(process.env.HEAP_WARNING_THRESHOLD || DEFAULTS.warningThreshold * 100) / 100,
+    criticalThreshold:
+      parseFloat(process.env.HEAP_CRITICAL_THRESHOLD || DEFAULTS.criticalThreshold * 100) / 100,
+    shutdownThreshold:
+      parseFloat(process.env.HEAP_SHUTDOWN_THRESHOLD || DEFAULTS.shutdownThreshold * 100) / 100,
     interval: parseInt(process.env.MEMORY_MONITOR_INTERVAL_MS || DEFAULTS.interval, 10),
     maxHistorySize: parseInt(process.env.MEMORY_HISTORY_SIZE || DEFAULTS.maxHistorySize, 10),
   };
@@ -259,9 +262,7 @@ class MemoryMonitor {
    * @returns {MemoryMonitor} this (for chaining)
    */
   off(event, callback) {
-    this.listeners = this.listeners.filter(
-      l => !(l.event === event && l.callback === callback)
-    );
+    this.listeners = this.listeners.filter(l => !(l.event === event && l.callback === callback));
     return this;
   }
 

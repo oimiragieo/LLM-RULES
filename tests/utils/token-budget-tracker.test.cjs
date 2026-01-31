@@ -11,7 +11,7 @@ const {
   estimateTokens,
   trackAgentUsage,
   checkBudgetStatus,
-  logTokenEvent
+  logTokenEvent,
 } = require('../../.claude/lib/utils/token-budget-tracker.cjs');
 
 describe('token-budget-tracker.cjs', () => {
@@ -71,7 +71,7 @@ describe('token-budget-tracker.cjs', () => {
       const result = trackAgentUsage('agent-1', {
         inputTokens: 1000,
         outputTokens: 500,
-        toolResults: 'a'.repeat(1000) // 750 tokens
+        toolResults: 'a'.repeat(1000), // 750 tokens
       });
 
       assert.strictEqual(result.agentId, 'agent-1');
@@ -87,14 +87,14 @@ describe('token-budget-tracker.cjs', () => {
       trackAgentUsage('agent-2', {
         inputTokens: 5000,
         outputTokens: 3000,
-        toolResults: ''
+        toolResults: '',
       });
 
       // Second usage (cumulative)
       const result = trackAgentUsage('agent-2', {
         inputTokens: 2000,
         outputTokens: 1000,
-        toolResults: ''
+        toolResults: '',
       });
 
       assert.strictEqual(result.totalTokens, 11000); // 5000+3000 + 2000+1000
@@ -116,7 +116,7 @@ describe('token-budget-tracker.cjs', () => {
       const result = trackAgentUsage('agent-budget', {
         inputTokens: 50000,
         outputTokens: 50000,
-        toolResults: 'x'.repeat(10000) // 7500 tokens
+        toolResults: 'x'.repeat(10000), // 7500 tokens
       });
 
       assert.strictEqual(result.totalTokens, 107500);
@@ -134,7 +134,7 @@ describe('token-budget-tracker.cjs', () => {
       trackAgentUsage('agent-ok', {
         inputTokens: 40000,
         outputTokens: 10000,
-        toolResults: ''
+        toolResults: '',
       });
 
       const status = checkBudgetStatus('agent-ok');
@@ -151,7 +151,7 @@ describe('token-budget-tracker.cjs', () => {
       trackAgentUsage('agent-warn', {
         inputTokens: 150000,
         outputTokens: 20000,
-        toolResults: ''
+        toolResults: '',
       });
 
       const status = checkBudgetStatus('agent-warn');
@@ -166,7 +166,7 @@ describe('token-budget-tracker.cjs', () => {
       trackAgentUsage('agent-critical', {
         inputTokens: 180000,
         outputTokens: 5000,
-        toolResults: ''
+        toolResults: '',
       });
 
       const status = checkBudgetStatus('agent-critical');
@@ -179,7 +179,7 @@ describe('token-budget-tracker.cjs', () => {
       trackAgentUsage('agent-math', {
         inputTokens: 60000,
         outputTokens: 40000,
-        toolResults: ''
+        toolResults: '',
       });
 
       const status = checkBudgetStatus('agent-math');
@@ -194,7 +194,7 @@ describe('token-budget-tracker.cjs', () => {
       logTokenEvent('spawn', {
         agentId: 'test-agent',
         tokens: 5000,
-        reason: 'Agent spawned with large prompt'
+        reason: 'Agent spawned with large prompt',
       });
 
       // Read the log file
@@ -217,7 +217,7 @@ describe('token-budget-tracker.cjs', () => {
       logTokenEvent('completion', {
         agentId: 'time-test',
         tokens: 1000,
-        reason: 'Test timestamp'
+        reason: 'Test timestamp',
       });
 
       const content = fs.readFileSync(TOKEN_LOG_PATH, 'utf8');
@@ -235,7 +235,7 @@ describe('token-budget-tracker.cjs', () => {
         logTokenEvent(type, {
           agentId: `agent-${index}`,
           tokens: 100 * (index + 1),
-          reason: `Test ${type}`
+          reason: `Test ${type}`,
         });
       });
 
@@ -277,7 +277,7 @@ describe('token-budget-tracker.cjs', () => {
       const result = trackAgentUsage('config-test', {
         inputTokens: 10000,
         outputTokens: 0,
-        toolResults: ''
+        toolResults: '',
       });
 
       assert.strictEqual(result.budget, 200000);
@@ -291,7 +291,7 @@ describe('token-budget-tracker.cjs', () => {
         const result = trackAgentUsage(agentId, {
           inputTokens: 1000,
           outputTokens: 0,
-          toolResults: ''
+          toolResults: '',
         });
 
         assert.strictEqual(result.budget, 200000);
@@ -303,7 +303,7 @@ describe('token-budget-tracker.cjs', () => {
       trackAgentUsage('threshold-test', {
         inputTokens: 180000,
         outputTokens: 0,
-        toolResults: ''
+        toolResults: '',
       });
 
       const status = checkBudgetStatus('threshold-test');
@@ -322,7 +322,7 @@ describe('token-budget-tracker.cjs', () => {
       const trackResult = trackAgentUsage(agentId, {
         inputTokens: 5000,
         outputTokens: 3000,
-        toolResults: 'x'.repeat(2000) // 1500 tokens
+        toolResults: 'x'.repeat(2000), // 1500 tokens
       });
 
       assert.strictEqual(trackResult.totalTokens, 9500);
@@ -338,7 +338,7 @@ describe('token-budget-tracker.cjs', () => {
       logTokenEvent('spawn', {
         agentId,
         tokens: trackResult.totalTokens,
-        reason: 'End-to-end test'
+        reason: 'End-to-end test',
       });
 
       // Verify log was written
@@ -365,7 +365,7 @@ describe('token-budget-tracker.cjs', () => {
         trackAgentUsage('non-blocking', {
           inputTokens: 195000,
           outputTokens: 0,
-          toolResults: ''
+          toolResults: '',
         });
 
         const status = checkBudgetStatus('non-blocking');
@@ -379,7 +379,7 @@ describe('token-budget-tracker.cjs', () => {
         logTokenEvent('test', {
           agentId: `smoke-${i}`,
           tokens: 1000 * i,
-          reason: `Smoke test ${i}`
+          reason: `Smoke test ${i}`,
         });
       }
 

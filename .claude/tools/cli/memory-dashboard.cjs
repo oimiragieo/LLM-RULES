@@ -33,7 +33,10 @@ function parseJSONL(filePath) {
   }
 
   const content = fs.readFileSync(filePath, 'utf8');
-  const lines = content.trim().split('\n').filter(line => line.length > 0);
+  const lines = content
+    .trim()
+    .split('\n')
+    .filter(line => line.length > 0);
 
   return lines
     .map(line => {
@@ -98,7 +101,7 @@ function aggregatePerAgent(tokenEvents, compressionTriggers = []) {
         compressionCount: 0,
         budget: DEFAULT_BUDGET,
         budgetPercent: 0,
-        status: 'OK'
+        status: 'OK',
       };
     }
 
@@ -118,7 +121,7 @@ function aggregatePerAgent(tokenEvents, compressionTriggers = []) {
         compressionCount: 0,
         budget: DEFAULT_BUDGET,
         budgetPercent: 0,
-        status: 'OK'
+        status: 'OK',
       };
     }
 
@@ -167,7 +170,7 @@ function renderDashboard(data) {
     totalCompressions = 0,
     status = 'UNKNOWN',
     agents = {},
-    compressions = []
+    compressions = [],
   } = data;
 
   let output = '';
@@ -228,7 +231,9 @@ function renderDashboard(data) {
   for (const [agentId, stats] of Object.entries(agents)) {
     if (stats.status === 'WARNING' || stats.status === 'CRITICAL') {
       const threshold = stats.status === 'CRITICAL' ? '90%' : '50%';
-      alerts.push(`${agentId} token usage at ${stats.budgetPercent.toFixed(1)}% (approaching ${threshold} threshold)`);
+      alerts.push(
+        `${agentId} token usage at ${stats.budgetPercent.toFixed(1)}% (approaching ${threshold} threshold)`
+      );
     }
   }
 
@@ -280,6 +285,49 @@ function filterByPeriod(events, period) {
 }
 
 /**
+ * Normalize agent data for display
+ */
+function normalizeAgentStats(agentsSource, agent) {
+  let normalized = {};
+  for (const [agentId, agentData] of Object.entries(agentsSource)) {
+    normalized[agentId] = {
+      totalTokens: agentData.totalTokens || 0,
+      budget: agentData.budget || DEFAULT_BUDGET,
+      budgetPercent:
+        agentData.budgetPercent ||
+        ((agentData.totalTokens || 0) / (agentData.budget || DEFAULT_BUDGET)) * 100,
+      status: agentData.status || 'OK',
+      compressionCount: agentData.compressionCount || 0,
+      eventCount: agentData.eventCount || 0,
+    };
+  }
+  if (agent) {
+    normalized = Object.fromEntries(Object.entries(normalized).filter(([id]) => id === agent));
+  }
+  return normalized;
+}
+
+/**
+ * Calculate overall system status from agent stats
+ */
+function calculateOverallStatus(agentStats) {
+  for (const stats of Object.values(agentStats)) {
+    if (stats.status === 'CRITICAL') return 'CRITICAL';
+    if (stats.status === 'WARNING') return 'WARNING';
+  }
+  return 'HEALTHY';
+}
+
+/**
+ * Format and export output
+ */
+function formatAndExport(data, json, exportPath) {
+  const output = json ? JSON.stringify(data, null, 2) : renderDashboard(data);
+  if (exportPath) fs.writeFileSync(exportPath, output, 'utf8');
+  return output;
+}
+
+/**
  * Main function
  *
  * @param {Object} options - CLI options
@@ -296,50 +344,27 @@ function main(options = {}) {
     agents: providedAgents = null,
     tokenEvents: providedTokenEvents = null,
     activeAgents = null,
-    avgTokenUsage = null
+    avgTokenUsage = null,
   } = options;
 
   // If stats provided directly (for testing), use them
   if (stats || providedAgents !== null || activeAgents !== null) {
-    // Ensure agent stats have all required fields
-    let normalizedAgents = {};
     const agentsSource = providedAgents || stats?.agents || {};
-
-    for (const [agentId, agentData] of Object.entries(agentsSource)) {
-      normalizedAgents[agentId] = {
-        totalTokens: agentData.totalTokens || 0,
-        budget: agentData.budget || DEFAULT_BUDGET,
-        budgetPercent: agentData.budgetPercent || ((agentData.totalTokens || 0) / (agentData.budget || DEFAULT_BUDGET) * 100),
-        status: agentData.status || 'OK',
-        compressionCount: agentData.compressionCount || 0,
-        eventCount: agentData.eventCount || 0
-      };
-    }
-
-    // Filter by agent if specified
-    if (agent) {
-      normalizedAgents = Object.fromEntries(
-        Object.entries(normalizedAgents).filter(([agentId]) => agentId === agent)
-      );
-    }
+    const normalizedAgents = normalizeAgentStats(agentsSource, agent);
 
     const data = {
-      activeAgents: activeAgents !== null ? activeAgents : (stats?.activeAgents || Object.keys(normalizedAgents).length),
-      avgTokenUsage: avgTokenUsage !== null ? avgTokenUsage : (stats?.avgTokenUsage || 0),
+      activeAgents:
+        activeAgents !== null
+          ? activeAgents
+          : stats?.activeAgents || Object.keys(normalizedAgents).length,
+      avgTokenUsage: avgTokenUsage !== null ? avgTokenUsage : stats?.avgTokenUsage || 0,
       totalCompressions: stats?.totalCompressions || 0,
       status: stats?.status || 'UNKNOWN',
       agents: normalizedAgents,
-      compressions: stats?.compressions || []
+      compressions: stats?.compressions || [],
     };
 
-    const output = json ? JSON.stringify(data, null, 2) : renderDashboard(data);
-
-    // Export to file if requested
-    if (exportPath) {
-      fs.writeFileSync(exportPath, output, 'utf8');
-    }
-
-    return output;
+    return formatAndExport(data, json, exportPath);
   }
 
   // Load data from JSONL files
@@ -379,44 +404,16 @@ function main(options = {}) {
   const avgTokens = activeAgentsCount > 0 ? Math.round(totalTokens / activeAgentsCount) : 0;
   const totalCompressionsCount = compressionStats.length;
 
-  // Determine overall status
-  let overallStatus = 'HEALTHY';
-  for (const stats of Object.values(agentStats)) {
-    if (stats.status === 'CRITICAL') {
-      overallStatus = 'CRITICAL';
-      break;
-    } else if (stats.status === 'WARNING') {
-      overallStatus = 'WARNING';
-    }
-  }
-
   const dashboardData = {
     activeAgents: activeAgentsCount,
     avgTokenUsage: avgTokens,
     totalCompressions: totalCompressionsCount,
-    status: overallStatus,
+    status: calculateOverallStatus(agentStats),
     agents: agentStats,
-    compressions: compressionStats
+    compressions: compressionStats,
   };
 
-  // JSON output
-  if (json) {
-    const output = JSON.stringify(dashboardData, null, 2);
-    if (exportPath) {
-      fs.writeFileSync(exportPath, output, 'utf8');
-    }
-    return output;
-  }
-
-  // ASCII output
-  const output = renderDashboard(dashboardData);
-
-  // Export to file
-  if (exportPath) {
-    fs.writeFileSync(exportPath, output, 'utf8');
-  }
-
-  return output;
+  return formatAndExport(dashboardData, json, exportPath);
 }
 
 // CLI execution
@@ -448,5 +445,5 @@ module.exports = {
   parseCompressionTriggers,
   aggregatePerAgent,
   renderDashboard,
-  main
+  main,
 };

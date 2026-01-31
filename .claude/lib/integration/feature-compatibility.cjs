@@ -224,27 +224,27 @@ function generateCompatibilityChecklist() {
     },
     {
       description: 'Agent-Studio v2.2.1 available',
-      validation: context => {
+      validation: _context => {
         // Would check package.json version
         return true;
       },
     },
     {
       description: 'Conductor-main backup created',
-      validation: context => {
+      validation: _context => {
         // Would check for backup
         return true;
       },
     },
     {
       description: 'Test environment available',
-      validation: context => {
+      validation: _context => {
         return true;
       },
     },
     {
       description: 'All hooks registered',
-      validation: context => {
+      validation: _context => {
         // Would check settings.json
         return true;
       },

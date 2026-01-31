@@ -31,7 +31,7 @@ skills:
   - visual-and-observational-rules
   - mobile-first-design-rules
 context_files:
-  - .claude/context/memory/learnings.md
+  - @.claude/context/memory/learnings.md
 ---
 
 # Mobile UX Reviewer Agent

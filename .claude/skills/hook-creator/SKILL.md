@@ -6,6 +6,9 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep]
+# Phase 1 Integration: Hook validation references .claude/config/tool-manifest.json
+# Hooks can validate tool availability and use fallback tools from the manifest
+# Single source of truth: .claude/config/tool-manifest.json
 best_practices:
   - Always register hooks in appropriate config
   - Test hooks before deployment
@@ -384,7 +387,144 @@ After creating a hook:
 
 **BLOCKING**: If ANY item above is missing, hook creation is INCOMPLETE.
 
-### Step 8: Integration Verification (BLOCKING - DO NOT SKIP)
+### Step 8: Post-Creation Hook Registration (Phase 1 Integration)
+
+**This step is CRITICAL.** After creating the hook artifact, you MUST register it in the hook discovery system.
+
+**Phase 1 Context:** Phase 1 is responsible for tool and hook validation/discovery. Hooks created without registration are invisible to the system and will not be loaded at startup.
+
+After hook file is written and tested:
+
+1. **Create/Update Hook Registry Entry** in appropriate location:
+
+   If registry doesn't exist, create `.claude/context/artifacts/hook-registry.json`:
+
+   ```json
+   {
+     "hooks": [
+       {
+         "name": "{hook-name}",
+         "id": "{hook-name}",
+         "description": "{Brief description from hook}",
+         "category": "{safety|routing|memory|session|validation|audit}",
+         "type": "{pre-tool|post-tool|user-prompt|session-start|session-end}",
+         "version": "1.0.0",
+         "targetTools": ["{Tool1}", "{Tool2}"],
+         "enforcementMode": "{block|warn|off}",
+         "defaultEnabled": true,
+         "filePath": ".claude/hooks/{category}/{hook-name}.cjs",
+         "testFilePath": ".claude/hooks/{category}/{hook-name}.test.cjs",
+         "environmentVariable": "{HOOK_NAME}_MODE"
+       }
+     ]
+   }
+   ```
+
+2. **Validate Hook Against Schema:**
+
+   Ensure hook validates against `.claude/schemas/hook-schema.json` (if exists):
+
+   ```bash
+   # Validate hook structure
+   node -e "
+     const hook = require('./.claude/hooks/{category}/{hook-name}.cjs');
+     if (hook.validate) console.log('✓ Has validate() export');
+     if (hook.PROJECT_ROOT) console.log('✓ Has PROJECT_ROOT');
+     if (hook.findProjectRoot) console.log('✓ Has findProjectRoot()');
+   "
+   ```
+
+3. **Register Hook in Loader:**
+
+   Update `.claude/lib/hooks/hook-loader.cjs` (if exists) to include new hook:
+
+   ```javascript
+   const HOOKS_MANIFEST = {
+     '{hook-name}': {
+       path: './.claude/hooks/{category}/{hook-name}.cjs',
+       type: '{pre-tool|post-tool}',
+       matcher: '{Bash|Write|Edit|Read}', // Optional
+       enabled: true,
+       enforcementMode: process.env.{HOOK_NAME}_MODE || 'warn'
+     }
+   };
+   ```
+
+4. **Register Hook in Configuration:**
+
+   **For pre/post-tool hooks** - Update `.claude/settings.json`:
+
+   ```json
+   {
+     "hooks": {
+       "pre-tool": ["./.claude/hooks/safety/{hook-name}.cjs"],
+       "post-tool": ["./.claude/hooks/memory/{hook-name}.cjs"]
+     }
+   }
+   ```
+
+   **For event hooks** - Update `.claude/config.yaml`:
+
+   ```yaml
+   hooks:
+     UserPromptSubmit:
+       - path: ./.claude/hooks/routing/{hook-name}.cjs
+         type: command
+     SessionStart:
+       - path: ./.claude/hooks/session/{hook-name}.cjs
+         type: command
+   ```
+
+5. **Document in `.claude/hooks/README.md`:**
+
+   Add entry under appropriate category:
+
+   ```markdown
+   #### {Hook Name} (`{hook-name}.cjs`)
+
+   {Detailed description of what the hook does.}
+
+   **When it runs:** {Trigger condition - e.g., "Before every Bash command", "After task completion"}
+
+   **What it checks/does:**
+
+   - {Check/action 1}
+   - {Check/action 2}
+   - {Check/action 3}
+
+   **Enforcement mode:** `process.env.{HOOK_NAME}_MODE` (default: `warn`)
+
+   **Test file:** `.claude/hooks/{category}/{hook-name}.test.cjs`
+
+   **Related hooks:** {List any hooks that interact with this one}
+   ```
+
+6. **Update Memory:**
+
+   Append to `.claude/context/memory/learnings.md`:
+
+   ```markdown
+   ## Hook: {hook-name}
+
+   - **Type:** {pre-tool|post-tool|event}
+   - **Category:** {safety|routing|memory|session|validation}
+   - **Purpose:** {Detailed purpose}
+   - **Trigger:** {When it runs}
+   - **Enforcement:** {Block/warn/off by default}
+   - **Integration Notes:** {Any special considerations}
+   ```
+
+**Why this matters:** Without hook registration:
+
+- Hooks are not loaded at startup
+- Hook validation doesn't occur
+- System cannot discover available hooks
+- Safety validators are bypassed
+- "Invisible artifact" pattern emerges
+
+**Phase 1 Integration:** Hook registry is the discovery mechanism for Phase 1, enabling the system to validate hooks against schema, load them at startup, and enforce safety rules consistently.
+
+### Step 9: Integration Verification (BLOCKING - DO NOT SKIP)
 
 **This step verifies the artifact is properly integrated into the ecosystem.**
 
@@ -401,8 +541,9 @@ Before calling `TaskUpdate({ status: "completed" })`, you MUST run the Post-Crea
 3. **If exit code is 1** (one or more checks failed):
    - Read the error output for specific failures
    - Fix each failure:
+     - Missing hook registry -> Create registry entry (Step 8)
+     - Missing settings.json entry -> Register hook (Step 8)
      - Missing documentation -> Add to hooks/README.md
-     - Missing settings.json entry -> Register hook
      - Missing memory update -> Update learnings.md
      - Missing test file -> Create .test.cjs file
    - Re-run validation until exit code is 0

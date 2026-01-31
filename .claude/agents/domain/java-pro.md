@@ -29,7 +29,7 @@ skills:
   - doc-generator
   - verification-before-completion
 context_files:
-  - .claude/context/memory/learnings.md
+  - @.claude/context/memory/learnings.md
 ---
 
 # Java Pro Agent

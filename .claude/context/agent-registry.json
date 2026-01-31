@@ -1,0 +1,3475 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-01-31T05:55:09.332Z",
+  "metadata": {
+    "totalAgents": 49,
+    "healthyAgents": 48,
+    "degradedAgents": 0,
+    "unavailableAgents": 1,
+    "lastHealthCheck": "2026-01-31T05:57:24.604Z",
+    "lastFullScan": "2026-01-31T05:55:09.332Z"
+  },
+  "agents": {
+    "architect": {
+      "id": "architect",
+      "displayName": "architect",
+      "category": "core",
+      "filePath": ".claude/agents/core/architect.md",
+      "capabilities": [
+        {
+          "name": "architect",
+          "domain": "security",
+          "description": "System designer. Makes high-level technical decisions, chooses stacks, and ensures scalability and maintainability.",
+          "triggerPhrases": [
+            "architect",
+            "designer",
+            "architecture-review",
+            "database-architect",
+            "security-architect",
+            "swarm-coordination",
+            "ripgrep",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "Search",
+            "SequentialThinking",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "architecture-review",
+            "database-architect",
+            "security-architect",
+            "swarm-coordination",
+            "ripgrep",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer",
+            "brainstorming",
+            "progressive-disclosure"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.329Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-01-31T05:55:09.330Z",
+        "updatedAt": "2026-01-31T05:55:09.330Z"
+      }
+    },
+    "context-compressor": {
+      "id": "context-compressor",
+      "displayName": "context-compressor",
+      "category": "core",
+      "filePath": ".claude/agents/core/context-compressor.md",
+      "capabilities": [
+        {
+          "name": "context-compressor",
+          "domain": "code",
+          "description": "Intelligently summarizes and compresses context (files, logs, outputs) to save tokens and prevent poisoning.",
+          "triggerPhrases": [
+            "context",
+            "compressor",
+            "context-compressor",
+            "verification-before-completion",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Grep",
+            "Glob",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "context-compressor",
+            "verification-before-completion",
+            "task-management-protocol"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "haiku"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.330Z",
+        "updatedAt": "2026-01-31T05:55:09.330Z"
+      }
+    },
+    "developer": {
+      "id": "developer",
+      "displayName": "developer",
+      "category": "core",
+      "filePath": ".claude/agents/core/developer.md",
+      "capabilities": [
+        {
+          "name": "developer",
+          "domain": "code",
+          "description": "TDD-focused implementer. Writes code, runs tests, and refactors. Follows Red-Green-Refactor strictly.",
+          "triggerPhrases": [
+            "developer",
+            "implementer",
+            "tests",
+            "refactors",
+            "refactor",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "security-architect"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet"
+          ],
+          "skills": [
+            "tdd",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "security-architect",
+            "context-compressor",
+            "github-mcp",
+            "verification-before-completion",
+            "checklist-generator",
+            "code-analyzer"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "unavailable",
+        "consecutiveFailures": 3,
+        "successCount": 2,
+        "failureCount": 3,
+        "successRate": 0.4,
+        "lastUpdate": "2026-01-31T05:57:24.604Z",
+        "isolatedAt": "2026-01-31T05:57:24.604Z",
+        "isolationReason": "3 consecutive failures: test3",
+        "lastSuccessAt": "2026-01-31T05:57:13.275Z",
+        "lastFailureAt": "2026-01-31T05:57:24.604Z"
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-01-31T05:55:09.330Z",
+        "updatedAt": "2026-01-31T05:55:09.330Z"
+      }
+    },
+    "planner": {
+      "id": "planner",
+      "displayName": "planner",
+      "category": "core",
+      "filePath": ".claude/agents/core/planner.md",
+      "capabilities": [
+        {
+          "name": "planner",
+          "domain": "planning",
+          "description": "Strategic thinker. Breaks down complex goals into atomic, actionable steps. Use for new features, large refactors, or ambiguous requests.",
+          "triggerPhrases": [
+            "planner",
+            "refactors",
+            "plan-generator",
+            "task-breakdown",
+            "sequential-thinking",
+            "context-compressor",
+            "progressive-disclosure"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet"
+          ],
+          "skills": [
+            "plan-generator",
+            "task-breakdown",
+            "sequential-thinking",
+            "context-compressor",
+            "progressive-disclosure"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-01-31T05:55:09.330Z",
+        "updatedAt": "2026-01-31T05:55:09.330Z"
+      }
+    },
+    "pm": {
+      "id": "pm",
+      "displayName": "pm",
+      "category": "core",
+      "filePath": ".claude/agents/core/pm.md",
+      "capabilities": [
+        {
+          "name": "pm",
+          "domain": "planning",
+          "description": "Product Manager. Manages product backlogs, sprint planning, stakeholder communication, and feature prioritization. Use for roadmap planning, user story creation, stakeholder updates, and agile work...",
+          "triggerPhrases": [
+            "planning",
+            "linear-pm",
+            "jira-pm",
+            "slack-notifications",
+            "consensus-voting",
+            "plan-generator",
+            "sequential-thinking",
+            "verification-before-completion",
+            "task-management-protocol",
+            "progressive-disclosure"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "linear-pm",
+            "jira-pm",
+            "slack-notifications",
+            "consensus-voting",
+            "plan-generator",
+            "sequential-thinking",
+            "verification-before-completion",
+            "task-management-protocol",
+            "progressive-disclosure"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.330Z",
+        "updatedAt": "2026-01-31T05:55:09.330Z"
+      }
+    },
+    "qa": {
+      "id": "qa",
+      "displayName": "qa",
+      "category": "core",
+      "filePath": ".claude/agents/core/qa.md",
+      "capabilities": [
+        {
+          "name": "qa",
+          "domain": "code",
+          "description": "Quality Assurance specialist. Writes comprehensive test suites, performs regression testing, and validates releases.",
+          "triggerPhrases": [
+            "test",
+            "testing",
+            "validates",
+            "test-generator",
+            "rule-auditor",
+            "verification-before-completion",
+            "checklist-generator",
+            "tdd",
+            "ripgrep",
+            "code-analyzer"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "Git",
+            "SequentialThinking",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "test-generator",
+            "rule-auditor",
+            "verification-before-completion",
+            "checklist-generator",
+            "tdd",
+            "ripgrep",
+            "code-analyzer",
+            "chrome-browser",
+            "task-management-protocol"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-01-31T05:55:09.330Z",
+        "updatedAt": "2026-01-31T05:55:09.330Z"
+      }
+    },
+    "reflection-agent": {
+      "id": "reflection-agent",
+      "displayName": "reflection-agent",
+      "category": "core",
+      "filePath": ".claude/agents/core/reflection-agent.md",
+      "capabilities": [
+        {
+          "name": "reflection-agent",
+          "domain": "code",
+          "description": "Quality assessor and learning consolidator using RECE loop (Reflect-Evaluate-Correct-Execute). Scores outputs against rubrics, extracts patterns, and updates memory. Use after task completion for m...",
+          "triggerPhrases": [
+            "reflection",
+            "agent",
+            "task-management-protocol",
+            "verification-before-completion",
+            "code-analyzer",
+            "insight-extraction"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Grep",
+            "Glob",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "verification-before-completion",
+            "code-analyzer",
+            "insight-extraction"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.330Z",
+        "updatedAt": "2026-01-31T05:55:09.330Z"
+      }
+    },
+    "router": {
+      "id": "router",
+      "displayName": "router",
+      "category": "core",
+      "filePath": ".claude/agents/core/router.md",
+      "capabilities": [
+        {
+          "name": "router",
+          "domain": "code",
+          "description": "Orchestrates multi-agent system by analyzing requests and spawning appropriate subagents via the Task tool. Enables true parallel execution and isolated agent contexts.",
+          "triggerPhrases": [
+            "router",
+            "orchestrates",
+            "agent-creator",
+            "skill-creator",
+            "verification-before-completion",
+            "tool-search",
+            "swarm-coordination",
+            "skill-discovery"
+          ],
+          "requiredTools": [
+            "Read",
+            "Task",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "agent-creator",
+            "skill-creator",
+            "verification-before-completion",
+            "tool-search",
+            "swarm-coordination",
+            "skill-discovery"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.330Z",
+        "updatedAt": "2026-01-31T05:55:09.330Z"
+      }
+    },
+    "technical-writer": {
+      "id": "technical-writer",
+      "displayName": "technical-writer",
+      "category": "core",
+      "filePath": ".claude/agents/core/technical-writer.md",
+      "capabilities": [
+        {
+          "name": "technical-writer",
+          "domain": "documentation",
+          "description": "Creates and updates documentation, user guides, API docs, and technical content. Use for any documentation task including updating existing docs.",
+          "triggerPhrases": [
+            "technical",
+            "writer",
+            "creates",
+            "doc-generator",
+            "writing-skills",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer",
+            "mkdocs-specific-rules",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate"
+          ],
+          "skills": [
+            "doc-generator",
+            "writing-skills",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer",
+            "mkdocs-specific-rules",
+            "task-management-protocol"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "c4-code": {
+      "id": "c4-code",
+      "displayName": "c4-code",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/c4-code.md",
+      "capabilities": [
+        {
+          "name": "c4-code",
+          "domain": "code",
+          "description": "Expert C4 Code-level documentation specialist. Analyzes code directories to create comprehensive C4 code-level documentation including function signatures, arguments, dependencies, and code structu...",
+          "triggerPhrases": [
+            "code",
+            "analyzes",
+            "create",
+            "task-management-protocol",
+            "doc-generator",
+            "code-analyzer",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Write",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "doc-generator",
+            "code-analyzer",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "c4-component": {
+      "id": "c4-component",
+      "displayName": "c4-component",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/c4-component.md",
+      "capabilities": [
+        {
+          "name": "c4-component",
+          "domain": "architecture",
+          "description": "Expert C4 Component-level documentation specialist. Synthesizes C4 Code-level documentation into Component-level architecture, defining component boundaries, interfaces, and relationships. Creates ...",
+          "triggerPhrases": [
+            "component",
+            "creates",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "verification-before-completion",
+            "diagram-generator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Write",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "verification-before-completion",
+            "diagram-generator"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "c4-container": {
+      "id": "c4-container",
+      "displayName": "c4-container",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/c4-container.md",
+      "capabilities": [
+        {
+          "name": "c4-container",
+          "domain": "architecture",
+          "description": "Expert C4 Container-level documentation specialist. Synthesizes Component-level documentation into Container-level architecture, mapping components to deployment units, documenting container interf...",
+          "triggerPhrases": [
+            "container",
+            "deployment",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "api-development-expert",
+            "verification-before-completion",
+            "diagram-generator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Write",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "api-development-expert",
+            "verification-before-completion",
+            "diagram-generator"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "c4-context": {
+      "id": "c4-context",
+      "displayName": "c4-context",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/c4-context.md",
+      "capabilities": [
+        {
+          "name": "c4-context",
+          "domain": "architecture",
+          "description": "Expert C4 Context-level documentation specialist. Creates high-level system context diagrams, documents personas, user journeys, system features, and external dependencies. Synthesizes container an...",
+          "triggerPhrases": [
+            "context",
+            "creates",
+            "create",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Write",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "code-reviewer": {
+      "id": "code-reviewer",
+      "displayName": "code-reviewer",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/code-reviewer.md",
+      "capabilities": [
+        {
+          "name": "code-reviewer",
+          "domain": "code",
+          "description": "Senior code reviewer with two-stage review process - spec compliance first, then code quality. Use for code reviews, PR reviews, and implementation verification.",
+          "triggerPhrases": [
+            "code",
+            "reviewer",
+            "review",
+            "reviews",
+            "implementation",
+            "task-management-protocol",
+            "requesting-code-review",
+            "receiving-code-review",
+            "verification-before-completion",
+            "checklist-generator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Glob",
+            "Grep",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "requesting-code-review",
+            "receiving-code-review",
+            "verification-before-completion",
+            "checklist-generator",
+            "code-analyzer",
+            "code-quality-expert",
+            "rule-auditor",
+            "code-style-validator"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "code-simplifier": {
+      "id": "code-simplifier",
+      "displayName": "code-simplifier",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/code-simplifier.md",
+      "capabilities": [
+        {
+          "name": "code-simplifier",
+          "domain": "code",
+          "description": "Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Focuses on recently modified code unless instructed otherwise. Use for code cleanup, re...",
+          "triggerPhrases": [
+            "code",
+            "simplifier",
+            "refactoring",
+            "task-management-protocol",
+            "best-practices-guidelines",
+            "code-analyzer",
+            "code-style-validator",
+            "dry-principle",
+            "debugging"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "best-practices-guidelines",
+            "code-analyzer",
+            "code-style-validator",
+            "dry-principle",
+            "debugging"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "conductor-validator": {
+      "id": "conductor-validator",
+      "displayName": "conductor-validator",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/conductor-validator.md",
+      "capabilities": [
+        {
+          "name": "conductor-validator",
+          "domain": "code",
+          "description": "Validates Conductor project artifacts for completeness, consistency, and correctness. Use after setup, when diagnosing issues, or before implementation to verify project context.",
+          "triggerPhrases": [
+            "conductor",
+            "validator",
+            "validates",
+            "implementation",
+            "task-management-protocol",
+            "context-driven-development",
+            "track-management",
+            "workflow-patterns",
+            "verification-before-completion",
+            "rule-auditor"
+          ],
+          "requiredTools": [
+            "Read",
+            "Glob",
+            "Grep",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "context-driven-development",
+            "track-management",
+            "workflow-patterns",
+            "verification-before-completion",
+            "rule-auditor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "database-architect": {
+      "id": "database-architect",
+      "displayName": "database-architect",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/database-architect.md",
+      "capabilities": [
+        {
+          "name": "database-architect",
+          "domain": "architecture",
+          "description": "Database schema design, query optimization, migration planning, and data modeling. Use for designing database schemas, optimizing queries, planning migrations, data consistency validation, and data...",
+          "triggerPhrases": [
+            "database",
+            "architect",
+            "design",
+            "planning",
+            "designing",
+            "task-management-protocol",
+            "database-expert",
+            "text-to-sql",
+            "diagram-generator",
+            "sequential-thinking"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "database-expert",
+            "text-to-sql",
+            "diagram-generator",
+            "sequential-thinking",
+            "doc-generator",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "devops-troubleshooter": {
+      "id": "devops-troubleshooter",
+      "displayName": "devops-troubleshooter",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/devops-troubleshooter.md",
+      "capabilities": [
+        {
+          "name": "devops-troubleshooter",
+          "domain": "code",
+          "description": "Expert DevOps troubleshooter specializing in rapid incident response, advanced debugging, and modern observability. Masters log analysis, distributed tracing, Kubernetes debugging, performance opti...",
+          "triggerPhrases": [
+            "devops",
+            "troubleshooter",
+            "debugging",
+            "task-management-protocol",
+            "context-compressor",
+            "smart-debug",
+            "verification-before-completion",
+            "sentry-monitoring",
+            "recovery",
+            "chrome-browser"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Grep",
+            "Glob",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "context-compressor",
+            "debugging",
+            "smart-debug",
+            "verification-before-completion",
+            "sentry-monitoring",
+            "recovery",
+            "chrome-browser",
+            "logging-module-usage"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "devops": {
+      "id": "devops",
+      "displayName": "devops",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/devops.md",
+      "capabilities": [
+        {
+          "name": "devops",
+          "domain": "devops",
+          "description": "Infrastructure as Code, CI/CD pipeline design, deployment automation, SRE practices, release management, and observability. Use for containerization, orchestration (Kubernetes), cloud architecture ...",
+          "triggerPhrases": [
+            "devops",
+            "design",
+            "deployment",
+            "task-management-protocol",
+            "dependency-analyzer",
+            "git-expert",
+            "github-mcp",
+            "architecture-review",
+            "database-architect",
+            "consensus-voting"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Grep",
+            "Glob",
+            "Bash",
+            "MCP Tools",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "dependency-analyzer",
+            "git-expert",
+            "github-mcp",
+            "architecture-review",
+            "database-architect",
+            "consensus-voting",
+            "context-compressor",
+            "filesystem",
+            "k8s-manifest-generator"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "incident-responder": {
+      "id": "incident-responder",
+      "displayName": "incident-responder",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/incident-responder.md",
+      "capabilities": [
+        {
+          "name": "incident-responder",
+          "domain": "code",
+          "description": "Expert SRE incident responder specializing in rapid problem resolution, modern observability, and comprehensive incident management. Masters incident command, blameless post-mortems, error budget m...",
+          "triggerPhrases": [
+            "incident",
+            "responder",
+            "task-management-protocol",
+            "debugging",
+            "postmortem-writing",
+            "on-call-handoff-patterns",
+            "incident-runbook-templates",
+            "verification-before-completion",
+            "sentry-monitoring",
+            "slack-notifications"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Bash",
+            "Write",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "debugging",
+            "postmortem-writing",
+            "on-call-handoff-patterns",
+            "incident-runbook-templates",
+            "verification-before-completion",
+            "sentry-monitoring",
+            "slack-notifications",
+            "recovery"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "researcher": {
+      "id": "researcher",
+      "displayName": "researcher",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/researcher.md",
+      "capabilities": [
+        {
+          "name": "researcher",
+          "domain": "research",
+          "description": "Research and fact-finding specialist with web access and Exa tools. Use for external information gathering, best practice research, technology comparisons, fact-checking, and pre-creation research ...",
+          "triggerPhrases": [
+            "researcher",
+            "building",
+            "research-synthesis",
+            "thinking-tools",
+            "doc-generator",
+            "ripgrep",
+            "task-management-protocol",
+            "context-compressor"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "research-synthesis",
+            "thinking-tools",
+            "doc-generator",
+            "ripgrep",
+            "task-management-protocol",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "reverse-engineer": {
+      "id": "reverse-engineer",
+      "displayName": "reverse-engineer",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/reverse-engineer.md",
+      "capabilities": [
+        {
+          "name": "reverse-engineer",
+          "domain": "code",
+          "description": "Expert reverse engineer specializing in binary analysis, disassembly, decompilation, and software analysis. Masters IDA Pro, Ghidra, radare2, x64dbg, and modern RE toolchains. Handles executable an...",
+          "triggerPhrases": [
+            "reverse",
+            "engineer",
+            "task-management-protocol",
+            "binary-analysis-patterns",
+            "memory-forensics",
+            "protocol-reverse-engineering",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "security-architect"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Glob",
+            "Grep",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "binary-analysis-patterns",
+            "memory-forensics",
+            "protocol-reverse-engineering",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "security-architect",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "security-architect": {
+      "id": "security-architect",
+      "displayName": "security-architect",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/security-architect.md",
+      "capabilities": [
+        {
+          "name": "security-architect",
+          "domain": "security",
+          "description": "Security architecture, threat modeling, compliance validation, and security assessment. Use for designing authentication systems, evaluating vulnerabilities, security code review, penetration testi...",
+          "triggerPhrases": [
+            "security",
+            "architect",
+            "designing",
+            "review",
+            "testing",
+            "planning",
+            "task-management-protocol",
+            "rule-auditor",
+            "dependency-analyzer",
+            "explaining-rules"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "Search",
+            "MCP Tools",
+            "SequentialThinking",
+            "TaskUpdate"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "rule-auditor",
+            "dependency-analyzer",
+            "explaining-rules",
+            "repo-rag",
+            "security-architect",
+            "doc-generator",
+            "verification-before-completion",
+            "auth-security-expert",
+            "authentication-flow-rules"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "ai-ml-specialist": {
+      "id": "ai-ml-specialist",
+      "displayName": "ai-ml-specialist",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/ai-ml-specialist.md",
+      "capabilities": [
+        {
+          "name": "ai-ml-specialist",
+          "domain": "code",
+          "description": "AI/ML specialist for machine learning model development, deep learning, MLOps, experiment tracking, and model deployment. Use for PyTorch, TensorFlow, Hugging Face, scikit-learn projects, ML pipeli...",
+          "triggerPhrases": [
+            "specialist",
+            "deployment",
+            "task-management-protocol",
+            "ai-ml-expert",
+            "python-backend-expert",
+            "data-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion",
+            "scientific-skills"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "ai-ml-expert",
+            "python-backend-expert",
+            "data-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion",
+            "scientific-skills"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "android-pro": {
+      "id": "android-pro",
+      "displayName": "android-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/android-pro.md",
+      "capabilities": [
+        {
+          "name": "android",
+          "domain": "code",
+          "description": "Native Android development expert for Kotlin, Jetpack Compose, and Android SDK. Use for building native Android applications, Material Design interfaces, and Android platform integrations.",
+          "triggerPhrases": [
+            "android",
+            "pro",
+            "building",
+            "design",
+            "task-management-protocol",
+            "android-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "android-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "data-engineer": {
+      "id": "data-engineer",
+      "displayName": "data-engineer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/data-engineer.md",
+      "capabilities": [
+        {
+          "name": "data-engineer",
+          "domain": "code",
+          "description": "Data engineering expert for ETL pipelines, data validation, analytics, and data infrastructure. Use for building data pipelines, data quality checks, data transformations, and analytics workflows.",
+          "triggerPhrases": [
+            "data",
+            "engineer",
+            "building",
+            "task-management-protocol",
+            "data-expert",
+            "text-to-sql",
+            "diagram-generator",
+            "tdd",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "data-expert",
+            "text-to-sql",
+            "diagram-generator",
+            "tdd",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "expo-mobile-developer": {
+      "id": "expo-mobile-developer",
+      "displayName": "expo-mobile-developer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/expo-mobile-developer.md",
+      "capabilities": [
+        {
+          "name": "expo-mobile-developer",
+          "domain": "code",
+          "description": "Expo and React Native mobile application development expert for iOS and Android. Use for building cross-platform mobile apps, native integrations, and mobile-first user experiences.",
+          "triggerPhrases": [
+            "expo",
+            "mobile",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "expo-framework-rule",
+            "expo-mobile-app-rule",
+            "react-expert",
+            "tdd",
+            "mobile-ui-development-rule"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "expo-framework-rule",
+            "expo-mobile-app-rule",
+            "react-expert",
+            "tdd",
+            "mobile-ui-development-rule",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "fastapi-pro": {
+      "id": "fastapi-pro",
+      "displayName": "fastapi-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/fastapi-pro.md",
+      "capabilities": [
+        {
+          "name": "fastapi",
+          "domain": "code",
+          "description": "Build high-performance async APIs with FastAPI, SQLAlchemy 2.0, and Pydantic V2. Master microservices, WebSockets, and modern Python async patterns. Use PROACTIVELY for FastAPI development, async o...",
+          "triggerPhrases": [
+            "fastapi",
+            "pro",
+            "build",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "security-architect",
+            "verification-before-completion",
+            "api-development-expert"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "security-architect",
+            "verification-before-completion",
+            "api-development-expert",
+            "python-backend-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "frontend-pro": {
+      "id": "frontend-pro",
+      "displayName": "frontend-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/frontend-pro.md",
+      "capabilities": [
+        {
+          "name": "frontend",
+          "domain": "code",
+          "description": "Frontend development expert for React, Vue, modern CSS, component libraries, and UI/UX implementation. Use for building user interfaces, component libraries, responsive designs, accessibility, and ...",
+          "triggerPhrases": [
+            "frontend",
+            "pro",
+            "implementation",
+            "building",
+            "designs",
+            "task-management-protocol",
+            "frontend-expert",
+            "react-expert",
+            "styling-expert",
+            "ui-components-expert"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "frontend-expert",
+            "react-expert",
+            "styling-expert",
+            "ui-components-expert",
+            "tdd",
+            "accessibility",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "gamedev-pro": {
+      "id": "gamedev-pro",
+      "displayName": "gamedev-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/gamedev-pro.md",
+      "capabilities": [
+        {
+          "name": "gamedev",
+          "domain": "code",
+          "description": "Master game development across Unity, Unreal Engine, and Godot with expertise in ECS architecture, game loops, shaders, physics, and cross-platform optimization. Use PROACTIVELY for game mechanics,...",
+          "triggerPhrases": [
+            "gamedev",
+            "pro",
+            "implementation",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "gamedev-expert",
+            "cpp"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "gamedev-expert",
+            "cpp"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "golang-pro": {
+      "id": "golang-pro",
+      "displayName": "golang-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/golang-pro.md",
+      "capabilities": [
+        {
+          "name": "golang",
+          "domain": "code",
+          "description": "Master Go 1.21+ with modern patterns, advanced concurrency, performance optimization, and production-ready microservices. Expert in the latest Go ecosystem including generics, workspaces, and cutti...",
+          "triggerPhrases": [
+            "golang",
+            "pro",
+            "design",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "go-expert",
+            "api-development-expert"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "go-expert",
+            "api-development-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "graphql-pro": {
+      "id": "graphql-pro",
+      "displayName": "graphql-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/graphql-pro.md",
+      "capabilities": [
+        {
+          "name": "graphql",
+          "domain": "code",
+          "description": "GraphQL API development expert with schema design, resolver patterns, performance optimization, and security. Use for building GraphQL APIs, optimizing queries, implementing subscriptions, and API ...",
+          "triggerPhrases": [
+            "graphql",
+            "pro",
+            "design",
+            "building",
+            "implementing",
+            "task-management-protocol",
+            "graphql-expert",
+            "api-development-expert",
+            "tdd",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "graphql-expert",
+            "api-development-expert",
+            "tdd",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "ios-pro": {
+      "id": "ios-pro",
+      "displayName": "ios-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/ios-pro.md",
+      "capabilities": [
+        {
+          "name": "ios",
+          "domain": "code",
+          "description": "iOS/Swift development expert for iPhone, iPad, watchOS, and visionOS apps. Use for building native iOS applications, SwiftUI interfaces, UIKit components, and Apple platform integrations.",
+          "triggerPhrases": [
+            "ios",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "ios-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "ios-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "java-pro": {
+      "id": "java-pro",
+      "displayName": "java-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/java-pro.md",
+      "capabilities": [
+        {
+          "name": "java",
+          "domain": "code",
+          "description": "Java 21+ and Spring Boot 3.x development expert for enterprise backend systems. Use for building Spring Boot microservices, REST APIs, JPA repositories, and Java enterprise applications.",
+          "triggerPhrases": [
+            "java",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "java-expert",
+            "tdd",
+            "debugging",
+            "doc-generator",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "java-expert",
+            "tdd",
+            "debugging",
+            "doc-generator",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "mobile-ux-reviewer": {
+      "id": "mobile-ux-reviewer",
+      "displayName": "mobile-ux-reviewer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/mobile-ux-reviewer.md",
+      "capabilities": [
+        {
+          "name": "mobile-ux-reviewer",
+          "domain": "mobile",
+          "description": "UX/UI expert for reviewing mobile applications on iOS and Android. Use for design critiques, accessibility audits, Human Interface Guidelines compliance, and user experience evaluations.",
+          "triggerPhrases": [
+            "mobile",
+            "reviewer",
+            "reviewing",
+            "design",
+            "audits",
+            "task-management-protocol",
+            "diagram-generator",
+            "doc-generator",
+            "verification-before-completion",
+            "accessibility"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Grep",
+            "Glob",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "diagram-generator",
+            "doc-generator",
+            "verification-before-completion",
+            "accessibility",
+            "visual-and-observational-rules",
+            "mobile-first-design-rules"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "nextjs-pro": {
+      "id": "nextjs-pro",
+      "displayName": "nextjs-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/nextjs-pro.md",
+      "capabilities": [
+        {
+          "name": "nextjs",
+          "domain": "code",
+          "description": "Next.js 14+ App Router expert with React Server Components, Server Actions, and modern full-stack patterns. Use for building Next.js applications with SSR, SSG, ISR, and React Server Components.",
+          "triggerPhrases": [
+            "nextjs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "nextjs-expert",
+            "react-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "nextjs-expert",
+            "react-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "nodejs-pro": {
+      "id": "nodejs-pro",
+      "displayName": "nodejs-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/nodejs-pro.md",
+      "capabilities": [
+        {
+          "name": "nodejs",
+          "domain": "code",
+          "description": "Node.js backend expert for Express, NestJS, and modern async patterns. Use for building REST APIs, GraphQL servers, microservices, WebSocket servers, and backend architecture using Node.js and Type...",
+          "triggerPhrases": [
+            "nodejs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "nodejs-expert",
+            "tdd",
+            "debugging",
+            "typescript-expert",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "nodejs-expert",
+            "tdd",
+            "debugging",
+            "typescript-expert",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "php-pro": {
+      "id": "php-pro",
+      "displayName": "php-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/php-pro.md",
+      "capabilities": [
+        {
+          "name": "php",
+          "domain": "code",
+          "description": "PHP 8.x and Laravel 11+ development expert. Use for building modern PHP applications, REST APIs, Laravel apps, and PHP backend systems with best practices.",
+          "triggerPhrases": [
+            "php",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "php-expert",
+            "tdd",
+            "debugging",
+            "doc-generator",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "php-expert",
+            "tdd",
+            "debugging",
+            "doc-generator",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "python-pro": {
+      "id": "python-pro",
+      "displayName": "python-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/python-pro.md",
+      "capabilities": [
+        {
+          "name": "python",
+          "domain": "code",
+          "description": "Master Python 3.12+ with modern features, async programming, performance optimization, and production-ready practices. Expert in the latest Python ecosystem including uv, ruff, pydantic, and FastAP...",
+          "triggerPhrases": [
+            "python",
+            "pro",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "python-backend-expert",
+            "api-development-expert"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "python-backend-expert",
+            "api-development-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "rust-pro": {
+      "id": "rust-pro",
+      "displayName": "rust-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/rust-pro.md",
+      "capabilities": [
+        {
+          "name": "rust",
+          "domain": "code",
+          "description": "Master Rust 1.75+ with modern async patterns, advanced type system features, and production-ready systems programming. Expert in the latest Rust ecosystem including Tokio, axum, and cutting-edge cr...",
+          "triggerPhrases": [
+            "rust",
+            "pro",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "build-tools-expert"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "build-tools-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "scientific-research-expert": {
+      "id": "scientific-research-expert",
+      "displayName": "scientific-research-expert",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/scientific-research-expert.md",
+      "capabilities": [
+        {
+          "name": "scientific-research",
+          "domain": "code",
+          "description": "Scientific research expert specializing in computational biology, cheminformatics, data analysis, and research methodology. Use for literature reviews, hypothesis generation, genomics/proteomics an...",
+          "triggerPhrases": [
+            "scientific",
+            "research",
+            "expert",
+            "reviews",
+            "task-management-protocol",
+            "scientific-skills",
+            "research-synthesis",
+            "diagram-generator",
+            "doc-generator",
+            "tdd"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "scientific-skills",
+            "research-synthesis",
+            "diagram-generator",
+            "doc-generator",
+            "tdd",
+            "verification-before-completion",
+            "arxiv-mcp"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "sveltekit-expert": {
+      "id": "sveltekit-expert",
+      "displayName": "sveltekit-expert",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/sveltekit-expert.md",
+      "capabilities": [
+        {
+          "name": "sveltekit",
+          "domain": "code",
+          "description": "SvelteKit and Svelte 5 runes expert for full-stack web apps. Use for building reactive web applications, SSR/SSG apps, form handling, SEO optimization, and full-stack development with SvelteKit.",
+          "triggerPhrases": [
+            "sveltekit",
+            "expert",
+            "building",
+            "task-management-protocol",
+            "svelte-expert",
+            "form-and-actions-in-sveltekit",
+            "seo-and-meta-tags-in-sveltekit",
+            "tdd",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "svelte-expert",
+            "form-and-actions-in-sveltekit",
+            "seo-and-meta-tags-in-sveltekit",
+            "tdd",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.331Z",
+        "updatedAt": "2026-01-31T05:55:09.331Z"
+      }
+    },
+    "tauri-desktop-developer": {
+      "id": "tauri-desktop-developer",
+      "displayName": "tauri-desktop-developer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/tauri-desktop-developer.md",
+      "capabilities": [
+        {
+          "name": "tauri-desktop-developer",
+          "domain": "code",
+          "description": "Tauri 2.0 desktop application development expert with Rust backend and web frontend integration. Use for building cross-platform desktop apps, native system integrations, and secure desktop applica...",
+          "triggerPhrases": [
+            "tauri",
+            "desktop",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "tauri-native-api-integration",
+            "tauri-security-rules",
+            "tauri-svelte-typescript-general",
+            "tauri-svelte-ui-components",
+            "debugging"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "tauri-native-api-integration",
+            "tauri-security-rules",
+            "tauri-svelte-typescript-general",
+            "tauri-svelte-ui-components",
+            "debugging",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.332Z",
+        "updatedAt": "2026-01-31T05:55:09.332Z"
+      }
+    },
+    "typescript-pro": {
+      "id": "typescript-pro",
+      "displayName": "typescript-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/typescript-pro.md",
+      "capabilities": [
+        {
+          "name": "typescript",
+          "domain": "code",
+          "description": "Master TypeScript with advanced types, generics, and strict type safety. Handles complex type systems, decorators, and enterprise-grade patterns. Use PROACTIVELY for TypeScript architecture, type i...",
+          "triggerPhrases": [
+            "typescript",
+            "pro",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "typescript-expert",
+            "state-management-expert"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "typescript-expert",
+            "state-management-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.332Z",
+        "updatedAt": "2026-01-31T05:55:09.332Z"
+      }
+    },
+    "web3-blockchain-expert": {
+      "id": "web3-blockchain-expert",
+      "displayName": "web3-blockchain-expert",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/web3-blockchain-expert.md",
+      "capabilities": [
+        {
+          "name": "web3-blockchain",
+          "domain": "security",
+          "description": "Web3, blockchain, and smart contract development expert. Specializes in Solidity, DeFi protocols, security auditing, gas optimization, and multi-chain development. Use PROACTIVELY for smart contrac...",
+          "triggerPhrases": [
+            "web3",
+            "blockchain",
+            "expert",
+            "auditing",
+            "review",
+            "task-management-protocol",
+            "web3-expert",
+            "security-architect",
+            "auth-security-expert",
+            "tdd"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "web3-expert",
+            "security-architect",
+            "auth-security-expert",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.332Z",
+        "updatedAt": "2026-01-31T05:55:09.332Z"
+      }
+    },
+    "evolution-orchestrator": {
+      "id": "evolution-orchestrator",
+      "displayName": "evolution-orchestrator",
+      "category": "orchestrator",
+      "filePath": ".claude/agents/orchestrators/evolution-orchestrator.md",
+      "capabilities": [
+        {
+          "name": "evolution-orchestrator",
+          "domain": "orchestration",
+          "description": "Meta-agent that orchestrates the EVOLVE workflow for creating new agents, skills, workflows, hooks, and schemas. Ensures research-first, validation-gated artifact creation.",
+          "triggerPhrases": [
+            "evolution",
+            "orchestrator",
+            "orchestrates",
+            "research-synthesis",
+            "agent-creator",
+            "skill-creator",
+            "workflow-creator",
+            "hook-creator",
+            "schema-creator",
+            "template-creator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Task",
+            "TaskCreate",
+            "TaskUpdate",
+            "TaskList",
+            "TaskGet"
+          ],
+          "skills": [
+            "research-synthesis",
+            "agent-creator",
+            "skill-creator",
+            "workflow-creator",
+            "hook-creator",
+            "schema-creator",
+            "template-creator",
+            "task-management-protocol"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.332Z",
+        "updatedAt": "2026-01-31T05:55:09.332Z"
+      }
+    },
+    "master-orchestrator": {
+      "id": "master-orchestrator",
+      "displayName": "master-orchestrator",
+      "category": "orchestrator",
+      "filePath": ".claude/agents/orchestrators/master-orchestrator.md",
+      "capabilities": [
+        {
+          "name": "master-orchestrator",
+          "domain": "orchestration",
+          "description": "The \"CEO\" agent. Manages the project lifecycle, coordinates subagents, and handles high-level user requests. Never implements code directly.",
+          "triggerPhrases": [
+            "master",
+            "orchestrator",
+            "coordinates",
+            "implements",
+            "plan-generator",
+            "task-management-protocol",
+            "response-rater",
+            "artifact-publisher",
+            "recovery",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Task",
+            "Read",
+            "Grep",
+            "Glob",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "plan-generator",
+            "task-management-protocol",
+            "response-rater",
+            "artifact-publisher",
+            "recovery",
+            "verification-before-completion",
+            "swarm-coordination",
+            "dispatching-parallel-agents",
+            "track-management",
+            "subagent-driven-development"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.332Z",
+        "updatedAt": "2026-01-31T05:55:09.332Z"
+      }
+    },
+    "party-orchestrator": {
+      "id": "party-orchestrator",
+      "displayName": "party-orchestrator",
+      "category": "orchestrator",
+      "filePath": ".claude/agents/orchestrators/party-orchestrator.md",
+      "capabilities": [
+        {
+          "name": "party-orchestrator",
+          "domain": "security",
+          "description": "Multi-agent collaboration coordinator for Party Mode. Orchestrates team-based agent interactions with security controls.",
+          "triggerPhrases": [
+            "party",
+            "orchestrator",
+            "orchestrates",
+            "party-mode",
+            "security-architect",
+            "context-compressor"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Task",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "party-mode",
+            "security-architect",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.332Z",
+        "updatedAt": "2026-01-31T05:55:09.332Z"
+      }
+    },
+    "swarm-coordinator": {
+      "id": "swarm-coordinator",
+      "displayName": "swarm-coordinator",
+      "category": "orchestrator",
+      "filePath": ".claude/agents/orchestrators/swarm-coordinator.md",
+      "capabilities": [
+        {
+          "name": "swarm-coordinator",
+          "domain": "orchestration",
+          "description": "Manages multi-agent swarms (Queen/Worker topology). Handles consensus, task distribution, and result aggregation.",
+          "triggerPhrases": [
+            "swarm",
+            "coordinator",
+            "swarm-coordination",
+            "task-management-protocol",
+            "consensus-voting",
+            "verification-before-completion",
+            "dispatching-parallel-agents",
+            "subagent-driven-development"
+          ],
+          "requiredTools": [
+            "Task",
+            "Read",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "swarm-coordination",
+            "task-management-protocol",
+            "consensus-voting",
+            "verification-before-completion",
+            "dispatching-parallel-agents",
+            "subagent-driven-development"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-01-31T05:55:09.332Z",
+        "updatedAt": "2026-01-31T05:55:09.332Z"
+      }
+    }
+  },
+  "index": {
+    "byCapability": {
+      "architect": [
+        "architect"
+      ],
+      "context-compressor": [
+        "context-compressor"
+      ],
+      "developer": [
+        "developer"
+      ],
+      "planner": [
+        "planner"
+      ],
+      "pm": [
+        "pm"
+      ],
+      "qa": [
+        "qa"
+      ],
+      "reflection-agent": [
+        "reflection-agent"
+      ],
+      "router": [
+        "router"
+      ],
+      "technical-writer": [
+        "technical-writer"
+      ],
+      "c4-code": [
+        "c4-code"
+      ],
+      "c4-component": [
+        "c4-component"
+      ],
+      "c4-container": [
+        "c4-container"
+      ],
+      "c4-context": [
+        "c4-context"
+      ],
+      "code-reviewer": [
+        "code-reviewer"
+      ],
+      "code-simplifier": [
+        "code-simplifier"
+      ],
+      "conductor-validator": [
+        "conductor-validator"
+      ],
+      "database-architect": [
+        "database-architect"
+      ],
+      "devops-troubleshooter": [
+        "devops-troubleshooter"
+      ],
+      "devops": [
+        "devops"
+      ],
+      "incident-responder": [
+        "incident-responder"
+      ],
+      "researcher": [
+        "researcher"
+      ],
+      "reverse-engineer": [
+        "reverse-engineer"
+      ],
+      "security-architect": [
+        "security-architect"
+      ],
+      "ai-ml-specialist": [
+        "ai-ml-specialist"
+      ],
+      "android": [
+        "android-pro"
+      ],
+      "data-engineer": [
+        "data-engineer"
+      ],
+      "expo-mobile-developer": [
+        "expo-mobile-developer"
+      ],
+      "fastapi": [
+        "fastapi-pro"
+      ],
+      "frontend": [
+        "frontend-pro"
+      ],
+      "gamedev": [
+        "gamedev-pro"
+      ],
+      "golang": [
+        "golang-pro"
+      ],
+      "graphql": [
+        "graphql-pro"
+      ],
+      "ios": [
+        "ios-pro"
+      ],
+      "java": [
+        "java-pro"
+      ],
+      "mobile-ux-reviewer": [
+        "mobile-ux-reviewer"
+      ],
+      "nextjs": [
+        "nextjs-pro"
+      ],
+      "nodejs": [
+        "nodejs-pro"
+      ],
+      "php": [
+        "php-pro"
+      ],
+      "python": [
+        "python-pro"
+      ],
+      "rust": [
+        "rust-pro"
+      ],
+      "scientific-research": [
+        "scientific-research-expert"
+      ],
+      "sveltekit": [
+        "sveltekit-expert"
+      ],
+      "tauri-desktop-developer": [
+        "tauri-desktop-developer"
+      ],
+      "typescript": [
+        "typescript-pro"
+      ],
+      "web3-blockchain": [
+        "web3-blockchain-expert"
+      ],
+      "evolution-orchestrator": [
+        "evolution-orchestrator"
+      ],
+      "master-orchestrator": [
+        "master-orchestrator"
+      ],
+      "party-orchestrator": [
+        "party-orchestrator"
+      ],
+      "swarm-coordinator": [
+        "swarm-coordinator"
+      ]
+    },
+    "byDomain": {
+      "security": [
+        "architect",
+        "security-architect",
+        "web3-blockchain-expert",
+        "party-orchestrator"
+      ],
+      "code": [
+        "context-compressor",
+        "developer",
+        "qa",
+        "reflection-agent",
+        "router",
+        "c4-code",
+        "code-reviewer",
+        "code-simplifier",
+        "conductor-validator",
+        "devops-troubleshooter",
+        "incident-responder",
+        "reverse-engineer",
+        "ai-ml-specialist",
+        "android-pro",
+        "data-engineer",
+        "expo-mobile-developer",
+        "fastapi-pro",
+        "frontend-pro",
+        "gamedev-pro",
+        "golang-pro",
+        "graphql-pro",
+        "ios-pro",
+        "java-pro",
+        "nextjs-pro",
+        "nodejs-pro",
+        "php-pro",
+        "python-pro",
+        "rust-pro",
+        "scientific-research-expert",
+        "sveltekit-expert",
+        "tauri-desktop-developer",
+        "typescript-pro"
+      ],
+      "planning": [
+        "planner",
+        "pm"
+      ],
+      "documentation": [
+        "technical-writer"
+      ],
+      "architecture": [
+        "c4-component",
+        "c4-container",
+        "c4-context",
+        "database-architect"
+      ],
+      "devops": [
+        "devops"
+      ],
+      "research": [
+        "researcher"
+      ],
+      "mobile": [
+        "mobile-ux-reviewer"
+      ],
+      "orchestration": [
+        "evolution-orchestrator",
+        "master-orchestrator",
+        "swarm-coordinator"
+      ]
+    },
+    "byCategory": {
+      "core": [
+        "architect",
+        "context-compressor",
+        "developer",
+        "planner",
+        "pm",
+        "qa",
+        "reflection-agent",
+        "router",
+        "technical-writer"
+      ],
+      "specialized": [
+        "c4-code",
+        "c4-component",
+        "c4-container",
+        "c4-context",
+        "code-reviewer",
+        "code-simplifier",
+        "conductor-validator",
+        "database-architect",
+        "devops-troubleshooter",
+        "devops",
+        "incident-responder",
+        "researcher",
+        "reverse-engineer",
+        "security-architect"
+      ],
+      "domain": [
+        "ai-ml-specialist",
+        "android-pro",
+        "data-engineer",
+        "expo-mobile-developer",
+        "fastapi-pro",
+        "frontend-pro",
+        "gamedev-pro",
+        "golang-pro",
+        "graphql-pro",
+        "ios-pro",
+        "java-pro",
+        "mobile-ux-reviewer",
+        "nextjs-pro",
+        "nodejs-pro",
+        "php-pro",
+        "python-pro",
+        "rust-pro",
+        "scientific-research-expert",
+        "sveltekit-expert",
+        "tauri-desktop-developer",
+        "typescript-pro",
+        "web3-blockchain-expert"
+      ],
+      "orchestrator": [
+        "evolution-orchestrator",
+        "master-orchestrator",
+        "party-orchestrator",
+        "swarm-coordinator"
+      ]
+    }
+  },
+  "health": {
+    "healthy": [
+      "architect",
+      "context-compressor",
+      "planner",
+      "pm",
+      "qa",
+      "reflection-agent",
+      "router",
+      "technical-writer",
+      "c4-code",
+      "c4-component",
+      "c4-container",
+      "c4-context",
+      "code-reviewer",
+      "code-simplifier",
+      "conductor-validator",
+      "database-architect",
+      "devops-troubleshooter",
+      "devops",
+      "incident-responder",
+      "researcher",
+      "reverse-engineer",
+      "security-architect",
+      "ai-ml-specialist",
+      "android-pro",
+      "data-engineer",
+      "expo-mobile-developer",
+      "fastapi-pro",
+      "frontend-pro",
+      "gamedev-pro",
+      "golang-pro",
+      "graphql-pro",
+      "ios-pro",
+      "java-pro",
+      "mobile-ux-reviewer",
+      "nextjs-pro",
+      "nodejs-pro",
+      "php-pro",
+      "python-pro",
+      "rust-pro",
+      "scientific-research-expert",
+      "sveltekit-expert",
+      "tauri-desktop-developer",
+      "typescript-pro",
+      "web3-blockchain-expert",
+      "evolution-orchestrator",
+      "master-orchestrator",
+      "party-orchestrator",
+      "swarm-coordinator"
+    ],
+    "degraded": [],
+    "unavailable": [
+      "developer"
+    ]
+  }
+}

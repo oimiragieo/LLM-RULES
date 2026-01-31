@@ -13,6 +13,40 @@
 
 ---
 
+## [ADR-069] Tool Manifest and Pre-Spawn Validation Architecture
+
+- **Date**: 2026-01-30
+- **Status**: Accepted
+- **Context**: Agent-Studio orchestration had five critical issues: (1) Agents don't know what tools they have, causing "Invalid tool parameters" errors; (2) Agents don't know available skills; (3) Tool errors repeated across spawns; (4) Orchestrator makes wrong tool decisions; (5) Zero error tolerance for spawns. Root causes: no single source of truth for tool definitions (3 conflicting definitions in developer.md, master-orchestrator.md, CLAUDE.md), no skill discovery mechanism, 11+ agents reference unavailable MCP tools (mcp**Exa**_, mcp**memory**_, mcp**filesystem**_, mcp**chrome-devtools**_).
+- **Decision**: Implement Tool Registry with Pre-Spawn Validation pattern:
+  1. **Single Source of Truth**: Create `tool-manifest.json` defining all 20 core tools + 9 MCP tools with metadata (category, description, availability, mandatory flags)
+  2. **Toolsets**: Define DEVELOPER, ORCHESTRATOR, ROUTER, READ_ONLY toolsets mapping agent types to appropriate tools
+  3. **Skill Index**: Generate `skill-index.json` from 435-skill catalog with domain/category/tool-requirement indexes
+  4. **Pre-Spawn Validation Hook**: `pre-spawn-tool-validator.cjs` validates spawn requests against manifest (check tool existence, mandatory tools, MCP fallbacks, tool count <= 15)
+  5. **Spawn Prompt Injection**: Add AVAILABLE_TOOLS and AVAILABLE_SKILLS sections to spawn templates
+  6. **MCP Fallbacks**: Document fallbacks for all unavailable MCP tools (e.g., mcp\_\_sequential-thinking -> Skill({ skill: 'sequential-thinking' }))
+- **Consequences**:
+  - **Benefits**:
+    - Zero tool parameter errors (guaranteed by pre-spawn validation)
+    - Agents fully aware of available tools (injected into prompt)
+    - Agents know how to discover skills (skill index + discovery protocol)
+    - Consistent toolsets across all agents (manifest-driven)
+    - MCP tool fallbacks documented and suggested
+    - <50ms validation overhead (manifest cached)
+  - **Trade-offs**:
+    - Additional file to maintain (tool-manifest.json)
+    - Spawn prompt slightly larger (+~500 chars for tool/skill sections)
+    - Hook chain adds validation step (minimal overhead)
+  - **Risk Mitigations**:
+    - CI validates manifest on every commit
+    - Manifest version-controlled
+    - Hook has warn mode for gradual rollout
+- **Implementation**: `.claude/docs/ARCHITECTURE_DESIGN_TOOL_AWARENESS.md` (comprehensive design)
+- **Migration Path**: Phase 1A (foundation, 2 days) -> Phase 1B (integration, 1 day) -> Phase 1C (agent cleanup, 1 day)
+- **Related ADRs**: ADR-051 (Tool Availability Validation Hook), ADR-043 (MCP Tool Removal)
+
+---
+
 ## [ADR-065] Track Metadata Schema Design (SPEC-007)
 
 - **Date**: 2026-01-29
@@ -1041,5 +1075,162 @@ _Negative:_
 - **Implementation**: `.claude/lib/workflow/hybrid-executor.cjs`
 - **Related ADRs**: Phase 3 SPEC-015 (Conductor Integration)
 - **Risk Assessment**: See phase-4-risk-assessment.md (Risks 19.1-19.4)
+
+---
+
+## [ADR-071] Agent Capability Cards Architecture (Phase 3)
+
+- **Date**: 2026-01-31
+- **Status**: Accepted (Implementation-Ready)
+- **Context**: Router uses static agent routing table (CLAUDE.md Section 3) and cannot dynamically discover agent capabilities. No mechanism exists for health-aware routing - failed agents can be repeatedly spawned. Need Phase 3 to complement Phase 2 (SkillCatalog for skills) with capability discovery for agents.
+- **Decision**: Implement Agent Capability Cards system with the following architecture:
+  1. **Agent Capability Card Schema** (`.claude/schemas/agent-capability-card.schema.json`): JSON Schema v7 defining id, displayName, category, capabilities[], constraints, health, metadata. Capabilities include name, domain (15 predefined), description, triggerPhrases, requiredTools, skills.
+  2. **Agent Registry Generator** (`.claude/lib/tools/agent-registry-generator.cjs`): Scans `.claude/agents/**/*.md`, parses YAML frontmatter, generates capability cards, builds indices (byCapability, byDomain, byCategory), outputs to `.claude/context/agent-registry.json`.
+  3. **AvailableAgents Tool** (`.claude/lib/tools/available-agents.cjs`): Query interface with filters (capability, domain, category, excludeFailed, minSuccessRate, limit). Caching (LRU, 5min TTL). Returns sorted by success rate.
+  4. **Agent Health Tracker** (`.claude/lib/tools/agent-health-tracker.cjs`): State machine (healthy->degraded->unavailable). Isolation after 3 consecutive failures. Recovery window (5 minutes). Updates success rate and execution time.
+  5. **Agent Health Hook** (`.claude/hooks/routing/agent-health-hook.cjs`): PostToolUse integration with Task tool. Extracts agent ID from spawn prompt. Records success/failure. Pre-spawn health check blocks unavailable agents.
+- **Consequences**:
+  - **Positive**:
+    - Dynamic agent discovery complements static routing table
+    - Health-aware routing prevents repeated failures
+    - Failure isolation protects system from problematic agents
+    - Recovery mechanism allows agents to return to service
+    - Query API consistent with SkillCatalog (familiar pattern)
+    - O(1) capability lookup via indices
+  - **Negative**:
+    - Additional registry file (~2KB per agent, ~100KB total)
+    - Generator must run on agent file changes
+    - Health state persistence requires file writes
+    - ~400 lines of new code to maintain
+  - **Trade-offs**:
+    - Chose 3 indices (capability/domain/category) over single index (faster query)
+    - Chose file-based health persistence over memory-only (survives restart)
+    - Chose 3-failure isolation threshold (balance safety/availability)
+    - Chose 5-min recovery window (balance cooldown/recovery speed)
+- **Implementation Files**:
+  - `.claude/schemas/agent-capability-card.schema.json` (~150 lines)
+  - `.claude/lib/tools/agent-registry-generator.cjs` (~400 lines)
+  - `.claude/lib/tools/available-agents.cjs` (~300 lines)
+  - `.claude/lib/tools/agent-health-tracker.cjs` (~250 lines)
+  - `.claude/hooks/routing/agent-health-hook.cjs` (~150 lines)
+  - `.claude/context/agent-registry.json` (~2000 lines, auto-generated)
+- **Architecture Document**: `.claude/docs/PHASE_3_IMPLEMENTATION_ARCHITECTURE.md`
+- **Related ADRs**: ADR-069 (Tool Manifest), ADR-070 (SkillCatalog - Phase 2 reference)
+- **Test Requirements**: 35+ tests across 4 test files
+- **Integration Requirements**: CLAUDE.md Section 1.4, router.md Gate 3
+
+---
+
+## [ADR-070] SkillCatalog Tool Architecture
+
+- **Date**: 2026-01-30
+- **Status**: Accepted
+- **Context**: Agents receive a static AVAILABLE_SKILLS list at spawn time (Phase 1D), but lack runtime skill discovery capability. Agents cannot filter by domain/category/tags or receive intelligent suggestions when queries return no results.
+- **Decision**: Implement SkillCatalogQuery class with the following architecture:
+  1. **Single Data Source**: Uses skill-index.json from Phase 1A
+  2. **Query Filters**: domain, category, tags (AND logic), agentType, limit (1-50)
+  3. **In-Memory Cache**: LRU eviction at 100 entries, 5-minute TTL, <50ms cached queries
+  4. **Suggestions Engine**: Returns alternative queries when count=0 (typo detection, broader filters)
+  5. **Schema Validation**: JSON Schema v7 for query/response validation
+  6. **Error Recovery**: Always returns response object (never throws), includes suggestions
+- **Consequences**:
+  - **Positive**:
+    - Runtime skill discovery complements static AVAILABLE_SKILLS
+    - <100ms query performance (50ms cached)
+    - Intelligent suggestions reduce agent confusion
+    - Type-safe API via JSON Schema validation
+    - No external dependencies (Node.js built-ins only)
+  - **Negative**:
+    - Additional file to maintain (.claude/lib/tools/skill-catalog.cjs)
+    - Cache coordination needed with skill-index regeneration
+    - ~400 lines of implementation code
+  - **Trade-offs**:
+    - Chose in-memory cache over file cache (simplicity vs persistence)
+    - Chose AND logic for tags over OR logic (precision vs recall)
+    - Chose LRU eviction over LFU (simplicity vs optimization)
+- **Implementation Files**:
+  - `.claude/lib/tools/skill-catalog.cjs` (~400 lines)
+  - `tests/lib/tools/skill-catalog.test.cjs` (~600 lines)
+  - `.claude/docs/SKILLCATALOG_USAGE.md` (agent guidance)
+  - `.claude/schemas/skillcatalog-query.schema.json`
+  - `.claude/schemas/skillcatalog-response.schema.json`
+- **Architecture Document**: `.claude/docs/SKILLCATALOG_ARCHITECTURE.md`
+- **Related ADRs**: ADR-069 (Tool Manifest and Pre-Spawn Validation)
+- **Test Requirements**: 40+ unit tests, 10+ integration tests, 5+ schema tests
+
+---
+
+## [ADR-072] Creator Skills Infrastructure Alignment
+
+- **Date**: 2026-01-31
+- **Status**: Proposed
+- **Context**: Audit of all 6 creator skills (agent-creator, skill-creator, workflow-creator, hook-creator, template-creator, schema-creator) revealed critical misalignment with Phase 1-3 orchestration infrastructure. None of the creators reference or integrate with tool-manifest.json (Phase 1), skill-index.json (Phase 2), or agent-registry.json (Phase 3). This causes "invisible artifacts" - newly created agents/skills are not discoverable by SkillCatalog() or AvailableAgents() tools.
+- **Decision**: Require all creator skills to integrate with Phase 1-3 infrastructure:
+  1. **Post-Creation Regeneration**: Creators must trigger registry regeneration after creating artifacts
+     - agent-creator: `node .claude/tools/cli/generate-agent-registry.cjs`
+     - skill-creator: `node .claude/tools/cli/generate-skill-index.cjs`
+  2. **Toolset References**: Replace hardcoded tool lists with toolset references from tool-manifest.json
+  3. **Validation**: Validate tool/skill/agent references against respective registries before creation
+  4. **Health Initialization**: New agents must have health object initialized in capability card
+- **Consequences**:
+  - **Benefits**:
+    - New artifacts immediately discoverable by runtime tools
+    - Tool consistency via manifest-driven toolsets
+    - Health tracking active from agent creation
+    - Validation prevents invalid references
+  - **Trade-offs**:
+    - Creator workflow slightly longer (regeneration step)
+    - Dependency on generator scripts being available
+    - May require creator skill updates when infrastructure changes
+  - **Migration Path**:
+    - Phase 1: Update creator SKILL.md files with post-creation steps (2 hours)
+    - Phase 2: Add npm scripts for regeneration (4 hours)
+    - Phase 3: Create post-creation-infrastructure-sync hook (8 hours)
+    - Phase 4: Add integration tests (4 hours)
+- **Audit Report**: `.claude/docs/CREATOR_SKILLS_ALIGNMENT_AUDIT.md`
+- **Related ADRs**: ADR-069 (Tool Manifest), ADR-070 (SkillCatalog), ADR-071 (Agent Capability Cards)
+
+---
+
+## [ADR-073] Code Indexing and Semantic Search System Architecture
+
+- **Date**: 2026-01-31
+- **Status**: Accepted (Design Complete)
+- **Context**: Agents currently use Grep/Glob for code search, which is keyword-based and produces many false positives. Natural language queries require manual translation to regex patterns. Users requested Greb-like semantic search capabilities using the Cursor RAG pipeline architecture as reference.
+- **Decision**: Implement a 7-step code indexing and semantic search pipeline:
+  1. **Code Parsing**: tree-sitter for 40+ language support with unified AST
+  2. **Semantic Chunking**: Extract functions, classes, methods (50-2048 tokens per chunk)
+  3. **Embedding Generation**: Local model (all-MiniLM-L6-v2, 384-dim) via @xenova/transformers
+  4. **Metadata Enrichment**: Path, language, type, line range, imports, exports, signatures
+  5. **Vector Storage**: ChromaDB (reusing ADR-054 infrastructure) with HNSW indexing
+  6. **Query Processing**: Query expansion, vector search, metadata filtering, re-ranking
+  7. **Index Maintenance**: Merkle trees for O(log n) change detection, incremental updates
+- **Consequences**:
+  - **Benefits**:
+    - +100% accuracy improvement (40% grep false positives → 80%+ relevant in top-5)
+    - 4-10x faster queries (<500ms vs 2-5s for full ripgrep scan)
+    - Natural language queries without regex translation
+    - Local-first, privacy-preserving (code never leaves machine)
+    - Zero operational cost ($0 for local embeddings)
+    - Leverages existing ChromaDB infrastructure from ADR-054
+    - Agent-native integration via dedicated Skill
+  - **Trade-offs**:
+    - Additional dependencies (tree-sitter, @xenova/transformers)
+    - Initial indexing time (~60s for 1000 files)
+    - Disk usage (~100MB per 10K files)
+    - Lower quality than cloud embeddings (0.82 vs 0.91 OpenAI)
+- **Implementation Timeline**: 6-8 weeks (3 phases: Foundation, Enhancement, Optimization)
+- **Key Technology Choices**:
+  - Parser: tree-sitter (40+ languages, battle-tested, Cursor precedent)
+  - Embeddings: all-MiniLM-L6-v2 local (free, private, offline-capable)
+  - Vector DB: ChromaDB (existing infrastructure from ADR-054)
+  - Change Detection: Merkle trees (O(log n) diffing, Cursor precedent)
+  - Integration: Native Skill (code-semantic-search)
+- **Design Documents**:
+  - `.claude/docs/CODE_INDEXING_DESIGN.md` (comprehensive system design)
+  - `.claude/docs/CODE_INDEXING_IMPLEMENTATION_ROADMAP.md` (phased implementation plan)
+  - `.claude/docs/CODE_INDEXING_TECH_STACK.md` (technology rationale)
+  - `.claude/context/artifacts/diagrams/code-indexing-architecture.md` (visual diagrams)
+- **Related ADRs**: ADR-054 (Memory System Enhancement - ChromaDB infrastructure), ADR-070 (SkillCatalog)
 
 ---

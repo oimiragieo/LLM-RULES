@@ -6,7 +6,7 @@
 
 'use strict';
 
-const { describe, it, beforeEach, mock } = require('node:test');
+const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert');
 
 // Tests for error-pattern-detector.cjs

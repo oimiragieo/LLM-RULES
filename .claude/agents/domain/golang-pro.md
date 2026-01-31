@@ -31,7 +31,7 @@ skills:
   - go-expert
   - api-development-expert
 context_files:
-  - .claude/context/memory/learnings.md
+  - @.claude/context/memory/learnings.md
 ---
 
 # Go Pro Agent

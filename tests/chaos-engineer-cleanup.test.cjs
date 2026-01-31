@@ -38,7 +38,11 @@ describe('ChaosEngineer cleanup between tests', () => {
 
     // This test should start with empty arrays due to afterEach cleanup
     assert.strictEqual(chaos.testResults.length, 0, 'testResults should be empty after cleanup');
-    assert.strictEqual(chaos.recoveryAttempts.length, 0, 'recoveryAttempts should be empty after cleanup');
+    assert.strictEqual(
+      chaos.recoveryAttempts.length,
+      0,
+      'recoveryAttempts should be empty after cleanup'
+    );
 
     // Run test
     await chaos.runChaosTest('test3', 1000);
@@ -60,7 +64,11 @@ describe('ChaosEngineer cleanup between tests', () => {
 
     // Verify cleared
     assert.strictEqual(chaos.testResults.length, 0, 'testResults should be empty after cleanup');
-    assert.strictEqual(chaos.recoveryAttempts.length, 0, 'recoveryAttempts should be empty after cleanup');
+    assert.strictEqual(
+      chaos.recoveryAttempts.length,
+      0,
+      'recoveryAttempts should be empty after cleanup'
+    );
     assert.strictEqual(chaos.injections.hooks.size, 0, 'hooks injections should be cleared');
     assert.strictEqual(chaos.injections.tools.size, 0, 'tools injections should be cleared');
   });

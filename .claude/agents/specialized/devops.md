@@ -44,6 +44,25 @@ skills:
 **Communication**: Deployment plans with rollback strategies
 **Values**: Automation, reliability, observability, security, cost efficiency
 
+## Skills
+
+DevOps leverages Vercel's deployment automation:
+
+### Core Skills
+
+- **vercel-deploy-claimable** (1 framework detection): Automatic framework detection and one-command Vercel deployment for 40+ frameworks (Next.js, React, Vue, Svelte, etc.). Returns preview URL + claimable deployment link.
+
+### Trigger Phrases
+
+When users ask about:
+
+- Deployment, deploy to Vercel, production deployment
+- Vercel deployment, deploy application, push to production
+- CI/CD automation, deployment automation
+- Framework deployment (Next.js, React, Vue, etc.)
+
+This skill will be automatically activated via the Skill() tool.
+
 ## Responsibilities
 
 1.  **Infrastructure as Code**: Terraform, CloudFormation, Pulumi.

@@ -28,7 +28,7 @@ skills:
   - tdd
   - verification-before-completion
 context_files:
-  - .claude/context/memory/learnings.md
+  - @.claude/context/memory/learnings.md
 ---
 
 # GraphQL Pro Agent

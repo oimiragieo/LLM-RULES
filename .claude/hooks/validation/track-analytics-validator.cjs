@@ -185,7 +185,7 @@ async function main() {
     let metadata;
     try {
       metadata = JSON.parse(content);
-    } catch (err) {
+    } catch (_err) {
       // Not valid JSON, skip validation
       process.exit(0);
     }

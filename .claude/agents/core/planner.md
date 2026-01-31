@@ -269,7 +269,7 @@ Before creating ANY artifact:
 Task({
 subagent_type: "reflection-agent",
 description: "Session reflection and learning extraction",
-prompt: "You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
+prompt: "You are REFLECTION-AGENT. Read @.claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
 })
 
 **Success Criteria**:
@@ -301,7 +301,7 @@ Skill({
   args: {
     topic: '[Feature Name] technical approach',
     minSources: 3,
-    outputPath: '.claude/context/artifacts/research-reports/[feature-name]-research.md',
+    outputPath: '@.claude/context/artifacts/research-reports/[feature-name]-research.md',
   },
 });
 ```

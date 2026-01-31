@@ -556,7 +556,7 @@ describe('SPEC-024: Automated Optimization Engine', () => {
       recommender = new OptimizationRecommender();
       const recommendations = Array(100)
         .fill(null)
-        .map((_, i) => ({
+        .map((_, _i) => ({
           type: 'optimization',
           estimatedImpact: { timeReductionMs: Math.random() * 10000 },
           confidence: Math.random(),

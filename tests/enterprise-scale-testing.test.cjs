@@ -18,7 +18,7 @@ const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs').promises;
 const path = require('node:path');
-const os = require('node:test');
+const _os = require('node:test');
 
 // ============================================================================
 // Test Framework Imports (to be implemented)
@@ -27,7 +27,7 @@ const os = require('node:test');
 const LoadTestFramework = require('../.claude/lib/testing/load-test-framework.cjs');
 const ChaosEngineer = require('../.claude/lib/testing/chaos-engineer.cjs');
 const {
-  FAILURE_SCENARIOS,
+  FAILURE_SCENARIOS: _FAILURE_SCENARIOS,
   executeFailureScenario,
   validateScenarioRecovery,
 } = require('../.claude/lib/testing/failure-scenarios.cjs');
@@ -177,7 +177,7 @@ describe('Load Testing - Concurrent Workflows', () => {
     it('should flag performance regressions', async () => {
       // Run baseline
       await framework.simulateConcurrentWorkflows(10, 'even');
-      const baseline = await framework.measureTaskSpawnTime([]);
+      const _baseline = await framework.measureTaskSpawnTime([]);
 
       // Run test
       await framework.simulateConcurrentWorkflows(100, 'even');

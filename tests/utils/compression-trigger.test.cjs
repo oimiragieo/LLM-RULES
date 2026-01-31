@@ -11,7 +11,7 @@ const {
   checkCompressionNeeded,
   triggerCompression,
   getCompressionStats,
-  resetCompressionCounters
+  resetCompressionCounters,
 } = require('../../.claude/lib/utils/compression-trigger.cjs');
 
 describe('compression-trigger.cjs', () => {
@@ -41,7 +41,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 85, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, false);
@@ -52,7 +52,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 90, status: 'CRITICAL' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, true);
@@ -65,7 +65,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 95, status: 'CRITICAL' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, true);
@@ -81,7 +81,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 8000,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, false);
@@ -92,7 +92,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 10000,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, true);
@@ -106,7 +106,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 15000,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, true);
@@ -120,7 +120,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 3000,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, false);
@@ -131,7 +131,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 5000,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, true);
@@ -145,7 +145,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 8000,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, true);
@@ -162,7 +162,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 9
+        operationCount: 9,
       });
 
       assert.strictEqual(result.needed, false);
@@ -173,7 +173,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 10
+        operationCount: 10,
       });
 
       assert.strictEqual(result.needed, true);
@@ -187,7 +187,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 15
+        operationCount: 15,
       });
 
       assert.strictEqual(result.needed, true);
@@ -205,7 +205,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 8000, // Below threshold individually
         lastFetchSize: 0,
-        operationCount: 2
+        operationCount: 2,
       });
 
       assert.strictEqual(result.needed, false);
@@ -220,7 +220,7 @@ describe('compression-trigger.cjs', () => {
         lastReadSize: 0,
         lastFetchSize: 0,
         operationCount: 5,
-        largeOperationPattern: true // Signal for pattern detection
+        largeOperationPattern: true, // Signal for pattern detection
       });
 
       // This will pass once pattern detection is implemented
@@ -237,7 +237,7 @@ describe('compression-trigger.cjs', () => {
       const result = await triggerCompression({
         reason: 'Budget > 90%',
         urgency: 'high',
-        maxRetries: 1
+        maxRetries: 1,
       });
 
       assert.strictEqual(result.success, true);
@@ -252,7 +252,7 @@ describe('compression-trigger.cjs', () => {
         reason: 'Test failure',
         urgency: 'low',
         maxRetries: 1,
-        _simulateFailure: true // Internal test flag
+        _simulateFailure: true, // Internal test flag
       });
 
       assert.strictEqual(result.success, false);
@@ -264,7 +264,7 @@ describe('compression-trigger.cjs', () => {
         reason: 'Error test',
         urgency: 'medium',
         maxRetries: 1,
-        _simulateFailure: true
+        _simulateFailure: true,
       });
 
       assert.strictEqual(result.success, false);
@@ -308,7 +308,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 5
+        operationCount: 5,
       });
 
       resetCompressionCounters();
@@ -317,7 +317,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 0 // Counter should be reset
+        operationCount: 0, // Counter should be reset
       });
 
       // After reset, operation count should be 0
@@ -332,7 +332,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, false);
@@ -346,7 +346,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 70, status: 'OK' },
         lastReadSize: 15000, // 15 KB - triggers compression
         lastFetchSize: 0,
-        operationCount: 5
+        operationCount: 5,
       });
 
       assert.strictEqual(compressionCheck.needed, true);
@@ -357,7 +357,7 @@ describe('compression-trigger.cjs', () => {
         const result = await triggerCompression({
           reason: compressionCheck.reason,
           urgency: compressionCheck.urgency,
-          maxRetries: 1
+          maxRetries: 1,
         });
 
         assert.ok(result.success !== undefined);
@@ -369,7 +369,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 2000, // 2 KB - below threshold
         lastFetchSize: 0,
-        operationCount: 3
+        operationCount: 3,
       });
 
       assert.strictEqual(compressionCheck.needed, false);
@@ -380,7 +380,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 92, status: 'CRITICAL' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(compressionCheck.needed, true);
@@ -389,7 +389,7 @@ describe('compression-trigger.cjs', () => {
       const result1 = await triggerCompression({
         reason: compressionCheck.reason,
         urgency: compressionCheck.urgency,
-        maxRetries: 1
+        maxRetries: 1,
       });
 
       // Should succeed
@@ -400,7 +400,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 92, status: 'CRITICAL' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       // Check should still detect need (no automatic cooldown)
@@ -416,7 +416,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 91, status: 'CRITICAL' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(compressionCheck.needed, true);
@@ -425,7 +425,7 @@ describe('compression-trigger.cjs', () => {
       const triggerResult = await triggerCompression({
         reason: compressionCheck.reason,
         urgency: compressionCheck.urgency,
-        maxRetries: 1
+        maxRetries: 1,
       });
 
       assert.ok(triggerResult.success !== undefined);
@@ -442,13 +442,16 @@ describe('compression-trigger.cjs', () => {
       const triggerResult = await triggerCompression({
         reason: 'Test logging',
         urgency: 'low',
-        maxRetries: 1
+        maxRetries: 1,
       });
 
       // If successful, check log file
       if (triggerResult.success && fs.existsSync(COMPRESSION_STATS_PATH)) {
         const logContent = fs.readFileSync(COMPRESSION_STATS_PATH, 'utf8');
-        const lines = logContent.trim().split('\n').filter(line => line.length > 0);
+        const lines = logContent
+          .trim()
+          .split('\n')
+          .filter(line => line.length > 0);
 
         assert.ok(lines.length > 0);
 
@@ -465,7 +468,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 8
+        operationCount: 8,
       });
 
       // Reset
@@ -476,7 +479,7 @@ describe('compression-trigger.cjs', () => {
         tokenBudgetStatus: { percentUsed: 50, status: 'OK' },
         lastReadSize: 0,
         lastFetchSize: 0,
-        operationCount: 0
+        operationCount: 0,
       });
 
       assert.strictEqual(result.needed, false);

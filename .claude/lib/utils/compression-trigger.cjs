@@ -22,9 +22,9 @@ const PROJECT_ROOT = process.cwd();
 const COMPRESSION_STATS_PATH = path.join(PROJECT_ROOT, '.claude/context/compression-stats.jsonl');
 
 // Thresholds
-const READ_SIZE_THRESHOLD = 10000;  // 10 KB
-const FETCH_SIZE_THRESHOLD = 5000;  // 5 KB
-const PERIODIC_INTERVAL = 10;       // Every 10 operations
+const READ_SIZE_THRESHOLD = 10000; // 10 KB
+const FETCH_SIZE_THRESHOLD = 5000; // 5 KB
+const PERIODIC_INTERVAL = 10; // Every 10 operations
 
 // Operation tracking (in-memory)
 let operationCounter = 0;
@@ -47,7 +47,7 @@ function checkCompressionNeeded(context) {
     lastReadSize = 0,
     lastFetchSize = 0,
     operationCount = 0,
-    largeOperationPattern = false
+    largeOperationPattern = false,
   } = context;
 
   // Trigger 1: Budget threshold (CRITICAL)
@@ -55,7 +55,7 @@ function checkCompressionNeeded(context) {
     return {
       needed: true,
       reason: `Budget > 90% (${tokenBudgetStatus.percentUsed.toFixed(1)}%)`,
-      urgency: 'high'
+      urgency: 'high',
     };
   }
 
@@ -65,7 +65,7 @@ function checkCompressionNeeded(context) {
     return {
       needed: true,
       reason: `Read > 10KB (${sizeKB}KB)`,
-      urgency: 'medium'
+      urgency: 'medium',
     };
   }
 
@@ -75,7 +75,7 @@ function checkCompressionNeeded(context) {
     return {
       needed: true,
       reason: `Fetch > 5KB (${sizeKB}KB)`,
-      urgency: 'medium'
+      urgency: 'medium',
     };
   }
 
@@ -87,7 +87,7 @@ function checkCompressionNeeded(context) {
     return {
       needed: true,
       reason: `Periodic compression (${operationCounter} ops)`,
-      urgency: 'low'
+      urgency: 'low',
     };
   }
 
@@ -96,14 +96,14 @@ function checkCompressionNeeded(context) {
     return {
       needed: true,
       reason: '3+ large operations detected',
-      urgency: 'high'
+      urgency: 'high',
     };
   }
 
   return {
     needed: false,
     reason: 'No compression triggers met',
-    urgency: 'low'
+    urgency: 'low',
   };
 }
 
@@ -119,11 +119,7 @@ function checkCompressionNeeded(context) {
  * @returns {Promise<{ success: boolean, message: string, bytesFreed: number }>}
  */
 async function triggerCompression(options) {
-  const {
-    reason,
-    urgency,
-    _simulateFailure = false
-  } = options;
+  const { reason, urgency, _simulateFailure = false } = options;
 
   try {
     // Simulate failure if test flag is set
@@ -141,7 +137,7 @@ async function triggerCompression(options) {
       reason,
       urgency,
       bytesFreed,
-      success: true
+      success: true,
     };
 
     // Ensure directory exists
@@ -156,14 +152,14 @@ async function triggerCompression(options) {
     return {
       success: true,
       message: `Compression triggered: ${reason} (${bytesFreed} bytes freed)`,
-      bytesFreed
+      bytesFreed,
     };
   } catch (error) {
     // Error handling - don't retry in Phase 2
     return {
       success: false,
       message: `Compression failed: ${error.message}`,
-      bytesFreed: 0
+      bytesFreed: 0,
     };
   }
 }
@@ -185,38 +181,44 @@ function getCompressionStats() {
       totalCompressions: 0,
       totalBytesSaved: 0,
       averageReduction: '0%',
-      lastCompressionTime: 'Never'
+      lastCompressionTime: 'Never',
     };
   }
 
   try {
     // Read JSONL file
     const logContent = fs.readFileSync(COMPRESSION_STATS_PATH, 'utf8');
-    const lines = logContent.trim().split('\n').filter(line => line.length > 0);
+    const lines = logContent
+      .trim()
+      .split('\n')
+      .filter(line => line.length > 0);
 
     if (lines.length === 0) {
       return {
         totalCompressions: 0,
         totalBytesSaved: 0,
         averageReduction: '0%',
-        lastCompressionTime: 'Never'
+        lastCompressionTime: 'Never',
       };
     }
 
     // Parse entries
-    const entries = lines.map(line => {
-      try {
-        return JSON.parse(line);
-      } catch (_e) {
-        return null;
-      }
-    }).filter(entry => entry !== null && entry.success);
+    const entries = lines
+      .map(line => {
+        try {
+          return JSON.parse(line);
+        } catch (_e) {
+          return null;
+        }
+      })
+      .filter(entry => entry !== null && entry.success);
 
     const totalCompressions = entries.length;
     const totalBytesSaved = entries.reduce((sum, entry) => sum + (entry.bytesFreed || 0), 0);
-    const averageReduction = totalCompressions > 0
-      ? Math.floor((totalBytesSaved / totalCompressions / 1000) * 100) / 100 + '%'
-      : '0%';
+    const averageReduction =
+      totalCompressions > 0
+        ? Math.floor((totalBytesSaved / totalCompressions / 1000) * 100) / 100 + '%'
+        : '0%';
     const lastEntry = entries[entries.length - 1];
     const lastCompressionTime = lastEntry ? lastEntry.timestamp : 'Never';
 
@@ -224,7 +226,7 @@ function getCompressionStats() {
       totalCompressions,
       totalBytesSaved,
       averageReduction,
-      lastCompressionTime
+      lastCompressionTime,
     };
   } catch (_error) {
     // Return zeros on error
@@ -232,7 +234,7 @@ function getCompressionStats() {
       totalCompressions: 0,
       totalBytesSaved: 0,
       averageReduction: '0%',
-      lastCompressionTime: 'Never'
+      lastCompressionTime: 'Never',
     };
   }
 }
@@ -248,5 +250,5 @@ module.exports = {
   checkCompressionNeeded,
   triggerCompression,
   getCompressionStats,
-  resetCompressionCounters
+  resetCompressionCounters,
 };

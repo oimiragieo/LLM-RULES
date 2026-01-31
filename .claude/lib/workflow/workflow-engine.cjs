@@ -986,7 +986,7 @@ class WorkflowEngine {
    * @returns {number} - Estimated cost in USD
    * @private
    */
-  _estimateWorkflowCost(context) {
+  _estimateWorkflowCost(_context) {
     if (!this.ml.costPredictor || !this.workflow) {
       return 0;
     }

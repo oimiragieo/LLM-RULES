@@ -125,11 +125,13 @@ function getOptimizationEngine(config = {}) {
  * @returns {boolean} - True if any ML feature is enabled
  */
 function isMLEnabled() {
-  return patternDetectionEnabled ||
-         costPredictionEnabled ||
-         adaptiveExecutionEnabled ||
-         performanceProfilingEnabled ||
-         patternLibraryEnabled;
+  return (
+    patternDetectionEnabled ||
+    costPredictionEnabled ||
+    adaptiveExecutionEnabled ||
+    performanceProfilingEnabled ||
+    patternLibraryEnabled
+  );
 }
 
 /**

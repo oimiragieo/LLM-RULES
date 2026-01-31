@@ -18,27 +18,30 @@
 const ALERT_THRESHOLDS = {
   // Memory Alerts
   memory: {
-    warning: 0.70,  // 70% of heap limit
+    warning: 0.7, // 70% of heap limit
     critical: 0.85, // 85% of heap limit
-    heapLimit: parseInt(process.env.NODE_OPTIONS?.match(/--max-old-space-size=(\d+)/)?.[1] || '4096', 10) * 1024 * 1024, // bytes
+    heapLimit:
+      parseInt(process.env.NODE_OPTIONS?.match(/--max-old-space-size=(\d+)/)?.[1] || '4096', 10) *
+      1024 *
+      1024, // bytes
   },
 
   // ML Feature Health
   ml: {
     patternDetectionLatency: {
-      warning: 10,    // 10ms
-      critical: 100,  // 100ms (target threshold)
+      warning: 10, // 10ms
+      critical: 100, // 100ms (target threshold)
     },
     costPredictionLatency: {
-      warning: 5,     // 5ms
-      critical: 50,   // 50ms (target threshold)
+      warning: 5, // 5ms
+      critical: 50, // 50ms (target threshold)
     },
     adaptiveExecutorLatency: {
-      warning: 20,    // 20ms
-      critical: 200,  // 200ms (target threshold)
+      warning: 20, // 20ms
+      critical: 200, // 200ms (target threshold)
     },
     memoryOverhead: {
-      warning: 100 * 1024 * 1024,  // 100 MB
+      warning: 100 * 1024 * 1024, // 100 MB
       critical: 500 * 1024 * 1024, // 500 MB (target threshold)
     },
   },
@@ -47,29 +50,29 @@ const ALERT_THRESHOLDS = {
   errors: {
     warningRate: 0.001, // 0.1% error rate
     criticalRate: 0.01, // 1% error rate
-    spikeThreshold: 5,  // 5 errors in 1 minute
+    spikeThreshold: 5, // 5 errors in 1 minute
   },
 
   // Performance Latency
   latency: {
     taskRouting: {
-      warning: 5,   // 5ms
+      warning: 5, // 5ms
       critical: 10, // 10ms
     },
     stateSync: {
-      warning: 100,  // 100ms
+      warning: 100, // 100ms
       critical: 200, // 200ms
     },
     resultNormalization: {
-      warning: 10,  // 10ms
+      warning: 10, // 10ms
       critical: 20, // 20ms
     },
     workflowCheckpoint: {
-      warning: 200,  // 200ms
+      warning: 200, // 200ms
       critical: 400, // 400ms
     },
     agentSpawn: {
-      warning: 500,  // 500ms
+      warning: 500, // 500ms
       critical: 1000, // 1000ms (1 second)
     },
   },
@@ -77,20 +80,20 @@ const ALERT_THRESHOLDS = {
   // Throughput
   throughput: {
     taskCreation: {
-      min: 10,     // 10/sec minimum
-      max: 100,    // 100/sec maximum (before throttling)
+      min: 10, // 10/sec minimum
+      max: 100, // 100/sec maximum (before throttling)
     },
     agentSpawning: {
-      min: 1,      // 1/sec minimum
-      max: 10,     // 10/sec maximum (budget limit)
+      min: 1, // 1/sec minimum
+      max: 10, // 10/sec maximum (budget limit)
     },
   },
 
   // Concurrent Workflows
   concurrency: {
-    warning: 150,   // 150 concurrent workflows
-    critical: 200,  // 200 concurrent workflows (approaching system limits)
-    max: 500,       // 500 max (load shedding trigger)
+    warning: 150, // 150 concurrent workflows
+    critical: 200, // 200 concurrent workflows (approaching system limits)
+    max: 500, // 500 max (load shedding trigger)
   },
 };
 
@@ -274,7 +277,11 @@ function checkSystemHealth(metrics) {
 
   // Error Rate
   if (metrics.errors !== undefined && metrics.totalOperations) {
-    const errorAlert = checkErrorRate(metrics.errors, metrics.totalOperations, metrics.windowSeconds || 60);
+    const errorAlert = checkErrorRate(
+      metrics.errors,
+      metrics.totalOperations,
+      metrics.windowSeconds || 60
+    );
     if (errorAlert.triggered) alerts.push({ component: 'error-rate', ...errorAlert });
   }
 

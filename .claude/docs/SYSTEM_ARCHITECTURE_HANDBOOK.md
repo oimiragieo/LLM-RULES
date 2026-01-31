@@ -82,23 +82,27 @@ The system consists of four major subsystems:
 ### Technology Stack
 
 **Runtime Environment:**
+
 - Node.js 20+ (V8 JavaScript engine)
 - CommonJS modules (.cjs) for production code
 - ES Modules (.mjs) for test files
 
 **Core Technologies:**
+
 - Custom YAML parser for workflow definitions
 - Event-driven architecture (EventEmitter pattern)
 - Feature flags via environment variables
 - Git-based version control and rollback
 
 **Observability:**
+
 - Heap monitoring with threshold-based alerts
 - Event-based logging at all execution points
 - Production alerts with escalation matrix
 - Prometheus metrics endpoints
 
 **Testing:**
+
 - Node.js built-in test runner
 - TDD workflow (RED-GREEN-REFACTOR)
 - 1364 total tests (1322 passing, 96.9% pass rate)
@@ -122,6 +126,7 @@ The Router is the system's front controller. It receives every user request and 
 **Tool Restrictions:**
 
 The Router has a whitelist of allowed tools:
+
 - `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet`
 - `Read` (for agent files and routing docs only)
 - `AskUserQuestion`
@@ -130,12 +135,12 @@ The Router cannot use: `Edit`, `Write`, `Bash`, `Glob`, `Grep`, `WebSearch`, or 
 
 **Self-Check Gates:**
 
-| Gate | Trigger | Action |
-|------|---------|--------|
-| Gate 1: Complexity | Multi-step, multi-file, architecture decisions | Spawn PLANNER first |
-| Gate 2: Security | Auth/authz, credentials, security-critical code | Include SECURITY-ARCHITECT |
-| Gate 3: Tool | Would use blacklisted tools | Spawn appropriate agent |
-| Gate 4: Creator | Writing to artifact paths | Invoke creator skill |
+| Gate               | Trigger                                         | Action                     |
+| ------------------ | ----------------------------------------------- | -------------------------- |
+| Gate 1: Complexity | Multi-step, multi-file, architecture decisions  | Spawn PLANNER first        |
+| Gate 2: Security   | Auth/authz, credentials, security-critical code | Include SECURITY-ARCHITECT |
+| Gate 3: Tool       | Would use blacklisted tools                     | Spawn appropriate agent    |
+| Gate 4: Creator    | Writing to artifact paths                       | Invoke creator skill       |
 
 **Routing Decision Flow:**
 
@@ -166,6 +171,7 @@ User Request
 ### Agent Ecosystem: 50+ Specialized Agents
 
 **Directory Structure:**
+
 ```
 .claude/agents/
 ├── core/           # Essential agents (developer, qa, planner, architect)
@@ -176,64 +182,68 @@ User Request
 
 **Core Agents:**
 
-| Agent | Purpose | Model |
-|-------|---------|-------|
-| `developer` | Bug fixes, feature implementation, coding | sonnet |
-| `planner` | Feature planning, task breakdown, design | sonnet |
-| `architect` | System design, architecture decisions | opus |
-| `qa` | Testing, QA validation, test writing | sonnet |
-| `technical-writer` | Documentation, user guides, API docs | sonnet |
-| `pm` | Product management, requirements | sonnet |
-| `reflection-agent` | Quality reflection, session analysis | sonnet |
-| `context-compressor` | Context summarization | sonnet |
+| Agent                | Purpose                                   | Model  |
+| -------------------- | ----------------------------------------- | ------ |
+| `developer`          | Bug fixes, feature implementation, coding | sonnet |
+| `planner`            | Feature planning, task breakdown, design  | sonnet |
+| `architect`          | System design, architecture decisions     | opus   |
+| `qa`                 | Testing, QA validation, test writing      | sonnet |
+| `technical-writer`   | Documentation, user guides, API docs      | sonnet |
+| `pm`                 | Product management, requirements          | sonnet |
+| `reflection-agent`   | Quality reflection, session analysis      | sonnet |
+| `context-compressor` | Context summarization                     | sonnet |
 
 **Domain Experts:**
 
-| Agent | Expertise | Model |
-|-------|-----------|-------|
-| `python-pro` | Python, Django, FastAPI | sonnet |
-| `rust-pro` | Rust, systems programming | sonnet |
-| `golang-pro` | Go, microservices | sonnet |
-| `typescript-pro` | TypeScript, Node.js | sonnet |
-| `frontend-pro` | React, Vue, Angular | sonnet |
-| `java-pro` | Java, Spring Boot | sonnet |
-| `nextjs-pro` | Next.js App Router | sonnet |
-| `ai-ml-specialist` | AI/ML, deep learning | opus |
-| `data-engineer` | ETL, data pipelines | sonnet |
+| Agent              | Expertise                 | Model  |
+| ------------------ | ------------------------- | ------ |
+| `python-pro`       | Python, Django, FastAPI   | sonnet |
+| `rust-pro`         | Rust, systems programming | sonnet |
+| `golang-pro`       | Go, microservices         | sonnet |
+| `typescript-pro`   | TypeScript, Node.js       | sonnet |
+| `frontend-pro`     | React, Vue, Angular       | sonnet |
+| `java-pro`         | Java, Spring Boot         | sonnet |
+| `nextjs-pro`       | Next.js App Router        | sonnet |
+| `ai-ml-specialist` | AI/ML, deep learning      | opus   |
+| `data-engineer`    | ETL, data pipelines       | sonnet |
 
 **Specialized Functions:**
 
-| Agent | Function | Model |
-|-------|----------|-------|
-| `security-architect` | Security review, threat modeling | opus |
-| `devops` | Infrastructure, deployment | sonnet |
-| `devops-troubleshooter` | Debugging, incident response | sonnet |
-| `incident-responder` | Production incidents | opus |
-| `code-reviewer` | Code review, PR review | sonnet |
-| `code-simplifier` | Refactoring, simplification | sonnet |
-| `database-architect` | Schema design, query optimization | sonnet |
-| `c4-*` | C4 architecture diagrams | sonnet |
+| Agent                   | Function                          | Model  |
+| ----------------------- | --------------------------------- | ------ |
+| `security-architect`    | Security review, threat modeling  | opus   |
+| `devops`                | Infrastructure, deployment        | sonnet |
+| `devops-troubleshooter` | Debugging, incident response      | sonnet |
+| `incident-responder`    | Production incidents              | opus   |
+| `code-reviewer`         | Code review, PR review            | sonnet |
+| `code-simplifier`       | Refactoring, simplification       | sonnet |
+| `database-architect`    | Schema design, query optimization | sonnet |
+| `c4-*`                  | C4 architecture diagrams          | sonnet |
 
 ### Orchestrators: Multi-Agent Coordination
 
 Orchestrators are special agents that can spawn other agents. They coordinate complex multi-agent workflows.
 
 **Master Orchestrator:**
+
 - Coordinates large projects requiring multiple specialists
 - Manages parallel execution of independent tasks
 - Consolidates results from multiple agents
 
 **Swarm Coordinator:**
+
 - Manages swarm-based coordination patterns
 - Handles convergent workflows (multiple agents to single result)
 - Implements consensus-based decision making
 
 **Evolution Orchestrator:**
+
 - Implements the EVOLVE workflow for self-evolution
 - Creates new agents, skills, and workflows
 - Enforces research requirements before creation
 
 **Party Orchestrator:**
+
 - Multi-agent collaboration and discussion
 - Debate and consensus modes
 - Team decision making
@@ -249,6 +259,7 @@ Orchestrators MUST include `Task` tool in their allowed_tools list. Without it, 
 The ML Platform provides four core capabilities:
 
 **1. Pattern Detector (WorkflowPatternDetector)**
+
 - Analyzes workflow execution history
 - Identifies frequent task sequences using N-gram analysis
 - Detects bottleneck patterns and optimization opportunities
@@ -261,6 +272,7 @@ const patterns = detector.detectFrequentSequences(workflows);
 ```
 
 **2. Cost Predictor (CostPredictor)**
+
 - Estimates token counts for prompts
 - Predicts LLM costs by model
 - Tracks actual vs predicted costs
@@ -273,6 +285,7 @@ const cost = predictor.estimateCost(inputTokens, outputTokens, 'claude-sonnet-4-
 ```
 
 **3. Adaptive Executor (AdaptiveExecutor)**
+
 - Applies pattern-based optimizations
 - Parallelizes independent tasks
 - Caches frequently-used results
@@ -285,6 +298,7 @@ const optimizations = executor.generateOptimizations(patterns);
 ```
 
 **4. Optimization Recommender (OptimizationRecommender)**
+
 - Generates optimization recommendations
 - Tracks optimization history
 - Measures optimization effectiveness
@@ -359,21 +373,21 @@ const { getGlobalMonitor } = require('.claude/lib/utils/memory-monitor.cjs');
 const monitor = getGlobalMonitor();
 monitor.start();
 
-monitor.on('warning', (data) => {
+monitor.on('warning', data => {
   console.warn(`Memory warning: ${(data.percent * 100).toFixed(1)}%`);
 });
 ```
 
 **Memory Budgets by Component:**
 
-| Component | Budget | Enforcement |
-|-----------|--------|-------------|
-| StateSyncManager | 50KB | maxHistorySize = 1000 |
-| LoadTestFramework | 100KB | MAX_METRICS = 1000 |
-| ChaosEngineer | 0KB | cleanup() in afterEach |
-| WorkflowEngine | 500KB | Manual monitoring |
-| Agent Context | 2MB | context-compressor skill |
-| Test Output | 50MB | Summarization |
+| Component         | Budget | Enforcement              |
+| ----------------- | ------ | ------------------------ |
+| StateSyncManager  | 50KB   | maxHistorySize = 1000    |
+| LoadTestFramework | 100KB  | MAX_METRICS = 1000       |
+| ChaosEngineer     | 0KB    | cleanup() in afterEach   |
+| WorkflowEngine    | 500KB  | Manual monitoring        |
+| Agent Context     | 2MB    | context-compressor skill |
+| Test Output       | 50MB   | Summarization            |
 
 ### Workflow Engine: State Management and Checkpoints
 
@@ -384,12 +398,14 @@ The WorkflowEngine provides production-grade workflow execution:
 **EVOLVE Phase Machine:**
 
 The workflow engine implements the EVOLVE state machine:
+
 ```
 E -> V -> O -> L -> V -> E
 Evaluate -> Validate -> Obtain -> Lock -> Verify -> Enable
 ```
 
 Valid transitions are strictly enforced:
+
 - evaluate -> validate
 - validate -> obtain
 - obtain -> lock
@@ -398,6 +414,7 @@ Valid transitions are strictly enforced:
 - enable -> complete
 
 **Features:**
+
 - YAML workflow definition parsing
 - Step execution with handlers
 - Gate validation for phase transitions
@@ -710,6 +727,7 @@ async syncBidirectional(localState, remoteState) {
 **Conflict Detection:**
 
 Conflicts are detected by comparing vector clocks:
+
 - If local clock > remote clock: no conflict (local is newer)
 - If remote clock > local clock: no conflict (remote is newer)
 - If clocks are concurrent: conflict exists
@@ -877,7 +895,7 @@ const { shouldPause, reason } = checkMemoryPressure();
 if (shouldPause) {
   return {
     decision: 'block',
-    message: `Task spawn blocked: ${reason}`
+    message: `Task spawn blocked: ${reason}`,
   };
 }
 ```
@@ -916,38 +934,39 @@ const results = await Promise.all(
 
 ### Latency Targets
 
-| Operation | Target | Typical | Notes |
-|-----------|--------|---------|-------|
-| Task routing | <5ms | 2ms | Router decision time |
-| State sync (single) | <100ms | 50ms | Bidirectional sync |
-| Result normalization | <10ms | 5ms | Format conversion |
-| Workflow checkpoint | <200ms | 100ms | Save to filesystem |
-| Agent spawn | <500ms | 300ms | Template load + init |
-| ML Pattern Detection | <100ms | 0.01ms | Per workflow |
-| ML Cost Prediction | <50ms | 0.00ms | Per estimation |
-| ML Adaptive Execution | <200ms | 0.001ms | Per optimization |
+| Operation             | Target | Typical | Notes                |
+| --------------------- | ------ | ------- | -------------------- |
+| Task routing          | <5ms   | 2ms     | Router decision time |
+| State sync (single)   | <100ms | 50ms    | Bidirectional sync   |
+| Result normalization  | <10ms  | 5ms     | Format conversion    |
+| Workflow checkpoint   | <200ms | 100ms   | Save to filesystem   |
+| Agent spawn           | <500ms | 300ms   | Template load + init |
+| ML Pattern Detection  | <100ms | 0.01ms  | Per workflow         |
+| ML Cost Prediction    | <50ms  | 0.00ms  | Per estimation       |
+| ML Adaptive Execution | <200ms | 0.001ms | Per optimization     |
 
 ### Memory Budgets
 
 | Environment | Heap Size | Target Usage | Buffer |
-|-------------|-----------|--------------|--------|
-| Development | 4GB | 3GB | 1GB |
-| Staging | 8GB | 6GB | 2GB |
-| Production | 12GB | 10GB | 2GB |
+| ----------- | --------- | ------------ | ------ |
+| Development | 4GB       | 3GB          | 1GB    |
+| Staging     | 8GB       | 6GB          | 2GB    |
+| Production  | 12GB      | 10GB         | 2GB    |
 
 **Threshold Alerts:**
+
 - Warning: 70% heap
 - Critical: 85% heap (spawn blocking)
 - Shutdown: 95% heap
 
 ### Throughput Expectations
 
-| Operation | Target Rate | Notes |
-|-----------|-------------|-------|
-| Task creation | 100/sec | Peak load |
-| Agent spawning | 10/sec | Prevents sync history explosion |
-| State syncs | 50/sec | Across all orchestrators |
-| Workflow checkpoints | 20/sec | Background saves |
+| Operation            | Target Rate | Notes                           |
+| -------------------- | ----------- | ------------------------------- |
+| Task creation        | 100/sec     | Peak load                       |
+| Agent spawning       | 10/sec      | Prevents sync history explosion |
+| State syncs          | 50/sec      | Across all orchestrators        |
+| Workflow checkpoints | 20/sec      | Background saves                |
 
 ### Load Test Results (Production Validated)
 
@@ -993,15 +1012,15 @@ const results = await Promise.all(
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
-| `.claude/CLAUDE.md` | Framework specification (source of truth) |
-| `.claude/lib/workflow/workflow-engine.cjs` | Workflow execution engine |
-| `.claude/lib/ml/index.cjs` | ML platform entry point |
-| `.claude/lib/utils/memory-monitor.cjs` | Heap monitoring |
-| `.claude/hooks/routing/routing-guard.cjs` | Routing enforcement |
-| `.claude/docs/MEMORY_MANAGEMENT.md` | Memory patterns guide |
-| `.claude/docs/MONITORING_RUNBOOK.md` | Operations runbook |
+| File                                       | Purpose                                   |
+| ------------------------------------------ | ----------------------------------------- |
+| `.claude/CLAUDE.md`                        | Framework specification (source of truth) |
+| `.claude/lib/workflow/workflow-engine.cjs` | Workflow execution engine                 |
+| `.claude/lib/ml/index.cjs`                 | ML platform entry point                   |
+| `.claude/lib/utils/memory-monitor.cjs`     | Heap monitoring                           |
+| `.claude/hooks/routing/routing-guard.cjs`  | Routing enforcement                       |
+| `.claude/docs/MEMORY_MANAGEMENT.md`        | Memory patterns guide                     |
+| `.claude/docs/MONITORING_RUNBOOK.md`       | Operations runbook                        |
 
 ### Environment Variables
 

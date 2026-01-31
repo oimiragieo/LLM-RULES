@@ -28,7 +28,7 @@ const path = require('path');
 let sanitizer;
 try {
   sanitizer = require('../../lib/utils/error-sanitizer.cjs');
-} catch (e) {
+} catch (_e) {
   // Fallback sanitizer
   sanitizer = {
     sanitizeForLogging: obj => obj,
@@ -40,7 +40,7 @@ try {
 let errorWriter;
 try {
   errorWriter = require('../../lib/error-writer.cjs');
-} catch (e) {
+} catch (_e) {
   // Fallback writer
   errorWriter = {
     writeError: entry => {
@@ -231,7 +231,7 @@ function buildErrorEntry(error, tool, params, context) {
 
   // Extract source information from stack trace
   const stack = error?.stack || '';
-  const sourceMatch = stack.match(/at\s+(?:.*?\s)?\(?([\w\/\-._]+\.(?:js|cjs|mjs)):(\d+)/);
+  const sourceMatch = stack.match(/at\s+(?:.*?\s)?\(?([\w/._-]+\.(?:js|cjs|mjs)):(\d+)/);
   const source = {
     component: 'tool',
     location: sourceMatch ? sourceMatch[1] : tool,
@@ -335,10 +335,10 @@ function postToolUse(tool, params, result, context) {
         })
       );
     }
-  } catch (e) {
+  } catch (_e) {
     // Fail-open: never block agent execution
     if (process.env.DEBUG_ERROR_CAPTURE) {
-      console.error('[error-capture] Internal error:', e.message);
+      console.error('[error-capture] Internal error:', _e.message);
     }
   }
 

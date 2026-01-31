@@ -30,7 +30,7 @@ const ANALYTICS_LIB_PATH = path.join(
 let trackAnalytics;
 try {
   trackAnalytics = require(ANALYTICS_LIB_PATH);
-} catch (err) {
+} catch (_err) {
   // Expected to fail in RED phase
   trackAnalytics = null;
 }

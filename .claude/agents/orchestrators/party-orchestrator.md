@@ -72,7 +72,7 @@ This orchestrator enables true multi-agent collaboration where agents respond wi
 const {
   loadTeam,
   validateTeamDefinition,
-} = require('./.claude/lib/party-mode/orchestration/team-loader.cjs');
+} = require('./@.claude/lib/party-mode/orchestration/team-loader.cjs');
 
 // Load desired team
 const team = await loadTeam('default'); // or 'creative', 'technical'
@@ -84,7 +84,7 @@ if (!validation.valid) {
 }
 
 // Initialize session
-const { initializeSession } = require('./.claude/lib/party-mode/orchestration/round-manager.cjs');
+const { initializeSession } = require('./@.claude/lib/party-mode/orchestration/round-manager.cjs');
 const sessionState = await initializeSession(sessionId, team.teamName);
 ```
 
@@ -94,7 +94,7 @@ const sessionState = await initializeSession(sessionId, team.teamName);
 const {
   startRound,
   enforceRateLimits,
-} = require('./.claude/lib/party-mode/orchestration/round-manager.cjs');
+} = require('./@.claude/lib/party-mode/orchestration/round-manager.cjs');
 
 // Check rate limits before starting
 const rateLimitCheck = await enforceRateLimits(sessionId, team.agents.length);
@@ -109,7 +109,7 @@ const roundState = await startRound(sessionId);
 ### Step 3: Spawn Agents
 
 ```javascript
-const { spawnAgent } = require('./.claude/lib/party-mode/orchestration/lifecycle-manager.cjs');
+const { spawnAgent } = require('./@.claude/lib/party-mode/orchestration/lifecycle-manager.cjs');
 
 // Prepare shared context
 const sharedContext = {
@@ -175,7 +175,7 @@ TaskUpdate({ taskId: "${taskId}", status: "completed", metadata: { summary: "...
 ```javascript
 const {
   updateAgentStatus,
-} = require('./.claude/lib/party-mode/orchestration/lifecycle-manager.cjs');
+} = require('./@.claude/lib/party-mode/orchestration/lifecycle-manager.cjs');
 
 // Wait for all agents to complete (via TaskList polling or event)
 // For each completed agent:
@@ -197,7 +197,7 @@ for (const agent of spawnedAgents) {
 ### Step 6: Complete Round
 
 ```javascript
-const { completeRound } = require('./.claude/lib/party-mode/orchestration/round-manager.cjs');
+const { completeRound } = require('./@.claude/lib/party-mode/orchestration/round-manager.cjs');
 
 // Mark round as completed
 const completionResult = await completeRound(sessionId);
@@ -216,7 +216,7 @@ return formatTeamResponse(sharedContext.previousResponses);
 const {
   getAllAgents,
   terminateAgent,
-} = require('./.claude/lib/party-mode/orchestration/lifecycle-manager.cjs');
+} = require('./@.claude/lib/party-mode/orchestration/lifecycle-manager.cjs');
 
 const allAgents = await getAllAgents(sessionId);
 for (const agent of allAgents) {

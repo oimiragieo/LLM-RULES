@@ -11,7 +11,7 @@
 
 'use strict';
 
-const { describe, it, before, after, beforeEach, afterEach, mock } = require('node:test');
+const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
@@ -40,7 +40,7 @@ describe('error-writer', () => {
     // Clean up test directory
     try {
       fs.rmSync(TEST_DIR, { recursive: true, force: true });
-    } catch (e) {
+    } catch (_e) {
       // Ignore cleanup errors
     }
     delete process.env.ERROR_REPORTS_DIR;
@@ -119,7 +119,7 @@ describe('error-writer', () => {
 
     it('should return file path with current date', () => {
       const logFile = errorWriter.getActiveLogFile();
-      const today = new Date().toISOString().slice(0, 10);
+      const _today = new Date().toISOString().slice(0, 10);
 
       assert.ok(logFile.includes('errors-'));
       assert.ok(logFile.includes('.jsonl'));
@@ -176,7 +176,7 @@ describe('error-writer', () => {
     });
 
     it('should create archive directory if needed', () => {
-      const archiveDir = path.join(ERROR_REPORTS_DIR, 'archive');
+      const _archiveDir = path.join(ERROR_REPORTS_DIR, 'archive');
 
       // Archive should create directory
       errorWriter.archiveOldLogs({ daysOld: 30, compress: false });

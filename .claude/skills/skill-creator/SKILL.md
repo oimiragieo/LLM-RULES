@@ -6,6 +6,9 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
+# Phase 1 Integration: All tools validated against .claude/config/tool-manifest.json
+# If a tool becomes unavailable, new skills will use fallback tools from the manifest
+# Single source of truth: .claude/config/tool-manifest.json
 args: '<action> [options]'
 best_practices:
   - Always use standardized structure
@@ -842,6 +845,79 @@ Before calling `TaskUpdate({ status: "completed" })`, you MUST run the Post-Crea
 **Why this matters:** The Party Mode incident showed that fully-implemented artifacts can be invisible to the Router if integration steps are missed. This validation ensures no "invisible artifact" pattern.
 
 **Reference:** `.claude/workflows/core/post-creation-validation.md`
+
+### Step 11: Post-Creation Skill Index Regeneration (BLOCKING - PHASE 2 INTEGRATION)
+
+**This step ensures the new skill is discoverable via the SkillCatalog() tool (Phase 2 infrastructure).**
+
+After the skill is created and validated, you MUST regenerate the skill index:
+
+1. **Run the skill index generator:**
+
+   ```bash
+   node .claude/tools/cli/generate-skill-index.cjs
+   ```
+
+2. **Verify the command completed successfully:**
+   - Exit code should be 0
+   - You should see: `Successfully generated skill index`
+
+3. **Verify skill appears in skill-index.json:**
+
+   ```bash
+   grep "<skill-name>" .claude/config/skill-index.json || echo "ERROR: Skill not in index!"
+   ```
+
+4. **Check skill metadata in the index:**
+   - Verify the skill has proper metadata: `name`, `description`, `requiredTools`, `agentPrimary`, `agentSupporting`, `tags`, `priority`
+   - Verify agent assignments from Step 7 are reflected as `agentPrimary` and `agentSupporting` entries
+   - Verify tools are correct
+
+**Why this is mandatory:**
+
+- Skills not in skill-index.json are **invisible to SkillCatalog()** tool
+- Agents cannot discover and invoke skills dynamically without the index
+- SkillCatalog() filters by domain, category, tags, and agent type - all require the index
+- New skills must be registered in Phase 2 discovery system
+
+**Phase 2 Context:**
+
+- **File**: `.claude/config/skill-index.json` (runtime skill discovery registry)
+- **Tool**: `SkillCatalog()` for skill discovery by domain/category/agent type
+- **Reference**: `.claude/context/artifacts/skill-catalog.md` (documentation)
+- **Metadata**: `requiredTools`, `agentPrimary`, `agentSupporting`, `tags`, `priority`, `category`, `description`
+
+**Troubleshooting:**
+
+If skill doesn't appear in index:
+
+- Check skill file has valid YAML frontmatter with `name:` field
+- Verify no syntax errors in SKILL.md
+- Check skill file is readable and in correct location
+- Re-run generator with verbose output: `node .claude/tools/cli/generate-skill-index.cjs --verbose`
+- Check agent assignments from Step 7 are valid (agents must exist)
+
+**Integration Diagram:**
+
+```
+Skill Created
+    ↓
+Step 6: CLAUDE.md Update
+    ↓
+Step 7: Agent Assignment
+    ↓
+Step 8: Skill Catalog Update
+    ↓
+Step 10: Integration Verification
+    ↓
+Step 11: Index Regeneration (Phase 2 Discovery)
+    ↓
+Skill in skill-index.json
+    ↓
+SkillCatalog() can discover
+    ↓
+Agents can invoke dynamically
+```
 
 ---
 

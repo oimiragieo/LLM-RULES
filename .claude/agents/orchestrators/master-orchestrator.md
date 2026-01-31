@@ -93,6 +93,53 @@ Skill({ skill: 'response-rater' }); // Quality assessment of outputs
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 
+## Capability-Based Agent Selection (Phase 3)
+
+The orchestrator uses `AvailableAgents` to discover the best agent for each task:
+
+### Discovery Process
+
+1. **Analyze task**: Determine required capability (e.g., 'code-review', 'implementation', 'testing')
+2. **Query agents**: `AvailableAgents({ capability: '...' })`
+3. **Select best**: Pick agent with highest success rate
+4. **Spawn agent**: `Task({ subagent_type: best.id })`
+
+### Example Usage
+
+```javascript
+// Task: "Review this code"
+const agents = AvailableAgents({
+  capability: 'code-review',
+  excludeFailed: true,
+  minSuccessRate: 0.7
+});
+
+// Pick best agent (sorted by success rate)
+const reviewer = agents.agents[0]; // code-reviewer (best success rate)
+
+Task({
+  subagent_type: reviewer.id,
+  description: 'Code review task',
+  prompt: ...
+});
+```
+
+### Self-Healing Benefits
+
+- **Isolated agents automatically skipped**: Unavailable agents filtered out
+- **Hot-swapping**: Replace broken agent with next-best alternative
+- **Load-aware routing**: Can pick least-loaded agent when needed
+- **Automatic recovery**: Failed agents recover after 5-minute cooldown
+
+### Fallback Strategy
+
+If no agents match capability:
+
+1. Query with `excludeFailed: false` (include degraded)
+2. Query with lower `minSuccessRate` (0.5)
+3. Fall back to domain-based lookup
+4. Use hardcoded default from `.claude/config/capability-routing.json`
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting any task:**

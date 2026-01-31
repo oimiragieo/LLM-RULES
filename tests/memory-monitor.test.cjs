@@ -45,16 +45,16 @@ describe('MemoryMonitor - Category 1: Configuration (5 tests)', () => {
 
   it('should accept custom configuration', () => {
     const monitor = new MemoryMonitor({
-      warningThreshold: 0.60,
+      warningThreshold: 0.6,
       criticalThreshold: 0.75,
-      shutdownThreshold: 0.90,
+      shutdownThreshold: 0.9,
       interval: 1000,
       maxHistorySize: 50,
     });
 
-    assert.strictEqual(monitor.warningThreshold, 0.60);
+    assert.strictEqual(monitor.warningThreshold, 0.6);
     assert.strictEqual(monitor.criticalThreshold, 0.75);
-    assert.strictEqual(monitor.shutdownThreshold, 0.90);
+    assert.strictEqual(monitor.shutdownThreshold, 0.9);
     assert.strictEqual(monitor.interval, 1000);
     assert.strictEqual(monitor.maxHistorySize, 50);
   });
@@ -68,8 +68,8 @@ describe('MemoryMonitor - Category 1: Configuration (5 tests)', () => {
 
     const monitor = new MemoryMonitor();
 
-    assert.strictEqual(monitor.warningThreshold, 0.60);
-    assert.strictEqual(monitor.criticalThreshold, 0.80);
+    assert.strictEqual(monitor.warningThreshold, 0.6);
+    assert.strictEqual(monitor.criticalThreshold, 0.8);
     assert.strictEqual(monitor.shutdownThreshold, 0.92);
     assert.strictEqual(monitor.interval, 2000);
     assert.strictEqual(monitor.maxHistorySize, 200);
@@ -78,15 +78,15 @@ describe('MemoryMonitor - Category 1: Configuration (5 tests)', () => {
   it('should throw error for invalid threshold order', () => {
     assert.throws(() => {
       new MemoryMonitor({
-        warningThreshold: 0.90,
-        criticalThreshold: 0.80,
+        warningThreshold: 0.9,
+        criticalThreshold: 0.8,
         shutdownThreshold: 0.95,
       });
     }, /warningThreshold must be less than criticalThreshold/);
 
     assert.throws(() => {
       new MemoryMonitor({
-        warningThreshold: 0.70,
+        warningThreshold: 0.7,
         criticalThreshold: 0.95,
         shutdownThreshold: 0.85,
       });
@@ -104,7 +104,7 @@ describe('MemoryMonitor - Category 1: Configuration (5 tests)', () => {
 
     assert.throws(() => {
       new MemoryMonitor({
-        warningThreshold: 0.70,
+        warningThreshold: 0.7,
         criticalThreshold: 0.85,
         shutdownThreshold: 1.1,
       });
@@ -161,7 +161,7 @@ describe('MemoryMonitor - Category 2: Heap Checking (6 tests)', () => {
     let checkCount = 0;
     let lastEntry = null;
 
-    monitor.on('check', (entry) => {
+    monitor.on('check', entry => {
       checkCount++;
       lastEntry = entry;
     });
@@ -209,8 +209,12 @@ describe('MemoryMonitor - Category 3: Threshold Events (8 tests)', () => {
     let warningEmitted = false;
     let criticalEmitted = false;
 
-    monitor.on('warning', () => { warningEmitted = true; });
-    monitor.on('critical', () => { criticalEmitted = true; });
+    monitor.on('warning', () => {
+      warningEmitted = true;
+    });
+    monitor.on('critical', () => {
+      criticalEmitted = true;
+    });
 
     // With thresholds at 99%+, normal heap usage won't trigger events
     monitor.checkHeap();
@@ -229,7 +233,7 @@ describe('MemoryMonitor - Category 3: Threshold Events (8 tests)', () => {
 
     let warningData = null;
 
-    monitor.on('warning', (data) => {
+    monitor.on('warning', data => {
       warningData = data;
     });
 
@@ -251,7 +255,7 @@ describe('MemoryMonitor - Category 3: Threshold Events (8 tests)', () => {
 
     let criticalData = null;
 
-    monitor.on('critical', (data) => {
+    monitor.on('critical', data => {
       criticalData = data;
     });
 
@@ -271,7 +275,7 @@ describe('MemoryMonitor - Category 3: Threshold Events (8 tests)', () => {
 
     let shutdownData = null;
 
-    monitor.on('critical', (data) => {
+    monitor.on('critical', data => {
       if (data.level === 'SHUTDOWN') {
         shutdownData = data;
       }
@@ -315,7 +319,7 @@ describe('MemoryMonitor - Category 3: Threshold Events (8 tests)', () => {
     monitor.warningThreshold = 0.99;
 
     let recoveryData = null;
-    monitor.on('recovery', (data) => {
+    monitor.on('recovery', data => {
       recoveryData = data;
     });
 
@@ -335,8 +339,12 @@ describe('MemoryMonitor - Category 3: Threshold Events (8 tests)', () => {
 
     let count = 0;
 
-    monitor.on('warning', () => { count++; });
-    monitor.on('warning', () => { count++; });
+    monitor.on('warning', () => {
+      count++;
+    });
+    monitor.on('warning', () => {
+      count++;
+    });
 
     monitor.checkHeap();
 
@@ -351,7 +359,9 @@ describe('MemoryMonitor - Category 3: Threshold Events (8 tests)', () => {
     });
 
     let count = 0;
-    const listener = () => { count++; };
+    const listener = () => {
+      count++;
+    };
 
     monitor.on('warning', listener);
     monitor.checkHeap();

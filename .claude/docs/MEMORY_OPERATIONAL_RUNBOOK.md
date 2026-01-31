@@ -117,12 +117,12 @@ NODE_OPTIONS="--max-old-space-size=12288 --trace-gc" \
 
 **Key Metrics to Track:**
 
-| Metric               | Warning Level | Critical Level | Action                        |
-|----------------------|---------------|----------------|-------------------------------|
-| Heap Used            | 8GB (80%)     | 10GB (95%)     | Investigate, prepare restart  |
-| Heap Growth Rate     | 10MB/sec      | 20MB/sec       | Identify leak source          |
-| GC Frequency         | 10/sec        | 20/sec         | Memory pressure detected      |
-| GC Pause Time (p99)  | 100ms         | 500ms          | Performance degradation       |
+| Metric              | Warning Level | Critical Level | Action                       |
+| ------------------- | ------------- | -------------- | ---------------------------- |
+| Heap Used           | 8GB (80%)     | 10GB (95%)     | Investigate, prepare restart |
+| Heap Growth Rate    | 10MB/sec      | 20MB/sec       | Identify leak source         |
+| GC Frequency        | 10/sec        | 20/sec         | Memory pressure detected     |
+| GC Pause Time (p99) | 100ms         | 500ms          | Performance degradation      |
 
 **Monitoring Setup:**
 
@@ -130,13 +130,15 @@ NODE_OPTIONS="--max-old-space-size=12288 --trace-gc" \
 // Add to index.js
 setInterval(() => {
   const mem = process.memoryUsage();
-  console.log(JSON.stringify({
-    timestamp: new Date().toISOString(),
-    heapUsed: mem.heapUsed / 1024 / 1024, // MB
-    heapTotal: mem.heapTotal / 1024 / 1024,
-    external: mem.external / 1024 / 1024,
-    rss: mem.rss / 1024 / 1024
-  }));
+  console.log(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      heapUsed: mem.heapUsed / 1024 / 1024, // MB
+      heapTotal: mem.heapTotal / 1024 / 1024,
+      external: mem.external / 1024 / 1024,
+      rss: mem.rss / 1024 / 1024,
+    })
+  );
 }, 60000); // Every minute
 ```
 
@@ -202,6 +204,7 @@ pm2 start index.js --max-memory-restart 12G
 **Next**: Root cause analysis
 
 **Timeline**:
+
 - 14:23 UTC: OOM detected
 - 14:24 UTC: Snapshot captured
 - 14:25 UTC: Service restarted
@@ -347,9 +350,11 @@ Add to `.claude/context/memory/learnings.md`:
 # Post-Mortem: Production OOM (YYYY-MM-DD)
 
 ## Summary
+
 Production heap OOM due to unbounded syncHistory growth in StateSyncManager.
 
 ## Timeline
+
 - 14:23 UTC: OOM alert triggered
 - 14:24 UTC: Heap snapshot captured
 - 14:25 UTC: Service restarted
@@ -358,19 +363,23 @@ Production heap OOM due to unbounded syncHistory growth in StateSyncManager.
 - 18:00 UTC: Regression test added
 
 ## Root Cause
+
 StateSyncManager.syncHistory accumulated 34,000 entries during orchestrator
 spawning 34 agents, causing ~1.7MB unbounded growth.
 
 ## Resolution
+
 Added maxHistorySize limit (1000) + automatic trimming after push.
 
 ## Prevention
+
 1. Added regression test
 2. Updated code review checklist
 3. Added pre-deployment memory check
 4. Enhanced monitoring alerts
 
 ## Action Items
+
 - [ ] Audit all classes for unbounded arrays (OWNER)
 - [ ] Add memory budget tests (OWNER)
 - [ ] Update developer training (OWNER)
@@ -394,6 +403,7 @@ Add incident to this runbook as case study:
 **Resolution Time**: 2.5 hours (root cause → hotfix → deploy)
 
 **Lessons Learned**:
+
 - Heap snapshots critical for rapid diagnosis
 - Automated alerts enabled fast response
 - Regression tests prevent recurrence
@@ -437,16 +447,20 @@ jobs:
   "panels": [
     {
       "title": "Heap Usage",
-      "targets": [{
-        "expr": "nodejs_heap_used_bytes / 1024 / 1024"
-      }],
+      "targets": [
+        {
+          "expr": "nodejs_heap_used_bytes / 1024 / 1024"
+        }
+      ],
       "thresholds": [8000, 10000]
     },
     {
       "title": "GC Frequency",
-      "targets": [{
-        "expr": "rate(nodejs_gc_duration_seconds_count[1m])"
-      }],
+      "targets": [
+        {
+          "expr": "rate(nodejs_gc_duration_seconds_count[1m])"
+        }
+      ],
       "thresholds": [10, 20]
     }
   ]

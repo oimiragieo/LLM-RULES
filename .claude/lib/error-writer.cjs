@@ -66,7 +66,7 @@ const ARCHIVE_CONFIG = {
  * @param {number} ms
  * @returns {Promise<void>}
  */
-function sleep(ms) {
+function _sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -243,7 +243,7 @@ function queryErrors(filter = {}) {
           if (filter.taskId && entry.context?.taskId !== filter.taskId) continue;
 
           results.push(entry);
-        } catch (e) {
+        } catch (_e) {
           // Skip invalid lines
           if (process.env.DEBUG_ERROR_WRITER) {
             console.error('[error-writer] Invalid JSON line:', line.slice(0, 50));

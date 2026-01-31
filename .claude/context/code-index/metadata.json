@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-01-31T08:06:23.271Z",
+  "stats": {
+    "files": 1,
+    "chunks": 1,
+    "embeddings": 1,
+    "byLanguage": {
+      "javascript": 1
+    }
+  },
+  "files": {
+    "tests\\code-indexing\\fixtures\\test-project\\src\\example.js": {
+      "hash": "1ccf76bf87ed8df56b2ab4225385993c53746164dc7df566462c0243377e69a0",
+      "chunks": 1
+    }
+  }
+}

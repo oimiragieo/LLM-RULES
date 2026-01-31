@@ -16,7 +16,7 @@ const os = require('os');
 let detector;
 try {
   detector = require('../.claude/lib/utils/tech-stack-detector.cjs');
-} catch (err) {
+} catch (_err) {
   // Expected to fail in RED phase
   detector = null;
 }

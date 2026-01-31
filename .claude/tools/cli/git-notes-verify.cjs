@@ -20,7 +20,7 @@
 
 const { execSync } = require('child_process');
 const fs = require('fs');
-const path = require('path');
+const _path = require('path');
 
 // Import hook for verification logic
 const gitNotesAudit = require('../../hooks/audit/git-notes-audit.cjs');
@@ -61,7 +61,7 @@ function getCommits(range) {
 function getNotes(commitHash) {
   try {
     return execSync(`git notes show ${commitHash}`, { encoding: 'utf-8' });
-  } catch (error) {
+  } catch (_error) {
     return null; // No note for this commit
   }
 }

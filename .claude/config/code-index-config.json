@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "indexing": {
+    "enabled": true,
+    "projectRoot": ".",
+    "excludePatterns": [
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/coverage/**",
+      "**/*.min.js",
+      "**/*.bundle.js",
+      "**/*.map",
+      "**/package-lock.json",
+      "**/yarn.lock",
+      "**/pnpm-lock.yaml",
+      "**/.claude/data/**"
+    ],
+    "includePatterns": [
+      "**/*.js",
+      "**/*.mjs",
+      "**/*.cjs",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.mts",
+      "**/*.cts",
+      "**/*.py",
+      "**/*.go",
+      "**/*.rs"
+    ],
+    "maxFileSize": 1048576,
+    "batchSize": 50,
+    "concurrency": 4
+  },
+  "chunking": {
+    "minTokens": 50,
+    "maxTokens": 2048,
+    "targetTokens": 512,
+    "overlapTokens": 50
+  },
+  "embedding": {
+    "provider": "local",
+    "model": "Xenova/all-MiniLM-L6-v2",
+    "dimensions": 384,
+    "batchSize": 100,
+    "cacheEnabled": true
+  },
+  "vectorStore": {
+    "persistDirectory": ".claude/data/code-index",
+    "collectionName": "agent-studio-code",
+    "distanceFunction": "cosine"
+  },
+  "search": {
+    "defaultLimit": 10,
+    "defaultMinScore": 0.5,
+    "maxLimit": 50,
+    "includeContext": true,
+    "contextLines": 5
+  },
+  "languages": {
+    "javascript": {
+      "extensions": [".js", ".mjs", ".cjs"],
+      "grammar": "tree-sitter-javascript"
+    },
+    "typescript": {
+      "extensions": [".ts", ".tsx", ".mts", ".cts"],
+      "grammar": "tree-sitter-typescript"
+    },
+    "python": {
+      "extensions": [".py"],
+      "grammar": "tree-sitter-python"
+    },
+    "go": {
+      "extensions": [".go"],
+      "grammar": "tree-sitter-go"
+    },
+    "rust": {
+      "extensions": [".rs"],
+      "grammar": "tree-sitter-rust"
+    }
+  }
+}

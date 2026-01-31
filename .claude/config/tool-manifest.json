@@ -1,0 +1,867 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-01-31T04:38:57.277Z",
+  "metadata": {
+    "totalTools": 29,
+    "totalCoreTools": 20,
+    "totalMcpTools": 9,
+    "totalAgents": 16,
+    "lastValidated": "2026-01-31T04:38:57.278Z",
+    "source": ".claude/CLAUDE.md sections 1.1-1.4"
+  },
+  "tools": {
+    "core": [
+      {
+        "name": "Read",
+        "category": "File I/O",
+        "description": "Read files from filesystem",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "yes"
+        }
+      },
+      {
+        "name": "Write",
+        "category": "File I/O",
+        "description": "Create/overwrite files",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "Edit",
+        "category": "File I/O",
+        "description": "Make precise edits to files",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "Bash",
+        "category": "Shell",
+        "description": "Execute shell commands",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "Glob",
+        "category": "Search",
+        "description": "Pattern-based file discovery",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "Grep",
+        "category": "Search",
+        "description": "Content search in files",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "Task",
+        "category": "Orchestration",
+        "description": "Spawn subagents",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "no",
+          "orchestrators": "all",
+          "router": "yes"
+        }
+      },
+      {
+        "name": "TaskCreate",
+        "category": "Task Management",
+        "description": "Create trackable tasks",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "yes"
+        }
+      },
+      {
+        "name": "TaskUpdate",
+        "category": "Task Management",
+        "description": "Update task status/metadata",
+        "status": "available",
+        "mandatory": true,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "yes"
+        }
+      },
+      {
+        "name": "TaskList",
+        "category": "Task Management",
+        "description": "List all tasks",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "yes"
+        }
+      },
+      {
+        "name": "TaskGet",
+        "category": "Task Management",
+        "description": "Get task details",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "yes"
+        }
+      },
+      {
+        "name": "TaskOutput",
+        "category": "Task Management",
+        "description": "Read task output",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "TaskStop",
+        "category": "Task Management",
+        "description": "Stop running task",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "Skill",
+        "category": "Capability",
+        "description": "Invoke skill workflows",
+        "status": "available",
+        "mandatory": true,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "AskUserQuestion",
+        "category": "Interaction",
+        "description": "Get user input",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "no",
+          "orchestrators": "no",
+          "router": "yes"
+        }
+      },
+      {
+        "name": "EnterPlanMode",
+        "category": "Planning",
+        "description": "Switch to planning mode",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "ExitPlanMode",
+        "category": "Planning",
+        "description": "Exit planning mode",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "WebSearch",
+        "category": "Research",
+        "description": "Search the web",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "WebFetch",
+        "category": "Research",
+        "description": "Fetch webpage content",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      },
+      {
+        "name": "NotebookEdit",
+        "category": "Jupyter",
+        "description": "Edit notebook cells",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
+      }
+    ],
+    "mcp": [
+      {
+        "name": "mcp__chrome-devtools__*",
+        "category": "MCP - chrome-devtools",
+        "description": "Browser automation via Chrome DevTools Protocol",
+        "status": "unavailable",
+        "reason": "MCP server 'chrome-devtools' not configured",
+        "mcp_server": "chrome-devtools",
+        "fallback": "Skill({ skill: 'chrome-browser' })",
+        "fallback_status": "available",
+        "fallback_tools": [
+          "Read",
+          "Write",
+          "WebFetch"
+        ]
+      },
+      {
+        "name": "mcp__sequential-thinking__sequentialthinking",
+        "category": "MCP - sequential-thinking",
+        "description": "Structured thinking and analysis",
+        "status": "unavailable",
+        "reason": "MCP server 'sequential-thinking' not configured",
+        "mcp_server": "sequential-thinking",
+        "fallback": "Skill({ skill: 'sequential-thinking' })",
+        "fallback_status": "available",
+        "fallback_tools": [
+          "Read",
+          "Write",
+          "Bash"
+        ]
+      },
+      {
+        "name": "mcp__Ref__ref_search_documentation",
+        "category": "MCP - Ref",
+        "description": "Documentation search",
+        "status": "unavailable",
+        "reason": "MCP server 'Ref' not configured",
+        "mcp_server": "Ref",
+        "fallback": "WebSearch + WebFetch",
+        "fallback_status": "available",
+        "fallback_tools": [
+          "WebSearch",
+          "WebFetch"
+        ]
+      },
+      {
+        "name": "mcp__Ref__ref_read_url",
+        "category": "MCP - Ref",
+        "description": "Read URL content via Ref",
+        "status": "unavailable",
+        "reason": "MCP server 'Ref' not configured",
+        "mcp_server": "Ref",
+        "fallback": "WebFetch",
+        "fallback_status": "available",
+        "fallback_tools": [
+          "WebFetch"
+        ]
+      },
+      {
+        "name": "mcp__Exa__web_search_exa",
+        "category": "MCP - Exa",
+        "description": "Enhanced web search via Exa",
+        "status": "unavailable",
+        "reason": "MCP server 'Exa' not configured",
+        "mcp_server": "Exa",
+        "fallback": "WebSearch",
+        "fallback_status": "available",
+        "fallback_tools": [
+          "WebSearch"
+        ]
+      },
+      {
+        "name": "mcp__Exa__get_code_context_exa",
+        "category": "MCP - Exa",
+        "description": "Code context search via Exa",
+        "status": "unavailable",
+        "reason": "MCP server 'Exa' not configured",
+        "mcp_server": "Exa",
+        "fallback": "Grep + Glob",
+        "fallback_status": "available",
+        "fallback_tools": [
+          "Grep",
+          "Glob"
+        ]
+      },
+      {
+        "name": "mcp__Exa__company_research_exa",
+        "category": "MCP - Exa",
+        "description": "Company research via Exa",
+        "status": "unavailable",
+        "reason": "MCP server 'Exa' not configured",
+        "mcp_server": "Exa",
+        "fallback": "WebSearch",
+        "fallback_status": "available",
+        "fallback_tools": [
+          "WebSearch"
+        ]
+      },
+      {
+        "name": "mcp__shadcn__getComponents",
+        "category": "MCP - shadcn",
+        "description": "Get shadcn/ui components list",
+        "status": "unavailable",
+        "reason": "MCP server 'shadcn' not configured",
+        "mcp_server": "shadcn",
+        "fallback": "WebFetch('https://ui.shadcn.com/...')",
+        "fallback_status": "available",
+        "fallback_tools": [
+          "WebFetch"
+        ]
+      },
+      {
+        "name": "mcp__shadcn__getComponent",
+        "category": "MCP - shadcn",
+        "description": "Get specific shadcn/ui component",
+        "status": "unavailable",
+        "reason": "MCP server 'shadcn' not configured",
+        "mcp_server": "shadcn",
+        "fallback": "WebFetch('https://ui.shadcn.com/...')",
+        "fallback_status": "available",
+        "fallback_tools": [
+          "WebFetch"
+        ]
+      }
+    ],
+    "toolsets": {
+      "CORE_TOOLS": {
+        "description": "All 20 core tools built into Claude Code",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "Task",
+          "TaskCreate",
+          "TaskUpdate",
+          "TaskList",
+          "TaskGet",
+          "TaskOutput",
+          "TaskStop",
+          "Skill",
+          "AskUserQuestion",
+          "EnterPlanMode",
+          "ExitPlanMode",
+          "WebSearch",
+          "WebFetch",
+          "NotebookEdit"
+        ]
+      },
+      "DEVELOPER": {
+        "description": "Standard development agent toolset",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "mandatory": [
+          "TaskUpdate",
+          "Skill"
+        ]
+      },
+      "PLANNER": {
+        "description": "Planning agent toolset with planning mode",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill",
+          "EnterPlanMode",
+          "ExitPlanMode"
+        ],
+        "mandatory": [
+          "TaskUpdate",
+          "Skill"
+        ]
+      },
+      "ORCHESTRATOR": {
+        "description": "Agent orchestration toolset (can spawn subagents)",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "Task",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "mandatory": [
+          "Task",
+          "TaskUpdate",
+          "Skill"
+        ]
+      },
+      "ROUTER": {
+        "description": "Router-only toolset (restricted)",
+        "tools": [
+          "Read",
+          "Task",
+          "TaskList",
+          "TaskCreate",
+          "TaskUpdate",
+          "TaskGet",
+          "AskUserQuestion"
+        ],
+        "mandatory": [
+          "Task",
+          "TaskList"
+        ]
+      },
+      "RESEARCHER": {
+        "description": "Research agent toolset with web access",
+        "tools": [
+          "Read",
+          "Glob",
+          "Grep",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "mandatory": [
+          "TaskUpdate",
+          "Skill"
+        ]
+      },
+      "READ_ONLY": {
+        "description": "Read-only agent toolset (e.g., code-reviewer)",
+        "tools": [
+          "Read",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "Skill"
+        ],
+        "mandatory": [
+          "TaskUpdate",
+          "Skill"
+        ]
+      },
+      "DATA_SCIENCE": {
+        "description": "Data science and ML toolset with Jupyter support",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "NotebookEdit",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "mandatory": [
+          "TaskUpdate",
+          "Skill"
+        ]
+      }
+    }
+  },
+  "constraints": {
+    "maxToolsPerAgent": 15,
+    "maxToolsPerOrchestrator": 18,
+    "toolCounts": {
+      "coreTools": 20,
+      "mcpTools": 9,
+      "totalAvailable": 20,
+      "totalUnavailable": 9
+    }
+  },
+  "validation": {
+    "agentDefaults": {
+      "developer": {
+        "toolset": "DEVELOPER",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 12
+      },
+      "qa": {
+        "toolset": "DEVELOPER",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 12
+      },
+      "planner": {
+        "toolset": "PLANNER",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill",
+          "EnterPlanMode",
+          "ExitPlanMode"
+        ],
+        "maxTools": 14
+      },
+      "architect": {
+        "toolset": "PLANNER",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill",
+          "EnterPlanMode",
+          "ExitPlanMode"
+        ],
+        "maxTools": 14
+      },
+      "security-architect": {
+        "toolset": "DEVELOPER",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 12
+      },
+      "technical-writer": {
+        "toolset": "DEVELOPER",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 12
+      },
+      "devops": {
+        "toolset": "DEVELOPER",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 12
+      },
+      "code-reviewer": {
+        "toolset": "READ_ONLY",
+        "tools": [
+          "Read",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "Skill"
+        ],
+        "maxTools": 6
+      },
+      "researcher": {
+        "toolset": "RESEARCHER",
+        "tools": [
+          "Read",
+          "Glob",
+          "Grep",
+          "WebSearch",
+          "WebFetch",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 10
+      },
+      "master-orchestrator": {
+        "toolset": "ORCHESTRATOR",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "Task",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 13
+      },
+      "swarm-coordinator": {
+        "toolset": "ORCHESTRATOR",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "Task",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 13
+      },
+      "evolution-orchestrator": {
+        "toolset": "ORCHESTRATOR",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "Task",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 13
+      },
+      "party-orchestrator": {
+        "toolset": "ORCHESTRATOR",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "Task",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 13
+      },
+      "context-compressor": {
+        "toolset": "DEVELOPER",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "TaskOutput",
+          "Skill"
+        ],
+        "maxTools": 5
+      },
+      "data-engineer": {
+        "toolset": "DATA_SCIENCE",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "NotebookEdit",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 12
+      },
+      "ai-ml-specialist": {
+        "toolset": "DATA_SCIENCE",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "NotebookEdit",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill"
+        ],
+        "maxTools": 12
+      }
+    },
+    "reservedTools": {
+      "Task": [
+        "router",
+        "master-orchestrator",
+        "evolution-orchestrator",
+        "swarm-coordinator",
+        "party-orchestrator"
+      ],
+      "AskUserQuestion": [
+        "router"
+      ]
+    },
+    "mandatoryTools": [
+      "TaskUpdate",
+      "Skill"
+    ],
+    "blockOnMissingMandatory": true,
+    "warnOnMCPWithoutServer": true,
+    "blockOnUnknownTool": true
+  }
+}

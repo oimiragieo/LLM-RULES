@@ -1,0 +1,280 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/agent-capability-card",
+  "title": "Agent Capability Card",
+  "description": "Schema for agent capability publication - enables dynamic discovery and health-aware routing",
+  "type": "object",
+  "required": ["id", "capabilities", "health"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Agent ID (must match agent filename without .md extension)",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "examples": ["developer", "code-reviewer", "frontend-pro"]
+    },
+    "displayName": {
+      "type": "string",
+      "description": "Human-readable agent name",
+      "examples": ["Developer Agent", "Code Reviewer", "Frontend Pro"]
+    },
+    "category": {
+      "type": "string",
+      "enum": ["core", "specialized", "domain", "orchestrator"],
+      "description": "Agent category based on directory location"
+    },
+    "filePath": {
+      "type": "string",
+      "description": "Relative path to agent definition file",
+      "pattern": "^\\.claude/agents/(core|specialized|domain|orchestrators)/[a-z0-9-]+\\.md$"
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "description": "List of capabilities this agent provides",
+      "items": {
+        "$ref": "#/$defs/Capability"
+      }
+    },
+    "constraints": {
+      "$ref": "#/$defs/Constraints"
+    },
+    "health": {
+      "$ref": "#/$defs/Health"
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    }
+  },
+  "$defs": {
+    "Capability": {
+      "type": "object",
+      "required": ["name", "domain", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Capability name (e.g., 'code-review', 'implementation', 'testing')",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain category for capability grouping",
+          "enum": [
+            "code",
+            "testing",
+            "security",
+            "devops",
+            "research",
+            "documentation",
+            "architecture",
+            "database",
+            "frontend",
+            "backend",
+            "mobile",
+            "ai-ml",
+            "blockchain",
+            "orchestration",
+            "planning"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "What this capability does",
+          "maxLength": 200
+        },
+        "triggerPhrases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Router keywords that trigger this capability",
+          "examples": [["code review", "review PR", "analyze code"]]
+        },
+        "requiredTools": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tools needed for this capability",
+          "examples": [["Read", "Write", "Edit", "Bash"]]
+        },
+        "skills": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Skills used for this capability",
+          "examples": [["tdd", "code-reviewer", "debugging"]]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Constraints": {
+      "type": "object",
+      "description": "Resource and execution constraints",
+      "properties": {
+        "maxConcurrentTasks": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 5,
+          "description": "Maximum simultaneous tasks this agent can handle"
+        },
+        "rateLimit": {
+          "type": "string",
+          "pattern": "^[0-9]+/(second|minute|hour)$",
+          "description": "Rate limit for spawn requests (e.g., '10/minute')"
+        },
+        "maxTaskSize": {
+          "type": "string",
+          "pattern": "^[0-9]+(KB|MB)$",
+          "description": "Maximum input size for tasks (e.g., '50KB')"
+        },
+        "preferredModel": {
+          "type": "string",
+          "enum": ["haiku", "sonnet", "opus"],
+          "default": "sonnet",
+          "description": "Preferred model for this agent"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Health": {
+      "type": "object",
+      "required": ["status"],
+      "description": "Real-time health status for routing decisions",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["healthy", "degraded", "unavailable"],
+          "description": "Current health status"
+        },
+        "consecutiveFailures": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Count of consecutive spawn/task failures"
+        },
+        "successCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Total successful completions"
+        },
+        "failureCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Total failures"
+        },
+        "successRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1.0,
+          "description": "Success rate (successCount / total)"
+        },
+        "averageExecutionMs": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average task execution time in milliseconds"
+        },
+        "lastUpdate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of last health update"
+        },
+        "isolatedAt": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When agent was isolated (null if not isolated)"
+        },
+        "isolationReason": {
+          "type": ["string", "null"],
+          "description": "Why isolated (e.g., '3 consecutive failures: timeout')"
+        },
+        "lastSuccessAt": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Timestamp of last successful completion"
+        },
+        "lastFailureAt": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Timestamp of last failure"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Metadata": {
+      "type": "object",
+      "description": "Additional metadata for tracking and auditing",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "description": "Agent definition version"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "author": {
+          "type": "string"
+        },
+        "references": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Related documentation or ADRs"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Other agents this agent depends on"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "examples": [
+    {
+      "id": "developer",
+      "displayName": "Developer Agent",
+      "category": "core",
+      "filePath": ".claude/agents/core/developer.md",
+      "capabilities": [
+        {
+          "name": "implementation",
+          "domain": "code",
+          "description": "TDD-focused code implementation with Red-Green-Refactor",
+          "triggerPhrases": ["implement", "code", "develop", "build", "create feature"],
+          "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+          "skills": ["tdd", "debugging", "git-expert"]
+        },
+        {
+          "name": "bug-fix",
+          "domain": "code",
+          "description": "Fix bugs using systematic debugging and TDD",
+          "triggerPhrases": ["fix bug", "debug", "resolve issue", "error"],
+          "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep"],
+          "skills": ["debugging", "tdd"]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1.0,
+        "lastUpdate": "2026-01-31T12:00:00.000Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-01-23T00:00:00.000Z",
+        "updatedAt": "2026-01-31T12:00:00.000Z"
+      }
+    }
+  ]
+}

@@ -304,9 +304,7 @@ class TaskCleanupManager {
    * @returns {TaskCleanupManager} this (for chaining)
    */
   off(event, callback) {
-    this.listeners = this.listeners.filter(
-      l => !(l.event === event && l.callback === callback)
-    );
+    this.listeners = this.listeners.filter(l => !(l.event === event && l.callback === callback));
     return this;
   }
 

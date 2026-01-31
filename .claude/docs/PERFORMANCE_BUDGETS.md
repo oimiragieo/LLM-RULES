@@ -13,23 +13,23 @@ Performance budgets define maximum acceptable resource usage for each component 
 
 ### Per-Component Memory Limits
 
-| Component                    | Budget      | Rationale                                    | Enforcement                   |
-|------------------------------|-------------|----------------------------------------------|-------------------------------|
-| **StateSyncManager**         | 50KB        | 1000 sync entries × ~50 bytes per entry     | `maxHistorySize = 1000`       |
-| **LoadTestFramework**        | 100KB       | 1000 metrics × 3 arrays × ~33 bytes          | `MAX_METRICS = 1000`          |
-| **ChaosEngineer**            | 0KB         | State cleared in `afterEach`                 | `cleanup()` method            |
-| **WorkflowEngine**           | 500KB       | Workflow state + checkpoints                 | Manual monitoring             |
-| **MemoryManager**            | 200KB       | Tier metadata + smart pruning state          | Manual monitoring             |
-| **Agent Context**            | 2MB         | Per spawned agent (compress if exceeded)     | Context-compressor skill      |
-| **Test Output Buffer**       | 50MB        | Per test run (summarize if exceeded)         | Manual monitoring             |
+| Component              | Budget | Rationale                                | Enforcement              |
+| ---------------------- | ------ | ---------------------------------------- | ------------------------ |
+| **StateSyncManager**   | 50KB   | 1000 sync entries × ~50 bytes per entry  | `maxHistorySize = 1000`  |
+| **LoadTestFramework**  | 100KB  | 1000 metrics × 3 arrays × ~33 bytes      | `MAX_METRICS = 1000`     |
+| **ChaosEngineer**      | 0KB    | State cleared in `afterEach`             | `cleanup()` method       |
+| **WorkflowEngine**     | 500KB  | Workflow state + checkpoints             | Manual monitoring        |
+| **MemoryManager**      | 200KB  | Tier metadata + smart pruning state      | Manual monitoring        |
+| **Agent Context**      | 2MB    | Per spawned agent (compress if exceeded) | Context-compressor skill |
+| **Test Output Buffer** | 50MB   | Per test run (summarize if exceeded)     | Manual monitoring        |
 
 ### System-Wide Memory Limits
 
-| Environment  | Heap Size | Target Usage | Buffer    | Notes                          |
-|--------------|-----------|--------------|-----------|--------------------------------|
-| Development  | 4GB       | 3GB          | 1GB       | Local testing, agent spawning  |
-| Staging      | 8GB       | 6GB          | 2GB       | Load testing, 100+ agents      |
-| Production   | 12GB      | 10GB         | 2GB       | Enterprise scale, monitoring   |
+| Environment | Heap Size | Target Usage | Buffer | Notes                         |
+| ----------- | --------- | ------------ | ------ | ----------------------------- |
+| Development | 4GB       | 3GB          | 1GB    | Local testing, agent spawning |
+| Staging     | 8GB       | 6GB          | 2GB    | Load testing, 100+ agents     |
+| Production  | 12GB      | 10GB         | 2GB    | Enterprise scale, monitoring  |
 
 **Buffer Rationale:** 25% overhead for GC, OS, and peak usage.
 
@@ -45,12 +45,12 @@ Performance budgets define maximum acceptable resource usage for each component 
 
 ### Test Execution Time
 
-| Test Type               | Budget    | Notes                              |
-|-------------------------|-----------|------------------------------------|
-| Unit tests (individual) | <100ms    | Fast feedback                      |
-| Integration tests       | <1s       | Multiple components                |
-| Load tests              | <30s      | 100+ concurrent workflows          |
-| Full test suite         | <5min     | 1311 total tests                   |
+| Test Type               | Budget | Notes                     |
+| ----------------------- | ------ | ------------------------- |
+| Unit tests (individual) | <100ms | Fast feedback             |
+| Integration tests       | <1s    | Multiple components       |
+| Load tests              | <30s   | 100+ concurrent workflows |
+| Full test suite         | <5min  | 1311 total tests          |
 
 ---
 
@@ -58,12 +58,12 @@ Performance budgets define maximum acceptable resource usage for each component 
 
 ### Concurrent Agent Spawning
 
-| Scenario                | Agents | Memory per Agent | Total Memory | Notes                     |
-|-------------------------|--------|------------------|--------------|---------------------------|
-| Standard workflow       | 3-5    | 2MB              | 10MB         | Typical feature work      |
-| Master orchestrator     | 10-15  | 2MB              | 30MB         | Complex planning          |
-| Enterprise scale        | 34+    | 2MB              | 68MB         | Load testing scenario     |
-| **Budget Limit**        | 50     | 2MB              | **100MB**    | Maximum safe concurrency  |
+| Scenario            | Agents | Memory per Agent | Total Memory | Notes                    |
+| ------------------- | ------ | ---------------- | ------------ | ------------------------ |
+| Standard workflow   | 3-5    | 2MB              | 10MB         | Typical feature work     |
+| Master orchestrator | 10-15  | 2MB              | 30MB         | Complex planning         |
+| Enterprise scale    | 34+    | 2MB              | 68MB         | Load testing scenario    |
+| **Budget Limit**    | 50     | 2MB              | **100MB**    | Maximum safe concurrency |
 
 **Spawn Rate Limit:** 10 agents/second (prevents sync history explosion)
 
@@ -81,11 +81,11 @@ Performance budgets define maximum acceptable resource usage for each component 
 
 ### Pattern Detection
 
-| Component                | Budget   | Items   | Memory per Item | Notes                        |
-|--------------------------|----------|---------|-----------------|------------------------------|
-| PatternDetectionEngine   | 500KB    | 10,000  | ~50 bytes       | Code patterns detected       |
-| MLOptimizationEngine     | 1MB      | 5,000   | ~200 bytes      | Optimization suggestions     |
-| SemanticCache            | 2MB      | 1,000   | ~2KB            | Embeddings + metadata        |
+| Component              | Budget | Items  | Memory per Item | Notes                    |
+| ---------------------- | ------ | ------ | --------------- | ------------------------ |
+| PatternDetectionEngine | 500KB  | 10,000 | ~50 bytes       | Code patterns detected   |
+| MLOptimizationEngine   | 1MB    | 5,000  | ~200 bytes      | Optimization suggestions |
+| SemanticCache          | 2MB    | 1,000  | ~2KB            | Embeddings + metadata    |
 
 ### Training Data Retention
 
@@ -99,12 +99,12 @@ Performance budgets define maximum acceptable resource usage for each component 
 
 ### Per-Component Metrics
 
-| Component            | Metrics Tracked | Max Entries | Memory Budget | Retention Policy      |
-|----------------------|-----------------|-------------|---------------|-----------------------|
-| LoadTestFramework    | 3 arrays        | 1000        | 100KB         | Rolling window (FIFO) |
-| WorkflowEngine       | 5 arrays        | 1000        | 150KB         | Rolling window        |
-| StateSyncManager     | 1 array         | 1000        | 50KB          | Rolling window        |
-| **Total Budget**     | -               | -           | **300KB**     | -                     |
+| Component         | Metrics Tracked | Max Entries | Memory Budget | Retention Policy      |
+| ----------------- | --------------- | ----------- | ------------- | --------------------- |
+| LoadTestFramework | 3 arrays        | 1000        | 100KB         | Rolling window (FIFO) |
+| WorkflowEngine    | 5 arrays        | 1000        | 150KB         | Rolling window        |
+| StateSyncManager  | 1 array         | 1000        | 50KB          | Rolling window        |
+| **Total Budget**  | -               | -           | **300KB**     | -                     |
 
 ---
 
@@ -151,22 +151,22 @@ it('should stay within memory budget', async () => {
 
 ### Latency Budgets
 
-| Operation                  | Budget    | p50   | p95   | p99   | Notes                        |
-|----------------------------|-----------|-------|-------|-------|------------------------------|
-| Task routing               | <5ms      | 2ms   | 4ms   | 8ms   | Router decision time         |
-| State sync (single)        | <100ms    | 50ms  | 80ms  | 150ms | Bi-directional sync          |
-| Result normalization       | <10ms     | 5ms   | 8ms   | 15ms  | Format conversion            |
-| Workflow checkpoint        | <200ms    | 100ms | 180ms | 300ms | Checkpoint save/load         |
-| Agent spawn                | <500ms    | 300ms | 450ms | 700ms | Template load + init         |
+| Operation            | Budget | p50   | p95   | p99   | Notes                |
+| -------------------- | ------ | ----- | ----- | ----- | -------------------- |
+| Task routing         | <5ms   | 2ms   | 4ms   | 8ms   | Router decision time |
+| State sync (single)  | <100ms | 50ms  | 80ms  | 150ms | Bi-directional sync  |
+| Result normalization | <10ms  | 5ms   | 8ms   | 15ms  | Format conversion    |
+| Workflow checkpoint  | <200ms | 100ms | 180ms | 300ms | Checkpoint save/load |
+| Agent spawn          | <500ms | 300ms | 450ms | 700ms | Template load + init |
 
 ### Throughput Budgets
 
-| Operation                  | Budget         | Notes                              |
-|----------------------------|----------------|------------------------------------|
-| Task creation              | 100/sec        | Peak load scenario                 |
-| Agent spawning             | 10/sec         | Prevents sync history explosion    |
-| State syncs                | 50/sec         | Across all orchestrators           |
-| Workflow checkpoints       | 20/sec         | Background checkpoint saves        |
+| Operation            | Budget  | Notes                           |
+| -------------------- | ------- | ------------------------------- |
+| Task creation        | 100/sec | Peak load scenario              |
+| Agent spawning       | 10/sec  | Prevents sync history explosion |
+| State syncs          | 50/sec  | Across all orchestrators        |
+| Workflow checkpoints | 20/sec  | Background checkpoint saves     |
 
 ---
 

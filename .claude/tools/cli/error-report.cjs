@@ -37,13 +37,7 @@ const path = require('path');
 // =============================================================================
 
 // Try to load error writer, fall back to direct file reading
-let errorWriter;
-try {
-  errorWriter = require('../../lib/error-writer.cjs');
-} catch (e) {
-  // Fallback implementation
-  errorWriter = null;
-}
+// NOTE: errorWriter import removed - currently unused in this tool
 
 // =============================================================================
 // Configuration
@@ -135,7 +129,7 @@ function readErrors(options = {}) {
       .filter(f => f.startsWith('errors-') && f.endsWith('.jsonl'))
       .sort()
       .reverse(); // Most recent first
-  } catch (e) {
+  } catch (_e) {
     return errors;
   }
 
@@ -159,11 +153,11 @@ function readErrors(options = {}) {
         try {
           const entry = JSON.parse(line);
           errors.push(entry);
-        } catch (e) {
+        } catch (_e) {
           // Skip invalid lines
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // Skip unreadable files
     }
   }

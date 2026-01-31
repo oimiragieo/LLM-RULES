@@ -129,14 +129,14 @@ Task({
   subagent_type: 'general-purpose',
   description: 'Developer fixing login bug',
   prompt: `
-You are the DEVELOPER agent. Your instructions are in .claude/agents/core/developer.md
+You are the DEVELOPER agent. Your instructions are in @.claude/agents/core/developer.md
 
 ## Your Assigned Task
 Task ID: 3
 Subject: Fix login bug in auth module
 
 ## Instructions
-1. Read your agent definition: .claude/agents/core/developer.md
+1. Read your agent definition: @.claude/agents/core/developer.md
 2. **Claim your task**: TaskUpdate({ taskId: "3", status: "in_progress", owner: "developer" })
 3. **Invoke your skills**: Skill({ skill: "tdd" }) and Skill({ skill: "debugging" })
 4. Execute the task following skill workflows
@@ -160,13 +160,13 @@ When a task benefits from multiple perspectives or parallel work:
 Task({
   subagent_type: "general-purpose",
   description: "Architect designing system",
-  prompt: "You are ARCHITECT. Read .claude/agents/core/architect.md and design..."
+  prompt: "You are ARCHITECT. Read @.claude/agents/core/architect.md and design..."
 })
 
 Task({
   subagent_type: "general-purpose",
   description: "Security reviewing design",
-  prompt: "You are SECURITY-ARCHITECT. Read .claude/agents/specialized/security-architect.md and review..."
+  prompt: "You are SECURITY-ARCHITECT. Read @.claude/agents/specialized/security-architect.md and review..."
 })
 ```
 
@@ -179,7 +179,7 @@ Task({
   subagent_type: "general-purpose",
   description: "Creating specialized agent",
   prompt: `
-You are the AGENT-CREATOR. Your skill is defined in .claude/skills/agent-creator/SKILL.md
+You are the AGENT-CREATOR. Your skill is defined in @.claude/skills/agent-creator/SKILL.md
 
 ## Task
 Create a new agent for: ${userRequest}
@@ -202,7 +202,7 @@ Task({
   subagent_type: "general-purpose",
   description: "Creating new skill",
   prompt: `
-You are the SKILL-CREATOR. Your skill is defined in .claude/skills/skill-creator/SKILL.md
+You are the SKILL-CREATOR. Your skill is defined in @.claude/skills/skill-creator/SKILL.md
 
 ## Task
 Create skill for: ${userRequest}
@@ -251,7 +251,7 @@ Then spawn:
 Task({
   subagent_type: "general-purpose",
   description: "Developer fixing login bug",
-  prompt: "You are DEVELOPER. Read .claude/agents/core/developer.md first, then fix the login form bug. Follow Memory Protocol."
+  prompt: "You are DEVELOPER. Read @.claude/agents/core/developer.md first, then fix the login form bug. Follow Memory Protocol."
 })
 ```
 
@@ -277,7 +277,7 @@ Task({
   subagent_type: "general-purpose",
   model: "opus",
   description: "Planner designing payment feature",
-  prompt: "You are PLANNER. Read .claude/agents/core/planner.md and create a plan for payment processing. Save to .claude/context/plans/"
+  prompt: "You are PLANNER. Read @.claude/agents/core/planner.md and create a plan for payment processing. Save to @.claude/context/plans/"
 })
 ```
 
@@ -288,14 +288,14 @@ Task({
   subagent_type: "general-purpose",
   model: "opus",
   description: "Architect reviewing payment architecture",
-  prompt: "You are ARCHITECT. Read .claude/agents/core/architect.md. Review the plan in .claude/context/plans/ for architectural concerns: scalability, patterns, integration points, technical debt. Save review to .claude/context/reports/architect-review.md"
+  prompt: "You are ARCHITECT. Read @.claude/agents/core/architect.md. Review the plan in @.claude/context/plans/ for architectural concerns: scalability, patterns, integration points, technical debt. Save review to @.claude/context/reports/architect-review.md"
 })
 
 Task({
   subagent_type: "general-purpose",
   model: "opus",
   description: "Security reviewing payment design",
-  prompt: "You are SECURITY-ARCHITECT. Read .claude/agents/specialized/security-architect.md. Review the plan in .claude/context/plans/ for security concerns: OWASP, PCI-DSS, encryption, auth. Save review to .claude/context/reports/security-review.md"
+  prompt: "You are SECURITY-ARCHITECT. Read @.claude/agents/specialized/security-architect.md. Review the plan in @.claude/context/plans/ for security concerns: OWASP, PCI-DSS, encryption, auth. Save review to @.claude/context/reports/security-review.md"
 })
 ```
 
@@ -305,7 +305,7 @@ Task({
 Task({
   subagent_type: "general-purpose",
   description: "Planner consolidating reviews",
-  prompt: "You are PLANNER. Read the reviews in .claude/context/reports/ and update the plan to address Architect and Security feedback."
+  prompt: "You are PLANNER. Read the reviews in @.claude/context/reports/ and update the plan to address Architect and Security feedback."
 })
 ```
 
@@ -350,8 +350,121 @@ Task({
   subagent_type: "general-purpose",
   description: "QA running full test suite",
   run_in_background: true,
-  prompt: "You are QA. Read .claude/agents/core/qa.md and run the full test suite..."
+  prompt: "You are QA. Read @.claude/agents/core/qa.md and run the full test suite..."
 })
+```
+
+## Tool Enhancement: SkillCatalog
+
+The router now supports agents using `SkillCatalog()` for runtime skill discovery.
+
+**When to inject AVAILABLE_SKILLS (Phase 1)**:
+
+- Pre-selected skills for agent role
+- 15-20 domain-specific skills
+- Agent has predictable skill needs
+
+**When agents use SkillCatalog (Phase 2)**:
+
+- Dynamic skill discovery: `SkillCatalog({ domain: 'testing' })`
+- Task-specific skill selection
+- Access to all 434+ skills with filtering
+
+Agents can use BOTH:
+
+1. Reference pre-injected AVAILABLE_SKILLS (quick)
+2. Query SkillCatalog() for more options (flexible)
+
+See: `.claude/docs/SKILLCATALOG_USAGE.md`
+
+## Capability-Aware Agent Selection (Phase 3)
+
+**Gate 3.5: Capability Discovery**
+
+Before spawning an agent, discover the best available agent via capabilities:
+
+### Step 1: Classify Task Capability
+
+Determine what capability is needed:
+
+- Code review request? → capability: `code-review`
+- Implementation task? → capability: `implementation`
+- Testing needed? → capability: `testing`
+- Security sensitive? → capability: `security-review`
+- Architecture design? → capability: `architecture-design`
+- Documentation? → capability: `documentation`
+
+See `.claude/config/capability-routing.json` for full mapping.
+
+### Step 2: Query Available Agents
+
+```javascript
+const agents = AvailableAgents({
+  capability: 'code-review',
+  excludeFailed: true, // Skip unavailable agents
+  minSuccessRate: 0.7, // Only agents with 70%+ success rate
+  limit: 5, // Top 5 matches
+});
+```
+
+### Step 3: Select Best Agent
+
+```javascript
+// Pick highest success rate agent
+const best = agents.agents[0];
+
+// Or find recommended agent for this task
+const recommended = agents.agents.find(a => a.recommendedAgents?.includes('code-reviewer'));
+
+// Fallback to hardcoded if no capability match
+const selected = best || recommended || 'developer';
+```
+
+### Step 4: Check Agent Availability
+
+Before spawning, verify:
+
+- `agent.health.status !== 'unavailable'`
+- Agent has required tools for the task
+- Agent is not at capacity
+
+### Step 5: Spawn Selected Agent
+
+```javascript
+Task({
+  subagent_type: best.id,
+  prompt: assembleSpawnPrompt(best.id, userRequest),
+});
+```
+
+### Self-Healing Behavior
+
+**If AvailableAgents returns no agents:**
+
+1. Try with `excludeFailed: false` (include degraded agents)
+2. Try with lower `minSuccessRate` (0.5)
+3. Log as capacity issue
+4. Return error with suggestion
+
+**Benefits of Capability-Based Selection:**
+
+- **Self-healing**: Isolated agents automatically skipped
+- **Hot-swapping**: Replace broken agent with next-best
+- **Load-aware**: Can pick least-loaded agent
+- **Automatic recovery**: Failed agents recover after 5 min
+
+### Example: Capability-Based Routing
+
+```
+[ROUTER] Analyzing Request...
+- Intent: Review this code
+- Capability: code-review
+
+[ROUTER] Querying AvailableAgents({ capability: 'code-review' })
+- Found 2 agents: code-reviewer (98%), developer (85%)
+- Selected: code-reviewer (highest success rate)
+
+[ROUTER] Spawning code-reviewer...
 ```
 
 ## Model Selection for Subagents

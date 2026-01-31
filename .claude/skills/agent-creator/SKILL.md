@@ -6,6 +6,10 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Glob, Grep, WebSearch, WebFetch, Bash, Task]
+# Phase 1 Integration: All tools validated against .claude/config/tool-manifest.json
+# If a tool becomes unavailable, spawned agents will be notified at spawn time via
+# pre-spawn-tool-validator.cjs hook (Phase 1B)
+# Single source of truth: .claude/config/tool-manifest.json
 best_practices:
   - Verify no existing agent matches first
   - Research domain before creating agent
@@ -175,12 +179,44 @@ Grep: "<related-term>" in .claude/skills/
 | Domain Expert | `.claude/agents/domain/`        | ux-reviewer, data-scientist   |
 | Orchestrator  | `.claude/agents/orchestrators/` | master-orchestrator           |
 
-### Step 5: Generate Agent Definition (WITH SKILL LOADING)
+### Step 5: Generate Agent Definition (WITH SKILL LOADING AND LAZY-LOAD RULE)
 
 **CRITICAL**: The generated agent MUST include:
 
 1. Skills listed in frontmatter `skills:` array
 2. "Step 0: Load Skills" in the Workflow section with ACTUAL skill paths
+3. **LAZY-LOAD CONTEXT RULE** (see below)
+
+#### LAZY-LOAD CONTEXT RULE (MANDATORY)
+
+When referencing `.claude/` file paths in the agent, follow these rules:
+
+| Location                   | Pattern        | Example                                   | Rule            |
+| -------------------------- | -------------- | ----------------------------------------- | --------------- |
+| **Markdown documentation** | `@.claude/...` | Read: `@.claude/skills/tdd/SKILL.md`      | ✅ Add @ prefix |
+| **context_files array**    | `@.claude/...` | `- @.claude/context/memory/learnings.md`  | ✅ Add @ prefix |
+| **Bash commands**          | `.claude/...`  | `cat .claude/context/memory/learnings.md` | ❌ NO @ prefix  |
+| **Bash examples**          | `.claude/...`  | `Bash("node .claude/tools/validate.mjs")` | ❌ NO @ prefix  |
+
+**Why this matters:**
+
+- `@.claude/` paths enable lazy-loading in Claude Code context system
+- Lazy-loaded references don't count toward token limits
+- Reduces agent spawn prompt size (faster initialization)
+- Makes intent clear: @ signals "reference, not inline content"
+
+**Examples in agent documentation:**
+
+```markdown
+✅ CORRECT: Read: @.claude/skills/tdd/SKILL.md
+❌ WRONG: Read: .claude/skills/tdd/SKILL.md
+
+✅ CORRECT: Location: @.claude/context/memory/decisions.md
+❌ WRONG: Location: .claude/context/memory/decisions.md
+
+✅ CORRECT: Bash("grep '<pattern>' .claude/CLAUDE.md")
+❌ WRONG: Bash("grep '<pattern>' @.claude/CLAUDE.md")
+```
 
 Write to `.claude/agents/<category>/<agent-name>.md`:
 
@@ -198,7 +234,7 @@ skills:
   - <skill-2>
   - task-management-protocol
 context_files:
-  - .claude/context/memory/learnings.md
+  - @.claude/context/memory/learnings.md
 ---
 
 # <Agent Title>
@@ -303,9 +339,14 @@ When executing tasks, follow this 8-step approach:
 
 ## Output Locations
 
-- Deliverables: `.claude/context/artifacts/`
-- Reports: `.claude/context/reports/`
-- Temporary files: `.claude/context/tmp/`
+> **LAZY-LOAD RULE**: In agent documentation, reference these paths with `@` prefix for lazy-loading.
+
+- Deliverables: `@.claude/context/artifacts/`
+- Reports: `@.claude/context/reports/`
+- Temporary files: `@.claude/context/tmp/`
+- Memory: `@.claude/context/memory/`
+
+(No `@` prefix in bash commands: `cat .claude/context/artifacts/file.md`)
 
 ## Task Progress Protocol (MANDATORY)
 
@@ -697,9 +738,10 @@ Categories:
 
 ### Mandatory References
 
-- **File Placement**: See `.claude/docs/FILE_PLACEMENT_RULES.md`
-- **Developer Workflow**: See `.claude/docs/DEVELOPER_WORKFLOW.md`
-- **Artifact Naming**: See `.claude/docs/ARTIFACT_NAMING.md`
+- **File Placement**: See `@.claude/docs/FILE_PLACEMENT_RULES.md`
+- **Developer Workflow**: See `@.claude/docs/DEVELOPER_WORKFLOW.md`
+- **Artifact Naming**: See `@.claude/docs/ARTIFACT_NAMING.md`
+- **Lazy-Load Rule**: All new agents should use `@.claude/` prefix in documentation (see LAZY-LOAD CONTEXT RULE above)
 
 ### Enforcement
 
@@ -941,6 +983,72 @@ Before calling `TaskUpdate({ status: "completed" })`, you MUST run the Post-Crea
 **Why this matters:** The Party Mode incident showed that fully-implemented artifacts can be invisible to the Router if integration steps are missed. This validation ensures no "invisible artifact" pattern.
 
 **Reference:** `.claude/workflows/core/post-creation-validation.md`
+
+### Step 11: Post-Creation Registry Regeneration (BLOCKING - PHASE 3 INTEGRATION)
+
+**This step ensures the new agent is discoverable via the AvailableAgents() tool (Phase 3 infrastructure).**
+
+After the agent is created and validated, you MUST regenerate the agent registry:
+
+1. **Run the agent registry generator:**
+
+   ```bash
+   node .claude/tools/cli/generate-agent-registry.cjs
+   ```
+
+2. **Verify the command completed successfully:**
+   - Exit code should be 0
+   - You should see: `Successfully generated agent registry`
+
+3. **Verify agent appears in registry:**
+
+   ```bash
+   grep "<agent-name>" .claude/context/agent-registry.json || echo "ERROR: Agent not in registry!"
+   ```
+
+4. **Check capability card was generated:**
+   - Verify the agent has a capability card in agent-registry.json
+   - Card should include `capabilities`, `health`, and `constraints`
+   - Health status should be `healthy` for new agents
+
+**Why this is mandatory:**
+
+- Agents not in agent-registry.json are **invisible to AvailableAgents()** tool
+- Router cannot discover them for capability-based routing
+- AvailableAgents() excludeFailed logic won't work without health tracking
+- New agents must be registered in Phase 3 discovery system
+
+**Phase 3 Context:**
+
+- **File**: `.claude/context/agent-registry.json` (runtime agent registry)
+- **Tool**: `AvailableAgents()` for agent discovery by capability
+- **Schema**: `.claude/schemas/agent-capability-card.schema.json`
+- **Routing**: `.claude/config/capability-routing.json` (capability-to-agent mapping)
+
+**Troubleshooting:**
+
+If agent doesn't appear in registry:
+
+- Check agent file has valid YAML frontmatter
+- Verify no syntax errors in agent name/description
+- Check agent file is readable and in correct location
+- Re-run generator with verbose output: `node .claude/tools/cli/generate-agent-registry.cjs --verbose`
+
+**Integration Diagram:**
+
+```
+Agent Created
+    ↓
+Step 10: Validation (CLAUDE.md, router-enforcer.cjs)
+    ↓
+Step 11: Registry Regeneration (Phase 3 Discovery)
+    ↓
+Agent in agent-registry.json
+    ↓
+AvailableAgents() can discover
+    ↓
+Router can route by capability
+```
 
 ---
 

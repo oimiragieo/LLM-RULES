@@ -299,7 +299,7 @@ describe('TaskCleanupManager - Category 4: Events (4 tests)', () => {
     manager.addTask({ id: 'task-1', status: 'completed', completedAt: oldTime });
 
     let eventData = null;
-    manager.on('cleanup', (data) => {
+    manager.on('cleanup', data => {
       eventData = data;
     });
 
@@ -314,7 +314,7 @@ describe('TaskCleanupManager - Category 4: Events (4 tests)', () => {
     manager.addTask({ id: 'task-1', status: 'completed' });
 
     let eventData = null;
-    manager.on('forceCleanup', (data) => {
+    manager.on('forceCleanup', data => {
       eventData = data;
     });
 
@@ -333,7 +333,7 @@ describe('TaskCleanupManager - Category 4: Events (4 tests)', () => {
     });
 
     let errorData = null;
-    failingManager.on('error', (data) => {
+    failingManager.on('error', data => {
       errorData = data;
     });
 
@@ -348,7 +348,9 @@ describe('TaskCleanupManager - Category 4: Events (4 tests)', () => {
     manager.addTask({ id: 'task-1', status: 'completed', completedAt: oldTime });
 
     let count = 0;
-    const listener = () => { count++; };
+    const listener = () => {
+      count++;
+    };
 
     manager.on('cleanup', listener);
     await manager.runCleanup();
@@ -498,7 +500,7 @@ describe('TaskCleanupManager - Custom Task Access', () => {
     const manager = new TaskCleanupManager({
       retentionMs: 100,
       getTaskList: async () => Array.from(externalStore.values()),
-      removeTask: async (taskId) => externalStore.delete(taskId),
+      removeTask: async taskId => externalStore.delete(taskId),
     });
 
     const result = await manager.runCleanup();

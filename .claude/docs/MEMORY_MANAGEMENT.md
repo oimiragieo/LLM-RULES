@@ -119,9 +119,9 @@ class StateSyncManager {
 class LoadTestFramework {
   constructor() {
     this.metrics = {
-      spawnTimes: [],   // UNBOUNDED
-      throughput: [],   // UNBOUNDED
-      memoryUsage: []   // UNBOUNDED
+      spawnTimes: [], // UNBOUNDED
+      throughput: [], // UNBOUNDED
+      memoryUsage: [], // UNBOUNDED
     };
   }
 
@@ -141,7 +141,7 @@ class LoadTestFramework {
     this.metrics = {
       spawnTimes: [],
       throughput: [],
-      memoryUsage: []
+      memoryUsage: [],
     };
   }
 
@@ -181,8 +181,12 @@ describe('Chaos Engineering', () => {
 
   // NO afterEach cleanup - STATE LEAKS
 
-  it('test 1', () => { /* chaos.testResults grows */ });
-  it('test 2', () => { /* chaos.testResults grows */ });
+  it('test 1', () => {
+    /* chaos.testResults grows */
+  });
+  it('test 2', () => {
+    /* chaos.testResults grows */
+  });
   // ... 20 more tests = 20x accumulation
 });
 ```
@@ -201,8 +205,12 @@ describe('Chaos Engineering', () => {
     if (chaos) await chaos.cleanup(); // CLEAR STATE
   });
 
-  it('test 1', () => { /* clean state */ });
-  it('test 2', () => { /* clean state */ });
+  it('test 1', () => {
+    /* clean state */
+  });
+  it('test 2', () => {
+    /* clean state */
+  });
 });
 ```
 
@@ -250,15 +258,15 @@ class Workflow {
 
 ## Memory Performance Budgets
 
-| Component              | Max Memory | Notes                                    |
-|------------------------|------------|------------------------------------------|
-| **Task Spawn Rate**    | 10/second  | Prevents sync history explosion          |
-| **Heap Growth**        | 5MB/sec    | During normal operations                 |
-| **Agent Context**      | 2MB        | Per agent (use context-compressor if exceeded) |
-| **Test Output**        | 50MB       | Per test run (use summarization)         |
-| **Metrics Arrays**     | 1000 entries | All history/metrics arrays             |
-| **Sync History**       | 1000 entries | Per manager instance                   |
-| **Test Class State**   | 0 MB       | Must be cleared in `afterEach`           |
+| Component            | Max Memory   | Notes                                          |
+| -------------------- | ------------ | ---------------------------------------------- |
+| **Task Spawn Rate**  | 10/second    | Prevents sync history explosion                |
+| **Heap Growth**      | 5MB/sec      | During normal operations                       |
+| **Agent Context**    | 2MB          | Per agent (use context-compressor if exceeded) |
+| **Test Output**      | 50MB         | Per test run (use summarization)               |
+| **Metrics Arrays**   | 1000 entries | All history/metrics arrays                     |
+| **Sync History**     | 1000 entries | Per manager instance                           |
+| **Test Class State** | 0 MB         | Must be cleared in `afterEach`                 |
 
 ---
 
@@ -325,6 +333,7 @@ node --expose-gc --inspect-brk index.js
    - Save any heap snapshots generated
 
 2. **Identify Memory Hog**
+
    ```bash
    # Enable heap profiling
    NODE_OPTIONS="--max-old-space-size=4096 --trace-gc --heapsnapshot-on-oom" npm test
@@ -334,6 +343,7 @@ node --expose-gc --inspect-brk index.js
    ```
 
 3. **Debug Commands**
+
    ```bash
    # Run single failing test with memory tracking
    node --trace-gc --max-old-space-size=2048 --test tests/failing-test.cjs
@@ -446,8 +456,7 @@ it('should prevent memory leak in sync history', () => {
   }
 
   // Should be bounded to 1000
-  assert(manager.syncHistory.length <= 1000,
-    `Expected ≤1000, got ${manager.syncHistory.length}`);
+  assert(manager.syncHistory.length <= 1000, `Expected ≤1000, got ${manager.syncHistory.length}`);
 });
 ```
 
@@ -503,21 +512,21 @@ The `MemoryMonitor` class provides real-time heap monitoring with threshold-base
 const MemoryMonitor = require('./.claude/lib/utils/memory-monitor.cjs');
 
 const monitor = new MemoryMonitor({
-  warningThreshold: 0.70,  // 70%
+  warningThreshold: 0.7, // 70%
   criticalThreshold: 0.85, // 85%
   shutdownThreshold: 0.95, // 95%
-  interval: 5000,          // 5 seconds
+  interval: 5000, // 5 seconds
 });
 
-monitor.on('warning', (data) => {
+monitor.on('warning', data => {
   console.warn(`Memory warning: ${(data.percent * 100).toFixed(1)}%`);
 });
 
-monitor.on('critical', (data) => {
+monitor.on('critical', data => {
   console.error(`Memory critical: ${data.level} - ${data.message}`);
 });
 
-monitor.on('recovery', (data) => {
+monitor.on('recovery', data => {
   console.log(`Memory recovered from ${data.previousLevel}`);
 });
 
@@ -545,12 +554,12 @@ if (shouldPause) {
 
 #### Event Reference
 
-| Event    | When Fired                           | Data Fields                                  |
-|----------|--------------------------------------|----------------------------------------------|
-| check    | Every monitoring interval            | timestamp, heapUsed, heapLimit, heapPercent  |
-| warning  | Heap exceeds warning threshold       | level, percent, heapUsedMB, message, entry   |
-| critical | Heap exceeds critical/shutdown       | level, percent, heapUsedMB, message, entry   |
-| recovery | Heap drops below warning threshold   | previousLevel, percent, message, entry       |
+| Event    | When Fired                         | Data Fields                                 |
+| -------- | ---------------------------------- | ------------------------------------------- |
+| check    | Every monitoring interval          | timestamp, heapUsed, heapLimit, heapPercent |
+| warning  | Heap exceeds warning threshold     | level, percent, heapUsedMB, message, entry  |
+| critical | Heap exceeds critical/shutdown     | level, percent, heapUsedMB, message, entry  |
+| recovery | Heap drops below warning threshold | previousLevel, percent, message, entry      |
 
 ---
 
@@ -603,11 +612,11 @@ const TaskCleanupManager = require('./.claude/lib/workflow/task-cleanup-manager.
 
 const manager = new TaskCleanupManager({
   retentionMs: 30 * 60 * 1000, // 30 minutes
-  interval: 60 * 1000,          // 1 minute
+  interval: 60 * 1000, // 1 minute
   batchSize: 100,
 });
 
-manager.on('cleanup', (result) => {
+manager.on('cleanup', result => {
   console.log(`Cleaned up ${result.count} tasks`);
 });
 
@@ -616,11 +625,11 @@ manager.start();
 
 #### Configuration Environment Variables
 
-| Variable                    | Default  | Description                              |
-| --------------------------- | -------- | ---------------------------------------- |
-| `TASK_CLEANUP_RETENTION_MS` | 1800000  | Retention period (30 min)                |
-| `TASK_CLEANUP_INTERVAL_MS`  | 60000    | Cleanup interval (1 min)                 |
-| `TASK_CLEANUP_BATCH_SIZE`   | 100      | Max tasks per cleanup                    |
+| Variable                    | Default | Description               |
+| --------------------------- | ------- | ------------------------- |
+| `TASK_CLEANUP_RETENTION_MS` | 1800000 | Retention period (30 min) |
+| `TASK_CLEANUP_INTERVAL_MS`  | 60000   | Cleanup interval (1 min)  |
+| `TASK_CLEANUP_BATCH_SIZE`   | 100     | Max tasks per cleanup     |
 
 ---
 
@@ -628,14 +637,14 @@ manager.start();
 
 ### Memory Monitoring
 
-| Variable                     | Default  | Description                              |
-| ---------------------------- | -------- | ---------------------------------------- |
-| `HEAP_WARNING_THRESHOLD`     | 70       | Warning threshold (%)                    |
-| `HEAP_CRITICAL_THRESHOLD`    | 85       | Critical threshold (%)                   |
-| `HEAP_SHUTDOWN_THRESHOLD`    | 95       | Shutdown threshold (%)                   |
-| `MEMORY_MONITOR_INTERVAL_MS` | 5000     | Monitor interval (ms)                    |
-| `MEMORY_HISTORY_SIZE`        | 100      | Max history entries                      |
-| `MEMORY_SPAWN_THROTTLING`    | true     | Enable spawn throttling                  |
+| Variable                     | Default | Description             |
+| ---------------------------- | ------- | ----------------------- |
+| `HEAP_WARNING_THRESHOLD`     | 70      | Warning threshold (%)   |
+| `HEAP_CRITICAL_THRESHOLD`    | 85      | Critical threshold (%)  |
+| `HEAP_SHUTDOWN_THRESHOLD`    | 95      | Shutdown threshold (%)  |
+| `MEMORY_MONITOR_INTERVAL_MS` | 5000    | Monitor interval (ms)   |
+| `MEMORY_HISTORY_SIZE`        | 100     | Max history entries     |
+| `MEMORY_SPAWN_THROTTLING`    | true    | Enable spawn throttling |
 
 ---
 

@@ -47,12 +47,14 @@ Works immediately - no MCP server, no restart needed.
 ## Result Limits (Memory Safeguard)
 
 arxiv-mcp returns academic papers. To prevent memory exhaustion:
+
 - **max_results: 20 (HARD LIMIT)**
 - Each paper metadata ~300 bytes
 - 20 papers × 300 bytes = ~6 KB metadata
 - Papers can be 100+ KB each if fetched - DON'T fetch full papers
 
 **Why the limit?**
+
 - Previous limit: 100 results → 30 KB+ metadata → context explosion
 - New limit: 20 results → 6 KB metadata → memory safe
 - 20 papers is usually enough to find your target
@@ -169,6 +171,7 @@ search_query=cat:cs.LG+ANDNOT+ti:survey
 - Community discussions → Use WebSearch for forums/Stack Overflow
 
 **arxiv-mcp is best for:**
+
 - Finding academic papers on specific topics
 - Understanding theoretical foundations
 - Citing research in documentation

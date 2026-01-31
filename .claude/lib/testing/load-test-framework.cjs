@@ -234,7 +234,7 @@ class LoadTestFramework {
     }
 
     const spawnTimes = [];
-    for (const workflow of workflows.slice(0, 10)) {
+    for (const _workflow of workflows.slice(0, 10)) {
       // Sample 10 workflows
       const startTime = Date.now();
       await this.simulateTaskOperation();

@@ -259,7 +259,9 @@ function main() {
       }
     }
 
-    console.warn(`\nCurrent tools: ${allowedTools.slice(0, 5).join(', ')}${allowedTools.length > 5 ? '...' : ''} (${sizeInfo.toolCount} tools)`);
+    console.warn(
+      `\nCurrent tools: ${allowedTools.slice(0, 5).join(', ')}${allowedTools.length > 5 ? '...' : ''} (${sizeInfo.toolCount} tools)`
+    );
     console.warn(`More info: .claude/docs/MEMORY_MANAGEMENT.md\n`);
   }
 

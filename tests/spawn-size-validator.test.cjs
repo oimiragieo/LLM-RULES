@@ -6,20 +6,34 @@
 
 const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { calculateSpawnSize, validateSpawnSize, generatePruningSuggestions } = require('../.claude/hooks/safety/spawn-size-validator.cjs');
+const {
+  calculateSpawnSize,
+  validateSpawnSize,
+  generatePruningSuggestions,
+} = require('../.claude/hooks/safety/spawn-size-validator.cjs');
 
 describe('spawn-size-validator.cjs', () => {
   describe('calculateSpawnSize', () => {
     it('calculates minimal spawn size correctly', () => {
-      const tools = ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'];
+      const tools = [
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
+        'Skill',
+      ];
       const prompt = 'Short prompt';
       const template = '';
 
       const result = calculateSpawnSize(tools, prompt, template);
 
       assert.equal(result.toolCount, 9);
-      assert.equal(result.totalBytes, 4000 + (9 * 200) + 12 + 0); // 5812 bytes
-      assert.equal(result.totalKB, Math.round(5812 / 1024 * 10) / 10); // ~5.7 KB
+      assert.equal(result.totalBytes, 4000 + 9 * 200 + 12 + 0); // 5812 bytes
+      assert.equal(result.totalKB, Math.round((5812 / 1024) * 10) / 10); // ~5.7 KB
       assert.deepEqual(result.breakdown, {
         base: 4000,
         tools: 1800,
@@ -30,7 +44,18 @@ describe('spawn-size-validator.cjs', () => {
 
     it('calculates large spawn size correctly', () => {
       const tools = [
-        'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill',
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'Glob',
+        'Grep',
+        'Task',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
+        'Skill',
         'mcp__chrome-devtools__list_pages',
         'mcp__chrome-devtools__select_page',
         'mcp__chrome-devtools__new_page',
@@ -53,8 +78,8 @@ describe('spawn-size-validator.cjs', () => {
       const result = calculateSpawnSize(tools, prompt, template);
 
       assert.equal(result.toolCount, 27); // 12 core + 15 chrome tools = 27
-      assert.equal(result.totalBytes, 4000 + (27 * 200) + 5000 + 3000); // 17400 bytes
-      assert.equal(result.totalKB, Math.round(17400 / 1024 * 10) / 10); // ~17.0 KB
+      assert.equal(result.totalBytes, 4000 + 27 * 200 + 5000 + 3000); // 17400 bytes
+      assert.equal(result.totalKB, Math.round((17400 / 1024) * 10) / 10); // ~17.0 KB
     });
   });
 
@@ -102,7 +127,9 @@ describe('spawn-size-validator.cjs', () => {
   describe('generatePruningSuggestions', () => {
     it('suggests removing chrome tools when present', () => {
       const tools = [
-        'Read', 'Write', 'Edit',
+        'Read',
+        'Write',
+        'Edit',
         'mcp__chrome-devtools__list_pages',
         'mcp__chrome-devtools__select_page',
         'mcp__chrome-devtools__new_page',
@@ -120,15 +147,29 @@ describe('spawn-size-validator.cjs', () => {
 
     it('suggests removing optional MCP tools', () => {
       const tools = [
-        'Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill',
-        'WebSearch', 'WebFetch', 'NotebookEdit',
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
+        'Skill',
+        'WebSearch',
+        'WebFetch',
+        'NotebookEdit',
         'mcp__Exa__web_search_exa',
       ];
 
       const result = generatePruningSuggestions(tools);
 
       assert.ok(result.suggestions.length > 0);
-      assert.ok(result.suggestions.some(s => s.includes('WebFetch') || s.includes('WebSearch') || s.includes('Exa')));
+      assert.ok(
+        result.suggestions.some(
+          s => s.includes('WebFetch') || s.includes('WebSearch') || s.includes('Exa')
+        )
+      );
     });
 
     it('suggests splitting spawn for very large tool lists', () => {
@@ -140,7 +181,17 @@ describe('spawn-size-validator.cjs', () => {
     });
 
     it('returns no suggestions for minimal tool lists', () => {
-      const tools = ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'];
+      const tools = [
+        'Read',
+        'Write',
+        'Edit',
+        'Bash',
+        'TaskUpdate',
+        'TaskList',
+        'TaskCreate',
+        'TaskGet',
+        'Skill',
+      ];
 
       const result = generatePruningSuggestions(tools);
 

@@ -31,9 +31,9 @@ skills:
   - template-creator
   - task-management-protocol
 context_files:
-  - .claude/context/memory/learnings.md
-  - .claude/context/memory/decisions.md
-  - .claude/context/evolution-state.json
+  - @.claude/context/memory/learnings.md
+  - @.claude/context/memory/decisions.md
+  - @.claude/context/evolution-state.json
 triggers:
   - 'create new agent'
   - 'create new skill'
@@ -83,10 +83,10 @@ E - Enable     -> Deploy and register in ecosystem
 
 ```javascript
 // 1. Read current evolution state
-Read('.claude/context/evolution-state.json');
+Read('@.claude/context/evolution-state.json');
 
 // 2. Check if similar artifact exists
-Glob('.claude/agents/**/*.md'); // or skills, workflows, etc.
+Glob('@.claude/agents/**/*.md'); // or skills, workflows, etc.
 Grep('similar capability pattern');
 
 // 3. Analyze the gap using structured thinking
@@ -126,12 +126,12 @@ Skill({ skill: 'sequential-thinking' });
 
 ```javascript
 // Check for naming conflicts
-Read('.claude/context/artifacts/skill-catalog.md');
-Grep('proposed-name', '.claude/agents/');
-Grep('proposed-name', '.claude/skills/');
+Read('@.claude/context/artifacts/skill-catalog.md');
+Grep('proposed-name', '@.claude/agents/');
+Grep('proposed-name', '@.claude/skills/');
 
 // Check capability overlaps
-Glob('.claude/agents/**/*.md');
+Glob('@.claude/agents/**/*.md');
 // Read each similar agent and compare capabilities
 
 // Verify naming conventions
@@ -266,7 +266,7 @@ If you need >5 queries for one aspect:
   "currentEvolution": {
     "phase": "obtain",
     "gatePassed": true,
-    "researchReport": ".claude/context/artifacts/research-reports/<name>-research.md",
+    "researchReport": "@.claude/context/artifacts/research-reports/<name>-research.md",
     "queriesExecuted": 3,
     "sourcesConsulted": ["url1", "url2", "url3"],
     "codebasePatterns": ["path1", "path2"]
@@ -336,7 +336,7 @@ switch (artifactType) {
   "currentEvolution": {
     "phase": "lock",
     "gatePassed": true,
-    "artifactPath": ".claude/<category>/<name>",
+    "artifactPath": "@.claude/<category>/<name>",
     "schemaValidation": "passed",
     "requiredFields": "complete"
   }
@@ -360,7 +360,7 @@ Read('created-artifact-path');
 // - Documentation is complete
 
 // For agents, verify skills exist
-Glob('.claude/skills/*/SKILL.md'); // Check all assigned skills
+Glob('@.claude/skills/*/SKILL.md'); // Check all assigned skills
 
 // Run validation tools if available
 Bash("node .claude/tools/validate-agents.mjs 2>&1 | grep '<agent-name>'");
@@ -412,7 +412,7 @@ Bash("node .claude/tools/validate-agents.mjs 2>&1 | grep '<agent-name>'");
 ```javascript
 // 1. Update CLAUDE.md routing table (for agents)
 if (artifactType === 'agent') {
-  Edit('.claude/CLAUDE.md', {
+  Edit('@.claude/CLAUDE.md', {
     old_string: '| System routing', // Insert before this line
     new_string: `| ${requestType} | \`${agentName}\` | \`.claude/agents/${category}/${agentName}.md\` |\n| System routing`,
   });
@@ -423,17 +423,17 @@ if (artifactType === 'agent') {
 
 // 2. Update skill catalog (for skills)
 if (artifactType === 'skill') {
-  Edit('.claude/context/artifacts/skill-catalog.md', 'new skill entry');
+  Edit('@.claude/context/artifacts/skill-catalog.md', 'new skill entry');
 }
 
 // 3. Record in evolution state
-Edit('.claude/context/evolution-state.json', {
+Edit('@.claude/context/evolution-state.json', {
   // Add to evolutions array
 });
 
 // 4. Record in memory
-Edit('.claude/context/memory/learnings.md', 'evolution record');
-Edit('.claude/context/memory/decisions.md', 'design decisions from research');
+Edit('@.claude/context/memory/learnings.md', 'evolution record');
+Edit('@.claude/context/memory/decisions.md', 'design decisions from research');
 ```
 
 **Gate Criteria**:
@@ -448,10 +448,10 @@ Edit('.claude/context/memory/decisions.md', 'design decisions from research');
 
 ```bash
 # For agents
-grep "<agent-name>" .claude/CLAUDE.md || echo "FAILED: Not in routing table"
+grep "<agent-name>" @.claude/CLAUDE.md || echo "FAILED: Not in routing table"
 
 # For skills
-grep "<skill-name>" .claude/context/artifacts/skill-catalog.md || echo "FAILED: Not in catalog"
+grep "<skill-name>" @.claude/context/artifacts/skill-catalog.md || echo "FAILED: Not in catalog"
 ```
 
 **Final State**:
@@ -464,7 +464,7 @@ grep "<skill-name>" .claude/context/artifacts/skill-catalog.md || echo "FAILED: 
     {
       "type": "agent",
       "name": "completed-agent-name",
-      "path": ".claude/agents/category/name.md",
+      "path": "@.claude/agents/category/name.md",
       "completedAt": "ISO-timestamp",
       "researchReport": "path-to-research",
       "registrations": ["CLAUDE.md", "router.md"]
@@ -479,7 +479,7 @@ grep "<skill-name>" .claude/context/artifacts/skill-catalog.md || echo "FAILED: 
 
 ```javascript
 // Read current state
-const stateContent = Read('.claude/context/evolution-state.json');
+const stateContent = Read('@.claude/context/evolution-state.json');
 const state = JSON.parse(stateContent);
 
 // Update phase
@@ -489,7 +489,7 @@ state.currentEvolution.gatePassed = true;
 state.lastUpdated = new Date().toISOString();
 
 // Write back
-Write('.claude/context/evolution-state.json', JSON.stringify(state, null, 2));
+Write('@.claude/context/evolution-state.json', JSON.stringify(state, null, 2));
 ```
 
 **State Values**:
@@ -523,7 +523,7 @@ if (!gatePassed) {
   state.currentEvolution.recommendedAction =
     'Use existing data-scientist agent or choose different name';
 
-  Write('.claude/context/evolution-state.json', JSON.stringify(state, null, 2));
+  Write('@.claude/context/evolution-state.json', JSON.stringify(state, null, 2));
 
   // Return recommendation to user
   return {
@@ -717,7 +717,7 @@ Review:
 
 === Phase E: EVALUATE ===
 - Reading evolution state: idle, no current evolution
-- Searching for existing agents: Glob(".claude/agents/**/*graphql*.md")
+- Searching for existing agents: Glob("@.claude/agents/**/*graphql*.md")
 - Result: No graphql-specific agent found
 - Gap confirmed: Need GraphQL schema reviewer
 - Gate 1 PASSED
@@ -734,13 +734,13 @@ Review:
 - Query 2: "GraphQL schema validation tools patterns"
 - Query 3: "AI agent GraphQL review automation"
 - Codebase analysis: Reading api-integrator.md, architect.md
-- Research report saved: .claude/context/artifacts/research-reports/graphql-schema-reviewer-research.md
+- Research report saved: @.claude/context/artifacts/research-reports/graphql-schema-reviewer-research.md
 - Gate 3 PASSED
 
 === Phase L: LOCK ===
 - Invoking agent-creator skill
 - Using research findings for capabilities
-- Creating: .claude/agents/domain/graphql-schema-reviewer.md
+- Creating: @.claude/agents/domain/graphql-schema-reviewer.md
 - Schema validation: PASSED
 - Required fields: COMPLETE
 - Gate 4 PASSED
@@ -761,8 +761,8 @@ Review:
 
 [EVOLUTION-ORCHESTRATOR] Evolution complete!
 Created: graphql-schema-reviewer agent
-Location: .claude/agents/domain/graphql-schema-reviewer.md
-Research: .claude/context/artifacts/research-reports/graphql-schema-reviewer-research.md
+Location: @.claude/agents/domain/graphql-schema-reviewer.md
+Research: @.claude/context/artifacts/research-reports/graphql-schema-reviewer-research.md
 ```
 
 ## Integration with Router
@@ -792,6 +792,54 @@ This agent is the meta-orchestrator for the Creator Ecosystem:
 | `hook-creator`       | Phase L    | Create hook artifacts     |
 | `schema-creator`     | Phase L    | Create schema artifacts   |
 | `template-creator`   | Phase L    | Create template artifacts |
+
+## Self-Healing Agent Selection (Phase 3)
+
+When deciding which agent to spawn for evolution tasks, use capability discovery:
+
+### Query Pattern
+
+```javascript
+// Determine capability needed for evolution subtask
+const capability = determineCapability(task); // e.g., 'code-review', 'implementation'
+
+// Query healthy agents for that capability
+const agents = AvailableAgents({
+  capability: capability,
+  excludeFailed: true,
+  minSuccessRate: 0.7,
+});
+
+// Pick best healthy agent
+const best = agents.agents[0];
+
+// If none available, return error with suggestions
+if (!best) {
+  return {
+    error: 'No healthy agents for capability',
+    suggestions: AvailableAgents({ domain: 'code' }).agents.slice(0, 3),
+  };
+}
+```
+
+### Benefits for Evolution
+
+- **Reliability**: Evolution tasks only spawn healthy agents
+- **Recovery**: Automatically skips agents that failed recently
+- **Adaptation**: Falls back to alternatives when primary agent unavailable
+- **Monitoring**: Health data informs which agents need attention
+
+### Capability Mapping for Evolution
+
+| Evolution Phase | Capability      | Primary Agent      |
+| --------------- | --------------- | ------------------ |
+| Research        | research        | researcher         |
+| Implementation  | implementation  | developer          |
+| Validation      | testing         | qa                 |
+| Security Review | security-review | security-architect |
+| Documentation   | documentation   | technical-writer   |
+
+This ensures evolution tasks spawn healthy agents only, improving success rates.
 
 **Related Workflows**:
 

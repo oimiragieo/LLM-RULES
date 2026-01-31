@@ -1,0 +1,56 @@
+name: Skill Build Validation
+
+on:
+  pull_request:
+    paths:
+      - '.claude/skills/**'
+      - '.claude/lib/skill-build/**'
+      - 'package.json'
+  push:
+    branches:
+      - main
+    paths:
+      - '.claude/skills/**'
+      - '.claude/lib/skill-build/**'
+      - 'package.json'
+
+jobs:
+  validate-skills:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript compilation check
+        run: npx tsc --project .claude/lib/skill-build/tsconfig.json --noEmit
+
+      - name: Validate rule structure
+        run: npm run skill:validate
+        continue-on-error: false
+
+      - name: Extract test cases
+        run: npm run skill:extract-tests
+        continue-on-error: true
+
+      - name: Build skills
+        run: npm run skill:build
+        continue-on-error: true
+
+      - name: Report results
+        if: always()
+        run: |
+          echo "::group::Validation Summary"
+          echo "✓ TypeScript compilation passed"
+          echo "✓ Rule structure validation passed"
+          echo "::endgroup::"

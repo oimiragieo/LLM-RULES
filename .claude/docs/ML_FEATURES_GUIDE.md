@@ -44,16 +44,19 @@ PATTERN_LIBRARY_ENABLED=true
 The Pattern Detector identifies recurring task sequences in workflow execution history. Detected patterns include:
 
 **Successful Task Sequences:**
+
 - Tasks that frequently execute together successfully
 - Common execution orders (A then B then C)
 - Tasks that tend to complete faster when grouped
 
 **Bottleneck Patterns:**
+
 - Tasks that frequently cause delays
 - Sequences where failures cluster
 - Long-running task combinations
 
 **Optimization Opportunities:**
+
 - Independent tasks that could run in parallel
 - Repeated identical operations (cache candidates)
 - Redundant task sequences
@@ -79,10 +82,10 @@ Each pattern is counted across all workflows:
 
 ```javascript
 candidates = {
-  'A->B': 150,      // Appears in 150 workflows
-  'B->C': 120,      // Appears in 120 workflows
-  'A->B->C': 100    // Appears in 100 workflows
-}
+  'A->B': 150, // Appears in 150 workflows
+  'B->C': 120, // Appears in 120 workflows
+  'A->B->C': 100, // Appears in 100 workflows
+};
 ```
 
 **Step 3: Support Filtering**
@@ -115,8 +118,8 @@ const { getPatternDetector } = require('.claude/lib/ml');
 
 // Get detector instance (null if feature disabled)
 const detector = getPatternDetector({
-  minSupport: 0.1,      // 10% frequency threshold
-  minConfidence: 0.6    // 60% confidence threshold
+  minSupport: 0.1, // 10% frequency threshold
+  minConfidence: 0.6, // 60% confidence threshold
 });
 
 if (detector) {
@@ -136,8 +139,8 @@ if (detector) {
 
 ```javascript
 const bottlenecks = detector.detectBottleneckPatterns(workflows, {
-  minDurationMs: 1000,  // Only consider tasks >1s
-  topN: 10              // Return top 10 bottlenecks
+  minDurationMs: 1000, // Only consider tasks >1s
+  topN: 10, // Return top 10 bottlenecks
 });
 
 for (const bottleneck of bottlenecks) {
@@ -180,13 +183,13 @@ class WorkflowPatternDetector {
 
 **Configuration Parameters:**
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `PATTERN_MIN_SUPPORT` | 0.1 | Minimum pattern frequency (10%) |
-| `PATTERN_MIN_CONFIDENCE` | 0.6 | Minimum pattern confidence (60%) |
-| `MAX_INPUT_WORKFLOWS` | 5000 | Maximum workflows to process |
-| `MAX_RESULT_SIZE` | 500 | Maximum patterns returned |
-| `MAX_CANDIDATES` | 10000 | Maximum candidate patterns |
+| Parameter                | Default | Description                      |
+| ------------------------ | ------- | -------------------------------- |
+| `PATTERN_MIN_SUPPORT`    | 0.1     | Minimum pattern frequency (10%)  |
+| `PATTERN_MIN_CONFIDENCE` | 0.6     | Minimum pattern confidence (60%) |
+| `MAX_INPUT_WORKFLOWS`    | 5000    | Maximum workflows to process     |
+| `MAX_RESULT_SIZE`        | 500     | Maximum patterns returned        |
+| `MAX_CANDIDATES`         | 10000   | Maximum candidate patterns       |
 
 ---
 
@@ -223,7 +226,7 @@ const predictor = getCostPredictor();
 if (predictor) {
   // Estimate tokens for a prompt
   const tokens = predictor.estimateTokens(promptText, {
-    includeSystemOverhead: true
+    includeSystemOverhead: true,
   });
 
   console.log(`Estimated tokens: ${tokens}`);
@@ -236,12 +239,12 @@ Token estimation accuracy depends on:
 
 **Factors Affecting Accuracy:**
 
-| Factor | Impact | Notes |
-|--------|--------|-------|
-| Language | High | English ~4 chars/token, code varies |
-| Content Type | Medium | Code has more symbols, prose is regular |
-| Formatting | Low | Markdown adds ~5% overhead |
-| System Prompts | Fixed | ~500 tokens constant overhead |
+| Factor         | Impact | Notes                                   |
+| -------------- | ------ | --------------------------------------- |
+| Language       | High   | English ~4 chars/token, code varies     |
+| Content Type   | Medium | Code has more symbols, prose is regular |
+| Formatting     | Low    | Markdown adds ~5% overhead              |
+| System Prompts | Fixed  | ~500 tokens constant overhead           |
 
 **Accuracy Expectations:**
 
@@ -268,11 +271,7 @@ console.log(`Prediction accuracy: ${accuracy.toFixed(1)}%`);
 **Pre-Execution Cost Check:**
 
 ```javascript
-const estimatedCost = predictor.estimateCost(
-  inputTokens,
-  outputTokens,
-  'claude-sonnet-4-20250514'
-);
+const estimatedCost = predictor.estimateCost(inputTokens, outputTokens, 'claude-sonnet-4-20250514');
 
 if (estimatedCost > budgetLimit) {
   console.warn(`Estimated cost $${estimatedCost} exceeds budget`);
@@ -284,10 +283,10 @@ if (estimatedCost > budgetLimit) {
 
 ```javascript
 const predictor = getCostPredictor({
-  budgetAlertThreshold: 10.00  // Alert at $10
+  budgetAlertThreshold: 10.0, // Alert at $10
 });
 
-predictor.on('budgetAlert', (data) => {
+predictor.on('budgetAlert', data => {
   console.warn(`Budget alert: $${data.currentCost} spent`);
 });
 ```
@@ -325,17 +324,17 @@ class CostPredictor {
 
 **Model Pricing (per million tokens):**
 
-| Model | Input | Output |
-|-------|-------|--------|
-| claude-opus-4-20250514 | $15.00 | $75.00 |
-| claude-sonnet-4-20250514 | $3.00 | $15.00 |
-| claude-haiku-3-5-20241022 | $0.25 | $1.25 |
+| Model                     | Input  | Output |
+| ------------------------- | ------ | ------ |
+| claude-opus-4-20250514    | $15.00 | $75.00 |
+| claude-sonnet-4-20250514  | $3.00  | $15.00 |
+| claude-haiku-3-5-20241022 | $0.25  | $1.25  |
 
 **Configuration Parameters:**
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `COST_BUDGET_ALERT_USD` | 10.00 | Budget alert threshold |
+| Parameter               | Default | Description            |
+| ----------------------- | ------- | ---------------------- |
+| `COST_BUDGET_ALERT_USD` | 10.00   | Budget alert threshold |
 
 ---
 
@@ -375,21 +374,23 @@ The Adaptive Executor applies optimizations based on detected patterns:
 Track adaptation effectiveness:
 
 **Latency Reduction:**
+
 ```javascript
 // Before optimization
-const baselineDuration = 10000;  // 10 seconds
+const baselineDuration = 10000; // 10 seconds
 
 // After optimization
-const optimizedDuration = 6000;  // 6 seconds
+const optimizedDuration = 6000; // 6 seconds
 
 const latencyReduction = ((baselineDuration - optimizedDuration) / baselineDuration) * 100;
 // 40% reduction
 ```
 
 **Cost Savings:**
+
 ```javascript
 // Before: Sequential execution
-const sequentialCost = 0.50;
+const sequentialCost = 0.5;
 
 // After: Cached repeated calls
 const optimizedCost = 0.35;
@@ -401,18 +402,21 @@ const costSavings = ((sequentialCost - optimizedCost) / sequentialCost) * 100;
 ### Enabling/Disabling Adaptive Execution
 
 **Enable:**
+
 ```bash
 ADAPTIVE_EXECUTION_ENABLED=true
 pm2 restart agent-studio
 ```
 
 **Disable:**
+
 ```bash
 ADAPTIVE_EXECUTION_ENABLED=false
 pm2 restart agent-studio
 ```
 
 **Runtime Check:**
+
 ```javascript
 const { ML_FEATURES } = require('.claude/lib/ml');
 
@@ -459,9 +463,9 @@ class AdaptiveExecutor {
 
 **Configuration Parameters:**
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `ADAPTIVE_MAX_CONCURRENCY` | 10 | Maximum parallel tasks |
+| Parameter                  | Default | Description            |
+| -------------------------- | ------- | ---------------------- |
+| `ADAPTIVE_MAX_CONCURRENCY` | 10      | Maximum parallel tasks |
 
 ---
 
@@ -474,6 +478,7 @@ The Pattern Library stores detected patterns for reuse across sessions:
 **Storage Location:** `.claude/lib/ml/patterns.json`
 
 **Storage Format:**
+
 ```json
 {
   "patterns": [
@@ -519,10 +524,12 @@ for (const match of matches) {
 ### Library Statistics
 
 **Coverage:**
+
 - Percentage of workflows with matching patterns
 - Indicates how well the library covers common cases
 
 **Effectiveness:**
+
 - Success rate of pattern-based optimizations
 - Latency improvement from cached patterns
 
@@ -584,9 +591,9 @@ class PatternLibrary {
 
 **Configuration Parameters:**
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `PATTERN_LIBRARY_MAX_SIZE` | 1000 | Maximum stored patterns |
+| Parameter                  | Default | Description             |
+| -------------------------- | ------- | ----------------------- |
+| `PATTERN_LIBRARY_MAX_SIZE` | 1000    | Maximum stored patterns |
 
 ---
 
@@ -656,20 +663,20 @@ If ML initialization fails, the workflow engine continues operating without ML f
 
 ### ML Module Memory Limits
 
-| Module | Budget | Enforcement |
-|--------|--------|-------------|
-| PatternDetector | 500KB | MAX_CANDIDATES=10000 |
-| CostPredictor | Stateless | Per-call estimation |
-| AdaptiveExecutor | 1MB | Bounded optimization history |
-| PatternLibrary | 2MB | PATTERN_LIBRARY_MAX_SIZE=1000 |
-| **Total ML** | **3.5MB** | Within 4GB heap |
+| Module           | Budget    | Enforcement                   |
+| ---------------- | --------- | ----------------------------- |
+| PatternDetector  | 500KB     | MAX_CANDIDATES=10000          |
+| CostPredictor    | Stateless | Per-call estimation           |
+| AdaptiveExecutor | 1MB       | Bounded optimization history  |
+| PatternLibrary   | 2MB       | PATTERN_LIBRARY_MAX_SIZE=1000 |
+| **Total ML**     | **3.5MB** | Within 4GB heap               |
 
 ### Preventing Memory Issues
 
 ```javascript
 // Pattern detector: Input validation
 if (workflows.length > MAX_INPUT_WORKFLOWS) {
-  workflows = workflows.slice(-MAX_INPUT_WORKFLOWS);  // Keep recent
+  workflows = workflows.slice(-MAX_INPUT_WORKFLOWS); // Keep recent
 }
 
 // Pattern library: LRU eviction
@@ -724,7 +731,7 @@ If >10MB, clean up old patterns.
 Large workflow histories can cause slow detection. Limit input:
 
 ```javascript
-const recentWorkflows = workflows.slice(-1000);  // Last 1000 only
+const recentWorkflows = workflows.slice(-1000); // Last 1000 only
 ```
 
 ### ML Module Errors
@@ -736,6 +743,7 @@ grep "Pattern" /var/log/agent-studio/app.log | grep -i error
 ```
 
 Common causes:
+
 - Corrupted pattern library
 - Invalid workflow format
 - Memory exhaustion
@@ -773,14 +781,14 @@ PATTERN_LIBRARY_MAX_SIZE=1000
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
-| `.claude/lib/ml/index.cjs` | ML entry point |
-| `.claude/lib/ml/pattern-detector.cjs` | Pattern detection |
-| `.claude/lib/ml/cost-predictor.cjs` | Cost prediction |
-| `.claude/lib/ml/adaptive-executor.cjs` | Adaptive execution |
-| `.claude/lib/ml/optimization-engine.cjs` | Optimization |
-| `.claude/lib/ml/patterns.json` | Pattern storage |
+| File                                     | Purpose            |
+| ---------------------------------------- | ------------------ |
+| `.claude/lib/ml/index.cjs`               | ML entry point     |
+| `.claude/lib/ml/pattern-detector.cjs`    | Pattern detection  |
+| `.claude/lib/ml/cost-predictor.cjs`      | Cost prediction    |
+| `.claude/lib/ml/adaptive-executor.cjs`   | Adaptive execution |
+| `.claude/lib/ml/optimization-engine.cjs` | Optimization       |
+| `.claude/lib/ml/patterns.json`           | Pattern storage    |
 
 ### Feature Flag Rollback
 

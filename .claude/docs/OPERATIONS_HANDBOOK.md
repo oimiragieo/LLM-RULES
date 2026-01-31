@@ -31,6 +31,7 @@ Complete this checklist at the start of each operational day:
 ```
 
 If any alerts fired overnight:
+
 - [ ] Acknowledge or close resolved alerts
 - [ ] Create follow-up tickets for unresolved issues
 - [ ] Note any patterns (recurring alerts = systemic issue)
@@ -78,16 +79,19 @@ git log --oneline -5 --since="24 hours ago"
 ### Weekly Maintenance Tasks
 
 **Monday:**
+
 - [ ] Review past week's incident reports
 - [ ] Check for pending security updates
 - [ ] Verify backup procedures
 
 **Wednesday:**
+
 - [ ] Run full test suite in staging
 - [ ] Review memory usage trends
 - [ ] Check disk space on log volumes
 
 **Friday:**
+
 - [ ] Generate weekly operations report
 - [ ] Review SLO compliance
 - [ ] Plan for next week's maintenance windows
@@ -106,11 +110,13 @@ git log --oneline -5 --since="24 hours ago"
 ### Heap Monitoring
 
 **What to Check:**
+
 - Current heap usage (percentage of limit)
 - Heap growth rate (MB/minute)
 - GC frequency and duration
 
 **Normal Operation:**
+
 - Heap usage <70%
 - Growth rate <5MB/minute sustained
 - GC runs <10 times/minute
@@ -135,23 +141,25 @@ NODE_OPTIONS="--trace-gc" pm2 restart agent-studio
 
 **Thresholds:**
 
-| Level | Percentage | Action |
-|-------|------------|--------|
-| Normal | <70% | No action |
-| Warning | 70-85% | Monitor closely, prepare scaling |
-| Critical | 85-95% | Block spawning, investigate immediately |
-| Shutdown | >95% | Emergency restart, scale horizontally |
+| Level    | Percentage | Action                                  |
+| -------- | ---------- | --------------------------------------- |
+| Normal   | <70%       | No action                               |
+| Warning  | 70-85%     | Monitor closely, prepare scaling        |
+| Critical | 85-95%     | Block spawning, investigate immediately |
+| Shutdown | >95%       | Emergency restart, scale horizontally   |
 
 ### Agent Spawn Rate
 
 **What to Check:**
+
 - Spawns per second
 - Spawn success rate
 - Queue depth (if applicable)
 
 **Normal Operation:**
+
 - <10 spawns/second
-- >99% success rate
+- > 99% success rate
 
 **Commands:**
 
@@ -164,17 +172,20 @@ curl -s http://localhost:3000/api/health/tasks | jq '.inProgress'
 ```
 
 **Warning Signs:**
+
 - Spawn rate >10/sec sustained = sync history explosion risk
 - Spawn failures >1% = check routing guard, agent templates
 
 ### Error Rate Monitoring
 
 **What to Check:**
+
 - Total errors per time window
 - Error rate percentage
 - Error categorization
 
 **Normal Operation:**
+
 - <0.1% error rate
 - No repeating error patterns
 
@@ -193,16 +204,17 @@ tail -n 10000 /var/log/agent-studio/app.log | grep ERROR | \
 
 **Thresholds:**
 
-| Level | Rate | Action |
-|-------|------|--------|
-| Normal | <0.1% | No action |
-| Warning | 0.1-0.5% | Investigate error patterns |
-| Critical | 0.5-1% | Escalate, prepare rollback |
-| Emergency | >1% | Immediate rollback decision |
+| Level     | Rate     | Action                      |
+| --------- | -------- | --------------------------- |
+| Normal    | <0.1%    | No action                   |
+| Warning   | 0.1-0.5% | Investigate error patterns  |
+| Critical  | 0.5-1%   | Escalate, prepare rollback  |
+| Emergency | >1%      | Immediate rollback decision |
 
 ### ML Module Health
 
 **What to Check:**
+
 - All 5 ML modules responding
 - Module latency within targets
 - Feature flags correctly applied
@@ -228,20 +240,22 @@ env | grep -E '(PATTERN|COST|ADAPTIVE|PERFORMANCE|PATTERN_LIBRARY)_ENABLED'
 
 **Latency Targets:**
 
-| Module | Target | Warning | Critical |
-|--------|--------|---------|----------|
-| Pattern Detection | <10ms | 10-50ms | >50ms |
-| Cost Prediction | <5ms | 5-20ms | >20ms |
-| Adaptive Executor | <10ms | 10-50ms | >50ms |
+| Module            | Target | Warning | Critical |
+| ----------------- | ------ | ------- | -------- |
+| Pattern Detection | <10ms  | 10-50ms | >50ms    |
+| Cost Prediction   | <5ms   | 5-20ms  | >20ms    |
+| Adaptive Executor | <10ms  | 10-50ms | >50ms    |
 
 ### Workflow Throughput
 
 **What to Check:**
+
 - Workflows completed per hour
 - Average workflow duration
 - Workflow queue depth
 
 **Normal Operation:**
+
 - Stable throughput matching load
 - Duration within SLO targets
 
@@ -262,6 +276,7 @@ cat .claude/context/workflow-state.json | jq '.active | length'
 ### Heap OOM Incidents
 
 **Symptoms:**
+
 - Process crash with "FATAL ERROR: Reached heap limit"
 - Sudden service unavailability
 - Incomplete task results
@@ -294,16 +309,17 @@ grep "spawn" /var/log/agent-studio/app.log | tail -100
 
 **Common Causes and Fixes:**
 
-| Cause | Evidence | Fix |
-|-------|----------|-----|
-| Unbounded syncHistory | >1000 entries logged | Verify maxHistorySize in StateSyncManager |
-| Missing test cleanup | Heap grows during tests | Add afterEach cleanup hooks |
-| Large workflow state | Workflow files >1MB | Use context-compressor skill |
-| Event listener leak | Warning about listener count | Check for removeAllListeners calls |
+| Cause                 | Evidence                     | Fix                                       |
+| --------------------- | ---------------------------- | ----------------------------------------- |
+| Unbounded syncHistory | >1000 entries logged         | Verify maxHistorySize in StateSyncManager |
+| Missing test cleanup  | Heap grows during tests      | Add afterEach cleanup hooks               |
+| Large workflow state  | Workflow files >1MB          | Use context-compressor skill              |
+| Event listener leak   | Warning about listener count | Check for removeAllListeners calls        |
 
 **Prevention:**
 
 Follow MEMORY_MANAGEMENT.md for all new code:
+
 - All arrays MUST have max size limits
 - All classes MUST implement cleanup() methods
 - All tests MUST use afterEach cleanup hooks
@@ -311,6 +327,7 @@ Follow MEMORY_MANAGEMENT.md for all new code:
 ### Agent Spawn Failures
 
 **Symptoms:**
+
 - Tasks stuck in "pending" status
 - Router logs showing spawn blocks
 - User requests not being processed
@@ -330,12 +347,12 @@ curl -s http://localhost:3000/api/health/memory | jq '.heapPercent'
 
 **Common Causes:**
 
-| Cause | Evidence | Fix |
-|-------|----------|-----|
-| Memory pressure | heapPercent >85% | Restart or scale horizontally |
-| Missing template | "Template not found" error | Verify template exists |
-| Gate 1 failure | "Multi-step task" in logs | Ensure PLANNER spawned first |
-| Gate 2 failure | "Security-sensitive" in logs | Include SECURITY-ARCHITECT |
+| Cause            | Evidence                     | Fix                           |
+| ---------------- | ---------------------------- | ----------------------------- |
+| Memory pressure  | heapPercent >85%             | Restart or scale horizontally |
+| Missing template | "Template not found" error   | Verify template exists        |
+| Gate 1 failure   | "Multi-step task" in logs    | Ensure PLANNER spawned first  |
+| Gate 2 failure   | "Security-sensitive" in logs | Include SECURITY-ARCHITECT    |
 
 **Recovery:**
 
@@ -416,18 +433,19 @@ kill -USR2 $(pgrep -f agent-studio)
 
 **Common Leak Sources (Fixed in Production):**
 
-| Source | Pattern | Status |
-|--------|---------|--------|
-| StateSyncManager | syncHistory unbounded | FIXED - maxHistorySize=1000 |
-| LoadTestFramework | metrics arrays | FIXED - MAX_METRICS=1000 |
-| ChaosEngineer | testResults accumulation | FIXED - afterEach cleanup |
-| ErrorPatternDetector | Large input processing | FIXED - input validation |
-| PatternDetector | N-gram explosion | FIXED - early termination |
-| CheckpointManager | workflowStepCounters | FIXED - LRU eviction |
+| Source               | Pattern                  | Status                      |
+| -------------------- | ------------------------ | --------------------------- |
+| StateSyncManager     | syncHistory unbounded    | FIXED - maxHistorySize=1000 |
+| LoadTestFramework    | metrics arrays           | FIXED - MAX_METRICS=1000    |
+| ChaosEngineer        | testResults accumulation | FIXED - afterEach cleanup   |
+| ErrorPatternDetector | Large input processing   | FIXED - input validation    |
+| PatternDetector      | N-gram explosion         | FIXED - early termination   |
+| CheckpointManager    | workflowStepCounters     | FIXED - LRU eviction        |
 
 ### Deadlocks and Hangs
 
 **Symptoms:**
+
 - Workflows stuck in "in_progress" indefinitely
 - No progress on tasks for >1 hour
 - System responsive but work not completing
@@ -456,6 +474,7 @@ pm2 restart agent-studio
 ```
 
 **Prevention:**
+
 - Set workflow timeouts
 - Implement heartbeat for long-running workflows
 - Monitor "in_progress" duration
@@ -608,11 +627,11 @@ export ADAPTIVE_MAX_CONCURRENCY=20  # Default: 10
 
 **Alert Levels:**
 
-| Level | Response Time | Escalation |
-|-------|---------------|------------|
-| INFO | No SLA | None |
-| WARNING | 15 minutes | On-call |
-| CRITICAL | 5 minutes | Immediate |
+| Level    | Response Time | Escalation |
+| -------- | ------------- | ---------- |
+| INFO     | No SLA        | None       |
+| WARNING  | 15 minutes    | On-call    |
+| CRITICAL | 5 minutes     | Immediate  |
 
 ### Dashboard Setup
 
@@ -621,6 +640,7 @@ export ADAPTIVE_MAX_CONCURRENCY=20  # Default: 10
 Import dashboard from `.claude/context/artifacts/monitoring/grafana-dashboard.json`
 
 **Key Panels:**
+
 - System Health: Heap, CPU, Disk
 - ML Features: Latency per module
 - Workflow Metrics: Throughput, Duration
@@ -683,12 +703,12 @@ severity_mapping:
 
 **Escalation Policy:**
 
-| Time Since Alert | Escalation |
-|------------------|------------|
-| 0-5 minutes | On-call engineer |
-| 5-15 minutes | Senior DevOps |
-| 15-30 minutes | Engineering Manager |
-| 30+ minutes | Executive escalation |
+| Time Since Alert | Escalation           |
+| ---------------- | -------------------- |
+| 0-5 minutes      | On-call engineer     |
+| 5-15 minutes     | Senior DevOps        |
+| 15-30 minutes    | Engineering Manager  |
+| 30+ minutes      | Executive escalation |
 
 **Slack Integration:**
 
@@ -709,12 +729,12 @@ curl -X POST https://hooks.slack.com/services/YOUR/WEBHOOK/URL \
 
 ### Health Check Endpoints
 
-| Endpoint | Purpose | Response |
-|----------|---------|----------|
-| `/api/health` | Overall health | `{ status, uptime, memory }` |
-| `/api/health/ml` | ML features | `{ patternDetection, costPrediction, ... }` |
-| `/api/health/memory` | Memory details | `{ heapUsed, heapTotal, heapPercent }` |
-| `/api/metrics` | Prometheus format | `agent_studio_*` metrics |
+| Endpoint             | Purpose           | Response                                    |
+| -------------------- | ----------------- | ------------------------------------------- |
+| `/api/health`        | Overall health    | `{ status, uptime, memory }`                |
+| `/api/health/ml`     | ML features       | `{ patternDetection, costPrediction, ... }` |
+| `/api/health/memory` | Memory details    | `{ heapUsed, heapTotal, heapPercent }`      |
+| `/api/metrics`       | Prometheus format | `agent_studio_*` metrics                    |
 
 ### Prometheus Scrape Configuration
 
@@ -800,14 +820,17 @@ pm2 restart agent-studio
 ### Contact Information
 
 **On-Call:**
+
 - Pagerduty: Rotation schedule
 - Phone: +1-555-ON-CALL
 
 **Senior DevOps:**
+
 - Slack: @devops-senior
 - Phone: +1-555-DEVOPS
 
 **Engineering Manager:**
+
 - Email: eng-manager@company.com
 - Phone: +1-555-EXEC
 

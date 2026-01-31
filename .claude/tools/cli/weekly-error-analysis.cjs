@@ -49,7 +49,7 @@ const ERROR_SUMMARIES_DIR = path.join(
 
 // Constants
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
-const MS_PER_WEEK = 7 * MS_PER_DAY;
+const _MS_PER_WEEK = 7 * MS_PER_DAY;
 
 /**
  * Get ISO week number from date

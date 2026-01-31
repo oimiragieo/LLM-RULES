@@ -6,6 +6,9 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep]
+# Phase 1 Integration: All tools validated against .claude/config/tool-manifest.json
+# When workflows spawn agents, agents receive tools from manifest-based toolsets
+# Single source of truth: .claude/config/tool-manifest.json
 best_practices:
   - Define clear phase boundaries
   - Specify agent handoffs explicitly
@@ -476,7 +479,118 @@ grep "<workflow-name>" .claude/CLAUDE.md || echo "ERROR: Not in CLAUDE.md - WORK
 
 **BLOCKING**: If ANY item fails, workflow creation is INCOMPLETE. Fix all issues before proceeding.
 
-### Step 8: Integration Verification (BLOCKING - DO NOT SKIP)
+### Step 8: Post-Creation Workflow Registration (Phase 3 Integration)
+
+**This step is CRITICAL.** After creating the workflow artifact, you MUST register it in the workflow discovery system.
+
+**Phase 3 Context:** Phase 1 created tool manifests (tools), Phase 2 created skill indices (skills), Phase 3 creates workflow registries so workflows can be discovered and invoked by orchestrators.
+
+After workflow file is written and validated:
+
+1. **Create/Update Workflow Registry Entry** in appropriate location:
+
+   If registry doesn't exist, create `.claude/context/artifacts/workflow-registry.json`:
+
+   ```json
+   {
+     "workflows": [
+       {
+         "name": "{workflow-name}",
+         "id": "{workflow-name}",
+         "description": "{Brief description from workflow}",
+         "category": "{enterprise|core|operations}",
+         "version": "1.0.0",
+         "triggerConditions": ["{Condition 1}", "{Condition 2}"],
+         "participatingAgents": ["{agent-1}", "{agent-2}"],
+         "phases": [
+           { "name": "{Phase 1 Name}", "description": "{Brief description}" },
+           { "name": "{Phase 2 Name}", "description": "{Brief description}" }
+         ],
+         "filePath": ".claude/workflows/{category}/{workflow-name}.md",
+         "orchestratorReferences": []
+       }
+     ]
+   }
+   ```
+
+2. **Register with Appropriate Orchestrator:**
+
+   Update the orchestrator that should use this workflow:
+   - **master-orchestrator.md**: Meta-workflows coordinating other workflows
+   - **evolution-orchestrator.md**: EVOLVE phase workflows (research, creation, validation)
+   - **party-orchestrator.md**: Consensus/voting workflows
+   - **swarm-coordinator.md**: Coordination workflows
+
+   Add to orchestrator's workflow references:
+
+   ```markdown
+   ## Available Workflows
+
+   - `{workflow-name}` (.claude/workflows/{category}/{workflow-name}.md)
+   ```
+
+3. **Document in `.claude/docs/WORKFLOW_CATALOG.md`:**
+
+   If catalog doesn't exist, create it. Add entry:
+
+   ```markdown
+   ### {Workflow Title}
+
+   **Path:** `.claude/workflows/{category}/{workflow-name}.md`
+
+   **When to use:** {Trigger conditions - specific scenarios}
+
+   **Participating Agents:**
+
+   - {agent-1}: {role in workflow}
+   - {agent-2}: {role in workflow}
+
+   **Phases:**
+
+   1. **{Phase 1 Name}** - {Description}
+   2. **{Phase 2 Name}** - {Description}
+
+   **Orchestrator Integration:**
+
+   - Invoked by: {orchestrator-name}
+   - Trigger: {How orchestrator discovers/triggers this}
+   ```
+
+4. **Verify Workflow Discoverability:**
+
+   Test that the workflow can be discovered:
+
+   ```bash
+   # Check workflow registry exists and is valid JSON
+   node -e "console.log(JSON.stringify(require('./.claude/context/artifacts/workflow-registry.json'), null, 2))"
+
+   # Verify orchestrator references it
+   grep "{workflow-name}" .claude/agents/orchestrators/*-orchestrator.md
+   ```
+
+5. **Update Memory:**
+
+   Append to `.claude/context/memory/learnings.md`:
+
+   ```markdown
+   ## Workflow: {workflow-name}
+
+   - **Purpose:** {Workflow purpose}
+   - **Orchestrator:** {Which orchestrator uses it}
+   - **Key Pattern:** {Key pattern discovered}
+   - **Integration Notes:** {Any special integration considerations}
+   ```
+
+**Why this matters:** Without workflow registration:
+
+- Orchestrators cannot discover available workflows
+- Workflows cannot be dynamically selected for complex tasks
+- System loses visibility into workflow network
+- "Invisible artifact" pattern emerges
+
+**Phase 3 Integration:** Workflow registry is the discovery mechanism for Phase 3, enabling orchestrators to query available workflows and select appropriate ones for complex multi-agent tasks.
+
+### Step 9: Integration Verification (BLOCKING - DO NOT SKIP)
 
 **This step verifies the artifact is properly integrated into the ecosystem.**
 
@@ -494,7 +608,8 @@ Before calling `TaskUpdate({ status: "completed" })`, you MUST run the Post-Crea
    - Read the error output for specific failures
    - Fix each failure:
      - Missing CLAUDE.md entry -> Add to Section 8.6
-     - Missing agent references -> Assign workflow to relevant agents
+     - Missing workflow registry -> Create registry entry (Step 8)
+     - Missing orchestrator reference -> Add to orchestrator definition
      - Missing memory update -> Update learnings.md
    - Re-run validation until exit code is 0
 

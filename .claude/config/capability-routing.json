@@ -1,0 +1,131 @@
+{
+  "$schema": "../schemas/capability-routing.schema.json",
+  "version": "1.0.0",
+  "description": "Maps common request patterns to capabilities and default agents for router capability discovery",
+  "lastUpdated": "2026-01-31",
+
+  "capabilityMap": {
+    "review": "code-review",
+    "code review": "code-review",
+    "critique": "code-review",
+    "analyze code": "code-review",
+    "pr review": "code-review",
+
+    "implement": "implementation",
+    "code": "implementation",
+    "build": "implementation",
+    "feature": "implementation",
+    "develop": "implementation",
+    "create": "implementation",
+
+    "fix": "bug-fixing",
+    "bug": "bug-fixing",
+    "debug": "bug-fixing",
+    "patch": "bug-fixing",
+    "resolve": "bug-fixing",
+
+    "test": "testing",
+    "testing": "testing",
+    "tdd": "testing",
+    "qa": "testing",
+    "quality": "testing",
+    "validate": "testing",
+
+    "research": "research",
+    "investigate": "research",
+    "analyze": "research",
+    "explore": "research",
+    "study": "research",
+
+    "security": "security-review",
+    "audit": "security-review",
+    "vulnerability": "security-review",
+    "pentest": "security-review",
+    "owasp": "security-review",
+
+    "architecture": "architecture-design",
+    "design": "architecture-design",
+    "refactor": "architecture-design",
+    "system design": "architecture-design",
+    "structure": "architecture-design",
+
+    "document": "documentation",
+    "docs": "documentation",
+    "readme": "documentation",
+    "guide": "documentation",
+    "tutorial": "documentation",
+    "api docs": "documentation",
+
+    "deploy": "devops",
+    "infrastructure": "devops",
+    "ci/cd": "devops",
+    "pipeline": "devops",
+    "kubernetes": "devops",
+    "docker": "devops",
+
+    "incident": "incident-response",
+    "outage": "incident-response",
+    "emergency": "incident-response",
+    "production issue": "incident-response",
+
+    "plan": "planning",
+    "planning": "planning",
+    "strategy": "planning",
+    "roadmap": "planning",
+    "breakdown": "planning",
+
+    "orchestrate": "orchestration",
+    "coordinate": "orchestration",
+    "multi-agent": "orchestration",
+    "workflow": "orchestration"
+  },
+
+  "defaultAgents": {
+    "code-review": "code-reviewer",
+    "implementation": "developer",
+    "bug-fixing": "developer",
+    "testing": "qa",
+    "research": "researcher",
+    "security-review": "security-architect",
+    "architecture-design": "architect",
+    "documentation": "technical-writer",
+    "devops": "devops",
+    "incident-response": "incident-responder",
+    "planning": "planner",
+    "orchestration": "master-orchestrator"
+  },
+
+  "domainFallbacks": {
+    "code": ["developer", "code-reviewer"],
+    "testing": ["qa", "developer"],
+    "security": ["security-architect"],
+    "architecture": ["architect", "planner"],
+    "documentation": ["technical-writer"],
+    "devops": ["devops", "devops-troubleshooter"],
+    "research": ["researcher"],
+    "orchestration": ["master-orchestrator", "swarm-coordinator"],
+    "frontend": ["frontend-pro", "developer"],
+    "backend": ["developer", "nodejs-pro", "python-pro"],
+    "mobile": ["expo-mobile-developer", "ios-pro", "android-pro"],
+    "database": ["database-architect", "developer"]
+  },
+
+  "capabilityPriority": {
+    "description": "When multiple capabilities match, use this priority order",
+    "order": [
+      "security-review",
+      "architecture-design",
+      "code-review",
+      "testing",
+      "implementation",
+      "documentation",
+      "research"
+    ]
+  },
+
+  "notes": {
+    "usage": "Router uses this config to classify user requests into capabilities, then queries AvailableAgents({ capability: '...' }) to find best agent",
+    "fallback": "If no agents found for capability, try domain-based lookup using domainFallbacks",
+    "priority": "Security and architecture take precedence when multiple capabilities apply"
+  }
+}

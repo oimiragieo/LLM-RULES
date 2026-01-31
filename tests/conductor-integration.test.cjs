@@ -18,7 +18,7 @@ const path = require('path');
 const os = require('os');
 
 // Test fixtures
-const FIXTURE_DIR = path.join(__dirname, 'fixtures', 'conductor-main');
+const _FIXTURE_DIR = path.join(__dirname, 'fixtures', 'conductor-main');
 const TEMP_DIR = path.join(os.tmpdir(), `conductor-test-${Date.now()}`);
 
 // Modules under test (will fail until implemented)
@@ -795,7 +795,7 @@ describe('Safety Procedures', () => {
   });
 
   it('should validate rollback safety before executing', async () => {
-    const backupId = await safetyManager.createBackup('test-component');
+    const _backupId = await safetyManager.createBackup('test-component');
 
     const safety = await safetyManager.validateRollbackSafety('incompatible-rollback');
 

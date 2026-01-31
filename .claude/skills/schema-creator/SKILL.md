@@ -6,6 +6,9 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep]
+# Phase 1 Integration: Schemas validate tools against .claude/config/tool-manifest.json
+# Agent/skill schemas reference available tools from the manifest
+# Single source of truth: .claude/config/tool-manifest.json
 best_practices:
   - Use JSON Schema draft-07 or later
   - Include descriptions for all properties
@@ -249,7 +252,127 @@ console.log('Invalid:', validate(invalidData));
 console.log('Errors:', validate.errors);
 ```
 
-### Step 7: System Impact Analysis (MANDATORY)
+### Step 7: Post-Creation Schema Registration (Phase 1 Integration)
+
+**This step is CRITICAL.** After creating the schema artifact, you MUST register it in the schema discovery system.
+
+**Phase 1 Context:** Phase 1 is responsible for discovering and cataloging schemas for validation. Schemas created without registration are invisible to validators and other systems that need them for data validation.
+
+After schema file is written and validated:
+
+1. **Create/Update Schema Registry Entry** in appropriate location:
+
+   If registry doesn't exist, create `.claude/context/artifacts/schema-registry.json`:
+
+   ```json
+   {
+     "schemas": [
+       {
+         "name": "{schema-name}",
+         "id": "{schema-name}",
+         "$id": "https://claude.ai/schemas/{schema-name}",
+         "type": "{input|output|definition|global|component}",
+         "description": "{What this schema validates}",
+         "version": "1.0.0",
+         "filePath": ".claude/schemas/{schema-name}.schema.json",
+         "validatesFor": ["{artifact-type-1}", "{artifact-type-2}"],
+         "relatedSchemas": [],
+         "usedBy": ["{validator-hook}", "{creator-skill}"]
+       }
+     ]
+   }
+   ```
+
+2. **Register with Validators:**
+
+   Update any validation hooks that should use this schema:
+   - Check `.claude/hooks/validation/` for relevant validators
+   - Add schema to schemaMap in validators that need it
+
+   Example:
+
+   ```javascript
+   const schemaMap = {
+     '.claude/agents/': '.claude/schemas/agent-definition.schema.json',
+     '.claude/schemas/{schema-name}.schema.json': require('./.claude/schemas/{schema-name}.schema.json'),
+   };
+   ```
+
+3. **Document in `.claude/docs/SCHEMA_CATALOG.md`:**
+
+   If catalog doesn't exist, create it. Add entry:
+
+   ````markdown
+   ### {Schema Title} (`{schema-name}.schema.json`)
+
+   **$id:** `https://claude.ai/schemas/{schema-name}`
+
+   **Purpose:** {Detailed description of what this schema validates}
+
+   **Used by:**
+
+   - {Validator/hook 1}
+   - {Creator skill 1}
+
+   **Root properties:**
+
+   - {property-1}: {description}
+   - {property-2}: {description}
+
+   **Example valid data:**
+
+   ```json
+   {
+     "example": "value"
+   }
+   ```
+   ````
+
+   **Required fields:** {List required fields}
+
+   **Validation:** When data matches this schema, {describe what is validated}
+
+   ```
+
+   ```
+
+4. **Update `.claude/CLAUDE.md` if Schema Enables New Capabilities:**
+
+   If this schema supports new artifact types or validation:
+   - Add to relevant section (Section 4.1 for creator schemas, Section 9.7 for schemas directory)
+   - Add to "Existing Schemas Reference" table in Step 7 of this skill
+
+   Example entry:
+
+   ```markdown
+   | `{schema-name}` | `.claude/schemas/` | {Purpose} |
+   ```
+
+5. **Update Memory:**
+
+   Append to `.claude/context/memory/learnings.md`:
+
+   ```markdown
+   ## Schema: {schema-name}
+
+   - **Type:** {input|output|definition|global|component}
+   - **Validates:** {What artifact/data type}
+   - **Purpose:** {Detailed purpose}
+   - **$id:** https://claude.ai/schemas/{schema-name}
+   - **Validators:** {Which hooks/validators use it}
+   - **Related Schemas:** {Any $ref references}
+   ```
+
+**Why this matters:** Without schema registration:
+
+- Validators cannot discover and use schemas
+- Data validation doesn't occur system-wide
+- Invalid artifacts are created without detection
+- "Invisible artifact" pattern emerges
+
+**Phase 1 Integration:** Schema registry is the discovery mechanism for Phase 1, enabling validators to find and apply schemas consistently across the system.
+
+### Step 8: System Impact Analysis (MANDATORY)
 
 **Before marking schema creation complete, verify ALL items:**
 
@@ -260,7 +383,9 @@ console.log('Errors:', validate.errors);
 [ ] All required fields defined in "required" array
 [ ] All properties have descriptions
 [ ] Examples included for complex schemas
-[ ] Schema registered with validators (if applicable)
+[ ] Schema registry entry created (Step 7)
+[ ] Validators registered with schema (if applicable)
+[ ] SCHEMA_CATALOG.md updated (Step 7)
 [ ] Related documentation updated
 ```
 
@@ -272,6 +397,9 @@ node -e "JSON.parse(require('fs').readFileSync('.claude/schemas/{name}.schema.js
 
 # Check required fields
 node -e "const s = require('.claude/schemas/{name}.schema.json'); console.log('title:', s.title); console.log('description:', s.description);"
+
+# Check schema registry
+grep "{schema-name}" .claude/context/artifacts/schema-registry.json
 
 # List all schemas
 ls -la .claude/schemas/*.schema.json

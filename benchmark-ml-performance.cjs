@@ -7,15 +7,11 @@ const { PatternDetector } = require('./.claude/lib/ml/pattern-detector.cjs');
 const { CostPredictor } = require('./.claude/lib/ml/cost-predictor.cjs');
 const { AdaptiveExecutor } = require('./.claude/lib/ml/adaptive-executor.cjs');
 
-async function benchmarkPatternDetector() {
+function benchmarkPatternDetector() {
   const pd = new PatternDetector();
   const workflows = Array.from({ length: 100 }, (_, i) => ({
     id: `wf-${i}`,
-    taskSequence: [
-      { agentType: 'developer' },
-      { agentType: 'qa' },
-      { agentType: 'developer' },
-    ],
+    taskSequence: [{ agentType: 'developer' }, { agentType: 'qa' }, { agentType: 'developer' }],
   }));
 
   const start = Date.now();
@@ -32,7 +28,7 @@ async function benchmarkPatternDetector() {
   };
 }
 
-async function benchmarkCostPredictor() {
+function benchmarkCostPredictor() {
   const cp = new CostPredictor();
   const text = 'Hello, world! This is a test message for cost prediction.';
   const iterations = 1000;
@@ -57,7 +53,7 @@ async function benchmarkCostPredictor() {
   };
 }
 
-async function benchmarkAdaptiveExecutor() {
+function benchmarkAdaptiveExecutor() {
   const ae = new AdaptiveExecutor();
   const pattern = {
     type: 'independent',
@@ -81,13 +77,13 @@ async function benchmarkAdaptiveExecutor() {
   };
 }
 
-async function measureMemoryOverhead() {
+function measureMemoryOverhead() {
   const baseline = process.memoryUsage().heapUsed;
 
   // Load all ML modules
   const pd = new PatternDetector();
   const cp = new CostPredictor();
-  const ae = new AdaptiveExecutor();
+  const _ae = new AdaptiveExecutor();
 
   // Populate with sample data
   const workflows = Array.from({ length: 100 }, (_, i) => ({

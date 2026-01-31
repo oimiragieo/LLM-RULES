@@ -13,7 +13,7 @@
 const path = require('path');
 const { loadDomainPatterns } = require('./memory-integrated-suggester.cjs');
 const {
-  scoreCompleteness,
+  scoreCompleteness: _scoreCompleteness,
   scoreQuality,
   scoreConsistency,
   computeOverallReadiness,

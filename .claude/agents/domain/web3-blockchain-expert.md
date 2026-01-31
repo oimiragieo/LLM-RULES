@@ -32,7 +32,7 @@ skills:
   - git-expert
   - verification-before-completion
 context_files:
-  - .claude/context/memory/learnings.md
+  - @.claude/context/memory/learnings.md
 ---
 
 # Web3 Blockchain Expert Agent

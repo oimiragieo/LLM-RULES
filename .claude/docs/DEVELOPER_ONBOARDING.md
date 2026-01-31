@@ -176,7 +176,7 @@ This directory contains all agent definitions. Each agent is a markdown file wit
 name: agent-name
 version: 1.0.0
 description: What this agent does
-model: sonnet  # haiku, sonnet, or opus
+model: sonnet # haiku, sonnet, or opus
 tools: [Read, Write, Edit, Bash, TaskUpdate, TaskList, Skill]
 skills:
   - skill-name
@@ -185,12 +185,15 @@ skills:
 # Agent Name
 
 ## Purpose
+
 [Agent purpose]
 
 ## Capabilities
+
 [What the agent can do]
 
 ## Workflow
+
 [How the agent operates]
 ```
 
@@ -224,14 +227,14 @@ Hooks intercept tool calls and enforce policies:
 
 ```javascript
 // Hook intercepts tool use
-module.exports = async function(input) {
+module.exports = async function (input) {
   const { tool_name, tool_input } = input;
 
   // Validate the operation
   if (shouldBlock(tool_input)) {
     return {
       decision: 'block',
-      message: 'Operation blocked: reason'
+      message: 'Operation blocked: reason',
     };
   }
 
@@ -344,11 +347,11 @@ We fixed 8 memory leak sources to achieve production stability. Follow these pat
 // BAD: Unbounded growth
 class Manager {
   constructor() {
-    this.history = [];  // Will grow forever
+    this.history = []; // Will grow forever
   }
 
   record(item) {
-    this.history.push(item);  // LEAK
+    this.history.push(item); // LEAK
   }
 }
 
@@ -364,7 +367,7 @@ class Manager {
 
     // Trim after each push
     if (this.history.length > this.maxHistorySize) {
-      this.history.shift();  // Remove oldest
+      this.history.shift(); // Remove oldest
     }
   }
 }
@@ -388,7 +391,7 @@ class ChaosEngineer extends EventEmitter {
     this.testResults = [];
     this.recoveryAttempts = [];
     this.injectedFaults.clear();
-    this.removeAllListeners();  // Clear event listeners
+    this.removeAllListeners(); // Clear event listeners
   }
 }
 ```
@@ -494,7 +497,7 @@ node --test tests/my-feature.test.cjs
 // .claude/lib/my-feature.cjs
 class MyFeature {
   doSomething() {
-    return 'expected value';  // Minimal implementation
+    return 'expected value'; // Minimal implementation
   }
 }
 
@@ -545,8 +548,10 @@ test('should prevent memory leak in sync history', () => {
   }
 
   // Verify bounded
-  assert.ok(manager.syncHistory.length <= 1000,
-    `Expected <=1000, got ${manager.syncHistory.length}`);
+  assert.ok(
+    manager.syncHistory.length <= 1000,
+    `Expected <=1000, got ${manager.syncHistory.length}`
+  );
 });
 ```
 
@@ -570,7 +575,7 @@ test('should handle 100 concurrent workflows', async () => {
   try {
     const results = await framework.simulateConcurrentWorkflows({
       workflowCount: 100,
-      duration: 60000  // 1 minute
+      duration: 60000, // 1 minute
     });
 
     assert.ok(results.successRate >= 99.5);
@@ -685,9 +690,9 @@ description: Use when [specific triggering conditions]
 ## Quick Reference
 
 | Command | Description |
-|---------|-------------|
-| cmd1 | Does X |
-| cmd2 | Does Y |
+| ------- | ----------- |
+| cmd1    | Does X      |
+| cmd2    | Does Y      |
 
 ## Common Mistakes
 
@@ -727,7 +732,7 @@ Create `.claude/hooks/category/my-hook.cjs`:
  * Purpose: [What this hook does]
  */
 
-module.exports = async function(input) {
+module.exports = async function (input) {
   const { tool_name, tool_input } = input;
 
   // Skip if not relevant tool
@@ -739,7 +744,7 @@ module.exports = async function(input) {
   if (someCondition(tool_input)) {
     return {
       decision: 'block',
-      message: 'Blocked: reason'
+      message: 'Blocked: reason',
     };
   }
 
@@ -754,9 +759,7 @@ Add to `.claude/settings.json`:
 ```json
 {
   "hooks": {
-    "PreToolUse": [
-      ".claude/hooks/category/my-hook.cjs"
-    ]
+    "PreToolUse": [".claude/hooks/category/my-hook.cjs"]
   }
 }
 ```
@@ -785,6 +788,7 @@ Multi-agent workflow for [purpose].
 **Agent:** planner
 
 **Steps:**
+
 1. Analyze requirements
 2. Create task breakdown
 3. Identify dependencies
@@ -794,6 +798,7 @@ Multi-agent workflow for [purpose].
 **Agent:** developer
 
 **Steps:**
+
 1. Implement features
 2. Write tests
 3. Update documentation
@@ -803,6 +808,7 @@ Multi-agent workflow for [purpose].
 **Agent:** code-reviewer
 
 **Steps:**
+
 1. Review code changes
 2. Identify issues
 3. Approve or request changes
@@ -836,6 +842,7 @@ NODE_OPTIONS="--inspect --trace-gc" node index.js
 **Step 4: Identify Leaks**
 
 Look for:
+
 - Growing arrays
 - Retained closures
 - Accumulated event listeners
@@ -857,6 +864,7 @@ npm run lint:fix
 ```
 
 **Key Rules:**
+
 - No unused variables
 - No console.log in production (warning)
 - Consistent quotes (single)
@@ -868,23 +876,27 @@ npm run lint:fix
 Before submitting PR, verify:
 
 **Memory Safety:**
+
 - [ ] All arrays have max size limits
 - [ ] All classes implement cleanup() methods
 - [ ] Tests use afterEach cleanup hooks
 - [ ] No event listener leaks
 
 **Testing:**
+
 - [ ] New code has tests (TDD)
 - [ ] Tests follow RED-GREEN-REFACTOR
 - [ ] Memory leak regression tests added if applicable
 - [ ] All tests pass locally
 
 **Documentation:**
+
 - [ ] Code comments explain WHY, not WHAT
 - [ ] README updated if API changed
 - [ ] Agent/skill definitions follow templates
 
 **Quality:**
+
 - [ ] No ESLint errors
 - [ ] Consistent with existing code style
 - [ ] Meaningful commit messages
@@ -892,6 +904,7 @@ Before submitting PR, verify:
 ### Documentation Standards
 
 **Code Comments:**
+
 ```javascript
 // GOOD: Explains why
 // Limit to 1000 entries to prevent heap OOM during long-running processes
@@ -903,6 +916,7 @@ this.maxHistorySize = 1000;
 ```
 
 **JSDoc for Public APIs:**
+
 ```javascript
 /**
  * Detect frequent task sequences in workflow history.
@@ -921,12 +935,12 @@ detectFrequentSequences(workflows, options = {}) {
 
 Follow budgets in `.claude/docs/PERFORMANCE_BUDGETS.md`:
 
-| Component | Memory Budget | Enforcement |
-|-----------|---------------|-------------|
-| StateSyncManager | 50KB | maxHistorySize = 1000 |
-| LoadTestFramework | 100KB | MAX_METRICS = 1000 |
-| ChaosEngineer | 0KB | cleanup() in afterEach |
-| Agent Context | 2MB | context-compressor skill |
+| Component         | Memory Budget | Enforcement              |
+| ----------------- | ------------- | ------------------------ |
+| StateSyncManager  | 50KB          | maxHistorySize = 1000    |
+| LoadTestFramework | 100KB         | MAX_METRICS = 1000       |
+| ChaosEngineer     | 0KB           | cleanup() in afterEach   |
+| Agent Context     | 2MB           | context-compressor skill |
 
 ---
 
@@ -934,13 +948,13 @@ Follow budgets in `.claude/docs/PERFORMANCE_BUDGETS.md`:
 
 ### Documentation
 
-| Topic | Location |
-|-------|----------|
-| Framework spec | `.claude/CLAUDE.md` |
-| Memory management | `.claude/docs/MEMORY_MANAGEMENT.md` |
-| Performance budgets | `.claude/docs/PERFORMANCE_BUDGETS.md` |
-| Operations | `.claude/docs/OPERATIONS_HANDBOOK.md` |
-| Architecture | `.claude/docs/SYSTEM_ARCHITECTURE_HANDBOOK.md` |
+| Topic               | Location                                       |
+| ------------------- | ---------------------------------------------- |
+| Framework spec      | `.claude/CLAUDE.md`                            |
+| Memory management   | `.claude/docs/MEMORY_MANAGEMENT.md`            |
+| Performance budgets | `.claude/docs/PERFORMANCE_BUDGETS.md`          |
+| Operations          | `.claude/docs/OPERATIONS_HANDBOOK.md`          |
+| Architecture        | `.claude/docs/SYSTEM_ARCHITECTURE_HANDBOOK.md` |
 
 ### Memory Files
 
@@ -953,16 +967,19 @@ Check project history and decisions:
 ### Common Issues
 
 **Tests failing with OOM:**
+
 - Reduce heap size to catch leaks earlier
 - Add afterEach cleanup hooks
 - Check for unbounded arrays
 
 **Agent not routing correctly:**
+
 - Verify keywords in router-enforcer.cjs
 - Check agent file exists and is valid YAML
 - Review routing table in CLAUDE.md
 
 **Skill not invoking:**
+
 - Use `Skill({ skill: 'name' })`, not just reading the file
 - Verify skill is in skill catalog
 - Check skill assigned to agent

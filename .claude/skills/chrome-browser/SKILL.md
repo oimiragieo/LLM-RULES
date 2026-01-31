@@ -86,12 +86,14 @@ Chrome Browser Skill - Unified browser automation using TWO integrations: Chrome
 ## Performance Limits (Memory Safeguard)
 
 Chrome browser automation can record GIF videos. To prevent memory exhaustion:
+
 - **GIF frame limit: 100 frames (HARD LIMIT)**
 - Each frame: 5-20 KB (depends on complexity)
 - 100 frames × 10 KB avg = ~1 MB per recording
 - Keeps browser session memory-efficient
 
 **Frame tracking:**
+
 - Typical actions per frame: 1-2 (click, scroll, type)
 - 50 frames = 25-50 actions
 - 100 frames = 50-100 actions
@@ -335,18 +337,21 @@ mcp__claude-in-chrome__gif_creator({
 ### Recording Best Practices
 
 ✓ GOOD patterns:
+
 - Login flow: 15-20 frames (5-10 actions)
 - Form filling: 10-15 frames (5-8 actions)
 - Navigation demo: 20-30 frames (10-15 actions)
 - Full workflow: 2-3 recordings of 30-50 frames each
 
 ✗ BAD patterns:
+
 - Single recording with 200+ frames
 - Waiting for loading (adds 10+ empty frames per second)
 - Continuous scrolling (can reach 100+ frames quickly)
 - Multiple simultaneous recordings
 
 **If you hit 100 frames:**
+
 1. Stop recording
 2. Export current GIF
 3. Start new recording for next part

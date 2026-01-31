@@ -312,7 +312,7 @@ class ConductorGapAnalyzer {
     return count;
   }
 
-  async _countCommits(dirPath) {
+  async _countCommits(_dirPath) {
     // Mock: Return 0 (git operations require real git repo)
     return 0;
   }
@@ -372,7 +372,7 @@ class ConductorGapAnalyzer {
     return 'LOW';
   }
 
-  _generateRecommendations(gaps, patterns) {
+  _generateRecommendations(gaps, _patterns) {
     let recommendations = '';
 
     // Helper to check feature name

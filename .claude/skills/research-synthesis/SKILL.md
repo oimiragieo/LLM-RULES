@@ -75,16 +75,19 @@ If you haven't executed the research protocol, you cannot proceed with artifact 
 ```
 
 Exceeding this limit causes:
+
 - Memory exhaustion (reports >10 KB → context window overflow)
 - Information overload (can't process 10+ sources effectively)
 - Diminishing returns (quality > quantity)
 
 **Query Budget by Complexity:**
+
 - **Simple research** (fact-checking, version checking): 3 queries
 - **Medium research** (feature comparison, implementation patterns): 4 queries
 - **Complex research** (comprehensive best practices, ecosystem overview): 5 queries
 
 **NEVER:**
+
 - Execute >5 queries in a single research session
 - Execute unbounded "research everything" queries
 - Combine multiple unrelated research topics in one session
@@ -100,23 +103,27 @@ Exceeding this limit causes:
 ```
 
 **Why 10 KB?**
+
 - Context efficiency (10 KB = ~2500 words = readable in one context window)
 - Forces prioritization (include only essential findings)
 - Prevents "encyclopedia syndrome" (copying entire articles)
 
 **Format Requirements:**
+
 - Use bullet points (compact)
 - Reference URLs instead of copying content
 - Summarize findings in <3 sentences per source
 - Remove noise, keep essentials
 
 **When approaching 10 KB:**
+
 1. Stop adding new sources
 2. Consolidate duplicates
 3. Remove redundant details
 4. Focus on unique insights
 
 **For complex topics:**
+
 - Split into 2-3 mini-reports (each <10 KB)
 - Each focused on one aspect
 - Link reports together in summary
@@ -136,11 +143,13 @@ Before executing queries, define scope AND plan query budget:
 **Domain/Capability**: [What this artifact will do]
 
 **Complexity Assessment**:
+
 - [ ] Simple (fact-checking, version checking) → 3 queries
 - [ ] Medium (feature comparison, implementation patterns) → 4 queries
 - [ ] Complex (comprehensive best practices, ecosystem overview) → 5 queries
 
 **Planned Queries** (list 3-5 BEFORE executing):
+
 1. [Query 1: Best practices - specific question]
 2. [Query 2: Implementation patterns - specific question]
 3. [Query 3: Framework/AI-specific - specific question]
@@ -148,18 +157,21 @@ Before executing queries, define scope AND plan query budget:
 5. [Optional Query 5: Trade-offs/alternatives - specific question]
 
 **Key Questions**:
+
 1. What are the best practices for this domain?
 2. What implementation patterns exist?
 3. What tools/frameworks should be used?
 4. What are the common pitfalls?
 
 **Existing Patterns to Examine**:
+
 - .claude/[category]/ - Similar artifacts
 - .claude/templates/ - Relevant templates
 - .claude/schemas/ - Validation patterns
 ```
 
 **Pre-Research Checklist:**
+
 ```
 [ ] Complexity assessed (3, 4, or 5 queries planned)
 [ ] Queries planned BEFORE executing (prevents scope creep)
@@ -218,6 +230,7 @@ WebSearch({
 ```
 
 **Query Efficiency Tips:**
+
 - Prefer 2-3 high-quality queries over 10 generic ones
 - Combine related questions in one query ("X best practices + implementation patterns")
 - Use WebFetch for known authoritative sources (faster, more focused)
@@ -417,24 +430,29 @@ After completing research, provide this handoff to the creator skill:
 When research complexity **exceeds 5 queries**, split into phases:
 
 **Phase 1: Scope & Definition (2 queries)**
+
 - What is the topic/technology?
 - What are the key concepts?
 
 **Phase 2: Implementation (2 queries)**
+
 - How do experts implement this?
 - Common patterns & best practices?
 
 **Phase 3: Comparison & Trade-offs (1 query)**
+
 - How does this compare to alternatives?
 - Trade-offs & gotchas?
 
 **Benefits:**
+
 - Each phase is independent (less context bleed)
 - Can be done in separate skill invocations
 - Clearer organization
 - Easier to reuse findings
 
 **Example:**
+
 ```
 Session 1: Research "Rust async/await" (Phase 1: 2 queries)
 Session 2: Research "Tokio patterns" (Phase 2: 2 queries)
@@ -446,6 +464,7 @@ Session 3: Research "async-trait vs manual impl" (Phase 3: 1 query)
 ## Memory-Aware Chunking Examples
 
 **GOOD - Focused query + chunked report:**
+
 ```
 Query: "Rust async/await best practices 2026"
 Report structure:
@@ -458,6 +477,7 @@ Report structure:
 ```
 
 **BAD - Unbounded research:**
+
 ```
 Query: "everything about Rust ecosystem 2026"
 Report: 50 sources, 15 KB (truncated by context limit)
@@ -465,6 +485,7 @@ Report: 50 sources, 15 KB (truncated by context limit)
 ```
 
 **GOOD - Phased approach:**
+
 ```
 Phase 1 Report: Rust async fundamentals (3 KB)
 Phase 2 Report: Tokio implementation patterns (4 KB)
@@ -473,6 +494,7 @@ Phase 3 Report: Performance comparison (2 KB)
 ```
 
 **BAD - Single massive report:**
+
 ```
 Single Report: Comprehensive Rust async guide (25 KB)
 ---Truncated to 10 KB, missing critical sections

@@ -1,0 +1,168 @@
+TAP version 13
+# Subtest: Performance Profiling Framework (RED Phase)
+    # Subtest: PerformanceProfiler - Instrumentation (15+ tests)
+        # Subtest: should create profiler with specs path
+        ok 1 - should create profiler with specs path
+          ---
+          duration_ms: 2.9465
+          type: 'test'
+          ...
+#   Checkpoint Manager Tests
+#   CrossWorkflowTrigger
+#   constructor
+#   trigger()
+#   triggerMultiple()
+#   registerTriggerHandler()
+#   getTriggerHistory()
+#   detectCircularTrigger()
+#   CrossWorkflowTrigger Tests
+# Workflow Ecosystem Test Runner
+# ==============================
+# Running 3 test suite(s): cli, validator, integration
+# ============================================================
+# Running: Workflow CLI
+# File: workflow-cli.test.cjs
+# ============================================================
+# Results: 26 passed, 0 failed
+# ============================================================
+# Running: Workflow Validator
+# File: workflow-validator.test.cjs
+# ============================================================
+# Tests failed for Workflow Validator
+# WorkflowValidator Module
+# WorkflowValidator Basic Validation
+# EVOLVE Phase Validation
+# Gate Validation
+# Rollback Action Validation
+# Step Schema Validation
+# Iron Laws Validation
+# Validate All Workflows
+# Workflow Validator Tests
+# ========================
+#   ✓ should export WorkflowValidator class
+#   ✗ should export validateEvolvePhases function
+#     Error: validateEvolvePhases should be exported
+#   ✗ should export EVOLVE_PHASES constant
+#     Error: EVOLVE_PHASES should be exported
+#   ✗ should validate a correct workflow
+#     Error: Workflow must have a phases array (or be marked abstract)
+#   ✗ should detect missing name field
+#     Error: Workflow must have a name (missing 'name' field)
+#   ✗ should detect missing phases field
+#     Error: Workflow must have a phases array (or be marked abstract)
+#   ✗ should detect duplicate step IDs
+#     Error: Workflow must have a phases array (or be marked abstract)
+#   ✗ should check for all EVOLVE phases
+#     Error: validateEvolvePhases is not a function
+#   ✗ should detect missing OBTAIN phase
+#     Error: validateEvolvePhases is not a function
+#   ✗ should warn about missing EVALUATE phase
+#     Error: validateEvolvePhases is not a function
+#   ✗ should validate gate conditions
+#     Error: validator.checkGates is not a function
+#   ✗ should detect gate without condition
+#     Error: validator.checkGates is not a function
+#   ✗ should detect gate without message
+#     Error: validator.checkGates is not a function
+#   ✗ should validate rollback configuration
+#     Error: validator.checkRollbackActions is not a function
+#   ✗ should require rollback for workflows with compensate steps
+#     Error: Workflow must have a phases array (or be marked abstract)
+#   ✗ should validate a single step with required id
+#     Error: validateSingleStep is not a function
+#   ✗ should detect step missing id field
+#     Error: validateSingleStep is not a function
+#   ✗ should detect step missing handler/action field
+#     Error: validateSingleStep is not a function
+#   ✗ should validate step with action field instead of handler
+#     Error: validateSingleStep is not a function
+#   ✓ should validate entire workflow step schemas
+#   ✓ should detect invalid steps across all phases
+#   ✗ should reject workflow with step missing id field
+#     Error: Workflow must have a phases array (or be marked abstract)
+#   ✗ should reject workflow with step missing handler
+#     Error: Workflow must have a phases array (or be marked abstract)
+#   ✗ should accept workflow with handler field
+#     Error: Workflow must have a phases array (or be marked abstract)
+#   ✗ should check for iron laws in metadata
+#     Error: validator.checkIronLaws is not a function
+#   ✗ should warn when no iron laws defined
+#     Error: validator.checkIronLaws is not a function
+#   ✗ should validate all workflows in a directory
+#     Error: validator.validateAll is not a function
+#   ✗ should generate validation report
+#     Error: validator.generateReport is not a function
+# Results: 3 passed, 25 failed
+# ============================================================
+# Running: Workflow Integration
+# File: workflow-integration.test.cjs
+# ============================================================
+# Tests failed for Workflow Integration
+# Full Workflow Execution
+# Cross-Workflow Triggering
+# Checkpoint and Resume
+# Rollback Scenarios
+# System Registration
+# Evolution State Sync
+# Error Handling and Recovery
+# Workflow Validation Integration
+# Workflow Integration Tests
+# ==========================
+#   ✓ should execute a complete workflow end-to-end
+#   ✓ should capture step results for gate evaluation
+#   ✓ should emit events during execution
+#   ✓ should trigger another workflow synchronously
+#   ✓ should detect circular triggers
+#   ✓ should track trigger history
+#   ✓ should trigger multiple workflows in parallel
+#   ✓ should save and load checkpoints
+#   ✓ should list checkpoints for a workflow
+#   ✓ should get latest checkpoint for a workflow
+#   ✓ should cleanup old checkpoints
+#   ✓ should rollback with saga coordinator
+#   ✓ should backup and restore files
+#   ✓ should continue rollback even if one compensation fails
+#   ✓ should create backups before registration
+#   ✓ should verify registration status
+#   ✓ should load and save evolution state
+#   ✓ should manage suggestion queue
+#   ✓ should record evolution history
+#   ✓ should support locking mechanism
+#   ✓ should handle step execution errors gracefully
+#   ✓ should checkpoint before risky operations
+#   ✗ should validate actual workflow files
+#     Error: validator.validateAll is not a function
+#   ✗ should integrate validation with CLI
+#     Error: Workflow must have a phases array (or be marked abstract)
+# Results: 22 passed, 2 failed
+# ============================================================
+# SUMMARY
+# ============================================================
+# [OK] Workflow CLI: PASS
+# [X] Workflow Validator: FAIL
+# [X] Workflow Integration: FAIL
+# ============================================================
+# Overall: SOME TESTS FAILED
+# ============================================================
+# [saga-coordinator] Compensation failed for step2: Compensation failed!
+# Subtest: tests\\performance-profiling.test.cjs
+not ok 1 - tests\\performance-profiling.test.cjs
+  ---
+  duration_ms: 1258.9405
+  type: 'test'
+  location: 'C:\\dev\\projects\\agent-studio\\tests\\performance-profiling.test.cjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1266.4477

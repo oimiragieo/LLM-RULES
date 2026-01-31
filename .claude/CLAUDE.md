@@ -305,30 +305,72 @@ Comprehensive guide to all available tools in the agent-studio framework.
 
 These tools are built into Claude Code and work immediately:
 
-| Tool                | Category        | Purpose                      | Availability                   |
-| ------------------- | --------------- | ---------------------------- | ------------------------------ |
-| **Read**            | File I/O        | Read files from filesystem   | ✅ All agents                  |
-| **Write**           | File I/O        | Create/overwrite files       | ✅ All agents                  |
-| **Edit**            | File I/O        | Make precise edits to files  | ✅ All agents                  |
-| **Bash**            | Shell           | Execute shell commands       | ✅ All agents (restricted)     |
-| **Glob**            | Search          | Pattern-based file discovery | ✅ All agents                  |
-| **Grep**            | Search          | Content search in files      | ✅ All agents                  |
-| **Task**            | Orchestration   | Spawn subagents              | ✅ Router + Orchestrators ONLY |
-| **TaskCreate**      | Task Management | Create trackable tasks       | ✅ All agents                  |
-| **TaskUpdate**      | Task Management | Update task status/metadata  | ✅ All agents (MANDATORY)      |
-| **TaskList**        | Task Management | List all tasks               | ✅ All agents                  |
-| **TaskGet**         | Task Management | Get task details             | ✅ All agents                  |
-| **TaskOutput**      | Task Management | Read task output             | ✅ All agents                  |
-| **TaskStop**        | Task Management | Stop running task            | ✅ All agents                  |
-| **Skill**           | Capability      | Invoke skill workflows       | ✅ All agents (MANDATORY)      |
-| **AskUserQuestion** | Interaction     | Get user input               | ✅ Router ONLY                 |
-| **EnterPlanMode**   | Planning        | Switch to planning mode      | ✅ All agents                  |
-| **ExitPlanMode**    | Planning        | Exit planning mode           | ✅ All agents                  |
-| **WebSearch**       | Research        | Search the web               | ✅ All agents                  |
-| **WebFetch**        | Research        | Fetch webpage content        | ✅ All agents                  |
-| **NotebookEdit**    | Jupyter         | Edit notebook cells          | ✅ All agents                  |
+| Tool                | Category        | Purpose                                     | Availability                   |
+| ------------------- | --------------- | ------------------------------------------- | ------------------------------ |
+| **Read**            | File I/O        | Read files from filesystem                  | ✅ All agents                  |
+| **Write**           | File I/O        | Create/overwrite files                      | ✅ All agents                  |
+| **Edit**            | File I/O        | Make precise edits to files                 | ✅ All agents                  |
+| **Bash**            | Shell           | Execute shell commands                      | ✅ All agents (restricted)     |
+| **Glob**            | Search          | Pattern-based file discovery                | ✅ All agents                  |
+| **Grep**            | Search          | Content search in files                     | ✅ All agents                  |
+| **Task**            | Orchestration   | Spawn subagents                             | ✅ Router + Orchestrators ONLY |
+| **TaskCreate**      | Task Management | Create trackable tasks                      | ✅ All agents                  |
+| **TaskUpdate**      | Task Management | Update task status/metadata                 | ✅ All agents (MANDATORY)      |
+| **TaskList**        | Task Management | List all tasks                              | ✅ All agents                  |
+| **TaskGet**         | Task Management | Get task details                            | ✅ All agents                  |
+| **TaskOutput**      | Task Management | Read task output                            | ✅ All agents                  |
+| **TaskStop**        | Task Management | Stop running task                           | ✅ All agents                  |
+| **Skill**           | Capability      | Invoke skill workflows                      | ✅ All agents (MANDATORY)      |
+| **SkillCatalog**    | Capability      | Query available skills at runtime           | ✅ All agents                  |
+| **AvailableAgents** | Capability      | Query available agents by capability/domain | ✅ Router + Orchestrators      |
+| **AskUserQuestion** | Interaction     | Get user input                              | ✅ Router ONLY                 |
+| **EnterPlanMode**   | Planning        | Switch to planning mode                     | ✅ All agents                  |
+| **ExitPlanMode**    | Planning        | Exit planning mode                          | ✅ All agents                  |
+| **WebSearch**       | Research        | Search the web                              | ✅ All agents                  |
+| **WebFetch**        | Research        | Fetch webpage content                       | ✅ All agents                  |
+| **NotebookEdit**    | Jupyter         | Edit notebook cells                         | ✅ All agents                  |
 
-**Total Core Tools:** 20
+**Total Core Tools:** 22
+
+**SkillCatalog**: Agents can query available skills dynamically at runtime:
+
+- Example: `SkillCatalog({ domain: 'testing' })`
+- Filters: domain, category, agentType, tags, limit
+- Returns: Matching skills with descriptions and recommendations
+- Use when: Agent needs to discover skills for current task (more flexible than pre-injected AVAILABLE_SKILLS)
+
+Example usage in agent code:
+
+```javascript
+const skills = SkillCatalog({ domain: 'testing', agentType: 'developer' });
+const best = skills.skills.find(s => s.recommended);
+Skill({ skill: best.name });
+```
+
+**AvailableAgents** (Phase 3): Router and orchestrators can query available agents at runtime:
+
+- Example: `AvailableAgents({ capability: 'code-review' })`
+- Filters: capability, domain, category, excludeFailed, minSuccessRate, limit
+- Returns: Available agents with health status, sorted by success rate
+- Use when: Router selects best agent for task dynamically
+
+Example usage in router:
+
+```javascript
+const agents = AvailableAgents({
+  capability: 'code-review',
+  excludeFailed: true,
+  minSuccessRate: 0.7
+});
+const best = agents.agents[0] || agents.agents.find(a => a.recommendedAgents?.includes('code-reviewer'));
+Task({ subagent_type: best.id, prompt: ... });
+```
+
+**Capability Routing**: Router uses `.claude/config/capability-routing.json` to map request patterns to capabilities:
+
+- `"review"` -> `code-review` capability -> `code-reviewer` agent
+- `"implement"` -> `implementation` capability -> `developer` agent
+- `"security"` -> `security-review` capability -> `security-architect` agent
 
 ### MCP Tools (Require Server Configuration)
 
@@ -359,7 +401,7 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 - File I/O: Read, Write, Edit
 - Search: Glob, Grep
 - Task Management: TaskCreate, TaskUpdate, TaskList, TaskGet, TaskOutput, TaskStop
-- Capability: Skill
+- Capability: Skill, SkillCatalog, AvailableAgents
 - Research: WebSearch, WebFetch
 - Planning: EnterPlanMode, ExitPlanMode
 - Jupyter: NotebookEdit
@@ -389,6 +431,7 @@ tools:
     TaskGet,
     TaskOutput,
     Skill,
+    SkillCatalog,
   ]
 ```
 
@@ -409,6 +452,7 @@ tools: [
     TaskGet,
     TaskOutput,
     Skill,
+    SkillCatalog,
   ]
 ```
 

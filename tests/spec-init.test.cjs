@@ -137,7 +137,7 @@ Problem here`;
     const spec = 'test spec content';
     const filename = saveSpec(spec, 'test-feature');
 
-    const expectedPath = path.join(process.cwd(), '.claude/context/artifacts/specs', filename);
+    const _expectedPath = path.join(process.cwd(), '.claude/context/artifacts/specs', filename);
 
     assert.ok(filename.includes('test-feature'));
     assert.ok(filename.includes('-spec-'));
@@ -159,7 +159,7 @@ Problem here`;
   // Integration Tests
   test('works with progressive-disclosure', () => {
     // Simulates integration with progressive-disclosure skill
-    const questions = generateQuestions('feature');
+    const _questions = generateQuestions('feature');
     const answers = {
       problem: 'Test problem',
       users: 'Test users',
@@ -462,7 +462,7 @@ function saveSpec(spec, name) {
 }
 
 function generateMetadata(config) {
-  const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+  const _date = new Date().toISOString().split('T')[0].replace(/-/g, '');
   const randomId = Math.floor(Math.random() * 100000000)
     .toString()
     .padStart(8, '0');

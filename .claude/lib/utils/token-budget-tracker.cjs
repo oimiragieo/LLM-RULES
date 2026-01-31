@@ -35,7 +35,7 @@ function estimateTokens(content) {
   return {
     tokens,
     chars,
-    estimate: `~${tokens} tokens (${chars} chars × ${CHAR_TO_TOKEN_RATIO})`
+    estimate: `~${tokens} tokens (${chars} chars × ${CHAR_TO_TOKEN_RATIO})`,
   };
 }
 
@@ -59,7 +59,7 @@ function trackAgentUsage(agentId, usage) {
   if (!agentUsageMap.has(agentId)) {
     agentUsageMap.set(agentId, {
       totalTokens: 0,
-      budget: DEFAULT_BUDGET
+      budget: DEFAULT_BUDGET,
     });
   }
 
@@ -86,7 +86,7 @@ function trackAgentUsage(agentId, usage) {
     budget: agentData.budget,
     budgetRemaining,
     percentUsed,
-    status
+    status,
   };
 }
 
@@ -103,7 +103,7 @@ function checkBudgetStatus(agentId) {
       budget: DEFAULT_BUDGET,
       remaining: DEFAULT_BUDGET,
       percentUsed: 0,
-      status: 'OK'
+      status: 'OK',
     };
   }
 
@@ -123,7 +123,7 @@ function checkBudgetStatus(agentId) {
     budget: agentData.budget,
     remaining,
     percentUsed,
-    status
+    status,
   };
 }
 
@@ -141,7 +141,7 @@ function logTokenEvent(eventType, data) {
     eventType,
     agentId,
     tokens,
-    reason
+    reason,
   };
 
   // Ensure directory exists
@@ -158,5 +158,5 @@ module.exports = {
   estimateTokens,
   trackAgentUsage,
   checkBudgetStatus,
-  logTokenEvent
+  logTokenEvent,
 };

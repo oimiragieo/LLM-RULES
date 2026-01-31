@@ -71,7 +71,22 @@
     "test:a2a:ci": "echo 'A2A tests archived - see .claude.archive/.claude.old/tests/a2a-framework/'",
     "lint": "eslint . --ext .js,.cjs,.mjs --max-warnings 0",
     "lint:fix": "eslint . --ext .js,.cjs,.mjs --fix",
-    "lint:staged": "eslint --ext .js,.cjs,.mjs"
+    "lint:staged": "eslint --ext .js,.cjs,.mjs",
+    "skill:build": "tsx .claude/lib/skill-build/src/build.ts",
+    "skill:validate": "tsx .claude/lib/skill-build/src/validate.ts",
+    "skill:extract-tests": "tsx .claude/lib/skill-build/src/extract-tests.ts",
+    "skill:migrate": "tsx .claude/lib/skill-build/src/migrate.ts",
+    "manifest:generate": "node .claude/tools/cli/generate-tool-manifest.cjs",
+    "manifest:validate": "node .claude/tools/cli/generate-tool-manifest.cjs --validate",
+    "skills:index": "node .claude/tools/cli/generate-skill-index.cjs",
+    "skills:validate": "node .claude/tools/cli/generate-skill-index.cjs --validate",
+    "agents:registry": "node .claude/tools/cli/generate-agent-registry.cjs",
+    "agents:registry:validate": "node .claude/tools/cli/generate-agent-registry.cjs --validate",
+    "gen:agent-registry": "node .claude/tools/cli/generate-agent-registry.cjs",
+    "gen:skill-index": "node .claude/tools/cli/generate-skill-index.cjs",
+    "gen:tool-manifest": "node .claude/tools/cli/generate-tool-manifest.cjs",
+    "gen:all-registries": "npm run gen:tool-manifest && npm run gen:skill-index && npm run gen:agent-registry",
+    "validator:test": "node --test tests/hooks/pre-spawn-tool-validator.test.cjs"
   },
   "keywords": [
     "claude",
@@ -90,18 +105,30 @@
   "dependencies": {
     "@chroma-core/default-embed": "^0.1.9",
     "@jest/globals": "^30.2.0",
-    "@opentelemetry/auto-instrumentations-node": "^0.69.0",
-    "@opentelemetry/sdk-node": "^0.211.0",
+    "@xenova/transformers": "^2.17.2",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "better-sqlite3": "^11.10.0",
+    "chalk": "^5.6.2",
     "chromadb": "^3.2.2",
+    "cli-progress": "^3.12.0",
+    "commander": "^14.0.3",
     "glob": "^13.0.0",
-    "proper-lockfile": "^4.1.2"
+    "proper-lockfile": "^4.1.2",
+    "tree-sitter": "^0.25.0",
+    "tree-sitter-go": "^0.25.0",
+    "tree-sitter-javascript": "^0.25.0",
+    "tree-sitter-python": "^0.25.0",
+    "tree-sitter-rust": "^0.24.0",
+    "tree-sitter-typescript": "^0.23.2"
   },
   "devDependencies": {
+    "@types/node": "^20.19.30",
     "eslint": "^9.39.2",
+    "jest": "^30.2.0",
     "js-yaml": "^4.1.1",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
   }
 }

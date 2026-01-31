@@ -1370,6 +1370,110 @@ const intentKeywords = {
     'design feedback',
   ],
 
+  // === VERCEL SKILLS (5) ===
+  react_performance: [
+    'react performance',
+    'next.js optimization',
+    'nextjs optimization',
+    'bundle size',
+    'code review',
+    'performance',
+    'waterfalls',
+    're-render',
+    'render optimization',
+    'server-side rendering',
+    'client-side optimization',
+    'lazy loading',
+    'code splitting',
+    'tree shaking',
+    'image optimization',
+    'prefetching',
+    'hydration',
+    'ssr performance',
+    'csr performance',
+    'lighthouse',
+    'core web vitals',
+    'lcp',
+    'fcp',
+    'cls',
+    'fid',
+  ],
+  react_native: [
+    'react native',
+    'expo',
+    'mobile',
+    'ios',
+    'android',
+    'list performance',
+    'flatlist',
+    'animation',
+    'native module',
+    'mobile optimization',
+    'mobile performance',
+    'gesture',
+    'navigation',
+    'hermes',
+    'metro',
+    'fast refresh',
+    'reanimated',
+    'react native performance',
+  ],
+  composition_patterns: [
+    'boolean prop',
+    'compound component',
+    'composition',
+    'component library',
+    'component architecture',
+    'component pattern',
+    'design system',
+    'react 19',
+    'react patterns',
+    'render props',
+    'higher-order component',
+    'hoc',
+    'children prop',
+    'context api',
+    'hooks pattern',
+  ],
+  web_design: [
+    'accessibility',
+    'audit',
+    'wcag',
+    'aria',
+    'ux',
+    'ui review',
+    'design review',
+    'dark mode',
+    'typography',
+    'form design',
+    'color contrast',
+    'focus management',
+    'semantic html',
+    'keyboard navigation',
+    'screen reader',
+    'a11y',
+    'responsive design',
+    'mobile-first',
+  ],
+  vercel_deploy: [
+    'deploy',
+    'vercel',
+    'production',
+    'deployment',
+    'push live',
+    'go live',
+    'release',
+    'cicd',
+    'ci-cd',
+    'deployment automation',
+    'vercel deploy',
+    'next.js deploy',
+    'edge functions',
+    'serverless',
+    'preview deployment',
+    'production deployment',
+  ],
+
   // === SPECIALIZED AGENTS (12) ===
   c4_code: [
     'c4 code',
@@ -2028,6 +2132,13 @@ const INTENT_TO_AGENT = {
   data_engineer: 'data-engineer',
   mobile_ux: 'mobile-ux-reviewer',
 
+  // Vercel skills (5 skills integrated from Vercel)
+  react_performance: 'frontend-pro', // Uses react-best-practices-vercel skill
+  react_native: 'expo-mobile-developer', // Uses react-native-skills-vercel skill
+  composition_patterns: 'frontend-pro', // Uses composition-patterns-vercel skill
+  web_design: 'frontend-pro', // Uses web-design-guidelines-vercel skill
+  vercel_deploy: 'devops', // Uses vercel-deploy-claimable skill
+
   // Specialized
   c4_code: 'c4-code',
   c4_component: 'c4-component',
@@ -2263,6 +2374,45 @@ const DISAMBIGUATION_RULES = {
       condition: ['etl', 'pipeline', 'warehouse', 'bigquery', 'snowflake'],
       prefer: 'data-engineer',
       deprioritize: 'database-architect',
+    },
+  ],
+  // "react" could be frontend-pro (web) or expo-mobile-developer (mobile)
+  react: [
+    {
+      condition: ['mobile', 'native', 'ios', 'android', 'expo', 'flatlist'],
+      prefer: 'expo-mobile-developer',
+      deprioritize: 'frontend-pro',
+    },
+    {
+      condition: ['web', 'browser', 'next', 'performance', 'bundle'],
+      prefer: 'frontend-pro',
+      deprioritize: 'expo-mobile-developer',
+    },
+  ],
+  // "component" could be composition-patterns or frontend-pro performance
+  'component-pattern': [
+    {
+      condition: ['boolean', 'compound', 'pattern', 'architecture'],
+      prefer: 'composition-patterns-vercel', // Skill routing hint
+      deprioritize: 'react-best-practices-vercel',
+    },
+    {
+      condition: ['performance', 'optimize', 're-render'],
+      prefer: 'react-best-practices-vercel', // Skill routing hint
+      deprioritize: 'composition-patterns-vercel',
+    },
+  ],
+  // "design" could be web-design (accessibility) or frontend-pro (performance)
+  'design-guidelines': [
+    {
+      condition: ['accessibility', 'wcag', 'aria', 'contrast'],
+      prefer: 'web-design-guidelines-vercel', // Skill routing hint
+      deprioritize: 'react-best-practices-vercel',
+    },
+    {
+      condition: ['performance', 'speed', 'optimization'],
+      prefer: 'react-best-practices-vercel', // Skill routing hint
+      deprioritize: 'web-design-guidelines-vercel',
     },
   ],
 };

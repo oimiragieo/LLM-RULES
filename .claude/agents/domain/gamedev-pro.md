@@ -31,7 +31,7 @@ skills:
   - gamedev-expert
   - cpp
 context_files:
-  - .claude/context/memory/learnings.md
+  - @.claude/context/memory/learnings.md
 ---
 
 # Game Development Pro Agent

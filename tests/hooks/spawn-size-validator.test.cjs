@@ -30,7 +30,17 @@ const {
 
 describe('Unit: calculateSpawnSize()', () => {
   it('calculates minimal spawn (9 tools, 2KB prompt) correctly', () => {
-    const tools = ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'];
+    const tools = [
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
+    ];
     const prompt = 'A'.repeat(2048); // 2KB prompt
     const template = '';
 
@@ -39,7 +49,7 @@ describe('Unit: calculateSpawnSize()', () => {
     // Base: 4000 + Tools: 9*200=1800 + Prompt: 2048 + Template: 0 = 7848
     assert.equal(result.toolCount, 9);
     assert.equal(result.totalBytes, 4000 + 1800 + 2048 + 0);
-    assert.equal(result.totalKB, Math.round(7848 / 1024 * 10) / 10);
+    assert.equal(result.totalKB, Math.round((7848 / 1024) * 10) / 10);
     assert.deepEqual(result.breakdown, {
       base: 4000,
       tools: 1800,
@@ -50,8 +60,21 @@ describe('Unit: calculateSpawnSize()', () => {
 
   it('calculates medium spawn (15 tools, 5KB prompt) correctly', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task', 'TaskUpdate',
-      'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill', 'WebSearch', 'WebFetch'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'Task',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+      'WebSearch',
+      'WebFetch',
     ];
     const prompt = 'B'.repeat(5120); // 5KB prompt
     const template = '';
@@ -61,20 +84,37 @@ describe('Unit: calculateSpawnSize()', () => {
     // Base: 4000 + Tools: 15*200=3000 + Prompt: 5120 + Template: 0 = 12120
     assert.equal(result.toolCount, 15);
     assert.equal(result.totalBytes, 4000 + 3000 + 5120 + 0);
-    assert.equal(result.totalKB, Math.round(12120 / 1024 * 10) / 10);
+    assert.equal(result.totalKB, Math.round((12120 / 1024) * 10) / 10);
   });
 
   it('calculates large spawn (26 tools, 10KB prompt) correctly', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task', 'TaskUpdate',
-      'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill',
-      'mcp__chrome-devtools__list_pages', 'mcp__chrome-devtools__select_page',
-      'mcp__chrome-devtools__new_page', 'mcp__chrome-devtools__close_page',
-      'mcp__chrome-devtools__navigate_page', 'mcp__chrome-devtools__take_snapshot',
-      'mcp__chrome-devtools__take_screenshot', 'mcp__chrome-devtools__click',
-      'mcp__chrome-devtools__fill', 'mcp__chrome-devtools__fill_form',
-      'mcp__chrome-devtools__hover', 'mcp__chrome-devtools__drag',
-      'mcp__chrome-devtools__press_key'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'Task',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+      'mcp__chrome-devtools__list_pages',
+      'mcp__chrome-devtools__select_page',
+      'mcp__chrome-devtools__new_page',
+      'mcp__chrome-devtools__close_page',
+      'mcp__chrome-devtools__navigate_page',
+      'mcp__chrome-devtools__take_snapshot',
+      'mcp__chrome-devtools__take_screenshot',
+      'mcp__chrome-devtools__click',
+      'mcp__chrome-devtools__fill',
+      'mcp__chrome-devtools__fill_form',
+      'mcp__chrome-devtools__hover',
+      'mcp__chrome-devtools__drag',
+      'mcp__chrome-devtools__press_key',
     ];
     const prompt = 'C'.repeat(10240); // 10KB prompt
     const template = '';
@@ -89,14 +129,32 @@ describe('Unit: calculateSpawnSize()', () => {
 
   it('calculates researcher actual tools (26 tools, 15KB prompt) → ~30 KB', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task', 'TaskUpdate',
-      'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill', 'WebSearch', 'WebFetch',
-      'mcp__chrome-devtools__list_pages', 'mcp__chrome-devtools__select_page',
-      'mcp__chrome-devtools__new_page', 'mcp__chrome-devtools__take_snapshot',
-      'mcp__chrome-devtools__take_screenshot', 'mcp__chrome-devtools__click',
-      'mcp__chrome-devtools__fill', 'mcp__chrome-devtools__navigate_page',
-      'mcp__chrome-devtools__evaluate_script', 'mcp__Exa__web_search_exa',
-      'mcp__Exa__get_code_context_exa'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'Task',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+      'WebSearch',
+      'WebFetch',
+      'mcp__chrome-devtools__list_pages',
+      'mcp__chrome-devtools__select_page',
+      'mcp__chrome-devtools__new_page',
+      'mcp__chrome-devtools__take_snapshot',
+      'mcp__chrome-devtools__take_screenshot',
+      'mcp__chrome-devtools__click',
+      'mcp__chrome-devtools__fill',
+      'mcp__chrome-devtools__navigate_page',
+      'mcp__chrome-devtools__evaluate_script',
+      'mcp__Exa__web_search_exa',
+      'mcp__Exa__get_code_context_exa',
     ];
     const prompt = 'D'.repeat(15360); // 15KB prompt
     const template = '';
@@ -105,7 +163,10 @@ describe('Unit: calculateSpawnSize()', () => {
 
     // Base: 4000 + Tools: 26*200=5200 + Prompt: 15360 = 24560 (~24 KB)
     assert.equal(result.toolCount, 26);
-    assert.ok(result.totalKB >= 23 && result.totalKB <= 25, `Expected ~24 KB, got ${result.totalKB}`);
+    assert.ok(
+      result.totalKB >= 23 && result.totalKB <= 25,
+      `Expected ~24 KB, got ${result.totalKB}`
+    );
   });
 
   it('handles empty tools array → 4 KB base only', () => {
@@ -117,7 +178,7 @@ describe('Unit: calculateSpawnSize()', () => {
 
     assert.equal(result.toolCount, 0);
     assert.equal(result.totalBytes, 4000);
-    assert.equal(result.totalKB, Math.round(4000 / 1024 * 10) / 10);
+    assert.equal(result.totalKB, Math.round((4000 / 1024) * 10) / 10);
   });
 
   it('handles very long prompt (20KB) correctly', () => {
@@ -146,9 +207,13 @@ describe('Unit: calculateSpawnSize()', () => {
 
   it('handles mixed tool types (core + MCP) correctly', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Skill',
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Skill',
       'mcp__chrome-devtools__click',
-      'mcp__Exa__web_search_exa'
+      'mcp__Exa__web_search_exa',
     ];
     const prompt = 'Test';
     const template = 'Template content';
@@ -286,7 +351,9 @@ describe('Unit: validateSpawnSize()', () => {
 describe('Unit: generatePruningSuggestions()', () => {
   it('detects chrome-devtools tools (8 tools)', () => {
     const tools = [
-      'Read', 'Write', 'Edit',
+      'Read',
+      'Write',
+      'Edit',
       'mcp__chrome-devtools__list_pages',
       'mcp__chrome-devtools__select_page',
       'mcp__chrome-devtools__new_page',
@@ -306,7 +373,8 @@ describe('Unit: generatePruningSuggestions()', () => {
 
   it('detects claude-in-chrome tools (7 tools)', () => {
     const tools = [
-      'Read', 'Write',
+      'Read',
+      'Write',
       'mcp__claude-in-chrome__navigate',
       'mcp__claude-in-chrome__read_page',
       'mcp__claude-in-chrome__find',
@@ -354,8 +422,17 @@ describe('Unit: generatePruningSuggestions()', () => {
 
   it('detects MCP tools (WebSearch, WebFetch, Exa tools)', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill',
-      'WebSearch', 'WebFetch',
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
+      'WebSearch',
+      'WebFetch',
       'mcp__Exa__web_search_exa',
       'mcp__Exa__get_code_context_exa',
     ];
@@ -363,15 +440,31 @@ describe('Unit: generatePruningSuggestions()', () => {
     const result = generatePruningSuggestions(tools);
 
     assert.ok(result.suggestions.length > 0);
-    assert.ok(result.suggestions.some(s =>
-      s.includes('WebSearch') || s.includes('WebFetch') || s.includes('Exa') || s.includes('optional')
-    ));
+    assert.ok(
+      result.suggestions.some(
+        s =>
+          s.includes('WebSearch') ||
+          s.includes('WebFetch') ||
+          s.includes('Exa') ||
+          s.includes('optional')
+      )
+    );
   });
 
   it('calculates MCP tool savings (~0.4-0.6 KB per tool)', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill',
-      'WebSearch', 'WebFetch', 'NotebookEdit',
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
+      'WebSearch',
+      'WebFetch',
+      'NotebookEdit',
     ];
 
     const result = generatePruningSuggestions(tools);
@@ -383,8 +476,17 @@ describe('Unit: generatePruningSuggestions()', () => {
 
   it('suggests split first for chrome removal, then MCP when both present', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill',
-      'WebSearch', 'WebFetch',
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
+      'WebSearch',
+      'WebFetch',
       'mcp__chrome-devtools__click',
       'mcp__chrome-devtools__fill',
     ];
@@ -398,15 +500,22 @@ describe('Unit: generatePruningSuggestions()', () => {
   });
 
   it('no suggestions needed for <10 KB spawn with core tools only', () => {
-    const tools = ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'];
+    const tools = [
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
+    ];
 
     const result = generatePruningSuggestions(tools);
 
     // Minimal tool list with only core tools should have no suggestions
-    assert.ok(
-      result.suggestions.length === 0 ||
-      result.estimatedSavings === '0 KB'
-    );
+    assert.ok(result.suggestions.length === 0 || result.estimatedSavings === '0 KB');
   });
 
   it('suggests split for >20 tools', () => {
@@ -414,14 +523,24 @@ describe('Unit: generatePruningSuggestions()', () => {
 
     const result = generatePruningSuggestions(tools);
 
-    assert.ok(result.suggestions.some(s =>
-      s.includes('split') || s.includes('multi-agent') || s.includes('two agents')
-    ));
+    assert.ok(
+      result.suggestions.some(
+        s => s.includes('split') || s.includes('multi-agent') || s.includes('two agents')
+      )
+    );
   });
 
   it('example includes recommended core tools list', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill',
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
       'mcp__chrome-devtools__click',
     ];
 
@@ -451,14 +570,32 @@ describe('Integration: Hook behavior', () => {
 
   it('hook blocks researcher spawn (26 tools) with pruning suggestions in block mode', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task', 'TaskUpdate',
-      'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill', 'WebSearch', 'WebFetch',
-      'mcp__chrome-devtools__list_pages', 'mcp__chrome-devtools__select_page',
-      'mcp__chrome-devtools__new_page', 'mcp__chrome-devtools__take_snapshot',
-      'mcp__chrome-devtools__take_screenshot', 'mcp__chrome-devtools__click',
-      'mcp__chrome-devtools__fill', 'mcp__chrome-devtools__navigate_page',
-      'mcp__chrome-devtools__evaluate_script', 'mcp__Exa__web_search_exa',
-      'mcp__Exa__get_code_context_exa'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'Task',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+      'WebSearch',
+      'WebFetch',
+      'mcp__chrome-devtools__list_pages',
+      'mcp__chrome-devtools__select_page',
+      'mcp__chrome-devtools__new_page',
+      'mcp__chrome-devtools__take_snapshot',
+      'mcp__chrome-devtools__take_screenshot',
+      'mcp__chrome-devtools__click',
+      'mcp__chrome-devtools__fill',
+      'mcp__chrome-devtools__navigate_page',
+      'mcp__chrome-devtools__evaluate_script',
+      'mcp__Exa__web_search_exa',
+      'mcp__Exa__get_code_context_exa',
     ];
     const prompt = 'Research task prompt'.repeat(100); // Long prompt
 
@@ -476,8 +613,21 @@ describe('Integration: Hook behavior', () => {
 
   it('hook warns developer spawn (15 tools, 18 KB estimated)', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task', 'TaskUpdate',
-      'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill', 'WebSearch', 'WebFetch'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'Task',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+      'WebSearch',
+      'WebFetch',
     ];
     const prompt = 'D'.repeat(10000); // ~10 KB prompt
 
@@ -490,7 +640,17 @@ describe('Integration: Hook behavior', () => {
   });
 
   it('hook passes minimal spawn (9 tools, 8 KB)', () => {
-    const tools = ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'];
+    const tools = [
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
+    ];
     const prompt = 'Short prompt';
 
     const sizeInfo = calculateSpawnSize(tools, prompt, '');
@@ -663,14 +823,32 @@ describe('Edge Cases & Boundary Tests', () => {
 describe('Regression Tests - Specific Scenarios', () => {
   it('Researcher (26 tools, 15 KB prompt) → ~30 KB, BLOCK', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task', 'TaskUpdate',
-      'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill', 'WebSearch', 'WebFetch',
-      'mcp__chrome-devtools__list_pages', 'mcp__chrome-devtools__select_page',
-      'mcp__chrome-devtools__new_page', 'mcp__chrome-devtools__take_snapshot',
-      'mcp__chrome-devtools__take_screenshot', 'mcp__chrome-devtools__click',
-      'mcp__chrome-devtools__fill', 'mcp__chrome-devtools__navigate_page',
-      'mcp__chrome-devtools__evaluate_script', 'mcp__Exa__web_search_exa',
-      'mcp__Exa__get_code_context_exa'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'Task',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+      'WebSearch',
+      'WebFetch',
+      'mcp__chrome-devtools__list_pages',
+      'mcp__chrome-devtools__select_page',
+      'mcp__chrome-devtools__new_page',
+      'mcp__chrome-devtools__take_snapshot',
+      'mcp__chrome-devtools__take_screenshot',
+      'mcp__chrome-devtools__click',
+      'mcp__chrome-devtools__fill',
+      'mcp__chrome-devtools__navigate_page',
+      'mcp__chrome-devtools__evaluate_script',
+      'mcp__Exa__web_search_exa',
+      'mcp__Exa__get_code_context_exa',
     ];
     const prompt = 'R'.repeat(15360); // 15 KB
 
@@ -697,8 +875,18 @@ describe('Regression Tests - Specific Scenarios', () => {
 
   it('Planner (12 tools, 8 KB prompt) → ~10 KB, PASS', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-      'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
     ];
     const prompt = 'P'.repeat(8192); // 8 KB
 
@@ -712,8 +900,21 @@ describe('Regression Tests - Specific Scenarios', () => {
 
   it('Security-architect (15 tools, 12 KB prompt) → ~17 KB, WARN', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'Task', 'TaskUpdate',
-      'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput', 'Skill', 'WebSearch', 'WebFetch'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'Task',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'TaskOutput',
+      'Skill',
+      'WebSearch',
+      'WebFetch',
     ];
     const prompt = 'S'.repeat(12288); // 12 KB
 
@@ -727,8 +928,16 @@ describe('Regression Tests - Specific Scenarios', () => {
 
   it('QA (10 tools, 6 KB prompt) → ~8 KB, PASS', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-      'TaskUpdate', 'TaskList', 'TaskCreate', 'Skill'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'Skill',
     ];
     const prompt = 'Q'.repeat(6144); // 6 KB
 
@@ -742,10 +951,21 @@ describe('Regression Tests - Specific Scenarios', () => {
 
   it('Developer with browser tools - warns appropriately', () => {
     const tools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'TaskUpdate', 'TaskList',
-      'TaskCreate', 'TaskGet', 'Skill',
-      'mcp__chrome-devtools__click', 'mcp__chrome-devtools__fill',
-      'mcp__chrome-devtools__navigate_page', 'mcp__chrome-devtools__take_screenshot'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
+      'mcp__chrome-devtools__click',
+      'mcp__chrome-devtools__fill',
+      'mcp__chrome-devtools__navigate_page',
+      'mcp__chrome-devtools__take_screenshot',
     ];
     const prompt = 'Test prompt';
 
@@ -842,25 +1062,31 @@ describe('Smoke Tests - End-to-End', () => {
     assert.ok(result.message.includes('KB'), 'Message should include size in KB');
     assert.ok(result.message.includes('tools'), 'Message should include tool count');
     assert.ok(
-      result.message.includes('SPAWN_SIZE_VALIDATOR') ||
-      result.message.includes('threshold'),
+      result.message.includes('SPAWN_SIZE_VALIDATOR') || result.message.includes('threshold'),
       'Message should include mitigation steps'
     );
   });
 
   it('pruning suggestions include actionable items', () => {
     const tools = [
-      'Read', 'Write', 'Edit',
-      'mcp__chrome-devtools__click', 'mcp__chrome-devtools__fill',
-      'WebSearch', 'WebFetch'
+      'Read',
+      'Write',
+      'Edit',
+      'mcp__chrome-devtools__click',
+      'mcp__chrome-devtools__fill',
+      'WebSearch',
+      'WebFetch',
     ];
 
     const pruning = generatePruningSuggestions(tools);
 
     // Check suggestions are actionable
-    assert.ok(pruning.suggestions.every(s =>
-      s.includes('Remove') || s.includes('Consider') || s.includes('Save')
-    ), 'All suggestions should be actionable');
+    assert.ok(
+      pruning.suggestions.every(
+        s => s.includes('Remove') || s.includes('Consider') || s.includes('Save')
+      ),
+      'All suggestions should be actionable'
+    );
 
     // Check savings are included
     assert.ok(pruning.estimatedSavings.includes('KB'));

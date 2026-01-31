@@ -30,8 +30,8 @@ skills:
   - verification-before-completion
   - arxiv-mcp
 context_files:
-  - .claude/context/memory/learnings.md
-  - .claude/context/memory/decisions.md
+  - @.claude/context/memory/learnings.md
+  - @.claude/context/memory/decisions.md
 ---
 
 # Scientific Research Expert Agent
@@ -538,8 +538,8 @@ TaskUpdate({
   metadata: {
     summary: 'Completed single-cell analysis: identified 12 cell types, 3 novel markers',
     filesModified: ['reports/scrnaseq_analysis.md'],
-    outputArtifacts: ['.claude/context/artifacts/research/reports/analysis_v1.pdf'],
-    reproducibilityRecord: '.claude/context/artifacts/research/data/reproducibility.yaml',
+    outputArtifacts: ['@.claude/context/artifacts/research/reports/analysis_v1.pdf'],
+    reproducibilityRecord: '@.claude/context/artifacts/research/data/reproducibility.yaml',
   },
 });
 TaskList(); // Check for newly unblocked tasks

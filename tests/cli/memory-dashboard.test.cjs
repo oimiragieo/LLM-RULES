@@ -13,7 +13,7 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('path');
-const { execSync } = require('child_process');
+// execSync not needed in tests
 
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 const CLI_PATH = path.join(PROJECT_ROOT, '.claude/tools/cli/memory-dashboard.cjs');
@@ -38,9 +38,18 @@ describe('Memory Dashboard CLI', () => {
     it('should export required functions', () => {
       const dashboard = require(CLI_PATH);
       assert.ok(typeof dashboard.parseTokenUsage === 'function', 'should export parseTokenUsage');
-      assert.ok(typeof dashboard.parseCompressionStats === 'function', 'should export parseCompressionStats');
-      assert.ok(typeof dashboard.parseCompressionTriggers === 'function', 'should export parseCompressionTriggers');
-      assert.ok(typeof dashboard.aggregatePerAgent === 'function', 'should export aggregatePerAgent');
+      assert.ok(
+        typeof dashboard.parseCompressionStats === 'function',
+        'should export parseCompressionStats'
+      );
+      assert.ok(
+        typeof dashboard.parseCompressionTriggers === 'function',
+        'should export parseCompressionTriggers'
+      );
+      assert.ok(
+        typeof dashboard.aggregatePerAgent === 'function',
+        'should export aggregatePerAgent'
+      );
       assert.ok(typeof dashboard.renderDashboard === 'function', 'should export renderDashboard');
       assert.ok(typeof dashboard.main === 'function', 'should export main function');
     });
@@ -50,11 +59,33 @@ describe('Memory Dashboard CLI', () => {
     it('should parse token-usage.jsonl correctly', () => {
       const tokenUsageLog = path.join(TEST_DIR, 'token-usage.jsonl');
       const entries = [
-        { timestamp: '2026-01-30T10:00:00.000Z', eventType: 'spawn', agentId: 'researcher', tokens: 5000, reason: 'Agent spawn' },
-        { timestamp: '2026-01-30T10:05:00.000Z', eventType: 'tool_result', agentId: 'researcher', tokens: 10000, reason: 'Read 10KB file' },
-        { timestamp: '2026-01-30T10:10:00.000Z', eventType: 'spawn', agentId: 'developer', tokens: 3000, reason: 'Agent spawn' }
+        {
+          timestamp: '2026-01-30T10:00:00.000Z',
+          eventType: 'spawn',
+          agentId: 'researcher',
+          tokens: 5000,
+          reason: 'Agent spawn',
+        },
+        {
+          timestamp: '2026-01-30T10:05:00.000Z',
+          eventType: 'tool_result',
+          agentId: 'researcher',
+          tokens: 10000,
+          reason: 'Read 10KB file',
+        },
+        {
+          timestamp: '2026-01-30T10:10:00.000Z',
+          eventType: 'spawn',
+          agentId: 'developer',
+          tokens: 3000,
+          reason: 'Agent spawn',
+        },
       ];
-      fs.writeFileSync(tokenUsageLog, entries.map(e => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+      fs.writeFileSync(
+        tokenUsageLog,
+        entries.map(e => JSON.stringify(e)).join('\n') + '\n',
+        'utf8'
+      );
 
       const dashboard = require(CLI_PATH);
       const result = dashboard.parseTokenUsage(tokenUsageLog);
@@ -68,10 +99,26 @@ describe('Memory Dashboard CLI', () => {
     it('should parse compression-stats.jsonl correctly', () => {
       const compressionStatsLog = path.join(TEST_DIR, 'compression-stats.jsonl');
       const entries = [
-        { timestamp: '2026-01-30T10:15:00.000Z', reason: 'Budget > 90%', urgency: 'high', bytesFreed: 35420, success: true },
-        { timestamp: '2026-01-30T10:30:00.000Z', reason: 'Read > 10KB', urgency: 'medium', bytesFreed: 15000, success: true }
+        {
+          timestamp: '2026-01-30T10:15:00.000Z',
+          reason: 'Budget > 90%',
+          urgency: 'high',
+          bytesFreed: 35420,
+          success: true,
+        },
+        {
+          timestamp: '2026-01-30T10:30:00.000Z',
+          reason: 'Read > 10KB',
+          urgency: 'medium',
+          bytesFreed: 15000,
+          success: true,
+        },
       ];
-      fs.writeFileSync(compressionStatsLog, entries.map(e => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+      fs.writeFileSync(
+        compressionStatsLog,
+        entries.map(e => JSON.stringify(e)).join('\n') + '\n',
+        'utf8'
+      );
 
       const dashboard = require(CLI_PATH);
       const result = dashboard.parseCompressionStats(compressionStatsLog);
@@ -84,10 +131,28 @@ describe('Memory Dashboard CLI', () => {
     it('should parse compression-triggers.jsonl correctly', () => {
       const compressionTriggersLog = path.join(TEST_DIR, 'compression-triggers.jsonl');
       const entries = [
-        { timestamp: '2026-01-30T10:00:00.000Z', taskId: 'task-1', agentId: 'researcher', trigger: 'Read > 10KB (15KB)', urgency: 'medium', phase: 2 },
-        { timestamp: '2026-01-30T10:20:00.000Z', taskId: 'task-2', agentId: 'developer', trigger: 'Budget > 90% (91.0%)', urgency: 'high', phase: 2 }
+        {
+          timestamp: '2026-01-30T10:00:00.000Z',
+          taskId: 'task-1',
+          agentId: 'researcher',
+          trigger: 'Read > 10KB (15KB)',
+          urgency: 'medium',
+          phase: 2,
+        },
+        {
+          timestamp: '2026-01-30T10:20:00.000Z',
+          taskId: 'task-2',
+          agentId: 'developer',
+          trigger: 'Budget > 90% (91.0%)',
+          urgency: 'high',
+          phase: 2,
+        },
       ];
-      fs.writeFileSync(compressionTriggersLog, entries.map(e => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+      fs.writeFileSync(
+        compressionTriggersLog,
+        entries.map(e => JSON.stringify(e)).join('\n') + '\n',
+        'utf8'
+      );
 
       const dashboard = require(CLI_PATH);
       const result = dashboard.parseCompressionTriggers(compressionTriggersLog);
@@ -121,7 +186,7 @@ describe('Memory Dashboard CLI', () => {
         { agentId: 'researcher', tokens: 5000 },
         { agentId: 'researcher', tokens: 10000 },
         { agentId: 'developer', tokens: 3000 },
-        { agentId: 'developer', tokens: 2000 }
+        { agentId: 'developer', tokens: 2000 },
       ];
 
       const dashboard = require(CLI_PATH);
@@ -136,33 +201,43 @@ describe('Memory Dashboard CLI', () => {
     it('should calculate compression count per agent', () => {
       const tokenEvents = [
         { agentId: 'researcher', tokens: 5000 },
-        { agentId: 'researcher', tokens: 10000 }
+        { agentId: 'researcher', tokens: 10000 },
       ];
-      const compressionEvents = [
-        { timestamp: '2026-01-30T10:00:00.000Z', reason: 'Budget > 90%', success: true }
+      const _compressionEvents = [
+        { timestamp: '2026-01-30T10:00:00.000Z', reason: 'Budget > 90%', success: true },
       ];
       const compressionTriggers = [
         { agentId: 'researcher', urgency: 'high' },
-        { agentId: 'researcher', urgency: 'medium' }
+        { agentId: 'researcher', urgency: 'medium' },
       ];
 
       const dashboard = require(CLI_PATH);
       const result = dashboard.aggregatePerAgent(tokenEvents, compressionTriggers);
 
-      assert.equal(result.researcher.compressionCount, 2, 'should count compressions for researcher');
+      assert.equal(
+        result.researcher.compressionCount,
+        2,
+        'should count compressions for researcher'
+      );
     });
 
     it('should calculate budget percentage', () => {
       const tokenEvents = [
         { agentId: 'researcher', tokens: 95000 }, // 47.5% of 200K budget
-        { agentId: 'developer', tokens: 42000 }  // 21% of 200K budget
+        { agentId: 'developer', tokens: 42000 }, // 21% of 200K budget
       ];
 
       const dashboard = require(CLI_PATH);
       const result = dashboard.aggregatePerAgent(tokenEvents);
 
-      assert.ok(result.researcher.budgetPercent >= 47 && result.researcher.budgetPercent <= 48, 'researcher ~47.5%');
-      assert.ok(result.developer.budgetPercent >= 21 && result.developer.budgetPercent <= 22, 'developer ~21%');
+      assert.ok(
+        result.researcher.budgetPercent >= 47 && result.researcher.budgetPercent <= 48,
+        'researcher ~47.5%'
+      );
+      assert.ok(
+        result.developer.budgetPercent >= 21 && result.developer.budgetPercent <= 22,
+        'developer ~21%'
+      );
     });
   });
 
@@ -172,7 +247,7 @@ describe('Memory Dashboard CLI', () => {
         activeAgents: 3,
         avgTokenUsage: 45000,
         totalCompressions: 2,
-        status: 'HEALTHY'
+        status: 'HEALTHY',
       };
 
       const dashboard = require(CLI_PATH);
@@ -187,8 +262,20 @@ describe('Memory Dashboard CLI', () => {
 
     it('should render per-agent breakdown', () => {
       const agentStats = {
-        researcher: { totalTokens: 95000, budget: 200000, budgetPercent: 47.5, compressionCount: 2, status: 'WARNING' },
-        developer: { totalTokens: 42000, budget: 200000, budgetPercent: 21.0, compressionCount: 0, status: 'OK' }
+        researcher: {
+          totalTokens: 95000,
+          budget: 200000,
+          budgetPercent: 47.5,
+          compressionCount: 2,
+          status: 'WARNING',
+        },
+        developer: {
+          totalTokens: 42000,
+          budget: 200000,
+          budgetPercent: 21.0,
+          compressionCount: 0,
+          status: 'OK',
+        },
       };
 
       const dashboard = require(CLI_PATH);
@@ -206,7 +293,11 @@ describe('Memory Dashboard CLI', () => {
     it('should render compression timeline', () => {
       const compressionEvents = [
         { timestamp: '2026-01-30T14:35:00.000Z', reason: 'Budget > 90%', bytesFreed: 45000 },
-        { timestamp: '2026-01-30T12:10:00.000Z', reason: 'Read > 10KB (10.5KB)', bytesFreed: 10500 }
+        {
+          timestamp: '2026-01-30T12:10:00.000Z',
+          reason: 'Read > 10KB (10.5KB)',
+          bytesFreed: 10500,
+        },
       ];
 
       const dashboard = require(CLI_PATH);
@@ -219,7 +310,7 @@ describe('Memory Dashboard CLI', () => {
 
     it('should render alerts section', () => {
       const agentStats = {
-        researcher: { totalTokens: 95000, budget: 200000, budgetPercent: 47.5, status: 'WARNING' }
+        researcher: { totalTokens: 95000, budget: 200000, budgetPercent: 47.5, status: 'WARNING' },
       };
 
       const dashboard = require(CLI_PATH);
@@ -234,7 +325,13 @@ describe('Memory Dashboard CLI', () => {
       const output = dashboard.renderDashboard({ activeAgents: 1 });
 
       // Check for Unicode box characters
-      assert.ok(output.includes('╔') || output.includes('║') || output.includes('─') || output.includes('├'), 'should use Unicode box characters');
+      assert.ok(
+        output.includes('╔') ||
+          output.includes('║') ||
+          output.includes('─') ||
+          output.includes('├'),
+        'should use Unicode box characters'
+      );
     });
   });
 
@@ -252,7 +349,7 @@ describe('Memory Dashboard CLI', () => {
     it('should support --agent filter', () => {
       const agentStats = {
         researcher: { totalTokens: 95000 },
-        developer: { totalTokens: 42000 }
+        developer: { totalTokens: 42000 },
       };
 
       const dashboard = require(CLI_PATH);
@@ -265,7 +362,7 @@ describe('Memory Dashboard CLI', () => {
     it('should support --period filter', () => {
       const tokenEvents = [
         { timestamp: '2026-01-30T10:00:00.000Z', agentId: 'researcher', tokens: 5000 },
-        { timestamp: '2026-01-23T10:00:00.000Z', agentId: 'researcher', tokens: 3000 } // 7 days ago
+        { timestamp: '2026-01-23T10:00:00.000Z', agentId: 'researcher', tokens: 3000 }, // 7 days ago
       ];
 
       const dashboard = require(CLI_PATH);
@@ -291,13 +388,17 @@ describe('Memory Dashboard CLI', () => {
     it('should run full dashboard without errors', () => {
       // Create minimal test data
       const tokenUsageLog = path.join(TEST_DIR, 'token-usage.jsonl');
-      fs.writeFileSync(tokenUsageLog, JSON.stringify({
-        timestamp: '2026-01-30T10:00:00.000Z',
-        eventType: 'spawn',
-        agentId: 'developer',
-        tokens: 3000,
-        reason: 'Agent spawn'
-      }) + '\n', 'utf8');
+      fs.writeFileSync(
+        tokenUsageLog,
+        JSON.stringify({
+          timestamp: '2026-01-30T10:00:00.000Z',
+          eventType: 'spawn',
+          agentId: 'developer',
+          tokens: 3000,
+          reason: 'Agent spawn',
+        }) + '\n',
+        'utf8'
+      );
 
       const dashboard = require(CLI_PATH);
       const output = dashboard.main({ contextDir: TEST_DIR });

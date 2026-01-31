@@ -6,6 +6,9 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep]
+# Phase 1 Integration: Template tools validated against .claude/config/tool-manifest.json
+# Templates should reference tools from the manifest for consistency
+# Single source of truth: .claude/config/tool-manifest.json
 assigned_agents: []
 best_practices:
   - Include all required fields with placeholders
@@ -300,12 +303,127 @@ Use when {{use case}}.
 grep "<template-name>" .claude/templates/README.md || echo "ERROR: README NOT UPDATED - BLOCKING!"
 ```
 
-### Step 8: System Impact Analysis (MANDATORY)
+### Step 8: Post-Creation Template Registration (Phase 1 Integration)
+
+**This step is CRITICAL.** After creating the template artifact, you MUST register it in the template discovery system.
+
+**Phase 1 Context:** Phase 1 is responsible for discovering and cataloging templates for reuse. Templates created without registration are invisible to other creators and will never be used to standardize new artifacts.
+
+After template file is written and validated:
+
+1. **Create/Update Template Registry Entry** in appropriate location:
+
+   If registry doesn't exist, create `.claude/context/artifacts/template-registry.json`:
+
+   ```json
+   {
+     "templates": [
+       {
+         "name": "{template-name}",
+         "id": "{template-name}",
+         "type": "{agent|skill|workflow|hook|code|schema}",
+         "category": "{subcategory if applicable}",
+         "description": "{What this template is for}",
+         "version": "1.0.0",
+         "location": ".claude/templates/{category}/{template-name}.md",
+         "placeholders": ["{PLACEHOLDER_1}", "{PLACEHOLDER_2}"],
+         "usageScenarios": ["{Scenario 1}", "{Scenario 2}"]
+       }
+     ]
+   }
+   ```
+
+2. **Document Placeholders with Usage Guide:**
+
+   For each placeholder in the template, ensure documentation exists:
+
+   ```markdown
+   ## Template Placeholders
+
+   | Placeholder       | Description  | Format   | Example   |
+   | ----------------- | ------------ | -------- | --------- |
+   | {{PLACEHOLDER_1}} | What this is | {format} | {example} |
+   | {{PLACEHOLDER_2}} | What this is | {format} | {example} |
+   ```
+
+3. **Register in `.claude/templates/README.md`:**
+
+   Add comprehensive entry to the templates catalog:
+
+   ```markdown
+   ### {Template Type} Templates (`{directory}/`)
+
+   Use when {describe use case}.
+
+   **File:** `.claude/templates/{directory}/{template-name}.md`
+
+   **Placeholders:**
+
+   - {{PLACEHOLDER_1}}: {Description}
+   - {{PLACEHOLDER_2}}: {Description}
+
+   **Usage:**
+
+   1. Copy template to `{target-path}`
+   2. Replace all `{{PLACEHOLDER_*}}` values with actual values
+   3. Validate with: `grep "{{" {file} && echo "ERROR: Unresolved placeholders!"`
+
+   **Related Templates:**
+
+   - {Related template 1}
+   - {Related template 2}
+
+   **Assigned for use by:**
+
+   - {Creator skill 1}
+   - {Creator skill 2}
+   ```
+
+4. **Update Consumer Skills/Creators:**
+
+   If this template is meant to be used by specific creators, add reference:
+   - In agent-creator.md: Add to Step 2 (Agent Definition)
+   - In skill-creator.md: Add to Step 2 (Skill Definition)
+   - In hook-creator.md: Add to Step 3 (Hook Template)
+   - In workflow-creator.md: Add to Step 4 (Workflow Definition)
+
+   Example:
+
+   ```markdown
+   **Available Templates:**
+
+   - See `.claude/templates/{category}/{template-name}.md` for standardized {type} template
+   ```
+
+5. **Update Memory:**
+
+   Append to `.claude/context/memory/learnings.md`:
+
+   ```markdown
+   ## Template: {template-name}
+
+   - **Type:** {agent|skill|workflow|hook|code|schema}
+   - **Purpose:** {What this template standardizes}
+   - **Placeholders:** {List key placeholders}
+   - **Discovery Path:** {How users find it}
+   - **Related Templates:** {Any related templates}
+   ```
+
+**Why this matters:** Without template registration:
+
+- Other creators cannot discover available templates
+- Artifacts are created inconsistently instead of using standards
+- System loses visibility into template network
+- "Invisible artifact" pattern emerges
+
+**Phase 1 Integration:** Template registry is the discovery mechanism for Phase 1, enabling creators and agents to discover standardized patterns and ensure consistent artifact creation.
+
+### Step 9: System Impact Analysis (MANDATORY)
 
 After creating a template:
 
 1. **README Update (BLOCKING)**
-   - Add to .claude/templates/README.md
+   - Add to .claude/templates/README.md (Step 8 covers this)
    - Document template purpose and placeholders
 
 2. **Related Templates**
@@ -314,7 +432,8 @@ After creating a template:
 
 3. **Consumer Documentation**
    - Document which skills/agents should use this template
-   - Add to relevant creator skill if applicable
+   - Update relevant creator skill with template reference
+   - Update CLAUDE.md Section 8.5 if template is user-invocable
 
 **BLOCKING**: Template without README entry may not be discovered.
 
@@ -323,10 +442,11 @@ After creating a template:
 ```
 [TEMPLATE-CREATOR] System Impact Analysis for: <template-name>
 
-1. README UPDATE (MANDATORY)
+1. README UPDATE (MANDATORY - Step 8)
    - Added to .claude/templates/README.md
    - Usage instructions documented
    - Quick Reference table updated
+   - Template registry entry created
 
 2. RELATED TEMPLATES CHECK
    - Does this template supersede an existing one?
@@ -335,7 +455,7 @@ After creating a template:
 
 3. CONSUMER DOCUMENTATION
    - Which skills/agents should use this template?
-   - Is template added to relevant creator skill?
+   - Is template reference added to relevant creator skill?
    - Is CLAUDE.md Section 8.5 update needed?
 
 4. MEMORY UPDATE
