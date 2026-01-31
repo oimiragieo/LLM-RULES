@@ -186,7 +186,10 @@ function parseSessionInsightsFromMarkdown(content) {
   const normalizeSection = headerLine => {
     const h = headerLine.toLowerCase();
     if (/(^|\b)(tasks?|completed)(\b|$)/.test(h)) return 'tasks';
-    if (/(^|\b)(discover|found|learned)(\b|$)/.test(h)) return 'discoveries';
+    // Avoid overly-broad matches like "Patterns Found".
+    if (/(^|\b)(discover|discoveries|learning|learnings|insights)(\b|$)/.test(h)) {
+      return 'discoveries';
+    }
     if (/(^|\b)(files?|modified|changed)(\b|$)/.test(h)) return 'files';
     if (/(^|\b)(patterns?|solutions?|approaches)(\b|$)/.test(h)) return 'patterns';
     if (/(^|\b)(gotchas?|pitfalls?|warnings?|cautions)(\b|$)/.test(h)) return 'gotchas';
