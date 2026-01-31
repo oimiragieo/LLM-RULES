@@ -22,6 +22,7 @@ const fs = require('fs');
 // Test framework
 let passed = 0;
 let failed = 0;
+const pending = [];
 
 function describe(name, fn) {
   console.log(`\n${name}`);
@@ -30,7 +31,24 @@ function describe(name, fn) {
 
 function it(name, fn) {
   try {
-    fn();
+    const result = fn();
+    if (result && typeof result.then === 'function') {
+      pending.push(
+        result.then(
+          () => {
+            console.log(`  [PASS] ${name}`);
+            passed++;
+          },
+          err => {
+            console.log(`  [FAIL] ${name}`);
+            console.log(`         ${err.message}`);
+            failed++;
+          }
+        )
+      );
+      return;
+    }
+
     console.log(`  [PASS] ${name}`);
     passed++;
   } catch (err) {
@@ -396,6 +414,222 @@ describe('unified-reflection-handler.cjs', () => {
         tasksCompleted: 10,
       });
     });
+
+    it('should gather session insights from active_context.md (fallback)', () => {
+      const activeContextPath = path.join(
+        __dirname,
+        '../..',
+        '.claude',
+        'context',
+        'memory',
+        'active_context.md'
+      );
+
+      const original = fs.existsSync(activeContextPath)
+        ? fs.readFileSync(activeContextPath, 'utf8')
+        : null;
+
+      try {
+        fs.mkdirSync(path.dirname(activeContextPath), { recursive: true });
+        fs.writeFileSync(
+          activeContextPath,
+          [
+            'Session summary line.',
+            '',
+            '## Tasks Completed',
+            '- Did A',
+            '',
+            '## Patterns',
+            '- Use Zod schemas',
+            '',
+            '## Gotchas',
+            '- Watch out for Windows path casing',
+          ].join('\n'),
+          'utf8'
+        );
+
+        const result = hook.handleSessionEnd({ event: 'SessionEnd', session_id: 'session-xyz' });
+        assertEqual(result.sessionData.summary, 'Session summary line.');
+        assertDeepEqual(result.sessionData.tasks_completed, ['Did A']);
+        assertDeepEqual(result.sessionData.patterns_found, ['Use Zod schemas']);
+        assertDeepEqual(result.sessionData.gotchas_encountered, [
+          'Watch out for Windows path casing',
+        ]);
+      } finally {
+        if (original === null) {
+          try {
+            fs.unlinkSync(activeContextPath);
+          } catch (_e) {
+            // ignore
+          }
+        } else {
+          fs.writeFileSync(activeContextPath, original, 'utf8');
+        }
+      }
+    });
+  });
+
+  describe('Session Saving', () => {
+    const projectRoot = path.join(__dirname, '../..');
+    const memoryDir = path.join(projectRoot, '.claude', 'context', 'memory');
+    const sessionsDir = path.join(memoryDir, 'sessions');
+    const mtmDir = path.join(memoryDir, 'mtm');
+    const activeContextPath = path.join(memoryDir, 'active_context.md');
+
+    function listSessionFilesSafe() {
+      if (!fs.existsSync(sessionsDir)) return [];
+      return fs
+        .readdirSync(sessionsDir)
+        .filter(f => /^session_\d{3}\.json$/.test(f))
+        .sort();
+    }
+
+    function listMtmFilesSafe() {
+      if (!fs.existsSync(mtmDir)) return [];
+      return fs
+        .readdirSync(mtmDir)
+        .filter(f => /^session_.*\.json$/.test(f))
+        .sort();
+    }
+
+    it('should gather session insights from structured hook input (preferred)', () => {
+      const insights = hook.gatherSessionInsights({
+        summary: 'Structured summary',
+        tasks_completed: ['T1'],
+        patterns_found: ['P1'],
+        gotchas_encountered: ['G1'],
+        next_steps: ['N1'],
+      });
+
+      assertEqual(insights.summary, 'Structured summary');
+      assertDeepEqual(insights.tasks_completed, ['T1']);
+      assertDeepEqual(insights.patterns_found, ['P1']);
+      assertDeepEqual(insights.gotchas_encountered, ['G1']);
+      assertDeepEqual(insights.next_steps, ['N1']);
+    });
+
+    it('should extract tasks_completed from markdown', () => {
+      const parsed = hook.parseSessionInsightsFromMarkdown(
+        ['Summary.', '', '## Tasks Completed', '- A', '- B'].join('\n')
+      );
+      assertDeepEqual(parsed.tasks_completed, ['A', 'B']);
+    });
+
+    it('should extract patterns_found from markdown', () => {
+      const parsed = hook.parseSessionInsightsFromMarkdown(
+        ['Summary.', '', '## Patterns Found', '- Use foo', '- Use bar'].join('\n')
+      );
+      assertDeepEqual(parsed.patterns_found, ['Use foo', 'Use bar']);
+    });
+
+    it('should extract gotchas_encountered from markdown', () => {
+      const parsed = hook.parseSessionInsightsFromMarkdown(
+        ['Summary.', '', '## Gotchas', '- Avoid baz'].join('\n')
+      );
+      assertDeepEqual(parsed.gotchas_encountered, ['Avoid baz']);
+    });
+
+    it('should handle missing active_context.md gracefully', () => {
+      const originalExists = fs.existsSync(activeContextPath);
+      const backupPath = `${activeContextPath}.bak-test`;
+
+      try {
+        if (originalExists) {
+          fs.renameSync(activeContextPath, backupPath);
+        }
+
+        const insights = hook.gatherSessionInsights();
+        assertEqual(insights.summary, 'Session ended');
+        assertDeepEqual(insights.tasks_completed, []);
+      } finally {
+        if (fs.existsSync(backupPath)) {
+          fs.renameSync(backupPath, activeContextPath);
+        }
+      }
+    });
+
+    it('should handle empty active_context.md gracefully', () => {
+      const original = fs.existsSync(activeContextPath)
+        ? fs.readFileSync(activeContextPath, 'utf8')
+        : null;
+
+      try {
+        fs.mkdirSync(path.dirname(activeContextPath), { recursive: true });
+        fs.writeFileSync(activeContextPath, '', 'utf8');
+
+        const insights = hook.gatherSessionInsights();
+        assertEqual(insights.summary, 'Session ended');
+        assertDeepEqual(insights.tasks_completed, []);
+        assertDeepEqual(insights.patterns_found, []);
+        assertDeepEqual(insights.gotchas_encountered, []);
+      } finally {
+        if (original === null) {
+          try {
+            fs.unlinkSync(activeContextPath);
+          } catch (_e) {
+            // ignore
+          }
+        } else {
+          fs.writeFileSync(activeContextPath, original, 'utf8');
+        }
+      }
+    });
+
+    it('should create a session file when recordSession called', () => {
+      fs.mkdirSync(sessionsDir, { recursive: true });
+      fs.mkdirSync(mtmDir, { recursive: true });
+
+      const beforeSessions = new Set(listSessionFilesSafe());
+      const beforeMtm = new Set(listMtmFilesSafe());
+
+      // Avoid triggering pruning/summarization in real memory dirs.
+      if (beforeSessions.size >= 50 || beforeMtm.size >= 10) {
+        console.log(
+          '  [SKIP] recordSession persistence assertions (existing memory dirs near capacity)'
+        );
+        return;
+      }
+
+      const sessionData = {
+        session_id: `test-session-${Date.now()}`,
+        summary: 'Test session persistence',
+        tasks_completed: ['T1'],
+        files_modified: [],
+        discoveries: [],
+        patterns_found: [],
+        gotchas_encountered: [],
+        decisions_made: [],
+        next_steps: [],
+        timestamp: new Date().toISOString(),
+      };
+
+      hook.recordSession(sessionData);
+
+      const afterSessions = new Set(listSessionFilesSafe());
+      const afterMtm = new Set(listMtmFilesSafe());
+
+      const newSessions = [...afterSessions].filter(f => !beforeSessions.has(f));
+      assert(newSessions.length >= 1, 'Expected new sessions/session_XXX.json file');
+
+      const newMtm = [...afterMtm].filter(f => !beforeMtm.has(f));
+      assert(newMtm.length >= 1, 'Expected new mtm/session_TIMESTAMP.json file');
+
+      // Cleanup only files created by this test.
+      for (const f of newSessions) {
+        try {
+          fs.unlinkSync(path.join(sessionsDir, f));
+        } catch (_e) {
+          // ignore
+        }
+      }
+      for (const f of newMtm) {
+        try {
+          fs.unlinkSync(path.join(mtmDir, f));
+        } catch (_e) {
+          // ignore
+        }
+      }
+    });
   });
 
   describe('handleMemoryExtraction()', () => {
@@ -613,28 +847,30 @@ describe('unified-reflection-handler.cjs', () => {
 // RUN TESTS
 // ============================================================
 
-console.log('\n========================================');
-console.log(`RESULTS: ${passed} passed, ${failed} failed`);
-console.log('========================================\n');
+Promise.allSettled(pending).then(() => {
+  console.log('\n========================================');
+  console.log(`RESULTS: ${passed} passed, ${failed} failed`);
+  console.log('========================================\n');
 
-// Cleanup
-cleanupTestQueue();
-try {
-  hook.QUEUE_FILE = originalQueueFile;
-} catch (_e) {
-  // Ignore
-}
+  // Cleanup
+  cleanupTestQueue();
+  try {
+    hook.QUEUE_FILE = originalQueueFile;
+  } catch (_e) {
+    // Ignore
+  }
 
-// Restore env
-if (origReflectionEnabled !== undefined) {
-  process.env.REFLECTION_ENABLED = origReflectionEnabled;
-} else {
-  delete process.env.REFLECTION_ENABLED;
-}
-if (origReflectionMode !== undefined) {
-  process.env.REFLECTION_HOOK_MODE = origReflectionMode;
-} else {
-  delete process.env.REFLECTION_HOOK_MODE;
-}
+  // Restore env
+  if (origReflectionEnabled !== undefined) {
+    process.env.REFLECTION_ENABLED = origReflectionEnabled;
+  } else {
+    delete process.env.REFLECTION_ENABLED;
+  }
+  if (origReflectionMode !== undefined) {
+    process.env.REFLECTION_HOOK_MODE = origReflectionMode;
+  } else {
+    delete process.env.REFLECTION_HOOK_MODE;
+  }
 
-process.exit(failed > 0 ? 1 : 0);
+  process.exit(failed > 0 ? 1 : 0);
+});

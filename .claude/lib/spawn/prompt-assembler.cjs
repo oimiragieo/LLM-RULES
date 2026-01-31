@@ -354,6 +354,14 @@ Skill({ skill: 'tdd' });        // Invoke TDD workflow
 Skill({ skill: 'debugging' });  // Invoke debugging skill
 \`\`\`
 
+### Fast Search Defaults (Use These First)
+- Prefer ripgrep: \`rg -n "needle" path/\`
+- List files quickly: \`rg --files\` (instead of slow directory walks)
+- When you need AST-aware search/refactors, prefer hybrid search:
+  \`node .claude/tools/cli/index-codebase.cjs search "query"\`
+  (uses semantic index + structural refinement via ast-grep when available)
+- For change awareness: \`git status --porcelain\` and \`git diff\`
+
 ### Finding Capabilities
 For a full skill list: Read .claude/context/artifacts/skill-catalog.md
 For skill search: Look for skills matching your task domain

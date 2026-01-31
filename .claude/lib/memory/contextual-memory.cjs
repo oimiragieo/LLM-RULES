@@ -155,10 +155,96 @@ class ContextualMemory {
         source: 'chromadb',
       }));
     } catch {
-      // Fallback: keyword search via grep (not implemented yet)
-      // For now, re-throw error
-      throw new Error('Semantic search failed');
+      // Fallback: lightweight keyword search over key memory artifacts.
+      return await this._keywordSearch(query, { limit });
     }
+  }
+
+  /**
+   * Keyword search fallback for when semantic search is unavailable.
+   *
+   * This intentionally stays simple and fast (bounded reads and file set),
+   * returning results shaped similarly to semantic results.
+   *
+   * @private
+   * @param {string} query
+   * @param {object} options
+   * @param {number} options.limit
+   * @returns {Promise<Array>}
+   */
+  async _keywordSearch(query, options = {}) {
+    const limit = typeof options.limit === 'number' ? options.limit : 5;
+    const q = String(query || '')
+      .trim()
+      .toLowerCase();
+    if (!q) return [];
+
+    const candidates = [];
+
+    // Keep file set explicit to avoid scanning large directories.
+    const files = [
+      'learnings.md',
+      'decisions.md',
+      'issues.md',
+      'active_context.md',
+      'gotchas.json',
+      'patterns.json',
+      'codebase_map.json',
+    ];
+
+    // Include some recent sessions and MTM entries (bounded).
+    for (const dir of ['sessions', 'mtm']) {
+      const absDir = path.join(this.config.memoryDir, dir);
+      try {
+        if (!fs.existsSync(absDir)) continue;
+        const names = fs
+          .readdirSync(absDir)
+          .filter(n => n.endsWith('.json'))
+          .sort()
+          .slice(-10);
+        for (const n of names) files.push(path.join(dir, n));
+      } catch {
+        // ignore
+      }
+    }
+
+    // Read up to the last N bytes to keep the search cheap.
+    const MAX_BYTES = 80_000;
+
+    for (const rel of files) {
+      const abs = path.join(this.config.memoryDir, rel);
+      try {
+        if (!fs.existsSync(abs)) continue;
+        const stat = fs.statSync(abs);
+        const start = stat.size > MAX_BYTES ? stat.size - MAX_BYTES : 0;
+        const fd = fs.openSync(abs, 'r');
+        try {
+          const buf = Buffer.alloc(stat.size - start);
+          fs.readSync(fd, buf, 0, buf.length, start);
+          const text = buf.toString('utf8');
+          const lower = text.toLowerCase();
+          const idx = lower.indexOf(q);
+          if (idx === -1) continue;
+
+          const snippetStart = Math.max(0, idx - 100);
+          const snippetEnd = Math.min(text.length, idx + q.length + 300);
+          const snippet = text.slice(snippetStart, snippetEnd).trim();
+
+          candidates.push({
+            content: snippet,
+            metadata: { path: rel },
+            similarity: null,
+            source: 'keyword',
+          });
+        } finally {
+          fs.closeSync(fd);
+        }
+      } catch {
+        // ignore unreadable file
+      }
+    }
+
+    return candidates.slice(0, limit);
   }
 
   /**

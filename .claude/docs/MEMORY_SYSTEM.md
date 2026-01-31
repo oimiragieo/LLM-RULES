@@ -260,6 +260,12 @@ The `unified-reflection-handler.cjs` hook automatically captures session insight
 
 Memory context is automatically injected into agent spawn prompts via `prompt-assembler.cjs`.
 
+**Integration point**:
+
+- Injection is applied at runtime by the PreToolUse(Task) hook: `.claude/hooks/routing/spawn-prompt-assembler.cjs`
+- This avoids relying on the Router agent (a prompt file) to manually call the assembler.
+- Semantic matches are enabled by default; set `SPAWN_PROMPT_SEMANTIC_MEMORY=off` to disable.
+
 **What's injected**:
 
 - Recent gotchas

@@ -6,7 +6,7 @@
 
 'use strict';
 
-const { ContextualMemory } = require('./contextual-memory.cjs');
+const memoryManager = require('./memory-manager.cjs');
 
 async function main() {
   const query = process.argv.slice(2).join(' ').trim();
@@ -17,8 +17,7 @@ async function main() {
   }
 
   try {
-    const memory = new ContextualMemory();
-    const results = await memory.search(query, { limit: 10 });
+    const results = await memoryManager.searchMemory(query, { limit: 10, threshold: 0.75 });
 
     console.log(`Found ${results.length} results for: "${query}"\n`);
 
@@ -34,8 +33,6 @@ async function main() {
         console.log('(no content)\n');
       }
     }
-
-    memory.close();
   } catch (err) {
     console.error('Search failed:', err.message);
     process.exit(1);
@@ -47,4 +44,3 @@ if (require.main === module) {
 }
 
 module.exports = { main };
-

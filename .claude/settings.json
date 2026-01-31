@@ -107,6 +107,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/spawn-prompt-assembler.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/safety/spawn-prompt-validator.cjs"
           },
           {

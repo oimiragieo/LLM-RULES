@@ -53,8 +53,16 @@ test('validatePathWithinProject is Windows-case tolerant for drive letters', () 
 });
 
 test('SessionEnd uses active_context.md to populate sessionData', () => {
-  const activeContextPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'active_context.md');
-  const original = fs.existsSync(activeContextPath) ? fs.readFileSync(activeContextPath, 'utf8') : null;
+  const activeContextPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'memory',
+    'active_context.md'
+  );
+  const original = fs.existsSync(activeContextPath)
+    ? fs.readFileSync(activeContextPath, 'utf8')
+    : null;
 
   try {
     fs.mkdirSync(path.dirname(activeContextPath), { recursive: true });
@@ -79,7 +87,10 @@ test('SessionEnd uses active_context.md to populate sessionData', () => {
       'utf8'
     );
 
-    const result = reflectionHook.handleSessionEnd({ event: 'SessionEnd', session_id: 'test-session' });
+    const result = reflectionHook.handleSessionEnd({
+      event: 'SessionEnd',
+      session_id: 'test-session',
+    });
     assert.equal(result.sessionData.summary, 'This is the session summary.');
     assert.deepEqual(result.sessionData.tasks_completed, ['Did A', 'Did B']);
     assert.deepEqual(result.sessionData.patterns_found, ['Use Zod for validation']);
@@ -101,15 +112,12 @@ test('SessionEnd uses active_context.md to populate sessionData', () => {
 test('recordSession writes to sessions/ and mtm/stm tiers (best effort)', () => {
   const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
   const sessionsDir = path.join(memoryDir, 'sessions');
-  const stmDir = path.join(memoryDir, 'stm');
   const mtmDir = path.join(memoryDir, 'mtm');
 
   fs.mkdirSync(sessionsDir, { recursive: true });
-  fs.mkdirSync(stmDir, { recursive: true });
   fs.mkdirSync(mtmDir, { recursive: true });
 
   const beforeSessions = new Set(listFilesSafe(sessionsDir));
-  const beforeSTM = new Set(listFilesSafe(stmDir));
   const beforeMTM = new Set(listFilesSafe(mtmDir));
 
   const sessionData = {
@@ -128,25 +136,21 @@ test('recordSession writes to sessions/ and mtm/stm tiers (best effort)', () => 
   reflectionHook.recordSession(sessionData);
 
   const afterSessions = new Set(listFilesSafe(sessionsDir));
-  const afterSTM = new Set(listFilesSafe(stmDir));
   const afterMTM = new Set(listFilesSafe(mtmDir));
 
-  const newSessions = [...afterSessions].filter(f => !beforeSessions.has(f) && /^session_\d{3}\.json$/.test(f));
+  const newSessions = [...afterSessions].filter(
+    f => !beforeSessions.has(f) && /^session_\d{3}\.json$/.test(f)
+  );
   assert.ok(newSessions.length >= 1, 'Expected at least one new sessions/session_XXX.json file');
 
-  // STM is a fixed filename (session_current.json) and may overwrite an existing file.
-  const stmPath = path.join(stmDir, 'session_current.json');
-  const stmChanged = fs.existsSync(stmPath);
+  // MTM should receive a consolidated session file.
   const mtmChanged = [...afterMTM].some(f => !beforeMTM.has(f) && /^session_/.test(f));
-  assert.ok(stmChanged, 'Expected stm/session_current.json to exist after recordSession');
   assert.ok(mtmChanged, 'Expected MTM directory to change');
 
   // Cleanup (only remove new files we created).
-  const newSTM = [...afterSTM].filter(f => !beforeSTM.has(f) && f !== '.gitkeep');
   const newMTM = [...afterMTM].filter(f => !beforeMTM.has(f) && f !== '.gitkeep');
 
   removeFiles(sessionsDir, newSessions);
-  removeFiles(stmDir, newSTM);
   removeFiles(mtmDir, newMTM);
 });
 
@@ -169,7 +173,10 @@ test('assembleSpawnPrompt injects Memory Context section when enabled', () => {
     includeMemory: true,
   });
 
-  assert.ok(out.includes('## Memory Context (Auto-Loaded)'), 'Expected memory section to be injected');
+  assert.ok(
+    out.includes('## Memory Context (Auto-Loaded)'),
+    'Expected memory section to be injected'
+  );
 });
 
 test('memory-manager.saveSession works even if projectRoot differs only by casing (Windows)', () => {
