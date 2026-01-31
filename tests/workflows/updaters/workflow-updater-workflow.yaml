@@ -1,0 +1,367 @@
+# Workflow Updater Workflow
+#
+# EVOLVE workflow for updating existing workflows via safe modification.
+# Executable by WorkflowEngine at .claude/lib/workflow/workflow-engine.cjs
+#
+# Key differences from workflow-creator:
+# - Loads existing workflow state before modification
+# - Validates changes don't break workflow consumers
+# - Creates backup before modification
+# - Updates CLAUDE.md registration if needed
+
+name: workflow-updater-workflow
+description: Update existing workflows following the EVOLVE process with backup and validation
+version: 1.0.0
+artifact_type: workflow
+input_location: .claude/workflows/
+
+# Updater-specific configuration
+updater_config:
+  backup_enabled: true
+  backup_location: .claude/context/backups/workflows/
+  compatibility_check: true
+  registration_targets:
+    - '.claude/CLAUDE.md'
+    - '.claude/context/memory/learnings.md'
+  protected_phases:
+    - evaluate
+    - validate
+    - obtain
+    - lock
+    - verify
+    - enable
+
+phases:
+  evaluate:
+    description: Verify workflow exists and changes are justified
+    steps:
+      - id: check-evolution-state
+        action: function
+        handler: checkEvolutionState
+        description: Verify evolution state is idle or can accept new evolution
+      - id: load-existing-workflow
+        action: function
+        handler: loadExistingWorkflow
+        description: Load current workflow definition from file
+        inputs:
+          - workflow_name
+        outputs:
+          - workflow_path
+          - test_path
+          - current_content
+          - current_phases
+      - id: identify-changes
+        action: prompt
+        description: Gather what changes are needed
+        outputs:
+          - change_description
+          - change_type
+          - affected_phases
+      - id: validate-change-justification
+        action: function
+        handler: validateChangeJustification
+        description: Ensure changes are justified and documented
+        inputs:
+          - change_description
+          - change_type
+        outputs:
+          - justification_valid
+          - justification_reason
+      - id: update-state-evaluate
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to evaluating
+    gates:
+      - id: gate-evaluate-exists
+        condition: "steps['load-existing-workflow'].output.workflow_path !== null"
+        on_fail: abort
+        message: 'Workflow does not exist. Use workflow-creator-workflow to create new workflows.'
+      - id: gate-evaluate-justified
+        condition: "steps['validate-change-justification'].output.justification_valid === true"
+        on_fail: abort
+        message: 'Changes must be justified with clear rationale.'
+
+  validate:
+    description: Check changes don't break workflow structure
+    steps:
+      - id: check-phase-preservation
+        action: function
+        handler: checkPhasePreservation
+        description: Ensure EVOLVE phases are not being removed
+        inputs:
+          - affected_phases
+          - current_phases
+        outputs:
+          - phases_intact
+          - violations
+      - id: check-gate-preservation
+        action: function
+        handler: checkGatePreservation
+        description: Verify gates are not being removed without replacement
+        inputs:
+          - change_description
+          - current_content
+        outputs:
+          - gates_intact
+          - gate_changes
+      - id: check-trigger-impact
+        action: function
+        handler: checkTriggerImpact
+        description: Check if changes affect workflow triggers
+        inputs:
+          - change_description
+        outputs:
+          - triggers_affected
+          - trigger_changes
+      - id: update-state-validate
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to validating
+    gates:
+      - id: gate-validate-phases
+        condition: "steps['check-phase-preservation'].output.phases_intact === true"
+        on_fail: abort
+        message: 'Cannot remove EVOLVE phases (evaluate, validate, obtain, lock, verify, enable)'
+      - id: gate-validate-gates
+        condition: "steps['check-gate-preservation'].output.gates_intact === true"
+        on_fail: warn
+        message: 'Removing gates may weaken workflow validation. Review carefully.'
+
+  obtain:
+    description: Research best practices for the change type (optional)
+    optional: true
+    steps:
+      - id: analyze-change-patterns
+        action: function
+        handler: analyzeChangePatterns
+        description: Look at similar changes in other workflows
+        inputs:
+          - change_type
+        outputs:
+          - pattern_analysis
+          - recommendations
+      - id: review-existing-tests
+        action: function
+        handler: reviewExistingTests
+        description: Review existing test cases for the workflow
+        inputs:
+          - test_path
+        outputs:
+          - test_coverage
+          - uncovered_areas
+      - id: update-state-obtain
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to obtaining
+    gates:
+      - id: gate-obtain
+        condition: 'true'
+        on_fail: pass
+        message: 'Research phase is optional for updates'
+
+  lock:
+    description: Create backup and apply changes
+    steps:
+      - id: create-backup
+        action: function
+        handler: createBackup
+        description: Backup current workflow and test files before modification
+        inputs:
+          - workflow_path
+          - test_path
+        outputs:
+          - backup_id
+          - backup_paths
+      - id: apply-changes
+        action: function
+        handler: applyChanges
+        description: Apply the requested changes to workflow content
+        inputs:
+          - current_content
+          - change_description
+          - affected_phases
+        outputs:
+          - updated_content
+          - changes_applied
+      - id: write-updated-workflow
+        action: write
+        description: Write the updated workflow file
+        inputs:
+          - updated_content
+          - workflow_path
+        outputs:
+          - workflow_updated
+      - id: validate-yaml-syntax
+        action: function
+        handler: validateYamlSyntax
+        description: Validate YAML syntax after changes
+        inputs:
+          - workflow_path
+        outputs:
+          - yaml_valid
+          - yaml_errors
+      - id: update-tests-if-needed
+        action: function
+        handler: updateTestsIfNeeded
+        description: Update test file if workflow behavior changed
+        inputs:
+          - test_path
+          - change_description
+          - changes_applied
+        outputs:
+          - tests_updated
+      - id: update-state-lock
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to locking
+    gates:
+      - id: gate-lock-backup
+        condition: "steps['create-backup'].output.backup_id !== null"
+        on_fail: abort
+        message: 'Backup must be created before modification'
+      - id: gate-lock-write
+        condition: "steps['write-updated-workflow'].output.workflow_updated === true"
+        on_fail: retry
+        max_retries: 3
+        message: 'Failed to write updated workflow file'
+      - id: gate-lock-yaml
+        condition: "steps['validate-yaml-syntax'].output.yaml_valid === true"
+        on_fail: retry
+        max_retries: 3
+        message: 'YAML syntax validation failed after changes'
+
+  verify:
+    description: Run tests and validate structure
+    steps:
+      - id: run-tests
+        action: function
+        handler: runWorkflowTests
+        description: Execute the test file to verify workflow structure
+        inputs:
+          - test_path
+        outputs:
+          - tests_passed
+          - test_results
+          - failure_reason
+      - id: validate-phases
+        action: function
+        handler: validateWorkflowPhases
+        description: Verify all 6 EVOLVE phases are still present
+        inputs:
+          - workflow_path
+        outputs:
+          - all_phases_present
+          - missing_phases
+      - id: validate-gates
+        action: function
+        handler: validateWorkflowGates
+        description: Verify each phase has at least one gate
+        inputs:
+          - workflow_path
+        outputs:
+          - gates_valid
+          - missing_gates
+      - id: update-state-verify
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to verifying
+    gates:
+      - id: gate-verify-tests
+        condition: "steps['run-tests'].output.tests_passed === true"
+        on_fail: return_to_lock
+        message: 'Tests failed after update. Fix workflow.'
+      - id: gate-verify-phases
+        condition: "steps['validate-phases'].output.all_phases_present === true"
+        on_fail: return_to_lock
+        message: 'Workflow must have all 6 EVOLVE phases'
+      - id: gate-verify-gates
+        condition: "steps['validate-gates'].output.gates_valid === true"
+        on_fail: return_to_lock
+        message: 'Each phase must have at least one gate'
+
+  enable:
+    description: Update registrations and record changes
+    steps:
+      - id: update-claude-md-if-needed
+        action: function
+        handler: updateClaudeMdIfNeeded
+        description: Update CLAUDE.md if workflow description changed
+        inputs:
+          - workflow_name
+          - change_description
+        outputs:
+          - claude_md_updated
+      - id: update-memory
+        action: function
+        handler: updateMemory
+        description: Record workflow update in learnings.md
+        inputs:
+          - workflow_name
+          - change_description
+          - changes_applied
+        outputs:
+          - memory_updated
+      - id: cleanup-backup-on-success
+        action: function
+        handler: cleanupBackupOnSuccess
+        description: Optionally clean up backup after successful update
+        inputs:
+          - backup_id
+        outputs:
+          - backup_cleaned
+      - id: update-state-enable
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to idle with completed evolution
+        inputs:
+          - workflow_name
+          - change_description
+      - id: verify-registration
+        action: function
+        handler: verifyRegistration
+        description: Verify workflow is still properly registered
+        inputs:
+          - workflow_name
+        outputs:
+          - verification_passed
+    gates:
+      - id: gate-enable-verify
+        condition: "steps['verify-registration'].output.verification_passed === true"
+        on_fail: retry
+        max_retries: 2
+        message: 'Workflow registration verification failed after update'
+
+# Rollback/compensate actions for each phase
+compensate:
+  lock:
+    - action: restore_backup
+      target: backup_id
+      description: Restore workflow and test files from backup
+  enable:
+    - action: revert_claude_md
+      target: '.claude/CLAUDE.md'
+      description: Revert CLAUDE.md changes if made
+    - action: revert_memory
+      target: '.claude/context/memory/learnings.md'
+      description: Remove update entry from learnings
+
+# Iron Laws for workflow updates
+iron_laws:
+  - id: no-update-without-backup
+    rule: 'Every update MUST create a backup first'
+    enforcement: gate-lock-backup
+  - id: no-removal-of-evolve-phases
+    rule: 'Cannot remove EVOLVE phases'
+    enforcement: gate-validate-phases
+  - id: no-update-without-justification
+    rule: 'Changes must be justified with clear rationale'
+    enforcement: gate-evaluate-justified
+  - id: yaml-must-remain-valid
+    rule: 'YAML syntax must remain valid after update'
+    enforcement: gate-lock-yaml
+  - id: tests-must-pass
+    rule: 'All tests must pass after update'
+    enforcement: gate-verify-tests
+  - id: maintain-gate-coverage
+    rule: 'Each phase must have at least one gate'
+    enforcement: gate-verify-gates

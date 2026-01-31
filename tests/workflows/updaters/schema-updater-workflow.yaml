@@ -1,0 +1,375 @@
+# Schema Updater Workflow
+#
+# EVOLVE workflow for updating existing JSON schemas via safe modification.
+# Executable by WorkflowEngine at .claude/lib/workflow/workflow-engine.cjs
+#
+# Key differences from schema-creator:
+# - Loads existing schema state before modification
+# - Validates changes don't break schema consumers
+# - Creates backup before modification
+# - Validates changes maintain backwards compatibility
+
+name: schema-updater-workflow
+description: Update existing JSON schemas following the EVOLVE process with backup and validation
+version: 1.0.0
+artifact_type: schema
+input_location: .claude/schemas/
+
+# Updater-specific configuration
+updater_config:
+  backup_enabled: true
+  backup_location: .claude/context/backups/schemas/
+  compatibility_check: true
+  registration_targets:
+    - '.claude/schemas/index.json'
+    - '.claude/context/memory/learnings.md'
+  protected_fields:
+    - '$schema'
+    - '$id'
+    - 'type'
+
+phases:
+  evaluate:
+    description: Verify schema exists and changes are justified
+    steps:
+      - id: check-evolution-state
+        action: function
+        handler: checkEvolutionState
+        description: Verify evolution state is idle or can accept new evolution
+      - id: load-existing-schema
+        action: function
+        handler: loadExistingSchema
+        description: Load current schema definition from file
+        inputs:
+          - schema_name
+        outputs:
+          - schema_path
+          - current_content
+          - current_properties
+      - id: identify-changes
+        action: prompt
+        description: Gather what changes are needed
+        outputs:
+          - change_description
+          - change_type
+          - affected_properties
+      - id: validate-change-justification
+        action: function
+        handler: validateChangeJustification
+        description: Ensure changes are justified and documented
+        inputs:
+          - change_description
+          - change_type
+        outputs:
+          - justification_valid
+          - justification_reason
+      - id: update-state-evaluate
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to evaluating
+    gates:
+      - id: gate-evaluate-exists
+        condition: "steps['load-existing-schema'].output.schema_path !== null"
+        on_fail: abort
+        message: 'Schema does not exist. Use schema-creator-workflow to create new schemas.'
+      - id: gate-evaluate-justified
+        condition: "steps['validate-change-justification'].output.justification_valid === true"
+        on_fail: abort
+        message: 'Changes must be justified with clear rationale.'
+
+  validate:
+    description: Check changes maintain backwards compatibility
+    steps:
+      - id: check-protected-fields
+        action: function
+        handler: checkProtectedFields
+        description: Ensure protected fields are not being removed
+        inputs:
+          - affected_properties
+          - current_content
+        outputs:
+          - protected_intact
+          - violations
+      - id: check-backwards-compatibility
+        action: function
+        handler: checkBackwardsCompatibility
+        description: Verify changes don't break existing valid documents
+        inputs:
+          - change_description
+          - current_properties
+          - affected_properties
+        outputs:
+          - backwards_compatible
+          - breaking_changes
+      - id: check-required-changes
+        action: function
+        handler: checkRequiredChanges
+        description: Check if required fields are being added/removed
+        inputs:
+          - change_description
+          - current_content
+        outputs:
+          - required_changed
+          - required_changes
+      - id: update-state-validate
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to validating
+    gates:
+      - id: gate-validate-protected
+        condition: "steps['check-protected-fields'].output.protected_intact === true"
+        on_fail: abort
+        message: 'Cannot remove protected fields ($schema, $id, type)'
+      - id: gate-validate-compatibility
+        condition: "steps['check-backwards-compatibility'].output.backwards_compatible === true"
+        on_fail: warn
+        message: 'Breaking changes detected. Ensure all consumers are updated.'
+      - id: gate-validate-required
+        condition: "steps['check-required-changes'].output.required_changed === false"
+        on_fail: warn
+        message: 'Adding required fields may break existing documents.'
+
+  obtain:
+    description: Research best practices for the change type (optional)
+    optional: true
+    steps:
+      - id: analyze-change-patterns
+        action: function
+        handler: analyzeChangePatterns
+        description: Look at similar changes in other schemas
+        inputs:
+          - change_type
+        outputs:
+          - pattern_analysis
+          - recommendations
+      - id: identify-consumers
+        action: function
+        handler: identifyConsumers
+        description: Find all files that reference this schema
+        inputs:
+          - schema_name
+        outputs:
+          - consumer_files
+          - consumer_count
+      - id: update-state-obtain
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to obtaining
+    gates:
+      - id: gate-obtain
+        condition: 'true'
+        on_fail: pass
+        message: 'Research phase is optional for updates'
+
+  lock:
+    description: Create backup and apply changes
+    steps:
+      - id: create-backup
+        action: function
+        handler: createBackup
+        description: Backup current schema file before modification
+        inputs:
+          - schema_path
+        outputs:
+          - backup_id
+          - backup_path
+      - id: apply-changes
+        action: function
+        handler: applyChanges
+        description: Apply the requested changes to schema content
+        inputs:
+          - current_content
+          - change_description
+          - affected_properties
+        outputs:
+          - updated_content
+          - changes_applied
+      - id: write-updated-schema
+        action: write
+        description: Write the updated schema file
+        inputs:
+          - updated_content
+          - schema_path
+        outputs:
+          - schema_updated
+      - id: validate-json-syntax
+        action: function
+        handler: validateJsonSyntax
+        description: Validate JSON syntax after changes
+        inputs:
+          - schema_path
+        outputs:
+          - json_valid
+          - json_errors
+      - id: validate-schema-structure
+        action: function
+        handler: validateSchemaStructure
+        description: Validate schema follows JSON Schema specification
+        inputs:
+          - schema_path
+        outputs:
+          - structure_valid
+          - structure_errors
+      - id: update-state-lock
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to locking
+    gates:
+      - id: gate-lock-backup
+        condition: "steps['create-backup'].output.backup_id !== null"
+        on_fail: abort
+        message: 'Backup must be created before modification'
+      - id: gate-lock-write
+        condition: "steps['write-updated-schema'].output.schema_updated === true"
+        on_fail: retry
+        max_retries: 3
+        message: 'Failed to write updated schema file'
+      - id: gate-lock-json
+        condition: "steps['validate-json-syntax'].output.json_valid === true"
+        on_fail: retry
+        max_retries: 3
+        message: 'JSON syntax validation failed after changes'
+      - id: gate-lock-structure
+        condition: "steps['validate-schema-structure'].output.structure_valid === true"
+        on_fail: retry
+        max_retries: 3
+        message: 'Schema structure validation failed after changes'
+
+  verify:
+    description: Validate schema against test data
+    steps:
+      - id: validate-required-fields
+        action: function
+        handler: validateRequiredFields
+        description: Verify all required JSON Schema fields are still present
+        inputs:
+          - schema_path
+        outputs:
+          - fields_present
+          - missing_fields
+      - id: test-with-existing-documents
+        action: function
+        handler: testWithExistingDocuments
+        description: Test updated schema validates existing conforming documents
+        inputs:
+          - schema_path
+          - consumer_files
+        outputs:
+          - existing_valid
+          - validation_errors
+      - id: test-schema-validation
+        action: function
+        handler: testSchemaValidation
+        description: Test schema with new valid and invalid sample data
+        inputs:
+          - schema_path
+        outputs:
+          - validation_tests_passed
+          - test_results
+      - id: update-state-verify
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to verifying
+    gates:
+      - id: gate-verify-fields
+        condition: "steps['validate-required-fields'].output.fields_present === true"
+        on_fail: return_to_lock
+        message: 'Required JSON Schema fields missing after update'
+      - id: gate-verify-existing
+        condition: "steps['test-with-existing-documents'].output.existing_valid === true"
+        on_fail: return_to_lock
+        message: 'Updated schema breaks existing conforming documents'
+      - id: gate-verify-tests
+        condition: "steps['test-schema-validation'].output.validation_tests_passed === true"
+        on_fail: return_to_lock
+        message: 'Schema validation tests failed after update'
+
+  enable:
+    description: Update registrations and record changes
+    steps:
+      - id: update-schema-index
+        action: function
+        handler: updateSchemaIndex
+        description: Update .claude/schemas/index.json if properties changed
+        inputs:
+          - schema_name
+          - change_description
+        outputs:
+          - index_updated
+      - id: update-memory
+        action: function
+        handler: updateMemory
+        description: Record schema update in learnings.md
+        inputs:
+          - schema_name
+          - change_description
+          - changes_applied
+        outputs:
+          - memory_updated
+      - id: cleanup-backup-on-success
+        action: function
+        handler: cleanupBackupOnSuccess
+        description: Optionally clean up backup after successful update
+        inputs:
+          - backup_id
+        outputs:
+          - backup_cleaned
+      - id: update-state-enable
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to idle with completed evolution
+        inputs:
+          - schema_name
+          - change_description
+      - id: verify-registration
+        action: function
+        handler: verifyRegistration
+        description: Verify schema is still valid and accessible
+        inputs:
+          - schema_name
+        outputs:
+          - verification_passed
+    gates:
+      - id: gate-enable-verify
+        condition: "steps['verify-registration'].output.verification_passed === true"
+        on_fail: retry
+        max_retries: 2
+        message: 'Schema registration verification failed after update'
+
+# Rollback/compensate actions for each phase
+compensate:
+  lock:
+    - action: restore_backup
+      target: backup_id
+      description: Restore schema file from backup
+  enable:
+    - action: revert_index
+      target: '.claude/schemas/index.json'
+      description: Revert index changes if made
+    - action: revert_memory
+      target: '.claude/context/memory/learnings.md'
+      description: Remove update entry from learnings
+
+# Iron Laws for schema updates
+iron_laws:
+  - id: no-update-without-backup
+    rule: 'Every update MUST create a backup first'
+    enforcement: gate-lock-backup
+  - id: no-removal-of-protected
+    rule: 'Cannot remove $schema, $id, or type fields'
+    enforcement: gate-validate-protected
+  - id: no-update-without-justification
+    rule: 'Changes must be justified with clear rationale'
+    enforcement: gate-evaluate-justified
+  - id: json-must-remain-valid
+    rule: 'JSON syntax must remain valid after update'
+    enforcement: gate-lock-json
+  - id: schema-must-remain-valid
+    rule: 'Schema structure must remain valid after update'
+    enforcement: gate-lock-structure
+  - id: backwards-compatibility-preferred
+    rule: 'Prefer backwards-compatible changes'
+    enforcement: gate-validate-compatibility
+  - id: existing-documents-must-validate
+    rule: 'Existing conforming documents must still validate'
+    enforcement: gate-verify-existing

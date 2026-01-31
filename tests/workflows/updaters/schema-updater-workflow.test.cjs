@@ -15,7 +15,7 @@ const {
   parseWorkflow,
   validateWorkflow,
   WorkflowEngine,
-} = require('../../.claude/lib/workflow/workflow-engine.cjs');
+} = require('../../../.claude/lib/workflow/workflow-engine.cjs');
 
 // =============================================================================
 // Test Framework

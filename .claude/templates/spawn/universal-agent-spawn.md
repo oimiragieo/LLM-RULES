@@ -207,6 +207,7 @@ See \`.claude/docs/SHELL-SECURITY-GUIDE.md\` for complete guide.
 
 ## Memory Protocol
 1) Read: .claude/context/memory/learnings.md (before starting)
+   NOTE: Recent memory context is auto-loaded above (gotchas, patterns, discoveries, sessions)
 2) Write: decisions/issues/learnings to appropriate memory files
 \`,
 });

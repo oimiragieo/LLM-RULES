@@ -102,6 +102,38 @@ Every `{{PLACEHOLDER}}` must have a corresponding comment explaining:
 
 ## Workflow
 
+### Step -1: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
+
+**BEFORE creating any template file, check if it already exists:**
+
+1. **Check if template already exists:**
+
+   ```bash
+   test -f .claude/templates/<template-name> && echo "EXISTS" || echo "NEW"
+   ```
+
+2. **If template EXISTS:**
+   - **DO NOT proceed with creation**
+   - **Invoke template-updater workflow instead:**
+
+     ```javascript
+     Skill({
+       skill: 'template-updater',
+       args: {
+         name: '<template-name>',
+         changes: '<description of requested changes>',
+         justification: 'Update requested via template-creator',
+       },
+     });
+     ```
+
+   - **Return updater result and STOP**
+
+3. **If template is NEW:**
+   - Continue with Step 0 below
+
+---
+
 ### Step 0: Load Related Skills (FIRST)
 
 Invoke related creator skills for context:

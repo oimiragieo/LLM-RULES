@@ -1,0 +1,355 @@
+# Agent Updater Workflow
+#
+# EVOLVE workflow for updating existing agents via safe modification.
+# Executable by WorkflowEngine at .claude/lib/workflow/workflow-engine.cjs
+#
+# Key differences from agent-creator:
+# - Loads existing agent state before modification
+# - Validates changes don't break compatibility
+# - Creates backup before modification
+# - Updates registrations if needed (routing keywords, etc.)
+
+name: agent-updater-workflow
+description: Update existing agents following the EVOLVE process with backup and validation
+version: 1.0.0
+artifact_type: agent
+input_location: .claude/agents/
+
+# Updater-specific configuration
+updater_config:
+  backup_enabled: true
+  backup_location: .claude/context/backups/agents/
+  compatibility_check: true
+  registration_targets:
+    - '.claude/CLAUDE.md'
+    - '.claude/hooks/routing/router-enforcer.cjs'
+    - '.claude/context/memory/learnings.md'
+  protected_sections:
+    - 'Task Progress Protocol'
+    - 'Memory Protocol'
+
+phases:
+  evaluate:
+    description: Verify agent exists and changes are justified
+    steps:
+      - id: check-evolution-state
+        action: function
+        handler: checkEvolutionState
+        description: Verify evolution state is idle or can accept new evolution
+      - id: load-existing-agent
+        action: function
+        handler: loadExistingAgent
+        description: Load current agent definition from file
+        inputs:
+          - agent_name
+        outputs:
+          - agent_path
+          - current_content
+          - current_metadata
+      - id: identify-changes
+        action: prompt
+        description: Gather what changes are needed
+        outputs:
+          - change_description
+          - change_type
+          - affected_sections
+      - id: validate-change-justification
+        action: function
+        handler: validateChangeJustification
+        description: Ensure changes are justified and documented
+        inputs:
+          - change_description
+          - change_type
+        outputs:
+          - justification_valid
+          - justification_reason
+      - id: update-state-evaluate
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to evaluating
+    gates:
+      - id: gate-evaluate-exists
+        condition: "steps['load-existing-agent'].output.agent_path !== null"
+        on_fail: abort
+        message: 'Agent does not exist. Use agent-creator-workflow to create new agents.'
+      - id: gate-evaluate-justified
+        condition: "steps['validate-change-justification'].output.justification_valid === true"
+        on_fail: abort
+        message: 'Changes must be justified with clear rationale.'
+
+  validate:
+    description: Check changes don't break compatibility
+    steps:
+      - id: check-protected-sections
+        action: function
+        handler: checkProtectedSections
+        description: Ensure protected sections are not being removed
+        inputs:
+          - affected_sections
+          - current_content
+        outputs:
+          - protected_intact
+          - violations
+      - id: check-routing-impact
+        action: function
+        handler: checkRoutingImpact
+        description: Determine if changes affect routing keywords
+        inputs:
+          - change_description
+          - current_metadata
+        outputs:
+          - routing_affected
+          - keyword_changes
+      - id: check-dependency-impact
+        action: function
+        handler: checkDependencyImpact
+        description: Check if other agents/skills depend on this agent
+        inputs:
+          - agent_name
+        outputs:
+          - dependencies_found
+          - affected_artifacts
+      - id: update-state-validate
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to validating
+    gates:
+      - id: gate-validate-protected
+        condition: "steps['check-protected-sections'].output.protected_intact === true"
+        on_fail: abort
+        message: 'Cannot remove protected sections (Task Progress Protocol, Memory Protocol)'
+      - id: gate-validate-dependencies
+        condition: "steps['check-dependency-impact'].output.dependencies_found === false || steps['check-dependency-impact'].output.affected_artifacts.length === 0"
+        on_fail: warn
+        message: 'Changes may affect dependent artifacts. Review dependencies.'
+
+  obtain:
+    description: Research best practices for the change type (optional)
+    optional: true
+    steps:
+      - id: analyze-change-patterns
+        action: function
+        handler: analyzeChangePatterns
+        description: Look at similar changes in other agents
+        inputs:
+          - change_type
+        outputs:
+          - pattern_analysis
+          - recommendations
+      - id: research-if-needed
+        action: prompt
+        description: Optional research for complex changes
+        optional: true
+        inputs:
+          - change_type
+        outputs:
+          - research_findings
+      - id: update-state-obtain
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to obtaining
+    gates:
+      - id: gate-obtain
+        condition: 'true'
+        on_fail: pass
+        message: 'Research phase is optional for updates'
+
+  lock:
+    description: Create backup and apply changes
+    steps:
+      - id: create-backup
+        action: function
+        handler: createBackup
+        description: Backup current agent file before modification
+        inputs:
+          - agent_path
+        outputs:
+          - backup_id
+          - backup_path
+      - id: apply-changes
+        action: function
+        handler: applyChanges
+        description: Apply the requested changes to agent content
+        inputs:
+          - current_content
+          - change_description
+          - affected_sections
+        outputs:
+          - updated_content
+          - changes_applied
+      - id: write-updated-agent
+        action: write
+        description: Write the updated agent file
+        inputs:
+          - updated_content
+          - agent_path
+        outputs:
+          - agent_updated
+      - id: update-routing-if-needed
+        action: function
+        handler: updateRoutingIfNeeded
+        description: Update router-enforcer.cjs if routing keywords changed
+        inputs:
+          - routing_affected
+          - keyword_changes
+          - agent_name
+        outputs:
+          - routing_updated
+      - id: update-state-lock
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to locking
+    gates:
+      - id: gate-lock-backup
+        condition: "steps['create-backup'].output.backup_id !== null"
+        on_fail: abort
+        message: 'Backup must be created before modification'
+      - id: gate-lock-write
+        condition: "steps['write-updated-agent'].output.agent_updated === true"
+        on_fail: retry
+        max_retries: 3
+        message: 'Failed to write updated agent file'
+
+  verify:
+    description: Validate updated agent meets quality standards
+    steps:
+      - id: validate-yaml-frontmatter
+        action: function
+        handler: validateYamlFrontmatter
+        description: Validate YAML frontmatter is still correct
+        inputs:
+          - agent_path
+        outputs:
+          - yaml_valid
+          - yaml_errors
+      - id: check-required-sections
+        action: function
+        handler: checkRequiredSections
+        description: Verify all required sections are present
+        inputs:
+          - agent_path
+        outputs:
+          - sections_complete
+          - missing_sections
+      - id: check-placeholders
+        action: function
+        handler: checkPlaceholders
+        description: Ensure no placeholder content remains
+        inputs:
+          - agent_path
+        outputs:
+          - no_placeholders
+          - placeholder_locations
+      - id: run-agent-tests
+        action: function
+        handler: runAgentTests
+        description: Run any agent-specific validation tests
+        inputs:
+          - agent_name
+        outputs:
+          - tests_passed
+          - test_results
+      - id: update-state-verify
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to verifying
+    gates:
+      - id: gate-verify-yaml
+        condition: "steps['validate-yaml-frontmatter'].output.yaml_valid === true"
+        on_fail: return_to_lock
+        message: 'YAML frontmatter validation failed'
+      - id: gate-verify-sections
+        condition: "steps['check-required-sections'].output.sections_complete === true"
+        on_fail: return_to_lock
+        message: 'Required sections missing after update'
+      - id: gate-verify-placeholders
+        condition: "steps['check-placeholders'].output.no_placeholders === true"
+        on_fail: return_to_lock
+        message: 'Placeholder content found after update'
+
+  enable:
+    description: Update registrations and record changes
+    steps:
+      - id: update-claude-md-if-needed
+        action: function
+        handler: updateClaudeMdIfNeeded
+        description: Update CLAUDE.md if agent description changed
+        inputs:
+          - agent_name
+          - change_description
+        outputs:
+          - claude_md_updated
+      - id: update-memory
+        action: function
+        handler: updateMemory
+        description: Record agent update in learnings.md
+        inputs:
+          - agent_name
+          - change_description
+          - changes_applied
+        outputs:
+          - memory_updated
+      - id: cleanup-backup-on-success
+        action: function
+        handler: cleanupBackupOnSuccess
+        description: Optionally clean up backup after successful update
+        inputs:
+          - backup_id
+        outputs:
+          - backup_cleaned
+      - id: update-state-enable
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to idle with completed evolution
+        inputs:
+          - agent_name
+          - change_description
+      - id: verify-registration
+        action: function
+        handler: verifyRegistration
+        description: Verify agent is still properly registered
+        inputs:
+          - agent_name
+        outputs:
+          - verification_passed
+    gates:
+      - id: gate-enable-verify
+        condition: "steps['verify-registration'].output.verification_passed === true"
+        on_fail: retry
+        max_retries: 2
+        message: 'Agent registration verification failed after update'
+
+# Rollback/compensate actions for each phase
+compensate:
+  lock:
+    - action: restore_backup
+      target: backup_id
+      description: Restore agent from backup
+    - action: revert_routing
+      target: '.claude/hooks/routing/router-enforcer.cjs'
+      description: Revert routing changes if made
+  enable:
+    - action: revert_claude_md
+      target: '.claude/CLAUDE.md'
+      description: Revert CLAUDE.md changes if made
+    - action: revert_memory
+      target: '.claude/context/memory/learnings.md'
+      description: Remove update entry from learnings
+
+# Iron Laws for agent updates
+iron_laws:
+  - id: no-update-without-backup
+    rule: 'Every update MUST create a backup first'
+    enforcement: gate-lock-backup
+  - id: no-removal-of-protected
+    rule: 'Cannot remove Task Progress Protocol or Memory Protocol sections'
+    enforcement: gate-validate-protected
+  - id: no-update-without-justification
+    rule: 'Changes must be justified with clear rationale'
+    enforcement: gate-evaluate-justified
+  - id: maintain-yaml-validity
+    rule: 'YAML frontmatter must remain valid after update'
+    enforcement: gate-verify-yaml
+  - id: maintain-required-sections
+    rule: 'All required sections must be present after update'
+    enforcement: gate-verify-sections

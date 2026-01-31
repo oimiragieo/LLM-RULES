@@ -103,10 +103,16 @@ function validatePathWithinProject(filePath, projectRoot = PROJECT_ROOT) {
   // Ensure resolved path is within project root
   // Use startsWith with separator to prevent prefix attacks
   // e.g., /project-root vs /project-root-evil
-  const pathWithSep = resolvedPath + path.sep;
-  const rootWithSep = normalizedRoot + path.sep;
+  // Windows paths are typically case-insensitive; compare accordingly to avoid false negatives.
+  const isWin = process.platform === 'win32';
+  const pathWithSep = (resolvedPath + path.sep).replace(/\\/g, '/');
+  const rootWithSep = (normalizedRoot + path.sep).replace(/\\/g, '/');
+  const pathCmp = isWin ? pathWithSep.toLowerCase() : pathWithSep;
+  const rootCmp = isWin ? rootWithSep.toLowerCase() : rootWithSep;
+  const resolvedCmp = isWin ? resolvedPath.toLowerCase() : resolvedPath;
+  const rootExactCmp = isWin ? normalizedRoot.toLowerCase() : normalizedRoot;
 
-  if (!pathWithSep.startsWith(rootWithSep) && resolvedPath !== normalizedRoot) {
+  if (!pathCmp.startsWith(rootCmp) && resolvedCmp !== rootExactCmp) {
     return {
       safe: false,
       reason: 'Path resolves outside project root',

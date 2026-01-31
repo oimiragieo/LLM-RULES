@@ -1267,6 +1267,29 @@ Examples:
   }
 }
 
+/**
+ * Search memory using ContextualMemory (semantic search).
+ * Falls back to an empty result set if ContextualMemory is unavailable.
+ *
+ * @param {string} query - Natural language query
+ * @param {object} [options] - Search options (passed through)
+ * @returns {Promise<Array>} Search results
+ */
+async function searchMemory(query, options = {}) {
+  try {
+    const { ContextualMemory } = require('./contextual-memory.cjs');
+    const memory = new ContextualMemory();
+    const results = await memory.search(query, options);
+    memory.close();
+    return results;
+  } catch (err) {
+    if (process.env.MEMORY_DEBUG) {
+      console.error('[MEMORY_DEBUG]', 'ContextualMemory search failed:', err.message);
+    }
+    return [];
+  }
+}
+
 module.exports = {
   getMemoryDir,
   getCurrentSessionNumber,
@@ -1280,6 +1303,7 @@ module.exports = {
   getMemoryHealth,
   checkAndArchiveLearnings,
   pruneCodebaseMap,
+  searchMemory,
   CONFIG,
   // Async functions (SEC-IMPL-001)
   readMemoryAsync,

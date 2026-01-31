@@ -60,6 +60,40 @@ grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md ROUTING TABLE NO
 
 ## Agent Creation Process
 
+### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
+
+**BEFORE creating any agent file, check if it already exists:**
+
+1. **Check if agent already exists:**
+
+   ```bash
+   test -f .claude/agents/<category>/<agent-name>.md && echo "EXISTS" || echo "NEW"
+   ```
+
+2. **If agent EXISTS:**
+   - **DO NOT proceed with creation**
+   - **Invoke agent-updater workflow instead:**
+
+     ```javascript
+     // Delegate to updater
+     Skill({
+       skill: 'agent-updater',
+       args: {
+         name: '<agent-name>',
+         changes: '<description of requested changes>',
+         justification: 'Update requested via agent-creator',
+       },
+     });
+     ```
+
+   - **Return updater result to user**
+   - **STOP HERE** - Do not continue with creation steps
+
+3. **If agent is NEW:**
+   - Continue to Step 1 below (verification and creation steps)
+
+**Why this matters:** The agent-updater workflow safely handles updates with backup, protected section validation, registry synchronization, and version tracking.
+
 ### Step 1: Verify No Existing Agent
 
 ```bash

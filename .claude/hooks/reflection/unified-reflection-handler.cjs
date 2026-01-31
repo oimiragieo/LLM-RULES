@@ -89,6 +89,162 @@ function isEnabled() {
 }
 
 /**
+ * Gather session insights for persistence.
+ *
+ * Note: hook input is already read/parsed via parseHookInputAsync(), so stdin is
+ * not reliably available here. We primarily use structured fields on the input
+ * (if provided) and fall back to `.claude/context/memory/active_context.md`.
+ *
+ * @param {object} [input] - SessionEnd hook input (optional)
+ * @returns {object} Normalized insights object
+ */
+function gatherSessionInsights(input = null) {
+  // Prefer structured fields on the hook payload if present.
+  if (input && typeof input === 'object') {
+    const hasStructured =
+      input.summary ||
+      input.tasks_completed ||
+      input.files_modified ||
+      input.discoveries ||
+      input.patterns_found ||
+      input.gotchas_encountered ||
+      input.decisions_made ||
+      input.next_steps;
+
+    if (hasStructured) {
+      return {
+        summary: input.summary || 'Session ended',
+        tasks_completed: input.tasks_completed || [],
+        files_modified: input.files_modified || [],
+        discoveries: input.discoveries || [],
+        patterns_found: input.patterns_found || [],
+        gotchas_encountered: input.gotchas_encountered || [],
+        decisions_made: input.decisions_made || [],
+        next_steps: input.next_steps || [],
+      };
+    }
+  }
+
+  // Fallback: parse active_context.md (best-effort, non-fatal).
+  const activeContextPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'memory',
+    'active_context.md'
+  );
+  if (!fs.existsSync(activeContextPath)) {
+    return {
+      summary: 'Session ended',
+      tasks_completed: [],
+      files_modified: [],
+      discoveries: [],
+      patterns_found: [],
+      gotchas_encountered: [],
+      decisions_made: [],
+      next_steps: [],
+    };
+  }
+
+  try {
+    const content = fs.readFileSync(activeContextPath, 'utf8');
+    return parseSessionInsightsFromMarkdown(content);
+  } catch (_e) {
+    return {
+      summary: 'Session ended',
+      tasks_completed: [],
+      files_modified: [],
+      discoveries: [],
+      patterns_found: [],
+      gotchas_encountered: [],
+      decisions_made: [],
+      next_steps: [],
+    };
+  }
+}
+
+/**
+ * Best-effort markdown parser for active_context.md -> session insights.
+ * @param {string} content
+ * @returns {object}
+ */
+function parseSessionInsightsFromMarkdown(content) {
+  const insights = {
+    summary: 'Session ended',
+    tasks_completed: [],
+    discoveries: [],
+    files_modified: [],
+    patterns_found: [],
+    gotchas_encountered: [],
+    decisions_made: [],
+    next_steps: [],
+  };
+
+  const lines = String(content || '').split('\n');
+  let currentSection = null;
+
+  const normalizeSection = headerLine => {
+    const h = headerLine.toLowerCase();
+    if (/(^|\b)(tasks?|completed)(\b|$)/.test(h)) return 'tasks';
+    if (/(^|\b)(discover|found|learned)(\b|$)/.test(h)) return 'discoveries';
+    if (/(^|\b)(files?|modified|changed)(\b|$)/.test(h)) return 'files';
+    if (/(^|\b)(patterns?|solutions?|approaches)(\b|$)/.test(h)) return 'patterns';
+    if (/(^|\b)(gotchas?|pitfalls?|warnings?|cautions)(\b|$)/.test(h)) return 'gotchas';
+    if (/(^|\b)(decisions?|adrs?)(\b|$)/.test(h)) return 'decisions';
+    if (/(^|\b)(next|steps?|todo)(\b|$)/.test(h)) return 'next_steps';
+    return null;
+  };
+
+  const pushItem = (section, item) => {
+    if (!item) return;
+    if (section === 'tasks') insights.tasks_completed.push(item);
+    if (section === 'discoveries') insights.discoveries.push(item);
+    if (section === 'files') insights.files_modified.push(item);
+    if (section === 'patterns') insights.patterns_found.push(item);
+    if (section === 'gotchas') insights.gotchas_encountered.push(item);
+    if (section === 'decisions') insights.decisions_made.push(item);
+    if (section === 'next_steps') insights.next_steps.push(item);
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // Headings define section context.
+    const headerMatch = trimmed.match(/^#{1,3}\s+(.+)$/);
+    if (headerMatch) {
+      currentSection = normalizeSection(headerMatch[1]);
+      continue;
+    }
+
+    // First meaningful non-heading text becomes summary (unless overwritten later).
+    if (
+      !currentSection &&
+      trimmed &&
+      !trimmed.startsWith('-') &&
+      !trimmed.startsWith('*') &&
+      !/^\d+\.\s+/.test(trimmed)
+    ) {
+      if (!insights.summary || insights.summary === 'Session ended') {
+        insights.summary = trimmed;
+      }
+      continue;
+    }
+
+    // Bulleted or numbered list items.
+    if (trimmed.startsWith('-') || trimmed.startsWith('*') || /^\d+\.\s+/.test(trimmed)) {
+      const item = trimmed
+        .replace(/^[-*]\s*/, '')
+        .replace(/^\d+\.\s*/, '')
+        .trim();
+      pushItem(currentSection, item);
+      continue;
+    }
+  }
+
+  return insights;
+}
+
+/**
  * Detect the event type from hook input
  * Routes to appropriate handler based on input content
  *
@@ -321,6 +477,7 @@ function getErrorSummaryForReflection() {
 function handleSessionEnd(input) {
   const sessionId = input.session_id || input.sessionId || process.env.CLAUDE_SESSION_ID;
   const stats = getSessionStats(input);
+  const insights = gatherSessionInsights(input);
 
   // Phase 4 Integration: Get error summary for reflection
   const errorSummary = getErrorSummaryForReflection();
@@ -351,14 +508,14 @@ function handleSessionEnd(input) {
   // Create session data for memory recording (formerly from session-end-recorder.cjs)
   const sessionData = {
     session_id: sessionId || `session-${Date.now()}`,
-    summary: 'Session ended',
-    tasks_completed: [],
-    files_modified: [],
-    discoveries: [],
-    patterns_found: [],
-    gotchas_encountered: [],
-    decisions_made: [],
-    next_steps: [],
+    summary: insights.summary || 'Session ended',
+    tasks_completed: insights.tasks_completed || [],
+    files_modified: insights.files_modified || insights.filesModified || [],
+    discoveries: insights.discoveries || [],
+    patterns_found: insights.patterns_found || insights.patterns || [],
+    gotchas_encountered: insights.gotchas_encountered || insights.gotchas || [],
+    decisions_made: insights.decisions_made || insights.decisions || [],
+    next_steps: insights.next_steps || insights.nextSteps || [],
     timestamp: new Date().toISOString(),
   };
 
@@ -717,6 +874,8 @@ if (require.main === module) {
 module.exports = {
   // Core functions
   isEnabled,
+  gatherSessionInsights,
+  parseSessionInsightsFromMarkdown,
   detectEventType,
 
   // Event handlers

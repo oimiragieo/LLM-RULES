@@ -1,0 +1,353 @@
+# Template Updater Workflow
+#
+# EVOLVE workflow for updating existing templates via safe modification.
+# Executable by WorkflowEngine at .claude/lib/workflow/workflow-engine.cjs
+#
+# Key differences from template-creator:
+# - Loads existing template state before modification
+# - Validates changes don't break template consumers
+# - Creates backup before modification
+# - Updates template registry if needed
+
+name: template-updater-workflow
+description: Update existing templates following the EVOLVE process with backup and validation
+version: 1.0.0
+artifact_type: template
+input_location: .claude/templates/
+
+# Updater-specific configuration
+updater_config:
+  backup_enabled: true
+  backup_location: .claude/context/backups/templates/
+  compatibility_check: true
+  registration_targets:
+    - '.claude/templates/registry.json'
+    - '.claude/context/memory/learnings.md'
+  protected_placeholders:
+    - '{{name}}'
+    - '{{description}}'
+
+phases:
+  evaluate:
+    description: Verify template exists and changes are justified
+    steps:
+      - id: check-evolution-state
+        action: function
+        handler: checkEvolutionState
+        description: Verify evolution state is idle or can accept new evolution
+      - id: load-existing-template
+        action: function
+        handler: loadExistingTemplate
+        description: Load current template definition from file
+        inputs:
+          - template_name
+        outputs:
+          - template_path
+          - current_content
+          - current_placeholders
+      - id: identify-changes
+        action: prompt
+        description: Gather what changes are needed
+        outputs:
+          - change_description
+          - change_type
+          - affected_sections
+      - id: validate-change-justification
+        action: function
+        handler: validateChangeJustification
+        description: Ensure changes are justified and documented
+        inputs:
+          - change_description
+          - change_type
+        outputs:
+          - justification_valid
+          - justification_reason
+      - id: update-state-evaluate
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to evaluating
+    gates:
+      - id: gate-evaluate-exists
+        condition: "steps['load-existing-template'].output.template_path !== null"
+        on_fail: abort
+        message: 'Template does not exist. Use template-creator-workflow to create new templates.'
+      - id: gate-evaluate-justified
+        condition: "steps['validate-change-justification'].output.justification_valid === true"
+        on_fail: abort
+        message: 'Changes must be justified with clear rationale.'
+
+  validate:
+    description: Check changes don't break template functionality
+    steps:
+      - id: check-protected-placeholders
+        action: function
+        handler: checkProtectedPlaceholders
+        description: Ensure protected placeholders are not being removed
+        inputs:
+          - affected_sections
+          - current_placeholders
+        outputs:
+          - placeholders_intact
+          - violations
+      - id: check-placeholder-changes
+        action: function
+        handler: checkPlaceholderChanges
+        description: Identify added or removed placeholders
+        inputs:
+          - change_description
+          - current_placeholders
+        outputs:
+          - placeholders_changed
+          - added_placeholders
+          - removed_placeholders
+      - id: check-consumer-impact
+        action: function
+        handler: checkConsumerImpact
+        description: Check if changes affect template consumers
+        inputs:
+          - template_name
+          - removed_placeholders
+        outputs:
+          - consumers_affected
+          - affected_artifacts
+      - id: update-state-validate
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to validating
+    gates:
+      - id: gate-validate-protected
+        condition: "steps['check-protected-placeholders'].output.placeholders_intact === true"
+        on_fail: abort
+        message: 'Cannot remove protected placeholders ({{name}}, {{description}})'
+      - id: gate-validate-consumers
+        condition: "steps['check-consumer-impact'].output.consumers_affected === false"
+        on_fail: warn
+        message: 'Removing placeholders may break consumers. Review affected artifacts.'
+
+  obtain:
+    description: Research best practices for the change type (optional)
+    optional: true
+    steps:
+      - id: analyze-change-patterns
+        action: function
+        handler: analyzeChangePatterns
+        description: Look at similar changes in other templates
+        inputs:
+          - change_type
+        outputs:
+          - pattern_analysis
+          - recommendations
+      - id: analyze-target-artifacts
+        action: function
+        handler: analyzeTargetArtifacts
+        description: Review current target artifact structure
+        inputs:
+          - template_name
+        outputs:
+          - artifact_structure
+          - structure_changes
+      - id: update-state-obtain
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to obtaining
+    gates:
+      - id: gate-obtain
+        condition: 'true'
+        on_fail: pass
+        message: 'Research phase is optional for updates'
+
+  lock:
+    description: Create backup and apply changes
+    steps:
+      - id: create-backup
+        action: function
+        handler: createBackup
+        description: Backup current template file before modification
+        inputs:
+          - template_path
+        outputs:
+          - backup_id
+          - backup_path
+      - id: apply-changes
+        action: function
+        handler: applyChanges
+        description: Apply the requested changes to template content
+        inputs:
+          - current_content
+          - change_description
+          - affected_sections
+        outputs:
+          - updated_content
+          - changes_applied
+      - id: write-updated-template
+        action: write
+        description: Write the updated template file
+        inputs:
+          - updated_content
+          - template_path
+        outputs:
+          - template_updated
+      - id: validate-placeholders
+        action: function
+        handler: validatePlaceholders
+        description: Validate all placeholders are well-formed after changes
+        inputs:
+          - template_path
+        outputs:
+          - placeholders_valid
+          - placeholder_errors
+      - id: update-state-lock
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to locking
+    gates:
+      - id: gate-lock-backup
+        condition: "steps['create-backup'].output.backup_id !== null"
+        on_fail: abort
+        message: 'Backup must be created before modification'
+      - id: gate-lock-write
+        condition: "steps['write-updated-template'].output.template_updated === true"
+        on_fail: retry
+        max_retries: 3
+        message: 'Failed to write updated template file'
+      - id: gate-lock-placeholders
+        condition: "steps['validate-placeholders'].output.placeholders_valid === true"
+        on_fail: retry
+        max_retries: 3
+        message: 'Template placeholders validation failed after changes'
+
+  verify:
+    description: Validate template produces valid artifacts
+    steps:
+      - id: validate-required-placeholders
+        action: function
+        handler: validateRequiredPlaceholders
+        description: Verify template still has required placeholders
+        inputs:
+          - template_path
+        outputs:
+          - required_present
+          - missing_required
+      - id: test-template-rendering
+        action: function
+        handler: testTemplateRendering
+        description: Test template with sample data produces valid output
+        inputs:
+          - template_path
+        outputs:
+          - rendering_successful
+          - rendered_output
+      - id: validate-rendered-output
+        action: function
+        handler: validateRenderedOutput
+        description: Verify rendered output matches target artifact structure
+        inputs:
+          - rendered_output
+        outputs:
+          - output_valid
+          - validation_errors
+      - id: update-state-verify
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to verifying
+    gates:
+      - id: gate-verify-required
+        condition: "steps['validate-required-placeholders'].output.required_present === true"
+        on_fail: return_to_lock
+        message: 'Required placeholders missing after update (name, description)'
+      - id: gate-verify-render
+        condition: "steps['test-template-rendering'].output.rendering_successful === true"
+        on_fail: return_to_lock
+        message: 'Template rendering failed after update'
+      - id: gate-verify-output
+        condition: "steps['validate-rendered-output'].output.output_valid === true"
+        on_fail: return_to_lock
+        message: 'Rendered output does not match target artifact structure'
+
+  enable:
+    description: Update registrations and record changes
+    steps:
+      - id: update-template-registry
+        action: function
+        handler: updateTemplateRegistry
+        description: Update .claude/templates/registry.json if placeholders changed
+        inputs:
+          - template_name
+          - placeholders_changed
+          - added_placeholders
+        outputs:
+          - registry_updated
+      - id: update-memory
+        action: function
+        handler: updateMemory
+        description: Record template update in learnings.md
+        inputs:
+          - template_name
+          - change_description
+          - changes_applied
+        outputs:
+          - memory_updated
+      - id: cleanup-backup-on-success
+        action: function
+        handler: cleanupBackupOnSuccess
+        description: Optionally clean up backup after successful update
+        inputs:
+          - backup_id
+        outputs:
+          - backup_cleaned
+      - id: update-state-enable
+        action: function
+        handler: updateEvolutionState
+        description: Update evolution-state.json to idle with completed evolution
+        inputs:
+          - template_name
+          - change_description
+      - id: verify-registration
+        action: function
+        handler: verifyRegistration
+        description: Verify template is still in registry and renderable
+        inputs:
+          - template_name
+        outputs:
+          - verification_passed
+    gates:
+      - id: gate-enable-verify
+        condition: "steps['verify-registration'].output.verification_passed === true"
+        on_fail: retry
+        max_retries: 2
+        message: 'Template registration verification failed after update'
+
+# Rollback/compensate actions for each phase
+compensate:
+  lock:
+    - action: restore_backup
+      target: backup_id
+      description: Restore template file from backup
+  enable:
+    - action: revert_registry
+      target: '.claude/templates/registry.json'
+      description: Revert registry changes if made
+    - action: revert_memory
+      target: '.claude/context/memory/learnings.md'
+      description: Remove update entry from learnings
+
+# Iron Laws for template updates
+iron_laws:
+  - id: no-update-without-backup
+    rule: 'Every update MUST create a backup first'
+    enforcement: gate-lock-backup
+  - id: no-removal-of-required-placeholders
+    rule: 'Cannot remove {{name}} or {{description}} placeholders'
+    enforcement: gate-validate-protected
+  - id: no-update-without-justification
+    rule: 'Changes must be justified with clear rationale'
+    enforcement: gate-evaluate-justified
+  - id: placeholders-must-remain-valid
+    rule: 'All placeholders must remain well-formed after update'
+    enforcement: gate-lock-placeholders
+  - id: template-must-render
+    rule: 'Template must render successfully after update'
+    enforcement: gate-verify-render
+  - id: output-must-match-target
+    rule: 'Rendered output must match target artifact structure'
+    enforcement: gate-verify-output

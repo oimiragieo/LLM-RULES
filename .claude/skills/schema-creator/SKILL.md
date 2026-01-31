@@ -100,6 +100,38 @@ grep "schema-name" .claude/CLAUDE.md || echo "WARNING: Schema not registered in 
 
 ## Workflow
 
+### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
+
+**BEFORE creating any schema file, check if it already exists:**
+
+1. **Check if schema already exists:**
+
+   ```bash
+   test -f .claude/schemas/<schema-name>.json && echo "EXISTS" || echo "NEW"
+   ```
+
+2. **If schema EXISTS:**
+   - **DO NOT proceed with creation**
+   - **Invoke schema-updater workflow instead:**
+
+     ```javascript
+     Skill({
+       skill: 'schema-updater',
+       args: {
+         name: '<schema-name>',
+         changes: '<description of requested changes>',
+         justification: 'Update requested via schema-creator',
+       },
+     });
+     ```
+
+   - **Return updater result and STOP**
+
+3. **If schema is NEW:**
+   - Continue with Step 1 below
+
+---
+
 ### Step 1: Gather Schema Requirements
 
 Before creating a schema, understand:

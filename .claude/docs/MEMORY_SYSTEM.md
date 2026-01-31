@@ -223,21 +223,23 @@ Agents must operate under the assumption that their context can reset at any tim
 
 ## How Sessions Persist
 
-The `session-end-recorder.cjs` hook automatically captures session insights:
+The `unified-reflection-handler.cjs` hook automatically captures session insights:
 
-**Location**: `.claude/hooks/memory/session-end-recorder.cjs`
+**Location**: `.claude/hooks/reflection/unified-reflection-handler.cjs`
 
 **Trigger**: SessionEnd event (when a conversation session ends)
 
 **Workflow**:
 
-1. Gather session insights from stdin or `active_context.md`
+1. Gather session insights from the SessionEnd payload (if provided) or `active_context.md`
 2. Build session data structure
 3. Call `memory-manager.cjs` `saveSession()` function
 4. Auto-increment session number
 5. Save to `sessions/session_NNN.json`
 6. Extract patterns and gotchas to their respective JSON files
 7. Prune old sessions if count exceeds 50
+
+**Note**: The deprecated `session-end-recorder.cjs` functionality was consolidated into `unified-reflection-handler.cjs` (PERF-003).
 
 **Session Data Structure**:
 
@@ -253,6 +255,26 @@ The `session-end-recorder.cjs` hook automatically captures session insights:
   next_steps: ['Next step 1']
 }
 ```
+
+## Automatic Memory Injection
+
+Memory context is automatically injected into agent spawn prompts via `prompt-assembler.cjs`.
+
+**What's injected**:
+
+- Recent gotchas
+- Recent patterns
+- Recent discoveries
+- Recent session summaries
+
+**How it works**:
+
+1. Router spawns agent via Task()
+2. `prompt-assembler.cjs` loads memory via `loadMemoryForContext()`
+3. Memory is formatted as a markdown section
+4. Memory section is injected near `## Memory Protocol` when possible
+
+**Disabling**: Pass `includeMemory: false` to `assembleSpawnPrompt()` (not recommended).
 
 ## ADR Format (decisions.md)
 

@@ -1547,3 +1547,107 @@ _Negative:_
   - `.claude/skills/hook-creator/SKILL.md` (added Architecture Compliance section with Phase 2/3 hook references)
 
 ---
+
+## ADR-078: Updater Workflows Architecture
+
+**Date:** 2026-01-31
+**Status:** Accepted
+**Context:**
+
+Creators (agent-creator, skill-creator, hook-creator, workflow-creator, template-creator, schema-creator) could create new artifacts OR modify existing ones. Modifying existing artifacts without backup risked data loss, and lacking backward compatibility checks risked breaking existing integrations.
+
+**Problem:**
+
+- Creators lacked safe update mechanisms (no backups before changes)
+- Modifying existing artifacts bypassed protected section validation
+- No distinction between "create new" vs "update existing" workflows
+- Registry synchronization (CLAUDE.md, catalogs) was inconsistent for updates
+- Backward compatibility was not validated during artifact modifications
+
+**Decision:**
+
+Implemented dedicated updater workflows (separate from creators) with these characteristics:
+
+1. **Updater vs Creator Distinction:**
+   - **Creators:** Make NEW artifacts (research-first, register in CLAUDE.md/catalogs, assign to agents)
+   - **Updaters:** Modify EXISTING artifacts (backup-first, validate protected sections, update registries)
+   - Decision point: File existence check (Step 0 in creator skills)
+
+2. **EVOLVE Workflow Structure (6 phases):**
+   - **Evaluate:** Load evolution state, identify changes, check artifact exists
+   - **Validate:** Validate changes against protected sections, check backward compatibility
+   - **Obtain:** Research best practices for changes (research-synthesis if complex)
+   - **Lock:** Create backup, apply changes atomically
+   - **Verify:** Run tests, validate protected sections intact, check registries updated
+   - **Enable:** Update catalogs/CLAUDE.md, cleanup backups, record learnings
+
+3. **Backup Strategy:**
+   - `backup_enabled: true` in all updater_config sections
+   - Backups stored in `.claude/context/backups/<artifact-type>/`
+   - Automatic restoration on failure (compensate sections)
+   - Cleanup after successful verification
+
+4. **Protected Sections Validation:**
+   - Agent updater: Validates frontmatter, routing keywords, agent assignments intact
+   - Skill updater: Validates examples, references, assigned agents intact
+   - Hook updater: Validates hook metadata, trigger conditions, enforcement modes intact
+   - Workflow updater: Validates workflow phases, step ordering, dependencies intact
+   - Template updater: Validates placeholder names, sections intact
+   - Schema updater: Validates required fields, backward compatibility
+
+5. **Creator Integration (Step 0 Pattern):**
+   - All 6 creator skills check artifact existence BEFORE creation workflow
+   - If artifact exists → invoke updater workflow with change description
+   - If artifact is new → continue with creation workflow
+   - Prevents accidental overwrites
+
+**Consequences:**
+
+- **Positive:**
+  - Safe artifact updates with automatic backups and restoration
+  - Backward compatibility validated before changes applied
+  - Clear separation of concerns (creators vs updaters)
+  - Registry synchronization consistent across create/update operations
+  - Protected sections preserved during updates
+  - Test-driven design (140 tests validated workflows before implementation)
+
+- **Negative:**
+  - Slight complexity increase (6 new workflows, Step 0 in creators)
+  - Backup storage overhead (mitigated by automatic cleanup)
+  - Updaters must stay synchronized with protected section definitions
+
+- **Neutral:**
+  - EVOLVE phases apply to both creation AND updates (consistent pattern)
+  - Updaters reuse shared utilities (backup-manager.cjs, registry-updater.cjs, protected-section-validator.cjs)
+
+**Alternatives Considered:**
+
+1. **Creators handle both create and update:**
+   - Rejected: Violates single responsibility principle, no backup guarantee
+2. **Manual backups before updates:**
+   - Rejected: Human error risk, inconsistent application
+3. **Version control only (no backups):**
+   - Rejected: Requires git commit before update, doesn't protect in-progress changes
+
+**Implementation:**
+
+- **Workflows:** `.claude/workflows/updaters/*.yaml` (agent, skill, hook, workflow, template, schema)
+- **Tests:** `tests/workflows/updaters/*.test.cjs` (42 passing tests, 140 test cases total)
+- **Integration:** `.claude/skills/*/SKILL.md` (Step 0: Existence Check and Updater Delegation)
+- **Shared Utilities:** `.claude/lib/workflow/` (backup-manager.cjs, registry-updater.cjs, protected-section-validator.cjs)
+
+**Related ADRs:**
+
+- ADR-076: File Placement Enforcement (updaters maintain correct file locations)
+- ADR-077: Shell Safety Validators (updaters use safe shell commands)
+- ADR-043: EVOLVE Workflow (updaters follow EVOLVE phases)
+
+**Metrics:**
+
+- 6 updater workflows implemented
+- 42 tests passing (29+23+23+20+22+23)
+- 6 creator skills integrated (Step 0 pattern)
+- Backup/restore tested for all artifact types
+- Protected sections validated for all artifact types
+
+---

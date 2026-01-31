@@ -73,6 +73,38 @@ This skill creates hooks for the Claude Code framework:
 
 ## Workflow Steps
 
+### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
+
+**BEFORE creating any hook file, check if it already exists:**
+
+1. **Check if hook already exists:**
+
+   ```bash
+   test -f .claude/hooks/<category>/<hook-name>.cjs && echo "EXISTS" || echo "NEW"
+   ```
+
+2. **If hook EXISTS:**
+   - **DO NOT proceed with creation**
+   - **Invoke hook-updater workflow instead:**
+
+     ```javascript
+     Skill({
+       skill: 'hook-updater',
+       args: {
+         name: '<hook-name>',
+         changes: '<description of requested changes>',
+         justification: 'Update requested via hook-creator',
+       },
+     });
+     ```
+
+   - **Return updater result and STOP**
+
+3. **If hook is NEW:**
+   - Continue with Step 1 below
+
+---
+
 ### Reference Hook
 
 **Use `.claude/hooks/routing/router-enforcer.cjs` as the canonical reference hook.**

@@ -58,6 +58,91 @@ function getSkillIndex() {
 }
 
 /**
+ * Load memory context for agent spawn.
+ * Non-critical: failures should not prevent agent spawning.
+ *
+ * @returns {object} Memory context object
+ */
+function loadMemoryContext() {
+  try {
+    // Local require to keep prompt assembly fast when memory is unused.
+    const memoryManager = require('../memory/memory-manager.cjs');
+    return memoryManager.loadMemoryForContext();
+  } catch (_e) {
+    return {
+      gotchas: [],
+      patterns: [],
+      discoveries: [],
+      recent_sessions: [],
+      legacy_summary: '',
+    };
+  }
+}
+
+/**
+ * Format memory context as a markdown section.
+ *
+ * @param {object} memory
+ * @returns {string}
+ */
+function formatMemorySection(memory) {
+  const safe = memory && typeof memory === 'object' ? memory : {};
+  const gotchas = Array.isArray(safe.gotchas) ? safe.gotchas : [];
+  const patterns = Array.isArray(safe.patterns) ? safe.patterns : [];
+  const discoveries = Array.isArray(safe.discoveries) ? safe.discoveries : [];
+  const recentSessions = Array.isArray(safe.recent_sessions) ? safe.recent_sessions : [];
+
+  const lines = [];
+  lines.push('## Memory Context (Auto-Loaded)');
+  lines.push('_Recent learnings from past sessions_');
+  lines.push('');
+
+  if (gotchas.length > 0) {
+    lines.push('### Gotchas (Pitfalls to Avoid)');
+    for (const g of gotchas) {
+      const text = typeof g === 'string' ? g : g?.text;
+      if (text) lines.push(`- ${text}`);
+    }
+    lines.push('');
+  }
+
+  if (patterns.length > 0) {
+    lines.push('### Patterns (Reusable Solutions)');
+    for (const p of patterns) {
+      const text = typeof p === 'string' ? p : p?.text;
+      if (text) lines.push(`- ${text}`);
+    }
+    lines.push('');
+  }
+
+  if (discoveries.length > 0) {
+    lines.push('### Recent Discoveries');
+    for (const d of discoveries) {
+      const p = d?.path;
+      const desc = d?.description;
+      if (p && desc) lines.push(`- \`${p}\`: ${desc}`);
+    }
+    lines.push('');
+  }
+
+  if (recentSessions.length > 0) {
+    lines.push('### Recent Sessions');
+    for (const s of recentSessions.slice(0, 3)) {
+      const n = s?.session_number ?? s?.sessionNum;
+      const summary = s?.summary || 'No summary';
+      if (n !== undefined && n !== null) {
+        lines.push(`- Session ${n}: ${summary}`);
+      } else {
+        lines.push(`- ${summary}`);
+      }
+    }
+    lines.push('');
+  }
+
+  return lines.join('\n').trimEnd();
+}
+
+/**
  * Filter and describe tools from allowed list
  *
  * @param {string[]} allowedTools - List of tool names
@@ -289,10 +374,12 @@ For new skills: Domain experts (language-specific agents) have domain-focused sk
 function injectSections(basePrompt, sections) {
   if (!basePrompt) {
     // Return just the sections if no base prompt
-    return `${sections.toolsSection}\n\n${sections.skillsSection}\n\n${sections.discoverySection}`;
+    const parts = [sections.toolsSection, sections.skillsSection, sections.discoverySection];
+    if (sections.memorySection) parts.push(sections.memorySection);
+    return parts.filter(Boolean).join('\n\n');
   }
 
-  const { toolsSection, skillsSection, discoverySection } = sections;
+  const { toolsSection, skillsSection, discoverySection, memorySection } = sections;
 
   // Find the best injection point
   // Priority: After warning box, before PROJECT CONTEXT or INSTRUCTIONS
@@ -345,7 +432,33 @@ function injectSections(basePrompt, sections) {
   // Build the enhanced prompt
   const injectedSections = `\n\n${toolsSection}\n\n${skillsSection}\n\n${discoverySection}\n\n`;
 
-  return beforeContent + injectedSections + afterContent;
+  let enhanced = beforeContent + injectedSections + afterContent;
+
+  // Memory section is optional and should appear near the Memory Protocol if possible.
+  if (memorySection && !enhanced.includes('## Memory Context (Auto-Loaded)')) {
+    const header = '## Memory Protocol';
+    const idx = enhanced.toLowerCase().indexOf(header.toLowerCase());
+    if (idx !== -1) {
+      // Insert after the Memory Protocol section block (until next ## heading).
+      const afterHeaderIdx = enhanced.indexOf('\n', idx);
+      const nextHeadingIdx = enhanced.indexOf(
+        '\n## ',
+        afterHeaderIdx === -1 ? idx : afterHeaderIdx
+      );
+      if (nextHeadingIdx !== -1) {
+        enhanced =
+          enhanced.slice(0, nextHeadingIdx) +
+          `\n\n${memorySection}\n` +
+          enhanced.slice(nextHeadingIdx);
+      } else {
+        enhanced = enhanced + `\n\n${memorySection}\n`;
+      }
+    } else {
+      enhanced = enhanced + `\n\n${memorySection}\n`;
+    }
+  }
+
+  return enhanced;
 }
 
 /**
@@ -366,6 +479,7 @@ function assembleSpawnPrompt({
   basePrompt = '',
   maxToolsInPrompt = 15,
   maxSkillsInPrompt = 20,
+  includeMemory = true,
 } = {}) {
   // 1. Filter and describe tools (respecting limit)
   const toolsToShow = allowedTools.slice(0, maxToolsInPrompt);
@@ -374,16 +488,20 @@ function assembleSpawnPrompt({
   // 2. Get skills for this agent type
   const skills = getSkillsByAgent(agentType, maxSkillsInPrompt);
 
-  // 3. Build sections
+  // 3. Load memory context (optional)
+  const memorySection = includeMemory ? formatMemorySection(loadMemoryContext()) : '';
+
+  // 4. Build sections
   const toolsSection = buildToolsSection(describedTools);
   const skillsSection = buildSkillsSection(skills);
   const discoverySection = buildDiscoverySection();
 
-  // 4. Inject sections into prompt
+  // 5. Inject sections into prompt
   const enhancedPrompt = injectSections(basePrompt, {
     toolsSection,
     skillsSection,
     discoverySection,
+    memorySection,
   });
 
   return enhancedPrompt;
@@ -398,6 +516,8 @@ module.exports = {
   buildSkillsSection,
   buildDiscoverySection,
   injectSections,
+  loadMemoryContext,
+  formatMemorySection,
   // For testing cache invalidation
   _clearCache: () => {
     TOOL_MANIFEST = null;

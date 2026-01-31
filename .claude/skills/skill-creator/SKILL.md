@@ -674,6 +674,60 @@ Check for:
 
 ---
 
+## MANDATORY PRE-CREATION CHECK (BLOCKING)
+
+**BEFORE creating any skill file, check if it already exists:**
+
+### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
+
+**This step prevents duplicate skills and delegates updates to the skill-updater workflow.**
+
+1. **Check if skill already exists:**
+
+   ```bash
+   test -f .claude/skills/<skill-name>/SKILL.md && echo "EXISTS" || echo "NEW"
+   ```
+
+2. **If skill EXISTS:**
+   - **DO NOT proceed with creation**
+   - **Invoke skill-updater workflow instead:**
+
+     ```javascript
+     // Delegate to updater
+     Skill({
+       skill: 'skill-updater',
+       args: {
+         name: '<skill-name>',
+         changes: '<description of requested changes>',
+         justification: 'Update requested via skill-creator',
+       },
+     });
+     ```
+
+   - **Return updater result to user**
+   - **STOP HERE** - Do not continue with creation steps
+
+3. **If skill is NEW:**
+   - Continue to Step 6 below (creation steps)
+
+**Why this matters:** Creating a skill that already exists leads to:
+
+- Lost version history
+- Broken agent assignments
+- Duplicate catalog entries
+- Overwriting custom modifications
+
+The skill-updater workflow safely handles updates with:
+
+- Backup before modification
+- Protected section validation
+- Registry synchronization
+- Version tracking
+
+**Enforcement:** This check is MANDATORY. Bypassing it via direct Write operations is blocked by `unified-creator-guard.cjs`.
+
+---
+
 ## MANDATORY POST-CREATION STEPS (BLOCKING)
 
 After creating ANY skill file, you MUST complete these steps in order. Skill creation is INCOMPLETE until all steps pass.

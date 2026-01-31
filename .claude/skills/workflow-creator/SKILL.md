@@ -82,6 +82,38 @@ grep "{workflow-name}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md SECTION 8.6 N
 
 ## Workflow Creation Process
 
+### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
+
+**BEFORE creating any workflow file, check if it already exists:**
+
+1. **Check if workflow already exists:**
+
+   ```bash
+   test -f .claude/workflows/<category>/<workflow-name>.md && echo "EXISTS" || echo "NEW"
+   ```
+
+2. **If workflow EXISTS:**
+   - **DO NOT proceed with creation**
+   - **Invoke workflow-updater workflow instead:**
+
+     ```javascript
+     Skill({
+       skill: 'workflow-updater',
+       args: {
+         name: '<workflow-name>',
+         changes: '<description of requested changes>',
+         justification: 'Update requested via workflow-creator',
+       },
+     });
+     ```
+
+   - **Return updater result and STOP**
+
+3. **If workflow is NEW:**
+   - Continue with Step 1 below
+
+---
+
 ### Step 1: Verify No Existing Workflow
 
 ```bash
