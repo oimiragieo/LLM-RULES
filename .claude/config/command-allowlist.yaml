@@ -6,100 +6,100 @@
 
 allowed_commands:
   # File discovery (restrict dangerous flags)
-  - find      # File search (no -delete, -exec, rm flags)
-  - grep      # Pattern matching
-  - rg        # Ripgrep pattern matching
+  - find # File search (no -delete, -exec, rm flags)
+  - grep # Pattern matching
+  - rg # Ripgrep pattern matching
 
   # Directory operations (read-only)
-  - ls        # Directory listing
-  - pwd       # Current directory
-  - cd        # Change directory (must start with cd "$PROJECT_ROOT")
+  - ls # Directory listing
+  - pwd # Current directory
+  - cd # Change directory (must start with cd "$PROJECT_ROOT")
 
   # File reading (safe read-only)
-  - cat       # File display
-  - head      # File head
-  - tail      # File tail
-  - less      # File pager
-  - more      # File pager
+  - cat # File display
+  - head # File head
+  - tail # File tail
+  - less # File pager
+  - more # File pager
 
   # Counting and reporting
-  - wc        # Word/line/character count
-  - sort      # Sorting
-  - uniq      # Uniqueness
+  - wc # Word/line/character count
+  - sort # Sorting
+  - uniq # Uniqueness
 
   # Text processing
-  - awk       # Pattern scanning
-  - sed       # Stream editor (no -i flag)
+  - awk # Pattern scanning
+  - sed # Stream editor (no -i flag)
 
   # Data processing
-  - jq        # JSON processing
+  - jq # JSON processing
 
   # Version control (read-only)
-  - git       # Git (status, log, diff, show, branch, ls-files only)
+  - git # Git (status, log, diff, show, branch, ls-files only)
 
   # Package managers (read-only)
-  - pnpm      # Package manager (list/ls/outdated only)
-  - npm       # Node package manager (list/ls/view/outdated only)
-  - node      # JavaScript runtime
+  - pnpm # Package manager (list/ls/outdated only)
+  - npm # Node package manager (list/ls/view/outdated only)
+  - node # JavaScript runtime
 
   # Testing
-  - test      # File test command
+  - test # File test command
 
   # Environment
-  - env       # Display environment variables
-  - echo      # Display text
-  - printf    # Format and print
+  - env # Display environment variables
+  - echo # Display text
+  - printf # Format and print
 
 blocked_commands:
   # Destructive operations
-  - rm        # Destructive - files cannot be recovered
-  - rmdir     # Destructive - directories cannot be recovered
-  - mv        # Data loss risk - can overwrite files
-  - cp        # Data loss risk - can overwrite files
+  - rm # Destructive - files cannot be recovered
+  - rmdir # Destructive - directories cannot be recovered
+  - mv # Data loss risk - can overwrite files
+  - cp # Data loss risk - can overwrite files
 
   # Dangerous low-level operations
-  - dd        # Low-level dangerous - can destroy filesystems
-  - mkfs      # Creates filesystems - can destroy data
-  - fdisk     # Partition editor - can destroy data
+  - dd # Low-level dangerous - can destroy filesystems
+  - mkfs # Creates filesystems - can destroy data
+  - fdisk # Partition editor - can destroy data
 
   # Code execution risks
-  - eval      # Code injection risk
-  - exec      # Process replacement risk
-  - source    # Executes arbitrary scripts
-  - .         # Executes arbitrary scripts (dot command)
+  - eval # Code injection risk
+  - exec # Process replacement risk
+  - source # Executes arbitrary scripts
+  - . # Executes arbitrary scripts (dot command)
 
   # Shell invocation (use specific commands)
-  - sh        # Shell invocation
-  - bash      # Bash invocation
-  - zsh       # Zsh invocation
+  - sh # Shell invocation
+  - bash # Bash invocation
+  - zsh # Zsh invocation
 
   # System modification
-  - chmod     # Modifies file permissions
-  - chown     # Modifies file ownership
-  - sudo      # Privilege escalation
-  - su        # User switching
+  - chmod # Modifies file permissions
+  - chown # Modifies file ownership
+  - sudo # Privilege escalation
+  - su # User switching
 
   # Network operations (require manual approval)
-  - curl      # Network operations
-  - wget      # Network operations
-  - nc        # Network operations
-  - netcat    # Network operations
+  - curl # Network operations
+  - wget # Network operations
+  - nc # Network operations
+  - netcat # Network operations
 
 dangerous_flags:
   find:
-    - -delete  # Can delete files
-    - -exec    # Can run arbitrary commands
-    - rm       # Combined with find is destructive
+    - -delete # Can delete files
+    - -exec # Can run arbitrary commands
+    - rm # Combined with find is destructive
 
   sed:
-    - -i       # In-place editing (modifies files)
+    - -i # In-place editing (modifies files)
 
   git:
-    - reset    # Can lose changes
-    - clean    # Deletes files
-    - push --force  # Can overwrite remote history
-    - rebase   # Can rewrite history
-    - checkout .    # Discards changes
+    - reset # Can lose changes
+    - clean # Deletes files
+    - push --force # Can overwrite remote history
+    - rebase # Can rewrite history
+    - checkout . # Discards changes
 
 # Command patterns (examples for documentation)
 safe_patterns:

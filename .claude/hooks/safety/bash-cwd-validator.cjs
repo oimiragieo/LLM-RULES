@@ -115,7 +115,7 @@ function checkCwdInitialization(command) {
     /^cd\s+"?\$\{PROJECT_ROOT\}"?/i,
   ];
 
-  return cwdPatterns.some((pattern) => pattern.test(firstCommand));
+  return cwdPatterns.some(pattern => pattern.test(firstCommand));
 }
 
 module.exports = {

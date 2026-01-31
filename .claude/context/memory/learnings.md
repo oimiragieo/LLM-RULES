@@ -413,6 +413,7 @@ Multi-layer defense-in-depth validation hooks:
 **Key Patterns:**
 
 1. **Bash CWD Protocol (MANDATORY for background tasks):**
+
    ```bash
    # ALWAYS prefix background Bash tasks:
    cd "$PROJECT_ROOT" || { echo "CWD failed"; exit 1; }
@@ -421,6 +422,7 @@ Multi-layer defense-in-depth validation hooks:
    ```
 
 2. **Variable Quoting (MANDATORY):**
+
    ```bash
    # WRONG: cd $PROJECT_ROOT
    # CORRECT: cd "$PROJECT_ROOT"
@@ -485,12 +487,14 @@ Multi-layer defense-in-depth validation hooks:
    - Both templates link to bash-safe-background.md
 
 **Test Coverage:**
+
 - Total: 42 tests (17 CWD + 25 injection)
 - Pass rate: 100%
 - No false positives detected
 - Coverage: background/foreground, quoted/unquoted, multiline, edge cases
 
 **Files Created:**
+
 - `.claude/hooks/safety/bash-cwd-validator.cjs`
 - `.claude/hooks/safety/shell-injection-validator.cjs`
 - `.claude/templates/spawn/bash-safe-background.md`
@@ -498,12 +502,14 @@ Multi-layer defense-in-depth validation hooks:
 - `tests/hooks/shell-injection-validator.test.cjs`
 
 **Files Modified:**
+
 - `.claude/templates/spawn/universal-agent-spawn.md`
 - `.claude/templates/spawn/orchestrator-spawn.md`
 - `.claude/context/memory/decisions.md` (ADR-077 Phase 1 complete)
 - `.claude/context/memory/learnings.md` (this file)
 
 **Next Steps (Phase 2 - Week 2):**
+
 1. variable-quoting-validator.cjs (warn mode, educational)
 2. PROJECT_ROOT environment export (.env)
 3. Integration testing across all validators
@@ -518,6 +524,7 @@ Multi-layer defense-in-depth validation hooks:
 **Implementation:**
 
 **1. Shellcheck Validator Hook** (`.claude/hooks/safety/shellcheck-validator.cjs`)
+
 - Validates Bash commands using shellcheck (if available)
 - Gracefully degrades if shellcheck not installed (warns but allows)
 - Filters false positives: SC1071 (non-bash), SC2086 (handled by Phase 2)
@@ -525,6 +532,7 @@ Multi-layer defense-in-depth validation hooks:
 - Environment: `SHELLCHECK_VALIDATOR=block|warn|off`
 
 **2. Command Allowlist Library** (`.claude/lib/safety/command-allowlist.cjs`)
+
 - Defines 25+ allowed commands (find, grep, ls, git, wc, etc.)
 - Blocks 15+ dangerous commands (rm, eval, sudo, curl, chmod)
 - Detects dangerous flags (`find -delete`, `sed -i`, `git reset`)
@@ -532,12 +540,14 @@ Multi-layer defense-in-depth validation hooks:
 - Primary command extraction from complex shell strings
 
 **3. Command Allowlist Validator Hook** (`.claude/hooks/safety/command-allowlist-validator.cjs`)
+
 - Validates commands against allowlist before execution
 - Enforcement: `warn` (default), `block`, `off`
 - Environment: `COMMAND_ALLOWLIST=block|warn|off`
 - Clear error messages with bypass instructions
 
 **4. Command Allowlist Configuration** (`.claude/config/command-allowlist.yaml`)
+
 - YAML format for easy editing
 - Allowed commands with descriptions
 - Blocked commands with reasons
@@ -577,6 +587,7 @@ Multi-layer defense-in-depth validation hooks:
    - Don't fail tests due to missing optional dependencies
 
 **Files Created:**
+
 - `.claude/hooks/safety/shellcheck-validator.cjs`
 - `.claude/lib/safety/command-allowlist.cjs`
 - `.claude/hooks/safety/command-allowlist-validator.cjs`
@@ -587,16 +598,19 @@ Multi-layer defense-in-depth validation hooks:
 - `.claude/docs/SHELL-SECURITY-GUIDE.md` (comprehensive documentation)
 
 **Files Modified:**
+
 - `.claude/context/memory/decisions.md` (ADR-077 Phase 3 complete)
 - `.claude/context/memory/issues.md` (SHELL-SECURITY-004 resolved)
 - `.claude/context/memory/learnings.md` (this file)
 
 **Test Results:**
+
 - Shellcheck validator: 20/21 tests passing (1 test requires shellcheck installed)
 - Command allowlist: 39/43 tests passing (graceful degradation tests)
 - Integration tests: 25 tests validating multi-phase coordination
 
 **Next Steps (Phase 4 - Monitoring):**
+
 1. Audit logging for blocked commands
 2. Security event reporting
 3. Usage pattern analysis
@@ -607,9 +621,10 @@ Multi-layer defense-in-depth validation hooks:
 **Context:** Implemented Phase 2 of shell security (ADR-077) - variable quoting validator.
 
 **Pattern Learned:**
+
 1. **Unquoted Variables Are Dangerous:**
    - `cd $DIR` can fail if DIR contains spaces: `/path with spaces/`
-   - `rm -rf $FILES` can expand globs: if FILES="*", deletes everything
+   - `rm -rf $FILES` can expand globs: if FILES="\*", deletes everything
    - `find $DIR` can traverse wrong paths if DIR malicious
 
 2. **Detection Strategy:**
@@ -640,9 +655,9 @@ Multi-layer defense-in-depth validation hooks:
    - Test foreground vs background behavior (CWD only checks background)
 
 **Evidence:**
+
 - 17/17 unit tests passing (variable-quoting-validator.test.cjs)
 - 13/13 integration tests passing (shell-security-integration.test.mjs)
 - All validators coordinated without conflicts
 
 **Reusable:** Yes - variable quoting detection pattern applicable to any shell command validation
-

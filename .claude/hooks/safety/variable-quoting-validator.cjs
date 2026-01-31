@@ -63,12 +63,13 @@ async function handler(input) {
   // Check if any unquoted variables are in dangerous contexts
   const dangerousContexts = detectDangerousContexts(command, unquotedVars);
 
-  const varList = unquotedVars.map((v) => v.original).join(', '); // Use original ($VAR) instead of just name (VAR)
+  const varList = unquotedVars.map(v => v.original).join(', '); // Use original ($VAR) instead of just name (VAR)
   const priority = dangerousContexts.length > 0 ? 'HIGH' : '';
-  const contextInfo = dangerousContexts.length > 0 ? ` (dangerous contexts: ${dangerousContexts.join(', ')})` : '';
+  const contextInfo =
+    dangerousContexts.length > 0 ? ` (dangerous contexts: ${dangerousContexts.join(', ')})` : '';
 
   const message = `[VARIABLE-QUOTING${priority ? `-${priority}` : ''}] unquoted variables detected: ${varList}${contextInfo}. Use "$VAR" instead of $VAR`;
-  const fix = `Quote variables: ${unquotedVars.map((v) => `"${v.original}"`).join(', ')}`;
+  const fix = `Quote variables: ${unquotedVars.map(v => `"${v.original}"`).join(', ')}`;
 
   if (mode === 'warn') {
     return {

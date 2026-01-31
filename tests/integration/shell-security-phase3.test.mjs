@@ -359,10 +359,7 @@ describe('Shell Security Phase 3 Integration', () => {
       // Allowlist blocks -delete flag
       const allowlistResult = commandAllowlistValidator.handler(destructiveInput);
       // Warn mode allows but warns
-      assert.ok(
-        allowlistResult.warning?.includes('dangerous flag'),
-        'Should warn about -delete'
-      );
+      assert.ok(allowlistResult.warning?.includes('dangerous flag'), 'Should warn about -delete');
     });
 
     it('should block shell injection attempts', () => {
@@ -388,8 +385,7 @@ describe('Shell Security Phase 3 Integration', () => {
     });
 
     it('should handle very long commands', () => {
-      const longCommand =
-        'cd "$PROJECT_ROOT" && ' + 'echo "test" && '.repeat(100) + 'echo "done"';
+      const longCommand = 'cd "$PROJECT_ROOT" && ' + 'echo "test" && '.repeat(100) + 'echo "done"';
       const input = { command: longCommand, run_in_background: true };
 
       const cwdResult = bashCwdValidator.handler(input);

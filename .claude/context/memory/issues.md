@@ -132,6 +132,7 @@
   - **Globbing Issues**: Special characters expanded unexpectedly
   - **Hard-to-Debug**: Error messages unclear (`No such file or directory: /c/Program`)
 - **Example Failure**:
+
   ```bash
   cd $PROJECT_ROOT && find tests/
   # If PROJECT_ROOT="/c/Program Files/agent-studio"
@@ -142,6 +143,7 @@
   cd "$PROJECT_ROOT" && find tests/
   # Shell executes: cd "/c/Program Files/agent-studio" (works!)
   ```
+
 - **Common Patterns**:
   - `cd $PROJECT_ROOT` → `cd "$PROJECT_ROOT"`
   - `find $DIR` → `find "$DIR"`
@@ -192,6 +194,7 @@
   - Environment: `BASH_SHELLCHECK_VALIDATOR=warn|off`
 - **Workaround**: Manual shellcheck runs on command files
 - **Verification**:
+
   ```bash
   # Install shellcheck
   brew install shellcheck  # macOS
@@ -201,6 +204,7 @@
   Bash({ command: 'cd $PROJECT_ROOT' });  # Should WARN (SC2086: unquoted)
   Bash({ command: 'cd "$PROJECT_ROOT"' });  # Should PASS
   ```
+
 - **Related ADR**: ADR-077 (Shell Command Security Architecture)
 - **Related Issues**: SHELL-SECURITY-003 (quoting validation overlap)
 

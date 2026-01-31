@@ -411,6 +411,35 @@ cat .claude/context/memory/learnings.md
 
 ```
 
+## Architecture Compliance
+
+### File Placement (ADR-076)
+- Agents: `.claude/agents/{category}/` (core, domain, specialized, orchestrators)
+- Skills: `.claude/skills/{name}/SKILL.md`
+- Hooks: `.claude/hooks/{category}/`
+- Tests: `tests/` (NOT in .claude/)
+- Workflows: `.claude/workflows/{category}/`
+- Templates: `.claude/templates/`
+- Schemas: `.claude/schemas/`
+
+### Documentation References (CLAUDE.md v2.2.1)
+- Reference files use @notation: @AGENT_ROUTING_TABLE.md, @TOOL_REFERENCE.md, etc.
+- Located in: `.claude/docs/@*.md`
+- See: CLAUDE.md Section 3 (AGENT ROUTING TABLE reference)
+
+### Shell Security (ADR-077)
+- Background Bash tasks require: `cd "$PROJECT_ROOT" || exit 1`
+- Environment variables control validators (block/warn/off mode)
+- See: .claude/docs/SHELL-SECURITY-GUIDE.md
+- Apply to: spawn templates, background tasks, agent documentation
+
+### Recent ADRs
+- ADR-075: Router Config-Aware Model Selection
+- ADR-076: File Placement Architecture Redesign
+- ADR-077: Shell Command Security Architecture
+
+---
+
 ### Reference Agent (MANDATORY COMPARISON)
 
 **Use `.claude/agents/domain/python-pro.md` as the canonical reference agent.**

@@ -68,7 +68,11 @@ describe('bash-cwd-validator.cjs', () => {
 
       const result = await validator.handler(input);
 
-      assert.strictEqual(result.allowed, true, 'Should allow unquoted CWD (quoting checked by separate validator)');
+      assert.strictEqual(
+        result.allowed,
+        true,
+        'Should allow unquoted CWD (quoting checked by separate validator)'
+      );
     });
 
     it('should PASS foreground task without CWD (not background)', async () => {
@@ -95,7 +99,7 @@ describe('bash-cwd-validator.cjs', () => {
   });
 
   describe('CWD Pattern Matching', () => {
-    it('should detect cd with single quotes: cd \'$PROJECT_ROOT\'', async () => {
+    it("should detect cd with single quotes: cd '$PROJECT_ROOT'", async () => {
       const input = {
         command: "cd '$PROJECT_ROOT' && find tests/",
         run_in_background: true,
@@ -114,7 +118,11 @@ describe('bash-cwd-validator.cjs', () => {
 
       const result = await validator.handler(input);
 
-      assert.strictEqual(result.allowed, true, 'Should allow CWD without quotes (quoting validator handles this)');
+      assert.strictEqual(
+        result.allowed,
+        true,
+        'Should allow CWD without quotes (quoting validator handles this)'
+      );
     });
 
     it('should BLOCK cd to different directory', async () => {
@@ -136,7 +144,11 @@ describe('bash-cwd-validator.cjs', () => {
 
       const result = await validator.handler(input);
 
-      assert.strictEqual(result.allowed, false, 'Should block cd to relative path (not PROJECT_ROOT)');
+      assert.strictEqual(
+        result.allowed,
+        false,
+        'Should block cd to relative path (not PROJECT_ROOT)'
+      );
     });
   });
 

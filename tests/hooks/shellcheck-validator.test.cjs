@@ -6,7 +6,11 @@
 
 const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
-const { handler, runShellcheck, IGNORED_CODES } = require('../../.claude/hooks/safety/shellcheck-validator.cjs');
+const {
+  handler,
+  runShellcheck,
+  IGNORED_CODES,
+} = require('../../.claude/hooks/safety/shellcheck-validator.cjs');
 
 describe('Shellcheck Validator Hook', () => {
   let originalMode;

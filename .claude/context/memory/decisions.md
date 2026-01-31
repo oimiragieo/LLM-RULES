@@ -1498,23 +1498,9 @@ _Negative:_
     3. ✅ bash-safe-background.md template created
     4. ✅ universal-agent-spawn.md updated with Bash safety section
     5. ✅ orchestrator-spawn.md updated with Bash safety reference
-  - **Phase 2 (Week 2 - HIGH)**: Quoting + Environment ✅ COMPLETE (2026-01-31)
-    4. ✅ variable-quoting-validator.cjs created (17 tests passing)
-    5. ✅ PROJECT_ROOT exported to .env and .env.example (Section 7)
-    6. ✅ Integration tests created (13 tests passing - shell-security-integration.test.mjs)
-    7. ✅ SHELL-SECURITY-GUIDE.md updated with Phase 2 documentation
-  - **Phase 3 (Week 3 - MEDIUM)**: Enhancements ✅ COMPLETE (2026-01-31)
-    7. ✅ shellcheck-validator.cjs created (graceful fallback if not installed)
-    8. ✅ command-allowlist.cjs library created (25+ allowed, 15+ blocked commands)
-    9. ✅ command-allowlist-validator.cjs hook created
-    10. ✅ command-allowlist.yaml configuration created
-    11. ✅ shellcheck-validator.test.cjs (20 tests)
-    12. ✅ command-allowlist-validator.test.cjs (40 tests)
-    13. ✅ shell-security-phase3.test.mjs integration tests (25 tests)
-    14. ✅ SHELL-SECURITY-GUIDE.md comprehensive documentation
-  - **Phase 4 (Ongoing)**: Monitoring
-    9. Audit logging (1 day)
-    10. Documentation (ongoing)
+  - **Phase 2 (Week 2 - HIGH)**: Quoting + Environment ✅ COMPLETE (2026-01-31) 4. ✅ variable-quoting-validator.cjs created (17 tests passing) 5. ✅ PROJECT_ROOT exported to .env and .env.example (Section 7) 6. ✅ Integration tests created (13 tests passing - shell-security-integration.test.mjs) 7. ✅ SHELL-SECURITY-GUIDE.md updated with Phase 2 documentation
+  - **Phase 3 (Week 3 - MEDIUM)**: Enhancements ✅ COMPLETE (2026-01-31) 7. ✅ shellcheck-validator.cjs created (graceful fallback if not installed) 8. ✅ command-allowlist.cjs library created (25+ allowed, 15+ blocked commands) 9. ✅ command-allowlist-validator.cjs hook created 10. ✅ command-allowlist.yaml configuration created 11. ✅ shellcheck-validator.test.cjs (20 tests) 12. ✅ command-allowlist-validator.test.cjs (40 tests) 13. ✅ shell-security-phase3.test.mjs integration tests (25 tests) 14. ✅ SHELL-SECURITY-GUIDE.md comprehensive documentation
+  - **Phase 4 (Ongoing)**: Monitoring 9. Audit logging (1 day) 10. Documentation (ongoing)
 - **Audit Document**: `.claude/context/artifacts/audits/BACKGROUND-TASK-SHELL-AUDIT.md`
 - **Related Issues**: ROUTER-MONITORING-001 (background task tracking), CONFIG-001 (configuration drift)
 - **New Issues Created**:
@@ -1522,5 +1508,42 @@ _Negative:_
   - [SHELL-SECURITY-002] No shell injection validation (CRITICAL)
   - [SHELL-SECURITY-003] Unquoted variables in Bash commands (HIGH)
   - [SHELL-SECURITY-004] No shellcheck integration (MEDIUM)
+
+---
+
+## [2026-01-31] Creator Skills Updated for New Architecture (ADR-075, 076, 077)
+
+- **Date**: 2026-01-31
+- **Context**: Creator skills (agent-creator, skill-creator, workflow-creator, hook-creator) needed to document new architecture compliance requirements for ADR-075 (Router Config-Aware Model Selection), ADR-076 (File Placement Architecture Redesign), and ADR-077 (Shell Command Security Architecture). Creators are responsible for educating generated artifacts about where files go and how to handle shell security.
+- **Decision**: Added "Architecture Compliance" section to all 4 creator skills with:
+  1. **File Placement (ADR-076)**: Documents where each artifact type goes (agents, skills, hooks, workflows, templates, schemas, tests)
+  2. **Documentation References (CLAUDE.md v2.2.1)**: Explains @notation reference files in .claude/docs/
+  3. **Shell Security (ADR-077)**: Documents background Bash task requirements (`cd "$PROJECT_ROOT" || exit 1`) and Phase 3 validator layers
+  4. **Recent ADRs**: Lists ADR-075, 076, 077 for creator awareness
+  5. **Hook-Creator Specific**: Added references to new Phase 2 and Phase 3 safety hooks (bash-cwd-validator.cjs, shell-injection-validator.cjs, variable-quoting-validator.cjs, shellcheck-validator.cjs, command-allowlist-validator.cjs)
+- **Implementation**:
+  - Updated `.env` with Section 7 shell security variables (BASH_CWD_VALIDATOR, SHELL_INJECTION_VALIDATOR, VARIABLE_QUOTING_VALIDATOR, SHELLCHECK_VALIDATOR, COMMAND_ALLOWLIST_VALIDATOR)
+  - Updated `.env.example` Section 7 with detailed comments and purpose documentation
+  - Updated spawn templates (universal-agent-spawn.md, orchestrator-spawn.md) with Phase 3 shell security validator reference
+  - Added Architecture Compliance section to agent-creator.md, skill-creator.md, workflow-creator.md, hook-creator.md
+- **Consequences**:
+  - **Benefits**:
+    - Creators now educate generated artifacts about file placement (fixes ADR-076 compliance)
+    - Creators document shell security requirements (prevents ADR-077 violations)
+    - Generated agents/skills/workflows/hooks will include proper architecture compliance from creation
+    - Reduces architectural drift (creators enforce standards at generation time)
+    - Hook-creator documents new safety hooks as reference examples
+  - **Trade-offs**:
+    - Slight increase in creator skill file size (~25 lines per creator)
+    - Creators must stay updated when new ADRs are added (maintenance burden)
+- **Files Modified**:
+  - `.env` (added/updated Section 7 shell security variables)
+  - `.env.example` (added comprehensive Section 7 documentation)
+  - `.claude/templates/spawn/universal-agent-spawn.md` (added Phase 3 validator reference)
+  - `.claude/templates/spawn/orchestrator-spawn.md` (added Phase 3 validator reference)
+  - `.claude/skills/agent-creator/SKILL.md` (added Architecture Compliance section)
+  - `.claude/skills/skill-creator/SKILL.md` (added Architecture Compliance section)
+  - `.claude/skills/workflow-creator/SKILL.md` (added Architecture Compliance section)
+  - `.claude/skills/hook-creator/SKILL.md` (added Architecture Compliance section with Phase 2/3 hook references)
 
 ---

@@ -51,9 +51,7 @@ function runShellcheck(command) {
       const issues = JSON.parse(result || '[]');
 
       // Filter ignored codes
-      const relevantIssues = issues.filter(
-        issue => !IGNORED_CODES.includes(`SC${issue.code}`)
-      );
+      const relevantIssues = issues.filter(issue => !IGNORED_CODES.includes(`SC${issue.code}`));
 
       if (relevantIssues.length > 0) {
         return {
@@ -76,9 +74,7 @@ function runShellcheck(command) {
       // Try to parse stderr as JSON
       try {
         const issues = JSON.parse(shellcheckError.stdout || '[]');
-        const relevantIssues = issues.filter(
-          issue => !IGNORED_CODES.includes(`SC${issue.code}`)
-        );
+        const relevantIssues = issues.filter(issue => !IGNORED_CODES.includes(`SC${issue.code}`));
 
         if (relevantIssues.length > 0) {
           return {
@@ -107,7 +103,8 @@ function runShellcheck(command) {
     if (error.code === 'ENOENT' || error.message.includes('command not found')) {
       return {
         valid: true,
-        warning: 'Shellcheck not installed, skipping validation. Install with: brew install shellcheck (macOS) or apt-get install shellcheck (Linux)',
+        warning:
+          'Shellcheck not installed, skipping validation. Install with: brew install shellcheck (macOS) or apt-get install shellcheck (Linux)',
       };
     }
 

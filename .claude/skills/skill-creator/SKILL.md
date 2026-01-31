@@ -592,6 +592,37 @@ Concrete usage examples.
 - Memory updates: `.claude/context/memory/learnings.md`
 - Logs: `.claude/context/tmp/skill-creator.log`
 
+## Architecture Compliance
+
+### File Placement (ADR-076)
+
+- Skills: `.claude/skills/{name}/SKILL.md` (main definition)
+- Skills directories contain: SKILL.md, scripts/, schemas/, hooks/, references/
+- Tests: `tests/` (NOT in .claude/)
+- Related hooks: `.claude/hooks/{category}/`
+- Related workflows: `.claude/workflows/{category}/`
+
+### Documentation References (CLAUDE.md v2.2.1)
+
+- Reference files use @notation: @SKILL_CATALOG_TABLE.md, @TOOL_REFERENCE.md
+- Located in: `.claude/docs/@*.md`
+- See: CLAUDE.md Section 8.5 (WORKFLOW ENHANCEMENT SKILLS reference)
+
+### Shell Security (ADR-077)
+
+- Skill scripts that use Bash must enforce: `cd "$PROJECT_ROOT" || exit 1`
+- Environment variables control validators (block/warn/off mode)
+- See: .claude/docs/SHELL-SECURITY-GUIDE.md
+- Apply to: skill executors, CLI wrappers, test scripts
+
+### Recent ADRs
+
+- ADR-075: Router Config-Aware Model Selection
+- ADR-076: File Placement Architecture Redesign
+- ADR-077: Shell Command Security Architecture
+
+---
+
 ## File Placement & Standards
 
 ### Output Location Rules

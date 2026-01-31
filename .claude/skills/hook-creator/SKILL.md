@@ -949,6 +949,38 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
 
 ---
 
+## Architecture Compliance
+
+### File Placement (ADR-076)
+
+- Hooks: `.claude/hooks/{category}/` (safety, routing, memory, session, validation, audit)
+- Hook tests: `.claude/hooks/{category}/{name}.test.cjs` (co-located with hooks)
+- Tests: `tests/` (integration tests for hooks)
+- Related docs: `.claude/docs/`
+- Hook registry: `.claude/hooks/README.md`
+
+### Documentation References (CLAUDE.md v2.2.1)
+
+- Reference files use @notation: @ENFORCEMENT_HOOKS.md, @TOOL_REFERENCE.md
+- Located in: `.claude/docs/@*.md`
+- See: CLAUDE.md Section 1.3 (ENFORCEMENT HOOKS reference)
+
+### Shell Security (ADR-077)
+
+- **NEW SAFETY HOOKS:** bash-cwd-validator.cjs, shell-injection-validator.cjs, variable-quoting-validator.cjs (ADR-077 Phase 2)
+- **PHASE 3 HOOKS:** shellcheck-validator.cjs, command-allowlist-validator.cjs (reference implementations)
+- Hook tests MUST validate shell security patterns
+- See: .claude/docs/SHELL-SECURITY-GUIDE.md
+- Apply to: all safety hooks, pre-tool hooks, validation hooks
+
+### Recent ADRs
+
+- ADR-075: Router Config-Aware Model Selection
+- ADR-076: File Placement Architecture Redesign
+- ADR-077: Shell Command Security Architecture
+
+---
+
 ## File Placement & Standards
 
 ### Output Location Rules
@@ -957,7 +989,7 @@ This skill outputs to: `.claude/hooks/<category>/`
 
 Categories:
 
-- `safety/` - Safety validators (command validation, security checks)
+- `safety/` - Safety validators (command validation, security checks, **shell security**)
 - `routing/` - Router enforcement hooks
 - `memory/` - Memory management hooks
 - `session/` - Session lifecycle hooks

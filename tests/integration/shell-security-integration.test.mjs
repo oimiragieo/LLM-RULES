@@ -27,7 +27,7 @@ describe('Shell Security Integration (Phase 1 + 2)', () => {
   });
 
   after(() => {
-    Object.keys(originalEnv).forEach((key) => {
+    Object.keys(originalEnv).forEach(key => {
       if (originalEnv[key] !== undefined) {
         process.env[key] = originalEnv[key];
       } else {

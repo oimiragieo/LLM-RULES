@@ -788,6 +788,37 @@ Use the template at `.claude/templates/workflows/workflow-template.md` for consi
 
 ---
 
+## Architecture Compliance
+
+### File Placement (ADR-076)
+
+- Workflows: `.claude/workflows/{category}/` (core, enterprise, operations, creators)
+- Tests: `tests/` (NOT in .claude/)
+- Related agents: `.claude/agents/{category}/`
+- Related skills: `.claude/skills/{name}/`
+- Related templates: `.claude/templates/`
+
+### Documentation References (CLAUDE.md v2.2.1)
+
+- Reference files use @notation: @ENTERPRISE_WORKFLOWS.md, @AGENT_ROUTING_TABLE.md
+- Located in: `.claude/docs/@*.md`
+- See: CLAUDE.md Section 8.6 (ENTERPRISE WORKFLOWS reference)
+
+### Shell Security (ADR-077)
+
+- Workflow spawn templates must include: `cd "$PROJECT_ROOT" || exit 1` for background tasks
+- Environment variables control validators (block/warn/off mode)
+- See: .claude/docs/SHELL-SECURITY-GUIDE.md
+- Apply to: agent spawn prompts, task execution examples
+
+### Recent ADRs
+
+- ADR-075: Router Config-Aware Model Selection
+- ADR-076: File Placement Architecture Redesign
+- ADR-077: Shell Command Security Architecture
+
+---
+
 ## File Placement & Standards
 
 ### Output Location Rules

@@ -185,8 +185,22 @@ Bash({
 - Device redirects: \`>> /dev/\`
 
 **Validation Hooks:**
+
+### Phase 2: CWD and Injection Validators (Active)
 - \`bash-cwd-validator.cjs\` - Blocks background tasks without CWD (CRITICAL)
 - \`shell-injection-validator.cjs\` - Blocks dangerous patterns (CRITICAL)
+- \`variable-quoting-validator.cjs\` - Warns on unquoted variables (default: warn)
+
+### Phase 3: Shell Security Validators (ADR-077)
+
+Background Bash tasks go through automated validation:
+- **Layer 1:** CWD validator (requires \`cd "$PROJECT_ROOT"\`)
+- **Layer 2:** Injection validator (blocks dangerous patterns)
+- **Layer 3:** Quoting validator (warns on unquoted variables)
+- **Layer 4:** Shellcheck validator (syntax checking)
+- **Layer 5:** Command allowlist (blocks dangerous commands)
+
+See \`.claude/docs/SHELL-SECURITY-GUIDE.md\` for complete guide.
 
 **Full Template:** .claude/templates/spawn/bash-safe-background.md
 **Related:** ADR-077, SHELL-SECURITY-001, SHELL-SECURITY-002

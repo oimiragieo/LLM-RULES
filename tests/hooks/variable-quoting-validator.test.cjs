@@ -75,7 +75,7 @@ describe('variable-quoting-validator.cjs', () => {
       assert.ok(!result.warning, 'Should not warn on quoted variable');
     });
 
-    it('should PASS on single-quoted variable: cd \'$PROJECT_ROOT\'', async () => {
+    it("should PASS on single-quoted variable: cd '$PROJECT_ROOT'", async () => {
       const input = {
         command: "cd '$PROJECT_ROOT' && find tests/",
       };

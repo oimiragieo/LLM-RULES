@@ -243,7 +243,11 @@ rm -rf /`,
       // Comments should NOT trigger validation (handled by Bash, not executed)
       // But our current implementation doesn't parse comments, so it WILL block
       // This is a safe false positive (overly strict is better than missed injection)
-      assert.strictEqual(result.allowed, false, 'Should block even in comments (safe false positive)');
+      assert.strictEqual(
+        result.allowed,
+        false,
+        'Should block even in comments (safe false positive)'
+      );
     });
 
     it('should ALLOW rm -rf in string literal', async () => {
@@ -256,7 +260,11 @@ rm -rf /`,
       // String literals should be safe, but detection is complex
       // Current implementation MAY trigger (depends on pattern matching)
       // This test documents behavior (may be false positive)
-      assert.strictEqual(result.allowed, false, 'Current implementation blocks (safe false positive)');
+      assert.strictEqual(
+        result.allowed,
+        false,
+        'Current implementation blocks (safe false positive)'
+      );
     });
   });
 
