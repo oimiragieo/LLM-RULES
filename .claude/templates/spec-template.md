@@ -13,6 +13,7 @@ What will this feature/fix accomplish?
 "As a [user type], I want [capability], so that [benefit]"
 
 **Acceptance Criteria**:
+
 - [ ] [Specific, testable criterion]
 - [ ] [Specific, testable criterion]
 - [ ] [Specific, testable criterion]
@@ -23,10 +24,12 @@ What will this feature/fix accomplish?
 How do things work now?
 
 **Pain Points**:
+
 - [Issue 1]
 - [Issue 2]
 
 **Impact**:
+
 - Who is affected?
 - What's the cost of inaction?
 - What's the opportunity?
@@ -37,6 +40,7 @@ How do things work now?
 High-level description of how we'll solve this.
 
 **Key Features**:
+
 - [Feature 1]
 - [Feature 2]
 
@@ -46,21 +50,25 @@ What are we explicitly NOT doing?
 ## 4. Implementation Approach
 
 **Phase 1 - Design** (X days):
+
 - Research/spike if needed
 - Design architecture
 - Get design approval
 
 **Phase 2 - Implementation** (Y days):
+
 - Build core features
 - Write tests (TDD)
 - Follow style guide
 
 **Phase 3 - Testing** (Z days):
+
 - Integration tests
 - Performance testing
 - Security review
 
 **Phase 4 - Documentation** (W days):
+
 - User docs
 - API documentation
 - Examples
@@ -68,37 +76,43 @@ What are we explicitly NOT doing?
 ## 5. Success Metrics
 
 **Quantitative**:
+
 - [Measurable outcome 1]
 - [Measurable outcome 2]
 
 **Qualitative**:
+
 - [User satisfaction measure]
 - [Team feedback]
 
 **Timeline**:
+
 - Target completion date
 - Key milestones
 
 ## 6. Effort Estimate
 
-| Phase | Effort | Notes |
-|-------|--------|-------|
-| Design | 1 day | Include spike if needed |
-| Implementation | 3 days | TDD approach |
-| Testing | 2 days | Unit + integration |
-| Documentation | 1 day | API + user docs |
-| **Total** | **7 days** | With 2-3 person team |
+| Phase          | Effort     | Notes                   |
+| -------------- | ---------- | ----------------------- |
+| Design         | 1 day      | Include spike if needed |
+| Implementation | 3 days     | TDD approach            |
+| Testing        | 2 days     | Unit + integration      |
+| Documentation  | 1 day      | API + user docs         |
+| **Total**      | **7 days** | With 2-3 person team    |
 
 ## 7. Dependencies
 
 **Must Complete First**:
+
 - [Blocking dependency 1]
 - [Blocking dependency 2]
 
 **Should Complete First**:
+
 - [Preferred dependency 1]
 
 **Risks**:
+
 - [Risk 1] → Mitigation: [Plan]
 - [Risk 2] → Mitigation: [Plan]
 
@@ -118,6 +132,7 @@ What are we explicitly NOT doing?
 ---
 
 **Next Steps**:
+
 - [ ] Get spec approval
 - [ ] Generate implementation plan
 - [ ] Assign developers

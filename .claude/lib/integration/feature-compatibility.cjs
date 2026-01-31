@@ -21,12 +21,14 @@ function assessFeatureCompatibility(conductorFeature, agentStudioFeature) {
     if (conductorFeature.format !== agentStudioFeature.format) {
       return {
         level: 'incompatible',
-        breakingChanges: [{
-          field: 'format',
-          description: `Format mismatch: ${conductorFeature.format} vs ${agentStudioFeature.format}`,
-          type: 'format-change'
-        }],
-        confidence: 1.0
+        breakingChanges: [
+          {
+            field: 'format',
+            description: `Format mismatch: ${conductorFeature.format} vs ${agentStudioFeature.format}`,
+            type: 'format-change',
+          },
+        ],
+        confidence: 1.0,
       };
     }
   }
@@ -39,7 +41,7 @@ function assessFeatureCompatibility(conductorFeature, agentStudioFeature) {
   // Default: compatible
   return {
     level: 'compatible',
-    confidence: 0.8
+    confidence: 0.8,
   };
 }
 
@@ -69,7 +71,7 @@ function assessSchemaCompatibility(conductorSchema, agentStudioSchema) {
           type: 'rename',
           from: condField,
           to: renamed,
-          description: `Rename field: ${condField} → ${renamed}`
+          description: `Rename field: ${condField} → ${renamed}`,
         });
       }
     }
@@ -87,7 +89,7 @@ function assessSchemaCompatibility(conductorSchema, agentStudioSchema) {
           field,
           from: condType,
           to: agentType,
-          description: `Convert ${field} from ${condType} to ${agentType}`
+          description: `Convert ${field} from ${condType} to ${agentType}`,
         });
       }
     }
@@ -95,25 +97,31 @@ function assessSchemaCompatibility(conductorSchema, agentStudioSchema) {
 
   // Detect new required fields (need defaults)
   for (const agentField of agentStudioRequired) {
-    if (!conductorRequired.includes(agentField) && !transformationRules.some(r => r.to === agentField)) {
+    if (
+      !conductorRequired.includes(agentField) &&
+      !transformationRules.some(r => r.to === agentField)
+    ) {
       const defaultValue = agentStudioProps[agentField]?.default;
 
       transformationRules.push({
         type: 'add-default',
         field: agentField,
         value: defaultValue || null,
-        description: `Add missing required field: ${agentField}`
+        description: `Add missing required field: ${agentField}`,
       });
     }
   }
 
   // Detect removed fields (breaking change)
   for (const condField of conductorRequired) {
-    if (!agentStudioRequired.includes(condField) && !transformationRules.some(r => r.from === condField)) {
+    if (
+      !agentStudioRequired.includes(condField) &&
+      !transformationRules.some(r => r.from === condField)
+    ) {
       breakingChanges.push({
         field: condField,
         description: `Field ${condField} removed in agent-studio`,
-        type: 'field-removed'
+        type: 'field-removed',
       });
     }
   }
@@ -130,7 +138,7 @@ function assessSchemaCompatibility(conductorSchema, agentStudioSchema) {
 
   // Calculate confidence
   const totalDifferences = transformationRules.length + breakingChanges.length;
-  const confidence = totalDifferences === 0 ? 1.0 : Math.max(0.5, 1.0 - (totalDifferences * 0.1));
+  const confidence = totalDifferences === 0 ? 1.0 : Math.max(0.5, 1.0 - totalDifferences * 0.1);
 
   return {
     level,
@@ -139,8 +147,8 @@ function assessSchemaCompatibility(conductorSchema, agentStudioSchema) {
     confidence,
     version: {
       conductor: conductorSchema.version || '1.0.0',
-      agentStudio: agentStudioSchema.version || '2.0.0'
-    }
+      agentStudio: agentStudioSchema.version || '2.0.0',
+    },
   };
 }
 
@@ -158,8 +166,8 @@ function findRenamedField(original, candidates) {
 
   // Check common renames
   const renames = {
-    'workflow_name': 'workflowId',
-    'current_phase': 'currentPhase'
+    workflow_name: 'workflowId',
+    current_phase: 'currentPhase',
   };
 
   return renames[original] || null;
@@ -176,7 +184,7 @@ function buildCompatibilityMatrix() {
     'metadata.json',
     'workflow-state',
     'git-notes',
-    'analytics'
+    'analytics',
   ];
 
   const pairs = {};
@@ -187,14 +195,14 @@ function buildCompatibilityMatrix() {
       const key = `${features[i]} <-> ${features[j]}`;
       pairs[key] = {
         compatible: true, // Placeholder
-        notes: 'No known conflicts'
+        notes: 'No known conflicts',
       };
     }
   }
 
   return {
     features,
-    pairs
+    pairs,
   };
 }
 
@@ -207,45 +215,45 @@ function generateCompatibilityChecklist() {
     {
       description: 'Node.js 18+ installed',
       validation: 'node --version',
-      command: 'node --version'
+      command: 'node --version',
     },
     {
       description: 'Git 2.30+ installed',
       validation: 'git --version',
-      command: 'git --version'
+      command: 'git --version',
     },
     {
       description: 'Agent-Studio v2.2.1 available',
-      validation: (context) => {
+      validation: context => {
         // Would check package.json version
         return true;
-      }
+      },
     },
     {
       description: 'Conductor-main backup created',
-      validation: (context) => {
+      validation: context => {
         // Would check for backup
         return true;
-      }
+      },
     },
     {
       description: 'Test environment available',
-      validation: (context) => {
+      validation: context => {
         return true;
-      }
+      },
     },
     {
       description: 'All hooks registered',
-      validation: (context) => {
+      validation: context => {
         // Would check settings.json
         return true;
-      }
-    }
+      },
+    },
   ];
 }
 
 module.exports = {
   assessFeatureCompatibility,
   buildCompatibilityMatrix,
-  generateCompatibilityChecklist
+  generateCompatibilityChecklist,
 };

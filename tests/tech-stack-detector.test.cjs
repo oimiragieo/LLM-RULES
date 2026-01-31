@@ -46,7 +46,7 @@ describe('Tech Stack Detector', () => {
       fs.writeFileSync(
         path.join(projectPath, 'package.json'),
         JSON.stringify({
-          dependencies: { 'typescript': '^5.0.0', 'react': '^18.0.0' }
+          dependencies: { typescript: '^5.0.0', react: '^18.0.0' },
         })
       );
 
@@ -66,7 +66,7 @@ describe('Tech Stack Detector', () => {
       fs.writeFileSync(
         path.join(projectPath, 'package.json'),
         JSON.stringify({
-          dependencies: { 'next': '^14.0.0' }
+          dependencies: { next: '^14.0.0' },
         })
       );
 
@@ -83,7 +83,7 @@ describe('Tech Stack Detector', () => {
       fs.writeFileSync(
         path.join(projectPath, 'package.json'),
         JSON.stringify({
-          devDependencies: { 'jest': '^29.0.0', 'vitest': '^1.0.0' }
+          devDependencies: { jest: '^29.0.0', vitest: '^1.0.0' },
         })
       );
 
@@ -116,10 +116,7 @@ describe('Tech Stack Detector', () => {
 
       const projectPath = path.join(tempDir, 'pip-project');
       fs.mkdirSync(projectPath, { recursive: true });
-      fs.writeFileSync(
-        path.join(projectPath, 'requirements.txt'),
-        'django==4.2.0\npytest==7.4.0'
-      );
+      fs.writeFileSync(path.join(projectPath, 'requirements.txt'), 'django==4.2.0\npytest==7.4.0');
 
       const result = await detector.detect(projectPath);
 
@@ -156,12 +153,9 @@ describe('Tech Stack Detector', () => {
       // TypeScript project with Python scripts
       fs.writeFileSync(
         path.join(projectPath, 'package.json'),
-        JSON.stringify({ dependencies: { 'typescript': '^5.0.0' } })
+        JSON.stringify({ dependencies: { typescript: '^5.0.0' } })
       );
-      fs.writeFileSync(
-        path.join(projectPath, 'requirements.txt'),
-        'pytest==7.4.0'
-      );
+      fs.writeFileSync(path.join(projectPath, 'requirements.txt'), 'pytest==7.4.0');
 
       const result = await detector.detect(projectPath);
 
@@ -179,8 +173,8 @@ describe('Tech Stack Detector', () => {
       fs.writeFileSync(
         path.join(projectPath, 'package.json'),
         JSON.stringify({
-          dependencies: { 'react': '^18.0.0' },
-          devDependencies: { 'jest': '^29.0.0' }
+          dependencies: { react: '^18.0.0' },
+          devDependencies: { jest: '^29.0.0' },
         })
       );
 
@@ -212,10 +206,7 @@ describe('Tech Stack Detector', () => {
 
       const projectPath = path.join(tempDir, 'gh-actions');
       fs.mkdirSync(path.join(projectPath, '.github/workflows'), { recursive: true });
-      fs.writeFileSync(
-        path.join(projectPath, '.github/workflows/ci.yml'),
-        'name: CI\non: push'
-      );
+      fs.writeFileSync(path.join(projectPath, '.github/workflows/ci.yml'), 'name: CI\non: push');
 
       const result = await detector.detect(projectPath);
 
@@ -229,10 +220,7 @@ describe('Tech Stack Detector', () => {
 
       const projectPath = path.join(tempDir, 'single-lang');
       fs.mkdirSync(projectPath, { recursive: true });
-      fs.writeFileSync(
-        path.join(projectPath, 'package.json'),
-        JSON.stringify({})
-      );
+      fs.writeFileSync(path.join(projectPath, 'package.json'), JSON.stringify({}));
 
       const result = await detector.detectLanguage(projectPath);
 

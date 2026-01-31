@@ -52,6 +52,7 @@ Hash: a1b2c3d4e5f6...
 ```
 
 **Patterns Masked**:
+
 - `API_KEY=...` → `API_KEY=[REDACTED]`
 - `PASSWORD=...` → `PASSWORD=[REDACTED]`
 - `sk-*` (OpenAI keys) → `[REDACTED]`
@@ -79,6 +80,7 @@ git notes show abc123def
 ```
 
 **Output**:
+
 ```
 [TASK-test-123] developer
 Decision: Test feature implementation
@@ -105,6 +107,7 @@ node .claude/tools/cli/git-notes-verify.cjs --all
 ```
 
 **Output**:
+
 ```
 === Git Notes Audit Trail ===
 
@@ -167,6 +170,7 @@ node .claude/tools/cli/git-notes-verify.cjs v1.0..v1.1 --report=audit-v1.1.md
 ```
 
 **Report Contents**:
+
 - All commits in release
 - Task IDs for each commit
 - Verification hashes (tamper-proof)
@@ -174,6 +178,7 @@ node .claude/tools/cli/git-notes-verify.cjs v1.0..v1.1 --report=audit-v1.1.md
 - Decision rationale
 
 **Compliance Benefits**:
+
 - **Traceability**: Every code change linked to task and agent
 - **Accountability**: Clear record of who made what decision
 - **Integrity**: Cryptographic verification prevents tampering
@@ -218,6 +223,7 @@ done | sort
 ```
 
 **Insights**:
+
 - Which tasks took longest?
 - Which agents are most productive?
 - What time of day are commits made?
@@ -234,6 +240,7 @@ Hash: <SHA-256 verification hash>
 ```
 
 **Constraints**:
+
 - `taskId`: Any string (from TaskCreate/TaskUpdate)
 - `agentName`: Any string (from agent context)
 - `workSummary`: Max 200 characters, credentials masked
@@ -244,7 +251,8 @@ Hash: <SHA-256 verification hash>
 
 ```javascript
 function computeVerificationHash(taskId, commitHash, timestamp, agentName) {
-  return crypto.createHash('sha256')
+  return crypto
+    .createHash('sha256')
     .update(taskId + commitHash + timestamp + agentName)
     .digest('hex');
 }
@@ -261,12 +269,14 @@ function computeVerificationHash(taskId, commitHash, timestamp, agentName) {
 ### Performance
 
 **Hook Execution**:
+
 - **Build note**: <1ms (string concatenation + crypto hash)
 - **Write temp file**: <5ms (small file write)
 - **Git notes add**: ~30-40ms (git command execution)
 - **Total overhead**: <50ms per commit
 
 **Storage**:
+
 - **Note size**: ~150 bytes per commit
 - **Repository impact**: <15 KB per 100 commits (negligible)
 
@@ -288,17 +298,20 @@ function computeVerificationHash(taskId, commitHash, timestamp, agentName) {
 **Diagnosis**:
 
 1. **Check if hook is registered**:
+
    ```bash
    cat .claude/hooks/index.json | grep git-notes-audit
    ```
 
 2. **Verify hook is executable**:
+
    ```bash
    node .claude/hooks/audit/git-notes-audit.cjs
    # Should not throw errors
    ```
 
 3. **Check git commit output** (hook needs commit hash):
+
    ```bash
    git log --oneline -1
    # Should show: [branch hash] message
@@ -311,6 +324,7 @@ function computeVerificationHash(taskId, commitHash, timestamp, agentName) {
    ```
 
 **Common Causes**:
+
 - Hook not registered in `.claude/hooks/index.json`
 - PostToolUse hook not enabled
 - Git commit failed (no hash to attach note to)
@@ -325,6 +339,7 @@ node .claude/tools/cli/git-notes-verify.cjs HEAD~100..HEAD
 ```
 
 **Output States**:
+
 - **✓ VERIFIED**: Hash matches, note is authentic
 - **⚠ MISSING**: No note attached to commit
 - **🚨 TAMPERED**: Hash mismatch, note has been modified
@@ -332,11 +347,13 @@ node .claude/tools/cli/git-notes-verify.cjs HEAD~100..HEAD
 **If Tampered Detected**:
 
 1. **Identify commit**:
+
    ```bash
    git notes show <commit_hash>
    ```
 
 2. **Check original note** (if backed up):
+
    ```bash
    git log refs/notes/commits
    ```
@@ -353,6 +370,7 @@ node .claude/tools/cli/git-notes-verify.cjs HEAD~100..HEAD
 **Cause**: Invalid commit range
 
 **Fix**: Use `git log` to verify range exists:
+
 ```bash
 git log main..HEAD  # Check range has commits
 ```
@@ -362,6 +380,7 @@ git log main..HEAD  # Check range has commits
 **Cause**: Malformed git note (missing required fields)
 
 **Fix**: Manually inspect note and delete if corrupt:
+
 ```bash
 git notes show <commit_hash>
 git notes remove <commit_hash>
@@ -372,12 +391,14 @@ git notes remove <commit_hash>
 ### 1. Always Commit with Git Commit
 
 **DO**: Use standard git commit workflow
+
 ```bash
 git add file.txt
 git commit -m "feat: new feature"
 ```
 
 **DON'T**: Use alternative commit methods that bypass hooks
+
 ```bash
 git commit --amend  # May skip hook
 git rebase -i       # Modifies existing commits
@@ -386,6 +407,7 @@ git rebase -i       # Modifies existing commits
 ### 2. Review Notes Before Publishing
 
 **Before pushing to remote**:
+
 ```bash
 # Verify last 10 commits have notes
 node .claude/tools/cli/git-notes-verify.cjs HEAD~10..HEAD
@@ -397,6 +419,7 @@ git notes show HEAD
 ### 3. Run Audits Before Releases
 
 **Add to release checklist**:
+
 ```bash
 # Generate audit report
 node .claude/tools/cli/git-notes-verify.cjs v1.0..v1.1 --report=audit-v1.1.md
@@ -408,6 +431,7 @@ node .claude/tools/cli/git-notes-verify.cjs v1.0..v1.1 --report=audit-v1.1.md
 ### 4. Archive Reports
 
 **Store audit reports in version control**:
+
 ```bash
 mkdir -p .claude/context/artifacts/audit-reports
 node .claude/tools/cli/git-notes-verify.cjs main..v1.1 \
@@ -419,6 +443,7 @@ git commit -m "docs: add v1.1 audit report"
 ### 5. Monitor for Tampering
 
 **Add to CI/CD pipeline**:
+
 ```yaml
 # .github/workflows/audit.yml
 - name: Verify git notes integrity
@@ -435,6 +460,7 @@ git commit -m "docs: add v1.1 audit report"
 ### What Git Notes Protect
 
 **✓ Protects Against**:
+
 - **Unauthorized modification**: Hash mismatch detected
 - **Attribution forgery**: Hash includes agent name
 - **Timestamp manipulation**: Hash includes timestamp
@@ -443,6 +469,7 @@ git commit -m "docs: add v1.1 audit report"
 ### What Git Notes DON'T Protect
 
 **✗ Does NOT Protect Against**:
+
 - **Commit rewriting** (rebase/amend): Notes lost during git history rewrite
 - **Force push**: Can overwrite history and notes
 - **Repository access**: Anyone with repo access can read notes
@@ -459,10 +486,12 @@ git commit -m "docs: add v1.1 audit report"
 ### Credential Leakage Prevention
 
 **Automatic Masking** (implemented):
+
 - API keys, passwords, tokens automatically replaced with `[REDACTED]`
 - Max note length (200 chars) prevents accidental inclusion of large secrets
 
 **Manual Review** (recommended):
+
 ```bash
 # Review notes before pushing
 git notes show HEAD
@@ -481,7 +510,7 @@ Notes automatically use context from task operations:
 TaskUpdate({
   taskId: 'feature-123',
   status: 'in_progress',
-  metadata: { summary: 'Implementing user authentication' }
+  metadata: { summary: 'Implementing user authentication' },
 });
 
 // Later, when agent commits:
@@ -506,7 +535,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Fetch full history for git notes
+          fetch-depth: 0 # Fetch full history for git notes
 
       - name: Fetch git notes
         run: git fetch origin refs/notes/*:refs/notes/*

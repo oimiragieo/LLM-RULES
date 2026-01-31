@@ -53,7 +53,7 @@ function handlePreToolUse(input) {
   const attributes = {
     tool,
     agent: agent || 'unknown',
-    timestamp: timestamp || Date.now()
+    timestamp: timestamp || Date.now(),
   };
 
   const span = tracer.startSpan(spanName, attributes);
@@ -69,8 +69,8 @@ function handlePreToolUse(input) {
       spanId: span.spanId,
       traceId: span.traceId,
       spanName,
-      toolInvocations: metrics.getCounter('toolInvocations')
-    }
+      toolInvocations: metrics.getCounter('toolInvocations'),
+    },
   };
 }
 
@@ -118,8 +118,8 @@ function handlePostToolUse(input) {
       action: 'continue',
       metadata: {
         duration: span.duration,
-        status
-      }
+        status,
+      },
     };
   }
 
@@ -155,8 +155,8 @@ function handleError(input) {
     action: 'continue',
     metadata: {
       errorLogged: true,
-      errorCategory
-    }
+      errorCategory,
+    },
   };
 }
 
@@ -173,8 +173,8 @@ function handleCustomEvent(input) {
     action: 'continue',
     metadata: {
       eventRecorded: true,
-      eventName
-    }
+      eventName,
+    },
   };
 }
 
@@ -242,5 +242,5 @@ module.exports = {
   getMetrics,
   getTracer,
   getMetricsCollector,
-  reset
+  reset,
 };

@@ -92,7 +92,9 @@ describe('SPEC-021: Category 1 - Strangler Fig Pattern', () => {
 
   it('1.7: Should rollback to legacy on error', async () => {
     const legacyFn = () => 'legacy';
-    const newFn = () => { throw new Error('new system error'); };
+    const newFn = () => {
+      throw new Error('new system error');
+    };
 
     stranglerFig.register('feature', { legacyFn, newFn, percentage: 100, fallbackOnError: true });
 
@@ -104,7 +106,7 @@ describe('SPEC-021: Category 1 - Strangler Fig Pattern', () => {
     stranglerFig.register('feature', {
       legacyFn: () => {},
       newFn: () => {},
-      featureFlag: 'use-new-checkout'
+      featureFlag: 'use-new-checkout',
     });
 
     assert.strictEqual(stranglerFig.getFeatureFlag('feature'), 'use-new-checkout');
@@ -131,7 +133,9 @@ describe('SPEC-021: Category 1 - Strangler Fig Pattern', () => {
 
   it('1.11: Should collect metrics (legacy calls, new calls, fallbacks)', async () => {
     const legacyFn = () => 'legacy';
-    const newFn = () => { throw new Error('error'); };
+    const newFn = () => {
+      throw new Error('error');
+    };
 
     stranglerFig.register('feature', { legacyFn, newFn, percentage: 100, fallbackOnError: true });
 
@@ -277,7 +281,11 @@ describe('SPEC-021: Category 2 - Adapter Pattern', () => {
     const registry = new AdapterRegistry();
 
     // Register factory function instead of instance
-    registry.registerFactory('conductor-main', '1.0.0', () => new LegacyAdapter('conductor-main', '1.0.0'));
+    registry.registerFactory(
+      'conductor-main',
+      '1.0.0',
+      () => new LegacyAdapter('conductor-main', '1.0.0')
+    );
 
     const adapter = await registry.load('conductor-main', '1.0.0');
     assert.ok(adapter instanceof LegacyAdapter);
@@ -300,7 +308,7 @@ describe('SPEC-021: Category 3 - Interface Mapping', () => {
 
     mapper.addMapping('createTask', {
       from: { taskId: 'string', taskName: 'string' },
-      to: { task: { id: 'string', name: 'string' } }
+      to: { task: { id: 'string', name: 'string' } },
     });
 
     const legacyData = { taskId: '123', taskName: 'task1' };
@@ -314,14 +322,14 @@ describe('SPEC-021: Category 3 - Interface Mapping', () => {
 
     mapper.addMapping('user', {
       from: { userId: 'string', userName: 'string', userEmail: 'string' },
-      to: { user: { id: 'string', profile: { name: 'string', email: 'string' } } }
+      to: { user: { id: 'string', profile: { name: 'string', email: 'string' } } },
     });
 
     const flat = { userId: '1', userName: 'Alice', userEmail: 'alice@example.com' };
     const nested = mapper.map('user', flat);
 
     assert.deepStrictEqual(nested, {
-      user: { id: '1', profile: { name: 'Alice', email: 'alice@example.com' } }
+      user: { id: '1', profile: { name: 'Alice', email: 'alice@example.com' } },
     });
   });
 
@@ -330,7 +338,7 @@ describe('SPEC-021: Category 3 - Interface Mapping', () => {
 
     mapper.addMapping('userReverse', {
       from: { user: { id: 'string', profile: { name: 'string' } } },
-      to: { userId: 'string', userName: 'string' }
+      to: { userId: 'string', userName: 'string' },
     });
 
     const nested = { user: { id: '1', profile: { name: 'Alice' } } };
@@ -371,7 +379,7 @@ describe('SPEC-021: Category 3 - Interface Mapping', () => {
     mapper.addMapping('timestamp', {
       from: { createdAt: 'string' },
       to: { timestamp: 'number' },
-      transform: (data) => ({ timestamp: new Date(data.createdAt).getTime() })
+      transform: data => ({ timestamp: new Date(data.createdAt).getTime() }),
     });
 
     const result = mapper.map('timestamp', { createdAt: '2026-01-30T10:00:00Z' });
@@ -384,7 +392,7 @@ describe('SPEC-021: Category 3 - Interface Mapping', () => {
     mapper.addMapping('validateTask', {
       from: { taskId: 'string' },
       to: { task: { id: 'string' } },
-      schema: { task: { id: { type: 'string', required: true } } }
+      schema: { task: { id: { type: 'string', required: true } } },
     });
 
     const result = mapper.map('validateTask', { taskId: '123' });
@@ -400,7 +408,7 @@ describe('SPEC-021: Category 3 - Interface Mapping', () => {
 
     mapper.addMapping('task', {
       from: { taskId: 'string' },
-      to: { task: { id: 'string' } }
+      to: { task: { id: 'string' } },
     });
 
     const forward = mapper.map('task', { taskId: '123' });
@@ -415,7 +423,7 @@ describe('SPEC-021: Category 3 - Interface Mapping', () => {
 
     mapper.addMapping('taskList', {
       from: { tasks: [{ taskId: 'string' }] },
-      to: { items: [{ task: { id: 'string' } }] }
+      to: { items: [{ task: { id: 'string' } }] },
     });
 
     const legacy = { tasks: [{ taskId: '1' }, { taskId: '2' }] };
@@ -441,7 +449,9 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
 
   it('4.1: Should handle legacy system failure', async () => {
     const stranglerFig = new StranglerFig();
-    const legacyFn = () => { throw new Error('Legacy system down'); };
+    const legacyFn = () => {
+      throw new Error('Legacy system down');
+    };
     const newFn = () => 'new-result';
 
     stranglerFig.register('feature', { legacyFn, newFn, percentage: 0, fallbackToNew: true });
@@ -453,7 +463,9 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
   it('4.2: Should fallback to legacy on new system failure', async () => {
     const stranglerFig = new StranglerFig();
     const legacyFn = () => 'legacy-result';
-    const newFn = () => { throw new Error('New system error'); };
+    const newFn = () => {
+      throw new Error('New system error');
+    };
 
     stranglerFig.register('feature', { legacyFn, newFn, percentage: 100, fallbackOnError: true });
 
@@ -474,7 +486,7 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
       legacyFn: flakeyFn,
       newFn: () => {},
       percentage: 0,
-      retryConfig: { maxRetries: 3, backoff: 'exponential' }
+      retryConfig: { maxRetries: 3, backoff: 'exponential' },
     });
 
     const result = await stranglerFig.execute('feature', []);
@@ -484,20 +496,22 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
 
   it('4.4: Should circuit break after consecutive failures', async () => {
     const stranglerFig = new StranglerFig();
-    const failingFn = () => { throw new Error('System down'); };
+    const failingFn = () => {
+      throw new Error('System down');
+    };
 
     stranglerFig.register('feature', {
       legacyFn: failingFn,
       newFn: () => 'new',
       percentage: 0,
-      circuitBreaker: { threshold: 3, timeout: 5000 }
+      circuitBreaker: { threshold: 3, timeout: 5000 },
     });
 
     // Trigger circuit breaker
     for (let i = 0; i < 3; i++) {
       try {
         await stranglerFig.execute('feature', []);
-      } catch (error) {
+      } catch (_error) {
         // Expected
       }
     }
@@ -510,14 +524,16 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
   it('4.5: Should log errors for monitoring', async () => {
     const stranglerFig = new StranglerFig();
     const errors = [];
-    const legacyFn = () => { throw new Error('Legacy error'); };
+    const legacyFn = () => {
+      throw new Error('Legacy error');
+    };
 
     stranglerFig.register('feature', {
       legacyFn,
       newFn: () => 'new',
       percentage: 0,
       fallbackToNew: true,
-      onError: (error) => errors.push(error)
+      onError: error => errors.push(error),
     });
 
     await stranglerFig.execute('feature', []);
@@ -530,7 +546,7 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
 
     // Simulate partial adapter failure
     const originalRequest = adapter.request;
-    adapter.request = (data) => {
+    adapter.request = data => {
       if (!data) throw new Error('Invalid request');
       return originalRequest.call(adapter, data);
     };
@@ -550,7 +566,7 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
       newFn: () => 'new',
       percentage: 0,
       timeout: 100,
-      fallbackToNew: true
+      fallbackToNew: true,
     });
 
     const startTime = Date.now();
@@ -563,15 +579,19 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
 
   it('4.8: Should provide degraded service on both systems failing', async () => {
     const stranglerFig = new StranglerFig();
-    const failingLegacy = () => { throw new Error('Legacy down'); };
-    const failingNew = () => { throw new Error('New down'); };
+    const failingLegacy = () => {
+      throw new Error('Legacy down');
+    };
+    const failingNew = () => {
+      throw new Error('New down');
+    };
 
     stranglerFig.register('feature', {
       legacyFn: failingLegacy,
       newFn: failingNew,
       percentage: 100,
       fallbackOnError: true,
-      degradedFn: () => ({ status: 'degraded', message: 'Limited functionality' })
+      degradedFn: () => ({ status: 'degraded', message: 'Limited functionality' }),
     });
 
     const result = await stranglerFig.execute('feature', []);
@@ -580,13 +600,15 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
 
   it('4.9: Should collect error metrics (error rate, error types)', async () => {
     const stranglerFig = new StranglerFig();
-    const legacyFn = () => { throw new Error('Error 1'); };
+    const legacyFn = () => {
+      throw new Error('Error 1');
+    };
 
     stranglerFig.register('feature', {
       legacyFn,
       newFn: () => 'new',
       percentage: 0,
-      fallbackToNew: true
+      fallbackToNew: true,
     });
 
     await stranglerFig.execute('feature', []);
@@ -605,7 +627,7 @@ describe('SPEC-021: Category 4 - Error Resilience', () => {
       newFn: () => ({ validField: 'value' }),
       percentage: 0,
       fallbackToNew: true,
-      responseSchema: { validField: { type: 'string', required: true } }
+      responseSchema: { validField: { type: 'string', required: true } },
     });
 
     const result = await stranglerFig.execute('feature', []);

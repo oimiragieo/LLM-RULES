@@ -69,31 +69,17 @@
     },
     "legacyDeprecatedTools": {
       "type": "string",
-      "enum": [
-        "Search",
-        "Git",
-        "SequentialThinking",
-        "MCP Tools"
-      ],
+      "enum": ["Search", "Git", "SequentialThinking", "MCP Tools"],
       "description": "Legacy tools that should be replaced (Search->Grep, Git->Bash, SequentialThinking->Skill, MCP Tools->specific tools)"
     },
     "agentCategory": {
       "type": "string",
-      "enum": [
-        "core",
-        "domain",
-        "specialized",
-        "orchestrator"
-      ],
+      "enum": ["core", "domain", "specialized", "orchestrator"],
       "description": "Agent category determines tool profile"
     },
     "modelDefault": {
       "type": "string",
-      "enum": [
-        "haiku",
-        "sonnet",
-        "opus"
-      ],
+      "enum": ["haiku", "sonnet", "opus"],
       "description": "Default model for agent spawning"
     }
   },
@@ -194,16 +180,7 @@
       "modelDefault": "opus"
     },
     {
-      "tools": [
-        "Read",
-        "Glob",
-        "Grep",
-        "TaskUpdate",
-        "TaskList",
-        "TaskCreate",
-        "TaskGet",
-        "Skill"
-      ],
+      "tools": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "TaskCreate", "TaskGet", "Skill"],
       "category": "specialized",
       "modelDefault": "sonnet",
       "$comment": "code-reviewer: read-only agent, no Write/Edit"

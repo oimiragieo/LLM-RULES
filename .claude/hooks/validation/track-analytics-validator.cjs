@@ -31,7 +31,7 @@ const MODE = process.env.TRACK_ANALYTICS_VALIDATOR || 'warn';
 async function readInput() {
   return new Promise((resolve, reject) => {
     let data = '';
-    process.stdin.on('data', (chunk) => {
+    process.stdin.on('data', chunk => {
       data += chunk;
     });
     process.stdin.on('end', () => {
@@ -199,7 +199,7 @@ async function main() {
     const allErrors = [...metricsErrors, ...reportingErrors];
 
     if (allErrors.length > 0) {
-      const errorMessage = `Track analytics validation failed:\n${allErrors.map((e) => `  - ${e}`).join('\n')}`;
+      const errorMessage = `Track analytics validation failed:\n${allErrors.map(e => `  - ${e}`).join('\n')}`;
 
       if (MODE === 'block') {
         console.error(errorMessage);

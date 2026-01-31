@@ -61,12 +61,12 @@ console.log(language); // 'typescript'
 
 Scores project maturity on 4 dimensions:
 
-| Dimension    | Score Factors                                              |
-| ------------ | ---------------------------------------------------------- |
-| **Structure**  | Directory organization (src/, tests/, docs/, config/), CI/CD |
-| **Tests**      | Test file count (0 = 0.0, 1-5 = 0.3, 5-10 = 0.5, 10-20 = 0.7, 20+ = 0.9) |
-| **Docs**       | README quality, CHANGELOG, CONTRIBUTING, LICENSE, etc. |
-| **Patterns**   | Config files (tsconfig, eslint, prettier, etc.) |
+| Dimension     | Score Factors                                                            |
+| ------------- | ------------------------------------------------------------------------ |
+| **Structure** | Directory organization (src/, tests/, docs/, config/), CI/CD             |
+| **Tests**     | Test file count (0 = 0.0, 1-5 = 0.3, 5-10 = 0.5, 10-20 = 0.7, 20+ = 0.9) |
+| **Docs**      | README quality, CHANGELOG, CONTRIBUTING, LICENSE, etc.                   |
+| **Patterns**  | Config files (tsconfig, eslint, prettier, etc.)                          |
 
 **Project Classification:**
 
@@ -118,19 +118,19 @@ Skill({ skill: 'project-onboarding' });
 
 ### Fully Supported (10+ patterns)
 
-| Language/Framework | Detection Files | Confidence |
-| ------------------ | --------------- | ---------- |
-| **TypeScript**     | package.json (typescript), tsconfig.json | 0.9+ |
-| **JavaScript**     | package.json (no typescript) | 0.9+ |
-| **Python**         | pyproject.toml, requirements.txt | 0.9+ |
-| **Go**             | go.mod | 0.9+ |
-| **React**          | package.json (react) | 0.9+ |
-| **Next.js**        | package.json (next) | 0.9+ |
-| **Vue**            | package.json (vue) | 0.9+ |
-| **Django**         | requirements.txt (django) | 0.9+ |
-| **FastAPI**        | pyproject.toml (fastapi) | 0.9+ |
-| **Jest**           | package.json (jest) | 0.9+ |
-| **pytest**         | requirements.txt (pytest) | 0.9+ |
+| Language/Framework | Detection Files                          | Confidence |
+| ------------------ | ---------------------------------------- | ---------- |
+| **TypeScript**     | package.json (typescript), tsconfig.json | 0.9+       |
+| **JavaScript**     | package.json (no typescript)             | 0.9+       |
+| **Python**         | pyproject.toml, requirements.txt         | 0.9+       |
+| **Go**             | go.mod                                   | 0.9+       |
+| **React**          | package.json (react)                     | 0.9+       |
+| **Next.js**        | package.json (next)                      | 0.9+       |
+| **Vue**            | package.json (vue)                       | 0.9+       |
+| **Django**         | requirements.txt (django)                | 0.9+       |
+| **FastAPI**        | pyproject.toml (fastapi)                 | 0.9+       |
+| **Jest**           | package.json (jest)                      | 0.9+       |
+| **pytest**         | requirements.txt (pytest)                | 0.9+       |
 
 ### Partially Supported
 

@@ -5,6 +5,7 @@
 Unified entry point for creating feature/bug specifications.
 
 Guides users through:
+
 1. Auto-detect work type (feature/bug/chore/etc)
 2. Ask 5-7 targeted questions (progressive disclosure)
 3. Generate spec from answers
@@ -14,12 +15,14 @@ Guides users through:
 ## When to Use
 
 **Good for:**
+
 - New features (start with spec-init)
 - Bug fixes (document in spec)
 - Refactoring (spec the approach)
 - Chores (lightweight spec)
 
 **Not ideal for:**
+
 - Urgent hotfixes (skip spec, go straight to implementation)
 - Trivial changes (fix typo → direct commit)
 
@@ -28,7 +31,7 @@ Guides users through:
 ### 1. Invoke Skill
 
 ```javascript
-Skill({ skill: "spec-init" })
+Skill({ skill: 'spec-init' });
 ```
 
 ### 2. Answer Questions
@@ -54,7 +57,7 @@ Ensures all required sections present.
 Once approved, offer plan generation:
 
 ```javascript
-Skill({ skill: "plan-generator", args: { specPath: "path/to/spec.md" } })
+Skill({ skill: 'plan-generator', args: { specPath: 'path/to/spec.md' } });
 ```
 
 ## Example Workflow
@@ -65,6 +68,7 @@ Skill({ skill: "plan-generator", args: { specPath: "path/to/spec.md" } })
 **spec-init detects**: type = "feature"
 
 **Asks:**
+
 1. Problem solved: "Users want dark mode for accessibility/comfort"
 2. Users: "End users"
 3. Success metric: "80% of users enable dark mode"
@@ -72,10 +76,12 @@ Skill({ skill: "plan-generator", args: { specPath: "path/to/spec.md" } })
 5. Have AC?: "No, help me define them"
 
 **Generates Spec:**
+
 ```markdown
 # SPEC: Dark Mode Support
 
 ## 1. Overview
+
 **Objective**: Enable users to switch between light and dark themes
 
 ...
@@ -83,6 +89,7 @@ Skill({ skill: "plan-generator", args: { specPath: "path/to/spec.md" } })
 ...
 
 ## 8. Acceptance Criteria
+
 - [ ] Light/dark toggle in settings
 - [ ] Preference persisted to localStorage
 - [ ] All components support both themes
@@ -139,13 +146,13 @@ Use as reference when writing specs manually.
 
 Spec-init auto-detects work type from description keywords:
 
-| Type       | Keywords                                      |
-|------------|-----------------------------------------------|
-| `feature`  | build, add, create, implement                 |
-| `bug`      | fix, bug, issue, leak                         |
-| `chore`    | update, upgrade, dependency                   |
-| `refactor` | reorganize, refactor, restructure             |
-| `docs`     | document, docs, readme                        |
+| Type       | Keywords                          |
+| ---------- | --------------------------------- |
+| `feature`  | build, add, create, implement     |
+| `bug`      | fix, bug, issue, leak             |
+| `chore`    | update, upgrade, dependency       |
+| `refactor` | reorganize, refactor, restructure |
+| `docs`     | document, docs, readme            |
 
 Default: `feature` (if no keyword match)
 
@@ -168,11 +175,13 @@ Total: 5-7 questions per spec
 ## Storage
 
 Specs are saved to:
+
 ```
 .claude/context/artifacts/specs/[feature-name]-spec-YYYYMMDD.md
 ```
 
 Filename format:
+
 - `[feature-name]`: Lowercase with underscores
 - `spec`: Literal
 - `YYYYMMDD`: Date (e.g., 20260129)
@@ -194,6 +203,7 @@ Track metadata JSON is generated for each spec:
 ```
 
 Fields:
+
 - `trackId`: Auto-generated (feature name + random 8-digit ID)
 - `type`: Detected type (feature/bug/chore/refactor/docs)
 - `status`: Always "new" for fresh specs
@@ -206,6 +216,7 @@ Fields:
 Spec-init invokes progressive-disclosure for question asking.
 
 Config:
+
 ```javascript
 {
   header: "Feature Specification",
@@ -216,6 +227,7 @@ Config:
 ### spec-validator
 
 Spec-init validates generated specs for:
+
 - Required sections (## 1. Overview, ## 2. Problem Statement, etc.)
 - Type field present
 - At least 3 acceptance criteria
@@ -223,19 +235,22 @@ Spec-init validates generated specs for:
 ### plan-generator
 
 After spec completion, spec-init offers plan generation:
+
 ```javascript
-Skill({ skill: "plan-generator", args: { specPath: "path/to/spec.md" } })
+Skill({ skill: 'plan-generator', args: { specPath: 'path/to/spec.md' } });
 ```
 
 ## Validation Rules
 
 Minimum required sections:
+
 1. `# SPEC: [Title]`
 2. `**Type**: [type]`
 3. `## 1. Overview`
 4. `## 2. Problem Statement`
 
 Full spec template includes 8 sections total:
+
 1. Overview
 2. Problem Statement
 3. Proposed Solution
@@ -265,11 +280,13 @@ This skill is assigned to:
 ## Memory Protocol
 
 **Before starting:**
+
 ```bash
 cat .claude/context/memory/learnings.md
 ```
 
 **After completing:**
+
 - New spec pattern → `.claude/context/memory/learnings.md`
 - Issue with spec generation → `.claude/context/memory/issues.md`
 - Spec-driven workflow decision → `.claude/context/memory/decisions.md`

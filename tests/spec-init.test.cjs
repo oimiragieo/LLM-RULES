@@ -49,7 +49,7 @@ describe('Spec Initialization Skill', () => {
       users: 'End users',
       success: 'User adoption',
       deadline: '1 week',
-      criteria: 'Yes'
+      criteria: 'Yes',
     };
     const result = validateAnswers(answers);
     assert.equal(result.valid, true);
@@ -65,8 +65,8 @@ describe('Spec Initialization Skill', () => {
         users: 'End users',
         success: 'User adoption',
         deadline: '2 weeks',
-        criteria: 'Toggle in settings, persisted preference'
-      }
+        criteria: 'Toggle in settings, persisted preference',
+      },
     });
 
     assert.ok(spec.includes('# SPEC: Dark Mode'));
@@ -80,7 +80,7 @@ describe('Spec Initialization Skill', () => {
     const spec = generateSpec({
       title: 'Test Feature',
       type: 'feature',
-      answers: {}
+      answers: {},
     });
 
     const requiredSections = [
@@ -91,7 +91,7 @@ describe('Spec Initialization Skill', () => {
       '## 5. Success Metrics',
       '## 6. Effort Estimate',
       '## 7. Dependencies',
-      '## 8. Acceptance Criteria Checklist'
+      '## 8. Acceptance Criteria Checklist',
     ];
 
     requiredSections.forEach(section => {
@@ -103,7 +103,7 @@ describe('Spec Initialization Skill', () => {
     const spec = generateSpec({
       title: 'Test',
       type: 'feature',
-      answers: { criteria: 'Feature works, Tests pass, Docs updated' }
+      answers: { criteria: 'Feature works, Tests pass, Docs updated' },
     });
 
     const acMatches = spec.match(/- \[ \]/g);
@@ -137,11 +137,7 @@ Problem here`;
     const spec = 'test spec content';
     const filename = saveSpec(spec, 'test-feature');
 
-    const expectedPath = path.join(
-      process.cwd(),
-      '.claude/context/artifacts/specs',
-      filename
-    );
+    const expectedPath = path.join(process.cwd(), '.claude/context/artifacts/specs', filename);
 
     assert.ok(filename.includes('test-feature'));
     assert.ok(filename.includes('-spec-'));
@@ -151,7 +147,7 @@ Problem here`;
   test('generates valid track metadata', () => {
     const metadata = generateMetadata({
       title: 'Test Feature',
-      type: 'feature'
+      type: 'feature',
     });
 
     assert.ok(metadata.trackId);
@@ -169,13 +165,13 @@ Problem here`;
       users: 'Test users',
       success: 'Test success',
       deadline: 'Test deadline',
-      criteria: 'Test criteria'
+      criteria: 'Test criteria',
     };
 
     const spec = generateSpec({
       title: 'Test',
       type: 'feature',
-      answers
+      answers,
     });
 
     assert.ok(spec.includes('Test problem'));
@@ -185,7 +181,7 @@ Problem here`;
     const spec = generateSpec({
       title: 'Test',
       type: 'feature',
-      answers: {}
+      answers: {},
     });
 
     const validation = validateSpec(spec);
@@ -226,7 +222,12 @@ function detectType(description) {
   const lower = description.toLowerCase();
 
   // Keywords for detection
-  if (lower.includes('fix') || lower.includes('bug') || lower.includes('issue') || lower.includes('leak')) {
+  if (
+    lower.includes('fix') ||
+    lower.includes('bug') ||
+    lower.includes('issue') ||
+    lower.includes('leak')
+  ) {
     return 'bug';
   }
   if (lower.includes('update') || lower.includes('upgrade') || lower.includes('dependency')) {
@@ -238,7 +239,12 @@ function detectType(description) {
   if (lower.includes('document') || lower.includes('docs') || lower.includes('readme')) {
     return 'docs';
   }
-  if (lower.includes('build') || lower.includes('add') || lower.includes('create') || lower.includes('implement')) {
+  if (
+    lower.includes('build') ||
+    lower.includes('add') ||
+    lower.includes('create') ||
+    lower.includes('implement')
+  ) {
     return 'feature';
   }
 
@@ -248,32 +254,32 @@ function detectType(description) {
 function generateQuestions(type) {
   const baseQuestions = [
     {
-      question: "What problem does this solve?",
-      options: ["User frustration", "Performance issue", "Missing capability", "Other"]
+      question: 'What problem does this solve?',
+      options: ['User frustration', 'Performance issue', 'Missing capability', 'Other'],
     },
     {
-      question: "Who are the users?",
-      options: ["End users", "Developers", "Operators", "All of above"]
+      question: 'Who are the users?',
+      options: ['End users', 'Developers', 'Operators', 'All of above'],
     },
     {
-      question: "How will you measure success?",
-      options: ["User adoption", "Performance metrics", "Error reduction", "Feature usage"]
+      question: 'How will you measure success?',
+      options: ['User adoption', 'Performance metrics', 'Error reduction', 'Feature usage'],
     },
     {
       question: "What's the deadline?",
-      options: ["ASAP", "1 week", "1 month", "No deadline", "Type custom"]
+      options: ['ASAP', '1 week', '1 month', 'No deadline', 'Type custom'],
     },
     {
-      question: "Do you have acceptance criteria?",
-      options: ["Yes (provide list)", "No (I'll define them)", "Other"]
-    }
+      question: 'Do you have acceptance criteria?',
+      options: ['Yes (provide list)', "No (I'll define them)", 'Other'],
+    },
   ];
 
   // Add type-specific questions
   if (type === 'bug') {
     baseQuestions.push({
-      question: "Can you reproduce this consistently?",
-      options: ["Yes", "Sometimes", "No"]
+      question: 'Can you reproduce this consistently?',
+      options: ['Yes', 'Sometimes', 'No'],
     });
   }
 
@@ -292,7 +298,7 @@ function validateAnswers(answers) {
   if (missing.length > 0) {
     return {
       valid: false,
-      errors: missing.map(field => `Missing required field: ${field}`)
+      errors: missing.map(field => `Missing required field: ${field}`),
     };
   }
 
@@ -430,11 +436,7 @@ function validateSpec(spec) {
   const errors = [];
 
   // Check for minimum required sections (basic validation)
-  const minimumRequiredSections = [
-    '# SPEC:',
-    '## 1. Overview',
-    '## 2. Problem Statement'
-  ];
+  const minimumRequiredSections = ['# SPEC:', '## 1. Overview', '## 2. Problem Statement'];
 
   minimumRequiredSections.forEach(section => {
     if (!spec.includes(section)) {
@@ -449,7 +451,7 @@ function validateSpec(spec) {
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -461,13 +463,15 @@ function saveSpec(spec, name) {
 
 function generateMetadata(config) {
   const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
-  const randomId = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+  const randomId = Math.floor(Math.random() * 100000000)
+    .toString()
+    .padStart(8, '0');
 
   return {
     trackId: `${config.title.toLowerCase().replace(/\s+/g, '_')}_${randomId}`,
     type: config.type,
     status: 'new',
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
   };
 }
 

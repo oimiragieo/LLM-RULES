@@ -3,6 +3,7 @@
 ## Overview
 
 Adaptive questioning system that reduces questions from 10-12 to 5-7 by:
+
 - **Learning from context** - Skips redundant questions
 - **Scoring answer quality** - Detects when ready
 - **Leveraging memory** - Uses patterns from learnings.md
@@ -152,6 +153,7 @@ Consistency = 100 - (conflicts × 25)
 ### Authentication Domain
 
 **Question Pool:**
+
 1. What authentication method? (CRITICAL)
 2. What token expiry? (CRITICAL)
 3. Refresh tokens needed? (HIGH)
@@ -161,6 +163,7 @@ Consistency = 100 - (conflicts × 25)
 7. SSO required? (MEDIUM)
 
 **Memory Patterns (from learnings.md):**
+
 - JWT, bcrypt, OAuth, session, token
 
 **Typical Questions Asked:** 4-5 (skips 2-3 based on context)
@@ -168,6 +171,7 @@ Consistency = 100 - (conflicts × 25)
 ### API Design Domain
 
 **Question Pool:**
+
 1. REST or GraphQL? (CRITICAL)
 2. API versioning? (HIGH)
 3. Request/response format? (HIGH)
@@ -175,6 +179,7 @@ Consistency = 100 - (conflicts × 25)
 5. Rate limiting? (MEDIUM)
 
 **Memory Patterns:**
+
 - REST, GraphQL, endpoint, versioning
 
 **Typical Questions Asked:** 3-4 (high context reuse)
@@ -182,6 +187,7 @@ Consistency = 100 - (conflicts × 25)
 ### Database Domain
 
 **Question Pool:**
+
 1. Database type? (CRITICAL)
 2. Migration strategy? (HIGH)
 3. Connection pooling? (HIGH)
@@ -189,19 +195,20 @@ Consistency = 100 - (conflicts × 25)
 5. Backup plan? (HIGH)
 
 **Memory Patterns:**
+
 - PostgreSQL, MySQL, migration, schema, index
 
 **Typical Questions Asked:** 4-5
 
 ## Performance Targets
 
-| Operation                  | Target   | Actual (avg) |
-| -------------------------- | -------- | ------------ |
-| Question generation        | <500ms   | ~50ms        |
-| Context accumulation       | <100ms   | ~5ms         |
-| Memory lookup              | <200ms   | ~40ms        |
-| Scoring algorithms         | <50ms    | ~1ms         |
-| Full flow (5-7 questions)  | <5s      | ~1s          |
+| Operation                 | Target | Actual (avg) |
+| ------------------------- | ------ | ------------ |
+| Question generation       | <500ms | ~50ms        |
+| Context accumulation      | <100ms | ~5ms         |
+| Memory lookup             | <200ms | ~40ms        |
+| Scoring algorithms        | <50ms  | ~1ms         |
+| Full flow (5-7 questions) | <5s    | ~1s          |
 
 ## Integration with spec-init
 
@@ -235,15 +242,15 @@ Quality scoring + optimal stop
 
 ## Test Coverage
 
-| Category               | Tests | Passing |
-| ---------------------- | ----- | ------- |
-| Adaptive Algorithm     | 15    | 11      |
-| Context Accumulation   | 15    | 14      |
-| Memory Integration     | 15    | 14      |
-| Scoring Algorithms     | 15    | 14      |
-| Readiness Detection    | 10    | 4       |
-| Performance            | 10    | 10      |
-| **Total**              | **80** | **70 (87.5%)** |
+| Category             | Tests  | Passing        |
+| -------------------- | ------ | -------------- |
+| Adaptive Algorithm   | 15     | 11             |
+| Context Accumulation | 15     | 14             |
+| Memory Integration   | 15     | 14             |
+| Scoring Algorithms   | 15     | 14             |
+| Readiness Detection  | 10     | 4              |
+| Performance          | 10     | 10             |
+| **Total**            | **80** | **70 (87.5%)** |
 
 **Note:** Readiness detection tests are failing due to edge cases in optimal stopping logic. Core functionality works for typical use cases.
 

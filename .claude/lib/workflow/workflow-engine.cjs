@@ -33,6 +33,16 @@ const fs = require('fs');
 const path = require('path');
 const { safeEvaluateCondition } = require('./step-validators.cjs');
 
+// Phase 5 ML Features Integration
+const {
+  getPatternDetector,
+  getCostPredictor,
+  getAdaptiveExecutor,
+  getOptimizationEngine,
+  isMLEnabled,
+  ML_FEATURES,
+} = require('../ml/index.cjs');
+
 // =============================================================================
 // Constants
 // =============================================================================
@@ -429,6 +439,52 @@ class WorkflowEngine {
 
     // Reverse mapping: handler function -> { event, id } for off() cleanup
     this.handlerIdMap = new Map();
+
+    // Phase 5 ML Features (lazy-loaded if enabled)
+    this.ml = {
+      patternDetector: null,
+      costPredictor: null,
+      adaptiveExecutor: null,
+      optimizationEngine: null,
+      enabled: isMLEnabled(),
+    };
+
+    // Initialize ML modules if enabled
+    if (isMLEnabled()) {
+      this._initializeMLModules();
+    }
+  }
+
+  /**
+   * Initialize Phase 5 ML modules (lazy-loaded)
+   * @private
+   */
+  _initializeMLModules() {
+    try {
+      if (ML_FEATURES.PATTERN_DETECTION) {
+        this.ml.patternDetector = getPatternDetector();
+      }
+      if (ML_FEATURES.COST_PREDICTION) {
+        this.ml.costPredictor = getCostPredictor();
+      }
+      if (ML_FEATURES.ADAPTIVE_EXECUTION) {
+        this.ml.adaptiveExecutor = getAdaptiveExecutor();
+      }
+      if (ML_FEATURES.PERFORMANCE_PROFILING) {
+        this.ml.optimizationEngine = getOptimizationEngine();
+      }
+
+      console.log('[workflow-engine] Phase 5 ML modules initialized:', {
+        patternDetection: !!this.ml.patternDetector,
+        costPrediction: !!this.ml.costPredictor,
+        adaptiveExecution: !!this.ml.adaptiveExecutor,
+        performanceProfiling: !!this.ml.optimizationEngine,
+      });
+    } catch (error) {
+      console.warn('[workflow-engine] Failed to initialize ML modules:', error.message);
+      // Continue without ML features (graceful degradation)
+      this.ml.enabled = false;
+    }
   }
 
   // ===========================================================================
@@ -890,6 +946,12 @@ class WorkflowEngine {
     this.state.stepResults = {};
     this.state.errors = [];
 
+    // Phase 5 ML: Initialize cost tracking
+    if (this.ml.costPredictor) {
+      const estimatedCost = this._estimateWorkflowCost(context);
+      console.log(`[workflow-engine] Estimated workflow cost: $${estimatedCost.toFixed(4)}`);
+    }
+
     try {
       // Execute each phase in order
       for (const phaseName of PHASE_ORDER) {
@@ -899,12 +961,114 @@ class WorkflowEngine {
       this.state.status = 'completed';
       this.state.endedAt = Date.now();
 
+      // Phase 5 ML: Record execution pattern
+      if (this.ml.patternDetector) {
+        this._recordExecutionPattern();
+      }
+
+      // Phase 5 ML: Generate optimization recommendations
+      if (this.ml.optimizationEngine) {
+        this._generateOptimizations();
+      }
+
       return this.getState();
     } catch (e) {
       this.state.status = 'failed';
       this.state.errors.push(e.message);
       this.state.endedAt = Date.now();
       throw e;
+    }
+  }
+
+  /**
+   * Estimate workflow cost using ML cost predictor
+   * @param {Object} context - Execution context
+   * @returns {number} - Estimated cost in USD
+   * @private
+   */
+  _estimateWorkflowCost(context) {
+    if (!this.ml.costPredictor || !this.workflow) {
+      return 0;
+    }
+
+    try {
+      // Estimate based on workflow complexity
+      const phaseCount = Object.keys(this.workflow.phases || {}).length;
+      const avgStepsPerPhase = 3; // Rough estimate
+      const avgPromptLength = 500; // Characters per step
+
+      const totalChars = phaseCount * avgStepsPerPhase * avgPromptLength;
+      const tokens = this.ml.costPredictor.estimateTokens(totalChars, {
+        includeSystemOverhead: true,
+      });
+
+      // Assume sonnet model for estimation
+      const cost = this.ml.costPredictor.estimateCost(
+        tokens,
+        tokens * 0.5, // Assume 50% response ratio
+        'claude-sonnet-4-20250514'
+      );
+
+      return cost;
+    } catch (error) {
+      console.warn('[workflow-engine] Cost estimation failed:', error.message);
+      return 0;
+    }
+  }
+
+  /**
+   * Record execution pattern for ML analysis
+   * @private
+   */
+  _recordExecutionPattern() {
+    if (!this.ml.patternDetector) {
+      return;
+    }
+
+    try {
+      const pattern = {
+        workflowId: this.workflow?.name || 'unknown',
+        phases: this.state.completedPhases,
+        steps: this.state.completedSteps,
+        duration: this.state.endedAt - this.state.startedAt,
+        errors: this.state.errors,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Note: Pattern storage would be implemented in pattern library module
+      console.log('[workflow-engine] Execution pattern recorded:', {
+        phases: pattern.phases.length,
+        steps: pattern.steps.length,
+        duration: `${pattern.duration}ms`,
+      });
+    } catch (error) {
+      console.warn('[workflow-engine] Pattern recording failed:', error.message);
+    }
+  }
+
+  /**
+   * Generate optimization recommendations based on execution
+   * @private
+   */
+  _generateOptimizations() {
+    if (!this.ml.optimizationEngine) {
+      return;
+    }
+
+    try {
+      const executionMetrics = {
+        duration: this.state.endedAt - this.state.startedAt,
+        phaseCount: this.state.completedPhases.length,
+        stepCount: this.state.completedSteps.length,
+        errorCount: this.state.errors.length,
+      };
+
+      console.log('[workflow-engine] Execution metrics:', executionMetrics);
+
+      // Note: Optimization recommendations would be generated by optimization-engine module
+      // This is a placeholder for future enhancement
+    } catch (error) {
+      console.warn('[workflow-engine] Optimization generation failed:', error.message);
     }
   }
 

@@ -34,14 +34,14 @@ class SafetyRollbackManager {
     const backupId = `${componentName}_${timestamp}`;
 
     // Get current state if not provided
-    const stateToBackup = state || await this.getCurrentState(componentName);
+    const stateToBackup = state || (await this.getCurrentState(componentName));
 
     const backup = {
       id: backupId,
       componentName,
       timestamp: new Date().toISOString(),
       state: stateToBackup,
-      compressed: options.compress || false
+      compressed: options.compress || false,
     };
 
     // Calculate checksum
@@ -86,7 +86,11 @@ class SafetyRollbackManager {
 
         if (!(key in after)) {
           missingFields.push(fullKey);
-        } else if (typeof before[key] === 'object' && before[key] !== null && !Array.isArray(before[key])) {
+        } else if (
+          typeof before[key] === 'object' &&
+          before[key] !== null &&
+          !Array.isArray(before[key])
+        ) {
           checkFields(before[key], after[key], fullKey);
         }
       }
@@ -97,7 +101,7 @@ class SafetyRollbackManager {
     return {
       valid: missingFields.length === 0,
       dataLoss: missingFields.length > 0,
-      missingFields: missingFields.length > 0 ? missingFields : undefined
+      missingFields: missingFields.length > 0 ? missingFields : undefined,
     };
   }
 
@@ -183,7 +187,7 @@ class SafetyRollbackManager {
 
     return {
       valid,
-      checksum: calculatedChecksum
+      checksum: calculatedChecksum,
     };
   }
 
@@ -225,12 +229,12 @@ class SafetyRollbackManager {
     if (scenario === 'incompatible-rollback') {
       return {
         safe: false,
-        reasons: ['Incompatible rollback scenario']
+        reasons: ['Incompatible rollback scenario'],
       };
     }
 
     return {
-      safe: true
+      safe: true,
     };
   }
 
@@ -326,14 +330,14 @@ class SafetyRollbackManager {
           changes.push({
             type: 'restore',
             field: fullKey,
-            value: after[key]
+            value: after[key],
           });
         } else if (JSON.stringify(before[key]) !== JSON.stringify(after[key])) {
           changes.push({
             type: 'modify',
             field: fullKey,
             from: before[key],
-            to: after[key]
+            to: after[key],
           });
         }
       }
@@ -389,7 +393,7 @@ class SafetyRollbackManager {
       action,
       component,
       backupId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 

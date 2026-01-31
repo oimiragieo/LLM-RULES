@@ -23,30 +23,30 @@ function getFullSpecFlowScenario() {
       {
         spec: 'SPEC-001',
         action: 'spec-init',
-        description: 'Initialize new specification'
+        description: 'Initialize new specification',
       },
       {
         spec: 'SPEC-009',
         action: 'progressive-disclosure',
-        description: 'Adaptive questioning based on context'
+        description: 'Adaptive questioning based on context',
       },
       {
         spec: 'SPEC-008',
         action: 'track-metadata',
-        description: 'Create track metadata'
+        description: 'Create track metadata',
       },
       {
         spec: 'SPEC-004',
         action: 'phase-verification',
-        description: 'Verify phase gate compliance'
-      }
+        description: 'Verify phase gate compliance',
+      },
     ],
     expectedOutcome: {
       status: 'completed',
       specCreated: true,
       metadataCreated: true,
-      phaseVerified: true
-    }
+      phaseVerified: true,
+    },
   };
 }
 
@@ -66,25 +66,25 @@ function getRevertAuditScenario() {
       {
         spec: 'SPEC-003',
         action: 'workflow-checkpointing',
-        description: 'Create workflow checkpoint'
+        description: 'Create workflow checkpoint',
       },
       {
         spec: 'SPEC-010',
         action: 'smart-revert',
-        description: 'Revert changes by task ID'
+        description: 'Revert changes by task ID',
       },
       {
         spec: 'SPEC-002',
         action: 'git-notes-audit',
-        description: 'Verify audit trail'
-      }
+        description: 'Verify audit trail',
+      },
     ],
     expectedOutcome: {
       status: 'completed',
       checkpointCreated: true,
       revertSuccessful: true,
-      auditTrailComplete: true
-    }
+      auditTrailComplete: true,
+    },
   };
 }
 
@@ -104,25 +104,25 @@ function getBrownfieldSetupScenario() {
       {
         spec: 'SPEC-005',
         action: 'brownfield-detection',
-        description: 'Detect project tech stack'
+        description: 'Detect project tech stack',
       },
       {
         spec: 'SPEC-006',
         action: 'code-styleguides',
-        description: 'Auto-inject styleguides'
+        description: 'Auto-inject styleguides',
       },
       {
         spec: 'SPEC-001',
         action: 'onboarding-orchestration',
-        description: 'Complete onboarding workflow'
-      }
+        description: 'Complete onboarding workflow',
+      },
     ],
     expectedOutcome: {
       status: 'completed',
       techStackDetected: true,
       styleguidesInjected: true,
-      onboardingComplete: true
-    }
+      onboardingComplete: true,
+    },
   };
 }
 
@@ -142,54 +142,54 @@ function getComplexWorkflowScenario() {
       {
         spec: 'SPEC-005',
         action: 'brownfield-detection',
-        description: 'Detect project context'
+        description: 'Detect project context',
       },
       {
         spec: 'SPEC-001',
         action: 'spec-init',
-        description: 'Initialize specification'
+        description: 'Initialize specification',
       },
       {
         spec: 'SPEC-009',
         action: 'progressive-disclosure',
-        description: 'Adaptive questioning'
+        description: 'Adaptive questioning',
       },
       {
         spec: 'SPEC-007',
         action: 'create-track-metadata',
-        description: 'Create track metadata'
+        description: 'Create track metadata',
       },
       {
         spec: 'SPEC-004',
         action: 'phase-verification',
-        description: 'Verify phase gate'
+        description: 'Verify phase gate',
       },
       {
         spec: 'SPEC-003',
         action: 'workflow-checkpointing',
-        description: 'Create checkpoint'
+        description: 'Create checkpoint',
       },
       {
         spec: 'SPEC-002',
         action: 'git-notes-audit',
-        description: 'Add audit trail'
+        description: 'Add audit trail',
       },
       {
         spec: 'SPEC-008',
         action: 'analytics-report',
-        description: 'Generate analytics'
+        description: 'Generate analytics',
       },
       {
         spec: 'SPEC-010',
         action: 'smart-revert',
-        description: 'Smart revert capability'
-      }
+        description: 'Smart revert capability',
+      },
     ],
     expectedOutcome: {
       status: 'completed',
       allSPECsExecuted: true,
-      noStateContamination: true
-    }
+      noStateContamination: true,
+    },
   };
 }
 
@@ -209,25 +209,25 @@ function getErrorRecoveryScenario() {
       {
         spec: 'SPEC-001',
         action: 'spec-init',
-        description: 'Initialize spec (should succeed)'
+        description: 'Initialize spec (should succeed)',
       },
       {
         spec: 'SPEC-009',
         action: 'progressive-disclosure',
-        description: 'Adaptive questioning (simulated failure)'
+        description: 'Adaptive questioning (simulated failure)',
       },
       {
         spec: 'SPEC-003',
         action: 'workflow-checkpointing',
-        description: 'Create checkpoint (should still work)'
-      }
+        description: 'Create checkpoint (should still work)',
+      },
     ],
     expectedOutcome: {
       status: 'completed',
       isolatedFailure: true,
-      recoverySuccessful: true
+      recoverySuccessful: true,
     },
-    continueOnFailure: true // Continue even if SPEC-009 fails
+    continueOnFailure: true, // Continue even if SPEC-009 fails
   };
 }
 
@@ -242,7 +242,7 @@ function getAllScenarios() {
     getRevertAuditScenario(),
     getBrownfieldSetupScenario(),
     getComplexWorkflowScenario(),
-    getErrorRecoveryScenario()
+    getErrorRecoveryScenario(),
   ];
 }
 
@@ -257,11 +257,7 @@ function loadScenariosIntoFramework(framework) {
   let count = 0;
 
   for (const scenario of scenarios) {
-    framework.addScenario(
-      scenario.scenarioId,
-      scenario.steps,
-      scenario.expectedOutcome
-    );
+    framework.addScenario(scenario.scenarioId, scenario.steps, scenario.expectedOutcome);
     count++;
   }
 
@@ -275,5 +271,5 @@ module.exports = {
   getComplexWorkflowScenario,
   getErrorRecoveryScenario,
   getAllScenarios,
-  loadScenariosIntoFramework
+  loadScenariosIntoFramework,
 };

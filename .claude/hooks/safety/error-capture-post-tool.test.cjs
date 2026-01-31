@@ -132,10 +132,7 @@ describe('error-capture-post-tool', () => {
     });
 
     it('should return CRITICAL for security violations', () => {
-      assert.strictEqual(
-        errorCapture.classifySeverity('SECURITY_VIOLATION', {}),
-        'CRITICAL'
-      );
+      assert.strictEqual(errorCapture.classifySeverity('SECURITY_VIOLATION', {}), 'CRITICAL');
     });
 
     it('should return CRITICAL for data loss', () => {
@@ -146,10 +143,7 @@ describe('error-capture-post-tool', () => {
     });
 
     it('should return HIGH for execution errors', () => {
-      assert.strictEqual(
-        errorCapture.classifySeverity('EXECUTION_ERROR', {}),
-        'HIGH'
-      );
+      assert.strictEqual(errorCapture.classifySeverity('EXECUTION_ERROR', {}), 'HIGH');
     });
 
     it('should return HIGH for task-blocking errors', () => {
@@ -160,16 +154,13 @@ describe('error-capture-post-tool', () => {
     });
 
     it('should return MEDIUM for tool failures', () => {
-      assert.strictEqual(
-        errorCapture.classifySeverity('TOOL_FAILURE', {}),
-        'MEDIUM'
-      );
+      assert.strictEqual(errorCapture.classifySeverity('TOOL_FAILURE', {}), 'MEDIUM');
     });
 
     it('should return LOW for recoverable errors', () => {
       assert.strictEqual(
         errorCapture.classifySeverity('TOOL_FAILURE', {
-          impact: { recoverable: true, userVisible: false }
+          impact: { recoverable: true, userVisible: false },
         }),
         'LOW'
       );

@@ -11,9 +11,11 @@ Comprehensive integration testing framework for validating interactions between 
 ## Components
 
 ### 1. Integration Test Framework
+
 **File**: `.claude/lib/testing/integration-test-suite.cjs`
 
 Core framework providing:
+
 - `addScenario()` - Define multi-step test scenarios
 - `executeSequential()` - Run scenarios in order
 - `executeParallel()` - Run scenarios concurrently
@@ -22,24 +24,31 @@ Core framework providing:
 - `generateReport()` - Markdown report with analytics
 
 **Usage**:
+
 ```javascript
 const { IntegrationTestFramework } = require('.claude/lib/testing/integration-test-suite.cjs');
 
 const framework = new IntegrationTestFramework();
-framework.addScenario('full-spec-flow', [
-  { spec: 'SPEC-001', action: 'spec-init' },
-  { spec: 'SPEC-009', action: 'progressive-disclosure' },
-  { spec: 'SPEC-008', action: 'track-metadata' }
-], { status: 'completed' });
+framework.addScenario(
+  'full-spec-flow',
+  [
+    { spec: 'SPEC-001', action: 'spec-init' },
+    { spec: 'SPEC-009', action: 'progressive-disclosure' },
+    { spec: 'SPEC-008', action: 'track-metadata' },
+  ],
+  { status: 'completed' }
+);
 
 const result = await framework.executeSequential('full-spec-flow');
 console.log(result.status); // 'completed'
 ```
 
 ### 2. Integration Scenarios
+
 **File**: `.claude/lib/testing/integration-scenarios.cjs`
 
 Predefined scenarios:
+
 1. **Full Spec Flow**: SPEC-001 → SPEC-009 → SPEC-008 → SPEC-004
 2. **Revert & Audit**: SPEC-003 → SPEC-010 → SPEC-002
 3. **Brownfield Setup**: SPEC-005 → SPEC-006 → Onboarding
@@ -47,8 +56,12 @@ Predefined scenarios:
 5. **Error Recovery**: Injected failure + isolation
 
 **Usage**:
+
 ```javascript
-const { getAllScenarios, loadScenariosIntoFramework } = require('.claude/lib/testing/integration-scenarios.cjs');
+const {
+  getAllScenarios,
+  loadScenariosIntoFramework,
+} = require('.claude/lib/testing/integration-scenarios.cjs');
 
 const framework = new IntegrationTestFramework();
 loadScenariosIntoFramework(framework); // Loads all 5 scenarios
@@ -57,15 +70,18 @@ const result = await framework.executeSequential('complex-workflow');
 ```
 
 ### 3. Feature Interaction Validator
+
 **File**: `.claude/lib/testing/feature-interaction-validator.cjs`
 
 Validates SPEC pair interactions:
+
 - `validateFeaturePair()` - Check bidirectional interaction (SPEC-001 ↔ SPEC-002)
 - `detectStateContamination()` - Ensure no cross-feature pollution
 - `validateMetadataConsistency()` - Check metadata integrity
 - `validateMemoryBoundaries()` - Detect memory leaks
 
 **Supported Pairs**:
+
 - SPEC-001 ↔ SPEC-002 (spec-init + git notes)
 - SPEC-001 ↔ SPEC-007 (spec-init + metadata)
 - SPEC-001 ↔ SPEC-009 (spec-init + adaptive)
@@ -76,12 +92,13 @@ Validates SPEC pair interactions:
 - SPEC-007 ↔ SPEC-008 (metadata + analytics)
 
 **Usage**:
+
 ```javascript
 const { validateFeaturePair } = require('.claude/lib/testing/feature-interaction-validator.cjs');
 
 const result = validateFeaturePair('SPEC-001', 'SPEC-009', {
   adaptiveQuestioningUsed: true,
-  questionsAsked: 5
+  questionsAsked: 5,
 });
 
 console.log(result.valid); // true
@@ -89,9 +106,11 @@ console.log(result.issues); // []
 ```
 
 ### 4. Performance Integration Tester
+
 **File**: `.claude/lib/testing/performance-integration-tester.cjs`
 
 Performance measurement:
+
 - `measureSequentialWorkflow()` - Time sequential execution (<10s target)
 - `measureParallelWorkflow()` - Time concurrent execution (<300MB memory target)
 - `measureComponentPerformance()` - Time individual SPECs
@@ -112,8 +131,12 @@ Performance measurement:
 | Parallel (50 workflows) | <300MB | Memory usage |
 
 **Usage**:
+
 ```javascript
-const { measureSequentialWorkflow, generatePerformanceReport } = require('.claude/lib/testing/performance-integration-tester.cjs');
+const {
+  measureSequentialWorkflow,
+  generatePerformanceReport,
+} = require('.claude/lib/testing/performance-integration-tester.cjs');
 
 const metrics = await measureSequentialWorkflow(
   () => framework.executeSequential('full-spec-flow'),
@@ -130,9 +153,11 @@ console.log(report); // Markdown report
 ## Test Coverage
 
 ### Test File
+
 **File**: `tests/multi-feature-integration.test.cjs`
 
 **80+ Integration Tests**:
+
 1. **Scenario Execution** (15 tests):
    - Full spec flow execution
    - Revert & audit workflow
@@ -170,11 +195,13 @@ console.log(report); // Markdown report
 ## Running Tests
 
 ### Run All Integration Tests
+
 ```bash
 npm test -- tests/multi-feature-integration.test.cjs
 ```
 
 ### Run Specific Test Category
+
 ```bash
 # Scenario execution tests only
 npm test -- tests/multi-feature-integration.test.cjs --grep "Scenario Execution"
@@ -184,6 +211,7 @@ npm test -- tests/multi-feature-integration.test.cjs --grep "Performance"
 ```
 
 ### Generate Performance Report
+
 ```bash
 node .claude/tools/cli/integration-performance-report.cjs
 ```
@@ -193,6 +221,7 @@ node .claude/tools/cli/integration-performance-report.cjs
 See `.claude/context/plans/phase-3-integration-matrix.md` for complete feature interaction mapping.
 
 **Critical Paths**:
+
 1. Spec Creation: SPEC-001 → SPEC-009 → SPEC-007 → SPEC-004
 2. Workflow Execution: SPEC-003 → SPEC-004 → SPEC-002 → SPEC-008
 3. Recovery: SPEC-003 → SPEC-010 → SPEC-002
@@ -202,6 +231,7 @@ See `.claude/context/plans/phase-3-integration-matrix.md` for complete feature i
 ## Success Criteria
 
 ✅ **Functionality**:
+
 - [x] 80+ integration tests written
 - [x] 5 critical scenarios implemented
 - [x] All SPEC pair interactions tested
@@ -209,12 +239,14 @@ See `.claude/context/plans/phase-3-integration-matrix.md` for complete feature i
 - [x] Performance framework complete
 
 ✅ **Quality**:
+
 - [x] 100% test pass rate (80+ tests passing)
 - [x] Framework documented with examples
 - [x] Performance targets defined
 - [x] State contamination detection working
 
 ✅ **Integration**:
+
 - [x] Feature interaction matrix 80%+ covered
 - [x] Zero state contamination detected
 - [x] Performance targets met in framework

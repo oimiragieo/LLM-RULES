@@ -32,8 +32,8 @@ describe('Category 1: Version Management', () => {
       const versioner = new WorkflowVersioner();
 
       assert.equal(versioner.compareVersions('1.0.0', '2.0.0'), -1); // 1.0.0 < 2.0.0
-      assert.equal(versioner.compareVersions('2.0.0', '2.0.0'), 0);  // equal
-      assert.equal(versioner.compareVersions('2.1.0', '2.0.5'), 1);  // 2.1.0 > 2.0.5
+      assert.equal(versioner.compareVersions('2.0.0', '2.0.0'), 0); // equal
+      assert.equal(versioner.compareVersions('2.1.0', '2.0.5'), 1); // 2.1.0 > 2.0.5
     });
 
     it('should validate version constraints (semver ranges)', async () => {
@@ -164,8 +164,12 @@ describe('Category 1: Version Management', () => {
       const versioner = new WorkflowVersioner();
 
       await versioner.register('feature-dev', '1.0.0', {});
-      await versioner.register('feature-dev', '2.0.0', { migrations: [{ from: '1.x.x', to: '2.0.0' }] });
-      await versioner.register('feature-dev', '3.0.0', { migrations: [{ from: '2.x.x', to: '3.0.0' }] });
+      await versioner.register('feature-dev', '2.0.0', {
+        migrations: [{ from: '1.x.x', to: '2.0.0' }],
+      });
+      await versioner.register('feature-dev', '3.0.0', {
+        migrations: [{ from: '2.x.x', to: '3.0.0' }],
+      });
 
       const path = versioner.getUpgradePath('feature-dev', '1.0.0', '3.0.0');
 
@@ -235,15 +239,19 @@ describe('Category 2: Blue-Green Deployment', () => {
 
       await deployer.setTraffic('feature-dev', { greenPercentage: 50 });
 
-      // Run 100 requests, count green
+      // Run 1000 requests for better statistical accuracy
       const results = [];
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 1000; i++) {
         const version = deployer.selectVersion('feature-dev');
         results.push(version.version);
       }
 
       const greenCount = results.filter(v => v === '2.0.0').length;
-      assert.ok(greenCount >= 40 && greenCount <= 60, 'Should route ~50% to green');
+      // With 1000 samples, 50% ± 5% is more reliable (450-550)
+      assert.ok(
+        greenCount >= 450 && greenCount <= 550,
+        `Should route ~50% to green (got ${greenCount}/1000)`
+      );
     });
   });
 
@@ -409,7 +417,7 @@ describe('Category 3: Migration Strategies', () => {
       const migration = {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({ ...state, newField: 'added' }),
+        migrate: async state => ({ ...state, newField: 'added' }),
       };
 
       executor.register('feature-dev', migration);
@@ -425,8 +433,8 @@ describe('Category 3: Migration Strategies', () => {
       const migration = {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => state,
-        validate: async (state) => {
+        migrate: async state => state,
+        validate: async state => {
           const errors = [];
           if (!state.phases['security-review']) {
             errors.push('Missing security-review phase');
@@ -451,8 +459,8 @@ describe('Category 3: Migration Strategies', () => {
       const migration = {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({ ...state, newField: 'added' }),
-        rollback: async (state) => {
+        migrate: async state => ({ ...state, newField: 'added' }),
+        rollback: async state => {
           const rolled = { ...state };
           delete rolled.newField;
           return rolled;
@@ -474,13 +482,13 @@ describe('Category 3: Migration Strategies', () => {
       executor.register('feature-dev', {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({ ...state, v2: true }),
+        migrate: async state => ({ ...state, v2: true }),
       });
 
       executor.register('feature-dev', {
         from: '2.x.x',
         to: '3.0.0',
-        migrate: async (state) => ({ ...state, v3: true }),
+        migrate: async state => ({ ...state, v3: true }),
       });
 
       const path = executor.getMigrationPath('feature-dev', '1.0.0', '3.0.0');
@@ -501,8 +509,8 @@ describe('Category 3: Migration Strategies', () => {
       executor.register('feature-dev', {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({ ...state, migrated: true }),
-        validate: async (state) => ({ valid: !!state.migrated, errors: [] }),
+        migrate: async state => ({ ...state, migrated: true }),
+        validate: async state => ({ valid: !!state.migrated, errors: [] }),
       });
     });
 
@@ -543,9 +551,7 @@ describe('Category 3: Migration Strategies', () => {
     });
 
     it('should validate migrated instances', async () => {
-      const states = [
-        { id: 'task-1', workflowVersion: '1.0.0' },
-      ];
+      const states = [{ id: 'task-1', workflowVersion: '1.0.0' }];
 
       await executor.migrateGradual('feature-dev', states, '2.0.0', { percentage: 100 });
 
@@ -558,13 +564,13 @@ describe('Category 3: Migration Strategies', () => {
       executor.register('feature-dev', {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => {
+        migrate: async state => {
           if (state.id === 'task-fail') {
             throw new Error('Migration failed');
           }
           return { ...state, migrated: true };
         },
-        rollback: async (state) => ({ ...state, migrated: false }),
+        rollback: async state => ({ ...state, migrated: false }),
       });
 
       const states = [
@@ -574,7 +580,7 @@ describe('Category 3: Migration Strategies', () => {
 
       try {
         await executor.migrateGradual('feature-dev', states, '2.0.0', { percentage: 100 });
-      } catch (error) {
+      } catch (_error) {
         // Expected failure
       }
 
@@ -591,7 +597,7 @@ describe('Category 3: Migration Strategies', () => {
       const migration = {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => {
+        migrate: async state => {
           const mapped = { ...state };
           if (mapped.phases.testing) {
             mapped.phases['quality-assurance'] = mapped.phases.testing;
@@ -621,7 +627,7 @@ describe('Category 3: Migration Strategies', () => {
       const migration = {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({
+        migrate: async state => ({
           ...state,
           phases: {
             ...state.phases,
@@ -646,7 +652,7 @@ describe('Category 3: Migration Strategies', () => {
       const migration = {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => {
+        migrate: async state => {
           const mapped = { ...state };
           delete mapped.deprecatedField;
           return mapped;
@@ -668,7 +674,7 @@ describe('Category 3: Migration Strategies', () => {
       const migration = {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({
+        migrate: async state => ({
           ...state,
           metadata: {
             ...(state.metadata || {}),
@@ -696,8 +702,8 @@ describe('Category 3: Migration Strategies', () => {
       const migration = {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({ ...state, newField: 'added' }),
-        rollback: async (state) => {
+        migrate: async state => ({ ...state, newField: 'added' }),
+        rollback: async state => {
           const rolled = { ...state };
           delete rolled.newField;
           return rolled;
@@ -720,13 +726,13 @@ describe('Category 3: Migration Strategies', () => {
       const migration = {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({ ...state, newField: 'added' }),
-        rollback: async (state) => {
+        migrate: async state => ({ ...state, newField: 'added' }),
+        rollback: async state => {
           const rolled = { ...state };
           delete rolled.newField;
           return rolled;
         },
-        validateRollback: async (state) => {
+        validateRollback: async state => {
           const errors = [];
           if (state.newField) errors.push('newField should be removed');
           return { valid: errors.length === 0, errors };
@@ -917,7 +923,9 @@ describe('Category 4: Version Compatibility', () => {
       const registry = new VersionRegistry();
 
       await registry.register('feature-dev', '1.0.0', {});
-      await registry.register('feature-dev', '2.0.0', { migrations: [{ from: '1.x.x', to: '2.0.0' }] });
+      await registry.register('feature-dev', '2.0.0', {
+        migrations: [{ from: '1.x.x', to: '2.0.0' }],
+      });
 
       const hasPath = registry.hasUpgradePath('feature-dev', '1.0.0', '2.0.0');
 
@@ -941,8 +949,12 @@ describe('Category 4: Version Compatibility', () => {
       const registry = new VersionRegistry();
 
       await registry.register('feature-dev', '1.0.0', {});
-      await registry.register('feature-dev', '2.0.0', { migrations: [{ from: '1.x.x', to: '2.0.0' }] });
-      await registry.register('feature-dev', '3.0.0', { migrations: [{ from: '2.x.x', to: '3.0.0' }] });
+      await registry.register('feature-dev', '2.0.0', {
+        migrations: [{ from: '1.x.x', to: '2.0.0' }],
+      });
+      await registry.register('feature-dev', '3.0.0', {
+        migrations: [{ from: '2.x.x', to: '3.0.0' }],
+      });
 
       const path = registry.getUpgradePath('feature-dev', '1.0.0', '3.0.0');
 
@@ -956,11 +968,13 @@ describe('Category 4: Version Compatibility', () => {
       const registry = new VersionRegistry();
 
       await registry.register('feature-dev', '2.0.0', {
-        migrations: [{
-          from: '1.x.x',
-          to: '2.0.0',
-          estimatedDuration: 5000, // 5s
-        }],
+        migrations: [
+          {
+            from: '1.x.x',
+            to: '2.0.0',
+            estimatedDuration: 5000, // 5s
+          },
+        ],
       });
 
       const estimate = registry.estimateUpgradeDuration('feature-dev', '1.0.0', '2.0.0');
@@ -1131,13 +1145,11 @@ describe('Category 5: End-to-End Versioning Scenarios', () => {
       executor.register('feature-dev', {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({ ...state, migrated: true }),
-        rollback: async (state) => ({ ...state, migrated: false }),
+        migrate: async state => ({ ...state, migrated: true }),
+        rollback: async state => ({ ...state, migrated: false }),
       });
 
-      const states = [
-        { id: 'task-1', workflowVersion: '1.0.0' },
-      ];
+      const states = [{ id: 'task-1', workflowVersion: '1.0.0' }];
 
       await executor.migrate('feature-dev', states[0], '2.0.0');
       assert.equal(states[0].migrated, true);
@@ -1172,14 +1184,14 @@ describe('Category 5: End-to-End Versioning Scenarios', () => {
       executor.register('feature-dev', {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => {
+        migrate: async state => {
           callCount++;
           if (callCount > 1) {
             throw new Error('Migration failed');
           }
           return { ...state, migrated: true };
         },
-        rollback: async (state) => ({ ...state, migrated: false }),
+        rollback: async state => ({ ...state, migrated: false }),
       });
 
       const states = [
@@ -1192,7 +1204,7 @@ describe('Category 5: End-to-End Versioning Scenarios', () => {
           percentage: 100,
           rollbackOnError: true,
         });
-      } catch (error) {
+      } catch (_error) {
         // Expected
       }
 
@@ -1213,7 +1225,7 @@ describe('Category 5: End-to-End Versioning Scenarios', () => {
       executor.register('feature-dev', {
         from: '1.x.x',
         to: '2.0.0',
-        migrate: async (state) => ({ ...state, migrated: true }),
+        migrate: async state => ({ ...state, migrated: true }),
       });
 
       await executor.migrateGradual('feature-dev', states, '2.0.0', {

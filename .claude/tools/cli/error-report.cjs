@@ -130,7 +130,8 @@ function readErrors(options = {}) {
   // List log files
   let files;
   try {
-    files = fs.readdirSync(dir)
+    files = fs
+      .readdirSync(dir)
       .filter(f => f.startsWith('errors-') && f.endsWith('.jsonl'))
       .sort()
       .reverse(); // Most recent first
@@ -397,7 +398,16 @@ function formatMarkdown(summary) {
  * @returns {string}
  */
 function formatCsv(errors) {
-  const headers = ['errorId', 'timestamp', 'category', 'severity', 'message', 'agent', 'tool', 'taskId'];
+  const headers = [
+    'errorId',
+    'timestamp',
+    'category',
+    'severity',
+    'message',
+    'agent',
+    'tool',
+    'taskId',
+  ];
   const lines = [headers.join(',')];
 
   for (const error of errors) {

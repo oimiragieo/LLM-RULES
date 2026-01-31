@@ -103,7 +103,7 @@ class MetricsCollector {
         count: 0,
         sum: 0,
         min: Infinity,
-        max: -Infinity
+        max: -Infinity,
       });
     }
 
@@ -135,7 +135,7 @@ class MetricsCollector {
         p50: 0,
         p95: 0,
         p99: 0,
-        values: []
+        values: [],
       };
     }
 
@@ -156,7 +156,7 @@ class MetricsCollector {
       p50,
       p95,
       p99,
-      values: histogram.values
+      values: histogram.values,
     };
   }
 
@@ -222,7 +222,7 @@ class MetricsCollector {
       counters,
       gauges,
       histograms,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -258,7 +258,7 @@ class MetricsCollector {
       counters,
       gauges,
       histograms,
-      agent
+      agent,
     };
   }
 
@@ -294,7 +294,7 @@ class MetricsCollector {
       counters,
       gauges,
       histograms,
-      specId
+      specId,
     };
   }
 

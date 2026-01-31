@@ -13,6 +13,7 @@ model_selection: See Section 5 (haiku for simple, sonnet for standard, opus for 
 Use this template for ALL non-orchestrator agents (developer, qa, planner, etc.)
 
 ## When to Use
+
 - Bug fixes, feature implementation, testing, documentation
 - Single-purpose tasks (one agent, one task)
 - Non-orchestrator agents (not master-orchestrator, swarm-coordinator, etc.)
@@ -97,6 +98,52 @@ Subject: <SUBJECT>
 - TaskUpdate() - track progress (MANDATORY)
 - TaskList() - find next work
 
+## Memory Management Requirements (MANDATORY)
+
+All agents MUST follow these memory management rules:
+
+1. **Use Bounded Collections**
+   - All arrays MUST have max size limits (1000 entries default)
+   - Add trimming after each push operation
+   - Example:
+     \`\`\`javascript
+     this.history = [];
+     this.maxHistorySize = 1000;
+     this.history.push(item);
+     if (this.history.length > this.maxHistorySize) {
+       this.history.shift();
+     }
+     \`\`\`
+
+2. **Implement cleanup() Methods**
+   - Required for all classes managing resources
+   - Clear arrays, Maps, Sets
+   - Remove event listeners
+   - Close file handles
+   - Clear timers/intervals
+
+3. **Call Cleanup in Test Teardown**
+   - Add \`afterEach\` hooks to all test suites
+   - Call \`cleanup()\` on all test instances
+   - Example:
+     \`\`\`javascript
+     afterEach(async () => {
+       if (instance) await instance.cleanup();
+     });
+     \`\`\`
+
+4. **NO Unbounded Data Accumulation**
+   - Never accumulate data without limits
+   - Use LRU eviction for caches
+   - Trim metrics arrays to max size
+
+5. **Monitor Memory During Long Operations**
+   - Track heap usage for operations >1000 iterations
+   - Log warnings if memory grows unexpectedly
+   - Use \`process.memoryUsage()\` for monitoring
+
+**Reference:** .claude/docs/MEMORY_MANAGEMENT.md
+
 ## Memory Protocol
 1) Read: .claude/context/memory/learnings.md (before starting)
 2) Write: decisions/issues/learnings to appropriate memory files
@@ -106,12 +153,13 @@ Subject: <SUBJECT>
 
 ## Model Selection Guide
 
-| Task Type | Model | Justification |
-|-----------|-------|---------------|
-| Simple validation, quick fixes | `haiku` | Low cost, fast |
-| Standard coding, testing, docs | `sonnet` | Balanced cost/quality |
-| Architecture, security, complex reasoning | `opus` | High quality |
+| Task Type                                 | Model    | Justification         |
+| ----------------------------------------- | -------- | --------------------- |
+| Simple validation, quick fixes            | `haiku`  | Low cost, fast        |
+| Standard coding, testing, docs            | `sonnet` | Balanced cost/quality |
+| Architecture, security, complex reasoning | `opus`   | High quality          |
 
 ## Related Templates
+
 - Agent Identity Integration: `.claude/templates/spawn/agent-identity-integration.md`
 - Orchestrator Spawn: `.claude/templates/spawn/orchestrator-spawn.md`

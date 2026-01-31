@@ -24,15 +24,15 @@ This document defines the data strategy for Phase 5 ML capabilities, covering da
 
 ### 2.1 Data Sources
 
-| Source | Component | Data Type | Collection Point | Volume/Session |
-|--------|-----------|-----------|------------------|----------------|
-| **Metrics** | MetricsCollector | Counters, gauges, histograms | metrics-collector.cjs | ~10KB |
-| **Traces** | DistributedTracer | Spans, trace IDs, durations | distributed-tracer.cjs | ~50KB |
-| **Profiles** | PerformanceProfiler | Execution times, memory | performance-profiler.cjs | ~5KB |
-| **Errors** | Error Logger | Error categories, context | errors.jsonl | ~2KB |
-| **Tasks** | TaskUpdate | Task metadata, status, duration | post-task-unified.cjs | ~3KB |
-| **Tools** | PostToolUse hook | Tool invocations, params, results | observability-hook.cjs | ~15KB |
-| **Routing** | Router decisions | Agent selection, complexity | routing-guard.cjs | ~5KB |
+| Source       | Component           | Data Type                         | Collection Point         | Volume/Session |
+| ------------ | ------------------- | --------------------------------- | ------------------------ | -------------- |
+| **Metrics**  | MetricsCollector    | Counters, gauges, histograms      | metrics-collector.cjs    | ~10KB          |
+| **Traces**   | DistributedTracer   | Spans, trace IDs, durations       | distributed-tracer.cjs   | ~50KB          |
+| **Profiles** | PerformanceProfiler | Execution times, memory           | performance-profiler.cjs | ~5KB           |
+| **Errors**   | Error Logger        | Error categories, context         | errors.jsonl             | ~2KB           |
+| **Tasks**    | TaskUpdate          | Task metadata, status, duration   | post-task-unified.cjs    | ~3KB           |
+| **Tools**    | PostToolUse hook    | Tool invocations, params, results | observability-hook.cjs   | ~15KB          |
+| **Routing**  | Router decisions    | Agent selection, complexity       | routing-guard.cjs        | ~5KB           |
 
 **Total per session:** ~90KB (compressed: ~15KB)
 **Sessions for initial training:** 100 minimum (1.5MB training data)
@@ -137,14 +137,14 @@ This document defines the data strategy for Phase 5 ML capabilities, covering da
 
 ### 2.3 Collection Triggers
 
-| Event | Collection Action | Data Captured |
-|-------|-------------------|---------------|
-| **Session Start** | Create session record | sessionId, timestamp |
-| **Task Spawn** | Add task record | taskType, agentType, model |
-| **Task Complete** | Update task record | duration, tokens, status |
-| **Tool Invocation** | Append tool record | tool, params (sanitized), result |
-| **Error Occurrence** | Append error summary | category, severity |
-| **Session End** | Finalize session record | outcome, total metrics |
+| Event                | Collection Action       | Data Captured                    |
+| -------------------- | ----------------------- | -------------------------------- |
+| **Session Start**    | Create session record   | sessionId, timestamp             |
+| **Task Spawn**       | Add task record         | taskType, agentType, model       |
+| **Task Complete**    | Update task record      | duration, tokens, status         |
+| **Tool Invocation**  | Append tool record      | tool, params (sanitized), result |
+| **Error Occurrence** | Append error summary    | category, severity               |
+| **Session End**      | Finalize session record | outcome, total metrics           |
 
 ### 2.4 Collection Implementation
 
@@ -164,7 +164,7 @@ class MLDataCollector {
       taskSequence: [],
       metrics: this._initializeMetrics(),
       errors: [],
-      outcome: 'in_progress'
+      outcome: 'in_progress',
     };
   }
 
@@ -182,7 +182,7 @@ class MLDataCollector {
     this.currentSession.errors.push({
       category: errorData.category,
       severity: errorData.severity,
-      recovered: errorData.recovered || false
+      recovered: errorData.recovered || false,
     });
   }
 
@@ -214,7 +214,7 @@ class MLDataCollector {
       memoryPeakMb: taskData.memory,
       toolsUsed: taskData.tools || [],
       status: taskData.status,
-      errorCount: taskData.errorCount || 0
+      errorCount: taskData.errorCount || 0,
       // Explicitly NOT including: taskDescription, filePaths, userContent
     };
   }
@@ -234,13 +234,13 @@ class MLDataCollector {
 
 ### 3.1 Quality Dimensions
 
-| Dimension | Definition | Threshold | Validation Method |
-|-----------|------------|-----------|-------------------|
-| **Completeness** | Required fields present | 100% | Schema validation |
-| **Consistency** | Values within expected ranges | 95%+ | Range checks |
-| **Accuracy** | Correct data type and format | 100% | Type validation |
-| **Timeliness** | Data freshness | <24 hours | Timestamp check |
-| **Uniqueness** | No duplicate sessions | 100% | Session ID dedup |
+| Dimension        | Definition                    | Threshold | Validation Method |
+| ---------------- | ----------------------------- | --------- | ----------------- |
+| **Completeness** | Required fields present       | 100%      | Schema validation |
+| **Consistency**  | Values within expected ranges | 95%+      | Range checks      |
+| **Accuracy**     | Correct data type and format  | 100%      | Type validation   |
+| **Timeliness**   | Data freshness                | <24 hours | Timestamp check   |
+| **Uniqueness**   | No duplicate sessions         | 100%      | Session ID dedup  |
 
 ### 3.2 Validation Rules
 
@@ -251,15 +251,25 @@ const VALIDATION_RULES = {
     { field: 'sessionId', type: 'string', required: true, pattern: /^[a-f0-9]{32}$/ },
     { field: 'timestamp', type: 'string', required: true, format: 'date-time' },
     { field: 'taskSequence', type: 'array', required: true, minLength: 1 },
-    { field: 'outcome', type: 'string', required: true, enum: ['success', 'partial_success', 'failure', 'abandoned'] }
+    {
+      field: 'outcome',
+      type: 'string',
+      required: true,
+      enum: ['success', 'partial_success', 'failure', 'abandoned'],
+    },
   ],
   task: [
     { field: 'taskType', type: 'string', required: true },
     { field: 'agentType', type: 'string', required: true },
     { field: 'durationMs', type: 'number', required: true, min: 0, max: 7200000 }, // Max 2 hours
     { field: 'tokenCount', type: 'number', required: false, min: 0, max: 200000 },
-    { field: 'status', type: 'string', required: true, enum: ['completed', 'failed', 'timeout', 'cancelled'] }
-  ]
+    {
+      field: 'status',
+      type: 'string',
+      required: true,
+      enum: ['completed', 'failed', 'timeout', 'cancelled'],
+    },
+  ],
 };
 
 function validateSession(session) {
@@ -295,7 +305,7 @@ function validateSession(session) {
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }
 ```
@@ -358,13 +368,13 @@ class TrainingDataFilter {
 
 ### 3.4 Data Quality Metrics
 
-| Metric | Target | Monitoring |
-|--------|--------|------------|
-| **Schema Validation Pass Rate** | >=99% | Per-session check |
-| **Outlier Rejection Rate** | <5% | Weekly audit |
-| **Data Completeness** | >=98% | Hourly check |
-| **Collection Latency** | <100ms | Per-event timing |
-| **Storage Growth Rate** | <10MB/day | Daily monitoring |
+| Metric                          | Target    | Monitoring        |
+| ------------------------------- | --------- | ----------------- |
+| **Schema Validation Pass Rate** | >=99%     | Per-session check |
+| **Outlier Rejection Rate**      | <5%       | Weekly audit      |
+| **Data Completeness**           | >=98%     | Hourly check      |
+| **Collection Latency**          | <100ms    | Per-event timing  |
+| **Storage Growth Rate**         | <10MB/day | Daily monitoring  |
 
 ---
 
@@ -372,23 +382,23 @@ class TrainingDataFilter {
 
 ### 4.1 Privacy Principles
 
-| Principle | Implementation |
-|-----------|----------------|
-| **Data Minimization** | Collect only what's needed for ML |
-| **Purpose Limitation** | Data used only for model training |
-| **Local Storage** | All data stays on local machine |
-| **No PII** | No user identifiers, names, emails |
-| **Content Exclusion** | Task descriptions, file contents excluded |
-| **Anonymization** | Session IDs are hashed |
+| Principle              | Implementation                            |
+| ---------------------- | ----------------------------------------- |
+| **Data Minimization**  | Collect only what's needed for ML         |
+| **Purpose Limitation** | Data used only for model training         |
+| **Local Storage**      | All data stays on local machine           |
+| **No PII**             | No user identifiers, names, emails        |
+| **Content Exclusion**  | Task descriptions, file contents excluded |
+| **Anonymization**      | Session IDs are hashed                    |
 
 ### 4.2 Data Classification
 
-| Classification | Examples | Handling |
-|----------------|----------|----------|
-| **Safe for ML** | Agent types, tool names, durations, token counts | Collect and train |
-| **Hash Before Storage** | Session IDs, trace IDs | SHA-256 hash |
-| **Exclude Entirely** | Task descriptions, file paths, user content | Never collect |
-| **Aggregate Only** | Error messages | Category + count only |
+| Classification          | Examples                                         | Handling              |
+| ----------------------- | ------------------------------------------------ | --------------------- |
+| **Safe for ML**         | Agent types, tool names, durations, token counts | Collect and train     |
+| **Hash Before Storage** | Session IDs, trace IDs                           | SHA-256 hash          |
+| **Exclude Entirely**    | Task descriptions, file paths, user content      | Never collect         |
+| **Aggregate Only**      | Error messages                                   | Category + count only |
 
 ### 4.3 Sensitive Data Detection
 
@@ -408,7 +418,7 @@ const SENSITIVE_PATTERNS = [
   // File path patterns
   /\/home\/[^\/]+/,
   /C:\\Users\\[^\\]+/,
-  /\/Users\/[^\/]+/
+  /\/Users\/[^\/]+/,
 ];
 
 function containsSensitiveData(text) {
@@ -444,13 +454,13 @@ function sanitizeForML(data) {
 
 ### 4.4 Data Retention Policy
 
-| Data Type | Retention Period | Deletion Method |
-|-----------|------------------|-----------------|
-| **Raw Training Data** | 90 days | Automatic rotation |
-| **Trained Models** | Indefinite | Manual cleanup |
-| **Model Checkpoints** | 30 days | Automatic rotation |
-| **Validation Results** | 90 days | Automatic rotation |
-| **Inference Logs** | 7 days | Automatic rotation |
+| Data Type              | Retention Period | Deletion Method    |
+| ---------------------- | ---------------- | ------------------ |
+| **Raw Training Data**  | 90 days          | Automatic rotation |
+| **Trained Models**     | Indefinite       | Manual cleanup     |
+| **Model Checkpoints**  | 30 days          | Automatic rotation |
+| **Validation Results** | 90 days          | Automatic rotation |
+| **Inference Logs**     | 7 days           | Automatic rotation |
 
 ### 4.5 Audit Trail
 
@@ -463,7 +473,7 @@ const mlAuditLog = {
   dataType: 'task_record',
   fieldsCollected: ['taskType', 'agentType', 'durationMs', 'tokenCount', 'status'],
   fieldsExcluded: ['description', 'filePath'], // For transparency
-  bytesCollected: 128
+  bytesCollected: 128,
 };
 ```
 
@@ -501,13 +511,13 @@ const mlAuditLog = {
 
 ### 5.2 Storage Format Selection
 
-| Data Type | Format | Rationale |
-|-----------|--------|-----------|
-| **Raw Data** | JSONL | Append-only, streaming, line-by-line processing |
-| **Feature Vectors** | JSONL | Same benefits as raw, ready for batch processing |
-| **Models** | JSON | Human-readable, easy to inspect weights |
-| **Compressed Archives** | GZIP | 10:1 compression for old data |
-| **Validation Results** | JSON | Structured, easy to query |
+| Data Type               | Format | Rationale                                        |
+| ----------------------- | ------ | ------------------------------------------------ |
+| **Raw Data**            | JSONL  | Append-only, streaming, line-by-line processing  |
+| **Feature Vectors**     | JSONL  | Same benefits as raw, ready for batch processing |
+| **Models**              | JSON   | Human-readable, easy to inspect weights          |
+| **Compressed Archives** | GZIP   | 10:1 compression for old data                    |
+| **Validation Results**  | JSON   | Structured, easy to query                        |
 
 ### 5.3 Storage Optimization
 
@@ -572,11 +582,11 @@ class StorageManager {
 
 ### 5.4 Backup Strategy
 
-| Backup Type | Frequency | Retention | Location |
-|-------------|-----------|-----------|----------|
-| **Training Data** | Daily | 30 days | archive/ directory |
-| **Trained Models** | On training | Indefinite | models/ with versioning |
-| **Validation Results** | On validation | 90 days | validation/ directory |
+| Backup Type            | Frequency     | Retention  | Location                |
+| ---------------------- | ------------- | ---------- | ----------------------- |
+| **Training Data**      | Daily         | 30 days    | archive/ directory      |
+| **Trained Models**     | On training   | Indefinite | models/ with versioning |
+| **Validation Results** | On validation | 90 days    | validation/ directory   |
 
 ---
 
@@ -636,13 +646,13 @@ class StorageManager {
 
 ### 6.2 Training Triggers
 
-| Trigger | Condition | Action |
-|---------|-----------|--------|
-| **Initial Training** | 100+ sessions collected | Train all models |
-| **Periodic Retraining** | Every 7 days | Retrain with new data |
-| **Performance Degradation** | Accuracy drops >10% | Retrain affected model |
-| **Data Drift Detection** | Distribution shift | Retrain affected model |
-| **Manual Trigger** | CLI command | Train specified model |
+| Trigger                     | Condition               | Action                 |
+| --------------------------- | ----------------------- | ---------------------- |
+| **Initial Training**        | 100+ sessions collected | Train all models       |
+| **Periodic Retraining**     | Every 7 days            | Retrain with new data  |
+| **Performance Degradation** | Accuracy drops >10%     | Retrain affected model |
+| **Data Drift Detection**    | Distribution shift      | Retrain affected model |
+| **Manual Trigger**          | CLI command             | Train specified model  |
 
 ### 6.3 Cross-Validation Strategy
 
@@ -680,7 +690,7 @@ class CrossValidator {
       stdAccuracy: this._std(metrics.map(m => m.accuracy)),
       meanPrecision: this._mean(metrics.map(m => m.precision)),
       meanRecall: this._mean(metrics.map(m => m.recall)),
-      foldMetrics: metrics
+      foldMetrics: metrics,
     };
   }
 }
@@ -688,14 +698,14 @@ class CrossValidator {
 
 ### 6.4 Hyperparameter Tuning
 
-| Model | Hyperparameters | Tuning Range | Method |
-|-------|-----------------|--------------|--------|
-| **K-Means** | k (clusters) | 3-10 | Elbow method |
-| **Association Rules** | min_support, min_confidence | 0.05-0.3, 0.5-0.9 | Grid search |
-| **Markov Chain** | order | 1-3 | Cross-validation |
-| **Linear Regression** | regularization | 0-1 | Cross-validation |
-| **Decision Tree** | max_depth | 3-10 | Cross-validation |
-| **Z-Score Detector** | threshold | 2-4 | ROC analysis |
+| Model                 | Hyperparameters             | Tuning Range      | Method           |
+| --------------------- | --------------------------- | ----------------- | ---------------- |
+| **K-Means**           | k (clusters)                | 3-10              | Elbow method     |
+| **Association Rules** | min_support, min_confidence | 0.05-0.3, 0.5-0.9 | Grid search      |
+| **Markov Chain**      | order                       | 1-3               | Cross-validation |
+| **Linear Regression** | regularization              | 0-1               | Cross-validation |
+| **Decision Tree**     | max_depth                   | 3-10              | Cross-validation |
+| **Z-Score Detector**  | threshold                   | 2-4               | ROC analysis     |
 
 ### 6.5 Training Metrics
 
@@ -707,27 +717,27 @@ const trainingMetrics = {
   training: {
     samplesUsed: 850,
     trainingDurationMs: 12500,
-    iterationsCompleted: 100
+    iterationsCompleted: 100,
   },
   validation: {
     crossValidationK: 5,
     accuracy: { mean: 0.82, std: 0.03 },
     precision: { mean: 0.79, std: 0.04 },
     recall: { mean: 0.85, std: 0.02 },
-    f1: { mean: 0.82, std: 0.03 }
+    f1: { mean: 0.82, std: 0.03 },
   },
   holdout: {
     samplesUsed: 150,
     accuracy: 0.81,
     precision: 0.78,
     recall: 0.84,
-    f1: 0.81
+    f1: 0.81,
   },
   hyperparameters: {
     k: 5,
     min_support: 0.1,
-    min_confidence: 0.6
-  }
+    min_confidence: 0.6,
+  },
 };
 ```
 
@@ -737,14 +747,14 @@ const trainingMetrics = {
 
 ### 7.1 Validation Metrics by Model
 
-| Model | Primary Metric | Secondary Metrics | Target |
-|-------|----------------|-------------------|--------|
-| **Workflow Clustering** | Silhouette Score | Inertia, Cluster purity | >0.5 |
-| **Association Rules** | Confidence | Support, Lift | >0.7 |
-| **Markov Chain** | Prediction Accuracy | Perplexity | >0.7 |
-| **Anomaly Detection** | F1 Score | Precision, Recall, AUC | >0.85 |
-| **Token Prediction** | MAPE | R-squared, MAE | <15% |
-| **Model Recommender** | Accuracy | Precision, Recall | >0.9 |
+| Model                   | Primary Metric      | Secondary Metrics       | Target |
+| ----------------------- | ------------------- | ----------------------- | ------ |
+| **Workflow Clustering** | Silhouette Score    | Inertia, Cluster purity | >0.5   |
+| **Association Rules**   | Confidence          | Support, Lift           | >0.7   |
+| **Markov Chain**        | Prediction Accuracy | Perplexity              | >0.7   |
+| **Anomaly Detection**   | F1 Score            | Precision, Recall, AUC  | >0.85  |
+| **Token Prediction**    | MAPE                | R-squared, MAE          | <15%   |
+| **Model Recommender**   | Accuracy            | Precision, Recall       | >0.9   |
 
 ### 7.2 Validation Workflow
 
@@ -757,7 +767,7 @@ async function validateModel(modelType, model, testData) {
     modelType,
     testSamples: testData.length,
     metrics: {},
-    passed: false
+    passed: false,
   };
 
   // Calculate metrics
@@ -778,7 +788,7 @@ async function validateModel(modelType, model, testData) {
     emitEvent('model_validation_failed', {
       modelType,
       metrics: results.metrics,
-      thresholds
+      thresholds,
     });
   }
 
@@ -789,7 +799,7 @@ const VALIDATION_THRESHOLDS = {
   'pattern-detector': { accuracy: 0.8, precision: 0.75, recall: 0.75 },
   'anomaly-detector': { f1: 0.85, precision: 0.85, recall: 0.85 },
   'token-predictor': { mape: 0.15, r_squared: 0.7 },
-  'model-recommender': { accuracy: 0.9, precision: 0.85 }
+  'model-recommender': { accuracy: 0.9, precision: 0.85 },
 };
 ```
 
@@ -808,7 +818,7 @@ class ABTestValidator {
       prediction,
       actual,
       correct: prediction === actual,
-      outcome // e.g., task success, user override
+      outcome, // e.g., task success, user override
     };
 
     if (variant === 'control') {
@@ -823,26 +833,25 @@ class ABTestValidator {
     const treatmentAccuracy = this._accuracy(this.treatmentResults);
 
     const { pValue, significant } = this._tTest(
-      this.controlResults.map(r => r.correct ? 1 : 0),
-      this.treatmentResults.map(r => r.correct ? 1 : 0),
+      this.controlResults.map(r => (r.correct ? 1 : 0)),
+      this.treatmentResults.map(r => (r.correct ? 1 : 0)),
       this.config.significance
     );
 
     return {
       control: {
         samples: this.controlResults.length,
-        accuracy: controlAccuracy
+        accuracy: controlAccuracy,
       },
       treatment: {
         samples: this.treatmentResults.length,
-        accuracy: treatmentAccuracy
+        accuracy: treatmentAccuracy,
       },
       improvement: treatmentAccuracy - controlAccuracy,
       pValue,
       significant,
-      recommendation: significant && treatmentAccuracy > controlAccuracy
-        ? 'promote_treatment'
-        : 'continue_test'
+      recommendation:
+        significant && treatmentAccuracy > controlAccuracy ? 'promote_treatment' : 'continue_test',
     };
   }
 }
@@ -854,13 +863,13 @@ class ABTestValidator {
 
 ### 8.1 Drift Types
 
-| Drift Type | Definition | Detection Method |
-|------------|------------|------------------|
-| **Covariate Drift** | Input distribution changes | KL divergence, PSI |
-| **Concept Drift** | Relationship between input/output changes | Accuracy monitoring |
-| **Label Drift** | Output distribution changes | Chi-squared test |
-| **Sudden Drift** | Abrupt distribution change | Change point detection |
-| **Gradual Drift** | Slow distribution change | Sliding window comparison |
+| Drift Type          | Definition                                | Detection Method          |
+| ------------------- | ----------------------------------------- | ------------------------- |
+| **Covariate Drift** | Input distribution changes                | KL divergence, PSI        |
+| **Concept Drift**   | Relationship between input/output changes | Accuracy monitoring       |
+| **Label Drift**     | Output distribution changes               | Chi-squared test          |
+| **Sudden Drift**    | Abrupt distribution change                | Change point detection    |
+| **Gradual Drift**   | Slow distribution change                  | Sliding window comparison |
 
 ### 8.2 Drift Detection Implementation
 
@@ -875,10 +884,7 @@ class DriftDetector {
     const newDistribution = this._computeDistribution(newData);
 
     // Calculate Population Stability Index (PSI)
-    const psi = this._calculatePSI(
-      this.referenceDistribution,
-      newDistribution
-    );
+    const psi = this._calculatePSI(this.referenceDistribution, newDistribution);
 
     const hasDrift = psi > this.threshold;
 
@@ -887,7 +893,7 @@ class DriftDetector {
       threshold: this.threshold,
       hasDrift,
       severity: psi < 0.1 ? 'none' : psi < 0.25 ? 'moderate' : 'significant',
-      recommendation: hasDrift ? 'retrain_model' : 'no_action'
+      recommendation: hasDrift ? 'retrain_model' : 'no_action',
     };
   }
 
@@ -910,13 +916,9 @@ class DriftDetector {
 
     for (const feature of Object.keys(data[0])) {
       if (typeof data[0][feature] === 'number') {
-        distribution[feature] = this._computeHistogram(
-          data.map(d => d[feature])
-        );
+        distribution[feature] = this._computeHistogram(data.map(d => d[feature]));
       } else {
-        distribution[feature] = this._computeFrequency(
-          data.map(d => d[feature])
-        );
+        distribution[feature] = this._computeFrequency(data.map(d => d[feature]));
       }
     }
 
@@ -927,11 +929,11 @@ class DriftDetector {
 
 ### 8.3 Drift Monitoring Schedule
 
-| Check | Frequency | Action on Drift |
-|-------|-----------|-----------------|
-| **Covariate Drift** | Daily | Alert + evaluate impact |
-| **Accuracy Drift** | Per 100 predictions | Alert + retrain if >10% drop |
-| **Distribution Drift** | Weekly | Archive reference + retrain |
+| Check                  | Frequency           | Action on Drift              |
+| ---------------------- | ------------------- | ---------------------------- |
+| **Covariate Drift**    | Daily               | Alert + evaluate impact      |
+| **Accuracy Drift**     | Per 100 predictions | Alert + retrain if >10% drop |
+| **Distribution Drift** | Weekly              | Archive reference + retrain  |
 
 ---
 
@@ -974,14 +976,14 @@ class DriftDetector {
 
 ## 10. Success Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Data Collection Rate** | >95% of sessions | Sessions collected / total sessions |
-| **Data Quality Score** | >98% | Valid records / total records |
-| **Storage Efficiency** | <10MB/day growth | Daily storage delta |
-| **Training Success Rate** | >99% | Successful trainings / total attempts |
-| **Model Accuracy Retention** | <5% degradation/month | Monthly accuracy comparison |
-| **Drift Detection Latency** | <24 hours | Time to detect significant drift |
+| Metric                       | Target                | Measurement                           |
+| ---------------------------- | --------------------- | ------------------------------------- |
+| **Data Collection Rate**     | >95% of sessions      | Sessions collected / total sessions   |
+| **Data Quality Score**       | >98%                  | Valid records / total records         |
+| **Storage Efficiency**       | <10MB/day growth      | Daily storage delta                   |
+| **Training Success Rate**    | >99%                  | Successful trainings / total attempts |
+| **Model Accuracy Retention** | <5% degradation/month | Monthly accuracy comparison           |
+| **Drift Detection Latency**  | <24 hours             | Time to detect significant drift      |
 
 ---
 

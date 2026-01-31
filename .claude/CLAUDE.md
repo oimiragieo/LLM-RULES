@@ -305,28 +305,28 @@ Comprehensive guide to all available tools in the agent-studio framework.
 
 These tools are built into Claude Code and work immediately:
 
-| Tool                 | Category        | Purpose                                   | Availability                   |
-| -------------------- | --------------- | ----------------------------------------- | ------------------------------ |
-| **Read**             | File I/O        | Read files from filesystem                | ✅ All agents                  |
-| **Write**            | File I/O        | Create/overwrite files                    | ✅ All agents                  |
-| **Edit**             | File I/O        | Make precise edits to files               | ✅ All agents                  |
-| **Bash**             | Shell           | Execute shell commands                    | ✅ All agents (restricted)     |
-| **Glob**             | Search          | Pattern-based file discovery              | ✅ All agents                  |
-| **Grep**             | Search          | Content search in files                   | ✅ All agents                  |
-| **Task**             | Orchestration   | Spawn subagents                           | ✅ Router + Orchestrators ONLY |
-| **TaskCreate**       | Task Management | Create trackable tasks                    | ✅ All agents                  |
-| **TaskUpdate**       | Task Management | Update task status/metadata               | ✅ All agents (MANDATORY)      |
-| **TaskList**         | Task Management | List all tasks                            | ✅ All agents                  |
-| **TaskGet**          | Task Management | Get task details                          | ✅ All agents                  |
-| **TaskOutput**       | Task Management | Read task output                          | ✅ All agents                  |
-| **TaskStop**         | Task Management | Stop running task                         | ✅ All agents                  |
-| **Skill**            | Capability      | Invoke skill workflows                    | ✅ All agents (MANDATORY)      |
-| **AskUserQuestion**  | Interaction     | Get user input                            | ✅ Router ONLY                 |
-| **EnterPlanMode**    | Planning        | Switch to planning mode                   | ✅ All agents                  |
-| **ExitPlanMode**     | Planning        | Exit planning mode                        | ✅ All agents                  |
-| **WebSearch**        | Research        | Search the web                            | ✅ All agents                  |
-| **WebFetch**         | Research        | Fetch webpage content                     | ✅ All agents                  |
-| **NotebookEdit**     | Jupyter         | Edit notebook cells                       | ✅ All agents                  |
+| Tool                | Category        | Purpose                      | Availability                   |
+| ------------------- | --------------- | ---------------------------- | ------------------------------ |
+| **Read**            | File I/O        | Read files from filesystem   | ✅ All agents                  |
+| **Write**           | File I/O        | Create/overwrite files       | ✅ All agents                  |
+| **Edit**            | File I/O        | Make precise edits to files  | ✅ All agents                  |
+| **Bash**            | Shell           | Execute shell commands       | ✅ All agents (restricted)     |
+| **Glob**            | Search          | Pattern-based file discovery | ✅ All agents                  |
+| **Grep**            | Search          | Content search in files      | ✅ All agents                  |
+| **Task**            | Orchestration   | Spawn subagents              | ✅ Router + Orchestrators ONLY |
+| **TaskCreate**      | Task Management | Create trackable tasks       | ✅ All agents                  |
+| **TaskUpdate**      | Task Management | Update task status/metadata  | ✅ All agents (MANDATORY)      |
+| **TaskList**        | Task Management | List all tasks               | ✅ All agents                  |
+| **TaskGet**         | Task Management | Get task details             | ✅ All agents                  |
+| **TaskOutput**      | Task Management | Read task output             | ✅ All agents                  |
+| **TaskStop**        | Task Management | Stop running task            | ✅ All agents                  |
+| **Skill**           | Capability      | Invoke skill workflows       | ✅ All agents (MANDATORY)      |
+| **AskUserQuestion** | Interaction     | Get user input               | ✅ Router ONLY                 |
+| **EnterPlanMode**   | Planning        | Switch to planning mode      | ✅ All agents                  |
+| **ExitPlanMode**    | Planning        | Exit planning mode           | ✅ All agents                  |
+| **WebSearch**       | Research        | Search the web               | ✅ All agents                  |
+| **WebFetch**        | Research        | Fetch webpage content        | ✅ All agents                  |
+| **NotebookEdit**    | Jupyter         | Edit notebook cells          | ✅ All agents                  |
 
 **Total Core Tools:** 20
 
@@ -336,17 +336,17 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 
 **Tool Pattern:** `mcp__<server>__<tool>`
 
-| Tool                                      | Server              | Purpose                | Configured? | Agent References |
-| ----------------------------------------- | ------------------- | ---------------------- | ----------- | ---------------- |
-| **mcp__chrome-devtools__\***              | chrome-devtools     | Browser automation     | ❌ No       | 0 agents         |
-| **mcp__sequential-thinking__\***          | sequential-thinking | Structured reasoning   | ❌ No       | Use Skill()      |
-| **mcp__Ref__ref_search_documentation**    | Ref                 | Documentation search   | ❌ No       | 0 agents         |
-| **mcp__Ref__ref_read_url**                | Ref                 | Read URL content       | ❌ No       | 0 agents         |
-| **mcp__Exa__web_search_exa**              | Exa                 | Enhanced web search    | ❌ No       | evolution-orch   |
-| **mcp__Exa__get_code_context_exa**        | Exa                 | Code context search    | ❌ No       | evolution-orch   |
-| **mcp__Exa__company_research_exa**        | Exa                 | Company research       | ❌ No       | 0 agents         |
-| **mcp__shadcn__getComponents**            | shadcn              | shadcn/ui components   | ❌ No       | 0 agents         |
-| **mcp__shadcn__getComponent**             | shadcn              | Component details      | ❌ No       | 0 agents         |
+| Tool                                   | Server              | Purpose              | Configured? | Agent References |
+| -------------------------------------- | ------------------- | -------------------- | ----------- | ---------------- |
+| **mcp**chrome-devtools**\***           | chrome-devtools     | Browser automation   | ❌ No       | 0 agents         |
+| **mcp**sequential-thinking**\***       | sequential-thinking | Structured reasoning | ❌ No       | Use Skill()      |
+| **mcp**Ref**ref_search_documentation** | Ref                 | Documentation search | ❌ No       | 0 agents         |
+| **mcp**Ref**ref_read_url**             | Ref                 | Read URL content     | ❌ No       | 0 agents         |
+| **mcp**Exa**web_search_exa**           | Exa                 | Enhanced web search  | ❌ No       | evolution-orch   |
+| **mcp**Exa**get_code_context_exa**     | Exa                 | Code context search  | ❌ No       | evolution-orch   |
+| **mcp**Exa**company_research_exa**     | Exa                 | Company research     | ❌ No       | 0 agents         |
+| **mcp**shadcn**getComponents**         | shadcn              | shadcn/ui components | ❌ No       | 0 agents         |
+| **mcp**shadcn**getComponent**          | shadcn              | Component details    | ❌ No       | 0 agents         |
 
 **Fallback Strategy:** Use `Skill({ skill: '<skill-name>' })` instead of MCP tools when servers are not configured.
 
@@ -355,6 +355,7 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 ### Tool Categories and Usage
 
 **Always Available (No restrictions):**
+
 - File I/O: Read, Write, Edit
 - Search: Glob, Grep
 - Task Management: TaskCreate, TaskUpdate, TaskList, TaskGet, TaskOutput, TaskStop
@@ -364,6 +365,7 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 - Jupyter: NotebookEdit
 
 **Restricted (Special permissions):**
+
 - **Task**: Only Router and Orchestrators (for spawning subagents)
 - **AskUserQuestion**: Only Router (for user interaction)
 - **Bash**: All agents have access, but Router limited to read-only git commands
@@ -371,55 +373,87 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 ### Agent Tool Mapping
 
 **Standard Agent Toolset** (developer, planner, qa, architect, pm, technical-writer):
+
 ```yaml
-tools: [
-  Read, Write, Edit, Bash, Glob, Grep,
-  TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput,
-  Skill
-]
+tools:
+  [
+    Read,
+    Write,
+    Edit,
+    Bash,
+    Glob,
+    Grep,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    TaskOutput,
+    Skill,
+  ]
 ```
 
 **Orchestrator Toolset** (master-orchestrator, swarm-coordinator, evolution-orchestrator, party-orchestrator):
+
 ```yaml
 tools: [
-  Read, Write, Edit, Bash, Glob, Grep,
-  Task,  # MANDATORY for spawning subagents
-  TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput,
-  Skill
-]
+    Read,
+    Write,
+    Edit,
+    Bash,
+    Glob,
+    Grep,
+    Task, # MANDATORY for spawning subagents
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    TaskOutput,
+    Skill,
+  ]
 ```
 
 **Router Toolset** (router.md):
+
 ```yaml
 tools: [
-  Read,  # agent files / routing docs
-  Task, TaskList, TaskCreate, TaskUpdate, TaskGet,
-  AskUserQuestion  # user interaction
-]
+    Read, # agent files / routing docs
+    Task,
+    TaskList,
+    TaskCreate,
+    TaskUpdate,
+    TaskGet,
+    AskUserQuestion, # user interaction
+  ]
 # Router CANNOT use: Edit, Write, Bash (implementation), Glob, Grep, WebSearch, mcp__*
 ```
 
 **Read-Only Agents** (intentional security constraint):
+
 - **code-reviewer**: No Write, No Edit (read-only code analysis)
 - **researcher**: Read, Glob, Grep, WebSearch, WebFetch (prevents data exfiltration)
 
 **Write-Only Agents:**
+
 - **context-compressor**: No Edit (write-only mode)
 
 **Monitoring-Only Agents:**
+
 - **reflection-agent**: No Bash (read-only, monitors Bash errors for reflection)
 
 ### Router Tool Restrictions (Section 1.1)
 
 **Router Whitelist** (ONLY these tools allowed):
+
 - `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet`
 - `Read` (agent files / routing docs)
 - `AskUserQuestion`
 
 **Router Blacklist** (must spawn agent instead):
+
 - `Edit`, `Write`, `Bash` (implementation), `Glob`, `Grep`, `WebSearch`, `mcp__*`
 
 **Bash Exception (Router only):** Read-only git commands:
+
 - `git status -s`
 - `git log --oneline -5`
 
@@ -428,6 +462,7 @@ tools: [
 **Hook:** `.claude/hooks/routing/tool-availability-validator.cjs`
 
 **Purpose:**
+
 - Validates tool availability before agent spawning
 - Blocks spawn if required tools (core tools) are unavailable
 - Warns but allows spawn if optional tools (MCP) are missing
@@ -439,12 +474,14 @@ tools: [
 **Status:** All legacy tool references cleaned up (2026-01-29)
 
 **Completed Actions:**
+
 - ✅ Replaced "Search" in master-orchestrator.md with Grep/Glob (code search + file discovery)
 - ✅ Removed "Git" from developer.md (use Bash for git commands)
 - ✅ Removed generic "MCP Tools" from developer.md (agents use Skill fallbacks)
 - ✅ Added clarifying comments to all affected agent files
 
 **Files Modified:**
+
 - `.claude/agents/orchestrators/master-orchestrator.md`
 - `.claude/agents/core/developer.md`
 - `.claude/agents/core/context-compressor.md`
@@ -948,35 +985,35 @@ All spawned agents:
 
 ### 8.5 WORKFLOW ENHANCEMENT SKILLS
 
-| Skill                                | When to Use                              |
-| ------------------------------------ | ---------------------------------------- |
-| `project-onboarding`                 | unfamiliar codebase                      |
-| `thinking-tools`                     | self-reflection at critical phases       |
-| `operational-modes`                  | regulate tool usage                      |
-| `summarize-changes`                  | after non-trivial coding                 |
-| `session-handoff`                    | before ending long sessions              |
-| `interactive-requirements-gathering` | structured user input                    |
+| Skill                                | When to Use                                                |
+| ------------------------------------ | ---------------------------------------------------------- |
+| `project-onboarding`                 | unfamiliar codebase                                        |
+| `thinking-tools`                     | self-reflection at critical phases                         |
+| `operational-modes`                  | regulate tool usage                                        |
+| `summarize-changes`                  | after non-trivial coding                                   |
+| `session-handoff`                    | before ending long sessions                                |
+| `interactive-requirements-gathering` | structured user input                                      |
 | `smart-revert`                       | revert logical work units (git notes-based, feature-level) |
-| `codebase-integration`               | integrating external codebases           |
-| `artifact-lifecycle`                 | manage artifact updates/deprecation      |
-| `workflow-creator`                   | create multi-agent workflows             |
-| `template-creator`                   | create templates                         |
-| `schema-creator`                     | create JSON schemas                      |
-| `hook-creator`                       | create safety/validation hooks           |
-| `spec-init`                          | unified spec creation (progressive disclosure) |
-| `spec-gathering`                     | start new features                       |
-| `spec-writing`                       | formal specs                             |
-| `spec-critique`                      | validate specs                           |
-| `complexity-assessment`              | analyze complexity                       |
-| `insight-extraction`                 | capture learnings                        |
-| `qa-workflow`                        | systematic test/fix loops                |
-| `ripgrep`                            | enhanced search for .mjs/.cjs/.mts/.cts  |
-| `chrome-browser`                     | browser automation/testing               |
-| `arxiv-mcp`                          | arXiv search/retrieve                    |
-| `checklist-generator`                | quality checklists (IEEE + contextual)   |
-| `progressive-disclosure`             | gather requirements (3-5 clarifications) |
-| `template-renderer`                  | render templates with token replacement  |
-| `task-breakdown`                     | break plans into Epic→Story→Task lists   |
+| `codebase-integration`               | integrating external codebases                             |
+| `artifact-lifecycle`                 | manage artifact updates/deprecation                        |
+| `workflow-creator`                   | create multi-agent workflows                               |
+| `template-creator`                   | create templates                                           |
+| `schema-creator`                     | create JSON schemas                                        |
+| `hook-creator`                       | create safety/validation hooks                             |
+| `spec-init`                          | unified spec creation (progressive disclosure)             |
+| `spec-gathering`                     | start new features                                         |
+| `spec-writing`                       | formal specs                                               |
+| `spec-critique`                      | validate specs                                             |
+| `complexity-assessment`              | analyze complexity                                         |
+| `insight-extraction`                 | capture learnings                                          |
+| `qa-workflow`                        | systematic test/fix loops                                  |
+| `ripgrep`                            | enhanced search for .mjs/.cjs/.mts/.cts                    |
+| `chrome-browser`                     | browser automation/testing                                 |
+| `arxiv-mcp`                          | arXiv search/retrieve                                      |
+| `checklist-generator`                | quality checklists (IEEE + contextual)                     |
+| `progressive-disclosure`             | gather requirements (3-5 clarifications)                   |
+| `template-renderer`                  | render templates with token replacement                    |
+| `task-breakdown`                     | break plans into Epic→Story→Task lists                     |
 
 ### 8.6 ENTERPRISE WORKFLOWS
 
@@ -1202,6 +1239,7 @@ schemas/
 ```
 
 **Track Metadata Schema** (SPEC-007):
+
 - **Path**: `.claude/schemas/track-metadata.schema.json`
 - **Documentation**: `.claude/docs/TRACK_METADATA.md`
 - **Purpose**: Consistent structure for task/track metadata

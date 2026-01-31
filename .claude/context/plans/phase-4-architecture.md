@@ -26,6 +26,7 @@ This document describes the architecture for Phase 4 features, explaining how ad
 ### 2.1 Building on SPEC-011 (Workflow State Machine Enhancements)
 
 **What SPEC-011 Provides**:
+
 - Transaction support (begin/commit/rollback)
 - Parallel phase support (fork/join)
 - Nested workflow references (parentId/childIds)
@@ -42,6 +43,7 @@ SPEC-011 (Foundation)          SPEC-017 (Extension)
 ```
 
 **Integration Points**:
+
 ```javascript
 // SPEC-017 uses SPEC-011 transaction support
 const fanOut = async (tasks, options) => {
@@ -61,6 +63,7 @@ const fanOut = async (tasks, options) => {
 ### 2.2 Building on SPEC-015 (Conductor-Main Integration)
 
 **What SPEC-015 Provides**:
+
 - Migration assessment tool
 - State format migration script
 - Validation test framework
@@ -75,6 +78,7 @@ SPEC-015 (Foundation)              SPEC-019 (Extension)
 ```
 
 **Hybrid Execution Flow**:
+
 ```
 Request arrives
      |
@@ -98,6 +102,7 @@ Request arrives
 ### 2.3 Building on SPEC-013 (Performance Profiling)
 
 **What SPEC-013 Provides**:
+
 - Performance benchmarks
 - Bottleneck detection
 - Baseline measurements
@@ -120,6 +125,7 @@ SPEC-013 (Foundation)              SPEC-022 (Extension)
 **Problem**: Execute N tasks in parallel and collect results
 
 **Architecture**:
+
 ```
                     ┌── Task A ──┐
                     │            │
@@ -130,14 +136,15 @@ Input ──> Splitter ─┼── Task B ──┼─> Collector ──> Resul
 
 **Collection Strategies**:
 
-| Strategy | Description | Use Case |
-|----------|-------------|----------|
-| `all` | Wait for all, fail if any fails | Critical path tasks |
-| `any` | Return first success, cancel others | Racing multiple approaches |
-| `majority` | Wait for >50% to succeed | Voting/consensus |
-| `quorum(n)` | Wait for n successes | Distributed agreement |
+| Strategy    | Description                         | Use Case                   |
+| ----------- | ----------------------------------- | -------------------------- |
+| `all`       | Wait for all, fail if any fails     | Critical path tasks        |
+| `any`       | Return first success, cancel others | Racing multiple approaches |
+| `majority`  | Wait for >50% to succeed            | Voting/consensus           |
+| `quorum(n)` | Wait for n successes                | Distributed agreement      |
 
 **Implementation**:
+
 ```javascript
 class FanOutPattern {
   async execute(tasks, options) {
@@ -177,6 +184,7 @@ class FanOutPattern {
 **Problem**: Execute different paths based on runtime conditions
 
 **Architecture**:
+
 ```
                     ┌── Then Branch ──┐
                     │                 │
@@ -187,13 +195,14 @@ Condition ──> When ─┤                 ├─> Continue
 
 **Condition Evaluators**:
 
-| Evaluator | Syntax | Example |
-|-----------|--------|---------|
-| JavaScript | `(ctx) => expr` | `(ctx) => ctx.result.score > 0.8` |
-| JSONPath | `$.path.to.value` | `$.result.status === 'approved'` |
-| Simple | `key operator value` | `result.count > 10` |
+| Evaluator  | Syntax               | Example                           |
+| ---------- | -------------------- | --------------------------------- |
+| JavaScript | `(ctx) => expr`      | `(ctx) => ctx.result.score > 0.8` |
+| JSONPath   | `$.path.to.value`    | `$.result.status === 'approved'`  |
+| Simple     | `key operator value` | `result.count > 10`               |
 
 **Implementation**:
+
 ```javascript
 class ConditionalBranching {
   constructor() {
@@ -201,7 +210,7 @@ class ConditionalBranching {
       // Use safe expression evaluator library (e.g., expr-eval)
       javascript: (expr, ctx) => this.safeEval(expr, ctx),
       jsonpath: (expr, ctx) => jp.query(ctx, expr)[0],
-      simple: (expr, ctx) => this.parseSimple(expr, ctx)
+      simple: (expr, ctx) => this.parseSimple(expr, ctx),
     };
   }
 
@@ -239,6 +248,7 @@ class ConditionalBranching {
 **Problem**: Execute tasks repeatedly with controlled iteration
 
 **Architecture**:
+
 ```
                     ┌─────────────────────┐
                     │                     │
@@ -251,13 +261,14 @@ Start ──> [Condition] ──> Body ──> Update ┘
 
 **Loop Types**:
 
-| Type | Description | Max Iterations |
-|------|-------------|----------------|
-| `forEach` | Iterate over collection | Collection size |
-| `doWhile` | Loop until condition false | Required |
-| `retryUntil` | Retry until success | Required |
+| Type         | Description                | Max Iterations  |
+| ------------ | -------------------------- | --------------- |
+| `forEach`    | Iterate over collection    | Collection size |
+| `doWhile`    | Loop until condition false | Required        |
+| `retryUntil` | Retry until success        | Required        |
 
 **Implementation**:
+
 ```javascript
 class LoopPatterns {
   async forEach(items, task, options = {}) {
@@ -289,7 +300,7 @@ class LoopPatterns {
       iterations++;
       await this.checkpoint({ iteration: iterations, lastResult: result });
     } while (
-      await this.evaluateCondition(condition, { result, iterations }) &&
+      (await this.evaluateCondition(condition, { result, iterations })) &&
       iterations < maxIterations
     );
 
@@ -327,6 +338,7 @@ class LoopPatterns {
 **Problem**: Build complex workflows from simpler, reusable components
 
 **Architecture**:
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Composed Workflow                               │
@@ -344,18 +356,20 @@ class LoopPatterns {
 ### 4.2 Composition Operations
 
 **Include**: Insert a sub-workflow at a specific point
+
 ```yaml
 workflow:
   name: feature-with-security
   phases:
     - name: planning
       tasks: [...]
-    - include: security-review-workflow  # Insert entire workflow
+    - include: security-review-workflow # Insert entire workflow
     - name: implementation
       tasks: [...]
 ```
 
 **Extend**: Inherit from base workflow with overrides
+
 ```yaml
 workflow:
   name: feature-with-testing
@@ -366,15 +380,16 @@ workflow:
         - task: integration-tests
           after: unit-tests
       remove:
-        - task: manual-testing  # Replaced by automated
+        - task: manual-testing # Replaced by automated
 ```
 
 **Compose**: Combine multiple workflows
+
 ```yaml
 workflow:
   name: complete-feature
   compose:
-    strategy: sequential  # or 'parallel', 'conditional'
+    strategy: sequential # or 'parallel', 'conditional'
     workflows:
       - feature-development-workflow
       - qa-workflow
@@ -425,6 +440,7 @@ class WorkflowResolver {
 **Problem**: Convert composed workflow to flat, executable form
 
 **Process**:
+
 ```
 1. Load workflow definition
 2. Resolve all includes (recursive)
@@ -488,29 +504,30 @@ class WorkflowComposer {
 ### 5.2 Routing Rules
 
 **Configuration Format**:
+
 ```yaml
 hybrid_execution:
   enabled: true
   default_system: agent-studio
   routing_rules:
     # Pattern-based routing
-    - pattern: "legacy/authentication/*"
+    - pattern: 'legacy/authentication/*'
       system: conductor-main
-      reason: "Auth still being migrated"
+      reason: 'Auth still being migrated'
 
     # Feature flag routing
-    - feature_flag: "new-checkout"
+    - feature_flag: 'new-checkout'
       percentage: 25
       system: agent-studio
       fallback: conductor-main
 
     # Time-based routing (canary)
-    - pattern: "checkout/*"
+    - pattern: 'checkout/*'
       system: agent-studio
       schedule:
-        start: "02:00"
-        end: "06:00"
-        timezone: "UTC"
+        start: '02:00'
+        end: '06:00'
+        timezone: 'UTC'
 ```
 
 ### 5.3 State Synchronization
@@ -533,6 +550,7 @@ Agent-Studio                    Conductor-Main
 ```
 
 **Conflict Resolution**:
+
 ```javascript
 class StateSync {
   async sync(taskId) {
@@ -565,7 +583,7 @@ class StateSync {
           merged[`${key}_conflict`] = {
             local: local[key],
             remote: value,
-            resolvedAt: null
+            resolvedAt: null,
           };
         } else {
           merged[key] = this.mergeField(key, local[key], value);
@@ -584,6 +602,7 @@ class StateSync {
 ### 6.1 Version Registry
 
 **Storage Format**:
+
 ```
 .claude/workflows/
 ├── feature-development/
@@ -599,6 +618,7 @@ class StateSync {
 ```
 
 **Metadata Schema**:
+
 ```json
 {
   "workflowId": "feature-development",
@@ -630,6 +650,7 @@ class StateSync {
 ### 6.2 Migration Engine
 
 **Migration Script Structure**:
+
 ```javascript
 // migrations/from-1.0.cjs
 module.exports = {
@@ -649,7 +670,7 @@ module.exports = {
     migrated.phases['security-review'] = {
       status: 'pending',
       startedAt: null,
-      completedAt: null
+      completedAt: null,
     };
 
     // Update version
@@ -684,13 +705,14 @@ module.exports = {
     rolledBack.workflowVersion = '1.0.0';
 
     return rolledBack;
-  }
+  },
 };
 ```
 
 ### 6.3 Blue-Green Deployment
 
 **Deployment Flow**:
+
 ```
 1. Deploy new version (green) alongside current (blue)
 2. Route percentage of traffic to green (start: 10%)
@@ -701,6 +723,7 @@ module.exports = {
 ```
 
 **Implementation**:
+
 ```javascript
 class BlueGreenDeployer {
   constructor(versionManager) {
@@ -717,14 +740,14 @@ class BlueGreenDeployer {
     await this.setRouting(workflowId, {
       blue: this.versionManager.getActive(workflowId),
       green: newVersion,
-      greenPercentage: startPercentage
+      greenPercentage: startPercentage,
     });
 
     // Step 3: Start monitoring
     const monitor = this.startMonitoring(workflowId, {
       successThreshold: 0.99,
       latencyThreshold: 1000,
-      period: monitoringPeriod
+      period: monitoringPeriod,
     });
 
     return { deployment: 'in-progress', monitor };
@@ -738,19 +761,19 @@ class BlueGreenDeployer {
     }
 
     await this.setRouting(workflowId, {
-      greenPercentage: targetPercentage
+      greenPercentage: targetPercentage,
     });
   }
 
   async rollback(workflowId) {
     await this.setRouting(workflowId, {
-      greenPercentage: 0
+      greenPercentage: 0,
     });
 
     // Log rollback
     await this.versionManager.recordRollback(workflowId, {
       reason: 'metrics-degradation',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 }
@@ -790,7 +813,7 @@ class LegacyAdapter {
       percentage: 0,
       fallbackOnError: true,
       metrics: true,
-      ...options
+      ...options,
     };
   }
 
@@ -896,11 +919,13 @@ class FeatureToggle {
 ### 8.2 Caching Strategy
 
 **Cache Layers**:
+
 1. **L1 (Memory)**: Recently accessed workflows (LRU, 100 items)
 2. **L2 (File)**: Parsed workflow definitions (JSON cache)
 3. **L3 (Computed)**: Flattened/resolved workflows
 
 **Cache Invalidation**:
+
 ```javascript
 class CacheManager {
   constructor(options = {}) {
@@ -974,22 +999,24 @@ class StreamProcessor {
         for (const item of chunk) {
           this.push(item);
         }
-      }
+      },
     });
   }
 
   transformStream(stream, transformer) {
-    return stream.pipe(new Transform({
-      objectMode: true,
-      transform(chunk, encoding, callback) {
-        try {
-          const transformed = transformer(chunk);
-          callback(null, transformed);
-        } catch (error) {
-          callback(error);
-        }
-      }
-    }));
+    return stream.pipe(
+      new Transform({
+        objectMode: true,
+        transform(chunk, encoding, callback) {
+          try {
+            const transformed = transformer(chunk);
+            callback(null, transformed);
+          } catch (error) {
+            callback(error);
+          }
+        },
+      })
+    );
   }
 }
 
@@ -1058,14 +1085,14 @@ class MemoryBudgetEnforcer {
 
 ### Phase 4 Feature Integration
 
-| Feature | SPEC-017 | SPEC-018 | SPEC-019 | SPEC-020 | SPEC-021 | SPEC-022 |
-|---------|----------|----------|----------|----------|----------|----------|
-| **SPEC-017** | - | Uses patterns in composed workflows | N/A | Versioned patterns | N/A | Patterns optimized |
-| **SPEC-018** | Composition uses patterns | - | Composed hybrid workflows | Versioned compositions | N/A | Lazy load compositions |
-| **SPEC-019** | N/A | Hybrid composed workflows | - | Version-aware routing | Uses adapters | Optimized sync |
-| **SPEC-020** | Versioned patterns | Versioned compositions | Version-aware routing | - | Versioned adapters | Cached versions |
-| **SPEC-021** | N/A | N/A | Uses adapters | Versioned adapters | - | Adapter metrics cached |
-| **SPEC-022** | Patterns optimized | Lazy load compositions | Optimized sync | Cached versions | Adapter metrics cached | - |
+| Feature      | SPEC-017                  | SPEC-018                            | SPEC-019                  | SPEC-020               | SPEC-021               | SPEC-022               |
+| ------------ | ------------------------- | ----------------------------------- | ------------------------- | ---------------------- | ---------------------- | ---------------------- |
+| **SPEC-017** | -                         | Uses patterns in composed workflows | N/A                       | Versioned patterns     | N/A                    | Patterns optimized     |
+| **SPEC-018** | Composition uses patterns | -                                   | Composed hybrid workflows | Versioned compositions | N/A                    | Lazy load compositions |
+| **SPEC-019** | N/A                       | Hybrid composed workflows           | -                         | Version-aware routing  | Uses adapters          | Optimized sync         |
+| **SPEC-020** | Versioned patterns        | Versioned compositions              | Version-aware routing     | -                      | Versioned adapters     | Cached versions        |
+| **SPEC-021** | N/A                       | N/A                                 | Uses adapters             | Versioned adapters     | -                      | Adapter metrics cached |
+| **SPEC-022** | Patterns optimized        | Lazy load compositions              | Optimized sync            | Cached versions        | Adapter metrics cached | -                      |
 
 ---
 
@@ -1123,6 +1150,7 @@ optimizer.stream(query);
 ### Deprecation Path
 
 If any existing APIs are deprecated:
+
 1. Mark as `@deprecated` with version
 2. Log warning on first use
 3. Maintain for 2 major versions minimum

@@ -308,7 +308,11 @@ class DeploymentManager {
    * @param {object} options - Deployment options
    */
   async deployCanary(workflowId, newVersion, options = {}) {
-    const { canaryPercentage = 10, autoRollbackOnFailure = false, healthCheckInterval = 100 } = options;
+    const {
+      canaryPercentage = 10,
+      autoRollbackOnFailure = false,
+      healthCheckInterval = 100,
+    } = options;
 
     await this.deploy(workflowId, newVersion, {
       startPercentage: canaryPercentage,

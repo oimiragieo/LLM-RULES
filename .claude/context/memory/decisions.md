@@ -993,7 +993,7 @@ _Negative:_
   1. **Include**: Insert sub-workflow at specific point in parent workflow
   2. **Extend**: Inherit from base workflow with selective overrides
   3. **Compose**: Combine multiple workflows with strategy (sequential, parallel, conditional)
-  Additionally, implement WorkflowResolver with DFS-based cycle detection to prevent infinite recursion.
+     Additionally, implement WorkflowResolver with DFS-based cycle detection to prevent infinite recursion.
 - **Consequences**:
   - **Positive**:
     - 60% reduction in workflow definition duplication

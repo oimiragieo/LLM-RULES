@@ -39,10 +39,7 @@ describe('Brownfield Assessor', () => {
 
       const projectPath = path.join(tempDir, 'greenfield');
       fs.mkdirSync(projectPath, { recursive: true });
-      fs.writeFileSync(
-        path.join(projectPath, 'package.json'),
-        JSON.stringify({ name: 'test' })
-      );
+      fs.writeFileSync(path.join(projectPath, 'package.json'), JSON.stringify({ name: 'test' }));
       // Minimal structure - just package.json
 
       const result = await assessor.assess(projectPath);
@@ -65,11 +62,17 @@ describe('Brownfield Assessor', () => {
         JSON.stringify({
           name: 'test',
           scripts: { test: 'jest' },
-          devDependencies: { jest: '^29.0.0' }
+          devDependencies: { jest: '^29.0.0' },
         })
       );
-      fs.writeFileSync(path.join(projectPath, 'README.md'), '# Project\n\n## Installation\n\n## Usage');
-      fs.writeFileSync(path.join(projectPath, 'tests/example.test.js'), 'test("example", () => {});');
+      fs.writeFileSync(
+        path.join(projectPath, 'README.md'),
+        '# Project\n\n## Installation\n\n## Usage'
+      );
+      fs.writeFileSync(
+        path.join(projectPath, 'tests/example.test.js'),
+        'test("example", () => {});'
+      );
 
       const result = await assessor.assess(projectPath);
 
@@ -99,11 +102,14 @@ describe('Brownfield Assessor', () => {
             test: 'jest',
             'test:coverage': 'jest --coverage',
             lint: 'eslint .',
-            build: 'webpack'
-          }
+            build: 'webpack',
+          },
         })
       );
-      fs.writeFileSync(path.join(projectPath, 'README.md'), '# Complex Project\n\n## Table of Contents\n\n## Architecture\n\n## Installation\n\n## Usage\n\n## API Reference');
+      fs.writeFileSync(
+        path.join(projectPath, 'README.md'),
+        '# Complex Project\n\n## Table of Contents\n\n## Architecture\n\n## Installation\n\n## Usage\n\n## API Reference'
+      );
       fs.writeFileSync(path.join(projectPath, 'CHANGELOG.md'), '# Changelog\n\n## [1.0.0]');
       fs.writeFileSync(path.join(projectPath, 'CONTRIBUTING.md'), '# Contributing');
       fs.writeFileSync(path.join(projectPath, 'LICENSE'), 'MIT License');
@@ -116,7 +122,10 @@ describe('Brownfield Assessor', () => {
 
       // Create multiple test files (20+ for high score)
       for (let i = 0; i < 25; i++) {
-        fs.writeFileSync(path.join(projectPath, `tests/unit/test${i}.test.js`), 'test("example", () => {});');
+        fs.writeFileSync(
+          path.join(projectPath, `tests/unit/test${i}.test.js`),
+          'test("example", () => {});'
+        );
       }
 
       const result = await assessor.assess(projectPath);
@@ -150,7 +159,10 @@ describe('Brownfield Assessor', () => {
 
       // Create test files
       for (let i = 0; i < 5; i++) {
-        fs.writeFileSync(path.join(projectPath, `tests/test${i}.test.js`), 'test("example", () => {});');
+        fs.writeFileSync(
+          path.join(projectPath, `tests/test${i}.test.js`),
+          'test("example", () => {});'
+        );
       }
 
       const result = await assessor.assess(projectPath);
@@ -163,7 +175,10 @@ describe('Brownfield Assessor', () => {
 
       const projectPath = path.join(tempDir, 'documented');
       fs.mkdirSync(projectPath, { recursive: true });
-      fs.writeFileSync(path.join(projectPath, 'README.md'), '# Project\n\nComprehensive documentation');
+      fs.writeFileSync(
+        path.join(projectPath, 'README.md'),
+        '# Project\n\nComprehensive documentation'
+      );
       fs.writeFileSync(path.join(projectPath, 'CHANGELOG.md'), '# Changelog');
       fs.writeFileSync(path.join(projectPath, 'CONTRIBUTING.md'), '# Contributing');
 
@@ -199,7 +214,9 @@ describe('Brownfield Assessor', () => {
       const result = await assessor.assess(projectPath);
 
       assert.ok(result.recommendations.length > 0);
-      assert.ok(result.recommendations.some(r => r.includes('test') || r.includes('documentation')));
+      assert.ok(
+        result.recommendations.some(r => r.includes('test') || r.includes('documentation'))
+      );
     });
 
     it('should suggest appropriate agents', async () => {
@@ -210,7 +227,7 @@ describe('Brownfield Assessor', () => {
       fs.writeFileSync(
         path.join(projectPath, 'package.json'),
         JSON.stringify({
-          dependencies: { 'typescript': '^5.0.0' }
+          dependencies: { typescript: '^5.0.0' },
         })
       );
 
@@ -229,7 +246,10 @@ describe('Brownfield Assessor', () => {
       const result = await assessor.assess(projectPath);
 
       assert.ok(result.suggested_workflows.length > 0);
-      assert.ok(result.suggested_workflows.includes('tdd') || result.suggested_workflows.includes('project-onboarding'));
+      assert.ok(
+        result.suggested_workflows.includes('tdd') ||
+          result.suggested_workflows.includes('project-onboarding')
+      );
     });
   });
 

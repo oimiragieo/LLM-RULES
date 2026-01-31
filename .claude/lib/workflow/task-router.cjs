@@ -12,6 +12,8 @@ class TaskRouter {
     this.featureFlags = config.featureFlags || {};
     this.stickySessionStore = new Map(); // userId → system
     this.defaultSystem = config.defaultSystem || 'agent-studio';
+    this.fallbackCount = 0;
+    this.totalRoutes = 0;
   }
 
   /**
@@ -20,11 +22,16 @@ class TaskRouter {
    * @param {string} task.path - Task path for pattern matching
    * @param {string} [task.userId] - User ID for sticky sessions
    * @param {string} [task.featureFlag] - Feature flag name
+   * @param {Object} [task.systemHealth] - Health status of systems
+   * @param {string} [task.timestamp] - Override timestamp for time-based routing
    * @returns {Promise<Object>} Routing decision { system, reason, metadata }
    */
   async route(task) {
-    // 1. Sticky session check (highest priority)
-    if (task.userId && this.stickySessionStore.has(task.userId)) {
+    this.totalRoutes++;
+
+    // 1. Sticky session check (highest priority for non-feature flag rules)
+    const stickyRule = this.rules.find(r => r.stickySession && r.featureFlag);
+    if (!stickyRule && task.userId && this.stickySessionStore.has(task.userId)) {
       return {
         system: this.stickySessionStore.get(task.userId),
         reason: 'sticky_session',
@@ -32,36 +39,88 @@ class TaskRouter {
       };
     }
 
-    // 2. Evaluate rules (in order, first match wins)
-    for (const rule of this.rules) {
+    // Sort rules by priority (higher priority first)
+    const sortedRules = [...this.rules].sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
+    // 2. Evaluate rules (by priority, then order)
+    for (const rule of sortedRules) {
       // Feature flag routing (percentage-based)
       if (rule.featureFlag) {
+        // Check sticky session for this specific rule
+        if (rule.stickySession && task.userId && this.stickySessionStore.has(task.userId)) {
+          return {
+            system: this.stickySessionStore.get(task.userId),
+            reason: 'sticky_session',
+            metadata: { userId: task.userId },
+          };
+        }
+
         const rand = Math.random();
         const system = rand < rule.percentage / 100 ? rule.system : rule.fallback;
-        return this._recordStickySession(task.userId, system, {
+        if (rule.stickySession) {
+          return this._recordStickySession(task.userId, system, {
+            reason: 'feature_flag',
+            featureFlag: rule.featureFlag,
+            percentage: rule.percentage,
+          });
+        }
+        return {
+          system,
           reason: 'feature_flag',
           featureFlag: rule.featureFlag,
           percentage: rule.percentage,
-          rand,
-        });
+        };
       }
 
       // Pattern-based routing
       if (rule.pattern && this._matchesPattern(task.path, rule.pattern)) {
-        // Handle time-based routing
-        if (rule.time) {
-          const now = Date.now();
-          if (now >= rule.time.start && now <= rule.time.end) {
+        // Check system health for fallback
+        if (task.systemHealth && task.systemHealth[rule.system] === 'unhealthy') {
+          if (rule.fallback) {
+            this.fallbackCount++;
+            return {
+              system: rule.fallback,
+              reason: 'fallback_on_error',
+              metadata: {
+                originalSystem: rule.system,
+                fallbackReason: 'health_check_failed',
+              },
+            };
+          }
+        }
+
+        // Handle time-based routing with schedule
+        if (rule.schedule) {
+          const isInWindow = this._isInTimeWindow(rule.schedule, task.timestamp);
+          if (isInWindow) {
             return this._recordStickySession(task.userId, rule.system, {
               reason: 'time_match',
               pattern: rule.pattern,
-              time: rule.time,
+              schedule: rule.schedule,
             });
+          }
+          // Outside time window, use fallback
+          if (rule.fallback) {
+            return {
+              system: rule.fallback,
+              reason: 'time_fallback',
+              pattern: rule.pattern,
+            };
           }
           continue; // Time window not active, try next rule
         }
 
-        // Handle weighted routing
+        // Handle weighted routing with weights object
+        if (rule.weights) {
+          const system = this._selectByWeight(rule.weights);
+          return this._recordStickySession(task.userId, system, {
+            reason: 'weighted_routing',
+            pattern: rule.pattern,
+            weights: rule.weights,
+          });
+        }
+
+        // Handle single weight (legacy)
         if (rule.weight) {
           const rand = Math.random();
           const decision = rand < rule.weight ? rule.system : rule.fallback;
@@ -69,7 +128,6 @@ class TaskRouter {
             reason: 'weighted_routing',
             pattern: rule.pattern,
             weight: rule.weight,
-            rand,
           });
         }
 
@@ -90,7 +148,6 @@ class TaskRouter {
         reason: 'feature_flag',
         flag: task.featureFlag,
         percentage: flag.percentage,
-        rand,
       });
     }
 
@@ -98,6 +155,52 @@ class TaskRouter {
     return this._recordStickySession(task.userId, this.defaultSystem, {
       reason: 'default',
     });
+  }
+
+  /**
+   * Check if current time is within schedule window
+   */
+  _isInTimeWindow(schedule, taskTimestamp) {
+    // Parse timestamp or use current time
+    const now = taskTimestamp ? new Date(taskTimestamp) : new Date();
+    const hours = now.getUTCHours();
+    const minutes = now.getUTCMinutes();
+    const currentTime = hours * 60 + minutes;
+
+    // Parse schedule times (HH:MM format)
+    const parseTime = timeStr => {
+      const [h, m] = timeStr.split(':').map(Number);
+      return h * 60 + m;
+    };
+
+    const startTime = parseTime(schedule.start);
+    const endTime = parseTime(schedule.end);
+
+    // Handle wrap-around (e.g., 22:00 - 06:00)
+    if (startTime <= endTime) {
+      return currentTime >= startTime && currentTime < endTime;
+    } else {
+      return currentTime >= startTime || currentTime < endTime;
+    }
+  }
+
+  /**
+   * Select system based on weighted distribution
+   */
+  _selectByWeight(weights) {
+    const total = Object.values(weights).reduce((sum, w) => sum + w, 0);
+    const rand = Math.random() * total;
+    let cumulative = 0;
+
+    for (const [system, weight] of Object.entries(weights)) {
+      cumulative += weight;
+      if (rand < cumulative) {
+        return system;
+      }
+    }
+
+    // Fallback to first system
+    return Object.keys(weights)[0];
   }
 
   /**
@@ -130,6 +233,7 @@ class TaskRouter {
    */
   async routeWithFallback(task, primarySystem) {
     const fallbackSystem = primarySystem === 'agent-studio' ? 'conductor-main' : 'agent-studio';
+    this.fallbackCount++;
 
     return {
       system: fallbackSystem,
@@ -157,6 +261,28 @@ class TaskRouter {
       ruleCount: this.rules.length,
       featureFlagCount: Object.keys(this.featureFlags).length,
     };
+  }
+
+  /**
+   * Get routing metrics (includes fallback tracking)
+   */
+  getMetrics() {
+    return {
+      stickySessionCount: this.stickySessionStore.size,
+      ruleCount: this.rules.length,
+      featureFlagCount: Object.keys(this.featureFlags).length,
+      fallbackCount: this.fallbackCount,
+      totalRoutes: this.totalRoutes,
+      fallbackRate: this.totalRoutes > 0 ? this.fallbackCount / this.totalRoutes : 0,
+    };
+  }
+
+  /**
+   * Reset metrics counters
+   */
+  resetMetrics() {
+    this.fallbackCount = 0;
+    this.totalRoutes = 0;
   }
 }
 

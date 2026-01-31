@@ -45,6 +45,29 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const routerState = require('./router-state.cjs');
 
+// Memory Monitor integration (lazy-loaded to avoid circular dependencies)
+let MemoryMonitor = null;
+let memoryMonitor = null;
+
+/**
+ * Get or create the memory monitor instance (lazy initialization)
+ * @returns {Object|null} MemoryMonitor instance or null if unavailable
+ */
+function getMemoryMonitor() {
+  if (memoryMonitor === null && MemoryMonitor === null) {
+    try {
+      MemoryMonitor = require('../../lib/utils/memory-monitor.cjs');
+      memoryMonitor = MemoryMonitor.getGlobalMonitor();
+      // Don't auto-start - just use for spot checks
+    } catch (_err) {
+      // Memory monitor not available - graceful degradation
+      MemoryMonitor = false; // Mark as unavailable
+      memoryMonitor = false;
+    }
+  }
+  return memoryMonitor || null;
+}
+
 // Event Bus integration (P1-6.4)
 let eventBus;
 try {
@@ -645,6 +668,99 @@ The Router cannot directly edit files. Spawn an agent using the Task tool.`;
 }
 
 // =============================================================================
+// CHECK 6: MEMORY PRESSURE (blocks Task spawning under memory pressure)
+// =============================================================================
+
+/**
+ * Check 6: Memory Pressure Check (blocks agent spawning under memory pressure)
+ *
+ * When heap usage exceeds critical threshold, blocks Task tool to prevent
+ * additional memory consumption from spawning new agents.
+ *
+ * Environment Variables:
+ *   MEMORY_SPAWN_THROTTLING=true|false (default: true)
+ *
+ * @param {string} toolName - Tool being used
+ * @returns {{ pass: boolean, result?: string, message?: string }}
+ */
+function checkMemoryPressure(toolName) {
+  // Only applies to Task tool (agent spawning)
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+
+  // Check if memory spawn throttling is enabled
+  const throttlingEnabled = process.env.MEMORY_SPAWN_THROTTLING !== 'false';
+  if (!throttlingEnabled) {
+    return { pass: true };
+  }
+
+  // Get memory monitor (lazy-loaded)
+  const monitor = getMemoryMonitor();
+  if (!monitor) {
+    // Memory monitor unavailable - allow (fail-open for this optional check)
+    return { pass: true };
+  }
+
+  // Perform a heap check
+  monitor.checkHeap();
+
+  // Check if we should pause spawning
+  const { shouldPause, reason, stats } = monitor.shouldPauseSpawning();
+
+  if (shouldPause) {
+    const heapUsedMB = stats?.current?.heapUsedMB?.toFixed(1) || 'unknown';
+    const heapLimitMB = stats?.current?.heapLimitMB?.toFixed(1) || 'unknown';
+    const percentStr = stats?.current?.percent
+      ? (stats.current.percent * 100).toFixed(1)
+      : 'unknown';
+
+    const message = `
++======================================================================+
+|  MEMORY PRESSURE - AGENT SPAWNING PAUSED                             |
++======================================================================+
+|  Heap Usage: ${heapUsedMB}MB / ${heapLimitMB}MB (${percentStr}%)
+|
+|  Reason: ${reason}
+|
+|  Actions to recover:
+|    1. Wait for existing agents to complete
+|    2. Reduce concurrent agent spawns
+|    3. Increase NODE_OPTIONS --max-old-space-size
+|    4. Set MEMORY_SPAWN_THROTTLING=false to override (not recommended)
+|
+|  Memory Stats:
+|    - Min: ${(stats?.min * 100)?.toFixed(1) || 'N/A'}%
+|    - Max: ${(stats?.max * 100)?.toFixed(1) || 'N/A'}%
+|    - Avg: ${(stats?.avg * 100)?.toFixed(1) || 'N/A'}%
+|    - Trend: ${stats?.trend > 0 ? '+' : ''}${(stats?.trend * 100)?.toFixed(2) || 'N/A'}%
+|
++======================================================================+
+`;
+
+    // Log to audit
+    auditLog('routing-guard', 'memory_pressure_block', {
+      heapUsedMB,
+      heapLimitMB,
+      percent: percentStr,
+      reason,
+    });
+
+    // Block the spawn
+    return { pass: false, result: 'block', message };
+  }
+
+  // Memory is OK - emit stats for monitoring if in debug mode
+  if (process.env.DEBUG_HOOKS === 'true' && stats) {
+    console.error(
+      `[routing-guard] Memory check passed: ${(stats.current.percent * 100).toFixed(1)}%`
+    );
+  }
+
+  return { pass: true };
+}
+
+// =============================================================================
 // MAIN EXECUTION
 // =============================================================================
 
@@ -716,6 +832,12 @@ function runAllChecks(toolName, toolInput) {
   }
   if (writeCheck.result === 'warn') {
     console.warn(writeCheck.message);
+  }
+
+  // Check 6: Memory Pressure Check (for Task tool only)
+  const memoryCheck = checkMemoryPressure(toolName);
+  if (!memoryCheck.pass) {
+    return { pass: false, result: memoryCheck.result, message: memoryCheck.message };
   }
 
   // All checks passed
@@ -853,6 +975,7 @@ if (require.main === module) {
  * @property {Function} checkTaskCreate - Check TaskCreate complexity enforcement
  * @property {Function} checkSecurityReview - Check security review requirements
  * @property {Function} checkRouterWrite - Check direct write restrictions
+ * @property {Function} checkMemoryPressure - Check memory pressure before agent spawning
  * @property {Function} isPlannerSpawn - Detect if spawn is a PLANNER agent
  * @property {Function} isSecuritySpawn - Detect if spawn is security-related
  * @property {Function} isImplementationAgentSpawn - Detect if spawn is implementation agent
@@ -860,6 +983,7 @@ if (require.main === module) {
  * @property {Function} isWhitelistedBashCommand - Check if bash command is whitelisted
  * @property {Function} getCachedRouterState - Get cached router state (PERF-001)
  * @property {Function} invalidateCachedState - Invalidate router state cache
+ * @property {Function} getMemoryMonitor - Get memory monitor instance for heap checks
  * @property {Array<string>} ALL_WATCHED_TOOLS - Tools monitored by this guard
  * @property {Array<string>} BLACKLISTED_TOOLS - Tools Router cannot use directly
  * @property {Array<string>} WHITELISTED_TOOLS - Tools only Router can use
@@ -878,6 +1002,7 @@ module.exports = {
   checkTaskCreate,
   checkSecurityReview,
   checkRouterWrite,
+  checkMemoryPressure,
   isPlannerSpawn,
   isSecuritySpawn,
   isImplementationAgentSpawn,
@@ -887,6 +1012,8 @@ module.exports = {
   // PERF-001: Cache management
   getCachedRouterState,
   invalidateCachedState,
+  // Memory monitoring
+  getMemoryMonitor,
   // Constants
   ALL_WATCHED_TOOLS,
   BLACKLISTED_TOOLS,

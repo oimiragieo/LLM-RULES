@@ -15,10 +15,7 @@
  * @returns {Promise<object>} Performance metrics
  */
 async function measureSequentialWorkflow(workflowFn, options = {}) {
-  const {
-    iterations = 1,
-    warmup = 0
-  } = options;
+  const { iterations = 1, warmup = 0 } = options;
 
   if (typeof workflowFn !== 'function') {
     throw new Error('workflowFn must be a function');
@@ -45,7 +42,7 @@ async function measureSequentialWorkflow(workflowFn, options = {}) {
     memorySnapshots.push({
       before: memBefore,
       after: memAfter,
-      delta: (memAfter.heapUsed - memBefore.heapUsed) / 1024 / 1024 // MB
+      delta: (memAfter.heapUsed - memBefore.heapUsed) / 1024 / 1024, // MB
     });
   }
 
@@ -63,7 +60,7 @@ async function measureSequentialWorkflow(workflowFn, options = {}) {
     avgMemory,
     target: 10000, // <10s target
     passed: avgTime < 10000,
-    measuredAt: new Date().toISOString()
+    measuredAt: new Date().toISOString(),
   };
 }
 
@@ -75,10 +72,7 @@ async function measureSequentialWorkflow(workflowFn, options = {}) {
  * @returns {Promise<object>} Performance metrics
  */
 async function measureParallelWorkflow(workflowFn, options = {}) {
-  const {
-    concurrency = 10,
-    iterations = 1
-  } = options;
+  const { concurrency = 10, iterations = 1 } = options;
 
   if (typeof workflowFn !== 'function') {
     throw new Error('workflowFn must be a function');
@@ -91,7 +85,9 @@ async function measureParallelWorkflow(workflowFn, options = {}) {
     const startTime = Date.now();
 
     // Execute workflows in parallel
-    const promises = Array(concurrency).fill(0).map(() => workflowFn());
+    const promises = Array(concurrency)
+      .fill(0)
+      .map(() => workflowFn());
     await Promise.all(promises);
 
     const endTime = Date.now();
@@ -110,10 +106,10 @@ async function measureParallelWorkflow(workflowFn, options = {}) {
     memoryUsage,
     target: {
       time: concurrency * 1000, // Rough estimate: concurrency * 1s
-      memory: 300 // <300MB target
+      memory: 300, // <300MB target
     },
     passed: avgTime < concurrency * 1000 && memoryUsage < 300,
-    measuredAt: new Date().toISOString()
+    measuredAt: new Date().toISOString(),
   };
 }
 
@@ -126,10 +122,7 @@ async function measureParallelWorkflow(workflowFn, options = {}) {
  * @returns {Promise<object>} Performance metrics
  */
 async function measureComponentPerformance(specId, componentFn, options = {}) {
-  const {
-    iterations = 100,
-    warmup = 10
-  } = options;
+  const { iterations = 100, warmup = 10 } = options;
 
   if (!specId || typeof specId !== 'string') {
     throw new Error('specId must be a non-empty string');
@@ -170,7 +163,7 @@ async function measureComponentPerformance(specId, componentFn, options = {}) {
     p99,
     target,
     passed: avgTime < target,
-    measuredAt: new Date().toISOString()
+    measuredAt: new Date().toISOString(),
   };
 }
 
@@ -197,16 +190,16 @@ function calculatePercentile(timings, percentile) {
  */
 function getComponentTarget(specId) {
   const targets = {
-    'SPEC-001': 2000,  // spec-init <2s
-    'SPEC-002': 50,    // git notes <50ms
-    'SPEC-003': 100,   // checkpoint <100ms
-    'SPEC-004': 1000,  // phase gate <1s
-    'SPEC-005': 5000,  // brownfield <5s
-    'SPEC-006': 100,   // styleguides <100ms
-    'SPEC-007': 10,    // metadata <10ms
-    'SPEC-008': 500,   // analytics <500ms
-    'SPEC-009': 1000,  // adaptive <1s
-    'SPEC-010': 2000   // smart revert <2s
+    'SPEC-001': 2000, // spec-init <2s
+    'SPEC-002': 50, // git notes <50ms
+    'SPEC-003': 100, // checkpoint <100ms
+    'SPEC-004': 1000, // phase gate <1s
+    'SPEC-005': 5000, // brownfield <5s
+    'SPEC-006': 100, // styleguides <100ms
+    'SPEC-007': 10, // metadata <10ms
+    'SPEC-008': 500, // analytics <500ms
+    'SPEC-009': 1000, // adaptive <1s
+    'SPEC-010': 2000, // smart revert <2s
   };
 
   return targets[specId] || 1000; // Default 1s
@@ -220,9 +213,7 @@ function getComponentTarget(specId) {
  * @returns {Promise<object>} Memory metrics
  */
 async function measureMemoryUsage(workflowFn, options = {}) {
-  const {
-    count = 10
-  } = options;
+  const { count = 10 } = options;
 
   if (typeof workflowFn !== 'function') {
     throw new Error('workflowFn must be a function');
@@ -239,7 +230,7 @@ async function measureMemoryUsage(workflowFn, options = {}) {
       iteration: i + 1,
       heapUsed: mem.heapUsed / 1024 / 1024,
       external: mem.external / 1024 / 1024,
-      rss: mem.rss / 1024 / 1024
+      rss: mem.rss / 1024 / 1024,
     });
   }
 
@@ -259,7 +250,7 @@ async function measureMemoryUsage(workflowFn, options = {}) {
     heapGrowth,
     target: 200, // <200MB for single workflow
     passed: heapGrowth < 50, // <50MB growth after count runs
-    measuredAt: new Date().toISOString()
+    measuredAt: new Date().toISOString(),
   };
 }
 
@@ -279,13 +270,13 @@ function generatePerformanceReport(metrics) {
     summary: {
       totalTests: 0,
       passed: 0,
-      failed: 0
+      failed: 0,
     },
     sequential: {},
     parallel: {},
     components: {},
     memory: {},
-    recommendations: []
+    recommendations: [],
   };
 
   // Process sequential metrics
@@ -294,7 +285,7 @@ function generatePerformanceReport(metrics) {
       avgTime: metrics.sequential.avgTime,
       target: metrics.sequential.target,
       passed: metrics.sequential.passed,
-      status: metrics.sequential.passed ? 'PASS' : 'FAIL'
+      status: metrics.sequential.passed ? 'PASS' : 'FAIL',
     };
     report.summary.totalTests++;
     if (metrics.sequential.passed) report.summary.passed++;
@@ -304,7 +295,7 @@ function generatePerformanceReport(metrics) {
       report.recommendations.push({
         category: 'sequential',
         issue: `Sequential workflow time (${metrics.sequential.avgTime}ms) exceeds target (${metrics.sequential.target}ms)`,
-        suggestion: 'Optimize critical path operations or increase parallelism'
+        suggestion: 'Optimize critical path operations or increase parallelism',
       });
     }
   }
@@ -317,7 +308,7 @@ function generatePerformanceReport(metrics) {
       memoryUsage: metrics.parallel.memoryUsage,
       memoryTarget: metrics.parallel.target.memory,
       passed: metrics.parallel.passed,
-      status: metrics.parallel.passed ? 'PASS' : 'FAIL'
+      status: metrics.parallel.passed ? 'PASS' : 'FAIL',
     };
     report.summary.totalTests++;
     if (metrics.parallel.passed) report.summary.passed++;
@@ -327,7 +318,7 @@ function generatePerformanceReport(metrics) {
       report.recommendations.push({
         category: 'parallel',
         issue: `Memory usage (${metrics.parallel.memoryUsage.toFixed(2)}MB) exceeds target (${metrics.parallel.target.memory}MB)`,
-        suggestion: 'Implement lazy loading or reduce concurrent workflow count'
+        suggestion: 'Implement lazy loading or reduce concurrent workflow count',
       });
     }
   }
@@ -342,7 +333,7 @@ function generatePerformanceReport(metrics) {
         p95: comp.p95,
         target: comp.target,
         passed: comp.passed,
-        status: comp.passed ? 'PASS' : 'FAIL'
+        status: comp.passed ? 'PASS' : 'FAIL',
       });
       report.summary.totalTests++;
       if (comp.passed) report.summary.passed++;
@@ -351,7 +342,7 @@ function generatePerformanceReport(metrics) {
         report.recommendations.push({
           category: 'component',
           issue: `${comp.specId} performance (${comp.avgTime.toFixed(2)}ms avg) exceeds target (${comp.target}ms)`,
-          suggestion: `Optimize ${comp.specId} implementation or increase target`
+          suggestion: `Optimize ${comp.specId} implementation or increase target`,
         });
       }
     }
@@ -364,7 +355,7 @@ function generatePerformanceReport(metrics) {
       heapGrowth: metrics.memory.heapGrowth,
       target: metrics.memory.target,
       passed: metrics.memory.passed,
-      status: metrics.memory.passed ? 'PASS' : 'FAIL'
+      status: metrics.memory.passed ? 'PASS' : 'FAIL',
     };
     report.summary.totalTests++;
     if (metrics.memory.passed) report.summary.passed++;
@@ -373,7 +364,7 @@ function generatePerformanceReport(metrics) {
       report.recommendations.push({
         category: 'memory',
         issue: `Heap growth (${metrics.memory.heapGrowth.toFixed(2)}MB) exceeds threshold`,
-        suggestion: 'Check for memory leaks or implement garbage collection hints'
+        suggestion: 'Check for memory leaks or implement garbage collection hints',
       });
     }
   }
@@ -383,7 +374,7 @@ function generatePerformanceReport(metrics) {
     report.recommendations.unshift({
       category: 'overall',
       issue: `${report.summary.failed} performance tests failed`,
-      suggestion: 'Address failed tests before production deployment'
+      suggestion: 'Address failed tests before production deployment',
     });
   }
 
@@ -395,5 +386,5 @@ module.exports = {
   measureParallelWorkflow,
   measureComponentPerformance,
   measureMemoryUsage,
-  generatePerformanceReport
+  generatePerformanceReport,
 };

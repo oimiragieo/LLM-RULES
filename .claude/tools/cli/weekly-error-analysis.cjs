@@ -61,7 +61,7 @@ function getISOWeek(date) {
   const dayNum = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((d - yearStart) / MS_PER_DAY) + 1) / 7);
+  const weekNo = Math.ceil(((d - yearStart) / MS_PER_DAY + 1) / 7);
   return { year: d.getUTCFullYear(), week: weekNo };
 }
 
@@ -330,16 +330,25 @@ function generateMarkdown(analysis) {
   lines.push(`# Weekly Error Analysis - ${analysis.week}`);
   lines.push('');
   lines.push(`Generated: ${analysis.generatedAt}`);
-  lines.push(`Period: ${analysis.period.start.split('T')[0]} to ${analysis.period.end.split('T')[0]}`);
+  lines.push(
+    `Period: ${analysis.period.start.split('T')[0]} to ${analysis.period.end.split('T')[0]}`
+  );
   lines.push('');
 
   // Summary with Trend
   lines.push('## Summary');
   lines.push('');
-  const trendIcon = analysis.summary.trend.direction === 'up' ? '↑' : analysis.summary.trend.direction === 'down' ? '↓' : '→';
+  const trendIcon =
+    analysis.summary.trend.direction === 'up'
+      ? '↑'
+      : analysis.summary.trend.direction === 'down'
+        ? '↓'
+        : '→';
   lines.push(`| Metric | This Week | Last Week | Trend |`);
   lines.push(`|--------|-----------|-----------|-------|`);
-  lines.push(`| Total Errors | ${analysis.summary.totalErrors} | ${analysis.summary.previousWeekErrors} | ${trendIcon} ${analysis.summary.trend.text} |`);
+  lines.push(
+    `| Total Errors | ${analysis.summary.totalErrors} | ${analysis.summary.previousWeekErrors} | ${trendIcon} ${analysis.summary.trend.text} |`
+  );
   lines.push('');
 
   // Critical Issues
@@ -361,7 +370,9 @@ function generateMarkdown(analysis) {
   lines.push('|------|-------|--------|-------|----------|------|--------|-----|');
   analysis.agentRanking.forEach((agent, index) => {
     const s = agent.severities;
-    lines.push(`| ${index + 1} | ${agent.agent} | ${agent.errorCount} | ${agent.score}/100 | ${s.CRITICAL} | ${s.HIGH} | ${s.MEDIUM} | ${s.LOW} |`);
+    lines.push(
+      `| ${index + 1} | ${agent.agent} | ${agent.errorCount} | ${agent.score}/100 | ${s.CRITICAL} | ${s.HIGH} | ${s.MEDIUM} | ${s.LOW} |`
+    );
   });
   lines.push('');
 

@@ -149,7 +149,8 @@ test('workflow-validator - step schema validation', async t => {
 
     const result = validator.validateStepSchema(workflow);
     assert.strictEqual(result.valid, false);
-    assert.match(result.errors[0], /Phase evaluate, Step 2/i);
+    // Match "Phase 'evaluate', Step 2" (with quotes around phase name)
+    assert.match(result.errors[0], /Phase ['"]?evaluate['"]?, Step 2/i);
   });
 
   await t.test('integration: validate() includes step schema validation', async () => {
@@ -180,7 +181,7 @@ phases:
 
     try {
       fs.writeFileSync(workflowPath, invalidWorkflowContent);
-      const result = await validator.validate(workflowPath);
+      const result = await validator.validate(workflowPath, { returnErrors: true });
 
       assert.strictEqual(result.valid, false);
       assert.strictEqual(result.errors.length > 0, true);

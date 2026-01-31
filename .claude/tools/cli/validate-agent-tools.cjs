@@ -75,7 +75,7 @@ function validateAllAgents() {
       mcpToolCount: result.metadata?.mcpToolCount || 0,
       valid: result.valid,
       errors: result.errors,
-      warnings: result.warnings
+      warnings: result.warnings,
     });
 
     // Print status
@@ -122,7 +122,7 @@ function generateReport(results) {
     '## Summary by Category',
     '',
     '| Category | Agents | Valid | Invalid | Warnings |',
-    '|----------|--------|-------|---------|----------|'
+    '|----------|--------|-------|---------|----------|',
   ];
 
   // Group by category
@@ -139,7 +139,9 @@ function generateReport(results) {
   }
 
   for (const [category, stats] of Object.entries(byCategory)) {
-    report.push(`| ${category} | ${stats.total} | ${stats.valid} | ${stats.invalid} | ${stats.warnings} |`);
+    report.push(
+      `| ${category} | ${stats.total} | ${stats.valid} | ${stats.invalid} | ${stats.warnings} |`
+    );
   }
 
   report.push('', '---', '', '## Validation Results', '');
@@ -199,7 +201,9 @@ function generateReport(results) {
     report.push('|-------|----------|-------|-----------|');
 
     for (const result of valid) {
-      report.push(`| ${result.agentName} | ${result.category} | ${result.toolCount} | ${result.mcpToolCount} |`);
+      report.push(
+        `| ${result.agentName} | ${result.category} | ${result.toolCount} | ${result.mcpToolCount} |`
+      );
     }
 
     report.push('');
@@ -224,7 +228,9 @@ function generateReport(results) {
   }
 
   report.push('---', '', '## Next Steps', '');
-  report.push('1. Run `node .claude/tools/cli/validate-agent-tools.js --fix` to auto-fix common issues');
+  report.push(
+    '1. Run `node .claude/tools/cli/validate-agent-tools.js --fix` to auto-fix common issues'
+  );
   report.push('2. Set `AGENT_TOOLS_VALIDATOR=block` to enforce validation in hooks');
   report.push('3. Add validation to CI/CD pipeline');
   report.push('');
@@ -238,7 +244,7 @@ function generateReport(results) {
 function autoFix(results) {
   console.log('\n🔧 Auto-fix mode enabled...\n');
 
-  let fixedCount = 0;
+  const fixedCount = 0;
 
   for (const result of results) {
     if (!result.valid) {
@@ -281,7 +287,11 @@ function main() {
   const warningCount = results.reduce((sum, r) => sum + r.warnings.length, 0);
 
   console.log('\n╔══════════════════════════════════════════════════════╗');
-  console.log(`║ Summary: ${validCount}/${results.length} valid, ${invalidCount} invalid, ${warningCount} warnings`.padEnd(54) + '║');
+  console.log(
+    `║ Summary: ${validCount}/${results.length} valid, ${invalidCount} invalid, ${warningCount} warnings`.padEnd(
+      54
+    ) + '║'
+  );
   console.log('╚══════════════════════════════════════════════════════╝\n');
 
   if (invalidCount > 0) {

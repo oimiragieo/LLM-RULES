@@ -5,6 +5,7 @@
 Smart revert enables feature-level rollback using git notes metadata.
 
 Instead of reverting individual commits by hash, you can:
+
 - Revert entire features by name
 - Revert entire bugs by ID
 - Revert with dependency checking
@@ -184,6 +185,7 @@ Select task to revert (6, 7, 8): 6
 **Cause**: Feature predates git-notes-audit hook
 
 **Solution**:
+
 1. Manually add git notes for commits:
    ```bash
    git notes add -m "TASK-#6: Dark Mode" abc123
@@ -199,6 +201,7 @@ Select task to revert (6, 7, 8): 6
 **Symptom**: "Revert failed: other features depend on this"
 
 **Options:**
+
 1. Revert dependent features first:
    ```bash
    # Revert Task #8 (depends on #7)
@@ -219,6 +222,7 @@ Select task to revert (6, 7, 8): 6
 **Symptom**: "Merge conflicts during revert"
 
 **Resolution:**
+
 1. Resolve conflicts manually:
    ```bash
    # Edit conflicted files
@@ -390,6 +394,7 @@ The `git-notes-audit.cjs` hook automatically creates git notes on every commit:
 ```
 
 **Benefits:**
+
 - No manual note creation required
 - Automatic task grouping
 - Context preserved for every commit
@@ -434,13 +439,16 @@ Conductor tracks automatically use git notes:
 ## Track: user-auth_20250115
 
 ### Phase 1: Setup
+
 - [x] Task 1.1: Create repo `abc123`
 
 ### Phase 2: Implementation
+
 - [x] Task 2.1: Add dark mode `def456`
 ```
 
 When reverting Task 2.1:
+
 1. Find commits with git note `TASK-#2.1`
 2. Revert in reverse order
 3. Update plan.md to mark task incomplete
@@ -459,6 +467,7 @@ Read `.claude/context/memory/learnings.md` for project-specific revert patterns.
 
 **After successful revert:**
 Record any learnings or issues in:
+
 - `.claude/context/memory/learnings.md` (successful patterns)
 - `.claude/context/memory/issues.md` (revert conflicts or blockers)
 - `.claude/context/memory/decisions.md` (why revert was needed)

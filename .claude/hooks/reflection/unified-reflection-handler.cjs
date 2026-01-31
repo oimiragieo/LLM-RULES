@@ -227,7 +227,10 @@ function handleErrorRecovery(input) {
   let severity = 'MEDIUM';
   if (toolResult.error?.includes('CRITICAL') || toolResult.error?.includes('SECURITY')) {
     severity = 'CRITICAL';
-  } else if (toolResult.error?.includes('permission denied') || toolResult.error?.includes('not found')) {
+  } else if (
+    toolResult.error?.includes('permission denied') ||
+    toolResult.error?.includes('not found')
+  ) {
     severity = 'HIGH';
   }
 
@@ -258,9 +261,8 @@ function handleErrorRecovery(input) {
 
   // Add error from tool result
   if (toolResult.error) {
-    entry.error = typeof toolResult.error === 'string'
-      ? toolResult.error
-      : JSON.stringify(toolResult.error);
+    entry.error =
+      typeof toolResult.error === 'string' ? toolResult.error : JSON.stringify(toolResult.error);
   }
 
   // Include relevant tool input for context

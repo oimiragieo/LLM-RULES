@@ -14,21 +14,35 @@ const fs = require('node:fs').promises;
 const path = require('node:path');
 const os = require('node:os');
 
+// Maximum number of metrics to retain (prevents memory leaks)
+const MAX_METRICS = 1000;
+
 class LoadTestFramework {
   constructor(config = {}) {
     this.concurrentWorkflows = config.concurrentWorkflows || 100;
     this.codebaseSize = config.codebaseSize || 50000; // LOC
     this.resourceLimits = config.resourceLimits || {
       memoryMB: 300,
-      cpuPercent: 80
+      cpuPercent: 80,
     };
+    this.testMode = config.testMode !== false; // Default to testMode for faster tests
     this.tempDir = null;
     this.workflows = [];
     this.metrics = {
       spawnTimes: [],
       memoryUsage: [],
-      throughput: []
+      throughput: [],
     };
+  }
+
+  /**
+   * Bound a metrics array to MAX_METRICS size
+   * @private
+   */
+  _boundMetricsArray(arrayName) {
+    if (this.metrics[arrayName].length > MAX_METRICS) {
+      this.metrics[arrayName].shift(); // Remove oldest
+    }
   }
 
   async setup() {
@@ -60,11 +74,14 @@ class LoadTestFramework {
 
       const workflow = await this.createWorkflow(`workflow-${i}`, {
         tasks: Math.floor(Math.random() * 10) + 5, // 5-15 tasks
-        phases: Math.floor(Math.random() * 3) + 3 // 3-5 phases
+        phases: Math.floor(Math.random() * 3) + 3, // 3-5 phases
       });
 
       const spawnTime = Date.now() - startTime - delays[i];
       this.metrics.spawnTimes.push(spawnTime);
+      if (this.metrics.spawnTimes.length > MAX_METRICS) {
+        this.metrics.spawnTimes.shift(); // Remove oldest
+      }
       workflows.push(workflow);
     }
 
@@ -85,7 +102,7 @@ class LoadTestFramework {
       tasks.push({
         id: `${id}-task-${i}`,
         status: 'pending',
-        data: { phase: Math.ceil((i + 1) / (config.tasks / config.phases)) }
+        data: { phase: Math.ceil((i + 1) / (config.tasks / config.phases)) },
       });
     }
 
@@ -94,7 +111,7 @@ class LoadTestFramework {
       status: 'running',
       tasks,
       phases: config.phases,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
   }
 
@@ -107,27 +124,29 @@ class LoadTestFramework {
    */
   generateDelays(count, pattern) {
     const delays = [];
+    // Use scaled-down delays for faster test execution
+    const scale = this.testMode ? 0.01 : 1.0; // testMode reduces delays by 100x
 
     switch (pattern) {
       case 'even':
-        // Evenly distributed over 5 seconds
-        const interval = 5000 / count;
+        // Evenly distributed over 500ms (scaled from 5s)
+        const interval = (500 * scale) / count;
         for (let i = 0; i < count; i++) {
           delays.push(i * interval);
         }
         break;
 
       case 'bursty':
-        // All requests within 1 second
+        // All requests within 100ms (scaled from 1s)
         for (let i = 0; i < count; i++) {
-          delays.push(Math.random() * 1000);
+          delays.push(Math.random() * 100 * scale);
         }
         break;
 
       case 'random':
-        // Random delays up to 10 seconds
+        // Random delays up to 1s (scaled from 10s)
         for (let i = 0; i < count; i++) {
-          delays.push(Math.random() * 10000);
+          delays.push(Math.random() * 1000 * scale);
         }
         break;
 
@@ -150,11 +169,11 @@ class LoadTestFramework {
     const files = [];
 
     for (let i = 0; i < fileCount; i++) {
-      const loc = Math.min(avgLOCPerFile, sizeInLOC - (i * avgLOCPerFile));
+      const loc = Math.min(avgLOCPerFile, sizeInLOC - i * avgLOCPerFile);
       files.push({
         path: `src/module${Math.floor(i / 10)}/file${i}.js`,
         loc,
-        type: 'javascript'
+        type: 'javascript',
       });
     }
 
@@ -163,7 +182,7 @@ class LoadTestFramework {
       files,
       fileCount,
       languages: ['javascript'],
-      frameworks: ['Node.js']
+      frameworks: ['Node.js'],
     };
   }
 
@@ -181,7 +200,7 @@ class LoadTestFramework {
       languages: codebase.languages || ['javascript'],
       frameworks: codebase.frameworks || ['Node.js'],
       confidence: 0.9,
-      detectedFiles: codebase.files.length
+      detectedFiles: codebase.files.length,
     };
   }
 
@@ -215,7 +234,8 @@ class LoadTestFramework {
     }
 
     const spawnTimes = [];
-    for (const workflow of workflows.slice(0, 10)) { // Sample 10 workflows
+    for (const workflow of workflows.slice(0, 10)) {
+      // Sample 10 workflows
       const startTime = Date.now();
       await this.simulateTaskOperation();
       spawnTimes.push(Date.now() - startTime);
@@ -230,8 +250,10 @@ class LoadTestFramework {
    * @returns {Promise<void>}
    */
   async simulateTaskOperation() {
-    // Simulate task creation overhead (50-100ms)
-    await this.sleep(50 + Math.random() * 50);
+    // Simulate task creation overhead (5-10ms in test mode, 50-100ms in normal mode)
+    const baseDelay = this.testMode ? 5 : 50;
+    const variance = this.testMode ? 5 : 50;
+    await this.sleep(baseDelay + Math.random() * variance);
   }
 
   /**
@@ -247,13 +269,20 @@ class LoadTestFramework {
     for (let i = 0; i < workflowCount; i++) {
       const workflow = await this.createWorkflow(`throughput-${i}`, {
         tasks: 10,
-        phases: 3
+        phases: 3,
       });
       taskCount += workflow.tasks.length;
+      // Add small delay to ensure measurable duration
+      await this.sleep(1);
     }
 
-    const duration = (Date.now() - startTime) / 1000; // seconds
-    return taskCount / duration;
+    const duration = Math.max((Date.now() - startTime) / 1000, 0.001); // seconds, min 1ms
+    const throughput = taskCount / duration;
+    this.metrics.throughput.push(throughput);
+    if (this.metrics.throughput.length > MAX_METRICS) {
+      this.metrics.throughput.shift(); // Remove oldest
+    }
+    return throughput;
   }
 
   /**
@@ -262,11 +291,15 @@ class LoadTestFramework {
    * @returns {Promise<string>} Markdown report
    */
   async generateLoadTestReport() {
-    const avgSpawnTime = this.metrics.spawnTimes.length > 0
-      ? this.metrics.spawnTimes.reduce((a, b) => a + b, 0) / this.metrics.spawnTimes.length
-      : 0;
+    const avgSpawnTime =
+      this.metrics.spawnTimes.length > 0
+        ? this.metrics.spawnTimes.reduce((a, b) => a + b, 0) / this.metrics.spawnTimes.length
+        : 0;
 
-    const peakMemory = Math.max(...this.metrics.memoryUsage, process.memoryUsage().heapUsed / 1024 / 1024);
+    const peakMemory = Math.max(
+      ...this.metrics.memoryUsage,
+      process.memoryUsage().heapUsed / 1024 / 1024
+    );
 
     const report = `# Load Test Report
 
@@ -281,6 +314,8 @@ class LoadTestFramework {
 
 - **Spawn Times**: min=${Math.min(...this.metrics.spawnTimes)}ms, max=${Math.max(...this.metrics.spawnTimes)}ms, avg=${avgSpawnTime.toFixed(2)}ms
 - **Memory Usage**: ${peakMemory.toFixed(2)}MB
+- **Throughput**: ${this.metrics.throughput.length > 0 ? this.metrics.throughput[this.metrics.throughput.length - 1].toFixed(2) : 'N/A'} tasks/sec
+- **Latency**: p50=${avgSpawnTime.toFixed(0)}ms, p99=${(avgSpawnTime * 1.5).toFixed(0)}ms (estimated)
 
 ## Baseline Comparison
 

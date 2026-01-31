@@ -137,7 +137,10 @@ describe('error-report CLI', () => {
       const summary = errorReport.generateSummary({ date: 'today' });
 
       assert.ok(summary.byCategory.TOOL_FAILURE >= 1, 'Should have TOOL_FAILURE errors');
-      assert.ok(summary.byCategory.SECURITY_VIOLATION >= 1, 'Should have SECURITY_VIOLATION errors');
+      assert.ok(
+        summary.byCategory.SECURITY_VIOLATION >= 1,
+        'Should have SECURITY_VIOLATION errors'
+      );
     });
 
     it('should count errors by agent', () => {
@@ -176,10 +179,9 @@ describe('error-report CLI', () => {
         category: 'TOOL_FAILURE',
       });
 
-      assert.ok(errors.every(e =>
-        e.context?.agentName === 'developer' &&
-        e.category === 'TOOL_FAILURE'
-      ));
+      assert.ok(
+        errors.every(e => e.context?.agentName === 'developer' && e.category === 'TOOL_FAILURE')
+      );
     });
   });
 

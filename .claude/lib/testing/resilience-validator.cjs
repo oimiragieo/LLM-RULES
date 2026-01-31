@@ -38,7 +38,7 @@ class ResilienceValidator {
       lostTasks: 0,
       survivalRate: 0,
       allTasksPresent: false,
-      allDataIntact: false
+      allDataIntact: false,
     };
 
     // Simulate failure and recovery
@@ -52,7 +52,11 @@ class ResilienceValidator {
     // Check data integrity
     result.allDataIntact = survivedTasks.every((task, index) => {
       const originalTask = allTasks[index];
-      return originalTask && task.id === originalTask.id && JSON.stringify(task.data) === JSON.stringify(originalTask.data);
+      return (
+        originalTask &&
+        task.id === originalTask.id &&
+        JSON.stringify(task.data) === JSON.stringify(originalTask.data)
+      );
     });
 
     this.validationResults.push(result);
@@ -87,7 +91,7 @@ class ResilienceValidator {
     const result = {
       failureType,
       passed: true,
-      issues: []
+      issues: [],
     };
 
     // Check task count consistency
@@ -132,7 +136,7 @@ class ResilienceValidator {
       issues: [],
       entryCount: auditLog.length,
       validEntries: 0,
-      invalidEntries: 0
+      invalidEntries: 0,
     };
 
     // Check chronological order
@@ -184,7 +188,7 @@ class ResilienceValidator {
     this.validationResults.push({
       failureType: failure.type,
       recoveryTime,
-      withinTarget: recoveryTime < 30000 // <30s general target
+      withinTarget: recoveryTime < 30000, // <30s general target
     });
 
     return recoveryTime;
@@ -203,7 +207,7 @@ class ResilienceValidator {
       passed: true,
       degradationPercent: 0,
       threshold,
-      metrics: {}
+      metrics: {},
     };
 
     // Calculate degradation for each metric
@@ -223,7 +227,7 @@ class ResilienceValidator {
       result.metrics[metric] = {
         baseline: baselineValue,
         underLoad: underLoadValue,
-        degradation: degradation.toFixed(2)
+        degradation: degradation.toFixed(2),
       };
 
       if (Math.abs(degradation) > threshold) {
@@ -234,7 +238,9 @@ class ResilienceValidator {
 
     // Use worst-case degradation
     if (result.degradationPercent === 0 && Object.keys(result.metrics).length > 0) {
-      const degradations = Object.values(result.metrics).map(m => Math.abs(parseFloat(m.degradation)));
+      const degradations = Object.values(result.metrics).map(m =>
+        Math.abs(parseFloat(m.degradation))
+      );
       result.degradationPercent = Math.max(...degradations);
     }
 
@@ -249,41 +255,78 @@ class ResilienceValidator {
    */
   async generateResilienceReport() {
     const survivalResults = this.validationResults.filter(r => r.survivalRate !== undefined);
-    const consistencyResults = this.validationResults.filter(r => r.issues !== undefined && r.failureType);
-    const performanceResults = this.validationResults.filter(r => r.degradationPercent !== undefined);
+    const consistencyResults = this.validationResults.filter(
+      r => r.issues !== undefined && r.failureType
+    );
+    const performanceResults = this.validationResults.filter(
+      r => r.degradationPercent !== undefined
+    );
 
     const report = `# Resilience Validation Report
 
 ## Task Survival Rate
 
-${survivalResults.length > 0 ? survivalResults.map(r => `
+${
+  survivalResults.length > 0
+    ? survivalResults
+        .map(
+          r => `
 - **${r.failureType}**: ${(r.survivalRate * 100).toFixed(1)}% (${r.survivedTasks}/${r.totalTasks} tasks survived)
   - All Tasks Present: ${r.allTasksPresent ? '✅' : '❌'}
   - All Data Intact: ${r.allDataIntact ? '✅' : '❌'}
-`).join('\n') : 'No survival tests run'}
+`
+        )
+        .join('\n')
+    : 'No survival tests run'
+}
 
 ## Data Consistency
 
-${consistencyResults.length > 0 ? consistencyResults.map(r => `
+${
+  consistencyResults.length > 0
+    ? consistencyResults
+        .map(
+          r => `
 - **${r.failureType}**: ${r.passed ? '✅ PASS' : '❌ FAIL'}
   - Issues: ${r.issues.length > 0 ? r.issues.join(', ') : 'None'}
-`).join('\n') : 'No consistency tests run'}
+`
+        )
+        .join('\n')
+    : 'No consistency tests run'
+}
 
 ## Recovery Time
 
-${this.validationResults.filter(r => r.recoveryTime).map(r => `
+${
+  this.validationResults
+    .filter(r => r.recoveryTime)
+    .map(
+      r => `
 - **${r.failureType}**: ${r.recoveryTime}ms ${r.withinTarget ? '✅' : '⚠️'}
-`).join('\n') || 'No recovery time measurements'}
+`
+    )
+    .join('\n') || 'No recovery time measurements'
+}
 
 ## Performance Degradation
 
-${performanceResults.length > 0 ? performanceResults.map(r => `
+${
+  performanceResults.length > 0
+    ? performanceResults
+        .map(
+          r => `
 - **Overall Degradation**: ${r.degradationPercent.toFixed(1)}% (threshold: ${r.threshold}%)
   - Status: ${r.passed ? '✅ PASS' : '❌ FAIL'}
-  - Metrics: ${Object.entries(r.metrics).map(([metric, data]) =>
-    `${metric}: ${data.baseline} → ${data.underLoad} (${data.degradation}%)`
-  ).join(', ')}
-`).join('\n') : 'No performance tests run'}
+  - Metrics: ${Object.entries(r.metrics)
+    .map(
+      ([metric, data]) => `${metric}: ${data.baseline} → ${data.underLoad} (${data.degradation}%)`
+    )
+    .join(', ')}
+`
+        )
+        .join('\n')
+    : 'No performance tests run'
+}
 
 ## Summary
 

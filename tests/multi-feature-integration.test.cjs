@@ -84,7 +84,7 @@ class IntegrationTestFramework {
       totalScenarios: results.length,
       succeeded: results.filter(r => r.status === 'completed').length,
       failed: results.filter(r => r.status !== 'completed').length,
-      scenarios: results
+      scenarios: results,
     };
     return JSON.stringify(report, null, 2);
   }
@@ -108,12 +108,16 @@ describe('Scenario Execution', () => {
 
   describe('Scenario 1: Full Spec Flow', () => {
     it('should execute spec-init → progressive disclosure → track metadata → phase verification', async () => {
-      framework.addScenario('full-spec-flow', [
-        { spec: 'SPEC-001', action: 'spec-init' },
-        { spec: 'SPEC-009', action: 'progressive-disclosure' },
-        { spec: 'SPEC-008', action: 'track-metadata' },
-        { spec: 'SPEC-004', action: 'phase-verification' }
-      ], { status: 'completed' });
+      framework.addScenario(
+        'full-spec-flow',
+        [
+          { spec: 'SPEC-001', action: 'spec-init' },
+          { spec: 'SPEC-009', action: 'progressive-disclosure' },
+          { spec: 'SPEC-008', action: 'track-metadata' },
+          { spec: 'SPEC-004', action: 'phase-verification' },
+        ],
+        { status: 'completed' }
+      );
 
       const result = await framework.executeSequential('full-spec-flow');
       assert.strictEqual(result.status, 'completed');
@@ -135,11 +139,15 @@ describe('Scenario Execution', () => {
 
   describe('Scenario 2: Revert & Audit', () => {
     it('should execute workflow checkpointing → smart revert → git notes audit', async () => {
-      framework.addScenario('revert-audit', [
-        { spec: 'SPEC-003', action: 'workflow-checkpointing' },
-        { spec: 'SPEC-010', action: 'smart-revert' },
-        { spec: 'SPEC-002', action: 'git-notes-audit' }
-      ], { status: 'completed' });
+      framework.addScenario(
+        'revert-audit',
+        [
+          { spec: 'SPEC-003', action: 'workflow-checkpointing' },
+          { spec: 'SPEC-010', action: 'smart-revert' },
+          { spec: 'SPEC-002', action: 'git-notes-audit' },
+        ],
+        { status: 'completed' }
+      );
 
       const result = await framework.executeSequential('revert-audit');
       assert.strictEqual(result.status, 'completed');
@@ -154,11 +162,15 @@ describe('Scenario Execution', () => {
 
   describe('Scenario 3: Brownfield Setup', () => {
     it('should execute brownfield detection → code styleguides → onboarding', async () => {
-      framework.addScenario('brownfield-setup', [
-        { spec: 'SPEC-005', action: 'brownfield-detection' },
-        { spec: 'SPEC-006', action: 'code-styleguides' },
-        { spec: 'SPEC-001', action: 'onboarding-orchestration' }
-      ], { status: 'completed' });
+      framework.addScenario(
+        'brownfield-setup',
+        [
+          { spec: 'SPEC-005', action: 'brownfield-detection' },
+          { spec: 'SPEC-006', action: 'code-styleguides' },
+          { spec: 'SPEC-001', action: 'onboarding-orchestration' },
+        ],
+        { status: 'completed' }
+      );
 
       const result = await framework.executeSequential('brownfield-setup');
       assert.strictEqual(result.status, 'completed');
@@ -173,17 +185,21 @@ describe('Scenario Execution', () => {
 
   describe('Scenario 4: Complex Workflow', () => {
     it('should execute all 9 SPECs in realistic workflow order', async () => {
-      framework.addScenario('complex-workflow', [
-        { spec: 'SPEC-005', action: 'brownfield-detection' },
-        { spec: 'SPEC-001', action: 'spec-init' },
-        { spec: 'SPEC-009', action: 'progressive-disclosure' },
-        { spec: 'SPEC-007', action: 'create-track-metadata' },
-        { spec: 'SPEC-004', action: 'phase-verification' },
-        { spec: 'SPEC-003', action: 'workflow-checkpointing' },
-        { spec: 'SPEC-002', action: 'git-notes-audit' },
-        { spec: 'SPEC-008', action: 'analytics-report' },
-        { spec: 'SPEC-010', action: 'smart-revert' }
-      ], { status: 'completed' });
+      framework.addScenario(
+        'complex-workflow',
+        [
+          { spec: 'SPEC-005', action: 'brownfield-detection' },
+          { spec: 'SPEC-001', action: 'spec-init' },
+          { spec: 'SPEC-009', action: 'progressive-disclosure' },
+          { spec: 'SPEC-007', action: 'create-track-metadata' },
+          { spec: 'SPEC-004', action: 'phase-verification' },
+          { spec: 'SPEC-003', action: 'workflow-checkpointing' },
+          { spec: 'SPEC-002', action: 'git-notes-audit' },
+          { spec: 'SPEC-008', action: 'analytics-report' },
+          { spec: 'SPEC-010', action: 'smart-revert' },
+        ],
+        { status: 'completed' }
+      );
 
       const result = await framework.executeSequential('complex-workflow');
       assert.strictEqual(result.status, 'completed');
@@ -199,11 +215,15 @@ describe('Scenario Execution', () => {
 
   describe('Scenario 5: Error Recovery', () => {
     it('should handle failure in one SPEC without cascading', async () => {
-      framework.addScenario('error-recovery', [
-        { spec: 'SPEC-001', action: 'spec-init' },
-        { spec: 'SPEC-009', action: 'progressive-disclosure' },
-        { spec: 'SPEC-003', action: 'workflow-checkpointing' }
-      ], { status: 'completed' });
+      framework.addScenario(
+        'error-recovery',
+        [
+          { spec: 'SPEC-001', action: 'spec-init' },
+          { spec: 'SPEC-009', action: 'progressive-disclosure' },
+          { spec: 'SPEC-003', action: 'workflow-checkpointing' },
+        ],
+        { status: 'completed' }
+      );
 
       // Simulate failure in SPEC-009
       const result = await framework.executeSequential('error-recovery');
@@ -223,7 +243,7 @@ describe('Scenario Execution', () => {
       const results = await framework.executeParallel([
         'full-spec-flow',
         'revert-audit',
-        'brownfield-setup'
+        'brownfield-setup',
       ]);
       const duration = Date.now() - startTime;
 
@@ -232,10 +252,7 @@ describe('Scenario Execution', () => {
     });
 
     it('should not contaminate state between parallel scenarios', async () => {
-      const results = await framework.executeParallel([
-        'full-spec-flow',
-        'revert-audit'
-      ]);
+      const results = await framework.executeParallel(['full-spec-flow', 'revert-audit']);
 
       // Each scenario should have independent results
       assert(results[0].scenarioId !== results[1].scenarioId);

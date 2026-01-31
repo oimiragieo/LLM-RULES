@@ -3,9 +3,7 @@
   "stepId": "step-1",
   "stepNumber": 1,
   "state": {
-    "files": [
-      "file1.js"
-    ],
+    "files": ["file1.js"],
     "vars": {
       "count": 42
     }

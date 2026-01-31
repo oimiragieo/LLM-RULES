@@ -43,7 +43,7 @@ class DistributedTracer {
       status: 'in_progress',
       result: null,
       exception: null,
-      events: []
+      events: [],
     };
 
     this.activeSpans.set(spanId, span);
@@ -78,7 +78,7 @@ class DistributedTracer {
       message: error.message,
       code: error.code || 'UNKNOWN',
       stack: error.stack,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -96,7 +96,7 @@ class DistributedTracer {
     span.events.push({
       name,
       attributes,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -132,7 +132,7 @@ class DistributedTracer {
       version: '1.0',
       serviceName: this.serviceName,
       traces: filteredTraces,
-      exportTime: Date.now()
+      exportTime: Date.now(),
     };
   }
 
@@ -148,14 +148,14 @@ class DistributedTracer {
         {
           resource: {
             attributes: {
-              'service.name': this.serviceName
-            }
+              'service.name': this.serviceName,
+            },
           },
           scopeSpans: [
             {
               scope: {
                 name: 'agent-studio-tracer',
-                version: '1.0.0'
+                version: '1.0.0',
               },
               spans: traces.map(t => ({
                 traceId: t.traceId,
@@ -167,16 +167,16 @@ class DistributedTracer {
                 endTimeUnixNano: t.endTime ? t.endTime * 1000000 : undefined,
                 attributes: Object.entries(t.attributes).map(([key, value]) => ({
                   key,
-                  value: { stringValue: String(value) }
+                  value: { stringValue: String(value) },
                 })),
                 status: {
-                  code: t.status === 'success' ? 'STATUS_CODE_OK' : 'STATUS_CODE_ERROR'
-                }
-              }))
-            }
-          ]
-        }
-      ]
+                  code: t.status === 'success' ? 'STATUS_CODE_OK' : 'STATUS_CODE_ERROR',
+                },
+              })),
+            },
+          ],
+        },
+      ],
     };
   }
 
@@ -194,7 +194,7 @@ class DistributedTracer {
       startTime: span.startTime,
       endTime: span.endTime,
       status: span.status,
-      attributes: span.attributes
+      attributes: span.attributes,
     }));
 
     // Sort by startTime for hierarchical display
@@ -204,7 +204,7 @@ class DistributedTracer {
       serviceName: this.serviceName,
       nodes,
       totalDuration: Math.max(...nodes.map(n => n.duration)),
-      nodeCount: nodes.length
+      nodeCount: nodes.length,
     };
   }
 

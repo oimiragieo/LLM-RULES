@@ -3,11 +3,7 @@
   "stepId": "step-3",
   "stepNumber": 3,
   "state": {
-    "files": [
-      "file1.js",
-      "file2.js",
-      "file3.js"
-    ]
+    "files": ["file1.js", "file2.js", "file3.js"]
   },
   "timestamp": "2026-01-30T03:22:49.645Z",
   "checksum": "b8feff4cf9026e30b68fb46dd7b6bae520353b4fb4717f6525c589e5f6f9679a"

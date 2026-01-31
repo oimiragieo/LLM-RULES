@@ -14,6 +14,11 @@
 const fs = require('fs');
 const path = require('path');
 
+// Memory safety limits (prevent OOM with large workflow datasets)
+const MAX_INPUT_WORKFLOWS = 5000; // Reject overly large inputs
+const MAX_RESULT_SIZE = 500; // Limit result array sizes
+const MAX_CANDIDATES = 10000; // Limit candidate map size during analysis
+
 class WorkflowPatternDetector {
   constructor(config = {}) {
     this.config = {
@@ -46,6 +51,14 @@ class WorkflowPatternDetector {
       return [];
     }
 
+    // Memory safety: reject overly large inputs
+    if (workflows.length > MAX_INPUT_WORKFLOWS) {
+      console.warn(
+        `[detectFrequentSequences] Input too large (${workflows.length} workflows). Truncating to ${MAX_INPUT_WORKFLOWS}.`
+      );
+      workflows = workflows.slice(0, MAX_INPUT_WORKFLOWS);
+    }
+
     const patterns = [];
     const sequences = workflows.map(w => this._extractSequence(w.taskSequence));
 
@@ -67,6 +80,14 @@ class WorkflowPatternDetector {
 
     // Sort by support descending
     patterns.sort((a, b) => b.support - a.support);
+
+    // Memory safety: limit result size
+    if (patterns.length > MAX_RESULT_SIZE) {
+      console.warn(
+        `[detectFrequentSequences] Result too large (${patterns.length} patterns). Truncating to top ${MAX_RESULT_SIZE}.`
+      );
+      return patterns.slice(0, MAX_RESULT_SIZE);
+    }
 
     return patterns;
   }
@@ -104,6 +125,14 @@ class WorkflowPatternDetector {
       for (let i = 0; i <= sequence.length - length; i++) {
         const subseq = sequence.slice(i, i + length).join(',');
         candidates.set(subseq, (candidates.get(subseq) || 0) + 1);
+
+        // Memory safety: limit candidate map size
+        if (candidates.size > MAX_CANDIDATES) {
+          console.warn(
+            `[_generateCandidates] Candidate map too large (${candidates.size}). Stopping early.`
+          );
+          return candidates;
+        }
       }
     }
 
@@ -136,6 +165,14 @@ class WorkflowPatternDetector {
   detectBottleneckPatterns(metrics) {
     if (!metrics || metrics.length === 0) {
       return [];
+    }
+
+    // Memory safety: reject overly large inputs
+    if (metrics.length > MAX_INPUT_WORKFLOWS) {
+      console.warn(
+        `[detectBottleneckPatterns] Input too large (${metrics.length} metrics). Truncating to ${MAX_INPUT_WORKFLOWS}.`
+      );
+      metrics = metrics.slice(0, MAX_INPUT_WORKFLOWS);
     }
 
     const taskStats = new Map();
@@ -182,6 +219,14 @@ class WorkflowPatternDetector {
 
     // Sort by average duration descending
     bottlenecks.sort((a, b) => b.avgDurationMs - a.avgDurationMs);
+
+    // Memory safety: limit result size
+    if (bottlenecks.length > MAX_RESULT_SIZE) {
+      console.warn(
+        `[detectBottleneckPatterns] Result too large (${bottlenecks.length} bottlenecks). Truncating to top ${MAX_RESULT_SIZE}.`
+      );
+      return bottlenecks.slice(0, MAX_RESULT_SIZE);
+    }
 
     return bottlenecks;
   }

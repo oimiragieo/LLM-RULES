@@ -23,6 +23,7 @@ Phase 3 delivers **enterprise-scale reliability and advanced orchestration capab
 ### Expected Value Delivery
 
 **Cumulative Completion After Phase 3**:
+
 - **Phase 0-2**: 9 features (90% of 10 total specs)
 - **Phase 3**: +6 features/optimizations = **Enterprise-ready platform**
 - **Value**: 100% of enterprise use cases enabled with validated integration and scale testing
@@ -37,6 +38,7 @@ Phase 3 delivers **enterprise-scale reliability and advanced orchestration capab
 
 **Total Effort**: 12-18 person-days
 **Breakdown**:
+
 - SPEC-011 (Workflow State Machine Enhancements): 3-4 days
 - SPEC-012 (Multi-Feature Integration Testing): 2-3 days
 - SPEC-013 (Performance Profiling Framework): 2-3 days
@@ -50,18 +52,18 @@ Phase 3 delivers **enterprise-scale reliability and advanced orchestration capab
 
 ### Features Completed (9/10)
 
-| SPEC | Feature | Status | Tests | Notes |
-|------|---------|--------|-------|-------|
-| SPEC-001 | Spec-Init Skill | COMPLETE | 20/20 | Progressive disclosure integrated |
-| SPEC-002 | Git Notes Audit Trail | COMPLETE | 17/17 | Tamper-proof verification |
-| SPEC-003 | Workflow State Checkpointing | IN PROGRESS | ~65 | Core functionality working |
-| SPEC-004 | Phase Verification Protocol | COMPLETE | 15+ | Enforcement hooks active |
-| SPEC-005 | Brownfield Project Detection | COMPLETE | 50+ | 10+ languages detected |
-| SPEC-006 | Code Styleguides | COMPLETE | 50/50 | 8 language templates |
-| SPEC-007 | Track Metadata Schema | COMPLETE | 150+ | Foundation for analytics |
-| SPEC-008 | Track Metadata Analytics | COMPLETE | 107/107 | Reports + insights working |
-| SPEC-009 | Progressive Disclosure v2 | COMPLETE | 70/80 (87.5%) | Adaptive questioning working |
-| SPEC-010 | Smart Revert Enhancement | COMPLETE | 20/20 | Git notes-based logical revert |
+| SPEC     | Feature                      | Status      | Tests         | Notes                             |
+| -------- | ---------------------------- | ----------- | ------------- | --------------------------------- |
+| SPEC-001 | Spec-Init Skill              | COMPLETE    | 20/20         | Progressive disclosure integrated |
+| SPEC-002 | Git Notes Audit Trail        | COMPLETE    | 17/17         | Tamper-proof verification         |
+| SPEC-003 | Workflow State Checkpointing | IN PROGRESS | ~65           | Core functionality working        |
+| SPEC-004 | Phase Verification Protocol  | COMPLETE    | 15+           | Enforcement hooks active          |
+| SPEC-005 | Brownfield Project Detection | COMPLETE    | 50+           | 10+ languages detected            |
+| SPEC-006 | Code Styleguides             | COMPLETE    | 50/50         | 8 language templates              |
+| SPEC-007 | Track Metadata Schema        | COMPLETE    | 150+          | Foundation for analytics          |
+| SPEC-008 | Track Metadata Analytics     | COMPLETE    | 107/107       | Reports + insights working        |
+| SPEC-009 | Progressive Disclosure v2    | COMPLETE    | 70/80 (87.5%) | Adaptive questioning working      |
+| SPEC-010 | Smart Revert Enhancement     | COMPLETE    | 20/20         | Git notes-based logical revert    |
 
 **Total Tests**: 570+ tests across Phase 0-2 features
 **Pass Rate**: 92%+ average across all features
@@ -84,6 +86,7 @@ Phase 3 delivers **enterprise-scale reliability and advanced orchestration capab
 **User Story**: "As a developer running complex multi-phase workflows, I want automatic rollback on failure and support for parallel sub-workflows, so that long-running operations are reliable and recoverable."
 
 **Business Value**:
+
 - Enables parallel task execution within workflows (2-3x throughput improvement)
 - Automatic rollback reduces manual intervention by 80%
 - Nested workflow support enables composition of complex pipelines
@@ -91,12 +94,14 @@ Phase 3 delivers **enterprise-scale reliability and advanced orchestration capab
 ### Problem Statement
 
 **Current Gap** (from SPEC-003):
+
 - WorkflowStateManager handles single-threaded workflows
 - No automatic rollback on phase failure
 - No support for nested/parent-child workflows
 - Concurrent workflows use isolated state files (no coordination)
 
 **Pain Points**:
+
 1. Parallel tasks within a phase cannot share state
 2. Phase failures require manual state cleanup
 3. Complex workflows cannot compose simpler workflows
@@ -105,6 +110,7 @@ Phase 3 delivers **enterprise-scale reliability and advanced orchestration capab
 ### Proposed Solution
 
 **Architecture Extensions**:
+
 ```
 .claude/lib/workflow/workflow-state-manager.cjs (enhanced)
 +-- ParallelPhaseSupport
@@ -122,6 +128,7 @@ Phase 3 delivers **enterprise-scale reliability and advanced orchestration capab
 ```
 
 **New Schema Fields** (workflow-state.schema.json):
+
 ```json
 {
   "parallelSupport": {
@@ -143,12 +150,14 @@ Phase 3 delivers **enterprise-scale reliability and advanced orchestration capab
 #### Task 11.1: Extend State Schema (~4 hours)
 
 **Subtasks**:
+
 - [ ] **11.1.1** Add parallelSupport fields to workflow-state.schema.json (~1 hour)
 - [ ] **11.1.2** Add transactionSupport fields to schema (~1 hour)
 - [ ] **11.1.3** Create migration script for existing state files (~1 hour)
 - [ ] **11.1.4** Write schema validation tests (~1 hour)
 
 **Verification Gate**:
+
 ```bash
 node --test tests/workflow-state-schema-extended.test.cjs
 # Expected: All enhanced schema tests pass
@@ -157,6 +166,7 @@ node --test tests/workflow-state-schema-extended.test.cjs
 #### Task 11.2: Implement Transaction Support (~8 hours)
 
 **Subtasks**:
+
 - [ ] **11.2.1** Implement beginTransaction() with state snapshot (~2 hours)
 - [ ] **11.2.2** Implement commit() with cleanup (~1 hour)
 - [ ] **11.2.3** Implement rollback() with state restoration (~2 hours)
@@ -164,6 +174,7 @@ node --test tests/workflow-state-schema-extended.test.cjs
 - [ ] **11.2.5** Write transaction unit tests (15+ tests) (~1 hour)
 
 **Verification Gate**:
+
 ```bash
 node --test tests/workflow-transaction-support.test.cjs
 # Expected: 15/15 transaction tests pass
@@ -172,6 +183,7 @@ node --test tests/workflow-transaction-support.test.cjs
 #### Task 11.3: Implement Parallel Phase Support (~8 hours)
 
 **Subtasks**:
+
 - [ ] **11.3.1** Implement forkState() for child workflow creation (~2 hours)
 - [ ] **11.3.2** Implement joinState() for result merging (~2 hours)
 - [ ] **11.3.3** Implement waitForChildren() with timeout (~2 hours)
@@ -179,6 +191,7 @@ node --test tests/workflow-transaction-support.test.cjs
 - [ ] **11.3.5** Write parallel execution tests (~1 hour)
 
 **Verification Gate**:
+
 ```bash
 node --test tests/workflow-parallel-support.test.cjs
 # Expected: Fork/join/wait tests pass
@@ -187,6 +200,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 11.4: Integration Testing (~4 hours)
 
 **Subtasks**:
+
 - [ ] **11.4.1** Test with feature-development-workflow (~1 hour)
 - [ ] **11.4.2** Test with conductor-setup-workflow (~1 hour)
 - [ ] **11.4.3** Test failure + rollback scenarios (~1 hour)
@@ -195,12 +209,14 @@ node --test tests/workflow-parallel-support.test.cjs
 ### Success Criteria
 
 **Functional**:
+
 - [x] Transaction begin/commit/rollback working
 - [x] Parallel phase fork/join working
 - [x] Nested workflow parent/child references working
 - [x] Auto-rollback on uncaught errors
 
 **Quality**:
+
 - [x] 30+ new tests passing
 - [x] <50ms overhead for transaction operations
 - [x] No regression in SPEC-003 functionality
@@ -218,6 +234,7 @@ node --test tests/workflow-parallel-support.test.cjs
 **User Story**: "As a framework maintainer, I want automated tests that verify all features work together correctly, so that regressions are caught before release."
 
 **Business Value**:
+
 - Catches integration bugs before production (estimated 40% of bugs are integration issues)
 - Enables confident refactoring and optimization
 - Documents expected feature interactions
@@ -225,6 +242,7 @@ node --test tests/workflow-parallel-support.test.cjs
 ### Problem Statement
 
 **Current Gap**:
+
 - Each SPEC has unit/integration tests in isolation
 - No tests verify cross-feature interactions
 - Critical user journeys not tested end-to-end
@@ -234,6 +252,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 1: Spec-Init --> Progressive Disclosure --> Track Metadata --> Phase Verification
 
 **Flow**:
+
 ```
 1. User: "Create a new user authentication feature"
 2. SPEC-001 (spec-init): Invoke with progressive disclosure
@@ -248,6 +267,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 2: Workflow Checkpoint + Smart Revert + Git Notes Audit
 
 **Flow**:
+
 ```
 1. Start feature-development-workflow
 2. SPEC-003 (checkpoint): Save state after Phase 1
@@ -263,6 +283,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 3: Brownfield Detection + Code Styleguides + Onboarding
 
 **Flow**:
+
 ```
 1. Clone sample project (Node.js + TypeScript)
 2. SPEC-005 (brownfield): Detect tech stack (expect: Node, TypeScript, Jest)
@@ -277,6 +298,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 4: Analytics Report + Phase Verification + Git Notes
 
 **Flow**:
+
 ```
 1. Create 10 tracks with varying completion status
 2. SPEC-008 (analytics): Generate project metrics report
@@ -291,6 +313,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 5: Parallel Workflow + Transaction Rollback
 
 **Flow**:
+
 ```
 1. Start multi-agent workflow (3 parallel tasks)
 2. SPEC-011 (parallel): Fork state for each task
@@ -307,6 +330,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 12.1: Create Integration Test Framework (~4 hours)
 
 **Subtasks**:
+
 - [ ] **12.1.1** Create test utilities (fixture loader, temp project setup) (~2 hours)
 - [ ] **12.1.2** Create mock project templates (Node, Python, TypeScript) (~1 hour)
 - [ ] **12.1.3** Create test harness for workflow execution (~1 hour)
@@ -314,6 +338,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 12.2: Implement 5 Core Scenarios (~12 hours)
 
 **Subtasks**:
+
 - [ ] **12.2.1** Scenario 1: Spec workflow chain (~2 hours)
 - [ ] **12.2.2** Scenario 2: Workflow recovery (~3 hours)
 - [ ] **12.2.3** Scenario 3: Brownfield onboarding (~2 hours)
@@ -323,17 +348,20 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 12.3: Document Integration Points (~4 hours)
 
 **Subtasks**:
+
 - [ ] **12.3.1** Create feature interaction matrix (~2 hours)
 - [ ] **12.3.2** Document known limitations and edge cases (~2 hours)
 
 ### Success Criteria
 
 **Functional**:
+
 - [x] 5 integration scenarios implemented
 - [x] All scenarios pass on clean project
 - [x] Scenarios run in <5 minutes total
 
 **Quality**:
+
 - [x] 50+ integration assertions
 - [x] Coverage of all SPEC-001 through SPEC-009 interactions
 - [x] Documentation complete
@@ -352,21 +380,22 @@ node --test tests/workflow-parallel-support.test.cjs
 
 ### Performance Targets
 
-| Component | Metric | Target | Current Baseline |
-|-----------|--------|--------|------------------|
-| Track Analytics Query | 1000 tracks | <500ms | 450ms (Phase 2) |
-| Workflow State Save | Per phase | <100ms | 80ms (Phase 2) |
-| Brownfield Detection | Full scan | <30s | Unknown |
-| Adaptive Questioning | Per question | <500ms | Unknown |
-| Git Notes Attachment | Per commit | <50ms | 45ms (Phase 1) |
-| Schema Validation | Per object | <1ms | 0.5ms (SPEC-007) |
-| Memory Usage (steady state) | 10,000 tracks | <200MB | Unknown |
+| Component                   | Metric        | Target | Current Baseline |
+| --------------------------- | ------------- | ------ | ---------------- |
+| Track Analytics Query       | 1000 tracks   | <500ms | 450ms (Phase 2)  |
+| Workflow State Save         | Per phase     | <100ms | 80ms (Phase 2)   |
+| Brownfield Detection        | Full scan     | <30s   | Unknown          |
+| Adaptive Questioning        | Per question  | <500ms | Unknown          |
+| Git Notes Attachment        | Per commit    | <50ms  | 45ms (Phase 1)   |
+| Schema Validation           | Per object    | <1ms   | 0.5ms (SPEC-007) |
+| Memory Usage (steady state) | 10,000 tracks | <200MB | Unknown          |
 
 ### Implementation Tasks
 
 #### Task 13.1: Create Performance Test Suite (~6 hours)
 
 **Subtasks**:
+
 - [ ] **13.1.1** Create benchmark harness with timing utilities (~2 hours)
 - [ ] **13.1.2** Implement track analytics benchmarks (~1 hour)
 - [ ] **13.1.3** Implement workflow state benchmarks (~1 hour)
@@ -378,6 +407,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 13.2: Profile and Optimize (~8 hours)
 
 **Subtasks**:
+
 - [ ] **13.2.1** Profile track analytics with 10,000 tracks (~2 hours)
 - [ ] **13.2.2** Profile workflow state with concurrent saves (~2 hours)
 - [ ] **13.2.3** Profile brownfield detection on large projects (~2 hours)
@@ -386,6 +416,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 13.3: Create Performance Dashboard CLI (~4 hours)
 
 **Subtasks**:
+
 - [ ] **13.3.1** Create `performance-report.cjs` CLI tool (~2 hours)
 - [ ] **13.3.2** Generate markdown report with trends (~1 hour)
 - [ ] **13.3.3** Add baseline comparison capability (~1 hour)
@@ -393,11 +424,13 @@ node --test tests/workflow-parallel-support.test.cjs
 ### Success Criteria
 
 **Functional**:
+
 - [x] Benchmark suite runs all performance tests
 - [x] CLI generates performance reports
 - [x] Baseline captured for all components
 
 **Quality**:
+
 - [x] All targets met or documented with improvement plan
 - [x] No regression from Phase 2 baselines
 - [x] Bottlenecks identified and prioritized
@@ -419,12 +452,14 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 1: Large Task Volume (100+ Concurrent Tasks)
 
 **Test Parameters**:
+
 - 100 tracks with metadata
 - 500 total tasks across tracks
 - 20 parallel TaskCreate operations
 - 50 parallel TaskUpdate operations
 
 **Assertions**:
+
 - No deadlocks or race conditions
 - All tasks properly tracked
 - Memory usage <500MB
@@ -433,11 +468,13 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 2: Long-Running Workflow (8+ Hours Simulated)
 
 **Test Parameters**:
+
 - 50 phases with checkpoints
 - 10 state save/restore cycles
 - 3 simulated crashes with recovery
 
 **Assertions**:
+
 - All checkpoints valid after recovery
 - No state corruption
 - Resume time <5s
@@ -445,11 +482,13 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 3: Concurrent Workflows (10+ Parallel)
 
 **Test Parameters**:
+
 - 10 feature-development-workflows in parallel
 - Each with 5 phases
 - Random delays and failures injected
 
 **Assertions**:
+
 - No cross-workflow state pollution
 - Independent progress tracking
 - Proper cleanup on completion
@@ -457,12 +496,14 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 4: Failure Recovery Stress Test
 
 **Test Parameters**:
+
 - 100 tasks
 - 20% random failure rate
 - Auto-retry with exponential backoff
 - Rollback on 3 consecutive failures
 
 **Assertions**:
+
 - No orphaned tasks
 - Proper failure propagation
 - Audit trail complete for failures
@@ -470,11 +511,13 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Scenario 5: Memory Pressure Test
 
 **Test Parameters**:
+
 - 10,000 track metadata objects
 - Generate 1,000 analytics reports
 - Continuous query loop for 5 minutes
 
 **Assertions**:
+
 - Memory usage stays <200MB
 - No memory leaks (heap stable)
 - GC pauses <100ms
@@ -484,6 +527,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 14.1: Create Scale Test Framework (~6 hours)
 
 **Subtasks**:
+
 - [ ] **14.1.1** Create task generator (random tracks, metadata) (~2 hours)
 - [ ] **14.1.2** Create workflow simulator (~2 hours)
 - [ ] **14.1.3** Create failure injector (~1 hour)
@@ -492,6 +536,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 14.2: Implement Scale Scenarios (~12 hours)
 
 **Subtasks**:
+
 - [ ] **14.2.1** Scenario 1: Large task volume (~2 hours)
 - [ ] **14.2.2** Scenario 2: Long-running workflow (~3 hours)
 - [ ] **14.2.3** Scenario 3: Concurrent workflows (~2 hours)
@@ -501,17 +546,20 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 14.3: Document Scale Limits (~4 hours)
 
 **Subtasks**:
+
 - [ ] **14.3.1** Document tested limits (tasks, workflows, memory) (~2 hours)
 - [ ] **14.3.2** Create scaling recommendations (~2 hours)
 
 ### Success Criteria
 
 **Functional**:
+
 - [x] All 5 scale scenarios pass
 - [x] No data corruption under load
 - [x] Recovery works from any failure point
 
 **Quality**:
+
 - [x] Memory usage within targets
 - [x] Performance within targets at scale
 - [x] Documentation complete
@@ -530,17 +578,17 @@ node --test tests/workflow-parallel-support.test.cjs
 
 ### Gap Analysis: Conductor-Main vs Agent-Studio
 
-| Capability | Conductor-Main | Agent-Studio | Action Required |
-|------------|----------------|--------------|-----------------|
-| Context artifacts | product.md, tech-stack.md | Same (CDD skill) | None |
-| Track management | spec.md, plan.md | Same (track-management) | None |
-| Git notes | Manual | Automated (SPEC-002) | Enable hook |
-| Phase verification | Manual checkpoints | Automated (SPEC-004) | Enable hook |
-| Brownfield detection | Manual analysis | Automated (SPEC-005) | Run detection |
-| Workflow state | setup_state.json | Generalized (SPEC-003) | Migrate state format |
-| Code styleguides | Per-project | Framework-provided | Reference guides |
-| Track analytics | None | Automated (SPEC-008) | New capability |
-| Adaptive questioning | Basic | Context-aware (SPEC-009) | New capability |
+| Capability           | Conductor-Main            | Agent-Studio             | Action Required      |
+| -------------------- | ------------------------- | ------------------------ | -------------------- |
+| Context artifacts    | product.md, tech-stack.md | Same (CDD skill)         | None                 |
+| Track management     | spec.md, plan.md          | Same (track-management)  | None                 |
+| Git notes            | Manual                    | Automated (SPEC-002)     | Enable hook          |
+| Phase verification   | Manual checkpoints        | Automated (SPEC-004)     | Enable hook          |
+| Brownfield detection | Manual analysis           | Automated (SPEC-005)     | Run detection        |
+| Workflow state       | setup_state.json          | Generalized (SPEC-003)   | Migrate state format |
+| Code styleguides     | Per-project               | Framework-provided       | Reference guides     |
+| Track analytics      | None                      | Automated (SPEC-008)     | New capability       |
+| Adaptive questioning | Basic                     | Context-aware (SPEC-009) | New capability       |
 
 ### Migration Strategy
 
@@ -576,6 +624,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 15.1: Create Migration Assessment Tool (~4 hours)
 
 **Subtasks**:
+
 - [ ] **15.1.1** Create conductor-migration-assess.cjs CLI (~2 hours)
 - [ ] **15.1.2** Implement compatibility checker (~1 hour)
 - [ ] **15.1.3** Generate migration report (~1 hour)
@@ -583,6 +632,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 15.2: Create State Migration Script (~4 hours)
 
 **Subtasks**:
+
 - [ ] **15.2.1** Parse setup_state.json format (~1 hour)
 - [ ] **15.2.2** Transform to workflow-state.schema.json (~2 hours)
 - [ ] **15.2.3** Validate migrated state (~1 hour)
@@ -590,6 +640,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 15.3: Integration Validation (~6 hours)
 
 **Subtasks**:
+
 - [ ] **15.3.1** Clone conductor-main for testing (~1 hour)
 - [ ] **15.3.2** Run assessment tool (~1 hour)
 - [ ] **15.3.3** Execute migration (~2 hours)
@@ -598,6 +649,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 15.4: Create Migration Documentation (~4 hours)
 
 **Subtasks**:
+
 - [ ] **15.4.1** Write migration guide (~2 hours)
 - [ ] **15.4.2** Create rollback procedures (~1 hour)
 - [ ] **15.4.3** Document known limitations (~1 hour)
@@ -605,11 +657,13 @@ node --test tests/workflow-parallel-support.test.cjs
 ### Success Criteria
 
 **Functional**:
+
 - [x] Migration assessment tool working
 - [x] State migration script working
 - [x] Validation tests pass on conductor-main
 
 **Quality**:
+
 - [x] Zero breaking changes to conductor-main
 - [x] All existing workflows functional post-migration
 - [x] Documentation complete
@@ -678,6 +732,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 16.1: Create Dashboard CLI Framework (~4 hours)
 
 **Subtasks**:
+
 - [ ] **16.1.1** Create base CLI with refresh loop (~1 hour)
 - [ ] **16.1.2** Implement terminal UI rendering (~2 hours)
 - [ ] **16.1.3** Add keyboard navigation (~1 hour)
@@ -685,6 +740,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 16.2: Implement Dashboard Views (~8 hours)
 
 **Subtasks**:
+
 - [ ] **16.2.1** Implement workflow status view (~2 hours)
 - [ ] **16.2.2** Implement agent activity view (~2 hours)
 - [ ] **16.2.3** Implement system health view (~2 hours)
@@ -693,6 +749,7 @@ node --test tests/workflow-parallel-support.test.cjs
 #### Task 16.3: Add Alerting (~4 hours)
 
 **Subtasks**:
+
 - [ ] **16.3.1** Define alert thresholds (~1 hour)
 - [ ] **16.3.2** Implement alert detection (~2 hours)
 - [ ] **16.3.3** Add notification support (~1 hour)
@@ -700,11 +757,13 @@ node --test tests/workflow-parallel-support.test.cjs
 ### Success Criteria
 
 **Functional**:
+
 - [x] Dashboard displays all 3 views
 - [x] Real-time refresh working
 - [x] Alerts trigger on threshold violations
 
 **Quality**:
+
 - [x] <100ms render time
 - [x] Usable on 80-column terminal
 - [x] Documentation complete
@@ -752,6 +811,7 @@ All Developers: Final Integration
 ```
 
 **Expected Timeline**:
+
 - **Week 1**: SPEC-011, SPEC-012, SPEC-013 complete
 - **Week 2**: SPEC-014, SPEC-015, SPEC-016 complete
 - **Week 3**: Integration and polish
@@ -800,10 +860,11 @@ Phase 3
 **Probability**: MEDIUM
 **Detection**: Memory profiling in SPEC-013 and SPEC-014
 **Mitigation**:
+
 - Implement lazy loading for track metadata
 - Add memory limits with graceful degradation
 - Stream large analytics queries
-**Fallback**: Reduce concurrent workflow limit, add pagination
+  **Fallback**: Reduce concurrent workflow limit, add pagination
 
 ### Risk 2: Performance Degradation Under Load
 
@@ -811,10 +872,11 @@ Phase 3
 **Probability**: LOW
 **Detection**: Performance benchmarks in SPEC-013
 **Mitigation**:
+
 - Profile before optimization
 - Use caching for repeated queries
 - Implement connection pooling for state files
-**Fallback**: Revert to synchronous operations, reduce parallelism
+  **Fallback**: Revert to synchronous operations, reduce parallelism
 
 ### Risk 3: Integration Conflicts Between SPECs
 
@@ -822,10 +884,11 @@ Phase 3
 **Probability**: MEDIUM
 **Detection**: SPEC-012 integration tests
 **Mitigation**:
+
 - Comprehensive integration test suite
 - Clear interface contracts between features
 - Feature flags for individual SPECs
-**Fallback**: Disable conflicting feature, hotfix
+  **Fallback**: Disable conflicting feature, hotfix
 
 ### Risk 4: Testing Coverage Gaps
 
@@ -833,10 +896,11 @@ Phase 3
 **Probability**: LOW
 **Detection**: Coverage reports, SPEC-012 matrix
 **Mitigation**:
+
 - 80%+ coverage target for all new code
 - Integration tests for all feature combinations
 - Manual testing for UI components
-**Fallback**: Additional QA cycle before release
+  **Fallback**: Additional QA cycle before release
 
 ### Risk 5: Conductor-Main Compatibility Issues
 
@@ -844,10 +908,11 @@ Phase 3
 **Probability**: MEDIUM
 **Detection**: SPEC-015 validation
 **Mitigation**:
+
 - Assessment tool identifies issues early
 - Backward-compatible migration path
 - Rollback procedures documented
-**Fallback**: Maintain separate configuration for conductor-main
+  **Fallback**: Maintain separate configuration for conductor-main
 
 ### Risk 6: Schema Migration Failures
 
@@ -855,10 +920,11 @@ Phase 3
 **Probability**: LOW
 **Detection**: SPEC-011 migration tests
 **Mitigation**:
+
 - Backup state files before migration
 - Validate migrated state against schema
 - Dry-run mode for migration scripts
-**Fallback**: Restore from backup, manual migration
+  **Fallback**: Restore from backup, manual migration
 
 ---
 
@@ -867,6 +933,7 @@ Phase 3
 ### Phase 3 Completion Checklist
 
 **Functional Requirements**:
+
 - [ ] SPEC-011: Transaction and parallel workflow support working
 - [ ] SPEC-012: All 5 integration scenarios pass
 - [ ] SPEC-013: Performance benchmarks established
@@ -875,6 +942,7 @@ Phase 3
 - [ ] SPEC-016: Monitoring dashboard functional
 
 **Quality Gates**:
+
 - [ ] 100+ new tests passing
 - [ ] 85%+ test pass rate across all SPECs
 - [ ] Performance targets met for all components
@@ -882,12 +950,14 @@ Phase 3
 - [ ] Memory usage <200MB at 10,000 tracks
 
 **Integration Verification**:
+
 - [ ] Phase 0-2 features still work (regression testing)
 - [ ] CLAUDE.md updated with Phase 3 features
 - [ ] Documentation complete for all 6 features
 - [ ] ADRs created for major decisions
 
 **Production Deployment Ready**:
+
 - [ ] All hooks registered in settings.json
 - [ ] Performance benchmarks documented
 - [ ] Rollback procedures for each feature
@@ -897,16 +967,16 @@ Phase 3
 
 ## Deliverables Summary
 
-| Deliverable | Location | Status |
-|-------------|----------|--------|
-| Extended workflow-state.schema.json | `.claude/schemas/workflow-state.schema.json` | TBD |
-| Transaction support in state manager | `.claude/lib/workflow/workflow-state-manager.cjs` | TBD |
-| Integration test suite | `tests/integration/phase-3/` | TBD |
-| Performance benchmark suite | `tests/performance/phase-3-benchmarks.test.cjs` | TBD |
-| Scale test framework | `tests/scale/` | TBD |
-| Conductor migration tools | `.claude/tools/cli/conductor-migration-*.cjs` | TBD |
-| Monitoring dashboard CLI | `.claude/tools/cli/monitoring-dashboard.cjs` | TBD |
-| Documentation updates | CLAUDE.md, ARCHITECTURE.md | TBD |
+| Deliverable                          | Location                                          | Status |
+| ------------------------------------ | ------------------------------------------------- | ------ |
+| Extended workflow-state.schema.json  | `.claude/schemas/workflow-state.schema.json`      | TBD    |
+| Transaction support in state manager | `.claude/lib/workflow/workflow-state-manager.cjs` | TBD    |
+| Integration test suite               | `tests/integration/phase-3/`                      | TBD    |
+| Performance benchmark suite          | `tests/performance/phase-3-benchmarks.test.cjs`   | TBD    |
+| Scale test framework                 | `tests/scale/`                                    | TBD    |
+| Conductor migration tools            | `.claude/tools/cli/conductor-migration-*.cjs`     | TBD    |
+| Monitoring dashboard CLI             | `.claude/tools/cli/monitoring-dashboard.cjs`      | TBD    |
+| Documentation updates                | CLAUDE.md, ARCHITECTURE.md                        | TBD    |
 
 ---
 
@@ -914,14 +984,14 @@ Phase 3
 
 Phase 3 outputs enable Phase 4 (Production Hardening):
 
-| Phase 3 Feature | Phase 4 Enablement |
-|-----------------|-------------------|
-| SPEC-011 (State Machine) | Distributed workflow coordination |
-| SPEC-012 (Integration) | Regression test suite for CI/CD |
-| SPEC-013 (Performance) | Performance monitoring in production |
-| SPEC-014 (Scale) | Capacity planning and auto-scaling |
-| SPEC-015 (Migration) | Production deployment of conductor-main |
-| SPEC-016 (Dashboard) | Operations monitoring and alerting |
+| Phase 3 Feature          | Phase 4 Enablement                      |
+| ------------------------ | --------------------------------------- |
+| SPEC-011 (State Machine) | Distributed workflow coordination       |
+| SPEC-012 (Integration)   | Regression test suite for CI/CD         |
+| SPEC-013 (Performance)   | Performance monitoring in production    |
+| SPEC-014 (Scale)         | Capacity planning and auto-scaling      |
+| SPEC-015 (Migration)     | Production deployment of conductor-main |
+| SPEC-016 (Dashboard)     | Operations monitoring and alerting      |
 
 ---
 

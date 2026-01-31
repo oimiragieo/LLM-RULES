@@ -234,10 +234,21 @@ class AdaptiveQuestioner {
       return !questionTopics.some(topic => contextKeys.some(key => key.includes(topic)));
     });
 
-    // Prioritize by question priority
+    // Prioritize questions based on context gaps
+    // If context indicates a feature exists but related feature doesn't, prioritize the related
+    const contextGaps = this._identifyContextGaps(context);
+
+    // Prioritize by question priority AND context gaps
     const priorityOrder = { CRITICAL: 3, HIGH: 2, MEDIUM: 1 };
     const sorted = relevantQuestions.sort((a, b) => {
-      return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
+      // Context gap bonus (prioritize questions that fill gaps)
+      const aGapBonus = contextGaps.some(gap => a.question.toLowerCase().includes(gap)) ? 2 : 0;
+      const bGapBonus = contextGaps.some(gap => b.question.toLowerCase().includes(gap)) ? 2 : 0;
+
+      const aScore = (priorityOrder[a.priority] || 0) + aGapBonus;
+      const bScore = (priorityOrder[b.priority] || 0) + bGapBonus;
+
+      return bScore - aScore;
     });
 
     const nextQuestion = sorted[0] || this.questionPool[0];
@@ -250,6 +261,33 @@ class AdaptiveQuestioner {
       followupAreas: nextQuestion.followups || [],
       alternatives,
     };
+  }
+
+  /**
+   * Identify context gaps (features that should be asked about)
+   */
+  _identifyContextGaps(context) {
+    const gaps = [];
+
+    // If hasAuth is true but hasRBAC is false, ask about RBAC
+    if (context.hasAuth === true && context.hasRBAC === false) {
+      gaps.push('role');
+      gaps.push('permission');
+      gaps.push('rbac');
+    }
+
+    // If hasDatabase is true but hasBackup is false, ask about backup
+    if (context.hasDatabase === true && context.hasBackup === false) {
+      gaps.push('backup');
+    }
+
+    // If hasAPI is true but hasRateLimit is false, ask about rate limiting
+    if (context.hasAPI === true && context.hasRateLimit === false) {
+      gaps.push('rate');
+      gaps.push('limit');
+    }
+
+    return gaps;
   }
 
   /**
@@ -268,14 +306,39 @@ class AdaptiveQuestioner {
     }
 
     // Calculate scores
-    const expectedFields = this.questionPool.map(q => this._extractTopics(q.question)[0]);
+    const expectedFields = this.questionPool
+      .map(q => this._extractTopics(q.question)[0])
+      .filter(f => f !== undefined); // Filter out undefined values
+
     const answers = history.map(h => ({
       answer: h.answer,
       question: h.question,
       quality: this._calculateAnswerQuality(h.answer),
     }));
 
-    const completenessScore = scoreCompleteness(answers, expectedFields);
+    // Calculate completeness based on actual answer coverage vs expected topics
+    // Use flexible matching - if history covers similar topics to expected fields
+    const answeredTopics = new Set();
+    history.forEach(h => {
+      const topics = this._extractTopics(h.question);
+      topics.forEach(t => answeredTopics.add(t));
+      // Also extract topics from answers (sometimes answers mention related topics)
+      const answerTopics = this._extractTopics(h.answer);
+      answerTopics.forEach(t => answeredTopics.add(t));
+    });
+
+    // Match answered topics to expected fields
+    const expectedMatched = expectedFields.filter(
+      f =>
+        f &&
+        (answeredTopics.has(f) ||
+          Array.from(answeredTopics).some(at => at && (at.includes(f) || f.includes(at))))
+    );
+
+    const completenessScore =
+      expectedFields.length > 0
+        ? Math.round((expectedMatched.length / expectedFields.length) * 100)
+        : 100;
 
     // Load domain patterns for quality scoring
     const domainPatterns = await loadDomainPatterns(this.domain);
@@ -289,26 +352,30 @@ class AdaptiveQuestioner {
     });
 
     // Identify missing areas (check for CRITICAL priority questions)
-    const answeredTopics = history.map(h => this._extractTopics(h.question)).flat();
     const criticalQuestions = this.questionPool.filter(q => q.priority === 'CRITICAL');
     const missingCritical = criticalQuestions.filter(q => {
       const topics = this._extractTopics(q.question);
-      return !topics.some(t => answeredTopics.includes(t));
+      return !topics.some(
+        t =>
+          answeredTopics.has(t) ||
+          Array.from(answeredTopics).some(at => at.includes(t) || t.includes(at))
+      );
     });
 
     const missingAreas = missingCritical.map(q => q.question);
 
     // Stopping criteria:
     // 1. Readiness >= 80 AND no missing critical areas
-    // 2. OR history.length >= 7 AND quality score >= 70 (raised from 60 to ensure quality)
-    // 3. Never stop if quality score < 50 (low-quality answers)
+    // 2. OR history.length >= 5 AND quality score >= 70 AND completeness >= 60
+    // 3. OR history.length >= 10 (very long history - always stop)
+    // 4. Never stop if quality score < 50 (low-quality answers)
     let shouldStop = false;
 
     if (qualityScore >= 50) {
       shouldStop =
         (readiness >= 80 && missingCritical.length === 0) ||
-        (history.length >= 7 && qualityScore >= 70) ||
-        history.length >= 10; // Very long history
+        (history.length >= 5 && qualityScore >= 70 && completenessScore >= 60) ||
+        history.length >= 10;
     }
 
     return { shouldStop, readiness, missingAreas };

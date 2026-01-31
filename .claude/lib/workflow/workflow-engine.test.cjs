@@ -44,6 +44,9 @@ let failCount = 0;
 const testQueue = [];
 let currentDescribe = '';
 
+// SEC-IMPL-003: Track WorkflowEngine instances for cleanup to prevent memory leaks
+let engineInstances = [];
+
 function describe(name, fn) {
   currentDescribe = name;
   fn();
@@ -75,6 +78,15 @@ async function runTestQueue() {
       console.error(`         ${err.message}`);
       failCount++;
       process.exitCode = 1;
+    } finally {
+      // SEC-IMPL-003: Clean up WorkflowEngine event handlers after each test
+      // Prevents memory leak from accumulated handlers (50 tests x 100 handlers = 5MB)
+      for (const engine of engineInstances) {
+        if (engine && typeof engine.clearHandlers === 'function') {
+          engine.clearHandlers();
+        }
+      }
+      engineInstances = [];
     }
   }
 }
@@ -100,7 +112,16 @@ function loadModule() {
   try {
     delete require.cache[require.resolve('./workflow-engine.cjs')];
     const mod = require('./workflow-engine.cjs');
-    WorkflowEngine = mod.WorkflowEngine;
+
+    // SEC-IMPL-003: Wrap WorkflowEngine to track instances for cleanup
+    const OriginalWorkflowEngine = mod.WorkflowEngine;
+    WorkflowEngine = class TrackedWorkflowEngine extends OriginalWorkflowEngine {
+      constructor(...args) {
+        super(...args);
+        engineInstances.push(this);
+      }
+    };
+
     PHASES = mod.PHASES;
     TRANSITIONS = mod.TRANSITIONS;
     parseWorkflow = mod.parseWorkflow;

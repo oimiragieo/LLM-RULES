@@ -4,14 +4,7 @@
   "title": "Agent Studio Error Log Entry",
   "description": "Schema for error log entries in the error logging system",
   "type": "object",
-  "required": [
-    "errorId",
-    "timestamp",
-    "category",
-    "severity",
-    "source",
-    "message"
-  ],
+  "required": ["errorId", "timestamp", "category", "severity", "source", "message"],
   "properties": {
     "errorId": {
       "type": "string",

@@ -26,13 +26,7 @@ const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { debugLog } = require('../../lib/utils/hook-input.cjs');
 
 // Configuration - can be overridden for testing
-let ERROR_REPORTS_DIR = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'artifacts',
-  'error-reports'
-);
+let ERROR_REPORTS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'artifacts', 'error-reports');
 let ERROR_SUMMARIES_DIR = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -215,9 +209,7 @@ function generateSummaryMarkdown(summary) {
     lines.push(`## Critical Issues (${summary.criticalErrors.length})`);
     lines.push('');
     for (const error of summary.criticalErrors) {
-      const context = error.context?.agentName
-        ? `Agent: ${error.context.agentName}`
-        : '';
+      const context = error.context?.agentName ? `Agent: ${error.context.agentName}` : '';
       lines.push(`- **${error.errorId}**: ${error.message} ${context ? `(${context})` : ''}`);
     }
     lines.push('');
@@ -243,7 +235,9 @@ function generateSummaryMarkdown(summary) {
       lines.push('## Pattern Detected: Error Cascades');
       lines.push('');
       for (const cascade of cascades) {
-        lines.push(`- Root: ${cascade.rootErrorId} -> ${cascade.childErrorIds.length} child errors`);
+        lines.push(
+          `- Root: ${cascade.rootErrorId} -> ${cascade.childErrorIds.length} child errors`
+        );
       }
       lines.push('');
     }
@@ -322,9 +316,9 @@ function calculateReflectionWeight(summary) {
 
   // Severity weight (max 0.4)
   const severityCounts = summary.bySeverity || {};
-  const criticalWeight = ((severityCounts.CRITICAL || 0) * 0.15);
-  const highWeight = ((severityCounts.HIGH || 0) * 0.05);
-  const mediumWeight = ((severityCounts.MEDIUM || 0) * 0.02);
+  const criticalWeight = (severityCounts.CRITICAL || 0) * 0.15;
+  const highWeight = (severityCounts.HIGH || 0) * 0.05;
+  const mediumWeight = (severityCounts.MEDIUM || 0) * 0.02;
   weight += Math.min(criticalWeight + highWeight + mediumWeight, 0.4);
 
   // Pattern weight (max 0.2)
@@ -353,7 +347,9 @@ function generateActionItems(summary) {
   // Repeated errors suggest systemic issues
   const repeatedErrors = summary.patterns?.repeatedErrors || [];
   for (const repeated of repeatedErrors.slice(0, 3)) {
-    items.push(`Investigate repeated error: "${repeated.message?.substring(0, 40)}..." (${repeated.count}x)`);
+    items.push(
+      `Investigate repeated error: "${repeated.message?.substring(0, 40)}..." (${repeated.count}x)`
+    );
   }
 
   // Agent-specific issues

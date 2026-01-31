@@ -6,20 +6,7 @@ model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 priority: high
-tools:
-  [
-    Read,
-    Write,
-    Edit,
-    Glob,
-    Grep,
-    Bash,
-    TaskUpdate,
-    TaskList,
-    TaskCreate,
-    TaskGet,
-    Skill,
-  ]
+tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 # Note: Git operations use Bash tool (git commands); MCP tools optional (agents use Skill fallbacks)
 skills:
   - tdd

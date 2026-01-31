@@ -200,7 +200,8 @@ const VALIDATION_RULES = [
   {
     name: 'TaskUpdate Call Instruction',
     // SECURE: Bounded quantifiers prevent backtracking
-    pattern: /TaskUpdate\s{0,5}\(\s{0,5}\{[^}]{0,200}status[^}]{0,50}in_progress|TaskUpdate[^)]{0,100}completed/,
+    pattern:
+      /TaskUpdate\s{0,5}\(\s{0,5}\{[^}]{0,200}status[^}]{0,50}in_progress|TaskUpdate[^)]{0,100}completed/,
     severity: 'high',
     suggestion: 'Include explicit TaskUpdate call instructions for in_progress and completed',
     weight: 5,
@@ -356,9 +357,7 @@ function isOrchestratorSpawn(toolInput) {
   const description = (toolInput.description || '').toLowerCase();
   const subagentType = (toolInput.subagent_type || '').toLowerCase();
 
-  return orchestratorTypes.some(orch =>
-    description.includes(orch) || subagentType.includes(orch)
-  );
+  return orchestratorTypes.some(orch => description.includes(orch) || subagentType.includes(orch));
 }
 
 /**
@@ -367,8 +366,7 @@ function isOrchestratorSpawn(toolInput) {
  * @returns {boolean} True if using template reference
  */
 function isTemplateBasedSpawn(prompt) {
-  return prompt.includes('.claude/templates/spawn/') ||
-         prompt.includes('See .claude/templates');
+  return prompt.includes('.claude/templates/spawn/') || prompt.includes('See .claude/templates');
 }
 
 // =============================================================================
@@ -463,7 +461,7 @@ async function main() {
     if (validation.needsWarning && mode === 'warn') {
       console.warn(
         `[SPAWN-PROMPT-VALIDATOR] Spawn prompt could be improved (score: ${validation.score}/100). ` +
-        `Missing: ${validation.failed.join(', ')}`
+          `Missing: ${validation.failed.join(', ')}`
       );
     }
 

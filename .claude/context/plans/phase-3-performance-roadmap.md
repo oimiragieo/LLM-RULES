@@ -11,58 +11,58 @@
 
 ### Track Analytics (SPEC-008)
 
-| Metric | Value | Measurement Method | Date |
-|--------|-------|-------------------|------|
-| Schema validation | <1ms per object | 1000 iterations, avg | 2026-01-29 |
-| queryByPhase (1000 tracks) | <100ms | Single query benchmark | 2026-01-29 |
-| computeProjectMetrics (1000 tracks) | <200ms | Single call benchmark | 2026-01-29 |
-| generateReport (1000 tracks) | <500ms | Full report generation | 2026-01-29 |
-| Memory (1000 tracks) | ~45MB | heap snapshot | 2026-01-29 |
+| Metric                              | Value           | Measurement Method     | Date       |
+| ----------------------------------- | --------------- | ---------------------- | ---------- |
+| Schema validation                   | <1ms per object | 1000 iterations, avg   | 2026-01-29 |
+| queryByPhase (1000 tracks)          | <100ms          | Single query benchmark | 2026-01-29 |
+| computeProjectMetrics (1000 tracks) | <200ms          | Single call benchmark  | 2026-01-29 |
+| generateReport (1000 tracks)        | <500ms          | Full report generation | 2026-01-29 |
+| Memory (1000 tracks)                | ~45MB           | heap snapshot          | 2026-01-29 |
 
 **Assessment**: All targets met. Excellent foundation for scale testing.
 
 ### Workflow State Checkpointing (SPEC-003)
 
-| Metric | Value | Measurement Method | Date |
-|--------|-------|-------------------|------|
+| Metric                    | Value | Measurement Method    | Date       |
+| ------------------------- | ----- | --------------------- | ---------- |
 | State save (atomic write) | ~80ms | Per-phase measurement | 2026-01-30 |
-| State load | ~15ms | Single load benchmark | 2026-01-30 |
-| Resume detection | ~5ms | canResume() call | 2026-01-30 |
-| State cleanup | ~3ms | unlink operation | 2026-01-30 |
+| State load                | ~15ms | Single load benchmark | 2026-01-30 |
+| Resume detection          | ~5ms  | canResume() call      | 2026-01-30 |
+| State cleanup             | ~3ms  | unlink operation      | 2026-01-30 |
 
 **Assessment**: Save slightly high, investigate atomic write overhead.
 
 ### Git Notes Audit (SPEC-002)
 
-| Metric | Value | Measurement Method | Date |
-|--------|-------|-------------------|------|
-| Note attachment | ~45ms | Per-commit overhead | 2026-01-29 |
-| Verification (single) | ~30ms | Hash computation | 2026-01-29 |
-| Verification (range) | ~150ms for 10 commits | Range verification | 2026-01-29 |
-| CLI report generation | ~500ms for 50 commits | Full audit report | 2026-01-29 |
+| Metric                | Value                 | Measurement Method  | Date       |
+| --------------------- | --------------------- | ------------------- | ---------- |
+| Note attachment       | ~45ms                 | Per-commit overhead | 2026-01-29 |
+| Verification (single) | ~30ms                 | Hash computation    | 2026-01-29 |
+| Verification (range)  | ~150ms for 10 commits | Range verification  | 2026-01-29 |
+| CLI report generation | ~500ms for 50 commits | Full audit report   | 2026-01-29 |
 
 **Assessment**: Within targets. Monitor at scale.
 
 ### Brownfield Detection (SPEC-005)
 
-| Metric | Value | Measurement Method | Date |
-|--------|-------|-------------------|------|
-| Package.json parse | ~5ms | Single file | 2026-01-30 |
-| Requirements.txt parse | ~3ms | Single file | 2026-01-30 |
-| Full detection (Node project) | ~150ms | Tech stack analyzer | 2026-01-30 |
-| Full detection (Python project) | ~180ms | Tech stack analyzer | 2026-01-30 |
-| Monorepo detection | ~500ms | 5 package.json files | 2026-01-30 |
+| Metric                          | Value  | Measurement Method   | Date       |
+| ------------------------------- | ------ | -------------------- | ---------- |
+| Package.json parse              | ~5ms   | Single file          | 2026-01-30 |
+| Requirements.txt parse          | ~3ms   | Single file          | 2026-01-30 |
+| Full detection (Node project)   | ~150ms | Tech stack analyzer  | 2026-01-30 |
+| Full detection (Python project) | ~180ms | Tech stack analyzer  | 2026-01-30 |
+| Monorepo detection              | ~500ms | 5 package.json files | 2026-01-30 |
 
 **Assessment**: Good performance. Monorepo needs optimization for larger codebases.
 
 ### Progressive Disclosure v2 (SPEC-009)
 
-| Metric | Value | Measurement Method | Date |
-|--------|-------|-------------------|------|
-| Context accumulation | ~50ms | Full context load | 2026-01-30 |
-| Inference evaluation | ~10ms per question | skipIfInferred() | 2026-01-30 |
-| Memory load (learnings.md) | ~30ms | File read + parse | 2026-01-30 |
-| Total question flow | ~300ms per question | End-to-end | 2026-01-30 |
+| Metric                     | Value               | Measurement Method | Date       |
+| -------------------------- | ------------------- | ------------------ | ---------- |
+| Context accumulation       | ~50ms               | Full context load  | 2026-01-30 |
+| Inference evaluation       | ~10ms per question  | skipIfInferred()   | 2026-01-30 |
+| Memory load (learnings.md) | ~30ms               | File read + parse  | 2026-01-30 |
+| Total question flow        | ~300ms per question | End-to-end         | 2026-01-30 |
 
 **Assessment**: Good baseline. Total flow could be faster with caching.
 
@@ -72,30 +72,30 @@
 
 ### Tier 1: Critical Path (Must Meet)
 
-| Component | Metric | Target | Current | Gap |
-|-----------|--------|--------|---------|-----|
-| Track Analytics | 10,000 tracks query | <2s | Unknown | Measure |
-| Workflow State | Parallel save (10 workflows) | <500ms total | Unknown | Measure |
-| Git Notes | Range verification (100 commits) | <1s | Unknown | Measure |
-| Memory | Steady state (10,000 tracks) | <200MB | Unknown | Measure |
-| Integration Tests | Full suite | <5 minutes | Unknown | Measure |
+| Component         | Metric                           | Target       | Current | Gap     |
+| ----------------- | -------------------------------- | ------------ | ------- | ------- |
+| Track Analytics   | 10,000 tracks query              | <2s          | Unknown | Measure |
+| Workflow State    | Parallel save (10 workflows)     | <500ms total | Unknown | Measure |
+| Git Notes         | Range verification (100 commits) | <1s          | Unknown | Measure |
+| Memory            | Steady state (10,000 tracks)     | <200MB       | Unknown | Measure |
+| Integration Tests | Full suite                       | <5 minutes   | Unknown | Measure |
 
 ### Tier 2: Important (Should Meet)
 
-| Component | Metric | Target | Current | Gap |
-|-----------|--------|--------|---------|-----|
-| Brownfield | Large project (50,000 files) | <60s | Unknown | Measure |
-| Adaptive | Context accumulation | <100ms | ~50ms | Met |
-| Dashboard | Render cycle | <100ms | N/A | New |
-| Migration | State transform | <10s | N/A | New |
+| Component  | Metric                       | Target | Current | Gap     |
+| ---------- | ---------------------------- | ------ | ------- | ------- |
+| Brownfield | Large project (50,000 files) | <60s   | Unknown | Measure |
+| Adaptive   | Context accumulation         | <100ms | ~50ms   | Met     |
+| Dashboard  | Render cycle                 | <100ms | N/A     | New     |
+| Migration  | State transform              | <10s   | N/A     | New     |
 
 ### Tier 3: Aspirational (Nice to Have)
 
-| Component | Metric | Target | Current | Gap |
-|-----------|--------|--------|---------|-----|
-| Analytics | Report caching | <50ms (cached) | N/A | New |
-| Workflow | Transaction rollback | <100ms | N/A | New |
-| Git Notes | Async attachment | 0ms blocking | ~45ms | New |
+| Component | Metric               | Target         | Current | Gap |
+| --------- | -------------------- | -------------- | ------- | --- |
+| Analytics | Report caching       | <50ms (cached) | N/A     | New |
+| Workflow  | Transaction rollback | <100ms         | N/A     | New |
+| Git Notes | Async attachment     | 0ms blocking   | ~45ms   | New |
 
 ---
 
@@ -108,11 +108,13 @@
 **Target**: <50ms
 
 **Analysis**:
+
 - Current implementation uses synchronous fs.writeFileSync
 - Atomic write library adds ~30ms overhead for temp file + rename
 - JSON.stringify adds ~5ms for large state objects
 
 **Proposed Optimizations**:
+
 1. **Incremental State Save**: Only write changed fields (delta compression)
 2. **Async Write with Callback**: Non-blocking write with completion callback
 3. **State Batching**: Batch multiple updates before save
@@ -128,11 +130,13 @@
 **Target**: <0.5ms with caching
 
 **Analysis**:
+
 - Each query reads all metadata files from disk
 - No caching layer between queries
 - File system calls dominate query time
 
 **Proposed Optimizations**:
+
 1. **In-Memory Cache**: Cache metadata objects after first read
 2. **Cache Invalidation**: Invalidate on write/edit operations
 3. **Lazy Loading**: Load metadata on demand, not all at once
@@ -148,11 +152,13 @@
 **Target**: <10ms
 
 **Analysis**:
+
 - SHA-256 computation is fast (~1ms)
 - Git notes fetch adds ~25ms per commit
 - Sequential verification (no parallelism)
 
 **Proposed Optimizations**:
+
 1. **Batch Notes Fetch**: Fetch all notes in range with single git command
 2. **Parallel Verification**: Verify multiple commits in parallel
 3. **Hash Caching**: Cache computed hashes for unchanged commits
@@ -168,11 +174,13 @@
 **Target**: <20ms
 
 **Analysis**:
+
 - Reads multiple files (tech-stack.md, learnings.md, session state)
 - No combined cache for context sources
 - Repeated reads within same session
 
 **Proposed Optimizations**:
+
 1. **Session Context Cache**: Cache accumulated context for session duration
 2. **Lazy Source Loading**: Only load sources when needed
 3. **Priority Sorting**: Load high-priority sources first
@@ -188,11 +196,13 @@
 **Target**: <20ms per file with parallel processing
 
 **Analysis**:
+
 - Sequential file traversal
 - Full parsing even for simple detection
 - No early termination when confident
 
 **Proposed Optimizations**:
+
 1. **Parallel File Processing**: Process package files in parallel
 2. **Quick Detection Mode**: Stop when confidence > 0.95
 3. **Manifest Caching**: Cache parsed manifests for session
@@ -207,13 +217,13 @@
 
 ### Profiling Tools
 
-| Tool | Purpose | Usage |
-|------|---------|-------|
-| Node.js --inspect | CPU profiling | Identify hot functions |
-| process.memoryUsage() | Memory tracking | Detect leaks |
-| performance.now() | Timing | Micro-benchmarks |
-| clinic.js | Full analysis | Production profiling |
-| node --trace-gc | GC analysis | Memory optimization |
+| Tool                  | Purpose         | Usage                  |
+| --------------------- | --------------- | ---------------------- |
+| Node.js --inspect     | CPU profiling   | Identify hot functions |
+| process.memoryUsage() | Memory tracking | Detect leaks           |
+| performance.now()     | Timing          | Micro-benchmarks       |
+| clinic.js             | Full analysis   | Production profiling   |
+| node --trace-gc       | GC analysis     | Memory optimization    |
 
 ### Benchmark Harness
 
@@ -311,16 +321,19 @@ module.exports = { measureMemory, trackMemoryOverTime };
 ### Phase 3 Week 1: Profiling
 
 **Day 1-2: Establish Baselines**
+
 - [ ] Run full benchmark suite against Phase 2 code
 - [ ] Document all baseline metrics
 - [ ] Identify top 5 hotspots
 
 **Day 3-4: Scale Testing**
+
 - [ ] Generate 10,000 track test data
 - [ ] Profile at scale
 - [ ] Identify scale-specific bottlenecks
 
 **Day 5: Memory Profiling**
+
 - [ ] Run memory leak detection
 - [ ] Profile GC behavior
 - [ ] Document memory characteristics
@@ -328,21 +341,25 @@ module.exports = { measureMemory, trackMemoryOverTime };
 ### Phase 3 Week 2: Optimization
 
 **Day 1-2: Track Metadata Caching**
+
 - [ ] Implement in-memory cache
 - [ ] Add cache invalidation
 - [ ] Benchmark improvement
 
 **Day 3: Workflow State Optimization**
+
 - [ ] Implement incremental save
 - [ ] Test async write option
 - [ ] Benchmark improvement
 
 **Day 4: Git Notes Batching**
+
 - [ ] Implement batch fetch
 - [ ] Add parallel verification
 - [ ] Benchmark improvement
 
 **Day 5: Context Caching**
+
 - [ ] Implement session cache
 - [ ] Add lazy loading
 - [ ] Benchmark improvement
@@ -350,11 +367,13 @@ module.exports = { measureMemory, trackMemoryOverTime };
 ### Phase 3 Week 3: Validation
 
 **Day 1-2: Regression Testing**
+
 - [ ] Verify all tests pass with optimizations
 - [ ] Compare before/after benchmarks
 - [ ] Document improvements
 
 **Day 3: Documentation**
+
 - [ ] Update performance documentation
 - [ ] Create optimization guide
 - [ ] Set up monitoring
@@ -422,8 +441,10 @@ describe('Scale Performance', () => {
     const memAfter = process.memoryUsage().heapUsed;
     const memDelta = memAfter - memBefore;
 
-    assert(memDelta < 200 * 1024 * 1024,
-      `Memory delta (${Math.round(memDelta / 1024 / 1024)}MB) exceeds 200MB`);
+    assert(
+      memDelta < 200 * 1024 * 1024,
+      `Memory delta (${Math.round(memDelta / 1024 / 1024)}MB) exceeds 200MB`
+    );
   });
 
   it('should query 10,000 tracks in <2s', async () => {
@@ -444,14 +465,12 @@ describe('Scale Performance', () => {
 ```javascript
 describe('Stress Performance', () => {
   it('should handle 100 concurrent state saves', async () => {
-    const workflows = Array(100).fill(0).map((_, i) =>
-      new WorkflowStateManager(`workflow-${i}`)
-    );
+    const workflows = Array(100)
+      .fill(0)
+      .map((_, i) => new WorkflowStateManager(`workflow-${i}`));
 
     const start = performance.now();
-    await Promise.all(workflows.map(wf =>
-      wf.save({ phase: 1, status: 'in_progress' })
-    ));
+    await Promise.all(workflows.map(wf => wf.save({ phase: 1, status: 'in_progress' })));
     const elapsed = performance.now() - start;
 
     assert(elapsed < 500, `Concurrent saves took ${elapsed}ms (target: <500ms)`);
@@ -499,8 +518,7 @@ describe('Memory Leak Detection', () => {
     const lastHeap = snapshots[snapshots.length - 1].heap;
     const growth = (lastHeap - firstHeap) / firstHeap;
 
-    assert(growth < 0.1,
-      `Memory grew by ${Math.round(growth * 100)}% (target: <10%)`);
+    assert(growth < 0.1, `Memory grew by ${Math.round(growth * 100)}% (target: <10%)`);
   });
 });
 ```
@@ -511,13 +529,13 @@ describe('Memory Leak Detection', () => {
 
 ### Metrics to Track
 
-| Metric | Collection Method | Alert Threshold |
-|--------|-------------------|-----------------|
-| Analytics query time | Instrumentation | >1s |
-| State save time | Instrumentation | >200ms |
-| Memory usage | process.memoryUsage() | >250MB |
-| GC pause time | --trace-gc | >100ms |
-| Error rate | Error counter | >5% |
+| Metric               | Collection Method     | Alert Threshold |
+| -------------------- | --------------------- | --------------- |
+| Analytics query time | Instrumentation       | >1s             |
+| State save time      | Instrumentation       | >200ms          |
+| Memory usage         | process.memoryUsage() | >250MB          |
+| GC pause time        | --trace-gc            | >100ms          |
+| Error rate           | Error counter         | >5%             |
 
 ### Monitoring Implementation
 
@@ -595,7 +613,9 @@ function renderPerformanceView(tracker) {
 
   for (const [name, stats] of Object.entries(report)) {
     const status = getStatus(name, stats.p95);
-    console.log(`| ${name.padEnd(17)} | ${stats.p95.toFixed(0).padStart(5)}ms | ${stats.mean.toFixed(0).padStart(5)}ms | ${status.padEnd(16)} |`);
+    console.log(
+      `| ${name.padEnd(17)} | ${stats.p95.toFixed(0).padStart(5)}ms | ${stats.mean.toFixed(0).padStart(5)}ms | ${status.padEnd(16)} |`
+    );
   }
 
   console.log('+----------------------------------------------------------+');
@@ -623,23 +643,23 @@ function getStatus(name, p95) {
 
 ### Phase 3 Performance Goals
 
-| Goal | Target | Measurement |
-|------|--------|-------------|
-| Track analytics at 10,000 scale | <2s query, <200MB memory | Benchmark suite |
-| Workflow state parallel saves | <500ms for 10 workflows | Stress test |
-| Git notes batch verification | <1s for 100 commits | Benchmark |
-| Memory stability | <10% growth over 1000 cycles | Leak test |
-| Performance monitoring | Real-time tracking operational | Dashboard |
+| Goal                            | Target                         | Measurement     |
+| ------------------------------- | ------------------------------ | --------------- |
+| Track analytics at 10,000 scale | <2s query, <200MB memory       | Benchmark suite |
+| Workflow state parallel saves   | <500ms for 10 workflows        | Stress test     |
+| Git notes batch verification    | <1s for 100 commits            | Benchmark       |
+| Memory stability                | <10% growth over 1000 cycles   | Leak test       |
+| Performance monitoring          | Real-time tracking operational | Dashboard       |
 
 ### Optimization Success Criteria
 
-| Bottleneck | Before | Target | Achieved |
-|------------|--------|--------|----------|
-| State atomic write | 80ms | <50ms | TBD |
-| Track metadata query | ~2ms/file | <0.5ms (cached) | TBD |
-| Git notes verify | ~30ms/commit | <10ms | TBD |
-| Context accumulation | ~50ms | <20ms | TBD |
-| Monorepo detection | ~100ms/file | <20ms (parallel) | TBD |
+| Bottleneck           | Before       | Target           | Achieved |
+| -------------------- | ------------ | ---------------- | -------- |
+| State atomic write   | 80ms         | <50ms            | TBD      |
+| Track metadata query | ~2ms/file    | <0.5ms (cached)  | TBD      |
+| Git notes verify     | ~30ms/commit | <10ms            | TBD      |
+| Context accumulation | ~50ms        | <20ms            | TBD      |
+| Monorepo detection   | ~100ms/file  | <20ms (parallel) | TBD      |
 
 ---
 

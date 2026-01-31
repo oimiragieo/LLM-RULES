@@ -18,7 +18,13 @@ const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(PROJECT_ROOT, '.claude', 'schemas', 'track-metadata.schema.json');
-const ANALYTICS_LIB_PATH = path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'track-analytics.cjs');
+const ANALYTICS_LIB_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'lib',
+  'utils',
+  'track-analytics.cjs'
+);
 
 // Import analytics library (will fail initially in RED phase)
 let trackAnalytics;
@@ -180,10 +186,7 @@ describe('Track Metadata Analytics - SPEC-008', () => {
         reporting: {
           generatedAt: '2026-01-29T10:00:00Z',
           lastReportPath: '.claude/context/artifacts/reports/test-report.md',
-          insights: [
-            'Implementation faster than estimated',
-            'Testing took 80% of estimate',
-          ],
+          insights: ['Implementation faster than estimated', 'Testing took 80% of estimate'],
         },
       };
 
@@ -610,7 +613,7 @@ describe('Track Metadata Analytics - SPEC-008', () => {
         assert.fail('Analytics library not loaded');
       }
 
-      const tracksWithAgents = sampleTracks.map((t) => ({ ...t, assignee: 'developer' }));
+      const tracksWithAgents = sampleTracks.map(t => ({ ...t, assignee: 'developer' }));
       const report = trackAnalytics.generateReport(tracksWithAgents);
 
       assert.ok(report.includes('## Agent Metrics'), 'Should have agent section');
@@ -644,7 +647,10 @@ describe('Track Metadata Analytics - SPEC-008', () => {
       const report = trackAnalytics.generateReport(sampleTracks);
 
       // Track1: 3.5 actual vs 5 estimated (30% faster)
-      assert.ok(report.includes('faster than estimated') || report.includes('under budget'), 'Should detect faster completion');
+      assert.ok(
+        report.includes('faster than estimated') || report.includes('under budget'),
+        'Should detect faster completion'
+      );
     });
 
     it('should auto-generate insights (critical priority items)', () => {
@@ -696,7 +702,10 @@ describe('Track Metadata Analytics - SPEC-008', () => {
 
       const report = trackAnalytics.generateReport(sampleTracks);
 
-      assert.ok(report.includes('Estimated') || report.includes('Actual'), 'Should show effort comparison');
+      assert.ok(
+        report.includes('Estimated') || report.includes('Actual'),
+        'Should show effort comparison'
+      );
     });
 
     it('should include data consistency validation', () => {

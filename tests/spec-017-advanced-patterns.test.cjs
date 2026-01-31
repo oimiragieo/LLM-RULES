@@ -62,22 +62,47 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
   test('01.04: strategy="all" should fail if any task fails', async () => {
     const tasks = [
       { id: 'task1', fn: async () => 'result1' },
-      { id: 'task2', fn: async () => { throw new Error('task2 failed'); } },
+      {
+        id: 'task2',
+        fn: async () => {
+          throw new Error('task2 failed');
+        },
+      },
       { id: 'task3', fn: async () => 'result3' },
     ];
 
-    await assert.rejects(
-      async () => executor.execute(tasks, { strategy: 'all' }),
-      { message: 'task2 failed' }
-    );
+    await assert.rejects(async () => executor.execute(tasks, { strategy: 'all' }), {
+      message: 'task2 failed',
+    });
   });
 
   test('01.05: strategy="all" should wait for all tasks to complete', async () => {
-    let completed = [];
+    const completed = [];
     const tasks = [
-      { id: 'task1', fn: async () => { await sleep(10); completed.push('task1'); return 'result1'; } },
-      { id: 'task2', fn: async () => { await sleep(20); completed.push('task2'); return 'result2'; } },
-      { id: 'task3', fn: async () => { await sleep(5); completed.push('task3'); return 'result3'; } },
+      {
+        id: 'task1',
+        fn: async () => {
+          await sleep(10);
+          completed.push('task1');
+          return 'result1';
+        },
+      },
+      {
+        id: 'task2',
+        fn: async () => {
+          await sleep(20);
+          completed.push('task2');
+          return 'result2';
+        },
+      },
+      {
+        id: 'task3',
+        fn: async () => {
+          await sleep(5);
+          completed.push('task3');
+          return 'result3';
+        },
+      },
     ];
 
     await executor.execute(tasks, { strategy: 'all' });
@@ -87,9 +112,27 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
   // Collection strategy: 'any' (return first success, cancel others)
   test('01.06: strategy="any" should return first successful result', async () => {
     const tasks = [
-      { id: 'task1', fn: async () => { await sleep(50); return 'slow'; } },
-      { id: 'task2', fn: async () => { await sleep(5); return 'fast'; } },
-      { id: 'task3', fn: async () => { await sleep(100); return 'slowest'; } },
+      {
+        id: 'task1',
+        fn: async () => {
+          await sleep(50);
+          return 'slow';
+        },
+      },
+      {
+        id: 'task2',
+        fn: async () => {
+          await sleep(5);
+          return 'fast';
+        },
+      },
+      {
+        id: 'task3',
+        fn: async () => {
+          await sleep(100);
+          return 'slowest';
+        },
+      },
     ];
 
     const result = await executor.execute(tasks, { strategy: 'any' });
@@ -98,14 +141,23 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
 
   test('01.07: strategy="any" should throw if all tasks fail', async () => {
     const tasks = [
-      { id: 'task1', fn: async () => { throw new Error('fail1'); } },
-      { id: 'task2', fn: async () => { throw new Error('fail2'); } },
+      {
+        id: 'task1',
+        fn: async () => {
+          throw new Error('fail1');
+        },
+      },
+      {
+        id: 'task2',
+        fn: async () => {
+          throw new Error('fail2');
+        },
+      },
     ];
 
-    await assert.rejects(
-      async () => executor.execute(tasks, { strategy: 'any' }),
-      { message: /all.*failed/i }
-    );
+    await assert.rejects(async () => executor.execute(tasks, { strategy: 'any' }), {
+      message: /all.*failed/i,
+    });
   });
 
   // Collection strategy: 'majority' (wait for >50% to succeed)
@@ -113,7 +165,12 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
     const tasks = [
       { id: 'task1', fn: async () => 'result1' },
       { id: 'task2', fn: async () => 'result2' },
-      { id: 'task3', fn: async () => { throw new Error('fail'); } },
+      {
+        id: 'task3',
+        fn: async () => {
+          throw new Error('fail');
+        },
+      },
     ];
 
     const results = await executor.execute(tasks, { strategy: 'majority' });
@@ -122,15 +179,24 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
 
   test('01.09: strategy="majority" should fail if majority fails', async () => {
     const tasks = [
-      { id: 'task1', fn: async () => { throw new Error('fail1'); } },
-      { id: 'task2', fn: async () => { throw new Error('fail2'); } },
+      {
+        id: 'task1',
+        fn: async () => {
+          throw new Error('fail1');
+        },
+      },
+      {
+        id: 'task2',
+        fn: async () => {
+          throw new Error('fail2');
+        },
+      },
       { id: 'task3', fn: async () => 'result3' },
     ];
 
-    await assert.rejects(
-      async () => executor.execute(tasks, { strategy: 'majority' }),
-      { message: /majority.*failed/i }
-    );
+    await assert.rejects(async () => executor.execute(tasks, { strategy: 'majority' }), {
+      message: /majority.*failed/i,
+    });
   });
 
   // Collection strategy: 'quorum' (wait for n successes)
@@ -148,8 +214,18 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
 
   test('01.11: strategy="quorum" should fail if quorum not met', async () => {
     const tasks = [
-      { id: 'task1', fn: async () => { throw new Error('fail1'); } },
-      { id: 'task2', fn: async () => { throw new Error('fail2'); } },
+      {
+        id: 'task1',
+        fn: async () => {
+          throw new Error('fail1');
+        },
+      },
+      {
+        id: 'task2',
+        fn: async () => {
+          throw new Error('fail2');
+        },
+      },
       { id: 'task3', fn: async () => 'result3' },
     ];
 
@@ -162,18 +238,29 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
   // Timeout handling
   test('01.12: should timeout tasks that exceed duration', async () => {
     const tasks = [
-      { id: 'task1', fn: async () => { await sleep(100); return 'slow'; } },
+      {
+        id: 'task1',
+        fn: async () => {
+          await sleep(100);
+          return 'slow';
+        },
+      },
     ];
 
-    await assert.rejects(
-      async () => executor.execute(tasks, { timeout: 20 }),
-      { message: /timeout/i }
-    );
+    await assert.rejects(async () => executor.execute(tasks, { timeout: 20 }), {
+      message: /timeout/i,
+    });
   });
 
   test('01.13: should not timeout tasks within duration', async () => {
     const tasks = [
-      { id: 'task1', fn: async () => { await sleep(10); return 'fast'; } },
+      {
+        id: 'task1',
+        fn: async () => {
+          await sleep(10);
+          return 'fast';
+        },
+      },
     ];
 
     const results = await executor.execute(tasks, { timeout: 50 });
@@ -182,15 +269,33 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
 
   // Failure policies
   test('01.14: failurePolicy="fail-fast" should stop on first failure', async () => {
-    let task3Executed = false;
+    let _task3Executed = false;
     const tasks = [
-      { id: 'task1', fn: async () => { await sleep(5); return 'result1'; } },
-      { id: 'task2', fn: async () => { await sleep(10); throw new Error('task2 failed'); } },
-      { id: 'task3', fn: async () => { task3Executed = true; return 'result3'; } },
+      {
+        id: 'task1',
+        fn: async () => {
+          await sleep(5);
+          return 'result1';
+        },
+      },
+      {
+        id: 'task2',
+        fn: async () => {
+          await sleep(10);
+          throw new Error('task2 failed');
+        },
+      },
+      {
+        id: 'task3',
+        fn: async () => {
+          _task3Executed = true;
+          return 'result3';
+        },
+      },
     ];
 
-    await assert.rejects(
-      async () => executor.execute(tasks, { strategy: 'all', failurePolicy: 'fail-fast' })
+    await assert.rejects(async () =>
+      executor.execute(tasks, { strategy: 'all', failurePolicy: 'fail-fast' })
     );
     // task3 might or might not execute depending on timing
   });
@@ -198,7 +303,12 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
   test('01.15: failurePolicy="continue" should collect all results and failures', async () => {
     const tasks = [
       { id: 'task1', fn: async () => 'result1' },
-      { id: 'task2', fn: async () => { throw new Error('task2 failed'); } },
+      {
+        id: 'task2',
+        fn: async () => {
+          throw new Error('task2 failed');
+        },
+      },
       { id: 'task3', fn: async () => 'result3' },
     ];
 
@@ -219,7 +329,7 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
         await sleep(10);
         concurrentTasks--;
         return `result${i}`;
-      }
+      },
     }));
 
     await executor.execute(tasks, { maxConcurrency: 3 });
@@ -229,7 +339,7 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
   test('01.17: should execute all tasks when maxConcurrency not set', async () => {
     const tasks = Array.from({ length: 5 }, (_, i) => ({
       id: `task${i}`,
-      fn: async () => `result${i}`
+      fn: async () => `result${i}`,
     }));
 
     const results = await executor.execute(tasks, { strategy: 'all' });
@@ -245,7 +355,7 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
 
     const results = await executor.execute(tasks, {
       strategy: 'all',
-      transform: (results) => results.map(r => r.toUpperCase())
+      transform: results => results.map(r => r.toUpperCase()),
     });
 
     assert.deepStrictEqual(results, ['RESULT1', 'RESULT2']);
@@ -254,14 +364,29 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
   // Error aggregation
   test('01.19: should aggregate errors when multiple tasks fail', async () => {
     const tasks = [
-      { id: 'task1', fn: async () => { throw new Error('error1'); } },
-      { id: 'task2', fn: async () => { throw new Error('error2'); } },
-      { id: 'task3', fn: async () => { throw new Error('error3'); } },
+      {
+        id: 'task1',
+        fn: async () => {
+          throw new Error('error1');
+        },
+      },
+      {
+        id: 'task2',
+        fn: async () => {
+          throw new Error('error2');
+        },
+      },
+      {
+        id: 'task3',
+        fn: async () => {
+          throw new Error('error3');
+        },
+      },
     ];
 
     await assert.rejects(
       async () => executor.execute(tasks, { strategy: 'all' }),
-      (err) => {
+      err => {
         assert.ok(err.message.includes('error1'));
         assert.ok(err.message.includes('error2'));
         assert.ok(err.message.includes('error3'));
@@ -272,15 +397,18 @@ describe('SPEC-017 Category 1: Fan-Out/Fan-In Pattern', () => {
 
   // Progress tracking
   test('01.20: should emit progress events during execution', async () => {
-    let progressEvents = [];
+    const progressEvents = [];
     const tasks = Array.from({ length: 5 }, (_, i) => ({
       id: `task${i}`,
-      fn: async () => { await sleep(10); return `result${i}`; }
+      fn: async () => {
+        await sleep(10);
+        return `result${i}`;
+      },
     }));
 
     await executor.execute(tasks, {
       strategy: 'all',
-      onProgress: (completed, total) => progressEvents.push({ completed, total })
+      onProgress: (completed, total) => progressEvents.push({ completed, total }),
     });
 
     assert.ok(progressEvents.length > 0);
@@ -328,36 +456,32 @@ describe('SPEC-017 Category 2: Conditional Branching', () => {
 
   // Context-aware conditions
   test('02.04: should evaluate condition with provided context', async () => {
-    const condition = (ctx) => ctx.score > 0.8;
-    const thenBranch = async (ctx) => `approved: ${ctx.name}`;
-    const elseBranch = async (ctx) => `rejected: ${ctx.name}`;
+    const condition = ctx => ctx.score > 0.8;
+    const thenBranch = async ctx => `approved: ${ctx.name}`;
+    const elseBranch = async ctx => `rejected: ${ctx.name}`;
 
-    const result = await executor.when(
-      condition,
-      thenBranch,
-      elseBranch,
-      { score: 0.9, name: 'test' }
-    );
+    const result = await executor.when(condition, thenBranch, elseBranch, {
+      score: 0.9,
+      name: 'test',
+    });
     assert.strictEqual(result, 'approved: test');
   });
 
   test('02.05: should pass context to branches', async () => {
-    const condition = (ctx) => ctx.enabled;
-    const thenBranch = async (ctx) => ctx.value * 2;
-    const elseBranch = async (ctx) => ctx.value / 2;
+    const condition = ctx => ctx.enabled;
+    const thenBranch = async ctx => ctx.value * 2;
+    const elseBranch = async ctx => ctx.value / 2;
 
-    const result = await executor.when(
-      condition,
-      thenBranch,
-      elseBranch,
-      { enabled: true, value: 10 }
-    );
+    const result = await executor.when(condition, thenBranch, elseBranch, {
+      enabled: true,
+      value: 10,
+    });
     assert.strictEqual(result, 20);
   });
 
   // Async conditions
   test('02.06: should support async condition evaluation', async () => {
-    const condition = async (ctx) => {
+    const condition = async ctx => {
       await sleep(10);
       return ctx.ready;
     };
@@ -371,9 +495,9 @@ describe('SPEC-017 Category 2: Conditional Branching', () => {
   // Switch/case pattern
   test('02.07: should execute matching case in switch', async () => {
     const cases = {
-      'case1': async () => 'result1',
-      'case2': async () => 'result2',
-      'case3': async () => 'result3',
+      case1: async () => 'result1',
+      case2: async () => 'result2',
+      case3: async () => 'result3',
     };
 
     const result = await executor.switch('case2', cases);
@@ -382,8 +506,8 @@ describe('SPEC-017 Category 2: Conditional Branching', () => {
 
   test('02.08: should execute default case when no match', async () => {
     const cases = {
-      'case1': async () => 'result1',
-      'case2': async () => 'result2',
+      case1: async () => 'result1',
+      case2: async () => 'result2',
     };
     const defaultCase = async () => 'default-result';
 
@@ -393,7 +517,7 @@ describe('SPEC-017 Category 2: Conditional Branching', () => {
 
   test('02.09: should return null when no match and no default', async () => {
     const cases = {
-      'case1': async () => 'result1',
+      case1: async () => 'result1',
     };
 
     const result = await executor.switch('case99', cases);
@@ -406,12 +530,10 @@ describe('SPEC-017 Category 2: Conditional Branching', () => {
     const thenBranch = async () => 'proceed';
     const elseBranch = async () => 'block';
 
-    const result = await executor.when(
-      condition,
-      thenBranch,
-      elseBranch,
-      { score: 0.9, status: 'approved' }
-    );
+    const result = await executor.when(condition, thenBranch, elseBranch, {
+      score: 0.9,
+      status: 'approved',
+    });
     assert.strictEqual(result, 'proceed');
   });
 
@@ -420,25 +542,28 @@ describe('SPEC-017 Category 2: Conditional Branching', () => {
     const thenBranch = async () => 'then';
     const elseBranch = async () => 'else';
 
-    await assert.rejects(
-      async () => executor.when(condition, thenBranch, elseBranch, {}),
-      { message: /cannot.*read.*property/i }
-    );
+    await assert.rejects(async () => executor.when(condition, thenBranch, elseBranch, {}), {
+      message: /cannot.*read.*property/i,
+    });
   });
 
   // Nested conditionals
   test('02.12: should support nested conditional branching', async () => {
-    const outerCondition = (ctx) => ctx.level1;
-    const innerCondition = (ctx) => ctx.level2;
-    const nestedThen = async (ctx) => executor.when(innerCondition, async () => 'deep', async () => 'shallow', ctx);
+    const outerCondition = ctx => ctx.level1;
+    const innerCondition = ctx => ctx.level2;
+    const nestedThen = async ctx =>
+      executor.when(
+        innerCondition,
+        async () => 'deep',
+        async () => 'shallow',
+        ctx
+      );
     const outerElse = async () => 'none';
 
-    const result = await executor.when(
-      outerCondition,
-      nestedThen,
-      outerElse,
-      { level1: true, level2: true }
-    );
+    const result = await executor.when(outerCondition, nestedThen, outerElse, {
+      level1: true,
+      level2: true,
+    });
     assert.strictEqual(result, 'deep');
   });
 
@@ -477,51 +602,64 @@ describe('SPEC-017 Category 2: Conditional Branching', () => {
   // Error handling in branches
   test('02.15: should propagate errors from then branch', async () => {
     const condition = () => true;
-    const thenBranch = async () => { throw new Error('then-error'); };
+    const thenBranch = async () => {
+      throw new Error('then-error');
+    };
     const elseBranch = async () => 'else';
 
-    await assert.rejects(
-      async () => executor.when(condition, thenBranch, elseBranch),
-      { message: 'then-error' }
-    );
+    await assert.rejects(async () => executor.when(condition, thenBranch, elseBranch), {
+      message: 'then-error',
+    });
   });
 
   test('02.16: should propagate errors from else branch', async () => {
     const condition = () => false;
     const thenBranch = async () => 'then';
-    const elseBranch = async () => { throw new Error('else-error'); };
+    const elseBranch = async () => {
+      throw new Error('else-error');
+    };
 
-    await assert.rejects(
-      async () => executor.when(condition, thenBranch, elseBranch),
-      { message: 'else-error' }
-    );
+    await assert.rejects(async () => executor.when(condition, thenBranch, elseBranch), {
+      message: 'else-error',
+    });
   });
 
   // Conditional chains (if-else-if)
   test('02.17: should support if-else-if chains', async () => {
-    const result = await executor.chain([
-      { condition: (ctx) => ctx.score > 90, branch: async () => 'excellent' },
-      { condition: (ctx) => ctx.score > 70, branch: async () => 'good' },
-      { condition: (ctx) => ctx.score > 50, branch: async () => 'fair' },
-    ], async () => 'poor', { score: 75 });
+    const result = await executor.chain(
+      [
+        { condition: ctx => ctx.score > 90, branch: async () => 'excellent' },
+        { condition: ctx => ctx.score > 70, branch: async () => 'good' },
+        { condition: ctx => ctx.score > 50, branch: async () => 'fair' },
+      ],
+      async () => 'poor',
+      { score: 75 }
+    );
 
     assert.strictEqual(result, 'good');
   });
 
   test('02.18: should execute default for chain when no conditions match', async () => {
-    const result = await executor.chain([
-      { condition: (ctx) => ctx.score > 90, branch: async () => 'excellent' },
-      { condition: (ctx) => ctx.score > 70, branch: async () => 'good' },
-    ], async () => 'default', { score: 30 });
+    const result = await executor.chain(
+      [
+        { condition: ctx => ctx.score > 90, branch: async () => 'excellent' },
+        { condition: ctx => ctx.score > 70, branch: async () => 'good' },
+      ],
+      async () => 'default',
+      { score: 30 }
+    );
 
     assert.strictEqual(result, 'default');
   });
 
   // Context mutation
   test('02.19: should allow branches to mutate context', async () => {
-    let context = { value: 10 };
+    const context = { value: 10 };
     const condition = () => true;
-    const thenBranch = async (ctx) => { ctx.value = 20; return 'modified'; };
+    const thenBranch = async ctx => {
+      ctx.value = 20;
+      return 'modified';
+    };
 
     await executor.when(condition, thenBranch, null, context);
     assert.strictEqual(context.value, 20);
@@ -532,7 +670,10 @@ describe('SPEC-017 Category 2: Conditional Branching', () => {
     let elseExecuted = false;
     const condition = () => true;
     const thenBranch = async () => 'then';
-    const elseBranch = async () => { elseExecuted = true; return 'else'; };
+    const elseBranch = async () => {
+      elseExecuted = true;
+      return 'else';
+    };
 
     await executor.when(condition, thenBranch, elseBranch);
     assert.strictEqual(elseExecuted, false);
@@ -554,7 +695,7 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   test('03.01: should iterate over items sequentially', async () => {
     const items = [1, 2, 3, 4, 5];
     const results = [];
-    const task = async (ctx) => {
+    const task = async ctx => {
       results.push(ctx.item * 2);
       return ctx.item * 2;
     };
@@ -565,7 +706,7 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
 
   test('03.02: should iterate over items in parallel when specified', async () => {
     const items = [1, 2, 3, 4, 5];
-    const task = async (ctx) => ctx.item * 2;
+    const task = async ctx => ctx.item * 2;
 
     const results = await executor.forEach(items, task, { parallel: true });
     assert.strictEqual(results.length, 5);
@@ -594,8 +735,8 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   // doWhile pattern
   test('03.05: should execute task while condition is true', async () => {
     let iterations = 0;
-    const condition = (ctx) => ctx.iterations < 5;
-    const task = async (ctx) => {
+    const condition = ctx => ctx.iterations < 5;
+    const task = async _ctx => {
       iterations++;
       return { iterations };
     };
@@ -607,7 +748,7 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
 
   test('03.06: should enforce maxIterations to prevent infinite loops', async () => {
     const condition = () => true; // Always true
-    const task = async (ctx) => ctx.iteration;
+    const task = async ctx => ctx.iteration;
 
     const result = await executor.doWhile(condition, task, { maxIterations: 10 });
     assert.strictEqual(result.iterations, 10);
@@ -617,20 +758,19 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
     const condition = () => true;
     const task = async () => {};
 
-    await assert.rejects(
-      async () => executor.doWhile(condition, task),
-      { message: /maxIterations.*required/i }
-    );
+    await assert.rejects(async () => executor.doWhile(condition, task), {
+      message: /maxIterations.*required/i,
+    });
   });
 
   test('03.08: should checkpoint progress during loop', async () => {
-    let checkpoints = [];
-    const condition = (ctx) => ctx.iteration < 5;
-    const task = async (ctx) => ctx.iteration;
+    const checkpoints = [];
+    const condition = ctx => ctx.iteration < 5;
+    const task = async ctx => ctx.iteration;
 
     await executor.doWhile(condition, task, {
       maxIterations: 10,
-      onCheckpoint: (state) => checkpoints.push(state)
+      onCheckpoint: state => checkpoints.push(state),
     });
 
     assert.ok(checkpoints.length > 0);
@@ -639,7 +779,7 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   // retryUntil pattern
   test('03.09: should retry until success condition met', async () => {
     let attempts = 0;
-    const successCondition = (ctx) => ctx.result === 'success';
+    const successCondition = ctx => ctx.result === 'success';
     const task = async () => {
       attempts++;
       return { result: attempts >= 3 ? 'success' : 'failure' };
@@ -660,7 +800,7 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   });
 
   test('03.11: should apply exponential backoff between retries', async () => {
-    let delays = [];
+    const delays = [];
     const startTime = Date.now();
     const successCondition = () => false;
     const task = async () => {
@@ -671,7 +811,7 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
     await executor.retryUntil(successCondition, task, {
       maxRetries: 3,
       backoff: 'exponential',
-      initialDelay: 10
+      initialDelay: 10,
     });
 
     // Delays should increase exponentially (10ms, 20ms, 40ms...)
@@ -682,7 +822,7 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   });
 
   test('03.12: should apply linear backoff between retries', async () => {
-    let delays = [];
+    const delays = [];
     const startTime = Date.now();
     const successCondition = () => false;
     const task = async () => {
@@ -693,7 +833,7 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
     await executor.retryUntil(successCondition, task, {
       maxRetries: 3,
       backoff: 'linear',
-      initialDelay: 10
+      initialDelay: 10,
     });
 
     // Delays should increase linearly (10ms, 20ms, 30ms...)
@@ -703,8 +843,8 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   // Loop control
   test('03.13: should support break condition in forEach', async () => {
     const items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    let processed = [];
-    const task = async (ctx) => {
+    const processed = [];
+    const task = async ctx => {
       processed.push(ctx.item);
       if (ctx.item === 5) {
         return { break: true };
@@ -717,8 +857,8 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
 
   test('03.14: should support continue/skip in forEach', async () => {
     const items = [1, 2, 3, 4, 5];
-    let processed = [];
-    const task = async (ctx) => {
+    const processed = [];
+    const task = async ctx => {
       if (ctx.item % 2 === 0) {
         return { continue: true };
       }
@@ -732,14 +872,14 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   // Error handling in loops
   test('03.15: should collect errors in parallel forEach with continueOnError', async () => {
     const items = [1, 2, 3, 4, 5];
-    const task = async (ctx) => {
+    const task = async ctx => {
       if (ctx.item === 3) throw new Error('item-3-error');
       return ctx.item * 2;
     };
 
     const result = await executor.forEach(items, task, {
       parallel: true,
-      continueOnError: true
+      continueOnError: true,
     });
 
     assert.strictEqual(result.successes.length, 4);
@@ -749,24 +889,21 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   test('03.16: should stop forEach on first error by default', async () => {
     const items = [1, 2, 3, 4, 5];
     let processed = 0;
-    const task = async (ctx) => {
+    const task = async ctx => {
       processed++;
       if (ctx.item === 3) throw new Error('item-3-error');
       return ctx.item;
     };
 
-    await assert.rejects(
-      async () => executor.forEach(items, task),
-      { message: 'item-3-error' }
-    );
+    await assert.rejects(async () => executor.forEach(items, task), { message: 'item-3-error' });
     assert.strictEqual(processed, 3);
   });
 
   // Context preservation
   test('03.17: should preserve context across loop iterations', async () => {
-    let context = { accumulator: 0 };
+    const context = { accumulator: 0 };
     const items = [1, 2, 3, 4, 5];
-    const task = async (ctx) => {
+    const task = async ctx => {
       ctx.accumulator += ctx.item;
     };
 
@@ -776,12 +913,12 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
 
   // Progress reporting
   test('03.18: should report progress during forEach', async () => {
-    let progressReports = [];
+    const progressReports = [];
     const items = Array.from({ length: 10 }, (_, i) => i);
-    const task = async (ctx) => ctx.item;
+    const task = async ctx => ctx.item;
 
     await executor.forEach(items, task, {
-      onProgress: (completed, total) => progressReports.push({ completed, total })
+      onProgress: (completed, total) => progressReports.push({ completed, total }),
     });
 
     assert.ok(progressReports.length > 0);
@@ -791,8 +928,8 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   // Batch processing
   test('03.19: should process items in batches', async () => {
     const items = Array.from({ length: 10 }, (_, i) => i);
-    let batchSizes = [];
-    const task = async (batch) => {
+    const batchSizes = [];
+    const task = async batch => {
       batchSizes.push(batch.length);
       return batch.map(item => item * 2);
     };
@@ -804,7 +941,7 @@ describe('SPEC-017 Category 3: Loop Patterns', () => {
   // Performance measurement
   test('03.20: should measure execution time per iteration', async () => {
     const items = [1, 2, 3];
-    const task = async (ctx) => {
+    const task = async ctx => {
       await sleep(10);
       return ctx.item;
     };
@@ -829,9 +966,9 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
   // Basic dynamic generation
   test('04.01: should generate tasks from runtime data', async () => {
     const data = { files: ['file1.txt', 'file2.txt', 'file3.txt'] };
-    const template = (file) => ({
+    const template = file => ({
       id: `process-${file}`,
-      fn: async () => `processed ${file}`
+      fn: async () => `processed ${file}`,
     });
 
     const tasks = await generator.generate(data.files, template);
@@ -841,9 +978,9 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
 
   test('04.02: should execute generated tasks', async () => {
     const data = [1, 2, 3];
-    const template = (num) => ({
+    const template = num => ({
       id: `task-${num}`,
-      fn: async () => num * 2
+      fn: async () => num * 2,
     });
 
     const results = await generator.generateAndExecute(data, template);
@@ -857,11 +994,11 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
       { id: 2, process: false },
       { id: 3, process: true },
     ];
-    const template = (item) => ({
+    const template = item => ({
       id: `task-${item.id}`,
-      fn: async () => item.id
+      fn: async () => item.id,
     });
-    const filter = (item) => item.process;
+    const filter = item => item.process;
 
     const tasks = await generator.generate(data, template, { filter });
     assert.strictEqual(tasks.length, 2);
@@ -873,12 +1010,12 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
       phases: [
         { name: 'phase1', tasks: ['task1', 'task2'] },
         { name: 'phase2', tasks: ['task3', 'task4'] },
-      ]
+      ],
     };
 
     const tasks = await generator.generateHierarchy(data.phases, {
-      parentTemplate: (phase) => ({ id: phase.name }),
-      childTemplate: (task) => ({ id: task, fn: async () => task })
+      parentTemplate: phase => ({ id: phase.name }),
+      childTemplate: task => ({ id: task, fn: async () => task }),
     });
 
     assert.strictEqual(tasks.length, 2);
@@ -894,8 +1031,8 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
     ];
 
     const tasks = await generator.generateWithDependencies(data, {
-      template: (item) => ({ id: item.id, fn: async () => item.id }),
-      getDependencies: (item) => item.dependsOn
+      template: item => ({ id: item.id, fn: async () => item.id }),
+      getDependencies: item => item.dependsOn,
     });
 
     assert.strictEqual(tasks[2].dependencies.length, 2);
@@ -905,12 +1042,12 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
   test('04.06: should compose templates for complex generation', async () => {
     const data = [{ type: 'validate' }, { type: 'transform' }, { type: 'store' }];
     const templates = {
-      validate: (item) => ({ fn: async () => 'validated' }),
-      transform: (item) => ({ fn: async () => 'transformed' }),
-      store: (item) => ({ fn: async () => 'stored' }),
+      validate: _item => ({ fn: async () => 'validated' }),
+      transform: _item => ({ fn: async () => 'transformed' }),
+      store: _item => ({ fn: async () => 'stored' }),
     };
 
-    const tasks = await generator.generate(data, (item) => templates[item.type](item));
+    const tasks = await generator.generate(data, item => templates[item.type](item));
     const results = await Promise.all(tasks.map(t => t.fn()));
     assert.deepStrictEqual(results, ['validated', 'transformed', 'stored']);
   });
@@ -920,10 +1057,14 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
     const data = Array.from({ length: 100 }, (_, i) => i);
     const availableWorkers = 10;
 
-    const tasks = await generator.generate(data, (item) => ({
-      id: `task-${item}`,
-      fn: async () => item
-    }), { maxTasks: availableWorkers });
+    const tasks = await generator.generate(
+      data,
+      item => ({
+        id: `task-${item}`,
+        fn: async () => item,
+      }),
+      { maxTasks: availableWorkers }
+    );
 
     assert.strictEqual(tasks.length, availableWorkers);
   });
@@ -931,20 +1072,19 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
   // Error handling in generation
   test('04.08: should handle errors during task generation', async () => {
     const data = [1, 2, 'invalid', 4];
-    const template = (item) => {
+    const template = item => {
       if (typeof item !== 'number') throw new Error('invalid-type');
       return { id: `task-${item}`, fn: async () => item };
     };
 
-    await assert.rejects(
-      async () => generator.generate(data, template),
-      { message: 'invalid-type' }
-    );
+    await assert.rejects(async () => generator.generate(data, template), {
+      message: 'invalid-type',
+    });
   });
 
   test('04.09: should skip failed generation with continueOnError', async () => {
     const data = [1, 2, 'invalid', 4];
-    const template = (item) => {
+    const template = item => {
       if (typeof item !== 'number') throw new Error('invalid-type');
       return { id: `task-${item}`, fn: async () => item };
     };
@@ -964,10 +1104,14 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
       }
     }
 
-    const tasks = await generator.generateLazy(dataGenerator(), (item) => ({
-      id: `task-${item}`,
-      fn: async () => item
-    }), { limit: 3 });
+    const tasks = await generator.generateLazy(
+      dataGenerator(),
+      item => ({
+        id: `task-${item}`,
+        fn: async () => item,
+      }),
+      { limit: 3 }
+    );
 
     assert.strictEqual(tasks.length, 3);
     assert.strictEqual(generated, 3); // Only generated what was needed
@@ -976,7 +1120,7 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
   // Validation
   test('04.11: should validate generated tasks before execution', async () => {
     const data = [1, 2, 3];
-    const template = (item) => ({ id: `task-${item}` }); // Missing fn
+    const template = item => ({ id: `task-${item}` }); // Missing fn
 
     await assert.rejects(
       async () => generator.generateAndExecute(data, template, { validate: true }),
@@ -987,9 +1131,9 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
   // Deduplication
   test('04.12: should deduplicate generated tasks by ID', async () => {
     const data = [1, 1, 2, 2, 3];
-    const template = (item) => ({
+    const template = item => ({
       id: `task-${item}`,
-      fn: async () => item
+      fn: async () => item,
     });
 
     const tasks = await generator.generate(data, template, { deduplicate: true });
@@ -1003,10 +1147,10 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
       { value: 2, priority: 1 },
       { value: 3, priority: 2 },
     ];
-    const template = (item) => ({
+    const template = item => ({
       id: `task-${item.value}`,
       priority: item.priority,
-      fn: async () => item.value
+      fn: async () => item.value,
     });
 
     const tasks = await generator.generate(data, template, { sortByPriority: true });
@@ -1019,7 +1163,7 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
     const context = { multiplier: 10 };
     const template = (item, ctx) => ({
       id: `task-${item}`,
-      fn: async () => item * ctx.multiplier
+      fn: async () => item * ctx.multiplier,
     });
 
     const results = await generator.generateAndExecute(data, template, { context });
@@ -1030,7 +1174,7 @@ describe('SPEC-017 Category 4: Dynamic Task Generation', () => {
   test('04.15: should generate tasks in batches to control memory', async () => {
     const data = Array.from({ length: 100 }, (_, i) => i);
     let generationCalls = 0;
-    const template = (item) => {
+    const template = item => {
       generationCalls++;
       return { id: `task-${item}`, fn: async () => item };
     };

@@ -10,7 +10,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const STYLEGUIDES_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'artifacts', 'code-styleguides');
+const STYLEGUIDES_DIR = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'artifacts',
+  'code-styleguides'
+);
 
 describe('Code Styleguides - Structure', () => {
   it('should have code-styleguides directory', () => {
@@ -43,7 +49,7 @@ describe('Code Styleguides - Content Quality', () => {
     '## Best Practices',
     '## Common Patterns',
     '## Tools & Enforcement',
-    '## Quick Reference'
+    '## Quick Reference',
   ];
 
   const languages = ['python', 'javascript', 'typescript', 'go', 'dart', 'csharp', 'html-css'];
@@ -54,10 +60,7 @@ describe('Code Styleguides - Content Quality', () => {
       const content = fs.readFileSync(guidePath, 'utf8');
 
       requiredSections.forEach(section => {
-        assert.ok(
-          content.includes(section),
-          `${lang}.md should have section: ${section}`
-        );
+        assert.ok(content.includes(section), `${lang}.md should have section: ${section}`);
       });
     });
 
@@ -71,10 +74,7 @@ describe('Code Styleguides - Content Quality', () => {
     it(`${lang}.md should have code examples`, () => {
       const guidePath = path.join(STYLEGUIDES_DIR, `${lang}.md`);
       const content = fs.readFileSync(guidePath, 'utf8');
-      assert.ok(
-        content.includes('```'),
-        `${lang}.md should have code examples`
-      );
+      assert.ok(content.includes('```'), `${lang}.md should have code examples`);
     });
   });
 });
@@ -90,7 +90,7 @@ describe('Code Styleguides - General Guide Content', () => {
     'Code review',
     'Security',
     'Performance',
-    'Accessibility'
+    'Accessibility',
   ];
 
   it('general.md should have all universal principles', () => {
@@ -117,10 +117,7 @@ describe('Code Styleguides - README Content', () => {
   it('README should describe purpose', () => {
     const readmePath = path.join(STYLEGUIDES_DIR, 'README.md');
     const content = fs.readFileSync(readmePath, 'utf8');
-    assert.ok(
-      content.includes('Code Styleguides'),
-      'README should describe purpose'
-    );
+    assert.ok(content.includes('Code Styleguides'), 'README should describe purpose');
   });
 
   it('README should have language support matrix', () => {
@@ -161,7 +158,7 @@ describe('Code Styleguides - Markdown Syntax', () => {
     'go.md',
     'dart.md',
     'csharp.md',
-    'html-css.md'
+    'html-css.md',
   ];
 
   allFiles.forEach(file => {
@@ -178,10 +175,7 @@ describe('Code Styleguides - Markdown Syntax', () => {
 
       // Check for proper heading hierarchy (# at start of line)
       const headings = content.match(/^#+\s+.+$/gm) || [];
-      assert.ok(
-        headings.length > 0,
-        `${file} should have at least one heading`
-      );
+      assert.ok(headings.length > 0, `${file} should have at least one heading`);
     });
 
     it(`${file} should not have broken links`, () => {
@@ -211,7 +205,7 @@ describe('Code Styleguides - Performance', () => {
       'go.md',
       'dart.md',
       'csharp.md',
-      'html-css.md'
+      'html-css.md',
     ];
 
     files.forEach(file => {

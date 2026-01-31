@@ -23,17 +23,18 @@ Phase 4 delivers **advanced workflow orchestration patterns and enterprise-grade
 
 ### Phase 0-3 Foundation (What We're Building On)
 
-| Phase | Features | Tests | Key Capabilities |
-|-------|----------|-------|------------------|
-| Phase 0-1 | SPEC-001 to SPEC-007, SPEC-010 | 570+ | Spec-init, git notes, checkpointing, phase gates, brownfield, styleguides, metadata, smart revert |
-| Phase 2 | SPEC-008, SPEC-009 | 180+ | Track analytics, adaptive questioning |
-| Phase 3 | SPEC-011 to SPEC-016 | 140+ | State machine enhancements, integration testing, performance profiling, enterprise scale, conductor integration, observability |
+| Phase     | Features                       | Tests | Key Capabilities                                                                                                               |
+| --------- | ------------------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Phase 0-1 | SPEC-001 to SPEC-007, SPEC-010 | 570+  | Spec-init, git notes, checkpointing, phase gates, brownfield, styleguides, metadata, smart revert                              |
+| Phase 2   | SPEC-008, SPEC-009             | 180+  | Track analytics, adaptive questioning                                                                                          |
+| Phase 3   | SPEC-011 to SPEC-016           | 140+  | State machine enhancements, integration testing, performance profiling, enterprise scale, conductor integration, observability |
 
 **Total Foundation**: 16 features, 890+ tests, enterprise-ready platform
 
 ### Expected Value Delivery
 
 **Cumulative Completion After Phase 4**:
+
 - **Phase 0-3**: 16 features (enterprise-ready platform)
 - **Phase 4**: +6 features = **Advanced orchestration platform with migration capabilities**
 - **Value**: Complex workflow patterns, gradual migration paths, performance at scale
@@ -48,6 +49,7 @@ Phase 4 delivers **advanced workflow orchestration patterns and enterprise-grade
 
 **Total Effort**: 14-20 person-days
 **Breakdown**:
+
 - SPEC-017 (Advanced Workflow Orchestration): 3-4 days
 - SPEC-018 (Workflow Composition & Nesting): 3-4 days
 - SPEC-019 (Brownfield/Greenfield Hybrid): 2-3 days
@@ -120,6 +122,7 @@ Before creating ANY artifact:
 **User Story**: "As a developer orchestrating complex multi-agent workflows, I want to fan out tasks to multiple agents in parallel and collect their results, so that I can maximize throughput while maintaining workflow integrity."
 
 **Business Value**:
+
 - Enables parallel task execution with result aggregation (3-5x throughput improvement)
 - Conditional branching reduces unnecessary work by 40-60%
 - Loop patterns enable iterative refinement workflows
@@ -127,12 +130,14 @@ Before creating ANY artifact:
 ### Problem Statement
 
 **Current Gap** (from SPEC-011):
+
 - SPEC-011 provides basic fork/join for parallel phases
 - No support for conditional branching within workflows
 - No loop constructs with iteration limits
 - No dynamic task generation based on previous results
 
 **Pain Points**:
+
 1. Complex workflows require manual orchestration
 2. Conditional logic embedded in agent prompts (not declarative)
 3. Iterative workflows (test-fix-retest) require manual intervention
@@ -141,6 +146,7 @@ Before creating ANY artifact:
 ### Proposed Solution
 
 **Architecture Extensions**:
+
 ```
 .claude/lib/workflow/workflow-patterns.cjs (NEW)
 +-- FanOutPattern
@@ -158,6 +164,7 @@ Before creating ANY artifact:
 ```
 
 **New Schema Extensions** (workflow-patterns.schema.json):
+
 ```json
 {
   "fanOut": {
@@ -188,12 +195,14 @@ Before creating ANY artifact:
 #### Task 17.1: Create Workflow Patterns Module (~6 hours)
 
 **Subtasks**:
+
 - [ ] **17.1.1** Create fan-out executor with configurable strategies (~2 hours)
 - [ ] **17.1.2** Implement result collection with aggregation (~1 hour)
 - [ ] **17.1.3** Add timeout and failure policy handling (~1 hour)
 - [ ] **17.1.4** Write fan-out unit tests (15+ tests) (~2 hours)
 
 **Verification Gate**:
+
 ```bash
 node --test tests/workflow-patterns-fanout.test.cjs
 # Expected: 15/15 fan-out tests pass
@@ -202,12 +211,14 @@ node --test tests/workflow-patterns-fanout.test.cjs
 #### Task 17.2: Implement Conditional Branching (~6 hours)
 
 **Subtasks**:
+
 - [ ] **17.2.1** Create condition evaluator (JavaScript + JSONPath) (~2 hours)
 - [ ] **17.2.2** Implement when/then/else branching (~1 hour)
 - [ ] **17.2.3** Implement switch/case multi-way branching (~1 hour)
 - [ ] **17.2.4** Write conditional branching tests (12+ tests) (~2 hours)
 
 **Verification Gate**:
+
 ```bash
 node --test tests/workflow-patterns-conditional.test.cjs
 # Expected: 12/12 conditional tests pass
@@ -216,12 +227,14 @@ node --test tests/workflow-patterns-conditional.test.cjs
 #### Task 17.3: Implement Loop Patterns (~6 hours)
 
 **Subtasks**:
+
 - [ ] **17.3.1** Create forEach iterator with parallel/sequential options (~2 hours)
 - [ ] **17.3.2** Implement doWhile with max iterations safeguard (~1 hour)
 - [ ] **17.3.3** Implement retryUntil with exponential backoff (~2 hours)
 - [ ] **17.3.4** Write loop pattern tests (15+ tests) (~1 hour)
 
 **Verification Gate**:
+
 ```bash
 node --test tests/workflow-patterns-loops.test.cjs
 # Expected: 15/15 loop tests pass
@@ -230,6 +243,7 @@ node --test tests/workflow-patterns-loops.test.cjs
 #### Task 17.4: Integration with SPEC-011 State Machine (~4 hours)
 
 **Subtasks**:
+
 - [ ] **17.4.1** Integrate patterns with TransactionSupport (~1 hour)
 - [ ] **17.4.2** Add pattern checkpointing (state save after each iteration) (~2 hours)
 - [ ] **17.4.3** Test rollback scenarios with patterns (~1 hour)
@@ -237,17 +251,20 @@ node --test tests/workflow-patterns-loops.test.cjs
 ### Success Criteria
 
 **Functional**:
+
 - [ ] Fan-out with 10+ parallel tasks working
 - [ ] Conditional branching with nested conditions
 - [ ] Loop patterns with iteration limits enforced
 - [ ] Integration with SPEC-011 transactions
 
 **Quality**:
+
 - [ ] 42+ new tests passing
 - [ ] <100ms overhead for pattern execution
 - [ ] No regression in SPEC-011 functionality
 
 **Performance Targets**:
+
 - Fan-out coordination: <50ms for 10 tasks
 - Condition evaluation: <5ms per expression
 - Loop iteration: <10ms overhead per iteration
@@ -265,6 +282,7 @@ node --test tests/workflow-patterns-loops.test.cjs
 **User Story**: "As a workflow designer, I want to compose complex workflows from smaller, tested sub-workflows, so that I can reuse proven patterns and reduce duplication."
 
 **Business Value**:
+
 - 60% reduction in workflow definition duplication
 - Enables library of reusable workflow components
 - Simplifies testing (test sub-workflows independently)
@@ -272,6 +290,7 @@ node --test tests/workflow-patterns-loops.test.cjs
 ### Problem Statement
 
 **Current Gap**:
+
 - Workflows are monolithic (cannot reference other workflows)
 - No inheritance or extension mechanism
 - Common patterns duplicated across workflows
@@ -279,6 +298,7 @@ node --test tests/workflow-patterns-loops.test.cjs
 ### Proposed Solution
 
 **Architecture**:
+
 ```
 .claude/lib/workflow/workflow-composer.cjs (NEW)
 +-- WorkflowComposer
@@ -292,6 +312,7 @@ node --test tests/workflow-patterns-loops.test.cjs
 ```
 
 **Workflow Definition Enhancement**:
+
 ```yaml
 # .claude/workflows/enterprise/feature-with-security.md
 extends: feature-development-workflow
@@ -310,6 +331,7 @@ overrides:
 #### Task 18.1: Create Workflow Composer (~6 hours)
 
 **Subtasks**:
+
 - [ ] **18.1.1** Implement include() with path resolution (~2 hours)
 - [ ] **18.1.2** Implement extend() with override merging (~2 hours)
 - [ ] **18.1.3** Implement compose() with strategy options (~1 hour)
@@ -318,6 +340,7 @@ overrides:
 #### Task 18.2: Create Workflow Resolver (~6 hours)
 
 **Subtasks**:
+
 - [ ] **18.2.1** Implement resolve() with caching (~2 hours)
 - [ ] **18.2.2** Implement cycle detection (DFS) (~1 hour)
 - [ ] **18.2.3** Implement hierarchy flattening (~2 hours)
@@ -326,6 +349,7 @@ overrides:
 #### Task 18.3: Integration with Workflow Engine (~6 hours)
 
 **Subtasks**:
+
 - [ ] **18.3.1** Extend workflow-engine.cjs to handle composition (~2 hours)
 - [ ] **18.3.2** Add nested workflow state tracking (~2 hours)
 - [ ] **18.3.3** Implement parent-child event propagation (~1 hour)
@@ -334,12 +358,14 @@ overrides:
 ### Success Criteria
 
 **Functional**:
+
 - [ ] Sub-workflow inclusion working
 - [ ] Workflow inheritance with overrides
 - [ ] Cycle detection prevents infinite loops
 - [ ] Nested state properly tracked
 
 **Quality**:
+
 - [ ] 30+ new tests passing
 - [ ] <50ms resolution time for 5-level deep nesting
 - [ ] Clear error messages for composition errors
@@ -357,6 +383,7 @@ overrides:
 **User Story**: "As a platform engineer migrating from conductor-main, I want to run some tasks in the old system and some in the new system, so that I can migrate gradually without disrupting production."
 
 **Business Value**:
+
 - Zero-downtime migration path
 - Reduces migration risk by 80%
 - Enables A/B testing between old and new implementations
@@ -364,6 +391,7 @@ overrides:
 ### Problem Statement
 
 **Current Gap** (from SPEC-015):
+
 - SPEC-015 provides assessment and state migration tools
 - No support for running hybrid workflows
 - No task routing between systems
@@ -371,6 +399,7 @@ overrides:
 ### Proposed Solution
 
 **Architecture**:
+
 ```
 .claude/lib/workflow/hybrid-executor.cjs (NEW)
 +-- HybridExecutor
@@ -384,15 +413,16 @@ overrides:
 ```
 
 **Configuration**:
+
 ```yaml
 # .claude/config.yaml
 hybrid_execution:
   enabled: true
   default_system: agent-studio
   routing_rules:
-    - pattern: "legacy/*"
+    - pattern: 'legacy/*'
       system: conductor-main
-    - pattern: "new/*"
+    - pattern: 'new/*'
       system: agent-studio
   sync_interval: 5000 # ms
 ```
@@ -402,6 +432,7 @@ hybrid_execution:
 #### Task 19.1: Create Hybrid Executor (~6 hours)
 
 **Subtasks**:
+
 - [ ] **19.1.1** Create task router with rule-based routing (~2 hours)
 - [ ] **19.1.2** Implement state synchronization (~2 hours)
 - [ ] **19.1.3** Implement result normalization (~1 hour)
@@ -410,6 +441,7 @@ hybrid_execution:
 #### Task 19.2: Create System Adapters (~6 hours)
 
 **Subtasks**:
+
 - [ ] **19.2.1** Create conductor-main adapter (mock interface) (~2 hours)
 - [ ] **19.2.2** Create Agent-Studio adapter (~1 hour)
 - [ ] **19.2.3** Implement task format translation (~2 hours)
@@ -418,6 +450,7 @@ hybrid_execution:
 #### Task 19.3: Integration with SPEC-015 (~4 hours)
 
 **Subtasks**:
+
 - [ ] **19.3.1** Extend migration assessment for hybrid mode (~1 hour)
 - [ ] **19.3.2** Add hybrid metrics to monitoring (~1 hour)
 - [ ] **19.3.3** Create gradual migration workflow (~2 hours)
@@ -425,12 +458,14 @@ hybrid_execution:
 ### Success Criteria
 
 **Functional**:
+
 - [ ] Tasks route correctly based on rules
 - [ ] State synchronizes between systems
 - [ ] Results normalize to common format
 - [ ] Integration with SPEC-015 migration tools
 
 **Quality**:
+
 - [ ] 18+ new tests passing
 - [ ] <100ms routing decision time
 - [ ] <500ms state sync latency
@@ -448,6 +483,7 @@ hybrid_execution:
 **User Story**: "As a workflow maintainer, I want to version my workflows and safely migrate running workflows to new versions, so that I can evolve workflows without disrupting active executions."
 
 **Business Value**:
+
 - Safe workflow evolution with rollback capability
 - Blue-green deployment reduces downtime to zero
 - Migration scripts ensure data compatibility
@@ -455,6 +491,7 @@ hybrid_execution:
 ### Problem Statement
 
 **Current Gap**:
+
 - Workflows have no version metadata
 - No mechanism to migrate running workflows
 - Breaking changes can corrupt active workflows
@@ -462,6 +499,7 @@ hybrid_execution:
 ### Proposed Solution
 
 **Architecture**:
+
 ```
 .claude/lib/workflow/workflow-versioning.cjs (NEW)
 +-- VersionManager
@@ -476,14 +514,13 @@ hybrid_execution:
 ```
 
 **Version Metadata**:
+
 ```json
 {
   "workflowId": "feature-development",
   "version": "2.1.0",
   "minCompatibleVersion": "2.0.0",
-  "migrations": [
-    { "from": "2.0.x", "to": "2.1.0", "script": "migrate-2.0-to-2.1.cjs" }
-  ],
+  "migrations": [{ "from": "2.0.x", "to": "2.1.0", "script": "migrate-2.0-to-2.1.cjs" }],
   "changelog": ["Added security review phase", "Renamed phase3 to review"]
 }
 ```
@@ -493,6 +530,7 @@ hybrid_execution:
 #### Task 20.1: Create Version Manager (~6 hours)
 
 **Subtasks**:
+
 - [ ] **20.1.1** Implement version registry with semantic versioning (~2 hours)
 - [ ] **20.1.2** Implement version retrieval and listing (~1 hour)
 - [ ] **20.1.3** Implement active version management (~1 hour)
@@ -501,6 +539,7 @@ hybrid_execution:
 #### Task 20.2: Create Migration Engine (~8 hours)
 
 **Subtasks**:
+
 - [ ] **20.2.1** Implement migration script execution (~2 hours)
 - [ ] **20.2.2** Implement state transformation (~2 hours)
 - [ ] **20.2.3** Implement migration validation (~2 hours)
@@ -509,6 +548,7 @@ hybrid_execution:
 #### Task 20.3: Blue-Green Deployment Support (~4 hours)
 
 **Subtasks**:
+
 - [ ] **20.3.1** Implement version routing for new executions (~2 hours)
 - [ ] **20.3.2** Implement gradual traffic shifting (~1 hour)
 - [ ] **20.3.3** Add rollback triggers (~1 hour)
@@ -516,12 +556,14 @@ hybrid_execution:
 ### Success Criteria
 
 **Functional**:
+
 - [ ] Version creation and retrieval working
 - [ ] State migration between versions working
 - [ ] Blue-green routing functional
 - [ ] Rollback to previous version working
 
 **Quality**:
+
 - [ ] 22+ new tests passing
 - [ ] <100ms version lookup
 - [ ] Migration validation catches 95%+ of issues
@@ -539,6 +581,7 @@ hybrid_execution:
 **User Story**: "As a migration engineer, I want adapters that wrap legacy APIs so I can gradually replace them with new implementations without changing consumers."
 
 **Business Value**:
+
 - Non-disruptive migration path
 - Enables A/B testing of new implementations
 - Provides fallback to legacy on errors
@@ -546,6 +589,7 @@ hybrid_execution:
 ### Proposed Solution
 
 **Architecture**:
+
 ```
 .claude/lib/integration/legacy-adapter.cjs (NEW)
 +-- LegacyAdapter
@@ -562,6 +606,7 @@ hybrid_execution:
 #### Task 21.1: Create Legacy Adapter Framework (~6 hours)
 
 **Subtasks**:
+
 - [ ] **21.1.1** Create adapter wrapper with routing (~2 hours)
 - [ ] **21.1.2** Implement error handling and fallback (~1 hour)
 - [ ] **21.1.3** Implement metrics collection (~1 hour)
@@ -570,6 +615,7 @@ hybrid_execution:
 #### Task 21.2: Create Feature Toggle System (~4 hours)
 
 **Subtasks**:
+
 - [ ] **21.2.1** Implement percentage-based routing (~1 hour)
 - [ ] **21.2.2** Implement gradual ramp-up (~1 hour)
 - [ ] **21.2.3** Add override capabilities (~1 hour)
@@ -578,6 +624,7 @@ hybrid_execution:
 #### Task 21.3: Integration Testing (~4 hours)
 
 **Subtasks**:
+
 - [ ] **21.3.1** Create mock legacy system (~1 hour)
 - [ ] **21.3.2** Test adapter behavior under load (~1 hour)
 - [ ] **21.3.3** Test fallback scenarios (~1 hour)
@@ -586,12 +633,14 @@ hybrid_execution:
 ### Success Criteria
 
 **Functional**:
+
 - [ ] Adapter wrapping working
 - [ ] Routing based on feature toggles
 - [ ] Fallback on errors working
 - [ ] Metrics collection active
 
 **Quality**:
+
 - [ ] 18+ new tests passing
 - [ ] <10ms adapter overhead
 - [ ] Fallback success rate >99%
@@ -609,6 +658,7 @@ hybrid_execution:
 **User Story**: "As a developer running workflows with 100+ tasks, I want the system to handle large workflows efficiently without memory exhaustion or slow query times."
 
 **Business Value**:
+
 - Enables 10x larger workflow scale (1000+ tasks)
 - Reduces memory usage by 50-70%
 - Maintains query performance at scale
@@ -616,6 +666,7 @@ hybrid_execution:
 ### Problem Statement
 
 **Current Gap** (from SPEC-013, SPEC-014):
+
 - Performance profiled and optimized for 100-500 tasks
 - No lazy loading for workflow definitions
 - Full state loaded into memory on resume
@@ -624,6 +675,7 @@ hybrid_execution:
 ### Proposed Solution
 
 **Architecture**:
+
 ```
 .claude/lib/workflow/workflow-optimizer.cjs (NEW)
 +-- LazyLoader
@@ -643,6 +695,7 @@ hybrid_execution:
 #### Task 22.1: Implement Lazy Loading (~6 hours)
 
 **Subtasks**:
+
 - [ ] **22.1.1** Create lazy loader with on-demand section loading (~2 hours)
 - [ ] **22.1.2** Implement predictive prefetching (~2 hours)
 - [ ] **22.1.3** Add cache integration (~1 hour)
@@ -651,6 +704,7 @@ hybrid_execution:
 #### Task 22.2: Implement Caching Layer (~4 hours)
 
 **Subtasks**:
+
 - [ ] **22.2.1** Create cache manager with LRU eviction (~1 hour)
 - [ ] **22.2.2** Implement pattern-based invalidation (~1 hour)
 - [ ] **22.2.3** Add cache statistics (~1 hour)
@@ -659,6 +713,7 @@ hybrid_execution:
 #### Task 22.3: Implement Result Streaming (~4 hours)
 
 **Subtasks**:
+
 - [ ] **22.3.1** Create stream processor with chunking (~1 hour)
 - [ ] **22.3.2** Implement transform streams (~1 hour)
 - [ ] **22.3.3** Integrate with analytics queries (~1 hour)
@@ -667,6 +722,7 @@ hybrid_execution:
 #### Task 22.4: Memory Optimization (~4 hours)
 
 **Subtasks**:
+
 - [ ] **22.4.1** Implement state compression for inactive workflows (~1 hour)
 - [ ] **22.4.2** Add memory budget enforcement (~1 hour)
 - [ ] **22.4.3** Create memory pressure alerts (~1 hour)
@@ -675,17 +731,20 @@ hybrid_execution:
 ### Success Criteria
 
 **Functional**:
+
 - [ ] Lazy loading reduces initial load time by 50%
 - [ ] Caching improves repeat query performance by 80%
 - [ ] Streaming handles 10,000+ result sets
 - [ ] Memory stays within budget under load
 
 **Quality**:
+
 - [ ] 28+ new tests passing
 - [ ] Memory usage <200MB for 1000 tasks
 - [ ] Query time <500ms at 10,000 scale
 
 **Performance Targets**:
+
 - Workflow definition load: <100ms (lazy) vs <500ms (eager)
 - Cache hit rate: >80% for repeated queries
 - Memory per 100 tasks: <10MB
@@ -706,15 +765,18 @@ hybrid_execution:
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Spawn Command**:
+
 ```javascript
 Task({
-  subagent_type: "reflection-agent",
-  description: "Session reflection and learning extraction",
-  prompt: "You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
-})
+  subagent_type: 'reflection-agent',
+  description: 'Session reflection and learning extraction',
+  prompt:
+    'You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created).',
+});
 ```
 
 **Success Criteria**:
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
@@ -801,13 +863,13 @@ See detailed risk assessment in: `.claude/context/plans/phase-4-risk-assessment.
 
 ### High-Impact Risks
 
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| Fan-out coordination complexity | HIGH | MEDIUM | Start with simple strategies, add complexity incrementally |
-| Workflow composition cycles | HIGH | LOW | DFS cycle detection (implemented in SPEC-018) |
-| Hybrid execution state drift | HIGH | MEDIUM | Bi-directional sync with conflict resolution |
-| Migration data loss | HIGH | LOW | Backup before migration, dry-run mode |
-| Performance regression at scale | MEDIUM | MEDIUM | Continuous profiling, performance gates |
+| Risk                            | Impact | Probability | Mitigation                                                 |
+| ------------------------------- | ------ | ----------- | ---------------------------------------------------------- |
+| Fan-out coordination complexity | HIGH   | MEDIUM      | Start with simple strategies, add complexity incrementally |
+| Workflow composition cycles     | HIGH   | LOW         | DFS cycle detection (implemented in SPEC-018)              |
+| Hybrid execution state drift    | HIGH   | MEDIUM      | Bi-directional sync with conflict resolution               |
+| Migration data loss             | HIGH   | LOW         | Backup before migration, dry-run mode                      |
+| Performance regression at scale | MEDIUM | MEDIUM      | Continuous profiling, performance gates                    |
 
 ---
 
@@ -816,6 +878,7 @@ See detailed risk assessment in: `.claude/context/plans/phase-4-risk-assessment.
 ### Phase 4 Completion Checklist
 
 **Functional Requirements**:
+
 - [ ] SPEC-017: Fan-out/fan-in, conditionals, loops working
 - [ ] SPEC-018: Workflow composition and nesting functional
 - [ ] SPEC-019: Hybrid execution with conductor-main working
@@ -824,6 +887,7 @@ See detailed risk assessment in: `.claude/context/plans/phase-4-risk-assessment.
 - [ ] SPEC-022: Performance optimizations achieving targets
 
 **Quality Gates**:
+
 - [ ] 160+ new tests passing
 - [ ] 90%+ test pass rate across all SPECs
 - [ ] Performance targets met for all components
@@ -831,6 +895,7 @@ See detailed risk assessment in: `.claude/context/plans/phase-4-risk-assessment.
 - [ ] Memory usage <200MB at 1000 tasks
 
 **Integration Verification**:
+
 - [ ] Phase 0-3 features still work (regression testing)
 - [ ] CLAUDE.md updated with Phase 4 features
 - [ ] Documentation complete for all 6 features
@@ -840,18 +905,18 @@ See detailed risk assessment in: `.claude/context/plans/phase-4-risk-assessment.
 
 ## Deliverables Summary
 
-| Deliverable | Location | Status |
-|-------------|----------|--------|
-| Workflow patterns module | `.claude/lib/workflow/workflow-patterns.cjs` | TBD |
-| Workflow composer module | `.claude/lib/workflow/workflow-composer.cjs` | TBD |
-| Hybrid executor module | `.claude/lib/workflow/hybrid-executor.cjs` | TBD |
-| Version manager module | `.claude/lib/workflow/workflow-versioning.cjs` | TBD |
-| Legacy adapter framework | `.claude/lib/integration/legacy-adapter.cjs` | TBD |
-| Performance optimizer | `.claude/lib/workflow/workflow-optimizer.cjs` | TBD |
-| Test suites (6 features) | `tests/phase-4/` | TBD |
-| Architecture documentation | `.claude/context/plans/phase-4-architecture.md` | TBD |
-| Risk assessment | `.claude/context/plans/phase-4-risk-assessment.md` | TBD |
-| ADRs (3 decisions) | `.claude/context/memory/decisions.md` | TBD |
+| Deliverable                | Location                                           | Status |
+| -------------------------- | -------------------------------------------------- | ------ |
+| Workflow patterns module   | `.claude/lib/workflow/workflow-patterns.cjs`       | TBD    |
+| Workflow composer module   | `.claude/lib/workflow/workflow-composer.cjs`       | TBD    |
+| Hybrid executor module     | `.claude/lib/workflow/hybrid-executor.cjs`         | TBD    |
+| Version manager module     | `.claude/lib/workflow/workflow-versioning.cjs`     | TBD    |
+| Legacy adapter framework   | `.claude/lib/integration/legacy-adapter.cjs`       | TBD    |
+| Performance optimizer      | `.claude/lib/workflow/workflow-optimizer.cjs`      | TBD    |
+| Test suites (6 features)   | `tests/phase-4/`                                   | TBD    |
+| Architecture documentation | `.claude/context/plans/phase-4-architecture.md`    | TBD    |
+| Risk assessment            | `.claude/context/plans/phase-4-risk-assessment.md` | TBD    |
+| ADRs (3 decisions)         | `.claude/context/memory/decisions.md`              | TBD    |
 
 ---
 
@@ -859,14 +924,14 @@ See detailed risk assessment in: `.claude/context/plans/phase-4-risk-assessment.
 
 Phase 4 outputs enable Phase 5 (ML-Based Evolution & Continuous Learning):
 
-| Phase 4 Feature | Phase 5 Enablement |
-|-----------------|-------------------|
-| SPEC-017 (Patterns) | ML can learn optimal pattern selection |
+| Phase 4 Feature        | Phase 5 Enablement                             |
+| ---------------------- | ---------------------------------------------- |
+| SPEC-017 (Patterns)    | ML can learn optimal pattern selection         |
 | SPEC-018 (Composition) | Auto-generate composed workflows from patterns |
-| SPEC-019 (Hybrid) | A/B testing data for ML training |
-| SPEC-020 (Versioning) | Version comparison for improvement detection |
-| SPEC-021 (Adapters) | Gradual replacement based on ML confidence |
-| SPEC-022 (Performance) | Performance data feeds ML optimization |
+| SPEC-019 (Hybrid)      | A/B testing data for ML training               |
+| SPEC-020 (Versioning)  | Version comparison for improvement detection   |
+| SPEC-021 (Adapters)    | Gradual replacement based on ML confidence     |
+| SPEC-022 (Performance) | Performance data feeds ML optimization         |
 
 ---
 

@@ -56,7 +56,7 @@ class IntegrationTestFramework {
       scenarioId,
       steps,
       expectedOutcome,
-      addedAt: new Date().toISOString()
+      addedAt: new Date().toISOString(),
     });
 
     return this.scenarios.length - 1; // Return scenario index
@@ -88,7 +88,7 @@ class IntegrationTestFramework {
           action: step.action,
           status: result.status || 'success',
           duration: stepDuration,
-          data: result.data || {}
+          data: result.data || {},
         });
 
         // Stop execution if step failed (unless continueOnFailure is set)
@@ -106,7 +106,7 @@ class IntegrationTestFramework {
         results,
         duration,
         startedAt: new Date(startTime).toISOString(),
-        completedAt: new Date().toISOString()
+        completedAt: new Date().toISOString(),
       };
 
       this.executionLog.push(executionResult);
@@ -120,7 +120,7 @@ class IntegrationTestFramework {
         error: error.message,
         duration,
         startedAt: new Date(startTime).toISOString(),
-        completedAt: new Date().toISOString()
+        completedAt: new Date().toISOString(),
       };
 
       this.executionLog.push(executionResult);
@@ -156,8 +156,8 @@ class IntegrationTestFramework {
       data: {
         spec: step.spec,
         action: step.action,
-        executed: true
-      }
+        executed: true,
+      },
     };
   }
 
@@ -206,7 +206,7 @@ class IntegrationTestFramework {
       succeeded,
       failed,
       successRate: results.length > 0 ? succeeded.length / results.length : 0,
-      failureRate: results.length > 0 ? failed.length / results.length : 0
+      failureRate: results.length > 0 ? failed.length / results.length : 0,
     };
   }
 
@@ -261,7 +261,9 @@ class IntegrationTestFramework {
         lines.push('|------|------|--------|--------|----------|');
 
         for (const step of result.results) {
-          lines.push(`| ${step.stepIndex + 1} | ${step.spec} | ${step.action} | ${step.status} | ${step.duration}ms |`);
+          lines.push(
+            `| ${step.stepIndex + 1} | ${step.spec} | ${step.action} | ${step.status} | ${step.duration}ms |`
+          );
         }
       }
 
@@ -282,12 +284,16 @@ class IntegrationTestFramework {
     }
 
     if (avgDuration > 5000) {
-      lines.push(`**Performance Warning:** Average scenario duration (${avgDuration.toFixed(0)}ms) exceeds 5s target.`);
+      lines.push(
+        `**Performance Warning:** Average scenario duration (${avgDuration.toFixed(0)}ms) exceeds 5s target.`
+      );
       lines.push('');
     }
 
     if (isolation.successRate < 0.8) {
-      lines.push(`**Quality Warning:** Success rate (${(isolation.successRate * 100).toFixed(2)}%) below 80% target.`);
+      lines.push(
+        `**Quality Warning:** Success rate (${(isolation.successRate * 100).toFixed(2)}%) below 80% target.`
+      );
       lines.push('');
     }
 

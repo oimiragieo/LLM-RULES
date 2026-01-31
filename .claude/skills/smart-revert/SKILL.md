@@ -281,10 +281,12 @@ Update context files if revert affects product features.
 Instead of asking "Which commits?", ask "Which feature/bug?"
 
 **Old Workflow:**
+
 1. User: "Revert commit abc123"
 2. Agent: Runs `git revert abc123`
 
 **New Workflow (Git Notes-Based):**
+
 1. User: "Revert the dark mode feature"
 2. Agent:
    - Search git notes for "dark mode" or feature ID
@@ -384,18 +386,21 @@ smart-revert workflow:
 ### Benefits
 
 **For Users:**
+
 - Feature-level revert (not commit-level)
 - No need to remember commit hashes
 - Automatic correct order (reverse chronological)
 - Dependency checking prevents breaking other features
 
 **For Safety:**
+
 - Git notes provide context for every commit
 - Reverse order prevents conflicts
 - Verification before execution
 - Audit trail preserved in git notes
 
 **For Automation:**
+
 - Integrates with git-notes-audit hook (automatic note creation)
 - Works with existing conductor workflow
 - No manual note maintenance required
@@ -417,6 +422,7 @@ The `git-notes-audit.cjs` hook automatically creates git notes for every commit:
 ```
 
 This enables:
+
 - Automatic task grouping (no manual note management)
 - Dependency detection (via Depends-On field)
 - Context-aware revert decisions

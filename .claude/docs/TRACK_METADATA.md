@@ -22,29 +22,29 @@ The Track Metadata Schema provides a consistent structure for enriched task trac
 
 Every track metadata file **MUST** include:
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `trackId` | string | Unique identifier (format: `shortname_YYYYMMDD`) | `"user-auth_20260129"` |
-| `type` | enum | Type of work (`feature`, `bug`, `chore`, `refactor`, `docs`) | `"feature"` |
-| `status` | enum | Current status (`new`, `in_progress`, `review`, `completed`, `cancelled`) | `"in_progress"` |
+| Field     | Type   | Description                                                               | Example                |
+| --------- | ------ | ------------------------------------------------------------------------- | ---------------------- |
+| `trackId` | string | Unique identifier (format: `shortname_YYYYMMDD`)                          | `"user-auth_20260129"` |
+| `type`    | enum   | Type of work (`feature`, `bug`, `chore`, `refactor`, `docs`)              | `"feature"`            |
+| `status`  | enum   | Current status (`new`, `in_progress`, `review`, `completed`, `cancelled`) | `"in_progress"`        |
 
 ### Optional Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `phaseState` | enum | Spec-driven workflow phase (`draft`, `spec_review`, `plan_ready`, `implementation`, `qa`, `deployed`) |
-| `description` | string | User-friendly description (min 10 characters) |
-| `priority` | enum | Business priority (`low`, `medium`, `high`, `critical`) |
-| `classification` | array | Category tags (`security`, `performance`, `ux`, `dx`, `testing`, `documentation`, `technical-debt`) |
-| `estimatedEffort` | object | Estimated effort with breakdown |
-| `actualEffort` | object | Actual effort spent (for tracking accuracy) |
-| `acceptance_criteria` | array | List of completion criteria |
-| `dependencies` | array | Other track IDs this depends on |
-| `created_at` | datetime | ISO 8601 creation timestamp |
-| `updated_at` | datetime | ISO 8601 last update timestamp |
-| `assignee` | string | Assigned agent or person |
-| `blocked_by` | array | Track IDs blocking this one |
-| `blocks` | array | Track IDs blocked by this one |
+| Field                 | Type     | Description                                                                                           |
+| --------------------- | -------- | ----------------------------------------------------------------------------------------------------- |
+| `phaseState`          | enum     | Spec-driven workflow phase (`draft`, `spec_review`, `plan_ready`, `implementation`, `qa`, `deployed`) |
+| `description`         | string   | User-friendly description (min 10 characters)                                                         |
+| `priority`            | enum     | Business priority (`low`, `medium`, `high`, `critical`)                                               |
+| `classification`      | array    | Category tags (`security`, `performance`, `ux`, `dx`, `testing`, `documentation`, `technical-debt`)   |
+| `estimatedEffort`     | object   | Estimated effort with breakdown                                                                       |
+| `actualEffort`        | object   | Actual effort spent (for tracking accuracy)                                                           |
+| `acceptance_criteria` | array    | List of completion criteria                                                                           |
+| `dependencies`        | array    | Other track IDs this depends on                                                                       |
+| `created_at`          | datetime | ISO 8601 creation timestamp                                                                           |
+| `updated_at`          | datetime | ISO 8601 last update timestamp                                                                        |
+| `assignee`            | string   | Assigned agent or person                                                                              |
+| `blocked_by`          | array    | Track IDs blocking this one                                                                           |
+| `blocks`              | array    | Track IDs blocked by this one                                                                         |
 
 ### Field Details
 
@@ -65,34 +65,34 @@ Examples:
 
 #### type Enum
 
-| Value | Use For | Example |
-|-------|---------|---------|
-| `feature` | New functionality | "Add user authentication" |
-| `bug` | Defect fixes | "Fix login crash" |
-| `chore` | Maintenance tasks | "Update dependencies" |
+| Value      | Use For                                   | Example                    |
+| ---------- | ----------------------------------------- | -------------------------- |
+| `feature`  | New functionality                         | "Add user authentication"  |
+| `bug`      | Defect fixes                              | "Fix login crash"          |
+| `chore`    | Maintenance tasks                         | "Update dependencies"      |
 | `refactor` | Code improvements without behavior change | "Extract common utilities" |
-| `docs` | Documentation work | "Write API guide" |
+| `docs`     | Documentation work                        | "Write API guide"          |
 
 #### status Enum
 
-| Value | Meaning | Typical Duration |
-|-------|---------|------------------|
-| `new` | Not yet started | Days to weeks |
-| `in_progress` | Active work | Hours to days |
-| `review` | Under review/QA | Hours |
-| `completed` | Done and verified | Permanent |
-| `cancelled` | Work cancelled | Permanent |
+| Value         | Meaning           | Typical Duration |
+| ------------- | ----------------- | ---------------- |
+| `new`         | Not yet started   | Days to weeks    |
+| `in_progress` | Active work       | Hours to days    |
+| `review`      | Under review/QA   | Hours            |
+| `completed`   | Done and verified | Permanent        |
+| `cancelled`   | Work cancelled    | Permanent        |
 
 #### phaseState Enum (Spec-Driven Workflow)
 
-| Phase | Description | Artifacts |
-|-------|-------------|-----------|
-| `draft` | Initial context gathering | `context/`, `product.md`, `tech-stack.md` |
-| `spec_review` | Specification review | `spec.md` |
-| `plan_ready` | Planning complete, ready to implement | `plan.md` |
-| `implementation` | Active coding | Code commits |
-| `qa` | Quality assurance and testing | Test results, QA signoff |
-| `deployed` | Deployed to production | Deployment logs |
+| Phase            | Description                           | Artifacts                                 |
+| ---------------- | ------------------------------------- | ----------------------------------------- |
+| `draft`          | Initial context gathering             | `context/`, `product.md`, `tech-stack.md` |
+| `spec_review`    | Specification review                  | `spec.md`                                 |
+| `plan_ready`     | Planning complete, ready to implement | `plan.md`                                 |
+| `implementation` | Active coding                         | Code commits                              |
+| `qa`             | Quality assurance and testing         | Test results, QA signoff                  |
+| `deployed`       | Deployed to production                | Deployment logs                           |
 
 **Workflow Flow**: `draft` → `spec_review` → `plan_ready` → `implementation` → `qa` → `deployed`
 
@@ -100,15 +100,15 @@ Examples:
 
 Multiple tags allowed for rich categorization:
 
-| Tag | Use For |
-|-----|---------|
-| `security` | Security-related work (auth, encryption, vulnerability fixes) |
-| `performance` | Performance improvements (caching, optimization) |
-| `ux` | User experience improvements |
-| `dx` | Developer experience improvements |
-| `testing` | Testing infrastructure or coverage |
-| `documentation` | Documentation work |
-| `technical-debt` | Technical debt reduction |
+| Tag              | Use For                                                       |
+| ---------------- | ------------------------------------------------------------- |
+| `security`       | Security-related work (auth, encryption, vulnerability fixes) |
+| `performance`    | Performance improvements (caching, optimization)              |
+| `ux`             | User experience improvements                                  |
+| `dx`             | Developer experience improvements                             |
+| `testing`        | Testing infrastructure or coverage                            |
+| `documentation`  | Documentation work                                            |
+| `technical-debt` | Technical debt reduction                                      |
 
 #### Effort Tracking
 
@@ -127,6 +127,7 @@ Multiple tags allowed for rich categorization:
 ```
 
 **Best Practices**:
+
 - Always provide `estimatedEffort` for features
 - Update `actualEffort` when work completes
 - Compare estimates vs actuals to improve planning
@@ -316,12 +317,13 @@ TaskCreate({
     status: 'new',
     phaseState: 'plan_ready',
     priority: 'high',
-    classification: ['security', 'ux']
-  }
+    classification: ['security', 'ux'],
+  },
 });
 ```
 
 **Benefits**:
+
 - TaskList shows priority and classification
 - TaskUpdate can update track status automatically
 - Reporting tools can aggregate by classification
@@ -333,6 +335,7 @@ TaskCreate({
 For tasks created before schema introduction:
 
 1. **Add minimal metadata**:
+
    ```json
    {
      "trackId": "existing-task_20260129",
@@ -360,6 +363,7 @@ The schema supports **additional properties** (`additionalProperties: true`), en
 - Migration to new schema versions is non-breaking
 
 **Example custom field**:
+
 ```json
 {
   "trackId": "custom_20260129",
@@ -376,6 +380,7 @@ The schema supports **additional properties** (`additionalProperties: true`), en
 ### 1. Always Use Meaningful Descriptions
 
 ❌ Bad:
+
 ```json
 {
   "description": "Fix bug"
@@ -383,6 +388,7 @@ The schema supports **additional properties** (`additionalProperties: true`), en
 ```
 
 ✅ Good:
+
 ```json
 {
   "description": "Fix crash when user enters invalid email format in login form"
@@ -402,6 +408,7 @@ Dependencies enable automatic scheduling and blocking detection.
 ```
 
 **Router can use this to**:
+
 - Prevent starting dependent tracks too early
 - Show critical path in plans
 - Auto-unblock when dependencies complete
@@ -412,13 +419,13 @@ Enable powerful reporting:
 
 ```javascript
 // Find all security-related tracks
-tracks.filter(t => t.classification.includes('security'))
+tracks.filter(t => t.classification.includes('security'));
 
 // Find all technical debt
-tracks.filter(t => t.classification.includes('technical-debt'))
+tracks.filter(t => t.classification.includes('technical-debt'));
 
 // Find high-priority UX work
-tracks.filter(t => t.priority === 'high' && t.classification.includes('ux'))
+tracks.filter(t => t.priority === 'high' && t.classification.includes('ux'));
 ```
 
 ### 4. Update Timestamps
@@ -487,7 +494,7 @@ const metadata = {
   trackId: 'test_20260129',
   type: 'feature',
   status: 'new',
-  description: 'Test metadata'
+  description: 'Test metadata',
 };
 
 if (validate(metadata)) {
@@ -526,6 +533,7 @@ if (validate(metadata)) {
 ```
 
 **Usage**:
+
 ```bash
 node validate-track-metadata.mjs .claude/context/tracks/user-auth_20260129/metadata.json
 ```
@@ -553,6 +561,7 @@ done
 #### 1. Invalid trackId Format
 
 **Error**:
+
 ```json
 {
   "keyword": "pattern",
@@ -562,6 +571,7 @@ done
 ```
 
 **Fix**: Use lowercase letters, numbers, hyphens, underscores, and 8-digit date:
+
 ```json
 {
   "trackId": "user-auth_20260129"
@@ -571,6 +581,7 @@ done
 #### 2. Missing Required Fields
 
 **Error**:
+
 ```json
 {
   "keyword": "required",
@@ -583,6 +594,7 @@ done
 #### 3. Invalid Enum Value
 
 **Error**:
+
 ```json
 {
   "keyword": "enum",
@@ -592,15 +604,17 @@ done
 ```
 
 **Fix**: Use only allowed enum values:
+
 ```json
 {
-  "priority": "high"  // not "urgent" or "p1"
+  "priority": "high" // not "urgent" or "p1"
 }
 ```
 
 #### 4. Description Too Short
 
 **Error**:
+
 ```json
 {
   "keyword": "minLength",
@@ -610,6 +624,7 @@ done
 ```
 
 **Fix**: Provide meaningful description (minimum 10 characters):
+
 ```json
 {
   "description": "Implement user authentication with JWT tokens"
@@ -666,12 +681,12 @@ SPEC-008 adds analytics capabilities to track metadata:
 }
 ```
 
-| Field | Type | Range | Description |
-|-------|------|-------|-------------|
-| `elapsedTimeMs` | number | >= 0 | Elapsed time in milliseconds from track start to completion |
+| Field              | Type   | Range   | Description                                                                                |
+| ------------------ | ------ | ------- | ------------------------------------------------------------------------------------------ |
+| `elapsedTimeMs`    | number | >= 0    | Elapsed time in milliseconds from track start to completion                                |
 | `effortMultiplier` | number | 0.5 - 5 | Ratio of actual to estimated effort (1.0 = perfect estimate, <1.0 = faster, >1.0 = slower) |
-| `riskScore` | number | 0 - 100 | Risk assessment score (0 = low risk, 100 = high risk) |
-| `completionRate` | number | 0 - 100 | Percentage of acceptance criteria completed (0-100) |
+| `riskScore`        | number | 0 - 100 | Risk assessment score (0 = low risk, 100 = high risk)                                      |
+| `completionRate`   | number | 0 - 100 | Percentage of acceptance criteria completed (0-100)                                        |
 
 #### reporting Object
 
@@ -680,31 +695,28 @@ SPEC-008 adds analytics capabilities to track metadata:
   "reporting": {
     "generatedAt": "2026-01-29T10:00:00Z",
     "lastReportPath": ".claude/context/artifacts/reports/analytics-2026-01-29.md",
-    "insights": [
-      "Implementation faster than estimated",
-      "Testing took 80% of estimate"
-    ]
+    "insights": ["Implementation faster than estimated", "Testing took 80% of estimate"]
   }
 }
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `generatedAt` | string (ISO 8601) | Timestamp when last report was generated |
-| `lastReportPath` | string | File path to the most recent analytics report |
-| `insights` | array of strings | Auto-generated insights about track performance |
+| Field            | Type              | Description                                     |
+| ---------------- | ----------------- | ----------------------------------------------- |
+| `generatedAt`    | string (ISO 8601) | Timestamp when last report was generated        |
+| `lastReportPath` | string            | File path to the most recent analytics report   |
+| `insights`       | array of strings  | Auto-generated insights about track performance |
 
 ### Analytics Functions
 
 **Library**: `.claude/lib/utils/track-analytics.cjs`
 
-| Function | Purpose | Returns |
-|----------|---------|---------|
-| `queryByPhase(phaseId, tracks)` | Group tasks by phase with aggregated metrics | `{ phase, tasks, metrics }` |
-| `queryByAgent(agentId, tracks)` | Group tasks by agent with completion metrics | `{ agent, tasks, metrics }` |
-| `queryByStatus(status, tracks)` | Group tasks by status with timeline metrics | `{ status, tasks, metrics }` |
-| `computeProjectMetrics(tracks)` | Aggregate project-wide statistics | `{ completionPercentage, avgEffortMultiplier, ... }` |
-| `generateReport(tracks)` | Create markdown analytics report | Markdown string |
+| Function                        | Purpose                                      | Returns                                              |
+| ------------------------------- | -------------------------------------------- | ---------------------------------------------------- |
+| `queryByPhase(phaseId, tracks)` | Group tasks by phase with aggregated metrics | `{ phase, tasks, metrics }`                          |
+| `queryByAgent(agentId, tracks)` | Group tasks by agent with completion metrics | `{ agent, tasks, metrics }`                          |
+| `queryByStatus(status, tracks)` | Group tasks by status with timeline metrics  | `{ status, tasks, metrics }`                         |
+| `computeProjectMetrics(tracks)` | Aggregate project-wide statistics            | `{ completionPercentage, avgEffortMultiplier, ... }` |
+| `generateReport(tracks)`        | Create markdown analytics report             | Markdown string                                      |
 
 **Example Usage:**
 
@@ -752,6 +764,7 @@ Validates analytics fields on Write/Edit to `metadata.json` files:
 ### Version 1.1.0 (2026-01-29)
 
 **SPEC-008 Release**:
+
 - Added `metrics` object (elapsedTimeMs, effortMultiplier, riskScore, completionRate)
 - Added `reporting` object (generatedAt, lastReportPath, insights)
 - Analytics library (`.claude/lib/utils/track-analytics.cjs`)
@@ -763,6 +776,7 @@ Validates analytics fields on Write/Edit to `metadata.json` files:
 ### Version 1.0.0 (2026-01-29)
 
 **Initial Release** (SPEC-007):
+
 - JSON Schema v7 draft
 - Required fields: trackId, type, status
 - Optional fields: phaseState, description, priority, classification, effort tracking, dependencies, timestamps, assignee, blocking relationships

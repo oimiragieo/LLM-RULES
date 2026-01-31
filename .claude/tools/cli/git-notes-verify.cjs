@@ -39,10 +39,13 @@ function getCommits(range) {
       return [];
     }
 
-    return output.trim().split('\n').map(line => {
-      const [hash, ...messageParts] = line.split('\t');
-      return { hash: hash.trim(), message: messageParts.join('\t') };
-    });
+    return output
+      .trim()
+      .split('\n')
+      .map(line => {
+        const [hash, ...messageParts] = line.split('\t');
+        return { hash: hash.trim(), message: messageParts.join('\t') };
+      });
   } catch (error) {
     console.error(`Error getting commits: ${error.message}`);
     return [];
@@ -83,7 +86,7 @@ function verify(range) {
         notes: null,
         verified: false,
         status: 'MISSING',
-        timestamp: null
+        timestamp: null,
       });
       continue;
     }
@@ -99,7 +102,7 @@ function verify(range) {
       timestamp: verification.timestamp || null,
       taskId: verification.taskId || null,
       agentName: verification.agentName || null,
-      error: verification.error || null
+      error: verification.error || null,
     });
   }
 
@@ -128,7 +131,7 @@ function generateReport(results, range) {
 ## Summary
 
 - **Total Commits**: ${total}
-- **With Notes**: ${withNotes} (${((withNotes/total)*100).toFixed(1)}%)
+- **With Notes**: ${withNotes} (${((withNotes / total) * 100).toFixed(1)}%)
 - **Verified**: ${verified} ✓
 - **Missing**: ${missing} ${missing > 0 ? '⚠' : ''}
 - **Tampered**: ${tampered} ${tampered > 0 ? '🚨' : ''}
@@ -139,9 +142,11 @@ function generateReport(results, range) {
     report += `## ⚠ Missing Audit Notes (${missing})\n\n`;
     report += `| Commit | Message |\n`;
     report += `|--------|----------|\n`;
-    results.filter(r => r.status === 'MISSING').forEach(r => {
-      report += `| ${r.hash} | ${r.message} |\n`;
-    });
+    results
+      .filter(r => r.status === 'MISSING')
+      .forEach(r => {
+        report += `| ${r.hash} | ${r.message} |\n`;
+      });
     report += `\n`;
   }
 
@@ -149,18 +154,22 @@ function generateReport(results, range) {
     report += `## 🚨 Tampered Notes (${tampered})\n\n`;
     report += `| Commit | Message | Error |\n`;
     report += `|--------|---------|-------|\n`;
-    results.filter(r => r.status === 'TAMPERED').forEach(r => {
-      report += `| ${r.hash} | ${r.message} | ${r.error} |\n`;
-    });
+    results
+      .filter(r => r.status === 'TAMPERED')
+      .forEach(r => {
+        report += `| ${r.hash} | ${r.message} | ${r.error} |\n`;
+      });
     report += `\n`;
   }
 
   report += `## Verified Commits (${verified})\n\n`;
   report += `| Commit | Task ID | Agent | Timestamp | Message |\n`;
   report += `|--------|---------|-------|-----------|----------|\n`;
-  results.filter(r => r.verified).forEach(r => {
-    report += `| ${r.hash} | ${r.taskId} | ${r.agentName} | ${r.timestamp} | ${r.message} |\n`;
-  });
+  results
+    .filter(r => r.verified)
+    .forEach(r => {
+      report += `| ${r.hash} | ${r.taskId} | ${r.agentName} | ${r.timestamp} | ${r.message} |\n`;
+    });
 
   return report;
 }
@@ -185,25 +194,31 @@ function printSummary(results) {
 
   if (missing > 0) {
     console.log('⚠ Commits missing audit notes:');
-    results.filter(r => r.status === 'MISSING').forEach(r => {
-      console.log(`  ${r.hash} - ${r.message}`);
-    });
+    results
+      .filter(r => r.status === 'MISSING')
+      .forEach(r => {
+        console.log(`  ${r.hash} - ${r.message}`);
+      });
     console.log('');
   }
 
   if (tampered > 0) {
     console.log('🚨 Commits with tampered notes:');
-    results.filter(r => r.status === 'TAMPERED').forEach(r => {
-      console.log(`  ${r.hash} - ${r.message}`);
-      console.log(`    Error: ${r.error}`);
-    });
+    results
+      .filter(r => r.status === 'TAMPERED')
+      .forEach(r => {
+        console.log(`  ${r.hash} - ${r.message}`);
+        console.log(`    Error: ${r.error}`);
+      });
     console.log('');
   }
 
   console.log('Verified commits:');
-  results.filter(r => r.verified).forEach(r => {
-    console.log(`  ${r.hash} [${r.taskId}] ${r.agentName} - ${r.message}`);
-  });
+  results
+    .filter(r => r.verified)
+    .forEach(r => {
+      console.log(`  ${r.hash} [${r.taskId}] ${r.agentName} - ${r.message}`);
+    });
   console.log('');
 }
 

@@ -4,20 +4,85 @@
  * WorkflowValidator validates workflow structure, dependencies, and constraints.
  */
 
+const fs = require('fs');
+const path = require('path');
+const yaml = require('yaml');
+
 class WorkflowValidator {
   /**
    * Validate complete workflow structure
+   * @param {string|object} workflowOrPath - Workflow object or path to YAML file
+   * @param {object} options - Validation options
+   *   - maxNestingDepth: Maximum allowed nesting depth (default: 10)
+   *   - returnErrors: If true, return {valid, errors} instead of throwing (default: false)
+   * @returns {object|void} - Returns {valid, errors} if returnErrors=true, otherwise throws on error
    */
-  async validate(workflow, options = {}) {
-    const { maxNestingDepth = 10 } = options;
+  async validate(workflowOrPath, options = {}) {
+    const { maxNestingDepth = 10, returnErrors = false } = options;
 
-    // Basic structure validation
+    // Handle file path input
+    let workflow = workflowOrPath;
+    if (typeof workflowOrPath === 'string') {
+      try {
+        const content = fs.readFileSync(workflowOrPath, 'utf8');
+        workflow = yaml.parse(content);
+      } catch (err) {
+        if (returnErrors) {
+          return { valid: false, errors: [`Failed to read workflow file: ${err.message}`] };
+        }
+        throw err;
+      }
+    }
+
+    if (returnErrors) {
+      // Collect validation errors instead of throwing
+      const errors = [];
+
+      try {
+        this._validateStructure(workflow);
+      } catch (err) {
+        errors.push(err.message);
+      }
+
+      try {
+        this._validatePhases(workflow, maxNestingDepth);
+      } catch (err) {
+        errors.push(err.message);
+      }
+
+      try {
+        this._validateVariables(workflow);
+      } catch (err) {
+        errors.push(err.message);
+      }
+
+      // Also validate step schema
+      const stepResult = this.validateStepSchema(workflow);
+      if (!stepResult.valid) {
+        errors.push(...stepResult.errors);
+      }
+
+      // Workflow requirements (if not abstract and has phases)
+      if (!workflow.abstract && workflow.phases) {
+        if (Array.isArray(workflow.phases) && workflow.phases.length === 0) {
+          errors.push('Workflow must have at least one phase');
+        }
+
+        if (Array.isArray(workflow.phases)) {
+          for (const phase of workflow.phases) {
+            if (!phase.subphases && (!phase.tasks || phase.tasks.length === 0)) {
+              errors.push(`Phase '${phase.name}' must have at least one task`);
+            }
+          }
+        }
+      }
+
+      return { valid: errors.length === 0, errors };
+    }
+
+    // Original throwing behavior (default)
     this._validateStructure(workflow);
-
-    // Phase validation
     this._validatePhases(workflow, maxNestingDepth);
-
-    // Variable validation
     this._validateVariables(workflow);
 
     // Workflow requirements
@@ -210,17 +275,16 @@ class WorkflowValidator {
       // Validate each step
       for (let i = 0; i < phase.steps.length; i++) {
         const step = phase.steps[i];
+        const stepNum = i + 1; // Use 1-indexed step numbers for human-readable errors
 
         // Check for required 'id' field
         if (!step.id) {
-          errors.push(`Phase '${phaseName}', step ${i}: missing 'id' field`);
+          errors.push(`Phase '${phaseName}', Step ${stepNum}: missing 'id' field`);
         }
 
         // Check for either 'handler' or 'action' field
         if (!step.handler && !step.action) {
-          errors.push(
-            `Phase '${phaseName}', step ${i}: missing 'handler' or 'action' field`
-          );
+          errors.push(`Phase '${phaseName}', Step ${stepNum}: missing 'handler' or 'action' field`);
         }
       }
     }

@@ -139,19 +139,8 @@ const CATEGORY_PATTERNS = {
     /path traversal/i,
     /injection/i,
   ],
-  VALIDATION_ERROR: [
-    /validation/i,
-    /schema/i,
-    /invalid/i,
-    /missing required/i,
-    /malformed/i,
-  ],
-  TIMEOUT_ERROR: [
-    /timeout/i,
-    /timed out/i,
-    /deadline exceeded/i,
-    /ETIMEDOUT/,
-  ],
+  VALIDATION_ERROR: [/validation/i, /schema/i, /invalid/i, /missing required/i, /malformed/i],
+  TIMEOUT_ERROR: [/timeout/i, /timed out/i, /deadline exceeded/i, /ETIMEDOUT/],
   MEMORY_ERROR: [
     /memory/i,
     /file not found/i,
@@ -160,18 +149,8 @@ const CATEGORY_PATTERNS = {
     /decisions\.md/i,
     /issues\.md/i,
   ],
-  EXECUTION_ERROR: [
-    /spawn/i,
-    /task/i,
-    /agent/i,
-    /TaskUpdate/i,
-  ],
-  RESOURCE_ERROR: [
-    /token limit/i,
-    /context limit/i,
-    /quota exceeded/i,
-    /rate limit/i,
-  ],
+  EXECUTION_ERROR: [/spawn/i, /task/i, /agent/i, /TaskUpdate/i],
+  RESOURCE_ERROR: [/token limit/i, /context limit/i, /quota exceeded/i, /rate limit/i],
 };
 
 /**
@@ -346,12 +325,15 @@ function postToolUse(tool, params, result, context) {
         console.error('[error-capture] Write failed:', writeErr.message);
       }
       // Fallback to stderr
-      console.error('[ERROR-CAPTURE-FALLBACK]', JSON.stringify({
-        errorId: errorEntry.errorId,
-        category: errorEntry.category,
-        severity: errorEntry.severity,
-        message: errorEntry.message,
-      }));
+      console.error(
+        '[ERROR-CAPTURE-FALLBACK]',
+        JSON.stringify({
+          errorId: errorEntry.errorId,
+          category: errorEntry.category,
+          severity: errorEntry.severity,
+          message: errorEntry.message,
+        })
+      );
     }
   } catch (e) {
     // Fail-open: never block agent execution

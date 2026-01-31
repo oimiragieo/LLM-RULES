@@ -20,13 +20,13 @@ This document defines the machine learning architecture for Phase 5 of Agent-Stu
 
 ### Architecture Principles
 
-| Principle | Description |
-|-----------|-------------|
-| **Edge ML** | All inference runs locally in Node.js |
-| **Hybrid Models** | Mix of statistical (Z-score) and ML (clustering) approaches |
+| Principle         | Description                                                        |
+| ----------------- | ------------------------------------------------------------------ |
+| **Edge ML**       | All inference runs locally in Node.js                              |
+| **Hybrid Models** | Mix of statistical (Z-score) and ML (clustering) approaches        |
 | **Interpretable** | Prefer explainable models (decision trees, rules) over black boxes |
-| **Incremental** | Support online learning and incremental updates |
-| **Modular** | Each ML component is independently testable and replaceable |
+| **Incremental**   | Support online learning and incremental updates                    |
+| **Modular**       | Each ML component is independently testable and replaceable        |
 
 ---
 
@@ -34,24 +34,26 @@ This document defines the machine learning architecture for Phase 5 of Agent-Stu
 
 ### 2.1 Model Overview
 
-| Component | Model Type | Library | Rationale |
-|-----------|------------|---------|-----------|
-| **Workflow Clustering** | K-Means | TensorFlow.js or Custom | Group similar workflows for pattern discovery |
-| **Sequence Mining** | Apriori/FP-Growth | Custom JS | Extract "if A then B" rules from task sequences |
-| **Sequence Prediction** | Markov Chain | Custom JS | Predict next likely agent/tool |
-| **Anomaly Detection** | Z-Score + Isolation Forest | Custom JS | Statistical + ML hybrid |
-| **Resource Prediction** | Linear Regression | Custom JS | Simple, interpretable token/memory prediction |
-| **Model Recommendation** | Decision Tree | Custom JS | Explainable model selection |
+| Component                | Model Type                 | Library                 | Rationale                                       |
+| ------------------------ | -------------------------- | ----------------------- | ----------------------------------------------- |
+| **Workflow Clustering**  | K-Means                    | TensorFlow.js or Custom | Group similar workflows for pattern discovery   |
+| **Sequence Mining**      | Apriori/FP-Growth          | Custom JS               | Extract "if A then B" rules from task sequences |
+| **Sequence Prediction**  | Markov Chain               | Custom JS               | Predict next likely agent/tool                  |
+| **Anomaly Detection**    | Z-Score + Isolation Forest | Custom JS               | Statistical + ML hybrid                         |
+| **Resource Prediction**  | Linear Regression          | Custom JS               | Simple, interpretable token/memory prediction   |
+| **Model Recommendation** | Decision Tree              | Custom JS               | Explainable model selection                     |
 
 ### 2.2 Why TensorFlow.js (When Used)
 
 **Pros:**
+
 - Pure JavaScript, runs in Node.js without Python
 - GPU acceleration available via WebGL/WASM
 - Pre-built operations for common ML tasks
 - Active community and documentation
 
 **Cons:**
+
 - Larger bundle size (~5MB)
 - Learning curve for tensor operations
 - Overkill for simple statistical models
@@ -61,6 +63,7 @@ This document defines the machine learning architecture for Phase 5 of Agent-Stu
 ### 2.3 Why Custom Implementations
 
 For simpler models, custom implementations offer:
+
 - **Smaller footprint**: No large dependencies
 - **Full control**: Customize for our specific use case
 - **Transparency**: Easier to debug and explain
@@ -165,11 +168,12 @@ const workflowFeatures = {
   // Resource features (normalized 0-1)
   totalTokens: 0.45,
   maxMemory: 0.23,
-  checkpointCount: 3
+  checkpointCount: 3,
 };
 ```
 
 **Normalization Strategy:**
+
 - **Min-Max Normalization**: For bounded metrics (0-1 range)
 - **Z-Score Normalization**: For unbounded metrics (mean=0, std=1)
 - **One-Hot Encoding**: For categorical features (agent types, tools)
@@ -225,6 +229,7 @@ class WorkflowClusterer {
 ```
 
 **Cluster Interpretation:**
+
 - Cluster 0: "Quick fixes" (short duration, developer-only)
 - Cluster 1: "Full feature" (planner → developer → qa)
 - Cluster 2: "Architecture changes" (architect → developer → security)
@@ -259,8 +264,8 @@ class AssociationRuleMiner {
 
     while (candidates.length > 0) {
       // Count support for each candidate
-      const supported = candidates.filter(c =>
-        this._calculateSupport(c, sequences) >= this.minSupport
+      const supported = candidates.filter(
+        c => this._calculateSupport(c, sequences) >= this.minSupport
       );
 
       if (supported.length === 0) break;
@@ -433,7 +438,7 @@ class ZScoreDetector {
       zscore,
       mean,
       std,
-      threshold: this.threshold
+      threshold: this.threshold,
     };
   }
 
@@ -481,18 +486,18 @@ class ThresholdDetector {
 
     return {
       isAnomaly: anomalies.length > 0,
-      anomalies
+      anomalies,
     };
   }
 }
 
 // Default thresholds
 const DEFAULT_THRESHOLDS = {
-  'task_duration_ms': { max: 600000 }, // 10 minutes
-  'error_rate': { max: 0.1 }, // 10%
-  'memory_mb': { max: 512 }, // 512MB
-  'token_usage': { max: 20000 }, // 20K tokens
-  'concurrent_tasks': { max: 10 }
+  task_duration_ms: { max: 600000 }, // 10 minutes
+  error_rate: { max: 0.1 }, // 10%
+  memory_mb: { max: 512 }, // 512MB
+  token_usage: { max: 20000 }, // 20K tokens
+  concurrent_tasks: { max: 10 },
 };
 ```
 
@@ -516,7 +521,7 @@ class PatternAnomalyDetector {
         type: 'UNUSUAL_SEQUENCE',
         sequence,
         similarity,
-        closestPattern: this._findClosestPattern(sequence)
+        closestPattern: this._findClosestPattern(sequence),
       });
     }
 
@@ -525,13 +530,13 @@ class PatternAnomalyDetector {
       anomalies.push({
         type: 'FORBIDDEN_PATTERN',
         sequence,
-        forbiddenPart: this._extractForbiddenPart(sequence)
+        forbiddenPart: this._extractForbiddenPart(sequence),
       });
     }
 
     return {
       isAnomaly: anomalies.length > 0,
-      anomalies
+      anomalies,
     };
   }
 
@@ -631,7 +636,7 @@ class TokenPredictor {
     return {
       tokens: Math.max(0, Math.round(prediction)),
       confidence: this._calculateConfidence(features),
-      features: this._explainFeatures(features)
+      features: this._explainFeatures(features),
     };
   }
 }
@@ -661,7 +666,7 @@ class ModelRecommender {
     return {
       model: result.label,
       confidence: result.confidence,
-      reasoning: this._generateReasoning(features, result.path)
+      reasoning: this._generateReasoning(features, result.path),
     };
   }
 
@@ -680,7 +685,10 @@ class ModelRecommender {
 
     // Split data
     const { leftFeatures, leftLabels, rightFeatures, rightLabels } = this._splitData(
-      features, labels, featureIndex, threshold
+      features,
+      labels,
+      featureIndex,
+      threshold
     );
 
     return {
@@ -689,7 +697,7 @@ class ModelRecommender {
       threshold,
       featureName: FEATURE_NAMES[featureIndex],
       left: this._buildTree(leftFeatures, leftLabels, depth + 1, maxDepth),
-      right: this._buildTree(rightFeatures, rightLabels, depth + 1, maxDepth)
+      right: this._buildTree(rightFeatures, rightLabels, depth + 1, maxDepth),
     };
   }
 
@@ -752,13 +760,13 @@ class ModelRecommender {
 
 ### 4.2 Training Schedule
 
-| Trigger | Condition | Models Retrained |
-|---------|-----------|------------------|
-| **Initial** | First 100 samples collected | All models |
-| **Periodic** | Every 24 hours | Pattern detection, predictions |
-| **Data Drift** | Distribution shift detected | Affected model only |
-| **Manual** | CLI command | Specified model |
-| **On Error** | Model accuracy drops >10% | Affected model only |
+| Trigger        | Condition                   | Models Retrained               |
+| -------------- | --------------------------- | ------------------------------ |
+| **Initial**    | First 100 samples collected | All models                     |
+| **Periodic**   | Every 24 hours              | Pattern detection, predictions |
+| **Data Drift** | Distribution shift detected | Affected model only            |
+| **Manual**     | CLI command                 | Specified model                |
+| **On Error**   | Model accuracy drops >10%   | Affected model only            |
 
 ### 4.3 Model Versioning
 
@@ -787,13 +795,13 @@ const AB_TEST_CONFIG = {
   'model-recommender': {
     enabled: true,
     variants: {
-      'control': { weight: 0.5, model: 'v1.0.0' },
-      'treatment': { weight: 0.5, model: 'v1.1.0' }
+      control: { weight: 0.5, model: 'v1.0.0' },
+      treatment: { weight: 0.5, model: 'v1.1.0' },
     },
     metrics: ['accuracy', 'user_override_rate', 'task_success_rate'],
     minSamples: 100,
-    significance: 0.95
-  }
+    significance: 0.95,
+  },
 };
 ```
 
@@ -846,12 +854,12 @@ const AB_TEST_CONFIG = {
 
 ### 5.2 Performance Requirements
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Inference Latency** | <10ms | p99 latency |
-| **Model Load Time** | <100ms | Cold start |
-| **Memory Footprint** | <50MB | Per model |
-| **CPU Usage** | <5% baseline | Average overhead |
+| Metric                | Target       | Measurement      |
+| --------------------- | ------------ | ---------------- |
+| **Inference Latency** | <10ms        | p99 latency      |
+| **Model Load Time**   | <100ms       | Cold start       |
+| **Memory Footprint**  | <50MB        | Per model        |
+| **CPU Usage**         | <5% baseline | Average overhead |
 
 ### 5.3 Caching Strategy
 
@@ -900,7 +908,7 @@ if (process.env.ML_AUTO_MODEL === 'true') {
     taskType: classifiedIntent,
     complexity: complexityScore,
     tools: estimatedTools,
-    historical: taskHistory
+    historical: taskHistory,
   });
 
   if (recommendation.confidence >= 0.8) {
@@ -916,7 +924,7 @@ if (process.env.ML_AUTO_MODEL === 'true') {
 // .claude/hooks/ml/pre-spawn-prediction.cjs
 module.exports = {
   trigger: 'PreToolUse(Task)',
-  execute: async (input) => {
+  execute: async input => {
     if (!process.env.ML_RESOURCE_PREDICTION) return input;
 
     const features = extractFeatures(input.toolInput.prompt);
@@ -925,11 +933,11 @@ module.exports = {
     // Add prediction to spawn metadata
     input.toolInput.metadata = {
       ...input.toolInput.metadata,
-      mlPrediction: prediction
+      mlPrediction: prediction,
     };
 
     return input;
-  }
+  },
 };
 ```
 
@@ -951,7 +959,7 @@ module.exports = {
       eventBus.emit('anomaly_detected', {
         tool,
         anomaly: anomalyResult,
-        context
+        context,
       });
 
       // Trigger self-healing if enabled
@@ -961,7 +969,7 @@ module.exports = {
     }
 
     return { tool, params, result };
-  }
+  },
 };
 ```
 
@@ -971,21 +979,21 @@ module.exports = {
 
 ### 7.1 Model Security
 
-| Threat | Mitigation |
-|--------|------------|
-| **Model Tampering** | Checksum verification on model load |
-| **Adversarial Inputs** | Input validation, outlier detection |
-| **Data Poisoning** | Training data validation, anomaly filtering |
-| **Model Extraction** | Models stored locally, not exposed via API |
+| Threat                 | Mitigation                                  |
+| ---------------------- | ------------------------------------------- |
+| **Model Tampering**    | Checksum verification on model load         |
+| **Adversarial Inputs** | Input validation, outlier detection         |
+| **Data Poisoning**     | Training data validation, anomaly filtering |
+| **Model Extraction**   | Models stored locally, not exposed via API  |
 
 ### 7.2 Data Privacy
 
-| Data Type | Privacy Measure |
-|-----------|-----------------|
+| Data Type             | Privacy Measure                               |
+| --------------------- | --------------------------------------------- |
 | **Task Descriptions** | Hash before storage (not stored in plaintext) |
-| **File Paths** | Anonymize to relative paths |
-| **User Information** | Not collected |
-| **Error Messages** | Sensitive data masking (existing) |
+| **File Paths**        | Anonymize to relative paths                   |
+| **User Information**  | Not collected                                 |
+| **Error Messages**    | Sensitive data masking (existing)             |
 
 ### 7.3 Audit Logging
 
@@ -998,7 +1006,7 @@ const mlAuditLog = {
   output: { model: 'sonnet', confidence: 0.85 },
   mlVersion: '1.0.0',
   override: false,
-  sessionId: process.env.CLAUDE_SESSION_ID
+  sessionId: process.env.CLAUDE_SESSION_ID,
 };
 ```
 
@@ -1046,7 +1054,7 @@ class PatternDetector {
       return {
         patterns: [],
         status: 'cold_start',
-        samplesNeeded: this.minSamples - this.samples.length
+        samplesNeeded: this.minSamples - this.samples.length,
       };
     }
 
@@ -1061,32 +1069,32 @@ class PatternDetector {
 
 ### 9.1 Unit Tests
 
-| Component | Test Coverage | Key Tests |
-|-----------|---------------|-----------|
-| K-Means Clustering | 90%+ | Convergence, k selection, edge cases |
-| Association Rules | 90%+ | Support/confidence calculation, pruning |
-| Markov Chain | 90%+ | Transition probabilities, prediction accuracy |
-| Z-Score Detector | 95%+ | Statistical correctness, window handling |
-| Linear Regression | 95%+ | Normal equation, prediction accuracy |
-| Decision Tree | 90%+ | Split selection, pruning, overfitting prevention |
+| Component          | Test Coverage | Key Tests                                        |
+| ------------------ | ------------- | ------------------------------------------------ |
+| K-Means Clustering | 90%+          | Convergence, k selection, edge cases             |
+| Association Rules  | 90%+          | Support/confidence calculation, pruning          |
+| Markov Chain       | 90%+          | Transition probabilities, prediction accuracy    |
+| Z-Score Detector   | 95%+          | Statistical correctness, window handling         |
+| Linear Regression  | 95%+          | Normal equation, prediction accuracy             |
+| Decision Tree      | 90%+          | Split selection, pruning, overfitting prevention |
 
 ### 9.2 Integration Tests
 
-| Scenario | Expected Outcome |
-|----------|------------------|
-| **End-to-end pattern detection** | Patterns extracted from 100+ task sequences |
-| **Anomaly detection + healing** | Anomaly injected -> detected -> healed |
-| **Resource prediction before spawn** | Prediction available, task succeeds |
-| **Model recommendation accuracy** | A/B test shows improvement over baseline |
+| Scenario                             | Expected Outcome                            |
+| ------------------------------------ | ------------------------------------------- |
+| **End-to-end pattern detection**     | Patterns extracted from 100+ task sequences |
+| **Anomaly detection + healing**      | Anomaly injected -> detected -> healed      |
+| **Resource prediction before spawn** | Prediction available, task succeeds         |
+| **Model recommendation accuracy**    | A/B test shows improvement over baseline    |
 
 ### 9.3 Chaos Tests
 
-| Injection | Expected Response |
-|-----------|-------------------|
-| **Latency spike** | Detected within 5s, alert generated |
-| **Error burst** | Circuit breaker activated |
-| **Memory leak** | Detected, context compression triggered |
-| **Token exhaustion** | Early warning, checkpoint triggered |
+| Injection            | Expected Response                       |
+| -------------------- | --------------------------------------- |
+| **Latency spike**    | Detected within 5s, alert generated     |
+| **Error burst**      | Circuit breaker activated               |
+| **Memory leak**      | Detected, context compression triggered |
+| **Token exhaustion** | Early warning, checkpoint triggered     |
 
 ---
 
@@ -1111,9 +1119,9 @@ const taskFeatures = {
   historicalSuccessRate: 0.95,
 
   // Context features
-  contextSize: 0.60, // Normalized
+  contextSize: 0.6, // Normalized
   hasSecurityContext: 1, // Binary
-  hasArchitectureContext: 0 // Binary
+  hasArchitectureContext: 0, // Binary
 };
 ```
 
@@ -1133,7 +1141,7 @@ const sequenceFeatures = {
   totalDuration: 45000, // ms
   avgStepDuration: 15000, // ms
   maxStepDuration: 25000, // ms
-  minStepDuration: 8000 // ms
+  minStepDuration: 8000, // ms
 };
 ```
 
@@ -1152,7 +1160,7 @@ function zScoreNormalize(value, mean, std) {
 
 // One-hot encoding
 function oneHot(category, categories) {
-  return categories.map(c => c === category ? 1 : 0);
+  return categories.map(c => (c === category ? 1 : 0));
 }
 
 // Sequence padding

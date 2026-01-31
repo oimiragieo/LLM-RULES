@@ -74,7 +74,7 @@ module.exports = {
 
       // Cleanup temp file
       fs.unlinkSync(tempFile);
-    } catch (error) {
+    } catch (_error) {
       // Note might already exist (re-run), ignore error
       // Hook should not block commit on note failures
     }
@@ -97,7 +97,7 @@ module.exports = {
     // Match: [branch commitHash] message
     // Or: commitHash message (detached HEAD)
     const match = output.match(/\[[\w/-]+\s+([a-f0-9]+)\]|^([a-f0-9]{7,})/m);
-    return match ? (match[1] || match[2]) : null;
+    return match ? match[1] || match[2] : null;
   },
 
   /**
@@ -165,7 +165,8 @@ Hash: ${verificationHash}`.trim();
    * @returns {string} SHA-256 hash (hex)
    */
   computeVerificationHash: function (taskId, commitHash, timestamp, agentName) {
-    return crypto.createHash('sha256')
+    return crypto
+      .createHash('sha256')
       .update(taskId + commitHash + timestamp + agentName)
       .digest('hex');
   },
@@ -199,7 +200,7 @@ Hash: ${verificationHash}`.trim();
         verified: false,
         error: 'Hash mismatch - note may have been tampered with',
         expected: expectedHash,
-        actual: providedHash
+        actual: providedHash,
       };
     }
 
@@ -229,5 +230,5 @@ Hash: ${verificationHash}`.trim();
   escapeForShell: function (str) {
     // Escape double quotes and backslashes for -m "..." argument
     return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\$/g, '\\$');
-  }
+  },
 };

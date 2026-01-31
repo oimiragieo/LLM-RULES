@@ -61,7 +61,10 @@ describe('validatePrompt()', () => {
     const result = validatePrompt(validPrompt);
 
     assert.strictEqual(result.isValid, true);
-    assert.ok(result.score >= MINIMUM_SCORE, `Expected score >= ${MINIMUM_SCORE}, got ${result.score}`);
+    assert.ok(
+      result.score >= MINIMUM_SCORE,
+      `Expected score >= ${MINIMUM_SCORE}, got ${result.score}`
+    );
     assert.ok(result.passed.includes('TaskUpdate Warning Box'));
     assert.ok(result.passed.includes('Task ID Reference'));
   });
@@ -220,9 +223,7 @@ describe('normalizeUnicode() - VULN-001', () => {
 
   test('should detect TaskUpdate with Greek Tau homoglyph', () => {
     const bypass = '\u03A4askUpdate({ taskId: "1", status: "in_progress" })'; // Greek Tau
-    const result = validatePrompt(
-      createMinimalValidPrompt().replace('TaskUpdate', bypass)
-    );
+    const result = validatePrompt(createMinimalValidPrompt().replace('TaskUpdate', bypass));
 
     // After normalization, should still match TaskUpdate pattern
     assert.ok(result.score > 0, 'Should normalize and match pattern');
@@ -230,9 +231,7 @@ describe('normalizeUnicode() - VULN-001', () => {
 
   test('should detect Task ID with Cyrillic lookalikes', () => {
     const bypass = '\u03A4\u0430sk ID: 123'; // Greek Tau + Cyrillic a
-    const result = validatePrompt(
-      createMinimalValidPrompt().replace('Task ID: 456', bypass)
-    );
+    const result = validatePrompt(createMinimalValidPrompt().replace('Task ID: 456', bypass));
 
     // After normalization, should match
     assert.ok(result.passed.includes('Task ID Reference'));
@@ -259,7 +258,14 @@ describe('safeRegexTest() - VULN-002', () => {
   test('should handle ReDoS-safe patterns efficiently', () => {
     // Our bounded patterns should execute quickly even on adversarial input
     const pattern = /\+={10,100}\+[\s\S]{0,500}TASK TRACKING REQUIRED[\s\S]{0,500}={10,100}\+/;
-    const adversarial = '+' + '='.repeat(50) + 'A'.repeat(500) + 'TASK TRACKING REQUIRED' + 'B'.repeat(500) + '='.repeat(50) + '+';
+    const adversarial =
+      '+' +
+      '='.repeat(50) +
+      'A'.repeat(500) +
+      'TASK TRACKING REQUIRED' +
+      'B'.repeat(500) +
+      '='.repeat(50) +
+      '+';
 
     const startTime = Date.now();
     safeRegexTest(pattern, adversarial); // Execute but don't need result
@@ -278,7 +284,7 @@ describe('safeRegexTest() - VULN-002', () => {
 
   test('should handle bounded quantifiers correctly', () => {
     const boundedPattern = /TaskUpdate\s{0,5}\(/;
-    const text1 = 'TaskUpdate(';      // 0 spaces
+    const text1 = 'TaskUpdate('; // 0 spaces
     const text2 = 'TaskUpdate     ('; // 5 spaces
     const text3 = 'TaskUpdate      ('; // 6 spaces (should not match)
 
@@ -463,15 +469,23 @@ Task ID: 1
     const result = validatePrompt(attackPrompt);
 
     // After normalization, should match
-    assert.ok(result.passed.includes('TaskUpdate Warning Box'), 'Should detect after normalization');
+    assert.ok(
+      result.passed.includes('TaskUpdate Warning Box'),
+      'Should detect after normalization'
+    );
   });
 
   test('VULN-002: Should prevent ReDoS attack', () => {
-    const redosPayload = '+' + '='.repeat(100) +
-      'TASK'.repeat(50) + ' ' +
-      'TRACKING'.repeat(50) + ' ' +
+    const redosPayload =
+      '+' +
+      '='.repeat(100) +
+      'TASK'.repeat(50) +
+      ' ' +
+      'TRACKING'.repeat(50) +
+      ' ' +
       'REQUIRED'.repeat(50) +
-      '='.repeat(100) + '+';
+      '='.repeat(100) +
+      '+';
 
     const startTime = Date.now();
     validatePrompt(redosPayload);

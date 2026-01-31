@@ -72,7 +72,10 @@ describe('Performance Profiling - Minimal Tests', () => {
   });
 
   it('should load optimization targets', () => {
-    const { setPerformanceTargets, optimizationPriority } = require('../.claude/lib/utils/optimization-targets.cjs');
+    const {
+      setPerformanceTargets,
+      optimizationPriority,
+    } = require('../.claude/lib/utils/optimization-targets.cjs');
     assert.ok(setPerformanceTargets);
     assert.ok(optimizationPriority);
   });
@@ -88,12 +91,16 @@ describe('Performance Profiling - Minimal Tests', () => {
   });
 
   it('should load report generator', () => {
-    const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+    const {
+      generateProfilingReport,
+    } = require('../.claude/lib/utils/profiling-report-generator.cjs');
     assert.ok(generateProfilingReport);
   });
 
   it('should generate report', () => {
-    const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+    const {
+      generateProfilingReport,
+    } = require('../.claude/lib/utils/profiling-report-generator.cjs');
     const report = generateProfilingReport(
       { fn1: { executionTime: 100 } },
       [{ name: 'fn1', executionTime: 100, percentage: 50 }],

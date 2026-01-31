@@ -38,7 +38,7 @@ function validateFeaturePair(spec1, spec2, testData = {}) {
     issues,
     spec1,
     spec2,
-    checkedAt: new Date().toISOString()
+    checkedAt: new Date().toISOString(),
   };
 }
 
@@ -187,7 +187,7 @@ function detectStateContamination(beforeState, afterState, modifiedSPEC) {
           type: 'added',
           key,
           value: afterState[key],
-          reason: `${modifiedSPEC} added unexpected key`
+          reason: `${modifiedSPEC} added unexpected key`,
         });
       }
     } else if (beforeState[key] !== afterState[key]) {
@@ -198,7 +198,7 @@ function detectStateContamination(beforeState, afterState, modifiedSPEC) {
           key,
           before: beforeState[key],
           after: afterState[key],
-          reason: `${modifiedSPEC} modified unexpected key`
+          reason: `${modifiedSPEC} modified unexpected key`,
         });
       }
     }
@@ -208,7 +208,7 @@ function detectStateContamination(beforeState, afterState, modifiedSPEC) {
     contaminated: differences.length > 0,
     differences,
     modifiedSPEC,
-    checkedAt: new Date().toISOString()
+    checkedAt: new Date().toISOString(),
   };
 }
 
@@ -230,7 +230,7 @@ function getAllowedStateKeys(spec) {
     'SPEC-007': ['trackMetadata', 'metadataPath'],
     'SPEC-008': ['analyticsReport', 'metrics'],
     'SPEC-009': ['adaptiveContext', 'questionsAsked', 'questionsSkipped'],
-    'SPEC-010': ['revertResult', 'revertedCommits']
+    'SPEC-010': ['revertResult', 'revertedCommits'],
   };
 
   return allowedKeys[spec] || [];
@@ -261,7 +261,7 @@ function validateMetadataConsistency(metadata) {
         field: 'trackId',
         issue: 'Invalid trackId format',
         expected: '<name>_<YYYYMMDD>',
-        actual: metadata.trackId
+        actual: metadata.trackId,
       });
     }
   }
@@ -276,7 +276,7 @@ function validateMetadataConsistency(metadata) {
           field,
           issue: 'Invalid timestamp format',
           expected: 'ISO 8601 (YYYY-MM-DDTHH:mm:ss)',
-          actual: metadata[field]
+          actual: metadata[field],
         });
       }
     }
@@ -292,7 +292,7 @@ function validateMetadataConsistency(metadata) {
         field: 'effort',
         issue: 'Actual effort significantly exceeds estimate',
         expected: `<${estTotal * 3} days`,
-        actual: `${actTotal} days`
+        actual: `${actTotal} days`,
       });
     }
   }
@@ -300,7 +300,7 @@ function validateMetadataConsistency(metadata) {
   return {
     consistent: inconsistencies.length === 0,
     inconsistencies,
-    checkedAt: new Date().toISOString()
+    checkedAt: new Date().toISOString(),
   };
 }
 
@@ -330,7 +330,7 @@ function validateMemoryBoundaries(memoryBefore, memoryAfter) {
       type: 'heap',
       growth: `${heapDelta.toFixed(2)}MB`,
       threshold: '50MB',
-      severity: 'warning'
+      severity: 'warning',
     });
   }
 
@@ -340,7 +340,7 @@ function validateMemoryBoundaries(memoryBefore, memoryAfter) {
       type: 'external',
       growth: `${externalDelta.toFixed(2)}MB`,
       threshold: '100MB',
-      severity: 'warning'
+      severity: 'warning',
     });
   }
 
@@ -351,7 +351,7 @@ function validateMemoryBoundaries(memoryBefore, memoryAfter) {
       type: 'total',
       usage: `${totalMemory.toFixed(2)}MB`,
       threshold: '200MB',
-      severity: 'error'
+      severity: 'error',
     });
   }
 
@@ -360,7 +360,7 @@ function validateMemoryBoundaries(memoryBefore, memoryAfter) {
     leaks,
     heapDelta: `${heapDelta.toFixed(2)}MB`,
     externalDelta: `${externalDelta.toFixed(2)}MB`,
-    checkedAt: new Date().toISOString()
+    checkedAt: new Date().toISOString(),
   };
 }
 
@@ -368,5 +368,5 @@ module.exports = {
   validateFeaturePair,
   detectStateContamination,
   validateMetadataConsistency,
-  validateMemoryBoundaries
+  validateMemoryBoundaries,
 };

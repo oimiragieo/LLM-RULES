@@ -24,6 +24,10 @@ const DEFAULT_HOOK_FAILURE_THRESHOLD = 2;
 const DEFAULT_TOOL_FAILURE_THRESHOLD = 5;
 const DEFAULT_AGENT_ERROR_THRESHOLD = 5;
 
+// Memory safety limits (prevent OOM with large error datasets)
+const MAX_INPUT_ERRORS = 10000; // Reject overly large inputs
+const MAX_RESULT_SIZE = 1000; // Limit result array sizes
+
 /**
  * Detect repeated errors (same error message > threshold times)
  * @param {Array<object>} errors - Array of error entries
@@ -33,6 +37,14 @@ const DEFAULT_AGENT_ERROR_THRESHOLD = 5;
 function detectRepeatedErrors(errors, threshold = DEFAULT_REPEATED_THRESHOLD) {
   if (!Array.isArray(errors) || errors.length === 0) {
     return [];
+  }
+
+  // Memory safety: reject overly large inputs
+  if (errors.length > MAX_INPUT_ERRORS) {
+    console.warn(
+      `[detectRepeatedErrors] Input too large (${errors.length} errors). Truncating to ${MAX_INPUT_ERRORS}.`
+    );
+    errors = errors.slice(0, MAX_INPUT_ERRORS);
   }
 
   const messageCounts = new Map();
@@ -58,7 +70,17 @@ function detectRepeatedErrors(errors, threshold = DEFAULT_REPEATED_THRESHOLD) {
     entry.lastSeen = error.timestamp;
   }
 
-  return Array.from(messageCounts.values()).filter(entry => entry.count >= threshold);
+  const results = Array.from(messageCounts.values()).filter(entry => entry.count >= threshold);
+
+  // Memory safety: limit result size
+  if (results.length > MAX_RESULT_SIZE) {
+    console.warn(
+      `[detectRepeatedErrors] Result too large (${results.length} patterns). Truncating to top ${MAX_RESULT_SIZE}.`
+    );
+    return results.sort((a, b) => b.count - a.count).slice(0, MAX_RESULT_SIZE);
+  }
+
+  return results;
 }
 
 /**
@@ -70,6 +92,14 @@ function detectRepeatedErrors(errors, threshold = DEFAULT_REPEATED_THRESHOLD) {
 function detectCascades(errors) {
   if (!Array.isArray(errors) || errors.length === 0) {
     return [];
+  }
+
+  // Memory safety: reject overly large inputs
+  if (errors.length > MAX_INPUT_ERRORS) {
+    console.warn(
+      `[detectCascades] Input too large (${errors.length} errors). Truncating to ${MAX_INPUT_ERRORS}.`
+    );
+    errors = errors.slice(0, MAX_INPUT_ERRORS);
   }
 
   const cascades = [];
@@ -147,9 +177,7 @@ function detectCascades(errors) {
     const sorted = taskErrors.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
     // Find critical/high severity errors that might be root causes
-    const potentialRoots = sorted.filter(
-      e => e.severity === 'CRITICAL' || e.severity === 'HIGH'
-    );
+    const potentialRoots = sorted.filter(e => e.severity === 'CRITICAL' || e.severity === 'HIGH');
 
     for (const root of potentialRoots) {
       const rootTime = new Date(root.timestamp).getTime();
@@ -174,6 +202,15 @@ function detectCascades(errors) {
     }
   }
 
+  // Memory safety: limit result size
+  if (cascades.length > MAX_RESULT_SIZE) {
+    console.warn(
+      `[detectCascades] Result too large (${cascades.length} cascades). Truncating to ${MAX_RESULT_SIZE}.`
+    );
+    cascades.sort((a, b) => b.childErrorIds.length - a.childErrorIds.length);
+    return cascades.slice(0, MAX_RESULT_SIZE);
+  }
+
   return cascades;
 }
 
@@ -186,6 +223,14 @@ function detectCascades(errors) {
 function detectHookFailures(errors, threshold = DEFAULT_HOOK_FAILURE_THRESHOLD) {
   if (!Array.isArray(errors) || errors.length === 0) {
     return [];
+  }
+
+  // Memory safety: reject overly large inputs
+  if (errors.length > MAX_INPUT_ERRORS) {
+    console.warn(
+      `[detectHookFailures] Input too large (${errors.length} errors). Truncating to ${MAX_INPUT_ERRORS}.`
+    );
+    errors = errors.slice(0, MAX_INPUT_ERRORS);
   }
 
   const hookCounts = new Map();
@@ -210,7 +255,17 @@ function detectHookFailures(errors, threshold = DEFAULT_HOOK_FAILURE_THRESHOLD) 
     entry.lastOccurrence = error.timestamp;
   }
 
-  return Array.from(hookCounts.values()).filter(entry => entry.count > threshold);
+  const results = Array.from(hookCounts.values()).filter(entry => entry.count > threshold);
+
+  // Memory safety: limit result size
+  if (results.length > MAX_RESULT_SIZE) {
+    console.warn(
+      `[detectHookFailures] Result too large (${results.length} patterns). Truncating to top ${MAX_RESULT_SIZE}.`
+    );
+    return results.sort((a, b) => b.count - a.count).slice(0, MAX_RESULT_SIZE);
+  }
+
+  return results;
 }
 
 /**
@@ -222,6 +277,14 @@ function detectHookFailures(errors, threshold = DEFAULT_HOOK_FAILURE_THRESHOLD) 
 function detectToolFailures(errors, threshold = DEFAULT_TOOL_FAILURE_THRESHOLD) {
   if (!Array.isArray(errors) || errors.length === 0) {
     return [];
+  }
+
+  // Memory safety: reject overly large inputs
+  if (errors.length > MAX_INPUT_ERRORS) {
+    console.warn(
+      `[detectToolFailures] Input too large (${errors.length} errors). Truncating to ${MAX_INPUT_ERRORS}.`
+    );
+    errors = errors.slice(0, MAX_INPUT_ERRORS);
   }
 
   const toolCounts = new Map();
@@ -246,7 +309,17 @@ function detectToolFailures(errors, threshold = DEFAULT_TOOL_FAILURE_THRESHOLD) 
     entry.lastOccurrence = error.timestamp;
   }
 
-  return Array.from(toolCounts.values()).filter(entry => entry.count >= threshold);
+  const results = Array.from(toolCounts.values()).filter(entry => entry.count >= threshold);
+
+  // Memory safety: limit result size
+  if (results.length > MAX_RESULT_SIZE) {
+    console.warn(
+      `[detectToolFailures] Result too large (${results.length} patterns). Truncating to top ${MAX_RESULT_SIZE}.`
+    );
+    return results.sort((a, b) => b.count - a.count).slice(0, MAX_RESULT_SIZE);
+  }
+
+  return results;
 }
 
 /**
@@ -258,6 +331,14 @@ function detectToolFailures(errors, threshold = DEFAULT_TOOL_FAILURE_THRESHOLD) 
 function detectAgentIssues(errors, threshold = DEFAULT_AGENT_ERROR_THRESHOLD) {
   if (!Array.isArray(errors) || errors.length === 0) {
     return [];
+  }
+
+  // Memory safety: reject overly large inputs
+  if (errors.length > MAX_INPUT_ERRORS) {
+    console.warn(
+      `[detectAgentIssues] Input too large (${errors.length} errors). Truncating to ${MAX_INPUT_ERRORS}.`
+    );
+    errors = errors.slice(0, MAX_INPUT_ERRORS);
   }
 
   const agentCounts = new Map();
@@ -282,7 +363,17 @@ function detectAgentIssues(errors, threshold = DEFAULT_AGENT_ERROR_THRESHOLD) {
     }
   }
 
-  return Array.from(agentCounts.values()).filter(entry => entry.errorCount > threshold);
+  const results = Array.from(agentCounts.values()).filter(entry => entry.errorCount > threshold);
+
+  // Memory safety: limit result size
+  if (results.length > MAX_RESULT_SIZE) {
+    console.warn(
+      `[detectAgentIssues] Result too large (${results.length} patterns). Truncating to top ${MAX_RESULT_SIZE}.`
+    );
+    return results.sort((a, b) => b.errorCount - a.errorCount).slice(0, MAX_RESULT_SIZE);
+  }
+
+  return results;
 }
 
 /**

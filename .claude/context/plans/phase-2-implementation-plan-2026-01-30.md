@@ -22,6 +22,7 @@ Phase 2 delivers **enterprise-grade reliability and intelligent onboarding** to 
 ### Expected Value Delivery
 
 **Cumulative Completion After Phase 2**:
+
 - **Phase 0-1**: 6 features (60% of 10 total specs)
 - **Phase 2**: +4 features = **10 features (100% of current roadmap)**
 - **Value**: 80% of enterprise use cases enabled (crash recovery + brownfield support unlock production adoption)
@@ -36,6 +37,7 @@ Phase 2 delivers **enterprise-grade reliability and intelligent onboarding** to 
 
 **Total Effort**: 15-20 person-days equivalent
 **Breakdown**:
+
 - SPEC-003 (Workflow State Checkpointing): 4-5 days
 - SPEC-005 (Brownfield Detection): 5-6 days
 - SPEC-008 (Track Metadata Enhancement): 1-2 days
@@ -53,6 +55,7 @@ Phase 2 delivers **enterprise-grade reliability and intelligent onboarding** to 
 **User Story**: "As a developer, I want to resume a workflow where I left off after a crash or session timeout, so that I don't lose progress."
 
 **Business Value**:
+
 - Reduces frustration from lost work (25% completion rate improvement per research)
 - Enables confident execution of multi-hour workflows
 - Production-ready reliability for enterprise adoption
@@ -60,12 +63,14 @@ Phase 2 delivers **enterprise-grade reliability and intelligent onboarding** to 
 ### Problem Statement
 
 **Current Gap**:
+
 - `evolution-state.json` tracks EVOLVE workflow state, but no general workflow state mechanism exists
 - Long workflows (conductor setup, feature development) lose progress on crash
 - No resume capability for interrupted sessions
 - Users must restart from scratch
 
 **Pain Points**:
+
 1. Lost work after context limit reached
 2. No checkpoint recovery for multi-phase workflows
 3. Inconsistent state tracking across workflow types
@@ -75,12 +80,14 @@ Phase 2 delivers **enterprise-grade reliability and intelligent onboarding** to 
 
 **High-Level Design**:
 Create a general-purpose `WorkflowStateManager` library that any workflow can use to:
+
 1. Auto-save state after each phase
 2. Detect existing state on workflow start
 3. Prompt user to resume or start fresh
 4. Clean up state after workflow completion
 
 **Architecture**:
+
 ```
 .claude/lib/workflow/workflow-state-manager.cjs
 ├── WorkflowStateManager class
@@ -93,6 +100,7 @@ Create a general-purpose `WorkflowStateManager` library that any workflow can us
 ```
 
 **State Storage**:
+
 - Location: `.claude/context/runtime/workflow-state/{workflow-id}.json`
 - Format: JSON with schema validation
 - Lifecycle: Created on first phase, deleted on completion
@@ -104,6 +112,7 @@ Create a general-purpose `WorkflowStateManager` library that any workflow can us
 **Description**: Create `WorkflowStateManager` class with core state persistence methods.
 
 **Subtasks**:
+
 - [ ] **3.1.1** Create `workflow-state-manager.cjs` class skeleton (~1 hour)
   - Command: `touch .claude/lib/workflow/workflow-state-manager.cjs`
   - Verify: `ls .claude/lib/workflow/workflow-state-manager.cjs`
@@ -129,6 +138,7 @@ Create a general-purpose `WorkflowStateManager` library that any workflow can us
 **Estimated Effort**: 1 day
 
 **Verification Gate**:
+
 ```bash
 # All must pass
 node --test tests/workflow-state-manager.test.cjs
@@ -142,6 +152,7 @@ ls .claude/schemas/workflow-state.schema.json
 **Description**: Integrate `WorkflowStateManager` with existing `workflow-engine.cjs` for auto-save.
 
 **Subtasks**:
+
 - [ ] **3.2.1** Add state manager to workflow-engine.cjs constructor (~1 hour)
   - Command: Edit workflow-engine.cjs, import WorkflowStateManager
   - Verify: Engine instantiates with state manager
@@ -163,6 +174,7 @@ ls .claude/schemas/workflow-state.schema.json
 **Estimated Effort**: 1-2 days
 
 **Verification Gate**:
+
 ```bash
 # Test resume capability
 node .claude/tools/cli/test-workflow-resume.cjs
@@ -176,6 +188,7 @@ node .claude/tools/cli/test-workflow-resume.cjs
 **Description**: Add resume detection and user prompts for interrupted workflows.
 
 **Subtasks**:
+
 - [ ] **3.3.1** Detect existing state on workflow start (~2 hours)
   - Command: Edit workflow-engine.cjs, check for state file on init
   - Verify: Engine detects existing state
@@ -197,6 +210,7 @@ node .claude/tools/cli/test-workflow-resume.cjs
 **Estimated Effort**: 1 day
 
 **Verification Gate**:
+
 ```bash
 # Test full resume flow
 node .claude/tools/cli/test-workflow-crash-recovery.cjs
@@ -210,6 +224,7 @@ node .claude/tools/cli/test-workflow-crash-recovery.cjs
 **Description**: Comprehensive testing of crash recovery and edge cases.
 
 **Subtasks**:
+
 - [ ] **3.4.1** Test crash during phase execution (~2 hours)
   - Command: Simulate crash (kill process mid-phase), restart, resume
   - Verify: Workflow resumes at start of interrupted phase
@@ -235,6 +250,7 @@ node .claude/tools/cli/test-workflow-crash-recovery.cjs
 **Estimated Effort**: 1 day
 
 **Verification Gate**:
+
 ```bash
 # All tests must pass
 node --test tests/workflow-state-crash-recovery.test.cjs
@@ -247,6 +263,7 @@ node --test tests/workflow-state-integration.test.cjs
 ### Success Criteria
 
 **Functional**:
+
 - [x] State persisted after each phase transition
 - [x] Resume detection on workflow restart
 - [x] User prompted to resume or start fresh
@@ -254,12 +271,14 @@ node --test tests/workflow-state-integration.test.cjs
 - [x] State cleanup on workflow completion
 
 **Quality**:
+
 - [x] 100% test coverage for WorkflowStateManager
 - [x] <100ms state save overhead per phase
 - [x] Crash recovery works for 3+ workflow types
 - [x] State schema validation prevents corruption
 
 **Integration**:
+
 - [x] Works with workflow-engine.cjs
 - [x] Works with conductor-setup-workflow
 - [x] Works with feature-development-workflow
@@ -268,6 +287,7 @@ node --test tests/workflow-state-integration.test.cjs
 **Effort Estimate**: 4-5 days
 
 **Integration with Phase 1**:
+
 - Uses atomic-write utility from Phase 1 (SPEC-007)
 - Integrates with workflow-patterns skill documentation
 - Complements phase-completion-guard.cjs (SPEC-004)
@@ -283,6 +303,7 @@ node --test tests/workflow-state-integration.test.cjs
 **User Story**: "As a developer onboarding an existing project, I want automatic tech stack detection and context generation, so that I can start using agent-studio without manual configuration."
 
 **Business Value**:
+
 - Reduces onboarding time from hours to <30 minutes
 - Eliminates manual tech-stack.md creation
 - Increases adoption for existing codebases (80% of real-world use cases)
@@ -291,12 +312,14 @@ node --test tests/workflow-state-integration.test.cjs
 ### Problem Statement
 
 **Current Gap**:
+
 - `project-onboarding` skill has basic brownfield detection (checks for .git, package manifests)
 - No automatic context artifact generation
 - No tech stack inference or pattern recognition
 - Manual setup required for existing projects
 
 **Pain Points**:
+
 1. Manual tech-stack.md creation (30-60 min per project)
 2. Guessing which code styleguides to use
 3. Missing existing patterns (testing, linting, CI/CD)
@@ -306,12 +329,14 @@ node --test tests/workflow-state-integration.test.cjs
 
 **High-Level Design**:
 Enhance `project-onboarding` skill with deep analysis engine that:
+
 1. Parses package manifests (package.json, requirements.txt, go.mod, etc.)
 2. Detects tech stack with confidence scoring
 3. Recognizes patterns (testing frameworks, linters, CI/CD)
 4. Generates draft tech-stack.md and recommendations
 
 **Architecture**:
+
 ```
 .claude/tools/analysis/tech-stack-analyzer.cjs
 ├── Detectors (per language):
@@ -344,6 +369,7 @@ Enhance `project-onboarding` skill with deep analysis engine that:
 **Description**: Create detection engine with confidence scoring for tech stack inference.
 
 **Subtasks**:
+
 - [ ] **5.1.1** Create tech-stack-analyzer.cjs skeleton (~1 hour)
   - Command: `touch .claude/tools/analysis/tech-stack-analyzer.cjs`
   - Verify: `ls .claude/tools/analysis/tech-stack-analyzer.cjs`
@@ -366,6 +392,7 @@ Enhance `project-onboarding` skill with deep analysis engine that:
 **Estimated Effort**: 1 day
 
 **Verification Gate**:
+
 ```bash
 # All detection tests must pass
 node --test tests/tech-stack-analyzer.test.cjs
@@ -379,6 +406,7 @@ node --test tests/tech-stack-analyzer.test.cjs
 **Description**: Create language-specific detectors for Node.js, Python, Go, Rust, TypeScript.
 
 **Subtasks**:
+
 - [ ] **5.2.1** Implement detectNodeJS() (~2 hours)
   - Command: Edit tech-stack-analyzer.cjs, parse package.json
   - Logic: Read dependencies, detect frameworks (express, fastify, nest), test frameworks (jest, vitest)
@@ -413,6 +441,7 @@ node --test tests/tech-stack-analyzer.test.cjs
 **Estimated Effort**: 2 days
 
 **Verification Gate**:
+
 ```bash
 # Language detection tests
 node --test tests/tech-stack-detection-nodejs.test.cjs
@@ -429,6 +458,7 @@ node --test tests/tech-stack-detection-typescript.test.cjs
 **Description**: Recognize patterns (testing, linting, CI/CD) to assess project maturity.
 
 **Subtasks**:
+
 - [ ] **5.3.1** Implement detectTestFramework() (~2 hours)
   - Command: Edit tech-stack-analyzer.cjs, detect test frameworks per language
   - Logic: Check package.json/requirements.txt for test dependencies
@@ -454,6 +484,7 @@ node --test tests/tech-stack-detection-typescript.test.cjs
 **Estimated Effort**: 1 day
 
 **Verification Gate**:
+
 ```bash
 # Pattern recognition tests
 node --test tests/tech-stack-pattern-recognition.test.cjs
@@ -467,6 +498,7 @@ node --test tests/tech-stack-pattern-recognition.test.cjs
 **Description**: Integrate tech-stack-analyzer with project-onboarding skill and generate artifacts.
 
 **Subtasks**:
+
 - [ ] **5.4.1** Add analyzer invocation to project-onboarding skill (~2 hours)
   - Command: Edit .claude/skills/project-onboarding/SKILL.md, add analyzer step
   - Verify: Skill invokes analyzer during brownfield detection
@@ -495,6 +527,7 @@ node --test tests/tech-stack-pattern-recognition.test.cjs
 **Estimated Effort**: 1-2 days
 
 **Verification Gate**:
+
 ```bash
 # End-to-end brownfield detection
 node .claude/tools/cli/test-brownfield-detection.cjs --project ./samples/nodejs-app
@@ -506,6 +539,7 @@ node .claude/tools/cli/test-brownfield-detection.cjs --project ./samples/nodejs-
 ### Success Criteria
 
 **Functional**:
+
 - [x] Detect 10+ languages/frameworks
 - [x] Confidence scoring for all detections (0.0-1.0)
 - [x] Pattern recognition for testing, linting, CI/CD
@@ -513,12 +547,14 @@ node .claude/tools/cli/test-brownfield-detection.cjs --project ./samples/nodejs-
 - [x] Recommend code styleguides
 
 **Quality**:
+
 - [x] 90%+ detection accuracy
 - [x] 100% test coverage for analyzer
 - [x] <30 min total onboarding time
 - [x] Generated artifacts require minimal editing
 
 **Integration**:
+
 - [x] Works with project-onboarding skill
 - [x] Works with conductor-setup-workflow
 - [x] CLAUDE.md updated (Section 8.5)
@@ -527,6 +563,7 @@ node .claude/tools/cli/test-brownfield-detection.cjs --project ./samples/nodejs-
 **Effort Estimate**: 5-6 days
 
 **Integration with Phase 1**:
+
 - Uses code styleguides from Phase 1 (SPEC-006)
 - Integrates with spec-init skill (SPEC-001)
 - Complements track metadata schema (SPEC-007)
@@ -542,6 +579,7 @@ node .claude/tools/cli/test-brownfield-detection.cjs --project ./samples/nodejs-
 **User Story**: "As a project manager, I want detailed analytics on task execution (duration, blockers, deviations), so that I can optimize workflows and identify bottlenecks."
 
 **Business Value**:
+
 - Enables data-driven workflow optimization
 - Identifies bottlenecks in multi-agent execution
 - Provides compliance reporting for enterprise
@@ -550,12 +588,14 @@ node .claude/tools/cli/test-brownfield-detection.cjs --project ./samples/nodejs-
 ### Problem Statement
 
 **Current Gap**:
+
 - track-metadata.schema.json (Phase 1 - SPEC-007) has basic fields (trackId, type, status, effort)
 - No analytics fields (actual duration, blockers, deviations)
 - No reporting queries or aggregation support
 - Limited insight into workflow efficiency
 
 **Pain Points**:
+
 1. Cannot measure task execution time accurately
 2. Blocker tracking is manual
 3. Deviations from plan not captured
@@ -565,12 +605,14 @@ node .claude/tools/cli/test-brownfield-detection.cjs --project ./samples/nodejs-
 
 **High-Level Design**:
 Extend existing track-metadata.schema.json with:
+
 1. Analytics fields (actualDuration, blockers, deviations)
 2. Timestamps (startTime, endTime, checkpoints)
 3. Workflow context (phase, dependencies, outcomes)
 4. Reporting queries (duration aggregation, blocker analysis)
 
 **Architecture**:
+
 ```
 .claude/schemas/track-metadata.schema.json (enhanced)
 ├── Analytics Fields:
@@ -595,6 +637,7 @@ Extend existing track-metadata.schema.json with:
 **Description**: Add analytics fields to track-metadata.schema.json.
 
 **Subtasks**:
+
 - [ ] **8.1.1** Add actualDuration field (~1 hour)
   - Command: Edit .claude/schemas/track-metadata.schema.json
   - Schema: `{ actualDuration: { type: "object", properties: { hours: "number", breakdown: "object" } } }`
@@ -620,6 +663,7 @@ Extend existing track-metadata.schema.json with:
 **Estimated Effort**: 4 hours
 
 **Verification Gate**:
+
 ```bash
 # Schema validation tests
 node --test tests/track-metadata-schema-enhanced.test.cjs
@@ -633,6 +677,7 @@ node --test tests/track-metadata-schema-enhanced.test.cjs
 **Description**: Document usage of new analytics fields in TRACK_METADATA.md.
 
 **Subtasks**:
+
 - [ ] **8.2.1** Update TRACK_METADATA.md documentation (~1 hour)
   - Command: Edit .claude/docs/TRACK_METADATA.md
   - Add: Examples for actualDuration, blockers, deviations, checkpoints
@@ -654,6 +699,7 @@ node --test tests/track-metadata-schema-enhanced.test.cjs
 **Description**: Create CLI tool for querying and aggregating track metadata analytics.
 
 **Subtasks**:
+
 - [ ] **8.3.1** Create analytics-report.cjs CLI tool (~2 hours)
   - Command: `touch .claude/tools/cli/analytics-report.cjs`
   - Features: Query by date range, aggregate duration, list blockers
@@ -674,6 +720,7 @@ node --test tests/track-metadata-schema-enhanced.test.cjs
 **Estimated Effort**: 4 hours
 
 **Verification Gate**:
+
 ```bash
 # Analytics reporting tests
 node .claude/tools/cli/analytics-report.cjs --duration-summary
@@ -688,6 +735,7 @@ node .claude/tools/cli/analytics-report.cjs --blocker-analysis
 **Description**: Comprehensive testing of enhanced metadata schema.
 
 **Subtasks**:
+
 - [ ] **8.4.1** Test metadata with all analytics fields (~1 hour)
   - Command: Create sample metadata.json with all new fields
   - Verify: Validation passes
@@ -705,18 +753,21 @@ node .claude/tools/cli/analytics-report.cjs --blocker-analysis
 ### Success Criteria
 
 **Functional**:
+
 - [x] Schema extended with analytics fields
 - [x] Documentation updated with examples
 - [x] CLI tool generates analytics reports
 - [x] Queries aggregate duration and blockers
 
 **Quality**:
+
 - [x] 100% schema validation coverage
 - [x] All new fields documented
 - [x] Reporting queries tested
 - [x] Backward compatible with Phase 1 schema
 
 **Integration**:
+
 - [x] Works with track-management skill
 - [x] Works with workflow-state-manager (SPEC-003)
 - [x] CLAUDE.md updated (Section 9.7)
@@ -725,6 +776,7 @@ node .claude/tools/cli/analytics-report.cjs --blocker-analysis
 **Effort Estimate**: 1-2 days (12 hours)
 
 **Integration with Phase 1**:
+
 - Extends track-metadata.schema.json from Phase 1 (SPEC-007)
 - Integrates with git notes audit (SPEC-002) for timestamp capture
 - Supports phase verification (SPEC-004) with checkpoint tracking
@@ -740,6 +792,7 @@ node .claude/tools/cli/analytics-report.cjs --blocker-analysis
 **User Story**: "As a user being onboarded, I want questionnaires that adapt to my previous answers and don't ask unnecessary questions, so that setup is faster and less repetitive."
 
 **Business Value**:
+
 - Reduces onboarding friction (25% completion rate improvement)
 - Eliminates repetitive questions across sessions
 - Leverages project context for smart defaults
@@ -748,6 +801,7 @@ node .claude/tools/cli/analytics-report.cjs --blocker-analysis
 ### Problem Statement
 
 **Current Gap**:
+
 - progressive-disclosure skill exists (basic A/B/C/D/E pattern)
 - No adaptive questioning based on previous answers
 - No memory of user preferences across sessions
@@ -755,6 +809,7 @@ node .claude/tools/cli/analytics-report.cjs --blocker-analysis
 - No progress indicators
 
 **Pain Points**:
+
 1. Users answer same questions in every setup
 2. Questions don't adapt to previous answers
 3. Cannot skip questions when context is obvious
@@ -764,12 +819,14 @@ node .claude/tools/cli/analytics-report.cjs --blocker-analysis
 
 **High-Level Design**:
 Enhance progressive-disclosure skill with:
+
 1. **Adaptive Questioning**: Skip questions when answers can be inferred from previous responses
 2. **Context Accumulation**: Use project context (tech-stack.md, existing files) to pre-fill answers
 3. **Memory Integration**: Remember user preferences across sessions (stored in learnings.md)
 4. **Progress Indicators**: Show completion percentage during questionnaire
 
 **Architecture**:
+
 ```
 .claude/skills/progressive-disclosure/SKILL.md (enhanced)
 ├── Adaptive Logic:
@@ -791,6 +848,7 @@ Enhance progressive-disclosure skill with:
 **Description**: Create logic to skip questions when answers can be inferred.
 
 **Subtasks**:
+
 - [ ] **9.1.1** Create inference rules (~3 hours)
   - Command: Edit .claude/skills/progressive-disclosure/SKILL.md
   - Rules: If language=Python detected → skip "Which language?" question
@@ -815,6 +873,7 @@ Enhance progressive-disclosure skill with:
 **Estimated Effort**: 1 day
 
 **Verification Gate**:
+
 ```bash
 # Adaptive questioning tests
 node --test tests/progressive-disclosure-adaptive.test.cjs
@@ -828,6 +887,7 @@ node --test tests/progressive-disclosure-adaptive.test.cjs
 **Description**: Build context from previous answers and project files.
 
 **Subtasks**:
+
 - [ ] **9.2.1** Create accumulateContext() function (~3 hours)
   - Command: Edit progressive-disclosure skill
   - Logic: Merge context from tech-stack.md + previous answers + learnings.md
@@ -852,6 +912,7 @@ node --test tests/progressive-disclosure-adaptive.test.cjs
 **Estimated Effort**: 1 day
 
 **Verification Gate**:
+
 ```bash
 # Context accumulation tests
 node --test tests/progressive-disclosure-context.test.cjs
@@ -865,6 +926,7 @@ node --test tests/progressive-disclosure-context.test.cjs
 **Description**: Remember user preferences across sessions in learnings.md.
 
 **Subtasks**:
+
 - [ ] **9.3.1** Implement loadUserPreferences() (~2 hours)
   - Command: Edit progressive-disclosure skill
   - Logic: Read .claude/context/memory/learnings.md for user preferences
@@ -885,6 +947,7 @@ node --test tests/progressive-disclosure-context.test.cjs
 **Estimated Effort**: 4 hours
 
 **Verification Gate**:
+
 ```bash
 # Memory persistence tests
 node --test tests/progressive-disclosure-memory.test.cjs
@@ -898,6 +961,7 @@ node --test tests/progressive-disclosure-memory.test.cjs
 **Description**: Integration testing with conductor-setup-workflow and project-onboarding.
 
 **Subtasks**:
+
 - [ ] **9.4.1** Test with conductor-setup-workflow (~2 hours)
   - Command: Run conductor-setup-workflow with progressive-disclosure v2
   - Verify: Setup time <10 min (vs 30 min without adaptive questioning)
@@ -915,6 +979,7 @@ node --test tests/progressive-disclosure-memory.test.cjs
 **Estimated Effort**: 4 hours
 
 **Verification Gate**:
+
 ```bash
 # End-to-end workflow tests
 node .claude/tools/cli/test-progressive-disclosure-v2.cjs --workflow conductor-setup
@@ -926,18 +991,21 @@ node .claude/tools/cli/test-progressive-disclosure-v2.cjs --workflow conductor-s
 ### Success Criteria
 
 **Functional**:
+
 - [x] Questions adapt based on previous answers
 - [x] Skips questions when answers can be inferred
 - [x] Remembers preferences across sessions
 - [x] Provides progress indicators
 
 **Quality**:
+
 - [x] 70%+ question skip rate with context
 - [x] 100% test coverage for adaptive logic
 - [x] <10 min setup time (vs 30 min baseline)
 - [x] User satisfaction improved (qualitative)
 
 **Integration**:
+
 - [x] Works with progressive-disclosure skill
 - [x] Works with conductor-setup-workflow
 - [x] Works with spec-init skill
@@ -946,6 +1014,7 @@ node .claude/tools/cli/test-progressive-disclosure-v2.cjs --workflow conductor-s
 **Effort Estimate**: 2-3 days
 
 **Integration with Phase 1**:
+
 - Uses spec-init skill (SPEC-001) as primary consumer
 - Integrates with brownfield detection (SPEC-005) for context
 - Leverages memory protocol from learnings.md
@@ -986,6 +1055,7 @@ Developer 4: SPEC-009 (Progressive Disclosure v2) [PARALLEL]
 ```
 
 **Expected Timeline**:
+
 - **Week 1**: SPEC-003 + SPEC-005 complete (4-5 days wall-clock)
 - **Week 2**: SPEC-008 + SPEC-009 complete (2-3 days wall-clock)
 - **Total**: 5-7 days wall-clock time with 2-4 parallel teams
@@ -1015,18 +1085,19 @@ Phase 1 (COMPLETE)
 ```
 
 **Key Insights**:
+
 - SPEC-003 and SPEC-005 are **fully independent** → can run in parallel
 - SPEC-008 extends SPEC-007 (already complete) → can start immediately
 - SPEC-009 depends on SPEC-005 → must start after brownfield detection
 
 ### Risk Mitigation for Parallel Execution
 
-| Risk | Mitigation |
-|------|------------|
-| SPEC-009 starts before SPEC-005 complete | Gate 9.1 task until 5.4 integration complete |
-| Merge conflicts in CLAUDE.md | Assign sections: Dev1 = 9.5, Dev2 = 8.5, Dev3 = 9.7, Dev4 = 8.5 |
-| Test suite interference | Isolate test files: tests/spec-003/, tests/spec-005/, etc. |
-| Shared file edits (workflow-engine.cjs) | Dev1 owns workflow-engine.cjs, others coordinate |
+| Risk                                     | Mitigation                                                      |
+| ---------------------------------------- | --------------------------------------------------------------- |
+| SPEC-009 starts before SPEC-005 complete | Gate 9.1 task until 5.4 integration complete                    |
+| Merge conflicts in CLAUDE.md             | Assign sections: Dev1 = 9.5, Dev2 = 8.5, Dev3 = 9.7, Dev4 = 8.5 |
+| Test suite interference                  | Isolate test files: tests/spec-003/, tests/spec-005/, etc.      |
+| Shared file edits (workflow-engine.cjs)  | Dev1 owns workflow-engine.cjs, others coordinate                |
 
 ---
 
@@ -1035,21 +1106,25 @@ Phase 1 (COMPLETE)
 ### How Phase 2 Outputs Feed Phase 3
 
 **SPEC-003 (Workflow Checkpointing)**:
+
 - Enables complex multi-phase workflows in Phase 3
 - Foundation for automated rollback workflows
 - Supports long-running spec-driven development flows
 
 **SPEC-005 (Brownfield Detection)**:
+
 - Enables legacy code adoption in Phase 3
 - Foundation for automated refactoring workflows
 - Supports migration planning workflows
 
 **SPEC-008 (Track Metadata Enhancement)**:
+
 - Enables advanced reporting in Phase 3
 - Foundation for workflow optimization analytics
 - Supports retrospective analysis workflows
 
 **SPEC-009 (Progressive Disclosure v2)**:
+
 - Reduces friction in Phase 3 complex workflows
 - Foundation for intelligent agent spawning (context-aware)
 - Supports adaptive planning workflows
@@ -1058,12 +1133,12 @@ Phase 1 (COMPLETE)
 
 Based on Phase 2 foundations:
 
-| Future Feature | Enabled By | Expected Value |
-|----------------|------------|----------------|
-| Automated Rollback Workflow | SPEC-003 checkpointing | Instant recovery from failed deployments |
-| Legacy Code Migration Planner | SPEC-005 brownfield | Automated migration plans for legacy → modern |
-| Workflow Optimization Dashboard | SPEC-008 analytics | Real-time insights into bottlenecks |
-| Context-Aware Agent Spawning | SPEC-009 progressive disclosure | 50% reduction in agent spawn failures |
+| Future Feature                  | Enabled By                      | Expected Value                                |
+| ------------------------------- | ------------------------------- | --------------------------------------------- |
+| Automated Rollback Workflow     | SPEC-003 checkpointing          | Instant recovery from failed deployments      |
+| Legacy Code Migration Planner   | SPEC-005 brownfield             | Automated migration plans for legacy → modern |
+| Workflow Optimization Dashboard | SPEC-008 analytics              | Real-time insights into bottlenecks           |
+| Context-Aware Agent Spawning    | SPEC-009 progressive disclosure | 50% reduction in agent spawn failures         |
 
 ---
 
@@ -1072,6 +1147,7 @@ Based on Phase 2 foundations:
 ### Phase 2 Completion Checklist
 
 **Functional Requirements**:
+
 - [ ] SPEC-003: Workflow state persists after each phase
 - [ ] SPEC-003: Resume capability works for 3+ workflows
 - [ ] SPEC-005: Brownfield detection identifies 10+ languages/frameworks
@@ -1082,6 +1158,7 @@ Based on Phase 2 foundations:
 - [ ] SPEC-009: User preferences remembered across sessions
 
 **Quality Gates**:
+
 - [ ] 15+ new tests passing (5 per feature minimum)
 - [ ] 100% test coverage for new modules
 - [ ] <30 min onboarding time (SPEC-005)
@@ -1090,6 +1167,7 @@ Based on Phase 2 foundations:
 - [ ] Zero breaking changes to Phase 1 features
 
 **Integration Verification**:
+
 - [ ] Phase 1 features still work (regression testing)
 - [ ] CLAUDE.md updated with all new features
 - [ ] Documentation complete for all 4 features
@@ -1097,6 +1175,7 @@ Based on Phase 2 foundations:
 - [ ] ADRs created for major decisions
 
 **Production Deployment Ready**:
+
 - [ ] All hooks registered in .claude/settings.json
 - [ ] Security review passed (if applicable)
 - [ ] Performance benchmarks met
@@ -1104,16 +1183,16 @@ Based on Phase 2 foundations:
 
 ### Phase 2 Deliverables
 
-| Deliverable | Location | Status |
-|-------------|----------|--------|
-| WorkflowStateManager library | `.claude/lib/workflow/workflow-state-manager.cjs` | TBD |
-| Workflow state schema | `.claude/schemas/workflow-state.schema.json` | TBD |
-| Tech stack analyzer tool | `.claude/tools/analysis/tech-stack-analyzer.cjs` | TBD |
-| Enhanced track metadata schema | `.claude/schemas/track-metadata.schema.json` | TBD |
-| Analytics report CLI | `.claude/tools/cli/analytics-report.cjs` | TBD |
-| Progressive disclosure v2 skill | `.claude/skills/progressive-disclosure/SKILL.md` (enhanced) | TBD |
-| Test suites | `tests/spec-003/`, `tests/spec-005/`, `tests/spec-008/`, `tests/spec-009/` | TBD |
-| Documentation updates | CLAUDE.md Sections 8.5, 9.5, 9.7 | TBD |
+| Deliverable                     | Location                                                                   | Status |
+| ------------------------------- | -------------------------------------------------------------------------- | ------ |
+| WorkflowStateManager library    | `.claude/lib/workflow/workflow-state-manager.cjs`                          | TBD    |
+| Workflow state schema           | `.claude/schemas/workflow-state.schema.json`                               | TBD    |
+| Tech stack analyzer tool        | `.claude/tools/analysis/tech-stack-analyzer.cjs`                           | TBD    |
+| Enhanced track metadata schema  | `.claude/schemas/track-metadata.schema.json`                               | TBD    |
+| Analytics report CLI            | `.claude/tools/cli/analytics-report.cjs`                                   | TBD    |
+| Progressive disclosure v2 skill | `.claude/skills/progressive-disclosure/SKILL.md` (enhanced)                | TBD    |
+| Test suites                     | `tests/spec-003/`, `tests/spec-005/`, `tests/spec-008/`, `tests/spec-009/` | TBD    |
+| Documentation updates           | CLAUDE.md Sections 8.5, 9.5, 9.7                                           | TBD    |
 
 ---
 
@@ -1122,6 +1201,7 @@ Based on Phase 2 foundations:
 ### Per-Feature Rollback Commands
 
 **SPEC-003 (Workflow Checkpointing)**:
+
 ```bash
 # Disable state persistence
 rm .claude/lib/workflow/workflow-state-manager.cjs
@@ -1131,6 +1211,7 @@ git revert <commit-hash-range>
 ```
 
 **SPEC-005 (Brownfield Detection)**:
+
 ```bash
 # Disable brownfield detection
 rm .claude/tools/analysis/tech-stack-analyzer.cjs
@@ -1139,6 +1220,7 @@ git revert <commit-hash-range>
 ```
 
 **SPEC-008 (Track Metadata Enhancement)**:
+
 ```bash
 # Revert to Phase 1 schema
 git checkout HEAD~1 .claude/schemas/track-metadata.schema.json
@@ -1147,6 +1229,7 @@ git revert <commit-hash-range>
 ```
 
 **SPEC-009 (Progressive Disclosure v2)**:
+
 ```bash
 # Revert to basic progressive-disclosure
 git checkout HEAD~1 .claude/skills/progressive-disclosure/SKILL.md
@@ -1182,6 +1265,7 @@ node --test tests/phase-1-regression.test.cjs
 ### Before Phase 2 Implementation
 
 **Read**:
+
 ```bash
 cat .claude/context/memory/learnings.md
 cat .claude/context/memory/decisions.md
@@ -1189,6 +1273,7 @@ cat .claude/context/memory/issues.md
 ```
 
 **Check for**:
+
 - Phase 1 learnings (TDD patterns, schema design)
 - Known issues with workflow-engine.cjs
 - Previous decisions on state management
@@ -1198,28 +1283,33 @@ cat .claude/context/memory/issues.md
 **Record**:
 
 **learnings.md**:
+
 ```markdown
 ## Phase 2: Core Safety & Auditability Implementation (2026-01-30)
 
 **Features Delivered**:
+
 - SPEC-003: Workflow State Checkpointing (4-5 days)
 - SPEC-005: Brownfield Project Detection (5-6 days)
 - SPEC-008: Track Metadata Schema Enhancement (1-2 days)
 - SPEC-009: Progressive Disclosure v2 (2-3 days)
 
 **Key Learnings**:
+
 - [Pattern discovered during SPEC-003 implementation]
 - [Brownfield detection accuracy insights from SPEC-005]
 - [Analytics query optimization from SPEC-008]
 - [Adaptive questioning improvements from SPEC-009]
 
 **Integration Points**:
+
 - SPEC-003 integrates with workflow-engine.cjs via state manager
 - SPEC-005 integrates with project-onboarding skill
 - SPEC-008 extends SPEC-007 (track-metadata schema)
 - SPEC-009 enhances progressive-disclosure skill
 
 **Performance Metrics**:
+
 - Workflow state save: <100ms per phase (target met)
 - Brownfield detection: 90%+ accuracy (target met)
 - Onboarding time: <30 min (target met)
@@ -1227,6 +1317,7 @@ cat .claude/context/memory/issues.md
 ```
 
 **decisions.md**:
+
 ```markdown
 ## ADR-XXX: Workflow State Manager Design
 
@@ -1246,6 +1337,7 @@ cat .claude/context/memory/issues.md
 ```
 
 **issues.md**:
+
 ```markdown
 ## Issue: [Any blockers encountered during Phase 2]
 

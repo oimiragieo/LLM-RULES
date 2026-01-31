@@ -3,9 +3,7 @@
   "stepId": "step-1",
   "stepNumber": 1,
   "state": {
-    "files": [
-      "file1.js"
-    ],
+    "files": ["file1.js"],
     "phase": "implementation"
   },
   "timestamp": "2026-01-30T03:22:49.567Z",

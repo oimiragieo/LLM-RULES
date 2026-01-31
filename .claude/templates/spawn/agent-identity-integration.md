@@ -15,6 +15,7 @@ requires:
 When spawning agents with identity fields, enhance prompts with structured personality for +20-30% consistency improvement.
 
 ## When to Use
+
 - Agent files have `identity` frontmatter fields (role, goal, backstory, motto, personality)
 - Want consistent agent personality across invocations
 - Need trait-based decision-making (risk tolerance, communication style)
@@ -64,8 +65,15 @@ Task({
   model: agentData.model,
   description: `${agentData.identity?.role || agentData.name} doing <TASK>`,
   allowed_tools: agentData.tools || [
-    'Read', 'Write', 'Edit', 'Bash',
-    'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput',
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'TaskOutput',
     'Skill',
   ],
   prompt: `You are the ${agentData.name} agent.

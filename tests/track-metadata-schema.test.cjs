@@ -192,7 +192,14 @@ describe('Track Metadata Schema Validation', () => {
     });
 
     it('should validate all phase states', () => {
-      const phaseStates = ['draft', 'spec_review', 'plan_ready', 'implementation', 'qa', 'deployed'];
+      const phaseStates = [
+        'draft',
+        'spec_review',
+        'plan_ready',
+        'implementation',
+        'qa',
+        'deployed',
+      ];
 
       for (const phaseState of phaseStates) {
         const metadata = {
@@ -204,7 +211,10 @@ describe('Track Metadata Schema Validation', () => {
         };
 
         const valid = validate(metadata);
-        assert.ok(valid, `Failed for phaseState="${phaseState}": ${JSON.stringify(validate.errors, null, 2)}`);
+        assert.ok(
+          valid,
+          `Failed for phaseState="${phaseState}": ${JSON.stringify(validate.errors, null, 2)}`
+        );
       }
     });
   });
@@ -369,7 +379,15 @@ describe('Track Metadata Schema Validation', () => {
         type: 'feature',
         status: 'new',
         description: 'Multi-classification test',
-        classification: ['security', 'performance', 'ux', 'dx', 'testing', 'documentation', 'technical-debt'],
+        classification: [
+          'security',
+          'performance',
+          'ux',
+          'dx',
+          'testing',
+          'documentation',
+          'technical-debt',
+        ],
       };
 
       const valid = validate(metadata);

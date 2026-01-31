@@ -1,0 +1,275 @@
+npm warn exec The following package was not found and will be installed: cross-env@10.1.0
+
+> agent-studio@2.0.0 test
+> node --test --test-concurrency=1 tests/*.test.mjs
+
+TAP version 13
+# Subtest: agent-context-tracker PLANNER detection
+    # Subtest: detects PLANNER spawn via subagent_type containing "plan"
+    ok 1 - detects PLANNER spawn via subagent_type containing "plan"
+      ---
+      duration_ms: 262.6731
+      type: 'test'
+      ...
+    # Subtest: detects PLANNER spawn via description containing "planner" (case-insensitive)
+    ok 2 - detects PLANNER spawn via description containing "planner" (case-insensitive)
+      ---
+      duration_ms: 240.2958
+      type: 'test'
+      ...
+    # Subtest: detects PLANNER spawn via prompt containing "You are PLANNER"
+    ok 3 - detects PLANNER spawn via prompt containing "You are PLANNER"
+      ---
+      duration_ms: 240.4506
+      type: 'test'
+      ...
+    # Subtest: detects PLANNER spawn via prompt containing "You are the PLANNER"
+    ok 4 - detects PLANNER spawn via prompt containing "You are the PLANNER"
+      ---
+      duration_ms: 250.2522
+      type: 'test'
+      ...
+    # Subtest: does NOT mark plannerSpawned for non-planner tasks
+    ok 5 - does NOT mark plannerSpawned for non-planner tasks
+      ---
+      duration_ms: 232.847
+      type: 'test'
+      ...
+    1..5
+ok 1 - agent-context-tracker PLANNER detection
+  ---
+  duration_ms: 1227.5773
+  type: 'suite'
+  ...
+# Subtest: agent-context-tracker SECURITY detection
+    # Subtest: detects SECURITY spawn via subagent_type containing "security"
+    ok 1 - detects SECURITY spawn via subagent_type containing "security"
+      ---
+      duration_ms: 251.9609
+      type: 'test'
+      ...
+    # Subtest: detects SECURITY spawn via description containing "security" (case-insensitive)
+    ok 2 - detects SECURITY spawn via description containing "security" (case-insensitive)
+      ---
+      duration_ms: 243.6492
+      type: 'test'
+      ...
+    # Subtest: detects SECURITY spawn via prompt containing "SECURITY-ARCHITECT"
+    ok 3 - detects SECURITY spawn via prompt containing "SECURITY-ARCHITECT"
+      ---
+      duration_ms: 246.4443
+      type: 'test'
+      ...
+    # Subtest: does NOT mark securitySpawned for non-security tasks
+    ok 4 - does NOT mark securitySpawned for non-security tasks
+      ---
+      duration_ms: 234.4362
+      type: 'test'
+      ...
+    1..4
+ok 2 - agent-context-tracker SECURITY detection
+  ---
+  duration_ms: 976.8767
+  type: 'suite'
+  ...
+# Subtest: agent-context-tracker existing behavior preserved
+    # Subtest: enters agent mode when Task tool is used
+    ok 1 - enters agent mode when Task tool is used
+      ---
+      duration_ms: 231.3963
+      type: 'test'
+      ...
+    # Subtest: ignores non-Task tools
+    ok 2 - ignores non-Task tools
+      ---
+      duration_ms: 233.7897
+      type: 'test'
+      ...
+    1..2
+ok 3 - agent-context-tracker existing behavior preserved
+  ---
+  duration_ms: 465.3672
+  type: 'suite'
+  ...
+# Subtest: Party Mode Configuration
+    # Subtest: should have feature flag enabled
+    ok 1 - should have feature flag enabled
+      ---
+      duration_ms: 6.2684
+      type: 'test'
+      ...
+    # Subtest: should have all 3 default teams
+    ok 2 - should have all 3 default teams
+      ---
+      duration_ms: 1.3595
+      type: 'test'
+      ...
+    # Subtest: should have valid CSV format
+    ok 3 - should have valid CSV format
+      ---
+      duration_ms: 0.9295
+      type: 'test'
+      ...
+    # Subtest: should have valid agent types
+    ok 4 - should have valid agent types
+      ---
+      duration_ms: 0.7441
+      type: 'test'
+      ...
+    # Subtest: should have valid roles
+    ok 5 - should have valid roles
+      ---
+      duration_ms: 0.8165
+      type: 'test'
+      ...
+    # Subtest: should have valid models
+    ok 6 - should have valid models
+      ---
+      duration_ms: 0.7482
+      type: 'test'
+      ...
+    1..6
+ok 4 - Party Mode Configuration
+  ---
+  duration_ms: 12.9554
+  type: 'suite'
+  ...
+# Subtest: smoke test - test infrastructure is working
+ok 5 - smoke test - test infrastructure is working
+  ---
+  duration_ms: 0.6528
+  type: 'test'
+  ...
+# Subtest: smoke test - environment is configured
+ok 6 - smoke test - environment is configured
+  ---
+  duration_ms: 0.1629
+  type: 'test'
+  ...
+# Skipping staging smoke tests (not in staging environment)
+# Subtest: tests\\staging-smoke.test.mjs
+ok 4 - tests\\staging-smoke.test.mjs
+  ---
+  duration_ms: 197.708
+  type: 'test'
+  ...
+# Subtest: validate-skill-invocation hook
+    # Subtest: exits 0 when no input provided
+    ok 1 - exits 0 when no input provided
+      ---
+      duration_ms: 187.4656
+      type: 'test'
+      ...
+    # Subtest: exits 0 for non-Read tool calls
+    ok 2 - exits 0 for non-Read tool calls
+      ---
+      duration_ms: 186.1215
+      type: 'test'
+      ...
+    # Subtest: exits 0 for Read calls to non-skill files
+    ok 3 - exits 0 for Read calls to non-skill files
+      ---
+      duration_ms: 183.0753
+      type: 'test'
+      ...
+    # Subtest: exits 0 with warning for Read calls to SKILL.md files
+    ok 4 - exits 0 with warning for Read calls to SKILL.md files
+      ---
+      duration_ms: 181.7491
+      type: 'test'
+      ...
+    # Subtest: extracts skill name correctly from Windows-style paths
+    ok 5 - extracts skill name correctly from Windows-style paths
+      ---
+      duration_ms: 193.7688
+      type: 'test'
+      ...
+    # Subtest: extracts skill name correctly from Unix-style paths
+    ok 6 - extracts skill name correctly from Unix-style paths
+      ---
+      duration_ms: 201.0398
+      type: 'test'
+      ...
+    1..6
+ok 8 - validate-skill-invocation hook
+  ---
+  duration_ms: 1134.4618
+  type: 'suite'
+  ...
+# Subtest: validate-skill-invocation exports
+    # Subtest: exports validate function for programmatic use
+    ok 1 - exports validate function for programmatic use
+      ---
+      duration_ms: 5.8675
+      type: 'test'
+      ...
+    # Subtest: validate function works programmatically
+    ok 2 - validate function works programmatically
+      ---
+      duration_ms: 0.5203
+      type: 'test'
+      ...
+    1..2
+ok 9 - validate-skill-invocation exports
+  ---
+  duration_ms: 6.6654
+  type: 'suite'
+  ...
+# Subtest: workflow-validator - step schema validation
+    # Subtest: validateStep: detects missing step id
+    ok 1 - validateStep: detects missing step id
+      ---
+      duration_ms: 0.9492
+      type: 'test'
+      ...
+    # Subtest: validateStep: detects missing handler and action
+    ok 2 - validateStep: detects missing handler and action
+      ---
+      duration_ms: 0.2701
+      type: 'test'
+      ...
+    # Subtest: validateStep: allows step with id and handler
+    ok 3 - validateStep: allows step with id and handler
+      ---
+      duration_ms: 0.2686
+      type: 'test'
+      ...
+    # Subtest: validateStep: allows step with id and action
+    ok 4 - validateStep: allows step with id and action
+      ---
+      duration_ms: 0.2517
+      type: 'test'
+      ...
+    # Subtest: validateStep: validates multiple steps in multiple phases
+    ok 5 - validateStep: validates multiple steps in multiple phases
+      ---
+      duration_ms: 0.3172
+      type: 'test'
+      ...
+    # Subtest: validateStep: reports phase and step index in errors
+    ok 6 - validateStep: reports phase and step index in errors
+      ---
+      duration_ms: 0.2296
+      type: 'test'
+      ...
+    # Subtest: integration: validate() includes step schema validation
+    ok 7 - integration: validate() includes step schema validation
+      ---
+      duration_ms: 18.2207
+      type: 'test'
+      ...
+    1..7
+ok 10 - workflow-validator - step schema validation
+  ---
+  duration_ms: 22.49
+  type: 'test'
+  ...
+1..10
+# tests 36
+# suites 6
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5188.0507

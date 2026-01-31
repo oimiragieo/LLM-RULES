@@ -218,7 +218,9 @@ function generateMonitoringDashboard(metrics, traces = [], options = {}) {
       </table>
     </div>
 
-    ${metrics.recentErrors && metrics.recentErrors.length > 0 ? `
+    ${
+      metrics.recentErrors && metrics.recentErrors.length > 0
+        ? `
     <div class="section">
       <h2>Recent Errors</h2>
       <table>
@@ -230,17 +232,23 @@ function generateMonitoringDashboard(metrics, traces = [], options = {}) {
           </tr>
         </thead>
         <tbody>
-          ${metrics.recentErrors.map(err => `
+          ${metrics.recentErrors
+            .map(
+              err => `
             <tr>
               <td>${new Date(err.timestamp).toLocaleTimeString()}</td>
               <td>${err.message}</td>
               <td>${JSON.stringify(err.context || {})}</td>
             </tr>
-          `).join('')}
+          `
+            )
+            .join('')}
         </tbody>
       </table>
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 
     <div class="section">
       <h2>Duration Trend</h2>
@@ -273,7 +281,7 @@ function generateMonitoringDashboard(metrics, traces = [], options = {}) {
 function generateMetricsJSON(metrics) {
   const exportData = {
     ...metrics,
-    exportTime: Date.now()
+    exportTime: Date.now(),
   };
 
   return JSON.stringify(exportData, null, 2);
@@ -281,5 +289,5 @@ function generateMetricsJSON(metrics) {
 
 module.exports = {
   generateMonitoringDashboard,
-  generateMetricsJSON
+  generateMetricsJSON,
 };

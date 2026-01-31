@@ -76,11 +76,14 @@ describe('Git Notes Audit Hook', () => {
         taskId: 'test-123',
         agentName: 'developer',
         timestamp: new Date().toISOString(),
-        workSummary: 'Test feature implementation'
+        workSummary: 'Test feature implementation',
       };
 
       gitNotesAudit.execute(
-        { command: 'git commit -m "feat: test feature"', output: `[main ${commitHash}] feat: test feature` },
+        {
+          command: 'git commit -m "feat: test feature"',
+          output: `[main ${commitHash}] feat: test feature`,
+        },
         context
       );
 
@@ -105,7 +108,7 @@ describe('Git Notes Audit Hook', () => {
         taskId: 'bug-456',
         agentName: 'developer',
         timestamp: new Date().toISOString(),
-        workSummary: 'Fixed critical bug'
+        workSummary: 'Fixed critical bug',
       };
 
       gitNotesAudit.execute(
@@ -132,11 +135,14 @@ describe('Git Notes Audit Hook', () => {
         taskId: 'doc-789',
         agentName: 'technical-writer',
         timestamp: new Date().toISOString(),
-        workSummary: 'Updated documentation'
+        workSummary: 'Updated documentation',
       };
 
       gitNotesAudit.execute(
-        { command: 'git commit -m "docs: update readme"', output: `[main ${commitHash}] docs: update readme` },
+        {
+          command: 'git commit -m "docs: update readme"',
+          output: `[main ${commitHash}] docs: update readme`,
+        },
         context
       );
 
@@ -160,11 +166,14 @@ describe('Git Notes Audit Hook', () => {
         taskId: 'chore-111',
         agentName: 'developer',
         timestamp: timestamp,
-        workSummary: 'Code cleanup'
+        workSummary: 'Code cleanup',
       };
 
       gitNotesAudit.execute(
-        { command: 'git commit -m "chore: cleanup"', output: `[main ${commitHash}] chore: cleanup` },
+        {
+          command: 'git commit -m "chore: cleanup"',
+          output: `[main ${commitHash}] chore: cleanup`,
+        },
         context
       );
 
@@ -187,11 +196,14 @@ describe('Git Notes Audit Hook', () => {
         taskId: 'test-222',
         agentName: 'qa',
         timestamp: new Date().toISOString(),
-        workSummary: 'Added test coverage'
+        workSummary: 'Added test coverage',
       };
 
       gitNotesAudit.execute(
-        { command: 'git commit -m "test: add tests"', output: `[main ${commitHash}] test: add tests` },
+        {
+          command: 'git commit -m "test: add tests"',
+          output: `[main ${commitHash}] test: add tests`,
+        },
         context
       );
 
@@ -211,13 +223,23 @@ describe('Git Notes Audit Hook', () => {
       const timestamp = '2026-01-29T11:00:00Z';
       const agentName = 'developer';
 
-      const expectedHash = crypto.createHash('sha256')
+      const expectedHash = crypto
+        .createHash('sha256')
         .update(taskId + commitHash + timestamp + agentName)
         .digest('hex');
 
-      const actualHash = gitNotesAudit.computeVerificationHash(taskId, commitHash, timestamp, agentName);
+      const actualHash = gitNotesAudit.computeVerificationHash(
+        taskId,
+        commitHash,
+        timestamp,
+        agentName
+      );
 
-      assert.strictEqual(actualHash, expectedHash, 'Verification hash must match SHA-256(taskId+commitHash+timestamp+agentName)');
+      assert.strictEqual(
+        actualHash,
+        expectedHash,
+        'Verification hash must match SHA-256(taskId+commitHash+timestamp+agentName)'
+      );
     });
 
     it('detects tampered notes', () => {
@@ -310,7 +332,7 @@ Hash: 0000000000000000000000000000000000000000000000000000000000000000`;
           taskId: `perf-${i}`,
           agentName: 'developer',
           timestamp: new Date().toISOString(),
-          workSummary: 'Performance test'
+          workSummary: 'Performance test',
         };
 
         gitNotesAudit.buildAuditNote(context, 'abc123');
@@ -352,7 +374,7 @@ Co-authored-by: Someone <someone@example.com>`;
         taskId: 'special-777',
         agentName: 'developer',
         timestamp: new Date().toISOString(),
-        workSummary: 'Fixed "quotes" and \'apostrophes\' and $pecial ch@rs'
+        workSummary: 'Fixed "quotes" and \'apostrophes\' and $pecial ch@rs',
       };
 
       const note = gitNotesAudit.buildAuditNote(context, 'abc123');
@@ -362,7 +384,7 @@ Co-authored-by: Someone <someone@example.com>`;
       assert.ok(!note.includes('\n\n'), 'Should not create malformed note structure');
     });
 
-    it('doesn\'t leak credentials in notes', () => {
+    it("doesn't leak credentials in notes", () => {
       if (!gitNotesAudit) {
         assert.fail('Hook module not loaded');
       }
@@ -371,7 +393,7 @@ Co-authored-by: Someone <someone@example.com>`;
         taskId: 'creds-888',
         agentName: 'developer',
         timestamp: new Date().toISOString(),
-        workSummary: 'Updated API_KEY=sk-abc123 and PASSWORD=secret123'
+        workSummary: 'Updated API_KEY=sk-abc123 and PASSWORD=secret123',
       };
 
       const note = gitNotesAudit.buildAuditNote(context, 'abc123');

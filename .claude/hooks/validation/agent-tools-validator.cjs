@@ -29,38 +29,49 @@ const MCP_PATTERN = new RegExp(schema.definitions.mcpToolPattern.pattern);
 
 // Agent-specific rules
 const AGENT_RULES = {
-  'orchestrator': {
+  orchestrator: {
     requiredTools: ['Task'],
-    reason: 'Orchestrators MUST have Task tool for spawning subagents'
+    reason: 'Orchestrators MUST have Task tool for spawning subagents',
   },
   'code-reviewer': {
     forbiddenTools: ['Write', 'Edit'],
-    reason: 'Code reviewers are read-only and must not modify files'
+    reason: 'Code reviewers are read-only and must not modify files',
   },
-  'researcher': {
+  researcher: {
     forbiddenTools: ['Write', 'Edit'],
-    reason: 'Researchers are read-only and must not modify files'
+    reason: 'Researchers are read-only and must not modify files',
   },
-  'router': {
-    allowedTools: ['Read', 'Task', 'TaskList', 'TaskCreate', 'TaskUpdate', 'TaskGet', 'AskUserQuestion', 'Bash', 'Skill'],
-    reason: 'Router has restricted toolset per CLAUDE.md Section 1.1 (Bash limited to read-only git, Skill for agent/skill creation)'
-  }
+  router: {
+    allowedTools: [
+      'Read',
+      'Task',
+      'TaskList',
+      'TaskCreate',
+      'TaskUpdate',
+      'TaskGet',
+      'AskUserQuestion',
+      'Bash',
+      'Skill',
+    ],
+    reason:
+      'Router has restricted toolset per CLAUDE.md Section 1.1 (Bash limited to read-only git, Skill for agent/skill creation)',
+  },
 };
 
 // Category-specific requirements
 const CATEGORY_REQUIREMENTS = {
-  'core': {
+  core: {
     requiredTools: ['TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'],
-    reason: 'Core agents must have task tracking tools'
+    reason: 'Core agents must have task tracking tools',
   },
-  'domain': {
+  domain: {
     requiredTools: ['TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'],
-    reason: 'Domain agents must have task tracking tools'
+    reason: 'Domain agents must have task tracking tools',
   },
-  'orchestrator': {
+  orchestrator: {
     requiredTools: ['Task', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'],
-    reason: 'Orchestrators must have Task tool and task tracking'
-  }
+    reason: 'Orchestrators must have Task tool and task tracking',
+  },
 };
 
 /**
@@ -125,7 +136,7 @@ function validateAgentTools(filePath, content) {
     return {
       valid: false,
       errors: ['No frontmatter found in agent file'],
-      warnings: []
+      warnings: [],
     };
   }
 
@@ -133,7 +144,7 @@ function validateAgentTools(filePath, content) {
     return {
       valid: false,
       errors: ['No tools array found in frontmatter'],
-      warnings: []
+      warnings: [],
     };
   }
 
@@ -172,7 +183,9 @@ function validateAgentTools(filePath, content) {
       invalidTools.push(tool);
     } else if (validation.type === 'legacy') {
       legacyTools.push(tool);
-      warnings.push(`Legacy/deprecated tool "${tool}" should be replaced (Search->Grep, Git->Bash, SequentialThinking->Skill, MCP Tools->specific tools)`);
+      warnings.push(
+        `Legacy/deprecated tool "${tool}" should be replaced (Search->Grep, Git->Bash, SequentialThinking->Skill, MCP Tools->specific tools)`
+      );
     } else if (validation.type.startsWith('mcp')) {
       mcpTools.push(tool);
       if (!validation.configured) {
@@ -192,7 +205,9 @@ function validateAgentTools(filePath, content) {
     if (agentRule.requiredTools) {
       const missing = agentRule.requiredTools.filter(t => !tools.includes(t));
       if (missing.length > 0) {
-        errors.push(`${agentName}: Missing required tools: ${missing.join(', ')} (${agentRule.reason})`);
+        errors.push(
+          `${agentName}: Missing required tools: ${missing.join(', ')} (${agentRule.reason})`
+        );
       }
     }
 
@@ -206,7 +221,9 @@ function validateAgentTools(filePath, content) {
     if (agentRule.allowedTools) {
       const disallowed = tools.filter(t => !agentRule.allowedTools.includes(t));
       if (disallowed.length > 0) {
-        errors.push(`${agentName}: Disallowed tools: ${disallowed.join(', ')} (${agentRule.reason})`);
+        errors.push(
+          `${agentName}: Disallowed tools: ${disallowed.join(', ')} (${agentRule.reason})`
+        );
       }
     }
   }
@@ -216,7 +233,9 @@ function validateAgentTools(filePath, content) {
   if (categoryReq) {
     const missing = categoryReq.requiredTools.filter(t => !tools.includes(t));
     if (missing.length > 0) {
-      errors.push(`Category "${category}": Missing required tools: ${missing.join(', ')} (${categoryReq.reason})`);
+      errors.push(
+        `Category "${category}": Missing required tools: ${missing.join(', ')} (${categoryReq.reason})`
+      );
     }
   }
 
@@ -229,8 +248,8 @@ function validateAgentTools(filePath, content) {
       category,
       toolCount: tools.length,
       mcpToolCount: mcpTools.length,
-      legacyToolCount: legacyTools.length
-    }
+      legacyToolCount: legacyTools.length,
+    },
   };
 }
 
@@ -247,7 +266,11 @@ async function handler(input) {
   const { filePath, content } = input;
 
   // Only validate agent files (skip README.md)
-  if (!filePath.includes('.claude/agents/') || !filePath.endsWith('.md') || filePath.endsWith('README.md')) {
+  if (
+    !filePath.includes('.claude/agents/') ||
+    !filePath.endsWith('.md') ||
+    filePath.endsWith('README.md')
+  ) {
     return { decision: 'allow' };
   }
 
@@ -263,14 +286,14 @@ async function handler(input) {
       '  2. Ensure category-specific requirements are met',
       '  3. Check agent-specific rules (orchestrators, reviewers, etc.)',
       '',
-      `Enforcement mode: ${mode} (set AGENT_TOOLS_VALIDATOR=warn to allow with warnings)`
+      `Enforcement mode: ${mode} (set AGENT_TOOLS_VALIDATOR=warn to allow with warnings)`,
     ].join('\n');
 
     if (mode === 'block') {
       return {
         decision: 'deny',
         reason: errorMsg,
-        metadata: result.metadata
+        metadata: result.metadata,
       };
     } else {
       console.warn(errorMsg);
@@ -279,15 +302,17 @@ async function handler(input) {
 
   // Show warnings even if valid
   if (result.warnings.length > 0) {
-    console.warn([
-      `Agent tools warnings for ${path.basename(filePath)}:`,
-      ...result.warnings.map(w => `  ⚠️  ${w}`)
-    ].join('\n'));
+    console.warn(
+      [
+        `Agent tools warnings for ${path.basename(filePath)}:`,
+        ...result.warnings.map(w => `  ⚠️  ${w}`),
+      ].join('\n')
+    );
   }
 
   return {
     decision: 'allow',
-    metadata: result.metadata
+    metadata: result.metadata,
   };
 }
 
@@ -302,11 +327,9 @@ const metadata = {
   enforcement: {
     modes: ['block', 'warn', 'off'],
     default: 'warn',
-    env: 'AGENT_TOOLS_VALIDATOR'
+    env: 'AGENT_TOOLS_VALIDATOR',
   },
-  dependencies: [
-    '.claude/schemas/agent-tools.json'
-  ]
+  dependencies: ['.claude/schemas/agent-tools.json'],
 };
 
 module.exports = {
@@ -316,8 +339,8 @@ module.exports = {
   _test: {
     extractFrontmatter,
     isApprovedTool,
-    validateAgentTools
-  }
+    validateAgentTools,
+  },
 };
 
 // CLI mode for testing

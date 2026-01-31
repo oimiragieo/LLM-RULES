@@ -5,6 +5,7 @@
 Unified skill that guides spec creation through structured, interactive process.
 
 Wraps these existing skills:
+
 - progressive-disclosure (requirements gathering)
 - spec-validator (schema validation)
 - plan-generator (plan from spec)
@@ -16,6 +17,7 @@ Wraps these existing skills:
 Question: "What are you building?"
 
 Auto-detect from description:
+
 - Feature: "Build X functionality" → `type: feature`
 - Bug: "Fix X issue" → `type: bug`
 - Chore: "Update X component" → `type: chore`
@@ -86,6 +88,7 @@ Auto-populate spec from answers:
 # SPEC: [Feature Name]
 
 ## 1. Overview
+
 **Title**: [From question 1]
 **Type**: [Detected type]
 **Objective**: [User summary]
@@ -95,27 +98,32 @@ Auto-populate spec from answers:
 **Acceptance Criteria**: [From question 5]
 
 ## 2. Problem Statement
+
 - **Current State**: [From question 1 answers]
 - **Pain Points**: [Extracted from answers]
 - **Impact**: [Quantified if possible]
 
 ## 3. Proposed Solution
+
 - **Approach**: [From user input]
 - **Key Features**: [From answers]
 - **Scope**: [What's in/out]
 
 ## 4. Implementation Approach
+
 - **Phase 1**: [Design/spike if needed]
 - **Phase 2**: [Core implementation]
 - **Phase 3**: [Testing]
 - **Phase 4**: [Documentation]
 
 ## 5. Success Metrics
+
 - **Quantitative**: [From question 3]
 - **Qualitative**: [User satisfaction]
 - **Timeline**: [From question 4]
 
 ## 6. Effort Estimate
+
 - **Design**: 1 day
 - **Implementation**: 3 days
 - **Testing**: 2 days
@@ -123,11 +131,13 @@ Auto-populate spec from answers:
 - **Total**: 7 days
 
 ## 7. Dependencies
+
 - **Required**: [Extracted from context]
 - **Blocking**: [What must complete first]
 - **Risk**: [Key risks identified]
 
 ## 8. Acceptance Criteria Checklist
+
 - [ ] Feature implemented per spec
 - [ ] All tests passing
 - [ ] Documentation updated
@@ -138,6 +148,7 @@ Auto-populate spec from answers:
 ### 4. Validation
 
 Validate spec against schema:
+
 - Invoke spec-validator skill
 - Check: all required sections present
 - Check: at least 3 acceptance criteria
@@ -146,6 +157,7 @@ Validate spec against schema:
 ### 5. Plan Suggestion
 
 After spec approved:
+
 - Suggest: "Ready for planner to create plan?"
 - If yes: Show `Skill({ skill: "plan-generator", args: { specPath: "..." } })`
 - If no: Allow editing spec
@@ -153,11 +165,13 @@ After spec approved:
 ### 6. Storage
 
 Save spec to:
+
 ```
 .claude/context/artifacts/specs/[feature-name]-spec-YYYYMMDD.md
 ```
 
 Track metadata:
+
 - trackId: auto-generated
 - type: detected
 - status: "new"

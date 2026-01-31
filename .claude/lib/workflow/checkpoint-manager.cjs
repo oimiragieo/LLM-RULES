@@ -412,6 +412,9 @@ const SPEC003_CHECKPOINT_DIR = path.join(__dirname, '../../context/workflows/che
 // Track step numbers for workflows
 const workflowStepCounters = new Map();
 
+// Memory safety: limit max workflow counters (LRU eviction)
+const MAX_WORKFLOW_COUNTERS = 1000;
+
 function getStepNumber(workflowId, stepId) {
   const match = stepId.match(/(\d+)/);
   if (match) {
@@ -420,6 +423,17 @@ function getStepNumber(workflowId, stepId) {
   const currentCount = workflowStepCounters.get(workflowId) || 0;
   const nextCount = currentCount + 1;
   workflowStepCounters.set(workflowId, nextCount);
+
+  // Memory safety: enforce max size with LRU eviction
+  if (workflowStepCounters.size > MAX_WORKFLOW_COUNTERS) {
+    // Evict oldest entry (first key in Map, since Map preserves insertion order)
+    const firstKey = workflowStepCounters.keys().next().value;
+    workflowStepCounters.delete(firstKey);
+    console.warn(
+      `[CheckpointManager] Evicted workflow counter for ${firstKey} (size: ${workflowStepCounters.size})`
+    );
+  }
+
   return nextCount;
 }
 
@@ -440,8 +454,27 @@ function generateChecksum(data) {
 
 /**
  * Save checkpoint (simple API)
+ * Accepts both signatures:
+ * - save({ workflowId, stepId, state }, checkpointDir)
+ * - save(workflowId, stepId, state, checkpointDir)
  */
-async function save(workflowId, stepId, state, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+async function save(arg1, arg2, arg3, arg4) {
+  let workflowId, stepId, state, checkpointDir;
+
+  // Handle object-style call: save({ workflowId, stepId, state }, checkpointDir)
+  if (typeof arg1 === 'object' && arg1 !== null && arg1.workflowId) {
+    workflowId = arg1.workflowId;
+    stepId = arg1.stepId;
+    state = arg1.state;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  } else {
+    // Handle positional call: save(workflowId, stepId, state, checkpointDir)
+    workflowId = arg1;
+    stepId = arg2;
+    state = arg3;
+    checkpointDir = arg4 || SPEC003_CHECKPOINT_DIR;
+  }
+
   await fs.promises.mkdir(checkpointDir, { recursive: true });
 
   const timestamp = new Date().toISOString();
@@ -462,8 +495,17 @@ async function save(workflowId, stepId, state, checkpointDir = SPEC003_CHECKPOIN
 
 /**
  * Load checkpoint (simple API)
+ * Accepts both: load({ workflowId }, checkpointDir) or load(workflowId, checkpointDir)
  */
-async function load(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+async function load(arg1, arg2) {
+  let workflowId, checkpointDir;
+  if (typeof arg1 === 'object' && arg1 !== null && arg1.workflowId) {
+    workflowId = arg1.workflowId;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  } else {
+    workflowId = arg1;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  }
   const checkpointPath = path.join(checkpointDir, `${workflowId}.json`);
 
   try {
@@ -479,8 +521,17 @@ async function load(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
 
 /**
  * Check if checkpoint exists (simple API)
+ * Accepts both: exists({ workflowId }, checkpointDir) or exists(workflowId, checkpointDir)
  */
-async function exists(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+async function exists(arg1, arg2) {
+  let workflowId, checkpointDir;
+  if (typeof arg1 === 'object' && arg1 !== null && arg1.workflowId) {
+    workflowId = arg1.workflowId;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  } else {
+    workflowId = arg1;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  }
   const checkpointPath = path.join(checkpointDir, `${workflowId}.json`);
 
   try {
@@ -493,8 +544,17 @@ async function exists(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
 
 /**
  * Verify checkpoint integrity (simple API)
+ * Accepts both: verify({ workflowId }, checkpointDir) or verify(workflowId, checkpointDir)
  */
-async function verify(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+async function verify(arg1, arg2) {
+  let workflowId, checkpointDir;
+  if (typeof arg1 === 'object' && arg1 !== null && arg1.workflowId) {
+    workflowId = arg1.workflowId;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  } else {
+    workflowId = arg1;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  }
   const checkpoint = await load(workflowId, checkpointDir);
 
   if (!checkpoint) {
@@ -507,8 +567,17 @@ async function verify(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
 
 /**
  * Clear checkpoint (simple API)
+ * Accepts both: clear({ workflowId }, checkpointDir) or clear(workflowId, checkpointDir)
  */
-async function clear(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+async function clear(arg1, arg2) {
+  let workflowId, checkpointDir;
+  if (typeof arg1 === 'object' && arg1 !== null && arg1.workflowId) {
+    workflowId = arg1.workflowId;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  } else {
+    workflowId = arg1;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  }
   const checkpointPath = path.join(checkpointDir, `${workflowId}.json`);
 
   try {
@@ -523,8 +592,17 @@ async function clear(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
 
 /**
  * Recover workflow from checkpoint (simple API)
+ * Accepts both: recover({ workflowId }, checkpointDir) or recover(workflowId, checkpointDir)
  */
-async function recover(workflowId, checkpointDir = SPEC003_CHECKPOINT_DIR) {
+async function recover(arg1, arg2) {
+  let workflowId, checkpointDir;
+  if (typeof arg1 === 'object' && arg1 !== null && arg1.workflowId) {
+    workflowId = arg1.workflowId;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  } else {
+    workflowId = arg1;
+    checkpointDir = arg2 || SPEC003_CHECKPOINT_DIR;
+  }
   const checkpoint = await load(workflowId, checkpointDir);
 
   if (!checkpoint) {

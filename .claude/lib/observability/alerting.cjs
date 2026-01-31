@@ -30,7 +30,7 @@ class AlertingSystem {
       actions: config.actions || [],
       severity: config.severity || 'warning',
       deduplicationWindow: config.deduplicationWindow || 0,
-      metadata: config.metadata || {}
+      metadata: config.metadata || {},
     };
 
     this.alerts.push(alert);
@@ -63,7 +63,7 @@ class AlertingSystem {
             timestamp: Date.now(),
             threshold: alert.threshold,
             severity: alert.severity,
-            metadata: alert.metadata
+            metadata: alert.metadata,
           };
 
           triggered.push(triggeredAlert);
@@ -94,7 +94,7 @@ class AlertingSystem {
     const lastTime = this.lastTriggered.get(alertName);
     const now = Date.now();
 
-    if (lastTime && (now - lastTime) < windowMs) {
+    if (lastTime && now - lastTime < windowMs) {
       return true;
     }
 
@@ -154,7 +154,7 @@ class AlertingSystem {
   recordAlert(alert) {
     this.alertHistory.push({
       ...alert,
-      recordedAt: Date.now()
+      recordedAt: Date.now(),
     });
   }
 
@@ -196,7 +196,7 @@ class AlertingSystem {
       name: alert.name,
       threshold: alert.threshold,
       severity: alert.severity,
-      metadata: alert.metadata
+      metadata: alert.metadata,
     }));
   }
 
@@ -214,9 +214,9 @@ class AlertingSystem {
           'Check recent error logs for patterns',
           'Verify task inputs and dependencies',
           'Check system resource availability',
-          'Review recent code changes'
+          'Review recent code changes',
         ],
-        runbook: 'https://docs.example.com/alerts/high-error-rate'
+        runbook: 'https://docs.example.com/alerts/high-error-rate',
       },
       memory_pressure: {
         description: 'Memory usage exceeds safe threshold',
@@ -226,9 +226,9 @@ class AlertingSystem {
           'Identify memory-intensive operations',
           'Check for memory leaks',
           'Consider reducing concurrent task limit',
-          'Review recent task workloads'
+          'Review recent task workloads',
         ],
-        runbook: 'https://docs.example.com/alerts/memory-pressure'
+        runbook: 'https://docs.example.com/alerts/memory-pressure',
       },
       context_exhaustion: {
         description: 'Context window usage approaching limit',
@@ -238,9 +238,9 @@ class AlertingSystem {
           'Invoke context-compressor skill',
           'Summarize completed work',
           'Archive completed tasks',
-          'Consider breaking into subtasks'
+          'Consider breaking into subtasks',
         ],
-        runbook: 'https://docs.example.com/alerts/context-exhaustion'
+        runbook: 'https://docs.example.com/alerts/context-exhaustion',
       },
       performance_degradation: {
         description: 'Task duration significantly higher than baseline',
@@ -250,9 +250,9 @@ class AlertingSystem {
           'Check system resource contention',
           'Review recent performance changes',
           'Identify slow operations via profiling',
-          'Consider optimization opportunities'
+          'Consider optimization opportunities',
         ],
-        runbook: 'https://docs.example.com/alerts/performance-degradation'
+        runbook: 'https://docs.example.com/alerts/performance-degradation',
       },
       long_task_hang: {
         description: 'Task running for over 1 hour without completion',
@@ -262,10 +262,10 @@ class AlertingSystem {
           'Check task logs for progress indicators',
           'Verify task is not deadlocked',
           'Consider manual intervention',
-          'Check for infinite loops or blocking operations'
+          'Check for infinite loops or blocking operations',
         ],
-        runbook: 'https://docs.example.com/alerts/long-task-hang'
-      }
+        runbook: 'https://docs.example.com/alerts/long-task-hang',
+      },
     };
   }
 

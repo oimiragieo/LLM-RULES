@@ -205,7 +205,8 @@ function queryErrors(filter = {}) {
     // All files in directory
     try {
       if (fs.existsSync(dir)) {
-        files = fs.readdirSync(dir)
+        files = fs
+          .readdirSync(dir)
           .filter(f => f.endsWith('.jsonl'))
           .map(f => path.join(dir, f))
           .sort()
@@ -298,8 +299,7 @@ function archiveOldLogs(options = {}) {
   let files = [];
   try {
     if (fs.existsSync(dir)) {
-      files = fs.readdirSync(dir)
-        .filter(f => f.startsWith('errors-') && f.endsWith('.jsonl'));
+      files = fs.readdirSync(dir).filter(f => f.startsWith('errors-') && f.endsWith('.jsonl'));
     }
   } catch (e) {
     if (process.env.DEBUG_ERROR_WRITER) {

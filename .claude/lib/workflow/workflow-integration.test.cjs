@@ -18,6 +18,9 @@ const tests = [];
 let passed = 0;
 let failed = 0;
 
+// SEC-IMPL-003: Track WorkflowEngine instances for cleanup to prevent memory leaks
+const engineInstances = [];
+
 function describe(name, fn) {
   console.log(`\n${name}`);
   fn();
@@ -37,6 +40,15 @@ async function runTests() {
       console.log(`  ✗ ${test.name}`);
       console.log(`    Error: ${e.message}`);
       failed++;
+    } finally {
+      // SEC-IMPL-003: Clean up WorkflowEngine event handlers after each test
+      // Prevents memory leak from accumulated handlers
+      for (const engine of engineInstances) {
+        if (engine && typeof engine.clearHandlers === 'function') {
+          engine.clearHandlers();
+        }
+      }
+      engineInstances.length = 0; // Clear array
     }
   }
 }
@@ -59,6 +71,32 @@ const TEST_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'test-integration
 const TEST_CHECKPOINT_DIR = path.join(TEST_DIR, 'checkpoints');
 const TEST_BACKUP_DIR = path.join(TEST_DIR, 'backups');
 const TEST_STATE_FILE = path.join(TEST_DIR, 'evolution-state.json');
+
+// SEC-IMPL-003: Monkey-patch WorkflowEngine to track instances for cleanup
+const Module = require('module');
+const originalRequire = Module.prototype.require;
+
+Module.prototype.require = function (id) {
+  const module = originalRequire.apply(this, arguments);
+
+  // Intercept workflow-engine.cjs
+  if (id === './workflow-engine.cjs' && module.WorkflowEngine) {
+    const OriginalWorkflowEngine = module.WorkflowEngine;
+
+    // Return wrapped version that tracks instances
+    return {
+      ...module,
+      WorkflowEngine: class TrackedWorkflowEngine extends OriginalWorkflowEngine {
+        constructor(...args) {
+          super(...args);
+          engineInstances.push(this);
+        }
+      },
+    };
+  }
+
+  return module;
+};
 
 // Cleanup function
 function cleanup() {

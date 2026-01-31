@@ -128,7 +128,9 @@ describe('Smart Revert Enhancement', () => {
 
       // ACT
       assert(logicalUnitTracker, 'logical-unit-tracker.cjs not found');
-      const deps = await logicalUnitTracker.findDependencies(testRepoPath, '8', { transitive: true });
+      const deps = await logicalUnitTracker.findDependencies(testRepoPath, '8', {
+        transitive: true,
+      });
 
       // ASSERT: Should include both direct and transitive dependencies
       assert(deps.includes('7'), 'Task #8 should depend on Task #7');
@@ -240,7 +242,7 @@ describe('Smart Revert Enhancement', () => {
         taskId: '6',
         timestamp: new Date().toISOString(),
         author: 'test@example.com',
-        metadata: { phase: 'implementation' }
+        metadata: { phase: 'implementation' },
       });
       createCommitWithNote(testRepoPath, 'Feature', note);
 
@@ -400,7 +402,5 @@ function getGitNote(repoPath, commitHash) {
 }
 
 function getCommitLog(repoPath) {
-  return execSync('git log --oneline', { cwd: repoPath, encoding: 'utf8' })
-    .trim()
-    .split('\n');
+  return execSync('git log --oneline', { cwd: repoPath, encoding: 'utf8' }).trim().split('\n');
 }

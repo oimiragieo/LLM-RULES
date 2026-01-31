@@ -39,7 +39,7 @@ class ConductorGapAnalyzer {
       missing,
       redundant,
       incompatible,
-      trackCount
+      trackCount,
     };
   }
 
@@ -59,13 +59,13 @@ class ConductorGapAnalyzer {
     return {
       lineCount: {
         conductor: conductorLines,
-        agentStudio: agentStudioLines
+        agentStudio: agentStudioLines,
       },
       complexity: {
         conductor: conductorComplexity,
-        agentStudio: agentStudioComplexity
+        agentStudio: agentStudioComplexity,
       },
-      commitCount
+      commitCount,
     };
   }
 
@@ -77,38 +77,38 @@ class ConductorGapAnalyzer {
     const patterns = [];
 
     // Check for git notes
-    if (!await this._hasGitNotesHook(this.conductorPath)) {
+    if (!(await this._hasGitNotesHook(this.conductorPath))) {
       patterns.push({
         name: 'git-notes-audit hook',
         description: 'Automatic git notes attachment for commit metadata',
-        effort: '2 hours'
+        effort: '2 hours',
       });
     }
 
     // Check for track metadata schema
-    if (!await this._hasTrackMetadataSchema(this.conductorPath)) {
+    if (!(await this._hasTrackMetadataSchema(this.conductorPath))) {
       patterns.push({
         name: 'track metadata schema',
         description: 'Validated metadata structure for tracks',
-        effort: '1 hour'
+        effort: '1 hour',
       });
     }
 
     // Check for workflow checkpointing
-    if (!await this._hasWorkflowCheckpointing(this.conductorPath)) {
+    if (!(await this._hasWorkflowCheckpointing(this.conductorPath))) {
       patterns.push({
         name: 'workflow checkpointing',
         description: 'State persistence and crash recovery',
-        effort: '3 hours'
+        effort: '3 hours',
       });
     }
 
     // Check for brownfield detection
-    if (!await this._hasBrownfieldDetection(this.conductorPath)) {
+    if (!(await this._hasBrownfieldDetection(this.conductorPath))) {
       patterns.push({
         name: 'brownfield detection',
         description: 'Automatic tech stack detection',
-        effort: '4 hours'
+        effort: '4 hours',
       });
     }
 
@@ -178,38 +178,40 @@ class ConductorGapAnalyzer {
     const missing = [];
 
     // Tech stack auto-generation
-    if (!await this._fileExists(this.conductorPath, 'tech-stack.md')) {
+    if (!(await this._fileExists(this.conductorPath, 'tech-stack.md'))) {
       missing.push({
         name: 'tech-stack.md auto-generation (SPEC-005)',
         effort: '1 hour',
-        estimatedHours: 1
+        estimatedHours: 1,
       });
     }
 
     // Git notes audit
-    if (!await this._hasGitNotesHook(this.conductorPath)) {
+    if (!(await this._hasGitNotesHook(this.conductorPath))) {
       missing.push({
         name: 'git-notes-audit hook (SPEC-002)',
         effort: '2 hours',
-        estimatedHours: 2
+        estimatedHours: 2,
       });
     }
 
     // Track analytics
-    if (!await this._fileExists(this.conductorPath, '.claude/lib/utils/track-analytics.cjs')) {
+    if (!(await this._fileExists(this.conductorPath, '.claude/lib/utils/track-analytics.cjs'))) {
       missing.push({
         name: 'track-analytics module (SPEC-008)',
         effort: '2 hours',
-        estimatedHours: 2
+        estimatedHours: 2,
       });
     }
 
     // Brownfield detection
-    if (!await this._fileExists(this.conductorPath, '.claude/lib/utils/brownfield-detector.cjs')) {
+    if (
+      !(await this._fileExists(this.conductorPath, '.claude/lib/utils/brownfield-detector.cjs'))
+    ) {
       missing.push({
         name: 'brownfield-detection module (SPEC-005)',
         effort: '4 hours',
-        estimatedHours: 4
+        estimatedHours: 4,
       });
     }
 
@@ -253,7 +255,7 @@ class ConductorGapAnalyzer {
   async _countLines(dirPath) {
     let total = 0;
 
-    const walk = (dir) => {
+    const walk = dir => {
       const entries = fs.readdirSync(dir, { withFileTypes: true });
 
       for (const entry of entries) {
@@ -289,7 +291,7 @@ class ConductorGapAnalyzer {
   async _countFiles(dirPath) {
     let count = 0;
 
-    const walk = (dir) => {
+    const walk = dir => {
       const entries = fs.readdirSync(dir, { withFileTypes: true });
 
       for (const entry of entries) {
@@ -339,10 +341,10 @@ class ConductorGapAnalyzer {
     if (fs.existsSync(toolsDir)) {
       const tools = fs.readdirSync(toolsDir);
       for (const tool of tools) {
-        if (!await this._fileExists(this.agentStudioPath, `tools/${tool}`)) {
+        if (!(await this._fileExists(this.agentStudioPath, `tools/${tool}`))) {
           unique.push({
             name: `custom-tool: ${tool}`,
-            description: `Conductor-specific tool not in agent-studio`
+            description: `Conductor-specific tool not in agent-studio`,
           });
         }
       }
@@ -373,16 +375,23 @@ class ConductorGapAnalyzer {
   _generateRecommendations(gaps, patterns) {
     let recommendations = '';
 
+    // Helper to check feature name
+    const hasFeature = (arr, keyword) =>
+      arr.some(f => {
+        const name = typeof f === 'string' ? f : f.name || '';
+        return name.toLowerCase().includes(keyword.toLowerCase());
+      });
+
     // High-priority recommendations
-    if (gaps.missing.some(f => f.includes('git-notes'))) {
+    if (hasFeature(gaps.missing, 'git-notes')) {
       recommendations += '1. Enable git-notes-audit hook for commit traceability\n';
     }
 
-    if (gaps.incompatible.some(f => f.includes('workflow-state'))) {
+    if (hasFeature(gaps.incompatible, 'workflow-state')) {
       recommendations += '2. Migrate setup_state.json to workflow-state.schema.json format\n';
     }
 
-    if (gaps.missing.some(f => f.includes('track-analytics'))) {
+    if (hasFeature(gaps.missing, 'track-analytics')) {
       recommendations += '3. Install track-analytics module for project metrics\n';
     }
 

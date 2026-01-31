@@ -584,7 +584,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
 
       const priority = optimizationPriority(bottleneck, 100);
 
-      assert.ok(priority.effort === 'medium' || (priority.effortDays >= 0.5 && priority.effortDays <= 2));
+      assert.ok(
+        priority.effort === 'medium' || (priority.effortDays >= 0.5 && priority.effortDays <= 2)
+      );
     });
 
     it('should estimate low effort (<0.5 days)', () => {
@@ -644,7 +646,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
 
   describe('ProfilingReportGenerator - Markdown Reports (15+ tests)', () => {
     it('should generate markdown report from metrics and bottlenecks', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const metrics = { fn1: { executionTime: 100 } };
       const bottlenecks = [{ name: 'fn1', executionTime: 100, percentage: 50 }];
@@ -657,7 +661,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should include executive summary section', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const metrics = {};
       const bottlenecks = [{ name: 'fn1', executionTime: 500, percentage: 40 }];
@@ -669,7 +675,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should list top bottlenecks in summary', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const bottlenecks = [
         { name: 'fn1', executionTime: 500, percentage: 40 },
@@ -683,7 +691,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should include recommendations in summary', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const bottlenecks = [{ name: 'fn1', executionTime: 500, suggestions: ['Add caching'] }];
 
@@ -693,7 +703,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should include per-SPEC performance breakdown', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const metrics = {
         'SPEC-001': { executionTime: 100 },
@@ -702,11 +714,15 @@ describe('Performance Profiling Framework (RED Phase)', () => {
 
       const report = generateProfilingReport(metrics, [], { tier1: [], tier2: [], tier3: [] });
 
-      assert.ok(report.includes('SPEC-001') || report.includes('Per-SPEC') || report.includes('Breakdown'));
+      assert.ok(
+        report.includes('SPEC-001') || report.includes('Per-SPEC') || report.includes('Breakdown')
+      );
     });
 
     it('should include bottleneck analysis section', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const bottlenecks = [{ name: 'fn1', executionTime: 500 }];
 
@@ -716,13 +732,17 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should include optimization strategies for each bottleneck', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
-      const bottlenecks = [{
-        name: 'slowQuery',
-        executionTime: 600,
-        suggestions: ['Add indexing', 'Use caching'],
-      }];
+      const bottlenecks = [
+        {
+          name: 'slowQuery',
+          executionTime: 600,
+          suggestions: ['Add indexing', 'Use caching'],
+        },
+      ];
 
       const report = generateProfilingReport({}, bottlenecks, { tier1: [], tier2: [], tier3: [] });
 
@@ -730,7 +750,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should include tier-based recommendations (Tier 1)', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const targets = {
         tier1: [{ component: 'analytics', targetTime: 500, rationale: 'Critical path' }],
@@ -744,7 +766,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should include tier-based recommendations (Tier 2)', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const targets = {
         tier1: [],
@@ -758,7 +782,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should include tier-based recommendations (Tier 3)', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const targets = {
         tier1: [],
@@ -772,7 +798,9 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should include historical comparison if baseline available', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const metrics = { fn1: { executionTime: 100 } };
       const baseline = { fn1: { executionTime: 150 } };
@@ -784,32 +812,44 @@ describe('Performance Profiling Framework (RED Phase)', () => {
         baseline
       );
 
-      assert.ok(report.includes('Baseline') || report.includes('baseline') || report.includes('Historical'));
+      assert.ok(
+        report.includes('Baseline') || report.includes('baseline') || report.includes('Historical')
+      );
     });
 
     it('should estimate time savings per optimization', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
-      const bottlenecks = [{
-        name: 'slowFn',
-        executionTime: 500,
-        targetTime: 100,
-        callCount: 100,
-      }];
+      const bottlenecks = [
+        {
+          name: 'slowFn',
+          executionTime: 500,
+          targetTime: 100,
+          callCount: 100,
+        },
+      ];
 
       const report = generateProfilingReport({}, bottlenecks, { tier1: [], tier2: [], tier3: [] });
 
-      assert.ok(report.includes('savings') || report.includes('improvement') || report.includes('%'));
+      assert.ok(
+        report.includes('savings') || report.includes('improvement') || report.includes('%')
+      );
     });
 
     it('should estimate memory savings per optimization', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
-      const bottlenecks = [{
-        name: 'memoryHeavy',
-        memoryUsed: 100 * 1024 * 1024,
-        targetMemory: 50 * 1024 * 1024,
-      }];
+      const bottlenecks = [
+        {
+          name: 'memoryHeavy',
+          memoryUsed: 100 * 1024 * 1024,
+          targetMemory: 50 * 1024 * 1024,
+        },
+      ];
 
       const report = generateProfilingReport({}, bottlenecks, { tier1: [], tier2: [], tier3: [] });
 
@@ -817,20 +857,24 @@ describe('Performance Profiling Framework (RED Phase)', () => {
     });
 
     it('should format report as valid markdown', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
-      const report = generateProfilingReport(
-        { fn1: { executionTime: 100 } },
-        [],
-        { tier1: [], tier2: [], tier3: [] }
-      );
+      const report = generateProfilingReport({ fn1: { executionTime: 100 } }, [], {
+        tier1: [],
+        tier2: [],
+        tier3: [],
+      });
 
       // Check for markdown headers
       assert.ok(report.includes('#') || report.includes('##'));
     });
 
     it('should include visualization placeholders or ASCII charts', () => {
-      const { generateProfilingReport } = require('../.claude/lib/utils/profiling-report-generator.cjs');
+      const {
+        generateProfilingReport,
+      } = require('../.claude/lib/utils/profiling-report-generator.cjs');
 
       const metrics = {
         fn1: { executionTime: 500 },

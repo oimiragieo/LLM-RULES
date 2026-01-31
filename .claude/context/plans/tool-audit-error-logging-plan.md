@@ -13,6 +13,7 @@ Comprehensive audit of all tools used across agent-studio, establishment of an e
 ## Executive Summary
 
 This initiative addresses four interconnected goals:
+
 1. **Tools Inventory Audit** - Deep dive into all tools used in the codebase, verify against approved list
 2. **Error Logging System Design** - Infrastructure to capture, log, and report agent errors
 3. **Agent Tool Assignment Review** - Ensure all agents know which tools apply to them
@@ -20,14 +21,14 @@ This initiative addresses four interconnected goals:
 
 ## Key Questions Addressed
 
-| Question | Answer (from research) |
-|----------|----------------------|
+| Question                                                | Answer (from research)                                                                                          |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | What tools are currently used but not in approved list? | TOOL-001 identified MCP tools referenced but not configured; SequentialThinking in 11 agents without MCP server |
-| How should errors be captured? | Hook-based error interceptors at PreToolUse/PostToolUse boundaries with wrapper functions for try/catch |
-| What metadata is needed for error reports? | Agent name, timestamp, stack trace, context snapshot, tool name, recovery attempt status, session ID |
-| How to prevent sensitive data leaks? | Sanitization patterns, credential detection, environment variable redaction |
-| Which agents need which tools? | See Phase 3 tool assignment matrix |
-| How should reflection incorporate error review? | Daily error digest in reflection-queue.jsonl, weekly pattern analysis |
+| How should errors be captured?                          | Hook-based error interceptors at PreToolUse/PostToolUse boundaries with wrapper functions for try/catch         |
+| What metadata is needed for error reports?              | Agent name, timestamp, stack trace, context snapshot, tool name, recovery attempt status, session ID            |
+| How to prevent sensitive data leaks?                    | Sanitization patterns, credential detection, environment variable redaction                                     |
+| Which agents need which tools?                          | See Phase 3 tool assignment matrix                                                                              |
+| How should reflection incorporate error review?         | Daily error digest in reflection-queue.jsonl, weekly pattern analysis                                           |
 
 ---
 
@@ -132,6 +133,7 @@ Before creating ANY artifact:
 #### Phase 1 Error Handling
 
 If any task fails:
+
 1. Document error in `.claude/context/memory/issues.md`
 2. Continue with remaining parallel tasks
 3. Mark incomplete tasks for retry
@@ -246,6 +248,7 @@ If any task fails:
 #### Phase 2 Error Handling
 
 If sanitization patterns miss sensitive data:
+
 1. Add pattern to sanitizer immediately
 2. Scan existing logs for leaks (manual review)
 3. Purge affected logs if found
@@ -440,10 +443,12 @@ If sanitization patterns miss sensitive data:
     ```json
     {
       "matcher": "",
-      "hooks": [{
-        "type": "command",
-        "command": "node .claude/hooks/safety/error-capture-post-tool.cjs"
-      }]
+      "hooks": [
+        {
+          "type": "command",
+          "command": "node .claude/hooks/safety/error-capture-post-tool.cjs"
+        }
+      ]
     }
     ```
   - **Output**: Update `.claude/settings.json`
@@ -502,15 +507,18 @@ If sanitization patterns miss sensitive data:
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Spawn Command**:
+
 ```javascript
 Task({
-  subagent_type: "reflection-agent",
-  description: "Session reflection and learning extraction",
-  prompt: "You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
-})
+  subagent_type: 'reflection-agent',
+  description: 'Session reflection and learning extraction',
+  prompt:
+    'You are REFLECTION-AGENT. Read .claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created).',
+});
 ```
 
 **Success Criteria**:
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
@@ -519,46 +527,46 @@ Task({
 
 ## Risk Assessment
 
-| Risk | Impact | Likelihood | Mitigation |
-|------|--------|------------|------------|
-| Sensitive data leaks in error logs | HIGH | MEDIUM | Comprehensive sanitization patterns, automated detection |
-| Error log volume overwhelming | MEDIUM | LOW | Rotation strategy, aggregation, severity filtering |
-| Performance impact from error hooks | MEDIUM | LOW | Fail-open default, async logging |
-| Agents with incorrect tools cause failures | HIGH | MEDIUM | Validation schema, tool-availability-validator.cjs |
-| Reflection workflow overwhelmed by errors | MEDIUM | LOW | Summarization, top-N limits |
+| Risk                                       | Impact | Likelihood | Mitigation                                               |
+| ------------------------------------------ | ------ | ---------- | -------------------------------------------------------- |
+| Sensitive data leaks in error logs         | HIGH   | MEDIUM     | Comprehensive sanitization patterns, automated detection |
+| Error log volume overwhelming              | MEDIUM | LOW        | Rotation strategy, aggregation, severity filtering       |
+| Performance impact from error hooks        | MEDIUM | LOW        | Fail-open default, async logging                         |
+| Agents with incorrect tools cause failures | HIGH   | MEDIUM     | Validation schema, tool-availability-validator.cjs       |
+| Reflection workflow overwhelmed by errors  | MEDIUM | LOW        | Summarization, top-N limits                              |
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Parallel? | Dependencies |
-|-------|-------|-----------|-----------|--------------|
-| 0 | 4 | 4-6 hours | No | None |
-| 1 | 7 | 6-8 hours | Partial | Phase 0 |
-| 2 | 7 | 8-10 hours | Partial | Phase 0 |
-| 3 | 6 | 4-6 hours | Yes | Phase 1 |
-| 4 | 6 | 4-6 hours | No | Phase 2 |
-| 5 | 7 | 6-8 hours | Partial | Phases 1-4 |
-| FINAL | 3 | 1-2 hours | No | Phase 5 |
-| **Total** | **38** | **28-40 hours** | | |
+| Phase     | Tasks  | Est. Time       | Parallel? | Dependencies |
+| --------- | ------ | --------------- | --------- | ------------ |
+| 0         | 4      | 4-6 hours       | No        | None         |
+| 1         | 7      | 6-8 hours       | Partial   | Phase 0      |
+| 2         | 7      | 8-10 hours      | Partial   | Phase 0      |
+| 3         | 6      | 4-6 hours       | Yes       | Phase 1      |
+| 4         | 6      | 4-6 hours       | No        | Phase 2      |
+| 5         | 7      | 6-8 hours       | Partial   | Phases 1-4   |
+| FINAL     | 3      | 1-2 hours       | No        | Phase 5      |
+| **Total** | **38** | **28-40 hours** |           |              |
 
 ## Deliverables Summary
 
-| Deliverable | Location | Phase |
-|-------------|----------|-------|
-| Agent Tools Inventory | `.claude/context/artifacts/reports/agent-tools-inventory.md` | 1 |
-| Approved Tools List | `.claude/context/artifacts/approved-tools-list.md` | 1 |
-| Tool Mismatch Report | `.claude/context/artifacts/reports/tool-mismatch-report.md` | 1 |
-| Tool Dependency Matrix | `.claude/context/artifacts/tool-dependency-matrix.md` | 1 |
-| Error Log Schema | `.claude/schemas/error-log-schema.json` | 2 |
-| Error Sanitizer | `.claude/lib/utils/error-sanitizer.cjs` | 2 |
-| Error Capture Architecture | `.claude/context/artifacts/designs/error-capture-architecture.md` | 2 |
-| Error Report CLI | `.claude/tools/cli/error-report.cjs` | 5 |
-| Tool Assignment Reviews | `.claude/context/artifacts/reports/*-tool-review.md` | 3 |
-| Reflection Integration Spec | `.claude/context/artifacts/designs/reflection-error-integration-spec.md` | 4 |
-| Error Summary Extractor | `.claude/hooks/reflection/error-summary-extractor.cjs` | 4 |
-| Error Pattern Analyzer | `.claude/lib/analysis/error-pattern-analyzer.cjs` | 4 |
-| Error Capture Hook | `.claude/hooks/safety/error-capture-post-tool.cjs` | 5 |
-| Validation Report | `.claude/context/artifacts/reports/error-logging-validation-report.md` | 5 |
-| ADR-065 | `.claude/context/memory/decisions.md` | 5 |
+| Deliverable                 | Location                                                                 | Phase |
+| --------------------------- | ------------------------------------------------------------------------ | ----- |
+| Agent Tools Inventory       | `.claude/context/artifacts/reports/agent-tools-inventory.md`             | 1     |
+| Approved Tools List         | `.claude/context/artifacts/approved-tools-list.md`                       | 1     |
+| Tool Mismatch Report        | `.claude/context/artifacts/reports/tool-mismatch-report.md`              | 1     |
+| Tool Dependency Matrix      | `.claude/context/artifacts/tool-dependency-matrix.md`                    | 1     |
+| Error Log Schema            | `.claude/schemas/error-log-schema.json`                                  | 2     |
+| Error Sanitizer             | `.claude/lib/utils/error-sanitizer.cjs`                                  | 2     |
+| Error Capture Architecture  | `.claude/context/artifacts/designs/error-capture-architecture.md`        | 2     |
+| Error Report CLI            | `.claude/tools/cli/error-report.cjs`                                     | 5     |
+| Tool Assignment Reviews     | `.claude/context/artifacts/reports/*-tool-review.md`                     | 3     |
+| Reflection Integration Spec | `.claude/context/artifacts/designs/reflection-error-integration-spec.md` | 4     |
+| Error Summary Extractor     | `.claude/hooks/reflection/error-summary-extractor.cjs`                   | 4     |
+| Error Pattern Analyzer      | `.claude/lib/analysis/error-pattern-analyzer.cjs`                        | 4     |
+| Error Capture Hook          | `.claude/hooks/safety/error-capture-post-tool.cjs`                       | 5     |
+| Validation Report           | `.claude/context/artifacts/reports/error-logging-validation-report.md`   | 5     |
+| ADR-065                     | `.claude/context/memory/decisions.md`                                    | 5     |
 
 ---
 
@@ -577,33 +585,37 @@ This creates a recovery point before Phase 4-5 integration work.
 ## Appendix A: Tool Categories Reference
 
 ### Core Tools (Always Available)
+
 - Read, Write, Edit, Bash, Grep, Glob
 - TaskUpdate, TaskList, TaskCreate, TaskGet
 - Skill
 
 ### Task Tools (Router/Orchestrator Only)
+
 - Task (spawns subagents)
 
 ### MCP Tools (Require Server Configuration)
-- mcp__Exa__web_search_exa
-- mcp__Exa__get_code_context_exa
-- mcp__sequential-thinking__sequentialthinking
+
+- mcp**Exa**web_search_exa
+- mcp**Exa**get_code_context_exa
+- mcp**sequential-thinking**sequentialthinking
 
 ### Deprecated/Invalid Tools
+
 - SequentialThinking (use Skill({ skill: 'sequential-thinking' }) instead)
 - Search (not a valid tool, use Grep/Glob)
-- WebSearch (use mcp__Exa__web_search_exa if configured)
+- WebSearch (use mcp**Exa**web_search_exa if configured)
 
 ---
 
 ## Appendix B: Error Severity Classification
 
-| Severity | Criteria | Example |
-|----------|----------|---------|
-| CRITICAL | System halt, data loss risk | Hook crash, file corruption |
-| HIGH | Feature broken, workaround exists | Tool validation failure |
-| MEDIUM | Degraded experience | Slow response, retry succeeded |
-| LOW | Cosmetic, logging | Warning message, deprecation notice |
+| Severity | Criteria                          | Example                             |
+| -------- | --------------------------------- | ----------------------------------- |
+| CRITICAL | System halt, data loss risk       | Hook crash, file corruption         |
+| HIGH     | Feature broken, workaround exists | Tool validation failure             |
+| MEDIUM   | Degraded experience               | Slow response, retry succeeded      |
+| LOW      | Cosmetic, logging                 | Warning message, deprecation notice |
 
 ---
 
@@ -613,9 +625,17 @@ This creates a recovery point before Phase 4-5 integration work.
 const SANITIZATION_PATTERNS = [
   { name: 'api_key', pattern: /[A-Za-z0-9_-]{32,}/, replacement: '[API_KEY_REDACTED]' },
   { name: 'password', pattern: /password[=:][^\s]+/gi, replacement: 'password=[REDACTED]' },
-  { name: 'private_key', pattern: /-----BEGIN.*PRIVATE KEY-----[\s\S]*?-----END.*PRIVATE KEY-----/g, replacement: '[PRIVATE_KEY_REDACTED]' },
+  {
+    name: 'private_key',
+    pattern: /-----BEGIN.*PRIVATE KEY-----[\s\S]*?-----END.*PRIVATE KEY-----/g,
+    replacement: '[PRIVATE_KEY_REDACTED]',
+  },
   { name: 'aws_key', pattern: /AKIA[0-9A-Z]{16}/, replacement: '[AWS_KEY_REDACTED]' },
   { name: 'env_var', pattern: /process\.env\.[A-Z_]+/g, replacement: '[ENV_VAR_REDACTED]' },
-  { name: 'connection_string', pattern: /:\/\/[^:]+:[^@]+@/g, replacement: '://[CREDENTIALS_REDACTED]@' }
+  {
+    name: 'connection_string',
+    pattern: /:\/\/[^:]+:[^@]+@/g,
+    replacement: '://[CREDENTIALS_REDACTED]@',
+  },
 ];
 ```

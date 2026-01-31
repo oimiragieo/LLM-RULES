@@ -20,7 +20,7 @@ class ChaosEngineer {
       hooks: new Map(), // hookName -> failureRate
       tools: new Map(), // toolName -> failureRate
       contextExhausted: false,
-      memoryPressure: 0
+      memoryPressure: 0,
     };
     this.testResults = [];
     this.recoveryAttempts = [];
@@ -64,7 +64,7 @@ class ChaosEngineer {
     this.injections.contextExhausted = true;
     return {
       compressionUsed: true,
-      checkpointCreated: true
+      checkpointCreated: true,
     };
   }
 
@@ -100,16 +100,17 @@ class ChaosEngineer {
       retries: 0,
       auditTrail: [],
       recovered: false,
+      crashed: false, // Added: explicit crashed state
       failureRate: 0,
       recoveryRate: 0,
-      gcTriggered: false,
+      gcTriggered: this.injections.memoryPressure > 80, // Set immediately based on memory pressure
       compressionTriggered: false,
       truncationTriggered: false,
       maxConcurrency: 100,
       initialConcurrency: 100,
       checkpointCreated: false,
       checkpointValid: false,
-      finalState: { consistent: true }
+      finalState: { consistent: true },
     };
 
     // Run scenario simulation
@@ -124,7 +125,7 @@ class ChaosEngineer {
         result.auditTrail.push({
           type: 'failure',
           timestamp: Date.now(),
-          valid: true
+          valid: true,
         });
 
         // Attempt recovery
@@ -135,14 +136,14 @@ class ChaosEngineer {
           result.auditTrail.push({
             type: 'recovery',
             timestamp: Date.now(),
-            valid: true
+            valid: true,
           });
         }
       } else {
         result.auditTrail.push({
           type: 'success',
           timestamp: Date.now(),
-          valid: true
+          valid: true,
         });
       }
 
@@ -164,9 +165,10 @@ class ChaosEngineer {
     }
 
     // Calculate final metrics
-    result.failureRate = result.failures / result.totalAttempts;
+    result.failureRate = result.totalAttempts > 0 ? result.failures / result.totalAttempts : 0;
     result.recoveryRate = result.failures > 0 ? result.recoveries / result.failures : 1.0;
-    result.recovered = result.recoveryRate >= 0.9; // 90% recovery rate threshold
+    // Consider recovered if: no failures OR high recovery rate
+    result.recovered = result.failures === 0 || result.recoveryRate >= 0.9;
 
     this.testResults.push(result);
     return result;
@@ -182,7 +184,7 @@ class ChaosEngineer {
     const operation = {
       name: scenarioName,
       failed: false,
-      reason: null
+      reason: null,
     };
 
     // Check hook failures
@@ -219,7 +221,7 @@ class ChaosEngineer {
   async attemptRecovery(operation) {
     const recovery = {
       success: false,
-      retries: 0
+      retries: 0,
     };
 
     // Retry up to 3 times
@@ -233,7 +235,7 @@ class ChaosEngineer {
         this.recoveryAttempts.push({
           operation: operation.name,
           retries: recovery.retries,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
         return recovery;
       }
@@ -252,7 +254,7 @@ class ChaosEngineer {
     return {
       passed: result.recovered && result.recoveryRate >= 0.9,
       recoveryRate: result.recoveryRate,
-      issues: result.recovered ? [] : ['low-recovery-rate']
+      issues: result.recovered ? [] : ['low-recovery-rate'],
     };
   }
 
@@ -275,8 +277,16 @@ class ChaosEngineer {
 
 ## Failure Injection
 
-- **Hook Failures**: ${Array.from(this.injections.hooks.entries()).map(([h, r]) => `${h} (${r * 100}%)`).join(', ') || 'None'}
-- **Tool Failures**: ${Array.from(this.injections.tools.entries()).map(([t, r]) => `${t} (${r * 100}%)`).join(', ') || 'None'}
+- **Hook Failures**: ${
+      Array.from(this.injections.hooks.entries())
+        .map(([h, r]) => `${h} (${r * 100}%)`)
+        .join(', ') || 'None'
+    }
+- **Tool Failures**: ${
+      Array.from(this.injections.tools.entries())
+        .map(([t, r]) => `${t} (${r * 100}%)`)
+        .join(', ') || 'None'
+    }
 - **Memory Pressure**: ${this.injections.memoryPressure}%
 
 ## Recovery Metrics

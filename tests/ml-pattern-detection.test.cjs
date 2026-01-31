@@ -18,7 +18,8 @@ describe('SPEC-023: ML Pattern Detection', () => {
   let detector;
 
   before(async () => {
-    WorkflowPatternDetector = require('../.claude/lib/ml/pattern-detector.cjs').WorkflowPatternDetector;
+    WorkflowPatternDetector =
+      require('../.claude/lib/ml/pattern-detector.cjs').WorkflowPatternDetector;
   });
 
   describe('Class Instantiation', () => {
@@ -44,25 +45,25 @@ describe('SPEC-023: ML Pattern Detection', () => {
         taskSequence: [
           { agentType: 'planner', taskType: 'design' },
           { agentType: 'developer', taskType: 'implementation' },
-          { agentType: 'qa', taskType: 'testing' }
-        ]
+          { agentType: 'qa', taskType: 'testing' },
+        ],
       },
       {
         sessionId: 'session2',
         taskSequence: [
           { agentType: 'planner', taskType: 'design' },
           { agentType: 'developer', taskType: 'implementation' },
-          { agentType: 'qa', taskType: 'testing' }
-        ]
+          { agentType: 'qa', taskType: 'testing' },
+        ],
       },
       {
         sessionId: 'session3',
         taskSequence: [
           { agentType: 'planner', taskType: 'design' },
           { agentType: 'security-architect', taskType: 'review' },
-          { agentType: 'developer', taskType: 'implementation' }
-        ]
-      }
+          { agentType: 'developer', taskType: 'implementation' },
+        ],
+      },
     ];
 
     it('should detect frequent single-item sequences', () => {
@@ -86,16 +87,16 @@ describe('SPEC-023: ML Pattern Detection', () => {
 
     it('should respect minSupport threshold', () => {
       const patterns = detector.detectFrequentSequences(mockWorkflows, 0.8);
-      // // Only sequences appearing in 80%+ of workflows
+      // Only sequences appearing in 80%+ of workflows
       patterns.forEach(p => {
-      //   assert.ok(p.support >= 0.8);
-      // });
+        assert.ok(p.support >= 0.8);
+      });
     });
 
     it('should calculate support correctly', () => {
       const patterns = detector.detectFrequentSequences(mockWorkflows, 0.5);
-      const plannerDevPattern = patterns.find(p =>
-        p.sequence[0] === 'planner' && p.sequence[1] === 'developer'
+      const plannerDevPattern = patterns.find(
+        p => p.sequence[0] === 'planner' && p.sequence[1] === 'developer'
       );
       assert.strictEqual(plannerDevPattern.support, 1.0); // Appears in all 3
     });
@@ -119,42 +120,50 @@ describe('SPEC-023: ML Pattern Detection', () => {
     it('should return patterns sorted by support descending', () => {
       const patterns = detector.detectFrequentSequences(mockWorkflows, 0.3);
       for (let i = 1; i < patterns.length; i++) {
-      //   assert.ok(patterns[i-1].support >= patterns[i].support);
-      // }
+        assert.ok(patterns[i - 1].support >= patterns[i].support);
+      }
     });
 
     it('should include confidence for sequences', () => {
       const patterns = detector.detectFrequentSequences(mockWorkflows, 0.5);
       patterns.forEach(p => {
-      //   assert.ok(p.confidence >= 0 && p.confidence <= 1);
-      // });
+        assert.ok(p.confidence >= 0 && p.confidence <= 1);
+      });
     });
 
     it('should handle workflows with different lengths', () => {
       const mixedLengthWorkflows = [
         { sessionId: 's1', taskSequence: [{ agentType: 'planner', taskType: 'design' }] },
-        { sessionId: 's2', taskSequence: [
-          { agentType: 'planner', taskType: 'design' },
-          { agentType: 'developer', taskType: 'implementation' }
-        ]},
-        { sessionId: 's3', taskSequence: [
-          { agentType: 'planner', taskType: 'design' },
-          { agentType: 'developer', taskType: 'implementation' },
-          { agentType: 'qa', taskType: 'testing' }
-        ]}
+        {
+          sessionId: 's2',
+          taskSequence: [
+            { agentType: 'planner', taskType: 'design' },
+            { agentType: 'developer', taskType: 'implementation' },
+          ],
+        },
+        {
+          sessionId: 's3',
+          taskSequence: [
+            { agentType: 'planner', taskType: 'design' },
+            { agentType: 'developer', taskType: 'implementation' },
+            { agentType: 'qa', taskType: 'testing' },
+          ],
+        },
       ];
       const patterns = detector.detectFrequentSequences(mixedLengthWorkflows, 0.5);
       assert.ok(patterns.length > 0);
     });
 
     it('should complete within performance target (<500ms for 1000 workflows)', () => {
-      const largeWorkflowSet = Array(1000).fill(null).map((_, i) => ({
-      //   sessionId: `session${i}`,
-      //   taskSequence: [
-      //     { agentType: 'planner', taskType: 'design' },
-      //     { agentType: 'developer', taskType: 'implementation' }
-      //   ]
-      // }));
+      const largeWorkflowSet = Array(1000)
+        .fill(null)
+        .map((_, i) => ({
+          sessionId: `session${i}`,
+          taskSequence: [
+            { agentType: 'planner', taskType: 'design' },
+            { agentType: 'developer', taskType: 'implementation' },
+          ],
+        }));
       const startTime = Date.now();
       detector.detectFrequentSequences(largeWorkflowSet, 0.1);
       const duration = Date.now() - startTime;
@@ -169,19 +178,19 @@ describe('SPEC-023: ML Pattern Detection', () => {
         taskSequence: [
           { agentType: 'planner', taskType: 'design', durationMs: 5000 },
           { agentType: 'developer', taskType: 'implementation', durationMs: 50000 }, // Slow
-          { agentType: 'qa', taskType: 'testing', durationMs: 3000 }
+          { agentType: 'qa', taskType: 'testing', durationMs: 3000 },
         ],
-        totalDurationMs: 58000
+        totalDurationMs: 58000,
       },
       {
         sessionId: 'session2',
         taskSequence: [
           { agentType: 'planner', taskType: 'design', durationMs: 4000 },
           { agentType: 'developer', taskType: 'implementation', durationMs: 55000 }, // Slow
-          { agentType: 'qa', taskType: 'testing', durationMs: 2500 }
+          { agentType: 'qa', taskType: 'testing', durationMs: 2500 },
         ],
-        totalDurationMs: 61500
-      }
+        totalDurationMs: 61500,
+      },
     ];
 
     it('should identify slow tasks as bottlenecks', () => {
@@ -200,8 +209,8 @@ describe('SPEC-023: ML Pattern Detection', () => {
     it('should calculate percentage of total time', () => {
       const bottlenecks = detector.detectBottleneckPatterns(mockMetrics);
       bottlenecks.forEach(b => {
-      //   assert.ok(b.percentOfTotal > 0 && b.percentOfTotal <= 100);
-      // });
+        assert.ok(b.percentOfTotal > 0 && b.percentOfTotal <= 100);
+      });
     });
 
     it('should include occurrence count', () => {
@@ -213,8 +222,8 @@ describe('SPEC-023: ML Pattern Detection', () => {
     it('should sort bottlenecks by average duration descending', () => {
       const bottlenecks = detector.detectBottleneckPatterns(mockMetrics);
       for (let i = 1; i < bottlenecks.length; i++) {
-      //   assert.ok(bottlenecks[i-1].avgDurationMs >= bottlenecks[i].avgDurationMs);
-      // }
+        assert.ok(bottlenecks[i - 1].avgDurationMs >= bottlenecks[i].avgDurationMs);
+      }
     });
 
     it('should handle empty metrics', () => {
@@ -225,10 +234,10 @@ describe('SPEC-023: ML Pattern Detection', () => {
     it('should filter bottlenecks by threshold', () => {
       detector = new WorkflowPatternDetector({ bottleneckThreshold: 0.5 });
       const bottlenecks = detector.detectBottleneckPatterns(mockMetrics);
-      // // Only tasks taking >50% of total time
+      // Only tasks taking >50% of total time
       bottlenecks.forEach(b => {
-      //   assert.ok(b.percentOfTotal > 50);
-      // });
+        assert.ok(b.percentOfTotal > 50);
+      });
     });
   });
 
@@ -239,7 +248,7 @@ describe('SPEC-023: ML Pattern Detection', () => {
       { agentType: 'qa', taskType: 'testing', durationMs: 3000, tokenCount: 2000 },
       { agentType: 'qa', taskType: 'testing', durationMs: 3500, tokenCount: 2200 },
       { agentType: 'planner', taskType: 'design', durationMs: 8000, tokenCount: 10000 },
-      { agentType: 'planner', taskType: 'design', durationMs: 9000, tokenCount: 11000 }
+      { agentType: 'planner', taskType: 'design', durationMs: 9000, tokenCount: 11000 },
     ];
 
     it('should cluster tasks into k groups', () => {
@@ -257,9 +266,9 @@ describe('SPEC-023: ML Pattern Detection', () => {
     it('should calculate cluster centroids', () => {
       const clusters = detector.clusterTasks(mockTasks);
       clusters.forEach(c => {
-      //   assert.ok(c.centroid.durationMs > 0);
-      //   assert.ok(c.centroid.tokenCount > 0);
-      // });
+        assert.ok(c.centroid.durationMs > 0);
+        assert.ok(c.centroid.tokenCount > 0);
+      });
     });
 
     it('should calculate silhouette score for clustering quality', () => {
@@ -270,10 +279,8 @@ describe('SPEC-023: ML Pattern Detection', () => {
 
     it('should group similar tasks together', () => {
       const clusters = detector.clusterTasks(mockTasks);
-      // // Developers should cluster together
-      const devCluster = clusters.find(c =>
-      //   c.tasks.every(t => t.agentType === 'developer')
-      // );
+      // Developers should cluster together
+      const devCluster = clusters.find(c => c.tasks.every(t => t.agentType === 'developer'));
       assert.ok(devCluster);
     });
 
@@ -286,7 +293,7 @@ describe('SPEC-023: ML Pattern Detection', () => {
     it('should handle tasks with missing features', () => {
       const tasksWithMissing = [
         { agentType: 'developer', taskType: 'implementation', durationMs: 10000 }, // Missing tokenCount
-        { agentType: 'qa', taskType: 'testing', tokenCount: 2000 } // Missing durationMs
+        { agentType: 'qa', taskType: 'testing', tokenCount: 2000 }, // Missing durationMs
       ];
       const clusters = detector.clusterTasks(tasksWithMissing);
       assert.ok(clusters.length > 0);
@@ -299,22 +306,20 @@ describe('SPEC-023: ML Pattern Detection', () => {
         sessionId: 's1',
         taskSequence: [
           { agentType: 'planner', taskType: 'design' },
-          { agentType: 'developer', taskType: 'implementation' }
-        ]
+          { agentType: 'developer', taskType: 'implementation' },
+        ],
       },
       {
         sessionId: 's2',
         taskSequence: [
           { agentType: 'planner', taskType: 'design' },
-          { agentType: 'developer', taskType: 'implementation' }
-        ]
+          { agentType: 'developer', taskType: 'implementation' },
+        ],
       },
       {
         sessionId: 's3',
-        taskSequence: [
-          { agentType: 'developer', taskType: 'bugfix' }
-        ]
-      }
+        taskSequence: [{ agentType: 'developer', taskType: 'bugfix' }],
+      },
     ];
 
     it('should count pattern occurrences', () => {
@@ -326,8 +331,8 @@ describe('SPEC-023: ML Pattern Detection', () => {
     it('should calculate occurrence percentage', () => {
       const frequencies = detector.analyzePatternFrequency(mockWorkflows);
       frequencies.forEach(f => {
-      //   assert.ok(f.percentage > 0 && f.percentage <= 100);
-      // });
+        assert.ok(f.percentage > 0 && f.percentage <= 100);
+      });
     });
 
     it('should identify most common pattern', () => {
@@ -338,14 +343,14 @@ describe('SPEC-023: ML Pattern Detection', () => {
 
     it('should track first and last occurrence timestamps', () => {
       const workflows = mockWorkflows.map(w => ({
-      //   ...w,
-      //   timestamp: new Date().toISOString()
-      // }));
+        ...w,
+        timestamp: new Date().toISOString(),
+      }));
       const frequencies = detector.analyzePatternFrequency(workflows);
       frequencies.forEach(f => {
-      //   assert.ok(f.firstSeen);
-      //   assert.ok(f.lastSeen);
-      // });
+        assert.ok(f.firstSeen);
+        assert.ok(f.lastSeen);
+      });
     });
   });
 
@@ -355,14 +360,14 @@ describe('SPEC-023: ML Pattern Detection', () => {
         sequence: ['planner', 'developer', 'qa'],
         support: 0.8,
         confidence: 0.9,
-        occurrences: 24
+        occurrences: 24,
       },
       {
         sequence: ['developer', 'qa'],
         support: 0.6,
         confidence: 0.85,
-        occurrences: 18
-      }
+        occurrences: 18,
+      },
     ];
 
     it('should generate markdown report', () => {
@@ -409,40 +414,42 @@ describe('SPEC-023: ML Pattern Detection', () => {
       const startDate = new Date('2026-01-01');
       const endDate = new Date('2026-01-30');
       const workflows = detector.loadWorkflowsFromMetrics({ startDate, endDate });
-      // workflows.forEach(w => {
-      //   const wDate = new Date(w.timestamp);
-      //   assert.ok(wDate >= startDate && wDate <= endDate);
-      // });
+      workflows.forEach(w => {
+        const wDate = new Date(w.timestamp);
+        assert.ok(wDate >= startDate && wDate <= endDate);
+      });
     });
 
     it('should filter workflows by outcome', () => {
       const workflows = detector.loadWorkflowsFromMetrics({ outcome: 'success' });
-      // workflows.forEach(w => {
-      //   assert.strictEqual(w.outcome, 'success');
-      // });
+      workflows.forEach(w => {
+        assert.strictEqual(w.outcome, 'success');
+      });
     });
   });
 
   describe('Accuracy Target (80%+)', () => {
-    it('should achieve 80%+ accuracy on pattern detection', () => {
-      // Create ground truth patterns and test detection accuracy
-      const groundTruth = [...]; // Known patterns
-      const detected = detector.detectFrequentSequences(workflows, 0.1);
-      const accuracy = calculateAccuracy(detected, groundTruth);
-      assert.ok(accuracy >= 0.8, `Accuracy ${accuracy} below 80% target`);
+    it.skip('should achieve 80%+ accuracy on pattern detection', () => {
+      // TODO: Implement with ground truth test data
+      // const groundTruth = [...]; // Known patterns
+      // const detected = detector.detectFrequentSequences(workflows, 0.1);
+      // const accuracy = calculateAccuracy(detected, groundTruth);
+      // assert.ok(accuracy >= 0.8, `Accuracy ${accuracy} below 80% target`);
     });
 
-    it('should have low false positive rate (<10%)', () => {
-      const detected = detector.detectFrequentSequences(workflows, 0.1);
-      const falsePositives = detected.filter(p => !isRealPattern(p));
-      const fpr = falsePositives.length / detected.length;
-      assert.ok(fpr < 0.1, `False positive rate ${fpr} exceeds 10%`);
+    it.skip('should have low false positive rate (<10%)', () => {
+      // TODO: Implement with ground truth test data
+      // const detected = detector.detectFrequentSequences(workflows, 0.1);
+      // const falsePositives = detected.filter(p => !isRealPattern(p));
+      // const fpr = falsePositives.length / detected.length;
+      // assert.ok(fpr < 0.1, `False positive rate ${fpr} exceeds 10%`);
     });
 
-    it('should have high recall (>75%)', () => {
-      const detected = detector.detectFrequentSequences(workflows, 0.1);
-      const recall = calculateRecall(detected, groundTruth);
-      assert.ok(recall > 0.75, `Recall ${recall} below 75% target`);
+    it.skip('should have high recall (>75%)', () => {
+      // TODO: Implement with ground truth test data
+      // const detected = detector.detectFrequentSequences(workflows, 0.1);
+      // const recall = calculateRecall(detected, groundTruth);
+      // assert.ok(recall > 0.75, `Recall ${recall} below 75% target`);
     });
   });
 
@@ -453,8 +460,8 @@ describe('SPEC-023: ML Pattern Detection', () => {
         taskSequence: [
           { agentType: 'developer', taskType: 'implementation' },
           { agentType: 'developer', taskType: 'implementation' }, // Duplicate
-          { agentType: 'qa', taskType: 'testing' }
-        ]
+          { agentType: 'qa', taskType: 'testing' },
+        ],
       };
       const patterns = detector.detectFrequentSequences([workflowWithDuplicates], 0.5);
       assert.ok(patterns.length > 0);
@@ -465,8 +472,8 @@ describe('SPEC-023: ML Pattern Detection', () => {
         sessionId: 's1',
         taskSequence: [
           { agentType: null, taskType: 'design' },
-          { agentType: 'developer', taskType: undefined }
-        ]
+          { agentType: 'developer', taskType: undefined },
+        ],
       };
       // Should not crash, filter invalid tasks
       const patterns = detector.detectFrequentSequences([workflowWithNulls], 0.5);
@@ -476,10 +483,12 @@ describe('SPEC-023: ML Pattern Detection', () => {
     it('should handle extremely long sequences (>100 tasks)', () => {
       const longWorkflow = {
         sessionId: 's1',
-        taskSequence: Array(150).fill(null).map((_, i) => ({
-          agentType: `agent${i % 10}`,
-          taskType: 'task'
-        }))
+        taskSequence: Array(150)
+          .fill(null)
+          .map((_, i) => ({
+            agentType: `agent${i % 10}`,
+            taskType: 'task',
+          })),
       };
       // Should complete without crashing
       const patterns = detector.detectFrequentSequences([longWorkflow], 0.1);
@@ -488,28 +497,37 @@ describe('SPEC-023: ML Pattern Detection', () => {
 
     it('should handle minSupport = 1.0 (100% support)', () => {
       // Only patterns in ALL workflows
-      const patterns = detector.detectFrequentSequences(workflows, 1.0);
+      const mockWorkflows = [
+        { sessionId: 's1', taskSequence: [{ agentType: 'planner', taskType: 'design' }] },
+        { sessionId: 's2', taskSequence: [{ agentType: 'planner', taskType: 'design' }] },
+      ];
+      const patterns = detector.detectFrequentSequences(mockWorkflows, 1.0);
       patterns.forEach(p => {
-      //   assert.strictEqual(p.support, 1.0);
-      // });
+        assert.strictEqual(p.support, 1.0);
+      });
     });
 
     it('should handle minSupport = 0.0 (all patterns)', () => {
       // All possible patterns
-      const patterns = detector.detectFrequentSequences(workflows, 0.0);
+      const mockWorkflows = [
+        { sessionId: 's1', taskSequence: [{ agentType: 'planner', taskType: 'design' }] },
+      ];
+      const patterns = detector.detectFrequentSequences(mockWorkflows, 0.0);
       assert.ok(patterns.length > 0);
     });
   });
 
   describe('Performance Benchmarks', () => {
     it('should process 100 workflows in <100ms', () => {
-      const workflows = Array(100).fill(null).map((_, i) => ({
-        sessionId: `s${i}`,
-        taskSequence: [
-          { agentType: 'planner', taskType: 'design' },
-          { agentType: 'developer', taskType: 'implementation' }
-        ]
-      }));
+      const workflows = Array(100)
+        .fill(null)
+        .map((_, i) => ({
+          sessionId: `s${i}`,
+          taskSequence: [
+            { agentType: 'planner', taskType: 'design' },
+            { agentType: 'developer', taskType: 'implementation' },
+          ],
+        }));
       const startTime = Date.now();
       detector.detectFrequentSequences(workflows, 0.1);
       const duration = Date.now() - startTime;
@@ -517,14 +535,16 @@ describe('SPEC-023: ML Pattern Detection', () => {
     });
 
     it('should process 1000 workflows in <500ms', () => {
-      const workflows = Array(1000).fill(null).map((_, i) => ({
-        sessionId: `s${i}`,
-        taskSequence: [
-          { agentType: 'planner', taskType: 'design' },
-          { agentType: 'developer', taskType: 'implementation' },
-          { agentType: 'qa', taskType: 'testing' }
-        ]
-      }));
+      const workflows = Array(1000)
+        .fill(null)
+        .map((_, i) => ({
+          sessionId: `s${i}`,
+          taskSequence: [
+            { agentType: 'planner', taskType: 'design' },
+            { agentType: 'developer', taskType: 'implementation' },
+            { agentType: 'qa', taskType: 'testing' },
+          ],
+        }));
       const startTime = Date.now();
       detector.detectFrequentSequences(workflows, 0.1);
       const duration = Date.now() - startTime;
@@ -535,12 +555,20 @@ describe('SPEC-023: ML Pattern Detection', () => {
       // Test with 100, 500, 1000 workflows and verify linear scaling
       const times = [];
       for (const size of [100, 500, 1000]) {
-      //   const workflows = Array(size).fill(null).map((_, i) => ({ ... }));
-      //   const start = Date.now();
-      //   detector.detectFrequentSequences(workflows, 0.1);
-      //   times.push(Date.now() - start);
-      // }
-      // // Verify roughly linear: time(1000) ~= 10 * time(100)
+        const workflows = Array(size)
+          .fill(null)
+          .map((_, i) => ({
+            sessionId: `s${i}`,
+            taskSequence: [
+              { agentType: 'planner', taskType: 'design' },
+              { agentType: 'developer', taskType: 'implementation' },
+            ],
+          }));
+        const start = Date.now();
+        detector.detectFrequentSequences(workflows, 0.1);
+        times.push(Date.now() - start);
+      }
+      // Verify roughly linear: time(1000) ~= 10 * time(100)
       const ratio = times[2] / times[0];
       assert.ok(ratio < 15, `Non-linear scaling: ${ratio}x`);
     });

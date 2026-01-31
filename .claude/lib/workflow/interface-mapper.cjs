@@ -189,7 +189,7 @@ class InterfaceMapper {
         if (toKey === 'task' && data.taskId) {
           // Special case: flat → nested { task: { id, name } }
           result[toKey] = {
-            id: data.taskId
+            id: data.taskId,
           };
           // Add optional fields only if they exist
           if (data.taskName !== undefined) {

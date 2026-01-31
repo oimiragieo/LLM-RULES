@@ -157,36 +157,51 @@ async function parseHookInputAsync(options = {}) {
     // Set encoding for proper text handling
     process.stdin.setEncoding('utf8');
 
-    // Handle stdin data
-    process.stdin.on('data', chunk => {
+    // Store listener references for cleanup (prevent memory leak when used as library)
+    const dataListener = chunk => {
       hasData = true;
       input += chunk;
-    });
+    };
 
-    // Handle end of input
-    process.stdin.on('end', () => {
+    const endListener = () => {
       if (!hasData || !input.trim()) {
+        cleanup();
         resolveOnce(allowEmpty ? null : undefined);
         return;
       }
 
       try {
         const parsed = JSON.parse(input);
+        cleanup();
         resolveOnce(sanitizeObject(parsed));
       } catch (_e) {
         // Invalid JSON
+        cleanup();
         resolveOnce(allowEmpty ? null : undefined);
       }
-    });
+    };
 
-    // Handle errors
-    process.stdin.on('error', () => {
+    const errorListener = () => {
+      cleanup();
       resolveOnce(allowEmpty ? null : undefined);
-    });
+    };
+
+    // Cleanup function to remove listeners
+    const cleanup = () => {
+      process.stdin.removeListener('data', dataListener);
+      process.stdin.removeListener('end', endListener);
+      process.stdin.removeListener('error', errorListener);
+    };
+
+    // Attach listeners
+    process.stdin.on('data', dataListener);
+    process.stdin.on('end', endListener);
+    process.stdin.on('error', errorListener);
 
     // Set a timeout in case stdin never ends
     setTimeout(() => {
       if (!hasData) {
+        cleanup();
         resolveOnce(allowEmpty ? null : undefined);
       }
     }, timeout);

@@ -53,7 +53,7 @@ describe('SPEC-019: Hybrid Execution - Category 1: Task Routing (15 tests)', () 
   beforeEach(() => {
     try {
       TaskRouter = require('../.claude/lib/workflow/task-router.cjs');
-    } catch (err) {
+    } catch (_err) {
       TaskRouter = null; // Expected in RED phase
     }
   });
@@ -63,9 +63,7 @@ describe('SPEC-019: Hybrid Execution - Category 1: Task Routing (15 tests)', () 
       if (!TaskRouter) throw new Error('MODULE_NOT_FOUND: task-router.cjs');
 
       const router = new TaskRouter({
-        rules: [
-          { pattern: 'legacy/*', system: 'conductor-main' },
-        ],
+        rules: [{ pattern: 'legacy/*', system: 'conductor-main' }],
       });
 
       const decision = await router.route({ path: 'legacy/auth' });
@@ -77,9 +75,7 @@ describe('SPEC-019: Hybrid Execution - Category 1: Task Routing (15 tests)', () 
       if (!TaskRouter) throw new Error('MODULE_NOT_FOUND: task-router.cjs');
 
       const router = new TaskRouter({
-        rules: [
-          { pattern: 'new/*', system: 'agent-studio' },
-        ],
+        rules: [{ pattern: 'new/*', system: 'agent-studio' }],
       });
 
       const decision = await router.route({ path: 'new/checkout' });
@@ -259,9 +255,7 @@ describe('SPEC-019: Hybrid Execution - Category 1: Task Routing (15 tests)', () 
       if (!TaskRouter) throw new Error('MODULE_NOT_FOUND: task-router.cjs');
 
       const router = new TaskRouter({
-        rules: [
-          { pattern: 'new/*', system: 'agent-studio', fallback: 'conductor-main' },
-        ],
+        rules: [{ pattern: 'new/*', system: 'agent-studio', fallback: 'conductor-main' }],
       });
 
       // Simulate agent-studio failure
@@ -278,9 +272,7 @@ describe('SPEC-019: Hybrid Execution - Category 1: Task Routing (15 tests)', () 
       if (!TaskRouter) throw new Error('MODULE_NOT_FOUND: task-router.cjs');
 
       const router = new TaskRouter({
-        rules: [
-          { pattern: '*', system: 'agent-studio', fallback: 'conductor-main' },
-        ],
+        rules: [{ pattern: '*', system: 'agent-studio', fallback: 'conductor-main' }],
       });
 
       // Simulate 3 failures
@@ -332,9 +324,7 @@ describe('SPEC-019: Hybrid Execution - Category 1: Task Routing (15 tests)', () 
       if (!TaskRouter) throw new Error('MODULE_NOT_FOUND: task-router.cjs');
 
       const router = new TaskRouter({
-        rules: [
-          { pattern: 'test/*', system: 'agent-studio' },
-        ],
+        rules: [{ pattern: 'test/*', system: 'agent-studio' }],
       });
 
       const start = Date.now();
@@ -350,7 +340,7 @@ describe('SPEC-019: Hybrid Execution - Category 2: State Synchronization (15 tes
   beforeEach(() => {
     try {
       StateSyncManager = require('../.claude/lib/workflow/state-sync-manager.cjs');
-    } catch (err) {
+    } catch (_err) {
       StateSyncManager = null;
     }
   });
@@ -627,6 +617,33 @@ describe('SPEC-019: Hybrid Execution - Category 2: State Synchronization (15 tes
       // Should be faster than 10 individual syncs (< 500ms for 10 tasks)
       assert.ok(duration < 500, `Batch sync took ${duration}ms, expected <500ms`);
     });
+
+    it('should prevent syncHistory memory leak with max history limit', async () => {
+      if (!StateSyncManager) throw new Error('MODULE_NOT_FOUND: state-sync-manager.cjs');
+
+      const syncManager = new StateSyncManager();
+
+      // Simulate 1500 sync operations (exceeds default 1000 limit)
+      for (let i = 0; i < 1500; i++) {
+        await syncManager.sync(`task-${i}`, {
+          taskId: `task-${i}`,
+          status: 'running',
+          vectorClock: i,
+        });
+      }
+
+      // Verify syncHistory is bounded to maxHistorySize (default 1000)
+      const metrics = syncManager.getMetrics();
+      assert.ok(
+        metrics.totalSyncs <= 1000,
+        `syncHistory has ${metrics.totalSyncs} entries, expected <= 1000`
+      );
+      assert.strictEqual(
+        metrics.totalSyncs,
+        1000,
+        'syncHistory should be trimmed to maxHistorySize'
+      );
+    });
   });
 });
 
@@ -634,7 +651,7 @@ describe('SPEC-019: Hybrid Execution - Category 3: Result Normalization (12 test
   beforeEach(() => {
     try {
       ResultNormalizer = require('../.claude/lib/workflow/result-normalizer.cjs');
-    } catch (err) {
+    } catch (_err) {
       ResultNormalizer = null;
     }
   });
@@ -882,7 +899,7 @@ describe('SPEC-019: Hybrid Execution - Category 4: System Adapters (12 tests)', 
   beforeEach(() => {
     try {
       SystemAdapters = require('../.claude/lib/workflow/system-adapters.cjs');
-    } catch (err) {
+    } catch (_err) {
       SystemAdapters = null;
     }
   });
@@ -976,10 +993,10 @@ describe('SPEC-019: Hybrid Execution - Category 4: System Adapters (12 tests)', 
 
       const customAdapter = {
         name: 'custom-system',
-        readState: async (taskId) => ({ taskId, status: 'custom' }),
-        writeState: async (state) => {},
-        translateToSystem: (state) => state,
-        translateFromSystem: (state) => state,
+        readState: async taskId => ({ taskId, status: 'custom' }),
+        writeState: async _state => {},
+        translateToSystem: state => state,
+        translateFromSystem: state => state,
       };
 
       SystemAdapters.registerAdapter(customAdapter);
@@ -1001,10 +1018,7 @@ describe('SPEC-019: Hybrid Execution - Category 4: System Adapters (12 tests)', 
     it('should throw error for unknown adapter', async () => {
       if (!SystemAdapters) throw new Error('MODULE_NOT_FOUND: system-adapters.cjs');
 
-      assert.throws(
-        () => SystemAdapters.getAdapter('unknown-system'),
-        /Adapter not found/
-      );
+      assert.throws(() => SystemAdapters.getAdapter('unknown-system'), /Adapter not found/);
     });
   });
 
@@ -1050,7 +1064,7 @@ describe('SPEC-019: Hybrid Execution - Category 5: End-to-End Hybrid Workflows (
       // Hypothetical orchestrator module combining all components
       const { HybridExecutor: HE } = require('../.claude/lib/workflow/hybrid-executor.cjs');
       HybridExecutor = HE;
-    } catch (err) {
+    } catch (_err) {
       HybridExecutor = null;
     }
   });
@@ -1082,9 +1096,7 @@ describe('SPEC-019: Hybrid Execution - Category 5: End-to-End Hybrid Workflows (
       if (!HybridExecutor) throw new Error('MODULE_NOT_FOUND: hybrid-executor.cjs or dependencies');
 
       const executor = new HybridExecutor({
-        rules: [
-          { pattern: 'legacy/*', system: 'conductor-main' },
-        ],
+        rules: [{ pattern: 'legacy/*', system: 'conductor-main' }],
       });
 
       const task = {
@@ -1128,9 +1140,7 @@ describe('SPEC-019: Hybrid Execution - Category 5: End-to-End Hybrid Workflows (
       if (!HybridExecutor) throw new Error('MODULE_NOT_FOUND: hybrid-executor.cjs or dependencies');
 
       const executor = new HybridExecutor({
-        rules: [
-          { pattern: '*', system: 'agent-studio', fallback: 'conductor-main' },
-        ],
+        rules: [{ pattern: '*', system: 'agent-studio', fallback: 'conductor-main' }],
       });
 
       const task = {
@@ -1149,9 +1159,7 @@ describe('SPEC-019: Hybrid Execution - Category 5: End-to-End Hybrid Workflows (
       if (!HybridExecutor) throw new Error('MODULE_NOT_FOUND: hybrid-executor.cjs or dependencies');
 
       const executor = new HybridExecutor({
-        rules: [
-          { pattern: '*', system: 'agent-studio', fallback: 'conductor-main' },
-        ],
+        rules: [{ pattern: '*', system: 'agent-studio', fallback: 'conductor-main' }],
       });
 
       const task = {

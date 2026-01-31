@@ -15,12 +15,14 @@ model_selection: opus (orchestration requires complex reasoning)
 Use this template for orchestrator agents that coordinate multiple subagents.
 
 ## When to Use
+
 - Master orchestration (master-orchestrator)
 - Swarm coordination (swarm-coordinator)
 - Self-evolution (evolution-orchestrator)
 - Party mode collaboration (party-orchestrator)
 
 ## Critical Difference from Universal Template
+
 - **MUST include `Task` tool** in allowed_tools (orchestrators spawn subagents)
 - **MUST use `opus` model** (orchestration requires complex reasoning)
 - **May include MCP tools** for research (e.g., Exa for evolution-orchestrator)
@@ -90,19 +92,32 @@ Subject: <SUBJECT>
 ## Orchestrator-Specific Guidance
 
 ### Parallel Spawn (Rule)
+
 For multi-perspective tasks: include multiple `Task(...)` calls in ONE response (parallel execution).
 
 ### Background Spawn (Supported)
+
 ```javascript
 Task({
   subagent_type: 'general-purpose',
   run_in_background: true,
   description: 'QA running test suite',
-  allowed_tools: ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'],
+  allowed_tools: [
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+  ],
   prompt: 'You are QA. Read .claude/agents/core/qa.md and run full test suite...',
 });
 ```
 
 ## Related Templates
+
 - Universal Agent Spawn: `.claude/templates/spawn/universal-agent-spawn.md`
 - Agent Identity Integration: `.claude/templates/spawn/agent-identity-integration.md`
