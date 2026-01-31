@@ -22,14 +22,12 @@ const PROJECT_ROOT = process.cwd();
 const COMPRESSION_STATS_PATH = path.join(PROJECT_ROOT, '.claude/context/compression-stats.jsonl');
 
 // Thresholds
-const BUDGET_THRESHOLD = 0.90;      // Compress at 90% budget
 const READ_SIZE_THRESHOLD = 10000;  // 10 KB
 const FETCH_SIZE_THRESHOLD = 5000;  // 5 KB
 const PERIODIC_INTERVAL = 10;       // Every 10 operations
 
 // Operation tracking (in-memory)
 let operationCounter = 0;
-let largeOperationHistory = []; // Track last 5 operations
 
 /**
  * Check if compression should trigger
@@ -124,7 +122,6 @@ async function triggerCompression(options) {
   const {
     reason,
     urgency,
-    maxRetries = 1,
     _simulateFailure = false
   } = options;
 
@@ -210,7 +207,7 @@ function getCompressionStats() {
     const entries = lines.map(line => {
       try {
         return JSON.parse(line);
-      } catch (e) {
+      } catch (_e) {
         return null;
       }
     }).filter(entry => entry !== null && entry.success);
@@ -229,7 +226,7 @@ function getCompressionStats() {
       averageReduction,
       lastCompressionTime
     };
-  } catch (error) {
+  } catch (_error) {
     // Return zeros on error
     return {
       totalCompressions: 0,
@@ -245,7 +242,6 @@ function getCompressionStats() {
  */
 function resetCompressionCounters() {
   operationCounter = 0;
-  largeOperationHistory = [];
 }
 
 module.exports = {

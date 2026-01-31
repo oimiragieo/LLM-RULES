@@ -27,7 +27,7 @@ const path = require('path');
 let compressionTrigger;
 try {
   compressionTrigger = require('../../lib/utils/compression-trigger.cjs');
-} catch (e) {
+} catch (_e) {
   // Fallback (no-op)
   compressionTrigger = {
     checkCompressionNeeded: () => ({ needed: false, reason: 'Module not available', urgency: 'low' }),
@@ -39,7 +39,7 @@ try {
 let tokenBudgetTracker;
 try {
   tokenBudgetTracker = require('../../lib/utils/token-budget-tracker.cjs');
-} catch (e) {
+} catch (_e) {
   // Fallback
   tokenBudgetTracker = {
     checkBudgetStatus: () => ({ percentUsed: 0, status: 'OK' }),

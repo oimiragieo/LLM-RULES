@@ -189,7 +189,7 @@ function logSpawnAudit(sizeInfo, subagentType, status) {
       breakdown: sizeInfo.breakdown,
     };
     fs.appendFileSync(auditPath, JSON.stringify(entry) + '\n');
-  } catch (err) {
+  } catch (_err) {
     // Audit logging is optional - don't fail the hook
   }
 }

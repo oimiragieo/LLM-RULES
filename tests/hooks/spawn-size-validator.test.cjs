@@ -550,7 +550,7 @@ describe('Edge Cases & Boundary Tests', () => {
     try {
       const result = calculateSpawnSize(tools || [], '', '');
       assert.equal(result.toolCount, 0);
-    } catch (e) {
+    } catch (_e) {
       assert.fail('Should handle null tools array');
     }
   });
@@ -560,7 +560,7 @@ describe('Edge Cases & Boundary Tests', () => {
     try {
       const result = calculateSpawnSize(tools || [], '', '');
       assert.equal(result.toolCount, 0);
-    } catch (e) {
+    } catch (_e) {
       assert.fail('Should handle undefined tools array');
     }
   });
@@ -571,7 +571,7 @@ describe('Edge Cases & Boundary Tests', () => {
     try {
       const result = calculateSpawnSize(tools, prompt || '', '');
       assert.equal(result.breakdown.prompt, 0);
-    } catch (e) {
+    } catch (_e) {
       assert.fail('Should handle null prompt');
     }
   });
@@ -582,7 +582,7 @@ describe('Edge Cases & Boundary Tests', () => {
     try {
       const result = calculateSpawnSize(tools, prompt || '', '');
       assert.equal(result.breakdown.prompt, 0);
-    } catch (e) {
+    } catch (_e) {
       assert.fail('Should handle undefined prompt');
     }
   });
@@ -913,7 +913,7 @@ describe('Audit Logging', () => {
     try {
       logSpawnAudit(sizeInfo, 'developer', 'pass');
       assert.ok(true, 'Did not throw on audit logging');
-    } catch (e) {
+    } catch (_e) {
       // Audit logging should be silent on errors
       assert.fail('Audit logging should not throw');
     }
