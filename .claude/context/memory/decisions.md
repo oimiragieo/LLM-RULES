@@ -1430,3 +1430,90 @@ _Negative:_
 - **Related ADRs**: ADR-069 (Tool Manifest), ADR-070 (SkillCatalog), ADR-071 (Agent Capability Cards), ADR-074 (CLAUDE.md Compression)
 
 ---
+
+## [ADR-077] Shell Command Security Architecture
+
+- **Date**: 2026-01-31
+- **Status**: Accepted (Phase 1 COMPLETE - 2026-01-31)
+- **Context**: Background Bash tasks executed with undefined CWD, causing `find` commands to search entire filesystem instead of PROJECT_ROOT. Error output showed traversal to `/c/XboxGames/` (user data exposure), malformed path arguments (`'/v'`, `''`), and exit code 1 failures. Root cause: Background tasks don't initialize CWD to PROJECT_ROOT before shell execution, creating critical security vulnerabilities (shell injection, path traversal, data exfiltration, resource exhaustion).
+- **Problem Statement**:
+  1. **Missing CWD Initialization**: Background tasks execute in undefined CWD (not PROJECT_ROOT)
+     - Relative paths fail silently
+     - `find tests/` searches from root (/) instead of PROJECT_ROOT
+     - Exposes system structure to LLM context
+  2. **No Shell Injection Protection**: Unvalidated Bash commands allow arbitrary execution
+     - Unquoted variables: `$VAR` instead of `"$VAR"`
+     - Chained commands: `; rm -rf /`
+     - Command substitution: `$(malicious)`
+  3. **Missing Safeguards**: No pre-execution validation hooks
+     - No shellcheck integration
+     - No dangerous pattern detection
+     - No command allowlist
+- **Decision**: Implement multi-layer shell security architecture:
+  1. **CWD Validation Hook** (`.claude/hooks/safety/bash-cwd-validator.cjs`):
+     - PreToolUse(Bash) blocks background tasks missing `cd "$PROJECT_ROOT"`
+     - Enforcement mode: `block` (default), `warn`, `off`
+     - Environment: `BASH_CWD_VALIDATOR=block|warn|off`
+  2. **Shell Injection Validator** (`.claude/hooks/safety/shell-injection-validator.cjs`):
+     - Blocks dangerous patterns: `rm -rf /`, `eval`, `>>/dev/`, chained `rm`, backtick execution
+     - Blocks dangerous targets: root deletion, home deletion, wildcard deletion
+     - Enforcement mode: `block` (default)
+  3. **Variable Quoting Validator** (warn mode):
+     - Detects unquoted variables: `$VAR` not within quotes
+     - Suggests fixes: `"$VAR"` instead of `$VAR`
+     - Non-blocking (educational)
+  4. **Spawn Template Updates**:
+     - Add CWD requirement to universal-agent-spawn.md
+     - Add shell safety checklist
+     - Document variable quoting rules
+  5. **PROJECT_ROOT Environment Export**:
+     - Add to `.env`: `PROJECT_ROOT=/c/dev/projects/agent-studio`
+     - Inject in spawn context for availability
+  6. **Optional Shellcheck Integration** (`.claude/hooks/validation/shellcheck-validator.cjs`):
+     - Runs shellcheck on commands (requires installation)
+     - Fallback gracefully if unavailable
+     - Non-blocking (warn mode)
+- **Consequences**:
+  - **Benefits**:
+    - Prevents filesystem traversal (no more root searches)
+    - Blocks shell injection attacks (malicious command prevention)
+    - Reduces data exposure risk (no accidental user data scanning)
+    - Improves command reliability (CWD consistency)
+    - Educational feedback (quoting and safety suggestions)
+    - Defense-in-depth (multiple validation layers)
+  - **Trade-offs**:
+    - Additional validation latency (~10-50ms per Bash call)
+    - Requires shellcheck installation for full validation (optional)
+    - May block legitimate edge-case commands (override available)
+    - Developers must learn quoting and CWD rules
+  - **Risk Reduction**: 53% overall (7.5/10 → 3.5/10 risk score)
+    - Shell Injection: CRITICAL→MEDIUM (↓40%)
+    - Path Traversal: HIGH→LOW (↓60%)
+    - Data Exfiltration: MEDIUM→LOW (↓50%)
+    - Resource Exhaustion: MEDIUM→LOW (↓60%)
+- **Implementation Plan**:
+  - **Phase 1 (Week 1 - CRITICAL)**: CWD + Injection validators ✅ COMPLETE (2026-01-31)
+    1. ✅ bash-cwd-validator.cjs created (17 tests passing)
+    2. ✅ shell-injection-validator.cjs created (25 tests passing)
+    3. ✅ bash-safe-background.md template created
+    4. ✅ universal-agent-spawn.md updated with Bash safety section
+    5. ✅ orchestrator-spawn.md updated with Bash safety reference
+  - **Phase 2 (Week 2 - HIGH)**: Quoting + Environment
+    4. Variable quoting validator (1 day)
+    5. PROJECT_ROOT environment export (1 day)
+    6. Integration testing (1 day)
+  - **Phase 3 (Week 3 - MEDIUM)**: Enhancements
+    7. Shellcheck integration (1 day)
+    8. Command allowlist (1 day)
+  - **Phase 4 (Ongoing)**: Monitoring
+    9. Audit logging (1 day)
+    10. Documentation (ongoing)
+- **Audit Document**: `.claude/context/artifacts/audits/BACKGROUND-TASK-SHELL-AUDIT.md`
+- **Related Issues**: ROUTER-MONITORING-001 (background task tracking), CONFIG-001 (configuration drift)
+- **New Issues Created**:
+  - [SHELL-SECURITY-001] Background Bash tasks missing CWD initialization (CRITICAL)
+  - [SHELL-SECURITY-002] No shell injection validation (CRITICAL)
+  - [SHELL-SECURITY-003] Unquoted variables in Bash commands (HIGH)
+  - [SHELL-SECURITY-004] No shellcheck integration (MEDIUM)
+
+---

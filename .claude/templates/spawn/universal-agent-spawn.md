@@ -97,6 +97,7 @@ Subject: <SUBJECT>
 - Skill() - invoke skills (don't just read them)
 - TaskUpdate() - track progress (MANDATORY)
 - TaskList() - find next work
+- Bash() - MUST start with: cd "$PROJECT_ROOT" || exit 1 (for background tasks, see bash-safe-background.md)
 
 ## Memory Management Requirements (MANDATORY)
 
@@ -143,6 +144,52 @@ All agents MUST follow these memory management rules:
    - Use \`process.memoryUsage()\` for monitoring
 
 **Reference:** .claude/docs/MEMORY_MANAGEMENT.md
+
+## Bash Safety Protocol (MANDATORY for Background Tasks)
+
+**CRITICAL:** All background Bash tasks MUST include CWD initialization to prevent filesystem traversal.
+
+**Required Pattern:**
+\`\`\`bash
+cd "$PROJECT_ROOT" || { echo "Failed to change to project root"; exit 1; }
+
+# Your command here
+find tests/ -name "*.test.*"
+\`\`\`
+
+**Why This Matters:**
+- Background tasks execute in undefined CWD (not PROJECT_ROOT)
+- Without \`cd "$PROJECT_ROOT"\`, relative paths resolve from root (/)
+- This causes filesystem traversal and user data exposure
+
+**Examples:**
+\`\`\`javascript
+// ❌ WRONG (will search from root /)
+Bash({ command: 'find tests/', run_in_background: true });
+
+// ✅ CORRECT (searches from PROJECT_ROOT)
+Bash({
+  command: 'cd "$PROJECT_ROOT" || exit 1; find tests/ -name "*.test.*"',
+  run_in_background: true
+});
+\`\`\`
+
+**Variable Quoting (MANDATORY):**
+- Always quote variables: \`"$VAR"\` not \`$VAR\`
+- Prevents failures when paths have spaces: \`/c/Program Files/\`
+
+**Blocked Patterns:**
+- Chained \`rm\`: \`; rm -rf /\`, \`&& rm -rf\`, \`| rm -rf\`
+- Dangerous targets: \`rm -rf /\`, \`rm -rf ~\`, \`rm -rf *\`
+- Code injection: \`eval\`, backticks, \`$()\` with rm
+- Device redirects: \`>> /dev/\`
+
+**Validation Hooks:**
+- \`bash-cwd-validator.cjs\` - Blocks background tasks without CWD (CRITICAL)
+- \`shell-injection-validator.cjs\` - Blocks dangerous patterns (CRITICAL)
+
+**Full Template:** .claude/templates/spawn/bash-safe-background.md
+**Related:** ADR-077, SHELL-SECURITY-001, SHELL-SECURITY-002
 
 ## Memory Protocol
 1) Read: .claude/context/memory/learnings.md (before starting)

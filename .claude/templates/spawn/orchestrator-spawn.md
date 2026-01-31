@@ -82,6 +82,18 @@ Subject: <SUBJECT>
 5) LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: { summary: "...", filesModified: [...] } })
 6) THEN: TaskList()
 
+## Bash Safety Protocol (MANDATORY for Background Tasks)
+
+**CRITICAL:** All background Bash tasks MUST include CWD initialization.
+
+**Required Pattern:**
+\`\`\`bash
+cd "$PROJECT_ROOT" || exit 1; find tests/ -name "*.test.*"
+\`\`\`
+
+**Full Template:** .claude/templates/spawn/bash-safe-background.md
+**Related:** ADR-077, SHELL-SECURITY-001, SHELL-SECURITY-002
+
 ## Memory Protocol
 1) Read: .claude/context/memory/learnings.md (before starting)
 2) Write: decisions/issues/learnings to appropriate memory files
