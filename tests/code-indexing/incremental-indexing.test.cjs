@@ -29,10 +29,7 @@ describe('Incremental indexing', () => {
       path.join(projectRoot, 'main.js'),
       'function hello() { return "hello"; }\nfunction world() { return "world"; }\n'
     );
-    await fs.writeFile(
-      path.join(projectRoot, 'util.js'),
-      'function util() { return "util"; }\n'
-    );
+    await fs.writeFile(path.join(projectRoot, 'util.js'), 'function util() { return "util"; }\n');
     manager = new IndexManager({ projectRoot });
   });
 
@@ -68,11 +65,17 @@ describe('Incremental indexing', () => {
     test('modify file triggers re-index of that file only', async () => {
       const mainPath = path.join(projectRoot, 'main.js');
       const original = await fs.readFile(mainPath, 'utf8');
-      await fs.writeFile(mainPath, 'function hello() { return "hello"; }\nfunction world() { return "world"; }\n// modified\n');
+      await fs.writeFile(
+        mainPath,
+        'function hello() { return "hello"; }\nfunction world() { return "world"; }\n// modified\n'
+      );
 
       const result = await manager.incrementalUpdate();
       assert.strictEqual(result.updateType, 'incremental');
-      assert.ok(result.filesModified >= 1 || result.chunksUpdated >= 0, 'Should detect modification');
+      assert.ok(
+        result.filesModified >= 1 || result.chunksUpdated >= 0,
+        'Should detect modification'
+      );
 
       await fs.writeFile(mainPath, original);
     });
@@ -112,7 +115,9 @@ describe('Incremental indexing', () => {
       assert.ok(result.updateType === 'full' || result.updateType === 'incremental');
       assert.ok(result.filesIndexed >= 1 || result.filesAdded >= 1);
 
-      await fs.rm(path.join(isolatedRoot, '.claude'), { recursive: true, force: true }).catch(() => {});
+      await fs
+        .rm(path.join(isolatedRoot, '.claude'), { recursive: true, force: true })
+        .catch(() => {});
       await fs.rm(isolatedRoot, { recursive: true, force: true }).catch(() => {});
     });
   });
@@ -122,7 +127,10 @@ describe('Incremental indexing', () => {
       const metadataPath = path.join(projectRoot, '.claude/context/code-index/metadata.json');
       const content = await fs.readFile(metadataPath, 'utf8').catch(() => '{}');
       const metadata = JSON.parse(content);
-      assert.ok(metadata.lastIncrementalUpdate === undefined || typeof metadata.lastIncrementalUpdate === 'string');
+      assert.ok(
+        metadata.lastIncrementalUpdate === undefined ||
+          typeof metadata.lastIncrementalUpdate === 'string'
+      );
       if (metadata.incrementalStats) {
         assert.ok(typeof metadata.incrementalStats.filesAdded === 'number');
         assert.ok(typeof metadata.incrementalStats.filesModified === 'number');

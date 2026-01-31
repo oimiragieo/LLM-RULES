@@ -32,10 +32,7 @@ describe('Search tools and indexing E2E', () => {
       path.join(projectRoot, 'app.js'),
       'function greet() { return "Hello"; }\nfunction farewell() { return "Bye"; }\n'
     );
-    await fs.writeFile(
-      path.join(projectRoot, 'util.js'),
-      'function add(a, b) { return a + b; }\n'
-    );
+    await fs.writeFile(path.join(projectRoot, 'util.js'), 'function add(a, b) { return a + b; }\n');
     manager = new IndexManager({ projectRoot: E2E_PROJECT });
   });
 
@@ -57,11 +54,17 @@ describe('Search tools and indexing E2E', () => {
     test('2. Modify file then incremental update detects change', async () => {
       const appPath = path.join(projectRoot, 'app.js');
       const original = await fs.readFile(appPath, 'utf8');
-      await fs.writeFile(appPath, 'function greet() { return "Hello"; }\nfunction farewell() { return "Bye"; }\n// updated\n');
+      await fs.writeFile(
+        appPath,
+        'function greet() { return "Hello"; }\nfunction farewell() { return "Bye"; }\n// updated\n'
+      );
 
       const result = await manager.incrementalUpdate();
       assert.strictEqual(result.updateType, 'incremental');
-      assert.ok(result.filesModified >= 1 || result.chunksUpdated >= 0, 'Should detect modification');
+      assert.ok(
+        result.filesModified >= 1 || result.chunksUpdated >= 0,
+        'Should detect modification'
+      );
 
       await fs.writeFile(appPath, original);
     });

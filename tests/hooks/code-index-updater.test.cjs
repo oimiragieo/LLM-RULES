@@ -23,10 +23,7 @@ describe('code-index-updater hook', () => {
 
   before(async () => {
     await fs.mkdir(path.join(HOOK_TEST_DIR, '.claude/context/code-index'), { recursive: true });
-    await fs.writeFile(
-      path.join(HOOK_TEST_DIR, '.claude/context/code-index/metadata.json'),
-      '{}'
-    );
+    await fs.writeFile(path.join(HOOK_TEST_DIR, '.claude/context/code-index/metadata.json'), '{}');
   });
 
   after(async () => {
@@ -104,7 +101,10 @@ describe('code-index-updater hook', () => {
       assert.strictEqual(hook.shouldIndexFile('/project/node_modules/pkg/index.js'), false);
       assert.strictEqual(hook.shouldIndexFile('/project/.git/hooks/pre-commit'), false);
       assert.strictEqual(hook.shouldIndexFile('/project/dist/bundle.min.js'), false);
-      assert.strictEqual(hook.shouldIndexFile('/project/.claude/context/code-index/file.js'), false);
+      assert.strictEqual(
+        hook.shouldIndexFile('/project/.claude/context/code-index/file.js'),
+        false
+      );
     });
 
     test('returns false for empty or invalid input', () => {
@@ -147,7 +147,9 @@ describe('code-index-updater hook', () => {
 
     test('completes without throwing (fail-open)', async () => {
       const hook = getHook();
-      await assert.doesNotReject(() => hook.triggerIndexUpdate(path.join(HOOK_TEST_DIR, 'src', 'main.js')));
+      await assert.doesNotReject(() =>
+        hook.triggerIndexUpdate(path.join(HOOK_TEST_DIR, 'src', 'main.js'))
+      );
       await new Promise(r => setImmediate(r));
       await new Promise(r => setTimeout(r, 300));
     });

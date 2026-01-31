@@ -199,7 +199,9 @@ describe('MerkleTree', () => {
       assert.ok(!hasExclude, '*.exclude should be excluded');
       assert.ok(tree.root.children['keep.js'], 'keep.js should be included');
 
-      await fs.rm(path.join(MERKLE_TEST_DIR, 'node_modules'), { recursive: true, force: true }).catch(() => {});
+      await fs
+        .rm(path.join(MERKLE_TEST_DIR, 'node_modules'), { recursive: true, force: true })
+        .catch(() => {});
       await fs.unlink(path.join(MERKLE_TEST_DIR, 'file.exclude')).catch(() => {});
       await fs.unlink(path.join(MERKLE_TEST_DIR, 'keep.js')).catch(() => {});
     });
