@@ -13,9 +13,7 @@ tools:
   - Edit
   - Glob
   - Grep
-  - Search
   - Bash
-  - mcp__memory__*
   - TaskUpdate
   - TaskList
   - TaskCreate

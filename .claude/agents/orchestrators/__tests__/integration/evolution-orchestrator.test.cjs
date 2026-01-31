@@ -107,7 +107,7 @@ describe('Evolution Orchestrator Integration Tests', () => {
         subagent_type: 'evolution-orchestrator',
         description: 'Phase O: Research',
         prompt: 'Phase O: OBTAIN (Research). Invoke Skill({ skill: "research-synthesis" })',
-        allowed_tools: ['Skill', 'mcp__Exa__web_search_exa', 'TaskUpdate'],
+        allowed_tools: ['Skill', 'WebSearch', 'TaskUpdate'],
       });
 
       const phaseO = taskTool.getSpawnedAgent(0);
@@ -118,8 +118,8 @@ describe('Evolution Orchestrator Integration Tests', () => {
         'Should have Skill tool for research-synthesis'
       );
       assert.ok(
-        phaseO.allowed_tools.includes('mcp__Exa__web_search_exa'),
-        'Should have Exa search tool'
+        phaseO.allowed_tools.includes('WebSearch'),
+        'Should have WebSearch tool for research (fallback from MCP)'
       );
 
       // Verify prompt mentions research-synthesis

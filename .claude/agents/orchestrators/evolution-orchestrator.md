@@ -19,8 +19,6 @@ tools:
   - TaskList
   - TaskGet
   - Skill
-  - mcp__Exa__web_search_exa
-  - mcp__Exa__get_code_context_exa
   - WebSearch
   - WebFetch
 skills:
@@ -92,13 +90,8 @@ Glob('.claude/agents/**/*.md'); // or skills, workflows, etc.
 Grep('similar capability pattern');
 
 // 3. Analyze the gap using structured thinking
-mcp__sequential -
-  thinking__sequentialthinking({
-    thought: 'Analyzing capability gap: [description]. Checking existing artifacts for overlap...',
-    thoughtNumber: 1,
-    totalThoughts: 5,
-    nextThoughtNeeded: true,
-  });
+Skill({ skill: 'sequential-thinking' });
+// Then use structured thinking methodology to analyze capability gap
 ```
 
 **Gate Criteria**:

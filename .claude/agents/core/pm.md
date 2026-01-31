@@ -13,8 +13,6 @@ tools:
   - Edit
   - Glob
   - Grep
-  - Search
-  - mcp__memory__*
   - TaskUpdate
   - TaskList
   - TaskCreate

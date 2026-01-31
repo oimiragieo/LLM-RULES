@@ -9,8 +9,6 @@ tools:
   - Glob
   - Grep
   - Bash
-  - Search
-  - mcp__memory__*
   - TaskUpdate
   - TaskList
   - TaskCreate

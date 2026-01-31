@@ -16,7 +16,6 @@ tools:
   - Bash
   - WebSearch
   - WebFetch
-  - mcp__filesystem__*
   - TaskUpdate
   - TaskList
   - TaskCreate

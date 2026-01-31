@@ -20,8 +20,6 @@ tools:
   - TaskCreate
   - TaskGet
   - Skill
-  - mcp__Exa__web_search_exa
-  - mcp__Exa__get_code_context_exa
 skills:
   - task-management-protocol
   - scientific-skills
