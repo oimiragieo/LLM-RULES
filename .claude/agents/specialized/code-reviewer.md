@@ -42,7 +42,7 @@ This agent can search code efficiently using the ripgrep skill for comprehensive
 - Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
 - Faster than: `Grep` or `Glob` (10-100x speed improvement)
 - Automatically respects: `.gitignore` files
-- Available: Binary at `C:\dev\projects\agent-studio\bin\rg` (Windows)
+- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
 
 **When to use ripgrep:**
 
@@ -71,6 +71,87 @@ Skill({ skill: 'ripgrep', args: 'execute.*\\+.*req\\.' });
 Skill({ skill: 'ripgrep', args: 'await.*\\(' -A 2 | grep -v 'catch' });
 ```
 
+### code-semantic-search (Semantic Search)
+
+Find code by meaning using hybrid semantic search (95% accuracy, <150ms):
+
+**When to use semantic search:**
+
+- Finding similar code patterns for consistency checks
+- Discovering anti-patterns across codebase
+- Locating security-sensitive code by concept (auth, validation, sanitization)
+- Finding error handling implementations
+- Understanding code quality patterns
+
+**Modes:**
+
+- **Hybrid (default)**: Combines semantic + structural (best accuracy, <150ms)
+- **Semantic-only**: Fast conceptual search (<50ms, 85% accuracy)
+- **Structural-only**: Exact pattern matching (<50ms, 100% accuracy)
+
+**Example:**
+
+```javascript
+// Find authentication implementations (for consistency review)
+Skill({ skill: 'code-semantic-search', args: 'authentication and authorization logic' });
+
+// Find error handling patterns (for quality review)
+Skill({
+  skill: 'code-semantic-search',
+  args: 'error handling and exception management',
+  options: { mode: 'hybrid' },
+});
+
+// Find security-sensitive code
+Skill({ skill: 'code-semantic-search', args: 'input validation and sanitization' });
+```
+
+### ast-grep (Structural Search)
+
+For precise AST-based pattern matching using `@ast-grep/cli` npm package:
+
+**When to use ast-grep:**
+
+- Finding exact code structures (functions with specific signatures)
+- Precise security pattern detection (SQL injection, XSS risks)
+- Code quality pattern checks (nested functions, long parameter lists)
+- Finding anti-patterns and inconsistencies
+
+**Binary**: Automatically managed via `@ast-grep/cli` npm package (cross-platform)
+
+**Example:**
+
+```javascript
+// Find unprotected routes (no auth middleware)
+Skill({ skill: 'code-structural-search', args: 'router.post($PATH, $HANDLER) --lang ts' });
+
+// Find SQL injection risks
+// Prefer patterns that detect dynamic SQL assembly without embedding a vulnerable example.
+Skill({ skill: 'code-structural-search', args: 'db.query($SQL, $$$) --lang js' });
+
+// Find functions with too many parameters
+Skill({
+  skill: 'code-structural-search',
+  args: 'function $NAME($A, $B, $C, $D, $E, $F) { $$ } --lang ts',
+});
+```
+
+### Search Strategy
+
+**When reviewing code, use this workflow:**
+
+1. **Broad Discovery**: `ripgrep` for fast keyword search (find patterns, secrets, vulnerabilities)
+2. **Semantic Understanding**: `code-semantic-search` to find similar implementations for consistency checks
+3. **Structural Refinement**: `code-structural-search` for exact pattern detection (security, quality)
+
+**Tool Selection Guide:**
+
+| Tool                   | Type       | Speed  | Accuracy | Best For                      |
+| ---------------------- | ---------- | ------ | -------- | ----------------------------- |
+| ripgrep                | Text       | <10ms  | ~70%     | Security pattern scanning     |
+| code-semantic-search   | Hybrid     | <150ms | ~95%     | Finding similar patterns      |
+| code-structural-search | Structural | <50ms  | 100%     | Exact security/quality checks |
+
 ## Code Pattern Review
 
 Use structural search to find code patterns during review:
@@ -79,7 +160,7 @@ Use structural search to find code patterns during review:
 
 - Find unprotected routes: `router.post($PATH, $HANDLER)` (no auth)
 - Find SQL patterns: `query($$$)` (potential SQL injection)
-- Find eval usage: `eval($$$)` (dangerous)
+- Find dynamic code execution: search for `eval` usage (dangerous)
 
 ### Code Quality Patterns
 

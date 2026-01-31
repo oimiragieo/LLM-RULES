@@ -147,7 +147,7 @@ This agent can search code efficiently using the ripgrep skill for fast codebase
 - Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
 - Faster than: `Grep` or `Glob` (10-100x speed improvement)
 - Automatically respects: `.gitignore` files
-- Available: Binary at `C:\dev\projects\agent-studio\bin\rg` (Windows)
+- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
 
 **When to use ripgrep:**
 
@@ -175,6 +175,83 @@ Skill({ skill: 'ripgrep', args: 'app\\.(get|post|put|delete)' });
 // Find database model definitions
 Skill({ skill: 'ripgrep', args: 'model\\(' });
 ```
+
+### code-semantic-search (Semantic Search)
+
+Find code by meaning using hybrid semantic search (95% accuracy, <150ms):
+
+**When to use semantic search:**
+
+- Finding authentication logic without knowing function names
+- Searching for error handling patterns by concept
+- Locating database queries and data access patterns
+- Discovering similar implementations across codebase
+- Understanding architectural patterns by meaning
+
+**Modes:**
+
+- **Hybrid (default)**: Combines semantic + structural (best accuracy, <150ms)
+- **Semantic-only**: Fast conceptual search (<50ms, 85% accuracy)
+- **Structural-only**: Exact pattern matching (<50ms, 100% accuracy)
+
+**Example:**
+
+```javascript
+// Hybrid search (recommended) - find by meaning
+Skill({ skill: 'code-semantic-search', args: 'find authentication logic' });
+
+// Semantic-only (fast conceptual search)
+Skill({
+  skill: 'code-semantic-search',
+  args: 'error handling patterns',
+  options: { mode: 'semantic-only' },
+});
+
+// Find database access patterns
+Skill({ skill: 'code-semantic-search', args: 'database queries and transactions' });
+```
+
+### ast-grep (Structural Search)
+
+For precise AST-based pattern matching using `@ast-grep/cli` npm package:
+
+**When to use ast-grep:**
+
+- Finding exact code structures (functions with N arguments, classes extending X)
+- Precise pattern matching for refactoring
+- Understanding code organization by structure
+- Finding architectural patterns (service classes, middleware, etc.)
+
+**Binary**: Automatically managed via `@ast-grep/cli` npm package (cross-platform)
+
+**Example:**
+
+```javascript
+// Find all service classes
+Skill({ skill: 'code-structural-search', args: 'class $NAME extends Service { $$ } --lang ts' });
+
+// Find API routes
+Skill({ skill: 'code-structural-search', args: 'router.$METHOD($PATH, $HANDLER) --lang ts' });
+
+// Find database models
+Skill({ skill: 'code-structural-search', args: '@Entity class $NAME { $$ } --lang ts' });
+```
+
+### Search Strategy
+
+**When analyzing architecture, use this workflow:**
+
+1. **Broad Discovery**: `ripgrep` for fast keyword search (10-100x faster than Grep)
+2. **Semantic Understanding**: `code-semantic-search` (hybrid mode) to find by meaning
+3. **Structural Refinement**: `code-structural-search` for exact patterns
+
+**Tool Selection Guide:**
+
+| Tool                   | Type       | Speed  | Accuracy | Best For                  |
+| ---------------------- | ---------- | ------ | -------- | ------------------------- |
+| ripgrep                | Text       | <10ms  | ~70%     | Initial keyword filtering |
+| code-semantic-search   | Hybrid     | <150ms | ~95%     | General code discovery    |
+| code-structural-search | Structural | <50ms  | 100%     | Exact pattern matching    |
 
 ## Architecture Pattern Analysis
 

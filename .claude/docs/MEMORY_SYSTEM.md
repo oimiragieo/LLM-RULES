@@ -280,7 +280,29 @@ Memory context is automatically injected into agent spawn prompts via `prompt-as
 3. Memory is formatted as a markdown section
 4. Memory section is injected near `## Memory Protocol` when possible
 
-**Disabling**: Pass `includeMemory: false` to `assembleSpawnPrompt()` (not recommended).
+**Disabling**:
+
+- Memory injection: Pass `includeMemory: false` to `assembleSpawnPrompt()` (not recommended)
+- Semantic matches: Set `SPAWN_PROMPT_SEMANTIC_MEMORY=off` environment variable
+
+## Keyword Search Fallback
+
+When semantic search (ChromaDB) is unavailable, `ContextualMemory` falls back to keyword search with performance optimizations:
+
+**Tool Priority**:
+
+1. **ripgrep** (fastest) - Uses `@vscode/ripgrep` npm package or bundled binary
+2. **File reads** (fallback) - Bounded reads (80KB max per file)
+
+**Performance**:
+
+- ripgrep: <50ms for typical searches across memory files
+- File reads: <200ms (bounded to last 80KB per file)
+
+**Dependencies**:
+
+- `@vscode/ripgrep` - Automatically downloads correct binary for your platform
+- `@ast-grep/cli` - Available for future structured search enhancements
 
 ## ADR Format (decisions.md)
 

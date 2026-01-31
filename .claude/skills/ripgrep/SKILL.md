@@ -18,14 +18,14 @@ Enhanced code search with custom ripgrep binary supporting ES module extensions 
 
 ## Overview
 
-This skill provides access to a custom ripgrep (rg) binary with enhanced file type support for modern JavaScript/TypeScript projects. The binary location and configuration are managed by this project.
+This skill provides access to ripgrep (rg) via the `@vscode/ripgrep` npm package, which automatically downloads the correct binary for your platform (Windows, Linux, macOS). Enhanced file type support for modern JavaScript/TypeScript projects.
 
-**Binary Location**: `C:\dev\projects\agent-studio\bin\`
+**Binary Source**: `@vscode/ripgrep` npm package (cross-platform, auto-installed)
 
-- Windows: `rg.exe`
-- Mac/Linux: `rg`
+- Automatically handles Windows, Linux, macOS binaries
+- No manual binary management required
 
-**Config Location**: `C:\dev\projects\agent-studio\bin\.ripgreprc`
+**Optional Config**: `bin/.ripgreprc` (if present, automatically used)
 
 ## Why Use This Over Built-in Grep Tool?
 
@@ -253,7 +253,7 @@ Ripgrep is typically:
 
 ## Custom Configuration
 
-The `.ripgreprc` file at `C:\dev\projects\agent-studio\bin\.ripgreprc` contains:
+The optional `.ripgreprc` file at `bin/.ripgreprc` (if present) contains:
 
 ```
 # Extended file types
@@ -317,7 +317,7 @@ rg "BLOCKING|CRITICAL" -C 2
 4. **Enable PCRE2** (`-P`) only when advanced features needed
 5. **Exclude large directories** with `-g "!node_modules/**"`
 6. **Use literal search** (`-F`) when pattern has no regex
-7. **Check binary location** before searching (C:\dev\projects\agent-studio\bin\)
+7. **Binary automatically managed** via `@vscode/ripgrep` npm package
 8. **Use quick-search presets** for common .claude directory searches
    </best_practices>
    </instructions>
@@ -345,15 +345,15 @@ node .claude/skills/ripgrep/scripts/search.mjs -P "^function\s+\w+\(" -tjs
 </usage_example>
 </examples>
 
-## Binary Detection
+## Binary Management
 
-The search scripts automatically detect the operating system and architecture to select the correct ripgrep binary:
+The search scripts use `@vscode/ripgrep` npm package which automatically:
 
-| Platform | Architecture | Binary     |
-| -------- | ------------ | ---------- |
-| Windows  | x64          | bin/rg.exe |
-| macOS    | x64/arm64    | bin/rg     |
-| Linux    | x64          | bin/rg     |
+- Detects your platform (Windows, Linux, macOS)
+- Downloads the correct binary during `pnpm install`
+- Handles all architecture variants (x64, ARM64, etc.)
+
+No manual binary management required - the npm package handles everything automatically.
 
 ## Related Skills
 

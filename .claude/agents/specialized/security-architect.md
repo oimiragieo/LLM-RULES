@@ -24,6 +24,9 @@ skills:
   - chrome-browser
   - template-renderer
   - checklist-generator
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
 context_files:
   - @.claude/context/memory/learnings.md
 ---
@@ -152,6 +155,67 @@ Skill({ skill: 'auth-security-expert' }); // OAuth 2.1, JWT, authentication
 | Rules explanation          | `explaining-rules`               | Explain security policies       |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
+
+## Code Search Optimization
+
+This agent can search code efficiently using multiple search tools for security analysis:
+
+**For fast code search across large codebases:**
+
+- Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
+- Faster than: `Grep` or `Glob` (10-100x speed improvement)
+- Automatically respects: `.gitignore` files
+- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
+
+**When to use ripgrep:**
+
+- Finding security-sensitive patterns (secrets, auth, crypto)
+- Searching for vulnerability patterns (SQL injection, XSS risks)
+- Locating security-critical code paths
+- Large codebases (1000+ files)
+
+### code-semantic-search (Semantic Search)
+
+Find code by meaning using hybrid semantic search (95% accuracy, <150ms):
+
+**When to use semantic search:**
+
+- Finding authentication/authorization logic by concept
+- Discovering security-sensitive code patterns
+- Locating input validation and sanitization code
+- Understanding security architecture by meaning
+
+**Example:**
+
+```javascript
+// Find authentication implementations
+Skill({ skill: 'code-semantic-search', args: 'authentication and authorization logic' });
+
+// Find input validation patterns
+Skill({ skill: 'code-semantic-search', args: 'input validation and sanitization' });
+```
+
+### code-structural-search (AST Patterns)
+
+Find code by exact AST structure patterns:
+
+**When to use structural search:**
+
+- Finding exact security patterns (SQL injection, XSS risks)
+- Locating unprotected routes and endpoints
+- Finding crypto function usage patterns
+- Discovering security anti-patterns
+
+**Example:**
+
+```javascript
+// Find SQL injection risks
+// Prefer patterns that detect dynamic SQL assembly without embedding a vulnerable example.
+Skill({ skill: 'code-structural-search', args: 'db.query($SQL, $$$) --lang js' });
+
+// Find XSS risks
+Skill({ skill: 'code-structural-search', args: '$ELEM.innerHTML = $DATA --lang js' });
+```
 
 ## Memory Protocol (MANDATORY)
 

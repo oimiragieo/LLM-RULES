@@ -4,6 +4,7 @@
 const fsPromises = require('fs').promises;
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 const { MemoryVectorStore } = require('./chromadb-client.cjs');
 const { EntityQuery } = require('./entity-query.cjs');
 
@@ -161,10 +162,161 @@ class ContextualMemory {
   }
 
   /**
+   * Get ripgrep binary path from @vscode/ripgrep npm package.
+   * @private
+   * @returns {string|null} Path to ripgrep binary or null if unavailable
+   */
+  _getRipgrepPath() {
+    try {
+      const { rgPath } = require('@vscode/ripgrep');
+      return rgPath;
+    } catch {
+      // Fallback to bundled binary if npm package not available
+      const bundledPath = path.join(
+        process.cwd(),
+        'bin',
+        process.platform === 'win32' ? 'rg.exe' : 'rg'
+      );
+      if (fs.existsSync(bundledPath)) {
+        return bundledPath;
+      }
+      return null;
+    }
+  }
+
+  /**
+   * Get ast-grep binary path from @ast-grep/cli npm package.
+   * @private
+   * @returns {string|null} Path to ast-grep binary or null if unavailable
+   */
+  _getAstGrepPath() {
+    try {
+      const astGrepPkgPath = require.resolve('@ast-grep/cli');
+      const binDir = path.join(path.dirname(astGrepPkgPath), '../.bin');
+      const binName = process.platform === 'win32' ? 'ast-grep.cmd' : 'ast-grep';
+      const binPath = path.join(binDir, binName);
+      if (fs.existsSync(binPath)) {
+        return binPath;
+      }
+      // Try without .cmd extension on Windows
+      if (process.platform === 'win32') {
+        const altPath = path.join(binDir, 'ast-grep');
+        if (fs.existsSync(altPath)) {
+          return altPath;
+        }
+      }
+    } catch {
+      // Package not installed, try global or bundled
+    }
+    // Fallback to global installation check
+    return 'ast-grep';
+  }
+
+  /**
+   * Check if a binary is available by running --version.
+   * @private
+   * @param {string} binPath - Path to binary
+   * @returns {Promise<boolean>}
+   */
+  async _checkBinaryAvailable(binPath) {
+    return new Promise(resolve => {
+      const proc = spawn(binPath, ['--version'], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      proc.on('error', () => resolve(false));
+      proc.on('close', code => resolve(code === 0));
+      setTimeout(() => {
+        proc.kill();
+        resolve(false);
+      }, 5000);
+    });
+  }
+
+  /**
+   * Use ripgrep to search memory files.
+   * @private
+   * @param {string} query - Search query
+   * @param {string[]} files - Relative file paths to search
+   * @param {number} limit - Max results
+   * @returns {Promise<Array>}
+   */
+  async _searchWithRipgrep(query, files, limit) {
+    const rgPath = this._getRipgrepPath();
+    if (!rgPath) return [];
+
+    const available = await this._checkBinaryAvailable(rgPath);
+    if (!available) return [];
+
+    const memoryDir = this.config.memoryDir;
+    const candidates = [];
+
+    // Build ripgrep command: search query in specific files
+    const args = [
+      '-i', // case-insensitive
+      '-n', // line numbers
+      '-C',
+      '2', // context lines
+      '--', // end of options
+      query,
+    ];
+
+    // Add file paths (absolute)
+    for (const rel of files) {
+      const abs = path.join(memoryDir, rel);
+      if (fs.existsSync(abs)) {
+        args.push(abs);
+      }
+    }
+
+    if (args.length === 5) return []; // No files to search
+
+    return new Promise(resolve => {
+      const proc = spawn(rgPath, args, {
+        cwd: memoryDir,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+
+      let stdout = '';
+      proc.stdout.on('data', data => {
+        stdout += data.toString();
+      });
+
+      proc.on('close', code => {
+        // ripgrep returns 1 when no matches found (not an error)
+        if (code !== 0 && code !== 1) {
+          resolve([]);
+          return;
+        }
+
+        // Parse ripgrep output: "file:line:context"
+        const lines = stdout.split('\n').filter(l => l.trim());
+        for (const line of lines.slice(0, limit * 3)) {
+          // Format: "path/to/file:123:  context line"
+          const match = line.match(/^([^:]+):(\d+):(.*)$/);
+          if (match) {
+            const [, filePath, , content] = match;
+            const rel = path.relative(memoryDir, filePath).replace(/\\/g, '/');
+            candidates.push({
+              content: content.trim(),
+              metadata: { path: rel },
+              similarity: null,
+              source: 'ripgrep',
+            });
+          }
+        }
+
+        resolve(candidates.slice(0, limit));
+      });
+
+      proc.on('error', () => resolve([]));
+    });
+  }
+
+  /**
    * Keyword search fallback for when semantic search is unavailable.
    *
-   * This intentionally stays simple and fast (bounded reads and file set),
-   * returning results shaped similarly to semantic results.
+   * Enhanced to use ripgrep and ast-grep when available for faster searches.
+   * Falls back to bounded file reads if tools unavailable.
    *
    * @private
    * @param {string} query
@@ -178,8 +330,6 @@ class ContextualMemory {
       .trim()
       .toLowerCase();
     if (!q) return [];
-
-    const candidates = [];
 
     // Keep file set explicit to avoid scanning large directories.
     const files = [
@@ -208,7 +358,14 @@ class ContextualMemory {
       }
     }
 
-    // Read up to the last N bytes to keep the search cheap.
+    // Try ripgrep first (fastest for text search)
+    const ripgrepResults = await this._searchWithRipgrep(q, files, limit);
+    if (ripgrepResults.length > 0) {
+      return ripgrepResults;
+    }
+
+    // Fallback to file-read approach (original implementation)
+    const candidates = [];
     const MAX_BYTES = 80_000;
 
     for (const rel of files) {

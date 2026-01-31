@@ -99,7 +99,7 @@ This agent can search code efficiently using the ripgrep skill for codebase anal
 - Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
 - Faster than: `Grep` or `Glob` (10-100x speed improvement)
 - Automatically respects: `.gitignore` files
-- Available: Binary at `C:\dev\projects\agent-studio\bin\rg` (Windows)
+- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
 
 **When to use ripgrep:**
 
@@ -127,6 +127,83 @@ Skill({ skill: 'ripgrep', args: 'strcpy|strcat|sprintf' });
 // Find network operations
 Skill({ skill: 'ripgrep', args: 'socket|connect|send|recv' });
 ```
+
+### code-semantic-search (Semantic Search)
+
+Find code by meaning using hybrid semantic search (95% accuracy, <150ms):
+
+**When to use semantic search:**
+
+- Understanding code functionality in decompiled/reverse-engineered code
+- Finding security-critical code by concept (crypto, validation, serialization)
+- Discovering protocol implementations and data formats
+- Locating algorithm implementations by behavior
+- Understanding code flow and control structures
+
+**Modes:**
+
+- **Hybrid (default)**: Combines semantic + structural (best accuracy, <150ms)
+- **Semantic-only**: Fast conceptual search (<50ms, 85% accuracy)
+- **Structural-only**: Exact pattern matching (<50ms, 100% accuracy)
+
+**Example:**
+
+```javascript
+// Find cryptographic implementations
+Skill({ skill: 'code-semantic-search', args: 'encryption and decryption logic' });
+
+// Find protocol parsing code
+Skill({
+  skill: 'code-semantic-search',
+  args: 'network protocol parsing and serialization',
+  options: { mode: 'hybrid' },
+});
+
+// Find state management and control flow
+Skill({ skill: 'code-semantic-search', args: 'state machine and control flow logic' });
+```
+
+### ast-grep (Structural Search)
+
+For precise AST-based pattern matching using `@ast-grep/cli` npm package:
+
+**When to use ast-grep:**
+
+- Finding exact function signatures and call patterns
+- Understanding code structure in decompiled/reverse-engineered code
+- Detecting algorithm patterns (state machines, event handlers)
+- Finding security-critical code structures
+
+**Binary**: Automatically managed via `@ast-grep/cli` npm package (cross-platform)
+
+**Example:**
+
+```javascript
+// Find exported functions (entry points)
+Skill({ skill: 'code-structural-search', args: 'export function $NAME($$$) { $$ } --lang ts' });
+
+// Find state machines
+Skill({ skill: 'code-structural-search', args: 'switch($STATE) { $$ } --lang js' });
+
+// Find event handlers
+Skill({ skill: 'code-structural-search', args: 'on($EVENT, $HANDLER) --lang js' });
+```
+
+### Search Strategy
+
+**When reverse engineering, use this workflow:**
+
+1. **Broad Discovery**: `ripgrep` for fast keyword search (crypto functions, network calls)
+2. **Semantic Understanding**: `code-semantic-search` to understand functionality by meaning
+3. **Structural Refinement**: `code-structural-search` for exact function signatures and patterns
+
+**Tool Selection Guide:**
+
+| Tool                   | Type       | Speed  | Accuracy | Best For                    |
+| ---------------------- | ---------- | ------ | -------- | --------------------------- |
+| ripgrep                | Text       | <10ms  | ~70%     | Finding crypto/network code |
+| code-semantic-search   | Hybrid     | <150ms | ~95%     | Understanding functionality |
+| code-structural-search | Structural | <50ms  | 100%     | Exact signature matching    |
 
 ## Code Structure Analysis
 
@@ -157,7 +234,7 @@ IDA Pro          - Industry-standard disassembler with Hex-Rays decompiler
 Ghidra           - NSA's open-source reverse engineering suite
 radare2/rizin    - Open-source RE framework with scriptability
 Binary Ninja     - Modern disassembler with clean API
-x64dbg           - Windows debugger with plugin ecosystem
+x64dbg           - Windows debugging tool with plugin ecosystem
 ```
 
 ### Supporting Tools

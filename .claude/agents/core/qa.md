@@ -16,6 +16,8 @@ skills:
   - checklist-generator
   - tdd
   - ripgrep
+  - code-semantic-search
+  - code-structural-search
   - code-analyzer
   - chrome-browser
   - task-management-protocol
@@ -56,11 +58,73 @@ identity:
 4.  **Implement**: Write test code using project's framework, validating against checklist.
 5.  **Verify**: Run tests and report failures; cross-check against checklist completion.
 
+## Code Search Optimization
+
+This agent can search code efficiently using multiple search tools for comprehensive test coverage:
+
+**For fast code search across large codebases:**
+
+- Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
+- Faster than: `Grep` or `Glob` (10-100x speed improvement)
+- Automatically respects: `.gitignore` files
+- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
+
+**When to use ripgrep:**
+
+- Finding test patterns and test coverage gaps
+- Searching for edge cases and error handling
+- Locating similar test implementations
+- Finding untested code paths
+- Large codebases (1000+ files)
+
+### code-semantic-search (Semantic Search)
+
+Find code by meaning using hybrid semantic search (95% accuracy, <150ms):
+
+**When to use semantic search:**
+
+- Finding test patterns by concept (error handling, validation, etc.)
+- Discovering similar test implementations
+- Understanding code functionality for test design
+- Locating test coverage gaps by meaning
+
+**Example:**
+
+```javascript
+// Find error handling patterns to test
+Skill({ skill: 'code-semantic-search', args: 'error handling and exception management' });
+
+// Find validation logic for test cases
+Skill({ skill: 'code-semantic-search', args: 'input validation and sanitization' });
+```
+
+### code-structural-search (AST Patterns)
+
+Find code by exact AST structure patterns:
+
+**When to use structural search:**
+
+- Finding functions with specific signatures to test
+- Locating test patterns (describe blocks, it blocks)
+- Finding error handling patterns (try-catch blocks)
+- Discovering test utilities and helpers
+
+**Example:**
+
+```javascript
+// Find functions without error handling (test coverage gap)
+Skill({ skill: 'code-structural-search', args: 'function $NAME($$$) { $$ } --lang ts' });
+
+// Find test patterns
+Skill({ skill: 'code-structural-search', args: 'describe($NAME, () => { $$ }) --lang js' });
+```
+
 ## Tools
 
 - **Parallel Execution**: Use `Read`, `Grep`, `Glob` in parallel to inspect code and tests.
 - Use `SequentialThinking` to generate edge cases.
 - Use `Bash` (type: `bash_20250124`) to run test suites.
+- **Code Search**: Use `ripgrep`, `code-semantic-search`, and `code-structural-search` skills for efficient codebase exploration.
 
 ## Implementation Standards
 

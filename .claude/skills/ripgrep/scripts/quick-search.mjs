@@ -29,7 +29,9 @@ import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,24 +52,21 @@ function findProjectRoot() {
 }
 
 const PROJECT_ROOT = findProjectRoot();
-const BIN_DIR = path.join(PROJECT_ROOT, 'bin');
-const RIPGREPRC = path.join(BIN_DIR, '.ripgreprc');
 
-// Detect platform
-const platform = os.platform();
-let binaryName = 'rg';
-if (platform === 'win32') {
-  binaryName = 'rg.exe';
-}
-
-const RG_BINARY = path.join(BIN_DIR, binaryName);
-
-// Verify binary exists
-if (!fs.existsSync(RG_BINARY)) {
-  console.error(`❌ Ripgrep binary not found at: ${RG_BINARY}`);
-  console.error('   Expected location: C:\\dev\\projects\\agent-studio\\bin\\');
+// Get ripgrep binary path from @vscode/ripgrep npm package
+let rgPath;
+try {
+  const { rgPath: npmRgPath } = require('@vscode/ripgrep');
+  rgPath = npmRgPath;
+} catch (_err) {
+  console.error('❌ @vscode/ripgrep package not found.');
+  console.error('   Install with: pnpm add @vscode/ripgrep');
   process.exit(1);
 }
+
+// Optional: Check for .ripgreprc config file (backward compatibility)
+const RIPGREPRC = path.join(PROJECT_ROOT, 'bin', '.ripgreprc');
+const configExists = fs.existsSync(RIPGREPRC);
 
 // Parse arguments
 const args = process.argv.slice(2);
@@ -121,14 +120,16 @@ if (!presets[preset]) {
 // Build final args: [pattern, ...preset-args, ...extra-args]
 const rgArgs = [pattern, ...presets[preset], ...extraArgs];
 
-// Set environment variable for config
+// Set environment variable for config if it exists
 const env = {
   ...process.env,
-  RIPGREP_CONFIG_PATH: RIPGREPRC,
 };
+if (configExists) {
+  env.RIPGREP_CONFIG_PATH = RIPGREPRC;
+}
 
 // Spawn ripgrep
-const rg = spawn(RG_BINARY, rgArgs, {
+const rg = spawn(rgPath, rgArgs, {
   stdio: 'inherit',
   env,
   shell: false, // SECURITY: Prevent shell interpretation

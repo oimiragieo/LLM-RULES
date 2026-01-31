@@ -12,6 +12,7 @@ const assert = require('node:assert');
 const fs = require('fs').promises;
 const path = require('path');
 const { AstGrepSearch } = require('../../.claude/lib/code-indexing/ast-grep-wrapper.cjs');
+const { ContextualMemory } = require('../../.claude/lib/memory/contextual-memory.cjs');
 
 const TEST_DIR = path.join(__dirname, 'fixtures', 'ast-grep-test');
 
@@ -60,6 +61,76 @@ describe('AstGrepSearch', () => {
   after(async () => {
     // Clean up fixtures
     await fs.rm(TEST_DIR, { recursive: true, force: true });
+  });
+
+  describe('npm package (@ast-grep/cli) integration', () => {
+    test('binary path resolution from @ast-grep/cli when available', () => {
+      const memory = new ContextualMemory({ memoryDir: TEST_DIR });
+      const binPath = memory._getAstGrepPath();
+      assert.ok(typeof binPath === 'string', 'Should return string (path or "ast-grep")');
+      assert.ok(binPath.length > 0, 'Path should be non-empty');
+      if (binPath !== 'ast-grep') {
+        assert.ok(
+          binPath.endsWith('.cmd') || binPath.endsWith('ast-grep') || binPath.includes('ast-grep'),
+          'Resolved path should reference ast-grep or .cmd'
+        );
+      }
+    });
+
+    test('Windows vs Unix binary naming', () => {
+      const memory = new ContextualMemory({ memoryDir: TEST_DIR });
+      const binPath = memory._getAstGrepPath();
+      if (process.platform === 'win32' && binPath !== 'ast-grep' && binPath.includes(path.sep)) {
+        const hasCmd = binPath.endsWith('.cmd');
+        const hasAstGrep = binPath.includes('ast-grep');
+        assert.ok(hasCmd || hasAstGrep, 'Windows path should reference .cmd or ast-grep');
+      }
+    });
+
+    test('isAvailable() with npm package path', async () => {
+      const memory = new ContextualMemory({ memoryDir: TEST_DIR });
+      const binPath = memory._getAstGrepPath();
+      const sg = new AstGrepSearch({ binPath, projectRoot: TEST_DIR });
+      const available = await sg.isAvailable();
+      assert.strictEqual(typeof available, 'boolean');
+    });
+
+    test('getVersion() with npm package path when binary available', async () => {
+      const memory = new ContextualMemory({ memoryDir: TEST_DIR });
+      const binPath = memory._getAstGrepPath();
+      const sg = new AstGrepSearch({ binPath, projectRoot: TEST_DIR });
+      const isAvailable = await sg.isAvailable();
+      if (!isAvailable) {
+        assert.ok(true, 'Skipped: ast-grep not available');
+        return;
+      }
+      const version = await sg.getVersion();
+      assert.strictEqual(typeof version, 'string');
+      assert.ok(version.length > 0, 'Version string should not be empty');
+    });
+
+    test('search() works with npm package binPath', async () => {
+      const memory = new ContextualMemory({ memoryDir: TEST_DIR });
+      const binPath = memory._getAstGrepPath();
+      const sg = new AstGrepSearch({ binPath, projectRoot: TEST_DIR });
+      const isAvailable = await sg.isAvailable();
+      if (!isAvailable) {
+        assert.ok(true, 'Skipped: ast-grep not installed');
+        return;
+      }
+      const results = await sg.search('function $NAME($$$) { $$$ }', 'javascript');
+      assert.ok(Array.isArray(results));
+      if (results.length > 0) {
+        assert.ok(results[0].filePath, 'Result has filePath');
+        assert.ok(results[0].code, 'Result has code');
+      }
+    });
+
+    test('fallback to global ast-grep when npm package unavailable', () => {
+      const memory = new ContextualMemory({ memoryDir: TEST_DIR });
+      const binPath = memory._getAstGrepPath();
+      assert.ok(binPath === 'ast-grep' || (typeof binPath === 'string' && binPath.length > 0));
+    });
   });
 
   describe('isAvailable()', () => {

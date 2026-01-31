@@ -51,7 +51,7 @@ This agent can search code efficiently using the ripgrep skill for research:
 - Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
 - Faster than: `Grep` or `Glob` (10-100x speed improvement)
 - Automatically respects: `.gitignore` files
-- Available: Binary at `C:\dev\projects\agent-studio\bin\rg` (Windows)
+- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
 
 **When to use ripgrep:**
 
@@ -79,6 +79,86 @@ Skill({ skill: 'ripgrep', args: 'class.*API' });
 // Understand patterns
 Skill({ skill: 'ripgrep', args: 'async.*function' });
 ```
+
+### code-semantic-search (Semantic Search)
+
+Find code by meaning using hybrid semantic search (95% accuracy, <150ms):
+
+**When to use semantic search:**
+
+- Researching implementation patterns by concept
+- Finding examples of specific functionality without knowing exact names
+- Understanding how frameworks/libraries are used
+- Discovering best practices in existing codebase
+- Exploring unfamiliar codebases by meaning
+
+**Modes:**
+
+- **Hybrid (default)**: Combines semantic + structural (best accuracy, <150ms)
+- **Semantic-only**: Fast conceptual search (<50ms, 85% accuracy)
+- **Structural-only**: Exact pattern matching (<50ms, 100% accuracy)
+
+**Example:**
+
+```javascript
+// Research authentication implementations
+Skill({ skill: 'code-semantic-search', args: 'how is user authentication implemented' });
+
+// Find API integration patterns
+Skill({
+  skill: 'code-semantic-search',
+  args: 'external API calls and error handling',
+  options: { mode: 'hybrid' },
+});
+
+// Research data processing patterns
+Skill({ skill: 'code-semantic-search', args: 'data transformation and validation' });
+```
+
+### ast-grep (Structural Search)
+
+For precise AST-based pattern matching using `@ast-grep/cli` npm package:
+
+**When to use ast-grep:**
+
+- Finding exact code structures for research (React components, Express routes)
+- Understanding framework usage patterns
+- Discovering integration points and API patterns
+- Systematic codebase exploration by structure
+
+**Binary**: Automatically managed via `@ast-grep/cli` npm package (cross-platform)
+
+**Example:**
+
+```javascript
+// Find React components
+Skill({ skill: 'code-structural-search', args: 'function $NAME() { return <$TAG>; } --lang tsx' });
+
+// Find Express routes
+Skill({ skill: 'code-structural-search', args: 'app.$METHOD($PATH, $HANDLER) --lang js' });
+
+// Find async handlers
+Skill({
+  skill: 'code-structural-search',
+  args: 'async function $NAME($$$) { await $EXPR } --lang ts',
+});
+```
+
+### Search Strategy
+
+**When researching code, use this workflow:**
+
+1. **Broad Discovery**: `ripgrep` for fast keyword search (framework usage, imports)
+2. **Semantic Understanding**: `code-semantic-search` to find implementations by concept
+3. **Structural Refinement**: `code-structural-search` for exact framework patterns
+
+**Tool Selection Guide:**
+
+| Tool                   | Type       | Speed  | Accuracy | Best For                    |
+| ---------------------- | ---------- | ------ | -------- | --------------------------- |
+| ripgrep                | Text       | <10ms  | ~70%     | Framework/library detection |
+| code-semantic-search   | Hybrid     | <150ms | ~95%     | Implementation research     |
+| code-structural-search | Structural | <50ms  | 100%     | Exact pattern discovery     |
 
 ## Codebase Research
 

@@ -13,6 +13,9 @@ skills:
   - code-style-validator
   - dry-principle
   - debugging
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
 context_files:
   - @.claude/context/memory/learnings.md
 ---
@@ -109,6 +112,28 @@ Skill({ skill: 'dry-principle' });
 4. **Evaluate abstractions** (unnecessary indirection, over-engineering)
 5. **Assess maintainability** (cognitive load, debugging difficulty)
 6. **Detect code smells** (long methods, large classes, feature envy)
+
+**Code Search Tools:**
+
+- **ripgrep**: Fast keyword search for finding similar patterns across codebase
+- **code-semantic-search**: Find code by meaning to discover similar implementations
+- **code-structural-search**: Find exact code structures for pattern matching
+
+**Example:**
+
+```javascript
+// Find similar functions for consistency review
+Skill({ skill: 'ripgrep', args: 'function.*handle.*error' });
+
+// Find complex nested conditionals
+Skill({
+  skill: 'code-structural-search',
+  args: 'if ($A) { if ($B) { if ($C) { $$ } } } --lang ts',
+});
+
+// Find duplicate patterns by meaning
+Skill({ skill: 'code-semantic-search', args: 'data validation and error handling' });
+```
 
 ### Step 3: Apply Project-Specific Best Practices
 

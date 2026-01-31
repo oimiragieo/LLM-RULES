@@ -57,12 +57,14 @@ function appendSemanticMatches(prompt, results) {
 
   for (const r of results.slice(0, 3)) {
     const src = r?.source || 'unknown';
-    const sim =
-      typeof r?.similarity === 'number' ? ` ${(r.similarity * 100).toFixed(1)}%` : '';
+    const sim = typeof r?.similarity === 'number' ? ` ${(r.similarity * 100).toFixed(1)}%` : '';
     const metaPath = r?.metadata?.path || r?.metadata?.file || r?.metadata?.source || null;
     const where = metaPath ? ` (${metaPath})` : '';
 
-    const snippet = String(r?.content || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+    const snippet = String(r?.content || '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 180);
     if (!snippet) continue;
     lines.push(`- [${src}${sim}]${where}: ${snippet}${snippet.length >= 180 ? '...' : ''}`);
   }
@@ -117,7 +119,7 @@ async function main() {
       includeMemory: true,
     });
 
-  // Optional Phase 3 enhancement: ContextualMemory semantic search.
+    // Optional Phase 3 enhancement: ContextualMemory semantic search.
     // Enabled by default; set SPAWN_PROMPT_SEMANTIC_MEMORY=off to disable.
     if (process.env.SPAWN_PROMPT_SEMANTIC_MEMORY !== 'off') {
       try {

@@ -92,7 +92,7 @@ This agent can search code efficiently using the ripgrep skill:
 - Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
 - Faster than: `Grep` or `Glob` (10-100x speed improvement)
 - Automatically respects: `.gitignore` files
-- Available: Binary at `C:\dev\projects\agent-studio\bin\rg` (Windows)
+- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
 
 **When to use ripgrep:**
 

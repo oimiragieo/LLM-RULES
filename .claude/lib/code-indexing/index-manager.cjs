@@ -14,6 +14,7 @@ const { CodeParser } = require('./code-parser.cjs');
 const { SemanticChunker } = require('./semantic-chunker.cjs');
 const { EmbeddingGenerator } = require('./embedding-generator.cjs');
 const VectorDatabase = require('./vector-db.cjs');
+const { MerkleTree } = require('./merkle-tree.cjs');
 
 // Default configuration
 const DEFAULT_OPTIONS = {
@@ -332,10 +333,180 @@ class IndexManager {
     await fs.mkdir(metadataDir, { recursive: true });
     await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
 
+    // Build and save Merkle tree for future incremental updates
+    const merklePath = path.join(
+      this.options.projectRoot,
+      '.claude/context/code-index/merkle-tree.json'
+    );
+    const merkleTree = new MerkleTree(this.options.projectRoot, this.options.excludePatterns);
+    await merkleTree.build();
+    await merkleTree.save(merklePath);
+
     return {
       filesIndexed: files.length,
       chunksCreated: totalChunks,
       embeddingsGenerated: totalEmbeddings,
+      timeMs: Date.now() - startTime,
+    };
+  }
+
+  /**
+   * Perform incremental update using Merkle tree change detection
+   * Only re-indexes files that have changed since last index
+   * @param {Object} options - Update options
+   * @returns {Promise<Object>} Update results
+   */
+  async incrementalUpdate(options = {}) {
+    const startTime = Date.now();
+    await this._initializeComponents();
+
+    const merklePath = path.join(
+      this.options.projectRoot,
+      '.claude/context/code-index/merkle-tree.json'
+    );
+
+    // Load old Merkle tree
+    const oldTree = await MerkleTree.load(merklePath);
+
+    if (!oldTree) {
+      // No previous tree - do full index
+      const result = await this.indexDirectory(this.options.projectRoot, options);
+      // Save new tree
+      const newTree = new MerkleTree(this.options.projectRoot, this.options.excludePatterns);
+      await newTree.build();
+      await newTree.save(merklePath);
+      return {
+        ...result,
+        updateType: 'full',
+        filesChanged: result.filesIndexed,
+      };
+    }
+
+    // Build new Merkle tree
+    const newTree = new MerkleTree(this.options.projectRoot, this.options.excludePatterns);
+    await newTree.build();
+
+    // Compare trees to find changes
+    const diff = MerkleTree.diff(oldTree, newTree.root, '');
+
+    if (diff.added.length === 0 && diff.modified.length === 0 && diff.deleted.length === 0) {
+      // No changes
+      return {
+        updateType: 'incremental',
+        filesAdded: 0,
+        filesModified: 0,
+        filesDeleted: 0,
+        chunksAdded: 0,
+        chunksUpdated: 0,
+        chunksDeleted: 0,
+        timeMs: Date.now() - startTime,
+      };
+    }
+
+    // Process changed files
+    const filesToIndex = [...diff.added, ...diff.modified];
+    const filesToDelete = diff.deleted;
+
+    let chunksAdded = 0;
+    let chunksUpdated = 0;
+    let chunksDeleted = 0;
+
+    // Delete removed files from index
+    for (const filePath of filesToDelete) {
+      const fullPath = path.isAbsolute(filePath)
+        ? filePath
+        : path.join(this.options.projectRoot, filePath);
+      await this.vectorDb.deleteFile(fullPath);
+      chunksDeleted++;
+    }
+
+    // Re-index changed/added files
+    for (const filePath of filesToIndex) {
+      const fullPath = path.isAbsolute(filePath)
+        ? filePath
+        : path.join(this.options.projectRoot, filePath);
+
+      try {
+        // Check if file exists and is readable
+        await fs.access(fullPath);
+        const stats = await fs.stat(fullPath);
+        if (stats.size > this.options.maxFileSize) continue;
+
+        // Parse, chunk, embed, and store
+        const content = await fs.readFile(fullPath, 'utf8');
+        const language = this.parser.detectLanguage(fullPath);
+        if (!language) continue;
+
+        const parseResult = this.parser.parse(content, language);
+        const chunks = this.chunker.chunk(parseResult, fullPath);
+        if (chunks.length === 0) continue;
+
+        const embeddedChunks = await this.embedder.embedChunks(chunks);
+        const chunkData = embeddedChunks.map(ec => ec.chunk);
+        const embeddings = embeddedChunks.map(ec => ec.embedding);
+        const metadata = embeddedChunks.map(ec => ({
+          id: ec.chunk.id,
+          filePath: ec.chunk.filePath,
+          language: ec.chunk.language,
+          type: ec.chunk.type,
+          lineStart: ec.chunk.lineStart,
+          lineEnd: ec.chunk.lineEnd,
+        }));
+
+        // Delete old chunks for this file first
+        await this.vectorDb.deleteFile(fullPath);
+        chunksDeleted += chunks.length;
+
+        // Add new chunks
+        await this.vectorDb.addChunks(chunkData, embeddings, metadata);
+
+        if (diff.added.includes(filePath)) {
+          chunksAdded += chunks.length;
+        } else {
+          chunksUpdated += chunks.length;
+        }
+      } catch (_error) {
+        // File might not exist or be unreadable - skip
+        continue;
+      }
+    }
+
+    // Save new Merkle tree
+    await newTree.save(merklePath);
+
+    // Update metadata
+    const metadataPath = path.join(
+      this.options.projectRoot,
+      '.claude/context/code-index/metadata.json'
+    );
+    let metadata = {};
+    try {
+      const metadataContent = await fs.readFile(metadataPath, 'utf8');
+      metadata = JSON.parse(metadataContent);
+    } catch (_err) {
+      // Metadata doesn't exist - create new
+    }
+
+    metadata.lastIncrementalUpdate = new Date().toISOString();
+    metadata.incrementalStats = {
+      filesAdded: diff.added.length,
+      filesModified: diff.modified.length,
+      filesDeleted: diff.deleted.length,
+      chunksAdded,
+      chunksUpdated,
+      chunksDeleted,
+    };
+
+    await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+
+    return {
+      updateType: 'incremental',
+      filesAdded: diff.added.length,
+      filesModified: diff.modified.length,
+      filesDeleted: diff.deleted.length,
+      chunksAdded,
+      chunksUpdated,
+      chunksDeleted,
       timeMs: Date.now() - startTime,
     };
   }
