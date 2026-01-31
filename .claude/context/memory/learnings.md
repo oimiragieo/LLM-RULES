@@ -601,3 +601,48 @@ Multi-layer defense-in-depth validation hooks:
 2. Security event reporting
 3. Usage pattern analysis
 4. False positive tuning
+
+### 2026-01-31: Variable Quoting Patterns (Phase 2 Shell Security)
+
+**Context:** Implemented Phase 2 of shell security (ADR-077) - variable quoting validator.
+
+**Pattern Learned:**
+1. **Unquoted Variables Are Dangerous:**
+   - `cd $DIR` can fail if DIR contains spaces: `/path with spaces/`
+   - `rm -rf $FILES` can expand globs: if FILES="*", deletes everything
+   - `find $DIR` can traverse wrong paths if DIR malicious
+
+2. **Detection Strategy:**
+   - Regex: `/(?<!["'])\$\{?[A-Z_][A-Z0-9_]*\}?(?!["'])/g` (unquoted variables)
+   - Check before/after quotes to count quote pairs (handle nesting)
+   - Special variables ($$, $?, $!) are safe unquoted (shell built-ins)
+
+3. **Dangerous Context Detection:**
+   - HIGH priority: `cd $VAR`, `find $VAR`, `rm $VAR` (filesystem operations)
+   - Medium priority: `mv $VAR`, `cp $VAR`, `chmod $VAR` (file operations)
+   - Low priority: `echo $VAR` (output only, limited impact)
+
+4. **Implementation Details:**
+   - Default mode: `warn` (not blocking, educational)
+   - Hook: `PreToolUse(Bash)` runs before command execution
+   - Environment: `VARIABLE_QUOTING_VALIDATOR=warn|block|off`
+   - Message format: `[VARIABLE-QUOTING-HIGH] unquoted variables detected: $VAR (dangerous contexts: cd)`
+
+5. **Test Environment Isolation:**
+   - Node.js test runner doesn't isolate env vars between test suites
+   - Solution: Add `before()` hook to delete process.env.VARIABLE_QUOTING_VALIDATOR
+   - Pattern: Always clean up env vars in suite setup/teardown
+
+6. **Integration Testing Strategy:**
+   - Test multi-hook coordination (CWD + injection + quoting)
+   - Verify validators don't conflict (orthogonal concerns)
+   - Test environment override (off/warn/block modes)
+   - Test foreground vs background behavior (CWD only checks background)
+
+**Evidence:**
+- 17/17 unit tests passing (variable-quoting-validator.test.cjs)
+- 13/13 integration tests passing (shell-security-integration.test.mjs)
+- All validators coordinated without conflicts
+
+**Reusable:** Yes - variable quoting detection pattern applicable to any shell command validation
+
