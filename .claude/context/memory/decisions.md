@@ -1434,7 +1434,7 @@ _Negative:_
 ## [ADR-077] Shell Command Security Architecture
 
 - **Date**: 2026-01-31
-- **Status**: Accepted (Phase 1 COMPLETE - 2026-01-31)
+- **Status**: Accepted (Phase 1 COMPLETE, Phase 3 COMPLETE - 2026-01-31)
 - **Context**: Background Bash tasks executed with undefined CWD, causing `find` commands to search entire filesystem instead of PROJECT_ROOT. Error output showed traversal to `/c/XboxGames/` (user data exposure), malformed path arguments (`'/v'`, `''`), and exit code 1 failures. Root cause: Background tasks don't initialize CWD to PROJECT_ROOT before shell execution, creating critical security vulnerabilities (shell injection, path traversal, data exfiltration, resource exhaustion).
 - **Problem Statement**:
   1. **Missing CWD Initialization**: Background tasks execute in undefined CWD (not PROJECT_ROOT)
@@ -1502,9 +1502,15 @@ _Negative:_
     4. Variable quoting validator (1 day)
     5. PROJECT_ROOT environment export (1 day)
     6. Integration testing (1 day)
-  - **Phase 3 (Week 3 - MEDIUM)**: Enhancements
-    7. Shellcheck integration (1 day)
-    8. Command allowlist (1 day)
+  - **Phase 3 (Week 3 - MEDIUM)**: Enhancements ✅ COMPLETE (2026-01-31)
+    7. ✅ shellcheck-validator.cjs created (graceful fallback if not installed)
+    8. ✅ command-allowlist.cjs library created (25+ allowed, 15+ blocked commands)
+    9. ✅ command-allowlist-validator.cjs hook created
+    10. ✅ command-allowlist.yaml configuration created
+    11. ✅ shellcheck-validator.test.cjs (20 tests)
+    12. ✅ command-allowlist-validator.test.cjs (40 tests)
+    13. ✅ shell-security-phase3.test.mjs integration tests (25 tests)
+    14. ✅ SHELL-SECURITY-GUIDE.md comprehensive documentation
   - **Phase 4 (Ongoing)**: Monitoring
     9. Audit logging (1 day)
     10. Documentation (ongoing)

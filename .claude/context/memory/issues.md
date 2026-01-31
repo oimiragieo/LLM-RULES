@@ -37,6 +37,174 @@
 
 <!-- OPEN ISSUES BELOW THIS LINE -->
 
+## [SHELL-SECURITY-001] Background Bash Tasks Missing CWD Initialization (CRITICAL) 🔴 OPEN
+
+- **Date**: 2026-01-31
+- **Severity**: CRITICAL
+- **Status**: OPEN
+- **Category**: shell_security
+- **Discovery**: Background Task Shell Command Audit (AUDIT-2026-01-31-SHELL-INJECTION)
+- **Description**: Background Bash tasks execute in undefined CWD instead of PROJECT_ROOT, causing relative paths to fail and `find` commands to search entire filesystem from root (/). Observed: `find tests/` searched `/c/XboxGames/` (user data), malformed paths (`'/v'`, `''`), exit code 1 failures.
+- **Root Cause**: Spawn templates don't inject `cd "$PROJECT_ROOT"` before shell commands. Bash tool CWD persists per session but resets for background tasks.
+- **Impact**:
+  - **Path Traversal**: Filesystem searches from root (/) instead of PROJECT_ROOT
+  - **Data Exposure**: User data directories scanned (XboxGames, Documents, etc.)
+  - **Resource Exhaustion**: Entire filesystem searched (slow, high CPU)
+  - **Silent Failures**: Commands fail without clear error messages
+- **Evidence**:
+  - Task: "Count all test files in tests/ directory"
+  - Output: `find: '/v': No such file or directory` + XboxGames files listed
+  - Background tasks spawned without CWD context
+- **Fix**: Create bash-cwd-validator.cjs hook (PreToolUse Bash):
+  - Blocks background tasks missing `cd "$PROJECT_ROOT"` prefix
+  - Enforcement mode: `block` (default), `warn`, `off`
+  - Environment: `BASH_CWD_VALIDATOR=block|warn|off`
+- **Workaround**: Manually prepend `cd "$PROJECT_ROOT" && ` to all background Bash commands
+- **Verification**:
+  ```bash
+  # Test CWD validation
+  Bash({ command: 'find tests/', run_in_background: true });  # Should BLOCK
+  Bash({ command: 'cd "$PROJECT_ROOT" && find tests/', run_in_background: true });  # Should PASS
+  ```
+- **Related ADR**: ADR-077 (Shell Command Security Architecture)
+- **Related Issues**: SHELL-SECURITY-002 (injection), SHELL-SECURITY-003 (quoting)
+
+---
+
+## [SHELL-SECURITY-002] No Shell Injection Validation (CRITICAL) 🔴 OPEN
+
+- **Date**: 2026-01-31
+- **Severity**: CRITICAL
+- **Status**: OPEN
+- **Category**: shell_security
+- **Discovery**: Background Task Shell Command Audit (AUDIT-2026-01-31-SHELL-INJECTION)
+- **Description**: No validation exists for Bash commands before execution, allowing arbitrary command injection via unescaped user input, chained commands, or command substitution. Malicious patterns like `; rm -rf /`, `eval`, backticks, and redirects to system devices are not detected.
+- **Attack Surface**:
+  1. **Chained Commands**: `; rm -rf /`, `&& malicious`, `| dangerous`
+  2. **Command Substitution**: `$(rm -rf /)`, `` `malicious` ``
+  3. **Dangerous Targets**: `rm -rf /`, `rm -rf ~`, `rm -rf *`
+  4. **Code Injection**: `eval`, redirects to `/dev/`
+- **Current Safeguards**: NONE (0% protection)
+  - Router restricted to read-only git (doesn't protect subagents)
+  - Spawn template has warnings only (no enforcement)
+  - File placement guard doesn't validate Bash commands
+- **Impact**:
+  - **Arbitrary Command Execution**: Attacker can run any shell command
+  - **Data Destruction**: `rm -rf /` deletes entire filesystem
+  - **Privilege Escalation**: Execute commands as current user
+  - **Data Exfiltration**: Redirect sensitive data to external servers
+- **Example Exploit**:
+  ```javascript
+  const userDir = getUserInput(); // User provides: "tests; rm -rf /"
+  Bash({ command: `find ${userDir} -name "*.test.*"` });
+  // Executes: find tests; rm -rf / -name "*.test.*" (DELETES FILESYSTEM!)
+  ```
+- **Fix**: Create shell-injection-validator.cjs hook (PreToolUse Bash):
+  - Block patterns: `; rm -rf`, `eval`, `>>/dev/`, command substitution with `rm`
+  - Block targets: `rm -rf /`, `rm -rf ~`, `rm -rf *`
+  - Enforcement mode: `block` (default, no override)
+- **Workaround**: Manual code review of all Bash commands
+- **Verification**:
+  ```bash
+  # Test injection detection
+  Bash({ command: 'find tests/; rm -rf /' });  # Should BLOCK
+  Bash({ command: 'eval "malicious"' });  # Should BLOCK
+  Bash({ command: 'find tests/' });  # Should PASS
+  ```
+- **Related ADR**: ADR-077 (Shell Command Security Architecture)
+- **Related Issues**: SHELL-SECURITY-001 (CWD), SHELL-SECURITY-003 (quoting)
+
+---
+
+## [SHELL-SECURITY-003] Unquoted Variables in Bash Commands (HIGH) 🟡 OPEN
+
+- **Date**: 2026-01-31
+- **Severity**: HIGH
+- **Status**: OPEN
+- **Category**: shell_security
+- **Discovery**: Background Task Shell Command Audit (AUDIT-2026-01-31-SHELL-INJECTION)
+- **Description**: Bash commands frequently use unquoted variables (`$VAR` instead of `"$VAR"`), causing failures when paths contain spaces or special characters. Pattern violates shell best practices and creates subtle bugs.
+- **Root Cause**: Spawn templates don't enforce quoting rules. No validation hook checks for unquoted variables.
+- **Impact**:
+  - **Silent Failures**: Commands fail when paths have spaces (e.g., `/c/Program Files/`)
+  - **Word Splitting**: Shell interprets spaces as argument separators
+  - **Globbing Issues**: Special characters expanded unexpectedly
+  - **Hard-to-Debug**: Error messages unclear (`No such file or directory: /c/Program`)
+- **Example Failure**:
+  ```bash
+  cd $PROJECT_ROOT && find tests/
+  # If PROJECT_ROOT="/c/Program Files/agent-studio"
+  # Shell executes: cd /c/Program Files/agent-studio
+  # Error: cd: /c/Program: No such file or directory
+
+  # CORRECT:
+  cd "$PROJECT_ROOT" && find tests/
+  # Shell executes: cd "/c/Program Files/agent-studio" (works!)
+  ```
+- **Common Patterns**:
+  - `cd $PROJECT_ROOT` → `cd "$PROJECT_ROOT"`
+  - `find $DIR` → `find "$DIR"`
+  - `grep $PATTERN` → `grep "$PATTERN"`
+- **Fix**: Create variable-quoting-validator.cjs hook (PreToolUse Bash):
+  - Detects unquoted variables: `$VAR` or `${VAR}` not within quotes
+  - Suggests fixes: `"$VAR"` instead of `$VAR`
+  - Enforcement mode: `warn` (educational, non-blocking)
+  - Environment: `BASH_QUOTING_VALIDATOR=warn|off`
+- **Workaround**: Manual quoting audit of all Bash commands
+- **Verification**:
+  ```bash
+  # Test quoting detection
+  Bash({ command: 'cd $PROJECT_ROOT' });  # Should WARN
+  Bash({ command: 'cd "$PROJECT_ROOT"' });  # Should PASS
+  ```
+- **Related ADR**: ADR-077 (Shell Command Security Architecture)
+- **Related Issues**: SHELL-SECURITY-001 (CWD), SHELL-SECURITY-002 (injection)
+
+---
+
+## [SHELL-SECURITY-004] No Shellcheck Integration (MEDIUM) ✅ RESOLVED
+
+- **Date**: 2026-01-31
+- **Severity**: MEDIUM
+- **Status**: RESOLVED (2026-01-31 - Phase 3 Complete)
+- **Category**: shell_security
+- **Discovery**: Background Task Shell Command Audit (AUDIT-2026-01-31-SHELL-INJECTION)
+- **Description**: No automated shellcheck validation before executing Bash commands. Shellcheck detects common mistakes (unquoted variables, syntax errors, deprecated patterns) but is not integrated into the validation pipeline.
+- **Current State**: No shellcheck usage detected in hooks or spawn workflows
+- **Impact**:
+  - **Missed Errors**: Common shell mistakes not detected before execution
+  - **Runtime Failures**: Syntax errors only caught after command runs
+  - **Lower Quality**: Commands don't follow shell best practices
+  - **Debugging Overhead**: Troubleshooting shell errors post-execution
+- **Shellcheck Benefits**:
+  - Detects unquoted variables (SC2086)
+  - Detects deprecated syntax (`[ ]` vs `[[ ]]`)
+  - Detects unused variables
+  - Detects command not found risks
+  - Suggests best practices
+- **Fix**: Create shellcheck-validator.cjs hook (PreToolUse Bash):
+  - Writes command to temp file
+  - Runs `shellcheck -f json` on command
+  - Parses issues and blocks if errors detected
+  - Fallback gracefully if shellcheck not installed
+  - Enforcement mode: `warn` (optional, requires installation)
+  - Environment: `BASH_SHELLCHECK_VALIDATOR=warn|off`
+- **Workaround**: Manual shellcheck runs on command files
+- **Verification**:
+  ```bash
+  # Install shellcheck
+  brew install shellcheck  # macOS
+  apt-get install shellcheck  # Linux
+
+  # Test shellcheck detection
+  Bash({ command: 'cd $PROJECT_ROOT' });  # Should WARN (SC2086: unquoted)
+  Bash({ command: 'cd "$PROJECT_ROOT"' });  # Should PASS
+  ```
+- **Related ADR**: ADR-077 (Shell Command Security Architecture)
+- **Related Issues**: SHELL-SECURITY-003 (quoting validation overlap)
+
+---
+
 ## [LINT-001] ADR-076 Migration - Linting Errors Remaining (HIGH) 🟡 OPEN
 
 - **Date**: 2026-01-31
@@ -355,7 +523,7 @@ When Task() is spawned:
   3. Created pattern for single test verification before bulk testing
   4. Recommended `verify-api.cjs` tooling for plan vs implementation comparison
 - **Prevention for Future**:
-  1. **MANDATORY**: Check actual exports: `node -e "console.log(Object.keys(require('./module.cjs')).join(', '))"`
+  1. **MANDATORY**: Check actual exports: `node -e "Object.keys(require('./module.cjs')).join(', ')"`
   2. Write ONE passing test first to verify imports
   3. Update implementation plan when scope changes during development
   4. Generate API reference doc after implementation, before testing
