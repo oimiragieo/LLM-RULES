@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Text To Sql executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Text To Sql completed successfully');
+  console.log(
+    'Text-to-SQL skill provides in-context guidance for converting natural language to SQL. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

@@ -1,0 +1,20 @@
+{
+  "type": "directory",
+  "name": "sample-code",
+  "hash": "54b62f1bf831a8d203c6f17b44f508eb2f91baeba56149c898d82ad9a489204b",
+  "metadata": {
+    "path": ""
+  },
+  "children": {
+    "sample.js": {
+      "type": "file",
+      "name": "sample.js",
+      "hash": "e4f8994cf66c8c543d0c046e4498497cc4cc088a9c206177d317a4c92a732857",
+      "metadata": {
+        "path": "sample.js",
+        "size": 493,
+        "mtime": 1769915227970.4814
+      }
+    }
+  }
+}

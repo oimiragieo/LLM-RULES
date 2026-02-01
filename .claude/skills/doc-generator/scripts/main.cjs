@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Doc Generator executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Doc Generator completed successfully');
+  console.log(
+    'Doc Generator provides in-context guidance for API docs, developer guides, and architecture docs. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

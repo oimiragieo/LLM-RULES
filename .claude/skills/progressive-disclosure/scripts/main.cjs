@@ -60,11 +60,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Progressive Disclosure executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Progressive Disclosure completed successfully');
+  console.log(
+    'Progressive Disclosure skill provides ECLAIR-pattern requirements gathering. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

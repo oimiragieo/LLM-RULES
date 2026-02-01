@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Slack Notifications executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Slack Notifications completed successfully');
+  console.log(
+    'Slack Notifications skill provides in-context guidance; configure Slack MCP/API for full functionality. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

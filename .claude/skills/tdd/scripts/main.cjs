@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Tdd executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Tdd completed successfully');
+  console.log(
+    'TDD skill provides test-driven development guidance. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

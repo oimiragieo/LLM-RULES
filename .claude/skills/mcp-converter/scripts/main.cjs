@@ -56,11 +56,25 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Mcp Converter executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Mcp Converter completed successfully');
+  const { spawn } = require('child_process');
+  const integrationDir = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'tools',
+    'integrations',
+    'mcp-converter'
+  );
+  const batchPath = path.join(integrationDir, 'batch_converter.py');
+  if (!fs.existsSync(batchPath)) {
+    console.error('MCP batch converter not found:', batchPath);
+    process.exit(1);
+  }
+  const child = spawn('python', [batchPath, ...args.filter(a => a !== '--help')], {
+    stdio: 'inherit',
+    cwd: integrationDir,
+    shell: true,
+  });
+  child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }
 
 main();

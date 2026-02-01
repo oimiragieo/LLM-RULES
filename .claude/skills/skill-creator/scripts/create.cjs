@@ -551,9 +551,8 @@ Options:
 
   console.log('🔧 ${titleCase} executing...');
 
-  // TODO: Implement skill logic here
-
-  console.log('✅ ${titleCase} completed successfully');
+  console.warn('WARNING: This skill is currently a scaffold and has no implementation.');
+  process.exit(1);
 }
 
 main();

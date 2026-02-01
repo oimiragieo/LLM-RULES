@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 // Find project root
 function findProjectRoot() {
@@ -56,11 +57,22 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Commit Validator executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Commit Validator completed successfully');
+  const message = args.join(' ').trim();
+  const validatePath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-commit.mjs');
+  if (!fs.existsSync(validatePath)) {
+    console.error('Commit validator tool not found:', validatePath);
+    process.exit(1);
+  }
+  const child = spawn(process.execPath, message ? [validatePath, message] : [validatePath], {
+    stdio: message ? ['ignore', 'inherit', 'inherit'] : ['pipe', 'inherit', 'inherit'],
+    cwd: PROJECT_ROOT,
+  });
+  if (!message && process.stdin.isTTY) {
+    console.error('Usage: node main.cjs "<commit message>" or echo "<message>" | node main.cjs');
+    process.exit(1);
+  }
+  if (!message) process.stdin.pipe(child.stdin);
+  child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }
 
 main();

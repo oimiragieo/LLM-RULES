@@ -19,6 +19,36 @@ safety_level: high
 
 # Kubernetes Flux Skill
 
+## Installation
+
+The skill invokes the **Flux** CLI. Install:
+
+- **macOS/Linux (Homebrew)**: `brew install fluxcd/tap/flux`
+- **macOS/Linux (script)**: `curl -s https://fluxcd.io/install.sh | sudo bash`
+- **Windows (winget)**: `winget install -e --id FluxCD.Flux`
+- **Windows (Chocolatey)**: `choco install flux`
+- **Custom dir**: `curl -s https://fluxcd.io/install.sh | bash -s ~/.local/bin`
+
+Verify: `flux --version`. Then use `flux bootstrap` to deploy controllers if needed.
+
+## Cheat Sheet & Best Practices
+
+**Bootstrap:** `flux bootstrap git --url=ssh://git@host/repo.git --path=clusters/my-cluster`; use `--branch`, `--interval`, `--private-key-file` or `--token-auth` as needed.
+
+**Status:** `flux check` — controllers/CRDs; `flux get all -A` — all resources; `flux get kustomizations`; `flux tree kustomization <name>` — managed objects.
+
+**Hacks:** Use `flux get sources git` and `flux get kustomizations` to see sync state. Reconcile on demand: `flux reconcile kustomization <name> --with-source`. Pin versions with `FLUX_VERSION` on install script. Prefer Git over Helm for app manifests when using GitOps.
+
+## Certifications & Training
+
+**Kubernetes:** [CKA](https://kubernetes.io/training/) / [CKAD](https://www.cncf.io/training/certification/ckad/) (Linux Foundation). **Flux:** [GitOps with Flux (LFS269)](https://training.linuxfoundation.org/training/gitops-continuous-delivery-on-kubernetes-with-flux-lfs269/). **Skill data:** Bootstrap, reconcile, status (`flux check`, `flux get all`), tree; GitOps workflow.
+
+## Hooks & Workflows
+
+**Suggested hooks:** Pre-apply: `flux check`. Post-push (to Git repo used by Flux): optional reconcile trigger. Use with **devops** (always) for GitOps clusters.
+
+**Workflows:** Use with **devops** (always). Flow: bootstrap or reconcile; debug with `flux get all`, `flux tree kustomization`. See `gitops-workflow` skill and enterprise workflows.
+
 ## Overview
 
 This skill provides comprehensive Kubernetes cluster management through kubectl, enabling AI agents to inspect, troubleshoot, and manage Kubernetes resources.

@@ -16,6 +16,32 @@ streaming: supported
 
 # Sequential Thinking Skill
 
+## Installation
+
+**Optional standalone executor**: The skill can run `.claude/tools/optimization/sequential-thinking/executor.py`. Requirements:
+
+- **Python 3.10+**: [python.org](https://www.python.org/downloads/) or `winget install Python.Python.3.12` (Windows), `brew install python@3.12` (macOS).
+- **MCP Python package**: `pip install mcp`
+- If the executor is not present or MCP is not installed, the skill still provides in-context guidance and exits successfully.
+
+## Cheat Sheet & Best Practices
+
+**Frameworks:** Polya: (1) Understand the problem (2) Devise a plan (3) Carry out the plan (4) Look back. IDEAL: Identify → Define context → Explore strategies → Act on best → Look back and learn.
+
+**Process:** Be systematic: preview outcomes, sustain effort, examine from multiple angles, pace and self-monitor. Use diagrams, tables, patterns; break into subgoals; work backwards when useful.
+
+**Hacks:** Number thoughts (thoughtNumber, totalThoughts); allow revision and branching. Start with an initial step count and refine. Use the MCP sequential-thinking tool for multi-step analysis and hypothesis verification when the full scope is unclear.
+
+## Certifications & Training
+
+**No cert.** Problem-solving frameworks: Polya (Understand → Plan → Execute → Look back), IDEAL (Identify → Define → Explore → Act → Look back). **Skill data:** Systematic steps; preview outcomes; sustain effort; revise and branch; use diagrams/tables/patterns.
+
+## Hooks & Workflows
+
+**Suggested hooks:** Optional: pre-plan or pre-complex-task hook to suggest sequential-thinking for multi-step tasks. Use with **planner** (primary) for planning and **master-orchestrator** when decomposing work.
+
+**Workflows:** Use with **planner** (primary). Flow: complex task → load sequential-thinking → emit thoughts (MCP or executor) → revise → act. See `core/router-decision` for when router assigns planner.
+
 ## Overview
 
 This skill provides structured problem-solving through a flexible thinking process that can adapt and evolve. Each thought can build on, question, or revise previous insights.

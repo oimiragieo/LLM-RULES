@@ -27,6 +27,14 @@ const PROJECT_ROOT = process.cwd();
 const CONFIG_DIR = path.join(PROJECT_ROOT, '.claude', 'config');
 const MANIFEST_PATH = path.join(CONFIG_DIR, 'tool-manifest.json');
 const SETTINGS_PATH = path.join(PROJECT_ROOT, '.claude', 'settings.json');
+const SKILL_INDEX_PATH = path.join(CONFIG_DIR, 'skill-index.json');
+const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
+const TOOL_MANIFEST_SCHEMA_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'schemas',
+  'tool-manifest.schema.json'
+);
 
 // Core tools definition (from CLAUDE.md Section 1.4)
 const CORE_TOOLS = [
@@ -190,7 +198,10 @@ const MCP_TOOLS = [
 ];
 
 // Toolset definitions (from CLAUDE.md Section 1.4)
-const TOOLSETS = {
+// NOTE: `tools.toolsets` in the manifest must map toolset names to arrays of tool names
+// (see `.claude/schemas/tool-manifest.schema.json`). Keep richer metadata here and
+// derive the schema-shape mapping below.
+const TOOLSET_DEFINITIONS = {
   CORE_TOOLS: {
     description: 'All 20 core tools built into Claude Code',
     tools: CORE_TOOLS.map(t => t.name),
@@ -298,6 +309,10 @@ const TOOLSETS = {
   },
 };
 
+const TOOLSETS = Object.fromEntries(
+  Object.entries(TOOLSET_DEFINITIONS).map(([name, def]) => [name, def.tools])
+);
+
 // Agent defaults (from CLAUDE.md Section 1.4)
 const AGENT_DEFAULTS = {
   developer: { toolset: 'DEVELOPER', maxTools: 12 },
@@ -390,7 +405,7 @@ function generateManifest(options = {}) {
   // Build agent defaults with tools
   const agentDefaults = {};
   for (const [agent, config] of Object.entries(AGENT_DEFAULTS)) {
-    const toolset = TOOLSETS[config.toolset];
+    const toolset = TOOLSET_DEFINITIONS[config.toolset];
     agentDefaults[agent] = {
       toolset: config.toolset,
       tools: toolset.tools,
@@ -461,6 +476,57 @@ function generateManifest(options = {}) {
 }
 
 /**
+ * Collect all tool names referenced in skill-index and agent-registry requiredTools
+ * @returns {Set<string>}
+ */
+function collectReferencedTools() {
+  const tools = new Set();
+  try {
+    if (fs.existsSync(SKILL_INDEX_PATH)) {
+      const skillIndex = JSON.parse(fs.readFileSync(SKILL_INDEX_PATH, 'utf8'));
+      const skills = skillIndex.skills || {};
+      for (const skill of Object.values(skills)) {
+        if (skill && Array.isArray(skill.requiredTools)) {
+          skill.requiredTools.forEach(t => tools.add(t));
+        }
+      }
+    }
+  } catch (_error) {
+    // ignore
+  }
+  try {
+    if (fs.existsSync(AGENT_REGISTRY_PATH)) {
+      const registry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+      const agents = registry.agents || {};
+      for (const agent of Object.values(agents)) {
+        const caps = agent.capabilities || [];
+        for (const cap of caps) {
+          if (cap && Array.isArray(cap.requiredTools)) {
+            cap.requiredTools.forEach(t => tools.add(t));
+          }
+        }
+      }
+    }
+  } catch (_error) {
+    // ignore
+  }
+  return tools;
+}
+
+/**
+ * Check if a tool name is in manifest (core by exact name, mcp by exact or wildcard prefix match)
+ */
+function toolInManifest(toolName, manifest) {
+  const core = (manifest.tools?.core || []).map(t => t.name);
+  if (core.includes(toolName)) return true;
+  const mcp = (manifest.tools?.mcp || []).map(t => t.name);
+  if (mcp.includes(toolName)) return true;
+  // MCP wildcard: mcp__Exa__* matches mcp__Exa__web_search_exa
+  if (mcp.some(m => m.endsWith('*') && toolName.startsWith(m.replace(/\*$/, '')))) return true;
+  return false;
+}
+
+/**
  * Validate existing manifest
  */
 function validateManifest(manifestPath) {
@@ -498,6 +564,39 @@ function validateManifest(manifestPath) {
     const toolsets = manifest.tools?.toolsets || {};
     if (Object.keys(toolsets).length < 5) {
       warnings.push(`Expected at least 5 toolsets, found ${Object.keys(toolsets).length}`);
+    }
+
+    // Audit: every tool referenced in skill-index or agent-registry must be in manifest
+    const referenced = collectReferencedTools();
+    const missing = [];
+    for (const t of referenced) {
+      if (!toolInManifest(t, manifest)) {
+        missing.push(t);
+      }
+    }
+    if (missing.length > 0) {
+      warnings.push(
+        `Tools referenced in skill-index or agent-registry but not in manifest: ${missing.join(', ')}`
+      );
+    }
+
+    // Optional: validate against JSON schema when schema and Ajv exist
+    if (fs.existsSync(TOOL_MANIFEST_SCHEMA_PATH)) {
+      try {
+        const Ajv = require('ajv');
+        const addFormats = require('ajv-formats');
+        const schema = JSON.parse(fs.readFileSync(TOOL_MANIFEST_SCHEMA_PATH, 'utf8'));
+        const ajv = new Ajv({ strict: false });
+        addFormats(ajv);
+        const validate = ajv.compile(schema);
+        if (!validate(manifest)) {
+          (validate.errors || []).forEach(e => {
+            errors.push(`Schema: ${e.instancePath || '/'} ${e.message}`);
+          });
+        }
+      } catch (_error) {
+        // Ajv or schema missing - skip schema validation
+      }
     }
 
     return { valid: errors.length === 0, errors, warnings };

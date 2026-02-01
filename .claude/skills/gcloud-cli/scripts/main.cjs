@@ -56,11 +56,25 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Gcloud Cli executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Gcloud Cli completed successfully');
+  const { spawn } = require('child_process');
+  const child = spawn(
+    'gcloud',
+    args.filter(a => a !== '--help'),
+    {
+      stdio: 'inherit',
+      cwd: PROJECT_ROOT,
+      shell: true,
+    }
+  );
+  child.on('close', (code, signal) => {
+    if (code === 127)
+      console.error(
+        'gcloud CLI not found. Install: see this skill\'s SKILL.md, section "Installation".'
+      );
+    if (code !== null && code !== undefined) process.exit(code);
+    if (signal) process.exit(1);
+    process.exit(0);
+  });
 }
 
 main();

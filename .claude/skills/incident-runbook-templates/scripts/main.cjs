@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Incident Runbook Templates executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Incident Runbook Templates completed successfully');
+  console.log(
+    'Incident Runbook Templates skill provides in-context guidance for runbook creation. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

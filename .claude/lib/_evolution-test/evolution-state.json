@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "state": "validate",
+  "currentEvolution": {
+    "type": "agent",
+    "name": "test-agent"
+  },
+  "evolutions": [],
+  "patterns": [],
+  "suggestions": [],
+  "lastUpdated": "2026-02-01T03:06:59.015Z",
+  "locks": {
+    "timeout-test": "2026-02-01T03:06:59.014Z"
+  }
+}

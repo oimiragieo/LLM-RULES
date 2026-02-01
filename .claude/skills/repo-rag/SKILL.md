@@ -16,6 +16,8 @@ error_handling: graceful
 streaming: supported
 ---
 
+**References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — semantic search / vector patterns from everything-claude-code backend-patterns, tdd-workflow.
+
 <identity>
 Repo RAG (Retrieval Augmented Generation) - Provides advanced codebase search capabilities beyond simple grep.
 </identity>

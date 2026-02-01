@@ -1,3 +1,0 @@
-# Test-run artifacts (fixtures are created in test before() hooks)
-**/.indexing.lock
-**/code-index/

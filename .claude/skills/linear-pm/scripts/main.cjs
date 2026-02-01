@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Linear Pm executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Linear Pm completed successfully');
+  console.log(
+    'Linear PM skill provides in-context guidance; configure Linear API for full functionality. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

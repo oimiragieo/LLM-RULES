@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Github Mcp executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Github Mcp completed successfully');
+  console.log(
+    'GitHub MCP skill provides in-context guidance; configure GitHub MCP for full functionality. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

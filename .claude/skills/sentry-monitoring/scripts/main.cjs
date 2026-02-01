@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Sentry Monitoring executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Sentry Monitoring completed successfully');
+  console.log(
+    'Sentry Monitoring skill provides in-context guidance; configure Sentry MCP/API for full functionality. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

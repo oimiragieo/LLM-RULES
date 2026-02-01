@@ -35,6 +35,9 @@ This runs all three generators in sequence:
 - After manual artifact creation
 - As part of CI/CD validation
 - Troubleshooting discovery issues
+- After changing [agent-skill-matrix.json](.claude/context/config/agent-skill-matrix.json) or skill `requiredTools` (so spawn enricher and prompt-assembler see correct agent/skill and tool data)
+
+**MCP whitelisting:** For a skill to grant an MCP tool to agents, the tool must be in [tool-manifest.json](.claude/config/tool-manifest.json) (core or mcp) and in the skill's `requiredTools` in the skill-index. The agent-registry generator merges each agent's skill `requiredTools` into that agent's `requiredTools`, so agents that have the skill in the matrix will receive the MCP tool when the enricher runs.
 
 ### Regenerate Individual Registries
 

@@ -27,6 +27,9 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
 const {
   parseHookInputAsync,
   getToolName,
@@ -34,8 +37,113 @@ const {
   debugLog,
 } = require('../../lib/utils/hook-input.cjs');
 
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+
+const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
+const TOOL_MANIFEST_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'tool-manifest.json');
+
+const MAX_TOOLS_AGENT = 15;
+const MAX_TOOLS_ORCHESTRATOR = 18;
+const ORCHESTRATOR_IDS = new Set([
+  'router',
+  'master-orchestrator',
+  'evolution-orchestrator',
+  'swarm-coordinator',
+  'party-orchestrator',
+]);
+
 function isDisabled() {
   return process.env.SPAWN_PROMPT_ASSEMBLER === 'off';
+}
+
+function isEnricherDisabled() {
+  return process.env.ALLOWED_TOOLS_ENRICHER === 'off';
+}
+
+/**
+ * Load agent-registry and tool-manifest (cached for the hook run).
+ */
+let _registryCache = null;
+let _manifestCache = null;
+
+function loadAgentRegistry() {
+  if (_registryCache) return _registryCache;
+  try {
+    if (fs.existsSync(AGENT_REGISTRY_PATH)) {
+      _registryCache = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+      return _registryCache;
+    }
+  } catch (e) {
+    debugLog('spawn-prompt-assembler', 'Failed to load agent-registry', e);
+  }
+  _registryCache = { agents: {} };
+  return _registryCache;
+}
+
+function loadToolManifest() {
+  if (_manifestCache) return _manifestCache;
+  try {
+    if (fs.existsSync(TOOL_MANIFEST_PATH)) {
+      _manifestCache = JSON.parse(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf8'));
+      return _manifestCache;
+    }
+  } catch (e) {
+    debugLog('spawn-prompt-assembler', 'Failed to load tool-manifest', e);
+  }
+  _manifestCache = {
+    constraints: {
+      maxToolsPerAgent: MAX_TOOLS_AGENT,
+      maxToolsPerOrchestrator: MAX_TOOLS_ORCHESTRATOR,
+    },
+  };
+  return _manifestCache;
+}
+
+/**
+ * Infer agent type from prompt text (e.g. "You are DEVELOPER" -> developer).
+ */
+function inferAgentFromPrompt(prompt) {
+  if (!prompt || typeof prompt !== 'string') return null;
+  const m = prompt.match(/\bYou are (?:the )?([A-Z][A-Za-z_-]+)/);
+  if (m) {
+    return m[1].toLowerCase().replace(/\s+/g, '-');
+  }
+  return null;
+}
+
+/**
+ * Enrich allowed_tools from agent-registry when missing or partial.
+ * @param {string} agentType - subagent_type or agent_type
+ * @param {string[]} currentTools - existing allowed_tools from Task()
+ * @param {string} prompt - prompt text (for inferring agent when agentType is general-purpose)
+ * @returns {string[]} Enriched allowed_tools (deduplicated, capped)
+ */
+function enrichAllowedTools(agentType, currentTools, prompt) {
+  if (isEnricherDisabled()) return currentTools;
+
+  const registry = loadAgentRegistry();
+  const manifest = loadToolManifest();
+  const agents = registry.agents || {};
+  const maxTools = ORCHESTRATOR_IDS.has((agentType || '').toLowerCase())
+    ? (manifest.constraints?.maxToolsPerOrchestrator ?? MAX_TOOLS_ORCHESTRATOR)
+    : (manifest.constraints?.maxToolsPerAgent ?? MAX_TOOLS_AGENT);
+
+  let resolvedType = (agentType || '').toLowerCase();
+  if (resolvedType === 'general-purpose' && prompt) {
+    const inferred = inferAgentFromPrompt(prompt);
+    if (inferred) resolvedType = inferred;
+    else resolvedType = 'developer';
+  }
+
+  const agent = agents[resolvedType];
+  const registryTools = agent?.capabilities?.[0]?.requiredTools;
+  if (!Array.isArray(registryTools) || registryTools.length === 0) {
+    return currentTools;
+  }
+
+  const merged = new Set([...(Array.isArray(currentTools) ? currentTools : []), ...registryTools]);
+  const result = [...merged].slice(0, maxTools);
+  return result;
 }
 
 function looksAssembled(prompt) {
@@ -110,7 +218,8 @@ async function main() {
     const promptAssembler = require('../../lib/spawn/prompt-assembler.cjs');
 
     const agentType = toolInput.subagent_type || toolInput.agent_type || 'developer';
-    const allowedTools = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
+    const rawAllowedTools = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
+    const allowedTools = enrichAllowedTools(agentType, rawAllowedTools, basePrompt);
 
     let assembled = promptAssembler.assembleSpawnPrompt({
       agentType,
@@ -134,7 +243,7 @@ async function main() {
       }
     }
 
-    const modifiedInput = { ...toolInput, prompt: assembled };
+    const modifiedInput = { ...toolInput, prompt: assembled, allowed_tools: allowedTools };
 
     // Claude Code hook protocol: output { tool_input: { ... } } to modify tool parameters.
     console.log(JSON.stringify({ tool_input: modifiedInput }));
@@ -153,5 +262,7 @@ if (require.main === module) {
 module.exports = {
   looksAssembled,
   appendSemanticMatches,
+  enrichAllowedTools,
+  inferAgentFromPrompt,
   main,
 };

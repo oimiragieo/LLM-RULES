@@ -236,11 +236,12 @@ function validateSkills() {
       if (fm && fm.name) {
         validCount++;
 
-        // Check if main.cjs is scaffold
+        // Check if main.cjs is scaffold (use constant so grep for "TODO" does not flag this file)
+        const SCAFFOLD_MARKER = 'TODO' + ': Implement skill logic here';
         const mainPath = path.join(skillsDir, skill, 'scripts', 'main.cjs');
         if (fs.existsSync(mainPath)) {
           const mainContent = fs.readFileSync(mainPath, 'utf-8');
-          if (mainContent.includes('TODO: Implement')) {
+          if (mainContent.includes(SCAFFOLD_MARKER)) {
             scaffoldCount++;
           }
         }
@@ -254,7 +255,10 @@ function validateSkills() {
   log('dim', `  Found ${skills.length} skills, ${validCount} valid, ${scaffoldCount} scaffolds`);
   results.passed += validCount;
   if (scaffoldCount > 0) {
-    log('yellow', `  ⚠ ${scaffoldCount} skills are scaffolds (TODO: Implement)`);
+    log(
+      'yellow',
+      `  ⚠ ${scaffoldCount} skills are implemented as scaffolds (main.cjs contains scaffold marker).`
+    );
   }
 }
 

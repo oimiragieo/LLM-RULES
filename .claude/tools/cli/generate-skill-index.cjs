@@ -30,6 +30,13 @@ const CONFIG_DIR = path.join(PROJECT_ROOT, '.claude', 'config');
 const INDEX_PATH = path.join(CONFIG_DIR, 'skill-index.json');
 const CATALOG_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'artifacts', 'skill-catalog.md');
 const SKILLS_DIR = path.join(PROJECT_ROOT, '.claude', 'skills');
+const AGENT_SKILL_MATRIX_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'config',
+  'agent-skill-matrix.json'
+);
 
 // Domain mappings
 const DOMAIN_MAP = {
@@ -467,7 +474,78 @@ const SKILL_TOOLS = {
   'code-style-validator': ['Read', 'Grep', 'Bash', 'Glob'],
   'commit-validator': ['Read', 'Grep', 'Bash'],
   'smart-revert': ['Read', 'Bash', 'Glob', 'Grep', 'Write', 'Edit'],
+  'repo-rag': ['Read', 'Bash', 'Glob', 'Grep'],
+  'project-analyzer': ['Read', 'Bash', 'Glob', 'Grep'],
+  'tool-search': ['Read', 'Glob', 'Grep'],
 };
+
+/**
+ * Load agent-skill-matrix.json and build skill -> agents and agent -> skills maps.
+ * Primary/always -> agentPrimary; secondary/contextual -> agentSupporting.
+ * @returns {{ skillToAgents: Object.<string, { agentPrimary: string[], agentSupporting: string[] }>, agentToSkills: Object.<string, string[]> }}
+ */
+function loadAgentSkillMatrix() {
+  const skillToAgents = {};
+  const agentToSkills = {};
+
+  try {
+    if (!fs.existsSync(AGENT_SKILL_MATRIX_PATH)) {
+      return { skillToAgents, agentToSkills };
+    }
+    const raw = fs.readFileSync(AGENT_SKILL_MATRIX_PATH, 'utf8');
+    const matrix = JSON.parse(raw);
+    const agents = matrix.agents || {};
+
+    for (const [_category, categoryAgents] of Object.entries(agents)) {
+      if (typeof categoryAgents !== 'object') continue;
+      for (const [agentId, config] of Object.entries(categoryAgents)) {
+        if (typeof config !== 'object') continue;
+        const primary = Array.isArray(config.primary) ? config.primary : [];
+        const secondary = Array.isArray(config.secondary) ? config.secondary : [];
+        const always = Array.isArray(config.always) ? config.always : [];
+        const contextual =
+          config.contextual && typeof config.contextual === 'object'
+            ? Object.values(config.contextual).flat()
+            : [];
+        const allSkills = [...new Set([...primary, ...always, ...secondary, ...contextual])];
+        agentToSkills[agentId] = allSkills;
+
+        for (const skillName of primary) {
+          if (!skillToAgents[skillName])
+            skillToAgents[skillName] = { agentPrimary: [], agentSupporting: [] };
+          if (!skillToAgents[skillName].agentPrimary.includes(agentId)) {
+            skillToAgents[skillName].agentPrimary.push(agentId);
+          }
+        }
+        for (const skillName of always) {
+          if (!skillToAgents[skillName])
+            skillToAgents[skillName] = { agentPrimary: [], agentSupporting: [] };
+          if (!skillToAgents[skillName].agentPrimary.includes(agentId)) {
+            skillToAgents[skillName].agentPrimary.push(agentId);
+          }
+        }
+        for (const skillName of secondary) {
+          if (!skillToAgents[skillName])
+            skillToAgents[skillName] = { agentPrimary: [], agentSupporting: [] };
+          if (!skillToAgents[skillName].agentSupporting.includes(agentId)) {
+            skillToAgents[skillName].agentSupporting.push(agentId);
+          }
+        }
+        for (const skillName of contextual) {
+          if (!skillToAgents[skillName])
+            skillToAgents[skillName] = { agentPrimary: [], agentSupporting: [] };
+          if (!skillToAgents[skillName].agentSupporting.includes(agentId)) {
+            skillToAgents[skillName].agentSupporting.push(agentId);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn(`Warning: Could not load agent-skill-matrix: ${err.message}`);
+  }
+
+  return { skillToAgents, agentToSkills };
+}
 
 /**
  * Parse skill catalog to extract skill names
@@ -550,6 +628,9 @@ function generateIndex(options = {}) {
     console.log(`Found ${Object.keys(scannedSkills).length} skill directories`);
   }
 
+  // Load agent-skill-matrix as single source of truth for agent <-> skill mapping
+  const { skillToAgents, agentToSkills } = loadAgentSkillMatrix();
+
   // Build skills object
   const skills = {};
   const allSkillNames = new Set([
@@ -563,16 +644,21 @@ function generateIndex(options = {}) {
     const category = CATEGORY_MAP[name] || 'Other';
     const requiredTools = SKILL_TOOLS[name] || ['Read', 'Write', 'Edit'];
 
-    // Find agents that use this skill
-    const agentPrimary = [];
-    const agentSupporting = [];
-
-    for (const [agent, skillList] of Object.entries(AGENT_SKILLS)) {
-      if (skillList.includes(name)) {
-        if (skillList.indexOf(name) < 3) {
-          agentPrimary.push(agent);
-        } else {
-          agentSupporting.push(agent);
+    // Find agents from matrix first; fallback to hardcoded AGENT_SKILLS
+    let agentPrimary = [];
+    let agentSupporting = [];
+    if (skillToAgents[name]) {
+      agentPrimary = skillToAgents[name].agentPrimary || [];
+      agentSupporting = skillToAgents[name].agentSupporting || [];
+    }
+    if (agentPrimary.length === 0 && agentSupporting.length === 0) {
+      for (const [agent, skillList] of Object.entries(AGENT_SKILLS)) {
+        if (skillList.includes(name)) {
+          if (skillList.indexOf(name) < 3) {
+            agentPrimary.push(agent);
+          } else {
+            agentSupporting.push(agent);
+          }
         }
       }
     }
@@ -622,9 +708,10 @@ function generateIndex(options = {}) {
     }
   }
 
-  // By agent
-  for (const [agent, skillList] of Object.entries(AGENT_SKILLS)) {
-    byAgent[agent] = skillList;
+  // By agent: use matrix-derived agentToSkills; fallback to AGENT_SKILLS
+  const agentSource = Object.keys(agentToSkills).length > 0 ? agentToSkills : AGENT_SKILLS;
+  for (const [agent, skillList] of Object.entries(agentSource)) {
+    byAgent[agent] = Array.isArray(skillList) ? skillList : [];
   }
 
   const index = {
@@ -647,7 +734,7 @@ function generateIndex(options = {}) {
     discovery: {
       maxSkillsPerDomain: 50,
       maxSkillsInPrompt: 20,
-      recommendedForAgent: AGENT_SKILLS,
+      recommendedForAgent: byAgent,
     },
   };
 

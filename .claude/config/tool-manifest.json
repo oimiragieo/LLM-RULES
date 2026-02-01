@@ -1,12 +1,12 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-01-31T04:38:57.277Z",
+  "generatedAt": "2026-02-01T03:02:10.276Z",
   "metadata": {
     "totalTools": 29,
     "totalCoreTools": 20,
     "totalMcpTools": 9,
     "totalAgents": 16,
-    "lastValidated": "2026-01-31T04:38:57.278Z",
+    "lastValidated": "2026-02-01T03:02:10.277Z",
     "source": ".claude/CLAUDE.md sections 1.1-1.4"
   },
   "tools": {
@@ -354,140 +354,109 @@
       }
     ],
     "toolsets": {
-      "CORE_TOOLS": {
-        "description": "All 20 core tools built into Claude Code",
-        "tools": [
-          "Read",
-          "Write",
-          "Edit",
-          "Bash",
-          "Glob",
-          "Grep",
-          "Task",
-          "TaskCreate",
-          "TaskUpdate",
-          "TaskList",
-          "TaskGet",
-          "TaskOutput",
-          "TaskStop",
-          "Skill",
-          "AskUserQuestion",
-          "EnterPlanMode",
-          "ExitPlanMode",
-          "WebSearch",
-          "WebFetch",
-          "NotebookEdit"
-        ]
-      },
-      "DEVELOPER": {
-        "description": "Standard development agent toolset",
-        "tools": [
-          "Read",
-          "Write",
-          "Edit",
-          "Bash",
-          "Glob",
-          "Grep",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "TaskOutput",
-          "Skill"
-        ],
-        "mandatory": ["TaskUpdate", "Skill"]
-      },
-      "PLANNER": {
-        "description": "Planning agent toolset with planning mode",
-        "tools": [
-          "Read",
-          "Write",
-          "Edit",
-          "Bash",
-          "Glob",
-          "Grep",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "TaskOutput",
-          "Skill",
-          "EnterPlanMode",
-          "ExitPlanMode"
-        ],
-        "mandatory": ["TaskUpdate", "Skill"]
-      },
-      "ORCHESTRATOR": {
-        "description": "Agent orchestration toolset (can spawn subagents)",
-        "tools": [
-          "Read",
-          "Write",
-          "Edit",
-          "Bash",
-          "Glob",
-          "Grep",
-          "Task",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "TaskOutput",
-          "Skill"
-        ],
-        "mandatory": ["Task", "TaskUpdate", "Skill"]
-      },
-      "ROUTER": {
-        "description": "Router-only toolset (restricted)",
-        "tools": [
-          "Read",
-          "Task",
-          "TaskList",
-          "TaskCreate",
-          "TaskUpdate",
-          "TaskGet",
-          "AskUserQuestion"
-        ],
-        "mandatory": ["Task", "TaskList"]
-      },
-      "RESEARCHER": {
-        "description": "Research agent toolset with web access",
-        "tools": [
-          "Read",
-          "Glob",
-          "Grep",
-          "WebSearch",
-          "WebFetch",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "Skill"
-        ],
-        "mandatory": ["TaskUpdate", "Skill"]
-      },
-      "READ_ONLY": {
-        "description": "Read-only agent toolset (e.g., code-reviewer)",
-        "tools": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill"],
-        "mandatory": ["TaskUpdate", "Skill"]
-      },
-      "DATA_SCIENCE": {
-        "description": "Data science and ML toolset with Jupyter support",
-        "tools": [
-          "Read",
-          "Write",
-          "Edit",
-          "Bash",
-          "Glob",
-          "Grep",
-          "NotebookEdit",
-          "TaskUpdate",
-          "TaskList",
-          "TaskCreate",
-          "TaskGet",
-          "Skill"
-        ],
-        "mandatory": ["TaskUpdate", "Skill"]
-      }
+      "CORE_TOOLS": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "Task",
+        "TaskCreate",
+        "TaskUpdate",
+        "TaskList",
+        "TaskGet",
+        "TaskOutput",
+        "TaskStop",
+        "Skill",
+        "AskUserQuestion",
+        "EnterPlanMode",
+        "ExitPlanMode",
+        "WebSearch",
+        "WebFetch",
+        "NotebookEdit"
+      ],
+      "DEVELOPER": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "PLANNER": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill",
+        "EnterPlanMode",
+        "ExitPlanMode"
+      ],
+      "ORCHESTRATOR": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "Task",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "ROUTER": [
+        "Read",
+        "Task",
+        "TaskList",
+        "TaskCreate",
+        "TaskUpdate",
+        "TaskGet",
+        "AskUserQuestion"
+      ],
+      "RESEARCHER": [
+        "Read",
+        "Glob",
+        "Grep",
+        "WebSearch",
+        "WebFetch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ],
+      "READ_ONLY": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill"],
+      "DATA_SCIENCE": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "NotebookEdit",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ]
     }
   },
   "constraints": {

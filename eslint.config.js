@@ -99,6 +99,7 @@ export default [
       'coverage/',
       '.next/',
       '.nuxt/',
+      'tests/fixtures/',
       '.claude/lib/utils/.claude/staging/',
       '.claude/staging/',
       'vendor/',

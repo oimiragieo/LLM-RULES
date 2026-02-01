@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Smart Debug executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Smart Debug completed successfully');
+  console.log(
+    'Smart Debug skill provides AI-assisted debugging guidance. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

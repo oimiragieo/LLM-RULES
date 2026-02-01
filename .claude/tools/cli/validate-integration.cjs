@@ -309,26 +309,27 @@ function checkTestsExist(artifactPath, artifactType, _artifactName) {
 /**
  * Check 8: Documentation Complete
  */
+/** Placeholder strings used for artifact completeness checks (intentional list, not unfinished work). */
+const PLACEHOLDER_STRINGS = [
+  'TODO',
+  'TBD',
+  'FIXME',
+  '<fill',
+  '[fill',
+  '{{',
+  '}}',
+  '<placeholder',
+  '[placeholder',
+];
+
 function checkDocumentationComplete(artifactPath, _artifactType, _artifactName) {
   const content = readFileSafe(artifactPath);
   if (!content) {
     return { applicable: true, passed: false, message: 'Could not read artifact file' };
   }
 
-  const placeholders = [
-    'TODO',
-    'TBD',
-    'FIXME',
-    '<fill',
-    '[fill',
-    '{{',
-    '}}',
-    '<placeholder',
-    '[placeholder',
-  ];
-
   const foundPlaceholders = [];
-  for (const placeholder of placeholders) {
+  for (const placeholder of PLACEHOLDER_STRINGS) {
     if (content.toLowerCase().includes(placeholder.toLowerCase())) {
       foundPlaceholders.push(placeholder);
     }

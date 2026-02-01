@@ -56,11 +56,17 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Code Style Validator executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Code Style Validator completed successfully');
+  const { spawn } = require('child_process');
+  const securityLintPath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'security-lint.cjs');
+  if (!fs.existsSync(securityLintPath)) {
+    console.error('Security lint tool not found:', securityLintPath);
+    process.exit(1);
+  }
+  const child = spawn(process.execPath, [securityLintPath, ...args.filter(a => a !== '--help')], {
+    stdio: 'inherit',
+    cwd: PROJECT_ROOT,
+  });
+  child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }
 
 main();

@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Test Generator executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Test Generator completed successfully');
+  console.log(
+    'Test Generator skill provides in-context guidance for unit/integration/E2E tests. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

@@ -16,7 +16,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
-const { PROJECT_ROOT } = require('../.claude/lib/utils/project-root.cjs');
+const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 
 // ============================================================================
 // CATEGORY 1: Adaptive Algorithm Behavior (15+ tests)

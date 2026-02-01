@@ -65,6 +65,33 @@ streaming: supported
 
 # Chrome Browser Automation
 
+## Installation
+
+**Standalone script**: No download; the skill invokes `.claude/tools/chrome-browser/chrome-browser.cjs` (Node.js v18+ required).
+
+**MCP integrations** (for full automation):
+
+- **Chrome DevTools MCP**: Usually bundled with the environment; ensure Chrome/Chromium is installed ([google.com/chrome](https://www.google.com/chrome/)).
+- **Claude-in-Chrome**: Install the Claude-in-Chrome extension and run with `--chrome` when needed.
+
+## Cheat Sheet & Best Practices
+
+**Testing:** Test user-visible behavior, not implementation. Isolate tests (own storage/cookies); use before/after hooks for login or setup. Mock third-party networks instead of depending on live services.
+
+**DevTools Recorder:** Record flows in Recorder panel; export as JSON or test scripts (Puppeteer, Nightwatch). Replay with Puppeteer Replay in CI. Use for performance measurement of user flows.
+
+**Hacks:** Prefer Chrome DevTools MCP for testing/debugging (always on); use Claude-in-Chrome for authenticated sessions (GIF, forms). Limit GIF frames (e.g. 100) to avoid memory issues. Use `take_snapshot` for structure; `evaluate_script` for custom checks.
+
+## Certifications & Training
+
+**No official cert.** [Chrome for Developers – DevTools](https://developer.chrome.com/docs/devtools). Frontend Masters / Udemy “Mastering Chrome DevTools.” **Skill data:** Test user-visible behavior; isolate tests; Recorder + Puppeteer Replay; performance tracing.
+
+## Hooks & Workflows
+
+**Suggested hooks:** Optional: post-test hook to capture screenshots on failure. Use when **qa** or **frontend-pro** is routed for browser testing (add chrome-browser to contextual: `browser_testing` or similar).
+
+**Workflows:** Use with **qa** (add to contextual) or **frontend-pro** for E2E/browser flows. Flow: open URL → interact (click/fill) → snapshot or assert. See `.claude/workflows/chrome-browser-skill-workflow.md`.
+
 <identity>
 Chrome Browser Skill - Unified browser automation using TWO integrations: Chrome DevTools MCP (always available, performance tracing, network inspection) and Claude-in-Chrome extension (authenticated sessions, GIF recording).
 </identity>

@@ -53,9 +53,9 @@ const DANGEROUS_TARGETS = [
  * Validates Bash command for shell injection patterns
  * @param {object} input - Hook input
  * @param {string} input.command - Bash command to execute
- * @returns {Promise<{allowed: boolean, reason?: string, warning?: string, detected?: string}>}
+ * @returns {{allowed: boolean, reason?: string, warning?: string, detected?: string}}
  */
-async function handler(input) {
+function handler(input) {
   const { command } = input;
 
   // Check enforcement mode

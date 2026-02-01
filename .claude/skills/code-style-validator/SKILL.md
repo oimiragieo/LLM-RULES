@@ -14,6 +14,31 @@ error_handling: graceful
 streaming: supported
 ---
 
+## Installation
+
+No separate download: the skill runs the in-repo tool `.claude/tools/cli/security-lint.cjs`.
+
+- Ensure **Node.js** (v18+) is installed: [nodejs.org](https://nodejs.org/) or `winget install OpenJS.NodeJS.LTS` (Windows), `brew install node` (macOS).
+- From the project root, the script is invoked automatically; no extra install steps.
+
+## Cheat Sheet & Best Practices
+
+**AST-based validation:** Use ESLint (or equivalent) with selectors/patterns; rules listen for specific node types. Prefer existing community rules before writing custom ones; custom rules need `meta` (type, fixable, schema) and `create`.
+
+**Process:** Check naming (camelCase/PascalCase/snake_case), indentation, import order, function/class structure, comment style. Run in pre-commit and CI; provide auto-fix where possible.
+
+**Hacks:** Use `--fix` for auto-fixable rules; combine with security-lint for policy. Define rule metadata clearly for docs and tooling. Use AST selectors for precise pattern matching (node type, attributes, child/sibling).
+
+## Certifications & Training
+
+**ESLint:** [Use in project](https://eslint.org/docs/latest/use/), [custom rules](https://eslint.org/docs/latest/extend/custom-rules), [selectors](https://eslint.org/docs/latest/extend/selectors). No cert; skill data: AST-based validation, pre-commit/CI, auto-fix, naming/indent/imports.
+
+## Hooks & Workflows
+
+**Suggested hooks:** Pre-commit: run security-lint (skill script) or ESLint; block commit on failure. Use with **developer** (secondary), **code-reviewer** (secondary), **qa** (CI).
+
+**Workflows:** Use with **code-reviewer** (secondary), **developer** (secondary). Flow: before commit or in CI → run validator → fix or block. See `enterprise/code-review.yaml`, `validation` hooks.
+
 <identity>
 Code Style Validator - Programmatically validates code style using AST (Abstract Syntax Tree) analysis. Complements code-style rules by providing automated checking.
 </identity>

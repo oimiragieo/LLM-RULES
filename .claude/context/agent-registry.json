@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-01-31T05:55:09.332Z",
+  "generatedAt": "2026-02-01T03:04:55.396Z",
   "metadata": {
     "totalAgents": 49,
-    "healthyAgents": 48,
+    "healthyAgents": 49,
     "degradedAgents": 0,
-    "unavailableAgents": 1,
-    "lastHealthCheck": "2026-01-31T05:57:24.604Z",
-    "lastFullScan": "2026-01-31T05:55:09.332Z"
+    "unavailableAgents": 0,
+    "lastHealthCheck": "2026-02-01T03:04:55.396Z",
+    "lastFullScan": "2026-02-01T03:04:55.396Z"
   },
   "agents": {
     "architect": {
@@ -19,7 +19,7 @@
         {
           "name": "architect",
           "domain": "security",
-          "description": "System designer. Makes high-level technical decisions, chooses stacks, and ensures scalability and maintainability.",
+          "description": "System designer. Makes high-level technical decisions, chooses stacks, and ensures scalability and maintainability. Uses ripgrep for fast codebase analysis.",
           "triggerPhrases": [
             "architect",
             "designer",
@@ -28,9 +28,9 @@
             "security-architect",
             "swarm-coordination",
             "ripgrep",
-            "verification-before-completion",
-            "diagram-generator",
-            "project-analyzer"
+            "code-semantic-search",
+            "code-structural-search",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
@@ -39,10 +39,11 @@
             "Glob",
             "Grep",
             "Bash",
-            "Search",
-            "SequentialThinking",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "architecture-review",
@@ -50,11 +51,11 @@
             "security-architect",
             "swarm-coordination",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
             "verification-before-completion",
             "diagram-generator",
-            "project-analyzer",
-            "brainstorming",
-            "progressive-disclosure"
+            "project-analyzer"
           ]
         }
       ],
@@ -68,14 +69,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.329Z",
+        "lastUpdate": "2026-02-01T03:04:55.393Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-01-31T05:55:09.330Z",
-        "updatedAt": "2026-01-31T05:55:09.330Z"
+        "createdAt": "2026-02-01T03:04:55.394Z",
+        "updatedAt": "2026-02-01T03:04:55.394Z"
       }
     },
     "context-compressor": {
@@ -104,7 +105,8 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Edit"
           ],
           "skills": [
             "context-compressor",
@@ -123,14 +125,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "lastUpdate": "2026-02-01T03:04:55.394Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.330Z",
-        "updatedAt": "2026-01-31T05:55:09.330Z"
+        "createdAt": "2026-02-01T03:04:55.394Z",
+        "updatedAt": "2026-02-01T03:04:55.394Z"
       }
     },
     "developer": {
@@ -142,7 +144,7 @@
         {
           "name": "developer",
           "domain": "code",
-          "description": "TDD-focused implementer. Writes code, runs tests, and refactors. Follows Red-Green-Refactor strictly.",
+          "description": "TDD-focused implementer. Writes code, runs tests, and refactors. Follows Red-Green-Refactor strictly. Uses ripgrep for fast code discovery.",
           "triggerPhrases": [
             "developer",
             "implementer",
@@ -153,7 +155,7 @@
             "debugging",
             "git-expert",
             "ripgrep",
-            "security-architect"
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -165,19 +167,20 @@
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "tdd",
             "debugging",
             "git-expert",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
             "security-architect",
             "context-compressor",
             "github-mcp",
-            "verification-before-completion",
-            "checklist-generator",
-            "code-analyzer"
+            "verification-before-completion"
           ]
         }
       ],
@@ -186,21 +189,19 @@
         "preferredModel": "sonnet"
       },
       "health": {
-        "status": "unavailable",
-        "consecutiveFailures": 3,
-        "successCount": 2,
-        "failureCount": 3,
-        "successRate": 0.4,
-        "lastUpdate": "2026-01-31T05:57:24.604Z",
-        "isolatedAt": "2026-01-31T05:57:24.604Z",
-        "isolationReason": "3 consecutive failures: test3",
-        "lastSuccessAt": "2026-01-31T05:57:13.275Z",
-        "lastFailureAt": "2026-01-31T05:57:24.604Z"
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-01T03:04:55.394Z",
+        "isolatedAt": null,
+        "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-01-31T05:55:09.330Z",
-        "updatedAt": "2026-01-31T05:55:09.330Z"
+        "createdAt": "2026-02-01T03:04:55.394Z",
+        "updatedAt": "2026-02-01T03:04:55.394Z"
       }
     },
     "planner": {
@@ -232,7 +233,8 @@
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "plan-generator",
@@ -253,14 +255,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "lastUpdate": "2026-02-01T03:04:55.394Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-01-31T05:55:09.330Z",
-        "updatedAt": "2026-01-31T05:55:09.330Z"
+        "createdAt": "2026-02-01T03:04:55.394Z",
+        "updatedAt": "2026-02-01T03:04:55.394Z"
       }
     },
     "pm": {
@@ -320,14 +322,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "lastUpdate": "2026-02-01T03:04:55.394Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.330Z",
-        "updatedAt": "2026-01-31T05:55:09.330Z"
+        "createdAt": "2026-02-01T03:04:55.394Z",
+        "updatedAt": "2026-02-01T03:04:55.394Z"
       }
     },
     "qa": {
@@ -350,7 +352,7 @@
             "checklist-generator",
             "tdd",
             "ripgrep",
-            "code-analyzer"
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -359,10 +361,11 @@
             "Glob",
             "Grep",
             "Bash",
-            "Git",
-            "SequentialThinking",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "test-generator",
@@ -371,9 +374,10 @@
             "checklist-generator",
             "tdd",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
             "code-analyzer",
-            "chrome-browser",
-            "task-management-protocol"
+            "chrome-browser"
           ]
         }
       ],
@@ -387,14 +391,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "lastUpdate": "2026-02-01T03:04:55.394Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-01-31T05:55:09.330Z",
-        "updatedAt": "2026-01-31T05:55:09.330Z"
+        "createdAt": "2026-02-01T03:04:55.394Z",
+        "updatedAt": "2026-02-01T03:04:55.394Z"
       }
     },
     "reflection-agent": {
@@ -445,14 +449,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "lastUpdate": "2026-02-01T03:04:55.394Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.330Z",
-        "updatedAt": "2026-01-31T05:55:09.330Z"
+        "createdAt": "2026-02-01T03:04:55.394Z",
+        "updatedAt": "2026-02-01T03:04:55.394Z"
       }
     },
     "router": {
@@ -482,7 +486,9 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Write",
+            "Edit"
           ],
           "skills": [
             "agent-creator",
@@ -504,14 +510,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.330Z",
+        "lastUpdate": "2026-02-01T03:04:55.394Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.330Z",
-        "updatedAt": "2026-01-31T05:55:09.330Z"
+        "createdAt": "2026-02-01T03:04:55.394Z",
+        "updatedAt": "2026-02-01T03:04:55.394Z"
       }
     },
     "technical-writer": {
@@ -546,7 +552,11 @@
             "WebFetch",
             "TaskUpdate",
             "TaskList",
-            "TaskCreate"
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "Bash",
+            "Task"
           ],
           "skills": [
             "doc-generator",
@@ -569,14 +579,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "c4-code": {
@@ -608,7 +618,8 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Edit"
           ],
           "skills": [
             "task-management-protocol",
@@ -628,14 +639,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "c4-component": {
@@ -667,7 +678,8 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Edit"
           ],
           "skills": [
             "task-management-protocol",
@@ -688,14 +700,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "c4-container": {
@@ -728,7 +740,8 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Edit"
           ],
           "skills": [
             "task-management-protocol",
@@ -750,14 +763,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "c4-context": {
@@ -791,7 +804,8 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Edit"
           ],
           "skills": [
             "task-management-protocol",
@@ -813,14 +827,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "code-reviewer": {
@@ -832,7 +846,7 @@
         {
           "name": "code-reviewer",
           "domain": "code",
-          "description": "Senior code reviewer with two-stage review process - spec compliance first, then code quality. Use for code reviews, PR reviews, and implementation verification.",
+          "description": "Senior code reviewer with two-stage review process - spec compliance first, then code quality. Use for code reviews, PR reviews, and implementation verification. Uses ripgrep for fast codebase anal...",
           "triggerPhrases": [
             "code",
             "reviewer",
@@ -854,7 +868,9 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Write",
+            "Edit"
           ],
           "skills": [
             "task-management-protocol",
@@ -865,7 +881,8 @@
             "code-analyzer",
             "code-quality-expert",
             "rule-auditor",
-            "code-style-validator"
+            "code-style-validator",
+            "ripgrep"
           ]
         }
       ],
@@ -879,14 +896,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "code-simplifier": {
@@ -908,7 +925,8 @@
             "code-analyzer",
             "code-style-validator",
             "dry-principle",
-            "debugging"
+            "debugging",
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -920,7 +938,8 @@
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -928,7 +947,10 @@
             "code-analyzer",
             "code-style-validator",
             "dry-principle",
-            "debugging"
+            "debugging",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ]
         }
       ],
@@ -942,14 +964,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "conductor-validator": {
@@ -983,7 +1005,9 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Write",
+            "Edit"
           ],
           "skills": [
             "task-management-protocol",
@@ -1005,14 +1029,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "database-architect": {
@@ -1047,7 +1071,8 @@
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1070,14 +1095,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "devops-troubleshooter": {
@@ -1112,7 +1137,8 @@
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1137,14 +1163,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "devops": {
@@ -1176,10 +1202,11 @@
             "Grep",
             "Glob",
             "Bash",
-            "MCP Tools",
             "TaskUpdate",
             "TaskList",
-            "TaskCreate"
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1205,14 +1232,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "incident-responder": {
@@ -1247,7 +1274,8 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Edit"
           ],
           "skills": [
             "task-management-protocol",
@@ -1272,14 +1300,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "researcher": {
@@ -1299,6 +1327,8 @@
             "thinking-tools",
             "doc-generator",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
             "task-management-protocol",
             "context-compressor"
           ],
@@ -1319,6 +1349,8 @@
             "thinking-tools",
             "doc-generator",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
             "task-management-protocol",
             "context-compressor"
           ]
@@ -1334,14 +1366,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "reverse-engineer": {
@@ -1376,7 +1408,8 @@
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1387,7 +1420,8 @@
             "debugging",
             "git-expert",
             "security-architect",
-            "verification-before-completion"
+            "verification-before-completion",
+            "ripgrep"
           ]
         }
       ],
@@ -1401,14 +1435,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.395Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.395Z",
+        "updatedAt": "2026-02-01T03:04:55.395Z"
       }
     },
     "security-architect": {
@@ -1440,10 +1474,11 @@
             "Glob",
             "Grep",
             "Bash",
-            "Search",
-            "MCP Tools",
-            "SequentialThinking",
-            "TaskUpdate"
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1469,14 +1504,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "ai-ml-specialist": {
@@ -1511,7 +1546,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1535,14 +1573,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "android-pro": {
@@ -1576,7 +1614,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1597,14 +1638,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "data-engineer": {
@@ -1638,7 +1679,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1660,14 +1704,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "expo-mobile-developer": {
@@ -1702,7 +1746,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1725,14 +1772,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "fastapi-pro": {
@@ -1767,7 +1814,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1791,14 +1841,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "frontend-pro": {
@@ -1833,7 +1883,8 @@
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
-            "TaskGet"
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1857,14 +1908,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "gamedev-pro": {
@@ -1899,7 +1950,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1922,14 +1976,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "golang-pro": {
@@ -1964,7 +2018,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -1987,14 +2044,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "graphql-pro": {
@@ -2029,7 +2086,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2050,14 +2110,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "ios-pro": {
@@ -2090,7 +2150,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2111,14 +2174,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "java-pro": {
@@ -2152,7 +2215,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2174,14 +2240,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "mobile-ux-reviewer": {
@@ -2216,7 +2282,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2239,14 +2308,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "nextjs-pro": {
@@ -2280,7 +2349,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2302,14 +2374,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "nodejs-pro": {
@@ -2343,7 +2415,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2365,14 +2440,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "php-pro": {
@@ -2406,7 +2481,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2428,14 +2506,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "python-pro": {
@@ -2469,7 +2547,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2492,14 +2573,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "rust-pro": {
@@ -2532,7 +2613,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2554,14 +2638,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "scientific-research-expert": {
@@ -2596,7 +2680,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2620,14 +2707,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "sveltekit-expert": {
@@ -2661,7 +2748,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2683,14 +2773,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.331Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.331Z",
-        "updatedAt": "2026-01-31T05:55:09.331Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "tauri-desktop-developer": {
@@ -2725,7 +2815,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2748,14 +2841,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.332Z",
-        "updatedAt": "2026-01-31T05:55:09.332Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "typescript-pro": {
@@ -2789,7 +2882,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2812,14 +2908,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.332Z",
-        "updatedAt": "2026-01-31T05:55:09.332Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "web3-blockchain-expert": {
@@ -2854,7 +2950,10 @@
             "WebSearch",
             "WebFetch",
             "TaskUpdate",
-            "TaskList"
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
           ],
           "skills": [
             "task-management-protocol",
@@ -2878,14 +2977,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.332Z",
-        "updatedAt": "2026-01-31T05:55:09.332Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "evolution-orchestrator": {
@@ -2920,7 +3019,11 @@
             "TaskCreate",
             "TaskUpdate",
             "TaskList",
-            "TaskGet"
+            "TaskGet",
+            "Skill",
+            "WebSearch",
+            "WebFetch",
+            "Bash"
           ],
           "skills": [
             "research-synthesis",
@@ -2944,14 +3047,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.332Z",
-        "updatedAt": "2026-01-31T05:55:09.332Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "master-orchestrator": {
@@ -2985,7 +3088,10 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Write",
+            "Edit",
+            "Bash"
           ],
           "skills": [
             "plan-generator",
@@ -3011,14 +3117,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.332Z",
-        "updatedAt": "2026-01-31T05:55:09.332Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "party-orchestrator": {
@@ -3063,14 +3169,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.332Z",
-        "updatedAt": "2026-01-31T05:55:09.332Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     },
     "swarm-coordinator": {
@@ -3100,7 +3206,12 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Write",
+            "Edit",
+            "Bash",
+            "Glob",
+            "Grep"
           ],
           "skills": [
             "swarm-coordination",
@@ -3122,14 +3233,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-01-31T05:55:09.332Z",
+        "lastUpdate": "2026-02-01T03:04:55.396Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-01-31T05:55:09.332Z",
-        "updatedAt": "2026-01-31T05:55:09.332Z"
+        "createdAt": "2026-02-01T03:04:55.396Z",
+        "updatedAt": "2026-02-01T03:04:55.396Z"
       }
     }
   },
@@ -3298,6 +3409,7 @@
     "healthy": [
       "architect",
       "context-compressor",
+      "developer",
       "planner",
       "pm",
       "qa",
@@ -3346,6 +3458,6 @@
       "swarm-coordinator"
     ],
     "degraded": [],
-    "unavailable": ["developer"]
+    "unavailable": []
   }
 }

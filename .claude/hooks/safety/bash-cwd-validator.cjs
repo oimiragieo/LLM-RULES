@@ -32,9 +32,9 @@
  * @param {object} input - Hook input
  * @param {string} input.command - Bash command to execute
  * @param {boolean} input.run_in_background - Whether task runs in background
- * @returns {Promise<{allowed: boolean, reason?: string, warning?: string, fix?: string}>}
+ * @returns {{allowed: boolean, reason?: string, warning?: string, fix?: string}}
  */
-async function handler(input) {
+function handler(input) {
   const { command, run_in_background } = input;
 
   // Only validate background tasks

@@ -6,8 +6,7 @@ model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
 priority: medium
-tools:
-  [Read, Write, Edit, Grep, Glob, Bash, MCP Tools, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools: [Read, Write, Edit, Grep, Glob, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol
   - dependency-analyzer

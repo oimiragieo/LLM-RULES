@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 // Find project root
 function findProjectRoot() {
@@ -56,11 +57,23 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Project Analyzer executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Project Analyzer completed successfully');
+  const analyzerPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'tools',
+    'analysis',
+    'project-analyzer',
+    'analyzer.mjs'
+  );
+  if (!fs.existsSync(analyzerPath)) {
+    console.error('Project analyzer not found:', analyzerPath);
+    process.exit(1);
+  }
+  const child = spawn(process.execPath, [analyzerPath, ...args], {
+    stdio: 'inherit',
+    cwd: PROJECT_ROOT,
+  });
+  child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }
 
 main();

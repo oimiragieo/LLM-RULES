@@ -13,7 +13,16 @@ const ALLOWED_COMMANDS = {
   // File operations (safe read-only)
   find: {
     allowed: true,
-    patterns: [/^find\s+["']?\$\{?PROJECT_ROOT\}?["']?.*-name/, /^find\s+\./],
+    patterns: [
+      // Absolute-ish safe roots
+      /^find\s+["']?\$\{?PROJECT_ROOT\}?["']?.*-name/,
+      // Relative roots (rely on CWD validator to enforce PROJECT_ROOT for background tasks)
+      /^find\s+\./,
+      /^find\s+tests\//,
+      /^find\s+src\//,
+      /^find\s+["'][^/][^"']*["']/,
+      /^find\s+[^/\s][^\s]*/,
+    ],
     dangerous_flags: ['-delete', '-exec', 'rm'],
     description: 'Find files (restrict -delete, -exec, rm)',
   },
@@ -146,6 +155,14 @@ const ALLOWED_COMMANDS = {
     allowed: true,
     description: 'Format and print data',
   },
+  exit: {
+    allowed: true,
+    description: 'Exit shell (used in guard clauses)',
+  },
+  export: {
+    allowed: true,
+    description: 'Set environment variables (shell builtin)',
+  },
 };
 
 /**
@@ -269,83 +286,148 @@ function extractPrimaryCommand(command) {
 }
 
 /**
+ * Split a shell command into "segments" separated by control operators.
+ * This is intentionally conservative (no full shell parsing) but handles common
+ * safe cases and keeps checks from only looking at the first command.
+ * @param {string} command
+ * @returns {string[]} segments
+ */
+function splitShellCommandSegments(command) {
+  const segments = [];
+  let buffer = '';
+  let inSingle = false;
+  let inDouble = false;
+  let escapeNext = false;
+
+  for (let i = 0; i < command.length; i++) {
+    const ch = command[i];
+
+    if (escapeNext) {
+      buffer += ch;
+      escapeNext = false;
+      continue;
+    }
+
+    if (ch === '\\') {
+      buffer += ch;
+      escapeNext = true;
+      continue;
+    }
+
+    if (!inDouble && ch === "'") {
+      inSingle = !inSingle;
+      buffer += ch;
+      continue;
+    }
+
+    if (!inSingle && ch === '"') {
+      inDouble = !inDouble;
+      buffer += ch;
+      continue;
+    }
+
+    if (!inSingle && !inDouble) {
+      const two = command.slice(i, i + 2);
+      if (two === '&&' || two === '||') {
+        segments.push(buffer);
+        buffer = '';
+        i++;
+        continue;
+      }
+
+      if (ch === ';' || ch === '|' || ch === '\n') {
+        segments.push(buffer);
+        buffer = '';
+        continue;
+      }
+    }
+
+    buffer += ch;
+  }
+
+  segments.push(buffer);
+  return segments.map(s => s.trim()).filter(Boolean);
+}
+
+/**
  * Check if command is allowed
  * @param {string} command - Full shell command
  * @returns {{allowed: boolean, reason?: string, command?: string}}
  */
 function isCommandAllowed(command) {
-  const primaryCommand = extractPrimaryCommand(command);
-
-  if (!primaryCommand) {
-    return {
-      allowed: false,
-      reason: 'Could not extract command from input',
-      command: primaryCommand,
-    };
+  const segments = splitShellCommandSegments(command || '');
+  if (segments.length === 0) {
+    return { allowed: false, reason: 'Could not extract command from input', command: '' };
   }
 
-  // Check if blocked
-  if (BLOCKED_COMMANDS[primaryCommand]) {
-    return {
-      allowed: false,
-      reason: BLOCKED_COMMANDS[primaryCommand].reason,
-      command: primaryCommand,
-    };
-  }
+  for (const segment of segments) {
+    const primaryCommand = extractPrimaryCommand(segment);
 
-  // Check if allowed
-  const allowlistEntry = ALLOWED_COMMANDS[primaryCommand];
-  if (!allowlistEntry) {
-    return {
-      allowed: false,
-      reason: `Command "${primaryCommand}" not in allowlist. Add to ALLOWED_COMMANDS or use a different command.`,
-      command: primaryCommand,
-    };
-  }
+    if (!primaryCommand) {
+      return { allowed: false, reason: 'Could not extract command from input', command: '' };
+    }
 
-  // Check patterns if defined
-  if (allowlistEntry.patterns) {
-    const matchesPattern = allowlistEntry.patterns.some(pattern => pattern.test(command));
-    if (!matchesPattern) {
+    // Check if blocked
+    if (BLOCKED_COMMANDS[primaryCommand]) {
       return {
         allowed: false,
-        reason: `Command "${primaryCommand}" does not match allowed patterns. Allowed: ${allowlistEntry.description}`,
+        reason: BLOCKED_COMMANDS[primaryCommand].reason,
+        command: primaryCommand,
+      };
+    }
+
+    // Check if allowed
+    const allowlistEntry = ALLOWED_COMMANDS[primaryCommand];
+    if (!allowlistEntry) {
+      return {
+        allowed: false,
+        reason: `Command "${primaryCommand}" not in allowlist. Add to ALLOWED_COMMANDS or use a different command.`,
+        command: primaryCommand,
+      };
+    }
+
+    // Check patterns if defined
+    if (allowlistEntry.patterns) {
+      const matchesPattern = allowlistEntry.patterns.some(pattern => pattern.test(segment));
+      if (!matchesPattern) {
+        return {
+          allowed: false,
+          reason: `Command "${primaryCommand}" does not match allowed patterns. Allowed: ${allowlistEntry.description}`,
+          command: primaryCommand,
+        };
+      }
+    }
+
+    // Check dangerous flags
+    if (allowlistEntry.dangerous_flags) {
+      for (const flag of allowlistEntry.dangerous_flags) {
+        if (segment.includes(flag)) {
+          return {
+            allowed: false,
+            reason: `Command "${primaryCommand}" contains dangerous flag: ${flag}`,
+            command: primaryCommand,
+          };
+        }
+      }
+    }
+
+    // Check must_start_with
+    if (allowlistEntry.must_start_with && !segment.startsWith(allowlistEntry.must_start_with)) {
+      return {
+        allowed: false,
+        reason: `Command "${primaryCommand}" must start with: ${allowlistEntry.must_start_with}`,
         command: primaryCommand,
       };
     }
   }
 
-  // Check dangerous flags
-  if (allowlistEntry.dangerous_flags) {
-    for (const flag of allowlistEntry.dangerous_flags) {
-      if (command.includes(flag)) {
-        return {
-          allowed: false,
-          reason: `Command "${primaryCommand}" contains dangerous flag: ${flag}`,
-          command: primaryCommand,
-        };
-      }
-    }
-  }
-
-  // Check must_start_with
-  if (allowlistEntry.must_start_with && !command.startsWith(allowlistEntry.must_start_with)) {
-    return {
-      allowed: false,
-      reason: `Command "${primaryCommand}" must start with: ${allowlistEntry.must_start_with}`,
-      command: primaryCommand,
-    };
-  }
-
-  return {
-    allowed: true,
-    command: primaryCommand,
-  };
+  return { allowed: true, command: extractPrimaryCommand(segments[0]) };
 }
 
 module.exports = {
   ALLOWED_COMMANDS,
   BLOCKED_COMMANDS,
   extractPrimaryCommand,
+  splitShellCommandSegments,
   isCommandAllowed,
 };

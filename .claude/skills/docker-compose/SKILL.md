@@ -19,6 +19,34 @@ safety_level: high
 
 # Docker Compose Skill
 
+## Installation
+
+The skill invokes `docker compose`. Easiest: install **Docker Desktop** (includes Docker Engine + Compose):
+
+- **Windows**: [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) (WSL 2 or Hyper-V)
+- **Mac**: [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/) (Apple Silicon or Intel)
+- **Linux**: [Docker Desktop for Linux](https://docs.docker.com/desktop/setup/install/linux/) or Docker Engine + Compose plugin from Docker’s repo
+
+Verify: `docker compose version`
+
+## Cheat Sheet & Best Practices
+
+**Commands:** `docker compose up -d` / `down`; `docker compose ps` / `logs -f <service>`; `docker compose exec <service> sh`; `docker compose build --no-cache`; `docker compose -f compose.prod.yaml config` — validate.
+
+**YAML:** Use named volumes for DBs (`postgres_data:/var/lib/postgresql/data`). Use healthchecks (`healthcheck:` with `test`, `interval`, `timeout`, `retries`). One network default; reference services by name (e.g. `http://api:3000`). Use `env_file` or `environment`; keep secrets in `secrets:`.
+
+**Hacks:** `-f compose.yaml -f override.yaml` merges files (later overrides). Use `--project-name` for isolation. Prefer `build: context: . dockerfile: Dockerfile` for dev; pin image tags in prod. Run `docker compose config` before `up` to catch errors.
+
+## Certifications & Training
+
+**Docker Certified Associate (DCA):** Orchestration 25%, Image/Registry 20%, Install/Config 15%, Networking 15%, Security 15%, Storage 10%. Free: [Official DCA Study Guide](https://www.docker.com/certification/), [Coursera DCA Prep](https://www.coursera.org/specializations/docker-certified-associate-dca-course) (audit). **Skill data:** Compose YAML (services, volumes, networks, healthchecks), CLI (up/down/ps/logs/exec).
+
+## Hooks & Workflows
+
+**Suggested hooks:** Pre-up: `docker compose config` (validate). Post-down: optional cleanup. Use when **devops** or **devops-troubleshooter** is routed.
+
+**Workflows:** Use with **devops** (primary), **devops-troubleshooter** (primary). Flow: validate compose → up/down/exec per task. See `operations/incident-response` for container debugging.
+
 ## Overview
 
 This skill provides comprehensive Docker Compose management, enabling AI agents to orchestrate multi-container applications, manage services, inspect logs, and troubleshoot containerized environments with progressive disclosure for optimal context usage.

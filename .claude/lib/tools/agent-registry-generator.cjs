@@ -17,6 +17,15 @@ const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
+const AGENT_SKILL_MATRIX_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'config',
+  'agent-skill-matrix.json'
+);
+const SKILL_INDEX_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'skill-index.json');
+
 // Try to load optional dependencies
 let yaml;
 let Ajv;
@@ -197,8 +206,16 @@ function parseAgentFrontmatter(content) {
     // Fallback: simple YAML parsing for key: value pairs
     return parseSimpleYaml(frontmatterMatch[1]);
   } catch (_error) {
-    // Don't throw, just return null for invalid YAML
-    return null;
+    // If the YAML parser rejects the frontmatter, fall back to the simple parser.
+    // This keeps registry generation resilient to slightly-nonstandard YAML.
+    try {
+      const parsed = parseSimpleYaml(frontmatterMatch[1]);
+      if (!parsed || !parsed.name || !parsed.description) return null;
+      return parsed;
+    } catch (_fallbackError) {
+      // Don't throw, just return null for invalid frontmatter
+      return null;
+    }
   }
 }
 
@@ -219,19 +236,55 @@ function parseSimpleYaml(yamlContent) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
 
-    // Array item
-    if (trimmed.startsWith('- ')) {
-      if (currentKey) {
-        arrayValues.push(trimmed.slice(2).trim());
-      }
-      continue;
-    }
-
-    // Finish previous array
+    // Array context (supports both dash arrays and flow arrays split across lines)
     if (inArray && currentKey) {
+      // Flow array delimiters
+      if (trimmed === '[') continue;
+      if (trimmed === ']') {
+        result[currentKey] = arrayValues;
+        arrayValues = [];
+        inArray = false;
+        currentKey = null;
+        continue;
+      }
+
+      // Dash array item
+      if (trimmed.startsWith('- ')) {
+        const raw = trimmed.slice(2).trim();
+        const withoutComment = raw.replace(/\s+#.*$/, '').trim();
+        if (withoutComment) arrayValues.push(parseYamlValue(withoutComment));
+        continue;
+      }
+
+      const colonIndex = trimmed.indexOf(':');
+      if (colonIndex <= 0) {
+        // Flow array item (e.g. "Read," or "'some string',")
+        const raw = trimmed.replace(/,\s*$/, '').trim();
+        const withoutComment = raw.replace(/\s+#.*$/, '').trim();
+        if (!withoutComment) continue;
+
+        // Allow a one-line inline array inside an array context:
+        // tools:
+        //   [Read, Write]
+        if (withoutComment.startsWith('[') && withoutComment.endsWith(']')) {
+          const arrayContent = withoutComment.slice(1, -1);
+          arrayContent
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean)
+            .forEach(v => arrayValues.push(parseYamlValue(v)));
+          continue;
+        }
+
+        arrayValues.push(parseYamlValue(withoutComment));
+        continue;
+      }
+
+      // New key encountered: finish previous array and continue parsing the key line below
       result[currentKey] = arrayValues;
       arrayValues = [];
       inArray = false;
+      currentKey = null;
     }
 
     // Key: value
@@ -240,22 +293,23 @@ function parseSimpleYaml(yamlContent) {
       const key = trimmed.slice(0, colonIndex).trim();
       const value = trimmed.slice(colonIndex + 1).trim();
 
+      // Handle inline array [a, b, c]
+      if (value.startsWith('[') && value.endsWith(']')) {
+        const arrayContent = value.slice(1, -1);
+        result[key] = arrayContent
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+        inArray = false;
+        currentKey = null;
+        continue;
+      }
+
       if (value === '' || value === '[') {
         // Start of array or nested object
         currentKey = key;
         inArray = true;
         arrayValues = [];
-
-        // Handle inline array [a, b, c]
-        if (value.startsWith('[') && value.endsWith(']')) {
-          const arrayContent = value.slice(1, -1);
-          result[key] = arrayContent
-            .split(',')
-            .map(s => s.trim())
-            .filter(Boolean);
-          inArray = false;
-          currentKey = null;
-        }
       } else {
         // Simple value
         result[key] = parseYamlValue(value);
@@ -360,25 +414,95 @@ function inferDomain(agentDef, agentId, category) {
 }
 
 /**
+ * Load agent-skill-matrix and skill-index for tool union computation
+ * @returns {{ matrix: Object, skillIndex: Object }}
+ */
+function loadAgentSkillMatrixAndSkillIndex() {
+  let matrix = { agents: {} };
+  let skillIndex = { skills: {} };
+  try {
+    if (fs.existsSync(AGENT_SKILL_MATRIX_PATH)) {
+      matrix = JSON.parse(fs.readFileSync(AGENT_SKILL_MATRIX_PATH, 'utf8'));
+    }
+  } catch (_error) {
+    // ignore
+  }
+  try {
+    if (fs.existsSync(SKILL_INDEX_PATH)) {
+      skillIndex = JSON.parse(fs.readFileSync(SKILL_INDEX_PATH, 'utf8'));
+    }
+  } catch (_error) {
+    // ignore
+  }
+  return { matrix, skillIndex };
+}
+
+/**
+ * Get union of requiredTools for all skills assigned to this agent in agent-skill-matrix
+ * @param {string} agentId - Agent ID
+ * @param {Object} matrix - agent-skill-matrix.json content
+ * @param {Object} skillIndex - skill-index.json content
+ * @returns {string[]} Tool names
+ */
+function getRequiredToolsUnionForAgent(agentId, matrix, skillIndex) {
+  const skills = new Set();
+  const agents = matrix.agents || {};
+  for (const categoryAgents of Object.values(agents)) {
+    if (typeof categoryAgents !== 'object') continue;
+    const config = categoryAgents[agentId];
+    if (!config) continue;
+    const primary = Array.isArray(config.primary) ? config.primary : [];
+    const secondary = Array.isArray(config.secondary) ? config.secondary : [];
+    const always = Array.isArray(config.always) ? config.always : [];
+    const contextual =
+      config.contextual && typeof config.contextual === 'object'
+        ? Object.values(config.contextual).flat()
+        : [];
+    [...primary, ...secondary, ...always, ...contextual].forEach(s => skills.add(s));
+  }
+  const tools = new Set();
+  const indexSkills = skillIndex.skills || {};
+  for (const skillName of skills) {
+    const skill = indexSkills[skillName];
+    if (skill && Array.isArray(skill.requiredTools)) {
+      skill.requiredTools.forEach(t => tools.add(t));
+    }
+  }
+  return [...tools];
+}
+
+/**
  * Generate capability card for a single agent
  * @param {Object} agentDef - Agent definition from frontmatter
  * @param {string} agentId - Agent ID (filename without .md)
  * @param {string} category - Agent category
  * @param {string} filePath - Full path to agent file
+ * @param {string[]} [toolsUnionFromSkills] - Union of tools required by agent's skills (from matrix + skill-index)
  * @returns {Object} Capability card
  */
-function generateCapabilityCard(agentDef, agentId, category, filePath) {
+function generateCapabilityCard(agentDef, agentId, category, filePath, toolsUnionFromSkills = []) {
   const domain = inferDomain(agentDef, agentId, category);
   const triggerPhrases = extractTriggerPhrases(agentDef, agentId);
 
-  // Get tools list
+  // Get tools list from agent .md
   let tools = ['Read', 'Write', 'Edit', 'Bash'];
   if (agentDef.tools) {
     if (Array.isArray(agentDef.tools)) {
       tools = agentDef.tools;
     } else if (typeof agentDef.tools === 'string') {
-      tools = agentDef.tools.split(',').map(t => t.trim());
+      tools = agentDef.tools
+        .trim()
+        .replace(/^\[/, '')
+        .replace(/\]$/, '')
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
     }
+  }
+  // Merge with union of tools required by this agent's skills so registry has full set
+  if (toolsUnionFromSkills.length > 0) {
+    const merged = new Set([...tools, ...toolsUnionFromSkills]);
+    tools = [...merged];
   }
 
   // Get skills list
@@ -409,7 +533,7 @@ function generateCapabilityCard(agentDef, agentId, category, filePath) {
       domain: domain,
       description: description,
       triggerPhrases: triggerPhrases.slice(0, 10),
-      requiredTools: tools.slice(0, 10),
+      requiredTools: tools.slice(0, 18),
       skills: skills.slice(0, 10),
     },
   ];
@@ -588,13 +712,16 @@ class AgentRegistryGenerator {
    */
   async generate(agentsDir) {
     const agents = await this.scanAgents(agentsDir);
+    const { matrix, skillIndex } = loadAgentSkillMatrixAndSkillIndex();
 
     for (const [agentId, agentInfo] of agents) {
+      const toolsUnionFromSkills = getRequiredToolsUnionForAgent(agentId, matrix, skillIndex);
       const card = generateCapabilityCard(
         agentInfo.definition,
         agentId,
         agentInfo.category,
-        agentInfo.filePath
+        agentInfo.filePath,
+        toolsUnionFromSkills
       );
       this.registry.agents[agentId] = card;
     }

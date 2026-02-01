@@ -17,6 +17,8 @@ streaming: supported
 templates: [architecture-diagram, database-diagram, component-diagram, sequence-diagram]
 ---
 
+**References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — Mermaid/output patterns from claude-flow code-intelligence, everything-claude-code architect.
+
 <identity>
 Diagram Generator Skill - Generates architecture, database, and system diagrams using Mermaid syntax to visualize system structure, relationships, and flows.
 </identity>

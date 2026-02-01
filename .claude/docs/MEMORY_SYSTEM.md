@@ -105,11 +105,11 @@ The memory system automatically prunes old sessions to prevent unbounded growth:
 
 **Summary:**
 
-| What was deleted | Behavior |
-|------------------|----------|
-| `.claude/context/memory/` (entire dir) | Recreated when any memory write runs (e.g. SessionEnd, ChromaDB init, memory-manager CLI). |
-| `sessions/`, `archive/`, `stm/`, `mtm/`, `ltm/` | Recreated on next write to that tier (e.g. `saveSession()` → `sessions/`). |
-| `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, etc. | **Not** auto-recreated. Created only when something writes to that file. |
+| What was deleted                                                  | Behavior                                                                                   |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `.claude/context/memory/` (entire dir)                            | Recreated when any memory write runs (e.g. SessionEnd, ChromaDB init, memory-manager CLI). |
+| `sessions/`, `archive/`, `stm/`, `mtm/`, `ltm/`                   | Recreated on next write to that tier (e.g. `saveSession()` → `sessions/`).                 |
+| `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, etc. | **Not** auto-recreated. Created only when something writes to that file.                   |
 
 ## Memory Manager CLI
 

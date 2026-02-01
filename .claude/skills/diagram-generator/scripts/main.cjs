@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 // Find project root
 function findProjectRoot() {
@@ -56,11 +57,24 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Diagram Generator executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Diagram Generator completed successfully');
+  const generatePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'tools',
+    'visualization',
+    'diagram-generator',
+    'scripts',
+    'generate.mjs'
+  );
+  if (!fs.existsSync(generatePath)) {
+    console.error('Diagram generator not found:', generatePath);
+    process.exit(1);
+  }
+  const child = spawn(process.execPath, [generatePath, ...args], {
+    stdio: 'inherit',
+    cwd: PROJECT_ROOT,
+  });
+  child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }
 
 main();

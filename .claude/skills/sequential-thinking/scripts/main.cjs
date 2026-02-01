@@ -56,11 +56,28 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Sequential Thinking executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Sequential Thinking completed successfully');
+  const { spawn } = require('child_process');
+  const executorPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'tools',
+    'optimization',
+    'sequential-thinking',
+    'executor.py'
+  );
+  if (fs.existsSync(executorPath)) {
+    const child = spawn('python', [executorPath, ...args.filter(a => a !== '--help')], {
+      stdio: 'inherit',
+      cwd: path.dirname(executorPath),
+      shell: true,
+    });
+    child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
+  } else {
+    console.log(
+      'Sequential Thinking skill provides structured thinking guidance. Invoke via the agent; executor not found.'
+    );
+    process.exit(0);
+  }
 }
 
 main();

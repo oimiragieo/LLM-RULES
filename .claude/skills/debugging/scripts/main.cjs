@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Debugging executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Debugging completed successfully');
+  console.log(
+    'Debugging skill provides systematic 4-phase debugging guidance. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

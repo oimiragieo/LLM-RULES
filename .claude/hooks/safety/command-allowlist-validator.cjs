@@ -11,8 +11,6 @@
 
 const { isCommandAllowed } = require('../../lib/safety/command-allowlist.cjs');
 
-const MODE = process.env.COMMAND_ALLOWLIST || 'warn';
-
 /**
  * Validate Bash command against command allowlist
  * @param {Object} input - Tool input from PreToolUse hook
@@ -20,9 +18,10 @@ const MODE = process.env.COMMAND_ALLOWLIST || 'warn';
  */
 function validateCommandAllowlist(input) {
   const { command } = input;
+  const mode = process.env.COMMAND_ALLOWLIST || 'warn';
 
   // Skip if disabled
-  if (MODE === 'off') {
+  if (mode === 'off') {
     return { allowed: true };
   }
 
@@ -37,7 +36,7 @@ function validateCommandAllowlist(input) {
   const message = `[COMMAND-ALLOWLIST] ${result.reason}\n\nCommand: ${result.command}\nFull: ${command}\n\nTo bypass: Set COMMAND_ALLOWLIST=off`;
 
   // Block or warn based on mode
-  if (MODE === 'block') {
+  if (mode === 'block') {
     return {
       allowed: false,
       reason: message,

@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Skill Creator executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Skill Creator completed successfully');
+  console.log(
+    'Skill Creator provides in-context guidance for creating/validating skills. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

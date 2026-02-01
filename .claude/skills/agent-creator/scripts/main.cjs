@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Agent Creator executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Agent Creator completed successfully');
+  console.log(
+    'Agent Creator provides in-context guidance for creating specialized agents. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

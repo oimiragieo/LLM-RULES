@@ -12,7 +12,8 @@
           "code-analyzer",
           "code-style-validator",
           "commit-validator",
-          "smart-revert"
+          "smart-revert",
+          "github-ops"
         ],
         "contextual": {
           "python_project": ["python-backend-expert", "comprehensive-unit-testing-with-pytest"],
@@ -45,7 +46,8 @@
         "secondary": ["code-analyzer", "rule-auditor", "qa-workflow"],
         "contextual": {
           "python_project": ["comprehensive-unit-testing-with-pytest"],
-          "security_testing": ["security-architect"]
+          "security_testing": ["security-architect"],
+          "browser_testing": ["chrome-browser"]
         },
         "always": ["verification-before-completion", "task-management-protocol"]
       },
@@ -395,7 +397,7 @@
       },
       "evolution-orchestrator": {
         "primary": ["research-synthesis", "agent-creator", "skill-creator"],
-        "secondary": ["workflow-creator", "hook-creator", "template-creator", "schema-creator"],
+        "secondary": ["workflow-creator", "hook-creator", "template-creator", "schema-creator", "mcp-converter"],
         "contextual": {},
         "always": [
           "verification-before-completion",
@@ -553,8 +555,13 @@
         "hook-creator",
         "template-creator",
         "schema-creator",
+        "mcp-converter",
         "artifact-lifecycle"
       ]
+    },
+    "testing": {
+      "description": "Browser and E2E testing skills",
+      "skills": ["chrome-browser", "testing-expert", "qa-workflow"]
     },
     "orchestration": {
       "description": "Multi-agent coordination skills",
@@ -638,6 +645,10 @@
         "threat"
       ],
       "description": "Security-focused request"
+    },
+    "browser_testing": {
+      "keywords": ["e2e", "browser", "chrome", "playwright", "cypress", "selenium", "devtools"],
+      "description": "Browser or E2E testing request"
     },
     "web3_project": {
       "packageDependencies": ["ethers", "web3", "hardhat", "foundry"],

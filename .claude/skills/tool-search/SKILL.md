@@ -15,6 +15,8 @@ error_handling: graceful
 streaming: supported
 ---
 
+**References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — embedding/semantic tool discovery from everything-claude-code backend-patterns, tdd-workflow.
+
 # Tool Search Skill
 
 ## Identity

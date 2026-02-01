@@ -14,8 +14,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const MODE = process.env.SHELLCHECK_VALIDATOR || 'warn';
-
 // SC codes to ignore (false positives or handled by other validators)
 const IGNORED_CODES = [
   'SC1071', // ShellCheck can only follow this non-bash script
@@ -123,10 +121,11 @@ function runShellcheck(command) {
  */
 function validateShellcheck(input) {
   const { command } = input;
+  const mode = process.env.SHELLCHECK_VALIDATOR || 'warn';
 
   // Skip if disabled
-  if (MODE === 'off') {
-    return { allowed: true };
+  if (mode === 'off') {
+    return { allowed: true, valid: true };
   }
 
   // Run shellcheck
@@ -136,13 +135,14 @@ function validateShellcheck(input) {
   if (result.warning) {
     return {
       allowed: true,
+      valid: true,
       warning: `[SHELLCHECK-VALIDATOR] ${result.warning}`,
     };
   }
 
   // If valid, allow
   if (result.valid) {
-    return { allowed: true };
+    return { allowed: true, valid: true };
   }
 
   // If invalid, format error message
@@ -153,9 +153,10 @@ function validateShellcheck(input) {
   const message = `[SHELLCHECK-VALIDATOR] Shellcheck found issues:\n${errorSummary}\n\nFix these issues or set SHELLCHECK_VALIDATOR=off to bypass.`;
 
   // Block or warn based on mode
-  if (MODE === 'block') {
+  if (mode === 'block') {
     return {
       allowed: false,
+      valid: false,
       reason: message,
     };
   }
@@ -163,6 +164,7 @@ function validateShellcheck(input) {
   // Warn mode
   return {
     allowed: true,
+    valid: false,
     warning: message,
   };
 }

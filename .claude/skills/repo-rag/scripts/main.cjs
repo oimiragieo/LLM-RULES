@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 // Find project root
 function findProjectRoot() {
@@ -56,11 +57,24 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Repo Rag executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Repo Rag completed successfully');
+  const searchPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'tools',
+    'analysis',
+    'repo-rag',
+    'scripts',
+    'search.mjs'
+  );
+  if (!fs.existsSync(searchPath)) {
+    console.error('Repo RAG search tool not found:', searchPath);
+    process.exit(1);
+  }
+  const child = spawn(process.execPath, [searchPath, ...args], {
+    stdio: 'inherit',
+    cwd: PROJECT_ROOT,
+  });
+  child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }
 
 main();

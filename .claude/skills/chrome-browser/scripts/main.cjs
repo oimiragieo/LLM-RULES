@@ -60,11 +60,23 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Chrome Browser executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Chrome Browser completed successfully');
+  const { spawn } = require('child_process');
+  const toolPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'tools',
+    'chrome-browser',
+    'chrome-browser.cjs'
+  );
+  if (!fs.existsSync(toolPath)) {
+    console.error('Chrome browser tool not found:', toolPath);
+    process.exit(1);
+  }
+  const child = spawn(process.execPath, [toolPath, ...args.filter(a => a !== '--help')], {
+    stdio: 'inherit',
+    cwd: PROJECT_ROOT,
+  });
+  child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }
 
 main();

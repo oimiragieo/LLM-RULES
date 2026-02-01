@@ -1,25 +1,15 @@
-/**
- * Jest Configuration
- *
- * @type {import('@jest/types').Config.InitialOptions}
- */
-
+/** @type {import('jest').Config} */
 module.exports = {
   testEnvironment: 'node',
-  moduleFileExtensions: ['js', 'cjs', 'mjs'],
-  testMatch: ['**/tests/**/*.test.cjs', '**/tests/**/*.test.mjs'],
+  // This repo's main test runner is Node's built-in `node --test` (see `pnpm test`).
+  // Keep `npx jest` from accidentally picking up non-Jest tests/helpers.
+  testMatch: ['**/?(*.)jest.test.[cm]js'],
+  passWithNoTests: true,
   modulePathIgnorePatterns: [
     '<rootDir>/.claude.archive/',
-    '<rootDir>/node_modules/',
-    '<rootDir>/dist/',
-    '<rootDir>/build/',
+    '<rootDir>/.claude.old/',
+    '<rootDir>/.claude/staging/',
+    '<rootDir>/.claude/lib/utils/.claude/staging/',
   ],
-  testPathIgnorePatterns: ['/node_modules/', '/.claude.archive/'],
-  collectCoverageFrom: [
-    '.claude/lib/**/*.{js,cjs,mjs}',
-    '.claude/hooks/**/*.{js,cjs,mjs}',
-    '.claude/tools/**/*.{js,cjs,mjs}',
-    '!**/*.test.{js,cjs,mjs}',
-    '!**/node_modules/**',
-  ],
+  watchPathIgnorePatterns: ['<rootDir>/.claude.archive/', '<rootDir>/.claude.old/'],
 };

@@ -31,3 +31,26 @@ test('appendSemanticMatches appends a semantic section', () => {
   assert.ok(out.includes('### Semantic Matches (ContextualMemory)'));
   assert.ok(out.includes('learnings.md'));
 });
+
+test('inferAgentFromPrompt extracts agent from "You are X"', () => {
+  assert.equal(hook.inferAgentFromPrompt('You are DEVELOPER.'), 'developer');
+  assert.equal(hook.inferAgentFromPrompt('You are the ARCHITECT'), 'architect');
+  assert.equal(hook.inferAgentFromPrompt('Hello world'), null);
+});
+
+test('enrichAllowedTools returns currentTools when enricher disabled', () => {
+  const prev = process.env.ALLOWED_TOOLS_ENRICHER;
+  process.env.ALLOWED_TOOLS_ENRICHER = 'off';
+  const result = hook.enrichAllowedTools('developer', ['Read', 'Write'], '');
+  process.env.ALLOWED_TOOLS_ENRICHER = prev;
+  assert.deepEqual(result, ['Read', 'Write']);
+});
+
+test('enrichAllowedTools returns array (merged or current when no registry)', () => {
+  const prev = process.env.ALLOWED_TOOLS_ENRICHER;
+  process.env.ALLOWED_TOOLS_ENRICHER = '';
+  const result = hook.enrichAllowedTools('developer', ['Read'], '');
+  process.env.ALLOWED_TOOLS_ENRICHER = prev;
+  assert.ok(Array.isArray(result));
+  assert.ok(result.includes('Read'));
+});

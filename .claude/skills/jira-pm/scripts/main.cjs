@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Jira Pm executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Jira Pm completed successfully');
+  console.log(
+    'Jira PM skill provides in-context guidance; configure Jira API for full functionality. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

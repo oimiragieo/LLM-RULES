@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 On Call Handoff Patterns executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ On Call Handoff Patterns completed successfully');
+  console.log(
+    'On-call Handoff Patterns skill provides in-context guidance for shift handoffs. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

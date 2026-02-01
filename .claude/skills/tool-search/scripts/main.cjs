@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 // Find project root
 function findProjectRoot() {
@@ -56,11 +57,16 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Tool Search executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Tool Search completed successfully');
+  const toolSearchPath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'tool_search.mjs');
+  if (!fs.existsSync(toolSearchPath)) {
+    console.error('Tool search not found:', toolSearchPath);
+    process.exit(1);
+  }
+  const child = spawn(process.execPath, [toolSearchPath, ...args], {
+    stdio: 'inherit',
+    cwd: PROJECT_ROOT,
+  });
+  child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }
 
 main();

@@ -60,11 +60,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Arxiv Mcp executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Arxiv Mcp completed successfully');
+  console.log(
+    'arXiv MCP skill provides in-context guidance; use WebFetch/Exa for arXiv API access. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

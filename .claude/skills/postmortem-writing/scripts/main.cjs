@@ -56,11 +56,10 @@ Options:
     process.exit(0);
   }
 
-  console.log('🔧 Postmortem Writing executing...');
-
-  // TODO: Implement skill logic here
-
-  console.log('✅ Postmortem Writing completed successfully');
+  console.log(
+    'Postmortem Writing skill provides in-context guidance for blameless postmortems. Invoke via the agent; no standalone script.'
+  );
+  process.exit(0);
 }
 
 main();

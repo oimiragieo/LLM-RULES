@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.ai/schemas/tool-manifest.schema.json",
+  "title": "Tool Manifest",
+  "description": "Schema for .claude/config/tool-manifest.json - tool availability and constraints for spawn validation",
+  "type": "object",
+  "required": ["version", "tools"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Manifest schema version",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 generation timestamp"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "totalTools": { "type": "integer" },
+        "totalCoreTools": { "type": "integer" },
+        "totalMcpTools": { "type": "integer" },
+        "totalAgents": { "type": "integer" },
+        "lastValidated": { "type": "string", "format": "date-time" },
+        "source": { "type": "string" }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "required": ["core"],
+      "properties": {
+        "core": {
+          "type": "array",
+          "description": "Core tools available to agents",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "category": { "type": "string" },
+              "description": { "type": "string" },
+              "status": { "type": "string", "enum": ["available", "unavailable"] },
+              "mandatory": { "type": "boolean" },
+              "availability": {
+                "type": "object",
+                "properties": {
+                  "agents": { "type": "string" },
+                  "orchestrators": { "type": "string" },
+                  "router": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "mcp": {
+          "type": "array",
+          "description": "MCP tools (optional server configuration)",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "category": { "type": "string" },
+              "description": { "type": "string" },
+              "status": { "type": "string" },
+              "mcp_server": { "type": "string" },
+              "fallback": { "type": "string" },
+              "fallback_status": { "type": "string" },
+              "fallback_tools": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "toolsets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "maxToolsPerAgent": { "type": "integer", "minimum": 1, "maximum": 30 },
+        "maxToolsPerOrchestrator": { "type": "integer", "minimum": 1, "maximum": 30 }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "reservedTools": { "type": "object" },
+        "mandatory": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "agentDefaults": { "type": "object" }
+      }
+    }
+  }
+}
