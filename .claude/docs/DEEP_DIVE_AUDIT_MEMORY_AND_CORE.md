@@ -224,18 +224,18 @@ The `.claude` memory system is a hybrid architecture combining:
 
 ### Core Memory Libraries
 
-| File                    | Status | Notes                                                               |
-| ----------------------- | ------ | ------------------------------------------------------------------- |
-| `memory-manager.cjs`    | ✅     | Gotchas, patterns, codebase_map, learnings (sessions deprecated)    |
-| `memory-tiers.cjs`      | ✅     | STM/MTM/LTM hierarchy (canonical for sessions)                      |
-| `contextual-memory.cjs` | ✅     | Unified API                                                         |
-| `lancedb-client.cjs`    | ✅     | Embedded vector store (replaced ChromaDB)                           |
-| `entity-extractor.cjs`  | ✅     | Markdown parsing (now uses node:sqlite)                             |
-| `entity-query.cjs`      | ✅     | Graph queries (now validates tables)                                |
-| `sync-layer.cjs`        | ⚠️     | Deprecated. Replaced by `sync-memory-index.cjs`. Not used by hooks. |
-| `smart-pruner.cjs`      | ✅     | Utility pruning                                                     |
-| `memory-scheduler.cjs`  | ✅     | Automated maintenance (daily + weekly)                              |
-| `memory-dashboard.cjs`  | ✅     | Metrics collection and health scoring                               |
+| File                    | Status   | Notes                                                                                                    |
+| ----------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `memory-manager.cjs`    | ✅       | Gotchas, patterns, codebase_map, learnings (sessions deprecated)                                         |
+| `memory-tiers.cjs`      | ✅       | STM/MTM/LTM hierarchy (canonical for sessions)                                                           |
+| `contextual-memory.cjs` | ✅       | Unified API                                                                                              |
+| `lancedb-client.cjs`    | ✅       | Embedded vector store (replaced ChromaDB)                                                                |
+| `entity-extractor.cjs`  | ✅       | Markdown parsing (now uses node:sqlite)                                                                  |
+| `entity-query.cjs`      | ✅       | Graph queries (now validates tables)                                                                     |
+| `sync-layer.cjs`        | Archived | Moved to `.claude/archive/lib/memory/`. Replaced by `sync-memory-index.cjs`. Same for `sync-worker.cjs`. |
+| `smart-pruner.cjs`      | ✅       | Utility pruning                                                                                          |
+| `memory-scheduler.cjs`  | ✅       | Automated maintenance (daily + weekly)                                                                   |
+| `memory-dashboard.cjs`  | ✅       | Metrics collection and health scoring                                                                    |
 
 ### Memory Data
 
@@ -249,6 +249,16 @@ The `.claude` memory system is a hybrid architecture combining:
 | `mtm/`              | ✅     | Canonical session storage     |
 | `ltm/`              | ✅     | Long-term summaries           |
 | `metrics/`          | ✅     | Daily health metrics          |
+
+---
+
+## Post-fix (Enterprise) — 2026-02-01
+
+- **Deprecated code archived**: SyncLayer, SyncWorker, session-memory-extractor, and extract-workflow-learnings have been moved to `.claude/archive/` (lib/memory and hooks/memory). Active sync path is `sync-memory-index.cjs` only; workflow/session extraction is canonical in `post-task-unified.cjs` and `unified-reflection-handler.cjs`.
+- **Reflection**: Reflection is reminder-driven with mandatory **Step 0** in CLAUDE.md (ROUTER OUTPUT CONTRACT). The Router must read `reflection-reminder.txt` and spawn reflection-agent when it exists; there is no automated spawn from hooks.
+- **TaskList-first**: TaskList() must be called before Task() in the same session (since last UserPromptSubmit). Enforced via `router-state.cjs` (`taskListCalledSincePrompt`), PostToolUse(TaskList) hook `task-list-tracker.cjs`, and PreToolUse(Task) check in `pre-task-unified.cjs` (env: `TASKLIST_FIRST_ENFORCEMENT=block|warn|off`, default `block`).
+- **Weekly maintenance fallback**: When weekly maintenance is overdue (missing or older than 7 days), `user-prompt-unified.cjs` invokes weekly maintenance in a child process (timeout 30s) so it runs even when SessionEnd rarely fires.
+- **Dashboard Phase 4**: `memory-health-check.cjs` Phase 4 is hardened with try/catch; on error it sets `output.metricsLogged = false` and `output.metricsError` and optionally writes a one-line JSONL entry to `.claude/context/memory/metrics/fallback.jsonl`.
 
 ---
 

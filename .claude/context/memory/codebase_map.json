@@ -4,56 +4,65 @@
       "description": "Main orchestration instructions - Router protocol, agent routing table, spawn patterns",
       "category": "core",
       "discovered_at": "2026-01-24T00:00:00.000Z",
-      "last_accessed": "2026-01-24T00:00:00.000Z"
+      "last_accessed": "2026-01-24T00:00:00.000Z",
+      "accessDate": "2026-01-24T00:00:00.000Z"
     },
     ".claude/lib/platform.cjs": {
       "description": "Cross-platform utilities - NULL_DEVICE, isWindows, shellQuote, suppressStderr",
       "category": "utility",
       "discovered_at": "2026-01-24T00:00:00.000Z",
-      "last_accessed": "2026-01-24T00:00:00.000Z"
+      "last_accessed": "2026-01-24T00:00:00.000Z",
+      "accessDate": "2026-01-24T00:00:00.000Z"
     },
     ".claude/lib/memory/memory-manager.cjs": {
       "description": "Session-based memory system with read-time truncation",
       "category": "core",
       "discovered_at": "2026-01-24T00:00:00.000Z",
-      "last_accessed": "2026-01-24T00:00:00.000Z"
+      "last_accessed": "2026-01-24T00:00:00.000Z",
+      "accessDate": "2026-01-24T00:00:00.000Z"
     },
     ".claude/settings.json": {
       "description": "Missing SessionEnd hook - this is why only session_001.json exists",
       "category": "general",
       "discovered_at": "2026-01-25T05:59:41.065Z",
-      "last_accessed": "2026-01-25T05:59:41.065Z"
+      "last_accessed": "2026-01-25T05:59:41.065Z",
+      "accessDate": "2026-01-25T05:59:41.065Z"
     },
     ".claude/hooks/safety/windows-null-sanitizer.cjs": {
       "description": "Sanitizes /dev/null to NUL in bash commands on Windows",
       "category": "hook",
       "discovered_at": "2026-01-24T00:00:00.000Z",
-      "last_accessed": "2026-01-24T00:00:00.000Z"
+      "last_accessed": "2026-01-24T00:00:00.000Z",
+      "accessDate": "2026-01-24T00:00:00.000Z"
     },
     ".claude/context/memory/": {
       "description": "Memory storage - sessions/, gotchas.json, patterns.json, codebase_map.json",
       "category": "memory",
       "discovered_at": "2026-01-24T00:00:00.000Z",
-      "last_accessed": "2026-01-24T00:00:00.000Z"
+      "last_accessed": "2026-01-24T00:00:00.000Z",
+      "accessDate": "2026-01-24T00:00:00.000Z"
     },
     ".claude/hooks/memory/session-end-recorder.cjs": {
       "description": "SessionEnd hook that auto-saves session summaries to memory system on session end",
       "category": "general",
       "discovered_at": "2026-01-25T06:14:17.210Z",
-      "last_accessed": "2026-01-25T06:14:17.210Z"
+      "last_accessed": "2026-01-25T06:14:17.210Z",
+      "accessDate": "2026-01-25T06:14:17.210Z"
     },
     ".claude/hooks/routing/planner-first-guard.integration.test.cjs": {
       "description": "16 integration tests for planner-first enforcement: blocks DEVELOPER/QA/DEVOPS/ARCHITECT for EPIC/HIGH complexity until PLANNER spawned, allows PLANNER to break cycle, validates warn/off modes, tests full flow from prompt analysis to Task blocking",
       "category": "general",
       "discovered_at": "2026-01-25T06:53:49.789Z",
-      "last_accessed": "2026-01-25T06:53:49.789Z"
+      "last_accessed": "2026-01-25T06:53:49.789Z",
+      "accessDate": "2026-01-25T06:53:49.789Z"
     },
     "tests/fixtures/code-indexing/hook-test/src/main.js": {
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-01T08:08:40.333Z",
-      "last_accessed": "2026-02-01T08:08:40.333Z"
+      "last_accessed": "2026-02-01T08:08:40.333Z",
+      "accessDate": "2026-02-01T08:08:40.333Z"
     }
   },
-  "last_updated": "2026-02-01T08:08:40.333Z"
+  "last_updated": "2026-02-01T23:46:15.492Z"
 }

@@ -176,7 +176,7 @@ async function atomicWriteAsync(filePath, content, options = {}) {
  * @throws {Error} If serialization, write, or rename fails
  */
 function atomicWriteJSONSync(filePath, data) {
-  const content = JSON.stringify(data, null, 2);
+  const content = JSON.stringify(data, null, 2) + '\n';
   atomicWriteSync(filePath, content, 'utf8');
 }
 

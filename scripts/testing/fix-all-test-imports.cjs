@@ -66,8 +66,8 @@ const PATH_MAPPINGS = {
     'format-memory.cjs': '.claude/hooks/memory/format-memory.cjs',
     'memory-health-check.cjs': '.claude/hooks/memory/memory-health-check.cjs',
     'session-end-recorder.cjs': '.claude/archive/hooks/memory/session-end-recorder.cjs',
-    'session-memory-extractor.cjs': '.claude/hooks/memory/session-memory-extractor.cjs',
-    'extract-workflow-learnings.cjs': '.claude/hooks/memory/extract-workflow-learnings.cjs',
+    'session-memory-extractor.cjs': '.claude/archive/hooks/memory/session-memory-extractor.cjs',
+    'extract-workflow-learnings.cjs': '.claude/archive/hooks/memory/extract-workflow-learnings.cjs',
 
     // Evolution hooks
     'evolution-state-guard.cjs': '.claude/hooks/evolution/evolution-state-guard.cjs',

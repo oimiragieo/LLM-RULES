@@ -409,7 +409,7 @@ function pruneCodebaseMap(projectRoot = PROJECT_ROOT) {
   codebaseMap.last_updated = now.toISOString();
 
   // Write back
-  atomicWriteSync(mapPath, JSON.stringify(codebaseMap, null, 2));
+  atomicWriteSync(mapPath, JSON.stringify(codebaseMap, null, 2) + '\n');
 
   if (result.totalPruned > 0) {
     console.log(
@@ -577,7 +577,7 @@ function recordDiscovery(filePath, description, category = 'general', projectRoo
   };
   codebaseMap.last_updated = now;
 
-  atomicWriteSync(mapFile, JSON.stringify(codebaseMap, null, 2));
+  atomicWriteSync(mapFile, JSON.stringify(codebaseMap, null, 2) + '\n');
   return true;
 }
 

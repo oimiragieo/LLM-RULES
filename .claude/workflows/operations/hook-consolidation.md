@@ -446,13 +446,13 @@ Real-world example of successful hook consolidation from 2026-01-27.
 
 ### Before (5 hooks, 5 processes)
 
-| Hook                             | Event                  | Purpose                             |
-| -------------------------------- | ---------------------- | ----------------------------------- |
-| `task-completion-reflection.cjs` | PostToolUse:TaskUpdate | Queue reflection on task completion |
-| `error-recovery-reflection.cjs`  | PostToolUse:Bash       | Queue reflection on errors          |
-| `session-end-reflection.cjs`     | SessionEnd             | Queue reflection at session end     |
-| `session-memory-extractor.cjs`   | PostToolUse:Task       | Extract memory from spawned agents  |
-| `session-end-recorder.cjs`       | SessionEnd             | Record session metrics              |
+| Hook                             | Event                       | Purpose                                                                                                |
+| -------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `task-completion-reflection.cjs` | PostToolUse:TaskUpdate      | Queue reflection on task completion                                                                    |
+| `error-recovery-reflection.cjs`  | PostToolUse:Bash            | Queue reflection on errors                                                                             |
+| `session-end-reflection.cjs`     | SessionEnd                  | Queue reflection at session end                                                                        |
+| `session-memory-extractor.cjs`   | (archived) PostToolUse:Task | Extract memory from spawned agents → unified in post-task-unified.cjs / unified-reflection-handler.cjs |
+| `session-end-recorder.cjs`       | SessionEnd                  | Record session metrics                                                                                 |
 
 **Problems**:
 

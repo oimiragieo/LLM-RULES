@@ -51,7 +51,7 @@ The memory system is enforced/maintained via Claude Code hooks registered in `.c
 - `PostToolUse` (matcher `Edit|Write|NotebookEdit`)
   - `.claude/hooks/memory/format-memory.cjs` (formats/normalizes memory writes after edits/writes)
   - `.claude/hooks/memory/sync-memory-index.cjs` (canonical sync path: syncs learnings/decisions/issues into the SQLite entity index).
-  - Note: `SyncLayer` and `BackgroundSyncWorker` libraries are **deprecated** and not wired.
+  - Note: `SyncLayer` and `BackgroundSyncWorker` have been moved to `.claude/archive/lib/memory/` and are no longer in the active codebase. Sync is done only by `sync-memory-index.cjs`.
 - `SessionEnd`
   - `.claude/hooks/reflection/unified-reflection-handler.cjs` (records session into STM/MTM, best-effort embeddings + maintenance, queues reflection)
   - `.claude/hooks/reflection/reflection-queue-processor.cjs` (writes `.claude/context/runtime/reflection-spawn-request.json` so reflection is actionable)
@@ -61,6 +61,10 @@ The memory system is enforced/maintained via Claude Code hooks registered in `.c
 The “memory reminder” behavior is handled inside `.claude/hooks/routing/user-prompt-unified.cjs`.
 There is no separate `memory-reminder.cjs` hook wired in settings.
 Note: Claude Code does not provide a `SessionStart` hook event; “session-start” behavior is implemented via `UserPromptSubmit`.
+
+### Reflection spawn
+
+Reflection is **reminder-driven**: there is no automated spawn from hooks (hooks cannot invoke the Task tool). On `UserPromptSubmit`, when there are pending reflection requests, `.claude/hooks/routing/user-prompt-unified.cjs` writes `.claude/context/runtime/reflection-reminder.txt` and appends to `.claude/context/runtime/reflection-spawn-request.json`. The Router must treat **Step 0** (see CLAUDE.md ROUTER OUTPUT CONTRACT) as mandatory: before `TaskList()` or any other tool, if `reflection-reminder.txt` exists, read it, read `reflection-spawn-request.json`, spawn reflection-agent for each request (or the first batch), then delete the reminder file and clear/trim the spawn request file. The Router is the only component that can spawn reflection-agent; the reminder ensures it is impossible to miss pending reflection.
 
 ### Inlined vs Standalone Memory Health Check
 
@@ -75,6 +79,10 @@ There are two primary metrics roots:
 
 - Observability metrics: `.claude/context/metrics/` (e.g. hook/error/limit events)
 - Memory health metrics: `.claude/context/memory/metrics/`
+
+### Metrics and dashboard
+
+Metrics are collected on `UserPromptSubmit` via `memory-health-check.cjs` (Phase 4). The hook loads `.claude/lib/memory/memory-dashboard.cjs`; if that module fails to load or Phase 4 throws, the hook still completes and sets `output.metricsLogged = false` and `output.metricsError` so callers know metrics did not run. A structured error is logged (`metrics_logging_error`). When dashboard load or Phase 4 fails, an optional fallback one-line JSONL entry is written to `.claude/context/memory/metrics/fallback.jsonl` with `timestamp`, `event: 'health_check'`, `status`, `warningsCount`, and optionally `metricsError`, so at least one data point exists for the run. Inspect metrics without running the full health check via `pnpm run memory:dashboard` (or `node .claude/lib/memory/memory-dashboard.cjs`; default command shows health).
 
 ## Caveats / Verification Notes
 
@@ -128,8 +136,7 @@ The memory system is designed to stay bounded:
 
 ### When does weekly maintenance run?
 
-- Weekly maintenance (including `archiveOldLTM`) runs only when **SessionEnd** fires (conversation session ends). It is triggered by `unified-reflection-handler.cjs` → `triggerMaintenance()` → `memory-scheduler.cjs` `runWeeklyMaintenance()`.
-- If you rarely end sessions (e.g. close IDE without ending the conversation), you should run maintenance manually: `pnpm run memory:weekly` (or `memory:daily`). To check last run: `pnpm run memory:status`.
+- Weekly maintenance (including `archiveOldLTM`) runs when **SessionEnd** fires (via `unified-reflection-handler.cjs` → `triggerMaintenance()` → `memory-scheduler.cjs` `runWeeklyMaintenance()`) or when **UserPromptSubmit** detects it is overdue: `user-prompt-unified.cjs` reads `.claude/context/memory/maintenance-status.json`; if `lastWeekly` is missing or older than 7 days, it invokes weekly maintenance in a child process (timeout 30s) so the hook does not block. Manual fallback: `pnpm run memory:weekly` (or `memory:daily`). To check last run: `pnpm run memory:status`.
 
 ### Tunables
 

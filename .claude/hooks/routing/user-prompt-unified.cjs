@@ -19,6 +19,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 // Import shared utilities
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
@@ -926,6 +927,48 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     } else if (fs.existsSync(reminderPath)) {
       // Clean up stale reminder if request file is missing
       fs.unlinkSync(reminderPath);
+    }
+  } catch (_e) {
+    // best-effort; ignore
+  }
+
+  // Weekly maintenance fallback: run weekly when overdue (e.g. SessionEnd rarely fires).
+  try {
+    const statusPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'context',
+      'memory',
+      'maintenance-status.json'
+    );
+    let lastWeekly = null;
+    if (fs.existsSync(statusPath)) {
+      try {
+        const status = JSON.parse(fs.readFileSync(statusPath, 'utf8'));
+        lastWeekly = status.lastWeekly || null;
+      } catch (_e) {
+        // ignore parse errors
+      }
+    }
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const lastWeeklyMs = lastWeekly ? new Date(lastWeekly).getTime() : 0;
+    const isOverdue = !lastWeekly || now - lastWeeklyMs > sevenDaysMs;
+    if (isOverdue) {
+      const schedulerPath = path.join(
+        PROJECT_ROOT,
+        '.claude',
+        'lib',
+        'memory',
+        'memory-scheduler.cjs'
+      );
+      if (fs.existsSync(schedulerPath)) {
+        spawnSync(process.execPath, [schedulerPath, 'weekly'], {
+          cwd: PROJECT_ROOT,
+          stdio: 'ignore',
+          timeout: 30000,
+        });
+      }
     }
   } catch (_e) {
     // best-effort; ignore

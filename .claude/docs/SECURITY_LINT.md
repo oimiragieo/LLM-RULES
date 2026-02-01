@@ -35,11 +35,11 @@ If you add new doc/plan/skill directories that are example-only, you can add the
 
 Findings in these **path + rule** combinations are **excluded** from the report and from blocking:
 
-| Path (substring)           | Rule    | Reason |
-|----------------------------|---------|--------|
-| `user-prompt-unified.cjs`  | SEC-040 | `path.join` with literal `"reflection-spawn-request"`, not user input |
-| `generate-tool-manifest.cjs` | SEC-030 | CLI diagnostic logging (tool names), not sensitive data |
-| `tests/migration/`         | SEC-011 | Test harness `execSync` with controlled input |
+| Path (substring)             | Rule    | Reason                                                                |
+| ---------------------------- | ------- | --------------------------------------------------------------------- |
+| `user-prompt-unified.cjs`    | SEC-040 | `path.join` with literal `"reflection-spawn-request"`, not user input |
+| `generate-tool-manifest.cjs` | SEC-030 | CLI diagnostic logging (tool names), not sensitive data               |
+| `tests/migration/`           | SEC-011 | Test harness `execSync` with controlled input                         |
 
 To add another allowed false positive, add an entry to `skipFindings`:
 

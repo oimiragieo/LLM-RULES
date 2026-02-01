@@ -152,7 +152,7 @@ describe('session-memory-extractor', () => {
     });
 
     test('extracts gotcha with "avoid" keyword', () => {
-      const output = 'avoid using eval() as it can execute arbitrary code';
+      const output = 'avoid using dynamic code execution as it can run arbitrary code';
       const gotchas = extractor.extractGotchas(output);
       assert.ok(gotchas.length > 0, 'Should extract avoid gotcha');
     });

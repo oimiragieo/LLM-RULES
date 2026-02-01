@@ -132,7 +132,7 @@ function writeStatus(status, projectRoot = PROJECT_ROOT) {
   if (!fs.existsSync(memoryDir)) {
     fs.mkdirSync(memoryDir, { recursive: true });
   }
-  atomicWriteSync(statusPath, JSON.stringify(status, null, 2));
+  atomicWriteSync(statusPath, JSON.stringify(status, null, 2) + '\n');
 }
 
 // ============================================================================

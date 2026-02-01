@@ -53,9 +53,8 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 │   └── router-state.cjs (shared state)
 ├── memory/           # Memory operations
 │   ├── session-end-recorder.cjs
-│   ├── session-memory-extractor.cjs
-│   ├── extract-workflow-learnings.cjs
-│   └── format-memory.cjs
+│   ├── format-memory.cjs
+│   └── (archived: session-memory-extractor.cjs, extract-workflow-learnings.cjs → .claude/archive/hooks/memory/)
 └── session/          # Session management
     └── memory-reminder.cjs
 ```
@@ -149,6 +148,14 @@ Router: Task({ prompt: 'You are PLANNER. Design auth feature...' });
 // PLANNER creates tasks via TaskCreate
 ```
 
+### task-list-tracker.cjs
+
+**Event**: `PostToolUse(TaskList)`
+**Purpose**: Records that TaskList() was called since the last UserPromptSubmit. Used with PreToolUse(Task) to enforce **TaskList-first**: TaskList() must be called before Task() in the same session.
+**Environment**: TaskList-first enforcement is in `pre-task-unified.cjs` (PreToolUse Task): `TASKLIST_FIRST_ENFORCEMENT=block|warn|off` (default: `block`).
+
+**Note**: Router TaskList-first is enforced by pre-task-unified (PreToolUse Task) and state set by PostToolUse TaskList (task-list-tracker.cjs).
+
 ### router-write-guard.cjs
 
 **Event**: `PreToolUse(Edit|Write|NotebookEdit)`
@@ -200,19 +207,11 @@ Router: Task({ prompt: "You are DEVELOPER. Fix bug in app.ts..." })
 
 ### session-memory-extractor.cjs
 
-> **⚠️ DEPRECATED**: This hook has been consolidated into `unified-reflection-handler.cjs`.
-> The file remains for backward compatibility but is no longer actively used.
-> See `.claude/hooks/reflection/unified-reflection-handler.cjs` for the canonical implementation.
-
-**Event**: Deprecated (not registered in `.claude/settings.json`)
-**Purpose**: Extract insights from agent spawns
-**Records**: Discoveries, patterns, decisions made by agents
+> **Archived**: Moved to `.claude/archive/hooks/memory/`. Canonical behavior is in `post-task-unified.cjs` (task-output memory extraction) and `unified-reflection-handler.cjs` (session recording). Not registered in `.claude/settings.json`.
 
 ### extract-workflow-learnings.cjs
 
-**Event**: `PostToolUse(Task)`
-**Purpose**: Extract workflow patterns from multi-agent interactions
-**Records**: Orchestration patterns, agent collaboration insights
+> **Archived**: Moved to `.claude/archive/hooks/memory/`. Canonical behavior is in `post-task-unified.cjs` (workflow learning extraction and task-output memory extraction). Not registered in `.claude/settings.json`.
 
 ### format-memory.cjs
 

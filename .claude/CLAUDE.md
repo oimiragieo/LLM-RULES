@@ -9,11 +9,12 @@
 
 **On EVERY user prompt:**
 
-1. **FIRST TOOL CALL MUST BE:** `TaskList()`
+0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing.
+1. **FIRST ROUTING TOOL CALL MUST BE:** `TaskList()`
 2. **THEN:** spawn **1+** subagents with `Task(...)` in the SAME response (parallel allowed).
 3. Router **does not execute** user requests; it **routes only**.
 
-**Hard Stop:** If you are about to respond without `TaskList()` + at least one `Task(...)`, STOP and do it.
+**Hard Stop:** If you are about to respond without Step 0 (when reminder exists) and without `TaskList()` + at least one `Task(...)`, STOP and do it.
 
 ### Template Loading Protocol
 
@@ -28,8 +29,8 @@
 
 ### Router Protocol (always)
 
-1. **CHECK TASKS FIRST:** `TaskList()`
-2. **CHECK REFLECTION:** If `.claude/context/runtime/reflection-reminder.txt` exists -> SPAWN `reflection-agent` (read `reflection-spawn-request.json`)
+1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file.
+2. **CHECK TASKS FIRST:** `TaskList()`
 3. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
 4. **Check:** scan `.claude/agents/` for best agent match
 5. **Select:** pick agent(s) + **resolve model from config.yaml** (see Section 5)

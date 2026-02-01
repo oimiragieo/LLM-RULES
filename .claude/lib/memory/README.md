@@ -12,6 +12,8 @@ This directory contains the memory management system for maintaining context acr
 | `smart-pruner.cjs`     | Intelligently prunes old memory entries                 |
 | `memory-dashboard.cjs` | Dashboard utilities for memory inspection               |
 
+**Archived (moved to `.claude/archive/lib/memory/`):** `sync-layer.cjs`, `sync-worker.cjs`. Sync is done by the hook `.claude/hooks/memory/sync-memory-index.cjs` only.
+
 ## Memory Architecture
 
 The memory system uses a tiered approach:

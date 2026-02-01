@@ -75,7 +75,7 @@ class SyncLayer extends EventEmitter {
    *
    * @returns {Promise<void>}
    */
-  async start() {
+  start() {
     if (this.watching) {
       // Already watching - idempotent
       return;
@@ -126,7 +126,7 @@ class SyncLayer extends EventEmitter {
    *
    * @returns {Promise<void>}
    */
-  async stop() {
+  stop() {
     // Stop all watchers
     for (const [_filePath, watcher] of this.watchers.entries()) {
       watcher.close();

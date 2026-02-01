@@ -10,6 +10,7 @@ module.exports = {
     '<rootDir>/.claude.old/',
     '<rootDir>/.claude/staging/',
     '<rootDir>/.claude/lib/utils/.claude/staging/',
+    '<rootDir>/tests/archive/',
   ],
   watchPathIgnorePatterns: ['<rootDir>/.claude.archive/', '<rootDir>/.claude.old/'],
 };

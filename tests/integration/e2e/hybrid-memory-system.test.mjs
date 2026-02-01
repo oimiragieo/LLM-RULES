@@ -4,7 +4,7 @@
 // Test Coverage:
 // 1. Write → Extract → Search (full pipeline)
 // 2. Entity relationships → Graph traversal
-// 3. Event flow → Observability (SyncLayer → EventBus)
+// 3. (Scenario 3 SyncLayer removed; sync is via sync-memory-index.cjs hook)
 // 4. ContextualMemory unified API (all 4 methods)
 // 5. Error handling and resilience
 
@@ -17,7 +17,6 @@ import { setTimeout } from 'timers/promises';
 import { DatabaseSync } from 'node:sqlite';
 import os from 'node:os';
 import { ContextualMemory } from '../../../.claude/lib/memory/contextual-memory.cjs';
-import { SyncLayer } from '../../../.claude/lib/memory/sync-layer.cjs';
 import { EntityExtractor } from '../../../.claude/lib/memory/entity-extractor.cjs';
 import EventBus from '../../../.claude/lib/events/event-bus.cjs';
 
@@ -26,7 +25,6 @@ const _projectRoot = path.resolve(__dirname, '../../../');
 
 describe('Hybrid Memory System - End-to-End Integration', () => {
   let memory;
-  let syncLayer;
   let testDbPath;
   let testMemoryDir;
   let tempRoot;
@@ -102,20 +100,9 @@ describe('Hybrid Memory System - End-to-End Integration', () => {
       memoryDir: testMemoryDir,
       dbPath: testDbPath,
     });
-
-    syncLayer = new SyncLayer({
-      watchPaths: [testMemoryDir],
-      dbPath: testDbPath,
-      debounceMs: 500, // Shorter for tests
-    });
   });
 
   afterEach(async () => {
-    // Stop sync layer
-    if (syncLayer) {
-      await syncLayer.stop();
-    }
-
     // Close memory instance
     if (memory) {
       memory.close();
@@ -410,98 +397,6 @@ This enables finding connected concepts and dependencies.
     });
   });
 
-  describe('Scenario 3: Event Flow → Observability (SyncLayer → EventBus)', () => {
-    it('should emit events throughout sync lifecycle', async () => {
-      // Note: SyncLayer emits events through EventBus or its own EventEmitter
-      // Let's verify events from the SyncLayer's internal EventEmitter
-      const localEvents = [];
-
-      syncLayer.on('sync', data => localEvents.push({ type: 'sync', ...data }));
-      syncLayer.on('sync-complete', data => localEvents.push({ type: 'sync-complete', ...data }));
-      syncLayer.on('sync-error', data => localEvents.push({ type: 'sync-error', ...data }));
-
-      // Start sync layer
-      await syncLayer.start();
-
-      // Write to file (triggers file change event)
-      const testContent = `# Learnings
-
-## New Pattern (2026-01-29)
-
-Testing event emission during sync operations.
-
-**Related**: events, observability, sync-layer
-`;
-
-      fs.writeFileSync(path.join(testMemoryDir, 'learnings.md'), testContent);
-
-      // Wait for debounce + sync completion
-      await setTimeout(1000);
-
-      // Verify events were emitted (either from EventBus or SyncLayer's EventEmitter)
-      const totalEvents = capturedEvents.length + localEvents.length;
-
-      if (totalEvents > 0) {
-        assert.ok(true, 'Events were emitted during sync');
-
-        // Check event structure (either from captured or local events)
-        const allEvents = [...capturedEvents, ...localEvents];
-        allEvents.forEach(event => {
-          assert.ok(event.type || event.timestamp, 'Event should have type or timestamp');
-        });
-      } else {
-        // Sync may be working even without events (events are observability, not core functionality)
-        assert.ok(true, 'Sync completed (event emission is optional for testing)');
-      }
-    });
-
-    it('should emit entity extraction events', async () => {
-      // Extract entities and check for events
-      const extractor = new EntityExtractor(testDbPath);
-      const content = '## Test Pattern\nTest description\n**Related**: test';
-
-      // Clear events
-      capturedEvents = [];
-
-      const entities = await extractor.extract(content, 'test.md');
-
-      // Close the extractor's database connection
-      extractor.close();
-
-      // Should return entity array (even if empty)
-      assert.ok(Array.isArray(entities), 'Should return entity array');
-    });
-
-    it('should handle event listener errors gracefully', async () => {
-      // Add a failing event listener
-      const errorListener = () => {
-        throw new Error('Listener intentional failure');
-      };
-      EventBus.on('SYNC_COMPLETE', errorListener);
-
-      try {
-        // Start sync
-        await syncLayer.start();
-
-        // Write file to trigger sync
-        fs.writeFileSync(
-          path.join(testMemoryDir, 'learnings.md'),
-          '# Learnings\n\n## Test\nTest content\n'
-        );
-
-        // Wait for sync
-        await setTimeout(1000);
-
-        // Sync should complete despite listener error
-        // (EventBus should catch listener errors)
-        const fileContent = await memory.readFile('learnings.md');
-        assert.match(fileContent, /Test content/);
-      } finally {
-        EventBus.off(errorListener);
-      }
-    });
-  });
-
   describe('Scenario 4: ContextualMemory Unified API (All 4 Methods)', () => {
     it('should use all 4 ContextualMemory methods in workflow', async () => {
       // Setup: Populate database with test data
@@ -706,31 +601,6 @@ Testing event emission during sync operations.
       const testEntity = entities.find(e => e.id === 'concurrent-test');
       assert.ok(testEntity, 'Entity should still exist after concurrent updates');
       assert.match(testEntity.description, /Updated \d+/, 'Description should be updated');
-    });
-
-    it('should recover from sync failures with retry logic', async () => {
-      // Start sync layer
-      await syncLayer.start();
-
-      // Simulate sync failure by writing to non-existent subdirectory
-      // (This tests retry logic in SyncLayer)
-      const invalidPath = path.join(testMemoryDir, 'nonexistent', 'learnings.md');
-
-      // SyncLayer should handle this gracefully (not crash)
-      try {
-        // This write will fail, but sync layer should retry and eventually give up
-        fs.mkdirSync(path.dirname(invalidPath), { recursive: true });
-        fs.writeFileSync(invalidPath, '# Test\n\nTest content\n');
-
-        // Wait for sync attempt
-        await setTimeout(1000);
-
-        // Sync layer should still be running (not crashed)
-        assert.ok(syncLayer.isWatching(), 'Sync layer should still be watching');
-      } catch (_error) {
-        // Expected behavior: sync may fail but should not crash
-        assert.ok(true, 'Sync failure handled gracefully');
-      }
     });
   });
 });

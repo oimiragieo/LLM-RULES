@@ -234,12 +234,11 @@ hooks/
 │   ├── quality-gate-validator.cjs
 │   ├── research-enforcement.cjs
 │   └── unified-evolution-guard.cjs
-├── memory/              # Memory management (5 hooks)
-│   ├── extract-workflow-learnings.cjs
+├── memory/              # Memory management (active hooks)
 │   ├── format-memory.cjs
 │   ├── memory-health-check.cjs
 │   ├── session-end-recorder.cjs
-│   └── session-memory-extractor.cjs
+│   └── (archived: extract-workflow-learnings.cjs, session-memory-extractor.cjs)
 ├── reflection/          # Reflection queue (4 hooks)
 │   ├── error-recovery-reflection.cjs
 │   ├── reflection-queue-processor.cjs

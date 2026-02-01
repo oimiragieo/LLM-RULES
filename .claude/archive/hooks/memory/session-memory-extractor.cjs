@@ -17,7 +17,6 @@
 'use strict';
 
 const path = require('path');
-const fs = require('fs');
 
 // PERF-006/PERF-007: Use shared utilities instead of duplicated code
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');

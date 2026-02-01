@@ -112,6 +112,8 @@ function getDefaultState() {
     taskSpawnedAt: null,
     taskDescription: null,
     sessionId: process.env.CLAUDE_SESSION_ID || null,
+    // TaskList-first: must call TaskList() before Task() in same session
+    taskListCalledSincePrompt: false,
     // Complexity tracking fields
     complexity: 'trivial',
     requiresPlannerFirst: false,
@@ -320,6 +322,7 @@ function resetToRouterMode() {
     taskSpawnedAt: null,
     taskDescription: null,
     sessionId: process.env.CLAUDE_SESSION_ID || null,
+    taskListCalledSincePrompt: false,
     // Reset complexity tracking fields
     complexity: 'trivial',
     requiresPlannerFirst: false,
@@ -618,6 +621,24 @@ function invalidateStateCache() {
   invalidateCache(STATE_FILE);
 }
 
+/**
+ * Mark that TaskList() was called since last UserPromptSubmit.
+ * Called from PostToolUse(TaskList) hook.
+ */
+function setTaskListCalled() {
+  return saveStateWithRetry({ taskListCalledSincePrompt: true });
+}
+
+/**
+ * Check if TaskList() has been called since last UserPromptSubmit.
+ * Used by PreToolUse(Task) to enforce TaskList-first.
+ * @returns {boolean}
+ */
+function isTaskListCalledSincePrompt() {
+  const state = getState();
+  return state.taskListCalledSincePrompt === true;
+}
+
 // Export functions
 module.exports = {
   // Existing exports
@@ -648,6 +669,9 @@ module.exports = {
   resetTaskUpdateTracking,
   // Cache management
   invalidateStateCache,
+  // TaskList-first enforcement
+  setTaskListCalled,
+  isTaskListCalledSincePrompt,
   // Constants
   VALID_COMPLEXITY_LEVELS,
   // Optimistic concurrency

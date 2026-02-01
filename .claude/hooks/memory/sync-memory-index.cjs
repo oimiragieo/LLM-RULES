@@ -6,8 +6,9 @@
  * are edited via Edit/Write/NotebookEdit.
  *
  * Why:
- * - The original SyncLayer/BackgroundSyncWorker model assumes a long-lived Node process.
+ * - The original SyncLayer/BackgroundSyncWorker model assumes a long-lived Node process (archived).
  * - Claude Code hooks run in short-lived processes, so we do a one-shot sync per write instead.
+ * - Canonical sync: this hook only. SyncLayer/SyncWorker have been moved to .claude/archive/lib/memory/.
  *
  * Trigger:
  * - PostToolUse matcher: Edit|Write|NotebookEdit (wired in .claude/settings.json)

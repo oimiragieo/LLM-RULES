@@ -2,12 +2,12 @@
 /**
  * Unified PostToolUse(Task) Hook
  *
+ * Canonical place for workflow learning extraction and task-output memory extraction.
  * Consolidates 5 hooks into a single process for better performance:
  * 1. agent-context-tracker.cjs - Agent mode tracking
- * 2. extract-workflow-learnings.cjs - Workflow learning extraction
- * 3. session-memory-extractor.cjs - Session memory extraction
- * 4. task-completion-guard.cjs - Task completion warning
- * 5. evolution-audit.cjs - Evolution auditing
+ * 2. Workflow learning + session/task-output memory extraction (canonical; archived hooks in .claude/archive/hooks/memory/)
+ * 3. task-completion-guard.cjs - Task completion warning
+ * 4. evolution-audit.cjs - Evolution auditing
  *
  * Event: PostToolUse
  * Matcher: Task

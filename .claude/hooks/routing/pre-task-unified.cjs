@@ -389,6 +389,35 @@ function getCooldownMs() {
 }
 
 // =============================================================================
+// CHECK 0: TaskList-first (TaskList() must be called before Task() in same session)
+// =============================================================================
+// TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: block)
+
+/**
+ * Enforce TaskList() before Task() in the same session (since last UserPromptSubmit).
+ * @param {string} toolName - Tool being used
+ * @returns {{ pass: boolean, result?: 'block'|'warn', message?: string }}
+ */
+function checkTaskListFirst(toolName) {
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+  const mode = (process.env.TASKLIST_FIRST_ENFORCEMENT || 'block').toLowerCase();
+  if (mode === 'off') {
+    return { pass: true };
+  }
+  if (routerState.isTaskListCalledSincePrompt()) {
+    return { pass: true };
+  }
+  const message =
+    'TaskList() must be called before Task(). Call TaskList() first, then spawn with Task().';
+  if (mode === 'warn') {
+    return { pass: true, result: 'warn', message };
+  }
+  return { pass: false, result: 'block', message };
+}
+
+// =============================================================================
 // CHECK 1: Agent Context Pre-Tracker (from agent-context-pre-tracker.cjs)
 // =============================================================================
 
@@ -675,6 +704,7 @@ function updateLoopStateAfterAllow(hookInput) {
  * Run all 4 checks in order.
  *
  * Order:
+ * 0. TaskList-first: TaskList() must be called before Task() in same session
  * 1. Agent Context Pre-Tracker (always passes, sets state)
  * 2. Routing Guard (planner-first, security review)
  * 3. Documentation Routing Guard
@@ -695,6 +725,19 @@ function runAllChecks(hookInput) {
   invalidateCachedState();
 
   const toolInput = getToolInput(hookInput);
+
+  // Check 0: TaskList-first (TASKLIST_FIRST_ENFORCEMENT=block|warn|off, default block)
+  const taskListFirstResult = checkTaskListFirst(toolName);
+  if (!taskListFirstResult.pass) {
+    return {
+      pass: false,
+      exitCode: taskListFirstResult.result === 'block' ? 2 : 0,
+      message: taskListFirstResult.message,
+    };
+  }
+  if (taskListFirstResult.result === 'warn') {
+    console.warn(taskListFirstResult.message);
+  }
 
   // Check 1: Agent Context Pre-Tracker (always passes, sets state)
   const _contextResult = checkAgentContextPreTracker(hookInput);
@@ -804,6 +847,7 @@ module.exports = {
   runAllChecks,
 
   // Individual check functions (for testing)
+  checkTaskListFirst,
   checkAgentContextPreTracker,
   checkRoutingGuard,
   checkDocumentationRouting,

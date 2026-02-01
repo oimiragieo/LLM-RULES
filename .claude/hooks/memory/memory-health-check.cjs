@@ -274,7 +274,29 @@ function main() {
 
   output.autoActions = autoActions;
 
-  // Phase 4: Save metrics to history (runs silently)
+  // Phase 4: Save metrics to history (resilient: try/catch, fallback JSONL)
+  output.metricsLogged = false;
+  const writeFallbackMetrics = errMsg => {
+    try {
+      const metricsDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'metrics');
+      if (!fs.existsSync(metricsDir)) {
+        fs.mkdirSync(metricsDir, { recursive: true });
+      }
+      const fallbackPath = path.join(metricsDir, 'fallback.jsonl');
+      const line =
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          event: 'health_check',
+          status: output.status,
+          warningsCount: (output.warnings && output.warnings.length) || 0,
+          ...(errMsg ? { metricsError: errMsg } : {}),
+        }) + '\n';
+      fs.appendFileSync(fallbackPath, line);
+    } catch (_e) {
+      // ignore fallback write failure
+    }
+  };
+
   if (memoryDashboard) {
     try {
       const metrics = memoryDashboard.collectMetrics(PROJECT_ROOT);
@@ -294,6 +316,7 @@ function main() {
         );
       }
     } catch (e) {
+      output.metricsError = e.message;
       console.error(
         JSON.stringify({
           hook: 'memory-health-check',
@@ -302,7 +325,11 @@ function main() {
           timestamp: new Date().toISOString(),
         })
       );
+      writeFallbackMetrics(e.message);
     }
+  } else {
+    output.metricsError = 'dashboard not loaded';
+    writeFallbackMetrics('dashboard not loaded');
   }
 
   // Format user-friendly message

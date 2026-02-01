@@ -11,6 +11,23 @@ This plan addresses every finding from the deep-dive audit with specific files, 
 
 ---
 
+## Audit integration (28-item comprehensive audit)
+
+A **Comprehensive Audit** (17 critical, 12 moderate, 8 minor issues) has been merged into a single fix plan with reviewer assessment and proposed solutions for each finding:
+
+- **Comprehensive plan:** [memory-and-core-comprehensive-audit-fix-plan-2026-02-01.md](memory-and-core-comprehensive-audit-fix-plan-2026-02-01.md)
+
+That document contains:
+
+- **Part A:** Every audit item (C1–C8, M9–M20, N21–N28) with **Review** and **Proposed Solution**
+- **Part B:** Priority order (P0/P1/P2) and implementation order
+- **Part C:** Mapping from audit items to this plan’s sections
+- **Part D:** Updated success criteria
+
+Use the comprehensive plan as the source of truth for the 28-item audit; this plan remains the detailed implementation guide for the original deep-dive findings (reflection spawn, weekly maintenance, SyncLayer, etc.), which the comprehensive plan references.
+
+---
+
 ## 1. Reflection spawn request – wire a consumer
 
 **Finding:** [reflection-queue-processor.cjs](.claude/hooks/reflection/reflection-queue-processor.cjs) writes `.claude/context/runtime/reflection-spawn-request.json` (see `getSpawnRequestFile()` at line 55–57 and `writeSpawnRequests()` at 187–221). No code reads this file to spawn the reflection-agent.

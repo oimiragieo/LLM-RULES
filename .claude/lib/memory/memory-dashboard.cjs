@@ -409,14 +409,15 @@ function getFileStatus(value, threshold) {
 // ============================================================================
 
 /**
- * Save metrics to daily file
+ * Save metrics to daily file.
+ * getMetricsDir() ensures the metrics directory exists before write.
  */
 function saveMetrics(metrics, projectRoot = PROJECT_ROOT) {
   const metricsDir = getMetricsDir(projectRoot);
   const today = new Date().toISOString().split('T')[0];
   const metricsPath = path.join(metricsDir, `${today}.json`);
 
-  fs.writeFileSync(metricsPath, JSON.stringify(metrics, null, 2));
+  fs.writeFileSync(metricsPath, JSON.stringify(metrics, null, 2) + '\n');
   return metricsPath;
 }
 

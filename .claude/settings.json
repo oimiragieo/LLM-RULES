@@ -195,6 +195,15 @@
         ]
       },
       {
+        "matcher": "TaskList",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/task-list-tracker.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "Edit|Write|NotebookEdit",
         "hooks": [
           {

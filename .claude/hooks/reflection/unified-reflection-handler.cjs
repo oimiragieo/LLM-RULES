@@ -8,7 +8,7 @@
  * - task-completion-reflection.cjs (PostToolUse:TaskUpdate)
  * - error-recovery-reflection.cjs (PostToolUse:Bash)
  * - session-end-reflection.cjs (SessionEnd)
- * - session-memory-extractor.cjs (PostToolUse:Task)
+ * - Session memory extraction (canonical)
  * - session-end-recorder.cjs (SessionEnd)
  * - task-update-tracker.cjs (PostToolUse:TaskUpdate) [NEW in PERF-003 #2]
  *
@@ -568,7 +568,7 @@ function handleMemoryExtraction(input) {
 }
 
 // ============================================================
-// MEMORY EXTRACTION HELPERS (from session-memory-extractor.cjs)
+// MEMORY EXTRACTION HELPERS (canonical session memory extraction)
 // ============================================================
 
 /**
