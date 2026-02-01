@@ -1,3 +1,0 @@
-# Learnings
-
-Test content

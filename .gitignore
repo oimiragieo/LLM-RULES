@@ -57,6 +57,12 @@
 .claude/context/rule-index-cache.json
 .claude/context/skill-summaries.json
 
+# Test run artifacts (unit/integration tests create timestamped dirs; avoid committing leftovers)
+.claude/context/test-contextual-memory-*/
+.claude/context/test-e2e-*/
+.claude/data/test-contextual-memory-*.db
+.claude/data/test-contextual-memory-integration-*.db
+
 # Context session files (runtime data)
 context/sessions/
 

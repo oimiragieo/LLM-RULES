@@ -97,6 +97,20 @@ The memory system automatically prunes old sessions to prevent unbounded growth:
 - **Pruning**: Automatic when saving new sessions
 - **Retention**: Most recent 50 sessions kept
 
+## Deleted Files and Folders
+
+**Directories:** The memory system **recreates missing directories on demand**. When code writes sessions, archives, ChromaDB data, or tier data (STM/MTM/LTM), it calls an `ensureDir()`-style helper that creates the directory (and parents) if they do not exist. So if you delete `.claude/context/memory/sessions/` or `.claude/context/memory/archive/`, the next write (e.g. `saveSession()`, archival, or ChromaDB init) will recreate the folder. No manual restore is required for directories.
+
+**Files:** The memory system **does not auto-recreate deleted files**. Files like `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, `patterns.json`, and `codebase_map.json` are created only when something writes to them (e.g. a hook, the memory-manager CLI, or an agent). If you delete `learnings.md`, reads will get "file not found" (or empty results) until some code writes to that path again. To restore a deleted memory file you can: (1) recreate it with minimal content (e.g. `# Learnings\n\n`) so reads succeed, or (2) rely on the next write from a hook/CLI/agent to recreate it.
+
+**Summary:**
+
+| What was deleted | Behavior |
+|------------------|----------|
+| `.claude/context/memory/` (entire dir) | Recreated when any memory write runs (e.g. SessionEnd, ChromaDB init, memory-manager CLI). |
+| `sessions/`, `archive/`, `stm/`, `mtm/`, `ltm/` | Recreated on next write to that tier (e.g. `saveSession()` → `sessions/`). |
+| `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, etc. | **Not** auto-recreated. Created only when something writes to that file. |
+
 ## Memory Manager CLI
 
 The `memory-manager.cjs` script provides CLI access to the memory system.
