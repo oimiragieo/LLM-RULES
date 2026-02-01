@@ -31,6 +31,7 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const path = require('path');
 const fs = require('fs').promises;
+const { validatePathWithinProject } = require('../../lib/utils/project-root.cjs');
 
 // Code file extensions that should be indexed
 const INDEXABLE_EXTENSIONS = new Set([
@@ -153,6 +154,28 @@ async function removeLock() {
 async function triggerIndexUpdate(filePath) {
   if (isDisabled()) {
     return;
+  }
+
+  // Best-effort: refresh codebase_map.json so it doesn't go stale.
+  // Only record safe, in-project paths (fail-open if anything is weird).
+  try {
+    const projectRoot = process.cwd();
+    const validation = validatePathWithinProject(filePath, projectRoot);
+    if (validation.safe) {
+      const abs = path.isAbsolute(filePath) ? filePath : path.join(projectRoot, filePath);
+      const rel = path.relative(projectRoot, abs).replace(/\\/g, '/');
+      if (!rel.startsWith('.claude/context/')) {
+        const memoryManager = require('../../lib/memory/memory-manager.cjs');
+        memoryManager.recordDiscovery(
+          rel,
+          'Auto-discovered (code-index-updater)',
+          'code-indexing',
+          projectRoot
+        );
+      }
+    }
+  } catch (_err) {
+    // best-effort only
   }
 
   // Quick check - if another process is indexing, skip (they'll handle it)

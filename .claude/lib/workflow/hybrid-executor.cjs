@@ -229,6 +229,50 @@ class HybridExecutor {
           : 0,
     };
   }
+
+  /**
+   * SPEC-019: Route task using config (routing_rules, default_system)
+   * @param {Object} task - Task to route
+   * @param {Object} config - { routing_rules, default_system, enabled }
+   * @returns {Promise<Object>} { system, reason }
+   */
+  async routeTask(task, config = {}) {
+    const enabled = config.enabled !== false;
+    if (!enabled) {
+      return {
+        system: config.default_system || this.router.defaultSystem,
+        reason: 'hybrid_disabled',
+      };
+    }
+    const decision = await this.router.route({
+      ...task,
+      path: task.path || task.taskId,
+    });
+    return {
+      system: decision.system,
+      reason: decision.reason || 'rule_match',
+      metadata: decision.metadata,
+    };
+  }
+
+  /**
+   * SPEC-019: Sync state for a task between systems (bi-directional, conflict resolution)
+   * @param {string} taskId - Task id
+   * @returns {Promise<Object|null>} Resolved state or null
+   */
+  async syncState(taskId) {
+    return this.reconcileState(taskId);
+  }
+
+  /**
+   * SPEC-019: Normalize result from source system to common format
+   * @param {Object} result - Raw result
+   * @param {string} sourceSystem - 'conductor-main' | 'agent-studio'
+   * @returns {Object} Normalized result
+   */
+  translateResult(result, sourceSystem) {
+    return this.normalizer.normalize(result, sourceSystem);
+  }
 }
 
 module.exports = { HybridExecutor };

@@ -86,13 +86,15 @@ const COMPLEXITY_DEFAULTS = {
   default: 'sonnet',
 };
 
+const yaml = require('js-yaml');
+
 // =============================================================================
 // CONFIG READING FUNCTIONS
 // =============================================================================
 
 /**
  * Load and parse config.yaml.
- * Uses simple YAML parsing for the agents section.
+ * Uses js-yaml for robust parsing.
  *
  * @param {string} projectRoot - Project root directory
  * @returns {Object|null} Parsed config object or null if not found
@@ -104,63 +106,7 @@ function loadConfig(projectRoot) {
       return null;
     }
     const content = fs.readFileSync(configPath, 'utf8');
-    return { content, path: configPath };
-  } catch (_e) {
-    return null;
-  }
-}
-
-/**
- * Parse agent configuration from config.yaml content.
- * Uses regex-based parsing to avoid external YAML dependencies in hook context.
- *
- * @param {string} content - Config file content
- * @param {string} agentType - Agent type to find
- * @returns {Object|null} Agent config object or null
- */
-function parseAgentFromConfig(content, agentType) {
-  try {
-    // Find agents section
-    const agentsMatch = content.match(/^agents:\s*\n((?:[ \t]+.*\n)+)/m);
-    if (!agentsMatch) {
-      return null;
-    }
-
-    const agentsSection = agentsMatch[1];
-
-    // Find the specific agent block
-    // Pattern: "  agentType:\n    key: value\n    key: value\n"
-    const agentPattern = new RegExp(`^[ \\t]*${agentType}:\\s*\\n((?:[ \\t]+[^\\n]+\\n)+)`, 'm');
-    const agentMatch = agentsSection.match(agentPattern);
-
-    if (!agentMatch) {
-      return null;
-    }
-
-    const agentBlock = agentMatch[1];
-
-    // Extract properties from the block
-    const result = {};
-
-    // Extract path
-    const pathMatch = agentBlock.match(/^\s*path:\s*(.+)$/m);
-    if (pathMatch) {
-      result.path = pathMatch[1].trim();
-    }
-
-    // Extract model
-    const modelMatch = agentBlock.match(/^\s*model:\s*(.+)$/m);
-    if (modelMatch) {
-      result.model = modelMatch[1].trim();
-    }
-
-    // Extract extended_thinking
-    const thinkingMatch = agentBlock.match(/^\s*extended_thinking:\s*(.+)$/m);
-    if (thinkingMatch) {
-      result.extended_thinking = thinkingMatch[1].trim() === 'true';
-    }
-
-    return Object.keys(result).length > 0 ? result : null;
+    return yaml.load(content);
   } catch (_e) {
     return null;
   }
@@ -175,16 +121,10 @@ function parseAgentFromConfig(content, agentType) {
  */
 function getModelFromConfig(agentType, projectRoot) {
   const config = loadConfig(projectRoot);
-  if (!config) {
+  if (!config || !config.agents || !config.agents[agentType]) {
     return null;
   }
-
-  const agentConfig = parseAgentFromConfig(config.content, agentType);
-  if (!agentConfig || !agentConfig.model) {
-    return null;
-  }
-
-  return agentConfig.model;
+  return config.agents[agentType].model || null;
 }
 
 /**
@@ -196,11 +136,10 @@ function getModelFromConfig(agentType, projectRoot) {
  */
 function getAgentConfig(agentType, projectRoot) {
   const config = loadConfig(projectRoot);
-  if (!config) {
+  if (!config || !config.agents || !config.agents[agentType]) {
     return null;
   }
-
-  return parseAgentFromConfig(config.content, agentType);
+  return config.agents[agentType];
 }
 
 // =============================================================================

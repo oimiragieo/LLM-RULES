@@ -1,3 +1,13 @@
+---
+name: ripgrep
+description: Enhanced code search with custom ripgrep binary supporting ES module extensions and advanced patterns.
+version: 1.0.0
+model: sonnet
+invoked_by: user
+user_invocable: true
+tools: [Read, Write, Edit]
+---
+
 # Ripgrep Skill
 
 <identity>

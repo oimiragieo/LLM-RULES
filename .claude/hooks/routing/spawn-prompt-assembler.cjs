@@ -236,7 +236,13 @@ async function main() {
         const query =
           (toolInput.description && String(toolInput.description).trim()) ||
           String(basePrompt).slice(0, 240);
-        const results = await memoryManager.searchMemory(query, { limit: 3, threshold: 0.75 });
+        // Hot-only by default: exclude cold-archived LTM summaries from the prompt path.
+        // (Cold remains searchable for explicit queries elsewhere.)
+        const results = await memoryManager.searchMemory(query, {
+          limit: 3,
+          threshold: 0.75,
+          filters: `metadata NOT LIKE '%"source":"ltm_archive"%'`,
+        });
         assembled = appendSemanticMatches(assembled, results);
       } catch (err) {
         debugLog('spawn-prompt-assembler', 'Semantic memory retrieval failed (ignored)', err);

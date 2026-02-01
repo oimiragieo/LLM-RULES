@@ -19,7 +19,27 @@ All memory files live in `.claude/context/memory/`:
 | `gotchas.json`      | Pitfalls to avoid             | JSON array                |
 | `patterns.json`     | Reusable solutions            | JSON array                |
 | `codebase_map.json` | File discoveries              | JSON object               |
-| `sessions/`         | Per-session JSON files        | JSON                      |
+| `stm/`              | Current session (STM)         | JSON                      |
+| `mtm/`              | Recent sessions (MTM)         | JSON                      |
+| `ltm/`              | Long-term summaries (LTM)     | JSON                      |
+| `sessions/`         | Legacy per-session files      | JSON                      |
+
+## Entity Index (SQLite)
+
+The hybrid memory system also maintains an entity/relationship index at `.claude/data/memory.db` (SQLite).
+It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/lib/memory/entity-query.cjs` (reads). Only high-value items (learnings, decisions, issues) are indexed; session transcripts (MTM) are not currently synchronized to SQLite.
+
+> **Ghost Memory**: The SQLite database is a **sync-only** implementation (using `node:sqlite`). It is considered "ghost memory" because it runs in the background to index content but is **not directly exposed** to agents via tools. Agents access this data only through the Contextual Memory API (injected into prompts) or the Memory Manager CLI.
+
+- SQLite driver: Node’s built-in `node:sqlite` (`DatabaseSync`) to avoid native addon installs.
+- Initialize schema: `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`).
+
+### Troubleshooting
+
+- **"Required table 'entities' not found"**:
+  - Run `npm run memory:init` to create the SQLite schema.
+- **"EntityExtractor not initialized"**:
+  - Check if `.claude/data/memory.db` exists and is readable.
 
 ## Hook Wiring (What Runs When)
 
@@ -30,6 +50,11 @@ The memory system is enforced/maintained via Claude Code hooks registered in `.c
   - `.claude/hooks/memory/memory-health-check.cjs` (full memory health check with tier monitoring + smart pruning + metrics)
 - `PostToolUse` (matcher `Edit|Write|NotebookEdit`)
   - `.claude/hooks/memory/format-memory.cjs` (formats/normalizes memory writes after edits/writes)
+  - `.claude/hooks/memory/sync-memory-index.cjs` (canonical sync path: syncs learnings/decisions/issues into the SQLite entity index).
+  - Note: `SyncLayer` and `BackgroundSyncWorker` libraries are **deprecated** and not wired.
+- `SessionEnd`
+  - `.claude/hooks/reflection/unified-reflection-handler.cjs` (records session into STM/MTM, best-effort embeddings + maintenance, queues reflection)
+  - `.claude/hooks/reflection/reflection-queue-processor.cjs` (writes `.claude/context/runtime/reflection-spawn-request.json` so reflection is actionable)
 
 ### Memory Reminder
 
@@ -71,19 +96,88 @@ The repo still contains `.claude/lib/utils/state-cache.cjs`, but `router-state.j
 - Execution limits are wired via a persistent wrapper hook: `.claude/hooks/monitoring/execution-limit-monitor-hook.cjs` (the original `execution-limit-monitor.cjs` module is in-memory and does not persist across hook processes).
 - Cost-based limits are not strictly enforceable from hook input (no reliable per-call cost), so cost is recorded/logged best-effort rather than enforced hard.
 
-## Session-Based Memory
+## Session Memory (STM/MTM/LTM)
 
-Sessions persist automatically via the SessionEnd hook. This is the primary memory storage mechanism.
+Sessions persist automatically via the `SessionEnd` hook. The canonical session storage is the tiered memory system (`.claude/lib/memory/memory-tiers.cjs`):
 
-### Session Files
+### STM (Current Session)
 
-**Location**: `.claude/context/memory/sessions/`
+**Location**: `.claude/context/memory/stm/session_current.json`
 
-Session files follow the naming pattern `session_NNN.json` where NNN is a zero-padded number (e.g., `session_001.json`, `session_002.json`).
+### MTM (Recent Sessions)
 
-**Auto-increment**: The memory manager automatically creates the next session number when saving.
+**Location**: `.claude/context/memory/mtm/session_YYYY-MM-DDTHH-MM-SS.json` (timestamp-based)
 
-**Structure**:
+MTM entries include `tier: "MTM"` and `consolidated_at` metadata.
+
+### LTM (Long-Term Summaries)
+
+**Location**: `.claude/context/memory/ltm/`
+
+## Retention and Cold Storage
+
+The memory system is designed to stay bounded:
+
+- **Hot memory (loaded into prompts)**: STM, MTM, and a bounded set of recent LTM summaries in `ltm/`.
+- **Cold memory (not loaded into prompts)**: archived LTM summaries in `cold/` (compressed). Cold is retained for forensics and remains searchable via LanceDB, but is not injected into spawn prompts.
+
+### LTM retention policy
+
+- LTM summaries are written by `memory-tiers.cjs` and can grow unbounded without retention.
+- Retention is enforced by the **weekly** maintenance task `archiveOldLTM` in `memory-scheduler.cjs`.
+
+### When does weekly maintenance run?
+
+- Weekly maintenance (including `archiveOldLTM`) runs only when **SessionEnd** fires (conversation session ends). It is triggered by `unified-reflection-handler.cjs` → `triggerMaintenance()` → `memory-scheduler.cjs` `runWeeklyMaintenance()`.
+- If you rarely end sessions (e.g. close IDE without ending the conversation), you should run maintenance manually: `pnpm run memory:weekly` (or `memory:daily`). To check last run: `pnpm run memory:status`.
+
+### Tunables
+
+- `MEMORY_LTM_MAX_SUMMARIES` (default: `50`): max number of `ltm/summary_*.json` files to keep hot.
+- `MEMORY_COLD_ENABLE` (default: `true`): if `false`, the scheduler deletes old LTM summaries without archiving.
+- `MEMORY_COLD_ARCHIVE_AFTER_DAYS` (optional): also archive/delete any LTM summaries older than N days.
+- `MEMORY_COLD_DIR` (default: `.claude/context/memory/cold`): cold archive directory (validated to be within the project root).
+
+### Cold archive format
+
+Cold archives are written as **one gzip’d JSONL per run** (no gzip append), e.g.:
+
+- `.claude/context/memory/cold/ltm-YYYY-MM-DD-<timestamp>.jsonl.gz`
+
+### Retention Configuration (Env Vars)
+
+The following environment variables control retention behavior (defined in `.claude/lib/memory/memory-retention-config.cjs`):
+
+| Variable                         | Default                       | Description                                                              |
+| :------------------------------- | :---------------------------- | :----------------------------------------------------------------------- |
+| `MEMORY_LTM_MAX_SUMMARIES`       | `50`                          | Max number of LTM summary files to keep in the hot `ltm/` directory.     |
+| `MEMORY_COLD_ENABLE`             | `true`                        | Enable moving old summaries to cold storage. If false, they are deleted. |
+| `MEMORY_COLD_ARCHIVE_AFTER_DAYS` | (unset)                       | Optional: Also archive summaries older than N days regardless of count.  |
+| `MEMORY_COLD_DIR`                | `.claude/context/memory/cold` | Custom location for cold storage archives.                               |
+
+### Search behavior (hot vs cold)
+
+- Spawn prompt semantic memory (`spawn-prompt-assembler.cjs`) is **hot-only by default** and excludes cold-archived summaries.
+- Explicit semantic search (`memoryManager.searchMemory`) can search across all documents unless a filter is supplied.
+
+### Legacy sessions/ (Deprecated)
+
+The legacy path `.claude/context/memory/sessions/` is retained for backward compatibility and may be used if `memory-tiers` is unavailable.
+The function `.claude/lib/memory/memory-manager.cjs#saveSession` is deprecated for session recording.
+
+### Memory Read Path (Split-Brain Fix)
+
+The `loadMemoryForContext()` and `loadMemoryForContextAsync()` functions in `memory-manager.cjs` now read sessions from the canonical tiered storage:
+
+1. **MTM First**: Reads from `.claude/context/memory/mtm/` (canonical session storage)
+2. **LTM Summaries**: Also loads last 2 LTM summaries from `.claude/context/memory/ltm/`
+3. **Legacy Fallback**: Falls back to `.claude/context/memory/sessions/` only if MTM is empty/unavailable
+
+Session entries include a `source` field (`'mtm'`, `'ltm'`, or `'legacy'`) for debugging.
+
+This ensures agents can recall session data written via `memory-tiers.cjs` (STM → MTM → LTM flow).
+
+**Legacy Structure Example**:
 
 ```json
 {
@@ -108,7 +202,9 @@ Session files follow the naming pattern `session_NNN.json` where NNN is a zero-p
 [
   {
     "text": "Always close DB connections in workers",
-    "timestamp": "2026-01-25T10:30:00.000Z"
+    "timestamp": "2026-01-25T10:30:00.000Z",
+    "accessCount": 5,
+    "lastAccessed": "2026-02-01T14:00:00.000Z"
   }
 ]
 ```
@@ -119,10 +215,18 @@ Session files follow the naming pattern `session_NNN.json` where NNN is a zero-p
 [
   {
     "text": "Use async/await for all API calls",
-    "timestamp": "2026-01-25T10:30:00.000Z"
+    "timestamp": "2026-01-25T10:30:00.000Z",
+    "accessCount": 3,
+    "lastAccessed": "2026-02-01T14:00:00.000Z"
   }
 ]
 ```
+
+**Access Tracking**: Gotchas and patterns now include `accessCount` and `lastAccessed` fields:
+
+- `accessCount`: Incremented each time the item is loaded via `loadMemoryForContext()`
+- `lastAccessed`: Updated to current timestamp on read
+- Writes are rate-limited per entry via `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS` (default: 5 minutes)
 
 **Codebase Map** (`.claude/context/memory/codebase_map.json`):
 
@@ -149,17 +253,17 @@ The memory system automatically prunes old sessions to prevent unbounded growth:
 
 ## Deleted Files and Folders
 
-**Directories:** The memory system **recreates missing directories on demand**. When code writes sessions, archives, ChromaDB data, or tier data (STM/MTM/LTM), it calls an `ensureDir()`-style helper that creates the directory (and parents) if they do not exist. So if you delete `.claude/context/memory/sessions/` or `.claude/context/memory/archive/`, the next write (e.g. `saveSession()`, archival, or ChromaDB init) will recreate the folder. No manual restore is required for directories.
+**Directories:** The memory system **recreates missing directories on demand**. When code writes sessions, archives, LanceDB data, or tier data (STM/MTM/LTM), it calls an `ensureDir()`-style helper that creates the directory (and parents) if they do not exist. So if you delete `.claude/context/memory/sessions/` or `.claude/context/memory/archive/`, the next write (e.g. `saveSession()`, archival, or LanceDB init) will recreate the folder. No manual restore is required for directories.
 
 **Files:** The memory system **does not auto-recreate deleted files**. Files like `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, `patterns.json`, and `codebase_map.json` are created only when something writes to them (e.g. a hook, the memory-manager CLI, or an agent). If you delete `learnings.md`, reads will get "file not found" (or empty results) until some code writes to that path again. To restore a deleted memory file you can: (1) recreate it with minimal content (e.g. `# Learnings\n\n`) so reads succeed, or (2) rely on the next write from a hook/CLI/agent to recreate it.
 
 **Summary:**
 
-| What was deleted                                                  | Behavior                                                                                   |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `.claude/context/memory/` (entire dir)                            | Recreated when any memory write runs (e.g. SessionEnd, ChromaDB init, memory-manager CLI). |
-| `sessions/`, `archive/`, `stm/`, `mtm/`, `ltm/`                   | Recreated on next write to that tier (e.g. `saveSession()` → `sessions/`).                 |
-| `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, etc. | **Not** auto-recreated. Created only when something writes to that file.                   |
+| What was deleted                                                  | Behavior                                                                                  |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `.claude/context/memory/` (entire dir)                            | Recreated when any memory write runs (e.g. SessionEnd, LanceDB init, memory-manager CLI). |
+| `sessions/`, `archive/`, `stm/`, `mtm/`, `ltm/`                   | Recreated on next write to that tier (e.g. `saveSession()` → `sessions/`).                |
+| `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, etc. | **Not** auto-recreated. Created only when something writes to that file.                  |
 
 ## Memory Manager CLI
 
@@ -287,7 +391,7 @@ Agents must operate under the assumption that their context can reset at any tim
 
 ## How Sessions Persist
 
-The `unified-reflection-handler.cjs` hook automatically captures session insights:
+The `unified-reflection-handler.cjs` hook automatically captures session insights using the memory-tiers system (STM → MTM).
 
 **Location**: `.claude/hooks/reflection/unified-reflection-handler.cjs`
 
@@ -297,13 +401,17 @@ The `unified-reflection-handler.cjs` hook automatically captures session insight
 
 1. Gather session insights from the SessionEnd payload (if provided) or `active_context.md`
 2. Build session data structure
-3. Call `memory-manager.cjs` `saveSession()` function
-4. Auto-increment session number
-5. Save to `sessions/session_NNN.json`
-6. Extract patterns and gotchas to their respective JSON files
-7. Prune old sessions if count exceeds 50
+3. Write to STM (Short-Term Memory) via `memory-tiers.writeSTMEntry()`
+4. Consolidate STM → MTM via `memory-tiers.consolidateSession()`
+5. Extract patterns and gotchas to their respective JSON files
 
-**Note**: The deprecated `session-end-recorder.cjs` functionality was consolidated into `unified-reflection-handler.cjs` (PERF-003).
+**Note**: The legacy `memory-manager.saveSession()` function is deprecated for session recording. Sessions now use the memory-tiers system exclusively (STM → MTM → LTM). The legacy `sessions/` directory is no longer actively written to.
+
+**Memory Tiers**:
+
+- **STM** (Short-Term Memory): `.claude/context/memory/stm/` - Current session data
+- **MTM** (Mid-Term Memory): `.claude/context/memory/mtm/` - Recent sessions (canonical storage)
+- **LTM** (Long-Term Memory): `.claude/context/memory/ltm/` - Summarized older sessions
 
 **Session Data Structure**:
 
@@ -351,7 +459,7 @@ Memory context is automatically injected into agent spawn prompts via `prompt-as
 
 ## Keyword Search Fallback
 
-When semantic search (ChromaDB) is unavailable, `ContextualMemory` falls back to keyword search with performance optimizations:
+When semantic search (LanceDB) is unavailable, `ContextualMemory` falls back to keyword search with performance optimizations:
 
 **Tool Priority**:
 
@@ -722,26 +830,35 @@ console.log(memory.gotchas);
 const stats = memoryManager.getMemoryStats();
 console.log(`Total gotchas: ${stats.gotchas_count}`);
 
-// Save a session
-memoryManager.saveSession({
+// Session storage (canonical): memory-tiers STM → MTM
+const memoryTiers = require('./.claude/lib/memory/memory-tiers.cjs');
+const sessionData = {
+  session_id: 'session-123',
+  timestamp: new Date().toISOString(),
   summary: 'Fixed auth bug',
   tasks_completed: ['Fix login'],
   files_modified: ['src/auth.ts'],
-});
+};
+memoryTiers.writeSTMEntry(sessionData);
+memoryTiers.consolidateSession(sessionData.session_id);
 ```
 
 ### Custom Session Data
 
-The `saveSession` function accepts additional custom fields:
+The tiered session flow preserves additional custom fields:
 
 ```javascript
-memoryManager.saveSession({
+const memoryTiers = require('./.claude/lib/memory/memory-tiers.cjs');
+
+const sessionData = {
   summary: 'Implemented feature X',
   tasks_completed: ['Task 1', 'Task 2'],
   files_modified: ['file1.ts', 'file2.ts'],
   custom_metric: 42, // Custom field preserved
   team_notes: 'Reviewed by Alice', // Custom field preserved
-});
+};
+memoryTiers.writeSTMEntry(sessionData);
+memoryTiers.consolidateSession(sessionData.session_id || 'session-custom');
 ```
 
 ### Filtering Loaded Memory
@@ -766,7 +883,7 @@ const recentSessions = memory.recent_sessions.filter(s => {
 
 The memory system provides persistent context across AI agent sessions through:
 
-1. **Session-based JSON files** for structured memory storage
+1. **Tiered session JSON (STM/MTM/LTM)** for structured memory storage
 2. **Read-time truncation** for context efficiency
 3. **Automatic SessionEnd hook** for zero-overhead persistence
 4. **CLI and programmatic access** for flexible memory recording

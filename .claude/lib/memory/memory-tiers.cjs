@@ -19,6 +19,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { atomicWriteSync } = require('../utils/atomic-write.cjs');
 
 // BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
@@ -127,7 +128,7 @@ function writeSTMEntry(sessionData, projectRoot = PROJECT_ROOT) {
     updated_at: new Date().toISOString(),
   };
 
-  fs.writeFileSync(stmPath, JSON.stringify(entry, null, 2));
+  atomicWriteSync(stmPath, JSON.stringify(entry, null, 2));
   return { success: true, path: stmPath };
 }
 
@@ -257,7 +258,7 @@ function consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
   };
 
   // Write to MTM
-  fs.writeFileSync(mtmPath, JSON.stringify(mtmData, null, 2));
+  atomicWriteSync(mtmPath, JSON.stringify(mtmData, null, 2));
 
   // Clear STM
   clearSTM(projectRoot);
@@ -338,7 +339,7 @@ function promoteToLTM(sessionId, projectRoot = PROJECT_ROOT) {
   delete ltmData._filename;
 
   // Write to LTM
-  fs.writeFileSync(ltmPath, JSON.stringify(ltmData, null, 2));
+  atomicWriteSync(ltmPath, JSON.stringify(ltmData, null, 2));
 
   // Remove from MTM
   if (fs.existsSync(found.path)) {
@@ -454,7 +455,7 @@ function summarizeOldSessions(projectRoot = PROJECT_ROOT) {
   const summaryFilename = `summary_${timestamp}.json`;
   const summaryPath = path.join(ltmDir, summaryFilename);
 
-  fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2));
+  atomicWriteSync(summaryPath, JSON.stringify(summary, null, 2));
 
   // Remove summarized sessions from MTM
   for (const session of sessionsToSummarize) {

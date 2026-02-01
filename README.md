@@ -26,7 +26,15 @@ Notes:
 
 1. Copy `.claude/` into your target project.
 2. (Optional) Copy `.cursor/` if you also support Cursor IDE.
-3. Open the project in Claude Code and run a normal request; routing + hooks + workflows apply automatically.
+3. **Initialize memory system** (recommended):
+
+   ```bash
+   pnpm run memory:init
+   ```
+
+   This creates the SQLite schema for the hybrid memory system. If you see errors about missing tables, run this command.
+
+4. Open the project in Claude Code and run a normal request; routing + hooks + workflows apply automatically.
 
 **What happens automatically:**
 
@@ -41,6 +49,46 @@ If you also want the repo’s CLI validation utilities (recommended), install de
 pnpm install
 ```
 
+## Memory System Setup
+
+The memory system uses a **hybrid architecture** combining three storage layers:
+
+- **File-based storage**: Markdown files (`.claude/context/memory/`) for learnings, decisions, and issues
+- **SQLite entity graph**: Structured relationships (`.claude/data/memory.db`) for entity/relationship queries
+- **LanceDB vector search**: Semantic search (embedded, no server required) for similarity-based retrieval
+
+### Initialization
+
+After copying `.claude/` to your project, initialize the memory database:
+
+```bash
+pnpm run memory:init
+```
+
+This creates the SQLite schema at `.claude/data/memory.db`. If you see errors about missing tables, run this command.
+
+**Note**: The system uses Node's built-in `node:sqlite` (no native dependencies) and embedded LanceDB (no Docker/server required).
+
+### LanceDB Embeddings (Optional)
+
+For semantic search with LanceDB, the system uses local embeddings via `@xenova/transformers`. This uses `sharp` internally and requires `sharp`’s native binary to be built/available.
+
+If LanceDB logs that it “failed to load” the embedding model and falls back to a mock embedder, run:
+
+```bash
+pnpm rebuild sharp
+```
+
+Or do a fresh install:
+
+```bash
+pnpm install
+```
+
+**Note**: With `pnpm` v10+, dependency build scripts can be blocked by default. Ensure `pnpm-workspace.yaml` includes `sharp` under `onlyBuiltDependencies`, and if `pnpm` prompts for build approvals run `pnpm approve-builds` and explicitly approve `sharp` so the native binary is actually built.
+
+For detailed memory system documentation, see `.claude/docs/MEMORY_SYSTEM.md`.
+
 ## Environment Configuration
 
 All environment-specific settings are managed through the `.env` file. This file is **not committed to version control** (see `.gitignore`) to protect sensitive data.
@@ -54,6 +102,7 @@ All environment-specific settings are managed through the `.env` file. This file
    ```
 
 2. **Customize for your environment**:
+
    ```bash
    # Edit .env and adjust variables for your setup
    # (see .env.example for full documentation)

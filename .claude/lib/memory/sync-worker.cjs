@@ -20,15 +20,13 @@ const { SyncLayer } = require('./sync-layer.cjs');
  * @class BackgroundSyncWorker
  * @extends EventEmitter
  *
- * @example
- * const worker = new BackgroundSyncWorker({
- *   memoryDir: '.claude/context/memory',
- *   dbPath: '.claude/data/memory.db',
- *   intervalMs: 60000
- * });
  * await worker.start();
  * // ... worker runs in background ...
  * await worker.stop();
+ */
+/**
+ * @deprecated SyncLayer is deprecated; BackgroundSyncWorker is not used.
+ * See .claude/lib/memory/sync-layer.cjs and .claude/hooks/memory/sync-memory-index.cjs.
  */
 class BackgroundSyncWorker extends EventEmitter {
   /**

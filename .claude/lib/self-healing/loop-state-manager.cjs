@@ -228,11 +228,9 @@ function recordEvolution(type, stateFile = LOOP_STATE_FILE) {
   if (!type || typeof type !== 'string') return;
 
   const state = getState(stateFile);
-  state.evolutionCount =
-    typeof state.evolutionCount === 'number' ? state.evolutionCount + 1 : 1;
-  state.lastEvolutions = state.lastEvolutions && typeof state.lastEvolutions === 'object'
-    ? state.lastEvolutions
-    : {};
+  state.evolutionCount = typeof state.evolutionCount === 'number' ? state.evolutionCount + 1 : 1;
+  state.lastEvolutions =
+    state.lastEvolutions && typeof state.lastEvolutions === 'object' ? state.lastEvolutions : {};
   state.lastEvolutions[type] = new Date().toISOString();
   saveState(state, stateFile);
   recordAction(`evolution:${type}`, stateFile);

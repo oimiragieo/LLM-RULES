@@ -44,6 +44,18 @@ const { auditLog, debugLog } = require('../../lib/utils/hook-input.cjs');
 // Configuration
 let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue.jsonl');
 
+function getContextDir(queueFile = QUEUE_FILE) {
+  return path.dirname(queueFile);
+}
+
+function getRuntimeDir(queueFile = QUEUE_FILE) {
+  return path.join(getContextDir(queueFile), 'runtime');
+}
+
+function getSpawnRequestFile(queueFile = QUEUE_FILE) {
+  return path.join(getRuntimeDir(queueFile), 'reflection-spawn-request.json');
+}
+
 /**
  * Check if reflection is enabled
  * @returns {boolean} True if reflection should run
@@ -127,6 +139,86 @@ Task({
   description: "Reflection: ${reason}",
   prompt: \`${taskPrompt}\`
 })`;
+}
+
+/**
+ * Generate a machine-readable spawn request payload for a reflection entry.
+ *
+ * Claude Code's hook runner does not parse stderr to invoke `Task(...)`, so
+ * writing a request file is the handoff mechanism to make reflection actionable.
+ *
+ * @param {object} entry - Queue entry
+ * @returns {object} Spawn request payload
+ */
+function generateSpawnRequest(entry) {
+  const reason = buildReason(entry);
+  const taskPrompt = buildTaskPrompt(entry);
+  const id = `${entry.trigger}:${entry.timestamp}:${entry.taskId || entry.context || ''}`;
+
+  return {
+    id,
+    subagent_type: 'reflection-agent',
+    description: `Reflection: ${reason}`,
+    prompt: taskPrompt,
+    source: {
+      trigger: entry.trigger || 'unknown',
+      timestamp: entry.timestamp || null,
+      taskId: entry.taskId || null,
+      context: entry.context || null,
+      priority: entry.priority || 'medium',
+    },
+  };
+}
+
+function readExistingSpawnRequests(spawnRequestFile) {
+  try {
+    if (!fs.existsSync(spawnRequestFile)) {
+      return [];
+    }
+    const content = fs.readFileSync(spawnRequestFile, 'utf8');
+    if (!content.trim()) return [];
+    const parsed = JSON.parse(content);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    debugLog('reflection-queue-processor', 'Error reading existing spawn requests', err);
+    return [];
+  }
+}
+
+function writeSpawnRequests(newRequests, queueFile = QUEUE_FILE) {
+  if (!Array.isArray(newRequests) || newRequests.length === 0) {
+    return { written: 0 };
+  }
+
+  try {
+    const runtimeDir = getRuntimeDir(queueFile);
+    if (!fs.existsSync(runtimeDir)) {
+      fs.mkdirSync(runtimeDir, { recursive: true });
+    }
+
+    const spawnRequestFile = getSpawnRequestFile(queueFile);
+    const existing = readExistingSpawnRequests(spawnRequestFile);
+    const existingById = new Map(
+      existing
+        .filter(r => r && typeof r === 'object' && typeof r.id === 'string')
+        .map(r => [r.id, r])
+    );
+
+    for (const req of newRequests) {
+      if (!req || typeof req !== 'object' || typeof req.id !== 'string') continue;
+      if (!existingById.has(req.id)) {
+        existingById.set(req.id, req);
+      }
+    }
+
+    const merged = Array.from(existingById.values());
+    atomicWriteSync(spawnRequestFile, JSON.stringify(merged, null, 2));
+
+    return { written: newRequests.length, total: merged.length, file: spawnRequestFile };
+  } catch (err) {
+    debugLog('reflection-queue-processor', 'Error writing spawn request file', err);
+    return { written: 0 };
+  }
 }
 
 /**
@@ -251,6 +343,7 @@ function processQueue(queueFile = QUEUE_FILE) {
   const result = {
     processed: 0,
     instructions: [],
+    spawnRequests: [],
   };
 
   if (!isEnabled()) {
@@ -267,6 +360,7 @@ function processQueue(queueFile = QUEUE_FILE) {
   for (const entry of pending) {
     const instruction = generateSpawnInstruction(entry);
     result.instructions.push(instruction);
+    result.spawnRequests.push(generateSpawnRequest(entry));
     result.processed++;
   }
 
@@ -289,6 +383,10 @@ async function main() {
     // Process the queue
     const result = processQueue(QUEUE_FILE);
 
+    // Write a machine-readable spawn request file so a follow-up Router turn can
+    // actually call Task() for each request.
+    const writeResult = writeSpawnRequests(result.spawnRequests);
+
     // Output spawn instructions to stderr for visibility
     if (result.instructions.length > 0) {
       for (const instruction of result.instructions) {
@@ -298,7 +396,10 @@ async function main() {
 
       const mode = process.env.REFLECTION_HOOK_MODE || 'block';
       if (mode === 'warn') {
-        auditLog('reflection-queue-processor', 'processed', { count: result.processed });
+        auditLog('reflection-queue-processor', 'processed', {
+          count: result.processed,
+          spawnRequestsWritten: writeResult.written || 0,
+        });
       }
     }
 
@@ -322,9 +423,12 @@ module.exports = {
   readQueueEntries,
   getPendingEntries,
   generateSpawnInstruction,
+  generateSpawnRequest,
+  writeSpawnRequests,
   markEntriesProcessed,
   processQueue,
   main,
+  getSpawnRequestFile,
   get QUEUE_FILE() {
     return QUEUE_FILE;
   },

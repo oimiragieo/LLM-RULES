@@ -8,7 +8,7 @@ import { promisify } from 'node:util';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -24,8 +24,8 @@ describe('Memory Migration Tool (Integration)', () => {
   before(async () => {
     // Ensure test database exists (should be initialized by Task #25)
     try {
-      db = new Database(testDbPath);
-      db.pragma('foreign_keys = ON');
+      db = new DatabaseSync(testDbPath);
+      db.exec('PRAGMA foreign_keys = ON');
     } catch (_error) {
       throw new Error(
         `Database not found at ${testDbPath}. Run 'node .claude/tools/cli/init-memory-db.cjs' first.`

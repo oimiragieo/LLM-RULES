@@ -2,34 +2,35 @@
 
 This plan fixes the remaining gaps from the memory/observability audits and the loop-prevention design.
 
-**Important:** Parts of the system are already consolidated into unified hooks and *are wired today* via `.claude/settings.json`. This plan focuses on what is still broken or misleading (paths/docs), and what is missing for loop-prevention to actually work.
+**Important:** Parts of the system are already consolidated into unified hooks and _are wired today_ via `.claude/settings.json`. This plan focuses on what is still broken or misleading (paths/docs), and what is missing for loop-prevention to actually work.
 
 ---
 
 ## Current state (verified against `.claude/settings.json`)
 
-| Component | Wired? | Notes |
-|---|---:|---|
-| `.claude/hooks/memory/format-memory.cjs` | Yes | `PostToolUse` for `Edit|Write` |
-| `.claude/hooks/routing/user-prompt-unified.cjs` | Yes | `UserPromptSubmit`; includes “memory reminder” + “memory health check” logic inlined |
-| `.claude/hooks/memory/memory-health-check.cjs` | No | Standalone script exists, but not registered; has a **wrong dashboard path** (see Phase 2) |
-| `.claude/hooks/session/memory-reminder.cjs` | No | **Deprecated**; intentionally not registered (consolidated into `user-prompt-unified.cjs`) |
-| `.claude/hooks/monitoring/error-tracker.cjs` | No | Not registerable as-is: exports `preToolUse/postToolUse` but is not a hook “command” script |
-| `.claude/hooks/monitoring/metrics-collector.cjs` | No | Same: exports `preToolUse/postToolUse`, not a hook “command” script |
-| `.claude/hooks/monitoring/execution-limit-monitor.cjs` | No | Not a hook script; it’s a library used by tests/integration code |
-| `.claude/hooks/routing/pre-task-unified.cjs` | Yes | Runs on `PreToolUse` for `Task`; enforces loop limits by reading `loop-state.json` |
-| `.claude/hooks/self-healing/loop-prevention.cjs` | No | Standalone `PreToolUse(Task)` hook that **updates** loop state, but it is not registered |
+| Component                                              | Wired? | Notes                                                                                       |
+| ------------------------------------------------------ | -----: | ------------------------------------------------------------------------------------------- | ------ |
+| `.claude/hooks/memory/format-memory.cjs`               |    Yes | `PostToolUse` for `Edit                                                                     | Write` |
+| `.claude/hooks/routing/user-prompt-unified.cjs`        |    Yes | `UserPromptSubmit`; includes “memory reminder” + “memory health check” logic inlined        |
+| `.claude/hooks/memory/memory-health-check.cjs`         |     No | Standalone script exists, but not registered; has a **wrong dashboard path** (see Phase 2)  |
+| `.claude/hooks/session/memory-reminder.cjs`            |     No | **Deprecated**; intentionally not registered (consolidated into `user-prompt-unified.cjs`)  |
+| `.claude/hooks/monitoring/error-tracker.cjs`           |     No | Not registerable as-is: exports `preToolUse/postToolUse` but is not a hook “command” script |
+| `.claude/hooks/monitoring/metrics-collector.cjs`       |     No | Same: exports `preToolUse/postToolUse`, not a hook “command” script                         |
+| `.claude/hooks/monitoring/execution-limit-monitor.cjs` |     No | Not a hook script; it’s a library used by tests/integration code                            |
+| `.claude/hooks/routing/pre-task-unified.cjs`           |    Yes | Runs on `PreToolUse` for `Task`; enforces loop limits by reading `loop-state.json`          |
+| `.claude/hooks/self-healing/loop-prevention.cjs`       |     No | Standalone `PreToolUse(Task)` hook that **updates** loop state, but it is not registered    |
 
 ### The core bug: loop prevention reads state, but nothing updates it
 
-`pre-task-unified.cjs` enforces limits using `.claude/context/self-healing/loop-state.json`, but *no wired hook updates* `spawnDepth` / `evolutionCount`. The only code that mutates those counters is inside `.claude/hooks/self-healing/loop-prevention.cjs`, which is currently **not registered**, so the counters stay at 0 and the guard is ineffective.
+`pre-task-unified.cjs` enforces limits using `.claude/context/self-healing/loop-state.json`, but _no wired hook updates_ `spawnDepth` / `evolutionCount`. The only code that mutates those counters is inside `.claude/hooks/self-healing/loop-prevention.cjs`, which is currently **not registered**, so the counters stay at 0 and the guard is ineffective.
 
 ---
 
 ## Phase 1: Fix loop-prevention so it actually works (critical)
 
 **Goal:** Ensure `spawnDepth` and `evolutionCount` are updated as part of the existing wired Task hook flow:
-- `PreToolUse(Task)` should increment state *before* enforcement decisions (so nesting is measurable).
+
+- `PreToolUse(Task)` should increment state _before_ enforcement decisions (so nesting is measurable).
 - `PostToolUse(Task)` should decrement spawn depth on completion.
 
 ### Recommended approach (fits current wiring): move state updates into the unified routing hooks
@@ -55,13 +56,14 @@ This plan fixes the remaining gaps from the memory/observability audits and the 
 
 4. Keep or retire `.claude/hooks/self-healing/loop-prevention.cjs`:
    - Once the unified hooks update state, the standalone hook becomes redundant.
-   - Keep it as a reference/deprecated file, or repurpose it to *only* export pure helpers that delegate to the new manager.
+   - Keep it as a reference/deprecated file, or repurpose it to _only_ export pure helpers that delegate to the new manager.
 
 ### Alternative (less code, but more moving parts): register `loop-prevention.cjs`
 
 Add `.claude/hooks/self-healing/loop-prevention.cjs` to `.claude/settings.json` under `PreToolUse` matcher `Task` **before** `pre-task-unified.cjs`.
 
 This is only viable if you also:
+
 - decide which hook owns enforcement to avoid double-blocking, and
 - ensure spawn depth gets decremented (either by porting decrement logic into `post-task-unified.cjs`, or by adding a matching PostToolUse hook).
 
@@ -70,17 +72,21 @@ This is only viable if you also:
 ## Phase 2: Memory health check path correctness (bugfix)
 
 `memory-health-check.cjs` currently resolves the dashboard to:
+
 - `.claude/lib/memory-dashboard.cjs`
 
 …but the real file lives at:
+
 - `.claude/lib/memory/memory-dashboard.cjs`
 
 Fix `getMemoryDashboardPath()` in:
+
 - `.claude/hooks/memory/memory-health-check.cjs`
 
 ### Wiring decision (pick one, don’t double-run)
 
 Because `user-prompt-unified.cjs` already runs on `UserPromptSubmit` and includes a memory-health check section, decide:
+
 - **Option A (recommended):** Keep the inlined check only, and treat `memory-health-check.cjs` as a manual/diagnostic CLI script.
 - **Option B:** Wire `memory-health-check.cjs` in `.claude/settings.json` (e.g. `UserPromptSubmit`) and remove the inlined health-check from `user-prompt-unified.cjs` to avoid drift/duplication.
 
@@ -88,13 +94,14 @@ Because `user-prompt-unified.cjs` already runs on `UserPromptSubmit` and include
 
 ## Phase 3: Observability hooks (wiring requires wrappers or integration)
 
-The current monitoring “hooks” under `.claude/hooks/monitoring/` are *library-style modules* (they export functions) and do **not** implement the stdin/stdout hook command contract used by `.claude/settings.json`.
+The current monitoring “hooks” under `.claude/hooks/monitoring/` are _library-style modules_ (they export functions) and do **not** implement the stdin/stdout hook command contract used by `.claude/settings.json`.
 
 To make them run automatically, pick one approach:
 
 ### Option A: Add hook-command wrappers (recommended)
 
 Create small command-style hook scripts that:
+
 - parse hook input (`.claude/lib/utils/hook-input.cjs` utilities),
 - call the monitoring modules, and
 - write output to stdout.
@@ -104,6 +111,7 @@ Then register the wrappers in `.claude/settings.json` (e.g. `PostToolUse` matche
 ### Option B: Integrate observability into existing wired unified hooks
 
 Add metrics/error logging into:
+
 - `.claude/hooks/routing/pre-task-unified.cjs`
 - `.claude/hooks/routing/post-task-unified.cjs`
 - `.claude/hooks/reflection/unified-reflection-handler.cjs`
@@ -135,4 +143,3 @@ This avoids extra hook processes but increases complexity of the unified hooks.
   - `evolutionCount` increments only when appropriate
 - Run `node .claude/hooks/memory/memory-health-check.cjs` and confirm it loads `.claude/lib/memory/memory-dashboard.cjs` correctly.
 - Confirm docs match `.claude/settings.json` (no “wired” claims for unregistered hooks).
-

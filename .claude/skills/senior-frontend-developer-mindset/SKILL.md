@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash]
-globs: **/*.{svelte,js,ts,jsx,tsx,html,css}
+globs: '**/*.{svelte,js,ts,jsx,tsx,html,css}'
 best_practices:
   - Follow the guidelines consistently
   - Apply rules during code review

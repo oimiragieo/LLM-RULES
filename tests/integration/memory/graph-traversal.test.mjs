@@ -3,7 +3,7 @@
 
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { EntityQuery } from '../../../.claude/lib/memory/entity-query.cjs';
 import path from 'path';
 import fs from 'fs';
@@ -19,8 +19,8 @@ describe('EntityQuery Graph Traversal Integration Tests', () => {
   beforeEach(() => {
     // Create temporary database for integration tests
     testDbPath = path.join(__dirname, `test-graph-${Date.now()}.db`);
-    db = new Database(testDbPath);
-    db.pragma('foreign_keys = ON');
+    db = new DatabaseSync(testDbPath);
+    db.exec('PRAGMA foreign_keys = ON');
 
     // Create schema
     db.exec(`

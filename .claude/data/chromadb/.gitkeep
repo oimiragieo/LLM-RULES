@@ -1,5 +1,0 @@
-# ChromaDB Persist Directory
-
-This directory stores ChromaDB vector embeddings for the hybrid memory system.
-
-See: .claude/context/artifacts/specs/memory-system-enhancement-spec.md

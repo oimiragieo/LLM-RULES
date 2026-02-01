@@ -2,7 +2,7 @@
 name: research-synthesis
 description: Research best practices and synthesize into design decisions for artifact creation. Invoke BEFORE any creator skill to ensure research-backed decisions.
 version: 1.0.0
-model: claude-sonnet-4-5
+model: sonnet
 invoked_by: both
 user_invocable: true
 tools:

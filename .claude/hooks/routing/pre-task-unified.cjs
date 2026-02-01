@@ -407,7 +407,7 @@ function checkAgentContextPreTracker(hookInput) {
   routerState.enterAgentMode(taskDescription);
 
   if (process.env.ROUTER_DEBUG === 'true') {
-    console.log(`[pre-task-unified:context] Pre-set mode=agent for: ${taskDescription}`);
+    console.error(`[pre-task-unified:context] Pre-set mode=agent for: ${taskDescription}`);
   }
 
   // Always pass (tracking only)

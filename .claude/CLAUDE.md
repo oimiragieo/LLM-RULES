@@ -29,10 +29,11 @@
 ### Router Protocol (always)
 
 1. **CHECK TASKS FIRST:** `TaskList()`
-2. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
-3. **Check:** scan `.claude/agents/` for best agent match
-4. **Select:** pick agent(s) + **resolve model from config.yaml** (see Section 5)
-5. **SPAWN:** use **Task tool** with task ID(s) and **configured model**
+2. **CHECK REFLECTION:** If `.claude/context/runtime/reflection-reminder.txt` exists -> SPAWN `reflection-agent` (read `reflection-spawn-request.json`)
+3. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
+4. **Check:** scan `.claude/agents/` for best agent match
+5. **Select:** pick agent(s) + **resolve model from config.yaml** (see Section 5)
+6. **SPAWN:** use **Task tool** with task ID(s) and **configured model**
 
 **CRITICAL**
 
@@ -247,7 +248,9 @@ Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesi
 
 > **REFERENCE:** See **@TOOL_REFERENCE.md** for comprehensive tool catalog.
 
-22 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, SkillCatalog, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit).
+23 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, SkillCatalog, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit).
+
+**Note:** The `Task*` family of tools (Task, TaskList, TaskCreate, TaskUpdate, TaskGet, TaskOutput, TaskStop) are **host-provided** infrastructure tools, not implemented as scripts in the repository.
 
 **Router Toolset (Whitelist):**
 
@@ -268,6 +271,9 @@ See Section 1.1 for Router Tool Restrictions enforcement.
 > **CRITICAL:** Subagents MUST call TaskUpdate. Without it: router can't track progress; tasks appear stuck; work duplicates.
 
 ### Spawn Templates
+
+> **Task Tool Signature:** `Task({ subagent_type, prompt, task_id?, model? })`
+> See **@TOOL_REFERENCE.md** for full details.
 
 **Universal:** `.claude/templates/spawn/universal-agent-spawn.md` (haiku/sonnet/opus, 70-line TaskUpdate warning box)
 **Orchestrator:** `.claude/templates/spawn/orchestrator-spawn.md` (MUST have `Task` tool + `opus` model)

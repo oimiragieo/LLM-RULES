@@ -291,6 +291,8 @@ Error rate CRITICAL: 2.34% (234/10000 in 60s)
    pm2 restart agent-studio
    ```
 
+   **Phase 4 feature flags (rollback):** `WORKFLOW_PATTERNS_ENABLED=false` (SPEC-017), `WORKFLOW_COMPOSITION_ENABLED=false` (SPEC-018), `HYBRID_EXECUTION_ENABLED=false` (SPEC-019), set green percentage to 0 for versioning (SPEC-020), set new-implementation percentage to 0 for adapters (SPEC-021), `CACHE_CLEAR=true` or `LAZY_LOADING_ENABLED=false` (SPEC-022). See `.claude/context/plans/phase-4-risk-assessment.md` Section 4 for full rollback steps.
+
 4. **Notify stakeholders** (immediate)
    - Email: operations@company.com
    - Slack: #incidents
@@ -387,6 +389,26 @@ Concurrent workflows CRITICAL: 237 (threshold: 200)
 ---
 
 ## Monitoring Dashboard
+
+### Local Dashboard CLI (Repo)
+
+For environments without Grafana/Prometheus, use the built-in CLI:
+
+```bash
+# 24h summary (default)
+node .claude/tools/cli/monitoring-dashboard.cjs --summary
+
+# Live mode (refreshes)
+node .claude/tools/cli/monitoring-dashboard.cjs --live
+
+# Alerts only
+node .claude/tools/cli/monitoring-dashboard.cjs --alerts
+```
+
+Memory retention / cold storage signals:
+
+- Check `.claude/context/memory/maintenance-status.json` for `lastColdArchive`
+- Cold archives appear in `.claude/context/memory/cold/ltm-*.jsonl.gz`
 
 ### Key Metrics to Display
 

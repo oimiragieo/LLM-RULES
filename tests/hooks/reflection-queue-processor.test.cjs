@@ -15,7 +15,15 @@ const path = require('path');
 const os = require('os');
 
 // Test file path
-const PROCESSOR_PATH = path.join(__dirname, 'reflection-queue-processor.cjs');
+const PROCESSOR_PATH = path.join(
+  __dirname,
+  '..',
+  '..',
+  '.claude',
+  'hooks',
+  'reflection',
+  'reflection-queue-processor.cjs'
+);
 
 // Helper to create a temporary test directory
 function createTestDir() {
@@ -202,6 +210,52 @@ describe('reflection-queue-processor', () => {
 
       assert.ok(instruction.includes('[REFLECTION-TRIGGER]'));
       assert.ok(instruction.includes('error'));
+    });
+  });
+
+  describe('spawn request handoff file', () => {
+    it('should write reflection-spawn-request.json for pending entries', () => {
+      const entry1 = {
+        taskId: '1',
+        trigger: 'task_completion',
+        timestamp: '2026-01-26T10:00:00Z',
+        priority: 'high',
+      };
+
+      fs.writeFileSync(processor.QUEUE_FILE, JSON.stringify(entry1) + '\n');
+
+      const result = processor.processQueue(processor.QUEUE_FILE);
+      assert.strictEqual(result.processed, 1);
+      assert.strictEqual(result.spawnRequests.length, 1);
+
+      const writeResult = processor.writeSpawnRequests(result.spawnRequests, processor.QUEUE_FILE);
+      assert.strictEqual(writeResult.written, 1);
+
+      const spawnFile = processor.getSpawnRequestFile(processor.QUEUE_FILE);
+      assert.ok(fs.existsSync(spawnFile), 'Spawn request file should exist');
+
+      const requests = JSON.parse(fs.readFileSync(spawnFile, 'utf8'));
+      assert.strictEqual(requests.length, 1);
+      assert.strictEqual(requests[0].subagent_type, 'reflection-agent');
+      assert.ok(typeof requests[0].prompt === 'string' && requests[0].prompt.length > 0);
+    });
+
+    it('should merge requests by id (no duplicates)', () => {
+      const entry1 = {
+        taskId: '1',
+        trigger: 'task_completion',
+        timestamp: '2026-01-26T10:00:00Z',
+        priority: 'high',
+      };
+
+      fs.writeFileSync(processor.QUEUE_FILE, JSON.stringify(entry1) + '\n');
+      const result = processor.processQueue(processor.QUEUE_FILE);
+
+      const first = processor.writeSpawnRequests(result.spawnRequests, processor.QUEUE_FILE);
+      const second = processor.writeSpawnRequests(result.spawnRequests, processor.QUEUE_FILE);
+
+      assert.strictEqual(first.total, 1);
+      assert.strictEqual(second.total, 1);
     });
   });
 

@@ -116,13 +116,20 @@ A production-grade multi-agent orchestration framework built on Claude Code, pro
 
 ### Remaining Failures
 
-34 failing tests are unrelated to memory or ML:
+This summary previously referenced “34 failing tests” from older runs.
 
-- Timing-sensitive tests (network delays)
-- File system edge cases
-- External dependency mocks
+**Verification (2026-02-01):** locally, the following all pass:
 
-These are tracked for future iteration but do not block production.
+- `pnpm lint`
+- `pnpm test`
+- `pnpm run test:integration`
+
+Additionally:
+
+- `pnpm run test:framework` currently executes **0 tests**
+- `npx jest` currently finds **no tests**
+
+If CI runs a different command set or env, update this section to list the exact failing suite(s) and reproduce steps.
 
 ---
 
@@ -246,10 +253,10 @@ These are tracked for future iteration but do not block production.
 
 ### Known Issues
 
-| Issue                     | Status       | Workaround                   |
-| ------------------------- | ------------ | ---------------------------- |
-| 34 failing tests          | Non-blocking | Timing/filesystem edge cases |
-| Console.log in production | Low priority | Replace with winston/pino    |
+| Issue                      | Status       | Workaround                                           |
+| -------------------------- | ------------ | ---------------------------------------------------- |
+| Test failure drift in docs | Investigate  | Ensure CI command set is documented and reproducible |
+| Console.log in production  | Low priority | Replace with winston/pino                            |
 
 ---
 

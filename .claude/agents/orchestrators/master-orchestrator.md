@@ -7,7 +7,7 @@ temperature: 0.6
 context_strategy: lazy_load
 priority: highest
 extended_thinking: true
-tools: [Task, Read, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools: [Task, Read, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill, Orchestrator]
 # Note: Grep for code search, Glob for file discovery (replaces ambiguous "Search" tool)
 skills:
   - plan-generator
@@ -55,10 +55,8 @@ skills:
 ## Standard Flow
 
 1.  **User Request**: "Build X."
-2.  **Plan**: Task -> Planner.
-3.  **Approve**: Task -> Response Rater.
-4.  **Execute**: Task -> Architect -> Developer -> QA.
-5.  **Finish**: Publish artifacts.
+2.  **Orchestrate**: Call `Orchestrator({ task: "Build X" })`.
+3.  **Finish**: Publish artifacts.
 
 ## Skill Invocation Protocol (MANDATORY)
 

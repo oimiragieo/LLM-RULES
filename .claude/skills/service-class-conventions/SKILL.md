@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit]
-globs: **/src/main/java/com/example/services/*.java
+globs: '**/src/main/java/com/example/services/*.java'
 best_practices:
   - Follow the guidelines consistently
   - Apply rules during code review

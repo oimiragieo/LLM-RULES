@@ -1,12 +1,12 @@
 ---
 name: activities
-description: globs:
+description: Coding standards and best practices for Temporal activities.
 version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit]
-globs: alwaysApply: false
+globs: '**/*.go'
 best_practices:
   - Follow the guidelines consistently
   - Apply rules during code review

@@ -3,7 +3,7 @@
 
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
@@ -22,8 +22,8 @@ describe('EntityQuery', () => {
   beforeEach(() => {
     // Create in-memory database for testing
     testDbPath = ':memory:';
-    db = new Database(testDbPath);
-    db.pragma('foreign_keys = ON');
+    db = new DatabaseSync(testDbPath);
+    db.exec('PRAGMA foreign_keys = ON');
 
     // Create schema
     db.exec(`
@@ -101,6 +101,21 @@ describe('EntityQuery', () => {
   afterEach(() => {
     if (db) {
       db.close();
+    }
+  });
+
+  it('should throw a descriptive error when schema is missing', () => {
+    const emptyDb = new DatabaseSync(':memory:');
+    try {
+      assert.throws(
+        () => new EntityQuery(emptyDb),
+        err =>
+          String(err?.message || '').includes('Memory DB not initialized') &&
+          String(err?.message || '').includes('entities'),
+        'Should throw helpful schema initialization error'
+      );
+    } finally {
+      emptyDb.close();
     }
   });
 

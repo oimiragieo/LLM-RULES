@@ -1,12 +1,12 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-01T06:13:44.959Z",
+  "generatedAt": "2026-02-01T18:22:16.062Z",
   "metadata": {
     "totalTools": 29,
     "totalCoreTools": 20,
     "totalMcpTools": 9,
     "totalAgents": 16,
-    "lastValidated": "2026-02-01T06:13:44.960Z",
+    "lastValidated": "2026-02-01T18:22:16.062Z",
     "source": ".claude/CLAUDE.md sections 1.1-1.4"
   },
   "tools": {
@@ -165,6 +165,18 @@
           "agents": "all",
           "orchestrators": "all",
           "router": "no"
+        }
+      },
+      {
+        "name": "Orchestrator",
+        "category": "Orchestration",
+        "description": "Delegate complex tasks to specialized agents (Architect -> Developer -> QA)",
+        "status": "available",
+        "mandatory": false,
+        "availability": {
+          "agents": "no",
+          "orchestrators": "all",
+          "router": "yes"
         }
       },
       {
@@ -413,6 +425,7 @@
         "Bash",
         "Glob",
         "Grep",
+        "Orchestrator",
         "Task",
         "TaskUpdate",
         "TaskList",
@@ -631,6 +644,7 @@
           "Bash",
           "Glob",
           "Grep",
+          "Orchestrator",
           "Task",
           "TaskUpdate",
           "TaskList",

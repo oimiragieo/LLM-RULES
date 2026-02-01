@@ -27,6 +27,7 @@ These tools are built into Claude Code and work immediately:
 | **Glob**            | Search          | Pattern-based file discovery                | ✅ All agents                  |
 | **Grep**            | Search          | Content search in files                     | ✅ All agents                  |
 | **Task**            | Orchestration   | Spawn subagents                             | ✅ Router + Orchestrators ONLY |
+| **Orchestrator**    | Orchestration   | Delegate task to agent pipeline             | ✅ Orchestrators               |
 | **TaskCreate**      | Task Management | Create trackable tasks                      | ✅ All agents                  |
 | **TaskUpdate**      | Task Management | Update task status/metadata                 | ✅ All agents (MANDATORY)      |
 | **TaskList**        | Task Management | List all tasks                              | ✅ All agents                  |
@@ -43,7 +44,32 @@ These tools are built into Claude Code and work immediately:
 | **WebFetch**        | Research        | Fetch webpage content                       | ✅ All agents                  |
 | **NotebookEdit**    | Jupyter         | Edit notebook cells                         | ✅ All agents                  |
 
-**Total Core Tools:** 22
+**Total Core Tools:** 23
+
+### Task Tool Signature
+
+The `Task` tool is the primary mechanism for Router and Orchestrators to spawn subagents.
+
+**Signature:**
+`Task({ subagent_type: string, prompt: string, task_id?: string, model?: string })`
+
+**Parameters:**
+
+- `subagent_type`: The type of agent to spawn (e.g., 'planner', 'developer', 'qa').
+- `prompt`: The detailed instruction for the agent. MUST include task ID and context.
+- `task_id` (Optional): ID from `TaskCreate` or `TaskList`. Recommended for tracking.
+- `model` (Optional): Override the default model (see `@MODEL_SELECTION.md`).
+
+**Usage:**
+
+```javascript
+Task({
+  subagent_type: 'developer',
+  prompt: 'Task [DEV-01]: Implement auth middleware... (See context in ...)',
+  task_id: 'DEV-01',
+  model: 'claude-3-5-sonnet-20241022',
+});
+```
 
 ### MCP Tools (Require Server Configuration)
 
@@ -119,6 +145,7 @@ tools: [
     Glob,
     Grep,
     Task, # MANDATORY for spawning subagents
+    Orchestrator,
     TaskUpdate,
     TaskList,
     TaskCreate,

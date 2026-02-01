@@ -6,31 +6,28 @@ import assert from 'node:assert/strict';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
+import os from 'node:os';
 import { ContextualMemory } from '../../../.claude/lib/memory/contextual-memory.cjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const projectRoot = path.resolve(__dirname, '../../../');
+const _projectRoot = path.resolve(__dirname, '../../../');
 
 describe('ContextualMemory - Integration Tests', () => {
   let memory;
   let testDbPath;
   let testMemoryDir;
+  let tempRoot;
 
   beforeEach(async () => {
-    // Create unique test paths
-    const timestamp = Date.now();
-    testDbPath = path.join(
-      projectRoot,
-      `.claude/data/test-contextual-memory-integration-${timestamp}.db`
+    // Create unique test root (keep test artifacts out of the repo tree)
+    tempRoot = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'agent-studio-contextual-memory-integration-')
     );
-    testMemoryDir = path.join(
-      projectRoot,
-      `.claude/context/test-contextual-memory-integration-${timestamp}`
-    );
+    testDbPath = path.join(tempRoot, 'memory.db');
+    testMemoryDir = path.join(tempRoot, 'memory');
 
     // Ensure directories exist
-    fs.mkdirSync(path.dirname(testDbPath), { recursive: true });
     fs.mkdirSync(testMemoryDir, { recursive: true });
 
     // Create realistic memory files with content
@@ -73,7 +70,7 @@ Test-Driven Development requires writing failing tests FIRST before implementati
     fs.writeFileSync(path.join(testMemoryDir, 'issues.md'), '# Issues\n\nNo issues yet.\n');
 
     // Initialize database schema
-    const db = new Database(testDbPath);
+    const db = new DatabaseSync(testDbPath);
     db.exec(`
       CREATE TABLE IF NOT EXISTS entities (
         id TEXT PRIMARY KEY,
@@ -162,7 +159,7 @@ Test-Driven Development requires writing failing tests FIRST before implementati
     );
 
     // Enable foreign keys
-    db.pragma('foreign_keys = ON');
+    db.exec('PRAGMA foreign_keys = ON');
 
     // Add relationships
     db.prepare(
@@ -202,12 +199,10 @@ Test-Driven Development requires writing failing tests FIRST before implementati
     }
 
     // Cleanup
-    if (fs.existsSync(testDbPath)) {
-      fs.unlinkSync(testDbPath);
+    if (tempRoot && fs.existsSync(tempRoot)) {
+      fs.rmSync(tempRoot, { recursive: true, force: true });
     }
-    if (fs.existsSync(testMemoryDir)) {
-      fs.rmSync(testMemoryDir, { recursive: true, force: true });
-    }
+    tempRoot = null;
   });
 
   describe('End-to-End Scenarios', () => {

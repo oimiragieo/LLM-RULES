@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash]
-globs: **/*.{html,js,css}
+globs: '**/*.{html,js,css}'
 best_practices:
   - Follow the guidelines consistently
   - Apply rules during code review

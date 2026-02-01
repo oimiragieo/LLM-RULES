@@ -42,6 +42,11 @@
 !.claude/context/memory/ltm/.gitkeep
 .claude/context/memory/sessions/*
 !.claude/context/memory/sessions/.gitkeep
+# ML runtime state (models, policies, session logs)
+.claude/context/ml/*
+!.claude/context/ml/.gitkeep
+# Access tracking timestamp (runtime artifact)
+.claude/context/memory/.access-tracking-timestamp
 
 # Config data (version-controlled) - NEW PATTERNS
 !.claude/context/config/
@@ -62,6 +67,8 @@
 .claude/context/test-e2e-*/
 .claude/data/test-contextual-memory-*.db
 .claude/data/test-contextual-memory-integration-*.db
+.claude/data/test-e2e-*.db
+.claude/data/test-*.db
 
 # Context session files (runtime data)
 context/sessions/

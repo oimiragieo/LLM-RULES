@@ -82,6 +82,7 @@ git log --oneline -5 --since="24 hours ago"
 
 - [ ] Review past week's incident reports
 - [ ] Check for pending security updates
+- [ ] Verify memory retention ran (`.claude/context/memory/maintenance-status.json` has `lastColdArchive`)
 - [ ] Verify backup procedures
 
 **Wednesday:**

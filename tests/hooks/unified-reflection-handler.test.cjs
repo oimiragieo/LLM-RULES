@@ -476,7 +476,7 @@ describe('unified-reflection-handler.cjs', () => {
     const mtmDir = path.join(memoryDir, 'mtm');
     const activeContextPath = path.join(memoryDir, 'active_context.md');
 
-    function listSessionFilesSafe() {
+    function _listSessionFilesSafe() {
       if (!fs.existsSync(sessionsDir)) return [];
       return fs
         .readdirSync(sessionsDir)
@@ -576,14 +576,14 @@ describe('unified-reflection-handler.cjs', () => {
     });
 
     it('should create a session file when recordSession called', () => {
-      fs.mkdirSync(sessionsDir, { recursive: true });
+      // Note: recordSession now uses memory-tiers (STM → MTM) exclusively.
+      // Legacy sessions/ directory is no longer written to (duplicate storage removed).
       fs.mkdirSync(mtmDir, { recursive: true });
 
-      const beforeSessions = new Set(listSessionFilesSafe());
       const beforeMtm = new Set(listMtmFilesSafe());
 
       // Avoid triggering pruning/summarization in real memory dirs.
-      if (beforeSessions.size >= 50 || beforeMtm.size >= 10) {
+      if (beforeMtm.size >= 10) {
         console.log(
           '  [SKIP] recordSession persistence assertions (existing memory dirs near capacity)'
         );
@@ -605,23 +605,12 @@ describe('unified-reflection-handler.cjs', () => {
 
       hook.recordSession(sessionData);
 
-      const afterSessions = new Set(listSessionFilesSafe());
       const afterMtm = new Set(listMtmFilesSafe());
-
-      const newSessions = [...afterSessions].filter(f => !beforeSessions.has(f));
-      assert(newSessions.length >= 1, 'Expected new sessions/session_XXX.json file');
 
       const newMtm = [...afterMtm].filter(f => !beforeMtm.has(f));
       assert(newMtm.length >= 1, 'Expected new mtm/session_TIMESTAMP.json file');
 
       // Cleanup only files created by this test.
-      for (const f of newSessions) {
-        try {
-          fs.unlinkSync(path.join(sessionsDir, f));
-        } catch (_e) {
-          // ignore
-        }
-      }
       for (const f of newMtm) {
         try {
           fs.unlinkSync(path.join(mtmDir, f));
@@ -853,39 +842,34 @@ describe('unified-reflection-handler.cjs', () => {
       const memoryFileRel = '.claude/context/memory/test-embeddings.md';
       const memoryFileAbs = path.resolve(PROJECT_ROOT, memoryFileRel);
 
-      const chromaModulePath = path.resolve(PROJECT_ROOT, '.claude/lib/memory/chromadb-client.cjs');
+      const lancedbClientPath = path.resolve(PROJECT_ROOT, '.claude/lib/memory/lancedb-client.cjs');
       const embeddingsModulePath = path.resolve(
         PROJECT_ROOT,
         '.claude/tools/cli/generate-embeddings.cjs'
       );
 
-      const chromaKey = require.resolve(chromaModulePath);
+      const lancedbKey = require.resolve(lancedbClientPath);
       const embeddingsKey = require.resolve(embeddingsModulePath);
-      const originalChroma = require.cache[chromaKey];
+      const originalLancedb = require.cache[lancedbKey];
       const originalEmbeddings = require.cache[embeddingsKey];
 
-      const adds = [];
+      const upserts = [];
 
       try {
         fs.mkdirSync(path.dirname(memoryFileAbs), { recursive: true });
         fs.writeFileSync(memoryFileAbs, '## Section A\n\nHello\n\n## Section B\n\nWorld\n', 'utf8');
 
-        require.cache[chromaKey] = {
-          id: chromaKey,
-          filename: chromaKey,
+        require.cache[lancedbKey] = {
+          id: lancedbKey,
+          filename: lancedbKey,
           loaded: true,
           exports: {
             MemoryVectorStore: class MemoryVectorStoreStub {
-              async initialize() {}
               async isAvailable() {
                 return true;
               }
-              async getCollection() {
-                return {
-                  add: async payload => {
-                    adds.push(payload);
-                  },
-                };
+              async upsertDocuments(payload) {
+                upserts.push(payload);
               }
             },
           },
@@ -912,13 +896,13 @@ describe('unified-reflection-handler.cjs', () => {
 
         await hook.triggerEmbeddingGeneration({ files_modified: [memoryFileRel] });
 
-        assertEqual(adds.length, 1, 'Should add a single batch per file');
-        assertEqual(adds[0].ids.length, 2, 'Should add two chunks');
-        assertEqual(adds[0].metadatas[0].section, 'Section A');
-        assertEqual(adds[0].metadatas[1].section, 'Section B');
+        assertEqual(upserts.length, 1, 'Should upsert once per file');
+        assertEqual(upserts[0].length, 2, 'Should upsert two chunks');
+        assertEqual(upserts[0][0].metadata.section, 'Section A');
+        assertEqual(upserts[0][1].metadata.section, 'Section B');
       } finally {
-        if (originalChroma) require.cache[chromaKey] = originalChroma;
-        else delete require.cache[chromaKey];
+        if (originalLancedb) require.cache[lancedbKey] = originalLancedb;
+        else delete require.cache[lancedbKey];
         if (originalEmbeddings) require.cache[embeddingsKey] = originalEmbeddings;
         else delete require.cache[embeddingsKey];
 

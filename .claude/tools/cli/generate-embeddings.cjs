@@ -3,7 +3,7 @@
 /**
  * Embedding Generator CLI Tool
  *
- * Generates embeddings for existing memory files and stores them in ChromaDB.
+ * Generates embeddings for existing memory files and stores them in LanceDB.
  * Supports chunking by markdown sections and handles archived files.
  *
  * Usage:
@@ -20,7 +20,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { MemoryVectorStore } = require('../../lib/memory/chromadb-client.cjs');
+const { MemoryVectorStore } = require('../../lib/memory/lancedb-client.cjs');
 
 /**
  * Chunk markdown content by section headers (##)
@@ -163,22 +163,15 @@ async function processFile(filePath, options, vectorStore) {
     return chunks.length;
   }
 
-  // Get collection
-  const collection = await vectorStore.getCollection();
-
-  // Generate embeddings for each chunk
-  for (const chunk of chunks) {
+  // Generate embeddings for each chunk and upsert into LanceDB
+  const docs = chunks.map(chunk => {
     const metadata = extractMetadata(filePath, chunk.section, chunk.line);
     const documentId = `${metadata.filePath}-${chunk.line}`;
     const documentText = `${chunk.section}\n\n${chunk.content}`;
+    return { id: documentId, text: documentText, metadata };
+  });
 
-    // Add to collection (ChromaDB generates embeddings automatically with default embedding function)
-    await collection.add({
-      ids: [documentId],
-      documents: [documentText],
-      metadatas: [metadata],
-    });
-  }
+  await vectorStore.upsertDocuments(docs);
 
   console.log(`  Processed ${chunks.length} chunks from ${path.basename(filePath)}`);
   return chunks.length;
@@ -235,21 +228,20 @@ async function main() {
   }
 
   // Initialize vector store
-  console.log('Initializing ChromaDB...');
+  console.log('Initializing LanceDB...');
   const vectorStore = new MemoryVectorStore({
-    persistDirectory: path.join(PROJECT_ROOT, '.claude/data/chromadb'),
-    collectionName: 'agent-studio-memory',
+    persistDirectory: path.join(PROJECT_ROOT, '.claude/data/lancedb'),
+    collectionName: 'agent_memory',
   });
-  await vectorStore.initialize();
 
   // Check if available
   const available = await vectorStore.isAvailable();
   if (!available) {
-    console.error('ERROR: ChromaDB is not available');
+    console.error('ERROR: LanceDB is not available');
     process.exit(1);
   }
 
-  console.log('ChromaDB initialized successfully');
+  console.log('LanceDB initialized successfully');
   console.log('');
 
   // Process files

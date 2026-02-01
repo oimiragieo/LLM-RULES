@@ -40,4 +40,3 @@ test('PostToolUse Edit|Write|NotebookEdit includes memory/index hooks', () => {
   assert.ok(commands.includes('node .claude/hooks/safety/enforce-claude-md-update.cjs'));
   assert.ok(commands.includes('node .claude/hooks/routing/code-index-updater.cjs'));
 });
-

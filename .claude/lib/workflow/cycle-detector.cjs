@@ -3,7 +3,10 @@
  *
  * CycleDetector identifies circular dependencies in workflow includes and extends.
  * Uses DFS with visited tracking for O(V+E) complexity.
+ * Max depth 10 to prevent runaway recursion.
  */
+
+const MAX_DEPTH = 10;
 
 class CycleDetector {
   /**
@@ -11,47 +14,49 @@ class CycleDetector {
    * @param {Object} workflow - The workflow to check
    * @param {Map} registry - Map of all workflows by name
    * @param {Set} visited - Already validated workflows (optimization)
+   * @param {Object} options - { maxDepth: 10 }
    */
-  async detectCycles(workflow, registry, visited = new Set()) {
-    const stack = new Set(); // Current path
+  async detectCycles(workflow, registry, visited = new Set(), options = {}) {
+    const maxDepth = options.maxDepth ?? MAX_DEPTH;
+    const stack = new Set();
     const allVisited = new Set(visited);
 
-    await this._dfs(workflow.name, registry, stack, allVisited, []);
+    await this._dfs(workflow.name || workflow.id, registry, stack, allVisited, [], maxDepth);
   }
 
   /**
    * Depth-first search to detect cycles
    */
-  async _dfs(name, registry, stack, visited, path) {
-    // Check if workflow exists
+  async _dfs(name, registry, stack, visited, path, maxDepth) {
+    if (path.length >= maxDepth) {
+      throw new Error(
+        `Workflow composition depth exceeded ${maxDepth}: ${[...path, name].join(' -> ')}`
+      );
+    }
+
     if (!registry.has(name)) {
       throw new Error(`Workflow '${name}' not found in registry`);
     }
 
-    // Already visited and validated - no cycle
     if (visited.has(name)) {
       return;
     }
 
-    // Currently in path - cycle detected!
     if (stack.has(name)) {
       const cyclePath = [...path, name].join(' -> ');
       throw new Error(`Circular dependency detected: ${cyclePath}`);
     }
 
-    // Add to current path
     stack.add(name);
     path.push(name);
 
     const workflow = registry.get(name);
     const dependencies = this._extractDependencies(workflow);
 
-    // Visit each dependency
     for (const depName of dependencies) {
-      await this._dfs(depName, registry, stack, visited, [...path]);
+      await this._dfs(depName, registry, stack, visited, [...path], maxDepth);
     }
 
-    // Remove from path
     stack.delete(name);
     visited.add(name);
   }

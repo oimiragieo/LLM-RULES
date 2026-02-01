@@ -61,6 +61,12 @@ const CORE_TOOLS = [
   { name: 'Grep', category: 'Search', description: 'Content search in files', mandatory: false },
   { name: 'Task', category: 'Orchestration', description: 'Spawn subagents', mandatory: false },
   {
+    name: 'Orchestrator',
+    category: 'Orchestration',
+    description: 'Delegate task to agent pipeline',
+    mandatory: false,
+  },
+  {
     name: 'TaskCreate',
     category: 'Task Management',
     description: 'Create trackable tasks',
@@ -254,6 +260,7 @@ const TOOLSET_DEFINITIONS = {
       'Glob',
       'Grep',
       'Task',
+      'Orchestrator',
       'TaskUpdate',
       'TaskList',
       'TaskCreate',

@@ -1,3 +1,13 @@
+---
+name: code-semantic-search
+description: Semantic code search using Phase 1 vector embeddings and Phase 2 hybrid search.
+version: 1.0.0
+model: sonnet
+invoked_by: user
+user_invocable: true
+tools: [Read, Write, Edit]
+---
+
 # Code Semantic Search
 
 ## Overview

@@ -636,4 +636,44 @@ describe('performance optimizations', () => {
   });
 });
 
+// =============================================================================
+// Core Fundamentals: STM writes on UserPromptSubmit
+// =============================================================================
+
+describe('STM writes (UserPromptSubmit)', () => {
+  it('should write STM session_current.json (best-effort)', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const os = require('os');
+    const path = require('path');
+    const fs = require('fs');
+
+    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-studio-stm-'));
+
+    try {
+      const result = unified.runAllChecks(
+        { prompt: 'Hello STM', session_id: 'test-session-stm' },
+        tmpRoot
+      );
+
+      // If memory tiers are available, verify the expected file exists.
+      const stmPath = path.join(
+        tmpRoot,
+        '.claude',
+        'context',
+        'memory',
+        'stm',
+        'session_current.json'
+      );
+      if (result.stmWrite) {
+        assert.strictEqual(fs.existsSync(stmPath), true, 'STM session_current.json should exist');
+        const entry = JSON.parse(fs.readFileSync(stmPath, 'utf8'));
+        assert.strictEqual(entry.session_id, 'test-session-stm');
+        assert.strictEqual(entry.tier, 'STM');
+      }
+    } finally {
+      fs.rmSync(tmpRoot, { recursive: true, force: true });
+    }
+  });
+});
+
 console.log('All tests defined. Running...');

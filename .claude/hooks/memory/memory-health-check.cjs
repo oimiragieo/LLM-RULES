@@ -3,18 +3,19 @@
  * Memory Health Check Hook
  * ========================
  *
- * Triggers on SessionStart (or UserPromptSubmit) to check memory system health.
+ * Triggers on UserPromptSubmit to check memory system health.
  * Warns if:
  * - learnings.md > 35KB (recommend archival at 40KB)
  * - codebase_map.json > 400 entries (prune at 500)
- * - sessions directory getting large
+ * - sessions directory getting large (legacy)
  * - MTM approaching limit (8+ sessions)
  * - patterns.json or gotchas.json getting too large
  *
  * Also auto-archives and auto-prunes when thresholds are exceeded.
  *
- * Phase 2 Integration: Now monitors STM/MTM/LTM memory tiers
- * Phase 3 Integration: Now uses smart pruning with utility-based scoring
+ * Phase 2 Integration: Monitors STM/MTM/LTM memory tiers
+ * Phase 3 Integration: Smart pruning with utility-based scoring
+ * Phase 4 Integration: Metrics dashboard logging
  */
 
 'use strict';
@@ -112,14 +113,14 @@ function main() {
     }
   }
 
-  // Phase 4: Try to load memory dashboard for metrics logging
+  // Try to load memory dashboard for metrics logging
   const memoryDashboardPath = getMemoryDashboardPath();
   let memoryDashboard = null;
   if (fs.existsSync(memoryDashboardPath)) {
     try {
       memoryDashboard = require(memoryDashboardPath);
-    } catch (_e) {
-      // Memory dashboard not available - continue without
+    } catch (e) {
+      console.error(`[MemoryHealthCheck] Failed to load memory dashboard: ${e.message}`);
     }
   }
 
@@ -220,7 +221,6 @@ function main() {
           }
         }
       } catch (e) {
-        // CRITICAL-003 FIX: Log errors instead of silently swallowing
         console.error(
           JSON.stringify({
             hook: 'memory-health-check',
@@ -260,7 +260,6 @@ function main() {
           }
         }
       } catch (e) {
-        // CRITICAL-003 FIX: Log errors instead of silently swallowing
         console.error(
           JSON.stringify({
             hook: 'memory-health-check',
@@ -279,11 +278,22 @@ function main() {
   if (memoryDashboard) {
     try {
       const metrics = memoryDashboard.collectMetrics(PROJECT_ROOT);
-      memoryDashboard.saveMetrics(metrics, PROJECT_ROOT);
+      const metricsPath = memoryDashboard.saveMetrics(metrics, PROJECT_ROOT);
       memoryDashboard.cleanupOldMetrics(PROJECT_ROOT);
       output.metricsLogged = true;
+      output.metricsPath = metricsPath;
+
+      if (process.env.METRICS_DEBUG === 'true') {
+        console.error(
+          JSON.stringify({
+            hook: 'memory-health-check',
+            event: 'metrics_saved',
+            metricsPath,
+            timestamp: new Date().toISOString(),
+          })
+        );
+      }
     } catch (e) {
-      // CRITICAL-003 FIX: Log errors instead of silently swallowing
       console.error(
         JSON.stringify({
           hook: 'memory-health-check',
@@ -314,7 +324,7 @@ function main() {
     }
 
     // Phase 2: Show tier metrics
-    if (output.tiers) {
+    if (output.tiers && memoryTiers) {
       console.log('Memory Tiers:');
       console.log(`  - STM: ${output.tiers.stm.sessionCount} session(s)`);
       console.log(

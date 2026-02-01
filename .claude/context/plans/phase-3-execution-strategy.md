@@ -22,13 +22,14 @@ Phase 3 delivers 6 SPEC features (SPEC-011 through SPEC-016) for enterprise-scal
 
 ### Test Coverage Analysis
 
-| Test File                                | Lines | Tests | Maps to SPEC        | Status           |
-| ---------------------------------------- | ----- | ----- | ------------------- | ---------------- |
-| multi-feature-integration.test.cjs       | 721   | 80+   | SPEC-012            | Ready for TDD    |
-| performance-profiling.test.cjs           | 1081  | 70+   | SPEC-013            | Ready for TDD    |
-| ml-pattern-detection.test.cjs            | 137   | ~25   | SPEC-023 (Phase 5)  | Staged for later |
-| progressive-disclosure-adaptive.test.cjs | 1278  | 70+   | SPEC-009 (Complete) | Reference only   |
-| smart-revert-enhanced.test.cjs           | 407   | 20+   | SPEC-010 (Complete) | Reference only   |
+| Test File                                            | Lines | Tests | Maps to SPEC        | Status           |
+| ---------------------------------------------------- | ----- | ----- | ------------------- | ---------------- |
+| tests/integration/multi-feature-integration.test.cjs | ~43k  | 80+   | SPEC-012            | Implemented      |
+| tests/performance-profiling.test.cjs                 | ~37k  | 70+   | SPEC-013            | Implemented      |
+| tests/workflow-state-transactions.test.cjs           | ~53k  | 71    | SPEC-011            | Implemented      |
+| ml-pattern-detection.test.cjs                        | 137   | ~25   | SPEC-023 (Phase 5)  | Staged for later |
+| progressive-disclosure-adaptive.test.cjs             | 1278  | 70+   | SPEC-009 (Complete) | Reference only   |
+| smart-revert-enhanced.test.cjs                       | 407   | 20+   | SPEC-010 (Complete) | Reference only   |
 
 ### Gap Analysis
 
@@ -36,13 +37,15 @@ Phase 3 delivers 6 SPEC features (SPEC-011 through SPEC-016) for enterprise-scal
 
 - SPEC-012: Multi-Feature Integration Testing (multi-feature-integration.test.cjs)
 - SPEC-013: Performance Profiling Framework (performance-profiling.test.cjs)
+- SPEC-011: Workflow State Machine Enhancements (workflow-state-transactions.test.cjs)
+- SPEC-016: Monitoring Dashboard (tests/monitoring/dashboard-core.test.cjs)
+- SPEC-015: Conductor gap analyzer (tests/cli/conductor-gap-analyzer.test.cjs)
+- SPEC-014: Scale slice (tests/scale/track-analytics-scale.test.cjs)
 
-**SPECs WITHOUT test files (need test creation):**
+**Remaining Phase 3 gaps (as of 2026-02-01):**
 
-- SPEC-011: Workflow State Machine Enhancements
-- SPEC-014: Enterprise-Scale Testing Suite
-- SPEC-015: Conductor-Main Integration Readiness
-- SPEC-016: Observability & Monitoring Dashboard
+- SPEC-014: Expand scale scenarios beyond track analytics
+- SPEC-015: Add full migration tooling + conductor-main validation runbook
 
 ### Estimated Total Effort
 
@@ -60,7 +63,7 @@ Phase 3 delivers 6 SPEC features (SPEC-011 through SPEC-016) for enterprise-scal
 
 ### SPEC-011: Workflow State Machine Enhancements
 
-**Test File**: NOT IN STAGING (needs creation)
+**Test File**: `tests/workflow-state-transactions.test.cjs` (implemented)
 **Implementation Files**:
 
 - `.claude/lib/workflow/workflow-state-manager.cjs` (extend existing)
@@ -83,8 +86,8 @@ Total: ~50 tests needed
 
 ### SPEC-012: Multi-Feature Integration Testing
 
-**Test File**: `.claude/context/artifacts/phase-2-tests/multi-feature-integration.test.cjs`
-**Line Count**: 721 lines
+**Test File**: `tests/integration/multi-feature-integration.test.cjs`
+**Line Count**: ~43k lines
 **Test Categories**:
 
 1. Scenario Execution (15+ tests)
@@ -95,8 +98,8 @@ Total: ~50 tests needed
 
 **Implementation Files**:
 
-- `tests/integration/phase-3/` (new directory)
-- Test utilities and fixtures
+- `tests/integration/IntegrationTestFramework.cjs`
+- Test utilities and fixtures under `tests/integration/`
 
 **Key Implementation Points**:
 
@@ -112,8 +115,8 @@ Total: ~50 tests needed
 
 ### SPEC-013: Performance Profiling Framework
 
-**Test File**: `.claude/context/artifacts/phase-2-tests/performance-profiling.test.cjs`
-**Line Count**: 1081 lines
+**Test File**: `tests/performance-profiling.test.cjs`
+**Line Count**: ~37k lines
 **Test Categories**:
 
 1. PerformanceProfiler Instrumentation (15+ tests)
@@ -144,7 +147,7 @@ Total: ~50 tests needed
 
 ### SPEC-014: Enterprise-Scale Testing Suite
 
-**Test File**: NOT IN STAGING (needs creation)
+**Test File**: `tests/scale/track-analytics-scale.test.cjs` (initial slice implemented)
 **Implementation Files**:
 
 - `tests/scale/` (new directory)
@@ -171,10 +174,11 @@ Total: ~40 tests needed
 
 ### SPEC-015: Conductor-Main Integration Readiness
 
-**Test File**: NOT IN STAGING (needs creation)
+**Test File**: `tests/cli/conductor-gap-analyzer.test.cjs` (initial slice implemented)
 **Implementation Files**:
 
-- `.claude/tools/cli/conductor-migration-assess.cjs`
+- `.claude/lib/integration/conductor-gap-analyzer.cjs`
+- `.claude/tools/cli/conductor-gap-analyzer.cjs`
 - `.claude/tools/cli/conductor-state-migrate.cjs`
 - Migration documentation
 
@@ -195,7 +199,7 @@ Total: ~25 tests needed
 
 ### SPEC-016: Observability & Monitoring Dashboard
 
-**Test File**: NOT IN STAGING (needs creation)
+**Test File**: `tests/monitoring/dashboard-core.test.cjs` (implemented)
 **Implementation Files**:
 
 - `.claude/tools/cli/monitoring-dashboard.cjs`
@@ -437,15 +441,20 @@ Day 1-3: Final testing, documentation, reflection
 ### Overall Phase 3 Gates
 
 - [ ] All 6 SPECs implemented and tested
-- [ ] Total tests: 295+ passing
-- [ ] Memory usage <500MB at 10,000 tracks
-- [ ] No regression in Phase 0-2 features
+- [ ] Total tests: 295+ passing (note: historical target; current repo uses `node --test` suites)
+- [x] Memory usage <500MB at 10,000 tracks (verified via `tests/scale/track-analytics-scale.test.cjs`)
+- [x] No regression in Phase 0-2 features (verified via `pnpm test` + `pnpm run test:integration`)
 - [ ] CLAUDE.md updated with Phase 3 features
 - [ ] Learnings extracted to memory files
 
 ---
 
 ## Subtask Summary (for TaskCreate)
+
+**Status update (2026-02-01):**
+
+- SPEC-011/012/013/016 are implemented and tested in-repo.
+- SPEC-014 and SPEC-015 have initial slices implemented (scale smoke + conductor gap analyzer CLI); remaining work is expanding scenarios and adding full migration tooling/validation.
 
 | Task ID | Subject                                                | Blocked By | Effort |
 | ------- | ------------------------------------------------------ | ---------- | ------ |

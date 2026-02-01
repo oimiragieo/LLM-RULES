@@ -1,7 +1,7 @@
 // .claude/lib/memory/entity-query.cjs
 // Entity query API with graph traversal for hybrid memory system (Task #28 - P1-2.4)
 
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 
 /**
@@ -18,7 +18,7 @@ const path = require('path');
 class EntityQuery {
   /**
    * Create EntityQuery instance
-   * @param {Database|string} dbOrPath - Database instance or path to SQLite database
+   * @param {DatabaseSync|string} dbOrPath - Database instance or path to SQLite database
    */
   constructor(dbOrPath) {
     if (typeof dbOrPath === 'string') {
@@ -34,13 +34,37 @@ class EntityQuery {
         // Relative path - join with project root
         dbPath = path.join(projectRoot, dbOrPath);
       }
-      this.db = new Database(dbPath);
-      this.db.pragma('foreign_keys = ON');
+      this.db = new DatabaseSync(dbPath);
+      this.db.exec('PRAGMA foreign_keys = ON');
       this.ownDb = true; // Close on cleanup
     } else {
       // Use provided database instance
       this.db = dbOrPath;
       this.ownDb = false; // Don't close (caller manages)
+    }
+
+    // Validate schema early to avoid runtime crashes like "no such table: entities".
+    this.validateSchema();
+  }
+
+  /**
+   * Validate required SQLite tables exist.
+   *
+   * @throws {Error} If schema is missing
+   */
+  validateSchema() {
+    const requiredTables = ['entities', 'entity_relationships'];
+    const placeholders = requiredTables.map(() => '?').join(', ');
+    const rows = this.db
+      .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name IN (${placeholders})`)
+      .all(...requiredTables);
+    const found = new Set(rows.map(r => r.name));
+    const missing = requiredTables.filter(t => !found.has(t));
+
+    if (missing.length > 0) {
+      const hint =
+        'Memory DB not initialized. Run `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`).';
+      throw new Error(`${hint} Missing tables: ${missing.join(', ')}`);
     }
   }
 

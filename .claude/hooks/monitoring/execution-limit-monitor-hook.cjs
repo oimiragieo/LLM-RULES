@@ -29,12 +29,23 @@ const fs = require('fs');
 const path = require('path');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
-const { parseHookInputSync, getToolName, getToolInput, formatResult } = require('../../lib/utils/hook-input.cjs');
+const {
+  parseHookInputSync,
+  getToolName,
+  getToolInput,
+  formatResult,
+} = require('../../lib/utils/hook-input.cjs');
 
 // <project>/.claude/hooks/monitoring/execution-limit-monitor-hook.cjs -> <project>
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
-const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'execution-limits.json');
+const STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'execution-limits.json'
+);
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const EVENTS_FILE = path.join(METRICS_DIR, 'execution-limit-events.jsonl');
 
@@ -109,7 +120,9 @@ function acquireLock(filePath) {
 
   while (Date.now() - startTime < MAX_LOCK_WAIT_MS) {
     try {
-      fs.writeFileSync(lockFile, JSON.stringify({ pid: process.pid, time: Date.now() }), { flag: 'wx' });
+      fs.writeFileSync(lockFile, JSON.stringify({ pid: process.pid, time: Date.now() }), {
+        flag: 'wx',
+      });
       return true;
     } catch (e) {
       if (e.code === 'EEXIST') {
@@ -185,12 +198,16 @@ function normalizeLimits(raw) {
       ? Math.floor(raw.max_duration_ms)
       : null;
   const maxCostUsd =
-    typeof raw.max_cost_usd === 'number' && Number.isFinite(raw.max_cost_usd) && raw.max_cost_usd > 0
+    typeof raw.max_cost_usd === 'number' &&
+    Number.isFinite(raw.max_cost_usd) &&
+    raw.max_cost_usd > 0
       ? raw.max_cost_usd
       : null;
 
   const timeoutAction =
-    raw.timeout_action === 'warn' || raw.timeout_action === 'pause' || raw.timeout_action === 'terminate'
+    raw.timeout_action === 'warn' ||
+    raw.timeout_action === 'pause' ||
+    raw.timeout_action === 'terminate'
       ? raw.timeout_action
       : 'terminate';
 
@@ -284,8 +301,11 @@ function main() {
     session.warningsEmitted = session.warningsEmitted || {};
     session.exceeded = session.exceeded || {};
 
-    const { max_turns: maxTurns, max_duration_ms: maxDurationMs, timeout_action: timeoutAction } =
-      session.limits;
+    const {
+      max_turns: maxTurns,
+      max_duration_ms: maxDurationMs,
+      timeout_action: timeoutAction,
+    } = session.limits;
 
     // Warn at 80%
     if (maxTurns !== Infinity) {
@@ -364,4 +384,3 @@ If this is expected, increase Task({ execution_limits: { ... } }) for this sessi
 if (require.main === module) {
   main();
 }
-

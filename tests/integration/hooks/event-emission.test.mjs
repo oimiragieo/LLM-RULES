@@ -9,7 +9,7 @@
  *
  * Related Files:
  * - .claude/hooks/routing/routing-guard.cjs (routing validation)
- * - .claude/hooks/safety/unified-creator-guard.cjs (creator guard)
+ * - .claude/hooks/routing/unified-creator-guard.cjs (creator guard)
  * - .claude/lib/events/event-bus.cjs (EventBus singleton)
  * - .claude/lib/events/event-types.cjs (Event types)
  *

@@ -866,7 +866,195 @@ if (require.main === module) {
       });
     });
 
-    // Test Suite 7: Error Path Coverage (IMP-006)
+    // Test Suite 7: Access Tracking (lastAccessed/accessCount)
+    await describe('Access Tracking - Gotchas and Patterns', async function () {
+      await it('should initialize and update access tracking fields on loadMemoryForContext', function () {
+        setupTestDir();
+        const prevInterval = process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS;
+        process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS = '0';
+
+        try {
+          const gotchasFile = path.join(MEMORY_DIR, 'gotchas.json');
+          const patternsFile = path.join(MEMORY_DIR, 'patterns.json');
+
+          fs.writeFileSync(
+            gotchasFile,
+            JSON.stringify([{ text: 'gotcha 1', timestamp: '2026-02-01T00:00:00.000Z' }], null, 2)
+          );
+          fs.writeFileSync(
+            patternsFile,
+            JSON.stringify([{ text: 'pattern 1', timestamp: '2026-02-01T00:00:00.000Z' }], null, 2)
+          );
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
+          const {
+            loadMemoryForContext,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
+
+          const memory = loadMemoryForContext(TEST_PROJECT_ROOT);
+          assert.strictEqual(memory.gotchas.length, 1, 'Should load gotchas');
+          assert.strictEqual(memory.patterns.length, 1, 'Should load patterns');
+
+          const gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
+          const patterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
+
+          assert.strictEqual(gotchas[0].accessCount, 1, 'Gotcha accessCount should increment');
+          assert.strictEqual(typeof gotchas[0].lastAccessed, 'string', 'Gotcha lastAccessed set');
+
+          assert.strictEqual(patterns[0].accessCount, 1, 'Pattern accessCount should increment');
+          assert.strictEqual(typeof patterns[0].lastAccessed, 'string', 'Pattern lastAccessed set');
+        } finally {
+          if (typeof prevInterval === 'undefined') {
+            delete process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS;
+          } else {
+            process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS = prevInterval;
+          }
+          cleanupTestDir();
+        }
+      });
+
+      await it('should update access tracking fields on loadMemoryForContextAsync', async function () {
+        setupTestDir();
+        const prevInterval = process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS;
+        process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS = '0';
+
+        try {
+          const gotchasFile = path.join(MEMORY_DIR, 'gotchas.json');
+          fs.writeFileSync(
+            gotchasFile,
+            JSON.stringify(
+              [{ text: 'gotcha async', timestamp: '2026-02-01T00:00:00.000Z' }],
+              null,
+              2
+            )
+          );
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
+          const {
+            loadMemoryForContextAsync,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
+
+          const memory = await loadMemoryForContextAsync(TEST_PROJECT_ROOT);
+          assert.strictEqual(memory.gotchas.length, 1, 'Should load gotchas async');
+
+          const gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
+          assert.strictEqual(
+            gotchas[0].accessCount,
+            1,
+            'Async gotcha accessCount should increment'
+          );
+          assert.strictEqual(
+            typeof gotchas[0].lastAccessed,
+            'string',
+            'Async gotcha lastAccessed set'
+          );
+        } finally {
+          if (typeof prevInterval === 'undefined') {
+            delete process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS;
+          } else {
+            process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS = prevInterval;
+          }
+          cleanupTestDir();
+        }
+      });
+    });
+
+    await describe('Split-Brain Fix - MTM sessions loaded into recent_sessions', async function () {
+      await it('should load recent_sessions from MTM (memory-tiers) when present', function () {
+        setupTestDir();
+        try {
+          const mtmDir = path.join(MEMORY_DIR, 'mtm');
+          fs.mkdirSync(mtmDir, { recursive: true });
+
+          fs.writeFileSync(
+            path.join(mtmDir, 'session_2026-02-01T10-00-00.json'),
+            JSON.stringify(
+              {
+                tier: 'MTM',
+                session_id: 'mtm-1',
+                timestamp: '2026-02-01T10:00:00.000Z',
+                summary: 'MTM summary 1',
+                tasks_completed: ['A', 'B'],
+              },
+              null,
+              2
+            )
+          );
+          fs.writeFileSync(
+            path.join(mtmDir, 'session_2026-02-01T11-00-00.json'),
+            JSON.stringify(
+              {
+                tier: 'MTM',
+                session_id: 'mtm-2',
+                timestamp: '2026-02-01T11:00:00.000Z',
+                summary: 'MTM summary 2',
+                tasks_completed: ['C'],
+              },
+              null,
+              2
+            )
+          );
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
+          const {
+            loadMemoryForContext,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
+
+          const memory = loadMemoryForContext(TEST_PROJECT_ROOT);
+          assert.ok(memory.recent_sessions.length >= 2, 'Expected MTM sessions to be loaded');
+          assert.ok(
+            memory.recent_sessions.some(s => s.source === 'mtm' && s.summary === 'MTM summary 1'),
+            'Expected MTM summary 1 present'
+          );
+          assert.ok(
+            memory.recent_sessions.some(s => s.source === 'mtm' && s.summary === 'MTM summary 2'),
+            'Expected MTM summary 2 present'
+          );
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      await it('should fall back to legacy sessions/ when MTM is empty', function () {
+        setupTestDir();
+        try {
+          const sessionsDir = path.join(MEMORY_DIR, 'sessions');
+          fs.mkdirSync(sessionsDir, { recursive: true });
+
+          fs.writeFileSync(
+            path.join(sessionsDir, 'session_001.json'),
+            JSON.stringify(
+              {
+                session_number: 1,
+                timestamp: '2026-02-01T10:00:00.000Z',
+                summary: 'Legacy session summary',
+                tasks_completed: ['X'],
+              },
+              null,
+              2
+            )
+          );
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
+          const {
+            loadMemoryForContext,
+          } = require('../../../.claude/lib/memory/memory-manager.cjs');
+
+          const memory = loadMemoryForContext(TEST_PROJECT_ROOT);
+          assert.ok(memory.recent_sessions.length >= 1, 'Expected legacy session to be loaded');
+          assert.ok(
+            memory.recent_sessions.some(
+              s => s.source === 'legacy' && s.summary === 'Legacy session summary'
+            ),
+            'Expected legacy session summary present'
+          );
+        } finally {
+          cleanupTestDir();
+        }
+      });
+    });
+
+    // Test Suite 8: Error Path Coverage (IMP-006)
     await describe('Error Path Coverage - Corrupted JSON', async function () {
       await it('should handle corrupted gotchas.json gracefully', function () {
         setupTestDir();

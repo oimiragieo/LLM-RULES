@@ -1,8 +1,9 @@
 // tests/unit/memory/schema-creation.test.mjs
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,11 +19,13 @@ const MIGRATION_SCRIPT_URL = new URL(`file:///${MIGRATION_SCRIPT_PATH.replace(/\
 describe('SQLite Entity Schema Creation', () => {
   let db;
   let tempDbPath;
+  let tempDir;
 
   beforeEach(async () => {
     // Create temporary database for testing
-    tempDbPath = path.join(PROJECT_ROOT, `.claude/data/test-memory-${Date.now()}.db`);
-    db = new Database(tempDbPath);
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'agent-studio-schema-creation-'));
+    tempDbPath = path.join(tempDir, 'memory.db');
+    db = new DatabaseSync(tempDbPath);
   });
 
   afterEach(async () => {
@@ -30,10 +33,13 @@ describe('SQLite Entity Schema Creation', () => {
     if (db) {
       db.close();
     }
-    try {
-      await fs.unlink(tempDbPath);
-    } catch (_err) {
-      // Ignore if file doesn't exist
+    if (tempDir) {
+      try {
+        await fs.rm(tempDir, { recursive: true, force: true });
+      } catch (_err) {
+        // best-effort cleanup
+      }
+      tempDir = null;
     }
   });
 
@@ -281,7 +287,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
           ).run();
         },
-        { name: 'SqliteError' },
+        /UNIQUE constraint failed/i,
         'Should reject duplicate primary key'
       );
     });
@@ -308,7 +314,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
           ).run();
         },
-        { name: 'SqliteError' },
+        /CHECK constraint failed/i,
         'Should reject invalid entity type'
       );
     });
@@ -343,7 +349,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
           ).run();
         },
-        { name: 'SqliteError' },
+        /CHECK constraint failed/i,
         'Should reject invalid relationship type'
       );
     });
@@ -353,7 +359,7 @@ describe('SQLite Entity Schema Creation', () => {
       await initializeDatabase(db);
 
       // Enable foreign key constraints
-      db.pragma('foreign_keys = ON');
+      db.exec('PRAGMA foreign_keys = ON');
 
       // Create test entity
       db.prepare(
@@ -373,7 +379,7 @@ describe('SQLite Entity Schema Creation', () => {
         `
           ).run();
         },
-        { name: 'SqliteError' },
+        /FOREIGN KEY constraint failed/i,
         'Should reject relationship to non-existent entity'
       );
     });

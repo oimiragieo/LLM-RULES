@@ -142,6 +142,18 @@ class FanOutFanInExecutor {
       if (failurePolicy === 'continue') {
         return { successes, failures };
       }
+      if (failurePolicy === 'fail-at-end') {
+        // Wait for all, then throw if any failed
+        if (failures.length > 0) {
+          if (failures.length === 1) {
+            throw failures[0];
+          }
+          const errorMsg = failures.map((e, i) => `${i + 1}. ${e.message}`).join('; ');
+          throw new Error(errorMsg);
+        }
+        return successes;
+      }
+      // fail-fast (default): throw on first failure (handled in _executeWithConcurrency by collecting all)
       if (failures.length > 0) {
         if (failures.length === 1) {
           throw failures[0];

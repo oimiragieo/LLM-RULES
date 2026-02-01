@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit]
-globs: **/*.{svelte,js,ts}
+globs: '**/*.{svelte,js,ts}'
 best_practices:
   - Follow the guidelines consistently
   - Apply rules during code review

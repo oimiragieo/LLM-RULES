@@ -56,6 +56,14 @@ try {
   // Error summary extractor not available - graceful degradation
 }
 
+// Phase 5 ML: Optimization engine and feedback loop (advice-only unless ML_AUTOMATION_MODE=log|enforce)
+let mlIndex = null;
+try {
+  mlIndex = require('../../lib/ml/index.cjs');
+} catch (_e) {
+  // ML not available - graceful degradation
+}
+
 // Configuration
 let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue.jsonl');
 
@@ -692,6 +700,11 @@ function queueReflection(entry, queueFile = QUEUE_FILE) {
 
 /**
  * Record session to memory system
+ *
+ * ITEM-4 FIX: Session recording now uses memory-tiers exclusively (STM → MTM).
+ * The legacy memory-manager.saveSession() call has been removed to avoid
+ * duplicate session storage in both sessions/ and mtm/ directories.
+ *
  * @param {object} sessionData - Session data to record
  */
 function recordSession(sessionData) {
@@ -700,15 +713,6 @@ function recordSession(sessionData) {
   }
 
   try {
-    // Import memory manager
-    let memoryManager;
-    try {
-      memoryManager = require('../../lib/memory/memory-manager.cjs');
-    } catch (_e) {
-      const libPath = path.join(__dirname, '..', '..', 'lib', 'memory', 'memory-manager.cjs');
-      memoryManager = require(libPath);
-    }
-
     // Try to load memory-tiers (may not exist in older installations)
     let memoryTiers = null;
     try {
@@ -716,23 +720,37 @@ function recordSession(sessionData) {
         path.join(PROJECT_ROOT, '.claude', 'lib', 'memory', 'memory-tiers.cjs')
       );
     } catch (_e) {
-      // Memory tiers not available - continue with legacy behavior
+      // Memory tiers not available - fall back to legacy behavior
+      debugLog(
+        'unified-reflection',
+        'memory-tiers not available, falling back to legacy saveSession'
+      );
+      try {
+        const memoryManager = require('../../lib/memory/memory-manager.cjs');
+        memoryManager.saveSession(sessionData, PROJECT_ROOT);
+      } catch (legacyErr) {
+        debugLog('unified-reflection', 'Legacy saveSession also failed', legacyErr);
+      }
+      return;
     }
 
-    // Phase 2: Use memory tiers if available
-    if (memoryTiers) {
-      // Write to STM first
-      memoryTiers.writeSTMEntry(sessionData, PROJECT_ROOT);
+    // Use memory tiers (canonical path): STM → MTM
+    // Write to STM first
+    memoryTiers.writeSTMEntry(sessionData, PROJECT_ROOT);
 
-      // Consolidate STM -> MTM
-      memoryTiers.consolidateSession(sessionData.session_id, PROJECT_ROOT);
-    }
+    // Consolidate STM -> MTM
+    memoryTiers.consolidateSession(sessionData.session_id, PROJECT_ROOT);
 
-    // Also call legacy memory-manager.cjs saveSession for backward compatibility
-    memoryManager.saveSession(sessionData, PROJECT_ROOT);
+    // NOTE: We no longer call memory-manager.saveSession() here.
+    // This avoids duplicate session storage in both sessions/ and mtm/ directories.
+    // memory-manager.saveSession() is now deprecated for session recording.
+    // Use memory-tiers for sessions; memory-manager for gotchas, patterns, codebase_map, learnings.
 
     if (process.env.DEBUG_HOOKS) {
-      debugLog('unified-reflection', `Session recorded: ${sessionData.session_id}`);
+      debugLog(
+        'unified-reflection',
+        `Session recorded via memory-tiers: ${sessionData.session_id}`
+      );
     }
   } catch (err) {
     debugLog('unified-reflection', 'Error recording session', err);
@@ -742,8 +760,8 @@ function recordSession(sessionData) {
 /**
  * Best-effort: generate embeddings for modified memory markdown files.
  *
- * This is intentionally fire-and-forget (do not block SessionEnd).
- * It also fails silently if ChromaDB is unavailable.
+ * Note: This is awaited by the SessionEnd handler so the process doesn't exit early.
+ * It should still be treated as best-effort (failures must not block SessionEnd).
  *
  * @param {object} sessionData
  * @returns {Promise<void>}
@@ -776,57 +794,173 @@ async function triggerEmbeddingGeneration(sessionData) {
   }
 
   try {
-    const { MemoryVectorStore } = require('../../lib/memory/chromadb-client.cjs');
+    const { MemoryVectorStore } = require('../../lib/memory/lancedb-client.cjs');
     const embeddings = require('../../tools/cli/generate-embeddings.cjs');
 
     const vectorStore = new MemoryVectorStore({
-      persistDirectory: path.join(PROJECT_ROOT, '.claude', 'data', 'chromadb'),
-      collectionName: 'agent-studio-memory',
+      persistDirectory:
+        process.env.LANCEDB_URI || path.join(PROJECT_ROOT, '.claude', 'data', 'lancedb'),
+      collectionName: process.env.LANCEDB_TABLE || 'agent_memory',
     });
 
-    await vectorStore.initialize();
     const available = await vectorStore.isAvailable();
     if (!available) {
-      debugLog('unified-reflection', 'ChromaDB not available, skipping embedding generation');
+      debugLog('unified-reflection', 'LanceDB not available, skipping embedding generation');
       return;
     }
 
-    const collection = await vectorStore.getCollection();
-
+    // Process files
     for (const fullPath of memoryFiles) {
       try {
         const content = fs.readFileSync(fullPath, 'utf8');
         const chunks = embeddings.chunkByHeaders(content, fullPath);
         if (chunks.length === 0) continue;
 
-        const ids = [];
-        const documents = [];
-        const metadatas = [];
-
-        for (const chunk of chunks) {
+        const docs = chunks.map(chunk => {
           const metadata = embeddings.extractMetadata(fullPath, chunk.section, chunk.line);
-          const documentId = `${metadata.filePath}-${chunk.line}`;
-          const documentText = `${chunk.section}\n\n${chunk.content}`;
-          ids.push(documentId);
-          documents.push(documentText);
-          metadatas.push(metadata);
-        }
+          return {
+            id: `${metadata.filePath}-${chunk.line}`,
+            text: `${chunk.section}\n\n${chunk.content}`,
+            metadata,
+          };
+        });
 
-        await collection.add({ ids, documents, metadatas });
-        debugLog(
-          'unified-reflection',
-          `Generated embeddings for ${path.relative(PROJECT_ROOT, fullPath)} (${chunks.length} chunks)`
-        );
+        await vectorStore.upsertDocuments(docs);
       } catch (err) {
+        debugLog('unified-reflection', `Error processing file ${fullPath}`, err);
+      }
+    }
+
+    if (process.env.DEBUG_HOOKS) {
+      debugLog('unified-reflection', `Generated embeddings for ${memoryFiles.length} files`);
+    }
+  } catch (err) {
+    debugLog('unified-reflection', 'Error in embedding generation workflow', err);
+  }
+} // End triggerEmbeddingGeneration
+
+/**
+ * Best-effort: Phase 5 ML session-end. Ingests session into FeedbackLoop (training when
+ * ML_AUTOMATION_MODE=log|enforce) and logs optimization recommendations (advice-only).
+ * Does not apply config; ML remains advisory unless ML_AUTOMATION_MODE=enforce (future).
+ * @param {{ reflection: object, sessionData: object }} result - From handleSessionEnd
+ * @returns {void}
+ */
+function triggerMLSessionEnd(result) {
+  if (!mlIndex || !mlIndex.isMLEnabled()) return;
+
+  try {
+    const toSafeInt = (value, fallback = 0) => {
+      const n = Number(value);
+      return Number.isFinite(n) ? Math.trunc(n) : fallback;
+    };
+
+    const bucketize = (value, thresholds, labels) => {
+      const v = Math.max(0, toSafeInt(value, 0));
+      for (let i = 0; i < thresholds.length; i++) {
+        if (v < thresholds[i]) return labels[i];
+      }
+      return labels[labels.length - 1];
+    };
+
+    const stats = result.reflection?.stats || {};
+    const errorReview = result.reflection?.errorReview || {};
+    const sessionData = result.sessionData || {};
+
+    const tasksCompleted = Array.isArray(sessionData.tasks_completed)
+      ? sessionData.tasks_completed
+      : [];
+    const filesModified = Array.isArray(sessionData.files_modified)
+      ? sessionData.files_modified
+      : [];
+
+    // Use real signals we have today: reflection stats + sessionData lists.
+    // If duration/tokens/memory are available later from the host payload, they can flow through
+    // sessionData.* and will be picked up below.
+    const tasksCount = Math.max(tasksCompleted.length, toSafeInt(stats.tasksCompleted, 0), 0);
+    const historyLen = Math.min(Math.max(tasksCount, 1), 200);
+
+    const toolCalls = toSafeInt(stats.toolCalls, 0);
+    const toolCallsBucket = bucketize(toolCalls, [1, 10, 50], ['none', 'low', 'med', 'high']);
+
+    const filesModifiedCount = filesModified.length;
+    const filesModifiedBucket = bucketize(
+      filesModifiedCount,
+      [1, 5, 20],
+      ['none', 'low', 'med', 'high']
+    );
+
+    const history = Array.from({ length: historyLen }, () => {
+      const tools = ['Task', `toolCalls:${toolCallsBucket}`];
+      if (filesModifiedCount > 0) {
+        tools.push(`filesModified:${filesModifiedBucket}`);
+      }
+      return { agent: 'session', tools };
+    });
+
+    // Prefer real metrics if present. Otherwise, use consistent proxies:
+    // - tokenUsage: toolCalls * 500 (roughly correlates with "work done"; keeps scale stable)
+    const totalDuration =
+      toSafeInt(sessionData.totalDuration, null) ??
+      toSafeInt(sessionData.duration_ms, null) ??
+      toSafeInt(sessionData.durationMs, null) ??
+      0;
+    const tokenUsage =
+      toSafeInt(sessionData.tokenUsage, null) ??
+      toSafeInt(sessionData.token_usage, null) ??
+      (toolCalls > 0 ? toolCalls * 500 : 0);
+    const peakMemoryMB =
+      toSafeInt(sessionData.peakMemoryMB, null) ??
+      toSafeInt(sessionData.peak_memory_mb, null) ??
+      toSafeInt(sessionData.peakMemoryMb, null) ??
+      0;
+
+    // Minimal session shape for ML: { history, metrics, trace }
+    const sessionForML = {
+      history,
+      metrics: {
+        totalDuration,
+        errorCount: toSafeInt(stats.errors, 0),
+        tokenUsage,
+        peakMemoryMB,
+        criticalErrors: toSafeInt(errorReview.criticalIssues, 0),
+      },
+      trace: {
+        tasksCount,
+        filesModifiedCount,
+        toolCalls,
+      },
+    };
+
+    const mlContextDir = path.join(PROJECT_ROOT, '.claude', 'context', 'ml');
+    const persistence = {
+      modelPath: process.env.ML_MODEL_PATH || path.join(mlContextDir, 'pattern-model.json'),
+      policyPath:
+        process.env.ML_POLICY_PATH || path.join(mlContextDir, 'optimization-policies.json'),
+      statePath:
+        process.env.ML_FEEDBACK_STATE_PATH || path.join(mlContextDir, 'feedback-loop-state.json'),
+      sessionsPath: process.env.ML_SESSIONS_LOG_PATH || path.join(mlContextDir, 'sessions.jsonl'),
+    };
+
+    const feedback = mlIndex.getFeedbackLoop(persistence);
+    if (feedback) {
+      feedback.process(sessionForML);
+    }
+
+    const engine = feedback?.optimizationEngine || mlIndex.getOptimizationEngine(persistence);
+    if (engine && engine.isReady().ready) {
+      const recommendation = engine.optimize(sessionForML);
+      const mode = mlIndex.getMLAutomationMode();
+      if (recommendation && (mode === 'log' || mode === 'enforce')) {
         debugLog(
           'unified-reflection',
-          `Embedding generation failed for ${path.relative(PROJECT_ROOT, fullPath)}`,
-          err
+          'ML optimization recommendation (advice-only)',
+          recommendation
         );
       }
     }
   } catch (err) {
-    debugLog('unified-reflection', 'Error initializing embedding generation', err);
+    debugLog('unified-reflection', 'ML session-end failed', err);
   }
 }
 
@@ -979,6 +1113,7 @@ async function main() {
         await triggerEmbeddingGeneration(result.sessionData).catch(err => {
           debugLog('unified-reflection', 'Embedding generation failed', err);
         });
+        triggerMLSessionEnd(result);
         triggerMaintenance();
         break;
       }
@@ -1030,6 +1165,7 @@ module.exports = {
   queueReflection,
   recordSession,
   triggerEmbeddingGeneration,
+  triggerMLSessionEnd,
   triggerMaintenance,
   recordMemoryItems,
 

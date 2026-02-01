@@ -47,7 +47,13 @@
       "category": "general",
       "discovered_at": "2026-01-25T06:53:49.789Z",
       "last_accessed": "2026-01-25T06:53:49.789Z"
+    },
+    "tests/fixtures/code-indexing/hook-test/src/main.js": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-01T08:08:40.333Z",
+      "last_accessed": "2026-02-01T08:08:40.333Z"
     }
   },
-  "last_updated": "2026-01-25T21:28:10.879Z"
+  "last_updated": "2026-02-01T08:08:40.333Z"
 }

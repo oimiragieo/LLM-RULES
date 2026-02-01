@@ -37,6 +37,24 @@ PATTERN_LIBRARY_ENABLED=true
 
 ---
 
+## Training flow and automation
+
+**Where training happens:** The Pattern Detector is trained when `FeedbackLoop.process(session)` is called with enough sessions to reach the retrain threshold. That is wired at **SessionEnd** in `.claude/hooks/reflection/unified-reflection-handler.cjs`: on session end, the handler calls `getFeedbackLoop()?.process(sessionForML)`, which ingests the session and, when the ingest count reaches `retrainThreshold`, triggers retraining (if automation mode allows). Training can also be triggered manually by constructing a FeedbackLoop and calling `process()` repeatedly, or by calling `PatternDetector.train()` after ingesting data.
+
+**Persistence (required for hooks):** Hook invocations run in fresh Node processes, so ML training state is persisted under `.claude/context/ml/` by default (model, policies, retrain counter, and a bounded `sessions.jsonl` training window). Paths can be overridden via `ML_MODEL_PATH`, `ML_POLICY_PATH`, `ML_FEEDBACK_STATE_PATH`, and `ML_SESSIONS_LOG_PATH`.
+
+**OptimizationEngine readiness:** `OptimizationEngine.optimize(session)` is only useful when the Pattern Detector is trained. Call `engine.isReady()` before `optimize()`; it returns `{ ready: boolean, reason?: string }`. If not ready, `optimize()` returns `null`. Training happens as above (SessionEnd + FeedbackLoop), so after enough sessions with `ML_AUTOMATION_MODE=log` or `enforce`, the engine becomes ready.
+
+**ML_AUTOMATION_MODE (advice-only by default):** ML modules are advisory-only unless explicitly enabled.
+
+- **off (default):** Recommendations and metrics only; no auto-retrain, no applying config. FeedbackLoop ingests session data but does not run retrain when threshold is hit.
+- **log:** Same as off, plus retraining is allowed (FeedbackLoop retrains and persists when threshold is hit). Recommendations are logged (e.g. at SessionEnd) but not applied.
+- **enforce:** Retrain + (future) allow applying config. For now, same as log.
+
+Set `ML_AUTOMATION_MODE=log` or `ML_AUTOMATION_MODE=enforce` to enable retraining. Set `ML_DEBUG=true` for verbose ML logs (e.g. FeedbackLoop retraining messages).
+
+---
+
 ## Pattern Detection
 
 ### What Patterns Are Detected

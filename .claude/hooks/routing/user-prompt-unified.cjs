@@ -23,6 +23,13 @@ const path = require('path');
 // Import shared utilities
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { parseHookInputSync } = require('../../lib/utils/hook-input.cjs');
+
+let memoryTiers = null;
+try {
+  memoryTiers = require('../../lib/memory/memory-tiers.cjs');
+} catch (_e) {
+  memoryTiers = null;
+}
 const { getCachedState, invalidateCache } = require('../../lib/utils/state-cache.cjs');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 
@@ -860,12 +867,77 @@ function checkMemoryHealth(hookInput, projectRoot = PROJECT_ROOT) {
 function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
   const input = hookInput || {};
 
+  // Core Fundamentals: Write STM on every UserPromptSubmit (best-effort).
+  // This ensures `.claude/context/memory/stm/session_current.json` stays current during the session,
+  // not only at SessionEnd.
+  let stmWrite = null;
+  try {
+    if (memoryTiers?.writeSTMEntry) {
+      const sessionId =
+        input.session_id ||
+        input.sessionId ||
+        process.env.CLAUDE_SESSION_ID ||
+        `session-${Date.now()}`;
+      const summary = input.prompt || input.message || 'User prompt submitted';
+      stmWrite = memoryTiers.writeSTMEntry(
+        {
+          session_id: sessionId,
+          timestamp: new Date().toISOString(),
+          summary,
+        },
+        projectRoot
+      );
+    }
+  } catch (_e) {
+    // best-effort; ignore
+  }
+
+  // Reflection Spawn Check: If requests exist, remind Router to spawn reflection-agent.
+  try {
+    const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+    const spawnRequestPath = path.join(runtimeDir, 'reflection-spawn-request.json');
+    const reminderPath = path.join(runtimeDir, 'reflection-reminder.txt');
+
+    if (fs.existsSync(spawnRequestPath)) {
+      const raw = fs.readFileSync(spawnRequestPath, 'utf8');
+      const requests = (() => {
+        try {
+          const a = JSON.parse(raw);
+          return Array.isArray(a) ? a : [];
+        } catch {
+          return [];
+        }
+      })();
+
+      if (requests.length > 0) {
+        if (!fs.existsSync(runtimeDir)) {
+          fs.mkdirSync(runtimeDir, { recursive: true });
+        }
+        // Write reminder file
+        fs.writeFileSync(
+          reminderPath,
+          `You have ${requests.length} pending reflection spawn request(s). Read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent for each request (or the first batch). Then delete this file and clear/trim the spawn request file.\n`,
+          'utf8'
+        );
+      } else if (fs.existsSync(reminderPath)) {
+        // Clean up stale reminder if request file is empty or invalid
+        fs.unlinkSync(reminderPath);
+      }
+    } else if (fs.existsSync(reminderPath)) {
+      // Clean up stale reminder if request file is missing
+      fs.unlinkSync(reminderPath);
+    }
+  } catch (_e) {
+    // best-effort; ignore
+  }
+
   const result = {
     routerModeReset: checkRouterModeReset(input),
     routerEnforcement: checkRouterEnforcement(input),
     memoryReminder: checkMemoryReminder(input, projectRoot),
     evolutionTrigger: checkEvolutionTrigger(input),
     memoryHealth: checkMemoryHealth(input, projectRoot),
+    stmWrite,
     exitCode: 0, // Always allow (advisory)
   };
 

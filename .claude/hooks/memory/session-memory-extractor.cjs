@@ -126,6 +126,18 @@ function extractDiscoveries(output) {
  */
 async function main() {
   try {
+    // Deprecated hook: do nothing unless explicitly enabled.
+    // This prevents accidental re-wiring from causing double-counting or extra IO.
+    const enabled =
+      process.env.SESSION_MEMORY_EXTRACTOR_ENABLE === 'true' ||
+      process.env.SESSION_MEMORY_EXTRACTOR_ENABLE === '1';
+    if (!enabled) {
+      if (process.env.DEBUG_HOOKS) {
+        debugLog('session-memory-extractor', 'Deprecated hook skipped (not enabled)');
+      }
+      process.exit(0);
+    }
+
     // PERF-006: Use shared utility
     const hookInput = await parseHookInputAsync();
 

@@ -1,3 +1,13 @@
+---
+name: code-structural-search
+description: Use ast-grep for AST-based code pattern matching.
+version: 1.0.0
+model: sonnet
+invoked_by: user
+user_invocable: true
+tools: [Read, Write, Edit]
+---
+
 # Code Structural Search
 
 Use ast-grep for AST-based code pattern matching.

@@ -17,6 +17,8 @@ Before you begin, ensure you have:
 
 **Note**: Node.js and pnpm are only required if you want to run validation scripts or workflow gates. The core agent configuration works without them.
 
+**Optional (Semantic Memory Search)**: If you use embedded LanceDB vector search via `@xenova/transformers`, `pnpm install` may need to build `sharp` (native dependency). If embeddings fall back to a mock embedder, run `pnpm rebuild sharp` (or do a fresh `pnpm install`). With `pnpm` v10+, you may need to run `pnpm approve-builds` and explicitly approve `sharp` so the native binary is actually built.
+
 ## Quick Install
 
 ### Step 1: Copy Configuration

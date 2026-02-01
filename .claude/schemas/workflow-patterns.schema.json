@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-code.anthropic.com/schemas/workflow-patterns",
+  "title": "Workflow Patterns Schema",
+  "description": "Schema for SPEC-017 workflow patterns: fan-out, conditional, loop",
+  "type": "object",
+  "properties": {
+    "fanOut": {
+      "type": "object",
+      "description": "Fan-out/fan-in pattern options",
+      "properties": {
+        "parallelTasks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/taskDefinition" },
+          "description": "Tasks to execute in parallel"
+        },
+        "collectStrategy": {
+          "type": "string",
+          "enum": ["all", "any", "majority", "quorum"],
+          "default": "all",
+          "description": "How to collect results"
+        },
+        "quorumThreshold": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Required successes for quorum strategy"
+        },
+        "timeout": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Timeout in milliseconds per task"
+        },
+        "failurePolicy": {
+          "type": "string",
+          "enum": ["fail-fast", "continue", "fail-at-end"],
+          "default": "fail-fast",
+          "description": "Behavior when a task fails"
+        }
+      },
+      "additionalProperties": false
+    },
+    "conditional": {
+      "type": "object",
+      "description": "Conditional branching options",
+      "properties": {
+        "condition": {
+          "type": "string",
+          "description": "Expression to evaluate"
+        },
+        "then": { "$ref": "#/$defs/taskDefinition" },
+        "else": { "$ref": "#/$defs/taskDefinition" },
+        "evaluator": {
+          "type": "string",
+          "enum": ["javascript", "jsonpath", "simple"],
+          "default": "javascript"
+        }
+      },
+      "additionalProperties": false
+    },
+    "loop": {
+      "type": "object",
+      "description": "Loop pattern options",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["forEach", "doWhile", "retryUntil"],
+          "description": "Loop type"
+        },
+        "items": {
+          "description": "Collection or variable reference for forEach"
+        },
+        "condition": {
+          "type": "string",
+          "description": "Expression for doWhile/retryUntil"
+        },
+        "maxIterations": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10000,
+          "description": "Required cap for doWhile/retryUntil"
+        },
+        "body": { "$ref": "#/$defs/taskDefinition" }
+      },
+      "required": ["maxIterations"],
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "taskDefinition": {
+      "type": "object",
+      "description": "Reference to a task or inline task definition"
+    }
+  }
+}

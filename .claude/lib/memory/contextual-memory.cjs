@@ -5,46 +5,22 @@ const fsPromises = require('fs').promises;
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
-const { MemoryVectorStore } = require('./chromadb-client.cjs');
+const { MemoryVectorStore } = require('./lancedb-client.cjs');
 const { EntityQuery } = require('./entity-query.cjs');
 
 /**
  * ContextualMemory - Unified API for hybrid memory system
  *
  * Aggregates three memory sources with smart routing:
- * 1. ChromaDB - Semantic search (vector similarity)
+ * 1. LanceDB - Semantic search (vector similarity) - Replaces ChromaDB
  * 2. SQLite - Entity relationships (graph queries)
  * 3. File system - Raw content (backward compatibility)
  *
  * Smart routing decisions:
- * - search(query) → ChromaDB (semantic search)
+ * - search(query) → LanceDB (semantic search)
  * - findEntities(type) → SQLite (structured queries)
  * - getRelated(id) → SQLite (graph traversal)
  * - readFile(path) → File system (direct read)
- *
- * @class ContextualMemory
- *
- * @example
- * const memory = new ContextualMemory({
- *   memoryDir: '.claude/context/memory',
- *   dbPath: '.claude/data/memory.db',
- *   chromaConfig: {
- *     persistDirectory: '.claude/data/chromadb',
- *     collectionName: 'agent-studio-memory'
- *   }
- * });
- *
- * // Semantic search
- * const results = await memory.search('vector database patterns', { limit: 5 });
- *
- * // Entity queries
- * const concepts = await memory.findEntities('concept', { quality_score: 0.8 });
- *
- * // Graph traversal
- * const related = await memory.getRelated('task-123', { depth: 2 });
- *
- * // File access (backward compatible)
- * const content = await memory.readFile('learnings.md');
  */
 class ContextualMemory {
   /**
@@ -53,9 +29,9 @@ class ContextualMemory {
    * @param {Object} config - Configuration options
    * @param {string} config.memoryDir - Directory containing memory files (default: .claude/context/memory)
    * @param {string} config.dbPath - Path to SQLite database (default: .claude/data/memory.db)
-   * @param {Object} config.chromaConfig - ChromaDB configuration (optional)
-   * @param {string} config.chromaConfig.persistDirectory - ChromaDB persist directory
-   * @param {string} config.chromaConfig.collectionName - ChromaDB collection name
+   * @param {Object} config.lancedbConfig - LanceDB configuration (optional)
+   * @param {string} config.lancedbConfig.persistDirectory - LanceDB persist directory
+   * @param {string} config.lancedbConfig.collectionName - LanceDB table name
    */
   constructor(config = {}) {
     const projectRoot = path.resolve(__dirname, '../../../');
@@ -63,8 +39,8 @@ class ContextualMemory {
     this.config = {
       memoryDir: config.memoryDir || path.join(projectRoot, '.claude/context/memory'),
       dbPath: config.dbPath || path.join(projectRoot, '.claude/data/memory.db'),
-      chromaConfig: config.chromaConfig || {
-        persistDirectory: path.join(projectRoot, '.claude/data/chromadb'),
+      lancedbConfig: config.lancedbConfig || {
+        persistDirectory: path.join(projectRoot, '.claude/data/lancedb'),
         collectionName: 'agent-studio-memory',
       },
     };
@@ -75,7 +51,7 @@ class ContextualMemory {
   }
 
   /**
-   * Initialize ChromaDB vector store (lazy)
+   * Initialize LanceDB vector store (lazy)
    *
    * @private
    * @returns {Promise<MemoryVectorStore>}
@@ -86,11 +62,11 @@ class ContextualMemory {
     }
 
     if (!this.vectorStore) {
-      this.vectorStore = new MemoryVectorStore(this.config.chromaConfig);
+      this.vectorStore = new MemoryVectorStore(this.config.lancedbConfig);
       try {
         await this.vectorStore.initialize();
       } catch (error) {
-        console.warn('[ContextualMemory] ChromaDB initialization failed:', error.message);
+        console.warn('[ContextualMemory] LanceDB initialization failed:', error.message);
         this.vectorStore = null; // Mark as unavailable
       }
     }
@@ -119,45 +95,46 @@ class ContextualMemory {
   /**
    * Semantic search across all memory sources
    *
-   * Routes to ChromaDB for vector similarity search.
-   * Falls back to keyword search if ChromaDB unavailable.
+   * Routes to LanceDB for vector similarity search.
+   * Falls back to keyword search if LanceDB unavailable.
    *
    * @param {string} query - Natural language query
    * @param {Object} options - Search options
    * @param {number} [options.limit=5] - Maximum results
    * @param {number} [options.threshold=0.7] - Similarity threshold (0-1)
-   * @param {string} [options.tier='all'] - 'all' | 'semantic' | 'entity' | 'file'
    * @returns {Promise<Array>} Ranked results with sources
-   *
-   * @example
-   * const results = await memory.search('authentication patterns', {
-   *   limit: 10,
-   *   threshold: 0.8
-   * });
-   * // Returns: [{content, metadata, similarity, source: 'chromadb'}]
    */
   async search(query, options = {}) {
-    const { limit = 5, threshold = 0.7 } = options;
+    const { limit = 5, threshold = 0.7, filters } = options;
 
     try {
-      // Try ChromaDB semantic search
+      // Try LanceDB semantic search
       const vectorStore = await this._getVectorStore();
 
       if (!vectorStore) {
-        throw new Error('ChromaDB unavailable - falling back to keyword search');
+        throw new Error('LanceDB unavailable - falling back to keyword search');
+      }
+
+      if (vectorStore.isMockMode()) {
+        // In mock mode, semantic search returns random results.
+        // Fallback to keyword search to provide meaningful results.
+        return await this._keywordSearch(query, { limit });
       }
 
       const results = await vectorStore.search(query, {
         limit,
-        minScore: threshold,
+        filters,
       });
 
+      // Filter by threshold logic if needed (LanceDB returns similarity 0-1 from our client wrapper)
+      const validResults = results.filter(r => r.similarity >= threshold);
+
       // Format results with source metadata
-      return results.map(result => ({
+      return validResults.map(result => ({
         content: result.content,
         metadata: result.metadata,
         similarity: result.similarity,
-        source: 'chromadb',
+        source: 'lancedb',
       }));
     } catch {
       // Fallback: lightweight keyword search over key memory artifacts.
@@ -479,7 +456,7 @@ class ContextualMemory {
       this.entityQuery.close();
       this.entityQuery = null;
     }
-    // ChromaDB doesn't require explicit close
+    // Best-effort close (no-op in most embedded configurations)
     this.vectorStore = null;
   }
 }

@@ -1,7 +1,7 @@
 // .claude/lib/memory/entity-extractor.cjs
 // Entity extraction from markdown files for hybrid memory system
 
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 const fs = require('fs');
 const path = require('path');
 
@@ -27,8 +27,32 @@ class EntityExtractor {
     }
 
     // Open database connection
-    this.db = new Database(dbPath);
-    this.db.pragma('foreign_keys = ON');
+    this.db = new DatabaseSync(dbPath);
+    this.db.exec('PRAGMA foreign_keys = ON');
+
+    // Validate schema exists
+    try {
+      const tableCheck = this.db
+        .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='entities'")
+        .get();
+      if (!tableCheck) {
+        console.log('[EntityExtractor] Database not initialized. Auto-initializing...');
+        try {
+          const initScript = require('../../tools/cli/init-memory-db.cjs');
+          initScript.initializeDatabase(this.db);
+        } catch (initError) {
+          throw new Error(
+            `Auto-initialization failed: ${initError.message}. Run \`npm run memory:init\`.`
+          );
+        }
+      }
+    } catch (error) {
+      // Re-throw specific errors, wrap others
+      if (error.message.includes('memory:init')) throw error;
+      throw new Error(
+        `Database validation failed: ${error.message}. Try running \`npm run memory:init\`.`
+      );
+    }
   }
 
   /**

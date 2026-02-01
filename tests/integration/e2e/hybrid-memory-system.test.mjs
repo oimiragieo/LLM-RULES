@@ -14,36 +14,35 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { setTimeout } from 'timers/promises';
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
+import os from 'node:os';
 import { ContextualMemory } from '../../../.claude/lib/memory/contextual-memory.cjs';
 import { SyncLayer } from '../../../.claude/lib/memory/sync-layer.cjs';
 import { EntityExtractor } from '../../../.claude/lib/memory/entity-extractor.cjs';
 import EventBus from '../../../.claude/lib/events/event-bus.cjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const projectRoot = path.resolve(__dirname, '../../../');
+const _projectRoot = path.resolve(__dirname, '../../../');
 
 describe('Hybrid Memory System - End-to-End Integration', () => {
   let memory;
   let syncLayer;
   let testDbPath;
   let testMemoryDir;
+  let tempRoot;
   let eventListener;
   let capturedEvents;
 
   beforeEach(async () => {
-    // Create unique test paths
-    const timestamp = Date.now();
-    const testId = `e2e-${timestamp}`;
-    testDbPath = path.join(projectRoot, `.claude/data/test-${testId}.db`);
-    testMemoryDir = path.join(projectRoot, `.claude/context/test-${testId}`);
+    tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-studio-hybrid-e2e-'));
+    testDbPath = path.join(tempRoot, 'memory.db');
+    testMemoryDir = path.join(tempRoot, 'memory');
 
     // Ensure directories exist
-    fs.mkdirSync(path.dirname(testDbPath), { recursive: true });
     fs.mkdirSync(testMemoryDir, { recursive: true });
 
     // Initialize database schema
-    const db = new Database(testDbPath);
+    const db = new DatabaseSync(testDbPath);
     db.exec(`
       CREATE TABLE IF NOT EXISTS entities (
         id TEXT PRIMARY KEY,
@@ -80,7 +79,7 @@ describe('Hybrid Memory System - End-to-End Integration', () => {
       CREATE INDEX IF NOT EXISTS idx_relationships_from ON entity_relationships(from_entity_id);
       CREATE INDEX IF NOT EXISTS idx_relationships_to ON entity_relationships(to_entity_id);
     `);
-    db.pragma('foreign_keys = ON');
+    db.exec('PRAGMA foreign_keys = ON');
     db.close();
 
     // Create initial memory files
@@ -126,12 +125,20 @@ describe('Hybrid Memory System - End-to-End Integration', () => {
     EventBus.off(eventListener);
 
     // Cleanup test files
-    if (fs.existsSync(testDbPath)) {
-      fs.unlinkSync(testDbPath);
+    if (tempRoot && fs.existsSync(tempRoot)) {
+      // Best-effort cleanup (Windows file locking can be flaky with background watchers)
+      try {
+        fs.rmSync(tempRoot, { recursive: true, force: true });
+      } catch (_err) {
+        await setTimeout(50);
+        try {
+          fs.rmSync(tempRoot, { recursive: true, force: true });
+        } catch (_err2) {
+          // ignore
+        }
+      }
     }
-    if (fs.existsSync(testMemoryDir)) {
-      fs.rmSync(testMemoryDir, { recursive: true, force: true });
-    }
+    tempRoot = null;
   });
 
   describe('Scenario 1: Write → Extract → Search (Full Pipeline)', () => {
@@ -181,7 +188,7 @@ This enables finding connected concepts and dependencies.
 
       // 3. Insert test entities directly (bypassing extraction for now)
       // This ensures we have data to query
-      const db = new Database(testDbPath);
+      const db = new DatabaseSync(testDbPath);
       const insertStmt = db.prepare(`
         INSERT OR REPLACE INTO entities (id, type, name, description, source_file, quality_score)
         VALUES (?, ?, ?, ?, ?, ?)
@@ -256,7 +263,7 @@ This enables finding connected concepts and dependencies.
   describe('Scenario 2: Entity Relationships → Graph Traversal', () => {
     it('should traverse complex entity graphs', async () => {
       // Setup: Create a graph of entities with relationships
-      const db = new Database(testDbPath);
+      const db = new DatabaseSync(testDbPath);
 
       // Insert entities
       const entities = [
@@ -360,7 +367,7 @@ This enables finding connected concepts and dependencies.
 
     it('should prevent circular relationship cycles', async () => {
       // Setup: Try to create circular relationship
-      const db = new Database(testDbPath);
+      const db = new DatabaseSync(testDbPath);
 
       // Insert entities
       db.prepare(
@@ -498,7 +505,7 @@ Testing event emission during sync operations.
   describe('Scenario 4: ContextualMemory Unified API (All 4 Methods)', () => {
     it('should use all 4 ContextualMemory methods in workflow', async () => {
       // Setup: Populate database with test data
-      const db = new Database(testDbPath);
+      const db = new DatabaseSync(testDbPath);
 
       const insertEntity = db.prepare(`
         INSERT INTO entities (id, type, name, description, source_file, quality_score)
@@ -598,7 +605,7 @@ Testing event emission during sync operations.
   describe('Scenario 5: Error Handling and Resilience', () => {
     it('should handle database connection failures gracefully', async () => {
       // Close database
-      const db = new Database(testDbPath);
+      const db = new DatabaseSync(testDbPath);
       db.close();
 
       // Delete database file
@@ -611,23 +618,16 @@ Testing event emission during sync operations.
       });
 
       try {
-        // Entity queries should handle missing database gracefully
-        // EntityQuery will recreate the database schema on first access
-        await setTimeout(100); // Give time for lazy initialization
+        // Entity queries should fail fast with a clear initialization error (not hang/crash).
+        await setTimeout(50);
 
-        // The database will be recreated on first query, so this should not throw
-        // Instead, it will return empty results
-        const results = await newMemory.findEntities('pattern');
-        assert.ok(Array.isArray(results), 'Should return array (DB recreated automatically)');
-        // Results should be empty since we deleted the original DB
-        assert.strictEqual(results.length, 0, 'Should return empty array for fresh DB');
-      } catch (error) {
-        // If entity query throws, it should be a clear error (not hanging)
-        assert.ok(
-          error.message.includes('no such table') || error.message.includes('SQLITE_ERROR'),
-          `Expected SQLite error, got: ${error.message}`
+        await assert.rejects(
+          () => newMemory.findEntities('pattern'),
+          err =>
+            String(err?.message || '').includes('Memory DB not initialized') &&
+            String(err?.message || '').includes('memory:init'),
+          'Should throw a descriptive schema initialization error'
         );
-        // Test passes if error is handled gracefully
       } finally {
         newMemory.close();
       }
@@ -672,7 +672,7 @@ Testing event emission during sync operations.
 
     it('should handle concurrent entity modifications safely', async () => {
       // Setup: Insert initial entity
-      const db = new Database(testDbPath);
+      const db = new DatabaseSync(testDbPath);
       db.prepare(
         `
         INSERT INTO entities (id, type, name, description)
@@ -684,7 +684,7 @@ Testing event emission during sync operations.
       // Attempt concurrent updates (simulates race condition)
       const updates = Array.from({ length: 5 }, (_, i) =>
         (async () => {
-          const db = new Database(testDbPath);
+          const db = new DatabaseSync(testDbPath);
           try {
             db.prepare(
               `

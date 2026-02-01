@@ -11,11 +11,38 @@ This runbook provides step-by-step procedures for memory management in productio
 
 ## Pre-Deployment Memory Checks
 
+### Step 0: Verify LTM Retention / Cold Storage
+
+The tiered memory system includes retention so hot LTM stays bounded:
+
+- Hot LTM: `.claude/context/memory/ltm/summary_*.json` (capped by `MEMORY_LTM_MAX_SUMMARIES`, default 50)
+- Cold archives: `.claude/context/memory/cold/ltm-*.jsonl.gz` (written per run; no gzip append)
+
+```bash
+# Run the weekly scheduler (includes cold archiving)
+# Run the weekly scheduler (includes cold archiving)
+node .claude/lib/memory/memory-scheduler.cjs weekly
+# OR: pnpm run memory:weekly
+
+# Or run the task directly
+node .claude/lib/memory/memory-scheduler.cjs task archiveOldLTM
+# OR: pnpm run memory:daily (runs daily tasks)
+
+# Confirm lastColdArchive is updated
+cat .claude/context/memory/maintenance-status.json
+```
+
+**Pass Criteria:**
+
+- [ ] `maintenance-status.json` includes `lastColdArchive`
+- [ ] `ltm/` count stays within `MEMORY_LTM_MAX_SUMMARIES`
+- [ ] Cold archive files appear under `cold/` when LTM exceeds the cap
+
 ### Step 1: Run Memory Budget Tests
 
 ```bash
 # Run full test suite with memory monitoring
-NODE_OPTIONS="--trace-gc --max-old-space-size=4096" npm test
+NODE_OPTIONS="--trace-gc --max-old-space-size=4096" pnpm test
 
 # Check for warnings:
 # - Heap size continuously increasing
@@ -37,7 +64,7 @@ NODE_OPTIONS="--trace-gc --max-old-space-size=4096" npm test
 ```bash
 # Run load tests with memory profiling
 NODE_OPTIONS="--trace-gc --max-old-space-size=4096" \
-  node tests/enterprise-scale-testing.test.cjs
+  node --test tests/scale/track-analytics-scale.test.cjs
 
 # Monitor:
 # - Peak heap usage

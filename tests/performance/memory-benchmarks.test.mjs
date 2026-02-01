@@ -13,9 +13,9 @@ import assert from 'node:assert/strict';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { ContextualMemory } from '../../.claude/lib/memory/contextual-memory.cjs';
-import { MemoryVectorStore } from '../../.claude/lib/memory/chromadb-client.cjs';
+import { MemoryVectorStore } from '../../.claude/lib/memory/lancedb-client.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,7 +29,7 @@ const TEMP_DIR = path.join(
 describe('Performance Benchmarks - Hybrid Memory System', () => {
   let memory;
   let db;
-  let chromaDbPath;
+  let lancedbPath;
   let vectorStore;
 
   beforeEach(async () => {
@@ -39,10 +39,10 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
     }
 
     const dbPath = path.join(TEMP_DIR, 'benchmark.db');
-    chromaDbPath = path.join(TEMP_DIR, 'chromadb');
+    lancedbPath = path.join(TEMP_DIR, 'lancedb');
 
     // Initialize database and create schema
-    db = new Database(dbPath);
+    db = new DatabaseSync(dbPath);
     db.exec(`
       CREATE TABLE IF NOT EXISTS entities (
         id TEXT PRIMARY KEY,
@@ -79,9 +79,10 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
     memory = new ContextualMemory({
       memoryDir: path.join(TEMP_DIR, 'memory'),
       dbPath: dbPath,
-      chromaConfig: {
-        persistDirectory: chromaDbPath,
+      lancedbConfig: {
+        persistDirectory: lancedbPath,
         collectionName: 'benchmark-memory',
+        embeddingMode: 'test',
       },
     });
 
@@ -90,16 +91,12 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
       fs.mkdirSync(memory.config.memoryDir, { recursive: true });
     }
 
-    // Initialize ChromaDB vector store
+    // Initialize LanceDB vector store
     vectorStore = new MemoryVectorStore({
-      persistDirectory: chromaDbPath,
+      persistDirectory: lancedbPath,
       collectionName: 'benchmark-memory',
+      embeddingMode: 'test',
     });
-    try {
-      await vectorStore.initialize();
-    } catch (err) {
-      console.warn('[Benchmark] ChromaDB initialization skipped:', err.message);
-    }
   });
 
   afterEach(() => {
@@ -114,7 +111,7 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
   describe('Semantic Search Latency', () => {
     it('should complete semantic search in <100ms (p50)', async () => {
       if (!vectorStore) {
-        console.log('Skipping: ChromaDB unavailable');
+        console.log('Skipping: LanceDB unavailable');
         return;
       }
 
@@ -161,7 +158,7 @@ describe('Performance Benchmarks - Hybrid Memory System', () => {
 
     it('should complete semantic search in <200ms (p99)', async () => {
       if (!vectorStore) {
-        console.log('Skipping: ChromaDB unavailable');
+        console.log('Skipping: LanceDB unavailable');
         return;
       }
 

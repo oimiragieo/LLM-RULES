@@ -2,22 +2,22 @@
 // .claude/tools/cli/init-memory-db.cjs
 // Migration script to initialize SQLite entity schema for hybrid memory system
 
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const fs = require('fs');
 
 /**
  * Initialize SQLite database with entity schema
- * @param {Database|string} dbOrPath - Database instance or path to database file
- * @returns {Database} Database instance
+ * @param {DatabaseSync|string} dbOrPath - Database instance or path to database file
+ * @returns {DatabaseSync} Database instance
  */
 function initializeDatabase(dbOrPath) {
   // Handle both database instance and path
-  const db = typeof dbOrPath === 'string' ? new Database(dbOrPath) : dbOrPath;
+  const db = typeof dbOrPath === 'string' ? new DatabaseSync(dbOrPath) : dbOrPath;
 
   // Enable foreign key constraints
-  db.pragma('foreign_keys = ON');
-  db.pragma('journal_mode = WAL'); // Write-Ahead Logging for better concurrency
+  db.exec('PRAGMA foreign_keys = ON');
+  db.exec('PRAGMA journal_mode = WAL'); // Write-Ahead Logging for better concurrency
 
   // Check if schema already exists (idempotent)
   const tableCheck = db
@@ -35,9 +35,11 @@ function initializeDatabase(dbOrPath) {
   }
 
   // Create schema in a transaction
-  const createSchema = db.transaction(() => {
-    // 1. Create entities table
-    db.exec(`
+  const createSchema = () => {
+    db.exec('BEGIN');
+    try {
+      // 1. Create entities table
+      db.exec(`
       CREATE TABLE IF NOT EXISTS entities (
         id TEXT PRIMARY KEY,
         type TEXT NOT NULL CHECK(type IN (
@@ -56,8 +58,8 @@ function initializeDatabase(dbOrPath) {
       );
     `);
 
-    // 2. Create entity_relationships table
-    db.exec(`
+      // 2. Create entity_relationships table
+      db.exec(`
       CREATE TABLE IF NOT EXISTS entity_relationships (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         from_entity_id TEXT NOT NULL,
@@ -76,8 +78,8 @@ function initializeDatabase(dbOrPath) {
       );
     `);
 
-    // 3. Create entity_attributes table
-    db.exec(`
+      // 3. Create entity_attributes table
+      db.exec(`
       CREATE TABLE IF NOT EXISTS entity_attributes (
         entity_id TEXT NOT NULL,
         attribute_key TEXT NOT NULL,
@@ -88,8 +90,8 @@ function initializeDatabase(dbOrPath) {
       );
     `);
 
-    // 4. Create schema_version table
-    db.exec(`
+      // 4. Create schema_version table
+      db.exec(`
       CREATE TABLE IF NOT EXISTS schema_version (
         version INTEGER PRIMARY KEY,
         applied_at TIMESTAMP DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
@@ -97,8 +99,8 @@ function initializeDatabase(dbOrPath) {
       );
     `);
 
-    // 5. Create indexes for performance
-    db.exec(`
+      // 5. Create indexes for performance
+      db.exec(`
       CREATE INDEX IF NOT EXISTS idx_entities_type ON entities(type);
       CREATE INDEX IF NOT EXISTS idx_entities_name ON entities(name);
       CREATE INDEX IF NOT EXISTS idx_entities_source_file ON entities(source_file);
@@ -110,14 +112,24 @@ function initializeDatabase(dbOrPath) {
       CREATE INDEX IF NOT EXISTS idx_relationships_type ON entity_relationships(relationship_type);
     `);
 
-    // 6. Insert initial schema version
-    db.prepare(
-      `
+      // 6. Insert initial schema version
+      db.prepare(
+        `
       INSERT INTO schema_version (version, description)
       VALUES (?, ?)
     `
-    ).run(1, 'Initial entity schema with entities, relationships, and attributes');
-  });
+      ).run(1, 'Initial entity schema with entities, relationships, and attributes');
+
+      db.exec('COMMIT');
+    } catch (err) {
+      try {
+        db.exec('ROLLBACK');
+      } catch (_rollbackErr) {
+        // ignore rollback failures
+      }
+      throw err;
+    }
+  };
 
   // Run the transaction
   createSchema();

@@ -56,9 +56,9 @@ describe('Entity Storage Integration', () => {
     }
 
     // Create new extractor (will initialize schema)
-    const Database = require('better-sqlite3');
-    const db = new Database(testDbPath);
-    db.pragma('foreign_keys = ON');
+    const { DatabaseSync } = require('node:sqlite');
+    const db = new DatabaseSync(testDbPath);
+    db.exec('PRAGMA foreign_keys = ON');
 
     // Initialize schema manually (since we're using test database)
     const initMemoryDb = require(path.join(projectRoot, '.claude/tools/cli/init-memory-db.cjs'));

@@ -1,8 +1,9 @@
-# Enforcement Hooks
+# Enforcement Hooks Reference
 
-**Source:** CLAUDE.md Section 1.3
-**Version:** v2.2.1
-**Last Updated:** 2026-01-31
+> **NOTE**: `routing-guard.cjs` has grown large and complex. It is a candidate for future refactoring into smaller, more focused modules (e.g. `complexity-guard.cjs`, `security-guard.cjs`).
+> **Source:** CLAUDE.md Section 1.3
+> **Version:** v2.2.1
+> **Last Updated:** 2026-01-31
 
 ---
 
@@ -50,7 +51,7 @@ Consolidates multiple enforcement checks:
 
 Enforces Gate 4 (Creator Workflow) for all artifact types:
 
-**Location:** `.claude/hooks/safety/unified-creator-guard.cjs`
+**Location:** `.claude/hooks/routing/unified-creator-guard.cjs`
 **Trigger:** PreToolUse(Write), PreToolUse(Edit)
 **Default:** `block`
 **Override:** `CREATOR_GUARD=warn|off`

@@ -205,14 +205,14 @@ if (require.main === module) {
 
         // Should include both daily and weekly tasks
         const taskTypes = result.tasks.map(t => t.type);
-        assert(
-          taskTypes.includes('consolidation') ||
-            taskTypes.includes('summarization') ||
-            taskTypes.includes('deduplication') ||
-            taskTypes.includes('pruning') ||
-            taskTypes.includes('healthCheck'),
-          'Should include maintenance tasks'
-        );
+        assert(taskTypes.includes('consolidation'), 'Should include consolidation');
+        assert(taskTypes.includes('healthCheck'), 'Should include healthCheck');
+        assert(taskTypes.includes('metricsLog'), 'Should include metricsLog');
+        assert(taskTypes.includes('summarization'), 'Should include summarization');
+        assert(taskTypes.includes('deduplication'), 'Should include deduplication');
+        assert(taskTypes.includes('pruning'), 'Should include pruning');
+        assert(taskTypes.includes('archiveOldLTM'), 'Should include archiveOldLTM');
+        assert(taskTypes.includes('weeklyReport'), 'Should include weeklyReport');
       } finally {
         cleanupTestDir();
       }
@@ -362,6 +362,23 @@ if (require.main === module) {
 
         assert(result, 'Should return result');
         assert(result.type === 'deduplication', 'Should be deduplication type');
+      } finally {
+        cleanupTestDir();
+      }
+    });
+
+    it('should run archiveOldLTM task', function () {
+      setupTestDir();
+      try {
+        createTestMemoryData();
+
+        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+        const { runTask } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+        const result = runTask('archiveOldLTM', TEST_PROJECT_ROOT);
+
+        assert(result, 'Should return result');
+        assert(result.type === 'archiveOldLTM', 'Should be archiveOldLTM type');
+        assert(typeof result.success === 'boolean', 'Should have success flag');
       } finally {
         cleanupTestDir();
       }

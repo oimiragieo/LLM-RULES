@@ -28,6 +28,8 @@
 const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('path');
+const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.cjs');
+const { DatabaseSync } = require('node:sqlite');
 
 // BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
 // CRITICAL-001-MEMORY: Import path validation utility
@@ -78,6 +80,74 @@ const CONFIG = {
   CODEBASE_MAP_WARN_ENTRIES: 400,
 };
 
+const ACCESS_TRACKING_MIN_INTERVAL_MS = Number(
+  process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS || 5 * 60 * 1000
+);
+
+function toSafeInt(val, fallback = 0) {
+  const n = Number.parseInt(String(val), 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function ensureAccessTrackingFields(entry) {
+  if (!entry || typeof entry !== 'object') return false;
+  let changed = false;
+
+  if (typeof entry.accessCount !== 'number') {
+    entry.accessCount = 0;
+    changed = true;
+  }
+  if (typeof entry.lastAccessed === 'undefined') {
+    entry.lastAccessed = null;
+    changed = true;
+  }
+
+  return changed;
+}
+
+function maybeTouchEntriesForAccessTracking(allEntries, returnedEntries, nowIso) {
+  if (!Array.isArray(allEntries) || allEntries.length === 0) return false;
+  if (!Array.isArray(returnedEntries) || returnedEntries.length === 0) {
+    // Still ensure schema defaults exist for older entries, but don't bump counts.
+    let schemaChanged = false;
+    for (const entry of allEntries) {
+      schemaChanged = ensureAccessTrackingFields(entry) || schemaChanged;
+    }
+    return schemaChanged;
+  }
+
+  const nowMs = Date.parse(nowIso);
+  const identifiers = new Set(
+    returnedEntries
+      .filter(e => e && typeof e === 'object' && typeof e.text === 'string')
+      .map(e => `${e.text}\n${e.timestamp || ''}`)
+  );
+
+  let changed = false;
+  for (const entry of allEntries) {
+    changed = ensureAccessTrackingFields(entry) || changed;
+
+    if (!entry || typeof entry !== 'object') continue;
+    if (typeof entry.text !== 'string') continue;
+
+    const id = `${entry.text}\n${entry.timestamp || ''}`;
+    if (!identifiers.has(id)) continue;
+
+    const lastAccessedMs = entry.lastAccessed ? Date.parse(entry.lastAccessed) : 0;
+    const minInterval = Number.isFinite(ACCESS_TRACKING_MIN_INTERVAL_MS)
+      ? ACCESS_TRACKING_MIN_INTERVAL_MS
+      : 0;
+
+    if (!entry.lastAccessed || nowMs - lastAccessedMs >= minInterval) {
+      entry.accessCount = toSafeInt(entry.accessCount, 0) + 1;
+      entry.lastAccessed = nowIso;
+      changed = true;
+    }
+  }
+
+  return changed;
+}
+
 /**
  * Get the memory directory path for the given project root.
  *
@@ -122,9 +192,24 @@ function getCurrentSessionNumber(memoryDir) {
 /**
  * Save a new session with insights from agent work.
  *
+ * @deprecated Prefer `.claude/lib/memory/memory-tiers.cjs` for canonical session storage (STM → MTM → LTM).
+ * This legacy path writes `.claude/context/memory/sessions/session_NNN.json` and is kept only for backward
+ * compatibility and tooling that still expects `sessions/`.
+ *
  * Creates a numbered session file (e.g., session_001.json) containing
  * the session summary, tasks completed, patterns found, and gotchas.
  * Also records any patterns and gotchas to their respective files.
+ *
+ * @deprecated Use memory-tiers.cjs (writeSTMEntry + consolidateSession) for session recording.
+ * This function writes to the legacy sessions/ directory. The canonical session storage
+ * is now STM → MTM via memory-tiers.cjs. This function is retained for:
+ * - Backward compatibility with older code
+ * - Recording patterns and gotchas extracted from sessions
+ *
+ * For new code, use:
+ *   const memoryTiers = require('./memory-tiers.cjs');
+ *   memoryTiers.writeSTMEntry(sessionData, projectRoot);
+ *   memoryTiers.consolidateSession(sessionId, projectRoot);
  *
  * @param {Object} insights - Session insights to save
  * @param {string} [insights.summary] - Brief summary of the session
@@ -146,48 +231,11 @@ function getCurrentSessionNumber(memoryDir) {
  * });
  * // Returns: { sessionNum: 1, file: '/path/.claude/context/memory/sessions/session_001.json' }
  */
-function saveSession(insights, projectRoot = PROJECT_ROOT) {
-  // CRITICAL-001-MEMORY FIX: Validate projectRoot
-  validateProjectRoot(projectRoot);
-  const memoryDir = getMemoryDir(projectRoot);
-  const sessionsDir = path.join(memoryDir, 'sessions');
-  ensureDir(sessionsDir);
-
-  const sessionNum = getCurrentSessionNumber(memoryDir);
-  const sessionFile = path.join(sessionsDir, `session_${String(sessionNum).padStart(3, '0')}.json`);
-
-  const sessionData = {
-    session_number: sessionNum,
-    timestamp: new Date().toISOString(),
-    summary: insights.summary || '',
-    tasks_completed: insights.tasks_completed || [],
-    files_modified: insights.files_modified || [],
-    discoveries: insights.discoveries || [],
-    patterns_found: insights.patterns_found || [],
-    gotchas_encountered: insights.gotchas_encountered || [],
-    decisions_made: insights.decisions_made || [],
-    next_steps: insights.next_steps || [],
-  };
-
-  fs.writeFileSync(sessionFile, JSON.stringify(sessionData, null, 2));
-
-  // Also append patterns/gotchas to their respective files
-  if (sessionData.patterns_found.length > 0) {
-    for (const pattern of sessionData.patterns_found) {
-      recordPattern(pattern, projectRoot);
-    }
-  }
-
-  if (sessionData.gotchas_encountered.length > 0) {
-    for (const gotcha of sessionData.gotchas_encountered) {
-      recordGotcha(gotcha, projectRoot);
-    }
-  }
-
-  // Prune old sessions if needed
-  pruneOldSessions(sessionsDir);
-
-  return { sessionNum, file: sessionFile };
+function saveSession(insights, _projectRoot = PROJECT_ROOT) {
+  throw new Error(
+    'saveSession is DEPRECATED. Use memory-tiers.cjs writeSTMEntry + consolidateSession instead. ' +
+      'The .claude/context/memory/sessions/ directory is legacy.'
+  );
 }
 
 /**
@@ -247,13 +295,15 @@ function checkAndArchiveLearnings(projectRoot = PROJECT_ROOT) {
   fs.appendFileSync(archivePath, archiveContent + '\n\n');
 
   // Write truncated content back to learnings.md
-  fs.writeFileSync(learningsPath, keepContent);
+  atomicWriteSync(learningsPath, keepContent);
 
   result.archived = true;
   result.archivedBytes = archiveContent.length;
   result.archivePath = archivePath;
 
-  console.log(`[MEMORY] Archived ${result.archivedBytes} bytes to ${archivePath}`);
+  if (process.env.MEMORY_DEBUG || process.env.DEBUG_HOOKS) {
+    console.error(`[MEMORY] Archived ${result.archivedBytes} bytes to ${archivePath}`);
+  }
 
   return result;
 }
@@ -261,7 +311,7 @@ function checkAndArchiveLearnings(projectRoot = PROJECT_ROOT) {
 /**
  * Prune old sessions beyond MAX_SESSIONS
  */
-function pruneOldSessions(sessionsDir) {
+function _pruneOldSessions(sessionsDir) {
   const files = fs
     .readdirSync(sessionsDir)
     .filter(f => f.match(/^session_\d{3}\.json$/))
@@ -359,7 +409,7 @@ function pruneCodebaseMap(projectRoot = PROJECT_ROOT) {
   codebaseMap.last_updated = now.toISOString();
 
   // Write back
-  fs.writeFileSync(mapPath, JSON.stringify(codebaseMap, null, 2));
+  atomicWriteSync(mapPath, JSON.stringify(codebaseMap, null, 2));
 
   if (result.totalPruned > 0) {
     console.log(
@@ -412,13 +462,14 @@ function recordGotcha(gotcha, projectRoot = PROJECT_ROOT) {
   );
 
   if (!isDuplicate) {
+    const now = new Date().toISOString();
     const entry =
       typeof gotcha === 'string'
-        ? { text: gotcha, timestamp: new Date().toISOString() }
-        : { ...gotcha, timestamp: new Date().toISOString() };
+        ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null }
+        : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null };
 
     gotchas.push(entry);
-    fs.writeFileSync(gotchasFile, JSON.stringify(gotchas, null, 2));
+    atomicWriteJSONSync(gotchasFile, gotchas);
   }
 
   return !isDuplicate;
@@ -466,13 +517,14 @@ function recordPattern(pattern, projectRoot = PROJECT_ROOT) {
   );
 
   if (!isDuplicate) {
+    const now = new Date().toISOString();
     const entry =
       typeof pattern === 'string'
-        ? { text: pattern, timestamp: new Date().toISOString() }
-        : { ...pattern, timestamp: new Date().toISOString() };
+        ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null }
+        : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null };
 
     patterns.push(entry);
-    fs.writeFileSync(patternsFile, JSON.stringify(patterns, null, 2));
+    atomicWriteJSONSync(patternsFile, patterns);
   }
 
   return !isDuplicate;
@@ -525,7 +577,7 @@ function recordDiscovery(filePath, description, category = 'general', projectRoo
   };
   codebaseMap.last_updated = now;
 
-  fs.writeFileSync(mapFile, JSON.stringify(codebaseMap, null, 2));
+  atomicWriteSync(mapFile, JSON.stringify(codebaseMap, null, 2));
   return true;
 }
 
@@ -535,6 +587,9 @@ function recordDiscovery(filePath, description, category = 'general', projectRoo
  * This is the key function for loading memory into agent context.
  * It loads gotchas, patterns, discoveries, and recent sessions with
  * truncation to fit within context limits defined in CONFIG.
+ *
+ * Access tracking: Updates lastAccessed and accessCount for loaded items.
+ * Writes are rate-limited per entry via MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS.
  *
  * @param {string} [projectRoot=PROJECT_ROOT] - Project root directory path
  * @returns {Object} Memory context object
@@ -550,8 +605,6 @@ function recordDiscovery(filePath, description, category = 'general', projectRoo
  * console.log(memory.patterns); // [{text: '...', timestamp: '...'}]
  */
 function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
-  // CRITICAL-001-MEMORY FIX: Validate projectRoot
-  validateProjectRoot(projectRoot);
   const memoryDir = getMemoryDir(projectRoot);
   const result = {
     gotchas: [],
@@ -561,33 +614,90 @@ function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
     legacy_summary: '',
   };
 
-  // Load gotchas (truncated)
-  const gotchasFile = path.join(memoryDir, 'gotchas.json');
-  if (fs.existsSync(gotchasFile)) {
+  // Try loading from SQLite (Ghost Memory) first
+  // This uses the 'entities' table populated by EntityExtractor
+  const dbPath = path.join(projectRoot, '.claude/data/memory.db');
+  let dbPatternsLoaded = false;
+  let dbGotchasLoaded = false;
+
+  if (fs.existsSync(dbPath)) {
     try {
-      const gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
-      // Take most recent, truncate to max chars
-      result.gotchas = truncateItems(
-        gotchas.slice(-CONFIG.MAX_ITEMS.gotchas),
-        CONFIG.MAX_CONTEXT_CHARS.gotchas
-      );
+      const db = new DatabaseSync(dbPath);
+
+      // Load patterns
+      const patterns = db
+        .prepare(
+          "SELECT name, content, created_at FROM entities WHERE type = 'pattern' ORDER BY quality_score DESC, created_at DESC LIMIT ?"
+        )
+        .all(CONFIG.MAX_ITEMS.patterns);
+
+      if (patterns.length > 0) {
+        result.patterns = patterns.map(p => ({
+          text: p.name + (p.content ? '\n' + p.content : ''),
+          timestamp: p.created_at,
+        }));
+        dbPatternsLoaded = true;
+      }
+
+      // Load issues/gotchas
+      const issues = db
+        .prepare(
+          "SELECT name, content, created_at FROM entities WHERE type = 'issue' ORDER BY quality_score DESC, created_at DESC LIMIT ?"
+        )
+        .all(CONFIG.MAX_ITEMS.gotchas);
+
+      if (issues.length > 0) {
+        result.gotchas = issues.map(i => ({
+          text: i.name + (i.content ? '\n' + i.content : ''),
+          timestamp: i.created_at,
+        }));
+        dbGotchasLoaded = true;
+      }
+
+      db.close();
     } catch (e) {
+      if (process.env.MEMORY_DEBUG) {
+        console.error('[MEMORY] DB load failed:', e.message);
+      }
+    }
+  }
+
+  // Load gotchas from JSON if not loaded from DB
+  const gotchasFile = path.join(memoryDir, 'gotchas.json');
+  if (!dbGotchasLoaded && fs.existsSync(gotchasFile)) {
+    try {
+      const allGotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
+      const selectedGotchas = allGotchas.slice(-CONFIG.MAX_ITEMS.gotchas);
+      result.gotchas = truncateItems(selectedGotchas, CONFIG.MAX_CONTEXT_CHARS.gotchas);
+
+      const now = new Date().toISOString();
+      const changed = maybeTouchEntriesForAccessTracking(allGotchas, result.gotchas, now);
+      if (changed) {
+        atomicWriteJSONSync(gotchasFile, allGotchas);
+      }
+    } catch (e) {
+      console.warn('[Memory] Failed to parse gotchas.json:', e.message);
       if (process.env.MEMORY_DEBUG) {
         console.error('[MEMORY_DEBUG]', 'loadMemory (gotchas):', e.message);
       }
     }
   }
 
-  // Load patterns (truncated)
+  // Load patterns from JSON if not loaded from DB
   const patternsFile = path.join(memoryDir, 'patterns.json');
-  if (fs.existsSync(patternsFile)) {
+  if (!dbPatternsLoaded && fs.existsSync(patternsFile)) {
     try {
-      const patterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
-      result.patterns = truncateItems(
-        patterns.slice(-CONFIG.MAX_ITEMS.patterns),
-        CONFIG.MAX_CONTEXT_CHARS.patterns
-      );
+      const allPatterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
+      const selectedPatterns = allPatterns.slice(-CONFIG.MAX_ITEMS.patterns);
+      result.patterns = truncateItems(selectedPatterns, CONFIG.MAX_CONTEXT_CHARS.patterns);
+
+      const now = new Date().toISOString();
+      const changed = maybeTouchEntriesForAccessTracking(allPatterns, result.patterns, now);
+      if (changed) {
+        atomicWriteJSONSync(patternsFile, allPatterns);
+      }
     } catch (e) {
+      console.warn('[Memory] Failed to parse patterns.json:', e.message);
       if (process.env.MEMORY_DEBUG) {
         console.error('[MEMORY_DEBUG]', 'loadMemory (patterns):', e.message);
       }
@@ -604,33 +714,107 @@ function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
         .map(([path, info]) => ({ path, ...info }));
       result.discoveries = truncateItems(discoveries, CONFIG.MAX_CONTEXT_CHARS.discoveries);
     } catch (e) {
+      console.warn('[Memory] Failed to parse codebase_map.json:', e.message);
       if (process.env.MEMORY_DEBUG) {
         console.error('[MEMORY_DEBUG]', 'loadMemory (discoveries):', e.message);
       }
     }
   }
 
-  // Load recent sessions (truncated)
-  const sessionsDir = path.join(memoryDir, 'sessions');
-  if (fs.existsSync(sessionsDir)) {
-    const files = fs
-      .readdirSync(sessionsDir)
-      .filter(f => f.match(/^session_\d{3}\.json$/))
-      .sort()
-      .slice(-CONFIG.MAX_ITEMS.sessions);
+  // Load recent sessions from MTM (canonical) with fallback to legacy sessions/
+  // SPLIT-BRAIN FIX: Write path uses memory-tiers (STM → MTM → LTM), so read path must also use MTM
+  let mtmLoaded = false;
+  try {
+    // Try to load memory-tiers for MTM sessions
+    const memoryTiers = require('./memory-tiers.cjs');
+    const mtmSessions = memoryTiers.getMTMSessions(projectRoot);
 
-    for (const file of files) {
-      try {
-        const session = JSON.parse(fs.readFileSync(path.join(sessionsDir, file), 'utf8'));
+    if (mtmSessions && mtmSessions.length > 0) {
+      // Sort by time (oldest first) and take last N (newest slice).
+      const sorted = mtmSessions
+        .sort(
+          (a, b) =>
+            new Date(a.timestamp || a.consolidated_at || 0) -
+            new Date(b.timestamp || b.consolidated_at || 0)
+        )
+        .slice(-CONFIG.MAX_ITEMS.sessions);
+
+      const sessionNumberBase = mtmSessions.length - sorted.length;
+      for (let i = 0; i < sorted.length; i++) {
+        const session = sorted[i];
         result.recent_sessions.push({
-          session_number: session.session_number,
-          timestamp: session.timestamp,
-          summary: session.summary,
-          tasks_completed: session.tasks_completed?.slice(0, 5),
+          session_number: sessionNumberBase + i + 1, // Derived stable numbering for MTM
+          timestamp: session.timestamp || session.consolidated_at,
+          summary: session.summary || '',
+          tasks_completed: (session.tasks_completed || []).slice(0, 5),
+          source: 'mtm', // Mark source for debugging
         });
-      } catch (e) {
-        if (process.env.MEMORY_DEBUG) {
-          console.error('[MEMORY_DEBUG]', 'loadMemory (sessions):', e.message);
+      }
+      mtmLoaded = true;
+
+      // Optionally load recent LTM summaries
+      const ltmDir = memoryTiers.getTierPath('LTM', projectRoot);
+      if (fs.existsSync(ltmDir)) {
+        try {
+          const ltmFiles = fs
+            .readdirSync(ltmDir)
+            .filter(f => f.endsWith('.json') && f.startsWith('summary_'))
+            .sort()
+            .slice(-2); // Last 2 summaries
+
+          for (const file of ltmFiles) {
+            try {
+              const summary = JSON.parse(fs.readFileSync(path.join(ltmDir, file), 'utf8'));
+              if (summary.type === 'session_summary') {
+                result.recent_sessions.unshift({
+                  session_number: 0, // LTM summaries are older
+                  timestamp: summary.created_at,
+                  summary: `[LTM Summary] ${summary.session_count} sessions from ${summary.date_range?.start || 'unknown'} to ${summary.date_range?.end || 'unknown'}`,
+                  tasks_completed: [],
+                  source: 'ltm',
+                  key_learnings: (summary.key_learnings || []).slice(0, 3),
+                });
+              }
+            } catch (_e) {
+              // Skip malformed LTM files
+            }
+          }
+        } catch (_e) {
+          // LTM dir read failed, continue without
+        }
+      }
+    }
+  } catch (_e) {
+    // memory-tiers not available, fall through to legacy
+    if (process.env.MEMORY_DEBUG) {
+      console.error('[MEMORY_DEBUG]', 'loadMemory (mtm):', _e.message);
+    }
+  }
+
+  // Fallback to legacy sessions/ if MTM is empty or unavailable
+  if (!mtmLoaded) {
+    const sessionsDir = path.join(memoryDir, 'sessions');
+    if (fs.existsSync(sessionsDir)) {
+      const files = fs
+        .readdirSync(sessionsDir)
+        .filter(f => f.match(/^session_\d{3}\.json$/))
+        .sort()
+        .slice(-CONFIG.MAX_ITEMS.sessions);
+
+      for (const file of files) {
+        try {
+          const session = JSON.parse(fs.readFileSync(path.join(sessionsDir, file), 'utf8'));
+          result.recent_sessions.push({
+            session_number: session.session_number,
+            timestamp: session.timestamp,
+            summary: session.summary,
+            tasks_completed: session.tasks_completed?.slice(0, 5),
+            source: 'legacy', // Mark source for debugging
+          });
+        } catch (e) {
+          if (process.env.MEMORY_DEBUG) {
+            console.error('[MEMORY_DEBUG]', 'loadMemory (sessions):', e.message);
+          }
         }
       }
     }
@@ -767,10 +951,11 @@ async function recordGotchaAsync(gotcha, projectRoot = PROJECT_ROOT) {
   );
 
   if (!isDuplicate) {
+    const now = new Date().toISOString();
     const entry =
       typeof gotcha === 'string'
-        ? { text: gotcha, timestamp: new Date().toISOString() }
-        : { ...gotcha, timestamp: new Date().toISOString() };
+        ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null }
+        : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null };
 
     gotchas.push(entry);
     await atomicWriteAsync(gotchasFile, JSON.stringify(gotchas, null, 2));
@@ -811,10 +996,11 @@ async function recordPatternAsync(pattern, projectRoot = PROJECT_ROOT) {
   );
 
   if (!isDuplicate) {
+    const now = new Date().toISOString();
     const entry =
       typeof pattern === 'string'
-        ? { text: pattern, timestamp: new Date().toISOString() }
-        : { ...pattern, timestamp: new Date().toISOString() };
+        ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null }
+        : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null };
 
     patterns.push(entry);
     await atomicWriteAsync(patternsFile, JSON.stringify(patterns, null, 2));
@@ -841,14 +1027,19 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
   };
 
   // Load gotchas (truncated)
-  const gotchasContent = await readMemoryAsync(path.join(memoryDir, 'gotchas.json'));
+  const gotchasFile = path.join(memoryDir, 'gotchas.json');
+  const gotchasContent = await readMemoryAsync(gotchasFile);
   if (gotchasContent) {
     try {
       const gotchas = JSON.parse(gotchasContent);
-      result.gotchas = truncateItems(
-        gotchas.slice(-CONFIG.MAX_ITEMS.gotchas),
-        CONFIG.MAX_CONTEXT_CHARS.gotchas
-      );
+      const selectedGotchas = gotchas.slice(-CONFIG.MAX_ITEMS.gotchas);
+      result.gotchas = truncateItems(selectedGotchas, CONFIG.MAX_CONTEXT_CHARS.gotchas);
+
+      const now = new Date().toISOString();
+      const changed = maybeTouchEntriesForAccessTracking(gotchas, result.gotchas, now);
+      if (changed) {
+        await atomicWriteAsync(gotchasFile, JSON.stringify(gotchas, null, 2));
+      }
     } catch (e) {
       if (process.env.MEMORY_DEBUG) {
         console.error('[MEMORY_DEBUG]', 'loadMemoryAsync (gotchas):', e.message);
@@ -857,14 +1048,19 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
   }
 
   // Load patterns (truncated)
-  const patternsContent = await readMemoryAsync(path.join(memoryDir, 'patterns.json'));
+  const patternsFile = path.join(memoryDir, 'patterns.json');
+  const patternsContent = await readMemoryAsync(patternsFile);
   if (patternsContent) {
     try {
       const patterns = JSON.parse(patternsContent);
-      result.patterns = truncateItems(
-        patterns.slice(-CONFIG.MAX_ITEMS.patterns),
-        CONFIG.MAX_CONTEXT_CHARS.patterns
-      );
+      const selectedPatterns = patterns.slice(-CONFIG.MAX_ITEMS.patterns);
+      result.patterns = truncateItems(selectedPatterns, CONFIG.MAX_CONTEXT_CHARS.patterns);
+
+      const now = new Date().toISOString();
+      const changed = maybeTouchEntriesForAccessTracking(patterns, result.patterns, now);
+      if (changed) {
+        await atomicWriteAsync(patternsFile, JSON.stringify(patterns, null, 2));
+      }
     } catch (e) {
       if (process.env.MEMORY_DEBUG) {
         console.error('[MEMORY_DEBUG]', 'loadMemoryAsync (patterns):', e.message);
@@ -888,41 +1084,115 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
     }
   }
 
-  // Load recent sessions (truncated)
-  const sessionsDir = path.join(memoryDir, 'sessions');
+  // Load recent sessions from MTM (canonical) with fallback to legacy sessions/
+  // SPLIT-BRAIN FIX: Write path uses memory-tiers (STM → MTM → LTM), so read path must also use MTM
+  let mtmLoaded = false;
   try {
-    const files = await fsp.readdir(sessionsDir);
-    const sessionFiles = files
-      .filter(f => f.match(/^session_\d{3}\.json$/))
-      .sort()
-      .slice(-CONFIG.MAX_ITEMS.sessions);
+    // Try to load memory-tiers for MTM sessions
+    const memoryTiers = require('./memory-tiers.cjs');
+    const mtmSessions = memoryTiers.getMTMSessions(projectRoot);
 
-    for (const file of sessionFiles) {
+    if (mtmSessions && mtmSessions.length > 0) {
+      // Sort by time (oldest first) and take last N (newest slice).
+      const sorted = mtmSessions
+        .sort(
+          (a, b) =>
+            new Date(a.timestamp || a.consolidated_at || 0) -
+            new Date(b.timestamp || b.consolidated_at || 0)
+        )
+        .slice(-CONFIG.MAX_ITEMS.sessions);
+
+      const sessionNumberBase = mtmSessions.length - sorted.length;
+      for (let i = 0; i < sorted.length; i++) {
+        const session = sorted[i];
+        result.recent_sessions.push({
+          session_number: sessionNumberBase + i + 1, // Derived stable numbering for MTM
+          timestamp: session.timestamp || session.consolidated_at,
+          summary: session.summary || '',
+          tasks_completed: (session.tasks_completed || []).slice(0, 5),
+          source: 'mtm', // Mark source for debugging
+        });
+      }
+      mtmLoaded = true;
+
+      // Optionally load recent LTM summaries
+      const ltmDir = memoryTiers.getTierPath('LTM', projectRoot);
       try {
-        const sessionContent = await readMemoryAsync(path.join(sessionsDir, file));
-        if (sessionContent) {
-          const session = JSON.parse(sessionContent);
-          result.recent_sessions.push({
-            session_number: session.session_number,
-            timestamp: session.timestamp,
-            summary: session.summary,
-            tasks_completed: session.tasks_completed?.slice(0, 5),
-          });
+        const ltmFiles = await fsp.readdir(ltmDir);
+        const summaryFiles = ltmFiles
+          .filter(f => f.endsWith('.json') && f.startsWith('summary_'))
+          .sort()
+          .slice(-2); // Last 2 summaries
+
+        for (const file of summaryFiles) {
+          try {
+            const summaryContent = await readMemoryAsync(path.join(ltmDir, file));
+            if (summaryContent) {
+              const summary = JSON.parse(summaryContent);
+              if (summary.type === 'session_summary') {
+                result.recent_sessions.unshift({
+                  session_number: 0, // LTM summaries are older
+                  timestamp: summary.created_at,
+                  summary: `[LTM Summary] ${summary.session_count} sessions from ${summary.date_range?.start || 'unknown'} to ${summary.date_range?.end || 'unknown'}`,
+                  tasks_completed: [],
+                  source: 'ltm',
+                  key_learnings: (summary.key_learnings || []).slice(0, 3),
+                });
+              }
+            }
+          } catch (_e) {
+            // Skip malformed LTM files
+          }
         }
-      } catch (e) {
-        if (process.env.METRICS_DEBUG === 'true') {
-          console.error(
-            JSON.stringify({
-              module: 'memory-manager',
-              error: e.message,
-              timestamp: new Date().toISOString(),
-            })
-          );
-        }
+      } catch (_e) {
+        // LTM dir read failed, continue without
       }
     }
   } catch (_e) {
-    /* ignore - sessions dir may not exist */
+    // memory-tiers not available, fall through to legacy
+    if (process.env.MEMORY_DEBUG) {
+      console.error('[MEMORY_DEBUG]', 'loadMemoryAsync (mtm):', _e.message);
+    }
+  }
+
+  // Fallback to legacy sessions/ if MTM is empty or unavailable
+  if (!mtmLoaded) {
+    const sessionsDir = path.join(memoryDir, 'sessions');
+    try {
+      const files = await fsp.readdir(sessionsDir);
+      const sessionFiles = files
+        .filter(f => f.match(/^session_\d{3}\.json$/))
+        .sort()
+        .slice(-CONFIG.MAX_ITEMS.sessions);
+
+      for (const file of sessionFiles) {
+        try {
+          const sessionContent = await readMemoryAsync(path.join(sessionsDir, file));
+          if (sessionContent) {
+            const session = JSON.parse(sessionContent);
+            result.recent_sessions.push({
+              session_number: session.session_number,
+              timestamp: session.timestamp,
+              summary: session.summary,
+              tasks_completed: session.tasks_completed?.slice(0, 5),
+              source: 'legacy', // Mark source for debugging
+            });
+          }
+        } catch (e) {
+          if (process.env.METRICS_DEBUG === 'true') {
+            console.error(
+              JSON.stringify({
+                module: 'memory-manager',
+                error: e.message,
+                timestamp: new Date().toISOString(),
+              })
+            );
+          }
+        }
+      }
+    } catch (_e) {
+      /* ignore - sessions dir may not exist */
+    }
   }
 
   // Load legacy learnings.md (truncated to last N chars)

@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash]
-globs: **/tests/**/*.*
+globs: '**/tests/**/*.*'
 best_practices:
   - Follow the guidelines consistently
   - Apply rules during code review

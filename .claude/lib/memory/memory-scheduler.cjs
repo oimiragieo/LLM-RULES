@@ -20,6 +20,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
+const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.cjs');
 
 // BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
 // CRITICAL-001 FIX: Path traversal prevention
@@ -40,6 +42,7 @@ const CONFIG = {
     summarization: { type: 'weekly', description: 'Summarize old MTM sessions to LTM' },
     deduplication: { type: 'weekly', description: 'Deduplicate patterns and gotchas' },
     pruning: { type: 'weekly', description: 'Prune low-utility entries' },
+    archiveOldLTM: { type: 'weekly', description: 'Archive old LTM summaries to cold storage' },
     weeklyReport: { type: 'weekly', description: 'Generate weekly health report' },
   },
 };
@@ -75,7 +78,7 @@ function getMemoryDir(projectRoot = PROJECT_ROOT) {
 /**
  * Get the lib directory path - always use __dirname since modules are siblings
  */
-function getLibDir() {
+function getLibDir(_projectRoot = PROJECT_ROOT) {
   return __dirname;
 }
 
@@ -129,7 +132,7 @@ function writeStatus(status, projectRoot = PROJECT_ROOT) {
   if (!fs.existsSync(memoryDir)) {
     fs.mkdirSync(memoryDir, { recursive: true });
   }
-  fs.writeFileSync(statusPath, JSON.stringify(status, null, 2));
+  atomicWriteSync(statusPath, JSON.stringify(status, null, 2));
 }
 
 // ============================================================================
@@ -305,7 +308,7 @@ function runDeduplication(projectRoot = PROJECT_ROOT) {
       });
 
       if (patternsResult.deduplicated > 0) {
-        fs.writeFileSync(patternsPath, JSON.stringify(patternsResult.kept, null, 2));
+        atomicWriteJSONSync(patternsPath, patternsResult.kept);
       }
       result.patterns.deduplicated = patternsResult.deduplicated;
     }
@@ -322,7 +325,7 @@ function runDeduplication(projectRoot = PROJECT_ROOT) {
       });
 
       if (gotchasResult.deduplicated > 0) {
-        fs.writeFileSync(gotchasPath, JSON.stringify(gotchasResult.kept, null, 2));
+        atomicWriteJSONSync(gotchasPath, gotchasResult.kept);
       }
       result.gotchas.deduplicated = gotchasResult.deduplicated;
     }
@@ -369,6 +372,77 @@ function runPruning(projectRoot = PROJECT_ROOT) {
     result.success = true;
   } catch (e) {
     result.details = e.message;
+  }
+
+  return result;
+}
+
+/**
+ * Run LTM cold archiving task (best-effort).
+ *
+ * Implemented via a child Node process so the scheduler remains synchronous.
+ */
+function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
+  // CRITICAL-001-MEMORY FIX: Validate projectRoot
+  validateProjectRoot(projectRoot);
+
+  const result = {
+    type: 'archiveOldLTM',
+    timestamp: new Date().toISOString(),
+    success: false,
+    details: null,
+  };
+
+  // Construct absolute paths for requirements to avoid CWD issues
+  const coldStoragePath = path
+    .join(projectRoot, '.claude/lib/memory/cold-storage.cjs')
+    .replace(/\\/g, '\\\\');
+  const retentionConfigPath = path
+    .join(projectRoot, '.claude/lib/memory/memory-retention-config.cjs')
+    .replace(/\\/g, '\\\\');
+  const projectRootEscaped = projectRoot.replace(/\\/g, '\\\\');
+
+  const script = `
+  (async () => {
+    const { archiveOldLTM } = require('${coldStoragePath}');
+    const { getRetentionOptions } = require('${retentionConfigPath}');
+    const projectRoot = '${projectRootEscaped}';
+    const options = getRetentionOptions(projectRoot);
+    const details = await archiveOldLTM(projectRoot, options);
+    process.stdout.write(JSON.stringify({ success: true, details }));
+  })().catch((err) => {
+    process.stdout.write(JSON.stringify({ success: false, details: err && err.message ? err.message : String(err) }));
+  });
+  `;
+
+  const proc = spawnSync(process.execPath, ['-e', script], {
+    cwd: projectRoot,
+    env: process.env,
+    encoding: 'utf8',
+  });
+
+  if (proc.error) {
+    result.details = proc.error.message;
+    return result;
+  }
+
+  try {
+    const parsed = JSON.parse(String(proc.stdout || '').trim() || '{}');
+    result.success = Boolean(parsed.success);
+    result.details = parsed.details ?? null;
+  } catch (e) {
+    result.details = `Failed to parse archiver output: ${e.message}`;
+  }
+
+  // Record lastColdArchive for reporting (best-effort).
+  if (result.success) {
+    try {
+      const status = readStatus(projectRoot);
+      status.lastColdArchive = result.timestamp;
+      writeStatus(status, projectRoot);
+    } catch (_e) {
+      // ignore status write failures
+    }
   }
 
   return result;
@@ -451,6 +525,8 @@ function runTask(taskName, projectRoot = PROJECT_ROOT) {
       return runDeduplication(projectRoot);
     case 'pruning':
       return runPruning(projectRoot);
+    case 'archiveOldLTM':
+      return runArchiveOldLTM(projectRoot);
     case 'weeklyReport':
       return runWeeklyReport(projectRoot);
     default:
@@ -521,6 +597,7 @@ function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
   tasks.push(runSummarization(projectRoot));
   tasks.push(runDeduplication(projectRoot));
   tasks.push(runPruning(projectRoot));
+  tasks.push(runArchiveOldLTM(projectRoot));
   const weeklyReportResult = runWeeklyReport(projectRoot);
   tasks.push(weeklyReportResult);
 
@@ -670,6 +747,7 @@ Weekly Tasks (in addition to daily):
   - summarization  Summarize old MTM sessions to LTM
   - deduplication  Deduplicate patterns and gotchas
   - pruning        Prune low-utility entries and archive
+  - archiveOldLTM  Archive old LTM summaries to cold storage
   - weeklyReport   Generate weekly health report
 
 Examples:
@@ -696,6 +774,7 @@ module.exports = {
   runSummarization,
   runDeduplication,
   runPruning,
+  runArchiveOldLTM,
   runWeeklyReport,
   // Maintenance runners
   runDailyMaintenance,

@@ -33,6 +33,11 @@ const { retryWithBackoff } = require('../utils/retry-with-backoff.cjs');
  * });
  * await sync.start();
  */
+/**
+ * @deprecated Replaced by sync-memory-index.cjs (PostToolUse hook).
+ * SyncLayer assumed a long-lived Node process; Claude Code hooks are short-lived.
+ * Do not use in new code. See .claude/hooks/memory/sync-memory-index.cjs.
+ */
 class SyncLayer extends EventEmitter {
   /**
    * Create SyncLayer instance

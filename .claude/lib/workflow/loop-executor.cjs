@@ -6,7 +6,11 @@
  * - doWhile: repeat until condition false
  * - retryUntil: retry until condition met
  * - forEachBatch: process items in batches
+ *
+ * System cap: maxIterations is required and capped at SYSTEM_MAX_ITERATIONS (10,000).
  */
+
+const SYSTEM_MAX_ITERATIONS = 10000;
 
 class LoopExecutor {
   async forEach(items, task, options = {}) {
@@ -142,10 +146,12 @@ class LoopExecutor {
       throw new Error('maxIterations is required to prevent infinite loops');
     }
 
+    const capped = Math.min(maxIterations, SYSTEM_MAX_ITERATIONS);
+
     let state = { iteration: 0, iterations: 0 };
     let conditionMet = true;
 
-    for (let i = 0; i < maxIterations && conditionMet; i++) {
+    for (let i = 0; i < capped && conditionMet; i++) {
       state.iteration = i;
       state.iterations = i + 1;
 
@@ -165,10 +171,12 @@ class LoopExecutor {
   async retryUntil(successCondition, task, options = {}) {
     const { maxRetries = 3, backoff = 'linear', initialDelay = 100 } = options;
 
+    const cappedRetries = Math.min(maxRetries, SYSTEM_MAX_ITERATIONS);
+
     let attempts = 0;
     let lastResult = null;
 
-    for (let i = 0; i < maxRetries; i++) {
+    for (let i = 0; i < cappedRetries; i++) {
       attempts++;
       lastResult = await task();
 
@@ -176,13 +184,13 @@ class LoopExecutor {
         return { success: true, result: lastResult, attempts };
       }
 
-      if (i < maxRetries - 1) {
+      if (i < cappedRetries - 1) {
         const delay = this._calculateBackoff(backoff, i, initialDelay);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
 
-    return { success: false, result: lastResult, attempts };
+    return { success: false, result: lastResult, attempts: cappedRetries };
   }
 
   _calculateBackoff(backoff, attempt, initialDelay) {

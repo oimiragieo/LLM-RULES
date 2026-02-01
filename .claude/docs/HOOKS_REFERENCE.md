@@ -200,7 +200,11 @@ Router: Task({ prompt: "You are DEVELOPER. Fix bug in app.ts..." })
 
 ### session-memory-extractor.cjs
 
-**Event**: `PostToolUse(Task)`
+> **⚠️ DEPRECATED**: This hook has been consolidated into `unified-reflection-handler.cjs`.
+> The file remains for backward compatibility but is no longer actively used.
+> See `.claude/hooks/reflection/unified-reflection-handler.cjs` for the canonical implementation.
+
+**Event**: Deprecated (not registered in `.claude/settings.json`)
 **Purpose**: Extract insights from agent spawns
 **Records**: Discoveries, patterns, decisions made by agents
 
@@ -326,57 +330,86 @@ Hooks are registered in `.claude/settings.json`:
       {
         "matcher": "",
         "hooks": [
-          { "type": "command", "command": "node .claude/hooks/routing/router-mode-reset.cjs" },
-          { "type": "command", "command": "node .claude/hooks/routing/router-enforcer.cjs" },
-          { "type": "command", "command": "node .claude/archive/hooks/session/memory-reminder.cjs" }
+          { "type": "command", "command": "node .claude/hooks/routing/user-prompt-unified.cjs" },
+          { "type": "command", "command": "node .claude/hooks/memory/memory-health-check.cjs" }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash",
-        "hooks": [
-          { "type": "command", "command": "node .claude/hooks/safety/windows-null-sanitizer.cjs" },
-          { "type": "command", "command": "node .claude/hooks/safety/bash-command-validator.cjs" }
-        ]
-      },
-      {
         "matcher": "Edit|Write|NotebookEdit",
         "hooks": [
+          { "type": "command", "command": "node .claude/hooks/safety/file-placement-guard.cjs" },
+          { "type": "command", "command": "node .claude/hooks/safety/write-size-validator.cjs" },
+          { "type": "command", "command": "node .claude/hooks/routing/routing-guard.cjs" },
           { "type": "command", "command": "node .claude/hooks/safety/router-write-guard.cjs" },
-          { "type": "command", "command": "node .claude/hooks/safety/tdd-check.cjs" }
-        ]
-      },
-      {
-        "matcher": "TaskCreate",
-        "hooks": [
-          { "type": "command", "command": "node .claude/hooks/routing/task-create-guard.cjs" }
+          { "type": "command", "command": "node .claude/hooks/routing/unified-creator-guard.cjs" },
+          { "type": "command", "command": "node .claude/hooks/safety/tdd-check.cjs" },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/validation/plan-evolution-guard.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/evolution/unified-evolution-guard.cjs"
+          }
         ]
       },
       {
         "matcher": "Task",
         "hooks": [
-          { "type": "command", "command": "node .claude/hooks/routing/security-review-guard.cjs" }
+          { "type": "command", "command": "node .claude/hooks/routing/spawn-prompt-assembler.cjs" },
+          { "type": "command", "command": "node .claude/hooks/safety/spawn-prompt-validator.cjs" },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/pre-spawn-tool-validator.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/tool-availability-validator.cjs"
+          },
+          { "type": "command", "command": "node .claude/hooks/routing/pre-task-unified.cjs" }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "",
         "hooks": [
-          { "type": "command", "command": "node .claude/hooks/memory/format-memory.cjs" },
-          { "type": "command", "command": "node .claude/hooks/safety/enforce-claude-md-update.cjs" }
+          {
+            "type": "command",
+            "command": "node .claude/hooks/monitoring/metrics-collector-hook.cjs"
+          },
+          { "type": "command", "command": "node .claude/hooks/monitoring/error-tracker-hook.cjs" },
+          { "type": "command", "command": "node .claude/hooks/self-healing/anomaly-detector.cjs" }
         ]
       },
       {
         "matcher": "Task",
         "hooks": [
-          { "type": "command", "command": "node .claude/hooks/routing/agent-context-tracker.cjs" },
+          { "type": "command", "command": "node .claude/hooks/self-healing/auto-rerouter.cjs" },
+          { "type": "command", "command": "node .claude/hooks/routing/post-task-unified.cjs" }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/memory/format-memory.cjs" },
+          { "type": "command", "command": "node .claude/hooks/memory/sync-memory-index.cjs" },
           {
             "type": "command",
-            "command": "node .claude/hooks/memory/extract-workflow-learnings.cjs"
+            "command": "node .claude/hooks/safety/enforce-claude-md-update.cjs"
           },
-          { "type": "command", "command": "node .claude/hooks/memory/session-memory-extractor.cjs" }
+          { "type": "command", "command": "node .claude/hooks/routing/code-index-updater.cjs" }
+        ]
+      },
+      {
+        "matcher": "Task|TaskUpdate|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/reflection/unified-reflection-handler.cjs"
+          }
         ]
       }
     ],
@@ -386,7 +419,11 @@ Hooks are registered in `.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/archive/hooks/memory/session-end-recorder.cjs"
+            "command": "node .claude/hooks/reflection/unified-reflection-handler.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/reflection/reflection-queue-processor.cjs"
           }
         ]
       }

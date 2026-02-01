@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
@@ -109,49 +110,56 @@ test('SessionEnd uses active_context.md to populate sessionData', () => {
   }
 });
 
-test('recordSession writes to sessions/ and mtm/stm tiers (best effort)', () => {
+test('recordSession persists session into MTM (canonical) and does not require legacy sessions/', async () => {
   const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
-  const sessionsDir = path.join(memoryDir, 'sessions');
   const mtmDir = path.join(memoryDir, 'mtm');
 
-  fs.mkdirSync(sessionsDir, { recursive: true });
+  // Ensure MTM dir exists
   fs.mkdirSync(mtmDir, { recursive: true });
 
-  const beforeSessions = new Set(listFilesSafe(sessionsDir));
+  // Use a temp directory for LanceDB to avoid polluting real data
+  const tempLanceDir = path.join(os.tmpdir(), `test-lancedb-${Date.now()}`);
+  process.env.LANCEDB_URI = tempLanceDir;
+
   const beforeMTM = new Set(listFilesSafe(mtmDir));
 
-  const sessionData = {
-    session_id: `test-session-${Date.now()}`,
-    summary: 'Test session persistence',
-    tasks_completed: ['Task 1'],
-    files_modified: [],
-    discoveries: [],
-    patterns_found: [],
-    gotchas_encountered: [],
-    decisions_made: [],
-    next_steps: [],
-    timestamp: new Date().toISOString(),
-  };
+  try {
+    const sessionData = {
+      session_id: `test-session-${Date.now()}`,
+      summary: 'Test session persistence',
+      tasks_completed: ['Task 1'],
+      files_modified: [],
+      discoveries: [],
+      patterns_found: [],
+      gotchas_encountered: [],
+      decisions_made: [],
+      next_steps: [],
+      timestamp: new Date().toISOString(),
+    };
 
-  reflectionHook.recordSession(sessionData);
+    // recordSession triggers embedding generation which uses LANCEDB_URI
+    await reflectionHook.recordSession(sessionData);
 
-  const afterSessions = new Set(listFilesSafe(sessionsDir));
-  const afterMTM = new Set(listFilesSafe(mtmDir));
+    const afterMTM = new Set(listFilesSafe(mtmDir));
 
-  const newSessions = [...afterSessions].filter(
-    f => !beforeSessions.has(f) && /^session_\d{3}\.json$/.test(f)
-  );
-  assert.ok(newSessions.length >= 1, 'Expected at least one new sessions/session_XXX.json file');
+    // MTM should receive a consolidated session file.
+    const mtmChanged = [...afterMTM].some(f => !beforeMTM.has(f) && /^session_/.test(f));
+    assert.ok(mtmChanged, 'Expected MTM directory to change');
 
-  // MTM should receive a consolidated session file.
-  const mtmChanged = [...afterMTM].some(f => !beforeMTM.has(f) && /^session_/.test(f));
-  assert.ok(mtmChanged, 'Expected MTM directory to change');
-
-  // Cleanup (only remove new files we created).
-  const newMTM = [...afterMTM].filter(f => !beforeMTM.has(f) && f !== '.gitkeep');
-
-  removeFiles(sessionsDir, newSessions);
-  removeFiles(mtmDir, newMTM);
+    // Cleanup (only remove new files we created).
+    const newMTM = [...afterMTM].filter(f => !beforeMTM.has(f) && f !== '.gitkeep');
+    removeFiles(mtmDir, newMTM);
+  } finally {
+    // Cleanup LanceDB temp dir
+    delete process.env.LANCEDB_URI;
+    if (fs.existsSync(tempLanceDir)) {
+      try {
+        fs.rmSync(tempLanceDir, { recursive: true, force: true });
+      } catch {
+        // ignore
+      }
+    }
+  }
 });
 
 test('assembleSpawnPrompt injects Memory Context section when enabled', () => {
@@ -179,29 +187,9 @@ test('assembleSpawnPrompt injects Memory Context section when enabled', () => {
   );
 });
 
-test('memory-manager.saveSession works even if projectRoot differs only by casing (Windows)', () => {
-  if (process.platform !== 'win32') {
-    return;
-  }
-
-  const flipDrive = p => {
-    const m = p.match(/^([a-zA-Z]):(.*)$/);
-    if (!m) return p;
-    const drive = m[1];
-    const rest = m[2];
-    const flipped = drive === drive.toUpperCase() ? drive.toLowerCase() : drive.toUpperCase();
-    return `${flipped}:${rest}`;
-  };
-
-  const altRoot = flipDrive(PROJECT_ROOT);
-  const res = memoryManager.saveSession({ summary: 'Case-insensitive root test' }, altRoot);
-  assert.ok(res?.file, 'Expected saveSession to return a file path');
-  assert.ok(fs.existsSync(res.file), 'Expected session file to be created');
-
-  // Cleanup only the created session file.
-  try {
-    fs.unlinkSync(res.file);
-  } catch {
-    // ignore
-  }
+test('memory-manager.saveSession throws deprecation error (use memory-tiers instead)', () => {
+  assert.throws(
+    () => memoryManager.saveSession({ summary: 'Deprecation test' }),
+    /saveSession is DEPRECATED|memory-tiers\.cjs writeSTMEntry/
+  );
 });

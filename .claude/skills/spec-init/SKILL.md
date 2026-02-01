@@ -1,3 +1,13 @@
+---
+name: spec-init
+description: Unified skill that guides spec creation through structured, interactive process.
+version: 1.0.0
+model: sonnet
+invoked_by: user
+user_invocable: true
+tools: [Read, Write, Edit]
+---
+
 # SKILL: spec-init
 
 ## Overview
