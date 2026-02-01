@@ -71,7 +71,7 @@ pnpm run test:integration
 pnpm run test:framework
 ```
 
-**All tests (if using Jest for tests/**):**
+**All tests (if using Jest for tests/**):\*\*
 
 ```bash
 npx jest --testPathPattern="tests/(unit/hooks/spawn-prompt-assembler|lib/tools/agent-registry-generator|lib/spawn/prompt-assembler)|hooks/pre-spawn-tool-validator"
@@ -102,12 +102,12 @@ node --test --test-concurrency=1 tests/unit/hooks/spawn-prompt-assembler.test.mj
 
 ## What each part checks
 
-| Step | What it verifies |
-|------|------------------|
-| `gen:skill-index` | Reads agent-skill-matrix; builds agentPrimary/agentSupporting and byAgent; SKILL_TOOLS for repo-rag, project-analyzer, tool-search. |
-| `gen:agent-registry` | Loads matrix + skill-index; merges skill requiredTools into each agent’s requiredTools (up to 18). |
-| `manifest:validate` | Referenced tools (from skill-index + agent-registry) exist in tool-manifest; optional schema validation. |
-| `spawn-prompt-assembler.test.mjs` | looksAssembled, appendSemanticMatches, inferAgentFromPrompt, enrichAllowedTools. |
-| `prompt-assembler.test.cjs` | getSkillsByAgent, buildToolsSection, assembleSpawnPrompt using skill-index. |
-| `agent-registry-generator.test.cjs` | generateCapabilityCard (with optional 5th arg), schema, scanAgents, generate. |
-| `pre-spawn-tool-validator.test.cjs` | allowed_tools validation against manifest, reserved tools, mandatory tools. |
+| Step                                | What it verifies                                                                                                                    |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `gen:skill-index`                   | Reads agent-skill-matrix; builds agentPrimary/agentSupporting and byAgent; SKILL_TOOLS for repo-rag, project-analyzer, tool-search. |
+| `gen:agent-registry`                | Loads matrix + skill-index; merges skill requiredTools into each agent’s requiredTools (up to 18).                                  |
+| `manifest:validate`                 | Referenced tools (from skill-index + agent-registry) exist in tool-manifest; optional schema validation.                            |
+| `spawn-prompt-assembler.test.mjs`   | looksAssembled, appendSemanticMatches, inferAgentFromPrompt, enrichAllowedTools.                                                    |
+| `prompt-assembler.test.cjs`         | getSkillsByAgent, buildToolsSection, assembleSpawnPrompt using skill-index.                                                         |
+| `agent-registry-generator.test.cjs` | generateCapabilityCard (with optional 5th arg), schema, scanAgents, generate.                                                       |
+| `pre-spawn-tool-validator.test.cjs` | allowed_tools validation against manifest, reserved tools, mandatory tools.                                                         |

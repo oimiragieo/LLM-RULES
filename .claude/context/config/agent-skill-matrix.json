@@ -397,7 +397,13 @@
       },
       "evolution-orchestrator": {
         "primary": ["research-synthesis", "agent-creator", "skill-creator"],
-        "secondary": ["workflow-creator", "hook-creator", "template-creator", "schema-creator", "mcp-converter"],
+        "secondary": [
+          "workflow-creator",
+          "hook-creator",
+          "template-creator",
+          "schema-creator",
+          "mcp-converter"
+        ],
         "contextual": {},
         "always": [
           "verification-before-completion",

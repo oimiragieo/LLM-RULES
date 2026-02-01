@@ -29,6 +29,7 @@ Verify: `git --version`
 ## Cheat Sheet & Best Practices
 
 **Essential commands (token-efficient):**
+
 - `git status -s` — short status; `git add -p` — stage hunks; `git diff --cached` — review staged
 - `git switch -c <branch>` or `git checkout -b <branch>` — new branch; `git branch` — list
 - `git log --oneline -5` — compact history; `git log --follow <file>` — track renames
