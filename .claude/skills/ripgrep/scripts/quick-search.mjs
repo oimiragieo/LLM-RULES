@@ -118,7 +118,9 @@ if (!presets[preset]) {
 }
 
 // Build final args: [pattern, ...preset-args, ...extra-args]
-const rgArgs = [pattern, ...presets[preset], ...extraArgs];
+// Note: `.claude/`-prefixed paths are treated as "hidden" by ripgrep, so include `--hidden`
+// to make presets like `hooks`, `skills`, etc. work by default.
+const rgArgs = ['--hidden', ...presets[preset], ...extraArgs, pattern];
 
 // Set environment variable for config if it exists
 const env = {

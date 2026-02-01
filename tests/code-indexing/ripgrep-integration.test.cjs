@@ -16,6 +16,9 @@ const fsPromises = require('fs').promises;
 const path = require('path');
 const { spawn } = require('child_process');
 
+// Keep tests deterministic and avoid heavy ChromaDB initialization.
+process.env.MEMORY_SEMANTIC_SEARCH ??= 'off';
+
 const { ContextualMemory } = require('../../.claude/lib/memory/contextual-memory.cjs');
 
 const FIXTURES_DIR = path.join(__dirname, '..', 'fixtures', 'code-indexing');
@@ -219,7 +222,9 @@ describe('Ripgrep integration', () => {
         done();
         return;
       }
-      const child = spawn('node', [scriptPath, 'js', 'function'], {
+      // Keep this fast and deterministic by searching a small, known subtree.
+      // The goal is to validate that the script can resolve and execute the rg binary.
+      const child = spawn('node', [scriptPath, 'skills', 'Quick Search Presets'], {
         cwd: path.join(__dirname, '..', '..'),
         stdio: ['ignore', 'pipe', 'pipe'],
       });

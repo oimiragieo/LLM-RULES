@@ -151,6 +151,10 @@ async function removeLock() {
  * Trigger index update with simple debouncing
  */
 async function triggerIndexUpdate(filePath) {
+  if (isDisabled()) {
+    return;
+  }
+
   // Quick check - if another process is indexing, skip (they'll handle it)
   const proceed = await canProceed();
   if (!proceed) {

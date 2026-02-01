@@ -77,6 +77,25 @@ class MerkleTree {
     this.root = null;
   }
 
+  _globToRegExp(pattern) {
+    // Minimal glob support for the patterns we use in code-indexing:
+    // - `*` matches within a path segment
+    // - `**` matches across path segments
+    // This is intentionally small and avoids pulling in a glob dependency.
+    // Escape regex metacharacters but keep glob tokens `*` intact for replacement.
+    const escaped = String(pattern).replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+
+    const regexSource = escaped
+      // `**/` should match "foo/" or be empty at the start of a path.
+      .replace(/\*\*\//g, '(?:.*\\/)?')
+      // `/**` should match "/foo" or be empty at the end of a path.
+      .replace(/\/\*\*/g, '(?:\\/.*)?')
+      .replace(/\*\*/g, '.*')
+      .replace(/\*/g, '[^/]*');
+
+    return new RegExp(`^${regexSource}$`);
+  }
+
   /**
    * Hash file content
    */
@@ -116,10 +135,7 @@ class MerkleTree {
    */
   shouldExclude(relativePath) {
     const normalized = relativePath.replace(/\\/g, '/');
-    return this.excludePatterns.some(pattern => {
-      const regex = new RegExp(pattern.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*'));
-      return regex.test(normalized);
-    });
+    return this.excludePatterns.some(pattern => this._globToRegExp(pattern).test(normalized));
   }
 
   /**

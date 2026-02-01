@@ -81,6 +81,10 @@ class ContextualMemory {
    * @returns {Promise<MemoryVectorStore>}
    */
   async _getVectorStore() {
+    if (process.env.MEMORY_SEMANTIC_SEARCH === 'off') {
+      return null;
+    }
+
     if (!this.vectorStore) {
       this.vectorStore = new MemoryVectorStore(this.config.chromaConfig);
       try {

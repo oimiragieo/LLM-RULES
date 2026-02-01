@@ -22,6 +22,7 @@ const DEFAULT_OPTIONS = {
   excludePatterns: [
     '**/node_modules/**',
     '**/.git/**',
+    '**/.claude/context/code-index/**', // Don't index the index itself
     '**/dist/**',
     '**/build/**',
     '**/.next/**',
@@ -68,7 +69,10 @@ class IndexManager {
    */
   async _initializeComponents() {
     if (!this.parser) this.parser = new CodeParser();
-    if (!this.chunker) this.chunker = new SemanticChunker();
+    if (!this.chunker) {
+      const minTokens = parseInt(process.env.CODE_INDEX_MIN_TOKENS || '5', 10);
+      this.chunker = new SemanticChunker({ minTokens });
+    }
     if (!this.embedder) {
       this.embedder = new EmbeddingGenerator();
       await this.embedder.initialize();

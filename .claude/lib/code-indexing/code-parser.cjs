@@ -7,7 +7,16 @@
 
 'use strict';
 
-const _Parser = require('tree-sitter');
+// tree-sitter is a native module; in some environments (e.g. Node ABI mismatch)
+// it may fail to load. Keep the code-indexing stack fail-open so tests and
+// non-AST features can still run.
+let _Parser = null;
+let _TREE_SITTER_LOAD_ERROR = null;
+try {
+  _Parser = require('tree-sitter');
+} catch (err) {
+  _TREE_SITTER_LOAD_ERROR = err;
+}
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -40,6 +49,8 @@ class CodeParser {
     this.options = options;
     this.grammars = new Map();
     this.parsers = new Map();
+    this._Parser = _Parser;
+    this._treeSitterLoadError = _TREE_SITTER_LOAD_ERROR;
   }
 
   /**

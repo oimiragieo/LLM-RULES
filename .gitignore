@@ -53,6 +53,7 @@
 .claude/context/blackboard/*.json
 .claude/context/runs/
 .claude/context/cache/
+.claude/context/code-index/.indexing.lock
 .claude/context/rule-index-cache.json
 .claude/context/skill-summaries.json
 

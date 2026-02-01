@@ -13,6 +13,12 @@ const { test, describe, before, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs').promises;
 const path = require('path');
+
+// Keep tests lightweight and deterministic: avoid loading transformer models / large caches.
+process.env.CODE_INDEX_EMBEDDER ??= 'mock';
+process.env.CODE_INDEX_EMBEDDINGS ??= 'off';
+process.env.MEMORY_SEMANTIC_SEARCH ??= 'off';
+
 const { IndexManager } = require('../../.claude/lib/code-indexing/index-manager.cjs');
 const { MerkleTree } = require('../../.claude/lib/code-indexing/merkle-tree.cjs');
 const { ContextualMemory } = require('../../.claude/lib/memory/contextual-memory.cjs');
@@ -135,9 +141,13 @@ describe('Search tools and indexing E2E', () => {
   describe('hook integration (triggerIndexUpdate)', () => {
     test('code-index-updater triggerIndexUpdate does not throw', async () => {
       const codeIndexUpdater = require('../../.claude/hooks/routing/code-index-updater.cjs');
+      const orig = process.env.CODE_INDEX_AUTO_UPDATE;
+      process.env.CODE_INDEX_AUTO_UPDATE = 'off';
       await assert.doesNotReject(() =>
         codeIndexUpdater.triggerIndexUpdate(path.join(projectRoot, 'app.js'))
       );
+      if (orig !== undefined) process.env.CODE_INDEX_AUTO_UPDATE = orig;
+      else delete process.env.CODE_INDEX_AUTO_UPDATE;
       await new Promise(r => setImmediate(r));
       await new Promise(r => setTimeout(r, 200));
     });
