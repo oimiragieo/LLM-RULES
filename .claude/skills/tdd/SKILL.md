@@ -16,6 +16,8 @@ error_handling: strict
 streaming: supported
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 # Test-Driven Development (TDD)
 
 ## Overview

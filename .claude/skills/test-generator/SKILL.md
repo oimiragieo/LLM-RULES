@@ -17,6 +17,8 @@ streaming: supported
 templates: [unit-test, integration-test, e2e-test, api-test]
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 <identity>
 Test Generator Skill - Generates test code from specifications, components, and API endpoints following project testing patterns and conventions.
 </identity>

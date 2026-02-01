@@ -17,6 +17,8 @@ streaming: supported
 templates: [api-docs, developer-guide, architecture-docs, user-manual]
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 <identity>
 Documentation Generator Skill - Generates comprehensive documentation from code, APIs, and specifications including API docs, developer guides, architecture documentation, and user manuals.
 </identity>

@@ -15,6 +15,8 @@ error_handling: graceful
 streaming: supported
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 # Postmortem Writing
 
 Comprehensive guide to writing effective, blameless postmortems that drive organizational learning and prevent incident recurrence.

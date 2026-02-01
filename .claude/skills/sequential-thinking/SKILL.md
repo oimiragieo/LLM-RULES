@@ -24,6 +24,8 @@ streaming: supported
 - **MCP Python package**: `pip install mcp`
 - If the executor is not present or MCP is not installed, the skill still provides in-context guidance and exits successfully.
 
+**Full functionality:** The Python script `.claude/tools/optimization/sequential-thinking/executor.py` must exist for standalone executor runs. Run `node .claude/tools/cli/doctor.mjs` to verify; doctor warns if the executor is missing.
+
 ## Cheat Sheet & Best Practices
 
 **Frameworks:** Polya: (1) Understand the problem (2) Devise a plan (3) Carry out the plan (4) Look back. IDEAL: Identify → Define context → Explore strategies → Act on best → Look back and learn.

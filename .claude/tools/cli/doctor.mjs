@@ -18,6 +18,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -347,6 +348,62 @@ function validateMcp() {
 }
 
 /**
+ * Check CLI/env dependencies for skills that wrap external tools.
+ * If a CLI-wrapper skill is present, doctor runs the corresponding command and warns if missing.
+ */
+function checkEnvCli() {
+  console.log('\n🔧 Checking CLI/Env Dependencies (skill wrappers)...');
+
+  const skillsDir = path.join(CLAUDE_DIR, 'skills');
+  if (!fs.existsSync(skillsDir)) return;
+
+  const cliChecks = [
+    { skill: 'aws-cloud-ops', cmd: 'aws', args: ['--version'] },
+    { skill: 'gcloud-cli', cmd: 'gcloud', args: ['--version'] },
+    { skill: 'docker-compose', cmd: 'docker', args: ['compose', 'version'] },
+    { skill: 'kubernetes-flux', cmd: 'flux', args: ['--version'] },
+    { skill: 'terraform-infra', cmd: 'terraform', args: ['--version'] },
+    { skill: 'github-ops', cmd: 'gh', args: ['--version'] },
+    { skill: 'git-expert', cmd: 'git', args: ['--version'] },
+  ];
+
+  for (const { skill, cmd, args } of cliChecks) {
+    const skillPath = path.join(skillsDir, skill);
+    if (!fs.existsSync(skillPath)) continue;
+
+    const out = spawnSync(cmd, args, { encoding: 'utf8', shell: true });
+    if (out.status !== 0 && out.status !== null) {
+      log(
+        'yellow',
+        `  ⚠ ${skill}: \`${cmd}\` not found or failed (install per skill SKILL.md → Installation)`
+      );
+      results.warnings++;
+    } else if (VERBOSE) {
+      log('green', `  ✓ ${skill}: ${cmd} available`);
+    }
+  }
+
+  const sequentialThinkingSkill = path.join(skillsDir, 'sequential-thinking');
+  const executorPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'tools',
+    'optimization',
+    'sequential-thinking',
+    'executor.py'
+  );
+  if (fs.existsSync(sequentialThinkingSkill) && !fs.existsSync(executorPath)) {
+    log(
+      'yellow',
+      '  ⚠ sequential-thinking: executor.py not found; full functionality requires .claude/tools/optimization/sequential-thinking/executor.py'
+    );
+    results.warnings++;
+  } else if (fs.existsSync(sequentialThinkingSkill) && fs.existsSync(executorPath) && VERBOSE) {
+    log('green', '  ✓ sequential-thinking: executor.py present');
+  }
+}
+
+/**
  * Check for doc/path drift
  */
 function validateDocPaths() {
@@ -413,6 +470,7 @@ async function main() {
   validateSkills();
   validateHooks();
   validateMcp();
+  checkEnvCli();
   validateDocPaths();
 
   // Summary

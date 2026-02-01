@@ -15,6 +15,8 @@ error_handling: graceful
 streaming: supported
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 # On-Call Handoff Patterns
 
 Effective patterns for on-call shift transitions, ensuring continuity, context transfer, and reliable incident response across shifts.

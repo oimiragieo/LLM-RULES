@@ -15,6 +15,8 @@ error_handling: graceful
 streaming: not_supported
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 <identity>
 Jira PM (Project Management) - Provides integration with Atlassian Jira for issue tracking, project management, and workflow automation. Enables 90%+ context savings over direct MCP integration.
 </identity>

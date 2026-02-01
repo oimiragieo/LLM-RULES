@@ -15,6 +15,8 @@ error_handling: graceful
 streaming: supported
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 # Incident Runbook Templates
 
 Production-ready templates for incident response runbooks covering detection, triage, mitigation, resolution, and communication.

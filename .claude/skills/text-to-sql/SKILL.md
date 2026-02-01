@@ -15,6 +15,8 @@ error_handling: graceful
 streaming: supported
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 # Text-to-SQL Skill
 
 ## Identity

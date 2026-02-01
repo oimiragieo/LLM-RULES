@@ -19,6 +19,8 @@ streaming: supported
 output_location: .claude/agents/
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 # Agent Creator Skill
 
 Creates specialized AI agents on-demand for capabilities that don't have existing agents.

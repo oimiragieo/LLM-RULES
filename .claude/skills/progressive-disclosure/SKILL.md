@@ -19,6 +19,8 @@ clarification_limit: 5
 default_mode: infer
 ---
 
+**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+
 # Progressive Disclosure
 
 ## Overview
