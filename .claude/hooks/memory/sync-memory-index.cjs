@@ -94,11 +94,7 @@ async function main() {
       debugLog('sync-memory-index', `Sync failed for ${path.basename(absPath)}`, err);
     }
   } catch (err) {
-    debugLog(
-      'sync-memory-index',
-      `Failed to initialize extractor for ${toolName || 'tool'}`,
-      err
-    );
+    debugLog('sync-memory-index', `Failed to initialize extractor for ${toolName || 'tool'}`, err);
   }
 
   // Best-effort / non-blocking.

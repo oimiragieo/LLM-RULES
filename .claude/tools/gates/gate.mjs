@@ -7,6 +7,6 @@
  * };
  */
 
-export const gate = async (_context) => {
-    return true;
+export const gate = async _context => {
+  return true;
 };

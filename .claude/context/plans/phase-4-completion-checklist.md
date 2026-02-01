@@ -25,12 +25,12 @@
 
 ## Deliverables
 
-| Deliverable | Location |
-|-------------|----------|
+| Deliverable                                     | Location                                                       |
+| ----------------------------------------------- | -------------------------------------------------------------- |
 | Fan-out fail-at-end, loop SYSTEM_MAX_ITERATIONS | `.claude/lib/workflow/fan-out-fan-in.cjs`, `loop-executor.cjs` |
-| Workflow patterns schema | `.claude/schemas/workflow-patterns.schema.json` |
-| Composer include/extend/compose/flatten | `.claude/lib/workflow/workflow-composer.cjs` |
-| Resolver getDependencies, resolveWithCycleCheck | `.claude/lib/workflow/workflow-resolver.cjs` |
-| Cycle detector max depth | `.claude/lib/workflow/cycle-detector.cjs` |
-| Hybrid routeTask, syncState, translateResult | `.claude/lib/workflow/hybrid-executor.cjs` |
-| Phase 4 tests | `tests/phase-4/*.test.cjs` |
+| Workflow patterns schema                        | `.claude/schemas/workflow-patterns.schema.json`                |
+| Composer include/extend/compose/flatten         | `.claude/lib/workflow/workflow-composer.cjs`                   |
+| Resolver getDependencies, resolveWithCycleCheck | `.claude/lib/workflow/workflow-resolver.cjs`                   |
+| Cycle detector max depth                        | `.claude/lib/workflow/cycle-detector.cjs`                      |
+| Hybrid routeTask, syncState, translateResult    | `.claude/lib/workflow/hybrid-executor.cjs`                     |
+| Phase 4 tests                                   | `tests/phase-4/*.test.cjs`                                     |

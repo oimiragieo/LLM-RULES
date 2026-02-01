@@ -10,7 +10,9 @@ const fs = require('fs');
 const { FanOutFanInExecutor } = require('../../.claude/lib/workflow/fan-out-fan-in.cjs');
 const { ConditionalExecutor } = require('../../.claude/lib/workflow/conditional-executor.cjs');
 const { LoopExecutor } = require('../../.claude/lib/workflow/loop-executor.cjs');
-const { TransactionalStateManager } = require('../../.claude/lib/workflow/state-transaction-manager.cjs');
+const {
+  TransactionalStateManager,
+} = require('../../.claude/lib/workflow/state-transaction-manager.cjs');
 
 const TEST_DIR = path.join(__dirname, '../temp/phase-4-patterns-tx');
 const JOURNAL_PATH = path.join(TEST_DIR, 'journal.jsonl');
@@ -53,7 +55,11 @@ describe('Phase 4: workflow patterns + state transaction integration', () => {
     await manager.setState(txId, 'step', 1);
 
     const conditional = new ConditionalExecutor();
-    const branch = await conditional.when(true, async () => 'then', async () => 'else');
+    const branch = await conditional.when(
+      true,
+      async () => 'then',
+      async () => 'else'
+    );
     await manager.setState(txId, 'branch', branch);
 
     await manager.rollback(txId);
@@ -68,12 +74,12 @@ describe('Phase 4: workflow patterns + state transaction integration', () => {
     const checkpoints = [];
 
     await loop.doWhile(
-      (s) => s.iterations < 2,
-      async (s) => {
+      s => s.iterations < 2,
+      async s => {
         checkpoints.push(s.iterations);
         return s;
       },
-      { maxIterations: 5, onCheckpoint: (s) => checkpoints.push(s.iterations) }
+      { maxIterations: 5, onCheckpoint: s => checkpoints.push(s.iterations) }
     );
 
     await manager.setState(txId, 'loopCheckpoints', checkpoints.length);

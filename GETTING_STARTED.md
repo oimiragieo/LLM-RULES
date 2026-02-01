@@ -91,6 +91,13 @@ your-project/
 
 See `.claude/hooks/README.md` for detailed hook documentation.
 
+### Pre-commit security lint (Git)
+
+When you commit, a **Git pre-commit hook** runs a security scanner on staged files (`.claude/tools/cli/security-lint.cjs --staged`). It blocks commits if critical or high-severity issues are found.
+
+- **Exclusions:** Documentation and example-only paths are not scanned or are treated as allowed false positives (e.g. `.claude/docs/`, `.claude/context/plans/`, `.claude/skills/` for `.md`; specific path+rule pairs in code).
+- **Details and configuration:** See [.claude/docs/SECURITY_LINT.md](.claude/docs/SECURITY_LINT.md) for skip rules, how to add exclusions, and how to run or bypass the check.
+
 ### Where outputs go (standardized)
 
 - **Reports**: `.claude/context/reports/` (outcomes, diagnostics, issues)

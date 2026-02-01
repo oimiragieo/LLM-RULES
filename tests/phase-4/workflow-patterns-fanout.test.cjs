@@ -41,16 +41,28 @@ describe('Phase 4: workflow-patterns fan-out', () => {
   test('all: fail if any task fails (fail-fast)', async () => {
     const tasks = [
       { id: 'a', fn: async () => 'ok' },
-      { id: 'b', fn: async () => { throw new Error('b failed'); } },
+      {
+        id: 'b',
+        fn: async () => {
+          throw new Error('b failed');
+        },
+      },
       { id: 'c', fn: async () => 'ok' },
     ];
-    await assert.rejects(async () => executor.execute(tasks, { strategy: 'all' }), { message: 'b failed' });
+    await assert.rejects(async () => executor.execute(tasks, { strategy: 'all' }), {
+      message: 'b failed',
+    });
   });
 
   test('all: failurePolicy continue returns successes and failures', async () => {
     const tasks = [
       { id: 'a', fn: async () => 'ok' },
-      { id: 'b', fn: async () => { throw new Error('b'); } },
+      {
+        id: 'b',
+        fn: async () => {
+          throw new Error('b');
+        },
+      },
       { id: 'c', fn: async () => 'ok' },
     ];
     const out = await executor.execute(tasks, { strategy: 'all', failurePolicy: 'continue' });
@@ -61,16 +73,36 @@ describe('Phase 4: workflow-patterns fan-out', () => {
   test('all: failurePolicy fail-at-end waits for all then throws', async () => {
     const tasks = [
       { id: 'a', fn: async () => 'ok' },
-      { id: 'b', fn: async () => { throw new Error('b'); } },
+      {
+        id: 'b',
+        fn: async () => {
+          throw new Error('b');
+        },
+      },
       { id: 'c', fn: async () => 'ok' },
     ];
-    await assert.rejects(async () => executor.execute(tasks, { strategy: 'all', failurePolicy: 'fail-at-end' }), { message: 'b' });
+    await assert.rejects(
+      async () => executor.execute(tasks, { strategy: 'all', failurePolicy: 'fail-at-end' }),
+      { message: 'b' }
+    );
   });
 
   test('any: returns first success', async () => {
     const tasks = [
-      { id: 'slow', fn: async () => { await sleep(50); return 'slow'; } },
-      { id: 'fast', fn: async () => { await sleep(5); return 'fast'; } },
+      {
+        id: 'slow',
+        fn: async () => {
+          await sleep(50);
+          return 'slow';
+        },
+      },
+      {
+        id: 'fast',
+        fn: async () => {
+          await sleep(5);
+          return 'fast';
+        },
+      },
     ];
     const result = await executor.execute(tasks, { strategy: 'any' });
     assert.strictEqual(result, 'fast');
@@ -78,17 +110,34 @@ describe('Phase 4: workflow-patterns fan-out', () => {
 
   test('any: throws if all fail', async () => {
     const tasks = [
-      { id: 'a', fn: async () => { throw new Error('a'); } },
-      { id: 'b', fn: async () => { throw new Error('b'); } },
+      {
+        id: 'a',
+        fn: async () => {
+          throw new Error('a');
+        },
+      },
+      {
+        id: 'b',
+        fn: async () => {
+          throw new Error('b');
+        },
+      },
     ];
-    await assert.rejects(async () => executor.execute(tasks, { strategy: 'any' }), { message: /all.*failed/i });
+    await assert.rejects(async () => executor.execute(tasks, { strategy: 'any' }), {
+      message: /all.*failed/i,
+    });
   });
 
   test('majority: returns when >50% succeed', async () => {
     const tasks = [
       { id: 'a', fn: async () => 'a' },
       { id: 'b', fn: async () => 'b' },
-      { id: 'c', fn: async () => { throw new Error('c'); } },
+      {
+        id: 'c',
+        fn: async () => {
+          throw new Error('c');
+        },
+      },
     ];
     const results = await executor.execute(tasks, { strategy: 'majority' });
     assert.strictEqual(results.length, 2);
@@ -96,11 +145,23 @@ describe('Phase 4: workflow-patterns fan-out', () => {
 
   test('majority: fails when majority fail', async () => {
     const tasks = [
-      { id: 'a', fn: async () => { throw new Error('a'); } },
-      { id: 'b', fn: async () => { throw new Error('b'); } },
+      {
+        id: 'a',
+        fn: async () => {
+          throw new Error('a');
+        },
+      },
+      {
+        id: 'b',
+        fn: async () => {
+          throw new Error('b');
+        },
+      },
       { id: 'c', fn: async () => 'c' },
     ];
-    await assert.rejects(async () => executor.execute(tasks, { strategy: 'majority' }), { message: /majority/i });
+    await assert.rejects(async () => executor.execute(tasks, { strategy: 'majority' }), {
+      message: /majority/i,
+    });
   });
 
   test('quorum: returns when quorumCount met', async () => {
@@ -115,16 +176,39 @@ describe('Phase 4: workflow-patterns fan-out', () => {
 
   test('quorum: fails when quorum not met', async () => {
     const tasks = [
-      { id: 'a', fn: async () => { throw new Error('a'); } },
-      { id: 'b', fn: async () => { throw new Error('b'); } },
+      {
+        id: 'a',
+        fn: async () => {
+          throw new Error('a');
+        },
+      },
+      {
+        id: 'b',
+        fn: async () => {
+          throw new Error('b');
+        },
+      },
       { id: 'c', fn: async () => 'c' },
     ];
-    await assert.rejects(async () => executor.execute(tasks, { strategy: 'quorum', quorumCount: 2 }), { message: /quorum/i });
+    await assert.rejects(
+      async () => executor.execute(tasks, { strategy: 'quorum', quorumCount: 2 }),
+      { message: /quorum/i }
+    );
   });
 
   test('timeout: rejects when task exceeds timeout', async () => {
-    const tasks = [{ id: 'slow', fn: async () => { await sleep(200); return 'x'; } }];
-    await assert.rejects(async () => executor.execute(tasks, { strategy: 'all', timeout: 30 }), { message: /timeout/i });
+    const tasks = [
+      {
+        id: 'slow',
+        fn: async () => {
+          await sleep(200);
+          return 'x';
+        },
+      },
+    ];
+    await assert.rejects(async () => executor.execute(tasks, { strategy: 'all', timeout: 30 }), {
+      message: /timeout/i,
+    });
   });
 
   test('onProgress called with completion count', async () => {
@@ -133,7 +217,10 @@ describe('Phase 4: workflow-patterns fan-out', () => {
       { id: 'a', fn: async () => 'a' },
       { id: 'b', fn: async () => 'b' },
     ];
-    await executor.execute(tasks, { strategy: 'all', onProgress: (done, total) => progress.push({ done, total }) });
+    await executor.execute(tasks, {
+      strategy: 'all',
+      onProgress: (done, total) => progress.push({ done, total }),
+    });
     assert.ok(progress.length >= 1);
     assert.strictEqual(progress[progress.length - 1].done, 2);
     assert.strictEqual(progress[progress.length - 1].total, 2);

@@ -21,11 +21,16 @@ class AnomalyDetector {
    */
   constructor(patternDetector, config = {}) {
     if (!patternDetector || typeof patternDetector.analyze !== 'function') {
-      throw new TypeError('AnomalyDetector requires a PatternDetector-like dependency with analyze(session)');
+      throw new TypeError(
+        'AnomalyDetector requires a PatternDetector-like dependency with analyze(session)'
+      );
     }
 
     this.patternDetector = patternDetector;
-    this.threshold = toNumber(config.threshold, toNumber(process.env.ANOMALY_DISTANCE_THRESHOLD, 10));
+    this.threshold = toNumber(
+      config.threshold,
+      toNumber(process.env.ANOMALY_DISTANCE_THRESHOLD, 10)
+    );
     this.treatUntrainedAsAnomaly = Boolean(config.treatUntrainedAsAnomaly);
   }
 
@@ -132,4 +137,3 @@ class AnomalyDetector {
 }
 
 module.exports = AnomalyDetector;
-

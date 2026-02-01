@@ -1,7 +1,7 @@
 /**
  * Production Agent Entry Point (Stub)
  * ===================================
- * 
+ *
  * This file serves as the entry point for the agent:production script.
  * Currently, the production agent mode is not fully implemented.
  * This stub prevents the "module not found" error in package.json.

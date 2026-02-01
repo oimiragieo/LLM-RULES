@@ -21,35 +21,41 @@ const { BaseAgent } = require(baseAgentPath);
 
 // Mock Agent to inspect config
 class SpyAgent extends BaseAgent {
-    constructor(config) {
-        super(config);
-    }
-    async resolveTask() { return { status: 'success' }; }
+  constructor(config) {
+    super(config);
+  }
+  async resolveTask() {
+    return { status: 'success' };
+  }
 }
 
 describe('Memory Integration', () => {
-    let orchestrator;
-    let createdAgentConfig;
+  let orchestrator;
+  let createdAgentConfig;
 
-    beforeEach(() => {
-        // Hijack Factory to spy on creation
-        const _originalCreate = AgentFactory.createAgent;
-        AgentFactory.createAgent = (type, config) => {
-            createdAgentConfig = config;
-            return new SpyAgent(config);
-        };
+  beforeEach(() => {
+    // Hijack Factory to spy on creation
+    const _originalCreate = AgentFactory.createAgent;
+    AgentFactory.createAgent = (type, config) => {
+      createdAgentConfig = config;
+      return new SpyAgent(config);
+    };
 
-        orchestrator = new OrchestratorService();
+    orchestrator = new OrchestratorService();
+  });
+
+  it('should pass context.memory to Agent', async () => {
+    const mockMemory = { mock: 'memory-instance' };
+
+    await orchestrator.processTask('Check memory', {
+      memory: mockMemory,
     });
 
-    it('should pass context.memory to Agent', async () => {
-        const mockMemory = { mock: 'memory-instance' };
-
-        await orchestrator.processTask('Check memory', {
-            memory: mockMemory
-        });
-
-        assert.ok(createdAgentConfig, 'Agent should be created');
-        assert.strictEqual(createdAgentConfig.memory, mockMemory, 'Memory should be passed to Agent config');
-    });
+    assert.ok(createdAgentConfig, 'Agent should be created');
+    assert.strictEqual(
+      createdAgentConfig.memory,
+      mockMemory,
+      'Memory should be passed to Agent config'
+    );
+  });
 });

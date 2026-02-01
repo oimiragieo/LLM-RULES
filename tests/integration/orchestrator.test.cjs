@@ -24,55 +24,65 @@ const { AgentFactory } = require(factoryPath);
 
 // Mock Agent classes to avoid complex side effects
 class MockAgent {
-    constructor(config) { this.config = config; }
-    async resolveTask(_task) { return { status: 'mocked-success', agentName: this.constructor.name }; }
+  constructor(config) {
+    this.config = config;
+  }
+  async resolveTask(_task) {
+    return { status: 'mocked-success', agentName: this.constructor.name };
+  }
 }
-class MockDeveloper extends MockAgent { }
-class MockArchitect extends MockAgent { }
-class MockQA extends MockAgent { }
+class MockDeveloper extends MockAgent {}
+class MockArchitect extends MockAgent {}
+class MockQA extends MockAgent {}
 
 describe('OrchestratorService Integration', () => {
-    let orchestrator;
+  let orchestrator;
 
-    beforeEach(() => {
-        orchestrator = new OrchestratorService();
+  beforeEach(() => {
+    orchestrator = new OrchestratorService();
 
-        // Spy/Mock Factory
-        const _originalCreateAgent = AgentFactory.createAgent;
-        AgentFactory.createAgent = (type, config) => {
-            switch (type) {
-                case 'developer': return new MockDeveloper(config);
-                case 'architect': return new MockArchitect(config);
-                case 'qa': return new MockQA(config);
-                default: throw new Error(`Unknown: ${type}`);
-            }
-        };
+    // Spy/Mock Factory
+    const _originalCreateAgent = AgentFactory.createAgent;
+    AgentFactory.createAgent = (type, config) => {
+      switch (type) {
+        case 'developer':
+          return new MockDeveloper(config);
+        case 'architect':
+          return new MockArchitect(config);
+        case 'qa':
+          return new MockQA(config);
+        default:
+          throw new Error(`Unknown: ${type}`);
+      }
+    };
+  });
+
+  // Restore mock after each test
+  // (Node test runner handles this well if process restarts, but good practice)
+
+  it('should route "Design login" to Architect', async () => {
+    const result = await orchestrator.processTask('Design login');
+    assert.strictEqual(result.agent, 'architect');
+    assert.strictEqual(result.result.agentName, 'MockArchitect');
+  });
+
+  it('should route "verify" tasks to QA', async () => {
+    const result = await orchestrator.processTask('Verify login feature', {
+      changedFiles: ['login.js'],
     });
+    assert.strictEqual(result.agent, 'qa');
+    assert.strictEqual(result.result.agentName, 'MockQA');
+  });
 
-    // Restore mock after each test
-    // (Node test runner handles this well if process restarts, but good practice)
+  it('should route "plan" tasks to Architect', async () => {
+    const result = await orchestrator.processTask('Plan database schema');
+    assert.strictEqual(result.agent, 'architect');
+    assert.strictEqual(result.result.agentName, 'MockArchitect');
+  });
 
-    it('should route "Design login" to Architect', async () => {
-        const result = await orchestrator.processTask('Design login');
-        assert.strictEqual(result.agent, 'architect');
-        assert.strictEqual(result.result.agentName, 'MockArchitect');
-    });
-
-    it('should route "verify" tasks to QA', async () => {
-        const result = await orchestrator.processTask('Verify login feature', { changedFiles: ['login.js'] });
-        assert.strictEqual(result.agent, 'qa');
-        assert.strictEqual(result.result.agentName, 'MockQA');
-    });
-
-    it('should route "plan" tasks to Architect', async () => {
-        const result = await orchestrator.processTask('Plan database schema');
-        assert.strictEqual(result.agent, 'architect');
-        assert.strictEqual(result.result.agentName, 'MockArchitect');
-    });
-
-    it('should route generic tasks to Developer', async () => {
-        const result = await orchestrator.processTask('Fix bug in auth');
-        assert.strictEqual(result.agent, 'developer');
-        assert.strictEqual(result.result.agentName, 'MockDeveloper');
-    });
+  it('should route generic tasks to Developer', async () => {
+    const result = await orchestrator.processTask('Fix bug in auth');
+    assert.strictEqual(result.agent, 'developer');
+    assert.strictEqual(result.result.agentName, 'MockDeveloper');
+  });
 });

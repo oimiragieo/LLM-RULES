@@ -1,6 +1,6 @@
 ---
 name: Memory and Core Fix Plan
-overview: "Detailed plan to fix all findings from three audits: (1) original six—reflection spawn consumer, weekly maintenance, SyncLayer deprecation, Orchestrator exposure, memory DB defensive init, runArchiveOldLTM paths; (2) second audit—ghost memory/SQLite read path, Task tool doc, agent:production script, agent-config-reader js-yaml, routing-guard doc, .claude/lib structural note; (3) third audit—23 issues (searchMemory mock fallback, scheduler trigger doc, MTM not indexed, cold storage LanceDB, saveSession split-brain, access/retention/ML/embedding/hook docs, corrupted file warning, atomicWriteJSONSync, orphan/test DB cleanup, optional perf/reliability)."
+overview: 'Detailed plan to fix all findings from three audits: (1) original six—reflection spawn consumer, weekly maintenance, SyncLayer deprecation, Orchestrator exposure, memory DB defensive init, runArchiveOldLTM paths; (2) second audit—ghost memory/SQLite read path, Task tool doc, agent:production script, agent-config-reader js-yaml, routing-guard doc, .claude/lib structural note; (3) third audit—23 issues (searchMemory mock fallback, scheduler trigger doc, MTM not indexed, cold storage LanceDB, saveSession split-brain, access/retention/ML/embedding/hook docs, corrupted file warning, atomicWriteJSONSync, orphan/test DB cleanup, optional perf/reliability).'
 todos: []
 isProject: false
 ---
@@ -25,8 +25,10 @@ This plan addresses every finding from the deep-dive audit with specific files, 
 
 1. Reads `.claude/context/runtime/reflection-spawn-request.json` (path: `path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'reflection-spawn-request.json')`).
 2. If the file exists and parses to an array with length > 0:
-  - Write `.claude/context/runtime/reflection-reminder.txt` with one line, e.g. `You have N pending reflection spawn request(s). Before handling the user prompt, read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent for each request (or the first batch). Then delete this reminder file and clear/trim the spawn request file.`
-  - Use a small constant for `N` (e.g. `requests.length`).
+
+- Write `.claude/context/runtime/reflection-reminder.txt` with one line, e.g. `You have N pending reflection spawn request(s). Before handling the user prompt, read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent for each request (or the first batch). Then delete this reminder file and clear/trim the spawn request file.`
+- Use a small constant for `N` (e.g. `requests.length`).
+
 3. If the file is missing or empty, remove `reflection-reminder.txt` if it exists (so we don't leave stale reminders).
 4. Wrap in try/catch; non-blocking (exit 0 always).
 
@@ -40,13 +42,26 @@ const reminderPath = path.join(runtimeDir, 'reflection-reminder.txt');
 try {
   if (fs.existsSync(spawnRequestPath)) {
     const raw = fs.readFileSync(spawnRequestPath, 'utf8');
-    const requests = (() => { try { const a = JSON.parse(raw); return Array.isArray(a) ? a : []; } catch { return []; } })();
+    const requests = (() => {
+      try {
+        const a = JSON.parse(raw);
+        return Array.isArray(a) ? a : [];
+      } catch {
+        return [];
+      }
+    })();
     if (requests.length > 0) {
       fs.mkdirSync(runtimeDir, { recursive: true });
-      fs.writeFileSync(reminderPath, `You have ${requests.length} pending reflection spawn request(s). Read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent before handling the user prompt. Then delete this file and clear the spawn request file.\n`, 'utf8');
+      fs.writeFileSync(
+        reminderPath,
+        `You have ${requests.length} pending reflection spawn request(s). Read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent before handling the user prompt. Then delete this file and clear the spawn request file.\n`,
+        'utf8'
+      );
     } else if (fs.existsSync(reminderPath)) fs.unlinkSync(reminderPath);
   } else if (fs.existsSync(reminderPath)) fs.unlinkSync(reminderPath);
-} catch (_e) { /* ignore */ }
+} catch (_e) {
+  /* ignore */
+}
 ```
 
 **File format reference:** The spawn request file is a JSON array of objects with at least `id`, `subagent_type: 'reflection-agent'`, `description`, `prompt` (see [reflection-queue-processor.cjs](.claude/hooks/reflection/reflection-queue-processor.cjs) `generateSpawnRequest()` at 152–170).
@@ -258,7 +273,13 @@ constructor(dbPath) {
 
 ```javascript
 const coldPath = path.join(projectRoot, '.claude', 'lib', 'memory', 'cold-storage.cjs');
-const configPath = path.join(projectRoot, '.claude', 'lib', 'memory', 'memory-retention-config.cjs');
+const configPath = path.join(
+  projectRoot,
+  '.claude',
+  'lib',
+  'memory',
+  'memory-retention-config.cjs'
+);
 const script = `
   (async () => {
     const { archiveOldLTM } = require(${JSON.stringify(coldPath)});
@@ -277,7 +298,7 @@ const script = `
 
 ## 7. Second audit: "Ghost" memory system (SQLite read path unused)
 
-**Finding:** EntityQuery and EntityExtractor *are* imported, but the **agent-visible** memory path never uses the SQLite graph. No hook or agent calls `ContextualMemory.findEntities()` or `getRelated()`.
+**Finding:** EntityQuery and EntityExtractor _are_ imported, but the **agent-visible** memory path never uses the SQLite graph. No hook or agent calls `ContextualMemory.findEntities()` or `getRelated()`.
 
 ### 7.1 Option A: Wire EntityQuery into agent memory (recommended)
 
@@ -350,7 +371,7 @@ This section maps all 23 issues from the "Memory System & Core Fundamentals Audi
 
 ### CATEGORY 3: Missing or incomplete
 
-- **15.9 (ISSUE 9) ContextualMemory.findEntities requires schema:** Extend Section 5 – add defensive init in EntityQuery constructor or ContextualMemory._getEntityQuery() when schema missing.
+- **15.9 (ISSUE 9) ContextualMemory.findEntities requires schema:** Extend Section 5 – add defensive init in EntityQuery constructor or ContextualMemory.\_getEntityQuery() when schema missing.
 - **15.10–15.15 (ISSUES 10–15):** Documentation only – ML integration, retention config env vars, embedding best-effort, SessionStart clarification, MEMORY_LTM_MAX_SUMMARIES usage, hook wiring (PostToolUse Task|TaskUpdate|Bash).
 
 ### CATEGORY 4 & 5: Performance, reliability, consistency
@@ -361,7 +382,7 @@ This section maps all 23 issues from the "Memory System & Core Fundamentals Audi
 - **15.20 (ISSUE 20) atomicWriteJSONSync:** In memory-tiers.cjs and memory-scheduler.cjs, use atomicWriteJSONSync for all JSON writes.
 - **15.21 (ISSUE 21) Session data validation:** Optional – validate minimal shape in writeSTMEntry.
 - **15.22 (ISSUE 22) vectors.db orphan:** Remove orphan or add to .gitignore and document.
-- **15.23 (ISSUE 23) Test DB cleanup:** Tests use temp dir or cleanup so .claude/data/test-*.db are not left behind.
+- **15.23 (ISSUE 23) Test DB cleanup:** Tests use temp dir or cleanup so .claude/data/test-\*.db are not left behind.
 
 ---
 

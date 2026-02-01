@@ -55,6 +55,16 @@ const CONFIG = {
   // Directories to skip
   skipDirs: ['node_modules', '.git', 'dist', 'build', 'coverage', '.next', '.nuxt', 'vendor'],
 
+  // Path patterns: do not scan .md files under these (docs/plans/skills - examples only)
+  skipMdPaths: ['.claude/docs/', '.claude/context/plans/', '.claude/skills/'],
+
+  // Known false positives: { pathSubstring, ruleId } - excluded from blocking
+  skipFindings: [
+    { pathSubstring: 'user-prompt-unified.cjs', ruleId: 'SEC-040' }, // path.join with literal "reflection-spawn-request"
+    { pathSubstring: 'generate-tool-manifest.cjs', ruleId: 'SEC-030' }, // CLI diagnostic logging
+    { pathSubstring: 'tests/migration/', ruleId: 'SEC-011' }, // test harness execSync with controlled input
+  ],
+
   // Severity levels
   severityLevels: {
     critical: 3,
@@ -298,16 +308,33 @@ function walkDirectory(dir) {
 }
 
 /**
+ * Normalize path for consistent matching (forward slashes)
+ * @param {string} filePath - File path
+ * @returns {string} Normalized path
+ */
+function normalizePathForMatch(filePath) {
+  return filePath.split(path.sep).join('/');
+}
+
+/**
  * Check if file should be scanned
  * @param {string} filePath - File path
  * @returns {boolean} Whether to scan
  */
 function shouldScanFile(filePath) {
   const ext = path.extname(filePath).toLowerCase();
+  const normalized = normalizePathForMatch(filePath);
 
   // Check extension
   if (!CONFIG.scanExtensions.includes(ext) && !filePath.includes('.env')) {
     return false;
+  }
+
+  // Skip .md files under docs/plans/skills (examples and documentation only)
+  if (ext === '.md' && CONFIG.skipMdPaths) {
+    if (CONFIG.skipMdPaths.some(prefix => normalized.includes(prefix))) {
+      return false;
+    }
   }
 
   // Check file size
@@ -529,10 +556,21 @@ Examples:
   }
 
   // Scan all files
-  const allFindings = [];
+  let allFindings = [];
   for (const file of filesToScan) {
     const findings = scanFile(file);
     allFindings.push(...findings);
+  }
+
+  // Exclude known false positives (path + ruleId) from blocking and report
+  if (CONFIG.skipFindings && CONFIG.skipFindings.length > 0) {
+    allFindings = allFindings.filter(f => {
+      const normalized = normalizePathForMatch(f.file);
+      const skip = CONFIG.skipFindings.some(
+        s => normalized.includes(s.pathSubstring) && f.ruleId === s.ruleId
+      );
+      return !skip;
+    });
   }
 
   // Output results
@@ -556,6 +594,7 @@ module.exports = {
   scanFile,
   shouldScanFile,
   shouldSkipScanning,
+  normalizePathForMatch,
   CONFIG,
 };
 

@@ -54,10 +54,8 @@ class MemoryVectorStore {
     this.config = {
       persistDirectory:
         config.persistDirectory || process.env.LANCEDB_URI || '.claude/data/lancedb',
-      collectionName:
-        config.collectionName || process.env.LANCEDB_TABLE || 'agent_memory',
-      embeddingMode:
-        config.embeddingMode || process.env.LANCEDB_EMBEDDING_MODE || 'transformers',
+      collectionName: config.collectionName || process.env.LANCEDB_TABLE || 'agent_memory',
+      embeddingMode: config.embeddingMode || process.env.LANCEDB_EMBEDDING_MODE || 'transformers',
       embeddingModel:
         config.embeddingModel || process.env.LANCEDB_EMBEDDING_MODEL || 'Xenova/all-MiniLM-L6-v2',
     };
@@ -99,9 +97,10 @@ class MemoryVectorStore {
             // Use efficient MiniLM model (384 dimensions)
             // 'feature-extraction' allows raw vector output
             this.embedder = await pipeline('feature-extraction', this.config.embeddingModel);
-
           } catch (e) {
-            console.warn('[LanceDB] Failed to load local embedding model (likely missing dependencies like "sharp"). switching to MOCK mode.');
+            console.warn(
+              '[LanceDB] Failed to load local embedding model (likely missing dependencies like "sharp"). switching to MOCK mode.'
+            );
             console.warn(`[LanceDB] Error details: ${e.message}`);
 
             // Fallback to Mock Embedder
@@ -139,18 +138,18 @@ class MemoryVectorStore {
    * Used when local transformers cannot be loaded
    */
   _createMockEmbedder() {
-    return async (_text) => {
+    return async _text => {
       // Return a mock tensor-like object or just handled in generateEmbedding
       // We'll return a function similar to the pipeline output
       return {
-        data: Array.from({ length: 384 }, () => Math.random()) // 384-dim random vector
+        data: Array.from({ length: 384 }, () => Math.random()), // 384-dim random vector
       };
     };
   }
 
   /**
    * Generate embedding for text
-   * @param {string} text 
+   * @param {string} text
    * @returns {Promise<Array<number>>} Vector
    */
   async generateEmbedding(text) {
@@ -165,13 +164,16 @@ class MemoryVectorStore {
     if (!this.embedder) throw new Error('Embedder not initialized');
 
     // Check if it's our mock
-    if (this.embedder.name === '_createMockEmbedder' || typeof this.embedder === 'function' && this.embedder.toString().includes('Math.random()')) {
+    if (
+      this.embedder.name === '_createMockEmbedder' ||
+      (typeof this.embedder === 'function' && this.embedder.toString().includes('Math.random()'))
+    ) {
       const output = await this.embedder(text);
       return output.data;
     }
 
     // Real Transformers pipeline
-    // Xenova/transformers returns a Tensor. 
+    // Xenova/transformers returns a Tensor.
     // We need pooling='mean', normalize=true
     const output = await this.embedder(text, { pooling: 'mean', normalize: true });
 
@@ -181,7 +183,7 @@ class MemoryVectorStore {
 
   /**
    * Add documents to the store
-   * @param {Array<{id: string, text: string, metadata: Object}>} documents 
+   * @param {Array<{id: string, text: string, metadata: Object}>} documents
    */
   async addDocuments(documents) {
     if (!documents || documents.length === 0) return;
@@ -210,7 +212,7 @@ class MemoryVectorStore {
     if (data.length === 0) return;
 
     if (!this.table) {
-      // Create table on first insert. 
+      // Create table on first insert.
       // LanceDB infers schema from the first batch of data.
       this.table = await this.db.createTable(this.config.collectionName, data);
     } else {
@@ -244,8 +246,8 @@ class MemoryVectorStore {
 
   /**
    * Search for similar documents
-   * @param {string} query 
-   * @param {Object} options 
+   * @param {string} query
+   * @param {Object} options
    * @returns {Promise<Array<{id: string, content: string, metadata: Object, similarity: number}>>}
    */
   async search(query, options = {}) {

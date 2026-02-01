@@ -22,14 +22,14 @@ let orchestratorService = null;
  * Get or create the OrchestratorService singleton
  */
 function getService() {
-    if (!orchestratorService) {
-        // Inject standard tools (Read, Write, etc.) into the service
-        // so specialized agents can use them.
-        orchestratorService = new OrchestratorService({
-            tools: StandardTools
-        });
-    }
-    return orchestratorService;
+  if (!orchestratorService) {
+    // Inject standard tools (Read, Write, etc.) into the service
+    // so specialized agents can use them.
+    orchestratorService = new OrchestratorService({
+      tools: StandardTools,
+    });
+  }
+  return orchestratorService;
 }
 
 /**
@@ -40,40 +40,40 @@ function getService() {
  * @returns {Promise<Object>} The result of the orchestration
  */
 async function Orchestrator({ task }) {
-    if (!task) {
-        throw new Error('Task argument is required for Orchestrator tool');
-    }
+  if (!task) {
+    throw new Error('Task argument is required for Orchestrator tool');
+  }
 
-    console.log(`[OrchestratorTool] Received task: "${task}"`);
+  console.log(`[OrchestratorTool] Received task: "${task}"`);
 
-    const service = getService();
+  const service = getService();
 
-    // Initialize real memory system for the agents
-    const memory = new ContextualMemory();
+  // Initialize real memory system for the agents
+  const memory = new ContextualMemory();
 
-    try {
-        // Execute the task pipeline
-        // context.changedFiles is not strictly required for the initial call,
-        // agents will discover files via tools.
-        const result = await service.processTask(task, {
-            memory,
-            changedFiles: []
-        });
+  try {
+    // Execute the task pipeline
+    // context.changedFiles is not strictly required for the initial call,
+    // agents will discover files via tools.
+    const result = await service.processTask(task, {
+      memory,
+      changedFiles: [],
+    });
 
-        // summarize result for the tool output
-        return {
-            status: 'success',
-            agent: result.agent,
-            output: result.result,
-            subTasks: result.subResults ? result.subResults.length : 0
-        };
-    } catch (error) {
-        console.error('[OrchestratorTool] Error:', error);
-        return {
-            status: 'error',
-            message: error.message
-        };
-    }
+    // summarize result for the tool output
+    return {
+      status: 'success',
+      agent: result.agent,
+      output: result.result,
+      subTasks: result.subResults ? result.subResults.length : 0,
+    };
+  } catch (error) {
+    console.error('[OrchestratorTool] Error:', error);
+    return {
+      status: 'error',
+      message: error.message,
+    };
+  }
 }
 
 module.exports = { Orchestrator };

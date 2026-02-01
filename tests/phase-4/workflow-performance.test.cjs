@@ -12,11 +12,7 @@ const MemoryBudgeter = require('../../.claude/lib/workflow/memory-budgeter.cjs')
 describe('Phase 4: workflow performance (SPEC-022)', () => {
   test('LazyLoader loadPhase loads phase and dependencies', () => {
     const workflow = {
-      phases: [
-        { name: 'a' },
-        { name: 'b', dependsOn: 'a' },
-        { name: 'c', dependsOn: 'b' },
-      ],
+      phases: [{ name: 'a' }, { name: 'b', dependsOn: 'a' }, { name: 'c', dependsOn: 'b' }],
     };
     const loader = new LazyLoader(workflow);
     loader.loadPhase('c');

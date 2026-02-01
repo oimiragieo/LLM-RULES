@@ -16,12 +16,12 @@ Add retention policies and cold-storage archiving so the memory system stays bou
 
 **Purpose**: Environment-driven limits so operators can cap LTM and control cold behavior.
 
-| Env / config | Default | Purpose |
-|-------------|--------|--------|
-| `MEMORY_LTM_MAX_SUMMARIES` | `50` | Max LTM summary files to keep in `ltm/` before archiving oldest. |
-| `MEMORY_COLD_ENABLE` | `true` | If `false`, only delete oldest LTM files (no cold archive). |
-| `MEMORY_COLD_ARCHIVE_AFTER_DAYS` | (optional) | If set, archive LTM summaries older than N days (alternative or complement to count cap). |
-| `MEMORY_COLD_DIR` | `.claude/context/memory/cold` | Directory for compressed archives. |
+| Env / config                     | Default                       | Purpose                                                                                   |
+| -------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------- |
+| `MEMORY_LTM_MAX_SUMMARIES`       | `50`                          | Max LTM summary files to keep in `ltm/` before archiving oldest.                          |
+| `MEMORY_COLD_ENABLE`             | `true`                        | If `false`, only delete oldest LTM files (no cold archive).                               |
+| `MEMORY_COLD_ARCHIVE_AFTER_DAYS` | (optional)                    | If set, archive LTM summaries older than N days (alternative or complement to count cap). |
+| `MEMORY_COLD_DIR`                | `.claude/context/memory/cold` | Directory for compressed archives.                                                        |
 
 ### Tasks
 
@@ -170,25 +170,25 @@ When doing a major version cleanup, remove the legacy `sessions/` fallback from 
 
 ## Subtask summary (for TaskCreate)
 
-| Task ID | Subject | Blocked By | Effort |
-|--------|---------|------------|--------|
-| R1 | Tunables: config helper + validation | None | 1h |
-| R2 | Cold format: choose (rotation vs per-run), path helpers | None | 1h |
-| R3 | Archiver: listLTMSummaries + archiveOldLTM + LanceDB index + safety | R2 | 4h |
-| R4 | Scheduler: weekly task + runArchiveOldLTM + getLibDir fix | R3 | 2h |
-| R5 | Docs: MEMORY_SYSTEM.md retention + cold + hot-only | R4 | 1h |
-| R6 | Tests: cold-storage unit tests + scheduler weekly test | R3 | 2h |
+| Task ID | Subject                                                             | Blocked By | Effort |
+| ------- | ------------------------------------------------------------------- | ---------- | ------ |
+| R1      | Tunables: config helper + validation                                | None       | 1h     |
+| R2      | Cold format: choose (rotation vs per-run), path helpers             | None       | 1h     |
+| R3      | Archiver: listLTMSummaries + archiveOldLTM + LanceDB index + safety | R2         | 4h     |
+| R4      | Scheduler: weekly task + runArchiveOldLTM + getLibDir fix           | R3         | 2h     |
+| R5      | Docs: MEMORY_SYSTEM.md retention + cold + hot-only                  | R4         | 1h     |
+| R6      | Tests: cold-storage unit tests + scheduler weekly test              | R3         | 2h     |
 
 ---
 
 ## File list
 
-| File | Change |
-|------|--------|
-| `.claude/lib/memory/cold-storage.cjs` | New: list LTM, archive to cold (no gzip append), optional LanceDB index, delete from ltm/. |
-| `.claude/lib/memory/memory-scheduler.cjs` | New weekly task; call archiver; CONFIG + getLibDir fix if needed. |
-| `tests/lib/memory/cold-storage.test.cjs` (or under `tests/`) | New: unit tests for archiver. |
-| `.claude/docs/MEMORY_SYSTEM.md` | New section: retention policy, cold storage, tunables, hot-only default. |
+| File                                                         | Change                                                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `.claude/lib/memory/cold-storage.cjs`                        | New: list LTM, archive to cold (no gzip append), optional LanceDB index, delete from ltm/. |
+| `.claude/lib/memory/memory-scheduler.cjs`                    | New weekly task; call archiver; CONFIG + getLibDir fix if needed.                          |
+| `tests/lib/memory/cold-storage.test.cjs` (or under `tests/`) | New: unit tests for archiver.                                                              |
+| `.claude/docs/MEMORY_SYSTEM.md`                              | New section: retention policy, cold storage, tunables, hot-only default.                   |
 
 ---
 

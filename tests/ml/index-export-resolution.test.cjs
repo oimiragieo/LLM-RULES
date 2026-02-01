@@ -18,7 +18,6 @@ function resetEnv() {
 }
 
 describe('ML index export resolution', () => {
-
   afterEach(() => {
     resetEnv();
     // Clear require cache so index re-reads env
@@ -64,7 +63,9 @@ describe('ML index export resolution', () => {
     const instance = ml.getOptimizationEngine();
     const r = instance.isReady();
     assert.equal(r.ready, false);
-    assert.ok(r.reason && (r.reason.includes('not trained') || r.reason.includes('No pattern detector')));
+    assert.ok(
+      r.reason && (r.reason.includes('not trained') || r.reason.includes('No pattern detector'))
+    );
   });
 
   it('ML_AUTOMATION_MODE is exported and defaults to off', () => {

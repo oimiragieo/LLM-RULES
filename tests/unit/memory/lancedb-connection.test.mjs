@@ -52,4 +52,3 @@ describe('LanceDB Connection', () => {
     assert.strictEqual(available, true);
   });
 });
-

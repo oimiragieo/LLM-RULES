@@ -28,7 +28,10 @@ describe('Phase 4: hybrid executor', () => {
   });
 
   test('routeTask with config default_system when disabled', async () => {
-    const decision = await executor.routeTask({ path: 'any' }, { enabled: false, default_system: 'conductor-main' });
+    const decision = await executor.routeTask(
+      { path: 'any' },
+      { enabled: false, default_system: 'conductor-main' }
+    );
     assert.strictEqual(decision.system, 'conductor-main');
     assert.strictEqual(decision.reason, 'hybrid_disabled');
   });

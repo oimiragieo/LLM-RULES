@@ -68,7 +68,7 @@ function listLTMSummaries(projectRoot = PROJECT_ROOT) {
     }
   }
 
-  entries.sort((a, b) => (a.mtimeMs - b.mtimeMs) || a.name.localeCompare(b.name));
+  entries.sort((a, b) => a.mtimeMs - b.mtimeMs || a.name.localeCompare(b.name));
   return entries;
 }
 
@@ -97,7 +97,9 @@ function buildIndexDocument(summaryObj, sourcePath, coldPath) {
     dateRange?.start || dateRange?.end
       ? `date_range: ${dateRange?.start || 'unknown'} → ${dateRange?.end || 'unknown'}`
       : null,
-    typeof summaryObj?.session_count === 'number' ? `session_count: ${summaryObj.session_count}` : null,
+    typeof summaryObj?.session_count === 'number'
+      ? `session_count: ${summaryObj.session_count}`
+      : null,
     '',
   ]
     .filter(Boolean)
@@ -180,7 +182,7 @@ async function archiveOldLTM(projectRoot = PROJECT_ROOT, options = {}) {
   }
 
   const toArchive = Array.from(selected.values()).sort(
-    (a, b) => (a.mtimeMs - b.mtimeMs) || a.name.localeCompare(b.name)
+    (a, b) => a.mtimeMs - b.mtimeMs || a.name.localeCompare(b.name)
   );
 
   if (toArchive.length === 0) {
@@ -278,4 +280,3 @@ module.exports = {
     buildIndexDocument,
   },
 };
-

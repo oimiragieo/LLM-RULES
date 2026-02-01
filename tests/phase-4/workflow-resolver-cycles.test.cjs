@@ -55,9 +55,12 @@ describe('Phase 4: workflow resolver and cycle detection', () => {
     registry.set('l3', { name: 'l3', extends: 'l4' });
     registry.set('l4', { name: 'l4' });
 
-    await assert.rejects(async () => detector.detectCycles(registry.get('l0'), registry, new Set(), { maxDepth: 3 }), {
-      message: /depth exceeded/,
-    });
+    await assert.rejects(
+      async () => detector.detectCycles(registry.get('l0'), registry, new Set(), { maxDepth: 3 }),
+      {
+        message: /depth exceeded/,
+      }
+    );
   });
 
   test('resolver resolveWithCycleCheck runs cycle check then resolve', async () => {

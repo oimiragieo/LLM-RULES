@@ -16,19 +16,24 @@ describe('Phase 4: workflow-patterns loops', () => {
 
   test('forEach: sequential returns all results', async () => {
     const items = [1, 2, 3];
-    const results = await executor.forEach(items, async (ctx) => ctx.item * 2);
+    const results = await executor.forEach(items, async ctx => ctx.item * 2);
     assert.deepStrictEqual(results, [2, 4, 6]);
   });
 
   test('forEach: parallel with maxConcurrency', async () => {
     const items = [1, 2, 3, 4];
-    const results = await executor.forEach(items, async (ctx) => ctx.item, { parallel: true, maxConcurrency: 2 });
+    const results = await executor.forEach(items, async ctx => ctx.item, {
+      parallel: true,
+      maxConcurrency: 2,
+    });
     assert.deepStrictEqual(results, [1, 2, 3, 4]);
   });
 
   test('forEach: onProgress called each iteration', async () => {
     const progress = [];
-    await executor.forEach([1, 2, 3], async (ctx) => ctx.item, { onProgress: (done, total) => progress.push({ done, total }) });
+    await executor.forEach([1, 2, 3], async ctx => ctx.item, {
+      onProgress: (done, total) => progress.push({ done, total }),
+    });
     assert.strictEqual(progress.length, 3);
     assert.strictEqual(progress[2].done, 3);
     assert.strictEqual(progress[2].total, 3);
@@ -36,7 +41,12 @@ describe('Phase 4: workflow-patterns loops', () => {
 
   test('doWhile: requires maxIterations', async () => {
     await assert.rejects(
-      async () => executor.doWhile(() => true, async () => ({}), {}),
+      async () =>
+        executor.doWhile(
+          () => true,
+          async () => ({}),
+          {}
+        ),
       { message: /maxIterations is required/i }
     );
   });
@@ -44,8 +54,8 @@ describe('Phase 4: workflow-patterns loops', () => {
   test('doWhile: runs until condition false', async () => {
     let count = 0;
     const state = await executor.doWhile(
-      (s) => s.iterations < 3,
-      async (_s) => ({ count: (count += 1) }),
+      s => s.iterations < 3,
+      async _s => ({ count: (count += 1) }),
       { maxIterations: 10 }
     );
     assert.strictEqual(state.iterations, 3);
@@ -54,7 +64,7 @@ describe('Phase 4: workflow-patterns loops', () => {
   test('doWhile: respects maxIterations cap', async () => {
     const state = await executor.doWhile(
       () => true,
-      async (s) => s,
+      async s => s,
       { maxIterations: 5 }
     );
     assert.strictEqual(state.iterations, 5);
@@ -63,9 +73,9 @@ describe('Phase 4: workflow-patterns loops', () => {
   test('doWhile: onCheckpoint called each iteration', async () => {
     const checkpoints = [];
     await executor.doWhile(
-      (s) => s.iterations < 2,
-      async (s) => s,
-      { maxIterations: 10, onCheckpoint: (s) => checkpoints.push(s) }
+      s => s.iterations < 2,
+      async s => s,
+      { maxIterations: 10, onCheckpoint: s => checkpoints.push(s) }
     );
     assert.strictEqual(checkpoints.length, 2);
   });
@@ -73,7 +83,7 @@ describe('Phase 4: workflow-patterns loops', () => {
   test('retryUntil: returns on first success', async () => {
     let attempts = 0;
     const out = await executor.retryUntil(
-      (r) => r === 'ok',
+      r => r === 'ok',
       async () => (attempts++ < 1 ? 'fail' : 'ok'),
       { maxRetries: 5 }
     );
@@ -103,14 +113,22 @@ describe('Phase 4: workflow-patterns loops', () => {
   });
 
   test('retryUntil: returns failure when maxRetries exhausted', async () => {
-    const out = await executor.retryUntil(() => false, async () => 'x', { maxRetries: 2 });
+    const out = await executor.retryUntil(
+      () => false,
+      async () => 'x',
+      { maxRetries: 2 }
+    );
     assert.strictEqual(out.success, false);
     assert.strictEqual(out.result, 'x');
     assert.strictEqual(out.attempts, 2);
   });
 
   test('retryUntil: success on first try', async () => {
-    const out = await executor.retryUntil((r) => r === 1, async () => 1, { maxRetries: 3 });
+    const out = await executor.retryUntil(
+      r => r === 1,
+      async () => 1,
+      { maxRetries: 3 }
+    );
     assert.strictEqual(out.success, true);
     assert.strictEqual(out.attempts, 1);
   });
@@ -119,7 +137,7 @@ describe('Phase 4: workflow-patterns loops', () => {
     const items = [1, 2, 3];
     const out = await executor.forEach(
       items,
-      async (ctx) => {
+      async ctx => {
         if (ctx.item === 2) throw new Error('two');
         return ctx.item;
       },
@@ -131,8 +149,8 @@ describe('Phase 4: workflow-patterns loops', () => {
 
   test('doWhile: system cap 10000 allows maxIterations 100', async () => {
     const state = await executor.doWhile(
-      (s) => s.iterations < 100,
-      async (s) => s,
+      s => s.iterations < 100,
+      async s => s,
       { maxIterations: 100 }
     );
     assert.strictEqual(state.iterations, 100);
@@ -142,7 +160,7 @@ describe('Phase 4: workflow-patterns loops', () => {
     const context = { sum: 0 };
     await executor.forEach(
       [1, 2, 3],
-      async (ctx) => {
+      async ctx => {
         ctx.sum = (ctx.sum || 0) + ctx.item;
         return ctx.item;
       },

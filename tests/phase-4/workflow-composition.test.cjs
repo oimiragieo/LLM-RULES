@@ -64,11 +64,7 @@ describe('Phase 4: workflow composition', () => {
     const registry = new Map();
     registry.set('root', {
       name: 'root',
-      phases: [
-        { name: 'before' },
-        { include: 'sub' },
-        { name: 'after' },
-      ],
+      phases: [{ name: 'before' }, { include: 'sub' }, { name: 'after' }],
     });
     registry.set('sub', { name: 'sub', phases: [{ name: 'subPhase' }] });
     resolver.setRegistry(registry);

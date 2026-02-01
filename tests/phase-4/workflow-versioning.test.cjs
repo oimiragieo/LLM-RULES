@@ -44,9 +44,9 @@ describe('Phase 4: workflow versioning', () => {
     migrations.register('wf4', {
       from: '1.0.0',
       to: '2.0.0',
-      migrate: (state) => ({ ...state, workflowVersion: '2.0.0', phase: 'v2' }),
-      validate: (state) => ({ valid: !!state.phase, errors: [] }),
-      rollback: (state) => ({ ...state, workflowVersion: '1.0.0' }),
+      migrate: state => ({ ...state, workflowVersion: '2.0.0', phase: 'v2' }),
+      validate: state => ({ valid: !!state.phase, errors: [] }),
+      rollback: state => ({ ...state, workflowVersion: '1.0.0' }),
     });
     const state = { workflowVersion: '1.0.0' };
     await migrations.migrate('wf4', state, '2.0.0');
@@ -58,7 +58,10 @@ describe('Phase 4: workflow versioning', () => {
     migrations.register('wf5', {
       from: '1.x.x',
       to: '2.0.0',
-      validate: (state) => ({ valid: state.workflowVersion === '2.0.0', errors: state.workflowVersion ? [] : ['missing version'] }),
+      validate: state => ({
+        valid: state.workflowVersion === '2.0.0',
+        errors: state.workflowVersion ? [] : ['missing version'],
+      }),
     });
     const result = await migrations.validateMigration('wf5', { workflowVersion: '2.0.0' }, '2.0.0');
     assert.ok(result.valid !== undefined || result.errors !== undefined);
@@ -68,8 +71,8 @@ describe('Phase 4: workflow versioning', () => {
     migrations.register('wf6', {
       from: '1.0.0',
       to: '2.0.0',
-      migrate: (s) => ({ ...s, workflowVersion: '2.0.0' }),
-      rollback: (s) => ({ ...s, workflowVersion: '1.0.0' }),
+      migrate: s => ({ ...s, workflowVersion: '2.0.0' }),
+      rollback: s => ({ ...s, workflowVersion: '1.0.0' }),
     });
     const state = { workflowVersion: '2.0.0' };
     await migrations.rollback('wf6', state, '1.0.0');

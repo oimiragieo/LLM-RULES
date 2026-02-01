@@ -11,13 +11,9 @@ const assert = require('node:assert/strict');
 const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
-const trackAnalytics = require(path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'lib',
-  'utils',
-  'track-analytics.cjs'
-));
+const trackAnalytics = require(
+  path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'track-analytics.cjs')
+);
 
 function makeTrack(i) {
   const day = String((i % 28) + 1).padStart(2, '0');

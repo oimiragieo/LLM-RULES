@@ -38,9 +38,21 @@ async function main() {
     );
 
     await store.upsertDocuments([
-      { id: 'doc1', content: 'JWT authentication flow and refresh tokens', metadata: { type: 'security' } },
-      { id: 'doc2', content: 'SQLite schema initialization and migrations', metadata: { type: 'db' } },
-      { id: 'doc3', content: 'Prompt engineering and tool usage patterns', metadata: { type: 'prompt' } },
+      {
+        id: 'doc1',
+        content: 'JWT authentication flow and refresh tokens',
+        metadata: { type: 'security' },
+      },
+      {
+        id: 'doc2',
+        content: 'SQLite schema initialization and migrations',
+        metadata: { type: 'db' },
+      },
+      {
+        id: 'doc3',
+        content: 'Prompt engineering and tool usage patterns',
+        metadata: { type: 'prompt' },
+      },
     ]);
 
     const results = await store.search('authentication tokens', {
@@ -65,4 +77,3 @@ main().catch(err => {
   console.error('[LanceDB integration] FAILED:', err && err.stack ? err.stack : err);
   process.exit(1);
 });
-

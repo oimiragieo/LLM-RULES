@@ -21,7 +21,7 @@ class ScaleTestUtils {
         name: `Phase ${i}`,
         status: 'pending',
         tasks: [],
-        checkpoints: []
+        checkpoints: [],
       };
     }
 
@@ -34,10 +34,10 @@ class ScaleTestUtils {
         startTime: Date.now(),
         metadata: {
           priority: 'high',
-          tags: ['scale-test', `w-${id}`]
-        }
+          tags: ['scale-test', `w-${id}`],
+        },
       },
-      history: []
+      history: [],
     };
   }
 
@@ -50,25 +50,25 @@ class ScaleTestUtils {
   static async simulateExecution(workflow, durationMs = 100, taskCount = 5) {
     const start = Date.now();
     let tasksAdded = 0;
-    
+
     // Simulate work by adding tasks to current phase
     while (Date.now() - start < durationMs && tasksAdded < taskCount) {
       const taskId = `task-${crypto.randomUUID().slice(0, 8)}`;
       const phaseId = workflow.currentPhase;
-      
+
       workflow.phases[phaseId].tasks.push({
         id: taskId,
         status: 'completed',
         result: `Result for ${taskId}`,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
-      
+
       workflow.history.push({
         event: 'task_completed',
         taskId,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
-      
+
       tasksAdded++;
       await new Promise(r => setTimeout(r, 5)); // Micro-yield
     }
@@ -83,7 +83,7 @@ class ScaleTestUtils {
     } else {
       workflow.status = 'completed';
     }
-    
+
     return tasksAdded;
   }
 }
