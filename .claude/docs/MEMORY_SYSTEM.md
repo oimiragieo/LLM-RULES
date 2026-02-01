@@ -21,6 +21,56 @@ All memory files live in `.claude/context/memory/`:
 | `codebase_map.json` | File discoveries              | JSON object               |
 | `sessions/`         | Per-session JSON files        | JSON                      |
 
+## Hook Wiring (What Runs When)
+
+The memory system is enforced/maintained via Claude Code hooks registered in `.claude/settings.json`:
+
+- `UserPromptSubmit`
+  - `.claude/hooks/routing/user-prompt-unified.cjs` (includes the Memory Protocol reminder and a lightweight memory health check)
+  - `.claude/hooks/memory/memory-health-check.cjs` (full memory health check with tier monitoring + smart pruning + metrics)
+- `PostToolUse` (matcher `Edit|Write|NotebookEdit`)
+  - `.claude/hooks/memory/format-memory.cjs` (formats/normalizes memory writes after edits/writes)
+
+### Memory Reminder
+
+The “memory reminder” behavior is handled inside `.claude/hooks/routing/user-prompt-unified.cjs`.
+There is no separate `memory-reminder.cjs` hook wired in settings.
+Note: Claude Code does not provide a `SessionStart` hook event; “session-start” behavior is implemented via `UserPromptSubmit`.
+
+### Inlined vs Standalone Memory Health Check
+
+Both exist by design:
+
+- **Inlined (lightweight)**: `user-prompt-unified.cjs` runs a quick health check + auto-archive/prune.
+- **Standalone (full)**: `memory-health-check.cjs` runs on `UserPromptSubmit` and writes richer health metrics.
+
+## Metrics Locations
+
+There are two primary metrics roots:
+
+- Observability metrics: `.claude/context/metrics/` (e.g. hook/error/limit events)
+- Memory health metrics: `.claude/context/memory/metrics/`
+
+## Caveats / Verification Notes
+
+### Loop Prevention
+
+- Loop counters are updated in the `PreToolUse(Task)` path (after checks pass, before the Task runs), so the loop pre-check is no longer read-only.
+- `PostToolUse(Task)` still performs a best-effort decrement when the Task returns.
+
+### loop-prevention.cjs (Deprecated)
+
+The standalone `.claude/archive/hooks/self-healing/loop-prevention.cjs` file remains for history but is marked `@deprecated` and must not be re-wired, otherwise you risk double-counting.
+
+### state-cache.cjs
+
+The repo still contains `.claude/lib/utils/state-cache.cjs`, but `router-state.json` reads do not rely on TTL caching anymore (for correctness and test determinism). Other hooks may still use the cache; the overhead is generally negligible.
+
+### Execution Limits
+
+- Execution limits are wired via a persistent wrapper hook: `.claude/hooks/monitoring/execution-limit-monitor-hook.cjs` (the original `execution-limit-monitor.cjs` module is in-memory and does not persist across hook processes).
+- Cost-based limits are not strictly enforceable from hook input (no reliable per-call cost), so cost is recorded/logged best-effort rather than enforced hard.
+
 ## Session-Based Memory
 
 Sessions persist automatically via the SessionEnd hook. This is the primary memory storage mechanism.

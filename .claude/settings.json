@@ -20,11 +20,24 @@
           {
             "type": "command",
             "command": "node .claude/hooks/session/post-creation-reminder.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/memory/memory-health-check.cjs"
           }
         ]
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/monitoring/execution-limit-monitor-hook.cjs"
+          }
+        ]
+      },
       {
         "matcher": "Bash",
         "hooks": [
@@ -65,6 +78,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/routing/routing-guard.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/router-write-guard.cjs"
           },
           {
             "type": "command",
@@ -152,6 +169,14 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/monitoring/metrics-collector-hook.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/monitoring/error-tracker-hook.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/self-healing/anomaly-detector.cjs"
           }
         ]
@@ -170,7 +195,7 @@
         ]
       },
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Write|NotebookEdit",
         "hooks": [
           {
             "type": "command",

@@ -18,6 +18,16 @@ const path = require('path');
 const os = require('os');
 const { execSync } = require('child_process');
 
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+const HOOK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'archive',
+  'hooks',
+  'session',
+  'memory-reminder.cjs'
+);
+
 describe('memory-reminder', () => {
   let testDir;
   let memoryDir;
@@ -104,8 +114,7 @@ describe('memory-reminder', () => {
 
   describe('hook execution', () => {
     it('should be executable via node', () => {
-      const hookPath = path.join(__dirname, 'memory-reminder.cjs');
-      assert.ok(fs.existsSync(hookPath), 'Hook file should exist');
+      assert.ok(fs.existsSync(HOOK_PATH), 'Hook file should exist');
     });
 
     it('should output reminder when memory files have content', () => {
@@ -114,11 +123,9 @@ describe('memory-reminder', () => {
       fs.writeFileSync(path.join(memoryDir, 'learnings.md'), content, 'utf-8');
 
       // Execute the hook from the test directory
-      const hookPath = path.join(__dirname, 'memory-reminder.cjs');
-
       try {
         // Run the hook with testDir as cwd
-        const output = execSync(`node "${hookPath}"`, {
+        const output = execSync(`node "${HOOK_PATH}"`, {
           cwd: testDir,
           encoding: 'utf-8',
           timeout: 5000,
@@ -142,10 +149,8 @@ describe('memory-reminder', () => {
       // Remove memory directory
       fs.rmSync(memoryDir, { recursive: true, force: true });
 
-      const hookPath = path.join(__dirname, 'memory-reminder.cjs');
-
       try {
-        const _output = execSync(`node "${hookPath}"`, {
+        const _output = execSync(`node "${HOOK_PATH}"`, {
           cwd: testDir,
           encoding: 'utf-8',
           timeout: 5000,
@@ -168,10 +173,8 @@ describe('memory-reminder', () => {
       // Create empty learnings.md (less than 5 lines)
       fs.writeFileSync(path.join(memoryDir, 'learnings.md'), '# Empty', 'utf-8');
 
-      const hookPath = path.join(__dirname, 'memory-reminder.cjs');
-
       try {
-        const _output = execSync(`node "${hookPath}"`, {
+        const _output = execSync(`node "${HOOK_PATH}"`, {
           cwd: testDir,
           encoding: 'utf-8',
           timeout: 5000,

@@ -3,6 +3,8 @@
  * Evolution State Sync
  * ====================
  *
+ * @deprecated No active consumers. plan-evolution-guard uses prompt patterns directly.
+ *
  * Synchronizes evolution state across workflows.
  * Part of the EVOLVE workflow integration layer.
  *

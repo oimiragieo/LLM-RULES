@@ -45,8 +45,7 @@ const {
   auditLog,
 } = require('../../lib/utils/hook-input.cjs');
 const routerState = require('./router-state.cjs');
-const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
-const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const loopStateManager = require('../../lib/self-healing/loop-state-manager.cjs');
 
 // =============================================================================
 // CONSTANTS
@@ -55,13 +54,7 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 /**
  * Loop state file path
  */
-const LOOP_STATE_FILE = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'self-healing',
-  'loop-state.json'
-);
+const LOOP_STATE_FILE = loopStateManager.LOOP_STATE_FILE;
 
 /**
  * Default loop prevention limits
@@ -168,28 +161,13 @@ const EVOLUTION_TYPES = {
 };
 
 // =============================================================================
-// CACHED STATE (per invocation)
+// STATE HELPERS
 // =============================================================================
-
-let _cachedRouterState = null;
-let _cachedLoopState = null;
-
-/**
- * Get cached router state (single read per invocation)
- */
-function getCachedRouterState() {
-  if (_cachedRouterState === null) {
-    _cachedRouterState = routerState.getState();
-  }
-  return _cachedRouterState;
-}
 
 /**
  * Invalidate cached state (for testing)
  */
 function invalidateCachedState() {
-  _cachedRouterState = null;
-  _cachedLoopState = null;
   // Also invalidate router-state's internal cache
   routerState.invalidateStateCache();
 }
@@ -198,31 +176,8 @@ function invalidateCachedState() {
  * Get loop state from file
  */
 function getLoopState() {
-  if (_cachedLoopState !== null) {
-    return _cachedLoopState;
-  }
-
-  const defaultState = {
-    sessionId: process.env.CLAUDE_SESSION_ID || `session-${Date.now()}`,
-    evolutionCount: 0,
-    lastEvolutions: {},
-    spawnDepth: 0,
-    actionHistory: [],
-  };
-
-  try {
-    if (fs.existsSync(LOOP_STATE_FILE)) {
-      const content = fs.readFileSync(LOOP_STATE_FILE, 'utf-8');
-      const state = safeParseJSON(content, 'loop-state');
-      _cachedLoopState = { ...defaultState, ...state };
-      return _cachedLoopState;
-    }
-  } catch (_e) {
-    // File corrupted or locked
-  }
-
-  _cachedLoopState = defaultState;
-  return _cachedLoopState;
+  // Backward-compatible helper kept for tests/exports.
+  return loopStateManager.getState();
 }
 
 // =============================================================================
@@ -478,7 +433,7 @@ function checkRoutingGuard(toolName, toolInput) {
     return { pass: true };
   }
 
-  const state = getCachedRouterState();
+  const state = routerState.getState();
 
   // Check 2a: Planner-First Guard
   const plannerEnforcement = getEnforcementMode('PLANNER_FIRST_ENFORCEMENT', 'block');
@@ -612,7 +567,7 @@ function checkLoopPrevention(hookInput) {
   const toolInput = getToolInput(hookInput);
   const prompt = toolInput.prompt || '';
   const description = toolInput.description || '';
-  const loopState = getLoopState();
+  const loopState = loopStateManager.getState();
 
   // Check 4a: Spawn Depth
   const depthLimit = getDepthLimit();
@@ -689,6 +644,29 @@ This is a safety mechanism to prevent infinite loops.`;
   return { pass: true };
 }
 
+/**
+ * Best-effort: update loop-prevention counters after a Task is allowed.
+ *
+ * This is the critical missing wiring that makes spawnDepth/evolutionCount actionable.
+ */
+function updateLoopStateAfterAllow(hookInput) {
+  try {
+    const toolInput = getToolInput(hookInput);
+    const prompt = toolInput.prompt || '';
+    const description = toolInput.description || '';
+
+    const agentType = extractAgentType(prompt, description);
+    loopStateManager.recordSpawn(agentType);
+
+    if (isEvolutionTrigger(prompt)) {
+      const evolutionType = detectEvolutionType(prompt) || 'unknown';
+      loopStateManager.recordEvolution(evolutionType);
+    }
+  } catch (err) {
+    auditLog('pre-task-unified', 'loop_state_update_failed', { error: err.message });
+  }
+}
+
 // =============================================================================
 // COMBINED CHECK
 // =============================================================================
@@ -760,6 +738,7 @@ function runAllChecks(hookInput) {
   }
 
   // All checks passed
+  updateLoopStateAfterAllow(hookInput);
   return { pass: true, exitCode: 0 };
 }
 
@@ -842,6 +821,7 @@ module.exports = {
   detectEvolutionType,
   getLoopState,
   invalidateCachedState,
+  updateLoopStateAfterAllow,
 
   // Constants
   DOC_KEYWORDS_HIGH,

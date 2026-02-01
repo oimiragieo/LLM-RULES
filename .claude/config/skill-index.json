@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-01T03:02:11.260Z",
+  "generatedAt": "2026-02-01T06:13:45.945Z",
   "metadata": {
     "totalSkills": 434,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-01T03:02:11.261Z",
+    "lastValidated": "2026-02-01T06:13:45.946Z",
     "source": ".claude/context/artifacts/skill-catalog.md"
   },
   "skills": {
@@ -1927,7 +1927,7 @@
       "description": "Other - mcp-converter",
       "requiredTools": ["Read", "Write", "Edit"],
       "agentPrimary": ["developer"],
-      "agentSupporting": [],
+      "agentSupporting": ["evolution-orchestrator"],
       "tags": ["creator", "other", "mcp-converter"],
       "priority": 3
     },
@@ -3172,7 +3172,7 @@
       "description": "Other - github-ops",
       "requiredTools": ["Read", "Write", "Edit"],
       "agentPrimary": ["developer"],
-      "agentSupporting": [],
+      "agentSupporting": ["developer"],
       "tags": ["integration", "other", "github-ops"],
       "priority": 3
     },
@@ -3232,7 +3232,7 @@
       "description": "Integration - chrome-browser",
       "requiredTools": ["Read", "Write", "WebFetch"],
       "agentPrimary": ["developer"],
-      "agentSupporting": [],
+      "agentSupporting": ["qa"],
       "tags": ["integration", "integration", "chrome-browser"],
       "priority": 3
     },
@@ -7691,6 +7691,7 @@
         "code-style-validator",
         "commit-validator",
         "smart-revert",
+        "github-ops",
         "python-backend-expert",
         "comprehensive-unit-testing-with-pytest",
         "typescript-expert",
@@ -7735,7 +7736,8 @@
         "rule-auditor",
         "qa-workflow",
         "comprehensive-unit-testing-with-pytest",
-        "security-architect"
+        "security-architect",
+        "chrome-browser"
       ],
       "technical-writer": [
         "doc-generator",
@@ -8140,7 +8142,8 @@
         "workflow-creator",
         "hook-creator",
         "template-creator",
-        "schema-creator"
+        "schema-creator",
+        "mcp-converter"
       ]
     }
   },
@@ -8159,6 +8162,7 @@
         "code-style-validator",
         "commit-validator",
         "smart-revert",
+        "github-ops",
         "python-backend-expert",
         "comprehensive-unit-testing-with-pytest",
         "typescript-expert",
@@ -8203,7 +8207,8 @@
         "rule-auditor",
         "qa-workflow",
         "comprehensive-unit-testing-with-pytest",
-        "security-architect"
+        "security-architect",
+        "chrome-browser"
       ],
       "technical-writer": [
         "doc-generator",
@@ -8608,7 +8613,8 @@
         "workflow-creator",
         "hook-creator",
         "template-creator",
-        "schema-creator"
+        "schema-creator",
+        "mcp-converter"
       ]
     }
   }

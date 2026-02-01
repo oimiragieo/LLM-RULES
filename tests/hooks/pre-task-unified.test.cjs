@@ -17,6 +17,8 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 const fs = require('fs');
+const { clearAllCache } = require('../../.claude/lib/utils/state-cache.cjs');
+const routerState = require('../../.claude/hooks/routing/router-state.cjs');
 
 // Prevent process.exit from actually exiting during tests
 const originalExit = process.exit;
@@ -32,21 +34,8 @@ const preTaskUnified = require('../../.claude/hooks/routing/pre-task-unified.cjs
 process.exit = originalExit;
 
 // Test helpers
-const PROJECT_ROOT = path.resolve(__dirname, '../../..');
-const ROUTER_STATE_FILE = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'runtime',
-  'router-state.json'
-);
-const LOOP_STATE_FILE = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'self-healing',
-  'loop-state.json'
-);
+const ROUTER_STATE_FILE = routerState.STATE_FILE;
+const LOOP_STATE_FILE = preTaskUnified.LOOP_STATE_FILE;
 
 function backupState(filePath) {
   if (fs.existsSync(filePath)) {
@@ -73,6 +62,11 @@ function writeState(filePath, state) {
   fs.writeFileSync(filePath, JSON.stringify(state, null, 2), 'utf-8');
 }
 
+function readState(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+}
+
 // ===========================================================================
 // Test Suite
 // ===========================================================================
@@ -83,6 +77,7 @@ describe('pre-task-unified.cjs', () => {
   let originalEnv = {};
 
   beforeEach(() => {
+    clearAllCache();
     // Backup state files
     routerStateBackup = backupState(ROUTER_STATE_FILE);
     loopStateBackup = backupState(LOOP_STATE_FILE);
@@ -123,6 +118,7 @@ describe('pre-task-unified.cjs', () => {
 
     // Invalidate caches after each test
     preTaskUnified.invalidateCachedState();
+    clearAllCache();
   });
 
   // ---------------------------------------------------------------------------
@@ -455,6 +451,15 @@ describe('pre-task-unified.cjs', () => {
 
       const result = preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, true);
+
+      const loopState = readState(LOOP_STATE_FILE);
+      assert.ok(loopState, 'expected loop-state.json to exist');
+      assert.strictEqual(loopState.spawnDepth, 1);
+      assert.strictEqual(loopState.evolutionCount, 0);
+      assert.ok(
+        Array.isArray(loopState.actionHistory) &&
+          loopState.actionHistory.some(e => e.action === 'spawn:developer' && e.count === 1)
+      );
     });
 
     it('should stop on first failure', () => {

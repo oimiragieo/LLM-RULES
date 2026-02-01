@@ -10,8 +10,15 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
-const HOOK_PATH = path.join(__dirname, 'session-end-recorder.cjs');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+const HOOK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'archive',
+  'hooks',
+  'memory',
+  'session-end-recorder.cjs'
+);
 const SESSIONS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'sessions');
 
 describe('SessionEnd Hook', () => {

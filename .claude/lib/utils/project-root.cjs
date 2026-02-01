@@ -48,9 +48,43 @@ function findProjectRoot(startDir = __dirname) {
   return startDir;
 }
 
+function resolveProjectRoot() {
+  // Fast path: this file lives under `<project>/.claude/lib/utils/` in this repo.
+  // Prefer that deterministic location when the marker exists.
+  try {
+    const candidate = path.resolve(__dirname, '..', '..', '..');
+    const marker = path.join(candidate, '.claude', 'CLAUDE.md');
+    if (fs.existsSync(marker)) return candidate;
+  } catch {
+    // ignore
+  }
+
+  // Prefer explicit override when provided by the runtime (many hooks/tools already set this)
+  if (process.env.CLAUDE_PROJECT_DIR && typeof process.env.CLAUDE_PROJECT_DIR === 'string') {
+    const candidate = process.env.CLAUDE_PROJECT_DIR;
+    try {
+      const marker = path.join(candidate, '.claude', 'CLAUDE.md');
+      if (fs.existsSync(marker)) return candidate;
+    } catch {
+      // ignore invalid override
+    }
+  }
+
+  // Prefer current working directory when it looks like the project root.
+  // This keeps tests and CLI runs stable even if this file is vendored/shared elsewhere.
+  try {
+    const cwdMarker = path.join(process.cwd(), '.claude', 'CLAUDE.md');
+    if (fs.existsSync(cwdMarker)) return process.cwd();
+  } catch {
+    // ignore
+  }
+
+  // Fallback: find project root relative to this file's location
+  return findProjectRoot(__dirname);
+}
+
 // Pre-compute PROJECT_ROOT at module load time
-// This finds the project root relative to this file's location
-const PROJECT_ROOT = findProjectRoot(__dirname);
+const PROJECT_ROOT = resolveProjectRoot();
 
 // =============================================================================
 // CRITICAL-001 FIX: Path Traversal Prevention

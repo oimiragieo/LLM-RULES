@@ -19,13 +19,15 @@
 
 'use strict';
 
+/* eslint-disable max-depth */
+
 const fs = require('fs');
 const path = require('path');
 const { _execSync } = require('child_process');
 
 // Import memory manager and memory tiers
 const PROJECT_ROOT = process.env.PROJECT_ROOT || process.cwd();
-const { debugLog } = require('../../lib/utils/hook-input.cjs');
+const { debugLog } = require('../../../lib/utils/hook-input.cjs');
 const memoryManager = require(
   path.join(PROJECT_ROOT, '.claude', 'lib', 'memory', 'memory-manager.cjs')
 );
@@ -49,7 +51,7 @@ function validate(_input) {
 /**
  * Parse stdin for session context (if provided)
  */
-async function parseStdin() {
+function parseStdin() {
   return new Promise(resolve => {
     let input = '';
     let hasData = false;

@@ -24,10 +24,11 @@
 const fs = require('fs');
 const path = require('path');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
-const { getCachedState, invalidateCache } = require('../../lib/utils/state-cache.cjs');
+const { invalidateCache } = require('../../lib/utils/state-cache.cjs');
 
-// PERF-007: Use shared project-root utility instead of duplicated findProjectRoot
-const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+// Resolve project root deterministically from this file location:
+// <project>/.claude/hooks/routing/router-state.cjs -> <project>
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 // =============================================================================
 // SEC-007: Safe JSON Parsing
@@ -130,47 +131,12 @@ function getDefaultState() {
 /**
  * Get current state from file
  * Uses SEC-007 safe JSON parsing to prevent prototype pollution
- * Uses state-cache for TTL-based caching to reduce I/O
  * @returns {Object} Current state object
  */
 function getState() {
-  try {
-    ensureRuntimeDir();
-    // Use cached state with 1 second TTL (default)
-    // This reduces redundant file reads across hooks in the same tool operation
-    const cachedRaw = getCachedState(STATE_FILE, null);
-    if (cachedRaw) {
-      // SEC-007: Apply safe parsing to cached content as well
-      // The cache returns raw parsed JSON, we need to sanitize it
-      const state = sanitizeParsedState(cachedRaw);
-      if (state) {
-        return { ...getDefaultState(), ...state };
-      }
-    }
-  } catch (_e) {
-    // File might be corrupted or locked, return default
-  }
-  return getDefaultState();
-}
-
-/**
- * Sanitize parsed state object to prevent prototype pollution
- * @param {Object} parsed - Parsed JSON object
- * @returns {Object|null} Sanitized object or null
- */
-function sanitizeParsedState(parsed) {
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    return null;
-  }
-  // Create clean object without prototype
-  const clean = Object.create(null);
-  const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
-  for (const key of Object.keys(parsed)) {
-    if (!dangerousKeys.includes(key)) {
-      clean[key] = parsed[key];
-    }
-  }
-  return Object.assign({}, clean);
+  // Read directly from disk for correctness.
+  // Hooks run in separate Node processes, so cross-hook in-memory caching is ineffective.
+  return loadStateFromFile();
 }
 
 /**

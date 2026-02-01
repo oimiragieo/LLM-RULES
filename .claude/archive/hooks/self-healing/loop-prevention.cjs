@@ -4,6 +4,12 @@
  *
  * PreToolUse hook for Task (and evolution triggers)
  *
+ * @deprecated
+ * Not wired in `.claude/settings.json`. Loop prevention is enforced by
+ * `.claude/hooks/routing/pre-task-unified.cjs` and state is updated by
+ * `.claude/lib/self-healing/loop-state-manager.cjs` (plus best-effort decrement
+ * in `.claude/hooks/routing/post-task-unified.cjs`).
+ *
  * Prevents runaway loops in self-healing and evolution processes via:
  * 1. Evolution Budget - Max evolutions per session (default: 3)
  * 2. Cooldown Period - Min time between same-type evolutions (default: 5 min)
@@ -34,23 +40,25 @@
 
 'use strict';
 
+/* eslint-disable max-depth */
+
 const fs = require('fs');
 const path = require('path');
 
 // PERF-006/PERF-007: Use shared utilities instead of duplicated code
-const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { PROJECT_ROOT } = require('../../../lib/utils/project-root.cjs');
 const {
   parseHookInputAsync,
   auditSecurityOverride,
   auditLog,
-} = require('../../lib/utils/hook-input.cjs');
+} = require('../../../lib/utils/hook-input.cjs');
 
 // SEC-007 FIX: Import safe JSON parser to prevent prototype pollution
-const { _safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { _safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 // NEW-HIGH-003 FIX: Use atomic writes to prevent state file corruption
-const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
+const { atomicWriteJSONSync } = require('../../../lib/utils/atomic-write.cjs');
 // PERF-005 FIX: Import state cache for TTL-based caching of loop-state.json
-const { getCachedState, invalidateCache } = require('../../lib/utils/state-cache.cjs');
+const { getCachedState, invalidateCache } = require('../../../lib/utils/state-cache.cjs');
 
 // ==========================================
 // Constants

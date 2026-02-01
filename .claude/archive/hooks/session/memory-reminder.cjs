@@ -42,7 +42,7 @@ const fs = require('fs');
 const path = require('path');
 
 // PROC-002: Use shared utility instead of duplicated findProjectRoot
-const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { PROJECT_ROOT } = require('../../../lib/utils/project-root.cjs');
 const MEMORY_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
 
 /**

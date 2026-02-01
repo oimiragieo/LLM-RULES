@@ -27,7 +27,6 @@ const path = require('path');
 // Shared Utilities
 // =============================================================================
 
-const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const {
   parseHookInputSync,
   parseHookInputAsync,
@@ -37,6 +36,11 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const { getCachedState } = require('../../lib/utils/state-cache.cjs');
 const routerState = require('./router-state.cjs');
+const loopStateManager = require('../../lib/self-healing/loop-state-manager.cjs');
+
+// Resolve project root deterministically from this file location:
+// <project>/.claude/hooks/routing/post-task-unified.cjs -> <project>
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 // Lazy-load memory manager to avoid crashes if not available
 let memoryManager = null;
@@ -623,6 +627,14 @@ async function main() {
 
     // 5. Evolution audit
     runEvolutionAudit();
+
+    // Best-effort: decrement spawn depth after Task tool returns.
+    // This keeps spawnDepth from monotonically increasing across a session.
+    try {
+      loopStateManager.decrementSpawnDepth();
+    } catch (_e) {
+      // Monitoring-only; never block
+    }
 
     // Always exit 0 - post-tool hooks should never block
     process.exit(0);

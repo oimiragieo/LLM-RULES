@@ -66,12 +66,12 @@ function getSmartPrunerPath() {
 
 function getMemoryDashboardPath() {
   // Try relative to this hook file first
-  const relPath = path.join(__dirname, '..', '..', 'lib', 'memory-dashboard.cjs');
+  const relPath = path.join(__dirname, '..', '..', 'lib', 'memory', 'memory-dashboard.cjs');
   if (fs.existsSync(relPath)) {
     return relPath;
   }
   // Fallback to project root
-  return path.join(PROJECT_ROOT, '.claude', 'lib', 'memory-dashboard.cjs');
+  return path.join(PROJECT_ROOT, '.claude', 'lib', 'memory', 'memory-dashboard.cjs');
 }
 
 function main() {

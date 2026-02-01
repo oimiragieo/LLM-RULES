@@ -5,6 +5,8 @@
  *
  * ADR-075 Phase 4B: Audit trail integration for tracking model selection decisions.
  *
+ * @deprecated No active consumers. Retained for potential future model-selection auditing.
+ *
  * Provides:
  * - ConfigModelSelection audit event logging
  * - Model selection drift report generation

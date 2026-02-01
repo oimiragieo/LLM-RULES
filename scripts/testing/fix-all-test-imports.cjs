@@ -65,7 +65,7 @@ const PATH_MAPPINGS = {
     // Memory hooks
     'format-memory.cjs': '.claude/hooks/memory/format-memory.cjs',
     'memory-health-check.cjs': '.claude/hooks/memory/memory-health-check.cjs',
-    'session-end-recorder.cjs': '.claude/hooks/memory/session-end-recorder.cjs',
+    'session-end-recorder.cjs': '.claude/archive/hooks/memory/session-end-recorder.cjs',
     'session-memory-extractor.cjs': '.claude/hooks/memory/session-memory-extractor.cjs',
     'extract-workflow-learnings.cjs': '.claude/hooks/memory/extract-workflow-learnings.cjs',
 
@@ -89,11 +89,11 @@ const PATH_MAPPINGS = {
     // Self-healing hooks
     'anomaly-detector.cjs': '.claude/hooks/self-healing/anomaly-detector.cjs',
     'auto-rerouter.cjs': '.claude/hooks/self-healing/auto-rerouter.cjs',
-    'loop-prevention.cjs': '.claude/hooks/self-healing/loop-prevention.cjs',
+    'loop-prevention.cjs': '.claude/archive/hooks/self-healing/loop-prevention.cjs',
 
     // Session hooks
     'post-creation-reminder.cjs': '.claude/hooks/session/post-creation-reminder.cjs',
-    'memory-reminder.cjs': '.claude/hooks/session/memory-reminder.cjs',
+    'memory-reminder.cjs': '.claude/archive/hooks/session/memory-reminder.cjs',
     'state-reset.cjs': '.claude/hooks/session/state-reset.cjs',
 
     // Validation hooks

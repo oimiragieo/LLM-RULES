@@ -113,7 +113,7 @@ function cleanupTestState() {
 }
 
 // Load the module under test
-const loopPrevention = require('../../.claude/hooks/self-healing/loop-prevention.cjs');
+const loopPrevention = require('../../.claude/archive/hooks/self-healing/loop-prevention.cjs');
 
 // ==========================================
 // Test Suites

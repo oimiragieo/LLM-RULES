@@ -841,6 +841,130 @@ describe('unified-reflection-handler.cjs', () => {
       assertEqual(eventType, null, 'Read should not be handled');
     });
   });
+
+  describe('SessionEnd activations', () => {
+    it('should export SessionEnd activation helpers', () => {
+      assertEqual(typeof hook.triggerEmbeddingGeneration, 'function');
+      assertEqual(typeof hook.triggerMaintenance, 'function');
+    });
+
+    it('triggerEmbeddingGeneration should enqueue vector writes for modified memory files (stubbed)', async () => {
+      const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+      const memoryFileRel = '.claude/context/memory/test-embeddings.md';
+      const memoryFileAbs = path.resolve(PROJECT_ROOT, memoryFileRel);
+
+      const chromaModulePath = path.resolve(PROJECT_ROOT, '.claude/lib/memory/chromadb-client.cjs');
+      const embeddingsModulePath = path.resolve(
+        PROJECT_ROOT,
+        '.claude/tools/cli/generate-embeddings.cjs'
+      );
+
+      const chromaKey = require.resolve(chromaModulePath);
+      const embeddingsKey = require.resolve(embeddingsModulePath);
+      const originalChroma = require.cache[chromaKey];
+      const originalEmbeddings = require.cache[embeddingsKey];
+
+      const adds = [];
+
+      try {
+        fs.mkdirSync(path.dirname(memoryFileAbs), { recursive: true });
+        fs.writeFileSync(memoryFileAbs, '## Section A\n\nHello\n\n## Section B\n\nWorld\n', 'utf8');
+
+        require.cache[chromaKey] = {
+          id: chromaKey,
+          filename: chromaKey,
+          loaded: true,
+          exports: {
+            MemoryVectorStore: class MemoryVectorStoreStub {
+              async initialize() {}
+              async isAvailable() {
+                return true;
+              }
+              async getCollection() {
+                return {
+                  add: async payload => {
+                    adds.push(payload);
+                  },
+                };
+              }
+            },
+          },
+        };
+
+        require.cache[embeddingsKey] = {
+          id: embeddingsKey,
+          filename: embeddingsKey,
+          loaded: true,
+          exports: {
+            chunkByHeaders: () => [
+              { section: 'Section A', content: 'Hello', line: 1 },
+              { section: 'Section B', content: 'World', line: 5 },
+            ],
+            extractMetadata: (_filePath, section, line) => ({
+              filePath: 'test-embeddings.md',
+              section,
+              line,
+              type: 'unknown',
+              timestamp: '2026-02-01',
+            }),
+          },
+        };
+
+        await hook.triggerEmbeddingGeneration({ files_modified: [memoryFileRel] });
+
+        assertEqual(adds.length, 1, 'Should add a single batch per file');
+        assertEqual(adds[0].ids.length, 2, 'Should add two chunks');
+        assertEqual(adds[0].metadatas[0].section, 'Section A');
+        assertEqual(adds[0].metadatas[1].section, 'Section B');
+      } finally {
+        if (originalChroma) require.cache[chromaKey] = originalChroma;
+        else delete require.cache[chromaKey];
+        if (originalEmbeddings) require.cache[embeddingsKey] = originalEmbeddings;
+        else delete require.cache[embeddingsKey];
+
+        if (fs.existsSync(memoryFileAbs)) fs.unlinkSync(memoryFileAbs);
+      }
+    });
+
+    it('triggerMaintenance should run daily and weekly maintenance when due (stubbed)', () => {
+      const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+      const schedulerModulePath = path.resolve(
+        PROJECT_ROOT,
+        '.claude/lib/memory/memory-scheduler.cjs'
+      );
+      const schedulerKey = require.resolve(schedulerModulePath);
+      const originalScheduler = require.cache[schedulerKey];
+
+      const calls = { daily: 0, weekly: 0 };
+
+      try {
+        require.cache[schedulerKey] = {
+          id: schedulerKey,
+          filename: schedulerKey,
+          loaded: true,
+          exports: {
+            runDailyMaintenance: () => {
+              calls.daily++;
+            },
+            runWeeklyMaintenance: () => {
+              calls.weekly++;
+            },
+            getMaintenanceStatus: () => ({
+              lastWeekly: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+            }),
+          },
+        };
+
+        hook.triggerMaintenance();
+
+        assertEqual(calls.daily, 1, 'Should run daily maintenance');
+        assertEqual(calls.weekly, 1, 'Should run weekly maintenance when due');
+      } finally {
+        if (originalScheduler) require.cache[schedulerKey] = originalScheduler;
+        else delete require.cache[schedulerKey];
+      }
+    });
+  });
 });
 
 // ============================================================

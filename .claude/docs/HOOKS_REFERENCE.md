@@ -328,7 +328,7 @@ Hooks are registered in `.claude/settings.json`:
         "hooks": [
           { "type": "command", "command": "node .claude/hooks/routing/router-mode-reset.cjs" },
           { "type": "command", "command": "node .claude/hooks/routing/router-enforcer.cjs" },
-          { "type": "command", "command": "node .claude/hooks/session/memory-reminder.cjs" }
+          { "type": "command", "command": "node .claude/archive/hooks/session/memory-reminder.cjs" }
         ]
       }
     ],
@@ -384,7 +384,10 @@ Hooks are registered in `.claude/settings.json`:
       {
         "matcher": "",
         "hooks": [
-          { "type": "command", "command": "node .claude/hooks/memory/session-end-recorder.cjs" }
+          {
+            "type": "command",
+            "command": "node .claude/archive/hooks/memory/session-end-recorder.cjs"
+          }
         ]
       }
     ]

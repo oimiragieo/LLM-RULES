@@ -7,6 +7,10 @@
  * and appends them to learnings.md.
  *
  * Trigger: PostToolUse (after Task tool completes)
+ *
+ * @deprecated
+ * Logic is consolidated into `.claude/hooks/routing/post-task-unified.cjs`.
+ * Do not register this file in `.claude/settings.json`.
  */
 
 const fs = require('fs');

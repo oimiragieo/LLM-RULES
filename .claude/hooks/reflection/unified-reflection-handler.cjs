@@ -740,6 +740,132 @@ function recordSession(sessionData) {
 }
 
 /**
+ * Best-effort: generate embeddings for modified memory markdown files.
+ *
+ * This is intentionally fire-and-forget (do not block SessionEnd).
+ * It also fails silently if ChromaDB is unavailable.
+ *
+ * @param {object} sessionData
+ * @returns {Promise<void>}
+ */
+async function triggerEmbeddingGeneration(sessionData) {
+  if (!isEnabled()) {
+    return;
+  }
+
+  const filesModified = Array.isArray(sessionData?.files_modified)
+    ? sessionData.files_modified
+    : [];
+  if (filesModified.length === 0) {
+    return;
+  }
+
+  const memoryDir = path.resolve(PROJECT_ROOT, '.claude', 'context', 'memory');
+  const memoryFiles = filesModified
+    .filter(f => typeof f === 'string' && f.toLowerCase().endsWith('.md'))
+    .map(f => (path.isAbsolute(f) ? path.resolve(f) : path.resolve(PROJECT_ROOT, f)))
+    .filter(fullPath => {
+      const resolved = path.resolve(fullPath);
+      if (resolved === memoryDir) return false;
+      return resolved.startsWith(memoryDir + path.sep);
+    })
+    .filter(fullPath => fs.existsSync(fullPath));
+
+  if (memoryFiles.length === 0) {
+    return;
+  }
+
+  try {
+    const { MemoryVectorStore } = require('../../lib/memory/chromadb-client.cjs');
+    const embeddings = require('../../tools/cli/generate-embeddings.cjs');
+
+    const vectorStore = new MemoryVectorStore({
+      persistDirectory: path.join(PROJECT_ROOT, '.claude', 'data', 'chromadb'),
+      collectionName: 'agent-studio-memory',
+    });
+
+    await vectorStore.initialize();
+    const available = await vectorStore.isAvailable();
+    if (!available) {
+      debugLog('unified-reflection', 'ChromaDB not available, skipping embedding generation');
+      return;
+    }
+
+    const collection = await vectorStore.getCollection();
+
+    for (const fullPath of memoryFiles) {
+      try {
+        const content = fs.readFileSync(fullPath, 'utf8');
+        const chunks = embeddings.chunkByHeaders(content, fullPath);
+        if (chunks.length === 0) continue;
+
+        const ids = [];
+        const documents = [];
+        const metadatas = [];
+
+        for (const chunk of chunks) {
+          const metadata = embeddings.extractMetadata(fullPath, chunk.section, chunk.line);
+          const documentId = `${metadata.filePath}-${chunk.line}`;
+          const documentText = `${chunk.section}\n\n${chunk.content}`;
+          ids.push(documentId);
+          documents.push(documentText);
+          metadatas.push(metadata);
+        }
+
+        await collection.add({ ids, documents, metadatas });
+        debugLog(
+          'unified-reflection',
+          `Generated embeddings for ${path.relative(PROJECT_ROOT, fullPath)} (${chunks.length} chunks)`
+        );
+      } catch (err) {
+        debugLog(
+          'unified-reflection',
+          `Embedding generation failed for ${path.relative(PROJECT_ROOT, fullPath)}`,
+          err
+        );
+      }
+    }
+  } catch (err) {
+    debugLog('unified-reflection', 'Error initializing embedding generation', err);
+  }
+}
+
+/**
+ * Best-effort: run memory maintenance tasks on SessionEnd.
+ *
+ * @returns {void}
+ */
+function triggerMaintenance() {
+  if (!isEnabled()) {
+    return;
+  }
+
+  try {
+    const scheduler = require('../../lib/memory/memory-scheduler.cjs');
+
+    scheduler.runDailyMaintenance(PROJECT_ROOT);
+
+    const status = scheduler.getMaintenanceStatus(PROJECT_ROOT);
+    const lastWeekly = status?.lastWeekly ? new Date(status.lastWeekly) : null;
+    const daysSinceWeekly = lastWeekly
+      ? (Date.now() - lastWeekly.getTime()) / (1000 * 60 * 60 * 24)
+      : Infinity;
+
+    if (daysSinceWeekly >= 7) {
+      scheduler.runWeeklyMaintenance(PROJECT_ROOT);
+      debugLog('unified-reflection', 'Weekly maintenance completed');
+    } else {
+      debugLog(
+        'unified-reflection',
+        `Weekly maintenance not due (${Math.round(daysSinceWeekly * 10) / 10} days since last run)`
+      );
+    }
+  } catch (err) {
+    debugLog('unified-reflection', 'Error running maintenance', err);
+  }
+}
+
+/**
  * Record extracted memory items
  * @param {object} extracted - Object with patterns, gotchas, discoveries
  */
@@ -848,6 +974,12 @@ async function main() {
         queueReflection(result.reflection);
         // Record session to memory
         recordSession(result.sessionData);
+        // Best-effort activations
+        // Note: Embedding generation is awaited to ensure the process doesn't exit before work completes.
+        await triggerEmbeddingGeneration(result.sessionData).catch(err => {
+          debugLog('unified-reflection', 'Embedding generation failed', err);
+        });
+        triggerMaintenance();
         break;
       }
 
@@ -897,6 +1029,8 @@ module.exports = {
   // Queue/memory management
   queueReflection,
   recordSession,
+  triggerEmbeddingGeneration,
+  triggerMaintenance,
   recordMemoryItems,
 
   // Main entry point
