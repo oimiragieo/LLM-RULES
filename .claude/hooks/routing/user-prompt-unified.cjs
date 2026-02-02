@@ -6,8 +6,8 @@
  * 1. router-mode-reset.cjs - Resets router state on new prompts
  * 2. router-enforcer.cjs - Analyzes prompts for routing recommendations
  * 3. memory-reminder.cjs - Reminds agents to read memory files
- * 4. evolution-trigger-detector.cjs - Detects evolution trigger patterns
- * 5. memory-health-check.cjs - Checks memory system health
+ * 4. evolution-trigger-detector.cjs - Detects evolution trigger patterns (merged)
+ * 5. memory-health-check.cjs - Checks memory system health (merged)
  *
  * Performance: Reduces 5 processes to 1, shares state reads across checks.
  *
@@ -577,7 +577,7 @@ function checkMemoryReminder(hookInput, projectRoot = PROJECT_ROOT) {
 }
 
 // =============================================================================
-// Check 4: Evolution Trigger Detection (from evolution-trigger-detector.cjs)
+// Check 4: Evolution Trigger Detection (merged logic)
 // =============================================================================
 
 /**
@@ -767,7 +767,7 @@ function checkEvolutionTrigger(hookInput) {
 }
 
 // =============================================================================
-// Check 5: Memory Health Check (from memory-health-check.cjs)
+// Check 5: Memory Health Check (merged logic)
 // =============================================================================
 
 /**

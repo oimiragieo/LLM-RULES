@@ -34,7 +34,15 @@ Notes:
 
    This creates the SQLite schema for the hybrid memory system. If you see errors about missing tables, run this command.
 
-4. Open the project in Claude Code and run a normal request; routing + hooks + workflows apply automatically.
+4. **Build initial semantic index** (recommended):
+
+   ```bash
+   pnpm run memory:embeddings
+   ```
+
+   This fills LanceDB from existing memory files (Markdown + `patterns.json` + `gotchas.json`). After that, semantic search can use the full set.
+
+5. Open the project in Claude Code and run a normal request; routing + hooks + workflows apply automatically.
 
 **What happens automatically:**
 
@@ -66,6 +74,14 @@ pnpm run memory:init
 ```
 
 This creates the SQLite schema at `.claude/data/memory.db`. If you see errors about missing tables, run this command.
+
+Then build the initial semantic index:
+
+```bash
+pnpm run memory:embeddings
+```
+
+To keep embeddings current on edits, set `MEMORY_EMBED_ON_EDIT=on` (and optionally `MEMORY_EMBED_ON_EDIT_TIMEOUT_MS=30000`) in your `.env`.
 
 **Note**: The system uses Node's built-in `node:sqlite` (no native dependencies) and embedded LanceDB (no Docker/server required).
 

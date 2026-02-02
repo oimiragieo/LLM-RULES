@@ -42,7 +42,7 @@ class EntityExtractor {
           initScript.initializeDatabase(this.db);
         } catch (initError) {
           throw new Error(
-            `Auto-initialization failed: ${initError.message}. Run \`npm run memory:init\`.`
+            `Auto-initialization failed: ${initError.message}. Run \`pnpm run memory:init\`.`
           );
         }
       }
@@ -50,7 +50,7 @@ class EntityExtractor {
       // Re-throw specific errors, wrap others
       if (error.message.includes('memory:init')) throw error;
       throw new Error(
-        `Database validation failed: ${error.message}. Try running \`npm run memory:init\`.`
+        `Database validation failed: ${error.message}. Try running \`pnpm run memory:init\`.`
       );
     }
   }

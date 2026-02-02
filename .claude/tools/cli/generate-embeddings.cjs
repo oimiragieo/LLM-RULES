@@ -11,6 +11,7 @@
  *
  * Options:
  *   --source <path>     Source directory containing memory files (default: .claude/context/memory)
+ *   --file <path>       Single file to process (absolute or relative to project root)
  *   --batch-size <num>  Batch size for embedding generation (default: 100)
  *   --dry-run           Preview what would be processed without actually generating embeddings
  *
@@ -75,6 +76,32 @@ function chunkByHeaders(content, _filePath) {
   return chunks;
 }
 
+function loadJsonEntries(filePath) {
+  const raw = fs.readFileSync(filePath, 'utf8');
+  let parsed = [];
+  try {
+    parsed = JSON.parse(raw);
+  } catch (_e) {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  return parsed
+    .map(entry => {
+      if (typeof entry === 'string') {
+        return { text: entry, content: null, timestamp: null };
+      }
+      if (entry && typeof entry === 'object') {
+        return {
+          text: entry.text || entry.title || entry.name || '',
+          content: entry.content || null,
+          timestamp: entry.timestamp || null,
+        };
+      }
+      return null;
+    })
+    .filter(entry => entry && entry.text);
+}
+
 /**
  * Extract metadata from markdown file
  *
@@ -106,6 +133,17 @@ function extractMetadata(filePath, section, line) {
   };
 }
 
+function extractJsonMetadata(filePath) {
+  const basename = path.basename(filePath, '.json');
+  return {
+    filePath: basename + '.json',
+    section: basename,
+    line: null,
+    type: basename === 'patterns' ? 'pattern' : basename === 'gotchas' ? 'issue' : 'memory',
+    timestamp: new Date().toISOString().split('T')[0],
+  };
+}
+
 /**
  * Find all memory files (including archived)
  *
@@ -116,7 +154,7 @@ function findMemoryFiles(sourceDir) {
   const files = [];
 
   // Main memory files
-  const mainFiles = ['learnings.md', 'decisions.md', 'issues.md'];
+  const mainFiles = ['learnings.md', 'decisions.md', 'issues.md', 'patterns.json', 'gotchas.json'];
   for (const file of mainFiles) {
     const fullPath = path.join(sourceDir, file);
     if (fs.existsSync(fullPath)) {
@@ -153,8 +191,11 @@ function findMemoryFiles(sourceDir) {
  * @returns {Promise<number>} Number of chunks processed
  */
 async function processFile(filePath, options, vectorStore) {
-  const content = fs.readFileSync(filePath, 'utf8');
-  const chunks = chunkByHeaders(content, filePath);
+  const ext = path.extname(filePath).toLowerCase();
+  const isJson = ext === '.json';
+  const chunks = isJson
+    ? loadJsonEntries(filePath)
+    : chunkByHeaders(fs.readFileSync(filePath, 'utf8'), filePath);
 
   if (options.dryRun) {
     console.log(
@@ -164,11 +205,21 @@ async function processFile(filePath, options, vectorStore) {
   }
 
   // Generate embeddings for each chunk and upsert into LanceDB
-  const docs = chunks.map(chunk => {
-    const metadata = extractMetadata(filePath, chunk.section, chunk.line);
-    const documentId = `${metadata.filePath}-${chunk.line}`;
-    const documentText = `${chunk.section}\n\n${chunk.content}`;
-    return { id: documentId, text: documentText, metadata };
+  const docs = chunks.map((chunk, index) => {
+    const metadata = isJson
+      ? extractJsonMetadata(filePath)
+      : extractMetadata(filePath, chunk.section, chunk.line);
+    const documentId = isJson
+      ? `${metadata.filePath}-${index + 1}`
+      : `${metadata.filePath}-${chunk.line}`;
+    const documentText = isJson
+      ? `${chunk.text}${chunk.content ? `\n\n${chunk.content}` : ''}`
+      : `${chunk.section}\n\n${chunk.content}`;
+    const docMeta = {
+      ...metadata,
+      source: metadata.filePath,
+    };
+    return { id: documentId, text: documentText, metadata: docMeta };
   });
 
   await vectorStore.upsertDocuments(docs);
@@ -186,6 +237,7 @@ async function main() {
     sourceDir: '.claude/context/memory',
     batchSize: 100,
     dryRun: false,
+    file: null,
   };
 
   // Parse arguments
@@ -198,6 +250,9 @@ async function main() {
       i++;
     } else if (args[i] === '--dry-run') {
       options.dryRun = true;
+    } else if (args[i] === '--file' && i + 1 < args.length) {
+      options.file = args[i + 1];
+      i++;
     }
   }
 
@@ -213,7 +268,15 @@ async function main() {
   console.log('');
 
   // Find files
-  const files = findMemoryFiles(sourceDir);
+  let files = [];
+  if (options.file) {
+    const filePath = path.isAbsolute(options.file)
+      ? options.file
+      : path.resolve(PROJECT_ROOT, options.file);
+    files = [filePath];
+  } else {
+    files = findMemoryFiles(sourceDir);
+  }
   console.log(`Found ${files.length} memory files to process`);
   console.log('');
 
@@ -247,6 +310,10 @@ async function main() {
   // Process files
   let totalChunks = 0;
   for (const file of files) {
+    if (!file.endsWith('.md')) {
+      console.log(`  Skipping non-markdown file: ${path.basename(file)}`);
+      continue;
+    }
     totalChunks += await processFile(file, options, vectorStore);
   }
 

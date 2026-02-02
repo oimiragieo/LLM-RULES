@@ -13,7 +13,10 @@ const path = require('path');
 const fs = require('fs');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
-const { syncJsonMemory, ensureEntityDbInitialized } = require('../../hooks/memory/sync-memory-index.cjs');
+const {
+  syncJsonMemory,
+  ensureEntityDbInitialized,
+} = require('../../hooks/memory/sync-memory-index.cjs');
 
 function parseArgs() {
   const args = process.argv.slice(2);

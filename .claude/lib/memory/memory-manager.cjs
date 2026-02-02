@@ -274,7 +274,7 @@ function saveSession(insights, _projectRoot = PROJECT_ROOT) {
   if (process.env.MEMORY_DEBUG !== '1' && !saveSession._deprecationWarned) {
     saveSession._deprecationWarned = true;
     console.warn(
-      '[memory-manager] saveSession is DEPRECATED. Use memory-tiers.cjs writeSTMEntry + consolidateSession instead. Sessions directory is legacy.'
+      '[memory-manager] CRITICAL DEPRECATION: saveSession called. This function is a NO-OP for saving. Use memory-tiers.cjs instead. Data was NOT persisted to legacy sessions.'
     );
   }
   return { sessionNum: 0, file: null };

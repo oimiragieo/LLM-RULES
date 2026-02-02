@@ -75,7 +75,7 @@ Note: Claude Code does not provide a `SessionStart` hook event; “session-start
 
 ### Reflection spawn
 
-Reflection is **reminder-driven**. The Router **must** perform Step 0 before `TaskList()`; no daemon or hook spawns the reflection-agent—compliance is required for pending reflections to run. On `UserPromptSubmit`, when there are pending reflection requests, `.claude/hooks/routing/user-prompt-unified.cjs` writes `.claude/context/runtime/reflection-reminder.txt` and appends to `.claude/context/runtime/reflection-spawn-request.json`. Before `TaskList()` or any other tool, if `reflection-reminder.txt` exists, the Router must read it, read `reflection-spawn-request.json`, spawn reflection-agent for each request (or the first batch), then delete the reminder file and clear/trim the spawn request file. Health/dashboard may show `pendingReflectionRequests: N` when the spawn-request file contains queued items.
+Reflection is **reminder-driven**. The Router **must** perform Step 0 before `TaskList()`; no daemon or hook spawns the reflection-agent—compliance is required for pending reflections to run. The reflection-queue-processor writes `.claude/context/runtime/reflection-spawn-request.json`; on `UserPromptSubmit`, when that file has pending requests, `.claude/hooks/routing/user-prompt-unified.cjs` writes `.claude/context/runtime/reflection-reminder.txt`. Before `TaskList()` or any other tool, if `reflection-reminder.txt` exists, the Router must read it, read `reflection-spawn-request.json`, spawn reflection-agent for each request (or the first batch), then delete the reminder file and clear/trim the spawn request file. Health/dashboard may show `pendingReflectionRequests: N` when the spawn-request file contains queued items.
 
 **Reflection is best-effort:** If the Router skips Step 0, pending reflections will not run. Check the dashboard (or health output) for `pendingReflectionRequests` to see if reflections are queued.
 
@@ -101,7 +101,11 @@ There are two primary metrics roots:
 
 ### Metrics and dashboard
 
-Metrics are collected on `UserPromptSubmit` via `memory-health-check.cjs` (Phase 4). The hook loads `.claude/lib/memory/memory-dashboard.cjs`; if that module fails to load or Phase 4 throws, the hook still completes and sets `output.metricsLogged = false` and `output.metricsError` so callers know metrics did not run. A structured error is logged (`metrics_logging_error`). When dashboard load or Phase 4 fails, an optional fallback one-line JSONL entry is written to `.claude/context/memory/metrics/fallback.jsonl` with `timestamp`, `event: 'health_check'`, `status`, `warningsCount`, and optionally `metricsError`, so at least one data point exists for the run. Inspect metrics without running the full health check via `pnpm run memory:dashboard` (or `node .claude/lib/memory/memory-dashboard.cjs`; default command shows health).
+Metrics are collected on `UserPromptSubmit` via `memory-health-check.cjs` (Phase 4). The hook loads `.claude/lib/memory/memory-dashboard.cjs`; if that module fails to load or Phase 4 throws, the hook still completes and sets `output.metricsLogged = false` and `output.metricsError` so callers know metrics did not run. A structured error is logged (`metrics_logging_error`). When dashboard load or Phase 4 fails, an optional fallback one-line JSONL entry is written to `.claude/context/memory/metrics/fallback.jsonl` with `timestamp`, `event: 'health_check'`, `status`, `warningsCount`, and optionally `metricsError`, so at least one data point exists for the run. Inspect metrics without running the full health check via `pnpm run memory:dashboard` (or `node .claude/lib/memory/memory-dashboard.cjs`; default command shows health). A separate token/budget dashboard CLI is available via `pnpm run memory:dashboard:budget` (from `.claude/tools/cli/memory-dashboard.cjs`).
+
+### Embeddings (auto-index)
+
+Semantic embeddings can be generated automatically on memory file edits when `MEMORY_EMBED_ON_EDIT=on`. The PostToolUse memory index hook will invoke the embedding generator for `learnings.md`, `decisions.md`, `issues.md`, `patterns.json`, and `gotchas.json` with a short timeout (`MEMORY_EMBED_ON_EDIT_TIMEOUT_MS`, default 30000). If disabled, use `pnpm run memory:embeddings` to build embeddings manually.
 
 ## Caveats / Verification Notes
 

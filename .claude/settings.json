@@ -124,6 +124,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/config-model-validator.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/routing/spawn-prompt-assembler.cjs"
           },
           {

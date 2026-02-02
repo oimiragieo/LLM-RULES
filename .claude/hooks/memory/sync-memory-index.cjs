@@ -19,6 +19,7 @@
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
+const { spawnSync } = require('child_process');
 
 const { PROJECT_ROOT, validatePathWithinProject } = require('../../lib/utils/project-root.cjs');
 const {
@@ -33,6 +34,13 @@ const { EntityExtractor } = require('../../lib/memory/entity-extractor.cjs');
 
 const CORE_MEMORY_MARKDOWN_FILES = new Set(['learnings.md', 'decisions.md', 'issues.md']);
 const CORE_MEMORY_JSON_FILES = new Set(['patterns.json', 'gotchas.json']);
+const EMBEDDING_MEMORY_FILES = new Set([
+  'learnings.md',
+  'decisions.md',
+  'issues.md',
+  'patterns.json',
+  'gotchas.json',
+]);
 
 function getCoreMemoryFileType(absPath) {
   if (!absPath) return false;
@@ -157,6 +165,37 @@ function syncJsonMemory(absPath, dbPath) {
   db.close();
 }
 
+function maybeGenerateEmbeddingsForFile(absPath) {
+  if (process.env.MEMORY_EMBED_ON_EDIT !== 'on') return;
+  if (!absPath) return;
+  const basename = path.basename(absPath);
+  if (!EMBEDDING_MEMORY_FILES.has(basename)) return;
+
+  const generatorPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'tools',
+    'cli',
+    'generate-embeddings.cjs'
+  );
+  if (!fs.existsSync(generatorPath)) return;
+
+  const timeoutMs = Number(process.env.MEMORY_EMBED_ON_EDIT_TIMEOUT_MS || 30000);
+  const spawnResult = spawnSync(process.execPath, [generatorPath, '--file', absPath], {
+    cwd: PROJECT_ROOT,
+    stdio: 'ignore',
+    timeout: timeoutMs,
+  });
+  if (spawnResult.signal === 'SIGTERM' || spawnResult.status !== 0) {
+    console.warn(
+      '[sync-memory-index] Embedding generation may be partial:',
+      spawnResult.signal ? `timeout (${spawnResult.signal})` : `exit ${spawnResult.status}`
+    );
+  } else if (process.env.DEBUG_HOOKS) {
+    console.warn('[sync-memory-index] Embeddings updated for', basename);
+  }
+}
+
 async function main() {
   const hookInput = parseHookInputSync();
   if (!hookInput) process.exit(0);
@@ -194,6 +233,7 @@ async function main() {
         extractor.close();
         debugLog('sync-memory-index', `Sync failed for ${path.basename(absPath)}`, err);
       }
+      maybeGenerateEmbeddingsForFile(absPath);
     }
   } catch (err) {
     debugLog('sync-memory-index', `Failed to initialize extractor for ${toolName || 'tool'}`, err);

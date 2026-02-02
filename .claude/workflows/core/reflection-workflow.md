@@ -77,21 +77,13 @@ if (tool === 'Bash' && exitCode !== 0) {
 
 ### 1.3 Reflection Queue
 
-**File**: `.claude/context/runtime/reflection-queue.json`
+**File**: `.claude/context/reflection-queue.jsonl`
 
-```json
-{
-  "pending": [
-    {
-      "taskId": "42",
-      "trigger": "task_completion",
-      "timestamp": "2026-01-25T22:00:00Z",
-      "priority": "high"
-    }
-  ],
-  "processing": null,
-  "completed": []
-}
+Format: JSONL (one JSON object per line), not a single JSON object. Example:
+
+```jsonl
+{"taskId":"42","trigger":"task_completion","timestamp":"2026-01-25T22:00:00Z","priority":"high"}
+{"context":"error_recovery","trigger":"error","command":"npm test","timestamp":"2026-01-25T22:05:00Z"}
 ```
 
 ### 1.4 Gate Conditions
