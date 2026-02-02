@@ -24,8 +24,8 @@ const path = require('path');
 const fs = require('fs');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 
-// Import memory manager functions
-const PROJECT_ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+// Import memory manager functions and shared project root (MEMORY_SYSTEM.md: use project-root.cjs)
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 // Smart pruning thresholds
 const SMART_PRUNE_CONFIG = {

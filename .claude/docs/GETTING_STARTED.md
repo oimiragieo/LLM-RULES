@@ -270,6 +270,11 @@ Agent Studio:
 - Automatic multi-agent coordination
 - Self-evolving capabilities
 
+## Scripts and entry points
+
+- **agent:production** is a stub; use **agent:worker** for headless/worker runs (`pnpm run agent:worker`).
+- Memory scripts: `memory:init`, `memory:health`, `memory:weekly`, `memory:dashboard` (see [MEMORY_SYSTEM.md](./MEMORY_SYSTEM.md)).
+
 ## Where to Learn More
 
 - **[CLAUDE.md](../CLAUDE.md)**: Complete framework reference

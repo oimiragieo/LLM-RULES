@@ -2,11 +2,10 @@
  * Production Agent Entry Point (Stub)
  * ===================================
  *
- * This file serves as the entry point for the agent:production script.
- * Currently, the production agent mode is not fully implemented.
- * This stub prevents the "module not found" error in package.json.
+ * Production agent mode is intentionally unimplemented.
+ * Use agent:worker for headless/worker runs (see package.json "agent:worker" script).
+ * This stub prevents "module not found" when agent:production is invoked.
  */
 
-console.log('Production agent mode is under construction.');
-console.log('Please use `pnpm agent:worker` or `pnpm agent:start` for now.');
+console.log('Production agent mode is under construction. Use `pnpm run agent:worker` for now.');
 process.exit(0);

@@ -231,24 +231,38 @@ async function main() {
     // Optional Phase 3 enhancement: ContextualMemory semantic search.
     // Enabled by default; set SPAWN_PROMPT_SEMANTIC_MEMORY=off to disable.
     if (process.env.SPAWN_PROMPT_SEMANTIC_MEMORY !== 'off') {
+      const memoryManager = require('../../lib/memory/memory-manager.cjs');
+      const query =
+        (toolInput.description && String(toolInput.description).trim()) ||
+        String(basePrompt).slice(0, 240);
+      const {
+        SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+      } = require('../../lib/memory/memory-constants.cjs');
+      let results = [];
       try {
-        const memoryManager = require('../../lib/memory/memory-manager.cjs');
-        const query =
-          (toolInput.description && String(toolInput.description).trim()) ||
-          String(basePrompt).slice(0, 240);
         // Hot-only by default: exclude cold-archived LTM summaries from the prompt path.
-        // (Cold remains searchable for explicit queries elsewhere.)
-        const {
-          SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
-        } = require('../../lib/memory/memory-constants.cjs');
-        const results = await memoryManager.searchMemory(query, {
+        results = await memoryManager.searchMemory(query, {
           limit: 3,
           threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
           filters: `metadata NOT LIKE '%"source":"ltm_archive"%'`,
         });
-        assembled = appendSemanticMatches(assembled, results);
       } catch (err) {
-        debugLog('spawn-prompt-assembler', 'Semantic memory retrieval failed (ignored)', err);
+        debugLog('spawn-prompt-assembler', 'Hot-only filter failed, using unfiltered search', err);
+        try {
+          results = await memoryManager.searchMemory(query, {
+            limit: 3,
+            threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+          });
+        } catch (fallbackErr) {
+          debugLog(
+            'spawn-prompt-assembler',
+            'Semantic memory retrieval failed (ignored)',
+            fallbackErr
+          );
+        }
+      }
+      if (results.length > 0) {
+        assembled = appendSemanticMatches(assembled, results);
       }
     }
 

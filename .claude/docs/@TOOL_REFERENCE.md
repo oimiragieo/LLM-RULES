@@ -108,6 +108,7 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 **Restricted (Special permissions):**
 
 - **Task**: Only Router and Orchestrators (for spawning subagents)
+- **Orchestrator**: Only orchestrator agents (master-orchestrator, swarm-coordinator, etc.), **not** the Router. Router routes; orchestrators orchestrate.
 - **AskUserQuestion**: Only Router (for user interaction)
 - **Bash**: All agents have access, but Router limited to read-only git commands
 

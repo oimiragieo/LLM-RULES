@@ -303,6 +303,24 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
   const mtmSessions = countDirFiles(path.join(memoryDir, 'mtm'), /\.json$/);
   const ltmSummaries = countDirFiles(path.join(memoryDir, 'ltm'), /\.json$/);
 
+  // Cold storage and maintenance status
+  let lastColdArchive = null;
+  let lastWeekly = null;
+  try {
+    const statusPath = path.join(memoryDir, 'maintenance-status.json');
+    if (fs.existsSync(statusPath)) {
+      const status = JSON.parse(fs.readFileSync(statusPath, 'utf8'));
+      lastColdArchive = status.lastColdArchive ?? null;
+      lastWeekly = status.lastWeekly ?? null;
+    }
+  } catch (_e) {
+    // ignore
+  }
+  const coldDir = path.join(memoryDir, 'cold');
+  const coldFileCount = fs.existsSync(coldDir)
+    ? fs.readdirSync(coldDir).filter(f => /\.jsonl\.gz$/.test(f)).length
+    : 0;
+
   // Calculate totals
   const totalEntries = patternsCount + gotchasCount + codebaseMapEntries;
 
@@ -343,6 +361,11 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
       stm: { sessions: stmSessions, sizeKB: 0 },
       mtm: { sessions: mtmSessions, sizeKB: 0 },
       ltm: { summaries: ltmSummaries, sizeKB: 0 },
+    },
+    cold: {
+      lastColdArchive,
+      lastWeekly,
+      fileCount: coldFileCount,
     },
     files: {
       'learnings.md': {
@@ -585,6 +608,11 @@ function formatDashboard(dashboard) {
   lines.push(`  STM (Short-Term): ${dashboard.tiers.stm.sessions} session(s)`);
   lines.push(`  MTM (Mid-Term): ${dashboard.tiers.mtm.sessions} sessions`);
   lines.push(`  LTM (Long-Term): ${dashboard.tiers.ltm.summaries} summaries`);
+  if (dashboard.cold) {
+    lines.push(
+      `  Cold: ${dashboard.cold.fileCount} archive(s), last: ${dashboard.cold.lastColdArchive || 'never'}`
+    );
+  }
   lines.push('');
 
   // Files

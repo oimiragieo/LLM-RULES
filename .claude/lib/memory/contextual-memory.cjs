@@ -45,9 +45,35 @@ class ContextualMemory {
       },
     };
 
-    // Initialize components
+    // Initialize components (undefined = not yet tried; null = tried and unavailable)
     this.vectorStore = null; // Lazy initialization
-    this.entityQuery = null; // Lazy initialization
+    this.entityQuery = undefined; // Lazy initialization
+    this._mockModeWarned = false;
+  }
+
+  /**
+   * Log LanceDB/embedding event to metrics JSONL for observability in headless environments.
+   * @private
+   * @param {string} event - Event name (e.g. 'mock_mode_detected')
+   * @param {Object} [payload] - Optional extra fields
+   */
+  _logLancedbEvent(event, payload = {}) {
+    try {
+      const metricsDir = path.join(this.config.memoryDir, 'metrics');
+      if (!fs.existsSync(metricsDir)) {
+        fs.mkdirSync(metricsDir, { recursive: true });
+      }
+      const eventsPath = path.join(metricsDir, 'lancedb-events.jsonl');
+      const line =
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          event,
+          ...payload,
+        }) + '\n';
+      fs.appendFileSync(eventsPath, line);
+    } catch (_e) {
+      // Best-effort; do not throw
+    }
   }
 
   /**
@@ -65,29 +91,60 @@ class ContextualMemory {
       this.vectorStore = new MemoryVectorStore(this.config.lancedbConfig);
       try {
         await this.vectorStore.initialize();
+        if (
+          this.vectorStore &&
+          typeof this.vectorStore.isMockMode === 'function' &&
+          this.vectorStore.isMockMode() &&
+          !this._mockModeWarned
+        ) {
+          console.warn(
+            '[ContextualMemory] Semantic search is in mock mode; using keyword fallback.'
+          );
+          this._mockModeWarned = true;
+          this._logLancedbEvent('mock_mode_detected', {
+            message: 'Semantic search in mock mode; using keyword fallback',
+          });
+        }
       } catch (error) {
         console.warn('[ContextualMemory] LanceDB initialization failed:', error.message);
         this.vectorStore = null; // Mark as unavailable
+        this._logLancedbEvent('lancedb_init_failed', {
+          message: error?.message || String(error),
+        });
       }
     }
     return this.vectorStore;
   }
 
   /**
-   * Initialize entity query API (lazy)
+   * Initialize entity query API (lazy).
+   * Ensures entity DB and schema exist before creating EntityQuery (avoids "Required table 'entities' not found").
    *
    * @private
-   * @returns {EntityQuery}
+   * @returns {EntityQuery|null}
    */
   _getEntityQuery() {
-    if (!this.entityQuery) {
-      // Ensure database directory exists before initializing
-      const dbDir = path.dirname(this.config.dbPath);
-      if (!fs.existsSync(dbDir)) {
-        fs.mkdirSync(dbDir, { recursive: true });
+    if (this.entityQuery !== undefined) {
+      return this.entityQuery;
+    }
+    const dbDir = path.dirname(this.config.dbPath);
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
+    try {
+      const init = require('../../tools/cli/init-memory-db.cjs');
+      const db = init.initializeDatabase(this.config.dbPath);
+      if (db && typeof db.close === 'function') {
+        db.close();
       }
-
+    } catch (_e) {
+      this.entityQuery = null;
+      return null;
+    }
+    try {
       this.entityQuery = new EntityQuery(this.config.dbPath);
+    } catch (_e) {
+      this.entityQuery = null;
     }
     return this.entityQuery;
   }
@@ -407,6 +464,7 @@ class ContextualMemory {
    */
   async findEntities(type, filters = {}) {
     const entityQuery = this._getEntityQuery();
+    if (!entityQuery) return [];
     return await entityQuery.findByType(type, filters);
   }
 
@@ -429,6 +487,7 @@ class ContextualMemory {
    */
   async getRelated(id, options = {}) {
     const entityQuery = this._getEntityQuery();
+    if (!entityQuery) return [];
     return await entityQuery.findRelated(id, options);
   }
 

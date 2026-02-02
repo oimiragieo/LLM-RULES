@@ -1531,7 +1531,7 @@ if (require.main === module) {
         console.log(dashboard.formatDashboard(dashboardData));
       } catch (e) {
         console.error('Dashboard not available:', e.message);
-        console.log('Run: node .claude/lib/memory-dashboard.cjs');
+        console.log('Run: node .claude/lib/memory/memory-dashboard.cjs');
       }
       break;
 
@@ -1545,6 +1545,7 @@ if (require.main === module) {
       } catch (e) {
         console.error('Scheduler not available:', e.message);
         console.log('Run: node .claude/lib/memory/memory-scheduler.cjs');
+        console.log('Or: pnpm run memory:weekly');
       }
       break;
 
@@ -1563,7 +1564,7 @@ Commands:
   record-gotcha      Record a gotcha/pitfall
   record-pattern     Record a reusable pattern
   record-discovery   Record a codebase discovery
-  save-session       Save a session (JSON from stdin)
+  save-session       (deprecated, no-op; use memory-tiers / SessionEnd)
 
 Examples:
   node memory-manager.cjs stats

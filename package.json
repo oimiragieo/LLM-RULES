@@ -17,7 +17,7 @@
     "cleanup:headless:check": "node .claude/tools/cleanup-headless-runs.mjs --dry-run",
     "cleanup:headless": "node .claude/tools/cleanup-headless-runs.mjs --execute --yes",
     "agent:production": "node --max-old-space-size=8192 --expose-gc --optimize_for_size --gc_interval=100 .claude/lib/boot/production-agent.js",
-    "agent:worker": "node --max-old-space-size=4096 --expose-gc --optimize_for_size",
+    "agent:worker": "node --max-old-space-size=4096 --expose-gc --optimize_for_size .claude/lib/boot/worker-agent.js",
     "validate": "node --max-old-space-size=4096 --expose-gc scripts/validate-config.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs",
     "validate:full": "pnpm validate && node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs && pnpm validate:cujs && pnpm validate:index && pnpm index-rules && pnpm validate:schemas",
     "validate:verbose": "node --max-old-space-size=4096 --expose-gc scripts/validate-config.mjs --verbose && node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs --verbose",

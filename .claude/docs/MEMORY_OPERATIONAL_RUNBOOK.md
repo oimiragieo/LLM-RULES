@@ -2,10 +2,13 @@
 
 **Last Updated:** 2026-01-30
 **Version:** 1.0.0
+**Last verified:** 2026-02-01 (Pre-deployment steps, headless/maintenance notes)
 
 ## Overview
 
 This runbook provides step-by-step procedures for memory management in production, including pre-deployment checks, monitoring, incident response, and post-mortem analysis.
+
+**When maintenance runs:** Maintenance runs on SessionEnd or when a user prompt occurs and weekly maintenance is overdue (7 days). For headless or rarely-used environments, run `pnpm run memory:weekly` (or `memory:daily`) periodically (e.g. cron or CI).
 
 ---
 
@@ -19,7 +22,6 @@ The tiered memory system includes retention so hot LTM stays bounded:
 - Cold archives: `.claude/context/memory/cold/ltm-*.jsonl.gz` (written per run; no gzip append)
 
 ```bash
-# Run the weekly scheduler (includes cold archiving)
 # Run the weekly scheduler (includes cold archiving)
 node .claude/lib/memory/memory-scheduler.cjs weekly
 # OR: pnpm run memory:weekly
@@ -125,6 +127,13 @@ done
 - [ ] No unbounded arrays found
 - [ ] All collections have max size limits
 - [ ] Trimming logic present after push
+
+---
+
+## Environment-specific
+
+- **Headless / no SessionEnd:** Run the reflection-queue-processor manually or simulate SessionEnd if reflection is required: `node .claude/hooks/reflection/reflection-queue-processor.cjs`
+- **Headless / rarely-used:** Schedule `pnpm run memory:weekly` (e.g. cron) for LTM retention and cold storage so maintenance runs without UserPromptSubmit or SessionEnd
 
 ---
 

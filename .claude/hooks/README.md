@@ -59,6 +59,17 @@ Reminds agents to read and update memory files.
 **When it runs:** Session start, periodic intervals
 **What it does:** Prompts reading learnings.md before starting work
 
+### Memory Injection
+
+Located in `.claude/hooks/routing/`
+
+#### Spawn Prompt Assembler (`spawn-prompt-assembler.cjs`)
+
+Injects memory context (Gotchas, Patterns) into agent spawn prompts.
+
+**When it runs:** PreToolUse (Task)
+**What it does:** Enhances agent prompts with relevant memory context.
+
 ### Memory Hooks
 
 Located in `.claude/hooks/memory/`

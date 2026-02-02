@@ -31,6 +31,9 @@ try {
 } catch (_e) {
   memoryTiers = null;
 }
+if (!memoryTiers) {
+  console.warn('[user-prompt-unified] memory-tiers not loaded; STM write skipped.');
+}
 const { getCachedState, invalidateCache } = require('../../lib/utils/state-cache.cjs');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 
@@ -920,6 +923,11 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
           `You have ${requests.length} pending reflection spawn request(s). Read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent for each request (or the first batch). Then delete this file and clear/trim the spawn request file.\n`,
           'utf8'
         );
+        if (process.env.DEBUG_HOOKS) {
+          console.warn(
+            '[user-prompt-unified] Reflection reminder written; Router must perform Step 0.'
+          );
+        }
       } else if (fs.existsSync(reminderPath)) {
         // Clean up stale reminder if request file is empty or invalid
         fs.unlinkSync(reminderPath);
@@ -963,12 +971,21 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
         'memory-scheduler.cjs'
       );
       if (fs.existsSync(schedulerPath)) {
+        if (process.env.DEBUG_HOOKS) {
+          console.warn('[user-prompt-unified] Weekly maintenance triggered (overdue).');
+        }
         const weeklyTimeoutMs = Number(process.env.MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS || 60000);
-        spawnSync(process.execPath, [schedulerPath, 'weekly'], {
+        const spawnResult = spawnSync(process.execPath, [schedulerPath, 'weekly'], {
           cwd: PROJECT_ROOT,
           stdio: 'ignore',
           timeout: weeklyTimeoutMs,
         });
+        if (spawnResult.signal === 'SIGTERM' || spawnResult.status !== 0) {
+          console.warn(
+            '[user-prompt-unified] Weekly maintenance may be partial:',
+            spawnResult.signal ? `timeout (${spawnResult.signal})` : `exit ${spawnResult.status}`
+          );
+        }
       }
     }
   } catch (_e) {

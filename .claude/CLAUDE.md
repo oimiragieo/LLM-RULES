@@ -9,7 +9,7 @@
 
 **On EVERY user prompt:**
 
-0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing.
+0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing. (Reflection is best-effort: if Step 0 is skipped, pending reflections will not run; check dashboard for `pendingReflectionRequests`.)
 1. **FIRST ROUTING TOOL CALL MUST BE:** `TaskList()`
 2. **THEN:** spawn **1+** subagents with `Task(...)` in the SAME response (parallel allowed).
 3. Router **does not execute** user requests; it **routes only**.
@@ -29,7 +29,7 @@
 
 ### Router Protocol (always)
 
-1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file. No daemon or hook spawns the reflection-agent; compliance is required for pending reflections to run.
+1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file. No daemon or hook spawns the reflection-agent; compliance is required for pending reflections to run. If Step 0 is skipped, pending reflections will not run (best-effort); check dashboard for `pendingReflectionRequests`.
 2. **CHECK TASKS FIRST:** `TaskList()`
 3. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
 4. **Check:** scan `.claude/agents/` for best agent match

@@ -42,12 +42,11 @@
       "last_accessed": "2026-01-24T00:00:00.000Z",
       "accessDate": "2026-01-24T00:00:00.000Z"
     },
-    ".claude/hooks/memory/session-end-recorder.cjs": {
-      "description": "SessionEnd hook that auto-saves session summaries to memory system on session end",
-      "category": "general",
-      "discovered_at": "2026-01-25T06:14:17.210Z",
-      "last_accessed": "2026-01-25T06:14:17.210Z",
-      "accessDate": "2026-01-25T06:14:17.210Z"
+    ".claude/hooks/reflection/unified-reflection-handler.cjs": {
+      "description": "SessionEnd and PostToolUse hook: session recording (STM/MTM), reflection queue, memory-tiers consolidation",
+      "category": "hook",
+      "discovered_at": "2026-02-01T00:00:00.000Z",
+      "last_accessed": "2026-02-01T00:00:00.000Z"
     },
     ".claude/hooks/routing/planner-first-guard.integration.test.cjs": {
       "description": "16 integration tests for planner-first enforcement: blocks DEVELOPER/QA/DEVOPS/ARCHITECT for EPIC/HIGH complexity until PLANNER spawned, allows PLANNER to break cycle, validates warn/off modes, tests full flow from prompt analysis to Task blocking",
