@@ -1,0 +1,54 @@
+{
+  "timestamp": "2026-02-02T07:46:35.142Z",
+  "summary": {
+    "totalEntries": 33,
+    "totalSizeKB": 263,
+    "healthScore": 0.96,
+    "entityCount": 48,
+    "relationshipCount": 1
+  },
+  "tiers": {
+    "stm": {
+      "sessions": 0,
+      "sizeKB": 0
+    },
+    "mtm": {
+      "sessions": 5,
+      "sizeKB": 0
+    },
+    "ltm": {
+      "summaries": 25,
+      "sizeKB": 0
+    }
+  },
+  "cold": {
+    "lastColdArchive": "2026-02-01T23:46:15.494Z",
+    "lastWeekly": "2026-02-01T23:46:15.465Z",
+    "fileCount": 0,
+    "sizeKB": 0
+  },
+  "files": {
+    "learnings.md": {
+      "sizeKB": 34,
+      "lines": 860,
+      "status": "healthy"
+    },
+    "patterns.json": {
+      "entries": 17,
+      "status": "healthy"
+    },
+    "gotchas.json": {
+      "entries": 7,
+      "status": "healthy"
+    },
+    "codebase_map.json": {
+      "entries": 9,
+      "status": "healthy"
+    },
+    "sessions/ (legacy)": {
+      "count": 0,
+      "status": "healthy"
+    }
+  },
+  "recommendations": []
+}

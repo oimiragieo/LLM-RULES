@@ -47,8 +47,6 @@
 !.claude/context/ml/.gitkeep
 # Access tracking timestamp (runtime artifact)
 .claude/context/memory/.access-tracking-timestamp
-# Memory health metrics (generated on UserPromptSubmit)
-.claude/context/memory/metrics/
 # Legacy/orphan vector DBs (LanceDB uses .claude/data/lancedb)
 .claude/context/memory/vectors.db
 .claude/context/memory/vectors.db_placeholder
