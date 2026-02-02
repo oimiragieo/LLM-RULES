@@ -192,6 +192,65 @@ function appendSemanticMatches(prompt, results) {
   return prompt + `\n\n${section}\n`;
 }
 
+function appendEntityGraph(prompt, data) {
+  const decisions = Array.isArray(data?.decisions) ? data.decisions : [];
+  const issues = Array.isArray(data?.issues) ? data.issues : [];
+  const related = Array.isArray(data?.related) ? data.related : [];
+
+  if (decisions.length === 0 && issues.length === 0 && related.length === 0) {
+    return prompt;
+  }
+
+  const lines = [];
+  lines.push('### Entity Graph (SQLite)');
+  lines.push('_Best-effort structured memory from entities/relationships_');
+  lines.push('');
+
+  if (decisions.length > 0) {
+    lines.push('**Decisions**');
+    for (const d of decisions.slice(0, 3)) {
+      const name = d?.name || d?.id || 'decision';
+      const content = d?.content ? `: ${String(d.content).slice(0, 140)}` : '';
+      lines.push(`- ${name}${content}${content.length >= 140 ? '...' : ''}`);
+    }
+    lines.push('');
+  }
+
+  if (issues.length > 0) {
+    lines.push('**Issues**');
+    for (const i of issues.slice(0, 3)) {
+      const name = i?.name || i?.id || 'issue';
+      const content = i?.content ? `: ${String(i.content).slice(0, 140)}` : '';
+      lines.push(`- ${name}${content}${content.length >= 140 ? '...' : ''}`);
+    }
+    lines.push('');
+  }
+
+  if (related.length > 0) {
+    lines.push('**Related**');
+    for (const r of related.slice(0, 4)) {
+      const ent = r?.entity || r;
+      const name = ent?.name || ent?.id || 'entity';
+      const relType = r?.relationship_type ? ` (${r.relationship_type})` : '';
+      lines.push(`- ${name}${relType}`);
+    }
+    lines.push('');
+  }
+
+  const section = lines.join('\n').trimEnd() + '\n';
+
+  const marker = '## Memory Context (Auto-Loaded)';
+  if (prompt.includes(marker)) {
+    const nextHeaderIdx = prompt.indexOf('\n## ', prompt.indexOf(marker) + marker.length);
+    if (nextHeaderIdx !== -1) {
+      return prompt.slice(0, nextHeaderIdx) + `\n\n${section}\n` + prompt.slice(nextHeaderIdx);
+    }
+    return prompt + `\n\n${section}\n`;
+  }
+
+  return prompt + `\n\n${section}\n`;
+}
+
 async function main() {
   try {
     if (isDisabled()) {
@@ -266,6 +325,26 @@ async function main() {
       }
     }
 
+    if (process.env.SPAWN_PROMPT_ENTITY_GRAPH !== 'off') {
+      try {
+        const { ContextualMemory } = require('../../lib/memory/contextual-memory.cjs');
+        const cm = new ContextualMemory();
+        const decisions = await cm.findEntities('decision', { limit: 3 });
+        const issues = await cm.findEntities('issue', { limit: 3 });
+        const related = [];
+        for (const d of decisions.slice(0, 2)) {
+          const rel = await cm.getRelated(d.id, { depth: 1 });
+          if (Array.isArray(rel)) {
+            related.push(...rel.slice(0, 2));
+          }
+        }
+        cm.close();
+        assembled = appendEntityGraph(assembled, { decisions, issues, related });
+      } catch (err) {
+        debugLog('spawn-prompt-assembler', 'Entity graph retrieval failed (ignored)', err);
+      }
+    }
+
     const modifiedInput = { ...toolInput, prompt: assembled, allowed_tools: allowedTools };
 
     // Claude Code hook protocol: output { tool_input: { ... } } to modify tool parameters.
@@ -285,6 +364,7 @@ if (require.main === module) {
 module.exports = {
   looksAssembled,
   appendSemanticMatches,
+  appendEntityGraph,
   enrichAllowedTools,
   inferAgentFromPrompt,
   main,

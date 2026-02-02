@@ -75,60 +75,20 @@ function getMemoryDashboardPath() {
   return path.join(PROJECT_ROOT, '.claude', 'lib', 'memory', 'memory-dashboard.cjs');
 }
 
-function main() {
-  const memoryManagerPath = getMemoryManagerPath();
-  const memoryTiersPath = getMemoryTiersPath();
-  const smartPrunerPath = getSmartPrunerPath();
-
-  if (!fs.existsSync(memoryManagerPath)) {
-    // Memory manager not available - skip silently
-    process.exit(0);
-  }
-
-  const {
-    getMemoryHealth,
-    checkAndArchiveLearnings,
-    pruneCodebaseMap,
-    getMemoryDir,
-    CONFIG,
-  } = require(memoryManagerPath);
-
-  // Try to load memory tiers
-  let memoryTiers = null;
-  if (fs.existsSync(memoryTiersPath)) {
-    try {
-      memoryTiers = require(memoryTiersPath);
-    } catch (_e) {
-      // Memory tiers not available - continue without
+function loadOptionalModule(filePath, label) {
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    return require(filePath);
+  } catch (e) {
+    if (label) {
+      console.error(`[MemoryHealthCheck] Failed to load ${label}: ${e.message}`);
     }
+    return null;
   }
+}
 
-  // Try to load smart pruner
-  let smartPruner = null;
-  if (fs.existsSync(smartPrunerPath)) {
-    try {
-      smartPruner = require(smartPrunerPath);
-    } catch (_e) {
-      // Smart pruner not available - continue without
-    }
-  }
-
-  // Try to load memory dashboard for metrics logging
-  const memoryDashboardPath = getMemoryDashboardPath();
-  let memoryDashboard = null;
-  if (fs.existsSync(memoryDashboardPath)) {
-    try {
-      memoryDashboard = require(memoryDashboardPath);
-    } catch (e) {
-      console.error(`[MemoryHealthCheck] Failed to load memory dashboard: ${e.message}`);
-    }
-  }
-
-  // Get health status
-  const health = getMemoryHealth(PROJECT_ROOT);
-
-  // Output health status
-  const output = {
+function buildOutput(health) {
+  return {
     status: health.status,
     warnings: [...health.warnings],
     metrics: {
@@ -136,34 +96,64 @@ function main() {
       codebaseMapEntries: health.codebaseMapEntries,
       sessionsCount: health.sessionsCount,
     },
-    // LanceDB mock mode: run pnpm run memory:dashboard to see embedding (mock vs real) status
-    lancedbMockMode: null,
+    semanticStatus: null,
   };
+}
 
-  // Phase 2: Add tier health metrics
-  if (memoryTiers) {
-    const tierHealth = memoryTiers.getTierHealth(PROJECT_ROOT);
-    output.tiers = {
-      stm: tierHealth.stm,
-      mtm: tierHealth.mtm,
-      ltm: tierHealth.ltm,
-    };
-
-    // Add tier warnings to overall warnings
-    if (tierHealth.mtm.warnings && tierHealth.mtm.warnings.length > 0) {
-      output.warnings.push(...tierHealth.mtm.warnings);
+async function attachSemanticStatus(output, memoryDashboard, projectRoot) {
+  if (!memoryDashboard || typeof memoryDashboard.getLanceDBStatus !== 'function') {
+    return;
+  }
+  try {
+    const semanticStatus = await memoryDashboard.getLanceDBStatus(projectRoot);
+    output.semanticStatus = semanticStatus;
+    if (
+      process.env.MEMORY_SEMANTIC_SEARCH !== 'off' &&
+      semanticStatus &&
+      semanticStatus.status === 'unavailable'
+    ) {
+      output.warnings.push(
+        `Semantic search disabled: ${semanticStatus.reason || semanticStatus.status}`
+      );
       if (output.status === 'healthy') {
         output.status = 'warning';
       }
     }
+  } catch (_e) {
+    // best-effort; don't fail hook
   }
+}
 
-  // Auto-remediation if over hard thresholds
+function applyTierHealth(output, memoryTiers, projectRoot) {
+  if (!memoryTiers) return;
+  const tierHealth = memoryTiers.getTierHealth(projectRoot);
+  output.tiers = {
+    stm: tierHealth.stm,
+    mtm: tierHealth.mtm,
+    ltm: tierHealth.ltm,
+  };
+
+  if (tierHealth.mtm.warnings && tierHealth.mtm.warnings.length > 0) {
+    output.warnings.push(...tierHealth.mtm.warnings);
+    if (output.status === 'healthy') {
+      output.status = 'warning';
+    }
+  }
+}
+
+function applyAutoRemediation(
+  health,
+  output,
+  memoryTiers,
+  smartPruner,
+  projectRoot,
+  memoryManager
+) {
+  const { checkAndArchiveLearnings, pruneCodebaseMap, getMemoryDir, CONFIG } = memoryManager;
   const autoActions = [];
 
-  // Check if learnings.md needs archival (over 40KB)
   if (health.learningsSizeKB > CONFIG.LEARNINGS_ARCHIVE_THRESHOLD_KB) {
-    const archiveResult = checkAndArchiveLearnings(PROJECT_ROOT);
+    const archiveResult = checkAndArchiveLearnings(projectRoot);
     if (archiveResult.archived) {
       autoActions.push(
         `Archived ${Math.round(archiveResult.archivedBytes / 1024)}KB of learnings.md`
@@ -171,31 +161,27 @@ function main() {
     }
   }
 
-  // Check if codebase_map needs pruning (over 500 entries)
   if (health.codebaseMapEntries > CONFIG.CODEBASE_MAP_MAX_ENTRIES) {
-    const pruneResult = pruneCodebaseMap(PROJECT_ROOT);
+    const pruneResult = pruneCodebaseMap(projectRoot);
     if (pruneResult.totalPruned > 0) {
       autoActions.push(`Pruned ${pruneResult.totalPruned} stale codebase_map entries`);
     }
   }
 
-  // Phase 2: Auto-summarize MTM if at limit
   if (
     memoryTiers &&
     output.tiers &&
     output.tiers.mtm.sessionCount >= memoryTiers.CONFIG.MTM_MAX_SESSIONS
   ) {
-    const summarizeResult = memoryTiers.summarizeOldSessions(PROJECT_ROOT);
+    const summarizeResult = memoryTiers.summarizeOldSessions(projectRoot);
     if (summarizeResult.summarized > 0) {
       autoActions.push(`Summarized ${summarizeResult.summarized} old MTM sessions to LTM`);
     }
   }
 
-  // Phase 3: Smart pruning for patterns and gotchas
   if (smartPruner) {
-    const memoryDir = getMemoryDir(PROJECT_ROOT);
+    const memoryDir = getMemoryDir(projectRoot);
 
-    // Check patterns.json
     const patternsPath = path.join(memoryDir, 'patterns.json');
     if (fs.existsSync(patternsPath)) {
       try {
@@ -209,7 +195,6 @@ function main() {
           output.status = 'warning';
         }
 
-        // Auto-prune if over max
         if (patterns.length > SMART_PRUNE_CONFIG.PATTERNS_MAX_COUNT) {
           const result = smartPruner.deduplicateAndPrune(patterns, {
             targetCount: SMART_PRUNE_CONFIG.PATTERNS_MAX_COUNT,
@@ -234,7 +219,6 @@ function main() {
       }
     }
 
-    // Check gotchas.json
     const gotchasPath = path.join(memoryDir, 'gotchas.json');
     if (fs.existsSync(gotchasPath)) {
       try {
@@ -248,7 +232,6 @@ function main() {
           output.status = 'warning';
         }
 
-        // Auto-prune if over max
         if (gotchas.length > SMART_PRUNE_CONFIG.GOTCHAS_MAX_COUNT) {
           const result = smartPruner.deduplicateAndPrune(gotchas, {
             targetCount: SMART_PRUNE_CONFIG.GOTCHAS_MAX_COUNT,
@@ -274,6 +257,43 @@ function main() {
     }
   }
 
+  return autoActions;
+}
+
+async function main() {
+  const memoryManagerPath = getMemoryManagerPath();
+  const memoryTiersPath = getMemoryTiersPath();
+  const smartPrunerPath = getSmartPrunerPath();
+
+  if (!fs.existsSync(memoryManagerPath)) {
+    // Memory manager not available - skip silently
+    process.exit(0);
+  }
+
+  const {
+    getMemoryHealth,
+    checkAndArchiveLearnings,
+    pruneCodebaseMap,
+    getMemoryDir,
+    CONFIG,
+  } = require(memoryManagerPath);
+
+  const memoryTiers = loadOptionalModule(memoryTiersPath);
+  const smartPruner = loadOptionalModule(smartPrunerPath);
+
+  const memoryDashboardPath = getMemoryDashboardPath();
+  const memoryDashboard = loadOptionalModule(memoryDashboardPath, 'memory dashboard');
+
+  const health = getMemoryHealth(PROJECT_ROOT);
+  const output = buildOutput(health);
+  await attachSemanticStatus(output, memoryDashboard, PROJECT_ROOT);
+  applyTierHealth(output, memoryTiers, PROJECT_ROOT);
+  const autoActions = applyAutoRemediation(health, output, memoryTiers, smartPruner, PROJECT_ROOT, {
+    checkAndArchiveLearnings,
+    pruneCodebaseMap,
+    getMemoryDir,
+    CONFIG,
+  });
   output.autoActions = autoActions;
 
   // Pending reflection requests (Router must perform Step 0 to process them)
@@ -395,7 +415,10 @@ function main() {
 
 // Allow direct execution or require
 if (require.main === module) {
-  main();
+  main().catch(err => {
+    console.error(`[MemoryHealthCheck] Fatal error: ${err.message}`);
+    process.exit(0);
+  });
 }
 
 module.exports = { main };

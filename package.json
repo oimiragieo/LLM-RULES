@@ -80,6 +80,8 @@
     "manifest:generate": "node .claude/tools/cli/generate-tool-manifest.cjs",
     "manifest:validate": "node .claude/tools/cli/generate-tool-manifest.cjs --validate",
     "memory:init": "node .claude/tools/cli/init-memory-db.cjs",
+    "memory:sync-json": "node .claude/tools/cli/sync-memory-json.cjs",
+    "memory:migrate-legacy": "node .claude/tools/cli/migrate-legacy-sessions.cjs",
     "memory:weekly": "node .claude/lib/memory/memory-scheduler.cjs weekly",
     "memory:daily": "node .claude/lib/memory/memory-scheduler.cjs daily",
     "memory:status": "node .claude/lib/memory/memory-scheduler.cjs status",

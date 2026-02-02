@@ -87,6 +87,49 @@ class CodeParser {
   getSupportedExtensions() {
     return Object.keys(EXTENSION_MAP);
   }
+
+  _loadGrammar(language) {
+    if (this.grammars.has(language)) return this.grammars.get(language);
+    const grammarName = LANGUAGE_GRAMMARS[language];
+    if (!grammarName) return null;
+    try {
+      const mod = require(grammarName);
+      let grammar = mod;
+      if (grammarName === 'tree-sitter-typescript') {
+        grammar = mod.typescript;
+      }
+      if (grammarName === 'tree-sitter-typescript/tsx') {
+        grammar = mod.tsx;
+      }
+      this.grammars.set(language, grammar);
+      return grammar;
+    } catch (_e) {
+      this.grammars.set(language, null);
+      return null;
+    }
+  }
+
+  _getParser(language) {
+    if (!this._Parser) return null;
+    if (this.parsers.has(language)) return this.parsers.get(language);
+    const grammar = this._loadGrammar(language);
+    if (!grammar) {
+      this.parsers.set(language, null);
+      return null;
+    }
+    const parser = new this._Parser();
+    parser.setLanguage(grammar);
+    this.parsers.set(language, parser);
+    return parser;
+  }
+
+  parse(content, language) {
+    if (!language || !this.isSupported(language)) return null;
+    const parser = this._getParser(language);
+    if (!parser) return null;
+    const tree = parser.parse(content);
+    return { content, language, rootNode: tree.rootNode };
+  }
 }
 
 module.exports = { CodeParser, LANGUAGE_GRAMMARS, EXTENSION_MAP };

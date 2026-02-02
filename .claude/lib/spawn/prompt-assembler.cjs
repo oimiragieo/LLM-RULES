@@ -89,6 +89,7 @@ function formatMemorySection(memory) {
   const safe = memory && typeof memory === 'object' ? memory : {};
   const gotchas = Array.isArray(safe.gotchas) ? safe.gotchas : [];
   const patterns = Array.isArray(safe.patterns) ? safe.patterns : [];
+  const decisions = Array.isArray(safe.decisions) ? safe.decisions : [];
   const discoveries = Array.isArray(safe.discoveries) ? safe.discoveries : [];
   const recentSessions = Array.isArray(safe.recent_sessions) ? safe.recent_sessions : [];
 
@@ -110,6 +111,15 @@ function formatMemorySection(memory) {
     lines.push('### Patterns (Reusable Solutions)');
     for (const p of patterns) {
       const text = typeof p === 'string' ? p : p?.text;
+      if (text) lines.push(`- ${text}`);
+    }
+    lines.push('');
+  }
+
+  if (decisions.length > 0) {
+    lines.push('### Decisions (ADRs)');
+    for (const d of decisions) {
+      const text = typeof d === 'string' ? d : d?.text;
       if (text) lines.push(`- ${text}`);
     }
     lines.push('');

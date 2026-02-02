@@ -1,13 +1,14 @@
 const path = require('node:path');
 const fs = require('node:fs');
+const { atomicWriteSync } = require('../utils/atomic-write.cjs');
 
 /**
  * Vector database wrapper for storing and searching code embeddings.
- * Uses in-memory storage; embeddings do not persist across process restarts.
- * Separate from the memory system's LanceDB (.claude/data/lancedb).
+ * Uses JSON file storage for persistence across process restarts.
+ * Stored at: .claude/context/code-index/vectors/vectors.json
  *
  * @class VectorDatabase
- * @description Provides semantic code search capabilities with in-memory vector storage
+ * @description Provides semantic code search capabilities with persistent vector storage
  */
 class VectorDatabase {
   /**
@@ -17,6 +18,7 @@ class VectorDatabase {
   constructor(options = {}) {
     this.dbPath = options.path || path.join(process.cwd(), '.claude/context/code-index/vectors');
     this.collectionName = 'code-embeddings';
+    this.storageFile = path.join(this.dbPath, 'vectors.json');
 
     // In-memory storage for embeddings
     this.embeddings = [];
@@ -26,6 +28,33 @@ class VectorDatabase {
     // Ensure database directory exists
     if (!fs.existsSync(this.dbPath)) {
       fs.mkdirSync(this.dbPath, { recursive: true });
+    }
+
+    this._loadFromDisk();
+  }
+
+  _loadFromDisk() {
+    if (!fs.existsSync(this.storageFile)) return;
+    try {
+      const data = JSON.parse(fs.readFileSync(this.storageFile, 'utf8'));
+      if (Array.isArray(data?.embeddings)) this.embeddings = data.embeddings;
+      if (Array.isArray(data?.metadata)) this.metadata = data.metadata;
+      if (Array.isArray(data?.ids)) this.ids = data.ids;
+    } catch (_e) {
+      // best-effort
+    }
+  }
+
+  _persist() {
+    try {
+      const payload = {
+        embeddings: this.embeddings,
+        metadata: this.metadata,
+        ids: this.ids,
+      };
+      atomicWriteSync(this.storageFile, JSON.stringify(payload));
+    } catch (_e) {
+      // best-effort
     }
   }
 
@@ -65,6 +94,8 @@ class VectorDatabase {
         this.metadata.push(metadata[i]);
       }
     }
+
+    this._persist();
   }
 
   /**
@@ -157,6 +188,8 @@ class VectorDatabase {
       this.embeddings.splice(idx, 1);
       this.metadata.splice(idx, 1);
     }
+
+    this._persist();
   }
 
   /**
@@ -200,6 +233,7 @@ class VectorDatabase {
     this.ids = [];
     this.embeddings = [];
     this.metadata = [];
+    this._persist();
   }
 
   /**

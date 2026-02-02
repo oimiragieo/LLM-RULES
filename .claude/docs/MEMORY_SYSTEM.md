@@ -37,7 +37,7 @@ It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/li
 - Initialize schema: `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`).
 - Check memory health (JSON): `pnpm run memory:health` (or `node .claude/lib/memory/memory-manager.cjs health`).
 
-The entity index is populated by `sync-memory-index` from `learnings.md`, `decisions.md`, and `issues.md`. Agent-visible patterns and gotchas are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are available for future use (e.g. graph-backed prompts or tools) but are **not yet called by any hook or agent**. They are **experimental / not yet wired**; they are available for future graph-backed prompts or tools but are not part of the current agent-visible path. The entity DB is created on first `pnpm run memory:init` or first sync when editing learnings/decisions/issues. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results. To enable entity-aware behavior, wire `findEntities`/`getRelated` into at least one hook or agent and document when they run.
+The entity index is populated by `sync-memory-index` from `learnings.md`, `decisions.md`, `issues.md`, and also `patterns.json` / `gotchas.json` when those JSON files are edited. Agent-visible patterns, gotchas, and decisions are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are now used in the spawn prompt pipeline: `spawn-prompt-assembler.cjs` can append an **Entity Graph (SQLite)** section by default (set `SPAWN_PROMPT_ENTITY_GRAPH=off` to disable). The entity DB is created on first `pnpm run memory:init` or first sync when editing these files. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results.
 
 ### Troubleshooting
 
@@ -45,6 +45,8 @@ The entity index is populated by `sync-memory-index` from `learnings.md`, `decis
   - Run `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`) before first use to create the SQLite schema. The sync-memory-index hook and EntityExtractor attempt to create the schema if missing; if they fail, run memory:init manually.
 - **"EntityExtractor not initialized"**:
   - Check if `.claude/data/memory.db` exists and is readable.
+- **Existing patterns/gotchas not in SQLite**:
+  - Run `pnpm run memory:sync-json` once to backfill `patterns.json` / `gotchas.json` into the entity DB.
 
 Entity extraction is format-based. Supported heading styles include `###` or `##` followed by `Pattern:`, `Concept:`, or `Issue:`; decisions use `## [ADR-NNN]` or `## ADR-NNN:` or `## Decision:`. Over-relaxing patterns can pollute the entity graph.
 
@@ -143,15 +145,27 @@ MTM entries include `tier: "MTM"` and `consolidated_at` metadata. Remove test se
 
 ## Vector Store (LanceDB)
 
-LanceDB persist directory is `.claude/data/lancedb`. Any `vectors.db` or `vectors.db_placeholder` under `.claude/context/memory/` is legacy/orphan (from an older or alternate config) and can be removed; the active client uses `.claude/data/lancedb` only. If LanceDB is in mock mode (e.g. @xenova/transformers failed to load), semantic search uses keyword fallback; no vectors are persisted until embeddings run. If LanceDB data dirs are empty, semantic search uses keyword fallback. The dashboard (`pnpm run memory:dashboard`) and memory health check show embedding status (mock vs real); when mock mode is active, ContextualMemory also logs a one-time warning on first use.
+LanceDB persist directory is `.claude/data/lancedb`. Any `vectors.db` or `vectors.db_placeholder` under `.claude/context/memory/` is legacy/orphan (from an older or alternate config) and can be removed; the active client uses `.claude/data/lancedb` only. If the embedding model fails to load (e.g. missing deps like `sharp`), semantic search is **disabled** (fail‑closed) and ContextualMemory falls back to keyword search; a warning is logged and the dashboard/health show the disabled state.
+
+**First run note:** the embedding model may download on first use (~90MB) and the first embed/search can be slow. Subsequent runs use the cached model.
+
+**Model changes:** changing `LANCEDB_EMBEDDING_MODEL` requires re‑indexing/recreating the LanceDB table. If the table vector dimension does not match the embedding model’s dimension, semantic search is disabled with a clear “dimension mismatch” warning until reindexing is done.
 
 - Spawn prompt semantic search may apply a hot-only filter (exclude cold LTM). If the filter fails (e.g. LanceDB schema/API change), the hook falls back to unfiltered search. Expected metadata for filtering is document-specific (e.g. `source: 'ltm_archive'` for cold).
 
 Semantic search similarity threshold is defined in `.claude/lib/memory/memory-constants.cjs` as `SEMANTIC_SEARCH_DEFAULT_THRESHOLD` (default 0.72). Override via env `MEMORY_SEMANTIC_SEARCH_THRESHOLD`. Used by contextual-memory, spawn-prompt-assembler, and memory-search.
 
+### Memory search CLI
+
+To run semantic search outside the spawn prompt pipeline, use:
+
+```
+node .claude/lib/memory/memory-search.cjs "query"
+```
+
 ### Code-indexing (separate from memory)
 
-Code-indexing (`.claude/lib/code-indexing/`) uses **in-memory** vector storage; embeddings do not persist across process restarts. It is separate from the memory system's LanceDB. Index metadata lives under `.claude/context/code-index/vectors` (or `code-index/chroma` in older configs).
+Code-indexing (`.claude/lib/code-indexing/`) uses a **JSON-backed vector store** (persistent) under `.claude/context/code-index/vectors/vectors.json`. It is separate from the memory system's LanceDB. Index metadata lives under `.claude/context/code-index/metadata.json`.
 
 ## Retention and Cold Storage
 
@@ -268,6 +282,20 @@ This ensures agents can recall session data written via `memory-tiers.cjs` (STM 
 - `accessCount`: Incremented each time the item is loaded via `loadMemoryForContext()`
 - `lastAccessed`: Updated to current timestamp on read
 - Updates to `accessCount` and `lastAccessed` are rate-limited per entry (default 5 minutes, configurable via `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS`); repeated reads within the interval do not bump the count.
+
+### Legacy sessions migration
+
+If legacy `.claude/context/memory/sessions/` contains old session files, migrate them into MTM:
+
+```
+pnpm run memory:migrate-legacy
+```
+
+To remove legacy files after a successful migration:
+
+```
+pnpm run memory:migrate-legacy -- --delete
+```
 
 **Codebase Map** (`.claude/context/memory/codebase_map.json`):
 

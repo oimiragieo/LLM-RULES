@@ -146,6 +146,26 @@ function countDirFiles(dirPath, pattern = /\.json$/) {
   return 0;
 }
 
+function getDirSizeKB(dirPath, pattern = null) {
+  try {
+    if (!fs.existsSync(dirPath)) return 0;
+    const files = fs.readdirSync(dirPath);
+    let total = 0;
+    for (const f of files) {
+      if (pattern && !pattern.test(f)) continue;
+      const fp = path.join(dirPath, f);
+      try {
+        total += fs.statSync(fp).size;
+      } catch (_e) {
+        // ignore
+      }
+    }
+    return Math.round(total / 1024);
+  } catch (_e) {
+    return 0;
+  }
+}
+
 // ============================================================================
 // Health Score Calculation
 // ============================================================================
@@ -219,6 +239,7 @@ function generateRecommendations(metrics) {
     gotchasCount = 0,
     codebaseMapEntries = 0,
     mtmSessionCount = 0,
+    legacySessionsCount = 0,
   } = metrics;
 
   const recommendations = [];
@@ -278,6 +299,12 @@ function generateRecommendations(metrics) {
     );
   }
 
+  if (legacySessionsCount > 0) {
+    recommendations.push(
+      `Legacy sessions/ has ${legacySessionsCount} files - run migration and delete legacy data`
+    );
+  }
+
   return recommendations;
 }
 
@@ -320,6 +347,26 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
   const coldFileCount = fs.existsSync(coldDir)
     ? fs.readdirSync(coldDir).filter(f => /\.jsonl\.gz$/.test(f)).length
     : 0;
+  const coldSizeKB = getDirSizeKB(coldDir, /\.jsonl\.gz$/);
+
+  let entityCount = 0;
+  let relationshipCount = 0;
+  const dbPath = path.join(projectRoot, '.claude', 'data', 'memory.db');
+  if (fs.existsSync(dbPath)) {
+    try {
+      const { DatabaseSync } = require('node:sqlite');
+      const db = new DatabaseSync(dbPath);
+      try {
+        entityCount = db.prepare('SELECT COUNT(*) AS c FROM entities').get()?.c || 0;
+        relationshipCount =
+          db.prepare('SELECT COUNT(*) AS c FROM entity_relationships').get()?.c || 0;
+      } finally {
+        db.close();
+      }
+    } catch (_e) {
+      // best-effort
+    }
+  }
 
   // Calculate totals
   const totalEntries = patternsCount + gotchasCount + codebaseMapEntries;
@@ -348,6 +395,7 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
     gotchasCount,
     codebaseMapEntries,
     mtmSessionCount: mtmSessions,
+    legacySessionsCount: sessionsCount,
   });
 
   return {
@@ -356,6 +404,8 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
       totalEntries,
       totalSizeKB,
       healthScore,
+      entityCount,
+      relationshipCount,
     },
     tiers: {
       stm: { sessions: stmSessions, sizeKB: 0 },
@@ -366,6 +416,7 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
       lastColdArchive,
       lastWeekly,
       fileCount: coldFileCount,
+      sizeKB: coldSizeKB,
     },
     files: {
       'learnings.md': {
@@ -385,7 +436,7 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
         entries: codebaseMapEntries,
         status: getFileStatus(codebaseMapEntries, CONFIG.THRESHOLDS.codebaseMapEntries),
       },
-      'sessions/': {
+      'sessions/ (legacy)': {
         count: sessionsCount,
         status: 'healthy',
       },
@@ -544,20 +595,38 @@ function cleanupOldMetrics(projectRoot = PROJECT_ROOT) {
  * Get complete dashboard with all sections
  */
 /**
- * Get LanceDB mock mode status (async). Used by dashboard CLI to show embedding status.
+ * Get semantic search status (async). Used by dashboard CLI to show embedding status.
  * @param {string} projectRoot
- * @returns {Promise<boolean|null>} true if mock mode, false if real embeddings, null if unavailable
+ * @returns {Promise<{status: string, mode?: string, reason?: string} | null>}
  */
-async function getLanceDBMockStatus(projectRoot = PROJECT_ROOT) {
+async function getLanceDBStatus(projectRoot = PROJECT_ROOT) {
+  if (process.env.MEMORY_SEMANTIC_SEARCH === 'off') {
+    return { status: 'disabled', reason: 'MEMORY_SEMANTIC_SEARCH=off' };
+  }
   try {
     const { MemoryVectorStore } = require('./lancedb-client.cjs');
     const store = new MemoryVectorStore({
       persistDirectory: path.join(projectRoot, '.claude', 'data', 'lancedb'),
     });
     await store.initialize();
-    return store.isMockMode();
-  } catch (_e) {
+    if (typeof store.getEmbeddingStatus === 'function') {
+      const status = store.getEmbeddingStatus();
+      if (status && status.status !== 'ready') return status;
+      if (typeof store.getTableVectorDimension === 'function') {
+        const tableDim = await store.getTableVectorDimension();
+        const embedDim = await store.getEmbeddingDimension();
+        if (Number.isFinite(tableDim) && Number.isFinite(embedDim) && tableDim !== embedDim) {
+          return {
+            status: 'unavailable',
+            reason: `embedding dimension mismatch (table ${tableDim} vs model ${embedDim})`,
+          };
+        }
+      }
+      return status;
+    }
     return null;
+  } catch (e) {
+    return { status: 'unavailable', reason: e.message };
   }
 }
 
@@ -591,15 +660,28 @@ function formatDashboard(dashboard) {
   lines.push(`  Total Entries: ${dashboard.summary.totalEntries}`);
   lines.push(`  Total Size: ${dashboard.summary.totalSizeKB} KB`);
   lines.push(`  Health Score: ${(dashboard.summary.healthScore * 100).toFixed(0)}%`);
+  if (dashboard.summary.entityCount !== undefined) {
+    lines.push(`  Entities: ${dashboard.summary.entityCount}`);
+  }
+  if (dashboard.summary.relationshipCount !== undefined) {
+    lines.push(`  Relationships: ${dashboard.summary.relationshipCount}`);
+  }
   lines.push('');
 
   // LanceDB / semantic search
-  if (dashboard.lancedbMockMode === true) {
-    lines.push('LanceDB: mock mode - semantic search uses keyword fallback');
-    lines.push('');
-  } else if (dashboard.lancedbMockMode === false) {
-    lines.push('LanceDB: real embeddings (semantic search active)');
-    lines.push('');
+  if (dashboard.semanticStatus) {
+    const status = dashboard.semanticStatus;
+    if (status.status === 'ready') {
+      lines.push(`Semantic search: enabled (${status.mode || 'transformers'})`);
+      lines.push('');
+    } else if (status.status === 'disabled') {
+      lines.push(`Semantic search: disabled (${status.reason || 'disabled'})`);
+      lines.push('');
+    } else if (status.status === 'unavailable') {
+      const reason = status.reason ? `: ${status.reason}` : '';
+      lines.push(`Semantic search: disabled (embeddings unavailable${reason})`);
+      lines.push('');
+    }
   }
 
   // Tiers
@@ -610,7 +692,7 @@ function formatDashboard(dashboard) {
   lines.push(`  LTM (Long-Term): ${dashboard.tiers.ltm.summaries} summaries`);
   if (dashboard.cold) {
     lines.push(
-      `  Cold: ${dashboard.cold.fileCount} archive(s), last: ${dashboard.cold.lastColdArchive || 'never'}`
+      `  Cold: ${dashboard.cold.fileCount} archive(s), ${dashboard.cold.sizeKB || 0} KB, last: ${dashboard.cold.lastColdArchive || 'never'}`
     );
   }
   lines.push('');
@@ -659,8 +741,8 @@ if (require.main === module) {
 
   const runWithLanceDBStatus = async outputFn => {
     const dashboard = getDashboard();
-    const lancedbMock = await getLanceDBMockStatus().catch(() => null);
-    dashboard.lancedbMockMode = lancedbMock;
+    const status = await getLanceDBStatus().catch(() => null);
+    dashboard.semanticStatus = status;
     outputFn(dashboard);
   };
 
@@ -731,7 +813,7 @@ module.exports = {
   // Unified dashboard
   getDashboard,
   formatDashboard,
-  getLanceDBMockStatus,
+  getLanceDBStatus,
   // Helpers (for testing)
   getMemoryDir,
   getMetricsDir,

@@ -11,7 +11,7 @@
  *
  * Storage Structure:
  *   .claude/context/memory/
- *   ├── sessions/
+ *   ├── sessions/              # Legacy (not read; migrate to MTM)
  *   │   ├── session_001.json
  *   │   ├── session_002.json
  *   │   └── ...
@@ -56,6 +56,7 @@ const CONFIG = {
   MAX_CONTEXT_CHARS: {
     gotchas: 2000,
     patterns: 2000,
+    decisions: 2000,
     discoveries: 3000,
     sessions: 5000,
     legacy: 3000,
@@ -64,6 +65,7 @@ const CONFIG = {
   MAX_ITEMS: {
     gotchas: 20,
     patterns: 20,
+    decisions: 10,
     discoveries: 30,
     sessions: 5,
   },
@@ -146,6 +148,43 @@ function maybeTouchEntriesForAccessTracking(allEntries, returnedEntries, nowIso)
   }
 
   return changed;
+}
+
+function computeQualityScore(accessCount) {
+  const count = Number.isFinite(accessCount) ? accessCount : 0;
+  const max = 20;
+  const ratio = Math.min(Math.log1p(count) / Math.log1p(max), 1);
+  return Math.round((0.5 + ratio * 0.5) * 1000) / 1000;
+}
+
+function loadEntitiesFromDb(db, type, limit) {
+  const rows = db
+    .prepare(
+      'SELECT id, name, content, created_at, access_count, last_accessed FROM entities WHERE type = ? ORDER BY quality_score DESC, created_at DESC LIMIT ?'
+    )
+    .all(type, limit);
+
+  if (rows.length === 0) return [];
+
+  const mapped = rows.map(r => ({
+    text: r.name + (r.content ? '\n' + r.content : ''),
+    timestamp: r.created_at,
+  }));
+
+  try {
+    const nowIso = new Date().toISOString();
+    const update = db.prepare(
+      'UPDATE entities SET access_count = ?, last_accessed = ?, quality_score = ? WHERE id = ?'
+    );
+    for (const r of rows) {
+      const nextCount = toSafeInt(r.access_count, 0) + 1;
+      update.run(nextCount, nowIso, computeQualityScore(nextCount), r.id);
+    }
+  } catch (_e) {
+    // best-effort
+  }
+
+  return mapped;
 }
 
 /**
@@ -612,6 +651,7 @@ function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
   const result = {
     gotchas: [],
     patterns: [],
+    decisions: [],
     discoveries: [],
     recent_sessions: [],
     legacy_summary: '',
@@ -628,33 +668,22 @@ function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
       const db = new DatabaseSync(dbPath);
 
       // Load patterns
-      const patterns = db
-        .prepare(
-          "SELECT name, content, created_at FROM entities WHERE type = 'pattern' ORDER BY quality_score DESC, created_at DESC LIMIT ?"
-        )
-        .all(CONFIG.MAX_ITEMS.patterns);
-
+      const patterns = loadEntitiesFromDb(db, 'pattern', CONFIG.MAX_ITEMS.patterns);
       if (patterns.length > 0) {
-        result.patterns = patterns.map(p => ({
-          text: p.name + (p.content ? '\n' + p.content : ''),
-          timestamp: p.created_at,
-        }));
+        result.patterns = patterns;
         dbPatternsLoaded = true;
       }
 
       // Load issues/gotchas
-      const issues = db
-        .prepare(
-          "SELECT name, content, created_at FROM entities WHERE type = 'issue' ORDER BY quality_score DESC, created_at DESC LIMIT ?"
-        )
-        .all(CONFIG.MAX_ITEMS.gotchas);
-
+      const issues = loadEntitiesFromDb(db, 'issue', CONFIG.MAX_ITEMS.gotchas);
       if (issues.length > 0) {
-        result.gotchas = issues.map(i => ({
-          text: i.name + (i.content ? '\n' + i.content : ''),
-          timestamp: i.created_at,
-        }));
+        result.gotchas = issues;
         dbGotchasLoaded = true;
+      }
+
+      const decisions = loadEntitiesFromDb(db, 'decision', CONFIG.MAX_ITEMS.decisions);
+      if (decisions.length > 0) {
+        result.decisions = decisions;
       }
 
       db.close();
@@ -726,7 +755,7 @@ function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
 
   // Load recent sessions from MTM (canonical) with fallback to legacy sessions/
   // SPLIT-BRAIN FIX: Write path uses memory-tiers (STM → MTM → LTM), so read path must also use MTM
-  let mtmLoaded = false;
+  let _mtmLoaded = false;
   try {
     // Try to load memory-tiers for MTM sessions
     const memoryTiers = require('./memory-tiers.cjs');
@@ -753,7 +782,7 @@ function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
           source: 'mtm', // Mark source for debugging
         });
       }
-      mtmLoaded = true;
+      _mtmLoaded = true;
 
       // Optionally load recent LTM summaries
       const ltmDir = memoryTiers.getTierPath('LTM', projectRoot);
@@ -792,35 +821,10 @@ function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
     if (process.env.MEMORY_DEBUG) {
       console.error('[MEMORY_DEBUG]', 'loadMemory (mtm):', _e.message);
     }
-  }
-
-  // Fallback to legacy sessions/ if MTM is empty or unavailable
-  if (!mtmLoaded) {
-    const sessionsDir = path.join(memoryDir, 'sessions');
-    if (fs.existsSync(sessionsDir)) {
-      const files = fs
-        .readdirSync(sessionsDir)
-        .filter(f => f.match(/^session_\d{3}\.json$/))
-        .sort()
-        .slice(-CONFIG.MAX_ITEMS.sessions);
-
-      for (const file of files) {
-        try {
-          const session = JSON.parse(fs.readFileSync(path.join(sessionsDir, file), 'utf8'));
-          result.recent_sessions.push({
-            session_number: session.session_number,
-            timestamp: session.timestamp,
-            summary: session.summary,
-            tasks_completed: session.tasks_completed?.slice(0, 5),
-            source: 'legacy', // Mark source for debugging
-          });
-        } catch (e) {
-          if (process.env.MEMORY_DEBUG) {
-            console.error('[MEMORY_DEBUG]', 'loadMemory (sessions):', e.message);
-          }
-        }
-      }
-    }
+    // MTM-only source of truth.
+    // If MTM is missing/failed, we return empty recent_sessions.
+    // We do NOT fall back to legacy 'sessions/' directory to avoid Split-Brain state.
+    // The legacy directory is strictly for archival/manual inspection.
   }
 
   // Load legacy learnings.md (truncated to last N chars)
@@ -1024,6 +1028,7 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
   const result = {
     gotchas: [],
     patterns: [],
+    decisions: [],
     discoveries: [],
     recent_sessions: [],
     legacy_summary: '',
@@ -1036,29 +1041,21 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
   if (fs.existsSync(dbPath)) {
     try {
       const db = new DatabaseSync(dbPath);
-      const patterns = db
-        .prepare(
-          "SELECT name, content, created_at FROM entities WHERE type = 'pattern' ORDER BY quality_score DESC, created_at DESC LIMIT ?"
-        )
-        .all(CONFIG.MAX_ITEMS.patterns);
+      const patterns = loadEntitiesFromDb(db, 'pattern', CONFIG.MAX_ITEMS.patterns);
       if (patterns.length > 0) {
-        result.patterns = patterns.map(p => ({
-          text: p.name + (p.content ? '\n' + p.content : ''),
-          timestamp: p.created_at,
-        }));
+        result.patterns = patterns;
         dbPatternsLoaded = true;
       }
-      const issues = db
-        .prepare(
-          "SELECT name, content, created_at FROM entities WHERE type = 'issue' ORDER BY quality_score DESC, created_at DESC LIMIT ?"
-        )
-        .all(CONFIG.MAX_ITEMS.gotchas);
+
+      const issues = loadEntitiesFromDb(db, 'issue', CONFIG.MAX_ITEMS.gotchas);
       if (issues.length > 0) {
-        result.gotchas = issues.map(i => ({
-          text: i.name + (i.content ? '\n' + i.content : ''),
-          timestamp: i.created_at,
-        }));
+        result.gotchas = issues;
         dbGotchasLoaded = true;
+      }
+
+      const decisions = loadEntitiesFromDb(db, 'decision', CONFIG.MAX_ITEMS.decisions);
+      if (decisions.length > 0) {
+        result.decisions = decisions;
       }
       db.close();
     } catch (e) {
@@ -1126,8 +1123,8 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
     }
   }
 
-  // Load recent sessions from MTM (canonical) with fallback to legacy sessions/
-  // SPLIT-BRAIN FIX: Write path uses memory-tiers (STM → MTM → LTM), so read path must also use MTM
+  // Load recent sessions from MTM (canonical).
+  // Split-brain prevention: legacy sessions/ are no longer read.
   let mtmLoaded = false;
   try {
     // Try to load memory-tiers for MTM sessions
@@ -1197,44 +1194,8 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
     }
   }
 
-  // Fallback to legacy sessions/ if MTM is empty or unavailable
-  if (!mtmLoaded) {
-    const sessionsDir = path.join(memoryDir, 'sessions');
-    try {
-      const files = await fsp.readdir(sessionsDir);
-      const sessionFiles = files
-        .filter(f => f.match(/^session_\d{3}\.json$/))
-        .sort()
-        .slice(-CONFIG.MAX_ITEMS.sessions);
-
-      for (const file of sessionFiles) {
-        try {
-          const sessionContent = await readMemoryAsync(path.join(sessionsDir, file));
-          if (sessionContent) {
-            const session = JSON.parse(sessionContent);
-            result.recent_sessions.push({
-              session_number: session.session_number,
-              timestamp: session.timestamp,
-              summary: session.summary,
-              tasks_completed: session.tasks_completed?.slice(0, 5),
-              source: 'legacy', // Mark source for debugging
-            });
-          }
-        } catch (e) {
-          if (process.env.METRICS_DEBUG === 'true') {
-            console.error(
-              JSON.stringify({
-                module: 'memory-manager',
-                error: e.message,
-                timestamp: new Date().toISOString(),
-              })
-            );
-          }
-        }
-      }
-    } catch (_e) {
-      /* ignore - sessions dir may not exist */
-    }
+  if (!mtmLoaded && process.env.MEMORY_DEBUG) {
+    console.error('[MEMORY_DEBUG]', 'loadMemoryAsync (mtm): no MTM sessions available');
   }
 
   // Load legacy learnings.md (truncated to last N chars)
@@ -1367,6 +1328,11 @@ function getMemoryHealth(projectRoot = PROJECT_ROOT) {
   if (fs.existsSync(sessionsDir)) {
     const files = fs.readdirSync(sessionsDir).filter(f => f.match(/^session_\d{3}\.json$/));
     result.sessionsCount = files.length;
+    if (result.sessionsCount > 0) {
+      result.warnings.push(
+        `legacy sessions/ has ${result.sessionsCount} files - migrate to MTM and remove legacy fallback`
+      );
+    }
   }
 
   // Set overall status

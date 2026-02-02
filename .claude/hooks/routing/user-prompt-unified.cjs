@@ -940,7 +940,7 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     // best-effort; ignore
   }
 
-  // Weekly maintenance fallback: run weekly when overdue (e.g. SessionEnd rarely fires).
+  // Daily/weekly maintenance fallback: run when date/week changes (e.g. SessionEnd rarely fires).
   try {
     const statusPath = path.join(
       PROJECT_ROOT,
@@ -950,29 +950,64 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
       'maintenance-status.json'
     );
     let lastWeekly = null;
+    let lastDaily = null;
     if (fs.existsSync(statusPath)) {
       try {
         const status = JSON.parse(fs.readFileSync(statusPath, 'utf8'));
         lastWeekly = status.lastWeekly || null;
+        lastDaily = status.lastDaily || null;
       } catch (_e) {
         // ignore parse errors
       }
     }
-    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
-    const lastWeeklyMs = lastWeekly ? new Date(lastWeekly).getTime() : 0;
-    const isOverdue = !lastWeekly || now - lastWeeklyMs > sevenDaysMs;
-    if (isOverdue) {
-      const schedulerPath = path.join(
-        PROJECT_ROOT,
-        '.claude',
-        'lib',
-        'memory',
-        'memory-scheduler.cjs'
-      );
-      if (fs.existsSync(schedulerPath)) {
+    const schedulerPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'lib',
+      'memory',
+      'memory-scheduler.cjs'
+    );
+    const getDayKey = value => {
+      const date = value ? new Date(value) : null;
+      if (!date || Number.isNaN(date.getTime())) return null;
+      return date.toISOString().slice(0, 10);
+    };
+    const getWeekKey = value => {
+      const date = value ? new Date(value) : null;
+      if (!date || Number.isNaN(date.getTime())) return null;
+      const utc = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+      const day = utc.getUTCDay() || 7;
+      utc.setUTCDate(utc.getUTCDate() + 4 - day);
+      const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil(((utc - yearStart) / 86400000 + 1) / 7);
+      return `${utc.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+    };
+    if (fs.existsSync(schedulerPath)) {
+      const now = new Date();
+      const lastDailyKey = getDayKey(lastDaily);
+      const todayKey = getDayKey(now);
+      if (!lastDailyKey || lastDailyKey !== todayKey) {
         if (process.env.DEBUG_HOOKS) {
-          console.warn('[user-prompt-unified] Weekly maintenance triggered (overdue).');
+          console.warn('[user-prompt-unified] Daily maintenance triggered (date change).');
+        }
+        const dailyTimeoutMs = Number(process.env.MEMORY_DAILY_FALLBACK_TIMEOUT_MS || 60000);
+        const spawnResult = spawnSync(process.execPath, [schedulerPath, 'daily'], {
+          cwd: PROJECT_ROOT,
+          stdio: 'ignore',
+          timeout: dailyTimeoutMs,
+        });
+        if (spawnResult.signal === 'SIGTERM' || spawnResult.status !== 0) {
+          console.warn(
+            '[user-prompt-unified] Daily maintenance may be partial:',
+            spawnResult.signal ? `timeout (${spawnResult.signal})` : `exit ${spawnResult.status}`
+          );
+        }
+      }
+      const lastWeeklyKey = getWeekKey(lastWeekly);
+      const currentWeekKey = getWeekKey(now);
+      if (!lastWeeklyKey || lastWeeklyKey !== currentWeekKey) {
+        if (process.env.DEBUG_HOOKS) {
+          console.warn('[user-prompt-unified] Weekly maintenance triggered (week change).');
         }
         const weeklyTimeoutMs = Number(process.env.MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS || 60000);
         const spawnResult = spawnSync(process.execPath, [schedulerPath, 'weekly'], {

@@ -7,6 +7,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { MemoryVectorStore } = require('./lancedb-client.cjs');
 const { EntityQuery } = require('./entity-query.cjs');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 /**
  * ContextualMemory - Unified API for hybrid memory system
@@ -34,7 +35,7 @@ class ContextualMemory {
    * @param {string} config.lancedbConfig.collectionName - LanceDB table name
    */
   constructor(config = {}) {
-    const projectRoot = path.resolve(__dirname, '../../../');
+    const projectRoot = config.projectRoot || PROJECT_ROOT;
 
     this.config = {
       memoryDir: config.memoryDir || path.join(projectRoot, '.claude/context/memory'),
@@ -88,22 +89,25 @@ class ContextualMemory {
     }
 
     if (!this.vectorStore) {
-      this.vectorStore = new MemoryVectorStore(this.config.lancedbConfig);
+      this.vectorStore = MemoryVectorStore.getSharedStore(this.config.lancedbConfig);
       try {
         await this.vectorStore.initialize();
-        if (
-          this.vectorStore &&
-          typeof this.vectorStore.isMockMode === 'function' &&
-          this.vectorStore.isMockMode() &&
-          !this._mockModeWarned
-        ) {
-          console.warn(
-            '[ContextualMemory] Semantic search is in mock mode; using keyword fallback.'
-          );
-          this._mockModeWarned = true;
-          this._logLancedbEvent('mock_mode_detected', {
-            message: 'Semantic search in mock mode; using keyword fallback',
-          });
+        if (this.vectorStore && typeof this.vectorStore.getEmbeddingStatus === 'function') {
+          const status = this.vectorStore.getEmbeddingStatus();
+          if (status && status.status !== 'ready') {
+            if (status.status === 'unavailable' && !this._mockModeWarned) {
+              console.warn(
+                `[ContextualMemory] Semantic search disabled: ${status.reason || status.status}`
+              );
+              this._mockModeWarned = true;
+            }
+            this._logLancedbEvent('semantic_disabled', {
+              status: status.status,
+              reason: status.reason || null,
+              mode: status.mode || null,
+            });
+            return null;
+          }
         }
       } catch (error) {
         console.warn('[ContextualMemory] LanceDB initialization failed:', error.message);
@@ -171,12 +175,6 @@ class ContextualMemory {
 
       if (!vectorStore) {
         throw new Error('LanceDB unavailable - falling back to keyword search');
-      }
-
-      if (vectorStore.isMockMode()) {
-        // In mock mode, semantic search returns random results.
-        // Fallback to keyword search to provide meaningful results.
-        return await this._keywordSearch(query, { limit });
       }
 
       const results = await vectorStore.search(query, {
@@ -382,7 +380,7 @@ class ContextualMemory {
     ];
 
     // Include some recent sessions and MTM entries (bounded).
-    for (const dir of ['sessions', 'mtm']) {
+    for (const dir of ['mtm']) {
       const absDir = path.join(this.config.memoryDir, dir);
       try {
         if (!fs.existsSync(absDir)) continue;
@@ -516,7 +514,20 @@ class ContextualMemory {
       this.entityQuery.close();
       this.entityQuery = null;
     }
-    // Best-effort close (no-op in most embedded configurations)
+    if (this.vectorStore && typeof this.vectorStore.close === 'function') {
+      if (typeof this.vectorStore.isShared === 'function' && this.vectorStore.isShared()) {
+        this.vectorStore = null;
+        return;
+      }
+      try {
+        const result = this.vectorStore.close();
+        if (result && typeof result.then === 'function') {
+          result.catch(() => {});
+        }
+      } catch (_e) {
+        // best-effort
+      }
+    }
     this.vectorStore = null;
   }
 }

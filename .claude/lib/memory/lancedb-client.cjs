@@ -65,6 +65,37 @@ class MemoryVectorStore {
     this.embedder = null;
     this.isInitialized = false;
     this._mockMode = false;
+    this._tableVectorDim = null;
+    this._shared = false;
+    this._embeddingStatus = {
+      status: 'unknown',
+      mode: this.config.embeddingMode,
+      reason: null,
+    };
+  }
+
+  static _sharedStores = new Map();
+
+  static _makeKey(config) {
+    const persistDirectory =
+      config.persistDirectory || process.env.LANCEDB_URI || '.claude/data/lancedb';
+    const collectionName = config.collectionName || process.env.LANCEDB_TABLE || 'agent_memory';
+    const embeddingMode =
+      config.embeddingMode || process.env.LANCEDB_EMBEDDING_MODE || 'transformers';
+    const embeddingModel =
+      config.embeddingModel || process.env.LANCEDB_EMBEDDING_MODEL || 'Xenova/all-MiniLM-L6-v2';
+    return [persistDirectory, collectionName, embeddingMode, embeddingModel].join('|');
+  }
+
+  static getSharedStore(config = {}) {
+    const key = MemoryVectorStore._makeKey(config);
+    if (MemoryVectorStore._sharedStores.has(key)) {
+      return MemoryVectorStore._sharedStores.get(key);
+    }
+    const store = new MemoryVectorStore(config);
+    store._shared = true;
+    MemoryVectorStore._sharedStores.set(key, store);
+    return store;
   }
 
   /**
@@ -97,25 +128,56 @@ class MemoryVectorStore {
             // Use efficient MiniLM model (384 dimensions)
             // 'feature-extraction' allows raw vector output
             this.embedder = await pipeline('feature-extraction', this.config.embeddingModel);
+            this._embeddingStatus = { status: 'ready', mode: 'transformers', reason: null };
+            this._mockMode = false;
           } catch (e) {
             console.warn(
-              '[LanceDB] Failed to load local embedding model (likely missing dependencies like "sharp"). switching to MOCK mode.'
+              '[LanceDB] Failed to load local embedding model (likely missing dependencies like "sharp"). Disabling semantic embeddings.'
             );
             console.warn(`[LanceDB] Error details: ${e.message}`);
 
-            // Fallback to Mock Embedder
-            this.embedder = this._createMockEmbedder();
+            // Fail-closed: no mock embeddings
+            this.embedder = null;
             this._mockMode = true;
+            this._embeddingStatus = {
+              status: 'unavailable',
+              mode: 'transformers',
+              reason: e.message,
+            };
           }
         } else {
           // Already loaded pipeline, just ensure embedder is ready
-          this.embedder = await pipeline('feature-extraction', this.config.embeddingModel);
+          try {
+            this.embedder = await pipeline('feature-extraction', this.config.embeddingModel);
+            this._embeddingStatus = { status: 'ready', mode: 'transformers', reason: null };
+            this._mockMode = false;
+          } catch (e) {
+            console.warn(
+              '[LanceDB] Failed to initialize embedding model on reuse. Disabling semantic embeddings.'
+            );
+            console.warn(`[LanceDB] Error details: ${e.message}`);
+            this.embedder = null;
+            this._mockMode = true;
+            this._embeddingStatus = {
+              status: 'unavailable',
+              mode: 'transformers',
+              reason: e.message,
+            };
+          }
         }
       } else if (this.config.embeddingMode === 'test') {
         // Deterministic, fast embedding for tests (no network/model download)
         this.embedder = null;
+        this._embeddingStatus = { status: 'ready', mode: 'test', reason: null };
+        this._mockMode = false;
       } else if (this.config.embeddingMode === 'off') {
         this.embedder = null;
+        this._embeddingStatus = {
+          status: 'disabled',
+          mode: 'off',
+          reason: 'LANCEDB_EMBEDDING_MODE=off',
+        };
+        this._mockMode = false;
       } else {
         throw new Error(`Unknown embeddingMode: ${this.config.embeddingMode}`);
       }
@@ -134,20 +196,6 @@ class MemoryVectorStore {
   }
 
   /**
-   * Create a mock embedder function that returns random vectors
-   * Used when local transformers cannot be loaded
-   */
-  _createMockEmbedder() {
-    return async _text => {
-      // Return a mock tensor-like object or just handled in generateEmbedding
-      // We'll return a function similar to the pipeline output
-      return {
-        data: Array.from({ length: 384 }, () => Math.random()), // 384-dim random vector
-      };
-    };
-  }
-
-  /**
    * Generate embedding for text
    * @param {string} text
    * @returns {Promise<Array<number>>} Vector
@@ -161,16 +209,13 @@ class MemoryVectorStore {
       return stableTestEmbedding(text, 384);
     }
 
-    if (!this.embedder) throw new Error('Embedder not initialized');
-
-    // Check if it's our mock
-    if (
-      this.embedder.name === '_createMockEmbedder' ||
-      (typeof this.embedder === 'function' && this.embedder.toString().includes('Math.random()'))
-    ) {
-      const output = await this.embedder(text);
-      return output.data;
+    if (this._embeddingStatus?.status === 'unavailable') {
+      throw new Error(
+        `Embeddings unavailable${this._embeddingStatus.reason ? `: ${this._embeddingStatus.reason}` : ''}`
+      );
     }
+
+    if (!this.embedder) throw new Error('Embedder not initialized');
 
     // Real Transformers pipeline
     // Xenova/transformers returns a Tensor.
@@ -179,6 +224,35 @@ class MemoryVectorStore {
 
     // Output is a Tensor, .data is Float32Array
     return Array.from(output.data);
+  }
+
+  async getTableVectorDimension() {
+    if (!this.isInitialized) await this.initialize();
+    if (!this.table) return null;
+    if (Number.isFinite(this._tableVectorDim)) {
+      return this._tableVectorDim;
+    }
+    try {
+      const schema = await this.table.schema();
+      const field = schema?.fields?.find(f => f.name === 'vector');
+      const listSize = field?.type?.listSize;
+      if (Number.isFinite(listSize)) {
+        this._tableVectorDim = listSize;
+        return listSize;
+      }
+    } catch (_e) {
+      // best-effort
+    }
+    return null;
+  }
+
+  async getEmbeddingDimension() {
+    if (this.config.embeddingMode === 'off') return null;
+    if (this.config.embeddingMode === 'test') return 384;
+    if (this._embeddingStatus?.status === 'unavailable') return null;
+    if (!this.embedder) return null;
+    const vec = await this.generateEmbedding('dimension_check');
+    return Array.isArray(vec) ? vec.length : null;
   }
 
   /**
@@ -196,6 +270,16 @@ class MemoryVectorStore {
       if (!text) continue;
 
       const vector = await this.generateEmbedding(text);
+      const tableDim = await this.getTableVectorDimension();
+      if (Number.isFinite(tableDim) && vector.length !== tableDim) {
+        const reason = `embedding dimension mismatch (table ${tableDim} vs vector ${vector.length}). Re-index or rebuild the LanceDB table.`;
+        this._embeddingStatus = {
+          status: 'unavailable',
+          mode: this._embeddingStatus?.mode || this.config.embeddingMode,
+          reason,
+        };
+        throw new Error(reason);
+      }
 
       const metadataObj = typeof doc.metadata === 'object' && doc.metadata ? doc.metadata : {};
 
@@ -215,6 +299,10 @@ class MemoryVectorStore {
       // Create table on first insert.
       // LanceDB infers schema from the first batch of data.
       this.table = await this.db.createTable(this.config.collectionName, data);
+      const firstVector = data[0]?.vector;
+      if (Array.isArray(firstVector)) {
+        this._tableVectorDim = firstVector.length;
+      }
     } else {
       await this.table.add(data);
     }
@@ -262,6 +350,16 @@ class MemoryVectorStore {
           ? options.threshold
           : null;
     const queryVector = await this.generateEmbedding(query);
+    const tableDim = await this.getTableVectorDimension();
+    if (Number.isFinite(tableDim) && queryVector.length !== tableDim) {
+      const reason = `embedding dimension mismatch (table ${tableDim} vs query ${queryVector.length}). Re-index or rebuild the LanceDB table.`;
+      this._embeddingStatus = {
+        status: 'unavailable',
+        mode: this._embeddingStatus?.mode || this.config.embeddingMode,
+        reason,
+      };
+      throw new Error(reason);
+    }
 
     let searchBuilder = this.table.vectorSearch(queryVector).limit(limit);
 
@@ -329,12 +427,21 @@ class MemoryVectorStore {
     return this._mockMode;
   }
 
+  getEmbeddingStatus() {
+    return { ...this._embeddingStatus };
+  }
+
   async close() {
+    if (this._shared) return;
     // Best-effort (LanceDB doesn't require explicit close in typical usage)
     this.db = null;
     this.table = null;
     this.embedder = null;
     this.isInitialized = false;
+  }
+
+  isShared() {
+    return this._shared;
   }
 }
 

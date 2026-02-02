@@ -18,30 +18,30 @@ const { PROJECT_ROOT } = require('../lib/utils/project-root.cjs');
 
 // Define hooks to run
 const HOOKS = [
-    path.join(__dirname, 'routing', 'spawn-prompt-assembler.cjs'),
-    // Add other hooks here as needed
+  path.join(__dirname, 'routing', 'spawn-prompt-assembler.cjs'),
+  // Add other hooks here as needed
 ];
 
 function main() {
-    // Pass through stdin
-    const input = fs.readFileSync(0, 'utf-8');
+  // Pass through stdin
+  const input = fs.readFileSync(0, 'utf-8');
 
-    for (const hook of HOOKS) {
-        // Run hook synchronously
-        const proc = spawnSync(process.execPath, [hook], {
-            input,
-            cwd: PROJECT_ROOT,
-            env: process.env,
-            stdio: ['pipe', 'inherit', 'inherit'] // pipe stdin, inherit stdout/stderr
-        });
+  for (const hook of HOOKS) {
+    // Run hook synchronously
+    const proc = spawnSync(process.execPath, [hook], {
+      input,
+      cwd: PROJECT_ROOT,
+      env: process.env,
+      stdio: ['pipe', 'inherit', 'inherit'], // pipe stdin, inherit stdout/stderr
+    });
 
-        if (proc.status !== 0) {
-            console.error(`[PreToolUse] Hook failed: ${hook}`);
-            process.exit(proc.status);
-        }
+    if (proc.status !== 0) {
+      console.error(`[PreToolUse] Hook failed: ${hook}`);
+      process.exit(proc.status);
     }
+  }
 }
 
 if (require.main === module) {
-    main();
+  main();
 }
