@@ -162,7 +162,9 @@ function runConsolidation(projectRoot = PROJECT_ROOT) {
 
   try {
     const consolidateResult = memoryTiers.consolidateSession('current', projectRoot);
-    result.success = consolidateResult.success !== false;
+    // Treat "no STM to consolidate" as success so maintenance history does not show failure
+    result.success =
+      consolidateResult.success === true || consolidateResult.error === 'No STM session found';
     result.details = consolidateResult;
   } catch (e) {
     result.details = e.message;
@@ -393,20 +395,21 @@ function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
     details: null,
   };
 
-  // Construct absolute paths for requirements to avoid CWD issues
-  const coldStoragePath = path
-    .join(projectRoot, '.claude/lib/memory/cold-storage.cjs')
-    .replace(/\\/g, '\\\\');
-  const retentionConfigPath = path
-    .join(projectRoot, '.claude/lib/memory/memory-retention-config.cjs')
-    .replace(/\\/g, '\\\\');
-  const projectRootEscaped = projectRoot.replace(/\\/g, '\\\\');
+  // Construct absolute paths for requirements (JSON.stringify makes paths safe for any characters)
+  const coldStoragePath = path.join(projectRoot, '.claude', 'lib', 'memory', 'cold-storage.cjs');
+  const retentionConfigPath = path.join(
+    projectRoot,
+    '.claude',
+    'lib',
+    'memory',
+    'memory-retention-config.cjs'
+  );
 
   const script = `
   (async () => {
-    const { archiveOldLTM } = require('${coldStoragePath}');
-    const { getRetentionOptions } = require('${retentionConfigPath}');
-    const projectRoot = '${projectRootEscaped}';
+    const { archiveOldLTM } = require(${JSON.stringify(coldStoragePath)});
+    const { getRetentionOptions } = require(${JSON.stringify(retentionConfigPath)});
+    const projectRoot = ${JSON.stringify(projectRoot)};
     const options = getRetentionOptions(projectRoot);
     const details = await archiveOldLTM(projectRoot, options);
     process.stdout.write(JSON.stringify({ success: true, details }));

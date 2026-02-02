@@ -83,6 +83,7 @@
     "memory:weekly": "node .claude/lib/memory/memory-scheduler.cjs weekly",
     "memory:daily": "node .claude/lib/memory/memory-scheduler.cjs daily",
     "memory:status": "node .claude/lib/memory/memory-scheduler.cjs status",
+    "memory:health": "node .claude/lib/memory/memory-manager.cjs health",
     "memory:dashboard": "node .claude/lib/memory/memory-dashboard.cjs",
     "skills:index": "node .claude/tools/cli/generate-skill-index.cjs",
     "skills:validate": "node .claude/tools/cli/generate-skill-index.cjs --validate",

@@ -3,7 +3,8 @@ const fs = require('node:fs');
 
 /**
  * Vector database wrapper for storing and searching code embeddings.
- * Uses in-memory storage for now (ChromaDB integration requires server setup).
+ * Uses in-memory storage; embeddings do not persist across process restarts.
+ * Separate from the memory system's LanceDB (.claude/data/lancedb).
  *
  * @class VectorDatabase
  * @description Provides semantic code search capabilities with in-memory vector storage
@@ -11,10 +12,10 @@ const fs = require('node:fs');
 class VectorDatabase {
   /**
    * @param {Object} options Configuration options
-   * @param {string} options.path Path to database directory (for persistence in future)
+   * @param {string} options.path Path to index directory (for metadata/cache; vectors are in-memory)
    */
   constructor(options = {}) {
-    this.dbPath = options.path || path.join(process.cwd(), '.claude/context/code-index/chroma');
+    this.dbPath = options.path || path.join(process.cwd(), '.claude/context/code-index/vectors');
     this.collectionName = 'code-embeddings';
 
     // In-memory storage for embeddings
@@ -29,7 +30,7 @@ class VectorDatabase {
   }
 
   /**
-   * Get collection metadata (compatibility with ChromaDB interface)
+   * Get collection metadata (query interface)
    * @returns {Promise<Object>} Collection metadata
    */
   async getCollection() {
@@ -100,7 +101,7 @@ class VectorDatabase {
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, topK);
 
-    // Format results to match ChromaDB query response format
+    // Format results as ids, distances, metadatas, documents
     return {
       ids: [topResults.map(r => this.ids[r.idx])],
       distances: [topResults.map(r => 1 - r.similarity)], // Convert similarity to distance

@@ -257,8 +257,29 @@ The `.claude` memory system is a hybrid architecture combining:
 - **Deprecated code archived**: SyncLayer, SyncWorker, session-memory-extractor, and extract-workflow-learnings have been moved to `.claude/archive/` (lib/memory and hooks/memory). Active sync path is `sync-memory-index.cjs` only; workflow/session extraction is canonical in `post-task-unified.cjs` and `unified-reflection-handler.cjs`.
 - **Reflection**: Reflection is reminder-driven with mandatory **Step 0** in CLAUDE.md (ROUTER OUTPUT CONTRACT). The Router must read `reflection-reminder.txt` and spawn reflection-agent when it exists; there is no automated spawn from hooks.
 - **TaskList-first**: TaskList() must be called before Task() in the same session (since last UserPromptSubmit). Enforced via `router-state.cjs` (`taskListCalledSincePrompt`), PostToolUse(TaskList) hook `task-list-tracker.cjs`, and PreToolUse(Task) check in `pre-task-unified.cjs` (env: `TASKLIST_FIRST_ENFORCEMENT=block|warn|off`, default `block`).
-- **Weekly maintenance fallback**: When weekly maintenance is overdue (missing or older than 7 days), `user-prompt-unified.cjs` invokes weekly maintenance in a child process (timeout 30s) so it runs even when SessionEnd rarely fires.
+- **Weekly maintenance fallback**: When weekly maintenance is overdue (missing or older than 7 days), `user-prompt-unified.cjs` invokes weekly maintenance in a child process. Timeout is configurable via `MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS` (default 60000 ms).
 - **Dashboard Phase 4**: `memory-health-check.cjs` Phase 4 is hardened with try/catch; on error it sets `output.metricsLogged = false` and `output.metricsError` and optionally writes a one-line JSONL entry to `.claude/context/memory/metrics/fallback.jsonl`.
+
+---
+
+## Post–100% Audit Fixes (2026-02-01)
+
+Summary of fixes applied from the Memory System and Core Audit plan:
+
+- **Consolidation success when STM empty**: `memory-scheduler.cjs` `runConsolidation()` now treats "No STM session found" as success; maintenance history no longer reports consolidation as failed when there is nothing to consolidate.
+- **saveSession no-op**: `memory-manager.cjs` `saveSession()` is a no-op with one-time deprecation warning and returns `{ sessionNum: 0, file: null }`. Legacy fallback in `unified-reflection-handler.cjs` skips calling it when memory-tiers is missing (logs that session recording is skipped).
+- **memory:health script**: Added `pnpm run memory:health` (runs `node .claude/lib/memory/memory-manager.cjs health`). Documented in MEMORY_SYSTEM.md.
+- **runArchiveOldLTM require paths**: Inline script in `memory-scheduler.cjs` now uses `JSON.stringify()` for `coldStoragePath`, `retentionConfigPath`, and `projectRoot` so paths with quotes or backslashes are safe.
+- **Orphan vectors.db and .gitignore**: `.gitignore` now includes `.claude/context/memory/vectors.db`, `.claude/context/memory/vectors.db_placeholder`, and `.claude/data/*.db`. MEMORY_SYSTEM.md states LanceDB persist directory is `.claude/data/lancedb` and any `vectors.db` under `.claude/context/memory/` is legacy/orphan.
+- **LanceDB mock visibility**: Health/dashboard indicate when LanceDB is in mock mode; `memory-dashboard.cjs` exposes embedding status (mock vs real). MEMORY_SYSTEM.md documents that health/dashboard show mock mode and semantic search uses keyword fallback when mock.
+- **loadMemoryForContextAsync aligned with sync**: `loadMemoryForContextAsync()` in `memory-manager.cjs` now loads patterns/gotchas from SQLite (entities table) first, then JSON fallback, matching the sync path.
+- **Entity graph API documented**: MEMORY_SYSTEM.md states that `findEntities()` and `getRelated()` are available for future use but not yet called by any hook or agent.
+- **Reflection reminder documented**: MEMORY_SYSTEM.md and CLAUDE.md state that the Router must perform Step 0 before TaskList(); no daemon or hook spawns the reflection-agent. Health check adds `pendingReflectionRequests: N` when reflection-spawn-request.json has queued items.
+- **Code-indexing ChromaDB removed**: Comments and default path in `vector-db.cjs`, `vector-store.cjs`, and `index-manager.cjs` no longer reference ChromaDB; path is `.claude/context/code-index/vectors`. MEMORY_SYSTEM.md documents that code-indexing uses in-memory vectors and is separate from memory LanceDB.
+- **Entity extractor patterns**: Relaxed patterns in `entity-extractor.cjs` (e.g. `##` in addition to `###` for Pattern/Concept/Issue; `## Decision:` for decisions). Documented supported formats in MEMORY_SYSTEM.md.
+- **Weekly maintenance timeout**: Increased to 60s default; configurable via `MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS`.
+- **Semantic search threshold**: Single constant `SEMANTIC_SEARCH_DEFAULT_THRESHOLD` (0.72) in `.claude/lib/memory/memory-constants.cjs`; used by contextual-memory, spawn-prompt-assembler, and memory-search. Override via env `MEMORY_SEMANTIC_SEARCH_THRESHOLD`.
+- **Hook chain error handling, STM semantics, cold storage, project root, save-session deprecated, test data in MTM, agent:production stub**: Documented in MEMORY_SYSTEM.md and GETTING_STARTED.md as specified in the plan.
 
 ---
 

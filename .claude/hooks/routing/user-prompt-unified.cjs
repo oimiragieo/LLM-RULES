@@ -963,10 +963,11 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
         'memory-scheduler.cjs'
       );
       if (fs.existsSync(schedulerPath)) {
+        const weeklyTimeoutMs = Number(process.env.MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS || 60000);
         spawnSync(process.execPath, [schedulerPath, 'weekly'], {
           cwd: PROJECT_ROOT,
           stdio: 'ignore',
-          timeout: 30000,
+          timeout: weeklyTimeoutMs,
         });
       }
     }

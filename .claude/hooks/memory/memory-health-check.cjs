@@ -136,6 +136,8 @@ function main() {
       codebaseMapEntries: health.codebaseMapEntries,
       sessionsCount: health.sessionsCount,
     },
+    // LanceDB mock mode: run pnpm run memory:dashboard to see embedding (mock vs real) status
+    lancedbMockMode: null,
   };
 
   // Phase 2: Add tier health metrics
@@ -273,6 +275,26 @@ function main() {
   }
 
   output.autoActions = autoActions;
+
+  // Pending reflection requests (Router must perform Step 0 to process them)
+  const reflectionSpawnPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'runtime',
+    'reflection-spawn-request.json'
+  );
+  if (fs.existsSync(reflectionSpawnPath)) {
+    try {
+      const raw = fs.readFileSync(reflectionSpawnPath, 'utf8').trim();
+      const arr = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(arr) && arr.length > 0) {
+        output.pendingReflectionRequests = arr.length;
+      }
+    } catch (_e) {
+      // ignore parse errors
+    }
+  }
 
   // Phase 4: Save metrics to history (resilient: try/catch, fallback JSONL)
   output.metricsLogged = false;

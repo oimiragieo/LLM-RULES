@@ -29,7 +29,7 @@
 
 ### Router Protocol (always)
 
-1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file.
+1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file. No daemon or hook spawns the reflection-agent; compliance is required for pending reflections to run.
 2. **CHECK TASKS FIRST:** `TaskList()`
 3. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
 4. **Check:** scan `.claude/agents/` for best agent match

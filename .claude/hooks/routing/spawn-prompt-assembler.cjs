@@ -238,9 +238,12 @@ async function main() {
           String(basePrompt).slice(0, 240);
         // Hot-only by default: exclude cold-archived LTM summaries from the prompt path.
         // (Cold remains searchable for explicit queries elsewhere.)
+        const {
+          SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+        } = require('../../lib/memory/memory-constants.cjs');
         const results = await memoryManager.searchMemory(query, {
           limit: 3,
-          threshold: 0.75,
+          threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
           filters: `metadata NOT LIKE '%"source":"ltm_archive"%'`,
         });
         assembled = appendSemanticMatches(assembled, results);

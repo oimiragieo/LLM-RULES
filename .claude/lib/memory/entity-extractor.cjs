@@ -259,16 +259,18 @@ class EntityExtractor {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      let conceptMatch;
 
-      // Pattern: ### Pattern: Name
-      if (line.match(/^###\s+Pattern:\s+(.+)/)) {
+      // Pattern: ### Pattern: Name or ## Pattern: Name
+      const patternMatch = line.match(/^#{2,3}\s+Pattern:\s+(.+)/);
+      if (patternMatch) {
         // Save previous entity if exists
         if (currentEntity) {
           currentEntity.content = currentContent.join('\n').trim();
           entities.push(currentEntity);
         }
 
-        const name = line.match(/^###\s+Pattern:\s+(.+)/)[1].trim();
+        const name = patternMatch[1].trim();
         currentEntity = {
           id: `pattern-${this._slugify(name)}`,
           type: 'pattern',
@@ -278,14 +280,14 @@ class EntityExtractor {
         };
         currentContent = [];
       }
-      // Concept: ### Concept: Name
-      else if (line.match(/^###\s+Concept:\s+(.+)/)) {
+      // Concept: ### Concept: Name or ## Concept: Name
+      else if ((conceptMatch = line.match(/^#{2,3}\s+Concept:\s+(.+)/))) {
         if (currentEntity) {
           currentEntity.content = currentContent.join('\n').trim();
           entities.push(currentEntity);
         }
 
-        const name = line.match(/^###\s+Concept:\s+(.+)/)[1].trim();
+        const name = conceptMatch[1].trim();
         currentEntity = {
           id: `concept-${this._slugify(name)}`,
           type: 'concept',
@@ -331,9 +333,9 @@ class EntityExtractor {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // Pattern: ## [ADR-NNN] Title OR ## ADR-NNN: Title
-      // Handle both square bracket and colon formats
+      // Pattern: ## [ADR-NNN] Title, ## ADR-NNN: Title, or ## Decision: Title
       const adrMatch = line.match(/^##\s+\[?ADR-(\d+)\]?\s*:?\s+(.+)/);
+      const decisionMatch = !adrMatch && line.match(/^##\s+Decision:\s+(.+)/);
       if (adrMatch) {
         // Save previous entity
         if (currentEntity) {
@@ -348,6 +350,20 @@ class EntityExtractor {
           id: `adr-${adrNumber}`,
           type: 'decision',
           name: `ADR-${adrNumber}: ${title}`,
+          source_file: filePath,
+          line_number: i + 1,
+        };
+        currentContent = [];
+      } else if (decisionMatch) {
+        if (currentEntity) {
+          currentEntity.content = currentContent.join('\n').trim();
+          entities.push(currentEntity);
+        }
+        const title = decisionMatch[1].trim();
+        currentEntity = {
+          id: `decision-${this._slugify(title)}`,
+          type: 'decision',
+          name: title,
           source_file: filePath,
           line_number: i + 1,
         };
@@ -389,15 +405,16 @@ class EntityExtractor {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // Pattern: ### Issue: Title
-      if (line.match(/^###\s+Issue:\s+(.+)/)) {
+      // Pattern: ### Issue: Title or ## Issue: Title
+      const issueMatch = line.match(/^#{2,3}\s+Issue:\s+(.+)/);
+      if (issueMatch) {
         // Save previous entity
         if (currentEntity) {
           currentEntity.content = currentContent.join('\n').trim();
           entities.push(currentEntity);
         }
 
-        const title = line.match(/^###\s+Issue:\s+(.+)/)[1].trim();
+        const title = issueMatch[1].trim();
 
         currentEntity = {
           id: `issue-${this._slugify(title)}`,

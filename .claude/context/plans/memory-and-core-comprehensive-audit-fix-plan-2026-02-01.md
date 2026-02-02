@@ -195,7 +195,7 @@ Each audit item is listed with: **Review** (assessment of root cause and impact)
 
 **Proposed Solution:**
 
-- **Document:** In [MEMORY_SYSTEM.md](.claude/docs/MEMORY_SYSTEM.md), state that canonical session storage is MTM (and STM for current session); legacy sessions/ is read-only fallback and will not be written to. Optionally add a one-time migration script (e.g. `node .claude/tools/cli/migrate-legacy-sessions-to-mtm.cjs`) that moves legacy session_*.json into mtm/ with the expected format and then optionally renames or removes the legacy files; run manually.
+- **Document:** In [MEMORY_SYSTEM.md](.claude/docs/MEMORY_SYSTEM.md), state that canonical session storage is MTM (and STM for current session); legacy sessions/ is read-only fallback and will not be written to. Optionally add a one-time migration script (e.g. `node .claude/tools/cli/migrate-legacy-sessions-to-mtm.cjs`) that moves legacy session\_\*.json into mtm/ with the expected format and then optionally renames or removes the legacy files; run manually.
 - **No change** to loadMemoryForContext order (MTM → LTM → legacy).
 
 ---
@@ -330,11 +330,11 @@ Each audit item is listed with: **Review** (assessment of root cause and impact)
 
 ## Part B: Priority and Implementation Order
 
-| Priority | Items | Action |
-|----------|--------|--------|
-| **P0** | C1–C8 | saveSession no-op (C1); consolidation success when no STM (C2); verify STM write (C3); UserPromptSubmit weekly fallback (C4, C5); LanceDB health/warning (C6, C7); entity pattern extension (C8). |
-| **P1** | M9–M20 | Archive SyncLayer/SyncWorker (M9); document health-check remediations (M10); access tracking doc/config (M11); reflection Step 0 in CLAUDE.md (M12); cold storage via weekly fallback (M13); legacy session doc/migration script (M14); ML/embedding visibility and optional edit-time embedding (M15, M16); router-state defensive read (M17); dashboard vs CLI doc (M18); codebase_map and EntityQuery doc (M19, M20). |
-| **P2** | N21–N28 | README, timestamps, config, JSDoc, tests, saveSession export note, error-handling doc, MEMORY_SYSTEM pass (N21–N28). |
+| Priority | Items   | Action                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **P0**   | C1–C8   | saveSession no-op (C1); consolidation success when no STM (C2); verify STM write (C3); UserPromptSubmit weekly fallback (C4, C5); LanceDB health/warning (C6, C7); entity pattern extension (C8).                                                                                                                                                                                                                        |
+| **P1**   | M9–M20  | Archive SyncLayer/SyncWorker (M9); document health-check remediations (M10); access tracking doc/config (M11); reflection Step 0 in CLAUDE.md (M12); cold storage via weekly fallback (M13); legacy session doc/migration script (M14); ML/embedding visibility and optional edit-time embedding (M15, M16); router-state defensive read (M17); dashboard vs CLI doc (M18); codebase_map and EntityQuery doc (M19, M20). |
+| **P2**   | N21–N28 | README, timestamps, config, JSDoc, tests, saveSession export note, error-handling doc, MEMORY_SYSTEM pass (N21–N28).                                                                                                                                                                                                                                                                                                     |
 
 ---
 

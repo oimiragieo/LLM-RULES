@@ -7,6 +7,7 @@
 'use strict';
 
 const memoryManager = require('./memory-manager.cjs');
+const { SEMANTIC_SEARCH_DEFAULT_THRESHOLD } = require('./memory-constants.cjs');
 
 async function main() {
   const query = process.argv.slice(2).join(' ').trim();
@@ -17,7 +18,10 @@ async function main() {
   }
 
   try {
-    const results = await memoryManager.searchMemory(query, { limit: 10, threshold: 0.75 });
+    const results = await memoryManager.searchMemory(query, {
+      limit: 10,
+      threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+    });
 
     console.log(`Found ${results.length} results for: "${query}"\n`);
 

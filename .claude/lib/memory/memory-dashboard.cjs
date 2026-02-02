@@ -520,6 +520,24 @@ function cleanupOldMetrics(projectRoot = PROJECT_ROOT) {
 /**
  * Get complete dashboard with all sections
  */
+/**
+ * Get LanceDB mock mode status (async). Used by dashboard CLI to show embedding status.
+ * @param {string} projectRoot
+ * @returns {Promise<boolean|null>} true if mock mode, false if real embeddings, null if unavailable
+ */
+async function getLanceDBMockStatus(projectRoot = PROJECT_ROOT) {
+  try {
+    const { MemoryVectorStore } = require('./lancedb-client.cjs');
+    const store = new MemoryVectorStore({
+      persistDirectory: path.join(projectRoot, '.claude', 'data', 'lancedb'),
+    });
+    await store.initialize();
+    return store.isMockMode();
+  } catch (_e) {
+    return null;
+  }
+}
+
 function getDashboard(projectRoot = PROJECT_ROOT) {
   const metrics = collectMetrics(projectRoot);
 
@@ -551,6 +569,15 @@ function formatDashboard(dashboard) {
   lines.push(`  Total Size: ${dashboard.summary.totalSizeKB} KB`);
   lines.push(`  Health Score: ${(dashboard.summary.healthScore * 100).toFixed(0)}%`);
   lines.push('');
+
+  // LanceDB / semantic search
+  if (dashboard.lancedbMockMode === true) {
+    lines.push('LanceDB: mock mode - semantic search uses keyword fallback');
+    lines.push('');
+  } else if (dashboard.lancedbMockMode === false) {
+    lines.push('LanceDB: real embeddings (semantic search active)');
+    lines.push('');
+  }
 
   // Tiers
   lines.push('MEMORY TIERS');
@@ -602,18 +629,24 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   const command = args[0];
 
+  const runWithLanceDBStatus = async outputFn => {
+    const dashboard = getDashboard();
+    const lancedbMock = await getLanceDBMockStatus().catch(() => null);
+    dashboard.lancedbMockMode = lancedbMock;
+    outputFn(dashboard);
+  };
+
   switch (command) {
     case 'metrics':
       console.log(JSON.stringify(collectMetrics(), null, 2));
       break;
 
     case 'health':
-      const dashboard = getDashboard();
-      console.log(formatDashboard(dashboard));
+      runWithLanceDBStatus(dashboard => console.log(formatDashboard(dashboard)));
       break;
 
     case 'json':
-      console.log(JSON.stringify(getDashboard(), null, 2));
+      runWithLanceDBStatus(dashboard => console.log(JSON.stringify(dashboard, null, 2)));
       break;
 
     case 'history': {
@@ -648,8 +681,7 @@ Examples:
 `);
       // Default to health display
       if (!command) {
-        const defaultDashboard = getDashboard();
-        console.log(formatDashboard(defaultDashboard));
+        runWithLanceDBStatus(dashboard => console.log(formatDashboard(dashboard)));
       }
   }
 }
@@ -671,6 +703,7 @@ module.exports = {
   // Unified dashboard
   getDashboard,
   formatDashboard,
+  getLanceDBMockStatus,
   // Helpers (for testing)
   getMemoryDir,
   getMetricsDir,

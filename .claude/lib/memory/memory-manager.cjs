@@ -232,10 +232,13 @@ function getCurrentSessionNumber(memoryDir) {
  * // Returns: { sessionNum: 1, file: '/path/.claude/context/memory/sessions/session_001.json' }
  */
 function saveSession(insights, _projectRoot = PROJECT_ROOT) {
-  throw new Error(
-    'saveSession is DEPRECATED. Use memory-tiers.cjs writeSTMEntry + consolidateSession instead. ' +
-      'The .claude/context/memory/sessions/ directory is legacy.'
-  );
+  if (process.env.MEMORY_DEBUG !== '1' && !saveSession._deprecationWarned) {
+    saveSession._deprecationWarned = true;
+    console.warn(
+      '[memory-manager] saveSession is DEPRECATED. Use memory-tiers.cjs writeSTMEntry + consolidateSession instead. Sessions directory is legacy.'
+    );
+  }
+  return { sessionNum: 0, file: null };
 }
 
 /**
@@ -1026,9 +1029,48 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
     legacy_summary: '',
   };
 
-  // Load gotchas (truncated)
+  // Try loading from SQLite first (align with sync path)
+  const dbPath = path.join(projectRoot, '.claude/data/memory.db');
+  let dbPatternsLoaded = false;
+  let dbGotchasLoaded = false;
+  if (fs.existsSync(dbPath)) {
+    try {
+      const db = new DatabaseSync(dbPath);
+      const patterns = db
+        .prepare(
+          "SELECT name, content, created_at FROM entities WHERE type = 'pattern' ORDER BY quality_score DESC, created_at DESC LIMIT ?"
+        )
+        .all(CONFIG.MAX_ITEMS.patterns);
+      if (patterns.length > 0) {
+        result.patterns = patterns.map(p => ({
+          text: p.name + (p.content ? '\n' + p.content : ''),
+          timestamp: p.created_at,
+        }));
+        dbPatternsLoaded = true;
+      }
+      const issues = db
+        .prepare(
+          "SELECT name, content, created_at FROM entities WHERE type = 'issue' ORDER BY quality_score DESC, created_at DESC LIMIT ?"
+        )
+        .all(CONFIG.MAX_ITEMS.gotchas);
+      if (issues.length > 0) {
+        result.gotchas = issues.map(i => ({
+          text: i.name + (i.content ? '\n' + i.content : ''),
+          timestamp: i.created_at,
+        }));
+        dbGotchasLoaded = true;
+      }
+      db.close();
+    } catch (e) {
+      if (process.env.MEMORY_DEBUG) {
+        console.error('[MEMORY_DEBUG]', 'loadMemoryAsync (DB):', e.message);
+      }
+    }
+  }
+
+  // Load gotchas from JSON if not loaded from DB
   const gotchasFile = path.join(memoryDir, 'gotchas.json');
-  const gotchasContent = await readMemoryAsync(gotchasFile);
+  const gotchasContent = !dbGotchasLoaded ? await readMemoryAsync(gotchasFile) : null;
   if (gotchasContent) {
     try {
       const gotchas = JSON.parse(gotchasContent);
@@ -1047,9 +1089,9 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
     }
   }
 
-  // Load patterns (truncated)
+  // Load patterns from JSON if not loaded from DB
   const patternsFile = path.join(memoryDir, 'patterns.json');
-  const patternsContent = await readMemoryAsync(patternsFile);
+  const patternsContent = !dbPatternsLoaded ? await readMemoryAsync(patternsFile) : null;
   if (patternsContent) {
     try {
       const patterns = JSON.parse(patternsContent);
@@ -1532,7 +1574,7 @@ Examples:
   node memory-manager.cjs record-gotcha "Always close DB connections in workers"
   node memory-manager.cjs record-pattern "Use async/await for all API calls"
   node memory-manager.cjs record-discovery "src/auth.ts" "JWT authentication handler"
-  echo '{"summary":"Fixed auth bug"}' | node memory-manager.cjs save-session
+  echo '{"summary":"Fixed auth bug"}' | node memory-manager.cjs save-session   # deprecated, no-op
 `);
   }
 }

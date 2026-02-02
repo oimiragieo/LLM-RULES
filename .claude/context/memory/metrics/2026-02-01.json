@@ -42,7 +42,5 @@
       "status": "healthy"
     }
   },
-  "recommendations": [
-    "Consider summarizing MTM sessions to LTM (9 sessions approaching 10 limit)"
-  ]
+  "recommendations": ["Consider summarizing MTM sessions to LTM (9 sessions approaching 10 limit)"]
 }

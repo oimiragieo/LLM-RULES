@@ -1,5 +1,5 @@
 /**
- * Vector Store - ChromaDB Wrapper
+ * Vector Store - Code index vector layer (in-memory; separate from memory system LanceDB)
  *
  * @module code-indexing/vector-store
  * @see {@link .claude/docs/CODE_INDEXING_DESIGN.md}

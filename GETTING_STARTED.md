@@ -121,6 +121,10 @@ Where to set these:
 - Read-only mode: `node .claude/tools/read-only.mjs enable` (disable with `node .claude/tools/read-only.mjs disable`)
 - Client context: `node .claude/tools/client-context.mjs set claude-code` (see `.claude/config/client-contexts.json`)
 
+### Known limitations
+
+- **agent:production** is a stub; production agent mode is not yet implemented. Use `agent:worker` or other commands for now.
+
 ### Step 4: Test It Works
 
 ```

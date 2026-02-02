@@ -720,17 +720,11 @@ function recordSession(sessionData) {
         path.join(PROJECT_ROOT, '.claude', 'lib', 'memory', 'memory-tiers.cjs')
       );
     } catch (_e) {
-      // Memory tiers not available - fall back to legacy behavior
+      // Memory tiers not available - session recording skipped (saveSession is deprecated no-op)
       debugLog(
         'unified-reflection',
-        'memory-tiers not available, falling back to legacy saveSession'
+        'memory-tiers not available; session recording skipped (memory-tiers required for session persistence)'
       );
-      try {
-        const memoryManager = require('../../lib/memory/memory-manager.cjs');
-        memoryManager.saveSession(sessionData, PROJECT_ROOT);
-      } catch (legacyErr) {
-        debugLog('unified-reflection', 'Legacy saveSession also failed', legacyErr);
-      }
       return;
     }
 

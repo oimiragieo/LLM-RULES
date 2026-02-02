@@ -101,11 +101,12 @@ class ContextualMemory {
    * @param {string} query - Natural language query
    * @param {Object} options - Search options
    * @param {number} [options.limit=5] - Maximum results
-   * @param {number} [options.threshold=0.7] - Similarity threshold (0-1)
+   * @param {number} [options.threshold] - Similarity threshold (0-1); default from memory-constants
    * @returns {Promise<Array>} Ranked results with sources
    */
   async search(query, options = {}) {
-    const { limit = 5, threshold = 0.7, filters } = options;
+    const { SEMANTIC_SEARCH_DEFAULT_THRESHOLD } = require('./memory-constants.cjs');
+    const { limit = 5, threshold = SEMANTIC_SEARCH_DEFAULT_THRESHOLD, filters } = options;
 
     try {
       // Try LanceDB semantic search

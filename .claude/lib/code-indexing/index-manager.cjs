@@ -79,7 +79,7 @@ class IndexManager {
     }
     if (!this.vectorDb) {
       this.vectorDb = new VectorDatabase({
-        path: path.join(this.options.projectRoot, '.claude/context/code-index/chroma'),
+        path: path.join(this.options.projectRoot, '.claude/context/code-index/vectors'),
       });
     }
   }

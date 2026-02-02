@@ -33,6 +33,9 @@ It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/li
 
 - SQLite driver: Node’s built-in `node:sqlite` (`DatabaseSync`) to avoid native addon installs.
 - Initialize schema: `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`).
+- Check memory health (JSON): `pnpm run memory:health` (or `node .claude/lib/memory/memory-manager.cjs health`).
+
+The entity index is populated by `sync-memory-index` from `learnings.md`, `decisions.md`, and `issues.md`. Agent-visible patterns and gotchas are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are available for future use (e.g. graph-backed prompts or tools) but are **not yet called by any hook or agent**.
 
 ### Troubleshooting
 
@@ -40,6 +43,10 @@ It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/li
   - Run `npm run memory:init` to create the SQLite schema.
 - **"EntityExtractor not initialized"**:
   - Check if `.claude/data/memory.db` exists and is readable.
+
+Entity extraction is format-based. Supported heading styles include `###` or `##` followed by `Pattern:`, `Concept:`, or `Issue:`; decisions use `## [ADR-NNN]` or `## ADR-NNN:` or `## Decision:`. Over-relaxing patterns can pollute the entity graph.
+
+**Project root:** Memory and hooks should use `PROJECT_ROOT` from `.claude/lib/utils/project-root.cjs` when available; fallback to `process.cwd()` or `CLAUDE_PROJECT_DIR` where documented.
 
 ## Hook Wiring (What Runs When)
 
@@ -64,7 +71,11 @@ Note: Claude Code does not provide a `SessionStart` hook event; “session-start
 
 ### Reflection spawn
 
-Reflection is **reminder-driven**: there is no automated spawn from hooks (hooks cannot invoke the Task tool). On `UserPromptSubmit`, when there are pending reflection requests, `.claude/hooks/routing/user-prompt-unified.cjs` writes `.claude/context/runtime/reflection-reminder.txt` and appends to `.claude/context/runtime/reflection-spawn-request.json`. The Router must treat **Step 0** (see CLAUDE.md ROUTER OUTPUT CONTRACT) as mandatory: before `TaskList()` or any other tool, if `reflection-reminder.txt` exists, read it, read `reflection-spawn-request.json`, spawn reflection-agent for each request (or the first batch), then delete the reminder file and clear/trim the spawn request file. The Router is the only component that can spawn reflection-agent; the reminder ensures it is impossible to miss pending reflection.
+Reflection is **reminder-driven**. The Router **must** perform Step 0 before `TaskList()`; no daemon or hook spawns the reflection-agent—compliance is required for pending reflections to run. On `UserPromptSubmit`, when there are pending reflection requests, `.claude/hooks/routing/user-prompt-unified.cjs` writes `.claude/context/runtime/reflection-reminder.txt` and appends to `.claude/context/runtime/reflection-spawn-request.json`. Before `TaskList()` or any other tool, if `reflection-reminder.txt` exists, the Router must read it, read `reflection-spawn-request.json`, spawn reflection-agent for each request (or the first batch), then delete the reminder file and clear/trim the spawn request file. Health/dashboard may show `pendingReflectionRequests: N` when the spawn-request file contains queued items.
+
+### Hook chain error handling
+
+Hooks run in sequence; a hook that exits non-zero may prevent subsequent hooks from running (host-dependent). Each hook should be defensive and avoid throwing; use try/catch and exit 0 for advisory checks so the chain can continue.
 
 ### Inlined vs Standalone Memory Health Check
 
@@ -112,15 +123,27 @@ Sessions persist automatically via the `SessionEnd` hook. The canonical session 
 
 **Location**: `.claude/context/memory/stm/session_current.json`
 
+STM is written on every UserPromptSubmit and cleared after consolidation on SessionEnd. Between sessions, or when no prompt was submitted before maintenance, seeing only `.gitkeep` in `stm/` is expected. Consolidation reporting "No STM session found" is a valid outcome and is treated as success (see maintenance status).
+
 ### MTM (Recent Sessions)
 
 **Location**: `.claude/context/memory/mtm/session_YYYY-MM-DDTHH-MM-SS.json` (timestamp-based)
 
-MTM entries include `tier: "MTM"` and `consolidated_at` metadata.
+MTM entries include `tier: "MTM"` and `consolidated_at` metadata. Remove test sessions from `mtm/` (e.g. `session_id` containing `test`) before treating MTM as production; no automated sanitize step is run in weekly maintenance.
 
 ### LTM (Long-Term Summaries)
 
 **Location**: `.claude/context/memory/ltm/`
+
+## Vector Store (LanceDB)
+
+LanceDB persist directory is `.claude/data/lancedb`. Any `vectors.db` or `vectors.db_placeholder` under `.claude/context/memory/` is legacy/orphan (from an older or alternate config) and can be removed; the active client uses `.claude/data/lancedb` only. If LanceDB is in mock mode (e.g. @xenova/transformers failed to load), semantic search uses keyword fallback; run `pnpm run memory:dashboard` to see embedding status (mock vs real) in the dashboard output.
+
+Semantic search similarity threshold is defined in `.claude/lib/memory/memory-constants.cjs` as `SEMANTIC_SEARCH_DEFAULT_THRESHOLD` (default 0.72). Override via env `MEMORY_SEMANTIC_SEARCH_THRESHOLD`. Used by contextual-memory, spawn-prompt-assembler, and memory-search.
+
+### Code-indexing (separate from memory)
+
+Code-indexing (`.claude/lib/code-indexing/`) uses **in-memory** vector storage; embeddings do not persist across process restarts. It is separate from the memory system's LanceDB. Index metadata lives under `.claude/context/code-index/vectors` (or `code-index/chroma` in older configs).
 
 ## Retention and Cold Storage
 
@@ -136,7 +159,7 @@ The memory system is designed to stay bounded:
 
 ### When does weekly maintenance run?
 
-- Weekly maintenance (including `archiveOldLTM`) runs when **SessionEnd** fires (via `unified-reflection-handler.cjs` → `triggerMaintenance()` → `memory-scheduler.cjs` `runWeeklyMaintenance()`) or when **UserPromptSubmit** detects it is overdue: `user-prompt-unified.cjs` reads `.claude/context/memory/maintenance-status.json`; if `lastWeekly` is missing or older than 7 days, it invokes weekly maintenance in a child process (timeout 30s) so the hook does not block. Manual fallback: `pnpm run memory:weekly` (or `memory:daily`). To check last run: `pnpm run memory:status`.
+- Weekly maintenance (including `archiveOldLTM`) runs when **SessionEnd** fires (via `unified-reflection-handler.cjs` → `triggerMaintenance()` → `memory-scheduler.cjs` `runWeeklyMaintenance()`) or when **UserPromptSubmit** detects it is overdue: `user-prompt-unified.cjs` reads `.claude/context/memory/maintenance-status.json`; if `lastWeekly` is missing or older than 7 days, it invokes weekly maintenance in a child process. Timeout is configurable via `MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS` (default 60000 ms). Manual fallback: `pnpm run memory:weekly` (or `memory:daily`). To check last run: `pnpm run memory:status`. LTM cold archival is performed by `cold-storage.cjs` inside `runArchiveOldLTM` in the scheduler.
 
 ### Tunables
 
@@ -345,7 +368,7 @@ Outputs JSON statistics about the memory system:
 ### Save a Session
 
 ```bash
-echo '{"summary":"Fixed auth bug", "tasks_completed":["Fix login"], "files_modified":["src/auth.ts"]}' | node .claude/lib/memory/memory-manager.cjs save-session
+echo '{"summary":"Fixed auth bug", "tasks_completed":["Fix login"], "files_modified":["src/auth.ts"]}' | node .claude/lib/memory/memory-manager.cjs save-session   # deprecated, no-op
 ```
 
 Saves a session from JSON input (via stdin). This is typically called by the SessionEnd hook automatically.
@@ -412,7 +435,7 @@ The `unified-reflection-handler.cjs` hook automatically captures session insight
 4. Consolidate STM → MTM via `memory-tiers.consolidateSession()`
 5. Extract patterns and gotchas to their respective JSON files
 
-**Note**: The legacy `memory-manager.saveSession()` function is deprecated for session recording. Sessions now use the memory-tiers system exclusively (STM → MTM → LTM). The legacy `sessions/` directory is no longer actively written to.
+**Note**: The legacy `memory-manager.saveSession()` function and the `save-session` CLI are deprecated and no-op; use memory-tiers for session recording. Sessions now use the memory-tiers system exclusively (STM → MTM → LTM). The legacy `sessions/` directory is no longer actively written to.
 
 **Memory Tiers**:
 
