@@ -10,7 +10,7 @@
 const { CodeParser, LANGUAGE_GRAMMARS, EXTENSION_MAP } = require('./code-parser.cjs');
 const { SemanticChunker, CHUNK_TYPES } = require('./semantic-chunker.cjs');
 const { EmbeddingGenerator } = require('./embedding-generator.cjs');
-const VectorDatabase = require('./vector-db.cjs');
+const { VectorStore } = require('./vector-store.cjs');
 const { IndexManager } = require('./index-manager.cjs');
 
 module.exports = {
@@ -20,6 +20,6 @@ module.exports = {
   SemanticChunker,
   CHUNK_TYPES,
   EmbeddingGenerator,
-  VectorDatabase,
+  VectorStore,
   IndexManager,
 };

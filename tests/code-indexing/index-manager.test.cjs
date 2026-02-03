@@ -7,13 +7,26 @@
 
 'use strict';
 
-const { test, describe } = require('node:test');
+const { test, describe, before, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs').promises;
 const path = require('path');
 const { IndexManager } = require('../../.claude/lib/code-indexing/index-manager.cjs');
 
+const LANCEDB_DIR = path.join(__dirname, '..', 'fixtures', 'code-indexing', 'lancedb-test');
+const TABLE_NAME = `code_index_test_${process.pid}`;
+
 describe('IndexManager', () => {
+  before(async () => {
+    process.env.LANCEDB_EMBEDDING_MODE = 'test';
+    process.env.LANCEDB_URI = LANCEDB_DIR;
+    process.env.LANCEDB_TABLE_CODE = TABLE_NAME;
+  });
+
+  after(async () => {
+    await fs.rm(LANCEDB_DIR, { recursive: true, force: true }).catch(() => {});
+  });
+
   describe('41.1: Class skeleton', () => {
     test('should construct with default config', () => {
       const manager = new IndexManager();

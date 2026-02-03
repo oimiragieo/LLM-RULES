@@ -12,8 +12,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const { CodeParser } = require('./code-parser.cjs');
 const { SemanticChunker } = require('./semantic-chunker.cjs');
-const { EmbeddingGenerator } = require('./embedding-generator.cjs');
-const VectorDatabase = require('./vector-db.cjs');
+const { VectorStore } = require('./vector-store.cjs');
 const { MerkleTree } = require('./merkle-tree.cjs');
 
 // Default configuration
@@ -59,8 +58,7 @@ class IndexManager {
     // Initialize components (lazy - only when indexing)
     this.parser = null;
     this.chunker = null;
-    this.embedder = null;
-    this.vectorDb = null;
+    this.vectorStore = null;
   }
 
   /**
@@ -73,13 +71,9 @@ class IndexManager {
       const minTokens = parseInt(process.env.CODE_INDEX_MIN_TOKENS || '5', 10);
       this.chunker = new SemanticChunker({ minTokens });
     }
-    if (!this.embedder) {
-      this.embedder = new EmbeddingGenerator();
-      await this.embedder.initialize();
-    }
-    if (!this.vectorDb) {
-      this.vectorDb = new VectorDatabase({
-        path: path.join(this.options.projectRoot, '.claude/context/code-index/vectors'),
+    if (!this.vectorStore) {
+      this.vectorStore = new VectorStore({
+        projectRoot: this.options.projectRoot,
       });
     }
   }
@@ -179,26 +173,9 @@ class IndexManager {
           // Report chunk progress
           if (onProgress) onProgress('chunk', fileIndex, files.length);
 
-          // 41.5: Generate embeddings
-          const embeddedChunks = await this.embedder.embedChunks(chunks);
-          totalEmbeddings += embeddedChunks.length;
-
-          // Report embed progress
-          if (onProgress) onProgress('embed', fileIndex, files.length);
-
-          // 41.6: Store in vector DB
-          const chunkData = embeddedChunks.map(ec => ec.chunk);
-          const embeddings = embeddedChunks.map(ec => ec.embedding);
-          const metadata = embeddedChunks.map(ec => ({
-            id: ec.chunk.id,
-            filePath: ec.chunk.filePath,
-            language: ec.chunk.language,
-            type: ec.chunk.type,
-            lineStart: ec.chunk.lineStart,
-            lineEnd: ec.chunk.lineEnd,
-          }));
-
-          await this.vectorDb.addChunks(chunkData, embeddings, metadata);
+          // 41.5: Store in vector DB (LanceDB embeds internally)
+          await this.vectorStore.addChunks(chunks);
+          totalEmbeddings += chunks.length;
 
           // Report index progress
           if (onProgress) onProgress('index', fileIndex, files.length);
@@ -330,7 +307,7 @@ class IndexManager {
       const fullPath = path.isAbsolute(filePath)
         ? filePath
         : path.join(this.options.projectRoot, filePath);
-      await this.vectorDb.deleteFile(fullPath);
+      await this.vectorStore.deleteFile(fullPath);
       chunksDeleted++;
     }
 
@@ -355,24 +332,12 @@ class IndexManager {
         const chunks = this.chunker.chunk(parseResult, fullPath);
         if (chunks.length === 0) continue;
 
-        const embeddedChunks = await this.embedder.embedChunks(chunks);
-        const chunkData = embeddedChunks.map(ec => ec.chunk);
-        const embeddings = embeddedChunks.map(ec => ec.embedding);
-        const metadata = embeddedChunks.map(ec => ({
-          id: ec.chunk.id,
-          filePath: ec.chunk.filePath,
-          language: ec.chunk.language,
-          type: ec.chunk.type,
-          lineStart: ec.chunk.lineStart,
-          lineEnd: ec.chunk.lineEnd,
-        }));
-
         // Delete old chunks for this file first
-        await this.vectorDb.deleteFile(fullPath);
+        await this.vectorStore.deleteFile(fullPath);
         chunksDeleted += chunks.length;
 
         // Add new chunks
-        await this.vectorDb.addChunks(chunkData, embeddings, metadata);
+        await this.vectorStore.addChunks(chunks);
 
         if (diff.added.includes(filePath)) {
           chunksAdded += chunks.length;
@@ -439,49 +404,43 @@ class IndexManager {
 
     const limit = options.limit || 10;
     const minScore = options.minScore || 0.5;
-
-    // Generate query embedding
-    const queryEmbedding = await this.embedder.embed(query);
-
-    // Search vector DB
-    const searchResults = await this.vectorDb.search(queryEmbedding, {
-      topK: limit,
-      filters: options.filters || {},
-    });
-
-    // Format results
-    const results = [];
-    const ids = searchResults.ids[0] || [];
-    const distances = searchResults.distances[0] || [];
-    const metadatas = searchResults.metadatas[0] || [];
-
-    for (let i = 0; i < ids.length; i++) {
-      const similarity = 1 - distances[i]; // Convert distance to similarity
-      if (similarity >= minScore) {
-        const metadata = metadatas[i];
-
-        // Read original code (if file still exists)
-        let code = null;
-        try {
-          const content = await fs.readFile(metadata.filePath, 'utf-8');
-          const lines = content.split('\n');
-          code = lines.slice(metadata.lineStart - 1, metadata.lineEnd).join('\n');
-        } catch (_error) {
-          // File may have been deleted/moved
-          code = null;
-        }
-
-        results.push({
-          id: ids[i],
-          code,
-          filePath: metadata.filePath,
-          language: metadata.language,
-          type: metadata.type,
-          lineRange: [metadata.lineStart, metadata.lineEnd],
-          similarity,
-          metadata,
-        });
+    let searchResults = [];
+    try {
+      searchResults = await this.vectorStore.search(query, {
+        limit,
+        minScore,
+        filters: options.filters || {},
+      });
+    } catch (error) {
+      if (process.env.CODE_INDEX_DEBUG) {
+        console.warn('[code-indexing] Semantic search unavailable:', error.message);
       }
+      return [];
+    }
+
+    const results = [];
+    for (const result of searchResults) {
+      const metadata = result.metadata || {};
+
+      let code = null;
+      try {
+        const content = await fs.readFile(metadata.filePath, 'utf-8');
+        const lines = content.split('\n');
+        code = lines.slice(metadata.lineStart - 1, metadata.lineEnd).join('\n');
+      } catch (_error) {
+        code = null;
+      }
+
+      results.push({
+        id: result.id,
+        code,
+        filePath: metadata.filePath,
+        language: metadata.language,
+        type: metadata.type,
+        lineRange: [metadata.lineStart, metadata.lineEnd],
+        similarity: result.similarity,
+        metadata,
+      });
     }
 
     return results;

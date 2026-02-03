@@ -20,6 +20,8 @@ suite('End-to-End Integration Tests (43.1)', () => {
   let tempDir;
   let manager;
   let testFiles;
+  const lancedbDir = path.join(os.tmpdir(), `code-index-lancedb-${process.pid}`);
+  const tableName = `code_index_test_${process.pid}`;
 
   // Helper: Create temporary test files
   function createTestProject(dir) {
@@ -118,6 +120,9 @@ suite('End-to-End Integration Tests (43.1)', () => {
 
   // Setup: Create temp directory and index manager
   test('setup - create test environment', _t => {
+    process.env.LANCEDB_EMBEDDING_MODE = 'test';
+    process.env.LANCEDB_URI = lancedbDir;
+    process.env.LANCEDB_TABLE_CODE = tableName;
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'code-index-test-'));
     testFiles = createTestProject(tempDir);
 
@@ -235,6 +240,9 @@ suite('End-to-End Integration Tests (43.1)', () => {
     // Clean up temp directory
     if (tempDir && fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+    if (fs.existsSync(lancedbDir)) {
+      fs.rmSync(lancedbDir, { recursive: true, force: true });
     }
     assert.ok(!fs.existsSync(tempDir), 'Temp directory should be removed');
   });

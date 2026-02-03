@@ -18,12 +18,17 @@ const { MerkleTree } = require('../../.claude/lib/code-indexing/merkle-tree.cjs'
 
 const FIXTURES_DIR = path.join(__dirname, '..', 'fixtures', 'code-indexing');
 const INCREMENTAL_TEST_DIR = path.join(FIXTURES_DIR, 'incremental-test');
+const LANCEDB_DIR = path.join(INCREMENTAL_TEST_DIR, 'lancedb-test');
+const TABLE_NAME = `code_index_test_${process.pid}`;
 
 describe('Incremental indexing', () => {
   let projectRoot;
   let manager;
 
   before(async () => {
+    process.env.LANCEDB_EMBEDDING_MODE = 'test';
+    process.env.LANCEDB_URI = LANCEDB_DIR;
+    process.env.LANCEDB_TABLE_CODE = TABLE_NAME;
     projectRoot = path.join(INCREMENTAL_TEST_DIR, 'sample-project');
     await fs.mkdir(projectRoot, { recursive: true });
     await fs.writeFile(
