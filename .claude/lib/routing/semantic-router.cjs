@@ -22,8 +22,7 @@ function cosineSimilarity(a, b) {
 function loadPrototypes(prototypesPath) {
   if (cachedPrototypes) return cachedPrototypes;
   const resolvedPath =
-    prototypesPath ||
-    path.join(PROJECT_ROOT, '.claude', 'config', 'routing-prototypes.json');
+    prototypesPath || path.join(PROJECT_ROOT, '.claude', 'config', 'routing-prototypes.json');
   try {
     const raw = fs.readFileSync(resolvedPath, 'utf8');
     const parsed = JSON.parse(raw);

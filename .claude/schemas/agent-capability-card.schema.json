@@ -98,6 +98,16 @@
           "items": { "type": "string" },
           "description": "Skills used for this capability",
           "examples": [["tdd", "code-reviewer", "debugging"]]
+        },
+        "examples": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Example user prompts or scenarios (A2A AgentSkill.examples); used for semantic prototype generation and discovery"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Keywords describing this capability (A2A AgentSkill.tags); used for keyword scoring in routing"
         }
       },
       "additionalProperties": false

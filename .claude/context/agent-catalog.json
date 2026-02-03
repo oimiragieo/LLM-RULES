@@ -1,0 +1,1296 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-02-03T23:14:14.935Z",
+  "agents": [
+    {
+      "id": "architect",
+      "name": "architect",
+      "description": "System designer. Makes high-level technical decisions, chooses stacks, and ensures scalability and maintainability. Uses ripgrep for fast codebase analysis.",
+      "version": "1.1.0",
+      "skills": [
+        {
+          "id": "architect",
+          "name": "architect",
+          "description": "System designer. Makes high-level technical decisions, chooses stacks, and ensures scalability and maintainability. Uses ripgrep for fast codebase analysis.",
+          "tags": [
+            "architect",
+            "designer",
+            "architecture-review",
+            "database-architect",
+            "security-architect",
+            "swarm-coordination",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer",
+            "brainstorming",
+            "progressive-disclosure",
+            "task-management-protocol"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "context-compressor",
+      "name": "context-compressor",
+      "description": "Intelligently summarizes and compresses context (files, logs, outputs) to save tokens and prevent poisoning.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "context-compressor",
+          "name": "context-compressor",
+          "description": "Intelligently summarizes and compresses context (files, logs, outputs) to save tokens and prevent poisoning.",
+          "tags": [
+            "context",
+            "compressor",
+            "context-compressor",
+            "verification-before-completion",
+            "task-management-protocol"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "developer",
+      "name": "developer",
+      "description": "TDD-focused implementer. Writes code, runs tests, and refactors. Follows Red-Green-Refactor strictly. Uses ripgrep for fast code discovery.",
+      "version": "1.1.0",
+      "skills": [
+        {
+          "id": "developer",
+          "name": "developer",
+          "description": "TDD-focused implementer. Writes code, runs tests, and refactors. Follows Red-Green-Refactor strictly. Uses ripgrep for fast code discovery.",
+          "tags": [
+            "developer",
+            "implementer",
+            "tests",
+            "refactors",
+            "refactor",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "security-architect",
+            "context-compressor",
+            "github-mcp",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "planner",
+      "name": "planner",
+      "description": "Strategic thinker. Breaks down complex goals into atomic, actionable steps. Use for new features, large refactors, or ambiguous requests.",
+      "version": "1.1.0",
+      "skills": [
+        {
+          "id": "planner",
+          "name": "planner",
+          "description": "Strategic thinker. Breaks down complex goals into atomic, actionable steps. Use for new features, large refactors, or ambiguous requests.",
+          "tags": [
+            "planner",
+            "refactors",
+            "plan-generator",
+            "task-breakdown",
+            "sequential-thinking",
+            "context-compressor",
+            "progressive-disclosure"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "pm",
+      "name": "pm",
+      "description": "Product Manager. Manages product backlogs, sprint planning, stakeholder communication, and feature prioritization. Use for roadmap planning, user story creation, stakeholder updates, and agile work...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "pm",
+          "name": "pm",
+          "description": "Product Manager. Manages product backlogs, sprint planning, stakeholder communication, and feature prioritization. Use for roadmap planning, user story creation, stakeholder updates, and agile work...",
+          "tags": [
+            "planning",
+            "linear-pm",
+            "jira-pm",
+            "slack-notifications",
+            "consensus-voting",
+            "plan-generator",
+            "sequential-thinking",
+            "verification-before-completion",
+            "task-management-protocol",
+            "progressive-disclosure"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "qa",
+      "name": "qa",
+      "description": "Quality Assurance specialist. Writes comprehensive test suites, performs regression testing, and validates releases.",
+      "version": "1.1.0",
+      "skills": [
+        {
+          "id": "qa",
+          "name": "qa",
+          "description": "Quality Assurance specialist. Writes comprehensive test suites, performs regression testing, and validates releases.",
+          "tags": [
+            "test",
+            "testing",
+            "validates",
+            "test-generator",
+            "rule-auditor",
+            "verification-before-completion",
+            "checklist-generator",
+            "tdd",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "code-analyzer",
+            "chrome-browser",
+            "task-management-protocol"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "reflection-agent",
+      "name": "reflection-agent",
+      "description": "Quality assessor and learning consolidator using RECE loop (Reflect-Evaluate-Correct-Execute). Scores outputs against rubrics, extracts patterns, and updates memory. Use after task completion for m...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "reflection-agent",
+          "name": "reflection-agent",
+          "description": "Quality assessor and learning consolidator using RECE loop (Reflect-Evaluate-Correct-Execute). Scores outputs against rubrics, extracts patterns, and updates memory. Use after task completion for m...",
+          "tags": [
+            "reflection",
+            "agent",
+            "task-management-protocol",
+            "verification-before-completion",
+            "code-analyzer",
+            "insight-extraction"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "router",
+      "name": "router",
+      "description": "Orchestrates multi-agent system by analyzing requests and spawning appropriate subagents via the Task tool. Enables true parallel execution and isolated agent contexts.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "router",
+          "name": "router",
+          "description": "Orchestrates multi-agent system by analyzing requests and spawning appropriate subagents via the Task tool. Enables true parallel execution and isolated agent contexts.",
+          "tags": [
+            "router",
+            "orchestrates",
+            "agent-creator",
+            "skill-creator",
+            "verification-before-completion",
+            "tool-search",
+            "swarm-coordination",
+            "skill-discovery"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "technical-writer",
+      "name": "technical-writer",
+      "description": "Creates and updates documentation, user guides, API docs, and technical content. Use for any documentation task including updating existing docs.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "technical-writer",
+          "name": "technical-writer",
+          "description": "Creates and updates documentation, user guides, API docs, and technical content. Use for any documentation task including updating existing docs.",
+          "tags": [
+            "technical",
+            "writer",
+            "creates",
+            "doc-generator",
+            "writing-skills",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer",
+            "mkdocs-specific-rules",
+            "task-management-protocol"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "c4-code",
+      "name": "c4-code",
+      "description": "Expert C4 Code-level documentation specialist. Analyzes code directories to create comprehensive C4 code-level documentation including function signatures, arguments, dependencies, and code structu...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "c4-code",
+          "name": "c4-code",
+          "description": "Expert C4 Code-level documentation specialist. Analyzes code directories to create comprehensive C4 code-level documentation including function signatures, arguments, dependencies, and code structu...",
+          "tags": [
+            "code",
+            "analyzes",
+            "create",
+            "task-management-protocol",
+            "doc-generator",
+            "code-analyzer",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "c4-component",
+      "name": "c4-component",
+      "description": "Expert C4 Component-level documentation specialist. Synthesizes C4 Code-level documentation into Component-level architecture, defining component boundaries, interfaces, and relationships. Creates ...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "c4-component",
+          "name": "c4-component",
+          "description": "Expert C4 Component-level documentation specialist. Synthesizes C4 Code-level documentation into Component-level architecture, defining component boundaries, interfaces, and relationships. Creates ...",
+          "tags": [
+            "component",
+            "creates",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "verification-before-completion",
+            "diagram-generator"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "c4-container",
+      "name": "c4-container",
+      "description": "Expert C4 Container-level documentation specialist. Synthesizes Component-level documentation into Container-level architecture, mapping components to deployment units, documenting container interf...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "c4-container",
+          "name": "c4-container",
+          "description": "Expert C4 Container-level documentation specialist. Synthesizes Component-level documentation into Container-level architecture, mapping components to deployment units, documenting container interf...",
+          "tags": [
+            "container",
+            "deployment",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "api-development-expert",
+            "verification-before-completion",
+            "diagram-generator"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "c4-context",
+      "name": "c4-context",
+      "description": "Expert C4 Context-level documentation specialist. Creates high-level system context diagrams, documents personas, user journeys, system features, and external dependencies. Synthesizes container an...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "c4-context",
+          "name": "c4-context",
+          "description": "Expert C4 Context-level documentation specialist. Creates high-level system context diagrams, documents personas, user journeys, system features, and external dependencies. Synthesizes container an...",
+          "tags": [
+            "context",
+            "creates",
+            "create",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "code-reviewer",
+      "name": "code-reviewer",
+      "description": "Senior code reviewer with two-stage review process - spec compliance first, then code quality. Use for code reviews, PR reviews, and implementation verification. Uses ripgrep for fast codebase anal...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "code-reviewer",
+          "name": "code-reviewer",
+          "description": "Senior code reviewer with two-stage review process - spec compliance first, then code quality. Use for code reviews, PR reviews, and implementation verification. Uses ripgrep for fast codebase anal...",
+          "tags": [
+            "code",
+            "reviewer",
+            "review",
+            "reviews",
+            "implementation",
+            "task-management-protocol",
+            "requesting-code-review",
+            "receiving-code-review",
+            "verification-before-completion",
+            "checklist-generator",
+            "code-analyzer",
+            "code-quality-expert",
+            "rule-auditor",
+            "code-style-validator",
+            "ripgrep"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "code-simplifier",
+      "name": "code-simplifier",
+      "description": "Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Focuses on recently modified code unless instructed otherwise. Use for code cleanup, re...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "code-simplifier",
+          "name": "code-simplifier",
+          "description": "Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Focuses on recently modified code unless instructed otherwise. Use for code cleanup, re...",
+          "tags": [
+            "code",
+            "simplifier",
+            "refactoring",
+            "task-management-protocol",
+            "best-practices-guidelines",
+            "code-analyzer",
+            "code-style-validator",
+            "dry-principle",
+            "debugging",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "conductor-validator",
+      "name": "conductor-validator",
+      "description": "Validates Conductor project artifacts for completeness, consistency, and correctness. Use after setup, when diagnosing issues, or before implementation to verify project context.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "conductor-validator",
+          "name": "conductor-validator",
+          "description": "Validates Conductor project artifacts for completeness, consistency, and correctness. Use after setup, when diagnosing issues, or before implementation to verify project context.",
+          "tags": [
+            "conductor",
+            "validator",
+            "validates",
+            "implementation",
+            "task-management-protocol",
+            "context-driven-development",
+            "track-management",
+            "workflow-patterns",
+            "verification-before-completion",
+            "rule-auditor"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "database-architect",
+      "name": "database-architect",
+      "description": "Database schema design, query optimization, migration planning, and data modeling. Use for designing database schemas, optimizing queries, planning migrations, data consistency validation, and data...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "database-architect",
+          "name": "database-architect",
+          "description": "Database schema design, query optimization, migration planning, and data modeling. Use for designing database schemas, optimizing queries, planning migrations, data consistency validation, and data...",
+          "tags": [
+            "database",
+            "architect",
+            "design",
+            "planning",
+            "designing",
+            "task-management-protocol",
+            "database-expert",
+            "text-to-sql",
+            "diagram-generator",
+            "sequential-thinking",
+            "doc-generator",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "devops-troubleshooter",
+      "name": "devops-troubleshooter",
+      "description": "Expert DevOps troubleshooter specializing in rapid incident response, advanced debugging, and modern observability. Masters log analysis, distributed tracing, Kubernetes debugging, performance opti...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "devops-troubleshooter",
+          "name": "devops-troubleshooter",
+          "description": "Expert DevOps troubleshooter specializing in rapid incident response, advanced debugging, and modern observability. Masters log analysis, distributed tracing, Kubernetes debugging, performance opti...",
+          "tags": [
+            "devops",
+            "troubleshooter",
+            "debugging",
+            "task-management-protocol",
+            "context-compressor",
+            "smart-debug",
+            "verification-before-completion",
+            "sentry-monitoring",
+            "recovery",
+            "chrome-browser",
+            "logging-module-usage"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "devops",
+      "name": "devops",
+      "description": "Infrastructure as Code, CI/CD pipeline design, deployment automation, SRE practices, release management, and observability. Use for containerization, orchestration (Kubernetes), cloud architecture ...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "devops",
+          "name": "devops",
+          "description": "Infrastructure as Code, CI/CD pipeline design, deployment automation, SRE practices, release management, and observability. Use for containerization, orchestration (Kubernetes), cloud architecture ...",
+          "tags": [
+            "devops",
+            "design",
+            "deployment",
+            "task-management-protocol",
+            "dependency-analyzer",
+            "git-expert",
+            "github-mcp",
+            "architecture-review",
+            "database-architect",
+            "consensus-voting",
+            "context-compressor",
+            "filesystem",
+            "k8s-manifest-generator",
+            "helm-chart-scaffolding",
+            "gitops-workflow"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "incident-responder",
+      "name": "incident-responder",
+      "description": "Expert SRE incident responder specializing in rapid problem resolution, modern observability, and comprehensive incident management. Masters incident command, blameless post-mortems, error budget m...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "incident-responder",
+          "name": "incident-responder",
+          "description": "Expert SRE incident responder specializing in rapid problem resolution, modern observability, and comprehensive incident management. Masters incident command, blameless post-mortems, error budget m...",
+          "tags": [
+            "incident",
+            "responder",
+            "task-management-protocol",
+            "debugging",
+            "postmortem-writing",
+            "on-call-handoff-patterns",
+            "incident-runbook-templates",
+            "verification-before-completion",
+            "sentry-monitoring",
+            "slack-notifications",
+            "recovery"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "researcher",
+      "name": "researcher",
+      "description": "Research and fact-finding specialist with web access and Exa tools. Use for external information gathering, best practice research, technology comparisons, fact-checking, and pre-creation research ...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "researcher",
+          "name": "researcher",
+          "description": "Research and fact-finding specialist with web access and Exa tools. Use for external information gathering, best practice research, technology comparisons, fact-checking, and pre-creation research ...",
+          "tags": [
+            "researcher",
+            "building",
+            "research-synthesis",
+            "thinking-tools",
+            "doc-generator",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "task-management-protocol",
+            "context-compressor"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "reverse-engineer",
+      "name": "reverse-engineer",
+      "description": "Expert reverse engineer specializing in binary analysis, disassembly, decompilation, and software analysis. Masters IDA Pro, Ghidra, radare2, x64dbg, and modern RE toolchains. Handles executable an...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "reverse-engineer",
+          "name": "reverse-engineer",
+          "description": "Expert reverse engineer specializing in binary analysis, disassembly, decompilation, and software analysis. Masters IDA Pro, Ghidra, radare2, x64dbg, and modern RE toolchains. Handles executable an...",
+          "tags": [
+            "reverse",
+            "engineer",
+            "task-management-protocol",
+            "binary-analysis-patterns",
+            "memory-forensics",
+            "protocol-reverse-engineering",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "security-architect",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "security-architect",
+      "name": "security-architect",
+      "description": "Security architecture, threat modeling, compliance validation, and security assessment. Use for designing authentication systems, evaluating vulnerabilities, security code review, penetration testi...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "security-architect",
+          "name": "security-architect",
+          "description": "Security architecture, threat modeling, compliance validation, and security assessment. Use for designing authentication systems, evaluating vulnerabilities, security code review, penetration testi...",
+          "tags": [
+            "security",
+            "architect",
+            "designing",
+            "review",
+            "testing",
+            "planning",
+            "task-management-protocol",
+            "rule-auditor",
+            "dependency-analyzer",
+            "explaining-rules",
+            "repo-rag",
+            "security-architect",
+            "doc-generator",
+            "verification-before-completion",
+            "auth-security-expert"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "ai-ml-specialist",
+      "name": "ai-ml-specialist",
+      "description": "AI/ML specialist for machine learning model development, deep learning, MLOps, experiment tracking, and model deployment. Use for PyTorch, TensorFlow, Hugging Face, scikit-learn projects, ML pipeli...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "ai-ml-specialist",
+          "name": "ai-ml-specialist",
+          "description": "AI/ML specialist for machine learning model development, deep learning, MLOps, experiment tracking, and model deployment. Use for PyTorch, TensorFlow, Hugging Face, scikit-learn projects, ML pipeli...",
+          "tags": [
+            "specialist",
+            "deployment",
+            "task-management-protocol",
+            "ai-ml-expert",
+            "python-backend-expert",
+            "data-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion",
+            "scientific-skills"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "android-pro",
+      "name": "android-pro",
+      "description": "Native Android development expert for Kotlin, Jetpack Compose, and Android SDK. Use for building native Android applications, Material Design interfaces, and Android platform integrations.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "android",
+          "name": "android",
+          "description": "Native Android development expert for Kotlin, Jetpack Compose, and Android SDK. Use for building native Android applications, Material Design interfaces, and Android platform integrations.",
+          "tags": [
+            "android",
+            "pro",
+            "building",
+            "design",
+            "task-management-protocol",
+            "android-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "data-engineer",
+      "name": "data-engineer",
+      "description": "Data engineering expert for ETL pipelines, data validation, analytics, and data infrastructure. Use for building data pipelines, data quality checks, data transformations, and analytics workflows.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "data-engineer",
+          "name": "data-engineer",
+          "description": "Data engineering expert for ETL pipelines, data validation, analytics, and data infrastructure. Use for building data pipelines, data quality checks, data transformations, and analytics workflows.",
+          "tags": [
+            "data",
+            "engineer",
+            "building",
+            "task-management-protocol",
+            "data-expert",
+            "text-to-sql",
+            "diagram-generator",
+            "tdd",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "expo-mobile-developer",
+      "name": "expo-mobile-developer",
+      "description": "Expo and React Native mobile application development expert for iOS and Android. Use for building cross-platform mobile apps, native integrations, and mobile-first user experiences.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "expo-mobile-developer",
+          "name": "expo-mobile-developer",
+          "description": "Expo and React Native mobile application development expert for iOS and Android. Use for building cross-platform mobile apps, native integrations, and mobile-first user experiences.",
+          "tags": [
+            "expo",
+            "mobile",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "expo-framework-rule",
+            "expo-mobile-app-rule",
+            "react-expert",
+            "tdd",
+            "mobile-ui-development-rule",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "fastapi-pro",
+      "name": "fastapi-pro",
+      "description": "Build high-performance async APIs with FastAPI, SQLAlchemy 2.0, and Pydantic V2. Master microservices, WebSockets, and modern Python async patterns. Use PROACTIVELY for FastAPI development, async o...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "fastapi",
+          "name": "fastapi",
+          "description": "Build high-performance async APIs with FastAPI, SQLAlchemy 2.0, and Pydantic V2. Master microservices, WebSockets, and modern Python async patterns. Use PROACTIVELY for FastAPI development, async o...",
+          "tags": [
+            "fastapi",
+            "pro",
+            "build",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "security-architect",
+            "verification-before-completion",
+            "api-development-expert",
+            "python-backend-expert"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "frontend-pro",
+      "name": "frontend-pro",
+      "description": "Frontend development expert for React, Vue, modern CSS, component libraries, and UI/UX implementation. Use for building user interfaces, component libraries, responsive designs, accessibility, and ...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "frontend",
+          "name": "frontend",
+          "description": "Frontend development expert for React, Vue, modern CSS, component libraries, and UI/UX implementation. Use for building user interfaces, component libraries, responsive designs, accessibility, and ...",
+          "tags": [
+            "frontend",
+            "pro",
+            "implementation",
+            "building",
+            "designs",
+            "task-management-protocol",
+            "frontend-expert",
+            "react-expert",
+            "styling-expert",
+            "ui-components-expert",
+            "tdd",
+            "accessibility",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "gamedev-pro",
+      "name": "gamedev-pro",
+      "description": "Master game development across Unity, Unreal Engine, and Godot with expertise in ECS architecture, game loops, shaders, physics, and cross-platform optimization. Use PROACTIVELY for game mechanics,...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "gamedev",
+          "name": "gamedev",
+          "description": "Master game development across Unity, Unreal Engine, and Godot with expertise in ECS architecture, game loops, shaders, physics, and cross-platform optimization. Use PROACTIVELY for game mechanics,...",
+          "tags": [
+            "gamedev",
+            "pro",
+            "implementation",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "gamedev-expert",
+            "cpp"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "golang-pro",
+      "name": "golang-pro",
+      "description": "Master Go 1.21+ with modern patterns, advanced concurrency, performance optimization, and production-ready microservices. Expert in the latest Go ecosystem including generics, workspaces, and cutti...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "golang",
+          "name": "golang",
+          "description": "Master Go 1.21+ with modern patterns, advanced concurrency, performance optimization, and production-ready microservices. Expert in the latest Go ecosystem including generics, workspaces, and cutti...",
+          "tags": [
+            "golang",
+            "pro",
+            "design",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "go-expert",
+            "api-development-expert"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "graphql-pro",
+      "name": "graphql-pro",
+      "description": "GraphQL API development expert with schema design, resolver patterns, performance optimization, and security. Use for building GraphQL APIs, optimizing queries, implementing subscriptions, and API ...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "graphql",
+          "name": "graphql",
+          "description": "GraphQL API development expert with schema design, resolver patterns, performance optimization, and security. Use for building GraphQL APIs, optimizing queries, implementing subscriptions, and API ...",
+          "tags": [
+            "graphql",
+            "pro",
+            "design",
+            "building",
+            "implementing",
+            "task-management-protocol",
+            "graphql-expert",
+            "api-development-expert",
+            "tdd",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "ios-pro",
+      "name": "ios-pro",
+      "description": "iOS/Swift development expert for iPhone, iPad, watchOS, and visionOS apps. Use for building native iOS applications, SwiftUI interfaces, UIKit components, and Apple platform integrations.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "ios",
+          "name": "ios",
+          "description": "iOS/Swift development expert for iPhone, iPad, watchOS, and visionOS apps. Use for building native iOS applications, SwiftUI interfaces, UIKit components, and Apple platform integrations.",
+          "tags": [
+            "ios",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "ios-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "java-pro",
+      "name": "java-pro",
+      "description": "Java 21+ and Spring Boot 3.x development expert for enterprise backend systems. Use for building Spring Boot microservices, REST APIs, JPA repositories, and Java enterprise applications.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "java",
+          "name": "java",
+          "description": "Java 21+ and Spring Boot 3.x development expert for enterprise backend systems. Use for building Spring Boot microservices, REST APIs, JPA repositories, and Java enterprise applications.",
+          "tags": [
+            "java",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "java-expert",
+            "tdd",
+            "debugging",
+            "doc-generator",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "mobile-ux-reviewer",
+      "name": "mobile-ux-reviewer",
+      "description": "UX/UI expert for reviewing mobile applications on iOS and Android. Use for design critiques, accessibility audits, Human Interface Guidelines compliance, and user experience evaluations.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "mobile-ux-reviewer",
+          "name": "mobile-ux-reviewer",
+          "description": "UX/UI expert for reviewing mobile applications on iOS and Android. Use for design critiques, accessibility audits, Human Interface Guidelines compliance, and user experience evaluations.",
+          "tags": [
+            "mobile",
+            "reviewer",
+            "reviewing",
+            "design",
+            "audits",
+            "task-management-protocol",
+            "diagram-generator",
+            "doc-generator",
+            "verification-before-completion",
+            "accessibility",
+            "visual-and-observational-rules",
+            "mobile-first-design-rules"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "nextjs-pro",
+      "name": "nextjs-pro",
+      "description": "Next.js 14+ App Router expert with React Server Components, Server Actions, and modern full-stack patterns. Use for building Next.js applications with SSR, SSG, ISR, and React Server Components.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "nextjs",
+          "name": "nextjs",
+          "description": "Next.js 14+ App Router expert with React Server Components, Server Actions, and modern full-stack patterns. Use for building Next.js applications with SSR, SSG, ISR, and React Server Components.",
+          "tags": [
+            "nextjs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "nextjs-expert",
+            "react-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "nodejs-pro",
+      "name": "nodejs-pro",
+      "description": "Node.js backend expert for Express, NestJS, and modern async patterns. Use for building REST APIs, GraphQL servers, microservices, WebSocket servers, and backend architecture using Node.js and Type...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "nodejs",
+          "name": "nodejs",
+          "description": "Node.js backend expert for Express, NestJS, and modern async patterns. Use for building REST APIs, GraphQL servers, microservices, WebSocket servers, and backend architecture using Node.js and Type...",
+          "tags": [
+            "nodejs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "nodejs-expert",
+            "tdd",
+            "debugging",
+            "typescript-expert",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "php-pro",
+      "name": "php-pro",
+      "description": "PHP 8.x and Laravel 11+ development expert. Use for building modern PHP applications, REST APIs, Laravel apps, and PHP backend systems with best practices.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "php",
+          "name": "php",
+          "description": "PHP 8.x and Laravel 11+ development expert. Use for building modern PHP applications, REST APIs, Laravel apps, and PHP backend systems with best practices.",
+          "tags": [
+            "php",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "php-expert",
+            "tdd",
+            "debugging",
+            "doc-generator",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "python-pro",
+      "name": "python-pro",
+      "description": "Master Python 3.12+ with modern features, async programming, performance optimization, and production-ready practices. Expert in the latest Python ecosystem including uv, ruff, pydantic, and FastAP...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "python",
+          "name": "python",
+          "description": "Master Python 3.12+ with modern features, async programming, performance optimization, and production-ready practices. Expert in the latest Python ecosystem including uv, ruff, pydantic, and FastAP...",
+          "tags": [
+            "python",
+            "pro",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "python-backend-expert",
+            "api-development-expert"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "rust-pro",
+      "name": "rust-pro",
+      "description": "Master Rust 1.75+ with modern async patterns, advanced type system features, and production-ready systems programming. Expert in the latest Rust ecosystem including Tokio, axum, and cutting-edge cr...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "rust",
+          "name": "rust",
+          "description": "Master Rust 1.75+ with modern async patterns, advanced type system features, and production-ready systems programming. Expert in the latest Rust ecosystem including Tokio, axum, and cutting-edge cr...",
+          "tags": [
+            "rust",
+            "pro",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "build-tools-expert"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "scientific-research-expert",
+      "name": "scientific-research-expert",
+      "description": "Scientific research expert specializing in computational biology, cheminformatics, data analysis, and research methodology. Use for literature reviews, hypothesis generation, genomics/proteomics an...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "scientific-research",
+          "name": "scientific-research",
+          "description": "Scientific research expert specializing in computational biology, cheminformatics, data analysis, and research methodology. Use for literature reviews, hypothesis generation, genomics/proteomics an...",
+          "tags": [
+            "scientific",
+            "research",
+            "expert",
+            "reviews",
+            "task-management-protocol",
+            "scientific-skills",
+            "research-synthesis",
+            "diagram-generator",
+            "doc-generator",
+            "tdd",
+            "verification-before-completion",
+            "arxiv-mcp"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "sveltekit-expert",
+      "name": "sveltekit-expert",
+      "description": "SvelteKit and Svelte 5 runes expert for full-stack web apps. Use for building reactive web applications, SSR/SSG apps, form handling, SEO optimization, and full-stack development with SvelteKit.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "sveltekit",
+          "name": "sveltekit",
+          "description": "SvelteKit and Svelte 5 runes expert for full-stack web apps. Use for building reactive web applications, SSR/SSG apps, form handling, SEO optimization, and full-stack development with SvelteKit.",
+          "tags": [
+            "sveltekit",
+            "expert",
+            "building",
+            "task-management-protocol",
+            "svelte-expert",
+            "form-and-actions-in-sveltekit",
+            "seo-and-meta-tags-in-sveltekit",
+            "tdd",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "tauri-desktop-developer",
+      "name": "tauri-desktop-developer",
+      "description": "Tauri 2.0 desktop application development expert with Rust backend and web frontend integration. Use for building cross-platform desktop apps, native system integrations, and secure desktop applica...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "tauri-desktop-developer",
+          "name": "tauri-desktop-developer",
+          "description": "Tauri 2.0 desktop application development expert with Rust backend and web frontend integration. Use for building cross-platform desktop apps, native system integrations, and secure desktop applica...",
+          "tags": [
+            "tauri",
+            "desktop",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "tauri-native-api-integration",
+            "tauri-security-rules",
+            "tauri-svelte-typescript-general",
+            "tauri-svelte-ui-components",
+            "debugging",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "typescript-pro",
+      "name": "typescript-pro",
+      "description": "Master TypeScript with advanced types, generics, and strict type safety. Handles complex type systems, decorators, and enterprise-grade patterns. Use PROACTIVELY for TypeScript architecture, type i...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "typescript",
+          "name": "typescript",
+          "description": "Master TypeScript with advanced types, generics, and strict type safety. Handles complex type systems, decorators, and enterprise-grade patterns. Use PROACTIVELY for TypeScript architecture, type i...",
+          "tags": [
+            "typescript",
+            "pro",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "typescript-expert",
+            "state-management-expert"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "web3-blockchain-expert",
+      "name": "web3-blockchain-expert",
+      "description": "Web3, blockchain, and smart contract development expert. Specializes in Solidity, DeFi protocols, security auditing, gas optimization, and multi-chain development. Use PROACTIVELY for smart contrac...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "web3-blockchain",
+          "name": "web3-blockchain",
+          "description": "Web3, blockchain, and smart contract development expert. Specializes in Solidity, DeFi protocols, security auditing, gas optimization, and multi-chain development. Use PROACTIVELY for smart contrac...",
+          "tags": [
+            "web3",
+            "blockchain",
+            "expert",
+            "auditing",
+            "review",
+            "task-management-protocol",
+            "web3-expert",
+            "security-architect",
+            "auth-security-expert",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "evolution-orchestrator",
+      "name": "evolution-orchestrator",
+      "description": "Meta-agent that orchestrates the EVOLVE workflow for creating new agents, skills, workflows, hooks, and schemas. Ensures research-first, validation-gated artifact creation.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "evolution-orchestrator",
+          "name": "evolution-orchestrator",
+          "description": "Meta-agent that orchestrates the EVOLVE workflow for creating new agents, skills, workflows, hooks, and schemas. Ensures research-first, validation-gated artifact creation.",
+          "tags": [
+            "evolution",
+            "orchestrator",
+            "orchestrates",
+            "research-synthesis",
+            "agent-creator",
+            "skill-creator",
+            "workflow-creator",
+            "hook-creator",
+            "schema-creator",
+            "template-creator",
+            "task-management-protocol"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "master-orchestrator",
+      "name": "master-orchestrator",
+      "description": "The \"CEO\" agent. Manages the project lifecycle, coordinates subagents, and handles high-level user requests. Never implements code directly.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "master-orchestrator",
+          "name": "master-orchestrator",
+          "description": "The \"CEO\" agent. Manages the project lifecycle, coordinates subagents, and handles high-level user requests. Never implements code directly.",
+          "tags": [
+            "master",
+            "orchestrator",
+            "coordinates",
+            "implements",
+            "plan-generator",
+            "task-management-protocol",
+            "response-rater",
+            "artifact-publisher",
+            "recovery",
+            "verification-before-completion",
+            "swarm-coordination",
+            "dispatching-parallel-agents",
+            "track-management",
+            "subagent-driven-development",
+            "workflow-creator"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "party-orchestrator",
+      "name": "party-orchestrator",
+      "description": "Multi-agent collaboration coordinator for Party Mode. Orchestrates team-based agent interactions with security controls.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "party-orchestrator",
+          "name": "party-orchestrator",
+          "description": "Multi-agent collaboration coordinator for Party Mode. Orchestrates team-based agent interactions with security controls.",
+          "tags": [
+            "party",
+            "orchestrator",
+            "orchestrates",
+            "party-mode",
+            "security-architect",
+            "context-compressor"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "swarm-coordinator",
+      "name": "swarm-coordinator",
+      "description": "Manages multi-agent swarms (Queen/Worker topology). Handles consensus, task distribution, and result aggregation.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "swarm-coordinator",
+          "name": "swarm-coordinator",
+          "description": "Manages multi-agent swarms (Queen/Worker topology). Handles consensus, task distribution, and result aggregation.",
+          "tags": [
+            "swarm",
+            "coordinator",
+            "swarm-coordination",
+            "task-management-protocol",
+            "consensus-voting",
+            "verification-before-completion",
+            "dispatching-parallel-agents",
+            "subagent-driven-development"
+          ],
+          "examples": []
+        }
+      ]
+    }
+  ]
+}

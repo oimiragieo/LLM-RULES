@@ -379,6 +379,20 @@ function extractTriggerPhrases(agentDef, agentId) {
   return [...new Set(phrases)];
 }
 
+function extractExamplesAndTags(agentDef, triggerPhrases, skills) {
+  const examples = Array.isArray(agentDef.examples)
+    ? agentDef.examples
+    : Array.isArray(agentDef.capability_examples)
+      ? agentDef.capability_examples
+      : [];
+  const tagsFromFrontmatter = Array.isArray(agentDef.tags) ? agentDef.tags : [];
+  const tagsFromPhrases = (triggerPhrases || [])
+    .flatMap(phrase => phrase.toLowerCase().split(/\s+/))
+    .filter(word => word.length > 2);
+  const tags = [...new Set([...tagsFromFrontmatter, ...tagsFromPhrases, ...(skills || [])])];
+  return { examples, tags };
+}
+
 /**
  * Infer domain from agent definition
  * @param {Object} agentDef - Agent definition
@@ -507,6 +521,7 @@ function generateCapabilityCard(agentDef, agentId, category, filePath, toolsUnio
 
   // Get skills list
   const skills = agentDef.skills && Array.isArray(agentDef.skills) ? agentDef.skills : [];
+  const { examples, tags } = extractExamplesAndTags(agentDef, triggerPhrases, skills);
 
   // Build display name
   let displayName = agentDef.name;
@@ -535,6 +550,8 @@ function generateCapabilityCard(agentDef, agentId, category, filePath, toolsUnio
       triggerPhrases: triggerPhrases.slice(0, 10),
       requiredTools: tools.slice(0, 18),
       skills: skills.slice(0, 10),
+      examples: examples.slice(0, 10),
+      tags: tags.slice(0, 15),
     },
   ];
 
@@ -831,5 +848,6 @@ module.exports = {
   normalizeModelName,
   inferDomain,
   extractTriggerPhrases,
+  extractExamplesAndTags,
   DOMAIN_MAPPING,
 };

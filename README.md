@@ -46,7 +46,17 @@ Notes:
 
    This fills LanceDB from existing memory files (Markdown + `patterns.json` + `gotchas.json`). After that, semantic search can use the full set.
 
-5. Open the project in Claude Code and run a normal request; routing + hooks + workflows apply automatically.
+5. **Generate routing artifacts** (recommended):
+
+   ```bash
+   pnpm run agents:registry
+   pnpm run routing:prototypes
+   pnpm run agents:catalog
+   ```
+
+   This builds the agent registry, routing prototypes, and agent catalog used by routing and discovery.
+
+6. Open the project in Claude Code and run a normal request; routing + hooks + workflows apply automatically.
 
 **What happens automatically:**
 

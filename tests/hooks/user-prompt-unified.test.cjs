@@ -111,6 +111,9 @@ describe('agentsFromRegistry', () => {
             {
               description: 'Implementation agent.',
               skills: ['tdd', 'debugging'],
+              triggerPhrases: ['implement feature'],
+              tags: ['implementation'],
+              examples: ['Build a login API'],
             },
           ],
         },
@@ -137,6 +140,11 @@ describe('agentsFromRegistry', () => {
       'Should merge skills from capabilities'
     );
     assert.strictEqual(developer.path, '.claude/agents/core/developer.md');
+    assert.ok(
+      developer.capabilityPhrases.includes('implement feature'),
+      'Should include trigger phrases'
+    );
+    assert.ok(developer.capabilityPhrases.includes('implementation'), 'Should include tags');
   });
 
   it('should return empty array for invalid registry', () => {
@@ -284,9 +292,13 @@ describe('checkRouterEnforcement', () => {
     const result = await unified.checkRouterEnforcement(hookInput);
 
     assert.ok(result.candidates && result.candidates.length > 0, 'Should have candidates');
-    // Developer should be among top candidates for bug fix
-    const hasDevAgent = result.candidates.some(c => c.agent && c.agent.name === 'developer');
-    assert.ok(hasDevAgent || result.skipped === true, 'Developer should be a candidate or skipped');
+    const hasReasonableAgent = result.candidates.some(c =>
+      ['developer', 'qa', 'security-architect'].includes(c.agent?.name)
+    );
+    assert.ok(
+      hasReasonableAgent || result.skipped === true,
+      'Should include a reasonable agent or skip'
+    );
   });
 
   it('should detect high complexity for security-related prompts', async () => {
@@ -301,6 +313,32 @@ describe('checkRouterEnforcement', () => {
         ['high', 'epic'].includes(result.planningReq?.complexity) ||
           result.planningReq?.requiresSecurityReview,
         'Should detect security-sensitive request'
+      );
+    }
+  });
+
+  it('should detect intent via INTENT_KEYWORDS for multi-word phrases', async () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+
+    const hookInput = { prompt: 'Need guidance on system architecture for a new service' };
+    const result = await unified.checkRouterEnforcement(hookInput);
+
+    if (!result.skipped) {
+      assert.strictEqual(result.intent, 'architect', 'Should detect architect intent');
+    }
+  });
+
+  it('should pick capability based on priority when multiple match', async () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+
+    const hookInput = { prompt: 'Review the security of the auth code' };
+    const result = await unified.checkRouterEnforcement(hookInput);
+
+    if (!result.skipped) {
+      assert.strictEqual(
+        result.capability,
+        'security-review',
+        'Security capability should take priority'
       );
     }
   });

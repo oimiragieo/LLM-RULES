@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-01T18:22:18.151Z",
+  "generatedAt": "2026-02-03T23:13:56.588Z",
   "metadata": {
     "totalAgents": 49,
     "healthyAgents": 49,
     "degradedAgents": 0,
     "unavailableAgents": 0,
-    "lastHealthCheck": "2026-02-01T18:22:18.151Z",
-    "lastFullScan": "2026-02-01T18:22:18.151Z"
+    "lastHealthCheck": "2026-02-03T23:13:56.588Z",
+    "lastFullScan": "2026-02-03T23:13:56.588Z"
   },
   "agents": {
     "architect": {
@@ -56,6 +56,24 @@
             "verification-before-completion",
             "diagram-generator",
             "project-analyzer"
+          ],
+          "examples": [],
+          "tags": [
+            "architect",
+            "designer",
+            "architecture-review",
+            "database-architect",
+            "security-architect",
+            "swarm-coordination",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer",
+            "brainstorming",
+            "progressive-disclosure",
+            "task-management-protocol"
           ]
         }
       ],
@@ -69,14 +87,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.146Z",
+        "lastUpdate": "2026-02-03T23:13:56.584Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-01T18:22:18.147Z",
-        "updatedAt": "2026-02-01T18:22:18.147Z"
+        "createdAt": "2026-02-03T23:13:56.585Z",
+        "updatedAt": "2026-02-03T23:13:56.585Z"
       }
     },
     "context-compressor": {
@@ -112,6 +130,14 @@
             "context-compressor",
             "verification-before-completion",
             "task-management-protocol"
+          ],
+          "examples": [],
+          "tags": [
+            "context",
+            "compressor",
+            "context-compressor",
+            "verification-before-completion",
+            "task-management-protocol"
           ]
         }
       ],
@@ -125,14 +151,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.147Z",
+        "lastUpdate": "2026-02-03T23:13:56.585Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.147Z",
-        "updatedAt": "2026-02-01T18:22:18.147Z"
+        "createdAt": "2026-02-03T23:13:56.585Z",
+        "updatedAt": "2026-02-03T23:13:56.585Z"
       }
     },
     "developer": {
@@ -181,6 +207,24 @@
             "context-compressor",
             "github-mcp",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "developer",
+            "implementer",
+            "tests",
+            "refactors",
+            "refactor",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "security-architect",
+            "context-compressor",
+            "github-mcp",
+            "verification-before-completion"
           ]
         }
       ],
@@ -194,14 +238,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.585Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.585Z",
+        "updatedAt": "2026-02-03T23:13:56.585Z"
       }
     },
     "planner": {
@@ -242,6 +286,16 @@
             "sequential-thinking",
             "context-compressor",
             "progressive-disclosure"
+          ],
+          "examples": [],
+          "tags": [
+            "planner",
+            "refactors",
+            "plan-generator",
+            "task-breakdown",
+            "sequential-thinking",
+            "context-compressor",
+            "progressive-disclosure"
           ]
         }
       ],
@@ -255,14 +309,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.585Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.585Z",
+        "updatedAt": "2026-02-03T23:13:56.585Z"
       }
     },
     "pm": {
@@ -309,6 +363,19 @@
             "verification-before-completion",
             "task-management-protocol",
             "progressive-disclosure"
+          ],
+          "examples": [],
+          "tags": [
+            "planning",
+            "linear-pm",
+            "jira-pm",
+            "slack-notifications",
+            "consensus-voting",
+            "plan-generator",
+            "sequential-thinking",
+            "verification-before-completion",
+            "task-management-protocol",
+            "progressive-disclosure"
           ]
         }
       ],
@@ -322,14 +389,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.585Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.585Z",
+        "updatedAt": "2026-02-03T23:13:56.585Z"
       }
     },
     "qa": {
@@ -379,6 +446,23 @@
             "code-structural-search",
             "code-analyzer",
             "chrome-browser"
+          ],
+          "examples": [],
+          "tags": [
+            "test",
+            "testing",
+            "validates",
+            "test-generator",
+            "rule-auditor",
+            "verification-before-completion",
+            "checklist-generator",
+            "tdd",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "code-analyzer",
+            "chrome-browser",
+            "task-management-protocol"
           ]
         }
       ],
@@ -392,14 +476,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.585Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.585Z",
+        "updatedAt": "2026-02-03T23:13:56.585Z"
       }
     },
     "reflection-agent": {
@@ -437,6 +521,15 @@
             "verification-before-completion",
             "code-analyzer",
             "insight-extraction"
+          ],
+          "examples": [],
+          "tags": [
+            "reflection",
+            "agent",
+            "task-management-protocol",
+            "verification-before-completion",
+            "code-analyzer",
+            "insight-extraction"
           ]
         }
       ],
@@ -450,14 +543,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.585Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.585Z",
+        "updatedAt": "2026-02-03T23:13:56.585Z"
       }
     },
     "router": {
@@ -498,6 +591,17 @@
             "tool-search",
             "swarm-coordination",
             "skill-discovery"
+          ],
+          "examples": [],
+          "tags": [
+            "router",
+            "orchestrates",
+            "agent-creator",
+            "skill-creator",
+            "verification-before-completion",
+            "tool-search",
+            "swarm-coordination",
+            "skill-discovery"
           ]
         }
       ],
@@ -511,14 +615,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.585Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.585Z",
+        "updatedAt": "2026-02-03T23:13:56.585Z"
       }
     },
     "technical-writer": {
@@ -567,6 +671,19 @@
             "project-analyzer",
             "mkdocs-specific-rules",
             "task-management-protocol"
+          ],
+          "examples": [],
+          "tags": [
+            "technical",
+            "writer",
+            "creates",
+            "doc-generator",
+            "writing-skills",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer",
+            "mkdocs-specific-rules",
+            "task-management-protocol"
           ]
         }
       ],
@@ -580,14 +697,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.586Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.586Z",
+        "updatedAt": "2026-02-03T23:13:56.586Z"
       }
     },
     "c4-code": {
@@ -627,6 +744,16 @@
             "doc-generator",
             "code-analyzer",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "code",
+            "analyzes",
+            "create",
+            "task-management-protocol",
+            "doc-generator",
+            "code-analyzer",
+            "verification-before-completion"
           ]
         }
       ],
@@ -640,14 +767,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.586Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.586Z",
+        "updatedAt": "2026-02-03T23:13:56.586Z"
       }
     },
     "c4-component": {
@@ -688,6 +815,16 @@
             "architecture-review",
             "verification-before-completion",
             "diagram-generator"
+          ],
+          "examples": [],
+          "tags": [
+            "component",
+            "creates",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "verification-before-completion",
+            "diagram-generator"
           ]
         }
       ],
@@ -701,14 +838,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.586Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.586Z",
+        "updatedAt": "2026-02-03T23:13:56.586Z"
       }
     },
     "c4-container": {
@@ -751,6 +888,17 @@
             "api-development-expert",
             "verification-before-completion",
             "diagram-generator"
+          ],
+          "examples": [],
+          "tags": [
+            "container",
+            "deployment",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "api-development-expert",
+            "verification-before-completion",
+            "diagram-generator"
           ]
         }
       ],
@@ -764,14 +912,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.586Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.586Z",
+        "updatedAt": "2026-02-03T23:13:56.586Z"
       }
     },
     "c4-context": {
@@ -815,6 +963,18 @@
             "verification-before-completion",
             "diagram-generator",
             "project-analyzer"
+          ],
+          "examples": [],
+          "tags": [
+            "context",
+            "creates",
+            "create",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer"
           ]
         }
       ],
@@ -828,14 +988,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.586Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.586Z",
+        "updatedAt": "2026-02-03T23:13:56.586Z"
       }
     },
     "code-reviewer": {
@@ -884,6 +1044,24 @@
             "rule-auditor",
             "code-style-validator",
             "ripgrep"
+          ],
+          "examples": [],
+          "tags": [
+            "code",
+            "reviewer",
+            "review",
+            "reviews",
+            "implementation",
+            "task-management-protocol",
+            "requesting-code-review",
+            "receiving-code-review",
+            "verification-before-completion",
+            "checklist-generator",
+            "code-analyzer",
+            "code-quality-expert",
+            "rule-auditor",
+            "code-style-validator",
+            "ripgrep"
           ]
         }
       ],
@@ -897,14 +1075,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.148Z",
+        "lastUpdate": "2026-02-03T23:13:56.586Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.148Z",
-        "updatedAt": "2026-02-01T18:22:18.148Z"
+        "createdAt": "2026-02-03T23:13:56.586Z",
+        "updatedAt": "2026-02-03T23:13:56.586Z"
       }
     },
     "code-simplifier": {
@@ -952,6 +1130,21 @@
             "ripgrep",
             "code-semantic-search",
             "code-structural-search"
+          ],
+          "examples": [],
+          "tags": [
+            "code",
+            "simplifier",
+            "refactoring",
+            "task-management-protocol",
+            "best-practices-guidelines",
+            "code-analyzer",
+            "code-style-validator",
+            "dry-principle",
+            "debugging",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ]
         }
       ],
@@ -965,14 +1158,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.149Z",
+        "lastUpdate": "2026-02-03T23:13:56.586Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.149Z",
-        "updatedAt": "2026-02-01T18:22:18.149Z"
+        "createdAt": "2026-02-03T23:13:56.586Z",
+        "updatedAt": "2026-02-03T23:13:56.586Z"
       }
     },
     "conductor-validator": {
@@ -1017,6 +1210,19 @@
             "workflow-patterns",
             "verification-before-completion",
             "rule-auditor"
+          ],
+          "examples": [],
+          "tags": [
+            "conductor",
+            "validator",
+            "validates",
+            "implementation",
+            "task-management-protocol",
+            "context-driven-development",
+            "track-management",
+            "workflow-patterns",
+            "verification-before-completion",
+            "rule-auditor"
           ]
         }
       ],
@@ -1030,14 +1236,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.149Z",
+        "lastUpdate": "2026-02-03T23:13:56.586Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.149Z",
-        "updatedAt": "2026-02-01T18:22:18.149Z"
+        "createdAt": "2026-02-03T23:13:56.586Z",
+        "updatedAt": "2026-02-03T23:13:56.586Z"
       }
     },
     "database-architect": {
@@ -1083,6 +1289,21 @@
             "sequential-thinking",
             "doc-generator",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "database",
+            "architect",
+            "design",
+            "planning",
+            "designing",
+            "task-management-protocol",
+            "database-expert",
+            "text-to-sql",
+            "diagram-generator",
+            "sequential-thinking",
+            "doc-generator",
+            "verification-before-completion"
           ]
         }
       ],
@@ -1096,14 +1317,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.149Z",
+        "lastUpdate": "2026-02-03T23:13:56.586Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.149Z",
-        "updatedAt": "2026-02-01T18:22:18.149Z"
+        "createdAt": "2026-02-03T23:13:56.586Z",
+        "updatedAt": "2026-02-03T23:13:56.586Z"
       }
     },
     "devops-troubleshooter": {
@@ -1151,6 +1372,20 @@
             "recovery",
             "chrome-browser",
             "logging-module-usage"
+          ],
+          "examples": [],
+          "tags": [
+            "devops",
+            "troubleshooter",
+            "debugging",
+            "task-management-protocol",
+            "context-compressor",
+            "smart-debug",
+            "verification-before-completion",
+            "sentry-monitoring",
+            "recovery",
+            "chrome-browser",
+            "logging-module-usage"
           ]
         }
       ],
@@ -1164,14 +1399,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.149Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.149Z",
-        "updatedAt": "2026-02-01T18:22:18.149Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "devops": {
@@ -1220,6 +1455,24 @@
             "context-compressor",
             "filesystem",
             "k8s-manifest-generator"
+          ],
+          "examples": [],
+          "tags": [
+            "devops",
+            "design",
+            "deployment",
+            "task-management-protocol",
+            "dependency-analyzer",
+            "git-expert",
+            "github-mcp",
+            "architecture-review",
+            "database-architect",
+            "consensus-voting",
+            "context-compressor",
+            "filesystem",
+            "k8s-manifest-generator",
+            "helm-chart-scaffolding",
+            "gitops-workflow"
           ]
         }
       ],
@@ -1233,14 +1486,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.149Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.149Z",
-        "updatedAt": "2026-02-01T18:22:18.149Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "incident-responder": {
@@ -1288,6 +1541,20 @@
             "sentry-monitoring",
             "slack-notifications",
             "recovery"
+          ],
+          "examples": [],
+          "tags": [
+            "incident",
+            "responder",
+            "task-management-protocol",
+            "debugging",
+            "postmortem-writing",
+            "on-call-handoff-patterns",
+            "incident-runbook-templates",
+            "verification-before-completion",
+            "sentry-monitoring",
+            "slack-notifications",
+            "recovery"
           ]
         }
       ],
@@ -1301,14 +1568,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.149Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.149Z",
-        "updatedAt": "2026-02-01T18:22:18.149Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "researcher": {
@@ -1354,6 +1621,19 @@
             "code-structural-search",
             "task-management-protocol",
             "context-compressor"
+          ],
+          "examples": [],
+          "tags": [
+            "researcher",
+            "building",
+            "research-synthesis",
+            "thinking-tools",
+            "doc-generator",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "task-management-protocol",
+            "context-compressor"
           ]
         }
       ],
@@ -1367,14 +1647,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.149Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.149Z",
-        "updatedAt": "2026-02-01T18:22:18.149Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "reverse-engineer": {
@@ -1423,6 +1703,23 @@
             "security-architect",
             "verification-before-completion",
             "ripgrep"
+          ],
+          "examples": [],
+          "tags": [
+            "reverse",
+            "engineer",
+            "task-management-protocol",
+            "binary-analysis-patterns",
+            "memory-forensics",
+            "protocol-reverse-engineering",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "security-architect",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ]
         }
       ],
@@ -1436,14 +1733,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.149Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.149Z",
-        "updatedAt": "2026-02-01T18:22:18.149Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "security-architect": {
@@ -1492,6 +1789,24 @@
             "verification-before-completion",
             "auth-security-expert",
             "authentication-flow-rules"
+          ],
+          "examples": [],
+          "tags": [
+            "security",
+            "architect",
+            "designing",
+            "review",
+            "testing",
+            "planning",
+            "task-management-protocol",
+            "rule-auditor",
+            "dependency-analyzer",
+            "explaining-rules",
+            "repo-rag",
+            "security-architect",
+            "doc-generator",
+            "verification-before-completion",
+            "auth-security-expert"
           ]
         }
       ],
@@ -1505,14 +1820,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "ai-ml-specialist": {
@@ -1561,6 +1876,19 @@
             "debugging",
             "verification-before-completion",
             "scientific-skills"
+          ],
+          "examples": [],
+          "tags": [
+            "specialist",
+            "deployment",
+            "task-management-protocol",
+            "ai-ml-expert",
+            "python-backend-expert",
+            "data-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion",
+            "scientific-skills"
           ]
         }
       ],
@@ -1574,14 +1902,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "android-pro": {
@@ -1626,6 +1954,18 @@
             "tdd",
             "debugging",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "android",
+            "pro",
+            "building",
+            "design",
+            "task-management-protocol",
+            "android-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion"
           ]
         }
       ],
@@ -1639,14 +1979,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "data-engineer": {
@@ -1692,6 +2032,18 @@
             "diagram-generator",
             "tdd",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "data",
+            "engineer",
+            "building",
+            "task-management-protocol",
+            "data-expert",
+            "text-to-sql",
+            "diagram-generator",
+            "tdd",
+            "verification-before-completion"
           ]
         }
       ],
@@ -1705,14 +2057,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "expo-mobile-developer": {
@@ -1760,6 +2112,20 @@
             "tdd",
             "mobile-ui-development-rule",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "expo",
+            "mobile",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "expo-framework-rule",
+            "expo-mobile-app-rule",
+            "react-expert",
+            "tdd",
+            "mobile-ui-development-rule",
+            "verification-before-completion"
           ]
         }
       ],
@@ -1773,14 +2139,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "fastapi-pro": {
@@ -1829,6 +2195,20 @@
             "verification-before-completion",
             "api-development-expert",
             "python-backend-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "fastapi",
+            "pro",
+            "build",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "security-architect",
+            "verification-before-completion",
+            "api-development-expert",
+            "python-backend-expert"
           ]
         }
       ],
@@ -1842,14 +2222,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "frontend-pro": {
@@ -1896,6 +2276,22 @@
             "tdd",
             "accessibility",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "frontend",
+            "pro",
+            "implementation",
+            "building",
+            "designs",
+            "task-management-protocol",
+            "frontend-expert",
+            "react-expert",
+            "styling-expert",
+            "ui-components-expert",
+            "tdd",
+            "accessibility",
+            "verification-before-completion"
           ]
         }
       ],
@@ -1909,14 +2305,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "gamedev-pro": {
@@ -1964,6 +2360,19 @@
             "verification-before-completion",
             "gamedev-expert",
             "cpp"
+          ],
+          "examples": [],
+          "tags": [
+            "gamedev",
+            "pro",
+            "implementation",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "gamedev-expert",
+            "cpp"
           ]
         }
       ],
@@ -1977,14 +2386,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "golang-pro": {
@@ -2032,6 +2441,19 @@
             "verification-before-completion",
             "go-expert",
             "api-development-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "golang",
+            "pro",
+            "design",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "go-expert",
+            "api-development-expert"
           ]
         }
       ],
@@ -2045,14 +2467,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "graphql-pro": {
@@ -2098,6 +2520,19 @@
             "api-development-expert",
             "tdd",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "graphql",
+            "pro",
+            "design",
+            "building",
+            "implementing",
+            "task-management-protocol",
+            "graphql-expert",
+            "api-development-expert",
+            "tdd",
+            "verification-before-completion"
           ]
         }
       ],
@@ -2111,14 +2546,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "ios-pro": {
@@ -2162,6 +2597,17 @@
             "tdd",
             "debugging",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "ios",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "ios-expert",
+            "tdd",
+            "debugging",
+            "verification-before-completion"
           ]
         }
       ],
@@ -2175,14 +2621,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "java-pro": {
@@ -2228,6 +2674,18 @@
             "debugging",
             "doc-generator",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "java",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "java-expert",
+            "tdd",
+            "debugging",
+            "doc-generator",
+            "verification-before-completion"
           ]
         }
       ],
@@ -2241,14 +2699,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "mobile-ux-reviewer": {
@@ -2296,6 +2754,21 @@
             "accessibility",
             "visual-and-observational-rules",
             "mobile-first-design-rules"
+          ],
+          "examples": [],
+          "tags": [
+            "mobile",
+            "reviewer",
+            "reviewing",
+            "design",
+            "audits",
+            "task-management-protocol",
+            "diagram-generator",
+            "doc-generator",
+            "verification-before-completion",
+            "accessibility",
+            "visual-and-observational-rules",
+            "mobile-first-design-rules"
           ]
         }
       ],
@@ -2309,14 +2782,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "nextjs-pro": {
@@ -2362,6 +2835,18 @@
             "tdd",
             "typescript-expert",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "nextjs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "nextjs-expert",
+            "react-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion"
           ]
         }
       ],
@@ -2375,14 +2860,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "nodejs-pro": {
@@ -2428,6 +2913,18 @@
             "debugging",
             "typescript-expert",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "nodejs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "nodejs-expert",
+            "tdd",
+            "debugging",
+            "typescript-expert",
+            "verification-before-completion"
           ]
         }
       ],
@@ -2441,14 +2938,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "php-pro": {
@@ -2494,6 +2991,18 @@
             "debugging",
             "doc-generator",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "php",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "php-expert",
+            "tdd",
+            "debugging",
+            "doc-generator",
+            "verification-before-completion"
           ]
         }
       ],
@@ -2507,14 +3016,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "python-pro": {
@@ -2561,6 +3070,18 @@
             "verification-before-completion",
             "python-backend-expert",
             "api-development-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "python",
+            "pro",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "python-backend-expert",
+            "api-development-expert"
           ]
         }
       ],
@@ -2574,14 +3095,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "rust-pro": {
@@ -2626,6 +3147,17 @@
             "git-expert",
             "verification-before-completion",
             "build-tools-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "rust",
+            "pro",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "build-tools-expert"
           ]
         }
       ],
@@ -2639,14 +3171,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "scientific-research-expert": {
@@ -2695,6 +3227,21 @@
             "tdd",
             "verification-before-completion",
             "arxiv-mcp"
+          ],
+          "examples": [],
+          "tags": [
+            "scientific",
+            "research",
+            "expert",
+            "reviews",
+            "task-management-protocol",
+            "scientific-skills",
+            "research-synthesis",
+            "diagram-generator",
+            "doc-generator",
+            "tdd",
+            "verification-before-completion",
+            "arxiv-mcp"
           ]
         }
       ],
@@ -2708,14 +3255,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "sveltekit-expert": {
@@ -2761,6 +3308,18 @@
             "seo-and-meta-tags-in-sveltekit",
             "tdd",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "sveltekit",
+            "expert",
+            "building",
+            "task-management-protocol",
+            "svelte-expert",
+            "form-and-actions-in-sveltekit",
+            "seo-and-meta-tags-in-sveltekit",
+            "tdd",
+            "verification-before-completion"
           ]
         }
       ],
@@ -2774,14 +3333,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "tauri-desktop-developer": {
@@ -2829,6 +3388,20 @@
             "tauri-svelte-ui-components",
             "debugging",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "tauri",
+            "desktop",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "tauri-native-api-integration",
+            "tauri-security-rules",
+            "tauri-svelte-typescript-general",
+            "tauri-svelte-ui-components",
+            "debugging",
+            "verification-before-completion"
           ]
         }
       ],
@@ -2842,14 +3415,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "typescript-pro": {
@@ -2896,6 +3469,18 @@
             "verification-before-completion",
             "typescript-expert",
             "state-management-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "typescript",
+            "pro",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion",
+            "typescript-expert",
+            "state-management-expert"
           ]
         }
       ],
@@ -2909,14 +3494,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "web3-blockchain-expert": {
@@ -2965,6 +3550,22 @@
             "debugging",
             "git-expert",
             "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "web3",
+            "blockchain",
+            "expert",
+            "auditing",
+            "review",
+            "task-management-protocol",
+            "web3-expert",
+            "security-architect",
+            "auth-security-expert",
+            "tdd",
+            "debugging",
+            "git-expert",
+            "verification-before-completion"
           ]
         }
       ],
@@ -2978,14 +3579,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "evolution-orchestrator": {
@@ -3035,6 +3636,20 @@
             "schema-creator",
             "template-creator",
             "task-management-protocol"
+          ],
+          "examples": [],
+          "tags": [
+            "evolution",
+            "orchestrator",
+            "orchestrates",
+            "research-synthesis",
+            "agent-creator",
+            "skill-creator",
+            "workflow-creator",
+            "hook-creator",
+            "schema-creator",
+            "template-creator",
+            "task-management-protocol"
           ]
         }
       ],
@@ -3048,14 +3663,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "master-orchestrator": {
@@ -3090,6 +3705,7 @@
             "TaskCreate",
             "TaskGet",
             "Skill",
+            "Orchestrator",
             "Write",
             "Edit",
             "Bash"
@@ -3105,6 +3721,24 @@
             "dispatching-parallel-agents",
             "track-management",
             "subagent-driven-development"
+          ],
+          "examples": [],
+          "tags": [
+            "master",
+            "orchestrator",
+            "coordinates",
+            "implements",
+            "plan-generator",
+            "task-management-protocol",
+            "response-rater",
+            "artifact-publisher",
+            "recovery",
+            "verification-before-completion",
+            "swarm-coordination",
+            "dispatching-parallel-agents",
+            "track-management",
+            "subagent-driven-development",
+            "workflow-creator"
           ]
         }
       ],
@@ -3118,14 +3752,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.150Z",
-        "updatedAt": "2026-02-01T18:22:18.150Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "party-orchestrator": {
@@ -3157,7 +3791,16 @@
             "TaskGet",
             "Skill"
           ],
-          "skills": ["party-mode", "security-architect", "context-compressor"]
+          "skills": ["party-mode", "security-architect", "context-compressor"],
+          "examples": [],
+          "tags": [
+            "party",
+            "orchestrator",
+            "orchestrates",
+            "party-mode",
+            "security-architect",
+            "context-compressor"
+          ]
         }
       ],
       "constraints": {
@@ -3170,14 +3813,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.150Z",
+        "lastUpdate": "2026-02-03T23:13:56.587Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.151Z",
-        "updatedAt": "2026-02-01T18:22:18.151Z"
+        "createdAt": "2026-02-03T23:13:56.587Z",
+        "updatedAt": "2026-02-03T23:13:56.587Z"
       }
     },
     "swarm-coordinator": {
@@ -3221,6 +3864,17 @@
             "verification-before-completion",
             "dispatching-parallel-agents",
             "subagent-driven-development"
+          ],
+          "examples": [],
+          "tags": [
+            "swarm",
+            "coordinator",
+            "swarm-coordination",
+            "task-management-protocol",
+            "consensus-voting",
+            "verification-before-completion",
+            "dispatching-parallel-agents",
+            "subagent-driven-development"
           ]
         }
       ],
@@ -3234,14 +3888,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-01T18:22:18.151Z",
+        "lastUpdate": "2026-02-03T23:13:56.588Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-01T18:22:18.151Z",
-        "updatedAt": "2026-02-01T18:22:18.151Z"
+        "createdAt": "2026-02-03T23:13:56.588Z",
+        "updatedAt": "2026-02-03T23:13:56.588Z"
       }
     }
   },

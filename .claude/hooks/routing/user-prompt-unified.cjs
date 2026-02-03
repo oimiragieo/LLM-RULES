@@ -25,7 +25,11 @@ const { spawnSync } = require('child_process');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { parseHookInputSync } = require('../../lib/utils/hook-input.cjs');
 const { loadConfig } = require('../../lib/utils/config-loader.cjs');
-const { ROUTING_TABLE, getPreferredAgent } = require('../../lib/routing/routing-table.cjs');
+const {
+  ROUTING_TABLE,
+  INTENT_KEYWORDS,
+  getPreferredAgent,
+} = require('../../lib/routing/routing-table.cjs');
 const semanticRouter = require('../../lib/routing/semantic-router.cjs');
 const { estimateTokens } = require('../../lib/utils/token-budget-tracker.cjs');
 const {
@@ -95,10 +99,18 @@ function loadCapabilityRouting() {
       parsed && parsed.defaultAgents && typeof parsed.defaultAgents === 'object'
         ? parsed.defaultAgents
         : null;
-    capabilityRoutingCache = { capabilityMap, defaultAgents };
+    const capabilityPriorityOrder =
+      parsed && parsed.capabilityPriority && Array.isArray(parsed.capabilityPriority.order)
+        ? parsed.capabilityPriority.order
+        : [];
+    capabilityRoutingCache = { capabilityMap, defaultAgents, capabilityPriorityOrder };
     return capabilityRoutingCache;
   } catch (_err) {
-    capabilityRoutingCache = { capabilityMap: null, defaultAgents: null };
+    capabilityRoutingCache = {
+      capabilityMap: null,
+      defaultAgents: null,
+      capabilityPriorityOrder: [],
+    };
     return capabilityRoutingCache;
   }
 }
@@ -504,9 +516,25 @@ function agentsFromRegistry(registry) {
     const description =
       capabilities[0]?.description || agent?.description || agent?.metadata?.description || '';
     const skillSet = new Set();
+    const capabilityPhrases = new Set();
     for (const cap of capabilities) {
       if (Array.isArray(cap?.skills)) {
         for (const skill of cap.skills) skillSet.add(skill);
+      }
+      if (Array.isArray(cap?.triggerPhrases)) {
+        for (const phrase of cap.triggerPhrases) {
+          if (phrase) capabilityPhrases.add(String(phrase).toLowerCase());
+        }
+      }
+      if (Array.isArray(cap?.tags)) {
+        for (const tag of cap.tags) {
+          if (tag) capabilityPhrases.add(String(tag).toLowerCase());
+        }
+      }
+      if (Array.isArray(cap?.examples)) {
+        for (const example of cap.examples) {
+          if (example) capabilityPhrases.add(String(example).toLowerCase());
+        }
       }
     }
     agents.push({
@@ -515,6 +543,7 @@ function agentsFromRegistry(registry) {
       skills: [...skillSet],
       priority: agent?.priority || agent?.constraints?.priority || 'medium',
       path: agent?.filePath || agent?.path || '',
+      capabilityPhrases: [...capabilityPhrases].slice(0, 50),
     });
   }
   return agents;
@@ -597,12 +626,24 @@ function scoreAgents(prompt, agents) {
   const promptLower = prompt.toLowerCase();
   const scores = [];
 
-  // Detect intent from routing table
+  // Detect intent from intent keywords first, then routing table
   let detectedIntent = 'general';
-  for (const [keyword, _agent] of Object.entries(ROUTING_TABLE)) {
-    if (promptLower.includes(keyword)) {
-      detectedIntent = keyword;
-      break;
+  for (const [intentKey, phrases] of Object.entries(INTENT_KEYWORDS)) {
+    if (!Array.isArray(phrases)) continue;
+    for (const phrase of phrases) {
+      if (promptLower.includes(String(phrase).toLowerCase())) {
+        detectedIntent = intentKey;
+        break;
+      }
+    }
+    if (detectedIntent !== 'general') break;
+  }
+  if (detectedIntent === 'general') {
+    for (const [keyword, _agent] of Object.entries(ROUTING_TABLE)) {
+      if (promptLower.includes(keyword)) {
+        detectedIntent = keyword;
+        break;
+      }
     }
   }
 
@@ -617,6 +658,19 @@ function scoreAgents(prompt, agents) {
     for (const word of promptWords) {
       if (word.length > 3 && agentDesc.includes(word)) {
         score += 1;
+      }
+    }
+
+    // Match by capability phrases/tags/examples
+    if (Array.isArray(agent.capabilityPhrases) && agent.capabilityPhrases.length > 0) {
+      let capabilityHits = 0;
+      for (const word of promptWords) {
+        if (word.length <= 3) continue;
+        if (agent.capabilityPhrases.some(phrase => phrase.includes(word) || phrase === word)) {
+          score += 1;
+          capabilityHits += 1;
+        }
+        if (capabilityHits >= 5) break;
       }
     }
 
@@ -726,9 +780,30 @@ async function checkRouterEnforcement(hookInput) {
   result.intent = intent;
 
   const capRouting = loadCapabilityRouting();
-  if (capRouting?.capabilityMap && capRouting.capabilityMap[intent]) {
-    result.capability = capRouting.capabilityMap[intent];
-    if (capRouting.defaultAgents) {
+  const promptLower = userPrompt.toLowerCase();
+  const matchingCapabilities = [];
+  if (capRouting?.capabilityMap) {
+    for (const [keyword, capabilityName] of Object.entries(capRouting.capabilityMap)) {
+      if (promptLower.includes(keyword)) {
+        matchingCapabilities.push(capabilityName);
+      }
+    }
+    const intentCapability = capRouting.capabilityMap[intent];
+    if (intentCapability && !matchingCapabilities.includes(intentCapability)) {
+      matchingCapabilities.push(intentCapability);
+    }
+  }
+  if (matchingCapabilities.length > 0) {
+    const order = Array.isArray(capRouting?.capabilityPriorityOrder)
+      ? capRouting.capabilityPriorityOrder
+      : [];
+    matchingCapabilities.sort((a, b) => {
+      const ia = order.indexOf(a);
+      const ib = order.indexOf(b);
+      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    });
+    result.capability = matchingCapabilities[0];
+    if (capRouting?.defaultAgents) {
       result.defaultAgentForCapability = capRouting.defaultAgents[result.capability];
     }
   }

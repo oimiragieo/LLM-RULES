@@ -11,6 +11,8 @@ const {
 } = require('../../lib/routing/routing-table.cjs');
 const { EmbeddingGenerator } = require('../../lib/code-indexing/embedding-generator.cjs');
 
+const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
+
 function collectPhrasesPerAgent() {
   const byAgent = new Map();
   for (const [keyword, agentId] of Object.entries(ROUTING_TABLE)) {
@@ -29,6 +31,28 @@ function collectPhrasesPerAgent() {
   for (const [agentId, list] of byAgent.entries()) {
     byAgent.set(agentId, Array.from(new Set(list)));
   }
+
+  try {
+    if (fs.existsSync(AGENT_REGISTRY_PATH)) {
+      const registry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+      if (registry && registry.agents) {
+        for (const [agentId, list] of byAgent.entries()) {
+          const card = registry.agents[agentId];
+          if (!card || !Array.isArray(card.capabilities)) continue;
+          const extra = [];
+          for (const cap of card.capabilities) {
+            if (Array.isArray(cap.triggerPhrases)) extra.push(...cap.triggerPhrases);
+            if (Array.isArray(cap.examples)) extra.push(...cap.examples);
+            if (Array.isArray(cap.tags)) extra.push(...cap.tags);
+          }
+          byAgent.set(agentId, Array.from(new Set([...list, ...extra])));
+        }
+      }
+    }
+  } catch (_err) {
+    // best-effort; ignore registry load failures
+  }
+
   return byAgent;
 }
 
@@ -78,8 +102,8 @@ async function main() {
   for (const [agentId, phrases] of byAgent.entries()) {
     if (!phrases.length) continue;
     const embeddings = await generator.batchEmbed(phrases);
-    const mean = embeddings[0].map((_, index) =>
-      embeddings.reduce((sum, vec) => sum + vec[index], 0) / embeddings.length
+    const mean = embeddings[0].map(
+      (_, index) => embeddings.reduce((sum, vec) => sum + vec[index], 0) / embeddings.length
     );
     prototypes[agentId] = normalizeL2(mean);
   }

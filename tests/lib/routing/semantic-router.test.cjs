@@ -6,7 +6,9 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { EmbeddingGenerator } = require('../../../.claude/lib/code-indexing/embedding-generator.cjs');
+const {
+  EmbeddingGenerator,
+} = require('../../../.claude/lib/code-indexing/embedding-generator.cjs');
 const semanticRouter = require('../../../.claude/lib/routing/semantic-router.cjs');
 
 const originalEmbedder = process.env.CODE_INDEX_EMBEDDER;

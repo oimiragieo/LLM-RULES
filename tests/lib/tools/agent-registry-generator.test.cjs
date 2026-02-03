@@ -131,6 +131,26 @@ describe('Agent Capability Card Schema', () => {
     });
   });
 
+  describe('Capability Optional Fields', () => {
+    it('should allow examples and tags on capability', () => {
+      const valid = createValidCard({
+        capabilities: [
+          {
+            name: 'testing',
+            domain: 'testing',
+            description: 'Test capability for validation',
+            triggerPhrases: ['test'],
+            requiredTools: ['Read'],
+            skills: [],
+            examples: ['Review this API', 'Design a schema'],
+            tags: ['review', 'schema'],
+          },
+        ],
+      });
+      assert.strictEqual(validate(valid), true, 'Should accept examples and tags');
+    });
+  });
+
   describe('Health Status Validation', () => {
     const validStatuses = ['healthy', 'degraded', 'unavailable'];
 
@@ -676,6 +696,34 @@ describe('Edge Cases', () => {
 
       assert.ok(phrases.includes('implement'), 'Should extract implement');
       assert.ok(phrases.includes('debug'), 'Should extract debug');
+    });
+  });
+
+  describe('Examples and Tags Extraction', () => {
+    it('should extract examples and tags from frontmatter', () => {
+      const generatorPath = path.join(
+        PROJECT_ROOT,
+        '.claude/lib/tools/agent-registry-generator.cjs'
+      );
+      if (!fs.existsSync(generatorPath)) {
+        console.log('Skipping: Generator not yet implemented');
+        return;
+      }
+
+      const { extractExamplesAndTags } = require(generatorPath);
+      const result = extractExamplesAndTags(
+        {
+          examples: ['Review this API', 'Design a schema'],
+          tags: ['review', 'schema'],
+          skills: ['tdd'],
+        },
+        ['code review'],
+        ['tdd']
+      );
+
+      assert.ok(result.examples.includes('Review this API'));
+      assert.ok(result.tags.includes('review'));
+      assert.ok(result.tags.includes('tdd'));
     });
   });
 });
