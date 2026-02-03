@@ -9,17 +9,17 @@
 
 All initial audit items have been remediated. The two remaining documentation discrepancies were fixed in this pass.
 
-| Finding | Status | Notes |
-|--------|--------|--------|
-| **Stale documentation (HOOKS_REFERENCE)** | ✅ Fixed | `security-review-guard.cjs`, `task-create-guard.cjs`, `session-end-recorder.cjs` no longer documented as standalone hooks; consolidated under `routing-guard.cjs` and archived session-end-recorder. |
-| **Staging config not used** | ✅ Verified | `agent-config-reader.cjs` uses `config.staging.yaml` when `AGENT_STUDIO_ENV=staging`. |
-| **Stub/placeholder agents** | ✅ Verified | `production-agent.js` and `worker-agent.cjs` documented as stubs in code and docs. |
-| **Reflection reminder-only** | ✅ Verified | `reflection-step0-guard.cjs` (PreToolUse TaskList) blocks by default; wired in `settings.json`. |
-| **Two memory dashboards** | ✅ Verified | Docs clarify `memory:dashboard` vs `memory:dashboard:budget`. |
-| **router-enforcer not wired** | ✅ Verified | Routing table (`routing-table.cjs`) is single source of truth; router-enforcer and routing-guard consume it; hooks registered. |
-| **saveSession deprecated** | ✅ Verified | `saveSession()` removed; CLI `save-session` exits 1 with deprecation message; MEMORY_SYSTEM.md and callers updated. |
-| **HOOKS_REFERENCE guard/session docs** | ✅ Fixed this pass | Consolidated guard section; session-end-recorder marked archived; SEC-002/003/004 reference routing-guard. |
-| **CLAUDE.md Step 0 wording** | ✅ Fixed this pass | Step 0 now states PreToolUse(TaskList) guard blocks by default; override `REFLECTION_STEP0_ENFORCEMENT=warn` documented. |
+| Finding                                   | Status             | Notes                                                                                                                                                                                                |
+| ----------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Stale documentation (HOOKS_REFERENCE)** | ✅ Fixed           | `security-review-guard.cjs`, `task-create-guard.cjs`, `session-end-recorder.cjs` no longer documented as standalone hooks; consolidated under `routing-guard.cjs` and archived session-end-recorder. |
+| **Staging config not used**               | ✅ Verified        | `agent-config-reader.cjs` uses `config.staging.yaml` when `AGENT_STUDIO_ENV=staging`.                                                                                                                |
+| **Stub/placeholder agents**               | ✅ Verified        | `production-agent.js` and `worker-agent.cjs` documented as stubs in code and docs.                                                                                                                   |
+| **Reflection reminder-only**              | ✅ Verified        | `reflection-step0-guard.cjs` (PreToolUse TaskList) blocks by default; wired in `settings.json`.                                                                                                      |
+| **Two memory dashboards**                 | ✅ Verified        | Docs clarify `memory:dashboard` vs `memory:dashboard:budget`.                                                                                                                                        |
+| **router-enforcer not wired**             | ✅ Verified        | Routing table (`routing-table.cjs`) is single source of truth; router-enforcer and routing-guard consume it; hooks registered.                                                                       |
+| **saveSession deprecated**                | ✅ Verified        | `saveSession()` removed; CLI `save-session` exits 1 with deprecation message; MEMORY_SYSTEM.md and callers updated.                                                                                  |
+| **HOOKS_REFERENCE guard/session docs**    | ✅ Fixed this pass | Consolidated guard section; session-end-recorder marked archived; SEC-002/003/004 reference routing-guard.                                                                                           |
+| **CLAUDE.md Step 0 wording**              | ✅ Fixed this pass | Step 0 now states PreToolUse(TaskList) guard blocks by default; override `REFLECTION_STEP0_ENFORCEMENT=warn` documented.                                                                             |
 
 ---
 
@@ -97,14 +97,14 @@ All initial audit items have been remediated. The two remaining documentation di
 
 Spot-check confirms all later-phase work is in place and original findings remain remediated.
 
-| Phase | Status | Notes |
-|-------|--------|--------|
-| **ContextualMemory read path** | ✅ Verified | `memory-manager.cjs` `loadMemoryForContext` / `loadMemoryForContextAsync` delegate to `ContextualMemory.loadContextSync` / `loadContext`; single read path. |
-| **LanceDB code indexing** | ✅ Verified | `vector-db.cjs` removed; `vector-store.cjs` wraps `MemoryVectorStore` (lancedb-client), table `LANCEDB_TABLE_CODE`/`code_index`; `index-manager.cjs` uses `VectorStore` only. |
-| **Worker runtime** | ✅ Verified | `worker-agent.cjs`: opt-in (WORKER_ENABLED), backoff, no-overlap, SIGINT/SIGTERM shutdown, heartbeat, JSONL metrics, event emit per tick; doc in GETTING_STARTED. |
-| **Event bus for blocking hooks** | ✅ Verified | TOOL_BLOCKED/TOOL_FAILED emitted before exit(2) in safety, routing, evolution, validation, monitoring hooks; only `skill-creation-guard.cjs.deprecated` has no emit. |
-| **Doc refresh** | ✅ Verified | README.md "What You Get" includes worker runtime, LanceDB-only code index, ContextualMemory read path, blocking hooks → event bus; pointer to GETTING_STARTED for worker. |
-| **No regressions** | ✅ Verified | HOOKS_REFERENCE, CLAUDE.md Step 0, agent-config-reader staging, reflection-step0-guard registration, saveSession removal, routing table usage all still correct. |
+| Phase                            | Status      | Notes                                                                                                                                                                         |
+| -------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ContextualMemory read path**   | ✅ Verified | `memory-manager.cjs` `loadMemoryForContext` / `loadMemoryForContextAsync` delegate to `ContextualMemory.loadContextSync` / `loadContext`; single read path.                   |
+| **LanceDB code indexing**        | ✅ Verified | `vector-db.cjs` removed; `vector-store.cjs` wraps `MemoryVectorStore` (lancedb-client), table `LANCEDB_TABLE_CODE`/`code_index`; `index-manager.cjs` uses `VectorStore` only. |
+| **Worker runtime**               | ✅ Verified | `worker-agent.cjs`: opt-in (WORKER_ENABLED), backoff, no-overlap, SIGINT/SIGTERM shutdown, heartbeat, JSONL metrics, event emit per tick; doc in GETTING_STARTED.             |
+| **Event bus for blocking hooks** | ✅ Verified | TOOL_BLOCKED/TOOL_FAILED emitted before exit(2) in safety, routing, evolution, validation, monitoring hooks; only `skill-creation-guard.cjs.deprecated` has no emit.          |
+| **Doc refresh**                  | ✅ Verified | README.md "What You Get" includes worker runtime, LanceDB-only code index, ContextualMemory read path, blocking hooks → event bus; pointer to GETTING_STARTED for worker.     |
+| **No regressions**               | ✅ Verified | HOOKS_REFERENCE, CLAUDE.md Step 0, agent-config-reader staging, reflection-step0-guard registration, saveSession removal, routing table usage all still correct.              |
 
 ---
 
@@ -173,4 +173,3 @@ Spot-check confirms all later-phase work is in place and original findings remai
 ## 6. Conclusion
 
 All initial audit findings and later-phase work are verified: single read path (ContextualMemory), LanceDB-only code index, worker runtime with hardening and observability, event bus coverage for blocking hooks, and doc refresh. No regressions detected. The suggestions in §5 are incremental; the codebase is in good shape for the next focus you choose.
-

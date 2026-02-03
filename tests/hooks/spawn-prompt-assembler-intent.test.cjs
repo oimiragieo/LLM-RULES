@@ -19,13 +19,7 @@ const HOOK_PATH = path.resolve(
 
 function writePreloadScript(tempDir, _capturePath) {
   const projectRoot = path.resolve(__dirname, '..', '..');
-  const intentPath = path.join(
-    projectRoot,
-    '.claude',
-    'lib',
-    'memory',
-    'intent-analyzer.cjs'
-  );
+  const intentPath = path.join(projectRoot, '.claude', 'lib', 'memory', 'intent-analyzer.cjs');
   const memoryManagerPath = path.join(
     projectRoot,
     '.claude',

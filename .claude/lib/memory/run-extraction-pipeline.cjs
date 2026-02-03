@@ -49,9 +49,7 @@ function dedupeCandidates(candidates) {
 async function runExtractionPipeline(projectRoot = PROJECT_ROOT, options = {}) {
   validateProjectRoot(projectRoot);
   const user = options.user || 'default';
-  const maxMtmSessions = Number.isFinite(options.maxMtmSessions)
-    ? options.maxMtmSessions
-    : 3;
+  const maxMtmSessions = Number.isFinite(options.maxMtmSessions) ? options.maxMtmSessions : 3;
   const deduplicate = options.deduplicate !== false;
   const memoryManager = options.memoryManager || require('./memory-manager.cjs');
   const modelClient = options.modelClient;
@@ -62,9 +60,7 @@ async function runExtractionPipeline(projectRoot = PROJECT_ROOT, options = {}) {
   let processedSessions = 0;
 
   for (const session of sessions) {
-    const data = session?._filename
-      ? readSessionFile(projectRoot, session._filename)
-      : session;
+    const data = session?._filename ? readSessionFile(projectRoot, session._filename) : session;
     if (!data) continue;
     processedSessions += 1;
     if (Array.isArray(data.tools_used)) {

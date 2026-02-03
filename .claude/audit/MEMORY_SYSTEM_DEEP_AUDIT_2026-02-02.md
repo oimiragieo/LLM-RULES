@@ -39,6 +39,7 @@ The memory system is architecturally sophisticated but has **critical wiring iss
 **Status:** VERIFIED WORKING - This was a false positive in initial analysis.
 
 **Evidence:**
+
 - `searchMemory()` IS defined at line 1051 of `memory-manager.cjs`
 - `searchMemory` IS exported at line 1079 in the module.exports block
 - `memory-search.cjs` correctly imports and uses it
@@ -85,7 +86,7 @@ function saveSession(insights, _projectRoot = PROJECT_ROOT) {
 // Still exported at line 1068:
 module.exports = {
   // ...
-  saveSession,  // <-- WHY IS THIS STILL HERE?
+  saveSession, // <-- WHY IS THIS STILL HERE?
   // ...
 };
 ```
@@ -93,6 +94,7 @@ module.exports = {
 **Impact:** Any code path that calls `saveSession()` will crash. The CLI `save-session` command is broken.
 
 **Recommendation:** Either:
+
 1. Remove the function entirely from exports
 2. Make it a no-op that logs a deprecation warning and redirects to memory-tiers
 3. Update all documentation to remove references
@@ -126,6 +128,7 @@ this._embeddingStatus = {
 **Evidence:** The code explicitly handles this failure case, indicating it's a known issue.
 
 **Fix Required:**
+
 1. Add `sharp` to package.json dependencies with proper platform handling
 2. Provide fallback embedding strategy (e.g., simple TF-IDF or hash-based)
 3. Surface clear error message to users in the dashboard
@@ -141,6 +144,7 @@ this._embeddingStatus = {
 **Impact:** LTM directory grows unbounded. The documentation says "weekly maintenance runs on SessionEnd" but many environments never emit SessionEnd.
 
 **Evidence from MEMORY_SYSTEM.md:**
+
 > "In headless or rarely-used environments, run `pnpm run memory:weekly` on a schedule (e.g. cron)"
 
 **Fix Required:** Add a fallback mechanism or document the cron requirement more prominently.
@@ -159,6 +163,7 @@ const patternHeader = /^(?:#{1,4}\s+|\s*[-*]\s+)(?:\*\*)?Pattern:?\*?\*?\s*:?\s*
 **Impact:** Many valid patterns/decisions/issues in memory files are not indexed because they don't match the exact format.
 
 **Example of missed content:**
+
 - `### Important Pattern - Use async/await` (no colon after "Pattern")
 - `## Decision: Use SQLite` (works)
 - `## We decided to use SQLite` (missed - no "Decision:" prefix)
@@ -227,6 +232,7 @@ _getEntityQuery() {
 **Issue:** The reflection queue processor only runs on `SessionEnd`. If SessionEnd never fires, reflections accumulate forever.
 
 **From MEMORY_SYSTEM.md:**
+
 > "Reflection queue is processed only when SessionEnd fires."
 
 **Impact:** In long-running sessions or environments without clean session termination, reflection queue grows unbounded.
@@ -252,11 +258,13 @@ const LAST_CHECK_PATH = path.join(RUNTIME_DIR, 'last-memory-health-check.txt');
 ### 10. Inconsistent Project Root Resolution
 
 Multiple files use different methods to find project root:
+
 - `PROJECT_ROOT` from `project-root.cjs` (correct)
 - `process.cwd()` (incorrect in some contexts)
 - `path.resolve(__dirname, '../../../')` (fragile)
 
 **Files affected:**
+
 - `memory-manager.cjs` - uses `PROJECT_ROOT` ✓
 - `memory-tiers.cjs` - uses `PROJECT_ROOT` ✓
 - `init-memory-db.cjs` - uses `path.resolve(__dirname, '../../../')` ⚠️
@@ -276,7 +284,7 @@ if (fs.existsSync(gotchasFile)) {
   try {
     gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
   } catch (_e) {
-    gotchas = [];  // Silent failure
+    gotchas = []; // Silent failure
   }
 }
 ```
@@ -331,6 +339,7 @@ DEFAULT_SIMILARITY_THRESHOLD: 0.4, // 40% word overlap = similar
 ### 15. Unused Imports and Dead Code
 
 **File:** `.claude/lib/memory/memory-manager.cjs`
+
 - `_pruneOldSessions()` function exists but is never called (prefixed with `_`)
 - `getCurrentSessionNumber()` is defined but only used by deprecated `saveSession()`
 
@@ -345,6 +354,7 @@ The entire memory system is JavaScript with JSDoc comments. No `.d.ts` files for
 ### 18. Test Coverage Gaps
 
 No tests found for:
+
 - `cold-storage.cjs` archival flow
 - `semantic-archival.cjs` importance scoring
 - `memory-retention-config.cjs` environment variable parsing
@@ -355,21 +365,21 @@ No tests found for:
 
 ### Hooks Properly Wired (✓)
 
-| Hook | Event | Status |
-|------|-------|--------|
-| `memory-health-check.cjs` | UserPromptSubmit | ✓ Wired |
-| `sync-memory-index.cjs` | PostToolUse (Edit/Write) | ✓ Wired |
-| `format-memory.cjs` | PostToolUse (Edit/Write) | ✓ Wired |
-| `unified-reflection-handler.cjs` | SessionEnd | ✓ Wired |
-| `reflection-queue-processor.cjs` | SessionEnd | ✓ Wired |
+| Hook                             | Event                    | Status  |
+| -------------------------------- | ------------------------ | ------- |
+| `memory-health-check.cjs`        | UserPromptSubmit         | ✓ Wired |
+| `sync-memory-index.cjs`          | PostToolUse (Edit/Write) | ✓ Wired |
+| `format-memory.cjs`              | PostToolUse (Edit/Write) | ✓ Wired |
+| `unified-reflection-handler.cjs` | SessionEnd               | ✓ Wired |
+| `reflection-queue-processor.cjs` | SessionEnd               | ✓ Wired |
 
 ### Components Not Wired (⚠️)
 
-| Component | Expected Trigger | Status |
-|-----------|------------------|--------|
-| `memory-scheduler.cjs` weekly | Cron/manual | ⚠️ No automatic trigger |
-| `cold-storage.cjs` archival | Weekly maintenance | ⚠️ Depends on SessionEnd |
-| `semantic-archival.cjs` | Manual only | ⚠️ No hook integration |
+| Component                     | Expected Trigger   | Status                   |
+| ----------------------------- | ------------------ | ------------------------ |
+| `memory-scheduler.cjs` weekly | Cron/manual        | ⚠️ No automatic trigger  |
+| `cold-storage.cjs` archival   | Weekly maintenance | ⚠️ Depends on SessionEnd |
+| `semantic-archival.cjs`       | Manual only        | ⚠️ No hook integration   |
 
 ---
 
@@ -432,12 +442,12 @@ Manual/Cron
 
 ## APPENDIX B: Issue Summary by Severity
 
-| Severity | Count | Issues |
-|----------|-------|--------|
-| CRITICAL | 4 | #1 saveSession throws, #2 LanceDB deps, #3 Cold storage never runs, #4 Entity regex too narrow |
-| HIGH | 5 | #5 Duplicate sessions, #6 Access tracking per-process, #7 EntityQuery silent fail, #8 Reflection queue unbounded, #9 Health check rate limiting |
-| MEDIUM | 5 | #10 Project root inconsistent, #11 No JSON schema validation, #12 Dimension mismatch UX, #13 Metrics dir creation, #14 Pruner threshold |
-| LOW | 4 | #15 Dead code, #16 Inconsistent logging, #17 No TypeScript, #18 Test gaps |
+| Severity | Count | Issues                                                                                                                                          |
+| -------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| CRITICAL | 4     | #1 saveSession throws, #2 LanceDB deps, #3 Cold storage never runs, #4 Entity regex too narrow                                                  |
+| HIGH     | 5     | #5 Duplicate sessions, #6 Access tracking per-process, #7 EntityQuery silent fail, #8 Reflection queue unbounded, #9 Health check rate limiting |
+| MEDIUM   | 5     | #10 Project root inconsistent, #11 No JSON schema validation, #12 Dimension mismatch UX, #13 Metrics dir creation, #14 Pruner threshold         |
+| LOW      | 4     | #15 Dead code, #16 Inconsistent logging, #17 No TypeScript, #18 Test gaps                                                                       |
 
 **Total Issues: 18** (down from 19 after removing false positive)
 
@@ -445,43 +455,42 @@ Manual/Cron
 
 **End of Audit Report**
 
-
 ---
 
 ## IMPLEMENTATION STATUS REVIEW (2026-02-03)
 
 ### ✅ VERIFIED FIXED - Issues Resolved
 
-| Issue | Status | Evidence |
-|-------|--------|----------|
-| `sharp` dependency | ✅ FIXED | Added to package.json: `"sharp": "^0.34.5"` |
-| Migration script for sessions/ | ✅ FIXED | `migrate-legacy-sessions.cjs` exists with --delete and --dry-run options |
-| Embedding status health check | ✅ FIXED | `getEmbeddingStatus()` in lancedb-client.cjs, surfaced in memory-dashboard.cjs |
+| Issue                           | Status   | Evidence                                                                         |
+| ------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| `sharp` dependency              | ✅ FIXED | Added to package.json: `"sharp": "^0.34.5"`                                      |
+| Migration script for sessions/  | ✅ FIXED | `migrate-legacy-sessions.cjs` exists with --delete and --dry-run options         |
+| Embedding status health check   | ✅ FIXED | `getEmbeddingStatus()` in lancedb-client.cjs, surfaced in memory-dashboard.cjs   |
 | Cron-based maintenance fallback | ✅ FIXED | `user-prompt-unified.cjs` triggers weekly maintenance on week change (line 1215) |
-| Runtime directory creation | ✅ FIXED | `memory-health-check.cjs` creates runtime dir at line 62-64 |
-| Cold storage tests | ✅ FIXED | `tests/lib/memory/cold-storage.test.cjs` exists with archiveOldLTM tests |
-| Windows sharp documentation | ✅ FIXED | README.md and GETTING_STARTED.md document `pnpm rebuild sharp` workaround |
-| Legacy sessions/ removed | ✅ FIXED | Per VERIFICATION_REPORT.md update note |
-| ContextualMemory load path | ✅ FIXED | memory-manager.cjs delegates to ContextualMemory |
-| Vector DB fragmentation | ✅ FIXED | JSON vector-db.cjs deleted, using LanceDB exclusively |
+| Runtime directory creation      | ✅ FIXED | `memory-health-check.cjs` creates runtime dir at line 62-64                      |
+| Cold storage tests              | ✅ FIXED | `tests/lib/memory/cold-storage.test.cjs` exists with archiveOldLTM tests         |
+| Windows sharp documentation     | ✅ FIXED | README.md and GETTING_STARTED.md document `pnpm rebuild sharp` workaround        |
+| Legacy sessions/ removed        | ✅ FIXED | Per VERIFICATION_REPORT.md update note                                           |
+| ContextualMemory load path      | ✅ FIXED | memory-manager.cjs delegates to ContextualMemory                                 |
+| Vector DB fragmentation         | ✅ FIXED | JSON vector-db.cjs deleted, using LanceDB exclusively                            |
 
 ### ⚠️ PARTIALLY FIXED - Needs Enhancement
 
-| Issue | Current State | Recommended Enhancement |
-|-------|---------------|------------------------|
-| `saveSession()` throws | Throws error but still exported | **Remove from exports entirely** - confuses consumers |
-| Entity extraction patterns | Patterns expanded per update note | **Add NLP-based extraction** - regex still misses natural language patterns like "We decided to..." |
-| Project root resolution | `init-memory-db.cjs` uses `__dirname` | **Use PROJECT_ROOT import** - fragile if file moves |
-| JSON schema validation | Schema validation exists in skills | **Apply to gotchas.json/patterns.json** - currently silent failure on malformed JSON |
-| Smart pruner threshold | Still at 0.4 (40%) | **Make configurable via env var** - `MEMORY_SIMILARITY_THRESHOLD` |
+| Issue                      | Current State                         | Recommended Enhancement                                                                             |
+| -------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `saveSession()` throws     | Throws error but still exported       | **Remove from exports entirely** - confuses consumers                                               |
+| Entity extraction patterns | Patterns expanded per update note     | **Add NLP-based extraction** - regex still misses natural language patterns like "We decided to..." |
+| Project root resolution    | `init-memory-db.cjs` uses `__dirname` | **Use PROJECT_ROOT import** - fragile if file moves                                                 |
+| JSON schema validation     | Schema validation exists in skills    | **Apply to gotchas.json/patterns.json** - currently silent failure on malformed JSON                |
+| Smart pruner threshold     | Still at 0.4 (40%)                    | **Make configurable via env var** - `MEMORY_SIMILARITY_THRESHOLD`                                   |
 
 ### ❌ NOT FIXED - Still Pending
 
-| Issue | Impact | Recommended Fix |
-|-------|--------|-----------------|
-| Access tracking per-process | Access counts inflated | **Use file-based timestamp** like health check does |
-| EntityQuery silent failure | Users don't know queries fail | **Log warning and emit event** on DB init failure |
-| Reflection queue unbounded | Memory grows in long sessions | **Add periodic drain** in user-prompt-unified.cjs |
+| Issue                       | Impact                        | Recommended Fix                                     |
+| --------------------------- | ----------------------------- | --------------------------------------------------- |
+| Access tracking per-process | Access counts inflated        | **Use file-based timestamp** like health check does |
+| EntityQuery silent failure  | Users don't know queries fail | **Log warning and emit event** on DB init failure   |
+| Reflection queue unbounded  | Memory grows in long sessions | **Add periodic drain** in user-prompt-unified.cjs   |
 
 ---
 
@@ -490,15 +499,17 @@ Manual/Cron
 ### 1. Remove `saveSession()` from Exports
 
 **Current State:**
+
 ```javascript
 // memory-manager.cjs - still exported
 module.exports = {
-  saveSession,  // <-- THROWS ERROR, WHY EXPORT?
+  saveSession, // <-- THROWS ERROR, WHY EXPORT?
   // ...
 };
 ```
 
 **Recommended Fix:**
+
 ```javascript
 // Remove from exports, keep internal for deprecation message
 module.exports = {
@@ -510,11 +521,13 @@ module.exports = {
 ### 2. Make Smart Pruner Threshold Configurable
 
 **Current State:**
+
 ```javascript
 DEFAULT_SIMILARITY_THRESHOLD: 0.4, // Hardcoded
 ```
 
 **Recommended Fix:**
+
 ```javascript
 DEFAULT_SIMILARITY_THRESHOLD: Number(
   process.env.MEMORY_SIMILARITY_THRESHOLD || 0.4
@@ -526,6 +539,7 @@ DEFAULT_SIMILARITY_THRESHOLD: Number(
 **Current State:** Queue only drains on SessionEnd
 
 **Recommended Fix:** Add to `user-prompt-unified.cjs`:
+
 ```javascript
 // Every 50 prompts, drain reflection queue
 const promptCount = getPromptCount();
@@ -537,6 +551,7 @@ if (promptCount % 50 === 0) {
 ### 4. Fix EntityQuery Silent Failure
 
 **Current State:**
+
 ```javascript
 } catch (_e) {
   this.entityQuery = null;
@@ -545,6 +560,7 @@ if (promptCount % 50 === 0) {
 ```
 
 **Recommended Fix:**
+
 ```javascript
 } catch (e) {
   console.warn('[ContextualMemory] EntityQuery init failed:', e.message);
@@ -557,9 +573,10 @@ if (promptCount % 50 === 0) {
 ### 5. Apply JSON Schema Validation to Memory Files
 
 **Recommended:** Create `.claude/schemas/memory-entry.schema.json`:
+
 ```json
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "array",
   "items": {
     "type": "object",
@@ -579,6 +596,7 @@ if (promptCount % 50 === 0) {
 ## SUMMARY
 
 **Progress Since Initial Audit:**
+
 - 7 issues fully resolved ✅
 - 5 issues partially fixed ⚠️
 - 3 issues still pending ❌
@@ -588,6 +606,7 @@ if (promptCount % 50 === 0) {
 The major blockers (sharp dependency, migration script, maintenance fallback) have been addressed. Remaining issues are quality-of-life improvements rather than critical failures.
 
 **Priority for Next Sprint:**
+
 1. Remove `saveSession()` from exports (5 min fix)
 2. Add EntityQuery failure logging (10 min fix)
 3. Make similarity threshold configurable (5 min fix)

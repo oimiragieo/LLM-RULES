@@ -10,6 +10,17 @@ The Router Enforcement System prevents the Router (Claude) from bypassing the Ro
 
 **Note**: `user-prompt-unified.cjs` performs complexity classification using `routing-table.cjs` on UserPromptSubmit. `router-enforcer.cjs` is an advisory standalone helper and is not registered by default in `settings.json`.
 
+## Semantic Fallback (Optional)
+
+When keyword scoring is weak (`intent === 'general'` or low top score), `user-prompt-unified.cjs` can fall back to a semantic router that compares the prompt embedding against precomputed routing prototypes.
+
+- **Prototype file**: `.claude/config/routing-prototypes.json` (committed in repo; works out of the box after `pnpm install` or `npm install`)
+- **If missing**: `postinstall` runs `.claude/scripts/ensure-routing-prototypes.cjs`, which generates the file automatically so no manual step is required
+- **Regenerate manually**: `pnpm run routing:prototypes`
+- **Disable**: `SEMANTIC_ROUTING=off`
+
+Semantic routing is advisory only and does not change blocking behavior.
+
 ## The Problem
 
 Despite explicit Router protocols in CLAUDE.md and router-decision.md, the Router violates the protocol by:

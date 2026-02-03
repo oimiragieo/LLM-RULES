@@ -27,6 +27,7 @@ const _TEST_EVOLUTION_STATE = path.join(PROJECT_ROOT, '.claude', 'context', 'evo
 
 // Prevent process.exit during tests
 const originalExit = process.exit;
+const originalSemanticRouting = process.env.SEMANTIC_ROUTING;
 let lastExitCode = null; // eslint-disable-line no-unused-vars
 
 beforeEach(() => {
@@ -34,10 +35,16 @@ beforeEach(() => {
   process.exit = code => {
     lastExitCode = code;
   };
+  process.env.SEMANTIC_ROUTING = 'off';
 });
 
 afterEach(() => {
   process.exit = originalExit;
+  if (originalSemanticRouting === undefined) {
+    delete process.env.SEMANTIC_ROUTING;
+  } else {
+    process.env.SEMANTIC_ROUTING = originalSemanticRouting;
+  }
 });
 
 // =============================================================================
@@ -252,29 +259,29 @@ describe('checkRouterModeReset', () => {
 // =============================================================================
 
 describe('checkRouterEnforcement', () => {
-  it('should skip for very short prompts', () => {
+  it('should skip for very short prompts', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
 
     const hookInput = { prompt: 'hi' };
-    const result = unified.checkRouterEnforcement(hookInput);
+    const result = await unified.checkRouterEnforcement(hookInput);
 
     assert.strictEqual(result.skipped, true, 'Should skip for short prompts');
   });
 
-  it('should skip for slash commands', () => {
+  it('should skip for slash commands', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
 
     const hookInput = { prompt: '/commit -m "test"' };
-    const result = unified.checkRouterEnforcement(hookInput);
+    const result = await unified.checkRouterEnforcement(hookInput);
 
     assert.strictEqual(result.skipped, true, 'Should skip for slash commands');
   });
 
-  it('should detect developer intent for bug fix prompts', () => {
+  it('should detect developer intent for bug fix prompts', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
 
     const hookInput = { prompt: 'Fix the login bug in the authentication module' };
-    const result = unified.checkRouterEnforcement(hookInput);
+    const result = await unified.checkRouterEnforcement(hookInput);
 
     assert.ok(result.candidates && result.candidates.length > 0, 'Should have candidates');
     // Developer should be among top candidates for bug fix
@@ -282,11 +289,11 @@ describe('checkRouterEnforcement', () => {
     assert.ok(hasDevAgent || result.skipped === true, 'Developer should be a candidate or skipped');
   });
 
-  it('should detect high complexity for security-related prompts', () => {
+  it('should detect high complexity for security-related prompts', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
 
     const hookInput = { prompt: 'Add OAuth2 authentication to the API' };
-    const result = unified.checkRouterEnforcement(hookInput);
+    const result = await unified.checkRouterEnforcement(hookInput);
 
     // Security-related prompts should trigger high complexity
     if (!result.skipped) {
@@ -430,11 +437,11 @@ describe('checkMemoryHealth', () => {
 // =============================================================================
 
 describe('runAllChecks', () => {
-  it('should run all checks and return combined result', () => {
+  it('should run all checks and return combined result', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
 
     const hookInput = { prompt: 'Fix the login bug in the app' };
-    const result = unified.runAllChecks(hookInput, PROJECT_ROOT);
+    const result = await unified.runAllChecks(hookInput, PROJECT_ROOT);
 
     // Should have all check results
     assert.ok(result.routerModeReset !== undefined, 'Should have routerModeReset result');
@@ -444,20 +451,20 @@ describe('runAllChecks', () => {
     assert.ok(result.memoryHealth !== undefined, 'Should have memoryHealth result');
   });
 
-  it('should handle null/empty input gracefully', () => {
+  it('should handle null/empty input gracefully', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
 
-    const result = unified.runAllChecks(null, PROJECT_ROOT);
+    const result = await unified.runAllChecks(null, PROJECT_ROOT);
 
     // Should not throw, should return results
     assert.ok(result !== undefined, 'Should return result for null input');
   });
 
-  it('should always allow (exit 0) as all checks are advisory', () => {
+  it('should always allow (exit 0) as all checks are advisory', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
 
     const hookInput = { prompt: 'Test prompt' };
-    const result = unified.runAllChecks(hookInput, PROJECT_ROOT);
+    const result = await unified.runAllChecks(hookInput, PROJECT_ROOT);
 
     // The unified hook should never block (all original hooks exit 0)
     assert.strictEqual(result.exitCode, 0, 'Should always exit 0 (advisory mode)');
@@ -469,11 +476,11 @@ describe('runAllChecks', () => {
 // =============================================================================
 
 describe('backward compatibility', () => {
-  it('should produce router analysis output for valid prompts', () => {
+  it('should produce router analysis output for valid prompts', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
 
     const hookInput = { prompt: 'Implement a new feature for user registration with OAuth' };
-    const result = unified.runAllChecks(hookInput, PROJECT_ROOT);
+    const result = await unified.runAllChecks(hookInput, PROJECT_ROOT);
 
     // Router enforcement should produce analysis
     const enforcement = result.routerEnforcement;
@@ -693,7 +700,7 @@ describe('performance optimizations', () => {
 // =============================================================================
 
 describe('STM writes (UserPromptSubmit)', () => {
-  it('should write STM session_current.json (best-effort)', () => {
+  it('should write STM session_current.json (best-effort)', async () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
     const os = require('os');
     const path = require('path');
@@ -702,7 +709,7 @@ describe('STM writes (UserPromptSubmit)', () => {
     const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-studio-stm-'));
 
     try {
-      const result = unified.runAllChecks(
+      const result = await unified.runAllChecks(
         { prompt: 'Hello STM', session_id: 'test-session-stm' },
         tmpRoot
       );

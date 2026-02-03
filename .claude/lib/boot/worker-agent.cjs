@@ -143,7 +143,7 @@ async function canProceedIndexing() {
     const stats = await fs.stat(lockFile);
     const lockAge = Date.now() - stats.mtimeMs;
     if (lockAge > LOCK_TIMEOUT_MS) {
-      await fs.unlink(lockFile).catch(() => { });
+      await fs.unlink(lockFile).catch(() => {});
       return true;
     }
     return false;
@@ -164,7 +164,7 @@ async function createLock() {
 }
 
 async function removeLock() {
-  await fs.unlink(lockFile).catch(() => { });
+  await fs.unlink(lockFile).catch(() => {});
 }
 
 async function runIndexTask() {
@@ -260,27 +260,27 @@ async function runTick() {
     tasks: {
       maintenance: tasks.maintenance
         ? {
-          ok: tasks.maintenance.ok,
-          durationMs: tasks.maintenance.durationMs,
-          skipped: tasks.maintenance.skipped,
-          reason: tasks.maintenance.reason,
-        }
+            ok: tasks.maintenance.ok,
+            durationMs: tasks.maintenance.durationMs,
+            skipped: tasks.maintenance.skipped,
+            reason: tasks.maintenance.reason,
+          }
         : null,
       index: tasks.index
         ? {
-          ok: tasks.index.ok,
-          durationMs: tasks.index.durationMs,
-          skipped: tasks.index.skipped,
-          reason: tasks.index.reason,
-        }
+            ok: tasks.index.ok,
+            durationMs: tasks.index.durationMs,
+            skipped: tasks.index.skipped,
+            reason: tasks.index.reason,
+          }
         : null,
       reflection: tasks.reflection
         ? {
-          ok: tasks.reflection.ok,
-          durationMs: tasks.reflection.durationMs,
-          skipped: tasks.reflection.skipped,
-          reason: tasks.reflection.reason,
-        }
+            ok: tasks.reflection.ok,
+            durationMs: tasks.reflection.durationMs,
+            skipped: tasks.reflection.skipped,
+            reason: tasks.reflection.reason,
+          }
         : null,
     },
   };
@@ -416,5 +416,5 @@ if (require.main === module) {
 
 module.exports = {
   start,
-  stop
+  stop,
 };

@@ -39,10 +39,7 @@ test('extractMemoriesFromSession parses JSON and strips fences', async () => {
     generateText: async () =>
       '```json\n{"memories":[{"category":"profile","abstract":"User","overview":"O","content":"C"}]}\n```',
   };
-  const result = await extractMemoriesFromSession(
-    { summary: 'Session summary' },
-    { modelClient }
-  );
+  const result = await extractMemoriesFromSession({ summary: 'Session summary' }, { modelClient });
   assert.strictEqual(result.length, 1);
   assert.strictEqual(result[0].category, 'profile');
 });
@@ -51,9 +48,6 @@ test('extractMemoriesFromSession returns empty on bad JSON', async () => {
   const modelClient = {
     generateText: async () => 'not json',
   };
-  const result = await extractMemoriesFromSession(
-    { summary: 'Session summary' },
-    { modelClient }
-  );
+  const result = await extractMemoriesFromSession({ summary: 'Session summary' }, { modelClient });
   assert.strictEqual(result.length, 0);
 });

@@ -34,7 +34,10 @@ function buildSessionContext(sessionData) {
   if (Array.isArray(sessionData.patterns_found) && sessionData.patterns_found.length > 0) {
     parts.push(`Patterns:\n- ${sessionData.patterns_found.join('\n- ')}`);
   }
-  if (Array.isArray(sessionData.gotchas_encountered) && sessionData.gotchas_encountered.length > 0) {
+  if (
+    Array.isArray(sessionData.gotchas_encountered) &&
+    sessionData.gotchas_encountered.length > 0
+  ) {
     parts.push(`Gotchas:\n- ${sessionData.gotchas_encountered.join('\n- ')}`);
   }
   if (Array.isArray(sessionData.tasks_completed) && sessionData.tasks_completed.length > 0) {
@@ -57,7 +60,9 @@ function resolveSummaryPath({ mtmPath, projectRoot, sessionId }) {
 
   const safeRoot = projectRoot || PROJECT_ROOT;
   const memoryDir = path.join(safeRoot, '.claude', 'context', 'memory', 'mtm');
-  const filename = sessionId ? `session_${sessionId}.summary.md` : `session_${Date.now()}.summary.md`;
+  const filename = sessionId
+    ? `session_${sessionId}.summary.md`
+    : `session_${Date.now()}.summary.md`;
   return path.join(memoryDir, filename);
 }
 

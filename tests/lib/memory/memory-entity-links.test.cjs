@@ -30,14 +30,10 @@ test('linkMemoryToTools creates memory and skill entities with relationships', (
       .prepare("SELECT COUNT(*) as count FROM entities WHERE type = 'skill'")
       .get();
     const relFromMemory = db
-      .prepare(
-        "SELECT COUNT(*) as count FROM entity_relationships WHERE from_entity_id = ?"
-      )
+      .prepare('SELECT COUNT(*) as count FROM entity_relationships WHERE from_entity_id = ?')
       .get(memoryId);
     const relFromSkill = db
-      .prepare(
-        "SELECT COUNT(*) as count FROM entity_relationships WHERE from_entity_id = ?"
-      )
+      .prepare('SELECT COUNT(*) as count FROM entity_relationships WHERE from_entity_id = ?')
       .get('skill:skill-one');
 
     db.close();

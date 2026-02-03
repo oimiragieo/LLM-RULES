@@ -3,9 +3,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
-const {
-  appendSemanticMatches,
-} = require('../../.claude/hooks/routing/spawn-prompt-assembler.cjs');
+const { appendSemanticMatches } = require('../../.claude/hooks/routing/spawn-prompt-assembler.cjs');
 
 test('appendSemanticMatches prefers abstract over content', () => {
   const prompt = 'Base prompt';

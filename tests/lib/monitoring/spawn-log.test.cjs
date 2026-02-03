@@ -6,7 +6,16 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 
 function getProjectRoot() {
-  const rootPath = path.join(__dirname, '..', '..', '..', '.claude', 'lib', 'utils', 'project-root.cjs');
+  const rootPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '.claude',
+    'lib',
+    'utils',
+    'project-root.cjs'
+  );
   return require(rootPath).PROJECT_ROOT;
 }
 
@@ -43,10 +52,7 @@ test('spawn-log appends entries and trims to max lines', () => {
     logSpawnEnd({ taskId: 'task-1', success: true });
     logMemoryFailure({ taskId: 'task-1', error: 'boom' });
 
-    const lines = fs
-      .readFileSync(logPath, 'utf8')
-      .split('\n')
-      .filter(Boolean);
+    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
     assert.equal(lines.length, 2);
   } finally {
     if (fs.existsSync(logPath)) {

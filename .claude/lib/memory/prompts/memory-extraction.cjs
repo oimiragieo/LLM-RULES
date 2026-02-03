@@ -195,7 +195,7 @@ function buildTemplate({ summary, recentMessages, user, feedback }) {
     'Notes:',
     '- Only extract truly valuable personalized information',
     '- If nothing worth recording, return {"memories": []}',
-    '- Preferences should be aggregated by topic, similar preferences should be merged into one memory',
+    '- Preferences should be aggregated by topic, similar preferences should be merged into one memory'
   );
 
   return lines.join('\n');

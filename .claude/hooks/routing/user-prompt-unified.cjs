@@ -26,6 +26,7 @@ const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { parseHookInputSync } = require('../../lib/utils/hook-input.cjs');
 const { loadConfig } = require('../../lib/utils/config-loader.cjs');
 const { ROUTING_TABLE, getPreferredAgent } = require('../../lib/routing/routing-table.cjs');
+const semanticRouter = require('../../lib/routing/semantic-router.cjs');
 const { estimateTokens } = require('../../lib/utils/token-budget-tracker.cjs');
 const {
   checkCompressionNeeded,
@@ -67,11 +68,40 @@ const AUTO_COMPRESSION_STATE_PATH = path.join(
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const USER_PROMPT_RESULTS_PATH = path.join(RUNTIME_DIR, 'user-prompt-results.jsonl');
 const USER_PROMPT_RESULTS_LOG_ENABLED = process.env.USER_PROMPT_RESULTS_LOG !== 'off';
+const CAPABILITY_ROUTING_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'config',
+  'capability-routing.json'
+);
 
 // Agent cache (shared across calls within same process)
 let agentCache = null;
 let agentCacheTime = 0;
 const AGENT_CACHE_TTL = 300000; // 5 minutes
+
+let capabilityRoutingCache = null;
+
+function loadCapabilityRouting() {
+  if (capabilityRoutingCache) return capabilityRoutingCache;
+  try {
+    const raw = fs.readFileSync(CAPABILITY_ROUTING_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    const capabilityMap =
+      parsed && parsed.capabilityMap && typeof parsed.capabilityMap === 'object'
+        ? parsed.capabilityMap
+        : null;
+    const defaultAgents =
+      parsed && parsed.defaultAgents && typeof parsed.defaultAgents === 'object'
+        ? parsed.defaultAgents
+        : null;
+    capabilityRoutingCache = { capabilityMap, defaultAgents };
+    return capabilityRoutingCache;
+  } catch (_err) {
+    capabilityRoutingCache = { capabilityMap: null, defaultAgents: null };
+    return capabilityRoutingCache;
+  }
+}
 
 // =============================================================================
 // Check 1: Router Mode Reset (from router-mode-reset.cjs)
@@ -618,6 +648,12 @@ function recordUserPromptResult(result) {
       candidates: (result?.routerEnforcement?.candidates || [])
         .map(candidate => candidate?.agent?.name)
         .filter(Boolean),
+      semanticCandidates: (result?.routerEnforcement?.semanticCandidates || []).map(candidate => ({
+        agent: candidate?.agent,
+        score: candidate?.score,
+      })),
+      capability: result?.routerEnforcement?.capability,
+      defaultAgentForCapability: result?.routerEnforcement?.defaultAgentForCapability,
       tokenMonitoring: result?.tokenMonitoring
         ? {
             enabled: result.tokenMonitoring.enabled,
@@ -655,7 +691,7 @@ function recordUserPromptResult(result) {
  * @param {Object} hookInput - Parsed hook input
  * @returns {Object} Result with skipped, candidates, planningReq
  */
-function checkRouterEnforcement(hookInput) {
+async function checkRouterEnforcement(hookInput) {
   const result = { skipped: false, candidates: [], planningReq: null, intent: 'general' };
 
   const userPrompt = hookInput?.prompt || hookInput?.message || '';
@@ -688,6 +724,43 @@ function checkRouterEnforcement(hookInput) {
   result.candidates = candidates;
   result.planningReq = planningReq;
   result.intent = intent;
+
+  const capRouting = loadCapabilityRouting();
+  if (capRouting?.capabilityMap && capRouting.capabilityMap[intent]) {
+    result.capability = capRouting.capabilityMap[intent];
+    if (capRouting.defaultAgents) {
+      result.defaultAgentForCapability = capRouting.defaultAgents[result.capability];
+    }
+  }
+
+  const topScore = candidates.length > 0 ? candidates[0].score : 0;
+  const semanticDisabled = process.env.SEMANTIC_ROUTING === 'off';
+  if (!semanticDisabled && (intent === 'general' || topScore <= 2)) {
+    const semanticCandidates = await semanticRouter.predict(userPrompt, {
+      topK: 5,
+      minScore: 0.25,
+    });
+    if (semanticCandidates.length > 0) {
+      result.semanticCandidates = semanticCandidates;
+      const semanticTop = semanticCandidates[0];
+      if (semanticTop.score > 0.5) {
+        const semanticAgent = agents.find(agent => agent.name === semanticTop.agent);
+        if (semanticAgent) {
+          result.candidates.unshift({
+            agent: semanticAgent,
+            score: semanticTop.score,
+            intent: 'semantic',
+            source: 'semantic',
+          });
+        }
+      }
+      console.log(
+        `[user-prompt-unified] Semantic fallback: ${semanticCandidates
+          .map(candidate => `${candidate.agent} (${candidate.score.toFixed(2)})`)
+          .join(', ')}`
+      );
+    }
+  }
 
   // Output routing info if clear recommendation
   if (candidates.length > 0 && candidates[0].score > 2) {
@@ -1107,7 +1180,7 @@ function checkMemoryHealth(hookInput, projectRoot = PROJECT_ROOT) {
  * @param {string} projectRoot - Project root path
  * @returns {Object} Combined results from all checks
  */
-function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
+async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
   const input = hookInput || {};
 
   // Core Fundamentals: Write STM on every UserPromptSubmit (best-effort).
@@ -1280,7 +1353,7 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
 
   const result = {
     routerModeReset: checkRouterModeReset(input),
-    routerEnforcement: checkRouterEnforcement(input),
+    routerEnforcement: await checkRouterEnforcement(input),
     tokenMonitoring: checkTokenMonitoring(input),
     memoryReminder: checkMemoryReminder(input, projectRoot),
     evolutionTrigger: checkEvolutionTrigger(input),
@@ -1305,11 +1378,11 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
 // Main Execution
 // =============================================================================
 
-function main() {
+async function main() {
   const startTime = Date.now();
   try {
     const hookInput = parseHookInputSync();
-    runAllChecks(hookInput, PROJECT_ROOT);
+    await runAllChecks(hookInput, PROJECT_ROOT);
     try {
       eventBus.emit(EventTypes.TOOL_COMPLETED, {
         type: EventTypes.TOOL_COMPLETED,
@@ -1340,7 +1413,9 @@ function main() {
 }
 
 if (require.main === module) {
-  main();
+  main().catch(() => {
+    process.exit(0);
+  });
 }
 
 // =============================================================================

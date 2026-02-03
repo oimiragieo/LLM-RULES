@@ -13,6 +13,7 @@ Concrete steps for the remaining optional/doc/maintenance items. None are requir
 **Where:** In or near the Router Protocol (e.g. after step 4 “Check: scan `.claude/agents/`” or in a short “Agent discovery” bullet). Current line 35 says “Check: scan `.claude/agents/` for best agent match.”
 
 **Change:**
+
 - Add one line after that step (or in a small subsection):  
   **Agent discovery:** Registry-first (`agent-registry.json`); filesystem fallback if registry missing. CI enforces registry freshness on PRs (see GETTING_STARTED).
 
@@ -29,6 +30,7 @@ Concrete steps for the remaining optional/doc/maintenance items. None are requir
 **Where:** New subsection, e.g. after “Worker Runtime (Optional)” or before “Environment Configuration.” Title: **Observability** (or **Monitoring & observability**).
 
 **Content (short):**
+
 - **Worker:** Heartbeat at `.claude/context/runtime/worker-heartbeat.json` (`lastTick`, `status`, tasks). Metrics: `.claude/context/metrics/worker.jsonl` (one JSONL line per tick). Summary CLI: `pnpm worker:summary`.
 - **Event bus:** Blocking hooks emit `TOOL_BLOCKED` / `TOOL_FAILED` before exit; worker emits `TOOL_COMPLETED` / `TOOL_FAILED` per tick. Subscribe via `.claude/lib/events/event-bus.cjs` and `EventTypes` for dashboards or logging.
 
@@ -46,6 +48,7 @@ Concrete steps for the remaining optional/doc/maintenance items. None are requir
 `NOTE: memory-manager.saveSession() is now deprecated and throws; do not run this hook in production.`
 
 **Optional “banner” addition:**
+
 - Add a one-line runtime warning at the top of the script (after `'use strict';`), e.g.  
   `console.warn('[session-end-recorder.cjs] DEPRECATED: saveSession() throws; do not run in production. Use unified-reflection-handler.cjs.');`  
   so that if someone runs the file directly, they see the warning immediately.
@@ -84,6 +87,7 @@ Or a one-liner that runs a small script under `.claude/tools/` if you prefer not
 **Goal:** Gate releases on a known-good test run.
 
 **What to run:**
+
 - **Option A:** `pnpm test:framework` (if it includes hooks, worker, and critical paths).
 - **Option B:** Full suite, e.g. `pnpm test` (or whatever runs all tests in the repo).
 
@@ -95,10 +99,10 @@ Or a one-liner that runs a small script under `.claude/tools/` if you prefer not
 
 ## Summary
 
-| # | Task                         | File(s)                          | Effort  |
-|---|-----------------------------|----------------------------------|---------|
-| 1 | CLAUDE.md registry + CI     | `.claude/CLAUDE.md`              | 1 line  |
-| 2 | Observability section       | `.claude/docs/GETTING_STARTED.md`| 1 block |
-| 3 | session-end-recorder banner | `.claude/archive/.../session-end-recorder.cjs` | 1 line (optional; JSDoc already present) |
-| 4 | Cold-storage CLI example    | `.claude/docs/MEMORY_SYSTEM.md`  | 3–5 lines |
-| 5 | Release gate (test run)     | Process / checklist               | No code |
+| #   | Task                        | File(s)                                        | Effort                                   |
+| --- | --------------------------- | ---------------------------------------------- | ---------------------------------------- |
+| 1   | CLAUDE.md registry + CI     | `.claude/CLAUDE.md`                            | 1 line                                   |
+| 2   | Observability section       | `.claude/docs/GETTING_STARTED.md`              | 1 block                                  |
+| 3   | session-end-recorder banner | `.claude/archive/.../session-end-recorder.cjs` | 1 line (optional; JSDoc already present) |
+| 4   | Cold-storage CLI example    | `.claude/docs/MEMORY_SYSTEM.md`                | 3–5 lines                                |
+| 5   | Release gate (test run)     | Process / checklist                            | No code                                  |

@@ -22,7 +22,9 @@ function normalizeDecision(decision) {
 }
 
 function normalizeCategory(value) {
-  const normalized = String(value || '').trim().toLowerCase();
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
   if (
     normalized === 'profile' ||
     normalized === 'preferences' ||

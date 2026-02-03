@@ -9,7 +9,9 @@ const {
   normalizeContextType,
   normalizePriority,
 } = require('../../../.claude/lib/memory/intent-analyzer.cjs');
-const { getIntentAnalysisPrompt } = require('../../../.claude/lib/memory/prompts/intent-analysis.cjs');
+const {
+  getIntentAnalysisPrompt,
+} = require('../../../.claude/lib/memory/prompts/intent-analysis.cjs');
 
 test('intent-analysis prompt includes context values', () => {
   const prompt = getIntentAnalysisPrompt('summary', 'recent', 'current', 'memory', 'target');

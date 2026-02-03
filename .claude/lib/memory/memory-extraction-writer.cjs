@@ -71,9 +71,7 @@ function appendToProfileFile(candidate, projectRoot) {
 
   const existing = fs.existsSync(profilePath) ? fs.readFileSync(profilePath, 'utf8') : '';
   const block = buildMemoryMarkdown(candidate).trimEnd();
-  const next = existing
-    ? `${existing.trimEnd()}\n\n---\n\n${block}\n`
-    : `${block}\n`;
+  const next = existing ? `${existing.trimEnd()}\n\n---\n\n${block}\n` : `${block}\n`;
   atomicWriteSync(profilePath, next, 'utf8');
   return profilePath;
 }
@@ -154,9 +152,7 @@ async function writeExtractedMemories(candidates, options = {}) {
   const sessionId = options.sessionId || 'batch';
   const deduplicate = options.deduplicate !== false;
   const indexToLanceDb = options.indexToLanceDb !== false;
-  const sessionToolsUsed = Array.isArray(options.sessionToolsUsed)
-    ? options.sessionToolsUsed
-    : [];
+  const sessionToolsUsed = Array.isArray(options.sessionToolsUsed) ? options.sessionToolsUsed : [];
   const deduplicateFn = options.deduplicateFn || deduplicateCandidate;
   const memoryManager = options.memoryManager || require('./memory-manager.cjs');
   const modelClient = options.modelClient || new ModelClient();
@@ -230,10 +226,7 @@ async function writeExtractedMemories(candidates, options = {}) {
       let filePath;
       if (category === 'profile') {
         filePath = appendToProfileFile(payload, projectRoot);
-      } else if (
-        decisionResult.decision === 'update' ||
-        decisionResult.decision === 'merge'
-      ) {
+      } else if (decisionResult.decision === 'update' || decisionResult.decision === 'merge') {
         const targetPath = resolveTargetFilePath(decisionResult, projectRoot);
         if (targetPath && fs.existsSync(targetPath)) {
           filePath = overwriteMemoryFile(payload, targetPath, projectRoot);

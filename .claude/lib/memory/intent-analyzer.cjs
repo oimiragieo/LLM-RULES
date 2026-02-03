@@ -14,7 +14,9 @@ function stripCodeFences(text) {
 }
 
 function normalizeContextType(value) {
-  const normalized = String(value || '').trim().toLowerCase();
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
   if (normalized === 'skill' || normalized === 'resource' || normalized === 'memory') {
     return normalized;
   }
@@ -22,7 +24,9 @@ function normalizeContextType(value) {
 }
 
 function normalizeCategory(value) {
-  const normalized = String(value || '').trim().toLowerCase();
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
   if (
     normalized === 'profile' ||
     normalized === 'preferences' ||

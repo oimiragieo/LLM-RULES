@@ -29,7 +29,10 @@ function formatRecentMessages(sessionData, maxMessages) {
   if (Array.isArray(sessionData?.patterns_found) && sessionData.patterns_found.length > 0) {
     parts.push(`Patterns: ${sessionData.patterns_found.join('; ')}`);
   }
-  if (Array.isArray(sessionData?.gotchas_encountered) && sessionData.gotchas_encountered.length > 0) {
+  if (
+    Array.isArray(sessionData?.gotchas_encountered) &&
+    sessionData.gotchas_encountered.length > 0
+  ) {
     parts.push(`Gotchas: ${sessionData.gotchas_encountered.join('; ')}`);
   }
 
@@ -37,7 +40,9 @@ function formatRecentMessages(sessionData, maxMessages) {
 }
 
 function scoreSummary(text, query) {
-  const q = String(query || '').trim().toLowerCase();
+  const q = String(query || '')
+    .trim()
+    .toLowerCase();
   if (!q) return 0;
   const haystack = String(text || '').toLowerCase();
   const tokens = q.split(/\s+/).filter(Boolean);

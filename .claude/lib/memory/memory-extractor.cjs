@@ -32,7 +32,10 @@ function buildRecentMessages(sessionData) {
   if (Array.isArray(sessionData.patterns_found) && sessionData.patterns_found.length > 0) {
     parts.push(`Patterns:\n- ${sessionData.patterns_found.join('\n- ')}`);
   }
-  if (Array.isArray(sessionData.gotchas_encountered) && sessionData.gotchas_encountered.length > 0) {
+  if (
+    Array.isArray(sessionData.gotchas_encountered) &&
+    sessionData.gotchas_encountered.length > 0
+  ) {
     parts.push(`Gotchas:\n- ${sessionData.gotchas_encountered.join('\n- ')}`);
   }
   if (Array.isArray(sessionData.tasks_completed) && sessionData.tasks_completed.length > 0) {

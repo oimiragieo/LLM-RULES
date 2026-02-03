@@ -3,7 +3,9 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
-const { getDedupDecisionPrompt } = require('../../../.claude/lib/memory/prompts/dedup-decision.cjs');
+const {
+  getDedupDecisionPrompt,
+} = require('../../../.claude/lib/memory/prompts/dedup-decision.cjs');
 const {
   deduplicateCandidate,
   normalizeDecision,

@@ -74,13 +74,7 @@ test('worker writes heartbeat on WORKER_ONCE', async () => {
 
 test('worker backs off after failure', async () => {
   const projectRoot = await createTempRoot();
-  const metricsPath = path.join(
-    projectRoot,
-    '.claude',
-    'context',
-    'metrics',
-    'worker.jsonl'
-  );
+  const metricsPath = path.join(projectRoot, '.claude', 'context', 'metrics', 'worker.jsonl');
 
   const { child, exit } = spawnWorker({
     WORKER_ENABLED: '1',
@@ -145,4 +139,3 @@ test('worker exits on SIGTERM without hanging', async () => {
 
   assert.notStrictEqual(code, 'timeout', 'worker should exit on SIGTERM');
 });
-

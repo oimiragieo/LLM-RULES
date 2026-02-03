@@ -6,7 +6,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { PROJECT_ROOT } = require('../../../.claude/lib/utils/project-root.cjs');
-const { runExtractionPipeline } = require('../../../.claude/lib/memory/run-extraction-pipeline.cjs');
+const {
+  runExtractionPipeline,
+} = require('../../../.claude/lib/memory/run-extraction-pipeline.cjs');
 const memoryTiers = require('../../../.claude/lib/memory/memory-tiers.cjs');
 
 function createTempProjectRoot() {
@@ -59,7 +61,14 @@ test('runExtractionPipeline writes extracted memories', async () => {
   assert.equal(result.processedSessions, 1);
   assert.equal(result.written, 1);
 
-  const memoriesDir = path.join(projectRoot, '.claude', 'context', 'memory', 'memories', 'patterns');
+  const memoriesDir = path.join(
+    projectRoot,
+    '.claude',
+    'context',
+    'memory',
+    'memories',
+    'patterns'
+  );
   const files = fs.existsSync(memoriesDir) ? fs.readdirSync(memoriesDir) : [];
   assert.equal(files.length, 1);
 
@@ -103,7 +112,9 @@ test('runExtractionPipeline passes tools_used from MTM sessions to writer and li
   if (fs.existsSync(dbPath)) {
     const { DatabaseSync } = require('node:sqlite');
     const db = new DatabaseSync(dbPath);
-    const memoryCount = db.prepare("SELECT COUNT(*) AS c FROM entities WHERE type = 'memory'").get();
+    const memoryCount = db
+      .prepare("SELECT COUNT(*) AS c FROM entities WHERE type = 'memory'")
+      .get();
     const skillCount = db.prepare("SELECT COUNT(*) AS c FROM entities WHERE type = 'skill'").get();
     const relCount = db
       .prepare(
