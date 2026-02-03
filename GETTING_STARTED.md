@@ -91,6 +91,8 @@ your-project/
 
 See `.claude/hooks/README.md` for detailed hook documentation.
 
+**Agent discovery:** Registry-first (`.claude/context/agent-registry.json`) with filesystem fallback if missing; CI enforces registry freshness.
+
 ### Pre-commit security lint (Git)
 
 When you commit, a **Git pre-commit hook** runs a security scanner on staged files (`.claude/tools/cli/security-lint.cjs --staged`). It blocks commits if critical or high-severity issues are found.
@@ -116,6 +118,15 @@ Where to set these:
 - In your terminal environment before launching Claude Code (recommended), or
 - In a local override file `.claude/settings.local.json` (`env` block).
 
+### Worker runtime (optional)
+
+- **Enable**: set `WORKER_ENABLED=1` to run the headless loop (maintenance, index updates, reflection queue).
+- **Heartbeat**: `.claude/context/runtime/worker-heartbeat.json`
+- **Metrics**: `.claude/context/runtime/worker.jsonl` (disable with `WORKER_METRICS=off`)
+- **Summary**: `pnpm worker:summary` for last ticks and status
+- **Event bus**: one `TOOL_COMPLETED`/`TOOL_FAILED` per tick (`toolName: 'worker-loop'`, disable with `WORKER_EVENTS=off`). Source: `.claude/lib/events/event-bus.cjs` + `.claude/lib/events/event-types.cjs`.
+- **Event log**: `.claude/context/runtime/event-bus.jsonl` (disable with `EVENT_BUS_SINK=off`)
+
 ### Optional safety switches
 
 - Read-only mode: `node .claude/tools/read-only.mjs enable` (disable with `node .claude/tools/read-only.mjs disable`)
@@ -123,7 +134,7 @@ Where to set these:
 
 ### Known limitations
 
-- **agent:production** is a stub; production agent mode is not yet implemented. Use `agent:worker` or other commands for now.
+- **agent:production** delegates to `agent:worker` (sets `WORKER_ENABLED=1`) for headless runs.
 
 ### Step 4: Test It Works
 

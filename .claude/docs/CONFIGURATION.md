@@ -175,9 +175,9 @@ Variables controlling hook execution and behavior.
 
 **Used By**:
 
-- `.claude/hooks/reflection/task-completion-reflection.cjs`
-- `.claude/hooks/reflection/error-recovery-reflection.cjs`
-- `.claude/hooks/reflection/session-end-reflection.cjs`
+- `.claude/hooks/reflection/unified-reflection-handler.cjs`
+- `.claude/hooks/reflection/reflection-queue-processor.cjs`
+- `.claude/hooks/reflection/reflection-step0-guard.cjs`
 
 **Example**:
 

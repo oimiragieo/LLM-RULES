@@ -16,6 +16,10 @@ The goal is simple: copy `.claude/` into another repo and get consistent routing
 - **Headless Verification**: CI-friendly testing (`pnpm ship-readiness:headless:json`, `pnpm integration:headless:json`)
 - **Memory System**: Persistent learnings, decisions, and issues across sessions (`.claude/context/memory/`)
 - **Spec-Kit Integration**: Complete feature set for requirements management with templates, skills, and automated quality validation
+- **Worker Runtime (optional)**: Opt-in headless loop for maintenance/index/queue; emits heartbeat + metrics (see `.claude/docs/GETTING_STARTED.md`)
+- **LanceDB-only Code Index**: Code indexing now uses LanceDB tables only (no JSON vector store)
+- **ContextualMemory Read Path**: Memory reads go through ContextualMemory as the single source of truth
+- **Blocking Hooks → Event Bus**: All blocking hooks emit events before exit for centralized observability
 
 Notes:
 
@@ -164,6 +168,7 @@ Important:
 
 - Treat the `workflow_id` printed by each headless command as the source of truth for follow-on verification.
 - Use the corresponding verify tool with that exact id:
+- Before release, run `pnpm lint` and `pnpm test:framework` (or `pnpm test`) to catch regressions.
 
 ```bash
 node .claude/tools/verify-ship-readiness.mjs --workflow-id <workflow_id> --json

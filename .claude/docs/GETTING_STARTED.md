@@ -115,6 +115,8 @@ The Router is the entry point for ALL requests. It acts like a project manager:
 
 The Router **never implements work directly**—it always delegates to specialized agents.
 
+Agent discovery uses `.claude/context/agent-registry.json` first, with a filesystem fallback if missing; CI enforces registry freshness, so run `pnpm gen:agent-registry` after agent changes.
+
 ## Available Agents
 
 Agent Studio includes 40+ specialized agents organized into categories:
@@ -173,6 +175,44 @@ Agent Studio uses a persistent memory system so context carries across sessions:
 - **sessions/**: Per-session history
 
 Agents read memory before starting work and record findings after completion. This means you can resume work days later without repeating context.
+
+## Worker Runtime (Optional)
+
+Agent Studio can run an **optional headless worker** for periodic maintenance tasks (opt-in only).
+
+**Enable:**
+
+```bash
+WORKER_ENABLED=1 pnpm run agent:worker
+```
+
+**What it runs (per tick):**
+
+- Memory maintenance (`memory-scheduler.cjs`, daily or weekly when overdue)
+- Code index incremental update (if an index exists)
+- Reflection queue processing (`reflection-queue-processor.cjs`)
+
+**Heartbeat file:**
+
+`.claude/context/runtime/worker-heartbeat.json` (includes `lastTick`, `status`, and per-task results)
+
+**Quick summary:**
+
+`pnpm worker:summary` (reads `.claude/context/metrics/worker.jsonl`)
+
+**Key env vars:**
+
+- `WORKER_ENABLED=1` (required)
+- `WORKER_INTERVAL_MS=60000` (default 60s)
+- `WORKER_TASKS=maintenance,index,reflection`
+- `WORKER_ONCE=1` (one tick then exit)
+- `WORKER_PROJECT_ROOT=...` (override project root)
+- `WORKER_METRICS=off` (disable JSONL writes to `worker.jsonl`, default: on)
+- `WORKER_EVENTS=off` (disable per-tick event bus emission, default: on)
+- `WORKER_METRICS_MAX_LINES=1000` (cap `worker.jsonl` to last N lines)
+- `WORKER_BACKOFF_BASE_MS=30000` / `WORKER_BACKOFF_MAX_MS=300000` (failure backoff tuning)
+
+For details, see the Memory System documentation.
 
 ## Task Management
 

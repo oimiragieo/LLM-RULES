@@ -8,6 +8,8 @@ The Router Enforcement System prevents the Router (Claude) from bypassing the Ro
 **ADR**: ADR-006 (Accepted 2026-01-25)
 **Configuration**: `PLANNER_FIRST_ENFORCEMENT` environment variable
 
+**Note**: `user-prompt-unified.cjs` performs complexity classification using `routing-table.cjs` on UserPromptSubmit. `router-enforcer.cjs` is an advisory standalone helper and is not registered by default in `settings.json`.
+
 ## The Problem
 
 Despite explicit Router protocols in CLAUDE.md and router-decision.md, the Router violates the protocol by:
@@ -27,7 +29,7 @@ Layer 1: Prompt Engineering (CLAUDE.md Section 1.2)
          ↓
 Layer 2: State Enhancement (router-state.cjs)
          ↓
-Layer 3: Advisory Detection (router-enforcer.cjs, uses routing-table.cjs)
+Layer 3: Advisory Detection (user-prompt-unified.cjs, uses routing-table.cjs)
          ↓
 Layer 4: Spawn Tracking (agent-context-tracker.cjs)
          ↓
@@ -40,7 +42,7 @@ Layer 5: BLOCKING Enforcement (task-create-guard.cjs)
 
 **Location**: `.claude/hooks/routing/router-state.cjs`
 **Hook Type**: `UserPromptSubmit` (pre-execution)
-**Purpose**: Tracks complexity classification and agent spawn events
+**Purpose**: Tracks complexity classification and agent spawn events (written by user-prompt-unified.cjs)
 
 **Extended State Schema**:
 
@@ -56,13 +58,13 @@ Layer 5: BLOCKING Enforcement (task-create-guard.cjs)
 
 **Behavior**:
 
-- Runs BEFORE router-enforcer.cjs (saves complexity for next hook)
-- Does NOT classify complexity itself (router-enforcer.cjs does that)
+- Updated by user-prompt-unified.cjs during UserPromptSubmit
+- Does NOT classify complexity itself (user-prompt-unified.cjs does that)
 - Provides state persistence across hook invocations
 
-### Component 2: Classification Storage (router-enforcer.cjs)
+### Component 2: Classification Storage (user-prompt-unified.cjs)
 
-**Location**: `.claude/hooks/routing/router-enforcer.cjs` (routing data in `.claude/lib/routing/routing-table.cjs`)
+**Location**: `.claude/hooks/routing/user-prompt-unified.cjs` (routing data in `.claude/lib/routing/routing-table.cjs`)
 **Hook Type**: `UserPromptSubmit` (pre-execution)
 **Purpose**: Classifies complexity and saves to router-state.cjs
 
@@ -85,7 +87,7 @@ const COMPLEXITY_INDICATORS = {
 };
 ```
 
-**Output**: Advisory message recommending PLANNER for HIGH/EPIC complexity
+**Output**: Advisory message (printed when running `router-enforcer.cjs` manually) recommending PLANNER for HIGH/EPIC complexity
 
 ```
 🔀 ROUTER ANALYSIS

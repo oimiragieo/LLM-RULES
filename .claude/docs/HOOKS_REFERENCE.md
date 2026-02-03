@@ -47,14 +47,13 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 ├── routing/          # Router enforcement
 │   ├── router-enforcer.cjs
 │   ├── router-mode-reset.cjs
-│   ├── security-review-guard.cjs
-│   ├── task-create-guard.cjs
+│   ├── routing-guard.cjs      # consolidated: security-review, task-create, planner-first, router-write
+│   ├── documentation-routing-guard.cjs  # not registered; logic in pre-task-unified.cjs (CHECK 3)
 │   ├── agent-context-tracker.cjs
 │   └── router-state.cjs (shared state)
 ├── memory/           # Memory operations
-│   ├── session-end-recorder.cjs
 │   ├── format-memory.cjs
-│   └── (archived: session-memory-extractor.cjs, extract-workflow-learnings.cjs → .claude/archive/hooks/memory/)
+│   └── (archived: session-end-recorder.cjs, session-memory-extractor.cjs, extract-workflow-learnings.cjs → .claude/archive/hooks/memory/)
 └── session/          # Session management
     └── memory-reminder.cjs
 ```
@@ -106,60 +105,21 @@ git config user.email hacker@evil.com   # Identity theft
 kill -9 0                                # Kill all processes
 ```
 
-### security-review-guard.cjs
+### routing-guard.cjs (consolidated)
 
-**Event**: `PreToolUse(Task)`
-**Purpose**: Enforces security review before spawning implementation agents (SEC-004 fix)
-**Environment**: `SECURITY_REVIEW_ENFORCEMENT=block|warn|off` (default: `warn`)
+**Event**: `PreToolUse(Task|TaskCreate|Edit|Write|NotebookEdit|Glob|Grep|WebSearch)`
+**Purpose**: Single hook consolidating router enforcement (SEC-002, SEC-003, SEC-004, router-write, planner-first). Replaces former standalone hooks: `security-review-guard.cjs`, `task-create-guard.cjs`, planner-first-guard, router-write-guard (write checks also in `router-write-guard.cjs` for Edit/Write/NotebookEdit).
 
-**Prevents**: Spawning DEVELOPER/QA/DEVOPS for security-sensitive tasks without SECURITY-ARCHITECT review first
+**Environment**:
 
-**Logic**:
+- `PLANNER_FIRST_ENFORCEMENT=block|warn|off` (default: `block`) — TaskCreate for HIGH/EPIC without PLANNER
+- `SECURITY_REVIEW_ENFORCEMENT=block|warn|off` (default: `block`) — implementation agents without security review
+- `ROUTER_WRITE_GUARD=block|warn|off` (default: `block`) — Router using Edit/Write/NotebookEdit
+- `ROUTER_SELF_CHECK=block|warn|off` (default: `block`)
 
-1. Reads router state from `router-state.cjs`
-2. Checks if `requiresSecurityReview=true` and `securitySpawned=false`
-3. Blocks implementation agents (`developer`, `qa`, `devops`) if security review pending
-4. Allows spawning SECURITY-ARCHITECT or PLANNER
+**Prevents**: Router creating tasks without PLANNER for complex work; spawning implementation agents without SECURITY-ARCHITECT when required; Router using blacklisted tools.
 
-**Example**:
-
-```javascript
-// BLOCKED (warn or block mode)
-User: 'Update authentication logic';
-Router: Task({ prompt: 'You are DEVELOPER. Modify auth...' });
-// ERROR: [SEC-004] Security review required before implementation.
-
-// CORRECT
-Router: Task({ prompt: 'You are SECURITY-ARCHITECT. Review auth...' });
-// Then spawn DEVELOPER after review completes
-```
-
-### task-create-guard.cjs
-
-**Event**: `PreToolUse(TaskCreate)`
-**Purpose**: Enforces PLANNER-first for complex tasks (SEC-002, SEC-003 fixes)
-**Environment**: `PLANNER_FIRST_ENFORCEMENT=block|warn|off` (default: `block`)
-
-**Prevents**: Router creating implementation tasks directly without planning
-
-**Logic**:
-
-1. Reads router state complexity level
-2. Blocks `TaskCreate` if complexity is `HIGH` or `EPIC` without PLANNER spawned
-3. Allows `TaskCreate` for `LOW`/`TRIVIAL` tasks or after PLANNER has spawned
-
-**Example**:
-
-```javascript
-// BLOCKED
-User: 'Add authentication to the app';
-Router: TaskCreate({ subject: 'Implement auth' });
-// ERROR: Complex task (HIGH) requires PLANNER agent.
-
-// CORRECT
-Router: Task({ prompt: 'You are PLANNER. Design auth feature...' });
-// PLANNER creates tasks via TaskCreate
-```
+**Exit Codes**: `0` allow, `2` block (fail-closed on error per SEC-008).
 
 ### task-list-tracker.cjs
 
@@ -168,6 +128,8 @@ Router: Task({ prompt: 'You are PLANNER. Design auth feature...' });
 **Environment**: TaskList-first enforcement is in `pre-task-unified.cjs` (PreToolUse Task): `TASKLIST_FIRST_ENFORCEMENT=block|warn|off` (default: `block`).
 
 **Note**: Router TaskList-first is enforced by pre-task-unified (PreToolUse Task) and state set by PostToolUse TaskList (task-list-tracker.cjs).
+
+**Documentation routing**: Documentation routing (routes docs to technical-writer) is enforced by `pre-task-unified.cjs` (CHECK 3: Documentation Routing Guard). The standalone file `documentation-routing-guard.cjs` exists in `.claude/hooks/routing/` but is not registered in `settings.json`; it is kept for reference or optional use.
 
 ### router-write-guard.cjs
 
@@ -192,31 +154,7 @@ Router: Task({ prompt: "You are DEVELOPER. Fix bug in app.ts..." })
 
 ### session-end-recorder.cjs
 
-**Event**: `SessionEnd`
-**Purpose**: Auto-create session files on session end
-**Output**: `.claude/context/memory/sessions/session_NNN.json`
-
-**Process**:
-
-1. Reads insights from stdin OR `.claude/context/memory/active_context.md`
-2. Extracts structured data (tasks, discoveries, files modified)
-3. Calls `memory-manager.cjs` to save session
-4. Generates incrementing session files
-
-**Session Data Structure**:
-
-```json
-{
-  "summary": "Session ended",
-  "tasks_completed": ["Task 1", "Task 2"],
-  "files_modified": ["file1.ts", "file2.md"],
-  "discoveries": ["Pattern X", "Gotcha Y"],
-  "patterns_found": [],
-  "gotchas_encountered": [],
-  "decisions_made": [],
-  "next_steps": []
-}
-```
+> **Archived**: Moved to `.claude/archive/hooks/memory/`. SessionEnd behavior is handled by `unified-reflection-handler.cjs` and `reflection-queue-processor.cjs` (registered for `SessionEnd` in `.claude/settings.json`). Not registered as a standalone hook.
 
 ### session-memory-extractor.cjs
 
@@ -309,7 +247,7 @@ Located in `.claude/hooks/safety/validators/`, each validator module exports val
 
 ## Enforcement Modes
 
-All enforcement hooks (`security-review-guard`, `task-create-guard`, `router-write-guard`) support three modes:
+All enforcement hooks (`routing-guard.cjs`, `router-write-guard.cjs`, `reflection-step0-guard.cjs`) support three modes:
 
 | Mode    | Behavior                             | Use Case                            |
 | ------- | ------------------------------------ | ----------------------------------- |
@@ -594,23 +532,23 @@ This hook system addresses critical security vulnerabilities identified in the 7
 
 **Vulnerability**: Router created implementation tasks directly without spawning PLANNER for complex tasks.
 
-**Fix**: Added `task-create-guard.cjs` hook that blocks `TaskCreate` for HIGH/EPIC complexity tasks.
+**Fix**: Enforced by `routing-guard.cjs` (consolidated hook): blocks `TaskCreate` for HIGH/EPIC complexity tasks unless PLANNER spawned first.
 
-**Enforcement**: Default `block` mode ensures Router spawns PLANNER first.
+**Enforcement**: `PLANNER_FIRST_ENFORCEMENT=block` (default).
 
 ### SEC-003: Router Spawning Implementation Agents
 
 **Vulnerability**: Router spawned DEVELOPER/QA without planning phase, leading to incomplete or insecure implementations.
 
-**Fix**: Combined with SEC-002, enforces PLANNER-first workflow for complex tasks.
+**Fix**: Enforced by `routing-guard.cjs`; combined with SEC-002, enforces PLANNER-first workflow for complex tasks.
 
 ### SEC-004: Security Review Bypass
 
 **Vulnerability**: Router spawned DEVELOPER for security-sensitive tasks without SECURITY-ARCHITECT review.
 
-**Fix**: Added `security-review-guard.cjs` hook that blocks implementation agent spawns when security review is required but not done.
+**Fix**: Enforced by `routing-guard.cjs`: blocks implementation agent spawns when security review is required but not done.
 
-**Enforcement**: Default `warn` mode (can be changed to `block` for stricter enforcement).
+**Enforcement**: `SECURITY_REVIEW_ENFORCEMENT=block|warn` (default: `block`).
 
 ## Best Practices
 

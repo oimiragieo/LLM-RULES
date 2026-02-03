@@ -36,7 +36,7 @@ This specification defines a Code Indexing and Semantic Search System for Agent-
 
 1. **Local-First:** All processing happens locally - no cloud dependencies for core functionality
 2. **Privacy-Preserving:** Code never leaves the local machine; only embeddings stored
-3. **Leverages Existing Infrastructure:** Builds on ChromaDB and embedding infrastructure from ADR-054
+3. **Leverages Existing Infrastructure:** Builds on LanceDB and embedding infrastructure from ADR-054
 4. **Incremental Adoption:** Can run alongside existing Grep/Glob without breaking changes
 5. **Agent-Native:** Designed as a Skill for seamless agent integration
 
@@ -63,8 +63,8 @@ This specification defines a Code Indexing and Semantic Search System for Agent-
 └───────────────────────────────┬─────────────────────────────────────┘
                                 │
 ┌───────────────────────────────▼─────────────────────────────────────┐
-│                        Vector Database (ChromaDB)                    │
-│   Collection: agent-studio-code                                      │
+│                        Vector Database (LanceDB)                    │
+│   table: code_index                                      │
 │   ├── Embeddings (1536 dimensions)                                  │
 │   ├── Metadata (path, type, line range, language)                   │
 │   └── HNSW Index (cosine similarity)                                │
@@ -123,7 +123,7 @@ Following the Cursor architecture, our pipeline consists of 7 distinct stages:
 └─────────────────────────────────┬───────────────────────────────────┘
                                   ↓
 ┌─────────────────────────────────────────────────────────────────────┐
-│ 5. VECTOR STORAGE (ChromaDB)                                         │
+│ 5. VECTOR STORAGE (LanceDB)                                         │
 │    Store embeddings + metadata in local vector database             │
 │    HNSW indexing for fast similarity search                        │
 │    Persistent storage: .claude/data/code-index                     │
@@ -466,7 +466,7 @@ class PathObfuscator {
 }
 ```
 
-### 3.5 Vector Database (ChromaDB)
+### 3.5 Vector Database (LanceDB)
 
 **File:** `.claude/lib/code-indexing/vector-store.cjs`
 
@@ -495,7 +495,7 @@ const CONFIG = {
 ```javascript
 class CodeVectorStore {
   /**
-   * Initialize vector store with ChromaDB
+   * Initialize vector store with LanceDB
    */
   async initialize()
 
@@ -577,7 +577,7 @@ User Query: "find authentication middleware"
                   ↓
 ┌─────────────────────────────────────────┐
 │ 4. Vector Search                         │
-│    ChromaDB similarity search           │
+│    LanceDB similarity search           │
 │    Return top-K candidates              │
 └─────────────────┬───────────────────────┘
                   ↓
@@ -864,7 +864,7 @@ for (const result of results.results) {
 │       ├── semantic-chunker.cjs      # AST to chunks
 │       ├── embedding-generator.cjs   # Vector embeddings
 │       ├── metadata-enricher.cjs     # Metadata extraction
-│       ├── vector-store.cjs          # ChromaDB wrapper
+│       ├── vector-store.cjs          # LanceDB wrapper
 │       ├── query-processor.cjs       # Query pipeline
 │       ├── index-maintainer.cjs      # Change detection + sync
 │       ├── merkle-tree.cjs           # Efficient diffing
@@ -879,7 +879,7 @@ for (const result of results.results) {
 │       └── search-code.cjs           # CLI search tool
 ├── data/
 │   └── code-index/
-│       ├── chromadb/                 # ChromaDB persistent storage
+│       ├── chromadb/                 # LanceDB persistent storage
 │       ├── merkle-tree.json          # Current Merkle tree state
 │       └── index-metadata.json       # Index statistics
 └── config/
@@ -968,7 +968,7 @@ CODE_INDEX_DEBUG=true
 - [ ] tree-sitter integration with JS/TS/Python support
 - [ ] Semantic chunker with basic chunking strategies
 - [ ] Local embedding generator (sentence-transformers)
-- [ ] ChromaDB vector store integration
+- [ ] LanceDB vector store integration
 - [ ] Basic query processor
 - [ ] CLI indexing tool
 
@@ -1034,7 +1034,7 @@ CODE_INDEX_DEBUG=true
 | tree-sitter Node bindings unstable | Medium      | High   | Use well-tested grammars, pin versions     |
 | Embedding quality insufficient     | Low         | High   | Allow OpenAI fallback, tune prompts        |
 | Large codebase performance         | Medium      | Medium | Batch processing, incremental updates      |
-| ChromaDB memory usage              | Low         | Medium | Configure HNSW parameters, use persistence |
+| LanceDB memory usage               | Low         | Medium | Configure HNSW parameters, use persistence |
 | False negatives in search          | Medium      | Medium | Combine with keyword fallback              |
 | Language grammar missing           | Low         | Low    | Graceful degradation, log unsupported      |
 
@@ -1057,7 +1057,7 @@ CODE_INDEX_DEBUG=true
 
 ## 11. Related ADRs
 
-- **ADR-054:** Memory System Enhancement Strategy (ChromaDB infrastructure)
+- **ADR-054:** Memory System Enhancement Strategy (LanceDB infrastructure)
 - **ADR-069:** Tool Manifest and Pre-Spawn Validation (tool registration)
 - **ADR-070:** SkillCatalog Tool Architecture (skill discovery)
 
@@ -1085,7 +1085,7 @@ CODE_INDEX_DEBUG=true
 
 _Quality Score: Average cosine similarity on semantic similarity benchmark_
 
-### C. ChromaDB Performance Tuning
+### C. LanceDB Performance Tuning
 
 ```javascript
 // HNSW Configuration for different use cases

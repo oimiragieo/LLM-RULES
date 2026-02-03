@@ -28,15 +28,16 @@ All environment-specific settings are managed through the `.env` file located at
 
 ### Key Configuration Categories
 
-| Category        | Variables                                           | Purpose                                      |
-| --------------- | --------------------------------------------------- | -------------------------------------------- |
-| **Environment** | `AGENT_STUDIO_ENV` (development/staging/production) | Selects configuration profile and data paths |
-| **Features**    | `PARTY_MODE_ENABLED`, `ELICITATION_ENABLED`         | Control feature availability                 |
-| **Hooks**       | `REFLECTION_ENABLED`, `REFLECTION_HOOK_MODE`        | Quality and learning controls                |
-| **Safety**      | `LOOP_PREVENTION_MODE`, `ANOMALY_DETECTION_ENABLED` | Loop/anomaly thresholds                      |
-| **Routing**     | `REROUTER_MODE`, `PLAN_EVOLUTION_GUARD`             | Orchestration behavior                       |
-| **Debug**       | `DEBUG_HOOKS`, `CLAUDE_SESSION_ID`                  | Troubleshooting aids                         |
-| **Integration** | `WEBHOOK_SECRET`, `API_URL`                         | External service integration                 |
+| Category          | Variables                                           | Purpose                                      |
+| ----------------- | --------------------------------------------------- | -------------------------------------------- |
+| **Environment**   | `AGENT_STUDIO_ENV` (development/staging/production) | Selects configuration profile and data paths |
+| **Features**      | `PARTY_MODE_ENABLED`, `ELICITATION_ENABLED`         | Control feature availability                 |
+| **Hooks**         | `REFLECTION_ENABLED`, `REFLECTION_HOOK_MODE`        | Quality and learning controls                |
+| **Safety**        | `LOOP_PREVENTION_MODE`, `ANOMALY_DETECTION_ENABLED` | Loop/anomaly thresholds                      |
+| **Routing**       | `REROUTER_MODE`, `PLAN_EVOLUTION_GUARD`             | Orchestration behavior                       |
+| **Debug**         | `DEBUG_HOOKS`, `CLAUDE_SESSION_ID`                  | Troubleshooting aids                         |
+| **Observability** | `EVENT_BUS_SINK`                                    | Event bus sink + JSONL log output            |
+| **Integration**   | `WEBHOOK_SECRET`, `API_URL`                         | External service integration                 |
 
 ### Enforcement Mode Variables
 
@@ -54,6 +55,23 @@ All environment-specific settings are managed through the `.env` file located at
 - `block` - Prevents action, throws error (production default)
 - `warn` - Logs warning but allows action (development)
 - `off` - Disables enforcement (dangerous, use sparingly)
+
+### Observability Variables
+
+| Variable         | Values                | Default | Purpose                                                                            |
+| ---------------- | --------------------- | ------- | ---------------------------------------------------------------------------------- |
+| `EVENT_BUS_SINK` | on/off                | on      | Enable event bus sink; writes events to `.claude/context/runtime/event-bus.jsonl`. |
+| `LOG_LEVEL`      | debug/info/warn/error | info    | Structured logger level for hooks and runtime components.                          |
+| `DEBUG_HOOKS`    | true/false            | false   | Emit hook debugLog output for troubleshooting.                                     |
+
+When enabled, all events (e.g. TOOL_COMPLETED, TOOL_FAILED, TOOL_BLOCKED) are appended as one JSON object per line to `.claude/context/runtime/event-bus.jsonl`. Set to `off` to disable the sink.
+For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY.md`.
+
+### Memory / Compression Variables
+
+| Variable                   | Values | Default | Purpose                                                                                                            |
+| -------------------------- | ------ | ------- | ------------------------------------------------------------------------------------------------------------------ |
+| `AUTO_COMPRESSION_PHASE_3` | on/off | off     | When on, writes `.claude/context/runtime/compression-reminder.*` so Router/agents can invoke `context-compressor`. |
 
 ### Staging Environment
 

@@ -37,7 +37,7 @@ It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/li
 - Initialize schema: `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`).
 - Check memory health (JSON): `pnpm run memory:health` (or `node .claude/lib/memory/memory-manager.cjs health`).
 
-The entity index is populated by `sync-memory-index` from `learnings.md`, `decisions.md`, `issues.md`, and also `patterns.json` / `gotchas.json` when those JSON files are edited. Agent-visible patterns, gotchas, and decisions are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are now used in the spawn prompt pipeline: `spawn-prompt-assembler.cjs` can append an **Entity Graph (SQLite)** section by default (set `SPAWN_PROMPT_ENTITY_GRAPH=off` to disable). The entity DB is created on first `pnpm run memory:init` or first sync when editing these files. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results.
+The entity index is populated by `sync-memory-index` from `learnings.md`, `decisions.md`, `issues.md`, and also `patterns.json` / `gotchas.json` when those JSON files are edited. Agent-visible patterns, gotchas, and decisions are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are now used in the spawn prompt pipeline: `spawn-prompt-assembler.cjs` can append an **Entity Graph (SQLite)** section by default (set `SPAWN_PROMPT_ENTITY_GRAPH=off` to disable). Extracted memories can also be linked to skill entities when SessionEnd provides `tools_used`, creating memory→skill relationships for later graph queries. The entity DB is created on first `pnpm run memory:init` or first sync when editing these files. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results.
 
 ### Troubleshooting
 
@@ -93,6 +93,7 @@ Both run by design: the inlined check is lightweight (e.g. auto-archive/prune); 
 
 - **Inlined (lightweight)**: `user-prompt-unified.cjs` runs a quick health check + auto-archive/prune.
 - **Standalone (full)**: `memory-health-check.cjs` runs on `UserPromptSubmit` and writes richer health metrics.
+  - Rate-limited via `MEMORY_HEALTH_CHECK_INTERVAL_MS` (default: 5 minutes) to avoid redundant checks.
 
 ## Metrics Locations
 
@@ -104,6 +105,15 @@ There are two primary metrics roots:
 ### Metrics and dashboard
 
 Metrics are collected on `UserPromptSubmit` via `memory-health-check.cjs` (Phase 4). The hook loads `.claude/lib/memory/memory-dashboard.cjs`; if that module fails to load or Phase 4 throws, the hook still completes and sets `output.metricsLogged = false` and `output.metricsError` so callers know metrics did not run. A structured error is logged (`metrics_logging_error`). When dashboard load or Phase 4 fails, an optional fallback one-line JSONL entry is written to `.claude/context/memory/metrics/fallback.jsonl` with `timestamp`, `event: 'health_check'`, `status`, `warningsCount`, and optionally `metricsError`, so at least one data point exists for the run. Inspect metrics without running the full health check via `pnpm run memory:dashboard` (or `node .claude/lib/memory/memory-dashboard.cjs`; default command shows health). A separate token/budget dashboard CLI is available via `pnpm run memory:dashboard:budget` (from `.claude/tools/cli/memory-dashboard.cjs`).
+
+### Auto-compression reminders (Phase 3 opt-in)
+
+When `AUTO_COMPRESSION_PHASE_3=1`, the auto-compression trigger writes a reminder file for the Router or agents to act on:
+
+- `.claude/context/runtime/compression-reminder.txt`
+- `.claude/context/runtime/compression-reminder.json` (reason, urgency, timestamp)
+
+This is advisory only. The Router should spawn the `context-compressor` skill (or invoke `Skill({ skill: 'context-compressor' })`) when the reminder exists.
 
 ### Embeddings (auto-index)
 
@@ -157,6 +167,8 @@ LanceDB persist directory is `.claude/data/lancedb`. Any `vectors.db` or `vector
 
 **Model changes:** changing `LANCEDB_EMBEDDING_MODEL` requires re‑indexing/recreating the LanceDB table. If the table vector dimension does not match the embedding model’s dimension, semantic search is disabled with a clear “dimension mismatch” warning until reindexing is done (`pnpm run memory:reindex`).
 
+- **L0/L1 metadata:** extracted memories store `abstract` (L0) and `overview` (L1) in LanceDB metadata. Spawn prompts prefer these fields for snippets; older rows won’t include them until you reindex.
+
 - Spawn prompt semantic search may apply a hot-only filter (exclude cold LTM). If the filter fails (e.g. LanceDB schema/API change), the hook falls back to unfiltered search. Expected metadata for filtering is document-specific (e.g. `source: 'ltm_archive'` for cold).
 
 Semantic search similarity threshold is defined in `.claude/lib/memory/memory-constants.cjs` as `SEMANTIC_SEARCH_DEFAULT_THRESHOLD` (default 0.72). Override via env `MEMORY_SEMANTIC_SEARCH_THRESHOLD`. Used by contextual-memory, spawn-prompt-assembler, and memory-search.
@@ -169,9 +181,9 @@ To run semantic search outside the spawn prompt pipeline, use:
 node .claude/lib/memory/memory-search.cjs "query"
 ```
 
-### Code-indexing (separate from memory)
+### Code-indexing (separate table, same LanceDB)
 
-Code-indexing (`.claude/lib/code-indexing/`) uses a **JSON-backed vector store** (persistent) under `.claude/context/code-index/vectors/vectors.json`. It is separate from the memory system's LanceDB. Index metadata lives under `.claude/context/code-index/metadata.json`.
+Code-indexing (`.claude/lib/code-indexing/`) uses **LanceDB** with a separate table (`code_index` by default). It shares the same LanceDB persist directory (`.claude/data/lancedb`) but uses a different table name from memory. Override the table name with `LANCEDB_TABLE_CODE` and the persist directory with `LANCEDB_URI`. Index metadata still lives under `.claude/context/code-index/metadata.json`. To (re)build the code index, run `pnpm run code:index:reindex`.
 
 ## Retention and Cold Storage
 
@@ -189,6 +201,7 @@ The memory system is designed to stay bounded:
 
 - Weekly maintenance (including `archiveOldLTM`) runs when **SessionEnd** fires (via `unified-reflection-handler.cjs` → `triggerMaintenance()` → `memory-scheduler.cjs` `runWeeklyMaintenance()`) or when **UserPromptSubmit** detects it is overdue: `user-prompt-unified.cjs` reads `.claude/context/memory/maintenance-status.json`; if `lastWeekly` is missing or older than 7 days, it invokes weekly maintenance in a child process. Timeout is configurable via `MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS` (default 60000 ms; for large repos or many LTM files, consider 120000 or higher). On timeout or non-zero exit, the hook logs a one-line warning so operators know maintenance may have been partial. Manual fallback: `pnpm run memory:weekly` (or `memory:daily`). To check last run: `pnpm run memory:status`. LTM cold archival is performed by `cold-storage.cjs` inside `runArchiveOldLTM` in the scheduler.
 - **Headless or rarely-used environments:** There is no cron or daemon. Maintenance runs only on SessionEnd or when a user prompt occurs and weekly is overdue. In headless or rarely-used environments, run `pnpm run memory:weekly` (or `memory:daily`) on a schedule (e.g. cron) so LTM retention and cold archival run.
+- **Optional worker runtime:** You can run the headless worker (`pnpm run agent:worker`) to execute memory maintenance, code-index incremental updates, and reflection queue processing on an interval. See GETTING_STARTED.md for how to enable it and the heartbeat file location.
 
 ### Tunables
 
@@ -219,12 +232,19 @@ The following environment variables control retention behavior (defined in `.cla
 ### Search behavior (hot vs cold)
 
 - Spawn prompt semantic memory (`spawn-prompt-assembler.cjs`) is **hot-only by default** and excludes cold-archived summaries.
-- Explicit semantic search (`memoryManager.searchMemory`) can search across all documents unless a filter is supplied.
+- Explicit semantic search (`memoryManager.searchMemory`) can search across all documents unless a filter is supplied. It also accepts `contextType`/`category` options, which are translated into metadata filters (e.g. `{ contextType: 'memory', category: 'profile' }` → `metadata.type = 'memory'`, `metadata.category = 'profile'`).
+- Cold-tier helper: `searchColdStorage()` (in `.claude/lib/memory/cold-storage.cjs`) performs a best-effort LanceDB search with `metadata.tier = 'cold'` filter and returns `[]` when unavailable.
+
+Example (best-effort cold search):
+
+```bash
+node -e "require('./.claude/lib/memory/cold-storage.cjs').searchColdStorage('auth regression').then(r => console.log(r.length)).catch(() => {})"
+```
 
 ### Legacy sessions/ (Deprecated)
 
 The legacy path `.claude/context/memory/sessions/` is retained for backward compatibility and may be used if `memory-tiers` is unavailable.
-The function `.claude/lib/memory/memory-manager.cjs#saveSession` is deprecated for session recording.
+The legacy `memory-manager.saveSession()` function has been removed; session recording uses memory-tiers.
 
 ### Memory Read Path (Split-Brain Fix)
 
@@ -480,7 +500,7 @@ The `unified-reflection-handler.cjs` hook automatically captures session insight
 4. Consolidate STM → MTM via `memory-tiers.consolidateSession()`
 5. Extract patterns and gotchas to their respective JSON files
 
-**Note**: The legacy `memory-manager.saveSession()` function is deprecated and throws; the `save-session` CLI exits with an error. Use memory-tiers for session recording. Sessions now use the memory-tiers system exclusively (STM → MTM → LTM). The legacy `sessions/` directory is no longer actively written to.
+**Note**: The legacy `memory-manager.saveSession()` function has been removed; the `save-session` CLI exits with an error. Use memory-tiers for session recording. Sessions now use the memory-tiers system exclusively (STM → MTM → LTM). The legacy `sessions/` directory is no longer actively written to.
 
 **Memory Tiers**:
 
