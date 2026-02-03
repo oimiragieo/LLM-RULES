@@ -27,7 +27,7 @@ Layer 1: Prompt Engineering (CLAUDE.md Section 1.2)
          ↓
 Layer 2: State Enhancement (router-state.cjs)
          ↓
-Layer 3: Advisory Detection (router-enforcer.cjs)
+Layer 3: Advisory Detection (router-enforcer.cjs, uses routing-table.cjs)
          ↓
 Layer 4: Spawn Tracking (agent-context-tracker.cjs)
          ↓
@@ -62,7 +62,7 @@ Layer 5: BLOCKING Enforcement (task-create-guard.cjs)
 
 ### Component 2: Classification Storage (router-enforcer.cjs)
 
-**Location**: `.claude/hooks/routing/router-enforcer.cjs`
+**Location**: `.claude/hooks/routing/router-enforcer.cjs` (routing data in `.claude/lib/routing/routing-table.cjs`)
 **Hook Type**: `UserPromptSubmit` (pre-execution)
 **Purpose**: Classifies complexity and saves to router-state.cjs
 

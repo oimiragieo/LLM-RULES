@@ -76,6 +76,7 @@ try {
   // Graceful degradation: EventBus unavailable, continue without events
   eventBus = null;
 }
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // =============================================================================
 // INTRA-HOOK STATE CACHING (PERF-001)
@@ -866,6 +867,7 @@ function runAllChecks(toolName, toolInput) {
  *   - Error: process.exit(2) + JSON audit log to stderr
  */
 async function main() {
+  const startTime = Date.now();
   try {
     // PERF-001: Invalidate cache at start of each invocation
     invalidateCachedState();
@@ -929,6 +931,32 @@ async function main() {
     const result = runAllChecks(toolName, toolInput);
 
     if (!result.pass) {
+      if (eventBus) {
+        try {
+          if (result.result === 'block') {
+            await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+              type: EventTypes.TOOL_BLOCKED,
+              timestamp: new Date().toISOString(),
+              toolName,
+              duration: Date.now() - startTime,
+              reason: result.message,
+            });
+          } else {
+            await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+              type: EventTypes.TOOL_COMPLETED,
+              timestamp: new Date().toISOString(),
+              toolName,
+              duration: Date.now() - startTime,
+              output: {
+                status: result.result,
+                reason: result.message,
+              },
+            });
+          }
+        } catch (_err) {
+          // Best-effort
+        }
+      }
       // HOOK-009: Security audit log for blocked/warned actions
       auditLog('routing-guard', `security_${result.result}`, {
         tool: toolName,
@@ -942,8 +970,35 @@ async function main() {
     }
 
     // All checks passed
+    if (eventBus) {
+      try {
+        await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+          type: EventTypes.TOOL_COMPLETED,
+          timestamp: new Date().toISOString(),
+          toolName,
+          duration: Date.now() - startTime,
+          output: {
+            status: 'ok',
+          },
+        });
+      } catch (_err) {
+        // Best-effort
+      }
+    }
     process.exit(0);
   } catch (err) {
+    if (eventBus) {
+      try {
+        await eventBus.emit(EventTypes.TOOL_FAILED, {
+          type: EventTypes.TOOL_FAILED,
+          timestamp: new Date().toISOString(),
+          toolName: 'routing-guard',
+          error: err.message,
+        });
+      } catch (_err) {
+        // Best-effort
+      }
+    }
     // SEC-008: Allow debug override for troubleshooting
     if (process.env.HOOK_FAIL_OPEN === 'true') {
       auditLog('routing-guard', 'fail_open_override', { error: err.message });

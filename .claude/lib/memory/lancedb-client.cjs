@@ -255,6 +255,40 @@ class MemoryVectorStore {
     return Array.isArray(vec) ? vec.length : null;
   }
 
+  async listTables() {
+    if (!this.isInitialized) await this.initialize();
+    if (!this.db) return [];
+    return await this.db.tableNames();
+  }
+
+  async dropTable() {
+    if (!this.isInitialized) await this.initialize();
+    if (!this.db) return false;
+    const tableNames = await this.db.tableNames();
+    if (!tableNames.includes(this.config.collectionName)) return false;
+
+    if (typeof this.db.dropTable === 'function') {
+      await this.db.dropTable(this.config.collectionName);
+      this.table = null;
+      this._tableVectorDim = null;
+      return true;
+    }
+
+    if (tableNames.length === 1) {
+      const dbPath = path.resolve(this.config.persistDirectory);
+      fs.rmSync(dbPath, { recursive: true, force: true });
+      this.db = null;
+      this.table = null;
+      this._tableVectorDim = null;
+      this.isInitialized = false;
+      return true;
+    }
+
+    throw new Error(
+      `LanceDB dropTable unsupported and multiple tables exist. Manually remove table "${this.config.collectionName}" from ${this.config.persistDirectory}.`
+    );
+  }
+
   /**
    * Add documents to the store
    * @param {Array<{id: string, text: string, metadata: Object}>} documents

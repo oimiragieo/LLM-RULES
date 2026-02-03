@@ -194,7 +194,7 @@ Task({
 
 ### Router Detection
 
-The router-enforcer hook automatically detects when multi-agent planning is required:
+The router-enforcer logic (invoked inside `user-prompt-unified.cjs`) automatically detects when multi-agent planning is required using the shared routing table.
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -408,7 +408,7 @@ function parseHookInput() {
 
 **Active Hooks:**
 
-- `routing/router-enforcer.cjs` - Analyzes user intent, scores agents, recommends routing
+- `routing/user-prompt-unified.cjs` - Runs router-enforcer logic using `lib/routing/routing-table.cjs`
 - `safety/tdd-check.cjs` - Enforces TDD by checking for test files before code edits
 
 **Hook Configuration** (in `settings.json`):
@@ -419,7 +419,7 @@ function parseHookInput() {
     "UserPromptSubmit": [
       {
         "matcher": "",
-        "hooks": [{ "command": "node .claude/hooks/routing/router-enforcer.cjs" }]
+        "hooks": [{ "command": "node .claude/hooks/routing/user-prompt-unified.cjs" }]
       }
     ],
     "PreToolUse": [

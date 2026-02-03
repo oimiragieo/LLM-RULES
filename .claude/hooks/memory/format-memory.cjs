@@ -27,6 +27,8 @@ const {
   auditLog,
   debugLog,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Memory paths to watch
 const MEMORY_PATHS = ['.claude/context/memory', '.claude/context/reports', '.claude/context/plans'];
@@ -144,6 +146,8 @@ function formatFile(filePath) {
  * Main execution
  */
 function main() {
+  const startTime = Date.now();
+  let output = null;
   // PERF-006: Use shared utility for parsing
   const input = parseHookInputSync();
   if (!input) {
@@ -175,6 +179,37 @@ function main() {
   if (formatted) {
     const fileName = path.basename(filePath);
     auditLog('format-memory', 'formatted', { file: fileName });
+  }
+  output = {
+    file: filePath,
+    formatted,
+    toolName,
+  };
+
+  try {
+    // Best-effort: no await to avoid blocking hook execution
+    eventBus.emit(EventTypes.TOOL_COMPLETED, {
+      type: EventTypes.TOOL_COMPLETED,
+      timestamp: new Date().toISOString(),
+      toolName: 'format-memory',
+      output,
+      duration: Date.now() - startTime,
+    });
+  } catch (_e) {
+    // Best-effort
+  }
+
+  if (!formatted) {
+    try {
+      eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'format-memory',
+        error: 'formatting_failed',
+      });
+    } catch (_e) {
+      // Best-effort
+    }
   }
 
   process.exit(0);

@@ -271,13 +271,9 @@ function getCurrentSessionNumber(memoryDir) {
  * // Returns: { sessionNum: 1, file: '/path/.claude/context/memory/sessions/session_001.json' }
  */
 function saveSession(insights, _projectRoot = PROJECT_ROOT) {
-  if (process.env.MEMORY_DEBUG !== '1' && !saveSession._deprecationWarned) {
-    saveSession._deprecationWarned = true;
-    console.warn(
-      '[memory-manager] CRITICAL DEPRECATION: saveSession called. This function is a NO-OP for saving. Use memory-tiers.cjs instead. Data was NOT persisted to legacy sessions.'
-    );
-  }
-  return { sessionNum: 0, file: null };
+  throw new Error(
+    'saveSession() is deprecated and disabled. Use memory-tiers / SessionEnd for session recording.'
+  );
 }
 
 /**
@@ -587,7 +583,7 @@ function recordPattern(pattern, projectRoot = PROJECT_ROOT) {
  * @throws {Error} If projectRoot is invalid or outside PROJECT_ROOT
  * @example
  * recordDiscovery('src/auth.ts', 'JWT authentication handler', 'security');
- * recordDiscovery('.claude/hooks/routing/router-enforcer.cjs', 'Main routing hook');
+ * recordDiscovery('.claude/lib/routing/routing-table.cjs', 'Routing table source of truth');
  */
 function recordDiscovery(filePath, description, category = 'general', projectRoot = PROJECT_ROOT) {
   // CRITICAL-001-MEMORY FIX: Validate projectRoot
@@ -1459,20 +1455,11 @@ if (require.main === module) {
       break;
 
     case 'save-session':
-      // Read JSON from stdin
-      let input = '';
-      process.stdin.setEncoding('utf8');
-      process.stdin.on('data', chunk => (input += chunk));
-      process.stdin.on('end', () => {
-        try {
-          const insights = JSON.parse(input);
-          const result = saveSession(insights);
-          console.log(JSON.stringify(result));
-        } catch (e) {
-          console.error('Invalid JSON input:', e.message);
-          process.exit(1);
-        }
-      });
+      console.error(
+        'save-session is deprecated and disabled. Sessions are recorded via memory-tiers on SessionEnd. ' +
+          'Use memory-tiers or pnpm run memory:weekly for maintenance.'
+      );
+      process.exit(1);
       break;
 
     case 'health':
@@ -1530,7 +1517,7 @@ Commands:
   record-gotcha      Record a gotcha/pitfall
   record-pattern     Record a reusable pattern
   record-discovery   Record a codebase discovery
-  save-session       (deprecated, no-op; use memory-tiers / SessionEnd)
+  save-session       (deprecated, exits 1; use memory-tiers / SessionEnd)
 
 Examples:
   node memory-manager.cjs stats
@@ -1541,7 +1528,7 @@ Examples:
   node memory-manager.cjs record-gotcha "Always close DB connections in workers"
   node memory-manager.cjs record-pattern "Use async/await for all API calls"
   node memory-manager.cjs record-discovery "src/auth.ts" "JWT authentication handler"
-  echo '{"summary":"Fixed auth bug"}' | node memory-manager.cjs save-session   # deprecated, no-op
+  echo '{"summary":"Fixed auth bug"}' | node memory-manager.cjs save-session   # deprecated, exits 1
 `);
   }
 }

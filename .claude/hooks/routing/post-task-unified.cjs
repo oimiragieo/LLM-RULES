@@ -37,6 +37,8 @@ const {
 const { getCachedState } = require('../../lib/utils/state-cache.cjs');
 const routerState = require('./router-state.cjs');
 const loopStateManager = require('../../lib/self-healing/loop-state-manager.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Resolve project root deterministically from this file location:
 // <project>/.claude/hooks/routing/post-task-unified.cjs -> <project>
@@ -591,6 +593,7 @@ function runEvolutionAudit() {
  * Main async execution function
  */
 async function main() {
+  const startTime = Date.now();
   try {
     // Parse hook input
     const hookInput = await parseHookInputAsync();
@@ -637,8 +640,31 @@ async function main() {
     }
 
     // Always exit 0 - post-tool hooks should never block
+    try {
+      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'Task',
+        duration: Date.now() - startTime,
+        output: {
+          status: 'ok',
+        },
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(0);
   } catch (err) {
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'post-task-unified',
+        error: err.message,
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     // Fail open - post-tool hooks should never block
     if (process.env.DEBUG_HOOKS) {
       console.error('[post-task-unified] Error:', err.message);

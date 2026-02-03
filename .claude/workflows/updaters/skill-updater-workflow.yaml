@@ -298,6 +298,16 @@ phases:
           - changes_applied
         outputs:
           - memory_updated
+      - id: reassign-agents-if-needed
+        action: prompt
+        description: If tools or domain changed, re-run agent registry or reassign agents; record what you did
+        inputs:
+          - tools_changed
+          - change_description
+          - affected_agents
+        outputs:
+          - reassignment_confirmed
+          - reassignment_notes
       - id: cleanup-backup-on-success
         action: function
         handler: cleanupBackupOnSuccess
@@ -313,6 +323,14 @@ phases:
         inputs:
           - skill_name
           - change_description
+      - id: run-post-creation-validation
+        action: function
+        handler: runPostCreationValidation
+        description: Run validate-integration.cjs for the updated skill
+        inputs:
+          - skill_path
+        outputs:
+          - validation_passed
       - id: verify-registration
         action: function
         handler: verifyRegistration
@@ -327,6 +345,11 @@ phases:
         on_fail: retry
         max_retries: 2
         message: 'Skill registration verification failed after update'
+      - id: gate-enable-validation
+        condition: "steps['run-post-creation-validation'].output.validation_passed === true"
+        on_fail: retry
+        max_retries: 2
+        message: 'Post-update validation failed'
 
 # Rollback/compensate actions for each phase
 compensate:

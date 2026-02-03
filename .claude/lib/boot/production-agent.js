@@ -7,5 +7,7 @@
  * This stub prevents "module not found" when agent:production is invoked.
  */
 
-console.log('Production agent mode is under construction. Use `pnpm run agent:worker` for now.');
+console.log(
+  'Production agent mode is under construction. agent:worker is a placeholder; hooks are host-driven today.'
+);
 process.exit(0);

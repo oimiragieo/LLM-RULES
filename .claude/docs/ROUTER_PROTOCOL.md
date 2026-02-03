@@ -43,6 +43,7 @@ The Router analyzes and delegates—it does NOT:
 The Router ONLY:
 
 - Reads routing configuration (`.claude/agents/*.md`, `.claude/workflows/*.md`)
+- For routing recommendations, it reads `.claude/context/agent-registry.json` first and falls back to scanning `.claude/agents/` if the registry is missing or invalid.
 - Classifies user requests
 - Spawns agents via `Task()` tool
 - Tracks work via `TaskList()`, `TaskUpdate()`
@@ -208,7 +209,7 @@ User: "What TypeScript files are in the project?"
 
 **How it works:**
 
-1. `router-enforcer.cjs` detects complexity level on UserPromptSubmit
+1. `router-enforcer.cjs` (uses `routing-table.cjs`) detects complexity level on UserPromptSubmit
 2. `task-create-guard.cjs` intercepts TaskCreate tool use
 3. If complexity is HIGH/EPIC and PLANNER not spawned → BLOCK
 
@@ -298,7 +299,7 @@ The Router Protocol is enforced via automated hooks at three levels:
 
 ### 6.1 Router Enforcer Hook
 
-**File:** `.claude/hooks/routing/router-enforcer.cjs`
+**File:** `.claude/hooks/routing/router-enforcer.cjs` (routing data in `.claude/lib/routing/routing-table.cjs`)
 **Event:** `UserPromptSubmit`
 **Purpose:** Analyze user prompts and suggest appropriate agents
 
@@ -380,7 +381,7 @@ Set SECURITY_REVIEW_ENFORCEMENT=off to disable (not recommended).
 
 **How it works:**
 
-1. `router-enforcer.cjs` detects security-sensitive keywords
+1. `router-enforcer.cjs` (uses `routing-table.cjs`) detects security-sensitive keywords
 2. Sets `requiresSecurityReview` flag in router state
 3. `security-review-guard.cjs` intercepts Task() spawns
 4. If spawning DEVELOPER/QA without SECURITY-ARCHITECT → WARN/BLOCK
@@ -630,7 +631,7 @@ set SECURITY_REVIEW_ENFORCEMENT=warn
 
 1. Verify Router is following self-check protocol (Step 4)
 2. Check if Router is using ONLY whitelisted tools
-3. Review router-enforcer.cjs logs for classification
+3. Review router-enforcer.cjs logs for classification (routing data from routing-table.cjs)
 
 **Prevention:** Enforce strict tool whitelisting in router agent definition.
 

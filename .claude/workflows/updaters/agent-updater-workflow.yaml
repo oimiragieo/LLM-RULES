@@ -22,7 +22,7 @@ updater_config:
   compatibility_check: true
   registration_targets:
     - '.claude/CLAUDE.md'
-    - '.claude/hooks/routing/router-enforcer.cjs'
+    - '.claude/lib/routing/routing-table.cjs'
     - '.claude/context/memory/learnings.md'
   protected_sections:
     - 'Task Progress Protocol'
@@ -188,7 +188,7 @@ phases:
       - id: update-routing-if-needed
         action: function
         handler: updateRoutingIfNeeded
-        description: Update router-enforcer.cjs if routing keywords changed
+        description: Update routing-table.cjs if routing keywords changed
         inputs:
           - routing_affected
           - keyword_changes
@@ -289,6 +289,11 @@ phases:
           - changes_applied
         outputs:
           - memory_updated
+      - id: run-post-creation-validation
+        action: command
+        handler: runPostCreationValidation
+        description: Run validate-integration.cjs for the updated agent
+        command: node .claude/tools/cli/validate-integration.cjs {{agent_path}}
       - id: cleanup-backup-on-success
         action: function
         handler: cleanupBackupOnSuccess
@@ -326,7 +331,7 @@ compensate:
       target: backup_id
       description: Restore agent from backup
     - action: revert_routing
-      target: '.claude/hooks/routing/router-enforcer.cjs'
+      target: '.claude/lib/routing/routing-table.cjs'
       description: Revert routing changes if made
   enable:
     - action: revert_claude_md

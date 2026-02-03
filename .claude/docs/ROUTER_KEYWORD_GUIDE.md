@@ -1271,9 +1271,9 @@ For each agent:
 
 The keyword mappings and routing logic are defined in:
 
-**Primary Source**: `.claude/hooks/routing/router-enforcer.cjs`
+**Primary Source**: `.claude/lib/routing/routing-table.cjs`
 
-- `intentKeywords` (lines 376-735): Comprehensive keyword lists for all agents
+- `INTENT_KEYWORDS` (lines 376-735): Comprehensive keyword lists for all agents
 - `INTENT_TO_AGENT` (lines 741-819): Intent-to-agent mapping
 - `DISAMBIGUATION_RULES` (lines 827-891): Contextual disambiguation rules
 - `scoreAgents()` (lines 930-1114): Scoring algorithm implementation
@@ -1294,7 +1294,7 @@ The keyword mappings and routing logic are defined in:
 
 When adding new agents or updating routing logic:
 
-1. **Add Intent Keywords**: Update `intentKeywords` object in router-enforcer.cjs
+1. **Add Intent Keywords**: Update `INTENT_KEYWORDS` in routing-table.cjs
 2. **Map Intent to Agent**: Add mapping in `INTENT_TO_AGENT`
 3. **Add Disambiguation Rules**: If keywords overlap with existing agents
 4. **Update Domain Boosts**: Add domain-specific keywords to `domainBoosts` object
@@ -1303,7 +1303,7 @@ When adding new agents or updating routing logic:
 
 **Keep In Sync**:
 
-- `router-enforcer.cjs` (source of truth)
+- `routing-table.cjs` (source of truth)
 - `CLAUDE.md` Section 3 (user-facing routing table)
 - This guide (comprehensive reference)
 - `.claude/agents/` (agent definitions)

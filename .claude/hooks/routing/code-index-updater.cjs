@@ -32,6 +32,8 @@ const {
 const path = require('path');
 const fs = require('fs').promises;
 const { validatePathWithinProject } = require('../../lib/utils/project-root.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Code file extensions that should be indexed
 const INDEXABLE_EXTENSIONS = new Set([
@@ -212,11 +214,20 @@ async function triggerIndexUpdate(filePath) {
     // Use incremental update (Merkle tree) if available, otherwise fall back to directory indexing
     // Run indexing in background (non-blocking)
     setImmediate(async () => {
+      const startTime = Date.now();
       try {
         // Try incremental update first (uses Merkle tree for O(log n) change detection)
         const result = await manager.incrementalUpdate({
           onProgress: () => {}, // Silent progress
         });
+
+        const output = {
+          filePath,
+          updateType: result.updateType,
+          filesAdded: result.filesAdded,
+          filesModified: result.filesModified,
+          filesDeleted: result.filesDeleted,
+        };
 
         if (
           result.updateType === 'incremental' &&
@@ -226,11 +237,24 @@ async function triggerIndexUpdate(filePath) {
         ) {
           // No changes detected - nothing to do
           debugLog('code-index-updater', 'No changes detected (Merkle tree)');
+          output.noChanges = true;
         } else {
           debugLog(
             'code-index-updater',
             `Incremental update: ${result.filesModified} modified, ${result.filesAdded} added, ${result.filesDeleted} deleted`
           );
+        }
+
+        try {
+          await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+            type: EventTypes.TOOL_COMPLETED,
+            timestamp: new Date().toISOString(),
+            toolName: 'code-index-updater',
+            duration: Date.now() - startTime,
+            output,
+          });
+        } catch (_e) {
+          // Best-effort
         }
       } catch (err) {
         // Fallback: if incremental fails, index the directory containing the file
@@ -244,8 +268,34 @@ async function triggerIndexUpdate(filePath) {
           await manager.indexDirectory(fileDir, {
             onProgress: () => {},
           });
+          try {
+            await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+              type: EventTypes.TOOL_COMPLETED,
+              timestamp: new Date().toISOString(),
+              toolName: 'code-index-updater',
+              duration: Date.now() - startTime,
+              output: {
+                filePath,
+                updateType: 'fallback',
+                indexedDirectory: fileDir,
+              },
+            });
+          } catch (_e) {
+            // Best-effort
+          }
         } catch (fallbackErr) {
           debugLog('code-index-updater', `Fallback indexing failed (non-blocking)`, fallbackErr);
+          try {
+            await eventBus.emit(EventTypes.TOOL_FAILED, {
+              type: EventTypes.TOOL_FAILED,
+              timestamp: new Date().toISOString(),
+              toolName: 'code-index-updater',
+              duration: Date.now() - startTime,
+              error: fallbackErr.message,
+            });
+          } catch (_e) {
+            // Best-effort
+          }
         }
       } finally {
         await removeLock();
@@ -253,6 +303,16 @@ async function triggerIndexUpdate(filePath) {
     });
   } catch (err) {
     debugLog('code-index-updater', 'Index update error (ignored)', err);
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'code-index-updater',
+        error: err.message,
+      });
+    } catch (_e) {
+      // Best-effort
+    }
     await removeLock();
   }
 }

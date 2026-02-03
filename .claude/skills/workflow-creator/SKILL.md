@@ -369,7 +369,7 @@ Task({
 When specifying allowed_tools for spawned agents:
 
 - Use standard tools: Read, Write, Edit, Bash, TaskUpdate, TaskList, etc.
-- DO NOT include MCP tools (mcp\_\_\*) unless whitelisted in router-enforcer.cjs
+- DO NOT include MCP tools (mcp\_\_\*) unless whitelisted in routing-table.cjs
 - MCP tools cause router enforcement failures
 
 **Allowed tools (standard):**
@@ -392,7 +392,7 @@ allowed_tools: [
 
 - `mcp__Exa__*` - Only for evolution-orchestrator
 - `mcp__github__*` - Only for specific GitHub operations
-- Other MCP tools - Must be whitelisted in router-enforcer.cjs
+- Other MCP tools - Must be whitelisted in routing-table.cjs
 
 **Validation checklist for agent spawns:**
 
@@ -768,6 +768,7 @@ After workflow is fully created and validated:
 [ ] Does workflow need entry/exit hooks? -> Create hooks
 [ ] Does workflow need input validation? -> Create schemas
 [ ] Should workflow be part of larger orchestration? -> Update master-orchestrator
+[ ] Run post-creation validation -> node .claude/tools/cli/validate-integration.cjs .claude/workflows/<category>/<workflow-name>.yaml
 ```
 
 ---

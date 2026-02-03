@@ -59,7 +59,20 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
     └── memory-reminder.cjs
 ```
 
+Routing data source: `.claude/lib/routing/routing-table.cjs`.
+
 ## Key Safety Hooks
+
+## Reflection Hooks
+
+### reflection-step0-guard.cjs
+
+**Event**: `PreToolUse(TaskList)`
+**Purpose**: Blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning (`off` disables).
+**Exit Codes**:
+
+- `0`: Allow operation (or warn)
+- `2`: Block TaskList (pending reflections)
 
 ### bash-command-validator.cjs
 

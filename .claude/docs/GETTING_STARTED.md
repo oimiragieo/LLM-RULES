@@ -272,8 +272,8 @@ Agent Studio:
 
 ## Scripts and entry points
 
-- **agent:production** is a stub; use **agent:worker** for headless/worker runs (`pnpm run agent:worker`).
-- Memory scripts: `memory:init`, `memory:embeddings`, `memory:health`, `memory:weekly`, `memory:dashboard` (see [MEMORY_SYSTEM.md](./MEMORY_SYSTEM.md)). Set `MEMORY_EMBED_ON_EDIT=on` in `.env` for automatic embedding updates on memory file edits.
+- **agent:production** is a stub; **agent:worker** is a placeholder that does not run the hook framework (hooks are host-driven today).
+- Memory scripts: `memory:init`, `memory:embeddings`, `memory:health`, `memory:weekly`, `memory:dashboard` (health), `memory:dashboard:budget` (token/budget) — see [MEMORY_SYSTEM.md](./MEMORY_SYSTEM.md). Set `MEMORY_EMBED_ON_EDIT=on` in `.env` for automatic embedding updates on memory file edits.
 
 ## Where to Learn More
 

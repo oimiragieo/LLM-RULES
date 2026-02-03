@@ -1,0 +1,41 @@
+name: Agent Registry Consistency
+
+on:
+  pull_request:
+    paths:
+      - '.claude/agents/**'
+      - '.claude/context/agent-registry.json'
+      - '.claude/tools/cli/generate-agent-registry.cjs'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  registry-consistency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Regenerate agent registry
+        run: npm run gen:agent-registry
+
+      - name: Verify registry is up to date
+        run: |
+          if git diff --quiet -- .claude/context/agent-registry.json; then
+            echo "Agent registry is up to date."
+          else
+            echo "Agent registry is stale. Run: npm run gen:agent-registry"
+            git --no-pager diff -- .claude/context/agent-registry.json
+            exit 1
+          fi

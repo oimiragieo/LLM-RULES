@@ -29,6 +29,7 @@ class EntityExtractor {
     // Open database connection
     this.db = new DatabaseSync(dbPath);
     this.db.exec('PRAGMA foreign_keys = ON');
+    this.db.exec('PRAGMA busy_timeout = 5000');
 
     // Validate schema exists
     try {

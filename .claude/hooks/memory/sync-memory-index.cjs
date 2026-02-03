@@ -31,6 +31,8 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 
 const { EntityExtractor } = require('../../lib/memory/entity-extractor.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 const CORE_MEMORY_MARKDOWN_FILES = new Set(['learnings.md', 'decisions.md', 'issues.md']);
 const CORE_MEMORY_JSON_FILES = new Set(['patterns.json', 'gotchas.json']);
@@ -197,10 +199,14 @@ function maybeGenerateEmbeddingsForFile(absPath) {
 }
 
 async function main() {
+  const startTime = Date.now();
+  let output = null;
+  let toolName = null;
+  let absPath = null;
   const hookInput = parseHookInputSync();
   if (!hookInput) process.exit(0);
 
-  const toolName = getToolName(hookInput);
+  toolName = getToolName(hookInput);
   const toolInput = getToolInput(hookInput);
   const filePath = extractFilePath(toolInput);
 
@@ -212,7 +218,7 @@ async function main() {
     process.exit(0);
   }
 
-  const absPath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
+  absPath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
   const fileType = getCoreMemoryFileType(absPath);
   if (!fileType) process.exit(0);
 
@@ -222,6 +228,7 @@ async function main() {
   try {
     if (fileType === 'json') {
       syncJsonMemory(absPath, dbPath);
+      maybeGenerateEmbeddingsForFile(absPath);
     } else {
       const extractor = new EntityExtractor(dbPath);
       try {
@@ -235,10 +242,38 @@ async function main() {
       }
       maybeGenerateEmbeddingsForFile(absPath);
     }
+    output = {
+      file: absPath,
+      fileType,
+      toolName,
+    };
   } catch (err) {
     debugLog('sync-memory-index', `Failed to initialize extractor for ${toolName || 'tool'}`, err);
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'sync-memory-index',
+        error: err.message,
+      });
+    } catch (_e) {
+      // Best-effort
+    }
   }
 
+  try {
+    if (output) {
+      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'sync-memory-index',
+        output,
+        duration: Date.now() - startTime,
+      });
+    }
+  } catch (_e) {
+    // Best-effort
+  }
   // Best-effort / non-blocking.
   process.exit(0);
 }

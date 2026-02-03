@@ -13,6 +13,7 @@
  *   --source <path>     Source directory containing memory files (default: .claude/context/memory)
  *   --file <path>       Single file to process (absolute or relative to project root)
  *   --batch-size <num>  Batch size for embedding generation (default: 100)
+ *   --reindex           Drop existing LanceDB table before embedding
  *   --dry-run           Preview what would be processed without actually generating embeddings
  *
  * Related: Task #24 (P1-1.2)
@@ -228,6 +229,15 @@ async function processFile(filePath, options, vectorStore) {
   return chunks.length;
 }
 
+async function reindexIfNeeded(vectorStore, options) {
+  if (!options?.reindex) return false;
+  if (!vectorStore || typeof vectorStore.dropTable !== 'function') {
+    throw new Error('LanceDB table drop is unavailable');
+  }
+  await vectorStore.dropTable();
+  return true;
+}
+
 /**
  * Main function
  */
@@ -238,6 +248,7 @@ async function main() {
     batchSize: 100,
     dryRun: false,
     file: null,
+    reindex: false,
   };
 
   // Parse arguments
@@ -250,6 +261,8 @@ async function main() {
       i++;
     } else if (args[i] === '--dry-run') {
       options.dryRun = true;
+    } else if (args[i] === '--reindex') {
+      options.reindex = true;
     } else if (args[i] === '--file' && i + 1 < args.length) {
       options.file = args[i + 1];
       i++;
@@ -265,6 +278,9 @@ async function main() {
   console.log(`Source directory: ${sourceDir}`);
   console.log(`Batch size: ${options.batchSize}`);
   console.log(`Mode: ${options.dryRun ? 'DRY RUN' : 'EXECUTE'}`);
+  if (options.reindex) {
+    console.log('Reindex: enabled (existing table will be dropped)');
+  }
   console.log('');
 
   // Find files
@@ -294,7 +310,7 @@ async function main() {
   console.log('Initializing LanceDB...');
   const vectorStore = new MemoryVectorStore({
     persistDirectory: path.join(PROJECT_ROOT, '.claude/data/lancedb'),
-    collectionName: 'agent_memory',
+    collectionName: process.env.LANCEDB_TABLE || 'agent_memory',
   });
 
   // Check if available
@@ -305,16 +321,29 @@ async function main() {
   }
 
   console.log('LanceDB initialized successfully');
+  if (options.reindex) {
+    console.log(`Dropping table: ${vectorStore.config.collectionName}`);
+    await reindexIfNeeded(vectorStore, options);
+  }
   console.log('');
 
   // Process files
   let totalChunks = 0;
   for (const file of files) {
-    if (!file.endsWith('.md')) {
-      console.log(`  Skipping non-markdown file: ${path.basename(file)}`);
+    const ext = path.extname(file).toLowerCase();
+    if (!['.md', '.json'].includes(ext)) {
+      console.log(`  Skipping unsupported file: ${path.basename(file)}`);
       continue;
     }
-    totalChunks += await processFile(file, options, vectorStore);
+    try {
+      totalChunks += await processFile(file, options, vectorStore);
+    } catch (error) {
+      if (String(error?.message || '').includes('embedding dimension mismatch')) {
+        console.error('ERROR: Embedding dimension mismatch detected.');
+        console.error('Run with --reindex to rebuild the LanceDB table.');
+      }
+      throw error;
+    }
   }
 
   console.log('');
@@ -330,6 +359,7 @@ module.exports = {
   extractMetadata,
   findMemoryFiles,
   processFile,
+  reindexIfNeeded,
 };
 
 // Run if executed directly

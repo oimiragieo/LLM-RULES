@@ -75,7 +75,9 @@ Note: Claude Code does not provide a `SessionStart` hook event; “session-start
 
 ### Reflection spawn
 
-Reflection is **reminder-driven**. The Router **must** perform Step 0 before `TaskList()`; no daemon or hook spawns the reflection-agent—compliance is required for pending reflections to run. The reflection-queue-processor writes `.claude/context/runtime/reflection-spawn-request.json`; on `UserPromptSubmit`, when that file has pending requests, `.claude/hooks/routing/user-prompt-unified.cjs` writes `.claude/context/runtime/reflection-reminder.txt`. Before `TaskList()` or any other tool, if `reflection-reminder.txt` exists, the Router must read it, read `reflection-spawn-request.json`, spawn reflection-agent for each request (or the first batch), then delete the reminder file and clear/trim the spawn request file. Health/dashboard may show `pendingReflectionRequests: N` when the spawn-request file contains queued items.
+Reflection is **reminder-driven**. The Router **must** perform Step 0 before `TaskList()`; no daemon or hook spawns the reflection-agent—compliance is required for pending reflections to run. The reflection-queue-processor writes `.claude/context/runtime/reflection-spawn-request.json`; on `UserPromptSubmit`, when that file has pending requests, `.claude/hooks/routing/user-prompt-unified.cjs` writes `.claude/context/runtime/reflection-reminder.txt`. Before `TaskList()` or any other tool, if `reflection-reminder.txt` exists, the Router must read it, read `reflection-spawn-request.json`, spawn reflection-agent for each request (or the first batch), then delete the reminder file and clear/trim the spawn request file. Health/dashboard may show `pendingReflectionRequests: N` when the spawn-request file contains queued items. A PreToolUse(TaskList) guard blocks by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning.
+
+An optional Step 0 guard runs on `PreToolUse(TaskList)` via `.claude/hooks/reflection/reflection-step0-guard.cjs`. It **blocks by default** when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow TaskList with warnings instead.
 
 **Reflection is best-effort:** If the Router skips Step 0, pending reflections will not run. Check the dashboard (or health output) for `pendingReflectionRequests` to see if reflections are queued.
 
@@ -105,7 +107,7 @@ Metrics are collected on `UserPromptSubmit` via `memory-health-check.cjs` (Phase
 
 ### Embeddings (auto-index)
 
-Semantic embeddings can be generated automatically on memory file edits when `MEMORY_EMBED_ON_EDIT=on`. The PostToolUse memory index hook will invoke the embedding generator for `learnings.md`, `decisions.md`, `issues.md`, `patterns.json`, and `gotchas.json` with a short timeout (`MEMORY_EMBED_ON_EDIT_TIMEOUT_MS`, default 30000). If disabled, use `pnpm run memory:embeddings` to build embeddings manually.
+Semantic embeddings can be generated automatically on memory file edits when `MEMORY_EMBED_ON_EDIT=on`. The PostToolUse memory index hook will invoke the embedding generator for `learnings.md`, `decisions.md`, `issues.md`, `patterns.json`, and `gotchas.json` with a short timeout (`MEMORY_EMBED_ON_EDIT_TIMEOUT_MS`, default 30000). If disabled, use `pnpm run memory:embeddings` to build embeddings manually. To rebuild from scratch (e.g. after a model change or dimension mismatch), use `pnpm run memory:reindex`.
 
 ## Caveats / Verification Notes
 
@@ -149,11 +151,11 @@ MTM entries include `tier: "MTM"` and `consolidated_at` metadata. Remove test se
 
 ## Vector Store (LanceDB)
 
-LanceDB persist directory is `.claude/data/lancedb`. Any `vectors.db` or `vectors.db_placeholder` under `.claude/context/memory/` is legacy/orphan (from an older or alternate config) and can be removed; the active client uses `.claude/data/lancedb` only. If the embedding model fails to load (e.g. missing deps like `sharp`), semantic search is **disabled** (fail‑closed) and ContextualMemory falls back to keyword search; a warning is logged and the dashboard/health show the disabled state.
+LanceDB persist directory is `.claude/data/lancedb`. Any `vectors.db` or `vectors.db_placeholder` under `.claude/context/memory/` is legacy/orphan (from an older or alternate config) and can be removed; the active client uses `.claude/data/lancedb` only. The default table name is `agent_memory` (override with `LANCEDB_TABLE`). If the embedding model fails to load (e.g. missing deps like `sharp`), semantic search is **disabled** (fail‑closed) and ContextualMemory falls back to keyword search; a warning is logged and the dashboard/health show the disabled state.
 
 **First run note:** the embedding model may download on first use (~90MB) and the first embed/search can be slow. Subsequent runs use the cached model.
 
-**Model changes:** changing `LANCEDB_EMBEDDING_MODEL` requires re‑indexing/recreating the LanceDB table. If the table vector dimension does not match the embedding model’s dimension, semantic search is disabled with a clear “dimension mismatch” warning until reindexing is done.
+**Model changes:** changing `LANCEDB_EMBEDDING_MODEL` requires re‑indexing/recreating the LanceDB table. If the table vector dimension does not match the embedding model’s dimension, semantic search is disabled with a clear “dimension mismatch” warning until reindexing is done (`pnpm run memory:reindex`).
 
 - Spawn prompt semantic search may apply a hot-only filter (exclude cold LTM). If the filter fails (e.g. LanceDB schema/API change), the hook falls back to unfiltered search. Expected metadata for filtering is document-specific (e.g. `source: 'ltm_archive'` for cold).
 
@@ -324,17 +326,17 @@ Session retention is governed by **memory-tiers** and the **scheduler** (LTM max
 
 ## Deleted Files and Folders
 
-**Directories:** The memory system **recreates missing directories on demand**. When code writes sessions, archives, LanceDB data, or tier data (STM/MTM/LTM), it calls an `ensureDir()`-style helper that creates the directory (and parents) if they do not exist. So if you delete `.claude/context/memory/sessions/` or `.claude/context/memory/archive/`, the next write (e.g. `saveSession()`, archival, or LanceDB init) will recreate the folder. No manual restore is required for directories.
+**Directories:** The memory system **recreates missing directories on demand**. When code writes archives, LanceDB data, or tier data (STM/MTM/LTM), it calls an `ensureDir()`-style helper that creates the directory (and parents) if they do not exist. So if you delete `.claude/context/memory/archive/`, the next write (archival or LanceDB init) will recreate the folder. No manual restore is required for directories.
 
 **Files:** The memory system **does not auto-recreate deleted files**. Files like `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, `patterns.json`, and `codebase_map.json` are created only when something writes to them (e.g. a hook, the memory-manager CLI, or an agent). If you delete `learnings.md`, reads will get "file not found" (or empty results) until some code writes to that path again. To restore a deleted memory file you can: (1) recreate it with minimal content (e.g. `# Learnings\n\n`) so reads succeed, or (2) rely on the next write from a hook/CLI/agent to recreate it.
 
 **Summary:**
 
-| What was deleted                                                  | Behavior                                                                                  |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `.claude/context/memory/` (entire dir)                            | Recreated when any memory write runs (e.g. SessionEnd, LanceDB init, memory-manager CLI). |
-| `sessions/`, `archive/`, `stm/`, `mtm/`, `ltm/`                   | Recreated on next write to that tier (e.g. `saveSession()` → `sessions/`).                |
-| `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, etc. | **Not** auto-recreated. Created only when something writes to that file.                  |
+| What was deleted                                                  | Behavior                                                                                     |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `.claude/context/memory/` (entire dir)                            | Recreated when any memory write runs (e.g. SessionEnd, LanceDB init, memory-manager CLI).    |
+| `sessions/`, `archive/`, `stm/`, `mtm/`, `ltm/`                   | Recreated on next write to that tier (STM/MTM/LTM). Legacy `sessions/` is no longer written. |
+| `learnings.md`, `decisions.md`, `issues.md`, `gotchas.json`, etc. | **Not** auto-recreated. Created only when something writes to that file.                     |
 
 ## Memory Manager CLI
 
@@ -408,13 +410,13 @@ Outputs JSON statistics about the memory system:
 
 ### Save a Session
 
-The `save-session` command is **deprecated and is a no-op**. Sessions are recorded only via the memory-tiers flow (STM → MTM → LTM) on SessionEnd. Do not rely on CLI save-session for persistence.
+The `save-session` command is **deprecated and exits with an error**. Sessions are recorded only via the memory-tiers flow (STM → MTM → LTM) on SessionEnd. Do not rely on CLI save-session for persistence.
 
 ```bash
-echo '{"summary":"Fixed auth bug", "tasks_completed":["Fix login"], "files_modified":["src/auth.ts"]}' | node .claude/lib/memory/memory-manager.cjs save-session   # deprecated, no-op
+echo '{"summary":"Fixed auth bug", "tasks_completed":["Fix login"], "files_modified":["src/auth.ts"]}' | node .claude/lib/memory/memory-manager.cjs save-session   # deprecated, exits 1
 ```
 
-The SessionEnd hook (unified-reflection-handler + memory-tiers) records sessions automatically; the CLI command does nothing.
+The SessionEnd hook (unified-reflection-handler + memory-tiers) records sessions automatically; the `save-session` CLI command is deprecated and exits with an error.
 
 ## Memory Protocol for Agents
 
@@ -478,7 +480,7 @@ The `unified-reflection-handler.cjs` hook automatically captures session insight
 4. Consolidate STM → MTM via `memory-tiers.consolidateSession()`
 5. Extract patterns and gotchas to their respective JSON files
 
-**Note**: The legacy `memory-manager.saveSession()` function and the `save-session` CLI are deprecated and no-op; use memory-tiers for session recording. Sessions now use the memory-tiers system exclusively (STM → MTM → LTM). The legacy `sessions/` directory is no longer actively written to.
+**Note**: The legacy `memory-manager.saveSession()` function is deprecated and throws; the `save-session` CLI exits with an error. Use memory-tiers for session recording. Sessions now use the memory-tiers system exclusively (STM → MTM → LTM). The legacy `sessions/` directory is no longer actively written to.
 
 **Memory Tiers**:
 

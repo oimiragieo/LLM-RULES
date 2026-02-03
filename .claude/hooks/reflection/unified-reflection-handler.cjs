@@ -44,6 +44,8 @@ const {
   auditLog,
   debugLog,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // PERF-003 #2: Import router-state for TaskUpdate tracking (consolidated from task-update-tracker.cjs)
 const routerState = require('../routing/router-state.cjs');
@@ -1055,6 +1057,16 @@ function recordMemoryItems(extracted) {
  * Main execution - route to appropriate handler based on event type
  */
 async function main() {
+  const startTime = Date.now();
+  const outcome = {
+    eventType: null,
+    queued: false,
+    sessionRecorded: false,
+    memoryItemsRecorded: false,
+    taskUpdateTracked: false,
+    embeddingTriggered: false,
+    maintenanceTriggered: false,
+  };
   try {
     // Check if enabled
     if (!isEnabled()) {
@@ -1075,11 +1087,14 @@ async function main() {
       process.exit(0);
     }
 
+    outcome.eventType = eventType;
+
     // Route to appropriate handler
     switch (eventType) {
       case 'task_completion': {
         const entry = handleTaskCompletion(hookInput);
         queueReflection(entry);
+        outcome.queued = true;
         break;
       }
 
@@ -1087,12 +1102,14 @@ async function main() {
       case 'task_update': {
         handleTaskUpdate(hookInput);
         // No queue entry for non-completion updates
+        outcome.taskUpdateTracked = true;
         break;
       }
 
       case 'error_recovery': {
         const entry = handleErrorRecovery(hookInput);
         queueReflection(entry);
+        outcome.queued = true;
         break;
       }
 
@@ -1100,15 +1117,19 @@ async function main() {
         const result = handleSessionEnd(hookInput);
         // Queue reflection entry
         queueReflection(result.reflection);
+        outcome.queued = true;
         // Record session to memory
         recordSession(result.sessionData);
+        outcome.sessionRecorded = true;
         // Best-effort activations
         // Note: Embedding generation is awaited to ensure the process doesn't exit before work completes.
+        outcome.embeddingTriggered = true;
         await triggerEmbeddingGeneration(result.sessionData).catch(err => {
           debugLog('unified-reflection', 'Embedding generation failed', err);
         });
         triggerMLSessionEnd(result);
         triggerMaintenance();
+        outcome.maintenanceTriggered = true;
         break;
       }
 
@@ -1116,13 +1137,35 @@ async function main() {
         const extracted = handleMemoryExtraction(hookInput);
         // Record to memory system
         recordMemoryItems(extracted);
+        outcome.memoryItemsRecorded = true;
         break;
       }
     }
 
+    try {
+      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'unified-reflection-handler',
+        output: outcome,
+        duration: Date.now() - startTime,
+      });
+    } catch (_e) {
+      // Best-effort
+    }
     // PostToolUse/SessionEnd hooks always exit 0 (don't block)
     process.exit(0);
   } catch (err) {
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'unified-reflection-handler',
+        error: err.message,
+      });
+    } catch (_e) {
+      // Best-effort
+    }
     // Fail open
     debugLog('unified-reflection', 'Hook error during processing', err);
     process.exit(0);

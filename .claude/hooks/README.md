@@ -41,7 +41,7 @@ Command validation system integrated from Auto-Claude. Provides pre-execution va
 
 Located in `.claude/hooks/routing/`
 
-#### Router Enforcer (`router-enforcer.cjs`)
+#### Router Enforcer (`router-enforcer.cjs`, uses `routing-table.cjs`)
 
 Enforces Router-First protocol for all user interactions.
 

@@ -196,7 +196,7 @@ This ensures:
 ├─────────────────────────────────────┤
 │ 1. Create agent file                │
 │ 2. Update CLAUDE.md routing table   │
-│ 3. Update router-enforcer.cjs       │
+│ 3. Update routing-table.cjs         │
 │ 4. Update learnings.md              │
 │ ⬇️ POST-CREATION (Step 11)          │
 │ 5. Run: gen:agent-registry 🔄       │
@@ -396,6 +396,20 @@ Creator skills **automatically** run registry generators:
 
 Do NOT skip these steps manually.
 
+### 1.1 Consistency Checks (Warn-Only by Default)
+
+AvailableAgents() performs a lightweight consistency check between
+`.claude/context/agent-registry.json` and `.claude/agents/`:
+
+- Warn-only by default (does not block).
+- Set `REGISTRY_CONSISTENCY_GATE=block` to turn drift into a hard failure.
+
+If warnings appear, regenerate:
+
+```bash
+npm run gen:agent-registry
+```
+
 ### 2. Batch Updates
 
 When creating multiple artifacts:
@@ -446,6 +460,12 @@ Large registries can impact startup time:
 # Check registry size
 ls -lh .claude/config/tool-manifest.json .claude/config/skill-index.json .claude/context/agent-registry.json
 ```
+
+### 6. Refresh Cadence
+
+Registry regeneration is already triggered by the agent-creator workflow after create/update.
+For batch changes or CI, run `npm run gen:all-registries`. In long-lived environments,
+schedule a periodic regeneration (e.g., nightly) to prevent drift.
 
 ## References
 

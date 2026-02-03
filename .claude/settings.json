@@ -111,6 +111,15 @@
         ]
       },
       {
+        "matcher": "TaskList",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/reflection/reflection-step0-guard.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "TaskCreate",
         "hooks": [
           {

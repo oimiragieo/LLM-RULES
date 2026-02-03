@@ -128,16 +128,16 @@ phases:
       - id: add_routing_keywords
         action: edit
         handler: addRoutingKeywords
-        description: Add routing keywords to router-enforcer.cjs
-        target: .claude/hooks/routing/router-enforcer.cjs
+        description: Add routing keywords to routing-table.cjs
+        target: .claude/lib/routing/routing-table.cjs
         compensate:
           type: file:modify
 
       - id: add_routing_table_entry
         action: edit
         handler: addRoutingTable
-        description: Add entry to ROUTING_TABLE in router-enforcer.cjs
-        target: .claude/hooks/routing/router-enforcer.cjs
+        description: Add entry to INTENT_TO_AGENT in routing-table.cjs
+        target: .claude/lib/routing/routing-table.cjs
         compensate:
           type: file:modify
 
@@ -209,16 +209,21 @@ phases:
         action: command
         handler: runTests
         description: Run validation to ensure agent is registered
-        command: node .claude/hooks/routing/router-enforcer.test.cjs
+        command: node --test tests/routing-table.test.cjs
+      - id: run-post-creation-validation
+        action: command
+        handler: runPostCreationValidation
+        description: Run validate-integration.cjs for the new agent
+        command: node .claude/tools/cli/validate-integration.cjs .claude/agents/{{category}}/{{name}}.md
 
     gates:
       - type: registration
         targets:
           - type: claude_md
             section: AGENT ROUTING TABLE
-          - type: router_enforcer
-            object: intentKeywords
-        message: Agent must be registered in CLAUDE.md and router-enforcer.cjs
+          - type: routing-table
+            object: INTENT_KEYWORDS
+        message: Agent must be registered in CLAUDE.md and routing-table.cjs
 
 rollback:
   strategy: saga

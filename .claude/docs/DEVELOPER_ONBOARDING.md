@@ -642,10 +642,10 @@ Add to `.claude/CLAUDE.md` Section 3:
 
 **Step 3: Add Intent Keywords**
 
-Update `.claude/hooks/routing/router-enforcer.cjs`:
+Update `.claude/lib/routing/routing-table.cjs`:
 
 ```javascript
-const intentKeywords = {
+const INTENT_KEYWORDS = {
   // ... existing keywords
   'my-agent': ['keyword1', 'keyword2', 'specific-phrase'],
 };
@@ -974,7 +974,7 @@ Check project history and decisions:
 
 **Agent not routing correctly:**
 
-- Verify keywords in router-enforcer.cjs
+- Verify keywords in routing-table.cjs
 - Check agent file exists and is valid YAML
 - Review routing table in CLAUDE.md
 

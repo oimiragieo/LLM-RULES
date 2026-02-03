@@ -76,7 +76,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 
 **Routing Logic Source of Truth:**
 
-- `.claude/hooks/routing/router-enforcer.cjs` (intentKeywords, INTENT_TO_AGENT, DISAMBIGUATION_RULES)
+- `.claude/lib/routing/routing-table.cjs` (INTENT_KEYWORDS, INTENT_TO_AGENT, DISAMBIGUATION_RULES)
 
 ---
 

@@ -259,11 +259,11 @@ phases:
       - id: check-graceful-degradation
         action: function
         handler: checkGracefulDegradation
-        description: Verify hook defaults to warn mode, not block
+        description: Verify hook supports enforcement modes (block|warn|off) with a documented default
         inputs:
           - hook_path
         outputs:
-          - graceful_degradation
+          - enforcement_config_valid
       - id: lint-hook
         action: function
         handler: lintHook
@@ -287,9 +287,9 @@ phases:
         on_fail: return_to_lock
         message: 'Hook must export validate() function'
       - id: gate-verify-graceful
-        condition: "steps['check-graceful-degradation'].output.graceful_degradation === true"
+        condition: "steps['check-graceful-degradation'].output.enforcement_config_valid === true"
         on_fail: return_to_lock
-        message: 'Hook must default to warn mode, not block'
+        message: 'Hook must support block|warn|off with a documented default (warn unless explicitly required)'
 
   enable:
     description: Register in settings.json, update hooks/README.md, update memory
@@ -345,6 +345,14 @@ phases:
         inputs:
           - hook_name
           - hook_path
+      - id: run-post-creation-validation
+        action: function
+        handler: runPostCreationValidation
+        description: Run validate-integration.cjs for the new hook
+        inputs:
+          - hook_path
+        outputs:
+          - validation_passed
       - id: verify-registration
         action: function
         handler: verifyRegistration
@@ -370,6 +378,11 @@ phases:
         on_fail: retry
         max_retries: 2
         message: 'Hook registration verification failed'
+      - id: gate-enable-validation
+        condition: "steps['run-post-creation-validation'].output.validation_passed === true"
+        on_fail: retry
+        max_retries: 2
+        message: 'Post-creation validation failed'
 
 # Rollback/compensate actions for each phase
 compensate:
@@ -397,7 +410,7 @@ iron_laws:
     rule: 'Every hook MUST have main() for CLI execution'
     enforcement: gate-verify-exports
   - id: no-hook-without-graceful
-    rule: "Default to 'warn' mode, not 'block'"
+    rule: "Support 'block|warn|off' enforcement with a documented default (warn unless explicitly required)"
     enforcement: gate-verify-graceful
   - id: no-hook-without-error-handling
     rule: 'Wrap JSON.parse in try/catch, handle missing parameters'

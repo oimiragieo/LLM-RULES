@@ -524,7 +524,7 @@ This checks:
 - **"The hooks aren't firing"**:
   - Check `settings.json` has correct format with `matcher` and `hooks` array
   - Ensure hook files use `.cjs` extension
-  - Test hook directly: `node .claude/hooks/routing/router-enforcer.cjs '{"prompt":"test"}'`
+- Test hook directly: `node .claude/hooks/routing/router-enforcer.cjs '{"prompt":"test"}'` (uses `.claude/lib/routing/routing-table.cjs`)
 
 - **"Agents aren't switching"**: Remind the model: "Read the agent profile for [Agent Name]."
 

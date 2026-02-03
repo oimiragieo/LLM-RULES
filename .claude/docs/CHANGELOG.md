@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **NEW**: Hybrid multi-layer Router enforcement system with 5 components
   - `router-state.cjs`: Extended state tracking for complexity and spawn events
-  - `router-enforcer.cjs`: Complexity classification and advisory warnings
+  - `router-enforcer.cjs` (uses `routing-table.cjs`): Complexity classification and advisory warnings
   - `agent-context-tracker.cjs`: Detects PLANNER/SECURITY-ARCHITECT spawns
   - `task-create-guard.cjs`: BLOCKING hook prevents TaskCreate for HIGH/EPIC tasks without PLANNER
   - CLAUDE.md Section 1.2: Explicit 3-gate decision tree with STOP gates

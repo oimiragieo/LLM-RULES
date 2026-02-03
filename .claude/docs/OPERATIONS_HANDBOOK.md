@@ -543,10 +543,10 @@ Add to `.claude/CLAUDE.md` Section 3 (Agent Routing Table):
 
 **Step 3: Add Intent Keywords**
 
-Update `.claude/hooks/routing/router-enforcer.cjs`:
+Update `.claude/lib/routing/routing-table.cjs`:
 
 ```javascript
-intentKeywords['new-agent'] = ['keyword1', 'keyword2', 'keyword3'];
+INTENT_KEYWORDS['new-agent'] = ['keyword1', 'keyword2', 'keyword3'];
 ```
 
 **Step 4: Test Routing**

@@ -26,6 +26,8 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 
 // Import memory manager functions and shared project root (MEMORY_SYSTEM.md: use project-root.cjs)
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Smart pruning thresholds
 const SMART_PRUNE_CONFIG = {
@@ -261,6 +263,7 @@ function applyAutoRemediation(
 }
 
 async function main() {
+  const startTime = Date.now();
   const memoryManagerPath = getMemoryManagerPath();
   const memoryTiersPath = getMemoryTiersPath();
   const smartPrunerPath = getSmartPrunerPath();
@@ -284,17 +287,33 @@ async function main() {
   const memoryDashboardPath = getMemoryDashboardPath();
   const memoryDashboard = loadOptionalModule(memoryDashboardPath, 'memory dashboard');
 
-  const health = getMemoryHealth(PROJECT_ROOT);
-  const output = buildOutput(health);
-  await attachSemanticStatus(output, memoryDashboard, PROJECT_ROOT);
-  applyTierHealth(output, memoryTiers, PROJECT_ROOT);
-  const autoActions = applyAutoRemediation(health, output, memoryTiers, smartPruner, PROJECT_ROOT, {
-    checkAndArchiveLearnings,
-    pruneCodebaseMap,
-    getMemoryDir,
-    CONFIG,
-  });
-  output.autoActions = autoActions;
+  let output;
+  let autoActions = [];
+  try {
+    const health = getMemoryHealth(PROJECT_ROOT);
+    output = buildOutput(health);
+    await attachSemanticStatus(output, memoryDashboard, PROJECT_ROOT);
+    applyTierHealth(output, memoryTiers, PROJECT_ROOT);
+    autoActions = applyAutoRemediation(health, output, memoryTiers, smartPruner, PROJECT_ROOT, {
+      checkAndArchiveLearnings,
+      pruneCodebaseMap,
+      getMemoryDir,
+      CONFIG,
+    });
+    output.autoActions = autoActions;
+  } catch (err) {
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'memory-health-check',
+        error: err.message,
+      });
+    } catch (_e) {
+      // Best-effort
+    }
+    throw err;
+  }
 
   // Pending reflection requests (Router must perform Step 0 to process them)
   const reflectionSpawnPath = path.join(
@@ -408,6 +427,18 @@ async function main() {
   // Return JSON result for programmatic access
   if (process.env.MEMORY_HEALTH_JSON) {
     console.log(JSON.stringify(output, null, 2));
+  }
+
+  try {
+    await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+      type: EventTypes.TOOL_COMPLETED,
+      timestamp: new Date().toISOString(),
+      toolName: 'memory-health-check',
+      output,
+      duration: Date.now() - startTime,
+    });
+  } catch (_e) {
+    // Best-effort
   }
 
   process.exit(0);

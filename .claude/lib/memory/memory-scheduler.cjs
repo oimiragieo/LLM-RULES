@@ -26,6 +26,8 @@ const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.
 // BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
 // CRITICAL-001 FIX: Path traversal prevention
 const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
+const eventBus = require('../events/event-bus.cjs');
+const { EventTypes } = require('../events/event-types.cjs');
 
 // ============================================================================
 // Configuration
@@ -545,6 +547,7 @@ function runTask(taskName, projectRoot = PROJECT_ROOT) {
  * Run daily maintenance tasks
  */
 function runDailyMaintenance(projectRoot = PROJECT_ROOT) {
+  const startTime = Date.now();
   const timestamp = new Date().toISOString();
   const tasks = [];
 
@@ -571,7 +574,7 @@ function runDailyMaintenance(projectRoot = PROJECT_ROOT) {
   // Get health check result
   const healthCheckTask = tasks.find(t => t.type === 'healthCheck');
 
-  return {
+  const result = {
     maintenanceType: 'daily',
     timestamp,
     tasks,
@@ -582,12 +585,41 @@ function runDailyMaintenance(projectRoot = PROJECT_ROOT) {
         }
       : null,
   };
+
+  try {
+    const taskSummaries = tasks.map(t => ({ type: t.type, success: t.success }));
+    const failures = taskSummaries.filter(t => t.success === false);
+    if (failures.length > 0) {
+      eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'memory-scheduler',
+        error: `daily_maintenance_failed:${failures.map(f => f.type).join(',')}`,
+      });
+    } else {
+      eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'memory-scheduler',
+        output: {
+          maintenanceType: result.maintenanceType,
+          tasks: taskSummaries,
+        },
+        duration: Date.now() - startTime,
+      });
+    }
+  } catch (_e) {
+    // Best-effort
+  }
+
+  return result;
 }
 
 /**
  * Run weekly maintenance tasks (includes daily tasks)
  */
 function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
+  const startTime = Date.now();
   const timestamp = new Date().toISOString();
   const tasks = [];
 
@@ -623,7 +655,7 @@ function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
   // Get health check result
   const healthCheckTask = tasks.find(t => t.type === 'healthCheck');
 
-  return {
+  const result = {
     maintenanceType: 'weekly',
     timestamp,
     tasks,
@@ -635,6 +667,34 @@ function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
       : null,
     weeklyReport: weeklyReportResult.report,
   };
+
+  try {
+    const taskSummaries = tasks.map(t => ({ type: t.type, success: t.success }));
+    const failures = taskSummaries.filter(t => t.success === false);
+    if (failures.length > 0) {
+      eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'memory-scheduler',
+        error: `weekly_maintenance_failed:${failures.map(f => f.type).join(',')}`,
+      });
+    } else {
+      eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'memory-scheduler',
+        output: {
+          maintenanceType: result.maintenanceType,
+          tasks: taskSummaries,
+        },
+        duration: Date.now() - startTime,
+      });
+    }
+  } catch (_e) {
+    // Best-effort
+  }
+
+  return result;
 }
 
 /**
@@ -648,6 +708,7 @@ function runMaintenance(type, projectRoot = PROJECT_ROOT) {
       return runWeeklyMaintenance(projectRoot);
     default:
       // Run specific task
+      const startTime = Date.now();
       const taskResult = runTask(type, projectRoot);
 
       // Update status
@@ -664,11 +725,38 @@ function runMaintenance(type, projectRoot = PROJECT_ROOT) {
       }
       writeStatus(status, projectRoot);
 
-      return {
+      const result = {
         maintenanceType: 'task',
         task: type,
         ...taskResult,
       };
+
+      try {
+        if (result.success === false) {
+          eventBus.emit(EventTypes.TOOL_FAILED, {
+            type: EventTypes.TOOL_FAILED,
+            timestamp: new Date().toISOString(),
+            toolName: 'memory-scheduler',
+            error: `maintenance_task_failed:${result.task}`,
+          });
+        } else {
+          eventBus.emit(EventTypes.TOOL_COMPLETED, {
+            type: EventTypes.TOOL_COMPLETED,
+            timestamp: new Date().toISOString(),
+            toolName: 'memory-scheduler',
+            output: {
+              maintenanceType: result.maintenanceType,
+              task: result.task,
+              success: result.success,
+            },
+            duration: Date.now() - startTime,
+          });
+        }
+      } catch (_e) {
+        // Best-effort
+      }
+
+      return result;
   }
 }
 

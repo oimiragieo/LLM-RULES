@@ -46,6 +46,8 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const routerState = require('./router-state.cjs');
 const loopStateManager = require('../../lib/self-healing/loop-state-manager.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // =============================================================================
 // CONSTANTS
@@ -793,6 +795,7 @@ function runAllChecks(hookInput) {
  * Main execution function
  */
 async function main() {
+  const startTime = Date.now();
   try {
     const hookInput = await parseHookInputAsync();
 
@@ -811,13 +814,60 @@ async function main() {
     const result = runAllChecks(hookInput);
 
     if (!result.pass) {
+      try {
+        if (result.exitCode === 2) {
+          await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+            type: EventTypes.TOOL_BLOCKED,
+            timestamp: new Date().toISOString(),
+            toolName: 'Task',
+            duration: Date.now() - startTime,
+            reason: result.message,
+          });
+        } else {
+          await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+            type: EventTypes.TOOL_COMPLETED,
+            timestamp: new Date().toISOString(),
+            toolName: 'Task',
+            duration: Date.now() - startTime,
+            output: {
+              status: 'warn',
+              reason: result.message,
+            },
+          });
+        }
+      } catch (_err) {
+        // Best-effort
+      }
       console.log(formatResult(result.exitCode === 2 ? 'block' : 'warn', result.message));
       process.exit(result.exitCode);
     }
 
     // All checks passed
+    try {
+      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'Task',
+        duration: Date.now() - startTime,
+        output: {
+          status: 'ok',
+        },
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(0);
   } catch (err) {
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'pre-task-unified',
+        error: err.message,
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     // SEC-008: Allow debug override for troubleshooting
     if (process.env.HOOK_FAIL_OPEN === 'true') {
       auditLog('pre-task-unified', 'fail_open_override', { error: err.message });

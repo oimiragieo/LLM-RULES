@@ -308,7 +308,7 @@ Output a concise summary:
 
 **Quick Commands**:
 - Validate: `node .claude/tools/validate-agents.mjs`
-- Test hooks: `node .claude/hooks/routing/router-enforcer.cjs`
+- Test hooks: `node .claude/hooks/routing/router-enforcer.cjs` (uses `.claude/lib/routing/routing-table.cjs`)
 
 **Key Locations**:
 - Agents: `.claude/agents/`

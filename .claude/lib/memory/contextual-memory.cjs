@@ -42,7 +42,7 @@ class ContextualMemory {
       dbPath: config.dbPath || path.join(projectRoot, '.claude/data/memory.db'),
       lancedbConfig: config.lancedbConfig || {
         persistDirectory: path.join(projectRoot, '.claude/data/lancedb'),
-        collectionName: 'agent-studio-memory',
+        collectionName: process.env.LANCEDB_TABLE || 'agent_memory',
       },
     };
 
@@ -192,7 +192,10 @@ class ContextualMemory {
         similarity: result.similarity,
         source: 'lancedb',
       }));
-    } catch {
+    } catch (error) {
+      this._logLancedbEvent('semantic_fallback', {
+        message: error?.message || String(error),
+      });
       // Fallback: lightweight keyword search over key memory artifacts.
       return await this._keywordSearch(query, { limit });
     }

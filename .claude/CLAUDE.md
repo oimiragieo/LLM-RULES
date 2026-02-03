@@ -297,7 +297,7 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 > **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for complete agent routing matrix.
 
 **Quick:** Bug fixes → developer | Security → security-architect | Multi-agent → master-orchestrator | Creators → @CREATOR_SKILLS_TABLE.md
-**Source of Truth:** `.claude/hooks/routing/router-enforcer.cjs`
+**Source of Truth:** `.claude/lib/routing/routing-table.cjs`
 
 ### Creator Skills
 

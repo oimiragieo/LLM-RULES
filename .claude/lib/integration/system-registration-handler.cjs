@@ -10,7 +10,7 @@
  * - CLAUDE.md (agents, skills, workflows)
  * - settings.json (hooks)
  * - skill-catalog.md (skills)
- * - router-enforcer.cjs (agent keywords)
+ * - routing-table.cjs (agent keywords)
  *
  * Features:
  * - Create backups before modification
@@ -45,7 +45,7 @@ const DEFAULT_PATHS = {
   claudeMd: '.claude/CLAUDE.md',
   settingsJson: '.claude/settings.json',
   skillCatalog: '.claude/context/artifacts/skill-catalog.md',
-  routerEnforcer: '.claude/hooks/routing/router-enforcer.cjs',
+  routerEnforcer: '.claude/lib/routing/routing-table.cjs',
   backups: '.claude/context/backups',
 };
 
@@ -74,7 +74,7 @@ class SystemRegistrationHandler {
    * @param {string} options.claudeMdPath - Path to CLAUDE.md
    * @param {string} options.settingsJsonPath - Path to settings.json
    * @param {string} options.skillCatalogPath - Path to skill-catalog.md
-   * @param {string} options.routerEnforcerPath - Path to router-enforcer.cjs
+   * @param {string} options.routerEnforcerPath - Path to routing-table.cjs
    * @param {string} options.backupDir - Directory for backups
    * @param {boolean} options.testMode - Enable test mode
    */
@@ -104,7 +104,7 @@ class SystemRegistrationHandler {
         path.join(basePath, testMode ? 'skill-catalog.md' : DEFAULT_PATHS.skillCatalog),
       routerEnforcerPath:
         options.routerEnforcerPath ||
-        path.join(basePath, testMode ? 'router-enforcer.cjs' : DEFAULT_PATHS.routerEnforcer),
+        path.join(basePath, testMode ? 'routing-table.cjs' : DEFAULT_PATHS.routerEnforcer),
       backupDir:
         options.backupDir || path.join(basePath, testMode ? 'backups' : DEFAULT_PATHS.backups),
     };

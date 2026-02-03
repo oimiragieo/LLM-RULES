@@ -91,7 +91,7 @@ Create consolidation design:
 ### Before (3 hooks, 3 processes, 6 file reads)
 
 1. router-mode-reset.cjs - reads router-state.json
-2. router-enforcer.cjs - reads router-state.json, CLAUDE.md
+2. router-enforcer.cjs - reads router-state.json, routing-table.cjs, CLAUDE.md
 3. task-create-guard.cjs - reads router-state.json
 
 ### After (1 hook, 1 process, 2 file reads)
@@ -166,7 +166,7 @@ Template for consolidated hook:
  *
  * Consolidates:
  * - router-mode-reset.cjs
- * - router-enforcer.cjs
+ * - router-enforcer.cjs (routing data in routing-table.cjs)
  * - task-create-guard.cjs
  *
  * Event: PreToolUse
@@ -193,7 +193,7 @@ function runEnforcementChecks(hookInput) {
   // Check 1: Mode reset (from router-mode-reset.cjs)
   results.push(checkModeReset(hookInput));
 
-  // Check 2: Router enforcement (from router-enforcer.cjs)
+  // Check 2: Router enforcement (uses routing-table.cjs)
   results.push(checkRouterEnforcement(hookInput));
 
   // Check 3: Task create guard (from task-create-guard.cjs)

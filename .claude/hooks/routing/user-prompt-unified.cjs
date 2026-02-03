@@ -4,7 +4,7 @@
  *
  * Consolidates 5 UserPromptSubmit hooks into a single file for reduced I/O and process spawning:
  * 1. router-mode-reset.cjs - Resets router state on new prompts
- * 2. router-enforcer.cjs - Analyzes prompts for routing recommendations
+ * 2. router-enforcer.cjs - Analyzes prompts for routing recommendations (uses routing-table.cjs)
  * 3. memory-reminder.cjs - Reminds agents to read memory files
  * 4. evolution-trigger-detector.cjs - Detects evolution trigger patterns (merged)
  * 5. memory-health-check.cjs - Checks memory system health (merged)
@@ -36,6 +36,8 @@ if (!memoryTiers) {
 }
 const { getCachedState, invalidateCache } = require('../../lib/utils/state-cache.cjs');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Import router state module
 const routerState = require('./router-state.cjs');
@@ -47,6 +49,7 @@ const routerState = require('./router-state.cjs');
 const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
 const _MEMORY_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
 const EVOLUTION_STATE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
+const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
 
 // Agent cache (shared across calls within same process)
 let agentCache = null;
@@ -150,7 +153,7 @@ function checkRouterModeReset(hookInput) {
 }
 
 // =============================================================================
-// Check 2: Router Enforcer (from router-enforcer.cjs)
+// Check 2: Router Enforcer (uses routing-table.cjs)
 // =============================================================================
 
 /**
@@ -267,6 +270,13 @@ function loadAgents() {
     return agentCache;
   }
 
+  const registryAgents = loadAgentsFromRegistry();
+  if (registryAgents.length > 0) {
+    agentCache = registryAgents;
+    agentCacheTime = now;
+    return registryAgents;
+  }
+
   const agents = [];
 
   function scanDir(dir) {
@@ -301,6 +311,50 @@ function loadAgents() {
 
   agentCache = agents;
   agentCacheTime = now;
+  return agents;
+}
+
+/**
+ * Load agents from agent-registry.json (preferred, indexed)
+ */
+function loadAgentsFromRegistry() {
+  try {
+    if (!fs.existsSync(AGENT_REGISTRY_PATH)) return [];
+    const registry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+    return agentsFromRegistry(registry);
+  } catch (_e) {
+    return [];
+  }
+}
+
+/**
+ * Normalize registry data into routing-scoring agent records
+ * @param {Object} registry
+ * @returns {Array<{name: string, description: string, skills: string[], priority: string, path: string}>}
+ */
+function agentsFromRegistry(registry) {
+  if (!registry || !registry.agents) return [];
+  const agents = [];
+  for (const agent of Object.values(registry.agents)) {
+    const name = agent?.id || agent?.displayName;
+    if (!name) continue;
+    const capabilities = Array.isArray(agent.capabilities) ? agent.capabilities : [];
+    const description =
+      capabilities[0]?.description || agent?.description || agent?.metadata?.description || '';
+    const skillSet = new Set();
+    for (const cap of capabilities) {
+      if (Array.isArray(cap?.skills)) {
+        for (const skill of cap.skills) skillSet.add(skill);
+      }
+    }
+    agents.push({
+      name,
+      description,
+      skills: [...skillSet],
+      priority: agent?.priority || agent?.constraints?.priority || 'medium',
+      path: agent?.filePath || agent?.path || '',
+    });
+  }
   return agents;
 }
 
@@ -1045,9 +1099,37 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
 // =============================================================================
 
 function main() {
-  const hookInput = parseHookInputSync();
-  runAllChecks(hookInput, PROJECT_ROOT);
-  process.exit(0);
+  const startTime = Date.now();
+  try {
+    const hookInput = parseHookInputSync();
+    runAllChecks(hookInput, PROJECT_ROOT);
+    try {
+      eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'UserPromptSubmit',
+        duration: Date.now() - startTime,
+        output: {
+          status: 'ok',
+        },
+      });
+    } catch (_err) {
+      // Best-effort
+    }
+    process.exit(0);
+  } catch (err) {
+    try {
+      eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'user-prompt-unified',
+        error: err.message,
+      });
+    } catch (_err) {
+      // Best-effort
+    }
+    process.exit(0);
+  }
 }
 
 if (require.main === module) {
@@ -1075,6 +1157,8 @@ module.exports = {
   detectPlanningRequirement,
   scoreAgents,
   loadAgents,
+  loadAgentsFromRegistry,
+  agentsFromRegistry,
 
   // Constants for testing
   ROUTING_TABLE,

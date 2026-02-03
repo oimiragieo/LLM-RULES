@@ -3,7 +3,8 @@
  * ========================
  *
  * This file serves as the entry point for the agent:worker script.
- * It initializes the agent environment and keeps the process alive.
+ * Placeholder only: it does not run the hook framework or routing loop.
+ * Hooks execute in the host (Cursor/Claude Code) today.
  */
 
 'use strict';

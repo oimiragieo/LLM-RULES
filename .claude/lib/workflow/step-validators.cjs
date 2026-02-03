@@ -368,7 +368,7 @@ function validateClaudeMdRegistration(artifactName, section) {
 }
 
 /**
- * Validate that an agent is registered in router-enforcer.cjs
+ * Validate that an agent is registered in routing-table.cjs
  *
  * @param {string} agentName - Name of the agent
  * @returns {{ passed: boolean, error?: string }}
@@ -378,13 +378,13 @@ function validateRouterEnforcerRegistration(agentName) {
     const routerEnforcerPath = path.join(
       getProjectRoot(),
       '.claude',
-      'hooks',
+      'lib',
       'routing',
-      'router-enforcer.cjs'
+      'routing-table.cjs'
     );
 
     if (!fs.existsSync(routerEnforcerPath)) {
-      return { passed: false, error: 'router-enforcer.cjs not found' };
+      return { passed: false, error: 'routing-table.cjs not found' };
     }
 
     const content = fs.readFileSync(routerEnforcerPath, 'utf-8');
@@ -397,10 +397,10 @@ function validateRouterEnforcerRegistration(agentName) {
 
     return {
       passed: false,
-      error: `Agent '${agentName}' not found in router-enforcer.cjs`,
+      error: `Agent '${agentName}' not found in routing-table.cjs`,
     };
   } catch (e) {
-    return { passed: false, error: `Failed to check router-enforcer.cjs: ${e.message}` };
+    return { passed: false, error: `Failed to check routing-table.cjs: ${e.message}` };
   }
 }
 
@@ -635,6 +635,7 @@ class StepValidator {
         return validateClaudeMdRegistration(artifactName, artifactType);
 
       case 'router-enforcer':
+      case 'routing-table':
         return validateRouterEnforcerRegistration(artifactName);
 
       case 'settings-json':

@@ -14,6 +14,7 @@ const assert = require('node:assert');
 const fs = require('fs').promises;
 const path = require('path');
 const { IndexManager } = require('../../.claude/lib/code-indexing/index-manager.cjs');
+const { MerkleTree } = require('../../.claude/lib/code-indexing/merkle-tree.cjs');
 
 const FIXTURES_DIR = path.join(__dirname, '..', 'fixtures', 'code-indexing');
 const INCREMENTAL_TEST_DIR = path.join(FIXTURES_DIR, 'incremental-test');
@@ -53,6 +54,32 @@ describe('Incremental indexing', () => {
   });
 
   describe('incremental update', () => {
+    test('uses MerkleTree.diff when prior tree exists', async () => {
+      const merklePath = path.join(projectRoot, '.claude/context/code-index/merkle-tree.json');
+      const hasTree = await fs
+        .access(merklePath)
+        .then(() => true)
+        .catch(() => false);
+      if (!hasTree) {
+        await manager.indexDirectory(projectRoot);
+      }
+
+      const originalDiff = MerkleTree.diff;
+      let diffCalls = 0;
+      MerkleTree.diff = (...args) => {
+        diffCalls += 1;
+        return originalDiff(...args);
+      };
+
+      try {
+        await manager.incrementalUpdate();
+      } finally {
+        MerkleTree.diff = originalDiff;
+      }
+
+      assert.ok(diffCalls >= 1, 'Expected MerkleTree.diff to be called');
+    });
+
     test('no changes returns immediately with no work', async () => {
       const result = await manager.incrementalUpdate();
       assert.strictEqual(result.updateType, 'incremental');
@@ -72,10 +99,10 @@ describe('Incremental indexing', () => {
 
       const result = await manager.incrementalUpdate();
       assert.strictEqual(result.updateType, 'incremental');
-      assert.ok(
-        result.filesModified >= 1 || result.chunksUpdated >= 0,
-        'Should detect modification'
-      );
+      assert.strictEqual(result.filesAdded, 0);
+      assert.strictEqual(result.filesDeleted, 0);
+      assert.strictEqual(result.filesModified, 1, 'Should detect single-file modification');
+      assert.ok(result.chunksUpdated >= 0);
 
       await fs.writeFile(mainPath, original);
     });

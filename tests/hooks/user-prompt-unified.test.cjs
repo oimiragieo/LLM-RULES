@@ -88,6 +88,58 @@ describe('user-prompt-unified module exports', () => {
 });
 
 // =============================================================================
+// Test: Agent registry normalization
+// =============================================================================
+
+describe('agentsFromRegistry', () => {
+  it('should map registry agents into scoring records', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const registry = {
+      agents: {
+        developer: {
+          id: 'developer',
+          displayName: 'developer',
+          filePath: '.claude/agents/core/developer.md',
+          capabilities: [
+            {
+              description: 'Implementation agent.',
+              skills: ['tdd', 'debugging'],
+            },
+          ],
+        },
+        qa: {
+          id: 'qa',
+          capabilities: [
+            {
+              description: 'Testing agent.',
+              skills: ['qa-workflow', 'tdd'],
+            },
+          ],
+        },
+      },
+    };
+
+    const agents = unified.agentsFromRegistry(registry);
+    assert.strictEqual(agents.length, 2, 'Should return two agents');
+    const developer = agents.find(a => a.name === 'developer');
+    assert.ok(developer, 'Developer agent should exist');
+    assert.strictEqual(developer.description, 'Implementation agent.');
+    assert.deepStrictEqual(
+      developer.skills.sort(),
+      ['debugging', 'tdd'].sort(),
+      'Should merge skills from capabilities'
+    );
+    assert.strictEqual(developer.path, '.claude/agents/core/developer.md');
+  });
+
+  it('should return empty array for invalid registry', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    assert.deepStrictEqual(unified.agentsFromRegistry(null), []);
+    assert.deepStrictEqual(unified.agentsFromRegistry({}), []);
+  });
+});
+
+// =============================================================================
 // Test: Router Mode Reset Logic (from router-mode-reset.cjs)
 // =============================================================================
 

@@ -316,6 +316,14 @@ phases:
         inputs:
           - workflow_name
           - change_description
+      - id: run-post-creation-validation
+        action: function
+        handler: runPostCreationValidation
+        description: Run validate-integration.cjs for the updated workflow
+        inputs:
+          - workflow_path
+        outputs:
+          - validation_passed
       - id: verify-registration
         action: function
         handler: verifyRegistration
@@ -330,6 +338,11 @@ phases:
         on_fail: retry
         max_retries: 2
         message: 'Workflow registration verification failed after update'
+      - id: gate-enable-validation
+        condition: "steps['run-post-creation-validation'].output.validation_passed === true"
+        on_fail: retry
+        max_retries: 2
+        message: 'Post-update validation failed'
 
 # Rollback/compensate actions for each phase
 compensate:

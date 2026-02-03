@@ -241,11 +241,11 @@ phases:
       - id: check-graceful-degradation
         action: function
         handler: checkGracefulDegradation
-        description: Verify hook still defaults to warn mode
+        description: Verify hook still supports enforcement modes (block|warn|off) with a documented default
         inputs:
           - hook_path
         outputs:
-          - graceful_degradation
+          - enforcement_config_valid
       - id: lint-hook
         action: function
         handler: lintHook
@@ -269,9 +269,9 @@ phases:
         on_fail: return_to_lock
         message: 'Hook must still export validate() and main()'
       - id: gate-verify-graceful
-        condition: "steps['check-graceful-degradation'].output.graceful_degradation === true"
+        condition: "steps['check-graceful-degradation'].output.enforcement_config_valid === true"
         on_fail: return_to_lock
-        message: 'Hook must still default to warn mode'
+        message: 'Hook must still support block|warn|off with a documented default (warn unless explicitly required)'
 
   enable:
     description: Update registrations and record changes
@@ -320,6 +320,14 @@ phases:
         inputs:
           - hook_name
           - change_description
+      - id: run-post-creation-validation
+        action: function
+        handler: runPostCreationValidation
+        description: Run validate-integration.cjs for the updated hook
+        inputs:
+          - hook_path
+        outputs:
+          - validation_passed
       - id: verify-registration
         action: function
         handler: verifyRegistration
@@ -334,6 +342,11 @@ phases:
         on_fail: retry
         max_retries: 2
         message: 'Hook registration verification failed after update'
+      - id: gate-enable-validation
+        condition: "steps['run-post-creation-validation'].output.validation_passed === true"
+        on_fail: retry
+        max_retries: 2
+        message: 'Post-update validation failed'
 
 # Rollback/compensate actions for each phase
 compensate:
@@ -370,5 +383,5 @@ iron_laws:
     rule: 'All tests must pass after update'
     enforcement: gate-verify-tests
   - id: maintain-graceful-degradation
-    rule: 'Hook must still default to warn mode'
+    rule: 'Hook must still support block|warn|off with a documented default'
     enforcement: gate-verify-graceful

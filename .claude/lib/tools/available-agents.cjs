@@ -19,6 +19,50 @@ const fs = require('fs');
 const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { parseAgentFrontmatter } = require('./agent-registry-generator.cjs');
+
+const DEFAULT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
+const DEFAULT_AGENTS_DIR = path.join(PROJECT_ROOT, '.claude/agents');
+
+function normalizeAgentPath(filePath) {
+  if (!filePath) return null;
+  let normalized = filePath;
+  if (path.isAbsolute(normalized)) {
+    normalized = path.relative(PROJECT_ROOT, normalized);
+  }
+  normalized = normalized.replace(/\\/g, '/');
+  if (!normalized.startsWith('.claude/')) {
+    normalized = '.claude/' + normalized.replace(/^\.\//, '');
+  }
+  return normalized;
+}
+
+function scanAgentsFromFilesystem(agentsDir) {
+  const categories = ['core', 'specialized', 'domain', 'orchestrators'];
+  const agents = new Map();
+
+  for (const category of categories) {
+    const categoryDir = path.join(agentsDir, category);
+    if (!fs.existsSync(categoryDir)) continue;
+
+    const files = fs.readdirSync(categoryDir).filter(f => f.endsWith('.md'));
+    for (const file of files) {
+      if (file.toLowerCase() === 'readme.md') continue;
+
+      const filePath = path.join(categoryDir, file);
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const agentDef = parseAgentFrontmatter(content);
+      if (!agentDef) continue;
+
+      const agentId = file.replace('.md', '');
+      agents.set(agentId, {
+        filePath: normalizeAgentPath(filePath),
+      });
+    }
+  }
+
+  return agents;
+}
 
 /**
  * AvailableAgentsQuery - Query interface for agent discovery
@@ -35,13 +79,17 @@ class AvailableAgentsQuery {
    * @param {number} options.cacheMaxSize - Maximum cache entries (default: 50)
    */
   constructor(options = {}) {
-    this.registryPath =
-      options.registryPath || path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
+    this.registryPath = options.registryPath || DEFAULT_REGISTRY_PATH;
+    this.agentsDir = options.agentsDir || DEFAULT_AGENTS_DIR;
     this.registry = null;
     this.cache = new Map();
     this.cacheTimeouts = new Map();
     this.CACHE_TTL = options.cacheTTL || 2 * 60 * 1000; // 2 minutes
     this.CACHE_MAX_SIZE = options.cacheMaxSize || 50;
+    this.CONSISTENCY_CHECK_INTERVAL = options.consistencyCheckIntervalMs || 5 * 60 * 1000; // 5 minutes
+    this.enableConsistencyCheck =
+      options.enableConsistencyCheck ?? this.registryPath === DEFAULT_REGISTRY_PATH;
+    this._lastConsistencyCheckAt = 0;
   }
 
   /**
@@ -55,9 +103,83 @@ class AvailableAgentsQuery {
     try {
       const content = fs.readFileSync(this.registryPath, 'utf-8');
       this.registry = JSON.parse(content);
+      this.checkRegistryConsistency();
       return this.registry;
     } catch (error) {
       throw new Error(`Failed to load agent registry: ${error.message}`);
+    }
+  }
+
+  checkRegistryConsistency() {
+    if (!this.enableConsistencyCheck) return;
+    if (process.env.REGISTRY_CONSISTENCY_CHECK === 'off') return;
+
+    const now = Date.now();
+    if (now - this._lastConsistencyCheckAt < this.CONSISTENCY_CHECK_INTERVAL) {
+      return;
+    }
+    this._lastConsistencyCheckAt = now;
+
+    try {
+      const registryAgents = this.registry?.agents || {};
+      const registryIds = Object.keys(registryAgents);
+      const registryIdSet = new Set(registryIds);
+      const fileAgents = scanAgentsFromFilesystem(this.agentsDir);
+
+      const missingOnDisk = [];
+      const pathMismatch = [];
+      for (const agentId of registryIds) {
+        const entry = registryAgents[agentId];
+        const fileInfo = fileAgents.get(agentId);
+        if (!fileInfo) {
+          missingOnDisk.push(agentId);
+          continue;
+        }
+        const registryPath = normalizeAgentPath(entry?.filePath);
+        if (registryPath && registryPath !== fileInfo.filePath) {
+          pathMismatch.push({ agentId, registryPath, filePath: fileInfo.filePath });
+        }
+      }
+
+      const missingInRegistry = [];
+      for (const agentId of fileAgents.keys()) {
+        if (!registryIdSet.has(agentId)) {
+          missingInRegistry.push(agentId);
+        }
+      }
+
+      if (
+        missingOnDisk.length === 0 &&
+        missingInRegistry.length === 0 &&
+        pathMismatch.length === 0
+      ) {
+        return;
+      }
+
+      const summary = [
+        missingOnDisk.length > 0 ? `missing on disk: ${missingOnDisk.length}` : null,
+        missingInRegistry.length > 0 ? `missing in registry: ${missingInRegistry.length}` : null,
+        pathMismatch.length > 0 ? `path mismatches: ${pathMismatch.length}` : null,
+      ]
+        .filter(Boolean)
+        .join(', ');
+
+      const message = [
+        '[registry] Agent registry drift detected:',
+        summary,
+        'Run: npm run gen:agent-registry',
+      ].join(' ');
+
+      if (process.env.REGISTRY_CONSISTENCY_GATE === 'block') {
+        throw new Error(message);
+      }
+
+      console.warn(message);
+    } catch (error) {
+      if (process.env.REGISTRY_CONSISTENCY_GATE === 'block') {
+        throw error;
+      }
+      console.warn('[registry] Consistency check failed (non-blocking):', error.message);
     }
   }
 

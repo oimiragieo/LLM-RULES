@@ -40,6 +40,8 @@ const { atomicWriteSync } = require('../../lib/utils/atomic-write.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 // HOOK-006 FIX: Use standardized audit logging
 const { auditLog, debugLog } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Configuration
 let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue.jsonl');
@@ -374,6 +376,7 @@ function processQueue(queueFile = QUEUE_FILE) {
  * Main execution
  */
 async function main() {
+  const startTime = Date.now();
   try {
     // Check if enabled
     if (!isEnabled()) {
@@ -403,9 +406,34 @@ async function main() {
       }
     }
 
+    try {
+      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'reflection-queue-processor',
+        output: {
+          processed: result.processed,
+          spawnRequestsWritten: writeResult.written || 0,
+          spawnRequestFile: writeResult.file || null,
+        },
+        duration: Date.now() - startTime,
+      });
+    } catch (_e) {
+      // Best-effort
+    }
     // Informational hook - always exit 0
     process.exit(0);
   } catch (err) {
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'reflection-queue-processor',
+        error: err.message,
+      });
+    } catch (_e) {
+      // Best-effort
+    }
     // Fail open - log error but don't block
     debugLog('reflection-queue-processor', 'Hook error during processing', err);
     process.exit(0);

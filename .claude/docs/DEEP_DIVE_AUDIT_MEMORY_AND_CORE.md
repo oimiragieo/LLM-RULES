@@ -267,7 +267,7 @@ The `.claude` memory system is a hybrid architecture combining:
 Summary of fixes applied from the Memory System and Core Audit plan:
 
 - **Consolidation success when STM empty**: `memory-scheduler.cjs` `runConsolidation()` now treats "No STM session found" as success; maintenance history no longer reports consolidation as failed when there is nothing to consolidate.
-- **saveSession no-op**: `memory-manager.cjs` `saveSession()` is a no-op with one-time deprecation warning and returns `{ sessionNum: 0, file: null }`. Legacy fallback in `unified-reflection-handler.cjs` skips calling it when memory-tiers is missing (logs that session recording is skipped).
+- **saveSession disabled**: `memory-manager.cjs` `saveSession()` now throws to prevent silent no-op. Legacy fallback in `unified-reflection-handler.cjs` skips calling it when memory-tiers is missing (logs that session recording is skipped).
 - **memory:health script**: Added `pnpm run memory:health` (runs `node .claude/lib/memory/memory-manager.cjs health`). Documented in MEMORY_SYSTEM.md.
 - **runArchiveOldLTM require paths**: Inline script in `memory-scheduler.cjs` now uses `JSON.stringify()` for `coldStoragePath`, `retentionConfigPath`, and `projectRoot` so paths with quotes or backslashes are safe.
 - **Orphan vectors.db and .gitignore**: `.gitignore` now includes `.claude/context/memory/vectors.db`, `.claude/context/memory/vectors.db_placeholder`, and `.claude/data/*.db`. MEMORY_SYSTEM.md states LanceDB persist directory is `.claude/data/lancedb` and any `vectors.db` under `.claude/context/memory/` is legacy/orphan.

@@ -38,8 +38,9 @@ const ROUTER_ENFORCER = path.join(
   PROJECT_ROOT,
   '.claude',
   'hooks',
+  'lib',
   'routing',
-  'router-enforcer.cjs'
+  'routing-table.cjs'
 );
 const LAST_RUN_FILE = path.join(
   PROJECT_ROOT,
@@ -117,11 +118,11 @@ function quickValidate(artifactPath) {
     }
   }
 
-  // Check router-enforcer for agents
+  // Check routing table for agents
   if (artifactType === 'agent') {
     const enforcer = readFileSafe(ROUTER_ENFORCER);
     if (enforcer && !enforcer.toLowerCase().includes(artifactName.toLowerCase())) {
-      issues.push('Missing router-enforcer keywords');
+      issues.push('Missing routing-table keywords');
     }
   }
 

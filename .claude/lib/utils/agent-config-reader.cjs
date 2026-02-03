@@ -101,7 +101,11 @@ const yaml = require('js-yaml');
  */
 function loadConfig(projectRoot) {
   try {
-    const configPath = path.join(projectRoot, '.claude', 'config.yaml');
+    const env = process.env.AGENT_STUDIO_ENV;
+    const baseDir = path.join(projectRoot, '.claude');
+    const stagingPath = path.join(baseDir, 'config.staging.yaml');
+    const defaultPath = path.join(baseDir, 'config.yaml');
+    const configPath = env === 'staging' && fs.existsSync(stagingPath) ? stagingPath : defaultPath;
     if (!fs.existsSync(configPath)) {
       return null;
     }

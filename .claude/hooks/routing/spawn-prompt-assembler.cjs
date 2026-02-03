@@ -36,6 +36,8 @@ const {
   getToolInput,
   debugLog,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
@@ -252,6 +254,7 @@ function appendEntityGraph(prompt, data) {
 }
 
 async function main() {
+  const startTime = Date.now();
   try {
     if (isDisabled()) {
       process.exit(0);
@@ -349,8 +352,32 @@ async function main() {
 
     // Claude Code hook protocol: output { tool_input: { ... } } to modify tool parameters.
     console.log(JSON.stringify({ tool_input: modifiedInput }));
+    try {
+      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'Task',
+        duration: Date.now() - startTime,
+        output: {
+          status: 'ok',
+          modified: true,
+        },
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(0);
   } catch (err) {
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'spawn-prompt-assembler',
+        error: err.message,
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     // Fail open: if we can't assemble, don't block spawns.
     debugLog('spawn-prompt-assembler', 'Hook error (fail open)', err);
     process.exit(0);

@@ -33,13 +33,7 @@ const SKILL_CATALOG = path.join(
   'artifacts',
   'skill-catalog.md'
 );
-const ROUTER_ENFORCER = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'hooks',
-  'routing',
-  'router-enforcer.cjs'
-);
+const ROUTING_TABLE = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table.cjs');
 const EVOLUTION_STATE = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
 const LEARNINGS_MD = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
 const DECISIONS_MD = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'decisions.md');
@@ -140,30 +134,30 @@ function checkSkillCatalog(artifactPath, artifactType, artifactName) {
 /**
  * Check 3: Router Enforcer Keywords
  */
-function checkRouterEnforcer(artifactPath, artifactType, artifactName) {
+function checkRoutingTable(artifactPath, artifactType, artifactName) {
   if (artifactType !== 'agent') {
     return { applicable: false, passed: true, message: 'Not applicable for this artifact type' };
   }
 
-  const enforcer = readFileSafe(ROUTER_ENFORCER);
-  if (!enforcer) {
-    return { applicable: true, passed: false, message: 'Could not read router-enforcer.cjs' };
+  const table = readFileSafe(ROUTING_TABLE);
+  if (!table) {
+    return { applicable: true, passed: false, message: 'Could not read routing-table.cjs' };
   }
 
-  const hasEntry = enforcer.toLowerCase().includes(artifactName.toLowerCase());
+  const hasEntry = table.toLowerCase().includes(artifactName.toLowerCase());
 
   if (hasEntry) {
     return {
       applicable: true,
       passed: true,
-      message: `Found "${artifactName}" in router-enforcer.cjs`,
+      message: `Found "${artifactName}" in routing-table.cjs`,
     };
   }
 
   return {
     applicable: true,
     passed: false,
-    message: `No keywords/mapping found for "${artifactName}" in router-enforcer.cjs`,
+    message: `No keywords/mapping found for "${artifactName}" in routing-table.cjs`,
   };
 }
 
@@ -376,12 +370,12 @@ function checkRouterDiscoverability(artifactPath, artifactType, artifactName) {
     return { applicable: false, passed: true, message: 'Not applicable for this artifact type' };
   }
 
-  // For agents: need CLAUDE.md + router-enforcer
+  // For agents: need CLAUDE.md + routing-table
   // For skills: need catalog + agent assignment
 
   if (artifactType === 'agent') {
     const claudeCheck = checkClaudeMdRouting(artifactPath, artifactType, artifactName);
-    const routerCheck = checkRouterEnforcer(artifactPath, artifactType, artifactName);
+    const routerCheck = checkRoutingTable(artifactPath, artifactType, artifactName);
 
     if (claudeCheck.passed && routerCheck.passed) {
       return { applicable: true, passed: true, message: 'Agent is discoverable by Router' };
@@ -390,7 +384,7 @@ function checkRouterDiscoverability(artifactPath, artifactType, artifactName) {
     return {
       applicable: true,
       passed: false,
-      message: 'Agent may not be discoverable - check CLAUDE.md and router-enforcer',
+      message: 'Agent may not be discoverable - check CLAUDE.md and routing-table',
     };
   }
 
@@ -441,7 +435,7 @@ function validateArtifact(artifactPath) {
   const checks = [
     { name: '1. CLAUDE.md Routing Entry', fn: checkClaudeMdRouting },
     { name: '2. Skill Catalog Entry', fn: checkSkillCatalog },
-    { name: '3. Router Enforcer Keywords', fn: checkRouterEnforcer },
+    { name: '3. Routing Table Keywords', fn: checkRoutingTable },
     { name: '4. Agent Assignment', fn: checkAgentAssignment },
     { name: '5. Memory File Updates', fn: checkMemoryFiles },
     { name: '6. Schema Validation', fn: checkSchemaValidation },

@@ -1137,7 +1137,7 @@ These rules are INVIOLABLE. Breaking them causes bugs that are hard to detect.
    - Check Memory Protocol section exists
 
 9. NO SKILL TEMPLATES WITH MCP TOOLS
-   - Unless tools are whitelisted in router-enforcer.cjs
+   - Unless tools are whitelisted in routing-table.cjs
    - MCP tools (mcp__*) cause routing failures
    - Standard tools only: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
 
@@ -1170,7 +1170,7 @@ Run this analysis after every skill creation:
    - Does this skill introduce a new capability type?
    - Is there an agent that can use this skill?
    - If NO agent exists → spawn agent-creator to create one
-   - If new agent created → update CLAUDE.md routing table
+   - If new agent created → update CLAUDE.md routing table and routing-table.cjs
 
 2. AGENT ASSIGNMENT CHECK
    - Which existing agents should have this skill?
@@ -1251,6 +1251,9 @@ done
 
 # Verify agent assignment
 grep -l "<skill-name>" .claude/agents/**/*.md || echo "WARNING: Not assigned to any agent"
+
+# Post-creation integration validation
+node .claude/tools/cli/validate-integration.cjs .claude/skills/<skill-name>/SKILL.md
 ```
 
 ## Post-Creation: Auto-Assign to Relevant Agents (CRITICAL)

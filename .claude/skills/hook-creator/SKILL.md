@@ -14,7 +14,7 @@ best_practices:
   - Test hooks before deployment
   - Include error handling in all hooks
   - Document hook triggers and behavior
-  - Use graceful degradation (warn, not block by default)
+  - Use explicit enforcement modes (block|warn|off) with env overrides; default warn unless spec requires block
 error_handling: graceful
 streaming: supported
 output_location: .claude/hooks/
@@ -107,9 +107,9 @@ This skill creates hooks for the Claude Code framework:
 
 ### Reference Hook
 
-**Use `.claude/hooks/routing/router-enforcer.cjs` as the canonical reference hook.**
+**Use `.claude/lib/routing/routing-table.cjs` as the canonical routing reference.**
 
-Before finalizing any hook, compare against router-enforcer structure:
+Before finalizing any hook, compare against routing-table structure:
 
 - [ ] Has proper CommonJS exports (module.exports)
 - [ ] Exports required functions for hook type (validate, main, etc.)
@@ -175,7 +175,7 @@ All hooks use CommonJS format and follow this template:
  * - 1: Block operation (when in blocking mode)
  *
  * Environment:
- *   {HOOK_NAME}_MODE=block|warn|off (default: warn)
+ *   {HOOK_NAME}_MODE=block|warn|off (default: warn unless explicitly required)
  */
 
 const fs = require('fs');
@@ -922,6 +922,7 @@ After hook is fully created and validated:
 [ ] Does hook need testing workflow? -> Create workflow
 [ ] Should hook be enabled by default? -> Update config.yaml
 [ ] Does hook interact with other hooks? -> Document in README.md
+[ ] Run post-creation validation -> node .claude/tools/cli/validate-integration.cjs .claude/hooks/<category>/<hook-name>.cjs
 ```
 
 ---
@@ -939,9 +940,9 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
    - Every hook MUST have main() for CLI execution
    - Run only when require.main === module
 
-3. NO HOOK WITHOUT GRACEFUL DEGRADATION
-   - Default to 'warn' mode, not 'block'
-   - Use environment variables for enforcement mode
+3. NO HOOK WITHOUT ENFORCEMENT CONTROLS
+   - Support 'block|warn|off' via environment variable
+   - Default to 'warn' unless explicitly required to block
    - Never crash on malformed input
 
 4. NO HOOK WITHOUT ERROR HANDLING

@@ -21,18 +21,18 @@ Every created artifact MUST pass all applicable items before the creator skill m
 
 ### Checklist
 
-| #   | Item                         | Applies To        | Validation Method                        |
-| --- | ---------------------------- | ----------------- | ---------------------------------------- |
-| 1   | **CLAUDE.md Routing Entry**  | Agents, Workflows | `grep "<artifact-name>" CLAUDE.md`       |
-| 2   | **Skill Catalog Entry**      | Skills            | `grep "<skill-name>" skill-catalog.md`   |
-| 3   | **Router Enforcer Keywords** | Agents            | `grep "<keywords>" router-enforcer.cjs`  |
-| 4   | **Agent Assignment**         | Skills, Workflows | At least one agent references artifact   |
-| 5   | **Memory File Updates**      | All               | learnings.md or decisions.md updated     |
-| 6   | **Schema Validation**        | All               | Passes appropriate JSON schema           |
-| 7   | **Tests Passing**            | All with tests    | `npm test` or equivalent passes          |
-| 8   | **Documentation Complete**   | All               | No placeholder text (TBD, TODO, etc.)    |
-| 9   | **Evolution State Updated**  | All               | evolution-state.json reflects completion |
-| 10  | **Router Discoverability**   | Agents, Skills    | Router can route requests to artifact    |
+| #   | Item                        | Applies To        | Validation Method                        |
+| --- | --------------------------- | ----------------- | ---------------------------------------- |
+| 1   | **CLAUDE.md Routing Entry** | Agents, Workflows | `grep "<artifact-name>" CLAUDE.md`       |
+| 2   | **Skill Catalog Entry**     | Skills            | `grep "<skill-name>" skill-catalog.md`   |
+| 3   | **Routing Table Keywords**  | Agents            | `grep "<keywords>" routing-table.cjs`    |
+| 4   | **Agent Assignment**        | Skills, Workflows | At least one agent references artifact   |
+| 5   | **Memory File Updates**     | All               | learnings.md or decisions.md updated     |
+| 6   | **Schema Validation**       | All               | Passes appropriate JSON schema           |
+| 7   | **Tests Passing**           | All with tests    | `npm test` or equivalent passes          |
+| 8   | **Documentation Complete**  | All               | No placeholder text (TBD, TODO, etc.)    |
+| 9   | **Evolution State Updated** | All               | evolution-state.json reflects completion |
+| 10  | **Router Discoverability**  | Agents, Skills    | Router can route requests to artifact    |
 
 ### Detailed Validation Steps
 
@@ -84,10 +84,10 @@ grep -i "<skill-name>" .claude/context/artifacts/skill-catalog.md
 
 ```bash
 # Check intentKeywords
-grep -i "<domain-keyword>" .claude/hooks/routing/router-enforcer.cjs
+grep -i "<domain-keyword>" .claude/lib/routing/routing-table.cjs
 
 # Check INTENT_TO_AGENT mapping
-grep -i "<agent-name>" .claude/hooks/routing/router-enforcer.cjs
+grep -i "<agent-name>" .claude/lib/routing/routing-table.cjs
 ```
 
 **Common failures:**

@@ -61,6 +61,10 @@ const CONFIG = {
   // Known false positives: { pathSubstring, ruleId } - excluded from blocking
   skipFindings: [
     { pathSubstring: 'user-prompt-unified.cjs', ruleId: 'SEC-040' }, // path.join with literal "reflection-spawn-request"
+    { pathSubstring: 'memory-health-check.cjs', ruleId: 'SEC-040' }, // path.join with literal "reflection-spawn-request.json"
+    { pathSubstring: 'reflection-step0-guard.cjs', ruleId: 'SEC-040' }, // path.join with literal "reflection-spawn-request"
+    { pathSubstring: 'reflection-step0-guard.test.cjs', ruleId: 'SEC-040' }, // path.join with literal in test
+    { pathSubstring: 'step-validators.cjs', ruleId: 'SEC-013' }, // new Function() for dynamic workflow validation (controlled input)
     { pathSubstring: 'generate-tool-manifest.cjs', ruleId: 'SEC-030' }, // CLI diagnostic logging
     { pathSubstring: 'tests/migration/', ruleId: 'SEC-011' }, // test harness execSync with controlled input
   ],

@@ -352,6 +352,14 @@ phases:
           - hasHooks
         outputs:
           - hooksCreated
+      - id: run-post-creation-validation
+        action: function
+        handler: runPostCreationValidation
+        description: Run validate-integration.cjs for the new skill
+        inputs:
+          - skillMdPath
+        outputs:
+          - validation_passed
 
       - id: verify-registration
         action: function
@@ -371,6 +379,9 @@ phases:
       - condition: steps.verifyRegistration.output.registrationVerified === true
         failure_action: retry
         failure_message: Skill not discoverable. Fix registration and verify.
+      - condition: steps.run-post-creation-validation.output.validation_passed === true
+        failure_action: retry
+        failure_message: Post-creation validation failed. Fix integration gaps.
 
 # Compensating actions for rollback
 compensate:

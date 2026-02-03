@@ -88,6 +88,7 @@
     "memory:health": "node .claude/lib/memory/memory-manager.cjs health",
     "memory:dashboard": "node .claude/lib/memory/memory-dashboard.cjs",
     "memory:embeddings": "node .claude/tools/cli/generate-embeddings.cjs",
+    "memory:reindex": "node .claude/tools/cli/generate-embeddings.cjs --reindex",
     "memory:dashboard:budget": "node .claude/tools/cli/memory-dashboard.cjs",
     "skills:index": "node .claude/tools/cli/generate-skill-index.cjs",
     "skills:validate": "node .claude/tools/cli/generate-skill-index.cjs --validate",

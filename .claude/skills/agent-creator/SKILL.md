@@ -550,7 +550,7 @@ Before finalizing any agent, compare against python-pro.md structure:
 
 **Tools Array Validation:**
 - Standard tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
-- DO NOT add MCP tools (mcp__*) unless whitelisted in router-enforcer.cjs
+- DO NOT add MCP tools (mcp__*) unless whitelisted in routing-table.cjs
 - MCP tools (mcp__Exa__*, mcp__GitHub__*, etc.) cause router enforcement failures
 - If MCP integration is needed, document it explicitly and verify hook compatibility
 
@@ -584,18 +584,18 @@ After agent file is written, you MUST update the CLAUDE.md routing table:
 
 **Why this is mandatory**: Agents not in the routing table will NEVER be spawned by the Router. An agent without a routing entry is effectively invisible to the system.
 
-### Step 7.5: Update Router-Enforcer (MANDATORY - BLOCKING)
+### Step 7.5: Update Routing Table (MANDATORY - BLOCKING)
 
 **This step is MANDATORY and BLOCKING. Without it, the Router cannot discover the agent.**
 
-After updating CLAUDE.md, you MUST register the agent in router-enforcer.cjs:
+After updating CLAUDE.md, you MUST register the agent in `routing-table.cjs`:
 
 #### Required Updates
 
-1. **Add to `intentKeywords` object** with keywords from Step 2.5:
+1. **Add to `INTENT_KEYWORDS`** with keywords from Step 2.5:
 
    ```javascript
-   // In router-enforcer.cjs intentKeywords section
+   // In routing-table.cjs INTENT_KEYWORDS section
    '<agent-name>': [
      // High-confidence keywords (unique to this agent)
      'keyword1', 'keyword2',
@@ -606,32 +606,34 @@ After updating CLAUDE.md, you MUST register the agent in router-enforcer.cjs:
    ],
    ```
 
-2. **Add to `ROUTING_TABLE` object**:
+2. **Add to `INTENT_TO_AGENT`** (map intent key → agent name):
 
    ```javascript
-   // In router-enforcer.cjs ROUTING_TABLE section
-   '<agent-name>': {
-     path: '.claude/agents/<category>/<agent-name>.md',
-     primaryKeywords: ['keyword1', 'keyword2'],  // High-confidence from Step 2.5
-     secondaryKeywords: ['keyword3', 'keyword4']  // Medium-confidence from Step 2.5
-   },
+   // In routing-table.cjs INTENT_TO_AGENT section
+   '<intent-key>': '<agent-name>',
    ```
 
-3. **Add to `SCORING_BOOSTS` if needed** (for high-priority agents):
+3. **Add a `DISAMBIGUATION_RULES` entry if needed** (for overlapping keywords):
    ```javascript
-   // In router-enforcer.cjs SCORING_BOOSTS section
-   '<agent-name>': { boost: 5, condition: 'specific_intent_type' },
+   // In routing-table.cjs DISAMBIGUATION_RULES section
+   '<keyword>': [
+     {
+       condition: ['keyword1', 'keyword2'],
+       prefer: '<agent-name>',
+       deprioritize: '<other-agent>',
+     },
+   ],
    ```
 
 #### Verification
 
 ```bash
-grep "<agent-name>" .claude/hooks/routing/router-enforcer.cjs || echo "ERROR: Agent not in router-enforcer.cjs - AGENT CREATION INCOMPLETE"
+grep "<agent-name>" .claude/lib/routing/routing-table.cjs || echo "ERROR: Agent not in routing-table.cjs - AGENT CREATION INCOMPLETE"
 ```
 
-**BLOCKING**: If router-enforcer update fails, agent creation is INCOMPLETE. The agent will never be discovered by the Router.
+**BLOCKING**: If routing-table update fails, agent creation is INCOMPLETE. The agent will never be discovered by the Router.
 
-**Why this is mandatory**: The router-enforcer.cjs uses keyword matching to select agents. Without keyword registration, the Router's scoring algorithm cannot consider this agent for any request.
+**Why this is mandatory**: The routing table drives router-enforcer scoring. Without keyword registration, the Router's scoring algorithm cannot consider this agent for any request.
 
 ### Step 8: Create Workflow & Update Memory
 
@@ -876,7 +878,7 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
 9. NO AGENT WITHOUT ROUTER KEYWORDS
    - Every agent MUST have researched keywords (Step 2.5)
    - Keywords must be documented in research report
-   - Agent must be registered in router-enforcer.cjs with keywords
+  - Agent must be registered in routing-table.cjs with keywords
    - Without router keywords, agent will never be discovered by Router
 
 10. NO AGENT WITHOUT RESPONSE APPROACH
@@ -990,8 +992,8 @@ done
 # Check CLAUDE.md routing table - MANDATORY
 grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: Not in routing table - AGENT CREATION INCOMPLETE"
 
-# Check router-enforcer.cjs keywords registration (Step 7.5) - MANDATORY
-grep "<agent-name>" .claude/hooks/routing/router-enforcer.cjs || echo "ERROR: Agent not in router-enforcer.cjs - AGENT CREATION INCOMPLETE"
+# Check routing-table.cjs keywords registration (Step 7.5) - MANDATORY
+grep "<agent-name>" .claude/lib/routing/routing-table.cjs || echo "ERROR: Agent not in routing-table.cjs - AGENT CREATION INCOMPLETE"
 ```
 
 **Completion Checklist** (all must be checked):
@@ -1010,7 +1012,7 @@ grep "<agent-name>" .claude/hooks/routing/router-enforcer.cjs || echo "ERROR: Ag
 [ ] validate-agents.mjs passes for new agent
 [ ] Task Progress Protocol section included in agent body
 [ ] Task tools included in tools: array
-[ ] Router keywords registered in router-enforcer.cjs (Iron Law #9)
+[ ] Router keywords registered in routing-table.cjs (Iron Law #9)
 [ ] Response Approach section present with 8 numbered steps (Iron Law #10)
 [ ] Behavioral Traits section present with 10+ domain-specific traits (Iron Law #10)
 [ ] Example Interactions section present with 8+ examples (Iron Law #10)
@@ -1037,8 +1039,8 @@ Before calling `TaskUpdate({ status: "completed" })`, you MUST run the Post-Crea
    - Read the error output for specific failures
    - Fix each failure:
      - Missing CLAUDE.md entry -> Add routing table entry
-     - Missing router-enforcer keywords -> Add intent keywords
-     - Missing memory update -> Update learnings.md
+   - Missing routing-table keywords -> Add intent keywords
+   - Missing memory update -> Update learnings.md
    - Re-run validation until exit code is 0
 
 4. **Only proceed when validation passes**
@@ -1104,7 +1106,7 @@ If agent doesn't appear in registry:
 ```
 Agent Created
     ↓
-Step 10: Validation (CLAUDE.md, router-enforcer.cjs)
+Step 10: Validation (CLAUDE.md, routing-table.cjs)
     ↓
 Step 11: Registry Regeneration (Phase 3 Discovery)
     ↓
