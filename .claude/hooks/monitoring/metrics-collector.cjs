@@ -14,12 +14,41 @@
  * @module hooks/monitoring/metrics-collector
  */
 
+/**
+ * @typedef {Object} Metric
+ * @property {string} timestamp
+ * @property {string} hook
+ * @property {string} event
+ * @property {string} tool
+ * @property {number} executionTimeMs
+ * @property {'success'|'failure'} status
+ * @property {string} [error]
+ * @property {Object} [metadata]
+ */
+
+/**
+ * @typedef {Object} HookContext
+ * @property {string} [sessionId]
+ * @property {number} [sessionDuration]
+ * @property {number} [_metricsStartTime]
+ */
+
+/**
+ * @typedef {Object} HookResult
+ * @property {Error|{message:string}} [error]
+ * @property {any} [output]
+ */
+
 const fs = require('fs');
 const path = require('path');
 const _crypto = require('crypto');
 
+const { createLogger } = require('../../lib/utils/logger.cjs');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const logger = createLogger('metrics-collector');
+
 // Metrics file location
-const METRICS_DIR = path.join(process.cwd(), '.claude', 'context', 'metrics');
+const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const HOOKS_METRICS_FILE = path.join(METRICS_DIR, 'hook-metrics.jsonl');
 
 // Rate limiting: 10000 metrics per hour (reasonable for hook execution)
@@ -52,7 +81,7 @@ function checkRateLimit() {
 
   // Check limit
   if (rateLimitState.count >= RATE_LIMIT_PER_HOUR) {
-    console.warn(`[metrics-collector] Rate limit exceeded (${RATE_LIMIT_PER_HOUR}/hour)`);
+    logger.warn(`Rate limit exceeded (${RATE_LIMIT_PER_HOUR}/hour)`);
     return false;
   }
 
@@ -62,6 +91,7 @@ function checkRateLimit() {
 
 /**
  * Validate metric entry (SEC-MON-001)
+ * @param {Metric} metric
  */
 function validateMetric(metric) {
   if (!metric.timestamp || typeof metric.timestamp !== 'string') {
@@ -89,6 +119,7 @@ function validateMetric(metric) {
 
 /**
  * Log metric to JSONL file
+ * @param {Metric} metric
  */
 function logMetric(metric) {
   try {
@@ -108,12 +139,16 @@ function logMetric(metric) {
     fs.appendFileSync(HOOKS_METRICS_FILE, line, 'utf8');
   } catch (error) {
     // Log error but don't throw (monitoring shouldn't break the system)
-    console.error('[metrics-collector] Failed to log metric:', error.message);
+    const err = /** @type {Error} */ (error);
+    logger.error('Failed to log metric', { error: err.message });
   }
 }
 
 /**
  * Store start time in context
+ * @param {string} tool
+ * @param {Object} params
+ * @param {HookContext} context
  */
 function preToolUse(tool, params, context) {
   // Store start time
@@ -124,6 +159,10 @@ function preToolUse(tool, params, context) {
 
 /**
  * Calculate and log metrics
+ * @param {string} tool
+ * @param {Object} params
+ * @param {HookResult} result
+ * @param {HookContext} context
  */
 function postToolUse(tool, params, result, context) {
   try {
@@ -132,6 +171,7 @@ function postToolUse(tool, params, result, context) {
     const executionTimeMs = Date.now() - startTime;
 
     // Determine status
+    /** @type {'success'|'failure'} */
     const status = result.error ? 'failure' : 'success';
 
     // Get hook name from stack trace (if available)
@@ -147,7 +187,11 @@ function postToolUse(tool, params, result, context) {
       tool,
       executionTimeMs: Math.round(executionTimeMs * 100) / 100, // Round to 2 decimals
       status,
-      error: result.error ? result.error.message : undefined,
+      error: result.error
+        ? result.error instanceof Error
+          ? result.error.message
+          : String(result.error)
+        : undefined,
       metadata: {
         paramsSize: JSON.stringify(params).length,
         resultSize: JSON.stringify(result).length,
@@ -158,7 +202,7 @@ function postToolUse(tool, params, result, context) {
     logMetric(metric);
   } catch (error) {
     // Silently fail - monitoring shouldn't break execution
-    console.error('[metrics-collector] Error in postToolUse:', error.message);
+    logger.error('Error in postToolUse', { error: error.message });
   }
 
   return { tool, params, result };
@@ -166,8 +210,10 @@ function postToolUse(tool, params, result, context) {
 
 /**
  * Session start tracking
+ * @param {HookContext} context
  */
 function sessionStart(context) {
+  /** @type {Metric} */
   const metric = {
     timestamp: new Date().toISOString(),
     hook: 'metrics-collector.cjs',
@@ -187,8 +233,10 @@ function sessionStart(context) {
 
 /**
  * Session end tracking
+ * @param {HookContext} context
  */
 function sessionEnd(context) {
+  /** @type {Metric} */
   const metric = {
     timestamp: new Date().toISOString(),
     hook: 'metrics-collector.cjs',

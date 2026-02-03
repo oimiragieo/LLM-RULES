@@ -15,9 +15,10 @@
 
 const fs = require('fs');
 const path = require('path');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 // Metrics file location
-const METRICS_DIR = path.join(process.cwd(), '.claude', 'context', 'metrics');
+const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const ERROR_METRICS_FILE = path.join(METRICS_DIR, 'error-metrics.jsonl');
 
 // Rate limiting

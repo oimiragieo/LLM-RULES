@@ -21,6 +21,9 @@
 
 const EventEmitter = require('events');
 const { validateEvent } = require('./event-types.cjs');
+const { createLogger } = require('../utils/logger.cjs');
+
+const logger = createLogger('event-bus');
 
 class EventBus {
   constructor() {
@@ -47,8 +50,8 @@ class EventBus {
     // Validate event before emitting
     const validation = validateEvent(eventType, enrichedPayload);
     if (!validation.valid) {
-      const errorMessage = `EventBus: Invalid event ${eventType}: ${validation.errors.map(e => e.message).join(', ')}`;
-      console.error(errorMessage);
+      const errorMessage = `Invalid event ${eventType}: ${validation.errors.map(e => e.message).join(', ')}`;
+      logger.error(errorMessage, { errors: validation.errors });
       // Don't emit invalid events
       return;
     }
@@ -67,7 +70,7 @@ class EventBus {
           await sub.handler(enrichedPayload);
         } catch (error) {
           // Log error but don't crash the event bus
-          console.error(`EventBus: Handler error for ${eventType}:`, error);
+          logger.error(`Handler error for ${eventType}`, { error: error.message });
         }
       }
     });
@@ -136,5 +139,13 @@ class EventBus {
   }
 }
 
+const bus = new EventBus();
+try {
+  const { registerDefaultSinks } = require('./event-bus-sink.cjs');
+  registerDefaultSinks(bus);
+} catch (_err) {
+  // Best-effort; event bus should still function without sinks.
+}
+
 // Export singleton instance
-module.exports = new EventBus();
+module.exports = bus;

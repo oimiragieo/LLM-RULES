@@ -11,8 +11,9 @@
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
-const METRICS_DIR = path.join(process.cwd(), '.claude', 'context', 'metrics');
+const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 
 /**
  * Read metrics from JSONL file with time filtering

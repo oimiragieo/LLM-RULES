@@ -35,6 +35,8 @@ const {
   getToolInput,
   formatResult,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // <project>/.claude/hooks/monitoring/execution-limit-monitor-hook.cjs -> <project>
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -374,6 +376,16 @@ function main() {
 
 If this is expected, increase Task({ execution_limits: { ... } }) for this session.`;
     process.stdout.write(formatResult('block', message));
+    try {
+      eventBus.emit(EventTypes.TOOL_BLOCKED, {
+        type: EventTypes.TOOL_BLOCKED,
+        timestamp: new Date().toISOString(),
+        toolName,
+        reason: 'execution_limit_exceeded',
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(2);
   } catch (_e) {
     // Fail open: monitoring must not break tool usage
