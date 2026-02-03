@@ -12,7 +12,10 @@
 const { test } = require('node:test');
 const assert = require('assert');
 const path = require('path');
-const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
+const {
+  PROJECT_ROOT,
+  validatePathWithinProject,
+} = require('../../../.claude/lib/utils/project-root.cjs');
 const smartPruner = require('../../../.claude/lib/memory/smart-pruner.cjs');
 
 test('PERF-009: smart-pruner - deduplicateAndPrune() should safely process entries', () => {

@@ -14,7 +14,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Test setup - we'll require the module after creating it
-const PRUNER_PATH = path.join(__dirname, 'smart-pruner.cjs');
+const PRUNER_PATH = path.join(__dirname, '../../../.claude/lib/memory/smart-pruner.cjs');
 
 // Helper to create test entries
 function createEntry(overrides = {}) {

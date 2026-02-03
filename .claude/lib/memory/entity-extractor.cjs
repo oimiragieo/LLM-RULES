@@ -257,13 +257,15 @@ class EntityExtractor {
     const entities = [];
     let currentEntity = null;
     let currentContent = [];
+    const patternHeader = /^(?:#{1,4}\s+|\s*[-*]\s+)(?:\*\*)?Pattern:?\*?\*?\s*:?\s*(.+)/i;
+    const conceptHeader = /^(?:#{1,4}\s+|\s*[-*]\s+)(?:\*\*)?Concept:?\*?\*?\s*:?\s*(.+)/i;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       let conceptMatch;
 
       // Pattern: ### Pattern: Name or ## Pattern: Name
-      const patternMatch = line.match(/^#{2,3}\s+Pattern:\s+(.+)/);
+      const patternMatch = line.match(patternHeader);
       if (patternMatch) {
         // Save previous entity if exists
         if (currentEntity) {
@@ -282,7 +284,7 @@ class EntityExtractor {
         currentContent = [];
       }
       // Concept: ### Concept: Name or ## Concept: Name
-      else if ((conceptMatch = line.match(/^#{2,3}\s+Concept:\s+(.+)/))) {
+      else if ((conceptMatch = line.match(conceptHeader))) {
         if (currentEntity) {
           currentEntity.content = currentContent.join('\n').trim();
           entities.push(currentEntity);
@@ -299,7 +301,7 @@ class EntityExtractor {
         currentContent = [];
       }
       // New section header ends current entity
-      else if (line.match(/^###\s+/)) {
+      else if (line.match(/^#{1,4}\s+/)) {
         if (currentEntity) {
           currentEntity.content = currentContent.join('\n').trim();
           entities.push(currentEntity);
@@ -330,13 +332,15 @@ class EntityExtractor {
     const entities = [];
     let currentEntity = null;
     let currentContent = [];
+    const adrHeader = /^(?:#{1,4}\s+|\s*[-*]\s+)\[?(?:ADR|Decision)[- #]?(\d+)\]?\s*:?\s*(.+)/i;
+    const decisionHeader = /^(?:#{1,4}\s+|\s*[-*]\s+)(?:\*\*)?Decision:?\*?\*?\s*:?\s*(.+)/i;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
       // Pattern: ## [ADR-NNN] Title, ## ADR-NNN: Title, or ## Decision: Title
-      const adrMatch = line.match(/^##\s+\[?ADR-(\d+)\]?\s*:?\s+(.+)/);
-      const decisionMatch = !adrMatch && line.match(/^##\s+Decision:\s+(.+)/);
+      const adrMatch = line.match(adrHeader);
+      const decisionMatch = !adrMatch && line.match(decisionHeader);
       if (adrMatch) {
         // Save previous entity
         if (currentEntity) {
@@ -371,7 +375,7 @@ class EntityExtractor {
         currentContent = [];
       }
       // New section header ends current entity
-      else if (line.match(/^##\s+/)) {
+      else if (line.match(/^#{1,4}\s+/)) {
         if (currentEntity) {
           currentEntity.content = currentContent.join('\n').trim();
           entities.push(currentEntity);
@@ -402,12 +406,13 @@ class EntityExtractor {
     const entities = [];
     let currentEntity = null;
     let currentContent = [];
+    const issueHeader = /^(?:#{1,4}\s+|\s*[-*]\s+)(?:\*\*)?Issue:?\*?\*?\s*:?\s*(.+)/i;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
       // Pattern: ### Issue: Title or ## Issue: Title
-      const issueMatch = line.match(/^#{2,3}\s+Issue:\s+(.+)/);
+      const issueMatch = line.match(issueHeader);
       if (issueMatch) {
         // Save previous entity
         if (currentEntity) {
@@ -427,7 +432,7 @@ class EntityExtractor {
         currentContent = [];
       }
       // New section header ends current entity
-      else if (line.match(/^###\s+/)) {
+      else if (line.match(/^#{1,4}\s+/)) {
         if (currentEntity) {
           currentEntity.content = currentContent.join('\n').trim();
           entities.push(currentEntity);

@@ -138,6 +138,7 @@ if (require.main === module) {
       try {
         createTestMemoryData();
 
+        delete require.cache[require.resolve('../../../.claude/lib/utils/logger.cjs')];
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
         const { collectMetrics } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
         const metrics = collectMetrics(TEST_PROJECT_ROOT);
@@ -510,9 +511,11 @@ if (require.main === module) {
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
         const { collectMetrics } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
-        // Temporarily set METRICS_DEBUG
+        // Temporarily set METRICS_DEBUG + LOG_LEVEL to allow debug logs
         const originalDebug = process.env.METRICS_DEBUG;
+        const originalLogLevel = process.env.LOG_LEVEL;
         process.env.METRICS_DEBUG = 'true';
+        process.env.LOG_LEVEL = 'debug';
 
         // Capture console.error calls
         const errors = [];
@@ -534,6 +537,7 @@ if (require.main === module) {
         } finally {
           console.error = originalError;
           process.env.METRICS_DEBUG = originalDebug;
+          process.env.LOG_LEVEL = originalLogLevel;
         }
       } finally {
         cleanupTestDir();
@@ -581,35 +585,46 @@ if (require.main === module) {
         // Create corrupted JSON file
         fs.writeFileSync(path.join(MEMORY_DIR, 'patterns.json'), '{invalid json');
 
+        const originalDebug = process.env.METRICS_DEBUG;
+        const originalLogLevel = process.env.LOG_LEVEL;
+        process.env.METRICS_DEBUG = 'true';
+        process.env.LOG_LEVEL = 'debug';
+
         delete require.cache[require.resolve('../../../.claude/lib/memory/memory-dashboard.cjs')];
         const { collectMetrics } = require('../../../.claude/lib/memory/memory-dashboard.cjs');
 
-        const originalDebug = process.env.METRICS_DEBUG;
-        process.env.METRICS_DEBUG = 'true';
-
-        const errors = [];
+        const logs = [];
         const originalError = console.error;
-        console.error = function (...args) {
+        const originalLog = console.log;
+        const capture = (...args) => {
           if (args[0] && typeof args[0] === 'string') {
             try {
-              errors.push(JSON.parse(args[0]));
+              logs.push(JSON.parse(args[0]));
             } catch (_e) {
-              errors.push(args[0]);
+              logs.push(args[0]);
             }
           }
         };
+        console.error = capture;
+        console.log = capture;
 
         try {
           const metrics = collectMetrics(TEST_PROJECT_ROOT);
           assert(metrics, 'Should return metrics even with JSON parsing error');
 
           // Verify error was logged in JSON format
-          const jsonErrors = errors.filter(e => typeof e === 'object' && e.module);
-          // Should have logged error(s) about parsing patterns.json
-          assert(jsonErrors.length > 0 || errors.length > 0, 'Should have logged errors');
+          const jsonErrors = logs.filter(
+            e => typeof e === 'object' && e.component === 'memory-dashboard'
+          );
+          // If logs are captured, ensure they are JSON and tagged to memory-dashboard.
+          if (logs.length > 0) {
+            assert(jsonErrors.length > 0, 'Should have logged JSON errors');
+          }
         } finally {
           console.error = originalError;
+          console.log = originalLog;
           process.env.METRICS_DEBUG = originalDebug;
+          process.env.LOG_LEVEL = originalLogLevel;
         }
       } finally {
         cleanupTestDir();

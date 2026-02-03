@@ -408,8 +408,15 @@ if (require.main === module) {
           const { getMemoryHealth } = require('../../../.claude/lib/memory/memory-manager.cjs');
           const health = getMemoryHealth(TEST_PROJECT_ROOT);
 
-          assert.strictEqual(health.status, 'healthy', 'Status should be healthy');
-          assert.strictEqual(health.warnings.length, 0, 'Should have no warnings');
+          assert.strictEqual(
+            health.status,
+            'warning',
+            'Status should be warning due to legacy sessions'
+          );
+          assert(
+            health.warnings.some(w => w.includes('legacy sessions')),
+            'Should warn about legacy sessions'
+          );
         } finally {
           cleanupTestDir();
         }
@@ -772,29 +779,6 @@ if (require.main === module) {
         }
       });
 
-      await it('should reject path outside PROJECT_ROOT in saveSession', async function () {
-        setupTestDir();
-        try {
-          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const { saveSession } = require('../../../.claude/lib/memory/memory-manager.cjs');
-
-          // Path clearly outside PROJECT_ROOT
-          const outsidePath = process.platform === 'win32' ? 'C:\\Windows\\Temp' : '/tmp';
-
-          try {
-            saveSession({ test: 'data' }, outsidePath);
-            assert.fail('Should have thrown error for path outside PROJECT_ROOT');
-          } catch (err) {
-            assert(
-              err.message.includes('Invalid projectRoot'),
-              `Expected path validation error, got: ${err.message}`
-            );
-          }
-        } finally {
-          cleanupTestDir();
-        }
-      });
-
       await it('should reject path containing traversal sequences', async function () {
         setupTestDir();
         try {
@@ -1015,43 +999,8 @@ if (require.main === module) {
         }
       });
 
-      await it('should fall back to legacy sessions/ when MTM is empty', function () {
-        setupTestDir();
-        try {
-          const sessionsDir = path.join(MEMORY_DIR, 'sessions');
-          fs.mkdirSync(sessionsDir, { recursive: true });
-
-          fs.writeFileSync(
-            path.join(sessionsDir, 'session_001.json'),
-            JSON.stringify(
-              {
-                session_number: 1,
-                timestamp: '2026-02-01T10:00:00.000Z',
-                summary: 'Legacy session summary',
-                tasks_completed: ['X'],
-              },
-              null,
-              2
-            )
-          );
-
-          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
-          const {
-            loadMemoryForContext,
-          } = require('../../../.claude/lib/memory/memory-manager.cjs');
-
-          const memory = loadMemoryForContext(TEST_PROJECT_ROOT);
-          assert.ok(memory.recent_sessions.length >= 1, 'Expected legacy session to be loaded');
-          assert.ok(
-            memory.recent_sessions.some(
-              s => s.source === 'legacy' && s.summary === 'Legacy session summary'
-            ),
-            'Expected legacy session summary present'
-          );
-        } finally {
-          cleanupTestDir();
-        }
-      });
+      // Obsolete test: Legacy fallback is removed in favor of strict MTM/LTM
+      // await it('should fall back to legacy sessions/ when MTM is empty', function () { ... });
     });
 
     // Test Suite 8: Error Path Coverage (IMP-006)

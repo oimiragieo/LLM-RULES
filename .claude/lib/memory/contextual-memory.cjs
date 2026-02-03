@@ -5,9 +5,97 @@ const fsPromises = require('fs').promises;
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const { DatabaseSync } = require('node:sqlite');
 const { MemoryVectorStore } = require('./lancedb-client.cjs');
 const { EntityQuery } = require('./entity-query.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { createLogger } = require('../utils/logger.cjs');
+
+const logger = createLogger('contextual-memory');
+
+/**
+ * @typedef {Object} ContextualMemoryConfig
+ * @property {string} [projectRoot]
+ * @property {string} [memoryDir]
+ * @property {string} [dbPath]
+ * @property {Object} [lancedbConfig]
+ * @property {string} lancedbConfig.persistDirectory
+ * @property {string} lancedbConfig.collectionName
+ */
+
+const ACCESS_TRACKING_MIN_INTERVAL_MS = Number(
+  process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS || 5 * 60 * 1000
+);
+
+function toSafeInt(val, fallback = 0) {
+  const n = Number.parseInt(String(val), 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function computeQualityScore(accessCount) {
+  const count = Number.isFinite(accessCount) ? accessCount : 0;
+  const max = 20;
+  const ratio = Math.min(Math.log1p(count) / Math.log1p(max), 1);
+  return Math.round((0.5 + ratio * 0.5) * 1000) / 1000;
+}
+
+function ensureAccessTrackingFields(entry) {
+  if (!entry || typeof entry !== 'object') return false;
+  let changed = false;
+
+  if (typeof entry.accessCount !== 'number') {
+    entry.accessCount = 0;
+    changed = true;
+  }
+  if (typeof entry.lastAccessed === 'undefined') {
+    entry.lastAccessed = null;
+    changed = true;
+  }
+
+  return changed;
+}
+
+function maybeTouchEntriesForAccessTracking(allEntries, returnedEntries, nowIso) {
+  if (!Array.isArray(allEntries) || allEntries.length === 0) return false;
+  if (!Array.isArray(returnedEntries) || returnedEntries.length === 0) {
+    let schemaChanged = false;
+    for (const entry of allEntries) {
+      schemaChanged = ensureAccessTrackingFields(entry) || schemaChanged;
+    }
+    return schemaChanged;
+  }
+
+  const nowMs = Date.parse(nowIso);
+  const identifiers = new Set(
+    returnedEntries
+      .filter(e => e && typeof e === 'object' && typeof e.text === 'string')
+      .map(e => `${e.text}\n${e.timestamp || ''}`)
+  );
+
+  let changed = false;
+  for (const entry of allEntries) {
+    changed = ensureAccessTrackingFields(entry) || changed;
+
+    if (!entry || typeof entry !== 'object') continue;
+    if (typeof entry.text !== 'string') continue;
+
+    const id = `${entry.text}\n${entry.timestamp || ''}`;
+    if (!identifiers.has(id)) continue;
+
+    const lastAccessedMs = entry.lastAccessed ? Date.parse(entry.lastAccessed) : 0;
+    const minInterval = Number.isFinite(ACCESS_TRACKING_MIN_INTERVAL_MS)
+      ? ACCESS_TRACKING_MIN_INTERVAL_MS
+      : 0;
+
+    if (!entry.lastAccessed || nowMs - lastAccessedMs >= minInterval) {
+      entry.accessCount = toSafeInt(entry.accessCount, 0) + 1;
+      entry.lastAccessed = nowIso;
+      changed = true;
+    }
+  }
+
+  return changed;
+}
 
 /**
  * ContextualMemory - Unified API for hybrid memory system
@@ -38,6 +126,7 @@ class ContextualMemory {
     const projectRoot = config.projectRoot || PROJECT_ROOT;
 
     this.config = {
+      projectRoot,
       memoryDir: config.memoryDir || path.join(projectRoot, '.claude/context/memory'),
       dbPath: config.dbPath || path.join(projectRoot, '.claude/data/memory.db'),
       lancedbConfig: config.lancedbConfig || {
@@ -96,9 +185,7 @@ class ContextualMemory {
           const status = this.vectorStore.getEmbeddingStatus();
           if (status && status.status !== 'ready') {
             if (status.status === 'unavailable' && !this._mockModeWarned) {
-              console.warn(
-                `[ContextualMemory] Semantic search disabled: ${status.reason || status.status}`
-              );
+              logger.warn(`Semantic search disabled: ${status.reason || status.status}`);
               this._mockModeWarned = true;
             }
             this._logLancedbEvent('semantic_disabled', {
@@ -110,7 +197,7 @@ class ContextualMemory {
           }
         }
       } catch (error) {
-        console.warn('[ContextualMemory] LanceDB initialization failed:', error.message);
+        logger.warn('LanceDB initialization failed', { error: error.message });
         this.vectorStore = null; // Mark as unavailable
         this._logLancedbEvent('lancedb_init_failed', {
           message: error?.message || String(error),
@@ -153,6 +240,230 @@ class ContextualMemory {
     return this.entityQuery;
   }
 
+  _loadEntitiesFromDb(db, type, limit) {
+    const rows = db
+      .prepare(
+        'SELECT id, name, content, created_at, access_count, last_accessed FROM entities WHERE type = ? ORDER BY quality_score DESC, created_at DESC LIMIT ?'
+      )
+      .all(type, limit);
+
+    if (rows.length === 0) return [];
+
+    const mapped = rows.map(r => ({
+      text: r.name + (r.content ? '\n' + r.content : ''),
+      timestamp: r.created_at,
+    }));
+
+    try {
+      const nowIso = new Date().toISOString();
+      const update = db.prepare(
+        'UPDATE entities SET access_count = ?, last_accessed = ?, quality_score = ? WHERE id = ?'
+      );
+      for (const r of rows) {
+        const nextCount = toSafeInt(r.access_count, 0) + 1;
+        update.run(nextCount, nowIso, computeQualityScore(nextCount), r.id);
+      }
+    } catch (_e) {
+      // best-effort
+    }
+
+    return mapped;
+  }
+
+  _truncateItems(items, maxChars) {
+    let totalChars = 0;
+    const result = [];
+
+    for (const item of items) {
+      const itemStr = JSON.stringify(item);
+      if (totalChars + itemStr.length > maxChars) {
+        break;
+      }
+      totalChars += itemStr.length;
+      result.push(item);
+    }
+
+    return result;
+  }
+
+  /**
+   * Load memory context using the unified ContextualMemory read path.
+   *
+   * @param {Object} options
+   * @param {Object} options.maxItems - Limits for each memory section
+   * @param {Object} options.maxChars - Character caps for each memory section
+   * @returns {Object} Memory context object
+   */
+  loadContextSync(options = {}) {
+    const maxItems = options.maxItems || {};
+    const maxChars = options.maxChars || {};
+    const result = {
+      gotchas: [],
+      patterns: [],
+      decisions: [],
+      discoveries: [],
+      recent_sessions: [],
+      legacy_summary: '',
+    };
+
+    const memoryDir = this.config.memoryDir;
+    const dbPath = this.config.dbPath;
+    let dbPatternsLoaded = false;
+    let dbGotchasLoaded = false;
+
+    if (dbPath && fs.existsSync(dbPath)) {
+      try {
+        const db = new DatabaseSync(dbPath);
+        const patterns = this._loadEntitiesFromDb(db, 'pattern', maxItems.patterns);
+        if (patterns.length > 0) {
+          result.patterns = patterns;
+          dbPatternsLoaded = true;
+        }
+
+        const issues = this._loadEntitiesFromDb(db, 'issue', maxItems.gotchas);
+        if (issues.length > 0) {
+          result.gotchas = issues;
+          dbGotchasLoaded = true;
+        }
+
+        const decisions = this._loadEntitiesFromDb(db, 'decision', maxItems.decisions);
+        if (decisions.length > 0) {
+          result.decisions = decisions;
+        }
+
+        db.close();
+      } catch (e) {
+        logger.debug('DB load failed', { error: e.message });
+      }
+    }
+
+    const gotchasFile = path.join(memoryDir, 'gotchas.json');
+    if (!dbGotchasLoaded && fs.existsSync(gotchasFile)) {
+      try {
+        const allGotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
+        const selectedGotchas = allGotchas.slice(-maxItems.gotchas);
+        result.gotchas = this._truncateItems(selectedGotchas, maxChars.gotchas);
+
+        const now = new Date().toISOString();
+        const changed = maybeTouchEntriesForAccessTracking(allGotchas, result.gotchas, now);
+        if (changed) {
+          fs.writeFileSync(gotchasFile, JSON.stringify(allGotchas, null, 2));
+        }
+      } catch (e) {
+        logger.debug('Gotchas load failed', { error: e.message });
+      }
+    }
+
+    const patternsFile = path.join(memoryDir, 'patterns.json');
+    if (!dbPatternsLoaded && fs.existsSync(patternsFile)) {
+      try {
+        const allPatterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
+        const selectedPatterns = allPatterns.slice(-maxItems.patterns);
+        result.patterns = this._truncateItems(selectedPatterns, maxChars.patterns);
+
+        const now = new Date().toISOString();
+        const changed = maybeTouchEntriesForAccessTracking(allPatterns, result.patterns, now);
+        if (changed) {
+          fs.writeFileSync(patternsFile, JSON.stringify(allPatterns, null, 2));
+        }
+      } catch (e) {
+        logger.debug('Patterns load failed', { error: e.message });
+      }
+    }
+
+    const mapFile = path.join(memoryDir, 'codebase_map.json');
+    if (fs.existsSync(mapFile)) {
+      try {
+        const map = JSON.parse(fs.readFileSync(mapFile, 'utf8'));
+        const discoveries = Object.entries(map.discovered_files || {})
+          .slice(-maxItems.discoveries)
+          .map(([filePath, info]) => ({ path: filePath, ...info }));
+        result.discoveries = this._truncateItems(discoveries, maxChars.discoveries);
+      } catch (e) {
+        logger.debug('Discoveries load failed', { error: e.message });
+      }
+    }
+
+    try {
+      const memoryTiers = require('./memory-tiers.cjs');
+      const projectRoot = this.config.projectRoot || PROJECT_ROOT;
+      const mtmSessions = memoryTiers.getMTMSessions(projectRoot);
+      if (mtmSessions && mtmSessions.length > 0) {
+        const sorted = mtmSessions
+          .sort(
+            (a, b) =>
+              new Date(a.timestamp || a.consolidated_at || 0) -
+              new Date(b.timestamp || b.consolidated_at || 0)
+          )
+          .slice(-maxItems.sessions);
+
+        const sessionNumberBase = mtmSessions.length - sorted.length;
+        for (let i = 0; i < sorted.length; i++) {
+          const session = sorted[i];
+          result.recent_sessions.push({
+            session_number: sessionNumberBase + i + 1,
+            timestamp: session.timestamp || session.consolidated_at,
+            summary: session.summary || '',
+            tasks_completed: (session.tasks_completed || []).slice(0, 5),
+            source: 'mtm',
+          });
+        }
+
+        const ltmDir = memoryTiers.getTierPath('LTM', projectRoot);
+        if (fs.existsSync(ltmDir)) {
+          try {
+            const ltmFiles = fs
+              .readdirSync(ltmDir)
+              .filter(f => f.endsWith('.json') && f.startsWith('summary_'))
+              .sort()
+              .slice(-2);
+            for (const file of ltmFiles) {
+              try {
+                const summary = JSON.parse(fs.readFileSync(path.join(ltmDir, file), 'utf8'));
+                if (summary.type === 'session_summary') {
+                  result.recent_sessions.unshift({
+                    session_number: 0,
+                    timestamp: summary.created_at,
+                    summary: `[LTM Summary] ${summary.session_count} sessions from ${summary.date_range?.start || 'unknown'} to ${summary.date_range?.end || 'unknown'}`,
+                    tasks_completed: [],
+                    source: 'ltm',
+                    key_learnings: (summary.key_learnings || []).slice(0, 3),
+                  });
+                }
+              } catch (_e) {
+                // ignore malformed LTM
+              }
+            }
+          } catch (_e) {
+            // ignore LTM read errors
+          }
+        }
+      }
+    } catch (e) {
+      logger.debug('loadContextSync (mtm) error', { error: e.message });
+    }
+
+    const legacyPath = path.join(memoryDir, 'learnings.md');
+    if (fs.existsSync(legacyPath)) {
+      try {
+        const legacyContent = fs.readFileSync(legacyPath, 'utf8');
+        const limit = maxChars.legacy;
+        result.legacy_summary =
+          typeof limit === 'number' && legacyContent.length > limit
+            ? '...' + legacyContent.slice(-limit)
+            : legacyContent;
+      } catch (_e) {
+        // ignore legacy read errors
+      }
+    }
+
+    return result;
+  }
+
+  async loadContext(options = {}) {
+    return this.loadContextSync(options);
+  }
+
   /**
    * Semantic search across all memory sources
    *
@@ -168,6 +479,32 @@ class ContextualMemory {
   async search(query, options = {}) {
     const { SEMANTIC_SEARCH_DEFAULT_THRESHOLD } = require('./memory-constants.cjs');
     const { limit = 5, threshold = SEMANTIC_SEARCH_DEFAULT_THRESHOLD, filters } = options;
+    const metadataFilters = {};
+    if (options.contextType) {
+      metadataFilters.type = options.contextType;
+    }
+    if (options.category) {
+      metadataFilters.category = options.category;
+    }
+    const hasMetadataFilters = Object.keys(metadataFilters).length > 0;
+    let effectiveFilters = filters;
+    if (hasMetadataFilters) {
+      if (!filters) {
+        effectiveFilters = metadataFilters;
+      } else if (typeof filters === 'string') {
+        const clauses = [];
+        for (const [key, value] of Object.entries(metadataFilters)) {
+          const k = String(key).replace(/'/g, "''");
+          const v = String(value).replace(/'/g, "''");
+          clauses.push(`metadata LIKE '%"${k}":"${v}"%'`);
+        }
+        if (clauses.length > 0) {
+          effectiveFilters = `${filters} AND ${clauses.join(' AND ')}`;
+        }
+      } else if (typeof filters === 'object') {
+        effectiveFilters = { ...filters, ...metadataFilters };
+      }
+    }
 
     try {
       // Try LanceDB semantic search
@@ -179,7 +516,7 @@ class ContextualMemory {
 
       const results = await vectorStore.search(query, {
         limit,
-        filters,
+        filters: effectiveFilters,
       });
 
       // Filter by threshold logic if needed (LanceDB returns similarity 0-1 from our client wrapper)

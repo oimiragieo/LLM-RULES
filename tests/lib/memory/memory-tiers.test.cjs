@@ -77,7 +77,7 @@ if (require.main === module) {
     it('should define STM tier with correct properties', function () {
       setupTestDir();
       try {
-        const { MEMORY_TIERS } = freshRequire('./memory-tiers.cjs');
+        const { MEMORY_TIERS } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         assert(MEMORY_TIERS.STM, 'STM tier should exist');
         assert.strictEqual(MEMORY_TIERS.STM.name, 'short-term', 'STM name should be "short-term"');
@@ -96,7 +96,7 @@ if (require.main === module) {
     it('should define MTM tier with correct properties', function () {
       setupTestDir();
       try {
-        const { MEMORY_TIERS } = freshRequire('./memory-tiers.cjs');
+        const { MEMORY_TIERS } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         assert(MEMORY_TIERS.MTM, 'MTM tier should exist');
         assert.strictEqual(MEMORY_TIERS.MTM.name, 'mid-term', 'MTM name should be "mid-term"');
@@ -115,7 +115,7 @@ if (require.main === module) {
     it('should define LTM tier with correct properties', function () {
       setupTestDir();
       try {
-        const { MEMORY_TIERS } = freshRequire('./memory-tiers.cjs');
+        const { MEMORY_TIERS } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         assert(MEMORY_TIERS.LTM, 'LTM tier should exist');
         assert.strictEqual(MEMORY_TIERS.LTM.name, 'long-term', 'LTM name should be "long-term"');
@@ -141,7 +141,7 @@ if (require.main === module) {
     it('should move session from STM to MTM after session ends', function () {
       setupTestDir();
       try {
-        const { consolidateSession } = freshRequire('./memory-tiers.cjs');
+        const { consolidateSession } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Create a session in STM
         const stmPath = path.join(MEMORY_DIR, 'stm', 'session_current.json');
@@ -173,10 +173,46 @@ if (require.main === module) {
       }
     });
 
+    it('should write session archive when enabled', function () {
+      setupTestDir();
+      const previous = process.env.MEMORY_SESSION_ARCHIVE;
+      process.env.MEMORY_SESSION_ARCHIVE = '1';
+      try {
+        const { consolidateSession } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
+
+        const stmPath = path.join(MEMORY_DIR, 'stm', 'session_current.json');
+        const sessionData = {
+          session_id: 'archive-session-001',
+          timestamp: new Date().toISOString(),
+          summary: 'Archive session summary',
+        };
+        fs.writeFileSync(stmPath, JSON.stringify(sessionData, null, 2));
+
+        const result = consolidateSession('archive-session-001', TEST_PROJECT_ROOT);
+
+        assert(result.success, 'Consolidation should succeed');
+        const mtmDir = path.join(MEMORY_DIR, 'mtm');
+        const archiveDirs = fs.readdirSync(mtmDir).filter(name => name.startsWith('archive_'));
+        assert.strictEqual(archiveDirs.length, 1, 'Should create one archive directory');
+
+        const archivePath = path.join(mtmDir, archiveDirs[0]);
+        assert(fs.existsSync(path.join(archivePath, 'session.json')));
+        assert(fs.existsSync(path.join(archivePath, '.overview.md')));
+        assert(fs.existsSync(path.join(archivePath, '.abstract.md')));
+      } finally {
+        if (previous === undefined) {
+          delete process.env.MEMORY_SESSION_ARCHIVE;
+        } else {
+          process.env.MEMORY_SESSION_ARCHIVE = previous;
+        }
+        cleanupTestDir();
+      }
+    });
+
     it('should add consolidated_at timestamp when moving to MTM', function () {
       setupTestDir();
       try {
-        const { consolidateSession } = freshRequire('./memory-tiers.cjs');
+        const { consolidateSession } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Create a session in STM
         const stmPath = path.join(MEMORY_DIR, 'stm', 'session_current.json');
@@ -213,7 +249,9 @@ if (require.main === module) {
     it('should enforce MTM max sessions limit (10)', function () {
       setupTestDir();
       try {
-        const { consolidateSession, getMTMSessions } = freshRequire('./memory-tiers.cjs');
+        const { consolidateSession, getMTMSessions } = freshRequire(
+          '../../../.claude/lib/memory/memory-tiers.cjs'
+        );
 
         // Create 12 sessions directly in MTM to test limit
         const mtmDir = path.join(MEMORY_DIR, 'mtm');
@@ -263,7 +301,7 @@ if (require.main === module) {
     it('should promote high-value session to LTM', function () {
       setupTestDir();
       try {
-        const { promoteToLTM } = freshRequire('./memory-tiers.cjs');
+        const { promoteToLTM } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Create a session in MTM
         const mtmDir = path.join(MEMORY_DIR, 'mtm');
@@ -303,7 +341,7 @@ if (require.main === module) {
     it('should remove session from MTM after promotion', function () {
       setupTestDir();
       try {
-        const { promoteToLTM } = freshRequire('./memory-tiers.cjs');
+        const { promoteToLTM } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Create a session in MTM
         const mtmDir = path.join(MEMORY_DIR, 'mtm');
@@ -337,7 +375,9 @@ if (require.main === module) {
     it('should compress old sessions into summary format', function () {
       setupTestDir();
       try {
-        const { summarizeOldSessions } = freshRequire('./memory-tiers.cjs');
+        const { summarizeOldSessions } = freshRequire(
+          '../../../.claude/lib/memory/memory-tiers.cjs'
+        );
 
         // Create 15 MTM sessions (more than 10 limit)
         const mtmDir = path.join(MEMORY_DIR, 'mtm');
@@ -393,7 +433,9 @@ if (require.main === module) {
     it('should not summarize if under 10 sessions in MTM', function () {
       setupTestDir();
       try {
-        const { summarizeOldSessions } = freshRequire('./memory-tiers.cjs');
+        const { summarizeOldSessions } = freshRequire(
+          '../../../.claude/lib/memory/memory-tiers.cjs'
+        );
 
         // Create only 5 MTM sessions
         const mtmDir = path.join(MEMORY_DIR, 'mtm');
@@ -426,7 +468,9 @@ if (require.main === module) {
     it('should generate markdown-compatible summary', function () {
       setupTestDir();
       try {
-        const { generateSessionSummary } = freshRequire('./memory-tiers.cjs');
+        const { generateSessionSummary } = freshRequire(
+          '../../../.claude/lib/memory/memory-tiers.cjs'
+        );
 
         const sessions = [
           {
@@ -472,7 +516,7 @@ if (require.main === module) {
     it('should report health of all tiers', function () {
       setupTestDir();
       try {
-        const { getTierHealth } = freshRequire('./memory-tiers.cjs');
+        const { getTierHealth } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Create some data in each tier
         fs.writeFileSync(
@@ -510,7 +554,7 @@ if (require.main === module) {
     it('should warn when MTM is approaching limit', function () {
       setupTestDir();
       try {
-        const { getTierHealth } = freshRequire('./memory-tiers.cjs');
+        const { getTierHealth } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Create 9 sessions in MTM (approaching 10 limit)
         for (let i = 1; i <= 9; i++) {
@@ -538,7 +582,9 @@ if (require.main === module) {
     it('should write current session data to STM', function () {
       setupTestDir();
       try {
-        const { writeSTMEntry, readSTMEntry } = freshRequire('./memory-tiers.cjs');
+        const { writeSTMEntry, readSTMEntry } = freshRequire(
+          '../../../.claude/lib/memory/memory-tiers.cjs'
+        );
 
         const sessionData = {
           session_id: 'current-session',
@@ -563,7 +609,7 @@ if (require.main === module) {
     it('should handle corrupted STM session file in readSTMEntry', function () {
       setupTestDir();
       try {
-        const { readSTMEntry } = freshRequire('./memory-tiers.cjs');
+        const { readSTMEntry } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Write corrupted JSON
         const stmPath = path.join(MEMORY_DIR, 'stm', 'session_current.json');
@@ -580,7 +626,7 @@ if (require.main === module) {
     it('should handle corrupted MTM session files in getMTMSessions', function () {
       setupTestDir();
       try {
-        const { getMTMSessions } = freshRequire('./memory-tiers.cjs');
+        const { getMTMSessions } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Write one valid and one corrupted session
         const mtmDir = path.join(MEMORY_DIR, 'mtm');
@@ -602,7 +648,7 @@ if (require.main === module) {
     it('should handle corrupted STM in consolidateSession', function () {
       setupTestDir();
       try {
-        const { consolidateSession } = freshRequire('./memory-tiers.cjs');
+        const { consolidateSession } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Write corrupted STM
         const stmPath = path.join(MEMORY_DIR, 'stm', 'session_current.json');
@@ -620,7 +666,7 @@ if (require.main === module) {
     it('should handle missing STM in consolidateSession', function () {
       setupTestDir();
       try {
-        const { consolidateSession } = freshRequire('./memory-tiers.cjs');
+        const { consolidateSession } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Don't create STM file
         const result = consolidateSession('nonexistent-session', TEST_PROJECT_ROOT);
@@ -634,7 +680,7 @@ if (require.main === module) {
     it('should handle session not found in promoteToLTM', function () {
       setupTestDir();
       try {
-        const { promoteToLTM } = freshRequire('./memory-tiers.cjs');
+        const { promoteToLTM } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Don't create any MTM sessions
         const result = promoteToLTM('nonexistent-session', TEST_PROJECT_ROOT);
@@ -650,7 +696,9 @@ if (require.main === module) {
     it('should handle empty sessions array in generateSessionSummary', function () {
       setupTestDir();
       try {
-        const { generateSessionSummary } = freshRequire('./memory-tiers.cjs');
+        const { generateSessionSummary } = freshRequire(
+          '../../../.claude/lib/memory/memory-tiers.cjs'
+        );
 
         // Should return null for empty array
         const result = generateSessionSummary([]);
@@ -663,7 +711,9 @@ if (require.main === module) {
     it('should handle null sessions in generateSessionSummary', function () {
       setupTestDir();
       try {
-        const { generateSessionSummary } = freshRequire('./memory-tiers.cjs');
+        const { generateSessionSummary } = freshRequire(
+          '../../../.claude/lib/memory/memory-tiers.cjs'
+        );
 
         // Should return null for null input
         const result = generateSessionSummary(null);
@@ -676,7 +726,7 @@ if (require.main === module) {
     it('should handle unknown tier in getTierPath', function () {
       setupTestDir();
       try {
-        const { getTierPath } = freshRequire('./memory-tiers.cjs');
+        const { getTierPath } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Should throw for unknown tier
         try {
@@ -698,7 +748,7 @@ if (require.main === module) {
     it('should handle clearSTM when file does not exist', function () {
       setupTestDir();
       try {
-        const { clearSTM } = freshRequire('./memory-tiers.cjs');
+        const { clearSTM } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
 
         // Should not throw when file doesn't exist
         clearSTM(TEST_PROJECT_ROOT);
@@ -712,7 +762,9 @@ if (require.main === module) {
     it('should handle summarizeOldSessions when under limit', function () {
       setupTestDir();
       try {
-        const { summarizeOldSessions } = freshRequire('./memory-tiers.cjs');
+        const { summarizeOldSessions } = freshRequire(
+          '../../../.claude/lib/memory/memory-tiers.cjs'
+        );
 
         // Create only 3 sessions (under the 10 limit)
         const mtmDir = path.join(MEMORY_DIR, 'mtm');

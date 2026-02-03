@@ -23,6 +23,9 @@ const path = require('path');
 
 // BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { createLogger } = require('../utils/logger.cjs');
+
+const logger = createLogger('memory-dashboard');
 
 // ============================================================================
 // Configuration
@@ -80,16 +83,10 @@ function getFileSizeKB(filePath) {
       return Math.round(fs.statSync(filePath).size / 1024);
     }
   } catch (e) {
-    if (process.env.METRICS_DEBUG === 'true') {
-      console.error(
-        JSON.stringify({
-          module: 'memory-dashboard',
-          function: 'getFileSizeKB',
-          error: e.message,
-          timestamp: new Date().toISOString(),
-        })
-      );
-    }
+    logger.debug('getFileSizeKB error', {
+      function: 'getFileSizeKB',
+      error: e.message,
+    });
   }
   return 0;
 }
@@ -109,16 +106,10 @@ function getJsonEntryCount(filePath) {
       }
     }
   } catch (e) {
-    if (process.env.METRICS_DEBUG === 'true') {
-      console.error(
-        JSON.stringify({
-          module: 'memory-dashboard',
-          function: 'getJsonEntryCount',
-          error: e.message,
-          timestamp: new Date().toISOString(),
-        })
-      );
-    }
+    logger.debug('getJsonEntryCount error', {
+      function: 'getJsonEntryCount',
+      error: e.message,
+    });
   }
   return 0;
 }
@@ -132,16 +123,10 @@ function countDirFiles(dirPath, pattern = /\.json$/) {
       return fs.readdirSync(dirPath).filter(f => pattern.test(f)).length;
     }
   } catch (e) {
-    if (process.env.METRICS_DEBUG === 'true') {
-      console.error(
-        JSON.stringify({
-          module: 'memory-dashboard',
-          function: 'countDirFiles',
-          error: e.message,
-          timestamp: new Date().toISOString(),
-        })
-      );
-    }
+    logger.debug('countDirFiles error', {
+      function: 'countDirFiles',
+      error: e.message,
+    });
   }
   return 0;
 }
@@ -455,16 +440,10 @@ function getFileLineCount(filePath) {
       return content.split('\n').length;
     }
   } catch (e) {
-    if (process.env.METRICS_DEBUG === 'true') {
-      console.error(
-        JSON.stringify({
-          module: 'memory-dashboard',
-          function: 'getFileLineCount',
-          error: e.message,
-          timestamp: new Date().toISOString(),
-        })
-      );
-    }
+    logger.debug('getFileLineCount error', {
+      function: 'getFileLineCount',
+      error: e.message,
+    });
   }
   return 0;
 }
@@ -518,32 +497,20 @@ function getMetricsHistory(days = 7, projectRoot = PROJECT_ROOT) {
           ...data,
         });
       } catch (e) {
-        if (process.env.METRICS_DEBUG === 'true') {
-          console.error(
-            JSON.stringify({
-              module: 'memory-dashboard',
-              function: 'getMetricsHistory',
-              context: 'parsing file',
-              file: file,
-              error: e.message,
-              timestamp: new Date().toISOString(),
-            })
-          );
-        }
+        logger.debug('getMetricsHistory parsing error', {
+          function: 'getMetricsHistory',
+          context: 'parsing file',
+          file: file,
+          error: e.message,
+        });
       }
     }
   } catch (e) {
-    if (process.env.METRICS_DEBUG === 'true') {
-      console.error(
-        JSON.stringify({
-          module: 'memory-dashboard',
-          function: 'getMetricsHistory',
-          context: 'reading directory',
-          error: e.message,
-          timestamp: new Date().toISOString(),
-        })
-      );
-    }
+    logger.debug('getMetricsHistory reading directory error', {
+      function: 'getMetricsHistory',
+      context: 'reading directory',
+      error: e.message,
+    });
   }
 
   return history;
@@ -572,16 +539,10 @@ function cleanupOldMetrics(projectRoot = PROJECT_ROOT) {
       }
     }
   } catch (e) {
-    if (process.env.METRICS_DEBUG === 'true') {
-      console.error(
-        JSON.stringify({
-          module: 'memory-dashboard',
-          function: 'cleanupOldMetrics',
-          error: e.message,
-          timestamp: new Date().toISOString(),
-        })
-      );
-    }
+    logger.debug('cleanupOldMetrics error', {
+      function: 'cleanupOldMetrics',
+      error: e.message,
+    });
   }
 
   return removedCount;

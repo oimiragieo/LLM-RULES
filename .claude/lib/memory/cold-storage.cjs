@@ -129,6 +129,53 @@ function buildIndexDocument(summaryObj, sourcePath, coldPath) {
 }
 
 /**
+ * Search cold storage via LanceDB (tier=cold filter).
+ *
+ * @param {string} query
+ * @param {object} [options]
+ * @param {object} [options.filters]
+ * @param {number} [options.limit]
+ * @param {number} [options.minScore]
+ * @param {object|null} [options.vectorStore] Optional injected vector store for tests
+ * @param {string} [options.projectRoot]
+ * @returns {Promise<Array>}
+ */
+async function searchColdStorage(query, options = {}) {
+  const projectRoot = options.projectRoot || PROJECT_ROOT;
+  validateProjectRoot(projectRoot);
+
+  try {
+    const { MemoryVectorStore } = require('./lancedb-client.cjs');
+    const vectorStore =
+      options.vectorStore ||
+      new MemoryVectorStore({
+        persistDirectory: path.join(projectRoot, '.claude', 'data', 'lancedb'),
+        collectionName: 'agent_memory',
+        embeddingMode: process.env.LANCEDB_EMBEDDING_MODE || 'transformers',
+      });
+
+    const available = await vectorStore.isAvailable();
+    if (!available) {
+      return [];
+    }
+
+    const results = await vectorStore.search(query, {
+      limit: options.limit,
+      minScore: options.minScore,
+      filters: { ...(options.filters || {}), 'metadata.tier': 'cold' },
+    });
+
+    if (!options.vectorStore && typeof vectorStore.close === 'function') {
+      await vectorStore.close();
+    }
+
+    return results;
+  } catch (_err) {
+    return [];
+  }
+}
+
+/**
  * Archive old LTM summaries to cold storage (no gzip append).
  *
  * @param {string} projectRoot
@@ -275,6 +322,7 @@ async function archiveOldLTM(projectRoot = PROJECT_ROOT, options = {}) {
 module.exports = {
   listLTMSummaries,
   archiveOldLTM,
+  searchColdStorage,
   // exported for tests
   _private: {
     buildIndexDocument,

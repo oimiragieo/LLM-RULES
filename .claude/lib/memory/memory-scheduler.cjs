@@ -27,6 +27,10 @@ const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.
 // CRITICAL-001 FIX: Path traversal prevention
 const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
 const eventBus = require('../events/event-bus.cjs');
+const { createLogger } = require('../utils/logger.cjs');
+
+const logger = createLogger('memory-scheduler');
+
 const { EventTypes } = require('../events/event-types.cjs');
 
 // ============================================================================
@@ -45,6 +49,7 @@ const CONFIG = {
     deduplication: { type: 'weekly', description: 'Deduplicate patterns and gotchas' },
     pruning: { type: 'weekly', description: 'Prune low-utility entries' },
     archiveOldLTM: { type: 'weekly', description: 'Archive old LTM summaries to cold storage' },
+    extraction: { type: 'weekly', description: 'Extract structured memories from recent MTM' },
     weeklyReport: { type: 'weekly', description: 'Generate weekly health report' },
   },
 };
@@ -116,9 +121,7 @@ function readStatus(projectRoot = PROJECT_ROOT) {
       return JSON.parse(fs.readFileSync(statusPath, 'utf8'));
     }
   } catch (e) {
-    if (process.env.MEMORY_DEBUG) {
-      console.error('[MEMORY_DEBUG]', 'readStatus:', e.message);
-    }
+    logger.debug('readStatus failed', { error: e.message });
   }
   return { lastDaily: null, lastWeekly: null, history: [] };
 }
@@ -163,6 +166,13 @@ function runConsolidation(projectRoot = PROJECT_ROOT) {
   }
 
   try {
+    const stmDir = memoryTiers.getTierPath('STM', projectRoot);
+    const stmPath = path.join(stmDir, 'session_current.json');
+    if (!fs.existsSync(stmPath)) {
+      result.success = true;
+      result.details = { skipped: true, reason: 'No active STM session' };
+      return result;
+    }
     const consolidateResult = memoryTiers.consolidateSession('current', projectRoot);
     // Treat "no STM to consolidate" as success so maintenance history does not show failure
     result.success =
@@ -237,6 +247,44 @@ function runMetricsLog(projectRoot = PROJECT_ROOT) {
     dashboard.cleanupOldMetrics(projectRoot);
     result.success = true;
     result.details = { savedPath, metrics: metrics.summary };
+  } catch (e) {
+    result.details = e.message;
+  }
+
+  return result;
+}
+
+/**
+ * Run memory extraction pipeline task
+ */
+function runExtraction(projectRoot = PROJECT_ROOT) {
+  // CRITICAL-001-MEMORY FIX: Validate projectRoot
+  validateProjectRoot(projectRoot);
+  const result = {
+    type: 'extraction',
+    timestamp: new Date().toISOString(),
+    success: false,
+    details: null,
+  };
+
+  try {
+    const cliPath = path.join(projectRoot, '.claude', 'tools', 'cli', 'memory-extract.cjs');
+    if (!fs.existsSync(cliPath)) {
+      result.details = 'memory-extract.cjs not available';
+      return result;
+    }
+
+    const proc = spawnSync(process.execPath, [cliPath, '--json'], {
+      encoding: 'utf8',
+    });
+    if (proc.status !== 0) {
+      result.details = proc.stderr || 'memory-extract failed';
+      return result;
+    }
+
+    const output = (proc.stdout || '').trim();
+    result.success = true;
+    result.details = output ? JSON.parse(output) : { status: 'ok' };
   } catch (e) {
     result.details = e.message;
   }
@@ -532,6 +580,8 @@ function runTask(taskName, projectRoot = PROJECT_ROOT) {
       return runPruning(projectRoot);
     case 'archiveOldLTM':
       return runArchiveOldLTM(projectRoot);
+    case 'extraction':
+      return runExtraction(projectRoot);
     case 'weeklyReport':
       return runWeeklyReport(projectRoot);
     default:
@@ -633,6 +683,7 @@ function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
   tasks.push(runDeduplication(projectRoot));
   tasks.push(runPruning(projectRoot));
   tasks.push(runArchiveOldLTM(projectRoot));
+  tasks.push(runExtraction(projectRoot));
   const weeklyReportResult = runWeeklyReport(projectRoot);
   tasks.push(weeklyReportResult);
 
@@ -796,7 +847,7 @@ if (require.main === module) {
       } else {
         console.error('Usage: memory-scheduler.cjs run <type>');
         console.error(
-          'Types: daily, weekly, consolidation, healthCheck, summarization, deduplication, pruning'
+          'Types: daily, weekly, consolidation, healthCheck, summarization, deduplication, pruning, archiveOldLTM, extraction'
         );
       }
       break;
@@ -813,7 +864,7 @@ if (require.main === module) {
       } else {
         console.error('Usage: memory-scheduler.cjs task <task-name>');
         console.error(
-          'Tasks: consolidation, healthCheck, metricsLog, summarization, deduplication, pruning, weeklyReport'
+          'Tasks: consolidation, healthCheck, metricsLog, summarization, deduplication, pruning, archiveOldLTM, extraction, weeklyReport'
         );
       }
       break;
@@ -839,6 +890,7 @@ Weekly Tasks (in addition to daily):
   - deduplication  Deduplicate patterns and gotchas
   - pruning        Prune low-utility entries and archive
   - archiveOldLTM  Archive old LTM summaries to cold storage
+  - extraction     Extract structured memories from recent MTM
   - weeklyReport   Generate weekly health report
 
 Examples:
@@ -862,6 +914,7 @@ module.exports = {
   runConsolidation,
   runHealthCheck,
   runMetricsLog,
+  runExtraction,
   runSummarization,
   runDeduplication,
   runPruning,

@@ -12,7 +12,10 @@
 const { test } = require('node:test');
 const assert = require('assert');
 const path = require('path');
-const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
+const {
+  PROJECT_ROOT,
+  validatePathWithinProject,
+} = require('../../../.claude/lib/utils/project-root.cjs');
 const scheduler = require('../../../.claude/lib/memory/memory-scheduler.cjs');
 
 test('PERF-009: memory-scheduler.cjs - getMemoryDir() should accept valid PROJECT_ROOT', () => {

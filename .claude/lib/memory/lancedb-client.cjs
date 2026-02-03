@@ -12,6 +12,24 @@
 
 const path = require('path');
 const fs = require('fs');
+const { createLogger } = require('../utils/logger.cjs');
+
+const logger = createLogger('lancedb-client');
+
+/**
+ * @typedef {Object} EmbeddingStatus
+ * @property {'unknown'|'ready'|'unavailable'|'disabled'} status
+ * @property {string|null} mode
+ * @property {string|null} reason
+ */
+
+/**
+ * @typedef {Object} VectorStoreConfig
+ * @property {string} [persistDirectory]
+ * @property {string} [collectionName]
+ * @property {string} [embeddingMode]
+ * @property {string} [embeddingModel]
+ */
 
 // Lazy load transformers
 let pipeline;
@@ -131,10 +149,10 @@ class MemoryVectorStore {
             this._embeddingStatus = { status: 'ready', mode: 'transformers', reason: null };
             this._mockMode = false;
           } catch (e) {
-            console.warn(
-              '[LanceDB] Failed to load local embedding model (likely missing dependencies like "sharp"). Disabling semantic embeddings.'
+            logger.warn(
+              'Failed to load local embedding model (likely missing dependencies like "sharp"). Disabling semantic embeddings.',
+              { error: e.message }
             );
-            console.warn(`[LanceDB] Error details: ${e.message}`);
 
             // Fail-closed: no mock embeddings
             this.embedder = null;
@@ -152,10 +170,10 @@ class MemoryVectorStore {
             this._embeddingStatus = { status: 'ready', mode: 'transformers', reason: null };
             this._mockMode = false;
           } catch (e) {
-            console.warn(
-              '[LanceDB] Failed to initialize embedding model on reuse. Disabling semantic embeddings.'
+            logger.warn(
+              'Failed to initialize embedding model on reuse. Disabling semantic embeddings.',
+              { error: e.message }
             );
-            console.warn(`[LanceDB] Error details: ${e.message}`);
             this.embedder = null;
             this._mockMode = true;
             this._embeddingStatus = {
@@ -306,7 +324,7 @@ class MemoryVectorStore {
       const vector = await this.generateEmbedding(text);
       const tableDim = await this.getTableVectorDimension();
       if (Number.isFinite(tableDim) && vector.length !== tableDim) {
-        const reason = `embedding dimension mismatch (table ${tableDim} vs vector ${vector.length}). Re-index or rebuild the LanceDB table.`;
+        const reason = `embedding dimension mismatch (table ${tableDim} vs vector ${vector.length}). Re-index or rebuild the LanceDB table (pnpm run memory:reindex).`;
         this._embeddingStatus = {
           status: 'unavailable',
           mode: this._embeddingStatus?.mode || this.config.embeddingMode,
@@ -386,7 +404,7 @@ class MemoryVectorStore {
     const queryVector = await this.generateEmbedding(query);
     const tableDim = await this.getTableVectorDimension();
     if (Number.isFinite(tableDim) && queryVector.length !== tableDim) {
-      const reason = `embedding dimension mismatch (table ${tableDim} vs query ${queryVector.length}). Re-index or rebuild the LanceDB table.`;
+      const reason = `embedding dimension mismatch (table ${tableDim} vs query ${queryVector.length}). Re-index or rebuild the LanceDB table (pnpm run memory:reindex).`;
       this._embeddingStatus = {
         status: 'unavailable',
         mode: this._embeddingStatus?.mode || this.config.embeddingMode,
@@ -440,6 +458,30 @@ class MemoryVectorStore {
 
     if (minScore === null) return mapped;
     return mapped.filter(r => typeof r.similarity === 'number' && r.similarity >= minScore);
+  }
+
+  /**
+   * Delete documents by metadata match.
+   * Uses a LIKE filter on the JSON-encoded metadata column.
+   *
+   * @param {string} field
+   * @param {string|number|boolean} value
+   * @returns {Promise<boolean>}
+   */
+  async deleteByMetadata(field, value) {
+    if (!this.isInitialized) await this.initialize();
+    if (!this.table) return false;
+
+    const k = String(field).replace(/'/g, "''");
+    const v = String(value).replace(/'/g, "''");
+    const clause = `metadata LIKE '%"${k}":"${v}"%'`;
+
+    try {
+      await this.table.delete(clause);
+      return true;
+    } catch (_e) {
+      return false;
+    }
   }
 
   /**

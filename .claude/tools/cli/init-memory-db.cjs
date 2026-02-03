@@ -30,9 +30,12 @@ function initializeDatabase(dbOrPath) {
     .get();
 
   if (tableCheck) {
-    console.log('Schema already initialized, skipping...');
+    migrateSchema(db);
+    console.log('Schema already initialized, migration check complete.');
     return db;
   }
+
+  const schemaVersion = 2;
 
   // Create schema in a transaction
   const createSchema = () => {
@@ -44,7 +47,7 @@ function initializeDatabase(dbOrPath) {
         id TEXT PRIMARY KEY,
         type TEXT NOT NULL CHECK(type IN (
           'agent', 'task', 'skill', 'concept', 'file',
-          'pattern', 'decision', 'issue'
+          'pattern', 'decision', 'issue', 'memory'
         )),
         name TEXT NOT NULL,
         content TEXT,
@@ -118,7 +121,7 @@ function initializeDatabase(dbOrPath) {
       INSERT INTO schema_version (version, description)
       VALUES (?, ?)
     `
-      ).run(1, 'Initial entity schema with entities, relationships, and attributes');
+      ).run(schemaVersion, 'Entity schema with memory type and relationships');
 
       db.exec('COMMIT');
     } catch (err) {
@@ -139,6 +142,98 @@ function initializeDatabase(dbOrPath) {
   console.log('Indexes created: 8 performance indexes');
 
   return db;
+}
+
+function getSchemaVersion(db) {
+  try {
+    const row = db.prepare('SELECT MAX(version) as version FROM schema_version').get();
+    return Number(row?.version || 0);
+  } catch (_err) {
+    return 0;
+  }
+}
+
+function migrateToV2(db) {
+  db.exec('BEGIN');
+  try {
+    db.exec('PRAGMA foreign_keys = OFF');
+    db.exec(`
+      CREATE TABLE entities_new (
+        id TEXT PRIMARY KEY,
+        type TEXT NOT NULL CHECK(type IN (
+          'agent', 'task', 'skill', 'concept', 'file',
+          'pattern', 'decision', 'issue', 'memory'
+        )),
+        name TEXT NOT NULL,
+        content TEXT,
+        source_file TEXT,
+        line_number INTEGER,
+        created_at TIMESTAMP,
+        updated_at TIMESTAMP,
+        last_accessed TIMESTAMP,
+        access_count INTEGER DEFAULT 0,
+        quality_score REAL DEFAULT 0.5 CHECK(quality_score BETWEEN 0 AND 1)
+      );
+    `);
+    db.exec(`
+      INSERT INTO entities_new (
+        id,
+        type,
+        name,
+        content,
+        source_file,
+        line_number,
+        created_at,
+        updated_at,
+        last_accessed,
+        access_count,
+        quality_score
+      )
+      SELECT
+        id,
+        type,
+        name,
+        content,
+        source_file,
+        line_number,
+        created_at,
+        updated_at,
+        last_accessed,
+        access_count,
+        quality_score
+      FROM entities;
+    `);
+    db.exec('DROP TABLE entities;');
+    db.exec('ALTER TABLE entities_new RENAME TO entities;');
+    db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_entities_type ON entities(type);
+      CREATE INDEX IF NOT EXISTS idx_entities_name ON entities(name);
+      CREATE INDEX IF NOT EXISTS idx_entities_source_file ON entities(source_file);
+      CREATE INDEX IF NOT EXISTS idx_entities_created ON entities(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_entities_quality ON entities(quality_score DESC);
+    `);
+    db.prepare(
+      `
+        INSERT INTO schema_version (version, description)
+        VALUES (?, ?)
+      `
+    ).run(2, 'Add memory entity type');
+    db.exec('PRAGMA foreign_keys = ON');
+    db.exec('COMMIT');
+  } catch (err) {
+    try {
+      db.exec('ROLLBACK');
+    } catch (_rollbackErr) {
+      // ignore rollback failures
+    }
+    throw err;
+  }
+}
+
+function migrateSchema(db) {
+  const version = getSchemaVersion(db);
+  if (version >= 2) return;
+  migrateToV2(db);
 }
 
 /**
