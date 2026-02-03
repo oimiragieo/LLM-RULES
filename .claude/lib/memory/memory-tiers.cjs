@@ -31,6 +31,78 @@ const CONFIG = {
   SUMMARY_MIN_SESSIONS: 5, // Minimum sessions to summarize
 };
 
+function isStructuredSummaryEnabled() {
+  const value = String(process.env.MEMORY_STRUCTURED_SUMMARY || '').toLowerCase();
+  return value === '1' || value === 'true';
+}
+
+function isSessionArchiveEnabled() {
+  const value = String(process.env.MEMORY_SESSION_ARCHIVE || '').toLowerCase();
+  return value === '1' || value === 'true';
+}
+
+function extractAbstractFromSummary(summaryText) {
+  const lines = String(summaryText || '')
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean);
+  if (lines.length === 0) return '';
+  const overviewIndex = lines.findIndex(line =>
+    line.toLowerCase().includes('one-sentence overview')
+  );
+  if (overviewIndex !== -1) {
+    const nextLine = lines.slice(overviewIndex + 1).find(line => !line.startsWith('#'));
+    if (nextLine) return nextLine;
+  }
+  return lines[0];
+}
+
+function getNextArchiveDir(mtmDir) {
+  ensureDir(mtmDir);
+  const entries = fs.readdirSync(mtmDir, { withFileTypes: true });
+  const existing = entries
+    .filter(ent => ent.isDirectory() && /^archive_\d+$/.test(ent.name))
+    .map(ent => Number(ent.name.replace('archive_', '')))
+    .filter(Number.isFinite);
+  const nextIndex = existing.length > 0 ? Math.max(...existing) + 1 : 1;
+  const dirName = `archive_${String(nextIndex).padStart(3, '0')}`;
+  return path.join(mtmDir, dirName);
+}
+
+function writeSessionArchive(mtmData, mtmPath, projectRoot) {
+  const mtmDir = getTierPath('MTM', projectRoot);
+  const archiveDir = getNextArchiveDir(mtmDir);
+  ensureDir(archiveDir);
+
+  const sessionPath = path.join(archiveDir, 'session.json');
+  atomicWriteSync(sessionPath, JSON.stringify(mtmData, null, 2));
+
+  const summaryPath = mtmPath.replace(/\.json$/i, '.summary.md');
+  let overview = '';
+  if (fs.existsSync(summaryPath)) {
+    try {
+      overview = fs.readFileSync(summaryPath, 'utf8').trim();
+    } catch (_e) {
+      overview = '';
+    }
+  }
+  if (!overview && mtmData.summary) {
+    overview = String(mtmData.summary).trim();
+  }
+  if (!overview) {
+    overview = '_No summary available._';
+  }
+
+  const overviewPath = path.join(archiveDir, '.overview.md');
+  atomicWriteSync(overviewPath, overview);
+
+  const abstract = extractAbstractFromSummary(overview);
+  const abstractPath = path.join(archiveDir, '.abstract.md');
+  atomicWriteSync(abstractPath, abstract || '_No summary available._');
+
+  return { archiveDir, overviewPath, abstractPath, sessionPath };
+}
+
 // Memory tier definitions
 const MEMORY_TIERS = {
   STM: {
@@ -259,6 +331,35 @@ function consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
 
   // Write to MTM
   atomicWriteSync(mtmPath, JSON.stringify(mtmData, null, 2));
+
+  if (isStructuredSummaryEnabled()) {
+    try {
+      const { generateStructuredSummaryForSession } = require('./session-summary.cjs');
+      const summaryPromise = generateStructuredSummaryForSession(mtmData, {
+        projectRoot,
+        mtmPath,
+      });
+      summaryPromise.catch(err => {
+        if (process.env.MEMORY_DEBUG) {
+          console.error('[MEMORY_DEBUG]', 'structured summary failed:', err.message);
+        }
+      });
+    } catch (e) {
+      if (process.env.MEMORY_DEBUG) {
+        console.error('[MEMORY_DEBUG]', 'structured summary init failed:', e.message);
+      }
+    }
+  }
+
+  if (isSessionArchiveEnabled()) {
+    try {
+      writeSessionArchive(mtmData, mtmPath, projectRoot);
+    } catch (e) {
+      if (process.env.MEMORY_DEBUG) {
+        console.error('[MEMORY_DEBUG]', 'session archive failed:', e.message);
+      }
+    }
+  }
 
   // Clear STM
   clearSTM(projectRoot);
