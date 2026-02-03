@@ -19,6 +19,8 @@ const routerState = require('./router-state.cjs');
 // PERF-006/PERF-007: Use shared utilities instead of duplicated code
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { parseHookInputSync } = require('../../lib/utils/hook-input.cjs');
+const { classifyIntent } = require('../../lib/routing/intent-classifier.cjs');
+const { getAgentForCapability } = require('../../lib/routing/agent-registry-resolver.cjs');
 const {
   INTENT_KEYWORDS,
   INTENT_TO_AGENT,
@@ -492,7 +494,7 @@ function applyDisambiguation(promptLower, candidates) {
 /**
  * Score agents against user prompt using comprehensive intent detection
  */
-function scoreAgents(prompt, agents) {
+function scoreAgents(prompt, agents, classification) {
   const promptLower = prompt.toLowerCase();
   const scores = [];
 
@@ -505,18 +507,15 @@ function scoreAgents(prompt, agents) {
     }
   }
 
-  // Find primary intent (highest scoring)
-  let detectedIntent = 'general';
-  let maxIntentScore = 0;
-  for (const [intent, score] of Object.entries(intentScores)) {
-    if (score > maxIntentScore) {
-      maxIntentScore = score;
-      detectedIntent = intent;
-    }
-  }
+  // Primary intent from shared classifier
+  const detectedIntent = classification?.intent || 'general';
 
   // Get preferred agent for the detected intent
-  const preferredAgentName = INTENT_TO_AGENT[detectedIntent] || null;
+  const preferredAgentName =
+    classification?.defaultAgent ||
+    (classification?.capability ? getAgentForCapability(classification.capability) : null) ||
+    INTENT_TO_AGENT[detectedIntent] ||
+    null;
 
   // Score each agent
   for (const agent of agents) {
@@ -915,7 +914,8 @@ function main() {
     process.exit(0);
   }
 
-  const { candidates, intent } = scoreAgents(userPrompt, agents);
+  const classification = classifyIntent(userPrompt);
+  const { candidates, intent } = scoreAgents(userPrompt, agents, classification);
   const planningReq = detectPlanningRequirement(userPrompt);
 
   // Only show routing info if we have a clear recommendation
@@ -923,7 +923,8 @@ function main() {
     console.log('\n┌─────────────────────────────────────────────────┐');
     console.log('│ 🔀 ROUTER ANALYSIS                              │');
     console.log('├─────────────────────────────────────────────────┤');
-    console.log(`│ Intent: ${intent.padEnd(39)} │`);
+    const displayIntent = classification.intent || intent;
+    console.log(`│ Intent: ${displayIntent.padEnd(39)} │`);
     console.log(`│ Complexity: ${planningReq.complexity.padEnd(36)} │`);
     console.log('│ Recommended agents:                             │');
     for (let i = 0; i < Math.min(3, candidates.length); i++) {

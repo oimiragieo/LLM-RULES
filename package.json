@@ -34,6 +34,7 @@
     "validate:cuj": "node --max-old-space-size=4096 --expose-gc .claude/tools/cuj-validator-unified.mjs",
     "validate:cujs:e2e": "node --max-old-space-size=4096 --expose-gc .claude/tools/cuj-validator-unified.mjs --mode full",
     "validate:cujs:dry-run": "node --max-old-space-size=4096 --expose-gc .claude/tools/cuj-validator-unified.mjs --mode dry-run",
+    "validate:routing": "node .claude/scripts/validate-routing-consistency.cjs",
     "validate:index": "node scripts/validate-index.mjs",
     "validate:index-version": "node scripts/validate-rule-index-paths.mjs --check-version",
     "validate:index-paths": "node scripts/validate-rule-index-paths.mjs",

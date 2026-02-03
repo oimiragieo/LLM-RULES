@@ -171,6 +171,16 @@ const ROUTING_TABLE = {
   pagerduty: 'incident-responder',
 };
 
+// Prefix/pattern routing for short-form tech tokens or frameworks
+const ROUTING_PREFIX_PATTERNS = [
+  { pattern: 'reactjs', agent: 'frontend-pro' },
+  { pattern: 'nextjs', agent: 'nextjs-pro' },
+  { pattern: 'nodejs', agent: 'nodejs-pro' },
+  { pattern: 'sveltekit', agent: 'sveltekit-expert' },
+  { pattern: 'vuejs', agent: 'frontend-pro' },
+  { pattern: 'fastapi', agent: 'fastapi-pro' },
+];
+
 const INTENT_KEYWORDS = {
   // === CORE AGENTS (8) ===
   architect: [
@@ -1977,6 +1987,7 @@ function getPreferredAgent(intent) {
 
 module.exports = {
   ROUTING_TABLE,
+  ROUTING_PREFIX_PATTERNS,
   INTENT_KEYWORDS,
   INTENT_TO_AGENT,
   DISAMBIGUATION_RULES,

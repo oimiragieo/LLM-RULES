@@ -25,11 +25,9 @@ const { spawnSync } = require('child_process');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { parseHookInputSync } = require('../../lib/utils/hook-input.cjs');
 const { loadConfig } = require('../../lib/utils/config-loader.cjs');
-const {
-  ROUTING_TABLE,
-  INTENT_KEYWORDS,
-  getPreferredAgent,
-} = require('../../lib/routing/routing-table.cjs');
+const { ROUTING_TABLE, getPreferredAgent } = require('../../lib/routing/routing-table.cjs');
+const { classifyIntent } = require('../../lib/routing/intent-classifier.cjs');
+const { getAgentForCapability } = require('../../lib/routing/agent-registry-resolver.cjs');
 const semanticRouter = require('../../lib/routing/semantic-router.cjs');
 const { estimateTokens } = require('../../lib/utils/token-budget-tracker.cjs');
 const {
@@ -72,48 +70,10 @@ const AUTO_COMPRESSION_STATE_PATH = path.join(
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const USER_PROMPT_RESULTS_PATH = path.join(RUNTIME_DIR, 'user-prompt-results.jsonl');
 const USER_PROMPT_RESULTS_LOG_ENABLED = process.env.USER_PROMPT_RESULTS_LOG !== 'off';
-const CAPABILITY_ROUTING_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'config',
-  'capability-routing.json'
-);
-
 // Agent cache (shared across calls within same process)
 let agentCache = null;
 let agentCacheTime = 0;
 const AGENT_CACHE_TTL = 300000; // 5 minutes
-
-let capabilityRoutingCache = null;
-
-function loadCapabilityRouting() {
-  if (capabilityRoutingCache) return capabilityRoutingCache;
-  try {
-    const raw = fs.readFileSync(CAPABILITY_ROUTING_PATH, 'utf8');
-    const parsed = JSON.parse(raw);
-    const capabilityMap =
-      parsed && parsed.capabilityMap && typeof parsed.capabilityMap === 'object'
-        ? parsed.capabilityMap
-        : null;
-    const defaultAgents =
-      parsed && parsed.defaultAgents && typeof parsed.defaultAgents === 'object'
-        ? parsed.defaultAgents
-        : null;
-    const capabilityPriorityOrder =
-      parsed && parsed.capabilityPriority && Array.isArray(parsed.capabilityPriority.order)
-        ? parsed.capabilityPriority.order
-        : [];
-    capabilityRoutingCache = { capabilityMap, defaultAgents, capabilityPriorityOrder };
-    return capabilityRoutingCache;
-  } catch (_err) {
-    capabilityRoutingCache = {
-      capabilityMap: null,
-      defaultAgents: null,
-      capabilityPriorityOrder: [],
-    };
-    return capabilityRoutingCache;
-  }
-}
 
 // =============================================================================
 // Check 1: Router Mode Reset (from router-mode-reset.cjs)
@@ -622,30 +582,10 @@ function detectPlanningRequirement(prompt) {
 /**
  * Score agents against the user prompt
  */
-function scoreAgents(prompt, agents) {
+function scoreAgents(prompt, agents, classification) {
   const promptLower = prompt.toLowerCase();
   const scores = [];
-
-  // Detect intent from intent keywords first, then routing table
-  let detectedIntent = 'general';
-  for (const [intentKey, phrases] of Object.entries(INTENT_KEYWORDS)) {
-    if (!Array.isArray(phrases)) continue;
-    for (const phrase of phrases) {
-      if (promptLower.includes(String(phrase).toLowerCase())) {
-        detectedIntent = intentKey;
-        break;
-      }
-    }
-    if (detectedIntent !== 'general') break;
-  }
-  if (detectedIntent === 'general') {
-    for (const [keyword, _agent] of Object.entries(ROUTING_TABLE)) {
-      if (promptLower.includes(keyword)) {
-        detectedIntent = keyword;
-        break;
-      }
-    }
-  }
+  const detectedIntent = classification?.intent || 'general';
 
   // Score each agent
   for (const agent of agents) {
@@ -675,7 +615,7 @@ function scoreAgents(prompt, agents) {
     }
 
     // Direct routing table match
-    const preferredAgent = getPreferredAgent(detectedIntent);
+    const preferredAgent = classification?.defaultAgent || getPreferredAgent(detectedIntent);
     if (preferredAgent && agent.name === preferredAgent) {
       score += 5;
     }
@@ -699,6 +639,8 @@ function recordUserPromptResult(result) {
     const entry = {
       timestamp: new Date().toISOString(),
       intent: result?.routerEnforcement?.intent || 'general',
+      intentConfidence: result?.routerEnforcement?.intentConfidence,
+      intentSource: result?.routerEnforcement?.intentSource,
       candidates: (result?.routerEnforcement?.candidates || [])
         .map(candidate => candidate?.agent?.name)
         .filter(Boolean),
@@ -772,45 +714,23 @@ async function checkRouterEnforcement(hookInput) {
     return result;
   }
 
-  const { candidates, intent } = scoreAgents(userPrompt, agents);
+  const classification = classifyIntent(userPrompt);
+  const { candidates, intent } = scoreAgents(userPrompt, agents, classification);
   const planningReq = detectPlanningRequirement(userPrompt);
 
   result.candidates = candidates;
   result.planningReq = planningReq;
-  result.intent = intent;
-
-  const capRouting = loadCapabilityRouting();
-  const promptLower = userPrompt.toLowerCase();
-  const matchingCapabilities = [];
-  if (capRouting?.capabilityMap) {
-    for (const [keyword, capabilityName] of Object.entries(capRouting.capabilityMap)) {
-      if (promptLower.includes(keyword)) {
-        matchingCapabilities.push(capabilityName);
-      }
-    }
-    const intentCapability = capRouting.capabilityMap[intent];
-    if (intentCapability && !matchingCapabilities.includes(intentCapability)) {
-      matchingCapabilities.push(intentCapability);
-    }
-  }
-  if (matchingCapabilities.length > 0) {
-    const order = Array.isArray(capRouting?.capabilityPriorityOrder)
-      ? capRouting.capabilityPriorityOrder
-      : [];
-    matchingCapabilities.sort((a, b) => {
-      const ia = order.indexOf(a);
-      const ib = order.indexOf(b);
-      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-    });
-    result.capability = matchingCapabilities[0];
-    if (capRouting?.defaultAgents) {
-      result.defaultAgentForCapability = capRouting.defaultAgents[result.capability];
-    }
-  }
+  result.intent = classification.intent || intent;
+  result.intentConfidence = classification.confidence;
+  result.intentSource = classification.source;
+  result.capability = classification.capability;
+  result.defaultAgentForCapability =
+    classification.defaultAgent ||
+    (classification.capability ? getAgentForCapability(classification.capability) : null);
 
   const topScore = candidates.length > 0 ? candidates[0].score : 0;
   const semanticDisabled = process.env.SEMANTIC_ROUTING === 'off';
-  if (!semanticDisabled && (intent === 'general' || topScore <= 2)) {
+  if (!semanticDisabled && (classification.intent === 'general' || topScore <= 2)) {
     const semanticCandidates = await semanticRouter.predict(userPrompt, {
       topK: 5,
       minScore: 0.25,

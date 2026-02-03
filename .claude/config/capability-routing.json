@@ -45,7 +45,6 @@
 
     "architecture": "architecture-design",
     "design": "architecture-design",
-    "refactor": "architecture-design",
     "system design": "architecture-design",
     "structure": "architecture-design",
 
@@ -59,7 +58,6 @@
     "deploy": "devops",
     "infrastructure": "devops",
     "ci/cd": "devops",
-    "pipeline": "devops",
     "kubernetes": "devops",
     "docker": "devops",
 
@@ -122,6 +120,8 @@
       "research"
     ]
   },
+
+  "routingConditions": {},
 
   "notes": {
     "usage": "Router uses this config to classify user requests into capabilities, then queries AvailableAgents({ capability: '...' }) to find best agent",
