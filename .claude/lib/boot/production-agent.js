@@ -1,13 +1,42 @@
 /**
- * Production Agent Entry Point (Stub)
- * ===================================
+ * Production Agent Entry Point
+ * ============================
  *
- * Production agent mode is intentionally unimplemented.
- * Use agent:worker for headless/worker runs (see package.json "agent:worker" script).
- * This stub prevents "module not found" when agent:production is invoked.
+ * Delegates to the worker runtime for headless operation.
+ * This keeps agent:production functional without introducing a second runtime loop.
  */
 
-console.log(
-  'Production agent mode is under construction. agent:worker is a placeholder; hooks are host-driven today.'
-);
-process.exit(0);
+'use strict';
+
+process.env.WORKER_ENABLED = process.env.WORKER_ENABLED || '1';
+const { start, stop } = require('./worker-agent.cjs');
+
+// Start the worker loop
+start().catch(err => {
+  console.error(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: 'fatal',
+      message: 'Failed to start production agent',
+      error: err.message,
+    })
+  );
+  process.exit(1);
+});
+
+// Graceful shutdown propagation
+const shutdown = async signal => {
+  console.log(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: 'info',
+      message: `Received ${signal}, shutting down production agent...`,
+    })
+  );
+
+  await stop();
+  process.exit(0);
+};
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
