@@ -38,6 +38,7 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
+const { createHookLogger } = require('../../lib/utils/hook-logger.cjs');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
@@ -53,6 +54,8 @@ const ORCHESTRATOR_IDS = new Set([
   'swarm-coordinator',
   'party-orchestrator',
 ]);
+
+const hookLog = createHookLogger('spawn-prompt-assembler');
 
 function isDisabled() {
   return process.env.SPAWN_PROMPT_ASSEMBLER === 'off';
@@ -171,7 +174,8 @@ function appendSemanticMatches(prompt, results) {
     const metaPath = r?.metadata?.path || r?.metadata?.file || r?.metadata?.source || null;
     const where = metaPath ? ` (${metaPath})` : '';
 
-    const snippet = String(r?.content || '')
+    const displayText = r?.metadata?.abstract || r?.metadata?.overview || String(r?.content || '');
+    const snippet = String(displayText || '')
       .replace(/\s+/g, ' ')
       .trim()
       .slice(0, 180);
@@ -253,6 +257,89 @@ function appendEntityGraph(prompt, data) {
   return prompt + `\n\n${section}\n`;
 }
 
+async function runIntentAnalysis({ memoryManager, query, threshold, projectRoot }) {
+  const { analyzeIntent } = require('../../lib/memory/intent-analyzer.cjs');
+  const context = await memoryManager.loadMemoryForContextAsync(projectRoot);
+  const recentSessions = Array.isArray(context?.recent_sessions) ? context.recent_sessions : [];
+  let compressionSummary = recentSessions
+    .map(session => `- ${session.summary || ''}`.trim())
+    .filter(Boolean)
+    .join('\n');
+  let recentMessages = recentSessions
+    .map(
+      session => `[${session.source || 'mtm'}] ${session.timestamp || ''} ${session.summary || ''}`
+    )
+    .map(line => line.trim())
+    .filter(Boolean)
+    .join('\n');
+
+  try {
+    const { getContextForSearch } = require('../../lib/memory/session-context-for-search.cjs');
+    const searchContext = getContextForSearch(query, {
+      projectRoot,
+      maxArchives: 3,
+      maxMessages: 20,
+    });
+    if (searchContext.summaries.length > 0) {
+      compressionSummary = searchContext.summaries
+        .map(summary => `- ${summary}`.trim())
+        .filter(Boolean)
+        .join('\n');
+    }
+    if (searchContext.recentMessages.length > 0) {
+      recentMessages = searchContext.recentMessages.map(line => line.trim()).join('\n');
+    }
+  } catch (err) {
+    debugLog('spawn-prompt-assembler', 'Context for search failed (ignored)', err);
+  }
+
+  const analysis = await analyzeIntent(
+    {
+      compressionSummary,
+      recentMessages,
+      currentMessage: query,
+    },
+    {}
+  );
+
+  const plannedQueries = Array.isArray(analysis.queries)
+    ? analysis.queries
+        .slice()
+        .sort((a, b) => a.priority - b.priority)
+        .slice(0, 5)
+    : [];
+
+  const results = [];
+  const seen = new Set();
+  for (const planned of plannedQueries) {
+    if (!planned?.query) continue;
+    try {
+      const plannedOptions = {
+        limit: 2,
+        threshold,
+        filters: `metadata NOT LIKE '%"source":"ltm_archive"%'`,
+      };
+      if (planned.context_type === 'memory') {
+        plannedOptions.contextType = 'memory';
+        if (planned.category) {
+          plannedOptions.category = planned.category;
+        }
+      }
+      const plannedResults = await memoryManager.searchMemory(planned.query, plannedOptions);
+      for (const r of plannedResults || []) {
+        const key = `${r?.source || ''}:${r?.content || ''}`.trim();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        results.push(r);
+      }
+    } catch (plannedErr) {
+      debugLog('spawn-prompt-assembler', 'Intent analysis query failed (ignored)', plannedErr);
+    }
+  }
+
+  return results;
+}
+
 async function main() {
   const startTime = Date.now();
   try {
@@ -272,8 +359,15 @@ async function main() {
     const basePrompt = toolInput.prompt;
     if (!basePrompt || typeof basePrompt !== 'string') process.exit(0);
 
+    const sessionId = hookInput.session_id || hookInput.sessionId || null;
+    hookLog.logStart('Task', {
+      session_id: sessionId,
+      task_id: toolInput.task_id || toolInput.id || null,
+    });
+
     // Avoid double-injection (can bloat prompts).
     if (looksAssembled(basePrompt)) {
+      hookLog.logEnd('Task', { status: 'already_assembled' });
       process.exit(0);
     }
 
@@ -290,6 +384,11 @@ async function main() {
       includeMemory: true,
     });
 
+    // Optional Phase 4 enhancement: intent-based query planning.
+    // Enable with MEMORY_INTENT_ANALYSIS=1|on.
+    const intentAnalysisEnabled =
+      process.env.MEMORY_INTENT_ANALYSIS === '1' || process.env.MEMORY_INTENT_ANALYSIS === 'on';
+
     // Optional Phase 3 enhancement: ContextualMemory semantic search.
     // Enabled by default; set SPAWN_PROMPT_SEMANTIC_MEMORY=off to disable.
     if (process.env.SPAWN_PROMPT_SEMANTIC_MEMORY !== 'off') {
@@ -301,28 +400,51 @@ async function main() {
         SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
       } = require('../../lib/memory/memory-constants.cjs');
       let results = [];
-      try {
-        // Hot-only by default: exclude cold-archived LTM summaries from the prompt path.
-        results = await memoryManager.searchMemory(query, {
-          limit: 3,
-          threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
-          filters: `metadata NOT LIKE '%"source":"ltm_archive"%'`,
-        });
-      } catch (err) {
-        debugLog('spawn-prompt-assembler', 'Hot-only filter failed, using unfiltered search', err);
+
+      if (intentAnalysisEnabled) {
         try {
+          results = await runIntentAnalysis({
+            memoryManager,
+            query,
+            threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+            projectRoot: PROJECT_ROOT,
+          });
+        } catch (err) {
+          debugLog('spawn-prompt-assembler', 'Intent analysis failed (ignored)', err);
+          hookLog.logFail('Task', err, { reason: 'intent_analysis' });
+        }
+      }
+
+      if (results.length === 0) {
+        try {
+          // Hot-only by default: exclude cold-archived LTM summaries from the prompt path.
           results = await memoryManager.searchMemory(query, {
             limit: 3,
             threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+            filters: `metadata NOT LIKE '%"source":"ltm_archive"%'`,
           });
-        } catch (fallbackErr) {
+        } catch (err) {
           debugLog(
             'spawn-prompt-assembler',
-            'Semantic memory retrieval failed (ignored)',
-            fallbackErr
+            'Hot-only filter failed, using unfiltered search',
+            err
           );
+          try {
+            results = await memoryManager.searchMemory(query, {
+              limit: 3,
+              threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+            });
+          } catch (fallbackErr) {
+            debugLog(
+              'spawn-prompt-assembler',
+              'Semantic memory retrieval failed (ignored)',
+              fallbackErr
+            );
+            hookLog.logFail('Task', fallbackErr, { reason: 'memory_or_semantic_load' });
+          }
         }
       }
+
       if (results.length > 0) {
         assembled = appendSemanticMatches(assembled, results);
       }
@@ -350,6 +472,18 @@ async function main() {
 
     const modifiedInput = { ...toolInput, prompt: assembled, allowed_tools: allowedTools };
 
+    try {
+      const { logSpawnStart } = require('../../lib/monitoring/spawn-log.cjs');
+      logSpawnStart({
+        taskId: toolInput.task_id || toolInput.id || null,
+        agentType,
+        promptLength: assembled.length,
+        sessionId,
+      });
+    } catch (_e) {
+      // best-effort
+    }
+
     // Claude Code hook protocol: output { tool_input: { ... } } to modify tool parameters.
     console.log(JSON.stringify({ tool_input: modifiedInput }));
     try {
@@ -366,6 +500,7 @@ async function main() {
     } catch (_err) {
       // Best-effort
     }
+    hookLog.logEnd('Task', { duration_ms: Date.now() - startTime });
     process.exit(0);
   } catch (err) {
     try {
@@ -378,6 +513,7 @@ async function main() {
     } catch (_err) {
       // Best-effort
     }
+    hookLog.logFail('Task', err);
     // Fail open: if we can't assemble, don't block spawns.
     debugLog('spawn-prompt-assembler', 'Hook error (fail open)', err);
     process.exit(0);

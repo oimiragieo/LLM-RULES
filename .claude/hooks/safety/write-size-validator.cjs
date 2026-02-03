@@ -34,6 +34,8 @@ const {
   _formatResult,
   auditLog,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // =============================================================================
 // CONSTANTS
@@ -197,6 +199,16 @@ async function main() {
           maxTokens: result.maxTokens,
         })
       );
+      try {
+        await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Write',
+          reason: 'write_size_exceeded',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       process.exit(2); // Block
     }
 

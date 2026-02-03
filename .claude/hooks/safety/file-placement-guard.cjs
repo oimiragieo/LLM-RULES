@@ -25,6 +25,8 @@ const {
   getToolName: sharedGetToolName,
   auditSecurityOverride,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // SEC-SF-001 FIX: Import safe JSON parser
 const { _safeParseJSON, _SCHEMAS } = require('../../lib/utils/safe-json.cjs');
@@ -921,6 +923,16 @@ function main() {
       );
       // Output human-readable blocked message
       console.error(`\n[BLOCKED] Path traversal detected: ${pathSafetyCheck.reason}\n`);
+      try {
+        eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName,
+          reason: 'path_traversal_blocked',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       process.exit(2);
     }
   }
@@ -961,6 +973,16 @@ function main() {
 |  - Cross-platform compatibility issues                               |
 +======================================================================+
 `);
+    try {
+      eventBus.emit(EventTypes.TOOL_BLOCKED, {
+        type: EventTypes.TOOL_BLOCKED,
+        timestamp: new Date().toISOString(),
+        toolName,
+        reason: 'windows_reserved_name_blocked',
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(2);
   }
 
@@ -997,6 +1019,16 @@ function main() {
         }
       }
 
+      try {
+        eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName,
+          reason: 'evolve_enforcement_blocked',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       process.exit(2);
     } else {
       console.warn(formatEvolveWarningMessage(toolName, filePath, evolveCheck));
@@ -1017,6 +1049,16 @@ function main() {
   // Path is invalid - show message based on enforcement mode
   if (enforcementMode === 'block') {
     console.error(formatBlockedMessage(toolName, filePath, result));
+    try {
+      eventBus.emit(EventTypes.TOOL_BLOCKED, {
+        type: EventTypes.TOOL_BLOCKED,
+        timestamp: new Date().toISOString(),
+        toolName,
+        reason: 'invalid_file_placement',
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(2);
   } else {
     // warn mode (default during rollout)

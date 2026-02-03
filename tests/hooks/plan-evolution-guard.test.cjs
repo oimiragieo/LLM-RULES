@@ -56,7 +56,15 @@ function _assertNotEqual(actual, expected, message = '') {
 
 // Paths
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
-const HOOK_PATH = path.join(__dirname, 'plan-evolution-guard.cjs');
+const HOOK_PATH = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  '.claude',
+  'hooks',
+  'validation',
+  'plan-evolution-guard.cjs'
+);
 
 /**
  * Run the hook with given input

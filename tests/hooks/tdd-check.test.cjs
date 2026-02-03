@@ -19,6 +19,8 @@
 
 const path = require('path');
 const fs = require('fs');
+const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
+const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'safety', 'tdd-check.cjs');
 
 // Test helpers
 let passed = 0;
@@ -405,7 +407,7 @@ test('Block mode should use exit(2) not exit(1)', () => {
   // This is a critical requirement from the framework
   // The hook should exit with code 2 to block operations
   // Verified by reading the source code at line 208: process.exit(2)
-  const tddCheckSource = fs.readFileSync(__filename.replace('.test.cjs', '.cjs'), 'utf8');
+  const tddCheckSource = fs.readFileSync(HOOK_PATH, 'utf8');
   assertTrue(tddCheckSource.includes('process.exit(2)'), 'Hook should use exit(2) for blocking');
   assertFalse(
     tddCheckSource.includes('process.exit(1)') && !tddCheckSource.includes('// exit 1'),
@@ -415,7 +417,7 @@ test('Block mode should use exit(2) not exit(1)', () => {
 
 test('Warn mode should use exit(0)', () => {
   // Verify warn mode exits with 0 (allow operation)
-  const tddCheckSource = fs.readFileSync(__filename.replace('.test.cjs', '.cjs'), 'utf8');
+  const tddCheckSource = fs.readFileSync(HOOK_PATH, 'utf8');
   // Line 220 has process.exit(0) for warn mode
   const exitZeroCount = (tddCheckSource.match(/process\.exit\(0\)/g) || []).length;
   assertTrue(exitZeroCount >= 2, 'Hook should use exit(0) for warn and success paths');
@@ -531,25 +533,25 @@ console.log('\n--- Framework Compliance ---');
 
 test('Uses shared hook-input utility (PERF-006)', () => {
   // Verify the module imports from hook-input.cjs
-  const tddCheckSource = fs.readFileSync(__filename.replace('.test.cjs', '.cjs'), 'utf8');
+  const tddCheckSource = fs.readFileSync(HOOK_PATH, 'utf8');
   assertTrue(
-    tddCheckSource.includes("require('../../.claude/lib/utils/hook-input.cjs')"),
+    tddCheckSource.includes('lib/utils/hook-input.cjs'),
     'Should use shared hook-input utility'
   );
 });
 
 test('Uses shared project-root utility (PERF-007)', () => {
   // Verify the module imports from project-root.cjs
-  const tddCheckSource = fs.readFileSync(__filename.replace('.test.cjs', '.cjs'), 'utf8');
+  const tddCheckSource = fs.readFileSync(HOOK_PATH, 'utf8');
   assertTrue(
-    tddCheckSource.includes("require('../../.claude/lib/utils/project-root.cjs')"),
+    tddCheckSource.includes('lib/utils/project-root.cjs'),
     'Should use shared project-root utility'
   );
 });
 
 test('Respects TDD_ENFORCEMENT environment variable', () => {
   // Verify the module checks TDD_ENFORCEMENT
-  const tddCheckSource = fs.readFileSync(__filename.replace('.test.cjs', '.cjs'), 'utf8');
+  const tddCheckSource = fs.readFileSync(HOOK_PATH, 'utf8');
   assertTrue(
     tddCheckSource.includes('TDD_ENFORCEMENT'),
     'Should check TDD_ENFORCEMENT environment variable'

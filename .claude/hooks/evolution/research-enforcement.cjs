@@ -35,6 +35,8 @@ const {
   getToolInput,
   getEnforcementMode: getEnfMode,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 const { getCachedState } = require('../../lib/utils/state-cache.cjs');
 // HOOK-003 FIX: Use safeReadJSON for SEC-007 prototype pollution prevention
 const { safeReadJSON } = require('../../lib/utils/safe-json.cjs');
@@ -171,6 +173,16 @@ async function main() {
     const message = formatViolationMessage(research.count);
 
     if (enforcement === 'block') {
+      try {
+        await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Write',
+          reason: 'research_requirement_not_met',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.log(JSON.stringify({ result: 'block', message }));
       process.exit(2);
     } else {
@@ -202,6 +214,16 @@ async function main() {
     );
 
     // SEC-008: Fail closed - deny when security state unknown
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'research-enforcement',
+        error: err.message,
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(2);
   }
 }

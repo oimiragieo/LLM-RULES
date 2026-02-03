@@ -19,7 +19,15 @@ const assert = require('assert');
 const { spawn } = require('child_process');
 const path = require('path');
 
-const HOOK_PATH = path.join(__dirname, 'write-size-validator.cjs');
+const HOOK_PATH = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  '.claude',
+  'hooks',
+  'safety',
+  'write-size-validator.cjs'
+);
 
 /**
  * Execute hook with JSON input via stdin and return parsed result

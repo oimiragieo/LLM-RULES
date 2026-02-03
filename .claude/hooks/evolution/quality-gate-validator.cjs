@@ -37,6 +37,8 @@ const {
   getToolInput,
   getEnforcementMode: getEnfMode,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 const { getCachedState } = require('../../lib/utils/state-cache.cjs');
 
 // Placeholder patterns that indicate incomplete content
@@ -279,6 +281,16 @@ async function main() {
     const message = formatViolationMessage(validation.issues);
 
     if (enforcement === 'block') {
+      try {
+        await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Write',
+          reason: 'quality_gate_failed',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.log(JSON.stringify({ result: 'block', message }));
       process.exit(2);
     } else {

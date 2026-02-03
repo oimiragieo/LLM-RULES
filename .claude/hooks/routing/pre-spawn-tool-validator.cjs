@@ -37,6 +37,8 @@ const {
   auditLog,
   getEnforcementMode,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
@@ -472,6 +474,16 @@ async function main() {
       });
 
       if (mode === 'block') {
+        try {
+          await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+            type: EventTypes.TOOL_BLOCKED,
+            timestamp: new Date().toISOString(),
+            toolName: 'Task',
+            reason: 'pre_spawn_tool_validation_failed',
+          });
+        } catch (_err) {
+          // Best-effort
+        }
         console.log(formatResult('block', message));
         process.exit(2);
       } else {

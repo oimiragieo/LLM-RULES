@@ -29,6 +29,8 @@ const {
   getToolInput,
   extractFilePath,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 const ENFORCEMENT_MODE = process.env.CLAUDE_MD_ENFORCEMENT || 'warn';
 
 // Paths that require CLAUDE.md update
@@ -196,6 +198,16 @@ function main() {
 
   if (currentTimestamp <= sessionStartTimestamp) {
     if (ENFORCEMENT_MODE === 'block') {
+      try {
+        eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Write',
+          reason: 'claude_md_update_required',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.log('\n' + '='.repeat(55));
       console.log(' CLAUDE.MD UPDATE REQUIRED - OPERATION BLOCKED');
       console.log('='.repeat(55));

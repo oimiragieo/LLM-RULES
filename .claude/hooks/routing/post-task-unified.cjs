@@ -39,6 +39,7 @@ const routerState = require('./router-state.cjs');
 const loopStateManager = require('../../lib/self-healing/loop-state-manager.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
+const { logSpawnEnd } = require('../../lib/monitoring/spawn-log.cjs');
 
 // Resolve project root deterministically from this file location:
 // <project>/.claude/hooks/routing/post-task-unified.cjs -> <project>
@@ -614,6 +615,20 @@ async function main() {
     const toolInput = getToolInput(hookInput);
     const toolOutput = getToolOutput(hookInput) || '';
     const toolOutputStr = typeof toolOutput === 'string' ? toolOutput : '';
+
+    try {
+      const taskId = toolInput?.task_id || toolInput?.id || null;
+      const sessionId = hookInput.session_id || hookInput.sessionId || null;
+      let success = true;
+      let errorSnippet = null;
+      if (toolOutput && typeof toolOutput === 'object' && toolOutput.error) {
+        success = false;
+        errorSnippet = toolOutput.error.message || String(toolOutput.error);
+      }
+      logSpawnEnd({ taskId, success, errorSnippet, sessionId });
+    } catch (_e) {
+      // best-effort
+    }
 
     // Run all consolidated hooks
     // 1. Agent context tracking (always runs)

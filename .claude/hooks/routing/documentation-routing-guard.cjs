@@ -31,6 +31,8 @@ const {
   getToolName,
   getToolInput,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 /**
  * Documentation-related keywords that indicate a doc task
@@ -257,6 +259,16 @@ async function main() {
 
     if (!result.valid) {
       // Block mode - output error and exit with code 2
+      try {
+        await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Task',
+          reason: 'documentation_routing_violation',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.log(JSON.stringify({ result: 'block', message: result.error }));
       process.exit(2);
     }

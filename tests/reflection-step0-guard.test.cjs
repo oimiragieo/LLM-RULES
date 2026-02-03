@@ -3,9 +3,10 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { hasPendingReflections, readSpawnRequests } = require(
-  '../.claude/hooks/reflection/reflection-step0-guard.cjs'
-);
+const {
+  hasPendingReflections,
+  readSpawnRequests,
+} = require('../.claude/hooks/reflection/reflection-step0-guard.cjs');
 
 const runtimeDir = path.join(__dirname, '..', '.claude', 'context', 'runtime');
 const spawnRequestPath = path.join(runtimeDir, 'reflection-spawn-request.json');

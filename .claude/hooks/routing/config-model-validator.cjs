@@ -37,6 +37,8 @@ const {
   auditSecurityOverride,
 } = require('../../lib/utils/hook-input.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // =============================================================================
 // AGENT TYPE EXTRACTION
@@ -274,6 +276,16 @@ async function main() {
       console.error(message);
 
       if (result.decision === 'block') {
+        try {
+          await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+            type: EventTypes.TOOL_BLOCKED,
+            timestamp: new Date().toISOString(),
+            toolName: 'Task',
+            reason: 'config_model_mismatch',
+          });
+        } catch (_err) {
+          // Best-effort
+        }
         console.log(formatResult('block', result.message));
         process.exit(2);
       } else {

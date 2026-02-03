@@ -34,6 +34,8 @@ const {
   getToolInput,
   getEnforcementMode: getEnfMode,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Artifact categories to check
 const ARTIFACT_CATEGORIES = ['agents', 'skills', 'workflows'];
@@ -249,6 +251,16 @@ async function main() {
       const message = formatNamingViolationMessage(name);
 
       if (enforcement === 'block') {
+        try {
+          await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+            type: EventTypes.TOOL_BLOCKED,
+            timestamp: new Date().toISOString(),
+            toolName: 'Write',
+            reason: 'artifact_name_invalid',
+          });
+        } catch (_err) {
+          // Best-effort
+        }
         console.log(JSON.stringify({ result: 'block', message }));
         process.exit(2);
       } else {
@@ -264,6 +276,16 @@ async function main() {
       const message = formatViolationMessage(name, category);
 
       if (enforcement === 'block') {
+        try {
+          await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+            type: EventTypes.TOOL_BLOCKED,
+            timestamp: new Date().toISOString(),
+            toolName: 'Write',
+            reason: 'artifact_name_conflict',
+          });
+        } catch (_err) {
+          // Best-effort
+        }
         console.log(JSON.stringify({ result: 'block', message }));
         process.exit(2);
       } else {

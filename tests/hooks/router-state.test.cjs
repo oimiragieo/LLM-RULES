@@ -328,13 +328,13 @@ function testInvalidComplexityValues() {
 }
 
 /**
- * Test 10: State caching reduces redundant file I/O
+ * Test 10: State reads reflect external updates
  *
- * Multiple getState() calls within TTL should use cache instead of re-reading file.
- * This test verifies the performance optimization from state-cache integration.
+ * Hooks run in separate processes, so getState() should read from disk and
+ * pick up external updates rather than relying on in-memory cache.
  */
 function testStateCaching() {
-  console.log('\nTest 10: State caching reduces redundant file I/O');
+  console.log('\nTest 10: State reads reflect external updates');
 
   delete require.cache[require.resolve(STATE_MODULE_PATH)];
   cleanupState();
@@ -361,29 +361,16 @@ function testStateCaching() {
   assert(state1.mode === state2.mode, 'Multiple getState() calls should return same mode');
   assert(state2.mode === state3.mode, 'Multiple getState() calls should be consistent');
 
-  // Now modify the file externally (simulating another process)
+  // Modify the file externally (simulating another process)
   const modifiedState = { ...state1, complexity: 'EXTERNALLY_MODIFIED' };
   fs.writeFileSync(STATE_FILE_PATH, JSON.stringify(modifiedState, null, 2));
 
-  // getState() should still return cached value (within TTL)
+  // getState() should read the updated file
   const state4 = mod.getState();
   assert(
-    state4.complexity !== 'EXTERNALLY_MODIFIED',
-    'getState() within TTL should return cached value, not re-read file'
+    state4.complexity === 'EXTERNALLY_MODIFIED',
+    'getState() should read updated state from disk'
   );
-
-  // After invalidation, should read fresh
-  if (mod.invalidateStateCache) {
-    mod.invalidateStateCache();
-    const state5 = mod.getState();
-    assert(
-      state5.complexity === 'EXTERNALLY_MODIFIED',
-      'After invalidation, getState() should read fresh from file'
-    );
-  } else {
-    // If no invalidate function, at least verify module exports getCachedState capability
-    console.log('  (invalidateStateCache not exposed - skipping cache invalidation test)');
-  }
 }
 
 /**

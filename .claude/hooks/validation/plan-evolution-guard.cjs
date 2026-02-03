@@ -40,6 +40,8 @@ const {
   getToolName: sharedGetToolName,
   getToolInput,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 /**
  * Patterns that indicate the Evolution phase is present
@@ -212,6 +214,16 @@ async function main() {
         message: 'Plan missing mandatory Evolution & Reflection phase',
       })
     );
+    try {
+      await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+        type: EventTypes.TOOL_BLOCKED,
+        timestamp: new Date().toISOString(),
+        toolName: 'Write',
+        reason: 'missing_evolution_phase',
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(2);
   } catch (err) {
     // Fail open for validation hooks (not security-critical)

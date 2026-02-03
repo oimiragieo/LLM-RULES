@@ -44,6 +44,8 @@ const {
   auditLog,
   debugLog,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // =============================================================================
 // SECURITY MITIGATION: Unicode Normalization (VULN-001)
@@ -448,6 +450,16 @@ async function main() {
       ].join('\n');
 
       if (mode === 'block') {
+        try {
+          await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+            type: EventTypes.TOOL_BLOCKED,
+            timestamp: new Date().toISOString(),
+            toolName: 'Task',
+            reason: 'spawn_prompt_validation_failed',
+          });
+        } catch (_err) {
+          // Best-effort
+        }
         console.log(formatResult('block', message));
         process.exit(2);
       } else {
@@ -483,6 +495,16 @@ async function main() {
     const failMode = process.env.SPAWN_PROMPT_VALIDATOR_FAIL_MODE || 'open';
 
     if (failMode === 'closed') {
+      try {
+        await eventBus.emit(EventTypes.TOOL_FAILED, {
+          type: EventTypes.TOOL_FAILED,
+          timestamp: new Date().toISOString(),
+          toolName: 'spawn-prompt-validator',
+          error: err.message,
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.log(formatResult('block', 'Internal validation error - fail-closed mode'));
       process.exit(2);
     }

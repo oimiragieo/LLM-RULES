@@ -26,6 +26,7 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 
 // Import memory manager functions and shared project root (MEMORY_SYSTEM.md: use project-root.cjs)
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { createHookLogger } = require('../../lib/utils/hook-logger.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
@@ -36,6 +37,38 @@ const SMART_PRUNE_CONFIG = {
   GOTCHAS_WARN_COUNT: 40,
   GOTCHAS_MAX_COUNT: 50,
 };
+
+const HEALTH_CHECK_INTERVAL_MS = Number(
+  process.env.MEMORY_HEALTH_CHECK_INTERVAL_MS || 5 * 60 * 1000
+);
+const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+const LAST_CHECK_PATH = path.join(RUNTIME_DIR, 'last-memory-health-check.txt');
+const hookLog = createHookLogger('memory-health-check');
+
+function shouldRunHealthCheck() {
+  if (!Number.isFinite(HEALTH_CHECK_INTERVAL_MS) || HEALTH_CHECK_INTERVAL_MS <= 0) {
+    return true;
+  }
+  try {
+    if (!fs.existsSync(LAST_CHECK_PATH)) return true;
+    const lastCheck = Number(fs.readFileSync(LAST_CHECK_PATH, 'utf8'));
+    if (!Number.isFinite(lastCheck)) return true;
+    return Date.now() - lastCheck > HEALTH_CHECK_INTERVAL_MS;
+  } catch (_e) {
+    return true;
+  }
+}
+
+function recordHealthCheckTimestamp() {
+  try {
+    if (!fs.existsSync(RUNTIME_DIR)) {
+      fs.mkdirSync(RUNTIME_DIR, { recursive: true });
+    }
+    fs.writeFileSync(LAST_CHECK_PATH, String(Date.now()));
+  } catch (_e) {
+    // best-effort; ignore
+  }
+}
 
 function getMemoryManagerPath() {
   // Try relative to this hook file first
@@ -264,12 +297,30 @@ function applyAutoRemediation(
 
 async function main() {
   const startTime = Date.now();
+  hookLog.logStart('UserPromptSubmit');
   const memoryManagerPath = getMemoryManagerPath();
   const memoryTiersPath = getMemoryTiersPath();
   const smartPrunerPath = getSmartPrunerPath();
 
   if (!fs.existsSync(memoryManagerPath)) {
     // Memory manager not available - skip silently
+    hookLog.logEnd('UserPromptSubmit', { status: 'skipped', reason: 'memory_manager_missing' });
+    process.exit(0);
+  }
+
+  if (!shouldRunHealthCheck()) {
+    try {
+      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'memory-health-check',
+        output: { status: 'skipped', reason: 'rate-limit' },
+        duration: Date.now() - startTime,
+      });
+    } catch (_e) {
+      // Best-effort
+    }
+    hookLog.logEnd('UserPromptSubmit', { status: 'skipped', reason: 'rate-limit' });
     process.exit(0);
   }
 
@@ -312,6 +363,7 @@ async function main() {
     } catch (_e) {
       // Best-effort
     }
+    hookLog.logFail('UserPromptSubmit', err);
     throw err;
   }
 
@@ -429,6 +481,8 @@ async function main() {
     console.log(JSON.stringify(output, null, 2));
   }
 
+  recordHealthCheckTimestamp();
+
   try {
     await eventBus.emit(EventTypes.TOOL_COMPLETED, {
       type: EventTypes.TOOL_COMPLETED,
@@ -440,6 +494,10 @@ async function main() {
   } catch (_e) {
     // Best-effort
   }
+  hookLog.logEnd('UserPromptSubmit', {
+    status: output.status,
+    duration_ms: Date.now() - startTime,
+  });
 
   process.exit(0);
 }

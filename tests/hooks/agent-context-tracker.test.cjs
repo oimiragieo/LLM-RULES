@@ -40,6 +40,11 @@ describe('agent-context-tracker', () => {
     if (routerState && routerState.STATE_FILE) {
       stateFilePath = routerState.STATE_FILE;
     }
+
+    if (routerState) {
+      routerState.resetToRouterMode();
+      routerState.invalidateStateCache();
+    }
   });
 
   afterEach(() => {
@@ -253,9 +258,9 @@ describe('agent-context-tracker', () => {
       // Verify file exists
       assert.ok(fs.existsSync(stateFilePath), 'State file should exist');
 
-      // Read and verify content
-      const content = fs.readFileSync(stateFilePath, 'utf-8');
-      const state = JSON.parse(content);
+      // Read and verify content via module (avoids partial JSON reads)
+      routerState.invalidateStateCache();
+      const state = routerState.getState();
 
       assert.strictEqual(state.mode, 'agent');
       assert.strictEqual(state.taskSpawned, true);

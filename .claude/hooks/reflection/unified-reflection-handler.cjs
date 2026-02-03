@@ -5,9 +5,9 @@
  * Purpose: Consolidated handler for reflection, memory extraction, and task tracking
  *
  * PERF-003: Consolidates 6 hooks into 1:
- * - task-completion-reflection.cjs (PostToolUse:TaskUpdate)
- * - error-recovery-reflection.cjs (PostToolUse:Bash)
- * - session-end-reflection.cjs (SessionEnd)
+ * - task-completion-reflection.cjs (archived; previously PostToolUse:TaskUpdate)
+ * - error-recovery-reflection.cjs (archived; previously PostToolUse:Bash)
+ * - session-end-reflection.cjs (archived; previously SessionEnd)
  * - Session memory extraction (canonical)
  * - session-end-recorder.cjs (SessionEnd)
  * - task-update-tracker.cjs (PostToolUse:TaskUpdate) [NEW in PERF-003 #2]
@@ -491,6 +491,11 @@ function handleSessionEnd(input) {
   const sessionId = input.session_id || input.sessionId || process.env.CLAUDE_SESSION_ID;
   const stats = getSessionStats(input);
   const insights = gatherSessionInsights(input);
+  const toolsUsed = Array.isArray(input?.tools_used)
+    ? input.tools_used
+    : Array.isArray(input?.stats?.tool_names)
+      ? input.stats.tool_names
+      : [];
 
   // Phase 4 Integration: Get error summary for reflection
   const errorSummary = getErrorSummaryForReflection();
@@ -529,6 +534,7 @@ function handleSessionEnd(input) {
     gotchas_encountered: insights.gotchas_encountered || insights.gotchas || [],
     decisions_made: insights.decisions_made || insights.decisions || [],
     next_steps: insights.next_steps || insights.nextSteps || [],
+    tools_used: toolsUsed,
     timestamp: new Date().toISOString(),
   };
 

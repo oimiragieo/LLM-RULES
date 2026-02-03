@@ -17,10 +17,12 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { createLogger } = require('../utils/logger.cjs');
 
 // Load manifests lazily to improve startup time
 let TOOL_MANIFEST = null;
 let SKILL_INDEX = null;
+const logger = createLogger('prompt-assembler');
 
 /**
  * Load tool manifest (cached)
@@ -68,7 +70,14 @@ function loadMemoryContext() {
     // Local require to keep prompt assembly fast when memory is unused.
     const memoryManager = require('../memory/memory-manager.cjs');
     return memoryManager.loadMemoryForContext();
-  } catch (_e) {
+  } catch (err) {
+    logger.warn('memory_load_failed', { error: err?.message });
+    try {
+      const { logMemoryFailure } = require('../monitoring/spawn-log.cjs');
+      logMemoryFailure({ error: err?.message || 'memory load failed' });
+    } catch (_e) {
+      // best-effort
+    }
     return {
       gotchas: [],
       patterns: [],

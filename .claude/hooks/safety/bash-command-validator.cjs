@@ -26,6 +26,8 @@ const {
   getToolInput,
   auditLog,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 /**
  * Extract the bash command from hook input.
@@ -105,6 +107,16 @@ async function main() {
 
     if (!result.valid) {
       // Command is dangerous - block it
+      try {
+        await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Bash',
+          reason: result.error || 'bash_command_blocked',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.error(formatBlockedMessage(command, result.error || 'Unknown safety violation'));
       process.exit(2);
     }
@@ -130,6 +142,16 @@ async function main() {
     if (process.env.DEBUG_HOOKS) {
       console.error('Bash command validator error - BLOCKING for safety:', err.message);
       console.error('Stack trace:', err.stack);
+    }
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'bash-command-validator',
+        error: err.message,
+      });
+    } catch (_err) {
+      // Best-effort
     }
     process.exit(2);
   }

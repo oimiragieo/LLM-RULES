@@ -3,13 +3,12 @@
  * Pre-Task Unified Hook
  * =====================
  *
- * Consolidates 4 PreToolUse(Task) hooks into a single guard:
+ * Consolidates 3 PreToolUse(Task) hooks into a single guard:
  *
  * | Original Hook                    | Check                                    |
  * |----------------------------------|------------------------------------------|
  * | agent-context-pre-tracker.cjs    | Sets mode='agent' before task starts     |
  * | routing-guard.cjs                | Planner-first, security review, self-check|
- * | documentation-routing-guard.cjs  | Routes docs to technical-writer          |
  * | loop-prevention.cjs              | Prevents runaway loops                   |
  *
  * Trigger: PreToolUse(Task)
@@ -18,7 +17,6 @@
  * - ROUTER_SELF_CHECK=block|warn|off (default: block)
  * - PLANNER_FIRST_ENFORCEMENT=block|warn|off (default: block)
  * - SECURITY_REVIEW_ENFORCEMENT=block|warn|off (default: block)
- * - DOCUMENTATION_ROUTING_GUARD=block|warn|off (default: block)
  * - LOOP_PREVENTION_MODE=block|warn|off (default: block)
  *
  * Exit codes:
@@ -86,53 +84,6 @@ const SECURITY_PATTERNS = {
  * Agents that need security review before spawning
  */
 const IMPLEMENTATION_AGENTS = ['developer', 'qa', 'devops'];
-
-/**
- * Documentation-related keywords (high confidence)
- */
-const DOC_KEYWORDS_HIGH = [
-  'documentation',
-  'document this',
-  'write docs',
-  'update docs',
-  'create docs',
-  'readme',
-  'user guide',
-  'api doc',
-  'technical writing',
-  'write guide',
-  'how-to guide',
-  'reference doc',
-];
-
-/**
- * Documentation-related keywords (medium confidence)
- */
-const DOC_KEYWORDS_MEDIUM = [
-  'document',
-  'docs',
-  'tutorial',
-  'explain',
-  'describe',
-  'guide',
-  'manual',
-  'howto',
-  'how-to',
-];
-
-/**
- * Patterns that indicate technical-writer agent spawn
- */
-const TECH_WRITER_PATTERNS = {
-  prompt: [
-    'you are technical-writer',
-    'you are the technical-writer',
-    'as technical-writer',
-    'you are tech-writer',
-    'technical writer agent',
-  ],
-  description: ['technical-writer', 'tech-writer', 'documentation', 'writing docs'],
-};
 
 /**
  * Evolution trigger keywords
@@ -226,57 +177,6 @@ function isImplementationAgentSpawn(toolInput) {
   return IMPLEMENTATION_AGENTS.some(
     agent => prompt.includes(`you are ${agent}`) || prompt.includes(`you are the ${agent}`)
   );
-}
-
-/**
- * Check if the Task being spawned is a technical-writer agent
- */
-function isTechWriterSpawn(toolInput) {
-  const prompt = (toolInput.prompt || '').toLowerCase();
-  const description = (toolInput.description || '').toLowerCase();
-
-  for (const pattern of TECH_WRITER_PATTERNS.prompt) {
-    if (prompt.includes(pattern)) return true;
-  }
-  for (const pattern of TECH_WRITER_PATTERNS.description) {
-    if (description.includes(pattern)) return true;
-  }
-  return false;
-}
-
-/**
- * Detect documentation intent in text
- */
-function detectDocumentationIntent(text) {
-  const textLower = text.toLowerCase();
-  const matchedKeywords = [];
-
-  // Check high-confidence keywords
-  for (const keyword of DOC_KEYWORDS_HIGH) {
-    if (textLower.includes(keyword)) {
-      matchedKeywords.push(keyword);
-    }
-  }
-
-  if (matchedKeywords.length > 0) {
-    return { isDocTask: true, confidence: 'high', matchedKeywords };
-  }
-
-  // Check medium-confidence keywords
-  for (const keyword of DOC_KEYWORDS_MEDIUM) {
-    if (textLower.includes(keyword)) {
-      matchedKeywords.push(keyword);
-    }
-  }
-
-  if (
-    matchedKeywords.length >= 2 ||
-    (matchedKeywords.length >= 1 && (textLower.includes('write') || textLower.includes('create')))
-  ) {
-    return { isDocTask: true, confidence: 'medium', matchedKeywords };
-  }
-
-  return { isDocTask: false, confidence: 'low', matchedKeywords };
 }
 
 /**
@@ -518,54 +418,7 @@ Spawn SECURITY-ARCHITECT first to review security implications.`;
 }
 
 // =============================================================================
-// CHECK 3: Documentation Routing Guard (from documentation-routing-guard.cjs)
-// =============================================================================
-
-/**
- * Ensures documentation requests are routed to technical-writer agent.
- *
- * @param {Object} toolInput - Tool input
- * @returns {{ pass: boolean, result?: string, message?: string }}
- */
-function checkDocumentationRouting(toolInput) {
-  const enforcement = getEnforcementMode('DOCUMENTATION_ROUTING_GUARD', 'block');
-  if (enforcement === 'off') {
-    return { pass: true };
-  }
-
-  const prompt = toolInput.prompt || '';
-  const description = toolInput.description || '';
-  const combinedText = `${prompt} ${description}`;
-
-  const detection = detectDocumentationIntent(combinedText);
-
-  if (!detection.isDocTask) {
-    return { pass: true };
-  }
-
-  // This is a documentation task - check if technical-writer is being spawned
-  if (isTechWriterSpawn(toolInput)) {
-    return { pass: true };
-  }
-
-  // Documentation task but NOT spawning technical-writer
-  const message = `[DOCUMENTATION ROUTING VIOLATION] Documentation task detected (${detection.confidence} confidence).
-Keywords matched: ${detection.matchedKeywords.join(', ')}
-
-Documentation tasks should be routed to technical-writer agent:
-  Task({ subagent_type: 'general-purpose', description: 'Technical writer creating docs...',
-         prompt: 'You are TECHNICAL-WRITER...' })`;
-
-  if (enforcement === 'block') {
-    return { pass: false, result: 'block', message };
-  } else {
-    console.warn(message);
-    return { pass: true, result: 'warn', message };
-  }
-}
-
-// =============================================================================
-// CHECK 4: Loop Prevention (from loop-prevention.cjs)
+// CHECK 3: Loop Prevention (from loop-prevention.cjs)
 // =============================================================================
 
 /**
@@ -703,14 +556,13 @@ function updateLoopStateAfterAllow(hookInput) {
 // =============================================================================
 
 /**
- * Run all 4 checks in order.
+ * Run all 3 checks in order.
  *
  * Order:
  * 0. TaskList-first: TaskList() must be called before Task() in same session
  * 1. Agent Context Pre-Tracker (always passes, sets state)
  * 2. Routing Guard (planner-first, security review)
- * 3. Documentation Routing Guard
- * 4. Loop Prevention
+ * 3. Loop Prevention
  *
  * @param {Object} hookInput - Full hook input
  * @returns {{ pass: boolean, exitCode: number, message?: string }}
@@ -762,17 +614,7 @@ function runAllChecks(hookInput) {
     routerState.markSecuritySpawned();
   }
 
-  // Check 3: Documentation Routing Guard
-  const docResult = checkDocumentationRouting(toolInput);
-  if (!docResult.pass) {
-    return {
-      pass: false,
-      exitCode: docResult.result === 'block' ? 2 : 0,
-      message: docResult.message,
-    };
-  }
-
-  // Check 4: Loop Prevention
+  // Check 3: Loop Prevention
   const loopResult = checkLoopPrevention(hookInput);
   if (!loopResult.pass) {
     return {
@@ -900,15 +742,12 @@ module.exports = {
   checkTaskListFirst,
   checkAgentContextPreTracker,
   checkRoutingGuard,
-  checkDocumentationRouting,
   checkLoopPrevention,
 
   // Helper functions (for testing)
   isPlannerSpawn,
   isSecuritySpawn,
   isImplementationAgentSpawn,
-  isTechWriterSpawn,
-  detectDocumentationIntent,
   extractTaskDescription,
   extractAgentType,
   isEvolutionTrigger,
@@ -918,9 +757,6 @@ module.exports = {
   updateLoopStateAfterAllow,
 
   // Constants
-  DOC_KEYWORDS_HIGH,
-  DOC_KEYWORDS_MEDIUM,
-  TECH_WRITER_PATTERNS,
   PLANNER_PATTERNS,
   SECURITY_PATTERNS,
   IMPLEMENTATION_AGENTS,

@@ -19,6 +19,8 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
+const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs');
 
 // The module we're testing
 let routingGuard;
@@ -910,9 +912,6 @@ describe('routing-guard', () => {
       // This test simulates what happens when Claude Code invokes the hook
       // with a Glob tool usage while in router mode
 
-      const hookPath = path.join(__dirname, 'routing-guard.cjs');
-      const projectRoot = path.join(__dirname, '..', '..', '..');
-
       // Create hook input simulating Glob tool usage
       const hookInput = JSON.stringify({
         tool_name: 'Glob',
@@ -921,15 +920,14 @@ describe('routing-guard', () => {
       });
 
       // Run the hook via subprocess
-      const result = spawnSync('node', [hookPath], {
-        input: hookInput,
+      const result = spawnSync('node', [HOOK_PATH, hookInput], {
         encoding: 'utf-8',
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'block', // Enable blocking
           // Point to our test runtime directory
         },
-        cwd: projectRoot,
+        cwd: PROJECT_ROOT,
       });
 
       // ENFORCEMENT-003 FIX: The hook MUST exit with code 2 to block
@@ -951,9 +949,6 @@ describe('routing-guard', () => {
     });
 
     it('ENFORCEMENT-003: Hook should exit with code 0 when allowing Read tool', () => {
-      const hookPath = path.join(__dirname, 'routing-guard.cjs');
-      const projectRoot = path.join(__dirname, '..', '..', '..');
-
       // Create hook input simulating Read tool usage (whitelisted)
       const hookInput = JSON.stringify({
         tool_name: 'Read',
@@ -961,14 +956,13 @@ describe('routing-guard', () => {
         session_id: 'test-session',
       });
 
-      const result = spawnSync('node', [hookPath], {
-        input: hookInput,
+      const result = spawnSync('node', [HOOK_PATH, hookInput], {
         encoding: 'utf-8',
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'block',
         },
-        cwd: projectRoot,
+        cwd: PROJECT_ROOT,
       });
 
       // Read is whitelisted, should exit 0
@@ -980,9 +974,6 @@ describe('routing-guard', () => {
     });
 
     it('ENFORCEMENT-003: Hook should exit with code 2 when blocking Write in router mode', () => {
-      const hookPath = path.join(__dirname, 'routing-guard.cjs');
-      const projectRoot = path.join(__dirname, '..', '..', '..');
-
       // Create hook input simulating Write tool usage (blacklisted)
       const hookInput = JSON.stringify({
         tool_name: 'Write',
@@ -990,15 +981,14 @@ describe('routing-guard', () => {
         session_id: 'test-session',
       });
 
-      const result = spawnSync('node', [hookPath], {
-        input: hookInput,
+      const result = spawnSync('node', [HOOK_PATH, hookInput], {
         encoding: 'utf-8',
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'block',
           ROUTER_WRITE_GUARD: 'block',
         },
-        cwd: projectRoot,
+        cwd: PROJECT_ROOT,
       });
 
       // Write is blacklisted in router mode, should exit 2
@@ -1011,23 +1001,19 @@ describe('routing-guard', () => {
     });
 
     it('ENFORCEMENT-003: Hook should exit with code 0 when enforcement is off', () => {
-      const hookPath = path.join(__dirname, 'routing-guard.cjs');
-      const projectRoot = path.join(__dirname, '..', '..', '..');
-
       const hookInput = JSON.stringify({
         tool_name: 'Glob',
         tool_input: { pattern: '**/*.ts' },
         session_id: 'test-session',
       });
 
-      const result = spawnSync('node', [hookPath], {
-        input: hookInput,
+      const result = spawnSync('node', [HOOK_PATH, hookInput], {
         encoding: 'utf-8',
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'off', // Enforcement disabled
         },
-        cwd: projectRoot,
+        cwd: PROJECT_ROOT,
       });
 
       // With enforcement off, should exit 0
@@ -1039,23 +1025,19 @@ describe('routing-guard', () => {
     });
 
     it('ENFORCEMENT-003: Hook blocking message should indicate spawn requirement', () => {
-      const hookPath = path.join(__dirname, 'routing-guard.cjs');
-      const projectRoot = path.join(__dirname, '..', '..', '..');
-
       const hookInput = JSON.stringify({
         tool_name: 'Grep',
         tool_input: { pattern: 'function', path: '/project' },
         session_id: 'test-session',
       });
 
-      const result = spawnSync('node', [hookPath], {
-        input: hookInput,
+      const result = spawnSync('node', [HOOK_PATH, hookInput], {
         encoding: 'utf-8',
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'block',
         },
-        cwd: projectRoot,
+        cwd: PROJECT_ROOT,
       });
 
       assert.strictEqual(result.status, 2, 'Should block with exit code 2');
@@ -1069,23 +1051,19 @@ describe('routing-guard', () => {
     });
 
     it('ENFORCEMENT-003: Hook should block WebSearch in router mode', () => {
-      const hookPath = path.join(__dirname, 'routing-guard.cjs');
-      const projectRoot = path.join(__dirname, '..', '..', '..');
-
       const hookInput = JSON.stringify({
         tool_name: 'WebSearch',
         tool_input: { query: 'test query' },
         session_id: 'test-session',
       });
 
-      const result = spawnSync('node', [hookPath], {
-        input: hookInput,
+      const result = spawnSync('node', [HOOK_PATH, hookInput], {
         encoding: 'utf-8',
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'block',
         },
-        cwd: projectRoot,
+        cwd: PROJECT_ROOT,
       });
 
       assert.strictEqual(
@@ -1096,9 +1074,6 @@ describe('routing-guard', () => {
     });
 
     it('ENFORCEMENT-003: Comprehensive blacklist test - all blacklisted tools should be blocked', () => {
-      const hookPath = path.join(__dirname, 'routing-guard.cjs');
-      const projectRoot = path.join(__dirname, '..', '..', '..');
-
       const blacklistedTools = [
         { tool_name: 'Glob', tool_input: { pattern: '*.ts' } },
         { tool_name: 'Grep', tool_input: { pattern: 'test' } },
@@ -1117,15 +1092,14 @@ describe('routing-guard', () => {
           session_id: 'test-session',
         });
 
-        const result = spawnSync('node', [hookPath], {
-          input: hookInput,
+        const result = spawnSync('node', [HOOK_PATH, hookInput], {
           encoding: 'utf-8',
           env: {
             ...process.env,
             ROUTER_SELF_CHECK: 'block',
             ROUTER_WRITE_GUARD: 'block',
           },
-          cwd: projectRoot,
+          cwd: PROJECT_ROOT,
         });
 
         assert.strictEqual(

@@ -33,6 +33,8 @@ const {
   extractFilePath,
   getEnforcementMode,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 const ENFORCEMENT_MODE = getEnforcementMode('TDD_ENFORCEMENT', 'warn');
 
@@ -187,6 +189,16 @@ function main() {
     const fileName = path.basename(normalizedPath);
 
     if (ENFORCEMENT_MODE === 'block') {
+      try {
+        eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Write',
+          reason: 'tdd_violation',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.log('\n┌─────────────────────────────────────────────────┐');
       console.log('│ 🛑 TDD VIOLATION - OPERATION BLOCKED            │');
       console.log('├─────────────────────────────────────────────────┤');

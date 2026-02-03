@@ -26,6 +26,8 @@ const {
   formatResult,
   auditLog,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Core tools that are ALWAYS available
 const CORE_TOOLS = [
@@ -129,6 +131,16 @@ async function main() {
         reason: message,
       });
 
+      try {
+        await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Task',
+          reason: 'tool_availability_missing',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.log(formatResult('block', message));
       process.exit(2);
     }

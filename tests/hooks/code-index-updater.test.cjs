@@ -16,12 +16,17 @@ const fs = require('fs').promises;
 
 const FIXTURES_DIR = path.join(__dirname, '..', 'fixtures', 'code-indexing');
 const HOOK_TEST_DIR = path.join(FIXTURES_DIR, 'hook-test');
+const LANCEDB_DIR = path.join(HOOK_TEST_DIR, '.claude', 'data', 'lancedb-test');
+const TABLE_NAME = `code_index_test_${process.pid}`;
 
 describe('code-index-updater hook', () => {
   let originalCwd;
   let hookModule;
 
   before(async () => {
+    process.env.LANCEDB_EMBEDDING_MODE = 'test';
+    process.env.LANCEDB_URI = LANCEDB_DIR;
+    process.env.LANCEDB_TABLE_CODE = TABLE_NAME;
     await fs.mkdir(path.join(HOOK_TEST_DIR, '.claude/context/code-index'), { recursive: true });
     await fs.writeFile(path.join(HOOK_TEST_DIR, '.claude/context/code-index/metadata.json'), '{}');
   });

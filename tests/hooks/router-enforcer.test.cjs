@@ -13,9 +13,11 @@ const path = require('path');
 // HOOK-002 FIX: Use shared project-root utility instead of duplicated function
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 const _STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'router-enforcer.cjs');
 
 // Import the router-state module to check state
 const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+const { INTENT_KEYWORDS, INTENT_TO_AGENT } = require('../../.claude/lib/routing/routing-table.cjs');
 
 describe('router-enforcer complexity classification', () => {
   beforeEach(() => {
@@ -31,18 +33,14 @@ describe('router-enforcer complexity classification', () => {
   describe('complexity detection and persistence', () => {
     it('should classify greeting as trivial complexity', async () => {
       // Simulate running the enforcer with a greeting prompt
-      const { execSync } = require('child_process');
+      const { spawnSync } = require('child_process');
       const hookInput = JSON.stringify({ prompt: 'Hello, how are you?' });
 
       try {
-        // Use double quotes for Windows compatibility, escape inner quotes
-        execSync(
-          `node "${path.join(__dirname, 'router-enforcer.cjs')}" "${hookInput.replace(/"/g, '\\"')}"`,
-          {
-            encoding: 'utf-8',
-            stdio: ['pipe', 'pipe', 'pipe'],
-          }
-        );
+        spawnSync('node', [HOOK_PATH, hookInput], {
+          encoding: 'utf-8',
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
       } catch (_e) {
         // Hook may exit with code 0 anyway
       }
@@ -52,17 +50,14 @@ describe('router-enforcer complexity classification', () => {
     });
 
     it('should classify single-file fix as low complexity', async () => {
-      const { execSync } = require('child_process');
+      const { spawnSync } = require('child_process');
       const hookInput = JSON.stringify({ prompt: 'Fix the typo in config.js' });
 
       try {
-        execSync(
-          `node "${path.join(__dirname, 'router-enforcer.cjs')}" "${hookInput.replace(/"/g, '\\"')}"`,
-          {
-            encoding: 'utf-8',
-            stdio: ['pipe', 'pipe', 'pipe'],
-          }
-        );
+        spawnSync('node', [HOOK_PATH, hookInput], {
+          encoding: 'utf-8',
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
       } catch (_e) {
         // Hook may exit with code 0 anyway
       }
@@ -72,17 +67,14 @@ describe('router-enforcer complexity classification', () => {
     });
 
     it('should classify feature addition as medium complexity', async () => {
-      const { execSync } = require('child_process');
+      const { spawnSync } = require('child_process');
       const hookInput = JSON.stringify({ prompt: 'Add a new button component with styling' });
 
       try {
-        execSync(
-          `node "${path.join(__dirname, 'router-enforcer.cjs')}" "${hookInput.replace(/"/g, '\\"')}"`,
-          {
-            encoding: 'utf-8',
-            stdio: ['pipe', 'pipe', 'pipe'],
-          }
-        );
+        spawnSync('node', [HOOK_PATH, hookInput], {
+          encoding: 'utf-8',
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
       } catch (_e) {
         // Hook may exit with code 0 anyway
       }
@@ -95,19 +87,16 @@ describe('router-enforcer complexity classification', () => {
     });
 
     it('should classify architecture work as high or epic complexity', async () => {
-      const { execSync } = require('child_process');
+      const { spawnSync } = require('child_process');
       const hookInput = JSON.stringify({
         prompt: 'Refactor the authentication system and add OAuth integration',
       });
 
       try {
-        execSync(
-          `node "${path.join(__dirname, 'router-enforcer.cjs')}" "${hookInput.replace(/"/g, '\\"')}"`,
-          {
-            encoding: 'utf-8',
-            stdio: ['pipe', 'pipe', 'pipe'],
-          }
-        );
+        spawnSync('node', [HOOK_PATH, hookInput], {
+          encoding: 'utf-8',
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
       } catch (_e) {
         // Hook may exit with code 0 anyway
       }
@@ -120,17 +109,14 @@ describe('router-enforcer complexity classification', () => {
     });
 
     it('should set security required flag for auth-related prompts', async () => {
-      const { execSync } = require('child_process');
+      const { spawnSync } = require('child_process');
       const hookInput = JSON.stringify({ prompt: 'Update the user authentication login flow' });
 
       try {
-        execSync(
-          `node "${path.join(__dirname, 'router-enforcer.cjs')}" "${hookInput.replace(/"/g, '\\"')}"`,
-          {
-            encoding: 'utf-8',
-            stdio: ['pipe', 'pipe', 'pipe'],
-          }
-        );
+        spawnSync('node', [HOOK_PATH, hookInput], {
+          encoding: 'utf-8',
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
       } catch (_e) {
         // Hook may exit with code 0 anyway
       }
@@ -144,17 +130,14 @@ describe('router-enforcer complexity classification', () => {
     });
 
     it('should not set security flag for non-security prompts', async () => {
-      const { execSync } = require('child_process');
+      const { spawnSync } = require('child_process');
       const hookInput = JSON.stringify({ prompt: 'Add a new color theme option' });
 
       try {
-        execSync(
-          `node "${path.join(__dirname, 'router-enforcer.cjs')}" "${hookInput.replace(/"/g, '\\"')}"`,
-          {
-            encoding: 'utf-8',
-            stdio: ['pipe', 'pipe', 'pipe'],
-          }
-        );
+        spawnSync('node', [HOOK_PATH, hookInput], {
+          encoding: 'utf-8',
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
       } catch (_e) {
         // Hook may exit with code 0 anyway
       }
@@ -169,15 +152,9 @@ describe('router-enforcer complexity classification', () => {
   });
 
   describe('documentation intent keywords', () => {
-    // Read the router-enforcer.cjs file to verify structure
-    const routerEnforcerCode = fs.readFileSync(
-      path.join(__dirname, 'router-enforcer.cjs'),
-      'utf-8'
-    );
-
     it('should have documentation key in intentKeywords', () => {
       assert.ok(
-        routerEnforcerCode.includes('documentation: ['),
+        Array.isArray(INTENT_KEYWORDS.documentation),
         'intentKeywords should have documentation key'
       );
     });
@@ -194,7 +171,7 @@ describe('router-enforcer complexity classification', () => {
       ];
       for (const keyword of keywords) {
         assert.ok(
-          routerEnforcerCode.includes(`'${keyword}'`),
+          INTENT_KEYWORDS.documentation.includes(keyword),
           `Should include "${keyword}" keyword`
         );
       }
@@ -204,7 +181,7 @@ describe('router-enforcer complexity classification', () => {
       const keywords = ['explain', 'describe', 'guide', 'manual', 'technical writing'];
       for (const keyword of keywords) {
         assert.ok(
-          routerEnforcerCode.includes(`'${keyword}'`),
+          INTENT_KEYWORDS.documentation.includes(keyword),
           `Should include "${keyword}" keyword`
         );
       }
@@ -212,15 +189,11 @@ describe('router-enforcer complexity classification', () => {
   });
 
   describe('technical-writer scoring via INTENT_TO_AGENT', () => {
-    const routerEnforcerCode = fs.readFileSync(
-      path.join(__dirname, 'router-enforcer.cjs'),
-      'utf-8'
-    );
+    const routerEnforcerCode = fs.readFileSync(HOOK_PATH, 'utf-8');
 
     it('should have INTENT_TO_AGENT mapping for documentation to technical-writer', () => {
       assert.ok(
-        routerEnforcerCode.includes("documentation: 'technical-writer'") &&
-          routerEnforcerCode.includes('const INTENT_TO_AGENT'),
+        INTENT_TO_AGENT.documentation === 'technical-writer',
         'Should have INTENT_TO_AGENT mapping for documentation to technical-writer'
       );
     });
@@ -235,74 +208,23 @@ describe('router-enforcer complexity classification', () => {
     });
   });
 
-  describe('ROUTING_TABLE data structure', () => {
-    const routerEnforcerCode = fs.readFileSync(
-      path.join(__dirname, 'router-enforcer.cjs'),
-      'utf-8'
-    );
-
-    it('should have ROUTING_TABLE constant defined', () => {
-      assert.ok(
-        routerEnforcerCode.includes('const ROUTING_TABLE = {'),
-        'Should have ROUTING_TABLE constant'
-      );
-    });
-
+  describe('routing table mappings', () => {
     it('should map documentation to technical-writer', () => {
-      assert.ok(
-        routerEnforcerCode.includes("documentation: 'technical-writer'"),
-        'Should map documentation to technical-writer'
-      );
-    });
-
-    it('should map docs to technical-writer', () => {
-      assert.ok(
-        routerEnforcerCode.includes("docs: 'technical-writer'"),
-        'Should map docs to technical-writer'
-      );
+      assert.strictEqual(INTENT_TO_AGENT.documentation, 'technical-writer');
     });
 
     it('should have all core routing mappings', () => {
-      const mappings = [
-        "bug: 'developer'",
-        "security: 'security-architect'",
-        "test: 'qa'",
-        "plan: 'planner'",
-        "devops: 'devops'",
-        "incident: 'incident-responder'",
-      ];
-      for (const mapping of mappings) {
-        assert.ok(routerEnforcerCode.includes(mapping), `Should have mapping: ${mapping}`);
+      const mappings = {
+        bug: 'developer',
+        security: 'security-architect',
+        test: 'qa',
+        plan: 'planner',
+        devops: 'devops',
+        incident: 'incident-responder',
+      };
+      for (const [intent, agent] of Object.entries(mappings)) {
+        assert.strictEqual(INTENT_TO_AGENT[intent], agent, `Should map ${intent} to ${agent}`);
       }
-    });
-
-    it('should have sync comment with CLAUDE.md', () => {
-      assert.ok(
-        routerEnforcerCode.includes('Keep in sync with CLAUDE.md') ||
-          routerEnforcerCode.includes('Mirrors CLAUDE.md'),
-        'Should have sync comment with CLAUDE.md'
-      );
-    });
-  });
-
-  describe('getPreferredAgent function', () => {
-    const routerEnforcerCode = fs.readFileSync(
-      path.join(__dirname, 'router-enforcer.cjs'),
-      'utf-8'
-    );
-
-    it('should have getPreferredAgent function defined', () => {
-      assert.ok(
-        routerEnforcerCode.includes('function getPreferredAgent(intent)'),
-        'Should have getPreferredAgent function'
-      );
-    });
-
-    it('should return agent from ROUTING_TABLE or null', () => {
-      assert.ok(
-        routerEnforcerCode.includes('return ROUTING_TABLE[intent] || null'),
-        'Should return from ROUTING_TABLE or null'
-      );
     });
   });
 });

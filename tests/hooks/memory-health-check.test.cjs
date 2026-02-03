@@ -65,7 +65,7 @@ describe('memory-health-check', () => {
       process.env.CLAUDE_PROJECT_DIR = testDir;
 
       try {
-        memoryHealthCheck.main();
+        await memoryHealthCheck.main();
       } catch (e) {
         // process.exit throws in our mock
         if (!e.message.includes('process.exit called')) {

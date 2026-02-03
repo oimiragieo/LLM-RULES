@@ -4,10 +4,9 @@
  *
  * Consolidated PostToolUse(Task) hook that combines:
  * 1. agent-context-tracker.cjs - Agent mode tracking
- * 2. extract-workflow-learnings.cjs - Workflow learning extraction
- * 3. session-memory-extractor.cjs - Session memory extraction
- * 4. task-completion-guard.cjs - Task completion warning
- * 5. evolution-audit.cjs - Evolution auditing
+ * 2. session-memory-extractor.cjs - Session memory extraction
+ * 3. task-completion-guard.cjs - Task completion warning
+ * 4. evolution-audit.cjs - Evolution auditing
  */
 
 'use strict';

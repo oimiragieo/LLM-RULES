@@ -32,6 +32,8 @@ const path = require('path');
 
 // PERF-006: Use shared hook-input utility
 const { parseHookInputAsync, getToolInput } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // PERF-007: Use shared project-root utility
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
@@ -196,6 +198,16 @@ async function main() {
     const message = formatViolationMessage(currentState, targetState);
 
     if (enforcement === 'block') {
+      try {
+        await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Write',
+          reason: 'evolution_state_transition_invalid',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.log(JSON.stringify({ result: 'block', message }));
       process.exit(2);
     } else {

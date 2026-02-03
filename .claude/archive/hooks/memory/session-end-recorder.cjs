@@ -4,6 +4,7 @@
  * This hook has been consolidated into unified-reflection-handler.cjs
  * which handles task-completion, error-recovery, session-end reflection,
  * and memory extraction in a single process.
+ * NOTE: memory-manager.saveSession() is now deprecated and throws; do not run this hook in production.
  *
  * SessionEnd Hook: Records session summary to memory system
  * ============================================================
@@ -21,6 +22,10 @@
 
 /* eslint-disable max-depth */
 
+console.warn(
+  '[session-end-recorder] DEPRECATED: saveSession() now throws. Do not run this hook in production. Use unified-reflection-handler.cjs instead.'
+);
+
 const fs = require('fs');
 const path = require('path');
 const { _execSync } = require('child_process');
@@ -28,9 +33,6 @@ const { _execSync } = require('child_process');
 // Import memory manager and memory tiers
 const PROJECT_ROOT = process.env.PROJECT_ROOT || process.cwd();
 const { debugLog } = require('../../../lib/utils/hook-input.cjs');
-const memoryManager = require(
-  path.join(PROJECT_ROOT, '.claude', 'lib', 'memory', 'memory-manager.cjs')
-);
 
 // Try to load memory-tiers (may not exist in older installations)
 let memoryTiers = null;
@@ -201,11 +203,7 @@ async function main() {
       debugLog('session-end-recorder', `Consolidated session to MTM: ${consolidateResult.mtmPath}`);
     }
 
-    // Also call legacy memory-manager.cjs saveSession for backward compatibility
-    const result = memoryManager.saveSession(sessionData, PROJECT_ROOT);
-
-    // Log success (for debugging)
-    debugLog('session-end-recorder', `Saved session ${result.sessionNum} to ${result.file}`);
+    // Legacy saveSession has been removed; memory-tiers is the canonical path.
 
     process.exit(0);
   } catch (err) {

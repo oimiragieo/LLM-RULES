@@ -38,6 +38,8 @@ const {
   getToolName,
   getToolInput,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Tools that this guard watches
 const WRITE_TOOLS = ['Edit', 'Write', 'NotebookEdit'];
@@ -179,6 +181,16 @@ function main() {
     const state = routerState.getState();
 
     if (enforcementMode === 'block') {
+      try {
+        eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName,
+          reason: 'router_write_blocked',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       console.log(formatBlockedMessage(toolName, filePath, state));
       // HOOK-005 FIX: Use exit(2) for blocking consistency with other security hooks
       process.exit(2);
@@ -214,6 +226,16 @@ function main() {
     );
 
     // Fail closed: block the operation when security state is unknown
+    try {
+      eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'router-write-guard',
+        error: err.message,
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(2);
   }
 }

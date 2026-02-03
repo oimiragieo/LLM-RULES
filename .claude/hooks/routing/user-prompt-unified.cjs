@@ -4,7 +4,7 @@
  *
  * Consolidates 5 UserPromptSubmit hooks into a single file for reduced I/O and process spawning:
  * 1. router-mode-reset.cjs - Resets router state on new prompts
- * 2. router-enforcer.cjs - Analyzes prompts for routing recommendations (uses routing-table.cjs)
+ * 2. router-enforcer.cjs - Advisory prompt analysis (shared routing-table.cjs)
  * 3. memory-reminder.cjs - Reminds agents to read memory files
  * 4. evolution-trigger-detector.cjs - Detects evolution trigger patterns (merged)
  * 5. memory-health-check.cjs - Checks memory system health (merged)
@@ -24,6 +24,13 @@ const { spawnSync } = require('child_process');
 // Import shared utilities
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { parseHookInputSync } = require('../../lib/utils/hook-input.cjs');
+const { loadConfig } = require('../../lib/utils/config-loader.cjs');
+const { ROUTING_TABLE, getPreferredAgent } = require('../../lib/routing/routing-table.cjs');
+const { estimateTokens } = require('../../lib/utils/token-budget-tracker.cjs');
+const {
+  checkCompressionNeeded,
+  triggerCompression,
+} = require('../../lib/utils/compression-trigger.cjs');
 
 let memoryTiers = null;
 try {
@@ -50,6 +57,16 @@ const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
 const _MEMORY_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
 const EVOLUTION_STATE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
 const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
+const AUTO_COMPRESSION_STATE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'auto-compression.json'
+);
+const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+const USER_PROMPT_RESULTS_PATH = path.join(RUNTIME_DIR, 'user-prompt-results.jsonl');
+const USER_PROMPT_RESULTS_LOG_ENABLED = process.env.USER_PROMPT_RESULTS_LOG !== 'off';
 
 // Agent cache (shared across calls within same process)
 let agentCache = null;
@@ -153,35 +170,8 @@ function checkRouterModeReset(hookInput) {
 }
 
 // =============================================================================
-// Check 2: Router Enforcer (uses routing-table.cjs)
+// Check 2: Router Enforcer (uses shared routing-table.cjs)
 // =============================================================================
-
-/**
- * ROUTING_TABLE - Maps intent keywords to agent names
- * (Subset for common cases - full table in original hook)
- */
-const ROUTING_TABLE = {
-  bug: 'developer',
-  coding: 'developer',
-  feature: 'developer',
-  test: 'qa',
-  testing: 'qa',
-  documentation: 'technical-writer',
-  docs: 'technical-writer',
-  security: 'security-architect',
-  architecture: 'architect',
-  design: 'architect',
-  plan: 'planner',
-  planning: 'planner',
-  devops: 'devops',
-  infrastructure: 'devops',
-  review: 'code-reviewer',
-  pr: 'code-reviewer',
-  python: 'python-pro',
-  typescript: 'typescript-pro',
-  rust: 'rust-pro',
-  go: 'golang-pro',
-};
 
 /**
  * Keywords for complexity detection
@@ -218,6 +208,148 @@ const COMPLEXITY_KEYWORDS = {
     'system-wide',
   ],
 };
+
+// =============================================================================
+// Token Monitoring + Auto-Compression (config.yaml)
+// =============================================================================
+
+let cachedConfig = null;
+
+function getConfig() {
+  if (cachedConfig) return cachedConfig;
+  try {
+    cachedConfig = loadConfig();
+  } catch (err) {
+    if (process.env.DEBUG_HOOKS) {
+      console.warn('[user-prompt-unified] Failed to load config.yaml:', err.message);
+    }
+    cachedConfig = null;
+  }
+  return cachedConfig;
+}
+
+function readCompressionState() {
+  try {
+    if (!fs.existsSync(AUTO_COMPRESSION_STATE_PATH)) {
+      return { sessions: {} };
+    }
+    return JSON.parse(fs.readFileSync(AUTO_COMPRESSION_STATE_PATH, 'utf8'));
+  } catch (_err) {
+    return { sessions: {} };
+  }
+}
+
+function writeCompressionState(state) {
+  try {
+    const dir = path.dirname(AUTO_COMPRESSION_STATE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    atomicWriteJSONSync(AUTO_COMPRESSION_STATE_PATH, state);
+  } catch (_err) {
+    // Best-effort
+  }
+}
+
+function checkTokenMonitoring(hookInput) {
+  const config = getConfig();
+  const tokenMonitoring = config?.token_monitoring;
+  if (!tokenMonitoring?.enabled) {
+    return { enabled: false };
+  }
+
+  const prompt = hookInput?.prompt || hookInput?.message || '';
+  const estimate = estimateTokens(prompt);
+  const maxTokens = Number(tokenMonitoring.max_session_tokens || 0);
+  const hardLimit = Number(tokenMonitoring.hard_limit || 0);
+
+  const result = {
+    enabled: true,
+    promptTokens: estimate.tokens,
+    maxTokens,
+    hardLimit,
+  };
+
+  if (maxTokens && estimate.tokens >= maxTokens) {
+    console.warn(
+      `[user-prompt-unified] Token monitoring: prompt estimate ${estimate.tokens} exceeds max_session_tokens (${maxTokens}).`
+    );
+  }
+
+  if (hardLimit && estimate.tokens >= hardLimit) {
+    console.warn(
+      `[user-prompt-unified] Token monitoring: prompt estimate ${estimate.tokens} exceeds hard_limit (${hardLimit}).`
+    );
+    try {
+      eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'token-monitoring',
+        error: 'hard_limit_exceeded',
+      });
+    } catch (_err) {
+      // Best-effort
+    }
+  }
+
+  return result;
+}
+
+function maybeAutoCompress(tokenStatus) {
+  const config = getConfig();
+  const autoCompression = config?.memory_management?.auto_compression;
+  if (!autoCompression?.enabled) {
+    return { enabled: false };
+  }
+
+  const maxTokens = tokenStatus?.maxTokens || 0;
+  const promptTokens = tokenStatus?.promptTokens || 0;
+  const percentUsed = maxTokens ? (promptTokens / maxTokens) * 100 : 0;
+  const thresholdPercent = Number(autoCompression.trigger_threshold || 0.9) * 100;
+
+  if (percentUsed < thresholdPercent) {
+    return { enabled: true, needed: false };
+  }
+
+  const sessionId = process.env.CLAUDE_SESSION_ID || 'unknown';
+  const state = readCompressionState();
+  const currentCount = state.sessions[sessionId]?.count || 0;
+  const maxCompressions = Number(autoCompression.max_compressions_per_session || 5);
+
+  if (currentCount >= maxCompressions) {
+    return { enabled: true, needed: false, skipped: 'max_compressions' };
+  }
+
+  const trigger = checkCompressionNeeded({
+    tokenBudgetStatus: {
+      percentUsed,
+      status: percentUsed >= 90 ? 'CRITICAL' : percentUsed >= 80 ? 'WARNING' : 'OK',
+    },
+    operationCount: 0,
+  });
+
+  if (!trigger.needed) {
+    return { enabled: true, needed: false };
+  }
+
+  try {
+    triggerCompression({ reason: trigger.reason, urgency: trigger.urgency })
+      .then(result => {
+        if (result.success) {
+          state.sessions[sessionId] = {
+            count: currentCount + 1,
+            lastRun: new Date().toISOString(),
+          };
+          writeCompressionState(state);
+        }
+      })
+      .catch(() => {});
+  } catch (_err) {
+    // Best-effort
+  }
+
+  return { enabled: true, needed: true, reason: trigger.reason };
+}
 
 /**
  * Parse YAML frontmatter from agent file
@@ -459,7 +591,7 @@ function scoreAgents(prompt, agents) {
     }
 
     // Direct routing table match
-    const preferredAgent = ROUTING_TABLE[detectedIntent];
+    const preferredAgent = getPreferredAgent(detectedIntent);
     if (preferredAgent && agent.name === preferredAgent) {
       score += 5;
     }
@@ -472,6 +604,48 @@ function scoreAgents(prompt, agents) {
 
   scores.sort((a, b) => b.score - a.score);
   return { candidates: scores.slice(0, 3), intent: detectedIntent };
+}
+
+function recordUserPromptResult(result) {
+  if (!USER_PROMPT_RESULTS_LOG_ENABLED) return;
+  try {
+    if (!fs.existsSync(RUNTIME_DIR)) {
+      fs.mkdirSync(RUNTIME_DIR, { recursive: true });
+    }
+    const entry = {
+      timestamp: new Date().toISOString(),
+      intent: result?.routerEnforcement?.intent || 'general',
+      candidates: (result?.routerEnforcement?.candidates || [])
+        .map(candidate => candidate?.agent?.name)
+        .filter(Boolean),
+      tokenMonitoring: result?.tokenMonitoring
+        ? {
+            enabled: result.tokenMonitoring.enabled,
+            status: result.tokenMonitoring.status,
+            percentUsed: result.tokenMonitoring.percentUsed,
+          }
+        : undefined,
+      autoCompression: result?.autoCompression
+        ? {
+            enabled: result.autoCompression.enabled,
+            needed: result.autoCompression.needed,
+            reason: result.autoCompression.reason,
+            urgency: result.autoCompression.urgency,
+          }
+        : undefined,
+      memoryHealth: result?.memoryHealth
+        ? {
+            status: result.memoryHealth.status,
+            warningsCount: Array.isArray(result.memoryHealth.warnings)
+              ? result.memoryHealth.warnings.length
+              : 0,
+          }
+        : undefined,
+    };
+    fs.appendFileSync(USER_PROMPT_RESULTS_PATH, JSON.stringify(entry) + '\n', 'utf8');
+  } catch (_err) {
+    // Best-effort; never block hook execution.
+  }
 }
 
 /**
@@ -853,6 +1027,17 @@ function checkMemoryHealth(hookInput, projectRoot = PROJECT_ROOT) {
   }
 
   try {
+    const healthIntervalMs = Number(process.env.MEMORY_HEALTH_CHECK_INTERVAL_MS || 5 * 60 * 1000);
+    const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+    const lastCheckPath = path.join(runtimeDir, 'last-memory-health-check.txt');
+
+    if (Number.isFinite(healthIntervalMs) && healthIntervalMs > 0 && fs.existsSync(lastCheckPath)) {
+      const lastCheck = Number(fs.readFileSync(lastCheckPath, 'utf8'));
+      if (Number.isFinite(lastCheck) && Date.now() - lastCheck <= healthIntervalMs) {
+        return { ...result, status: 'skipped', reason: 'recent_health_check' };
+      }
+    }
+
     const { getMemoryHealth, checkAndArchiveLearnings, pruneCodebaseMap, CONFIG } = require(
       memoryManagerPath
     );
@@ -947,7 +1132,19 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
       );
     }
   } catch (_e) {
-    // best-effort; ignore
+    if (process.env.DEBUG_HOOKS || process.env.MEMORY_DEBUG) {
+      console.warn('[user-prompt-unified] STM write failed:', _e.message);
+    }
+    try {
+      eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'writeSTMEntry',
+        error: _e.message,
+      });
+    } catch (_err) {
+      // Best-effort
+    }
   }
 
   // Reflection Spawn Check: If requests exist, remind Router to spawn reflection-agent.
@@ -1084,12 +1281,22 @@ function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
   const result = {
     routerModeReset: checkRouterModeReset(input),
     routerEnforcement: checkRouterEnforcement(input),
+    tokenMonitoring: checkTokenMonitoring(input),
     memoryReminder: checkMemoryReminder(input, projectRoot),
     evolutionTrigger: checkEvolutionTrigger(input),
     memoryHealth: checkMemoryHealth(input, projectRoot),
     stmWrite,
     exitCode: 0, // Always allow (advisory)
   };
+
+  // Best-effort: auto-compression driven by config.yaml
+  try {
+    result.autoCompression = maybeAutoCompress(result.tokenMonitoring);
+  } catch (_err) {
+    result.autoCompression = { enabled: false };
+  }
+
+  recordUserPromptResult(result);
 
   return result;
 }

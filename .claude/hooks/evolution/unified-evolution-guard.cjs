@@ -46,6 +46,8 @@ const {
   getToolInput,
   getEnforcementMode: getEnfMode,
 } = require('../../lib/utils/hook-input.cjs');
+const eventBus = require('../../lib/events/event-bus.cjs');
+const { EventTypes } = require('../../lib/events/event-types.cjs');
 const { getCachedState } = require('../../lib/utils/state-cache.cjs');
 const { safeReadJSON } = require('../../lib/utils/safe-json.cjs');
 
@@ -629,6 +631,16 @@ async function main() {
 
     if (blockingResult) {
       if (enforcement === 'block') {
+        try {
+          await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+            type: EventTypes.TOOL_BLOCKED,
+            timestamp: new Date().toISOString(),
+            toolName: 'Write',
+            reason: 'unified_evolution_blocked',
+          });
+        } catch (_err) {
+          // Best-effort
+        }
         console.log(JSON.stringify({ result: 'block', message: blockingResult.message }));
         process.exit(2);
       } else {
@@ -661,6 +673,16 @@ async function main() {
       })
     );
 
+    try {
+      await eventBus.emit(EventTypes.TOOL_FAILED, {
+        type: EventTypes.TOOL_FAILED,
+        timestamp: new Date().toISOString(),
+        toolName: 'unified-evolution-guard',
+        error: err.message,
+      });
+    } catch (_err) {
+      // Best-effort
+    }
     process.exit(2);
   }
 }

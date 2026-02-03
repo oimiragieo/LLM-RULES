@@ -2,11 +2,10 @@
 /**
  * Tests for pre-task-unified.cjs
  *
- * Consolidation of 4 PreToolUse(Task) hooks:
+ * Consolidation of 3 PreToolUse(Task) hooks:
  * 1. agent-context-pre-tracker.cjs - Sets mode='agent' before task starts
  * 2. routing-guard.cjs - Planner-first, security review, router self-check
- * 3. documentation-routing-guard.cjs - Routes docs to technical-writer
- * 4. loop-prevention.cjs - Prevents runaway loops
+ * 3. loop-prevention.cjs - Prevents runaway loops
  *
  * Run with: node --test .claude/hooks/routing/pre-task-unified.test.cjs
  */
@@ -87,7 +86,6 @@ describe('pre-task-unified.cjs', () => {
       ROUTER_SELF_CHECK: process.env.ROUTER_SELF_CHECK,
       PLANNER_FIRST_ENFORCEMENT: process.env.PLANNER_FIRST_ENFORCEMENT,
       SECURITY_REVIEW_ENFORCEMENT: process.env.SECURITY_REVIEW_ENFORCEMENT,
-      DOCUMENTATION_ROUTING_GUARD: process.env.DOCUMENTATION_ROUTING_GUARD,
       LOOP_PREVENTION_MODE: process.env.LOOP_PREVENTION_MODE,
     };
 
@@ -95,7 +93,6 @@ describe('pre-task-unified.cjs', () => {
     delete process.env.ROUTER_SELF_CHECK;
     delete process.env.PLANNER_FIRST_ENFORCEMENT;
     delete process.env.SECURITY_REVIEW_ENFORCEMENT;
-    delete process.env.DOCUMENTATION_ROUTING_GUARD;
     delete process.env.LOOP_PREVENTION_MODE;
 
     // Invalidate all caches before each test
@@ -135,8 +132,6 @@ describe('pre-task-unified.cjs', () => {
       assert.strictEqual(typeof preTaskUnified.checkAgentContextPreTracker, 'function');
       // From routing-guard
       assert.strictEqual(typeof preTaskUnified.checkRoutingGuard, 'function');
-      // From documentation-routing-guard
-      assert.strictEqual(typeof preTaskUnified.checkDocumentationRouting, 'function');
       // From loop-prevention
       assert.strictEqual(typeof preTaskUnified.checkLoopPrevention, 'function');
     });
@@ -268,79 +263,6 @@ describe('pre-task-unified.cjs', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Documentation Routing Guard Tests (from documentation-routing-guard.cjs)
-  // ---------------------------------------------------------------------------
-
-  describe('checkDocumentationRouting', () => {
-    it('should pass for non-documentation tasks', () => {
-      const input = {
-        tool_name: 'Task',
-        tool_input: {
-          prompt: 'You are DEVELOPER. Fix the authentication bug.',
-        },
-      };
-
-      const result = preTaskUnified.checkDocumentationRouting(input.tool_input);
-      assert.strictEqual(result.pass, true);
-    });
-
-    it('should pass for documentation tasks routed to technical-writer', () => {
-      const input = {
-        tool_name: 'Task',
-        tool_input: {
-          prompt: 'You are TECHNICAL-WRITER. Write documentation for the API.',
-          description: 'Technical-writer creating API docs',
-        },
-      };
-
-      const result = preTaskUnified.checkDocumentationRouting(input.tool_input);
-      assert.strictEqual(result.pass, true);
-    });
-
-    it('should block documentation tasks not routed to technical-writer', () => {
-      // Note: Description must NOT contain "documentation" as it would trigger
-      // the isTechWriterSpawn check (matching TECH_WRITER_PATTERNS.description)
-      const input = {
-        tool_name: 'Task',
-        tool_input: {
-          prompt: 'You are DEVELOPER. Write documentation for the API.',
-          description: 'Developer writing API reference',
-        },
-      };
-
-      const result = preTaskUnified.checkDocumentationRouting(input.tool_input);
-      assert.strictEqual(result.pass, false);
-      assert.ok(result.message.includes('DOCUMENTATION'));
-    });
-
-    it('should detect high-confidence doc keywords like "write docs"', () => {
-      const input = {
-        tool_name: 'Task',
-        tool_input: {
-          prompt: 'You are DEVELOPER. Please write docs for this module.',
-        },
-      };
-
-      const result = preTaskUnified.checkDocumentationRouting(input.tool_input);
-      assert.strictEqual(result.pass, false);
-    });
-
-    it('should pass when enforcement is off', () => {
-      process.env.DOCUMENTATION_ROUTING_GUARD = 'off';
-
-      const input = {
-        tool_name: 'Task',
-        tool_input: {
-          prompt: 'You are DEVELOPER. Write documentation.',
-        },
-      };
-
-      const result = preTaskUnified.checkDocumentationRouting(input.tool_input);
-      assert.strictEqual(result.pass, true);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
   // Loop Prevention Tests (from loop-prevention.cjs)
   // ---------------------------------------------------------------------------
 
@@ -427,13 +349,14 @@ describe('pre-task-unified.cjs', () => {
   // ---------------------------------------------------------------------------
 
   describe('runAllChecks', () => {
-    it('should run all 4 checks in order', () => {
+    it('should run all 3 checks in order', () => {
       // Set up clean state
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: false,
         plannerSpawned: false,
         requiresSecurityReview: false,
+        taskListCalledSincePrompt: true,
       });
 
       writeState(LOOP_STATE_FILE, {
@@ -469,6 +392,7 @@ describe('pre-task-unified.cjs', () => {
         requiresPlannerFirst: true,
         plannerSpawned: false,
         complexity: 'high',
+        taskListCalledSincePrompt: true,
       });
 
       writeState(LOOP_STATE_FILE, {
@@ -488,39 +412,12 @@ describe('pre-task-unified.cjs', () => {
       assert.ok(result.message.includes('PLANNER'));
     });
 
-    it('should check documentation routing after routing-guard', () => {
-      // Set up state that passes routing-guard but fails doc-routing
-      writeState(ROUTER_STATE_FILE, {
-        mode: 'router',
-        requiresPlannerFirst: false,
-        plannerSpawned: false,
-      });
-
-      writeState(LOOP_STATE_FILE, {
-        spawnDepth: 0,
-        actionHistory: [],
-      });
-
-      // Note: Description must NOT contain "documentation" as it would trigger
-      // the isTechWriterSpawn check (matching TECH_WRITER_PATTERNS.description)
-      const input = {
-        tool_name: 'Task',
-        tool_input: {
-          prompt: 'You are DEVELOPER. Write documentation for the API.',
-          description: 'Developer writing API reference',
-        },
-      };
-
-      const result = preTaskUnified.runAllChecks(input);
-      assert.strictEqual(result.pass, false);
-      assert.ok(result.message.includes('DOCUMENTATION'));
-    });
-
     it('should check loop prevention last', () => {
       // Set up state that passes all but loop-prevention
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: false,
+        taskListCalledSincePrompt: true,
       });
 
       writeState(LOOP_STATE_FILE, {
@@ -562,6 +459,7 @@ describe('pre-task-unified.cjs', () => {
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: false,
+        taskListCalledSincePrompt: true,
       });
 
       writeState(LOOP_STATE_FILE, {
@@ -587,6 +485,7 @@ describe('pre-task-unified.cjs', () => {
         requiresPlannerFirst: true,
         plannerSpawned: false,
         complexity: 'high',
+        taskListCalledSincePrompt: true,
       });
 
       const input = {
@@ -599,40 +498,6 @@ describe('pre-task-unified.cjs', () => {
       const result = preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, false);
       assert.strictEqual(result.exitCode, 2);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // State Caching Tests
-  // ---------------------------------------------------------------------------
-
-  describe('state caching', () => {
-    it('should read router-state.json only once per runAllChecks call', () => {
-      // This test verifies the optimization - multiple checks that need
-      // router state should share a single cached read
-
-      writeState(ROUTER_STATE_FILE, {
-        mode: 'router',
-        requiresPlannerFirst: false,
-      });
-
-      writeState(LOOP_STATE_FILE, {
-        spawnDepth: 0,
-        actionHistory: [],
-      });
-
-      const input = {
-        tool_name: 'Task',
-        tool_input: {
-          prompt: 'You are DEVELOPER. Fix bug.',
-        },
-      };
-
-      // This should succeed without throwing
-      const result = preTaskUnified.runAllChecks(input);
-      assert.strictEqual(result.pass, true);
-
-      // If caching works, no errors from excessive file reads
     });
   });
 });

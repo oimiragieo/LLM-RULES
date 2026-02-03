@@ -7,9 +7,9 @@
  * TDD: Write failing tests first, then implement to pass
  *
  * Consolidates:
- * - task-completion-reflection.cjs
- * - error-recovery-reflection.cjs
- * - session-end-reflection.cjs
+ * - task-completion-reflection.cjs (archived)
+ * - error-recovery-reflection.cjs (archived)
+ * - session-end-reflection.cjs (archived)
  * - session-memory-extractor.cjs
  * - session-end-recorder.cjs
  */
