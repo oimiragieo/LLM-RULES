@@ -13,7 +13,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const PROJECT_ROOT = process.cwd();
+const { PROJECT_ROOT } = require('./project-root.cjs');
 const TOKEN_LOG_PATH = path.join(PROJECT_ROOT, '.claude/context/token-usage.jsonl');
 const CHAR_TO_TOKEN_RATIO = 0.75; // 1 char ≈ 0.75 tokens (estimate)
 const DEFAULT_BUDGET = 200000; // Per model (haiku/sonnet/opus all same for simplicity)

@@ -18,8 +18,13 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const PROJECT_ROOT = process.cwd();
+const { PROJECT_ROOT } = require('./project-root.cjs');
+const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const COMPRESSION_STATS_PATH = path.join(PROJECT_ROOT, '.claude/context/compression-stats.jsonl');
+const COMPRESSION_REMINDER_PATH = path.join(RUNTIME_DIR, 'compression-reminder.txt');
+const COMPRESSION_REMINDER_JSON_PATH = path.join(RUNTIME_DIR, 'compression-reminder.json');
+const AUTO_COMPRESSION_PHASE_3 =
+  process.env.AUTO_COMPRESSION_PHASE_3 === '1' || process.env.AUTO_COMPRESSION_PHASE_3 === 'true';
 
 // Thresholds
 const READ_SIZE_THRESHOLD = 10000; // 10 KB
@@ -148,6 +153,31 @@ async function triggerCompression(options) {
 
     // Append to JSONL file
     fs.appendFileSync(COMPRESSION_STATS_PATH, JSON.stringify(logEntry) + '\n', 'utf8');
+
+    // Phase 3 (optional): write a reminder file for Router/agents to act on
+    if (AUTO_COMPRESSION_PHASE_3) {
+      try {
+        if (!fs.existsSync(RUNTIME_DIR)) {
+          fs.mkdirSync(RUNTIME_DIR, { recursive: true });
+        }
+        fs.writeFileSync(COMPRESSION_REMINDER_PATH, 'compression_needed\n', 'utf8');
+        fs.writeFileSync(
+          COMPRESSION_REMINDER_JSON_PATH,
+          JSON.stringify(
+            {
+              reason,
+              urgency,
+              timestamp: new Date().toISOString(),
+            },
+            null,
+            2
+          ),
+          'utf8'
+        );
+      } catch (_err) {
+        // Best-effort; reminder is advisory only
+      }
+    }
 
     return {
       success: true,

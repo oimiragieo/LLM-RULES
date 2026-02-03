@@ -153,6 +153,10 @@
           },
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/documentation-routing-guard.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/routing/pre-task-unified.cjs"
           }
         ]

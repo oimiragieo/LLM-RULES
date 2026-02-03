@@ -46,7 +46,8 @@
       "description": "SessionEnd and PostToolUse hook: session recording (STM/MTM), reflection queue, memory-tiers consolidation",
       "category": "hook",
       "discovered_at": "2026-02-01T00:00:00.000Z",
-      "last_accessed": "2026-02-01T00:00:00.000Z"
+      "last_accessed": "2026-02-01T00:00:00.000Z",
+      "accessDate": "2026-02-01T00:00:00.000Z"
     },
     ".claude/hooks/routing/planner-first-guard.integration.test.cjs": {
       "description": "16 integration tests for planner-first enforcement: blocks DEVELOPER/QA/DEVOPS/ARCHITECT for EPIC/HIGH complexity until PLANNER spawned, allows PLANNER to break cycle, validates warn/off modes, tests full flow from prompt analysis to Task blocking",
@@ -59,9 +60,8 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-01T08:08:40.333Z",
-      "last_accessed": "2026-02-01T08:08:40.333Z",
-      "accessDate": "2026-02-01T08:08:40.333Z"
+      "last_accessed": "2026-02-03T22:15:21.674Z"
     }
   },
-  "last_updated": "2026-02-01T23:46:15.492Z"
+  "last_updated": "2026-02-03T22:15:21.674Z"
 }

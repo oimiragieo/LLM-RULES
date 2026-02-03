@@ -31,8 +31,8 @@ integrations:
 # --- Token Monitoring ---
 token_monitoring:
   enabled: true
-  max_session_tokens: 60000 # Warning threshold
-  hard_limit: 100000 # Action required
+  max_session_tokens: 60000 # Warning threshold (best-effort estimate in user-prompt-unified)
+  hard_limit: 100000 # Action required (best-effort estimate in user-prompt-unified)
 
 # --- Evolution Settings (Self-Evolution System) ---
 evolution:
@@ -101,8 +101,8 @@ memory_management:
 
   # Auto-compression config (Phase 3)
   auto_compression:
-    enabled: false # Phase 3: Enable after testing
-    trigger_threshold: 0.90 # Compress at 90% budget
+    enabled: false # Best-effort auto-trigger via user-prompt-unified when enabled
+    trigger_threshold: 0.90 # Compress at 90% budget (estimated)
     max_compressions_per_session: 5
 
 # --- Core Agents Definition (Pointers) ---

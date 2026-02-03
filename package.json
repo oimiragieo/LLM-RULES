@@ -17,7 +17,8 @@
     "cleanup:headless:check": "node .claude/tools/cleanup-headless-runs.mjs --dry-run",
     "cleanup:headless": "node .claude/tools/cleanup-headless-runs.mjs --execute --yes",
     "agent:production": "node --max-old-space-size=8192 --expose-gc --optimize_for_size --gc_interval=100 .claude/lib/boot/production-agent.js",
-    "agent:worker": "node --max-old-space-size=4096 --expose-gc --optimize_for_size .claude/lib/boot/worker-agent.js",
+    "agent:worker": "node --max-old-space-size=4096 --expose-gc --optimize_for_size .claude/lib/boot/worker-agent.cjs",
+    "worker:summary": "node .claude/tools/cli/worker-metrics-summary.cjs",
     "validate": "node --max-old-space-size=4096 --expose-gc scripts/validate-config.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs",
     "validate:full": "pnpm validate && node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs && pnpm validate:cujs && pnpm validate:index && pnpm index-rules && pnpm validate:schemas",
     "validate:verbose": "node --max-old-space-size=4096 --expose-gc scripts/validate-config.mjs --verbose && node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs --verbose",
@@ -60,10 +61,10 @@
     "test:unit": "node --test --test-concurrency=1 tests/validate-cujs.test.mjs tests/validate-skills.test.mjs tests/run-cuj.test.mjs tests/cuj-measurability.test.mjs",
     "test:integration": "node --test tests/integration/*.test.mjs",
     "test:tools": "node --test --test-concurrency=1 \".claude/tools/**/*.test.mjs\" \".claude/tools/**/*.test.cjs\"",
-    "test:framework": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs .claude/lib/**/*.test.cjs",
+    "test:framework": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs .claude/lib/**/*.test.cjs tests/hooks/*.test.cjs tests/lib/memory/*.test.cjs tests/lib/monitoring/*.test.cjs",
     "test:framework:hooks": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs",
     "test:framework:lib": "node --test --test-concurrency=1 tests/lib/**/*.test.cjs",
-    "test:code-indexing": "node --test --test-concurrency=1 tests/code-indexing/ripgrep-integration.test.cjs tests/code-indexing/ast-grep-wrapper.test.cjs tests/code-indexing/merkle-tree.test.cjs tests/code-indexing/incremental-indexing.test.cjs tests/code-indexing/search-tools-integration.test.cjs tests/hooks/code-index-updater.test.cjs",
+    "test:code-indexing": "node --test --test-concurrency=1 tests/code-indexing/ripgrep-integration.test.cjs tests/code-indexing/ast-grep-wrapper.test.cjs tests/code-indexing/merkle-tree.test.cjs tests/code-indexing/incremental-indexing.test.cjs tests/code-indexing/search-tools-integration.test.cjs tests/code-indexing/vector-store-lancedb.test.cjs tests/hooks/code-index-updater.test.cjs",
     "test:all": "pnpm test && pnpm test:framework && pnpm test:tools",
     "test:ci": "node --test --test-concurrency=1 --test-reporter=spec tests/*.test.mjs tests/integration/*.test.mjs",
     "test:coverage": "node --test --test-concurrency=1 --experimental-test-coverage tests/*.test.mjs",
@@ -89,6 +90,7 @@
     "memory:dashboard": "node .claude/lib/memory/memory-dashboard.cjs",
     "memory:embeddings": "node .claude/tools/cli/generate-embeddings.cjs",
     "memory:reindex": "node .claude/tools/cli/generate-embeddings.cjs --reindex",
+    "memory:extract": "node .claude/tools/cli/memory-extract.cjs",
     "memory:dashboard:budget": "node .claude/tools/cli/memory-dashboard.cjs",
     "skills:index": "node .claude/tools/cli/generate-skill-index.cjs",
     "skills:validate": "node .claude/tools/cli/generate-skill-index.cjs --validate",
@@ -99,7 +101,8 @@
     "gen:tool-manifest": "node .claude/tools/cli/generate-tool-manifest.cjs",
     "gen:all-registries": "npm run gen:tool-manifest && npm run gen:skill-index && npm run gen:agent-registry",
     "validator:test": "node --test tests/hooks/pre-spawn-tool-validator.test.cjs",
-    "test:ml": "node --test --test-concurrency=1 tests/ml/*.test.cjs"
+    "test:ml": "node --test --test-concurrency=1 tests/ml/*.test.cjs",
+    "code:index:reindex": "node .claude/tools/cli/index-codebase.cjs index"
   },
   "keywords": [
     "claude",
@@ -113,7 +116,7 @@
   "author": "",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.5.0"
   },
   "dependencies": {
     "@ast-grep/cli": "^0.40.5",
