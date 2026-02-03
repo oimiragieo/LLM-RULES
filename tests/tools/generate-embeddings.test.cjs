@@ -4,10 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 
-const {
-  processFile,
-  reindexIfNeeded,
-} = require('../../.claude/tools/cli/generate-embeddings.cjs');
+const { processFile, reindexIfNeeded } = require('../../.claude/tools/cli/generate-embeddings.cjs');
 
 test('processFile handles JSON entries and builds documents', async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'embeddings-json-'));

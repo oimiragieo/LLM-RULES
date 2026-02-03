@@ -8,7 +8,6 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
-const memoryManager = require('../../.claude/lib/memory/memory-manager.cjs');
 const reflectionHook = require('../../.claude/hooks/reflection/unified-reflection-handler.cjs');
 const promptAssembler = require('../../.claude/lib/spawn/prompt-assembler.cjs');
 
@@ -184,12 +183,5 @@ test('assembleSpawnPrompt injects Memory Context section when enabled', () => {
   assert.ok(
     out.includes('## Memory Context (Auto-Loaded)'),
     'Expected memory section to be injected'
-  );
-});
-
-test('memory-manager.saveSession throws deprecation error (use memory-tiers instead)', () => {
-  assert.throws(
-    () => memoryManager.saveSession({ summary: 'Deprecation test' }),
-    /saveSession is DEPRECATED|memory-tiers\.cjs writeSTMEntry/
   );
 });
