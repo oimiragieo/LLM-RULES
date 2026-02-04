@@ -8,31 +8,21 @@
 
 'use strict';
 
+const { createLogger } = require('../utils/logger.cjs');
+const logger = createLogger('production-agent');
+
 process.env.WORKER_ENABLED = process.env.WORKER_ENABLED || '1';
 const { start, stop } = require('./worker-agent.cjs');
 
 // Start the worker loop
 start().catch(err => {
-  console.error(
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
-      level: 'fatal',
-      message: 'Failed to start production agent',
-      error: err.message,
-    })
-  );
+  logger.error('production_agent_start_failed', { error: err.message });
   process.exit(1);
 });
 
 // Graceful shutdown propagation
 const shutdown = async signal => {
-  console.log(
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
-      level: 'info',
-      message: `Received ${signal}, shutting down production agent...`,
-    })
-  );
+  logger.info('production_agent_shutdown', { signal });
 
   await stop();
   process.exit(0);

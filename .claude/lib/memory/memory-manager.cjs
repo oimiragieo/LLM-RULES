@@ -306,7 +306,11 @@ function loadMemoryArray(filePath) {
   try {
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     return Array.isArray(data) ? data : [];
-  } catch (_e) {
+  } catch (err) {
+    logger.warn('memory_json_parse_failed', {
+      file: filePath,
+      error: err?.message || String(err),
+    });
     return [];
   }
 }

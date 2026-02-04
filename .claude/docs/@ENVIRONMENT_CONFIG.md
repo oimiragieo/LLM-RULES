@@ -94,10 +94,11 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 
 ### Memory / Code Index Variables
 
-| Variable                                 | Values | Default    | Purpose                                     |
-| ---------------------------------------- | ------ | ---------- | ------------------------------------------- |
-| `LANCEDB_TABLE_CODE`                     | string | code_index | LanceDB table name for code indexing.       |
-| `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS` | number | 300000     | Rate limit for memory access tracking (ms). |
+| Variable                                 | Values | Default    | Purpose                                      |
+| ---------------------------------------- | ------ | ---------- | -------------------------------------------- |
+| `LANCEDB_TABLE_CODE`                     | string | code_index | LanceDB table name for code indexing.        |
+| `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS` | number | 300000     | Rate limit for memory access tracking (ms).  |
+| `MEMORY_HOOK_JSON_SYNC`                  | on/off | off        | Allow hook-driven JSON memory sync on edits. |
 
 ### Routing / Context Mode Variables
 

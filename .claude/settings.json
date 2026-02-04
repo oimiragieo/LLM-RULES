@@ -258,6 +258,15 @@
         ]
       },
       {
+        "matcher": "MemoryRecord",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/memory/sync-memory-index.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "Task|TaskUpdate|Bash",
         "hooks": [
           {

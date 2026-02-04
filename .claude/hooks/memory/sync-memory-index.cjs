@@ -11,7 +11,7 @@
  * - Canonical sync: this hook only. SyncLayer/SyncWorker have been moved to .claude/archive/lib/memory/.
  *
  * Trigger:
- * - PostToolUse matcher: Edit|Write|NotebookEdit (wired in .claude/settings.json)
+ * - PostToolUse matcher: Edit|Write|NotebookEdit, MemoryRecord (wired in .claude/settings.json)
  */
 
 'use strict';
@@ -34,10 +34,9 @@ const { EntityExtractor } = require('../../lib/memory/entity-extractor.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
-const CORE_MEMORY_MARKDOWN_FILES = new Set(['learnings.md', 'decisions.md', 'issues.md']);
+const CORE_MEMORY_MARKDOWN_FILES = new Set(['decisions.md', 'issues.md']);
 const CORE_MEMORY_JSON_FILES = new Set(['patterns.json', 'gotchas.json']);
 const EMBEDDING_MEMORY_FILES = new Set([
-  'learnings.md',
   'decisions.md',
   'issues.md',
   'patterns.json',
@@ -203,10 +202,46 @@ async function main() {
   let output = null;
   let toolName = null;
   let absPath = null;
+  const allowJsonHookSync = process.env.MEMORY_HOOK_JSON_SYNC === 'on';
   const hookInput = parseHookInputSync();
   if (!hookInput) process.exit(0);
 
   toolName = getToolName(hookInput);
+
+  if (toolName === 'MemoryRecord') {
+    const dbPath = path.join(PROJECT_ROOT, '.claude', 'data', 'memory.db');
+    ensureEntityDbInitialized(dbPath);
+    const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
+    for (const fileName of CORE_MEMORY_JSON_FILES) {
+      const targetPath = path.join(memoryDir, fileName);
+      if (!fs.existsSync(targetPath)) continue;
+      try {
+        syncJsonMemory(targetPath, dbPath);
+        maybeGenerateEmbeddingsForFile(targetPath);
+      } catch (err) {
+        debugLog('sync-memory-index', `Sync failed for ${fileName}`, err);
+      }
+    }
+
+    try {
+      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+        type: EventTypes.TOOL_COMPLETED,
+        timestamp: new Date().toISOString(),
+        toolName: 'sync-memory-index',
+        output: {
+          file: 'memory-record',
+          fileType: 'json',
+          toolName,
+        },
+        duration: Date.now() - startTime,
+      });
+    } catch (_e) {
+      // Best-effort
+    }
+
+    process.exit(0);
+  }
+
   const toolInput = getToolInput(hookInput);
   const filePath = extractFilePath(toolInput);
 
@@ -221,6 +256,15 @@ async function main() {
   absPath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
   const fileType = getCoreMemoryFileType(absPath);
   if (!fileType) process.exit(0);
+  if (fileType === 'json' && toolName !== 'MemoryRecord' && !allowJsonHookSync) {
+    if (process.env.DEBUG_HOOKS) {
+      console.warn(
+        '[sync-memory-index] Skipping JSON sync (use MemoryRecord or set MEMORY_HOOK_JSON_SYNC=on):',
+        path.basename(absPath)
+      );
+    }
+    process.exit(0);
+  }
 
   const dbPath = path.join(PROJECT_ROOT, '.claude', 'data', 'memory.db');
   ensureEntityDbInitialized(dbPath);

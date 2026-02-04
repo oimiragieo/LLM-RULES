@@ -43,8 +43,9 @@ These tools are built into Claude Code and work immediately:
 | **WebSearch**       | Research        | Search the web                              | ✅ All agents                  |
 | **WebFetch**        | Research        | Fetch webpage content                       | ✅ All agents                  |
 | **NotebookEdit**    | Jupyter         | Edit notebook cells                         | ✅ All agents                  |
+| **MemoryRecord**    | Memory          | Record structured memory entries            | ✅ All agents                  |
 
-**Total Core Tools:** 23
+**Total Core Tools:** 24
 
 ### Task Tool Signature
 
@@ -104,6 +105,7 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 - Research: WebSearch, WebFetch
 - Planning: EnterPlanMode, ExitPlanMode
 - Jupyter: NotebookEdit
+- Memory: MemoryRecord
 
 **Restricted (Special permissions):**
 
@@ -125,6 +127,7 @@ tools:
     Bash,
     Glob,
     Grep,
+    MemoryRecord,
     TaskUpdate,
     TaskList,
     TaskCreate,
@@ -147,6 +150,7 @@ tools: [
     Grep,
     Task, # MANDATORY for spawning subagents
     Orchestrator,
+    MemoryRecord,
     TaskUpdate,
     TaskList,
     TaskCreate,
@@ -201,6 +205,18 @@ const skills = SkillCatalog({ domain: 'testing', agentType: 'developer' });
 const best = skills.skills.find(s => s.recommended);
 Skill({ skill: best.name });
 ```
+
+### MemoryRecord Tool
+
+Record structured memory entries (patterns/gotchas) without manual JSON edits.
+
+**Signature:**
+`MemoryRecord({ type: 'pattern'|'gotcha', text: string, category?: string, area?: string })`
+
+**Notes:**
+
+- Backed by `.claude/tools/cli/memory-record.cjs`, which calls `memory-manager` record APIs.
+- Use this instead of editing `patterns.json` or `gotchas.json` directly.
 
 ### AvailableAgents Tool (Phase 3)
 
