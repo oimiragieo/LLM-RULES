@@ -14,7 +14,9 @@ function createCheckpointBox(type, content, actionPrompt) {
   const topBorder = `╔${'═'.repeat(CHECKPOINT_WIDTH)}╗`;
   const bottomBorder = `╚${'═'.repeat(CHECKPOINT_WIDTH)}╝`;
   const separator = '─'.repeat(CHECKPOINT_WIDTH);
-  const typeLine = `║  CHECKPOINT: ${String(type).padEnd(CHECKPOINT_WIDTH - 14)}║`;
+  // CHECKPOINT_WIDTH (62) - "║  CHECKPOINT: " (15) - "║" (1) = 46 chars for type + padding
+  const typePadding = CHECKPOINT_WIDTH - 15 - 1;
+  const typeLine = `║  CHECKPOINT: ${String(type).padEnd(typePadding)}║`;
 
   return `${topBorder}\n${typeLine}\n${bottomBorder}\n\n${content}\n\n${separator}\n→ ${actionPrompt}\n${separator}`;
 }
@@ -61,7 +63,9 @@ function createNextUpBlock(identifier, name, description, command, alternatives 
 function createErrorBox(errorDescription, resolutionSteps) {
   const topBorder = `╔${'═'.repeat(CHECKPOINT_WIDTH)}╗`;
   const bottomBorder = `╚${'═'.repeat(CHECKPOINT_WIDTH)}╝`;
-  const header = `║  ERROR${' '.repeat(CHECKPOINT_WIDTH - 7)}║`;
+  // CHECKPOINT_WIDTH (62) - "║  ERROR" (8) - "║" (1) = 53 chars for padding
+  const errorPadding = CHECKPOINT_WIDTH - 8 - 1;
+  const header = `║  ERROR${' '.repeat(errorPadding)}║`;
 
   return `${topBorder}\n${header}\n${bottomBorder}\n\n${errorDescription}\n\n**To fix:** ${resolutionSteps}`;
 }

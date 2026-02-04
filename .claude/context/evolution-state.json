@@ -318,8 +318,8 @@
   ],
   "suggestions": [
     {
-      "id": "sug-1770182715270",
-      "detectedAt": "2026-02-04T05:25:15.270Z",
+      "id": "sug-1770184623508",
+      "detectedAt": "2026-02-04T05:57:03.508Z",
       "triggers": [
         {
           "type": "explicit_creation",
@@ -330,8 +330,8 @@
       "status": "pending"
     },
     {
-      "id": "sug-1770182715286",
-      "detectedAt": "2026-02-04T05:25:15.286Z",
+      "id": "sug-1770184623520",
+      "detectedAt": "2026-02-04T05:57:03.520Z",
       "triggers": [
         {
           "type": "capability_need",
@@ -342,8 +342,8 @@
       "status": "pending"
     },
     {
-      "id": "sug-1770182715303",
-      "detectedAt": "2026-02-04T05:25:15.303Z",
+      "id": "sug-1770184623530",
+      "detectedAt": "2026-02-04T05:57:03.530Z",
       "triggers": [
         {
           "type": "gap_detection",
@@ -354,8 +354,8 @@
       "status": "pending"
     },
     {
-      "id": "sug-1770182715414",
-      "detectedAt": "2026-02-04T05:25:15.414Z",
+      "id": "sug-1770184623602",
+      "detectedAt": "2026-02-04T05:57:03.602Z",
       "triggers": [
         {
           "type": "explicit_evolution",
@@ -366,5 +366,5 @@
       "status": "pending"
     }
   ],
-  "lastUpdated": "2026-02-04T05:25:15.414Z"
+  "lastUpdated": "2026-02-04T05:57:03.602Z"
 }

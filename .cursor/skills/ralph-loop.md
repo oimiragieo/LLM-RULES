@@ -28,24 +28,29 @@ Run ralph-once to test one iteration first
 
 From the **project root** (where `.cursor/` lives):
 
-1. **Interactive setup (recommended)**  
+1. **Interactive setup (recommended)**
+
    ```bash
    .cursor/ralph-scripts/ralph-setup.sh
    ```
+
    Prompts for model, max iterations, branch, PR, and optional single-iteration test.
 
-2. **CLI (scripting/CI)**  
+2. **CLI (scripting/CI)**
+
    ```bash
    .cursor/ralph-scripts/ralph-loop.sh -n 30 -m opus-4.5-thinking -y
    ```
+
    Options: `-n` iterations, `-m` model, `--branch NAME`, `--pr`, `-y` skip confirm.
 
-3. **Single iteration (test before full loop)**  
+3. **Single iteration (test before full loop)**
+
    ```bash
    .cursor/ralph-scripts/ralph-once.sh
    ```
 
-4. **Initialize state and task template**  
+4. **Initialize state and task template**
    ```bash
    .cursor/ralph-scripts/init-ralph.sh
    ```
@@ -57,7 +62,7 @@ Create or edit `.cursor/RALPH_TASK.md`:
 ```markdown
 ---
 task: Short task description
-test_command: "pnpm test"
+test_command: 'pnpm test'
 ---
 
 # Task
@@ -75,17 +80,17 @@ What you want to accomplish.
 Any extra context (stack, constraints, etc.).
 ```
 
-The agent marks progress by changing `[ ]` to `[x]`. When all are `[x]` or the agent outputs ` COMPLETE `, the loop stops.
+The agent marks progress by changing `[ ]` to `[x]`. When all are `[x]` or the agent outputs `COMPLETE`, the loop stops.
 
 ## State and Logs
 
-| Path | Purpose |
-|------|--------|
-| `.cursor/RALPH_TASK.md` | Task and criteria (you and agent edit) |
-| `.cursor/.ralph/progress.md` | What’s done (agent updates) |
+| Path                           | Purpose                                  |
+| ------------------------------ | ---------------------------------------- |
+| `.cursor/RALPH_TASK.md`        | Task and criteria (you and agent edit)   |
+| `.cursor/.ralph/progress.md`   | What’s done (agent updates)              |
 | `.cursor/.ralph/guardrails.md` | Lessons from failures (agent adds Signs) |
-| `.cursor/.ralph/activity.log` | Tool call log and token usage |
-| `.cursor/.ralph/errors.log` | Failures and gutter detection |
+| `.cursor/.ralph/activity.log`  | Tool call log and token usage            |
+| `.cursor/.ralph/errors.log`    | Failures and gutter detection            |
 
 Monitor live: `tail -f .cursor/.ralph/activity.log`
 

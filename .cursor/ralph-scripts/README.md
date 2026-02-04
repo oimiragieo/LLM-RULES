@@ -16,12 +16,12 @@ Autonomous iteration loop for Cursor: run an agent on a task until completion or
 
 ## Scripts
 
-| Script | Purpose |
-|--------|--------|
+| Script           | Purpose                                                           |
+| ---------------- | ----------------------------------------------------------------- |
 | `ralph-setup.sh` | Interactive: model, iterations, branch, PR, single-iteration test |
-| `ralph-loop.sh` | CLI loop with flags (`-n`, `-m`, `--branch`, `--pr`, `-y`) |
-| `ralph-once.sh` | Single iteration then stop (test before full loop) |
-| `init-ralph.sh` | Create `.cursor/.ralph/` and `.cursor/RALPH_TASK.md` template |
+| `ralph-loop.sh`  | CLI loop with flags (`-n`, `-m`, `--branch`, `--pr`, `-y`)        |
+| `ralph-once.sh`  | Single iteration then stop (test before full loop)                |
+| `init-ralph.sh`  | Create `.cursor/.ralph/` and `.cursor/RALPH_TASK.md` template     |
 
 Run from **project root** (parent of `.cursor/`):
 
@@ -44,7 +44,7 @@ The stream parser emits:
 
 - **WARN** – token usage approaching limit (~70k); agent should wrap up
 - **ROTATE** – limit reached (~80k); start new iteration with fresh context
-- **COMPLETE** – agent output ` COMPLETE ` and/or all checkboxes `[x]`
+- **COMPLETE** – agent output `COMPLETE` and/or all checkboxes `[x]`
 - **GUTTER** – stuck (same command failed 3×, or file thrashing)
 - **DEFER** – rate limit/transient error; back off and retry
 

@@ -41,10 +41,7 @@ function buildContextBar(remainingPercentage) {
 }
 
 function getTodosDir() {
-  return (
-    process.env.STATUSLINE_TODOS_DIR ||
-    path.join(os.homedir(), '.claude', 'todos')
-  );
+  return process.env.STATUSLINE_TODOS_DIR || path.join(os.homedir(), '.claude', 'todos');
 }
 
 function getStateDir() {

@@ -13,13 +13,14 @@ Use for major workflow transitions.
 ```
 
 **Stage names (uppercase):**
+
 - `RESEARCHING`
 - `PLANNING`
 - `EXECUTING`
 - `VERIFYING`
 - `REFLECTING`
 - `PHASE COMPLETE ✓`
-- `MILESTONE COMPLETE `
+- `MILESTONE COMPLETE 🎉`
 
 ---
 
@@ -40,6 +41,7 @@ User action required. 62-character width.
 ```
 
 **Types:**
+
 - `CHECKPOINT: Verification Required` → `→ Type "approved" or describe issues`
 - `CHECKPOINT: Decision Required` → `→ Select: option-a / option-b`
 - `CHECKPOINT: Action Required` → `→ Type "done" when complete`
@@ -55,7 +57,7 @@ User action required. 62-character width.
 ○  Pending
 ⚡ Auto-approved
 ⚠  Warning
- Milestone complete (only in banner)
+🎉 Milestone complete (only in banner)
 ```
 
 ---
@@ -63,16 +65,19 @@ User action required. 62-character width.
 ## Progress Display
 
 **Phase/milestone level:**
+
 ```
 Progress: ████████░░ 80%
 ```
 
 **Task level:**
+
 ```
 Tasks: 2/4 complete
 ```
 
 **Plan level:**
+
 ```
 Plans: 3/5 complete
 ```
@@ -152,7 +157,7 @@ Always at end of major completions.
 - Varying box/banner widths
 - Mixing banner styles (`===`, `---`, `***`)
 - Skipping `AGENT-STUDIO ►` prefix in banners
-- Random emoji (``, `✨`, ``)
+- Random emoji (`🚀`, `✨`, `💫`)
 - Missing Next Up block after completions
 
 </ui_patterns>

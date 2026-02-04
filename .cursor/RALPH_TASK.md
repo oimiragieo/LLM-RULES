@@ -1,6 +1,6 @@
 ---
 task: Your task description here
-test_command: "pnpm test"
+test_command: 'pnpm test'
 ---
 
 # Task
