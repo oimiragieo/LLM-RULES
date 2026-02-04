@@ -20,7 +20,9 @@ test('insertContextModeSection inserts before next header after discovery sectio
 
   const output = insertContextModeSection(prompt, fragment);
   assert.ok(output.includes('## Context / Mode'));
-  assert.ok(output.indexOf('## Context / Mode') < output.indexOf('## Memory Context (Auto-Loaded)'));
+  assert.ok(
+    output.indexOf('## Context / Mode') < output.indexOf('## Memory Context (Auto-Loaded)')
+  );
 });
 
 test('insertContextModeSection does not duplicate fragment', () => {

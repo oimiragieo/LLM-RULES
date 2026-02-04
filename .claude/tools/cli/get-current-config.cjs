@@ -126,7 +126,9 @@ function runGetCurrentConfig(options = {}) {
 
   console.log('Current context: ' + (result.contextName || '(none)'));
   console.log('Context source: ' + result.contextSource);
-  console.log('Current modes: ' + (result.modeNames.length > 0 ? result.modeNames.join(', ') : '(none)'));
+  console.log(
+    'Current modes: ' + (result.modeNames.length > 0 ? result.modeNames.join(', ') : '(none)')
+  );
   console.log('Mode source: ' + result.modeSource);
   console.log('Active tools: ' + (result.activeTools.join(', ') || '(none)'));
   console.log('Inactive tools: ' + (result.inactiveTools.join(', ') || '(none)'));

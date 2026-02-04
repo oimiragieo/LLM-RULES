@@ -5,21 +5,9 @@ const path = require('path');
 const test = require('node:test');
 const assert = require('node:assert');
 
-const {
-  loadContext,
-  loadMode,
-  listContextNames,
-  listModeNames,
-} = require(path.join(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  '.claude',
-  'lib',
-  'config',
-  'context-mode-loader.cjs'
-));
+const { loadContext, loadMode, listContextNames, listModeNames } = require(
+  path.join(__dirname, '..', '..', '..', '.claude', 'lib', 'config', 'context-mode-loader.cjs')
+);
 
 const CONFIG_DIR = path.join(__dirname, '..', '..', '..', '.claude', 'config');
 

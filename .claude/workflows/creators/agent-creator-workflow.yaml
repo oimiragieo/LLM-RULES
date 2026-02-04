@@ -215,6 +215,11 @@ phases:
         handler: runPostCreationValidation
         description: Run validate-integration.cjs for the new agent
         command: node .claude/tools/cli/validate-integration.cjs .claude/agents/{{category}}/{{name}}.md
+      - id: update_agent_config
+        action: edit
+        handler: updateAgentConfig
+        description: Add the agent to agent-config.json with tools and thinking defaults
+        target: .claude/config/agent-config.json
 
     gates:
       - type: registration

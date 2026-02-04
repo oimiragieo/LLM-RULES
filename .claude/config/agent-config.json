@@ -1,0 +1,41 @@
+{
+  "$schema": "../schemas/agent-config.schema.json",
+  "version": "1.0.0",
+  "agents": {
+    "planner": {
+      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "WebFetch", "WebSearch"],
+      "thinkingDefault": "high",
+      "phase": "planning"
+    },
+    "developer": {
+      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "WebFetch", "WebSearch"],
+      "thinkingDefault": "none",
+      "phase": "coding"
+    },
+    "qa": {
+      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "WebFetch", "WebSearch"],
+      "thinkingDefault": "high",
+      "phase": "qa"
+    },
+    "code-reviewer": {
+      "tools": ["Read", "Glob", "Grep", "WebFetch", "WebSearch"],
+      "thinkingDefault": "high"
+    },
+    "architect": {
+      "tools": ["Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch"],
+      "thinkingDefault": "high",
+      "phase": "planning"
+    },
+    "researcher": {
+      "tools": ["Read", "Glob", "Grep", "WebFetch", "WebSearch"],
+      "thinkingDefault": "medium"
+    }
+  },
+  "thinkingBudgetMap": {
+    "none": null,
+    "low": 1024,
+    "medium": 4096,
+    "high": 16384,
+    "ultrathink": 63999
+  }
+}

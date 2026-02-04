@@ -55,7 +55,9 @@ function isValidToolName(toolName) {
 }
 
 function normalizeRole(role) {
-  return String(role || 'router').trim().toLowerCase();
+  return String(role || 'router')
+    .trim()
+    .toLowerCase();
 }
 
 function getRoleToolDefaults(role) {

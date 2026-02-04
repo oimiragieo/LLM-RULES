@@ -74,6 +74,7 @@ This ensures:
 - New agent appears in `agent-registry.json`
 - Capability card is generated
 - Health tracking is initialized
+- Add the agent to `.claude/config/agent-config.json` with tools and thinking defaults (spawn uses this as fallback)
 
 ### Skill Creator (Phase 2)
 

@@ -97,7 +97,7 @@ pnpm run context:reset --scope soft --force
 
 See `.claude/hooks/README.md` for detailed hook documentation.
 
-**Agent discovery:** Registry-first (`.claude/context/agent-registry.json`) with filesystem fallback if missing; CI enforces registry freshness.
+**Agent discovery:** Registry-first (`.claude/context/agent-registry.json`) with filesystem fallback if missing; CI enforces registry freshness. After adding an agent, update `.claude/config/agent-config.json` so spawn tool defaults are available even before registry-requiredTools exist.
 
 ### Pre-commit security lint (Git)
 

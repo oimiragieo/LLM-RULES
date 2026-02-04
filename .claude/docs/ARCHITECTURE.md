@@ -503,6 +503,8 @@ Auto-generated workflows from skill/agent creation:
 
 - `config.yaml`: High-level behavior (token limits, routing complexity).
 - `settings.json`: Low-level wiring for Hooks and MCP servers.
+- `config/agent-config.json`: Per-agent default tools/thinking (spawn fallback when registry lacks requiredTools).
+- `config/phase-models.json`: Phase → model/thinking mapping.
 
 ## Self-Evolution Architecture
 

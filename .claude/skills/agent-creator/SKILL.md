@@ -1092,6 +1092,27 @@ After the agent is created and validated, you MUST regenerate the agent registry
 - **Schema**: `.claude/schemas/agent-capability-card.schema.json`
 - **Routing**: `.claude/config/capability-routing.json` (capability-to-agent mapping)
 
+### Step 12: Update agent-config.json (REQUIRED FOR TOOL DEFAULTS)
+
+**Spawn tool enrichment uses agent-config.json as a fallback when registry requiredTools are missing.**
+
+After regenerating the agent registry, add an entry to:
+
+- **File:** `.claude/config/agent-config.json`
+- **Path:** `agents.<agent-name>`
+
+**Required fields:**
+
+- `tools`: array of tool names (match the agent’s frontmatter tools if present)
+- `thinkingDefault`: `none | low | medium | high | ultrathink`
+- `phase`: optional (`spec | planning | coding | qa`)
+
+**Verification:**
+
+```bash
+grep "\"<agent-name>\"" .claude/config/agent-config.json || echo "ERROR: agent-config.json NOT UPDATED!"
+```
+
 **Troubleshooting:**
 
 If agent doesn't appear in registry:
@@ -1109,6 +1130,8 @@ Agent Created
 Step 10: Validation (CLAUDE.md, routing-table.cjs)
     ↓
 Step 11: Registry Regeneration (Phase 3 Discovery)
+    ↓
+Step 12: Update agent-config.json (tool defaults)
     ↓
 Agent in agent-registry.json
     ↓

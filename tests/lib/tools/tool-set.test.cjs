@@ -4,20 +4,9 @@ const path = require('path');
 const test = require('node:test');
 const assert = require('node:assert');
 
-const {
-  ToolSet,
-  getManifest,
-  isCanEdit,
-} = require(path.join(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  '.claude',
-  'lib',
-  'tools',
-  'tool-set.cjs'
-));
+const { ToolSet, getManifest, isCanEdit } = require(
+  path.join(__dirname, '..', '..', '..', '.claude', 'lib', 'tools', 'tool-set.cjs')
+);
 
 test('ToolSet.default(router) excludes editing tools', () => {
   const toolSet = ToolSet.default('router');

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/phase-models",
+  "title": "Phase Models",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": { "type": "string" },
+    "phaseModels": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "phaseThinking": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

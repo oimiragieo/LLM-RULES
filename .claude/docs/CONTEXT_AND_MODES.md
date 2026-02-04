@@ -10,13 +10,12 @@ Context and modes define a layered system prompt and an allowed tool set. Contex
 
 ## Where Config Lives
 
-- Contexts: .claude/config/contexts/*.yml
-- Modes: .claude/config/modes/*.yml
+- Contexts: .claude/config/contexts/\*.yml
+- Modes: .claude/config/modes/\*.yml
 
 Each file defines:
 
-- 
-ame
+- ame
 - prompt
 - Optional xcluded_tools and included_optional_tools
 
@@ -35,14 +34,12 @@ If both runtime files exist, current-context.json is authoritative for both cont
 
 ## CLI Utilities
 
-- 
-ode .claude/tools/cli/get-current-config.cjs
+- ode .claude/tools/cli/get-current-config.cjs
   - Prints active context, active modes, active tools, and inactive tools.
-- 
-ode .claude/tools/cli/switch-modes.cjs planning
+- ode .claude/tools/cli/switch-modes.cjs planning
   - Writes .claude/context/runtime/current-modes.json with the provided mode list.
-  - To clear modes: 
-ode .claude/tools/cli/switch-modes.cjs
+  - To clear modes:
+    ode .claude/tools/cli/switch-modes.cjs
 
 ## Tool Restrictions
 
@@ -52,7 +49,7 @@ Tool restrictions are advisory unless a guard hook is enabled.
 
 ## Prompt Placement
 
-Context and mode prompts are injected into a single  Context / Mode section in the system prompt, after structured sections (skills, memory, task hints) and before any closing content.
+Context and mode prompts are injected into a single Context / Mode section in the system prompt, after structured sections (skills, memory, task hints) and before any closing content.
 
 ## Claude Code Note
 

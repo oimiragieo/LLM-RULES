@@ -44,24 +44,24 @@ These five decisions are **locked** for implementation. Any change requires a pl
 
 ## 2. Dependency and Existing Code Confirmation
 
-| Item | Status |
-|------|--------|
-| **js-yaml** | Present in `package.json` (`^4.1.1`) – use for context/mode YAML |
-| **Atomic write** | `.claude/lib/utils/atomic-write.cjs` – use `atomicWriteJSONSync` for `current-context.json` and `current-modes.json` |
-| **Tool manifest** | `.claude/config/tool-manifest.json` + generator – extend schema then regenerate |
-| **Spawn prompt** | `.claude/hooks/routing/spawn-prompt-assembler.cjs` – integrate prompt-factory and ToolSet output here |
+| Item              | Status                                                                                                               |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **js-yaml**       | Present in `package.json` (`^4.1.1`) – use for context/mode YAML                                                     |
+| **Atomic write**  | `.claude/lib/utils/atomic-write.cjs` – use `atomicWriteJSONSync` for `current-context.json` and `current-modes.json` |
+| **Tool manifest** | `.claude/config/tool-manifest.json` + generator – extend schema then regenerate                                      |
+| **Spawn prompt**  | `.claude/hooks/routing/spawn-prompt-assembler.cjs` – integrate prompt-factory and ToolSet output here                |
 
 ---
 
 ## 3. Risks and Mitigations (from Critique)
 
-| Risk | Mitigation |
-|------|------------|
-| Breaking prompt assembly | Single “Context / Mode” section; no free-form append; tests assert section presence and order |
-| Tool gating drift (ToolSet vs spawn vs host) | Document that context/mode restrictions are **advisory unless guard hook is enabled**; intersection policy and logging keep behavior traceable |
-| Schema/manifest mismatch | Regenerate tool-manifest immediately after schema/generator changes; add validation script and tests that assume new structure |
-| YAML parsing in hooks | Loaders **fail open**: on parse/schema error, fall back to defaults and log warning; never throw in hook path so tool routing is not broken |
-| Router default granting edit tools | ToolSet.default("router") must use manifest’s router availability only; fallback role for unknown is “router” with **no** edit tools (explicit allow-list from manifest) |
+| Risk                                         | Mitigation                                                                                                                                                               |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Breaking prompt assembly                     | Single “Context / Mode” section; no free-form append; tests assert section presence and order                                                                            |
+| Tool gating drift (ToolSet vs spawn vs host) | Document that context/mode restrictions are **advisory unless guard hook is enabled**; intersection policy and logging keep behavior traceable                           |
+| Schema/manifest mismatch                     | Regenerate tool-manifest immediately after schema/generator changes; add validation script and tests that assume new structure                                           |
+| YAML parsing in hooks                        | Loaders **fail open**: on parse/schema error, fall back to defaults and log warning; never throw in hook path so tool routing is not broken                              |
+| Router default granting edit tools           | ToolSet.default("router") must use manifest’s router availability only; fallback role for unknown is “router” with **no** edit tools (explicit allow-list from manifest) |
 
 ---
 
@@ -199,14 +199,14 @@ These five decisions are **locked** for implementation. Any change requires a pl
 
 ## 5. Testing Checklist (Summary)
 
-| Area | Tests |
-|------|--------|
-| ToolSet | default(router) vs default(developer); apply + fixed_tools; unknown tool warning; withoutEditingTools |
-| Context/mode loaders | Valid YAML load; invalid YAML fallback; list names; resolution order |
-| Prompt factory | Fragment content; activeToolNames with exclusion; read-only removes canEdit |
-| Spawn-prompt-assembler | allowed_tools intersection when context/mode; unchanged when not; “Context / Mode” section |
-| get_current_config / switch_modes | Config output; switch_modes valid/invalid; only current-modes.json written |
-| Named memory | read/write/delete/list; normalization; not found |
+| Area                              | Tests                                                                                                 |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| ToolSet                           | default(router) vs default(developer); apply + fixed_tools; unknown tool warning; withoutEditingTools |
+| Context/mode loaders              | Valid YAML load; invalid YAML fallback; list names; resolution order                                  |
+| Prompt factory                    | Fragment content; activeToolNames with exclusion; read-only removes canEdit                           |
+| Spawn-prompt-assembler            | allowed_tools intersection when context/mode; unchanged when not; “Context / Mode” section            |
+| get_current_config / switch_modes | Config output; switch_modes valid/invalid; only current-modes.json written                            |
+| Named memory                      | read/write/delete/list; normalization; not found                                                      |
 
 **Regression:** Update any routing or spawn-prompt tests that assert exact prompt text or allowed_tools.
 
@@ -242,4 +242,4 @@ Each step keeps regressions localized and depends on the previous being stable.
 
 ---
 
-*Plan version: 1.0. Post-critique. Ready for Phase 1 implementation once you confirm.*
+_Plan version: 1.0. Post-critique. Ready for Phase 1 implementation once you confirm._

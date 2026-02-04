@@ -53,20 +53,12 @@ function buildContextModePrompt(options = {}) {
       /\{\{\s*available_tools\s*\}\}/gi,
       activeToolNames.join(', ')
     );
-    fragmentBody = fragmentBody.replace(
-      /\{\{\s*context_system_prompt\s*\}\}/gi,
-      contextPrompt
-    );
-    fragmentBody = fragmentBody.replace(
-      /\{\{\s*mode_system_prompts\s*\}\}/gi,
-      modePrompts
-    );
+    fragmentBody = fragmentBody.replace(/\{\{\s*context_system_prompt\s*\}\}/gi, contextPrompt);
+    fragmentBody = fragmentBody.replace(/\{\{\s*mode_system_prompts\s*\}\}/gi, modePrompts);
   }
 
   const promptFragment = fragmentBody ? `## Context / Mode\n\n${fragmentBody}` : '';
-  const resolvedModeNames = modes
-    .map(mode => mode?.name)
-    .filter(Boolean);
+  const resolvedModeNames = modes.map(mode => mode?.name).filter(Boolean);
 
   return {
     promptFragment,

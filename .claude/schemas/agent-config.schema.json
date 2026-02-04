@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/agent-config",
+  "title": "Agent Config",
+  "description": "Per-agent default tools and thinking levels",
+  "type": "object",
+  "required": ["version", "agents"],
+  "properties": {
+    "version": { "type": "string" },
+    "agents": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "tools": { "type": "array", "items": { "type": "string" } },
+          "thinkingDefault": { "type": "string" },
+          "phase": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "thinkingBudgetMap": {
+      "type": "object",
+      "additionalProperties": { "oneOf": [{ "type": "integer" }, { "type": "null" }] }
+    }
+  },
+  "additionalProperties": false
+}

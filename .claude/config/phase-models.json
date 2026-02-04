@@ -1,0 +1,16 @@
+{
+  "$schema": "../schemas/phase-models.schema.json",
+  "version": "1.0.0",
+  "phaseModels": {
+    "spec": "sonnet",
+    "planning": "sonnet",
+    "coding": "sonnet",
+    "qa": "sonnet"
+  },
+  "phaseThinking": {
+    "spec": "medium",
+    "planning": "high",
+    "coding": "medium",
+    "qa": "high"
+  }
+}

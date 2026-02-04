@@ -40,6 +40,7 @@ const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 const { createHookLogger } = require('../../lib/utils/hook-logger.cjs');
 const { buildContextModePrompt } = require('../../lib/spawn/prompt-factory.cjs');
+const { getDefaultTools } = require('../../lib/agents/agent-config.cjs');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
@@ -143,11 +144,15 @@ function enrichAllowedTools(agentType, currentTools, prompt) {
 
   const agent = agents[resolvedType];
   const registryTools = agent?.capabilities?.[0]?.requiredTools;
-  if (!Array.isArray(registryTools) || registryTools.length === 0) {
-    return currentTools;
-  }
+  const toolsToUse =
+    Array.isArray(registryTools) && registryTools.length > 0
+      ? registryTools
+      : getDefaultTools(resolvedType);
 
-  const merged = new Set([...(Array.isArray(currentTools) ? currentTools : []), ...registryTools]);
+  const merged = new Set([
+    ...(Array.isArray(currentTools) ? currentTools : []),
+    ...(Array.isArray(toolsToUse) ? toolsToUse : []),
+  ]);
   const result = [...merged].slice(0, maxTools);
   return result;
 }

@@ -65,11 +65,7 @@ function main() {
     process.exit(0);
   }
 
-  const decision = evaluateToolGuard(
-    toolName,
-    contextMode.activeToolNames || [],
-    enforcementMode
-  );
+  const decision = evaluateToolGuard(toolName, contextMode.activeToolNames || [], enforcementMode);
 
   if (decision.action === 'block') {
     auditLog('context-mode-tool-guard', 'block', {

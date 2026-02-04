@@ -13,12 +13,7 @@ const {
 } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
 test('named memory CRUD and normalization', () => {
-  const testRoot = path.join(
-    PROJECT_ROOT,
-    '.claude',
-    'staging',
-    'named-memory-test-' + Date.now()
-  );
+  const testRoot = path.join(PROJECT_ROOT, '.claude', 'staging', 'named-memory-test-' + Date.now());
 
   try {
     const writeMessage = writeMemory('Project Setup', 'hello', testRoot);

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Agent config system: `.claude/config/agent-config.json` + schema + `lib/agents/agent-config.cjs`
+- Phase config system: `.claude/config/phase-models.json` + schema + `lib/config/phase-config.cjs`
+- QA criteria/report modules: `lib/qa/criteria.cjs`, `lib/qa/report.cjs`
+- Implementation plan helpers: `lib/plan/implementation-plan.cjs`, `lib/plan/progress.cjs`
+- QA bounded loop workflow: `.claude/workflows/operations/qa-bounded-loop.md`
+- Reference docs: `.claude/docs/AGENT_CONFIG_AND_QA_REFERENCE.md` and new lib READMEs
+
 ## [1.1.0] - 2026-01-25
 
 ### Added

@@ -5,19 +5,9 @@ const path = require('path');
 const test = require('node:test');
 const assert = require('node:assert');
 
-const {
-  getCurrentContextName,
-  getCurrentModeNames,
-} = require(path.join(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  '.claude',
-  'lib',
-  'config',
-  'resolve-runtime-context.cjs'
-));
+const { getCurrentContextName, getCurrentModeNames } = require(
+  path.join(__dirname, '..', '..', '..', '.claude', 'lib', 'config', 'resolve-runtime-context.cjs')
+);
 
 const RUNTIME_DIR = path.join(__dirname, '..', '..', '..', '.claude', 'context', 'runtime');
 const CURRENT_CONTEXT_PATH = path.join(RUNTIME_DIR, 'current-context.json');
@@ -43,11 +33,7 @@ test('resolve runtime context prefers current-context.json', () => {
     JSON.stringify({ context: 'file-context', modes: ['file-mode'] }, null, 2),
     'utf8'
   );
-  fs.writeFileSync(
-    CURRENT_MODES_PATH,
-    JSON.stringify({ modes: ['mode-file'] }, null, 2),
-    'utf8'
-  );
+  fs.writeFileSync(CURRENT_MODES_PATH, JSON.stringify({ modes: ['mode-file'] }, null, 2), 'utf8');
 
   try {
     assert.strictEqual(getCurrentContextName(), 'file-context');
@@ -80,11 +66,7 @@ test('resolve runtime modes uses current-modes.json when context modes absent', 
     JSON.stringify({ context: 'file-context' }, null, 2),
     'utf8'
   );
-  fs.writeFileSync(
-    CURRENT_MODES_PATH,
-    JSON.stringify({ modes: ['mode-file'] }, null, 2),
-    'utf8'
-  );
+  fs.writeFileSync(CURRENT_MODES_PATH, JSON.stringify({ modes: ['mode-file'] }, null, 2), 'utf8');
 
   try {
     assert.deepStrictEqual(getCurrentModeNames(), ['mode-file']);

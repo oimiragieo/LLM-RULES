@@ -16,9 +16,7 @@ function isPathLike(value) {
 function resolveConfigPath(baseDir, nameOrPath) {
   if (!nameOrPath) return null;
   if (isPathLike(nameOrPath)) {
-    return path.isAbsolute(nameOrPath)
-      ? nameOrPath
-      : path.resolve(PROJECT_ROOT, nameOrPath);
+    return path.isAbsolute(nameOrPath) ? nameOrPath : path.resolve(PROJECT_ROOT, nameOrPath);
   }
   const basePath = path.join(baseDir, nameOrPath);
   const ymlPath = `${basePath}.yml`;

@@ -16,6 +16,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { getDefaultTools } = require('../agents/agent-config.cjs');
 
 const AGENT_SKILL_MATRIX_PATH = path.join(
   PROJECT_ROOT,
@@ -732,7 +733,10 @@ class AgentRegistryGenerator {
     const { matrix, skillIndex } = loadAgentSkillMatrixAndSkillIndex();
 
     for (const [agentId, agentInfo] of agents) {
-      const toolsUnionFromSkills = getRequiredToolsUnionForAgent(agentId, matrix, skillIndex);
+      let toolsUnionFromSkills = getRequiredToolsUnionForAgent(agentId, matrix, skillIndex);
+      if (!Array.isArray(toolsUnionFromSkills) || toolsUnionFromSkills.length === 0) {
+        toolsUnionFromSkills = getDefaultTools(agentId);
+      }
       const card = generateCapabilityCard(
         agentInfo.definition,
         agentId,
