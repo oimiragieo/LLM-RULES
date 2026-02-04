@@ -244,6 +244,28 @@ PLANNER_FIRST_ENFORCEMENT=off claude
 | `warn`            | Exit 0, prints warning        | Development, debugging         |
 | `off`             | Disabled, advisory hooks only | Emergency override             |
 
+## Capability Routing Conditions
+
+`capability-routing.json` can include optional `routingConditions` to limit when a capability applies:
+
+- **minPromptLength**: Minimum prompt length required to apply the capability.
+- **requireAnyKeyword**: Array of keywords; prompt must contain at least one (case-insensitive).
+
+Example:
+
+```json
+"routingConditions": {
+  "documentation": {
+    "minPromptLength": 10,
+    "requireAnyKeyword": ["readme", "doc", "api docs"]
+  }
+}
+```
+
+These conditions are evaluated in `intent-classifier.cjs` via `evaluateRoutingCondition` and only affect capability selection; intent detection still runs as usual.
+
+**Intent feedback (optional):** `.claude/config/intent-feedback.json` is written by `recordIntentFeedback()` in `intent-classifier.cjs` when you record routing success/failure for tuning. It is optional, advisory only, and does not change blocking behavior.
+
 ## Enforcement Flow
 
 ```

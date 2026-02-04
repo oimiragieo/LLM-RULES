@@ -4,10 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 const { PROJECT_ROOT } = require('../../../.claude/lib/utils/project-root.cjs');
-const {
-  buildResetPlan,
-  normalizeScope,
-} = require('../../../.claude/lib/utils/context-reset.cjs');
+const { buildResetPlan, normalizeScope } = require('../../../.claude/lib/utils/context-reset.cjs');
 
 test('normalizeScope defaults to soft', () => {
   assert.equal(normalizeScope(''), 'soft');
@@ -33,12 +30,7 @@ test('buildResetPlan includes memory for memory scope', () => {
 test('buildResetPlan includes full system targets', () => {
   const plan = buildResetPlan('full');
   const codeIndexDir = path.join(PROJECT_ROOT, '.claude', 'context', 'code-index');
-  const routingPrototypes = path.join(
-    PROJECT_ROOT,
-    '.claude',
-    'config',
-    'routing-prototypes.json'
-  );
+  const routingPrototypes = path.join(PROJECT_ROOT, '.claude', 'config', 'routing-prototypes.json');
   assert.ok(plan.targets.some(t => t.path === codeIndexDir));
   assert.ok(plan.targets.some(t => t.path === routingPrototypes));
 });

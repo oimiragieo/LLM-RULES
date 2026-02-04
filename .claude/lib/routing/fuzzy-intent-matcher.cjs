@@ -1,6 +1,7 @@
 'use strict';
 
 const DEFAULT_THRESHOLD = 0.6;
+const DEFAULT_MAX_CANDIDATES = 5;
 
 function tokenize(text) {
   return String(text || '')
@@ -23,7 +24,9 @@ function jaccardSimilarity(aTokens, bTokens) {
 
 function fuzzyMatchIntent(prompt, intentKeywords, options = {}) {
   const threshold = options.threshold ?? DEFAULT_THRESHOLD;
-  const normalized = String(prompt || '').trim().toLowerCase();
+  const normalized = String(prompt || '')
+    .trim()
+    .toLowerCase();
   if (normalized.length < 2 || !intentKeywords || typeof intentKeywords !== 'object') {
     return null;
   }
@@ -49,4 +52,39 @@ function fuzzyMatchIntent(prompt, intentKeywords, options = {}) {
   return { intent: top.intent, confidence: top.confidence, method: 'fuzzy' };
 }
 
-module.exports = { fuzzyMatchIntent, jaccardSimilarity, tokenize };
+function fuzzyMatchIntentAlternatives(prompt, intentKeywords, options = {}) {
+  const threshold = options.threshold ?? DEFAULT_THRESHOLD;
+  const maxCandidates = options.maxCandidates ?? DEFAULT_MAX_CANDIDATES;
+  const normalized = String(prompt || '')
+    .trim()
+    .toLowerCase();
+  if (normalized.length < 2 || !intentKeywords || typeof intentKeywords !== 'object') {
+    return [];
+  }
+  const promptTokens = tokenize(normalized);
+  if (promptTokens.length === 0) return [];
+
+  const scores = [];
+  for (const [intent, keywords] of Object.entries(intentKeywords)) {
+    if (!Array.isArray(keywords)) continue;
+    let best = 0;
+    for (const kw of keywords) {
+      const kwTokens = tokenize(kw);
+      const score = jaccardSimilarity(promptTokens, kwTokens);
+      if (score > best) best = score;
+    }
+    if (best >= threshold) {
+      scores.push({ intent, confidence: best });
+    }
+  }
+  if (scores.length === 0) return [];
+  scores.sort((a, b) => b.confidence - a.confidence);
+  return scores.slice(0, Math.max(0, maxCandidates)).map(match => ({ ...match, method: 'fuzzy' }));
+}
+
+module.exports = {
+  fuzzyMatchIntent,
+  fuzzyMatchIntentAlternatives,
+  jaccardSimilarity,
+  tokenize,
+};

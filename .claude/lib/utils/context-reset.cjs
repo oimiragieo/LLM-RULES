@@ -7,7 +7,9 @@ const { PROJECT_ROOT } = require('./project-root.cjs');
 const SCOPES = new Set(['soft', 'memory', 'full']);
 
 function normalizeScope(scope) {
-  const normalized = String(scope || '').trim().toLowerCase();
+  const normalized = String(scope || '')
+    .trim()
+    .toLowerCase();
   return SCOPES.has(normalized) ? normalized : 'soft';
 }
 
@@ -25,12 +27,7 @@ function buildResetPlan(scope, options = {}) {
 
   const agentRegistry = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
   const agentCatalog = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-catalog.json');
-  const routingPrototypes = path.join(
-    PROJECT_ROOT,
-    '.claude',
-    'config',
-    'routing-prototypes.json'
-  );
+  const routingPrototypes = path.join(PROJECT_ROOT, '.claude', 'config', 'routing-prototypes.json');
 
   const evolutionState = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
   const selfHealingDir = path.join(PROJECT_ROOT, '.claude', 'context', 'self-healing');

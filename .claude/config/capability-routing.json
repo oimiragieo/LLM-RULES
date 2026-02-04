@@ -126,6 +126,7 @@
   "notes": {
     "usage": "Router uses this config to classify user requests into capabilities, then queries AvailableAgents({ capability: '...' }) to find best agent",
     "fallback": "If no agents found for capability, try domain-based lookup using domainFallbacks",
-    "priority": "Security and architecture take precedence when multiple capabilities apply"
+    "priority": "Security and architecture take precedence when multiple capabilities apply",
+    "routingConditions": "Optional. Per-capability rules: minPromptLength (number), requireAnyKeyword (string[]). See ROUTER_ENFORCEMENT.md."
   }
 }

@@ -120,6 +120,12 @@ skills:
   - debugging
   - security-architect
   # Add agent-specific skills
+capabilities:
+  - code-generation
+  - refactoring
+  - debugging
+optimizations:
+  - context-caching
 context_files:
   - .claude/context/memory/learnings.md
   - .claude/context/memory/decisions.md
@@ -138,6 +144,8 @@ context_files:
 - **extended_thinking**: Enable extended reasoning (opus only)
 - **tools**: Available tools for this agent
 - **skills**: Skills this agent invokes during execution
+- **capabilities**: Optional descriptive capabilities (used for display/future routing)
+- **optimizations**: Optional descriptive optimizations (purely informational)
 - **context_files**: Files loaded automatically into agent context
 
 ## Context Strategies

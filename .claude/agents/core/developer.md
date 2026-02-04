@@ -25,6 +25,12 @@ skills:
   - code-style-validator
   - chrome-browser
   - commit-validator
+capabilities:
+  - code-generation
+  - refactoring
+  - debugging
+optimizations:
+  - context-caching
 
 # Agent Identity
 identity:

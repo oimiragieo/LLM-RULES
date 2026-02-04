@@ -23,9 +23,7 @@ function parseArgs(argv) {
 }
 
 function formatTargets(targets) {
-  return targets
-    .map(target => '- ' + target.path + ' (' + target.type + ')')
-    .join('\n');
+  return targets.map(target => '- ' + target.path + ' (' + target.type + ')').join('\n');
 }
 
 function printUsage() {

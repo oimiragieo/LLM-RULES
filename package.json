@@ -96,6 +96,7 @@
     "memory:extract": "node .claude/tools/cli/memory-extract.cjs",
     "memory:dashboard:budget": "node .claude/tools/cli/memory-dashboard.cjs",
     "routing:prototypes": "node .claude/tools/cli/generate-routing-prototypes.cjs",
+    "routing:status": "node .claude/scripts/quick-status.cjs",
     "skills:index": "node .claude/tools/cli/generate-skill-index.cjs",
     "skills:validate": "node .claude/tools/cli/generate-skill-index.cjs --validate",
     "agents:registry": "node .claude/tools/cli/generate-agent-registry.cjs",

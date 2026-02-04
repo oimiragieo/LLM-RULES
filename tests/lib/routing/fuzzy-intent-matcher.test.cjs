@@ -4,6 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   fuzzyMatchIntent,
+  fuzzyMatchIntentAlternatives,
   jaccardSimilarity,
   tokenize,
 } = require('../../../.claude/lib/routing/fuzzy-intent-matcher.cjs');
@@ -49,12 +50,32 @@ test('fuzzyMatchIntent picks best intent', () => {
 });
 
 test('fuzzyMatchIntent returns valid result when maxCandidates is 0', () => {
-  const result = fuzzyMatchIntent('fix the bug', { developer: ['fix bug'] }, {
-    threshold: 0.4,
-    maxCandidates: 0,
-  });
+  const result = fuzzyMatchIntent(
+    'fix the bug',
+    { developer: ['fix bug'] },
+    {
+      threshold: 0.4,
+      maxCandidates: 0,
+    }
+  );
   assert.ok(result);
   assert.equal(result.intent, 'developer');
   assert.equal(typeof result.confidence, 'number');
   assert.equal(result.method, 'fuzzy');
+});
+
+test('fuzzyMatchIntentAlternatives returns ranked list', () => {
+  const result = fuzzyMatchIntentAlternatives(
+    'review the code',
+    {
+      developer: ['implement code'],
+      'code-reviewer': ['code review', 'review code'],
+      qa: ['run tests'],
+    },
+    { threshold: 0.2, maxCandidates: 2 }
+  );
+  assert.equal(Array.isArray(result), true);
+  assert.equal(result.length, 2);
+  assert.equal(result[0].intent, 'code-reviewer');
+  assert.equal(result[0].method, 'fuzzy');
 });

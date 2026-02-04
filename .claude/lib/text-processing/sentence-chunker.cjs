@@ -43,9 +43,7 @@ function chunkBySentences(text, options = {}) {
     const sentenceLen = sentence.content.length + (current.length ? 1 : 0);
     const nextLen = currentLen + sentenceLen;
     const currentContent = current.length ? current.join(' ') : '';
-    const nextContent = currentContent
-      ? `${currentContent} ${sentence.content}`
-      : sentence.content;
+    const nextContent = currentContent ? `${currentContent} ${sentence.content}` : sentence.content;
     const nextTokenCount = maxTokens ? estimateTokens(nextContent) : null;
 
     const exceedsChar = nextLen > maxCharBuffer && current.length > 0;

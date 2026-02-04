@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 const {
   ROUTING_TABLE,
   ROUTING_PREFIX_PATTERNS,
@@ -11,7 +12,7 @@ const {
   getPreferredAgent,
 } = require('./routing-table.cjs');
 const { resolveByPattern } = require('./pattern-router.cjs');
-const { fuzzyMatchIntent } = require('./fuzzy-intent-matcher.cjs');
+const { fuzzyMatchIntent, fuzzyMatchIntentAlternatives } = require('./fuzzy-intent-matcher.cjs');
 
 const CAPABILITY_ROUTING_PATH = path.join(
   PROJECT_ROOT,
@@ -19,6 +20,7 @@ const CAPABILITY_ROUTING_PATH = path.join(
   'config',
   'capability-routing.json'
 );
+const INTENT_FEEDBACK_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'intent-feedback.json');
 
 let capabilityRoutingCache = null;
 
@@ -109,7 +111,39 @@ function matchIntentFromPrefixPatterns(promptLower) {
   return null;
 }
 
-function classifyIntent(prompt) {
+function recordIntentFeedback(intentId, success, options = {}) {
+  const maxEntries = Number.isFinite(options.maxEntries) ? options.maxEntries : 500;
+  const feedbackPath = process.env.INTENT_FEEDBACK_PATH || INTENT_FEEDBACK_PATH;
+  let payload = { version: '1.0', entries: [] };
+  try {
+    if (fs.existsSync(feedbackPath)) {
+      const raw = fs.readFileSync(feedbackPath, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.entries)) {
+        payload = parsed;
+      }
+    }
+  } catch (_err) {
+    // Best effort - fall back to empty payload
+  }
+
+  const entries = Array.isArray(payload.entries) ? payload.entries : [];
+  entries.push({
+    intentId: String(intentId || ''),
+    success: Boolean(success),
+    timestamp: Date.now(),
+  });
+  const trimmed = entries.slice(-Math.max(0, maxEntries));
+  payload.entries = trimmed;
+
+  try {
+    atomicWriteJSONSync(feedbackPath, payload);
+  } catch (_err) {
+    // Best effort - do not throw on feedback writes
+  }
+}
+
+function classifyIntent(prompt, options = {}) {
   const normalizedPrompt = String(prompt || '').trim();
   if (normalizedPrompt.length < 2) {
     return {
@@ -118,6 +152,7 @@ function classifyIntent(prompt) {
       defaultAgent: null,
       confidence: 'low',
       source: 'none',
+      alternatives: [],
     };
   }
 
@@ -212,12 +247,30 @@ function classifyIntent(prompt) {
   const confidence =
     hasIntent && hasCapability ? 'high' : hasIntent || hasCapability ? 'medium' : 'low';
 
+  let alternatives = [];
+  if (options.includeAlternatives) {
+    const maxAlternatives = Number.isFinite(options.maxAlternatives) ? options.maxAlternatives : 3;
+    const fuzzyAlternatives = fuzzyMatchIntentAlternatives(promptLower, INTENT_KEYWORDS, {
+      threshold: 0.5,
+      maxCandidates: maxAlternatives + 5,
+    });
+    alternatives = fuzzyAlternatives
+      .filter(candidate => candidate.intent !== intent)
+      .slice(0, Math.max(0, maxAlternatives))
+      .map(candidate => ({
+        intent: candidate.intent,
+        confidence: candidate.confidence,
+        source: 'fuzzy',
+      }));
+  }
+
   return {
     intent,
     capability,
     defaultAgent,
     confidence,
     source,
+    alternatives,
   };
 }
 
@@ -225,4 +278,5 @@ module.exports = {
   classifyIntent,
   evaluateRoutingCondition,
   loadCapabilityRoutingForClassifier,
+  recordIntentFeedback,
 };

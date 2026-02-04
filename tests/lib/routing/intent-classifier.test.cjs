@@ -4,7 +4,10 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
-const { classifyIntent } = require('../../../.claude/lib/routing/intent-classifier.cjs');
+const {
+  classifyIntent,
+  recordIntentFeedback,
+} = require('../../../.claude/lib/routing/intent-classifier.cjs');
 
 describe('intent-classifier', () => {
   it('should detect architect intent and capability from intent keywords', () => {
@@ -25,5 +28,25 @@ describe('intent-classifier', () => {
     const result = classifyIntent('ok');
     assert.strictEqual(result.intent, 'general');
     assert.strictEqual(result.confidence, 'low');
+  });
+
+  it('should include alternatives when requested', () => {
+    const result = classifyIntent('review the code', {
+      includeAlternatives: true,
+      maxAlternatives: 2,
+    });
+    assert.ok(Array.isArray(result.alternatives));
+    assert.ok(result.alternatives.length <= 2);
+  });
+
+  it('should record intent feedback to a custom path', () => {
+    const tmpPath = require('path').join(__dirname, 'intent-feedback.test.json');
+    process.env.INTENT_FEEDBACK_PATH = tmpPath;
+    recordIntentFeedback('code-reviewer', true, { maxEntries: 10 });
+    const payload = JSON.parse(require('fs').readFileSync(tmpPath, 'utf8'));
+    assert.ok(Array.isArray(payload.entries));
+    assert.equal(payload.entries[payload.entries.length - 1].intentId, 'code-reviewer');
+    require('fs').unlinkSync(tmpPath);
+    delete process.env.INTENT_FEEDBACK_PATH;
   });
 });

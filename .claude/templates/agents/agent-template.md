@@ -20,6 +20,10 @@ skills:
   - debugging
   - verification-before-completion
   # Add domain-specific skills here
+# Optional: for routing/display (e.g. code-generation, refactoring, debugging)
+# capabilities: []
+# Optional: e.g. context-caching, token-reduction
+# optimizations: []
 context_files:
   - .claude/context/memory/learnings.md
 ---
