@@ -37,7 +37,7 @@ It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/li
 - Initialize schema: `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`).
 - Check memory health (JSON): `pnpm run memory:health` (or `node .claude/lib/memory/memory-manager.cjs health`).
 
-The entity index is populated by `sync-memory-index` from `learnings.md`, `decisions.md`, `issues.md`, and also `patterns.json` / `gotchas.json` when those JSON files are edited. Agent-visible patterns, gotchas, and decisions are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are now used in the spawn prompt pipeline: `spawn-prompt-assembler.cjs` can append an **Entity Graph (SQLite)** section by default (set `SPAWN_PROMPT_ENTITY_GRAPH=off` to disable). Extracted memories can also be linked to skill entities when SessionEnd provides `tools_used`, creating memory→skill relationships for later graph queries. The entity DB is created on first `pnpm run memory:init` or first sync when editing these files. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results.
+The entity index is populated by `sync-memory-index` from `decisions.md` and `issues.md`, and from `patterns.json` / `gotchas.json` when those JSON files are edited. `learnings.md` is a legacy archive and is **not** synced into the entity index. Agent-visible patterns, gotchas, and decisions are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are now used in the spawn prompt pipeline: `spawn-prompt-assembler.cjs` can append an **Entity Graph (SQLite)** section by default (set `SPAWN_PROMPT_ENTITY_GRAPH=off` to disable). Extracted memories can also be linked to skill entities when SessionEnd provides `tools_used`, creating memory→skill relationships for later graph queries. The entity DB is created on first `pnpm run memory:init` or first sync when editing these files. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results.
 
 ### Troubleshooting
 
@@ -61,7 +61,7 @@ The memory system is enforced/maintained via Claude Code hooks registered in `.c
   - `.claude/hooks/memory/memory-health-check.cjs` (full memory health check with tier monitoring + smart pruning + metrics)
 - `PostToolUse` (matcher `Edit|Write|NotebookEdit`)
   - `.claude/hooks/memory/format-memory.cjs` (formats/normalizes memory writes after edits/writes)
-  - `.claude/hooks/memory/sync-memory-index.cjs` (canonical sync path: syncs learnings/decisions/issues into the SQLite entity index).
+  - `.claude/hooks/memory/sync-memory-index.cjs` (canonical sync path: syncs decisions/issues plus patterns.json/gotchas.json into the SQLite entity index).
   - Note: `SyncLayer` and `BackgroundSyncWorker` have been moved to `.claude/archive/lib/memory/` and are no longer in the active codebase. Sync is done only by `sync-memory-index.cjs`.
 - `SessionEnd`
   - `.claude/hooks/reflection/unified-reflection-handler.cjs` (records session into STM/MTM, best-effort embeddings + maintenance, queues reflection)
@@ -81,7 +81,7 @@ An optional Step 0 guard runs on `PreToolUse(TaskList)` via `.claude/hooks/refle
 
 **Reflection is best-effort:** If the Router skips Step 0, pending reflections will not run. Check the dashboard (or health output) for `pendingReflectionRequests` to see if reflections are queued.
 
-**Reflection queue is processed only when SessionEnd fires.** The reflection-queue-processor reads `.claude/context/reflection-queue.jsonl` and writes `.claude/context/runtime/reflection-spawn-request.json`. In environments that do not emit SessionEnd, the queue is never drained and no reflection-reminder is written. To run reflection in such environments, run the reflection-queue-processor manually (e.g. `node .claude/hooks/reflection/reflection-queue-processor.cjs`) or trigger a synthetic SessionEnd.
+**Reflection queue is processed on SessionEnd by default.** The reflection-queue-processor reads `.claude/context/reflection-queue.jsonl` and writes `.claude/context/runtime/reflection-spawn-request.json`. In environments that do not emit SessionEnd, you can enable prompt-based processing by setting `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on`, which runs the processor on `UserPromptSubmit` with an interval guard (`REFLECTION_QUEUE_PROCESS_INTERVAL_MS`). To run reflection manually, execute `node .claude/hooks/reflection/reflection-queue-processor.cjs`.
 
 ### Hook chain error handling
 
@@ -418,6 +418,23 @@ node .claude/lib/memory/memory-manager.cjs record-discovery "src/auth.ts" "JWT a
 node .claude/lib/memory/memory-manager.cjs load
 ```
 
+### Named Memory (Read / Write / List / Delete)
+
+Named memories are stored as individual Markdown files under:
+
+```
+.claude/context/memory/named/<name>.md
+```
+
+The memory-manager API exposes helpers to manage these entries:
+
+- `readMemory(name)` — read a named memory (returns a not-found message if missing)
+- `writeMemory(name, content)` — write or overwrite a named memory
+- `listMemories()` — list existing named memory keys (without `.md`)
+- `deleteMemory(name)` — delete a named memory
+
+**Name normalization**: input names are normalized to safe filenames (spaces → `_`, invalid chars replaced).
+
 Loads all memory files and outputs as formatted markdown. This is the command agents use to read memory at the start of a session.
 
 **Output includes**:
@@ -481,26 +498,43 @@ Every agent MUST follow the Memory Protocol before starting work:
 Before starting any task, agents must read memory to understand context:
 
 ```bash
-cat .claude/context/memory/learnings.md
-```
-
-Or use the memory manager to load structured memory:
-
-```bash
 node .claude/lib/memory/memory-manager.cjs load
 ```
+
+Or read structured memory directly:
+
+```bash
+cat .claude/context/memory/patterns.json
+cat .claude/context/memory/gotchas.json
+cat .claude/context/memory/decisions.md
+cat .claude/context/memory/issues.md
+```
+
+> `learnings.md` is a legacy archive and should be treated as **read-only**.
 
 ### 2. Record Learnings (MANDATORY)
 
 During and after completing work, agents must record discoveries:
 
-**Record a gotcha**:
+**Record a gotcha** (preferred: MemoryRecord tool or CLI):
+
+```bash
+node .claude/tools/cli/memory-record.cjs gotcha "Always validate user input before database queries"
+```
+
+**Record a gotcha** (memory-manager fallback):
 
 ```bash
 node .claude/lib/memory/memory-manager.cjs record-gotcha "Always validate user input before database queries"
 ```
 
-**Record a pattern**:
+**Record a pattern** (preferred: MemoryRecord tool or CLI):
+
+```bash
+node .claude/tools/cli/memory-record.cjs pattern "Use Zod schemas for API validation"
+```
+
+**Record a pattern** (memory-manager fallback):
 
 ```bash
 node .claude/lib/memory/memory-manager.cjs record-pattern "Use Zod schemas for API validation"
@@ -868,8 +902,8 @@ Task({
   prompt: `You are DEVELOPER.
 
 ## Memory Protocol (MANDATORY)
-1. Read .claude/context/memory/learnings.md before starting
-2. Record learnings/issues/decisions during work
+1. Load memory via `node .claude/lib/memory/memory-manager.cjs load`
+2. Record patterns/gotchas/decisions during work (MemoryRecord preferred)
 3. Assume interruption - persist context immediately
 
 ## Task

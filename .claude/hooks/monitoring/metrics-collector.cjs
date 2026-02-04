@@ -45,11 +45,13 @@ const _crypto = require('crypto');
 
 const { createLogger } = require('../../lib/utils/logger.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
 const logger = createLogger('metrics-collector');
 
 // Metrics file location
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const HOOKS_METRICS_FILE = path.join(METRICS_DIR, 'hook-metrics.jsonl');
+const HOOK_METRICS_MAX_LINES = Number(process.env.HOOK_METRICS_MAX_LINES || 2000);
 
 // Rate limiting: 10000 metrics per hour (reasonable for hook execution)
 const RATE_LIMIT_PER_HOUR = 10000;
@@ -134,9 +136,7 @@ function logMetric(metric) {
     // Ensure directory exists
     ensureMetricsDir();
 
-    // Append to log file
-    const line = JSON.stringify(metric) + '\n';
-    fs.appendFileSync(HOOKS_METRICS_FILE, line, 'utf8');
+    appendJsonl(HOOKS_METRICS_FILE, metric, { maxLines: HOOK_METRICS_MAX_LINES });
   } catch (error) {
     // Log error but don't throw (monitoring shouldn't break the system)
     const err = /** @type {Error} */ (error);

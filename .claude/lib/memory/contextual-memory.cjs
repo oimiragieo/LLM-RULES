@@ -139,6 +139,7 @@ class ContextualMemory {
     this.vectorStore = null; // Lazy initialization
     this.entityQuery = undefined; // Lazy initialization
     this._mockModeWarned = false;
+    this._semanticFallbackWarned = false;
   }
 
   /**
@@ -536,6 +537,12 @@ class ContextualMemory {
       this._logLancedbEvent('semantic_fallback', {
         message: error?.message || String(error),
       });
+      if (!this._semanticFallbackWarned) {
+        logger.warn('Semantic search unavailable; falling back to keyword search', {
+          error: error?.message || String(error),
+        });
+        this._semanticFallbackWarned = true;
+      }
       // Fallback: lightweight keyword search over key memory artifacts.
       return await this._keywordSearch(query, { limit });
     }

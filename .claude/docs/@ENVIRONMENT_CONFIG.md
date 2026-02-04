@@ -65,12 +65,18 @@ All environment-specific settings are managed through the `.env` file located at
 
 ### Observability Variables
 
-| Variable                   | Values                | Default | Purpose                                                                            |
-| -------------------------- | --------------------- | ------- | ---------------------------------------------------------------------------------- |
-| `EVENT_BUS_SINK`           | on/off                | on      | Enable event bus sink; writes events to `.claude/context/runtime/event-bus.jsonl`. |
-| `LOG_LEVEL`                | debug/info/warn/error | info    | Structured logger level for hooks and runtime components.                          |
-| `DEBUG_HOOKS`              | true/false            | false   | Emit hook debugLog output for troubleshooting.                                     |
-| `SCHEDULER_TICK_ON_PROMPT` | on/off                | off     | Run scheduler tick on UserPromptSubmit (best-effort).                              |
+| Variable                           | Values                | Default | Purpose                                                                            |
+| ---------------------------------- | --------------------- | ------- | ---------------------------------------------------------------------------------- |
+| `EVENT_BUS_SINK`                   | on/off                | on      | Enable event bus sink; writes events to `.claude/context/runtime/event-bus.jsonl`. |
+| `EVENT_BUS_MAX_LINES`              | number                | 2000    | Max lines to keep in event-bus.jsonl (rotation).                                   |
+| `LOG_LEVEL`                        | debug/info/warn/error | info    | Structured logger level for hooks and runtime components.                          |
+| `DEBUG_HOOKS`                      | true/false            | false   | Emit hook debugLog output for troubleshooting.                                     |
+| `SCHEDULER_TICK_ON_PROMPT`         | on/off                | off     | Run scheduler tick on UserPromptSubmit (best-effort).                              |
+| `HOOK_METRICS_MAX_LINES`           | number                | 2000    | Max lines to keep in hook-metrics.jsonl (rotation).                                |
+| `ERROR_METRICS_MAX_LINES`          | number                | 2000    | Max lines to keep in error-metrics.jsonl (rotation).                               |
+| `EXECUTION_LIMIT_EVENTS_MAX_LINES` | number                | 2000    | Max lines to keep in execution-limit-events.jsonl (rotation).                      |
+| `USER_PROMPT_RESULTS_MAX_LINES`    | number                | 2000    | Max lines to keep in user-prompt-results.jsonl (rotation).                         |
+| `ANOMALY_LOG_MAX_LINES`            | number                | 2000    | Max lines to keep in anomaly-log.jsonl (rotation).                                 |
 
 When enabled, all events (e.g. TOOL_COMPLETED, TOOL_FAILED, TOOL_BLOCKED) are appended as one JSON object per line to `.claude/context/runtime/event-bus.jsonl`. Set to `off` to disable the sink.
 For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY.md`.
@@ -99,6 +105,15 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 | `LANCEDB_TABLE_CODE`                     | string | code_index | LanceDB table name for code indexing.        |
 | `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS` | number | 300000     | Rate limit for memory access tracking (ms).  |
 | `MEMORY_HOOK_JSON_SYNC`                  | on/off | off        | Allow hook-driven JSON memory sync on edits. |
+
+### Reflection Queue Variables
+
+| Variable                               | Values | Default | Purpose                                                 |
+| -------------------------------------- | ------ | ------- | ------------------------------------------------------- |
+| `REFLECTION_QUEUE_PROCESS_ON_PROMPT`   | on/off | off     | Process reflection-queue.jsonl during UserPromptSubmit. |
+| `REFLECTION_QUEUE_PROCESS_INTERVAL_MS` | number | 600000  | Minimum interval between queue processing runs (ms).    |
+| `REFLECTION_QUEUE_PROCESS_TIMEOUT_MS`  | number | 60000   | Timeout for queue processing (ms).                      |
+| `REFLECTION_QUEUE_MAX_LINES`           | number | 5000    | Max lines to keep in reflection-queue.jsonl (rotation). |
 
 ### Routing / Context Mode Variables
 

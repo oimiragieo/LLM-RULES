@@ -4,10 +4,12 @@ const fs = require('fs');
 const path = require('path');
 const { EventTypes } = require('./event-types.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { appendJsonl } = require('../utils/jsonl-utils.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const EVENTS_PATH = path.join(RUNTIME_DIR, 'event-bus.jsonl');
 const ENABLED = process.env.EVENT_BUS_SINK !== 'off';
+const EVENT_BUS_MAX_LINES = Number(process.env.EVENT_BUS_MAX_LINES || 2000);
 
 function ensureRuntimeDir() {
   if (!fs.existsSync(RUNTIME_DIR)) {
@@ -18,7 +20,7 @@ function ensureRuntimeDir() {
 function appendEvent(event) {
   try {
     ensureRuntimeDir();
-    fs.appendFileSync(EVENTS_PATH, JSON.stringify(event) + '\n', 'utf8');
+    appendJsonl(EVENTS_PATH, event, { maxLines: EVENT_BUS_MAX_LINES });
   } catch (_err) {
     // Best-effort; never throw from sink.
   }

@@ -42,6 +42,7 @@ const CORE_TOOLS = [
   'TaskCreate',
   'TaskGet',
   'Skill',
+  'MemoryRecord',
   'AskUserQuestion',
   'NotebookEdit',
   'WebSearch',

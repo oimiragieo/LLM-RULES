@@ -36,6 +36,7 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 // PERF-006/PERF-007: Use shared utilities instead of duplicated code
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
 const {
   parseHookInputAsync,
   getToolName,
@@ -57,6 +58,7 @@ let ANOMALY_LOG = path.join(
   'self-healing',
   'anomaly-log.jsonl'
 );
+const ANOMALY_LOG_MAX_LINES = Number(process.env.ANOMALY_LOG_MAX_LINES || 2000);
 
 // History limits
 const MAX_TOKEN_HISTORY = 100;
@@ -357,7 +359,7 @@ function logAnomaly(anomaly) {
       timestamp: new Date().toISOString(),
     };
 
-    fs.appendFileSync(ANOMALY_LOG, JSON.stringify(entry) + '\n');
+    appendJsonl(ANOMALY_LOG, entry, { maxLines: ANOMALY_LOG_MAX_LINES });
 
     if (process.env.DEBUG_HOOKS) {
       console.log('[anomaly-detector] Logged anomaly:', anomaly.type);

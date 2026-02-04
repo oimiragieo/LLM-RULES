@@ -29,6 +29,7 @@ const fs = require('fs');
 const path = require('path');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
 const {
   parseHookInputSync,
   getToolName,
@@ -50,6 +51,9 @@ const STATE_FILE = path.join(
 );
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const EVENTS_FILE = path.join(METRICS_DIR, 'execution-limit-events.jsonl');
+const EXECUTION_LIMIT_EVENTS_MAX_LINES = Number(
+  process.env.EXECUTION_LIMIT_EVENTS_MAX_LINES || 2000
+);
 
 const LOCK_SUFFIX = '.lock';
 const MAX_LOCK_WAIT_MS = 2000;
@@ -180,7 +184,7 @@ function writeState(state) {
 function appendEvent(event) {
   try {
     ensureDir(METRICS_DIR);
-    fs.appendFileSync(EVENTS_FILE, JSON.stringify(event) + '\n', 'utf8');
+    appendJsonl(EVENTS_FILE, event, { maxLines: EXECUTION_LIMIT_EVENTS_MAX_LINES });
   } catch {
     // best effort
   }

@@ -16,10 +16,12 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
 
 // Metrics file location
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const ERROR_METRICS_FILE = path.join(METRICS_DIR, 'error-metrics.jsonl');
+const ERROR_METRICS_MAX_LINES = Number(process.env.ERROR_METRICS_MAX_LINES || 2000);
 
 // Rate limiting
 const RATE_LIMIT_PER_HOUR = 5000;
@@ -113,8 +115,7 @@ function logError(errorEntry) {
 
     ensureMetricsDir();
 
-    const line = JSON.stringify(errorEntry) + '\n';
-    fs.appendFileSync(ERROR_METRICS_FILE, line, 'utf8');
+    appendJsonl(ERROR_METRICS_FILE, errorEntry, { maxLines: ERROR_METRICS_MAX_LINES });
   } catch (err) {
     console.error('[error-tracker] Failed to log error:', err.message);
   }

@@ -25,6 +25,8 @@ const { spawnSync } = require('child_process');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { parseHookInputSync } = require('../../lib/utils/hook-input.cjs');
 const { loadConfig } = require('../../lib/utils/config-loader.cjs');
+const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
+const { createLogger } = require('../../lib/utils/logger.cjs');
 const { ROUTING_TABLE, getPreferredAgent } = require('../../lib/routing/routing-table.cjs');
 const { classifyIntent } = require('../../lib/routing/intent-classifier.cjs');
 const { getAgentForCapability } = require('../../lib/routing/agent-registry-resolver.cjs');
@@ -42,12 +44,13 @@ try {
   memoryTiers = null;
 }
 if (!memoryTiers) {
-  console.warn('[user-prompt-unified] memory-tiers not loaded; STM write skipped.');
+  logger.warn('memory-tiers not loaded; STM write skipped.');
 }
 const { getCachedState, invalidateCache } = require('../../lib/utils/state-cache.cjs');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
+const logger = createLogger('user-prompt-unified');
 
 // Import router state module
 const routerState = require('./router-state.cjs');
@@ -70,6 +73,7 @@ const AUTO_COMPRESSION_STATE_PATH = path.join(
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const USER_PROMPT_RESULTS_PATH = path.join(RUNTIME_DIR, 'user-prompt-results.jsonl');
 const USER_PROMPT_RESULTS_LOG_ENABLED = process.env.USER_PROMPT_RESULTS_LOG !== 'off';
+const USER_PROMPT_RESULTS_MAX_LINES = Number(process.env.USER_PROMPT_RESULTS_MAX_LINES || 2000);
 // Agent cache (shared across calls within same process)
 let agentCache = null;
 let agentCacheTime = 0;
@@ -680,7 +684,7 @@ function recordUserPromptResult(result) {
           }
         : undefined,
     };
-    fs.appendFileSync(USER_PROMPT_RESULTS_PATH, JSON.stringify(entry) + '\n', 'utf8');
+    appendJsonl(USER_PROMPT_RESULTS_PATH, entry, { maxLines: USER_PROMPT_RESULTS_MAX_LINES });
   } catch (_err) {
     // Best-effort; never block hook execution.
   }
@@ -1186,6 +1190,7 @@ function checkMemoryHealth(hookInput, projectRoot = PROJECT_ROOT) {
  * @param {string} projectRoot - Project root path
  * @returns {Object} Combined results from all checks
  */
+// eslint-disable-next-line complexity
 async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
   const input = hookInput || {};
 
@@ -1211,9 +1216,7 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
       );
     }
   } catch (_e) {
-    if (process.env.DEBUG_HOOKS || process.env.MEMORY_DEBUG) {
-      console.warn('[user-prompt-unified] STM write failed:', _e.message);
-    }
+    logger.warn('STM write failed', { error: _e.message });
     try {
       eventBus.emit(EventTypes.TOOL_FAILED, {
         type: EventTypes.TOOL_FAILED,
@@ -1265,6 +1268,51 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     } else if (fs.existsSync(reminderPath)) {
       // Clean up stale reminder if request file is missing
       fs.unlinkSync(reminderPath);
+    }
+  } catch (_e) {
+    // best-effort; ignore
+  }
+
+  // Headless-safe reflection queue processing (optional, rate-limited).
+  try {
+    const enabled =
+      String(process.env.REFLECTION_QUEUE_PROCESS_ON_PROMPT || '').toLowerCase() === 'on' ||
+      String(process.env.REFLECTION_QUEUE_PROCESS_ON_PROMPT || '').toLowerCase() === 'true';
+    if (enabled) {
+      const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+      const lastRunPath = path.join(runtimeDir, 'reflection-queue-processor-last.txt');
+      const intervalMs = Number(process.env.REFLECTION_QUEUE_PROCESS_INTERVAL_MS || 10 * 60 * 1000);
+      const timeoutMs = Number(process.env.REFLECTION_QUEUE_PROCESS_TIMEOUT_MS || 60000);
+      let lastRun = 0;
+      if (fs.existsSync(lastRunPath)) {
+        const raw = Number(fs.readFileSync(lastRunPath, 'utf8'));
+        if (Number.isFinite(raw)) lastRun = raw;
+      }
+      if (!lastRun || Date.now() - lastRun >= intervalMs) {
+        if (!fs.existsSync(runtimeDir)) {
+          fs.mkdirSync(runtimeDir, { recursive: true });
+        }
+        const processorPath = path.join(
+          PROJECT_ROOT,
+          '.claude',
+          'hooks',
+          'reflection',
+          'reflection-queue-processor.cjs'
+        );
+        if (fs.existsSync(processorPath)) {
+          const result = spawnSync(process.execPath, [processorPath], {
+            cwd: PROJECT_ROOT,
+            stdio: 'ignore',
+            timeout: timeoutMs,
+          });
+          fs.writeFileSync(lastRunPath, String(Date.now()), 'utf8');
+          if (result.status !== 0 && process.env.DEBUG_HOOKS) {
+            console.warn(
+              `[user-prompt-unified] reflection-queue-processor exited ${result.status}`
+            );
+          }
+        }
+      }
     }
   } catch (_e) {
     // best-effort; ignore

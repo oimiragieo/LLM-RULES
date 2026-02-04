@@ -36,6 +36,7 @@ const path = require('path');
 
 // PERF-006/PERF-007: Use shared utilities instead of duplicated code
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
 const {
   parseHookInputAsync,
   getToolName,
@@ -68,6 +69,7 @@ try {
 
 // Configuration
 let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue.jsonl');
+const REFLECTION_QUEUE_MAX_LINES = Number(process.env.REFLECTION_QUEUE_MAX_LINES || 5000);
 
 // Session end event types
 const SESSION_END_EVENTS = ['Stop', 'SessionEnd'];
@@ -686,8 +688,7 @@ function queueReflection(entry, queueFile = QUEUE_FILE) {
       fs.mkdirSync(queueDir, { recursive: true });
     }
 
-    // Append entry as JSON line
-    fs.appendFileSync(queueFile, JSON.stringify(entry) + '\n');
+    appendJsonl(queueFile, entry, { maxLines: REFLECTION_QUEUE_MAX_LINES });
 
     // Log in warn mode
     const mode = process.env.REFLECTION_HOOK_MODE || 'block';

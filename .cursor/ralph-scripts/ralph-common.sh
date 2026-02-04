@@ -10,6 +10,11 @@
 
 _RALPH_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Windows: ensure cursor-agent is on PATH when running from Git Bash (agent installs to LOCALAPPDATA)
+if [[ -n "$LOCALAPPDATA" ]] && [[ -d "$LOCALAPPDATA/cursor-agent" ]]; then
+  export PATH="$LOCALAPPDATA/cursor-agent:$PATH"
+fi
+
 # Token thresholds
 WARN_THRESHOLD="${WARN_THRESHOLD:-70000}"
 ROTATE_THRESHOLD="${ROTATE_THRESHOLD:-80000}"
@@ -20,6 +25,17 @@ MODEL="${RALPH_MODEL:-$DEFAULT_MODEL}"
 USE_BRANCH="${USE_BRANCH:-}"
 OPEN_PR="${OPEN_PR:-false}"
 SKIP_CONFIRM="${SKIP_CONFIRM:-false}"
+
+# Agent CLI: cursor-agent (Unix) or agent (Windows native) or full path to .cmd on Windows
+if command -v cursor-agent &> /dev/null; then
+  AGENT_CMD="cursor-agent"
+elif command -v agent &> /dev/null; then
+  AGENT_CMD="agent"
+elif [[ -n "$LOCALAPPDATA" ]] && [[ -f "$LOCALAPPDATA/cursor-agent/cursor-agent.cmd" ]]; then
+  AGENT_CMD="$LOCALAPPDATA/cursor-agent/cursor-agent.cmd"
+else
+  AGENT_CMD=""
+fi
 
 # Cursor layout: task and state live under .cursor/
 get_ralph_dir() {
@@ -303,8 +319,9 @@ EOF
 run_cursor_agent() {
   local prompt="$1"
   local model="${2:-$MODEL}"
-  if command -v cursor-agent &> /dev/null; then
-    cursor-agent -p --force --output-format stream-json --model "$model" "$prompt"
+  local cmd="${AGENT_CMD:-cursor-agent}"
+  if [[ -n "$cmd" ]]; then
+    $cmd -p --force --output-format stream-json --model "$model" "$prompt"
   elif [[ -n "$WSL_DISTRO_NAME" ]] || grep -qi microsoft /proc/version 2>/dev/null; then
     cursor-agent -p --force --output-format stream-json --model "$model" "$prompt"
   else
@@ -365,7 +382,7 @@ run_iteration() {
 
   log_progress "$workspace" "**Session $iteration started** (model: $MODEL)"
 
-  local cmd="cursor-agent -p --force --output-format stream-json --model $MODEL"
+  local cmd="${AGENT_CMD:-cursor-agent} -p --force --output-format stream-json --model $MODEL"
   [[ -n "$session_id" ]] && cmd="$cmd --resume=\"$session_id\""
 
   cd "$workspace" || return 1
@@ -531,10 +548,17 @@ check_prerequisites() {
     return 1
   fi
 
-  if ! command -v cursor-agent &> /dev/null; then
-    echo "❌ cursor-agent CLI not found"
+  if [[ -z "$AGENT_CMD" ]]; then
+    if command -v cursor-agent &> /dev/null; then
+      AGENT_CMD="cursor-agent"
+    elif command -v agent &> /dev/null; then
+      AGENT_CMD="agent"
+    fi
+  fi
+  if [[ -z "$AGENT_CMD" ]]; then
+    echo "❌ cursor-agent / agent CLI not found"
     echo "Install: curl https://cursor.com/install -fsS | bash"
-    echo "On Windows you may need to run from WSL."
+    echo "Windows: irm 'https://cursor.com/install?win32=true' | iex"
     return 1
   fi
 
