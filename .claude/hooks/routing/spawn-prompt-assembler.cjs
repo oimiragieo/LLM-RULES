@@ -39,6 +39,7 @@ const {
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 const { createHookLogger } = require('../../lib/utils/hook-logger.cjs');
+const { buildContextModePrompt } = require('../../lib/spawn/prompt-factory.cjs');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
@@ -257,6 +258,23 @@ function appendEntityGraph(prompt, data) {
   return prompt + `\n\n${section}\n`;
 }
 
+function insertContextModeSection(prompt, fragment) {
+  if (!fragment || typeof fragment !== 'string') return prompt;
+  if (prompt.includes('## Context / Mode')) return prompt;
+
+  const marker = '## SKILL DISCOVERY PROTOCOL';
+  const markerIdx = prompt.indexOf(marker);
+  if (markerIdx !== -1) {
+    const nextHeaderIdx = prompt.indexOf('\n## ', markerIdx + marker.length);
+    if (nextHeaderIdx !== -1) {
+      return prompt.slice(0, nextHeaderIdx) + `\n\n${fragment}\n` + prompt.slice(nextHeaderIdx);
+    }
+    return prompt + `\n\n${fragment}\n`;
+  }
+
+  return prompt + `\n\n${fragment}\n`;
+}
+
 async function runIntentAnalysis({ memoryManager, query, threshold, projectRoot }) {
   const { analyzeIntent } = require('../../lib/memory/intent-analyzer.cjs');
   const context = await memoryManager.loadMemoryForContextAsync(projectRoot);
@@ -375,7 +393,21 @@ async function main() {
 
     const agentType = toolInput.subagent_type || toolInput.agent_type || 'developer';
     const rawAllowedTools = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
-    const allowedTools = enrichAllowedTools(agentType, rawAllowedTools, basePrompt);
+    const enrichedTools = enrichAllowedTools(agentType, rawAllowedTools, basePrompt);
+    const contextMode = buildContextModePrompt({ role: agentType });
+    let allowedTools = enrichedTools;
+    if (contextMode.hasContextOrMode) {
+      const activeSet = new Set(contextMode.activeToolNames);
+      const removed = enrichedTools.filter(toolName => !activeSet.has(toolName));
+      allowedTools = enrichedTools.filter(toolName => activeSet.has(toolName));
+      if (removed.length > 0) {
+        debugLog('spawn-prompt-assembler', 'Context/mode removed tools', {
+          removed,
+          context: contextMode.contextName,
+          modes: contextMode.modeNames,
+        });
+      }
+    }
 
     let assembled = promptAssembler.assembleSpawnPrompt({
       agentType,
@@ -383,6 +415,10 @@ async function main() {
       basePrompt,
       includeMemory: true,
     });
+
+    if (contextMode.hasContextOrMode && contextMode.promptFragment) {
+      assembled = insertContextModeSection(assembled, contextMode.promptFragment);
+    }
 
     // Optional Phase 4 enhancement: intent-based query planning.
     // Enable with MEMORY_INTENT_ANALYSIS=1|on.
@@ -528,6 +564,7 @@ module.exports = {
   looksAssembled,
   appendSemanticMatches,
   appendEntityGraph,
+  insertContextModeSection,
   enrichAllowedTools,
   inferAgentFromPrompt,
   main,

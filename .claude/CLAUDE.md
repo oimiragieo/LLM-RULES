@@ -412,6 +412,11 @@ All spawned agents:
    - `decisions.md` (ADRs)
    - `issues.md` (blockers/workarounds)
 3. **Compression reminder (optional):** if `.claude/context/runtime/compression-reminder.txt` exists, spawn the `context-compressor` skill (or invoke `Skill({ skill: 'context-compressor' })`) and clear the reminder.
+4. **Named memory API (optional):** project-specific notes in `.claude/context/memory/named/` via:
+   - `readMemory(name)`
+   - `writeMemory(name, content)`
+   - `listMemories()`
+   - `deleteMemory(name)`
 
 > **Assume interruption:** if it's not in memory, it didn't happen.
 

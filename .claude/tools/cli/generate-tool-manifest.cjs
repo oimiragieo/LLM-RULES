@@ -136,6 +136,17 @@ const CORE_TOOLS = [
   },
 ];
 
+const EDITING_TOOLS = new Set(['Write', 'Edit', 'Bash', 'NotebookEdit', 'TaskStop']);
+const OPTIONAL_TOOLS = new Set(['EnterPlanMode', 'ExitPlanMode']);
+const NO_PROJECT_TOOLS = new Set([
+  'Task',
+  'TaskList',
+  'TaskCreate',
+  'AskUserQuestion',
+  'WebSearch',
+  'WebFetch',
+]);
+
 // MCP tools definition (from CLAUDE.md Section 1.4)
 const MCP_TOOLS = [
   {
@@ -376,6 +387,9 @@ function generateManifest(options = {}) {
     description: tool.description,
     status: 'available',
     mandatory: tool.mandatory,
+    canEdit: tool.canEdit ?? EDITING_TOOLS.has(tool.name),
+    optional: tool.optional ?? OPTIONAL_TOOLS.has(tool.name),
+    requiresActiveProject: tool.requiresActiveProject ?? !NO_PROJECT_TOOLS.has(tool.name),
     availability: {
       agents: tool.name === 'AskUserQuestion' ? 'no' : tool.name === 'Task' ? 'no' : 'all',
       orchestrators: tool.name === 'AskUserQuestion' ? 'no' : 'all',
@@ -406,6 +420,9 @@ function generateManifest(options = {}) {
       fallback: tool.fallback,
       fallback_status: 'available',
       fallback_tools: tool.fallbackTools,
+      canEdit: false,
+      optional: false,
+      requiresActiveProject: false,
     };
   });
 
@@ -550,8 +567,8 @@ function validateManifest(manifestPath) {
 
     // Check core tools count
     const coreTools = manifest.tools?.core || [];
-    if (coreTools.length !== 20) {
-      warnings.push(`Expected 20 core tools, found ${coreTools.length}`);
+    if (coreTools.length !== CORE_TOOLS.length) {
+      warnings.push(`Expected ${CORE_TOOLS.length} core tools, found ${coreTools.length}`);
     }
 
     // Check MCP tools count

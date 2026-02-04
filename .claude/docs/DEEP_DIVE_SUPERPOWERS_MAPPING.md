@@ -15,15 +15,15 @@ SessionStart hook injection (skill-awareness-inject) is **not** enabled by defau
 
 ## Mapping
 
-| Feature | Source (superpowers) | Destination (.claude) | Status |
-| --- | --- | --- | --- |
-| /brainstorm command | commands/brainstorm.md | .claude/commands/brainstorm.md | Added |
-| /write-plan command | commands/write-plan.md | .claude/commands/write-plan.md | Added |
-| /execute-plan command | commands/execute-plan.md | .claude/commands/execute-plan.md | Added |
-| Skill awareness reminder | hooks/session-start.sh | .claude/hooks/routing/user-prompt-unified.cjs | Implemented (memory reminder box) |
-| find-polluter reference | debugging skill docs | .claude/skills/debugging/SKILL.md | Added |
-| Skill-triggering prompts | tests/skill-triggering/prompts | .claude/tests/skill-triggering/prompts | Added |
-| Skill-triggering runner | tests/skill-triggering/run-*.sh | .claude/tests/skill-triggering/run-skill-triggering-test.cjs | Added |
+| Feature                  | Source (superpowers)             | Destination (.claude)                                        | Status                            |
+| ------------------------ | -------------------------------- | ------------------------------------------------------------ | --------------------------------- |
+| /brainstorm command      | commands/brainstorm.md           | .claude/commands/brainstorm.md                               | Added                             |
+| /write-plan command      | commands/write-plan.md           | .claude/commands/write-plan.md                               | Added                             |
+| /execute-plan command    | commands/execute-plan.md         | .claude/commands/execute-plan.md                             | Added                             |
+| Skill awareness reminder | hooks/session-start.sh           | .claude/hooks/routing/user-prompt-unified.cjs                | Implemented (memory reminder box) |
+| find-polluter reference  | debugging skill docs             | .claude/skills/debugging/SKILL.md                            | Added                             |
+| Skill-triggering prompts | tests/skill-triggering/prompts   | .claude/tests/skill-triggering/prompts                       | Added                             |
+| Skill-triggering runner  | tests/skill-triggering/run-\*.sh | .claude/tests/skill-triggering/run-skill-triggering-test.cjs | Added                             |
 
 ## Commands
 

@@ -125,6 +125,113 @@ function ensureDir(dirPath) {
 }
 
 /**
+ * Normalize a named memory key to a safe filename stem.
+ *
+ * @param {string} name - Raw memory name
+ * @returns {string} Normalized filename stem
+ */
+function normalizeMemoryName(name) {
+  return String(name || '')
+    .trim()
+    .replace(/\.md$/i, '')
+    .replace(/\s+/g, '_')
+    .replace(/[^a-zA-Z0-9_.-]/g, '_')
+    .toLowerCase();
+}
+
+/**
+ * Get the named memory directory for the given project root.
+ *
+ * @param {string} [projectRoot=PROJECT_ROOT] - The project root directory path
+ * @returns {string} The absolute path to the named memory directory
+ */
+function getNamedMemoryDir(projectRoot = PROJECT_ROOT) {
+  validateProjectRoot(projectRoot);
+  const dir = path.join(getMemoryDir(projectRoot), 'named');
+  ensureDir(dir);
+  return dir;
+}
+
+/**
+ * Read a named memory entry.
+ *
+ * @param {string} name - Memory name
+ * @param {string} [projectRoot=PROJECT_ROOT] - The project root directory path
+ * @returns {string} Memory content or a not-found message
+ */
+function readMemory(name, projectRoot = PROJECT_ROOT) {
+  validateProjectRoot(projectRoot);
+  const baseName = normalizeMemoryName(name);
+  const filePath = path.join(getNamedMemoryDir(projectRoot), `${baseName}.md`);
+  const validation = validatePathWithinProject(filePath, projectRoot);
+  if (!validation.safe) {
+    throw new Error(`Invalid memory path: ${validation.reason}`);
+  }
+  if (!fs.existsSync(filePath)) {
+    return `Memory '${name}' not found. Use write_memory to create it.`;
+  }
+  return fs.readFileSync(filePath, 'utf8');
+}
+
+/**
+ * Write a named memory entry.
+ *
+ * @param {string} name - Memory name
+ * @param {string} content - Memory content
+ * @param {string} [projectRoot=PROJECT_ROOT] - The project root directory path
+ * @returns {string} Confirmation message
+ */
+function writeMemory(name, content, projectRoot = PROJECT_ROOT) {
+  validateProjectRoot(projectRoot);
+  const baseName = normalizeMemoryName(name);
+  const filePath = path.join(getNamedMemoryDir(projectRoot), `${baseName}.md`);
+  const validation = validatePathWithinProject(filePath, projectRoot);
+  if (!validation.safe) {
+    throw new Error(`Invalid memory path: ${validation.reason}`);
+  }
+  atomicWriteSync(filePath, String(content || ''), 'utf8');
+  return `Memory '${name}' written.`;
+}
+
+/**
+ * List named memories.
+ *
+ * @param {string} [projectRoot=PROJECT_ROOT] - The project root directory path
+ * @returns {string[]} List of memory names (without extension)
+ */
+function listMemories(projectRoot = PROJECT_ROOT) {
+  validateProjectRoot(projectRoot);
+  const dir = path.join(getMemoryDir(projectRoot), 'named');
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir)
+    .filter(file => file.endsWith('.md'))
+    .map(file => file.replace(/\.md$/, ''));
+}
+
+/**
+ * Delete a named memory entry.
+ *
+ * @param {string} name - Memory name
+ * @param {string} [projectRoot=PROJECT_ROOT] - The project root directory path
+ * @returns {string} Confirmation or not-found message
+ */
+function deleteMemory(name, projectRoot = PROJECT_ROOT) {
+  validateProjectRoot(projectRoot);
+  const baseName = normalizeMemoryName(name);
+  const filePath = path.join(getNamedMemoryDir(projectRoot), `${baseName}.md`);
+  const validation = validatePathWithinProject(filePath, projectRoot);
+  if (!validation.safe) {
+    throw new Error(`Invalid memory path: ${validation.reason}`);
+  }
+  if (!fs.existsSync(filePath)) {
+    return `Memory '${name}' not found.`;
+  }
+  fs.unlinkSync(filePath);
+  return `Memory '${name}' deleted.`;
+}
+
+/**
  * Get current session number (auto-increment)
  */
 function getCurrentSessionNumber(memoryDir) {
@@ -1031,6 +1138,7 @@ async function searchMemory(query, options = {}) {
 
 module.exports = {
   getMemoryDir,
+  getNamedMemoryDir,
   getCurrentSessionNumber,
   recordGotcha,
   recordPattern,
@@ -1042,6 +1150,10 @@ module.exports = {
   checkAndArchiveLearnings,
   pruneCodebaseMap,
   searchMemory,
+  readMemory,
+  writeMemory,
+  listMemories,
+  deleteMemory,
   CONFIG,
   // Async functions (SEC-IMPL-001)
   readMemoryAsync,

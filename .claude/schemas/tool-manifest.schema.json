@@ -50,7 +50,10 @@
                   "orchestrators": { "type": "string" },
                   "router": { "type": "string" }
                 }
-              }
+              },
+              "canEdit": { "type": "boolean", "default": false },
+              "optional": { "type": "boolean", "default": false },
+              "requiresActiveProject": { "type": "boolean", "default": true }
             }
           }
         },
@@ -71,7 +74,10 @@
               "fallback_tools": {
                 "type": "array",
                 "items": { "type": "string" }
-              }
+              },
+              "canEdit": { "type": "boolean", "default": false },
+              "optional": { "type": "boolean", "default": false },
+              "requiresActiveProject": { "type": "boolean", "default": true }
             }
           }
         },

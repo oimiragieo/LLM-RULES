@@ -1,12 +1,12 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-01T18:22:16.062Z",
+  "generatedAt": "2026-02-04T01:48:38.824Z",
   "metadata": {
-    "totalTools": 29,
-    "totalCoreTools": 20,
+    "totalTools": 30,
+    "totalCoreTools": 21,
     "totalMcpTools": 9,
     "totalAgents": 16,
-    "lastValidated": "2026-02-01T18:22:16.062Z",
+    "lastValidated": "2026-02-04T01:48:38.824Z",
     "source": ".claude/CLAUDE.md sections 1.1-1.4"
   },
   "tools": {
@@ -17,6 +17,9 @@
         "description": "Read files from filesystem",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -29,6 +32,9 @@
         "description": "Create/overwrite files",
         "status": "available",
         "mandatory": false,
+        "canEdit": true,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -41,6 +47,9 @@
         "description": "Make precise edits to files",
         "status": "available",
         "mandatory": false,
+        "canEdit": true,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -53,6 +62,9 @@
         "description": "Execute shell commands",
         "status": "available",
         "mandatory": false,
+        "canEdit": true,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -65,6 +77,9 @@
         "description": "Pattern-based file discovery",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -77,6 +92,9 @@
         "description": "Content search in files",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -89,10 +107,28 @@
         "description": "Spawn subagents",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false,
         "availability": {
           "agents": "no",
           "orchestrators": "all",
           "router": "yes"
+        }
+      },
+      {
+        "name": "Orchestrator",
+        "category": "Orchestration",
+        "description": "Delegate task to agent pipeline",
+        "status": "available",
+        "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": true,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
         }
       },
       {
@@ -101,6 +137,9 @@
         "description": "Create trackable tasks",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -113,6 +152,9 @@
         "description": "Update task status/metadata",
         "status": "available",
         "mandatory": true,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -125,6 +167,9 @@
         "description": "List all tasks",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -137,6 +182,9 @@
         "description": "Get task details",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -149,6 +197,9 @@
         "description": "Read task output",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -161,22 +212,13 @@
         "description": "Stop running task",
         "status": "available",
         "mandatory": false,
+        "canEdit": true,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
           "router": "no"
-        }
-      },
-      {
-        "name": "Orchestrator",
-        "category": "Orchestration",
-        "description": "Delegate complex tasks to specialized agents (Architect -> Developer -> QA)",
-        "status": "available",
-        "mandatory": false,
-        "availability": {
-          "agents": "no",
-          "orchestrators": "all",
-          "router": "yes"
         }
       },
       {
@@ -185,6 +227,9 @@
         "description": "Invoke skill workflows",
         "status": "available",
         "mandatory": true,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -197,6 +242,9 @@
         "description": "Get user input",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false,
         "availability": {
           "agents": "no",
           "orchestrators": "no",
@@ -209,6 +257,9 @@
         "description": "Switch to planning mode",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": true,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -221,6 +272,9 @@
         "description": "Exit planning mode",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": true,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -233,6 +287,9 @@
         "description": "Search the web",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -245,6 +302,9 @@
         "description": "Fetch webpage content",
         "status": "available",
         "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -257,6 +317,9 @@
         "description": "Edit notebook cells",
         "status": "available",
         "mandatory": false,
+        "canEdit": true,
+        "optional": false,
+        "requiresActiveProject": true,
         "availability": {
           "agents": "all",
           "orchestrators": "all",
@@ -274,7 +337,10 @@
         "mcp_server": "chrome-devtools",
         "fallback": "Skill({ skill: 'chrome-browser' })",
         "fallback_status": "available",
-        "fallback_tools": ["Read", "Write", "WebFetch"]
+        "fallback_tools": ["Read", "Write", "WebFetch"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
       },
       {
         "name": "mcp__sequential-thinking__sequentialthinking",
@@ -285,7 +351,10 @@
         "mcp_server": "sequential-thinking",
         "fallback": "Skill({ skill: 'sequential-thinking' })",
         "fallback_status": "available",
-        "fallback_tools": ["Read", "Write", "Bash"]
+        "fallback_tools": ["Read", "Write", "Bash"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
       },
       {
         "name": "mcp__Ref__ref_search_documentation",
@@ -296,7 +365,10 @@
         "mcp_server": "Ref",
         "fallback": "WebSearch + WebFetch",
         "fallback_status": "available",
-        "fallback_tools": ["WebSearch", "WebFetch"]
+        "fallback_tools": ["WebSearch", "WebFetch"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
       },
       {
         "name": "mcp__Ref__ref_read_url",
@@ -307,7 +379,10 @@
         "mcp_server": "Ref",
         "fallback": "WebFetch",
         "fallback_status": "available",
-        "fallback_tools": ["WebFetch"]
+        "fallback_tools": ["WebFetch"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
       },
       {
         "name": "mcp__Exa__web_search_exa",
@@ -318,7 +393,10 @@
         "mcp_server": "Exa",
         "fallback": "WebSearch",
         "fallback_status": "available",
-        "fallback_tools": ["WebSearch"]
+        "fallback_tools": ["WebSearch"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
       },
       {
         "name": "mcp__Exa__get_code_context_exa",
@@ -329,7 +407,10 @@
         "mcp_server": "Exa",
         "fallback": "Grep + Glob",
         "fallback_status": "available",
-        "fallback_tools": ["Grep", "Glob"]
+        "fallback_tools": ["Grep", "Glob"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
       },
       {
         "name": "mcp__Exa__company_research_exa",
@@ -340,7 +421,10 @@
         "mcp_server": "Exa",
         "fallback": "WebSearch",
         "fallback_status": "available",
-        "fallback_tools": ["WebSearch"]
+        "fallback_tools": ["WebSearch"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
       },
       {
         "name": "mcp__shadcn__getComponents",
@@ -351,7 +435,10 @@
         "mcp_server": "shadcn",
         "fallback": "WebFetch('https://ui.shadcn.com/...')",
         "fallback_status": "available",
-        "fallback_tools": ["WebFetch"]
+        "fallback_tools": ["WebFetch"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
       },
       {
         "name": "mcp__shadcn__getComponent",
@@ -362,7 +449,10 @@
         "mcp_server": "shadcn",
         "fallback": "WebFetch('https://ui.shadcn.com/...')",
         "fallback_status": "available",
-        "fallback_tools": ["WebFetch"]
+        "fallback_tools": ["WebFetch"],
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": false
       }
     ],
     "toolsets": {
@@ -374,6 +464,7 @@
         "Glob",
         "Grep",
         "Task",
+        "Orchestrator",
         "TaskCreate",
         "TaskUpdate",
         "TaskList",
@@ -425,8 +516,8 @@
         "Bash",
         "Glob",
         "Grep",
-        "Orchestrator",
         "Task",
+        "Orchestrator",
         "TaskUpdate",
         "TaskList",
         "TaskCreate",
@@ -476,9 +567,9 @@
     "maxToolsPerAgent": 15,
     "maxToolsPerOrchestrator": 18,
     "toolCounts": {
-      "coreTools": 20,
+      "coreTools": 21,
       "mcpTools": 9,
-      "totalAvailable": 20,
+      "totalAvailable": 21,
       "totalUnavailable": 9
     }
   },
@@ -644,8 +735,8 @@
           "Bash",
           "Glob",
           "Grep",
-          "Orchestrator",
           "Task",
+          "Orchestrator",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",
@@ -665,6 +756,7 @@
           "Glob",
           "Grep",
           "Task",
+          "Orchestrator",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",
@@ -684,6 +776,7 @@
           "Glob",
           "Grep",
           "Task",
+          "Orchestrator",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",
@@ -703,6 +796,7 @@
           "Glob",
           "Grep",
           "Task",
+          "Orchestrator",
           "TaskUpdate",
           "TaskList",
           "TaskCreate",

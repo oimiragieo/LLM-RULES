@@ -43,6 +43,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/context-mode-tool-guard.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/safety/windows-null-sanitizer.cjs"
           },
           {
@@ -67,6 +71,10 @@
       {
         "matcher": "Edit|Write|NotebookEdit",
         "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/context-mode-tool-guard.cjs"
+          },
           {
             "type": "command",
             "command": "node .claude/hooks/safety/file-placement-guard.cjs"
