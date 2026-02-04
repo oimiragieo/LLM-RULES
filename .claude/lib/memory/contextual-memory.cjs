@@ -486,6 +486,9 @@ class ContextualMemory {
     if (options.category) {
       metadataFilters.category = options.category;
     }
+    if (options.area) {
+      metadataFilters.area = options.area;
+    }
     const hasMetadataFilters = Object.keys(metadataFilters).length > 0;
     let effectiveFilters = filters;
     if (hasMetadataFilters) {

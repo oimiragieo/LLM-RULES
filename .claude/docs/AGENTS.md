@@ -148,6 +148,24 @@ context_files:
 - **optimizations**: Optional descriptive optimizations (purely informational)
 - **context_files**: Files loaded automatically into agent context
 
+## Agent Prompt Overrides (Optional)
+
+Agents can include additional prompt fragments that are appended to the base agent definition at spawn time.
+
+**Location convention:**
+
+```
+.claude/agents/<category>/<agentId>/prompts/*.md
+```
+
+Example:
+
+```
+.claude/agents/core/developer/prompts/agent.system.main.role.md
+```
+
+All `*.md` files in the `prompts/` directory are read in filename order and appended to the base agent prompt.
+
 ## Context Strategies
 
 Context strategies control how agents load project context to balance detail with token efficiency.

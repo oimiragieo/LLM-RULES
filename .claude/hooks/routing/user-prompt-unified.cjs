@@ -75,6 +75,12 @@ let agentCache = null;
 let agentCacheTime = 0;
 const AGENT_CACHE_TTL = 300000; // 5 minutes
 
+function debugLog(source, message, err) {
+  if (!process.env.DEBUG_HOOKS) return;
+  const details = err ? ` ${err.message || err}` : '';
+  console.warn(`[${source}] ${message}${details}`);
+}
+
 // =============================================================================
 // Check 1: Router Mode Reset (from router-mode-reset.cjs)
 // =============================================================================
@@ -1382,6 +1388,16 @@ async function main() {
   const startTime = Date.now();
   try {
     const hookInput = parseHookInputSync();
+
+    if (process.env.SCHEDULER_TICK_ON_PROMPT === 'on') {
+      try {
+        const { runTick } = require('../../lib/scheduler/scheduler-tick.cjs');
+        runTick(PROJECT_ROOT);
+      } catch (err) {
+        debugLog('user-prompt-unified', 'scheduler tick failed (ignored)', err);
+      }
+    }
+
     await runAllChecks(hookInput, PROJECT_ROOT);
     try {
       eventBus.emit(EventTypes.TOOL_COMPLETED, {

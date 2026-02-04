@@ -204,6 +204,43 @@ function appendSemanticMatches(prompt, results) {
   return prompt + `\n\n${section}\n`;
 }
 
+function appendQueryMemories(prompt, results) {
+  if (!Array.isArray(results) || results.length === 0) return prompt;
+
+  const lines = [];
+  lines.push('### Relevant Memories (Query)');
+  lines.push('_Best-effort retrieval based on the current task_');
+  lines.push('');
+
+  for (const r of results.slice(0, 5)) {
+    const src = r?.source || 'unknown';
+    const sim = typeof r?.similarity === 'number' ? ` ${(r.similarity * 100).toFixed(1)}%` : '';
+    const metaPath = r?.metadata?.path || r?.metadata?.file || r?.metadata?.source || null;
+    const where = metaPath ? ` (${metaPath})` : '';
+
+    const displayText = r?.metadata?.abstract || r?.metadata?.overview || String(r?.content || '');
+    const snippet = String(displayText || '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 180);
+    if (!snippet) continue;
+    lines.push(`- [${src}${sim}]${where}: ${snippet}${snippet.length >= 180 ? '...' : ''}`);
+  }
+
+  const section = lines.join('\n').trimEnd() + '\n';
+
+  const marker = '## Memory Context (Auto-Loaded)';
+  if (prompt.includes(marker)) {
+    const nextHeaderIdx = prompt.indexOf('\n## ', prompt.indexOf(marker) + marker.length);
+    if (nextHeaderIdx !== -1) {
+      return prompt.slice(0, nextHeaderIdx) + `\n\n${section}\n` + prompt.slice(nextHeaderIdx);
+    }
+    return prompt + `\n\n${section}\n`;
+  }
+
+  return prompt + `\n\n${section}\n`;
+}
+
 function appendEntityGraph(prompt, data) {
   const decisions = Array.isArray(data?.decisions) ? data.decisions : [];
   const issues = Array.isArray(data?.issues) ? data.issues : [];
@@ -433,6 +470,9 @@ async function main() {
     // Optional Phase 3 enhancement: ContextualMemory semantic search.
     // Enabled by default; set SPAWN_PROMPT_SEMANTIC_MEMORY=off to disable.
     if (process.env.SPAWN_PROMPT_SEMANTIC_MEMORY !== 'off') {
+      const memoryQueryEnabled =
+        process.env.SPAWN_PROMPT_MEMORY_QUERY === '1' ||
+        process.env.SPAWN_PROMPT_MEMORY_QUERY === 'on';
       const memoryManager = require('../../lib/memory/memory-manager.cjs');
       const query =
         (toolInput.description && String(toolInput.description).trim()) ||
@@ -486,7 +526,21 @@ async function main() {
         }
       }
 
-      if (results.length > 0) {
+      if (memoryQueryEnabled) {
+        try {
+          const queryResults = await memoryManager.searchMemory(query, {
+            limit: 5,
+            threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+          });
+          if (queryResults.length > 0) {
+            assembled = appendQueryMemories(assembled, queryResults);
+          }
+        } catch (queryErr) {
+          debugLog('spawn-prompt-assembler', 'Memory query retrieval failed (ignored)', queryErr);
+        }
+      }
+
+      if (!memoryQueryEnabled && results.length > 0) {
         assembled = appendSemanticMatches(assembled, results);
       }
     }
@@ -568,6 +622,7 @@ if (require.main === module) {
 module.exports = {
   looksAssembled,
   appendSemanticMatches,
+  appendQueryMemories,
   appendEntityGraph,
   insertContextModeSection,
   enrichAllowedTools,

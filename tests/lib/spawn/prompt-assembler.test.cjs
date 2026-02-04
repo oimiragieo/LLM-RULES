@@ -25,10 +25,12 @@
 const { describe, it, beforeEach, before } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
+const fs = require('fs');
 
 // Module under test (will fail until implemented)
 let assembler;
 const MODULE_PATH = path.join(__dirname, '../../../.claude/lib/spawn/prompt-assembler.cjs');
+const BEHAVIOUR_PATH = path.join(__dirname, '../../../.claude/context/memory/behaviour.md');
 
 // Test data
 const VALID_DEVELOPER_TOOLS = [
@@ -78,6 +80,9 @@ PROJECT_ROOT: C:\\dev\\projects\\agent-studio
 `;
 
 describe('prompt-assembler', () => {
+  const overrideDir = path.join(__dirname, '../../../.claude/agents/core/developer/prompts');
+  const overrideFile = path.join(overrideDir, 'agent.system.main.role.md');
+
   before(() => {
     // Load the module
     try {
@@ -251,6 +256,25 @@ describe('prompt-assembler', () => {
       assert.ok(enhanced.includes('Instructions'), 'Should preserve Instructions');
     });
 
+    it('should append agent prompt overrides when present', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      fs.mkdirSync(overrideDir, { recursive: true });
+      fs.writeFileSync(overrideFile, '## Override Prompt\n\nCustom override line.', 'utf8');
+
+      const enhanced = assembler.assembleSpawnPrompt({
+        agentType: 'developer',
+        allowedTools: VALID_DEVELOPER_TOOLS,
+        basePrompt: SAMPLE_BASE_PROMPT,
+      });
+
+      assert.ok(enhanced.includes('## Override Prompt'), 'Should include agent prompt overrides');
+
+      fs.rmSync(overrideDir, { recursive: true, force: true });
+    });
+
     it('should inject sections at correct location', () => {
       if (!assembler) {
         assert.fail('Module not implemented yet');
@@ -269,6 +293,50 @@ describe('prompt-assembler', () => {
 
       assert.ok(toolsIndex > warningIndex, 'AVAILABLE_TOOLS should be after warning box');
       assert.ok(toolsIndex < contextIndex, 'AVAILABLE_TOOLS should be before PROJECT CONTEXT');
+    });
+
+    it('should include dynamic behaviour rules when present', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const original = fs.existsSync(BEHAVIOUR_PATH)
+        ? fs.readFileSync(BEHAVIOUR_PATH, 'utf8')
+        : null;
+
+      try {
+        fs.mkdirSync(path.dirname(BEHAVIOUR_PATH), { recursive: true });
+        fs.writeFileSync(
+          BEHAVIOUR_PATH,
+          '# comment line\nAlways prefer small diffs.\n\n# another comment\nUse Skill({ skill: "tdd" }) before coding.',
+          'utf8'
+        );
+
+        const enhanced = assembler.assembleSpawnPrompt({
+          agentType: 'developer',
+          allowedTools: VALID_DEVELOPER_TOOLS,
+          basePrompt: SAMPLE_BASE_PROMPT,
+        });
+
+        assert.ok(
+          enhanced.includes('## Dynamic behaviour rules'),
+          'Should inject Dynamic behaviour rules section'
+        );
+        assert.ok(
+          enhanced.includes('Always prefer small diffs.'),
+          'Should include non-comment rule lines'
+        );
+        assert.ok(
+          !enhanced.includes('# comment line'),
+          'Should strip comment lines from behaviour rules'
+        );
+      } finally {
+        if (original === null) {
+          fs.rmSync(BEHAVIOUR_PATH, { force: true });
+        } else {
+          fs.writeFileSync(BEHAVIOUR_PATH, original, 'utf8');
+        }
+      }
     });
   });
 

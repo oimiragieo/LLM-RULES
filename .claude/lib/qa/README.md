@@ -5,6 +5,7 @@
 Provides bounded QA loop criteria and signoff status helpers.
 
 Key exports:
+
 - `getQaSignoffStatus`
 - `isQaApproved` / `isQaRejected` / `isFixesApplied`
 - `getQaIterationCount`
@@ -16,6 +17,7 @@ Key exports:
 Tracks QA iteration history and recurring issues.
 
 Key exports:
+
 - `recordIteration`
 - `getIterationHistory`
 - `hasRecurringIssues`

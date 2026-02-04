@@ -65,7 +65,7 @@ function getQaIterationCount(planDir) {
 function isBuildComplete(planDir) {
   const plan = loadImplementationPlan(planDir);
   if (!plan || !Array.isArray(plan.subtasks) || plan.subtasks.length === 0) return true;
-  return plan.subtasks.every((task) => task && task.status === 'completed');
+  return plan.subtasks.every(task => task && task.status === 'completed');
 }
 
 function shouldRunQa(planDir) {

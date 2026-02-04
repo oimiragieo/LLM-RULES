@@ -309,6 +309,14 @@ This ensures agents can recall session data written via `memory-tiers.cjs` (STM 
 - `lastAccessed`: Updated to current timestamp on read
 - Updates to `accessCount` and `lastAccessed` are rate-limited per entry (default 5 minutes, configurable via `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS`); repeated reads within the interval do not bump the count.
 
+**Memory Areas**: Gotchas and patterns can optionally include `area`:
+
+- `main` (default)
+- `fragments`
+- `solutions`
+
+Area is preserved in JSON and can be used for filtering in semantic search.
+
 ### Legacy sessions migration
 
 If legacy `.claude/context/memory/sessions/` contains old session files, migrate them into MTM:
@@ -371,6 +379,11 @@ node .claude/lib/memory/memory-manager.cjs record-gotcha "description"
 ```
 
 Records a pitfall to avoid. The gotcha is saved to `gotchas.json` with a timestamp.
+Optional: add an area (`main`, `fragments`, `solutions`):
+
+```bash
+node .claude/lib/memory/memory-manager.cjs record-gotcha "description" --area solutions
+```
 
 ### Record a Pattern
 
@@ -379,6 +392,11 @@ node .claude/lib/memory/memory-manager.cjs record-pattern "description"
 ```
 
 Records a reusable solution. The pattern is saved to `patterns.json` with a timestamp.
+Optional: add an area (`main`, `fragments`, `solutions`):
+
+```bash
+node .claude/lib/memory/memory-manager.cjs record-pattern "description" --area main
+```
 
 ### Record a Discovery
 
@@ -437,6 +455,22 @@ echo '{"summary":"Fixed auth bug", "tasks_completed":["Fix login"], "files_modif
 ```
 
 The SessionEnd hook (unified-reflection-handler + memory-tiers) records sessions automatically; the `save-session` CLI command is deprecated and exits with an error.
+
+### Forget Memory by Query
+
+```bash
+node .claude/lib/memory/memory-manager.cjs forget "query text" --threshold 0.7 --area main
+```
+
+Runs a semantic search and deletes matched gotchas/patterns by id. Returns the list of deleted ids.
+
+### Delete Memory by Ids
+
+```bash
+node .claude/lib/memory/memory-manager.cjs delete-by-ids id1,id2,id3
+```
+
+Deletes gotcha/pattern entries with matching ids from JSON storage.
 
 ## Memory Protocol for Agents
 

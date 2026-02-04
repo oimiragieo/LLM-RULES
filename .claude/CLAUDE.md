@@ -282,6 +282,7 @@ See Section 1.1 for Router Tool Restrictions enforcement.
 **Universal:** `.claude/templates/spawn/universal-agent-spawn.md` (haiku/sonnet/opus, 70-line TaskUpdate warning box)
 **Orchestrator:** `.claude/templates/spawn/orchestrator-spawn.md` (MUST have `Task` tool + `opus` model)
 **Identity:** `.claude/templates/spawn/agent-identity-integration.md` (agents with personality frontmatter)
+**Subordinate (one-shot):** `.claude/templates/spawn/subordinate-once.md` (respond once; no delegation)
 **Core Tools:** Read, Write, Edit, Bash, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
 
 ### Golden-Path Example

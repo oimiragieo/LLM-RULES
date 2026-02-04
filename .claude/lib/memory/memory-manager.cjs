@@ -28,8 +28,10 @@
 const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('path');
+const crypto = require('crypto');
 const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.cjs');
 const { createLogger } = require('../utils/logger.cjs');
+const { DEFAULT_AREA, isValidArea } = require('./memory-areas.cjs');
 
 const logger = createLogger('memory-manager');
 
@@ -122,6 +124,28 @@ function ensureDir(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
+}
+
+/**
+ * Create a stable ID for memory entries when one is missing.
+ *
+ * @param {object} entry
+ * @returns {string}
+ */
+function buildEntryId(entry) {
+  if (entry && typeof entry.id === 'string' && entry.id.trim()) {
+    return entry.id;
+  }
+  const text = entry?.text || '';
+  const ts = entry?.timestamp || '';
+  const category = entry?.category || '';
+  const area = entry?.area || '';
+  const base = `${text}\n${ts}\n${category}\n${area}`;
+  return crypto.createHash('sha1').update(base).digest('hex');
+}
+
+function normalizeArea(area) {
+  return isValidArea(area) ? area : DEFAULT_AREA;
 }
 
 /**
@@ -229,6 +253,162 @@ function deleteMemory(name, projectRoot = PROJECT_ROOT) {
   }
   fs.unlinkSync(filePath);
   return `Memory '${name}' deleted.`;
+}
+
+function loadMemoryArray(filePath) {
+  if (!fs.existsSync(filePath)) return [];
+  try {
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return Array.isArray(data) ? data : [];
+  } catch (_e) {
+    return [];
+  }
+}
+
+function writeMemoryArray(filePath, data) {
+  atomicWriteJSONSync(filePath, Array.isArray(data) ? data : []);
+}
+
+function normalizeEntryIds(entries) {
+  let changed = false;
+  for (const entry of entries) {
+    if (!entry || typeof entry !== 'object') continue;
+    if (!entry.id) {
+      entry.id = buildEntryId(entry);
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+/**
+ * Delete memory entries by ids across gotchas and patterns.
+ *
+ * @param {string[]} ids
+ * @param {string} [projectRoot=PROJECT_ROOT]
+ * @returns {{ deleted: number, notFound: string[] }}
+ */
+function deleteMemoryByIds(ids, projectRoot = PROJECT_ROOT) {
+  validateProjectRoot(projectRoot);
+  const list = Array.isArray(ids) ? ids.filter(Boolean) : [];
+  if (list.length === 0) return { deleted: 0, notFound: [] };
+
+  const memoryDir = getMemoryDir(projectRoot);
+  const gotchasFile = path.join(memoryDir, 'gotchas.json');
+  const patternsFile = path.join(memoryDir, 'patterns.json');
+
+  let deleted = 0;
+  const remainingIds = new Set(list);
+
+  const gotchas = loadMemoryArray(gotchasFile);
+  const gotchasChanged = normalizeEntryIds(gotchas);
+  const keptGotchas = gotchas.filter(entry => {
+    const entryId = buildEntryId(entry);
+    if (remainingIds.has(entryId)) {
+      remainingIds.delete(entryId);
+      deleted += 1;
+      return false;
+    }
+    return true;
+  });
+  if (gotchasChanged || keptGotchas.length !== gotchas.length) {
+    writeMemoryArray(gotchasFile, keptGotchas);
+  }
+
+  const patterns = loadMemoryArray(patternsFile);
+  const patternsChanged = normalizeEntryIds(patterns);
+  const keptPatterns = patterns.filter(entry => {
+    const entryId = buildEntryId(entry);
+    if (remainingIds.has(entryId)) {
+      remainingIds.delete(entryId);
+      deleted += 1;
+      return false;
+    }
+    return true;
+  });
+  if (patternsChanged || keptPatterns.length !== patterns.length) {
+    writeMemoryArray(patternsFile, keptPatterns);
+  }
+
+  return { deleted, notFound: [...remainingIds] };
+}
+
+/**
+ * Forget memory items based on a query (best-effort).
+ *
+ * @param {string} query
+ * @param {object} [options]
+ * @param {number} [options.threshold]
+ * @param {number} [options.limit]
+ * @param {string} [options.area]
+ * @param {string} [projectRoot=PROJECT_ROOT]
+ * @returns {Promise<{ deleted: number, ids: string[] }>}
+ */
+async function forgetMemoryByQuery(query, options = {}, projectRoot = PROJECT_ROOT) {
+  validateProjectRoot(projectRoot);
+  const { threshold, limit = 20, area } = options || {};
+  const memoryDir = getMemoryDir(projectRoot);
+  const gotchasFile = path.join(memoryDir, 'gotchas.json');
+  const patternsFile = path.join(memoryDir, 'patterns.json');
+
+  let results = [];
+  try {
+    results = await searchMemory(query, {
+      limit,
+      threshold,
+      area: normalizeArea(area),
+    });
+  } catch (_e) {
+    results = [];
+  }
+
+  const candidateTexts = new Set(results.map(r => String(r?.content || '').trim()).filter(Boolean));
+
+  const ids = new Set();
+  const removeByText = entry => {
+    if (!entry || typeof entry.text !== 'string') return false;
+    if (!candidateTexts.has(entry.text.trim())) return false;
+    return !area || entry.area === normalizeArea(area);
+  };
+
+  const gotchas = loadMemoryArray(gotchasFile);
+  const gotchasChanged = normalizeEntryIds(gotchas);
+  const keptGotchas = gotchas.filter(entry => {
+    if (removeByText(entry)) {
+      ids.add(buildEntryId(entry));
+      return false;
+    }
+    return true;
+  });
+  if (gotchasChanged || keptGotchas.length !== gotchas.length) {
+    writeMemoryArray(gotchasFile, keptGotchas);
+  }
+
+  const patterns = loadMemoryArray(patternsFile);
+  const patternsChanged = normalizeEntryIds(patterns);
+  const keptPatterns = patterns.filter(entry => {
+    if (removeByText(entry)) {
+      ids.add(buildEntryId(entry));
+      return false;
+    }
+    return true;
+  });
+  if (patternsChanged || keptPatterns.length !== patterns.length) {
+    writeMemoryArray(patternsFile, keptPatterns);
+  }
+
+  // If no text matches were found but vector results have ids, try delete by ids.
+  if (ids.size === 0) {
+    const vectorIds = results
+      .map(r => r?.metadata?.id)
+      .filter(id => typeof id === 'string' && id.trim().length > 0);
+    if (vectorIds.length > 0) {
+      const deleted = deleteMemoryByIds(vectorIds, projectRoot);
+      return { deleted: deleted.deleted, ids: vectorIds };
+    }
+  }
+
+  return { deleted: ids.size, ids: [...ids] };
 }
 
 /**
@@ -476,10 +656,12 @@ function recordGotcha(gotcha, projectRoot = PROJECT_ROOT) {
 
   if (!isDuplicate) {
     const now = new Date().toISOString();
+    const area = typeof gotcha === 'object' && gotcha ? normalizeArea(gotcha.area) : DEFAULT_AREA;
     const entry =
       typeof gotcha === 'string'
-        ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null }
-        : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null };
+        ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area }
+        : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area };
+    entry.id = buildEntryId(entry);
 
     gotchas.push(entry);
     atomicWriteJSONSync(gotchasFile, gotchas);
@@ -531,10 +713,13 @@ function recordPattern(pattern, projectRoot = PROJECT_ROOT) {
 
   if (!isDuplicate) {
     const now = new Date().toISOString();
+    const area =
+      typeof pattern === 'object' && pattern ? normalizeArea(pattern.area) : DEFAULT_AREA;
     const entry =
       typeof pattern === 'string'
-        ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null }
-        : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null };
+        ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null, area }
+        : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null, area };
+    entry.id = buildEntryId(entry);
 
     patterns.push(entry);
     atomicWriteJSONSync(patternsFile, patterns);
@@ -719,10 +904,12 @@ async function recordGotchaAsync(gotcha, projectRoot = PROJECT_ROOT) {
 
   if (!isDuplicate) {
     const now = new Date().toISOString();
+    const area = typeof gotcha === 'object' && gotcha ? normalizeArea(gotcha.area) : DEFAULT_AREA;
     const entry =
       typeof gotcha === 'string'
-        ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null }
-        : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null };
+        ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area }
+        : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area };
+    entry.id = buildEntryId(entry);
 
     gotchas.push(entry);
     await atomicWriteAsync(gotchasFile, JSON.stringify(gotchas, null, 2));
@@ -764,10 +951,13 @@ async function recordPatternAsync(pattern, projectRoot = PROJECT_ROOT) {
 
   if (!isDuplicate) {
     const now = new Date().toISOString();
+    const area =
+      typeof pattern === 'object' && pattern ? normalizeArea(pattern.area) : DEFAULT_AREA;
     const entry =
       typeof pattern === 'string'
-        ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null }
-        : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null };
+        ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null, area }
+        : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null, area };
+    entry.id = buildEntryId(entry);
 
     patterns.push(entry);
     await atomicWriteAsync(patternsFile, JSON.stringify(patterns, null, 2));
@@ -998,6 +1188,16 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   const command = args[0];
 
+  function getFlagValue(flagName) {
+    const prefix = `--${flagName}=`;
+    for (let i = 0; i < args.length; i += 1) {
+      const arg = args[i];
+      if (arg && arg.startsWith(prefix)) return arg.slice(prefix.length);
+      if (arg === `--${flagName}` && i + 1 < args.length) return args[i + 1];
+    }
+    return null;
+  }
+
   switch (command) {
     case 'stats':
       console.log(JSON.stringify(getMemoryStats(), null, 2));
@@ -1009,19 +1209,21 @@ if (require.main === module) {
 
     case 'record-gotcha':
       if (args[1]) {
-        recordGotcha(args[1]);
+        const area = getFlagValue('area');
+        recordGotcha(args[1], PROJECT_ROOT, area);
         logger.info('Gotcha recorded');
       } else {
-        logger.error('Usage: memory-manager.cjs record-gotcha "gotcha text"');
+        logger.error('Usage: memory-manager.cjs record-gotcha "gotcha text" [--area main]');
       }
       break;
 
     case 'record-pattern':
       if (args[1]) {
-        recordPattern(args[1]);
+        const area = getFlagValue('area');
+        recordPattern(args[1], PROJECT_ROOT, area);
         logger.info('Pattern recorded');
       } else {
-        logger.error('Usage: memory-manager.cjs record-pattern "pattern text"');
+        logger.error('Usage: memory-manager.cjs record-pattern "pattern text" [--area main]');
       }
       break;
 
@@ -1031,6 +1233,44 @@ if (require.main === module) {
         logger.info('Discovery recorded');
       } else {
         logger.error('Usage: memory-manager.cjs record-discovery "path" "description" [category]');
+      }
+      break;
+
+    case 'forget':
+      if (args[1]) {
+        const opts = {};
+        for (const arg of args.slice(2)) {
+          if (arg.startsWith('--threshold=')) {
+            opts.threshold = Number(arg.split('=')[1]);
+          } else if (arg.startsWith('--limit=')) {
+            opts.limit = Number(arg.split('=')[1]);
+          } else if (arg.startsWith('--area=')) {
+            opts.area = arg.split('=')[1];
+          }
+        }
+        forgetMemoryByQuery(args[1], opts)
+          .then(result => console.log(JSON.stringify(result, null, 2)))
+          .catch(err => {
+            logger.error('Forget failed', { error: err.message });
+            process.exit(1);
+          });
+      } else {
+        logger.error(
+          'Usage: memory-manager.cjs forget "query" [--threshold=0.7] [--limit=20] [--area=main]'
+        );
+      }
+      break;
+
+    case 'delete-by-ids':
+      if (args[1]) {
+        const ids = String(args[1])
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+        const result = deleteMemoryByIds(ids);
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        logger.error('Usage: memory-manager.cjs delete-by-ids id1,id2,id3');
       }
       break;
 
@@ -1097,6 +1337,8 @@ Commands:
   record-gotcha      Record a gotcha/pitfall
   record-pattern     Record a reusable pattern
   record-discovery   Record a codebase discovery
+  forget             Remove memory entries similar to a query
+  delete-by-ids      Remove memory entries by id (gotchas/patterns)
   save-session       (deprecated, exits 1; use memory-tiers / SessionEnd)
 
 Examples:
@@ -1108,6 +1350,8 @@ Examples:
   node memory-manager.cjs record-gotcha "Always close DB connections in workers"
   node memory-manager.cjs record-pattern "Use async/await for all API calls"
   node memory-manager.cjs record-discovery "src/auth.ts" "JWT authentication handler"
+  node memory-manager.cjs forget "avoid sync fs in hooks" --threshold=0.7 --area=main
+  node memory-manager.cjs delete-by-ids id1,id2
   echo '{"summary":"Fixed auth bug"}' | node memory-manager.cjs save-session   # deprecated, exits 1
 `);
   }
@@ -1150,6 +1394,8 @@ module.exports = {
   checkAndArchiveLearnings,
   pruneCodebaseMap,
   searchMemory,
+  forgetMemoryByQuery,
+  deleteMemoryByIds,
   readMemory,
   writeMemory,
   listMemories,

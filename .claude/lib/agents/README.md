@@ -8,6 +8,7 @@
 - **Used by:** Spawn prompt tool enrichment when the registry has no requiredTools.
 
 Exports:
+
 - `getAgentConfig(agentType)`
 - `getDefaultTools(agentType)`
 - `getDefaultThinkingLevel(agentType)`

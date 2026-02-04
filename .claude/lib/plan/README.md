@@ -6,6 +6,7 @@ Load/save implementation plans at:
 `.claude/context/plans/<planId>/implementation_plan.json`
 
 Exports:
+
 - `load(planDir)`
 - `save(planDir, plan)`
 - `createMinimal(featureName)`
@@ -13,6 +14,7 @@ Exports:
 ## progress.cjs
 
 Progress helpers:
+
 - `isBuildComplete(planDir)`
 - `countSubtasks(planDir)`
 - `countCompletedSubtasks(planDir)`

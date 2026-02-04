@@ -89,6 +89,39 @@ function loadMemoryContext() {
 }
 
 /**
+ * Load dynamic behaviour rules (optional).
+ * Non-critical: failures should not prevent agent spawning.
+ *
+ * @param {string} projectRoot
+ * @returns {string} Behaviour rules text (comments stripped)
+ */
+function loadBehaviourRules(projectRoot = PROJECT_ROOT) {
+  try {
+    const behaviourPath = path.join(projectRoot, '.claude', 'context', 'memory', 'behaviour.md');
+    if (!fs.existsSync(behaviourPath)) return '';
+    const raw = fs.readFileSync(behaviourPath, 'utf8');
+    const lines = raw
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0 && !line.startsWith('#'));
+    return lines.join('\n').trim();
+  } catch (_e) {
+    return '';
+  }
+}
+
+/**
+ * Format behaviour rules as a markdown section.
+ *
+ * @param {string} rules
+ * @returns {string}
+ */
+function formatBehaviourSection(rules) {
+  if (!rules) return '';
+  return `## Dynamic behaviour rules\n\n${rules}\n`;
+}
+
+/**
  * Format memory context as a markdown section.
  *
  * @param {object} memory
@@ -159,6 +192,74 @@ function formatMemorySection(memory) {
   }
 
   return lines.join('\n').trimEnd();
+}
+
+function loadAgentRegistry(projectRoot = PROJECT_ROOT) {
+  const registryPath = path.join(projectRoot, '.claude', 'context', 'agent-registry.json');
+  if (!fs.existsSync(registryPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+  } catch (_e) {
+    return null;
+  }
+}
+
+function findAgentFilePath(agentType, projectRoot = PROJECT_ROOT) {
+  const registry = loadAgentRegistry(projectRoot);
+  const normalized = String(agentType || '')
+    .trim()
+    .toLowerCase();
+  if (registry && registry.agents && registry.agents[normalized]?.filePath) {
+    return registry.agents[normalized].filePath;
+  }
+
+  const agentsRoot = path.join(projectRoot, '.claude', 'agents');
+  if (!fs.existsSync(agentsRoot)) return '';
+  const target = `${normalized}.md`;
+
+  const stack = [agentsRoot];
+  while (stack.length > 0) {
+    const dir = stack.pop();
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(full);
+      } else if (entry.isFile() && entry.name.toLowerCase() === target) {
+        return full;
+      }
+    }
+  }
+
+  return '';
+}
+
+/**
+ * Load optional agent prompt overrides.
+ *
+ * Convention: .claude/agents/<category>/<agentId>/prompts/*.md
+ *
+ * @param {string} agentType
+ * @param {string} projectRoot
+ * @returns {string}
+ */
+function loadAgentPromptOverrides(agentType, projectRoot = PROJECT_ROOT) {
+  const agentPath = findAgentFilePath(agentType, projectRoot);
+  if (!agentPath) return '';
+  const agentDir = path.join(path.dirname(agentPath), path.basename(agentPath, '.md'));
+  const promptsDir = path.join(agentDir, 'prompts');
+  if (!fs.existsSync(promptsDir)) return '';
+  const files = fs
+    .readdirSync(promptsDir)
+    .filter(file => file.endsWith('.md'))
+    .sort();
+  if (files.length === 0) return '';
+  const chunks = [];
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(promptsDir, file), 'utf8').trim();
+    if (content) chunks.push(content);
+  }
+  return chunks.join('\n\n').trim();
 }
 
 /**
@@ -403,10 +504,12 @@ function injectSections(basePrompt, sections) {
     // Return just the sections if no base prompt
     const parts = [sections.toolsSection, sections.skillsSection, sections.discoverySection];
     if (sections.memorySection) parts.push(sections.memorySection);
+    if (sections.behaviourSection) parts.push(sections.behaviourSection);
     return parts.filter(Boolean).join('\n\n');
   }
 
-  const { toolsSection, skillsSection, discoverySection, memorySection } = sections;
+  const { toolsSection, skillsSection, discoverySection, memorySection, behaviourSection } =
+    sections;
 
   // Find the best injection point
   // Priority: After warning box, before PROJECT CONTEXT or INSTRUCTIONS
@@ -485,6 +588,24 @@ function injectSections(basePrompt, sections) {
     }
   }
 
+  // Behaviour section should appear after memory section when present.
+  if (behaviourSection && !enhanced.includes('## Dynamic behaviour rules')) {
+    const marker = '## Memory Context (Auto-Loaded)';
+    if (enhanced.includes(marker)) {
+      const nextHeaderIdx = enhanced.indexOf('\n## ', enhanced.indexOf(marker) + marker.length);
+      if (nextHeaderIdx !== -1) {
+        enhanced =
+          enhanced.slice(0, nextHeaderIdx) +
+          `\n\n${behaviourSection}\n` +
+          enhanced.slice(nextHeaderIdx);
+      } else {
+        enhanced = enhanced + `\n\n${behaviourSection}\n`;
+      }
+    } else {
+      enhanced = enhanced + `\n\n${behaviourSection}\n`;
+    }
+  }
+
   return enhanced;
 }
 
@@ -518,17 +639,25 @@ function assembleSpawnPrompt({
   // 3. Load memory context (optional)
   const memorySection = includeMemory ? formatMemorySection(loadMemoryContext()) : '';
 
+  // 3b. Load behaviour rules (optional)
+  const behaviourSection = formatBehaviourSection(loadBehaviourRules(PROJECT_ROOT));
+
+  // 3c. Load agent prompt overrides (optional)
+  const overrides = loadAgentPromptOverrides(agentType, PROJECT_ROOT);
+  const mergedBasePrompt = overrides ? `${basePrompt}\n\n${overrides}` : basePrompt;
+
   // 4. Build sections
   const toolsSection = buildToolsSection(describedTools);
   const skillsSection = buildSkillsSection(skills);
   const discoverySection = buildDiscoverySection();
 
   // 5. Inject sections into prompt
-  const enhancedPrompt = injectSections(basePrompt, {
+  const enhancedPrompt = injectSections(mergedBasePrompt, {
     toolsSection,
     skillsSection,
     discoverySection,
     memorySection,
+    behaviourSection,
   });
 
   return enhancedPrompt;
@@ -544,7 +673,10 @@ module.exports = {
   buildDiscoverySection,
   injectSections,
   loadMemoryContext,
+  loadBehaviourRules,
+  loadAgentPromptOverrides,
   formatMemorySection,
+  formatBehaviourSection,
   // For testing cache invalidation
   _clearCache: () => {
     TOOL_MANIFEST = null;
