@@ -499,7 +499,7 @@ describe('SQLite Entity Schema Creation', () => {
         )
         .get();
 
-      assert.equal(result.version, 1, 'Should be version 1');
+      assert.equal(result.version, 2, 'Should be version 2 (current initial schema version)');
       assert.ok(result.description, 'Should have description');
     });
 

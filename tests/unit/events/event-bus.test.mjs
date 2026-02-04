@@ -8,7 +8,20 @@
 
 'use strict';
 
-const path = require('path');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+// Valid payloads for registered event types (event-bus validates against event-types.cjs)
+const EVENT_TYPE = 'AGENT_STARTED';
+function validPayload(overrides = {}) {
+  return {
+    type: EVENT_TYPE,
+    agentId: 'test-agent',
+    agentType: 'test',
+    taskId: 'test-task',
+    ...overrides,
+  };
+}
 
 // Test utilities
 let passCount = 0;
@@ -103,11 +116,11 @@ async function runTests() {
   await describe('Event Emission', async () => {
     await test('should emit events to subscribers', async () => {
       let received = null;
-      const subscription = eventBus.on('TEST_EVENT', payload => {
+      const subscription = eventBus.on(EVENT_TYPE, payload => {
         received = payload;
       });
 
-      await eventBus.emit('TEST_EVENT', { data: 'test' });
+      await eventBus.emit(EVENT_TYPE, validPayload({ data: 'test' }));
 
       // Give time for async emission
       await new Promise(resolve => setTimeout(resolve, 10));
@@ -121,11 +134,11 @@ async function runTests() {
 
     await test('should add timestamp to emitted events', async () => {
       let received = null;
-      const subscription = eventBus.on('TIMESTAMP_TEST', payload => {
+      const subscription = eventBus.on(EVENT_TYPE, payload => {
         received = payload;
       });
 
-      await eventBus.emit('TIMESTAMP_TEST', { value: 42 });
+      await eventBus.emit(EVENT_TYPE, validPayload({ value: 42 }));
 
       await new Promise(resolve => setTimeout(resolve, 10));
 
@@ -137,14 +150,14 @@ async function runTests() {
 
     await test('should handle multiple subscribers for same event', async () => {
       const received = [];
-      const sub1 = eventBus.on('MULTI_TEST', _payload => {
+      const sub1 = eventBus.on(EVENT_TYPE, _payload => {
         received.push('handler1');
       });
-      const sub2 = eventBus.on('MULTI_TEST', _payload => {
+      const sub2 = eventBus.on(EVENT_TYPE, _payload => {
         received.push('handler2');
       });
 
-      await eventBus.emit('MULTI_TEST', { test: true });
+      await eventBus.emit(EVENT_TYPE, validPayload({ test: true }));
 
       await new Promise(resolve => setTimeout(resolve, 10));
 
@@ -160,11 +173,11 @@ async function runTests() {
   await describe('Priority Support', async () => {
     await test('should execute handlers in priority order (higher first)', async () => {
       const order = [];
-      const sub1 = eventBus.on('PRIORITY_TEST', () => order.push('low'), 10);
-      const sub2 = eventBus.on('PRIORITY_TEST', () => order.push('medium'), 50);
-      const sub3 = eventBus.on('PRIORITY_TEST', () => order.push('high'), 90);
+      const sub1 = eventBus.on(EVENT_TYPE, () => order.push('low'), 10);
+      const sub2 = eventBus.on(EVENT_TYPE, () => order.push('medium'), 50);
+      const sub3 = eventBus.on(EVENT_TYPE, () => order.push('high'), 90);
 
-      await eventBus.emit('PRIORITY_TEST', {});
+      await eventBus.emit(EVENT_TYPE, validPayload());
 
       await new Promise(resolve => setTimeout(resolve, 10));
 
@@ -181,11 +194,11 @@ async function runTests() {
 
     await test('should default priority to 50', async () => {
       const order = [];
-      const sub1 = eventBus.on('DEFAULT_PRIORITY', () => order.push('default'));
-      const sub2 = eventBus.on('DEFAULT_PRIORITY', () => order.push('high'), 90);
-      const sub3 = eventBus.on('DEFAULT_PRIORITY', () => order.push('low'), 10);
+      const sub1 = eventBus.on(EVENT_TYPE, () => order.push('default'));
+      const sub2 = eventBus.on(EVENT_TYPE, () => order.push('high'), 90);
+      const sub3 = eventBus.on(EVENT_TYPE, () => order.push('low'), 10);
 
-      await eventBus.emit('DEFAULT_PRIORITY', {});
+      await eventBus.emit(EVENT_TYPE, validPayload());
 
       await new Promise(resolve => setTimeout(resolve, 10));
 
@@ -200,16 +213,16 @@ async function runTests() {
   await describe('Subscription Management', async () => {
     await test('should unsubscribe correctly', async () => {
       let callCount = 0;
-      const subscription = eventBus.on('UNSUB_TEST', () => callCount++);
+      const subscription = eventBus.on(EVENT_TYPE, () => callCount++);
 
-      await eventBus.emit('UNSUB_TEST', {});
+      await eventBus.emit(EVENT_TYPE, validPayload());
       await new Promise(resolve => setTimeout(resolve, 10));
 
       assertEqual(callCount, 1, 'handler should be called once');
 
       eventBus.off(subscription);
 
-      await eventBus.emit('UNSUB_TEST', {});
+      await eventBus.emit(EVENT_TYPE, validPayload());
       await new Promise(resolve => setTimeout(resolve, 10));
 
       assertEqual(callCount, 1, 'handler should not be called after unsubscribe');
@@ -217,14 +230,14 @@ async function runTests() {
 
     await test('should support once subscription', async () => {
       let callCount = 0;
-      eventBus.once('ONCE_TEST', () => callCount++);
+      eventBus.once(EVENT_TYPE, () => callCount++);
 
-      await eventBus.emit('ONCE_TEST', {});
+      await eventBus.emit(EVENT_TYPE, validPayload());
       await new Promise(resolve => setTimeout(resolve, 10));
 
       assertEqual(callCount, 1, 'handler should be called once');
 
-      await eventBus.emit('ONCE_TEST', {});
+      await eventBus.emit(EVENT_TYPE, validPayload());
       await new Promise(resolve => setTimeout(resolve, 10));
 
       assertEqual(callCount, 1, 'handler should not be called again');
@@ -233,10 +246,10 @@ async function runTests() {
 
   await describe('waitFor Promise-based Event Waiting', async () => {
     await test('should resolve when event is emitted', async () => {
-      const promise = eventBus.waitFor('WAIT_TEST', 1000);
+      const promise = eventBus.waitFor(EVENT_TYPE, 1000);
 
       setTimeout(() => {
-        eventBus.emit('WAIT_TEST', { result: 'success' });
+        eventBus.emit(EVENT_TYPE, validPayload({ result: 'success' }));
       }, 50);
 
       const payload = await promise;
@@ -248,7 +261,7 @@ async function runTests() {
     await test('should timeout if event not emitted', async () => {
       let timedOut = false;
       try {
-        await eventBus.waitFor('TIMEOUT_TEST', 100);
+        await eventBus.waitFor(EVENT_TYPE, 100);
       } catch (error) {
         timedOut = true;
         assert(error.message.includes('Timeout'), 'error should mention timeout');
@@ -259,10 +272,10 @@ async function runTests() {
 
     await test('should support default timeout of 30 seconds', async () => {
       const start = Date.now();
-      const promise = eventBus.waitFor('NEVER_EMITTED');
+      const promise = eventBus.waitFor(EVENT_TYPE);
 
       setTimeout(() => {
-        eventBus.emit('NEVER_EMITTED', {});
+        eventBus.emit(EVENT_TYPE, validPayload());
       }, 50);
 
       await promise;
@@ -275,16 +288,16 @@ async function runTests() {
   await describe('Error Handling', async () => {
     await test('should not crash if handler throws error', async () => {
       let errorThrown = false;
-      const sub1 = eventBus.on('ERROR_TEST', () => {
+      const sub1 = eventBus.on(EVENT_TYPE, () => {
         errorThrown = true;
         throw new Error('Handler error');
       });
       let successCalled = false;
-      const sub2 = eventBus.on('ERROR_TEST', () => {
+      const sub2 = eventBus.on(EVENT_TYPE, () => {
         successCalled = true;
       });
 
-      await eventBus.emit('ERROR_TEST', {});
+      await eventBus.emit(EVENT_TYPE, validPayload());
 
       await new Promise(resolve => setTimeout(resolve, 10));
 

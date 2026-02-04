@@ -303,6 +303,7 @@ These techniques are part of systematic debugging and available in this director
 - **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
 - **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
+- **find-polluter** - For test pollution bisection (flaky tests due to shared state): run `.claude/tools/analysis/find-polluter/find-polluter.sh` (or `find-polluter.ps1` on Windows) from the project root to isolate which test pollutes the suite.
 
 **Related skills:**
 

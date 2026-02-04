@@ -59,6 +59,7 @@ SPARC methodology emphasizes:
 ## Development Phases
 
 ### Phase 1: Specification
+
 **Goal**: Define requirements, constraints, and success criteria
 
 - Requirements analysis
@@ -70,6 +71,7 @@ SPARC methodology emphasizes:
 **Key Modes**: `researcher`, `analyzer`, `memory-manager`
 
 ### Phase 2: Architecture
+
 **Goal**: Design system structure and component interfaces
 
 - System architecture design
@@ -81,6 +83,7 @@ SPARC methodology emphasizes:
 **Key Modes**: `architect`, `designer`, `orchestrator`
 
 ### Phase 3: Refinement (TDD Implementation)
+
 **Goal**: Implement features with test-first approach
 
 - Write failing tests
@@ -92,6 +95,7 @@ SPARC methodology emphasizes:
 **Key Modes**: `tdd`, `coder`, `tester`
 
 ### Phase 4: Review
+
 **Goal**: Ensure code quality, security, and performance
 
 - Code quality assessment
@@ -103,6 +107,7 @@ SPARC methodology emphasizes:
 **Key Modes**: `reviewer`, `optimizer`, `debugger`
 
 ### Phase 5: Completion
+
 **Goal**: Integration, deployment, and monitoring
 
 - System integration
@@ -120,9 +125,11 @@ SPARC methodology emphasizes:
 ### Core Orchestration Modes
 
 #### `orchestrator`
+
 Multi-agent task orchestration with TodoWrite/Task/Memory coordination.
 
 **Capabilities**:
+
 - Task decomposition into manageable units
 - Agent coordination and resource allocation
 - Progress tracking and result synthesis
@@ -130,6 +137,7 @@ Multi-agent task orchestration with TodoWrite/Task/Memory coordination.
 - Cross-agent communication
 
 **Usage**:
+
 ```javascript
 mcp__claude-flow__sparc_mode {
   mode: "orchestrator",
@@ -139,9 +147,11 @@ mcp__claude-flow__sparc_mode {
 ```
 
 #### `swarm-coordinator`
+
 Specialized swarm management for complex multi-agent workflows.
 
 **Capabilities**:
+
 - Topology optimization (mesh, hierarchical, ring, star)
 - Agent lifecycle management
 - Dynamic scaling based on workload
@@ -149,9 +159,11 @@ Specialized swarm management for complex multi-agent workflows.
 - Performance monitoring
 
 #### `workflow-manager`
+
 Process automation and workflow orchestration.
 
 **Capabilities**:
+
 - Workflow definition and execution
 - Event-driven triggers
 - Sequential and parallel pipelines
@@ -159,9 +171,11 @@ Process automation and workflow orchestration.
 - Error handling and retry logic
 
 #### `batch-executor`
+
 Parallel task execution for high-throughput operations.
 
 **Capabilities**:
+
 - Concurrent file operations
 - Batch processing optimization
 - Resource pooling
@@ -173,9 +187,11 @@ Parallel task execution for high-throughput operations.
 ### Development Modes
 
 #### `coder`
+
 Autonomous code generation with batch file operations.
 
 **Capabilities**:
+
 - Feature implementation
 - Code refactoring
 - Bug fixes and patches
@@ -183,6 +199,7 @@ Autonomous code generation with batch file operations.
 - Algorithm implementation
 
 **Quality Standards**:
+
 - ES2022+ standards
 - TypeScript type safety
 - Comprehensive error handling
@@ -190,6 +207,7 @@ Autonomous code generation with batch file operations.
 - Security best practices
 
 **Usage**:
+
 ```javascript
 mcp__claude-flow__sparc_mode {
   mode: "coder",
@@ -203,9 +221,11 @@ mcp__claude-flow__sparc_mode {
 ```
 
 #### `architect`
+
 System design with Memory-based coordination.
 
 **Capabilities**:
+
 - Microservices architecture
 - Event-driven design
 - Domain-driven design (DDD)
@@ -213,12 +233,14 @@ System design with Memory-based coordination.
 - CQRS and Event Sourcing
 
 **Memory Integration**:
+
 - Store architectural decisions
 - Share component specifications
 - Maintain design consistency
 - Track architectural evolution
 
 **Design Patterns**:
+
 - Layered architecture
 - Microservices patterns
 - Event-driven patterns
@@ -226,6 +248,7 @@ System design with Memory-based coordination.
 - Infrastructure as Code
 
 **Usage**:
+
 ```javascript
 mcp__claude-flow__sparc_mode {
   mode: "architect",
@@ -239,9 +262,11 @@ mcp__claude-flow__sparc_mode {
 ```
 
 #### `tdd`
+
 Test-driven development with comprehensive testing.
 
 **Capabilities**:
+
 - Test-first development
 - Red-green-refactor cycle
 - Test suite design
@@ -249,6 +274,7 @@ Test-driven development with comprehensive testing.
 - Continuous testing
 
 **TDD Workflow**:
+
 1. Write failing test (RED)
 2. Implement minimum code
 3. Make test pass (GREEN)
@@ -256,6 +282,7 @@ Test-driven development with comprehensive testing.
 5. Repeat cycle
 
 **Testing Strategies**:
+
 - Unit testing (Jest, Mocha, Vitest)
 - Integration testing
 - End-to-end testing (Playwright, Cypress)
@@ -263,6 +290,7 @@ Test-driven development with comprehensive testing.
 - Security testing
 
 **Usage**:
+
 ```javascript
 mcp__claude-flow__sparc_mode {
   mode: "tdd",
@@ -276,9 +304,11 @@ mcp__claude-flow__sparc_mode {
 ```
 
 #### `reviewer`
+
 Code review using batch file analysis.
 
 **Capabilities**:
+
 - Code quality assessment
 - Security vulnerability detection
 - Performance analysis
@@ -286,6 +316,7 @@ Code review using batch file analysis.
 - Documentation review
 
 **Review Criteria**:
+
 - Code correctness and logic
 - Design pattern adherence
 - Comprehensive error handling
@@ -295,6 +326,7 @@ Code review using batch file analysis.
 - Performance bottlenecks
 
 **Batch Analysis**:
+
 - Parallel file review
 - Pattern detection
 - Dependency checking
@@ -302,6 +334,7 @@ Code review using batch file analysis.
 - Automated reporting
 
 **Usage**:
+
 ```javascript
 mcp__claude-flow__sparc_mode {
   mode: "reviewer",
@@ -319,9 +352,11 @@ mcp__claude-flow__sparc_mode {
 ### Analysis and Research Modes
 
 #### `researcher`
+
 Deep research with parallel WebSearch/WebFetch and Memory coordination.
 
 **Capabilities**:
+
 - Comprehensive information gathering
 - Source credibility evaluation
 - Trend analysis and forecasting
@@ -329,6 +364,7 @@ Deep research with parallel WebSearch/WebFetch and Memory coordination.
 - Technology assessment
 
 **Research Methods**:
+
 - Parallel web searches
 - Academic paper analysis
 - Industry report synthesis
@@ -336,6 +372,7 @@ Deep research with parallel WebSearch/WebFetch and Memory coordination.
 - Statistical data compilation
 
 **Memory Integration**:
+
 - Store research findings with citations
 - Build knowledge graphs
 - Track information sources
@@ -343,6 +380,7 @@ Deep research with parallel WebSearch/WebFetch and Memory coordination.
 - Maintain research history
 
 **Usage**:
+
 ```javascript
 mcp__claude-flow__sparc_mode {
   mode: "researcher",
@@ -356,9 +394,11 @@ mcp__claude-flow__sparc_mode {
 ```
 
 #### `analyzer`
+
 Code and data analysis with pattern recognition.
 
 **Capabilities**:
+
 - Static code analysis
 - Dependency analysis
 - Performance profiling
@@ -366,9 +406,11 @@ Code and data analysis with pattern recognition.
 - Data pattern recognition
 
 #### `optimizer`
+
 Performance optimization and bottleneck resolution.
 
 **Capabilities**:
+
 - Algorithm optimization
 - Database query tuning
 - Caching strategy design
@@ -380,9 +422,11 @@ Performance optimization and bottleneck resolution.
 ### Creative and Support Modes
 
 #### `designer`
+
 UI/UX design with accessibility focus.
 
 **Capabilities**:
+
 - Interface design
 - User experience optimization
 - Accessibility compliance (WCAG 2.1)
@@ -390,9 +434,11 @@ UI/UX design with accessibility focus.
 - Responsive layout design
 
 #### `innovator`
+
 Creative problem-solving and novel solutions.
 
 **Capabilities**:
+
 - Brainstorming and ideation
 - Alternative approach generation
 - Technology evaluation
@@ -400,9 +446,11 @@ Creative problem-solving and novel solutions.
 - Innovation feasibility analysis
 
 #### `documenter`
+
 Comprehensive documentation generation.
 
 **Capabilities**:
+
 - API documentation (OpenAPI/Swagger)
 - Architecture diagrams
 - User guides and tutorials
@@ -410,9 +458,11 @@ Comprehensive documentation generation.
 - README and changelog maintenance
 
 #### `debugger`
+
 Systematic debugging and issue resolution.
 
 **Capabilities**:
+
 - Bug reproduction
 - Root cause analysis
 - Fix implementation
@@ -420,9 +470,11 @@ Systematic debugging and issue resolution.
 - Debug logging optimization
 
 #### `tester`
+
 Comprehensive testing beyond TDD.
 
 **Capabilities**:
+
 - Test suite expansion
 - Edge case identification
 - Performance testing
@@ -430,9 +482,11 @@ Comprehensive testing beyond TDD.
 - Chaos engineering
 
 #### `memory-manager`
+
 Knowledge management and context preservation.
 
 **Capabilities**:
+
 - Cross-session memory persistence
 - Knowledge graph construction
 - Context restoration
@@ -1058,6 +1112,7 @@ mcp__claude-flow__token_usage {
 ## Performance Benefits
 
 **Proven Results**:
+
 - **84.8%** SWE-Bench solve rate
 - **32.3%** token reduction through optimizations
 - **2.8-4.4x** speed improvement with parallel execution

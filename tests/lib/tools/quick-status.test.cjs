@@ -28,7 +28,10 @@ test('runQuickStatus reports ok with valid inputs', () => {
 
   const result = runQuickStatus({ projectRoot: tmpRoot, routingTablePath });
   assert.equal(result.ok, true);
-  assert.equal(result.results.some(entry => entry.status.startsWith('INVALID')), false);
+  assert.equal(
+    result.results.some(entry => entry.status.startsWith('INVALID')),
+    false
+  );
 });
 
 test('runQuickStatus fails on invalid required JSON', () => {
@@ -37,10 +40,7 @@ test('runQuickStatus fails on invalid required JSON', () => {
   fs.writeFileSync(routingTablePath, 'module.exports = {};');
 
   fs.mkdirSync(path.join(tmpRoot, '.claude', 'config'), { recursive: true });
-  fs.writeFileSync(
-    path.join(tmpRoot, '.claude', 'config', 'capability-routing.json'),
-    '{bad json'
-  );
+  fs.writeFileSync(path.join(tmpRoot, '.claude', 'config', 'capability-routing.json'), '{bad json');
   writeJson(path.join(tmpRoot, '.claude', 'config', 'routing-prototypes.json'), {
     prototypes: {},
     dimensions: 384,

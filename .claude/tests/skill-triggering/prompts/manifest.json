@@ -1,0 +1,10 @@
+{
+  "prompts": [
+    { "file": "writing-plans.txt", "expectedSkill": "writing-plans" },
+    { "file": "executing-plans.txt", "expectedSkill": "executing-plans" },
+    { "file": "systematic-debugging.txt", "expectedSkill": "debugging" },
+    { "file": "test-driven-development.txt", "expectedSkill": "tdd" },
+    { "file": "requesting-code-review.txt", "expectedSkill": "requesting-code-review" },
+    { "file": "dispatching-parallel-agents.txt", "expectedSkill": "dispatching-parallel-agents" }
+  ]
+}

@@ -867,6 +867,11 @@ function checkMemoryReminder(hookInput, projectRoot = PROJECT_ROOT) {
   console.log('| Path: .claude/context/memory/                    |');
   console.log('|                                                  |');
   console.log('| "If it is not in memory, it did not happen."    |');
+  console.log('+--------------------------------------------------+');
+  console.log('| SKILL PROTOCOL REMINDER                          |');
+  console.log('+--------------------------------------------------+');
+  console.log('| Invoke relevant skills BEFORE responding.        |');
+  console.log('| When in doubt, use Skill tool (skill-discovery). |');
   console.log('+--------------------------------------------------+\n');
 
   return result;

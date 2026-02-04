@@ -27,12 +27,7 @@ function runQuickStatus(options = {}) {
     'config',
     'routing-prototypes.json'
   );
-  const agentRegistryPath = path.join(
-    projectRoot,
-    '.claude',
-    'context',
-    'agent-registry.json'
-  );
+  const agentRegistryPath = path.join(projectRoot, '.claude', 'context', 'agent-registry.json');
 
   const results = [];
   let ok = true;

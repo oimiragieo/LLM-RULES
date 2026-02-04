@@ -18,6 +18,16 @@ Integration of the superpowers codebase into agent-studio framework. Key integra
 
 ---
 
+## Completed (this pass)
+
+- Phase 1: Commands added under `.claude/commands` (brainstorm, write-plan, execute-plan).
+- Phase 2 (Option A): Skill protocol reminder added to UserPromptSubmit memory reminder box.
+- Phase 3: Debugging skill updated with find-polluter reference.
+- Phase 5: Skill-triggering prompts + manifest + runner script added, with `pnpm test:skill-triggering`.
+- Phase 6: Added `.claude/docs/DEEP_DIVE_SUPERPOWERS_MAPPING.md` for mapping and test guidance.
+
+---
+
 ## 1. HIGH-VALUE INTEGRATIONS
 
 ### Tier 1: Critical (Must Have)

@@ -2,43 +2,43 @@
   {
     "text": "Using /dev/null in shell commands creates a literal 'nul' file on Windows - use NUL instead or the windows-null-sanitizer hook",
     "timestamp": "2026-01-24T00:00:00.000Z",
-    "accessCount": 10,
-    "lastAccessed": "2026-02-03T14:53:10.053Z"
+    "accessCount": 11,
+    "lastAccessed": "2026-02-04T01:28:11.903Z"
   },
   {
     "text": "Hooks can only block/allow commands, they cannot modify them directly - use JSON output with tool_input to modify",
     "timestamp": "2026-01-24T00:00:00.000Z",
-    "accessCount": 10,
-    "lastAccessed": "2026-02-03T14:53:10.053Z"
+    "accessCount": 11,
+    "lastAccessed": "2026-02-04T01:28:11.903Z"
   },
   {
     "text": "Always update CLAUDE.md after creating skills/agents/workflows - Router won't know about items not in CLAUDE.md",
     "timestamp": "2026-01-24T00:00:00.000Z",
-    "accessCount": 10,
-    "lastAccessed": "2026-02-03T14:53:10.053Z"
+    "accessCount": 11,
+    "lastAccessed": "2026-02-04T01:28:11.903Z"
   },
   {
     "text": "Agents must use Skill() tool to invoke skills, not just Read() the SKILL.md files",
     "timestamp": "2026-01-24T00:00:00.000Z",
-    "accessCount": 10,
-    "lastAccessed": "2026-02-03T14:53:10.053Z"
+    "accessCount": 11,
+    "lastAccessed": "2026-02-04T01:28:11.903Z"
   },
   {
     "text": "Task metadata must be updated with discoveries via TaskUpdate() for cross-session continuity",
     "timestamp": "2026-01-24T00:00:00.000Z",
-    "accessCount": 10,
-    "lastAccessed": "2026-02-03T14:53:10.053Z"
+    "accessCount": 11,
+    "lastAccessed": "2026-02-04T01:28:11.903Z"
   },
   {
     "text": "learnings.md grows unbounded - use session-based JSON storage with read-time truncation instead",
     "timestamp": "2026-01-24T00:00:00.000Z",
-    "accessCount": 10,
-    "lastAccessed": "2026-02-03T14:53:10.053Z"
+    "accessCount": 11,
+    "lastAccessed": "2026-02-04T01:28:11.903Z"
   },
   {
     "text": "saveSession() function exists but is NEVER invoked automatically - need SessionEnd hook to trigger session creation",
     "timestamp": "2026-01-25T05:59:27.179Z",
-    "accessCount": 10,
-    "lastAccessed": "2026-02-03T14:53:10.053Z"
+    "accessCount": 11,
+    "lastAccessed": "2026-02-04T01:28:11.903Z"
   }
 ]
