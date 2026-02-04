@@ -171,7 +171,10 @@ function classifyIntent(prompt) {
     capability = matchingCapabilities[0];
   }
 
-  if (capability && !evaluateRoutingCondition(capability, normalizedPrompt, capRouting.routingConditions)) {
+  if (
+    capability &&
+    !evaluateRoutingCondition(capability, normalizedPrompt, capRouting.routingConditions)
+  ) {
     capability = null;
   }
 
@@ -185,7 +188,8 @@ function classifyIntent(prompt) {
 
   const hasIntent = intent !== 'general';
   const hasCapability = Boolean(capability);
-  const confidence = hasIntent && hasCapability ? 'high' : hasIntent || hasCapability ? 'medium' : 'low';
+  const confidence =
+    hasIntent && hasCapability ? 'high' : hasIntent || hasCapability ? 'medium' : 'low';
 
   return {
     intent,

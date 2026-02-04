@@ -12,12 +12,7 @@ const CAPABILITY_ROUTING_PATH = path.join(
   'config',
   'capability-routing.json'
 );
-const AGENT_REGISTRY_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'agent-registry.json'
-);
+const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
 const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
 
 function readJsonIfExists(filePath) {
@@ -67,8 +62,7 @@ function validateRoutingConsistency() {
   const issues = [];
   const { capabilityMap, defaultAgents, domainFallbacks } = loadCapabilityRouting();
   const registry = readJsonIfExists(AGENT_REGISTRY_PATH);
-  const agentIds =
-    collectAgentIdsFromRegistry(registry) || collectAgentIdsFromFilesystem();
+  const agentIds = collectAgentIdsFromRegistry(registry) || collectAgentIdsFromFilesystem();
 
   for (const [keyword, capability] of Object.entries(capabilityMap)) {
     if (Object.prototype.hasOwnProperty.call(ROUTING_TABLE, keyword)) {
