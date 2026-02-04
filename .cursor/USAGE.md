@@ -107,6 +107,17 @@ All agents are instructed to:
 
 All agents optimized for Plan Mode workflows!
 
+### Ralph Loop (Autonomous Iteration)
+
+Use **@ralph-loop** for autonomous development loops:
+
+- **Task file**: `.cursor/RALPH_TASK.md` with checkboxes for success criteria
+- **Run**: From project root, `.cursor/ralph-scripts/ralph-setup.sh` (interactive) or `.cursor/ralph-scripts/ralph-loop.sh -y` (CLI)
+- **Single iteration**: `.cursor/ralph-scripts/ralph-once.sh` to test before a full loop
+- **State**: Progress and guardrails in `.cursor/.ralph/`; monitor with `tail -f .cursor/.ralph/activity.log`
+
+Requires **cursor-agent** CLI and **jq**. See `ralph-scripts/README.md` and `skills/ralph-loop.md`.
+
 ## Verification Checklist
 
 After copying `.cursor/` to your project:

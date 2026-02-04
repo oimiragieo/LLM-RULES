@@ -5,11 +5,7 @@ const os = require('os');
 const path = require('path');
 const fs = require('fs');
 
-const {
-  parseHookInputSync,
-  getToolName,
-  debugLog,
-} = require('../../lib/utils/hook-input.cjs');
+const { parseHookInputSync, getToolName, debugLog } = require('../../lib/utils/hook-input.cjs');
 
 const DEFAULT_THRESHOLD = 50;
 const DEFAULT_INTERVAL = 25;
@@ -50,7 +46,10 @@ function maybeSuggestCompact() {
   if (!isEnabled()) return null;
 
   const threshold = Number.parseInt(process.env.COMPACT_THRESHOLD || `${DEFAULT_THRESHOLD}`, 10);
-  const interval = Number.parseInt(process.env.COMPACT_REMINDER_INTERVAL || `${DEFAULT_INTERVAL}`, 10);
+  const interval = Number.parseInt(
+    process.env.COMPACT_REMINDER_INTERVAL || `${DEFAULT_INTERVAL}`,
+    10
+  );
   const counterFile = getCounterFile();
 
   const current = readCount(counterFile);

@@ -57,6 +57,7 @@ If any critical issues, list them with fix suggestions.
 ## Arguments
 
 $ARGUMENTS can be:
+
 - `quick` - Only build + types
 - `full` - All checks (default)
 - `pre-commit` - Checks relevant for commits

@@ -85,6 +85,11 @@ context/sessions/
 .cursor/settings.local.json
 .factory/settings.local.json
 
+# Ralph (runtime/cache; .cursor/.ralph/progress.md and guardrails.md are tracked)
+.cursor/.ralph/.iteration
+.cursor/.ralph/tasks.yaml
+.cursor/.ralph/.parser_fifo
+
 # Environment Variables
 .env
 .env.local

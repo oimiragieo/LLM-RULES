@@ -13,6 +13,7 @@ Sequential agent workflow for complex tasks.
 ## Workflow Types
 
 ### feature
+
 Full feature implementation workflow:
 
 ```
@@ -20,6 +21,7 @@ planner -> developer -> code-reviewer -> security-architect
 ```
 
 ### bugfix
+
 Bug investigation and fix workflow:
 
 ```
@@ -27,6 +29,7 @@ researcher -> developer -> code-reviewer
 ```
 
 ### refactor
+
 Safe refactoring workflow:
 
 ```
@@ -34,6 +37,7 @@ architect -> code-reviewer -> developer
 ```
 
 ### security
+
 Security-focused review:
 
 ```
@@ -57,18 +61,23 @@ Between agents, create handoff document:
 ## HANDOFF: [previous-agent] -> [next-agent]
 
 ### Context
+
 [Summary of what was done]
 
 ### Findings
+
 [Key discoveries or decisions]
 
 ### Files Modified
+
 [List of files touched]
 
 ### Open Questions
+
 [Unresolved items for next agent]
 
 ### Recommendations
+
 [Suggested next steps]
 ```
 
@@ -143,12 +152,15 @@ For independent checks, run agents in parallel:
 
 ```markdown
 ### Parallel Phase
+
 Run simultaneously:
+
 - code-reviewer (quality)
 - security-architect (security)
 - architect (design)
 
 ### Merge Results
+
 Combine outputs into single report
 ```
 
