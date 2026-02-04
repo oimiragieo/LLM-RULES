@@ -6,9 +6,12 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const {
   ROUTING_TABLE,
   ROUTING_PREFIX_PATTERNS,
+  ROUTING_PATTERNS,
   INTENT_KEYWORDS,
   getPreferredAgent,
 } = require('./routing-table.cjs');
+const { resolveByPattern } = require('./pattern-router.cjs');
+const { fuzzyMatchIntent } = require('./fuzzy-intent-matcher.cjs');
 
 const CAPABILITY_ROUTING_PATH = path.join(
   PROJECT_ROOT,
@@ -141,6 +144,24 @@ function classifyIntent(prompt) {
       intent = prefixMatch.intent;
       source = prefixMatch.source;
       defaultAgent = prefixMatch.agent;
+    }
+  }
+
+  if (intent === 'general' && !defaultAgent) {
+    const patternMatch = resolveByPattern(promptLower, ROUTING_PATTERNS);
+    if (patternMatch) {
+      intent = patternMatch.agent;
+      source = 'pattern';
+      defaultAgent = getPreferredAgent(patternMatch.agent) ?? patternMatch.agent;
+    }
+  }
+
+  if (intent === 'general' && !defaultAgent) {
+    const fuzzyMatch = fuzzyMatchIntent(promptLower, INTENT_KEYWORDS, { threshold: 0.6 });
+    if (fuzzyMatch) {
+      intent = fuzzyMatch.intent;
+      source = 'fuzzy';
+      defaultAgent = getPreferredAgent(fuzzyMatch.intent);
     }
   }
 

@@ -78,6 +78,12 @@ your-project/
 3. Point to `.claude/hooks` directory
 4. Enable security hooks
 
+If you need to reset runtime or memory state (e.g., after corruption or drift), run:
+
+```bash
+pnpm run context:reset --scope soft --force
+```
+
 **Available Hooks:**
 
 - **security-pre-tool.mjs** (PreToolUse): Blocks dangerous commands, protects sensitive files, prevents force pushes

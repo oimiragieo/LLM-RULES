@@ -391,5 +391,17 @@ describe('EntityQuery', () => {
       assert.ok(Array.isArray(path), 'Should handle circular relationships');
       assert.ok(path.length > 0, 'Should find path in circular graph');
     });
+
+    it('should handle invalid limit in findByType (no NaN in SQL)', async () => {
+      const tasks = await entityQuery.findByType('task', { limit: 'invalid' });
+      assert.ok(Array.isArray(tasks), 'Should return array');
+      assert.strictEqual(tasks.length, 0, 'Invalid limit should clamp to 0');
+    });
+
+    it('should handle invalid depth in findRelated (fallback to 1)', async () => {
+      const related = await entityQuery.findRelated('task-25', { depth: null });
+      assert.ok(Array.isArray(related), 'Should return array');
+      assert.ok(related.length >= 0, 'Invalid depth should not throw');
+    });
   });
 });

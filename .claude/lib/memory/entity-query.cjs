@@ -139,7 +139,8 @@ class EntityQuery {
     `;
 
     if (limit !== undefined) {
-      query += ` LIMIT ${parseInt(limit, 10)}`;
+      const limitNum = Number.isFinite(Number(limit)) ? Math.max(0, parseInt(limit, 10)) : 0;
+      query += ` LIMIT ${limitNum}`;
     }
 
     const stmt = this.db.prepare(query);
@@ -158,7 +159,9 @@ class EntityQuery {
    * @returns {Promise<Array>} Array of {entity, relationship_type, weight} objects
    */
   async findRelated(id, options = {}) {
-    const { relationshipType, depth = 1 } = options;
+    const { relationshipType, depth: rawDepth = 1 } = options;
+    const depthNum = parseInt(rawDepth, 10);
+    const depth = Number.isFinite(depthNum) && depthNum >= 1 ? depthNum : 1;
 
     // Build query based on whether we have a relationship type filter
     // Search BOTH outgoing (from_entity_id = id) AND incoming (to_entity_id = id)
@@ -204,7 +207,7 @@ class EntityQuery {
             'outgoing'
           FROM entity_relationships r
           JOIN related ON r.from_entity_id = related.entity_id
-          WHERE related.depth < ${parseInt(depth, 10)}
+          WHERE related.depth < ${depth}
             AND r.relationship_type = ?
         )
         SELECT DISTINCT
@@ -251,7 +254,7 @@ class EntityQuery {
             related.depth + 1
           FROM entity_relationships r
           JOIN related ON r.from_entity_id = related.entity_id
-          WHERE related.depth < ${parseInt(depth, 10)}
+          WHERE related.depth < ${depth}
         )
         SELECT DISTINCT
           e.*,

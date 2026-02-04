@@ -181,6 +181,33 @@ const ROUTING_PREFIX_PATTERNS = [
   { pattern: 'fastapi', agent: 'fastapi-pro' },
 ];
 
+/**
+ * Pattern-based routing: regex + priority. Higher priority wins.
+ * Used when keyword/prefix matching does not resolve intent.
+ */
+const ROUTING_PATTERNS = {
+  developer: [
+    { pattern: /^(implement|code|build|develop|create|fix|add)\b/i, priority: 10 },
+    { pattern: /\b(bug|fix|debug|patch|error|exception)\b/i, priority: 9 },
+  ],
+  qa: [
+    { pattern: /^(test|testing|qa|validate|coverage)\b/i, priority: 10 },
+    { pattern: /\b(tdd|test-driven|e2e|regression)\b/i, priority: 8 },
+  ],
+  architect: [
+    { pattern: /^(design|architecture|system\s+design|refactor)\b/i, priority: 10 },
+    { pattern: /\b(microservice|scalab|pattern|adr)\b/i, priority: 9 },
+  ],
+  planner: [{ pattern: /^(plan|planning|break\s*down|roadmap)\b/i, priority: 10 }],
+  'security-architect': [{ pattern: /^(security|audit|vulnerability|owasp)\b/i, priority: 10 }],
+  'technical-writer': [{ pattern: /^(document|docs|readme|guide|tutorial)\b/i, priority: 10 }],
+  devops: [{ pattern: /^(deploy|ci\/cd|pipeline|kubernetes|docker)\b/i, priority: 10 }],
+  'incident-responder': [
+    { pattern: /\b(incident|outage|emergency|production\s+down)\b/i, priority: 10 },
+  ],
+  'code-reviewer': [{ pattern: /^(review|pr\s+review|code\s+review)\b/i, priority: 10 }],
+};
+
 const INTENT_KEYWORDS = {
   // === CORE AGENTS (8) ===
   architect: [
@@ -1977,17 +2004,19 @@ const DISAMBIGUATION_RULES = {
 };
 
 /**
- * Get preferred agent for a detected intent
+ * Get preferred agent for a detected intent.
+ * Resolves from ROUTING_TABLE (keyword -> agent) then INTENT_TO_AGENT (intent key -> agent).
  * @param {string} intent
  * @returns {string|null}
  */
 function getPreferredAgent(intent) {
-  return ROUTING_TABLE[intent] || null;
+  return ROUTING_TABLE[intent] ?? INTENT_TO_AGENT[intent] ?? null;
 }
 
 module.exports = {
   ROUTING_TABLE,
   ROUTING_PREFIX_PATTERNS,
+  ROUTING_PATTERNS,
   INTENT_KEYWORDS,
   INTENT_TO_AGENT,
   DISAMBIGUATION_RULES,

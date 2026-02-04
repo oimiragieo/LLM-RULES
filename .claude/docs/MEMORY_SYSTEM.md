@@ -855,6 +855,36 @@ Workflow skills like `session-handoff` leverage memory:
 
 ## Troubleshooting
 
+### Reset Memory and Logs
+
+If memory or observability data becomes corrupted or you want a clean slate, use the reset script:
+
+```bash
+node scripts/reset-context.cjs --scope soft --force
+```
+
+Scopes:
+
+- `soft` (default): clears runtime and metrics only.
+- `memory`: clears runtime, metrics, and `.claude/context/memory/**`.
+- `full`: clears memory scope plus code index, registry outputs, routing prototypes, and self-healing/evolution state.
+
+Optional: `--include-lancedb` to wipe `.claude/data/lancedb`.
+
+After `memory` or `full` reset, reinitialize memory schema:
+
+```bash
+pnpm run memory:init
+```
+
+After `full` reset, also rebuild:
+
+```bash
+pnpm run code:index:reindex
+pnpm run routing:prototypes
+pnpm run agents:registry
+```
+
 ### Memory Files Not Found
 
 **Symptom**: `load` command returns empty results

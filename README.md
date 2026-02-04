@@ -38,6 +38,12 @@ Notes:
 
    This creates the SQLite schema for the hybrid memory system. If you see errors about missing tables, run this command.
 
+   If you need to reset memory/runtime/metrics state, use:
+
+   ```bash
+   pnpm run context:reset --scope soft --force
+   ```
+
 4. **Build initial semantic index** (recommended):
 
    ```bash

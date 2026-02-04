@@ -210,6 +210,7 @@ User: "What TypeScript files are in the project?"
 **How it works:**
 
 1. `user-prompt-unified.cjs` (uses `routing-table.cjs`) detects complexity level on UserPromptSubmit
+   - Classification uses keyword/routing-table matches with pattern and fuzzy fallbacks in `intent-classifier.cjs`.
 2. `task-create-guard.cjs` intercepts TaskCreate tool use
 3. If complexity is HIGH/EPIC and PLANNER not spawned → BLOCK
 

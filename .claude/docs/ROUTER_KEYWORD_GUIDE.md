@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide documents how the Router uses keyword matching to analyze user requests and select appropriate agents. The Router performs comprehensive intent detection using keyword scoring, intent-to-agent mapping, and disambiguation rules to route requests to specialized agents.
+This guide documents how the Router uses keyword matching to analyze user requests and select appropriate agents. The Router performs comprehensive intent detection using keyword scoring, intent-to-agent mapping, and disambiguation rules, with pattern and fuzzy fallbacks defined in `.claude/lib/routing/routing-table.cjs` when exact keyword matches are weak.
 
 ## Intent Detection System
 

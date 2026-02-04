@@ -221,6 +221,8 @@ class CodeParser {
 
 **Purpose:** Extract semantically meaningful code units from AST
 
+For non-code documents and long prose, use `.claude/lib/text-processing/sentence-chunker.cjs` for sentence-aware chunking.
+
 **Chunking Strategy:**
 
 | Code Type       | Chunk Boundary           | Rationale                 |
