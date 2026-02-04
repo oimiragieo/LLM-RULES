@@ -29,6 +29,7 @@ echo "Pending todos: $TODO_COUNT"
 ```
 
 If count is 0:
+
 ```
 No pending todos.
 
@@ -153,16 +154,18 @@ Update `.claude/state/current-task.json` if exists.
 </output>
 
 <anti_patterns>
+
 - Don't delete todos — move to done/ when work begins
 - Don't start work without moving to done/ first
 - Don't create plans from this command — route to /write-plan
-</anti_patterns>
+  </anti_patterns>
 
 <success_criteria>
+
 - [ ] All pending todos listed with title, area, age
 - [ ] Area filter applied if specified
 - [ ] Selected todo's full context loaded
 - [ ] Appropriate actions offered
 - [ ] Selected action executed
 - [ ] State updated if todo count changed
-</success_criteria>
+      </success_criteria>

@@ -1,12 +1,12 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-04T01:48:38.824Z",
+  "generatedAt": "2026-02-04T06:29:54.932Z",
   "metadata": {
-    "totalTools": 30,
-    "totalCoreTools": 21,
+    "totalTools": 31,
+    "totalCoreTools": 22,
     "totalMcpTools": 9,
     "totalAgents": 16,
-    "lastValidated": "2026-02-04T01:48:38.824Z",
+    "lastValidated": "2026-02-04T06:29:54.933Z",
     "source": ".claude/CLAUDE.md sections 1.1-1.4"
   },
   "tools": {
@@ -325,6 +325,21 @@
           "orchestrators": "all",
           "router": "no"
         }
+      },
+      {
+        "name": "MemoryRecord",
+        "category": "Memory",
+        "description": "Record structured memory entries",
+        "status": "available",
+        "mandatory": false,
+        "canEdit": false,
+        "optional": false,
+        "requiresActiveProject": true,
+        "availability": {
+          "agents": "all",
+          "orchestrators": "all",
+          "router": "no"
+        }
       }
     ],
     "mcp": [
@@ -477,7 +492,8 @@
         "ExitPlanMode",
         "WebSearch",
         "WebFetch",
-        "NotebookEdit"
+        "NotebookEdit",
+        "MemoryRecord"
       ],
       "DEVELOPER": [
         "Read",
@@ -491,7 +507,8 @@
         "TaskCreate",
         "TaskGet",
         "TaskOutput",
-        "Skill"
+        "Skill",
+        "MemoryRecord"
       ],
       "PLANNER": [
         "Read",
@@ -506,6 +523,7 @@
         "TaskGet",
         "TaskOutput",
         "Skill",
+        "MemoryRecord",
         "EnterPlanMode",
         "ExitPlanMode"
       ],
@@ -523,7 +541,8 @@
         "TaskCreate",
         "TaskGet",
         "TaskOutput",
-        "Skill"
+        "Skill",
+        "MemoryRecord"
       ],
       "ROUTER": [
         "Read",
@@ -544,9 +563,10 @@
         "TaskList",
         "TaskCreate",
         "TaskGet",
-        "Skill"
+        "Skill",
+        "MemoryRecord"
       ],
-      "READ_ONLY": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill"],
+      "READ_ONLY": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill", "MemoryRecord"],
       "DATA_SCIENCE": [
         "Read",
         "Write",
@@ -559,7 +579,8 @@
         "TaskList",
         "TaskCreate",
         "TaskGet",
-        "Skill"
+        "Skill",
+        "MemoryRecord"
       ]
     }
   },
@@ -567,9 +588,9 @@
     "maxToolsPerAgent": 15,
     "maxToolsPerOrchestrator": 18,
     "toolCounts": {
-      "coreTools": 21,
+      "coreTools": 22,
       "mcpTools": 9,
-      "totalAvailable": 21,
+      "totalAvailable": 22,
       "totalUnavailable": 9
     }
   },
@@ -589,7 +610,8 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 12
       },
@@ -607,7 +629,8 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 12
       },
@@ -626,6 +649,7 @@
           "TaskGet",
           "TaskOutput",
           "Skill",
+          "MemoryRecord",
           "EnterPlanMode",
           "ExitPlanMode"
         ],
@@ -646,6 +670,7 @@
           "TaskGet",
           "TaskOutput",
           "Skill",
+          "MemoryRecord",
           "EnterPlanMode",
           "ExitPlanMode"
         ],
@@ -665,7 +690,8 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 12
       },
@@ -683,7 +709,8 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 12
       },
@@ -701,13 +728,14 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 12
       },
       "code-reviewer": {
         "toolset": "READ_ONLY",
-        "tools": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill"],
+        "tools": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill", "MemoryRecord"],
         "maxTools": 6
       },
       "researcher": {
@@ -722,7 +750,8 @@
           "TaskList",
           "TaskCreate",
           "TaskGet",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 10
       },
@@ -742,7 +771,8 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 13
       },
@@ -762,7 +792,8 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 13
       },
@@ -782,7 +813,8 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 13
       },
@@ -802,7 +834,8 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 13
       },
@@ -820,7 +853,8 @@
           "TaskCreate",
           "TaskGet",
           "TaskOutput",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 5
       },
@@ -838,7 +872,8 @@
           "TaskList",
           "TaskCreate",
           "TaskGet",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 12
       },
@@ -856,7 +891,8 @@
           "TaskList",
           "TaskCreate",
           "TaskGet",
-          "Skill"
+          "Skill",
+          "MemoryRecord"
         ],
         "maxTools": 12
       }

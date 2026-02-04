@@ -288,7 +288,9 @@ module.exports = {
   main,
 };
 
-main().catch(err => {
-  debugLog('sync-memory-index', 'Unhandled error', err);
-  process.exit(0);
-});
+if (require.main === module) {
+  main().catch(err => {
+    debugLog('sync-memory-index', 'Unhandled error', err);
+    process.exit(0);
+  });
+}

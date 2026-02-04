@@ -73,10 +73,7 @@ test('formatStatusline includes current task when state file exists', () => {
 test('getCurrentTask reads state file when available', () => {
   const tmpState = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-state-'));
   const stateFile = path.join(tmpState, 'current-task.json');
-  fs.writeFileSync(
-    stateFile,
-    JSON.stringify({ currentTask: 'Task from state' }, null, 2)
-  );
+  fs.writeFileSync(stateFile, JSON.stringify({ currentTask: 'Task from state' }, null, 2));
   withEnv({ STATUSLINE_STATE_DIR: tmpState }, () => {
     const task = getCurrentTask('');
     assert.equal(task, 'Task from state');

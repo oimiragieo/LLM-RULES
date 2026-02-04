@@ -29,9 +29,14 @@ const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
+const { spawnSync } = require('child_process');
 const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { DEFAULT_AREA, isValidArea } = require('./memory-areas.cjs');
+const {
+  syncJsonMemory,
+  ensureEntityDbInitialized,
+} = require('../../hooks/memory/sync-memory-index.cjs');
 
 const logger = createLogger('memory-manager');
 
@@ -146,6 +151,47 @@ function buildEntryId(entry) {
 
 function normalizeArea(area) {
   return isValidArea(area) ? area : DEFAULT_AREA;
+}
+
+function maybeSyncMemoryJson(filePath, projectRoot = PROJECT_ROOT) {
+  if (process.env.MEMORY_AUTO_SYNC === 'off') return;
+  if (!filePath) return;
+
+  try {
+    const validated = validatePathWithinProject(filePath, projectRoot);
+    if (!validated.safe) return;
+
+    const dbPath = path.join(projectRoot, '.claude', 'data', 'memory.db');
+    ensureEntityDbInitialized(dbPath);
+    syncJsonMemory(filePath, dbPath);
+
+    if (process.env.MEMORY_EMBED_ON_WRITE === 'on') {
+      const generatorPath = path.join(
+        projectRoot,
+        '.claude',
+        'tools',
+        'cli',
+        'generate-embeddings.cjs'
+      );
+      if (fs.existsSync(generatorPath)) {
+        const timeoutMs = Number(process.env.MEMORY_EMBED_ON_WRITE_TIMEOUT_MS || 30000);
+        const spawnResult = spawnSync(process.execPath, [generatorPath, '--file', filePath], {
+          cwd: projectRoot,
+          stdio: 'ignore',
+          timeout: timeoutMs,
+        });
+        if (spawnResult.signal === 'SIGTERM' || spawnResult.status !== 0) {
+          logger.warn('Embedding generation may be partial', {
+            file: path.basename(filePath),
+            status: spawnResult.status,
+            signal: spawnResult.signal,
+          });
+        }
+      }
+    }
+  } catch (err) {
+    logger.warn('Memory sync failed', { file: path.basename(filePath), error: err.message });
+  }
 }
 
 /**
@@ -665,6 +711,7 @@ function recordGotcha(gotcha, projectRoot = PROJECT_ROOT) {
 
     gotchas.push(entry);
     atomicWriteJSONSync(gotchasFile, gotchas);
+    maybeSyncMemoryJson(gotchasFile, projectRoot);
   }
 
   return !isDuplicate;
@@ -723,6 +770,7 @@ function recordPattern(pattern, projectRoot = PROJECT_ROOT) {
 
     patterns.push(entry);
     atomicWriteJSONSync(patternsFile, patterns);
+    maybeSyncMemoryJson(patternsFile, projectRoot);
   }
 
   return !isDuplicate;
@@ -913,6 +961,7 @@ async function recordGotchaAsync(gotcha, projectRoot = PROJECT_ROOT) {
 
     gotchas.push(entry);
     await atomicWriteAsync(gotchasFile, JSON.stringify(gotchas, null, 2));
+    maybeSyncMemoryJson(gotchasFile, projectRoot);
   }
 
   return !isDuplicate;
@@ -961,6 +1010,7 @@ async function recordPatternAsync(pattern, projectRoot = PROJECT_ROOT) {
 
     patterns.push(entry);
     await atomicWriteAsync(patternsFile, JSON.stringify(patterns, null, 2));
+    maybeSyncMemoryJson(patternsFile, projectRoot);
   }
 
   return !isDuplicate;

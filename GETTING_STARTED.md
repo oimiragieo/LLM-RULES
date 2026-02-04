@@ -1213,9 +1213,10 @@ Quick access to frequently-used skills and workflows via slash commands.
 - `/verify` (verification)
 - `/checkpoint` (workflow checkpoints)
 - `/learn` (extract reusable patterns)
-- `/orchestrate` (multi-agent workflow)
-- `/tdd`, `/code-review`, `/test-coverage`, `/eval`, `/build-fix`, `/refactor-clean`, `/e2e`
-- `/setup-pm` (package manager setup)
+  - `/orchestrate` (multi-agent workflow)
+  - `/tdd`, `/code-review`, `/test-coverage`, `/eval`, `/build-fix`, `/refactor-clean`, `/e2e`
+  - `/setup-pm` (package manager setup)
+  - `/add-todo`, `/check-todos` (capture and review session todos)
 
 ### Usage
 

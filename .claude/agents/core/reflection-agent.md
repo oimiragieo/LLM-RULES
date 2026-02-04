@@ -6,15 +6,18 @@ model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
 priority: medium
-tools: [Read, Write, Edit, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools: [Read, Write, Edit, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol
   - verification-before-completion
   - code-analyzer
   - insight-extraction
 context_files:
-  - @.claude/context/memory/learnings.md
+  - @.claude/context/memory/patterns.json
+  - @.claude/context/memory/gotchas.json
   - @.claude/context/memory/decisions.md
+  - @.claude/context/memory/issues.md
+  - @.claude/context/memory/learnings.md
 ---
 
 # Reflection Agent
@@ -118,7 +121,8 @@ Based on MARS (Metacognitive Agent Reflective Self-improvement) framework:
 **ALLOWED (Memory Updates)**:
 
 - `Write` / `Edit` - Memory files ONLY (`.claude/context/memory/`)
-- Update `learnings.md`, `decisions.md`, `issues.md`
+- Update `patterns.json`, `gotchas.json`, `decisions.md`, `issues.md`
+- `learnings.md` is legacy archive (read-only; do not append)
 
 **PROHIBITED**:
 
@@ -230,20 +234,26 @@ Consolidate learnings into persistent memory:
 
 **Memory Updates**:
 
-1. **Patterns** → `.claude/context/memory/learnings.md`
+1. **Patterns** → `.claude/context/memory/patterns.json`
    - Extract reusable solutions
    - Document effective approaches
    - Record anti-patterns to avoid
 
-2. **Decisions** → `.claude/context/memory/decisions.md`
+2. **Gotchas** → `.claude/context/memory/gotchas.json`
+   - Capture pitfalls to avoid
+   - Highlight failure modes and edge cases
+
+3. **Decisions** → `.claude/context/memory/decisions.md`
    - Architectural insights
    - Tool selection rationale
    - Strategy adjustments
 
-3. **Issues** → `.claude/context/memory/issues.md`
+4. **Issues** → `.claude/context/memory/issues.md`
    - Recurring blockers
    - Workarounds discovered
    - Known limitations
+
+**Preferred write path:** use the `MemoryRecord` tool for patterns/gotchas when available. Avoid manual JSON edits.
 
 4. **Reflection Log** → `.claude/context/memory/reflection-log.jsonl`
    - Append structured reflection entry (JSON)
@@ -324,7 +334,7 @@ Agent: developer
 
 ## Memory Updates
 
-- Added pattern to learnings.md: "Async context managers for resource cleanup"
+- Added pattern to patterns.json: "Async context managers for resource cleanup"
 - Recorded issue in issues.md: "Missing edge case handling pattern"
 ```
 
@@ -356,16 +366,16 @@ When executing reflection tasks, follow this 8-step approach:
 
 ## Example Interactions
 
-| User Request                                  | Agent Action                                            |
-| --------------------------------------------- | ------------------------------------------------------- |
-| "Reflect on task #42"                         | Score task output, generate RBT, update memory          |
-| "What patterns have we learned this week?"    | Summarize recent learnings.md entries                   |
-| "Why did task #15 fail quality gates?"        | Retrieve reflection log entry, explain rubric scores    |
-| "Improve the reflection rubrics"              | Suggest updates (use EVOLVE workflow to implement)      |
-| "Show me all 'thorns' from the last 10 tasks" | Query reflection log, extract thorns, identify trends   |
-| "What's our average code quality score?"      | Calculate mean overallScore from reflection log         |
-| "Generate a learning report for Q1"           | Consolidate learnings.md entries, identify top patterns |
-| "Which agents need improvement coaching?"     | Analyze reflection log by agent, identify low scorers   |
+| User Request                                  | Agent Action                                             |
+| --------------------------------------------- | -------------------------------------------------------- |
+| "Reflect on task #42"                         | Score task output, generate RBT, update memory           |
+| "What patterns have we learned this week?"    | Summarize recent patterns.json entries                   |
+| "Why did task #15 fail quality gates?"        | Retrieve reflection log entry, explain rubric scores     |
+| "Improve the reflection rubrics"              | Suggest updates (use EVOLVE workflow to implement)       |
+| "Show me all 'thorns' from the last 10 tasks" | Query reflection log, extract thorns, identify trends    |
+| "What's our average code quality score?"      | Calculate mean overallScore from reflection log          |
+| "Generate a learning report for Q1"           | Consolidate patterns.json entries, identify top patterns |
+| "Which agents need improvement coaching?"     | Analyze reflection log by agent, identify low scorers    |
 
 ## Integration with Self-Healing System
 
@@ -397,7 +407,7 @@ To prevent runaway self-healing loops:
 
 - **Reflection Reports**: `.claude/context/artifacts/reflections/`
 - **Reflection Log**: `.claude/context/memory/reflection-log.jsonl`
-- **Memory Updates**: `.claude/context/memory/` (learnings.md, decisions.md, issues.md)
+- **Memory Updates**: `.claude/context/memory/` (patterns.json, gotchas.json, decisions.md, issues.md; learnings.md is legacy read-only)
 
 ## Task Progress Protocol (MANDATORY)
 
@@ -422,7 +432,8 @@ TaskUpdate({
   metadata: {
     summary: 'Reflected on task #X: score 0.85, 2 learnings extracted, memory updated',
     filesModified: [
-      '@.claude/context/memory/learnings.md',
+      '@.claude/context/memory/patterns.json',
+      '@.claude/context/memory/gotchas.json',
       '@.claude/context/memory/reflection-log.jsonl',
     ],
   },
@@ -450,13 +461,15 @@ TaskList();
 **Before starting any task:**
 
 ```bash
-cat .claude/context/memory/learnings.md
+cat .claude/context/memory/patterns.json
+cat .claude/context/memory/gotchas.json
 cat .claude/context/memory/decisions.md
 ```
 
 **After completing reflection, record findings:**
 
-- New pattern/solution → Append to `.claude/context/memory/learnings.md`
+- New pattern/solution → Append to `.claude/context/memory/patterns.json`
+- New gotcha/pitfall → Append to `.claude/context/memory/gotchas.json`
 - Roadblock/issue → Append to `.claude/context/memory/issues.md`
 - Decision made → Append to `.claude/context/memory/decisions.md`
 - Reflection entry → Append to `.claude/context/memory/reflection-log.jsonl`
@@ -471,7 +484,7 @@ Based on research findings and production requirements:
 
 | Threshold         | Score   | Action                                     |
 | ----------------- | ------- | ------------------------------------------ |
-| **Excellent**     | 0.9+    | Log to learnings.md as exemplary work      |
+| **Excellent**     | 0.9+    | Log to patterns.json as exemplary work     |
 | **Pass**          | 0.7-0.9 | Accept output, note minor improvements     |
 | **Warning**       | 0.4-0.7 | Generate recommendations, suggest retry    |
 | **Critical Fail** | <0.4    | Block completion, escalate to human review |

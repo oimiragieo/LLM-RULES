@@ -252,7 +252,7 @@ Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesi
 
 > **REFERENCE:** See **@TOOL_REFERENCE.md** for comprehensive tool catalog.
 
-23 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, SkillCatalog, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit).
+24 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, SkillCatalog, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit, MemoryRecord).
 
 **Note:** The `Task*` family of tools (Task, TaskList, TaskCreate, TaskUpdate, TaskGet, TaskOutput, TaskStop) are **host-provided** infrastructure tools, not implemented as scripts in the repository.
 
@@ -283,7 +283,7 @@ See Section 1.1 for Router Tool Restrictions enforcement.
 **Orchestrator:** `.claude/templates/spawn/orchestrator-spawn.md` (MUST have `Task` tool + `opus` model)
 **Identity:** `.claude/templates/spawn/agent-identity-integration.md` (agents with personality frontmatter)
 **Subordinate (one-shot):** `.claude/templates/spawn/subordinate-once.md` (respond once; no delegation)
-**Core Tools:** Read, Write, Edit, Bash, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
+**Core Tools:** Read, Write, Edit, Bash, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
 
 ### Golden-Path Example
 

@@ -21,7 +21,7 @@
     "agent:worker": "node --max-old-space-size=4096 --expose-gc --optimize_for_size .claude/lib/boot/worker-agent.cjs",
     "worker:summary": "node .claude/tools/cli/worker-metrics-summary.cjs",
     "validate": "node --max-old-space-size=4096 --expose-gc scripts/validate-config.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs",
-    "validate:full": "pnpm validate && node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs && pnpm validate:cujs && pnpm validate:index && pnpm index-rules && pnpm validate:schemas",
+    "validate:full": "pnpm validate && node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs && pnpm validate:cujs && pnpm validate:index && pnpm index-rules && pnpm validate:schemas && pnpm validate:commands",
     "validate:verbose": "node --max-old-space-size=4096 --expose-gc scripts/validate-config.mjs --verbose && node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs --verbose",
     "validate:sync": "bash scripts/validation/validate-sync.sh",
     "validate:models": "node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs",
@@ -109,7 +109,8 @@
     "gen:all-registries": "npm run gen:tool-manifest && npm run gen:skill-index && npm run gen:agent-registry",
     "validator:test": "node --test tests/hooks/pre-spawn-tool-validator.test.cjs",
     "test:ml": "node --test --test-concurrency=1 tests/ml/*.test.cjs",
-    "code:index:reindex": "node .claude/tools/cli/index-codebase.cjs index"
+    "code:index:reindex": "node .claude/tools/cli/index-codebase.cjs index",
+    "validate:commands": "node .claude/tools/validate-commands.mjs"
   },
   "keywords": [
     "claude",

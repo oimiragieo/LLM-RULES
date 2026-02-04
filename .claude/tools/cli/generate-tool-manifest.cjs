@@ -134,6 +134,12 @@ const CORE_TOOLS = [
     description: 'Edit notebook cells',
     mandatory: false,
   },
+  {
+    name: 'MemoryRecord',
+    category: 'Memory',
+    description: 'Record structured memory entries',
+    mandatory: false,
+  },
 ];
 
 const EDITING_TOOLS = new Set(['Write', 'Edit', 'Bash', 'NotebookEdit', 'TaskStop']);
@@ -238,6 +244,7 @@ const TOOLSET_DEFINITIONS = {
       'TaskGet',
       'TaskOutput',
       'Skill',
+      'MemoryRecord',
     ],
     mandatory: ['TaskUpdate', 'Skill'],
   },
@@ -256,6 +263,7 @@ const TOOLSET_DEFINITIONS = {
       'TaskGet',
       'TaskOutput',
       'Skill',
+      'MemoryRecord',
       'EnterPlanMode',
       'ExitPlanMode',
     ],
@@ -278,6 +286,7 @@ const TOOLSET_DEFINITIONS = {
       'TaskGet',
       'TaskOutput',
       'Skill',
+      'MemoryRecord',
     ],
     mandatory: ['Task', 'TaskUpdate', 'Skill'],
   },
@@ -299,12 +308,13 @@ const TOOLSET_DEFINITIONS = {
       'TaskCreate',
       'TaskGet',
       'Skill',
+      'MemoryRecord',
     ],
     mandatory: ['TaskUpdate', 'Skill'],
   },
   READ_ONLY: {
     description: 'Read-only agent toolset (e.g., code-reviewer)',
-    tools: ['Read', 'Glob', 'Grep', 'TaskUpdate', 'TaskList', 'Skill'],
+    tools: ['Read', 'Glob', 'Grep', 'TaskUpdate', 'TaskList', 'Skill', 'MemoryRecord'],
     mandatory: ['TaskUpdate', 'Skill'],
   },
   DATA_SCIENCE: {
@@ -322,6 +332,7 @@ const TOOLSET_DEFINITIONS = {
       'TaskCreate',
       'TaskGet',
       'Skill',
+      'MemoryRecord',
     ],
     mandatory: ['TaskUpdate', 'Skill'],
   },

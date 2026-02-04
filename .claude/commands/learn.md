@@ -79,6 +79,8 @@ Create a skill file at `.claude/skills/learned/[pattern-name].md`:
 
 ## Optional Memory Integration
 
-- Append a short summary to `.claude/context/memory/learnings.md`.
-- Run the memory extraction pipeline to index new learnings:
-  - `pnpm memory:extract`
+- Record a concise pattern or gotcha using the structured memory tool:
+  - `node .claude/tools/cli/memory-record.cjs pattern "Pattern text"`
+  - `node .claude/tools/cli/memory-record.cjs gotcha "Gotcha text"`
+- If needed, re-run embeddings to update semantic search:
+  - `pnpm memory:extract` (or `pnpm memory:reindex` for full rebuild)

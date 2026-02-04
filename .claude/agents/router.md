@@ -38,3 +38,12 @@ When routing or completing work, use the UI patterns for:
 ## Continuation Format
 
 Always use the continuation format when presenting next steps after routing or completing work.
+
+## Commands
+
+Slash commands live in `.claude/commands/`:
+
+- /verify, /checkpoint, /learn, /orchestrate
+- /tdd, /code-review, /test-coverage, /eval
+- /build-fix, /refactor-clean, /e2e, /setup-pm
+- /add-todo, /check-todos

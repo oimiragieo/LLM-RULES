@@ -41,31 +41,33 @@ Note existing areas for consistency in infer_area step.
 - `/add-todo Add auth token refresh` → title = "Add auth token refresh"
 
 **Without arguments:** Analyze recent conversation to extract:
+
 - The specific problem, idea, or task discussed
 - Relevant file paths mentioned
 - Technical details (error messages, line numbers, constraints)
 
 Formulate:
+
 - `title`: 3-10 word descriptive title (action verb preferred)
 - `problem`: What's wrong or why this is needed
 - `solution`: Approach hints or "TBD" if just an idea
 - `files`: Relevant paths with line numbers from conversation
-</step>
+  </step>
 
 <step name="infer_area">
 Infer area from file paths:
 
-| Path pattern | Area |
-|--------------|------|
-| `src/api/*`, `api/*` | `api` |
-| `src/components/*`, `src/ui/*` | `ui` |
-| `src/auth/*`, `auth/*` | `auth` |
-| `src/db/*`, `database/*` | `database` |
-| `tests/*`, `__tests__/*` | `testing` |
-| `docs/*` | `docs` |
-| `.claude/*` | `planning` |
-| `scripts/*`, `bin/*` | `tooling` |
-| No files or unclear | `general` |
+| Path pattern                   | Area       |
+| ------------------------------ | ---------- |
+| `src/api/*`, `api/*`           | `api`      |
+| `src/components/*`, `src/ui/*` | `ui`       |
+| `src/auth/*`, `auth/*`         | `auth`     |
+| `src/db/*`, `database/*`       | `database` |
+| `tests/*`, `__tests__/*`       | `testing`  |
+| `docs/*`                       | `docs`     |
+| `.claude/*`                    | `planning` |
+| `scripts/*`, `bin/*`           | `tooling`  |
+| No files or unclear            | `general`  |
 
 Use existing area from step 2 if similar match exists.
 </step>
@@ -76,17 +78,19 @@ grep -l -i "[key words from title]" .claude/todos/pending/*.md 2>/dev/null
 ```
 
 If potential duplicate found:
+
 1. Read the existing todo
 2. Compare scope
 
 If overlapping, use AskUserQuestion:
+
 - header: "Duplicate?"
 - question: "Similar todo exists: [title]. What would you like to do?"
 - options:
   - "Skip" — keep existing todo
   - "Replace" — update existing with new context
   - "Add anyway" — create as separate todo
-</step>
+    </step>
 
 <step name="create_file">
 ```bash
@@ -115,6 +119,7 @@ files:
 
 [approach hints or "TBD"]
 ```
+
 </step>
 
 <step name="update_state">
@@ -128,9 +133,9 @@ If `.claude/state/current-task.json` exists:
 ```
 Todo saved: .claude/todos/pending/[filename]
 
-  [title]
-  Area: [area]
-  Files: [count] referenced
+[title]
+Area: [area]
+Files: [count] referenced
 
 ───────────────────────────────────────────────────────────────
 
@@ -139,6 +144,7 @@ Would you like to:
 1. Continue with current work
 2. Add another todo
 3. View all todos (/check-todos)
+
 ```
 </step>
 
@@ -163,3 +169,4 @@ Would you like to:
 - [ ] Area consistent with existing todos
 - [ ] State updated if exists
 </success_criteria>
+```
