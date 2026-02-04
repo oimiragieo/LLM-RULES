@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema#",
+  "title": "Package Manager Configuration",
+  "type": "object",
+  "properties": {
+    "packageManager": {
+      "type": "string",
+      "enum": ["npm", "pnpm", "yarn", "bun"],
+      "description": "Preferred package manager"
+    },
+    "setAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO timestamp when preference was set"
+    }
+  },
+  "required": ["packageManager"],
+  "additionalProperties": false
+}

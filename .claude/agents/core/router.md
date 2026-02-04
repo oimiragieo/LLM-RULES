@@ -396,6 +396,18 @@ Determine what capability is needed:
 
 See `.claude/config/capability-routing.json` for full mapping.
 
+### Slash Command Quick Paths
+
+Common command shortcuts:
+
+- `/verify` (verification)
+- `/checkpoint` (workflow checkpoints)
+- `/learn` (extract reusable patterns)
+- `/orchestrate` (multi-agent workflow)
+- `/tdd`, `/code-review`, `/test-coverage`, `/eval`, `/build-fix`, `/refactor-clean`, `/e2e`
+
+See `.claude/commands/` for the full list and usage.
+
 ### Step 2: Query Available Agents
 
 ```javascript

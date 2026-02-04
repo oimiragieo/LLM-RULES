@@ -463,11 +463,15 @@ node .claude/tools/cleanup-repo.mjs --execute --reports-retention-days 5   # Opt
 
 - Configuration files (config.yaml) are valid
 - Model names are correct
+- Command files in `.claude/commands/` are present and non-empty
 
 **What full validation checks** (pnpm validate:all):
 
 - All referenced agent files exist
 - All workflow YAML files are valid
+
+CI note: include `pnpm validate` (or `pnpm validate:all`) in your pipeline to enforce command validation alongside config/model checks.
+
 - All schema files exist
 - All CUJ files are valid
 - Hook configurations are valid
@@ -1203,6 +1207,15 @@ Quick access to frequently-used skills and workflows via slash commands.
 | `/generate-tests`    | Generate test code       | `/generate-tests Button.tsx` |
 | `/generate-docs`     | Generate documentation   | `/generate-docs api/`        |
 | `/validate-security` | Security validation      | `/validate-security auth/`   |
+
+### Additional Commands
+
+- `/verify` (verification)
+- `/checkpoint` (workflow checkpoints)
+- `/learn` (extract reusable patterns)
+- `/orchestrate` (multi-agent workflow)
+- `/tdd`, `/code-review`, `/test-coverage`, `/eval`, `/build-fix`, `/refactor-clean`, `/e2e`
+- `/setup-pm` (package manager setup)
 
 ### Usage
 

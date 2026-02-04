@@ -2,6 +2,7 @@
 name: planning-with-files
 description: Manus-style file-based planning for complex tasks. Use task_plan.md, findings.md, and progress.md to maintain persistent context. Use for multi-step tasks, research, or work spanning many tool calls.
 ---
+
 # Planning with Files - Manus-Style File-Based Planning
 
 Work like Manus (the $2B AI agent Meta acquired): Use persistent markdown files as your "working memory on disk."
@@ -397,4 +398,3 @@ Phase 1
 ---
 
 **Remember:** The more context you gather upfront and write to disk, the better your execution will be. Files are your persistent memory.
-

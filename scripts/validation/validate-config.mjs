@@ -245,6 +245,7 @@ function validateConfig() {
     'ui-audit-report.schema.json',
     'user_story.schema.json',
     'ux_spec.schema.json',
+    'package-manager.schema.json',
   ];
 
   for (const schemaFile of schemaFiles) {
@@ -733,6 +734,32 @@ function validateConfig() {
 
   if (templateReferences.size === 0 && verbose) {
     console.log('  ℹ️  No template references found in agent or skill files');
+  }
+
+  // 11.5. Validate commands directory
+  console.log('\nValidating command files...');
+  const commandsDir = '.claude/commands';
+  if (checkDirectory(commandsDir, 'commands directory')) {
+    try {
+      const commandFiles = readdirSync(resolve(rootDir, commandsDir), { withFileTypes: true })
+        .filter(dirent => dirent.isFile() && dirent.name.endsWith('.md'))
+        .map(dirent => dirent.name);
+
+      if (commandFiles.length === 0) {
+        warnings.push('No command files found in .claude/commands');
+      } else {
+        for (const fileName of commandFiles) {
+          const commandPath = resolve(rootDir, commandsDir, fileName);
+          const content = readFileSync(commandPath, 'utf-8').trim();
+          if (content.length === 0) {
+            errors.push(`Command file is empty: ${commandsDir}/${fileName}`);
+          }
+        }
+        console.log(`  ✓ Command files validated: ${commandFiles.length}`);
+      }
+    } catch (error) {
+      errors.push(`Error reading commands directory: ${error.message}`);
+    }
   }
 
   // 12. Validate MCP server configuration

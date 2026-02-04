@@ -127,6 +127,7 @@
     "usage": "Router uses this config to classify user requests into capabilities, then queries AvailableAgents({ capability: '...' }) to find best agent",
     "fallback": "If no agents found for capability, try domain-based lookup using domainFallbacks",
     "priority": "Security and architecture take precedence when multiple capabilities apply",
-    "routingConditions": "Optional. Per-capability rules: minPromptLength (number), requireAnyKeyword (string[]). See ROUTER_ENFORCEMENT.md."
+    "routingConditions": "Optional. Per-capability rules: minPromptLength (number), requireAnyKeyword (string[]). See ROUTER_ENFORCEMENT.md.",
+    "commands": "Slash commands live in .claude/commands/ (verify, checkpoint, learn, orchestrate, tdd, code-review, test-coverage, eval, build-fix, refactor-clean, e2e, setup-pm)."
   }
 }

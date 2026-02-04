@@ -106,6 +106,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/evolution/unified-evolution-guard.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/scripts/hooks/suggest-compact.cjs"
           }
         ]
       },
@@ -274,6 +278,17 @@
           {
             "type": "command",
             "command": "node .claude/hooks/reflection/reflection-queue-processor.cjs"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/scripts/hooks/check-console-log.cjs"
           }
         ]
       }
