@@ -41,12 +41,8 @@ test('recordGotcha/recordPattern add area and id', () => {
     assert.strictEqual(okGotcha, true);
     assert.strictEqual(okPattern, true);
 
-    const gotchas = JSON.parse(
-      fs.readFileSync(path.join(MEMORY_DIR, 'gotchas.json'), 'utf8')
-    );
-    const patterns = JSON.parse(
-      fs.readFileSync(path.join(MEMORY_DIR, 'patterns.json'), 'utf8')
-    );
+    const gotchas = JSON.parse(fs.readFileSync(path.join(MEMORY_DIR, 'gotchas.json'), 'utf8'));
+    const patterns = JSON.parse(fs.readFileSync(path.join(MEMORY_DIR, 'patterns.json'), 'utf8'));
 
     assert.ok(gotchas[0].id, 'Gotcha should have id');
     assert.strictEqual(gotchas[0].area, 'main');
@@ -78,10 +74,7 @@ test('deleteMemoryByIds removes entries across gotchas and patterns', () => {
     };
     patternEntry.id = buildId(patternEntry);
 
-    fs.writeFileSync(
-      path.join(MEMORY_DIR, 'gotchas.json'),
-      JSON.stringify([gotchaEntry], null, 2)
-    );
+    fs.writeFileSync(path.join(MEMORY_DIR, 'gotchas.json'), JSON.stringify([gotchaEntry], null, 2));
     fs.writeFileSync(
       path.join(MEMORY_DIR, 'patterns.json'),
       JSON.stringify([patternEntry], null, 2)
@@ -93,12 +86,8 @@ test('deleteMemoryByIds removes entries across gotchas and patterns', () => {
 
     assert.strictEqual(result.deleted, 2);
 
-    const gotchas = JSON.parse(
-      fs.readFileSync(path.join(MEMORY_DIR, 'gotchas.json'), 'utf8')
-    );
-    const patterns = JSON.parse(
-      fs.readFileSync(path.join(MEMORY_DIR, 'patterns.json'), 'utf8')
-    );
+    const gotchas = JSON.parse(fs.readFileSync(path.join(MEMORY_DIR, 'gotchas.json'), 'utf8'));
+    const patterns = JSON.parse(fs.readFileSync(path.join(MEMORY_DIR, 'patterns.json'), 'utf8'));
     assert.strictEqual(gotchas.length, 0);
     assert.strictEqual(patterns.length, 0);
   } finally {

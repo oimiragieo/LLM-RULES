@@ -31,6 +31,8 @@ const fs = require('fs');
 let assembler;
 const MODULE_PATH = path.join(__dirname, '../../../.claude/lib/spawn/prompt-assembler.cjs');
 const BEHAVIOUR_PATH = path.join(__dirname, '../../../.claude/context/memory/behaviour.md');
+const SKILL_INDEX_PATH = path.join(__dirname, '../../../.claude/config/skill-index.json');
+const PRESETS_PATH = path.join(__dirname, '../../../.claude/config/presets.json');
 
 // Test data
 const VALID_DEVELOPER_TOOLS = [
@@ -273,6 +275,55 @@ describe('prompt-assembler', () => {
       assert.ok(enhanced.includes('## Override Prompt'), 'Should include agent prompt overrides');
 
       fs.rmSync(overrideDir, { recursive: true, force: true });
+    });
+
+    it('should use preset skills when presetId is provided', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const originalSkillIndex = fs.readFileSync(SKILL_INDEX_PATH, 'utf8');
+      const originalPresets = fs.readFileSync(PRESETS_PATH, 'utf8');
+
+      try {
+        const testSkillIndex = {
+          skills: {
+            'preset-test-skill': {
+              description: 'Preset test skill',
+              category: 'Test',
+            },
+          },
+        };
+        fs.writeFileSync(SKILL_INDEX_PATH, JSON.stringify(testSkillIndex, null, 2), 'utf8');
+
+        const testPresets = {
+          version: '1.0.0',
+          presets: {
+            'preset-test': {
+              agentId: 'developer',
+              enabledSkills: ['preset-test-skill'],
+              ruleSnippetPath: null,
+            },
+          },
+        };
+        fs.writeFileSync(PRESETS_PATH, JSON.stringify(testPresets, null, 2), 'utf8');
+
+        assembler._clearCache();
+
+        const enhanced = assembler.assembleSpawnPrompt({
+          agentType: 'developer',
+          allowedTools: VALID_DEVELOPER_TOOLS,
+          basePrompt: SAMPLE_BASE_PROMPT,
+          presetId: 'preset-test',
+          maxSkillsInPrompt: 5,
+        });
+
+        assert.ok(enhanced.includes('preset-test-skill'), 'Should include preset-provided skill');
+      } finally {
+        fs.writeFileSync(SKILL_INDEX_PATH, originalSkillIndex, 'utf8');
+        fs.writeFileSync(PRESETS_PATH, originalPresets, 'utf8');
+        assembler._clearCache();
+      }
     });
 
     it('should inject sections at correct location', () => {

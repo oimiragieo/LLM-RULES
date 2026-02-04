@@ -1,0 +1,16 @@
+{
+  "$schema": "../schemas/presets.schema.json",
+  "version": "1.0.0",
+  "presets": {
+    "planning-heavy": {
+      "agentId": "planner",
+      "enabledSkills": ["planning-with-files", "task-breakdown", "writing-plans"],
+      "ruleSnippetPath": null
+    },
+    "cowork-style": {
+      "agentId": "developer",
+      "enabledSkills": ["tdd", "debugging", "progressive-disclosure", "planning-with-files"],
+      "ruleSnippetPath": null
+    }
+  }
+}

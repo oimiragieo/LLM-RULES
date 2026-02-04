@@ -23,6 +23,29 @@
 
 ---
 
+## Execution Flow (/plan command scope)
+
+1. Load feature spec from input path
+   → If not found: ERROR "No feature spec at {path}"
+2. Fill Technical Context (scan for NEEDS CLARIFICATION)
+   → Detect project type from context (web=frontend+backend, mobile=app+api)
+   → Set structure decision based on project type
+3. Fill the Constitution Check section from `.claude/context/memory/constitution.md` (if present).
+4. Evaluate Constitution Check section below
+   → If violations exist: Document in Complexity Tracking
+   → If no justification possible: ERROR "Simplify approach first"
+   → Update Progress Tracking: Initial Constitution Check
+5. Execute Phase 0 → research
+   → If NEEDS CLARIFICATION remain: ERROR "Resolve unknowns"
+6. Execute Phase 1 → contracts, data-model, quickstart, agent-specific file (e.g. CLAUDE.md).
+7. Re-evaluate Constitution Check section
+   → If new violations: Refactor design, return to Phase 1
+   → Update Progress Tracking: Post-Design Constitution Check
+8. Plan Phase 2 → Describe task generation approach (DO NOT create tasks.md)
+9. STOP - Ready for /tasks command
+
+**IMPORTANT**: The /plan command STOPS at step 8. Phase 2 (task generation) is executed by the /tasks command (execute-plan). Phases 3–4 are implementation execution.
+
 ## Task Breakdown by Feature
 
 <!-- Organize tasks by feature/capability being implemented -->

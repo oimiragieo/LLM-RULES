@@ -246,6 +246,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/routing/code-index-updater.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/memory/planning-progress-tracker.cjs"
           }
         ]
       },

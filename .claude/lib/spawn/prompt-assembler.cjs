@@ -22,6 +22,7 @@ const { createLogger } = require('../utils/logger.cjs');
 // Load manifests lazily to improve startup time
 let TOOL_MANIFEST = null;
 let SKILL_INDEX = null;
+let PRESETS = null;
 const logger = createLogger('prompt-assembler');
 
 /**
@@ -57,6 +58,72 @@ function getSkillIndex() {
     }
   }
   return SKILL_INDEX;
+}
+
+/**
+ * Load presets (cached)
+ */
+function loadPresets(projectRoot = PROJECT_ROOT) {
+  if (!PRESETS) {
+    const presetsPath = path.join(projectRoot, '.claude', 'config', 'presets.json');
+    try {
+      if (fs.existsSync(presetsPath)) {
+        const parsed = JSON.parse(fs.readFileSync(presetsPath, 'utf-8'));
+        PRESETS = parsed?.presets || {};
+      } else {
+        PRESETS = {};
+      }
+    } catch (_e) {
+      PRESETS = {};
+    }
+  }
+  return PRESETS;
+}
+
+function getPresetSkillNames(presetId, projectRoot = PROJECT_ROOT) {
+  if (!presetId) return [];
+  const presets = loadPresets(projectRoot);
+  const preset = presets[presetId];
+  return Array.isArray(preset?.enabledSkills) ? preset.enabledSkills : [];
+}
+
+function getPresetRuleSnippet(presetId, projectRoot = PROJECT_ROOT) {
+  if (!presetId) return '';
+  const presets = loadPresets(projectRoot);
+  const preset = presets[presetId];
+  if (!preset?.ruleSnippetPath) return '';
+  try {
+    const snippetPath = path.resolve(projectRoot, preset.ruleSnippetPath);
+    if (!fs.existsSync(snippetPath)) return '';
+    return fs.readFileSync(snippetPath, 'utf-8').trim();
+  } catch (_e) {
+    return '';
+  }
+}
+
+/**
+ * Get skills by explicit name list.
+ *
+ * @param {string[]} skillNames
+ * @param {number} maxSkills
+ * @returns {Array<{name: string, description: string, category: string, requiredTools: string[]}>}
+ */
+function getSkillsByName(skillNames, maxSkills = 20) {
+  const skillIndex = getSkillIndex();
+  const skills = skillIndex.skills || {};
+  const result = [];
+  for (const name of skillNames || []) {
+    if (result.length >= maxSkills) break;
+    const skillData = skills[name];
+    if (!skillData) continue;
+    result.push({
+      name,
+      description: skillData.description || `${skillData.displayName || name} skill`,
+      category: skillData.category || 'General',
+      requiredTools: skillData.requiredTools || [],
+    });
+  }
+  return result;
 }
 
 /**
@@ -628,13 +695,20 @@ function assembleSpawnPrompt({
   maxToolsInPrompt = 15,
   maxSkillsInPrompt = 20,
   includeMemory = true,
+  presetId = null,
 } = {}) {
   // 1. Filter and describe tools (respecting limit)
   const toolsToShow = allowedTools.slice(0, maxToolsInPrompt);
   const describedTools = filterAndDescribeTools(toolsToShow);
 
   // 2. Get skills for this agent type
-  const skills = getSkillsByAgent(agentType, maxSkillsInPrompt);
+  let skills = getSkillsByAgent(agentType, maxSkillsInPrompt);
+  if (presetId) {
+    const presetSkills = getPresetSkillNames(presetId, PROJECT_ROOT);
+    if (presetSkills.length > 0) {
+      skills = getSkillsByName(presetSkills, maxSkillsInPrompt);
+    }
+  }
 
   // 3. Load memory context (optional)
   const memorySection = includeMemory ? formatMemorySection(loadMemoryContext()) : '';
@@ -644,7 +718,11 @@ function assembleSpawnPrompt({
 
   // 3c. Load agent prompt overrides (optional)
   const overrides = loadAgentPromptOverrides(agentType, PROJECT_ROOT);
-  const mergedBasePrompt = overrides ? `${basePrompt}\n\n${overrides}` : basePrompt;
+  const ruleSnippet = getPresetRuleSnippet(presetId, PROJECT_ROOT);
+  let mergedBasePrompt = overrides ? `${basePrompt}\n\n${overrides}` : basePrompt;
+  if (ruleSnippet) {
+    mergedBasePrompt = `## Preset Rules\n\n${ruleSnippet}\n\n${mergedBasePrompt}`;
+  }
 
   // 4. Build sections
   const toolsSection = buildToolsSection(describedTools);
@@ -668,12 +746,16 @@ module.exports = {
   assembleSpawnPrompt,
   filterAndDescribeTools,
   getSkillsByAgent,
+  getSkillsByName,
   buildToolsSection,
   buildSkillsSection,
   buildDiscoverySection,
   injectSections,
   loadMemoryContext,
   loadBehaviourRules,
+  loadPresets,
+  getPresetSkillNames,
+  getPresetRuleSnippet,
   loadAgentPromptOverrides,
   formatMemorySection,
   formatBehaviourSection,
@@ -681,5 +763,6 @@ module.exports = {
   _clearCache: () => {
     TOOL_MANIFEST = null;
     SKILL_INDEX = null;
+    PRESETS = null;
   },
 };

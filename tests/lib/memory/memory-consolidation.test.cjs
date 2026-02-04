@@ -14,10 +14,9 @@ test('buildUserPrompt includes new memory and similar list', () => {
 
 test('consolidateNewMemory parses model JSON response', async () => {
   const mockClient = {
-    generateText: async () =>
-      ({
-        text: '{"action":"merge","reason":"combine","merged_content":"merged"}',
-      }),
+    generateText: async () => ({
+      text: '{"action":"merge","reason":"combine","merged_content":"merged"}',
+    }),
   };
   const result = await consolidateNewMemory('New', ['Old'], { modelClient: mockClient });
   assert.equal(result.action, 'merge');

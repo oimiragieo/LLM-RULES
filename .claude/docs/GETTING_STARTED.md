@@ -176,6 +176,26 @@ Agent Studio uses a persistent memory system so context carries across sessions:
 
 Agents read memory before starting work and record findings after completion. This means you can resume work days later without repeating context.
 
+## Presets (optional)
+
+You can bias spawn prompts to a fixed **preset**: a named set of skills (and an optional rule snippet) defined in `.claude/config/presets.json`. When the Router (or any caller) passes a `preset_id` / `presetId` in the **Task** tool input, the spawn-prompt-assembler uses that preset’s `enabledSkills` (and optional `ruleSnippetPath`) instead of the default agent-based skill list.
+
+**Task tool_input convention:**
+
+- **`preset_id`** or **`presetId`** (string, optional): Key from `presets.json` (e.g. `planning-heavy`, `cowork-style`). If present, the assembled spawn prompt uses the preset’s skills and rule snippet; if absent, behavior is unchanged (agent-based skills only).
+
+**Example (conceptual):**
+
+```json
+Task({
+  "subagent_type": "planner",
+  "prompt": "...",
+  "preset_id": "planning-heavy"
+})
+```
+
+**Config:** Define presets in `.claude/config/presets.json` (see `.claude/schemas/presets.schema.json`). Each preset can set `agentId`, `enabledSkills`, and optional `ruleSnippetPath`. Presets are optional; omit `preset_id` / `presetId` to use default routing and skill selection.
+
 ## Worker Runtime (Optional)
 
 Agent Studio can run an **optional headless worker** for periodic maintenance tasks (opt-in only).

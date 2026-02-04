@@ -4,6 +4,27 @@
 **Created**: YYYY-MM-DD
 **Type**: feature | bug | chore | refactor | docs
 
+**Input**: User description or feature request.
+
+## Execution Flow (main)
+
+1. Parse user description from Input
+   → If empty: ERROR "No feature description provided"
+2. Extract key concepts from description
+   → Identify: actors, actions, data, constraints
+3. For each unclear aspect:
+   → Mark with [NEEDS CLARIFICATION: specific question]
+4. Fill User Scenarios and acceptance criteria (Section 1)
+   → If no clear user flow: ERROR "Cannot determine user scenarios"
+5. Generate functional requirements (Section 3)
+   → Each requirement must be testable
+   → Mark ambiguous requirements
+6. Identify key entities if data is involved
+7. Run review checklist
+   → If any [NEEDS CLARIFICATION]: WARN "Spec has uncertainties"
+   → If implementation details found: ERROR "Remove tech details"
+8. Return: SUCCESS (spec ready for planning)
+
 ## 1. Overview
 
 **Objective** (one sentence):

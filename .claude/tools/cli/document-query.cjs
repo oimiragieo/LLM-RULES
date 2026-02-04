@@ -28,10 +28,8 @@ function parseArgs(args) {
 
 function printUsage() {
   process.stdout.write(
-    [
-      'Usage:',
-      '  document-query.cjs --document <path_or_url> [--query "question"]',
-    ].join('\n') + '\n'
+    ['Usage:', '  document-query.cjs --document <path_or_url> [--query "question"]'].join('\n') +
+      '\n'
   );
 }
 
@@ -55,7 +53,9 @@ async function loadDocument(doc) {
 }
 
 function scoreParagraphs(text, query) {
-  const q = String(query || '').toLowerCase().trim();
+  const q = String(query || '')
+    .toLowerCase()
+    .trim();
   if (!q) return [];
   const terms = q.split(/\s+/).filter(Boolean);
   const paragraphs = text.split(/\n{2,}/);
@@ -94,9 +94,7 @@ async function run() {
     }
     const top = scored.slice(0, 3);
     process.stdout.write(
-      top
-        .map(item => `---\nScore: ${item.score}\n${item.paragraph}\n`)
-        .join('\n') + '\n'
+      top.map(item => `---\nScore: ${item.score}\n${item.paragraph}\n`).join('\n') + '\n'
     );
     process.exit(0);
   } catch (err) {

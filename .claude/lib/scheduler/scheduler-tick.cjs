@@ -3,11 +3,7 @@
 const { spawnSync } = require('child_process');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
-const {
-  loadStore,
-  saveStore,
-  computeNextRunAt,
-} = require('./scheduler-store.cjs');
+const { loadStore, saveStore, computeNextRunAt } = require('./scheduler-store.cjs');
 
 const logger = createLogger('scheduler-tick');
 
@@ -21,7 +17,10 @@ function runTaskCommand(command, projectRoot) {
   if (result.error) {
     return { success: false, error: result.error.message };
   }
-  return { success: result.status === 0, error: result.status === 0 ? null : `exit_${result.status}` };
+  return {
+    success: result.status === 0,
+    error: result.status === 0 ? null : `exit_${result.status}`,
+  };
 }
 
 function runTick(projectRoot = PROJECT_ROOT) {

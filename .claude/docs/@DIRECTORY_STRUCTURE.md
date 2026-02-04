@@ -1,8 +1,8 @@
 # Directory Structure Reference
 
 **Source:** CLAUDE.md Section 9
-**Version:** v2.2.1
-**Last Updated:** 2026-01-31
+**Version:** v2.2.5
+**Last Updated:** 2026-02-04
 
 ---
 
@@ -19,6 +19,7 @@ Complete directory structure reference for the `.claude/` framework directory, i
 ```
 .claude/
 ├── agents/
+├── config/
 ├── context/
 ├── docs/
 ├── hooks/
@@ -54,8 +55,19 @@ context/
 ├── memory/
 │   ├── learnings.md
 │   ├── decisions.md
-│   └── issues.md
+│   ├── issues.md
+│   └── constitution.md
 └── evolution-state.json
+```
+
+### config/
+
+```
+config/
+├── capability-routing.json
+├── presets.json
+├── skill-index.json
+└── tool-manifest.json
 ```
 
 ### hooks/
@@ -101,6 +113,14 @@ lib/
 │   └── logical-unit-tracker.cjs (Phase 1.5 - git notes-based revert)
 └── integration/
     └── system-registration-handler.cjs
+```
+
+### skills/
+
+```
+skills/
+├── planning-with-files/
+└── ...
 ```
 
 ### tools/
@@ -149,6 +169,21 @@ workflows/
 │   └── c4-architecture-workflow.md
 └── operations/
     └── incident-response.md
+```
+
+### templates/
+
+```
+templates/
+├── spec-template.md
+├── plan-template.md
+├── tasks-template.md
+├── planning/
+│   ├── task_plan.md
+│   ├── findings.md
+│   └── progress.md
+└── agents/
+    └── agent-context-template.md
 ```
 
 ### schemas/

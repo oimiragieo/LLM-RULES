@@ -25,7 +25,10 @@ async function consolidateNewMemory(newMemory, similarMemories, options = {}) {
   });
 
   const raw = response?.text || response?.content || response;
-  const cleaned = String(raw || '').trim().replace(/^```json\s*/i, '').replace(/```$/, '');
+  const cleaned = String(raw || '')
+    .trim()
+    .replace(/^```json\s*/i, '')
+    .replace(/```$/, '');
   try {
     const parsed = JSON.parse(cleaned);
     return {

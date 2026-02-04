@@ -18,8 +18,15 @@ Task({
   subagent_type: 'general-purpose',
   description: '<ROLE> respond once to <TASK>',
   allowed_tools: [
-    'Read','Write','Edit','Bash',
-    'TaskUpdate','TaskList','TaskCreate','TaskGet','TaskOutput',
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'TaskOutput',
     'Skill',
   ],
   prompt: `You are the <ROLE> agent.
@@ -60,6 +67,6 @@ When done, call TaskUpdate({ taskId: "<ID>", status: "completed", metadata: { su
 ## Your Assigned Task
 Task ID: <ID>
 Subject: <SUBJECT>
-`
+`,
 });
 ```

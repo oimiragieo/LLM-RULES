@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/presets",
+  "title": "Presets",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": { "type": "string" },
+    "presets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "agentId": { "type": "string" },
+          "enabledSkills": { "type": "array", "items": { "type": "string" } },
+          "ruleSnippetPath": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -434,6 +434,7 @@ async function main() {
     const promptAssembler = require('../../lib/spawn/prompt-assembler.cjs');
 
     const agentType = toolInput.subagent_type || toolInput.agent_type || 'developer';
+    const presetId = toolInput.preset_id || toolInput.presetId || null;
     const rawAllowedTools = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
     const enrichedTools = enrichAllowedTools(agentType, rawAllowedTools, basePrompt);
     const contextMode = buildContextModePrompt({ role: agentType });
@@ -456,6 +457,7 @@ async function main() {
       allowedTools,
       basePrompt,
       includeMemory: true,
+      presetId,
     });
 
     if (contextMode.hasContextOrMode && contextMode.promptFragment) {

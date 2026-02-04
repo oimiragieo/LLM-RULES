@@ -83,6 +83,7 @@ Skill({ skill: 'context-compressor' }); // Memory-efficient patterns
    - Save to: `.claude/context/artifacts/research-reports/`
 
 3. **Constitution Checkpoint (BLOCKING)**: All 4 gates must pass before Phase 1
+   - Constitution principles are defined in `.claude/context/memory/constitution.md`.
    - **Gate 1: Research Completeness**
      - [ ] Research report contains minimum 3 external sources with citations
      - [ ] All `[NEEDS CLARIFICATION]` items resolved

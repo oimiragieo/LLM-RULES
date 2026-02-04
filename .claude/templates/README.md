@@ -273,6 +273,15 @@ After creating task breakdown:
 
 - Task breakdowns: `.claude/context/artifacts/plans/`
 
+### Execution Flow Sections
+
+The spec, plan, and tasks templates include an **Execution Flow** block that defines
+the ordered steps and error/warn conditions for each artifact.
+
+- `spec-template.md` → **Execution Flow (main)**
+- `plan-template.md` → **Execution Flow (/plan command scope)**
+- `tasks-template.md` → **Execution Flow (main)**
+
 ## Template Creator Skill
 
 Use the `template-creator` skill to create new templates:
