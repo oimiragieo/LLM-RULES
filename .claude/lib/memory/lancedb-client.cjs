@@ -176,7 +176,10 @@ class MemoryVectorStore {
       this.db = await lancedb.connect(dbPath);
 
       // 2. GPU Detection (if enabled)
-      if (this.config.gpu?.enabled && this.config.embeddingMode === 'transformers') {
+      if (
+        this.config.gpu?.enabled &&
+        (this.config.embeddingMode === 'transformers' || this.config.embeddingMode === 'fastembed')
+      ) {
         await this._initializeGPU();
       }
 
@@ -240,21 +243,58 @@ class MemoryVectorStore {
         this.embedder = null;
         try {
           const fastembed = require('fastembed');
-          this._fastembedModel = await fastembed.FlagEmbedding.init({
+
+          // Initialize with GPU support if available
+          const initOptions = {
             model: fastembed.EmbeddingModel.BGESmallENV15,
-          });
+            // FastEmbed handles execution providers automatically
+            // GPU will be used if CUDA is available, otherwise falls back to CPU
+          };
+
+          if (this.device === 'gpu' && this.gpuDetected) {
+            logger.info('FastEmbed initializing with GPU (CUDA) support');
+          } else {
+            logger.info('FastEmbed initializing with CPU');
+          }
+
+          this._fastembedModel = await fastembed.FlagEmbedding.init(initOptions);
           this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
           this._mockMode = false;
+          logger.info(
+            `FastEmbed initialized successfully (${this.device === 'gpu' ? 'GPU' : 'CPU'} mode)`
+          );
         } catch (e) {
-          logger.warn('FastEmbed not available. Install optional dependency: pnpm add fastembed', {
-            error: e.message,
-          });
-          this._fastembedModel = null;
-          this._embeddingStatus = {
-            status: 'unavailable',
-            mode: 'fastembed',
-            reason: e.message || 'Install optional dependency: pnpm add fastembed',
-          };
+          // Try CPU fallback if GPU initialization fails
+          logger.warn(`FastEmbed initialization failed: ${e.message}`);
+
+          if (this.device === 'gpu') {
+            logger.info('Retrying FastEmbed initialization with CPU fallback...');
+            try {
+              const fastembed = require('fastembed');
+              this._fastembedModel = await fastembed.FlagEmbedding.init({
+                model: fastembed.EmbeddingModel.BGESmallENV15,
+              });
+              this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
+              this._mockMode = false;
+              this.device = 'cpu'; // Update device after fallback
+              logger.info('FastEmbed initialized with CPU fallback');
+            } catch (cpuErr) {
+              logger.warn('FastEmbed CPU fallback also failed', { error: cpuErr.message });
+              this._fastembedModel = null;
+              this._embeddingStatus = {
+                status: 'unavailable',
+                mode: 'fastembed',
+                reason: cpuErr.message || 'Install optional dependency: pnpm add fastembed',
+              };
+            }
+          } else {
+            this._fastembedModel = null;
+            this._embeddingStatus = {
+              status: 'unavailable',
+              mode: 'fastembed',
+              reason: e.message || 'Install optional dependency: pnpm add fastembed',
+            };
+          }
         }
       } else if (this.config.embeddingMode === 'off') {
         this.embedder = null;
@@ -370,7 +410,14 @@ class MemoryVectorStore {
     const gen = this._fastembedModel.embed(texts, batchSize);
     for await (const batch of gen) {
       for (const row of batch) {
-        results.push(Array.isArray(row) ? Array.from(row) : []);
+        // Handle both regular arrays and typed arrays (Float32Array, etc.)
+        if (row && typeof row === 'object' && (Array.isArray(row) || row.length !== undefined)) {
+          results.push(Array.from(row));
+        } else {
+          // Log unexpected types for debugging
+          logger.warn(`Unexpected embedding type: ${typeof row}, value:`, row);
+          results.push([]);
+        }
       }
       batchDone += 1;
       if (progressOptions?.onBatchComplete)

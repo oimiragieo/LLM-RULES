@@ -109,7 +109,7 @@
     "gen:all-registries": "npm run gen:tool-manifest && npm run gen:skill-index && npm run gen:agent-registry",
     "validator:test": "node --test tests/hooks/pre-spawn-tool-validator.test.cjs",
     "test:ml": "node --test --test-concurrency=1 tests/ml/*.test.cjs",
-    "code:index:reindex": "node .claude/tools/cli/index-codebase.cjs index",
+    "code:index:reindex": "node --max-old-space-size=32768 .claude/tools/cli/index-codebase.cjs index",
     "validate:commands": "node .claude/tools/validate-commands.mjs",
     "verify:debug-log": "node .claude/tools/cli/verify-debug-log-remediation.mjs"
   },
@@ -140,6 +140,7 @@
     "commander": "^14.0.3",
     "glob": "^13.0.0",
     "js-yaml": "^4.1.1",
+    "piscina": "^5.1.4",
     "proper-lockfile": "^4.1.2",
     "sharp": "^0.34.5",
     "tree-sitter": "^0.25.0",
@@ -148,6 +149,10 @@
     "tree-sitter-python": "^0.25.0",
     "tree-sitter-rust": "^0.24.0",
     "tree-sitter-typescript": "^0.23.2"
+  },
+  "optionalDependencies": {
+    "fastembed": "^2.1.0",
+    "onnxruntime-node": "^1.20.1"
   },
   "devDependencies": {
     "@types/node": "^20.19.30",

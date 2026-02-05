@@ -46,9 +46,19 @@
     "dimensions": 384,
     "batchSize": 100,
     "cacheEnabled": true,
+    "mode": "fastembed",
     "gpu": {
       "enabled": true,
       "autoTuneBatchSize": true
+    },
+    "fastEmbed": {
+      "enabled": true,
+      "model": "BGE-small-en-v1.5",
+      "gpuAcceleration": true
+    },
+    "fallback": {
+      "enabled": true,
+      "mode": "transformers"
     }
   },
   "vectorStore": {
