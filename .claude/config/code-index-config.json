@@ -32,7 +32,7 @@
     ],
     "maxFileSize": 1048576,
     "batchSize": 50,
-    "concurrency": 4
+    "concurrency": 8
   },
   "chunking": {
     "minTokens": 50,
@@ -45,7 +45,11 @@
     "model": "Xenova/all-MiniLM-L6-v2",
     "dimensions": 384,
     "batchSize": 100,
-    "cacheEnabled": true
+    "cacheEnabled": true,
+    "gpu": {
+      "enabled": true,
+      "autoTuneBatchSize": true
+    }
   },
   "vectorStore": {
     "persistDirectory": ".claude/data/code-index",
@@ -58,6 +62,18 @@
     "maxLimit": 50,
     "includeContext": true,
     "contextLines": 5
+  },
+  "bm25": {
+    "enabled": true,
+    "k1": 1.5,
+    "b": 0.75,
+    "k_sparse": 100,
+    "k_dense": 10,
+    "rrf_k": 60,
+    "weights": {
+      "sparse": 0.4,
+      "dense": 0.6
+    }
   },
   "languages": {
     "javascript": {

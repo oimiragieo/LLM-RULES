@@ -18,6 +18,10 @@ const DEFAULT_OPTIONS = {
   batchSize: 100,
   cacheEnabled: true,
   cachePath: '.claude/data/code-index/embedding-cache.json',
+  gpu: {
+    enabled: true,
+    autoTuneBatchSize: true,
+  },
 };
 
 /**
@@ -45,10 +49,14 @@ class EmbeddingGenerator {
     this.pipeline = null;
     this.cache = new Map();
     this.initialized = false;
+    this.device = 'cpu'; // Default to CPU
+    this.gpuName = null;
+    this.gpuMemoryMB = 0;
+    this.batchSize = this.options.batchSize;
   }
 
   /**
-   * Initialize the embedding pipeline
+   * Initialize the embedding pipeline with GPU detection
    * Downloads model on first run (~25MB)
    * @returns {Promise<void>}
    */
@@ -89,6 +97,11 @@ class EmbeddingGenerator {
       };
     };
 
+    // Step 1: GPU Detection (if enabled)
+    if (this.options.gpu?.enabled && !forceMock) {
+      await this._initializeGPU();
+    }
+
     if (!forceMock) {
       try {
         const { pipeline } = await import('@xenova/transformers');
@@ -96,12 +109,26 @@ class EmbeddingGenerator {
         console.log(`Loading embedding model: ${this.options.model}...`);
         this.pipeline = await pipeline('feature-extraction', this.options.model, {
           quantized: true, // Use quantized model for faster inference
+          // Note: GPU acceleration not available in Node.js
+          // @xenova/transformers WebGPU support is browser-only
+          // ONNX Runtime Node.js GPU bindings not yet integrated
         });
+
+        // Keep device set by GPU detection (or default to CPU)
+        if (this.device !== 'gpu') {
+          this.device = 'cpu';
+        }
       } catch (_err) {
         this.pipeline = createMockPipeline(this.options.dimensions);
+        if (this.device !== 'gpu') {
+          this.device = 'cpu';
+        }
       }
     } else {
       this.pipeline = createMockPipeline(this.options.dimensions);
+      if (this.device !== 'gpu') {
+        this.device = 'cpu';
+      }
     }
 
     this.initialized = true;
@@ -112,6 +139,60 @@ class EmbeddingGenerator {
     // Load cache if enabled
     if (this.options.cacheEnabled) {
       await this.loadCache();
+    }
+  }
+
+  /**
+   * Initialize GPU detection and configuration
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _initializeGPU() {
+    try {
+      // Use mock for testing if provided
+      if (this._mockGPUDetection) {
+        if (this._mockGPUDetection.available) {
+          this.device = 'gpu';
+          this.gpuName = this._mockGPUDetection.gpuName;
+          this.gpuMemoryMB = this._mockGPUDetection.totalMemoryMB;
+
+          // Auto-tune batch size based on GPU memory
+          if (this.options.gpu.autoTuneBatchSize) {
+            const { GPUDetector } = require('./gpu-detector.cjs');
+            const detector = new GPUDetector();
+            this.batchSize = detector.recommendBatchSize(this.gpuMemoryMB);
+          }
+
+          console.log(`✅ GPU Detected: ${this.gpuName} (${this.gpuMemoryMB}MB)`);
+          console.log(`Using batch size: ${this.batchSize}`);
+          return;
+        }
+      }
+
+      // Real GPU detection
+      const { GPUDetector } = require('./gpu-detector.cjs');
+      const detector = new GPUDetector();
+      const gpuInfo = await detector.detectNVIDIA();
+
+      if (gpuInfo.available && !this._mockGPUFailure) {
+        this.device = 'gpu';
+        this.gpuName = gpuInfo.gpuName;
+        this.gpuMemoryMB = gpuInfo.totalMemoryMB;
+
+        // Auto-tune batch size based on GPU memory
+        if (this.options.gpu.autoTuneBatchSize) {
+          this.batchSize = detector.recommendBatchSize(this.gpuMemoryMB);
+        }
+
+        console.log(`✅ GPU Detected: ${this.gpuName} (${this.gpuMemoryMB}MB)`);
+        console.log(`Using batch size: ${this.batchSize}`);
+      } else {
+        console.log('⚠️ No GPU detected, using CPU');
+        this.device = 'cpu';
+      }
+    } catch (error) {
+      console.log(`⚠️ GPU detection failed, falling back to CPU: ${error.message}`);
+      this.device = 'cpu';
     }
   }
 
