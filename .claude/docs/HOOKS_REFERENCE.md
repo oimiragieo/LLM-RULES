@@ -45,11 +45,11 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 │       ├── git-validators.cjs
 │       └── process-validators.cjs
 ├── routing/          # Router enforcement
-│   ├── router-enforcer.cjs
+│   ├── router-enforcer.cjs   # Not registered in settings.json; routing uses routing-guard and routing-table only
 │   ├── router-mode-reset.cjs
 │   ├── routing-guard.cjs      # consolidated: security-review, task-create, planner-first, router-write
-│   ├── documentation-routing-guard.cjs  # not registered; logic in pre-task-unified.cjs (CHECK 3)
-│   ├── agent-context-tracker.cjs
+│   ├── documentation-routing-guard.cjs  # PreToolUse(Task); documentation-related routing checks
+│   ├── agent-context-tracker.cjs   # PostToolUse(Task); sets router state to agent mode, marks PLANNER/SECURITY spawns
 │   └── router-state.cjs (shared state)
 ├── memory/           # Memory operations
 │   ├── format-memory.cjs
@@ -129,7 +129,7 @@ kill -9 0                                # Kill all processes
 
 **Note**: Router TaskList-first is enforced by pre-task-unified (PreToolUse Task) and state set by PostToolUse TaskList (task-list-tracker.cjs).
 
-**Documentation routing**: Documentation routing (routes docs to technical-writer) is enforced by `pre-task-unified.cjs` (CHECK 3: Documentation Routing Guard). The standalone file `documentation-routing-guard.cjs` exists in `.claude/hooks/routing/` but is not registered in `settings.json`; it is kept for reference or optional use.
+**Documentation routing**: Documentation routing (routes docs to technical-writer) is enforced by `documentation-routing-guard.cjs` (PreToolUse Task, registered in settings.json at line 188). The check logic is also duplicated in `pre-task-unified.cjs` (CHECK 3: Documentation Routing Guard) for defense-in-depth.
 
 ### router-write-guard.cjs
 

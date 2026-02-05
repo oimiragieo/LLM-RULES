@@ -275,7 +275,7 @@ const DOMAIN_MAP = {
   'pyqt6-ui-development-rules': 'styling',
   'alpine-js-usage-rules': 'styling',
   accessibility: 'styling',
-  'mobile-ux-reviewer': 'styling',
+  // NOTE: mobile-ux-reviewer is an AGENT, not a skill (no SKILL.md exists) - removed SKL-002
   'aceternity-ui-configuration': 'styling',
 
   // Scientific
@@ -576,7 +576,8 @@ function parseSkillCatalog() {
 }
 
 /**
- * Scan SKILL.md files for metadata
+ * Scan SKILL.md files for metadata (shallow - only direct children)
+ * @deprecated Use scanSkillFilesRecursively for nested skill directories
  */
 function scanSkillFiles() {
   const skills = {};
@@ -614,6 +615,60 @@ function scanSkillFiles() {
 }
 
 /**
+ * Recursively scan all SKILL.md files, preserving full relative paths.
+ * Fixes SKL-001: handles nested directories like scientific-skills/skills/biopython
+ *
+ * @param {string} baseDir - The base skills directory to scan
+ * @param {string} relativePath - Current relative path from baseDir (used in recursion)
+ * @returns {Object} Map of skill key (relative path) to skill metadata
+ */
+function scanSkillFilesRecursively(baseDir, relativePath = '') {
+  const skills = {};
+  const currentDir = relativePath ? path.join(baseDir, relativePath) : baseDir;
+
+  try {
+    if (!fs.existsSync(currentDir)) {
+      return skills;
+    }
+
+    const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        // Build the relative path for this entry
+        const entryRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+
+        const skillPath = path.join(currentDir, entry.name, 'SKILL.md');
+
+        if (fs.existsSync(skillPath)) {
+          const content = fs.readFileSync(skillPath, 'utf8');
+
+          // Extract frontmatter if exists
+          const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+
+          // Use forward slashes for consistent keys (cross-platform)
+          const skillKey = entryRelativePath.replace(/\\/g, '/');
+
+          skills[skillKey] = {
+            name: skillKey,
+            hasSkillFile: true,
+            hasFrontmatter: !!frontmatterMatch,
+          };
+        }
+
+        // Recursively scan subdirectories
+        const nestedSkills = scanSkillFilesRecursively(baseDir, entryRelativePath);
+        Object.assign(skills, nestedSkills);
+      }
+    }
+  } catch (err) {
+    console.warn(`Warning: Could not scan skill files in ${currentDir}: ${err.message}`);
+  }
+
+  return skills;
+}
+
+/**
  * Generate the skill index
  */
 function generateIndex(options = {}) {
@@ -621,7 +676,8 @@ function generateIndex(options = {}) {
 
   // Get skill list
   const catalogSkills = parseSkillCatalog();
-  const scannedSkills = scan ? scanSkillFiles() : {};
+  // Use recursive scanner to handle nested skill directories (SKL-001 fix)
+  const scannedSkills = scan ? scanSkillFilesRecursively(SKILLS_DIR) : {};
 
   if (verbose) {
     console.log(`Found ${catalogSkills.length} skills in catalog`);
@@ -872,4 +928,10 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { generateIndex, validateIndex, parseSkillCatalog, scanSkillFiles };
+module.exports = {
+  generateIndex,
+  validateIndex,
+  parseSkillCatalog,
+  scanSkillFiles,
+  scanSkillFilesRecursively,
+};

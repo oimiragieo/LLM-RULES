@@ -66,13 +66,55 @@ function resolveSummaryPath({ mtmPath, projectRoot, sessionId }) {
   return path.join(memoryDir, filename);
 }
 
+function buildFallbackSummary(sessionData) {
+  const parts = [];
+  if (sessionData?.summary) {
+    parts.push(`## Summary\n${sessionData.summary}`);
+  }
+  if (Array.isArray(sessionData?.tasks_completed) && sessionData.tasks_completed.length > 0) {
+    parts.push(`## Tasks Completed\n- ${sessionData.tasks_completed.join('\n- ')}`);
+  }
+  if (Array.isArray(sessionData?.decisions_made) && sessionData.decisions_made.length > 0) {
+    parts.push(`## Decisions\n- ${sessionData.decisions_made.join('\n- ')}`);
+  }
+  if (Array.isArray(sessionData?.patterns_found) && sessionData.patterns_found.length > 0) {
+    parts.push(`## Patterns\n- ${sessionData.patterns_found.join('\n- ')}`);
+  }
+  if (
+    Array.isArray(sessionData?.gotchas_encountered) &&
+    sessionData.gotchas_encountered.length > 0
+  ) {
+    parts.push(`## Gotchas\n- ${sessionData.gotchas_encountered.join('\n- ')}`);
+  }
+  if (Array.isArray(sessionData?.files_modified) && sessionData.files_modified.length > 0) {
+    parts.push(`## Files Modified\n- ${sessionData.files_modified.join('\n- ')}`);
+  }
+
+  if (parts.length === 0) {
+    return '## Summary\nNo structured summary available for this session.';
+  }
+
+  return parts.join('\n\n');
+}
+
 async function generateStructuredSummaryForSession(sessionData, options = {}) {
   const projectRoot = options.projectRoot || PROJECT_ROOT;
   const modelClient = options.modelClient || new ModelClient();
   const sessionContext = buildSessionContext(sessionData);
   const { system, user } = getSessionStructuredSummaryPrompt(sessionContext);
 
-  const summary = await modelClient.generateText({ system, messages: user });
+  let summary = '';
+  if (typeof modelClient.isMockMode === 'function' && modelClient.isMockMode()) {
+    summary = buildFallbackSummary(sessionData);
+    logger.warn('Session summary mock mode fallback used');
+  } else {
+    try {
+      summary = await modelClient.generateText({ system, messages: user });
+    } catch (error) {
+      logger.warn('Session summary failed; using fallback', { error: error.message });
+      summary = buildFallbackSummary(sessionData);
+    }
+  }
 
   const summaryPath = resolveSummaryPath({
     mtmPath: options.mtmPath,
@@ -94,5 +136,6 @@ async function generateStructuredSummaryForSession(sessionData, options = {}) {
 
 module.exports = {
   buildSessionContext,
+  buildFallbackSummary,
   generateStructuredSummaryForSession,
 };

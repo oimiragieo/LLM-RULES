@@ -18,7 +18,7 @@
  */
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
-import { resolve, dirname, _join } from 'path';
+import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 // Import js-yaml

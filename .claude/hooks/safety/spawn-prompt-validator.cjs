@@ -165,8 +165,11 @@ const VALIDATION_RULES = [
   {
     name: 'TaskUpdate Warning Box',
     // SECURE: Bounded quantifiers, no catastrophic backtracking
-    // Matches: +====...+ WARNING: TASK TRACKING REQUIRED ... ====...+
-    pattern: /\+={10,100}\+[\s\S]{0,500}TASK TRACKING REQUIRED[\s\S]{0,500}={10,100}\+/,
+    // Second [\s\S] increased to 1500 to span full assembler box (ReDoS-safe bounded quantifier)
+    // Matches: +====...+ WARNING: TASK TRACKING REQUIRED ... +====...+
+    // Also matches: +====...+ TASK TRACKING REQUIRED (with or without "WARNING:" prefix)
+    pattern:
+      /\+={10,100}\+[\s\S]{0,800}(?:WARNING:\s+)?TASK TRACKING REQUIRED[\s\S]{0,1500}\+={10,100}\+/,
     severity: 'critical',
     suggestion: 'Include the 70-line warning box from universal-agent-spawn.md template',
     weight: 40,
@@ -175,7 +178,9 @@ const VALIDATION_RULES = [
   {
     name: 'Task ID Reference',
     // SECURE: Simple pattern, no backtracking risk
-    pattern: /Task ID:\s{0,10}[<"']?\d{1,20}|taskId:\s{0,10}[<"']?\d{1,20}/i,
+    // Matches: "Task ID: 123", "Your Task ID: 456", "taskId: 789", etc.
+    // Allows 0-digit IDs (like "0") when taskId is null
+    pattern: /(?:Your\s+)?Task\s+ID:\s*[<"']?(?:\d+|0)[>"]?|taskId:\s*[<"']?(?:\d+|0)[>"]?/i,
     severity: 'critical',
     suggestion: 'Include "Task ID: <ID>" or reference specific task ID',
     weight: 30,
@@ -378,7 +383,7 @@ function isTemplateBasedSpawn(prompt) {
 async function main() {
   const startTime = Date.now();
 
-  const mode = getEnforcementMode('SPAWN_PROMPT_VALIDATOR', 'warn');
+  const mode = getEnforcementMode('SPAWN_PROMPT_VALIDATOR', 'block');
 
   // SECURITY MITIGATION: VULN-005 - Audit any non-default mode
   if (mode !== 'warn') {

@@ -19,7 +19,6 @@
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-const { spawnSync } = require('child_process');
 
 const { PROJECT_ROOT, validatePathWithinProject } = require('../../lib/utils/project-root.cjs');
 const {
@@ -56,6 +55,11 @@ function getCoreMemoryFileType(absPath) {
 
 function ensureEntityDbInitialized(dbPath) {
   try {
+    const dbDir = path.dirname(dbPath);
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
+
     // Lazily initialize schema if missing (idempotent).
     // This avoids the "EntityExtractor assumes schema exists" failure mode.
     const { DatabaseSync } = require('node:sqlite');
@@ -181,19 +185,19 @@ function maybeGenerateEmbeddingsForFile(absPath) {
   );
   if (!fs.existsSync(generatorPath)) return;
 
-  const timeoutMs = Number(process.env.MEMORY_EMBED_ON_EDIT_TIMEOUT_MS || 30000);
-  const spawnResult = spawnSync(process.execPath, [generatorPath, '--file', absPath], {
+  const timeoutMs = Number(process.env.MEMORY_EMBED_ON_EDIT_TIMEOUT_MS || 60000);
+  // REMEDIATION-FIX: Use non-blocking spawn to avoid hanging the hook
+  const { spawn } = require('child_process');
+  const child = spawn(process.execPath, [generatorPath, '--file', absPath], {
     cwd: PROJECT_ROOT,
     stdio: 'ignore',
+    detached: true, // Allow child to run after parent exits
     timeout: timeoutMs,
   });
-  if (spawnResult.signal === 'SIGTERM' || spawnResult.status !== 0) {
-    console.warn(
-      '[sync-memory-index] Embedding generation may be partial:',
-      spawnResult.signal ? `timeout (${spawnResult.signal})` : `exit ${spawnResult.status}`
-    );
-  } else if (process.env.DEBUG_HOOKS) {
-    console.warn('[sync-memory-index] Embeddings updated for', basename);
+  child.unref(); // Don't wait for child
+
+  if (process.env.DEBUG_HOOKS) {
+    console.warn('[sync-memory-index] Embedding generation triggered in background for', basename);
   }
 }
 
@@ -202,7 +206,6 @@ async function main() {
   let output = null;
   let toolName = null;
   let absPath = null;
-  const allowJsonHookSync = process.env.MEMORY_HOOK_JSON_SYNC === 'on';
   const hookInput = parseHookInputSync();
   if (!hookInput) process.exit(0);
 
@@ -256,15 +259,8 @@ async function main() {
   absPath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
   const fileType = getCoreMemoryFileType(absPath);
   if (!fileType) process.exit(0);
-  if (fileType === 'json' && toolName !== 'MemoryRecord' && !allowJsonHookSync) {
-    if (process.env.DEBUG_HOOKS) {
-      console.warn(
-        '[sync-memory-index] Skipping JSON sync (use MemoryRecord or set MEMORY_HOOK_JSON_SYNC=on):',
-        path.basename(absPath)
-      );
-    }
-    process.exit(0);
-  }
+  // REMEDIATION-FIX: Allow JSON sync for all tools (e.g. manual edits by agents)
+  // if (fileType === 'json' && toolName !== 'MemoryRecord' && !allowJsonHookSync) { ... }
 
   const dbPath = path.join(PROJECT_ROOT, '.claude', 'data', 'memory.db');
   ensureEntityDbInitialized(dbPath);

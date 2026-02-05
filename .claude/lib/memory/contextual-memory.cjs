@@ -10,6 +10,7 @@ const { MemoryVectorStore } = require('./lancedb-client.cjs');
 const { EntityQuery } = require('./entity-query.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
+const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 
 const logger = createLogger('contextual-memory');
 
@@ -26,6 +27,8 @@ const logger = createLogger('contextual-memory');
 const ACCESS_TRACKING_MIN_INTERVAL_MS = Number(
   process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS || 5 * 60 * 1000
 );
+const ACCESS_TRACKING_ENABLED =
+  String(process.env.MEMORY_ACCESS_TRACKING || 'on').toLowerCase() !== 'off';
 
 function toSafeInt(val, fallback = 0) {
   const n = Number.parseInt(String(val), 10);
@@ -39,61 +42,79 @@ function computeQualityScore(accessCount) {
   return Math.round((0.5 + ratio * 0.5) * 1000) / 1000;
 }
 
-function ensureAccessTrackingFields(entry) {
-  if (!entry || typeof entry !== 'object') return false;
-  let changed = false;
-
-  if (typeof entry.accessCount !== 'number') {
-    entry.accessCount = 0;
-    changed = true;
-  }
-  if (typeof entry.lastAccessed === 'undefined') {
-    entry.lastAccessed = null;
-    changed = true;
-  }
-
-  return changed;
+function getAccessStatsPath(memoryDir) {
+  return path.join(memoryDir, 'access-stats.json');
 }
 
-function maybeTouchEntriesForAccessTracking(allEntries, returnedEntries, nowIso) {
-  if (!Array.isArray(allEntries) || allEntries.length === 0) return false;
-  if (!Array.isArray(returnedEntries) || returnedEntries.length === 0) {
-    let schemaChanged = false;
-    for (const entry of allEntries) {
-      schemaChanged = ensureAccessTrackingFields(entry) || schemaChanged;
+function loadAccessStats(memoryDir) {
+  const statsPath = getAccessStatsPath(memoryDir);
+  try {
+    if (fs.existsSync(statsPath)) {
+      const parsed = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
+      if (parsed && typeof parsed === 'object') {
+        return {
+          version: parsed.version || '1.0',
+          entries: parsed.entries && typeof parsed.entries === 'object' ? parsed.entries : {},
+        };
+      }
     }
-    return schemaChanged;
+  } catch (_e) {
+    // Best-effort; fall through to default
   }
+  return { version: '1.0', entries: {} };
+}
 
+function buildAccessKey(entry) {
+  if (!entry || typeof entry !== 'object') return null;
+  if (entry.id) return `id:${entry.id}`;
+  if (typeof entry.text === 'string') {
+    return `text:${entry.text}\n${entry.timestamp || ''}`;
+  }
+  return null;
+}
+
+function applyAccessStats(entries, stats) {
+  if (!Array.isArray(entries) || entries.length === 0) return;
+  if (!stats || typeof stats !== 'object' || !stats.entries) return;
+  for (const entry of entries) {
+    const key = buildAccessKey(entry);
+    if (!key) continue;
+    const stat = stats.entries[key];
+    if (!stat) continue;
+    entry.accessCount = toSafeInt(stat.accessCount, 0);
+    entry.lastAccessed = stat.lastAccessed || null;
+  }
+}
+
+function updateAccessStatsInPlace(stats, returnedEntries, nowIso) {
+  if (!ACCESS_TRACKING_ENABLED) return false;
+  if (!stats || typeof stats !== 'object') return false;
+  if (!Array.isArray(returnedEntries) || returnedEntries.length === 0) return false;
+
+  const entries = stats.entries || {};
   const nowMs = Date.parse(nowIso);
-  const identifiers = new Set(
-    returnedEntries
-      .filter(e => e && typeof e === 'object' && typeof e.text === 'string')
-      .map(e => `${e.text}\n${e.timestamp || ''}`)
-  );
+  const minInterval = Number.isFinite(ACCESS_TRACKING_MIN_INTERVAL_MS)
+    ? ACCESS_TRACKING_MIN_INTERVAL_MS
+    : 0;
 
   let changed = false;
-  for (const entry of allEntries) {
-    changed = ensureAccessTrackingFields(entry) || changed;
+  for (const entry of returnedEntries) {
+    const key = buildAccessKey(entry);
+    if (!key) continue;
 
-    if (!entry || typeof entry !== 'object') continue;
-    if (typeof entry.text !== 'string') continue;
+    const current = entries[key] || { accessCount: 0, lastAccessed: null };
+    const lastAccessedMs = current.lastAccessed ? Date.parse(current.lastAccessed) : 0;
 
-    const id = `${entry.text}\n${entry.timestamp || ''}`;
-    if (!identifiers.has(id)) continue;
-
-    const lastAccessedMs = entry.lastAccessed ? Date.parse(entry.lastAccessed) : 0;
-    const minInterval = Number.isFinite(ACCESS_TRACKING_MIN_INTERVAL_MS)
-      ? ACCESS_TRACKING_MIN_INTERVAL_MS
-      : 0;
-
-    if (!entry.lastAccessed || nowMs - lastAccessedMs >= minInterval) {
-      entry.accessCount = toSafeInt(entry.accessCount, 0) + 1;
-      entry.lastAccessed = nowIso;
+    if (!current.lastAccessed || nowMs - lastAccessedMs >= minInterval) {
+      entries[key] = {
+        accessCount: toSafeInt(current.accessCount, 0) + 1,
+        lastAccessed: nowIso,
+      };
       changed = true;
     }
   }
 
+  stats.entries = entries;
   return changed;
 }
 
@@ -338,18 +359,16 @@ class ContextualMemory {
       }
     }
 
+    const accessStats = loadAccessStats(memoryDir);
+    const nowIso = new Date().toISOString();
+
     const gotchasFile = path.join(memoryDir, 'gotchas.json');
     if (!dbGotchasLoaded && fs.existsSync(gotchasFile)) {
       try {
         const allGotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
         const selectedGotchas = allGotchas.slice(-maxItems.gotchas);
         result.gotchas = this._truncateItems(selectedGotchas, maxChars.gotchas);
-
-        const now = new Date().toISOString();
-        const changed = maybeTouchEntriesForAccessTracking(allGotchas, result.gotchas, now);
-        if (changed) {
-          fs.writeFileSync(gotchasFile, JSON.stringify(allGotchas, null, 2));
-        }
+        applyAccessStats(result.gotchas, accessStats);
       } catch (e) {
         logger.debug('Gotchas load failed', { error: e.message });
       }
@@ -361,15 +380,31 @@ class ContextualMemory {
         const allPatterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
         const selectedPatterns = allPatterns.slice(-maxItems.patterns);
         result.patterns = this._truncateItems(selectedPatterns, maxChars.patterns);
-
-        const now = new Date().toISOString();
-        const changed = maybeTouchEntriesForAccessTracking(allPatterns, result.patterns, now);
-        if (changed) {
-          fs.writeFileSync(patternsFile, JSON.stringify(allPatterns, null, 2));
-        }
+        applyAccessStats(result.patterns, accessStats);
       } catch (e) {
         logger.debug('Patterns load failed', { error: e.message });
       }
+    }
+
+    const gotchasAccessChanged = updateAccessStatsInPlace(accessStats, result.gotchas, nowIso);
+    const patternsAccessChanged = updateAccessStatsInPlace(accessStats, result.patterns, nowIso);
+    const accessChanged = gotchasAccessChanged || patternsAccessChanged;
+
+    // FIXED (Issue #2 - HIGH): Make access stats write non-blocking (fire-and-forget)
+    // Using setImmediate to avoid blocking the read operation
+    if (accessChanged) {
+      setImmediate(() => {
+        try {
+          atomicWriteJSONSync(getAccessStatsPath(memoryDir), {
+            version: '1.0',
+            entries: accessStats.entries || {},
+          });
+          applyAccessStats(result.gotchas, accessStats);
+          applyAccessStats(result.patterns, accessStats);
+        } catch (_e) {
+          // Best-effort; do not block context load
+        }
+      });
     }
 
     const mapFile = path.join(memoryDir, 'codebase_map.json');

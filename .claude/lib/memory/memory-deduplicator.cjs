@@ -38,6 +38,34 @@ function normalizeCategory(value) {
   return null;
 }
 
+function isMockClient(modelClient) {
+  if (!modelClient) return true;
+  if (typeof modelClient.isMockMode === 'function') {
+    return modelClient.isMockMode();
+  }
+  return false;
+}
+
+function fallbackDecisionFromSimilarity(results) {
+  if (!Array.isArray(results) || results.length === 0) {
+    return { decision: 'create', reason: 'No similar memories found' };
+  }
+
+  const top = results[0];
+  const score = typeof top.similarity === 'number' ? top.similarity : null;
+
+  if (score !== null) {
+    if (score >= 0.88) {
+      return { decision: 'update', reason: `High similarity (${score.toFixed(2)})` };
+    }
+    if (score >= 0.78) {
+      return { decision: 'merge', reason: `Moderate similarity (${score.toFixed(2)})` };
+    }
+  }
+
+  return { decision: 'create', reason: 'Similarity below merge threshold' };
+}
+
 function formatExistingMemories(results) {
   if (!Array.isArray(results) || results.length === 0) {
     return 'None';
@@ -116,6 +144,17 @@ async function deduplicateCandidate(candidate, context = {}) {
     existingMemories
   );
 
+  if (isMockClient(modelClient)) {
+    const fallback = fallbackDecisionFromSimilarity(results);
+    return {
+      decision: fallback.decision,
+      candidate,
+      similarMemories: results,
+      mergedContent: null,
+      reason: `Mock dedup fallback: ${fallback.reason}`,
+    };
+  }
+
   try {
     const response = await modelClient.generateText({ system, messages: user });
     const payload = stripCodeFences(response);
@@ -134,12 +173,13 @@ async function deduplicateCandidate(candidate, context = {}) {
       error: error.message,
       projectRoot,
     });
+    const fallback = fallbackDecisionFromSimilarity(results);
     return {
-      decision: 'create',
+      decision: fallback.decision,
       candidate,
       similarMemories: results,
       mergedContent: null,
-      reason: 'Decision parse failed',
+      reason: `Decision parse failed; ${fallback.reason}`,
     };
   }
 }

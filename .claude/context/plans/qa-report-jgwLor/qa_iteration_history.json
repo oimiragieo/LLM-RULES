@@ -1,0 +1,26 @@
+[
+  {
+    "iteration": 1,
+    "timestamp": "2026-02-04T20:18:15.576Z",
+    "verdict": "rejected",
+    "issues_summary": [
+      "Issue A"
+    ]
+  },
+  {
+    "iteration": 2,
+    "timestamp": "2026-02-04T20:18:15.584Z",
+    "verdict": "rejected",
+    "issues_summary": [
+      "Issue A"
+    ]
+  },
+  {
+    "iteration": 3,
+    "timestamp": "2026-02-04T20:18:15.591Z",
+    "verdict": "rejected",
+    "issues_summary": [
+      "Issue A"
+    ]
+  }
+]

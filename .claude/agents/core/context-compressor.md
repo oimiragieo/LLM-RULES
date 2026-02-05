@@ -2,7 +2,7 @@
 name: context-compressor
 version: 1.0.0
 description: Intelligently summarizes and compresses context (files, logs, outputs) to save tokens and prevent poisoning.
-model: claude-haiku-4-5
+model: haiku
 temperature: 0.3
 context_strategy: minimal
 priority: medium

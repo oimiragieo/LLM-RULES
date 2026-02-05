@@ -36,6 +36,7 @@ const fs = require('fs');
 const path = require('path');
 // ATOMIC-001 FIX: Use atomic write utility to prevent data corruption
 const { atomicWriteSync } = require('../../lib/utils/atomic-write.cjs');
+const { trimJsonlFile } = require('../../lib/utils/jsonl-utils.cjs');
 // PROC-002: Use shared utility instead of duplicated findProjectRoot
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 // HOOK-006 FIX: Use standardized audit logging
@@ -45,6 +46,7 @@ const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // Configuration
 let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue.jsonl');
+const REFLECTION_QUEUE_MAX_LINES = Number(process.env.REFLECTION_QUEUE_MAX_LINES || 2000);
 
 function getContextDir(queueFile = QUEUE_FILE) {
   return path.dirname(queueFile);
@@ -368,6 +370,7 @@ function processQueue(queueFile = QUEUE_FILE) {
 
   // Mark entries as processed
   markEntriesProcessed(pending, queueFile);
+  trimJsonlFile(queueFile, REFLECTION_QUEUE_MAX_LINES);
 
   return result;
 }

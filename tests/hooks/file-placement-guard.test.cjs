@@ -12,6 +12,7 @@ const assert = require('node:assert');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const { spawnSync } = require('child_process');
 
 // PERF-004 FIX: Import state cache utilities for test cleanup
 const { invalidateCache, _clearAllCache } = require('../../.claude/lib/utils/state-cache.cjs');
@@ -140,6 +141,46 @@ describe('file-placement-guard isValidPath', () => {
     const result = guardModule.isValidPath('/project/.claude/random.txt');
     assert.strictEqual(result.valid, false);
     assert.ok(result.reason.includes('Invalid root-level'));
+  });
+});
+
+describe('memory JSON enforcement', () => {
+  const hookPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '.claude',
+    'hooks',
+    'safety',
+    'file-placement-guard.cjs'
+  );
+
+  it('should block direct Write to patterns.json by default', () => {
+    const input = JSON.stringify({
+      tool_name: 'Write',
+      tool_input: { file_path: '.claude/context/memory/patterns.json' },
+    });
+
+    const result = spawnSync(process.execPath, [hookPath, input], {
+      env: { ...process.env, MEMORY_JSON_WRITE_ENFORCEMENT: 'block' },
+      encoding: 'utf8',
+    });
+
+    assert.strictEqual(result.status, 2, 'Expected block exit code for patterns.json write');
+  });
+
+  it('should allow direct Write to patterns.json when enforcement is warn', () => {
+    const input = JSON.stringify({
+      tool_name: 'Write',
+      tool_input: { file_path: '.claude/context/memory/patterns.json' },
+    });
+
+    const result = spawnSync(process.execPath, [hookPath, input], {
+      env: { ...process.env, MEMORY_JSON_WRITE_ENFORCEMENT: 'warn' },
+      encoding: 'utf8',
+    });
+
+    assert.strictEqual(result.status, 0, 'Expected warn mode to allow patterns.json write');
   });
 });
 

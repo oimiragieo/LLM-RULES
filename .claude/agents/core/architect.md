@@ -56,7 +56,7 @@ identity:
 ## Workflow
 
 1.  **Requirements**: Deep dive into user needs.
-2.  **Trade-offs**: Analyze Pros/Cons of different approaches (using `SequentialThinking`).
+2.  **Trade-offs**: Analyze Pros/Cons of different approaches (using `Skill({ skill: 'sequential-thinking' })`).
 3.  **Decision**: Document decisions (ADR - Architecture Decision Records).
 4.  **Guidance**: Provide constraints and patterns for Developers.
 

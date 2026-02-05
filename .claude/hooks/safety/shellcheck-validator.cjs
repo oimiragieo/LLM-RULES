@@ -9,7 +9,7 @@
  * @environment SHELLCHECK_VALIDATOR=block|warn|off
  */
 
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -35,67 +35,69 @@ function runShellcheck(command) {
     const script = `#!/bin/bash\n${command}`;
     fs.writeFileSync(tmpFile, script);
 
+    let proc;
     try {
-      // Run shellcheck with JSON output (using array to prevent command injection)
-      const result = execSync('shellcheck --format=json ' + tmpFile, {
-        stdio: 'pipe',
+      // Run shellcheck with JSON output (spawnSync + array args: safe for paths with spaces; SHELLCHECK-VAL-001)
+      proc = spawnSync('shellcheck', ['--format=json', tmpFile], {
         encoding: 'utf8',
+        maxBuffer: 2 * 1024 * 1024,
       });
-
-      // Clean up temp file
-      fs.unlinkSync(tmpFile);
-
-      // Parse JSON output
-      const issues = JSON.parse(result || '[]');
-
-      // Filter ignored codes
-      const relevantIssues = issues.filter(issue => !IGNORED_CODES.includes(`SC${issue.code}`));
-
-      if (relevantIssues.length > 0) {
-        return {
-          valid: false,
-          issues: relevantIssues.map(issue => ({
-            line: issue.line,
-            column: issue.column,
-            level: issue.level, // error, warning, info
-            code: `SC${issue.code}`,
-            message: issue.message,
-          })),
-        };
-      }
-
-      return { valid: true };
-    } catch (shellcheckError) {
-      // Shellcheck found issues (exits with non-zero)
-      fs.unlinkSync(tmpFile);
-
-      // Try to parse stderr as JSON
+    } finally {
       try {
-        const issues = JSON.parse(shellcheckError.stdout || '[]');
-        const relevantIssues = issues.filter(issue => !IGNORED_CODES.includes(`SC${issue.code}`));
-
-        if (relevantIssues.length > 0) {
-          return {
-            valid: false,
-            issues: relevantIssues.map(issue => ({
-              line: issue.line,
-              column: issue.column,
-              level: issue.level,
-              code: `SC${issue.code}`,
-              message: issue.message,
-            })),
-          };
-        }
-
-        return { valid: true };
-      } catch {
-        // Could not parse error output, assume shellcheck not installed
-        return {
-          valid: true,
-          warning: 'Shellcheck error parsing failed, skipping validation',
-        };
+        fs.unlinkSync(tmpFile);
+      } catch (_) {
+        // ignore
       }
     }
+
+    if (proc.error) {
+      if (
+        proc.error.code === 'ENOENT' ||
+        (proc.error.message && proc.error.message.includes('command not found'))
+      ) {
+        return {
+          valid: true,
+          warning:
+            'Shellcheck not installed, skipping validation. Install with: brew install shellcheck (macOS) or apt-get install shellcheck (Linux). Set SHELLCHECK_VALIDATOR=off to disable.',
+        };
+      }
+      return {
+        valid: true,
+        warning: `Shellcheck execution failed: ${proc.error.message}. Set SHELLCHECK_VALIDATOR=off to disable.`,
+      };
+    }
+
+    const result =
+      (proc.stdout && proc.stdout.trim()) || (proc.stderr && proc.stderr.trim()) || '[]';
+    let issues;
+    try {
+      issues = JSON.parse(result);
+    } catch {
+      return {
+        valid: true,
+        warning:
+          'Shellcheck error parsing failed, skipping validation. Set SHELLCHECK_VALIDATOR=off to disable.',
+      };
+    }
+
+    if (!Array.isArray(issues)) {
+      return { valid: true };
+    }
+
+    const relevantIssues = issues.filter(issue => !IGNORED_CODES.includes(`SC${issue.code}`));
+    if (relevantIssues.length > 0) {
+      return {
+        valid: false,
+        issues: relevantIssues.map(issue => ({
+          line: issue.line,
+          column: issue.column,
+          level: issue.level, // error, warning, info
+          code: `SC${issue.code}`,
+          message: issue.message,
+        })),
+      };
+    }
+    return { valid: true };
   } catch (error) {
     // Shellcheck not installed or execution failed
     if (error.code === 'ENOENT' || error.message.includes('command not found')) {

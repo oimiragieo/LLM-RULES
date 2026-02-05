@@ -77,36 +77,42 @@ function validateProjectRoot(projectRoot) {
   }
 }
 
-// Configuration
+// FIXED (Issue #3 - MEDIUM): Load configuration from environment variables with defaults
+// Respects .env and settings.json overrides
 const CONFIG = {
   // Max characters to load into context per category
   MAX_CONTEXT_CHARS: {
-    gotchas: 2000,
-    patterns: 2000,
-    decisions: 2000,
-    discoveries: 3000,
-    sessions: 5000,
-    legacy: 3000,
+    gotchas: parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_GOTCHAS || '2000', 10),
+    patterns: parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_PATTERNS || '2000', 10),
+    decisions: parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_DECISIONS || '2000', 10),
+    discoveries: parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_DISCOVERIES || '3000', 10),
+    sessions: parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_SESSIONS || '5000', 10),
+    legacy: parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_LEGACY || '3000', 10),
   },
   // Max items to return
   MAX_ITEMS: {
-    gotchas: 20,
-    patterns: 20,
-    decisions: 10,
-    discoveries: 30,
-    sessions: 5,
+    gotchas: parseInt(process.env.MEMORY_MAX_ITEMS_GOTCHAS || '20', 10),
+    patterns: parseInt(process.env.MEMORY_MAX_ITEMS_PATTERNS || '20', 10),
+    decisions: parseInt(process.env.MEMORY_MAX_ITEMS_DECISIONS || '10', 10),
+    discoveries: parseInt(process.env.MEMORY_MAX_ITEMS_DISCOVERIES || '30', 10),
+    sessions: parseInt(process.env.MEMORY_MAX_ITEMS_SESSIONS || '5', 10),
   },
   // Session retention
-  MAX_SESSIONS: 50,
+  MAX_SESSIONS: parseInt(process.env.MEMORY_MAX_SESSIONS || '50', 10),
   // Archival thresholds
-  LEARNINGS_ARCHIVE_THRESHOLD_KB: 40,
-  LEARNINGS_KEEP_LINES: 50,
+  LEARNINGS_ARCHIVE_THRESHOLD_KB: parseInt(
+    process.env.MEMORY_LEARNINGS_ARCHIVE_THRESHOLD_KB || '40',
+    10
+  ),
+  LEARNINGS_KEEP_LINES: parseInt(process.env.MEMORY_LEARNINGS_KEEP_LINES || '50', 10),
   // Codebase map pruning
-  CODEBASE_MAP_TTL_DAYS: 90,
-  CODEBASE_MAP_MAX_ENTRIES: 500,
+  CODEBASE_MAP_TTL_DAYS: parseInt(process.env.MEMORY_CODEBASE_MAP_TTL_DAYS || '90', 10),
+  CODEBASE_MAP_MAX_ENTRIES: parseInt(process.env.MEMORY_CODEBASE_MAP_MAX_ENTRIES || '500', 10),
   // Health check thresholds
-  LEARNINGS_WARN_THRESHOLD_KB: 35,
-  CODEBASE_MAP_WARN_ENTRIES: 400,
+  LEARNINGS_WARN_THRESHOLD_KB: parseInt(process.env.MEMORY_LEARNINGS_WARN_THRESHOLD_KB || '40', 10),
+  CODEBASE_MAP_WARN_ENTRIES: parseInt(process.env.MEMORY_CODEBASE_MAP_WARN_ENTRIES || '400', 10),
+  // Decisions.md size threshold (warning at 80KB, rotate at 100KB to stay under 25K token limit)
+  DECISIONS_WARN_THRESHOLD_KB: parseInt(process.env.MEMORY_DECISIONS_WARN_THRESHOLD_KB || '80', 10),
 };
 
 /**
@@ -895,7 +901,25 @@ async function atomicWriteAsync(filePath, data) {
   const tmp = `${filePath}.${process.pid}.tmp`;
   try {
     await fsp.writeFile(tmp, data, 'utf8');
-    await fsp.rename(tmp, filePath);
+    try {
+      await fsp.rename(tmp, filePath);
+    } catch (err) {
+      if (
+        process.platform === 'win32' &&
+        (err.code === 'EPERM' || err.code === 'EACCES' || err.code === 'EBUSY')
+      ) {
+        try {
+          await fsp.unlink(filePath);
+        } catch (unlinkErr) {
+          if (unlinkErr.code !== 'ENOENT') {
+            throw unlinkErr;
+          }
+        }
+        await fsp.rename(tmp, filePath);
+      } else {
+        throw err;
+      }
+    }
   } catch (err) {
     // Clean up temp file on error (ignore cleanup errors)
     try {
@@ -1113,6 +1137,7 @@ function getMemoryHealth(projectRoot = PROJECT_ROOT) {
     status: 'healthy',
     warnings: [],
     learningsSizeKB: 0,
+    decisionsSizeKB: 0,
     codebaseMapEntries: 0,
     sessionsCount: 0,
   };
@@ -1127,6 +1152,20 @@ function getMemoryHealth(projectRoot = PROJECT_ROOT) {
       result.warnings.push(
         `learnings.md is ${result.learningsSizeKB}KB (threshold: ${CONFIG.LEARNINGS_WARN_THRESHOLD_KB}KB) - consider archival`
       );
+    }
+  }
+
+  // Check decisions.md size
+  const decisionsPath = path.join(memoryDir, 'decisions.md');
+  if (fs.existsSync(decisionsPath)) {
+    const stats = fs.statSync(decisionsPath);
+    result.decisionsSizeKB = Math.round(stats.size / 1024);
+
+    if (result.decisionsSizeKB > CONFIG.DECISIONS_WARN_THRESHOLD_KB) {
+      result.warnings.push(
+        `decisions.md is ${result.decisionsSizeKB}KB (warning at ${CONFIG.DECISIONS_WARN_THRESHOLD_KB}KB, rotate at 100KB)`
+      );
+      result.status = 'warning';
     }
   }
 
@@ -1264,7 +1303,7 @@ if (require.main === module) {
     case 'record-gotcha':
       if (args[1]) {
         const area = getFlagValue('area');
-        recordGotcha(args[1], PROJECT_ROOT, area);
+        recordGotcha({ text: args[1], area }, PROJECT_ROOT);
         logger.info('Gotcha recorded');
       } else {
         logger.error('Usage: memory-manager.cjs record-gotcha "gotcha text" [--area main]');
@@ -1274,7 +1313,7 @@ if (require.main === module) {
     case 'record-pattern':
       if (args[1]) {
         const area = getFlagValue('area');
-        recordPattern(args[1], PROJECT_ROOT, area);
+        recordPattern({ text: args[1], area }, PROJECT_ROOT);
         logger.info('Pattern recorded');
       } else {
         logger.error('Usage: memory-manager.cjs record-pattern "pattern text" [--area main]');

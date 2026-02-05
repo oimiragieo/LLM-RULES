@@ -38,14 +38,21 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
-const { createHookLogger } = require('../../lib/utils/hook-logger.cjs');
 const { buildContextModePrompt } = require('../../lib/spawn/prompt-factory.cjs');
 const { getDefaultTools } = require('../../lib/agents/agent-config.cjs');
+const { validatePrompt } = require('../safety/spawn-prompt-validator.cjs');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
 const TOOL_MANIFEST_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'tool-manifest.json');
+const _UNIVERSAL_SPAWN_TEMPLATE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'templates',
+  'spawn',
+  'universal-agent-spawn.md'
+);
 
 const MAX_TOOLS_AGENT = 15;
 const MAX_TOOLS_ORCHESTRATOR = 18;
@@ -57,7 +64,83 @@ const ORCHESTRATOR_IDS = new Set([
   'party-orchestrator',
 ]);
 
-const hookLog = createHookLogger('spawn-prompt-assembler');
+/** Log to stderr only (stdout is reserved for single JSON hook output). */
+function stderrLog(message, meta = {}) {
+  console.error(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: message === 'hook_failed' ? 'error' : 'info',
+      message,
+      component: 'hook:spawn-prompt-assembler',
+      tool: 'Task',
+      ...meta,
+    })
+  );
+}
+
+/**
+ * Generate the required prefix fragment (TaskUpdate Warning Box + PROJECT CONTEXT + Task ID)
+ * that the spawn-prompt-validator expects.
+ * @param {string|number|null} taskId - Task ID (numeric or string)
+ * @param {string} description - Task description/subject
+ * @returns {string} The required prefix fragment
+ */
+function generateRequiredPrefixFragment(taskId, description) {
+  const taskIdValue = taskId != null ? String(taskId) : '0';
+  const subject = (description || 'Task').slice(0, 80);
+
+  return `+======================================================================+
+|  WARNING: TASK TRACKING REQUIRED - READ THIS FIRST                   |
++======================================================================+
+|  Your Task ID: ${taskIdValue}                                                  |
+|                                                                      |
+|  BEFORE doing ANY work, run:                                         |
+|  TaskUpdate({ taskId: "${taskIdValue}", status: "in_progress" });              |
+|                                                                      |
+|  AFTER completing work, run:                                         |
+|  TaskUpdate({ taskId: "${taskIdValue}", status: "completed",                   |
+|    metadata: { summary: "...", filesModified: [...] }                |
+|  });                                                                 |
+|                                                                      |
+|  THEN check for more work:                                           |
+|  TaskList();                                                         |
+|                                                                      |
+|  FAILURE TO UPDATE TASK STATUS BREAKS THE ENTIRE SYSTEM              |
+|  YOU WILL BE EVALUATED ON: Task status updates, not just output      |
++======================================================================+
+
+## PROJECT CONTEXT (CRITICAL)
+PROJECT_ROOT: ${PROJECT_ROOT}
+
+All file operations MUST use relative paths from PROJECT_ROOT.
+- Agents: .claude/agents/
+- Skills: .claude/skills/
+- Context: .claude/context/
+
+## Your Assigned Task
+Task ID: ${taskIdValue}
+Subject: ${subject}`;
+}
+
+/**
+ * Check if prompt already contains the required TaskUpdate Warning Box
+ * @param {string} prompt - The prompt to check
+ * @returns {boolean} True if the warning box is present
+ */
+function hasRequiredWarningBox(prompt) {
+  return prompt && typeof prompt === 'string' && prompt.includes('TASK TRACKING REQUIRED');
+}
+
+/**
+ * Check if prompt already contains a Task ID reference
+ * @param {string} prompt - The prompt to check
+ * @returns {boolean} True if a Task ID reference is present
+ */
+function hasTaskIdReference(prompt) {
+  if (!prompt || typeof prompt !== 'string') return false;
+  // Match patterns like "Task ID: 123" or "taskId: 123" or "taskId: \"123\""
+  return /Task ID:\s{0,10}[<"']?\d{1,20}|taskId:\s{0,10}[<"']?\d{1,20}/i.test(prompt);
+}
 
 function isDisabled() {
   return process.env.SPAWN_PROMPT_ASSEMBLER === 'off';
@@ -65,6 +148,42 @@ function isDisabled() {
 
 function isEnricherDisabled() {
   return process.env.ALLOWED_TOOLS_ENRICHER === 'off';
+}
+
+/**
+ * Append config model section to assembled prompt (CONFIG-001). Returns assembled unchanged if disabled or on error.
+ * @param {string} assembled - Current prompt text
+ * @param {string} agentType - Agent type for config lookup
+ * @returns {string} Assembled prompt, possibly with model section appended
+ */
+function appendConfigModelSection(assembled, agentType) {
+  if (process.env.SPAWN_PROMPT_INJECT_CONFIG_MODEL === 'off') return assembled;
+  try {
+    const { getShorthand } = require('../../lib/utils/agent-config-reader.cjs');
+    const configResult = resolveConfigModel(agentType);
+    const shorthand = configResult && getShorthand(configResult.model);
+    if (configResult && configResult.model) {
+      const modelSection = [
+        '',
+        '### Model (from config)',
+        `Use model: **${configResult.model}** for this spawn. Invoke Task with \`model: "${configResult.model}"\` (or shorthand \`${shorthand || configResult.model}\`).`,
+      ].join('\n');
+      return assembled + modelSection;
+    }
+  } catch (err) {
+    debugLog('spawn-prompt-assembler', 'Config model injection failed (ignored)', err);
+  }
+  return assembled;
+}
+
+function resolveConfigModel(agentType) {
+  try {
+    const { resolveAgentModel } = require('../../lib/utils/agent-config-reader.cjs');
+    return resolveAgentModel(agentType, PROJECT_ROOT);
+  } catch (err) {
+    debugLog('spawn-prompt-assembler', 'Config model resolution failed (ignored)', err);
+    return null;
+  }
 }
 
 /**
@@ -135,6 +254,9 @@ function enrichAllowedTools(agentType, currentTools, prompt) {
     ? (manifest.constraints?.maxToolsPerOrchestrator ?? MAX_TOOLS_ORCHESTRATOR)
     : (manifest.constraints?.maxToolsPerAgent ?? MAX_TOOLS_AGENT);
 
+  // Extract mandatory tools from manifest (defensive fallback)
+  const mandatoryTools = manifest.validation?.mandatoryTools || ['TaskUpdate', 'Skill'];
+
   let resolvedType = (agentType || '').toLowerCase();
   if (resolvedType === 'general-purpose' && prompt) {
     const inferred = inferAgentFromPrompt(prompt);
@@ -149,11 +271,49 @@ function enrichAllowedTools(agentType, currentTools, prompt) {
       ? registryTools
       : getDefaultTools(resolvedType);
 
+  // Merge current tools and registry/config tools
   const merged = new Set([
     ...(Array.isArray(currentTools) ? currentTools : []),
     ...(Array.isArray(toolsToUse) ? toolsToUse : []),
   ]);
-  const result = [...merged].slice(0, maxTools);
+
+  // CRITICAL: Always add mandatory tools (defensive fallback)
+  for (const mandatoryTool of mandatoryTools) {
+    merged.add(mandatoryTool);
+  }
+
+  // Convert to array
+  const allTools = [...merged];
+
+  // Separate mandatory tools from other tools to ensure they're always included
+  const mandatoryInList = allTools.filter(t => mandatoryTools.includes(t));
+  const nonMandatory = allTools.filter(t => !mandatoryTools.includes(t));
+
+  // Cap non-mandatory tools to leave room for mandatory tools
+  const maxNonMandatory = maxTools - mandatoryInList.length;
+  const cappedNonMandatory = nonMandatory.slice(0, Math.max(0, maxNonMandatory));
+
+  // Combine: mandatory tools first (guaranteed), then non-mandatory up to limit
+  const result = [...mandatoryInList, ...cappedNonMandatory];
+
+  // Final safety check: if missing mandatory tools, log warning
+  const missingMandatory = mandatoryTools.filter(t => !result.includes(t));
+  if (missingMandatory.length > 0) {
+    debugLog('spawn-prompt-assembler', 'WARNING: Mandatory tools missing after merge', {
+      missing: missingMandatory,
+      agentType: resolvedType,
+      resultLength: result.length,
+      maxTools,
+    });
+    // Force-add missing tools (this should not happen with the above logic, but defensive)
+    for (const missing of missingMandatory) {
+      if (result.length >= maxTools) {
+        result.pop();
+      }
+      result.push(missing);
+    }
+  }
+
   return result;
 }
 
@@ -400,12 +560,109 @@ async function runIntentAnalysis({ memoryManager, query, threshold, projectRoot 
   return results;
 }
 
+/** Apply semantic memory and optional query memories to assembled prompt (reduces main complexity). */
+async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt) {
+  if (process.env.SPAWN_PROMPT_SEMANTIC_MEMORY === 'off') return assembled;
+  const memoryQueryEnabled =
+    process.env.SPAWN_PROMPT_MEMORY_QUERY === '1' || process.env.SPAWN_PROMPT_MEMORY_QUERY === 'on';
+  const memoryManager = require('../../lib/memory/memory-manager.cjs');
+  const query =
+    (toolInput.description && String(toolInput.description).trim()) ||
+    String(basePrompt).slice(0, 240);
+  const { SEMANTIC_SEARCH_DEFAULT_THRESHOLD } = require('../../lib/memory/memory-constants.cjs');
+  const intentAnalysisEnabled =
+    process.env.MEMORY_INTENT_ANALYSIS === '1' || process.env.MEMORY_INTENT_ANALYSIS === 'on';
+  let results = [];
+
+  if (intentAnalysisEnabled) {
+    try {
+      results = await runIntentAnalysis({
+        memoryManager,
+        query,
+        threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+        projectRoot: PROJECT_ROOT,
+      });
+    } catch (err) {
+      debugLog('spawn-prompt-assembler', 'Intent analysis failed (ignored)', err);
+      stderrLog('hook_failed', { error: err?.message, reason: 'intent_analysis' });
+    }
+  }
+
+  if (results.length === 0) {
+    try {
+      results = await memoryManager.searchMemory(query, {
+        limit: 3,
+        threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+        filters: `metadata NOT LIKE '%"source":"ltm_archive"%'`,
+      });
+    } catch (err) {
+      debugLog('spawn-prompt-assembler', 'Hot-only filter failed, using unfiltered search', err);
+      try {
+        results = await memoryManager.searchMemory(query, {
+          limit: 3,
+          threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+        });
+      } catch (fallbackErr) {
+        debugLog(
+          'spawn-prompt-assembler',
+          'Semantic memory retrieval failed (ignored)',
+          fallbackErr
+        );
+        stderrLog('hook_failed', {
+          error: fallbackErr?.message,
+          reason: 'memory_or_semantic_load',
+        });
+      }
+    }
+  }
+
+  if (memoryQueryEnabled) {
+    try {
+      const queryResults = await memoryManager.searchMemory(query, {
+        limit: 5,
+        threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
+      });
+      if (queryResults.length > 0) {
+        assembled = appendQueryMemories(assembled, queryResults);
+      }
+    } catch (queryErr) {
+      debugLog('spawn-prompt-assembler', 'Memory query retrieval failed (ignored)', queryErr);
+    }
+  }
+
+  if (!memoryQueryEnabled && results.length > 0) {
+    assembled = appendSemanticMatches(assembled, results);
+  }
+  return assembled;
+}
+
+/** Apply entity graph section to assembled prompt (reduces main complexity). */
+async function applyEntityGraphToPrompt(assembled) {
+  if (process.env.SPAWN_PROMPT_ENTITY_GRAPH === 'off') return assembled;
+  try {
+    const { ContextualMemory } = require('../../lib/memory/contextual-memory.cjs');
+    const cm = new ContextualMemory();
+    const decisions = await cm.findEntities('decision', { limit: 3 });
+    const issues = await cm.findEntities('issue', { limit: 3 });
+    const related = [];
+    for (const d of decisions.slice(0, 2)) {
+      const rel = await cm.getRelated(d.id, { depth: 1 });
+      if (Array.isArray(rel)) {
+        related.push(...rel.slice(0, 2));
+      }
+    }
+    cm.close();
+    return appendEntityGraph(assembled, { decisions, issues, related });
+  } catch (err) {
+    debugLog('spawn-prompt-assembler', 'Entity graph retrieval failed (ignored)', err);
+    return assembled;
+  }
+}
+
 async function main() {
   const startTime = Date.now();
   try {
-    if (isDisabled()) {
-      process.exit(0);
-    }
+    if (isDisabled()) process.exit(0);
 
     const hookInput = await parseHookInputAsync();
     if (!hookInput) process.exit(0);
@@ -416,23 +673,32 @@ async function main() {
     const toolInput = getToolInput(hookInput);
     if (!toolInput || typeof toolInput !== 'object') process.exit(0);
 
-    const basePrompt = toolInput.prompt;
+    let basePrompt = toolInput.prompt;
     if (!basePrompt || typeof basePrompt !== 'string') process.exit(0);
 
+    if (!hasRequiredWarningBox(basePrompt) || !hasTaskIdReference(basePrompt)) {
+      const taskId = toolInput.task_id || toolInput.id || null;
+      const description = toolInput.description || '';
+      basePrompt = generateRequiredPrefixFragment(taskId, description) + '\n\n' + basePrompt;
+      debugLog('spawn-prompt-assembler', 'Prepended required prefix fragment', {
+        hasWarningBox: hasRequiredWarningBox(toolInput.prompt),
+        hasTaskId: hasTaskIdReference(toolInput.prompt),
+        taskId,
+      });
+    }
+
     const sessionId = hookInput.session_id || hookInput.sessionId || null;
-    hookLog.logStart('Task', {
+    stderrLog('hook_start', {
       session_id: sessionId,
       task_id: toolInput.task_id || toolInput.id || null,
     });
 
-    // Avoid double-injection (can bloat prompts).
     if (looksAssembled(basePrompt)) {
-      hookLog.logEnd('Task', { status: 'already_assembled' });
+      stderrLog('hook_end', { status: 'already_assembled' });
       process.exit(0);
     }
 
     const promptAssembler = require('../../lib/spawn/prompt-assembler.cjs');
-
     const agentType = toolInput.subagent_type || toolInput.agent_type || 'developer';
     const presetId = toolInput.preset_id || toolInput.presetId || null;
     const rawAllowedTools = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
@@ -441,8 +707,8 @@ async function main() {
     let allowedTools = enrichedTools;
     if (contextMode.hasContextOrMode) {
       const activeSet = new Set(contextMode.activeToolNames);
-      const removed = enrichedTools.filter(toolName => !activeSet.has(toolName));
-      allowedTools = enrichedTools.filter(toolName => activeSet.has(toolName));
+      const removed = enrichedTools.filter(t => !activeSet.has(t));
+      allowedTools = enrichedTools.filter(t => activeSet.has(t));
       if (removed.length > 0) {
         debugLog('spawn-prompt-assembler', 'Context/mode removed tools', {
           removed,
@@ -464,121 +730,59 @@ async function main() {
       assembled = insertContextModeSection(assembled, contextMode.promptFragment);
     }
 
-    // Optional Phase 4 enhancement: intent-based query planning.
-    // Enable with MEMORY_INTENT_ANALYSIS=1|on.
-    const intentAnalysisEnabled =
-      process.env.MEMORY_INTENT_ANALYSIS === '1' || process.env.MEMORY_INTENT_ANALYSIS === 'on';
+    assembled = await applySemanticMemoryToPrompt(assembled, toolInput, basePrompt);
+    assembled = await applyEntityGraphToPrompt(assembled);
 
-    // Optional Phase 3 enhancement: ContextualMemory semantic search.
-    // Enabled by default; set SPAWN_PROMPT_SEMANTIC_MEMORY=off to disable.
-    if (process.env.SPAWN_PROMPT_SEMANTIC_MEMORY !== 'off') {
-      const memoryQueryEnabled =
-        process.env.SPAWN_PROMPT_MEMORY_QUERY === '1' ||
-        process.env.SPAWN_PROMPT_MEMORY_QUERY === 'on';
-      const memoryManager = require('../../lib/memory/memory-manager.cjs');
-      const query =
-        (toolInput.description && String(toolInput.description).trim()) ||
-        String(basePrompt).slice(0, 240);
-      const {
-        SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
-      } = require('../../lib/memory/memory-constants.cjs');
-      let results = [];
+    // CONFIG-001: Inject configured model into spawn prompt so Router passes it into Task().
+    assembled = appendConfigModelSection(assembled, agentType);
 
-      if (intentAnalysisEnabled) {
-        try {
-          results = await runIntentAnalysis({
-            memoryManager,
-            query,
-            threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
-            projectRoot: PROJECT_ROOT,
-          });
-        } catch (err) {
-          debugLog('spawn-prompt-assembler', 'Intent analysis failed (ignored)', err);
-          hookLog.logFail('Task', err, { reason: 'intent_analysis' });
-        }
-      }
-
-      if (results.length === 0) {
-        try {
-          // Hot-only by default: exclude cold-archived LTM summaries from the prompt path.
-          results = await memoryManager.searchMemory(query, {
-            limit: 3,
-            threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
-            filters: `metadata NOT LIKE '%"source":"ltm_archive"%'`,
-          });
-        } catch (err) {
-          debugLog(
-            'spawn-prompt-assembler',
-            'Hot-only filter failed, using unfiltered search',
-            err
-          );
-          try {
-            results = await memoryManager.searchMemory(query, {
-              limit: 3,
-              threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
-            });
-          } catch (fallbackErr) {
-            debugLog(
-              'spawn-prompt-assembler',
-              'Semantic memory retrieval failed (ignored)',
-              fallbackErr
-            );
-            hookLog.logFail('Task', fallbackErr, { reason: 'memory_or_semantic_load' });
-          }
-        }
-      }
-
-      if (memoryQueryEnabled) {
-        try {
-          const queryResults = await memoryManager.searchMemory(query, {
-            limit: 5,
-            threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
-          });
-          if (queryResults.length > 0) {
-            assembled = appendQueryMemories(assembled, queryResults);
-          }
-        } catch (queryErr) {
-          debugLog('spawn-prompt-assembler', 'Memory query retrieval failed (ignored)', queryErr);
-        }
-      }
-
-      if (!memoryQueryEnabled && results.length > 0) {
-        assembled = appendSemanticMatches(assembled, results);
-      }
-    }
-
-    if (process.env.SPAWN_PROMPT_ENTITY_GRAPH !== 'off') {
-      try {
-        const { ContextualMemory } = require('../../lib/memory/contextual-memory.cjs');
-        const cm = new ContextualMemory();
-        const decisions = await cm.findEntities('decision', { limit: 3 });
-        const issues = await cm.findEntities('issue', { limit: 3 });
-        const related = [];
-        for (const d of decisions.slice(0, 2)) {
-          const rel = await cm.getRelated(d.id, { depth: 1 });
-          if (Array.isArray(rel)) {
-            related.push(...rel.slice(0, 2));
-          }
-        }
-        cm.close();
-        assembled = appendEntityGraph(assembled, { decisions, issues, related });
-      } catch (err) {
-        debugLog('spawn-prompt-assembler', 'Entity graph retrieval failed (ignored)', err);
-      }
-    }
-
-    const modifiedInput = { ...toolInput, prompt: assembled, allowed_tools: allowedTools };
+    const configModel = resolveConfigModel(agentType);
+    const modifiedInput = {
+      ...toolInput,
+      prompt: assembled,
+      allowed_tools: allowedTools,
+      model: toolInput.model || configModel?.model || toolInput.model,
+    };
 
     try {
       const { logSpawnStart } = require('../../lib/monitoring/spawn-log.cjs');
+      // Generate fallback task_id if not provided (for legacy spawns)
+      const taskId =
+        toolInput.task_id ||
+        toolInput.id ||
+        `spawn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+      // Store task_id in router state so spawn_end can retrieve it
+      const { setCurrentSpawnTaskId } = require('./router-state.cjs');
+      setCurrentSpawnTaskId(taskId);
+
       logSpawnStart({
-        taskId: toolInput.task_id || toolInput.id || null,
+        taskId,
         agentType,
         promptLength: assembled.length,
         sessionId,
       });
+      // Warn if task_id was not provided (should be required)
+      if (!toolInput.task_id && !toolInput.id) {
+        stderrLog('missing_task_id', {
+          generated: taskId,
+          message: 'Task() call missing task_id parameter - generated fallback for traceability',
+        });
+      }
     } catch (_e) {
       // best-effort
+    }
+
+    const validation = validatePrompt(assembled);
+    if (
+      !validation.isValid ||
+      (validation.missingRequired && validation.missingRequired.length > 0)
+    ) {
+      stderrLog('hook_validation_failed', {
+        missingRequired: validation.missingRequired,
+        failed: validation.failed,
+      });
+      process.exit(2);
     }
 
     // Claude Code hook protocol: output { tool_input: { ... } } to modify tool parameters.
@@ -597,7 +801,7 @@ async function main() {
     } catch (_err) {
       // Best-effort
     }
-    hookLog.logEnd('Task', { duration_ms: Date.now() - startTime });
+    stderrLog('hook_end', { duration_ms: Date.now() - startTime });
     process.exit(0);
   } catch (err) {
     try {
@@ -610,7 +814,7 @@ async function main() {
     } catch (_err) {
       // Best-effort
     }
-    hookLog.logFail('Task', err);
+    stderrLog('hook_failed', { error: err?.message });
     // Fail open: if we can't assemble, don't block spawns.
     debugLog('spawn-prompt-assembler', 'Hook error (fail open)', err);
     process.exit(0);
@@ -629,5 +833,8 @@ module.exports = {
   insertContextModeSection,
   enrichAllowedTools,
   inferAgentFromPrompt,
+  generateRequiredPrefixFragment,
+  hasRequiredWarningBox,
+  hasTaskIdReference,
   main,
 };

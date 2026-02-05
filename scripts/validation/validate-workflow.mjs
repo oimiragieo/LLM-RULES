@@ -26,7 +26,7 @@
  */
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
-import { resolve, dirname, _join } from 'path';
+import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 // Import js-yaml
@@ -87,7 +87,7 @@ function isTemplateWorkflow(workflow) {
 }
 
 /**
- * Find all workflow YAML files
+ * Find all workflow YAML files (recursively under .claude/workflows)
  */
 function findWorkflowFiles() {
   const workflowsDir = resolve(rootDir, '.claude/workflows');
@@ -96,11 +96,10 @@ function findWorkflowFiles() {
     return [];
   }
 
-  const files = readdirSync(workflowsDir)
-    .filter(file => file.endsWith('.yaml') || file.endsWith('.yml'))
-    .map(file => resolve(workflowsDir, file));
-
-  return files;
+  const entries = readdirSync(workflowsDir, { recursive: true });
+  return entries
+    .filter(f => typeof f === 'string' && (f.endsWith('.yaml') || f.endsWith('.yml')))
+    .map(f => resolve(workflowsDir, f));
 }
 
 /**

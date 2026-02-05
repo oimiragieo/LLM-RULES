@@ -26,7 +26,6 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 
 // Import memory manager functions and shared project root (MEMORY_SYSTEM.md: use project-root.cjs)
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
-const { createHookLogger } = require('../../lib/utils/hook-logger.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
@@ -43,7 +42,20 @@ const HEALTH_CHECK_INTERVAL_MS = Number(
 );
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const LAST_CHECK_PATH = path.join(RUNTIME_DIR, 'last-memory-health-check.txt');
-const hookLog = createHookLogger('memory-health-check');
+
+/** Log to stderr only (stdout reserved for host hook protocol). */
+function stderrLog(message, meta = {}) {
+  console.error(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: message === 'hook_failed' ? 'error' : 'info',
+      message,
+      component: 'hook:memory-health-check',
+      tool: 'UserPromptSubmit',
+      ...meta,
+    })
+  );
+}
 
 function shouldRunHealthCheck() {
   if (!Number.isFinite(HEALTH_CHECK_INTERVAL_MS) || HEALTH_CHECK_INTERVAL_MS <= 0) {
@@ -128,6 +140,7 @@ function buildOutput(health) {
     warnings: [...health.warnings],
     metrics: {
       learningsSizeKB: health.learningsSizeKB,
+      decisionsSizeKB: health.decisionsSizeKB,
       codebaseMapEntries: health.codebaseMapEntries,
       sessionsCount: health.sessionsCount,
     },
@@ -297,14 +310,14 @@ function applyAutoRemediation(
 
 async function main() {
   const startTime = Date.now();
-  hookLog.logStart('UserPromptSubmit');
+  stderrLog('hook_start');
   const memoryManagerPath = getMemoryManagerPath();
   const memoryTiersPath = getMemoryTiersPath();
   const smartPrunerPath = getSmartPrunerPath();
 
   if (!fs.existsSync(memoryManagerPath)) {
     // Memory manager not available - skip silently
-    hookLog.logEnd('UserPromptSubmit', { status: 'skipped', reason: 'memory_manager_missing' });
+    stderrLog('hook_end', { status: 'skipped', reason: 'memory_manager_missing' });
     process.exit(0);
   }
 
@@ -320,7 +333,7 @@ async function main() {
     } catch (_e) {
       // Best-effort
     }
-    hookLog.logEnd('UserPromptSubmit', { status: 'skipped', reason: 'rate-limit' });
+    stderrLog('hook_end', { status: 'skipped', reason: 'rate-limit' });
     process.exit(0);
   }
 
@@ -363,7 +376,7 @@ async function main() {
     } catch (_e) {
       // Best-effort
     }
-    hookLog.logFail('UserPromptSubmit', err);
+    stderrLog('hook_failed', { error: err?.message });
     throw err;
   }
 
@@ -445,40 +458,40 @@ async function main() {
     writeFallbackMetrics('dashboard not loaded');
   }
 
-  // Format user-friendly message
+  // Format user-friendly message (stderr so host hook stdout stays empty)
   if (output.status === 'warning' || autoActions.length > 0) {
-    console.log('[MEMORY HEALTH CHECK]');
+    console.error('[MEMORY HEALTH CHECK]');
 
     if (output.warnings.length > 0) {
-      console.log('Warnings:');
+      console.error('Warnings:');
       for (const warning of output.warnings) {
-        console.log(`  - ${warning}`);
+        console.error(`  - ${warning}`);
       }
     }
 
     if (autoActions.length > 0) {
-      console.log('Auto-actions taken:');
+      console.error('Auto-actions taken:');
       for (const action of autoActions) {
-        console.log(`  - ${action}`);
+        console.error(`  - ${action}`);
       }
     }
 
     // Phase 2: Show tier metrics
     if (output.tiers && memoryTiers) {
-      console.log('Memory Tiers:');
-      console.log(`  - STM: ${output.tiers.stm.sessionCount} session(s)`);
-      console.log(
+      console.error('Memory Tiers:');
+      console.error(`  - STM: ${output.tiers.stm.sessionCount} session(s)`);
+      console.error(
         `  - MTM: ${output.tiers.mtm.sessionCount}/${memoryTiers.CONFIG.MTM_MAX_SESSIONS} sessions`
       );
-      console.log(`  - LTM: ${output.tiers.ltm.summaryCount} summaries`);
+      console.error(`  - LTM: ${output.tiers.ltm.summaryCount} summaries`);
     }
 
-    console.log('');
+    console.error('');
   }
 
-  // Return JSON result for programmatic access
+  // JSON result for programmatic access (stderr so host hook stdout stays empty)
   if (process.env.MEMORY_HEALTH_JSON) {
-    console.log(JSON.stringify(output, null, 2));
+    console.error(JSON.stringify(output, null, 2));
   }
 
   recordHealthCheckTimestamp();
@@ -494,7 +507,7 @@ async function main() {
   } catch (_e) {
     // Best-effort
   }
-  hookLog.logEnd('UserPromptSubmit', {
+  stderrLog('hook_end', {
     status: output.status,
     duration_ms: Date.now() - startTime,
   });

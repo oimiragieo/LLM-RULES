@@ -34,14 +34,7 @@ const SKILL_CATALOG = path.join(
   'artifacts',
   'skill-catalog.md'
 );
-const ROUTER_ENFORCER = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'hooks',
-  'lib',
-  'routing',
-  'routing-table.cjs'
-);
+const ROUTER_ENFORCER = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table.cjs');
 const LAST_RUN_FILE = path.join(
   PROJECT_ROOT,
   '.claude',

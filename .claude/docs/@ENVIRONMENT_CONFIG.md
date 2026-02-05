@@ -30,20 +30,21 @@ All environment-specific settings are managed through the `.env` file located at
 
 ### Key Configuration Categories
 
-| Category                  | Variables                                                                                                 | Purpose                                      |
-| ------------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| **Environment**           | `AGENT_STUDIO_ENV` (development/staging/production)                                                       | Selects configuration profile and data paths |
-| **Features**              | `PARTY_MODE_ENABLED`, `ELICITATION_ENABLED`                                                               | Control feature availability                 |
-| **Hooks**                 | `REFLECTION_ENABLED`, `REFLECTION_HOOK_MODE`                                                              | Quality and learning controls                |
-| **Safety**                | `LOOP_PREVENTION_MODE`, `ANOMALY_DETECTION_ENABLED`                                                       | Loop/anomaly thresholds                      |
-| **Routing / Context**     | `REROUTER_MODE`, `PLAN_EVOLUTION_GUARD`, `SEMANTIC_ROUTING`, `AGENT_STUDIO_CONTEXT`, `AGENT_STUDIO_MODES` | Orchestration and context/mode selection     |
-| **Enforcement**           | `PLANNER_FIRST_ENFORCEMENT`, `REFLECTION_STEP0_ENFORCEMENT`                                               | Guard/enforcement modes                      |
-| **Spawn Prompt / Memory** | `SPAWN_PROMPT_ASSEMBLER`, `SPAWN_PROMPT_SEMANTIC_MEMORY`, `SPAWN_PROMPT_MEMORY_QUERY`                     | Spawn prompt memory retrieval behavior       |
-| **Memory / Code Index**   | `LANCEDB_TABLE_CODE`, `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS`                                            | Code-index and memory tracking behavior      |
-| **Worker Runtime**        | `WORKER_ENABLED`, `WORKER_INTERVAL_MS`, `WORKER_TASKS`                                                    | Background maintenance/index/reflection loop |
-| **Debug**                 | `DEBUG_HOOKS`, `CLAUDE_SESSION_ID`                                                                        | Troubleshooting aids                         |
-| **Observability**         | `EVENT_BUS_SINK`, `LOG_LEVEL`, `SCHEDULER_TICK_ON_PROMPT`                                                 | Event bus sink + JSONL log output            |
-| **Integration**           | `WEBHOOK_SECRET`, `API_URL`                                                                               | External service integration                 |
+| Category                  | Variables                                                                                                                                                                                                                                                                    | Purpose                                      |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **Environment**           | `AGENT_STUDIO_ENV` (development/staging/production)                                                                                                                                                                                                                          | Selects configuration profile and data paths |
+| **Features**              | `PARTY_MODE_ENABLED`, `ELICITATION_ENABLED`                                                                                                                                                                                                                                  | Control feature availability                 |
+| **Hooks**                 | `REFLECTION_ENABLED`, `REFLECTION_HOOK_MODE`                                                                                                                                                                                                                                 | Quality and learning controls                |
+| **Safety**                | `LOOP_PREVENTION_MODE`, `ANOMALY_DETECTION_ENABLED`                                                                                                                                                                                                                          | Loop/anomaly thresholds                      |
+| **Routing / Context**     | `REROUTER_MODE`, `PLAN_EVOLUTION_GUARD`, `SEMANTIC_ROUTING`, `AGENT_STUDIO_CONTEXT`, `AGENT_STUDIO_MODES`                                                                                                                                                                    | Orchestration and context/mode selection     |
+| **Enforcement**           | `PLANNER_FIRST_ENFORCEMENT`, `REFLECTION_STEP0_ENFORCEMENT`                                                                                                                                                                                                                  | Guard/enforcement modes                      |
+| **Spawn Prompt / Memory** | `SPAWN_PROMPT_ASSEMBLER`, `SPAWN_PROMPT_SEMANTIC_MEMORY`, `SPAWN_PROMPT_MEMORY_QUERY`                                                                                                                                                                                        | Spawn prompt memory retrieval behavior       |
+| **Memory / Code Index**   | `LANCEDB_TABLE_CODE`, `MEMORY_ACCESS_TRACKING`, `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS`, `MEMORY_JSON_WRITE_ENFORCEMENT`, `MEMORY_EXTRACTION_RECENT_MESSAGES_LIMIT`, `MEMORY_EXTRACTION_RECENT_CHARS_LIMIT`, `MEMORY_EXTRACTION_LIST_LIMIT`, `COLD_STORAGE_INDEX_MAX_CHARS` | Code-index and memory tracking behavior      |
+| **Worker Runtime**        | `WORKER_ENABLED`, `WORKER_INTERVAL_MS`, `WORKER_TASKS`                                                                                                                                                                                                                       | Background maintenance/index/reflection loop |
+| **Model Client**          | `MODEL_CLIENT_DEFAULT_MODEL`, `MODEL_CLIENT_AGENT_TYPE`, `MODEL_CLIENT_MAX_RETRIES`, `MODEL_CLIENT_RETRY_BASE_MS`                                                                                                                                                            | LLM client defaults and retry behavior       |
+| **Debug**                 | `DEBUG_HOOKS`, `CLAUDE_SESSION_ID`                                                                                                                                                                                                                                           | Troubleshooting aids                         |
+| **Observability**         | `EVENT_BUS_SINK`, `LOG_LEVEL`, `SCHEDULER_TICK_ON_PROMPT`                                                                                                                                                                                                                    | Event bus sink + JSONL log output            |
+| **Integration**           | `WEBHOOK_SECRET`, `API_URL`, `ANTHROPIC_API_KEY`                                                                                                                                                                                                                             | External service integration                 |
 
 ### Enforcement Mode Variables
 
@@ -100,20 +101,43 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 
 ### Memory / Code Index Variables
 
-| Variable                                 | Values | Default    | Purpose                                      |
-| ---------------------------------------- | ------ | ---------- | -------------------------------------------- |
-| `LANCEDB_TABLE_CODE`                     | string | code_index | LanceDB table name for code indexing.        |
-| `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS` | number | 300000     | Rate limit for memory access tracking (ms).  |
-| `MEMORY_HOOK_JSON_SYNC`                  | on/off | off        | Allow hook-driven JSON memory sync on edits. |
+| Variable                                  | Values         | Default    | Purpose                                                                    |
+| ----------------------------------------- | -------------- | ---------- | -------------------------------------------------------------------------- |
+| `LANCEDB_TABLE_CODE`                      | string         | code_index | LanceDB table name for code indexing.                                      |
+| `MEMORY_ACCESS_TRACKING`                  | on/off         | on         | Enable/disable access tracking sidecar writes.                             |
+| `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS`  | number         | 300000     | Rate limit for memory access tracking (ms).                                |
+| `MEMORY_JSON_WRITE_ENFORCEMENT`           | block/warn/off | block      | Block direct edits to `patterns.json` / `gotchas.json` (use MemoryRecord). |
+| `MEMORY_EMBED_ON_EDIT`                    | on/off         | off        | Generate embeddings on memory file edits.                                  |
+| `MEMORY_EMBED_ON_EDIT_TIMEOUT_MS`         | number         | 60000      | Max time for embed-on-edit (ms).                                           |
+| `MEMORY_EXTRACTION_RECENT_MESSAGES_LIMIT` | number         | 40         | Max recent messages sent to memory extraction.                             |
+| `MEMORY_EXTRACTION_RECENT_CHARS_LIMIT`    | number         | 8000       | Max characters of recent messages sent to memory extraction.               |
+| `MEMORY_EXTRACTION_LIST_LIMIT`            | number         | 12         | Max items per list in extraction input (decisions/patterns/gotchas/tasks). |
+| `COLD_STORAGE_INDEX_MAX_CHARS`            | number         | 4000       | Max characters indexed per cold LTM summary.                               |
+
+### Memory Scheduler Variables
+
+| Variable                         | Values | Default | Purpose                               |
+| -------------------------------- | ------ | ------- | ------------------------------------- |
+| `MEMORY_SCHEDULER_HISTORY_LIMIT` | number | 30      | Max history entries retained per job. |
 
 ### Reflection Queue Variables
 
 | Variable                               | Values | Default | Purpose                                                 |
 | -------------------------------------- | ------ | ------- | ------------------------------------------------------- |
-| `REFLECTION_QUEUE_PROCESS_ON_PROMPT`   | on/off | off     | Process reflection-queue.jsonl during UserPromptSubmit. |
+| `REFLECTION_QUEUE_PROCESS_ON_PROMPT`   | on/off | on      | Process reflection-queue.jsonl during UserPromptSubmit. |
 | `REFLECTION_QUEUE_PROCESS_INTERVAL_MS` | number | 600000  | Minimum interval between queue processing runs (ms).    |
+| `REFLECTION_QUEUE_MAX_LINES`           | number | 2000    | Cap reflection-queue.jsonl to last N lines.             |
 | `REFLECTION_QUEUE_PROCESS_TIMEOUT_MS`  | number | 60000   | Timeout for queue processing (ms).                      |
 | `REFLECTION_QUEUE_MAX_LINES`           | number | 5000    | Max lines to keep in reflection-queue.jsonl (rotation). |
+
+### Model Client Variables
+
+| Variable                     | Values | Default | Purpose                                             |
+| ---------------------------- | ------ | ------- | --------------------------------------------------- |
+| `MODEL_CLIENT_DEFAULT_MODEL` | string | (unset) | Default model for model-client when none is passed. |
+| `MODEL_CLIENT_AGENT_TYPE`    | string | planner | Agent type used to resolve default model.           |
+| `MODEL_CLIENT_MAX_RETRIES`   | number | 2       | Max retries for model-client requests.              |
+| `MODEL_CLIENT_RETRY_BASE_MS` | number | 500     | Base retry backoff (ms).                            |
 
 ### Routing / Context Mode Variables
 
@@ -157,6 +181,48 @@ node .claude/tools/cli/init-staging.cjs
 # Verify setup
 node --test tests/staging-smoke.test.mjs
 ```
+
+### MCP Server Configuration
+
+MCP (Model Context Protocol) servers extend Claude's capabilities with external tools and integrations.
+
+**Important:** MCP servers are configured separately from `settings.json`:
+
+| Configuration File                         | Purpose                 | Scope                                           |
+| ------------------------------------------ | ----------------------- | ----------------------------------------------- |
+| `.claude/.mcp.json`                        | **Project MCP servers** | Per-project MCP tools (committed to repo)       |
+| `settings.json` → `mcpServers: {}`         | **User MCP servers**    | User-level MCP tools (not used in this project) |
+| `~/.config/claude/` or `%APPDATA%\Claude\` | **Global MCP servers**  | User-level MCP tools (OS-dependent)             |
+
+**Project MCP configuration (`.claude/.mcp.json`):**
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem@0", "."]
+    },
+    "github": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-github@0"] }
+  }
+}
+```
+
+**Why `mcpServers: {}` is empty in settings.json:**
+
+The `settings.json` file contains hook configuration, not MCP servers. Project-level MCP servers are stored in `.claude/.mcp.json` to keep concerns separated:
+
+- `settings.json` = hooks, max_tokens, RAG settings
+- `.mcp.json` = MCP server definitions
+
+**Available MCP servers in this project:**
+
+- `filesystem` - File system operations
+- `git` - Git operations
+- `memory` - Persistent memory
+- `sequential-thinking` - Multi-step reasoning
+- `github` - GitHub API operations
+- `sqlite` - SQLite database access
 
 ### Override Examples
 

@@ -136,6 +136,12 @@ function loadMemoryContext() {
   try {
     // Local require to keep prompt assembly fast when memory is unused.
     const memoryManager = require('../memory/memory-manager.cjs');
+
+    // Null check: ensure memoryManager and function exist
+    if (!memoryManager || typeof memoryManager.loadMemoryForContext !== 'function') {
+      throw new Error('memoryManager.loadMemoryForContext is not available');
+    }
+
     return memoryManager.loadMemoryForContext();
   } catch (err) {
     logger.warn('memory_load_failed', { error: err?.message });

@@ -280,7 +280,7 @@ The ripgrep skill creation session revealed that Router bypassed skill-creator w
 
 Without these, the skill was NEVER invoked because Router couldn't find it.
 
-**Enforcement**: The `skill-creation-guard.cjs` hook blocks direct SKILL.md writes unless skill-creator was recently invoked.
+**Enforcement**: The `unified-creator-guard.cjs` hook blocks direct SKILL.md writes unless skill-creator was recently invoked.
 
 **If ANY question is YES, Router MUST NOT proceed with direct execution.**
 

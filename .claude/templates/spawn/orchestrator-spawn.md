@@ -66,6 +66,77 @@ Task({
 |  YOU WILL BE EVALUATED ON: Task status updates, not just output      |
 +======================================================================+
 
+## STEP 2.5: Skill Discovery (MANDATORY - Do This First)
+
+Before doing ANY code search, answer these questions using the **Skill Usage Decision Tree**:
+
+**Need to search code?**
+```
+
+Does your task require finding code? (function definitions, imports, patterns, etc.)
+
+- YES -> Proceed to Q1
+- NO -> Skip to main work
+
+```
+
+**Q1: Do you know the EXACT text or keyword to search for?**
+```
+
+Examples:
+
+- "TaskUpdate" (exact function name) -> YES
+- "authentication logic pattern" (concept) -> NO
+- "class extends Service" (structure) -> NO
+
+```
+
+**If YES (exact keyword):**
+```
+
+- Simple keyword (1-2 words): Use Grep tool
+- Complex regex (PCRE2, lookahead, etc.): Use Skill({ skill: 'ripgrep', args: '...' })
+
+```
+
+**If NO (concept or structure):**
+```
+
+Q2: Are you searching for a CONCEPT/MEANING?
+
+- "Find authentication logic" -> YES -> Use Skill({ skill: 'code-semantic-search', args: 'find authentication logic' })
+- "Find functions with N params" -> NO -> Use Skill({ skill: 'code-structural-search', args: 'function ... { $$ }' })
+
+```
+
+### Skill Selection Cheat Sheet
+
+| What You Want | Tool | Speed | Accuracy | Example |
+|---------------|------|-------|----------|---------|
+| Exact text match | Grep | Fast | 70% | `grep "TaskUpdate"` |
+| Complex regex + ES modules | ripgrep | Fast | 85% | `Skill({ skill: 'ripgrep', args: '-P "foo(?=bar)"' })` |
+| Find by meaning/concept | code-semantic-search | Medium | 95% | `Skill({ skill: 'code-semantic-search', args: 'find auth logic' })` |
+| Find by code structure | code-structural-search | Medium | 100% | `Skill({ skill: 'code-structural-search', args: 'function $NAME($A, $B) { $$ }' })` |
+| File pattern matching | Glob | Fast | 100% | `Glob({ pattern: "**/*.ts" })` |
+
+### When NOT to Use Skills
+
+- File listing/glob patterns -> Use Glob tool (faster)
+- Single-file simple searches -> Use Grep tool
+- When you already know the exact file -> Use Read tool directly
+
+---
+
+**Why This Matters:**
+- Skills are 10-100x faster for large codebases
+- Each skill specializes in a different search type
+- Wrong tool wastes tokens and time
+- Decision tree makes the choice automatic
+
+**Action**: Find the line in orchestrator-spawn.md that mentions "Skill invocation" or the TaskUpdate warning box. Insert this new section right after line 60 (after the TaskUpdate box, before tool documentation).
+
+---
+
 ## PROJECT CONTEXT (CRITICAL)
 PROJECT_ROOT: <absolute-path-to-project>
 All file operations MUST be relative to PROJECT_ROOT.

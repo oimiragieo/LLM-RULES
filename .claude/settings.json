@@ -11,6 +11,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/reflection/force-step0-execution.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/session/state-reset.cjs"
           },
           {
@@ -24,6 +28,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/memory/memory-health-check.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/reflection/reflection-queue-processor.cjs"
           }
         ]
       }
@@ -35,6 +43,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/monitoring/execution-limit-monitor-hook.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/tool-scope-validator.cjs"
           }
         ]
       },
@@ -48,6 +60,26 @@
           {
             "type": "command",
             "command": "node .claude/hooks/safety/windows-null-sanitizer.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/bash-cwd-validator.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/shell-injection-validator.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/variable-quoting-validator.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/shellcheck-validator.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/command-allowlist-validator.cjs"
           },
           {
             "type": "command",
@@ -78,6 +110,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/safety/file-placement-guard.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/write-content-scanner.cjs"
           },
           {
             "type": "command",
@@ -178,6 +214,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/task-status-enforcement.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/validation/pre-completion-validation.cjs"
           }
         ]
@@ -215,11 +255,23 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/task-completion-guard.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/agent-context-tracker.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/self-healing/auto-rerouter.cjs"
           },
           {
             "type": "command",
             "command": "node .claude/hooks/routing/agent-health-hook.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/post-spawn-task-updater.cjs"
           },
           {
             "type": "command",

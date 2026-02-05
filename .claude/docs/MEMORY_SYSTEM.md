@@ -26,18 +26,43 @@ All memory files live in `.claude/context/memory/`:
 | `ltm/`              | Long-term summaries (LTM)     | JSON                      |
 | `sessions/`         | Legacy per-session files      | JSON                      |
 
+### learnings.md size and archival
+
+- **Path:** `.claude/context/memory/learnings.md`
+- **Warn threshold:** 40KB (config: `CONFIG.LEARNINGS_WARN_THRESHOLD_KB` in `memory-manager.cjs`). The memory-health-check hook warns when learnings.md exceeds this size.
+- **Archive threshold:** 40KB (`LEARNINGS_ARCHIVE_THRESHOLD_KB`). When exceeded, auto-archive runs (e.g. via health check or `node .claude/lib/memory/memory-manager.cjs archive-learnings`).
+- **Archival destination:** `.claude/context/memory/archive/` (e.g. dated `learnings-YYYY-MM.md`).
+
+## Model-backed extraction and deduplication
+
+Some memory features require an LLM:
+
+- **Memory extraction** (MTM → structured memories)
+- **Deduplication decisions** (merge/update/skip)
+- **Session summaries**
+
+Set `ANTHROPIC_API_KEY` to enable real model responses. Without an API key, these
+features fall back to mock responses or heuristic extraction and may produce
+limited results. See `@ENVIRONMENT_CONFIG.md` for model client env vars.
+
+Extraction input is bounded by:
+
+- `MEMORY_EXTRACTION_RECENT_MESSAGES_LIMIT`
+- `MEMORY_EXTRACTION_RECENT_CHARS_LIMIT`
+- `MEMORY_EXTRACTION_LIST_LIMIT`
+
 ## Entity Index (SQLite)
 
 The hybrid memory system also maintains an entity/relationship index at `.claude/data/memory.db` (SQLite).
-It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/lib/memory/entity-query.cjs` (reads). Only high-value items (learnings, decisions, issues) are indexed; session transcripts (MTM) are not currently synchronized to SQLite.
+It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/lib/memory/entity-query.cjs` (reads). Only high-value items (decisions, issues, patterns, gotchas) are indexed; learnings.md is legacy and not synced to the entity index. Session transcripts (MTM) are not currently synchronized to SQLite.
 
 > **Ghost Memory**: The SQLite database is a **sync-only** implementation (using `node:sqlite`). It is considered "ghost memory" because it runs in the background to index content but is **not directly exposed** to agents via tools. Agents access this data only through the Contextual Memory API (injected into prompts) or the Memory Manager CLI.
 
-- SQLite driver: Node’s built-in `node:sqlite` (`DatabaseSync`) to avoid native addon installs.
+- SQLite driver: Node’s built-in `node:sqlite` (`DatabaseSync`) to avoid native addon installs. You may see Node's `ExperimentalWarning: SQLite is an experimental feature` in logs; it is expected and can be ignored.
 - Initialize schema: `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`).
 - Check memory health (JSON): `pnpm run memory:health` (or `node .claude/lib/memory/memory-manager.cjs health`).
 
-The entity index is populated by `sync-memory-index` from `decisions.md` and `issues.md`, and from `patterns.json` / `gotchas.json` when those JSON files are edited. `learnings.md` is a legacy archive and is **not** synced into the entity index. Agent-visible patterns, gotchas, and decisions are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are now used in the spawn prompt pipeline: `spawn-prompt-assembler.cjs` can append an **Entity Graph (SQLite)** section by default (set `SPAWN_PROMPT_ENTITY_GRAPH=off` to disable). Extracted memories can also be linked to skill entities when SessionEnd provides `tools_used`, creating memory→skill relationships for later graph queries. The entity DB is created on first `pnpm run memory:init` or first sync when editing these files. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results.
+The entity index is populated by `sync-memory-index` from `decisions.md` and `issues.md`, and from `patterns.json` / `gotchas.json` when those JSON files are edited. `learnings.md` is a legacy archive and is **not** synced into the entity index. Agent-visible patterns, gotchas, and decisions are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are now used in the spawn prompt pipeline: `spawn-prompt-assembler.cjs` can append an **Entity Graph (SQLite)** section by default (set `SPAWN_PROMPT_ENTITY_GRAPH=off` to disable). Config model is validated by config-model-validator (block by default); the spawn prompt is augmented with the configured model so the Router should pass it into Task() when invoking. Extracted memories can also be linked to skill entities when SessionEnd provides `tools_used`, creating memory→skill relationships for later graph queries. The entity DB is created on first `pnpm run memory:init` or first sync when editing these files. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results.
 
 ### Troubleshooting
 
@@ -62,6 +87,7 @@ The memory system is enforced/maintained via Claude Code hooks registered in `.c
 - `PostToolUse` (matcher `Edit|Write|NotebookEdit`)
   - `.claude/hooks/memory/format-memory.cjs` (formats/normalizes memory writes after edits/writes)
   - `.claude/hooks/memory/sync-memory-index.cjs` (canonical sync path: syncs decisions/issues plus patterns.json/gotchas.json into the SQLite entity index).
+  - `.claude/hooks/memory/planning-progress-tracker.cjs` (tracks planning progress on memory edits)
   - Note: `SyncLayer` and `BackgroundSyncWorker` have been moved to `.claude/archive/lib/memory/` and are no longer in the active codebase. Sync is done only by `sync-memory-index.cjs`.
 - `SessionEnd`
   - `.claude/hooks/reflection/unified-reflection-handler.cjs` (records session into STM/MTM, best-effort embeddings + maintenance, queues reflection)
@@ -81,7 +107,7 @@ An optional Step 0 guard runs on `PreToolUse(TaskList)` via `.claude/hooks/refle
 
 **Reflection is best-effort:** If the Router skips Step 0, pending reflections will not run. Check the dashboard (or health output) for `pendingReflectionRequests` to see if reflections are queued.
 
-**Reflection queue is processed on SessionEnd by default.** The reflection-queue-processor reads `.claude/context/reflection-queue.jsonl` and writes `.claude/context/runtime/reflection-spawn-request.json`. In environments that do not emit SessionEnd, you can enable prompt-based processing by setting `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on`, which runs the processor on `UserPromptSubmit` with an interval guard (`REFLECTION_QUEUE_PROCESS_INTERVAL_MS`). To run reflection manually, execute `node .claude/hooks/reflection/reflection-queue-processor.cjs`.
+**Reflection queue is processed on SessionEnd by default.** The reflection-queue-processor reads `.claude/context/reflection-queue.jsonl` and writes `.claude/context/runtime/reflection-spawn-request.json`. In environments that do not emit SessionEnd, you can enable prompt-based processing by setting `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on`, which runs the processor on `UserPromptSubmit` with an interval guard (`REFLECTION_QUEUE_PROCESS_INTERVAL_MS`). The queue file is trimmed to the last N lines (default 2000) via `REFLECTION_QUEUE_MAX_LINES` to prevent unbounded growth. To run reflection manually, execute `node .claude/hooks/reflection/reflection-queue-processor.cjs`. **Headless / rare sessions:** If SessionEnd rarely or never fires (e.g. headless or long-lived sessions), set `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on` and run weekly maintenance via cron or `pnpm run memory:weekly` (or use the worker).
 
 ### Hook chain error handling
 
@@ -117,7 +143,7 @@ This is advisory only. The Router should spawn the `context-compressor` skill (o
 
 ### Embeddings (auto-index)
 
-Semantic embeddings can be generated automatically on memory file edits when `MEMORY_EMBED_ON_EDIT=on`. The PostToolUse memory index hook will invoke the embedding generator for `learnings.md`, `decisions.md`, `issues.md`, `patterns.json`, and `gotchas.json` with a short timeout (`MEMORY_EMBED_ON_EDIT_TIMEOUT_MS`, default 30000). If disabled, use `pnpm run memory:embeddings` to build embeddings manually. To rebuild from scratch (e.g. after a model change or dimension mismatch), use `pnpm run memory:reindex`.
+Semantic embeddings can be generated automatically on memory file edits when `MEMORY_EMBED_ON_EDIT=on`. The PostToolUse memory index hook (sync-memory-index.cjs) will invoke the embedding generator only for `decisions.md`, `issues.md`, `patterns.json`, and `gotchas.json` with a short timeout (`MEMORY_EMBED_ON_EDIT_TIMEOUT_MS`, default 60000). `learnings.md` is not included in auto-embed on edit (legacy archive). If disabled, use `pnpm run memory:embeddings` to build embeddings manually. To rebuild from scratch (e.g. after a model change or dimension mismatch), use `pnpm run memory:reindex`.
 
 ## Caveats / Verification Notes
 
@@ -200,7 +226,7 @@ The memory system is designed to stay bounded:
 ### When does weekly maintenance run?
 
 - Weekly maintenance (including `archiveOldLTM`) runs when **SessionEnd** fires (via `unified-reflection-handler.cjs` → `triggerMaintenance()` → `memory-scheduler.cjs` `runWeeklyMaintenance()`) or when **UserPromptSubmit** detects it is overdue: `user-prompt-unified.cjs` reads `.claude/context/memory/maintenance-status.json`; if `lastWeekly` is missing or older than 7 days, it invokes weekly maintenance in a child process. Timeout is configurable via `MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS` (default 60000 ms; for large repos or many LTM files, consider 120000 or higher). On timeout or non-zero exit, the hook logs a one-line warning so operators know maintenance may have been partial. Manual fallback: `pnpm run memory:weekly` (or `memory:daily`). To check last run: `pnpm run memory:status`. LTM cold archival is performed by `cold-storage.cjs` inside `runArchiveOldLTM` in the scheduler.
-- **Headless or rarely-used environments:** There is no cron or daemon. Maintenance runs only on SessionEnd or when a user prompt occurs and weekly is overdue. In headless or rarely-used environments, run `pnpm run memory:weekly` (or `memory:daily`) on a schedule (e.g. cron) so LTM retention and cold archival run.
+- **Headless or rarely-used environments:** There is no cron or daemon. Maintenance runs only on SessionEnd or when a user prompt occurs and weekly is overdue. If SessionEnd rarely or never fires, set `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on` and run `pnpm run memory:weekly` (or `memory:daily`) on a schedule (e.g. cron) or use the worker so LTM retention and cold archival run.
 - **Optional worker runtime:** You can run the headless worker (`pnpm run agent:worker`) to execute memory maintenance, code-index incremental updates, and reflection queue processing on an interval. See GETTING_STARTED.md for how to enable it and the heartbeat file location.
 
 ### Tunables
@@ -209,6 +235,7 @@ The memory system is designed to stay bounded:
 - `MEMORY_COLD_ENABLE` (default: `true`): if `false`, the scheduler deletes old LTM summaries without archiving.
 - `MEMORY_COLD_ARCHIVE_AFTER_DAYS` (optional): also archive/delete any LTM summaries older than N days.
 - `MEMORY_COLD_DIR` (default: `.claude/context/memory/cold`): cold archive directory (validated to be within the project root).
+- `COLD_STORAGE_INDEX_MAX_CHARS` (default: `4000`): max characters indexed per cold LTM summary.
 
 ### Cold archive format and visibility
 
@@ -305,9 +332,10 @@ This ensures agents can recall session data written via `memory-tiers.cjs` (STM 
 
 **Access Tracking**: Gotchas and patterns now include `accessCount` and `lastAccessed` fields:
 
-- `accessCount`: Incremented each time the item is loaded via `loadMemoryForContext()`
+- `accessCount`: Incremented when an item is loaded via `loadMemoryForContext()`
 - `lastAccessed`: Updated to current timestamp on read
-- Updates to `accessCount` and `lastAccessed` are rate-limited per entry (default 5 minutes, configurable via `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS`); repeated reads within the interval do not bump the count.
+- Access tracking is stored in a sidecar file: `.claude/context/memory/access-stats.json` (to avoid rewriting `patterns.json` / `gotchas.json` on read).
+- Updates to access tracking are rate-limited per entry (default 5 minutes, configurable via `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS`); repeated reads within the interval do not bump the count.
 
 **Memory Areas**: Gotchas and patterns can optionally include `area`:
 
@@ -533,6 +561,8 @@ node .claude/lib/memory/memory-manager.cjs record-gotcha "Always validate user i
 ```bash
 node .claude/tools/cli/memory-record.cjs pattern "Use Zod schemas for API validation"
 ```
+
+Direct edits to `patterns.json` / `gotchas.json` via Write/Edit are blocked by default. Use `MemoryRecord` or set `MEMORY_JSON_WRITE_ENFORCEMENT=warn|off` to override.
 
 **Record a pattern** (memory-manager fallback):
 

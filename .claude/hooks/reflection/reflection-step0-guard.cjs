@@ -29,7 +29,6 @@ const {
   formatResult,
   auditLog,
 } = require('../../lib/utils/hook-input.cjs');
-const { createHookLogger } = require('../../lib/utils/hook-logger.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
@@ -37,7 +36,20 @@ const { EventTypes } = require('../../lib/events/event-types.cjs');
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
 const REMINDER_PATH = path.join(RUNTIME_DIR, 'reflection-reminder.txt');
-const hookLog = createHookLogger('reflection-step0-guard');
+
+/** Log to stderr only (stdout reserved for single formatResult line). */
+function stderrLog(message, meta = {}) {
+  console.error(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: message === 'hook_failed' || message === 'hook_blocked' ? 'warn' : 'info',
+      message,
+      component: 'hook:reflection-step0-guard',
+      tool: 'TaskList',
+      ...meta,
+    })
+  );
+}
 
 function readSpawnRequests(filePath) {
   try {
@@ -81,10 +93,10 @@ async function main() {
       process.exit(0);
     }
 
-    hookLog.logStart('TaskList');
+    stderrLog('hook_start');
 
     if (!hasPendingReflections()) {
-      hookLog.logEnd('TaskList', { status: 'no_pending' });
+      stderrLog('hook_end', { status: 'no_pending' });
       process.exit(0);
     }
 
@@ -100,7 +112,7 @@ async function main() {
     });
 
     if (mode === 'block') {
-      hookLog.logBlock('TaskList', 'reflection_step0_pending');
+      stderrLog('hook_blocked', { reason: 'reflection_step0_pending' });
       try {
         await eventBus.emit(EventTypes.TOOL_BLOCKED, {
           type: EventTypes.TOOL_BLOCKED,
@@ -130,7 +142,7 @@ async function main() {
     } catch (_e) {
       // Best-effort
     }
-    hookLog.logEnd('TaskList', { status: 'warn', reason: 'reflection_step0_pending' });
+    stderrLog('hook_end', { status: 'warn', reason: 'reflection_step0_pending' });
     console.log(formatResult('warn', message));
     process.exit(0);
   } catch (err) {
@@ -144,7 +156,7 @@ async function main() {
     } catch (_e) {
       // Best-effort
     }
-    hookLog.logFail('TaskList', err);
+    stderrLog('hook_failed', { error: err?.message });
     if (process.env.DEBUG_HOOKS) {
       console.error('[reflection-step0-guard] Error:', err.message);
     }

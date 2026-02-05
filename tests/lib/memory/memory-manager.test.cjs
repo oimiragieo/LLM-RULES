@@ -422,10 +422,12 @@ if (require.main === module) {
         }
       });
 
-      await it('should warn when learnings.md exceeds 35KB', function () {
+      // Note: CONFIG.LEARNINGS_WARN_THRESHOLD_KB defaults to 40KB (via ADR-080 env var migration)
+      await it('should warn when learnings.md exceeds 40KB threshold', function () {
         setupTestDir();
         try {
-          fs.writeFileSync(path.join(MEMORY_DIR, 'learnings.md'), 'A'.repeat(38 * 1024));
+          // Create file larger than 40KB threshold
+          fs.writeFileSync(path.join(MEMORY_DIR, 'learnings.md'), 'A'.repeat(45 * 1024));
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
           const { getMemoryHealth } = require('../../../.claude/lib/memory/memory-manager.cjs');
@@ -852,10 +854,14 @@ if (require.main === module) {
 
     // Test Suite 7: Access Tracking (lastAccessed/accessCount)
     await describe('Access Tracking - Gotchas and Patterns', async function () {
-      await it('should initialize and update access tracking fields on loadMemoryForContext', function () {
+      // Note: ADR-079 made access stats writes non-blocking via setImmediate().
+      // These tests must be async to wait for the write to complete.
+      await it('should initialize and update access tracking fields on loadMemoryForContext', async function () {
         setupTestDir();
         const prevInterval = process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS;
+        const prevEnabled = process.env.MEMORY_ACCESS_TRACKING;
         process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS = '0';
+        process.env.MEMORY_ACCESS_TRACKING = 'on';
 
         try {
           const gotchasFile = path.join(MEMORY_DIR, 'gotchas.json');
@@ -879,19 +885,46 @@ if (require.main === module) {
           assert.strictEqual(memory.gotchas.length, 1, 'Should load gotchas');
           assert.strictEqual(memory.patterns.length, 1, 'Should load patterns');
 
-          const gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
-          const patterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
+          // ADR-079: Access stats writes are non-blocking via setImmediate()
+          // Wait for the async write to complete before checking the file
+          await new Promise(resolve => setTimeout(resolve, 50));
 
-          assert.strictEqual(gotchas[0].accessCount, 1, 'Gotcha accessCount should increment');
-          assert.strictEqual(typeof gotchas[0].lastAccessed, 'string', 'Gotcha lastAccessed set');
+          const accessStatsPath = path.join(MEMORY_DIR, 'access-stats.json');
+          const accessStats = JSON.parse(fs.readFileSync(accessStatsPath, 'utf8'));
+          const keys = Object.keys(accessStats.entries || {});
+          assert.ok(keys.length >= 2, 'Expected access stats entries for gotchas and patterns');
 
-          assert.strictEqual(patterns[0].accessCount, 1, 'Pattern accessCount should increment');
-          assert.strictEqual(typeof patterns[0].lastAccessed, 'string', 'Pattern lastAccessed set');
+          assert.strictEqual(
+            memory.gotchas[0].accessCount,
+            1,
+            'Gotcha accessCount should increment'
+          );
+          assert.strictEqual(
+            typeof memory.gotchas[0].lastAccessed,
+            'string',
+            'Gotcha lastAccessed set'
+          );
+
+          assert.strictEqual(
+            memory.patterns[0].accessCount,
+            1,
+            'Pattern accessCount should increment'
+          );
+          assert.strictEqual(
+            typeof memory.patterns[0].lastAccessed,
+            'string',
+            'Pattern lastAccessed set'
+          );
         } finally {
           if (typeof prevInterval === 'undefined') {
             delete process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS;
           } else {
             process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS = prevInterval;
+          }
+          if (typeof prevEnabled === 'undefined') {
+            delete process.env.MEMORY_ACCESS_TRACKING;
+          } else {
+            process.env.MEMORY_ACCESS_TRACKING = prevEnabled;
           }
           cleanupTestDir();
         }
@@ -900,7 +933,9 @@ if (require.main === module) {
       await it('should update access tracking fields on loadMemoryForContextAsync', async function () {
         setupTestDir();
         const prevInterval = process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS;
+        const prevEnabled = process.env.MEMORY_ACCESS_TRACKING;
         process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS = '0';
+        process.env.MEMORY_ACCESS_TRACKING = 'on';
 
         try {
           const gotchasFile = path.join(MEMORY_DIR, 'gotchas.json');
@@ -921,14 +956,22 @@ if (require.main === module) {
           const memory = await loadMemoryForContextAsync(TEST_PROJECT_ROOT);
           assert.strictEqual(memory.gotchas.length, 1, 'Should load gotchas async');
 
-          const gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
+          // ADR-079: Access stats writes are non-blocking via setImmediate()
+          // Wait for the async write to complete before checking the file
+          await new Promise(resolve => setTimeout(resolve, 50));
+
+          const accessStatsPath = path.join(MEMORY_DIR, 'access-stats.json');
+          const accessStats = JSON.parse(fs.readFileSync(accessStatsPath, 'utf8'));
+          const keys = Object.keys(accessStats.entries || {});
+          assert.ok(keys.length >= 1, 'Expected access stats entry for gotcha');
+
           assert.strictEqual(
-            gotchas[0].accessCount,
+            memory.gotchas[0].accessCount,
             1,
             'Async gotcha accessCount should increment'
           );
           assert.strictEqual(
-            typeof gotchas[0].lastAccessed,
+            typeof memory.gotchas[0].lastAccessed,
             'string',
             'Async gotcha lastAccessed set'
           );
@@ -937,6 +980,11 @@ if (require.main === module) {
             delete process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS;
           } else {
             process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS = prevInterval;
+          }
+          if (typeof prevEnabled === 'undefined') {
+            delete process.env.MEMORY_ACCESS_TRACKING;
+          } else {
+            process.env.MEMORY_ACCESS_TRACKING = prevEnabled;
           }
           cleanupTestDir();
         }

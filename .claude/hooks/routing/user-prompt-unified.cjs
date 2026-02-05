@@ -37,6 +37,7 @@ const {
   triggerCompression,
 } = require('../../lib/utils/compression-trigger.cjs');
 
+const logger = createLogger('user-prompt-unified');
 let memoryTiers = null;
 try {
   memoryTiers = require('../../lib/memory/memory-tiers.cjs');
@@ -50,7 +51,6 @@ const { getCachedState, invalidateCache } = require('../../lib/utils/state-cache
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
-const logger = createLogger('user-prompt-unified');
 
 // Import router state module
 const routerState = require('./router-state.cjs');
@@ -1275,9 +1275,8 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
 
   // Headless-safe reflection queue processing (optional, rate-limited).
   try {
-    const enabled =
-      String(process.env.REFLECTION_QUEUE_PROCESS_ON_PROMPT || '').toLowerCase() === 'on' ||
-      String(process.env.REFLECTION_QUEUE_PROCESS_ON_PROMPT || '').toLowerCase() === 'true';
+    const mode = String(process.env.REFLECTION_QUEUE_PROCESS_ON_PROMPT || '').toLowerCase();
+    const enabled = mode === '' || mode === 'on' || mode === 'true' || mode === '1';
     if (enabled) {
       const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
       const lastRunPath = path.join(runtimeDir, 'reflection-queue-processor-last.txt');

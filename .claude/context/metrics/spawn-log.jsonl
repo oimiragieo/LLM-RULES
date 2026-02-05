@@ -1,0 +1,10 @@
+{"event":"step0_block","timestamp":"2026-02-05T05:17:56.628Z","reason":"pending_reflections","reminder_file_exists":true,"spawn_request_count":14,"action":"blocking_all_router_operations_until_reflections_processed"}
+{"event":"spawn_start","task_id":"spawn-1770268692663-vbc5hy","agent_type":"developer","prompt_length":41994,"session_id":"48fa251c-c6e3-4260-8e2b-ab5d8d719859","timestamp":"2026-02-05T05:18:12.668Z"}
+{"event":"spawn_start","task_id":"spawn-1770268699895-5q9hx4","agent_type":"developer","prompt_length":42553,"session_id":"48fa251c-c6e3-4260-8e2b-ab5d8d719859","timestamp":"2026-02-05T05:18:19.899Z"}
+{"event":"spawn_start","task_id":"spawn-1770268707878-h6vf6l","agent_type":"developer","prompt_length":42738,"session_id":"48fa251c-c6e3-4260-8e2b-ab5d8d719859","timestamp":"2026-02-05T05:18:27.882Z"}
+{"event":"spawn_start","task_id":"spawn-1770268716073-4xobwn","agent_type":"developer","prompt_length":43663,"session_id":"48fa251c-c6e3-4260-8e2b-ab5d8d719859","timestamp":"2026-02-05T05:18:36.077Z"}
+{"event":"spawn_end","task_id":"spawn-1770268716073-4xobwn","success":true,"error":null,"session_id":"48fa251c-c6e3-4260-8e2b-ab5d8d719859","timestamp":"2026-02-05T05:19:44.537Z"}
+{"event":"memory_load_failed","task_id":null,"error":"memoryManager.loadMemoryForContext is not available","session_id":null,"timestamp":"2026-02-05T05:22:14.131Z"}
+{"event":"spawn_start","task_id":"spawn-1770268934187-6b67jk","agent_type":"developer","prompt_length":8225,"session_id":null,"timestamp":"2026-02-05T05:22:14.192Z"}
+{"event":"memory_load_failed","task_id":null,"error":"memoryManager.loadMemoryForContext is not available","session_id":null,"timestamp":"2026-02-05T05:22:53.079Z"}
+{"event":"spawn_start","task_id":"spawn-1770268973138-ky89sa","agent_type":"developer","prompt_length":8225,"session_id":null,"timestamp":"2026-02-05T05:22:53.143Z"}

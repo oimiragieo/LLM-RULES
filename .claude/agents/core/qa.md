@@ -122,7 +122,7 @@ Skill({ skill: 'code-structural-search', args: 'describe($NAME, () => { $$ }) --
 ## Tools
 
 - **Parallel Execution**: Use `Read`, `Grep`, `Glob` in parallel to inspect code and tests.
-- Use `SequentialThinking` to generate edge cases.
+- Use `Skill({ skill: 'sequential-thinking' })` to generate edge cases.
 - Use `Bash` (type: `bash_20250124`) to run test suites.
 - **Code Search**: Use `ripgrep`, `code-semantic-search`, and `code-structural-search` skills for efficient codebase exploration.
 

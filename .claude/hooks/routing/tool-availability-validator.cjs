@@ -29,25 +29,58 @@ const {
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
-// Core tools that are ALWAYS available
-const CORE_TOOLS = [
+// Core tools that are ALWAYS available (fallback if manifest load fails)
+const FALLBACK_CORE_TOOLS = [
   'Read',
   'Write',
   'Edit',
   'Bash',
   'Grep',
   'Glob',
+  'Task',
+  'TaskCreate',
   'TaskUpdate',
   'TaskList',
-  'TaskCreate',
   'TaskGet',
+  'TaskOutput',
+  'TaskStop',
   'Skill',
   'MemoryRecord',
   'AskUserQuestion',
   'NotebookEdit',
   'WebSearch',
   'WebFetch',
+  'EnterPlanMode',
+  'ExitPlanMode',
+  'Orchestrator',
 ];
+
+const MANIFEST_PATH = path.join(process.cwd(), '.claude', 'config', 'tool-manifest.json');
+
+let _coreToolsCache = null;
+
+function loadCoreTools() {
+  if (_coreToolsCache) {
+    return _coreToolsCache;
+  }
+
+  try {
+    if (fs.existsSync(MANIFEST_PATH)) {
+      const content = fs.readFileSync(MANIFEST_PATH, 'utf8');
+      const manifest = JSON.parse(content);
+      const coreTools = (manifest.tools?.core || []).map(tool => tool.name);
+      if (coreTools.length > 0) {
+        _coreToolsCache = coreTools;
+        return _coreToolsCache;
+      }
+    }
+  } catch (_e) {
+    // fall through to fallback list
+  }
+
+  _coreToolsCache = FALLBACK_CORE_TOOLS;
+  return _coreToolsCache;
+}
 
 /**
  * Check MCP server configuration
@@ -73,6 +106,7 @@ function checkMCPServers() {
  */
 function validateTools(allowedTools) {
   const mcpServers = checkMCPServers();
+  const coreTools = new Set(loadCoreTools());
   const unavailableTools = [];
   const mcpToolsWithoutServer = [];
 
@@ -91,7 +125,7 @@ function validateTools(allowedTools) {
     }
 
     // Check if it's a core tool
-    if (!CORE_TOOLS.includes(tool)) {
+    if (!coreTools.has(tool)) {
       unavailableTools.push(tool);
     }
   }
@@ -177,4 +211,4 @@ if (require.main === module) {
 }
 
 // Export for testing
-module.exports = { main, validateTools, checkMCPServers, CORE_TOOLS };
+module.exports = { main, validateTools, checkMCPServers, loadCoreTools, FALLBACK_CORE_TOOLS };

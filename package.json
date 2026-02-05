@@ -110,7 +110,8 @@
     "validator:test": "node --test tests/hooks/pre-spawn-tool-validator.test.cjs",
     "test:ml": "node --test --test-concurrency=1 tests/ml/*.test.cjs",
     "code:index:reindex": "node .claude/tools/cli/index-codebase.cjs index",
-    "validate:commands": "node .claude/tools/validate-commands.mjs"
+    "validate:commands": "node .claude/tools/validate-commands.mjs",
+    "verify:debug-log": "node .claude/tools/cli/verify-debug-log-remediation.mjs"
   },
   "keywords": [
     "claude",

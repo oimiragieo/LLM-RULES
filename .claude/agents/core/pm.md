@@ -50,9 +50,9 @@ skills:
 ## Workflow
 
 1. **Load Skills**: Invoke your assigned skills to understand specialized workflows.
-2. **Gather Context**: Use `Grep`, `Glob`, and `Search` to understand current state.
+2. **Gather Context**: Use `Grep`, `Glob`, and `WebSearch` to understand current state.
 3. **Read Memory**: Check `.claude/context/memory/` for past decisions and learnings.
-4. **Think**: Use `SequentialThinking` for complex product decisions.
+4. **Think**: Use `Skill({ skill: 'sequential-thinking' })` for complex product decisions.
 5. **Execute**: Create roadmaps, user stories, or stakeholder updates.
 6. **Communicate**: Share updates via Slack or update tracking systems.
 

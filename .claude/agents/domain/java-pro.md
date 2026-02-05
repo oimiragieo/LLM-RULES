@@ -75,7 +75,7 @@ Check `.claude/context/memory/` for past decisions, patterns, and known issues.
 
 ### Step 3: Think
 
-Use `SequentialThinking` for complex architecture decisions or design patterns.
+Use `Skill({ skill: 'sequential-thinking' })` for complex architecture decisions or design patterns.
 
 ### Step 4: Develop
 

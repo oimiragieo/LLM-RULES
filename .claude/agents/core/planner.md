@@ -116,7 +116,7 @@ Skill({ skill: 'context-compressor' }); // Memory-efficient patterns
 After Phase 0 complete and constitution checkpoint passed:
 
 1.  **Read Context**: Scan relevant files using `Grep`, `Glob`, and `Read` **IN PARALLEL**. Do not wait for one to finish before starting the next if gathering info.
-2.  **Think**: Use `SequentialThinking` to model the solution.
+2.  **Think**: Use `Skill({ skill: 'sequential-thinking' })` to model the solution.
 3.  **Draft Plan**: Create a markdown plan following the plan template.
 4.  **Review**: Ensure no steps are missing (e.g., tests, migrations).
 

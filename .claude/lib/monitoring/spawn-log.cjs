@@ -43,9 +43,19 @@ function append(entry) {
 }
 
 function logSpawnStart({ taskId, agentType, promptLength, sessionId }) {
+  // Guard against null task_id to prevent traceability corruption
+  if (!taskId || taskId === null) {
+    if (process.env.ROUTER_DEBUG === 'true') {
+      console.error(
+        '[spawn-log] Attempting to log spawn_start with null task_id. Skipping to prevent traceability corruption.'
+      );
+    }
+    return;
+  }
+
   append({
     event: 'spawn_start',
-    task_id: taskId || null,
+    task_id: taskId,
     agent_type: agentType || null,
     prompt_length: Number.isFinite(promptLength) ? promptLength : null,
     session_id: sessionId || null,
@@ -53,9 +63,19 @@ function logSpawnStart({ taskId, agentType, promptLength, sessionId }) {
 }
 
 function logSpawnEnd({ taskId, success, errorSnippet, sessionId }) {
+  // Guard against null task_id to prevent traceability corruption
+  if (!taskId || taskId === null) {
+    if (process.env.ROUTER_DEBUG === 'true') {
+      console.error(
+        '[spawn-log] Attempting to log spawn_end with null task_id. Skipping to prevent traceability corruption.'
+      );
+    }
+    return;
+  }
+
   append({
     event: 'spawn_end',
-    task_id: taskId || null,
+    task_id: taskId,
     success: Boolean(success),
     error: errorSnippet || null,
     session_id: sessionId || null,

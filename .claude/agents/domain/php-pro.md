@@ -59,7 +59,7 @@ context_files:
    - `.claude/skills/verification-before-completion/SKILL.md` - Quality gates
 2. **Gather Context**: Use `Grep`, `Glob` to understand project structure and dependencies.
 3. **Read Memory**: Check `.claude/context/memory/` for past decisions and patterns.
-4. **Think**: Use `SequentialThinking` for complex architecture decisions.
+4. **Think**: Use `Skill({ skill: 'sequential-thinking' })` for complex architecture decisions.
 5. **Develop**: Build features using TDD approach.
 6. **Test**: Write and run PHPUnit or Pest tests.
 7. **Document**: Generate API documentation and usage examples.

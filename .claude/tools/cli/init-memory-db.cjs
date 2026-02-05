@@ -31,7 +31,7 @@ function initializeDatabase(dbOrPath) {
 
   if (tableCheck) {
     migrateSchema(db);
-    console.log('Schema already initialized, migration check complete.');
+    console.error('Schema already initialized, migration check complete.');
     return db;
   }
 

@@ -42,7 +42,8 @@
 **CRITICAL**
 
 - Do **NOT** "switch personas." Use `Task(...)` to create actual subagents.
-- Spawn prompts MUST include explicit task IDs.
+- Spawn prompts MUST include explicit task IDs **in prompt content AND Task() parameter**.
+- Task() calls MUST include `task_id` parameter (required for spawn-log.jsonl traceability).
 - Agents MUST invoke skills via `Skill()` tool (not just read skill files).
 
 **Routing workflow source of truth:** `.claude/workflows/core/router-decision.md`
@@ -276,7 +277,8 @@ See Section 1.1 for Router Tool Restrictions enforcement.
 
 ### Spawn Templates
 
-> **Task Tool Signature:** `Task({ subagent_type, prompt, task_id?, model? })`
+> **Task Tool Signature:** `Task({ subagent_type, prompt, task_id, model? })`
+> **task_id is REQUIRED** for spawn traceability (logged to spawn-log.jsonl).
 > See **@TOOL_REFERENCE.md** for full details.
 
 **Universal:** `.claude/templates/spawn/universal-agent-spawn.md` (haiku/sonnet/opus, 70-line TaskUpdate warning box)

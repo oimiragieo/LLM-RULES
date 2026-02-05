@@ -10,11 +10,33 @@
 
 /* global fetch */
 
+const { createLogger } = require('../utils/logger.cjs');
+const { resolveAgentModel } = require('../utils/agent-config-reader.cjs');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+
+const logger = createLogger('model-client');
+
 class ModelClient {
   constructor(config = {}) {
     this.config = config;
     this.apiKey = process.env.ANTHROPIC_API_KEY || config.apiKey;
-    this.modelName = config.modelName || 'claude-3-5-sonnet-20240620';
+    this.isMock = !this.apiKey;
+    const agentType = process.env.MODEL_CLIENT_AGENT_TYPE || 'planner';
+    const resolved = resolveAgentModel(agentType, PROJECT_ROOT);
+    const defaultModel =
+      process.env.MODEL_CLIENT_DEFAULT_MODEL ||
+      process.env.ANTHROPIC_MODEL ||
+      resolved?.model ||
+      'claude-3-5-sonnet-20240620';
+    this.modelName = config.modelName || defaultModel;
+
+    if (this.isMock && !ModelClient._warnedNoApiKey) {
+      ModelClient._warnedNoApiKey = true;
+      logger.warn('model_client_no_api_key_startup', {
+        model: this.modelName,
+        mode: 'mock',
+      });
+    }
   }
 
   /**
@@ -34,12 +56,17 @@ class ModelClient {
 
     // 2. Check for Mock Mode
     if (!this.apiKey) {
-      console.warn('[ModelClient] No API key found. Using MOCK response.');
+      this.isMock = true;
+      logger.warn('model_client_no_api_key', { model: this.modelName, mode: 'mock' });
       return this._mockResponse(system, normalizedMessages);
     }
 
     // 3. Call Real API (Anthropic example)
-    try {
+    const maxRetries = Number(process.env.MODEL_CLIENT_MAX_RETRIES || 2);
+    const baseDelayMs = Number(process.env.MODEL_CLIENT_RETRY_BASE_MS || 500);
+    let attempt = 0;
+
+    while (attempt <= maxRetries) {
       // In a real implementation, use 'anthropic-sdk' or 'fetch'
       // For this Phase 9 pilot, we will simulate the fetch call to avoid adding heavyweight dependencies
       // unless the user explicitly requested external network calls.
@@ -47,32 +74,51 @@ class ModelClient {
 
       // However, I cannot install new packages easily. I'll use native fetch.
       // NOTE: Node 18+ has native fetch.
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'x-api-key': this.apiKey,
-          'anthropic-version': '2023-06-01',
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: this.modelName,
-          system: system,
-          messages: normalizedMessages,
-          max_tokens: 4096,
-        }),
-      });
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': this.apiKey,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: this.modelName,
+            system: system,
+            messages: normalizedMessages,
+            max_tokens: 4096,
+          }),
+        });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Anthropic API Error: ${response.status} - ${errText}`);
+        if (!response.ok) {
+          const errText = await response.text();
+          const error = new Error(`Anthropic API Error: ${response.status} - ${errText}`);
+          error.status = response.status;
+          throw error;
+        }
+
+        const data = await response.json();
+        return data.content[0].text;
+      } catch (error) {
+        const status = error?.status || 0;
+        const retryable = status === 429 || (status >= 500 && status < 600) || status === 0;
+        if (!retryable || attempt >= maxRetries) {
+          logger.error('model_client_request_failed', {
+            error: error.message,
+            status,
+            attempt,
+          });
+          throw error;
+        }
+
+        const delayMs = baseDelayMs * Math.pow(2, attempt);
+        logger.warn('model_client_retry', { attempt, delayMs, status });
+        await new Promise(resolve => setTimeout(resolve, delayMs));
       }
-
-      const data = await response.json();
-      return data.content[0].text;
-    } catch (error) {
-      console.error('[ModelClient] API Call Failed:', error.message);
-      throw error;
+      attempt += 1;
     }
+
+    throw new Error('ModelClient failed after retries');
   }
 
   _mockResponse(system, messages) {
@@ -97,6 +143,10 @@ class ModelClient {
     }
 
     return 'Mock response from ModelClient (No API Key)';
+  }
+
+  isMockMode() {
+    return !this.apiKey || this.isMock === true;
   }
 }
 

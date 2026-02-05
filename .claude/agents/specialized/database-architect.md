@@ -56,7 +56,7 @@ skills:
    - `.claude/skills/doc-generator/SKILL.md` - Schema documentation
 2. **Gather Context**: Scan existing schemas, migrations, and queries.
 3. **Read Memory**: Check `.claude/context/memory/` for past decisions and patterns.
-4. **Think**: Use `SequentialThinking` for complex schema design decisions.
+4. **Think**: Use `Skill({ skill: 'sequential-thinking' })` for complex schema design decisions.
 5. **Design**: Create schemas, migrations, or query optimizations.
 6. **Document**: Generate ERDs and comprehensive documentation.
 7. **Validate**: Verify data integrity, performance, and migration safety.

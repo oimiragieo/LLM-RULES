@@ -3,32 +3,128 @@
   "version": "1.0.0",
   "agents": {
     "planner": {
-      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "WebFetch", "WebSearch"],
-      "thinkingDefault": "high",
-      "phase": "planning"
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "phase": "planning",
+      "model": "claude-opus-4-5-20251101"
     },
     "developer": {
-      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "WebFetch", "WebSearch"],
-      "thinkingDefault": "none",
-      "phase": "coding"
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "phase": "coding",
+      "model": "claude-sonnet-4-5"
     },
     "qa": {
-      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "WebFetch", "WebSearch"],
-      "thinkingDefault": "high",
-      "phase": "qa"
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "phase": "qa",
+      "model": "claude-opus-4-5-20251101"
     },
     "code-reviewer": {
-      "tools": ["Read", "Glob", "Grep", "WebFetch", "WebSearch"],
-      "thinkingDefault": "high"
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskGet",
+        "Skill"
+      ],
+      "model": "claude-opus-4-5-20251101"
     },
     "architect": {
-      "tools": ["Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch"],
-      "thinkingDefault": "high",
-      "phase": "planning"
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "phase": "planning",
+      "model": "claude-opus-4-5-20251101"
     },
     "researcher": {
-      "tools": ["Read", "Glob", "Grep", "WebFetch", "WebSearch"],
-      "thinkingDefault": "medium"
+      "tools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
+    "reflection-agent": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Grep",
+        "Glob",
+        "MemoryRecord",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ],
+      "model": "claude-opus-4-5-20251101"
     }
   },
   "thinkingBudgetMap": {

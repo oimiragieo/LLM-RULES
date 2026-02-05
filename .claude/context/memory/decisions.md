@@ -1,5 +1,9 @@
 # Architecture Decision Records (ADR)
 
+> **Rotation Notice** (2026-02-05): Archived 32 ADRs to `archive/decisions-2026-02.md`.
+> Keeping only the 5 most recent ADRs in this file to maintain <25KB size.
+> Rotation strategy: Keep 5 most recent, archive older entries when file exceeds 25KB.
+
 ## Format
 
 ```
@@ -13,1253 +17,562 @@
 
 ---
 
-## [ADR-076] File Placement Architecture Redesign
+## [ADR-088] Comprehensive 100% Audit Completion - 8 Domains Validated
 
-- **Date**: 2026-01-31
-- **Status**: Accepted
-- **Context**: Tests, documentation, utilities, and artifacts were scattered across inconsistent locations, causing organizational chaos. Tests appeared in both `.claude/hooks/*.test.cjs` AND `tests/hooks/`, utilities in `.claude/lib/` had tests co-located despite FORBIDDEN_PATHS blocking writes, and agents were confused about where to place files. The existing `FILE_PLACEMENT_RULES.md` allowed co-located tests in hooks but `file-placement-guard.cjs` had conflicting rules.
-- **Decision**: Implement unified file placement architecture with strict enforcement:
-  1. **Single Test Location**: ALL tests MUST go in `tests/` directory, NOT in `.claude/`
-     - Hook tests: `tests/hooks/`
-     - Utility tests: `tests/unit/{category}/`
-     - Integration tests: `tests/integration/`
-     - CLI tests: `tests/cli/`
-  2. **Clear Code Homes**:
-     - Hooks: `.claude/hooks/{category}/` (code only, no tests)
-     - Utilities: `.claude/lib/{category}/` (code only, no tests)
-     - CLI tools: `.claude/tools/cli/` (code only, no tests)
-  3. **Artifact Categories**:
-     - Plans: `.claude/context/artifacts/plans/`
-     - Reports: `.claude/context/artifacts/reports/`
-     - Architecture: `.claude/context/artifacts/architecture/`
-     - Diagrams: `.claude/context/artifacts/diagrams/`
-  4. **Enforcement**: Update `file-placement-guard.cjs` to BLOCK test files in `.claude/`
-  5. **Migration**: Migrate ~45 test files from `.claude/` to `tests/`
-  6. **Education**: Add file placement checklist to spawn templates
-- **Consequences**:
-  - **Benefits**:
-    - Single source of truth for file placement
-    - CI/CD test discovery simplified (all in `tests/`)
-    - Clear separation of code and tests
-    - Consistent enforcement via hook
-    - Agent confusion eliminated
-  - **Trade-offs**:
-    - Migration effort required (~45 files)
-    - Import paths need updating in migrated tests
-    - Agents must learn new placement rules
-    - Slight increase in directory depth for tests
-  - **Rollback**: `git checkout HEAD -- .claude/ tests/`
-- **Architecture Document**: `.claude/context/artifacts/architecture/FILE-PLACEMENT-ARCHITECTURE.md`
-- **Implementation**:
-  - Phase 1: Create architecture document (DONE)
-  - Phase 2: Create migration script (DONE - `scripts/testing/migrate-test-files.cjs`)
-  - Phase 3: Execute migration (DONE - 147 test files migrated)
-  - Phase 4: Update `file-placement-guard.cjs` to enforce (DONE - TEST_FILE_PATTERNS blocking)
-  - Phase 5: Fix import paths (DONE - `scripts/testing/fix-all-test-imports.cjs`)
-- **Implementation Date**: 2026-01-31
-- **Estimated Effort**: 8-12 hours across 5 phases
-- **Migration Summary**:
-  - 147 test files migrated from `.claude/` to `tests/`
-  - 48 test files had import paths fixed
-  - 2 audit files moved from `plans/` to `audits/`
-  - `file-placement-guard.cjs` updated to block test files in `.claude/`
-  - New subdirectories added to VALID_PATHS: audits, audit-logs, error-reports
-
----
-
-## [ADR-075] Router Model Selection from Configuration
-
-- **Date**: 2026-01-31
-- **Status**: Proposed
-- **Context**: Router (CLAUDE.md) hardcodes model values (`'sonnet'`, `'opus'`, `'haiku'`) in spawn examples and documentation, completely ignoring agent configuration in `.claude/config.yaml`. This causes model misallocation (planner configured for opus in config.yaml may be spawned with sonnet), wasting compute and degrading performance.
-- **Decision**: Implement model selection precedence system:
-  1. **Explicit Task() parameter** (highest priority)
-  2. **Agent frontmatter** (`model:` field in agent definition)
-  3. **config.yaml agent entry** (`agents.{type}.model`)
-  4. **Complexity-based default** (trivial→haiku, medium→sonnet, high→opus)
-  5. **Fallback**: sonnet
-- **Implementation**:
-  1. Create `agent-config-reader.cjs` utility for config lookup
-  2. Create `pre-spawn-model-selector.cjs` hook (advisory, logs model selection)
-  3. Update CLAUDE.md Section 5, router-decision.md Step 8, @MODEL_SELECTION.md
-  4. Add `model_aliases` section to config.yaml for shorthand→full ID mapping
-  5. Update orchestrators to read config before spawning subagents
-- **Consequences**:
-  - **Benefits**:
-    - Centralized model control via config.yaml
-    - Cost optimization (right model for right task)
-    - Consistent behavior across spawns
-    - config.yaml becomes source of truth (not dead documentation)
-  - **Trade-offs**:
-    - Config read overhead per spawn (~1ms, negligible)
-    - Additional complexity in spawning workflow
-    - Requires orchestrator updates
-  - **Rollback**: Disable pre-spawn hook, revert documentation changes
-- **Related Files**:
-  - `.claude/context/artifacts/plans/ROUTER-CONFIG-INTEGRATION-AUDIT.md` (full design)
-  - `.claude/config.yaml` (source of truth for agent models)
-  - `.claude/workflows/core/router-decision.md` (routing workflow)
-- **Estimated Effort**: 19 hours across 6 phases
-
----
-
-## [ADR-074] CLAUDE.md Compression Strategy
-
-- **Date**: 2026-01-31
-- **Status**: Accepted
-- **Context**: CLAUDE.md was 1327 lines, approaching Read tool limits and causing context bloat in router spawns. Need compression while preserving 100% router-first enforcement.
-- **Decision**: Extract 11 reference sections to @files in `.claude/docs/`, keep enforcement-critical sections inline (Sections 0-2, 1.1-1.3, 5.6, 6-8).
-- **Consequences**:
-  - **Benefits**: 68% size reduction (1327 → 429 lines), improved maintainability, single-source-of-truth for reference material, @files enable progressive disclosure
-  - **Trade-offs**: Router must load @files explicitly via Read() tool (minimal overhead ~50 tokens/file), @files are additional files to maintain
-  - **Rollback**: `git checkout HEAD -- .claude/CLAUDE.md && rm .claude/docs/@*.md`
-- **Files Created**:
-  - @AGENT_ROUTING_TABLE.md (complete agent routing matrix)
-  - @CREATOR_SKILLS_TABLE.md (creator skill mapping)
-  - @TOOL_REFERENCE.md (complete tool catalog)
-  - @MODEL_SELECTION.md (model selection guidelines)
-  - @SKILL_CATALOG_TABLE.md (workflow enhancement skills)
-  - @ENTERPRISE_WORKFLOWS.md (enterprise workflow paths)
-  - @ENVIRONMENT_CONFIG.md (environment variable reference)
-  - @DIRECTORY_STRUCTURE.md (directory layout reference)
-  - @ENFORCEMENT_HOOKS.md (hook enforcement details)
-  - @TASK_TRACKING_GUIDE.md (TaskUpdate best practices)
-  - @EVOLUTION_WORKFLOW.md (EVOLVE workflow details)
-- **Navigation**: All @files include "BACK TO MAIN" link to CLAUDE.md section, "RELATED REFERENCES" to cross-referenced files
-- **Verification**: All 4 self-check gates inline and functional, router spawns agents successfully, all @files load without errors, no broken links
-
----
-
-## [ADR-070] Router Agent Mode Lifecycle - Keep Active Until Session End
-
-- **Date**: 2026-01-31
-- **Status**: Accepted (Emergency Fix)
-- **Context**: Router orchestration broke after PERF-003 hook consolidation. post-task-unified.cjs was immediately exiting agent mode after Task() spawned subagents asynchronously. This caused router to stop monitoring spawned agents, resulting in tasks stuck forever and duplicate spawning.
-- **Decision**: Removed `exitAgentMode()` call from post-task-unified.cjs (line 127). Router now remains in agent mode after Task() and only exits when SessionEnd hook fires.
-- **Consequences**:
-  - **Benefits**:
-    - Router monitors subagents throughout their lifecycle
-    - TaskUpdate completion properly tracked
-    - Multi-agent workflows function correctly
-    - Projects continue instead of appearing abandoned
-  - **Trade-offs**:
-    - Agent mode is held slightly longer (until session end vs immediate exit)
-    - No performance impact (hooks are already running)
-  - **Risk Mitigations**:
-    - SessionEnd hook ensures proper cleanup
-    - router-state tracks mode transitions
-    - Debug logging available via ROUTER_DEBUG=true
-- **Implementation**: File modified: `.claude/hooks/routing/post-task-unified.cjs`
-- **Related Issues**: ROUTER-MONITORING-001, PERF-003
-- **Verification**: Use `ROUTER_DEBUG=true` to confirm agent mode stays active during execution
-
----
-
-## [ADR-069] Tool Manifest and Pre-Spawn Validation Architecture
-
-- **Date**: 2026-01-30
-- **Status**: Accepted
-- **Context**: Agent-Studio orchestration had five critical issues: (1) Agents don't know what tools they have, causing "Invalid tool parameters" errors; (2) Agents don't know available skills; (3) Tool errors repeated across spawns; (4) Orchestrator makes wrong tool decisions; (5) Zero error tolerance for spawns. Root causes: no single source of truth for tool definitions (3 conflicting definitions in developer.md, master-orchestrator.md, CLAUDE.md), no skill discovery mechanism, 11+ agents reference unavailable MCP tools (mcp**Exa**_, mcp**memory**_, mcp**filesystem**_, mcp**chrome-devtools**_).
-- **Decision**: Implement Tool Registry with Pre-Spawn Validation pattern:
-  1. **Single Source of Truth**: Create `tool-manifest.json` defining all 20 core tools + 9 MCP tools with metadata (category, description, availability, mandatory flags)
-  2. **Toolsets**: Define DEVELOPER, ORCHESTRATOR, ROUTER, READ_ONLY toolsets mapping agent types to appropriate tools
-  3. **Skill Index**: Generate `skill-index.json` from 435-skill catalog with domain/category/tool-requirement indexes
-  4. **Pre-Spawn Validation Hook**: `pre-spawn-tool-validator.cjs` validates spawn requests against manifest (check tool existence, mandatory tools, MCP fallbacks, tool count <= 15)
-  5. **Spawn Prompt Injection**: Add AVAILABLE_TOOLS and AVAILABLE_SKILLS sections to spawn templates
-  6. **MCP Fallbacks**: Document fallbacks for all unavailable MCP tools (e.g., mcp\_\_sequential-thinking -> Skill({ skill: 'sequential-thinking' }))
-- **Consequences**:
-  - **Benefits**:
-    - Zero tool parameter errors (guaranteed by pre-spawn validation)
-    - Agents fully aware of available tools (injected into prompt)
-    - Agents know how to discover skills (skill index + discovery protocol)
-    - Consistent toolsets across all agents (manifest-driven)
-    - MCP tool fallbacks documented and suggested
-    - <50ms validation overhead (manifest cached)
-  - **Trade-offs**:
-    - Additional file to maintain (tool-manifest.json)
-    - Spawn prompt slightly larger (+~500 chars for tool/skill sections)
-    - Hook chain adds validation step (minimal overhead)
-  - **Risk Mitigations**:
-    - CI validates manifest on every commit
-    - Manifest version-controlled
-    - Hook has warn mode for gradual rollout
-- **Implementation**: `.claude/docs/ARCHITECTURE_DESIGN_TOOL_AWARENESS.md` (comprehensive design)
-- **Migration Path**: Phase 1A (foundation, 2 days) -> Phase 1B (integration, 1 day) -> Phase 1C (agent cleanup, 1 day)
-- **Related ADRs**: ADR-051 (Tool Availability Validation Hook), ADR-043 (MCP Tool Removal)
-
----
-
-## [ADR-065] Track Metadata Schema Design (SPEC-007)
-
-- **Date**: 2026-01-29
-- **Status**: Accepted
-- **Context**: Agent-Studio lacks a standardized schema for track/task metadata. Track-management skill documents metadata structure, but no validation enforces consistency. Phase 1 features (SPEC-001, 004, 006) require reliable metadata for spec-driven workflows, phase verification, and effort tracking. Need schema that balances structure with flexibility.
-- **Decision**: Create JSON Schema v7 for track metadata with these design principles:
-  1. **Required Fields Minimal**: Only trackId, type, status required (enables incremental adoption)
-  2. **Extensibility via additionalProperties: true**: Allows custom fields for project-specific needs
-  3. **Pattern Validation for IDs**: `^[a-z0-9_-]+_[0-9]{8}$` ensures cross-platform compatibility
-  4. **Effort Tracking Separation**: `estimatedEffort` vs `actualEffort` enables continuous improvement
-  5. **Phase State Enum**: Aligns with spec-driven workflow (draft → spec_review → plan_ready → implementation → qa → deployed)
-  6. **Classification Array**: Multiple tags enable rich categorization and reporting
-  7. **ISO 8601 Timestamps**: Timezone-safe date handling
-  8. **Dependency Fields**: `dependencies`, `blocked_by`, `blocks` enable graph visualization
-- **Consequences**:
-  - **Benefits**:
-    - Forward compatibility (additionalProperties allows schema evolution)
-    - Minimal friction (only 3 required fields for basic usage)
-    - Analytics-ready (structured effort, phase, classification data)
-    - Integration-ready (phaseState enum drives workflow transitions)
-    - Performance: <1ms validation (tested with 1000 iterations)
-  - **Trade-offs**:
-    - Lenient validation (additionalProperties allows invalid custom fields - mitigated by documentation)
-    - No cross-field validation (can't enforce "if phaseState=deployed then status=completed" - requires hook)
-  - **Future Work**:
-    - Validation hook on metadata.json writes (Phase 1.5)
-    - Auto-populate from TaskCreate metadata
-    - Dependency cycle detection
-    - Effort estimation analytics dashboard
-  - **Migration**: Backward compatible (existing tracks without metadata continue to work)
-
----
-
-## [ADR-064] Spawn Prompt Validator Security Review
-
-- **Date**: 2026-01-29
-- **Status**: Accepted (Approved with Conditions)
-- **Context**: Task #7 produced a detailed implementation plan for spawn-prompt-validator.cjs hook that validates spawn prompts contain required elements (TaskUpdate protocol, PROJECT_ROOT, Task ID, Memory Protocol). Security review was required before implementation to identify bypass vulnerabilities, injection risks, and performance attack vectors.
-- **Decision**: APPROVED WITH CONDITIONS. The design is fundamentally sound (backed by 97.3% correctness research), but 13 vulnerabilities identified require mitigation:
-  - **CRITICAL (2)**: Unicode lookalike bypass (VULN-001), ReDoS vulnerability (VULN-002)
-  - **HIGH (4)**: Missing prompt length limit, fail-open without audit, environment override without audit, missing required tool flags
-  - **MEDIUM (5)**: Rate limiting, orchestrator skip logic, score threshold configurability, hook signature verification, audit log rotation
-- **Consequences**:
-  - **Required Mitigations**:
-    - Unicode normalization function with homoglyph map (VULN-001)
-    - ReDoS-safe regex patterns with bounded quantifiers (VULN-002)
-    - Regex timeout wrapper using vm module (VULN-002)
-    - Prompt length limit of 500KB (VULN-003)
-    - Full audit context in exception handler (VULN-004)
-    - Environment override auditing (VULN-005)
-  - **Security Report**: `.claude/context/artifacts/security-reviews/spawn-validation-security-review-2026-01-29.md`
-  - **Implementation Plan Updated**: Appendix E added with security mitigations
-- **Related**: ADR-063 (Spawn Template Validation Safeguards - pending implementation)
-
----
-
-## [ADR-051] Tool Availability Validation Hook
-
-- **Date**: 2026-01-28
-- **Status**: Accepted
-- **Context**: Agents were spawned with references to unavailable tools (e.g., `mcp__sequential-thinking__sequentialthinking` without MCP server configured), causing runtime errors "No such tool available". Phase 1 removed unavailable tools from agent definitions; Phase 2 creates prevention.
-- **Decision**: Create `.claude/hooks/routing/tool-availability-validator.cjs` that validates tool availability before agent spawning. Hook blocks spawn if required tools (core tools) are unavailable, warns but allows spawn if optional tools (MCP) are missing.
-- **Consequences**:
-  - **Pros**: Prevents "tool not available" runtime errors; catches tool mismatches at spawn time; provides actionable warnings for MCP tools
-  - **Cons**: Adds validation overhead to every Task spawn (minimal - single settings.json read)
-  - **Integration**: Hook registered in settings.json PreToolUse(Task) as first hook (runs before pre-task-unified.cjs); uses CORE_TOOLS constant for validation
-  - **Rollback**: Can be removed from settings.json Task hooks array
-  - **Related**: See tool-availability-audit-2026-01-28.md for background investigation
-  - **Registration Date**: 2026-01-28 (Phase 3 completed)
-
----
-
-## [ADR-053] Write Size Validation Hook
-
-- **Date**: 2026-01-28
-- **Status**: Accepted
-- **Context**: Devops agent attempted to write 41,350 tokens to environment.cjs (limit: 25,000 tokens), causing Write tool failure. Error occurred AFTER agent generated content, wasting compute. Need prevention at tool invocation.
-- **Decision**: Create `.claude/hooks/safety/write-size-validator.cjs` that validates content size before Write/Edit/NotebookEdit operations. Hook estimates tokens (~4 chars/token), warns at 20K tokens (80% limit), blocks at >25K tokens.
-- **Consequences**:
-  - **Pros**: Prevents oversized writes before they fail; provides early warning at 80% threshold; actionable error messages suggest splitting content
-  - **Cons**: Token estimation is approximate (~4 chars/token); adds validation overhead to every write operation (minimal - string length check)
-  - **Integration**: Hook registered in settings.json PreToolUse(Write|Edit|NotebookEdit); fails open on error (SEC-008 compliance)
-  - **Thresholds**: WARNING_THRESHOLD = 20K tokens, MAX_TOKENS = 25K tokens (blocks > 25K, allows = 25K)
-  - **Rollback**: Can be removed from settings.json write tool hooks array
-  - **Test Coverage**: 13 unit tests (100% passing); manual testing validated all scenarios
-  - **Registration Date**: 2026-01-28 (Phase 3 completed - hook now registered in settings.json as second hook in Edit|Write|NotebookEdit matcher)
-
----
-
-## [ADR-052] Memory File Rotation Strategy
-
-- **Date**: 2026-01-28
-- **Status**: Accepted
-- **Context**: Memory files (decisions.md: 3096 lines, issues.md: 1973 lines) were approaching Read tool limits (25000 tokens), risking future context loading failures. Existing smart-pruner.cjs handles JSON files (gotchas, patterns) but not markdown files with structured content (ADRs, issues).
-- **Decision**: Create `.claude/lib/memory/memory-rotator.cjs` utility with age-based rotation policies:
-  - **decisions.md**: Archive ADRs older than 60 days when file > 1500 lines
-  - **issues.md**: Archive RESOLVED issues older than 7 days when file > 1500 lines
-  - **Archive Location**: `.claude/context/memory/archive/YYYY-MM/`
-  - **Format**: Full content preservation with metadata headers
-- **Consequences**:
-  - **Benefits**:
-    - Prevents memory files from exceeding Read tool limits (25000 tokens)
-    - Keeps active files focused on recent/relevant content
-    - Full archival (no data loss) - old content remains searchable via grep
-    - Dry-run mode for safe testing before execution
-    - CLI commands for manual rotation when needed
-  - **Trade-offs**:
-    - Archived content requires explicit search (not loaded by default)
-    - Age-based rotation may archive still-relevant ADRs (mitigated by 60-day threshold)
-    - Manual invocation required unless integrated into memory-scheduler.cjs
-  - **Implementation**:
-    - Parses ADRs by `## [ADR-XXX]` headers, extracts dates
-    - Parses issues by `### Title` headers, prioritizes Resolved date over Date field
-    - Creates archive files with metadata headers showing archived entry ranges
-    - Updates active files with notice of archival
-  - **Test Coverage**: 15 unit tests (parsing, selection, rotation, dry-run)
-  - **Documentation**: Added to `.claude/docs/MONITORING.md`
-- **Integration**: Can be invoked manually or scheduled:
-  ```bash
-  node .claude/lib/memory/memory-rotator.cjs check      # Check status
-  node .claude/lib/memory/memory-rotator.cjs rotate --dry-run  # Preview
-  node .claude/lib/memory/memory-rotator.cjs rotate    # Execute
-  ```
-- **Future Work**: Integrate into memory-scheduler.cjs for automated monthly rotation
-
----
-
-## [ADR-001] Router-First Protocol
-
-- **Date**: 2026-01-23
-- **Status**: Accepted
-- **Context**: Need consistent request handling across all agent interactions
-- **Decision**: All requests must first go through the Router Agent for classification
-- **Consequences**: Adds routing overhead but ensures proper agent selection
-
-## [ADR-002] Memory Persistence Strategy
-
-- **Date**: 2026-01-23
-- **Status**: Accepted
-- **Context**: Agent context can be reset at any time; need persistent memory
-- **Decision**: Use file-based memory in `.claude/context/memory/`
-- **Consequences**: Agents must read/write memory files; adds I/O but ensures continuity
-
-## [ADR-003] Serena Integration Scope
-
-- **Date**: 2026-01-24
-- **Status**: Accepted
-- **Context**: Serena codebase available for integration; need to decide what to port
-- **Decision**: Port workflow patterns as skills (onboarding, thinking-tools, modes, summarize-changes, session-handoff). Do NOT port Python runtime dependencies (LSP, dashboard, token counting).
-- **Consequences**: Framework gains valuable workflow patterns without adding runtime dependencies. CLI-first approach maintained. Some features (dynamic tool exclusion) rely on agent self-regulation rather than enforcement.
-
-## [ADR-005] Security Architect Workflow
-
-- **Date**: 2026-01-25
-- **Status**: Accepted
-- **Context**: Need a comprehensive security audit workflow that integrates threat modeling, OWASP Top 10 coverage, dependency auditing, penetration testing, and remediation planning into a structured multi-phase process.
-- **Decision**: Create `.claude/workflows/security-architect-skill-workflow.md` with 5 phases: Threat Modeling (STRIDE), Code Review (OWASP Top 10), Dependency Audit (CVE), Penetration Testing, and Remediation Planning. Workflow uses security-architect, code-reviewer, developer, and devops agents with appropriate skills.
-- **Consequences**:
-  - Standardized security audit process across all projects
-  - Clear severity classification (Critical/High/Medium/Low) with SLAs
-  - Security gates define what blocks deployment
-  - Integration with Task tracking system for multi-phase coordination
-
-## [ADR-041] Feature Flag Infrastructure for Safe Rollout
-
-- **Date**: 2026-01-28
-- **Status**: Accepted
-- **Context**: Party Mode and Advanced Elicitation are high-value, high-risk features requiring gradual rollout with emergency disable capability. Need infrastructure to control feature activation without code changes.
-- **Decision**: Implement FeatureFlagManager (`.claude/lib/utils/feature-flags.cjs`) with 3-tier priority system:
-  1. **Environment Variables** (highest priority) - Emergency override: `PARTY_MODE_ENABLED=true|false`, `ELICITATION_ENABLED=true|false`
-  2. **Config File** (`.claude/config.yaml`) - Default configuration with nested feature settings
-  3. **Runtime API** (in-memory) - Dynamic toggling for development: `enable()`, `disable()`, `isEnabled()`, `getConfig()`
-- **Consequences**:
-  - **Benefits**:
-    - Emergency disable without code changes (<1 minute via env var)
-    - Gradual rollout (10% → 50% → 100% of users)
-    - A/B testing capability
-    - Cost control monitoring before full rollout
-    - Rollback procedures documented in `.claude/docs/ROLLBACK_PROCEDURES.md`
-  - **Trade-offs**:
-    - Code must check flags before executing feature logic (adds complexity)
-    - Config drift if env vars and config.yaml diverge
-    - Documentation overhead to maintain feature flag lifecycle
-
-## [ADR-042] Party Mode Routing Integration
-
-- **Date**: 2026-01-28
-- **Status**: Accepted
-- **Context**: Party Mode was fully implemented (151 tests, 23 files, 3000+ lines of docs, party-orchestrator agent created) but Router had NO routing logic to activate it. When users said "Party Mode" or "multi-agent collaboration", Router didn't know to spawn party-orchestrator, making the feature effectively invisible.
-- **Decision**: Add Party Mode keyword detection and routing to Router's decision workflow:
-  1. **Intent Classification** (router-decision.md Step 2.1): Added "Party Mode" intent with keywords: "party mode", "multi-agent collaboration", "discuss with team", "debate", "consensus"
-  2. **Agent Selection** (router-decision.md Step 6): Added party-orchestrator to Orchestrator Agents section with complete spawn example showing Task() call with PROJECT_ROOT, TaskUpdate protocol, and Team coordination instructions
-  3. **Routing Table** (CLAUDE.md Section 3): Updated party-orchestrator row to include activation keywords: "(party mode, consensus, debate, team discussion)"
-- **Consequences**:
-  - **Benefits**:
-    - Party Mode now discoverable via natural language ("start Party Mode", "discuss with team")
-    - Router automatically spawns party-orchestrator instead of individual agents
-    - Consistent with existing orchestrator patterns (master-orchestrator, swarm-coordinator)
-    - Maintains post-creation integration checklist pattern (routing → catalog → assignment → validation)
-  - **Trade-offs**:
-    - Router must distinguish between "multi-agent collaboration" (party-orchestrator) vs. parallel agent spawning (multiple Task() calls)
-    - Additional routing complexity for disambiguation
-  - **Implementation Notes**:
-    - Routing logic follows Orchestrator Spawn Template (CLAUDE.md Section 2)
-    - party-orchestrator requires Task() tool to spawn team members
-    - Uses opus model for complex multi-agent coordination
-- **Related Issues**: Resolves post-creation integration gap identified in learnings.md (artifacts invisible without routing integration)
-- **Related ADRs**: ADR-041 (Feature Flags for Party Mode rollout control)
-
-## [ADR-043] MCP Tool Removal from Spawn Templates
-
-- **Date**: 2026-01-28
-- **Status**: Accepted
-- **Context**: Agent definitions referenced `mcp__sequential-thinking__sequentialthinking` tool but MCP server was not configured in settings.json, causing tool unavailability errors. This affected 12+ agent files and spawn templates in CLAUDE.md.
-- **Decision**: Remove `mcp__sequential-thinking__sequentialthinking` from all spawn templates and agent allowed_tools arrays. Add guidance comments directing users to use `Skill({ skill: 'sequential-thinking' })` as fallback when MCP servers are not configured.
-- **Consequences**:
-  - **Benefits**:
-    - Eliminates tool unavailability errors for agents
-    - Provides clear fallback mechanism via Skill() tool
-    - Maintains sequential thinking capability without MCP dependency
-    - Adds Tool Selection Notes documenting MCP vs core tool distinction
-  - **Trade-offs**:
-    - Users must explicitly configure MCP servers if they want MCP tools
-    - Skill-based sequential thinking may have different UX than MCP tool version
-  - **Implementation**:
-    - Phase 1: Removed MCP tool from 12 agent definition files
-    - Phase 2: Updated Universal Spawn Template and Orchestrator Spawn Template in CLAUDE.md
-    - Added Tool Selection Notes section explaining MCP requirements
-  - **Related Files**:
-    - `.claude/CLAUDE.md` (spawn templates updated)
-    - `.claude/context/plans/agent-error-fixes-plan-2026-01-28.md` (implementation plan)
-
----
-
-## [ADR-054] Memory System Enhancement Strategy
-
-- **Date**: 2026-01-28
-- **Status**: Proposed → **SPECIFICATION COMPLETE** (2026-01-28)
-- **Context**: Research shows graph-based and hybrid memory approaches outperform monolithic RAG by 45%. Current file-based system lacks semantic search and entity tracking. Multi-agent systems require relationship-aware memory (e.g., "What tasks is developer agent working on?") which file-based grep cannot provide. Industry analysis of MAGMA, Mem0, H-MEM, and CrewAI memory systems reveals hybrid architectures as optimal balance.
-- **Decision**: Adopt hybrid ChromaDB (vector) + SQLite (entities) + files (structured) approach for $0/mo with ~84-89% accuracy. Implementation phases:
-  1. **Phase 1 (Hybrid Memory):** Add ChromaDB embeddings for learnings.md (semantic search), create SQLite schema for entities (agents, tasks, skills) + relationships, migrate existing task tracking to entity memory. Backward compatible - keep files as source of truth, add indexes.
-  2. **Phase 2 (Semantic Cache):** Add GPTCache or in-memory semantic cache to reduce LLM costs by 40-60%.
-  3. **Phase 3 (Memory Tiers):** Define STM (session context), LTM (persistent files), episodic (task traces), create ContextualMemory aggregation layer.
-- **Consequences**:
-  - **Benefits**:
-    - **+10-15% accuracy improvement** (file-only 74% → hybrid 84-89%) [Validated - adjusted from +15-20%]
-    - Zero operational cost (self-hosted ChromaDB + SQLite)
-    - Semantic search capabilities ("find similar past issues")
-    - Entity relationship queries ("What tasks are blocked?")
-    - Backward compatible (existing files remain, new capabilities added)
-    - **<10ms query latency** (SQLite + ChromaDB in-process) [Validated - better than initial <100ms]
-  - **Trade-offs**:
-    - ⚠️ **4-5 weeks implementation effort** for Phase 1 [Validated - adjusted from 2-3 weeks]
-    - ⚠️ New dependencies: ChromaDB (~5MB), better-sqlite3 (~2MB)
-    - ⚠️ Complexity increase (3 storage layers vs 1)
-    - ⚠️ Embedding generation cost (one-time, **$0.01** for existing corpus) [Validated]
-- **Alternatives Considered**:
-  - **Pinecone ($250/mo):** Rejected due to cost (prohibitive for open-source project)
-  - **Pure file-based:** Insufficient for semantic search and relationship queries
-  - **Graph DB (Neo4j):** Too complex for MVP, save for Phase 3 (MAGMA-style multi-graph)
-  - **Weaviate:** Good alternative to ChromaDB but similar complexity, no clear advantage
-- **Research Sources**: 11 sources including MAGMA (arXiv:2410.10425), ChromaDB/Pinecone benchmarks, CrewAI memory system, Mem0, H-MEM, SEDM
-- **Related Files**:
-  - `.claude/context/artifacts/research-reports/memory-patterns-research-2026-01-28.md` (full research)
-  - `.claude/context/plans/crewai-analysis-integration-plan.md` (implementation plan)
-  - **`.claude/context/artifacts/specs/memory-system-enhancement-spec.md`** (comprehensive specification)
-
----
-
-## [ADR-055] Event-Driven Orchestration Adoption
-
-- **Date**: 2026-01-28
-- **Status**: Proposed → **SPECIFICATION COMPLETE** (2026-01-28)
-- **Context**: 72% of enterprise AI projects use event-driven multi-agent systems (Gartner 2026). Current hook system is synchronous/blocking, limiting scalability and observability. Research shows hybrid approach (imperative router + event-driven agents) offers best trade-offs for governance + scalability. OpenTelemetry is industry standard for observability (95% adoption in surveyed systems).
-- **Decision**: Implement centralized EventBus as optional add-on, preserving current hook system. Adopt OpenTelemetry for observability. Implementation phases:
-  1. **Phase 1 (EventBus Foundation):** Create EventBus class (centralized EventEmitter), define event schema (AgentEvent, TaskEvent, ToolEvent, MemoryEvent, LLMEvent, MCPEvent), add unit tests.
-  2. **Phase 2 (OpenTelemetry Integration):** Add OpenTelemetry JavaScript SDK, create spans for agent execution/task execution/tool calls, add span context propagation (parent → child agents), export traces to Arize Phoenix (Docker deployment).
-  3. **Phase 3 (Event-Aware Tasks):** Modify TaskUpdate to emit TASK_COMPLETED event, add event subscriptions for dependent task unblocking. Backward compatible.
-- **Consequences**:
-  - **Benefits**:
-    - ✅ Non-breaking (additive only, existing hooks/tasks continue to work)
-    - ✅ Enables async agent communication (10x throughput vs synchronous blocking)
-    - ✅ Industry-standard observability (OpenTelemetry compatible with all tools)
-    - ✅ End-to-end tracing across multi-agent workflows (correlation by trace ID)
-    - ✅ Zero cloud costs (self-hosted EventBus + Arize Phoenix)
-    - ✅ Event stream = audit log (debugging, compliance)
-  - **Trade-offs (VALIDATED)**:
-    - ⚠️ Medium complexity (EventBus ~200 LOC, OpenTelemetry SDK ~5MB)
-    - ⚠️ **5-35% latency overhead** (config-dependent, target 5-10% with 1-10% sampling)
-    - ⚠️ **$50-500/mo infrastructure costs** (Docker $0, Kubernetes $200-500)
-    - ⚠️ Learning curve for event-driven patterns
-    - ⚠️ Race conditions possible (event ordering, async coordination)
-- **Alternatives Considered**:
-  - **Distributed event mesh (Kafka):** Overkill for current scale, high operational complexity
-  - **Replace hooks entirely:** Too risky, breaking changes for existing system
-  - **Continue hook-only approach:** Limits scalability, poor observability
-  - **LangFuse:** Good but less OpenTelemetry-native than Arize Phoenix
-  - **Datadog:** Excellent features but enterprise pricing ($$$)
-- **Architectural Pattern**: Hybrid orchestration - Router uses imperative spawning (governance), agents communicate via events (scalability). This combines control flow (Router explicit Task() calls) with data flow (agents publish/subscribe to events).
-- **Research Sources**: 24 sources including CrewAI Flow framework, OpenTelemetry docs, Arize Phoenix, LangFuse, Datadog APM, XState, Martin Fowler's event-driven architecture patterns, IEEE Intelligent Systems multi-agent observability survey
-- **Specification**: `.claude/context/artifacts/specs/event-bus-integration-spec.md` (v1.0, READY FOR IMPLEMENTATION)
-- **Related Files**:
-  - `.claude/context/artifacts/research-reports/event-orchestration-research-2026-01-28.md` (full research)
-  - `.claude/context/artifacts/research-reports/hook-event-comparison-analysis-2026-01-28.md` (hooks + events coexistence)
-  - `.claude/context/plans/crewai-analysis-integration-plan.md` (implementation plan)
-
----
-
-## [ADR-056] Production Observability Tool Selection
-
-- **Date**: 2026-01-28
-- **Status**: Proposed → **SPECIFICATION COMPLETE** (2026-01-28)
-- **Context**: Production systems require tracing/monitoring for debugging multi-agent workflows, LLM cost tracking, and performance analysis. Research compared LangFuse (open-source, LLM-focused), Datadog (enterprise, full-stack), and Arize Phoenix (open-source, OpenTelemetry-native). OpenTelemetry is industry standard for vendor-agnostic observability.
-- **Decision**: Recommend Arize Phoenix (self-hosted) for OpenTelemetry-first approach. Implementation via Docker deployment (development) and Kubernetes (production) with OpenTelemetry JavaScript SDK exporter.
-- **Consequences**:
-  - **Benefits**:
-    - ✅ Free software (self-hosted, open-source under Apache 2.0)
-    - ✅ Vendor-agnostic (OpenTelemetry-native, can switch to Datadog/Jaeger later)
-    - ✅ Full control over data (no cloud vendor access)
-    - ✅ LLM-specific features (prompt analysis, embeddings visualization, cost tracking)
-    - ✅ Docker-based deployment (single command: `docker run`)
-    - ✅ Trace visualization for multi-agent workflows
-  - **Trade-offs (VALIDATED)**:
-    - ⚠️ Self-hosting operational burden (Docker container management, updates)
-    - ⚠️ **5-10% latency overhead** (with 1-10% sampling, batch processing)
-    - ⚠️ **$50-500/mo infrastructure** (Docker $0, shared node $80-150, dedicated $200-500)
-    - ⚠️ No enterprise support (community-driven, GitHub issues only)
-    - ⚠️ Requires storage for trace data (50GB for 7-day retention)
-- **Alternatives Considered**:
-  - **LangFuse:** Good LLM features but less OpenTelemetry-native (custom SDK), cloud tier has usage limits. Alternative if LLM focus > vendor-agnostic priority.
-  - **Datadog:** Excellent UI/UX and enterprise support, but expensive ($15-$23/host/month + $0.10/GB logs). Rejected due to cost for open-source project.
-  - **Jaeger:** OpenTelemetry-native, free, but lacks LLM-specific features (no prompt analysis, embeddings). Alternative for generic tracing.
-  - **Grafana Cloud:** Good for metrics/logs, but weak on LLM tracing. Alternative for infra monitoring.
-  - **No observability:** Unacceptable for production multi-agent systems (debugging impossible).
-- **Deployment Options**:
-  - **Development:** Docker Compose (`docker-compose up -d`) - $0/mo
-  - **Staging:** Shared Kubernetes node - $80-150/mo
-  - **Production:** Dedicated Kubernetes node (2 cores, 4GB RAM, 50GB storage) - $200-500/mo
-- **Vendor Lock-In Mitigation**: OpenTelemetry standard means traces can be exported to any OTLP-compatible backend (Jaeger, Datadog, Grafana, Honeycomb) without code changes. Phoenix is swappable.
-- **Research Sources**: Arize Phoenix documentation, OpenTelemetry JavaScript SDK, LangFuse docs, Datadog APM, Jaeger, observability tool comparison matrix (cost/latency/complexity)
-- **Specification**: `.claude/context/artifacts/specs/event-bus-integration-spec.md` (Section 10: Arize Phoenix Deployment)
-- **Related ADRs**: ADR-055 (Event-Driven Orchestration Adoption) - Phoenix visualizes event-driven workflows
-- **Related Files**:
-  - `.claude/context/artifacts/research-reports/event-orchestration-research-2026-01-28.md` (Section 5: Production Observability Tools)
-  - `.claude/context/plans/crewai-analysis-integration-plan.md` (Phase 3.2: Research validation for event system enhancements)
-
----
-
-## [ADR-057] Agent Enhancement Strategy (crewAI Patterns)
-
-- **Date**: 2026-01-28
-- **Status**: Proposed
-- **Context**: Comparative analysis of crewAI (Python) vs Agent-Studio (JavaScript) agent systems revealed 6 HIGH priority gaps in Agent-Studio. crewAI has richer agent identity (Role/Goal/Backstory), dual LLM architecture (60-70% cost savings), built-in execution limits (runaway prevention), and delegation tools. Agent-Studio has more specialized agents (45 vs ~5), Router governance (security), and Party Mode (unique collaboration feature).
-- **Decision**: Adopt P1 enhancements from crewAI patterns while preserving Agent-Studio's core strengths:
-  1. **P1.1 Structured Identity Pattern**: Add optional `role`, `goal`, `backstory` fields to agent YAML frontmatter
-  2. **P1.2 Execution Limits**: Add `execution_limits` block with `max_iter`, `max_execution_time`, `max_retry`
-  3. **P1.3 Dual LLM Support**: Add `execution_model` field for tool-call LLM (separate from planning)
-- **Consequences**:
-  - **Benefits**:
-    - Consistent agent personality (structured identity)
-    - 60-70% cost reduction on tool-heavy workflows (dual LLM)
-    - Runaway prevention (execution limits)
-    - All backward compatible (optional fields, default to current behavior)
-  - **Trade-offs**:
-    - Additional YAML fields increase agent definition complexity
-    - Dual LLM requires model selection logic in Task spawn
-    - Execution limits require monitoring hook for enforcement
-  - **Preserved Strengths**:
-    - 45+ specialized agents (NOT generalizing to crewAI-style few agents)
-    - Router governance (NOT adopting full agent autonomy)
-    - Skill composition (unique to Agent-Studio)
-    - Party Mode (unique multi-agent collaboration)
-    - File-based agents (human-readable, git-tracked)
-  - **Not Adopting (Trade-off Against Governance)**:
-    - Full agent delegation (DelegateWorkTool) - conflicts with Router-first
-    - Agent-to-agent questions (AskQuestionTool) - Router should mediate
-- **Implementation Path**:
-  - Phase 1: P1.1 + P1.2 + P1.3 (~10 days total)
-  - Phase 2: Consider hybrid delegation for specific use cases (future ADR)
-- **Related Files**:
-  - `.claude/context/artifacts/research-reports/agent-comparison-analysis-2026-01-28.md` (full comparison)
-  - `.claude/context/plans/crewai-analysis-integration-plan.md` (implementation plan)
-
----
-
-## [ADR-058] Enhancement Prioritization Strategy (P1/P2/P3)
-
-- **Date**: 2026-01-28
-- **Status**: Accepted
-- **Context**: Comprehensive analysis of crewAI vs Agent-Studio (Tasks #11-#18) identified 17 potential enhancements across Memory, Events, Agents, and Workflows. Need prioritization framework to allocate resources effectively.
-- **Decision**: Adopt 3-tier prioritization with parallel implementation strategy:
-  - **P1 (Must Have - 6 features):** ChromaDB, SQLite Entities, EventBus, OpenTelemetry, Structured Identity, Execution Limits
-  - **P2 (Should Have - 7 features):** Dual LLM, Workflow Persistence, Context Chaining, Routing DSL, Delegation Tool, MCP Discovery, Phoenix Production
-  - **P3 (Nice to Have - 4 features):** TypeScript Decorators, Process Types, Personality Profiles, Visual Editor
-- **Consequences**:
-  - **Benefits**:
-    - Clear implementation order based on validated research (35+ sources)
-    - Parallel development possible (Memory + Events independent)
-    - 8-10 weeks for P1 (2 developers), 8-12 weeks for P2
-    - Total operational cost: $0-150/mo (P1), $200-500/mo (P2)
-    - User-facing improvement (+10-15% accuracy) in P1
-    - Observability foundation established in P1
-  - **Trade-offs**:
-    - P2/P3 features delayed (Dual LLM cost savings deferred)
-    - Parallel development requires 2+ developers
-    - Phoenix hosting adds operational cost
-  - **Key Decision Points**:
-    - Memory vs Events first: PARALLEL (both foundational, no dependency)
-    - Arize Phoenix vs alternatives: Phoenix (OpenTelemetry-native, $0-500/mo)
-    - Agent delegation: P2 with guardrails (preserve Router governance)
-- **Implementation Strategy**: Scenario C (Parallel) - Memory and Events developed concurrently
-- **Timeline**:
-  - Q1 (Weeks 1-12): P1 implementation + phased rollout
-  - Q2 (Weeks 13-24): P2 implementation + production Phoenix
-  - Q3+: P3 based on user demand
-- **Related Files**:
-  - `.claude/context/artifacts/plans/enhancement-prioritization-matrix.md` (detailed matrix)
-  - `.claude/context/artifacts/specs/memory-system-enhancement-spec.md`
-  - `.claude/context/artifacts/specs/event-bus-integration-spec.md`
-  - ADR-054, ADR-055, ADR-056, ADR-057 (foundational decisions)
-
-## [ADR-059] P1 Implementation Timeline Strategy
-
-- **Date**: 2026-01-28
-- **Status**: Accepted
-- **Context**: 32 P1 implementation tasks (Tasks #22-#53) across 3 systems (Memory, Events, Agents) require detailed scheduling, resource allocation, milestone definitions, and go/no-go checkpoints for successful execution. Need to decide timeline (sequential vs parallel), rollout strategy (big bang vs phased), and contingency plans.
-- **Decision**: Adopt 10-week parallel development timeline with 4 milestones, 4 go/no-go checkpoints, phased rollout (10% → 50% → 100%), and 4 contingency scenarios:
-  1. **Timeline:** 10 weeks (Jan 29 - Apr 8, 2026)
-     - Weeks 1-2: Foundation (ChromaDB + EventBus in parallel)
-     - Weeks 3-4: Core features (Entity extraction + OpenTelemetry)
-     - Weeks 5-6: Integration (Sync layer + Agent enhancements)
-     - Weeks 7-8: Testing + Documentation + 10% rollout
-     - Weeks 9-10: Phased rollout (50% → 100%) + Stabilization
-  2. **Resource Allocation:** 2 developers in parallel (Developer 1 = Memory, Developer 2 = Events) + part-time QA/DevOps
-  3. **Milestones:**
-     - M1 (Week 2): Foundation Complete (ChromaDB + EventBus operational)
-     - M2 (Week 4): Core Features Complete (Memory 70% + OpenTelemetry integrated)
-     - M3 (Week 6): Agent Enhancements Complete (Identity + Execution limits)
-     - M4 (Week 8): Production Ready (All tests pass + 10% rollout stable)
-  4. **Go/No-Go Checkpoints:**
-     - Week 2: Continue with Memory System? (latency <10ms or evaluate alternative)
-     - Week 4: Continue with Event System? (overhead <15% or optimize/defer Phoenix)
-     - Week 6: Proceed to Integration? (all features functional, <10 P1 bugs)
-     - Week 8: Deploy to Production (10% rollout)? (all success criteria met, executive approval)
-  5. **Rollout Strategy:** Phased rollout with 48-hour stability checkpoints
-     - Week 8: 10% rollout (select agents)
-     - Week 9 (Mon): 50% rollout (if 10% stable for 48 hours)
-     - Week 9 (Fri): 100% rollout (if 50% stable for 48 hours)
-     - Rollback: Feature flags (<1 minute), not git revert
-  6. **Contingency Plans:**
-     - Scenario A: Memory behind schedule (Week 3) → Defer entity memory to P2
-     - Scenario B: Event overhead too high (Week 4) → Reduce sampling to 1%, defer Phoenix to P2
-     - Scenario C: Major bug discovered (Week 7+) → Pause rollout, allocate both developers to fix, extend 1 week
-     - Scenario D: Rollout issues (Week 9) → Immediate rollback, investigate, retry at 10%
-- **Consequences**:
-  - **Benefits**:
-    - Parallel development (2 developers) = 5-6 weeks vs 10-12 weeks sequential (halves timeline)
-    - Phased rollout reduces risk (10% → 50% → 100% with stability checkpoints)
-    - Go/No-Go checkpoints with specific no-go actions prevent "sunk cost fallacy"
-    - Contingency plans reduce panic during incidents (pre-defined responses)
-    - 4 milestones with acceptance + exit criteria enable progress tracking
-    - Risk monitoring matrix (8 high-priority risks) with weekly reviews
-    - Communication plan (4 levels: daily standups, weekly status, bi-weekly stakeholder, ad-hoc incidents)
-  - **Trade-offs**:
-    - Parallel development requires coordination overhead (sync points at Week 3-4)
-    - Phased rollout extends timeline by 2 weeks (vs big bang deployment)
-    - Go/No-Go checkpoints may delay timeline if no-go triggered (acceptable - prevents larger failures)
-    - Resource requirements: 2 developers minimum (not 1 developer sequential)
-  - **Key Decisions**:
-    - **Parallel vs Sequential:** PARALLEL (halves timeline, minimal coordination overhead)
-    - **Rollout Strategy:** PHASED (10% → 50% → 100%) vs big bang (too risky)
-    - **Rollback Mechanism:** Feature flags (<1 minute) vs git revert (too slow for production)
-    - **Milestone Structure:** Acceptance criteria (functional) + Exit criteria (quality) vs just "done" (insufficient)
-    - **Go/No-Go Actions:** Specific responses ("defer X to P2") vs generic ("re-evaluate") - specific is actionable
-- **Alternatives Considered**:
-  - **Sequential Development:** 10-12 weeks (rejected - too slow)
-  - **Big Bang Deployment:** All agents at once (rejected - too risky, no rollback option)
-  - **Git Revert Rollback:** Revert commits on failure (rejected - takes >5 minutes, unacceptable for production)
-  - **No Go/No-Go Checkpoints:** Trust developers to self-assess (rejected - sunk cost fallacy risk)
-- **Implementation**: `.claude/context/artifacts/plans/p1-detailed-implementation-plan.md` (comprehensive 10-week plan with all details)
-- **Related ADRs**: ADR-058 (Prioritization Strategy), ADR-054-057 (P1 feature decisions)
-
----
-
-## [ADR-060] Upgrade Analysis Plan - Plugin Marketplace vs Enterprise Framework (2026-01-29)
-
+**Date:** 2026-02-05
+**Status:** Accepted
 **Context:**
 
-- Archived codebase is a Claude Code Plugins marketplace (72 plugins, 108 agents, 129 skills, three-tier model strategy)
-- Current codebase is Agent-Studio Enterprise Framework (multi-agent orchestrator, router-first architecture)
-- Different architectures serve different purposes but share agent/skill concepts
+Comprehensive audit of 8 framework subsystems identified 47 issues (5 CRITICAL, 8 HIGH, 12 MEDIUM). Initial health score was 78/100. After remediation, health score improved to 95/100.
 
 **Decision:**
-Execute comprehensive upgrade analysis following Phase 0 research protocol (ADR-045):
 
-1. Research plugin architecture patterns (minimum 3 external sources)
-2. Create detailed inventories of both systems
-3. Extract valuable patterns (progressive disclosure, three-tier model strategy, plugin granularity)
-4. Identify gaps and prioritize enhancements (P1/P2/P3)
-5. Create implementation roadmap with quick wins
+1. **Establish 5-Step Verification Protocol** for all feature claims
+2. **Archive completed audit reports** to `.claude/audit/` directory
+3. **Record all learnings** in memory system for future sessions
+4. **Create ADRs** for all architectural decisions made during fixes
 
-**Rationale:**
+**Domains Audited:**
 
-- Plugin marketplace has proven patterns for agent organization and skill delivery
-- Progressive disclosure pattern could reduce token usage in our Skill() tool
-- Three-tier model strategy (Opus/Sonnet/Haiku) aligns with our spawning protocol
-- Gap analysis will reveal missing domain agents and skills
-- Systematic approach ensures no valuable patterns are missed
-
-**Alternatives Considered:**
-
-1. ❌ Direct port of plugin architecture → Incompatible with router-first orchestration
-2. ❌ Cherry-pick features without research → Risks missing integration dependencies
-3. ✅ Systematic research → Plan → Validate → Implement (EVOLVE workflow)
+- Memory System (93/100 -> 100/100)
+- Hooks System (88/100 -> 100/100)
+- Agents System (95/100)
+- Skills System (60/100 -> 95/100)
+- Workflows System (75/100 -> 95/100)
+- Creators System (85/100 -> 100/100)
+- Tools & Config (85/100)
+- Runtime State (70/100 -> 90/100)
 
 **Consequences:**
 
-- **Positive**: Comprehensive understanding of both architectures, prioritized roadmap, validated patterns
-- **Negative**: 21-29 hours research before implementation (mitigated by preventing failed integrations)
-- **Risks**: Plugin patterns may not translate directly (mitigated by Phase 0 technical feasibility gate)
-
-**Implementation Plan:**
-
-- Phase 0: Research (6-8 hours) - MANDATORY research with constitution checkpoint
-- Phase 1: Inventory & Gap Analysis (4-6 hours) - Parallel execution
-- Phase 2: Pattern Extraction (5-7 hours) - Extract 3+ valuable patterns
-- Phase 3: Prioritization (3-4 hours) - Create P1/P2/P3 roadmap
-- Phase 4: Recommendations (2-3 hours) - Executive summary + quick wins
-
-**Success Metrics:**
-
-- Constitution checkpoint passed (all 4 gates)
-- > =10 missing capabilities identified
-- > =3 valuable patterns extracted
-- P1/P2/P3 roadmap created
-- > =3 quick wins identified (<4 hours each)
-
-**Status:** Plan created, ready for Phase 0 research execution
+- 11 critical/high issues fixed
+- 276 tests passing
+- System operational at 95/100 health
+- Comprehensive audit trail documented
 
 ---
 
-## [ADR-061] Transformation Strategy - Plugin Capabilities to Framework Artifacts (2026-01-29)
+## [ADR-087] AUTO_COMPRESSION_PHASE_3 Intentional Opt-In Design
 
+**Date:** 2026-02-05
+**Status:** Accepted
 **Context:**
 
-- User requested upgrade analysis comparing archived Claude Code Plugins marketplace (72 plugins, 108 agents, 129 skills) with our Agent-Studio Enterprise Framework
-- Initial plan focused on "gap analysis" and potential "adoption" of plugin patterns
-- User provided critical architectural constraints: Transform (not install), Update (not duplicate), Keep current architecture, Integration focus
-
-**Problem:**
-
-- Plugin marketplace uses granular, user-installable architecture (marketplace model)
-- Our system uses centralized, router-first architecture (enterprise orchestration model)
-- Direct adoption of plugin architecture conflicts with our governance model
-- Need strategy to extract VALUE without adopting incompatible architecture
+Audit revealed AUTO_COMPRESSION_PHASE_3 is disabled by default. Initial assessment marked this as potential issue.
 
 **Decision:**
-Adopt **Transformation Strategy** for upgrade analysis:
 
-1. **Transform, Don't Install**: Extract capabilities from plugins → transform into our artifact types (skills/agents/hooks/workflows/schemas)
-2. **Update, Don't Duplicate**: Prioritize enhancing EXISTING artifacts (>=60% overlap) over creating parallel systems
-3. **No Plugin Architecture**: Do NOT adopt plugin installation/isolation model unless proven significantly better
-4. **Keep Current Architecture**: Router-first, centralized governance, lazy-load MCP unchanged
-5. **Integration Focus**: Mine PATTERNS and CAPABILITIES, transform into OUR artifact types
+Confirmed as **intentional design**, NOT a bug:
 
-**Transformation Mapping Decision Tree:**
-
-```
-Plugin Component → Framework Artifact:
-├─ Capability/tool → UPDATE existing SKILL (>=60% overlap) OR CREATE new skill (unique domain)
-├─ Agent pattern → UPDATE existing AGENT (same role) OR CREATE new agent (distinct specialization)
-├─ Validation logic → EXTRACT to HOOK (.claude/hooks/)
-├─ Orchestration → EXTRACT to WORKFLOW (.claude/workflows/)
-├─ Data structure → EXTRACT to SCHEMA (.claude/schemas/)
-└─ Utility code → EXTRACT to LIB/TOOLS (.claude/lib/, .claude/tools/)
-```
-
-**Update vs Create Criteria:**
-
-- UPDATE if existing artifact covers >=60% of capability (maintain cohesion)
-- CREATE if new domain/specialization (clear separation of concerns)
-- EXTRACT if cross-cutting concern (hooks/workflows/schemas/utilities)
-
-**Alternatives Considered:**
-
-1. ❌ **Direct Plugin Port**: Copy plugin structure to our codebase → Incompatible with router-first governance
-2. ❌ **Plugin Installation Architecture**: Add plugin loader/isolation → Conflicts with centralized control model
-3. ❌ **Hybrid Plugin+Framework**: Support both models → Excessive complexity, governance confusion
-4. ✅ **Transformation Strategy** (CHOSEN): Extract capabilities, transform to our artifacts, preserve architecture
+1. Default is `off` - this is an opt-in advanced feature
+2. When enabled (`AUTO_COMPRESSION_PHASE_3=1`), writes reminder files for Router/agents
+3. Documented in `.claude/docs/@ENVIRONMENT_CONFIG.md` line 100
+4. Explanation in `MEMORY_SYSTEM.md` lines 135-142
 
 **Consequences:**
 
-**Positive:**
+- No changes made (working as designed)
+- Marked as "WON'T FIX" in issues.md
+- Documentation verified accurate
 
-- Preserves router-first, centralized governance architecture
-- Enhances existing artifacts (maintains cohesion, avoids duplication)
-- Enables capability extraction without architectural changes
-- Clear prioritization: Updates (P1) → Creation (P2) → Patterns (P3)
-- Respects user's architectural constraints explicitly
+---
 
-**Negative:**
+## [ADR-086] Workflow Registry Centralization Pattern
 
-- Cannot adopt plugin granularity benefits (token efficiency from small plugins)
-- Transformation requires more effort than direct port (analysis + mapping + integration)
-- Some plugin patterns may not translate (if tightly coupled to marketplace architecture)
+**Date:** 2026-02-05
+**Status:** Accepted
+**Context:**
 
-**Risks:**
+No `workflow-registry.json` existed, preventing programmatic workflow discovery by orchestrators.
 
-- Risk: Transformation may miss valuable plugin patterns
-  - Mitigation: Phase 2 pattern extraction with transformation guidance
-- Risk: Updates to existing artifacts may introduce complexity
-  - Mitigation: 60% overlap threshold ensures updates are cohesive
-- Risk: Plugin architecture may prove superior for our use case
-  - Mitigation: "unless proven significantly better" escape clause allows re-evaluation
+**Decision:**
+
+1. **Create generator script** at `.claude/tools/cli/generate-workflow-registry.cjs`
+2. **Scan** all `.md` and `.yaml` files in `.claude/workflows/`
+3. **Extract metadata**: category, type, description, phases, requiredAgents, triggers, status
+4. **Detect workflow types** from content (state-machine, phased, parallel, sequential)
+5. **Generate registry** at `.claude/context/artifacts/workflow-registry.json`
+
+**Registry Structure:**
+
+```json
+{
+  "version": "1.0.0",
+  "lastUpdated": "ISO timestamp",
+  "summary": { "total": 36, "byCategory": {...}, "byType": {...}, "byStatus": {...} },
+  "workflows": { "name": { "path", "category", "type", "description", ... } }
+}
+```
+
+**Consequences:**
+
+- 36 workflows now cataloged
+- Programmatic discovery enabled
+- Orchestrators can dynamically select workflows
+- 12 TDD tests validate generator
+
+---
+
+## [ADR-085] Creator State TTL Alignment (3 Minute Standard)
+
+**Date:** 2026-02-05
+**Status:** Accepted
+**Context:**
+
+Pre-execute hooks used 10 minute TTL (600000ms), but `unified-creator-guard.cjs` used 3 minute TTL (180000ms). This 7-minute gap created artifact invisibility risk if creation exceeded 3 minutes.
+
+**Decision:**
+
+1. **Align all TTL values** to 3 minutes (`DEFAULT_TTL_MS = 180000`)
+2. **Add environment variable** `CREATOR_STATE_TTL_MS` for runtime configuration
+3. **Update all 6 pre-execute hooks**: skill-creator, agent-creator, hook-creator, workflow-creator, template-creator, schema-creator
+4. **Implement post-execute cleanup** in all 6 hooks (clear `active-creators.json` state)
 
 **Implementation:**
 
-- Phase 0: Research transformation patterns (not plugin adoption)
-- Phase 1: Map capabilities to artifact types (skill/agent/hook/workflow/schema)
-- Phase 2: Extract patterns WITH transformation guidance
-- Phase 3: Prioritize: P1 (updates) → P2 (creation) → P3 (patterns)
-- Phase 4: Concrete transformation examples + quick wins
+```javascript
+const DEFAULT_TTL_MS = 3 * 60 * 1000; // 3 minutes
+const ttl = parseInt(process.env.CREATOR_STATE_TTL_MS || DEFAULT_TTL_MS, 10);
+```
 
-**Status:** Accepted (plan refined with transformation strategy)
-**Date:** 2026-01-29
-**Supersedes:** ADR-060 (upgrade analysis plan) - refined with transformation focus
+**Consequences:**
+
+- Creator workflows properly clean up state
+- No more "stuck" artifacts
+- TTL configurable via environment
+- 95 tests validate fix
 
 ---
 
-## [ADR-062] Spawn Template Extraction Strategy (2026-01-29)
+## [ADR-084] Hook Metrics Collection via Stdin Pattern
 
+**Date:** 2026-02-05
+**Status:** Accepted
 **Context:**
 
-- CLAUDE.md is 51,085 chars (27% over 40k target / 13.1k tokens vs 10k target)
-- Section 2 (SPAWNING AGENTS) contains 18,500 chars (36% of file)
-- Root cause: Verbose spawn templates with 70-line warning boxes repeated 3 times
-- Performance impact: Router loads full CLAUDE.md on every spawn, wasting tokens on repetitive content
+Hook metrics were not being collected despite correct code. Root cause: `metrics-collector-hook.cjs` used `parseHookInputSync()` which only reads from `process.argv[2]`, but Claude Code sends hook input via **stdin**.
+
+**Decision:**
+
+1. **Use `parseHookInputAsync()`** for all PostToolUse hooks
+2. **Never use `parseHookInputSync()`** for modern Claude Code integration
+3. **Make main() async** to support await for stdin reading
+
+**Before:**
+
+```javascript
+const hookInput = parseHookInputSync(); // WRONG - only checks argv[2]
+```
+
+**After:**
+
+```javascript
+const hookInput = await parseHookInputAsync(); // CORRECT - checks stdin
+```
+
+**Consequences:**
+
+- Hook metrics now collecting (6+ entries after fix)
+- Performance monitoring operational
+- 4 tests validate hook wrapper
+- Prevention: New hooks always use `parseHookInputAsync()`
+
+---
+
+## [ADR-083] Skills Index Generator Recursive Scanning Pattern
+
+**Date:** 2026-02-05
+**Status:** Accepted
+**Context:**
+
+Skill index generator at `.claude/tools/cli/generate-skill-index.cjs` only scanned one level deep, ignoring nested directories like `scientific-skills/skills/biopython/`. This caused 142 missing + 138 stale entries in the index.
+
+**Decision:**
+
+1. **Create `scanSkillFilesRecursively(baseDir, relativePath)`** function that traverses all subdirectories
+2. **Preserve full relative paths** (don't strip intermediate directories like `skills/`)
+3. **Update `generateIndex()`** to use recursive scanner when `--scan` flag provided
+4. **Remove stale entries** (e.g., `mobile-ux-reviewer` is an AGENT, not a skill)
+
+**Verification:**
+
+```bash
+find .claude/skills -name "SKILL.md" | wc -l  # Should be 444
+```
+
+**Consequences:**
+
+- 444 SKILL.md files now properly indexed (was 280)
+- 142 scientific-skills entries have correct `skills/` in path
+- 5 TDD tests validate generator
+- Skill discovery works for all skills
+
+---
+
+## [ADR-082] Agents System Audit - Registry Validation and Legacy Tool Migration
+
+**Date:** 2026-02-05
+**Status:** Accepted
+**Context:**
+
+Comprehensive audit of the agents system as part of 100% codebase audit. Scope included:
+
+- Agent file inventory across core/domain/specialized/orchestrators
+- Agent registry validation (compare to filesystem)
+- Legacy tool references (Search, SequentialThinking)
+- Model configuration consistency
+- YAML frontmatter validation
+- Personality integration status
+
+**Findings:**
+
+### 1. Agent Inventory (49 agents)
+
+| Category      | Count | Status |
+| ------------- | ----- | ------ |
+| Core          | 9     | VALID  |
+| Domain        | 23    | VALID  |
+| Specialized   | 13    | VALID  |
+| Orchestrators | 4     | VALID  |
+
+All agents have valid YAML frontmatter with required fields (name, version, description, model, tools, skills).
+
+### 2. Registry Synchronization
+
+- Registry count: 49
+- Filesystem count: 49
+- Orphaned entries: 0
+- Missing entries: 0
+- **Status**: SYNCHRONIZED
+
+### 3. Legacy Tool Migration
+
+**SequentialThinking**: COMPLETE
+
+- All bare references migrated to `Skill({ skill: 'sequential-thinking' })`
+- Verified in nodejs-pro.md, php-pro.md, sveltekit-expert.md
+
+**Search Tool**: MINOR ISSUE
+
+- pm.md line 53 mentions non-existent "Search" tool
+- Should be "WebSearch" or removed (Grep/Glob cover code search)
+
+### 4. Model Configuration
+
+All agents in agent-config.json match their frontmatter:
+
+- planner: opus (match)
+- developer: sonnet (match)
+- qa: opus (match)
+- architect: opus (match)
+- code-reviewer: opus (match)
+- researcher: sonnet (match)
+- reflection-agent: opus (match)
+
+**Decision:**
+
+1. **ACCEPT** current agents system as healthy
+2. **FIX** pm.md line 53 (documentation issue, low priority)
+3. **NO REGENERATION** needed for registry (current)
+4. **NO CHANGES** to agent routing or model configuration
+
+**Consequences:**
+
+- **Positive:**
+  - Agents system validated as healthy
+  - Legacy tool migration confirmed complete
+  - Registry in sync with filesystem
+  - All 49 agents have personality integration
+
+- **Negative:**
+  - One minor documentation issue (pm.md Search reference)
+
+**Report Location:** `.claude/audit/AGENTS-SYSTEM-AUDIT-2026-02-05.md`
+
+---
+
+## [ADR-081] Memory System Architecture Review - Blocking I/O and Resource Cleanup
+
+**Date:** 2026-02-05
+**Status:** Accepted
+**Context:**
+
+Architecture review of memory system was requested to assess:
+
+1. Blocking I/O in `sync-memory-index.cjs` using synchronous DatabaseSync
+2. Dead code cleanup for `audit-trail-integration.cjs`
+3. Memory health check implementation completeness
+4. Resource cleanup (DB connections properly closed)
+
+**Findings:**
+
+### Issue 1: Blocking I/O in sync-memory-index.cjs (ACCEPTABLE)
+
+**Analysis:**
+
+- Hook uses `DatabaseSync` (Node.js 22+ built-in synchronous SQLite)
+- Hook runs as PostToolUse trigger (serialized by Claude Code host)
+- Each tool use completes before the next begins
+- Blocking in this context does NOT block the main agent thread
+
+**Decision:** ACCEPT blocking pattern.
+
+- PostToolUse hooks are inherently serialized by the host
+- Synchronous SQLite ensures atomic entity index updates
+- Converting to async would add complexity without benefit
+- Average execution time: <50ms (measured)
+
+**Pattern established:** Blocking I/O is acceptable in PostToolUse hooks because:
+
+1. Hooks run after tool completion (not during)
+2. Host serializes hook execution
+3. Atomic operations require synchronous completion
+
+### Issue 2: Dead Code - audit-trail-integration.cjs (RETAIN AS DEPRECATED)
+
+**Analysis:**
+
+- File explicitly marked `@deprecated` in JSDoc (line 8)
+- No active consumers found in codebase
+- Test file exists: `tests/lib/memory/audit-trail-integration.test.cjs`
+- Purpose: Model selection audit logging for ADR-075
+
+**Decision:** RETAIN as deprecated, do NOT delete.
+
+- File has comprehensive implementation (488 lines)
+- Tests pass (validates code quality)
+- May be needed for future model selection auditing
+- Cost tracking functionality is valuable for cost governance
+- Mark as "RETAIN_DEPRECATED" in audit reports
+
+### Issue 3: Memory Health Check (FULLY IMPLEMENTED)
+
+**Verification:**
+
+- `memory-health-check.cjs` is 527 lines, fully functional
+- Checks: learnings.md size, codebase_map entries, session counts
+- Integrates: memory-tiers, smart-pruner, memory-dashboard
+- Auto-remediation: archives learnings, prunes codebase_map
+- Metrics: Logs to JSONL with fallback mechanism
+
+**Decision:** NO ACTION NEEDED - implementation is complete.
+
+### Issue 4: Resource Cleanup (PROPERLY IMPLEMENTED)
+
+**Verification:**
+
+1. **contextual-memory.cjs** (lines 896-917):
+   - `close()` method properly closes EntityQuery
+   - Handles shared LanceDB stores (skips close if shared)
+   - Sets references to null after close
+
+2. **entity-query.cjs** (lines 441-445):
+   - `close()` method with `ownDb` flag
+   - Only closes DB if owned by this instance
+   - Prevents double-close issues
+
+3. **lancedb-client.cjs** (lines 504-511):
+   - `close()` method clears all references
+   - Shared stores not closed (managed by MemoryVectorStore.getSharedStore)
+   - `isShared()` method for lifecycle management
+
+**Decision:** NO ACTION NEEDED - resource cleanup is properly implemented.
+
+**Consequences:**
+
+- **Positive:**
+  - No code changes required for this review
+  - Architecture is sound and follows best practices
+  - Previous fixes (ADR-079, ADR-080) already addressed main concerns
+  - All 222 memory tests passing
+
+- **Negative:**
+  - `audit-trail-integration.cjs` remains as dead code (intentionally)
+
+- **Trade-offs:**
+  - Keeping deprecated code vs. future utility
+  - Chose retention for potential cost governance features
+
+**Verification:**
+
+- All 222 memory tests pass
+- No linting errors
+- Architecture patterns validated
+
+**Related ADRs:**
+
+- ADR-079: Memory System Non-Blocking Writes Pattern
+- ADR-080: Memory System Environment Variable Configuration
+- ADR-075: Router Config-Aware Model Selection (audit-trail-integration purpose)
+
+---
+
+## [ADR-079] Memory System Non-Blocking Writes Pattern
+
+**Date:** 2026-02-05
+**Status:** Accepted
+**Context:**
+
+Memory system had write-on-read side effects causing performance and concurrency issues. Every read operation (`loadContextSync`) triggered synchronous writes to `access-stats.json`, doubling I/O overhead and causing potential race conditions when multiple agents read simultaneously.
 
 **Problem:**
 
-- Universal Spawn Template: 11,700 chars (warning box + PROJECT_ROOT + instructions)
-- Identity Integration example: 2,800 chars (AgentParser example + benefits)
-- Orchestrator Spawn Template: 2,900 chars (similar structure to Universal)
-- Total overhead: 18,500 chars (36% of CLAUDE.md)
+- Synchronous `atomicWriteJSONSync` in read path (lines 392-403 of contextual-memory.cjs)
+- Read operations blocked on disk writes (~10-50ms penalty per read)
+- Concurrent reads could cause file corruption (multiple writers)
+- Infinite git churn (every read modifies access-stats.json)
 
 **Decision:**
 
-Adopt **@ file reference** strategy for spawn template extraction:
+Implemented fire-and-forget pattern using `setImmediate()`:
 
-1. **Extract 3 Templates to `.claude/templates/spawn/`:**
-   - `universal-agent-spawn.md` (11.7k chars) - Standard agent spawning
-   - `agent-identity-integration.md` (2.8k chars) - Optional personality enhancement
-   - `orchestrator-spawn.md` (2.9k chars) - Multi-agent coordination
-
-2. **Replace CLAUDE.md Section 2 with @ References:**
-   - Brief intro + template reference (300 chars per template)
-   - Keep Golden-Path Example (1.8k chars - Router learning value)
-   - New Section 2 size: 3.5k chars (down from 18.5k)
-
-3. **Template Structure:**
-   - YAML frontmatter metadata (template_type, use_cases, model_selection, requires)
-   - Full template content with code blocks
-   - Related templates cross-references
-
-4. **Router Loading Mechanism:**
-   - Router reads CLAUDE.md Section 2 (sees @ references)
-   - Router uses Read tool to load template file: `Read({ file_path: '.claude/templates/spawn/universal-agent-spawn.md' })`
-   - Template content (11.7k chars) loaded into Router context
-   - Router spawns agent with full template
-
-**Rationale:**
-
-**Why @ File References (Not TOON):**
-
-- Research (Task #3) showed @ references are optimal for static spawn templates
-- TOON (Type Object Notation) adds lookup overhead for no benefit with static content
-- @ references map directly to file paths (Router has Read tool whitelisted)
-- Zero runtime overhead (direct file load)
-- IDE support (go-to-definition, autocomplete) works with file paths
-
-**Why Extract These 3 Templates:**
-
-- High duplication: Warning box repeated 3 times (15.2k chars)
-- Static content: Spawn templates rarely change (good candidates for extraction)
-- Clear boundaries: Each template is self-contained unit
-- Significant impact: 18.5k char reduction (36% of CLAUDE.md)
-
-**Why Keep Golden-Path Example:**
-
-- Router learning tool (teaches by example)
-- Shows parallel spawning (PLANNER + SECURITY-ARCHITECT)
-- Demonstrates real-world routing decision
-- Only 1.8k chars (worth the cost for learning value)
+1. **Non-Blocking Writes**: Wrapped `atomicWriteJSONSync` in `setImmediate()` callback
+2. **Best-Effort Semantics**: Access stats writes are fire-and-forget (failures don't block reads)
+3. **Preserved Behavior**: Stats still update, just asynchronously
+4. **Zero API Changes**: No changes to function signatures or return types
 
 **Alternatives Considered:**
 
-1. ❌ **Inline Compression**: Shorten text, remove whitespace
-   - Only achieves 30% reduction (vs 36% with extraction)
-   - Reduces readability and maintainability
-
-2. ❌ **TOON References**: Use abstract object notation
-   - Adds lookup layer (complexity)
-   - No performance advantage for static templates
-   - Harder to debug (abstraction obscures source)
-   - Research showed @ references superior for this use case
-
-3. ❌ **Partial Extraction**: Extract only warning box
-   - Misses 3.3k chars from Identity + Orchestrator examples
-   - Still leaves Section 2 at 12k chars (24% of file)
-   - Less maintainable (warning box duplicated)
+1. **Option A: Default ACCESS_TRACKING_ENABLED to false**
+   - Rejected: Loses valuable access frequency data for memory pruning
+2. **Option B: Batched writes (debounce/throttle)**
+   - Rejected: More complex, requires state management, doesn't eliminate blocking
+3. **Option C: Move to async background process (worker thread)**
+   - Rejected: Over-engineering for this use case, adds dependencies
 
 **Consequences:**
 
-**Positive:**
-
-- **36% character reduction** (18.5k → 3.5k in Section 2)
-- **Achieves target** (32.5k chars, 19% below 40k target)
-- **Single source of truth** (templates in one location)
-- **Backward compatible** (Router has Read tool whitelisted)
-- **Low risk** (content relocation, not logic changes)
-- **Simple rollback** (`git checkout HEAD -- .claude/CLAUDE.md`)
-
-**Negative:**
-
-- Router must load template files explicitly (Read tool call overhead)
-  - Mitigation: Router caches template content in context
-- More files to maintain (3 new template files)
-  - Mitigation: Templates rarely change (spawn protocol is stable)
-- Documentation must be updated (@ references in workflows)
-  - Mitigation: Phase 4 of implementation plan updates docs
-
-**Trade-offs:**
-
-- **Token efficiency vs Maintainability**: Extraction improves both (fewer tokens in CLAUDE.md, single source of truth for templates)
-- **Router simplicity vs File count**: Slight complexity increase (Router loads files) for significant size reduction
-- **Inline vs External**: External templates require Read tool but enable reuse and clarity
+- **Positive:**
+  - Zero blocking on read operations (reads are now O(1) I/O)
+  - No race conditions (event loop serializes writes)
+  - Reduced I/O contention (writes batched by event loop)
+  - Git churn reduced (writes happen asynchronously, less frequent commits)
+- **Negative:**
+  - Access stats may be stale (writes happen after read returns)
+  - Writes can fail silently (best-effort, no guarantees)
+  - Debug complexity (writes happen in different tick)
+- **Trade-offs:**
+  - Chose performance over strict consistency (access stats are informational, not critical)
+  - Chose simplicity over guaranteed writes (best-effort is sufficient)
 
 **Implementation:**
 
-- **Phase 1 (1h)**: Create 3 template files with metadata headers
-- **Phase 2 (30m)**: Update CLAUDE.md Section 2 with @ references
-- **Phase 3 (30m)**: Test Router compatibility (Read tool, spawn test)
-- **Phase 4 (15m)**: Update documentation references (workflows, ARCHITECTURE.md)
-- **Phase 5 (15m)**: Validation (character count, Router spawning, markdown syntax)
+```javascript
+// BEFORE (blocking)
+if (accessChanged) {
+  atomicWriteJSONSync(getAccessStatsPath(memoryDir), {...});
+}
 
-**Success Criteria:**
-
-- CLAUDE.md size: 32,500 chars ±500 (19% below 40k target)
-- Section 2 size: 3,500 chars (81% reduction from 18,500)
-- Router compatibility: 100% (manual spawn test passes)
-- Template files: 3 created in `.claude/templates/spawn/`
-- No broken links or markdown syntax errors
-
-**Validation:**
-
-```bash
-# Character count
-wc -c .claude/CLAUDE.md
-# Expected: 51085 → 32500 chars
-
-# Template files
-ls -lh .claude/templates/spawn/
-# Expected: 3 files (~11k, ~3k, ~3k bytes)
-
-# Router spawn test
-node .claude/tools/cli/router-smoke-test.cjs
-# Expected: All tests pass
+// AFTER (non-blocking)
+if (accessChanged) {
+  setImmediate(() => {
+    try {
+      atomicWriteJSONSync(getAccessStatsPath(memoryDir), {...});
+    } catch (_e) {
+      // Best-effort; do not block context load
+    }
+  });
+}
 ```
 
-**Rollback Plan:**
+**Related ADRs:**
 
-```bash
-# If issues arise
-git checkout HEAD -- .claude/CLAUDE.md
-# Restores original CLAUDE.md
-# Template files remain for future use
-```
-
-**Related Files:**
-
-- `.claude/context/artifacts/plans/spawn-template-extraction-design-2026-01-29.md` (comprehensive design)
-- `.claude/context/artifacts/research-reports/toon-lazy-loading-research-2026-01-29.md` (research backing)
-
-**Status:** Accepted (design complete, ready for implementation)
-**Date:** 2026-01-29
-**Supersedes:** None (new decision)
-
----
-
-## [ADR-063] Spawn Template Validation Safeguards (2026-01-29)
-
-**Context:**
-
-- Spawn templates were extracted to lazy-loaded files (.claude/templates/spawn/)
-- Router references templates via @ file references
-- Risk: Template files could be missing, corrupted, or have structural issues
-- Need safeguards to ensure spawned agents have required elements (TaskUpdate protocol, PROJECT_ROOT, etc.)
-
-**Research Basis:**
-
-- Arxiv: 30+ papers, 97.3% correctness with pre-execution validation
-- Exa: 45+ implementations, 91% adoption of PreToolUse pattern
-- AgentSpec: <100ms gate execution, <2% false positive rate targets
-
-**Security Review:**
-
-- **Decision**: APPROVED WITH CONDITIONS (Task #8)
-- **Vulnerabilities Fixed**: 2 CRITICAL + 4 HIGH + 5 MEDIUM = 11 mitigations
-- **CRITICAL (Fixed)**: Unicode homoglyph bypass (VULN-001), ReDoS vulnerability (VULN-002)
-- **HIGH (Fixed)**: Prompt length limit (VULN-003), fail-open audit (VULN-004), environment override audit (VULN-005), required rule flags (VULN-006)
-- **MEDIUM (Fixed)**: Enhanced audit logging (VULN-007), hook file protection (VULN-010)
-- **Security Report**: `.claude/context/artifacts/security-reviews/spawn-validation-security-review-2026-01-29.md`
-
-**Decision:**
-Implement three-layer safeguard approach:
-
-1. **Option B: Validation Hook (spawn-prompt-validator.cjs)**
-   - PreToolUse(Task) hook validates spawn prompts
-   - Checks for: TaskUpdate box, Task ID, PROJECT_ROOT, Memory Protocol, TaskUpdate calls, allowed_tools
-   - Scoring system (0-100) with 70 minimum for pass
-   - Required flag on critical rules (TaskUpdate box, Task ID)
-   - Enforcement modes: block/warn/off (default: warn)
-
-2. **Security Mitigations (ALL IMPLEMENTED)**
-   - **VULN-001**: Unicode normalization function with homoglyph map (Cyrillic, Greek → ASCII)
-   - **VULN-002**: ReDoS-safe regex patterns with bounded quantifiers + timeout wrapper
-   - **VULN-003**: 500KB prompt length limit (100KB warning threshold)
-   - **VULN-004**: Full audit context in exception handler (error, stack, toolInput, mode, timestamp)
-   - **VULN-005**: Environment override auditing (SPAWN_PROMPT_VALIDATOR=off logged)
-   - **VULN-006**: Required flags on critical rules (TaskUpdate box, Task ID must be present)
-   - **VULN-007**: Enhanced audit log fields (sessionId, agentType, promptLength, promptHash, executionMs)
-
-**Implementation Completed:**
-
-- Phase 1: Created validation hook with 6 rules and weighted scoring (4 hours)
-- Phase 1.2: Created 48 unit/integration/security test cases (2 hours) - 100% passing
-- Phase 1.3: Registered hook in settings.json (30 minutes)
-- Total: 6.5 hours implementation + testing
-
-**Test Results:**
-
-- **Tests Created**: 48 test cases
-- **Tests Passing**: 48/48 (100%)
-- **Coverage**: validatePrompt, normalizeUnicode, safeRegexTest, isOrchestratorSpawn, isTemplateBasedSpawn, end-to-end integration, security vulnerabilities, edge cases
-- **Security Tests**: VULN-001 (Unicode), VULN-002 (ReDoS), VULN-003 (length), VULN-006 (required rules)
-- **Performance**: All tests complete in 240ms total
-
-**Consequences:**
-
-_Positive:_
-
-- Prevents invalid spawns (missing TaskUpdate protocol)
-- Blocks 2 CRITICAL security vulnerabilities (Unicode bypass, ReDoS)
-- Observable (audit logging on validation/fallback)
-- Non-breaking (default: warn mode)
-- Research-backed (91% industry adoption)
-- Performance: <5ms overhead per spawn (measured: <1ms average)
-
-_Negative:_
-
-- Adds ~5ms overhead per spawn (validation)
-- New hook to maintain (spawn-prompt-validator.cjs)
-- Documentation complexity increase
-
-**Trade-offs:**
-
-- Validation strictness vs spawn flexibility
-- Warn mode default balances safety and usability
-- Block mode available for production hardening
-
-**Files Created:**
-
-- `.claude/hooks/safety/spawn-prompt-validator.cjs` (500 lines, all security mitigations)
-- `.claude/hooks/safety/spawn-prompt-validator.test.cjs` (550 lines, 48 tests)
+- ADR-054: Memory System Enhancement (context: access stats feature)
+- ADR-077: Shell Command Security (context: non-blocking patterns)
 
 **Files Modified:**
 
-- `.claude/settings.json` (hook registration)
-
-**Status:** Implemented and Tested
-**Date:** 2026-01-29
-**Implementation Date:** 2026-01-29 (Task #11)
-**Related ADRs:** ADR-062 (Spawn Template Extraction)
-**Security Review:** Task #8 (APPROVED WITH CONDITIONS - all conditions met)
+- `.claude/lib/memory/contextual-memory.cjs` (lines 389-403)
 
 ---
 
-## [ADR-065] Error Logging and Reporting System Architecture
+## [ADR-080] Memory System Environment Variable Configuration
 
-- **Date**: 2026-01-29
-- **Status**: Accepted (Design Complete)
-- **Context**: Agent-Studio needed a comprehensive error logging and reporting infrastructure to:
-  1. Capture agent failures with full debugging context
-  2. Integrate with the reflection workflow for learning from errors
-  3. Prevent sensitive data leakage while maintaining debuggability
-  4. Support error pattern detection and correlation across parallel agents
-  5. Build on existing infrastructure (error-tracker.cjs, error-recovery-reflection.cjs, EventBus)
+**Date:** 2026-02-05
+**Status:** Accepted
+**Context:**
 
-- **Decision**: Implement a multi-layered error logging system with the following architecture:
-  1. **Error Capture Layer**: PostToolUse hooks capture errors at all critical points (hooks, tools, tasks, memory operations)
-  2. **Error Processing Layer**: Classification, severity evaluation, context enrichment, sensitive data masking, correlation ID generation
-  3. **Error Storage Layer**: JSON Lines format (errors.jsonl) for real-time append, daily JSON reports for aggregation, pattern tracking
-  4. **Consumer Integration**: Reflection workflow, anomaly detector, CLI dashboard, self-healing triggers
+Memory system configuration was hardcoded in `memory-manager.cjs` (lines 81-112), ignoring environment variables and settings.json. This violated 12-factor app principles and prevented administrators from tuning memory system behavior without code changes.
 
-  **Key Design Choices:**
-  - **Centralized vs Per-Agent Logs**: Centralized `errors.jsonl` for cross-agent correlation, with filtering by `context.agentName`
-  - **Context Depth**: Full task metadata, masked tool input, 10-line stack trace (balance of utility and security)
-  - **Correlation Strategy**: Session ID + Trace ID + 5-second temporal window for grouping related errors
-  - **Retention Policy**: 7 days active, 30 days archived (compressed), configurable for critical errors (90 days)
-  - **Fail-Safe**: Fail-open with circuit breaker to never block agent execution; fallback to stderr
+**Problem:**
 
-- **Consequences**:
-  - **Positive**:
-    - Comprehensive error capture with debugging context
-    - Secure handling of sensitive data (PII/credential masking)
-    - Integration with existing reflection and event systems
-    - Pattern detection enables self-healing triggers
-    - Cross-agent correlation for parallel execution debugging
-  - **Negative**:
-    - Additional storage requirements (~50MB/month estimated)
-    - Slight performance overhead (target <5ms per error)
-    - Complexity increase (new components to maintain)
-  - **Trade-offs**:
-    - Centralized log vs. per-agent: Chose centralized for correlation capability
-    - Full context vs. minimal: Chose full context (masked) for debuggability
-    - JSON Lines vs. structured DB: Chose JSON Lines for simplicity and streaming
+- Hardcoded CONFIG object (20+ configuration values)
+- No way to override thresholds via .env or settings.json
+- Developers editing code to tune memory system
+- Configuration drift between environments (dev/staging/prod)
 
-- **Implementation Plan**:
-  - Phase 1 (Week 1-2): Core infrastructure (schema, capture hook, masker, log writer)
-  - Phase 2 (Week 2-3): Integration with existing components
-  - Phase 3 (Week 3-4): Reporting CLI and pattern detection
-  - Phase 4 (Week 4): Testing and documentation
+**Decision:**
 
-- **Related Files**:
-  - Design Document: `.claude/context/artifacts/error-logging-system-design.md`
-  - Architecture Diagrams: `.claude/context/artifacts/diagrams/error-logging-architecture.md`
-  - Existing Components: `error-tracker.cjs`, `error-recovery-reflection.cjs`, `unified-reflection-handler.cjs`
+Migrated all CONFIG values to environment variables with defaults:
 
-- **Related ADRs**: ADR-055 (Event-Driven Orchestration), ADR-056 (Observability)
+1. **Environment Variable Naming**: Prefix all with `MEMORY_*` (e.g., `MEMORY_MAX_SESSIONS`)
+2. **Backward Compatibility**: All existing defaults preserved (no behavior change)
+3. **Type Safety**: Parse integers using `parseInt(process.env.VAR || 'default', 10)`
+4. **Documentation**: Add all variables to .env.example with comments
 
----
+**Configuration Categories:**
 
-## [ADR-066] Advanced Workflow Orchestration Patterns (SPEC-017)
+| Category            | Variables                                                                                  | Purpose                    |
+| ------------------- | ------------------------------------------------------------------------------------------ | -------------------------- |
+| Context Limits      | `MEMORY_MAX_CONTEXT_CHARS_*` (gotchas, patterns, decisions, discoveries, sessions, legacy) | Control context usage      |
+| Item Limits         | `MEMORY_MAX_ITEMS_*` (gotchas, patterns, decisions, discoveries, sessions)                 | Control item counts        |
+| Retention           | `MEMORY_MAX_SESSIONS`, `MEMORY_LEARNINGS_KEEP_LINES`                                       | Control data retention     |
+| Archival Thresholds | `MEMORY_LEARNINGS_ARCHIVE_THRESHOLD_KB`, `MEMORY_CODEBASE_MAP_TTL_DAYS`                    | Control archival triggers  |
+| Health Check        | `MEMORY_LEARNINGS_WARN_THRESHOLD_KB`, `MEMORY_CODEBASE_MAP_WARN_ENTRIES`                   | Control warning thresholds |
+| Pruning             | `MEMORY_CODEBASE_MAP_MAX_ENTRIES`, `MEMORY_DECISIONS_WARN_THRESHOLD_KB`                    | Control pruning thresholds |
 
-- **Date**: 2026-01-30
-- **Status**: Accepted
-- **Context**: Phase 4 requires advanced workflow orchestration patterns including fan-out/fan-in, conditional branching, and loop constructs. Current SPEC-011 provides basic fork/join but lacks declarative pattern support, conditional execution, and iteration with limits.
-- **Decision**: Implement workflow-patterns.cjs module with three pattern types:
-  1. **Fan-Out Pattern**: Execute N tasks in parallel with collection strategies (all, any, majority, quorum)
-  2. **Conditional Branching**: when/then/else and switch/case with JavaScript or JSONPath condition evaluators
-  3. **Loop Patterns**: forEach, doWhile, retryUntil with mandatory maxIterations to prevent infinite loops
-- **Consequences**:
-  - **Positive**:
-    - 3-5x throughput improvement for parallelizable workflows
-    - Declarative patterns reduce agent prompt complexity
-    - Iteration limits prevent runaway compute costs
-    - Integration with SPEC-011 transactions ensures rollback capability
-  - **Negative**:
-    - Fan-out coordination adds complexity (race conditions, timeout handling)
-    - Condition evaluation requires sandboxing for security
-    - Loop patterns require careful checkpoint management
-  - **Trade-offs**:
-    - Chose collection strategies over custom aggregation (simplicity vs flexibility)
-    - Chose mandatory maxIterations over optional (safety vs convenience)
-    - Chose JavaScript + JSONPath evaluators over custom DSL (familiarity vs control)
-- **Implementation**: `.claude/lib/workflow/workflow-patterns.cjs`
-- **Related ADRs**: ADR-055 (Event-Driven Orchestration), Phase 3 SPEC-011
-- **Risk Assessment**: See phase-4-risk-assessment.md (Risks 17.1-17.4)
+**Alternatives Considered:**
 
----
+1. **Option A: settings.json only**
+   - Rejected: Requires parsing YAML/JSON, less portable
+2. **Option B: Separate config file**
+   - Rejected: Violates 12-factor (config should be in environment)
+3. **Option C: Runtime API for config changes**
+   - Rejected: Over-engineering, config should be static
 
-## [ADR-067] Workflow Composition and Nesting Strategy (SPEC-018)
+**Consequences:**
 
-- **Date**: 2026-01-30
-- **Status**: Accepted
-- **Context**: Complex workflows require composition from simpler, reusable sub-workflows. Currently, workflows are monolithic with no inheritance or inclusion mechanism, leading to duplication and maintenance burden.
-- **Decision**: Implement workflow-composer.cjs with three composition mechanisms:
-  1. **Include**: Insert sub-workflow at specific point in parent workflow
-  2. **Extend**: Inherit from base workflow with selective overrides
-  3. **Compose**: Combine multiple workflows with strategy (sequential, parallel, conditional)
-     Additionally, implement WorkflowResolver with DFS-based cycle detection to prevent infinite recursion.
-- **Consequences**:
-  - **Positive**:
-    - 60% reduction in workflow definition duplication
-    - Enables library of reusable workflow components
-    - Simplifies testing (test sub-workflows independently)
-    - Clear error messages for circular dependencies
-  - **Negative**:
-    - State management complexity increases with nesting
-    - Override merge logic can have subtle bugs
-    - Resolution performance depends on hierarchy depth
-  - **Trade-offs**:
-    - Chose composition over configuration (reuse vs simplicity)
-    - Chose DFS cycle detection over adjacency matrix (memory vs time complexity)
-    - Chose 10-level depth limit (practical vs theoretical unlimited)
-- **Implementation**: `.claude/lib/workflow/workflow-composer.cjs`
-- **Related ADRs**: ADR-066 (patterns used in compositions)
-- **Risk Assessment**: See phase-4-risk-assessment.md (Risks 18.1-18.4)
+- **Positive:**
+  - Administrators can tune memory system via .env
+  - No code changes needed for configuration adjustments
+  - Environment-specific tuning (dev vs prod)
+  - Follows 12-factor app principles
+  - Backward compatible (defaults unchanged)
+- **Negative:**
+  - More environment variables to document
+  - Validation happens at runtime (no compile-time checks)
+  - Misconfiguration risk (invalid integers default to NaN)
+- **Trade-offs:**
+  - Chose runtime flexibility over compile-time safety
+  - Chose environment variables over config files (portability)
 
----
+**Implementation:**
 
-## [ADR-068] Brownfield/Greenfield Hybrid Execution Architecture (SPEC-019)
+```javascript
+// BEFORE (hardcoded)
+const CONFIG = {
+  MAX_SESSIONS: 50,
+  LEARNINGS_ARCHIVE_THRESHOLD_KB: 40,
+  ...
+};
 
-- **Date**: 2026-01-30
-- **Status**: Accepted
-- **Context**: Migrating from conductor-main to Agent-Studio requires a gradual path. Current SPEC-015 provides assessment and state migration tools, but no support for running hybrid workflows where some tasks execute in the legacy system and others in the new system.
-- **Decision**: Implement hybrid-executor.cjs with:
-  1. **Task Router**: Rule-based routing to legacy or new system (pattern matching, feature flags, time-based canary)
-  2. **State Sync**: Bi-directional synchronization with vector clocks for conflict detection
-  3. **Result Normalizer**: Transform results to common format regardless of source system
-  4. **System Adapters**: Pluggable adapters for conductor-main and Agent-Studio
-- **Consequences**:
-  - **Positive**:
-    - Zero-downtime migration path
-    - Reduces migration risk by 80% (gradual adoption)
-    - Enables A/B testing between implementations
-    - Fallback to legacy on errors
-  - **Negative**:
-    - State drift risk between systems (requires reconciliation)
-    - Routing rule errors can cause task failures
-    - Additional latency from routing, translation, and sync
-  - **Trade-offs**:
-    - Chose bi-directional sync over single-source (flexibility vs complexity)
-    - Chose vector clocks over timestamps (correctness vs simplicity)
-    - Chose rule-based routing over ML-based (predictability vs optimization)
-- **Implementation**: `.claude/lib/workflow/hybrid-executor.cjs`
-- **Related ADRs**: Phase 3 SPEC-015 (Conductor Integration)
-- **Risk Assessment**: See phase-4-risk-assessment.md (Risks 19.1-19.4)
+// AFTER (environment-aware)
+const CONFIG = {
+  MAX_SESSIONS: parseInt(process.env.MEMORY_MAX_SESSIONS || '50', 10),
+  LEARNINGS_ARCHIVE_THRESHOLD_KB: parseInt(process.env.MEMORY_LEARNINGS_ARCHIVE_THRESHOLD_KB || '40', 10),
+  ...
+};
+```
 
----
+**Related ADRs:**
 
-## [ADR-071] Agent Capability Cards Architecture (Phase 3)
+- ADR-075: Router Config-Aware Model Selection (context: config.yaml precedence pattern)
+- ADR-077: Shell Command Security (context: environment variable pattern)
 
-- **Date**: 2026-01-31
-- **Status**: Accepted (Implementation-Ready)
-- **Context**: Router uses static agent routing table (CLAUDE.md Section 3) and cannot dynamically discover agent capabilities. No mechanism exists for health-aware routing - failed agents can be repeatedly spawned. Need Phase 3 to complement Phase 2 (SkillCatalog for skills) with capability discovery for agents.
-- **Decision**: Implement Agent Capability Cards system with the following architecture:
-  1. **Agent Capability Card Schema** (`.claude/schemas/agent-capability-card.schema.json`): JSON Schema v7 defining id, displayName, category, capabilities[], constraints, health, metadata. Capabilities include name, domain (15 predefined), description, triggerPhrases, requiredTools, skills.
-  2. **Agent Registry Generator** (`.claude/lib/tools/agent-registry-generator.cjs`): Scans `.claude/agents/**/*.md`, parses YAML frontmatter, generates capability cards, builds indices (byCapability, byDomain, byCategory), outputs to `.claude/context/agent-registry.json`.
-  3. **AvailableAgents Tool** (`.claude/lib/tools/available-agents.cjs`): Query interface with filters (capability, domain, category, excludeFailed, minSuccessRate, limit). Caching (LRU, 5min TTL). Returns sorted by success rate.
-  4. **Agent Health Tracker** (`.claude/lib/tools/agent-health-tracker.cjs`): State machine (healthy->degraded->unavailable). Isolation after 3 consecutive failures. Recovery window (5 minutes). Updates success rate and execution time.
-  5. **Agent Health Hook** (`.claude/hooks/routing/agent-health-hook.cjs`): PostToolUse integration with Task tool. Extracts agent ID from spawn prompt. Records success/failure. Pre-spawn health check blocks unavailable agents.
-- **Consequences**:
-  - **Positive**:
-    - Dynamic agent discovery complements static routing table
-    - Health-aware routing prevents repeated failures
-    - Failure isolation protects system from problematic agents
-    - Recovery mechanism allows agents to return to service
-    - Query API consistent with SkillCatalog (familiar pattern)
-    - O(1) capability lookup via indices
-  - **Negative**:
-    - Additional registry file (~2KB per agent, ~100KB total)
-    - Generator must run on agent file changes
-    - Health state persistence requires file writes
-    - ~400 lines of new code to maintain
-  - **Trade-offs**:
-    - Chose 3 indices (capability/domain/category) over single index (faster query)
-    - Chose file-based health persistence over memory-only (survives restart)
-    - Chose 3-failure isolation threshold (balance safety/availability)
-    - Chose 5-min recovery window (balance cooldown/recovery speed)
-- **Implementation Files**:
-  - `.claude/schemas/agent-capability-card.schema.json` (~150 lines)
-  - `.claude/lib/tools/agent-registry-generator.cjs` (~400 lines)
-  - `.claude/lib/tools/available-agents.cjs` (~300 lines)
-  - `.claude/lib/tools/agent-health-tracker.cjs` (~250 lines)
-  - `.claude/hooks/routing/agent-health-hook.cjs` (~150 lines)
-  - `.claude/context/agent-registry.json` (~2000 lines, auto-generated)
-- **Architecture Document**: `.claude/docs/PHASE_3_IMPLEMENTATION_ARCHITECTURE.md`
-- **Related ADRs**: ADR-069 (Tool Manifest), ADR-070 (SkillCatalog - Phase 2 reference)
-- **Test Requirements**: 35+ tests across 4 test files
-- **Integration Requirements**: CLAUDE.md Section 1.4, router.md Gate 3
+**Files Modified:**
+
+- `.claude/lib/memory/memory-manager.cjs` (lines 81-112)
+- `.env.example` (Section 10 - Memory System)
 
 ---
 
@@ -1548,7 +861,7 @@ _Negative:_
 
 ---
 
-## ADR-078: Updater Workflows Architecture
+## [ADR-078] Updater Workflows Architecture
 
 **Date:** 2026-01-31
 **Status:** Accepted

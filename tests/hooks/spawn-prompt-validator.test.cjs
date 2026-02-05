@@ -10,6 +10,9 @@ const {
   MINIMUM_SCORE,
   MAX_PROMPT_LENGTH,
 } = require('../../.claude/hooks/safety/spawn-prompt-validator.cjs');
+const {
+  generateRequiredPrefixFragment,
+} = require('../../.claude/hooks/routing/spawn-prompt-assembler.cjs');
 
 // =============================================================================
 // Test Helpers
@@ -369,6 +372,18 @@ describe('isTemplateBasedSpawn()', () => {
 // =============================================================================
 
 describe('Integration: End-to-End Validation', () => {
+  test('should pass exact assembler generateRequiredPrefixFragment output', () => {
+    const assembledPrefix = generateRequiredPrefixFragment('0', 'test');
+    const result = validatePrompt(assembledPrefix);
+    assert.strictEqual(result.isValid, true, 'Assembler fragment must pass validation');
+    assert.ok(result.passed.includes('TaskUpdate Warning Box'), 'Must detect warning box');
+    assert.ok(result.passed.includes('Task ID Reference'), 'Must detect Task ID reference');
+    assert.ok(
+      !result.missingRequired || result.missingRequired.length === 0,
+      'No required elements missing'
+    );
+  });
+
   test('should pass complete valid spawn prompt', () => {
     const fullPrompt = `
 You are the developer agent.

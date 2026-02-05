@@ -54,6 +54,8 @@ const CONFIG = {
   },
 };
 
+const HISTORY_LIMIT = Number(process.env.MEMORY_SCHEDULER_HISTORY_LIMIT || 30);
+
 // ============================================================================
 // Helper Functions
 // ============================================================================
@@ -283,8 +285,19 @@ function runExtraction(projectRoot = PROJECT_ROOT) {
     }
 
     const output = (proc.stdout || '').trim();
-    result.success = true;
-    result.details = output ? JSON.parse(output) : { status: 'ok' };
+    if (!output && proc.stderr) {
+      result.details = proc.stderr.trim();
+    } else {
+      try {
+        result.success = true;
+        result.details = output ? JSON.parse(output) : { status: 'ok' };
+      } catch (parseErr) {
+        result.success = false;
+        result.details = `memory-extract JSON parse failed: ${parseErr.message}${
+          proc.stderr ? ` | stderr: ${proc.stderr.trim()}` : ''
+        }`;
+      }
+    }
   } catch (e) {
     result.details = e.message;
   }
@@ -332,6 +345,7 @@ function runDeduplication(projectRoot = PROJECT_ROOT) {
   validateProjectRoot(projectRoot);
   const libDir = getLibDir(projectRoot);
   const smartPruner = safeRequire(path.join(libDir, 'smart-pruner.cjs'));
+  const entityLinks = safeRequire(path.join(libDir, 'memory-entity-links.cjs'));
   const memoryDir = getMemoryDir(projectRoot);
 
   const result = {
@@ -340,6 +354,7 @@ function runDeduplication(projectRoot = PROJECT_ROOT) {
     success: false,
     patterns: { original: 0, deduplicated: 0 },
     gotchas: { original: 0, deduplicated: 0 },
+    relationshipsCleaned: 0,
   };
 
   if (!smartPruner) {
@@ -383,6 +398,10 @@ function runDeduplication(projectRoot = PROJECT_ROOT) {
     }
 
     result.success = true;
+    if (entityLinks && typeof entityLinks.cleanupOrphanedRelationships === 'function') {
+      const cleanup = entityLinks.cleanupOrphanedRelationships(projectRoot);
+      result.relationshipsCleaned = cleanup?.deleted || 0;
+    }
   } catch (e) {
     result.details = e.message;
   }
@@ -456,19 +475,21 @@ function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
   );
 
   const script = `
-  (async () => {
-    const { archiveOldLTM } = require(${JSON.stringify(coldStoragePath)});
-    const { getRetentionOptions } = require(${JSON.stringify(retentionConfigPath)});
-    const projectRoot = ${JSON.stringify(projectRoot)};
-    const options = getRetentionOptions(projectRoot);
+  import { archiveOldLTM } from ${JSON.stringify(coldStoragePath)};
+  import { getRetentionOptions } from ${JSON.stringify(retentionConfigPath)};
+
+  const projectRoot = ${JSON.stringify(projectRoot)};
+  const options = getRetentionOptions(projectRoot);
+
+  try {
     const details = await archiveOldLTM(projectRoot, options);
     process.stdout.write(JSON.stringify({ success: true, details }));
-  })().catch((err) => {
+  } catch (err) {
     process.stdout.write(JSON.stringify({ success: false, details: err && err.message ? err.message : String(err) }));
-  });
+  }
   `;
 
-  const proc = spawnSync(process.execPath, ['-e', script], {
+  const proc = spawnSync(process.execPath, ['--input-type=module', '-e', script], {
     cwd: projectRoot,
     env: process.env,
     encoding: 'utf8',
@@ -616,8 +637,8 @@ function runDailyMaintenance(projectRoot = PROJECT_ROOT) {
     tasks: tasks.map(t => ({ type: t.type, success: t.success })),
   });
   // Keep only last 30 history entries
-  if (status.history.length > 30) {
-    status.history = status.history.slice(0, 30);
+  if (status.history.length > HISTORY_LIMIT) {
+    status.history = status.history.slice(0, HISTORY_LIMIT);
   }
   writeStatus(status, projectRoot);
 
@@ -698,8 +719,8 @@ function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
     tasks: tasks.map(t => ({ type: t.type, success: t.success })),
   });
   // Keep only last 30 history entries
-  if (status.history.length > 30) {
-    status.history = status.history.slice(0, 30);
+  if (status.history.length > HISTORY_LIMIT) {
+    status.history = status.history.slice(0, HISTORY_LIMIT);
   }
   writeStatus(status, projectRoot);
 
@@ -771,8 +792,8 @@ function runMaintenance(type, projectRoot = PROJECT_ROOT) {
         timestamp: taskResult.timestamp,
         success: taskResult.success,
       });
-      if (status.history.length > 30) {
-        status.history = status.history.slice(0, 30);
+      if (status.history.length > HISTORY_LIMIT) {
+        status.history = status.history.slice(0, HISTORY_LIMIT);
       }
       writeStatus(status, projectRoot);
 

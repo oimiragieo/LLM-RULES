@@ -9,7 +9,7 @@
  *
  * ENFORCEMENT MODES:
  * - CONFIG_MODEL_VALIDATOR=block - Block spawn if model mismatch
- * - CONFIG_MODEL_VALIDATOR=warn  - Log warning but allow spawn (DEFAULT)
+ * - CONFIG_MODEL_VALIDATOR=warn  - Log warning but allow spawn
  * - CONFIG_MODEL_VALIDATOR=off   - Disable validation
  *
  * This hook does NOT modify the spawn - it only validates and logs.

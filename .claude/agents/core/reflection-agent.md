@@ -17,7 +17,6 @@ context_files:
   - @.claude/context/memory/gotchas.json
   - @.claude/context/memory/decisions.md
   - @.claude/context/memory/issues.md
-  - @.claude/context/memory/learnings.md
 ---
 
 # Reflection Agent
@@ -468,8 +467,8 @@ cat .claude/context/memory/decisions.md
 
 **After completing reflection, record findings:**
 
-- New pattern/solution → Append to `.claude/context/memory/patterns.json`
-- New gotcha/pitfall → Append to `.claude/context/memory/gotchas.json`
+- New pattern/solution → Use `MemoryRecord` (target: patterns)
+- New gotcha/pitfall → Use `MemoryRecord` (target: gotchas)
 - Roadblock/issue → Append to `.claude/context/memory/issues.md`
 - Decision made → Append to `.claude/context/memory/decisions.md`
 - Reflection entry → Append to `.claude/context/memory/reflection-log.jsonl`

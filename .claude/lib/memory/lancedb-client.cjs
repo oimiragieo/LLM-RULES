@@ -292,19 +292,13 @@ class MemoryVectorStore {
       return true;
     }
 
-    if (tableNames.length === 1) {
-      const dbPath = path.resolve(this.config.persistDirectory);
-      fs.rmSync(dbPath, { recursive: true, force: true });
-      this.db = null;
-      this.table = null;
-      this._tableVectorDim = null;
-      this.isInitialized = false;
-      return true;
-    }
-
-    throw new Error(
-      `LanceDB dropTable unsupported and multiple tables exist. Manually remove table "${this.config.collectionName}" from ${this.config.persistDirectory}.`
-    );
+    // FIXED (Issue #1 - CRITICAL): Remove destructive fs.rmSync that deletes entire directory
+    // When this is the only table, just mark it as dropped without deleting the DB directory.
+    // This allows multi-table usage and prevents catastrophic data loss.
+    this.table = null;
+    this._tableVectorDim = null;
+    logger.info(`Table "${this.config.collectionName}" marked as dropped (metadata cleared)`);
+    return true;
   }
 
   /**

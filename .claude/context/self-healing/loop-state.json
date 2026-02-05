@@ -1,4 +1,93 @@
 {
-  "spawnDepth": 10,
-  "actionHistory": []
+  "sessionId": "",
+  "evolutionCount": 2,
+  "lastEvolutions": {
+    "hook": "2026-02-04T23:04:20.105Z",
+    "agent": "2026-02-05T03:55:46.519Z"
+  },
+  "spawnDepth": 0,
+  "actionHistory": [
+    {
+      "action": "spawn:a",
+      "count": 1,
+      "lastAt": "2026-02-04T21:47:03.949Z"
+    },
+    {
+      "action": "spawn:developer",
+      "count": 3,
+      "lastAt": "2026-02-04T22:59:20.939Z"
+    },
+    {
+      "action": "spawn:conducting",
+      "count": 2,
+      "lastAt": "2026-02-04T22:59:49.554Z"
+    },
+    {
+      "action": "spawn:fixing",
+      "count": 1,
+      "lastAt": "2026-02-04T23:04:09.806Z"
+    },
+    {
+      "action": "spawn:creating",
+      "count": 1,
+      "lastAt": "2026-02-04T23:04:20.097Z"
+    },
+    {
+      "action": "evolution:hook",
+      "count": 1,
+      "lastAt": "2026-02-04T23:04:20.111Z"
+    },
+    {
+      "action": "spawn:completing",
+      "count": 1,
+      "lastAt": "2026-02-04T23:14:48.303Z"
+    },
+    {
+      "action": "spawn:qa",
+      "count": 3,
+      "lastAt": "2026-02-05T02:47:33.257Z"
+    },
+    {
+      "action": "spawn:planner",
+      "count": 3,
+      "lastAt": "2026-02-05T01:49:22.193Z"
+    },
+    {
+      "action": "spawn:conductor-validator",
+      "count": 1,
+      "lastAt": "2026-02-05T00:22:41.102Z"
+    },
+    {
+      "action": "spawn:unknown",
+      "count": 3,
+      "lastAt": "2026-02-05T02:33:53.310Z"
+    },
+    {
+      "action": "spawn:reflection-agent",
+      "count": 3,
+      "lastAt": "2026-02-05T04:15:15.953Z"
+    },
+    {
+      "action": "spawn:architect",
+      "count": 2,
+      "lastAt": "2026-02-05T03:55:33.086Z"
+    },
+    {
+      "action": "spawn:auditing",
+      "count": 1,
+      "lastAt": "2026-02-05T03:55:46.504Z"
+    },
+    {
+      "action": "evolution:agent",
+      "count": 1,
+      "lastAt": "2026-02-05T03:55:46.531Z"
+    },
+    {
+      "action": "spawn:consolidating",
+      "count": 1,
+      "lastAt": "2026-02-05T04:11:23.914Z"
+    }
+  ],
+  "createdAt": "2026-02-04T20:46:43.535Z",
+  "updatedAt": "2026-02-05T05:24:03.526Z"
 }

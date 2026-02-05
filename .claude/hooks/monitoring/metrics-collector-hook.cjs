@@ -10,12 +10,16 @@
  *
  * Event: PostToolUse
  * Matcher: (wired via .claude/settings.json)
+ *
+ * FIX-RS-003: Changed from parseHookInputSync() to parseHookInputAsync() because
+ * Claude Code sends hook input via stdin, not argv[2]. The sync version only checks
+ * argv[2] and returns null, causing metrics to never be collected.
  */
 
 'use strict';
 
 const {
-  parseHookInputSync,
+  parseHookInputAsync,
   getToolName,
   getToolInput,
   getToolOutput,
@@ -23,11 +27,12 @@ const {
 
 const metricsCollector = require('./metrics-collector.cjs');
 
-function main() {
+async function main() {
   const startedAt = Date.now();
 
   try {
-    const hookInput = parseHookInputSync();
+    // FIX-RS-003: Use async parsing to read from stdin (where Claude Code sends hook input)
+    const hookInput = await parseHookInputAsync();
     if (!hookInput) process.exit(0);
 
     const tool = getToolName(hookInput) || 'unknown';

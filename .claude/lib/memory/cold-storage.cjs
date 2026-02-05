@@ -19,6 +19,8 @@ const { atomicWriteSync } = require('../utils/atomic-write.cjs');
 const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
 const { getRetentionOptions } = require('./memory-retention-config.cjs');
 
+const COLD_INDEX_MAX_CHARS = Number(process.env.COLD_STORAGE_INDEX_MAX_CHARS || 4000);
+
 function validateProjectRoot(projectRoot) {
   if (projectRoot !== PROJECT_ROOT) {
     const validation = validatePathWithinProject(projectRoot, PROJECT_ROOT);
@@ -47,7 +49,6 @@ function toIsoDate(date) {
  *
  * @param {string} projectRoot
  * @returns {Array<{absPath: string, name: string, mtimeMs: number}>}
- * @deprecated Use memory-tiers.cjs for canonical LTM access.
  */
 function listLTMSummaries(projectRoot = PROJECT_ROOT) {
   validateProjectRoot(projectRoot);
@@ -111,7 +112,11 @@ function buildIndexDocument(summaryObj, sourcePath, coldPath) {
   if (decisions.length) bodyParts.push(`Major decisions:\n- ${decisions.join('\n- ')}`);
   if (touched.length) bodyParts.push(`Files frequently touched:\n- ${touched.join('\n- ')}`);
 
-  const text = `${header}\n${bodyParts.join('\n\n')}`.trim();
+  let text = `${header}\n${bodyParts.join('\n\n')}`.trim();
+  const truncated = Number.isFinite(COLD_INDEX_MAX_CHARS) && text.length > COLD_INDEX_MAX_CHARS;
+  if (truncated) {
+    text = `${text.slice(0, COLD_INDEX_MAX_CHARS)}…`;
+  }
 
   const idBase = path.basename(sourcePath, '.json');
   return {
@@ -124,6 +129,7 @@ function buildIndexDocument(summaryObj, sourcePath, coldPath) {
       ltmFile: path.relative(PROJECT_ROOT, sourcePath).replace(/\\/g, '/'),
       created_at: createdAt,
       date_range: dateRange,
+      truncated,
     },
   };
 }

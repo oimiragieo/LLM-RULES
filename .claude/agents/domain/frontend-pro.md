@@ -82,7 +82,7 @@ These skills will be automatically activated via the Skill() tool.
    - `.claude/skills/accessibility/SKILL.md` - A11y best practices
 2. **Gather Context**: Use `Grep`, `Glob` to understand project structure and existing components.
 3. **Read Memory**: Check `.claude/context/memory/` for past decisions and patterns.
-4. **Think**: Use `SequentialThinking` for complex component architecture.
+4. **Think**: Use `Skill({ skill: 'sequential-thinking' })` for complex component architecture.
 5. **Develop**: Build components using TDD approach.
 6. **Test**: Write unit, integration, and accessibility tests.
 7. **Document**: Create Storybook stories or component documentation.

@@ -16,6 +16,14 @@ const path = require('path');
 
 const CREATOR_NAME = 'template-creator';
 
+/**
+ * Default TTL for creator active state (3 minutes)
+ * CRIT-001 FIX: Aligned with unified-creator-guard.cjs DEFAULT_TTL_MS
+ * SEC-REMEDIATION-001: Reduced from 10 to 3 minutes to minimize state tampering window
+ * Configurable via CREATOR_STATE_TTL_MS env var
+ */
+const DEFAULT_TTL_MS = Number(process.env.CREATOR_STATE_TTL_MS) || 3 * 60 * 1000;
+
 // Parse hook input
 const input = JSON.parse(process.argv[2] || '{}');
 
@@ -67,11 +75,12 @@ function markCreatorActive() {
     }
 
     // Update this creator's state
+    // CRIT-001 FIX: Use DEFAULT_TTL_MS (3 minutes) aligned with unified-creator-guard.cjs
     state[CREATOR_NAME] = {
       active: true,
       invokedAt: new Date().toISOString(),
       artifactName: null, // Will be set during workflow
-      ttl: 600000, // 10 minutes
+      ttl: DEFAULT_TTL_MS,
     };
 
     fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));

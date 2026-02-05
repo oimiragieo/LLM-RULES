@@ -35,7 +35,6 @@ These tools are built into Claude Code and work immediately:
 | **TaskOutput**      | Task Management | Read task output                            | ✅ All agents                  |
 | **TaskStop**        | Task Management | Stop running task                           | ✅ All agents                  |
 | **Skill**           | Capability      | Invoke skill workflows                      | ✅ All agents (MANDATORY)      |
-| **SkillCatalog**    | Capability      | Query available skills at runtime           | ✅ All agents                  |
 | **AvailableAgents** | Capability      | Query available agents by capability/domain | ✅ Router + Orchestrators      |
 | **AskUserQuestion** | Interaction     | Get user input                              | ✅ Router ONLY                 |
 | **EnterPlanMode**   | Planning        | Switch to planning mode                     | ✅ All agents                  |
@@ -45,32 +44,166 @@ These tools are built into Claude Code and work immediately:
 | **NotebookEdit**    | Jupyter         | Edit notebook cells                         | ✅ All agents                  |
 | **MemoryRecord**    | Memory          | Record structured memory entries            | ✅ All agents                  |
 
-**Total Core Tools:** 24
+**Total Core Tools:** 23
+
+**Note:** SkillCatalog is a Node.js library (not a host-provided tool), documented in the SkillCatalog Query System section below.
 
 ### Task Tool Signature
 
 The `Task` tool is the primary mechanism for Router and Orchestrators to spawn subagents.
 
-**Signature:**
-`Task({ subagent_type: string, prompt: string, task_id?: string, model?: string })`
+---
 
-**Parameters:**
+#### CRITICAL: Parameter Structure Requirements
 
-- `subagent_type`: The type of agent to spawn (e.g., 'planner', 'developer', 'qa').
-- `prompt`: The detailed instruction for the agent. MUST include task ID and context.
-- `task_id` (Optional): ID from `TaskCreate` or `TaskList`. Recommended for tracking.
-- `model` (Optional): Override the default model (see `@MODEL_SELECTION.md`).
+**The Task tool MUST be invoked with an object parameter, NOT a string.**
 
-**Usage:**
+| Requirement         | Correct                   | Wrong          |
+| ------------------- | ------------------------- | -------------- |
+| Parameter type      | Object `{}`               | String `"..."` |
+| Property names      | `snake_case`              | `camelCase`    |
+| Required properties | `subagent_type`, `prompt` | Missing either |
+
+---
+
+#### Full Signature
+
+```typescript
+Task({
+  subagent_type: string,      // REQUIRED - Agent type to spawn
+  prompt: string,              // REQUIRED - Complete instructions
+  task_id?: string,           // RECOMMENDED - For spawn traceability
+  model?: string,             // OPTIONAL - Override default model
+  allowed_tools?: string[]    // OPTIONAL - Tool whitelist (auto-enriched)
+})
+```
+
+---
+
+#### Parameter Descriptions
+
+| Parameter       | Required    | Description                                                                                                                               |
+| --------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `subagent_type` | **YES**     | Must match an agent identifier (e.g., `'developer'`, `'planner'`, `'qa'`, `'architect'`). See `.claude/agents/` for available agents.     |
+| `prompt`        | **YES**     | Complete instructions for the agent. MUST include: task ID, role description, specific task details, and relevant context.                |
+| `task_id`       | Recommended | ID from `TaskCreate` or `TaskList`. Logged to `spawn-log.jsonl` for traceability. Without this, spawn tracking is incomplete.             |
+| `model`         | Optional    | Model override. Use `'haiku'`, `'sonnet'`, `'opus'` shorthands OR full model ID (e.g., `'claude-sonnet-4-5'`). See `@MODEL_SELECTION.md`. |
+| `allowed_tools` | Optional    | Tool whitelist for the agent. If omitted, `spawn-prompt-assembler.cjs` hook auto-enriches with mandatory tools (TaskUpdate, Skill, etc.). |
+
+---
+
+#### Common Errors and Solutions
+
+| Error                         | Cause                                  | Solution                                                     |
+| ----------------------------- | -------------------------------------- | ------------------------------------------------------------ |
+| `"Invalid tool parameters"`   | Single string passed instead of object | Use object: `Task({ subagent_type: '...', prompt: '...' })`  |
+| `"Invalid tool parameters"`   | Missing `subagent_type` property       | Always include `subagent_type` in the object                 |
+| `"Invalid tool parameters"`   | Missing `prompt` property              | Always include `prompt` in the object                        |
+| `"Invalid tool parameters"`   | Wrong property name (camelCase)        | Use `subagent_type` not `subagentType`                       |
+| `"Tool not available"`        | TaskUpdate not in allowed_tools        | Let hook auto-enrich OR add `TaskUpdate` explicitly          |
+| Spawn prompt validation fails | Missing required sections              | Include TaskUpdate warning box, task ID, and memory protocol |
+
+---
+
+#### Correct Usage Examples
+
+**1. Minimal (Required Properties Only)**
 
 ```javascript
 Task({
   subagent_type: 'developer',
-  prompt: 'Task [DEV-01]: Implement auth middleware... (See context in ...)',
-  task_id: 'DEV-01',
-  model: 'claude-3-5-sonnet-20241022',
+  prompt: 'Task [DEV-01]: Implement user login validation...',
 });
 ```
+
+**2. Recommended (With task_id and model)**
+
+```javascript
+Task({
+  subagent_type: 'developer',
+  prompt: 'Task [DEV-01]: Implement auth middleware...',
+  task_id: 'DEV-01',
+  model: 'sonnet',
+});
+```
+
+**3. Full (With Explicit allowed_tools)**
+
+```javascript
+Task({
+  subagent_type: 'planner',
+  prompt: 'Task [PLAN-001]: Design authentication system...',
+  task_id: 'PLAN-001',
+  model: 'opus',
+  allowed_tools: ['Read', 'Write', 'Edit', 'Bash', 'TaskUpdate', 'TaskList', 'Skill'],
+});
+```
+
+---
+
+#### Incorrect Usage Examples
+
+**1. Single String (WRONG)**
+
+```javascript
+// ❌ WRONG: Task() does not accept a string
+Task('Implement authentication for the app');
+
+// ✓ CORRECT: Use object with required properties
+Task({ subagent_type: 'developer', prompt: 'Implement authentication...' });
+```
+
+**2. Missing subagent_type (WRONG)**
+
+```javascript
+// ❌ WRONG: Missing subagent_type
+Task({ prompt: 'Implement the feature...' });
+
+// ✓ CORRECT: Include subagent_type
+Task({ subagent_type: 'developer', prompt: 'Implement the feature...' });
+```
+
+**3. Missing prompt (WRONG)**
+
+```javascript
+// ❌ WRONG: Missing prompt
+Task({ subagent_type: 'developer' });
+
+// ✓ CORRECT: Include prompt
+Task({ subagent_type: 'developer', prompt: 'Implement the feature...' });
+```
+
+**4. Wrong Property Name - camelCase (WRONG)**
+
+```javascript
+// ❌ WRONG: camelCase property name
+Task({ subagentType: 'developer', prompt: '...' });
+
+// ✓ CORRECT: snake_case property name
+Task({ subagent_type: 'developer', prompt: '...' });
+```
+
+---
+
+#### Hook Processing Pipeline
+
+The following hooks process `Task()` calls in order:
+
+| Hook                              | Trigger          | Purpose                                                         |
+| --------------------------------- | ---------------- | --------------------------------------------------------------- |
+| `routing-guard.cjs`               | PreToolUse(Task) | Enforces TaskList-first, planner-first, security review         |
+| `pre-task-unified.cjs`            | PreToolUse(Task) | Validates spawn parameters, loop prevention, task status        |
+| `spawn-prompt-assembler.cjs`      | PreToolUse(Task) | Auto-enriches prompt with memory, tools, and TaskUpdate warning |
+| `spawn-prompt-validator.cjs`      | PreToolUse(Task) | Validates prompt contains required sections                     |
+| `config-model-validator.cjs`      | PreToolUse(Task) | Validates model matches config.yaml                             |
+| `tool-availability-validator.cjs` | PreToolUse(Task) | Validates required tools are available                          |
+| `agent-context-pre-tracker.cjs`   | PreToolUse(Task) | Sets mode='agent' to prevent race conditions                    |
+
+**Key Behavior:**
+
+- `spawn-prompt-assembler.cjs` enriches `allowed_tools` with mandatory tools (`TaskUpdate`, `Skill`, etc.) if not explicitly provided
+- This guarantees spawned agents have the tools needed for task tracking
+- If `allowed_tools` is explicitly provided, mandatory tools are still added if missing
 
 ### MCP Tools (Require Server Configuration)
 
@@ -101,7 +234,7 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 - File I/O: Read, Write, Edit
 - Search: Glob, Grep
 - Task Management: TaskCreate, TaskUpdate, TaskList, TaskGet, TaskOutput, TaskStop
-- Capability: Skill, SkillCatalog, AvailableAgents
+- Capability: Skill, AvailableAgents
 - Research: WebSearch, WebFetch
 - Planning: EnterPlanMode, ExitPlanMode
 - Jupyter: NotebookEdit
@@ -134,7 +267,6 @@ tools:
     TaskGet,
     TaskOutput,
     Skill,
-    SkillCatalog,
   ]
 ```
 
@@ -157,7 +289,6 @@ tools: [
     TaskGet,
     TaskOutput,
     Skill,
-    SkillCatalog,
   ]
 ```
 
@@ -189,21 +320,26 @@ tools: [
 
 - **reflection-agent**: No Bash (read-only, monitors Bash errors for reflection)
 
-### SkillCatalog Tool
+### SkillCatalog Query System
 
-Agents can query available skills dynamically at runtime:
+**Type:** Node.js Library (not a host tool)
+**Usage:** `const { SkillCatalogQuery } = require('.claude/lib/tools/skill-catalog.cjs')`
+**In Agents:** Use `Skill({ skill: 'skill-name' })` instead
 
-- Example: `SkillCatalog({ domain: 'testing' })`
-- Filters: domain, category, agentType, tags, limit
-- Returns: Matching skills with descriptions and recommendations
-- Use when: Agent needs to discover skills for current task
+SkillCatalog is an internal library for querying the skill index. Agents use the Skill() tool to invoke skills, not the SkillCatalog library directly.
 
-Example usage:
+**For skill discovery:**
+
+- Agents receive AVAILABLE_SKILLS list at spawn time
+- Use Skill() tool to invoke specific skills
+- Skill discovery happens via agent documentation, not runtime queries
+
+**Internal usage (if implementing new tools):**
 
 ```javascript
-const skills = SkillCatalog({ domain: 'testing', agentType: 'developer' });
-const best = skills.skills.find(s => s.recommended);
-Skill({ skill: best.name });
+const { SkillCatalogQuery } = require('.claude/lib/tools/skill-catalog.cjs');
+const catalog = new SkillCatalogQuery();
+const results = catalog.query({ domain: 'testing', agentType: 'developer' });
 ```
 
 ### MemoryRecord Tool

@@ -24,6 +24,7 @@ Agent Studio transforms Claude Code from a single assistant into an entire devel
 - Claude Code CLI installed
 - Node.js 18+ (for some tooling)
 - Git (recommended)
+- **ANTHROPIC_API_KEY** (required for memory extraction, deduplication, and intelligent summaries)
 
 ## Quick Start
 
@@ -164,15 +165,27 @@ Agents don't just "know things"—they **invoke skills** to execute work. Skills
 
 The skill catalog contains **426 skills** organized into 20+ categories. Browse the [Skill Catalog](.claude/context/artifacts/skill-catalog.md) to see what's available.
 
+## Slash Commands (Quick Actions)
+
+Agent Studio ships with command shortcuts under `.claude/commands/` for common workflows:
+
+- **/verify**, **/checkpoint**, **/learn**, **/orchestrate**
+- **/tdd**, **/code-review**, **/test-coverage**, **/eval**
+- **/build-fix**, **/refactor-clean**, **/e2e**, **/setup-pm**
+- **/add-todo**, **/check-todos**
+
+These commands are documentation-driven prompts that guide the Router and agents through consistent workflows.
+
 ## Memory: Nothing Gets Forgotten
 
 Agent Studio uses a persistent memory system so context carries across sessions:
 
-- **learnings.md**: Patterns, solutions, gotchas
+- **patterns.json**: Structured reusable patterns
+- **gotchas.json**: Structured pitfalls and edge cases
 - **decisions.md**: Architecture Decision Records (ADRs)
 - **issues.md**: Known blockers and workarounds
-- **gotchas.json**, **patterns.json**: Structured memory
-- **sessions/**: Per-session history
+- **learnings.md**: Legacy archive (read-only; do not append)
+- **STM/MTM/LTM**: Tiered session memory under `.claude/context/memory/`
 
 Agents read memory before starting work and record findings after completion. This means you can resume work days later without repeating context.
 
@@ -334,6 +347,7 @@ Agent Studio:
 
 - **agent:production** is a stub; **agent:worker** is a placeholder that does not run the hook framework (hooks are host-driven today).
 - Memory scripts: `memory:init`, `memory:embeddings`, `memory:health`, `memory:weekly`, `memory:dashboard` (health), `memory:dashboard:budget` (token/budget) — see [MEMORY_SYSTEM.md](./MEMORY_SYSTEM.md). Set `MEMORY_EMBED_ON_EDIT=on` in `.env` for automatic embedding updates on memory file edits.
+- For headless or rarely-closed sessions, enable `REFLECTION_QUEUE_PROCESS_ON_PROMPT` and schedule `memory:weekly` (or use the worker).
 
 ## Where to Learn More
 
@@ -343,6 +357,20 @@ Agent Studio:
 - **[Agent Directory](../agents/)**: Explore agent definitions
 - **[Workflows](../workflows/)**: Multi-agent coordination patterns
 - **[HOOKS_AND_SAFETY.md](./HOOKS_AND_SAFETY.md)**: Safety validators and hooks
+
+## Troubleshooting
+
+### MCP server timeouts (e.g. shadcn)
+
+Some MCP servers (e.g. shadcn) may time out after ~30 seconds due to network, rate limits, or service availability. This is environmental, not a bug in Agent Studio. If you do not need a specific MCP server (e.g. shadcn components), you can disable it in your app’s MCP configuration to avoid noisy timeouts. Disabling an unused MCP server is safe.
+
+### MCP stderr lines shown as [ERROR]
+
+Some MCP servers (e.g. sequential-thinking, filesystem, chrome-devtools) write informational startup messages to stderr. The host may display these as `[ERROR]` in debug logs. If the servers connect successfully, these lines are cosmetic and do not indicate a failure. You can ignore them or reduce MCP verbosity in the server’s own config if available.
+
+### Agent frontmatter "Missing required name"
+
+Agent files under `.claude/agents/` must have YAML frontmatter with `name` as the **first** key (line 2 after `---`). Use a simple string value (e.g. `name: developer`, `name: reflection-agent`). Files must be saved as **UTF-8 without BOM**; a BOM can cause the host parser to fail. If the message persists, the host may require a specific format—check the host's documentation. You can verify all agents with: `node .claude/tools/cli/verify-agent-frontmatter.mjs`.
 
 ## Need Help?
 

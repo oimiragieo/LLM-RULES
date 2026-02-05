@@ -143,8 +143,43 @@ function getMemoriesForTool(toolName, projectRoot) {
   }
 }
 
+function cleanupOrphanedRelationships(projectRoot) {
+  const db = ensureDb(projectRoot);
+  try {
+    const countRow = db
+      .prepare(
+        `
+        SELECT COUNT(*) AS count
+        FROM entity_relationships
+        WHERE from_entity_id NOT IN (SELECT id FROM entities)
+           OR to_entity_id NOT IN (SELECT id FROM entities)
+      `
+      )
+      .get();
+    const count = countRow?.count || 0;
+
+    if (count > 0) {
+      db.exec(
+        `
+        DELETE FROM entity_relationships
+        WHERE from_entity_id NOT IN (SELECT id FROM entities)
+           OR to_entity_id NOT IN (SELECT id FROM entities)
+      `
+      );
+    }
+
+    return { deleted: count };
+  } catch (error) {
+    logger.warn('Failed to cleanup orphaned relationships', { error: error.message });
+    return { deleted: 0, error: error.message };
+  } finally {
+    db.close();
+  }
+}
+
 module.exports = {
   linkMemoryToTools,
   getMemoriesForTool,
+  cleanupOrphanedRelationships,
   slugify,
 };

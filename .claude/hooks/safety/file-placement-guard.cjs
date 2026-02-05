@@ -36,6 +36,10 @@ const { getCachedState } = require('../../lib/utils/state-cache.cjs');
 
 // Tools that this guard watches
 const WRITE_TOOLS = ['Edit', 'Write', 'NotebookEdit'];
+const MEMORY_JSON_FILES = new Set(['patterns.json', 'gotchas.json']);
+const MEMORY_JSON_WRITE_ENFORCEMENT = String(
+  process.env.MEMORY_JSON_WRITE_ENFORCEMENT || 'block'
+).toLowerCase();
 
 // Valid path patterns for each directory category
 const VALID_PATHS = {
@@ -932,6 +936,48 @@ function main() {
         });
       } catch (_err) {
         // Best-effort
+      }
+      process.exit(2);
+    }
+  }
+
+  // Memory JSON enforcement: prevent direct Write/Edit to structured memory files.
+  if (MEMORY_JSON_WRITE_ENFORCEMENT !== 'off') {
+    const normalizedPath = filePath.replace(/\\/g, '/');
+    const baseName = path.basename(filePath);
+    const isMemoryJson =
+      (normalizedPath.includes('/.claude/context/memory/') ||
+        normalizedPath.includes('.claude/context/memory/')) &&
+      MEMORY_JSON_FILES.has(baseName);
+
+    if (isMemoryJson) {
+      const warning = `Direct edits to ${baseName} are blocked. Use MemoryRecord instead.`;
+      console.error(
+        JSON.stringify({
+          hook: 'file-placement-guard',
+          event: 'memory_json_write_blocked',
+          tool: toolName,
+          path: filePath.substring(0, 120),
+          reason: warning,
+          timestamp: new Date().toISOString(),
+          severity: 'HIGH',
+        })
+      );
+      console.error(`\n[BLOCKED] ${warning}\n`);
+
+      try {
+        eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName,
+          reason: 'memory_json_write_blocked',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
+
+      if (MEMORY_JSON_WRITE_ENFORCEMENT === 'warn' || enforcementMode === 'warn') {
+        process.exit(0);
       }
       process.exit(2);
     }

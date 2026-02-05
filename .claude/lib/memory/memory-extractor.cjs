@@ -6,12 +6,16 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { getMemoryExtractionPrompt } = require('./prompts/memory-extraction.cjs');
 
 const logger = createLogger('memory-extractor');
+const RECENT_MESSAGES_LIMIT = Number(process.env.MEMORY_EXTRACTION_RECENT_MESSAGES_LIMIT || 40);
+const RECENT_MESSAGES_MAX_CHARS = Number(process.env.MEMORY_EXTRACTION_RECENT_CHARS_LIMIT || 8000);
+const LIST_LIMIT = Number(process.env.MEMORY_EXTRACTION_LIST_LIMIT || 12);
 
 function buildRecentMessages(sessionData) {
   if (!sessionData || typeof sessionData !== 'object') return '';
 
   if (Array.isArray(sessionData.recent_messages) && sessionData.recent_messages.length > 0) {
-    return sessionData.recent_messages
+    const recent = sessionData.recent_messages.slice(-RECENT_MESSAGES_LIMIT);
+    const joined = recent
       .map(entry => {
         if (!entry || typeof entry !== 'object') return '';
         const role = entry.role || 'unknown';
@@ -20,6 +24,11 @@ function buildRecentMessages(sessionData) {
       })
       .filter(Boolean)
       .join('\n');
+
+    if (joined.length > RECENT_MESSAGES_MAX_CHARS) {
+      return joined.slice(-RECENT_MESSAGES_MAX_CHARS);
+    }
+    return joined;
   }
 
   const parts = [];
@@ -27,22 +36,106 @@ function buildRecentMessages(sessionData) {
     parts.push(`Session summary:\n${sessionData.summary}`);
   }
   if (Array.isArray(sessionData.decisions_made) && sessionData.decisions_made.length > 0) {
-    parts.push(`Decisions:\n- ${sessionData.decisions_made.join('\n- ')}`);
+    const decisions = sessionData.decisions_made.slice(0, LIST_LIMIT);
+    parts.push(`Decisions:\n- ${decisions.join('\n- ')}`);
   }
   if (Array.isArray(sessionData.patterns_found) && sessionData.patterns_found.length > 0) {
-    parts.push(`Patterns:\n- ${sessionData.patterns_found.join('\n- ')}`);
+    const patterns = sessionData.patterns_found.slice(0, LIST_LIMIT);
+    parts.push(`Patterns:\n- ${patterns.join('\n- ')}`);
   }
   if (
     Array.isArray(sessionData.gotchas_encountered) &&
     sessionData.gotchas_encountered.length > 0
   ) {
-    parts.push(`Gotchas:\n- ${sessionData.gotchas_encountered.join('\n- ')}`);
+    const gotchas = sessionData.gotchas_encountered.slice(0, LIST_LIMIT);
+    parts.push(`Gotchas:\n- ${gotchas.join('\n- ')}`);
   }
   if (Array.isArray(sessionData.tasks_completed) && sessionData.tasks_completed.length > 0) {
-    parts.push(`Tasks completed:\n- ${sessionData.tasks_completed.join('\n- ')}`);
+    const tasks = sessionData.tasks_completed.slice(0, LIST_LIMIT);
+    parts.push(`Tasks completed:\n- ${tasks.join('\n- ')}`);
   }
 
-  return parts.join('\n\n');
+  const joined = parts.join('\n\n');
+  if (joined.length > RECENT_MESSAGES_MAX_CHARS) {
+    return joined.slice(-RECENT_MESSAGES_MAX_CHARS);
+  }
+  return joined;
+}
+
+function buildFallbackCandidate(category, text, tag) {
+  const clean = String(text || '').trim();
+  if (!clean) return null;
+  const label = tag ? `${tag}: ${clean}` : clean;
+  return {
+    category,
+    abstract: label.slice(0, 80),
+    overview: label,
+    content: clean,
+  };
+}
+
+function fallbackExtractMemories(sessionData) {
+  const candidates = [];
+  const patterns = Array.isArray(sessionData?.patterns_found) ? sessionData.patterns_found : [];
+  const gotchas = Array.isArray(sessionData?.gotchas_encountered)
+    ? sessionData.gotchas_encountered
+    : [];
+  const decisions = Array.isArray(sessionData?.decisions_made) ? sessionData.decisions_made : [];
+  const tasks = Array.isArray(sessionData?.tasks_completed) ? sessionData.tasks_completed : [];
+
+  for (const item of patterns) {
+    const candidate = buildFallbackCandidate('patterns', item, 'Pattern');
+    if (candidate) candidates.push(candidate);
+  }
+  for (const item of gotchas) {
+    const candidate = buildFallbackCandidate('cases', item, 'Gotcha');
+    if (candidate) candidates.push(candidate);
+  }
+  for (const item of decisions) {
+    const candidate = buildFallbackCandidate('events', item, 'Decision');
+    if (candidate) candidates.push(candidate);
+  }
+  for (const item of tasks) {
+    const candidate = buildFallbackCandidate('events', item, 'Task');
+    if (candidate) candidates.push(candidate);
+  }
+
+  return candidates;
+}
+
+function extractCandidatesFromText(text) {
+  const candidates = [];
+  if (!text) return candidates;
+  const lines = String(text)
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  const add = (category, line, tag) => {
+    const candidate = buildFallbackCandidate(category, line, tag);
+    if (candidate) candidates.push(candidate);
+  };
+
+  for (const line of lines) {
+    const lower = line.toLowerCase();
+    if (lower.startsWith('pattern:') || lower.includes('pattern -')) {
+      add('patterns', line.replace(/^pattern:\s*/i, ''), 'Pattern');
+      continue;
+    }
+    if (lower.startsWith('gotcha:') || lower.includes('gotcha -')) {
+      add('cases', line.replace(/^gotcha:\s*/i, ''), 'Gotcha');
+      continue;
+    }
+    if (lower.startsWith('decision:') || lower.includes('decision -')) {
+      add('events', line.replace(/^decision:\s*/i, ''), 'Decision');
+      continue;
+    }
+    if (lower.startsWith('lesson:') || lower.startsWith('remember:')) {
+      add('patterns', line.replace(/^(lesson|remember):\s*/i, ''), 'Lesson');
+    }
+  }
+
+  return candidates;
 }
 
 function extractJson(text) {
@@ -68,6 +161,19 @@ async function extractMemoriesFromSession(sessionData, options = {}) {
     summary
   );
 
+  if (typeof modelClient.isMockMode === 'function' && modelClient.isMockMode()) {
+    const fallback = fallbackExtractMemories(sessionData);
+    if (fallback.length > 0) {
+      logger.warn('Memory extraction mock mode fallback used', { count: fallback.length });
+      return fallback;
+    }
+    const heuristic = extractCandidatesFromText(recentMessages);
+    if (heuristic.length > 0) {
+      logger.warn('Memory extraction mock mode heuristic used', { count: heuristic.length });
+      return heuristic;
+    }
+  }
+
   try {
     const response = await modelClient.generateText({ system, messages: userPrompt });
     const jsonPayload = extractJson(response);
@@ -76,7 +182,7 @@ async function extractMemoriesFromSession(sessionData, options = {}) {
     }
     const parsed = JSON.parse(jsonPayload);
     if (!parsed || !Array.isArray(parsed.memories)) {
-      return [];
+      return fallbackExtractMemories(sessionData);
     }
     return parsed.memories;
   } catch (error) {
@@ -84,6 +190,16 @@ async function extractMemoriesFromSession(sessionData, options = {}) {
       error: error.message,
       projectRoot,
     });
+    const fallback = fallbackExtractMemories(sessionData);
+    if (fallback.length > 0) {
+      logger.warn('Memory extraction fallback used', { count: fallback.length });
+      return fallback;
+    }
+    const heuristic = extractCandidatesFromText(recentMessages);
+    if (heuristic.length > 0) {
+      logger.warn('Memory extraction heuristic fallback used', { count: heuristic.length });
+      return heuristic;
+    }
     return [];
   }
 }
@@ -91,4 +207,6 @@ async function extractMemoriesFromSession(sessionData, options = {}) {
 module.exports = {
   buildRecentMessages,
   extractMemoriesFromSession,
+  fallbackExtractMemories,
+  extractCandidatesFromText,
 };

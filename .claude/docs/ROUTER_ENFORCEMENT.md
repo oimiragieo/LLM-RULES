@@ -8,7 +8,7 @@ The Router Enforcement System prevents the Router (Claude) from bypassing the Ro
 **ADR**: ADR-006 (Accepted 2026-01-25)
 **Configuration**: `PLANNER_FIRST_ENFORCEMENT` environment variable
 
-**Note**: `user-prompt-unified.cjs` performs complexity classification using `routing-table.cjs` on UserPromptSubmit. `router-enforcer.cjs` is an advisory standalone helper and is not registered by default in `settings.json`.
+**Note**: `user-prompt-unified.cjs` performs complexity classification using `routing-table.cjs` on UserPromptSubmit. `router-enforcer.cjs` is not registered; enforcement is via `routing-guard.cjs` and `routing-table.cjs`.
 
 ## Semantic Fallback (Optional)
 

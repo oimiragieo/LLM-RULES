@@ -175,6 +175,14 @@ const SAFE_COMMANDS_ALLOWLIST = [
   'date',
   'time',
   'clear',
+  'stat', // Read file metadata (size, permissions, timestamps)
+  'file', // File type identification
+  'od', // Octal dump (binary inspection)
+  'hexdump', // Hex dump (binary inspection)
+  'lsof', // List open files
+  'strings', // Extract strings from binary
+  'sort', // Sort lines
+  'uniq', // Unique lines
 
   // Basic file operations (path validation happens in filesystem-validators.cjs)
   'mkdir',

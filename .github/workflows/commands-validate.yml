@@ -1,0 +1,37 @@
+name: Commands Validation
+
+on:
+  pull_request:
+    paths:
+      - '.claude/commands/**'
+      - '.claude/tools/validate-commands.mjs'
+      - 'package.json'
+  push:
+    branches:
+      - main
+    paths:
+      - '.claude/commands/**'
+      - '.claude/tools/validate-commands.mjs'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  validate-commands:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate commands
+        run: npm run validate:commands

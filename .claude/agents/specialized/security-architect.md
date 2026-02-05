@@ -52,7 +52,7 @@ context_files:
 ## Execution Rules
 
 - **Extended Thinking**: MANDATORY for architecture decisions and threat assessments.
-- **Tools**: Use `SequentialThinking` for deep analysis. Use `dependency-analyzer` for vulnerability scans.
+- **Tools**: Use `Skill({ skill: 'sequential-thinking' })` for deep analysis. Use `dependency-analyzer` for vulnerability scans.
 - **Output**: Security reports go to `.claude/context/reports/`. Structured data to `.claude/context/artifacts/`.
 - **Collaboration**: You advise the Architect and Developer. You do not implement non-security code.
 
