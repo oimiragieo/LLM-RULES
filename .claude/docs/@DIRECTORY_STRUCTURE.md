@@ -1,7 +1,7 @@
 # Directory Structure Reference
 
 **Source:** CLAUDE.md Section 9
-**Version:** v2.3.0
+**Version:** v2.4.0
 **Last Updated:** 2026-02-06
 
 ---
@@ -24,6 +24,7 @@ Complete directory structure reference for the `.claude/` framework directory, i
 ├── docs/
 ├── hooks/
 ├── lib/
+├── rules/
 ├── schemas/
 ├── skills/
 ├── templates/
@@ -49,14 +50,28 @@ agents/
 ```
 context/
 ├── artifacts/
-│   ├── plans/
-│   ├── research-reports/
-│   ├── architecture/
-│   ├── diagrams/
-│   ├── agent-catalog.md
-│   └── skill-catalog.md
+│   ├── analysis/            # Deep-dive analysis documents
+│   ├── architecture/        # Architecture documentation
+│   ├── catalogs/            # Catalog and registry files
+│   ├── database/            # Database design artifacts
+│   ├── diagrams/            # Mermaid/ASCII diagrams
+│   ├── plans/               # Implementation plans (legacy location)
+│   ├── reports/             # Agent reports (legacy location)
+│   │   └── archive/         # Archived reports
+│   ├── research-reports/    # Research synthesis outputs
+│   ├── specs/               # Specification documents
+│   ├── summaries/           # Phase summaries, checkpoints
+│   ├── skill-catalog.md     # Master skill catalog
+│   └── ...                  # (legacy root files being migrated)
+├── backups/                 # System backups
+├── checkpoints/             # Workflow checkpoints
+├── code-index/              # Code indexing data (merkle trees)
+├── code-indexing/           # Code indexing configuration
+├── config/                  # Configuration files
+│   ├── rule-index-cache.json
+│   └── ...
 ├── data/
-│   ├── lancedb/
+│   ├── lancedb/             # Vector store data
 │   │   ├── bm25-index.json
 │   │   ├── chunks.lance/
 │   │   └── index-metadata.json
@@ -67,20 +82,39 @@ context/
 │   ├── issues.md
 │   ├── constitution.md
 │   ├── behaviour.md
+│   ├── active_context.md
+│   ├── archive/
 │   └── named/
 ├── metrics/
 │   ├── hook-metrics.jsonl
-│   └── spawn-log.jsonl
+│   ├── spawn-log.jsonl
+│   └── spawn-size-audit.jsonl
+├── ml/                      # ML model data
+├── plans/                   # Planner outputs (canonical location)
+├── reports/                 # Agent reports (canonical location)
+│   ├── security/
+│   ├── qa/
+│   ├── architecture/
+│   └── database/
 ├── runtime/
 │   ├── router-state.json
 │   ├── compression-reminder.txt
 │   └── reflection-reminder.txt
+├── self-healing/            # Self-healing state
+├── sessions/                # Session data
 ├── teams/
 │   └── [team-name].csv
-├── access-stats.json
-├── agent-registry.json
-└── dashboard.json
+├── tmp/                     # Temporary files (auto-cleaned 24h)
+├── workflows/               # Workflow state data
+├── access-stats.json        # (legacy root - stats tracking)
+├── agent-catalog.json       # (legacy root - agent catalog)
+├── agent-registry.json      # Agent registry (canonical root location)
+├── dashboard.json           # Dashboard state
+├── evolution-state.json     # EVOLVE workflow state (canonical root location)
+└── reflection-queue.jsonl   # Reflection queue (canonical root location)
 ```
+
+**Root-level context files note:** `agent-registry.json`, `evolution-state.json`, and `reflection-queue.jsonl` remain at `.claude/context/` root because they have 30+ cross-cutting references in hooks, workflows, agents, and documentation. Moving them would cause widespread breakage. They are canonical at their current locations.
 
 ### config/
 
@@ -135,6 +169,21 @@ lib/
 │   └── logical-unit-tracker.cjs (Phase 1.5 - git notes-based revert)
 └── integration/
     └── system-registration-handler.cjs
+```
+
+### rules/
+
+```
+rules/
+├── agents.md
+├── coding-style.md
+├── git-workflow.md
+├── hooks.md
+├── patterns.md
+├── performance.md
+├── security.md
+├── testing.md
+└── workspace-conventions.md
 ```
 
 ### skills/
@@ -241,6 +290,15 @@ schemas/
 | `schema-creator`     | `.claude/schemas/`                            |
 | `diagram-generator`  | `.claude/context/artifacts/diagrams/`         |
 
+### Workspace Conventions
+
+- **Naming**: lowercase kebab-case, date suffix `YYYY-MM-DD`
+- **Pattern**: `{descriptive-name}-{YYYY-MM-DD}.{ext}`
+- **Provenance**: All generated files include `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+- **Temp files**: `.claude/context/tmp/` only (auto-cleaned 24h)
+- **Reports**: `.claude/context/reports/{domain}/` (security, qa, architecture, database)
+- **Full rules**: `.claude/rules/workspace-conventions.md`
+
 ### Deleted/Deprecated Directories
 
 | Old Path                  | Status                                           | Date       |
@@ -258,6 +316,14 @@ schemas/
 | `.claude/docs/archive/`   | Deleted (one-time debug fix reports)             | 2026-02-06 |
 | `.claude/docs/reference/` | Deleted (AI-generated unused reference material) | 2026-02-06 |
 
+### Moved Files (2026-02-06)
+
+| Old Path                                       | New Path                                                           | Reason               |
+| ---------------------------------------------- | ------------------------------------------------------------------ | -------------------- |
+| `.claude/context/spawn-size-audit.jsonl`       | `.claude/context/metrics/spawn-size-audit.jsonl`                   | Belongs in metrics   |
+| `.claude/context/rule-index-cache.json`        | `.claude/context/config/rule-index-cache.json`                     | Belongs in config    |
+| `.claude/context/checkpoint-week4-20260128.md` | `.claude/context/artifacts/summaries/checkpoint-week4-20260128.md` | Belongs in summaries |
+
 ### File Placement Enforcement
 
 Enforced by `file-placement-guard.cjs`:
@@ -266,6 +332,7 @@ Enforced by `file-placement-guard.cjs`:
 
 **Override:** `FILE_PLACEMENT_OVERRIDE=true`
 **Rules:** `.claude/docs/FILE_PLACEMENT_RULES.md`
+**Workspace Conventions:** `.claude/rules/workspace-conventions.md`
 
 ---
 
@@ -273,6 +340,7 @@ Enforced by `file-placement-guard.cjs`:
 
 - **@CREATOR_SKILLS_TABLE.md** - Output locations for each creator
 - **@ENVIRONMENT_CONFIG.md** - Configuration files location
+- `.claude/rules/workspace-conventions.md` - Naming, provenance, temp file rules
 
 ---
 

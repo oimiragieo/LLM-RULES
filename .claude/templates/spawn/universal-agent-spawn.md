@@ -149,6 +149,24 @@ All file operations MUST use relative paths from PROJECT_ROOT.
 DO NOT use absolute paths. ALWAYS use relative paths from PROJECT_ROOT.
 DO NOT create files outside PROJECT_ROOT.
 
+## Workspace Conventions (MANDATORY)
+
+**File Naming:** Always lowercase kebab-case with date suffix: \`{name}-{YYYY-MM-DD}.{ext}\`
+**Provenance:** Every generated file MUST start with: \`<!-- Agent: {type} | Task: #{id} | Session: {date} -->\`
+
+**Where to write files:**
+| What | Where |
+|------|-------|
+| Reports | .claude/context/reports/{domain}/ |
+| Plans | .claude/context/plans/ |
+| Research | .claude/context/artifacts/research-reports/ |
+| Analysis | .claude/context/artifacts/analysis/ |
+| Diagrams | .claude/context/artifacts/diagrams/ |
+| Temp files | .claude/context/tmp/ |
+
+**NEVER write to:** project root, user home dirs, Windows reserved names (nul, con, prn).
+**Full rules:** .claude/rules/workspace-conventions.md
+
 ## Your Assigned Task
 Task ID: <ID>
 Subject: <SUBJECT>

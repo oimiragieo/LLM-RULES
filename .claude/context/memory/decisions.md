@@ -14,6 +14,41 @@ Each decision should include:
 
 ---
 
+## ADR-078: Workspace Conventions and Directory Reorganization
+
+**Date:** 2026-02-06
+
+**Status:** Accepted
+
+**Context:**
+Deep audit (Task #19) found 55+ misplaced files in `.claude/context/artifacts/` root, no naming convention, no provenance tracking, and inconsistent report placement. Research (Task #20) identified industry best practices for agent workspace organization.
+
+**Decision:**
+
+1. Establish `.claude/rules/workspace-conventions.md` as the canonical workspace rules file
+2. Create new directory structure: `reports/{domain}/`, `artifacts/{analysis,catalogs,summaries,database}/`
+3. Adopt kebab-case naming with ISO 8601 date suffixes: `{name}-{YYYY-MM-DD}.{ext}`
+4. Require provenance headers on all generated files: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+5. Move `spawn-size-audit.jsonl` to `metrics/`, `rule-index-cache.json` to `config/`
+6. Keep `evolution-state.json`, `reflection-queue.jsonl`, and `agent-registry.json` at context root (35+ cross-cutting references each)
+7. Inject workspace conventions into the spawn template so all agents know the rules
+
+**Rationale:**
+
+- Flat structure (Option A) chosen over nested because it is simpler and easier to enforce
+- Files with deep cross-cutting references (evolution-state.json has 35+ refs in hooks, workflows, agents) are too risky to move; pragmatic decision to document as canonical
+- Provenance headers enable traceability without complex metadata systems
+- Rules placed in `.claude/rules/` which Claude Code auto-loads as project instructions
+
+**Consequences:**
+
+- All new agent-generated files will follow naming and placement conventions
+- Spawn template instructs every agent on correct file locations
+- Legacy files in `artifacts/` root remain for now (Task #22 handles migration)
+- Three root-level context files documented as canonical exceptions
+
+---
+
 ## ADR-076: Simple 50-Line Chunking for BM25-Only Mode
 
 **Date:** 2026-02-05

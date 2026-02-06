@@ -20,7 +20,13 @@ function buildResetPlan(scope, options = {}) {
 
   const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
   const metricsDir = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
-  const spawnAudit = path.join(PROJECT_ROOT, '.claude', 'context', 'spawn-size-audit.jsonl');
+  const spawnAudit = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'metrics',
+    'spawn-size-audit.jsonl'
+  );
 
   const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
   const codeIndexDir = path.join(PROJECT_ROOT, '.claude', 'context', 'code-index');

@@ -179,10 +179,20 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 | Subdirectory                  | Purpose                        | Allowed Files                               |
 | ----------------------------- | ------------------------------ | ------------------------------------------- |
 | `artifacts/`                  | Generated outputs              | `*.md`, `*.json`                            |
-| `plans/`                      | Planner outputs                | `*-plan.md`                                 |
+| `artifacts/analysis/`         | Deep-dive analysis documents   | `*.md`                                      |
+| `artifacts/catalogs/`         | Catalog and registry files     | `*.md`, `*.json`                            |
+| `artifacts/database/`         | Database design artifacts      | `*.md`, `*.json`                            |
 | `artifacts/reports/`          | QA, security, audit reports    | `*-report.md`, `*-audit.md`                 |
 | `artifacts/research-reports/` | Research synthesis outputs     | `*-research.md`                             |
+| `artifacts/summaries/`        | Phase summaries, checkpoints   | `*.md`                                      |
+| `plans/`                      | Planner outputs                | `*-plan.md`                                 |
+| `reports/`                    | Agent reports (NEW canonical)  | `*-report-YYYY-MM-DD.md`                    |
+| `reports/security/`           | Security domain reports        | `*.md`                                      |
+| `reports/qa/`                 | QA domain reports              | `*.md`                                      |
+| `reports/architecture/`       | Architecture domain reports    | `*.md`                                      |
+| `reports/database/`           | Database domain reports        | `*.md`                                      |
 | `memory/`                     | Persistent memory files        | `learnings.md`, `decisions.md`, `issues.md` |
+| `metrics/`                    | Metrics and audit logs         | `*.jsonl`, `*.json`                         |
 | `config/`                     | Configuration files            | `*.json`, `*.yaml`                          |
 | `runtime/`                    | Temporary runtime state        | `*.json`                                    |
 | `checkpoints/`                | Workflow checkpoints           | `*.json`                                    |
@@ -584,6 +594,7 @@ FILE_PLACEMENT_GUARD=off claude  # Dangerous
 
 ## Related Documentation
 
+- `.claude/rules/workspace-conventions.md` - Workspace naming, provenance, temp file rules
 - `.claude/docs/ARTIFACT_NAMING.md` - Naming conventions for artifacts
 - `.claude/docs/DEVELOPER_WORKFLOW.md` - Developer workflow guidelines
 - `.claude/workflows/core/skill-lifecycle.md` - Artifact lifecycle management

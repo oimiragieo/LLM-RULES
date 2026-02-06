@@ -179,7 +179,13 @@ function logSpawnAudit(sizeInfo, subagentType, status) {
   if (!process.env.SPAWN_SIZE_AUDIT_LOG) return;
 
   try {
-    const auditPath = path.join(PROJECT_ROOT, '.claude', 'context', 'spawn-size-audit.jsonl');
+    const auditPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'context',
+      'metrics',
+      'spawn-size-audit.jsonl'
+    );
     const entry = {
       timestamp: new Date().toISOString(),
       agent: subagentType,

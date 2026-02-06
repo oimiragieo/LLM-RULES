@@ -3,17 +3,20 @@
 ## Code Indexing System Verification (2026-02-06)
 
 ### Task
+
 Verify code indexing configuration, BM25 persistence, hook registration, and incremental indexing (Tasks #10 and #11).
 
 ### Verification Results
 
 **C5: Code Indexing Configuration** ✅ VERIFIED
+
 - `index-manager.cjs`: Memory-safe config with `calculateSafeMemoryConfig()`
 - BM25-only sync fast-path (lines 447-521) bypasses async pipeline when `embeddingMode === 'off'`
 - Checkpointing system for resume capability (lines 276-330)
 - Exclude patterns working correctly
 
 **C6: BM25 Index Persistence** ✅ VERIFIED
+
 - Directory: `.claude/context/data/lancedb/` exists
 - BM25 index: `bm25-index.json` exists (2MB, proper structure)
 - Atomic writes via `.tmp` file then `fs.renameSync()` (vector-store.cjs lines 167-189)
@@ -21,18 +24,21 @@ Verify code indexing configuration, BM25 persistence, hook registration, and inc
 - LanceDB vector store: `code_index.lance/` directory exists
 
 **H5: code-index-updater Hook** ✅ VERIFIED
+
 - Hook file: `.claude/hooks/routing/code-index-updater.cjs` exists
 - Registered in `.claude/settings.json` under PreToolUse → Write
 - Tests: 13/13 passing in `tests/hooks/*code-index*.test.cjs`
 - Incremental indexing on file writes working
 
 **H6: Incremental Indexing** ✅ VERIFIED
+
 - Method: `incrementalUpdate()` exists in index-manager.cjs (line 698)
 - Uses Merkle tree diffs to detect changes (lines 698-796)
 - Processes only added/modified/deleted files
 - No dedicated test file needed (tested via hook integration)
 
 **H4: skill-index.json Regeneration** ✅ COMPLETED
+
 - Generator: `.claude/tools/cli/generate-skill-index.cjs`
 - Output path: `.claude/config/skill-index.json`
 - Skills indexed: **434** (from 444 SKILL.md files)
@@ -42,6 +48,7 @@ Verify code indexing configuration, BM25 persistence, hook registration, and inc
 ### Test Results
 
 **Code Indexing Tests**: 62/64 pass, 1 skipped, 1 not ok (GPU serialization warning)
+
 - BM25Indexer: All tests passing
 - Hybrid search: All tests passing
 - GPU test: 6/6 pass, 1 skipped (serialization warning is informational, not a failure)
@@ -50,24 +57,28 @@ Verify code indexing configuration, BM25 persistence, hook registration, and inc
 ### Key Learnings
 
 **skill-index.json Generation Pattern**:
+
 - Generator script: `.claude/tools/cli/generate-skill-index.cjs`
 - Sources: `.claude/context/artifacts/skill-catalog.md` + individual SKILL.md files
 - Output structure: `{ version, metadata: { totalSkills }, skills: { skillName: {...} } }`
 - Count mismatch (434 vs 444) acceptable - some skills may not be cataloged (scientific-skills subdirs)
 
 **Code Indexing Configuration Verification**:
+
 - Check `.claude/context/data/lancedb/` directory exists
 - Verify `bm25-index.json` file present and well-formed
 - Check `code_index.lance/` directory for LanceDB vector store
 - Hooks must be registered in settings.json (existence ≠ activation)
 
 **Incremental Indexing Architecture**:
+
 - Merkle tree tracks file state (`.claude/context/code-index/merkle-tree.json`)
 - Diff operation identifies added/modified/deleted files
 - Only changed files are re-indexed (not full reindex)
 - Hook triggers indexing on Write tool usage
 
 **BM25-only Mode Performance**:
+
 - Set `LANCEDB_EMBEDDING_MODE=off` to skip dense embeddings
 - Sync fast-path (lines 447-521) bypasses async pipeline
 - Simple 50-line chunking (no AST parsing for BM25)
@@ -85,11 +96,13 @@ Verify code indexing configuration, BM25 persistence, hook registration, and inc
 ## CLAUDE.md Template and @docs Reference Verification (2026-02-06)
 
 ### Task
+
 Verify template file paths, placeholder names, and @docs references in CLAUDE.md are accurate.
 
 ### Findings
 
 **Templates (Section 0 - Template Loading Protocol)**: ✅ All accurate
+
 - All 4 referenced template files exist at correct paths
 - Placeholder names documented in CLAUDE.md match actual template usage
 - Templates: universal-agent-spawn.md, orchestrator-spawn.md, agent-identity-integration.md, subordinate-once.md
@@ -99,6 +112,7 @@ Verify template file paths, placeholder names, and @docs references in CLAUDE.md
 **Actual Template Placeholders**: Templates use all documented placeholders + additional optional ones (acceptable - templates are source of truth)
 
 **@docs Reference Files (REFERENCE INDEX)**: ⚠️ 1 missing entry
+
 - 12 @docs files exist in `.claude/docs/`
 - 11 were listed in REFERENCE INDEX
 - **Missing**: `@SKILL_USAGE_GUIDE.md` (skill selection decision tree)
@@ -108,6 +122,7 @@ Verify template file paths, placeholder names, and @docs references in CLAUDE.md
 ### Fix Applied
 
 Added missing `@SKILL_USAGE_GUIDE.md` to REFERENCE INDEX table:
+
 ```
 | **@SKILL_USAGE_GUIDE.md**    | Section 7              | Skill selection decision tree  |
 ```
@@ -115,11 +130,13 @@ Added missing `@SKILL_USAGE_GUIDE.md` to REFERENCE INDEX table:
 ### Key Learning
 
 **@docs File Discovery Pattern**:
+
 - List all @-prefixed files: `ls -1 .claude/docs/@*.md`
 - Compare with REFERENCE INDEX in CLAUDE.md
 - Any file not listed = missing documentation
 
 **Template Placeholder Verification Pattern**:
+
 - Extract all placeholders: `grep -ohE "<[a-zA-Z_-]+>" .claude/templates/spawn/*.md | sort -u`
 - Compare with CLAUDE.md Section 0 documentation
 - CLAUDE.md documents core placeholders; templates may have additional optional ones

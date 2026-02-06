@@ -1,0 +1,42 @@
+{
+  ".claude/rules/agents.md": {
+    "mtime": "1770183649564.533",
+    "hash": "f1a43147c1b5a298",
+    "indexed_at": "2026-02-05T20:53:13.611Z"
+  },
+  ".claude/rules/coding-style.md": {
+    "mtime": "1770183649571.6418",
+    "hash": "d49c542e067eb1e6",
+    "indexed_at": "2026-02-05T20:53:13.619Z"
+  },
+  ".claude/rules/git-workflow.md": {
+    "mtime": "1770183649577.317",
+    "hash": "c234b4f0f236cdac",
+    "indexed_at": "2026-02-05T20:53:13.626Z"
+  },
+  ".claude/rules/hooks.md": {
+    "mtime": "1770183649582.3745",
+    "hash": "bab4c851e2833a3a",
+    "indexed_at": "2026-02-05T20:53:13.632Z"
+  },
+  ".claude/rules/patterns.md": {
+    "mtime": "1770183649589.1958",
+    "hash": "8537cac944fda4b0",
+    "indexed_at": "2026-02-05T20:53:13.638Z"
+  },
+  ".claude/rules/performance.md": {
+    "mtime": "1770183649594.7302",
+    "hash": "b524b4308bc5d016",
+    "indexed_at": "2026-02-05T20:53:13.644Z"
+  },
+  ".claude/rules/security.md": {
+    "mtime": "1770183649603.443",
+    "hash": "19e63bb2f56f37cc",
+    "indexed_at": "2026-02-05T20:53:13.650Z"
+  },
+  ".claude/rules/testing.md": {
+    "mtime": "1770183649609.0413",
+    "hash": "2d2738b2402da0b9",
+    "indexed_at": "2026-02-05T20:53:13.657Z"
+  }
+}

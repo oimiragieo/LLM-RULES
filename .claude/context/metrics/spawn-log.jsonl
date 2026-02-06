@@ -16,3 +16,9 @@
 {"event":"spawn_start","task_id":"spawn-1770394253836-9e8d4h","agent_type":"developer","prompt_length":10704,"session_id":"9dd600d2-4c8c-4a6a-9c73-b7be128da5c0","timestamp":"2026-02-06T16:10:53.840Z"}
 {"event":"spawn_start","task_id":"spawn-1770394267437-xitow2","agent_type":"developer","prompt_length":10718,"session_id":"9dd600d2-4c8c-4a6a-9c73-b7be128da5c0","timestamp":"2026-02-06T16:11:07.441Z"}
 {"event":"spawn_end","task_id":"spawn-1770394267437-xitow2","success":true,"error":null,"session_id":"9dd600d2-4c8c-4a6a-9c73-b7be128da5c0","timestamp":"2026-02-06T16:16:55.163Z"}
+{"event":"step0_block","timestamp":"2026-02-06T17:39:36.834Z","reason":"pending_reflections","reminder_file_exists":true,"spawn_request_count":3,"action":"blocking_all_router_operations_until_reflections_processed"}
+{"event":"spawn_start","task_id":"spawn-1770399629375-xfwd9r","agent_type":"architect","prompt_length":11439,"session_id":"9dd600d2-4c8c-4a6a-9c73-b7be128da5c0","timestamp":"2026-02-06T17:40:29.379Z"}
+{"event":"spawn_start","task_id":"spawn-1770399641979-mku3iw","agent_type":"researcher","prompt_length":8922,"session_id":"9dd600d2-4c8c-4a6a-9c73-b7be128da5c0","timestamp":"2026-02-06T17:40:41.983Z"}
+{"event":"spawn_end","task_id":"spawn-1770399641979-mku3iw","success":true,"error":null,"session_id":"9dd600d2-4c8c-4a6a-9c73-b7be128da5c0","timestamp":"2026-02-06T17:46:00.967Z"}
+{"event":"spawn_start","task_id":"spawn-1770400152978-c1kwwv","agent_type":"architect","prompt_length":13277,"session_id":"9dd600d2-4c8c-4a6a-9c73-b7be128da5c0","timestamp":"2026-02-06T17:49:12.982Z"}
+{"event":"spawn_start","task_id":"spawn-1770400588695-ko4lx7","agent_type":"developer","prompt_length":10780,"session_id":"9dd600d2-4c8c-4a6a-9c73-b7be128da5c0","timestamp":"2026-02-06T17:56:28.699Z"}
