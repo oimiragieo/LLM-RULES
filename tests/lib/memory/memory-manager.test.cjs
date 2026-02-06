@@ -17,7 +17,7 @@ const path = require('path');
 
 // Test setup - use a temporary directory
 // We create a fake project root so getMemoryDir() resolves correctly
-const TEST_PROJECT_ROOT = path.join(__dirname, '..', 'context', 'memory', '.test-project');
+const TEST_PROJECT_ROOT = path.join(__dirname, '..', '.test-memory', '.test-project');
 const MEMORY_DIR = path.join(TEST_PROJECT_ROOT, '.claude', 'context', 'memory');
 
 // Cleanup and setup

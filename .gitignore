@@ -92,8 +92,14 @@ local_cache/
 .claude/data/test-e2e-*.db
 .claude/data/test-*.db
 
+# Memory test temp directories (tests/lib/memory/)
+tests/lib/.test-memory/
+
 # Context session files (runtime data)
 context/sessions/
+
+# Bare context/ directory (escape from test paths - should never exist at root)
+/context/
 
 # Local Settings
 .claude/settings.local.json

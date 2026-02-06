@@ -12,7 +12,7 @@ const path = require('path');
 
 const coldStorage = require('../../../.claude/lib/memory/cold-storage.cjs');
 
-const TEST_PROJECT_ROOT = path.join(__dirname, '..', 'context', 'memory', '.test-cold-storage');
+const TEST_PROJECT_ROOT = path.join(__dirname, '..', '.test-memory', '.test-cold-storage');
 const MEMORY_DIR = path.join(TEST_PROJECT_ROOT, '.claude', 'context', 'memory');
 const LTM_DIR = path.join(MEMORY_DIR, 'ltm');
 

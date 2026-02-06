@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const TEST_PROJECT_ROOT = path.join(__dirname, 'context', 'memory', '.test-forget');
+const TEST_PROJECT_ROOT = path.join(__dirname, '.test-memory', '.test-forget');
 const MEMORY_DIR = path.join(TEST_PROJECT_ROOT, '.claude', 'context', 'memory');
 
 function setup() {

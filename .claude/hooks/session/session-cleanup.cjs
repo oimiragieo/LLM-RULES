@@ -43,7 +43,9 @@ function getTmpDir() {
     // Not in project root - try parent directories
     const parts = cwd.split(path.sep);
     for (let i = parts.length; i > 0; i--) {
-      const testPath = path.join(parts.slice(0, i).join(path.sep), '.claude');
+      // Use path.sep to join parts, not manual join
+      const testRoot = parts.slice(0, i).join(path.sep);
+      const testPath = path.join(testRoot, '.claude');
       if (fs.existsSync(testPath)) {
         return path.join(testPath, 'context', 'tmp');
       }

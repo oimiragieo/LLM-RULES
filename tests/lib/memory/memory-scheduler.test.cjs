@@ -17,7 +17,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Test setup - use a temporary directory
-const TEST_PROJECT_ROOT = path.join(__dirname, '..', 'context', 'memory', '.test-scheduler');
+const TEST_PROJECT_ROOT = path.join(__dirname, '..', '.test-memory', '.test-scheduler');
 const MEMORY_DIR = path.join(TEST_PROJECT_ROOT, '.claude', 'context', 'memory');
 
 // Cleanup and setup
