@@ -52,6 +52,14 @@
 # Legacy/orphan vector DBs (LanceDB uses .claude/data/lancedb)
 .claude/context/memory/vectors.db
 .claude/context/memory/vectors.db_placeholder
+
+# Runtime state files (auto-generated during sessions)
+.claude/context/memory/access-stats.json
+.claude/context/metrics/hook-metrics.jsonl
+.claude/context/metrics/spawn-log.jsonl
+.claude/context/self-healing/loop-state.json
+.claude/data/memory.db
+
 # Memory and LanceDB data (runtime)
 .claude/data/*.db
 # LanceDB vector index (generated, excludes all transaction/version/data files)
