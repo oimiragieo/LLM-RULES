@@ -138,7 +138,9 @@ function readErrors(options = {}) {
     files = files.filter(f => {
       const match = f.match(/errors-(\d{4}-\d{2}-\d{2})\.jsonl/);
       if (!match) return false;
-      const fileDate = new Date(match[1]);
+      // Parse file date as local time to match dateRange timezone
+      const [year, month, day] = match[1].split('-').map(Number);
+      const fileDate = new Date(year, month - 1, day);
       return fileDate >= dateRange.start && fileDate < dateRange.end;
     });
   }

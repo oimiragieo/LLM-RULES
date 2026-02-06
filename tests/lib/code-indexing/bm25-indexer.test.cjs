@@ -87,6 +87,9 @@ test('BM25Indexer - addDocuments - should calculate IDF scores', () => {
 
   indexer.addDocuments(docs);
 
+  // BM25Indexer uses LAZY IDF calculation - must call search() or _ensureIDF() first
+  indexer._ensureIDF();
+
   // "user" appears in all 3 docs, should have lower IDF
   // "password" appears in 1 doc, should have higher IDF
   assert.ok(indexer.idf['user'] !== undefined);

@@ -14,7 +14,10 @@ const fs = require('fs');
 
 console.log('Testing Enhancement #8: Security Control Registry\n');
 
-const catalogPath = path.join(__dirname, 'security-controls-catalog.md');
+const catalogPath = path.join(
+  __dirname,
+  '../../.claude/context/artifacts/security-controls-catalog.md'
+);
 
 // Test 1: Catalog file exists
 console.log('Test 1: Security controls catalog exists');

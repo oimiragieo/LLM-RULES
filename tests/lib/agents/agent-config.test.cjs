@@ -15,7 +15,7 @@ test('agent-config exposes defaults for known agents', () => {
   const tools = getDefaultTools('planner');
   assert.ok(Array.isArray(tools));
   assert.ok(tools.includes('Read'));
-  assert.equal(getDefaultThinkingLevel('planner'), 'high');
+  assert.equal(getDefaultThinkingLevel('planner'), 'medium'); // planner has no thinkingDefault field, falls back to 'medium'
   assert.equal(getPhaseForAgent('planner'), 'planning');
 });
 

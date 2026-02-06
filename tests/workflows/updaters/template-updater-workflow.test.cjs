@@ -80,7 +80,10 @@ function expect(actual) {
 // Constants
 // =============================================================================
 
-const WORKFLOW_PATH = path.join(__dirname, 'template-updater-workflow.yaml');
+const WORKFLOW_PATH = path.join(
+  __dirname,
+  '../../../.claude/workflows/updaters/template-updater-workflow.yaml'
+);
 const EVOLVE_PHASES = ['evaluate', 'validate', 'obtain', 'lock', 'verify', 'enable'];
 
 // =============================================================================

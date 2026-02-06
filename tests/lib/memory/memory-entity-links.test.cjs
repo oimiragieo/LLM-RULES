@@ -20,7 +20,8 @@ test('linkMemoryToTools creates memory and skill entities with relationships', (
     const result = linkMemoryToTools(memoryId, ['Skill One', 'Skill Two'], projectRoot);
     assert.equal(result.linked, 2);
 
-    const dbPath = path.join(projectRoot, '.claude', 'data', 'memory.db');
+    // Correct path: .claude/context/data/memory.db (not .claude/data/memory.db)
+    const dbPath = path.join(projectRoot, '.claude', 'context', 'data', 'memory.db');
     const db = new DatabaseSync(dbPath);
 
     const memoryCount = db

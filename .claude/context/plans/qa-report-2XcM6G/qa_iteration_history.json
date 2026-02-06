@@ -3,24 +3,18 @@
     "iteration": 1,
     "timestamp": "2026-02-06T07:50:25.256Z",
     "verdict": "rejected",
-    "issues_summary": [
-      "Issue A"
-    ]
+    "issues_summary": ["Issue A"]
   },
   {
     "iteration": 2,
     "timestamp": "2026-02-06T07:50:25.268Z",
     "verdict": "rejected",
-    "issues_summary": [
-      "Issue A"
-    ]
+    "issues_summary": ["Issue A"]
   },
   {
     "iteration": 3,
     "timestamp": "2026-02-06T07:50:25.278Z",
     "verdict": "rejected",
-    "issues_summary": [
-      "Issue A"
-    ]
+    "issues_summary": ["Issue A"]
   }
 ]

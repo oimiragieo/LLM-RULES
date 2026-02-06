@@ -15,9 +15,15 @@ const fs = require('fs');
 console.log('Testing Enhancement #10: Hybrid Validation Extension\n');
 
 const agents = [
-  { name: 'code-reviewer', path: path.join(__dirname, 'specialized/code-reviewer.md') },
-  { name: 'security-architect', path: path.join(__dirname, 'specialized/security-architect.md') },
-  { name: 'architect', path: path.join(__dirname, 'core/architect.md') },
+  {
+    name: 'code-reviewer',
+    path: path.join(__dirname, '../../.claude/agents/specialized/code-reviewer.md'),
+  },
+  {
+    name: 'security-architect',
+    path: path.join(__dirname, '../../.claude/agents/specialized/security-architect.md'),
+  },
+  { name: 'architect', path: path.join(__dirname, '../../.claude/agents/core/architect.md') },
 ];
 
 // Test 1: All 3 agents exist

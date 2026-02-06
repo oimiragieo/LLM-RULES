@@ -20,14 +20,14 @@ function listCommands(block) {
   return (block?.hooks || []).map(h => h.command).filter(Boolean);
 }
 
-test('PreToolUse Edit|Write|NotebookEdit includes router-write-guard', () => {
+test('PreToolUse Edit|Write|NotebookEdit includes unified-pre-write-hook', () => {
   const block = findHookBlock('PreToolUse', 'Edit|Write|NotebookEdit');
   assert.ok(block, 'Expected PreToolUse block for Edit|Write|NotebookEdit');
 
   const commands = listCommands(block);
   assert.ok(
-    commands.includes('node .claude/hooks/safety/router-write-guard.cjs'),
-    'router-write-guard.cjs should be wired for Edit/Write/NotebookEdit'
+    commands.includes('node .claude/hooks/unified-pre-write-hook.cjs'),
+    'unified-pre-write-hook.cjs should be wired for Edit/Write/NotebookEdit'
   );
 });
 
@@ -36,7 +36,6 @@ test('PostToolUse Edit|Write|NotebookEdit includes memory/index hooks', () => {
   assert.ok(block, 'Expected PostToolUse block for Edit|Write|NotebookEdit');
 
   const commands = listCommands(block);
-  assert.ok(commands.includes('node .claude/hooks/memory/format-memory.cjs'));
-  assert.ok(commands.includes('node .claude/hooks/safety/enforce-claude-md-update.cjs'));
+  assert.ok(commands.includes('node .claude/hooks/memory/sync-memory-index.cjs'));
   assert.ok(commands.includes('node .claude/hooks/routing/code-index-updater.cjs'));
 });

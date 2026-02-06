@@ -146,7 +146,7 @@ describe('Party Mode Configuration', () => {
   });
 
   it('should have valid roles', () => {
-    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'teams');
+    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'context', 'teams');
     const teams = ['code-review.csv', 'secure-implementation.csv', 'architecture-decision.csv'];
     const validRoles = ['implementer', 'reviewer', 'validator', 'coordinator'];
 
@@ -185,7 +185,7 @@ describe('Party Mode Configuration', () => {
   });
 
   it('should have valid models', () => {
-    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'teams');
+    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'context', 'teams');
     const teams = ['code-review.csv', 'secure-implementation.csv', 'architecture-decision.csv'];
     const validModels = ['haiku', 'sonnet', 'opus'];
 

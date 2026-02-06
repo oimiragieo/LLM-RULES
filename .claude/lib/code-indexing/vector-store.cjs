@@ -163,6 +163,11 @@ class VectorStore {
    */
   async saveBM25Index() {
     if (this.bm25Index) {
+      // Ensure persist directory exists (for BM25-only mode)
+      if (!fs.existsSync(this.persistDirectory)) {
+        fs.mkdirSync(this.persistDirectory, { recursive: true });
+      }
+
       const bm25Path = path.join(this.persistDirectory, 'bm25-index.json');
       const tempPath = bm25Path + '.tmp';
 

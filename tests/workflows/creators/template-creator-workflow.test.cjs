@@ -15,7 +15,7 @@ const {
   parseWorkflow,
   validateWorkflow,
   WorkflowEngine,
-} = require('../../.claude/lib/workflow/workflow-engine.cjs');
+} = require('../../../.claude/lib/workflow/workflow-engine.cjs');
 
 // =============================================================================
 // Test Framework
@@ -80,7 +80,10 @@ function expect(actual) {
 // Constants
 // =============================================================================
 
-const WORKFLOW_PATH = path.join(__dirname, 'template-creator-workflow.yaml');
+const WORKFLOW_PATH = path.join(
+  __dirname,
+  '../../../.claude/workflows/creators/template-creator-workflow.yaml'
+);
 const EVOLVE_PHASES = ['evaluate', 'validate', 'obtain', 'lock', 'verify', 'enable'];
 
 // =============================================================================

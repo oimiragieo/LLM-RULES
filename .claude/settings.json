@@ -51,6 +51,10 @@
           },
           {
             "type": "command",
+            "command": "node .claude/hooks/safety/windows-null-sanitizer.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/routing/routing-guard.cjs"
           }
         ]

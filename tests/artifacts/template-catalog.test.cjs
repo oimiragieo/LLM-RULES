@@ -17,7 +17,7 @@ if (require.main === module) {
   let passed = 0;
   let failed = 0;
 
-  const catalogPath = path.join(__dirname, 'template-catalog.md');
+  const catalogPath = path.join(__dirname, '../../.claude/context/artifacts/template-catalog.md');
 
   // Test 1: Catalog file exists
   if (!fs.existsSync(catalogPath)) {
@@ -86,7 +86,7 @@ if (require.main === module) {
               passed++;
             } else {
               console.log(`✗ ${tests[4]}`);
-              console.log('  Error: Some templates missing discovery keywords');
+              console.log('  Error: Template validation failed');
               failed++;
             }
 

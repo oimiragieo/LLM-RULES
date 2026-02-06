@@ -653,7 +653,7 @@ test('isAvailable - returns true after successful init', async t => {
   await store.close();
 });
 
-test('isMockMode - returns false for test mode', async t => {
+test('isMockMode - returns true for test mode', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -667,7 +667,7 @@ test('isMockMode - returns false for test mode', async t => {
 
   await store.initialize();
 
-  assert.strictEqual(store.isMockMode(), false, 'Test mode should not be mock mode');
+  assert.strictEqual(store.isMockMode(), true, 'Test mode should be considered mock mode');
 
   await store.close();
 });

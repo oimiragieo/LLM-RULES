@@ -3,8 +3,6 @@
     "iteration": 1,
     "timestamp": "2026-02-06T07:17:34.489Z",
     "verdict": "rejected",
-    "issues_summary": [
-      "Issue A"
-    ]
+    "issues_summary": ["Issue A"]
   }
 ]

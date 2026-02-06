@@ -13,7 +13,7 @@ const fs = require('fs');
 
 console.log('Testing Enhancement #9: Commit Checkpoint Pattern\n');
 
-const plannerPath = path.join(__dirname, 'planner.md');
+const plannerPath = path.join(__dirname, '../../../.claude/agents/core/planner.md');
 
 // Test 1: planner.md exists
 console.log('Test 1: planner.md agent file exists');
