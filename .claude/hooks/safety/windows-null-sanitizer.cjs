@@ -31,14 +31,16 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 
 /**
- * Sanitize a command by replacing /dev/null with NUL on Windows.
+ * Sanitize a command by replacing /dev/null and lowercase reserved names with NUL on Windows.
  *
  * Handles various patterns:
- * - > /dev/null
- * - 2>/dev/null
- * - &>/dev/null
- * - 2>&1 >/dev/null
- * - >/dev/null 2>&1
+ * - > /dev/null → > NUL
+ * - 2>/dev/null → 2>NUL
+ * - &>/dev/null → &>NUL
+ * - > nul (lowercase) → > NUL
+ * - 2> nul → 2> NUL
+ * - > null → > NUL
+ * - > con/prn/aux → > CON/PRN/AUX
  *
  * @param {string} command - The command to sanitize
  * @returns {string} Sanitized command
@@ -48,12 +50,20 @@ function sanitizeNullDevice(command) {
     return command;
   }
 
-  // Replace all instances of /dev/null with NUL
-  // Handle various redirect patterns
   let sanitized = command;
 
-  // Pattern: /dev/null (the actual device reference)
+  // Pattern 1: /dev/null (Unix-style device reference)
   sanitized = sanitized.replace(/\/dev\/null/g, 'NUL');
+
+  // Pattern 2: Lowercase Windows reserved names in redirects
+  // These create files instead of using devices, so normalize to uppercase
+  // Match: > nul, 2> nul, &> nul, >> nul, 2>> nul, >nul (no space), etc.
+  // Also: > null (common typo)
+  sanitized = sanitized.replace(/([>&])(\s*)(nul|null|con|prn|aux)(\s|$|2|&)/gi, (match, prefix, space, device, suffix) => {
+    // Normalize 'null' to 'nul'
+    const normalizedDevice = device.toLowerCase() === 'null' ? 'NUL' : device.toUpperCase();
+    return prefix + space + normalizedDevice + suffix;
+  });
 
   return sanitized;
 }
@@ -89,8 +99,13 @@ async function main() {
       process.exit(0);
     }
 
-    // Check if command contains /dev/null
-    if (!command.includes('/dev/null')) {
+    // Check if command needs sanitization
+    // Patterns: /dev/null OR lowercase reserved names in redirects (> nul, > null, etc.)
+    const needsSanitization =
+      command.includes('/dev/null') ||
+      /[>&]\s*(nul|null|con|prn|aux)(\s|$|2|&)/i.test(command);
+
+    if (!needsSanitization) {
       process.exit(0);
     }
 

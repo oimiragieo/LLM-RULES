@@ -105,6 +105,63 @@ describe('windows-null-sanitizer', () => {
         assert.strictEqual(result, input);
       });
 
+      it('should normalize lowercase nul to NUL', () => {
+        const input = 'echo test > nul';
+        const result = sanitizer.sanitizeNullDevice(input);
+        if (process.platform === 'win32') {
+          assert.strictEqual(result, 'echo test > NUL');
+        } else {
+          assert.strictEqual(result, input);
+        }
+      });
+
+      it('should normalize lowercase stderr redirect', () => {
+        const input = 'command 2> nul';
+        const result = sanitizer.sanitizeNullDevice(input);
+        if (process.platform === 'win32') {
+          assert.strictEqual(result, 'command 2> NUL');
+        } else {
+          assert.strictEqual(result, input);
+        }
+      });
+
+      it('should normalize null (typo) to NUL', () => {
+        const input = 'echo test > null';
+        const result = sanitizer.sanitizeNullDevice(input);
+        if (process.platform === 'win32') {
+          assert.strictEqual(result, 'echo test > NUL');
+        } else {
+          assert.strictEqual(result, input);
+        }
+      });
+
+      it('should normalize other reserved names (con, prn, aux)', () => {
+        const inputs = [
+          { cmd: 'echo > con', expected: 'echo > CON' },
+          { cmd: 'ls > prn', expected: 'ls > PRN' },
+          { cmd: 'cat > aux', expected: 'cat > AUX' },
+        ];
+
+        inputs.forEach(({ cmd, expected }) => {
+          const result = sanitizer.sanitizeNullDevice(cmd);
+          if (process.platform === 'win32') {
+            assert.strictEqual(result, expected);
+          } else {
+            assert.strictEqual(result, cmd);
+          }
+        });
+      });
+
+      it('should handle mixed case reserved names', () => {
+        const input = 'echo test > NuL';
+        const result = sanitizer.sanitizeNullDevice(input);
+        if (process.platform === 'win32') {
+          assert.strictEqual(result, 'echo test > NUL');
+        } else {
+          assert.strictEqual(result, input);
+        }
+      });
+
       it('should handle empty string', () => {
         const result = sanitizer.sanitizeNullDevice('');
         assert.strictEqual(result, '');
