@@ -54,6 +54,11 @@
 .claude/context/memory/vectors.db_placeholder
 # Memory and LanceDB data (runtime)
 .claude/data/*.db
+# LanceDB vector index (generated, excludes all transaction/version/data files)
+.claude/context/data/lancedb/
+# BM25 index (generated from code indexer)
+.claude/context/data/lancedb/bm25-index.json
+.claude/context/data/lancedb/bm25-index.json.backup
 
 # Config data (version-controlled) - NEW PATTERNS
 !.claude/context/config/
