@@ -37,29 +37,31 @@ Task: Search for code
 
 ### Ripgrep vs Grep vs Semantic Search
 
-| Feature | Grep | Ripgrep | Semantic | Structural |
-|---------|------|---------|----------|-----------|
-| **Use Case** | Exact text | Complex regex | Concept search | Structure match |
-| **Speed** | Fast | Very Fast | Medium | Medium |
-| **Accuracy** | 70% | 85% | 95% | 100% |
-| **ES Module Support** | ❌ | ✅ (.mjs/.cjs) | ✅ | ✅ |
-| **.gitignore Respect** | ❌ | ✅ | ✅ | ✅ |
-| **PCRE2 Regex** | ❌ | ✅ (-P flag) | ❌ | ❌ |
-| **Query Examples** | "TaskUpdate" | "Task\\w+\\(" | "task state tracking" | "function \$(\$) { }" |
-| **Best For** | Single keywords | Advanced patterns | "What does this code do?" | "Find exact structure" |
+| Feature                | Grep            | Ripgrep           | Semantic                  | Structural             |
+| ---------------------- | --------------- | ----------------- | ------------------------- | ---------------------- |
+| **Use Case**           | Exact text      | Complex regex     | Concept search            | Structure match        |
+| **Speed**              | Fast            | Very Fast         | Medium                    | Medium                 |
+| **Accuracy**           | 70%             | 85%               | 95%                       | 100%                   |
+| **ES Module Support**  | ❌              | ✅ (.mjs/.cjs)    | ✅                        | ✅                     |
+| **.gitignore Respect** | ❌              | ✅                | ✅                        | ✅                     |
+| **PCRE2 Regex**        | ❌              | ✅ (-P flag)      | ❌                        | ❌                     |
+| **Query Examples**     | "TaskUpdate"    | "Task\\w+\\("     | "task state tracking"     | "function \$(\$) { }"  |
+| **Best For**           | Single keywords | Advanced patterns | "What does this code do?" | "Find exact structure" |
 
 ## Skill-by-Skill Guide
 
 ### 1. Grep (Built-in Tool)
 
 **When to use**:
+
 - Simple keyword search (1-2 words)
 - Single-file searches (when file is known)
 - Quick pattern checks
 
 **Example**:
+
 ```javascript
-Grep({ pattern: 'TaskUpdate', type: 'js' })
+Grep({ pattern: 'TaskUpdate', type: 'js' });
 ```
 
 **Pros**: Fast, simple, no dependencies
@@ -70,12 +72,14 @@ Grep({ pattern: 'TaskUpdate', type: 'js' })
 ### 2. Ripgrep Skill
 
 **When to use**:
+
 - Multi-file searches in large codebases
 - Complex regex patterns (PCRE2)
 - Need .gitignore respecting
 - Must find .mjs/.cjs files
 
 **Invocation**:
+
 ```javascript
 // Simple search
 Skill({ skill: 'ripgrep', args: 'pattern' });
@@ -91,6 +95,7 @@ Skill({ skill: 'ripgrep', args: 'agent "name:" -tmd' });
 **Cons**: Learning curve for advanced patterns
 
 **Performance Baseline**:
+
 - Ripgrep: 50-200ms typical search
 - Grep: 500ms-2s typical search
 - 10x improvement for large codebases
@@ -100,27 +105,38 @@ Skill({ skill: 'ripgrep', args: 'agent "name:" -tmd' });
 ### 3. Code Semantic Search Skill
 
 **When to use**:
+
 - Don't know exact function/variable names
 - Searching for concepts ("error handling", "auth logic")
 - Finding similar code patterns
 - Discovering implementations of ideas
 
 **Invocation**:
+
 ```javascript
 // Hybrid search (recommended, 95% accuracy)
 Skill({ skill: 'code-semantic-search', args: 'find authentication logic' });
 
 // Semantic-only (faster, 85% accuracy)
-Skill({ skill: 'code-semantic-search', args: 'database queries', options: { mode: 'semantic-only' } });
+Skill({
+  skill: 'code-semantic-search',
+  args: 'database queries',
+  options: { mode: 'semantic-only' },
+});
 
 // Structural-only (precise, 100% accuracy)
-Skill({ skill: 'code-semantic-search', args: 'function with 3 parameters', options: { mode: 'structural-only' } });
+Skill({
+  skill: 'code-semantic-search',
+  args: 'function with 3 parameters',
+  options: { mode: 'structural-only' },
+});
 ```
 
 **Pros**: Understands code meaning, hybrid approach, excellent accuracy
 **Cons**: Slower than ripgrep, requires understanding vectors
 
 **Performance Baseline**:
+
 - Hybrid mode: <150ms (95% accuracy)
 - Semantic-only: <50ms (85% accuracy)
 
@@ -129,18 +145,23 @@ Skill({ skill: 'code-semantic-search', args: 'function with 3 parameters', optio
 ### 4. Code Structural Search Skill (ast-grep)
 
 **When to use**:
+
 - Find functions/classes with specific structure
 - "Find all methods with exactly 3 parameters"
 - "Find classes extending Service"
 - Precise refactoring (change exact patterns)
 
 **Invocation**:
+
 ```javascript
 // Find all functions
 Skill({ skill: 'code-structural-search', args: 'function \$NAME(\$ARGS) { \$\$ } --lang ts' });
 
 // Find classes extending specific parent
-Skill({ skill: 'code-structural-search', args: 'class \$NAME extends Service { \$\$\$ } --lang ts' });
+Skill({
+  skill: 'code-structural-search',
+  args: 'class \$NAME extends Service { \$\$\$ } --lang ts',
+});
 
 // Find specific error handling
 Skill({ skill: 'code-structural-search', args: 'try { \$\$ } catch (\$ERR) { \$\$ } --lang ts' });
@@ -154,6 +175,7 @@ Skill({ skill: 'code-structural-search', args: 'try { \$\$ } catch (\$ERR) { \$\
 ## Common Scenarios
 
 ### Scenario 1: "Find all uses of TaskUpdate"
+
 ```
 Known exact name? YES
 Complex regex? NO
@@ -161,18 +183,21 @@ Complex regex? NO
 ```
 
 ### Scenario 2: "Find all error handling patterns"
+
 ```
 Concept search? YES
 -> Use Semantic: Skill({ skill: 'code-semantic-search', args: 'error handling' })
 ```
 
 ### Scenario 3: "Find functions with > 5 parameters"
+
 ```
 Structure search? YES
 -> Use ast-grep: Skill({ skill: 'code-structural-search', args: 'function \$(\$A, \$B, \$C, \$D, \$E, \$F, \$\$\$)' })
 ```
 
 ### Scenario 4: "Find socket.io connections that don't validate origin"
+
 ```
 Complex + security-relevant? YES
 -> Use Ripgrep: Skill({ skill: 'ripgrep', args: "socket\\.on.*{" --type js })
@@ -180,13 +205,13 @@ Complex + security-relevant? YES
 
 ## Agent-Specific Skill Recommendations
 
-| Agent | Primary Skills | When Applicable |
-|-------|----------------|-----------------|
-| **developer** | ripgrep, semantic-search, code-structural | Daily code discovery |
-| **architect** | ripgrep, semantic-search, code-structural | System understanding |
-| **qa** | code-semantic-search | Test coverage analysis |
-| **security-architect** | ripgrep, code-structural-search | Vulnerability patterns |
-| **code-reviewer** | semantic-search, structural-search | Pattern consistency |
+| Agent                  | Primary Skills                            | When Applicable        |
+| ---------------------- | ----------------------------------------- | ---------------------- |
+| **developer**          | ripgrep, semantic-search, code-structural | Daily code discovery   |
+| **architect**          | ripgrep, semantic-search, code-structural | System understanding   |
+| **qa**                 | code-semantic-search                      | Test coverage analysis |
+| **security-architect** | ripgrep, code-structural-search           | Vulnerability patterns |
+| **code-reviewer**      | semantic-search, structural-search        | Pattern consistency    |
 
 ## Performance Tips
 

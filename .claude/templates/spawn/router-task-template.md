@@ -1,5 +1,7 @@
 # Router Task() Call Template
+
 ## Copy-Paste Ready Template for High-Quality Spawns
+
 **Purpose**: Prevent spawn prompt validation failures (score 0/70)
 **Usage**: Use this template for ALL Task() calls from router or agents
 **Quality Score Target**: 70/70
@@ -12,14 +14,22 @@ Replace placeholders in `<>` and copy the entire block below:
 
 ```javascript
 Task({
-  subagent_type: '<TYPE>',  // developer, architect, qa, planner, etc.
-  task_id: '<TASK-ID>',  // e.g., FIX-ISSUE-001
-  description: '<SHORT DESCRIPTION>',  // 5-10 words
+  subagent_type: '<TYPE>', // developer, architect, qa, planner, etc.
+  task_id: '<TASK-ID>', // e.g., FIX-ISSUE-001
+  description: '<SHORT DESCRIPTION>', // 5-10 words
   allowed_tools: [
-    'Read', 'Write', 'Edit', 'Bash',
-    'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput',
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'TaskOutput',
     'Skill',
-    'Grep', 'Glob'  // Add/remove as needed
+    'Grep',
+    'Glob', // Add/remove as needed
   ],
   prompt: `# <AGENT-TYPE> - <TASK-TITLE>
 
@@ -80,8 +90,8 @@ Reference: \`.claude/docs/@SKILL_USAGE_GUIDE.md\`
 - <Criterion 1>
 - <Criterion 2>
 - <Criterion 3>
-`
-})
+`,
+});
 ```
 
 ---
@@ -89,35 +99,45 @@ Reference: \`.claude/docs/@SKILL_USAGE_GUIDE.md\`
 ## STEP-BY-STEP CUSTOMIZATION
 
 ### 1. Replace `<AGENT-TYPE>`
+
 Options: developer, architect, qa, planner, general-purpose, etc.
 
 ### 2. Replace `<TASK-ID>`
+
 Pattern: `<CATEGORY>-<DESCRIPTION>-<NUMBER>`
 Examples:
+
 - `FIX-AUTH-001` (fix authentication)
 - `FEAT-DASHBOARD-001` (feature: dashboard)
 - `TEST-API-001` (testing: API)
 - `DOC-MEMORY-001` (documentation: memory system)
 
 ### 3. Replace `<SHORT-DESCRIPTION>`
+
 5-10 words maximum
 Examples:
+
 - "Fix authentication bug in login flow"
 - "Implement new dashboard feature"
 - "Write tests for API endpoints"
 
 ### 4. Replace `<TASK-TITLE>` (in prompt header)
+
 Same as description but can be longer (1-2 sentences)
 
 ### 5. Replace `<DETAILED-TASK-DESCRIPTION>`
+
 2-5 paragraphs explaining:
+
 - What needs to be done
 - Why it matters
 - Any context or constraints
 - Links to related issues
 
 ### 6. Customize `allowed_tools`
+
 Remove/add based on task needs:
+
 - **Always include**: TaskUpdate, TaskList, Skill
 - **For file operations**: Read, Write, Edit
 - **For commands**: Bash
@@ -125,7 +145,9 @@ Remove/add based on task needs:
 - **For code search**: Grep, Glob (or use skills)
 
 ### 7. Customize Success Criteria
+
 Replace with 2-4 measurable outcomes:
+
 - "All tests passing"
 - "Lint score 0 errors, 0 warnings"
 - "Documentation updated"
@@ -161,9 +183,16 @@ Task({
   task_id: 'FIX-AUTH-001',
   description: 'Fix authentication token expiration bug',
   allowed_tools: [
-    'Read', 'Write', 'Edit', 'Bash',
-    'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet',
-    'Skill', 'Grep'
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+    'Grep',
   ],
   prompt: `# DEVELOPER - Fix Authentication Token Expiration
 
@@ -224,8 +253,8 @@ Root cause analysis needed:
 - JWT tokens last 24 hours (not immediate expiration)
 - All auth tests passing
 - Lint score 0 errors
-`
-})
+`,
+});
 ```
 
 ### Example 2: QA - Testing
@@ -236,9 +265,16 @@ Task({
   task_id: 'TEST-API-001',
   description: 'Write comprehensive API endpoint tests',
   allowed_tools: [
-    'Read', 'Write', 'Edit', 'Bash',
-    'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet',
-    'Skill', 'Grep'
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+    'Grep',
   ],
   prompt: `# QA - Write API Endpoint Tests
 
@@ -301,8 +337,8 @@ Tests should cover:
 - Test coverage >90%
 - All tests passing (pnpm test: 15/15 pass)
 - No lint errors
-`
-})
+`,
+});
 ```
 
 ---
@@ -319,6 +355,7 @@ EOF
 ```
 
 Expected output:
+
 ```
 Spawn prompt validation: score 70/70 ✓ PASS
 ```
@@ -330,12 +367,14 @@ If score < 70: Fix the missing elements using the checklist above.
 ## SUMMARY
 
 **Use this template to:**
+
 - ✅ Prevent validation failures (0/70 → 70/70)
 - ✅ Ensure proper task tracking (TaskUpdate calls)
 - ✅ Follow best practices (memory protocol, skills)
 - ✅ Get professional results (clear requirements, success criteria)
 
 **Template guarantees:**
+
 - Quality score: 70/70
 - Task tracking: 100% working
 - No validation warnings

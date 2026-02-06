@@ -43,6 +43,29 @@ const errors = [];
 const warnings = [];
 const _fixes = [];
 
+// Global config
+let config = null;
+
+/**
+ * Load config.yaml
+ */
+function loadConfig() {
+  if (config) return config;
+
+  const configPath = resolve(rootDir, '.claude/config.yaml');
+  if (!existsSync(configPath)) {
+    return null;
+  }
+
+  try {
+    const content = readFileSync(configPath, 'utf-8');
+    config = yaml.load(content);
+    return config;
+  } catch (_error) {
+    return null;
+  }
+}
+
 /**
  * Check if file exists
  */
@@ -224,11 +247,23 @@ function validateWorkflows() {
               return;
             }
             allAgents.add(step.agent);
-            const agentFile = resolve(rootDir, `.claude/agents/${step.agent}.md`);
-            if (!existsSync(agentFile)) {
-              errors.push(
-                `Agent missing: ${step.agent}.md (referenced in ${file}, step ${step.step})`
-              );
+            // Check agent using config paths
+            const agentConfig = config?.agents?.[step.agent];
+            if (agentConfig && agentConfig.path) {
+              const agentPath = agentConfig.path;
+              if (!checkFile(agentPath, `Agent ${step.agent}`, true)) {
+                errors.push(
+                  `Agent missing: ${step.agent}.md (referenced in ${file}, step ${step.step})`
+                );
+              }
+            } else {
+              // Fallback to direct file check
+              const agentFile = resolve(rootDir, `.claude/agents/${step.agent}.md`);
+              if (!existsSync(agentFile)) {
+                errors.push(
+                  `Agent missing: ${step.agent}.md (referenced in ${file}, step ${step.step})`
+                );
+              }
             }
           }
         });
@@ -248,11 +283,23 @@ function validateWorkflows() {
                   return;
                 }
                 allAgents.add(step.agent);
-                const agentFile = resolve(rootDir, `.claude/agents/${step.agent}.md`);
-                if (!existsSync(agentFile)) {
-                  errors.push(
-                    `Agent missing: ${step.agent}.md (referenced in ${file}, phase step ${step.step})`
-                  );
+                // Check agent using config paths
+                const agentConfig = config?.agents?.[step.agent];
+                if (agentConfig && agentConfig.path) {
+                  const agentPath = agentConfig.path;
+                  if (!checkFile(agentPath, `Agent ${step.agent}`, true)) {
+                    errors.push(
+                      `Agent missing: ${step.agent}.md (referenced in ${file}, step ${step.step ?? 'unknown'})`
+                    );
+                  }
+                } else {
+                  // Fallback to direct file check
+                  const agentFile = resolve(rootDir, `.claude/agents/${step.agent}.md`);
+                  if (!existsSync(agentFile)) {
+                    errors.push(
+                      `Agent missing: ${step.agent}.md (referenced in ${file}, step ${step.step ?? 'unknown'})`
+                    );
+                  }
                 }
               }
             });
@@ -406,6 +453,9 @@ function validateWorkflowRunner() {
 function main() {
   console.log('🔍 Comprehensive Reference Validation\n');
   console.log('='.repeat(60));
+
+  // Load config first
+  loadConfig();
 
   validateConfigYAML();
   validateWorkflows();

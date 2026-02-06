@@ -105,9 +105,13 @@ function processResult(executionResult) {
 
   // Log completion status
   if (executionResult.success) {
-    console.log(`[${CREATOR_NAME.toUpperCase()}] Workflow created successfully: ${executionResult.artifactName || 'unknown'}`);
+    console.log(
+      `[${CREATOR_NAME.toUpperCase()}] Workflow created successfully: ${executionResult.artifactName || 'unknown'}`
+    );
   } else {
-    console.warn(`[${CREATOR_NAME.toUpperCase()}] Workflow creation failed: ${executionResult.error || 'unknown error'}`);
+    console.warn(
+      `[${CREATOR_NAME.toUpperCase()}] Workflow creation failed: ${executionResult.error || 'unknown error'}`
+    );
   }
 
   return { success: true };

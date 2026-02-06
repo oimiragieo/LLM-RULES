@@ -1,0 +1,16 @@
+name: ui-perfection-loop
+description: UI perfection and iteration workflow
+version: 1.0.0
+steps:
+  - name: design
+    agent: architect
+    description: UI design review
+  - name: implement
+    agent: developer
+    description: UI implementation
+  - name: audit
+    agent: qa
+    description: UI audit
+  - name: iterate
+    agent: developer
+    description: UI improvements

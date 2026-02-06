@@ -13,7 +13,9 @@ const path = require('path');
 const os = require('os');
 
 // We'll test the recursive scanning function
-const { scanSkillFilesRecursively } = require('../../../.claude/tools/cli/generate-skill-index.cjs');
+const {
+  scanSkillFilesRecursively,
+} = require('../../../.claude/tools/cli/generate-skill-index.cjs');
 
 describe('generate-skill-index', () => {
   let tempDir;
@@ -76,12 +78,7 @@ describe('generate-skill-index', () => {
 
     test('should find SKILL.md at multiple nesting levels', () => {
       // Arrange: Create various nesting levels
-      const paths = [
-        'simple',
-        'nested/inner',
-        'deep/nested/skill',
-        'very/deep/nested/skill',
-      ];
+      const paths = ['simple', 'nested/inner', 'deep/nested/skill', 'very/deep/nested/skill'];
 
       for (const p of paths) {
         const fullPath = path.join(tempDir, p);
@@ -94,10 +91,7 @@ describe('generate-skill-index', () => {
 
       // Assert: All paths should be found with their full relative paths
       for (const p of paths) {
-        assert.ok(
-          result[p.replace(/\\/g, '/')],
-          `Should find skill at ${p}`
-        );
+        assert.ok(result[p.replace(/\\/g, '/')], `Should find skill at ${p}`);
       }
     });
 
@@ -122,7 +116,13 @@ describe('generate-skill-index', () => {
 
     test('should preserve exact relative path structure for document-skills', () => {
       // Arrange: Create scientific-skills/skills/document-skills/pdf structure
-      const nestedPath = path.join(tempDir, 'scientific-skills', 'skills', 'document-skills', 'pdf');
+      const nestedPath = path.join(
+        tempDir,
+        'scientific-skills',
+        'skills',
+        'document-skills',
+        'pdf'
+      );
       fs.mkdirSync(nestedPath, { recursive: true });
       fs.writeFileSync(path.join(nestedPath, 'SKILL.md'), '# PDF Skill');
 
@@ -131,10 +131,7 @@ describe('generate-skill-index', () => {
 
       // Assert: Should have full path
       const expectedKey = 'scientific-skills/skills/document-skills/pdf';
-      assert.ok(
-        result[expectedKey],
-        `Should find ${expectedKey} with exact path`
-      );
+      assert.ok(result[expectedKey], `Should find ${expectedKey} with exact path`);
     });
   });
 });

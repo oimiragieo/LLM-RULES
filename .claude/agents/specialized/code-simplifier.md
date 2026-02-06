@@ -17,7 +17,7 @@ skills:
   - code-semantic-search
   - code-structural-search
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 # Code Simplifier Agent

@@ -21,39 +21,54 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+// Resolve paths for reliable module loading
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
+const HOOKS_DIR = path.join(PROJECT_ROOT, '.claude', 'hooks');
+const ROUTING_DIR = path.join(HOOKS_DIR, 'routing');
+
+// Helper for lib requires
+function libRequire(modulePath) {
+  return require(path.join(LIB_DIR, modulePath));
+}
+
+// Helper for routing requires
+function routingRequire(modulePath) {
+  return require(path.join(ROUTING_DIR, modulePath));
+}
+
 // Import shared utilities
-const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
-const { parseHookInputSync } = require('../../lib/utils/hook-input.cjs');
-const { loadConfig } = require('../../lib/utils/config-loader.cjs');
-const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
-const { createLogger } = require('../../lib/utils/logger.cjs');
-const { ROUTING_TABLE, getPreferredAgent } = require('../../lib/routing/routing-table.cjs');
-const { classifyIntent } = require('../../lib/routing/intent-classifier.cjs');
-const { getAgentForCapability } = require('../../lib/routing/agent-registry-resolver.cjs');
-const semanticRouter = require('../../lib/routing/semantic-router.cjs');
-const { estimateTokens } = require('../../lib/utils/token-budget-tracker.cjs');
-const {
-  checkCompressionNeeded,
-  triggerCompression,
-} = require('../../lib/utils/compression-trigger.cjs');
+const { PROJECT_ROOT: _PROJECT_ROOT } = libRequire(path.join('utils', 'project-root.cjs'));
+const { parseHookInputSync } = libRequire(path.join('utils', 'hook-input.cjs'));
+const { loadConfig } = libRequire(path.join('utils', 'config-loader.cjs'));
+const { appendJsonl } = libRequire(path.join('utils', 'jsonl-utils.cjs'));
+const { createLogger } = libRequire(path.join('utils', 'logger.cjs'));
+const { ROUTING_TABLE, getPreferredAgent } = libRequire(path.join('routing', 'routing-table.cjs'));
+const { classifyIntent } = libRequire(path.join('routing', 'intent-classifier.cjs'));
+const { getAgentForCapability } = libRequire(path.join('routing', 'agent-registry-resolver.cjs'));
+const semanticRouter = libRequire(path.join('routing', 'semantic-router.cjs'));
+const { estimateTokens } = libRequire(path.join('utils', 'token-budget-tracker.cjs'));
+const { checkCompressionNeeded, triggerCompression } = libRequire(
+  path.join('utils', 'compression-trigger.cjs')
+);
 
 const logger = createLogger('user-prompt-unified');
 let memoryTiers = null;
 try {
-  memoryTiers = require('../../lib/memory/memory-tiers.cjs');
+  memoryTiers = libRequire(path.join('memory', 'memory-tiers.cjs'));
 } catch (_e) {
   memoryTiers = null;
 }
 if (!memoryTiers) {
   logger.warn('memory-tiers not loaded; STM write skipped.');
 }
-const { getCachedState, invalidateCache } = require('../../lib/utils/state-cache.cjs');
-const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
-const eventBus = require('../../lib/events/event-bus.cjs');
-const { EventTypes } = require('../../lib/events/event-types.cjs');
+const { getCachedState, invalidateCache } = libRequire(path.join('utils', 'state-cache.cjs'));
+const { atomicWriteJSONSync } = libRequire(path.join('utils', 'atomic-write.cjs'));
+const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
+const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
 
 // Import router state module
-const routerState = require('./router-state.cjs');
+const routerState = routingRequire('router-state.cjs');
 
 // =============================================================================
 // Constants
@@ -171,10 +186,21 @@ function checkRouterModeReset(hookInput) {
     routerState.saveStateWithRetry({ sessionId: currentSessionId });
   }
 
+  // PRESET-001: Update preset in state when AGENT_PRESET env var is set
+  // This allows spawn-prompt-assembler to read the preset from router-state.json
+  if (process.env.AGENT_PRESET) {
+    routerState.saveStateWithRetry({ preset: process.env.AGENT_PRESET });
+  }
+
   if (process.env.ROUTER_DEBUG === 'true') {
     console.log('[user-prompt-unified:reset] State reset to router mode (ROUTING-002 fix)');
     if (result.sessionBoundaryDetected) {
       console.log('[user-prompt-unified:reset] Session ID updated for ROUTING-003 fix');
+    }
+    if (process.env.AGENT_PRESET) {
+      console.log(
+        `[user-prompt-unified:reset] Preset set to ${process.env.AGENT_PRESET} (PRESET-001)`
+      );
     }
   }
 
@@ -1438,7 +1464,7 @@ async function main() {
 
     if (process.env.SCHEDULER_TICK_ON_PROMPT === 'on') {
       try {
-        const { runTick } = require('../../lib/scheduler/scheduler-tick.cjs');
+        const { runTick } = libRequire(path.join('scheduler', 'scheduler-tick.cjs'));
         runTick(PROJECT_ROOT);
       } catch (err) {
         debugLog('user-prompt-unified', 'scheduler tick failed (ignored)', err);

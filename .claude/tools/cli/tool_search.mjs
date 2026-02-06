@@ -9,7 +9,7 @@
  *   node .claude/tools/tool_search.mjs --query "github pull request" [--limit 5]
  */
 
-import { readFile, _readdir } from 'fs/promises';
+import { readFile } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -20,7 +20,7 @@ const __dirname = dirname(__filename);
  * Load tool definitions from MCP configuration
  */
 async function loadToolDefinitions() {
-  const mcpConfigPath = join(__dirname, '..', '.mcp.json');
+  const mcpConfigPath = join(__dirname, '..', '..', '.mcp.json');
 
   try {
     const config = JSON.parse(await readFile(mcpConfigPath, 'utf-8'));

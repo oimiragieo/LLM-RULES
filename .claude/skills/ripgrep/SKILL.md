@@ -11,17 +11,45 @@ tools: [Read, Write, Edit]
 # Ripgrep Skill
 
 <identity>
-Enhanced code search with custom ripgrep binary supporting ES module extensions (.mjs/.cjs/.mts/.cts) and advanced patterns.
+Enhanced code search with ripgrep binary. NOTE: Prefer `pnpm search:code` for hybrid text+semantic search - it's faster and requires no setup.
 </identity>
 
 <capabilities>
-- Fast recursive code search across project files
-- Support for ES module extensions (.mjs, .cjs, .mts, .cts)
-- Advanced regex patterns (PCRE2 with -P flag)
+- **DEPRECATED**: Use `pnpm search:code "query"` instead (hybrid ripgrep + embeddings)
+- Raw ripgrep access for advanced regex patterns (PCRE2 with -P flag)
 - Custom file type definitions via .ripgreprc
-- Performance-optimized for large codebases
 - Integration with .gitignore and custom ignore patterns
 </capabilities>
+
+## ⚡ RECOMMENDED: Hybrid Lazy Search (New)
+
+For **instant code search** without batch indexing, use the new hybrid system:
+
+```bash
+# Text search (ripgrep-based, 0.2-0.5s for 40k files)
+pnpm search:code "authentication logic"
+pnpm search:code "export class User"
+pnpm search:code "import react"
+
+# View project structure
+pnpm search:structure
+
+# Get file content
+pnpm search:file src/auth.ts 1 50
+```
+
+**Why use this instead of raw ripgrep?**
+
+- **Instant**: No batch indexing required (0s startup)
+- **Hybrid scoring**: Combines text (ripgrep) + semantic (embeddings) search
+- **Pre-prompt hook**: Automatically analyzes structure on each prompt
+- **Background embeddings**: Incremental updates as files change
+
+**Only use raw ripgrep (below) for:**
+
+- Advanced PCRE2 regex patterns (lookahead/lookbehind)
+- Custom file type filtering not supported by search:code
+- Pipeline integration with other CLI tools
 
 <instructions>
 <execution_process>

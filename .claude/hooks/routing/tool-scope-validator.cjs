@@ -15,7 +15,13 @@
  */
 'use strict';
 
-const { parseHookInputAsync, getToolName, getEnforcementMode, formatResult, auditLog } = require('../../lib/utils/hook-input.cjs');
+const {
+  parseHookInputAsync,
+  getToolName,
+  getEnforcementMode,
+  formatResult,
+  auditLog,
+} = require('../../lib/utils/hook-input.cjs');
 
 // Always allowed tools (safe read-only operations)
 const ALWAYS_ALLOWED = ['Read', 'TaskList', 'TaskGet', 'AskUserQuestion'];

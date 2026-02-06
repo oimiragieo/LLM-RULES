@@ -1,0 +1,289 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "System Architecture Schema",
+  "description": "Schema for system architecture documents",
+  "type": "object",
+  "properties": {
+    "documentTitle": {
+      "type": "string",
+      "description": "Full document title"
+    },
+    "version": {
+      "type": "string",
+      "description": "Document version"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Document creation date"
+    },
+    "author": {
+      "type": "string",
+      "description": "Document author"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "review", "approved"],
+      "description": "Document status"
+    },
+    "introduction": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "audience": {
+          "type": "string"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "systemOverview": {
+      "type": "object",
+      "properties": {
+        "businessContext": {
+          "type": "string"
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stakeholders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "architecturePrinciples": {
+      "type": "object",
+      "properties": {
+        "designPrinciples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "technologyPrinciples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "operationalPrinciples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "systemArchitecture": {
+      "type": "object",
+      "properties": {
+        "highLevelArchitecture": {
+          "type": "string"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "responsibilities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "interfaces": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["name"]
+          }
+        },
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "flows": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "componentArchitecture": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "responsibilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "interfaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "dataArchitecture": {
+      "type": "object",
+      "properties": {
+        "dataModel": {
+          "type": "string"
+        },
+        "dataStorage": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dataFlow": {
+          "type": "string"
+        },
+        "dataSecurity": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securityArchitecture": {
+      "type": "object",
+      "properties": {
+        "principles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "authentication": {
+          "type": "string"
+        },
+        "authorization": {
+          "type": "string"
+        },
+        "dataProtection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "deploymentArchitecture": {
+      "type": "object",
+      "properties": {
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "infrastructure": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "configurationManagement": {
+          "type": "string"
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scalability": {
+          "type": "string"
+        },
+        "monitoring": {
+          "type": "string"
+        }
+      }
+    },
+    "monitoring": {
+      "type": "object",
+      "properties": {
+        "logging": {
+          "type": "string"
+        },
+        "monitoring": {
+          "type": "string"
+        },
+        "alerting": {
+          "type": "string"
+        },
+        "troubleshooting": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": ["documentTitle", "introduction", "systemOverview"]
+}

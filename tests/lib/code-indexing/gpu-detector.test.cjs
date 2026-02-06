@@ -94,7 +94,7 @@ test('GPUDetector - getDeviceInfo - should return GPU info when available', asyn
   detector._gpuInfo = {
     available: true,
     gpuName: 'NVIDIA GeForce RTX 3080',
-    totalMemoryMB: 10240
+    totalMemoryMB: 10240,
   };
 
   const info = await detector.getDeviceInfo();
@@ -111,7 +111,7 @@ test('GPUDetector - getDeviceInfo - should return CPU when GPU unavailable', asy
   detector._gpuInfo = {
     available: false,
     gpuName: null,
-    totalMemoryMB: 0
+    totalMemoryMB: 0,
   };
 
   const info = await detector.getDeviceInfo();

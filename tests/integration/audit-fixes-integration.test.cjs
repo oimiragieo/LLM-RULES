@@ -54,8 +54,10 @@ describe('SKL-001: Skills System Integration', () => {
     assert.ok(skillIndex.skills['debugging'], 'Should have debugging skill');
 
     // Verify metadata
-    assert.ok(skillIndex.metadata.totalSkills > 400,
-      `Should have 400+ skills, got ${skillIndex.metadata.totalSkills}`);
+    assert.ok(
+      skillIndex.metadata.totalSkills > 400,
+      `Should have 400+ skills, got ${skillIndex.metadata.totalSkills}`
+    );
   });
 
   it('should find SKILL.md files in filesystem', () => {
@@ -105,8 +107,11 @@ describe('RS-001: Reflection Queue Not Blocking', () => {
     if (fs.existsSync(REFLECTION_SPAWN_FILE)) {
       const content = fs.readFileSync(REFLECTION_SPAWN_FILE, 'utf8');
       const requests = JSON.parse(content);
-      assert.strictEqual(requests.length, 0,
-        `Reflection queue should be empty, got ${requests.length} pending requests`);
+      assert.strictEqual(
+        requests.length,
+        0,
+        `Reflection queue should be empty, got ${requests.length} pending requests`
+      );
     }
     // File not existing is also acceptable
   });
@@ -120,14 +125,23 @@ describe('RS-001: Reflection Queue Not Blocking', () => {
 
   it('should allow Router to call TaskList (no Step 0 block)', () => {
     // Verify the guard module exists and can check pending reflections
-    const guardPath = path.join(PROJECT_ROOT, '.claude', 'hooks', 'reflection', 'reflection-step0-guard.cjs');
+    const guardPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'hooks',
+      'reflection',
+      'reflection-step0-guard.cjs'
+    );
     assert.ok(fs.existsSync(guardPath), 'Step 0 guard hook should exist');
 
     // Import and check
     const guard = require(guardPath);
     if (typeof guard.hasPendingReflections === 'function') {
-      assert.strictEqual(guard.hasPendingReflections(), false,
-        'hasPendingReflections should return false');
+      assert.strictEqual(
+        guard.hasPendingReflections(),
+        false,
+        'hasPendingReflections should return false'
+      );
     }
   });
 });
@@ -137,7 +151,13 @@ describe('RS-001: Reflection Queue Not Blocking', () => {
 // =============================================================================
 
 describe('RS-003: Hook Metrics Collection', () => {
-  const METRICS_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics', 'hook-metrics.jsonl');
+  const METRICS_FILE = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'metrics',
+    'hook-metrics.jsonl'
+  );
 
   it('should have hook metrics file', () => {
     assert.ok(fs.existsSync(METRICS_FILE), 'Hook metrics file should exist');
@@ -181,7 +201,13 @@ describe('RS-003: Hook Metrics Collection', () => {
 
 describe('WF-001: Workflow Registry Discovery', () => {
   let workflowRegistry;
-  const REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'artifacts', 'workflow-registry.json');
+  const REGISTRY_PATH = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'artifacts',
+    'workflow-registry.json'
+  );
 
   before(() => {
     workflowRegistry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
@@ -233,28 +259,52 @@ describe('WF-001: Workflow Registry Discovery', () => {
 // =============================================================================
 
 describe('CRIT-001/002: Creator Workflow TTL and Cleanup', () => {
-  const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'active-creators.json');
+  const STATE_FILE = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'runtime',
+    'active-creators.json'
+  );
   const EXPECTED_TTL_MS = 3 * 60 * 1000; // 3 minutes
 
   it('should have unified-creator-guard with correct TTL', () => {
-    const guardPath = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs');
+    const guardPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'hooks',
+      'routing',
+      'unified-creator-guard.cjs'
+    );
     assert.ok(fs.existsSync(guardPath), 'Unified creator guard should exist');
 
     const guard = require(guardPath);
     if (guard.DEFAULT_TTL_MS) {
-      assert.strictEqual(guard.DEFAULT_TTL_MS, EXPECTED_TTL_MS,
-        `Guard TTL should be ${EXPECTED_TTL_MS}ms (3 minutes)`);
+      assert.strictEqual(
+        guard.DEFAULT_TTL_MS,
+        EXPECTED_TTL_MS,
+        `Guard TTL should be ${EXPECTED_TTL_MS}ms (3 minutes)`
+      );
     }
   });
 
   it('should have skill-invocation-tracker with same TTL', () => {
-    const trackerPath = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'skill-invocation-tracker.cjs');
+    const trackerPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'hooks',
+      'routing',
+      'skill-invocation-tracker.cjs'
+    );
     assert.ok(fs.existsSync(trackerPath), 'Skill invocation tracker should exist');
 
     const tracker = require(trackerPath);
     if (tracker.DEFAULT_TTL_MS) {
-      assert.strictEqual(tracker.DEFAULT_TTL_MS, EXPECTED_TTL_MS,
-        `Tracker TTL should be ${EXPECTED_TTL_MS}ms (3 minutes)`);
+      assert.strictEqual(
+        tracker.DEFAULT_TTL_MS,
+        EXPECTED_TTL_MS,
+        `Tracker TTL should be ${EXPECTED_TTL_MS}ms (3 minutes)`
+      );
     }
   });
 
@@ -265,17 +315,19 @@ describe('CRIT-001/002: Creator Workflow TTL and Cleanup', () => {
       'hook-creator',
       'workflow-creator',
       'template-creator',
-      'schema-creator'
+      'schema-creator',
     ];
 
     for (const creator of creators) {
       const postExecPath = path.join(
-        PROJECT_ROOT, '.claude', 'skills', creator, 'hooks', 'post-execute.cjs'
+        PROJECT_ROOT,
+        '.claude',
+        'skills',
+        creator,
+        'hooks',
+        'post-execute.cjs'
       );
-      assert.ok(
-        fs.existsSync(postExecPath),
-        `Post-execute hook should exist for ${creator}`
-      );
+      assert.ok(fs.existsSync(postExecPath), `Post-execute hook should exist for ${creator}`);
     }
   });
 
@@ -289,8 +341,10 @@ describe('CRIT-001/002: Creator Workflow TTL and Cleanup', () => {
       for (const [name, data] of activeCreators) {
         if (data.startedAt) {
           const elapsed = now - new Date(data.startedAt).getTime();
-          assert.ok(elapsed < EXPECTED_TTL_MS,
-            `Creator ${name} should not be stuck (elapsed: ${elapsed}ms)`);
+          assert.ok(
+            elapsed < EXPECTED_TTL_MS,
+            `Creator ${name} should not be stuck (elapsed: ${elapsed}ms)`
+          );
         }
       }
     }
@@ -330,8 +384,7 @@ describe('MEM-001: Memory Database Integrity', () => {
     fs.closeSync(fd);
 
     const header = buffer.toString('utf8', 0, 16);
-    assert.ok(header.startsWith('SQLite format 3'),
-      'Memory database should be valid SQLite');
+    assert.ok(header.startsWith('SQLite format 3'), 'Memory database should be valid SQLite');
   });
 });
 
@@ -364,18 +417,19 @@ describe('AUDIT-AGENTS-001: Agent Registry Integration', () => {
   });
 
   it('should have healthy agent status', () => {
-    assert.strictEqual(agentRegistry.metadata.degradedAgents, 0,
-      'Should have no degraded agents');
-    assert.strictEqual(agentRegistry.metadata.unavailableAgents, 0,
-      'Should have no unavailable agents');
+    assert.strictEqual(agentRegistry.metadata.degradedAgents, 0, 'Should have no degraded agents');
+    assert.strictEqual(
+      agentRegistry.metadata.unavailableAgents,
+      0,
+      'Should have no unavailable agents'
+    );
   });
 
   it('should have agents with valid file paths', () => {
     const agents = Object.values(agentRegistry.agents).slice(0, 10);
     for (const agent of agents) {
       const fullPath = path.join(PROJECT_ROOT, agent.filePath);
-      assert.ok(fs.existsSync(fullPath),
-        `Agent file should exist: ${agent.filePath}`);
+      assert.ok(fs.existsSync(fullPath), `Agent file should exist: ${agent.filePath}`);
     }
   });
 });
@@ -386,17 +440,35 @@ describe('AUDIT-AGENTS-001: Agent Registry Integration', () => {
 
 describe('Task System Integration', () => {
   it('should have spawn-log.jsonl for task tracking', () => {
-    const spawnLogPath = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics', 'spawn-log.jsonl');
+    const spawnLogPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'context',
+      'metrics',
+      'spawn-log.jsonl'
+    );
     assert.ok(fs.existsSync(spawnLogPath), 'Spawn log should exist');
   });
 
   it('should have router-state.cjs for task routing', () => {
-    const routerStatePath = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'router-state.cjs');
+    const routerStatePath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'hooks',
+      'routing',
+      'router-state.cjs'
+    );
     assert.ok(fs.existsSync(routerStatePath), 'Router state module should exist');
   });
 
   it('should have spawn-prompt-validator.cjs for validation', () => {
-    const validatorPath = path.join(PROJECT_ROOT, '.claude', 'hooks', 'safety', 'spawn-prompt-validator.cjs');
+    const validatorPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'hooks',
+      'safety',
+      'spawn-prompt-validator.cjs'
+    );
     assert.ok(fs.existsSync(validatorPath), 'Spawn prompt validator should exist');
   });
 });
@@ -477,8 +549,10 @@ describe('Settings and Configuration Integration', () => {
           if (match) {
             const hookPath = match[1];
             const fullPath = path.join(PROJECT_ROOT, hookPath);
-            assert.ok(fs.existsSync(fullPath),
-              `Hook file should exist: ${hookPath} (referenced in ${hookType})`);
+            assert.ok(
+              fs.existsSync(fullPath),
+              `Hook file should exist: ${hookPath} (referenced in ${hookType})`
+            );
           }
         }
       }
@@ -530,25 +604,49 @@ describe('Critical Hooks Verification', () => {
 
 describe('Code References Validation', () => {
   it('should have no undefined exports in skill-index generator', () => {
-    const generatorPath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'generate-skill-index.cjs');
+    const generatorPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'tools',
+      'cli',
+      'generate-skill-index.cjs'
+    );
     const generator = require(generatorPath);
 
-    assert.ok(typeof generator.scanSkillFilesRecursively === 'function',
-      'scanSkillFilesRecursively should be exported');
+    assert.ok(
+      typeof generator.scanSkillFilesRecursively === 'function',
+      'scanSkillFilesRecursively should be exported'
+    );
   });
 
   it('should have no undefined exports in workflow registry generator', () => {
-    const generatorPath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'generate-workflow-registry.cjs');
+    const generatorPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'tools',
+      'cli',
+      'generate-workflow-registry.cjs'
+    );
     const generator = require(generatorPath);
 
-    assert.ok(typeof generator.scanWorkflowFiles === 'function',
-      'scanWorkflowFiles should be exported');
-    assert.ok(typeof generator.generateRegistry === 'function',
-      'generateRegistry should be exported');
+    assert.ok(
+      typeof generator.scanWorkflowFiles === 'function',
+      'scanWorkflowFiles should be exported'
+    );
+    assert.ok(
+      typeof generator.generateRegistry === 'function',
+      'generateRegistry should be exported'
+    );
   });
 
   it('should have no undefined exports in agent registry generator', () => {
-    const generatorPath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'generate-agent-registry.cjs');
+    const generatorPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'tools',
+      'cli',
+      'generate-agent-registry.cjs'
+    );
     assert.ok(fs.existsSync(generatorPath), 'Agent registry generator should exist');
   });
 });

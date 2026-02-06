@@ -31,9 +31,9 @@ skills:
   - template-creator
   - task-management-protocol
 context_files:
-  - @.claude/context/memory/learnings.md
-  - @.claude/context/memory/decisions.md
-  - @.claude/context/evolution-state.json
+  - '@.claude/context/memory/learnings.md'
+  - '@.claude/context/memory/decisions.md'
+  - '@.claude/context/evolution-state.json'
 triggers:
   - 'create new agent'
   - 'create new skill'

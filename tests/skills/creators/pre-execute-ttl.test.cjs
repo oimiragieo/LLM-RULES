@@ -102,11 +102,7 @@ describe('CRIT-001: Pre-execute hooks TTL consistency', () => {
       EXPECTED_TTL_MS,
       `Tracker TTL should be ${EXPECTED_TTL_MS}ms (3 minutes)`
     );
-    assert.strictEqual(
-      GUARD_TTL_MS,
-      TRACKER_TTL_MS,
-      'Guard and tracker should have the same TTL'
-    );
+    assert.strictEqual(GUARD_TTL_MS, TRACKER_TTL_MS, 'Guard and tracker should have the same TTL');
   });
 
   // Test each creator hook produces state with correct TTL
@@ -141,10 +137,7 @@ describe('CRIT-001: Pre-execute hooks TTL consistency', () => {
 
       // Read state and verify TTL
       const state = JSON.parse(fs.readFileSync(STATE_PATH, 'utf8'));
-      assert.ok(
-        state[creatorName],
-        `State should contain ${creatorName} entry`
-      );
+      assert.ok(state[creatorName], `State should contain ${creatorName} entry`);
       assert.strictEqual(
         state[creatorName].ttl,
         EXPECTED_TTL_MS,
@@ -163,22 +156,19 @@ describe('CRIT-001: TTL configurability via environment variable', () => {
     const customTTL = 5 * 60 * 1000; // 5 minutes
     process.env.CREATOR_STATE_TTL_MS = String(customTTL);
 
-    const hookPath = path.join(
-      PROJECT_ROOT,
-      '.claude/skills/skill-creator/hooks/pre-execute.cjs'
-    );
+    const hookPath = path.join(PROJECT_ROOT, '.claude/skills/skill-creator/hooks/pre-execute.cjs');
 
-      // Run the pre-execute hook with custom TTL
-      try {
-        execSync(`node "${hookPath}" "{}"`, {
-          cwd: PROJECT_ROOT,
-          stdio: 'pipe',
-          encoding: 'utf8',
-          env: { ...process.env, CREATOR_STATE_TTL_MS: String(customTTL) },
-        });
-      } catch {
-        // Continue checking state file
-      }
+    // Run the pre-execute hook with custom TTL
+    try {
+      execSync(`node "${hookPath}" "{}"`, {
+        cwd: PROJECT_ROOT,
+        stdio: 'pipe',
+        encoding: 'utf8',
+        env: { ...process.env, CREATOR_STATE_TTL_MS: String(customTTL) },
+      });
+    } catch {
+      // Continue checking state file
+    }
 
     // Verify TTL in state matches env var
     const state = JSON.parse(fs.readFileSync(STATE_PATH, 'utf8'));
@@ -226,10 +216,7 @@ describe('CRIT-001: Source code TTL values match', () => {
         /CREATOR_STATE_TTL_MS/.test(content) ||
         /3\s*\*\s*60\s*\*\s*1000/.test(content);
 
-      assert.ok(
-        hasCorrectTTL,
-        `${hookPath} should use correct 3-minute TTL (180000ms) or env var`
-      );
+      assert.ok(hasCorrectTTL, `${hookPath} should use correct 3-minute TTL (180000ms) or env var`);
     }
   });
 });

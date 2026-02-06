@@ -11,10 +11,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/reflection/force-step0-execution.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/session/state-reset.cjs"
           },
           {
@@ -23,15 +19,7 @@
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/session/post-creation-reminder.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/memory/memory-health-check.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/reflection/reflection-queue-processor.cjs"
+            "command": "node .claude/hooks/reflection/force-step0-execution.cjs"
           }
         ]
       }
@@ -55,15 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/context-mode-tool-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/windows-null-sanitizer.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/bash-cwd-validator.cjs"
+            "command": "node .claude/hooks/safety/bash-command-validator.cjs"
           },
           {
             "type": "command",
@@ -71,23 +51,7 @@
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/variable-quoting-validator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/shellcheck-validator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/command-allowlist-validator.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/routing/routing-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/bash-command-validator.cjs"
           }
         ]
       },
@@ -105,47 +69,28 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/context-mode-tool-guard.cjs"
+            "command": "node .claude/hooks/unified-pre-write-hook.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/file-placement-guard.cjs"
+            "command": "node .claude/hooks/evolution/evolution-state-guard.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/write-content-scanner.cjs"
+            "command": "node .claude/hooks/evolution/research-enforcement.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/write-size-validator.cjs"
-          },
+            "command": "node .claude/hooks/evolution/quality-gate-validator.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/routing-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/router-write-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/unified-creator-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/tdd-check.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/validation/plan-evolution-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/evolution/unified-evolution-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/scripts/hooks/suggest-compact.cjs"
+            "command": "node .claude/hooks/evolution/conflict-detector.cjs"
           }
         ]
       },
@@ -181,31 +126,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/config-model-validator.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/routing/spawn-prompt-assembler.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/spawn-prompt-validator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/pre-spawn-tool-validator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/tool-availability-validator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/documentation-routing-guard.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/routing/pre-task-unified.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/config-model-validator.cjs"
           }
         ]
       },
@@ -219,15 +148,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/validation/pre-completion-validation.cjs"
-          }
-        ]
-      },
-      {
-        "matcher": "Skill",
-        "hooks": [
+          },
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/skill-invocation-tracker.cjs"
+            "command": "node .claude/hooks/evolution/quality-gate-validator.cjs"
           }
         ]
       }
@@ -255,26 +179,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/task-completion-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/agent-context-tracker.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/self-healing/auto-rerouter.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/agent-health-hook.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/post-spawn-task-updater.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/routing/post-task-unified.cjs"
           }
         ]
@@ -293,23 +197,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/memory/format-memory.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/memory/sync-memory-index.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/enforce-claude-md-update.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/routing/code-index-updater.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/memory/planning-progress-tracker.cjs"
           }
         ]
       },

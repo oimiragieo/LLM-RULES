@@ -9,10 +9,13 @@ tools:
   - Glob
   - Grep
   - Bash
+  - WebFetch
+  - WebSearch
   - TaskUpdate
   - TaskList
   - TaskCreate
   - TaskGet
+  - TaskOutput
   - Skill
 model: opus
 temperature: 0.5

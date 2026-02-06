@@ -27,9 +27,9 @@ function getLatestDebugLog(dir, optionalPath) {
     return null;
   }
   if (!fs.existsSync(dir)) return null;
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.txt'));
+  const files = fs.readdirSync(dir).filter(f => f.endsWith('.txt'));
   if (files.length === 0) return null;
-  const withStats = files.map((f) => ({
+  const withStats = files.map(f => ({
     path: path.join(dir, f),
     mtime: fs.statSync(path.join(dir, f)).mtimeMs,
   }));
@@ -47,17 +47,21 @@ function main() {
   const content = fs.readFileSync(logPath, 'utf8');
   const lines = content.split('\n');
 
-  const parseFail = lines.filter((l) => l.includes('Failed to parse hook output as JSON'));
+  const parseFail = lines.filter(l => l.includes('Failed to parse hook output as JSON'));
   const missingRequired = lines.filter(
-    (l) =>
+    l =>
       l.includes('Missing required elements') &&
       (l.includes('TaskUpdate Warning Box') || l.includes('Task ID Reference'))
   );
   const testsReadme = lines.filter(
-    (l) => l.includes('Failed to parse agent') && (l.includes('__tests__') || l.includes('tests\\README'))
+    l =>
+      l.includes('Failed to parse agent') &&
+      (l.includes('__tests__') || l.includes('tests\\README'))
   );
   const invalidModel = lines.filter(
-    (l) => l.includes("invalid model 'claude-haiku-4-5'") || l.includes('invalid model \'claude-haiku-4-5\'')
+    l =>
+      l.includes("invalid model 'claude-haiku-4-5'") ||
+      l.includes("invalid model 'claude-haiku-4-5'")
   );
 
   console.log('Debug log:', logPath);
@@ -66,7 +70,11 @@ function main() {
   let ok = true;
 
   if (parseFail.length > 0) {
-    console.log('FAIL: "Failed to parse hook output as JSON" still present:', parseFail.length, 'occurrence(s)');
+    console.log(
+      'FAIL: "Failed to parse hook output as JSON" still present:',
+      parseFail.length,
+      'occurrence(s)'
+    );
     ok = false;
   } else {
     console.log('PASS: No "Failed to parse hook output as JSON" lines (Part 1).');
@@ -84,14 +92,22 @@ function main() {
   }
 
   if (testsReadme.length > 0) {
-    console.log('FAIL: Agent parse error for __tests__/README still present:', testsReadme.length, 'occurrence(s)');
+    console.log(
+      'FAIL: Agent parse error for __tests__/README still present:',
+      testsReadme.length,
+      'occurrence(s)'
+    );
     ok = false;
   } else {
     console.log('PASS: No "Failed to parse agent from ... __tests__/README" (Part 3.2).');
   }
 
   if (invalidModel.length > 0) {
-    console.log("FAIL: Invalid model 'claude-haiku-4-5' still present:", invalidModel.length, 'occurrence(s)');
+    console.log(
+      "FAIL: Invalid model 'claude-haiku-4-5' still present:",
+      invalidModel.length,
+      'occurrence(s)'
+    );
     ok = false;
   } else {
     console.log("PASS: No invalid model 'claude-haiku-4-5' for context-compressor (Part 3.1).");

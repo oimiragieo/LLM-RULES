@@ -114,7 +114,8 @@ function main() {
   console.log(
     JSON.stringify({
       block: true,
-      message: `STEP 0 REQUIRED: ${requestCount} pending reflection request(s) detected. ` +
+      message:
+        `STEP 0 REQUIRED: ${requestCount} pending reflection request(s) detected. ` +
         'Read .claude/context/runtime/reflection-reminder.txt and ' +
         '.claude/context/runtime/reflection-spawn-request.json, spawn reflection-agent ' +
         'for each request (or first batch), then delete reminder file and clear spawn request file. ' +

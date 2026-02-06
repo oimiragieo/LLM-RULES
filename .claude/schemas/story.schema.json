@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Story Schema",
+  "description": "Schema for user stories",
+  "type": "object",
+  "properties": {
+    "id": {"type": "string"},
+    "title": {"type": "string"},
+    "description": {"type": "string"},
+    "acceptance_criteria": {"type": "array", "items": {"type": "string"}},
+    "priority": {"type": "string", "enum": ["high", "medium", "low"]},
+    "estimate": {"type": "number"},
+    "status": {"type": "string", "enum": ["todo", "in-progress", "done"]},
+    "assignee": {"type": "string"}
+  },
+  "required": ["id", "title", "description"]
+}

@@ -1,27 +1,63 @@
 /**
- * Index Manager - Orchestrates the entire code indexing pipeline
+ * Index Manager - FIXED VERSION with Memory Safety
  *
- * @module code-indexing/index-manager
+ * @module code-indexing/index-manager-fixed
  * @see {@link .claude/docs/CODE_INDEXING_DESIGN.md}
- * @see {@link .claude/context/artifacts/PHASE_1_IMPLEMENTATION_PLAN.md#task-41}
+ * @critical-fix Memory-safe worker pool, backpressure, checkpointing
  */
 
 'use strict';
 
 const fs = require('fs').promises;
 const path = require('path');
+const os = require('os');
 const { CodeParser } = require('./code-parser.cjs');
 const { SemanticChunker } = require('./semantic-chunker.cjs');
 const { VectorStore } = require('./vector-store.cjs');
 const { MerkleTree } = require('./merkle-tree.cjs');
+const Piscina = require('piscina');
 
-// Default configuration
+// CRITICAL FIX: Calculate safe memory limits based on system
+function calculateSafeMemoryConfig() {
+  const _totalSystemMemoryGB = os.totalmem() / 1024 / 1024 / 1024;
+  const availableMemoryGB = os.freemem() / 1024 / 1024 / 1024;
+
+  // Use at most 50% of available memory for indexing
+  const maxIndexingMemoryGB = Math.min(availableMemoryGB * 0.5, 8);
+
+  // Calculate safe concurrency (1 worker per 2GB of allowed memory, max 4)
+  const safeConcurrency = Math.min(4, Math.max(1, Math.floor(maxIndexingMemoryGB / 2)));
+
+  // Memory per worker (divide by 2 for safety margin)
+  const maxOldGenMB = Math.min(
+    2048,
+    Math.floor((maxIndexingMemoryGB * 1024) / safeConcurrency / 2)
+  );
+
+  // Dynamic thresholds based on system
+  const memoryThresholdGB = Math.max(2, maxIndexingMemoryGB * 0.6);
+
+  return {
+    concurrency: safeConcurrency,
+    maxOldGenerationSizeMb: maxOldGenMB,
+    maxYoungGenerationSizeMb: Math.min(256, Math.floor(maxOldGenMB / 4)),
+    memoryThresholdGB,
+    flushSize: 50, // Reduced from 100 for faster memory release
+    emergencyThresholdGB: Math.max(3, maxIndexingMemoryGB * 0.8),
+  };
+}
+
+// Default configuration with memory-safe defaults
+const memoryConfig = calculateSafeMemoryConfig();
+
 const DEFAULT_OPTIONS = {
   projectRoot: process.cwd(),
   excludePatterns: [
     '**/node_modules/**',
     '**/.git/**',
-    '**/.claude/context/code-index/**', // Don't index the index itself
+    '**/.claude/context/code-index/**',
+    '**/.claude/data/**',
+    '**/local_cache/**',
     '**/dist/**',
     '**/build/**',
     '**/.next/**',
@@ -29,42 +65,34 @@ const DEFAULT_OPTIONS = {
     '**/*.min.js',
     '**/*.bundle.js',
     '**/*.map',
+    '**/.tmp/**',
+    '**/.claude.archive/**',
+    '**/pnpm-lock.yaml',
+    '**/*.jsonl',
+    '**/*.db',
   ],
-  maxFileSize: 1 * 1024 * 1024, // 1MB
-  batchSize: 50,
+  maxFileSize: 512 * 1024, // REDUCED: 512KB max (was 1MB)
+  batchSize: 25, // REDUCED: 25 files per batch (was 50)
+  concurrency: memoryConfig.concurrency, // DYNAMIC: Based on system memory
+  chunkFlushSize: memoryConfig.flushSize, // REDUCED: 50 chunks per flush
+  embedBatchSize: 32, // REDUCED: 32 embeddings per batch (was 64)
   verbose: false,
+  enableCheckpoints: true, // NEW: Enable progress checkpointing
+  checkpointInterval: 50, // NEW: Save every 50 files
 };
 
 /**
- * IndexManager orchestrates the full code indexing pipeline:
- * Files → Parser → Chunker → Embedder → Vector DB
- *
- * Features:
- * - Discovers source files (respects .gitignore)
- * - Parses to AST (tree-sitter)
- * - Chunks semantically (functions, classes, methods)
- * - Generates embeddings (all-MiniLM-L6-v2)
- * - Stores in vector DB
- * - Tracks metadata for incremental updates
+ * IndexManager with memory-safe defaults and backpressure
  */
 class IndexManager {
-  /**
-   * Create index manager
-   * @param {Object} options - Configuration options
-   */
   constructor(options = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
-
-    // Initialize components (lazy - only when indexing)
     this.parser = null;
     this.chunker = null;
     this.vectorStore = null;
+    this.memoryConfig = memoryConfig;
   }
 
-  /**
-   * Initialize components (lazy initialization)
-   * @private
-   */
   async _initializeComponents() {
     if (!this.parser) this.parser = new CodeParser();
     if (!this.chunker) {
@@ -74,40 +102,83 @@ class IndexManager {
     if (!this.vectorStore) {
       this.vectorStore = new VectorStore({
         projectRoot: this.options.projectRoot,
+        bm25: this.options.bm25 || {
+          k1: 1.5,
+          b: 0.75,
+          k_sparse: 50, // REDUCED: was 100
+          k_dense: 10,
+          rrf_k: 60,
+          weights: { sparse: 0.4, dense: 0.6 },
+        },
       });
     }
   }
 
-  /**
-   * Discover source files in directory (41.2)
-   * @param {string} dir - Directory to scan
-   * @returns {Promise<string[]>} List of source files
-   * @private
-   */
   async _discoverFiles(dir) {
     const files = [];
-    const entries = await fs.readdir(dir, { withFileTypes: true });
+    let entries;
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch {
+      return files; // Permission denied or broken path
+    }
+
+    const resolvedRoot = path.resolve(this.options.projectRoot);
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
-      const relativePath = path.relative(this.options.projectRoot, fullPath);
 
-      // Check exclude patterns
+      // Safety: ensure we haven't escaped the project root via symlinks/junctions
+      const resolvedFull = path.resolve(fullPath);
+      if (!resolvedFull.startsWith(resolvedRoot)) {
+        if (this.options.verbose) {
+          console.log(`[SKIP] Outside project root: ${fullPath}`);
+        }
+        continue;
+      }
+
+      // Normalize to forward slashes for cross-platform pattern matching
+      const relativePath = path.relative(this.options.projectRoot, fullPath).replace(/\\/g, '/');
+
+      // Check exclude patterns (use forward-slash normalized path)
       const excluded = this.options.excludePatterns.some(pattern => {
-        const regex = new RegExp(pattern.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*'));
+        // Convert glob pattern to regex with proper escaping
+        const regexStr = pattern
+          .replace(/[.+^${}()|[\]\\]/g, '\\$&')  // Escape regex special chars (except * and ?)
+          .replace(/\*\*/g, '{{GLOBSTAR}}')        // Temp placeholder
+          .replace(/\*/g, '[^/]*')                  // Single * = anything except /
+          .replace(/{{GLOBSTAR}}/g, '.*');          // ** = anything including /
+        const regex = new RegExp('^' + regexStr + '$');
         return regex.test(relativePath);
       });
       if (excluded) continue;
 
       if (entry.isDirectory()) {
+        // Check for symlinks pointing outside project
+        if (entry.isSymbolicLink()) {
+          try {
+            const realPath = await fs.realpath(fullPath);
+            if (!realPath.startsWith(resolvedRoot)) {
+              if (this.options.verbose) {
+                console.log(`[SKIP] Symlink escapes project: ${relativePath} -> ${realPath}`);
+              }
+              continue;
+            }
+          } catch {
+            continue; // broken symlink
+          }
+        }
         files.push(...(await this._discoverFiles(fullPath)));
       } else if (entry.isFile()) {
         const language = this.parser.detectLanguage(fullPath);
         if (language) {
-          // Check file size
           const stats = await fs.stat(fullPath);
           if (stats.size <= this.options.maxFileSize) {
             files.push(fullPath);
+          } else if (this.options.verbose) {
+            console.log(
+              `[SKIP] File too large: ${relativePath} (${(stats.size / 1024).toFixed(0)}KB)`
+            );
           }
         }
       }
@@ -117,12 +188,64 @@ class IndexManager {
   }
 
   /**
-   * Index a directory (discover → parse → chunk → embed → store)
-   * @param {string} projectPath - Path to project root
-   * @param {Object} options - Indexing options
-   * @param {Function} options.onProgress - Progress callback (phase, current, total)
-   * @returns {Promise<Object>} Indexing results
+   * NEW: Load checkpoint if exists
    */
+  async _loadCheckpoint() {
+    if (!this.options.enableCheckpoints) return { filesProcessed: 0, chunksProcessed: 0 };
+
+    const checkpointPath = path.join(
+      this.options.projectRoot,
+      '.claude/context/code-index/checkpoint.json'
+    );
+
+    try {
+      const checkpoint = JSON.parse(await fs.readFile(checkpointPath, 'utf8'));
+      console.log(
+        `[CHECKPOINT] Resuming: ${checkpoint.filesProcessed}/${checkpoint.totalFiles} files already processed`
+      );
+      return checkpoint;
+    } catch {
+      return { filesProcessed: 0, chunksProcessed: 0 };
+    }
+  }
+
+  /**
+   * NEW: Save checkpoint
+   */
+  async _saveCheckpoint(filesProcessed, totalFiles, totalChunks) {
+    if (!this.options.enableCheckpoints) return;
+
+    const checkpointPath = path.join(
+      this.options.projectRoot,
+      '.claude/context/code-index/checkpoint.json'
+    );
+
+    await fs.writeFile(
+      checkpointPath,
+      JSON.stringify({
+        filesProcessed,
+        totalFiles,
+        chunksProcessed: totalChunks,
+        timestamp: Date.now(),
+      })
+    );
+  }
+
+  /**
+   * NEW: Clear checkpoint on successful completion
+   */
+  async _clearCheckpoint() {
+    const checkpointPath = path.join(
+      this.options.projectRoot,
+      '.claude/context/code-index/checkpoint.json'
+    );
+    try {
+      await fs.unlink(checkpointPath);
+    } catch {
+      /* Ignore */
+    }
+  }
+
   async indexDirectory(projectPath, options = {}) {
     const startTime = Date.now();
     await this._initializeComponents();
@@ -130,74 +253,203 @@ class IndexManager {
     this.options.projectRoot = projectPath;
     const { onProgress } = options;
 
-    // 41.2: Discover files
-    const files = await this._discoverFiles(projectPath);
+    // Load checkpoint
+    const checkpoint = await this._loadCheckpoint();
+    const startIndex = checkpoint.filesProcessed;
+
+    // Discover files
+    const allFiles = await this._discoverFiles(projectPath);
+    const files = allFiles.slice(startIndex);
+
     if (this.options.verbose) {
-      console.log(`Discovered ${files.length} source files`);
+      console.log(`[DISCOVER] ${allFiles.length} total files, ${files.length} remaining to index`);
+      console.log(
+        `[MEMORY] Concurrency: ${this.options.concurrency}, Worker memory: ${this.memoryConfig.maxOldGenerationSizeMb}MB`
+      );
     }
 
-    // Report scan complete
-    if (onProgress) onProgress('scan', files.length, files.length);
+    if (onProgress) onProgress('scan', allFiles.length, allFiles.length);
 
-    let totalChunks = 0;
+    // Full reindex: drop code table
+    await this.vectorStore.dropCodeTable();
+
+    let totalChunks = checkpoint.chunksProcessed || 0;
     let totalEmbeddings = 0;
+    let chunksFlushed = checkpoint.chunksProcessed || 0;
     const fileHashes = {};
-    let fileIndex = 0;
+    const concurrency = this.options.concurrency;
+    const flushSize = this.options.chunkFlushSize;
 
-    // Process files in batches
-    for (let i = 0; i < files.length; i += this.options.batchSize) {
-      const batch = files.slice(i, Math.min(i + this.options.batchSize, files.length));
+    const chunkBuffer = [];
+    let flushPromise = Promise.resolve();
 
-      for (const filePath of batch) {
-        fileIndex++;
-        try {
-          // 41.3: Parse file
-          const content = await fs.readFile(filePath, 'utf-8');
-          const language = this.parser.detectLanguage(filePath);
+    const flushBuffer = async () => {
+      if (chunkBuffer.length === 0) return;
 
-          let parseResult = this.parser.parse(content, language);
+      // CRITICAL FIX: Take only flushSize chunks
+      const toFlush = chunkBuffer.splice(0, flushSize);
+      const embedBatchSize = this.options.embedBatchSize || 32;
+      const totalBatches = Math.ceil(toFlush.length / embedBatchSize) || 1;
 
-          if (!parseResult) {
-            parseResult = buildMockParseResult(content, language);
-          }
-
-          // Report parse progress
-          if (onProgress) onProgress('parse', fileIndex, files.length);
-
-          // 41.4: Chunk file
-          const chunks = this.chunker.chunk(parseResult, filePath);
-          totalChunks += chunks.length;
-
-          if (chunks.length === 0) continue;
-
-          // Report chunk progress
-          if (onProgress) onProgress('chunk', fileIndex, files.length);
-
-          // 41.5: Store in vector DB (LanceDB embeds internally)
-          await this.vectorStore.addChunks(chunks);
-          totalEmbeddings += chunks.length;
-
-          // Report index progress
-          if (onProgress) onProgress('index', fileIndex, files.length);
-
-          // Track file hash
-          const crypto = require('crypto');
-          const hash = crypto.createHash('sha256').update(content).digest('hex');
-          fileHashes[filePath] = { hash, chunks: chunks.length };
-
-          // 41.7: Progress tracking
-          if (this.options.verbose && (i + batch.indexOf(filePath) + 1) % 10 === 0) {
-            console.log(`Processed ${i + batch.indexOf(filePath) + 1}/${files.length} files`);
-          }
-        } catch (error) {
-          console.error(`Error indexing ${filePath}:`, error.message);
-        }
+      const heapUsedGB = process.memoryUsage().heapUsed / 1024 / 1024 / 1024;
+      if (this.options.verbose) {
+        console.log(
+          `[FLUSH] ${toFlush.length} chunks (buffer: ${chunkBuffer.length}, heap: ${heapUsedGB.toFixed(2)}GB)`
+        );
       }
+
+      if (onProgress) onProgress('embed', 0, totalBatches);
+
+      await this.vectorStore.addChunksOnly(toFlush, {
+        embedBatchSize,
+        onEmbedProgress: onProgress
+          ? (batchDone, tot) => onProgress('embed', batchDone, tot)
+          : undefined,
+      });
+
+      chunksFlushed += toFlush.length;
+      if (onProgress) onProgress('index', chunksFlushed, totalChunks);
+
+      await this.vectorStore.saveBM25Index();
+
+      if (this.options.verbose) {
+        const heapAfterGB = process.memoryUsage().heapUsed / 1024 / 1024 / 1024;
+        console.log(
+          `[FLUSH] Done ${chunksFlushed}/${totalChunks} (heap: ${heapAfterGB.toFixed(2)}GB)`
+        );
+      }
+
+      // CRITICAL FIX: Force GC after flush if available
+      if (typeof global.gc === 'function') {
+        global.gc();
+      }
+    };
+
+    // Worker pool with SAFE memory limits
+    const workerPath = path.resolve(__dirname, 'parse-chunk-worker.cjs');
+    const pool = new Piscina({
+      filename: workerPath,
+      maxThreads: concurrency,
+      minThreads: 1, // REDUCED: Start with 1 worker
+      resourceLimits: {
+        maxOldGenerationSizeMb: this.memoryConfig.maxOldGenerationSizeMb,
+        maxYoungGenerationSizeMb: this.memoryConfig.maxYoungGenerationSizeMb,
+      },
+    });
+
+    const inFlight = new Set();
+    let filesProcessed = startIndex;
+    const parseStartTime = Date.now();
+
+    const runOne = async (filePath, index) => {
+      const stats = await fs.stat(filePath);
+      if (stats.size > this.options.maxFileSize) {
+        return { filePath, chunks: [], hash: null, skipped: true, index };
+      }
+
+      const content = await fs.readFile(filePath, 'utf-8');
+      const language = this.parser.detectLanguage(filePath);
+      if (!language) {
+        return { filePath, chunks: [], hash: '', index };
+      }
+      const result = await pool.run({ filePath, content, language });
+      return { ...result, index };
+    };
+
+    // CRITICAL FIX: Memory-aware processing with backpressure
+    for (let i = 0; i < files.length; i++) {
+      const filePath = files[i];
+      const globalIndex = startIndex + i + 1;
+
+      // Check memory pressure before adding new work
+      const heapUsedGB = process.memoryUsage().heapUsed / 1024 / 1024 / 1024;
+
+      // EMERGENCY: Pause everything if memory is critical
+      if (heapUsedGB > this.memoryConfig.emergencyThresholdGB) {
+        console.warn(
+          `🚨 EMERGENCY: Memory critical (${heapUsedGB.toFixed(2)}GB), draining queue...`
+        );
+        await Promise.all(Array.from(inFlight));
+        await flushPromise;
+        await flushBuffer();
+
+        // Aggressive GC
+        if (typeof global.gc === 'function') {
+          for (let gc = 0; gc < 3; gc++) global.gc();
+        }
+
+        // Cool down
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log(`🔄 Resuming after memory recovery...`);
+      }
+
+      // BACKPRESSURE: If approaching threshold, wait for some work to complete
+      if (heapUsedGB > this.memoryConfig.memoryThresholdGB && inFlight.size >= concurrency) {
+        console.warn(`⚠️ Backpressure: Memory at ${heapUsedGB.toFixed(2)}GB, throttling...`);
+        await Promise.race(Array.from(inFlight));
+        await flushBuffer();
+      }
+
+      // Cap in-flight to concurrency
+      while (inFlight.size >= concurrency) {
+        await Promise.race(Array.from(inFlight));
+      }
+
+      const task = runOne.call(this, filePath, globalIndex);
+      inFlight.add(task);
+
+      task
+        .then(async result => {
+          filesProcessed++;
+          fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
+          totalChunks += result.chunks.length;
+          totalEmbeddings += result.chunks.length;
+
+          if (this.options.verbose && filesProcessed % 50 === 0) {
+            const elapsedSec = (Date.now() - parseStartTime) / 1000;
+            const filesPerSec = (filesProcessed - startIndex) / elapsedSec;
+            const remainingFiles = allFiles.length - filesProcessed;
+            const estimatedMin = remainingFiles / filesPerSec / 60;
+            const heapGB = process.memoryUsage().heapUsed / 1024 / 1024 / 1024;
+            console.log(
+              `[PROGRESS] ${filesProcessed}/${allFiles.length} (${filesPerSec.toFixed(1)}/sec, ~${estimatedMin.toFixed(1)}min left) heap: ${heapGB.toFixed(2)}GB`
+            );
+          }
+
+          if (onProgress) {
+            onProgress('parse', result.index, allFiles.length);
+            onProgress('chunk', result.index, allFiles.length);
+          }
+
+          if (result.chunks.length > 0) {
+            chunkBuffer.push(...result.chunks);
+
+            if (chunkBuffer.length >= flushSize) {
+              flushPromise = flushPromise.then(() => flushBuffer());
+            }
+          }
+
+          // Save checkpoint periodically
+          if (
+            this.options.enableCheckpoints &&
+            filesProcessed % this.options.checkpointInterval === 0
+          ) {
+            await this._saveCheckpoint(filesProcessed, allFiles.length, totalChunks);
+          }
+        })
+        .catch(err => console.error(`Error indexing ${filePath}:`, err.message))
+        .finally(() => inFlight.delete(task));
     }
 
-    // 41.8: Save metadata
+    await Promise.all(Array.from(inFlight));
+    await pool.destroy();
+
+    await flushPromise;
+    await flushBuffer();
+
+    // Build metadata
     const byLanguage = {};
-    for (const filePath of files) {
+    for (const filePath of allFiles) {
       const lang = this.parser.detectLanguage(filePath);
       if (lang) {
         byLanguage[lang] = (byLanguage[lang] || 0) + 1;
@@ -207,7 +459,7 @@ class IndexManager {
     const metadata = {
       timestamp: new Date().toISOString(),
       stats: {
-        files: files.length,
+        files: allFiles.length,
         chunks: totalChunks,
         embeddings: totalEmbeddings,
         byLanguage,
@@ -215,7 +467,6 @@ class IndexManager {
       files: fileHashes,
     };
 
-    // Save metadata (use projectRoot for path)
     const metadataPath = path.join(
       this.options.projectRoot,
       '.claude/context/code-index/metadata.json'
@@ -224,7 +475,7 @@ class IndexManager {
     await fs.mkdir(metadataDir, { recursive: true });
     await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
 
-    // Build and save Merkle tree for future incremental updates
+    // Build and save Merkle tree
     const merklePath = path.join(
       this.options.projectRoot,
       '.claude/context/code-index/merkle-tree.json'
@@ -233,20 +484,17 @@ class IndexManager {
     await merkleTree.build();
     await merkleTree.save(merklePath);
 
+    // Clear checkpoint on success
+    await this._clearCheckpoint();
+
     return {
-      filesIndexed: files.length,
+      filesIndexed: allFiles.length,
       chunksCreated: totalChunks,
       embeddingsGenerated: totalEmbeddings,
       timeMs: Date.now() - startTime,
     };
   }
 
-  /**
-   * Perform incremental update using Merkle tree change detection
-   * Only re-indexes files that have changed since last index
-   * @param {Object} options - Update options
-   * @returns {Promise<Object>} Update results
-   */
   async incrementalUpdate(options = {}) {
     const startTime = Date.now();
     await this._initializeComponents();
@@ -256,32 +504,22 @@ class IndexManager {
       '.claude/context/code-index/merkle-tree.json'
     );
 
-    // Load old Merkle tree
     const oldTree = await MerkleTree.load(merklePath);
 
     if (!oldTree) {
-      // No previous tree - do full index
       const result = await this.indexDirectory(this.options.projectRoot, options);
-      // Save new tree
       const newTree = new MerkleTree(this.options.projectRoot, this.options.excludePatterns);
       await newTree.build();
       await newTree.save(merklePath);
-      return {
-        ...result,
-        updateType: 'full',
-        filesChanged: result.filesIndexed,
-      };
+      return { ...result, updateType: 'full', filesChanged: result.filesIndexed };
     }
 
-    // Build new Merkle tree
     const newTree = new MerkleTree(this.options.projectRoot, this.options.excludePatterns);
     await newTree.build();
 
-    // Compare trees to find changes
     const diff = MerkleTree.diff(oldTree, newTree.root, '');
 
     if (diff.added.length === 0 && diff.modified.length === 0 && diff.deleted.length === 0) {
-      // No changes
       return {
         updateType: 'incremental',
         filesAdded: 0,
@@ -294,15 +532,14 @@ class IndexManager {
       };
     }
 
-    // Process changed files
+    // Process with reduced concurrency for incremental updates
     const filesToIndex = [...diff.added, ...diff.modified];
     const filesToDelete = diff.deleted;
 
-    let chunksAdded = 0;
-    let chunksUpdated = 0;
-    let chunksDeleted = 0;
+    let chunksAdded = 0,
+      chunksUpdated = 0,
+      chunksDeleted = 0;
 
-    // Delete removed files from index
     for (const filePath of filesToDelete) {
       const fullPath = path.isAbsolute(filePath)
         ? filePath
@@ -311,19 +548,17 @@ class IndexManager {
       chunksDeleted++;
     }
 
-    // Re-index changed/added files
+    // Process files sequentially for memory safety
     for (const filePath of filesToIndex) {
       const fullPath = path.isAbsolute(filePath)
         ? filePath
         : path.join(this.options.projectRoot, filePath);
 
       try {
-        // Check if file exists and is readable
         await fs.access(fullPath);
         const stats = await fs.stat(fullPath);
         if (stats.size > this.options.maxFileSize) continue;
 
-        // Parse, chunk, embed, and store
         const content = await fs.readFile(fullPath, 'utf8');
         const language = this.parser.detectLanguage(fullPath);
         if (!language) continue;
@@ -332,12 +567,9 @@ class IndexManager {
         const chunks = this.chunker.chunk(parseResult, fullPath);
         if (chunks.length === 0) continue;
 
-        // Delete old chunks for this file first
         await this.vectorStore.deleteFile(fullPath);
         chunksDeleted += chunks.length;
-
-        // Add new chunks
-        await this.vectorStore.addChunks(chunks);
+        await this.vectorStore.addChunks(chunks, { addOnly: true });
 
         if (diff.added.includes(filePath)) {
           chunksAdded += chunks.length;
@@ -345,38 +577,11 @@ class IndexManager {
           chunksUpdated += chunks.length;
         }
       } catch (_error) {
-        // File might not exist or be unreadable - skip
         continue;
       }
     }
 
-    // Save new Merkle tree
     await newTree.save(merklePath);
-
-    // Update metadata
-    const metadataPath = path.join(
-      this.options.projectRoot,
-      '.claude/context/code-index/metadata.json'
-    );
-    let metadata = {};
-    try {
-      const metadataContent = await fs.readFile(metadataPath, 'utf8');
-      metadata = JSON.parse(metadataContent);
-    } catch (_err) {
-      // Metadata doesn't exist - create new
-    }
-
-    metadata.lastIncrementalUpdate = new Date().toISOString();
-    metadata.incrementalStats = {
-      filesAdded: diff.added.length,
-      filesModified: diff.modified.length,
-      filesDeleted: diff.deleted.length,
-      chunksAdded,
-      chunksUpdated,
-      chunksDeleted,
-    };
-
-    await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
 
     return {
       updateType: 'incremental',
@@ -390,20 +595,12 @@ class IndexManager {
     };
   }
 
-  /**
-   * Search for code using semantic similarity
-   * @param {string} query - Natural language query
-   * @param {Object} options - Search options
-   * @param {number} options.limit - Max results (default: 10)
-   * @param {number} options.minScore - Minimum similarity (default: 0.5)
-   * @param {Object} options.filters - Metadata filters
-   * @returns {Promise<Array>} Search results
-   */
   async semanticSearch(query, options = {}) {
     await this._initializeComponents();
 
     const limit = options.limit || 10;
     const minScore = options.minScore || 0.5;
+
     let searchResults = [];
     try {
       searchResults = await this.vectorStore.search(query, {
@@ -421,8 +618,8 @@ class IndexManager {
     const results = [];
     for (const result of searchResults) {
       const metadata = result.metadata || {};
-
       let code = null;
+
       try {
         const content = await fs.readFile(metadata.filePath, 'utf-8');
         const lines = content.split('\n');
@@ -447,94 +644,4 @@ class IndexManager {
   }
 }
 
-function buildMockParseResult(content, language) {
-  const lines = content.split('\n');
-  const mockNodes = [];
-
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
-
-    const funcMatch = line.match(/function\s+(\w+)\s*\(/);
-    const constFuncMatch = line.match(/const\s+(\w+)\s*=\s*function/);
-    const arrowMatch = line.match(/const\s+(\w+)\s*=\s*\(/);
-
-    if (funcMatch || constFuncMatch || arrowMatch) {
-      const name = funcMatch?.[1] || constFuncMatch?.[1] || arrowMatch?.[1];
-      let braceCount = 0;
-      let foundOpen = false;
-      let endLine = i;
-
-      for (let j = i; j < lines.length; j++) {
-        const chars = lines[j];
-        for (const char of chars) {
-          if (char === '{') {
-            braceCount++;
-            foundOpen = true;
-          }
-          if (char === '}') braceCount--;
-          if (foundOpen && braceCount === 0) {
-            endLine = j;
-            break;
-          }
-        }
-        if (foundOpen && braceCount === 0) break;
-      }
-
-      const functionContent = lines.slice(i, endLine + 1).join('\n');
-      if (functionContent.trim().length > 0) {
-        mockNodes.push({
-          type: 'function_declaration',
-          text: functionContent,
-          startPosition: { row: i },
-          endPosition: { row: endLine },
-          children: [{ type: 'identifier', text: name || 'anonymous' }],
-        });
-      }
-      i = endLine + 1;
-    } else if (line.match(/class\s+(\w+)/)) {
-      const className = line.match(/class\s+(\w+)/)?.[1];
-      let braceCount = 0;
-      let foundOpen = false;
-      let endLine = i;
-
-      for (let j = i; j < lines.length; j++) {
-        const chars = lines[j];
-        for (const char of chars) {
-          if (char === '{') {
-            braceCount++;
-            foundOpen = true;
-          }
-          if (char === '}') braceCount--;
-          if (foundOpen && braceCount === 0) {
-            endLine = j;
-            break;
-          }
-        }
-        if (foundOpen && braceCount === 0) break;
-      }
-
-      const classContent = lines.slice(i, endLine + 1).join('\n');
-      if (classContent.trim().length > 0) {
-        mockNodes.push({
-          type: 'class_declaration',
-          text: classContent,
-          startPosition: { row: i },
-          endPosition: { row: endLine },
-          children: [{ type: 'identifier', text: className || 'Unknown' }],
-        });
-      }
-      i = endLine + 1;
-    } else {
-      i++;
-    }
-  }
-
-  return {
-    content,
-    language,
-    rootNode: { children: mockNodes },
-  };
-}
-
-module.exports = { IndexManager };
+module.exports = { IndexManager, calculateSafeMemoryConfig };

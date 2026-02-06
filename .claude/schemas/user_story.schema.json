@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User Story Schema",
+  "description": "Schema for user stories",
+  "type": "object",
+  "properties": {
+    "id": {"type": "string"},
+    "as_a": {"type": "string"},
+    "i_want": {"type": "string"},
+    "so_that": {"type": "string"},
+    "acceptance_criteria": {"type": "array", "items": {"type": "string"}},
+    "priority": {"type": "string", "enum": ["must-have", "should-have", "could-have", "wont-have"]},
+    "story_points": {"type": "number"}
+  },
+  "required": ["id", "as_a", "i_want"]
+}

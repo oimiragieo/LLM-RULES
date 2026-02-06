@@ -30,7 +30,7 @@ skills:
   - verification-before-completion
   - build-tools-expert
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 # Rust Pro Agent

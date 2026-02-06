@@ -65,6 +65,8 @@
 .claude/context/blackboard/*.json
 .claude/context/runs/
 .claude/context/cache/
+# Local model cache (embedding models; too large for repo)
+local_cache/
 .claude/context/code-index/.indexing.lock
 .claude/context/rule-index-cache.json
 .claude/context/skill-summaries.json

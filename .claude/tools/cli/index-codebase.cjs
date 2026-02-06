@@ -66,8 +66,27 @@ program
       const embedBar = multibar.create(100, 0, { stage: chalk.cyan('✓ Embedding...       ') });
       const indexBar = multibar.create(100, 0, { stage: chalk.cyan('✓ Indexing...        ') });
 
-      // Create index manager
-      const manager = new IndexManager({ projectRoot: targetPath });
+      // Load config
+      const configPath =
+        options.config || path.join(targetPath, '.claude', 'config', 'code-index-config.json');
+      let config = {};
+      try {
+        const configContent = await fs.readFile(configPath, 'utf-8');
+        config = JSON.parse(configContent);
+      } catch (_err) {
+        // Use defaults if config not found
+      }
+
+      // Create index manager with config
+      const manager = new IndexManager({
+        projectRoot: targetPath,
+        concurrency: config.indexing?.concurrency || 12,
+        batchSize: config.indexing?.batchSize || 50,
+        maxFileSize: config.indexing?.maxFileSize || 1048576,
+        excludePatterns: config.indexing?.excludePatterns,
+        chunkFlushSize: config.indexing?.chunkFlushSize,
+        embedBatchSize: config.indexing?.embedBatchSize,
+      });
 
       // Index directory
       const result = await manager.indexDirectory(targetPath, {

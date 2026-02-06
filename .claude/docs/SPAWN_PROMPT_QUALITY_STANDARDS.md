@@ -1,5 +1,7 @@
 # SPAWN PROMPT QUALITY STANDARDS
+
 ## Fixing Validation Score 0/70 Issues
+
 **Date**: 2026-02-05
 **Scope**: All Task() calls must meet these standards
 **Enforcement**: spawn-prompt-validator hook (default: warn mode)
@@ -12,6 +14,7 @@
 ### CRITICAL ELEMENTS (Must Have - 40 points)
 
 **1. TaskUpdate Warning Box (20 points)**
+
 ```
 ✓ Include full 70-line warning box from universal-agent-spawn.md
 ✓ Must start with +======= border
@@ -25,6 +28,7 @@
 ```
 
 **2. Task ID Reference (10 points)**
+
 ```
 ✓ Include "Task ID: <ID>" in prompt
 ✓ Task ID must match the task_id parameter in Task() call
@@ -36,6 +40,7 @@
 ```
 
 **3. allowed_tools Array (10 points)**
+
 ```
 ✓ TaskUpdate must be in allowed_tools
 ✓ TaskList must be in allowed_tools
@@ -54,6 +59,7 @@
 ### HIGH PRIORITY ELEMENTS (Should Have - 20 points)
 
 **4. PROJECT_ROOT Context (10 points)**
+
 ```
 ✓ Include PROJECT CONTEXT section
 ✓ Must state PROJECT_ROOT path
@@ -66,6 +72,7 @@
 ```
 
 **5. TaskUpdate Call Instructions (10 points)**
+
 ```
 ✓ Explicit instructions for TaskUpdate calls
 ✓ Show exact syntax:
@@ -80,6 +87,7 @@
 ### MEDIUM PRIORITY ELEMENTS (Could Have - 10 points)
 
 **6. Memory Protocol Section (5 points)**
+
 ```
 ✓ Reference to .claude/context/memory/
 ✓ Mention reading learnings.md, decisions.md, issues.md
@@ -92,6 +100,7 @@
 ```
 
 **7. Skills Discovery Section (5 points)**
+
 ```
 ✓ Reference Skill() tool usage
 ✓ Link to skill discovery decision tree
@@ -111,9 +120,17 @@ Task({
   task_id: 'TASK-001',
   description: 'Developer - Fix bug in auth system',
   allowed_tools: [
-    'Read', 'Write', 'Edit', 'Bash',
-    'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet',
-    'Skill', 'Grep', 'Glob'
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+    'Grep',
+    'Glob',
   ],
   prompt: `# DEVELOPER - Fix Authentication Bug
 
@@ -160,8 +177,8 @@ Fix the authentication bug in login flow...
 4. Implement fix
 5. Run tests
 6. TaskUpdate({ taskId: "TASK-001", status: "completed" })
-`
-})
+`,
+});
 ```
 
 ### Complete (Maximum Quality - All Elements)
@@ -172,10 +189,18 @@ Task({
   task_id: 'TASK-002',
   description: 'Developer - Implement feature X with testing',
   allowed_tools: [
-    'Read', 'Write', 'Edit', 'Bash',
-    'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'TaskOutput',
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'TaskOutput',
     'Skill',
-    'Grep', 'Glob'
+    'Grep',
+    'Glob',
   ],
   prompt: `# DEVELOPER - Implement Feature X
 
@@ -267,8 +292,8 @@ Reference: \`.claude/docs/@SKILL_USAGE_GUIDE.md\`
 - Linting passing (0 errors, 0 warnings)
 - Documentation updated
 - Memory updated (learnings.md)
-`
-})
+`,
+});
 ```
 
 ---
@@ -276,6 +301,7 @@ Reference: \`.claude/docs/@SKILL_USAGE_GUIDE.md\`
 ## INCORRECT EXAMPLES (Score 0/70)
 
 ### ❌ Example 1: Minimal Prompt (What Was Happening)
+
 ```javascript
 Task({
   subagent_type: 'developer',
@@ -283,11 +309,12 @@ Task({
   description: 'Fix issue',
   prompt: `# Fix this issue
 
-Do the thing described above.`
-})
+Do the thing described above.`,
+});
 ```
 
 **Issues**:
+
 - ❌ No TaskUpdate warning box
 - ❌ No Task ID reference in prompt
 - ❌ No allowed_tools array
@@ -297,6 +324,7 @@ Do the thing described above.`
 - ❌ Score: 0/70 (FAILS VALIDATION)
 
 ### ❌ Example 2: Missing Critical Elements
+
 ```javascript
 Task({
   subagent_type: 'developer',
@@ -305,11 +333,12 @@ Task({
 Your task ID is ABC-123. Do this work...
 
 [Actual task description]
-`
-})
+`,
+});
 ```
 
 **Issues**:
+
 - ❌ Task ID not in warning box
 - ❌ No TaskUpdate calls explained
 - ❌ TaskUpdate not in allowed_tools
@@ -339,16 +368,19 @@ Before calling Task(), verify:
 ## ENFORCEMENT
 
 ### Current Status
+
 - **Validator**: spawn-prompt-validator.cjs (active)
 - **Mode**: warn (allows execution, shows warnings)
 - **Score Threshold**: 0/70 = FAIL
 
 ### How to Check Score
+
 1. Run: `node .claude/hooks/routing/spawn-prompt-validator.cjs`
 2. Input: Your spawn prompt
 3. Output: Score X/70, specific failures
 
 ### How to Override (if needed)
+
 ```bash
 SPAWN_PROMPT_VALIDATOR=off  # Disable validation (not recommended)
 SPAWN_PROMPT_VALIDATOR=warn # Warn only (current)
@@ -360,11 +392,13 @@ SPAWN_PROMPT_VALIDATOR=block # Block invalid prompts
 ## SUMMARY
 
 ### The 42 Failures Can Be Prevented
+
 - **Root Cause**: Not using full universal-agent-spawn.md template
 - **Solution**: Always include TaskUpdate warning box + Task ID + PROJECT_ROOT
 - **Score Target**: 70/70 (not 0/70)
 
 ### Key Takeaways
+
 1. ✅ **Every Task() call needs a warning box** (70 lines)
 2. ✅ **Task ID must appear in at least 3 places**
 3. ✅ **TaskUpdate and TaskList must be in allowed_tools**
@@ -372,6 +406,7 @@ SPAWN_PROMPT_VALIDATOR=block # Block invalid prompts
 5. ✅ **PROJECT_ROOT context is required**
 
 ### Result of Following This Guide
+
 - **Score**: 70/70 (perfect)
 - **Task Tracking**: 100% working
 - **No Warnings**: Clean execution

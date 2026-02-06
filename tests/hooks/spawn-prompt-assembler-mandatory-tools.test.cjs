@@ -27,7 +27,13 @@ const PROJECT_ROOT = path.resolve(__dirname, '../..');
 const AGENT_CONFIG_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'agent-config.json');
 const TOOL_MANIFEST_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'tool-manifest.json');
 const SETTINGS_PATH = path.join(PROJECT_ROOT, '.claude', 'settings.json');
-const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'spawn-prompt-assembler.cjs');
+const HOOK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'routing',
+  'spawn-prompt-assembler.cjs'
+);
 
 const MANDATORY_TOOLS = ['TaskUpdate', 'Skill'];
 
@@ -74,7 +80,10 @@ describe('TEST SUITE 1: agent-config.json mandatory tools', () => {
   });
 
   test('should have valid agent-config.json file', () => {
-    assert.ok(fileExists(AGENT_CONFIG_PATH), `agent-config.json should exist at ${AGENT_CONFIG_PATH}`);
+    assert.ok(
+      fileExists(AGENT_CONFIG_PATH),
+      `agent-config.json should exist at ${AGENT_CONFIG_PATH}`
+    );
     assert.ok(config !== null, 'agent-config.json should be valid JSON');
   });
 
@@ -90,10 +99,7 @@ describe('TEST SUITE 1: agent-config.json mandatory tools', () => {
 
     for (const [agentName, agentConfig] of Object.entries(agents)) {
       const tools = agentConfig.tools || [];
-      assert.ok(
-        Array.isArray(tools),
-        `Agent "${agentName}" tools should be an array`
-      );
+      assert.ok(Array.isArray(tools), `Agent "${agentName}" tools should be an array`);
       assert.ok(
         tools.includes('TaskUpdate'),
         `Agent "${agentName}" must have TaskUpdate in tools array. Found: [${tools.join(', ')}]`
@@ -107,10 +113,7 @@ describe('TEST SUITE 1: agent-config.json mandatory tools', () => {
 
     for (const [agentName, agentConfig] of Object.entries(agents)) {
       const tools = agentConfig.tools || [];
-      assert.ok(
-        Array.isArray(tools),
-        `Agent "${agentName}" tools should be an array`
-      );
+      assert.ok(Array.isArray(tools), `Agent "${agentName}" tools should be an array`);
       assert.ok(
         tools.includes('Skill'),
         `Agent "${agentName}" must have Skill in tools array. Found: [${tools.join(', ')}]`
@@ -167,7 +170,10 @@ describe('TEST SUITE 2: tool-manifest.json mandatory tools definition', () => {
   });
 
   test('should have valid tool-manifest.json file', () => {
-    assert.ok(fileExists(TOOL_MANIFEST_PATH), `tool-manifest.json should exist at ${TOOL_MANIFEST_PATH}`);
+    assert.ok(
+      fileExists(TOOL_MANIFEST_PATH),
+      `tool-manifest.json should exist at ${TOOL_MANIFEST_PATH}`
+    );
     assert.ok(manifest !== null, 'tool-manifest.json should be valid JSON');
   });
 
@@ -179,10 +185,7 @@ describe('TEST SUITE 2: tool-manifest.json mandatory tools definition', () => {
 
   test('should have mandatoryTools array in validation', () => {
     assert.ok(manifest && manifest.validation, 'Manifest with validation should be loaded');
-    assert.ok(
-      manifest.validation.mandatoryTools,
-      'validation should have mandatoryTools property'
-    );
+    assert.ok(manifest.validation.mandatoryTools, 'validation should have mandatoryTools property');
     assert.ok(
       Array.isArray(manifest.validation.mandatoryTools),
       'mandatoryTools should be an array'
@@ -235,7 +238,10 @@ describe('TEST SUITE 2: tool-manifest.json mandatory tools definition', () => {
   });
 
   test('mandatoryTools should mark TaskUpdate as mandatory in core tools', () => {
-    assert.ok(manifest && manifest.tools && Array.isArray(manifest.tools.core), 'Core tools should exist');
+    assert.ok(
+      manifest && manifest.tools && Array.isArray(manifest.tools.core),
+      'Core tools should exist'
+    );
 
     const taskUpdateTool = manifest.tools.core.find(t => t.name === 'TaskUpdate');
     assert.ok(taskUpdateTool, 'TaskUpdate should exist in core tools');
@@ -247,7 +253,10 @@ describe('TEST SUITE 2: tool-manifest.json mandatory tools definition', () => {
   });
 
   test('mandatoryTools should mark Skill as mandatory in core tools', () => {
-    assert.ok(manifest && manifest.tools && Array.isArray(manifest.tools.core), 'Core tools should exist');
+    assert.ok(
+      manifest && manifest.tools && Array.isArray(manifest.tools.core),
+      'Core tools should exist'
+    );
 
     const skillTool = manifest.tools.core.find(t => t.name === 'Skill');
     assert.ok(skillTool, 'Skill should exist in core tools');
@@ -297,7 +306,9 @@ describe('TEST SUITE 3: spawn-prompt-assembler.cjs defensive fallback', () => {
       hookCode.includes('["TaskUpdate", "Skill"]') ||
       hookCode.includes('mandatoryTools') ||
       // Also check for alternative patterns that achieve the same defensive behavior
-      (hookCode.includes('TaskUpdate') && hookCode.includes('Skill') && hookCode.includes('mandatory'));
+      (hookCode.includes('TaskUpdate') &&
+        hookCode.includes('Skill') &&
+        hookCode.includes('mandatory'));
 
     assert.ok(
       hasFallbackPattern,
@@ -319,14 +330,11 @@ describe('TEST SUITE 3: spawn-prompt-assembler.cjs defensive fallback', () => {
     // Check for graceful handling of missing registry
     const hasGracefulHandling =
       hookCode.includes('loadAgentRegistry') ||
-      hookCode.includes('try') && hookCode.includes('catch') ||
+      (hookCode.includes('try') && hookCode.includes('catch')) ||
       hookCode.includes('|| {}') ||
       hookCode.includes('?? {}');
 
-    assert.ok(
-      hasGracefulHandling,
-      'Hook should handle missing registry gracefully'
-    );
+    assert.ok(hasGracefulHandling, 'Hook should handle missing registry gracefully');
   });
 
   test('should have getDefaultTools import or function for fallback tools', () => {
@@ -338,10 +346,7 @@ describe('TEST SUITE 3: spawn-prompt-assembler.cjs defensive fallback', () => {
       hookCode.includes('defaultTools') ||
       hookCode.includes('MANDATORY_TOOLS');
 
-    assert.ok(
-      hasDefaultToolsHandling,
-      'Hook should have mechanism to get default/fallback tools'
-    );
+    assert.ok(hasDefaultToolsHandling, 'Hook should have mechanism to get default/fallback tools');
   });
 });
 

@@ -1,0 +1,114 @@
+{
+  "version": "1.1.0",
+  "generated_at": "2026-02-06T00:55:08.593Z",
+  "prebuilt": false,
+  "total_rules": 8,
+  "master_rules": 8,
+  "library_rules": 0,
+  "schema_version": "1.0.0",
+  "versioning": {
+    "changelog": "Version 1.1.0: Added versioning metadata for skills compatibility tracking",
+    "increment_guide": {
+      "major": "Breaking changes to index structure (e.g., renamed fields, removed properties)",
+      "minor": "New rules added, rule paths changed, or new metadata fields added",
+      "patch": "Bug fixes, metadata corrections, or re-indexing without content changes"
+    }
+  },
+  "rules": [
+    {
+      "path": ".claude/rules/agents.md",
+      "name": "agents",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 871,
+      "line_count": 18
+    },
+    {
+      "path": ".claude/rules/coding-style.md",
+      "name": "coding-style",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 266,
+      "line_count": 8
+    },
+    {
+      "path": ".claude/rules/git-workflow.md",
+      "name": "git-workflow",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 187,
+      "line_count": 7
+    },
+    {
+      "path": ".claude/rules/hooks.md",
+      "name": "hooks",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 178,
+      "line_count": 6
+    },
+    {
+      "path": ".claude/rules/patterns.md",
+      "name": "patterns",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 127,
+      "line_count": 6
+    },
+    {
+      "path": ".claude/rules/performance.md",
+      "name": "performance",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 146,
+      "line_count": 6
+    },
+    {
+      "path": ".claude/rules/security.md",
+      "name": "security",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 195,
+      "line_count": 7
+    },
+    {
+      "path": ".claude/rules/testing.md",
+      "name": "testing",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": [
+        "api"
+      ],
+      "type": "master",
+      "size": 243,
+      "line_count": 8
+    }
+  ],
+  "technology_map": {
+    "api": [
+      ".claude/rules/testing.md"
+    ]
+  }
+}

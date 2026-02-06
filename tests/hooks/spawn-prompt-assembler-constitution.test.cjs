@@ -121,10 +121,7 @@ describe('appendConstitutionSection() - Append Constitution to Prompt', () => {
 
     assert.ok(constitutionIdx !== -1, 'Expected constitution section to be present');
     assert.ok(memoryIdx !== -1, 'Expected memory section to be present');
-    assert.ok(
-      constitutionIdx < memoryIdx,
-      'Expected constitution section before Memory Context'
-    );
+    assert.ok(constitutionIdx < memoryIdx, 'Expected constitution section before Memory Context');
   });
 
   test('should append to end if no Memory Context section', () => {

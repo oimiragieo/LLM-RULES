@@ -21,7 +21,7 @@
 ### Template Loading Protocol
 
 **Templates:** universal-agent-spawn.md (standard) | orchestrator-spawn.md (orchestrators) | agent-identity-integration.md (with personality)
-**Process:** Read template → Substitute placeholders (<ROLE>, <TASK>, <ID>, PROJECT_ROOT) → Spawn
+**Process:** Read template → Substitute placeholders (<ROLE>, <TASK>, <ID>, <SUBJECT>, <agent-file-path>, <orchestrator-file-path>, <absolute-path-to-project>, <ORCHESTRATOR>) → Spawn
 **Fallback:** If load fails, use Section 2 inline fallback
 **Validation:** spawn-prompt-validator.cjs (default: warn, override: `SPAWN_PROMPT_VALIDATOR=block|warn|off`)
 

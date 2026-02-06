@@ -18,13 +18,13 @@ try {
   console.warn('⚠️  js-yaml not available, using simple YAML parsing');
 }
 
-import { resolveConfigPath } from '../../.claude/tools/context-path-resolver.mjs';
+import { resolveConfigPath } from '../../.claude/tools/context/context-path-resolver.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.join(__dirname, '../..');
 
-const MASTER_RULES_DIR = path.join(ROOT, '.claude/rules-master');
+const MASTER_RULES_DIR = path.join(ROOT, '.claude/rules');
 const LIBRARY_DIR = path.join(ROOT, '.claude/rules-library');
 const OUTPUT_PATH = resolveConfigPath('rule-index.json', { read: false });
 const MAX_SIZE_BYTES = 100000; // 100KB limit
@@ -163,7 +163,7 @@ async function extractRuleMetadata(filePath, content) {
     globs: metadata.globs || '',
     priority: metadata.priority || '',
     technologies,
-    type: filePath.includes('rules-master') ? 'master' : 'library',
+    type: 'master',
     size: content.length,
     line_count: content.split('\n').length,
   };

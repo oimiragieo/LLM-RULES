@@ -29,7 +29,7 @@ skills:
   - accessibility
   - verification-before-completion
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 # Frontend Pro Agent

@@ -14,7 +14,7 @@ skills:
   - verification-before-completion
   - diagram-generator
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 # C4 Component Agent

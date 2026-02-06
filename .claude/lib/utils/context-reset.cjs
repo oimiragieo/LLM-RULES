@@ -40,6 +40,9 @@ function buildResetPlan(scope, options = {}) {
 
   if (normalizedScope === 'memory' || normalizedScope === 'full') {
     targets.push({ path: memoryDir, type: 'dir' });
+    if (includeLanceDb) {
+      targets.push({ path: lancedbDir, type: 'dir' });
+    }
   }
 
   if (normalizedScope === 'full') {
@@ -49,9 +52,6 @@ function buildResetPlan(scope, options = {}) {
     targets.push({ path: routingPrototypes, type: 'file' });
     targets.push({ path: evolutionState, type: 'file' });
     targets.push({ path: selfHealingDir, type: 'dir' });
-    if (includeLanceDb) {
-      targets.push({ path: lancedbDir, type: 'dir' });
-    }
   }
 
   return {

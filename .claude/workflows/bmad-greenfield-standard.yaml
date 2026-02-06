@@ -1,0 +1,19 @@
+name: bmad-greenfield-standard
+description: BMAD greenfield development standard
+version: 1.0.0
+steps:
+  - name: plan
+    agent: planner
+    description: Project planning
+  - name: design
+    agent: architect
+    description: System design
+  - name: develop
+    agent: developer
+    description: Development
+  - name: test
+    agent: qa
+    description: Testing
+  - name: deploy
+    agent: developer
+    description: Deployment

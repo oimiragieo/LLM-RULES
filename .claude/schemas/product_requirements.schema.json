@@ -1,0 +1,241 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Product Requirements Schema",
+  "description": "Schema for product requirements documents",
+  "type": "object",
+  "properties": {
+    "documentTitle": {
+      "type": "string",
+      "description": "Full document title"
+    },
+    "version": {
+      "type": "string",
+      "description": "Document version"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Document creation date"
+    },
+    "author": {
+      "type": "string",
+      "description": "Document author"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "review", "approved"],
+      "description": "Document status"
+    },
+    "executiveSummary": {
+      "type": "string",
+      "description": "High-level product summary"
+    },
+    "productOverview": {
+      "type": "object",
+      "properties": {
+        "productVision": {
+          "type": "string"
+        },
+        "targetAudience": {
+          "type": "string"
+        },
+        "keyFeatures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "valueProposition": {
+          "type": "string"
+        }
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "properties": {
+        "functionalRequirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^FR-\\d+$"
+              },
+              "description": {
+                "type": "string"
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "acceptanceCriteria": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["id", "description", "priority"]
+          }
+        },
+        "nonFunctionalRequirements": {
+          "type": "object",
+          "properties": {
+            "performance": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "security": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "usability": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "compatibility": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "userStories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "epic": {
+            "type": "string"
+          },
+          "asA": {
+            "type": "string"
+          },
+          "iWant": {
+            "type": "string"
+          },
+          "soThat": {
+            "type": "string"
+          },
+          "acceptanceCriteria": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          },
+          "storyPoints": {
+            "type": "number"
+          }
+        },
+        "required": ["asA", "iWant", "soThat"]
+      }
+    },
+    "technicalSpecifications": {
+      "type": "object",
+      "properties": {
+        "architecture": {
+          "type": "string"
+        },
+        "technologyStack": {
+          "type": "object",
+          "properties": {
+            "frontend": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "backend": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "database": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "infrastructure": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "apis": {
+          "type": "string"
+        },
+        "dataModels": {
+          "type": "string"
+        }
+      }
+    },
+    "timeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phase": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "deliverables": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "keyDates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "successMetrics": {
+      "type": "object",
+      "properties": {
+        "businessMetrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "technicalMetrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "userMetrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": ["documentTitle", "executiveSummary", "productOverview"]
+}

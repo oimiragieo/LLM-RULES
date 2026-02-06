@@ -109,7 +109,10 @@ function generateToken(userId) {
 
     // Verify BM25 index was built
     const bm25Path = path.join(LANCEDB_DIR, 'bm25-index.json');
-    const bm25Exists = await fs.access(bm25Path).then(() => true).catch(() => false);
+    const bm25Exists = await fs
+      .access(bm25Path)
+      .then(() => true)
+      .catch(() => false);
     assert.ok(bm25Exists, 'BM25 index should be created during indexing');
 
     if (bm25Exists) {
@@ -135,8 +138,10 @@ function generateToken(userId) {
     // If results found, verify they have the hybrid scoring
     if (hybridResults.length > 0) {
       const firstResult = hybridResults[0];
-      assert.ok('rrf_score' in firstResult || 'score' in firstResult,
-        'Results should have RRF scores from hybrid fusion');
+      assert.ok(
+        'rrf_score' in firstResult || 'score' in firstResult,
+        'Results should have RRF scores from hybrid fusion'
+      );
       console.log(`[E2E] Top result RRF score: ${firstResult.rrf_score || firstResult.score}`);
     }
   });

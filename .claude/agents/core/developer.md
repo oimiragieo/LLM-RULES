@@ -6,7 +6,23 @@ model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 priority: high
-tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  [
+    Read,
+    Write,
+    Edit,
+    Glob,
+    Grep,
+    Bash,
+    WebFetch,
+    WebSearch,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    TaskOutput,
+    Skill,
+  ]
 # Note: Git operations use Bash tool (git commands); MCP tools optional (agents use Skill fallbacks)
 skills:
   - tdd
@@ -91,13 +107,21 @@ Read your assigned skill files to understand specialized workflows:
 
 ## Code Search Optimization
 
-This agent can search code efficiently using the ripgrep skill:
+This agent can search code efficiently using the hybrid lazy search system:
 
-**For fast code search across large codebases:**
+**For instant code search (RECOMMENDED):**
+
+- Use: `pnpm search:code "<search-pattern>"`
+- Even faster: 0.2-0.5s for 40,000+ files
+- No batch indexing required (0s startup)
+- Hybrid: Combines ripgrep text + semantic embeddings
+- Also available: `pnpm search:structure` for project overview
+
+**For advanced regex patterns (ripgrep):**
 
 - Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
-- Faster than: `Grep` or `Glob` (10-100x speed improvement)
-- Automatically respects: `.gitignore` files
+- When you need: PCRE2 lookahead/lookbehind, custom file types
+- Use Glob/Grep only if: Skills unavailable
 - Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
 
 **When to use ripgrep:**

@@ -53,14 +53,16 @@ function fixSpawnLog(dryRun = false) {
     return { fixed: 0, total: 0 };
   }
 
-  const entries = lines.map(line => {
-    try {
-      return JSON.parse(line);
-    } catch (_err) {
-      console.error(`Failed to parse line: ${line.slice(0, 80)}...`);
-      return null;
-    }
-  }).filter(Boolean);
+  const entries = lines
+    .map(line => {
+      try {
+        return JSON.parse(line);
+      } catch (_err) {
+        console.error(`Failed to parse line: ${line.slice(0, 80)}...`);
+        return null;
+      }
+    })
+    .filter(Boolean);
 
   // Pair spawn_start and spawn_end events
   const pairs = [];
@@ -71,11 +73,14 @@ function fixSpawnLog(dryRun = false) {
 
     if (entry.event === 'spawn_start') {
       // Look for matching spawn_end
-      const matchingEnd = entries.slice(i + 1).find(e =>
-        e.event === 'spawn_end' &&
-        e.session_id === entry.session_id &&
-        (!e.task_id || e.task_id === entry.task_id)
-      );
+      const matchingEnd = entries
+        .slice(i + 1)
+        .find(
+          e =>
+            e.event === 'spawn_end' &&
+            e.session_id === entry.session_id &&
+            (!e.task_id || e.task_id === entry.task_id)
+        );
 
       if (matchingEnd) {
         pairs.push({ start: entry, end: matchingEnd });

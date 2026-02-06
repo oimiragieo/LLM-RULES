@@ -15,10 +15,12 @@ This project now supports GPU-accelerated embeddings via FastEmbed, providing 10
 ## Requirements
 
 ### Hardware
+
 - **GPU**: NVIDIA GPU with CUDA support (tested with RTX 4070, RTX 5070)
 - **Memory**: Minimum 4GB GPU memory (8GB+ recommended for larger batch sizes)
 
 ### Software
+
 - **Node.js**: v18+ (v22+ recommended)
 - **CUDA**: CUDA 11.x or 12.x installed
 - **nvidia-smi**: For GPU detection (comes with CUDA/NVIDIA drivers)
@@ -125,12 +127,12 @@ const embeddings = await store.generateEmbeddingsBatch(texts);
 
 ### Embedding Generation Speed
 
-| Mode                  | Hardware              | Batch Size | Speed (docs/sec) | Time for 5000 docs |
-| --------------------- | --------------------- | ---------- | ---------------- | ------------------ |
-| FastEmbed GPU         | RTX 4070 (12GB)       | 128        | ~2000            | 2.5 min            |
-| FastEmbed GPU         | RTX 5070 (16GB)       | 256        | ~3000            | 1.7 min            |
-| FastEmbed CPU         | Intel i9-12900K       | 64         | ~200             | 25 min             |
-| @xenova/transformers  | Intel i9-12900K (CPU) | 32         | ~100             | 50 min             |
+| Mode                 | Hardware              | Batch Size | Speed (docs/sec) | Time for 5000 docs |
+| -------------------- | --------------------- | ---------- | ---------------- | ------------------ |
+| FastEmbed GPU        | RTX 4070 (12GB)       | 128        | ~2000            | 2.5 min            |
+| FastEmbed GPU        | RTX 5070 (16GB)       | 256        | ~3000            | 1.7 min            |
+| FastEmbed CPU        | Intel i9-12900K       | 64         | ~200             | 25 min             |
+| @xenova/transformers | Intel i9-12900K (CPU) | 32         | ~100             | 50 min             |
 
 **Speedup:** 10-50x faster with GPU
 
@@ -154,11 +156,13 @@ The system automatically tunes batch size based on available GPU memory when `au
 **Solutions:**
 
 1. Verify NVIDIA drivers installed:
+
    ```bash
    nvidia-smi
    ```
 
 2. Check CUDA installation:
+
    ```bash
    nvcc --version
    ```
@@ -172,11 +176,13 @@ The system automatically tunes batch size based on available GPU memory when `au
 **Solutions:**
 
 1. Reinstall dependencies:
+
    ```bash
    pnpm install --force
    ```
 
 2. Check ONNX Runtime installation:
+
    ```bash
    pnpm list onnxruntime-node
    ```
@@ -200,6 +206,7 @@ The system automatically tunes batch size based on available GPU memory when `au
 **Solutions:**
 
 1. Reduce batch size manually:
+
    ```json
    {
      "embedding": {
@@ -209,6 +216,7 @@ The system automatically tunes batch size based on available GPU memory when `au
    ```
 
 2. Disable auto-tuning:
+
    ```json
    {
      "embedding": {
@@ -246,6 +254,7 @@ The system automatically falls back in this order:
 To migrate existing embeddings:
 
 1. **Reindex with FastEmbed:**
+
    ```bash
    pnpm run code:index:reindex
    ```

@@ -23,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.join(__dirname, '../..');
 
-const MASTER_RULES_DIR = path.join(ROOT, '.claude/rules-master');
+const MASTER_RULES_DIR = path.join(ROOT, '.claude/rules');
 const LIBRARY_DIR = path.join(ROOT, '.claude/rules-library');
 const OUTPUT_PATH = path.join(ROOT, '.claude/context/config/rule-index.json');
 const CACHE_PATH = path.join(ROOT, '.claude/context/rule-index-cache.json');
@@ -266,7 +266,7 @@ async function extractRuleMetadata(filePath, content) {
     globs: metadata.globs || '',
     priority: metadata.priority || '',
     technologies,
-    type: filePath.includes('rules-master') ? 'master' : 'library',
+    type: 'master',
     size: content.length,
     line_count: content.split('\n').length,
   };

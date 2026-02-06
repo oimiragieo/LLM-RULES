@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.join(__dirname, '../..');
 
-import { resolveConfigPath } from '../../.claude/tools/context-path-resolver.mjs';
+import { resolveConfigPath } from '../../.claude/tools/context/context-path-resolver.mjs';
 const RULE_INDEX_PATH = resolveConfigPath('rule-index.json', { read: true });
 const BACKUP_PATH = path.join(ROOT, '.claude/context/rule-index.backup.json');
 

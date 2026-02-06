@@ -31,7 +31,7 @@ skills:
   - typescript-expert
   - state-management-expert
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 # TypeScript Pro Agent

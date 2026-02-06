@@ -1,0 +1,314 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Database Architecture Schema",
+  "description": "Schema for database architecture documents",
+  "type": "object",
+  "properties": {
+    "documentTitle": {
+      "type": "string",
+      "description": "Full document title"
+    },
+    "version": {
+      "type": "string",
+      "description": "Document version"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Document creation date"
+    },
+    "author": {
+      "type": "string",
+      "description": "Document author"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "review", "approved"],
+      "description": "Document status"
+    },
+    "overview": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "description": "Purpose of the database architecture"
+        },
+        "scope": {
+          "type": "string",
+          "description": "What systems/databases are covered"
+        },
+        "objectives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Architecture objectives"
+        }
+      }
+    },
+    "currentState": {
+      "type": "object",
+      "properties": {
+        "existingDatabases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["relational", "document", "graph", "key-value", "columnar", "time-series"]
+              },
+              "purpose": {
+                "type": "string"
+              },
+              "size": {
+                "type": "string"
+              },
+              "users": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "dataVolume": {
+          "type": "string",
+          "description": "Current data volume metrics"
+        },
+        "performanceIssues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "architectureDesign": {
+      "type": "object",
+      "properties": {
+        "databaseStrategy": {
+          "type": "string",
+          "description": "Overall database strategy and approach"
+        },
+        "dataArchitecture": {
+          "type": "object",
+          "properties": {
+            "modelingApproach": {
+              "type": "string"
+            },
+            "normalizationLevel": {
+              "type": "string"
+            },
+            "partitioningStrategy": {
+              "type": "string"
+            },
+            "indexingStrategy": {
+              "type": "string"
+            }
+          }
+        },
+        "technologyStack": {
+          "type": "object",
+          "properties": {
+            "primaryDatabase": {
+              "type": "string"
+            },
+            "secondaryDatabases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "dataWarehousing": {
+              "type": "string"
+            },
+            "caching": {
+              "type": "string"
+            },
+            "search": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "dataModel": {
+      "type": "object",
+      "properties": {
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "attributes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "constraints": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "entity": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["one-to-one", "one-to-many", "many-to-many"]
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "required": ["name"]
+          }
+        },
+        "businessRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "type": "object",
+          "properties": {
+            "responseTime": {
+              "type": "string"
+            },
+            "throughput": {
+              "type": "string"
+            },
+            "concurrency": {
+              "type": "string"
+            },
+            "availability": {
+              "type": "string"
+            }
+          }
+        },
+        "optimizationStrategies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "monitoring": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "accessControl": {
+          "type": "string"
+        },
+        "encryption": {
+          "type": "string"
+        },
+        "auditLogging": {
+          "type": "string"
+        },
+        "backupStrategy": {
+          "type": "string"
+        },
+        "disasterRecovery": {
+          "type": "string"
+        }
+      }
+    },
+    "migrationStrategy": {
+      "type": "object",
+      "properties": {
+        "approach": {
+          "type": "string"
+        },
+        "phases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "timeline": {
+                "type": "string"
+              },
+              "risks": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "rollbackPlan": {
+          "type": "string"
+        }
+      }
+    },
+    "maintenance": {
+      "type": "object",
+      "properties": {
+        "backupSchedule": {
+          "type": "string"
+        },
+        "monitoring": {
+          "type": "string"
+        },
+        "optimization": {
+          "type": "string"
+        },
+        "capacityPlanning": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": ["documentTitle", "overview", "architectureDesign"]
+}

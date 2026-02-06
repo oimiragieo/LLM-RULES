@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Architecture Validation Schema",
+  "description": "Schema for validating architecture validation results",
+  "type": "object",
+  "properties": {
+    "architecture": {
+      "type": "object",
+      "description": "Architecture details"
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation results"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": {"type": "string", "enum": ["error", "warning", "info"]},
+          "message": {"type": "string"},
+          "location": {"type": "string"}
+        }
+      }
+    }
+  },
+  "required": ["architecture", "validation"]
+}

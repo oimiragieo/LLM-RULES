@@ -46,7 +46,10 @@ test('EmbeddingGenerator - CPU path - should load correctly (existing behavior)'
   await generator.initialize();
 
   assert.ok(generator.isInitialized(), 'Should be initialized');
-  assert.ok(generator.device === 'cpu' || generator.device === 'gpu', 'Should have device property');
+  assert.ok(
+    generator.device === 'cpu' || generator.device === 'gpu',
+    'Should have device property'
+  );
 });
 
 test('EmbeddingGenerator - GPU initialization - should detect and use GPU when available', async t => {
@@ -187,7 +190,10 @@ test('EmbeddingGenerator - device property - should expose device info', async t
   await generator.initialize();
 
   assert.ok('device' in generator, 'Should have device property');
-  assert.ok(generator.device === 'cpu' || generator.device === 'gpu', 'Device should be cpu or gpu');
+  assert.ok(
+    generator.device === 'cpu' || generator.device === 'gpu',
+    'Device should be cpu or gpu'
+  );
 
   if (generator.device === 'gpu') {
     assert.ok('gpuName' in generator, 'Should have gpuName when GPU');

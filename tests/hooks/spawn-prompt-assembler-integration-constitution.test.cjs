@@ -56,10 +56,7 @@ Recent session data...
     const memoryIdx = result.indexOf('## Memory Context');
     assert.ok(constitutionIdx !== -1, 'Expected constitution section to exist');
     assert.ok(memoryIdx !== -1, 'Expected memory section to exist');
-    assert.ok(
-      constitutionIdx < memoryIdx,
-      'Expected constitution section before Memory Context'
-    );
+    assert.ok(constitutionIdx < memoryIdx, 'Expected constitution section before Memory Context');
 
     // Verify content is present
     assert.ok(
@@ -77,25 +74,13 @@ Recent session data...
     assert.ok(context.behaviour.length > 0, 'Expected behaviour content to be loaded');
 
     // Verify it contains expected headers
-    assert.ok(
-      context.constitution.includes('# Constitution'),
-      'Expected constitution header'
-    );
+    assert.ok(context.constitution.includes('# Constitution'), 'Expected constitution header');
     assert.ok(context.behaviour.includes('# Behaviour'), 'Expected behaviour header');
 
     // Verify key principles are present
-    assert.ok(
-      context.constitution.includes('Core Principles'),
-      'Expected Core Principles section'
-    );
-    assert.ok(
-      context.behaviour.includes('Router Behaviour'),
-      'Expected Router Behaviour section'
-    );
-    assert.ok(
-      context.behaviour.includes('Agent Behaviour'),
-      'Expected Agent Behaviour section'
-    );
+    assert.ok(context.constitution.includes('Core Principles'), 'Expected Core Principles section');
+    assert.ok(context.behaviour.includes('Router Behaviour'), 'Expected Router Behaviour section');
+    assert.ok(context.behaviour.includes('Agent Behaviour'), 'Expected Agent Behaviour section');
   });
 
   test('should not break existing prompt sections', () => {

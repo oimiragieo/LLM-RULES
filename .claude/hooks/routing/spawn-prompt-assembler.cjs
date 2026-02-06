@@ -217,7 +217,13 @@ let _constitutionCache = null;
 function loadConstitutionContext(projectRoot) {
   if (_constitutionCache) return _constitutionCache;
 
-  const constitutionPath = path.join(projectRoot, '.claude', 'context', 'memory', 'constitution.md');
+  const constitutionPath = path.join(
+    projectRoot,
+    '.claude',
+    'context',
+    'memory',
+    'constitution.md'
+  );
   const behaviourPath = path.join(projectRoot, '.claude', 'context', 'memory', 'behaviour.md');
 
   let constitution = '';
@@ -834,6 +840,13 @@ async function main() {
     const constitutionContext = loadConstitutionContext(PROJECT_ROOT);
     assembled = appendConstitutionSection(assembled, constitutionContext);
 
+    // PRESET-001: Inject preset skills when a preset is active
+    const activePreset = getActivePreset();
+    if (activePreset) {
+      const presets = loadPresets();
+      assembled = appendPresetSection(assembled, agentType, activePreset, presets);
+    }
+
     // CONFIG-001: Inject configured model into spawn prompt so Router passes it into Task().
     assembled = appendConfigModelSection(assembled, agentType);
 
@@ -922,6 +935,120 @@ async function main() {
   }
 }
 
+// =============================================================================
+// Preset Integration (PRESET-001)
+// =============================================================================
+
+/**
+ * Cache for presets.json content (loaded once per hook execution).
+ */
+let _presetsCache = null;
+
+/**
+ * Load presets from .claude/config/presets.json with graceful fallback if missing.
+ * Content is cached for the hook run to avoid repeated file reads.
+ * @returns {{ presets: Object }} Presets configuration or empty object
+ */
+function loadPresets() {
+  if (_presetsCache) return _presetsCache;
+
+  const presetsPath = path.join(PROJECT_ROOT, '.claude', 'config', 'presets.json');
+
+  try {
+    if (fs.existsSync(presetsPath)) {
+      _presetsCache = JSON.parse(fs.readFileSync(presetsPath, 'utf8'));
+      return _presetsCache;
+    }
+  } catch (e) {
+    debugLog('spawn-prompt-assembler', 'Failed to load presets.json (ignored)', e);
+  }
+
+  _presetsCache = { presets: {} };
+  return _presetsCache;
+}
+
+/**
+ * Get the active preset name from environment or router state.
+ * Precedence: AGENT_PRESET env var > router-state.json preset field > null
+ * @returns {string|null} Preset name or null if no preset is active
+ */
+function getActivePreset() {
+  // Check env var first (highest precedence)
+  if (process.env.AGENT_PRESET) {
+    return process.env.AGENT_PRESET;
+  }
+
+  // Check router-state.json
+  const routerStatePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'runtime',
+    'router-state.json'
+  );
+  try {
+    if (fs.existsSync(routerStatePath)) {
+      const state = JSON.parse(fs.readFileSync(routerStatePath, 'utf8'));
+      if (state.preset) {
+        return state.preset;
+      }
+    }
+  } catch (e) {
+    debugLog('spawn-prompt-assembler', 'Failed to read router-state.json preset (ignored)', e);
+  }
+
+  return null;
+}
+
+/**
+ * Append preset section to assembled prompt when agent matches preset.
+ * @param {string} assembled - Current assembled prompt
+ * @param {string} agentType - Agent type being spawned
+ * @param {string|null} presetName - Active preset name (from getActivePreset)
+ * @param {{ presets: Object }} presets - Presets configuration (from loadPresets)
+ * @returns {string} Assembled prompt, possibly with preset section appended
+ */
+function appendPresetSection(assembled, agentType, presetName, presets) {
+  // Skip if no preset active
+  if (!presetName) return assembled;
+
+  // Skip if preset doesn't exist
+  const preset = presets?.presets?.[presetName];
+  if (!preset) return assembled;
+
+  // Skip if agent doesn't match preset agentId
+  if (preset.agentId !== agentType) return assembled;
+
+  // Skip if no skills to add
+  if (!Array.isArray(preset.enabledSkills) || preset.enabledSkills.length === 0) {
+    return assembled;
+  }
+
+  // Don't duplicate if section already exists
+  if (assembled.includes('## Active Preset:')) return assembled;
+
+  // Build preset section
+  const lines = [];
+  lines.push(`## Active Preset: ${presetName}`);
+  lines.push('');
+  lines.push('Invoke these skills for this task:');
+  for (const skill of preset.enabledSkills) {
+    lines.push(`- ${skill}`);
+  }
+  lines.push('');
+
+  const section = lines.join('\n');
+
+  // Insert before SKILL DISCOVERY PROTOCOL if present, otherwise append at end
+  const marker = '## SKILL DISCOVERY PROTOCOL';
+  if (assembled.includes(marker)) {
+    const markerIdx = assembled.indexOf(marker);
+    return assembled.slice(0, markerIdx) + `${section}\n` + assembled.slice(markerIdx);
+  }
+
+  return assembled + `\n${section}`;
+}
+
 if (require.main === module) {
   main();
 }
@@ -939,5 +1066,8 @@ module.exports = {
   hasTaskIdReference,
   loadConstitutionContext,
   appendConstitutionSection,
+  loadPresets,
+  getActivePreset,
+  appendPresetSection,
   main,
 };

@@ -178,11 +178,12 @@ function validateConfig() {
 
   // 3. Check agent files referenced in config
   console.log('\nChecking agent files...');
-  if (config.agent_routing) {
-    for (const agentName of Object.keys(config.agent_routing)) {
-      const agentFile = `.claude/agents/${agentName}.md`;
-      if (!checkFile(agentFile, `agent file for ${agentName}`)) {
-        warnings.push(`Agent ${agentName} referenced in config but file missing`);
+  if (config.agents && typeof config.agents === 'object') {
+    for (const [agentName, agentConfig] of Object.entries(config.agents)) {
+      if (agentConfig && typeof agentConfig === 'object' && agentConfig.path) {
+        if (!checkFile(agentConfig.path, `agent file for ${agentName}`)) {
+          warnings.push(`Agent ${agentName} referenced in config but file missing`);
+        }
       }
     }
   }
@@ -402,9 +403,19 @@ function validateConfig() {
 
   // Validate all referenced agents exist
   for (const { agent, workflow } of referencedAgents) {
-    const agentFile = `.claude/agents/${agent}.md`;
-    if (!checkFile(agentFile, `agent ${agent} referenced in ${workflow}`)) {
-      errors.push(`Agent ${agent} referenced in ${workflow} but file missing`);
+    // Check if agent is defined in config.yaml
+    const configAgents = config?.agents || {};
+    if (configAgents[agent] && configAgents[agent].path) {
+      const agentPath = configAgents[agent].path;
+      if (!checkFile(agentPath, `agent ${agent} referenced in ${workflow}`)) {
+        errors.push(`Missing agent ${agent} referenced in ${workflow}: ${agentPath}`);
+      }
+    } else {
+      // Fallback to direct file check
+      const agentFile = `.claude/agents/${agent}.md`;
+      if (!checkFile(agentFile, `agent ${agent} referenced in ${workflow}`)) {
+        errors.push(`Agent ${agent} referenced in ${workflow} but file missing`);
+      }
     }
   }
 
@@ -458,15 +469,15 @@ function validateConfig() {
           // Check required fields (MUST have these)
           const requiredFields = ['name', 'description'];
           for (const field of requiredFields) {
-            if (!parsed[field]) {
+            if (!(field in parsed)) {
               errors.push(`Skill ${name}: Missing required field: ${field}`);
             }
           }
 
           // Check recommended fields (SHOULD have these - warnings only)
-          const recommendedFields = ['allowed-tools', 'version'];
+          const recommendedFields = ['tools', 'version'];
           for (const field of recommendedFields) {
-            if (!parsed[field]) {
+            if (!(field in parsed)) {
               warnings.push(`Skill ${name}: Missing recommended field: ${field}`);
             }
           }
@@ -515,7 +526,7 @@ function validateConfig() {
           }
         }
 
-        const recommendedFields = ['allowed-tools:', 'version:'];
+        const recommendedFields = ['tools:', 'version:'];
         for (const field of recommendedFields) {
           if (!frontmatter.includes(field)) {
             warnings.push(`Skill ${name}: Missing recommended field: ${field.replace(':', '')}`);
@@ -566,7 +577,7 @@ function validateConfig() {
                 // Check required fields (same as Agent Studio skills)
                 const requiredFields = ['name', 'description'];
                 for (const field of requiredFields) {
-                  if (!parsed[field]) {
+                  if (!(field in parsed)) {
                     errors.push(`Codex Skill ${dirent.name}: Missing required field: ${field}`);
                   }
                 }
@@ -776,8 +787,13 @@ function validateConfig() {
       if (typeof mcpConfig !== 'object' || mcpConfig === null) {
         errors.push('.mcp.json: Root must be an object');
       } else {
-        // Validate top-level structure (betaFeatures, toolSearch, mcpServers)
-        const allowedTopLevelKeys = ['betaFeatures', 'toolSearch', 'mcpServers'];
+        // Validate top-level structure (betaFeatures, toolSearch, mcpServers, disabledMcpServers)
+        const allowedTopLevelKeys = [
+          'betaFeatures',
+          'toolSearch',
+          'mcpServers',
+          'disabledMcpServers',
+        ];
         const unknownKeys = Object.keys(mcpConfig).filter(
           key => !allowedTopLevelKeys.includes(key)
         );

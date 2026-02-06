@@ -1,2 +1,4 @@
 onlyBuiltDependencies:
+  - '@vscode/ripgrep'
+  - onnxruntime-node
   - sharp

@@ -32,7 +32,7 @@ skills:
   - api-development-expert
   - python-backend-expert
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 # FastAPI Pro Agent

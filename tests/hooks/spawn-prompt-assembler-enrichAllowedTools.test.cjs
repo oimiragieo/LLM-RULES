@@ -33,11 +33,7 @@ describe('enrichAllowedTools() - Mandatory Tools', () => {
 
     // Should have exactly one TaskUpdate (no duplicates)
     const taskUpdateCount = result.filter(t => t === 'TaskUpdate').length;
-    assert.strictEqual(
-      taskUpdateCount,
-      1,
-      `Expected exactly 1 TaskUpdate, got ${taskUpdateCount}`
-    );
+    assert.strictEqual(taskUpdateCount, 1, `Expected exactly 1 TaskUpdate, got ${taskUpdateCount}`);
   });
 
   test('should preserve Skill if already present', () => {

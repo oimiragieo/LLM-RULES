@@ -54,7 +54,7 @@ function getModule() {
 // Test Suite 1: CRITICAL - dropTable does NOT delete directory
 // =============================================================================
 
-test('dropTable - CRITICAL: does NOT delete directory when dropping table', async (t) => {
+test('dropTable - CRITICAL: does NOT delete directory when dropping table', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -95,7 +95,7 @@ test('dropTable - CRITICAL: does NOT delete directory when dropping table', asyn
   await store.close();
 });
 
-test('dropTable - returns false when table does not exist', async (t) => {
+test('dropTable - returns false when table does not exist', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -116,7 +116,7 @@ test('dropTable - returns false when table does not exist', async (t) => {
   await store.close();
 });
 
-test('dropTable - clears table vector dimension cache', async (t) => {
+test('dropTable - clears table vector dimension cache', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -131,9 +131,7 @@ test('dropTable - clears table vector dimension cache', async (t) => {
   await store.initialize();
 
   // Add document to create table
-  await store.addDocuments([
-    { id: 'doc1', text: 'Dimension test document', metadata: {} },
-  ]);
+  await store.addDocuments([{ id: 'doc1', text: 'Dimension test document', metadata: {} }]);
 
   // Get dimension (caches it)
   const dimBefore = await store.getTableVectorDimension();
@@ -152,7 +150,7 @@ test('dropTable - clears table vector dimension cache', async (t) => {
 // Test Suite 2: Table creation and initialization
 // =============================================================================
 
-test('initialize - creates directory if not exists', async (t) => {
+test('initialize - creates directory if not exists', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -175,7 +173,7 @@ test('initialize - creates directory if not exists', async (t) => {
   await store.close();
 });
 
-test('initialize - idempotent (can be called multiple times)', async (t) => {
+test('initialize - idempotent (can be called multiple times)', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -197,7 +195,7 @@ test('initialize - idempotent (can be called multiple times)', async (t) => {
   await store.close();
 });
 
-test('initialize - opens existing table if present', async (t) => {
+test('initialize - opens existing table if present', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -233,7 +231,7 @@ test('initialize - opens existing table if present', async (t) => {
 // Test Suite 3: Error handling
 // =============================================================================
 
-test('initialize - handles invalid embedding mode', async (t) => {
+test('initialize - handles invalid embedding mode', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -252,7 +250,7 @@ test('initialize - handles invalid embedding mode', async (t) => {
   );
 });
 
-test('generateEmbedding - throws when embeddings disabled', async (t) => {
+test('generateEmbedding - throws when embeddings disabled', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -275,7 +273,7 @@ test('generateEmbedding - throws when embeddings disabled', async (t) => {
   await store.close();
 });
 
-test('search - returns empty array when table does not exist', async (t) => {
+test('search - returns empty array when table does not exist', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -295,7 +293,7 @@ test('search - returns empty array when table does not exist', async (t) => {
   await store.close();
 });
 
-test('addDocuments - skips empty documents array', async (t) => {
+test('addDocuments - skips empty documents array', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -320,7 +318,7 @@ test('addDocuments - skips empty documents array', async (t) => {
   await store.close();
 });
 
-test('addDocuments - skips documents without text', async (t) => {
+test('addDocuments - skips documents without text', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -350,7 +348,7 @@ test('addDocuments - skips documents without text', async (t) => {
 // Test Suite 4: Concurrent operations
 // =============================================================================
 
-test('concurrent addDocuments - handles parallel inserts', async (t) => {
+test('concurrent addDocuments - handles parallel inserts', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -365,9 +363,7 @@ test('concurrent addDocuments - handles parallel inserts', async (t) => {
   await store.initialize();
 
   // Add initial document to create table
-  await store.addDocuments([
-    { id: 'init', text: 'Initial document', metadata: {} },
-  ]);
+  await store.addDocuments([{ id: 'init', text: 'Initial document', metadata: {} }]);
 
   // Parallel inserts
   const promises = [];
@@ -389,7 +385,7 @@ test('concurrent addDocuments - handles parallel inserts', async (t) => {
   await store.close();
 });
 
-test('shared store - returns same instance for same config', async (t) => {
+test('shared store - returns same instance for same config', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -408,7 +404,7 @@ test('shared store - returns same instance for same config', async (t) => {
   assert.strictEqual(store1.isShared(), true, 'Shared store should report isShared=true');
 });
 
-test('shared store - different instances for different configs', async (t) => {
+test('shared store - different instances for different configs', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -433,7 +429,7 @@ test('shared store - different instances for different configs', async (t) => {
 // Test Suite 5: Embedding and vector operations
 // =============================================================================
 
-test('generateEmbedding - test mode produces stable embeddings', async (t) => {
+test('generateEmbedding - test mode produces stable embeddings', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -456,7 +452,7 @@ test('generateEmbedding - test mode produces stable embeddings', async (t) => {
   await store.close();
 });
 
-test('getEmbeddingDimension - returns correct dimension for test mode', async (t) => {
+test('getEmbeddingDimension - returns correct dimension for test mode', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -476,7 +472,7 @@ test('getEmbeddingDimension - returns correct dimension for test mode', async (t
   await store.close();
 });
 
-test('getEmbeddingDimension - returns null when embeddings off', async (t) => {
+test('getEmbeddingDimension - returns null when embeddings off', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -500,7 +496,7 @@ test('getEmbeddingDimension - returns null when embeddings off', async (t) => {
 // Test Suite 6: Search operations
 // =============================================================================
 
-test('search - filters by similarity threshold', async (t) => {
+test('search - filters by similarity threshold', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -529,7 +525,7 @@ test('search - filters by similarity threshold', async (t) => {
   await store.close();
 });
 
-test('search - applies limit correctly', async (t) => {
+test('search - applies limit correctly', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -560,7 +556,7 @@ test('search - applies limit correctly', async (t) => {
 // Test Suite 7: Upsert and delete operations
 // =============================================================================
 
-test('upsertDocuments - updates existing document', async (t) => {
+test('upsertDocuments - updates existing document', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -590,7 +586,7 @@ test('upsertDocuments - updates existing document', async (t) => {
   await store.close();
 });
 
-test('deleteByMetadata - removes documents matching filter', async (t) => {
+test('deleteByMetadata - removes documents matching filter', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -615,7 +611,7 @@ test('deleteByMetadata - removes documents matching filter', async (t) => {
   await store.close();
 });
 
-test('deleteByMetadata - returns false when table does not exist', async (t) => {
+test('deleteByMetadata - returns false when table does not exist', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -639,7 +635,7 @@ test('deleteByMetadata - returns false when table does not exist', async (t) => 
 // Test Suite 8: Status and utility methods
 // =============================================================================
 
-test('isAvailable - returns true after successful init', async (t) => {
+test('isAvailable - returns true after successful init', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -657,7 +653,7 @@ test('isAvailable - returns true after successful init', async (t) => {
   await store.close();
 });
 
-test('isMockMode - returns false for test mode', async (t) => {
+test('isMockMode - returns false for test mode', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -676,7 +672,7 @@ test('isMockMode - returns false for test mode', async (t) => {
   await store.close();
 });
 
-test('getEmbeddingStatus - returns status object', async (t) => {
+test('getEmbeddingStatus - returns status object', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -698,7 +694,7 @@ test('getEmbeddingStatus - returns status object', async (t) => {
   await store.close();
 });
 
-test('listTables - returns array of table names', async (t) => {
+test('listTables - returns array of table names', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -711,9 +707,7 @@ test('listTables - returns array of table names', async (t) => {
   });
 
   await store.initialize();
-  await store.addDocuments([
-    { id: 'doc1', text: 'Test document', metadata: {} },
-  ]);
+  await store.addDocuments([{ id: 'doc1', text: 'Test document', metadata: {} }]);
 
   const tables = await store.listTables();
   assert.ok(Array.isArray(tables), 'Should return array');
@@ -722,7 +716,7 @@ test('listTables - returns array of table names', async (t) => {
   await store.close();
 });
 
-test('close - clears internal state', async (t) => {
+test('close - clears internal state', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -742,7 +736,7 @@ test('close - clears internal state', async (t) => {
   assert.strictEqual(store.isInitialized, false, 'isInitialized should be false after close');
 });
 
-test('close - no-op for shared stores', async (t) => {
+test('close - no-op for shared stores', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 

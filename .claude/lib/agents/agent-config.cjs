@@ -37,7 +37,20 @@ function getDefaultTools(agentType) {
   const entry = getAgentConfig(agentType);
   const tools = entry && Array.isArray(entry.tools) ? entry.tools : null;
   if (tools && tools.length > 0) return tools;
-  return ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'];
+  // Fallback includes Task management and Skill tools so agents can spawn and use skills
+  return [
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'Glob',
+    'Grep',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+  ];
 }
 
 function getDefaultThinkingLevel(agentType) {

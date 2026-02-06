@@ -26,7 +26,7 @@ function runHook(input) {
       input: inputJson,
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, WRITE_CONTENT_SCANNER: 'block' }
+      env: { ...process.env, WRITE_CONTENT_SCANNER: 'block' },
     });
     return { exitCode: 0, output: result };
   } catch (err) {
@@ -34,7 +34,7 @@ function runHook(input) {
     const output = (err.stdout || '') + (err.stderr || '');
     return {
       exitCode: err.status || 1,
-      output
+      output,
     };
   }
 }
@@ -70,8 +70,8 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'src/config.ts',
-          content: 'const apiKey = "sk-abc123def456ghi789jkl012mno345pqr";'
-        }
+          content: 'const apiKey = "sk-abc123def456ghi789jkl012mno345pqr";',
+        },
       };
 
       const result = runHook(input);
@@ -84,8 +84,8 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Edit',
         tool_input: {
           file_path: 'src/auth.ts',
-          new_string: 'const token = "ghp_1234567890abcdefghijklmnopqrstuvwxyz";'
-        }
+          new_string: 'const token = "ghp_1234567890abcdefghijklmnopqrstuvwxyz";',
+        },
       };
 
       const result = runHook(input);
@@ -98,8 +98,8 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'config.js',
-          content: 'const AWS_KEY = "AKIAIOSFODNN7EXAMPLE";'
-        }
+          content: 'const AWS_KEY = "AKIAIOSFODNN7EXAMPLE";',
+        },
       };
 
       const result = runHook(input);
@@ -114,8 +114,9 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'private.key',
-          content: '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----'
-        }
+          content:
+            '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----',
+        },
       };
 
       const result = runHook(input);
@@ -128,8 +129,8 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'ec.key',
-          content: '-----BEGIN EC PRIVATE KEY-----\nMHcCAQEE...\n-----END EC PRIVATE KEY-----'
-        }
+          content: '-----BEGIN EC PRIVATE KEY-----\nMHcCAQEE...\n-----END EC PRIVATE KEY-----',
+        },
       };
 
       const result = runHook(input);
@@ -144,13 +145,16 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'config.ts',
-          content: 'API_KEY=sk-test123\nSECRET=mysecret\nPASSWORD=admin123'
-        }
+          content: 'API_KEY=sk-test123\nSECRET=mysecret\nPASSWORD=admin123',
+        },
       };
 
       const result = runHook(input);
       assert.strictEqual(result.exitCode, 2, 'Should exit with code 2 (block)');
-      assert.ok(result.output.includes('.env or credentials'), 'Should detect env-style credentials');
+      assert.ok(
+        result.output.includes('.env or credentials'),
+        'Should detect env-style credentials'
+      );
     });
 
     it('should block AWS secret key', () => {
@@ -158,8 +162,8 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'aws-config.txt',
-          content: 'aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
-        }
+          content: 'aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+        },
       };
 
       const result = runHook(input);
@@ -174,8 +178,8 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'src/utils.ts',
-          content: 'export function formatDate(date: Date): string { return date.toISOString(); }'
-        }
+          content: 'export function formatDate(date: Date): string { return date.toISOString(); }',
+        },
       };
 
       const result = runHook(input);
@@ -187,8 +191,9 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: '.claude/context/memory/learnings.md',
-          content: 'API_KEY pattern detected in production code - this is a learning note, not actual secret'
-        }
+          content:
+            'API_KEY pattern detected in production code - this is a learning note, not actual secret',
+        },
       };
 
       const result = runHook(input);
@@ -200,8 +205,8 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: '.claude/audit/security-report.md',
-          content: 'Found hardcoded API_KEY in file.ts - sk-example123 (example for report)'
-        }
+          content: 'Found hardcoded API_KEY in file.ts - sk-example123 (example for report)',
+        },
       };
 
       const result = runHook(input);
@@ -213,8 +218,8 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'tests/fixtures/api-keys.ts',
-          content: 'export const FAKE_API_KEY = "sk-test123fake";'
-        }
+          content: 'export const FAKE_API_KEY = "sk-test123fake";',
+        },
       };
 
       const result = runHook(input);
@@ -228,8 +233,8 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'config.js',
-          content: 'const key = "sk-dangerouskey123";'
-        }
+          content: 'const key = "sk-dangerouskey123";',
+        },
       };
 
       try {
@@ -237,7 +242,7 @@ describe('write-content-scanner.cjs', () => {
           input: JSON.stringify(input),
           encoding: 'utf8',
           stdio: ['pipe', 'pipe', 'pipe'],
-          env: { ...process.env, WRITE_CONTENT_SCANNER: 'warn' }
+          env: { ...process.env, WRITE_CONTENT_SCANNER: 'warn' },
         });
         assert.ok(result !== undefined, 'Should exit with code 0 in warn mode');
       } catch (_err) {
@@ -250,15 +255,15 @@ describe('write-content-scanner.cjs', () => {
         tool_name: 'Write',
         tool_input: {
           file_path: 'config.js',
-          content: 'const key = "sk-dangerouskey123";'
-        }
+          content: 'const key = "sk-dangerouskey123";',
+        },
       };
 
       const result = execSync(`node "${HOOK_PATH}"`, {
         input: JSON.stringify(input),
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe'],
-        env: { ...process.env, WRITE_CONTENT_SCANNER: 'off' }
+        env: { ...process.env, WRITE_CONTENT_SCANNER: 'off' },
       });
       assert.ok(result !== undefined, 'Should exit cleanly when off');
     });
@@ -269,8 +274,8 @@ describe('write-content-scanner.cjs', () => {
       const input = {
         tool_name: 'Read',
         tool_input: {
-          file_path: 'any-file.ts'
-        }
+          file_path: 'any-file.ts',
+        },
       };
 
       const result = runHook(input);
@@ -281,8 +286,8 @@ describe('write-content-scanner.cjs', () => {
       const input = {
         tool_name: 'Bash',
         tool_input: {
-          command: 'echo sk-fakekey'
-        }
+          command: 'echo sk-fakekey',
+        },
       };
 
       const result = runHook(input);

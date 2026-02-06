@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Project Brief Schema",
+  "description": "Schema for project brief documents",
+  "type": "object",
+  "properties": {
+    "projectName": {
+      "type": "string",
+      "description": "Name of the project"
+    },
+    "version": {
+      "type": "string",
+      "description": "Document version"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Document creation date"
+    },
+    "author": {
+      "type": "string",
+      "description": "Document author"
+    },
+    "executiveSummary": {
+      "type": "string",
+      "description": "High-level project summary"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "inScope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "What's included in the project"
+        },
+        "outOfScope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "What's not included in the project"
+        }
+      }
+    },
+    "objectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Project objectives"
+    },
+    "stakeholders": {
+      "type": "object",
+      "properties": {
+        "productOwner": {
+          "type": "string"
+        },
+        "technicalLead": {
+          "type": "string"
+        },
+        "teamMembers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "keyStakeholders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "properties": {
+        "startDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "keyMilestones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "successCriteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "How success will be measured"
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "mitigation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Key assumptions"
+    },
+    "resourcesRequired": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "type": "string",
+          "description": "Team size and composition"
+        },
+        "technology": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Required technologies"
+        },
+        "budget": {
+          "type": "string",
+          "description": "Estimated budget"
+        }
+      }
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Immediate next actions"
+    }
+  },
+  "required": ["projectName", "executiveSummary", "objectives"]
+}

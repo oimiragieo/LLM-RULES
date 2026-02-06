@@ -17,7 +17,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { existsSync } from 'fs';
 
-import { resolveConfigPath } from '../../.claude/tools/context-path-resolver.mjs';
+import { resolveConfigPath } from '../../.claude/tools/context/context-path-resolver.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

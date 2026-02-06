@@ -1,0 +1,19 @@
+name: enterprise-track
+description: Enterprise-grade development workflow with comprehensive tracking
+version: 1.0.0
+steps:
+  - name: requirements
+    agent: planner
+    description: Gather and analyze requirements
+  - name: design
+    agent: architect
+    description: Create system architecture
+  - name: implement
+    agent: developer
+    description: Implement the solution
+  - name: test
+    agent: qa
+    description: Test the implementation
+  - name: deploy
+    agent: developer
+    description: Deploy to production

@@ -6,17 +6,18 @@ model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
 priority: medium
-tools: [Read, Write, Edit, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  [Read, Write, Edit, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol
   - verification-before-completion
   - code-analyzer
   - insight-extraction
 context_files:
-  - @.claude/context/memory/patterns.json
-  - @.claude/context/memory/gotchas.json
-  - @.claude/context/memory/decisions.md
-  - @.claude/context/memory/issues.md
+  - '@.claude/context/memory/patterns.json'
+  - '@.claude/context/memory/gotchas.json'
+  - '@.claude/context/memory/decisions.md'
+  - '@.claude/context/memory/issues.md'
 ---
 
 # Reflection Agent

@@ -61,10 +61,7 @@ describe('Workflow Registry Generator', () => {
 
   describe('extractWorkflowMetadata', () => {
     it('should extract metadata from markdown workflow', () => {
-      const metadata = generator.extractWorkflowMetadata(
-        'core/router-decision.md',
-        'md'
-      );
+      const metadata = generator.extractWorkflowMetadata('core/router-decision.md', 'md');
       assert.ok(metadata, 'Should return metadata');
       assert.strictEqual(metadata.path, 'core/router-decision.md');
       assert.strictEqual(metadata.category, 'core');
@@ -83,14 +80,8 @@ describe('Workflow Registry Generator', () => {
     });
 
     it('should detect required agents from workflow content', () => {
-      const metadata = generator.extractWorkflowMetadata(
-        'core/evolution-workflow.md',
-        'md'
-      );
-      assert.ok(
-        Array.isArray(metadata.requiredAgents),
-        'Should have requiredAgents array'
-      );
+      const metadata = generator.extractWorkflowMetadata('core/evolution-workflow.md', 'md');
+      assert.ok(Array.isArray(metadata.requiredAgents), 'Should have requiredAgents array');
     });
   });
 
@@ -125,10 +116,7 @@ describe('Workflow Registry Generator', () => {
       const enterpriseWorkflows = Object.values(registry.workflows).filter(
         w => w.category === 'enterprise'
       );
-      assert.ok(
-        enterpriseWorkflows.length > 0,
-        'Should have enterprise workflows'
-      );
+      assert.ok(enterpriseWorkflows.length > 0, 'Should have enterprise workflows');
     });
 
     it('should count total workflows correctly', () => {
@@ -148,11 +136,7 @@ describe('Workflow Registry Generator', () => {
     it('should validate that all workflow paths exist', () => {
       const registry = generator.generateRegistry();
       const errors = generator.validateRegistry(registry);
-      assert.strictEqual(
-        errors.length,
-        0,
-        `Registry should have no errors: ${errors.join(', ')}`
-      );
+      assert.strictEqual(errors.length, 0, `Registry should have no errors: ${errors.join(', ')}`);
     });
 
     it('should detect missing workflow files', () => {

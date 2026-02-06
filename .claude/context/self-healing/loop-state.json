@@ -1,93 +1,30 @@
 {
-  "sessionId": "",
-  "evolutionCount": 2,
-  "lastEvolutions": {
-    "hook": "2026-02-04T23:04:20.105Z",
-    "agent": "2026-02-05T03:55:46.519Z"
-  },
+  "sessionId": "session-1770299167425",
+  "evolutionCount": 0,
+  "lastEvolutions": {},
   "spawnDepth": 0,
   "actionHistory": [
     {
-      "action": "spawn:a",
-      "count": 1,
-      "lastAt": "2026-02-04T21:47:03.949Z"
-    },
-    {
-      "action": "spawn:developer",
+      "action": "spawn:architect",
       "count": 3,
-      "lastAt": "2026-02-04T22:59:20.939Z"
-    },
-    {
-      "action": "spawn:conducting",
-      "count": 2,
-      "lastAt": "2026-02-04T22:59:49.554Z"
-    },
-    {
-      "action": "spawn:fixing",
-      "count": 1,
-      "lastAt": "2026-02-04T23:04:09.806Z"
-    },
-    {
-      "action": "spawn:creating",
-      "count": 1,
-      "lastAt": "2026-02-04T23:04:20.097Z"
-    },
-    {
-      "action": "evolution:hook",
-      "count": 1,
-      "lastAt": "2026-02-04T23:04:20.111Z"
-    },
-    {
-      "action": "spawn:completing",
-      "count": 1,
-      "lastAt": "2026-02-04T23:14:48.303Z"
-    },
-    {
-      "action": "spawn:qa",
-      "count": 3,
-      "lastAt": "2026-02-05T02:47:33.257Z"
-    },
-    {
-      "action": "spawn:planner",
-      "count": 3,
-      "lastAt": "2026-02-05T01:49:22.193Z"
-    },
-    {
-      "action": "spawn:conductor-validator",
-      "count": 1,
-      "lastAt": "2026-02-05T00:22:41.102Z"
+      "lastAt": "2026-02-06T00:06:57.554Z"
     },
     {
       "action": "spawn:unknown",
       "count": 3,
-      "lastAt": "2026-02-05T02:33:53.310Z"
+      "lastAt": "2026-02-05T14:14:31.656Z"
     },
     {
-      "action": "spawn:reflection-agent",
+      "action": "spawn:developer",
       "count": 3,
-      "lastAt": "2026-02-05T04:15:15.953Z"
+      "lastAt": "2026-02-06T01:33:50.217Z"
     },
     {
-      "action": "spawn:architect",
-      "count": 2,
-      "lastAt": "2026-02-05T03:55:33.086Z"
-    },
-    {
-      "action": "spawn:auditing",
-      "count": 1,
-      "lastAt": "2026-02-05T03:55:46.504Z"
-    },
-    {
-      "action": "evolution:agent",
-      "count": 1,
-      "lastAt": "2026-02-05T03:55:46.531Z"
-    },
-    {
-      "action": "spawn:consolidating",
-      "count": 1,
-      "lastAt": "2026-02-05T04:11:23.914Z"
+      "action": "spawn:fixing",
+      "count": 3,
+      "lastAt": "2026-02-06T00:20:16.949Z"
     }
   ],
-  "createdAt": "2026-02-04T20:46:43.535Z",
-  "updatedAt": "2026-02-05T05:24:03.526Z"
+  "createdAt": "2026-02-05T13:46:07.425Z",
+  "updatedAt": "2026-02-06T01:40:36.385Z"
 }

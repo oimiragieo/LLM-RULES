@@ -33,6 +33,16 @@
 const path = require('path');
 const fs = require('fs');
 
+// Resolve paths for reliable module loading
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
+const _HOOKS_DIR = path.join(PROJECT_ROOT, '.claude', 'hooks');
+
+// Helper for lib requires
+function libRequire(modulePath) {
+  return require(path.join(LIB_DIR, modulePath));
+}
+
 // Shared utilities
 const {
   parseHookInputAsync,
@@ -41,11 +51,11 @@ const {
   getEnforcementMode,
   formatResult,
   auditLog,
-} = require('../../lib/utils/hook-input.cjs');
+} = libRequire(path.join('utils', 'hook-input.cjs'));
 const routerState = require('./router-state.cjs');
-const loopStateManager = require('../../lib/self-healing/loop-state-manager.cjs');
-const eventBus = require('../../lib/events/event-bus.cjs');
-const { EventTypes } = require('../../lib/events/event-types.cjs');
+const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manager.cjs'));
+const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
+const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
 
 // =============================================================================
 // CONSTANTS

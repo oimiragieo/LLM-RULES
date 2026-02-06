@@ -78,10 +78,17 @@ function createPatternsFile(patterns) {
  */
 function createCodebaseMapFile(discoveredFiles) {
   const filePath = path.join(TEST_MEMORY_DIR, 'codebase_map.json');
-  fs.writeFileSync(filePath, JSON.stringify({
-    discovered_files: discoveredFiles,
-    last_updated: new Date().toISOString(),
-  }, null, 2));
+  fs.writeFileSync(
+    filePath,
+    JSON.stringify(
+      {
+        discovered_files: discoveredFiles,
+        last_updated: new Date().toISOString(),
+      },
+      null,
+      2
+    )
+  );
   return filePath;
 }
 
@@ -98,7 +105,7 @@ function createLearningsFile(content) {
 // Test Suite 1: HIGH - loadContextSync non-blocking writes (Issue #2 fix)
 // =============================================================================
 
-test('loadContextSync - non-blocking: does not block on access stats write', async (t) => {
+test('loadContextSync - non-blocking: does not block on access stats write', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -109,12 +116,8 @@ test('loadContextSync - non-blocking: does not block on access stats write', asy
   process.env.MEMORY_ACCESS_TRACKING = 'on';
 
   try {
-    createGotchasFile([
-      { text: 'Test gotcha 1', timestamp: new Date().toISOString() },
-    ]);
-    createPatternsFile([
-      { text: 'Test pattern 1', timestamp: new Date().toISOString() },
-    ]);
+    createGotchasFile([{ text: 'Test gotcha 1', timestamp: new Date().toISOString() }]);
+    createPatternsFile([{ text: 'Test pattern 1', timestamp: new Date().toISOString() }]);
 
     const { ContextualMemory } = getModule();
     const memory = new ContextualMemory({
@@ -158,7 +161,7 @@ test('loadContextSync - non-blocking: does not block on access stats write', asy
   }
 });
 
-test('loadContextSync - access tracking respects interval', async (t) => {
+test('loadContextSync - access tracking respects interval', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -169,22 +172,27 @@ test('loadContextSync - access tracking respects interval', async (t) => {
   process.env.MEMORY_ACCESS_TRACKING = 'on';
 
   try {
-    createGotchasFile([
-      { text: 'Interval test gotcha', timestamp: new Date().toISOString() },
-    ]);
+    createGotchasFile([{ text: 'Interval test gotcha', timestamp: new Date().toISOString() }]);
 
     // Pre-create access stats with recent timestamp
     const accessStatsPath = path.join(TEST_MEMORY_DIR, 'access-stats.json');
     const recentTimestamp = new Date().toISOString();
-    fs.writeFileSync(accessStatsPath, JSON.stringify({
-      version: '1.0',
-      entries: {
-        'text:Interval test gotcha\n': {
-          accessCount: 5,
-          lastAccessed: recentTimestamp,
+    fs.writeFileSync(
+      accessStatsPath,
+      JSON.stringify(
+        {
+          version: '1.0',
+          entries: {
+            'text:Interval test gotcha\n': {
+              accessCount: 5,
+              lastAccessed: recentTimestamp,
+            },
+          },
         },
-      },
-    }, null, 2));
+        null,
+        2
+      )
+    );
 
     const { ContextualMemory } = getModule();
     const memory = new ContextualMemory({
@@ -205,7 +213,10 @@ test('loadContextSync - access tracking respects interval', async (t) => {
     const stats = JSON.parse(fs.readFileSync(accessStatsPath, 'utf8'));
     const key = Object.keys(stats.entries)[0];
     // Count may or may not be 5 depending on key matching
-    assert.ok(stats.entries[key].accessCount >= 5, 'Access count should not increase within interval');
+    assert.ok(
+      stats.entries[key].accessCount >= 5,
+      'Access count should not increase within interval'
+    );
 
     memory.close();
   } finally {
@@ -222,7 +233,7 @@ test('loadContextSync - access tracking respects interval', async (t) => {
   }
 });
 
-test('loadContextSync - access tracking can be disabled', async (t) => {
+test('loadContextSync - access tracking can be disabled', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -230,9 +241,7 @@ test('loadContextSync - access tracking can be disabled', async (t) => {
   process.env.MEMORY_ACCESS_TRACKING = 'off';
 
   try {
-    createGotchasFile([
-      { text: 'Disabled tracking gotcha', timestamp: new Date().toISOString() },
-    ]);
+    createGotchasFile([{ text: 'Disabled tracking gotcha', timestamp: new Date().toISOString() }]);
 
     const { ContextualMemory } = getModule();
     const memory = new ContextualMemory({
@@ -251,7 +260,10 @@ test('loadContextSync - access tracking can be disabled', async (t) => {
 
     // Access stats should NOT be created when tracking is off
     const accessStatsPath = path.join(TEST_MEMORY_DIR, 'access-stats.json');
-    assert.ok(!fs.existsSync(accessStatsPath), 'Access stats should not be created when tracking is off');
+    assert.ok(
+      !fs.existsSync(accessStatsPath),
+      'Access stats should not be created when tracking is off'
+    );
 
     memory.close();
   } finally {
@@ -267,7 +279,7 @@ test('loadContextSync - access tracking can be disabled', async (t) => {
 // Test Suite 2: loadContextSync with various memory sources
 // =============================================================================
 
-test('loadContextSync - loads gotchas from JSON file', async (t) => {
+test('loadContextSync - loads gotchas from JSON file', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -295,7 +307,7 @@ test('loadContextSync - loads gotchas from JSON file', async (t) => {
   memory.close();
 });
 
-test('loadContextSync - loads patterns from JSON file', async (t) => {
+test('loadContextSync - loads patterns from JSON file', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -322,7 +334,7 @@ test('loadContextSync - loads patterns from JSON file', async (t) => {
   memory.close();
 });
 
-test('loadContextSync - loads discoveries from codebase_map', async (t) => {
+test('loadContextSync - loads discoveries from codebase_map', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -344,13 +356,19 @@ test('loadContextSync - loads discoveries from codebase_map', async (t) => {
   });
 
   assert.strictEqual(result.discoveries.length, 2, 'Should load 2 discoveries');
-  assert.ok(result.discoveries.some(d => d.path === 'src/auth.ts'), 'Should include auth.ts');
-  assert.ok(result.discoveries.some(d => d.path === 'src/api.ts'), 'Should include api.ts');
+  assert.ok(
+    result.discoveries.some(d => d.path === 'src/auth.ts'),
+    'Should include auth.ts'
+  );
+  assert.ok(
+    result.discoveries.some(d => d.path === 'src/api.ts'),
+    'Should include api.ts'
+  );
 
   memory.close();
 });
 
-test('loadContextSync - loads legacy_summary from learnings.md', async (t) => {
+test('loadContextSync - loads legacy_summary from learnings.md', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -374,7 +392,7 @@ test('loadContextSync - loads legacy_summary from learnings.md', async (t) => {
   memory.close();
 });
 
-test('loadContextSync - truncates legacy_summary to maxChars', async (t) => {
+test('loadContextSync - truncates legacy_summary to maxChars', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -399,7 +417,7 @@ test('loadContextSync - truncates legacy_summary to maxChars', async (t) => {
   memory.close();
 });
 
-test('loadContextSync - respects maxItems limits', async (t) => {
+test('loadContextSync - respects maxItems limits', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -430,36 +448,36 @@ test('loadContextSync - respects maxItems limits', async (t) => {
 // Test Suite 3: Concurrent reads
 // =============================================================================
 
-test('loadContextSync - handles concurrent reads without deadlock', async (t) => {
+test('loadContextSync - handles concurrent reads without deadlock', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
-  createGotchasFile([
-    { text: 'Concurrent test gotcha', timestamp: new Date().toISOString() },
-  ]);
-  createPatternsFile([
-    { text: 'Concurrent test pattern', timestamp: new Date().toISOString() },
-  ]);
+  createGotchasFile([{ text: 'Concurrent test gotcha', timestamp: new Date().toISOString() }]);
+  createPatternsFile([{ text: 'Concurrent test pattern', timestamp: new Date().toISOString() }]);
 
   const { ContextualMemory } = getModule();
 
   // Create multiple memory instances
   const memories = [];
   for (let i = 0; i < 5; i++) {
-    memories.push(new ContextualMemory({
-      projectRoot: TEST_DIR,
-      memoryDir: TEST_MEMORY_DIR,
-      dbPath: TEST_DB_PATH,
-    }));
+    memories.push(
+      new ContextualMemory({
+        projectRoot: TEST_DIR,
+        memoryDir: TEST_MEMORY_DIR,
+        dbPath: TEST_DB_PATH,
+      })
+    );
   }
 
   // Concurrent reads
   const start = Date.now();
   const results = await Promise.all(
-    memories.map(m => m.loadContext({
-      maxItems: { gotchas: 10, patterns: 10 },
-      maxChars: { gotchas: 5000, patterns: 5000 },
-    }))
+    memories.map(m =>
+      m.loadContext({
+        maxItems: { gotchas: 10, patterns: 10 },
+        maxChars: { gotchas: 5000, patterns: 5000 },
+      })
+    )
   );
   const duration = Date.now() - start;
 
@@ -482,7 +500,7 @@ test('loadContextSync - handles concurrent reads without deadlock', async (t) =>
 // Test Suite 4: Error handling
 // =============================================================================
 
-test('loadContextSync - handles missing memory directory gracefully', async (t) => {
+test('loadContextSync - handles missing memory directory gracefully', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -506,7 +524,7 @@ test('loadContextSync - handles missing memory directory gracefully', async (t) 
   memory.close();
 });
 
-test('loadContextSync - handles corrupted JSON gracefully', async (t) => {
+test('loadContextSync - handles corrupted JSON gracefully', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -533,7 +551,7 @@ test('loadContextSync - handles corrupted JSON gracefully', async (t) => {
   memory.close();
 });
 
-test('loadContextSync - handles corrupted codebase_map gracefully', async (t) => {
+test('loadContextSync - handles corrupted codebase_map gracefully', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -552,7 +570,11 @@ test('loadContextSync - handles corrupted codebase_map gracefully', async (t) =>
     maxChars: { discoveries: 5000 },
   });
 
-  assert.deepStrictEqual(result.discoveries, [], 'Should return empty discoveries for corrupted file');
+  assert.deepStrictEqual(
+    result.discoveries,
+    [],
+    'Should return empty discoveries for corrupted file'
+  );
 
   memory.close();
 });
@@ -561,12 +583,14 @@ test('loadContextSync - handles corrupted codebase_map gracefully', async (t) =>
 // Test Suite 5: Search functionality
 // =============================================================================
 
-test('search - falls back to keyword search when LanceDB unavailable', async (t) => {
+test('search - falls back to keyword search when LanceDB unavailable', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
   // Create learnings with searchable content
-  createLearningsFile('# Authentication\n\nUse JWT tokens for authentication. Always validate tokens.');
+  createLearningsFile(
+    '# Authentication\n\nUse JWT tokens for authentication. Always validate tokens.'
+  );
 
   const { ContextualMemory } = getModule();
   const memory = new ContextualMemory({
@@ -587,7 +611,7 @@ test('search - falls back to keyword search when LanceDB unavailable', async (t)
   memory.close();
 });
 
-test('search - applies filters correctly', async (t) => {
+test('search - applies filters correctly', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -620,7 +644,7 @@ test('search - applies filters correctly', async (t) => {
   memory.close();
 });
 
-test('search - respects threshold', async (t) => {
+test('search - respects threshold', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -650,7 +674,7 @@ test('search - respects threshold', async (t) => {
 // Test Suite 6: Entity query integration
 // =============================================================================
 
-test('findEntities - returns empty array when entity query unavailable', async (t) => {
+test('findEntities - returns empty array when entity query unavailable', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -670,7 +694,7 @@ test('findEntities - returns empty array when entity query unavailable', async (
   memory.close();
 });
 
-test('getRelated - returns empty array when entity query unavailable', async (t) => {
+test('getRelated - returns empty array when entity query unavailable', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -692,7 +716,7 @@ test('getRelated - returns empty array when entity query unavailable', async (t)
 // Test Suite 7: File operations
 // =============================================================================
 
-test('readFile - reads file relative to memory directory', async (t) => {
+test('readFile - reads file relative to memory directory', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -712,7 +736,7 @@ test('readFile - reads file relative to memory directory', async (t) => {
   memory.close();
 });
 
-test('readFile - throws for non-existent file', async (t) => {
+test('readFile - throws for non-existent file', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -736,7 +760,7 @@ test('readFile - throws for non-existent file', async (t) => {
 // Test Suite 8: Cleanup and resource management
 // =============================================================================
 
-test('close - cleans up resources', async (t) => {
+test('close - cleans up resources', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -758,7 +782,7 @@ test('close - cleans up resources', async (t) => {
   assert.ok(memory.entityQuery == null, 'entityQuery should be null/undefined after close');
 });
 
-test('close - handles multiple close calls gracefully', async (t) => {
+test('close - handles multiple close calls gracefully', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -781,7 +805,7 @@ test('close - handles multiple close calls gracefully', async (t) => {
 // Test Suite 9: MTM/LTM session loading
 // =============================================================================
 
-test('loadContextSync - loads recent_sessions from MTM', async (t) => {
+test('loadContextSync - loads recent_sessions from MTM', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -789,23 +813,31 @@ test('loadContextSync - loads recent_sessions from MTM', async (t) => {
   const mtmDir = path.join(TEST_MEMORY_DIR, 'mtm');
   fs.writeFileSync(
     path.join(mtmDir, 'session_2026-02-01T10-00-00.json'),
-    JSON.stringify({
-      tier: 'MTM',
-      session_id: 'session-1',
-      timestamp: '2026-02-01T10:00:00.000Z',
-      summary: 'Session 1 summary',
-      tasks_completed: ['Task A', 'Task B'],
-    }, null, 2)
+    JSON.stringify(
+      {
+        tier: 'MTM',
+        session_id: 'session-1',
+        timestamp: '2026-02-01T10:00:00.000Z',
+        summary: 'Session 1 summary',
+        tasks_completed: ['Task A', 'Task B'],
+      },
+      null,
+      2
+    )
   );
   fs.writeFileSync(
     path.join(mtmDir, 'session_2026-02-01T11-00-00.json'),
-    JSON.stringify({
-      tier: 'MTM',
-      session_id: 'session-2',
-      timestamp: '2026-02-01T11:00:00.000Z',
-      summary: 'Session 2 summary',
-      tasks_completed: ['Task C'],
-    }, null, 2)
+    JSON.stringify(
+      {
+        tier: 'MTM',
+        session_id: 'session-2',
+        timestamp: '2026-02-01T11:00:00.000Z',
+        summary: 'Session 2 summary',
+        tasks_completed: ['Task C'],
+      },
+      null,
+      2
+    )
   );
 
   const { ContextualMemory } = getModule();
@@ -833,7 +865,7 @@ test('loadContextSync - loads recent_sessions from MTM', async (t) => {
   memory.close();
 });
 
-test('loadContextSync - handles malformed MTM session files', async (t) => {
+test('loadContextSync - handles malformed MTM session files', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 
@@ -863,7 +895,7 @@ test('loadContextSync - handles malformed MTM session files', async (t) => {
 // Test Suite 10: Truncation and character limits
 // =============================================================================
 
-test('loadContextSync - truncates items to maxChars', async (t) => {
+test('loadContextSync - truncates items to maxChars', async t => {
   setupTestDir();
   t.after(cleanupTestDir);
 

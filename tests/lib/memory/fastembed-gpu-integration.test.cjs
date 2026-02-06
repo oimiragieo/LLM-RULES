@@ -107,7 +107,10 @@ describe('FastEmbed GPU Integration', () => {
 
     assert.ok(Array.isArray(embedding), 'Embedding should be an array');
     assert.strictEqual(embedding.length, 384, 'BGE-small-en-v1.5 should have 384 dimensions');
-    assert.ok(embedding.every(v => typeof v === 'number'), 'All values should be numbers');
+    assert.ok(
+      embedding.every(v => typeof v === 'number'),
+      'All values should be numbers'
+    );
   });
 
   it('should batch generate embeddings with FastEmbed', async () => {

@@ -95,7 +95,10 @@ class AuthService {
     const bm25Path = path.join(LANCEDB_DIR, 'bm25-index.json');
     console.log('[DEBUG] Looking for BM25 at:', bm25Path);
 
-    const bm25Exists = await fs.access(bm25Path).then(() => true).catch(() => false);
+    const bm25Exists = await fs
+      .access(bm25Path)
+      .then(() => true)
+      .catch(() => false);
     console.log('[DEBUG] BM25 file exists:', bm25Exists);
 
     // THIS SHOULD FAIL initially, proving BM25 is not wired
@@ -122,7 +125,10 @@ class AuthService {
 
     // Check that BM25 index was saved
     const bm25Path = path.join(LANCEDB_DIR, 'bm25-index.json');
-    const bm25Exists = await fs.access(bm25Path).then(() => true).catch(() => false);
+    const bm25Exists = await fs
+      .access(bm25Path)
+      .then(() => true)
+      .catch(() => false);
 
     // THIS SHOULD FAIL initially
     assert.ok(bm25Exists, 'BM25 index should be saved after indexing');

@@ -30,7 +30,7 @@ skills:
   - mobile-ui-development-rule
   - verification-before-completion
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 # Expo Mobile Developer Agent

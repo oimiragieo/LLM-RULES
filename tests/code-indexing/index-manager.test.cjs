@@ -46,6 +46,69 @@ describe('IndexManager', () => {
   });
 
   describe('41.2-41.9: Full pipeline integration', () => {
+    test('should not stall with non-blocking flush (GREEN - stall fixed)', async () => {
+      const manager = new IndexManager({
+        verbose: true,
+        chunkFlushSize: 100,
+        concurrency: 12,
+      });
+      const testDir = path.join(__dirname, '../fixtures/sample-code-large');
+
+      // Create 200 files to trigger multiple flush cycles
+      await fs.mkdir(testDir, { recursive: true });
+      for (let i = 0; i < 200; i++) {
+        await fs.writeFile(
+          path.join(testDir, `file${i}.js`),
+          `
+function process${i}(data) {
+  // Process function ${i}
+  console.log('Processing:', data);
+  return data.map(x => x * ${i});
+}
+
+class Handler${i} {
+  constructor() {
+    this.id = ${i};
+  }
+
+  handle(input) {
+    return process${i}([input]);
+  }
+}
+          `
+        );
+      }
+
+      const startTime = Date.now();
+      let progressCalls = 0;
+
+      const result = await manager.indexDirectory(testDir, {
+        onProgress: (phase, current, total) => {
+          progressCalls++;
+          // Should see parse/chunk progress even while embedding
+          if (phase === 'parse' && progressCalls > 10) {
+            const elapsed = Date.now() - startTime;
+            // If parsing stalls, elapsed will be very high (>30s for 200 files)
+            // Non-blocking should parse all 200 files in <5s
+            assert.ok(
+              elapsed < 10000,
+              `Parsing should not stall (elapsed: ${elapsed}ms, progress: ${current}/${total})`
+            );
+          }
+        },
+      });
+
+      const totalTime = Date.now() - startTime;
+
+      assert.ok(result.filesIndexed === 200, 'All 200 files indexed');
+      assert.ok(result.chunksCreated >= 400, 'At least 400 chunks (2 per file)');
+      assert.ok(totalTime < 30000, `Total time should be <30s (was ${totalTime}ms)`);
+      assert.ok(progressCalls > 0, 'Progress callback invoked');
+
+      // Cleanup
+      await fs.rm(testDir, { recursive: true, force: true });
+    });
+
     test('should discover files in sample directory', async () => {
       const manager = new IndexManager();
       const testDir = path.join(__dirname, '../fixtures/sample-code');

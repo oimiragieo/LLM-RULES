@@ -1,0 +1,271 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UX Specification Schema",
+  "description": "Schema for user experience specification documents",
+  "type": "object",
+  "properties": {
+    "documentTitle": {
+      "type": "string",
+      "description": "Full document title"
+    },
+    "version": {
+      "type": "string",
+      "description": "Document version"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Document creation date"
+    },
+    "author": {
+      "type": "string",
+      "description": "Document author"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "review", "approved"],
+      "description": "Document status"
+    },
+    "featureDescription": {
+      "type": "string",
+      "description": "Brief description of the feature/page"
+    },
+    "userStories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Related user stories"
+    },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Acceptance criteria for the UI"
+    },
+    "userExperience": {
+      "type": "object",
+      "properties": {
+        "userJourney": {
+          "type": "string",
+          "description": "Describe the user flow"
+        },
+        "keyInteractions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Primary user interactions and behaviors"
+        },
+        "errorStates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "How errors are handled and displayed"
+        },
+        "loadingStates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Loading indicators and states"
+        }
+      }
+    },
+    "visualDesign": {
+      "type": "object",
+      "properties": {
+        "designSystem": {
+          "type": "string",
+          "description": "Reference to design system or style guide"
+        },
+        "colorPalette": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "string"
+            },
+            "secondary": {
+              "type": "string"
+            },
+            "accent": {
+              "type": "string"
+            },
+            "neutral": {
+              "type": "string"
+            }
+          }
+        },
+        "typography": {
+          "type": "object",
+          "properties": {
+            "headings": {
+              "type": "string"
+            },
+            "bodyText": {
+              "type": "string"
+            },
+            "labels": {
+              "type": "string"
+            }
+          }
+        },
+        "spacing": {
+          "type": "string",
+          "description": "Spacing scale and guidelines"
+        },
+        "icons": {
+          "type": "string",
+          "description": "Icon set and usage guidelines"
+        }
+      }
+    },
+    "componentSpecifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "states": {
+            "type": "object",
+            "properties": {
+              "default": {
+                "type": "string"
+              },
+              "hover": {
+                "type": "string"
+              },
+              "active": {
+                "type": "string"
+              },
+              "disabled": {
+                "type": "string"
+              },
+              "error": {
+                "type": "string"
+              }
+            }
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "size": {
+                "type": "string"
+              },
+              "variant": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            }
+          },
+          "interactions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "responsiveDesign": {
+      "type": "object",
+      "properties": {
+        "breakpoints": {
+          "type": "object",
+          "properties": {
+            "mobile": {
+              "type": "string"
+            },
+            "tablet": {
+              "type": "string"
+            },
+            "desktop": {
+              "type": "string"
+            }
+          }
+        },
+        "layoutAdaptations": {
+          "type": "string",
+          "description": "How the layout changes across breakpoints"
+        },
+        "touchTargets": {
+          "type": "string",
+          "description": "Minimum touch target sizes for mobile"
+        }
+      }
+    },
+    "accessibility": {
+      "type": "object",
+      "properties": {
+        "wcagCompliance": {
+          "type": "string",
+          "description": "WCAG level targeted"
+        },
+        "keyboardNavigation": {
+          "type": "string",
+          "description": "Keyboard navigation requirements"
+        },
+        "screenReaderSupport": {
+          "type": "string",
+          "description": "Screen reader announcements and labels"
+        },
+        "colorContrast": {
+          "type": "string",
+          "description": "Contrast ratio requirements"
+        },
+        "focusManagement": {
+          "type": "string",
+          "description": "Focus indicators and management"
+        }
+      }
+    },
+    "implementationNotes": {
+      "type": "object",
+      "properties": {
+        "technicalConsiderations": {
+          "type": "string"
+        },
+        "browserSupport": {
+          "type": "string"
+        },
+        "performanceConsiderations": {
+          "type": "string"
+        },
+        "testingChecklist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "wireframes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "screenName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "imagePath": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": ["documentTitle", "featureDescription"]
+}

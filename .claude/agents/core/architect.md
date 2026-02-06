@@ -7,7 +7,23 @@ temperature: 0.4
 context_strategy: full
 priority: high
 extended_thinking: true
-tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  [
+    Read,
+    Write,
+    Edit,
+    Glob,
+    Grep,
+    Bash,
+    WebFetch,
+    WebSearch,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    TaskOutput,
+    Skill,
+  ]
 # Note: Use Grep for code search, Glob for file discovery; sequential-thinking via Skill({ skill: 'sequential-thinking' })
 skills:
   - architecture-review
@@ -140,41 +156,43 @@ Skill({ skill: 'checklist-generator' });
 
 ## Code Search Optimization
 
-This agent can search code efficiently using the ripgrep skill for fast codebase understanding:
+This agent can search code efficiently using the **hybrid lazy search system** for instant codebase understanding:
 
-**For fast code search across large codebases:**
+### ⚡ RECOMMENDED: Hybrid Lazy Search (Instant)
 
-- Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
-- Faster than: `Grep` or `Glob` (10-100x speed improvement)
-- Automatically respects: `.gitignore` files
-- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
+For **architectural analysis** of any codebase size without waiting for batch indexing:
 
-**When to use ripgrep:**
+```bash
+# Instant project structure (with mermaid diagram)
+pnpm search:structure
 
-- Understanding system architecture (finding patterns across codebase)
-- Analyzing component interactions (searching for imports, calls)
-- Tech stack assessment (searching for framework usage)
-- Design pattern discovery (finding architectural patterns)
-- Large codebases (1000+ files)
+# Hybrid text + semantic search
+pnpm search:code "authentication pattern"
+pnpm search:code "API endpoint definitions"
+pnpm search:code "database models"
 
-**When to use Grep/Glob:**
-
-- Simple filename searches
-- File listing (not content search)
-- Small codebases (<100 files)
-
-**Example:**
-
-```javascript
-// Find all authentication implementations
-Skill({ skill: 'ripgrep', args: 'class.*Auth.*{' });
-
-// Find API endpoint definitions
-Skill({ skill: 'ripgrep', args: 'app\\.(get|post|put|delete)' });
-
-// Find database model definitions
-Skill({ skill: 'ripgrep', args: 'model\\(' });
+# Get specific file content
+pnpm search:file src/app.ts 1 50
 ```
+
+**Advantages for Architects:**
+
+- **0s startup**: No batch indexing (works immediately on 40k+ files)
+- **0.2-0.5s response**: ripgrep-based text search
+- **Hybrid scoring**: Combines text + semantic embeddings (optional)
+- **Auto-structure**: Pre-prompt hook injects mermaid diagrams
+
+**When to use CLI vs Skill:**
+
+- Use CLI commands (`pnpm search:*`) for initial codebase exploration
+- Use Skills for programmatic search within agent workflows
+
+### Legacy Search Methods
+
+**Only use these if hybrid search unavailable:**
+
+- `Skill({ skill: 'ripgrep', args: 'pattern' })` - Advanced regex (PCRE2)
+- `Grep` / `Glob` - Simple searches on small codebases (<100 files)
 
 ### code-semantic-search (Semantic Search)
 

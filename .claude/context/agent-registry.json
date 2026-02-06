@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-05T05:31:23.741Z",
+  "generatedAt": "2026-02-06T01:57:53.406Z",
   "metadata": {
     "totalAgents": 49,
     "healthyAgents": 49,
     "degradedAgents": 0,
     "unavailableAgents": 0,
-    "lastHealthCheck": "2026-02-05T05:31:23.741Z",
-    "lastFullScan": "2026-02-05T05:31:23.741Z"
+    "lastHealthCheck": "2026-02-06T01:57:53.406Z",
+    "lastFullScan": "2026-02-06T01:57:53.406Z"
   },
   "agents": {
     "architect": {
@@ -39,10 +39,13 @@
             "Glob",
             "Grep",
             "Bash",
+            "WebFetch",
+            "WebSearch",
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
             "TaskGet",
+            "TaskOutput",
             "Skill"
           ],
           "skills": [
@@ -87,14 +90,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.735Z",
+        "lastUpdate": "2026-02-06T01:57:53.402Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-05T05:31:23.736Z",
-        "updatedAt": "2026-02-05T05:31:23.736Z"
+        "createdAt": "2026-02-06T01:57:53.402Z",
+        "updatedAt": "2026-02-06T01:57:53.402Z"
       }
     },
     "context-compressor": {
@@ -151,14 +154,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.736Z",
+        "lastUpdate": "2026-02-06T01:57:53.403Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.736Z",
-        "updatedAt": "2026-02-05T05:31:23.736Z"
+        "createdAt": "2026-02-06T01:57:53.403Z",
+        "updatedAt": "2026-02-06T01:57:53.403Z"
       }
     },
     "developer": {
@@ -190,10 +193,13 @@
             "Glob",
             "Grep",
             "Bash",
+            "WebFetch",
+            "WebSearch",
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
             "TaskGet",
+            "TaskOutput",
             "Skill"
           ],
           "skills": [
@@ -238,14 +244,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.737Z",
+        "lastUpdate": "2026-02-06T01:57:53.403Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-05T05:31:23.737Z",
-        "updatedAt": "2026-02-05T05:31:23.737Z"
+        "createdAt": "2026-02-06T01:57:53.403Z",
+        "updatedAt": "2026-02-06T01:57:53.403Z"
       }
     },
     "planner": {
@@ -274,10 +280,13 @@
             "Glob",
             "Grep",
             "Bash",
+            "WebFetch",
+            "WebSearch",
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
             "TaskGet",
+            "TaskOutput",
             "Skill"
           ],
           "skills": [
@@ -309,14 +318,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.737Z",
+        "lastUpdate": "2026-02-06T01:57:53.403Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-05T05:31:23.737Z",
-        "updatedAt": "2026-02-05T05:31:23.737Z"
+        "createdAt": "2026-02-06T01:57:53.403Z",
+        "updatedAt": "2026-02-06T01:57:53.403Z"
       }
     },
     "pm": {
@@ -389,14 +398,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.737Z",
+        "lastUpdate": "2026-02-06T01:57:53.403Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.737Z",
-        "updatedAt": "2026-02-05T05:31:23.737Z"
+        "createdAt": "2026-02-06T01:57:53.403Z",
+        "updatedAt": "2026-02-06T01:57:53.403Z"
       }
     },
     "qa": {
@@ -428,12 +437,14 @@
             "Glob",
             "Grep",
             "Bash",
+            "WebFetch",
+            "WebSearch",
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill",
-            "WebFetch"
+            "TaskOutput",
+            "Skill"
           ],
           "skills": [
             "test-generator",
@@ -476,14 +487,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.737Z",
+        "lastUpdate": "2026-02-06T01:57:53.403Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-05T05:31:23.737Z",
-        "updatedAt": "2026-02-05T05:31:23.737Z"
+        "createdAt": "2026-02-06T01:57:53.403Z",
+        "updatedAt": "2026-02-06T01:57:53.403Z"
       }
     },
     "reflection-agent": {
@@ -544,14 +555,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.738Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.738Z",
-        "updatedAt": "2026-02-05T05:31:23.738Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "router": {
@@ -608,7 +619,7 @@
       ],
       "constraints": {
         "maxConcurrentTasks": 5,
-        "preferredModel": "sonnet"
+        "preferredModel": "haiku"
       },
       "health": {
         "status": "healthy",
@@ -616,14 +627,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.738Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.738Z",
-        "updatedAt": "2026-02-05T05:31:23.738Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "technical-writer": {
@@ -698,14 +709,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "c4-code": {
@@ -768,14 +779,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "c4-component": {
@@ -839,14 +850,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "c4-container": {
@@ -913,14 +924,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "c4-context": {
@@ -989,14 +1000,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "code-reviewer": {
@@ -1076,14 +1087,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "code-simplifier": {
@@ -1159,14 +1170,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "conductor-validator": {
@@ -1237,14 +1248,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "database-architect": {
@@ -1318,14 +1329,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "devops-troubleshooter": {
@@ -1400,14 +1411,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "devops": {
@@ -1487,14 +1498,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "incident-responder": {
@@ -1569,14 +1580,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "researcher": {
@@ -1649,14 +1660,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "reverse-engineer": {
@@ -1735,14 +1746,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "security-architect": {
@@ -1822,14 +1833,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "ai-ml-specialist": {
@@ -1904,14 +1915,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.739Z",
+        "lastUpdate": "2026-02-06T01:57:53.404Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.739Z",
-        "updatedAt": "2026-02-05T05:31:23.739Z"
+        "createdAt": "2026-02-06T01:57:53.404Z",
+        "updatedAt": "2026-02-06T01:57:53.404Z"
       }
     },
     "android-pro": {
@@ -1981,14 +1992,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "data-engineer": {
@@ -2059,14 +2070,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "expo-mobile-developer": {
@@ -2141,14 +2152,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "fastapi-pro": {
@@ -2224,14 +2235,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "frontend-pro": {
@@ -2307,14 +2318,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "gamedev-pro": {
@@ -2388,14 +2399,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "golang-pro": {
@@ -2469,14 +2480,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "graphql-pro": {
@@ -2548,14 +2559,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "ios-pro": {
@@ -2623,14 +2634,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "java-pro": {
@@ -2701,14 +2712,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "mobile-ux-reviewer": {
@@ -2784,14 +2795,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "nextjs-pro": {
@@ -2862,14 +2873,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "nodejs-pro": {
@@ -2940,14 +2951,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "php-pro": {
@@ -3018,14 +3029,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "python-pro": {
@@ -3097,14 +3108,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "rust-pro": {
@@ -3173,14 +3184,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "scientific-research-expert": {
@@ -3257,14 +3268,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "sveltekit-expert": {
@@ -3335,14 +3346,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "tauri-desktop-developer": {
@@ -3417,14 +3428,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "typescript-pro": {
@@ -3496,14 +3507,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "web3-blockchain-expert": {
@@ -3581,14 +3592,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "evolution-orchestrator": {
@@ -3665,14 +3676,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "master-orchestrator": {
@@ -3754,14 +3765,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "party-orchestrator": {
@@ -3822,14 +3833,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     },
     "swarm-coordinator": {
@@ -3897,14 +3908,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-05T05:31:23.740Z",
+        "lastUpdate": "2026-02-06T01:57:53.405Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-05T05:31:23.740Z",
-        "updatedAt": "2026-02-05T05:31:23.740Z"
+        "createdAt": "2026-02-06T01:57:53.405Z",
+        "updatedAt": "2026-02-06T01:57:53.405Z"
       }
     }
   },

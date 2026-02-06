@@ -70,8 +70,8 @@ class GPUDetector {
    */
   recommendBatchSize(memoryMB) {
     if (memoryMB >= 16384) return 256; // 16GB+
-    if (memoryMB >= 8192) return 128;  // 8GB
-    if (memoryMB >= 4096) return 64;   // 4GB
+    if (memoryMB >= 8192) return 128; // 8GB
+    if (memoryMB >= 4096) return 64; // 4GB
     return 32; // 2GB or less (minimum)
   }
 
@@ -88,14 +88,14 @@ class GPUDetector {
       return {
         device: 'gpu',
         name: this._gpuInfo.gpuName,
-        memoryMB: this._gpuInfo.totalMemoryMB
+        memoryMB: this._gpuInfo.totalMemoryMB,
       };
     }
 
     return {
       device: 'cpu',
       name: 'CPU',
-      memoryMB: 0
+      memoryMB: 0,
     };
   }
 }

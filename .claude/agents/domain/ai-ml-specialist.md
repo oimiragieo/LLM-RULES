@@ -30,7 +30,7 @@ skills:
   - verification-before-completion
   - scientific-skills
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 # AI/ML Specialist Agent

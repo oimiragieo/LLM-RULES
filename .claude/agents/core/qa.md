@@ -7,7 +7,23 @@ temperature: 0.3
 context_strategy: lazy_load
 priority: high
 extended_thinking: true
-tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  [
+    Read,
+    Write,
+    Edit,
+    Glob,
+    Grep,
+    Bash,
+    WebFetch,
+    WebSearch,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    TaskOutput,
+    Skill,
+  ]
 # Note: Git operations use Bash tool; sequential-thinking via Skill({ skill: 'sequential-thinking' })
 skills:
   - test-generator

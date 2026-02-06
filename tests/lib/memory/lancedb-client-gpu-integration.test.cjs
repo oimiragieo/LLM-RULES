@@ -49,11 +49,15 @@ test('RED: MemoryVectorStore should attempt GPU detection during initialize()', 
 
   // RED: This will FAIL because MemoryVectorStore doesn't have GPU detection
   // After fix, this property should exist
-  assert.ok('gpuDetected' in store || 'device' in store,
-    'Store should have GPU detection metadata after initialization');
+  assert.ok(
+    'gpuDetected' in store || 'device' in store,
+    'Store should have GPU detection metadata after initialization'
+  );
 
   console.log('[RED TEST] If this test passes, GPU detection is integrated');
-  console.log('[RED TEST] If this test fails, GPU detection is NOT integrated (expected initially)');
+  console.log(
+    '[RED TEST] If this test fails, GPU detection is NOT integrated (expected initially)'
+  );
 });
 
 test('RED: MemoryVectorStore should support GPU-optimized batch sizes', async t => {
@@ -72,8 +76,10 @@ test('RED: MemoryVectorStore should support GPU-optimized batch sizes', async t 
   // RED: This will FAIL because batch size isn't auto-tuned based on GPU
   // After fix, batch size should be larger when GPU is detected
   const hasBatchSizeConfig = 'batchSize' in store || 'embedBatchSize' in store.config;
-  assert.ok(hasBatchSizeConfig,
-    'Store should have batch size configuration based on GPU availability');
+  assert.ok(
+    hasBatchSizeConfig,
+    'Store should have batch size configuration based on GPU availability'
+  );
 
   console.log('[RED TEST] Expected to fail initially - batch size not GPU-aware');
 });
@@ -93,8 +99,7 @@ test('RED: MemoryVectorStore should expose device info', async t => {
 
   // RED: This should FAIL because device info isn't tracked
   const hasDeviceInfo = store.device || store.gpuName || store.embedder?.device;
-  assert.ok(hasDeviceInfo,
-    'Store should expose device information (cpu/gpu) after initialization');
+  assert.ok(hasDeviceInfo, 'Store should expose device information (cpu/gpu) after initialization');
 
   console.log('[RED TEST] Device info:', hasDeviceInfo || 'NOT AVAILABLE (expected)');
 });

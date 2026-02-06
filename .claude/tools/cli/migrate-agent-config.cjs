@@ -122,7 +122,9 @@ function main() {
   console.log(`\n=== Summary ===`);
   console.log(`Migrated: ${migrationCount} agents`);
   console.log(`Backup: ${path.relative(PROJECT_ROOT, BACKUP_PATH)}`);
-  console.log(`\nValidation: Run "node -e \\"JSON.parse(require('fs').readFileSync('.claude/config/agent-config.json', 'utf8'))\\""`)
+  console.log(
+    `\nValidation: Run "node -e \\"JSON.parse(require('fs').readFileSync('.claude/config/agent-config.json', 'utf8'))\\""`
+  );
 }
 
 // Error handling

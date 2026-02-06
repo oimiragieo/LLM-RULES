@@ -1,0 +1,19 @@
+name: brownfield-fullstack
+description: Full-stack development for existing projects
+version: 1.0.0
+steps:
+  - name: analyze
+    agent: architect
+    description: Analyze existing codebase
+  - name: plan
+    agent: planner
+    description: Plan modifications
+  - name: refactor
+    agent: developer
+    description: Refactor existing code
+  - name: enhance
+    agent: developer
+    description: Add new features
+  - name: validate
+    agent: qa
+    description: Validate changes

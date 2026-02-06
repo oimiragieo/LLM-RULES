@@ -15,6 +15,7 @@ The goal is simple: copy `.claude/` into another repo and get consistent routing
 - **Prompts**: Copy/paste prompts for UI (`.claude/prompts/`)
 - **Headless Verification**: CI-friendly testing (`pnpm ship-readiness:headless:json`, `pnpm integration:headless:json`)
 - **Memory System**: Persistent learnings, decisions, and issues across sessions (`.claude/context/memory/`)
+- **Hybrid Lazy Code Search**: Instant ripgrep + optional semantic embeddings (no batch indexing required)
 - **Spec-Kit Integration**: Complete feature set for requirements management with templates, skills, and automated quality validation
 - **Worker Runtime (optional)**: Opt-in headless loop for maintenance/index/queue; emits heartbeat + metrics (see `.claude/docs/GETTING_STARTED.md`)
 - **LanceDB-only Code Index**: Code indexing now uses LanceDB tables only (no JSON vector store)
@@ -41,8 +42,26 @@ Notes:
    If you need to reset memory/runtime/metrics state, use:
 
    ```bash
+   # Soft reset (runtime and metrics only)
    pnpm run context:reset --scope soft --force
+
+   # Memory reset (clears runtime, metrics, and memory files)
+   pnpm run context:reset --scope memory --force
+   pnpm run memory:init  # Required after memory reset
+
+   # Full reset (memory scope + code index + registries)
+   pnpm run context:reset --scope full --force
+   pnpm run memory:init
+   pnpm run code:index:reindex
+   pnpm run routing:prototypes
+   pnpm run agents:registry
+
+   # Optional: Include LanceDB vector store
+   pnpm run context:reset --scope memory --force --include-lancedb
+   pnpm run memory:init
    ```
+
+   **Note**: Without `--force`, the command runs in dry-run mode and shows what would be deleted without actually deleting anything.
 
 4. **Build initial semantic index** (recommended):
 
@@ -76,6 +95,54 @@ If you also want the repo’s CLI validation utilities (recommended), install de
 ```bash
 pnpm install
 ```
+
+## Hybrid Lazy Code Search (Instant, No Batch Indexing)
+
+The system uses a **hybrid approach** combining fast text search (ripgrep) with optional semantic embeddings:
+
+- **Instant**: 0.2-0.5 second response time for 40,000+ files
+- **No upfront indexing**: Searches immediately without waiting hours
+- **Lazy embeddings**: Background incremental updates as files are edited
+- **Hybrid scoring**: Reciprocal Rank Fusion (RRF) combines text + semantic results
+
+### Search Commands
+
+```bash
+# Search code instantly (ripgrep-based)
+pnpm search:code "authentication logic"
+pnpm search:code "export class User"
+pnpm search:code "import react"
+
+# View project structure
+pnpm search:structure
+
+# Get file content with line numbers
+pnpm search:file src/auth.ts 1 50
+```
+
+### How It Works
+
+1. **Pre-prompt hook** analyzes structure using ripgrep (0.5s)
+2. **Search** uses ripgrep for instant text matching
+3. **Optional embeddings** provide semantic similarity (background)
+4. **Post-edit hook** incrementally embeds changed files
+
+### Configuration
+
+```bash
+# Disable semantic search (text only, fastest)
+HYBRID_EMBEDDINGS=off
+
+# Enable semantic search (requires LanceDB)
+HYBRID_EMBEDDINGS=on
+```
+
+### Comparison with Batch Indexing
+
+| Approach        | Startup       | First Search | Memory     | Disk       |
+| --------------- | ------------- | ------------ | ---------- | ---------- |
+| **Old Batch**   | 2+ hours      | Instant      | 8-16GB     | 2-5GB      |
+| **Hybrid Lazy** | **0 seconds** | **0.5s**     | **<500MB** | **<100MB** |
 
 ## Memory System Setup
 

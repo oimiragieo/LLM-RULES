@@ -86,7 +86,7 @@ const SAFE_PATTERNS = [
  * @returns {boolean}
  */
 function isSafeDir(filePath) {
-  return SAFE_PATTERNS.some((pattern) => filePath.includes(pattern));
+  return SAFE_PATTERNS.some(pattern => filePath.includes(pattern));
 }
 
 /**
@@ -148,14 +148,14 @@ async function main() {
     if (matches.length > 0) {
       auditLog('write-content-scanner', 'secrets-detected', {
         file: filePath,
-        patterns: matches.map((m) => m.name),
+        patterns: matches.map(m => m.name),
         severity: matches[0].severity,
       });
 
       const message = [
         `[SECURITY] Dangerous content detected in write to ${filePath}`,
         'Patterns detected:',
-        ...matches.map((m) => `  - ${m.name}`),
+        ...matches.map(m => `  - ${m.name}`),
         '',
         'This may be a security risk. Check content before committing.',
       ].join('\n');

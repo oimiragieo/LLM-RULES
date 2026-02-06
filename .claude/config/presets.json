@@ -11,6 +11,37 @@
       "agentId": "developer",
       "enabledSkills": ["tdd", "debugging", "progressive-disclosure", "planning-with-files"],
       "ruleSnippetPath": null
+    },
+    "developer": {
+      "agentId": "developer",
+      "enabledSkills": [
+        "task-management-protocol",
+        "verification-before-completion",
+        "code-analyzer",
+        "debugging",
+        "testing"
+      ],
+      "ruleSnippetPath": null
+    },
+    "architect": {
+      "agentId": "architect",
+      "enabledSkills": [
+        "architecture-review",
+        "diagram-generator",
+        "database-architect",
+        "planning-with-files"
+      ],
+      "ruleSnippetPath": null
+    },
+    "qa": {
+      "agentId": "qa",
+      "enabledSkills": ["test-generator", "qa-workflow", "verification-before-completion"],
+      "ruleSnippetPath": null
+    },
+    "planner": {
+      "agentId": "planner",
+      "enabledSkills": ["planning-with-files", "task-breakdown", "spec-writing"],
+      "ruleSnippetPath": null
     }
   }
 }

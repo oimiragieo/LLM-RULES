@@ -206,7 +206,9 @@ function main() {
 
   console.log('\n=== Archiving Complete ===');
   console.log(`\nIssues: ${issueStats.archived} archived, ${issueStats.remaining} remaining`);
-  console.log(`Decisions: ${decisionStats.archived} archived, ${decisionStats.remaining} remaining`);
+  console.log(
+    `Decisions: ${decisionStats.archived} archived, ${decisionStats.remaining} remaining`
+  );
 
   // Get new file sizes
   const issuesSize = fs.statSync(path.join(MEMORY_DIR, 'issues.md')).size;

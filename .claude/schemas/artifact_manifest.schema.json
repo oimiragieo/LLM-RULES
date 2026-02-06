@@ -1,0 +1,211 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Artifact Manifest Schema",
+  "description": "Schema for artifact manifest documents",
+  "type": "object",
+  "properties": {
+    "manifestVersion": {
+      "type": "string",
+      "description": "Version of the manifest format"
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": ["name", "version"]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the artifact"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["document", "code", "design", "test", "deployment", "data", "configuration"],
+            "description": "Type of artifact"
+          },
+          "path": {
+            "type": "string",
+            "description": "Relative path to the artifact"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the artifact"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the artifact"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last modification timestamp"
+          },
+          "author": {
+            "type": "string",
+            "description": "Author/creator of the artifact"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "review", "approved", "published", "archived"],
+            "description": "Current status of the artifact"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags for categorization"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs of artifacts this one depends on"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata specific to the artifact type"
+          },
+          "checksum": {
+            "type": "string",
+            "description": "Checksum for integrity verification"
+          },
+          "size": {
+            "type": "number",
+            "description": "Size in bytes"
+          }
+        },
+        "required": ["id", "name", "type", "path"]
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Source artifact ID"
+          },
+          "to": {
+            "type": "string",
+            "description": "Target artifact ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["depends-on", "references", "implements", "tests", "deploys", "contains"],
+            "description": "Type of relationship"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the relationship"
+          }
+        },
+        "required": ["from", "to", "type"]
+      },
+      "description": "Relationships between artifacts"
+    },
+    "workflows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "artifacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Artifact IDs involved in this step"
+                },
+                "inputs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "outputs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": ["id", "name"]
+            }
+          }
+        },
+        "required": ["id", "name", "steps"]
+      },
+      "description": "Workflows that produce or consume artifacts"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "generator": {
+          "type": "string",
+          "description": "Tool that generated this manifest"
+        },
+        "environment": {
+          "type": "string",
+          "description": "Environment where manifest was generated"
+        }
+      }
+    }
+  },
+  "required": ["manifestVersion", "project", "artifacts"]
+}

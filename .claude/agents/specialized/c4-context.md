@@ -15,7 +15,7 @@ skills:
   - diagram-generator
   - project-analyzer
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 # C4 Context Agent

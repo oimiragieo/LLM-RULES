@@ -10,6 +10,40 @@
  * - Local embedding generation via @xenova/transformers
  */
 
+// CUDA Auto-Discovery and Compatibility Layer
+// Configure CUDA path before loading ONNX Runtime
+// Allows onnxruntime-node-gpu built for CUDA 12 to work with CUDA 11.x/13.x
+if (process.platform === 'win32' && !process.env.CUDA_PATH) {
+  const cudaVersions = ['v13.1', 'v13.0', 'v12.1', 'v12.0', 'v11.8', 'v11.7', 'v11.6', 'v11.5'];
+  const cudaBasePath = 'C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA';
+
+  for (const version of cudaVersions) {
+    const cudaPath = `${cudaBasePath}\\${version}`;
+    const cudaBinPath = `${cudaPath}\\bin`;
+
+    // Check if CUDA installation exists
+    const fs = require('fs');
+    if (fs.existsSync(cudaBinPath)) {
+      // Check for any cudart DLL (cudart64_13.dll, cudart64_12.dll, cudart64_11.dll, etc.)
+      const files = fs.readdirSync(cudaBinPath);
+      const cudartDll = files.find(f => /^cudart64_\d+\.dll$/i.test(f));
+
+      if (cudartDll) {
+        process.env.CUDA_PATH = cudaPath;
+        process.env.PATH = `${cudaBinPath};${process.env.PATH || ''}`;
+        console.log(`📍 CUDA_PATH configured for ${version} (found ${cudartDll})`);
+        break;
+      }
+    }
+  }
+
+  if (!process.env.CUDA_PATH) {
+    console.warn('⚠️  No CUDA installation detected in standard locations.');
+    console.warn('   GPU acceleration requires CUDA Toolkit.');
+    console.warn('   Install from: https://developer.nvidia.com/cuda-downloads');
+  }
+}
+
 const path = require('path');
 const fs = require('fs');
 const { createLogger } = require('../utils/logger.cjs');
@@ -238,7 +272,7 @@ class MemoryVectorStore {
         // Deterministic, fast embedding for tests (no network/model download)
         this.embedder = null;
         this._embeddingStatus = { status: 'ready', mode: 'test', reason: null };
-        this._mockMode = false;
+        this._mockMode = true;
       } else if (this.config.embeddingMode === 'fastembed') {
         this.embedder = null;
         try {

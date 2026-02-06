@@ -80,7 +80,12 @@ function matchIntentFromKeywords(promptLower) {
   for (const [intentKey, phrases] of Object.entries(INTENT_KEYWORDS)) {
     if (!Array.isArray(phrases)) continue;
     for (const phrase of phrases) {
-      if (promptLower.includes(String(phrase || '').toLowerCase())) {
+      const kw = String(phrase || '').toLowerCase();
+      if (!kw) continue;
+      // Use word-boundary matching to prevent false positives (e.g. 'going' matching 'go')
+      const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(`\\b${escaped}\\b`);
+      if (re.test(promptLower)) {
         return { intent: intentKey, source: 'intent_keywords' };
       }
     }
@@ -90,7 +95,10 @@ function matchIntentFromKeywords(promptLower) {
 
 function matchIntentFromRoutingTable(promptLower) {
   for (const [keyword, _agent] of Object.entries(ROUTING_TABLE)) {
-    if (promptLower.includes(keyword)) {
+    // Use word-boundary matching to prevent false positives
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`\\b${escaped}\\b`);
+    if (re.test(promptLower)) {
       return { intent: keyword, source: 'routing_table' };
     }
   }

@@ -42,7 +42,7 @@ try {
     console.error('[REGEN-HOOK] Regenerating agent-registry.json...');
     execSync('node .claude/tools/cli/generate-agent-registry.cjs', {
       stdio: 'inherit',
-      cwd: PROJECT_ROOT
+      cwd: PROJECT_ROOT,
     });
     execSync('git add .claude/context/agent-registry.json', { cwd: PROJECT_ROOT });
   }
@@ -54,32 +54,38 @@ try {
     if (fs.existsSync(skillIndexPath)) {
       execSync('node .claude/tools/cli/generate-skill-index.cjs', {
         stdio: 'inherit',
-        cwd: PROJECT_ROOT
+        cwd: PROJECT_ROOT,
       });
       execSync('git add .claude/config/skill-index.json', { cwd: PROJECT_ROOT });
     } else {
-      console.error('[REGEN-HOOK] ⚠️  generate-skill-index.cjs not found, skipping skill index regeneration');
+      console.error(
+        '[REGEN-HOOK] ⚠️  generate-skill-index.cjs not found, skipping skill index regeneration'
+      );
     }
   }
 
   // Regenerate tool manifest if needed
   if (needsToolRegen) {
     console.error('[REGEN-HOOK] Regenerating tool-manifest.json...');
-    const toolManifestPath = path.join(PROJECT_ROOT, '.claude/tools/cli/generate-tool-manifest.cjs');
+    const toolManifestPath = path.join(
+      PROJECT_ROOT,
+      '.claude/tools/cli/generate-tool-manifest.cjs'
+    );
     if (fs.existsSync(toolManifestPath)) {
       execSync('node .claude/tools/cli/generate-tool-manifest.cjs', {
         stdio: 'inherit',
-        cwd: PROJECT_ROOT
+        cwd: PROJECT_ROOT,
       });
       execSync('git add .claude/config/tool-manifest.json', { cwd: PROJECT_ROOT });
     } else {
-      console.error('[REGEN-HOOK] ⚠️  generate-tool-manifest.cjs not found, skipping tool manifest regeneration');
+      console.error(
+        '[REGEN-HOOK] ⚠️  generate-tool-manifest.cjs not found, skipping tool manifest regeneration'
+      );
     }
   }
 
   console.error('[REGEN-HOOK] ✓ Registries regenerated and staged');
   process.exit(0);
-
 } catch (err) {
   console.error('[REGEN-HOOK] ❌ Error:', err.message);
   process.exit(1);

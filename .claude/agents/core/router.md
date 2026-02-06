@@ -9,7 +9,7 @@ tools:
   - TaskCreate
   - TaskGet
   - Skill
-model: sonnet
+model: haiku
 temperature: 0.0
 priority: highest
 context_strategy: minimal

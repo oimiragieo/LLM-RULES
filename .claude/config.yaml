@@ -107,16 +107,19 @@ memory_management:
 
 # --- Core Agents Definition (Pointers) ---
 agents:
+  router:
+    path: .claude/agents/core/router.md
+    model: claude-haiku-4-5
   planner:
-    path: agents/core/planner.md
+    path: .claude/agents/core/planner.md
     model: claude-opus-4-5-20251101
     extended_thinking: true
   developer:
-    path: agents/core/developer.md
+    path: .claude/agents/core/developer.md
     model: claude-sonnet-4-5
   qa:
-    path: agents/core/qa.md
+    path: .claude/agents/core/qa.md
     model: claude-opus-4-5-20251101
   architect:
-    path: agents/core/architect.md
+    path: .claude/agents/core/architect.md
     model: claude-opus-4-5-20251101
