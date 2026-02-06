@@ -352,11 +352,7 @@
         "mcp_server": "chrome-devtools",
         "fallback": "Skill({ skill: 'chrome-browser' })",
         "fallback_status": "available",
-        "fallback_tools": [
-          "Read",
-          "Write",
-          "WebFetch"
-        ],
+        "fallback_tools": ["Read", "Write", "WebFetch"],
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": false
@@ -370,11 +366,7 @@
         "mcp_server": "sequential-thinking",
         "fallback": "Skill({ skill: 'sequential-thinking' })",
         "fallback_status": "available",
-        "fallback_tools": [
-          "Read",
-          "Write",
-          "Bash"
-        ],
+        "fallback_tools": ["Read", "Write", "Bash"],
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": false
@@ -388,10 +380,7 @@
         "mcp_server": "Ref",
         "fallback": "WebSearch + WebFetch",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebSearch",
-          "WebFetch"
-        ],
+        "fallback_tools": ["WebSearch", "WebFetch"],
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": false
@@ -405,9 +394,7 @@
         "mcp_server": "Ref",
         "fallback": "WebFetch",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebFetch"
-        ],
+        "fallback_tools": ["WebFetch"],
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": false
@@ -421,9 +408,7 @@
         "mcp_server": "Exa",
         "fallback": "WebSearch",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebSearch"
-        ],
+        "fallback_tools": ["WebSearch"],
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": false
@@ -437,10 +422,7 @@
         "mcp_server": "Exa",
         "fallback": "Grep + Glob",
         "fallback_status": "available",
-        "fallback_tools": [
-          "Grep",
-          "Glob"
-        ],
+        "fallback_tools": ["Grep", "Glob"],
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": false
@@ -454,9 +436,7 @@
         "mcp_server": "Exa",
         "fallback": "WebSearch",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebSearch"
-        ],
+        "fallback_tools": ["WebSearch"],
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": false
@@ -470,9 +450,7 @@
         "mcp_server": "shadcn",
         "fallback": "WebFetch('https://ui.shadcn.com/...')",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebFetch"
-        ],
+        "fallback_tools": ["WebFetch"],
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": false
@@ -486,9 +464,7 @@
         "mcp_server": "shadcn",
         "fallback": "WebFetch('https://ui.shadcn.com/...')",
         "fallback_status": "available",
-        "fallback_tools": [
-          "WebFetch"
-        ],
+        "fallback_tools": ["WebFetch"],
         "canEdit": false,
         "optional": false,
         "requiresActiveProject": false
@@ -590,15 +566,7 @@
         "Skill",
         "MemoryRecord"
       ],
-      "READ_ONLY": [
-        "Read",
-        "Glob",
-        "Grep",
-        "TaskUpdate",
-        "TaskList",
-        "Skill",
-        "MemoryRecord"
-      ],
+      "READ_ONLY": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill", "MemoryRecord"],
       "DATA_SCIENCE": [
         "Read",
         "Write",
@@ -767,15 +735,7 @@
       },
       "code-reviewer": {
         "toolset": "READ_ONLY",
-        "tools": [
-          "Read",
-          "Glob",
-          "Grep",
-          "TaskUpdate",
-          "TaskList",
-          "Skill",
-          "MemoryRecord"
-        ],
+        "tools": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill", "MemoryRecord"],
         "maxTools": 6
       },
       "researcher": {
@@ -945,14 +905,9 @@
         "swarm-coordinator",
         "party-orchestrator"
       ],
-      "AskUserQuestion": [
-        "router"
-      ]
+      "AskUserQuestion": ["router"]
     },
-    "mandatoryTools": [
-      "TaskUpdate",
-      "Skill"
-    ],
+    "mandatoryTools": ["TaskUpdate", "Skill"],
     "blockOnMissingMandatory": true,
     "warnOnMCPWithoutServer": true,
     "blockOnUnknownTool": true

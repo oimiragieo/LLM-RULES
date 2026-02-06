@@ -465,6 +465,7 @@ All external reference files are located in `.claude/docs/`:
 | **@TOOL_REFERENCE.md**       | Section 1.4            | Complete tool catalog          |
 | **@MODEL_SELECTION.md**      | Section 5              | Model selection guidelines     |
 | **@SKILL_CATALOG_TABLE.md**  | Section 8.5            | Workflow enhancement skills    |
+| **@SKILL_USAGE_GUIDE.md**    | Section 7              | Skill selection decision tree  |
 | **@ENTERPRISE_WORKFLOWS.md** | Section 8.6            | Enterprise workflow paths      |
 | **@ENVIRONMENT_CONFIG.md**   | Section 8.7            | Environment variable reference |
 | **@DIRECTORY_STRUCTURE.md**  | Section 9              | Directory layout reference     |

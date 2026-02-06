@@ -73,6 +73,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/unified-creator-guard.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/unified-pre-write-hook.cjs"
           },
           {
@@ -139,6 +143,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/routing/config-model-validator.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/spawn-prompt-validator.cjs"
           }
         ]
       },
