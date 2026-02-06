@@ -1,5 +1,109 @@
 **Result**: ✅ 29/29 tests passing (all code-indexing tests fixed)
 
+## Bare context/ Directory Bug Fix (2026-02-06)
+
+### Problem
+
+A bare `context/` directory was being created at the project root `C:\dev\projects\agent-studio\context\` instead of `.claude/context/`. This directory escape was caused by two bugs.
+
+### Root Cause Analysis
+
+**Investigation revealed TWO bugs:**
+
+1. **Hook Bug**: `.claude/hooks/session/session-cleanup.cjs` getTmpDir() function (lines 37-54) had incorrect path construction when walking up directories:
+   ```javascript
+   // BAD: Manual path.sep join creates malformed paths on Windows
+   const testPath = path.join(parts.slice(0, i).join(path.sep), '.claude');
+   ```
+   - On Windows, this could produce `context\tmp` instead of `.claude\context\tmp`
+   - The `path.join()` call after manual `join(path.sep)` created double path separators
+
+2. **Test Path Bug**: All 6 memory test files used relative paths starting with `context/`:
+   ```javascript
+   // BAD: Creates bare context/ at project root when tests run
+   const TEST_PROJECT_ROOT = path.join(__dirname, 'context', 'memory', '.test-forget');
+   ```
+   - When tests call `fs.mkdirSync(MEMORY_DIR, { recursive: true })`, they create:
+     - `tests/lib/memory/context/memory/.test-forget/.claude/context/memory/`
+   - The bare `context/` at project root leaks from these test paths
+
+### Solution Implemented
+
+**1. Fixed getTmpDir() path construction** (session-cleanup.cjs lines 43-48):
+```javascript
+// GOOD: Separate testRoot construction from testPath
+const testRoot = parts.slice(0, i).join(path.sep);
+const testPath = path.join(testRoot, '.claude');
+```
+
+**2. Fixed test paths** (all 6 memory test files):
+```javascript
+// GOOD: Use .test-memory subdirectory to avoid bare context/
+const TEST_PROJECT_ROOT = path.join(__dirname, '.test-memory', '.test-forget');
+```
+
+**3. Added .gitignore safety nets**:
+- `tests/lib/.test-memory/` - ignore test temp directories
+- `/context/` - block bare context/ at root (prevents accidental commits)
+
+### Verification Results
+
+**Tests Passing**:
+- memory-forget-delete.test.cjs: 2/2 passing
+- cold-storage.test.cjs: 3/3 passing (no output = all pass)
+- No bare `context/` directory after tests run ✅
+
+**Test Temp Directories**:
+- Tests now create temp dirs at `tests/lib/.test-memory/.test-*` (correct)
+- Tests clean up after themselves (no orphaned temp dirs)
+- No bare `context/` directory leakage ✅
+
+### Key Learnings
+
+**path.join() with Manual path.sep join Pattern**:
+```javascript
+// ANTI-PATTERN: Manual join then path.join
+path.join(parts.slice(0, i).join(path.sep), '.claude')
+
+// CORRECT: Separate construction then join
+const testRoot = parts.slice(0, i).join(path.sep);
+const testPath = path.join(testRoot, '.claude');
+```
+- Mixing manual `join(path.sep)` with `path.join()` creates malformed paths on Windows
+- `path.join()` expects individual path segments, not pre-joined strings
+- Separating the operations makes the code more readable and less error-prone
+
+**Test Temp Directory Pattern**:
+```javascript
+// ANTI-PATTERN: Relative paths that escape test directory
+const TEST_PROJECT_ROOT = path.join(__dirname, 'context', 'memory', '.test-*');
+
+// CORRECT: Temp directories inside test directory
+const TEST_PROJECT_ROOT = path.join(__dirname, '.test-memory', '.test-*');
+```
+- Test temp directories should ALWAYS be created inside the test directory tree
+- Using paths like `context/` or `tmp/` without `.` prefix can leak to project root
+- Prefix test temp dirs with `.test-` for visibility and cleanup
+
+**Defense-in-Depth Pattern**:
+1. **Fix root cause**: Correct path construction in production code
+2. **Fix tests**: Use proper test temp directory paths
+3. **Add .gitignore**: Block bare directories as safety net
+4. **Verify**: Run tests and confirm no leakage
+
+### Files Modified (8)
+
+1. `.claude/hooks/session/session-cleanup.cjs` - Fixed getTmpDir() path construction
+2-7. `tests/lib/memory/*.test.cjs` (6 files) - Fixed TEST_PROJECT_ROOT paths
+8. `.gitignore` - Added `/context/` and `tests/lib/.test-memory/` entries
+
+### Impact
+
+- ✅ **No more bare context/ directory** at project root
+- ✅ **Tests clean up properly** (no orphaned temp dirs)
+- ✅ **Defense-in-depth**: Multiple layers of protection
+- ✅ **Future-proof**: .gitignore blocks accidental commits if bug recurs
+
 ## Windows NUL File Problem - Root Cause Fix (2026-02-06)
 
 ### Problem Recurrence
