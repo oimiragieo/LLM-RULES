@@ -313,10 +313,31 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 ---
 
-## 3.5 MULTI-AGENT PLANNING ORCHESTRATION
+## 3.5 ENTERPRISE ORCHESTRATION WORKFLOW
 
-Complex tasks require phased execution: **Explore → Plan → Review → Consolidate/Implement**.
-See `router-decision.md` Step 7.3 Planning Orchestration Matrix.
+Complex tasks use phased execution with automatic advancement:
+**Triage → Design → Implement → Review → Deploy → Document → Reflect**
+
+**Key modules:**
+
+- `complexity-classifier.cjs` — classifies TRIVIAL/LOW/MEDIUM/HIGH/EPIC
+- `workflow-state-manager.cjs` — file-based state at `.claude/context/runtime/workflow-state.json`
+- `phase-advance-reader.cjs` — reads signals + maps phases to agent types
+- `post-completion-chain.cjs` — auto-advances phases on agent completion
+- `quality-gates.cjs` — blocking/non-blocking gates between phases
+
+**Phase skipping by complexity:**
+
+| Complexity | Phases                                | Agents |
+| ---------- | ------------------------------------- | ------ |
+| TRIVIAL    | Implement → Review                    | 2      |
+| LOW        | Design → Implement → Review           | 4      |
+| MEDIUM     | Design → Implement → Review → Document | 6      |
+| HIGH       | All except Dynamic Creation           | 8+     |
+| EPIC       | All 8 phases                          | 12+    |
+
+See `enterprise-workflow.md` for full workflow specification.
+See `router-decision.md` Step 7.5 for integration details.
 
 ---
 

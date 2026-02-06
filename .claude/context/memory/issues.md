@@ -125,3 +125,41 @@ Cannot complete indexing without one of these changes:
 - **Solution ready**: Option B (reduce flushSize, aggressive GC) as 30-minute quick fix
 - **Permanent fix**: Option A (streaming BM25 with SQLite) as 4-6 hour permanent solution
 - **Next action**: Apply Option B quick fix to unblock full indexing
+
+---
+
+## 2026-02-06: CRITICAL -- 94% Agent Under-Utilization (Task #35)
+
+**Date:** 2026-02-06
+
+**Issue:**
+The multi-agent orchestration framework declares 49 agents but only 1 (developer) is routinely spawned. 46 agents have never been spawned in recorded history. The routing infrastructure (routing-table.cjs, INTENT_KEYWORDS, DISAMBIGUATION_RULES) is correct, but enforcement hooks default to `warn` mode, allowing the Router to collapse all requests to `developer`.
+
+**Impact:**
+- No QA review after code changes
+- No security review for auth/credential code
+- No architectural review before implementation
+- No code review after implementation
+- No documentation updates via technical-writer
+- No learning extraction via reflection-agent
+- No multi-agent orchestration (all orchestrators unused)
+- No domain-specific expertise (all 23 domain agents unused)
+- The planner-first gate for complex tasks is bypassed
+
+**Root Causes:**
+1. `PLANNER_FIRST_ENFORCEMENT=warn` (should be `block`)
+2. `SECURITY_REVIEW_ENFORCEMENT` not enforced by default
+3. No PostToolUse hook on TaskUpdate(completed) to trigger follow-up agents
+4. Reflection Step 0 deadlock: blocks TaskList but never spawns reflection-agent
+5. No workflow state machine tracking multi-phase execution
+
+**Workaround:**
+None. This is a systemic design gap requiring architectural changes.
+
+**Resolution Path:**
+1. Change enforcement defaults from `warn` to `block` (P0, 15 min)
+2. Create post-completion workflow chain hook (P0, 2-4 hours)
+3. Fix reflection deadlock (P1, 1-2 hours)
+4. Implement workflow state machine (P1, 4-8 hours)
+
+**Full Report:** `.claude/context/reports/architecture/agent-utilization-audit-2026-02-06.md`

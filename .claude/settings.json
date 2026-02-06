@@ -138,6 +138,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/intent-agent-match.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/routing/spawn-prompt-assembler.cjs"
           },
           {
@@ -205,6 +209,15 @@
           {
             "type": "command",
             "command": "node .claude/hooks/routing/task-list-tracker.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow/post-completion-chain.cjs"
           }
         ]
       },

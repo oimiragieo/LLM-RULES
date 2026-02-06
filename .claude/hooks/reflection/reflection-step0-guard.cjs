@@ -37,6 +37,12 @@ const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
 const REMINDER_PATH = path.join(RUNTIME_DIR, 'reflection-reminder.txt');
 
+/**
+ * Maximum pending reflections before auto-clearing oldest entries
+ * Prevents deadlock when reflection queue grows unbounded
+ */
+const MAX_PENDING_REFLECTIONS = 5;
+
 /** Log to stderr only (stdout reserved for single formatResult line). */
 function stderrLog(message, meta = {}) {
   console.error(
@@ -63,6 +69,34 @@ function readSpawnRequests(filePath) {
   }
 }
 
+/**
+ * Auto-clear oldest pending reflections if count exceeds MAX_PENDING_REFLECTIONS
+ * Prevents deadlock by capping queue size
+ * @param {Array} requests - Current spawn requests
+ * @returns {Array} Trimmed spawn requests (max 5 most recent)
+ */
+function trimOldReflections(requests) {
+  if (!Array.isArray(requests) || requests.length <= MAX_PENDING_REFLECTIONS) {
+    return requests;
+  }
+
+  // Keep only the 5 most recent (sorted by timestamp descending)
+  const sorted = requests
+    .filter(r => r && r.timestamp)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  const trimmed = sorted.slice(0, MAX_PENDING_REFLECTIONS);
+  const discarded = sorted.length - trimmed.length;
+
+  stderrLog('auto_trim_old_reflections', {
+    total: requests.length,
+    kept: trimmed.length,
+    discarded,
+  });
+
+  return trimmed;
+}
+
 function hasPendingReflections() {
   if (fs.existsSync(REMINDER_PATH)) {
     return true;
@@ -78,7 +112,9 @@ async function main() {
       process.exit(0);
     }
 
-    const mode = getEnforcementMode('REFLECTION_STEP0_ENFORCEMENT', 'block');
+    // Task 1.2: Changed default from 'block' to 'warn' to prevent deadlock
+    // Router can proceed with TaskList after emitting warning about pending reflections
+    const mode = getEnforcementMode('REFLECTION_STEP0_ENFORCEMENT', 'warn');
     if (mode === 'off') {
       process.exit(0);
     }
@@ -98,6 +134,21 @@ async function main() {
     if (!hasPendingReflections()) {
       stderrLog('hook_end', { status: 'no_pending' });
       process.exit(0);
+    }
+
+    // Task 1.2: Auto-trim old reflections if count > MAX_PENDING_REFLECTIONS
+    const requests = readSpawnRequests(SPAWN_REQUEST_PATH);
+    if (requests.length > MAX_PENDING_REFLECTIONS) {
+      const trimmed = trimOldReflections(requests);
+      try {
+        fs.writeFileSync(SPAWN_REQUEST_PATH, JSON.stringify(trimmed, null, 2), 'utf8');
+        stderrLog('trimmed_old_reflections', {
+          before: requests.length,
+          after: trimmed.length,
+        });
+      } catch (err) {
+        stderrLog('trim_failed', { error: err.message });
+      }
     }
 
     const message =

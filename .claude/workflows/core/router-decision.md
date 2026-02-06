@@ -619,6 +619,124 @@ Review payment feature design for security best practices.
 | **Auth/Security change** | Explore            | Planner   | Security (mandatory) | Consolidate |
 | **Database migration**   | Explore            | Planner   | Architect            | Implement   |
 
+### 7.5 Enterprise Workflow Integration (Automatic Phase Advancement)
+
+**When**: MEDIUM+ complexity tasks requiring structured multi-phase execution with quality gates.
+
+**Overview**: The enterprise orchestration workflow automates phase-based execution for complex tasks. After Router classifies complexity, it creates a workflow state machine that coordinates agent execution through predefined phases with quality gates between them.
+
+**Key Components**:
+
+1. **Complexity Classification** (`.claude/lib/workflow/complexity-classifier.cjs`)
+   - Router classifies requests as TRIVIAL/LOW/MEDIUM/HIGH/EPIC
+   - Also determines risk level (LOW/MEDIUM/HIGH/CRITICAL)
+   - Returns phase path based on complexity (TRIVIAL: 2 phases, EPIC: 8 phases)
+
+2. **Workflow State Management** (`.claude/lib/workflow/workflow-state-manager.cjs`)
+   - Creates workflow state file: `.claude/context/runtime/workflow-state.json`
+   - Tracks: current phase, agents per phase, completion status, gate results
+   - Persists across context resets (file-based, not in-memory)
+
+3. **Phase-Advance Signals** (`.claude/lib/workflow/phase-advance-reader.cjs`)
+   - Router reads `.claude/context/runtime/phase-advance.json` at start of each turn
+   - Signal contains: workflowId, advanceTo phase, gate pass/fail results
+   - PHASE_AGENT_ROUTING table maps phases to agent types
+
+4. **Post-Completion Chain** (`.claude/hooks/workflow/post-completion-chain.cjs`)
+   - PostToolUse hook triggers on TaskUpdate(completed)
+   - Checks if all agents in current phase completed
+   - Evaluates quality gate for phase (6 gates total)
+   - Writes phase-advance signal if gate passes
+
+5. **Quality Gates** (`.claude/lib/workflow/quality-gates.cjs`)
+   - Blocking gates: Implementation → Review (tests must pass)
+   - Blocking gates: Review → Deploy (no critical security findings)
+   - Non-blocking: Document and Reflect gates (don't block completion)
+
+**Workflow Phases** (enterprise-workflow.md):
+
+```
+Triage → Dynamic Creation → Design → Implement → Review → Deploy → Document → Reflect
+```
+
+**Complexity-Based Phase Skipping**:
+
+| Complexity | Active Phases | Agent Count | Example |
+|-----------|---------------|-------------|---------|
+| TRIVIAL | Implement → Review | 2 | Typo fix, comment update |
+| LOW | Design → Implement → Review | 4 | Single-file feature |
+| MEDIUM | Design → Implement → Review → Document | 6 | Multi-file refactor |
+| HIGH | All except Dynamic Creation | 8+ | Architecture change |
+| EPIC | All 8 phases | 12+ | System redesign |
+
+**Router Integration Steps**:
+
+1. **On User Request**: Router calls `complexity-classifier.cjs` to get complexity + phasePath
+2. **For MEDIUM+ Complexity**: Router calls `workflow-state-manager.createWorkflow()`
+3. **Before Each Routing**: Router calls `phase-advance-reader.cjs` to check for signals
+4. **Agent Spawning**: Router spawns agents mapped to current phase (from PHASE_AGENT_ROUTING)
+5. **Auto-Advancement**: Post-completion hook triggers next phase when agents complete + gate passes
+
+**Agent Selection by Phase** (from phase-advance-reader.cjs):
+
+| Phase | Agents |
+|-------|--------|
+| PHASE_0_TRIAGE | general-purpose |
+| PHASE_1_DESIGN | architect, planner, security-architect (high risk) |
+| PHASE_2_IMPLEMENT | developer, domain experts |
+| PHASE_3_REVIEW | code-reviewer, security-architect (high risk) |
+| PHASE_4_DEPLOY | devops |
+| PHASE_5_DOCUMENT | technical-writer |
+| PHASE_6_REFLECT | reflection-agent |
+
+**Example Workflow Execution** (MEDIUM complexity):
+
+```
+1. Router classifies: "Refactor auth module" → MEDIUM complexity, HIGH risk
+2. Router creates workflow: { id: "wf-123", complexity: MEDIUM, phases: [DESIGN, IMPLEMENT, REVIEW, DOCUMENT] }
+3. Router spawns PHASE_1_DESIGN agents: architect, planner, security-architect (parallel)
+4. All Phase 1 agents complete → post-completion hook evaluates Gate 1
+5. Gate 1 passes → phase-advance.json written: { advanceTo: "PHASE_2_IMPLEMENT" }
+6. Router reads signal → spawns PHASE_2_IMPLEMENT agents: developer
+7. Developer completes → post-completion hook evaluates Gate 2 (tests passing?)
+8. Gate 2 passes → phase-advance.json: { advanceTo: "PHASE_3_REVIEW" }
+9. Router spawns PHASE_3_REVIEW: code-reviewer, security-architect
+10. Review completes → Gate 3 passes → advance to PHASE_5_DOCUMENT (skip deploy for non-prod)
+11. Technical-writer completes → Gate 5 passes (non-blocking) → workflow COMPLETE
+```
+
+**Router Workflow State Check Example**:
+
+```javascript
+// Router reads workflow state at start of turn
+const workflowState = Read('.claude/context/runtime/workflow-state.json');
+if (workflowState) {
+  const phaseAdvance = Read('.claude/context/runtime/phase-advance.json');
+  if (phaseAdvance && phaseAdvance.advanceTo) {
+    // Spawn agents for next phase
+    const nextPhaseAgents = PHASE_AGENT_ROUTING[phaseAdvance.advanceTo];
+    // Spawn each agent with workflow context
+  }
+}
+```
+
+**Benefits**:
+
+- **Automatic coordination**: No manual phase transitions
+- **Quality enforcement**: Gates prevent premature advancement
+- **Context survival**: File-based state survives context resets
+- **Complexity-appropriate**: Simple tasks skip unnecessary phases
+- **Risk-sensitive**: High-risk tasks include security reviews
+
+**Related Files**:
+
+- **Master Workflow**: `.claude/workflows/core/enterprise-workflow.md`
+- **Complexity Classifier**: `.claude/lib/workflow/complexity-classifier.cjs`
+- **State Manager**: `.claude/lib/workflow/workflow-state-manager.cjs`
+- **Quality Gates**: `.claude/lib/workflow/quality-gates.cjs`
+- **Phase Reader**: `.claude/lib/workflow/phase-advance-reader.cjs`
+- **Post-Completion Hook**: `.claude/hooks/workflow/post-completion-chain.cjs`
+
 #### Phase 1: Exploration (Gather Context)
 
 ```javascript

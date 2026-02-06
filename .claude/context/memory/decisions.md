@@ -49,6 +49,107 @@ Deep audit (Task #19) found 55+ misplaced files in `.claude/context/artifacts/` 
 
 ---
 
+## ADR-079: Agent Utilization Remediation Strategy
+
+**Date:** 2026-02-06
+
+**Status:** Proposed (pending implementation)
+
+**Context:**
+Audit (Task #35) found that 94% of agents (46/49) have never been spawned. The Router collapses all requests to `developer` because enforcement hooks default to `warn` and no post-completion workflow chain exists.
+
+**Decision:**
+Implement a 4-phase remediation strategy:
+
+1. **Phase 1 (Immediate):** Change enforcement defaults to `block` mode for `PLANNER_FIRST_ENFORCEMENT` and `SECURITY_REVIEW_ENFORCEMENT`. This forces the Router to spawn planner for complex tasks and security-architect for security-sensitive tasks.
+
+2. **Phase 2 (Short-term):** Create a PostToolUse hook on TaskUpdate(completed) that triggers follow-up agent spawns: code-reviewer for implementation tasks, qa for code changes, technical-writer for documentation changes, and reflection-agent for all completions.
+
+3. **Phase 3 (Medium-term):** Fix the reflection deadlock by making Step 0 either spawn reflection-agent automatically or make reflections asynchronous. Implement a workflow state machine in `.claude/context/runtime/workflow-state.json`.
+
+4. **Phase 4 (Long-term):** Add Router intent-to-agent enforcement that prevents spawning `developer` when the classified intent maps to a different agent.
+
+**Rationale:**
+- Phase 1 is zero-code (env var changes) and immediately activates planner + security-architect
+- Phase 2 activates 5 more agents (code-reviewer, qa, technical-writer, reflection-agent, architect)
+- Phase 3 fixes the reflection/learning loop
+- Phase 4 prevents regression to developer-only routing
+
+**Consequences:**
+- Agent spawn costs will increase (more agents = more API calls)
+- Task completion will take longer (multi-phase review)
+- Quality and security will significantly improve
+- The multi-agent architecture will finally be utilized as designed
+
+**Full Analysis:** `.claude/context/reports/architecture/agent-utilization-audit-2026-02-06.md`
+
+---
+
+## ADR-080: Enterprise Orchestration Workflow State Machine
+
+**Date:** 2026-02-06
+
+**Status:** Accepted
+
+**Context:**
+Agent utilization audit (Task #35, ADR-079) established that 94% of agents are never spawned. The Router collapses all requests to `developer` due to: (1) enforcement hooks defaulting to `warn`, (2) no post-completion workflow chain, (3) no workflow state machine, and (4) no phase-based execution model. Research (Task #36) identified that LangGraph-style state machines with CrewAI-style role-based teams and quality gates between phases represent industry best practices for enterprise multi-agent orchestration in 2026.
+
+**Decision:**
+Implement a 7-phase enterprise orchestration workflow state machine that the Router MUST follow for every request:
+
+1. **Phase 0: TRIAGE** -- Router classifies request (intent, complexity, domain, risk) and determines phase path
+2. **Phase 0.5: DYNAMIC CREATION** -- When capability gap detected, create missing agents/skills via EVOLVE workflow
+3. **Phase 1: DESIGN** -- Parallel spawn of planner + architect + security-architect (varies by complexity)
+4. **Phase 2: IMPLEMENT** -- Developer + domain specialist following the plan from Phase 1
+5. **Phase 3: REVIEW** -- Parallel spawn of code-reviewer + qa + security-architect
+6. **Phase 4: DEPLOY** -- DevOps agent: lint, format, commit, push, CI verification
+7. **Phase 5: DOCUMENT** -- Technical-writer updates docs, README, CHANGELOG
+8. **Phase 6: REFLECT** -- Reflection-agent extracts learnings and updates memory
+
+Key architectural decisions within this ADR:
+
+- **Complexity-based phase skipping:** TRIVIAL tasks skip to Phase 2+4 only; LOW adds Phase 1+3; MEDIUM adds Phase 5; HIGH runs all phases; EPIC adds orchestrator coordination
+- **Persistent state in workflow-state.json:** Router reads this file every turn to know which phase to advance to. Survives context resets.
+- **Quality gates between every phase:** Blocking checks prevent advancement; non-blocking checks generate warnings
+- **Post-completion chain hook:** PostToolUse on TaskUpdate(completed) automatically triggers next phase advancement
+- **Enforcement hooks in block mode by default:** `PLANNER_FIRST_ENFORCEMENT=block`, `SECURITY_REVIEW_ENFORCEMENT=block`, `SPAWN_PROMPT_VALIDATOR=block`
+- **Intent-to-agent enforcement:** New hook prevents spawning `developer` when classified intent maps to a different agent
+- **Agent handoff via artifacts + TaskUpdate metadata:** Agents communicate through files at workspace-convention-compliant paths plus structured metadata in TaskUpdate calls
+
+**Alternatives Considered:**
+
+1. **Keep current ad-hoc routing (status quo):** Rejected. 94% agent under-utilization makes the multi-agent architecture pointless. No quality gates, no post-implementation review.
+2. **Full LangGraph runtime integration:** Rejected. Would require a Python runtime and external dependency. The existing Task/TaskUpdate infrastructure provides equivalent state management capability.
+3. **CrewAI-only approach (role-based, no state machine):** Rejected. CrewAI crews lack quality gates between phases. State machine ensures each phase completes before the next begins.
+4. **Event-driven architecture (pub/sub between agents):** Rejected for now. The file-based blackboard pattern (workflow-state.json + artifact files) is simpler and works within Claude Code's single-conversation model. Event-driven could be added later as an optimization.
+
+**Rationale:**
+
+- The hybrid approach (LangGraph state machine + CrewAI role-based teams) combines the strengths of both frameworks
+- File-based state (workflow-state.json) survives context resets -- critical for long-running workflows
+- Quality gates enforce multi-agent collaboration rather than making it optional
+- Complexity-based phase skipping prevents overhead for simple tasks (TRIVIAL tasks still get just developer + devops)
+- The design uses ONLY existing infrastructure (Task, TaskUpdate, TaskList, file system) -- no new external dependencies
+- Block-mode enforcement is the single highest-impact change: it immediately forces the Router to use planner and security-architect
+
+**Consequences:**
+
+- **Positive:** Agent utilization increases from 2% to 24%+ (12 unique agent types activated)
+- **Positive:** Every code change gets at least one independent review (code-reviewer, qa, or security-architect)
+- **Positive:** Architectural decisions are captured in design documents before implementation
+- **Positive:** Memory system (learnings, decisions, issues) is actively maintained by reflection-agent
+- **Positive:** Workflow state survives interruptions -- no lost progress on context reset
+- **Negative:** API costs increase (3-10 agents per request vs 1 today)
+- **Negative:** Task completion time increases (multi-phase review adds latency)
+- **Negative:** Router complexity increases (must manage state machine transitions)
+- **Mitigated:** Complexity-based skipping keeps simple tasks fast (TRIVIAL: 2 agents, 1-2 turns)
+
+**Implementation Plan:** `.claude/context/plans/enterprise-orchestration-plan-2026-02-06.md`
+**Workflow Document:** `.claude/workflows/core/enterprise-workflow.md`
+**Depends On:** ADR-079 (Agent Utilization Remediation Strategy)
+
+---
+
 ## ADR-076: Simple 50-Line Chunking for BM25-Only Mode
 
 **Date:** 2026-02-05

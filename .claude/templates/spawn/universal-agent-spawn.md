@@ -58,6 +58,40 @@ Task({
 |  YOU WILL BE EVALUATED ON: Task status updates, not just output      |
 +======================================================================+
 
+## Workflow Context (if applicable)
+
+If this task is part of an enterprise workflow, the Router will provide:
+
+- **Workflow ID**: <WORKFLOW_ID> (unique identifier for multi-phase workflow)
+- **Current Phase**: <CURRENT_PHASE> (e.g., PHASE_1_DESIGN, PHASE_2_IMPLEMENT, etc.)
+- **Phase Gate Requirements**: <GATE_REQUIREMENTS> (what must be true to advance)
+- **Workflow State File**: .claude/context/runtime/workflow-state.json
+- **Input Artifacts**: Outputs from previous phase agents (plans, reports, reviews)
+- **Expected Output Location**: Where this agent should write artifacts for next phase
+
+**If no workflow context provided**: This is a single-agent task, proceed normally.
+
+**If workflow context provided**:
+
+1. Read workflow state file to understand phase context
+2. Read input artifacts from previous phase (if any)
+3. Complete your assigned work
+4. Write output artifacts to expected location
+5. TaskUpdate metadata should include artifact paths for next phase
+
+**Example Workflow Context**:
+
+```
+Workflow ID: wf-enterprise-20260206-123456
+Current Phase: PHASE_3_REVIEW
+Phase Gate Requirements: Gate 3 (no critical security findings, code-reviewer approved)
+Input Artifacts:
+  - .claude/context/plans/payment-feature-plan-final.md (from PHASE_1_DESIGN)
+  - src/payment/payment-service.ts (from PHASE_2_IMPLEMENT)
+  - tests/payment/payment-service.test.ts (from PHASE_2_IMPLEMENT)
+Expected Output: .claude/context/reports/code-review-2026-02-06.md
+```
+
 ## STEP 2.5: Skill Discovery (MANDATORY - Do This First)
 
 Before doing ANY code search, answer these questions using the **Skill Usage Decision Tree**:
