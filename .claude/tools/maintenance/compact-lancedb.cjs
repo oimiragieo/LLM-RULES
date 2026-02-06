@@ -22,7 +22,14 @@ const dryRun = args.includes('--dry-run');
 
 // Paths
 const projectRoot = path.resolve(__dirname, '../../..');
-const lancedbPath = path.join(projectRoot, '.claude', 'context', 'data', 'lancedb', 'code_index.lance');
+const lancedbPath = path.join(
+  projectRoot,
+  '.claude',
+  'context',
+  'data',
+  'lancedb',
+  'code_index.lance'
+);
 const versionsPath = path.join(lancedbPath, '_versions');
 const dataPath = path.join(lancedbPath, 'data');
 const transactionsPath = path.join(lancedbPath, '_transactions');
@@ -40,7 +47,8 @@ console.log(`Keep latest: ${keepVersions} versions`);
 console.log(`Mode: ${dryRun ? 'DRY RUN (no changes)' : 'LIVE (will delete files)'}\n`);
 
 // Step 1: List all version manifests
-const manifestFiles = fs.readdirSync(versionsPath)
+const manifestFiles = fs
+  .readdirSync(versionsPath)
   .filter(f => f.endsWith('.manifest'))
   .map(f => {
     const versionNum = parseInt(f.replace('.manifest', ''), 10);
@@ -53,7 +61,9 @@ if (manifestFiles.length === 0) {
   process.exit(0);
 }
 
-console.log(`Found ${manifestFiles.length} version manifests (${manifestFiles[0].version} - ${manifestFiles[manifestFiles.length - 1].version})`);
+console.log(
+  `Found ${manifestFiles.length} version manifests (${manifestFiles[0].version} - ${manifestFiles[manifestFiles.length - 1].version})`
+);
 
 // Step 2: Identify versions to delete
 const latestVersion = manifestFiles[manifestFiles.length - 1].version;
@@ -61,8 +71,12 @@ const keepFromVersion = Math.max(1, latestVersion - keepVersions + 1);
 const manifestsToDelete = manifestFiles.filter(m => m.version < keepFromVersion);
 const manifestsToKeep = manifestFiles.filter(m => m.version >= keepFromVersion);
 
-console.log(`\nVersions to KEEP: ${manifestsToKeep.map(m => m.version).join(', ')} (${manifestsToKeep.length} files)`);
-console.log(`Versions to DELETE: ${manifestsToDelete.map(m => m.version).join(', ')} (${manifestsToDelete.length} files)`);
+console.log(
+  `\nVersions to KEEP: ${manifestsToKeep.map(m => m.version).join(', ')} (${manifestsToKeep.length} files)`
+);
+console.log(
+  `Versions to DELETE: ${manifestsToDelete.map(m => m.version).join(', ')} (${manifestsToDelete.length} files)`
+);
 
 if (manifestsToDelete.length === 0) {
   console.log('\nNo old versions to clean up.');
@@ -73,7 +87,9 @@ if (manifestsToDelete.length === 0) {
 // LanceDB manifest format uses complex encoding for filenames (prefix can be 0, 1, or 8)
 // Parsing this reliably is difficult, and since this is BM25-only mode (index can be rebuilt),
 // we'll take the safe approach: only delete manifests and transactions, keep all data files.
-console.log(`\nData files: Keeping ALL (cannot reliably identify orphaned files from binary manifests)`);
+console.log(
+  `\nData files: Keeping ALL (cannot reliably identify orphaned files from binary manifests)`
+);
 
 const orphanedDataFiles = []; // Don't delete any data files
 if (fs.existsSync(dataPath)) {
@@ -90,11 +106,13 @@ if (fs.existsSync(transactionsPath)) {
     const txnVersion = parseInt(f.split('-')[0], 10);
     return !keepTransactionVersions.has(txnVersion);
   });
-  console.log(`Total transaction files: ${allTransactions.length}, Orphaned: ${orphanedTransactions.length}`);
+  console.log(
+    `Total transaction files: ${allTransactions.length}, Orphaned: ${orphanedTransactions.length}`
+  );
 }
 
 // Step 6: Calculate disk savings
-const getFileSize = (filePath) => {
+const getFileSize = filePath => {
   try {
     return fs.statSync(filePath).size;
   } catch {
@@ -104,7 +122,10 @@ const getFileSize = (filePath) => {
 
 const manifestsSize = manifestsToDelete.reduce((sum, m) => sum + getFileSize(m.path), 0);
 const dataSize = orphanedDataFiles.reduce((sum, f) => sum + getFileSize(path.join(dataPath, f)), 0);
-const txnSize = orphanedTransactions.reduce((sum, f) => sum + getFileSize(path.join(transactionsPath, f)), 0);
+const txnSize = orphanedTransactions.reduce(
+  (sum, f) => sum + getFileSize(path.join(transactionsPath, f)),
+  0
+);
 const totalSize = manifestsSize + dataSize + txnSize;
 
 console.log(`\nDisk space to reclaim:`);

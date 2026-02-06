@@ -59,11 +59,14 @@ function sanitizeNullDevice(command) {
   // These create files instead of using devices, so normalize to uppercase
   // Match: > nul, 2> nul, &> nul, >> nul, 2>> nul, >nul (no space), etc.
   // Also: > null (common typo)
-  sanitized = sanitized.replace(/([>&])(\s*)(nul|null|con|prn|aux)(\s|$|2|&)/gi, (match, prefix, space, device, suffix) => {
-    // Normalize 'null' to 'nul'
-    const normalizedDevice = device.toLowerCase() === 'null' ? 'NUL' : device.toUpperCase();
-    return prefix + space + normalizedDevice + suffix;
-  });
+  sanitized = sanitized.replace(
+    /([>&])(\s*)(nul|null|con|prn|aux)(\s|$|2|&)/gi,
+    (match, prefix, space, device, suffix) => {
+      // Normalize 'null' to 'nul'
+      const normalizedDevice = device.toLowerCase() === 'null' ? 'NUL' : device.toUpperCase();
+      return prefix + space + normalizedDevice + suffix;
+    }
+  );
 
   return sanitized;
 }
@@ -102,8 +105,7 @@ async function main() {
     // Check if command needs sanitization
     // Patterns: /dev/null OR lowercase reserved names in redirects (> nul, > null, etc.)
     const needsSanitization =
-      command.includes('/dev/null') ||
-      /[>&]\s*(nul|null|con|prn|aux)(\s|$|2|&)/i.test(command);
+      command.includes('/dev/null') || /[>&]\s*(nul|null|con|prn|aux)(\s|$|2|&)/i.test(command);
 
     if (!needsSanitization) {
       process.exit(0);
