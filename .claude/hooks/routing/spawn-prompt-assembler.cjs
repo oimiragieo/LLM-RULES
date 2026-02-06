@@ -30,19 +30,30 @@
 const fs = require('fs');
 const path = require('path');
 
-const {
-  parseHookInputAsync,
-  getToolName,
-  getToolInput,
-  debugLog,
-} = require('../../lib/utils/hook-input.cjs');
-const eventBus = require('../../lib/events/event-bus.cjs');
-const { EventTypes } = require('../../lib/events/event-types.cjs');
-const { buildContextModePrompt } = require('../../lib/spawn/prompt-factory.cjs');
-const { getDefaultTools } = require('../../lib/agents/agent-config.cjs');
-const { validatePrompt } = require('../safety/spawn-prompt-validator.cjs');
+// Resolve project root for absolute path resolution
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
+const HOOKS_DIR = path.join(PROJECT_ROOT, '.claude', 'hooks');
 
-const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+// Helper to require from lib directory
+function libRequire(modulePath) {
+  return require(path.join(LIB_DIR, modulePath));
+}
+
+// Helper to require from hooks directory
+function hooksRequire(modulePath) {
+  return require(path.join(HOOKS_DIR, modulePath));
+}
+
+const { parseHookInputAsync, getToolName, getToolInput, debugLog } = libRequire(
+  path.join('utils', 'hook-input.cjs')
+);
+
+const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
+const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
+const { buildContextModePrompt } = libRequire(path.join('spawn', 'prompt-factory.cjs'));
+const { getDefaultTools } = libRequire(path.join('agents', 'agent-config.cjs'));
+const { validatePrompt } = hooksRequire(path.join('safety', 'spawn-prompt-validator.cjs'));
 
 const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
 const TOOL_MANIFEST_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'tool-manifest.json');
@@ -159,7 +170,7 @@ function isEnricherDisabled() {
 function appendConfigModelSection(assembled, agentType) {
   if (process.env.SPAWN_PROMPT_INJECT_CONFIG_MODEL === 'off') return assembled;
   try {
-    const { getShorthand } = require('../../lib/utils/agent-config-reader.cjs');
+    const { getShorthand } = libRequire(path.join('utils', 'agent-config-reader.cjs'));
     const configResult = resolveConfigModel(agentType);
     const shorthand = configResult && getShorthand(configResult.model);
     if (configResult && configResult.model) {
@@ -178,7 +189,7 @@ function appendConfigModelSection(assembled, agentType) {
 
 function resolveConfigModel(agentType) {
   try {
-    const { resolveAgentModel } = require('../../lib/utils/agent-config-reader.cjs');
+    const { resolveAgentModel } = libRequire(path.join('utils', 'agent-config-reader.cjs'));
     return resolveAgentModel(agentType, PROJECT_ROOT);
   } catch (err) {
     debugLog('spawn-prompt-assembler', 'Config model resolution failed (ignored)', err);
@@ -191,6 +202,88 @@ function resolveConfigModel(agentType) {
  */
 let _registryCache = null;
 let _manifestCache = null;
+
+/**
+ * Cache for constitution and behaviour content (loaded once per hook execution).
+ */
+let _constitutionCache = null;
+
+/**
+ * Load constitution.md and behaviour.md with graceful fallback if missing.
+ * Content is cached for the hook run to avoid repeated file reads.
+ * @param {string} projectRoot - Absolute path to project root
+ * @returns {{ constitution: string, behaviour: string }}
+ */
+function loadConstitutionContext(projectRoot) {
+  if (_constitutionCache) return _constitutionCache;
+
+  const constitutionPath = path.join(projectRoot, '.claude', 'context', 'memory', 'constitution.md');
+  const behaviourPath = path.join(projectRoot, '.claude', 'context', 'memory', 'behaviour.md');
+
+  let constitution = '';
+  let behaviour = '';
+
+  try {
+    if (fs.existsSync(constitutionPath)) {
+      constitution = fs.readFileSync(constitutionPath, 'utf8');
+    }
+  } catch (e) {
+    debugLog('spawn-prompt-assembler', 'Failed to load constitution.md (ignored)', e);
+  }
+
+  try {
+    if (fs.existsSync(behaviourPath)) {
+      behaviour = fs.readFileSync(behaviourPath, 'utf8');
+    }
+  } catch (e) {
+    debugLog('spawn-prompt-assembler', 'Failed to load behaviour.md (ignored)', e);
+  }
+
+  _constitutionCache = { constitution, behaviour };
+  return _constitutionCache;
+}
+
+/**
+ * Append Agent Constitution section to assembled prompt.
+ * @param {string} assembled - Current assembled prompt
+ * @param {{ constitution: string, behaviour: string }} context - Constitution context
+ * @returns {string} Assembled prompt with constitution section appended
+ */
+function appendConstitutionSection(assembled, context) {
+  const { constitution, behaviour } = context;
+
+  // If both are empty, don't add section
+  if (!constitution && !behaviour) return assembled;
+
+  // Don't duplicate if section already exists
+  if (assembled.includes('## Agent Constitution')) return assembled;
+
+  const lines = [];
+  lines.push('## Agent Constitution');
+  lines.push('');
+  lines.push('These principles guide all agent behavior in this framework:');
+  lines.push('');
+
+  if (constitution) {
+    lines.push(constitution.trim());
+  }
+
+  if (behaviour) {
+    if (constitution) lines.push(''); // Add spacing between sections
+    lines.push(behaviour.trim());
+  }
+
+  const section = lines.join('\n') + '\n';
+
+  // Insert before Memory Context if present, otherwise append at end
+  const marker = '## Memory Context (Auto-Loaded)';
+  if (assembled.includes(marker)) {
+    const markerIdx = assembled.indexOf(marker);
+    return assembled.slice(0, markerIdx) + `${section}\n` + assembled.slice(markerIdx);
+  }
+
+  return assembled + `\n${section}`;
+}
 
 function loadAgentRegistry() {
   if (_registryCache) return _registryCache;
@@ -478,7 +571,7 @@ function insertContextModeSection(prompt, fragment) {
 }
 
 async function runIntentAnalysis({ memoryManager, query, threshold, projectRoot }) {
-  const { analyzeIntent } = require('../../lib/memory/intent-analyzer.cjs');
+  const { analyzeIntent } = libRequire(path.join('memory', 'intent-analyzer.cjs'));
   const context = await memoryManager.loadMemoryForContextAsync(projectRoot);
   const recentSessions = Array.isArray(context?.recent_sessions) ? context.recent_sessions : [];
   let compressionSummary = recentSessions
@@ -494,7 +587,9 @@ async function runIntentAnalysis({ memoryManager, query, threshold, projectRoot 
     .join('\n');
 
   try {
-    const { getContextForSearch } = require('../../lib/memory/session-context-for-search.cjs');
+    const { getContextForSearch } = libRequire(
+      path.join('memory', 'session-context-for-search.cjs')
+    );
     const searchContext = getContextForSearch(query, {
       projectRoot,
       maxArchives: 3,
@@ -565,11 +660,13 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt) {
   if (process.env.SPAWN_PROMPT_SEMANTIC_MEMORY === 'off') return assembled;
   const memoryQueryEnabled =
     process.env.SPAWN_PROMPT_MEMORY_QUERY === '1' || process.env.SPAWN_PROMPT_MEMORY_QUERY === 'on';
-  const memoryManager = require('../../lib/memory/memory-manager.cjs');
+  const memoryManager = libRequire(path.join('memory', 'memory-manager.cjs'));
   const query =
     (toolInput.description && String(toolInput.description).trim()) ||
     String(basePrompt).slice(0, 240);
-  const { SEMANTIC_SEARCH_DEFAULT_THRESHOLD } = require('../../lib/memory/memory-constants.cjs');
+  const { SEMANTIC_SEARCH_DEFAULT_THRESHOLD } = libRequire(
+    path.join('memory', 'memory-constants.cjs')
+  );
   const intentAnalysisEnabled =
     process.env.MEMORY_INTENT_ANALYSIS === '1' || process.env.MEMORY_INTENT_ANALYSIS === 'on';
   let results = [];
@@ -640,7 +737,7 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt) {
 async function applyEntityGraphToPrompt(assembled) {
   if (process.env.SPAWN_PROMPT_ENTITY_GRAPH === 'off') return assembled;
   try {
-    const { ContextualMemory } = require('../../lib/memory/contextual-memory.cjs');
+    const { ContextualMemory } = libRequire(path.join('memory', 'contextual-memory.cjs'));
     const cm = new ContextualMemory();
     const decisions = await cm.findEntities('decision', { limit: 3 });
     const issues = await cm.findEntities('issue', { limit: 3 });
@@ -698,7 +795,7 @@ async function main() {
       process.exit(0);
     }
 
-    const promptAssembler = require('../../lib/spawn/prompt-assembler.cjs');
+    const promptAssembler = libRequire(path.join('spawn', 'prompt-assembler.cjs'));
     const agentType = toolInput.subagent_type || toolInput.agent_type || 'developer';
     const presetId = toolInput.preset_id || toolInput.presetId || null;
     const rawAllowedTools = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
@@ -733,6 +830,10 @@ async function main() {
     assembled = await applySemanticMemoryToPrompt(assembled, toolInput, basePrompt);
     assembled = await applyEntityGraphToPrompt(assembled);
 
+    // Append constitution and behaviour principles to every spawned agent
+    const constitutionContext = loadConstitutionContext(PROJECT_ROOT);
+    assembled = appendConstitutionSection(assembled, constitutionContext);
+
     // CONFIG-001: Inject configured model into spawn prompt so Router passes it into Task().
     assembled = appendConfigModelSection(assembled, agentType);
 
@@ -745,7 +846,7 @@ async function main() {
     };
 
     try {
-      const { logSpawnStart } = require('../../lib/monitoring/spawn-log.cjs');
+      const { logSpawnStart } = libRequire(path.join('monitoring', 'spawn-log.cjs'));
       // Generate fallback task_id if not provided (for legacy spawns)
       const taskId =
         toolInput.task_id ||
@@ -836,5 +937,7 @@ module.exports = {
   generateRequiredPrefixFragment,
   hasRequiredWarningBox,
   hasTaskIdReference,
+  loadConstitutionContext,
+  appendConstitutionSection,
   main,
 };
