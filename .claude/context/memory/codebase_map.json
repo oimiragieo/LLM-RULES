@@ -1,5 +1,12 @@
 {
   "version": 1,
-  "discovered_files": {},
-  "last_updated": null
+  "discovered_files": {
+    "tests/fixtures/code-indexing/hook-test/src/main.js": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-06T07:16:13.004Z",
+      "last_accessed": "2026-02-06T07:58:13.744Z"
+    }
+  },
+  "last_updated": "2026-02-06T07:58:13.744Z"
 }

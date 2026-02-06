@@ -7,7 +7,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const checker = require('../../.claude/scripts/hooks/check-console-log.cjs');
+const checker = require('../../.claude/hooks/validation/check-console-log.cjs');
 
 describe('check-console-log hook', () => {
   let tempFile;

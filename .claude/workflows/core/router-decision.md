@@ -462,7 +462,7 @@ User Request: <USER_REQUEST>
 1) FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" })
 2) Read your agent definition: .claude/agents/orchestrators/party-orchestrator.md
 3) Follow Party Mode orchestration protocol:
-   - Load team (default: .claude/teams/default.csv)
+   - Load team (default: .claude/context/teams/default.csv)
    - Coordinate multi-agent discussion
    - Aggregate perspectives
 4) Use Task() tool to spawn team members

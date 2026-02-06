@@ -32,7 +32,7 @@ function buildResetPlan(scope, options = {}) {
   const evolutionState = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
   const selfHealingDir = path.join(PROJECT_ROOT, '.claude', 'context', 'self-healing');
 
-  const lancedbDir = path.join(PROJECT_ROOT, '.claude', 'data', 'lancedb');
+  const lancedbDir = path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'lancedb');
 
   targets.push({ path: runtimeDir, type: 'dir' });
   targets.push({ path: metricsDir, type: 'dir' });

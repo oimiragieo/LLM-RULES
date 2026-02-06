@@ -20,7 +20,7 @@ function slugify(value) {
 
 function ensureDb(projectRoot) {
   const root = projectRoot || PROJECT_ROOT;
-  const dbPath = path.join(root, '.claude', 'data', 'memory.db');
+  const dbPath = path.join(root, '.claude', 'context', 'data', 'memory.db');
   const dbDir = path.dirname(dbPath);
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });

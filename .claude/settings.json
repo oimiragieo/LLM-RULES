@@ -245,7 +245,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/scripts/hooks/check-console-log.cjs"
+            "command": "node .claude/hooks/validation/check-console-log.cjs"
           }
         ]
       }

@@ -45,11 +45,11 @@ identity:
 # Planner Agent
 
 <ui_patterns>
-@.claude/references/ui-patterns.md
+@.claude/docs/reference/ui-patterns.md
 </ui_patterns>
 
 <continuation_format>
-@.claude/references/continuation-format.md
+@.claude/docs/reference/continuation-format.md
 </continuation_format>
 
 ## Core Persona

@@ -155,7 +155,7 @@ async function searchColdStorage(query, options = {}) {
     const vectorStore =
       options.vectorStore ||
       new MemoryVectorStore({
-        persistDirectory: path.join(projectRoot, '.claude', 'data', 'lancedb'),
+        persistDirectory: path.join(projectRoot, '.claude', 'context', 'data', 'lancedb'),
         collectionName: 'agent_memory',
         embeddingMode: process.env.LANCEDB_EMBEDDING_MODE || 'transformers',
       });
@@ -288,7 +288,7 @@ async function archiveOldLTM(projectRoot = PROJECT_ROOT, options = {}) {
       const vectorStore =
         options.vectorStore ||
         new MemoryVectorStore({
-          persistDirectory: path.join(projectRoot, '.claude', 'data', 'lancedb'),
+          persistDirectory: path.join(projectRoot, '.claude', 'context', 'data', 'lancedb'),
           collectionName: 'agent_memory',
           embeddingMode: process.env.LANCEDB_EMBEDDING_MODE || 'transformers',
         });

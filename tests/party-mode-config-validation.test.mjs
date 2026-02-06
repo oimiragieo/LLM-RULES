@@ -35,7 +35,7 @@ describe('Party Mode Configuration', () => {
   });
 
   it('should have all 3 default teams', () => {
-    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'teams');
+    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'context', 'teams');
     const teams = ['code-review.csv', 'secure-implementation.csv', 'architecture-decision.csv'];
 
     for (const team of teams) {
@@ -56,7 +56,7 @@ describe('Party Mode Configuration', () => {
   });
 
   it('should have valid CSV format', () => {
-    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'teams');
+    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'context', 'teams');
     const teams = ['code-review.csv', 'secure-implementation.csv', 'architecture-decision.csv'];
 
     // Helper function to parse CSV lines (handles quoted strings)
@@ -104,7 +104,7 @@ describe('Party Mode Configuration', () => {
   });
 
   it('should have valid agent types', () => {
-    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'teams');
+    const teamsDir = path.join(PROJECT_ROOT, '.claude', 'context', 'teams');
     const teams = ['code-review.csv', 'secure-implementation.csv', 'architecture-decision.csv'];
     const validAgents = ['developer', 'code-reviewer', 'security-architect', 'qa', 'architect'];
 

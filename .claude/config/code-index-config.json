@@ -7,7 +7,7 @@
       "**/node_modules/**",
       "**/.git/**",
       "**/.claude/context/code-index/**",
-      "**/.claude/data/**",
+      "**/.claude/context/data/**",
       "**/.claude.archive/**",
       "**/local_cache/**",
       "**/dist/**",
@@ -68,7 +68,7 @@
     }
   },
   "vectorStore": {
-    "persistDirectory": ".claude/data/code-index",
+    "persistDirectory": ".claude/context/data/code-index",
     "collectionName": "agent-studio-code",
     "distanceFunction": "cosine"
   },

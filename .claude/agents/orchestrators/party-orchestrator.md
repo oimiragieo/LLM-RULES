@@ -36,7 +36,7 @@ This orchestrator enables true multi-agent collaboration where agents respond wi
 
 ### Team Management
 
-- Load team definitions from CSV files (`.claude/teams/*.csv`)
+- Load team definitions from CSV files (`.claude/context/teams/*.csv`)
 - Validate team structure (max 4 agents, valid roles/models/tools)
 - List available teams (default, creative, technical)
 

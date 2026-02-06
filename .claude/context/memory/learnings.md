@@ -566,7 +566,7 @@ The successful rebuild proves BM25 itself is fine, but IndexManager still has ar
 
 **BM25 Index:**
 
-- `.claude/data/lancedb/bm25-index.json` - rebuilt from scratch (14.69MB, 13,012 chunks)
+- `.claude/context/data/lancedb/bm25-index.json` - rebuilt from scratch (14.69MB, 13,012 chunks)
 
 **Checkpoint Deleted:**
 
@@ -675,3 +675,160 @@ The successful rebuild proves BM25 itself is fine, but IndexManager still has ar
 
 - Line 12: Removed top-level `require('../memory/lancedb-client.cjs')`
 - Line 30-31: Moved `require` inside `if (this.embeddingMode !== 'off')` block
+
+## 2026-02-06: CLI Tools Default to BM25-Only Mode
+
+### Fix Applied
+
+Added `LANCEDB_EMBEDDING_MODE=off` environment variable default to all entry points that load IndexManager:
+
+**Files Modified (3):**
+
+1. `.claude/tools/cli/index-codebase.cjs` (lines 16-20)
+   - Added env var default before first require
+   - Ensures CLI defaults to BM25-only sync fast-path
+   - Prevents async pipeline OOM
+
+2. `.claude/lib/boot/worker-agent.cjs` (lines 11-15)
+   - Added env var default before IndexManager require
+   - Worker can still override with LANCEDB_EMBEDDING_MODE=hybrid
+
+3. `.claude/lib/code-indexing/index.cjs` (lines 10-14)
+   - Added env var default before re-exports
+   - Ensures any module importing IndexManager gets BM25-only default
+
+### Why This Works
+
+- **Timing**: Env var set BEFORE any require() loads IndexManager
+- **VectorStore initialization** (index-manager.cjs line ~30): Reads `process.env.LANCEDB_EMBEDDING_MODE`
+  - If 'off': Sets `this.store = null`, all methods guard with `if (!this.store)`
+  - Activates sync fast-path: simple 50-line chunking, no CodeParser/SemanticChunker
+- **Result**: ~68 files/sec, 120MB peak memory, no OOM
+
+### Override Capability
+
+Users can still enable embeddings by explicitly setting the env var:
+
+```bash
+LANCEDB_EMBEDDING_MODE=hybrid node .claude/tools/cli/index-codebase.cjs index
+```
+
+This will bypass the default and use the async pipeline with dense vectors.
+
+### Impact
+
+- **Index-codebase CLI**: Now safe to run on large codebases without OOM
+- **Worker agent**: Also benefits from BM25-only default
+- **Backward compatible**: Existing code still works, just more memory-efficient
+
+## 2026-02-06: Scripts Directory Cleanup - Dead Code Removal
+
+### Cleanup Applied
+
+Systematic cleanup of scripts directories following evidence-based verification (grep references before deletion).
+
+**Files Deleted (9 total):**
+
+**From `.claude/scripts/hooks/` (2 files):**
+
+- `suggest-compact.cjs` - Consolidated into unified-pre-write-hook.cjs (line 19 comment)
+- Directory `.claude/scripts/hooks/` itself (empty after cleanup)
+
+**From `scripts/` root (4 one-time fix scripts):**
+
+- `add-lazy-load-prefixes.cjs` - One-time migration (added lazy-load prefixes to agent files)
+- `fix-bash-prefix-errors.cjs` - One-time fix (corrected bash command prefixes)
+- `fix-yaml-globs.cjs` - One-time fix (fixed YAML glob patterns)
+- `fix-agent-yaml.mjs` - One-time fix (fixed @-prefixed paths in YAML, added name field)
+
+**From `scripts/testing/` (5 one-time test migration scripts):**
+
+- `migrate-test-files.cjs` - One-time migration (moved tests from .claude/ to tests/)
+- `fix-lib-test-imports.cjs` - One-time fix (corrected test imports in lib/)
+- `fix-test-imports.cjs` - One-time fix (corrected general test imports)
+- `fix-tools-test-imports.cjs` - One-time fix (corrected test imports in tools/)
+- `fix-all-test-imports.cjs` - One-time fix (wrapper for all import fixes)
+
+**Files Moved (1):**
+
+- `check-console-log.cjs` - Moved from `.claude/scripts/hooks/` to `.claude/hooks/validation/`
+- **Reason:** Registered hook in settings.json (Stop event), wrong location
+- **Updated:** `.claude/settings.json` line 248 (command path corrected)
+
+**Files Kept (Analysis):**
+
+**`.claude/scripts/` (KEPT - utility tools):**
+
+- `setup-package-manager.cjs` - Has test file, has documentation, utility tool
+- `ensure-routing-prototypes.cjs` - Referenced by package.json postinstall
+- `validate-routing-consistency.cjs` - Referenced by package.json (validate:routing)
+- `quick-status.cjs` - Referenced by package.json (routing:status)
+
+**`scripts/` root (KEPT - re-export wrappers):**
+All root-level scripts are 5-7 line wrappers that import from subdirectories:
+
+- `format-tracked.mjs` → `./maintenance/format-tracked.mjs`
+- `generate-rule-index.mjs` → `./generation/generate-rule-index.mjs`
+- `validate-*.mjs` → `./validation/<script>.mjs`
+- `install.mjs` → `./installation/install.mjs`
+
+**Pattern:** Root scripts are thin re-export wrappers. Package.json references stable root paths while internals can reorganize.
+
+**`.claude/tools/cli/init-staging.cjs` (KEPT - functional utility):**
+
+- Creates `.claude/staging/` directory structure for staging environment
+- Referenced in README.md and @ENVIRONMENT_CONFIG.md
+- Can create directories that don't exist yet (not dead code)
+
+### Verification Protocol Used
+
+**Before ANY deletion:**
+
+1. `grep -r "filename" .` - Check for any references
+2. Read file header comments to confirm purpose (one-time fix vs utility)
+3. Check package.json for npm script references
+4. Check settings.json for hook registrations
+5. Check for test files
+
+**Pattern:** One-time fix scripts have past-tense comments ("fixed", "migrated") and no package.json references.
+
+### Impact
+
+- **Reduced clutter:** 9 dead files removed (one-time fixes completed)
+- **Improved organization:** Hook moved to correct location
+- **Verified architecture:** Root scripts/ uses wrapper pattern (stable API, flexible internals)
+- **Settings.json updated:** Hook command path corrected
+
+### Key Learnings
+
+**Re-Export Wrapper Pattern:**
+Root `scripts/` files are thin wrappers (5-7 lines):
+
+```javascript
+#!/usr/bin/env node
+/**
+ * Wrapper for <script>.mjs
+ * Maintains stable external API while scripts are organized internally
+ */
+import './subdirectory/<script>.mjs';
+```
+
+**Benefits:**
+
+- Package.json references never break (root paths stable)
+- Internal reorganization is safe (subdirectories can change)
+- Clear separation: root = API, subdirectory = implementation
+
+**One-Time Fix Script Pattern:**
+
+- Past-tense comments: "Fixed X", "Migrated Y"
+- No package.json references, no test files
+- Not imported by other scripts
+- Job is complete → safe to delete
+
+**Systematic Verification Prevents Accidents:**
+Using grep BEFORE deletion caught:
+
+- `setup-package-manager.cjs` has tests → KEEP (not dead)
+- `validate-sync.sh` referenced by package.json → KEEP
+- `check-console-log.cjs` registered in settings.json → MOVE (not delete)

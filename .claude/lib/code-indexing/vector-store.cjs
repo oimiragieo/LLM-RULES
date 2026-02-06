@@ -16,7 +16,7 @@ class VectorStore {
     const persistDirectory =
       options.persistDirectory ||
       process.env.LANCEDB_URI ||
-      path.join(projectRoot, '.claude', 'data', 'lancedb');
+      path.join(projectRoot, '.claude', 'context', 'data', 'lancedb');
     const collectionName = options.collectionName || process.env.LANCEDB_TABLE_CODE || 'code_index';
 
     this.embeddingMode =

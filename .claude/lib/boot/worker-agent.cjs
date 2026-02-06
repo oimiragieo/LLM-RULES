@@ -8,6 +8,12 @@
 
 'use strict';
 
+// Default to BM25-only mode to avoid async pipeline OOM
+// Override with LANCEDB_EMBEDDING_MODE=hybrid for dense vectors
+if (!process.env.LANCEDB_EMBEDDING_MODE) {
+  process.env.LANCEDB_EMBEDDING_MODE = 'off';
+}
+
 const path = require('path');
 const fs = require('fs').promises;
 const { spawn } = require('child_process');

@@ -53,7 +53,7 @@ Extraction input is bounded by:
 
 ## Entity Index (SQLite)
 
-The hybrid memory system also maintains an entity/relationship index at `.claude/data/memory.db` (SQLite).
+The hybrid memory system also maintains an entity/relationship index at `.claude/context/data/memory.db` (SQLite).
 It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/lib/memory/entity-query.cjs` (reads). Only high-value items (decisions, issues, patterns, gotchas) are indexed; learnings.md is legacy and not synced to the entity index. Session transcripts (MTM) are not currently synchronized to SQLite.
 
 > **Ghost Memory**: The SQLite database is a **sync-only** implementation (using `node:sqlite`). It is considered "ghost memory" because it runs in the background to index content but is **not directly exposed** to agents via tools. Agents access this data only through the Contextual Memory API (injected into prompts) or the Memory Manager CLI.
@@ -69,7 +69,7 @@ The entity index is populated by `sync-memory-index` from `decisions.md` and `is
 - **"Required table 'entities' not found"** or missing schema:
   - Run `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`) before first use to create the SQLite schema. The sync-memory-index hook and EntityExtractor attempt to create the schema if missing; if they fail, run memory:init manually.
 - **"EntityExtractor not initialized"**:
-  - Check if `.claude/data/memory.db` exists and is readable.
+  - Check if `.claude/context/data/memory.db` exists and is readable.
 - **Existing patterns/gotchas not in SQLite**:
   - Run `pnpm run memory:sync-json` once to backfill `patterns.json` / `gotchas.json` into the entity DB.
 
@@ -187,7 +187,7 @@ MTM entries include `tier: "MTM"` and `consolidated_at` metadata. Remove test se
 
 ## Vector Store (LanceDB)
 
-LanceDB persist directory is `.claude/data/lancedb`. Any `vectors.db` or `vectors.db_placeholder` under `.claude/context/memory/` is legacy/orphan (from an older or alternate config) and can be removed; the active client uses `.claude/data/lancedb` only. The default table name is `agent_memory` (override with `LANCEDB_TABLE`). If the embedding model fails to load (e.g. missing deps like `sharp`), semantic search is **disabled** (fail‑closed) and ContextualMemory falls back to keyword search; a warning is logged and the dashboard/health show the disabled state.
+LanceDB persist directory is `.claude/context/data/lancedb`. Any `vectors.db` or `vectors.db_placeholder` under `.claude/context/memory/` is legacy/orphan (from an older or alternate config) and can be removed; the active client uses `.claude/context/data/lancedb` only. The default table name is `agent_memory` (override with `LANCEDB_TABLE`). If the embedding model fails to load (e.g. missing deps like `sharp`), semantic search is **disabled** (fail‑closed) and ContextualMemory falls back to keyword search; a warning is logged and the dashboard/health show the disabled state.
 
 **First run note:** the embedding model may download on first use (~90MB) and the first embed/search can be slow. Subsequent runs use the cached model.
 
@@ -209,7 +209,7 @@ node .claude/lib/memory/memory-search.cjs "query"
 
 ### Code-indexing (separate table, same LanceDB)
 
-Code-indexing (`.claude/lib/code-indexing/`) uses **LanceDB** with a separate table (`code_index` by default). It shares the same LanceDB persist directory (`.claude/data/lancedb`) but uses a different table name from memory. Override the table name with `LANCEDB_TABLE_CODE` and the persist directory with `LANCEDB_URI`. Index metadata still lives under `.claude/context/code-index/metadata.json`. To (re)build the code index, run `pnpm run code:index:reindex`.
+Code-indexing (`.claude/lib/code-indexing/`) uses **LanceDB** with a separate table (`code_index` by default). It shares the same LanceDB persist directory (`.claude/context/data/lancedb`) but uses a different table name from memory. Override the table name with `LANCEDB_TABLE_CODE` and the persist directory with `LANCEDB_URI`. Index metadata still lives under `.claude/context/code-index/metadata.json`. To (re)build the code index, run `pnpm run code:index:reindex`.
 
 ## Retention and Cold Storage
 
@@ -967,7 +967,7 @@ Scopes:
 - `memory`: clears runtime, metrics, and `.claude/context/memory/**`.
 - `full`: clears memory scope plus code index, registry outputs, routing prototypes, and self-healing/evolution state.
 
-Optional: `--include-lancedb` to wipe `.claude/data/lancedb`.
+Optional: `--include-lancedb` to wipe `.claude/context/data/lancedb`.
 
 After `memory` or `full` reset, reinitialize memory schema:
 

@@ -114,7 +114,7 @@ async function indexMemory(candidate, filePath, projectRoot) {
   if (!category) return;
   const text = buildMemoryMarkdown(candidate);
   const store = MemoryVectorStore.getSharedStore({
-    persistDirectory: path.join(projectRoot, '.claude', 'data', 'lancedb'),
+    persistDirectory: path.join(projectRoot, '.claude', 'context', 'data', 'lancedb'),
     collectionName: process.env.LANCEDB_TABLE || 'agent_memory',
   });
 

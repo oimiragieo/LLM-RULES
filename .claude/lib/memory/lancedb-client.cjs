@@ -105,7 +105,7 @@ class MemoryVectorStore {
   constructor(config = {}) {
     this.config = {
       persistDirectory:
-        config.persistDirectory || process.env.LANCEDB_URI || '.claude/data/lancedb',
+        config.persistDirectory || process.env.LANCEDB_URI || '.claude/context/data/lancedb',
       collectionName: config.collectionName || process.env.LANCEDB_TABLE || 'agent_memory',
       embeddingMode: config.embeddingMode || process.env.LANCEDB_EMBEDDING_MODE || 'transformers',
       embeddingModel:
@@ -138,7 +138,7 @@ class MemoryVectorStore {
 
   static _makeKey(config) {
     const persistDirectory =
-      config.persistDirectory || process.env.LANCEDB_URI || '.claude/data/lancedb';
+      config.persistDirectory || process.env.LANCEDB_URI || '.claude/context/data/lancedb';
     const collectionName = config.collectionName || process.env.LANCEDB_TABLE || 'agent_memory';
     const embeddingMode =
       config.embeddingMode || process.env.LANCEDB_EMBEDDING_MODE || 'transformers';

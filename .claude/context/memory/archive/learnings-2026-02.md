@@ -14,6 +14,7 @@ Two critical bugs in `index-manager.cjs` `_discoverFiles()` method caused OOM cr
 ### Root Cause
 
 **Bug 1 (Path Separator):**
+
 - On Windows, `path.relative()` returns backslash-separated paths
 - Exclude pattern `**/node_modules/**` converts to regex `.*node_modules.*` with `[^/]*` for single `*`
 - The regex `[^/]*` matches "anything except forward slash" but Windows paths use backslashes
@@ -21,6 +22,7 @@ Two critical bugs in `index-manager.cjs` `_discoverFiles()` method caused OOM cr
 - Consequence: Zero exclusions on Windows, indexer processes entire `node_modules/`, `.git/`, etc.
 
 **Bug 2 (Symlink Boundary):**
+
 - `_discoverFiles()` recursively descends into directories without checking if symlink/junction target is still within `projectRoot`
 - Windows junctions can point anywhere on filesystem (e.g., `node_modules\.bin` → `C:\Program Files\...`)
 - No boundary check → indexer follows junction → walks entire `C:\Program Files\Adobe\` tree
@@ -46,14 +48,15 @@ const regex = new RegExp(pattern.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*'))
 
 // After (correct glob semantics)
 const regexStr = pattern
-  .replace(/[.+^${}()|[\]\\]/g, '\\$&')  // Escape regex special chars (except * and ?)
-  .replace(/\*\*/g, '{{GLOBSTAR}}')        // Temp placeholder
-  .replace(/\*/g, '[^/]*')                  // Single * = anything except /
-  .replace(/{{GLOBSTAR}}/g, '.*');          // ** = anything including /
+  .replace(/[.+^${}()|[\]\\]/g, '\\$&') // Escape regex special chars (except * and ?)
+  .replace(/\*\*/g, '{{GLOBSTAR}}') // Temp placeholder
+  .replace(/\*/g, '[^/]*') // Single * = anything except /
+  .replace(/{{GLOBSTAR}}/g, '.*'); // ** = anything including /
 const regex = new RegExp('^' + regexStr + '$');
 ```
 
 **Why this is better:**
+
 - Escapes regex special characters in pattern (e.g., `.` becomes `\.`)
 - Handles `**` glob correctly (matches across path separators, not just within segments)
 - Anchors regex with `^` and `$` (exact match, not substring)
@@ -111,18 +114,21 @@ try {
 ### Key Learnings
 
 **Cross-Platform Path Handling:**
+
 - **ALWAYS normalize paths to forward slashes** when using regex matching
 - `path.relative()` returns platform-specific separators (backslash on Windows, forward slash on Unix)
 - Glob patterns assume forward slashes (Unix convention)
 - Solution: `.replace(/\\/g, '/')` after `path.relative()` for consistent matching
 
 **Glob-to-Regex Conversion:**
+
 - Naive conversion `replace(/\*/g, '[^/]*')` fails for patterns like `**/*.min.js`
 - Correct approach: escape special chars, use placeholder for `**`, convert `*` and `**` separately
 - Glob `**` means "zero or more path segments" → regex `.*`
 - Glob `*` means "zero or more chars except /" → regex `[^/]*`
 
 **Symlink/Junction Safety:**
+
 - **ALWAYS resolve and check symlink targets** against project boundary
 - `fs.realpath()` resolves symlinks to actual filesystem location
 - `resolvedTarget.startsWith(resolvedRoot)` ensures target is within project
@@ -130,11 +136,13 @@ try {
 - Broken symlinks throw on `fs.realpath()` - wrap in try/catch
 
 **Performance Impact:**
+
 - Without exclusions: indexer processes ~500,000+ files (node_modules/, .git/, Program Files/)
 - With exclusions: indexer processes ~5,000 files (actual source code)
 - 100x reduction in file count → prevents OOM crashes
 
 **Defensive Coding:**
+
 - Add try/catch around `fs.readdir()` for permission errors
 - Add boundary checks BEFORE recursing (fail early)
 - Resolve paths once at start of function (avoid repeated path.resolve() calls)
@@ -158,6 +166,7 @@ try {
 ### Related Issues
 
 This fix prevents the same class of bugs that caused:
+
 - Slow indexing on Windows (processing node_modules/)
 - OOM crashes on Windows (processing Program Files/)
 - Inconsistent behavior between Windows and Unix (paths not normalized)
@@ -1016,5 +1025,3 @@ Consolidated into pre-task-unified.cjs (1 file):
 - agent-context-pre-tracker.cjs
 
 Infrastructure wrappers (never used, 3 files):
-
-

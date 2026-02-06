@@ -1,8 +1,8 @@
 # Directory Structure Reference
 
 **Source:** CLAUDE.md Section 9
-**Version:** v2.2.5
-**Last Updated:** 2026-02-04
+**Version:** v2.3.0
+**Last Updated:** 2026-02-06
 
 ---
 
@@ -51,13 +51,35 @@ context/
 ├── artifacts/
 │   ├── plans/
 │   ├── research-reports/
-│   └── .gitkeep
+│   ├── architecture/
+│   ├── diagrams/
+│   ├── agent-catalog.md
+│   └── skill-catalog.md
+├── data/
+│   ├── lancedb/
+│   │   ├── bm25-index.json
+│   │   ├── chunks.lance/
+│   │   └── index-metadata.json
+│   └── memory.db
 ├── memory/
 │   ├── learnings.md
 │   ├── decisions.md
 │   ├── issues.md
-│   └── constitution.md
-└── evolution-state.json
+│   ├── constitution.md
+│   ├── behaviour.md
+│   └── named/
+├── metrics/
+│   ├── hook-metrics.jsonl
+│   └── spawn-log.jsonl
+├── runtime/
+│   ├── router-state.json
+│   ├── compression-reminder.txt
+│   └── reflection-reminder.txt
+├── teams/
+│   └── [team-name].csv
+├── access-stats.json
+├── agent-registry.json
+└── dashboard.json
 ```
 
 ### config/
@@ -221,12 +243,20 @@ schemas/
 
 ### Deleted/Deprecated Directories
 
-| Old Path            | Status                                        |
-| ------------------- | --------------------------------------------- |
-| `.claude/commands/` | Deleted (was empty)                           |
-| `.claude/temp/`     | Deleted (was empty)                           |
-| `.claude/tests/`    | Moved to root `tests/` directory (2026-01-28) |
-| `.claude/scripts/`  | Consolidated into `.claude/lib/workflow/`     |
+| Old Path                  | Status                                           | Date       |
+| ------------------------- | ------------------------------------------------ | ---------- |
+| `.claude/commands/`       | Deleted (was empty)                              | 2026-01-28 |
+| `.claude/temp/`           | Deleted (was empty)                              | 2026-01-28 |
+| `.claude/tests/`          | Moved to root `tests/` directory                 | 2026-01-28 |
+| `.claude/scripts/`        | Consolidated into `.claude/lib/workflow/`        | 2026-01-28 |
+| `.claude/data/`           | Moved to `.claude/context/data/`                 | 2026-02-06 |
+| `.claude/staging/`        | Deleted (test artifacts and temp files)          | 2026-02-06 |
+| `.claude/audit/`          | Deleted (one-time audit reports)                 | 2026-02-06 |
+| `.claude/archive/`        | Deleted (outdated hooks and libs)                | 2026-02-06 |
+| `.claude/references/`     | Moved to `.claude/docs/reference/` then deleted  | 2026-02-06 |
+| `.claude/teams/`          | Moved to `.claude/context/teams/`                | 2026-02-06 |
+| `.claude/docs/archive/`   | Deleted (one-time debug fix reports)             | 2026-02-06 |
+| `.claude/docs/reference/` | Deleted (AI-generated unused reference material) | 2026-02-06 |
 
 ### File Placement Enforcement
 

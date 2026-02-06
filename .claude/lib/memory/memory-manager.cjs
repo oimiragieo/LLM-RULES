@@ -167,7 +167,7 @@ function maybeSyncMemoryJson(filePath, projectRoot = PROJECT_ROOT) {
     const validated = validatePathWithinProject(filePath, projectRoot);
     if (!validated.safe) return;
 
-    const dbPath = path.join(projectRoot, '.claude', 'data', 'memory.db');
+    const dbPath = path.join(projectRoot, '.claude', 'context', 'data', 'memory.db');
     ensureEntityDbInitialized(dbPath);
     syncJsonMemory(filePath, dbPath);
 

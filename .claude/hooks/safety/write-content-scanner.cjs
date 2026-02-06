@@ -72,7 +72,6 @@ const DANGEROUS_PATTERNS = [
 // Safe directory patterns (allow these even if they contain secrets in documentation/examples)
 const SAFE_PATTERNS = [
   '.claude/context/memory/', // Memory files (learnings, issues, decisions)
-  '.claude/audit/', // Audit reports
   '.claude/context/artifacts/', // Artifacts (plans, reports, research)
   'tests/', // Test fixtures
   'docs/', // Documentation

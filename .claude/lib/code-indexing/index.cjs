@@ -7,6 +7,12 @@
 
 'use strict';
 
+// Default to BM25-only mode to avoid async pipeline OOM
+// Override with LANCEDB_EMBEDDING_MODE=hybrid for dense vectors
+if (!process.env.LANCEDB_EMBEDDING_MODE) {
+  process.env.LANCEDB_EMBEDDING_MODE = 'off';
+}
+
 const { CodeParser, LANGUAGE_GRAMMARS, EXTENSION_MAP } = require('./code-parser.cjs');
 const { SemanticChunker, CHUNK_TYPES } = require('./semantic-chunker.cjs');
 const { EmbeddingGenerator } = require('./embedding-generator.cjs');

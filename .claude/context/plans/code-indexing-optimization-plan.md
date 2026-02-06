@@ -200,7 +200,7 @@ Before creating ANY implementation artifact:
 - [ ] **1.3** Implement persistence layer (~2 hours)
   - **File:** `.claude/lib/code-indexing/bm25-indexer.cjs` (continued)
   - **Storage Format:** JSON file with compressed inverted index
-  - **Path:** `.claude/data/code-index/bm25-index.json`
+  - **Path:** `.claude/context/data/code-index/bm25-index.json`
   - **Features:**
     - Atomic writes (write to temp, rename)
     - Lazy loading (load on first search if not in memory)
@@ -322,7 +322,7 @@ git commit -m "checkpoint: Phase 1 BM25 foundation complete"
         "enabled": true,
         "k1": 1.2,
         "b": 0.75,
-        "persistPath": ".claude/data/code-index/bm25-index.json",
+        "persistPath": ".claude/context/data/code-index/bm25-index.json",
         "candidateLimit": 100
       },
       "search": {

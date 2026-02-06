@@ -29,7 +29,7 @@ if errorlevel 1 (
 
 echo.
 echo [3/5] Building code index...
-node --max-old-space-size=32768 .claude/tools/cli/index-codebase.cjs index
+node .claude/tools/cli/index-codebase.cjs index
 if errorlevel 1 (
   echo WARNING: Code indexing may have failed
 )

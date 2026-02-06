@@ -104,7 +104,7 @@ const DEFAULT_OPTIONS = {
     '**/node_modules/**',
     '**/.git/**',
     '**/.claude/context/code-index/**',
-    '**/.claude/data/**',
+    '**/.claude/context/data/**',
     '**/local_cache/**',
     '**/dist/**',
     '**/build/**',

@@ -336,7 +336,7 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
 
   let entityCount = 0;
   let relationshipCount = 0;
-  const dbPath = path.join(projectRoot, '.claude', 'data', 'memory.db');
+  const dbPath = path.join(projectRoot, '.claude', 'context', 'data', 'memory.db');
   if (fs.existsSync(dbPath)) {
     try {
       const { DatabaseSync } = require('node:sqlite');
@@ -567,7 +567,7 @@ async function getLanceDBStatus(projectRoot = PROJECT_ROOT) {
   try {
     const { MemoryVectorStore } = require('./lancedb-client.cjs');
     const store = new MemoryVectorStore({
-      persistDirectory: path.join(projectRoot, '.claude', 'data', 'lancedb'),
+      persistDirectory: path.join(projectRoot, '.claude', 'context', 'data', 'lancedb'),
     });
     await store.initialize();
     if (typeof store.getEmbeddingStatus === 'function') {

@@ -126,7 +126,7 @@ Following the Cursor architecture, our pipeline consists of 7 distinct stages:
 │ 5. VECTOR STORAGE (LanceDB)                                         │
 │    Store embeddings + metadata in local vector database             │
 │    HNSW indexing for fast similarity search                        │
-│    Persistent storage: .claude/data/code-index                     │
+│    Persistent storage: .claude/context/data/code-index                     │
 └─────────────────────────────────┬───────────────────────────────────┘
                                   ↓
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -478,7 +478,7 @@ class PathObfuscator {
 
 ```javascript
 const CONFIG = {
-  persistDirectory: '.claude/data/code-index',
+  persistDirectory: '.claude/context/data/code-index',
   collectionName: 'agent-studio-code',
   embeddingDimensions: 384, // all-MiniLM-L6-v2
   distanceFunction: 'cosine',
@@ -748,7 +748,7 @@ const DEFAULT_EXCLUDES = [
   '**/package-lock.json',
   '**/yarn.lock',
   '**/pnpm-lock.yaml',
-  '**/.claude/data/**',
+  '**/.claude/context/data/**',
 ];
 ```
 
@@ -922,7 +922,7 @@ for (const result of results.results) {
     "cacheEnabled": true
   },
   "vectorStore": {
-    "persistDirectory": ".claude/data/code-index",
+    "persistDirectory": ".claude/context/data/code-index",
     "collectionName": "agent-studio-code",
     "distanceFunction": "cosine"
   },
@@ -950,7 +950,7 @@ CODE_INDEX_EMBEDDING_PROVIDER=openai  # 'local' | 'openai'
 CODE_INDEX_OPENAI_API_KEY=sk-...      # Required if provider=openai
 
 # Override storage location
-CODE_INDEX_DATA_DIR=.claude/data/code-index
+CODE_INDEX_DATA_DIR=.claude/context/data/code-index
 
 # Disable indexing
 CODE_INDEX_ENABLED=false

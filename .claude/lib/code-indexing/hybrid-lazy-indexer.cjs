@@ -24,7 +24,7 @@ class HybridLazyIndexer {
   constructor(options = {}) {
     this.projectRoot = options.projectRoot || process.cwd();
     this.cacheDir = path.join(this.projectRoot, '.claude', 'context', 'code-index');
-    this.lanceDbPath = path.join(this.projectRoot, '.claude', 'data', 'lancedb');
+    this.lanceDbPath = path.join(this.projectRoot, '.claude', 'context', 'data', 'lancedb');
 
     // Configuration
     this.config = {
