@@ -126,7 +126,7 @@ Skill({ skill: 'sequential-thinking' });
 
 ```javascript
 // Check for naming conflicts
-Read('@.claude/context/artifacts/skill-catalog.md');
+Read('@.claude/context/artifacts/catalogs/skill-catalog.md');
 Grep('proposed-name', '@.claude/agents/');
 Grep('proposed-name', '@.claude/skills/');
 
@@ -423,7 +423,7 @@ if (artifactType === 'agent') {
 
 // 2. Update skill catalog (for skills)
 if (artifactType === 'skill') {
-  Edit('@.claude/context/artifacts/skill-catalog.md', 'new skill entry');
+  Edit('@.claude/context/artifacts/catalogs/skill-catalog.md', 'new skill entry');
 }
 
 // 3. Record in evolution state
@@ -451,7 +451,7 @@ Edit('@.claude/context/memory/decisions.md', 'design decisions from research');
 grep "<agent-name>" @.claude/CLAUDE.md || echo "FAILED: Not in routing table"
 
 # For skills
-grep "<skill-name>" @.claude/context/artifacts/skill-catalog.md || echo "FAILED: Not in catalog"
+grep "<skill-name>" @.claude/context/artifacts/catalogs/skill-catalog.md || echo "FAILED: Not in catalog"
 ```
 
 **Final State**:

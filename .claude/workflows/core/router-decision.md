@@ -60,7 +60,7 @@ flowchart TD
 
 ```javascript
 // Read creator registry to check for duplicates
-Read('.claude/context/artifacts/creator-registry.json');
+Read('.claude/context/artifacts/catalogs/creator-registry.json');
 
 // Search for similar agents/skills/workflows
 Glob('.claude/agents/**/*.md');

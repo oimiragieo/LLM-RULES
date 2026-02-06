@@ -44,7 +44,7 @@ const { safeReadJSON } = require('../utils/safe-json.cjs');
 const DEFAULT_PATHS = {
   claudeMd: '.claude/CLAUDE.md',
   settingsJson: '.claude/settings.json',
-  skillCatalog: '.claude/context/artifacts/skill-catalog.md',
+  skillCatalog: '.claude/context/artifacts/catalogs/skill-catalog.md',
   routerEnforcer: '.claude/lib/routing/routing-table.cjs',
   backups: '.claude/context/backups',
 };

@@ -707,7 +707,7 @@ Write learnings after completing.
 
 **Step 3: Add to Skill Catalog**
 
-Update `.claude/context/artifacts/skill-catalog.md`
+Update `.claude/context/artifacts/catalogs/skill-catalog.md`
 
 **Step 4: Assign to Agents**
 

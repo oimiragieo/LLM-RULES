@@ -1505,7 +1505,7 @@
                   "name": "creator-registry.json",
                   "hash": "32e6fd81742105d217a5c2cc3bcc182c86694bbd9e4553ae172ff73941a94e55",
                   "metadata": {
-                    "path": ".claude/context/artifacts/creator-registry.json",
+                    "path": ".claude/context/artifacts/catalogs/creator-registry.json",
                     "size": 41061,
                     "mtime": 1769409712219.9954
                   }
@@ -3545,7 +3545,7 @@
                   "name": "skill-catalog.md",
                   "hash": "a66f9baed613020c548865e0d65fd718524818442ef2c4609eb58065c7910344",
                   "metadata": {
-                    "path": ".claude/context/artifacts/skill-catalog.md",
+                    "path": ".claude/context/artifacts/catalogs/skill-catalog.md",
                     "size": 44185,
                     "mtime": 1769831707759.7056
                   }
@@ -3665,7 +3665,7 @@
                   "name": "template-catalog.md",
                   "hash": "8f98c87e86c4aeb96162c953e7ce2ca3829e59739d6f3fa10a023e400da0ea02",
                   "metadata": {
-                    "path": ".claude/context/artifacts/template-catalog.md",
+                    "path": ".claude/context/artifacts/catalogs/template-catalog.md",
                     "size": 8732,
                     "mtime": 1769586416818.9602
                   }
@@ -3745,7 +3745,7 @@
                   "name": "workflow-registry.json",
                   "hash": "af630c48a488588e10b1c7fd141265e61c4e2e5b5478e9c2cdb3c308e0aded96",
                   "metadata": {
-                    "path": ".claude/context/artifacts/workflow-registry.json",
+                    "path": ".claude/context/artifacts/catalogs/workflow-registry.json",
                     "size": 19363,
                     "mtime": 1770265641791.1887
                   }

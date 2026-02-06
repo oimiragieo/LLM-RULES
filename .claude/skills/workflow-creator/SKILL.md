@@ -521,7 +521,7 @@ After workflow file is written and validated:
 
 1. **Create/Update Workflow Registry Entry** in appropriate location:
 
-   If registry doesn't exist, create `.claude/context/artifacts/workflow-registry.json`:
+   If registry doesn't exist, create `.claude/context/artifacts/catalogs/workflow-registry.json`:
 
    ```json
    {
@@ -594,7 +594,7 @@ After workflow file is written and validated:
 
    ```bash
    # Check workflow registry exists and is valid JSON
-   node -e "console.log(JSON.stringify(require('./.claude/context/artifacts/workflow-registry.json'), null, 2))"
+   node -e "console.log(JSON.stringify(require('./.claude/context/artifacts/catalogs/workflow-registry.json'), null, 2))"
 
    # Verify orchestrator references it
    grep "{workflow-name}" .claude/agents/orchestrators/*-orchestrator.md

@@ -59,7 +59,7 @@ Verify code indexing configuration, BM25 persistence, hook registration, and inc
 **skill-index.json Generation Pattern**:
 
 - Generator script: `.claude/tools/cli/generate-skill-index.cjs`
-- Sources: `.claude/context/artifacts/skill-catalog.md` + individual SKILL.md files
+- Sources: `.claude/context/artifacts/catalogs/skill-catalog.md` + individual SKILL.md files
 - Output structure: `{ version, metadata: { totalSkills }, skills: { skillName: {...} } }`
 - Count mismatch (434 vs 444) acceptable - some skills may not be cataloged (scientific-skills subdirs)
 
@@ -342,3 +342,165 @@ All 3 reported code-indexing failures were resolved:
 - **Test Files Updated**: 2 files
 - **Total Passing**: 31/31 tests (100% pass rate)
 - **No Breaking Changes**: Both tools work identically, only test infrastructure updated
+
+## Session Cleanup Hook Implementation (2026-02-06)
+
+### Task
+
+Create a PreToolUse hook that automatically cleans up stale files in `.claude/context/tmp/` older than 24 hours.
+
+### Implementation
+
+**Hook File**: `.claude/hooks/session/session-cleanup.cjs`
+
+**Features**:
+
+- Runs once per session (on first tool invocation)
+- Deletes files with mtime > 24 hours
+- NEVER blocks tools (always returns `{ "decision": "approve" }`)
+- Gracefully handles missing tmp directory
+- Logs cleanup stats to stderr (never stdout)
+- Uses session-scoped flag to prevent duplicate runs
+
+**Registration**: Added to `.claude/settings.json` under `PreToolUse` → matcher "" (all tools)
+
+**Test Results**:
+
+- Successfully deletes old files (tested: 1 file, 16 bytes deleted)
+- Returns correct JSON output format
+- Handles missing directory gracefully (returns zeros)
+- Session tracking prevents duplicate runs
+- Never blocks tools (always approves)
+
+### Key Learnings
+
+**Hook Design Pattern for Session-Level Operations**:
+
+- Use module-level state (`let cleanupRan = false`) to track session lifecycle
+- Check flag at start, skip if already run, set flag before operation
+- This prevents expensive operations from running on every tool invocation
+- Ideal for cleanup, initialization, or one-time setup tasks
+
+**tmp/ Directory Cleanup Best Practices**:
+
+- Use `fs.statSync(filePath).mtimeMs` to get modification time
+- Calculate age: `now - stats.mtimeMs`
+- Compare age to threshold (24 hours = 24 _ 60 _ 60 \* 1000 ms)
+- Skip directories with `stats.isDirectory()` check
+- Handle errors per-file (continue with other files if one fails)
+
+**Hook Registration Order**:
+
+- Session cleanup should run FIRST (before monitoring/validation hooks)
+- This ensures cleanup happens before expensive operations
+- Placement: First entry in PreToolUse matcher "" hooks array
+
+### Files Created
+
+1. `.claude/hooks/session/session-cleanup.cjs` (new)
+2. `.claude/settings.json` (updated - added session-cleanup to PreToolUse hooks)
+
+## Artifact Root Files Migration (2026-02-06)
+
+### Task
+
+Bulk migrate all artifact root files into appropriate subdirectories (Task #23).
+
+### Execution Summary
+
+**Files Migrated**: 58 files from `.claude/context/artifacts/` root into subdirectories
+
+**Categorization**:
+
+- Catalogs (4 files) → `artifacts/catalogs/`
+  - skill-catalog.md, template-catalog.md, creator-registry.json, workflow-registry.json
+- Analysis (16 files) → `artifacts/analysis/`
+  - architectural-preservation-strategy.md, architecture-review-findings.md, gap-analysis-conductor-vs-agent-studio.md, heap-oom-analysis.md, etc.
+- Summaries (21 files) → `artifacts/summaries/`
+  - AGENT_SKILLS_SUMMARY.md, FRAMEWORK-DEEP-DIVE-REPORT.md, MEMORY_MANAGEMENT_IMPLEMENTATION_SUMMARY.md, etc.
+- Specifications (4 files) → `artifacts/specs/`
+  - AST_GREP_PATTERNS.md, transformation-decision-tree.md, upgrade-implementation-roadmap.md, etc.
+- Plans (4 files) → `artifacts/plans/`
+  - PHASE_1_IMPLEMENTATION_PLAN.md, PHASE_2_HYBRID_SEARCH_DESIGN.md, deployment-execution-log.md
+- Security (7 files) → `artifacts/security-reviews/`
+  - error-logging-security-guidelines.md, security-assessment-phase0.md, security-audit-findings.md, etc.
+- Database (2 files) → `artifacts/database/`
+  - dependency-report.json, knowledge-base-index.csv
+
+**Path Reference Updates**: 31+ files updated with new paths
+
+- `.claude/CLAUDE.md` (skill-catalog path)
+- Agent files: planner.md, developer.md, qa.md, architect.md, etc.
+- Tools: generate-skill-index.cjs, generate-workflow-registry.cjs
+- Workflows: skill-creator-workflow.yaml, evolution-workflow.md
+- Documentation: GETTING_STARTED.md, DEVELOPER_WORKFLOW.md, @SKILL_CATALOG_TABLE.md
+
+**Command Used**: `find` + `sed -i` to batch update path references across all .md, .cjs, .json, .yaml files
+
+### Verification
+
+✅ All 58 files successfully moved to subdirectories
+✅ No files remain in artifacts root (only .gitkeep)
+✅ All path references updated (no broken links)
+✅ Critical files verified at new locations:
+
+- skill-catalog.md → catalogs/skill-catalog.md
+- Old paths removed
+
+### Key Learnings
+
+**Artifact Migration Pattern**:
+
+- Categorize files by content type (catalogs vs analysis vs summaries vs specs)
+- Use descriptive subdirectory names matching workspace conventions
+- Update path references BEFORE committing moves (prevents broken state)
+- Use `find` + `sed -i` for batch path updates across codebase
+
+**sed -i Batch Update Pattern**:
+
+```bash
+find . -type f \( -name "*.md" -o -name "*.cjs" -o -name "*.json" \) \
+  ! -path "./.git/*" ! -path "./node_modules/*" \
+  -exec sed -i 's|old-path|new-path|g' {} +
+```
+
+**Path Reference Verification**:
+
+- Search for old path: `grep -r "artifacts/skill-catalog\.md"`
+- Should return 0 results (or only in this learnings file)
+- Verify new path exists: `test -f new-path && echo "✓"`
+- Test critical file access after migration
+
+**Files Not Under Version Control**:
+
+- Untracked files cannot use `git mv` (will fail with "not under version control")
+- Use regular `mv` for untracked files, then stage them with `git add`
+- Artifacts directory files were untracked, so used `mv` instead of `git mv`
+
+**Related Workspace Conventions**:
+
+- See `.claude/rules/workspace-conventions.md` for file placement rules
+- Reports → `.claude/context/reports/` (by domain)
+- Plans → `.claude/context/plans/`
+- Artifacts → `.claude/context/artifacts/` (by type: catalogs, analysis, summaries, specs)
+
+### Impact
+
+- ✅ Cleaner artifact directory structure (no root clutter)
+- ✅ Easier to find files by category
+- ✅ Follows workspace conventions
+- ✅ No broken references in codebase
+- ✅ All 31+ referencing files updated automatically
+
+### Files Modified
+
+Path reference updates in 31+ files including:
+
+- .claude/CLAUDE.md
+- .claude/agents/core/{planner,developer,qa,architect,pm,technical-writer,context-compressor}.md
+- .claude/agents/orchestrators/evolution-orchestrator.md
+- .claude/config/skill-index.json
+- .claude/tools/cli/generate-skill-index.cjs
+- .claude/workflows/creators/skill-creator-workflow.yaml
+- .claude/docs/{GETTING_STARTED,DEVELOPER_WORKFLOW,@SKILL_CATALOG_TABLE}.md
+- And 19 more...

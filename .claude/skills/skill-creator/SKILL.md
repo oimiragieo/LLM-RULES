@@ -60,7 +60,7 @@ Create, validate, install, and convert skills for the multi-agent ecosystem.
 
 ```
 1. CLAUDE.md - Add to Section 8.5 "WORKFLOW ENHANCEMENT SKILLS" if user-invocable
-2. Skill Catalog - Add to .claude/context/artifacts/skill-catalog.md
+2. Skill Catalog - Add to .claude/context/artifacts/catalogs/skill-catalog.md
 3. learnings.md - Update with integration summary
 ```
 
@@ -68,7 +68,7 @@ Create, validate, install, and convert skills for the multi-agent ecosystem.
 
 ```bash
 grep "<skill-name>" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED!"
-grep "<skill-name>" .claude/context/artifacts/skill-catalog.md || echo "ERROR: Skill catalog NOT UPDATED!"
+grep "<skill-name>" .claude/context/artifacts/catalogs/skill-catalog.md || echo "ERROR: Skill catalog NOT UPDATED!"
 ```
 
 **WHY**: Skills not in CLAUDE.md are invisible to the Router. Skills not in the catalog are hard to discover.
@@ -590,7 +590,7 @@ Concrete usage examples.
 - Companion tools: `.claude/tools/[skill-name]/`
 - Converted MCP skills: `.claude/skills/[server-name]-mcp/`
 - Workflow examples: `.claude/workflows/[skill-name]-skill-workflow.md`
-- **Skill catalog**: `.claude/context/artifacts/skill-catalog.md` (MUST UPDATE)
+- **Skill catalog**: `.claude/context/artifacts/catalogs/skill-catalog.md` (MUST UPDATE)
 - Memory updates: `.claude/context/memory/learnings.md`
 - Logs: `.claude/context/tmp/skill-creator.log`
 
@@ -818,7 +818,7 @@ Update the skill catalog to ensure the new skill is discoverable.
 1. **Read current catalog:**
 
    ```bash
-   cat .claude/context/artifacts/skill-catalog.md
+   cat .claude/context/artifacts/catalogs/skill-catalog.md
    ```
 
 2. **Determine skill category** based on domain:
@@ -848,7 +848,7 @@ Update the skill catalog to ensure the new skill is discoverable.
 
 5. **Verify update:**
    ```bash
-   grep "{skill-name}" .claude/context/artifacts/skill-catalog.md || echo "ERROR: Skill catalog NOT UPDATED!"
+   grep "{skill-name}" .claude/context/artifacts/catalogs/skill-catalog.md || echo "ERROR: Skill catalog NOT UPDATED!"
    ```
 
 **BLOCKING**: Skill must appear in catalog. Uncataloged skills are hard to discover.
@@ -891,7 +891,7 @@ head -20 .claude/skills/{skill-name}/SKILL.md | grep "^name:"
 grep "{skill-name}" .claude/CLAUDE.md
 
 # Check skill catalog has skill
-grep "{skill-name}" .claude/context/artifacts/skill-catalog.md
+grep "{skill-name}" .claude/context/artifacts/catalogs/skill-catalog.md
 
 # Check agents have skill assigned
 grep -r "{skill-name}" .claude/agents/
@@ -971,7 +971,7 @@ After the skill is created and validated, you MUST regenerate the skill index:
 
 - **File**: `.claude/config/skill-index.json` (runtime skill discovery registry)
 - **Tool**: `SkillCatalog()` for skill discovery by domain/category/agent type
-- **Reference**: `.claude/context/artifacts/skill-catalog.md` (documentation)
+- **Reference**: `.claude/context/artifacts/catalogs/skill-catalog.md` (documentation)
 - **Metadata**: `requiredTools`, `agentPrimary`, `agentSupporting`, `tags`, `priority`, `category`, `description`
 
 **Troubleshooting:**
@@ -1119,7 +1119,7 @@ These rules are INVIOLABLE. Breaking them causes bugs that are hard to detect.
    - Unassigned skills are never invoked
 
 6. NO CREATION WITHOUT CATALOG UPDATE
-   - Skill must be added to .claude/context/artifacts/skill-catalog.md
+   - Skill must be added to .claude/context/artifacts/catalogs/skill-catalog.md
    - Uncataloged skills are hard to discover
    - Add to correct category table with description and tools
 

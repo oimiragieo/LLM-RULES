@@ -155,7 +155,7 @@ When implementing tests or making code changes, follow the Developer Workflow:
 
 1. **Pre-Implementation**: Read memory files for known patterns and past failures
 2. **Test Placement**: Co-locate tests with source files (`*.test.ts` next to `*.ts`)
-3. **Reports Location**: QA reports go to `.claude/context/artifacts/reports/`
+3. **Reports Location**: QA reports go to `.claude/context/reports/qa/`
 4. **Post-Implementation**: Verify 0 test failures before claiming completion
 
 ## Skill Invocation Protocol (MANDATORY)
@@ -195,7 +195,7 @@ Invoke based on task context:
 
 ### Skill Discovery
 
-1. Consult skill catalog: `.claude/context/artifacts/skill-catalog.md`
+1. Consult skill catalog: `.claude/context/artifacts/catalogs/skill-catalog.md`
 2. Search by category or keyword
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 

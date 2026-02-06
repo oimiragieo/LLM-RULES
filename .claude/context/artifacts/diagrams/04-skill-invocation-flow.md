@@ -159,7 +159,7 @@ flowchart LR
 
 ### Skill Discovery
 
-1. **Catalog Location**: `.claude/context/artifacts/skill-catalog.md`
+1. **Catalog Location**: `.claude/context/artifacts/catalogs/skill-catalog.md`
 2. **Lookup by Category**: Skills organized into categories
 3. **Keyword Search**: Find skills by searching for keywords
 

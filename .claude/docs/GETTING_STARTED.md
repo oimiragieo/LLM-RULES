@@ -163,7 +163,7 @@ Agents don't just "know things"—they **invoke skills** to execute work. Skills
 - `plan-generator` - Planning methodology
 - `verification-before-completion` - Quality gates
 
-The skill catalog contains **426 skills** organized into 20+ categories. Browse the [Skill Catalog](.claude/context/artifacts/skill-catalog.md) to see what's available.
+The skill catalog contains **426 skills** organized into 20+ categories. Browse the [Skill Catalog](.claude/context/artifacts/catalogs/skill-catalog.md) to see what's available.
 
 ## Slash Commands (Quick Actions)
 
@@ -353,7 +353,7 @@ Agent Studio:
 
 - **[CLAUDE.md](../CLAUDE.md)**: Complete framework reference
 - **[ROUTER_PROTOCOL.md](./ROUTER_PROTOCOL.md)**: Router decision-making process
-- **[Skill Catalog](../context/artifacts/skill-catalog.md)**: Browse all 426 skills
+- **[Skill Catalog](../context/artifacts/catalogs/skill-catalog.md)**: Browse all 426 skills
 - **[Agent Directory](../agents/)**: Explore agent definitions
 - **[Workflows](../workflows/)**: Multi-agent coordination patterns
 - **[HOOKS_AND_SAFETY.md](./HOOKS_AND_SAFETY.md)**: Safety validators and hooks

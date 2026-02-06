@@ -30,6 +30,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/session/session-cleanup.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/monitoring/execution-limit-monitor-hook.cjs"
           },
           {

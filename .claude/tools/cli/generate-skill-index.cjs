@@ -778,7 +778,7 @@ function generateIndex(options = {}) {
       totalDomains: Object.keys(byDomain).length,
       totalCategories: Object.keys(byCategory).length,
       lastValidated: new Date().toISOString(),
-      source: '.claude/context/artifacts/skill-catalog.md',
+      source: '.claude/context/artifacts/catalogs/skill-catalog.md',
     },
     skills,
     index: {

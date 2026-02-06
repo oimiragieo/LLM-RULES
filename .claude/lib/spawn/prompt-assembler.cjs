@@ -556,7 +556,7 @@ Skill({ skill: 'debugging' });  // Invoke debugging skill
 - For change awareness: \`git status --porcelain\` and \`git diff\`
 
 ### Finding Capabilities
-For a full skill list: Read .claude/context/artifacts/skill-catalog.md
+For a full skill list: Read .claude/context/artifacts/catalogs/skill-catalog.md
 For skill search: Look for skills matching your task domain
 For new skills: Domain experts (language-specific agents) have domain-focused skills
 `;

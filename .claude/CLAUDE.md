@@ -400,7 +400,7 @@ Skill({ skill: 'debugging' });
 // WRONG: Read('.claude/skills/tdd/SKILL.md');
 ```
 
-**Skill Catalog:** `.claude/context/artifacts/skill-catalog.md`
+**Skill Catalog:** `.claude/context/artifacts/catalogs/skill-catalog.md`
 **Discovery:** read catalog → search category/keyword → `Skill({ skill: "<name>" })`
 
 ---

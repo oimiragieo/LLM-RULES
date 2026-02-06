@@ -283,7 +283,7 @@ For stability, prefer the **headless harnesses** above. UI multi-agent orchestra
 **Quick References:**
 
 - **Agent-Skill Matrix**: `.claude/context/config/agent-skill-matrix.json` (central mapping)
-- **Skill Catalog**: `.claude/context/artifacts/skill-catalog.md` (complete skill list)
+- **Skill Catalog**: `.claude/context/artifacts/catalogs/skill-catalog.md` (complete skill list)
 - **Router Keywords**: `.claude/docs/ROUTER_KEYWORD_GUIDE.md` (intent routing)
 - **Pre-commit security lint**: `.claude/docs/SECURITY_LINT.md` (exclusions, configuration, bypass)
 

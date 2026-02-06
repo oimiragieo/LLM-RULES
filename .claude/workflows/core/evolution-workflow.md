@@ -158,7 +158,7 @@ Glob('.claude/workflows/**/*.md');
 Grep('similar-capability-pattern', '.claude/');
 
 // 3. Read skill catalog for existing solutions
-Read('.claude/context/artifacts/skill-catalog.md');
+Read('.claude/context/artifacts/catalogs/skill-catalog.md');
 
 // 4. Analyze the gap using structured thinking
 // (Use mcp__sequential-thinking__sequentialthinking if available)
@@ -229,7 +229,7 @@ Edit('.claude/context/evolution-state.json', {
 });
 
 // 2. Check naming conflicts
-Read('.claude/context/artifacts/skill-catalog.md');
+Read('.claude/context/artifacts/catalogs/skill-catalog.md');
 Grep('proposed-name', '.claude/agents/');
 Grep('proposed-name', '.claude/skills/');
 Grep('proposed-name', '.claude/workflows/');
@@ -649,7 +649,7 @@ if (artifactType === 'agent') {
 
 // 3. Update skill catalog (for skills)
 if (artifactType === 'skill') {
-  Edit('.claude/context/artifacts/skill-catalog.md', 'new skill entry');
+  Edit('.claude/context/artifacts/catalogs/skill-catalog.md', 'new skill entry');
 }
 
 // 4. Update workflow table (for workflows)
@@ -688,7 +688,7 @@ Edit('.claude/context/memory/decisions.md', 'ADR for design decisions');
 grep "<agent-name>" .claude/CLAUDE.md || echo "FAILED: Not in routing table"
 
 # For skills - MUST succeed
-grep "<skill-name>" .claude/context/artifacts/skill-catalog.md || echo "FAILED: Not in catalog"
+grep "<skill-name>" .claude/context/artifacts/catalogs/skill-catalog.md || echo "FAILED: Not in catalog"
 
 # For workflows - MUST succeed
 grep "<workflow-name>" .claude/CLAUDE.md || echo "FAILED: Not in workflow table"

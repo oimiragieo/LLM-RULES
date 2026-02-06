@@ -84,7 +84,7 @@ grep "skill-lifecycle" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED!"
 Before starting this workflow:
 
 1. **Required context**: Artifact purpose, target domain, expected inputs/outputs
-2. **Required files**: Creator registry (`.claude/context/artifacts/creator-registry.json`)
+2. **Required files**: Creator registry (`.claude/context/artifacts/catalogs/creator-registry.json`)
 3. **Required permissions**: Write access to `.claude/` directories
 
 ## Phase 1: Discovery
@@ -124,8 +124,8 @@ Subject: Discover artifact: $ARTIFACT_NAME
    - Workflows: Glob pattern ".claude/workflows/**/$ARTIFACT_NAME.md"
    - Templates: Glob pattern ".claude/templates/**/$ARTIFACT_NAME.md"
    - Schemas: Glob pattern ".claude/schemas/$ARTIFACT_NAME.schema.json"
-3. Check creator registry: .claude/context/artifacts/creator-registry.json
-4. Search skill catalog: .claude/context/artifacts/skill-catalog.md
+3. Check creator registry: .claude/context/artifacts/catalogs/creator-registry.json
+4. Search skill catalog: .claude/context/artifacts/catalogs/skill-catalog.md
 5. Check learnings.md for similar artifacts: .claude/context/memory/learnings.md
 6. Save findings to: .claude/context/reports/artifact-discovery-$ARTIFACT_NAME.md
 
@@ -538,11 +538,11 @@ Subject: Update catalogs/registries for: $ARTIFACT_NAME
 ## Instructions
 1. **Claim task**: TaskUpdate({ taskId: "$TASK_ID", status: "in_progress" })
 2. **Invoke skills**: Skill({ skill: "tdd" })
-3. Update creator registry: .claude/context/artifacts/creator-registry.json
+3. Update creator registry: .claude/context/artifacts/catalogs/creator-registry.json
    - Add artifact to appropriate array (agents/skills/hooks/workflows)
    - Update summary counts
    - Add relationships (agentToSkills, skillToAgents, etc.)
-4. Update skill catalog (if skill): .claude/context/artifacts/skill-catalog.md
+4. Update skill catalog (if skill): .claude/context/artifacts/catalogs/skill-catalog.md
    - Add skill to category section
    - Include description and key features
 5. Update CLAUDE.md (BLOCKING - MANDATORY):
@@ -553,7 +553,7 @@ Subject: Update catalogs/registries for: $ARTIFACT_NAME
 6. Verify integration:
 
    grep "$ARTIFACT_NAME" .claude/CLAUDE.md || echo "ERROR: NOT IN CLAUDE.md"
-   grep "$ARTIFACT_NAME" .claude/context/artifacts/creator-registry.json || echo "ERROR: NOT IN REGISTRY"
+   grep "$ARTIFACT_NAME" .claude/context/artifacts/catalogs/creator-registry.json || echo "ERROR: NOT IN REGISTRY"
 
 7. Save integration summary to: .claude/context/reports/integrated-$ARTIFACT_NAME.md
 
@@ -858,7 +858,7 @@ Record lifecycle completion to .claude/context/memory/learnings.md
 ### Final Deliverables
 
 - [ ] Artifact file at `.claude/{type}/{name}/` or `.claude/{type}/{category}/{name}.md`
-- [ ] Creator registry updated: `.claude/context/artifacts/creator-registry.json`
+- [ ] Creator registry updated: `.claude/context/artifacts/catalogs/creator-registry.json`
 - [ ] CLAUDE.md updated with artifact reference
 - [ ] Test report: `.claude/context/reports/test-{name}.md`
 - [ ] Verification report: `.claude/context/reports/verified-{name}.md`

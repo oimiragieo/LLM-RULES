@@ -610,7 +610,7 @@ Invoke based on task requirements:
 **Consult the catalog**:
 
 ```bash
-cat .claude/context/artifacts/skill-catalog.md
+cat .claude/context/artifacts/catalogs/skill-catalog.md
 ```
 
 **Search by category or keyword, then invoke**:

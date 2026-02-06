@@ -41,12 +41,12 @@ Use [Mermaid Live Editor](https://mermaid.live/) to paste and view diagrams.
 
 ## Related Documentation
 
-| Document           | Location                                       | Description                 |
-| ------------------ | ---------------------------------------------- | --------------------------- |
-| CLAUDE.md          | `.claude/CLAUDE.md`                            | Main framework instructions |
-| Router Decision    | `.claude/workflows/core/router-decision.md`    | Routing workflow            |
-| Evolution Workflow | `.claude/workflows/core/evolution-workflow.md` | EVOLVE process              |
-| Skill Catalog      | `.claude/context/artifacts/skill-catalog.md`   | All available skills        |
+| Document           | Location                                              | Description                 |
+| ------------------ | ----------------------------------------------------- | --------------------------- |
+| CLAUDE.md          | `.claude/CLAUDE.md`                                   | Main framework instructions |
+| Router Decision    | `.claude/workflows/core/router-decision.md`           | Routing workflow            |
+| Evolution Workflow | `.claude/workflows/core/evolution-workflow.md`        | EVOLVE process              |
+| Skill Catalog      | `.claude/context/artifacts/catalogs/skill-catalog.md` | All available skills        |
 
 ## Updating Diagrams
 

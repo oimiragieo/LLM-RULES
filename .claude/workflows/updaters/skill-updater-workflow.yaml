@@ -21,7 +21,7 @@ updater_config:
   backup_location: .claude/context/backups/skills/
   compatibility_check: true
   registration_targets:
-    - '.claude/context/artifacts/skill-catalog.md'
+    - '.claude/context/artifacts/catalogs/skill-catalog.md'
     - '.claude/CLAUDE.md'
     - '.claude/context/memory/learnings.md'
   protected_sections:
@@ -359,7 +359,7 @@ compensate:
       description: Restore skill directory from backup
   enable:
     - action: revert_catalog
-      target: '.claude/context/artifacts/skill-catalog.md'
+      target: '.claude/context/artifacts/catalogs/skill-catalog.md'
       description: Revert skill catalog changes if made
     - action: revert_claude_md
       target: '.claude/CLAUDE.md'

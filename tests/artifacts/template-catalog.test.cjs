@@ -17,7 +17,10 @@ if (require.main === module) {
   let passed = 0;
   let failed = 0;
 
-  const catalogPath = path.join(__dirname, '../../.claude/context/artifacts/template-catalog.md');
+  const catalogPath = path.join(
+    __dirname,
+    '../../.claude/context/artifacts/catalogs/template-catalog.md'
+  );
 
   // Test 1: Catalog file exists
   if (!fs.existsSync(catalogPath)) {

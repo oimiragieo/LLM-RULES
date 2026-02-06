@@ -158,7 +158,7 @@ Invoke based on task context:
 
 ### Skill Discovery
 
-1. Consult skill catalog: `.claude/context/artifacts/skill-catalog.md`
+1. Consult skill catalog: `.claude/context/artifacts/catalogs/skill-catalog.md`
 2. Search by category or keyword
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 

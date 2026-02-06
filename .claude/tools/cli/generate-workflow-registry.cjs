@@ -3,7 +3,7 @@
  * Workflow Registry Generator
  * ===========================
  *
- * Generates .claude/context/artifacts/workflow-registry.json from workflow files.
+ * Generates .claude/context/artifacts/catalogs/workflow-registry.json from workflow files.
  *
  * Usage:
  *   node .claude/tools/cli/generate-workflow-registry.cjs [options]
@@ -14,7 +14,7 @@
  *   --verbose   Show detailed output
  *
  * Output:
- *   .claude/context/artifacts/workflow-registry.json
+ *   .claude/context/artifacts/catalogs/workflow-registry.json
  *
  * Created: 2026-02-05
  * Task: fix-wf-001 (WF-001: workflow-registry.json missing)

@@ -405,7 +405,7 @@ metadata:
   creation_date: 2026-01-25
   references:
     skill_md_source: .claude/skills/skill-creator/SKILL.md
-    catalog_location: .claude/context/artifacts/skill-catalog.md
+    catalog_location: .claude/context/artifacts/catalogs/skill-catalog.md
     claude_md_section: 8.5
   agent_domain_mapping:
     testing: [qa, developer]

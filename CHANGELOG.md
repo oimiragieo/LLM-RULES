@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Impact**: 80% → 100% decision documentation consistency
 
 - **Template Catalog Registry (Enhancement #5)**: Template discovery and usage tracking
-  - Catalog: `.claude/context/artifacts/template-catalog.md` with YAML frontmatter
+  - Catalog: `.claude/context/artifacts/catalogs/template-catalog.md` with YAML frontmatter
   - Lists all 4 templates: specification, plan, tasks, ADR
   - Usage tracking: `created_count`, `last_used` metadata for each template
   - Discovery mechanisms: by keyword, category, complexity, usage stats
