@@ -25,13 +25,13 @@ function getProjectRoot() {
 
   // Start from current working directory and walk up
   let currentDir = process.cwd();
-  
+
   while (currentDir !== path.parse(currentDir).root) {
     // Check for .claude directory (most reliable indicator)
     if (fs.existsSync(path.join(currentDir, '.claude'))) {
       return currentDir;
     }
-    
+
     // Check for package.json as fallback
     if (fs.existsSync(path.join(currentDir, 'package.json'))) {
       // Verify it has our scripts or name
@@ -44,13 +44,13 @@ function getProjectRoot() {
         // Continue searching
       }
     }
-    
+
     // Move up one directory
     const parentDir = path.dirname(currentDir);
     if (parentDir === currentDir) break; // Reached root
     currentDir = parentDir;
   }
-  
+
   // Fallback to NODE_PATH if set
   if (process.env.NODE_PATH) {
     // NODE_PATH might be .claude/lib, so go up two levels
@@ -60,7 +60,7 @@ function getProjectRoot() {
     }
     return path.resolve(nodePath, '..');
   }
-  
+
   // Last resort: use current working directory
   return process.cwd();
 }
@@ -73,7 +73,7 @@ function getLibDir() {
   if (process.env.NODE_PATH && fs.existsSync(process.env.NODE_PATH)) {
     return process.env.NODE_PATH;
   }
-  
+
   return path.join(getProjectRoot(), '.claude', 'lib');
 }
 
@@ -91,7 +91,7 @@ function getHooksDir() {
 function libRequire(modulePath) {
   const libDir = getLibDir();
   const fullPath = path.join(libDir, modulePath);
-  
+
   // Try with .cjs extension if no extension provided
   if (!path.extname(fullPath)) {
     try {
@@ -100,7 +100,7 @@ function libRequire(modulePath) {
       // Fall through to try without extension
     }
   }
-  
+
   return require(fullPath);
 }
 
@@ -111,7 +111,7 @@ function libRequire(modulePath) {
 function hooksRequire(modulePath) {
   const hooksDir = getHooksDir();
   const fullPath = path.join(hooksDir, modulePath);
-  
+
   // Try with .cjs extension if no extension provided
   if (!path.extname(fullPath)) {
     try {
@@ -120,7 +120,7 @@ function hooksRequire(modulePath) {
       // Fall through to try without extension
     }
   }
-  
+
   return require(fullPath);
 }
 
@@ -134,13 +134,13 @@ function resolveHookRequire(relativePath) {
     const subPath = relativePath.replace('../../lib/', '');
     return libRequire(subPath);
   }
-  
+
   // Handle ../... paths (relative to hooks subdirectory)
   if (relativePath.startsWith('../')) {
     // Already relative to hooks, use normal require
     return require(relativePath);
   }
-  
+
   // Default: treat as lib path
   return libRequire(relativePath);
 }

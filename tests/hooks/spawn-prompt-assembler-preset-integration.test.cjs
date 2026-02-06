@@ -15,12 +15,20 @@ const assert = require('assert');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const _PRESETS_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'presets.json');
-const ROUTER_STATE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+const ROUTER_STATE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'router-state.json'
+);
 
 // Import functions under test - these will fail until we implement them
 let loadPresets, getActivePreset, appendPresetSection;
 try {
-  const funcs = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'spawn-prompt-assembler.cjs'));
+  const funcs = require(
+    path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'spawn-prompt-assembler.cjs')
+  );
   loadPresets = funcs.loadPresets;
   getActivePreset = funcs.getActivePreset;
   appendPresetSection = funcs.appendPresetSection;
@@ -167,7 +175,8 @@ test('Preset Section Injection - should append preset section when agent matches
     },
   };
 
-  const basePrompt = 'You are PLANNER\n\n## AVAILABLE_TOOLS\n\n## AVAILABLE_SKILLS\n\n## SKILL DISCOVERY PROTOCOL';
+  const basePrompt =
+    'You are PLANNER\n\n## AVAILABLE_TOOLS\n\n## AVAILABLE_SKILLS\n\n## SKILL DISCOVERY PROTOCOL';
   const result = appendPresetSection(basePrompt, 'planner', 'planning-heavy', presets);
 
   assert.ok(result.includes('## Active Preset: planning-heavy'), 'Should include preset header');
@@ -276,12 +285,16 @@ test('Preset Section Injection - should insert preset section before SKILL DISCO
     },
   };
 
-  const basePrompt = 'You are PLANNER\n\n## AVAILABLE_TOOLS\n\n## SKILL DISCOVERY PROTOCOL\n\nContent here';
+  const basePrompt =
+    'You are PLANNER\n\n## AVAILABLE_TOOLS\n\n## SKILL DISCOVERY PROTOCOL\n\nContent here';
   const result = appendPresetSection(basePrompt, 'planner', 'planning-heavy', presets);
 
   const presetIndex = result.indexOf('## Active Preset');
   const skillProtocolIndex = result.indexOf('## SKILL DISCOVERY PROTOCOL');
-  assert.ok(presetIndex < skillProtocolIndex, 'Preset section should come before SKILL DISCOVERY PROTOCOL');
+  assert.ok(
+    presetIndex < skillProtocolIndex,
+    'Preset section should come before SKILL DISCOVERY PROTOCOL'
+  );
 });
 
 test('Preset Section Injection - should handle empty enabledSkills array gracefully', () => {

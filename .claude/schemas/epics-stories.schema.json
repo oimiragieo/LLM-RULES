@@ -9,11 +9,11 @@
       "items": {
         "type": "object",
         "properties": {
-          "id": {"type": "string"},
-          "title": {"type": "string"},
+          "id": { "type": "string" },
+          "title": { "type": "string" },
           "stories": {
             "type": "array",
-            "items": {"type": "string"}
+            "items": { "type": "string" }
           }
         },
         "required": ["id", "title"]

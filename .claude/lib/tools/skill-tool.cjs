@@ -288,10 +288,11 @@ function searchSkills(keyword) {
   const allSkills = listAvailableSkills();
   const lowerKeyword = keyword.toLowerCase();
 
-  return allSkills.filter(skill =>
-    skill.name.toLowerCase().includes(lowerKeyword) ||
-    skill.description.toLowerCase().includes(lowerKeyword) ||
-    skill.category.toLowerCase().includes(lowerKeyword)
+  return allSkills.filter(
+    skill =>
+      skill.name.toLowerCase().includes(lowerKeyword) ||
+      skill.description.toLowerCase().includes(lowerKeyword) ||
+      skill.category.toLowerCase().includes(lowerKeyword)
   );
 }
 

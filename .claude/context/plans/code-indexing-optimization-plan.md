@@ -64,14 +64,14 @@ Query ──┬──→ BM25 Search (NEW) ────────────�
 
 ## Key Deliverables
 
-| Phase | Deliverable | Files |
-|-------|-------------|-------|
-| 1 | BM25 indexer module | `.claude/lib/code-indexing/bm25-indexer.cjs` |
-| 1 | Hybrid query interface | Updated `hybrid-search.cjs`, `vector-store.cjs` |
-| 1 | BM25 config | Updated `code-index-config.json` |
-| 2 | GPU-enabled embedding | Updated `embedding-generator.cjs` |
-| 2 | GPU detection utility | `.claude/lib/code-indexing/gpu-detector.cjs` |
-| 2 | Benchmark suite | `tests/benchmarks/indexing-benchmark.cjs` |
+| Phase | Deliverable            | Files                                           |
+| ----- | ---------------------- | ----------------------------------------------- |
+| 1     | BM25 indexer module    | `.claude/lib/code-indexing/bm25-indexer.cjs`    |
+| 1     | Hybrid query interface | Updated `hybrid-search.cjs`, `vector-store.cjs` |
+| 1     | BM25 config            | Updated `code-index-config.json`                |
+| 2     | GPU-enabled embedding  | Updated `embedding-generator.cjs`               |
+| 2     | GPU detection utility  | `.claude/lib/code-indexing/gpu-detector.cjs`    |
+| 2     | Benchmark suite        | `tests/benchmarks/indexing-benchmark.cjs`       |
 
 ---
 
@@ -244,6 +244,7 @@ ls .claude/lib/code-indexing/bm25-indexer.cjs
 #### Commit Checkpoint (REQUIRED - 10+ files project)
 
 Before starting Phase 2, commit Phase 1 changes:
+
 ```bash
 git add .claude/lib/code-indexing/bm25-indexer.cjs tests/lib/code-indexing/bm25-indexer.test.cjs
 git commit -m "checkpoint: Phase 1 BM25 foundation complete"
@@ -369,6 +370,7 @@ pnpm test -- --grep "hybrid" 2>&1 | grep -E "passing|PASS"
 #### Commit Checkpoint (REQUIRED - 10+ files project)
 
 Before starting Phase 3, commit Phase 2 changes:
+
 ```bash
 git add .
 git commit -m "checkpoint: Phase 2 BM25 integration complete"
@@ -447,12 +449,14 @@ ls .claude/context/artifacts/research-reports/gpu-acceleration-detailed.md
     - Add `useGPU: true` option (default: auto-detect)
   - **API Changes:**
     ```javascript
-    constructor(options = {
-      model: 'Xenova/all-MiniLM-L6-v2',
-      useGPU: 'auto',  // NEW: 'auto' | true | false
-      gpuBatchSize: 64, // NEW: larger batches for GPU
-      cpuBatchSize: 32, // NEW: smaller batches for CPU
-    })
+    constructor(
+      (options = {
+        model: 'Xenova/all-MiniLM-L6-v2',
+        useGPU: 'auto', // NEW: 'auto' | true | false
+        gpuBatchSize: 64, // NEW: larger batches for GPU
+        cpuBatchSize: 32, // NEW: smaller batches for CPU
+      })
+    );
     ```
   - **Verify:** Embedding generation uses GPU when available
   - **Rollback:** Git revert changes to embedding-generator.cjs
@@ -554,6 +558,7 @@ pnpm test -- --grep "embedding" 2>&1 | grep -E "passing|PASS"
 #### Commit Checkpoint (REQUIRED - 10+ files project)
 
 Before starting Phase 5, commit Phase 3-4 changes:
+
 ```bash
 git add .
 git commit -m "checkpoint: Phase 3-4 GPU acceleration complete"
@@ -647,10 +652,11 @@ node tests/benchmarks/indexing-benchmark.cjs 2>&1 | head -20
   - **Command:**
     ```javascript
     Task({
-      subagent_type: "reflection-agent",
-      description: "Session reflection and learning extraction",
-      prompt: "You are REFLECTION-AGENT. Read @.claude/agents/core/reflection-agent.md. Analyze the completed indexing optimization work, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
-    })
+      subagent_type: 'reflection-agent',
+      description: 'Session reflection and learning extraction',
+      prompt:
+        'You are REFLECTION-AGENT. Read @.claude/agents/core/reflection-agent.md. Analyze the completed indexing optimization work, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created).',
+    });
     ```
 
 - [ ] **FINAL.2** Extract learnings and update memory files
@@ -675,6 +681,7 @@ node tests/benchmarks/indexing-benchmark.cjs 2>&1 | head -20
   - **Add:** Performance tuning guide
 
 **Success Criteria:**
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
@@ -683,13 +690,13 @@ node tests/benchmarks/indexing-benchmark.cjs 2>&1 | head -20
 
 ## Risk Assessment
 
-| Risk | Impact | Probability | Mitigation | Rollback |
-|------|--------|-------------|------------|----------|
-| BM25 memory usage for large index | Medium | Medium | Use streaming/chunked index loading | Remove BM25, use dense-only |
-| GPU not available on target system | High | Medium | Implement robust CPU fallback | Disable GPU option in config |
-| ONNX Runtime compatibility issues | High | Low | Pin to known-working version | Revert to @xenova/transformers CPU |
-| Query latency regression | High | Low | Benchmark-driven development | Disable hybrid mode, use semantic-only |
-| LanceDB compatibility with hybrid | Medium | Low | Test thoroughly before integration | Use separate BM25 store |
+| Risk                               | Impact | Probability | Mitigation                          | Rollback                               |
+| ---------------------------------- | ------ | ----------- | ----------------------------------- | -------------------------------------- |
+| BM25 memory usage for large index  | Medium | Medium      | Use streaming/chunked index loading | Remove BM25, use dense-only            |
+| GPU not available on target system | High   | Medium      | Implement robust CPU fallback       | Disable GPU option in config           |
+| ONNX Runtime compatibility issues  | High   | Low         | Pin to known-working version        | Revert to @xenova/transformers CPU     |
+| Query latency regression           | High   | Low         | Benchmark-driven development        | Disable hybrid mode, use semantic-only |
+| LanceDB compatibility with hybrid  | Medium | Low         | Test thoroughly before integration  | Use separate BM25 store                |
 
 ---
 
@@ -702,6 +709,7 @@ node tests/benchmarks/indexing-benchmark.cjs 2>&1 | head -20
 **Context:** BM25 index needs to be persisted for incremental updates.
 
 **Options:**
+
 1. **In-memory HashMap** - Fast, but lost on restart
 2. **LanceDB table** - Consistent with vector store, but overkill for sparse index
 3. **Flat JSON file** - Simple, portable, good for moderate-size index
@@ -720,6 +728,7 @@ node tests/benchmarks/indexing-benchmark.cjs 2>&1 | head -20
 **Context:** Embedding generation is bottlenecked at 10-20/min on CPU.
 
 **Options:**
+
 1. **ONNX Runtime Node.js** - Native bindings, automatic CUDA detection
 2. **FastEmbed via child_process** - Python-based, proven fast
 3. **WebGPU via transformers.js** - Browser-focused, experimental in Node.js
@@ -738,6 +747,7 @@ node tests/benchmarks/indexing-benchmark.cjs 2>&1 | head -20
 **Context:** Need to combine BM25 and semantic search results.
 
 **Options:**
+
 1. **Reciprocal Rank Fusion (RRF)** - Simple, proven effective
 2. **Linear blend** - Weighted average of scores
 3. **Threshold-based** - Use BM25 above threshold, semantic below
@@ -751,16 +761,16 @@ node tests/benchmarks/indexing-benchmark.cjs 2>&1 | head -20
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Dependencies | Parallel? |
-|-------|-------|-----------|--------------|-----------|
-| 0 | 4 | 4-6 hours | None | No |
-| 1 | 4 | 6-8 hours | Phase 0 | Partial |
-| 2 | 6 | 6-8 hours | Phase 1 | No |
-| 3 | 4 | 4-6 hours | Phase 2 | No |
-| 4 | 6 | 6-8 hours | Phase 3 | No |
-| 5 | 5 | 4-6 hours | Phase 4 | Yes |
-| FINAL | 4 | 2-3 hours | Phase 5 | No |
-| **Total** | **33** | **~33-45 hours (4-7 days)** | | |
+| Phase     | Tasks  | Est. Time                   | Dependencies | Parallel? |
+| --------- | ------ | --------------------------- | ------------ | --------- |
+| 0         | 4      | 4-6 hours                   | None         | No        |
+| 1         | 4      | 6-8 hours                   | Phase 0      | Partial   |
+| 2         | 6      | 6-8 hours                   | Phase 1      | No        |
+| 3         | 4      | 4-6 hours                   | Phase 2      | No        |
+| 4         | 6      | 6-8 hours                   | Phase 3      | No        |
+| 5         | 5      | 4-6 hours                   | Phase 4      | Yes       |
+| FINAL     | 4      | 2-3 hours                   | Phase 5      | No        |
+| **Total** | **33** | **~33-45 hours (4-7 days)** |              |           |
 
 ---
 
@@ -768,37 +778,37 @@ node tests/benchmarks/indexing-benchmark.cjs 2>&1 | head -20
 
 ### New Files (4)
 
-| File | Purpose | Phase |
-|------|---------|-------|
-| `.claude/lib/code-indexing/bm25-indexer.cjs` | BM25 sparse indexer | 1 |
-| `.claude/lib/code-indexing/gpu-detector.cjs` | GPU detection utility | 3 |
-| `tests/lib/code-indexing/bm25-indexer.test.cjs` | BM25 unit tests | 1 |
-| `tests/benchmarks/indexing-benchmark.cjs` | Performance benchmarks | 5 |
+| File                                            | Purpose                | Phase |
+| ----------------------------------------------- | ---------------------- | ----- |
+| `.claude/lib/code-indexing/bm25-indexer.cjs`    | BM25 sparse indexer    | 1     |
+| `.claude/lib/code-indexing/gpu-detector.cjs`    | GPU detection utility  | 3     |
+| `tests/lib/code-indexing/bm25-indexer.test.cjs` | BM25 unit tests        | 1     |
+| `tests/benchmarks/indexing-benchmark.cjs`       | Performance benchmarks | 5     |
 
 ### Modified Files (8+)
 
-| File | Changes | Phase |
-|------|---------|-------|
-| `.claude/lib/code-indexing/index-manager.cjs` | BM25 integration | 2 |
-| `.claude/lib/code-indexing/vector-store.cjs` | Hybrid search API | 2 |
-| `.claude/lib/code-indexing/hybrid-search.cjs` | BM25 stage | 2 |
-| `.claude/lib/code-indexing/result-ranker.cjs` | RRF fusion | 2 |
-| `.claude/lib/code-indexing/embedding-generator.cjs` | GPU acceleration | 4 |
-| `.claude/lib/memory/lancedb-client.cjs` | GPU embeddings | 4 |
-| `.claude/config/code-index-config.json` | New config options | 2, 4 |
-| `tests/lib/code-indexing/hybrid-search.test.cjs` | Integration tests | 2 |
+| File                                                | Changes            | Phase |
+| --------------------------------------------------- | ------------------ | ----- |
+| `.claude/lib/code-indexing/index-manager.cjs`       | BM25 integration   | 2     |
+| `.claude/lib/code-indexing/vector-store.cjs`        | Hybrid search API  | 2     |
+| `.claude/lib/code-indexing/hybrid-search.cjs`       | BM25 stage         | 2     |
+| `.claude/lib/code-indexing/result-ranker.cjs`       | RRF fusion         | 2     |
+| `.claude/lib/code-indexing/embedding-generator.cjs` | GPU acceleration   | 4     |
+| `.claude/lib/memory/lancedb-client.cjs`             | GPU embeddings     | 4     |
+| `.claude/config/code-index-config.json`             | New config options | 2, 4  |
+| `tests/lib/code-indexing/hybrid-search.test.cjs`    | Integration tests  | 2     |
 
 ---
 
 ## Success Metrics
 
-| Metric | Before | Target | Measurement |
-|--------|--------|--------|-------------|
-| Query latency (p95) | 500ms | < 50ms | Benchmark suite |
-| Reindex throughput | 10-20/min | 200-1000/min | Benchmark suite |
-| BM25 query latency | N/A | < 10ms | Benchmark suite |
-| Full reindex time (10k files) | 20 min | < 2 min | Benchmark suite |
-| Memory usage (peak) | 500MB | < 1GB | Process monitoring |
+| Metric                        | Before    | Target       | Measurement        |
+| ----------------------------- | --------- | ------------ | ------------------ |
+| Query latency (p95)           | 500ms     | < 50ms       | Benchmark suite    |
+| Reindex throughput            | 10-20/min | 200-1000/min | Benchmark suite    |
+| BM25 query latency            | N/A       | < 10ms       | Benchmark suite    |
+| Full reindex time (10k files) | 20 min    | < 2 min      | Benchmark suite    |
+| Memory usage (peak)           | 500MB     | < 1GB        | Process monitoring |
 
 ---
 

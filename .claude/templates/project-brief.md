@@ -13,9 +13,11 @@
 ## Scope
 
 ### In Scope
+
 - [List what's included in the project]
 
 ### Out of Scope
+
 - [List what's not included in the project]
 
 ## Objectives
@@ -42,9 +44,11 @@
 ## Risks and Assumptions
 
 ### Risks
+
 - [Potential risks and mitigation strategies]
 
 ### Assumptions
+
 - [Key assumptions that could impact the project]
 
 ## Resources Required

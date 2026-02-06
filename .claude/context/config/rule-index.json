@@ -98,17 +98,13 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": [
-        "api"
-      ],
+      "technologies": ["api"],
       "type": "master",
       "size": 243,
       "line_count": 8
     }
   ],
   "technology_map": {
-    "api": [
-      ".claude/rules/testing.md"
-    ]
+    "api": [".claude/rules/testing.md"]
   }
 }

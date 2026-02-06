@@ -4,18 +4,18 @@
   "description": "Schema for agile epics",
   "type": "object",
   "properties": {
-    "id": {"type": "string"},
-    "title": {"type": "string"},
-    "description": {"type": "string"},
-    "goal": {"type": "string"},
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "goal": { "type": "string" },
     "stories": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": { "type": "string" }
     },
-    "status": {"type": "string", "enum": ["planned", "active", "completed"]},
-    "priority": {"type": "string", "enum": ["high", "medium", "low"]},
-    "created": {"type": "string", "format": "date-time"},
-    "updated": {"type": "string", "format": "date-time"}
+    "status": { "type": "string", "enum": ["planned", "active", "completed"] },
+    "priority": { "type": "string", "enum": ["high", "medium", "low"] },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" }
   },
   "required": ["id", "title", "description"]
 }

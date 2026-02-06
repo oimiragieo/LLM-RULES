@@ -14,21 +14,25 @@ Fixed **4 critical hook files** that were failing due to relative module path re
 ## Files Fixed
 
 ### 1. `hooks/unified-pre-write-hook.cjs` ✅
+
 **Lines Changed:** 20-50  
 **Fix:** Added `safeRequire()` helper with absolute path resolution  
 **Status:** Loads successfully
 
-### 2. `hooks/routing/spawn-prompt-assembler.cjs` ✅  
+### 2. `hooks/routing/spawn-prompt-assembler.cjs` ✅
+
 **Lines Changed:** 1-60, plus 10 require statements throughout file  
 **Fix:** Added `libRequire()` and `hooksRequire()` helpers  
 **Status:** Loads successfully
 
 ### 3. `hooks/routing/pre-task-unified.cjs` ✅
+
 **Lines Changed:** 27-55  
 **Fix:** Added path resolution helpers and converted all requires  
 **Status:** Loads successfully
 
 ### 4. `hooks/routing/user-prompt-unified.cjs` ✅
+
 **Lines Changed:** 27-65, plus 1 inline require at line 1457  
 **Fix:** Added path resolution helpers and converted all requires  
 **Status:** Loads successfully
@@ -38,12 +42,14 @@ Fixed **4 critical hook files** that were failing due to relative module path re
 ## Pattern Applied
 
 **Before (Broken):**
+
 ```javascript
 const { parseHookInputAsync } = require('../../lib/utils/hook-input.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 ```
 
 **After (Fixed):**
+
 ```javascript
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
@@ -63,8 +69,9 @@ const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 **41 additional hooks** still use relative require paths. These need the same pattern applied:
 
 ### Priority 1 (Active in settings.json):
+
 - `routing/config-model-validator.cjs`
-- `routing/router-enforcer.cjs`  
+- `routing/router-enforcer.cjs`
 - `routing/routing-guard.cjs`
 - `routing/post-task-unified.cjs`
 - `safety/bash-command-validator.cjs`
@@ -79,6 +86,7 @@ const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 - `evolution/unified-evolution-guard.cjs`
 
 ### Priority 2 (Referenced but may be dormant):
+
 - All hooks in `safety/*.cjs`
 - All hooks in `validation/*.cjs`
 - All hooks in `reflection/*.cjs`
@@ -101,7 +109,7 @@ To fix remaining hooks, apply this template to each file:
 const path = require('path');
 
 // Add these lines before any requires
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..');  // Adjust .. count based on depth
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..'); // Adjust .. count based on depth
 const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
 const HOOKS_DIR = path.join(PROJECT_ROOT, '.claude', 'hooks');
 
@@ -114,7 +122,7 @@ function hooksRequire(modulePath) {
 }
 
 // Then replace:
-//   require('../../lib/X') 
+//   require('../../lib/X')
 // With:
 //   libRequire(path.join('X'))
 ```
@@ -167,12 +175,12 @@ This makes `require('utils/hook-input.cjs')` work from any location.
 
 ## Impact
 
-| Component | Before Fix | After Fix |
-|-----------|-----------|-----------|
-| Hook loading | ❌ Module not found | ✅ Loads successfully |
-| Settings.json hooks | ❌ JSON parse errors | ✅ Working |
-| Agent spawning | ❌ Failing | ✅ Working |
-| Task tracking | ❌ Missing updates | ✅ Working |
+| Component           | Before Fix           | After Fix             |
+| ------------------- | -------------------- | --------------------- |
+| Hook loading        | ❌ Module not found  | ✅ Loads successfully |
+| Settings.json hooks | ❌ JSON parse errors | ✅ Working            |
+| Agent spawning      | ❌ Failing           | ✅ Working            |
+| Task tracking       | ❌ Missing updates   | ✅ Working            |
 
 ---
 
@@ -185,5 +193,5 @@ This makes `require('utils/hook-input.cjs')` work from any location.
 
 ---
 
-*Critical hooks fixed: 4/45*  
-*System status: OPERATIONAL with NODE_PATH workaround*
+_Critical hooks fixed: 4/45_  
+_System status: OPERATIONAL with NODE_PATH workaround_

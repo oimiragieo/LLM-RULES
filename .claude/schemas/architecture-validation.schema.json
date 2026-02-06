@@ -17,9 +17,9 @@
       "items": {
         "type": "object",
         "properties": {
-          "severity": {"type": "string", "enum": ["error", "warning", "info"]},
-          "message": {"type": "string"},
-          "location": {"type": "string"}
+          "severity": { "type": "string", "enum": ["error", "warning", "info"] },
+          "message": { "type": "string" },
+          "location": { "type": "string" }
         }
       }
     }

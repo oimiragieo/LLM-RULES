@@ -35,7 +35,7 @@ describe('Verify Actual GPU Usage', () => {
     const store = new MemoryVectorStore({
       persistDirectory: tmpDir,
       embeddingMode: 'fastembed',
-      gpu: { enabled: true }
+      gpu: { enabled: true },
     });
 
     await store.initialize();
@@ -53,7 +53,10 @@ describe('Verify Actual GPU Usage', () => {
     console.log(`GPU memory before: ${gpuBefore.memoryUsed}MB / ${gpuBefore.memoryTotal}MB`);
 
     // Generate embeddings for a batch of texts (should trigger GPU if configured)
-    const texts = Array.from({ length: 100 }, (_, i) => `Test embedding ${i} with some text content to process`);
+    const texts = Array.from(
+      { length: 100 },
+      (_, i) => `Test embedding ${i} with some text content to process`
+    );
 
     const startTime = Date.now();
     const embeddings = await store.generateEmbeddingsBatch(texts, 128);

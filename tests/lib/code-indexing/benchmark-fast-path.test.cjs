@@ -56,7 +56,9 @@ test('benchmark: JSON file parsing speed', () => {
   const avgTimeMs = elapsed / iterations;
   const filesPerSec = (1000 / avgTimeMs).toFixed(1);
 
-  console.log(`[BENCHMARK] JSON: ${avgTimeMs.toFixed(2)}ms avg per file (${filesPerSec} files/sec)`);
+  console.log(
+    `[BENCHMARK] JSON: ${avgTimeMs.toFixed(2)}ms avg per file (${filesPerSec} files/sec)`
+  );
 
   // Simple chunking should be very fast: <5ms per 1000-line JSON file
   assert.ok(avgTimeMs < 10, `JSON parsing should be fast: ${avgTimeMs}ms (expected <10ms)`);
@@ -150,9 +152,7 @@ test('benchmark: estimate full project index time', () => {
     `Full index should complete in <20 minutes, estimated ${estimatedMinutes}min`
   );
 
-  console.log(
-    `\n  ✅ Speedup: from 103 hours (6.4 files/sec) to ${estimatedMinutes} minutes`
-  );
+  console.log(`\n  ✅ Speedup: from 103 hours (6.4 files/sec) to ${estimatedMinutes} minutes`);
   const oldTimeMin = 103 * 60;
   const speedupFactor = (oldTimeMin / parseFloat(estimatedMinutes)).toFixed(1);
   console.log(`  ✅ Performance improvement: ${speedupFactor}x faster\n`);

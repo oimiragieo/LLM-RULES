@@ -6,17 +6,23 @@
     "excludePatterns": [
       "**/node_modules/**",
       "**/.git/**",
+      "**/.claude/context/code-index/**",
+      "**/.claude/data/**",
+      "**/.claude.archive/**",
+      "**/local_cache/**",
       "**/dist/**",
       "**/build/**",
       "**/.next/**",
       "**/coverage/**",
+      "**/.tmp/**",
       "**/*.min.js",
       "**/*.bundle.js",
       "**/*.map",
       "**/package-lock.json",
       "**/yarn.lock",
       "**/pnpm-lock.yaml",
-      "**/.claude/data/**"
+      "**/*.jsonl",
+      "**/*.db"
     ],
     "includePatterns": [
       "**/*.js",
@@ -30,9 +36,9 @@
       "**/*.go",
       "**/*.rs"
     ],
-    "maxFileSize": 1048576,
-    "batchSize": 50,
-    "concurrency": 8
+    "maxFileSize": 524288,
+    "concurrency": 1,
+    "batchSize": 10
   },
   "chunking": {
     "minTokens": 50,

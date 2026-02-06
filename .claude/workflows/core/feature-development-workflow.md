@@ -44,10 +44,12 @@ flowchart TD
 **Responsible Agent**: Router (initial), then delegates to appropriate domain expert
 
 **Entry Conditions**:
+
 - User request received
 - Request classified as "new feature"
 
 **Skills to Invoke**:
+
 ```javascript
 Skill({ skill: 'progressive-disclosure' }); // Clarify ambiguities
 Skill({ skill: 'spec-gathering' }); // Gather requirements systematically
@@ -72,6 +74,7 @@ Skill({ skill: 'spec-gathering' }); // Gather requirements systematically
    - Mark `[NEEDS CLARIFICATION]` items for research phase
 
 **Exit Criteria** (ALL required):
+
 - [ ] Requirements documented in spec file
 - [ ] All ambiguities resolved or marked for research
 - [ ] Acceptance criteria are measurable
@@ -79,6 +82,7 @@ Skill({ skill: 'spec-gathering' }); // Gather requirements systematically
 - [ ] Security sensitivity assessed
 
 **Failure Mode**:
+
 - If requirements remain unclear after 2 clarification rounds: PAUSE and schedule requirements workshop with stakeholders
 
 **Next Phase**: Planning
@@ -92,10 +96,12 @@ Skill({ skill: 'spec-gathering' }); // Gather requirements systematically
 **Responsible Agent**: `planner` (with `research-synthesis` skill)
 
 **Entry Conditions**:
+
 - Requirements documented and clear
 - Complexity ≥ Medium (trivial/low can skip to Implementation)
 
 **Skills to Invoke**:
+
 ```javascript
 Skill({ skill: 'plan-generator' }); // Structured plan creation
 Skill({ skill: 'research-synthesis' }); // Phase 0 research (MANDATORY)
@@ -148,6 +154,7 @@ Skill({ skill: 'sequential-thinking' }); // Step-by-step reasoning
    - Extracts learnings and checks for evolution opportunities
 
 **Exit Criteria** (ALL required):
+
 - [ ] Phase 0 research complete (3+ queries, 3+ sources)
 - [ ] Constitution checkpoint passed (all 4 gates green)
 - [ ] Implementation plan saved to correct location
@@ -156,6 +163,7 @@ Skill({ skill: 'sequential-thinking' }); // Step-by-step reasoning
 - [ ] Dependencies mapped
 
 **Failure Mode**:
+
 - If constitution checkpoint fails: Return to Phase 0, complete missing research
 - If technical feasibility fails: Escalate to architect for design review
 - If security review fails: Escalate to security-architect for threat modeling
@@ -171,6 +179,7 @@ Skill({ skill: 'sequential-thinking' }); // Step-by-step reasoning
 **Responsible Agent**: `security-architect`
 
 **Entry Conditions**:
+
 - Plan created and constitution checkpoint passed
 - Feature is security-sensitive (detected in Phase 1):
   - Involves authentication/authorization
@@ -180,6 +189,7 @@ Skill({ skill: 'sequential-thinking' }); // Step-by-step reasoning
   - Processes payments or financial data
 
 **Skills to Invoke**:
+
 ```javascript
 Skill({ skill: 'security-architect' }); // OWASP Top 10, STRIDE analysis
 ```
@@ -210,6 +220,7 @@ Skill({ skill: 'security-architect' }); // OWASP Top 10, STRIDE analysis
    - Save to: `.claude/context/reports/<feature-name>-security-review.md`
 
 **Exit Criteria** (ALL required):
+
 - [ ] STRIDE analysis completed
 - [ ] OWASP Top 10 reviewed for applicable categories
 - [ ] All CRITICAL/HIGH risks have mitigations documented
@@ -217,6 +228,7 @@ Skill({ skill: 'security-architect' }); // OWASP Top 10, STRIDE analysis
 - [ ] Implementation plan updated with security requirements
 
 **Failure Mode**:
+
 - If CRITICAL risks without mitigations: BLOCK implementation until mitigations identified
 - If design fundamentally insecure: Return to Planning phase with security-architect guidance
 
@@ -231,10 +243,12 @@ Skill({ skill: 'security-architect' }); // OWASP Top 10, STRIDE analysis
 **Responsible Agent**: `developer` (may spawn domain specialists: `typescript-pro`, `python-pro`, `react-expert`, etc.)
 
 **Entry Conditions**:
+
 - Plan approved (constitution checkpoint passed)
 - Security review passed (if required)
 
 **Skills to Invoke**:
+
 ```javascript
 Skill({ skill: 'tdd' }); // Red-Green-Refactor cycle (MANDATORY)
 Skill({ skill: 'debugging' }); // Systematic debugging if issues arise
@@ -244,8 +258,9 @@ Skill({ skill: 'git-expert' }); // Token-efficient Git workflow
 **Actions**:
 
 1. **Claim Task**
+
    ```javascript
-   TaskUpdate({ taskId: "X", status: "in_progress", owner: "developer" });
+   TaskUpdate({ taskId: 'X', status: 'in_progress', owner: 'developer' });
    ```
 
 2. **TDD Cycle for Each Task** (from `tdd` skill)
@@ -278,17 +293,18 @@ Skill({ skill: 'git-expert' }); // Token-efficient Git workflow
 5. **Update Task Progress**
    ```javascript
    TaskUpdate({
-     taskId: "X",
+     taskId: 'X',
      metadata: {
-       discoveries: ["Key insight found..."],
-       keyFiles: ["src/auth/login.ts"],
+       discoveries: ['Key insight found...'],
+       keyFiles: ['src/auth/login.ts'],
        testsAdded: 5,
-       testsPassing: true
-     }
+       testsPassing: true,
+     },
    });
    ```
 
 **Exit Criteria** (ALL required):
+
 - [ ] All planned tasks implemented
 - [ ] TDD cycle followed for ALL code (no code without failing test first)
 - [ ] All tests pass (0 failures)
@@ -296,6 +312,7 @@ Skill({ skill: 'git-expert' }); // Token-efficient Git workflow
 - [ ] Task metadata updated with summary
 
 **Failure Mode**:
+
 - If tests fail after multiple fix attempts (3+): Invoke `debugging` skill for systematic debugging
 - If architecture issue discovered: Return to Planning phase with architect input
 - If new security concern found: Escalate to security-architect
@@ -311,10 +328,12 @@ Skill({ skill: 'git-expert' }); // Token-efficient Git workflow
 **Responsible Agent**: `code-reviewer`
 
 **Entry Conditions**:
+
 - Implementation complete
 - All tests passing
 
 **Skills to Invoke**:
+
 ```javascript
 Skill({ skill: 'code-analyzer' }); // Static analysis and metrics
 Skill({ skill: 'code-quality-expert' }); // Best practices review
@@ -333,6 +352,7 @@ Skill({ skill: 'checklist-generator' }); // IEEE 1028 + contextual checklist
 2. **Stage 2: Code Quality** (only after Stage 1 passes)
 
    **Generate Quality Checklist** (Hybrid Validation):
+
    ```javascript
    Skill({ skill: 'checklist-generator' });
    ```
@@ -375,6 +395,7 @@ Skill({ skill: 'checklist-generator' }); // IEEE 1028 + contextual checklist
    - Verdict: Ready to merge? Yes/No/With fixes
 
 **Exit Criteria** (ALL required):
+
 - [ ] Stage 1: Spec compliance verified
 - [ ] Stage 2: Quality checklist completed
 - [ ] All CRITICAL issues resolved
@@ -383,6 +404,7 @@ Skill({ skill: 'checklist-generator' }); // IEEE 1028 + contextual checklist
 - [ ] Verdict: Ready to merge (Yes or With fixes)
 
 **Failure Mode**:
+
 - If CRITICAL issues found: Return to Implementation with specific fix requirements
 - If spec compliance fails: Return to Planning or Implementation depending on deviation severity
 - If fundamental design issue: Escalate to architect
@@ -398,10 +420,12 @@ Skill({ skill: 'checklist-generator' }); // IEEE 1028 + contextual checklist
 **Responsible Agent**: `qa`
 
 **Entry Conditions**:
+
 - Code review passed
 - All CRITICAL and IMPORTANT issues resolved
 
 **Skills to Invoke**:
+
 ```javascript
 Skill({ skill: 'checklist-generator' }); // Generate QA checklist
 Skill({ skill: 'test-generator' }); // Generate additional test cases
@@ -411,6 +435,7 @@ Skill({ skill: 'tdd' }); // TDD principles for test quality
 **Actions**:
 
 1. **Generate QA Checklist**
+
    ```javascript
    Skill({ skill: 'checklist-generator' });
    ```
@@ -443,6 +468,7 @@ Skill({ skill: 'tdd' }); // TDD principles for test quality
    - Include: Test results, coverage %, edge cases tested, recommendations
 
 **Exit Criteria** (ALL required):
+
 - [ ] All tests pass (0 failures)
 - [ ] Test coverage ≥ 80% for new code (or justified exceptions)
 - [ ] Edge cases covered
@@ -451,6 +477,7 @@ Skill({ skill: 'tdd' }); // TDD principles for test quality
 - [ ] Quality gates passed
 
 **Failure Mode**:
+
 - If tests fail: Return to Implementation with failure details
 - If coverage < 80% without justification: Add tests or document why gaps acceptable
 - If critical edge case missing: Add test, return to Implementation if code changes needed
@@ -466,6 +493,7 @@ Skill({ skill: 'tdd' }); // TDD principles for test quality
 **Responsible Agent**: `technical-writer`
 
 **Entry Conditions**:
+
 - QA phase passed
 - Feature requires documentation updates:
   - New public API
@@ -474,6 +502,7 @@ Skill({ skill: 'tdd' }); // TDD principles for test quality
   - Breaking change
 
 **Skills to Invoke**:
+
 ```javascript
 Skill({ skill: 'doc-generator' }); // Documentation templates
 Skill({ skill: 'writing-skills' }); // Voice, tone, banned words
@@ -505,12 +534,14 @@ Skill({ skill: 'readme' }); // README best practices
    - [ ] Code examples tested
 
 **Exit Criteria** (ALL required):
+
 - [ ] All necessary documentation updated
 - [ ] Quality checklist passed
 - [ ] Examples are accurate and working
 - [ ] Documentation committed to version control
 
 **Failure Mode**:
+
 - If documentation unclear: Iterate with feedback from developer who implemented feature
 
 **Next Phase**: Completion
@@ -524,6 +555,7 @@ Skill({ skill: 'readme' }); // README best practices
 **Responsible Agent**: Original agent (usually `developer` or `planner`)
 
 **Entry Conditions**:
+
 - All previous phases complete
 - All tests passing
 - Code reviewed and approved
@@ -531,6 +563,7 @@ Skill({ skill: 'readme' }); // README best practices
 - Documentation updated (if required)
 
 **Skills to Invoke**:
+
 ```javascript
 Skill({ skill: 'verification-before-completion' }); // Evidence-based gates
 ```
@@ -544,17 +577,26 @@ Skill({ skill: 'verification-before-completion' }); // Evidence-based gates
    - Evidence BEFORE claims
 
 2. **Mark Tasks Complete**
+
    ```javascript
    TaskUpdate({
-     taskId: "X",
-     status: "completed",
+     taskId: 'X',
+     status: 'completed',
      metadata: {
-       summary: "Implemented user authentication with JWT",
-       filesModified: ["src/auth/login.ts", "src/auth/middleware.ts"],
+       summary: 'Implemented user authentication with JWT',
+       filesModified: ['src/auth/login.ts', 'src/auth/middleware.ts'],
        testsAdded: 12,
-       coverage: "85%",
-       phasesCompleted: ["Requirements", "Planning", "Security", "Implementation", "Review", "QA", "Docs"]
-     }
+       coverage: '85%',
+       phasesCompleted: [
+         'Requirements',
+         'Planning',
+         'Security',
+         'Implementation',
+         'Review',
+         'QA',
+         'Docs',
+       ],
+     },
    });
    ```
 
@@ -564,11 +606,13 @@ Skill({ skill: 'verification-before-completion' }); // Evidence-based gates
    - **Issues**: Blockers encountered → `.claude/context/memory/issues.md`
 
 4. **Spawn Reflection Agent** (MANDATORY - from plan's final phase)
+
    ```javascript
    Task({
-     subagent_type: "reflection-agent",
-     description: "Session reflection and learning extraction",
-     prompt: "You are REFLECTION-AGENT. Read @.claude/agents/core/reflection-agent.md. Analyze the completed feature work, extract learnings to memory files, and check for evolution opportunities (patterns suggesting new agents or skills)."
+     subagent_type: 'reflection-agent',
+     description: 'Session reflection and learning extraction',
+     prompt:
+       'You are REFLECTION-AGENT. Read @.claude/agents/core/reflection-agent.md. Analyze the completed feature work, extract learnings to memory files, and check for evolution opportunities (patterns suggesting new agents or skills).',
    });
    ```
 
@@ -578,6 +622,7 @@ Skill({ skill: 'verification-before-completion' }); // Evidence-based gates
    ```
 
 **Exit Criteria** (ALL required):
+
 - [ ] Verification run WITH EVIDENCE (test output showing 0 failures)
 - [ ] All tasks marked complete
 - [ ] Memory files updated
@@ -585,6 +630,7 @@ Skill({ skill: 'verification-before-completion' }); // Evidence-based gates
 - [ ] Next work identified via TaskList()
 
 **Failure Mode**:
+
 - If verification shows failures: Return to Implementation, do NOT claim completion
 - If reflection agent reveals evolution opportunities: Document for future EVOLVE workflow
 
@@ -615,13 +661,13 @@ When phase completes, spawning agent updates task metadata:
 
 ```javascript
 TaskUpdate({
-  taskId: "X",
+  taskId: 'X',
   metadata: {
-    phaseComplete: "Planning",
-    nextPhase: "Security Review",
-    artifacts: [".claude/context/plans/auth-feature-plan.md"],
-    securitySensitive: true
-  }
+    phaseComplete: 'Planning',
+    nextPhase: 'Security Review',
+    artifacts: ['.claude/context/plans/auth-feature-plan.md'],
+    securitySensitive: true,
+  },
 });
 ```
 
@@ -631,16 +677,16 @@ Next phase agent reads metadata to understand context.
 
 ## Quality Gates Summary
 
-| Phase | Gate Type | Blocking? | Criteria |
-|-------|-----------|-----------|----------|
-| **Requirements** | Clarity Gate | Yes | All ambiguities resolved, acceptance criteria measurable |
-| **Planning** | Constitution Checkpoint | Yes | 4 gates: Research complete, technical feasible, security reviewed, spec quality |
-| **Security Review** | Threat Assessment | Yes (if security-sensitive) | CRITICAL/HIGH risks mitigated |
-| **Implementation** | TDD Gate | Yes | All code has failing test first, 0 test failures |
-| **Code Review** | Quality Gate | Yes | Stage 1 spec compliance passes, all CRITICAL issues resolved |
-| **QA** | Test Coverage Gate | Yes | ≥80% coverage, edge cases tested, 0 failures |
-| **Documentation** | Content Quality Gate | No (but recommended) | Quality checklist passes |
-| **Completion** | Verification Gate | Yes | Evidence of 0 failures BEFORE claiming complete |
+| Phase               | Gate Type               | Blocking?                   | Criteria                                                                        |
+| ------------------- | ----------------------- | --------------------------- | ------------------------------------------------------------------------------- |
+| **Requirements**    | Clarity Gate            | Yes                         | All ambiguities resolved, acceptance criteria measurable                        |
+| **Planning**        | Constitution Checkpoint | Yes                         | 4 gates: Research complete, technical feasible, security reviewed, spec quality |
+| **Security Review** | Threat Assessment       | Yes (if security-sensitive) | CRITICAL/HIGH risks mitigated                                                   |
+| **Implementation**  | TDD Gate                | Yes                         | All code has failing test first, 0 test failures                                |
+| **Code Review**     | Quality Gate            | Yes                         | Stage 1 spec compliance passes, all CRITICAL issues resolved                    |
+| **QA**              | Test Coverage Gate      | Yes                         | ≥80% coverage, edge cases tested, 0 failures                                    |
+| **Documentation**   | Content Quality Gate    | No (but recommended)        | Quality checklist passes                                                        |
+| **Completion**      | Verification Gate       | Yes                         | Evidence of 0 failures BEFORE claiming complete                                 |
 
 ---
 
@@ -664,12 +710,12 @@ Next phase agent reads metadata to understand context.
 
 ## Integration with Other Workflows
 
-| Workflow | Relationship |
-|----------|--------------|
-| **Router Decision** | Router triggers this workflow for "new feature" intent |
-| **Evolution Workflow** | If reflection reveals capability gaps, trigger EVOLVE |
-| **Incident Response** | If production issue during rollout, switch to incident workflow |
-| **C4 Architecture** | For Epic complexity features, may spawn C4 workflow for architecture docs |
+| Workflow               | Relationship                                                              |
+| ---------------------- | ------------------------------------------------------------------------- |
+| **Router Decision**    | Router triggers this workflow for "new feature" intent                    |
+| **Evolution Workflow** | If reflection reveals capability gaps, trigger EVOLVE                     |
+| **Incident Response**  | If production issue during rollout, switch to incident workflow           |
+| **C4 Architecture**    | For Epic complexity features, may spawn C4 workflow for architecture docs |
 
 ---
 
@@ -734,18 +780,23 @@ Total Duration: ~16-24 hours (Epic complexity, security-sensitive)
 ## Troubleshooting
 
 ### "Plan missing mandatory Evolution & Reflection Check phase"
+
 **Solution**: Regenerate plan. Every plan MUST end with Evolution & Reflection Check phase (CANNOT be omitted).
 
 ### "Constitution checkpoint failed - research incomplete"
+
 **Solution**: Return to Phase 0. Complete missing research queries/sources. Do NOT proceed to implementation.
 
 ### "Code review found CRITICAL spec violations"
+
 **Solution**: Return to Implementation or Planning (depending on deviation severity). Do NOT proceed to QA.
 
 ### "Tests failing after implementation"
+
 **Solution**: Invoke `debugging` skill (4-phase systematic debugging). Fix root cause, not symptoms.
 
 ### "Security review blocked - CRITICAL risks without mitigations"
+
 **Solution**: Return to Planning with security-architect guidance. Redesign to eliminate risks.
 
 ---
@@ -753,6 +804,7 @@ Total Duration: ~16-24 hours (Epic complexity, security-sensitive)
 ## Memory Protocol (MANDATORY)
 
 **Before starting any phase:**
+
 ```bash
 cat .claude/context/memory/learnings.md
 cat .claude/context/memory/decisions.md
@@ -761,6 +813,7 @@ cat .claude/context/memory/decisions.md
 Review past feature development patterns and decisions.
 
 **After completing workflow:**
+
 - Feature patterns → `.claude/context/memory/learnings.md`
 - Architecture decisions → `.claude/context/memory/decisions.md`
 - Blockers encountered → `.claude/context/memory/issues.md`

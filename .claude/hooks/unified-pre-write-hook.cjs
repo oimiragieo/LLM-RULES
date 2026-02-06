@@ -76,20 +76,20 @@ CHECKS.push({
   run: async (toolName, toolInput) => {
     // Only applies to Bash in certain contexts
     if (toolName !== 'Bash') return { pass: true };
-    
+
     const enforcement = getEnforcementMode('CONTEXT_MODE_TOOL_GUARD', 'warn');
     if (enforcement === 'off') return { pass: true };
-    
+
     // Check if context/mode restrictions apply
     const _context = process.env.AGENT_STUDIO_CONTEXT;
     const modes = process.env.AGENT_STUDIO_MODES;
-    
+
     // If editing mode and trying to run non-whitelisted bash command
     if (modes?.includes('editing')) {
       const allowedInEditing = ['git', 'npm', 'pnpm', 'yarn', 'node', 'npx'];
       const command = toolInput.command || '';
       const isAllowed = allowedInEditing.some(cmd => command.trim().startsWith(cmd));
-      
+
       if (!isAllowed) {
         return {
           pass: enforcement === 'warn',
@@ -98,7 +98,7 @@ CHECKS.push({
         };
       }
     }
-    
+
     return { pass: true };
   },
 });
@@ -109,19 +109,15 @@ CHECKS.push({
   run: async (toolName, toolInput) => {
     const filePath = toolInput.file_path || toolInput.target_file;
     if (!filePath) return { pass: true };
-    
+
     const enforcement = getEnforcementMode('FILE_PLACEMENT_GUARD', 'block');
     if (enforcement === 'off') return { pass: true };
-    
+
     // Disallowed directories
-    const disallowedPatterns = [
-      /\/\.git\//,
-      /\/node_modules\//,
-      /\.claude\/context\/code-index/,
-    ];
-    
+    const disallowedPatterns = [/\/\.git\//, /\/node_modules\//, /\.claude\/context\/code-index/];
+
     const normalizedPath = filePath.replace(/\\/g, '/');
-    
+
     for (const pattern of disallowedPatterns) {
       if (pattern.test(normalizedPath)) {
         return {
@@ -131,7 +127,7 @@ CHECKS.push({
         };
       }
     }
-    
+
     return { pass: true };
   },
 });
@@ -142,10 +138,10 @@ CHECKS.push({
   run: async (toolName, toolInput) => {
     const content = toolInput.content || toolInput.new_str || '';
     if (!content) return { pass: true };
-    
+
     const enforcement = getEnforcementMode('WRITE_CONTENT_SCANNER', 'block');
     if (enforcement === 'off') return { pass: true };
-    
+
     // Security patterns
     const dangerousPatterns = [
       { pattern: /eval\s*\(/, desc: 'eval() usage' },
@@ -153,7 +149,7 @@ CHECKS.push({
       { pattern: /child_process/, desc: 'child_process import' },
       { pattern: /require\s*\(\s*['"]node:child_process['"]\s*\)/, desc: 'child_process require' },
     ];
-    
+
     for (const { pattern, desc } of dangerousPatterns) {
       if (pattern.test(content)) {
         return {
@@ -163,7 +159,7 @@ CHECKS.push({
         };
       }
     }
-    
+
     return { pass: true };
   },
 });
@@ -174,13 +170,13 @@ CHECKS.push({
   run: async (toolName, toolInput) => {
     const content = toolInput.content || toolInput.new_str || '';
     if (!content) return { pass: true };
-    
+
     const enforcement = getEnforcementMode('WRITE_SIZE_VALIDATOR', 'warn');
     if (enforcement === 'off') return { pass: true };
-    
+
     // Configurable limits
     const maxSize = parseInt(process.env.MAX_WRITE_SIZE_CHARS || '500000', 10); // 500KB default
-    
+
     if (content.length > maxSize) {
       return {
         pass: enforcement === 'warn',
@@ -188,7 +184,7 @@ CHECKS.push({
         message: `[WRITE-SIZE-VALIDATOR] Write size ${content.length} exceeds limit ${maxSize}. Consider breaking into smaller writes.`,
       };
     }
-    
+
     return { pass: true };
   },
 });
@@ -199,10 +195,10 @@ CHECKS.push({
   run: async (_toolName, _toolInput) => {
     const enforcement = getEnforcementMode('ROUTER_WRITE_GUARD', 'block');
     if (enforcement === 'off') return { pass: true };
-    
+
     // Check if this is a Router context (simplified - full check requires router-state)
     const agentId = process.env.CLAUDE_AGENT_ID || 'router';
-    
+
     if (agentId === 'router') {
       // Router shouldn't write directly - should spawn agent
       return {
@@ -211,7 +207,7 @@ CHECKS.push({
         message: `[ROUTER-WRITE-GUARD] Router cannot directly write files. Spawn an agent using Task tool.`,
       };
     }
-    
+
     return { pass: true };
   },
 });
@@ -222,16 +218,18 @@ CHECKS.push({
   run: async (toolName, toolInput) => {
     const enforcement = getEnforcementMode('TDD_CHECK', 'warn');
     if (enforcement === 'off') return { pass: true };
-    
+
     // Check if this is implementation code without tests
     const filePath = toolInput.file_path || toolInput.target_file || '';
-    const isTestFile = /\.(test|spec)\.(js|ts|jsx|tsx|cjs|mjs)$/.test(filePath) ||
-                       /\/__tests__\//.test(filePath) ||
-                       /\/test\//.test(filePath);
-    
-    const isImplementationFile = /^(src|lib|app|pages|components|api)\//.test(filePath) ||
-                                 /\.(js|ts|jsx|tsx|cjs|mjs)$/.test(filePath);
-    
+    const isTestFile =
+      /\.(test|spec)\.(js|ts|jsx|tsx|cjs|mjs)$/.test(filePath) ||
+      /\/__tests__\//.test(filePath) ||
+      /\/test\//.test(filePath);
+
+    const isImplementationFile =
+      /^(src|lib|app|pages|components|api)\//.test(filePath) ||
+      /\.(js|ts|jsx|tsx|cjs|mjs)$/.test(filePath);
+
     // If writing implementation, check if tests exist
     if (isImplementationFile && !isTestFile) {
       // Look for corresponding test file
@@ -243,7 +241,7 @@ CHECKS.push({
         `${baseName}.spec.js`,
         `${baseName}.spec.ts`,
       ];
-      
+
       const hasTest = possibleTests.some(testPath => {
         try {
           fs.accessSync(testPath);
@@ -252,7 +250,7 @@ CHECKS.push({
           return false;
         }
       });
-      
+
       if (!hasTest) {
         return {
           pass: enforcement === 'warn',
@@ -261,7 +259,7 @@ CHECKS.push({
         };
       }
     }
-    
+
     return { pass: true };
   },
 });
@@ -272,11 +270,11 @@ CHECKS.push({
   run: async (_toolName, _toolInput) => {
     const enforcement = getEnforcementMode('PLAN_EVOLUTION_GUARD', 'block');
     if (enforcement === 'off') return { pass: true };
-    
+
     // Check if there's an active plan that should not be evolved
     // Simplified check - full implementation requires plan state tracking
     const evolutionState = process.env.EVOLUTION_STATE;
-    
+
     if (evolutionState === 'locked') {
       return {
         pass: false,
@@ -284,7 +282,7 @@ CHECKS.push({
         message: `[PLAN-EVOLUTION-GUARD] Plan is locked. Cannot modify while evolution is blocked.`,
       };
     }
-    
+
     return { pass: true };
   },
 });
@@ -295,18 +293,18 @@ CHECKS.push({
   run: async (toolName, toolInput) => {
     const enforcement = getEnforcementMode('CREATOR_GUARD', 'block');
     if (enforcement === 'off') return { pass: true };
-    
+
     const filePath = toolInput.file_path || toolInput.target_file || '';
-    
+
     // Check if trying to create certain protected file types without proper context
     const isSkillCreation = /\.claude\/skills\/[^/]+\/SKILL\.md$/.test(filePath);
     const isAgentCreation = /\.claude\/agents\/[^/]+\.md$/.test(filePath);
     const isWorkflowCreation = /\.claude\/workflows\/[^/]+\.(md|yaml)$/.test(filePath);
-    
+
     if (isSkillCreation || isAgentCreation || isWorkflowCreation) {
       // Check if running in creator workflow context
       const inCreatorWorkflow = process.env.CREATOR_WORKFLOW === 'active';
-      
+
       if (!inCreatorWorkflow) {
         return {
           pass: false,
@@ -315,7 +313,7 @@ CHECKS.push({
         };
       }
     }
-    
+
     return { pass: true };
   },
 });
@@ -327,17 +325,19 @@ CHECKS.push({
     // This check is always informational (never blocks)
     const content = toolInput.content || toolInput.new_str || '';
     const filePath = toolInput.file_path || toolInput.target_file || '';
-    
+
     // Suggest compression if file is very large
     const suggestionThreshold = 100000; // 100KB
-    
+
     if (content.length > suggestionThreshold) {
       // Log suggestion but don't block
       if (process.env.DEBUG_HOOKS === 'true') {
-        console.error(`[SUGGEST-COMPACT] Large write detected: ${filePath} (${content.length} chars). Consider context pruning.`);
+        console.error(
+          `[SUGGEST-COMPACT] Large write detected: ${filePath} (${content.length} chars). Consider context pruning.`
+        );
       }
     }
-    
+
     return { pass: true };
   },
 });
@@ -348,7 +348,7 @@ CHECKS.push({
 
 async function main() {
   const startTime = Date.now();
-  
+
   try {
     const hookInput = await parseHookInputAsync();
     if (!hookInput) {
@@ -367,7 +367,7 @@ async function main() {
     // Run all checks sequentially
     for (const check of CHECKS) {
       const result = await check.run(toolName, toolInput);
-      
+
       if (!result.pass) {
         // Emit blocked event
         if (eventBus) {
@@ -384,13 +384,13 @@ async function main() {
             // Best-effort
           }
         }
-        
+
         // Audit log
         auditLog('unified-pre-write-hook', `blocked_by_${check.name}`, {
           tool: toolName,
           file: toolInput.file_path || toolInput.target_file,
         });
-        
+
         console.log(formatResult(result.result, result.message));
         process.exit(result.result === 'block' ? 2 : 0);
       }
@@ -410,9 +410,8 @@ async function main() {
         // Best-effort
       }
     }
-    
+
     process.exit(0);
-    
   } catch (err) {
     // Fail closed
     if (process.env.HOOK_FAIL_OPEN === 'true') {
@@ -421,7 +420,7 @@ async function main() {
     }
 
     auditLog('unified-pre-write-hook', 'error_fail_closed', { error: err.message });
-    
+
     console.log(formatResult('block', `Hook error (fail-closed): ${err.message}`));
     process.exit(2);
   }

@@ -66,7 +66,12 @@ function resolveMcpToolStatus(toolName) {
   // Parse tool name: mcp__<server>__<tool>
   const parts = toolName.split('__');
   if (parts.length < 3) {
-    return { available: false, serverName: null, toolName: null, reason: 'Invalid MCP tool name format' };
+    return {
+      available: false,
+      serverName: null,
+      toolName: null,
+      reason: 'Invalid MCP tool name format',
+    };
   }
 
   const serverName = parts[1];
@@ -142,9 +147,7 @@ function getAvailableMcpTools() {
     const config = loadMcpConfig();
     const configuredServers = Object.keys(config.mcpServers || {});
 
-    return (manifest.tools?.mcp || []).filter(tool =>
-      configuredServers.includes(tool.mcp_server)
-    );
+    return (manifest.tools?.mcp || []).filter(tool => configuredServers.includes(tool.mcp_server));
   } catch (err) {
     console.error('[mcp-resolver] Error getting available MCP tools:', err.message);
     return [];

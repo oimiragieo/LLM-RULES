@@ -94,7 +94,7 @@ class DecisionHandler {
       /constructor/,
       /prototype/,
       /__proto__/,
-      /this\./
+      /this\./,
     ];
 
     for (const pattern of dangerousPatterns) {
@@ -114,14 +114,14 @@ class DecisionHandler {
           abs: Math.abs,
           round: Math.round,
           floor: Math.floor,
-          ceil: Math.ceil
+          ceil: Math.ceil,
         },
         // Allow basic string operations
         String: String,
         Number: Number,
         Boolean: Boolean,
         // Allow basic array operations
-        Array: { isArray: Array.isArray }
+        Array: { isArray: Array.isArray },
       };
 
       // Use Function constructor instead of eval (still not perfect but better)
@@ -142,12 +142,18 @@ class DecisionHandler {
       const rightValue = await this.evaluateCondition(right, context);
 
       switch (operator) {
-        case 'equals': return leftValue === rightValue;
-        case 'not_equals': return leftValue !== rightValue;
-        case 'greater_than': return leftValue > rightValue;
-        case 'less_than': return leftValue < rightValue;
-        case 'contains': return String(leftValue).includes(String(rightValue));
-        default: return false;
+        case 'equals':
+          return leftValue === rightValue;
+        case 'not_equals':
+          return leftValue !== rightValue;
+        case 'greater_than':
+          return leftValue > rightValue;
+        case 'less_than':
+          return leftValue < rightValue;
+        case 'contains':
+          return String(leftValue).includes(String(rightValue));
+        default:
+          return false;
       }
     }
 
@@ -176,7 +182,7 @@ class DecisionHandler {
         return {
           route: condition.route,
           reason: condition.description || `Condition met: ${condition.condition}`,
-          confidence: 1.0
+          confidence: 1.0,
         };
       }
     }
@@ -184,7 +190,7 @@ class DecisionHandler {
     return {
       route: defaultRoute || 'next',
       reason: 'Default route - no conditions met',
-      confidence: 0.5
+      confidence: 0.5,
     };
   }
 
@@ -201,7 +207,7 @@ class DecisionHandler {
       success: true,
       decision,
       timestamp: new Date().toISOString(),
-      handler: this.name
+      handler: this.name,
     };
   }
 }
@@ -210,8 +216,9 @@ class DecisionHandler {
 export default DecisionHandler;
 
 // CLI usage
-const isMainModule = import.meta.url === `file://${process.argv[1]}`
-  || import.meta.url === new URL(`file:///${process.argv[1].replace(/\\/g, '/')}`).href;
+const isMainModule =
+  import.meta.url === `file://${process.argv[1]}` ||
+  import.meta.url === new URL(`file:///${process.argv[1].replace(/\\/g, '/')}`).href;
 if (isMainModule) {
   const handler = new DecisionHandler();
 
@@ -219,7 +226,8 @@ if (isMainModule) {
   const input = process.argv[2] ? JSON.parse(process.argv[2]) : null;
 
   if (input) {
-    handler.execute(input)
+    handler
+      .execute(input)
       .then(result => {
         console.log(JSON.stringify(result, null, 2));
         process.exit(0);
@@ -230,7 +238,9 @@ if (isMainModule) {
       });
   } else {
     console.log('Usage: node decision-handler.mjs <json-input>');
-    console.log('Example: node decision-handler.mjs \'{"workflowStep": {"conditions": [{"condition": "true", "route": "success"}]}, "context": {}}\'');
+    console.log(
+      'Example: node decision-handler.mjs \'{"workflowStep": {"conditions": [{"condition": "true", "route": "success"}]}, "context": {}}\''
+    );
     process.exit(1);
   }
 }

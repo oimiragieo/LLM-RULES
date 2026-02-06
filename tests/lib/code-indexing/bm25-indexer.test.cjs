@@ -104,7 +104,10 @@ test('BM25Indexer - addDocuments - should handle empty documents array', () => {
 test('BM25Indexer - search - should return results ranked by relevance', () => {
   const indexer = new BM25Indexer();
   const docs = [
-    { id: '1', text: 'function authenticate(user, password) validates credentials and returns token' },
+    {
+      id: '1',
+      text: 'function authenticate(user, password) validates credentials and returns token',
+    },
     { id: '2', text: 'class AuthService handles user authentication and authorization' },
     { id: '3', text: 'const validatePassword checks password strength requirements' },
     { id: '4', text: 'async login(username, password) calls authenticate with credentials' },
@@ -120,14 +123,17 @@ test('BM25Indexer - search - should return results ranked by relevance', () => {
 
   // Results should be sorted by score (descending)
   for (let i = 1; i < results.length; i++) {
-    assert.ok(results[i-1].score >= results[i].score);
+    assert.ok(results[i - 1].score >= results[i].score);
   }
 });
 
 test('BM25Indexer - search - should find exact matches with high scores', () => {
   const indexer = new BM25Indexer();
   const docs = [
-    { id: '1', text: 'function authenticate(user, password) validates credentials and returns token' },
+    {
+      id: '1',
+      text: 'function authenticate(user, password) validates credentials and returns token',
+    },
     { id: '2', text: 'class AuthService handles user authentication and authorization' },
     { id: '3', text: 'const validatePassword checks password strength requirements' },
     { id: '4', text: 'async login(username, password) calls authenticate with credentials' },
@@ -240,7 +246,10 @@ test('BM25Indexer - scoring - should penalize longer documents (b parameter effe
   const indexer = new BM25Indexer({ k1: 1.5, b: 0.75 });
   const docs = [
     { id: 'short', text: 'authenticate' },
-    { id: 'long', text: 'authenticate function validates user credentials and returns authentication token after successful validation' },
+    {
+      id: 'long',
+      text: 'authenticate function validates user credentials and returns authentication token after successful validation',
+    },
   ];
   indexer.addDocuments(docs);
 

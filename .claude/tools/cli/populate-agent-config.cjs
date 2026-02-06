@@ -112,11 +112,11 @@ function main() {
     // Add phase if it's a core agent (optional field)
     if (registryData.category === 'core') {
       const phaseMap = {
-        'planner': 'planning',
-        'architect': 'planning',
-        'developer': 'coding',
-        'qa': 'qa',
-        'router': 'routing',
+        planner: 'planning',
+        architect: 'planning',
+        developer: 'coding',
+        qa: 'qa',
+        router: 'routing',
       };
       if (phaseMap[agentId]) {
         agentConfig.agents[agentId].phase = phaseMap[agentId];

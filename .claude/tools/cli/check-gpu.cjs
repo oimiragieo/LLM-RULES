@@ -21,7 +21,10 @@ console.log('=== GPU Configuration Check ===\n');
 // 1. Check nvidia-smi
 console.log('1. NVIDIA GPU Detection:\n');
 try {
-  const output = execSync('nvidia-smi --query-gpu=name,memory.total --format=csv,noheader,nounits', { encoding: 'utf-8' });
+  const output = execSync(
+    'nvidia-smi --query-gpu=name,memory.total --format=csv,noheader,nounits',
+    { encoding: 'utf-8' }
+  );
   const lines = output.trim().split('\n');
   console.log('✅ NVIDIA GPU(s) detected:');
   lines.forEach(line => {
@@ -43,7 +46,7 @@ if (fs.existsSync(packageJsonPath)) {
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
   const deps = {
     ...packageJson.dependencies,
-    ...packageJson.optionalDependencies
+    ...packageJson.optionalDependencies,
   };
 
   const hasGpuPackage = 'onnxruntime-node-gpu' in deps;
@@ -102,7 +105,6 @@ try {
   if (typeof ort.InferenceSession !== 'undefined') {
     console.log('   InferenceSession API available');
   }
-
 } catch (e) {
   console.log('❌ onnxruntime-node-gpu not loadable');
   console.log(`   Error: ${e.message}`);
@@ -158,7 +160,7 @@ try {
     try {
       const store = new MemoryVectorStore({
         embeddingMode: 'fastembed',
-        persistDirectory: '.claude/data/lancedb-test'
+        persistDirectory: '.claude/data/lancedb-test',
       });
       await store.initialize();
 

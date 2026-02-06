@@ -38,10 +38,7 @@ test('each agent should have required fields (tools, model)', () => {
     const agentData = agentConfig.agents[agentId];
 
     // This test should FAIL for missing agents
-    assert.ok(
-      agentData,
-      `Agent "${agentId}" from registry missing in agent-config.json`
-    );
+    assert.ok(agentData, `Agent "${agentId}" from registry missing in agent-config.json`);
 
     // Required fields
     assert.ok(
@@ -88,8 +85,17 @@ test('each agent should have tools from registry capabilities or fallback', () =
     // Check if tools are from registry or fallback
     const registryTools = registryData.capabilities?.[0]?.requiredTools || [];
     const fallbackTools = [
-      'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-      'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'
+      'Read',
+      'Write',
+      'Edit',
+      'Bash',
+      'Glob',
+      'Grep',
+      'TaskUpdate',
+      'TaskList',
+      'TaskCreate',
+      'TaskGet',
+      'Skill',
     ];
 
     if (registryTools.length > 0) {
@@ -102,7 +108,7 @@ test('each agent should have tools from registry capabilities or fallback', () =
     } else {
       // Should have fallback tools
       assert.ok(
-        fallbackTools.every((t) => agentData.tools.includes(t)),
+        fallbackTools.every(t => agentData.tools.includes(t)),
         `Agent "${agentId}" missing essential fallback tools`
       );
     }

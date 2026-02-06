@@ -4,12 +4,12 @@
   "description": "Schema for sprint planning",
   "type": "object",
   "properties": {
-    "sprint": {"type": "string"},
-    "goal": {"type": "string"},
-    "stories": {"type": "array", "items": {"type": "string"}},
-    "capacity": {"type": "number"},
-    "start_date": {"type": "string", "format": "date"},
-    "end_date": {"type": "string", "format": "date"}
+    "sprint": { "type": "string" },
+    "goal": { "type": "string" },
+    "stories": { "type": "array", "items": { "type": "string" } },
+    "capacity": { "type": "number" },
+    "start_date": { "type": "string", "format": "date" },
+    "end_date": { "type": "string", "format": "date" }
   },
   "required": ["sprint", "goal"]
 }

@@ -54,7 +54,6 @@ try {
 
   console.log('\n✅ Workflow execution completed (simulation)');
   process.exit(0);
-
 } catch (error) {
   console.error(`Error executing workflow ${workflowName}:`, error.message);
   process.exit(1);

@@ -154,9 +154,9 @@ describe('VectorStore Hybrid Search Integration', () => {
       const fused = vectorStore._fuseResultsRRF(
         sparseResults,
         denseResults,
-        60,  // k
+        60, // k
         0.4, // sparse weight
-        0.6  // dense weight
+        0.6 // dense weight
       );
 
       // doc2 appears in both lists (rank 1 in sparse, rank 0 in dense)

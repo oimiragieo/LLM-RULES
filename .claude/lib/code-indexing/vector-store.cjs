@@ -9,7 +9,6 @@
 
 const path = require('path');
 const fs = require('fs');
-const { MemoryVectorStore } = require('../memory/lancedb-client.cjs');
 
 class VectorStore {
   constructor(options = {}) {
@@ -28,6 +27,8 @@ class VectorStore {
 
     // Skip LanceDB initialization entirely when embeddings are off (BM25-only mode)
     if (this.embeddingMode !== 'off') {
+      // Lazy-load lancedb-client only when needed (avoid CUDA auto-discovery in BM25-only mode)
+      const { MemoryVectorStore } = require('../memory/lancedb-client.cjs');
       this.store = MemoryVectorStore.getSharedStore({
         persistDirectory,
         collectionName,
@@ -163,7 +164,22 @@ class VectorStore {
   async saveBM25Index() {
     if (this.bm25Index) {
       const bm25Path = path.join(this.persistDirectory, 'bm25-index.json');
-      fs.writeFileSync(bm25Path, JSON.stringify(this.bm25Index.toJSON()), 'utf-8');
+      const tempPath = bm25Path + '.tmp';
+
+      // Write to temp file first, then atomic rename
+      try {
+        fs.writeFileSync(tempPath, JSON.stringify(this.bm25Index.toJSON()), 'utf-8');
+        // Atomic rename (overwrites existing file)
+        fs.renameSync(tempPath, bm25Path);
+      } catch (err) {
+        // Clean up temp file if it exists
+        try {
+          fs.unlinkSync(tempPath);
+        } catch (_unlinkErr) {
+          // Ignore if temp file already missing
+        }
+        throw err;
+      }
     }
   }
 

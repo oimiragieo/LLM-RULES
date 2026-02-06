@@ -26,14 +26,7 @@ const { assembleSpawnPrompt } = require('../spawn/prompt-assembler.cjs');
  * @param {string} params.task_id - Unique identifier for this task
  * @returns {Promise<Object>} Result of the task execution
  */
-async function Task({
-  subagent_type,
-  description,
-  prompt,
-  allowed_tools = [],
-  _model,
-  task_id
-}) {
+async function Task({ subagent_type, description, prompt, allowed_tools = [], _model, task_id }) {
   if (!subagent_type) {
     throw new Error('subagent_type is required');
   }
@@ -57,7 +50,9 @@ async function Task({
 
     // In a real implementation, this would spawn an actual subagent
     // For now, we'll simulate the spawn and return a success result
-    console.log(`[Task Tool] Would spawn ${subagent_type} with prompt length: ${assembledPrompt.length}`);
+    console.log(
+      `[Task Tool] Would spawn ${subagent_type} with prompt length: ${assembledPrompt.length}`
+    );
 
     // Simulate task execution
     const result = {
@@ -70,7 +65,6 @@ async function Task({
     };
 
     return result;
-
   } catch (error) {
     console.error('[Task Tool] Error:', error);
     return {

@@ -69,8 +69,12 @@ class LoopHandler {
       return iteration === targetIter;
     }
 
-    if (condition.includes('iteration <=') || condition.includes('iteration >=') ||
-        condition.includes('iteration !=') || condition.includes('iteration !==')) {
+    if (
+      condition.includes('iteration <=') ||
+      condition.includes('iteration >=') ||
+      condition.includes('iteration !=') ||
+      condition.includes('iteration !==')
+    ) {
       // Add more complex iteration conditions as needed
       return true; // Default to continue for unsupported conditions
     }
@@ -102,13 +106,20 @@ class LoopHandler {
       }
 
       switch (operator) {
-        case 'equals': return leftValue === rightValue;
-        case 'not_equals': return leftValue !== rightValue;
-        case 'greater_than': return leftValue > rightValue;
-        case 'less_than': return leftValue < rightValue;
-        case 'less_than_or_equal': return leftValue <= rightValue;
-        case 'greater_than_or_equal': return leftValue >= rightValue;
-        default: return false;
+        case 'equals':
+          return leftValue === rightValue;
+        case 'not_equals':
+          return leftValue !== rightValue;
+        case 'greater_than':
+          return leftValue > rightValue;
+        case 'less_than':
+          return leftValue < rightValue;
+        case 'less_than_or_equal':
+          return leftValue <= rightValue;
+        case 'greater_than_or_equal':
+          return leftValue >= rightValue;
+        default:
+          return false;
       }
     }
 
@@ -139,7 +150,7 @@ class LoopHandler {
     if (iteration >= (loop.max_iterations || this.maxIterations)) {
       return {
         continue: false,
-        reason: `Maximum iterations reached: ${iteration}/${loop.max_iterations || this.maxIterations}`
+        reason: `Maximum iterations reached: ${iteration}/${loop.max_iterations || this.maxIterations}`,
       };
     }
 
@@ -149,24 +160,30 @@ class LoopHandler {
       if (shouldExit) {
         return {
           continue: false,
-          reason: `Exit condition met: ${loop.exit_condition}`
+          reason: `Exit condition met: ${loop.exit_condition}`,
         };
       }
     }
 
     // Evaluate continue condition
     if (loop.continue_condition) {
-      const shouldContinue = await this.evaluateLoopCondition(loop.continue_condition, context, iteration);
+      const shouldContinue = await this.evaluateLoopCondition(
+        loop.continue_condition,
+        context,
+        iteration
+      );
       return {
         continue: shouldContinue,
-        reason: shouldContinue ? `Continue condition met: ${loop.continue_condition}` : `Continue condition not met: ${loop.continue_condition}`
+        reason: shouldContinue
+          ? `Continue condition met: ${loop.continue_condition}`
+          : `Continue condition not met: ${loop.continue_condition}`,
       };
     }
 
     // Default: continue until max iterations
     return {
       continue: true,
-      reason: 'Default continuation until max iterations'
+      reason: 'Default continuation until max iterations',
     };
   }
 
@@ -179,8 +196,8 @@ class LoopHandler {
       loop: {
         iteration,
         max_iterations: loop.max_iterations || this.maxIterations,
-        total_iterations: iteration + 1
-      }
+        total_iterations: iteration + 1,
+      },
     };
 
     // Here you would execute the loop body steps
@@ -189,7 +206,7 @@ class LoopHandler {
       success: true,
       context: loopContext,
       iteration: iteration + 1,
-      completed: false // Will be set by the loop controller
+      completed: false, // Will be set by the loop controller
     };
   }
 
@@ -209,7 +226,7 @@ class LoopHandler {
         reason: loopDecision.reason,
         final_iteration: iteration,
         timestamp: new Date().toISOString(),
-        handler: this.name
+        handler: this.name,
       };
     }
 
@@ -222,7 +239,7 @@ class LoopHandler {
       iteration: iterationResult.iteration,
       context: iterationResult.context,
       timestamp: new Date().toISOString(),
-      handler: this.name
+      handler: this.name,
     };
   }
 }
@@ -231,8 +248,9 @@ class LoopHandler {
 export default LoopHandler;
 
 // CLI usage
-const isMainModule = import.meta.url === `file://${process.argv[1]}`
-  || import.meta.url === new URL(`file:///${process.argv[1].replace(/\\/g, '/')}`).href;
+const isMainModule =
+  import.meta.url === `file://${process.argv[1]}` ||
+  import.meta.url === new URL(`file:///${process.argv[1].replace(/\\/g, '/')}`).href;
 if (isMainModule) {
   const handler = new LoopHandler();
 
@@ -240,7 +258,8 @@ if (isMainModule) {
   const input = process.argv[2] ? JSON.parse(process.argv[2]) : null;
 
   if (input) {
-    handler.execute(input)
+    handler
+      .execute(input)
       .then(result => {
         console.log(JSON.stringify(result, null, 2));
         process.exit(0);
@@ -251,7 +270,9 @@ if (isMainModule) {
       });
   } else {
     console.log('Usage: node loop-handler.mjs <json-input>');
-    console.log('Example: node loop-handler.mjs \'{"workflowStep": {"loop": {"max_iterations": 5, "continue_condition": "iteration < 3"}}, "context": {}, "iteration": 0}\'');
+    console.log(
+      'Example: node loop-handler.mjs \'{"workflowStep": {"loop": {"max_iterations": 5, "continue_condition": "iteration < 3"}}, "context": {}, "iteration": 0}\''
+    );
     process.exit(1);
   }
 }

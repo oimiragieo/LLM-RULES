@@ -5,6 +5,7 @@
 **Symptom:** GPU detected but not used for embeddings (0% GPU utilization, CPU at 67%)
 
 **Root Cause:** CUDA version mismatch
+
 - System has CUDA 11.5 installed
 - onnxruntime-node-gpu v1.21.0 requires CUDA 12.x
 - pnpm skips GPU package installation due to missing CUDA 12 DLLs
@@ -18,6 +19,7 @@ pnpm run gpu:check
 ```
 
 Expected output if GPU is working:
+
 ```
 ✅ NVIDIA GPU(s) detected
 ✅ onnxruntime-node-gpu installed (GPU-enabled)
@@ -30,6 +32,7 @@ Expected output if GPU is working:
 ```
 
 Current output:
+
 ```
 ✅ NVIDIA GPU(s) detected: RTX 4070, RTX 5070
 ✅ onnxruntime-node-gpu in package.json
@@ -58,12 +61,14 @@ Current output:
    - Installation adds to PATH automatically
 
 3. **Verify Installation:**
+
    ```bash
    nvcc --version  # Should show CUDA 12.x
    where cudart64_12.dll  # Should find DLL in CUDA/v12.x/bin
    ```
 
 4. **Install GPU Package:**
+
    ```bash
    # Package.json already updated to onnxruntime-node-gpu
    pnpm install
@@ -82,6 +87,7 @@ Current output:
 If you cannot upgrade CUDA:
 
 1. **Downgrade onnxruntime-node-gpu:**
+
    ```bash
    # Find CUDA 11 compatible version
    pnpm info onnxruntime-node-gpu versions
@@ -107,6 +113,7 @@ pnpm install
 ```
 
 FastEmbed will use CPU automatically. Performance impact:
+
 - CPU: ~5-10s per 100 embeddings
 - GPU: ~50-100ms per 100 embeddings (100x faster)
 
@@ -120,6 +127,7 @@ node --test tests/lib/memory/verify-gpu-usage.test.cjs
 ```
 
 Expected output with working GPU:
+
 ```
 GPU utilization before: 0%
 GPU memory before: 0MB
@@ -132,6 +140,7 @@ Loaded package: onnxruntime-node-gpu (GPU)
 ```
 
 Current output (broken):
+
 ```
 GPU utilization before: 0%
 Generated 100 embeddings in 6902ms
@@ -143,11 +152,11 @@ Loaded package: onnxruntime-node (CPU-only)
 
 ## Performance Comparison
 
-| Mode | Speed (100 embeddings) | GPU Util | Memory |
-|------|------------------------|----------|---------|
-| **CPU** | 6.9s | 0% | 0MB |
-| **GPU (working)** | ~100ms | 50-100% | 2-4GB |
-| **Speedup** | **69x faster** | | |
+| Mode              | Speed (100 embeddings) | GPU Util | Memory |
+| ----------------- | ---------------------- | -------- | ------ |
+| **CPU**           | 6.9s                   | 0%       | 0MB    |
+| **GPU (working)** | ~100ms                 | 50-100%  | 2-4GB  |
+| **Speedup**       | **69x faster**         |          |        |
 
 ## Architecture
 
@@ -180,6 +189,7 @@ Loaded package: onnxruntime-node (CPU-only)
 ### Package Changes
 
 **Before:**
+
 ```json
 {
   "optionalDependencies": {
@@ -189,6 +199,7 @@ Loaded package: onnxruntime-node (CPU-only)
 ```
 
 **After:**
+
 ```json
 {
   "optionalDependencies": {
@@ -200,6 +211,7 @@ Loaded package: onnxruntime-node (CPU-only)
 ### Code Changes
 
 The `lancedb-client.cjs` already supports GPU:
+
 - GPU detection via `gpu-detector.cjs`
 - Auto-tunes batch size based on GPU memory
 - Falls back to CPU if GPU unavailable
@@ -215,6 +227,7 @@ pnpm run gpu:check
 ```
 
 Checks:
+
 1. NVIDIA GPU detection (nvidia-smi)
 2. ONNX Runtime package (CPU vs GPU)
 3. FastEmbed availability
@@ -227,6 +240,7 @@ Checks:
 ### pnpm skips onnxruntime-node-gpu
 
 **Symptom:**
+
 ```
 info: onnxruntime-node-gpu is an optional dependency and failed compatibility check
 ```
@@ -240,6 +254,7 @@ info: onnxruntime-node-gpu is an optional dependency and failed compatibility ch
 **Cause:** Package not installed due to compatibility check failure
 
 **Solution:**
+
 1. Install CUDA 12.x
 2. `pnpm install` (will succeed after CUDA installed)
 3. Verify: `node -e "require('onnxruntime-node-gpu')"`
@@ -249,6 +264,7 @@ info: onnxruntime-node-gpu is an optional dependency and failed compatibility ch
 **Cause:** CPU-only onnxruntime-node is loaded
 
 **Solution:**
+
 1. Check loaded package: `node -e "require('onnxruntime-node-gpu')"`
 2. If fails, CUDA DLLs missing
 3. Install CUDA 12.x
@@ -259,6 +275,7 @@ info: onnxruntime-node-gpu is an optional dependency and failed compatibility ch
 **Symptom:** CUDA 11.x installed but onnxruntime-node-gpu requires 12.x
 
 **Solution:**
+
 - Option A: Upgrade CUDA to 12.x (recommended)
 - Option B: Downgrade onnxruntime-node-gpu to CUDA 11 compatible version
 

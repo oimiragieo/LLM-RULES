@@ -4,21 +4,21 @@
   "description": "Schema for UI audit reports",
   "type": "object",
   "properties": {
-    "component": {"type": "string"},
+    "component": { "type": "string" },
     "issues": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "severity": {"type": "string", "enum": ["critical", "major", "minor"]},
-          "category": {"type": "string"},
-          "description": {"type": "string"},
-          "recommendation": {"type": "string"}
+          "severity": { "type": "string", "enum": ["critical", "major", "minor"] },
+          "category": { "type": "string" },
+          "description": { "type": "string" },
+          "recommendation": { "type": "string" }
         }
       }
     },
-    "score": {"type": "number", "minimum": 0, "maximum": 100},
-    "audited_at": {"type": "string", "format": "date-time"}
+    "score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "audited_at": { "type": "string", "format": "date-time" }
   },
   "required": ["component", "issues"]
 }

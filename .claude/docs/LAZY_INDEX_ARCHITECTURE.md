@@ -7,12 +7,14 @@ Your proposal: Pre-hook structural analysis + post-hook incremental updates = **
 ## Why This Works (And Cursor Does Something Similar)
 
 ### Traditional (Current) Approach
+
 ```
 Startup → Index ALL files → Store embeddings → Search
   0s    →   2 hours      →   GBs of data   → Fast
 ```
 
 ### Your Proposed Approach (Lazy)
+
 ```
 Startup → Nothing        → User prompts → Pre-hook analyzes → Search
   0s    →   0s           →     0s       →   0.5s ripgrep  → Fast enough
@@ -33,22 +35,24 @@ When user submits a prompt, instantly analyze codebase structure:
 async function analyzeStructure(projectRoot) {
   // 1. Get file tree (instant)
   const fileTree = await exec(`tree -L 3 --noreport --dirsfirst ${projectRoot}`);
-  
+
   // 2. Find entry points (instant ripgrep)
-  const entryPoints = await exec(`rg --type js --type ts "^export (default )?(class|function|const)" --json -l`);
-  
+  const entryPoints = await exec(
+    `rg --type js --type ts "^export (default )?(class|function|const)" --json -l`
+  );
+
   // 3. Map imports/dependencies (structural)
   const imports = await exec(`rg "^import .* from" --json`);
-  
+
   // 4. Generate mermaid-style diagram (in memory, no storage)
   const structure = {
     timestamp: Date.now(),
     files: parseFileTree(fileTree),
     exports: parseExports(entryPoints),
     dependencies: parseImports(imports),
-    diagram: generateMermaidDiagram({ files, exports, imports })
+    diagram: generateMermaidDiagram({ files, exports, imports }),
   };
-  
+
   return structure; // Pass to agent context
 }
 ```
@@ -57,10 +61,11 @@ async function analyzeStructure(projectRoot) {
 
 ### Step 2: Agent Uses Structure
 
-```markdown
+````markdown
 # Agent Context (Injected by Hook)
 
 ## Project Structure (Live Analysis)
+
 ```mermaid
 graph TD
     A[app.ts] --> B[controllers/]
@@ -69,18 +74,23 @@ graph TD
     C --> E[services/user.service.ts]
     D --> F[services/auth.service.ts]
 ```
+````
 
 ## Key Files (Most Referenced)
+
 - `app.ts` - Entry point (15 imports)
 - `controllers/user.controller.ts` - User API (8 exports)
 - `services/auth.service.ts` - Auth logic (5 exports)
 
 ## Relevant Files for Your Query
+
 Based on "authentication", ripgrep found:
+
 - `src/auth/*` (12 files)
 - `src/middleware/jwt.ts`
 - `src/services/auth.service.ts`
-```
+
+````
 
 ### Step 3: Post-Tool-Hook (Incremental Persistence)
 
@@ -93,22 +103,22 @@ async function incrementalUpdate(filePath) {
   // Only re-index if this file was actually touched
   const stats = await fs.stat(filePath);
   const lastIndexed = cache.get(filePath)?.timestamp || 0;
-  
+
   if (stats.mtimeMs > lastIndexed) {
     // Parse just this file
     const content = await fs.readFile(filePath, 'utf8');
     const chunks = parseAndChunk(content, filePath);
-    
+
     // Embed only this file's chunks
     const embeddings = await embedBatch(chunks);
-    
+
     // Upsert to LanceDB (fast, not full reindex)
     await vectorStore.upsertFile(filePath, embeddings);
-    
+
     cache.set(filePath, { timestamp: Date.now(), chunks: chunks.length });
   }
 }
-```
+````
 
 **Time: 50-200ms per file**
 
@@ -133,7 +143,7 @@ class StructuralAnalyzer {
   async analyze(query) {
     const cacheKey = `${this.projectRoot}:${query}`;
     const cached = this.cache.get(cacheKey);
-    
+
     if (cached && Date.now() - cached.time < this.cacheTimeout) {
       return cached.data;
     }
@@ -142,7 +152,7 @@ class StructuralAnalyzer {
     const [structure, relevantFiles, exports] = await Promise.all([
       this.getStructure(),
       this.findRelevantFiles(query),
-      this.getPublicAPI()
+      this.getPublicAPI(),
     ]);
 
     const result = {
@@ -150,7 +160,7 @@ class StructuralAnalyzer {
       relevantFiles,
       exports,
       diagram: this.generateMermaid(structure),
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.cache.set(cacheKey, { data: result, time: Date.now() });
@@ -159,10 +169,9 @@ class StructuralAnalyzer {
 
   async getStructure() {
     // 1. File tree (directories only - fast)
-    const { stdout: tree } = await execAsync(
-      `tree -d -L 3 --noreport "${this.projectRoot}"`,
-      { timeout: 5000 }
-    );
+    const { stdout: tree } = await execAsync(`tree -d -L 3 --noreport "${this.projectRoot}"`, {
+      timeout: 5000,
+    });
 
     // 2. Key source files (top-level only)
     const { stdout: files } = await execAsync(
@@ -175,7 +184,8 @@ class StructuralAnalyzer {
 
   async findRelevantFiles(query) {
     // Use ripgrep to find files matching query keywords
-    const keywords = query.toLowerCase()
+    const keywords = query
+      .toLowerCase()
       .replace(/\b(how|to|what|is|the|a|an|in|for|of|and|or)\b/g, '')
       .split(/\s+/)
       .filter(w => w.length > 2)
@@ -201,7 +211,8 @@ class StructuralAnalyzer {
         `rg "^export (default )?(class|function|interface|type|const)" --type js --type ts -n "${this.projectRoot}"`,
         { timeout: 3000 }
       );
-      return stdout.split('\n')
+      return stdout
+        .split('\n')
         .filter(Boolean)
         .map(line => {
           const [file, num, ...rest] = line.split(':');
@@ -216,7 +227,7 @@ class StructuralAnalyzer {
   generateMermaid(structure) {
     // Generate diagram from structure
     const lines = ['graph TD'];
-    
+
     // Group by directory
     const dirs = {};
     structure.files.forEach(f => {
@@ -257,7 +268,7 @@ class IncrementalIndexer {
 
   async queueUpdate(filePath) {
     this.pendingUpdates.add(filePath);
-    
+
     // Debounce: wait 5 seconds after last edit
     clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => this.flush(), 5000);
@@ -280,24 +291,20 @@ class IncrementalIndexer {
     try {
       // Skip if not source file
       if (!/\.(js|ts|jsx|tsx|cjs|mjs)$/.test(filePath)) return;
-      
+
       // Skip if in node_modules
       if (filePath.includes('node_modules')) return;
 
-      const content = await fs.readFile(
-        path.join(this.projectRoot, filePath), 
-        'utf8'
-      );
+      const content = await fs.readFile(path.join(this.projectRoot, filePath), 'utf8');
 
       // Quick parse (no heavy AST)
       const chunks = this.quickChunk(content, filePath);
-      
+
       // Generate lightweight embedding (or just hash for now)
       const fingerprint = this.fingerprint(content);
-      
+
       // Store in LanceDB (upsert, not full reindex)
       await this.upsert(filePath, { chunks, fingerprint, timestamp: Date.now() });
-      
     } catch (err) {
       // Silent fail - not critical
       console.error(`[incremental-indexer] Failed: ${filePath}`, err.message);
@@ -309,7 +316,7 @@ class IncrementalIndexer {
     const lines = content.split('\n');
     const chunks = [];
     let currentChunk = { lines: [], start: 0 };
-    
+
     lines.forEach((line, i) => {
       // New chunk on function/class definition
       if (/^(export\s+)?(function|class|const|let|var)\s+\w+/.test(line)) {
@@ -321,17 +328,13 @@ class IncrementalIndexer {
         currentChunk.lines.push(line);
       }
     });
-    
+
     return chunks;
   }
 
   fingerprint(content) {
     // Simple hash instead of expensive embedding
-    return require('crypto')
-      .createHash('md5')
-      .update(content)
-      .digest('hex')
-      .slice(0, 16);
+    return require('crypto').createHash('md5').update(content).digest('hex').slice(0, 16);
   }
 
   async upsert(filePath, data) {
@@ -377,14 +380,14 @@ module.exports = { IncrementalIndexer };
 
 ## Performance Comparison
 
-| Metric | Current Batch | Your Lazy Approach | Cursor (Reference) |
-|--------|---------------|-------------------|-------------------|
-| **Startup** | 2+ hours | **0 seconds** | 0 seconds |
-| **First Search** | Instant (after index) | **0.5 seconds** | 0.3 seconds |
-| **Subsequent** | Instant | **0.1 seconds** (cached) | Instant |
-| **After Edit** | Must reindex all | **0.2 seconds** (1 file) | ~0.1 seconds |
-| **Memory** | 8-16GB peak | **<500MB** | ~1GB |
-| **Disk** | 2-5GB embeddings | **<100MB** structure | ~500MB |
+| Metric           | Current Batch         | Your Lazy Approach       | Cursor (Reference) |
+| ---------------- | --------------------- | ------------------------ | ------------------ |
+| **Startup**      | 2+ hours              | **0 seconds**            | 0 seconds          |
+| **First Search** | Instant (after index) | **0.5 seconds**          | 0.3 seconds        |
+| **Subsequent**   | Instant               | **0.1 seconds** (cached) | Instant            |
+| **After Edit**   | Must reindex all      | **0.2 seconds** (1 file) | ~0.1 seconds       |
+| **Memory**       | 8-16GB peak           | **<500MB**               | ~1GB               |
+| **Disk**         | 2-5GB embeddings      | **<100MB** structure     | ~500MB             |
 
 ## Advantages of Your Approach
 
@@ -396,12 +399,12 @@ module.exports = { IncrementalIndexer };
 
 ## Disadvantages & Mitigations
 
-| Issue | Mitigation |
-|-------|------------|
-| First search slower | Cache structure for 30 seconds |
-| No semantic search | Add embeddings only for opened files (background) |
-| Large repos still slow | Limit ripgrep to 100 results, paginate |
-| No cross-file analysis | Build call graph incrementally over time |
+| Issue                  | Mitigation                                        |
+| ---------------------- | ------------------------------------------------- |
+| First search slower    | Cache structure for 30 seconds                    |
+| No semantic search     | Add embeddings only for opened files (background) |
+| Large repos still slow | Limit ripgrep to 100 results, paginate            |
+| No cross-file analysis | Build call graph incrementally over time          |
 
 ## Even Better: Hybrid Approach
 

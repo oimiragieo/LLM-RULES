@@ -1,7 +1,5343 @@
 {
-  "version": 1,
-  "lastIndexed": null,
-  "fileCount": 0,
-  "chunkCount": 0,
-  "status": "uninitialized"
+  "timestamp": "2026-02-06T05:04:33.382Z",
+  "stats": {
+    "files": 1332,
+    "chunks": 7184,
+    "embeddings": 0,
+    "byLanguage": {
+      "javascript": 1129,
+      "typescript": 8,
+      "python": 195
+    }
+  },
+  "files": {
+    "C:\\dev\\projects\\agent-studio\\.claude\\agents\\orchestrators\\__tests__\\mocks\\agent-response-mock.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\agents\\orchestrators\\__tests__\\mocks\\task-tool-mock.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\agents\\orchestrators\\__tests__\\run-all-tests.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\archive\\hooks\\memory\\extract-workflow-learnings.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\archive\\hooks\\memory\\session-end-recorder.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\archive\\hooks\\memory\\session-memory-extractor.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\archive\\hooks\\self-healing\\loop-prevention.cjs": {
+      "hash": null,
+      "chunks": 21
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\archive\\hooks\\session\\memory-reminder.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\archive\\lib\\memory\\sync-layer.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\archive\\lib\\memory\\sync-worker.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\code-indexing\\test-ast-grep.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\audit\\git-notes-audit.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\cost-tracking\\llm-usage-tracker.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\evolution\\conflict-detector.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\evolution\\evolution-audit.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\evolution\\evolution-state-guard.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\evolution\\quality-gate-validator.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\evolution\\research-enforcement.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\evolution\\unified-evolution-guard.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\git\\regenerate-registries.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\memory\\format-memory.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\memory\\planning-progress-tracker.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\memory\\sync-memory-index.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\error-tracker-hook.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\error-tracker.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\execution-limit-monitor-hook.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\execution-limit-monitor.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\metrics-collector-hook.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\metrics-collector.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\orchestrator.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\post-tool-use\\incremental-indexer.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\error-summary-extractor.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\force-step0-execution.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\reflection-queue-processor.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\reflection-step0-guard.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\unified-reflection-handler.cjs": {
+      "hash": null,
+      "chunks": 25
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\agent-context-tracker.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\agent-health-hook.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\code-index-updater.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\config-model-validator.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\context-mode-tool-guard.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\documentation-routing-guard.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\post-spawn-task-updater.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\post-task-unified.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\pre-spawn-task-validator.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\pre-spawn-tool-validator.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\pre-task-unified.cjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\router-state.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\routing-guard.cjs": {
+      "hash": null,
+      "chunks": 22
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\skill-invocation-tracker.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\spawn-prompt-assembler.cjs": {
+      "hash": null,
+      "chunks": 22
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\structural-context-hook.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\task-auto-route.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\task-completion-guard.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\task-list-tracker.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\task-status-enforcement.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\task-update-tracker.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\tool-availability-validator.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\tool-scope-validator.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\unified-creator-guard.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\user-prompt-unified.cjs": {
+      "hash": null,
+      "chunks": 31
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\bash-command-validator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\bash-cwd-validator.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\command-allowlist-validator.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\enforce-claude-md-update.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\error-capture-post-tool.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\file-path-guard.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\security-trigger.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\shell-injection-validator.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\shellcheck-validator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\spawn-prompt-validator.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\spawn-size-validator.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\validate-skill-invocation.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\validators\\database-validators.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\validators\\filesystem-validators.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\validators\\git-validators.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\validators\\network-validators.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\validators\\process-validators.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\validators\\registry.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\validators\\shell-validators.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\variable-quoting-validator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\windows-null-sanitizer.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\write-content-scanner.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\self-healing\\anomaly-detector.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\self-healing\\auto-rerouter.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\post-creation-reminder.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\state-reset.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\skills\\duplicate-detector.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\skills\\metadata-validator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\skills\\rule-structure-validator.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\skills\\rule-validator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\statusline.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\unified-pre-write-hook.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\validation\\agent-tools-validator.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\validation\\plan-evolution-guard.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\validation\\pre-completion-validation.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\validation\\track-analytics-validator.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\agents\\agent-config.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\agents\\agent-parser.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\agents\\architect\\index.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\agents\\base-agent.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\agents\\developer\\index.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\agents\\factory.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\agents\\orchestrator.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\agents\\qa\\index.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\boot\\production-agent.js": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\boot\\worker-agent.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\boot\\worker-agent.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\clients\\model-client.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\ast-grep-wrapper.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\bm25-indexer.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\code-parser.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\embedding-generator.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\gpu-detector.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\hybrid-lazy-indexer.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\hybrid-search.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\index-manager.cjs": {
+      "hash": null,
+      "chunks": 17
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\index.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\merkle-tree.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\parse-chunk-worker.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\parse-utils.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\query-analyzer.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\result-ranker.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\semantic-chunker.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\vector-store.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\config\\context-mode-loader.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\config\\phase-config.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\config\\resolve-runtime-context.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\error-pattern-detector.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\error-writer.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\events\\event-bus-sink.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\events\\event-bus.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\events\\event-types.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\evolution-state-sync.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\integration\\conductor-gap-analyzer.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\integration\\feature-compatibility.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\integration\\migration-strategy.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\integration\\safety-rollback-manager.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\integration\\system-registration-handler.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\audit-trail-integration.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\cold-storage.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\contextual-memory.cjs": {
+      "hash": null,
+      "chunks": 19
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\entity-extractor.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\entity-query.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\intent-analyzer.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\lancedb-client.cjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\learnings-parser.cjs": {
+      "hash": null,
+      "chunks": 14
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-areas.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-consolidation.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-constants.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-dashboard.cjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-deduplicator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-entity-links.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-extraction-writer.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-extractor.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-manager.cjs": {
+      "hash": null,
+      "chunks": 31
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-retention-config.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-rotator.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-scheduler.cjs": {
+      "hash": null,
+      "chunks": 20
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-search.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-tiers.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\prompts\\consolidation.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\prompts\\dedup-decision.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\prompts\\intent-analysis.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\prompts\\memory-extraction.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\prompts\\session-structured-summary.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\run-extraction-pipeline.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\semantic-archival.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\session-context-for-search.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\session-summary.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\smart-pruner.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\adaptive-executor.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\anomaly-detector.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\cost-predictor.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\feature-engineer.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\feedback-loop.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\index.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\models\\clustering.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\optimization-engine.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\pattern-detector.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\monitoring\\dashboard-renderer.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\monitoring\\metrics-reader.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\monitoring\\production-alerts.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\monitoring\\spawn-log.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\consensus\\response-aggregator.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\orchestration\\lifecycle-manager.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\orchestration\\round-manager.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\orchestration\\team-loader.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\protocol\\context-isolator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\protocol\\message-router.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\protocol\\sidecar-manager.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\security\\agent-identity.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\security\\response-integrity.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\party-mode\\security\\session-audit.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\plan\\implementation-plan.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\plan\\progress.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\platform.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\platform.mjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\qa\\criteria.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\qa\\report.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\agent-registry-resolver.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\fuzzy-intent-matcher.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\intent-classifier.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\pattern-router.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\routing-table.cjs": {
+      "hash": null,
+      "chunks": 41
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\semantic-router.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\safety\\command-allowlist.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\scheduler\\scheduler-store.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\scheduler\\scheduler-tick.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\self-healing\\dashboard.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\self-healing\\loop-state-manager.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\self-healing\\rollback-manager.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\self-healing\\validator.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\skill-build\\src\\build.ts": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\skill-build\\src\\config.ts": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\skill-build\\src\\extract-tests.ts": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\skill-build\\src\\migrate.ts": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\skill-build\\src\\parser.ts": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\skill-build\\src\\types.ts": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\skill-build\\src\\validate.ts": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\spawn\\prompt-assembler.cjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\spawn\\prompt-factory.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\testing\\chaos-engineer.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\testing\\failure-scenarios.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\testing\\feature-interaction-validator.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\testing\\integration-scenarios.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\testing\\integration-test-suite.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\testing\\load-test-framework.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\testing\\performance-integration-tester.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\testing\\resilience-validator.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\text-processing\\sentence-chunker.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\agent-health-tracker.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\agent-registry-generator.cjs": {
+      "hash": null,
+      "chunks": 18
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\available-agents.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\mcp-tool-resolver.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\orchestrator-tool.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\skill-catalog.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\skill-tool.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\standard-tools.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\task-tools.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\tool-set.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ui\\formatter.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\adaptive-discloser.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\agent-config-reader.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\atomic-write.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\bottleneck-analyzer.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\brownfield-assessor.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\build-knowledge-base-index.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\command-exists.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\compression-trigger.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\config-loader.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\context-accumulator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\context-reset.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\cost-calculator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\environment.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\error-sanitizer.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\feature-flags.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\hook-input.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\hook-logger.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\hook-resolver.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\jsonl-utils.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\knowledge-base-reader.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\logger.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\logical-unit-tracker.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\memory-integrated-suggester.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\memory-monitor.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\optimization-targets.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\package-manager.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\path-validator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\pattern-library.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\performance-profiler.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\platform.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\profiling-report-generator.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\project-root.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\readiness-scorer.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\retry-with-backoff.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\safe-json.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\state-cache.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\tech-stack-detector.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\token-budget-tracker.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\track-analytics.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\adapter-registry.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\brownfield-orchestrator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\checkpoint-manager.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\conditional-executor.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\cross-workflow-trigger.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\cycle-detector.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\deployment-manager.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\dynamic-task-generator.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\fan-out-fan-in.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\hybrid-executor.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\interface-mapper.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\lazy-loader.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\legacy-adapter.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\loop-executor.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\memory-budgeter.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\migration-executor.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\parallel-phase-executor.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\result-normalizer.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\result-streamer.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\run-workflow-tests.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\saga-coordinator.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\state-sync-manager.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\state-transaction-manager.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\state-validator.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\step-validators.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\strangler-fig.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\system-adapters.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\task-cleanup-manager.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\task-router.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\verify-workflows.mjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\version-registry.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-cache.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-cli.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-composer.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-engine.cjs": {
+      "hash": null,
+      "chunks": 24
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-resolver.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-state-machine.cjs": {
+      "hash": null,
+      "chunks": 14
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-validator.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-versioner.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\scripts\\ensure-routing-prototypes.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\scripts\\hooks\\check-console-log.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\scripts\\hooks\\suggest-compact.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\scripts\\quick-status.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\scripts\\setup-package-manager.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\scripts\\validate-routing-consistency.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\accessibility\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\aceternity-ui-configuration\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\activities\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\additional-htmx-and-flask-instructions\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\admin-interface-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-creator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-creator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-creator\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agp-router-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ai-ml-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\alpine-js-usage-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\android-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\angular-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\api-development-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\apiresponse-class\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\arxiv-mcp\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\assistant-behavior-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\astro-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\async-operations\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\asynchronous-programming-preference\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\auth-security-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\authentication-flow-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\automation-script-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\aws-cloud-ops\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\aws-cloud-ops\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\aws-cloud-ops\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\babel-configuration-for-nativewind\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\backend-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\beefreesdk\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\best-practices-guidelines\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\browser-api-usage-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\bug-handling-with-todo-comments\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\build-notes-file-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\build-tools-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\check-x-md-content-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\chrome-browser\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\chrome-extension-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ci-cd-implementation-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ckeditor-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\class-based-state-management\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\cloud-devops-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\cloud-native-and-kubernetes-expertise-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\code-analyzer\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\code-analyzer\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\code-analyzer\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\code-quality-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\code-style-validator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\code-style-validator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\code-style-validator\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\collaboration-and-version-control-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\comment-usage\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\commit-message-guidelines\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\commit-validator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\commit-validator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\commit-validator\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\communication-and-problem-solving\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\communication-tone\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\composer-dependency-management\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\comprehensive-type-annotations\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\comprehensive-unit-testing-with-pytest\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\computer-use\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\conditional-encapsulation\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\configuration-management\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\container-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\containerization-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\content-creation-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\context-files-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\continuous-improvement-focus\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\convex-development-general\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\cpp\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\custom-slash-commands\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\data-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\database-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\debugging\\condition-based-waiting-example.ts": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\debugging\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\debugging\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\debugging\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\dependencies-management-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\design-and-user-experience-guidelines\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\detailed-docstrings\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\diagram-generator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\diagram-generator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\diagram-generator\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\directory-naming-convention\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\doc-generator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\doc-generator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\doc-generator\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\docker-compose\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\docker-compose\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\docker-compose\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\drizzle-orm-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\dry-principle\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\dto-conventions\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\editing-code-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\elite-software-engineer-and-product-manager\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\elixir-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\elon-musk-s-algorithm-for-efficiency\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\entity-class-conventions\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\experiment-configuration-with-hydra-yaml\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\expo-framework-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\expo-mobile-app-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\fiber-logging-and-project-structure\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\fiber-routing-and-csrf-protection\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\file-by-file-changes-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\file-management-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\file-organization\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\file-path-usage\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\firebase-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\flutter-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\folder-structure\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\form-and-actions-in-sveltekit\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\form-validation-with-zod\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\framer-motion-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\frontend-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\full-stack-developer-persona\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\function-length-and-responsibility\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\function-ordering-conventions\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\functional-programming-preference\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\gamedev-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\gcloud-cli\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\gcloud-cli\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\gcloud-cli\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\git-expert\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\git-expert\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\git-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\gitflow\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\github-mcp\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\github-mcp\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\github-mcp\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\github-ops\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\github-ops\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\github-ops\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\globalexceptionhandler-class\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\go-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\graphql-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\handle-incomplete-tasks\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\history-and-next-task-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\hook-creator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\hook-creator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\html-specific-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\html-tailwind-css-and-javascript-expert-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\htmx-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\image-optimization-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\imports-aliasing\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\incident-runbook-templates\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\incident-runbook-templates\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\incident-runbook-templates\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\internationalization-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ios-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\java-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\jira-pm\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\jira-pm\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\jira-pm\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\jupyter-notebook-best-practices\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\kafka-development-practices\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\kubernetes-flux\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\kubernetes-flux\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\kubernetes-flux\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\large-data-with-dask\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\latest-language-versions-and-best-practices\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\library-usage\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\linear-pm\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\linear-pm\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\linear-pm\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\livewire-implementation-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\logging-module-usage\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\mcp-converter\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\mcp-converter\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\mcp-converter\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\medusa\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\metadata-and-seo-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\minimal-code-changes-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\mkdocs-specific-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\mobile-first-design-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\mobile-ui-development-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\modular-design-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\monorepo-and-tooling\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\nativescript\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\nativewind-and-tailwind-css-compatibility\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\nextjs-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\nodejs-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\observer-hoc-or-useobserver-hook\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\on-call-handoff-patterns\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\on-call-handoff-patterns\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\on-call-handoff-patterns\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\package-json-modification-protection\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\pandas-data-manipulation-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\paraglide-js-internationalization-i18n\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\param-parameterized-class-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\parameter-specific-logic-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\payment-tracking-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\persona-senior-full-stack-developer\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\php-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\placeholder-images\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\poetry-rye-dependency-management\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\postmortem-writing\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\postmortem-writing\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\postmortem-writing\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\pre-configured-apis-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\preserve-existing-code-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\prioritize-python-3-10-features\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\private-vs-shared-components\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\progressive-disclosure\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\project-analyzer\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\project-analyzer\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\project-analyzer\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\prompt-generation-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\protocol-buffer-definitions-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\provide-real-file-links-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\publishing-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\pyqt6-ui-development-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\python-backend-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\qwik-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\react-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\readme\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\recommended-folder-structure\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\rell-general-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\repo-rag\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\repo-rag\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\repo-rag\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\repository-class-conventions\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\restcontroller-conventions\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ripgrep\\scripts\\quick-search.mjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ripgrep\\scripts\\search.mjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\root-level-project-instructions\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\schema-creator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\schema-creator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\schema-creator\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\arboreto\\scripts\\basic_grn_inference.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\biorxiv-database\\scripts\\biorxiv_search.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\bioservices\\scripts\\batch_id_converter.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\bioservices\\scripts\\compound_cross_reference.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\bioservices\\scripts\\pathway_analysis.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\bioservices\\scripts\\protein_analysis_workflow.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\brenda-database\\scripts\\brenda_queries.py": {
+      "hash": null,
+      "chunks": 17
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\brenda-database\\scripts\\brenda_visualization.py": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\brenda-database\\scripts\\enzyme_pathway_builder.py": {
+      "hash": null,
+      "chunks": 22
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\chembl-database\\scripts\\example_queries.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\citation-management\\scripts\\doi_to_bibtex.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\citation-management\\scripts\\extract_metadata.py": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\citation-management\\scripts\\format_bibtex.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\citation-management\\scripts\\search_google_scholar.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\citation-management\\scripts\\search_pubmed.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\citation-management\\scripts\\validate_citations.py": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-decision-support\\scripts\\biomarker_classifier.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-decision-support\\scripts\\build_decision_tree.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-decision-support\\scripts\\create_cohort_tables.py": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-decision-support\\scripts\\generate_survival_analysis.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-decision-support\\scripts\\validate_cds_document.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-reports\\scripts\\check_deidentification.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-reports\\scripts\\compliance_checker.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-reports\\scripts\\extract_clinical_data.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-reports\\scripts\\format_adverse_events.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-reports\\scripts\\generate_report_template.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-reports\\scripts\\terminology_validator.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-reports\\scripts\\validate_case_report.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinical-reports\\scripts\\validate_trial_report.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinicaltrials-database\\scripts\\query_clinicaltrials.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\clinpgx-database\\scripts\\query_clinpgx.py": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\cosmic-database\\scripts\\download_cosmic.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\deepchem\\scripts\\graph_neural_network.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\deepchem\\scripts\\predict_solubility.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\deepchem\\scripts\\transfer_learning.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\deeptools\\scripts\\validate_files.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\deeptools\\scripts\\workflow_generator.py": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\diffdock\\scripts\\analyze_results.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\diffdock\\scripts\\prepare_batch_csv.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\diffdock\\scripts\\setup_check.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\ooxml\\scripts\\pack.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\ooxml\\scripts\\unpack.py": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\ooxml\\scripts\\validate.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\ooxml\\scripts\\validation\\base.py": {
+      "hash": null,
+      "chunks": 20
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\ooxml\\scripts\\validation\\docx.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\ooxml\\scripts\\validation\\pptx.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\ooxml\\scripts\\validation\\redlining.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\ooxml\\scripts\\validation\\__init__.py": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\scripts\\document.py": {
+      "hash": null,
+      "chunks": 26
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\scripts\\utilities.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\docx\\scripts\\__init__.py": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pdf\\scripts\\check_bounding_boxes.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pdf\\scripts\\check_bounding_boxes_test.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pdf\\scripts\\check_fillable_fields.py": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pdf\\scripts\\convert_pdf_to_images.py": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pdf\\scripts\\create_validation_image.py": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pdf\\scripts\\extract_form_field_info.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pdf\\scripts\\fill_fillable_fields.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pdf\\scripts\\fill_pdf_form_with_annotations.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\ooxml\\scripts\\pack.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\ooxml\\scripts\\unpack.py": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\ooxml\\scripts\\validate.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\ooxml\\scripts\\validation\\base.py": {
+      "hash": null,
+      "chunks": 20
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\ooxml\\scripts\\validation\\docx.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\ooxml\\scripts\\validation\\pptx.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\ooxml\\scripts\\validation\\redlining.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\ooxml\\scripts\\validation\\__init__.py": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\scripts\\html2pptx.js": {
+      "hash": null,
+      "chunks": 21
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\scripts\\inventory.py": {
+      "hash": null,
+      "chunks": 21
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\scripts\\rearrange.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\scripts\\replace.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\pptx\\scripts\\thumbnail.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\document-skills\\xlsx\\recalc.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\drugbank-database\\scripts\\drugbank_helper.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\ensembl-database\\scripts\\ensembl_query.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\etetoolkit\\scripts\\quick_visualize.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\etetoolkit\\scripts\\tree_operations.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\exploratory-data-analysis\\scripts\\eda_analyzer.py": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\fda-database\\scripts\\fda_examples.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\fda-database\\scripts\\fda_query.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\gene-database\\scripts\\batch_gene_lookup.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\gene-database\\scripts\\fetch_gene_data.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\gene-database\\scripts\\query_gene.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\generate-image\\scripts\\generate_image.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\get-available-resources\\scripts\\detect_resources.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\gget\\scripts\\batch_sequence_analysis.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\gget\\scripts\\enrichment_pipeline.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\gget\\scripts\\gene_analysis.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\iso-13485-certification\\scripts\\gap_analyzer.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\kegg-database\\scripts\\kegg_api.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\labarchive-integration\\scripts\\entry_operations.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\labarchive-integration\\scripts\\notebook_operations.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\labarchive-integration\\scripts\\setup_config.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\literature-review\\scripts\\generate_pdf.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\literature-review\\scripts\\search_databases.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\literature-review\\scripts\\verify_citations.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\market-research-reports\\scripts\\generate_market_visuals.py": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\markitdown\\scripts\\batch_convert.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\markitdown\\scripts\\convert_literature.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\markitdown\\scripts\\convert_with_ai.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\matplotlib\\scripts\\plot_template.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\matplotlib\\scripts\\style_configurator.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\medchem\\scripts\\filter_molecules.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\neuropixels-analysis\\assets\\analysis_template.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\neuropixels-analysis\\scripts\\compute_metrics.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\neuropixels-analysis\\scripts\\explore_recording.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\neuropixels-analysis\\scripts\\export_to_phy.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\neuropixels-analysis\\scripts\\neuropixels_pipeline.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\neuropixels-analysis\\scripts\\preprocess_recording.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\neuropixels-analysis\\scripts\\run_sorting.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\openalex-database\\scripts\\openalex_client.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\openalex-database\\scripts\\query_helpers.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\opentargets-database\\scripts\\query_opentargets.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\opentrons-integration\\scripts\\basic_protocol_template.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\opentrons-integration\\scripts\\pcr_setup_template.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\opentrons-integration\\scripts\\serial_dilution_template.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\perplexity-search\\scripts\\perplexity_search.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\perplexity-search\\scripts\\setup_env.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pubchem-database\\scripts\\bioactivity_query.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pubchem-database\\scripts\\compound_search.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pufferlib\\scripts\\env_template.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pufferlib\\scripts\\train_template.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pydeseq2\\scripts\\run_deseq2_analysis.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pydicom\\scripts\\anonymize_dicom.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pydicom\\scripts\\dicom_to_image.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pydicom\\scripts\\extract_metadata.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymatgen\\scripts\\phase_diagram_generator.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymatgen\\scripts\\structure_analyzer.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymatgen\\scripts\\structure_converter.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymc\\assets\\hierarchical_model_template.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymc\\assets\\linear_regression_template.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymc\\scripts\\model_comparison.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymc\\scripts\\model_diagnostics.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymoo\\scripts\\custom_problem_example.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymoo\\scripts\\decision_making_example.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymoo\\scripts\\many_objective_example.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymoo\\scripts\\multi_objective_example.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pymoo\\scripts\\single_objective_example.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pytdc\\scripts\\benchmark_evaluation.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pytdc\\scripts\\load_and_split_data.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pytdc\\scripts\\molecular_generation.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pytorch-lightning\\scripts\\quick_trainer_setup.py": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pytorch-lightning\\scripts\\template_datamodule.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\pytorch-lightning\\scripts\\template_lightning_module.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\rdkit\\scripts\\molecular_properties.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\rdkit\\scripts\\similarity_search.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\rdkit\\scripts\\substructure_filter.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\reactome-database\\scripts\\reactome_query.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\research-lookup\\scripts\\examples.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\research-lookup\\scripts\\lookup.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\research-lookup\\scripts\\research_lookup.py": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scanpy\\assets\\analysis_template.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scanpy\\scripts\\qc_analysis.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scholar-evaluation\\scripts\\calculate_scores.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-schematics\\scripts\\generate_schematic.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-schematics\\scripts\\generate_schematic_ai.py": {
+      "hash": null,
+      "chunks": 17
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-slides\\scripts\\generate_slide_image.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-slides\\scripts\\generate_slide_image_ai.py": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-slides\\scripts\\pdf_to_images.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-slides\\scripts\\slides_to_pdf.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-slides\\scripts\\validate_presentation.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-visualization\\assets\\color_palettes.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-visualization\\scripts\\figure_export.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scientific-visualization\\scripts\\style_presets.py": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scikit-learn\\scripts\\classification_pipeline.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\scikit-learn\\scripts\\clustering_analysis.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\simpy\\scripts\\basic_simulation_template.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\simpy\\scripts\\resource_monitor.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\stable-baselines3\\scripts\\custom_env_template.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\stable-baselines3\\scripts\\evaluate_agent.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\stable-baselines3\\scripts\\train_rl_agent.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\statistical-analysis\\scripts\\assumption_checks.py": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\string-database\\scripts\\string_api.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\torch_geometric\\scripts\\benchmark_model.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\torch_geometric\\scripts\\create_gnn_template.py": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\torch_geometric\\scripts\\visualize_graph.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\treatment-plans\\scripts\\check_completeness.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\treatment-plans\\scripts\\generate_template.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\treatment-plans\\scripts\\timeline_generator.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\treatment-plans\\scripts\\validate_treatment_plan.py": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\uniprot-database\\scripts\\uniprot_client.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\uspto-database\\scripts\\patent_search.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\uspto-database\\scripts\\peds_client.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\uspto-database\\scripts\\trademark_client.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\venue-templates\\scripts\\customize_template.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\venue-templates\\scripts\\query_template.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\scientific-skills\\skills\\venue-templates\\scripts\\validate_format.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\senior-frontend-developer-mindset\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\sentry-monitoring\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\sentry-monitoring\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\sentry-monitoring\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\seo-and-meta-tags-in-sveltekit\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\sequential-thinking\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\sequential-thinking\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\sequential-thinking\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\service-class-conventions\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\single-chunk-edits-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\batch-scaffold.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\consolidate.cjs": {
+      "hash": null,
+      "chunks": 17
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\convert.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\create.cjs": {
+      "hash": null,
+      "chunks": 73
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\validate-all.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\slack-notifications\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\slack-notifications\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\slack-notifications\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\smart-debug\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\smart-debug\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\smart-debug\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\solidjs-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\starknet-react-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\state-management-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\strategic-planning-with-pseudocode\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\strict-user-requirements-adherence\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\styling-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\submission-process-outline\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\svelte-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tall-stack-general\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tauri-native-api-integration\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tauri-security-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tauri-svelte-typescript-general\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tauri-svelte-ui-components\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tdd\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tdd\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tdd\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tech-stack\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\technical-accuracy-and-usability-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\telegram-bot-api-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\template-creator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\template-creator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\template-renderer\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\terminal-commands-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\terraform-infra\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\terraform-infra\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\terraform-infra\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\test-generator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\test-generator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\test-generator\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\text-to-sql\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\text-to-sql\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\text-to-sql\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\thoughtful-and-accurate-responses\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\todo-app-general-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tool-search\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tool-search\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tool-search\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\toon-format\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\trpc-api-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\truthfulness-and-clarity-for-ai\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\tsconfig-json-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\type-hinting-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\typescript-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ui-components-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\unit-testing-requirement\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\use-case-example\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\vercel-ai-sdk-best-practices\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\vercel-kv-database-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\verify-information-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\version-control-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\virtual-environment-usage\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\visual-and-observational-rules\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\vue-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\vueuse-library-rule\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\web3-expert\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\windows-compatibility\\scripts\\main.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\workflow-creator\\hooks\\post-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\workflow-creator\\hooks\\pre-execute.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\writing-skills\\render-graphs.js": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tests\\skill-triggering\\run-skill-triggering-test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\ecosystem-assessor\\assess-ecosystem.mjs": {
+      "hash": null,
+      "chunks": 14
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\ecosystem-assessor\\hook-assessor.mjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\ecosystem-assessor\\mcp-discoverer.mjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\project-analyzer\\analyzer.mjs": {
+      "hash": null,
+      "chunks": 18
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\project-analyzer\\detectors\\dependency-detector.mjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\project-analyzer\\detectors\\framework-detector.mjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\repo-rag\\evaluation.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\repo-rag\\metrics.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\repo-rag\\scripts\\search.mjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\chrome-browser\\chrome-browser.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\archive-issues.py": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\archive-memory.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\check-gpu.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\conductor-gap-analyzer.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\conductor-state-migrate.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\cost-report.js": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\detect-orphans.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\doctor.mjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\document-query.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\error-report.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\eslint-batch-fix.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\eslint-unused-var-fix.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\eslint-useless-escape-fix.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\fix-spawn-log-task-ids.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-agent-catalog.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-agent-registry.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-embeddings.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-routing-prototypes.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-skill-index.cjs": {
+      "hash": null,
+      "chunks": 19
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-tool-manifest.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-workflow-registry.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\get-current-config.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\git-notes-verify.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\hybrid-search.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\index-codebase.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\init-memory-db.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\init-staging.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\kb-search.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\memory-dashboard.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\memory-extract.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\memory-record.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\migrate-agent-config.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\migrate-legacy-sessions.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\migrate-memory.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\monitoring-dashboard.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\populate-agent-config.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\profile-hooks.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\schedule-task.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\security-lint.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\switch-modes.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\sync-memory-json.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\tool_search.mjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-agent-routing.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-agent-tools.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-agent.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-agents.mjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-commit.mjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-integration.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\verify-agent-frontmatter.mjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\verify-debug-log-remediation.mjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\weekly-error-analysis.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\worker-metrics-summary.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\context\\context-path-resolver.mjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cuj-validator-unified.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\gates\\gate.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\integrations\\github\\executor.py": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\integrations\\kubernetes-flux\\executor.py": {
+      "hash": null,
+      "chunks": 18
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\integrations\\mcp-converter\\batch_converter.py": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\integrations\\mcp-converter\\mcp_analyzer.py": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\integrations\\mcp-converter\\skill_generator.py": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\optimization\\sequential-thinking\\executor.py": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\optimization\\token-optimizer\\monitor.js": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\optimization\\token-optimizer\\prune.js": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\run-agent-framework-integration-headless.mjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\runtime\\observability\\status.js": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\runtime\\skills-core\\skills-core.js": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\runtime\\skills-core\\skills-core.test.js": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\runtime\\swarm-coordination\\swarm-coordination.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\validate-commands.mjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\validate-latest-integration-artifacts.mjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\visualization\\diagram-generator\\scripts\\generate.mjs": {
+      "hash": null,
+      "chunks": 18
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\visualization\\render-graphs\\render-graphs.js": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\workflow\\decision-handler.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\workflow\\loop-handler.mjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\workflow_runner.js": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.cursor\\skills\\diagram-generator\\scripts\\generate.mjs": {
+      "hash": null,
+      "chunks": 18
+    },
+    "C:\\dev\\projects\\agent-studio\\.cursor\\skills\\test-generator\\scripts\\generate.mjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\eslint.config.js": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\jest.config.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\add-lazy-load-prefixes.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\fix-agent-yaml.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\fix-bash-prefix-errors.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\fix-yaml-globs.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\format-tracked.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\generate-prebuilt-rule-index.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\generate-rule-index.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\generation\\generate-prebuilt-rule-index.mjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\generation\\generate-rule-index.mjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\install.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\installation\\install.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\maintenance\\format-tracked.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\reset-context.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\test-version-validation.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\testing\\benchmark-ml-performance.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\testing\\count-all-tests.mjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\testing\\fix-all-test-imports.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\testing\\fix-lib-test-imports.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\testing\\fix-test-imports.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\testing\\fix-tools-test-imports.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\testing\\migrate-test-files.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\testing\\test-version-validation.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validate-all-references.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validate-config.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validate-index.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validate-model-names.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validate-rule-index-paths.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validate-workflow.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-all-references.mjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-config.mjs": {
+      "hash": null,
+      "chunks": 22
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-index.mjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-model-names.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-rule-index-paths.mjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-workflow.mjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\verify-dependencies.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\test-index-manager.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\test-vectorstore.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agent-context-tracker.test.mjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\architect-agent.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\core\\planner.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\developer-agent.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\factory.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\memory-integration.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\orchestrators\\evolution-orchestrator.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\orchestrators\\master-orchestrator.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\orchestrators\\swarm-coordinator.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\qa-agent.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\agents\\real-intelligence.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\archive\\hooks\\session-memory-extractor.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\archive\\integration\\memory\\sync-accuracy.test.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\archive\\integration\\memory\\sync-retry.test.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\archive\\unit\\memory\\sync-layer.test.mjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\archive\\unit\\memory\\sync-worker.test.mjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\artifacts\\ml-pattern-detection.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\artifacts\\multi-feature-integration.test.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\artifacts\\performance-profiling.test.cjs": {
+      "hash": null,
+      "chunks": 22
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\artifacts\\progressive-disclosure-adaptive.test.cjs": {
+      "hash": null,
+      "chunks": 26
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\artifacts\\security-controls-catalog.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\artifacts\\smart-revert-enhanced.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\artifacts\\template-catalog.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\brownfield-assessor.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\chaos-engineer-cleanup.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\checkpoint-manager.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\cli\\conductor-gap-analyzer.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\cli\\memory-dashboard.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\cli\\setup-package-manager.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\clients\\model-client.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\ast-grep-wrapper.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\cli.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\embedding-generator.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\gpu-bm25-integration-e2e.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\hybrid-search-cli.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\hybrid-search.test.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\incremental-indexing.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\index-manager-gpu-integration.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\index-manager.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\integration.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\merkle-tree.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\multi-feature-integration-framework.test.cjs": {
+      "hash": null,
+      "chunks": 18
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\parser.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\phase-2-integration.test.cjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\query-analyzer.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\result-ranker.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\ripgrep-integration.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\search-tools-integration.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\semantic-chunker.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\vector-store-lancedb.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-styleguides.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\conductor-integration.test.cjs": {
+      "hash": null,
+      "chunks": 24
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\e2e\\party-mode-e2e.test.mjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\enterprise-scale-testing.test.cjs": {
+      "hash": null,
+      "chunks": 20
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\error-pattern-detector-memory.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\fixtures\\sample-code\\sample.js": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\git-notes-audit.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\agent-context-tracker.test.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\agent-health-hook.test.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\anomaly-detector.test.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\auto-rerouter.test.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\bash-command-validator.test.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\bash-cwd-validator.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\blocking-event-bus.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\check-console-log.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\code-index-updater.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\command-allowlist-validator.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\config-model-validator.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\conflict-detector.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\context-mode-tool-guard.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\database-validators.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\documentation-routing-guard.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\duplicate-detector.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\enforce-claude-md-update.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\error-capture-post-tool.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\error-summary-extractor.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\evolution-audit.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\evolution-state-guard.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\evolution-trigger-detector.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\file-placement-guard.test.cjs": {
+      "hash": null,
+      "chunks": 32
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\filesystem-validators.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\format-memory.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\git-validators.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\llm-usage-tracker.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\loop-prevention.test.cjs": {
+      "hash": null,
+      "chunks": 20
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\memory-health-check.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\memory-reminder.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\metadata-validator.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\metrics-collector-hook.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\metrics-collector.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\network-validators.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\plan-evolution-guard.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\planning-progress-tracker.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\post-creation-reminder.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\post-spawn-task-updater.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\post-task-unified.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\pre-spawn-task-validator.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\pre-spawn-tool-validator.test.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\pre-task-unified.test.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\process-validators.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\quality-gate-validator.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\reflection-queue-processor.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\registry.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\research-enforcement.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\router-enforcer.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\router-mode-reset.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\router-state.test.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\router-write-guard.test.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\routing-guard.test.cjs": {
+      "hash": null,
+      "chunks": 23
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\rule-structure-validator.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\security-trigger.test.cjs": {
+      "hash": null,
+      "chunks": 21
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\settings-wiring.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\shell-injection-validator.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\shell-validators.test.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\shellcheck-validator.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\skill-invocation-tracker.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-prompt-assembler-constitution.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-prompt-assembler-context-mode.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-prompt-assembler-enrichAllowedTools.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-prompt-assembler-integration-constitution.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-prompt-assembler-intent.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-prompt-assembler-mandatory-tools.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-prompt-assembler-preset-integration.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-prompt-assembler-snippet.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-prompt-validator.test.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-size-validator.test.cjs": {
+      "hash": null,
+      "chunks": 23
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\state-reset.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\suggest-compact.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\task-auto-route.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\task-completion-guard.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\task-update-tracker.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\tdd-check.test.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\tool-availability-validator.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\unified-creator-guard.test.cjs": {
+      "hash": null,
+      "chunks": 14
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\unified-evolution-guard.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\unified-reflection-handler.test.cjs": {
+      "hash": null,
+      "chunks": 20
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\user-prompt-unified.test.cjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\validate-skill-invocation.test.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\variable-quoting-validator.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\windows-null-sanitizer.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\write-content-scanner.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\write-size-validator.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\audit-fixes-integration.test.cjs": {
+      "hash": null,
+      "chunks": 14
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\context-memory-system.test.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\e2e\\hybrid-memory-system.test.mjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\e2e\\phase1a-e2e.test.cjs": {
+      "hash": null,
+      "chunks": 14
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\events\\priority-pub-sub.test.mjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\hooks\\event-emission.test.mjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\hooks\\execution-limits-integration.test.mjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\hooks\\hooks-events-integration.test.mjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\hooks-enabled.test.mjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\IntegrationTestFramework.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\memory\\contextual-memory-integration.test.mjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\memory\\entity-storage.test.mjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\memory\\graph-traversal.test.mjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\memory\\migration.test.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\memory\\semantic-search-integration.test.mjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\memory\\semantic-search.test.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\multi-feature-integration.test.cjs": {
+      "hash": null,
+      "chunks": 30
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\orchestrator.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\router-capability-discovery.test.cjs": {
+      "hash": null,
+      "chunks": 17
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\router-config-selection.test.mjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\sample-error-capture.test.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\shell-security-integration.test.mjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\shell-security-phase3.test.mjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\template-system-e2e-happy.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\template-system-e2e.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\agents\\agent-config.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\agents\\populate-agent-config.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\code-indexing\\benchmark-fast-path.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\code-indexing\\bm25-indexer.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\code-indexing\\embedding-generator-gpu.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\code-indexing\\gpu-detector.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\code-indexing\\hybrid-search.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\code-indexing\\parse-chunk-worker-fast-path.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\code-indexing\\vector-store-hybrid.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\config\\context-mode-loader.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\config\\phase-config.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\config\\resolve-runtime-context.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\integration\\system-registration-handler.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\audit-trail-integration.test.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\cold-storage.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\contextual-memory.search-filters.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\contextual-memory.test.cjs": {
+      "hash": null,
+      "chunks": 19
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\fastembed-gpu-integration.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\intent-analyzer.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\lancedb-client-gpu-integration.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\lancedb-client-gpu.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\lancedb-client.test.cjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\lancedb-gpu.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\learnings-parser.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-consolidation.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-dashboard.test.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-deduplicator.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-entity-links.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-extraction-writer.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-extractor.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-forget-delete.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-manager.test.cjs": {
+      "hash": null,
+      "chunks": 28
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-rotator.test.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-scheduler-perf-009.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-scheduler.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\memory-tiers.test.cjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\named-memory.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\run-extraction-pipeline.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\semantic-archival.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\session-context-for-search.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\session-summary.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\smart-pruner-perf-009.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\smart-pruner.test.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\verify-gpu-usage.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\monitoring\\spawn-log.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\consensus\\__tests__\\response-aggregator.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\orchestration\\__tests__\\lifecycle-manager.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\orchestration\\__tests__\\round-manager.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\orchestration\\__tests__\\team-loader.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\protocol\\__tests__\\context-isolator.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\protocol\\__tests__\\message-router.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\protocol\\__tests__\\sidecar-manager.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\security\\__tests__\\agent-identity.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\security\\__tests__\\response-integrity.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\security\\__tests__\\session-audit.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\__tests__\\integration\\party-mode-integration.test.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\__tests__\\performance\\performance-benchmarks.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\__tests__\\security\\penetration-tests.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\plan\\implementation-plan.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\plan\\progress.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\qa\\criteria.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\qa\\report.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\agent-registry-resolver.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\fuzzy-intent-matcher.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\generate-routing-prototypes.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\intent-classifier.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\pattern-router.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\semantic-router.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\validate-routing-consistency.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\scheduler\\scheduler-store.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\self-healing\\dashboard.test.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\self-healing\\rollback-manager.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\self-healing\\validator.test.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\spawn\\prompt-assembler.test.cjs": {
+      "hash": null,
+      "chunks": 14
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\spawn\\prompt-factory.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\text-processing\\sentence-chunker.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\agent-catalog-generator.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\agent-health-tracker.test.cjs": {
+      "hash": null,
+      "chunks": 17
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\agent-registry-generator.test.cjs": {
+      "hash": null,
+      "chunks": 16
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\available-agents.test.cjs": {
+      "hash": null,
+      "chunks": 19
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\document-query.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\get-current-config.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\memory-record.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\quick-status.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\skill-catalog.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\skill-triggering.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\switch-modes.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\tools\\tool-set.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\agent-config-reader.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\atomic-write-async.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\atomic-write.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\context-reset.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\error-sanitizer.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\hook-input.test.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\jsonl-utils.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\platform.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\project-root.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\safe-json.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\state-cache.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\__tests__\\feature-flags.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\__tests__\\knowledge-base-index.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\checkpoint-manager.test.cjs": {
+      "hash": null,
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\cross-workflow-trigger.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\saga-coordinator.test.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\step-validators.security.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\step-validators.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\workflow-cli.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\workflow-engine.test.cjs": {
+      "hash": null,
+      "chunks": 25
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\workflow-integration.test.cjs": {
+      "hash": null,
+      "chunks": 19
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\workflow-validator.test.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\memory-monitor.test.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\migration\\conductor-migration.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\misc\\error-pattern-detector.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\misc\\error-writer.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\misc\\evolution-state-sync.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\misc\\hybrid-validation.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\ml\\anomaly-detection.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\ml\\feedback-loop.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\ml\\index-export-resolution.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\ml\\optimization-engine.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\ml\\pattern-detection.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\ml-optimization-engine.test.cjs": {
+      "hash": null,
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\monitoring\\dashboard-core.test.cjs": {
+      "hash": null,
+      "chunks": 14
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\party-mode-config-validation.test.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\performance\\memory-benchmarks.test.mjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\performance-profiling-minimal.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\performance-profiling.test.cjs": {
+      "hash": null,
+      "chunks": 22
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\hybrid-executor.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\legacy-adapter-strangler.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\workflow-composition.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\workflow-patterns-conditional.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\workflow-patterns-fanout.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\workflow-patterns-loops.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\workflow-patterns-transaction-integration.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\workflow-performance.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\workflow-resolver-cycles.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\phase-4\\workflow-versioning.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\pilot\\e2e-scenario.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\reflection-step0-guard.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\routing-table.test.cjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\scale\\enterprise-scale.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\scale\\track-analytics-scale.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\scale\\utils\\ScaleTestUtils.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\schemas\\adr-template.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\schemas\\specification-template.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\skills\\code-semantic-search-skill.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\skills\\creators\\post-execute-cleanup.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\skills\\creators\\pre-execute-ttl.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\skills\\elicitation.test.mjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\skills\\SKILL.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\smoke.test.mjs": {
+      "hash": null,
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\spawn-size-validator.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\spec-017-advanced-patterns.test.cjs": {
+      "hash": null,
+      "chunks": 24
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\spec-018-composition.test.cjs": {
+      "hash": null,
+      "chunks": 30
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\spec-019-hybrid-execution.test.cjs": {
+      "hash": null,
+      "chunks": 26
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\spec-020-versioning.test.cjs": {
+      "hash": null,
+      "chunks": 25
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\spec-021-legacy-integration.test.cjs": {
+      "hash": null,
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\spec-022-performance-optimization.test.cjs": {
+      "hash": null,
+      "chunks": 25
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\spec-init.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\spec-phase-5-ml-optimization.test.cjs": {
+      "hash": null,
+      "chunks": 14
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\staging-smoke.test.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\task-cleanup-manager.test.cjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tech-stack-detector.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\templates\\security-design-checklist.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\test-lancedb-integration.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\analysis\\project-analyzer\\tests\\analyzer.test.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\error-report.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\generate-skill-index.test.cjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\generate-workflow-registry.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\pre-commit-security.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\security-lint.test.cjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\validate-agent-routing.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\validate-integration.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\generate-embeddings.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\runtime\\skills-core\\skills-core.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\track-metadata-analytics.test.cjs": {
+      "hash": null,
+      "chunks": 23
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\track-metadata-schema.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\agents\\agent-parser.test.mjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\events\\event-bus-extended.test.mjs": {
+      "hash": null,
+      "chunks": 20
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\events\\event-bus.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\events\\event-bus.test.mjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\events\\event-types.test.mjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\hooks\\execution-limit-monitor.test.mjs": {
+      "hash": null,
+      "chunks": 8
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\hooks\\spawn-prompt-assembler.test.mjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\memory\\contextual-memory.test.mjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\memory\\embedding-generator.test.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\memory\\entity-extraction.test.mjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\memory\\entity-query.test.mjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\memory\\lancedb-connection.test.mjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\memory\\schema-creation.test.mjs": {
+      "hash": null,
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\memory\\semantic-search.test.mjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\ui\\formatter.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\ui\\statusline.test.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\utils\\feature-flags.test.mjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\unit\\utils\\retry-backoff.test.mjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\utils\\compression-trigger.test.cjs": {
+      "hash": null,
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\utils\\token-budget-tracker.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\validate-schemas.mjs": {
+      "hash": null,
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\validate-skill-invocation.test.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\verify_access_tracking.cjs": {
+      "hash": null,
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflow-state-transactions.test.cjs": {
+      "hash": null,
+      "chunks": 31
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflow-validator.test.mjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\core\\evolution-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\creators\\agent-creator-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\creators\\schema-creator-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\creators\\template-creator-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\creators\\workflow-creator-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\state-machine-advanced.test.cjs": {
+      "hash": null,
+      "chunks": 22
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\updaters\\agent-updater-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\updaters\\hook-updater-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\updaters\\schema-updater-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\updaters\\skill-updater-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\updaters\\template-updater-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\workflows\\updaters\\workflow-updater-workflow.test.cjs": {
+      "hash": null,
+      "chunks": 6
+    }
+  }
 }

@@ -84,21 +84,21 @@ test('RRF Fusion - should fuse results from both sparse and dense', () => {
 
   // Results should be sorted by combined score
   for (let i = 1; i < fused.length; i++) {
-    assert.ok(fused[i-1].score >= fused[i].score);
+    assert.ok(fused[i - 1].score >= fused[i].score);
   }
 });
 
 test('RRF Fusion - should prioritize documents that rank high in both lists', () => {
   const sparseResults = [
-    { id: 'doc1', score: 1.0 },  // Rank 1
-    { id: 'doc2', score: 0.8 },  // Rank 2
-    { id: 'doc3', score: 0.6 },  // Rank 3
+    { id: 'doc1', score: 1.0 }, // Rank 1
+    { id: 'doc2', score: 0.8 }, // Rank 2
+    { id: 'doc3', score: 0.6 }, // Rank 3
   ];
 
   const denseResults = [
-    { id: 'doc2', score: 1.0 },  // Rank 1
-    { id: 'doc1', score: 0.9 },  // Rank 2
-    { id: 'doc4', score: 0.7 },  // Rank 3
+    { id: 'doc2', score: 1.0 }, // Rank 1
+    { id: 'doc1', score: 0.9 }, // Rank 2
+    { id: 'doc4', score: 0.7 }, // Rank 3
   ];
 
   const fused = fuseResults(sparseResults, denseResults);
@@ -128,13 +128,9 @@ test('RRF Fusion - should handle non-overlapping result sets', () => {
 });
 
 test('RRF Fusion - should apply weight parameters correctly', () => {
-  const sparseResults = [
-    { id: 'doc1', score: 1.0 },
-  ];
+  const sparseResults = [{ id: 'doc1', score: 1.0 }];
 
-  const denseResults = [
-    { id: 'doc2', score: 1.0 },
-  ];
+  const denseResults = [{ id: 'doc2', score: 1.0 }];
 
   // Test with 100% sparse weight
   const sparseOnly = fuseResults(sparseResults, denseResults, {
@@ -156,13 +152,9 @@ test('RRF Fusion - should apply weight parameters correctly', () => {
 });
 
 test('RRF Fusion - should use custom rrf_k parameter', () => {
-  const sparseResults = [
-    { id: 'doc1', score: 1.0 },
-  ];
+  const sparseResults = [{ id: 'doc1', score: 1.0 }];
 
-  const denseResults = [
-    { id: 'doc2', score: 1.0 },
-  ];
+  const denseResults = [{ id: 'doc2', score: 1.0 }];
 
   const k30 = fuseResults(sparseResults, denseResults, { rrf_k: 30 });
   const k60 = fuseResults(sparseResults, denseResults, { rrf_k: 60 });

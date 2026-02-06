@@ -77,16 +77,18 @@ program
         // Use defaults if config not found
       }
 
-      // Create index manager with config
-      const manager = new IndexManager({
-        projectRoot: targetPath,
-        concurrency: config.indexing?.concurrency || 12,
-        batchSize: config.indexing?.batchSize || 50,
-        maxFileSize: config.indexing?.maxFileSize || 1048576,
-        excludePatterns: config.indexing?.excludePatterns,
-        chunkFlushSize: config.indexing?.chunkFlushSize,
-        embedBatchSize: config.indexing?.embedBatchSize,
-      });
+      // Create index manager with config (let defaults handle memory-safe values)
+      const managerOpts = { projectRoot: targetPath };
+      if (config.indexing?.concurrency) managerOpts.concurrency = config.indexing.concurrency;
+      if (config.indexing?.batchSize) managerOpts.batchSize = config.indexing.batchSize;
+      if (config.indexing?.maxFileSize) managerOpts.maxFileSize = config.indexing.maxFileSize;
+      if (config.indexing?.excludePatterns)
+        managerOpts.excludePatterns = config.indexing.excludePatterns;
+      if (config.indexing?.chunkFlushSize)
+        managerOpts.chunkFlushSize = config.indexing.chunkFlushSize;
+      if (config.indexing?.embedBatchSize)
+        managerOpts.embedBatchSize = config.indexing.embedBatchSize;
+      const manager = new IndexManager(managerOpts);
 
       // Index directory
       const result = await manager.indexDirectory(targetPath, {

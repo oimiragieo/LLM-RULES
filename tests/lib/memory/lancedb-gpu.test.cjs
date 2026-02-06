@@ -35,7 +35,7 @@ describe('LanceDB GPU Acceleration', () => {
     const store = new MemoryVectorStore({
       persistDirectory: tmpDir,
       embeddingMode: 'fastembed',
-      gpu: { enabled: true, autoTuneBatchSize: true }
+      gpu: { enabled: true, autoTuneBatchSize: true },
     });
 
     await store.initialize();
@@ -78,7 +78,7 @@ describe('LanceDB GPU Acceleration', () => {
     const store = new MemoryVectorStore({
       persistDirectory: tmpDir,
       embeddingMode: 'fastembed',
-      gpu: { enabled: true }
+      gpu: { enabled: true },
     });
 
     await store.initialize();
@@ -101,7 +101,7 @@ describe('LanceDB GPU Acceleration', () => {
     const store = new MemoryVectorStore({
       persistDirectory: tmpDir,
       embeddingMode: 'fastembed',
-      gpu: { enabled: true, autoTuneBatchSize: true }
+      gpu: { enabled: true, autoTuneBatchSize: true },
     });
 
     await store.initialize();
@@ -118,7 +118,10 @@ describe('LanceDB GPU Acceleration', () => {
       else if (memoryMB >= 8192) expectedMin = 128;
       else if (memoryMB >= 4096) expectedMin = 64;
 
-      assert.ok(batchSize >= expectedMin, `Batch size ${batchSize} should match GPU memory tier (${memoryMB}MB)`);
+      assert.ok(
+        batchSize >= expectedMin,
+        `Batch size ${batchSize} should match GPU memory tier (${memoryMB}MB)`
+      );
       console.log(`GPU memory: ${memoryMB}MB → Batch size: ${batchSize}`);
     } else {
       console.log('No GPU detected - batch size auto-tuning test skipped');
@@ -130,7 +133,7 @@ describe('LanceDB GPU Acceleration', () => {
     const store = new MemoryVectorStore({
       persistDirectory: tmpDir,
       embeddingMode: 'fastembed',
-      gpu: { enabled: false } // Explicitly disable GPU
+      gpu: { enabled: false }, // Explicitly disable GPU
     });
 
     await store.initialize();

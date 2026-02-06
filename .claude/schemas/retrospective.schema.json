@@ -4,11 +4,11 @@
   "description": "Schema for sprint/project retrospectives",
   "type": "object",
   "properties": {
-    "period": {"type": "string"},
-    "what_went_well": {"type": "array", "items": {"type": "string"}},
-    "what_could_improve": {"type": "array", "items": {"type": "string"}},
-    "action_items": {"type": "array", "items": {"type": "string"}},
-    "participants": {"type": "array", "items": {"type": "string"}}
+    "period": { "type": "string" },
+    "what_went_well": { "type": "array", "items": { "type": "string" } },
+    "what_could_improve": { "type": "array", "items": { "type": "string" } },
+    "action_items": { "type": "array", "items": { "type": "string" } },
+    "participants": { "type": "array", "items": { "type": "string" } }
   },
   "required": ["period"]
 }

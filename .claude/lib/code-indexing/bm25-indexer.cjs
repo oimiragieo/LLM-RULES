@@ -11,10 +11,50 @@
  * Stop words to filter from tokenization (common English words with low information content)
  */
 const STOP_WORDS = new Set([
-  'the', 'is', 'a', 'an', 'and', 'or', 'to', 'for', 'in', 'on', 'at', 'by', 'of',
-  'with', 'from', 'as', 'be', 'was', 'are', 'been', 'being', 'have', 'has', 'had',
-  'do', 'does', 'did', 'will', 'would', 'should', 'could', 'may', 'might', 'must',
-  'can', 'that', 'this', 'these', 'those', 'it', 'its', 'they', 'them', 'their',
+  'the',
+  'is',
+  'a',
+  'an',
+  'and',
+  'or',
+  'to',
+  'for',
+  'in',
+  'on',
+  'at',
+  'by',
+  'of',
+  'with',
+  'from',
+  'as',
+  'be',
+  'was',
+  'are',
+  'been',
+  'being',
+  'have',
+  'has',
+  'had',
+  'do',
+  'does',
+  'did',
+  'will',
+  'would',
+  'should',
+  'could',
+  'may',
+  'might',
+  'must',
+  'can',
+  'that',
+  'this',
+  'these',
+  'those',
+  'it',
+  'its',
+  'they',
+  'them',
+  'their',
 ]);
 
 /**
@@ -48,10 +88,11 @@ class BM25Indexer {
     this.b = options.b ?? 0.75;
 
     // Index state
-    this.documents = [];     // Array of { id, text, tokens, length, termFreqs }
-    this.idf = {};           // IDF scores: { term: idfScore }
-    this.avgDocLength = 0;   // Average document length
-    this.N = 0;              // Total document count
+    this.documents = []; // Array of { id, text, tokens, length, termFreqs }
+    this.idf = {}; // IDF scores: { term: idfScore }
+    this.avgDocLength = 0; // Average document length
+    this.N = 0; // Total document count
+    this._idfDirty = true; // Flag to track if IDF needs recalculation
   }
 
   /**
@@ -95,7 +136,7 @@ class BM25Indexer {
 
     // Count document frequency for each term
     for (const doc of this.documents) {
-      const uniqueTerms = new Set(doc.tokens);
+      const uniqueTerms = Object.keys(doc.termFreqs);
       for (const term of uniqueTerms) {
         df[term] = (df[term] || 0) + 1;
       }
@@ -107,6 +148,18 @@ class BM25Indexer {
       const numerator = this.N - df[term] + 0.5;
       const denominator = df[term] + 0.5;
       this.idf[term] = Math.log(numerator / denominator + 1); // +1 to avoid log(0)
+    }
+  }
+
+  /**
+   * Ensure IDF scores are up-to-date (lazy calculation)
+   * Only calculates if _idfDirty flag is true
+   * @private
+   */
+  _ensureIDF() {
+    if (this._idfDirty) {
+      this._calculateIDF();
+      this._idfDirty = false;
     }
   }
 
@@ -126,8 +179,6 @@ class BM25Indexer {
 
       this.documents.push({
         id: doc.id,
-        text: doc.text,
-        tokens,
         length: tokens.length,
         termFreqs,
       });
@@ -138,8 +189,8 @@ class BM25Indexer {
     const totalLength = this.documents.reduce((sum, doc) => sum + doc.length, 0);
     this.avgDocLength = this.N > 0 ? totalLength / this.N : 0;
 
-    // Calculate IDF scores
-    this._calculateIDF();
+    // Mark IDF as dirty instead of recalculating immediately
+    this._idfDirty = true;
   }
 
   /**
@@ -161,7 +212,8 @@ class BM25Indexer {
 
       // BM25 formula
       const numerator = termFreq * (this.k1 + 1);
-      const denominator = termFreq + this.k1 * (1 - this.b + this.b * (doc.length / this.avgDocLength));
+      const denominator =
+        termFreq + this.k1 * (1 - this.b + this.b * (doc.length / this.avgDocLength));
 
       score += idf * (numerator / denominator);
     }
@@ -179,6 +231,9 @@ class BM25Indexer {
     if (!query || typeof query !== 'string' || query.trim().length === 0) {
       return [];
     }
+
+    // Ensure IDF is calculated before searching
+    this._ensureIDF();
 
     const queryTokens = this._tokenize(query);
     if (queryTokens.length === 0) {
@@ -204,6 +259,9 @@ class BM25Indexer {
    * @returns {Object} JSON representation
    */
   toJSON() {
+    // Ensure IDF is calculated before serializing
+    this._ensureIDF();
+
     return {
       k1: this.k1,
       b: this.b,
@@ -225,6 +283,7 @@ class BM25Indexer {
     indexer.idf = json.idf;
     indexer.avgDocLength = json.avgDocLength;
     indexer.N = json.N;
+    indexer._idfDirty = false; // IDF already calculated in serialized data
     return indexer;
   }
 }

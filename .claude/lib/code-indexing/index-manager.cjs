@@ -50,6 +50,54 @@ function calculateSafeMemoryConfig() {
 // Default configuration with memory-safe defaults
 const memoryConfig = calculateSafeMemoryConfig();
 
+/**
+ * Check if a forward-slash-normalized relative path matches any exclude pattern.
+ * Handles three pattern types:
+ *   - star-star/dir/star-star   - exclude directory and all contents
+ *   - star-star/name             - exclude exact file/dir name anywhere
+ *   - star-star/*.ext            - exclude files matching extension pattern
+ * (star-star represents double-asterisk glob pattern)
+ */
+function isExcluded(relativePath, patterns) {
+  for (const pattern of patterns) {
+    // Type 1: **/dir/** — directory exclusion
+    if (pattern.startsWith('**/') && pattern.endsWith('/**')) {
+      const dirName = pattern.slice(3, -3);
+      if (
+        relativePath === dirName ||
+        relativePath.startsWith(dirName + '/') ||
+        relativePath.includes('/' + dirName + '/') ||
+        relativePath.endsWith('/' + dirName)
+      ) {
+        return true;
+      }
+      continue;
+    }
+
+    // Type 2: **/*.ext or **/prefix*.ext — wildcard file match
+    if (pattern.startsWith('**/') && pattern.includes('*', 3)) {
+      const suffix = pattern.slice(3);
+      const regexStr = suffix.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*');
+      const regex = new RegExp('(^|/)' + regexStr + '$');
+      if (regex.test(relativePath)) return true;
+      continue;
+    }
+
+    // Type 3: **/exactname — exact file/directory name anywhere in path
+    if (pattern.startsWith('**/')) {
+      const name = pattern.slice(3);
+      if (relativePath === name || relativePath.endsWith('/' + name)) {
+        return true;
+      }
+      continue;
+    }
+
+    // Type 4: literal match
+    if (relativePath === pattern) return true;
+  }
+  return false;
+}
+
 const DEFAULT_OPTIONS = {
   projectRoot: process.cwd(),
   excludePatterns: [
@@ -86,7 +134,27 @@ const DEFAULT_OPTIONS = {
  */
 class IndexManager {
   constructor(options = {}) {
-    this.options = { ...DEFAULT_OPTIONS, ...options };
+    // Merge exclude patterns (union of defaults + user-provided) instead of replacing
+    const mergedExclude = options.excludePatterns
+      ? [...new Set([...DEFAULT_OPTIONS.excludePatterns, ...options.excludePatterns])]
+      : DEFAULT_OPTIONS.excludePatterns;
+    this.options = { ...DEFAULT_OPTIONS, ...options, excludePatterns: mergedExclude };
+
+    // CRITICAL FIX: Cap user-provided concurrency/batchSize at memory-safe calculated values
+    const safeConfig = calculateSafeMemoryConfig();
+    if (this.options.concurrency > safeConfig.concurrency) {
+      console.log(
+        `[INDEX] Config concurrency ${this.options.concurrency} capped to memory-safe ${safeConfig.concurrency}`
+      );
+      this.options.concurrency = safeConfig.concurrency;
+    }
+    if (this.options.batchSize > DEFAULT_OPTIONS.batchSize) {
+      console.log(
+        `[INDEX] Config batchSize ${this.options.batchSize} capped to memory-safe ${DEFAULT_OPTIONS.batchSize}`
+      );
+      this.options.batchSize = DEFAULT_OPTIONS.batchSize;
+    }
+
     this.parser = null;
     this.chunker = null;
     this.vectorStore = null;
@@ -124,6 +192,14 @@ class IndexManager {
     }
 
     const resolvedRoot = path.resolve(this.options.projectRoot);
+    // Safety valve: limit total files to prevent OOM from broken exclusions
+    const MAX_DISCOVERED_FILES = 10000;
+
+    // Log discovery start for root call
+    if (dir === this.options.projectRoot) {
+      console.log(`[DISCOVER] Starting file discovery in: ${dir}`);
+      console.log(`[DISCOVER] Exclude patterns: ${this.options.excludePatterns.length}`);
+    }
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
@@ -141,16 +217,7 @@ class IndexManager {
       const relativePath = path.relative(this.options.projectRoot, fullPath).replace(/\\/g, '/');
 
       // Check exclude patterns (use forward-slash normalized path)
-      const excluded = this.options.excludePatterns.some(pattern => {
-        // Convert glob pattern to regex with proper escaping
-        const regexStr = pattern
-          .replace(/[.+^${}()|[\]\\]/g, '\\$&')  // Escape regex special chars (except * and ?)
-          .replace(/\*\*/g, '{{GLOBSTAR}}')        // Temp placeholder
-          .replace(/\*/g, '[^/]*')                  // Single * = anything except /
-          .replace(/{{GLOBSTAR}}/g, '.*');          // ** = anything including /
-        const regex = new RegExp('^' + regexStr + '$');
-        return regex.test(relativePath);
-      });
+      const excluded = isExcluded(relativePath, this.options.excludePatterns);
       if (excluded) continue;
 
       if (entry.isDirectory()) {
@@ -168,13 +235,24 @@ class IndexManager {
             continue; // broken symlink
           }
         }
-        files.push(...(await this._discoverFiles(fullPath)));
+        const subFiles = await this._discoverFiles(fullPath);
+        files.push(...subFiles);
+        if (files.length >= MAX_DISCOVERED_FILES) {
+          console.warn(`[DISCOVER] Safety limit reached after recursing into ${relativePath}`);
+          return files;
+        }
       } else if (entry.isFile()) {
         const language = this.parser.detectLanguage(fullPath);
         if (language) {
           const stats = await fs.stat(fullPath);
           if (stats.size <= this.options.maxFileSize) {
             files.push(fullPath);
+            if (files.length >= MAX_DISCOVERED_FILES) {
+              console.warn(
+                `[DISCOVER] Safety limit reached: ${MAX_DISCOVERED_FILES} files. Stopping discovery.`
+              );
+              return files;
+            }
           } else if (this.options.verbose) {
             console.log(
               `[SKIP] File too large: ${relativePath} (${(stats.size / 1024).toFixed(0)}KB)`
@@ -182,6 +260,11 @@ class IndexManager {
           }
         }
       }
+    }
+
+    // Log discovery completion for root call
+    if (dir === this.options.projectRoot) {
+      console.log(`[DISCOVER] Found ${files.length} indexable files`);
     }
 
     return files;
@@ -291,10 +374,12 @@ class IndexManager {
       const embedBatchSize = this.options.embedBatchSize || 32;
       const totalBatches = Math.ceil(toFlush.length / embedBatchSize) || 1;
 
-      const heapUsedGB = process.memoryUsage().heapUsed / 1024 / 1024 / 1024;
+      const mem = process.memoryUsage();
+      const rss = (mem.rss / 1024 / 1024).toFixed(0);
+      const heapUsed = (mem.heapUsed / 1024 / 1024).toFixed(0);
       if (this.options.verbose) {
         console.log(
-          `[FLUSH] ${toFlush.length} chunks (buffer: ${chunkBuffer.length}, heap: ${heapUsedGB.toFixed(2)}GB)`
+          `[FLUSH] ${toFlush.length} chunks (buffer: ${chunkBuffer.length}, rss:${rss}MB heap:${heapUsed}MB)`
         );
       }
 
@@ -310,12 +395,17 @@ class IndexManager {
       chunksFlushed += toFlush.length;
       if (onProgress) onProgress('index', chunksFlushed, totalChunks);
 
-      await this.vectorStore.saveBM25Index();
+      // Save BM25 index periodically (not every flush) to reduce serialization overhead
+      if (chunksFlushed % (flushSize * 5) === 0 || chunkBuffer.length === 0) {
+        await this.vectorStore.saveBM25Index();
+      }
 
       if (this.options.verbose) {
-        const heapAfterGB = process.memoryUsage().heapUsed / 1024 / 1024 / 1024;
+        const memAfter = process.memoryUsage();
+        const rssAfter = (memAfter.rss / 1024 / 1024).toFixed(0);
+        const heapAfter = (memAfter.heapUsed / 1024 / 1024).toFixed(0);
         console.log(
-          `[FLUSH] Done ${chunksFlushed}/${totalChunks} (heap: ${heapAfterGB.toFixed(2)}GB)`
+          `[FLUSH] Done ${chunksFlushed}/${totalChunks} (rss:${rssAfter}MB heap:${heapAfter}MB)`
         );
       }
 
@@ -325,127 +415,237 @@ class IndexManager {
       }
     };
 
-    // Worker pool with SAFE memory limits
+    // In-process parsing when concurrency=1 to avoid Piscina worker overhead
     const workerPath = path.resolve(__dirname, 'parse-chunk-worker.cjs');
-    const pool = new Piscina({
-      filename: workerPath,
-      maxThreads: concurrency,
-      minThreads: 1, // REDUCED: Start with 1 worker
-      resourceLimits: {
-        maxOldGenerationSizeMb: this.memoryConfig.maxOldGenerationSizeMb,
-        maxYoungGenerationSizeMb: this.memoryConfig.maxYoungGenerationSizeMb,
-      },
-    });
+    let pool = null;
+    let parseInProcess = null;
 
-    const inFlight = new Set();
+    if (concurrency <= 1) {
+      console.log('[INDEX] Using in-process parsing (no worker threads)');
+      parseInProcess = require(workerPath);
+    } else {
+      console.log(`[INDEX] Using Piscina worker pool (${concurrency} threads)`);
+      pool = new Piscina({
+        filename: workerPath,
+        maxThreads: concurrency,
+        minThreads: 1,
+        resourceLimits: {
+          maxOldGenerationSizeMb: this.memoryConfig.maxOldGenerationSizeMb,
+          maxYoungGenerationSizeMb: this.memoryConfig.maxYoungGenerationSizeMb,
+        },
+      });
+    }
+
     let filesProcessed = startIndex;
-    const parseStartTime = Date.now();
 
-    const runOne = async (filePath, index) => {
-      const stats = await fs.stat(filePath);
-      if (stats.size > this.options.maxFileSize) {
-        return { filePath, chunks: [], hash: null, skipped: true, index };
-      }
+    // ════════════════════════════════════════════════════════════════════
+    // SYNC FAST-PATH: BM25-only mode bypasses async pipeline to avoid
+    // V8 heap fragmentation from Promise.race / inFlight tracking.
+    // Uses simple 50-line chunking (no AST parsing) for minimal memory.
+    // See: scratchpad/rebuild-index.cjs (proven pattern)
+    // ════════════════════════════════════════════════════════════════════
+    if (this.vectorStore.embeddingMode === 'off') {
+      console.log('[INDEX] BM25-only sync fast-path enabled (simple 50-line chunking)');
+      const fsSync = require('fs');
 
-      const content = await fs.readFile(filePath, 'utf-8');
-      const language = this.parser.detectLanguage(filePath);
-      if (!language) {
-        return { filePath, chunks: [], hash: '', index };
-      }
-      const result = await pool.run({ filePath, content, language });
-      return { ...result, index };
-    };
+      for (let i = 0; i < files.length; i++) {
+        const filePath = files[i];
+        const globalIndex = startIndex + i + 1;
 
-    // CRITICAL FIX: Memory-aware processing with backpressure
-    for (let i = 0; i < files.length; i++) {
-      const filePath = files[i];
-      const globalIndex = startIndex + i + 1;
+        try {
+          const stats = fsSync.statSync(filePath);
+          if (stats.size > this.options.maxFileSize || stats.size === 0) continue;
 
-      // Check memory pressure before adding new work
-      const heapUsedGB = process.memoryUsage().heapUsed / 1024 / 1024 / 1024;
+          const content = fsSync.readFileSync(filePath, 'utf-8');
+          const language = this.parser.detectLanguage(filePath);
+          if (!language) continue;
 
-      // EMERGENCY: Pause everything if memory is critical
-      if (heapUsedGB > this.memoryConfig.emergencyThresholdGB) {
-        console.warn(
-          `🚨 EMERGENCY: Memory critical (${heapUsedGB.toFixed(2)}GB), draining queue...`
-        );
-        await Promise.all(Array.from(inFlight));
-        await flushPromise;
-        await flushBuffer();
+          // Simple 50-line chunking for BM25 (no AST parsing needed)
+          const lines = content.split('\n');
+          const relPath = path.relative(this.options.projectRoot, filePath).replace(/\\/g, '/');
+          const chunks = [];
+          for (let lineIdx = 0; lineIdx < lines.length; lineIdx += 50) {
+            const text = lines
+              .slice(lineIdx, lineIdx + 50)
+              .join('\n')
+              .trim();
+            if (text.length === 0) continue;
+            chunks.push({ id: `${relPath}:${lineIdx}`, text });
+          }
 
-        // Aggressive GC
-        if (typeof global.gc === 'function') {
-          for (let gc = 0; gc < 3; gc++) global.gc();
-        }
-
-        // Cool down
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        console.log(`🔄 Resuming after memory recovery...`);
-      }
-
-      // BACKPRESSURE: If approaching threshold, wait for some work to complete
-      if (heapUsedGB > this.memoryConfig.memoryThresholdGB && inFlight.size >= concurrency) {
-        console.warn(`⚠️ Backpressure: Memory at ${heapUsedGB.toFixed(2)}GB, throttling...`);
-        await Promise.race(Array.from(inFlight));
-        await flushBuffer();
-      }
-
-      // Cap in-flight to concurrency
-      while (inFlight.size >= concurrency) {
-        await Promise.race(Array.from(inFlight));
-      }
-
-      const task = runOne.call(this, filePath, globalIndex);
-      inFlight.add(task);
-
-      task
-        .then(async result => {
           filesProcessed++;
-          fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
-          totalChunks += result.chunks.length;
-          totalEmbeddings += result.chunks.length;
+          fileHashes[filePath] = { hash: null, chunks: chunks.length };
+          totalChunks += chunks.length;
 
-          if (this.options.verbose && filesProcessed % 50 === 0) {
-            const elapsedSec = (Date.now() - parseStartTime) / 1000;
-            const filesPerSec = (filesProcessed - startIndex) / elapsedSec;
-            const remainingFiles = allFiles.length - filesProcessed;
-            const estimatedMin = remainingFiles / filesPerSec / 60;
-            const heapGB = process.memoryUsage().heapUsed / 1024 / 1024 / 1024;
+          if (chunks.length > 0) {
+            await this.vectorStore.addChunksToBM25(chunks);
+          }
+
+          if (this.options.verbose && filesProcessed % 100 === 0) {
+            const elapsed = (Date.now() - startTime) / 1000;
+            const rate = (filesProcessed - startIndex) / elapsed;
+            const remaining = allFiles.length - filesProcessed;
+            const mem = process.memoryUsage();
             console.log(
-              `[PROGRESS] ${filesProcessed}/${allFiles.length} (${filesPerSec.toFixed(1)}/sec, ~${estimatedMin.toFixed(1)}min left) heap: ${heapGB.toFixed(2)}GB`
+              `[PROGRESS] ${filesProcessed}/${allFiles.length} (${rate.toFixed(1)}/sec, ~${(remaining / rate / 60).toFixed(1)}min left) rss:${(mem.rss / 1048576).toFixed(0)}MB heap:${(mem.heapUsed / 1048576).toFixed(0)}MB`
             );
           }
 
           if (onProgress) {
-            onProgress('parse', result.index, allFiles.length);
-            onProgress('chunk', result.index, allFiles.length);
+            onProgress('parse', globalIndex, allFiles.length);
+            onProgress('chunk', globalIndex, allFiles.length);
           }
 
-          if (result.chunks.length > 0) {
-            chunkBuffer.push(...result.chunks);
-
-            if (chunkBuffer.length >= flushSize) {
-              flushPromise = flushPromise.then(() => flushBuffer());
-            }
-          }
-
-          // Save checkpoint periodically
+          // Checkpoint
           if (
             this.options.enableCheckpoints &&
             filesProcessed % this.options.checkpointInterval === 0
           ) {
             await this._saveCheckpoint(filesProcessed, allFiles.length, totalChunks);
           }
-        })
-        .catch(err => console.error(`Error indexing ${filePath}:`, err.message))
-        .finally(() => inFlight.delete(task));
-    }
 
-    await Promise.all(Array.from(inFlight));
-    await pool.destroy();
+          // Periodic BM25 save (every 500 files)
+          if (filesProcessed % 500 === 0) {
+            await this.vectorStore.saveBM25Index();
+          }
+        } catch (err) {
+          if (this.options.verbose) {
+            console.error(
+              `[INDEX] Error: ${path.relative(this.options.projectRoot, filePath)}: ${err.message}`
+            );
+          }
+        }
+      }
 
-    await flushPromise;
-    await flushBuffer();
+      // Final BM25 save
+      await this.vectorStore.saveBM25Index();
+    } else {
+      // ════════════════════════════════════════════════════════════════════
+      // ASYNC PIPELINE: Original async implementation for embedding mode
+      // ════════════════════════════════════════════════════════════════════
+      const inFlight = new Set();
+      filesProcessed = startIndex;
+      const parseStartTime = Date.now();
+
+      const runOne = async (filePath, index) => {
+        const stats = await fs.stat(filePath);
+        if (stats.size > this.options.maxFileSize) {
+          return { filePath, chunks: [], hash: null, skipped: true, index };
+        }
+
+        const content = await fs.readFile(filePath, 'utf-8');
+        const language = this.parser.detectLanguage(filePath);
+        if (!language) {
+          return { filePath, chunks: [], hash: '', index };
+        }
+
+        // Use in-process parsing or Piscina worker pool
+        const result = parseInProcess
+          ? parseInProcess({ filePath, content, language })
+          : await pool.run({ filePath, content, language });
+        return { ...result, index };
+      };
+
+      // CRITICAL FIX: Memory-aware processing with backpressure
+      for (let i = 0; i < files.length; i++) {
+        const filePath = files[i];
+        const globalIndex = startIndex + i + 1;
+
+        // Check memory pressure before adding new work
+        const mem = process.memoryUsage();
+        const rssGB = mem.rss / 1024 / 1024 / 1024;
+
+        // EMERGENCY: Pause everything if memory is critical
+        if (rssGB > this.memoryConfig.emergencyThresholdGB) {
+          console.warn(
+            `🚨 EMERGENCY: Memory critical (rss:${rssGB.toFixed(2)}GB), draining queue...`
+          );
+          await Promise.all(Array.from(inFlight));
+          await flushPromise;
+          await flushBuffer();
+
+          // Aggressive GC
+          if (typeof global.gc === 'function') {
+            for (let gc = 0; gc < 3; gc++) global.gc();
+          }
+
+          // Cool down
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          console.log(`🔄 Resuming after memory recovery...`);
+        }
+
+        // BACKPRESSURE: If approaching threshold, wait for some work to complete
+        if (rssGB > this.memoryConfig.memoryThresholdGB && inFlight.size >= concurrency) {
+          console.warn(`⚠️ Backpressure: Memory at ${rssGB.toFixed(2)}GB, throttling...`);
+          await Promise.race(Array.from(inFlight));
+          await flushBuffer();
+        }
+
+        // Cap in-flight to concurrency
+        while (inFlight.size >= concurrency) {
+          await Promise.race(Array.from(inFlight));
+        }
+
+        const task = runOne.call(this, filePath, globalIndex);
+        inFlight.add(task);
+
+        task
+          .then(async result => {
+            filesProcessed++;
+            fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
+            totalChunks += result.chunks.length;
+            totalEmbeddings += result.chunks.length;
+
+            if (this.options.verbose && filesProcessed % 50 === 0) {
+              const elapsedSec = (Date.now() - parseStartTime) / 1000;
+              const filesPerSec = (filesProcessed - startIndex) / elapsedSec;
+              const remainingFiles = allFiles.length - filesProcessed;
+              const estimatedMin = remainingFiles / filesPerSec / 60;
+              const mem = process.memoryUsage();
+              const rss = (mem.rss / 1024 / 1024).toFixed(0);
+              const heapUsed = (mem.heapUsed / 1024 / 1024).toFixed(0);
+              const ext = (mem.external / 1024 / 1024).toFixed(0);
+              console.log(
+                `[PROGRESS] ${filesProcessed}/${allFiles.length} (${filesPerSec.toFixed(1)}/sec, ~${estimatedMin.toFixed(1)}min left) rss:${rss}MB heap:${heapUsed}MB ext:${ext}MB`
+              );
+            }
+
+            if (onProgress) {
+              onProgress('parse', result.index, allFiles.length);
+              onProgress('chunk', result.index, allFiles.length);
+            }
+
+            if (result.chunks.length > 0) {
+              chunkBuffer.push(...result.chunks);
+
+              if (chunkBuffer.length >= flushSize) {
+                flushPromise = flushPromise.then(() => flushBuffer());
+              }
+            }
+
+            // Save checkpoint periodically (fire-and-forget to avoid deadlocking inFlight)
+            if (
+              this.options.enableCheckpoints &&
+              filesProcessed % this.options.checkpointInterval === 0
+            ) {
+              this._saveCheckpoint(filesProcessed, allFiles.length, totalChunks).catch(err =>
+                console.error('[CHECKPOINT] Save failed:', err.message)
+              );
+            }
+          })
+          .catch(err => console.error(`Error indexing ${filePath}:`, err.message))
+          .finally(() => inFlight.delete(task));
+      }
+
+      await Promise.all(Array.from(inFlight));
+      if (pool) await pool.destroy();
+
+      await flushPromise;
+      await flushBuffer();
+
+      // Final BM25 index save after all processing
+      await this.vectorStore.saveBM25Index();
+    } // End of async pipeline else block
 
     // Build metadata
     const byLanguage = {};

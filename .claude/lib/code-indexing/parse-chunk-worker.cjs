@@ -58,9 +58,23 @@ function shouldUseSimpleChunking(filePath) {
   const ext = filePath.toLowerCase().match(/\.[^.]+$/)?.[0];
   // Non-code file extensions that don't benefit from AST parsing
   const simpleExtensions = [
-    '.json', '.yaml', '.yml', '.md', '.txt', '.toml', '.ini',
-    '.xml', '.html', '.css', '.svg', '.lock', '.log',
-    '.env', '.gitignore', '.dockerignore', '.editorconfig'
+    '.json',
+    '.yaml',
+    '.yml',
+    '.md',
+    '.txt',
+    '.toml',
+    '.ini',
+    '.xml',
+    '.html',
+    '.css',
+    '.svg',
+    '.lock',
+    '.log',
+    '.env',
+    '.gitignore',
+    '.dockerignore',
+    '.editorconfig',
   ];
   return ext && simpleExtensions.includes(ext);
 }
@@ -89,7 +103,11 @@ module.exports = function parseAndChunk({ filePath, content, language }) {
     return { filePath, chunks, hash };
   } catch (error) {
     // CRITICAL FIX: Handle OOM and other worker errors gracefully
-    if (error.message.includes('memory') || error.message.includes('heap') || error.message.includes('out of memory')) {
+    if (
+      error.message.includes('memory') ||
+      error.message.includes('heap') ||
+      error.message.includes('out of memory')
+    ) {
       console.error(`[WORKER] OOM on file: ${filePath}, skipping`);
       return { filePath, chunks: [], hash: null, error: 'OOM' };
     }

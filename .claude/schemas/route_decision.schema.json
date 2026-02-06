@@ -4,11 +4,11 @@
   "description": "Schema for routing decisions",
   "type": "object",
   "properties": {
-    "input": {"type": "string"},
-    "decision": {"type": "string"},
-    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
-    "reasoning": {"type": "string"},
-    "agent": {"type": "string"}
+    "input": { "type": "string" },
+    "decision": { "type": "string" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "reasoning": { "type": "string" },
+    "agent": { "type": "string" }
   },
   "required": ["input", "decision", "agent"]
 }

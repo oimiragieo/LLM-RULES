@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * Dependency Verification Script
- * 
+ *
  * Checks that critical native dependencies are properly installed.
  * Run this before indexing or using semantic search.
- * 
+ *
  * Usage: node scripts/verify-dependencies.mjs [--fix]
  */
 
@@ -35,7 +35,9 @@ async function checkSharp() {
   try {
     const sharp = await import('sharp');
     // Try to create a simple image to verify it works
-    const img = sharp.default({ create: { width: 1, height: 1, channels: 3, background: 'black' } });
+    const img = sharp.default({
+      create: { width: 1, height: 1, channels: 3, background: 'black' },
+    });
     await img.raw().toBuffer();
     return { ok: true, version: sharp.default.versions.sharp };
   } catch (error) {
@@ -101,14 +103,16 @@ async function checkAstgrep() {
       if (fs.existsSync(astGrepPath)) {
         return { ok: true, path: astGrepPath, note: 'Local installation' };
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return { ok: false, error: 'ast-grep not found in PATH' };
   }
 }
 
 async function runChecks() {
   log('\n📦 Agent Studio Dependency Verification\n', BLUE);
-  log('=' .repeat(50));
+  log('='.repeat(50));
 
   const results = [];
   let criticalFailures = 0;
@@ -188,11 +192,11 @@ async function runChecks() {
   const totalMemGB = os.default.totalmem() / 1024 / 1024 / 1024;
   const freeMemGB = os.default.freemem() / 1024 / 1024 / 1024;
   const cpus = os.default.cpus().length;
-  
+
   log(`  ℹ️  CPUs: ${cpus} cores`, BLUE);
   log(`  ℹ️  Total RAM: ${totalMemGB.toFixed(1)} GB`, BLUE);
   log(`  ℹ️  Free RAM: ${freeMemGB.toFixed(1)} GB`, BLUE);
-  
+
   if (totalMemGB < 8) {
     log(`  ⚠️  Low memory: ${totalMemGB.toFixed(1)}GB (recommend 8GB+ for indexing)`, YELLOW);
   }
@@ -205,12 +209,12 @@ async function runChecks() {
   } else {
     log(`\n❌ ${criticalFailures} critical dependency(s) missing`, RED);
     log('   Semantic search will NOT work without these.', RED);
-    
+
     if (process.argv.includes('--fix')) {
       log('\n🔧 Attempting automatic fixes...', BLUE);
       // Could implement auto-fix logic here
     }
-    
+
     process.exit(1);
   }
 
@@ -218,16 +222,23 @@ async function runChecks() {
   const reportPath = '.claude/context/artifacts/dependency-report.json';
   try {
     fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-    fs.writeFileSync(reportPath, JSON.stringify({
-      timestamp: new Date().toISOString(),
-      results,
-      system: {
-        cpus,
-        totalMemoryGB: totalMemGB,
-        freeMemoryGB: freeMemGB,
-        platform: os.default.platform(),
-      }
-    }, null, 2));
+    fs.writeFileSync(
+      reportPath,
+      JSON.stringify(
+        {
+          timestamp: new Date().toISOString(),
+          results,
+          system: {
+            cpus,
+            totalMemoryGB: totalMemGB,
+            freeMemoryGB: freeMemGB,
+            platform: os.default.platform(),
+          },
+        },
+        null,
+        2
+      )
+    );
     log(`\n📄 Report saved to ${reportPath}`, BLUE);
   } catch (_e) {
     // Ignore write errors
