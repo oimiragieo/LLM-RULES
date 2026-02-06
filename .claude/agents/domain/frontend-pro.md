@@ -21,13 +21,20 @@ tools:
   - Skill
 skills:
   - task-management-protocol
-  - frontend-expert
-  - react-expert
-  - styling-expert
-  - ui-components-expert
-  - tdd
   - accessibility
+  - build-tools-expert
+  - debugging
+  - frontend-expert
+  - git-expert
+  - html-tailwind-css-and-javascript-expert-rule
+  - react-expert
+  - state-management-expert
+  - styling-expert
+  - tdd
+  - typescript-expert
+  - ui-components-expert
   - verification-before-completion
+  - web-design-guidelines-vercel
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

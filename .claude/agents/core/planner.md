@@ -23,11 +23,17 @@ extended_thinking: true
 priority: high
 context_strategy: lazy_load
 skills:
-  - plan-generator
-  - task-breakdown
-  - sequential-thinking
+  - brainstorming
+  - checklist-generator
+  - complexity-assessment
   - context-compressor
+  - plan-generator
   - progressive-disclosure
+  - sequential-thinking
+  - spec-gathering
+  - task-breakdown
+  - task-management-protocol
+  - verification-before-completion
 
 # Agent Identity
 identity:

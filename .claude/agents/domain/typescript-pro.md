@@ -24,12 +24,15 @@ tools:
   ]
 skills:
   - task-management-protocol
-  - tdd
+  - build-tools-expert
+  - code-quality-expert
   - debugging
   - git-expert
-  - verification-before-completion
-  - typescript-expert
   - state-management-expert
+  - tdd
+  - tsconfig-json-rules
+  - typescript-expert
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

@@ -23,10 +23,14 @@ tools:
   - Skill
 skills:
   - task-management-protocol
-  - svelte-expert
+  - debugging
   - form-and-actions-in-sveltekit
+  - git-expert
   - seo-and-meta-tags-in-sveltekit
+  - styling-expert
+  - svelte-expert
   - tdd
+  - typescript-expert
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

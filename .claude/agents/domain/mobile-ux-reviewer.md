@@ -24,12 +24,15 @@ tools:
   ]
 skills:
   - task-management-protocol
+  - accessibility
+  - checklist-generator
+  - design-and-user-experience-guidelines
   - diagram-generator
   - doc-generator
-  - verification-before-completion
-  - accessibility
-  - visual-and-observational-rules
   - mobile-first-design-rules
+  - mobile-ui-development-rule
+  - verification-before-completion
+  - visual-and-observational-rules
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

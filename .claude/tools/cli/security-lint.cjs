@@ -55,8 +55,8 @@ const CONFIG = {
   // Directories to skip
   skipDirs: ['node_modules', '.git', 'dist', 'build', 'coverage', '.next', '.nuxt', 'vendor'],
 
-  // Path patterns: do not scan .md files under these (docs/plans/skills - examples only)
-  skipMdPaths: ['.claude/docs/', '.claude/context/plans/', '.claude/skills/'],
+  // Path patterns: do not scan .md files under these (docs/plans/skills/agents - examples only)
+  skipMdPaths: ['.claude/docs/', '.claude/context/plans/', '.claude/skills/', '.claude/agents/'],
 
   // Known false positives: { pathSubstring, ruleId } - excluded from blocking
   skipFindings: [

@@ -23,9 +23,13 @@ tools:
   - Skill
 skills:
   - task-management-protocol
-  - graphql-expert
   - api-development-expert
+  - code-quality-expert
+  - debugging
+  - git-expert
+  - graphql-expert
   - tdd
+  - typescript-expert
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

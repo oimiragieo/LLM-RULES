@@ -24,13 +24,16 @@ tools:
   ]
 skills:
   - task-management-protocol
-  - tdd
-  - debugging
-  - git-expert
-  - security-architect
-  - verification-before-completion
   - api-development-expert
+  - comprehensive-type-annotations
+  - database-expert
+  - debugging
+  - form-validation-with-zod
+  - git-expert
   - python-backend-expert
+  - security-architect
+  - tdd
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

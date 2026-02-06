@@ -11,22 +11,26 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, T
 # Note: Use Grep for code search, Glob for file discovery; sequential-thinking via Skill({ skill: 'sequential-thinking' }); MCP tools optional (use Skill fallbacks)
 skills:
   - task-management-protocol
-  - rule-auditor
-  - dependency-analyzer
-  - explaining-rules
-  - repo-rag
-  - security-architect
-  - doc-generator
-  - verification-before-completion
   - auth-security-expert
   - authentication-flow-rules
-  - web3-expert
-  - chrome-browser
-  - template-renderer
+  - binary-analysis-patterns
   - checklist-generator
-  - ripgrep
+  - chrome-browser
+  - code-analyzer
   - code-semantic-search
   - code-structural-search
+  - dependency-analyzer
+  - doc-generator
+  - explaining-rules
+  - memory-forensics
+  - protocol-reverse-engineering
+  - repo-rag
+  - ripgrep
+  - rule-auditor
+  - security-architect
+  - template-renderer
+  - verification-before-completion
+  - web3-expert
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

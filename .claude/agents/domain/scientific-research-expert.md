@@ -22,13 +22,16 @@ tools:
   - Skill
 skills:
   - task-management-protocol
-  - scientific-skills
-  - research-synthesis
+  - arxiv-mcp
+  - debugging
   - diagram-generator
   - doc-generator
+  - jupyter-notebook-best-practices
+  - python-backend-expert
+  - research-synthesis
+  - scientific-skills
   - tdd
   - verification-before-completion
-  - arxiv-mcp
 context_files:
   - '@.claude/context/memory/learnings.md'
   - '@.claude/context/memory/decisions.md'

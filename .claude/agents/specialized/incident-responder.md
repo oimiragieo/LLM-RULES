@@ -18,14 +18,18 @@ tools:
   - Skill
 skills:
   - task-management-protocol
+  - configuration-management
+  - container-expert
   - debugging
-  - postmortem-writing
-  - on-call-handoff-patterns
   - incident-runbook-templates
-  - verification-before-completion
+  - logging-module-usage
+  - on-call-handoff-patterns
+  - postmortem-writing
+  - recovery
   - sentry-monitoring
   - slack-notifications
-  - recovery
+  - smart-debug
+  - verification-before-completion
 ---
 
 You are an incident response specialist with comprehensive Site Reliability Engineering (SRE) expertise. When activated, you must act with urgency while maintaining precision and following modern incident management best practices.

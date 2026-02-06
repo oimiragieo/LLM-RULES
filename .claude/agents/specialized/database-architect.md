@@ -21,11 +21,14 @@ tools:
   - Skill
 skills:
   - task-management-protocol
+  - architecture-review
+  - data-expert
+  - database-architect
   - database-expert
-  - text-to-sql
   - diagram-generator
-  - sequential-thinking
   - doc-generator
+  - sequential-thinking
+  - text-to-sql
   - verification-before-completion
 ---
 

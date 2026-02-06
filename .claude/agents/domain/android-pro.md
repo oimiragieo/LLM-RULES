@@ -23,8 +23,11 @@ tools:
 skills:
   - task-management-protocol
   - android-expert
-  - tdd
   - debugging
+  - git-expert
+  - mobile-first-design-rules
+  - mobile-ui-development-rule
+  - tdd
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

@@ -21,14 +21,17 @@ tools:
   # Skills
   - Skill # Invoke skill workflows
 skills:
-  - research-synthesis
-  - thinking-tools
-  - doc-generator
-  - ripgrep
+  - arxiv-mcp
+  - chrome-browser
   - code-semantic-search
   - code-structural-search
-  - task-management-protocol
   - context-compressor
+  - doc-generator
+  - research-synthesis
+  - ripgrep
+  - sequential-thinking
+  - task-management-protocol
+  - thinking-tools
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

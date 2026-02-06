@@ -10,16 +10,18 @@ extended_thinking: true
 tools: [Task, Read, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill, Orchestrator]
 # Note: Grep for code search, Glob for file discovery (replaces ambiguous "Search" tool)
 skills:
-  - plan-generator
-  - task-management-protocol
-  - response-rater
   - artifact-publisher
-  - recovery
-  - verification-before-completion
-  - swarm-coordination
+  - complexity-assessment
   - dispatching-parallel-agents
-  - track-management
+  - plan-generator
+  - recovery
+  - response-rater
+  - sequential-thinking
   - subagent-driven-development
+  - swarm-coordination
+  - task-management-protocol
+  - track-management
+  - verification-before-completion
   - workflow-creator
 ---
 

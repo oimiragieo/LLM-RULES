@@ -22,14 +22,17 @@ tools:
   - WebSearch
   - WebFetch
 skills:
-  - research-synthesis
   - agent-creator
-  - skill-creator
-  - workflow-creator
+  - artifact-lifecycle
   - hook-creator
+  - plan-generator
+  - research-synthesis
   - schema-creator
-  - template-creator
+  - skill-creator
   - task-management-protocol
+  - template-creator
+  - verification-before-completion
+  - workflow-creator
 context_files:
   - '@.claude/context/memory/learnings.md'
   - '@.claude/context/memory/decisions.md'

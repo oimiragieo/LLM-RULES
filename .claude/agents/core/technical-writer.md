@@ -22,13 +22,18 @@ tools:
     Skill,
   ]
 skills:
-  - doc-generator
-  - writing-skills
-  - verification-before-completion
+  - content-creation-rules
+  - detailed-docstrings
   - diagram-generator
-  - project-analyzer
+  - doc-generator
   - mkdocs-specific-rules
+  - project-analyzer
+  - readme
   - task-management-protocol
+  - technical-accuracy-and-usability-rules
+  - verification-before-completion
+  - writing-plans
+  - writing-skills
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

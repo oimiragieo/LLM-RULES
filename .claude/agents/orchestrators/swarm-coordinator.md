@@ -9,12 +9,14 @@ priority: high
 extended_thinking: true
 tools: [Task, Read, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
+  - consensus-voting
+  - context-compressor
+  - dispatching-parallel-agents
+  - plan-generator
+  - subagent-driven-development
   - swarm-coordination
   - task-management-protocol
-  - consensus-voting
   - verification-before-completion
-  - dispatching-parallel-agents
-  - subagent-driven-development
 ---
 
 # Swarm Coordinator Agent

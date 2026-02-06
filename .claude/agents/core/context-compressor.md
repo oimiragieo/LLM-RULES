@@ -10,8 +10,9 @@ tools: [Read, Write, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skil
 # Note: Uses Write (not Edit) to create new compressed summaries rather than modify originals
 skills:
   - context-compressor
-  - verification-before-completion
+  - session-handoff
   - task-management-protocol
+  - verification-before-completion
 ---
 
 # Context Compressor Agent

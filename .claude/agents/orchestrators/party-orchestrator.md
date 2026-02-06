@@ -8,9 +8,13 @@ context_strategy: lazy_load
 priority: high
 tools: [Read, Write, Edit, Task, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
+  - context-compressor
+  - dispatching-parallel-agents
   - party-mode
   - security-architect
-  - context-compressor
+  - swarm-coordination
+  - task-management-protocol
+  - verification-before-completion
 ---
 
 # Party Orchestrator Agent

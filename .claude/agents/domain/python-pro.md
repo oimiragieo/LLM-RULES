@@ -24,12 +24,16 @@ tools:
   ]
 skills:
   - task-management-protocol
-  - tdd
+  - api-development-expert
+  - code-quality-expert
+  - comprehensive-type-annotations
+  - comprehensive-unit-testing-with-pytest
   - debugging
   - git-expert
-  - verification-before-completion
+  - prioritize-python-3-10-features
   - python-backend-expert
-  - api-development-expert
+  - tdd
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

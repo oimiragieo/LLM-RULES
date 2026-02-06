@@ -26,20 +26,24 @@ tools:
   ]
 # Note: Use Grep for code search, Glob for file discovery; sequential-thinking via Skill({ skill: 'sequential-thinking' })
 skills:
+  - api-development-expert
   - architecture-review
-  - database-architect
-  - security-architect
-  - swarm-coordination
-  - ripgrep
+  - brainstorming
+  - checklist-generator
   - code-semantic-search
   - code-structural-search
-  - verification-before-completion
+  - complexity-assessment
+  - database-architect
   - diagram-generator
-  - project-analyzer
-  - brainstorming
   - progressive-disclosure
+  - project-analyzer
+  - ripgrep
+  - security-architect
+  - sequential-thinking
+  - spec-gathering
+  - swarm-coordination
   - task-management-protocol
-  - checklist-generator
+  - verification-before-completion
 
 # Agent Identity
 identity:

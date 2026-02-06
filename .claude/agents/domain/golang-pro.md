@@ -24,12 +24,14 @@ tools:
   ]
 skills:
   - task-management-protocol
-  - tdd
+  - api-development-expert
+  - build-tools-expert
+  - code-quality-expert
   - debugging
   - git-expert
-  - verification-before-completion
   - go-expert
-  - api-development-expert
+  - tdd
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

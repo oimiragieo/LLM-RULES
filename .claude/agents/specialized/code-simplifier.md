@@ -10,12 +10,15 @@ skills:
   - task-management-protocol
   - best-practices-guidelines
   - code-analyzer
-  - code-style-validator
-  - dry-principle
-  - debugging
-  - ripgrep
+  - code-quality-expert
   - code-semantic-search
   - code-structural-search
+  - code-style-validator
+  - debugging
+  - dry-principle
+  - function-length-and-responsibility
+  - ripgrep
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

@@ -23,8 +23,13 @@ tools:
   - Skill
 skills:
   - task-management-protocol
+  - debugging
+  - git-expert
   - nextjs-expert
+  - react-best-practices-vercel
   - react-expert
+  - state-management-expert
+  - styling-expert
   - tdd
   - typescript-expert
   - verification-before-completion

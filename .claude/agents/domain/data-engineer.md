@@ -24,9 +24,14 @@ tools:
 skills:
   - task-management-protocol
   - data-expert
-  - text-to-sql
+  - database-expert
+  - debugging
   - diagram-generator
+  - git-expert
+  - pandas-data-manipulation-rules
+  - python-backend-expert
   - tdd
+  - text-to-sql
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

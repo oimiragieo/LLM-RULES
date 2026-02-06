@@ -24,13 +24,14 @@ tools:
   ]
 skills:
   - task-management-protocol
-  - web3-expert
-  - security-architect
   - auth-security-expert
-  - tdd
+  - code-quality-expert
   - debugging
   - git-expert
+  - security-architect
+  - tdd
   - verification-before-completion
+  - web3-expert
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

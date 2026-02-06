@@ -19,14 +19,19 @@ tools:
   - Skill
 skills:
   - task-management-protocol
+  - aws-cloud-ops
+  - chrome-browser
+  - cloud-devops-expert
+  - container-expert
   - context-compressor
   - debugging
+  - incident-runbook-templates
+  - logging-module-usage
+  - postmortem-writing
+  - recovery
+  - sentry-monitoring
   - smart-debug
   - verification-before-completion
-  - sentry-monitoring
-  - recovery
-  - chrome-browser
-  - logging-module-usage
 ---
 
 You are a DevOps troubleshooter specializing in rapid incident response, advanced debugging, and modern observability practices.

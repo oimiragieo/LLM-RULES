@@ -23,10 +23,15 @@ tools:
   - Skill
 skills:
   - task-management-protocol
-  - java-expert
-  - tdd
+  - api-development-expert
   - debugging
   - doc-generator
+  - dto-conventions
+  - git-expert
+  - java-expert
+  - restcontroller-conventions
+  - service-class-conventions
+  - tdd
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

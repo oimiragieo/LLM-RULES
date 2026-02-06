@@ -9,10 +9,12 @@ priority: medium
 tools:
   [Read, Write, Edit, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
+  - code-analyzer
+  - context-compressor
+  - insight-extraction
+  - summarize-changes
   - task-management-protocol
   - verification-before-completion
-  - code-analyzer
-  - insight-extraction
 context_files:
   - '@.claude/context/memory/patterns.json'
   - '@.claude/context/memory/gotchas.json'

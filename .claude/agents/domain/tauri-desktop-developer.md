@@ -23,11 +23,15 @@ tools:
   - Skill
 skills:
   - task-management-protocol
+  - debugging
+  - git-expert
+  - rust-expert
   - tauri-native-api-integration
   - tauri-security-rules
   - tauri-svelte-typescript-general
   - tauri-svelte-ui-components
-  - debugging
+  - tdd
+  - typescript-expert
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

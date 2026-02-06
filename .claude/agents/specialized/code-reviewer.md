@@ -11,17 +11,21 @@ tools: [Read, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
 disallowedTools: [Write, Edit]
 skills:
   - task-management-protocol
-  - requesting-code-review
-  - receiving-code-review
-  - verification-before-completion
   - checklist-generator
   - code-analyzer
   - code-quality-expert
-  - rule-auditor
-  - code-style-validator
-  - ripgrep
   - code-semantic-search
   - code-structural-search
+  - code-style-validator
+  - dry-principle
+  - function-length-and-responsibility
+  - git-expert
+  - receiving-code-review
+  - requesting-code-review
+  - ripgrep
+  - rule-auditor
+  - security-architect
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 hooks: {}

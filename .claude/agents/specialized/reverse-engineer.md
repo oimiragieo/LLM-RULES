@@ -11,16 +11,17 @@ skills:
   [
     task-management-protocol,
     binary-analysis-patterns,
-    memory-forensics,
-    protocol-reverse-engineering,
-    tdd,
-    debugging,
-    git-expert,
-    security-architect,
-    verification-before-completion,
-    ripgrep,
+    code-analyzer,
     code-semantic-search,
     code-structural-search,
+    debugging,
+    git-expert,
+    memory-forensics,
+    protocol-reverse-engineering,
+    ripgrep,
+    security-architect,
+    tdd,
+    verification-before-completion,
   ]
 context_files: [C:/dev/projects/agent-studio/@.claude/context\memory\learnings.md]
 ---

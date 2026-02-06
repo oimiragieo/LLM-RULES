@@ -23,9 +23,12 @@ tools:
   - Skill
 skills:
   - task-management-protocol
-  - ios-expert
-  - tdd
   - debugging
+  - git-expert
+  - ios-expert
+  - mobile-first-design-rules
+  - mobile-ui-development-rule
+  - tdd
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

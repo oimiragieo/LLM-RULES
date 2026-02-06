@@ -13,24 +13,27 @@ skills:
   - git-expert
   - github-mcp
   - architecture-review
-  - database-architect
-  - consensus-voting
-  - context-compressor
-  - filesystem
-  - k8s-manifest-generator
-  - helm-chart-scaffolding
-  - gitops-workflow
-  - k8s-security-policies
-  - verification-before-completion
   - aws-cloud-ops
-  - docker-compose
-  - terraform-infra
-  - kubernetes-flux
-  - containerization-rules
   - ci-cd-implementation-rule
+  - cloud-devops-expert
+  - configuration-management
+  - consensus-voting
+  - container-expert
+  - containerization-rules
+  - context-compressor
+  - database-architect
+  - docker-compose
+  - filesystem
+  - gcloud-cli
+  - gitops-workflow
+  - helm-chart-scaffolding
+  - k8s-manifest-generator
+  - k8s-security-policies
+  - kubernetes-flux
   - sentry-monitoring
   - template-renderer
-  - gcloud-cli
+  - terraform-infra
+  - verification-before-completion
 ---
 
 # DevOps Engineer Agent

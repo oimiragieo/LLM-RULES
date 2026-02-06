@@ -26,17 +26,20 @@ tools:
   ]
 # Note: Git operations use Bash tool; sequential-thinking via Skill({ skill: 'sequential-thinking' })
 skills:
-  - test-generator
-  - rule-auditor
-  - verification-before-completion
   - checklist-generator
-  - tdd
-  - ripgrep
+  - chrome-browser
+  - code-analyzer
   - code-semantic-search
   - code-structural-search
-  - code-analyzer
-  - chrome-browser
+  - comprehensive-unit-testing-with-pytest
+  - debugging
+  - qa-workflow
+  - ripgrep
+  - rule-auditor
   - task-management-protocol
+  - tdd
+  - test-generator
+  - verification-before-completion
 
 # Agent Identity
 identity:

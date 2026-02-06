@@ -23,9 +23,13 @@ tools:
   - Skill
 skills:
   - task-management-protocol
+  - api-development-expert
+  - async-operations
+  - code-quality-expert
+  - debugging
+  - git-expert
   - nodejs-expert
   - tdd
-  - debugging
   - typescript-expert
   - verification-before-completion
 context_files:

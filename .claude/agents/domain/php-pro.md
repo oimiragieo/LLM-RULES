@@ -23,10 +23,14 @@ tools:
   - Skill
 skills:
   - task-management-protocol
-  - php-expert
-  - tdd
+  - api-development-expert
+  - composer-dependency-management
   - debugging
   - doc-generator
+  - git-expert
+  - php-expert
+  - tall-stack-general
+  - tdd
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
@@ -406,7 +410,7 @@ class UserServiceTest extends TestCase
         $data = new CreateUserData(
             name: 'Test User',
             email: 'test@example.com',
-            password: 'password123'
+            password: $_ENV['TEST_PASSWORD'] ?? 'test-pwd'
         );
 
         $user = $this->service->createUser($data);
@@ -459,7 +463,7 @@ it('can create a user', function () {
     $data = new CreateUserData(
         name: 'Test User',
         email: 'test@example.com',
-        password: 'password123'
+        password: $_ENV['TEST_PASSWORD'] ?? 'test-pwd'
     );
 
     $user = $this->service->createUser($data);

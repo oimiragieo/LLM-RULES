@@ -23,12 +23,16 @@ tools:
 skills:
   - task-management-protocol
   - ai-ml-expert
-  - python-backend-expert
+  - comprehensive-type-annotations
   - data-expert
-  - tdd
   - debugging
-  - verification-before-completion
+  - git-expert
+  - jupyter-notebook-best-practices
+  - logging-module-usage
+  - python-backend-expert
   - scientific-skills
+  - tdd
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

@@ -19,15 +19,18 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - linear-pm
-  - jira-pm
-  - slack-notifications
+  - checklist-generator
   - consensus-voting
+  - jira-pm
+  - linear-pm
   - plan-generator
-  - sequential-thinking
-  - verification-before-completion
-  - task-management-protocol
   - progressive-disclosure
+  - sequential-thinking
+  - slack-notifications
+  - spec-writing
+  - task-breakdown
+  - task-management-protocol
+  - verification-before-completion
 ---
 
 # Product Manager Agent

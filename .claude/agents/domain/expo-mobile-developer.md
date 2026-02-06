@@ -23,11 +23,15 @@ tools:
   - Skill
 skills:
   - task-management-protocol
+  - debugging
   - expo-framework-rule
   - expo-mobile-app-rule
-  - react-expert
-  - tdd
+  - git-expert
   - mobile-ui-development-rule
+  - react-expert
+  - react-native-skills-vercel
+  - tdd
+  - typescript-expert
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

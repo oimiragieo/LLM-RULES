@@ -16,10 +16,11 @@ context_strategy: minimal
 skills:
   - agent-creator
   - skill-creator
-  - verification-before-completion
-  - tool-search
-  - swarm-coordination
   - skill-discovery
+  - swarm-coordination
+  - task-management-protocol
+  - tool-search
+  - verification-before-completion
 ---
 
 # Router Agent - Multi-Agent Orchestrator

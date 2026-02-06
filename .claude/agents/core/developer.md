@@ -25,22 +25,25 @@ tools:
   ]
 # Note: Git operations use Bash tool (git commands); MCP tools optional (agents use Skill fallbacks)
 skills:
-  - tdd
-  - debugging
-  - git-expert
-  - ripgrep
-  - code-semantic-search
-  - code-structural-search
-  - security-architect
-  - context-compressor
-  - github-mcp
-  - verification-before-completion
   - checklist-generator
+  - chrome-browser
   - code-analyzer
   - code-quality-expert
+  - code-semantic-search
+  - code-structural-search
   - code-style-validator
-  - chrome-browser
   - commit-validator
+  - context-compressor
+  - debugging
+  - dependency-analyzer
+  - git-expert
+  - github-mcp
+  - ripgrep
+  - security-architect
+  - smart-revert
+  - task-management-protocol
+  - tdd
+  - verification-before-completion
 capabilities:
   - code-generation
   - refactoring

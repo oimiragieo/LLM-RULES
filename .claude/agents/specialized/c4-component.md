@@ -9,10 +9,11 @@ priority: medium
 tools: [Read, Grep, Glob, Write, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol
-  - doc-generator
   - architecture-review
-  - verification-before-completion
+  - code-analyzer
   - diagram-generator
+  - doc-generator
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
