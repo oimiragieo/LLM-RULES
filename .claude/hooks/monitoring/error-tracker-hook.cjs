@@ -11,7 +11,7 @@
 'use strict';
 
 const {
-  parseHookInputSync,
+  parseHookInputAsync,
   getToolName,
   getToolInput,
   getToolOutput,
@@ -53,9 +53,9 @@ function coerceError(toolOutput) {
   return null;
 }
 
-function main() {
+async function main() {
   try {
-    const hookInput = parseHookInputSync();
+    const hookInput = await parseHookInputAsync();
     if (!hookInput) process.exit(0);
 
     const tool = getToolName(hookInput) || 'unknown';

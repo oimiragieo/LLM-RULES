@@ -81,7 +81,7 @@
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/unified-pre-write-hook.cjs"
+            "command": "node .claude/hooks/safety/unified-pre-write-hook.cjs"
           },
           {
             "type": "command",

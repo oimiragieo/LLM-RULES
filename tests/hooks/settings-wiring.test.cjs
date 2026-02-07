@@ -26,7 +26,7 @@ test('PreToolUse Edit|Write|NotebookEdit includes unified-pre-write-hook', () =>
 
   const commands = listCommands(block);
   assert.ok(
-    commands.includes('node .claude/hooks/unified-pre-write-hook.cjs'),
+    commands.includes('node .claude/hooks/safety/unified-pre-write-hook.cjs'),
     'unified-pre-write-hook.cjs should be wired for Edit/Write/NotebookEdit'
   );
 });

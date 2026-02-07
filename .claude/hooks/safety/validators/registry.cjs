@@ -141,8 +141,8 @@ const SAFE_COMMANDS_ALLOWLIST = [
   'export', // export environment variables
   'source', // source a script
   '.', // source (dot notation)
-  'eval', // evaluate expression
-  'exec', // execute command
+  // 'eval', // REMOVED: SEC-CRITICAL - enables arbitrary code execution
+  // 'exec', // REMOVED: SEC-CRITICAL - enables arbitrary code execution
   'exit', // exit shell
   'return', // return from function
   'break', // break loop
