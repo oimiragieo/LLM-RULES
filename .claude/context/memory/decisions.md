@@ -995,6 +995,59 @@ Comprehensive 5-phase audit of all 49 agent definition files in `.claude/agents/
 
 ---
 
+## ADR-099: Skills System Cleanup — Archive Dead Skills and Fix Catalog
+
+**Date:** 2026-02-07
+**Status:** Accepted
+**Context:** Skills system audit (Pipeline #16) found 302 skills with 214 dead (70.9%, zero consumers). Catalog had 435 entries vs 302 on disk (141 phantoms: 138 scientific sub-skills + 3 missing). 8 orphan skills missing from catalog.
+
+**Decision:**
+- Archive 214 dead skills to `.claude/skills/_archive/dead/` using `git mv`
+- Fix catalog: remove 141 phantoms, add 8 orphans, restructure scientific sub-skills as 1 parent
+- Delete test artifact `test-skill-e2e-1769915216355`
+- Defer security HIGH findings (skill name injection, creator escalation, SSRF) to hardening pipeline
+
+**Rationale:**
+- 70.9% dead code creates maintenance burden without delivering value
+- Archive via `git mv` preserves git history (restoration possible if needed)
+- Catalog must be single source of truth (32% phantom rate unacceptable)
+- Scientific-skills as nested structure prevents 3x catalog inflation
+- Security findings are systemic (apply to all skills regardless of count)
+
+**Consequences:**
+- Active skills reduced from 302 to ~88
+- Catalog accuracy improves from 68% → 100%
+- Health score improves from 62/100 → projected 85/100
+- Skill count in documentation needs updating across 5+ files
+- 214 archived skills restorable via `git mv .claude/skills/_archive/dead/{skill} .claude/skills/{skill}`
+
+**Alternatives Considered:**
+- Full deletion: Rejected (loses git history, harder to restore)
+- Keep dead skills: Rejected (70.9% dead code is unsustainable maintenance burden)
+- Leave catalog as-is: Rejected (32% phantom entries breaks trust in discovery)
+
+**Security Considerations:**
+Security audit (78/100) identified 3 HIGH-severity issues:
+- H-001: Skill name injection (systemic - not skill-specific)
+- H-002: Creator privilege escalation (systemic)
+- H-003: WebFetch/WebSearch SSRF (systemic)
+
+**Impact of Cleanup:** None. Security issues are systemic (apply to all skills regardless of count).
+
+**Next Steps:** Defer to hardening pipeline (separate from structural cleanup).
+
+**Implementation:**
+- Task #124: Archived 214 dead skills via `git mv`, fixed catalog (remove 141 phantoms, add 8 orphans), deleted test artifact, committed with provenance
+- Task #125: Record ADR-099, update documentation (@SKILL_CATALOG_TABLE, @DIRECTORY_STRUCTURE, active_context, CLAUDE.md), record learnings
+
+**References:**
+- Audit report: `.claude/context/reports/architecture/skills-system-audit-2026-02-07.md`
+- Security report: `.claude/context/reports/security/skills-security-review-2026-02-07.md`
+- Archive pattern: ADR-098 (lib archival)
+- Pipeline: #16 Phase B-C
+
+---
+
 ### ADR-094: Context System Deep Dive -- Artifact Lifecycle + Governance Gap Fix
 
 **Date:** 2026-02-07
