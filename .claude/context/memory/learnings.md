@@ -1,3 +1,21 @@
+## Pipeline #14: Hooks System Deep Dive Security Review (2026-02-07)
+
+### Hooks Architecture Security Findings
+
+**Pattern: Environment variable override sprawl is a systemic issue.** Found 21 independent env vars that each disable a specific security control. This pattern appears across hooks, routing, context, and memory subsystems (Pipelines #11-#14). The root cause is using env vars for security config instead of integrity-protected config files.
+
+**Pattern: String-based agent detection is inherently spoofable.** Agent type detection via `prompt.includes('you are planner')` is trivially bypassed. This affects planner-first enforcement and security-review-first enforcement. Must use structured metadata (subagent_type field) for reliable detection.
+
+**Pattern: SAFE_COMMANDS_ALLOWLIST must never include dangerous builtins.** `eval`, `exec`, `source`, and `.` in the allowlist completely bypass bash command validation. Allowlists must be reviewed for transitive danger (a "safe" command that enables arbitrary execution is not safe).
+
+**Pattern: Fail-open vs fail-closed must be a deliberate per-hook decision.** Found 4 hooks that fail-open by default (tool-scope-validator, windows-null-sanitizer, config-model-validator, code-index-updater) vs 4 that fail-closed (routing-guard, pre-task-unified, unified-creator-guard, unified-pre-write-hook). Security hooks should fail-closed; utility hooks can fail-open.
+
+**Key Metric:** Hooks security score = 52/100 (conditional pass). Strongest area: enforcement completeness (75/100). Weakest area: bypass resistance (35/100).
+
+**Full report:** `.claude/context/reports/security/hooks-security-review-2026-02-07.md`
+
+---
+
 ## Pipeline #13: Post-Review Fixes (2026-02-07)
 
 ### Workflow Cleanup Follow-Up (Phase E)
@@ -506,5 +524,68 @@ grep -r "old/path/pattern" .claude/ --exclude-dir=_archive
 - Verification: grep confirmed no remaining active references to old paths
 - Commit: 097f549f "fix(context): clean up context system - delete dead files, update governance"
 - All files pass linting and security checks
+
+---
+
+## Pipeline #14: Hooks Documentation Expansion (2026-02-07)
+
+### @ENFORCEMENT_HOOKS.md Documentation Pattern
+
+**Pattern: Comprehensive hook documentation requires 6 key sections per hook:**
+1. Location and event type (PreToolUse/PostToolUse)
+2. Enforcement mode (block/warn/off) and default
+3. Purpose (1-sentence summary)
+4. Detailed behavior (what it checks, how it enforces)
+5. Environment variables (with defaults and examples)
+6. Examples (blocked/allowed patterns)
+
+**Why this structure:** Developers troubleshooting enforcement need to quickly find: (a) which hook is triggering, (b) how to configure it, (c) examples of what's allowed/blocked. Missing any section leaves knowledge gaps.
+
+### Hook Documentation Expansion Metrics
+
+**Before:** @ENFORCEMENT_HOOKS.md documented 2 hooks (routing-guard, unified-creator-guard) in ~150 lines
+**After:** Documented 10 critical hooks in ~700 lines (5x expansion, 5x hook coverage)
+**Coverage:** 10/36 registered hooks documented (28%) -- targets 90% of troubleshooting scenarios
+
+**Prioritization:** Documented hooks with highest impact:
+- Security hooks: 5/10 (bash-command-validator, shell-injection-validator, unified-pre-write-hook, unified-creator-guard, error-tracker-hook)
+- Routing hooks: 4/10 (routing-guard, pre-task-unified, tool-scope-validator, config-model-validator)
+- Reflection hooks: 1/10 (reflection-step0-guard)
+
+### ADR Recording Pattern
+
+**Pattern: ADR format for Pipeline cleanup tasks:**
+- Context: What audit found (scores, findings, stale references)
+- Decision: Enumerate fixes as P0/P1/P2 with rationale
+- Consequences: Impact of each fix (may block legitimate use cases)
+- Alternatives Considered: Why NOT doing X (rejected approaches)
+- Implementation: Tasks that executed the fixes
+- Validation: Evidence that fixes worked
+
+**Why this structure:** Pipeline cleanup ADRs justify each cleanup decision and record alternatives considered. Future maintainers need to understand WHY dead hooks were removed vs kept, WHY systemic issues were deferred.
+
+### Stdin Parsing in Hooks: parseHookInputSync vs parseHookInputAsync
+
+**Pattern: Hook stdin parsing must match event type:**
+- **PreToolUse hooks:** Synchronous stdin (use `parseHookInputSync()`)
+- **PostToolUse hooks:** Asynchronous stdin (use `parseHookInputAsync()` with `await`)
+
+**Why:** PreToolUse stdin is available immediately (blocking). PostToolUse stdin arrives after tool execution (async). Using wrong parser causes silent failures.
+
+**Example bug:** error-tracker-hook.cjs used `parseHookInputSync()` (PreToolUse pattern) in PostToolUse hook → hook never received input → 0 errors tracked.
+
+**Fix:** Change to `await parseHookInputAsync()` in all PostToolUse hooks.
+
+### Hook Count Accuracy
+
+**Hook inventory (2026-02-07):**
+- Total registered: 36 hooks in `.claude/settings.json`
+- After removals: 34 active hooks (orchestrator.mjs deleted, error-summary-extractor archived)
+- Location corrections: 1 (unified-pre-write-hook: hooks/ → hooks/safety/)
+
+**Search strategy for stale references:**
+1. Find all registered hooks: `jq '.hooks | keys[]' .claude/settings.json`
+2. Verify each file exists: `test -f .claude/hooks/routing/hook-name.cjs`
+3. Grep for removed hook names: `grep -r "orchestrator.mjs" .claude/docs/`
 
 ---

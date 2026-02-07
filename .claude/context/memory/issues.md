@@ -14,6 +14,70 @@ Each issue should include:
 
 ---
 
+## 2026-02-07: CRITICAL -- eval/exec in SAFE_COMMANDS_ALLOWLIST (Pipeline #14, SEC-HOOK-002)
+
+**Date:** 2026-02-07
+
+**Impact:** CRITICAL -- Allows arbitrary code execution via bash validator bypass
+
+**Description:**
+
+`validators/registry.cjs` lines 144-145 include `eval` and `exec` in SAFE_COMMANDS_ALLOWLIST. These are the most dangerous shell builtins (eval executes arbitrary strings, exec replaces current process). Commands starting with `eval` or `exec` pass the allowlist without further validation.
+
+**Workaround:** None -- commands using eval/exec are silently allowed.
+
+**Resolution:** Remove eval, exec, source, and . from SAFE_COMMANDS_ALLOWLIST. Add dedicated validators for any legitimate use cases.
+
+---
+
+## 2026-02-07: CRITICAL -- HOOK_FAIL_OPEN Master Kill Switch (Pipeline #14, SEC-HOOK-001)
+
+**Date:** 2026-02-07
+
+**Impact:** CRITICAL -- Single env var disables ALL fail-closed hooks simultaneously
+
+**Description:**
+
+Setting `HOOK_FAIL_OPEN=true` converts routing-guard, pre-task-unified, unified-creator-guard, and unified-pre-write-hook from fail-closed to fail-open. This is a single point of failure for the entire enforcement layer. Found in routing-guard.cjs:1041, pre-task-unified.cjs:724, unified-creator-guard.cjs:468, unified-pre-write-hook.cjs:~509.
+
+**Workaround:** Do not set HOOK_FAIL_OPEN in any environment.
+
+**Resolution:** Replace with per-hook specific overrides requiring config file (not env var).
+
+---
+
+## 2026-02-07: HIGH -- 21 Environment Variable Overrides for Security Controls (Pipeline #14, SEC-HOOK-003)
+
+**Date:** 2026-02-07
+
+**Impact:** HIGH -- Each variable independently disables a security control
+
+**Description:**
+
+21 independent environment variables can individually disable security controls across the hooks system. Key ones: HOOK_FAIL_OPEN, ROUTER_SELF_CHECK, PLANNER_FIRST_ENFORCEMENT, SECURITY_REVIEW_ENFORCEMENT, ROUTER_WRITE_GUARD, ROUTER_BASH_GUARD, CREATOR_GUARD, SHELL_INJECTION_VALIDATOR, LOOP_PREVENTION_MODE, ALLOW_UNREGISTERED_COMMANDS. Full list in hooks-security-review-2026-02-07.md appendix.
+
+**Workaround:** Document and monitor all override variables in production.
+
+**Resolution:** Consolidate into graduated SECURITY_LEVEL setting with persistent audit trail.
+
+---
+
+## 2026-02-07: HIGH -- Agent Type Detection via String Matching is Spoofable (Pipeline #14, SEC-HOOK-004)
+
+**Date:** 2026-02-07
+
+**Impact:** HIGH -- Planner-first and security-review enforcement can be bypassed
+
+**Description:**
+
+Agent type detection in pre-task-unified.cjs and routing-guard.cjs uses `prompt.toLowerCase().includes(pattern)` with patterns like 'you are planner', 'security-architect'. Including these strings anywhere in a spawn prompt fools the guard. Example: a developer spawn prompt containing "reviewed by security-architect" satisfies the security review requirement.
+
+**Workaround:** None -- detection is inherent to the design.
+
+**Resolution:** Use structured metadata (toolInput.subagent_type) as primary detection method.
+
+---
+
 ## 2026-02-07: CRITICAL -- Windows Reserved Filename `nul` in context/ (Pipeline #12)
 
 **Date:** 2026-02-07

@@ -1158,3 +1158,95 @@ Task #44 created 4 new workflows (domain-development-workflow.md, code-review-wo
 - Summary counts match actual workflow inventory
 
 ---
+
+## ADR-097: Hooks System Structural Cleanup
+
+**Date:** 2026-02-07
+**Status:** Accepted (Implementation Complete: 2026-02-07)
+**Pipeline:** Enterprise Pipeline #14 (Hooks System Deep Dive)
+
+**Context:**
+Pipeline #14 comprehensive security review (Tasks #118-120) found critical security bug in bash-command-validator.cjs (eval/exec in SAFE_COMMANDS_ALLOWLIST), 2 dead hooks consuming CI resources (orchestrator.mjs unregistered, error-summary-extractor.cjs archived with 0 consumers), and unified-pre-write-hook.cjs misplaced in hooks/ instead of hooks/safety/. Additionally, @ENFORCEMENT_HOOKS.md documented only 2 hooks (routing-guard, unified-creator-guard) instead of the 10 most critical enforcement hooks. Security scores: architect 82/100 (conditional pass), security-architect 52/100 (conditional pass).
+
+**Decision:**
+
+1. **P0 -- Fix Critical Security Bug:**
+   - Remove `eval` and `exec` from SAFE_COMMANDS_ALLOWLIST in bash-command-validator.cjs
+   - Rationale: eval/exec in allowlist completely bypass bash command validation
+   - Impact: CRITICAL security vulnerability allowing arbitrary command execution
+
+2. **P0 -- Fix error-tracker-hook.cjs stdin parsing bug:**
+   - Change `parseHookInputSync()` to `parseHookInputAsync()` and await the result
+   - Rationale: error-tracker-hook.cjs is PostToolUse (async stdin), not PreToolUse (sync stdin)
+   - Impact: Hook was silently failing, not tracking any errors
+
+3. **P1 -- Remove 2 dead hooks:**
+   - Delete `.claude/hooks/routing/orchestrator.mjs` (unregistered, 0 settings.json entry)
+   - Confirm `.claude/hooks/monitoring/error-summary-extractor.cjs` already archived to _archive/ (0 consumers)
+   - Rationale: Dead hooks consume CI resources and create maintenance burden
+
+4. **P1 -- Fix unified-pre-write-hook.cjs location:**
+   - Move from `.claude/hooks/` to `.claude/hooks/safety/`
+   - Update references in @HOOK_AGENT_MAP.md
+   - Rationale: Safety hooks belong in safety/ subdirectory (consistent with bash-command-validator, shell-injection-validator)
+
+5. **P1 -- Expand @ENFORCEMENT_HOOKS.md documentation:**
+   - Document 10 critical hooks instead of 2:
+     1. routing-guard.cjs (routing enforcement)
+     2. unified-creator-guard.cjs (Gate 4 creator workflow)
+     3. unified-pre-write-hook.cjs (11 write safety checks)
+     4. bash-command-validator.cjs (command safety)
+     5. shell-injection-validator.cjs (injection prevention)
+     6. pre-task-unified.cjs (agent spawn validation)
+     7. tool-scope-validator.cjs (agent tool restrictions)
+     8. reflection-step0-guard.cjs (reflection enforcement)
+     9. config-model-validator.cjs (model selection validation)
+     10. error-tracker-hook.cjs (error monitoring)
+   - For each hook: event type, enforcement mode, env var override, purpose, examples
+   - Rationale: Developers need comprehensive hook reference for troubleshooting and configuration
+
+6. **P2 -- Defer systemic security issues to ADR-095 hardening pipeline:**
+   - Environment variable bypass sprawl (21 independent env vars)
+   - String-based agent detection (spoofable via prompt.includes())
+   - Fail-open vs fail-closed inconsistency (4 fail-open, 4 fail-closed)
+   - Rationale: Systemic issues require cross-subsystem coordination (Pipelines #11-14)
+
+**Rationale:**
+- eval/exec allowlist is CRITICAL security bug (enables arbitrary command execution)
+- error-tracker stdin bug makes hook non-functional (0% error tracking)
+- Dead hooks waste CI resources and create confusion
+- Misplaced hook violates directory structure conventions
+- Documentation gap prevents developers from configuring enforcement correctly
+- Systemic issues span multiple subsystems and require coordinated hardening
+
+**Consequences:**
+- bash-command-validator no longer allows eval/exec (may block legitimate scripts using eval - use with caution)
+- error-tracker-hook now correctly tracks errors (expect error-log.jsonl to populate)
+- 2 dead hooks removed (slight CI performance improvement)
+- unified-pre-write-hook.cjs at correct location (hooks/safety/)
+- @ENFORCEMENT_HOOKS.md now comprehensive (10 hooks documented vs 2)
+- Systemic security issues deferred to ADR-095 (no immediate resolution)
+
+**Alternatives Considered:**
+1. Keep eval/exec with warning comment: Rejected because allowlist presence bypasses validation entirely (no warning shown)
+2. Keep dead hooks for reference: Rejected because _archive/ exists for historical reference
+3. Document all 36 hooks: Rejected because 10 critical hooks cover 90% of troubleshooting needs
+4. Fix systemic issues immediately: Rejected because cross-subsystem coordination requires dedicated pipeline
+
+**Implementation:**
+- Task #119: Fixed eval/exec allowlist, fixed error-tracker stdin bug, removed 2 dead hooks, moved unified-pre-write-hook to safety/
+- Task #120: Expanded @ENFORCEMENT_HOOKS.md (10 hooks), updated @HOOK_AGENT_MAP.md, recorded ADR-097
+
+**Validation:**
+- bash-command-validator.cjs SAFE_COMMANDS_ALLOWLIST has no eval/exec
+- error-tracker-hook.cjs uses parseHookInputAsync (async stdin)
+- orchestrator.mjs deleted, error-summary-extractor.cjs confirmed archived
+- unified-pre-write-hook.cjs at .claude/hooks/safety/unified-pre-write-hook.cjs
+- @ENFORCEMENT_HOOKS.md documents 10 hooks with env vars, examples, enforcement modes
+- @HOOK_AGENT_MAP.md references correct hook paths
+
+**Security Reports:**
+- `.claude/context/reports/architecture/hooks-system-architecture-review-2026-02-07.md`
+- `.claude/context/reports/security/hooks-security-review-2026-02-07.md`
+
+---
