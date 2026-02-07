@@ -73,41 +73,50 @@ You are a Senior Code Reviewer with expertise in software architecture, design p
 
 ## Code Search Optimization
 
-This agent can search code efficiently using the ripgrep skill for comprehensive code review:
+### ⚡ Recommended: Hybrid Lazy Code Search
 
-**For fast code search across large codebases:**
+For comprehensive code review, use the **hybrid search system** that combines ripgrep speed with semantic understanding:
 
-- Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
-- Faster than: `Grep` or `Glob` (10-100x speed improvement)
-- Automatically respects: `.gitignore` files
-- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
+```bash
+# General pattern search (0.2-0.5s for 40k files)
+pnpm search:code "authentication logic"
+pnpm search:code "error handling patterns"
+pnpm search:code "database queries"
 
-**When to use ripgrep:**
+# Project structure analysis
+pnpm search:structure
 
-- Finding code patterns across codebase (anti-patterns, inconsistencies)
-- Searching for security vulnerabilities (hardcoded secrets, SQL injection)
-- Checking adherence to standards (naming conventions, imports)
-- Verifying test coverage (finding untested functions)
-- Large codebases (1000+ files)
+# File content review
+pnpm search:file src/components/Button.tsx 1 50
+```
 
-**When to use Grep/Glob:**
+**When to use hybrid search:**
+- Finding similar patterns across codebase (consistency checks)
+- Discovering anti-patterns or code smells
+- Understanding project structure before review
+- General code exploration ("show me auth code")
 
-- Simple filename searches
-- File listing (not content search)
-- Small codebases (<100 files)
+**Performance**: 0.2-0.5s for 40k files, no indexing required
 
-**Example:**
+### Advanced: Ripgrep Skill (PCRE2 Regex)
+
+For **advanced regex patterns** not supported by hybrid search:
 
 ```javascript
-// Find hardcoded secrets
-Skill({ skill: 'ripgrep', args: '(API_KEY|SECRET|PASSWORD).*=.*["\']\\w+' });
+// Find hardcoded secrets (complex regex)
+Skill({ skill: 'ripgrep', args: '-P (API_KEY|SECRET|PASSWORD)\\s*=\\s*["\']\\w{20,}' });
 
-// Find SQL injection risks
-Skill({ skill: 'ripgrep', args: 'execute.*\\+.*req\\.' });
+// Find SQL injection risks (lookahead)
+Skill({ skill: 'ripgrep', args: '-P execute.*(?=.*req\\.)' });
 
-// Find missing error handling
-Skill({ skill: 'ripgrep', args: 'await.*\\(' -A 2 | grep -v 'catch' });
+// Find missing error handling (negative lookahead)
+Skill({ skill: 'ripgrep', args: '-P await.*\\((?!.*catch)' });
 ```
+
+**When to use ripgrep skill:**
+- PCRE2 regex features (lookahead, lookbehind)
+- Custom file type filtering beyond .js/.ts/.cjs/.mjs
+- Pipeline integration with other CLI tools
 
 ### code-semantic-search (Semantic Search)
 

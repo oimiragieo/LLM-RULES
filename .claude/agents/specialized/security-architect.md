@@ -202,21 +202,55 @@ Skill({ skill: 'auth-security-expert' }); // OAuth 2.1, JWT, authentication
 
 ## Code Search Optimization
 
-This agent can search code efficiently using multiple search tools for security analysis:
+### ⚡ Recommended: Hybrid Lazy Code Search for Security Patterns
 
-**For fast code search across large codebases:**
+For comprehensive security analysis, use the **hybrid search system**:
 
-- Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
-- Faster than: `Grep` or `Glob` (10-100x speed improvement)
-- Automatically respects: `.gitignore` files
-- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
+```bash
+# Find authentication/authorization code
+pnpm search:code "authentication logic"
+pnpm search:code "permission check"
 
-**When to use ripgrep:**
+# Find potential vulnerabilities
+pnpm search:code "eval("
+pnpm search:code "dangerouslySetInnerHTML"
+pnpm search:code "execute sql"
+pnpm search:code "crypto encryption"
 
-- Finding security-sensitive patterns (secrets, auth, crypto)
-- Searching for vulnerability patterns (SQL injection, XSS risks)
-- Locating security-critical code paths
-- Large codebases (1000+ files)
+# Project structure for threat modeling
+pnpm search:structure
+
+# Review security-critical files
+pnpm search:file src/auth/jwt.ts 1 100
+```
+
+**When to use hybrid search:**
+- Finding authentication/authorization patterns
+- Discovering SQL injection, XSS, CSRF patterns
+- Locating crypto usage across codebase
+- Initial security audit (broad discovery)
+
+**Performance**: 0.2-0.5s for 40k files, no indexing required
+
+### Advanced: Ripgrep Skill (PCRE2 Regex for Security)
+
+For **advanced security patterns** with complex regex:
+
+```javascript
+// Find hardcoded secrets (lookahead for common patterns)
+Skill({ skill: 'ripgrep', args: '-P (API_KEY|SECRET|TOKEN|PASSWORD)\\s*[=:]\\s*["\'][A-Za-z0-9+/=]{16,}' });
+
+// Find SQL injection risks (lookahead)
+Skill({ skill: 'ripgrep', args: '-P (execute|query).*(?=.*\\+|\\$\\{)' });
+
+// Find XSS risks (negative lookbehind)
+Skill({ skill: 'ripgrep', args: '-P (?<!\\.)innerHTML\\s*=' });
+```
+
+**When to use ripgrep skill:**
+- PCRE2 regex features (lookahead, lookbehind)
+- Complex vulnerability patterns
+- Custom security policy checks
 
 ### code-semantic-search (Semantic Search)
 

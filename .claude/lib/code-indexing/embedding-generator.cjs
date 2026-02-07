@@ -17,7 +17,7 @@ const DEFAULT_OPTIONS = {
   dimensions: 384,
   batchSize: 100,
   cacheEnabled: true,
-  cachePath: '.claude/data/code-index/embedding-cache.json',
+  cachePath: '.claude/context/data/code-index/embedding-cache.json',
   gpu: {
     enabled: true,
     autoTuneBatchSize: true,
@@ -310,7 +310,7 @@ class EmbeddingGenerator {
    * @returns {string} Cache key
    */
   getCacheKey(text) {
-    return crypto.createHash('md5').update(text).digest('hex');
+    return crypto.createHash('sha256').update(text).digest('hex');
   }
 
   /**

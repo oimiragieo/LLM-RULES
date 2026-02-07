@@ -194,19 +194,31 @@ Read({ file_path: 'path/to/large.js', offset: 1, limit: 2000 });
 Read({ file_path: 'path/to/large.js', offset: 2001, limit: 2000 });
 ```
 
-### Grep() - Result Limiting
+### Code Search - Hybrid Lazy Search (Recommended)
 
-When searching:
+For comprehensive code discovery during planning:
 
-- Use `head_limit: 100` to limit results
-- Default can return 1000+ matches
-- Example: Find first 100 occurrences of error handler
+```bash
+# Find patterns across codebase (0.2-0.5s for 40k files)
+pnpm search:code "authentication logic"
+pnpm search:code "database models"
 
-Pattern:
+# Analyze project structure
+pnpm search:structure
+
+# Review specific files
+pnpm search:file src/app.ts 1 100
+```
+
+**When to use:** Initial codebase exploration, understanding existing patterns, finding all implementations
+
+**Alternative - Grep() tool** (for simple exact matches):
 
 ```javascript
 Grep({ pattern: 'catch', glob: '**/*.ts', head_limit: 100 });
 ```
+
+Use Grep when you need exact pattern matching with specific file filtering. For comprehensive discovery, prefer `pnpm search:code`.
 
 ### Multi-Agent Planning (for large codebases)
 

@@ -309,7 +309,7 @@ async function main() {
   // Initialize vector store
   console.log('Initializing LanceDB...');
   const vectorStore = new MemoryVectorStore({
-    persistDirectory: path.join(PROJECT_ROOT, '.claude/data/lancedb'),
+    persistDirectory: path.join(PROJECT_ROOT, '.claude/context/data/lancedb'),
     collectionName: process.env.LANCEDB_TABLE || 'agent_memory',
   });
 

@@ -76,41 +76,55 @@ The following workflows guide this agent's execution:
 
 ## Code Search Optimization
 
-This agent can search code efficiently using the ripgrep skill for research:
+### ⚡ Recommended: Hybrid Lazy Code Search for Research
 
-**For fast code search across large codebases:**
+For researching code patterns and implementations, use the **hybrid search system**:
 
-- Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
-- Faster than: `Grep` or `Glob` (10-100x speed improvement)
-- Automatically respects: `.gitignore` files
-- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
+```bash
+# Research patterns by concept
+pnpm search:code "authentication patterns"
+pnpm search:code "error handling strategies"
+pnpm search:code "API design patterns"
 
-**When to use ripgrep:**
+# Find framework/library usage
+pnpm search:code "react hooks"
+pnpm search:code "database ORM"
+pnpm search:code "testing patterns"
 
-- Researching code patterns in codebase
-- Finding examples of specific implementations
-- Understanding technology usage (frameworks, libraries)
-- Analyzing existing solutions before research
-- Large codebases (1000+ files)
+# Project structure research
+pnpm search:structure
 
-**When to use Grep/Glob:**
+# Review example implementations
+pnpm search:file examples/auth.ts 1 100
+```
 
-- Simple filename searches
-- File listing (not content search)
-- Small codebases (<100 files)
+**When to use hybrid search:**
+- Researching implementation patterns ("show me auth examples")
+- Understanding framework/library usage across codebase
+- Finding similar implementations for comparison
+- Initial codebase exploration before deeper research
 
-**Example:**
+**Performance**: 0.2-0.5s for 40k files, semantic understanding
+
+### Advanced: Ripgrep Skill (PCRE2 Regex)
+
+For **precise research queries**:
 
 ```javascript
-// Research framework usage
-Skill({ skill: 'ripgrep', args: 'import.*react' });
+// Research specific import patterns
+Skill({ skill: 'ripgrep', args: '-P import\\s+\\{.*useState.*\\}.*react' });
 
-// Find existing implementations
-Skill({ skill: 'ripgrep', args: 'class.*API' });
+// Find specific class patterns
+Skill({ skill: 'ripgrep', args: 'class\\s+\\w+API\\s+extends' });
 
-// Understand patterns
-Skill({ skill: 'ripgrep', args: 'async.*function' });
+// Research async patterns
+Skill({ skill: 'ripgrep', args: 'async\\s+function\\s+\\w+.*\\{' });
 ```
+
+**When to use ripgrep skill:**
+- Exact syntax pattern research
+- PCRE2 regex for complex queries
+- Framework-specific pattern analysis
 
 ### code-semantic-search (Semantic Search)
 

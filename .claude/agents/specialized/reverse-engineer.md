@@ -128,41 +128,58 @@ If unclear whether a request is authorized, ASK the user for clarification befor
 
 ## Code Search Optimization
 
-This agent can search code efficiently using the ripgrep skill for codebase analysis:
+### ⚡ Recommended: Hybrid Lazy Code Search for Reverse Engineering
 
-**For fast code search across large codebases:**
+For understanding unfamiliar codebases, use the **hybrid search system** with semantic understanding:
 
-- Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
-- Faster than: `Grep` or `Glob` (10-100x speed improvement)
-- Automatically respects: `.gitignore` files
-- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
+```bash
+# Find crypto/hashing implementations
+pnpm search:code "encryption algorithm"
+pnpm search:code "hash function"
+pnpm search:code "AES RSA"
 
-**When to use ripgrep:**
+# Find protocol/network code
+pnpm search:code "network protocol"
+pnpm search:code "serialization deserialization"
 
-- Finding code patterns for reverse engineering (function signatures, crypto algorithms)
-- Analyzing implementation details (algorithm discovery, protocol patterns)
-- Searching for security vulnerabilities (buffer overflows, format strings)
-- Understanding code structure in decompiled output
-- Large codebases (1000+ files)
+# Find vulnerability patterns
+pnpm search:code "buffer overflow"
+pnpm search:code "format string"
 
-**When to use Grep/Glob:**
+# Project structure analysis
+pnpm search:structure
 
-- Simple filename searches
-- File listing (not content search)
-- Small codebases (<100 files)
+# Review decompiled/reversed files
+pnpm search:file reversed/main.c 1 200
+```
 
-**Example:**
+**When to use hybrid search:**
+- Understanding unfamiliar codebase structure
+- Finding similar implementations ("show me crypto code")
+- Discovering algorithm patterns semantically
+- Initial reconnaissance of decompiled code
+
+**Performance**: 0.2-0.5s for 40k files, semantic understanding
+
+### Advanced: Ripgrep Skill (PCRE2 Regex)
+
+For **precise pattern matching** in reverse engineering:
 
 ```javascript
-// Find cryptographic functions
-Skill({ skill: 'ripgrep', args: '(AES|RSA|SHA|MD5).*\\(' });
+// Find specific crypto functions
+Skill({ skill: 'ripgrep', args: '-P (AES|RSA|SHA256|MD5)_(encrypt|decrypt|hash)' });
 
-// Find buffer operations
-Skill({ skill: 'ripgrep', args: 'strcpy|strcat|sprintf' });
+// Find buffer operations (security risks)
+Skill({ skill: 'ripgrep', args: '(strcpy|strcat|sprintf|gets)\\s*\\(' });
 
-// Find network operations
-Skill({ skill: 'ripgrep', args: 'socket|connect|send|recv' });
+// Find network I/O
+Skill({ skill: 'ripgrep', args: '(socket|connect|send|recv|WSA)' });
 ```
+
+**When to use ripgrep skill:**
+- Exact function signature matching
+- PCRE2 regex for complex patterns
+- Binary/decompiled code analysis
 
 ### code-semantic-search (Semantic Search)
 

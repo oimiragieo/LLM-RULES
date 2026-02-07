@@ -119,22 +119,50 @@ The following workflows guide this agent's execution:
 
 ## Code Search Optimization
 
-This agent can search code efficiently using multiple search tools for comprehensive test coverage:
+### ⚡ Recommended: Hybrid Lazy Code Search for Test Discovery
 
-**For fast code search across large codebases:**
+For comprehensive QA analysis, use the **hybrid search system**:
 
-- Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
-- Faster than: `Grep` or `Glob` (10-100x speed improvement)
-- Automatically respects: `.gitignore` files
-- Binary: Automatically managed via `@vscode/ripgrep` npm package (cross-platform)
+```bash
+# Find test patterns
+pnpm search:code "test error handling"
+pnpm search:code "edge cases"
+pnpm search:code "validation tests"
 
-**When to use ripgrep:**
+# Discover untested code
+pnpm search:code "async function"  # Find all async functions
+pnpm search:code "export class"     # Find all classes
 
-- Finding test patterns and test coverage gaps
-- Searching for edge cases and error handling
-- Locating similar test implementations
-- Finding untested code paths
-- Large codebases (1000+ files)
+# Project structure for coverage analysis
+pnpm search:structure
+
+# Review test files
+pnpm search:file tests/auth.test.ts 1 100
+```
+
+**When to use hybrid search:**
+- Finding all test patterns across codebase
+- Discovering edge case implementations
+- Locating untested code paths (functions without tests)
+- Understanding code structure for test planning
+
+**Performance**: 0.2-0.5s for 40k files, no indexing required
+
+### Advanced: Ripgrep Skill (PCRE2 Regex)
+
+For **complex test discovery patterns**:
+
+```javascript
+// Find functions without tests (negative lookahead)
+Skill({ skill: 'ripgrep', args: '-P export\\s+function\\s+\\w+(?!.*test)' });
+
+// Find error handling without tests
+Skill({ skill: 'ripgrep', args: '-P catch\\s*\\((?!.*test)' });
+```
+
+**When to use ripgrep skill:**
+- PCRE2 regex features (lookahead, lookbehind)
+- Complex coverage analysis patterns
 
 ### code-semantic-search (Semantic Search)
 

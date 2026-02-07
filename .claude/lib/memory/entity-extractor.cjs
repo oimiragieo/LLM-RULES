@@ -17,13 +17,13 @@ const path = require('path');
 class EntityExtractor {
   /**
    * Create EntityExtractor instance
-   * @param {string} dbPath - Path to SQLite database (default: .claude/data/memory.db)
+   * @param {string} dbPath - Path to SQLite database (default: .claude/context/data/memory.db)
    */
   constructor(dbPath) {
     // Default database path
     if (!dbPath) {
       const projectRoot = path.resolve(__dirname, '../../../');
-      dbPath = path.join(projectRoot, '.claude/data/memory.db');
+      dbPath = path.join(projectRoot, '.claude/context/data/memory.db');
     }
 
     // Open database connection

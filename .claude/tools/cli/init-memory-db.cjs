@@ -249,7 +249,7 @@ Usage: node init-memory-db.cjs [options]
 Initialize SQLite entity schema for Agent Studio's hybrid memory system.
 
 Options:
-  --db-path <path>    Path to database file (default: .claude/data/memory.db)
+  --db-path <path>    Path to database file (default: .claude/context/data/memory.db)
   --help, -h          Show this help message
 
 Examples:
@@ -268,7 +268,7 @@ Examples:
   } else {
     // Default path
     const projectRoot = path.resolve(__dirname, '../../../');
-    dbPath = path.join(projectRoot, '.claude/data/memory.db');
+    dbPath = path.join(projectRoot, '.claude/context/data/memory.db');
   }
 
   // Ensure directory exists

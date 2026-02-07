@@ -138,7 +138,7 @@ class ContextualMemory {
    *
    * @param {Object} config - Configuration options
    * @param {string} config.memoryDir - Directory containing memory files (default: .claude/context/memory)
-   * @param {string} config.dbPath - Path to SQLite database (default: .claude/data/memory.db)
+   * @param {string} config.dbPath - Path to SQLite database (default: .claude/context/data/memory.db)
    * @param {Object} config.lancedbConfig - LanceDB configuration (optional)
    * @param {string} config.lancedbConfig.persistDirectory - LanceDB persist directory
    * @param {string} config.lancedbConfig.collectionName - LanceDB table name
@@ -149,9 +149,9 @@ class ContextualMemory {
     this.config = {
       projectRoot,
       memoryDir: config.memoryDir || path.join(projectRoot, '.claude/context/memory'),
-      dbPath: config.dbPath || path.join(projectRoot, '.claude/data/memory.db'),
+      dbPath: config.dbPath || path.join(projectRoot, '.claude/context/data/memory.db'),
       lancedbConfig: config.lancedbConfig || {
-        persistDirectory: path.join(projectRoot, '.claude/data/lancedb'),
+        persistDirectory: path.join(projectRoot, '.claude/context/data/lancedb'),
         collectionName: process.env.LANCEDB_TABLE || 'agent_memory',
       },
     };

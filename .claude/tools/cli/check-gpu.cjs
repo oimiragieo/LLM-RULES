@@ -12,7 +12,7 @@
 
 'use strict';
 
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -138,8 +138,14 @@ const cudaDlls = ['cudart64_12.dll', 'cublas64_12.dll', 'cublasLt64_12.dll', 'cu
 let allDllsFound = true;
 for (const dll of cudaDlls) {
   try {
-    execSync(`where ${dll}`, { encoding: 'utf-8', stdio: 'pipe' });
-    console.log(`✅ ${dll} found in PATH`);
+    // Use spawnSync with array args to prevent command injection
+    const result = spawnSync('where', [dll], { encoding: 'utf-8', stdio: 'pipe', shell: false });
+    if (result.status === 0) {
+      console.log(`✅ ${dll} found in PATH`);
+    } else {
+      console.log(`❌ ${dll} NOT found in PATH`);
+      allDllsFound = false;
+    }
   } catch (_e) {
     console.log(`❌ ${dll} NOT found in PATH`);
     allDllsFound = false;
@@ -160,7 +166,7 @@ try {
     try {
       const store = new MemoryVectorStore({
         embeddingMode: 'fastembed',
-        persistDirectory: '.claude/data/lancedb-test',
+        persistDirectory: '.claude/context/data/lancedb-test',
       });
       await store.initialize();
 
