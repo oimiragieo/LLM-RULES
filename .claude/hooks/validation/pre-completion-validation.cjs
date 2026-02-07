@@ -21,7 +21,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 // Use shared utility for project root
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
@@ -92,11 +92,17 @@ function detectArtifacts(filesModified) {
 function validateArtifact(artifactPath) {
   try {
     // Run validation script
-    execSync(`node "${VALIDATION_SCRIPT}" "${artifactPath}"`, {
+    // SEC-FIX: Use spawnSync with array args instead of string interpolation (prevents command injection)
+    const result = spawnSync(process.execPath, [VALIDATION_SCRIPT, artifactPath], {
       cwd: PROJECT_ROOT,
       stdio: 'pipe',
       encoding: 'utf-8',
     });
+
+    // Check exit code
+    if (result.status !== 0) {
+      throw new Error(result.stderr || result.stdout || 'Validation failed');
+    }
 
     return { passed: true, issues: [] };
   } catch (err) {

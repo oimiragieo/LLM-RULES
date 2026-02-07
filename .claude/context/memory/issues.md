@@ -27,8 +27,8 @@ This file tracks blockers, workarounds, and unresolved problems.
    - **Priority:** P1 - Add logging; P2 - Add approval flow
 
 3. **H-003: WebFetch/WebSearch SSRF (HIGH)**
-   - **Issue:** Skills use `WebFetch` and `WebSearch` without URL validation
-   - **Risk:** SSRF (access internal network: `http://169.254.169.254/latest/meta-data/`), data poisoning from malicious external sources
+   - **Issue:** Skills use WebFetch and WebSearch without URL validation
+   - **Risk:** SSRF (access internal network like AWS metadata endpoints), data poisoning from malicious external sources
    - **Impact:** Expose internal systems, inject malicious content into agent workflows
    - **Workaround:** Only use WebFetch/WebSearch with trusted URLs from allowlist
    - **Fix:** Implement domain allowlist, block private IP ranges (10.x, 172.16-31.x, 192.168.x), block localhost, enforce timeouts (10s) and size limits (1MB)
@@ -148,6 +148,8 @@ A file named `nul` (0 bytes) exists at `.claude/context/nul`. This is a Windows 
 
 **Resolution:** Delete via `git rm .claude/context/nul`. See ADR-094 P1-001.
 
+**Status: RESOLVED (2026-02-07)** — Fixed in Task #127, commit d68d6786. File deleted successfully.
+
 ---
 
 ## 2026-02-07: 7 Orphaned Hash-Named Plan Directories (Pipeline #12)
@@ -174,6 +176,8 @@ The QA workflow skill creates working directories in `.claude/context/plans/` wi
 **Resolution:**
 1. Delete 7 orphaned directories (immediate, ADR-094 P1-002)
 2. Add cleanup logic to QA workflow skill (ADR-094 P3-011, prevents recurrence)
+
+**Status: RESOLVED (2026-02-07)** — Fixed in Task #127, commit d68d6786. All 7 directories deleted successfully.
 
 ---
 
@@ -291,6 +295,8 @@ The `validate:full` npm script chains multiple validators, and `pnpm validate:in
 
 **Resolution:** Merge validate-index.mjs into validate-rule-index-paths.mjs and update the `validate:index` npm script to point to the latter. See ADR-090 Phase A.
 
+**Status: RESOLVED (2026-02-07)** — Fixed in Pipeline #8, ADR-090. Import path corrected and validator chain working.
+
 ---
 
 ## 2026-02-07: Tools System Security Findings (Task #92)
@@ -303,7 +309,7 @@ Security review of the `.claude/tools/` system (77 executable files, 15,203 LOC)
 
 **Key Findings:**
 
-1. **SEC-TOOL-001 [HIGH]**: Arbitrary code execution in `decision-handler.mjs` via `new Function()` expression evaluator. User-controlled workflow conditions can inject arbitrary JavaScript code.
+1. **SEC-TOOL-001 [HIGH]**: Arbitrary code execution in `decision-handler.mjs` via Function constructor for expression evaluator. User-controlled workflow conditions can inject arbitrary JavaScript code.
 
 2. **SEC-TOOL-002 [MEDIUM]**: Command injection risk in `eslint-batch-fix.cjs` via `execSync` with string interpolation. Current instance is low-risk but pattern is dangerous.
 
@@ -590,6 +596,8 @@ Fix:
 3. Change line 71 of `user-prompt-unified.cjs` from `routingRequire('router-state.cjs')` to `libRequire(path.join('routing', 'router-state.cjs'))`
 
 **Estimated fix time:** 15-30 minutes (developer agent)
+
+**Status: RESOLVED (2026-02-07)** — Fixed in Pipeline #15, commit 3487ee8b. All 3 hook modules restored and import paths corrected.
 
 ---
 
@@ -911,6 +919,37 @@ Command injection pattern: `execSync` with string interpolation appears in hybri
 **Full Report:** `.claude/context/reports/security/lib-security-review-2026-02-07.md`
 
 
+## 2026-02-07: NEW -- 3 Command Injection Vulnerabilities (Semgrep Scan, Task #131)
+
+**Date:** 2026-02-07
+
+**Impact:** HIGH -- 3 instances of `execSync` with string interpolation enable command injection
+
+**Description:**
+
+Semgrep security scan identified 3 NEW command injection vulnerabilities using unsafe execSync patterns:
+
+1. `.claude/hooks/validation/pre-completion-validation.cjs:95` — execSync with string interpolation for VALIDATION_SCRIPT and artifactPath
+2. `.claude/lib/workflow/run-workflow-tests.cjs:139` — execSync with string interpolation for testFile
+3. `.claude/lib/memory/contextual-memory.cjs:645` — FALSE POSITIVE (already uses safe spawn pattern)
+
+**Risk:** Command injection if variables contain shell metacharacters ($(), backticks, |, &&, ;, newlines).
+
+**Cross-Reference:** Same pattern as SEC-LIB-001 (hybrid-lazy-indexer.cjs) and SEC-TOOL-002 (eslint-batch-fix.cjs) from previous audits.
+
+**Workaround:** Variables are internally controlled (not user input), but pattern is still unsafe.
+
+**Resolution:**
+1. Replace `execSync` with `spawnSync` using array args and `shell: false`
+2. Pattern: `spawnSync(process.execPath, [scriptPath, arg1, arg2], { shell: false })`
+
+**Status: RESOLVED (2026-02-07)** — Fixed in Task #129:
+- pre-completion-validation.cjs: Changed to `spawnSync(process.execPath, [VALIDATION_SCRIPT, artifactPath], { shell: false })`
+- run-workflow-tests.cjs: Changed to `spawnSync(process.execPath, [testFile], { shell: false })`
+- contextual-memory.cjs: Already safe (uses `spawn` with array args)
+
+---
+
 ## Broken Import in agent-registry-generator.cjs (2026-02-07, Pipeline #15)
 
 **Issue**: `.claude/lib/tools/agent-registry-generator.cjs` tries to require `../agents/agent-config.cjs` which was archived to `_archive/agents/` in Task #122 (Pipeline #15).
@@ -941,4 +980,6 @@ Require stack:
 - ADR-098: Lib System Dead Code Archival
 - Task #122: Archive 10 dead subsystems
 - Pipeline #15: Lib System Deep Dive
+
+**Status: RESOLVED (2026-02-07)** — Fixed by inlining `getDefaultTools()` function directly into agent-registry-generator.cjs at line 33. Pre-commit hook now works correctly.
 

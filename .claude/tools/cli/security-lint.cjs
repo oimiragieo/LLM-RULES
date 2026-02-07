@@ -66,6 +66,7 @@ const CONFIG = {
     { pathSubstring: 'reflection-step0-guard.test.cjs', ruleId: 'SEC-040' }, // path.join with literal in test
     { pathSubstring: 'step-validators.cjs', ruleId: 'SEC-013' }, // new Function() for dynamic workflow validation (controlled input)
     { pathSubstring: 'generate-tool-manifest.cjs', ruleId: 'SEC-030' }, // CLI diagnostic logging
+    { pathSubstring: 'run-workflow-tests.cjs', ruleId: 'SEC-030' }, // CLI test suite help output (not sensitive)
     { pathSubstring: 'tests/migration/', ruleId: 'SEC-011' }, // test harness execSync with controlled input
   ],
 

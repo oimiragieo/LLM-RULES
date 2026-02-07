@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const path = require('path');
 
 // =============================================================================
@@ -107,6 +107,7 @@ Test Suites:
 `);
 
   for (const [key, suite] of Object.entries(TEST_SUITES)) {
+    // SEC-FALSE-POSITIVE: This logs test suite names, not sensitive data
     console.log(`  --${key.padEnd(15)} ${suite.description}`);
   }
 
@@ -136,15 +137,22 @@ function runTestSuite(suiteKey, verbose = false) {
   console.log(`${'='.repeat(60)}\n`);
 
   try {
-    const result = execSync(`node "${testFile}"`, {
+    // SEC-FIX: Use spawnSync with array args instead of string interpolation (prevents command injection)
+    const result = spawnSync(process.execPath, [testFile], {
       encoding: 'utf-8',
       stdio: verbose ? 'inherit' : 'pipe',
       cwd: PROJECT_ROOT,
     });
 
+    if (result.status !== 0) {
+      throw new Error(result.stderr || result.stdout || 'Tests failed');
+    }
+
+    const output = result.stdout || '';
+
     if (!verbose) {
       // Extract summary from output
-      const lines = result.split('\n');
+      const lines = output.split('\n');
       const summaryLine = lines.find(line => line.includes('Results:'));
       if (summaryLine) {
         console.log(summaryLine);
@@ -153,7 +161,7 @@ function runTestSuite(suiteKey, verbose = false) {
       }
     }
 
-    return { passed: true, output: result };
+    return { passed: true, output };
   } catch (e) {
     console.error(`Tests failed for ${suite.name}`);
     if (e.stdout) {

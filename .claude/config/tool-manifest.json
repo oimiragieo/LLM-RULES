@@ -1,12 +1,12 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-07T21:21:48.918Z",
+  "generatedAt": "2026-02-07T21:31:26.015Z",
   "metadata": {
     "totalTools": 31,
     "totalCoreTools": 22,
     "totalMcpTools": 9,
     "totalAgents": 49,
-    "lastValidated": "2026-02-07T21:21:48.919Z",
+    "lastValidated": "2026-02-07T21:31:26.016Z",
     "source": ".claude/CLAUDE.md sections 1.1-1.4"
   },
   "tools": {
