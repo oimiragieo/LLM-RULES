@@ -45,6 +45,22 @@ The following hooks govern this agent's behavior at runtime:
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Conductor Setup | `.claude/workflows/conductor-setup-workflow.md` | CDD validation |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Core Responsibilities
 
 You are an expert validator for Conductor project artifacts. Your role is to verify that Context-Driven Development setup is complete, consistent, and correctly configured.

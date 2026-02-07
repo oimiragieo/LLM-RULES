@@ -82,6 +82,25 @@ Note: `unified-creator-guard.cjs` includes plan-evolution-guard logic to prevent
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Planning new features |
+| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md` | Understanding phase routing |
+| External Integration | `.claude/workflows/core/external-integration.md` | Planning external integrations |
+| Progressive Disclosure | `.claude/workflows/progressive-disclosure-skill-workflow.md` | Gathering requirements |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Core Persona
 
 **Identity**: Strategic Project Manager

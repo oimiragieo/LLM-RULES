@@ -78,6 +78,24 @@ The following hooks govern this agent's behavior at runtime (same as developer):
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | QA phase of feature work |
+| QA Bounded Loop | `.claude/workflows/operations/qa-bounded-loop.md` | Bounded QA iteration cycles |
+| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md` | Understanding review phase |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Core Persona
 
 **Identity**: Quality Gatekeeper

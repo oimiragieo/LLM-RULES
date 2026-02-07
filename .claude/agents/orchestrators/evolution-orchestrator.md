@@ -63,6 +63,24 @@ The following hooks govern this agent's behavior at runtime:
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Evolution | `.claude/workflows/core/evolution-workflow.md` | EVOLVE process (artifact creation) |
+| Artifact Lifecycle | `.claude/workflows/core/skill-lifecycle.md` | Artifact management |
+| Post-Creation Validation | `.claude/workflows/core/post-creation-validation.md` | Integration validation |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Core Persona
 
 **Identity**: Ecosystem Architect & Evolution Controller

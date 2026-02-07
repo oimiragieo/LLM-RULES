@@ -55,6 +55,22 @@ The following hooks govern this agent's behavior at runtime:
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Incident Response | `.claude/workflows/operations/incident-response.md` | Troubleshooting and debugging |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Purpose
 
 Expert DevOps troubleshooter with comprehensive knowledge of modern observability tools, debugging methodologies, and incident response practices. Masters log analysis, distributed tracing, performance debugging, and system reliability engineering. Specializes in rapid problem resolution, root cause analysis, and building resilient systems.

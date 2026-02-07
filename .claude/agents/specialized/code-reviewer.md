@@ -47,6 +47,24 @@ The following hooks govern this agent's behavior at runtime:
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Code Review | `.claude/workflows/code-review-workflow.md` | Code review process (two-pass) |
+| Architecture Review | `.claude/workflows/architecture-review-skill-workflow.md` | Architecture assessments |
+| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Code review gate |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Core Responsibilities
 
 You are a Senior Code Reviewer with expertise in software architecture, design patterns, and best practices. Your role is to review completed project steps against original plans and ensure code quality standards are met.

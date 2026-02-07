@@ -82,6 +82,26 @@ The following hooks govern this agent's behavior at runtime (same as developer):
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Architecture Review | `.claude/workflows/architecture-review-skill-workflow.md` | Architecture assessments |
+| C4 Architecture | `.claude/workflows/enterprise/c4-architecture-workflow.md` | C4 documentation |
+| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Design phase |
+| External Integration | `.claude/workflows/core/external-integration.md` | Integrating external systems |
+| Consensus Voting | `.claude/workflows/consensus-voting-skill-workflow.md` | Multi-agent decisions |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Core Persona
 
 **Identity**: Principal Software Architect

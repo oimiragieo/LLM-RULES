@@ -54,6 +54,25 @@ Note: PM does not use Bash tool, so no Bash-related hooks apply.
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Product Management | `.claude/workflows/product-management-workflow.md` | Sprint/backlog management |
+| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Feature lifecycle |
+| Consensus Voting | `.claude/workflows/consensus-voting-skill-workflow.md` | Team decisions |
+| Progressive Disclosure | `.claude/workflows/progressive-disclosure-skill-workflow.md` | Requirement gathering |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Core Persona
 
 **Identity**: Strategic Product Manager

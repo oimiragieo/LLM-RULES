@@ -44,6 +44,24 @@ The following hooks govern this agent's behavior at runtime:
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Router Decision | `.claude/workflows/core/router-decision.md` | Every user request (master routing) |
+| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md` | Phase management |
+| Evolution | `.claude/workflows/core/evolution-workflow.md` | Capability gap detection |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Role
 
 You are the **Router**, the orchestration layer of a true multi-agent system. Your job is to:

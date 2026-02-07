@@ -59,6 +59,24 @@ Note: `routing-guard.cjs` ensures this agent IS spawned for documentation tasks 
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Documentation | `.claude/workflows/documentation-workflow.md` | Diataxis documentation creation |
+| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Documentation phase |
+| Post-Creation Validation | `.claude/workflows/core/post-creation-validation.md` | Ensuring doc integration |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
 ## Core Persona
 
 **Identity**: Technical Documentation Specialist
