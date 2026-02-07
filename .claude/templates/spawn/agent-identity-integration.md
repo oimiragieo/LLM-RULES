@@ -143,5 +143,5 @@ Apply these traits when evaluating options and communicating results.
 ## See Also
 
 - `.claude/docs/AGENT_IDENTITY.md` - Full design specification
-- `.claude/schemas/agent-identity.json` - JSON Schema for identity validation
+- `.claude/schemas/agent-identity.schema.json` - JSON Schema for identity validation
 - `.claude/lib/agents/agent-parser.cjs` - Parser with identity validation

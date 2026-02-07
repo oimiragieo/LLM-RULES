@@ -1,4 +1,83 @@
 {
   "version": 1,
-  "patterns": []
+  "patterns": [
+    {
+      "id": "commands-thin-delegator-pattern",
+      "name": "Thin Delegator Pattern for Commands",
+      "context": "Commands System Overhaul (Enterprise Pipeline #5, Tasks #83-86)",
+      "description": "Commands are 3-line markdown shims with `disable-model-invocation: true` that delegate to a single skill. The skill is the source of truth for behavior; the command is the user-facing entry point. Pattern: frontmatter with description and flag, then single line 'Invoke the {skill} skill'.",
+      "examples": [
+        {
+          "command": "/debug",
+          "content": "---\ndescription: Systematic debugging with root cause investigation\ndisable-model-invocation: true\n---\n\nInvoke the debugging skill and follow it exactly as presented to you"
+        },
+        {
+          "command": "/tdd",
+          "content": "---\ndescription: Test-driven development with Red-Green-Refactor\ndisable-model-invocation: true\n---\n\nInvoke the tdd skill and follow it exactly as presented to you"
+        }
+      ],
+      "applicability": "All new commands should follow this pattern unless they are standalone utilities (rare exceptions like /setup-pm) or enriched integrations (rare exceptions like /learn)",
+      "benefits": [
+        "Eliminates code duplication - skill logic in one place",
+        "Enables skill evolution without command changes",
+        "Scalable - 16+ commands follow identical pattern",
+        "Clear separation: commands (interface) vs skills (implementation)"
+      ],
+      "exceptions": [
+        "Standalone commands reference scripts directly (e.g., /setup-pm)",
+        "Enriched commands integrate multiple skills (e.g., /learn uses context-compressor + memory protocol)"
+      ],
+      "extracted_from": "Tasks #83-84, confirmed by QA Task #86",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "commands-inventory-audit-pattern",
+      "name": "Systematic Commands Inventory Audit",
+      "context": "Commands System Overhaul (Task #83 discovered inconsistent state)",
+      "description": "Before refactoring commands, create a comprehensive inventory matrix with: current state (3 working, 7 stubs, 4 dead, 3 special), disposition (keep, convert, delete, create new), target state, dependencies. Matrix prevents hidden dead code and uncovers patterns.",
+      "matrix_example": [
+        {
+          "command": "/brainstorm",
+          "current": "delegator",
+          "target": "delegator",
+          "disposition": "keep"
+        },
+        {
+          "command": "/checkpoint",
+          "current": "stub (dead)",
+          "target": "delete",
+          "disposition": "delete - references non-existent checkpoints.log"
+        }
+      ],
+      "applicability": "For any command system refactor, file inventory audit, or dead code cleanup",
+      "benefits": [
+        "Prevents missing edge cases",
+        "Documents architectural decisions",
+        "Enables parallel work (developers can see full scope)"
+      ],
+      "extracted_from": "Task #83 architecture phase",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "dead-infrastructure-cleanup-pattern",
+      "name": "Dead Infrastructure Cleanup via Grep Validation",
+      "context": "Tasks #84-85 validated removal of dead references",
+      "description": "When deleting commands or features that reference old infrastructure, validate removal with grep patterns: checkpoints.log, /todos/ paths, /state/ paths, skills/learned/ references, memory-record.cjs. Pattern: document expected grep results (should be zero matches), verify after cleanup.",
+      "grep_patterns": [
+        "grep -r 'checkpoints.log'",
+        "grep -r '/todos/'",
+        "grep -r '/state/'",
+        "grep -r 'skills/learned/'",
+        "grep -r 'memory-record.cjs'"
+      ],
+      "applicability": "For any feature that references old infrastructure, after deletion cleanup validation",
+      "benefits": [
+        "Prevents invisible dead code",
+        "Documents what was removed for future reference",
+        "Enables confident refactoring"
+      ],
+      "extracted_from": "Tasks #84 (deletion), #85 (catalog cleanup), QA validation",
+      "date": "2026-02-07"
+    }
+  ]
 }

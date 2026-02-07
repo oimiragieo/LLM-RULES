@@ -14,6 +14,45 @@ Each decision should include:
 
 ---
 
+## ADR-088: Schemas System Overhaul -- Dead Schema Cleanup + Wiring Activation
+
+**Date:** 2026-02-07
+
+**Status:** Proposed
+
+**Context:**
+
+Audit of `.claude/schemas/` found 52 schema files with only 2 (3.8%) actively loaded and validated against via Ajv in runtime code. 25 schemas (48%) have zero references anywhere in the codebase. The schema-creator skill references three infrastructure pieces that do not exist (schema-registry.json, SCHEMA_CATALOG.md, schemas/index.json). No schema catalog exists, unlike the parallel catalogs for skills, templates, and commands.
+
+**Decision:**
+
+1. Archive 25 dead schemas to `.claude/schemas/_archive/` via `git mv`
+2. Fix naming for `agent-identity.json` (rename to `agent-identity.schema.json`)
+3. Wire 8 schemas to actual Ajv validation in their consumers (agent-definition, skill-definition, hook-definition, workflow-definition, evolution-state, tool-manifest, presets, agent-config)
+4. Create schema catalog at `.claude/context/artifacts/catalogs/schema-catalog.md`
+5. Rewrite schemas README with complete inventory
+6. Fix schema-creator SKILL.md phantom references
+7. Fix schema-updater-workflow.yaml `schemas/index.json` reference
+8. Do NOT create schema-registry.json or schemas/index.json (catalog + README sufficient)
+
+**Rationale:**
+
+- Archive via `git mv` is the proven pattern (templates Pipeline #3, hooks Phase 2)
+- Wiring 8 schemas to Ajv activates validation, from 3.8% to 37% utilization
+- Catalog provides discoverability consistent with skill-catalog, template-catalog, command-catalog
+- Fixing phantom references prevents agents from trying to update infrastructure that doesn't exist
+
+**Consequences:**
+
+- Schema directory goes from 52 to 27 files (48% reduction)
+- Active validation increases from 2 to 10 schemas (5x improvement)
+- Schema-creator skill accurately reflects available infrastructure
+- 25 archived schemas preserved with `git mv` history
+
+**Architecture Plan:** `.claude/context/plans/schemas-overhaul-architecture-2026-02-07.md`
+
+---
+
 ## ADR-087: Commands System Overhaul -- Thin Delegator Pattern + Command Catalog
 
 **Date:** 2026-02-07

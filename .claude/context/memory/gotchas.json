@@ -1,4 +1,38 @@
 {
   "version": 1,
-  "gotchas": []
+  "gotchas": [
+    {
+      "id": "commands-not-creator-guarded",
+      "gotcha": "Commands are NOT protected by unified-creator-guard.cjs (unlike skills, agents, hooks, templates)",
+      "context": "Commands System security review (ADR-087 rationale)",
+      "why_it_happens": "Commands are passive markdown prompts with no privilege escalation or integration coupling. Security threat model is equivalent to direct user input. Creator guard overhead not justified.",
+      "trigger": "Developers may expect commands to require skill-creator workflow",
+      "solution": "Commands are user-controlled, lightweight artifacts. Direct writes to .claude/commands/ are intentional and safe. No creator workflow required.",
+      "alternatives_considered": "Protect commands with creator-guard (rejected - adds complexity without proportional security benefit)",
+      "extracted_from": "Task #86 security compliance check, confirmed by Task #83 architecture design",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "thin-delegator-template-scalability",
+      "gotcha": "While thin delegators (3-line shims) are scalable, they can become boilerplate at scale",
+      "context": "Commands System now has 16 identical 3-line delegators (only skill name varies)",
+      "why_it_happens": "Pattern is so simple that adding 1 command requires copy-paste of 3 lines",
+      "trigger": "After 10+ similar delegators are created manually, developers may want to automate",
+      "solution": "For future command additions: consider creating a command generator script or template expansion tool. But don't overcomplicate - 3-line pattern is maintainable",
+      "future_enhancement": "Optional: command-generator.cjs that takes skill name and generates command file",
+      "extracted_from": "Task #84 implementation, Task #85 catalog creation",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "enriched-commands-rarity",
+      "gotcha": "Enriched commands (/learn that integrates multiple features) can become maintenance burden if overused",
+      "context": "Only /learn enriches beyond single-skill delegation (combines context-compressor + memory protocol)",
+      "why_it_happens": "Developers may want to add convenience commands that combine multiple skills",
+      "trigger": "Multiple feature requests for 'multi-step commands'",
+      "solution": "Keep enriched commands rare. Document each enriched command's integration strategy in the catalog. Prefer orchestrating workflows via agent-level task chaining over command-level combinations.",
+      "pattern": "Enriched = single command + documentation of integration. Multi-step = agent delegation.",
+      "extracted_from": "Task #85 catalog design (1 enriched command documented as exception)",
+      "date": "2026-02-07"
+    }
+  ]
 }

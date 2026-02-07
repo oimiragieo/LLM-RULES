@@ -27,7 +27,7 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 class AgentParser {
   constructor() {
     // Load JSON Schema for agent identity
-    const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'agent-identity.json');
+    const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'agent-identity.schema.json');
     this.identitySchema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 
     // Initialize AJV validator
