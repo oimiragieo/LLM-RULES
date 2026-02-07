@@ -78,6 +78,19 @@ try {
 }
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
+// Violation Tracker integration (lazy-loaded)
+let violationTracker = null;
+function getViolationTracker() {
+  if (violationTracker) return violationTracker;
+  try {
+    violationTracker = require('../../lib/monitoring/violation-tracker.cjs');
+  } catch (_e) {
+    // Graceful degradation — monitoring is optional
+    violationTracker = null;
+  }
+  return violationTracker;
+}
+
 // =============================================================================
 // INTRA-HOOK STATE CACHING (PERF-001)
 // =============================================================================
@@ -363,6 +376,19 @@ function checkRouterBash(toolName, toolInput = {}) {
 +======================================================================+
 `;
 
+  // Record violation in violation-tracker
+  const tracker = getViolationTracker();
+  if (tracker) {
+    tracker.recordViolation({
+      tool: 'Bash',
+      action: enforcement === 'block' ? 'blocked' : 'warned',
+      checkName: 'router-bash-whitelist',
+      routerMode: 'router',
+      sessionId: process.env.CLAUDE_SESSION_ID || 'unknown',
+      metadata: { command: truncatedCmd },
+    });
+  }
+
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
   } else {
@@ -457,6 +483,18 @@ function checkRouterSelfCheck(toolName, toolInput = {}) {
   debugLog('BLOCK: Router using blacklisted tool', { tool: toolName, enforcement });
   const message = `[ROUTER SELF-CHECK VIOLATION] Router attempted to use blacklisted tool: ${toolName}
 Spawn an agent via Task() tool to perform this operation.`;
+
+  // Record violation in violation-tracker
+  const tracker = getViolationTracker();
+  if (tracker) {
+    tracker.recordViolation({
+      tool: toolName,
+      action: enforcement === 'block' ? 'blocked' : 'warned',
+      checkName: 'router-blacklist',
+      routerMode: 'router',
+      sessionId: process.env.CLAUDE_SESSION_ID || 'unknown',
+    });
+  }
 
   if (enforcement === 'block') {
     debugLog('Returning BLOCK decision');
