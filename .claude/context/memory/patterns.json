@@ -288,6 +288,66 @@
       "date": "2026-02-07"
     },
     {
+      "id": "agent-registry-consistency-pattern",
+      "name": "Agent Registry Consistency Model",
+      "context": "Agents System Deep Dive Pipeline #11 (Task #109) - fixed 3 stale agent name references in rules/agents.md",
+      "description": "After any system-wide audit that discovers agent name inconsistencies, fix them in layers: (1) Core registry files (agent-registry.json, agent-config.json) -- source of truth, (2) Routing documentation (rules/agents.md, @AGENT_ROUTING_TABLE.md), (3) Secondary references (catalogs, planning documents). Agent names are widely distributed (49 agents referenced in 46+ places). Fixing layer-by-layer ensures all consumers get updated consistently.",
+      "examples": [
+        {
+          "issue": "3 stale agent names in rules/agents.md",
+          "stale_names": ["python-backend-expert", "typescript-expert", "database-specialist"],
+          "correct_names": ["python-pro", "typescript-pro", "database-architect"],
+          "source": "agent-registry.json (49 agents, authority)")
+        }
+      ],
+      "applicability": "Any multi-agent system where agent names can change or agent counts can increase. Useful for: framework audits, agent renames, agent deprecations.",
+      "pattern": [
+        "1. Audit identifies inconsistency (e.g., rules/agents.md lists old names)",
+        "2. Verify source of truth: agent-registry.json is canonical",
+        "3. Fix in layers: core registries first, then docs, then secondary references",
+        "4. Grep entire .claude/ for old names to find all references",
+        "5. Update all references to match agent-registry.json",
+        "6. Update rule-index.json if rules are affected",
+        "7. Verify no broken imports or references remain"
+      ],
+      "prevention": [
+        "Add CI validation that agent name references match agent-registry.json",
+        "Create pre-commit hook checking for stale agent names",
+        "Include agent registry consistency check in post-overhaul checklist"
+      ],
+      "extracted_from": "Task #109 (stale reference fixes), Pipeline #11 audit findings",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "post-overhaul-registry-sync-pattern",
+      "name": "Registry Synchronization Following System Overhauls",
+      "context": "Agents System Deep Dive Pipeline #11 - consistency checks after major agent audit and refactoring",
+      "description": "After major system overhauls (agent audits, refactoring, consolidations), immediately run a full consistency check across all registries and documentation. Overhauls often move, rename, or delete files. Cross-references can become stale if not systematically checked. Pipeline #11 audit discovered: 3 stale agent names in rules/agents.md, 8 stale entries in rule-index.json (from Pipeline #9 rule merges), 1 duplicate agent file at root level, missing rule-index.json entries.",
+      "examples": [
+        {
+          "check": "Agent names in rules/agents.md vs agent-registry.json",
+          "result": "Found 3 mismatches (python-backend-expert, typescript-expert, database-specialist)"
+        },
+        {
+          "check": "Total agent count in agent-config.json vs actual agent count",
+          "result": "MISMATCH: config said 16 agents, registry had 49 agents"
+        }
+      ],
+      "applicability": "Any complex system with multiple registries/catalogs. Essential after: agent renames, agent merges, rule consolidations, tool relocations.",
+      "checklist": [
+        "1. Registry files: agent-registry.json, agent-config.json, tool-manifest.json, rule-index.json",
+        "2. Routing tables: routing-table.cjs, @AGENT_ROUTING_TABLE.md, capability-routing.json",
+        "3. Rules: rules/agents.md, rules/git-workflow.md, rules/security.md",
+        "4. Spawn templates: universal-agent-spawn.md, orchestrator-spawn.md",
+        "5. ADRs: decisions.md (check dates and implementation status)",
+        "6. Cross-references: CLAUDE.md, @AGENT_ROUTING_TABLE.md, agent catalog"
+      ],
+      "automation": "Create post-overhaul-consistency-check.mjs script that: (1) Reads all registry files, (2) Performs cross-checks, (3) Reports inconsistencies, (4) Suggests fixes, (5) Integrates into validation chain",
+      "cost_of_missing": "Stale references create confusion for future developers and can lead to agents not being discovered or routed correctly",
+      "extracted_from": "Task #109 (consistency fix), Pipeline #11 audit methodology",
+      "date": "2026-02-07"
+    },
+    {
       "id": "aggregate-metadata-staleness-detection",
       "name": "Aggregate Metadata Staleness Detection Pattern",
       "context": "Config System Overhaul Pipeline #10 (Task #106-108) - discovered tool-manifest.json and rule-index-cache.json with stale aggregate counts",
@@ -330,9 +390,5 @@
       "extracted_from": "Task #106 (audit), Task #107 (fixed phase-models.json), Task #108 (regenerated tool-manifest and rule-index)",
       "date": "2026-02-07"
     }
-  ]
-}
-  ]
-}
   ]
 }

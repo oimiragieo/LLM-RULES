@@ -14,6 +14,105 @@ Each issue should include:
 
 ---
 
+## 2026-02-07: CRITICAL -- Windows Reserved Filename `nul` in context/ (Pipeline #12)
+
+**Date:** 2026-02-07
+
+**Impact:** CRITICAL -- Violates workspace-conventions.md forbidden names, may cause NTFS issues
+
+**Description:**
+
+A file named `nul` (0 bytes) exists at `.claude/context/nul`. This is a Windows reserved device name. Creating or manipulating this file on Windows NTFS can cause unexpected behavior. The file was created 2026-02-07 12:55 (unknown source). workspace-conventions.md explicitly forbids creating files named `nul`, `con`, `prn`, `aux`, `com1`-`com9`, `lpt1`-`lpt9`.
+
+**Workaround:** None needed -- file is 0 bytes and has no consumers.
+
+**Resolution:** Delete via `git rm .claude/context/nul`. See ADR-094 P1-001.
+
+---
+
+## 2026-02-07: 7 Orphaned Hash-Named Plan Directories (Pipeline #12)
+
+**Date:** 2026-02-07
+
+**Impact:** HIGH -- 7 directories + files in plans/ with 0 consumers, violating naming conventions
+
+**Description:**
+
+The QA workflow skill creates working directories in `.claude/context/plans/` with random hash suffixes (e.g., `impl-plan-kHwypz/`, `qa-report-c05Ene/`, `test-plan-DCyOsO/`). These are never cleaned up after the QA workflow completes. All 7 directories have 0 consumers (confirmed by grep across entire `.claude/`). They violate workspace-conventions.md naming rules (not kebab-case, no date suffix, random hash identifiers).
+
+**Orphaned directories:**
+1. `plans/impl-plan-kHwypz/`
+2. `plans/progress-WuHjJL/`
+3. `plans/qa-report-c05Ene/`
+4. `plans/qa-report-eiwkdm/`
+5. `plans/qa-report-EjOE7P/`
+6. `plans/test-plan-DCyOsO/`
+7. `plans/test-plan-zHYXQi/`
+
+**Workaround:** Delete manually.
+
+**Resolution:**
+1. Delete 7 orphaned directories (immediate, ADR-094 P1-002)
+2. Add cleanup logic to QA workflow skill (ADR-094 P3-011, prevents recurrence)
+
+---
+
+## 2026-02-07: data/ Directory Undocumented in Governance (Pipeline #12)
+
+**Date:** 2026-02-07
+
+**Impact:** MEDIUM -- Code-indexing system works but governance does not cover the data/ directory
+
+**Description:**
+
+The `.claude/context/data/` directory contains 37 files (LanceDB vector store, SQLite memory database, BM25 search index). It is actively wired through `.claude/lib/code-indexing/` (index-manager.cjs, lancedb-client.cjs, bm25-indexer.cjs). However, neither FILE_PLACEMENT_RULES.md nor workspace-conventions.md document this directory. Agents cannot know the correct placement rules for data files.
+
+**Workaround:** None needed for functionality (the code-indexing system works). But new data files may be placed inconsistently.
+
+**Resolution:** Add `data/` to FILE_PLACEMENT_RULES.md and workspace-conventions.md with rules for LanceDB, SQLite, and index files. See ADR-094 P1-003.
+
+---
+
+## 2026-02-07: ADR-081 Consolidation Incomplete -- 15 Files in Old Locations (Pipeline #12)
+
+**Date:** 2026-02-07
+
+**Impact:** HIGH -- Duplicate report locations cause confusion for agents
+
+**Description:**
+
+ADR-081 consolidated reports from `artifacts/reports/` to `reports/{domain}/`. However, 15 files remain in the old artifact locations:
+- `artifacts/reflections/` (5 files) should be in `reports/reflections/`
+- `artifacts/security-reviews/` (9 files) should be in `reports/security/`
+- `artifacts/qa-reports/` (1 file) should be in `reports/qa/`
+
+At least one file (`artifacts/reports/model-selection-drift-2026-02-07.json`) was created AFTER the ADR-081 consolidation, indicating agents are still writing to old paths.
+
+**Workaround:** None -- agents reading reports may miss files in the old location.
+
+**Resolution:** Move all 16 files to canonical `reports/{domain}/` locations. See ADR-094 P2-001 through P2-004.
+
+---
+
+## 2026-02-07: 10 Artifact Subdirectories Not in FILE_PLACEMENT_RULES (Pipeline #12)
+
+**Date:** 2026-02-07
+
+**Impact:** MEDIUM -- Governance gap: 10 directories exist without placement rules
+
+**Description:**
+
+The following artifact subdirectories are NOT documented in FILE_PLACEMENT_RULES.md:
+`audit-logs/`, `audits/`, `code-styleguides/`, `deployment-docs/`, `error-reports/`, `error-summaries/`, `qa-reports/`, `reflections/`, `risk-assessments/`, `security-reviews/`, `tasks/`
+
+Of these, `error-reports/` and `error-summaries/` are actively wired (written by error-writer.cjs and error-summary-extractor). The rest have 0-4 consumers and are candidates for archiving.
+
+**Workaround:** None -- agents creating new files in these directories are operating outside governance.
+
+**Resolution:** Either document in FILE_PLACEMENT_RULES.md (for actively wired dirs) or archive (for dead dirs). See ADR-094 P2-005.
+
+---
+
 ## 2026-02-07: FILE_PLACEMENT_RULES.md Stale Paths Conflict with workspace-conventions.md (Pipeline #9)
 
 **Date:** 2026-02-07
@@ -502,4 +601,88 @@ Findings documented in `.claude/context/reports/security/agents-system-security-
 4. Extend routing-guard to orchestrators
 5. Add agent-registry.json integrity validation
 6. Block shell metacharacters in Bash validation
+
+---
+
+## 2026-02-07: Stale Agent References in Documentation (Task #109)
+
+**Date:** 2026-02-07
+
+**Impact:** MEDIUM -- Auto-loaded rules file contained incorrect agent names causing confusion
+
+**Description:**
+
+The file `.claude/rules/agents.md` (auto-loaded into every conversation's system prompt) contained 3 stale agent name references discovered during Agent System Deep Dive (Pipeline #11):
+
+1. `python-backend-expert` → should be `python-pro`
+2. `typescript-expert` → should be `typescript-pro`
+3. `database-specialist` → should be `database-architect`
+
+These agent names are outdated references from an earlier iteration. The actual agent registry documents 49 agents with the correct names (python-pro, typescript-pro, database-architect). Because rules/agents.md is auto-loaded, these stale references reach every conversation.
+
+**Workaround:**
+
+None needed for new conversations (Task #109 fixed the source). Agents that read the rules file will see corrected agent names.
+
+**Resolution:**
+
+✅ **FIXED** in Task #109:
+1. Updated rules/agents.md with 3 corrected agent names
+2. Updated ADR-093 status to "Accepted"
+3. Recorded learnings in decisions.md
+
+**Pattern Discovered:**
+
+After large system changes (e.g., agent count from 16 to 49), documentation files that manually reference those systems need update as part of the same task. Similar references may exist in other documentation files (check @DIRECTORY_STRUCTURE.md, agent-registry.json references in READMEs, etc.).
+
+---
+
+## 2026-02-07: Context Data Layer Security Findings (Pipeline #12)
+
+**Date:** 2026-02-07
+
+**Impact:** HIGH -- 3 HIGH, 5 MEDIUM, 5 LOW findings in context system security
+
+**Description:**
+
+Security review of `.claude/context/` data layer (memory, runtime, artifacts, config, reports, plans, tmp, metrics, data, self-healing, sessions, teams, workflows) identified security gaps primarily in state integrity, prompt injection via persistent context, and inconsistent security controls.
+
+**Key Findings:**
+
+1. **SEC-CTX-001 (HIGH)**: Inconsistent `safeJSONParse()` usage -- `task-status-enforcement.cjs` uses plain `JSON.parse()` while `router-state.cjs` has prototype pollution protection. File: `.claude/hooks/routing/task-status-enforcement.cjs` line 69.
+
+2. **SEC-CTX-002 (HIGH)**: Reflection spawn prompt injection -- `reflection-queue-processor.cjs` `generateSpawnRequest()` builds agent prompts from queue entries without content sanitization. File: `.claude/hooks/reflection/reflection-queue-processor.cjs` lines 130-175.
+
+3. **SEC-CTX-003 (HIGH)**: Memory file integrity not verified -- `constitution.md` and `behaviour.md` are injected into all agent spawn prompts via `spawn-prompt-assembler.cjs` without hash verification. Any agent with Write access could modify behavioral directives for all future agents.
+
+4. **SEC-CTX-004 (MEDIUM)**: No JSON Schema validation on runtime state file reads (`router-state.json`, `task-status.json`, `workflow-state.json`, `reflection-spawn-request.json`).
+
+5. **SEC-CTX-005 (MEDIUM)**: `nul` file (Windows reserved name, 0 bytes) at `.claude/context/nul` violates workspace-conventions.md.
+
+6. **SEC-CTX-006 (MEDIUM)**: Executable `.cjs` file in `tmp/` directory. `.gitignore` only covers `*.txt` in tmp/.
+
+7. **SEC-CTX-007 (MEDIUM)**: No JSONL rotation configured for `event-bus.jsonl` (unbounded growth risk).
+
+8. **SEC-CTX-008 (MEDIUM)**: `gotchas.json` and `patterns.json` lack provenance tracking (no author/timestamp per entry).
+
+**Positive Findings:**
+
+- Zero secrets or credentials found in any context file (comprehensive regex scan)
+- `spawn-log.jsonl` has good traceability (task_id, agent_type, session_id, timestamps)
+- `.gitignore` correctly excludes runtime/, metrics/, self-healing, sessions from version control
+- `router-state.cjs` has robust prototype pollution prevention and optimistic concurrency
+
+**Workaround:**
+
+- Do NOT deploy in adversarial environments until SEC-CTX-001 through SEC-CTX-003 are fixed
+- Monitor `reflection-spawn-request.json` for unexpected content
+- Manually verify `constitution.md` and `behaviour.md` integrity periodically
+
+**Resolution Path:**
+
+- P1 (3 HIGH findings): Extract shared `safeJSONParse`, add prompt sanitization, add memory integrity checks
+- P2 (5 MEDIUM findings): Schema validation, delete `nul` file, relocate tmp executables, JSONL rotation, provenance tracking
+- P3 (5 LOW findings): Metrics HMAC, session encryption, backup integrity, documentation gaps
+
+**Full Report:** `.claude/context/reports/security/context-security-review-2026-02-07.md`
 

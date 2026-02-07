@@ -27,10 +27,16 @@ Rules for file placement, naming, provenance, and cleanup in the agent-studio wo
 - Research reports: `.claude/context/artifacts/research-reports/`
 - Database artifacts: `.claude/context/artifacts/database/`
 
+### Data Files
+
+- Code index data: `.claude/context/data/`
+- Allowed files: `*.db`, `*.sqlite`, `*.json`, `*.lance` (LanceDB vector store, SQLite, BM25 index)
+- NEVER write temporary data outside `.claude/context/tmp/`
+
 ### Temporary Files
 
 - ALL temp files: `.claude/context/tmp/`
-- Auto-cleaned after 24 hours
+- Manual cleanup only (not automated)
 - NEVER write temp files to project root or user home directories
 
 ### Naming Convention

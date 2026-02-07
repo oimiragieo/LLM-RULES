@@ -641,7 +641,7 @@ module.exports = async ({ tool, params }) => {
 
 | Output Type            | Location                                                                   |
 | ---------------------- | -------------------------------------------------------------------------- |
-| **Reflection Reports** | `.claude/context/artifacts/reflections/reflection-{taskId}-{timestamp}.md` |
+| **Reflection Reports** | `.claude/context/reports/reflections/reflection-{taskId}-{timestamp}.md` |
 | **Reflection Log**     | `.claude/context/memory/reflection-log.jsonl`                              |
 | **Pattern Updates**    | `.claude/context/memory/learnings.md`                                      |
 | **Decision Records**   | `.claude/context/memory/decisions.md`                                      |

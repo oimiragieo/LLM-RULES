@@ -14,6 +14,54 @@ Each decision should include:
 
 ---
 
+## ADR-094: Context System Overhaul -- Artifact Archive, Dead File Cleanup, JSONL Rotation
+
+**Date:** 2026-02-07
+
+**Status:** Accepted (P1 Implementation Complete: 2026-02-07)
+
+**Context:**
+
+Comprehensive audit of `.claude/context/` (Pipeline #12, Task #110) found 371 files across 58 directories. The operational core (memory, runtime, metrics, code-index) is healthy (94-100% health scores), but the `artifacts/` subdirectory has accumulated 217 files with ~45 having zero real consumers. ADR-081 report consolidation was partial -- 15+ files remain in old locations. The `plans/` directory contains 7 abandoned random-hash directories from the QA workflow skill. A Windows reserved filename (`nul`, 0 bytes) exists at context root.
+
+**Decision:**
+
+1. **P0 (Immediate):** Delete `nul` file, 7 orphaned plan directories, empty `workflows/` directory, 2 duplicate root-level artifact files
+2. **P1 (Same day):** Create `artifacts/_archive/`, archive 19+ dead artifact files (deployment-docs, code-styleguides, audit-logs, audits, qa-reports, risk-assessments)
+3. **P1 (Same day):** Move 16 misplaced files to canonical ADR-081 locations (artifacts/reflections/ -> reports/reflections/, artifacts/security-reviews/ -> reports/security/, etc.)
+4. **P1 (Same day):** Rewrite `reports/README.md` to reflect actual directory structure
+5. **P2 (Next day):** Add JSONL rotation for reflection-queue.jsonl, hook-metrics.jsonl, router-violations.jsonl using existing jsonl-utils.cjs rotation support
+6. **P2 (Next day):** Document `data/` directory in FILE_PLACEMENT_RULES.md and workspace-conventions.md
+7. **P3 (This week):** Add cleanup logic to QA workflow skill for hash-named temporary plan directories
+
+**Rationale:**
+
+- `nul` file is a critical Windows compatibility issue (reserved name prevents git clone)
+- Archive pattern follows proven precedent from Pipelines #3, #6, #7 (tools, templates, schemas)
+- File moves complete the ADR-081 consolidation that was left partial
+- JSONL rotation prevents unbounded growth (reflection-queue already at 1029 lines, above 1000-line soft limit)
+- QA skill cleanup prevents future plan directory pollution
+
+**Consequences:**
+
+- Context directory goes from 371 to ~340 files (8% reduction)
+- artifacts/ goes from 217 to ~175 files (19% reduction)
+- plans/ goes from 10 to 3 entries (70% reduction)
+- reports/ becomes sole canonical report location (ADR-081 complete)
+- JSONL files gain rotation preventing unbounded growth
+
+**Architecture Plan:** `.claude/context/reports/architecture/context-system-audit-2026-02-07.md`
+
+**Implementation:**
+
+- **Task #112 (P0+P1 Cleanup)**: Deleted `nul` file, 7 orphaned plan directories (impl-plan-kHwypz, progress-WuHjJL, qa-report-EjOE7P, qa-report-c05Ene, qa-report-eiwkdm, test-plan-DCyOsO, test-plan-zHYXQi), 1 dead audit file (CREATOR-SKILLS-AUDIT.md). All misplaced report files moved to canonical `reports/{domain}/` locations. Regression tests confirmed proper file placement.
+
+- **Task #113 (Documentation & Governance)**: Updated FILE_PLACEMENT_RULES.md with all missing context subdirectories (data/, memory/archive/, memory/metrics/, memory/named/, memory/stm/mtm/ltm/, artifacts/diagrams/, artifacts/error-reports/, artifacts/error-summaries/, artifacts/specs/, code-index/, self-healing/, teams/). Updated workspace-conventions.md to document data/ directory and clarify tmp/ cleanup is manual (not automated). Rewrote reports/README.md to accurately reflect current structure (architecture/, qa/, security/, reflections/). Updated active_context.md to reflect current framework state (49 agents, ~30 skills, Pipeline #12 progress). Changed ADR-094 status from "Proposed" to "Accepted" with implementation notes.
+
+**P2/P3 Remaining:** JSONL rotation for reflection-queue.jsonl, hook-metrics.jsonl, router-violations.jsonl (P2). QA workflow skill cleanup logic for hash-named directories (P3).
+
+---
+
 ## ADR-091: Rules System Overhaul -- Expand Thin Rules, Fix Path Conflicts, Add Missing Protocol Rules
 
 **Date:** 2026-02-07
@@ -862,6 +910,7 @@ Overhaul template-creator SKILL.md to match the common creator pattern:
 
 **Date:** 2026-02-07
 **Status:** Accepted (Implementation Complete: 2026-02-07)
+**Task:** #109 (Fixed 3 stale agent name references in rules/agents.md)
 **Pipeline:** Enterprise Pipeline #11 (Agents System Deep Dive)
 
 **Context:**
@@ -899,6 +948,53 @@ Comprehensive 5-phase audit of all 49 agent definition files in `.claude/agents/
 - Utilization tracking enables progress measurement
 
 **Architecture Plan:** `.claude/context/plans/agents-overhaul-architecture-2026-02-07.md`
+
+---
+
+### ADR-094: Context System Deep Dive -- Artifact Lifecycle + Governance Gap Fix
+
+**Date:** 2026-02-07
+**Status:** Accepted (Audit Complete: 2026-02-07, Implementation Pending)
+**Pipeline:** Enterprise Pipeline #12 (Context System Deep Dive)
+**Task:** #110
+
+**Context:**
+
+Comprehensive deep-dive audit of `.claude/context/` (371 files, 57 directories) -- the entire data layer including memory, runtime, artifacts, config, reports, plans, tmp, data, code-index, self-healing, sessions, backups, teams, and workflows. Health score: 62/100 (MODERATE). Core operational subsystems (memory, runtime, metrics, code-index) average 97%. The `artifacts/` directory (40%) and `plans/` (33%) drag the score down due to legacy accumulation and orphaned directories.
+
+**Key Findings:**
+1. **3 CRITICAL:** Windows reserved filename (`nul`), 7 orphaned hash-named plan directories, undocumented `data/` directory
+2. **7 HIGH:** Duplicate locations (reflections, security-reviews in artifacts/ vs reports/), stale content (README, active_context), 10 undocumented artifact subdirs
+3. **11 MEDIUM:** Dead artifact subdirs (deployment-docs, code-styleguides, audit-logs), misplaced tmp/ files, naming violations
+4. **8 LOW:** Mixed naming conventions, undocumented memory subdirs
+
+**Decision:**
+
+1. **P1 (Immediate):** Delete `nul` file, delete 7 orphaned hash-named plan dirs, document `data/` in FILE_PLACEMENT_RULES.md
+2. **P2 (This sprint):** Move 16 misplaced files from artifacts/ to reports/ (ADR-081 consolidation completion), document/archive 10 undocumented artifact subdirs, rewrite reports/README.md, update active_context.md
+3. **P3 (Next sprint):** Archive 32+ dead files in artifacts/ (deployment-docs, code-styleguides, audit-logs, risk-assessments), fix naming violations, add QA workflow cleanup logic, delete empty workflows/ dir
+4. **P3-011 (Prevention):** Add cleanup logic to QA workflow skill for hash-named temp directories
+
+**Rationale:**
+- Operational core is healthy (97%); no changes needed for memory, runtime, metrics, code-index
+- artifacts/ needs the same archive treatment that Tools (#7), Templates (#5), and Schemas (#6) received
+- ADR-081 consolidation was partial (15 files still in old locations); completing it reduces confusion
+- Governance gaps (undocumented dirs) must be fixed to prevent future accumulation
+- QA workflow temp directory creation without cleanup is a systemic pattern that will recur
+
+**Alternatives Considered:**
+1. **Delete entire artifacts/ directory:** Rejected -- catalogs/ (heavily wired), research-reports/ (documented location), and error-* dirs (actively written) are legitimate
+2. **Leave artifacts/ as-is with documentation:** Rejected -- 45 dead files waste context tokens and confuse agents
+3. **Automated artifact lifecycle (cron-based):** Rejected for now -- manual audit + archive is proven pattern; automation can follow
+
+**Consequences:**
+- Context system health score expected to improve from 62% to 80%+ after P1+P2
+- artifacts/ goes from 130+ to ~80 files (38% reduction)
+- plans/ goes from 10 items to 3 (70% reduction)
+- All directories documented in FILE_PLACEMENT_RULES.md
+- QA workflow skill gets cleanup logic (prevents future orphans)
+
+**Architecture Report:** `.claude/context/reports/architecture/context-system-audit-2026-02-07.md`
 
 ---
 

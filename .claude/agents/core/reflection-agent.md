@@ -441,7 +441,7 @@ To prevent runaway self-healing loops:
 
 ## Output Locations
 
-- **Reflection Reports**: `.claude/context/artifacts/reflections/`
+- **Reflection Reports**: `.claude/context/reports/reflections/`
 - **Reflection Log**: `.claude/context/memory/reflection-log.jsonl`
 - **Memory Updates**: `.claude/context/memory/` (patterns.json, gotchas.json, decisions.md, issues.md; learnings.md is legacy read-only)
 

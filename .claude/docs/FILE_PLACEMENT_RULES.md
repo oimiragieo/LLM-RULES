@@ -182,10 +182,11 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 | `artifacts/analysis/`         | Deep-dive analysis documents   | `*.md`                                      |
 | `artifacts/catalogs/`         | Catalog and registry files     | `*.md`, `*.json`                            |
 | `artifacts/database/`         | Database design artifacts      | `*.md`, `*.json`                            |
-| `artifacts/analysis/`         | Deep-dive analysis documents   | `*.md`                                      |
-| `artifacts/catalogs/`         | Catalog and registry files     | `*.md`, `*.json`                            |
-| `artifacts/database/`         | Database design artifacts      | `*.md`, `*.json`                            |
+| `artifacts/diagrams/`         | Architecture diagrams          | `*.md`, `*.svg`, `*.png`                    |
+| `artifacts/error-reports/`    | Error tracking reports         | `*.md`, `*.json`                            |
+| `artifacts/error-summaries/`  | Error summary aggregations     | `*.md`, `*.json`                            |
 | `artifacts/research-reports/` | Research synthesis outputs     | `*-research.md`                             |
+| `artifacts/specs/`            | Technical specifications       | `*.md`                                      |
 | `artifacts/summaries/`        | Phase summaries, checkpoints   | `*.md`                                      |
 | `plans/`                      | Planner outputs (canonical)    | `*-plan-YYYY-MM-DD.md`                      |
 | `reports/`                    | Agent reports (canonical)      | `*-report-YYYY-MM-DD.md`                    |
@@ -195,11 +196,20 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 | `reports/database/`           | Database domain reports        | `*.md`                                      |
 | `reports/reflections/`        | Reflection agent reports       | `*.md`                                      |
 | `memory/`                     | Persistent memory files        | `learnings.md`, `decisions.md`, `issues.md` |
+| `memory/archive/`             | Archived memory snapshots      | `*.md`                                      |
+| `memory/metrics/`             | Memory system metrics          | `*.json`, `*.jsonl`                         |
+| `memory/stm/`                 | Short-term memory (session)    | `*.json`                                    |
+| `memory/mtm/`                 | Medium-term memory (recent)    | `*.json`                                    |
+| `memory/ltm/`                 | Long-term memory (summary)     | `*.md`, `*.json`                            |
+| `memory/named/`               | Named memory API storage       | `*.md`, `*.json`                            |
 | `metrics/`                    | Metrics and audit logs         | `*.jsonl`, `*.json`                         |
 | `config/`                     | Configuration files            | `*.json`, `*.yaml`                          |
 | `runtime/`                    | Temporary runtime state        | `*.json`                                    |
-| `checkpoints/`                | Workflow checkpoints           | `*.json`                                    |
+| `data/`                       | Code index data files          | `*.db`, `*.sqlite`, `*.json`, `*.lance`     |
+| `code-index/`                 | Code indexing metadata         | `*.json`, `*.jsonl`                         |
+| `self-healing/`               | Anomaly detection and recovery | `*.json`, `*.jsonl`                         |
 | `sessions/`                   | Session data                   | `*.json`                                    |
+| `teams/`                      | Party mode team definitions    | `*.json`                                    |
 | `tmp/`                        | Temporary files (auto-cleaned) | Any                                         |
 | `backups/`                    | System backups                 | Any                                         |
 

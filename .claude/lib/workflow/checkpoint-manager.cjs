@@ -404,10 +404,10 @@ class CheckpointManager {
 
 /**
  * Simplified functional API for SPEC-003 compatibility
- * Stores checkpoints at: .claude/context/workflows/checkpoints/
+ * Stores checkpoints at: .claude/context/runtime/checkpoints/
  */
 
-const SPEC003_CHECKPOINT_DIR = path.join(__dirname, '../../context/workflows/checkpoints');
+const SPEC003_CHECKPOINT_DIR = path.join(__dirname, '../../context/runtime/checkpoints');
 
 // Track step numbers for workflows
 const workflowStepCounters = new Map();

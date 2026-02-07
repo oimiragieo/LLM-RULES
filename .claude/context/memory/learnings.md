@@ -1,3 +1,35 @@
+## Pipeline #12: Context System Deep Dive (2026-02-07)
+
+### Key Findings
+
+1. **Context system operational core is excellent (94-100% health):** memory/, runtime/, metrics/, code-index/ subsystems are tightly wired with active producers and consumers. The 3-tier memory architecture (STM/MTM/LTM) is functional. All runtime files have active hooks consuming them.
+
+2. **artifacts/ is the biggest problem area (40% health, 217 files):** This directory accumulated 130+ files over weeks with no lifecycle management. 10 of 21 subdirectories are not documented in FILE_PLACEMENT_RULES.md. ~45 files have zero real consumers (merkle-tree.json indexing is NOT real consumption). ADR-081 consolidation was partial -- 15+ files remain in old locations (artifacts/security-reviews/, artifacts/reflections/, artifacts/qa-reports/) instead of the canonical reports/{domain}/ location.
+   - **RESOLVED (Task #112):** All misplaced report files have been moved to canonical locations. Files were already moved prior to running regression tests; tests confirmed proper placement.
+   - **RESOLVED (Task #113):** Documentation updated - FILE_PLACEMENT_RULES.md now documents 15 missing context subdirectories (memory/archive, memory/metrics, memory/stm, memory/mtm, memory/ltm, memory/named, data/, code-index/, self-healing/, sessions/, teams/, artifacts/diagrams, artifacts/error-reports, artifacts/error-summaries, artifacts/specs). workspace-conventions.md now documents data/ directory. reports/README.md rewritten with accurate inventory (96 reports across 4 domains). active_context.md updated to current state (49 agents, ~30 skills, not 434+ skills). ADR-094 status changed to "Accepted".
+   - **QA VALIDATED (Task #114):** All 14 regression tests passing. Zero broken references. All documentation accurate. APPROVED for completion.
+
+3. **plans/ contains 7 abandoned random-hash directories:** The QA workflow skill creates temporary working directories (e.g., `impl-plan-kHwypz/`, `qa-report-EjOE7P/`) but never cleans them up. These violate kebab-case naming conventions and have zero consumers. Prevention: add cleanup logic to QA workflow skill.
+   - **RESOLVED (Task #112):** All 7 hash-named plan directories have been deleted via git rm.
+   - **QA VALIDATED (Task #114):** Verified all 7 directories deleted, zero references remain.
+
+4. **Windows reserved filename `nul` exists at context root (0 bytes):** Violates workspace-conventions.md forbidden names list. Can prevent `git clone` on some Windows configurations. Created accidentally by a hook or agent.
+   - **RESOLVED (Task #112):** nul file deleted via git rm.
+   - **QA VALIDATED (Task #114):** Verified nul file does not exist, resolves critical Windows NTFS compatibility issue.
+
+5. **Consumer analysis requires excluding merkle-tree.json from counts:** The code index merkle-tree.json contains file paths for change detection, but these are NOT functional consumers. Many "consumer counts" in prior analyses are inflated by including merkle-tree references. Real consumer count requires checking .cjs, .md (agent/skill/workflow), and .json (config) files separately.
+
+6. **JSONL rotation is inconsistent:** `error-writer.cjs` rotates error reports by date, but `reflection-queue.jsonl` (1029 lines), `hook-metrics.jsonl` (913 lines), and `router-violations.jsonl` (182 lines) lack rotation. `jsonl-utils.cjs` has 1000-line rotation support but not all writers use it.
+
+7. **reports/README.md is stale:** References non-existent files (MASTER-SKILL-AUDIT.md, framework-skills-action-plan.md, etc.) and a non-existent archive/ subdirectory. Actual structure has architecture/, qa/, security/, reflections/ subdirectories.
+
+**Evidence:**
+- Report: `.claude/context/reports/architecture/context-system-audit-2026-02-07.md`
+- 371 files, 58 directories audited
+- Consumer analysis: grep across entire .claude/ tree (excludes _archive/)
+
+---
+
 **Pattern:** After any system overhaul that renames/merges files or changes counts, regenerate all caches:
 1. tool-manifest.json: `pnpm manifest:generate`
 2. rule-index-cache.json: regenerate script or manual update
@@ -73,6 +105,59 @@ Key function: `resolveAgentModel()` in `agent-config-reader.cjs`
 - Architecture plan: `.claude/context/plans/config-overhaul-architecture-2026-02-07.md`
 - Audited: 20 config files, 17+ consumer modules
 - Decision: ADR-092 (Config System Overhaul)
+
+---
+
+## Agent Registry Consistency is Canonical (2026-02-07, Pipeline #11, Task #109)
+
+**Key Insight:** agent-registry.json is the single source of truth for all 49 agents. When agent names are displayed, documented, or referenced anywhere in the framework, they MUST match agent-registry.json exactly.
+
+**Example:** Task #109 fixed references where old names (python-backend-expert, typescript-expert, database-specialist) were still documented in rules/agents.md even though the authoritative registry had changed them to (python-pro, typescript-pro, database-architect).
+
+**Actionability:** In future agent renames:
+1. Update agent-registry.json FIRST
+2. Search entire `.claude/` for old name with grep
+3. Update all references to new name
+4. Update rule-index.json if any rules are affected
+5. Verify no broken imports or references remain
+
+**Evidence:** Task #109 audit found 3 stale references in rules/agents.md; Pipeline #11 audit of all 49 agents confirmed 100% registry consistency (0 orphans, 0 phantoms)
+
+---
+
+## Rules Auto-Load System Prompt -- Stale Rules Have Global Impact (2026-02-07, Pipeline #11, Task #109)
+
+**Key Insight:** Rules in `.claude/rules/` are automatically loaded into every conversation's system prompt. This means stale rules reach EVERY agent spawned, creating confusion and misdirection.
+
+**Example:** rules/agents.md with outdated agent names would mislead agents: "Can I use python-backend-expert?" (but agent doesn't exist). Task #109 fixed this to maintain consistency with agent-registry.json.
+
+**Implication:** Rules are the most critical files to keep accurate because they have enterprise-wide reach. A single error in a rule file is seen by every conversation.
+
+**Actionability:** After any rule changes or agent renames:
+1. Update rules before documentation
+2. Verify all rule references match source of truth (agent-registry.json for agents, etc.)
+3. Include rule consistency in CI validation
+
+**Evidence:** Rules auto-loaded per ADR-091; rules/agents.md referenced in 46+ agent definitions (confirmed by Task #109 audit)
+
+---
+
+## Agents System is Structurally Healthy (100% Registry Consistency) (2026-02-07, Pipeline #11)
+
+**Key Insight:** Per Pipeline #11 findings:
+- 0 orphaned agents (all 49 agents defined, all files on disk, all registry entries match)
+- 0 phantom agents (all registry entries point to existing files)
+- 100% registry consistency (agent-registry.json, agent-config.json, tool-manifest.json all report same 49 agents)
+- Under-utilization (85.7%) is an orchestration problem, NOT an agent definition problem
+
+**Implication:** The agents subsystem is the cleanest audited component so far. No systemic issues with agent definitions, tooling, or registry management. Problems are elsewhere (enforcement hook defaults, no post-completion workflow, etc.).
+
+**Actionability:** Future work should focus on:
+1. Activating the agents that exist (ADR-079/080 enterprise workflow)
+2. Fixing orchestration problems (not agent definitions)
+3. Preventing stale references (CI validation)
+
+**Evidence:** Full audit of 49 agents against 5 registries and 46+ cross-references (Task #109 discovery phase); task completed with score 0.95/1.0
 
 ---
 
@@ -204,3 +289,96 @@ if (registry.signature !== expected) {
 **Findings**: 5 HIGH, 3 MEDIUM, 8 LOW
 **Status**: APPROVED WITH CONDITIONS (fix P1 HIGH findings before production)
 
+
+## Pipeline #12: Context System Deep Dive (2026-02-07)
+
+### Key Findings
+
+1. **Context System Health Score: 62/100 (MODERATE).** The operational core (memory, runtime, metrics, code-index) averages 97% health. The `artifacts/` directory (40%) and `plans/` (33%) drag the overall score down due to legacy accumulation and orphaned directories.
+
+2. **artifacts/ is a Legacy Dumping Ground.** 130+ files across 14 subdirectories. 10 subdirectories are NOT documented in FILE_PLACEMENT_RULES.md. ~45 files have zero or near-zero consumers. ADR-081 consolidation moved reports to `reports/{domain}/` but 15 files remain in the old `artifacts/{security-reviews, reflections, qa-reports, reports}` locations.
+
+3. **QA Workflow Skill Creates Orphaned Temp Directories.** 7 hash-named directories (e.g., `impl-plan-kHwypz/`, `qa-report-c05Ene/`) in `plans/` with 0 consumers. The QA skill creates these working directories but has no cleanup logic. They violate naming conventions (not kebab-case, no date suffix).
+
+4. **data/ Directory is Undocumented in Governance.** The `data/` directory (37 files: LanceDB vector store + SQLite + BM25 index) is actively wired through the code-indexing system but is not mentioned in FILE_PLACEMENT_RULES.md or workspace-conventions.md.
+
+5. **Windows Reserved Filename Violation.** A `nul` file (0 bytes) exists at the context root. This violates workspace-conventions.md forbidden names list and can cause issues on Windows NTFS.
+
+6. **Root Cause of Context Bloat.** No artifact lifecycle management exists. Files are created but never reviewed, archived, or deleted. Unlike configs (Pipeline #10 added aggregate validation), context files have no CI validation for orphaned content. The QA skill, deployment-docs, code-styleguides, audit-logs, and risk-assessments all have near-zero active consumers.
+
+### Wiring Assessment Patterns
+
+- **Fully wired (97%+ average):** memory/, runtime/, metrics/, code-index/ -- these are the operational core
+- **Good but with gaps (75-85%):** config/, reports/, data/, teams/, self-healing/
+- **Poorly wired (30-40%):** plans/ (7 orphaned dirs), artifacts/ (10 undocumented subdirs, ~45 dead files)
+
+### Context System Audit Pattern
+
+**How to audit a context subdirectory:**
+1. Glob all files in the directory
+2. For each file, grep the entire `.claude/` for the filename (not just path)
+3. Count consumers (0 = dead, 1-3 = low, 4+ = healthy)
+4. Cross-reference with FILE_PLACEMENT_RULES.md (is it documented?)
+5. Check naming against workspace-conventions.md (kebab-case, date suffix, provenance header)
+6. Flag hash-named directories as orphaned QA artifacts
+
+**Evidence:**
+- Architecture report: `.claude/context/reports/architecture/context-system-audit-2026-02-07.md`
+- Decision: ADR-094 (Context System Deep Dive)
+- Audited: 371 files, 57 directories, 14 artifact subdirectories
+
+### Security Assessment Findings (Context Data Layer)
+
+**Security Score: 72/100** -- APPROVED WITH CONDITIONS
+
+1. **Inconsistent `safeJSONParse()` Usage (HIGH).** `router-state.cjs` implements prototype pollution prevention via `safeJSONParse()` (strips `__proto__`, `constructor`, `prototype` keys), but `task-status-enforcement.cjs` uses plain `JSON.parse()` without this protection. All hooks consuming JSON state files must use the safe variant. Pattern: extract `safeJSONParse` to a shared utility in `.claude/lib/utils/` and import everywhere.
+
+2. **Reflection Spawn Prompt Injection (HIGH).** `reflection-queue-processor.cjs` `generateSpawnRequest()` builds agent prompts from queue entries without content sanitization. A malicious or corrupted queue entry could inject instructions into reflection agent prompts. Fix: sanitize `entry.trigger`, `entry.taskId`, and `entry.context` before interpolation into prompt strings.
+
+3. **Memory File Write Protection Missing (HIGH).** `constitution.md` and `behaviour.md` in `memory/` are read by every spawned agent and injected into prompts via `spawn-prompt-assembler.cjs`. Any agent with Write access can modify these files, altering all future agent behavior. Fix: add file integrity checks (hash verification) before injection into spawn prompts.
+
+4. **Runtime State Lacks Schema Validation (MEDIUM).** State files (`router-state.json`, `task-status.json`, `workflow-state.json`, `reflection-spawn-request.json`) are consumed by hooks and routing logic without JSON Schema validation on read. Malformed state causes silent failures or unexpected behavior. Fix: add schema validation using existing `.claude/schemas/` infrastructure.
+
+5. **No Secrets Found in Context Files.** Comprehensive scan for credential patterns (api_key, secret, password, bearer, sk-, ghp_, AKIA, eyJ) found zero actual secrets across all context files. Only documentation placeholders (`"..."`, `"${EXA_API_KEY}"`) exist. This is a positive finding.
+
+6. **Executable Code in tmp/ Directory (MEDIUM).** `verify-hooks.cjs` in `.claude/context/tmp/` is executable code in a directory designed for temporary text. The `.gitignore` only covers `*.txt` in tmp/. Fix: move to `scripts/validation/`, update `.gitignore` to `tmp/*` with whitelist for `.gitkeep`.
+
+7. **Spawn Log Traceability is Good.** `spawn-log.jsonl` captures task_id, agent_type, prompt_length, session_id, timestamps for every spawn. No secrets or PII leak into logs. Rotation via `trimJsonlFile()` prevents unbounded growth.
+
+**Report**: `.claude/context/reports/security/context-security-review-2026-02-07.md`
+**Findings**: 3 HIGH, 5 MEDIUM, 5 LOW
+**Status**: APPROVED WITH CONDITIONS (fix P1 HIGH findings before production)
+
+---
+
+## Task #113: Documentation and Governance Updates (2026-02-07, Pipeline #12)
+
+**Pattern:** After comprehensive system audits that discover missing documentation, update governance files in a single focused task rather than leaving documentation drift.
+
+**Key Updates:**
+1. **FILE_PLACEMENT_RULES.md**: Added ALL missing context subdirectories (data/, memory/metrics/archive/named/stm/mtm/ltm/, artifacts/diagrams/error-reports/error-summaries/specs/, code-index/, self-healing/, teams/). This prevents future "undocumented directory" findings.
+
+2. **workspace-conventions.md**: Added data/ directory reference for code indexing data (LanceDB, SQLite, BM25). Fixed tmp/ cleanup claim from "Auto-cleaned after 24 hours" to "Manual cleanup only" (reflects reality per audit findings).
+
+3. **reports/README.md**: File was already rewritten with accurate structure (architecture/, qa/, security/, reflections/ subdirectories), concrete examples, and current statistics (96 reports).
+
+4. **active_context.md**: File was already updated with current framework state (49 agents, ~30 skills, Pipeline #12 in progress). Removed stale claims like "434+ skills" and "no active task".
+
+5. **decisions.md (ADR-094)**: Changed status from "Proposed" to "Accepted (P1 Implementation Complete: 2026-02-07)" and added detailed implementation notes referencing Tasks #112 and #113. This completes the ADR lifecycle.
+
+**Why Consolidation Matters:**
+- Documentation updates scattered across multiple tasks lead to partial coverage
+- Single governance update task ensures all related files are synchronized
+- Prevents future audits from rediscovering the same gaps
+
+**Verification:**
+- All acceptance criteria met via targeted grep checks
+- No duplicate entries remain in FILE_PLACEMENT_RULES.md
+- All files reference current state (no stale claims)
+
+**Evidence:**
+- Task #113 acceptance criteria: 6/6 verified
+- Files modified: 4 (FILE_PLACEMENT_RULES.md, workspace-conventions.md, decisions.md) + 1 already updated (reports/README.md, active_context.md)
+- Commit: includes provenance and references ADR-094
+
+---
