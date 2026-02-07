@@ -350,6 +350,7 @@ function validatePrompt(prompt) {
 
 /**
  * Check if spawn is to an orchestrator (which has different requirements)
+ * SEC-TMPL-002 FIX: Only match on subagent_type, not description (prevents bypass)
  * @param {Object} toolInput - Task tool input
  * @returns {boolean} True if spawning orchestrator
  */
@@ -359,12 +360,14 @@ function isOrchestratorSpawn(toolInput) {
     'evolution-orchestrator',
     'swarm-coordinator',
     'party-orchestrator',
+    'router', // router is also an orchestrator type
   ];
 
-  const description = (toolInput.description || '').toLowerCase();
-  const subagentType = (toolInput.subagent_type || '').toLowerCase();
+  // SEC-TMPL-002 FIX: Only check subagent_type (exact match), not description
+  // Description can be manipulated by users to bypass validation
+  const subagentType = (toolInput.subagent_type || '').trim().toLowerCase();
 
-  return orchestratorTypes.some(orch => description.includes(orch) || subagentType.includes(orch));
+  return orchestratorTypes.some(orch => subagentType.includes(orch));
 }
 
 /**

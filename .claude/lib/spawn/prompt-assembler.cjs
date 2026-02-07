@@ -94,6 +94,17 @@ function getPresetRuleSnippet(presetId, projectRoot = PROJECT_ROOT) {
   if (!preset?.ruleSnippetPath) return '';
   try {
     const snippetPath = path.resolve(projectRoot, preset.ruleSnippetPath);
+
+    // SEC-TMPL-001 FIX: Validate resolved path stays within projectRoot
+    const normalizedProjectRoot = path.normalize(projectRoot);
+    const normalizedSnippetPath = path.normalize(snippetPath);
+
+    // Check if snippetPath starts with projectRoot (path traversal protection)
+    if (!normalizedSnippetPath.startsWith(normalizedProjectRoot + path.sep) &&
+        normalizedSnippetPath !== normalizedProjectRoot) {
+      return ''; // Block path traversal
+    }
+
     if (!fs.existsSync(snippetPath)) return '';
     return fs.readFileSync(snippetPath, 'utf-8').trim();
   } catch (_e) {

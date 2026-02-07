@@ -4,6 +4,20 @@
 **Scope**: {{scope}}
 **Agent**: {{agent}}
 
+## Executive Summary
+
+{{executive_summary}}
+
+**Key Findings:**
+
+- {{finding_1}}
+- {{finding_2}}
+- {{finding_3}}
+
+**Verdict:** {{verdict}}
+
+---
+
 ## Quality Assessment
 
 | Criterion     | Score (0-1)       | Notes                   |

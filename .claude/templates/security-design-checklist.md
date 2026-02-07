@@ -249,6 +249,246 @@ If STRIDE analysis reveals gaps, create new security controls:
 
 ---
 
+## DREAD Risk Scoring
+
+DREAD is a risk assessment model for prioritizing security threats. Score each STRIDE threat using the 5 DREAD factors (scale: 1-10).
+
+### DREAD Scoring Table
+
+For each threat identified in STRIDE analysis, calculate DREAD score:
+
+| Factor                  | Score (1-10) | Description                                                  |
+| ----------------------- | ------------ | ------------------------------------------------------------ |
+| **D**amage Potential    | 1-10         | How much damage will be caused if exploited?                 |
+| **R**eproducibility     | 1-10         | How easy is it to reproduce the attack?                      |
+| **E**xploitability      | 1-10         | How much effort is required to exploit?                      |
+| **A**ffected Users      | 1-10         | How many users will be impacted?                             |
+| **D**iscoverability     | 1-10         | How easy is it to discover the vulnerability?                |
+| **TOTAL DREAD Score**   | Sum / 5      | Average score (1-10). Higher score = higher priority fix.   |
+
+### Scoring Guidelines
+
+**Damage Potential (1-10):**
+
+- 10: Complete system compromise, data loss, legal liability
+- 7-9: Significant data breach, unauthorized access
+- 4-6: Limited data exposure, service disruption
+- 1-3: Minor annoyance, cosmetic issues
+
+**Reproducibility (1-10):**
+
+- 10: Works every time, trivial to reproduce
+- 7-9: Works most of the time with standard tools
+- 4-6: Requires specific conditions or timing
+- 1-3: Very difficult to reproduce, race conditions
+
+**Exploitability (1-10):**
+
+- 10: No authentication, automated tools available
+- 7-9: Basic skills required, public exploits exist
+- 4-6: Advanced skills, custom tools needed
+- 1-3: Expert skills, deep system knowledge required
+
+**Affected Users (1-10):**
+
+- 10: All users, entire system
+- 7-9: Majority of users, critical features
+- 4-6: Subset of users, specific features
+- 1-3: Individual users, edge cases
+
+**Discoverability (1-10):**
+
+- 10: Publicly documented, easily found
+- 7-9: Discoverable with basic scanning
+- 4-6: Requires source code analysis
+- 1-3: Obscure, requires deep knowledge
+
+### Example DREAD Scoring
+
+**Threat:** Template injection attack (STRIDE: Tampering)
+
+| Factor              | Score | Reasoning                                              |
+| ------------------- | ----- | ------------------------------------------------------ |
+| Damage              | 9     | Could execute arbitrary code                           |
+| Reproducibility     | 10    | Works every time with malicious template               |
+| Exploitability      | 7     | Requires understanding of template syntax              |
+| Affected Users      | 8     | All users of template rendering feature                |
+| Discoverability     | 6     | Requires code review or fuzzing to find                |
+| **DREAD Score**     | 8.0   | **HIGH PRIORITY** - Implement token whitelist controls |
+
+**Priority Mapping:**
+
+- **Critical (9-10):** Fix immediately, block release
+- **High (7-8.9):** Fix in current sprint
+- **Medium (4-6.9):** Fix in next sprint
+- **Low (1-3.9):** Backlog, fix when capacity allows
+
+---
+
+## OWASP ASVS (Application Security Verification Standard) References
+
+ASVS provides a framework for testing web application security controls. Map each STRIDE threat to relevant ASVS verification requirements.
+
+### ASVS Categories (V1-V14)
+
+| Category | Description                         | STRIDE Mapping           |
+| -------- | ----------------------------------- | ------------------------ |
+| **V1**   | Architecture, Design and Modeling   | All categories           |
+| **V2**   | Authentication                      | S (Spoofing)             |
+| **V3**   | Session Management                  | S (Spoofing), E (Elevation) |
+| **V4**   | Access Control                      | E (Elevation of Privilege) |
+| **V5**   | Validation, Sanitization, Encoding  | T (Tampering), I (Info Disclosure) |
+| **V6**   | Stored Cryptography                 | I (Information Disclosure) |
+| **V7**   | Error Handling and Logging          | R (Repudiation), I (Info Disclosure) |
+| **V8**   | Data Protection                     | I (Information Disclosure) |
+| **V9**   | Communication                       | I (Information Disclosure) |
+| **V10**  | Malicious Code                      | T (Tampering)            |
+| **V11**  | Business Logic                      | T (Tampering), E (Elevation) |
+| **V12**  | Files and Resources                 | T (Tampering), D (DoS)   |
+| **V13**  | API and Web Service                 | All categories           |
+| **V14**  | Configuration                       | E (Elevation), D (DoS)   |
+
+### STRIDE to ASVS Mapping
+
+#### S - Spoofing → V2 (Authentication) + V3 (Session Management)
+
+**Relevant ASVS Requirements:**
+
+- **V2.1:** Password security
+- **V2.2:** General authenticator security
+- **V2.7:** Out of band verifier security
+- **V3.2:** Session binding
+- **V3.3:** Session timeout
+
+**Example Verification:**
+
+- V2.1.1: Verify passwords are at least 12 characters
+- V2.2.1: Verify anti-automation controls (CAPTCHA, rate limiting)
+- V3.2.1: Verify session tokens generated by framework
+
+#### T - Tampering → V5 (Validation) + V10 (Malicious Code)
+
+**Relevant ASVS Requirements:**
+
+- **V5.1:** Input validation
+- **V5.2:** Sanitization and sandboxing
+- **V5.3:** Output encoding
+- **V10.3:** Application integrity
+
+**Example Verification:**
+
+- V5.1.1: Verify input validation for all user inputs
+- V5.2.1: Verify sanitization of user-supplied SVG/HTML
+- V5.3.1: Verify output encoding for XSS prevention
+
+#### R - Repudiation → V7 (Error Handling and Logging)
+
+**Relevant ASVS Requirements:**
+
+- **V7.1:** Log content
+- **V7.2:** Log processing
+- **V7.3:** Log protection
+
+**Example Verification:**
+
+- V7.1.1: Verify security-relevant events are logged
+- V7.2.1: Verify logs contain sufficient detail for investigation
+- V7.3.1: Verify logs are protected from unauthorized access
+
+#### I - Information Disclosure → V6 (Cryptography) + V8 (Data Protection)
+
+**Relevant ASVS Requirements:**
+
+- **V6.2:** Algorithms
+- **V8.1:** General data protection
+- **V8.3:** Sensitive private data
+
+**Example Verification:**
+
+- V6.2.1: Verify approved cryptographic algorithms
+- V8.1.1: Verify sensitive data encrypted at rest
+- V8.3.4: Verify sensitive data not logged
+
+#### D - Denial of Service → V12 (Files and Resources) + V14 (Configuration)
+
+**Relevant ASVS Requirements:**
+
+- **V12.1:** File upload
+- **V12.5:** File download
+- **V14.4:** HTTP security headers
+
+**Example Verification:**
+
+- V12.1.1: Verify file upload size limits
+- V12.5.1: Verify file download size limits
+- V14.4.3: Verify rate limiting headers
+
+#### E - Elevation of Privilege → V4 (Access Control)
+
+**Relevant ASVS Requirements:**
+
+- **V4.1:** General access control
+- **V4.2:** Operation level access control
+- **V4.3:** Other access control considerations
+
+**Example Verification:**
+
+- V4.1.1: Verify principle of least privilege
+- V4.2.1: Verify access control enforced on every request
+- V4.3.1: Verify administrative functions isolated
+
+### Using ASVS in Security Assessment
+
+**Step 1:** Identify STRIDE threats (see STRIDE section above)
+
+**Step 2:** Map each threat to ASVS categories
+
+**Step 3:** Select relevant ASVS requirements from categories
+
+**Step 4:** Verify implementation meets ASVS requirements
+
+**Example Security Assessment with ASVS:**
+
+```markdown
+## Security Assessment (STRIDE + ASVS)
+
+**Artifact**: User authentication system
+
+### S - Spoofing
+
+- **Threat**: Credential stuffing attacks
+- **DREAD Score**: 8.5 (High)
+- **ASVS Category**: V2 (Authentication)
+- **Requirements**:
+  - V2.2.1: Anti-automation controls (rate limiting)
+  - V2.2.3: Credential recovery not vulnerable to account enumeration
+- **Mitigation**: Implement rate limiting (5 attempts/minute)
+
+### T - Tampering
+
+- **Threat**: Session token manipulation
+- **DREAD Score**: 9.0 (Critical)
+- **ASVS Category**: V3 (Session Management)
+- **Requirements**:
+  - V3.2.1: Session tokens generated by secure framework
+  - V3.5.1: Session tokens invalidated on logout
+- **Mitigation**: Use framework-generated tokens, implement logout
+
+### R - Repudiation
+
+- **Threat**: No audit trail for login attempts
+- **DREAD Score**: 6.5 (Medium)
+- **ASVS Category**: V7 (Logging)
+- **Requirements**:
+  - V7.1.1: Log authentication successes and failures
+  - V7.2.1: Logs contain user ID, timestamp, outcome
+- **Mitigation**: Implement security event logging
+```
+
+**ASVS Reference**: [OWASP ASVS v4.0](https://owasp.org/www-project-application-security-verification-standard/)
+
+---
+
 ## OWASP Top 10 Quick Reference
 
 For deeper security analysis, cross-reference with OWASP Top 10:

@@ -62,6 +62,37 @@ Use when creating multi-agent orchestration patterns.
 - `operations/` - Operational workflows (incident response, deployment)
 - Root level - Simpler single-purpose workflows
 
+### Spawn Templates (`spawn/`)
+
+Agent spawning templates for router delegation.
+
+**Available:**
+
+- `universal-agent-spawn.md` - Standard agent spawning template (haiku/sonnet/opus)
+- `orchestrator-spawn.md` - Orchestrator agent spawning (requires Task tool + opus model)
+- `subordinate-once.md` - One-shot subordinate task spawning (respond once, no delegation)
+- `agent-identity-integration.md` - Agent spawning with personality frontmatter integration
+
+**Usage:**
+
+Router loads these templates via `.claude/templates/spawn/universal-agent-spawn.md` and substitutes placeholders before spawning agents. See CLAUDE.md Section 2 for spawn protocol.
+
+### Report Templates (`reports/`)
+
+Structured report output templates for agent deliverables.
+
+**Available:**
+
+- `audit-report-template.md` - QA and security audit reports
+- `implementation-report-template.md` - Developer implementation summaries and completion reports
+- `plan-template.md` - Planner output reports and implementation plans
+- `reflection-report-template.md` - Reflection agent analysis and learning extraction
+- `research-report-template.md` - Research synthesis reports with citations
+
+**Usage:**
+
+Agents copy these templates to `.claude/context/reports/<category>/` and fill in sections. Reports follow workspace conventions with provenance headers and ISO date suffixes.
+
 ### Code Style Templates (`code-styles/`)
 
 Language-specific coding style guidelines.
@@ -71,11 +102,10 @@ Language-specific coding style guidelines.
 - `python.md` - Python style guidelines
 - `typescript.md` - TypeScript style guidelines
 - `javascript.md` - JavaScript style guidelines
-- `go.md` - Go style guidelines
-- `dart.md` - Dart style guidelines
-- `csharp.md` - C# style guidelines
-- `html-css.md` - HTML/CSS style guidelines
-- `general.md` - General coding principles
+
+**Archived:**
+
+Other language styles (dart, csharp, go, html-css, general) archived to `_archive/code-styles/` due to lack of usage in current project.
 
 ### Hook Templates (`hooks/`) - Future
 
@@ -341,17 +371,65 @@ This ensures agents automatically load institutional memory.
 
 ## Quick Reference
 
-| Creating      | Template                         | CLAUDE.md Section         | Output Path                                 |
-| ------------- | -------------------------------- | ------------------------- | ------------------------------------------- |
-| Agent         | `agents/agent-template.md`       | Section 3 (Routing Table) | `.claude/agents/<category>/`                |
-| Skill         | `skills/skill-template.md`       | Section 8.5 (Skills)      | `.claude/skills/<name>/SKILL.md`            |
-| Workflow      | `workflows/workflow-template.md` | Section 3 (Workflows)     | `.claude/workflows/<category>/`             |
-| Specification | `specification-template.md`      | N/A                       | `.claude/context/artifacts/specifications/` |
-| Plan          | `plan-template.md`               | N/A                       | `.claude/context/plans/`                    |
-| Tasks         | `tasks-template.md`              | N/A                       | `.claude/context/artifacts/plans/`          |
-| Hook          | `hooks/<hook-type>.md`           | N/A                       | `.claude/hooks/<category>/`                 |
-| Code Pattern  | `code/<language>-<pattern>.md`   | N/A                       | Project source                              |
-| Schema        | `schemas/<schema-type>.md`       | N/A                       | `.claude/schemas/`                          |
+| Creating      | Template                         | CLAUDE.md Section         | Output Path                                 | Count |
+| ------------- | -------------------------------- | ------------------------- | ------------------------------------------- | ----- |
+| Agent         | `agents/agent-template.md`       | Section 3 (Routing Table) | `.claude/agents/<category>/`                | 1     |
+| Skill         | `skills/skill-template.md`       | Section 8.5 (Skills)      | `.claude/skills/<name>/SKILL.md`            | 1     |
+| Workflow      | `workflows/workflow-template.md` | Section 3 (Workflows)     | `.claude/workflows/<category>/`             | 1     |
+| Spawn         | `spawn/<spawn-type>.md`          | Section 2 (Spawning)      | Used by router (not copied)                 | 4     |
+| Report        | `reports/<report-type>.md`       | N/A                       | `.claude/context/reports/<category>/`       | 5     |
+| Specification | `specification-template.md`      | N/A                       | `.claude/context/artifacts/specifications/` | 1     |
+| Plan          | `plan-template.md`               | N/A                       | `.claude/context/plans/`                    | 1     |
+| Tasks         | `tasks-template.md`              | N/A                       | `.claude/context/artifacts/plans/`          | 1     |
+| Code Style    | `code-styles/<language>.md`      | N/A                       | Used as reference (not copied)              | 3     |
+| Hook          | `hooks/<hook-type>.md`           | N/A                       | `.claude/hooks/<category>/`                 | 0     |
+| Code Pattern  | `code/<language>-<pattern>.md`   | N/A                       | Project source                              | 0     |
+| Schema        | `schemas/<schema-type>.md`       | N/A                       | `.claude/schemas/`                          | 0     |
+
+## Template Catalog
+
+For the complete template catalog with agent assignments and cross-references, see:
+
+**Catalog:** `.claude/context/artifacts/catalogs/template-catalog.md`
+
+This catalog provides:
+- Full template inventory with descriptions
+- Agent assignment matrix (which agents use which templates)
+- Template dependencies and relationships
+- Usage statistics and recommendations
+
+## Archived Templates
+
+Templates no longer actively used are preserved in `.claude/templates/_archive/`.
+
+**Archival Date:** 2026-02-07
+**Reason:** Template system overhaul (Task #66) - removing dead templates per architecture audit
+
+See `_archive/README.md` for the complete archive index with archival reasons and restoration instructions.
+
+### Restoration
+
+To restore an archived template:
+
+```bash
+# Restore specific template to original location
+git mv .claude/templates/_archive/spawn/bash-safe-background.md .claude/templates/spawn/
+
+# Restore all templates in a category
+git mv .claude/templates/_archive/planning/*.md .claude/templates/planning/
+```
+
+**Important:** Restoring via `git mv` preserves full git history, just like the original archival.
+
+### Archived Content Summary
+
+- **Spawn templates** (2): bash-safe-background.md, router-task-template.md (superseded by universal-agent-spawn.md)
+- **Planning templates** (3): findings.md, progress.md, task_plan.md (unused)
+- **Code styles** (3): dart.md, csharp.md, go.md (no corresponding code in project)
+- **Examples** (2): example-adr-050.md, example-specification.md (unused)
+- **Other** (4): claude-md-template.md, project-brief.md, prd.md, ui-spec.md (unused)
+
+**Deleted (not archived):** html-css.md, general.md (overlapped with `.claude/rules/coding-style.md`)
 
 ## Creator Skills
 
@@ -359,4 +437,7 @@ This ensures agents automatically load institutional memory.
 | ------------ | ------------------ | -------------------------------------- |
 | New agent    | `agent-creator`    | `Skill({ skill: 'agent-creator' })`    |
 | New skill    | `skill-creator`    | `Skill({ skill: 'skill-creator' })`    |
+| New workflow | `workflow-creator` | `Skill({ skill: 'workflow-creator' })` |
+| New hook     | `hook-creator`     | `Skill({ skill: 'hook-creator' })`     |
 | New template | `template-creator` | `Skill({ skill: 'template-creator' })` |
+| New schema   | `schema-creator`   | `Skill({ skill: 'schema-creator' })`   |

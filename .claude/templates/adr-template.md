@@ -25,6 +25,10 @@ supersedes: ''
 # Example: "ADR-050"
 superseded_by: ''
 
+# [OPTIONAL] List of decision makers who approved this ADR (MADR field)
+# Example: ["Tech Lead", "Architect", "Engineering Manager"]
+deciders: []
+
 # [OPTIONAL] List of stakeholders involved in or affected by this decision
 # Example: ["Engineering Team", "Product Manager", "DevOps"]
 stakeholders: []

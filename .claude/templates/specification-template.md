@@ -375,7 +375,56 @@ This specification defines the requirements for implementing {{FEATURE_NAME}}.
 - **{{Dependency Name}}**: [What must be completed/available]
 - **{{Dependency Name}}**: [What must be completed/available]
 
-## 9. Future Enhancements
+## 9. Deployment
+
+<!-- [REQUIRED for production features] Document deployment strategy and requirements -->
+
+### 9.1 Deployment Strategy
+
+<!-- Deployment approach: blue-green, canary, rolling, etc. -->
+
+- **Strategy**: [Blue-Green | Canary | Rolling | Big Bang]
+- **Rollout Plan**: [Step-by-step deployment plan]
+- **Traffic Shifting**: [How traffic is gradually shifted to new version]
+
+### 9.2 Environment Requirements
+
+<!-- Infrastructure and environment requirements for deployment -->
+
+**Production Environment:**
+
+- [Infrastructure requirement 1]
+- [Infrastructure requirement 2]
+- [Infrastructure requirement 3]
+
+**Staging Environment:**
+
+- [Staging-specific requirements]
+
+**Development Environment:**
+
+- [Dev-specific requirements]
+
+### 9.3 Rollback Plan
+
+<!-- Detailed rollback procedure in case of deployment failure -->
+
+**Rollback Triggers:**
+
+- [Condition that triggers rollback 1]
+- [Condition that triggers rollback 2]
+
+**Rollback Steps:**
+
+1. [Rollback step 1]
+2. [Rollback step 2]
+3. [Rollback step 3]
+
+**Rollback Time:** [Expected time to complete rollback]
+
+**Data Recovery:** [How to recover data if needed]
+
+## 10. Future Enhancements
 
 <!-- [OPTIONAL] Document features deferred to future versions -->
 
@@ -383,7 +432,7 @@ This specification defines the requirements for implementing {{FEATURE_NAME}}.
 - [Future enhancement 2: brief description]
 - [Future enhancement 3: brief description]
 
-## 10. Acceptance Criteria (Summary)
+## 11. Acceptance Criteria (Summary)
 
 <!-- [REQUIRED] Recap all acceptance criteria with checkboxes -->
 
@@ -391,7 +440,7 @@ This specification defines the requirements for implementing {{FEATURE_NAME}}.
 ✅ **AC-002**: [Acceptance criteria 2 from frontmatter]
 ✅ **AC-003**: [Acceptance criteria 3 from frontmatter]
 
-## 11. Glossary
+## 12. Glossary
 
 <!-- [OPTIONAL] Comprehensive glossary of technical terms -->
 

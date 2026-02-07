@@ -7,6 +7,27 @@ const {
 } = require('../config/resolve-runtime-context.cjs');
 const { ToolSet } = require('../tools/tool-set.cjs');
 
+/**
+ * SEC-TMPL-004 FIX: Sanitize substitution values to prevent recursive placeholder injection
+ * Replaces {{ with { { and }} with } } to prevent nested placeholder expansion
+ * Uses loop to handle overlapping patterns (e.g., {{{{ → { { { {)
+ * @param {string} value - Value to sanitize
+ * @returns {string} Sanitized value
+ */
+function sanitizeSubstitutionValue(value) {
+  if (!value || typeof value !== 'string') return value;
+
+  let result = value;
+  // Loop until no more {{ or }} patterns exist (handles overlapping)
+  while (result.includes('{{') || result.includes('}}')) {
+    const prev = result;
+    result = result.replace(/\{\{/g, '{ {').replace(/\}\}/g, '} }');
+    if (result === prev) break; // Safety: prevent infinite loop
+  }
+
+  return result;
+}
+
 function normalizeModeNames(modeNames) {
   if (!Array.isArray(modeNames)) return [];
   return modeNames.map(mode => String(mode).trim()).filter(Boolean);
@@ -49,12 +70,17 @@ function buildContextModePrompt(options = {}) {
   let fragmentBody = [contextPrompt, modePrompts].filter(Boolean).join('\n\n').trim();
 
   if (fragmentBody) {
+    // SEC-TMPL-004 FIX: Sanitize values before substitution to prevent nested {{placeholder}} injection
+    const sanitizedToolNames = sanitizeSubstitutionValue(activeToolNames.join(', '));
+    const sanitizedContextPrompt = sanitizeSubstitutionValue(contextPrompt);
+    const sanitizedModePrompts = sanitizeSubstitutionValue(modePrompts);
+
     fragmentBody = fragmentBody.replace(
       /\{\{\s*available_tools\s*\}\}/gi,
-      activeToolNames.join(', ')
+      sanitizedToolNames
     );
-    fragmentBody = fragmentBody.replace(/\{\{\s*context_system_prompt\s*\}\}/gi, contextPrompt);
-    fragmentBody = fragmentBody.replace(/\{\{\s*mode_system_prompts\s*\}\}/gi, modePrompts);
+    fragmentBody = fragmentBody.replace(/\{\{\s*context_system_prompt\s*\}\}/gi, sanitizedContextPrompt);
+    fragmentBody = fragmentBody.replace(/\{\{\s*mode_system_prompts\s*\}\}/gi, sanitizedModePrompts);
   }
 
   const promptFragment = fragmentBody ? `## Context / Mode\n\n${fragmentBody}` : '';
@@ -71,4 +97,5 @@ function buildContextModePrompt(options = {}) {
 
 module.exports = {
   buildContextModePrompt,
+  sanitizeSubstitutionValue, // Export for testing (SEC-TMPL-004)
 };

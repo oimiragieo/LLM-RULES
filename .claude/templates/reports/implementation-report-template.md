@@ -4,6 +4,20 @@
 **Developer**: {{agent}}
 **Task ID**: {{task_id}}
 
+## Executive Summary
+
+{{executive_summary}}
+
+**Key Outcomes:**
+
+- {{outcome_1}}
+- {{outcome_2}}
+- {{outcome_3}}
+
+**Recommendation:** {{recommendation}}
+
+---
+
 ## Summary
 
 {{summary}}

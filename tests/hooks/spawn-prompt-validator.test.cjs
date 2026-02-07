@@ -302,8 +302,8 @@ describe('safeRegexTest() - VULN-002', () => {
 // =============================================================================
 
 describe('isOrchestratorSpawn()', () => {
-  test('should detect master-orchestrator in description', () => {
-    const toolInput = { description: 'master-orchestrator coordinating' };
+  test('should detect master-orchestrator in subagent_type', () => {
+    const toolInput = { subagent_type: 'master-orchestrator' };
     assert.strictEqual(isOrchestratorSpawn(toolInput), true);
   });
 
@@ -312,14 +312,23 @@ describe('isOrchestratorSpawn()', () => {
     assert.strictEqual(isOrchestratorSpawn(toolInput), true);
   });
 
-  test('should detect swarm-coordinator', () => {
-    const toolInput = { description: 'swarm-coordinator managing agents' };
+  test('should detect swarm-coordinator in subagent_type', () => {
+    const toolInput = { subagent_type: 'swarm-coordinator' };
     assert.strictEqual(isOrchestratorSpawn(toolInput), true);
   });
 
-  test('should detect party-orchestrator', () => {
-    const toolInput = { description: 'party-orchestrator facilitating discussion' };
+  test('should detect party-orchestrator in subagent_type', () => {
+    const toolInput = { subagent_type: 'party-orchestrator' };
     assert.strictEqual(isOrchestratorSpawn(toolInput), true);
+  });
+
+  test('should NOT detect orchestrator names in description (SEC-TMPL-002)', () => {
+    // After SEC-TMPL-002 fix, description field is no longer checked
+    const toolInput = {
+      subagent_type: 'developer',
+      description: 'master-orchestrator coordinating',
+    };
+    assert.strictEqual(isOrchestratorSpawn(toolInput), false);
   });
 
   test('should not detect regular developer', () => {

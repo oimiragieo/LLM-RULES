@@ -9,7 +9,7 @@ tools: [Read, Write, Edit, Bash, Glob, Grep]
 # Phase 1 Integration: Template tools validated against .claude/config/tool-manifest.json
 # Templates should reference tools from the manifest for consistency
 # Single source of truth: .claude/config/tool-manifest.json
-assigned_agents: []
+assigned_agents: [planner, architect, developer]
 best_practices:
   - Include all required fields with placeholders
   - Add documentation comments in templates
@@ -73,14 +73,17 @@ Templates ensure consistency across the multi-agent framework. This skill create
 
 ## Template Types
 
-| Type     | Location                       | Purpose                          | Key Fields                              |
-| -------- | ------------------------------ | -------------------------------- | --------------------------------------- |
-| Agent    | `.claude/templates/agents/`    | Agent definition templates       | name, description, tools, skills, model, enforcement_hooks, related_workflows |
-| Skill    | `.claude/templates/skills/`    | Skill definition templates       | name, version, tools, invoked_by        |
-| Workflow | `.claude/templates/workflows/` | Workflow orchestration templates | phases, agents, dependencies            |
-| Hook     | `.claude/templates/hooks/`     | Hook implementation templates    | trigger, action, validation             |
-| Code     | `.claude/templates/code/`      | Language-specific code patterns  | language, pattern_type                  |
-| Schema   | `.claude/templates/schemas/`   | JSON/YAML schema templates       | properties, required, validation        |
+| Type        | Location                         | Purpose                                     | Key Fields                              |
+| ----------- | -------------------------------- | ------------------------------------------- | --------------------------------------- |
+| Agent       | `.claude/templates/agents/`      | Agent definition templates (2 templates)    | name, description, tools, skills, model, enforcement_hooks, related_workflows |
+| Skill       | `.claude/templates/skills/`      | Skill definition templates (1 template)     | name, version, tools, invoked_by        |
+| Workflow    | `.claude/templates/workflows/`   | Workflow orchestration templates (1 template) | phases, agents, dependencies            |
+| Spawn       | `.claude/templates/spawn/`       | Agent spawn prompt templates (4 templates)  | subagent_type, prompt, model, task_id   |
+| Report      | `.claude/templates/reports/`     | Report document templates (5 templates)     | type, findings, recommendations         |
+| Code Style  | `.claude/templates/code-styles/` | Language style guides (3 templates)         | language, conventions, examples         |
+| Document    | `.claude/templates/` (root)      | General document templates (8+ templates)   | varies by template type                 |
+
+**Note:** Future categories (`hooks/`, `code/`, `schemas/`) can be created when demand arises. Currently no templates exist in these directories.
 
 ## The Iron Law
 
@@ -296,14 +299,20 @@ Write: .claude/templates/skills/<template-name>.md
 # Workflow template
 Write: .claude/templates/workflows/<template-name>.md
 
-# Hook template (create directory if needed)
-mkdir -p .claude/templates/hooks/
-Write: .claude/templates/hooks/<template-name>.md
+# Spawn template
+Write: .claude/templates/spawn/<template-name>.md
 
-# Code template (create directory if needed)
-mkdir -p .claude/templates/code/
-Write: .claude/templates/code/<template-name>.md
+# Report template
+Write: .claude/templates/reports/<template-name>.md
+
+# Code style template
+Write: .claude/templates/code-styles/<template-name>.md
+
+# Document template (root level)
+Write: .claude/templates/<template-name>.md
 ```
+
+**Note:** Future categories (`hooks/`, `code/`, `schemas/`) can be created when demand arises.
 
 ### Step 7: Update Templates README (MANDATORY - BLOCKING)
 
@@ -620,54 +629,53 @@ Skill({ skill: 'hook-creator' });
 
 ## Examples
 
-### Example 1: Creating a Hook Template
+### Example 1: Creating a Report Template
 
-**Request:** "Create a template for pre-execution validation hooks"
+**Request:** "Create a template for security audit reports"
 
 **Process:**
 
-1. **Analyze**: Hook type, validation focus, pre-execution trigger
-2. **Research**: Check existing hooks in `.claude/hooks/`
-3. **Design**: Structure for validation hooks
-4. **Create**: `.claude/templates/hooks/validation-hook-template.md`
+1. **Analyze**: Report type, security focus, audit findings structure
+2. **Research**: Check existing report templates in `.claude/templates/reports/`
+3. **Design**: Structure for security audit reports
+4. **Create**: `.claude/templates/reports/security-audit-report-template.md`
 
 ````markdown
 ---
-# [REQUIRED] Hook identifier, lowercase-with-hyphens
-name: { { HOOK_NAME } }
+# [REQUIRED] Report identifier, lowercase-with-hyphens
+name: { { REPORT_NAME } }
 
-# [REQUIRED] What this hook validates
-description: { { VALIDATION_DESCRIPTION } }
+# [REQUIRED] What this report documents
+description: { { REPORT_DESCRIPTION } }
 
-# [REQUIRED] Options: pre, post
-trigger: pre
+# [REQUIRED] Report type: audit, implementation, research, reflection, plan
+type: audit
 
-# [REQUIRED] Options: block, warn, log
-on_failure: { { ON_FAILURE:block } }
+# [REQUIRED] Severity levels for findings
+severity_levels: [CRITICAL, HIGH, MEDIUM, LOW]
 ---
 
-# {{HOOK_DISPLAY_NAME}} Hook
+# {{REPORT_DISPLAY_NAME}} Report
 
 ## POST-CREATION CHECKLIST (BLOCKING)
 
-After creating this hook:
+After creating this report:
 
-- [ ] Register in `.claude/settings.json`
-- [ ] Test with sample input
-- [ ] Document in hook README
+- [ ] All findings categorized by severity
+- [ ] Recommendations actionable and specific
+- [ ] Evidence provided for all claims
 
-## Validation Logic
+## Findings
 
-```javascript
-// {{VALIDATION_DESCRIPTION}}
-function validate(input) {
-  {
-    {
-      VALIDATION_LOGIC;
-    }
-  }
-}
-```
+### CRITICAL
+{{CRITICAL_FINDINGS}}
+
+### HIGH
+{{HIGH_FINDINGS}}
+
+## Recommendations
+
+{{RECOMMENDATIONS}}
 ````
 
 ## Memory Protocol (MANDATORY)
@@ -677,69 +685,75 @@ function validate(input) {
 
 ````
 
-5. **Update README**: Add hooks section to templates README
+5. **Update README**: Add to reports section in templates README
 6. **Update Memory**: Record in learnings.md
 
-### Example 2: Creating a Code Pattern Template
+### Example 2: Creating a Spawn Template
 
-**Request:** "Create a template for TypeScript API endpoint patterns"
+**Request:** "Create a template for specialized agent spawn prompts"
 
 **Process:**
 
-1. **Analyze**: TypeScript, API endpoint, code scaffolding
-2. **Research**: Check `.claude/templates/code-styles/typescript.md`
-3. **Design**: Structure for endpoint patterns
-4. **Create**: `.claude/templates/code/typescript-api-endpoint.md`
+1. **Analyze**: Agent spawn pattern, specialized vs general-purpose
+2. **Research**: Check `.claude/templates/spawn/universal-agent-spawn.md`
+3. **Design**: Structure for specialized spawn prompts
+4. **Create**: `.claude/templates/spawn/specialized-agent-spawn.md`
 
 ```markdown
 ---
-# [REQUIRED] Pattern identifier
-name: {{PATTERN_NAME}}
+# [REQUIRED] Template identifier
+name: {{TEMPLATE_NAME}}
 
-# [REQUIRED] Language for this pattern
-language: typescript
+# [REQUIRED] Agent type this template spawns
+agent_type: {{AGENT_TYPE}}
 
-# [REQUIRED] Type: endpoint, service, model, utility
-pattern_type: endpoint
+# [REQUIRED] Recommended model: haiku, sonnet, opus
+model: {{MODEL:sonnet}}
 
-# [OPTIONAL] Framework: express, fastify, nestjs
-framework: {{FRAMEWORK:express}}
+# [OPTIONAL] Task complexity level
+complexity: {{COMPLEXITY:medium}}
 ---
 
-# {{PATTERN_DISPLAY_NAME}} Pattern
+# {{AGENT_DISPLAY_NAME}} Spawn Template
 
 ## Usage
 
-Copy this pattern when creating new API endpoints.
+Use this template when spawning {{AGENT_TYPE}} agents.
 
-## Template
+## Spawn Pattern
 
-```typescript
-// {{ENDPOINT_DESCRIPTION}}
-// Route: {{HTTP_METHOD}} {{ROUTE_PATH}}
+```javascript
+Task({
+  subagent_type: '{{AGENT_TYPE}}',
+  model: '{{MODEL}}',
+  task_id: '{{TASK_ID}}',
+  prompt: `
+You are {{AGENT_IDENTITY}}.
 
-import { Request, Response } from '{{FRAMEWORK}}';
-import { {{SERVICE_NAME}} } from '../services/{{SERVICE_FILE}}';
+## Your Task (ID: {{TASK_ID}})
+{{TASK_DESCRIPTION}}
 
-export async function {{HANDLER_NAME}}(req: Request, res: Response) {
-  try {
-    {{HANDLER_LOGIC}}
+## Context
+{{CONTEXT}}
 
-    res.json({ success: true, data: result });
-  } catch (error) {
-    {{ERROR_HANDLING}}
-  }
-}
+## Success Criteria
+{{SUCCESS_CRITERIA}}
+
+## CRITICAL: TaskUpdate Protocol
+FIRST: TaskUpdate({ taskId: "{{TASK_ID}}", status: "in_progress" })
+LAST: TaskUpdate({ taskId: "{{TASK_ID}}", status: "completed" })
+  `
+});
 ````
 
 ## Validation
 
-After using this pattern:
+After using this template:
 
-- [ ] Route registered in router
-- [ ] Input validation added
-- [ ] Error handling implemented
-- [ ] Tests written
+- [ ] task_id is unique and matches prompt
+- [ ] Model matches agent complexity requirements
+- [ ] TaskUpdate protocol included in prompt
+- [ ] Success criteria clearly defined
 
 ```
 
@@ -792,12 +806,17 @@ Before completing template creation:
 This skill outputs to: `.claude/templates/`
 
 Subdirectories by type:
-- `agents/` - Agent definition templates
-- `skills/` - Skill definition templates
-- `workflows/` - Workflow orchestration templates
-- `hooks/` - Hook implementation templates
-- `code/` - Language-specific code patterns
-- `schemas/` - JSON/YAML schema templates
+- `agents/` - Agent definition templates (2 templates)
+- `skills/` - Skill definition templates (1 template)
+- `workflows/` - Workflow orchestration templates (1 template)
+- `spawn/` - Agent spawn prompt templates (4 templates)
+- `reports/` - Report document templates (5 templates)
+- `code-styles/` - Language style guides (3 templates)
+- Root level - General document templates (8+ templates)
+
+**Note:** Future categories (`hooks/`, `code/`, `schemas/`) can be created when demand arises.
+
+**Cross-Reference:** See `.claude/context/artifacts/catalogs/template-catalog.md` for the complete inventory of all templates.
 
 ### Mandatory References
 - **File Placement**: See `.claude/docs/FILE_PLACEMENT_RULES.md`
