@@ -24,17 +24,10 @@ const { spawnSync } = require('child_process');
 // Resolve paths for reliable module loading
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
-const HOOKS_DIR = path.join(PROJECT_ROOT, '.claude', 'hooks');
-const ROUTING_DIR = path.join(HOOKS_DIR, 'routing');
 
 // Helper for lib requires
 function libRequire(modulePath) {
   return require(path.join(LIB_DIR, modulePath));
-}
-
-// Helper for routing requires
-function routingRequire(modulePath) {
-  return require(path.join(ROUTING_DIR, modulePath));
 }
 
 // Import shared utilities
@@ -68,7 +61,7 @@ const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
 
 // Import router state module
-const routerState = routingRequire('router-state.cjs');
+const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 
 // =============================================================================
 // Constants

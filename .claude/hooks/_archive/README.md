@@ -30,9 +30,9 @@ These hooks have been superseded by consolidated versions and are no longer regi
 - `planning-progress-tracker.cjs` - Planning progress tracking (superseded by workflow-state-manager)
 
 ### monitoring/ (3)
-- `error-tracker.cjs` - Error tracking (superseded by error-tracker-hook.cjs)
+- `error-tracker.cjs` - Error tracking library (**RESTORED** to hooks/monitoring/ on 2026-02-06; required by error-tracker-hook.cjs wrapper)
 - `execution-limit-monitor.cjs` - Execution limits (superseded by execution-limit-monitor-hook.cjs)
-- `metrics-collector.cjs` - Metrics collection (superseded by metrics-collector-hook.cjs)
+- `metrics-collector.cjs` - Metrics collection library (**RESTORED** to hooks/monitoring/ on 2026-02-06; required by metrics-collector-hook.cjs wrapper)
 
 ### post-tool-use/ (1)
 - `incremental-indexer.cjs` - Incremental code indexing (superseded by code-index-updater)
