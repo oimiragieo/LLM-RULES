@@ -15,7 +15,7 @@
 import { readFileSync, existsSync, statSync, readdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { resolveConfigPath } from '../../.claude/tools/context/context-path-resolver.mjs';
+import { resolveConfigPath } from '../../.claude/lib/utils/context-path-resolver.mjs';
 
 // Try to import js-yaml, fail loudly if not available
 let yaml;

@@ -18,7 +18,7 @@ try {
   console.warn('⚠️  js-yaml not available, using simple YAML parsing');
 }
 
-import { resolveConfigPath } from '../../.claude/tools/context/context-path-resolver.mjs';
+import { resolveConfigPath } from '../../.claude/lib/utils/context-path-resolver.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

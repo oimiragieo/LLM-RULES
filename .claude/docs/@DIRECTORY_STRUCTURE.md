@@ -154,12 +154,21 @@ lib/
 ├── workflow/
 │   ├── workflow-engine.cjs
 │   ├── workflow-validator.cjs
-│   └── checkpoint-manager.cjs
+│   ├── checkpoint-manager.cjs
+│   ├── decision-handler.mjs (relocated from tools/workflow/)
+│   ├── loop-handler.mjs (relocated from tools/workflow/)
+│   └── workflow-runner.js (relocated from tools/workflow/)
 ├── memory/
 │   ├── memory-manager.cjs
 │   ├── memory-scheduler.cjs
 │   ├── memory-tiers.cjs
 │   └── smart-pruner.cjs
+├── skills/
+│   └── skills-core.js (relocated from tools/runtime/)
+├── coordination/
+│   └── swarm-coordination.cjs (relocated from tools/runtime/)
+├── qa/
+│   └── gate.mjs (relocated from tools/gates/)
 ├── self-healing/
 │   ├── dashboard.cjs
 │   ├── rollback-manager.cjs
@@ -170,6 +179,7 @@ lib/
 │   ├── safe-json.cjs
 │   ├── atomic-write.cjs
 │   ├── state-cache.cjs
+│   ├── context-path-resolver.mjs (relocated from tools/context/)
 │   └── logical-unit-tracker.cjs (Phase 1.5 - git notes-based revert)
 └── integration/
     └── system-registration-handler.cjs
@@ -200,35 +210,61 @@ skills/
 
 ### tools/
 
+**Total Active Tools:** 66 source files (25 archived, 8 relocated to lib/)
+**Boundary Rule:** CLI executables only; library modules go in `.claude/lib/`
+
 ```
 tools/
-├── cli/
-│   ├── doctor.js
-│   ├── validate-agents.js
-│   ├── validate-integration.cjs
-│   ├── kb-search.cjs
-│   ├── cost-report.js
-│   ├── monitoring-dashboard.cjs
-│   ├── init-staging.cjs
-│   ├── git-notes-verify.cjs (audit trail verification and reporting)
-│   └── ...
-├── integrations/
-│   ├── aws/
+├── _archive/               # 25 archived dead tools (git mv preserves history)
+├── cli/                    # CLI validators and utilities
+│   ├── doctor.mjs
+│   ├── validate-agents.mjs
+│   ├── security-lint.cjs
+│   ├── detect-orphans.mjs
+│   ├── validate-commit.mjs
+│   ├── tool_search.mjs
+│   └── git-notes-verify.cjs
+├── analysis/               # Code and project analysis
+│   ├── project-analyzer/
+│   ├── ecosystem-assessor/
+│   ├── find-polluter/
+│   └── repo-rag/
+├── integrations/           # External service connectors
+│   ├── aws-cloud-ops/
 │   ├── github/
-│   └── kubernetes/
-├── analysis/
-│   ├── project-analyzer.js
-│   └── ecosystem-assessor.js
-├── visualization/
-│   ├── diagram-generator.js
-│   └── render-graphs.js
-├── optimization/
-│   ├── token-optimizer.js
-│   └── sequential-thinking.js
-└── runtime/
-    ├── skills-core.js
-    └── swarm-coordination.js
+│   ├── kubernetes-flux/
+│   └── mcp-converter/
+├── optimization/           # Performance tools
+│   ├── token-optimizer/
+│   └── sequential-thinking/
+├── runtime/                # Runtime observability
+│   └── observability/
+├── visualization/          # Diagrams and graphs
+│   └── diagram-generator/
+├── workflow/               # Workflow execution
+│   ├── workflow-context-tracker.mjs
+│   └── workflow-validator.mjs
+├── context/                # Context management
+│   └── context-cleanup.cjs
+├── gates/                  # Quality gates
+│   └── run-agent-framework-integration-headless.mjs
+└── *.mjs                   # Root-level standalone utilities
 ```
+
+**Recently Relocated (2026-02-07):**
+- `skills-core.js` → `lib/skills/`
+- `swarm-coordination.cjs` → `lib/coordination/`
+- `context-path-resolver.mjs` → `lib/utils/`
+- `gate.mjs` → `lib/qa/`
+- `decision-handler.mjs` → `lib/workflow/` (+ SEC-TOOL-001 fix)
+- `loop-handler.mjs` → `lib/workflow/`
+- `workflow-runner.js` → `lib/workflow/`
+
+**Empty directories (archived tools):**
+- `maintenance/` - Files moved to `_archive/` (archive-memory, compact-lancedb)
+- `visualization/render-graphs/` - Moved to `_archive/`
+
+**See:** `.claude/context/artifacts/catalogs/tool-catalog.md` for complete inventory
 
 ### workflows/
 
