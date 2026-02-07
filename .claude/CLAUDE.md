@@ -491,6 +491,7 @@ All external reference files are located in `.claude/docs/`:
 | **@ENVIRONMENT_CONFIG.md**   | Section 8.7            | Environment variable reference |
 | **@DIRECTORY_STRUCTURE.md**  | Section 9              | Directory layout reference     |
 | **@ENFORCEMENT_HOOKS.md**    | Section 1.3            | Hook enforcement details       |
+| **@HOOK_AGENT_MAP.md**       | Section 1.3            | Hook-agent mapping matrix      |
 | **@TASK_TRACKING_GUIDE.md**  | Sections 5.5-5.6       | TaskUpdate best practices      |
 | **@EVOLUTION_WORKFLOW.md**   | Section 4              | EVOLVE workflow details        |
 

@@ -52,7 +52,7 @@ const {
   formatResult,
   auditLog,
 } = libRequire(path.join('utils', 'hook-input.cjs'));
-const routerState = require('./router-state.cjs');
+const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manager.cjs'));
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));

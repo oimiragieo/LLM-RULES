@@ -53,7 +53,7 @@ const CONFIG = {
   ],
 
   // Directories to skip
-  skipDirs: ['node_modules', '.git', 'dist', 'build', 'coverage', '.next', '.nuxt', 'vendor'],
+  skipDirs: ['node_modules', '.git', 'dist', 'build', 'coverage', '.next', '.nuxt', 'vendor', '_archive'],
 
   // Path patterns: do not scan .md files under these (docs/plans/skills/agents - examples only)
   skipMdPaths: ['.claude/docs/', '.claude/context/plans/', '.claude/skills/', '.claude/agents/'],
@@ -367,6 +367,13 @@ function shouldSkipScanning(filePath, content) {
     content.startsWith('/* security-lint-ignore') ||
     content.startsWith('# security-lint-ignore')
   ) {
+    return true;
+  }
+
+  const normalized = normalizePathForMatch(filePath);
+
+  // Skip archived hooks (superseded code, no longer active)
+  if (normalized.includes('/_archive/') || normalized.includes('\\archive\\')) {
     return true;
   }
 

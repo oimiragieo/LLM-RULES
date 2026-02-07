@@ -43,7 +43,7 @@ const {
   auditLog,
   auditSecurityOverride,
 } = require('../../lib/utils/hook-input.cjs');
-const routerState = require('./router-state.cjs');
+const routerState = require('../../lib/routing/router-state.cjs');
 
 // Memory Monitor integration (lazy-loaded to avoid circular dependencies)
 let MemoryMonitor = null;

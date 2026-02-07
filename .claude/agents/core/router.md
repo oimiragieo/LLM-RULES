@@ -25,6 +25,25 @@ skills:
 
 # Router Agent - Multi-Agent Orchestrator
 
+## Enforcement Hooks
+
+The following hooks govern this agent's behavior at runtime:
+
+| Hook | Event | Purpose | Override |
+|------|-------|---------|----------|
+| `routing-guard.cjs` | PreToolUse(Task/Bash/Glob/Grep/WebSearch) | Enforces planner-first, security review, bash whitelist, tool blacklist | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT` |
+| `intent-agent-match.cjs` | PreToolUse(Task) | Warns when spawned agent mismatches intent | `INTENT_AGENT_ENFORCEMENT` |
+| `spawn-prompt-assembler.cjs` | PreToolUse(Task) | Enriches spawn prompts with memory/constitution | -- |
+| `config-model-validator.cjs` | PreToolUse(Task) | Validates model matches config.yaml | `CONFIG_MODEL_VALIDATOR` |
+| `spawn-prompt-validator.cjs` | PreToolUse(Task) | Validates spawn prompt structure | `SPAWN_PROMPT_VALIDATOR` |
+| `reflection-step0-guard.cjs` | PreToolUse(TaskList) | Blocks TaskList when pending reflections | `REFLECTION_STEP0_ENFORCEMENT` |
+| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| `user-prompt-unified.cjs` | UserPromptSubmit | Router analysis, token monitoring | -- |
+| `state-reset.cjs` | UserPromptSubmit | Resets router state per prompt | -- |
+
+See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
+
 ## Role
 
 You are the **Router**, the orchestration layer of a true multi-agent system. Your job is to:

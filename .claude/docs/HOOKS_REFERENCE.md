@@ -1,5 +1,7 @@
 # Hooks and Safety Reference
 
+> **See also:** @HOOK_AGENT_MAP.md for hook-agent mapping matrix
+
 Event handlers that validate, transform, or record actions at specific execution points in the Claude Code framework. Hooks provide defense-in-depth security, enforce routing protocols, and persist memory.
 
 ## What Are Hooks?
@@ -29,14 +31,29 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 
 ```
 .claude/hooks/
-├── safety/           # Security validations, command blocking
+├── _archive/         # Orphan hooks (45 files) - superseded by consolidation
+│   ├── README.md     # Archive documentation
+│   ├── audit/
+│   ├── cost-tracking/
+│   ├── evolution/
+│   ├── git/
+│   ├── memory/
+│   ├── monitoring/
+│   ├── post-tool-use/
+│   ├── reflection/
+│   ├── routing/
+│   ├── safety/
+│   ├── self-healing/
+│   ├── session/
+│   ├── skills/
+│   └── validation/
+├── safety/           # Security validations, command blocking (ACTIVE)
 │   ├── bash-command-validator.cjs
-│   ├── router-write-guard.cjs
-│   ├── tdd-check.cjs
+│   ├── shell-injection-validator.cjs
 │   ├── windows-null-sanitizer.cjs
 │   ├── validate-skill-invocation.cjs
-│   ├── enforce-claude-md-update.cjs
-│   └── validators/   # Command-specific validators
+│   ├── spawn-prompt-validator.cjs
+│   └── validators/   # Validator modules used by bash-command-validator
 │       ├── registry.cjs
 │       ├── network-validators.cjs
 │       ├── shell-validators.cjs
@@ -44,19 +61,47 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 │       ├── filesystem-validators.cjs
 │       ├── git-validators.cjs
 │       └── process-validators.cjs
-├── routing/          # Router enforcement
-│   ├── router-enforcer.cjs   # Not registered in settings.json; routing uses routing-guard and routing-table only
-│   ├── router-mode-reset.cjs
-│   ├── routing-guard.cjs      # consolidated: security-review, task-create, planner-first, router-write
-│   ├── documentation-routing-guard.cjs  # PreToolUse(Task); documentation-related routing checks
-│   ├── agent-context-tracker.cjs   # PostToolUse(Task); sets router state to agent mode, marks PLANNER/SECURITY spawns
-│   └── router-state.cjs (shared state)
-├── memory/           # Memory operations
-│   ├── format-memory.cjs
-│   └── (archived: session-end-recorder.cjs, session-memory-extractor.cjs, extract-workflow-learnings.cjs → .claude/archive/hooks/memory/)
-└── session/          # Session management
-    └── memory-reminder.cjs
+├── routing/          # Router enforcement (ACTIVE)
+│   ├── routing-guard.cjs
+│   ├── intent-agent-match.cjs
+│   ├── spawn-prompt-assembler.cjs
+│   ├── pre-task-unified.cjs
+│   ├── config-model-validator.cjs
+│   ├── tool-scope-validator.cjs
+│   ├── task-status-enforcement.cjs
+│   ├── post-task-unified.cjs
+│   ├── task-list-tracker.cjs
+│   ├── code-index-updater.cjs
+│   └── unified-creator-guard.cjs
+├── memory/           # Memory operations (ACTIVE)
+│   └── sync-memory-index.cjs
+├── session/          # Session management (ACTIVE)
+│   ├── state-reset.cjs
+│   └── session-cleanup.cjs
+├── reflection/       # Reflection hooks (ACTIVE)
+│   ├── reflection-step0-guard.cjs
+│   ├── unified-reflection-handler.cjs
+│   └── reflection-queue-processor.cjs
+├── monitoring/       # Monitoring and metrics (ACTIVE)
+│   ├── execution-limit-monitor-hook.cjs
+│   ├── metrics-collector-hook.cjs
+│   └── error-tracker-hook.cjs
+├── evolution/        # Evolution workflow (ACTIVE)
+│   ├── evolution-state-guard.cjs
+│   ├── research-enforcement.cjs
+│   ├── quality-gate-validator.cjs
+│   └── conflict-detector.cjs
+├── workflow/         # Enterprise workflow (ACTIVE)
+│   └── post-completion-chain.cjs
+├── validation/       # Validation hooks (ACTIVE)
+│   ├── pre-completion-validation.cjs
+│   └── check-console-log.cjs
+├── self-healing/     # Self-healing (ACTIVE)
+│   └── anomaly-detector.cjs
+└── unified-pre-write-hook.cjs  # Consolidated write checks (ACTIVE)
 ```
+
+**Note:** `router-state.cjs` relocated to `.claude/lib/routing/router-state.cjs` (shared library, not a hook).
 
 Routing data source: `.claude/lib/routing/routing-table.cjs`.
 

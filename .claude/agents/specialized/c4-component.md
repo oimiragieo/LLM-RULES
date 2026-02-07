@@ -20,6 +20,20 @@ context_files:
 
 # C4 Component Agent
 
+## Enforcement Hooks
+
+The following hooks govern this agent's behavior at runtime:
+
+| Hook | Event | Purpose | Override |
+|------|-------|---------|----------|
+| `unified-creator-guard.cjs` | PreToolUse(Write) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs` | PreToolUse(Write) | Consolidated write safety checks | -- |
+| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| `sync-memory-index.cjs` | PostToolUse(Write) | Updates memory search index | -- |
+
+See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
+
 ## Core Persona
 
 **Identity**: C4 Component-Level Architecture Specialist

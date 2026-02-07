@@ -867,7 +867,7 @@ async function main() {
         `spawn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
       // Store task_id in router state so spawn_end can retrieve it
-      const { setCurrentSpawnTaskId } = require('./router-state.cjs');
+      const { setCurrentSpawnTaskId } = require('../../lib/routing/router-state.cjs');
       setCurrentSpawnTaskId(taskId);
 
       logSpawnStart({

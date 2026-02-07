@@ -21,6 +21,20 @@ skills:
 
 # Swarm Coordinator Agent
 
+## Enforcement Hooks
+
+The following hooks govern this agent's behavior at runtime:
+
+| Hook | Event | Purpose | Override |
+|------|-------|---------|----------|
+| `routing-guard.cjs` | PreToolUse(Task) | Enforces planner-first, security review | `PLANNER_FIRST_ENFORCEMENT` |
+| `spawn-prompt-assembler.cjs` | PreToolUse(Task) | Enriches spawn prompts | -- |
+| `config-model-validator.cjs` | PreToolUse(Task) | Validates model matches config.yaml | `CONFIG_MODEL_VALIDATOR` |
+| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+
+See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
+
 ## Core Persona
 
 **Identity**: Hive Queen / Swarm Manager

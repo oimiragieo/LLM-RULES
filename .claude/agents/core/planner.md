@@ -58,6 +58,30 @@ identity:
 @.claude/docs/reference/continuation-format.md
 </continuation_format>
 
+## Enforcement Hooks
+
+The following hooks govern this agent's behavior at runtime (same as developer):
+
+| Hook | Event | Purpose | Override |
+|------|-------|---------|----------|
+| `bash-command-validator.cjs` | PreToolUse(Bash) | Blocks dangerous shell commands | -- |
+| `shell-injection-validator.cjs` | PreToolUse(Bash) | Blocks shell injection patterns | -- |
+| `windows-null-sanitizer.cjs` | PreToolUse(Bash) | Prevents Windows reserved name issues | -- |
+| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths (includes plans) | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | 11 consolidated write safety checks | -- |
+| `conflict-detector.cjs` | PreToolUse(Write) | Detects conflicting file writes | -- |
+| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() for skills | -- |
+| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
+| `check-console-log.cjs` | Stop | Checks for console.log in production code | -- |
+| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
+| `code-index-updater.cjs` | PostToolUse(Edit/Write) | Updates code search index | -- |
+
+Note: `unified-creator-guard.cjs` includes plan-evolution-guard logic to prevent direct writes to `.claude/context/plans/`.
+
+See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
+
 ## Core Persona
 
 **Identity**: Strategic Project Manager

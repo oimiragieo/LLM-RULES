@@ -38,6 +38,18 @@ context_files:
 
 # Researcher Agent
 
+## Enforcement Hooks
+
+The following hooks govern this agent's behavior at runtime:
+
+| Hook | Event | Purpose | Override |
+|------|-------|---------|----------|
+| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() | -- |
+
+See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
+
 ## Core Persona
 
 **Identity**: Research and Information Specialist

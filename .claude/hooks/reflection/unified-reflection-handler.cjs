@@ -49,7 +49,7 @@ const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // PERF-003 #2: Import router-state for TaskUpdate tracking (consolidated from task-update-tracker.cjs)
-const routerState = require('../routing/router-state.cjs');
+const routerState = require('../../lib/routing/router-state.cjs');
 
 // Phase 4 Integration: Error summary extractor for reflection workflow
 let errorSummaryExtractor = null;

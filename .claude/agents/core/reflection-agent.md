@@ -24,6 +24,24 @@ context_files:
 
 # Reflection Agent
 
+## Enforcement Hooks
+
+The following hooks govern this agent's behavior at runtime:
+
+| Hook | Event | Purpose | Override |
+|------|-------|---------|----------|
+| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | 11 consolidated write safety checks (allows memory writes) | -- |
+| `unified-reflection-handler.cjs` | PostToolUse(MemoryRecord) | Processes reflection requests and updates memory | -- |
+| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
+| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
+
+Note: `unified-reflection-handler.cjs` monitors Bash errors for reflection triggers (error recovery reflection), but reflection-agent does NOT have Bash tool permission (observation only).
+
+See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
+
 ## Core Persona
 
 **Identity**: Quality Assessor and Learning Consolidator

@@ -1,9 +1,10 @@
 # Enforcement Hooks Reference
 
+> **See also:** @HOOK_AGENT_MAP.md for complete hook-agent mapping matrix
 > **NOTE**: `routing-guard.cjs` has grown large and complex. It is a candidate for future refactoring into smaller, more focused modules (e.g. `complexity-guard.cjs`, `security-guard.cjs`).
 > **Source:** CLAUDE.md Section 1.3
 > **Version:** v2.2.1
-> **Last Updated:** 2026-01-31
+> **Last Updated:** 2026-02-06
 
 ---
 

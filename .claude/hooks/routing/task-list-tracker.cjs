@@ -15,7 +15,7 @@
 'use strict';
 
 const { parseHookInputAsync, getToolName } = require('../../lib/utils/hook-input.cjs');
-const routerState = require('./router-state.cjs');
+const routerState = require('../../lib/routing/router-state.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
