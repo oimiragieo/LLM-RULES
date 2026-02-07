@@ -263,14 +263,30 @@ templates/
 
 ### schemas/
 
-Key schemas for validation:
+JSON Schema definitions for framework artifact validation:
+
+**Total Active Schemas:** 27 (25 archived in `_archive/`)
+**Actively Validated (Ajv):** 8 schemas with runtime validation
+**Documentation Reference:** 16 schemas as structural templates
+**Optional Validation:** 3 schemas with paths defined but validation skipped
 
 ```
 schemas/
-├── track-metadata.schema.json (track management, task metadata)
-├── skill-diagram-generator-output.schema.json
-└── skill-repo-rag-output.schema.json
+├── _archive/              (25 archived schemas from 2026-02-07 overhaul)
+├── agent-*.schema.json    (5 agent schemas: config, definition, identity, capability-card, spawn-params)
+├── skill-*.schema.json    (4 skill schemas: definition, diagram-output, repo-rag-output, test-output)
+├── workflow-definition.schema.json
+├── hook-definition.schema.json
+├── evolution-state.schema.json
+├── tool-manifest.schema.json
+├── presets.schema.json
+├── track-metadata.schema.json
+├── plan*.schema.json      (planning schemas: plan, implementation-plan, phase-models)
+├── test*.schema.json      (testing schemas: test_plan, test-results)
+└── [16 more schemas]      (architecture, requirements, templates - see catalog)
 ```
+
+**See:** `.claude/context/artifacts/catalogs/schema-catalog.md` for complete inventory with wiring status
 
 ### commands/
 

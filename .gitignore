@@ -10,9 +10,11 @@
 
 # Claude Code Session Data
 .claude/context/session.json
-# Artifacts: ignore everything except vetted reference artifacts
+# Artifacts: ignore everything except vetted reference artifacts and catalogs
 .claude/context/artifacts/**
 !.claude/context/artifacts/.gitkeep
+!.claude/context/artifacts/catalogs/
+!.claude/context/artifacts/catalogs/**
 !.claude/context/artifacts/reference/
 !.claude/context/artifacts/reference/**
 !.claude/context/artifacts/diagrams/

@@ -288,10 +288,10 @@ phases:
   enable:
     description: Register schema and update memory
     steps:
-      - id: create-schema-index-entry
+      - id: create-schema-catalog-entry
         action: function
-        handler: createSchemaIndexEntry
-        description: Add schema to .claude/schemas/index.json if exists
+        handler: createSchemaCatalogEntry
+        description: Add schema to .claude/context/artifacts/catalogs/schema-catalog.md
         inputs:
           - schema_name
           - schema_path
@@ -339,9 +339,9 @@ compensate:
       target: schema_path
       description: Remove created schema file
   enable:
-    - action: remove_from_index
-      target: '.claude/schemas/index.json'
-      description: Remove schema from index if added
+    - action: remove_from_catalog
+      target: '.claude/context/artifacts/catalogs/schema-catalog.md'
+      description: Remove schema from catalog if added
     - action: revert_memory
       target: '.claude/context/memory/learnings.md'
       description: Remove schema entry from learnings

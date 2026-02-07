@@ -23,6 +23,13 @@ output_location: .claude/schemas/
 
 # Schema Creator Skill
 
+> **WARNING: DO NOT WRITE DIRECTLY TO .claude/schemas/**
+>
+> Schema files are protected by `unified-creator-guard.cjs` (Gate 4 in CLAUDE.md).
+> Direct writes bypass post-creation steps (catalog updates, consumer assignment, integration verification).
+> Always use the `schema-creator` skill workflow for creating schemas.
+> Direct writes create "invisible artifacts" that no validator or agent can discover.
+
 Creates JSON Schema validation files for the Claude Code Enterprise Framework. Schemas enforce type safety, input validation, and structural consistency across skills, agents, hooks, workflows, and custom data structures.
 
 ## SYSTEM IMPACT ANALYSIS (CRITICAL - DO NOT SKIP)
@@ -100,7 +107,26 @@ grep "schema-name" .claude/CLAUDE.md || echo "WARNING: Schema not registered in 
 
 ## Workflow
 
-### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
+### Step 0: Research Synthesis (MANDATORY - ALWAYS FIRST)
+
+**BEFORE creating ANY schema, invoke research-synthesis:**
+
+```javascript
+Skill({ skill: 'research-synthesis' });
+```
+
+**Research Requirements:**
+- Minimum 3 Exa searches for JSON Schema best practices
+- Review existing schemas in `.claude/schemas/` for patterns
+- Check schema catalog at `.claude/context/artifacts/catalogs/schema-catalog.md`
+- Identify similar schemas that can be used as references
+- Document research findings before proceeding
+
+**Why:** Research-synthesis ensures schemas follow industry best practices and maintain consistency with existing framework schemas.
+
+---
+
+### Step 1: Existence Check and Updater Delegation (MANDATORY - SECOND STEP)
 
 **BEFORE creating any schema file, check if it already exists:**
 
@@ -128,11 +154,11 @@ grep "schema-name" .claude/CLAUDE.md || echo "WARNING: Schema not registered in 
    - **Return updater result and STOP**
 
 3. **If schema is NEW:**
-   - Continue with Step 1 below
+   - Continue with Step 2 below
 
 ---
 
-### Step 1: Gather Schema Requirements
+### Step 2: Gather Schema Requirements
 
 Before creating a schema, understand:
 
@@ -158,7 +184,7 @@ Before creating a schema, understand:
    - Lengths (min/max for strings/arrays)
 ```
 
-### Step 2: Determine Schema Type and Location
+### Step 3: Determine Schema Type and Location
 
 | Creating For       | Schema Location                                     | Example                    |
 | ------------------ | --------------------------------------------------- | -------------------------- |
@@ -167,7 +193,7 @@ Before creating a schema, understand:
 | Global definition  | `.claude/schemas/{name}.schema.json`                | `test-results.schema.json` |
 | Reusable component | `.claude/schemas/components/{name}.schema.json`     | `task-status.schema.json`  |
 
-### Step 3: Analyze Data Structure
+### Step 4: Analyze Data Structure
 
 Examine existing data or specify expected structure:
 
@@ -192,7 +218,7 @@ const exampleOutput = {
 // - metadata: object (optional)
 ```
 
-### Step 4: Generate JSON Schema
+### Step 5: Generate JSON Schema
 
 Use the schema template and customize:
 
@@ -227,7 +253,7 @@ Use the schema template and customize:
 }
 ```
 
-### Step 5: Add Descriptions and Examples
+### Step 6: Add Descriptions and Examples
 
 **Every property MUST have a description:**
 
@@ -258,7 +284,7 @@ Use the schema template and customize:
 }
 ```
 
-### Step 6: Create Validation Test
+### Step 7: Create Validation Test
 
 Write a simple test to verify the schema works:
 
@@ -284,7 +310,7 @@ console.log('Invalid:', validate(invalidData));
 console.log('Errors:', validate.errors);
 ```
 
-### Step 7: Post-Creation Schema Registration (Phase 1 Integration)
+### Step 8: Post-Creation Schema Registration (Phase 1 Integration)
 
 **This step is CRITICAL.** After creating the schema artifact, you MUST register it in the schema discovery system.
 
@@ -294,7 +320,7 @@ After schema file is written and validated:
 
 1. **Create/Update Schema Registry Entry** in appropriate location:
 
-   If registry doesn't exist, create `.claude/context/artifacts/schema-registry.json`:
+   If registry doesn't exist, create `.claude/context/artifacts/schema-catalog.md`:
 
    ```json
    {
@@ -330,9 +356,9 @@ After schema file is written and validated:
    };
    ```
 
-3. **Document in `.claude/docs/SCHEMA_CATALOG.md`:**
+3. **Document in `.claude/context/artifacts/catalogs/schema-catalog.md`:**
 
-   If catalog doesn't exist, create it. Add entry:
+   Add entry to the schema catalog:
 
    ````markdown
    ### {Schema Title} (`{schema-name}.schema.json`)
@@ -404,7 +430,7 @@ After schema file is written and validated:
 
 **Phase 1 Integration:** Schema registry is the discovery mechanism for Phase 1, enabling validators to find and apply schemas consistently across the system.
 
-### Step 8: System Impact Analysis (MANDATORY)
+### Step 9: System Impact Analysis (MANDATORY)
 
 **Before marking schema creation complete, verify ALL items:**
 
@@ -431,7 +457,7 @@ node -e "JSON.parse(require('fs').readFileSync('.claude/schemas/{name}.schema.js
 node -e "const s = require('.claude/schemas/{name}.schema.json'); console.log('title:', s.title); console.log('description:', s.description);"
 
 # Check schema registry
-grep "{schema-name}" .claude/context/artifacts/schema-registry.json
+grep "{schema-name}" .claude/context/artifacts/schema-catalog.md
 
 # List all schemas
 ls -la .claude/schemas/*.schema.json
@@ -868,15 +894,79 @@ This skill is part of the **Creator Ecosystem**. Use companion creators for rela
 
 ## Existing Schemas Reference
 
-| Schema                | Location           | Purpose                 |
-| --------------------- | ------------------ | ----------------------- |
-| `agent-definition`    | `.claude/schemas/` | Agent YAML frontmatter  |
-| `skill-definition`    | `.claude/schemas/` | Skill YAML frontmatter  |
-| `hook-definition`     | `.claude/schemas/` | Hook configuration      |
-| `workflow-definition` | `.claude/schemas/` | Workflow structure      |
-| `project-analysis`    | `.claude/schemas/` | Project analyzer output |
-| `test-results`        | `.claude/schemas/` | Test execution results  |
-| `test_plan`           | `.claude/schemas/` | Test plan structure     |
+**Total Active Schemas:** 27 (25 archived - see `.claude/schemas/_archive/`)
+**Actively Validated (Ajv):** 8 schemas with runtime validation
+**Documentation Reference:** 16 schemas as structural templates
+**Optional Validation:** 3 schemas with paths defined but validation skipped
+
+**Complete catalog:** `.claude/context/artifacts/catalogs/schema-catalog.md`
+
+### Active Schemas by Category
+
+#### Agent Schemas (5)
+| Schema                        | Wiring Status | Consumer                 |
+| ----------------------------- | ------------- | ------------------------ |
+| `agent-capability-card`       | WIRED         | generate-agent-registry  |
+| `agent-config`                | WIRED         | agent-config.cjs         |
+| `agent-definition`            | WIRED         | agent-parser.cjs         |
+| `agent-identity`              | WIRED         | agent-parser.cjs         |
+| `agent-spawn-params`          | DOCS ONLY     | Spawn prompt reference   |
+
+#### Skill Schemas (4)
+| Schema                          | Wiring Status | Consumer                     |
+| ------------------------------- | ------------- | ---------------------------- |
+| `skill-definition`              | WIRED         | skill-creator/create.cjs     |
+| `skill-diagram-generator-output`| SOFT-WIRED    | diagram-generator skill      |
+| `skill-repo-rag-output`         | SOFT-WIRED    | repo-rag skill               |
+| `skill-test-generator-output`   | SOFT-WIRED    | test-generator skill         |
+
+#### Workflow & Hook Schemas (2)
+| Schema                | Wiring Status | Consumer                     |
+| --------------------- | ------------- | ---------------------------- |
+| `workflow-definition` | DOCS ONLY     | No workflow-creator scripts  |
+| `hook-definition`     | DOCS ONLY     | No hook-creator scripts      |
+
+#### Evolution & Project Schemas (2)
+| Schema                | Wiring Status | Consumer                     |
+| --------------------- | ------------- | ---------------------------- |
+| `evolution-state`     | WIRED         | self-healing/validator.cjs   |
+| `track-metadata`      | DOCS ONLY     | TaskCreate metadata field    |
+
+#### Tool & Template Schemas (3)
+| Schema                | Wiring Status | Consumer                     |
+| --------------------- | ------------- | ---------------------------- |
+| `tool-manifest`       | WIRED         | generate-tool-manifest.cjs   |
+| `presets`             | WIRED         | spawn/prompt-assembler.cjs   |
+| `adr-template`        | DOCS ONLY     | ADR documentation structure  |
+
+#### Planning Schemas (5)
+| Schema                      | Wiring Status | Consumer                 |
+| --------------------------- | ------------- | ------------------------ |
+| `plan`                      | DOCS ONLY     | Planning phase reference |
+| `implementation-plan`       | DOCS ONLY     | Implementation planning  |
+| `phase-models`              | DOCS ONLY     | Phase planning reference |
+| `product_requirements`      | DOCS ONLY     | Requirements gathering   |
+| `project_brief`             | DOCS ONLY     | Project initialization   |
+
+#### Testing Schemas (2)
+| Schema            | Wiring Status | Consumer                 |
+| ----------------- | ------------- | ------------------------ |
+| `test_plan`       | DOCS ONLY     | Test planning reference  |
+| `test-results`    | DOCS ONLY     | Test execution output    |
+
+#### Architecture Schemas (3)
+| Schema                        | Wiring Status | Consumer                     |
+| ----------------------------- | ------------- | ---------------------------- |
+| `specification-template`      | DOCS ONLY     | Specification documents      |
+| `system_architecture`         | DOCS ONLY     | Architecture documentation   |
+| `ux_spec`                     | DOCS ONLY     | UX specification documents   |
+
+#### Project Schemas (1)
+| Schema                  | Wiring Status | Consumer                 |
+| ----------------------- | ------------- | ------------------------ |
+| `project-analysis`      | DOCS ONLY     | Project analyzer output  |
+
+**Note:** All schemas located at `.claude/schemas/` unless otherwise specified. See schema catalog for full details on consumers, validation methods, and integration status.
 
 ## File Placement & Standards
 

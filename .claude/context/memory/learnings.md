@@ -1,3 +1,124 @@
+## 2026-02-07: Phase 4-6 - Documentation + Schema-Creator Fixes + Workflow YAML Complete (Task #90 - Enterprise Pipeline #6)
+
+**Context:** Created comprehensive schema catalog, rewrote schemas README, updated @DIRECTORY_STRUCTURE.md and CLAUDE.md, fixed schema-creator SKILL.md phantom references (schema-registry.json, SCHEMA_CATALOG.md at wrong path, schemas/index.json), and fixed workflow YAML files.
+
+**Key Deliverables:**
+
+1. **Schema Catalog (`.claude/context/artifacts/catalogs/schema-catalog.md`):**
+   - Comprehensive catalog of all 27 active schemas organized by category
+   - Each entry includes: Path, Category, Wiring Status, Consumer, Validation method, $schema version, Purpose, Notes
+   - Categories: Agent (5), Skill (4), Workflow & Hook (2), Evolution & Project (2), Tool & Template (3), Planning (5), Testing (2), Architecture (3), Project (1)
+   - Summary table showing 8 WIRED, 3 SOFT-WIRED, 16 DOCS ONLY
+
+2. **Schemas README (`.claude/schemas/README.md`):**
+   - Complete rewrite with accurate counts (27 active, 25 archived)
+   - Overview of three purposes: runtime validation, documentation, optional
+   - Actively Validated Schemas table with 8 entries showing consumer and validation method
+   - Schema categories section listing all 27 by type
+   - Naming conventions with 7 documented exceptions
+   - Usage guidelines for developers and agents
+   - Archive section documenting 25 archived schemas
+   - History section documenting 2026-02-07 overhaul (ADR-088)
+
+3. **@DIRECTORY_STRUCTURE.md Schemas Section:**
+   - Replaced minimal 3-line section with comprehensive structure
+   - Added counts: 27 active, 25 archived, 8 Ajv-validated, 16 docs-only, 3 optional
+   - Added directory tree showing _archive/, agent-*.schema.json, skill-*.schema.json, etc.
+   - Referenced schema-catalog.md for complete inventory
+
+4. **CLAUDE.md Section 9 Update:**
+   - Minimal update to "Key:" line mentioning schemas with catalog reference
+   - Added: `.claude/schemas/` (27 active JSON schemas - see schema-catalog.md)
+
+5. **Schema-Creator SKILL.md Fixes (ALL phantom references removed):**
+   - Added WARNING BOX about unified-creator-guard.cjs Gate 4 protection
+   - Added new Step 0: Research Synthesis (research-synthesis invocation mandate)
+   - Renumbered all steps (Step 0→1, 1→2, 2→3, 3→4, 4→5, 5→6, 6→7, 7→8, 8→9)
+   - Globally replaced "schema-registry.json" with "schema-catalog.md" (all occurrences)
+   - Replaced ".claude/docs/SCHEMA_CATALOG.md" with ".claude/context/artifacts/catalogs/schema-catalog.md" (correct path)
+   - Updated Existing Schemas Reference table from 7 entries to 27 entries (all active schemas with wiring status)
+
+6. **Workflow YAML Files Fixed:**
+   - `schema-creator-workflow.yaml`: Replaced `schemas/index.json` references with `schema-catalog.md`
+   - `schema-updater-workflow.yaml`: Replaced `schemas/index.json` references with `schema-catalog.md`
+   - Updated step IDs: `create-schema-index-entry` → `create-schema-catalog-entry`, `update-schema-index` → `update-schema-catalog`
+   - Updated action names: `remove_from_index` → `remove_from_catalog`, `revert_index` → `revert_catalog`
+
+**Files Modified:**
+- Created: `.claude/context/artifacts/catalogs/schema-catalog.md`
+- Modified: `.claude/schemas/README.md` (complete rewrite)
+- Modified: `.claude/docs/@DIRECTORY_STRUCTURE.md` (schemas section expanded)
+- Modified: `.claude/CLAUDE.md` (Section 9 minimal addition)
+- Modified: `.claude/skills/schema-creator/SKILL.md` (WARNING BOX, Step 0, renumbering, phantom refs fixed, table updated)
+- Modified: `.claude/workflows/creators/schema-creator-workflow.yaml` (schemas/index.json → schema-catalog.md)
+- Modified: `.claude/workflows/updaters/schema-updater-workflow.yaml` (schemas/index.json → schema-catalog.md)
+
+**Validation:** Zero active code references to phantom files (schema-registry.json, schemas/index.json, SCHEMA_CATALOG.md at wrong path). Remaining references are only in documentation/planning files explaining the issues.
+
+---
+
+## 2026-02-07: Phase 3 - Schema-to-Ajv Wiring Complete (Task #89 - Enterprise Pipeline #6)
+
+**Context:** Wired 8 schemas to Ajv validation using TDD. Created shared `schema-validator.cjs` utility and integrated 5 schemas with consumer code (3 already done/skipped).
+
+**Key Technical Patterns:**
+
+1. **Shared Schema Validator Utility (`schema-validator.cjs`):**
+   - Lazy-loads Ajv (graceful if missing): `const ajvModule = require('ajv'); Ajv = ajvModule.default || ajvModule;`
+   - Caches compiled validators by schema path in a `Map`
+   - `validateSchema: false` required for schemas using `$schema: "https://json-schema.org/draft/2020-12/schema"` (Ajv doesn't auto-resolve draft-2020-12 meta-schema)
+   - Returns `{ valid: true, errors: null, skipped: true }` on graceful degradation (never crashes)
+
+2. **Advisory Validation Pattern:**
+   - Each consumer gets a `validateX()` method that returns `{ valid, errors, skipped }`
+   - Validation NEVER throws, NEVER blocks operations
+   - Errors are advisory warnings, not blockers
+   - Pattern: `if (!_validateData) return { valid: true, errors: null, skipped: true };`
+
+3. **Schema-Data Mismatches (Expected):**
+   - `agent-config.schema.json` has `additionalProperties: false` per agent entry, only allowing `tools`, `thinkingDefault`, `phase`
+   - Actual `agent-config.json` data includes `model` field (not in schema)
+   - Validation will FAIL on real data -- acceptable since advisory only
+   - Schema should be updated (Phase 4-6 task) to include `model` field
+
+4. **Ajv ESM Wrapper on Windows:**
+   - Ajv v8 uses ESM wrapper in this project
+   - CommonJS require needs: `const ajvModule = require('ajv'); Ajv = ajvModule.default || ajvModule;`
+   - Without `.default`, you get the ESM module wrapper, not the Ajv class
+
+**Wiring Summary (8 schemas):**
+
+| Schema | Consumer | Status | Method Added |
+|--------|----------|--------|-------------|
+| evolution-state | validator.cjs | WIRED | `validateStateWithSchema()` |
+| agent-definition | agent-parser.cjs | WIRED | `validateDefinition()` |
+| skill-definition | create.cjs | WIRED | Uses `_validateData` in `validateSkill()` |
+| agent-config | agent-config.cjs | WIRED | `validateConfig()` |
+| presets | prompt-assembler.cjs | WIRED | `validatePresets()` |
+| tool-manifest | generate-tool-manifest.cjs | ALREADY WIRED | (pre-existing) |
+| hook-definition | N/A | NO INTEGRATION POINT | No hook-creator scripts exist |
+| workflow-definition | N/A | NO INTEGRATION POINT | No workflow-creator scripts exist |
+
+**Test Suite:** 35 tests across 6 test files, all passing (0 failures)
+
+**Files Created:**
+- `.claude/lib/utils/schema-validator.cjs` (shared utility, 127 lines)
+- `tests/lib/utils/schema-validator.test.cjs` (8 tests)
+- `tests/lib/self-healing/validator-schema.test.cjs` (6 tests)
+- `tests/lib/agents/agent-definition-schema.test.cjs` (5 tests)
+- `tests/skills/skill-definition-schema.test.cjs` (6 tests)
+- `tests/lib/agents/agent-config-schema.test.cjs` (5 tests)
+- `tests/lib/spawn/presets-schema.test.cjs` (5 tests)
+
+**Files Modified:**
+- `.claude/lib/self-healing/validator.cjs` (added `validateStateWithSchema`)
+- `.claude/lib/agents/agent-parser.cjs` (added `validateDefinition`)
+- `.claude/skills/skill-creator/scripts/create.cjs` (added schema validation in `validateSkill()`)
+- `.claude/lib/agents/agent-config.cjs` (added `validateConfig`)
+- `.claude/lib/spawn/prompt-assembler.cjs` (added `validatePresets`)
+
+---
+
 ## 2026-02-07: Schemas System Deep Dive Architecture (Enterprise Pipeline #6 - COMPLETE)
 
 **Context:** Comprehensive audit of `.claude/schemas/` system -- 52 JSON schema files inventoried, wiring audited, gap analysis completed.

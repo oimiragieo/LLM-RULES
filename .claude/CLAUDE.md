@@ -494,7 +494,7 @@ All spawned agents:
 
 > **REFERENCE:** See **@DIRECTORY_STRUCTURE.md** for complete directory layout.
 
-**Key:** `.claude/agents/` (core/domain/specialized/orchestrators), `.claude/context/memory/` (learnings/decisions/issues), `.claude/hooks/` (routing/safety/validation), `.claude/skills/` (SKILL.md files)
+**Key:** `.claude/agents/` (core/domain/specialized/orchestrators), `.claude/context/memory/` (learnings/decisions/issues), `.claude/hooks/` (routing/safety/validation), `.claude/schemas/` (27 active JSON schemas - see schema-catalog.md), `.claude/skills/` (SKILL.md files)
 
 ---
 

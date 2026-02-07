@@ -21,7 +21,7 @@ updater_config:
   backup_location: .claude/context/backups/schemas/
   compatibility_check: true
   registration_targets:
-    - '.claude/schemas/index.json'
+    - '.claude/context/artifacts/catalogs/schema-catalog.md'
     - '.claude/context/memory/learnings.md'
   protected_fields:
     - '$schema'
@@ -287,10 +287,10 @@ phases:
   enable:
     description: Update registrations and record changes
     steps:
-      - id: update-schema-index
+      - id: update-schema-catalog
         action: function
-        handler: updateSchemaIndex
-        description: Update .claude/schemas/index.json if properties changed
+        handler: updateSchemaCatalog
+        description: Update .claude/context/artifacts/catalogs/schema-catalog.md if properties changed
         inputs:
           - schema_name
           - change_description
@@ -343,9 +343,9 @@ compensate:
       target: backup_id
       description: Restore schema file from backup
   enable:
-    - action: revert_index
-      target: '.claude/schemas/index.json'
-      description: Revert index changes if made
+    - action: revert_catalog
+      target: '.claude/context/artifacts/catalogs/schema-catalog.md'
+      description: Revert catalog changes if made
     - action: revert_memory
       target: '.claude/context/memory/learnings.md'
       description: Remove update entry from learnings
