@@ -16,7 +16,6 @@ const fs = require('fs');
 const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
-const { getDefaultTools } = require('../agents/agent-config.cjs');
 
 const AGENT_SKILL_MATRIX_PATH = path.join(
   PROJECT_ROOT,
@@ -26,6 +25,28 @@ const AGENT_SKILL_MATRIX_PATH = path.join(
   'agent-skill-matrix.json'
 );
 const SKILL_INDEX_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'skill-index.json');
+
+/**
+ * Get default tools for an agent (inlined from archived agent-config.cjs)
+ * @param {string} _agentType - Agent type (unused, kept for API compatibility)
+ * @returns {string[]} Default tool list
+ */
+function getDefaultTools(_agentType) {
+  // Fallback includes Task management and Skill tools so agents can spawn and use skills
+  return [
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'Glob',
+    'Grep',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+  ];
+}
 
 // Try to load optional dependencies
 let yaml;
