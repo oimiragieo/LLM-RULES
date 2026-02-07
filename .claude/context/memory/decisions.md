@@ -14,6 +14,50 @@ Each decision should include:
 
 ---
 
+## ADR-095: Workflow System Security Hardening -- Prompt Sanitization, State Integrity, Env Var Restriction
+
+**Date:** 2026-02-07
+
+**Status:** Proposed (Security Assessment Complete: 2026-02-07)
+
+**Context:**
+
+Pipeline #13 Workflows System Deep Dive security assessment (Task #115) found 5 HIGH, 5 MEDIUM, 4 LOW findings across the `.claude/workflows/` subsystem (54 files, 7 subdirectories). Security Score: 62/100 (CONDITIONAL PASS). The workflow orchestration layer controls agent execution flow, model selection, tool access, and quality gates. Key vulnerability classes: prompt injection via spawn templates, workflow state file tampering, phase-advance signal injection, environment variable security bypass, and complexity downgrade bypass.
+
+**Decision:**
+
+1. **P1 -- Centralized Prompt Sanitization:** Create `sanitizePromptContent()` in `.claude/lib/utils/prompt-sanitizer.cjs` to strip injection patterns from user content before embedding in spawn prompts. This addresses the SYSTEMIC prompt injection issue found in Pipelines #11 (agents), #12 (context), and #13 (workflows).
+
+2. **P1 -- State File Integrity:** Add HMAC verification to `workflow-state.json` and `phase-advance.json` reads/writes. Replace `JSON.parse()` with `safeJSONParse()` in `post-completion-chain.cjs`. Add JSON Schema validation for all runtime state files.
+
+3. **P1 -- Phase-Advance Authentication:** Add a source token to `phase-advance.json` signals that only `post-completion-chain.cjs` can generate. The Router must verify this token before accepting phase advancement.
+
+4. **P1 -- Environment Variable Hardening:** Remove `HOOK_FAIL_OPEN` master bypass. Restrict remaining override env vars to CI-only contexts (document in `.env.example` with warnings). Consider a single `SECURITY_ENFORCEMENT_MODE` variable instead of 8 individual overrides.
+
+5. **P1 -- Complexity Classification Integrity:** Add integrity checks to complexity classification output. Ensure security review is ALWAYS required regardless of complexity when the request involves auth/credentials/security-critical code.
+
+6. **P2 -- Quality Gate Independence:** Replace self-reported quality gate metrics with independent verification (e.g., run `pnpm test` instead of trusting `metadata.testsPassing`).
+
+7. **P2 -- Structured Agent Detection:** Replace string-matching agent detection in `routing-guard.cjs` with `subagent_type` parameter inspection.
+
+**Rationale:**
+
+- Prompt injection is the most widespread vulnerability (found in 3 of 3 subsystem audits)
+- State integrity is critical because file-based state is the backbone of enterprise workflow execution
+- Environment variable bypasses negate ALL security enforcement when set
+- Self-reported quality gates provide no real assurance
+
+**Consequences:**
+
+- All spawn prompts will have user content sanitized (may slightly alter prompt wording)
+- State file reads/writes become ~1ms slower (HMAC computation)
+- Reduced operational flexibility (fewer env var overrides)
+- Quality gates become meaningfully enforced (may slow phase transitions)
+
+**Security Report:** `.claude/context/reports/security/workflows-security-review-2026-02-07.md`
+
+---
+
 ## ADR-094: Context System Overhaul -- Artifact Archive, Dead File Cleanup, JSONL Rotation
 
 **Date:** 2026-02-07
@@ -1041,5 +1085,76 @@ Comprehensive audit of all configuration files across `.claude/config/` (13 file
 - Task #107: Fixed phase-models.json P1 model contradiction (planning/qa: sonnet → opus), archived 4 dead configs
 - Task #108: Regenerated tool-manifest.json (totalAgents: 16 → 49, updated generator to read agent-registry), regenerated rule-index-cache.json (removed coding-style.md, patterns.md entries, added current files)
 - Commits: 75f3417f (Task #108)
+
+---
+
+## ADR-096: Workflow System Structural Cleanup
+
+**Date:** 2026-02-07
+**Status:** Accepted (Implementation Complete: 2026-02-07)
+**Pipeline:** Enterprise Pipeline #13 (Workflows System Deep Dive)
+
+**Context:**
+Task #44 created 4 new workflows (domain-development-workflow.md, code-review-workflow.md, product-management-workflow.md, documentation-workflow.md) and Task #116 deleted 15 dead workflow files + duplicate feature-development-workflow.md. However, workflow-registry.json was not updated to reflect these changes, causing 5 missing entries, 2 deprecated entries still listed, and incorrect summary counts. Additionally, 2 phantom references existed: party-orchestrator.md referenced non-existent party-mode-workflow.md, and @WORKFLOW_AGENT_MAP.md listed workspace-conventions.md as a workflow (it's a rule).
+
+**Decision:**
+
+1. **Add 5 missing workflow entries to workflow-registry.json:**
+   - `enterprise-workflow` → `core/enterprise-workflow.md` (CRITICAL: missing from registry)
+   - `domain-development-workflow` → `domain-development-workflow.md`
+   - `code-review-workflow` → `code-review-workflow.md`
+   - `product-management-workflow` → `product-management-workflow.md`
+   - `documentation-workflow` → `documentation-workflow.md`
+
+2. **Remove 2 deprecated workflow entries from workflow-registry.json:**
+   - `artifact-lifecycle-management-workflow` (status: deprecated)
+   - `hook-consolidation-workflow` (status: deprecated)
+
+3. **Update schema-creator-workflow status from "draft" to "active"**
+
+4. **Update summary counts in workflow-registry.json:**
+   - total: 36 → 41 (added 5, removed 2, changed 1 from draft to active)
+   - byCategory.root: 9 → 13 (added 4 Task #44 workflows)
+   - byCategory.core: 6 → 7 (added enterprise-workflow)
+   - byStatus.active: 33 → 41 (all workflows now active)
+   - byStatus.deprecated: 2 → 0 (removed deprecated workflows)
+   - byStatus.draft: 1 → 0 (schema-creator-workflow now active)
+
+5. **Fix 2 phantom references:**
+   - party-orchestrator.md: Comment out reference to non-existent `enterprise/party-mode-workflow.md`
+   - @WORKFLOW_AGENT_MAP.md: Remove workspace-conventions row (it's a rule in `.claude/rules/`, not a workflow)
+
+6. **Update 4 documentation files:**
+   - @ENTERPRISE_WORKFLOWS.md: Add enterprise-workflow entry, add 4 Task #44 workflows, remove deprecated refs
+   - @WORKFLOW_AGENT_MAP.md: Remove workspace-conventions phantom, update Enterprise Workflows count (4 → 3)
+   - workflows/README.md: Add enterprise-workflow to core section, add post-creation-validation.md, update operations section (remove hook-consolidation, add qa-bounded-loop), add creators/updaters section
+   - CLAUDE.md Section 8.6: Disambiguate feature-development-workflow as `enterprise/feature-development-workflow.md`, add enterprise-workflow
+
+**Rationale:**
+- Missing workflow entries make workflows "invisible" to tooling and agents
+- Deprecated workflows clutter registry and mislead users
+- Phantom references create broken documentation paths
+- workspace-conventions is a universal rule, not a workflow (rules apply at all times, workflows apply to specific task types)
+- Accurate registry enables correct workflow discovery via workflow-registry.json
+
+**Consequences:**
+- workflow-registry.json now accurately reflects all 41 active workflows
+- No deprecated or draft workflows in registry
+- All Task #44 workflows are discoverable
+- Documentation cross-references are consistent
+- enterprise-workflow.md is now properly registered (was missing despite being critical multi-phase workflow)
+
+**Alternatives Considered:**
+1. Leave deprecated workflows with status flag: Rejected because it clutters registry and creates ambiguity
+2. Keep workspace-conventions in workflow table: Rejected because it's a rule (`.claude/rules/workspace-conventions.md`), not a workflow
+3. Delete party-mode-workflow.md reference outright: Rejected because commenting preserves intention for future creation
+
+**Implementation:**
+- Task #117: Fixed workflow-registry.json (5 added, 2 removed, 1 status change, counts updated), fixed party-orchestrator phantom, fixed @WORKFLOW_AGENT_MAP phantom, updated 4 doc files
+
+**Validation:**
+- All 41 workflows in registry have corresponding files in `.claude/workflows/`
+- No phantom references in agent files or docs
+- Summary counts match actual workflow inventory
 
 ---

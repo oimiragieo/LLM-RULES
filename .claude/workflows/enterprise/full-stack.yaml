@@ -1,6 +1,0 @@
-name: full-stack
-steps:
-  - plan
-  - architect
-  - implement
-  - test

@@ -418,7 +418,7 @@ If you receive a task in an excluded category, respond with routing recommendati
 
 ## Related Workflows
 
-- `.claude/workflows/enterprise/party-mode-workflow.md` - Full Party Mode workflow
+<!-- `.claude/workflows/enterprise/party-mode-workflow.md` - Full Party Mode workflow (NOT YET CREATED) -->
 - `.claude/workflows/core/router-decision.md` - Routing logic
 - `.claude/workflows/security-architect-skill-workflow.md` - Security audits
 

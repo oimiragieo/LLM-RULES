@@ -479,12 +479,15 @@ workflows/
 ├── enterprise/                    # Complex multi-step operations
 │   ├── feature-development-workflow.md   # 12-step end-to-end feature development
 │   ├── c4-architecture-workflow.md       # C4 model architecture documentation
-│   ├── full-stack.yaml                   # Plan → Architect → Implement → Test
-│   └── code-review.yaml                  # Comprehensive code review
-├── rapid/                         # Quick, focused tasks
-│   └── fix.yaml                          # Rapid bug fix workflow
-└── operations/                    # Operational procedures
-    └── incident-response.md              # Incident response runbook
+│   └── swarm-coordination-skill-workflow.md  # Multi-agent swarm orchestration
+├── operations/                    # Operational procedures
+│   ├── incident-response.md              # Incident response runbook
+│   └── qa-bounded-loop.md                # QA validation with bounded fix loops
+└── core/                          # Core framework workflows
+    ├── router-decision.md                # Master routing logic
+    ├── enterprise-workflow.md            # Phased execution (Triage → Deploy → Reflect)
+    ├── evolution-workflow.md             # EVOLVE process for creating artifacts
+    └── reflection-workflow.md            # Quality reflection and learning capture
 ```
 
 **Enterprise Workflows**:

@@ -2,25 +2,25 @@
   "version": "1.0.0",
   "lastUpdated": "2026-02-05T04:27:21.786Z",
   "summary": {
-    "total": 36,
+    "total": 38,
     "byCategory": {
-      "root": 9,
-      "core": 6,
-      "enterprise": 5,
+      "root": 13,
+      "core": 7,
+      "enterprise": 2,
       "operations": 3,
       "creators": 6,
-      "rapid": 1,
+      "rapid": 0,
       "updaters": 6
     },
     "byType": {
-      "phased": 26,
-      "sequential": 8,
+      "phased": 29,
+      "sequential": 10,
       "state-machine": 2
     },
     "byStatus": {
-      "active": 33,
-      "deprecated": 2,
-      "draft": 1
+      "active": 41,
+      "deprecated": 0,
+      "draft": 0
     }
   },
   "workflows": {
@@ -59,6 +59,21 @@
       ],
       "triggers": [
         "evolution"
+      ],
+      "status": "active"
+    },
+    "code-review-workflow": {
+      "path": "code-review-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "Two-pass code review workflow (Pass 1: blocking checks for spec/logic/security; Pass 2: non-blocking quality suggestions)",
+      "phases": 2,
+      "requiredAgents": [
+        "code-reviewer"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive"
       ],
       "status": "active"
     },
@@ -115,6 +130,33 @@
         "technical-writer",
         "code-reviewer",
         "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "enterprise-workflow": {
+      "path": "core/enterprise-workflow.md",
+      "category": "core",
+      "type": "phased",
+      "description": "Multi-phase execution workflow with automatic phase advancement (Triage → Design → Implement → Review → Deploy → Document → Reflect)",
+      "phases": 8,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "devops",
+        "technical-writer",
+        "code-reviewer",
+        "router",
+        "reflection-agent"
       ],
       "triggers": [
         "high_complexity",
@@ -245,30 +287,6 @@
       ],
       "status": "active"
     },
-    "artifact-lifecycle-management-workflow": {
-      "path": "core/skill-lifecycle.md",
-      "category": "core",
-      "type": "phased",
-      "description": "Universal lifecycle workflow for managing framework artifacts: skills, agents, hooks, workflows, templates, and schemas.",
-      "phases": 5,
-      "requiredAgents": [
-        "planner",
-        "developer",
-        "architect",
-        "qa",
-        "security-architect",
-        "devops",
-        "technical-writer",
-        "code-reviewer",
-        "router"
-      ],
-      "triggers": [
-        "security_sensitive",
-        "multi_agent",
-        "evolution"
-      ],
-      "status": "deprecated"
-    },
     "database-architect-workflow": {
       "path": "database-architect-skill-workflow.md",
       "category": "root",
@@ -293,6 +311,43 @@
         "evolution",
         "incident",
         "reflection"
+      ],
+      "status": "active"
+    },
+    "documentation-workflow": {
+      "path": "documentation-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "Diataxis framework for technical documentation (Tutorial, How-to, Reference, Explanation)",
+      "phases": 4,
+      "requiredAgents": [
+        "technical-writer"
+      ],
+      "triggers": [
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "domain-development-workflow": {
+      "path": "domain-development-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "TDD workflow for all 22 domain specialist agents with Red-Green-Refactor Cycle and Language Conventions Table",
+      "phases": 3,
+      "requiredAgents": [
+        "python-pro",
+        "rust-pro",
+        "typescript-pro",
+        "frontend-pro",
+        "nextjs-pro",
+        "nodejs-pro",
+        "golang-pro",
+        "java-pro",
+        "php-pro",
+        "fastapi-pro"
+      ],
+      "triggers": [
+        "high_complexity"
       ],
       "status": "active"
     },
@@ -364,26 +419,6 @@
       ],
       "status": "active"
     },
-    "hook-consolidation-workflow": {
-      "path": "operations/hook-consolidation.md",
-      "category": "operations",
-      "type": "phased",
-      "description": "Step-by-step process for safely consolidating hooks to reduce I/O overhead and improve performance.",
-      "phases": 5,
-      "requiredAgents": [
-        "architect",
-        "technical-writer",
-        "code-reviewer",
-        "router"
-      ],
-      "triggers": [
-        "high_complexity",
-        "security_sensitive",
-        "incident",
-        "reflection"
-      ],
-      "status": "deprecated"
-    },
     "incident-response-workflow": {
       "path": "operations/incident-response.md",
       "category": "operations",
@@ -415,6 +450,18 @@
       "requiredAgents": [
         "qa",
         "code-reviewer"
+      ],
+      "triggers": [],
+      "status": "active"
+    },
+    "product-management-workflow": {
+      "path": "product-management-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "INVEST criteria for user stories, sprint planning, backlog refinement, and prioritization (RICE, MoSCoW)",
+      "phases": 5,
+      "requiredAgents": [
+        "pm"
       ],
       "triggers": [],
       "status": "active"
@@ -516,7 +563,7 @@
         "high_complexity",
         "evolution"
       ],
-      "status": "draft"
+      "status": "active"
     },
     "skill-creator-workflow": {
       "path": "creators/skill-creator-workflow.yaml",
@@ -565,40 +612,6 @@
         "high_complexity",
         "evolution"
       ],
-      "status": "active"
-    },
-    "code-review": {
-      "path": "enterprise/code-review.yaml",
-      "category": "enterprise",
-      "type": "sequential",
-      "description": "",
-      "phases": 1,
-      "requiredAgents": [
-        "code-reviewer"
-      ],
-      "triggers": [],
-      "status": "active"
-    },
-    "full-stack": {
-      "path": "enterprise/full-stack.yaml",
-      "category": "enterprise",
-      "type": "sequential",
-      "description": "",
-      "phases": 1,
-      "requiredAgents": [
-        "architect"
-      ],
-      "triggers": [],
-      "status": "active"
-    },
-    "fix": {
-      "path": "rapid/fix.yaml",
-      "category": "rapid",
-      "type": "sequential",
-      "description": "",
-      "phases": 1,
-      "requiredAgents": [],
-      "triggers": [],
       "status": "active"
     },
     "agent-updater-workflow": {

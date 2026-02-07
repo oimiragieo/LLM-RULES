@@ -22,6 +22,8 @@ Orchestrate multi-agent swarms using Queen/Worker topology for massively paralle
 
 **Extended Thinking**: This workflow manages complex distributed agent coordination where a single Queen agent (swarm-coordinator) spawns, monitors, and aggregates results from multiple Worker agents executing in parallel. The topology supports hierarchical command, mesh collaboration, and voting-based consensus. Workers are ephemeral, replaceable, and isolated - failures are detected and recovered automatically. This pattern excels at tasks that can be decomposed into independent subtasks: large refactoring, multi-file reviews, parallel testing, or any work requiring consensus from multiple perspectives.
 
+**Related Workflows**: See `code-review-workflow.md` for two-pass code review process that can be parallelized using swarm topology.
+
 ## When to Use
 
 | Scenario                        | Why Swarm                   | Example                                      |
@@ -658,7 +660,7 @@ All agents in swarm MUST follow Memory Protocol:
 ## Related Workflows
 
 - **Feature Development**: `.claude/workflows/enterprise/feature-development-workflow.md`
-- **Code Review**: `.claude/workflows/enterprise/code-review.yaml`
+- **Code Review**: `.claude/workflows/code-review-workflow.md`
 - **Incident Response**: `.claude/workflows/operations/incident-response.md`
 
 ## Related Agents

@@ -25,10 +25,9 @@ This table shows which workflows are referenced by which agent archetypes. Workf
 | skill-lifecycle | | | | | x | | |
 | post-creation-validation | | | | | x | | |
 | external-integration | | x | | | | | x |
-| **Enterprise Workflows (4)** |
+| **Enterprise Workflows (3)** |
 | c4-architecture-workflow | | x | | x | | | |
 | swarm-coordination-skill-workflow | | | | | x | | |
-| workspace-conventions | x | x | x | x | x | x | x |
 | qa-bounded-loop | | | x | | | | |
 | **Operations Workflows (3)** |
 | incident-response | | x | | | | | |
@@ -66,7 +65,7 @@ This table shows which workflows are referenced by which agent archetypes. Workf
 
 Different agent archetypes reference different workflow sets based on their role:
 
-### Router/Orchestrator Workflow Set (8 workflows)
+### Router/Orchestrator Workflow Set (7 workflows)
 
 **Agents**: router, master-orchestrator, evolution-orchestrator, swarm-coordinator, party-orchestrator
 
@@ -77,12 +76,11 @@ Different agent archetypes reference different workflow sets based on their role
 4. feature-development-workflow
 5. swarm-coordination-skill-workflow (Orchestrators only)
 6. consensus-voting-skill-workflow (Orchestrators only)
-7. workspace-conventions
-8. context-compressor-skill-workflow
+7. context-compressor-skill-workflow
 
 **Purpose**: Routing, coordination, multi-agent spawning, and lifecycle management.
 
-### Implementer Workflow Set (12 workflows)
+### Implementer Workflow Set (11 workflows)
 
 **Agents**: developer, planner, qa, security-architect, architect, database-architect, devops, devops-troubleshooter, incident-responder, code-simplifier, conductor-validator
 
@@ -97,12 +95,11 @@ Different agent archetypes reference different workflow sets based on their role
 8. security-architect-skill-workflow (security-architect)
 9. database-architect-skill-workflow (database-architect)
 10. conductor-setup-workflow (developer)
-11. workspace-conventions
-12. context-compressor-skill-workflow
+11. context-compressor-skill-workflow
 
 **Purpose**: Implementation, testing, security, architecture, and operations.
 
-### Reviewer Workflow Set (6 workflows)
+### Reviewer Workflow Set (5 workflows)
 
 **Agents**: code-reviewer
 
@@ -111,12 +108,11 @@ Different agent archetypes reference different workflow sets based on their role
 2. feature-development-workflow
 3. reflection-workflow
 4. code-review-workflow
-5. workspace-conventions
-6. context-compressor-skill-workflow
+5. context-compressor-skill-workflow
 
 **Purpose**: Code review, quality validation, and compliance checking.
 
-### Documenter Workflow Set (7 workflows)
+### Documenter Workflow Set (6 workflows)
 
 **Agents**: technical-writer, c4-code, c4-component, c4-container, c4-context
 
@@ -126,12 +122,11 @@ Different agent archetypes reference different workflow sets based on their role
 3. reflection-workflow
 4. c4-architecture-workflow (c4-* agents only)
 5. documentation-workflow (technical-writer)
-6. workspace-conventions
-7. context-compressor-skill-workflow
+6. context-compressor-skill-workflow
 
 **Purpose**: Documentation creation, C4 architecture diagrams, and technical writing.
 
-### Researcher Workflow Set (5 workflows)
+### Researcher Workflow Set (4 workflows)
 
 **Agents**: researcher, reverse-engineer
 
@@ -139,12 +134,11 @@ Different agent archetypes reference different workflow sets based on their role
 1. enterprise-workflow
 2. reflection-workflow
 3. progressive-disclosure-skill-workflow
-4. workspace-conventions
-5. context-compressor-skill-workflow
+4. context-compressor-skill-workflow
 
 **Purpose**: Research, investigation, and knowledge gathering.
 
-### Domain Specialist Workflow Set (6 workflows)
+### Domain Specialist Workflow Set (5 workflows)
 
 **Agents**: All 22 domain specialists (python-pro, rust-pro, typescript-pro, etc.)
 
@@ -153,8 +147,7 @@ Different agent archetypes reference different workflow sets based on their role
 2. feature-development-workflow
 3. reflection-workflow
 4. domain-development-workflow (UNIVERSAL for all domain agents)
-5. workspace-conventions
-6. external-integration (optional: data-engineer, scientific-research-expert, web3-blockchain-expert)
+5. external-integration (optional: data-engineer, scientific-research-expert, web3-blockchain-expert)
 
 **Purpose**: Language/framework-specific implementation with TDD (Red-Green-Refactor Cycle).
 
@@ -176,10 +169,9 @@ Workflows are organized into 5 categories based on their scope and purpose:
 
 **Used By**: All agents (enterprise-workflow, reflection-workflow) + specialized agent types
 
-### Enterprise Workflows (4)
+### Enterprise Workflows (3)
 - `c4-architecture-workflow.md` - C4 model documentation (System Context, Containers, Components, Code)
 - `swarm-coordination-skill-workflow.md` - Multi-agent swarm patterns
-- `workspace-conventions.md` - File placement, naming, provenance, cleanup (UNIVERSAL)
 - `qa-bounded-loop.md` - QA validation with bounded fix loops
 
 **Used By**: Documenters (C4), Orchestrators (swarm), All agents (workspace-conventions), Reviewers (QA)

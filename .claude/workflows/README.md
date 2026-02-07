@@ -9,10 +9,12 @@ This directory contains workflow documentation for multi-agent orchestration, co
 Core workflows that define fundamental system behavior and patterns:
 
 - **router-decision.md** - Master routing logic for the multi-agent system. Defines when to spawn agents, complexity classification, and decision matrices.
+- **enterprise-workflow.md** - Multi-phase execution workflow with automatic advancement (Triage → Design → Implement → Review → Deploy → Document → Reflect)
 - **evolution-workflow.md** - Self-evolution process (EVOLVE: Evaluate → Validate → Obtain → Lock → Verify → Enable). Used when creating new agents, skills, hooks, workflows, templates, or schemas.
 - **reflection-workflow.md** - Quality reflection and learnings extraction. Defines how to capture insights, decisions, and patterns after task completion.
 - **skill-lifecycle.md** - Artifact lifecycle management. Covers creation, testing, deployment, and deprecation of skills.
 - **external-integration.md** - Safe integration of external codebases and libraries into projects.
+- **post-creation-validation.md** - Artifact integration validation after creation.
 
 **When to Reference**: Use core workflows to understand system-level decision patterns and architectural constraints.
 
@@ -31,7 +33,7 @@ Enterprise-scale workflows for coordinated multi-agent work:
 Operational workflows for production support and maintenance:
 
 - **incident-response.md** - Production incident handling. Defines severity levels, escalation paths, and resolution workflows.
-- **hook-consolidation.md** - Hook consolidation patterns for reducing duplication and improving maintainability.
+- **qa-bounded-loop.md** - QA validation with bounded fix loops.
 
 **When to Reference**: Use operational workflows for incident management and system maintenance tasks.
 
@@ -51,6 +53,28 @@ Skill-specific workflows tied to individual creator skills or domain agents:
 - **documentation-workflow.md** - Diataxis framework (Tutorial/How-to/Reference/Explanation) for technical-writer agent
 
 **When to Reference**: Use skill-specific workflows when invoking or working with particular domain agents or creator skills.
+
+### `/creators/` and `/updaters/`
+
+YAML-based workflows for artifact creation and updates (executed by creator skills):
+
+**Creators:**
+- **agent-creator-workflow.yaml** - Create new agents following EVOLVE
+- **skill-creator-workflow.yaml** - Create new skills following EVOLVE
+- **workflow-creator-workflow.yaml** - Create new workflows following EVOLVE
+- **hook-creator-workflow.yaml** - Create new hooks following EVOLVE
+- **template-creator-workflow.yaml** - Create new templates following EVOLVE
+- **schema-creator-workflow.yaml** - Create new JSON schemas following EVOLVE
+
+**Updaters:**
+- **agent-updater-workflow.yaml** - Update existing agents with backup/validation
+- **skill-updater-workflow.yaml** - Update existing skills with backup/validation
+- **workflow-updater-workflow.yaml** - Update existing workflows with backup/validation
+- **hook-updater-workflow.yaml** - Update existing hooks with backup/validation
+- **template-updater-workflow.yaml** - Update existing templates with backup/validation
+- **schema-updater-workflow.yaml** - Update existing schemas with backup/validation
+
+**When to Reference**: Used internally by creator/updater skills when invoked via `Skill()` tool.
 
 ## Workflow Organization Pattern
 
@@ -147,4 +171,4 @@ All workflows should include:
 
 ---
 
-_Last updated: 2026-01-28_
+_Last updated: 2026-02-07_

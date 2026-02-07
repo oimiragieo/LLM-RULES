@@ -42,7 +42,7 @@ Authenticate: `gh auth login`. Verify: `gh --version`
 
 **Suggested hooks:** Post-commit (optional): remind to push and open PR. Use with **developer** (with **github-mcp** in always) for CLI-based PR/issue ops; **devops** has github-mcp in always — add github-ops for scriptable gh CLI.
 
-**Workflows:** Use with **developer** or **devops**. Flow: after git push → `gh pr create --fill` or `gh pr list`; use **git-expert** for git, **github-ops** for gh. See `.claude/workflows/enterprise/code-review.yaml`, `full-stack.yaml`.
+**Workflows:** Use with **developer** or **devops**. Flow: after git push → `gh pr create --fill` or `gh pr list`; use **git-expert** for git, **github-ops** for gh. See `.claude/workflows/code-review-workflow.md`.
 
 ## 🛠️ CLI Tools
 

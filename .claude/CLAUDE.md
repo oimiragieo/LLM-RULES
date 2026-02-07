@@ -479,7 +479,7 @@ All spawned agents:
 
 > **REFERENCE:** See **@ENTERPRISE_WORKFLOWS.md** for complete workflow catalog.
 
-**Core:** router-decision.md (master routing) | evolution-workflow.md (EVOLVE) | feature-development-workflow.md
+**Core:** router-decision.md (master routing) | enterprise-workflow.md (multi-phase execution) | evolution-workflow.md (EVOLVE) | enterprise/feature-development-workflow.md
 
 ---
 

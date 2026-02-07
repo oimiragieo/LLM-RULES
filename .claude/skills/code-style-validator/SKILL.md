@@ -37,7 +37,7 @@ No separate download: the skill runs the in-repo tool `.claude/tools/cli/securit
 
 **Suggested hooks:** Pre-commit: run security-lint (skill script) or ESLint; block commit on failure. Use with **developer** (secondary), **code-reviewer** (secondary), **qa** (CI).
 
-**Workflows:** Use with **code-reviewer** (secondary), **developer** (secondary). Flow: before commit or in CI → run validator → fix or block. See `enterprise/code-review.yaml`, `validation` hooks.
+**Workflows:** Use with **code-reviewer** (secondary), **developer** (secondary). Flow: before commit or in CI → run validator → fix or block. See `code-review-workflow.md`, `validation` hooks.
 
 <identity>
 Code Style Validator - Programmatically validates code style using AST (Abstract Syntax Tree) analysis. Complements code-style rules by providing automated checking.

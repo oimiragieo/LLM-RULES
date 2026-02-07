@@ -637,6 +637,61 @@ After large system changes (e.g., agent count from 16 to 49), documentation file
 
 ---
 
+## 2026-02-07: Workflows System Security Findings (Pipeline #13)
+
+**Date:** 2026-02-07
+
+**Impact:** HIGH -- 5 HIGH, 5 MEDIUM, 4 LOW findings in workflow orchestration security
+
+**Description:**
+
+Security review of `.claude/workflows/` subsystem (54 files across 7 subdirectories) identified systemic vulnerabilities in the workflow orchestration layer that controls agent execution flow, model selection, tool access, and quality gates. Security Score: 62/100 (CONDITIONAL PASS).
+
+**Key Findings:**
+
+1. **I-WF-001 (HIGH)**: Prompt injection via spawn templates. ALL workflow files inject user content into spawn prompts via `User Request: $ARGUMENTS` (router-decision.md Step 7) without sanitization. This is the SAME systemic vulnerability found in Pipeline #11 (HIGH-001, agents) and Pipeline #12 (SEC-CTX-002, reflection queue). Three separate subsystems, same root cause: no centralized prompt sanitization layer.
+
+2. **T-WF-001 (HIGH)**: Workflow state file tampering. `post-completion-chain.cjs` reads `workflow-state.json` with plain `JSON.parse()` (line 81) -- no HMAC integrity check, no schema validation, no prototype pollution prevention. Any agent with Write access to `runtime/` can manipulate workflow state to skip phases.
+
+3. **T-WF-002 (HIGH)**: Phase-advance signal injection. `phase-advance.json` is writable by any agent and consumed by the Router (router-decision.md Step 7.5). No authentication token or source validation. An agent can force the Router to advance to arbitrary phases, bypassing design, review, or security gates.
+
+4. **E-WF-001 (HIGH)**: Environment variable security disable. 8 different environment variables can individually disable security enforcement:
+   - ROUTER_SELF_CHECK, PLANNER_FIRST_ENFORCEMENT, SECURITY_REVIEW_ENFORCEMENT
+   - ROUTER_WRITE_GUARD, ROUTER_BASH_GUARD, EVOLUTION_STATE_GUARD
+   - CREATOR_GUARD, HOOK_FAIL_OPEN
+   Setting `HOOK_FAIL_OPEN=true` bypasses ALL routing-guard checks simultaneously (line 1041-1043 of routing-guard.cjs).
+
+5. **E-WF-002 (HIGH)**: Complexity downgrade bypass. TRIVIAL and LOW complexity classification in enterprise-workflow.md skip security review entirely (jump directly to Implement+Review). A crafted complexity classification can bypass all security gates. The complexity-classifier.cjs itself is not integrity-protected.
+
+**Additional Findings (MEDIUM):**
+- S-WF-002: Agent type detection via string matching (easily spoofable)
+- T-WF-003: Evolution state file manipulation (partially mitigated by state-guard)
+- T-WF-004: Quality gate result falsification (self-reported metrics, not independently verified)
+- R-WF-001: Workflow audit trail gap (evolution-audit.cjs archived, no replacement)
+- D-WF-001: State file locking gap (no file locking for concurrent access)
+
+**Cross-Pipeline Pattern:**
+Prompt injection appears in ALL three deep-dive pipelines:
+- Pipeline #11 (Agents): HIGH-001 -- Task() prompt/description injection
+- Pipeline #12 (Context): SEC-CTX-002 -- Reflection spawn prompt injection
+- Pipeline #13 (Workflows): I-WF-001 -- Spawn template content injection
+This is a SYSTEMIC issue requiring a centralized `sanitizePromptContent()` utility.
+
+**Workaround:**
+- Do NOT deploy in adversarial environments until HIGH findings are remediated
+- Monitor `workflow-state.json` and `phase-advance.json` for unexpected modifications
+- Avoid setting HOOK_FAIL_OPEN=true in any environment
+- Manually verify complexity classifications for security-sensitive tasks
+
+**Resolution Path:**
+- P1 (5 HIGH findings): Centralized prompt sanitization, HMAC state integrity, phase-advance authentication, env var hardening, complexity classification integrity
+- P2 (5 MEDIUM findings): Structured agent detection, schema validation, quality gate independence, audit trail restoration, file locking
+- P3 (4 LOW findings): Rate limiting, workflow documentation, incident response auth, creator YAML hardening
+
+**Full Report:** `.claude/context/reports/security/workflows-security-review-2026-02-07.md`
+
+---
+
 ## 2026-02-07: Context Data Layer Security Findings (Pipeline #12)
 
 **Date:** 2026-02-07

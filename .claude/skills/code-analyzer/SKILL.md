@@ -39,7 +39,7 @@ No separate download: the skill runs the in-repo tool `.claude/tools/analysis/pr
 
 **Suggested hooks:** Pre-commit or CI: run project-analyzer/doctor for health; optional complexity gate. Use with **developer** (secondary), **qa** (secondary), **code-reviewer** (primary).
 
-**Workflows:** Use with **code-reviewer** (primary), **developer**/ **qa** (secondary), **c4-code** (primary). Flow: run analyzer → filter hotspots → refactor or add tests. See `enterprise/code-review.yaml`.
+**Workflows:** Use with **code-reviewer** (primary), **developer**/ **qa** (secondary), **c4-code** (primary). Flow: run analyzer → filter hotspots → refactor or add tests. See `code-review-workflow.md`.
 
 ## Overview
 

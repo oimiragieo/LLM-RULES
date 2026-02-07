@@ -8,7 +8,7 @@
 
 ## PURPOSE
 
-Complete catalog of 15+ enterprise workflows for multi-agent orchestration, security audits, architecture reviews, and operational processes.
+Complete catalog of 18+ enterprise workflows for multi-agent orchestration, security audits, architecture reviews, and operational processes.
 
 ---
 
@@ -17,6 +17,7 @@ Complete catalog of 15+ enterprise workflows for multi-agent orchestration, secu
 | Workflow             | Path                                                                | Purpose                 |
 | -------------------- | ------------------------------------------------------------------- | ----------------------- |
 | Router Decision      | `.claude/workflows/core/router-decision.md`                         | master routing          |
+| **Enterprise Workflow** | `.claude/workflows/core/enterprise-workflow.md`                  | **multi-phase execution** |
 | External Integration | `.claude/workflows/core/external-integration.md`                    | safe integration        |
 | Artifact Lifecycle   | `.claude/workflows/core/skill-lifecycle.md`                         | create/update/deprecate |
 | Feature Development  | `.claude/workflows/enterprise/feature-development-workflow.md`      | end-to-end              |
@@ -32,7 +33,6 @@ Complete catalog of 15+ enterprise workflows for multi-agent orchestration, secu
 | Swarm Coordination   | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md` | swarm patterns          |
 | Database Design      | `.claude/workflows/database-architect-skill-workflow.md`            | schema workflows        |
 | Context Compression  | `.claude/workflows/context-compressor-skill-workflow.md`            | summarization           |
-| Hook Consolidation   | `.claude/workflows/operations/hook-consolidation.md`                | hook consolidation      |
 | Post-Creation Valid. | `.claude/workflows/core/post-creation-validation.md`                | artifact integration    |
 | Progressive Disclos. | `.claude/workflows/progressive-disclosure-skill-workflow.md`        | requirements gathering  |
 | **Domain Development** | `.claude/workflows/domain-development-workflow.md`                | **TDD for domain agents** |
@@ -45,10 +45,12 @@ Complete catalog of 15+ enterprise workflows for multi-agent orchestration, secu
 **Core Workflows** (`.claude/workflows/core/`):
 
 - `router-decision.md` - Master routing logic (source of truth)
+- `enterprise-workflow.md` - **Multi-phase execution (Triage → Design → Implement → Review → Deploy → Document → Reflect)**
 - `evolution-workflow.md` - EVOLVE process (E→V→O→L→V→E)
 - `external-integration.md` - Safe integration of external systems
 - `skill-lifecycle.md` - Artifact creation, updates, deprecation
 - `reflection-workflow.md` - Quality reflection and learning capture
+- `post-creation-validation.md` - Artifact integration validation
 
 **Enterprise Workflows** (`.claude/workflows/enterprise/`):
 
@@ -59,7 +61,14 @@ Complete catalog of 15+ enterprise workflows for multi-agent orchestration, secu
 **Operations Workflows** (`.claude/workflows/operations/`):
 
 - `incident-response.md` - Production incident handling
-- `hook-consolidation.md` - Hook management and consolidation
+- `qa-bounded-loop.md` - QA validation with bounded fix loops
+
+**Root Workflows** (`.claude/workflows/`):
+
+- `domain-development-workflow.md` - TDD workflow for all 22 domain specialist agents
+- `code-review-workflow.md` - Two-pass review process
+- `product-management-workflow.md` - INVEST criteria and sprint planning
+- `documentation-workflow.md` - Diataxis framework for technical writing
 
 ---
 
