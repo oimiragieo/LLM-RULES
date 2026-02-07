@@ -33,6 +33,38 @@
       "pattern": "Enriched = single command + documentation of integration. Multi-step = agent delegation.",
       "extracted_from": "Task #85 catalog design (1 enriched command documented as exception)",
       "date": "2026-02-07"
+    },
+    {
+      "id": "depth-calculation-after-relocation",
+      "gotcha": "When moving files deeper in directory tree, __dirname-based path calculations must be updated",
+      "context": "Tools System Overhaul Phase C (Task #95) - relocated 8 modules from tools/ to lib/subdirs/",
+      "why_it_happens": "Code computes PROJECT_ROOT using relative paths like resolve(__dirname, '../..'). When file moves from depth 2 (tools/) to depth 3 (lib/workflow/), the depth changes.",
+      "symptoms": "Silent failures when computing PROJECT_ROOT - file operations target wrong directory, config files not found, MODULE_NOT_FOUND for sibling modules",
+      "trigger": "Relocating files from shallow to deep directory (or vice versa) without updating __dirname calculations",
+      "detection_pattern": "Search relocated files for __dirname, verify '../..' count matches new depth",
+      "solution": "Update all __dirname-based paths: resolve(__dirname, '../..') → resolve(__dirname, '../../..'). Better: use helper function that walks up to find .claude/CLAUDE.md",
+      "example": "Moved decision-handler.mjs from tools/workflow/ (depth 2) to lib/workflow/ (depth 3). Required updating resolve(__dirname, '../..') to resolve(__dirname, '../../..')",
+      "prevention": "Create computeProjectRoot() helper that walks directory tree instead of hardcoding depth",
+      "extracted_from": "Task #95 learnings.md, documented in ADR-089 implementation notes",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "security-lint-test-file-false-positives",
+      "gotcha": "Security scanner triggers false positives on test files containing intentional malicious strings",
+      "context": "Tools System Overhaul Phase C (Task #95) - decision-handler-security.test.cjs contains malicious expressions for testing",
+      "why_it_happens": "security-lint.cjs scans ALL .js/.cjs/.mjs files for dangerous patterns (eval, new Function, exec). Test files that verify these patterns are rejected correctly contain the patterns themselves.",
+      "symptoms": "security-lint.cjs fails on test files with ERROR: 'eval detected' or 'new Function detected' even though usage is safe (inside test strings)",
+      "trigger": "Creating security tests that include malicious code samples as test data",
+      "solution": "Add '// security-lint-ignore: Security test file - contains intentional malicious strings for validation' as first line of test file. Scanner skips files with this directive.",
+      "example": "decision-handler-security.test.cjs has malicious expression strings like 'process.exit(1)' and 'require(\"fs\")' for testing parser rejection",
+      "alternatives": [
+        "Extend security-lint.cjs to auto-detect test files (path includes tests/ or *.test.*)",
+        "Store malicious test data in separate .json file outside scan scope",
+        "Configure security-lint.cjs to allow eval/Function in test files only"
+      ],
+      "best_practice": "Always include reason in ignore directive: // security-lint-ignore: <clear explanation>",
+      "extracted_from": "Task #95 learnings.md (Security-Lint-Ignore Directive pattern)",
+      "date": "2026-02-07"
     }
   ]
 }

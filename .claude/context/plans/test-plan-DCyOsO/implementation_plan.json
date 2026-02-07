@@ -1,0 +1,13 @@
+{
+  "feature": "Test",
+  "subtasks": [
+    {
+      "id": 1,
+      "status": "completed"
+    }
+  ],
+  "qa_signoff": {
+    "status": "rejected",
+    "qa_session": 1
+  }
+}

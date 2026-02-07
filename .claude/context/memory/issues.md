@@ -14,6 +14,64 @@ Each issue should include:
 
 ---
 
+## 2026-02-07: validate:full CI Chain Broken (Pipeline #8, ADR-090)
+
+**Date:** 2026-02-07
+
+**Impact:** CRITICAL -- `pnpm validate:full` crashes at step 5 (`pnpm validate:index`)
+
+**Description:**
+`scripts/validation/validate-index.mjs` line 19 imports from `../../.claude/tools/context/context-path-resolver.mjs` -- a path that no longer exists. The module was moved to `../../.claude/lib/utils/context-path-resolver.mjs` during Phase C of the Tools Overhaul (ADR-089, Task #95, commit 789f849c). This script was missed in the consumer update pass.
+
+The `validate:full` npm script chains multiple validators, and `pnpm validate:index` is step 5 in that chain. When it fails with MODULE_NOT_FOUND, the chain aborts.
+
+**Workaround:** Run individual validators manually (skip `validate:index`), or use `pnpm validate:index-paths` instead (which uses the correct import path and is a superset of validate-index.mjs functionality).
+
+**Resolution:** Merge validate-index.mjs into validate-rule-index-paths.mjs and update the `validate:index` npm script to point to the latter. See ADR-090 Phase A.
+
+---
+
+## 2026-02-07: Tools System Security Findings (Task #92)
+
+**Date:** 2026-02-07
+
+**Issue:**
+
+Security review of the `.claude/tools/` system (77 executable files, 15,203 LOC) identified 1 HIGH and 3 MEDIUM severity findings requiring mitigation.
+
+**Key Findings:**
+
+1. **SEC-TOOL-001 [HIGH]**: Arbitrary code execution in `decision-handler.mjs` via `new Function()` expression evaluator. User-controlled workflow conditions can inject arbitrary JavaScript code.
+
+2. **SEC-TOOL-002 [MEDIUM]**: Command injection risk in `eslint-batch-fix.cjs` via `execSync` with string interpolation. Current instance is low-risk but pattern is dangerous.
+
+3. **SEC-TOOL-003 [MEDIUM]**: Path traversal in `document-query.cjs` allows reading arbitrary files outside PROJECT_ROOT via `../../` sequences. High exploitability.
+
+4. **SEC-TOOL-004 [MEDIUM]**: GitHub token exposure in `github/executor.py` passes credentials as Docker environment variables (visible in process list and logs).
+
+**Additional Findings (LOW):**
+- SEC-TOOL-005: Secrets logged by security-lint.cjs
+- SEC-TOOL-006: No confirmation prompts for file deletion
+- SEC-TOOL-007: Unbounded resource consumption in project analyzer
+- SEC-TOOL-008: Missing timeouts in MCP analyzer
+
+**Impact:**
+
+- SEC-TOOL-001 blocks workflow execution feature (arbitrary code execution)
+- SEC-TOOL-003 blocks document-query with untrusted paths (information disclosure)
+- Other findings are medium/low priority improvements
+
+**Workaround:**
+
+SEC-TOOL-001: Do not enable workflow execution until fixed.
+SEC-TOOL-003: Only use document-query.cjs with trusted paths.
+
+**Resolution:**
+
+Findings documented in `.claude/context/reports/security/tools-system-security-review-2026-02-07.md`. Verdict: APPROVED WITH CONDITIONS. SEC-TOOL-001 and SEC-TOOL-003 are MUST-FIX before enabling respective features.
+
+---
+
 ## 2026-02-07: Template-Creator Skill Security Findings (Task #76)
 
 **Date:** 2026-02-07

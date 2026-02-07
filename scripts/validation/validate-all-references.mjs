@@ -431,15 +431,15 @@ function validateSchemas() {
 function validateWorkflowRunner() {
   console.log('\n📋 Validating workflow runner...');
 
-  const _runnerPath = resolve(rootDir, '.claude/tools/workflow_runner.js');
-  if (!checkFile('.claude/tools/workflow_runner.js', 'Workflow runner', true)) {
+  const _runnerPath = resolve(rootDir, '.claude/lib/workflow/workflow-runner.js');
+  if (!checkFile('.claude/lib/workflow/workflow-runner.js', 'Workflow runner', true)) {
     return;
   }
 
   // Check for required dependencies
   const dependencies = [
-    '.claude/tools/workflow/decision-handler.mjs',
-    '.claude/tools/workflow/loop-handler.mjs',
+    '.claude/lib/workflow/decision-handler.mjs',
+    '.claude/lib/workflow/loop-handler.mjs',
   ];
 
   dependencies.forEach(dep => {

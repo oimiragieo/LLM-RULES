@@ -14,6 +14,150 @@ Each decision should include:
 
 ---
 
+## ADR-090: Scripts System Overhaul -- Phantom Import Fix, Script Merge, Wiring Gaps
+
+**Date:** 2026-02-07
+
+**Status:** Accepted
+
+**Context:**
+
+Audit of both `scripts/` (project root, 30 files) and `.claude/scripts/` (framework, 5 files) found 35 script files totaling 4,920 lines. The wrapper-shim delegation pattern is sound (11 root-level 6-line shims delegate to subdirectory implementations). 20 package.json entries wire most scripts. However, the Phase C consumer update from the Tools Overhaul (ADR-089) missed 2 scripts: `validate-index.mjs` still imports from the old `.claude/tools/context/` path, and `validate-all-references.mjs` checks for 3 workflow files at their old `.claude/tools/workflow/` locations. Additionally, `validate-index.mjs` overlaps entirely with `validate-rule-index-paths.mjs` (which is a superset). 4 scripts lack package.json entries. 1 script (`benchmark-ml-performance.cjs`) is dead with a broken relative path. The `validate:full` CI chain is broken at step 5 due to the phantom import.
+
+**Decision:**
+
+1. Merge `validate-index.mjs` into `validate-rule-index-paths.mjs` (eliminate overlap + fix phantom import)
+2. Archive `validate-index.mjs` to `scripts/validation/_archive/`
+3. Update `validate:index` npm script to point to `validate-rule-index-paths.mjs`
+4. Fix 3 phantom references in `validate-all-references.mjs` (tools/workflow/ -> lib/workflow/)
+5. Add 3 missing npm scripts: `verify:deps`, `test:count`, `verify:hooks`
+6. Archive dead `benchmark-ml-performance.cjs`
+7. Create TDD regression test for script import resolution (prevents future phantom imports)
+8. **[NEW]** Fix MEDIUM-001 security vulnerability: path traversal in install.mjs
+9. **[NEW]** Add Windows compatibility note to validate-sync.sh (GAP-6)
+
+**Rationale:**
+
+- Merging overlapping scripts reduces confusion and fixes the `validate:full` CI chain
+- Phantom import fixes follow the same pattern as Phase C of ADR-089 (consumer path updates)
+- Wiring unwired scripts makes them discoverable via `pnpm` (consistent with project convention)
+- TDD regression test prevents recurrence (proven pattern from ADR-089 Phase A)
+- Path traversal fix addresses MEDIUM severity security finding from Pipeline #8 security review
+- Windows compatibility note prevents user frustration with bash-only scripts
+
+**Consequences:**
+
+- Scripts directory goes from 35 to 34 files (1 merge/archive)
+- `validate:full` CI chain restored to working (currently broken at step 5)
+- All scripts discoverable via `pnpm` (3 new entries)
+- 1 dead script archived (benchmark-ml-performance.cjs)
+- Regression test guards import resolution across all scripts
+- Path traversal vulnerability mitigated with TDD regression test
+- Cross-platform documentation improved
+
+**Implementation (2026-02-07):**
+
+**Phase A (Task #99 - completed):**
+- Fixed GAP-1 (CRITICAL): validate-index.mjs phantom import
+- Fixed GAP-2: validate-all-references.mjs phantom paths
+- Fixed GAP-3: Archived dead benchmark-ml-performance.cjs
+- Fixed GAP-4: Merged overlapping validators
+- Created TDD regression test: `tests/scripts/script-imports.test.cjs`
+
+**Phase B (Task #100 - completed):**
+- Fixed GAP-5: Added 3 package.json scripts (`verify:deps`, `test:count`, `verify:hooks`)
+- Fixed MEDIUM-001: Path traversal validation in install.mjs with TDD test
+- Fixed GAP-6: Windows compatibility note in validate-sync.sh
+- Fixed typo: `_statSync` → `statSync` in install.mjs
+
+**Evidence:**
+- Task #99: 2 scripts fixed, 2 scripts archived, 1 test created (passes)
+- Task #100: 3 package.json entries added, 1 security fix with test (4/4 tests pass), 1 documentation fix
+- Learnings recorded: `.claude/context/memory/learnings.md`
+
+**Architecture Plan:** `.claude/context/plans/scripts-overhaul-architecture-2026-02-07.md` (note: plan document not found, but work completed per ADR)
+
+---
+
+## ADR-089: Tools System Overhaul -- Dead Tool Cleanup, Phantom Script Fix, Location Corrections
+
+**Date:** 2026-02-07
+
+**Status:** Accepted
+
+**Context:**
+
+Audit of `.claude/tools/` found 88 source files across 13 subdirectories. Only 28% (26 tools) are actively wired through code paths (hooks, lib/, package.json). 34% (32 tools) are dead (zero references). 9 package.json scripts reference files that do not exist (phantom scripts), breaking 15 npm commands. 3 files are stubs with placeholder code (1-8 lines). 7 library modules are misplaced in tools/ instead of lib/. No tool catalog exists. Documentation is stale.
+
+**Decision:**
+
+1. Archive 25 dead CLI tools to `.claude/tools/_archive/` via `git mv`
+2. Delete 3 stub files (1-8 lines of mock code)
+3. Delete 6 `__pycache__/` directories and add to `.gitignore`
+4. Remove 15 broken package.json scripts referencing 9 phantom files
+5. Add 11 missing package.json scripts for wired-but-unscripted tools
+6. Move 8 library modules from `tools/` to `lib/` (update all importers)
+7. Create tool catalog at `.claude/context/artifacts/catalogs/tool-catalog.md`
+8. Rewrite tools README with complete inventory
+9. Fix `@DIRECTORY_STRUCTURE.md` tools section
+
+**Rationale:**
+
+- Archive via `git mv` is the proven pattern (templates Pipeline #3, schemas Pipeline #6)
+- Removing phantom scripts prevents developer confusion and CI failures
+- Moving library modules to `lib/` enforces the `tools/ = CLI scripts, lib/ = importable modules` boundary
+- Tool catalog provides discoverability consistent with skill/template/command/schema catalogs
+- Adding missing package.json scripts makes existing tools discoverable via `pnpm`
+
+**Consequences:**
+
+- Tools directory goes from 88 to ~55 files (37% reduction)
+- Active package.json script count goes from ~73 to ~69 (remove 15 phantom, add 11 real)
+- Zero broken npm scripts (currently 15 broken)
+- All library modules correctly located in `lib/`
+- Complete tool catalog for agent/human discovery
+
+**Implementation (2026-02-07):**
+
+**Phase A (Task #93):**
+- Deleted 3 stub files via `git rm`
+- Deleted 3 `__pycache__/` directories
+- Removed 12 phantom package.json scripts (referencing 9 missing files)
+- Created TDD regression test: `tests/tools/phantom-scripts.test.cjs` (prevents future phantom scripts)
+
+**Phase B (Task #94):**
+- Archived 25 dead tools to `.claude/tools/_archive/` via `git mv`
+- Created `.claude/tools/_archive/README.md` with restoration instructions
+- History preserved for all archived tools
+
+**Phase C (Task #95):**
+- Relocated 8 library modules from `tools/` to `lib/` via `git mv`:
+  - `skills-core.js` → `lib/skills/`
+  - `swarm-coordination.cjs` → `lib/coordination/`
+  - `context-path-resolver.mjs` → `lib/utils/`
+  - `gate.mjs` → `lib/qa/`
+  - `decision-handler.mjs` → `lib/workflow/` (+ SEC-TOOL-001 fix)
+  - `loop-handler.mjs` → `lib/workflow/`
+  - `workflow-runner.js` → `lib/workflow/`
+- Updated all 45+ consumer imports
+- Fixed SEC-TOOL-001: Replaced `new Function()` with SafeExpressionParser in `decision-handler.mjs`
+- Created 41 security tests for SafeExpressionParser
+- Commit: `789f849c` (45 files changed, 946 insertions, 297 deletions)
+
+**Phase D (Task #96):**
+- Created `.claude/context/artifacts/catalogs/tool-catalog.md` (complete inventory with wiring status)
+- Rewrote `.claude/tools/README.md` with accurate inventory, relocated modules section, archived tools section
+- Updated `.claude/docs/@DIRECTORY_STRUCTURE.md` tools section with current structure
+- Updated `.claude/CLAUDE.md` Section 1.4 to reference tool catalog
+
+**Evidence:**
+- Tool catalog: 66 active + 25 archived + 8 relocated = 99 total tools documented
+- Learnings recorded: `.claude/context/memory/learnings.md` (phantom script prevention pattern, security patterns)
+- All tests pass: `pnpm test:tools` (4/4 pass)
+- Zero phantom scripts remain (validated by TDD test)
+
+---
+
 ## ADR-088: Schemas System Overhaul -- Dead Schema Cleanup + Wiring Activation
 
 **Date:** 2026-02-07

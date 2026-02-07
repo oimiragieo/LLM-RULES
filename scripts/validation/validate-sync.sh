@@ -1,6 +1,21 @@
 #!/bin/bash
 # validate-sync.sh - Validates cross-platform sync and configuration integrity
 # Run: bash scripts/validate-sync.sh
+#
+# WINDOWS COMPATIBILITY NOTE (GAP-6):
+# This script requires bash and Unix utilities (find, grep, wc).
+# On Windows, run via:
+#   - Git Bash (comes with Git for Windows)
+#   - WSL (Windows Subsystem for Linux)
+#   - Cygwin/MSYS2
+#
+# Alternative: Use the Node.js validation scripts which are cross-platform:
+#   - pnpm validate:config (validates config.yaml and settings.json)
+#   - pnpm validate:references (validates file references)
+#   - pnpm validate:full (comprehensive validation chain)
+#
+# For cross-platform agent count validation, consider creating a Node.js
+# equivalent of this script at scripts/validation/validate-sync.mjs
 
 set -e
 

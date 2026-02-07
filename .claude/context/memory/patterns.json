@@ -78,6 +78,77 @@
       ],
       "extracted_from": "Tasks #84 (deletion), #85 (catalog cleanup), QA validation",
       "date": "2026-02-07"
+    },
+    {
+      "id": "recursive-descent-parser-safe-eval",
+      "name": "Recursive Descent Parser for Safe Expression Evaluation",
+      "context": "Tools System Overhaul Phase C (Task #95) - SEC-TOOL-001 Fix",
+      "description": "When code needs to evaluate user-controlled expressions (workflow conditions, config DSLs, template logic), NEVER use new Function(), eval(), or regex-based sanitization. Instead, implement a recursive descent parser that only whitelists safe operations: literals (true/false/numbers/strings), comparisons (===, !==, ==, !=, >=, <=, >, <), logical operators (&&, ||, !), parenthesized grouping. The parser rejects anything it doesn't explicitly support.",
+      "why_it_works": "100% safe because undefined behavior defaults to rejection. Attackers cannot embed code in string literals or bypass pattern matching - parser only recognizes safe token types.",
+      "implementation": "SafeExpressionParser class in .claude/lib/workflow/decision-handler.mjs (~200 lines). Tokenizer → Parser → Evaluator. Supports boolean algebra for workflow gate expressions.",
+      "test_coverage": "41 security tests (20 malicious rejections, 16 legitimate expressions, 3 context integration, 2 complex conditions) in tests/lib/workflow/decision-handler-security.test.cjs",
+      "applicability": "Any expression evaluation: config files, workflow DSLs, template engines, rule engines, policy languages",
+      "examples": [
+        "Workflow gate: status === 'approved' && complexity < 5",
+        "Config condition: environment === 'production' || debug === true",
+        "Template logic: user !== null && user.role === 'admin'"
+      ],
+      "anti_patterns": [
+        "new Function('return ' + userInput)() - arbitrary code execution",
+        "eval(sanitized) - bypass via string escaping",
+        "Regex blacklist - incomplete, bypassable"
+      ],
+      "extracted_from": "Task #95 (SEC-TOOL-001 fix), validated by 41 passing security tests",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "consumer-discovery-pattern-relocations",
+      "name": "Consumer Discovery Pattern for File Relocations",
+      "context": "Tools System Overhaul Phase C (Task #95) - 8 library modules relocated from tools/ to lib/",
+      "description": "Before relocating ANY file, grep the ENTIRE codebase for: (1) the filename (e.g., 'decision-handler'), (2) the directory path (e.g., 'tools/workflow/'), (3) any require() or import() references to the file. Update ALL consumers before committing. Missing even one import breaks the build, often silently.",
+      "why_critical": "Relocated files with missed consumer updates cause MODULE_NOT_FOUND crashes. Example: user-prompt-unified.cjs still referenced old router-state.cjs path after relocation, causing crash on every UserPromptSubmit (Task #47).",
+      "grep_patterns": [
+        "grep -r 'decision-handler' .",
+        "grep -r 'tools/workflow/' .",
+        "grep -r \"require.*decision-handler\" .",
+        "grep -r \"import.*decision-handler\" ."
+      ],
+      "update_checklist": [
+        "Update all require() paths to new location",
+        "Update all import paths to new location",
+        "Update depth calculations (__dirname, '../..')",
+        "Update any documentation references",
+        "Test that all consumers still work"
+      ],
+      "example": "Task #95 relocated 8 modules, updated 45+ consumer imports. Full codebase grep caught all references.",
+      "applicability": "Any file relocation, library reorganization, directory restructuring",
+      "extracted_from": "Task #95 (8 relocations, 45+ import updates), lessons from Task #47 (missed consumer crash)",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "tool-catalog-discoverability",
+      "name": "Tool Catalog as Programmatic Discoverability Aid",
+      "context": "Tools System Overhaul Phase D (Task #96) - created tool-catalog.md for 99 tools",
+      "description": "Create markdown catalog at .claude/context/artifacts/catalogs/tool-catalog.md with: summary statistics (active/archived/relocated counts), active tools organized by category, wiring status per tool (package.json scripts, skill references, hook references), archived tools section with restoration instructions, relocated tools section with new locations.",
+      "why_valuable": "Enables agents and developers to discover available tools, understand what's wired vs reference-only documentation, know where deprecated tools were moved (git history preserved), avoid creating duplicate tools.",
+      "structure": [
+        "Summary Statistics table (counts by category)",
+        "Active Tools section (organized by 10+ categories)",
+        "Wiring Status column (package.json, skills, hooks, lib/)",
+        "Archived Tools section (location, reason, restoration)",
+        "Relocated Tools section (old → new path mapping)"
+      ],
+      "precedent": "Follows pattern from skill-catalog.md, template-catalog.md, command-catalog.md, schema-catalog.md",
+      "example": "Task #96 created catalog documenting 66 active + 25 archived + 8 relocated = 99 total tools",
+      "benefits": [
+        "Agents can search catalog to find tools for specific capabilities",
+        "Developers avoid duplicate tool creation",
+        "Archived tools can be restored with full git history",
+        "Wiring status shows what's actually used vs documentation-only"
+      ],
+      "applicability": "Any system with 20+ tools/utilities/modules where discovery is a problem",
+      "extracted_from": "Task #96 (tool catalog creation), pattern observed in 4 other catalogs",
+      "date": "2026-02-07"
     }
   ]
 }
