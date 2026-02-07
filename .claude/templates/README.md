@@ -429,7 +429,7 @@ git mv .claude/templates/_archive/planning/*.md .claude/templates/planning/
 - **Examples** (2): example-adr-050.md, example-specification.md (unused)
 - **Other** (4): claude-md-template.md, project-brief.md, prd.md, ui-spec.md (unused)
 
-**Deleted (not archived):** html-css.md, general.md (overlapped with `.claude/rules/coding-style.md`)
+**Deleted (not archived):** html-css.md, general.md (overlapped with `.claude/rules/code-standards.md`)
 
 ## Creator Skills
 

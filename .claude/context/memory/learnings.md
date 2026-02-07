@@ -1,3 +1,164 @@
+## 2026-02-07: Rules System Overhaul Implementation (Pipeline #9 - Complete)
+
+**Context:** Rules system overhaul (Pipeline #9, Task #105): create critical rules, merge, expand all, fix path conflicts, update registries.
+
+**Key Learnings:**
+
+1. **Rules are auto-loaded into system prompt — every line costs tokens.** Thin rules (3 lines) are worse than no rules — set minimum 6+ directives. Each rule should provide clear, actionable guidance with project-specific context.
+
+2. **When merging files, search entire codebase for references to deleted filenames.** Merged `coding-style.md` + `patterns.md` into `code-standards.md`. Found 5 broken references in:
+   - `@DIRECTORY_STRUCTURE.md` (directory tree listing)
+   - `templates/README.md` (deleted files note)
+   - `templates/_archive/README.md` (archive tracking)
+   - `rules-system-security-review-2026-02-07.md` (enforcement table)
+   Pattern: After any file deletion/rename, `grep -r "old-filename" .claude/` and update all matches.
+
+3. **Memory protocol and task tracking were critical gaps — now have dedicated rules.** These behaviors are mandatory for every agent (CLAUDE.md Sections 8 and 5.5-5.6) but had zero rule coverage. Created `memory-protocol.md` and `task-tracking.md` to enforce via system prompt auto-loading.
+
+4. **rule-index.json must stay in sync with filesystem.** After creating 2 rules, merging 2 into 1, and expanding 7 existing rules, updated rule-index.json to v1.3.0 with 10 rules total and complete descriptions.
+
+5. **ADR status must reflect implementation completion.** Updated ADR-091 from "Proposed" to "Accepted (Implementation Complete: 2026-02-07)" to reflect that all 8 implementation tasks from the plan were executed successfully.
+
+**Outcome:** 10 rules (was 9), all 33-54 lines (was 3-8), 2 critical gaps filled, 5 broken references fixed, registry updated, ADR-091 accepted.
+
+---
+
+## 2026-02-07: Rules System Deep Dive Architecture (Pipeline #9 - Task #102)
+
+**Context:** Comprehensive architecture audit of `.claude/rules/` (9 files, ~128 lines, ~4.3KB).
+
+**Key Learnings:**
+
+1. **Rules auto-load as system prompt -- no wiring needed.** Claude Code loads all `.claude/rules/*.md` files into every conversation's system prompt automatically. They do not need `require()`, `import`, or explicit references. The "wiring" question for rules is not "is the file imported?" but "is the content accurate and useful?"
+
+2. **Thin rules are worse than no rules.** A 3-line rule file provides minimal value while consuming system prompt tokens. Each rule should have 6+ actionable directives with project-specific detail. Generic platitudes ("prefer composition over inheritance") add noise without signal.
+
+3. **Rule-index.json must match filesystem.** The index had 8 entries but 9 files existed (workspace-conventions.md was missing). Any programmatic rule discovery system will have blind spots. Pattern: after creating/deleting/renaming any rule file, always update rule-index.json.
+
+4. **Cross-document path conflicts are insidious.** workspace-conventions.md (canonical, per ADR-078/ADR-081) and FILE_PLACEMENT_RULES.md (stale v2.0) disagree on plan and report paths. Agents reading different documents will write to different locations. Pattern: after any ADR that changes paths, grep the entire codebase for the old paths and update ALL references.
+
+5. **The most critical behaviors need rule coverage.** Memory protocol (CLAUDE.md Section 8) and task tracking (Sections 5.5-5.6) are mandatory for every agent but had zero rule coverage. Rules are the most reliable enforcement layer because they auto-load for every conversation -- unlike CLAUDE.md sections which spawned agents may not fully absorb.
+
+6. **workspace-conventions.md is the best-integrated rule.** Referenced by 46+ agent definitions, all 6 creator skills, the universal spawn template, and multiple docs. It is the model for what a rule file should look like: specific, actionable, cross-referenced, and hook-enforced.
+
+**Evidence:**
+- Architecture plan: `.claude/context/plans/rules-overhaul-architecture-2026-02-07.md`
+- ADR-091: Proposed (`.claude/context/memory/decisions.md`)
+
+---
+
+## 2026-02-07: Rules System Security Review (Pipeline #9 - COMPLETE)
+
+**Context:** Comprehensive security review of `.claude/rules/` system (9 markdown instruction files) for Pipeline #9.
+
+**Key Findings:**
+
+**Verdict:** ✅ APPROVED (Security Score: 88/100) — 2 MEDIUM, 2 LOW findings
+
+**What was analyzed:**
+
+1. **Content Security:** No credentials exposure, no prompt injection risk (static markdown)
+2. **OWASP Top 10 Coverage:** 40% covered (A01, A03, A04, A08), 60% gaps
+3. **Hook Enforcement:** 6/9 rules have hook enforcement, 3 advisory-only
+4. **STRIDE Analysis:** Low risk across all categories (markdown = no execution)
+
+**Key Learnings:**
+
+1. **Rules System Security-by-Design Pattern:** Markdown-only instruction files eliminate execution risk. Rules cannot be exploited via:
+   - Code injection (no execution)
+   - Path traversal (no file operations)
+   - Command injection (no shell access)
+   - Privilege escalation (advisory instructions only)
+   This demonstrates that **passive instruction systems** (markdown rules loaded by Claude Code) are inherently more secure than **active execution systems** (hooks, scripts, tools).
+
+2. **Advisory vs Enforced Rules Dichotomy:** Rules fall into two categories:
+   - **Enforced Rules** (6/9): Backed by hooks (routing-guard.cjs for agents.md, pre-commit.cjs for git-workflow.md, ESLint for coding-style.md, validators for workspace-conventions.md)
+   - **Advisory Rules** (3/9): No hook enforcement (testing.md, patterns.md, performance.md)
+   **Pattern:** Advisory-only rules are often ignored under time pressure. For critical rules (security, testing), always add hook enforcement. From memory: SEC-TOOL-001 (decision-handler.mjs `new Function()` vulnerability) occurred despite existing security rules against dynamic code execution — demonstrating advisory rules alone are insufficient.
+
+3. **OWASP Coverage Audit Pattern:** When reviewing security guidance, map rules to OWASP Top 10:
+   - ✅ Covered: A01 (Access Control), A03 (Injection), A04 (Insecure Design), A08 (Data Integrity)
+   - ❌ Missing: A06 (Vulnerable Components), A09 (Logging Failures), A10 (SSRF)
+   - ⚠️ Partial: A02 (Cryptography), A05 (Misconfiguration), A07 (Authentication)
+   **Gap:** 60% of OWASP categories have no guidance in `security.md`. However, comprehensive guidance exists in `security-architect` and `auth-security-expert` skills (500+ lines each). **Decision:** Keep rules concise and memorable; skills are the source of truth for deep guidance.
+
+4. **Security Lint Integration Pattern:** The rule "Never commit secrets" (security.md) has no automated enforcement. Tool exists (`security-lint.cjs`) but not integrated into pre-commit hook. **Pattern:** For any security rule, create enforcement hook:
+   ```javascript
+   // In .claude/hooks/git/pre-commit.cjs
+   execSync('node .claude/tools/validation/security-lint.cjs', { stdio: 'inherit' });
+   ```
+   This prevents accidental violations (similar to ESLint preventing code style violations).
+
+5. **Path Exposure in Documentation Anti-Pattern:** Documentation files (`workspace-conventions.md`) contained hardcoded Windows paths:
+   ```markdown
+   NEVER write to project root (`C:\dev\projects\agent-studio\`)
+   NEVER write to user home (`C:\Users\`)
+   ```
+   These reveal: (1) Exact project location, (2) Username structure, (3) Directory layout. **Pattern:** Always use placeholders in documentation:
+   ```markdown
+   NEVER write to project root (`<PROJECT_ROOT>/`)
+   NEVER write to user home (`<USER_HOME>/`)
+   ```
+   Prevents reconnaissance data leakage if documentation is publicly exposed.
+
+6. **Agent Routing Rules as Defense-in-Depth:** The `agents.md` routing table enforces defense-in-depth:
+   ```markdown
+   | security-architect | Auth, payment, PII |
+   ```
+   This ensures security-sensitive work is routed to specialists. However, from memory (ADR-079), the Router collapses 94% of requests to `developer` due to enforcement hooks defaulting to `warn` mode. **Pattern:** Routing rules without enforcement hooks are advisory-only. Set `SECURITY_REVIEW_ENFORCEMENT=block` to make routing mandatory.
+
+7. **Testing Rules as Security Gate:** The `testing.md` rules (TDD, unit tests, deterministic tests) provide a security safety net. From memory:
+   - Task #99: TDD test caught phantom imports in `validate-index.mjs`
+   - Task #100: TDD test caught path traversal in `install.mjs` (MEDIUM-001)
+   **Pattern:** Testing rules indirectly enforce security by catching vulnerabilities early. Testing is not just for correctness — it's a security control.
+
+8. **Rules vs Skills Authority Hierarchy:** Security guidance exists at two levels:
+   - **Rules** (8 lines): Concise, memorable, agent-loaded at conversation start
+   - **Skills** (500+ lines): Comprehensive, OWASP-complete, agent-invoked on demand
+   **Pattern:** Rules should point to skills for deep guidance. Example:
+   ```markdown
+   # Security
+   For comprehensive security guidance, see:
+   - `security-architect` skill (STRIDE, OWASP Top 10)
+   - `auth-security-expert` skill (OAuth 2.1, JWT)
+
+   Quick rules:
+   - Never commit secrets
+   - Validate all inputs
+   ```
+   This prevents rules from becoming unmanageably long while ensuring comprehensive guidance exists.
+
+**Recommendations Implemented:**
+
+**None yet — findings documented in security report.**
+
+**Recommendations Proposed:**
+
+1. **MEDIUM-001**: Expand OWASP coverage in `security.md` (6 missing categories)
+   - Option A: Add pointers to skills (15 min)
+   - Option B: Add 6 sections inline (2-3 hours)
+   - Recommended: **Option A** (concise rules + comprehensive skills)
+
+2. **MEDIUM-002**: Integrate `security-lint.cjs` into pre-commit hook (1 hour)
+   - Prevents accidental secret commits
+   - Pattern: Hook enforcement for critical security rules
+
+3. **LOW-001**: Replace hardcoded paths with placeholders (10 min)
+   - Prevents path structure leakage
+
+4. **LOW-002**: Clarify security-architect invocation in rules (10 min)
+   - Document enforcement mode requirement
+
+**Evidence:**
+- Security report: `.claude/context/reports/security/rules-system-security-review-2026-02-07.md`
+- 9 rules files analyzed, 176 lines total
+- 6 security-relevant rules, 3 non-security rules
+- STRIDE analysis: Low risk across all categories
+- OWASP coverage: 40% complete, 60% gaps
+- Hook enforcement: 6/9 rules enforced, 3 advisory-only
+
+---
+
 ## 2026-02-07: Scripts System Wiring + Security Fix (Task #100 - COMPLETE)
 
 **Context:** Fixed final 2 gaps (GAP-5, GAP-6) from Pipeline #8 audit + addressed MEDIUM-001 security vulnerability.

@@ -190,12 +190,13 @@ lib/
 ```
 rules/
 ├── agents.md
-├── coding-style.md
+├── code-standards.md
 ├── git-workflow.md
 ├── hooks.md
-├── patterns.md
+├── memory-protocol.md
 ├── performance.md
 ├── security.md
+├── task-tracking.md
 ├── testing.md
 └── workspace-conventions.md
 ```

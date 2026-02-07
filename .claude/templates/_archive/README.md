@@ -31,7 +31,7 @@ This directory contains templates that have been archived as part of the templat
 | Template Path | Reason | Date |
 |--------------|--------|------|
 | `code-styles/html-css.md` | No HTML/CSS in project - deleted via `git rm` | 2026-02-07 |
-| `code-styles/general.md` | Overlap with `.claude/rules/coding-style.md` - deleted via `git rm` | 2026-02-07 |
+| `code-styles/general.md` | Overlap with `.claude/rules/code-standards.md` - deleted via `git rm` | 2026-02-07 |
 
 ## Templates Explicitly Retained (Per Security Review)
 

@@ -14,6 +14,60 @@ Each decision should include:
 
 ---
 
+## ADR-091: Rules System Overhaul -- Expand Thin Rules, Fix Path Conflicts, Add Missing Protocol Rules
+
+**Date:** 2026-02-07
+
+**Status:** Accepted (Implementation Complete: 2026-02-07)
+
+**Context:**
+
+Comprehensive audit of `.claude/rules/` (Enterprise Pipeline #9) found 9 rule files totaling ~128 lines. Rules in Claude Code are auto-loaded into every conversation's system prompt. Key findings:
+
+1. **7 of 9 rules are extremely thin** (3-7 lines each), providing minimal actionable guidance
+2. **Critical path conflict:** `workspace-conventions.md` says plans go to `context/plans/` and reports to `context/reports/{domain}/` (correct per ADR-078, ADR-081), but `FILE_PLACEMENT_RULES.md` (stale v2.0) says `context/artifacts/plans/` and `context/artifacts/reports/` respectively
+3. **`agents.md` lists 7 agents when 49 exist** -- severely outdated
+4. **`rule-index.json` missing `workspace-conventions.md`** (8 indexed, 9 exist) -- the most-referenced rule file in the project is invisible to programmatic discovery
+5. **No rules for memory protocol or task tracking** -- the two most critical agent behavioral requirements (CLAUDE.md Sections 8 and 5.5-5.6) have no rule coverage
+6. **`coding-style.md` and `patterns.md` overlap** -- both cover "how to write code" in 3-5 bullet points
+
+**Decision:**
+
+1. **UPDATE 6 rules** (agents.md, git-workflow.md, hooks.md, performance.md, security.md, testing.md) -- expand from 3-7 lines to 8-15 lines each with project-specific directives
+2. **MERGE 2 rules** (coding-style.md + patterns.md) into `code-standards.md` -- eliminates overlap, creates single authoritative code conventions file
+3. **CREATE 2 new rules** (`memory-protocol.md`, `task-tracking.md`) -- covers the two most critical agent behavioral gaps
+4. **FIX path conflicts** in `FILE_PLACEMENT_RULES.md` (plan path, report path) to match `workspace-conventions.md` (canonical per ADR-078, ADR-081)
+5. **FIX rule-index.json** to include `workspace-conventions.md` and populate empty description fields
+6. **KEEP `workspace-conventions.md`** unchanged -- accurate, well-integrated, referenced by 46+ agents
+
+**Alternatives Considered:**
+
+1. **Leave rules as-is:** Rejected -- thin rules provide minimal value. The memory protocol and task tracking gaps are critical.
+2. **Move all rules into CLAUDE.md:** Rejected -- CLAUDE.md is already large (~5,000 lines compressed). Rules auto-load separately and are more maintainable as individual files.
+3. **Create granular per-agent rules with glob patterns:** Rejected -- Claude Code rules do not support per-agent loading. All rules load for every conversation.
+4. **Delete thin rules, keep only workspace-conventions:** Rejected -- even thin rules serve as reminders. Expanding them is better than removing them.
+
+**Rationale:**
+
+- Rules auto-load into every conversation, making them the most reliable way to enforce cross-cutting conventions
+- Memory protocol and task tracking are mandatory for every agent but currently only documented in CLAUDE.md (which spawned agents may not fully absorb)
+- Merging coding-style + patterns reduces rule count while increasing per-rule value
+- Path conflict fixes prevent agents from writing artifacts to wrong locations
+- Expanding thin rules from 3-7 to 8-15 lines adds ~950 tokens to system prompt -- acceptable given the value of consistent enforcement
+
+**Consequences:**
+
+- Rule count changes from 9 to 10 (merge 2 into 1, create 2 new)
+- System prompt token load increases by ~950 tokens (from ~1,100 to ~2,050)
+- FILE_PLACEMENT_RULES.md becomes consistent with workspace-conventions.md
+- rule-index.json becomes complete (10 of 10 rules indexed)
+- All conversations receive memory protocol and task tracking reminders automatically
+- TDD regression test prevents future rule-index drift
+
+**Architecture Plan:** `.claude/context/plans/rules-overhaul-architecture-2026-02-07.md`
+
+---
+
 ## ADR-090: Scripts System Overhaul -- Phantom Import Fix, Script Merge, Wiring Gaps
 
 **Date:** 2026-02-07
@@ -76,6 +130,13 @@ Audit of both `scripts/` (project root, 30 files) and `.claude/scripts/` (framew
 - Learnings recorded: `.claude/context/memory/learnings.md`
 
 **Architecture Plan:** `.claude/context/plans/scripts-overhaul-architecture-2026-02-07.md` (note: plan document not found, but work completed per ADR)
+
+**Reflection (Task #102):**
+- Batch reflection completed 2026-02-07
+- Overall score: 0.9725 / 1.0 (EXCELLENT)
+- All 6 gaps verified as fixed
+- 3 patterns extracted, 3 gotchas recorded
+- Report: `.claude/context/artifacts/reflections/batch-reflection-pipeline-8-scripts-2026-02-07.md`
 
 ---
 
