@@ -63,7 +63,7 @@ function assertIncludes(str, substring, message) {
 }
 
 // Load the module
-const { CHECKS } = require('../../.claude/hooks/unified-pre-write-hook.cjs');
+const { CHECKS } = require('../../.claude/hooks/safety/unified-pre-write-hook.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
