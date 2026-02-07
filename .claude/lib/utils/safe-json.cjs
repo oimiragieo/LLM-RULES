@@ -164,10 +164,28 @@ const SCHEMAS = {
 function safeParseJSON(content, schemaName) {
   // If no schema, do simple parse with fallback
   if (!schemaName || !SCHEMAS[schemaName]) {
+    // SEC-LIB-005 FIX: Warn when fallback path is used without schema protection
+    if (process.stderr && typeof process.stderr.write === 'function') {
+      process.stderr.write(
+        `[WARN] safe-json: No schema provided for JSON parsing. Using fallback with limited protection.\n`
+      );
+    }
+
     try {
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      // SEC-LIB-005 FIX: Use Object.create(null) to prevent prototype pollution even in fallback
+      const safe = Object.create(null);
+      // Deep copy properties to safe object
+      for (const key of Object.keys(parsed)) {
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          continue; // Skip dangerous keys
+        }
+        safe[key] = parsed[key];
+      }
+      return safe;
     } catch (_e) {
-      return {};
+      // SEC-LIB-005 FIX: Return Object.create(null) instead of {}
+      return Object.create(null);
     }
   }
 

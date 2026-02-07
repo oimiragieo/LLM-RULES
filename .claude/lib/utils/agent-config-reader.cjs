@@ -110,7 +110,8 @@ function loadConfig(projectRoot) {
       return null;
     }
     const content = fs.readFileSync(configPath, 'utf8');
-    return yaml.load(content);
+    // SEC-LIB-003 FIX: Use safe YAML schema to prevent deserialization attacks
+    return yaml.load(content, { schema: yaml.CORE_SCHEMA });
   } catch (_e) {
     return null;
   }

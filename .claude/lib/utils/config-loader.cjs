@@ -76,7 +76,8 @@ function loadConfig(useCache = true) {
   // Load and parse config
   try {
     const configContent = fs.readFileSync(configPath, 'utf8');
-    const config = yaml.load(configContent);
+    // SEC-LIB-003 FIX: Use safe YAML schema to prevent deserialization attacks
+    const config = yaml.load(configContent, { schema: yaml.CORE_SCHEMA });
 
     // Add metadata
     config._meta = {

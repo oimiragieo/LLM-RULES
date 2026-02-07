@@ -202,7 +202,8 @@ function parseAgentFrontmatter(content) {
 
   try {
     if (yaml) {
-      return yaml.load(frontmatterMatch[1]);
+      // SEC-LIB-003 FIX: Use safe YAML schema to prevent deserialization attacks
+      return yaml.load(frontmatterMatch[1], { schema: yaml.CORE_SCHEMA });
     }
     // Fallback: simple YAML parsing for key: value pairs
     return parseSimpleYaml(frontmatterMatch[1]);
