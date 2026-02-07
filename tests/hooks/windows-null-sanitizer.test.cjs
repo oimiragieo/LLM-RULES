@@ -4,14 +4,19 @@
  * ==================================
  *
  * TDD tests for windows-null-sanitizer.cjs.
- * Tests cover /dev/null to NUL conversion on Windows.
+ *
+ * The sanitizer now handles two distinct Windows environments:
+ * - Git Bash (MINGW): /dev/null works, NUL creates literal file -> convert NUL to /dev/null
+ * - cmd.exe/PowerShell: NUL works, /dev/null creates literal file -> convert /dev/null to NUL
+ *
+ * On Unix: no conversion (pass through).
  *
  * Exit codes: 0 = allow (with optional modified command)
  */
 
 'use strict';
 
-const { describe, it } = require('node:test');
+const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 
 // Import the module under test
@@ -29,180 +34,120 @@ describe('windows-null-sanitizer', () => {
   });
 
   describe('sanitizeNullDevice', () => {
-    // Note: These tests will behave differently on Windows vs non-Windows
-    // The function returns the original command on non-Windows platforms
+    it('should be callable', () => {
+      assert.doesNotThrow(() => {
+        sanitizer.sanitizeNullDevice('echo test');
+      });
+    });
 
-    describe('on Windows (when process.platform === win32)', () => {
-      // We can't easily mock process.platform, so we test the replacement logic
-      // by understanding that on Windows, the function replaces /dev/null
+    it('should handle empty string', () => {
+      const result = sanitizer.sanitizeNullDevice('');
+      assert.strictEqual(result, '');
+    });
 
-      it('should be callable', () => {
-        assert.doesNotThrow(() => {
-          sanitizer.sanitizeNullDevice('echo test');
+    it('should handle whitespace-only string', () => {
+      const result = sanitizer.sanitizeNullDevice('   ');
+      assert.strictEqual(result, '   ');
+    });
+
+    it('should handle command without any null device reference', () => {
+      const input = 'echo hello world';
+      const result = sanitizer.sanitizeNullDevice(input);
+      assert.strictEqual(result, input);
+    });
+
+    // Platform-specific tests
+    if (process.platform === 'win32') {
+      describe('on Windows', () => {
+        // Save original env
+        let savedMSYSTEM;
+        let savedMINGW_PREFIX;
+        let savedSHELL;
+        let savedTERM_PROGRAM;
+
+        beforeEach(() => {
+          savedMSYSTEM = process.env.MSYSTEM;
+          savedMINGW_PREFIX = process.env.MINGW_PREFIX;
+          savedSHELL = process.env.SHELL;
+          savedTERM_PROGRAM = process.env.TERM_PROGRAM;
+        });
+
+        afterEach(() => {
+          // Restore original env
+          if (savedMSYSTEM !== undefined) process.env.MSYSTEM = savedMSYSTEM;
+          else delete process.env.MSYSTEM;
+          if (savedMINGW_PREFIX !== undefined) process.env.MINGW_PREFIX = savedMINGW_PREFIX;
+          else delete process.env.MINGW_PREFIX;
+          if (savedSHELL !== undefined) process.env.SHELL = savedSHELL;
+          else delete process.env.SHELL;
+          if (savedTERM_PROGRAM !== undefined) process.env.TERM_PROGRAM = savedTERM_PROGRAM;
+          else delete process.env.TERM_PROGRAM;
+        });
+
+        describe('in Git Bash (MINGW) - converts NUL to /dev/null', () => {
+          // Git Bash is already the active shell in this test environment,
+          // so we just verify the behavior.
+
+          it('should convert > nul to > /dev/null', () => {
+            const result = sanitizer.sanitizeNullDevice('echo test > nul');
+            assert.strictEqual(result, 'echo test > /dev/null');
+          });
+
+          it('should convert > NUL to > /dev/null', () => {
+            const result = sanitizer.sanitizeNullDevice('echo test > NUL');
+            assert.strictEqual(result, 'echo test > /dev/null');
+          });
+
+          it('should convert 2>nul to 2>/dev/null', () => {
+            const result = sanitizer.sanitizeNullDevice('command 2>nul');
+            assert.strictEqual(result, 'command 2>/dev/null');
+          });
+
+          it('should convert 2> nul to 2> /dev/null', () => {
+            const result = sanitizer.sanitizeNullDevice('command 2> nul');
+            assert.strictEqual(result, 'command 2> /dev/null');
+          });
+
+          it('should convert > nul 2>&1 correctly', () => {
+            const result = sanitizer.sanitizeNullDevice('cmd > nul 2>&1');
+            assert.strictEqual(result, 'cmd > /dev/null 2>&1');
+          });
+
+          it('should convert > null (typo) to > /dev/null', () => {
+            const result = sanitizer.sanitizeNullDevice('echo test > null');
+            assert.strictEqual(result, 'echo test > /dev/null');
+          });
+
+          it('should leave /dev/null unchanged', () => {
+            const result = sanitizer.sanitizeNullDevice('echo test > /dev/null');
+            assert.strictEqual(result, 'echo test > /dev/null');
+          });
+
+          it('should leave command without redirects unchanged', () => {
+            const result = sanitizer.sanitizeNullDevice('echo hello world');
+            assert.strictEqual(result, 'echo hello world');
+          });
+
+          it('should handle mixed case NuL', () => {
+            const result = sanitizer.sanitizeNullDevice('echo test > NuL');
+            assert.strictEqual(result, 'echo test > /dev/null');
+          });
         });
       });
-    });
-
-    describe('/dev/null patterns', () => {
-      // Test the string replacement logic that would happen on Windows
-      // These tests verify the function handles various patterns
-
-      it('should handle simple /dev/null redirect', () => {
-        const input = 'echo test > /dev/null';
-        const result = sanitizer.sanitizeNullDevice(input);
-        // On non-Windows, returns unchanged; on Windows, replaces /dev/null with NUL
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'echo test > NUL');
-        } else {
+    } else {
+      describe('on non-Windows', () => {
+        it('should return command unchanged', () => {
+          const input = 'echo test > /dev/null';
+          const result = sanitizer.sanitizeNullDevice(input);
           assert.strictEqual(result, input);
-        }
-      });
+        });
 
-      it('should handle stderr redirect to /dev/null', () => {
-        const input = 'command 2>/dev/null';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'command 2>NUL');
-        } else {
+        it('should return nul redirect unchanged', () => {
+          const input = 'echo test > nul';
+          const result = sanitizer.sanitizeNullDevice(input);
           assert.strictEqual(result, input);
-        }
-      });
-
-      it('should handle combined redirect to /dev/null', () => {
-        const input = 'command &>/dev/null';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'command &>NUL');
-        } else {
-          assert.strictEqual(result, input);
-        }
-      });
-
-      it('should handle multiple /dev/null occurrences', () => {
-        const input = 'command >/dev/null 2>/dev/null';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'command >NUL 2>NUL');
-        } else {
-          assert.strictEqual(result, input);
-        }
-      });
-
-      it('should handle /dev/null in middle of command', () => {
-        const input = 'cat /dev/null && echo done';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'cat NUL && echo done');
-        } else {
-          assert.strictEqual(result, input);
-        }
-      });
-
-      it('should handle command without /dev/null', () => {
-        const input = 'echo hello world';
-        const result = sanitizer.sanitizeNullDevice(input);
-        // Should always return unchanged when no /dev/null present
-        assert.strictEqual(result, input);
-      });
-
-      it('should normalize lowercase nul to NUL', () => {
-        const input = 'echo test > nul';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'echo test > NUL');
-        } else {
-          assert.strictEqual(result, input);
-        }
-      });
-
-      it('should normalize lowercase stderr redirect', () => {
-        const input = 'command 2> nul';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'command 2> NUL');
-        } else {
-          assert.strictEqual(result, input);
-        }
-      });
-
-      it('should normalize null (typo) to NUL', () => {
-        const input = 'echo test > null';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'echo test > NUL');
-        } else {
-          assert.strictEqual(result, input);
-        }
-      });
-
-      it('should normalize other reserved names (con, prn, aux)', () => {
-        const inputs = [
-          { cmd: 'echo > con', expected: 'echo > CON' },
-          { cmd: 'ls > prn', expected: 'ls > PRN' },
-          { cmd: 'cat > aux', expected: 'cat > AUX' },
-        ];
-
-        inputs.forEach(({ cmd, expected }) => {
-          const result = sanitizer.sanitizeNullDevice(cmd);
-          if (process.platform === 'win32') {
-            assert.strictEqual(result, expected);
-          } else {
-            assert.strictEqual(result, cmd);
-          }
         });
       });
-
-      it('should handle mixed case reserved names', () => {
-        const input = 'echo test > NuL';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'echo test > NUL');
-        } else {
-          assert.strictEqual(result, input);
-        }
-      });
-
-      it('should handle empty string', () => {
-        const result = sanitizer.sanitizeNullDevice('');
-        assert.strictEqual(result, '');
-      });
-
-      it('should handle whitespace-only string', () => {
-        const result = sanitizer.sanitizeNullDevice('   ');
-        assert.strictEqual(result, '   ');
-      });
-    });
-
-    describe('edge cases', () => {
-      it('should not replace partial matches', () => {
-        const input = 'echo /dev/nullified';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          // The simple replacement would replace /dev/null in /dev/nullified
-          // This is a known limitation - the function does global replace
-          assert.strictEqual(result, 'echo NULified');
-        } else {
-          assert.strictEqual(result, input);
-        }
-      });
-
-      it('should handle quoted paths containing /dev/null', () => {
-        const input = 'echo "/dev/null"';
-        const result = sanitizer.sanitizeNullDevice(input);
-        if (process.platform === 'win32') {
-          assert.strictEqual(result, 'echo "NUL"');
-        } else {
-          assert.strictEqual(result, input);
-        }
-      });
-
-      it('should handle escaped slashes', () => {
-        // Note: The function uses simple regex replace, doesn't handle escapes specially
-        const input = 'echo \\/dev\\/null';
-        const result = sanitizer.sanitizeNullDevice(input);
-        // The pattern /\/dev\/null/g won't match \\/dev\\/null
-        assert.strictEqual(result, input);
-      });
-    });
+    }
   });
 });

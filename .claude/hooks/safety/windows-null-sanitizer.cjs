@@ -2,18 +2,22 @@
 /**
  * Windows Null Device Sanitizer Hook
  *
- * PreToolUse hook that sanitizes bash commands on Windows by replacing
- * Unix-style /dev/null with Windows NUL device.
+ * PreToolUse hook that sanitizes bash commands on Windows by ensuring
+ * null device references work correctly in the active shell environment.
  *
- * Problem: When Claude generates bash commands with "/dev/null" on Windows,
- * it creates a literal file named "nul" in the working directory instead of
- * discarding output.
+ * Background:
+ * Claude Code on Windows uses Git Bash (MINGW64), a Unix-like shell where
+ * /dev/null works correctly and maps to the Windows null device. In Git Bash,
+ * writing to "NUL" or "nul" creates a LITERAL FILE instead of using the
+ * null device, because Git Bash does not recognize Windows reserved device names.
  *
- * Solution: This hook intercepts Bash commands and replaces /dev/null with NUL
- * before execution.
+ * Therefore this hook does the OPPOSITE of what its original version did:
+ * - On Windows with Git Bash: ensures /dev/null is used (not NUL)
+ * - On Windows with cmd.exe/PowerShell: ensures NUL is used (not /dev/null)
+ * - On Unix: no-op (pass through)
  *
  * Exit codes:
- * - 0: Allow operation (outputs modified command if on Windows)
+ * - 0: Allow operation (outputs modified command if sanitization needed)
  *
  * Output (when modifying):
  * - JSON with tool_input containing the sanitized command
@@ -23,6 +27,20 @@
 
 const isWindows = process.platform === 'win32';
 
+/**
+ * Detect if the current shell is Git Bash (MINGW/MSYS).
+ * Git Bash sets MSYSTEM or MINGW environment variables.
+ * Claude Code's Bash tool always runs in Git Bash on Windows.
+ */
+function isGitBash() {
+  return !!(
+    process.env.MSYSTEM ||
+    process.env.MINGW_PREFIX ||
+    (process.env.SHELL && process.env.SHELL.includes('/usr/bin/bash')) ||
+    (process.env.TERM_PROGRAM && process.env.TERM_PROGRAM === 'mintty')
+  );
+}
+
 // PERF-006/PERF-007: Use shared hook-input.cjs utility
 const {
   parseHookInputAsync,
@@ -31,16 +49,19 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 
 /**
- * Sanitize a command by replacing /dev/null and lowercase reserved names with NUL on Windows.
+ * Sanitize a command to ensure null device references work correctly.
  *
- * Handles various patterns:
- * - > /dev/null → > NUL
- * - 2>/dev/null → 2>NUL
- * - &>/dev/null → &>NUL
- * - > nul (lowercase) → > NUL
- * - 2> nul → 2> NUL
- * - > null → > NUL
- * - > con/prn/aux → > CON/PRN/AUX
+ * In Git Bash (MINGW/MSYS) on Windows:
+ * - /dev/null works correctly (maps to Windows null device)
+ * - NUL/nul creates a LITERAL FILE (Git Bash doesn't handle Windows device names)
+ * - So we convert NUL/nul -> /dev/null
+ *
+ * In cmd.exe/PowerShell on Windows:
+ * - NUL is the correct null device
+ * - /dev/null creates a literal file
+ * - So we convert /dev/null -> NUL
+ *
+ * On Unix: no conversion needed.
  *
  * @param {string} command - The command to sanitize
  * @returns {string} Sanitized command
@@ -52,21 +73,36 @@ function sanitizeNullDevice(command) {
 
   let sanitized = command;
 
-  // Pattern 1: /dev/null (Unix-style device reference)
-  sanitized = sanitized.replace(/\/dev\/null/g, 'NUL');
+  if (isGitBash()) {
+    // Git Bash: convert Windows device names to /dev/null
+    // NUL/nul in redirects creates literal files in Git Bash
+    // Match: >NUL, > NUL, 2>NUL, >nul, > nul, 2> nul, >>NUL, etc.
+    sanitized = sanitized.replace(
+      /([>&])(\s*)(nul)(\s|$|2|&)/gi,
+      (match, prefix, space, _device, suffix) => {
+        return prefix + space + '/dev/null' + suffix;
+      }
+    );
+    // Also handle > null (common typo) -> /dev/null
+    sanitized = sanitized.replace(
+      /([>&])(\s*)(null)(\s|$|2|&)/gi,
+      (match, prefix, space, _device, suffix) => {
+        return prefix + space + '/dev/null' + suffix;
+      }
+    );
+  } else {
+    // cmd.exe/PowerShell: convert /dev/null to NUL
+    sanitized = sanitized.replace(/\/dev\/null/g, 'NUL');
 
-  // Pattern 2: Lowercase Windows reserved names in redirects
-  // These create files instead of using devices, so normalize to uppercase
-  // Match: > nul, 2> nul, &> nul, >> nul, 2>> nul, >nul (no space), etc.
-  // Also: > null (common typo)
-  sanitized = sanitized.replace(
-    /([>&])(\s*)(nul|null|con|prn|aux)(\s|$|2|&)/gi,
-    (match, prefix, space, device, suffix) => {
-      // Normalize 'null' to 'nul'
-      const normalizedDevice = device.toLowerCase() === 'null' ? 'NUL' : device.toUpperCase();
-      return prefix + space + normalizedDevice + suffix;
-    }
-  );
+    // Normalize lowercase device names to uppercase in redirects
+    sanitized = sanitized.replace(
+      /([>&])(\s*)(nul|null|con|prn|aux)(\s|$|2|&)/gi,
+      (match, prefix, space, device, suffix) => {
+        const normalizedDevice = device.toLowerCase() === 'null' ? 'NUL' : device.toUpperCase();
+        return prefix + space + normalizedDevice + suffix;
+      }
+    );
+  }
 
   return sanitized;
 }
@@ -102,10 +138,16 @@ async function main() {
       process.exit(0);
     }
 
-    // Check if command needs sanitization
-    // Patterns: /dev/null OR lowercase reserved names in redirects (> nul, > null, etc.)
-    const needsSanitization =
-      command.includes('/dev/null') || /[>&]\s*(nul|null|con|prn|aux)(\s|$|2|&)/i.test(command);
+    // Check if command needs sanitization based on shell environment
+    let needsSanitization;
+    if (isGitBash()) {
+      // Git Bash: need to convert NUL/nul/null -> /dev/null (prevent literal file creation)
+      needsSanitization = /[>&]\s*(nul|null)(\s|$|2|&)/i.test(command);
+    } else {
+      // cmd.exe/PowerShell: need to convert /dev/null -> NUL
+      needsSanitization =
+        command.includes('/dev/null') || /[>&]\s*(nul|null|con|prn|aux)(\s|$|2|&)/i.test(command);
+    }
 
     if (!needsSanitization) {
       process.exit(0);

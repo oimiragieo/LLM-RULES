@@ -9,14 +9,34 @@
  */
 
 /**
- * The null device for the current platform.
- * - Windows: 'NUL'
+ * Detect if the current shell is Git Bash (MINGW/MSYS) on Windows.
+ * In Git Bash, /dev/null works correctly but NUL creates a literal file.
+ */
+function _isGitBash() {
+  return !!(
+    process.env.MSYSTEM ||
+    process.env.MINGW_PREFIX ||
+    (process.env.SHELL && process.env.SHELL.includes('/usr/bin/bash')) ||
+    (process.env.TERM_PROGRAM && process.env.TERM_PROGRAM === 'mintty')
+  );
+}
+
+/**
+ * The null device for the current platform and shell environment.
+ * - Windows with Git Bash: '/dev/null' (Git Bash maps this to the null device;
+ *   NUL/nul creates a literal file in Git Bash)
+ * - Windows with cmd.exe/PowerShell: 'NUL'
  * - Unix/Linux/macOS: '/dev/null'
  *
- * IMPORTANT: Never hardcode '/dev/null' in shell commands.
- * On Windows, this creates a literal file named 'nul'.
+ * IMPORTANT: On Windows, the correct value depends on whether you're running
+ * in Git Bash (MINGW) or cmd.exe/PowerShell. This constant auto-detects.
  */
-const NULL_DEVICE = process.platform === 'win32' ? 'NUL' : '/dev/null';
+const NULL_DEVICE =
+  process.platform === 'win32'
+    ? _isGitBash()
+      ? '/dev/null'
+      : 'NUL'
+    : '/dev/null';
 
 /**
  * Whether the current platform is Windows.

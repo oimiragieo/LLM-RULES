@@ -48,8 +48,20 @@ function isPathSafe(filePath) {
   return !DANGEROUS_CHARS.some(char => filePath.includes(char));
 }
 
-// Cross-platform null device
-const _NULL_DEVICE = process.platform === 'win32' ? 'NUL' : '/dev/null';
+// Cross-platform null device (Git Bash on Windows uses /dev/null, not NUL)
+function _detectGitBash() {
+  return !!(
+    process.env.MSYSTEM ||
+    process.env.MINGW_PREFIX ||
+    (process.env.SHELL && process.env.SHELL.includes('/usr/bin/bash'))
+  );
+}
+const _NULL_DEVICE =
+  process.platform === 'win32'
+    ? _detectGitBash()
+      ? '/dev/null'
+      : 'NUL'
+    : '/dev/null';
 
 // Find project root
 function findProjectRoot() {
