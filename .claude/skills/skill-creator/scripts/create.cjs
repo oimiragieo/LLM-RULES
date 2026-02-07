@@ -17,6 +17,14 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+// Lazy-load schema validator (graceful if missing)
+let _validateData = null;
+try {
+  _validateData = require('../../lib/utils/schema-validator.cjs').validateData;
+} catch (_e) {
+  // Schema validator not available -- skip schema validation
+}
+
 /**
  * SEC-009 FIX: Security validation for paths to prevent command injection
  * Shell metacharacters in paths could execute arbitrary commands when passed to shell
@@ -88,7 +96,7 @@ const CLAUDE_DIR = path.join(PROJECT_ROOT, '.claude');
 const SKILLS_DIR = path.join(CLAUDE_DIR, 'skills');
 const AGENTS_DIR = path.join(CLAUDE_DIR, 'agents');
 const TOOLS_DIR = path.join(CLAUDE_DIR, 'tools');
-const _SCHEMA_PATH = path.join(CLAUDE_DIR, 'schemas', 'skill-definition.schema.json');
+const SKILL_SCHEMA_PATH = path.join(CLAUDE_DIR, 'schemas', 'skill-definition.schema.json');
 const STRUCTURE_PATH = path.join(
   CLAUDE_DIR,
   'skills',
@@ -1736,6 +1744,24 @@ function validateSkill(skillPath) {
     }
     if (!frontmatter.includes('tools:') && !frontmatter.includes('allowed-tools:')) {
       warnings.push('Missing recommended field: tools');
+    }
+
+    // Advisory Ajv schema validation (graceful degradation)
+    if (_validateData) {
+      try {
+        const yaml = require('js-yaml');
+        const frontmatterObj = yaml.load(frontmatter);
+        if (frontmatterObj && typeof frontmatterObj === 'object') {
+          const schemaResult = _validateData(frontmatterObj, SKILL_SCHEMA_PATH);
+          if (schemaResult && !schemaResult.valid && !schemaResult.skipped) {
+            for (const err of schemaResult.errors || []) {
+              warnings.push(`Schema: ${err.path} ${err.message}`);
+            }
+          }
+        }
+      } catch (_e) {
+        // js-yaml not available or parse error -- skip schema validation
+      }
     }
   }
 

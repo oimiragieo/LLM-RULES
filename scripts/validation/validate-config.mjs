@@ -227,26 +227,15 @@ function validateConfig() {
   const schemasDir = '.claude/schemas';
   checkDirectory(schemasDir, 'schemas directory');
 
-  // Validate all schema files in schemas directory exist and are valid JSON
+  // Validate all active schema files in schemas directory exist and are valid JSON
+  // Note: 12 schemas archived in 2026-02-07 (see .claude/schemas/_archive/README.md)
   const schemaFiles = [
-    'architecture-validation.schema.json',
     'artifact_manifest.schema.json',
-    'backlog.schema.json',
-    'epic.schema.json',
-    'epics-stories.schema.json',
-    'implementation-readiness.schema.json',
     'product_requirements.schema.json',
     'project_brief.schema.json',
-    'retrospective.schema.json',
-    'route_decision.schema.json',
-    'sprint-plan.schema.json',
-    'story.schema.json',
     'system_architecture.schema.json',
     'test_plan.schema.json',
-    'ui-audit-report.schema.json',
-    'user_story.schema.json',
     'ux_spec.schema.json',
-    'package-manager.schema.json',
   ];
 
   for (const schemaFile of schemaFiles) {

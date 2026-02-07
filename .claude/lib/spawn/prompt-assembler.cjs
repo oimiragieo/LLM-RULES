@@ -19,6 +19,14 @@ const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 
+// Lazy-load schema validator (graceful if missing)
+let _validateData = null;
+try {
+  _validateData = require('../utils/schema-validator.cjs').validateData;
+} catch (_e) {
+  // Schema validator not available -- skip schema validation
+}
+
 // Load manifests lazily to improve startup time
 let TOOL_MANIFEST = null;
 let SKILL_INDEX = null;
@@ -758,6 +766,31 @@ function assembleSpawnPrompt({
   return enhancedPrompt;
 }
 
+/**
+ * Validate the loaded presets.json against presets.schema.json.
+ * Advisory only -- returns validation result but does not throw.
+ * Graceful degradation if schema or validator is unavailable.
+ *
+ * @param {string} [projectRoot] - Project root directory
+ * @returns {{ valid: boolean, errors: Array|null, skipped?: boolean }}
+ */
+function validatePresets(projectRoot = PROJECT_ROOT) {
+  if (!_validateData) {
+    return { valid: true, errors: null, skipped: true };
+  }
+  const presetsPath = path.join(projectRoot, '.claude', 'config', 'presets.json');
+  try {
+    if (!fs.existsSync(presetsPath)) {
+      return { valid: true, errors: null, skipped: true };
+    }
+    const presetsData = JSON.parse(fs.readFileSync(presetsPath, 'utf-8'));
+    const schemaPath = path.join(projectRoot, '.claude', 'schemas', 'presets.schema.json');
+    return _validateData(presetsData, schemaPath);
+  } catch (_e) {
+    return { valid: true, errors: null, skipped: true };
+  }
+}
+
 // Export all functions for testing
 module.exports = {
   assembleSpawnPrompt,
@@ -776,6 +809,7 @@ module.exports = {
   loadAgentPromptOverrides,
   formatMemorySection,
   formatBehaviourSection,
+  validatePresets,
   // For testing cache invalidation
   _clearCache: () => {
     TOOL_MANIFEST = null;

@@ -4,6 +4,14 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
+// Lazy-load schema validator (graceful if missing)
+let _validateData = null;
+try {
+  _validateData = require('../utils/schema-validator.cjs').validateData;
+} catch (_e) {
+  // Schema validator not available -- skip schema validation
+}
+
 const CONFIG_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'agent-config.json');
 let _cache = null;
 
@@ -78,6 +86,22 @@ function listAgentTypes() {
   return Object.keys(agents);
 }
 
+/**
+ * Validate the loaded agent-config.json against agent-config.schema.json.
+ * Advisory only -- returns validation result but does not throw.
+ * Graceful degradation if schema or validator is unavailable.
+ *
+ * @returns {{ valid: boolean, errors: Array|null, skipped?: boolean }}
+ */
+function validateConfig() {
+  const configData = load();
+  if (!_validateData) {
+    return { valid: true, errors: null, skipped: true };
+  }
+  const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'agent-config.schema.json');
+  return _validateData(configData, schemaPath);
+}
+
 function clearCache() {
   _cache = null;
 }
@@ -91,4 +115,5 @@ module.exports = {
   listAgentTypes,
   clearCache,
   normalizeAgentType,
+  validateConfig,
 };

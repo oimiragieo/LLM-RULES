@@ -1,3 +1,109 @@
+## 2026-02-07: QA Validation - Schemas System Overhaul (Task #91 - APPROVED)
+
+**Context:** Comprehensive QA validation of Enterprise Pipeline #6 (schemas system overhaul spanning tasks #88-90).
+
+**Verdict:** ✅ APPROVED - 100% validation pass rate (9/9 checks)
+
+**Key Validations:**
+
+1. **File Inventory (100% Match):**
+   - Active schemas: 27 (expected 27) ✅
+   - Archived schemas: 25 (expected 25) ✅
+   - Total: 52 (nothing lost during overhaul)
+   - Method: `ls -1 /c/dev/projects/agent-studio/.claude/schemas/*.json | wc -l`
+
+2. **Ajv Wiring Tests (35/35 Pass):**
+   - schema-validator.test.cjs: 8/8 ✅
+   - validator-schema.test.cjs: 6/6 ✅
+   - agent-definition-schema.test.cjs: 5/5 ✅
+   - skill-definition-schema.test.cjs: 6/6 ✅
+   - agent-config-schema.test.cjs: 5/5 ✅
+   - presets-schema.test.cjs: 5/5 ✅
+   - Total duration: 1.878 seconds
+   - All using `node --test` (node:test framework)
+
+3. **Dead Reference Cleanup (0 Active Phantom Refs):**
+   - schema-registry.json: 0 active code refs (16 docs explaining removal)
+   - schemas/index.json: 0 active code refs (23 docs explaining removal)
+   - Schema-creator SKILL.md: 0 phantom refs ✅
+   - Pattern: Only documentation explaining cleanup remains (expected)
+
+4. **Archive Integrity (Complete):**
+   - Archive README: 51 lines with restoration instructions
+   - All 25 schemas archived via `git mv` (preserves history)
+   - Restoration commands documented for each schema
+
+5. **Schema Catalog (497 Lines, 27 Entries):**
+   - Wiring status: 8 WIRED, 3 SOFT-WIRED, 16 DOCS ONLY
+   - Sample verification: 5 random entries checked against actual code ✅
+   - All catalog entries match reality
+
+6. **Schema-Creator SKILL.md (v2.1 Compliant):**
+   - WARNING BOX: Lines 26-31 (Gate 4 protection) ✅
+   - Step 0: Research Synthesis (lines 110-126) ✅
+   - No phantom references (schema-registry.json, schemas/index.json) ✅
+   - Existing Schemas Reference table: 27 entries (expanded from 7)
+
+7. **Full Test Suite (No Regressions):**
+   - Total: 2110 tests
+   - Passed: 1720 (81.5%)
+   - Failed: 307 (unrelated areas: workflow state machine, enterprise scale)
+   - Zero failures in schema-related tests
+   - Zero new failures from schemas overhaul
+
+**QA Pattern - Documentation vs Active Code References:**
+
+When cleaning up phantom infrastructure, distinguish between:
+1. **Active code references** - Must be eliminated (breaks if file doesn't exist)
+2. **Documentation references** - Expected and correct (explains WHY file was removed)
+
+**Example:**
+```bash
+# Find ALL references
+grep -r "schema-registry\.json" .claude/
+
+# Filter to active code only (exclude docs explaining cleanup)
+grep -r "schema-registry\.json" .claude/ --exclude-dir="_archive" | grep -v "decisions.md\|learnings.md\|plans/"
+```
+
+Documentation in memory/decisions/plans that explains "we removed schema-registry.json because..." is CORRECT and should remain.
+
+**QA Validation Workflow for Multi-Task Pipelines:**
+
+When validating multi-task pipelines (3+ sequential tasks):
+
+1. **Pre-validation:** Read memory for pipeline context and past task deliverables
+2. **File inventory:** Verify exact counts (active + archived = original total)
+3. **Test execution:** Run all new tests (schema validation: 35 tests)
+4. **Dead reference check:** Grep for phantom files (distinguish docs vs active code)
+5. **Catalog validation:** Sample-check 3-5 random entries against actual code
+6. **Creator skill check:** WARNING BOX + research-synthesis mandate + no phantom refs
+7. **Full test suite:** Regression check (compare to baseline pass rate)
+8. **Report generation:** Comprehensive report with 9-section validation checklist
+9. **Task completion:** TaskUpdate with metadata (validation results, verdict)
+
+**Pattern - Using node:test for Test Validation:**
+
+When Jest doesn't find tests (Windows path issues, module resolution):
+```bash
+# Instead of: npx jest tests/path/to/test.cjs
+# Use: node --test tests/path/to/test.cjs
+node --test tests/lib/utils/schema-validator.test.cjs
+```
+
+Node's native test runner (`node:test`) works reliably on Windows Git Bash.
+
+**Quality Metrics:**
+- File inventory: 100% accuracy (52/52 files accounted for)
+- Test coverage: 100% (35/35 schema tests passing)
+- Dead reference cleanup: 100% (0 active phantom refs)
+- Documentation: 548 lines (497 catalog + 51 archive README)
+- Regression impact: 0 new failures
+
+**Report:** `.claude/context/reports/qa/schemas-system-qa-report-2026-02-07.md` (comprehensive 9-check validation)
+
+---
+
 ## 2026-02-07: Phase 4-6 - Documentation + Schema-Creator Fixes + Workflow YAML Complete (Task #90 - Enterprise Pipeline #6)
 
 **Context:** Created comprehensive schema catalog, rewrote schemas README, updated @DIRECTORY_STRUCTURE.md and CLAUDE.md, fixed schema-creator SKILL.md phantom references (schema-registry.json, SCHEMA_CATALOG.md at wrong path, schemas/index.json), and fixed workflow YAML files.

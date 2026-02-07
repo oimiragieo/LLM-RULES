@@ -1,0 +1,694 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-05T04:27:21.786Z",
+  "summary": {
+    "total": 36,
+    "byCategory": {
+      "root": 9,
+      "core": 6,
+      "enterprise": 5,
+      "operations": 3,
+      "creators": 6,
+      "rapid": 1,
+      "updaters": 6
+    },
+    "byType": {
+      "phased": 26,
+      "sequential": 8,
+      "state-machine": 2
+    },
+    "byStatus": {
+      "active": 33,
+      "deprecated": 2,
+      "draft": 1
+    }
+  },
+  "workflows": {
+    "architecture-review-workflow": {
+      "path": "architecture-review-skill-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "This workflow performs comprehensive architecture reviews by:",
+      "phases": 8,
+      "requiredAgents": [
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "technical-writer",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "chrome-browser-skill-workflow": {
+      "path": "chrome-browser-skill-workflow.md",
+      "category": "root",
+      "type": "sequential",
+      "description": "This workflow demonstrates how to use the chrome-browser skill.",
+      "phases": 1,
+      "requiredAgents": [
+        "developer"
+      ],
+      "triggers": [
+        "evolution"
+      ],
+      "status": "active"
+    },
+    "conductor-setup-workflow": {
+      "path": "conductor-setup-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "Orchestrates the full project setup using Context-Driven Development methodology. Guides users through product definition, tech stack selection, workflow customization, and initial track generation.",
+      "phases": 6,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "multi_agent"
+      ],
+      "status": "active"
+    },
+    "consensus-voting-workflow": {
+      "path": "consensus-voting-skill-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "Byzantine fault-tolerant consensus mechanism using Queen/Worker topology for critical multi-agent decisions.",
+      "phases": 4,
+      "requiredAgents": [
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "devops",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "context-compressor-workflow": {
+      "path": "context-compressor-skill-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "Systematic workflow for optimizing context in long-running sessions. This workflow enables agents to work efficiently within token limits by intelligently compressing verbose content while preservi...",
+      "phases": 4,
+      "requiredAgents": [
+        "architect",
+        "qa",
+        "technical-writer",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "evolve-workflow": {
+      "path": "core/evolution-workflow.md",
+      "category": "core",
+      "type": "state-machine",
+      "description": "> LOCKED-IN: This workflow MUST be followed exactly. Hooks enforce compliance.",
+      "phases": 6,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "qa",
+        "technical-writer",
+        "code-reviewer",
+        "router",
+        "evolution-orchestrator"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "evolution",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "external-integration-workflow": {
+      "path": "core/external-integration.md",
+      "category": "core",
+      "type": "phased",
+      "description": "Safely integrate external code, skills, agents, workflows, and templates from GitHub repositories or other sources into the Claude Code Enterprise Framework.",
+      "phases": 9,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "technical-writer",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "post-creation-validation-workflow": {
+      "path": "core/post-creation-validation.md",
+      "category": "core",
+      "type": "sequential",
+      "description": "Version: 1.0.0",
+      "phases": 1,
+      "requiredAgents": [
+        "technical-writer",
+        "router"
+      ],
+      "triggers": [
+        "evolution",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "reflection-workflow": {
+      "path": "core/reflection-workflow.md",
+      "category": "core",
+      "type": "phased",
+      "description": "Comprehensive metacognitive workflow for quality assessment, learning extraction, and continuous improvement. This workflow encapsulates the complete reflection process from trigger detection to re...",
+      "phases": 7,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "technical-writer",
+        "code-reviewer",
+        "router",
+        "reflection-agent"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "evolution",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "router-decision-workflow": {
+      "path": "core/router-decision.md",
+      "category": "core",
+      "type": "phased",
+      "description": "Comprehensive routing protocol for the Multi-Agent Orchestration Engine. This workflow encapsulates ALL routing decisions from initial request analysis to agent spawning.",
+      "phases": 4,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "devops",
+        "technical-writer",
+        "code-reviewer",
+        "router",
+        "master-orchestrator"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "evolution",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "artifact-lifecycle-management-workflow": {
+      "path": "core/skill-lifecycle.md",
+      "category": "core",
+      "type": "phased",
+      "description": "Universal lifecycle workflow for managing framework artifacts: skills, agents, hooks, workflows, templates, and schemas.",
+      "phases": 5,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "devops",
+        "technical-writer",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "security_sensitive",
+        "multi_agent",
+        "evolution"
+      ],
+      "status": "deprecated"
+    },
+    "database-architect-workflow": {
+      "path": "database-architect-skill-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "Multi-agent orchestration for database design, schema changes, and migration planning with built-in security review and rollback procedures.",
+      "phases": 5,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "devops",
+        "technical-writer",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "evolution",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "c4-architecture-documentation-workflow": {
+      "path": "enterprise/c4-architecture-workflow.md",
+      "category": "enterprise",
+      "type": "phased",
+      "description": "Generate comprehensive C4 architecture documentation for an existing repository/codebase using a bottom-up analysis approach.",
+      "phases": 4,
+      "requiredAgents": [
+        "architect",
+        "technical-writer",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive"
+      ],
+      "status": "active"
+    },
+    "enterprise-feature-development-workflow": {
+      "path": "enterprise/feature-development-workflow.md",
+      "category": "enterprise",
+      "type": "phased",
+      "description": "Orchestrate end-to-end feature development from requirements to production deployment.",
+      "phases": 4,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "devops",
+        "technical-writer",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "swarm-coordination-workflow": {
+      "path": "enterprise/swarm-coordination-skill-workflow.md",
+      "category": "enterprise",
+      "type": "phased",
+      "description": "Orchestrate multi-agent swarms using Queen/Worker topology for massively parallel task execution, consensus-based decisions, and fault-tolerant distributed work.",
+      "phases": 4,
+      "requiredAgents": [
+        "developer",
+        "architect",
+        "qa",
+        "technical-writer",
+        "code-reviewer",
+        "router",
+        "master-orchestrator"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "hook-consolidation-workflow": {
+      "path": "operations/hook-consolidation.md",
+      "category": "operations",
+      "type": "phased",
+      "description": "Step-by-step process for safely consolidating hooks to reduce I/O overhead and improve performance.",
+      "phases": 5,
+      "requiredAgents": [
+        "architect",
+        "technical-writer",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "incident",
+        "reflection"
+      ],
+      "status": "deprecated"
+    },
+    "incident-response-workflow": {
+      "path": "operations/incident-response.md",
+      "category": "operations",
+      "type": "phased",
+      "description": "Orchestrate multi-agent incident response with modern SRE practices for rapid resolution and learning.",
+      "phases": 5,
+      "requiredAgents": [
+        "developer",
+        "architect",
+        "security-architect",
+        "devops",
+        "technical-writer",
+        "code-reviewer"
+      ],
+      "triggers": [
+        "security_sensitive",
+        "multi_agent",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "qa-bounded-loop-workflow": {
+      "path": "operations/qa-bounded-loop.md",
+      "category": "operations",
+      "type": "sequential",
+      "description": "This workflow defines a bounded QA loop for a plan directory containing",
+      "phases": 1,
+      "requiredAgents": [
+        "qa",
+        "code-reviewer"
+      ],
+      "triggers": [],
+      "status": "active"
+    },
+    "progressive-disclosure-skill-workflow": {
+      "path": "progressive-disclosure-skill-workflow.md",
+      "category": "root",
+      "type": "sequential",
+      "description": "This workflow demonstrates how to use the progressive-disclosure skill.",
+      "phases": 1,
+      "requiredAgents": [
+        "developer"
+      ],
+      "triggers": [
+        "evolution"
+      ],
+      "status": "active"
+    },
+    "security-architect-workflow": {
+      "path": "security-architect-skill-workflow.md",
+      "category": "root",
+      "type": "phased",
+      "description": "Orchestrate comprehensive security audits using multi-phase threat analysis, vulnerability scanning, and remediation planning with OWASP Top 10 coverage.",
+      "phases": 5,
+      "requiredAgents": [
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "devops",
+        "code-reviewer",
+        "router"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "multi_agent",
+        "incident",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "template-renderer-skill-workflow": {
+      "path": "template-renderer-skill-workflow.md",
+      "category": "root",
+      "type": "sequential",
+      "description": "This workflow demonstrates how to use the template-renderer skill.",
+      "phases": 1,
+      "requiredAgents": [
+        "developer"
+      ],
+      "triggers": [
+        "evolution"
+      ],
+      "status": "active"
+    },
+    "agent-creator": {
+      "path": "creators/agent-creator-workflow.yaml",
+      "category": "creators",
+      "type": "state-machine",
+      "description": "Executable workflow for creating new agents following the EVOLVE state machine",
+      "phases": 28,
+      "requiredAgents": [
+        "qa",
+        "router",
+        "evolution-orchestrator"
+      ],
+      "triggers": [
+        "security_sensitive",
+        "multi_agent",
+        "evolution",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "hook-creator-workflow": {
+      "path": "creators/hook-creator-workflow.yaml",
+      "category": "creators",
+      "type": "phased",
+      "description": "Create, validate, and register hooks following the EVOLVE process",
+      "phases": 45,
+      "requiredAgents": [
+        "technical-writer"
+      ],
+      "triggers": [
+        "high_complexity",
+        "evolution"
+      ],
+      "status": "active"
+    },
+    "schema-creator-workflow": {
+      "path": "creators/schema-creator-workflow.yaml",
+      "category": "creators",
+      "type": "phased",
+      "description": "Create, validate, and register JSON schemas following the EVOLVE process",
+      "phases": 41,
+      "requiredAgents": [],
+      "triggers": [
+        "high_complexity",
+        "evolution"
+      ],
+      "status": "draft"
+    },
+    "skill-creator-workflow": {
+      "path": "creators/skill-creator-workflow.yaml",
+      "category": "creators",
+      "type": "phased",
+      "description": "Create a new skill following EVOLVE phases with validation, research, and registration",
+      "phases": 36,
+      "requiredAgents": [
+        "planner",
+        "developer",
+        "architect",
+        "qa",
+        "security-architect",
+        "devops",
+        "technical-writer"
+      ],
+      "triggers": [
+        "high_complexity",
+        "security_sensitive",
+        "evolution",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "template-creator-workflow": {
+      "path": "creators/template-creator-workflow.yaml",
+      "category": "creators",
+      "type": "phased",
+      "description": "Create, validate, and register templates following the EVOLVE process",
+      "phases": 40,
+      "requiredAgents": [],
+      "triggers": [
+        "high_complexity",
+        "evolution"
+      ],
+      "status": "active"
+    },
+    "workflow-creator-workflow": {
+      "path": "creators/workflow-creator-workflow.yaml",
+      "category": "creators",
+      "type": "phased",
+      "description": "Create, validate, and register workflows following the EVOLVE process",
+      "phases": 40,
+      "requiredAgents": [],
+      "triggers": [
+        "high_complexity",
+        "evolution"
+      ],
+      "status": "active"
+    },
+    "code-review": {
+      "path": "enterprise/code-review.yaml",
+      "category": "enterprise",
+      "type": "sequential",
+      "description": "",
+      "phases": 1,
+      "requiredAgents": [
+        "code-reviewer"
+      ],
+      "triggers": [],
+      "status": "active"
+    },
+    "full-stack": {
+      "path": "enterprise/full-stack.yaml",
+      "category": "enterprise",
+      "type": "sequential",
+      "description": "",
+      "phases": 1,
+      "requiredAgents": [
+        "architect"
+      ],
+      "triggers": [],
+      "status": "active"
+    },
+    "fix": {
+      "path": "rapid/fix.yaml",
+      "category": "rapid",
+      "type": "sequential",
+      "description": "",
+      "phases": 1,
+      "requiredAgents": [],
+      "triggers": [],
+      "status": "active"
+    },
+    "agent-updater-workflow": {
+      "path": "updaters/agent-updater-workflow.yaml",
+      "category": "updaters",
+      "type": "phased",
+      "description": "Update existing agents following the EVOLVE process with backup and validation",
+      "phases": 37,
+      "requiredAgents": [
+        "qa",
+        "code-reviewer"
+      ],
+      "triggers": [
+        "high_complexity",
+        "evolution",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "hook-updater-workflow": {
+      "path": "updaters/hook-updater-workflow.yaml",
+      "category": "updaters",
+      "type": "phased",
+      "description": "Update existing hooks following the EVOLVE process with backup and validation",
+      "phases": 39,
+      "requiredAgents": [
+        "technical-writer",
+        "code-reviewer"
+      ],
+      "triggers": [
+        "evolution"
+      ],
+      "status": "active"
+    },
+    "schema-updater-workflow": {
+      "path": "updaters/schema-updater-workflow.yaml",
+      "category": "updaters",
+      "type": "phased",
+      "description": "Update existing JSON schemas following the EVOLVE process with backup and validation",
+      "phases": 41,
+      "requiredAgents": [],
+      "triggers": [
+        "evolution"
+      ],
+      "status": "active"
+    },
+    "skill-updater-workflow": {
+      "path": "updaters/skill-updater-workflow.yaml",
+      "category": "updaters",
+      "type": "phased",
+      "description": "Update existing skills following the EVOLVE process with backup and validation",
+      "phases": 37,
+      "requiredAgents": [
+        "qa",
+        "code-reviewer"
+      ],
+      "triggers": [
+        "high_complexity",
+        "evolution",
+        "reflection"
+      ],
+      "status": "active"
+    },
+    "template-updater-workflow": {
+      "path": "updaters/template-updater-workflow.yaml",
+      "category": "updaters",
+      "type": "phased",
+      "description": "Update existing templates following the EVOLVE process with backup and validation",
+      "phases": 39,
+      "requiredAgents": [
+        "code-reviewer"
+      ],
+      "triggers": [
+        "evolution"
+      ],
+      "status": "active"
+    },
+    "workflow-updater-workflow": {
+      "path": "updaters/workflow-updater-workflow.yaml",
+      "category": "updaters",
+      "type": "phased",
+      "description": "Update existing workflows following the EVOLVE process with backup and validation",
+      "phases": 39,
+      "requiredAgents": [
+        "code-reviewer"
+      ],
+      "triggers": [
+        "evolution"
+      ],
+      "status": "active"
+    }
+  }
+}

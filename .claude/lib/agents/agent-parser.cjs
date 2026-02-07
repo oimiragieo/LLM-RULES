@@ -19,6 +19,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 const Ajv = require('ajv');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { validateData } = require('../utils/schema-validator.cjs');
 
 // =============================================================================
 // Agent Parser Class
@@ -102,6 +103,22 @@ class AgentParser {
     });
 
     return { valid: false, errors };
+  }
+
+  /**
+   * Validate a full agent definition (frontmatter + content) against
+   * agent-definition.schema.json using Ajv.
+   * Advisory only -- returns validation result but does not throw.
+   * Graceful degradation if schema is unavailable.
+   *
+   * @param {Object|null} definition - Agent definition object { frontmatter, content }
+   * @returns {{ valid: boolean, errors: Array|null, skipped?: boolean }}
+   */
+  validateDefinition(definition) {
+    const schemaPath = path.join(
+      PROJECT_ROOT, '.claude', 'schemas', 'agent-definition.schema.json'
+    );
+    return validateData(definition, schemaPath);
   }
 }
 

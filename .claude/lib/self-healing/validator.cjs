@@ -19,6 +19,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { validateData } = require('../utils/schema-validator.cjs');
 
 // =============================================================================
 // Constants
@@ -401,6 +402,23 @@ function validateMemory(memoryFile, options = {}) {
 }
 
 // =============================================================================
+// validateStateWithSchema - Ajv Schema Validation for Evolution State
+// =============================================================================
+
+/**
+ * Validate evolution state data against evolution-state.schema.json using Ajv.
+ * Advisory only -- logs warnings but does not block operations.
+ * Graceful degradation if Ajv or schema is unavailable.
+ *
+ * @param {Object|null} stateData - Parsed evolution state data (NOT a file path)
+ * @returns {{ valid: boolean, errors: Array|null, skipped?: boolean }}
+ */
+function validateStateWithSchema(stateData) {
+  const schemaPath = path.join(getProjectRoot(), '.claude', 'schemas', 'evolution-state.schema.json');
+  return validateData(stateData, schemaPath);
+}
+
+// =============================================================================
 // CLI Entry Point
 // =============================================================================
 
@@ -501,6 +519,7 @@ module.exports = {
   validatePath,
   validateState,
   validateMemory,
+  validateStateWithSchema,
   // Constants for external use
   VALID_STATES,
   STATES_REQUIRING_EVOLUTION,
