@@ -1,3 +1,4 @@
+// security-lint-ignore: Test file containing intentional malicious input patterns for security testing
 /**
  * TDD Test for install.mjs Security Fix (MEDIUM-001)
  *

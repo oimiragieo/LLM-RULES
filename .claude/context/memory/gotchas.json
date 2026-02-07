@@ -65,6 +65,113 @@
       "best_practice": "Always include reason in ignore directive: // security-lint-ignore: <clear explanation>",
       "extracted_from": "Task #95 learnings.md (Security-Lint-Ignore Directive pattern)",
       "date": "2026-02-07"
+    },
+    {
+      "id": "consumer-discovery-misses-dynamic-requires",
+      "gotcha": "Consumer discovery grep patterns may miss dynamic require statements and template-string imports in relocated modules",
+      "context": "Scripts System Overhaul Pipeline #8 (Task #99) - 2 scripts missed in Phase C (Task #95) consumer discovery despite comprehensive grep",
+      "why_it_happens": "Phase C (Task #95) used grep for static `require('literal-path')` patterns. However, dynamic requires like `require('.' + moduleName)` or template strings like ``require(`path/${dir}`)`` bypass literal pattern matching. Additionally, grep may miss requires in script files if search scope doesn't include scripts/ directory.",
+      "symptoms": "Scripts fail with MODULE_NOT_FOUND at runtime despite comprehensive grep-based consumer discovery. Example: validate-index.mjs phantom import was missed, breaking validate:full CI chain.",
+      "trigger": "Relocating a file from one directory to another (git mv) without exhaustive consumer discovery. Phase C coverage was 45+ imports, but 2 scripts (validate-index.mjs, validate-all-references.mjs) in scripts/ directory were missed.",
+      "solution": "Enhance consumer discovery to (1) include scripts/ directory explicitly, (2) use broader regex patterns that catch dynamic requires and template strings, (3) test by running affected npm scripts after relocation to catch runtime failures early",
+      "example": "validate-index.mjs has import statement: `import { contextPathResolver } from '../../.claude/tools/context/context-path-resolver.mjs'` (old path after Phase C relocation) → ERROR: MODULE_NOT_FOUND",
+      "prevention": [
+        "grep for filename alone: `grep -r 'context-path-resolver' .` (not just path patterns)",
+        "grep for old directory path: `grep -r 'tools/context' .` (catches any reference)",
+        "Test npm scripts: `pnpm validate:full` would have failed immediately, revealing the phantom import",
+        "Run full test suite before committing relocations"
+      ],
+      "best_practice": "After any file relocation: (1) grep filename, (2) grep old directory path, (3) run all affected npm scripts, (4) run full test suite",
+      "extracted_from": "Task #99 learnings (Script Import Regression Prevention), Task #95 post-QA fixes (Task #97)",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "architecture-plan-document-missing",
+      "gotcha": "Architecture plan documents may be referenced in ADRs but not actually created, creating false expectations",
+      "context": "Scripts System Overhaul Pipeline #8 (ADR-090) references `.claude/context/plans/scripts-overhaul-architecture-2026-02-07.md` that does not exist",
+      "why_it_happens": "During ADR authoring, the architecture plan is referenced as a separate document (following the pattern from other ADRs like ADR-087, ADR-089). However, the actual document file is not created. All work is completed correctly per the ADR, but the plan document itself is missing.",
+      "symptoms": "Reference to architecture plan fails when trying to link or read the document. Example: 'Architecture Plan: `.claude/context/plans/scripts-overhaul-architecture-2026-02-07.md`' but file is not found.",
+      "trigger": "Creating comprehensive ADRs without ensuring all referenced artifacts (plans, documents, reports) are actually created",
+      "solution": "After creating an ADR that references a plan document, verify the document exists. If it doesn't, either (1) create it by extracting relevant sections from the ADR, (2) remove the reference and note that implementation followed the ADR directly, or (3) mark it as TODO for future extraction.",
+      "prevention": [
+        "Checklist in ADR authoring: verify all artifact references exist",
+        "Use relative path references in ADRs only if documents are guaranteed to exist",
+        "Consider creating plan documents programmatically from ADR sections"
+      ],
+      "impact": "Minor - all work was completed correctly per ADR; plan document is not critical to understanding what was done, but reduces completeness",
+      "extracted_from": "Task #101 finalization review, noted during reflection evaluation",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "windows-compatibility-partial-resolution",
+      "gotcha": "Adding compatibility documentation without creating full cross-platform equivalent leaves the problem partially solved",
+      "context": "Scripts System Overhaul Pipeline #8 (Task #100) addressed validate-sync.sh Windows incompatibility by adding comments, but did not create full Node.js equivalent",
+      "why_it_happens": "When a tool has platform-specific limitations (bash-only on Windows), developers often add documentation explaining the limitation and providing workarounds. While this is an improvement, it's not a full solution. Users still cannot run the tool natively on Windows without workarounds.",
+      "symptoms": "Windows users must use WSL, Git Bash, or Cygwin to run validate-sync.sh. The documentation explains this, but users still cannot use the tool directly.",
+      "trigger": "Time constraints or complexity of creating cross-platform equivalent. Bash scripts that use Unix tools (find, grep, sed, etc.) are complex to port to Node.js.",
+      "solution": "For high-value scripts (critical in CI/CD), create a Node.js equivalent that provides identical functionality cross-platform. For lower-priority scripts, documentation + workarounds may be sufficient.",
+      "example": "validate-sync.sh uses `find`, `grep`, `xargs` to validate file synchronization. Creating Node.js equivalent (validate-sync.mjs) would enable Windows users to run it natively.",
+      "assessment": "validate-sync.sh is not critical (alternative validation scripts exist: validate:config, validate:references, validate:full). Documentation + workarounds are sufficient. Future enhancement: create Node.js equivalent if Windows compatibility becomes high-priority.",
+      "extracted_from": "Task #100 learnings (GAP-6 Windows compatibility), reflection analysis",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "thin-rules-worse-than-no-rules",
+      "gotcha": "Thin rules (3-7 lines) are worse than no rules -- they consume system prompt tokens without providing actionable guidance",
+      "context": "Rules System Overhaul Pipeline #9 (Task #102-103) found 7 of 9 rule files were only 3-8 lines each, providing minimal guidance",
+      "why_it_happens": "Rules are auto-loaded into system prompt (every line costs tokens). When a rule provides only generic platitudes (e.g., 'Prefer composition over inheritance', 'Avoid console logging'), it adds noise without signal. The developer already knows this. The rule's value is project-specific guidance, not generic best practices.",
+      "symptoms": "Rule file exists but is too thin to be useful. Developers read it once and forget. It consumes ~50 tokens per rule without changing behavior. At 9 rules × 50 tokens = 450 tokens of baseline cost for thin rules.",
+      "trigger": "Creating a rule file with less than 6 directives. Initial impulse: 'A short rule is better than no rule.' Actual result: 'A short generic rule is noise.'",
+      "solution": "Minimum 6+ actionable directives per rule, with project-specific context. Examples: Instead of 'Favor immutability', write 'Avoid in-place mutation of objects; use spread operator or Object.assign() for shallow copies, and libraries like immer for nested updates.'",
+      "example_before": "coding-style.md (8 lines): 5 bullet points, all generic, no project context",
+      "example_after": "code-standards.md (44 lines): 8 sections with 40+ directives, all with project-specific context (file extensions, test structure, .cjs vs .mjs conventions)",
+      "expansion_impact": "Pipeline #9 expanded 7 thin rules from 3-8 lines to 33-54 lines each. Token cost increased from ~350 to ~3500 tokens (+7x), but coverage improved (added memory protocol, task tracking rules that filled critical gaps). ROI: +7x tokens for +3 new rules and 2 filled behavioral gaps.",
+      "pattern": "After creating a rule, check: 'Does this rule provide project-specific guidance that would change a developer's behavior?' If not, expand or delete.",
+      "extracted_from": "Task #102-103 rules audit and expansion, learnings.md entry on thin rule analysis",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "merged-files-leave-broken-references",
+      "gotcha": "After merging files (e.g., coding-style.md + patterns.md into code-standards.md), references to the deleted filenames can break in other documentation files",
+      "context": "Rules System Overhaul Pipeline #9 (Task #103-104) merged coding-style.md and patterns.md into code-standards.md. Later discovered 5 broken references to the deleted files.",
+      "why_it_happens": "When merging files, developers update obvious references (imports, includes, links in README), but miss references in comment tables, historical notes, architecture docs, and examples. References in `.claude/` subdirectories are easy to miss because they're not in the main codebase.",
+      "symptoms": "Old filenames still mentioned in documentation: '@DIRECTORY_STRUCTURE.md (rule listing table)', 'templates/README.md (deleted files)', 'templates/_archive/README.md (archive tracking)', 'rules-system-security-review.md (enforcement table)', 'CLAUDE.md (Section 7)'. These create confusion: 'Is coding-style.md still a rule?' Users may search for the old file and get 404.",
+      "trigger": "Merging two files without doing exhaustive grep search for all references. Initial approach: grep for 'coding-style' and 'patterns' with limited scope. Actual references exist in: directory listings, archive notes, security docs, enforcement tables, cross-references.",
+      "solution": "After ANY file deletion/merge/rename: 1) `grep -r 'old-filename' .claude/` across entire framework directory (not just code), 2) Search for old filename in ALL `.md` files (architecture docs, catalogs, plans, reports), 3) Update all references. Pattern: file deletions require broader search scope than developers expect.",
+      "example_broken_references": [
+        "@DIRECTORY_STRUCTURE.md: 'Section 9.1 lists rules: agents.md, coding-style.md, patterns.md...' (should be: ...code-standards.md...)",
+        "templates/README.md: 'Deleted rules: coding-style.md and patterns.md' (implies they're archived, but they're merged into code-standards.md)",
+        "templates/_archive/README.md: 'Note: coding-style.md and patterns.md were part of Rules System Overhaul'",
+        "rules-system-security-review.md: 'Enforcement table references coding-style.md' (should be: code-standards.md)",
+        "CLAUDE.md Section 7: 'See coding-style.md in rules/' (stale reference)"
+      ],
+      "prevention": [
+        "Create pre-commit hook that validates all filenames referenced in .md files exist on filesystem",
+        "Include 'Update all cross-references' in merge checklist (not just obvious includes)",
+        "Use explicit grep search for old filename in .claude/ and docs/ when deleting files",
+        "Consider symbolic link (temporary) to redirect old filename to new location while fixing references"
+      ],
+      "extracted_from": "Task #104 (path conflict fixes), where 5 broken references discovered after Task #103 merge",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "config-headers-claim-false-consumers",
+      "gotcha": "Configuration files may have header comments claiming that certain tools/validators read them, but those tools may have been archived or replaced without updating the header",
+      "context": "Config System Overhaul Pipeline #10 (Task #106) discovered command-allowlist.yaml header claiming 'command-allowlist-validator.cjs reads this' but the validator was archived in Pipeline #7",
+      "why_it_happens": "When a tool is archived, the config file header is not automatically updated. Developers may assume if the config exists and is referenced in its own header, there's a consumer. But the header itself can become stale.",
+      "symptoms": "Config file exists with header claiming a consumer reads it. Developer writes code assuming the consumer processes the config. Upon wiring audit, discovers the consumer was archived and functionality was hardcoded into a different module instead.",
+      "example": "command-allowlist.yaml header: 'Read by command-allowlist-validator.cjs to validate commands'. But command-allowlist-validator.cjs was archived in Pipeline #7, and command-allowlist.cjs (the library) hardcodes the allowlist in JavaScript instead of reading the YAML file.",
+      "trigger": "Archiving a tool that reads a config file, but not updating the config file's header comment",
+      "solution": "During wiring audits, validate the config header's claimed consumers against actual require() statements in the codebase. If a consumer is archived, either: 1) Delete the config file, 2) Rewire the config to a new consumer, or 3) Update the header to reflect reality.",
+      "detection_pattern": "Grep for the validator/consumer tool name. If zero matches or only matches in the config header itself, the consumer is likely dead.",
+      "prevention": [
+        "Include config file header update in archival checklist (if archiving a tool, update all config headers that reference it)",
+        "During wiring audits, validate each config's claimed consumers exist and actually read the config"
+      ],
+      "extracted_from": "Task #106 findings in learnings.md ('Phantom References' section)",
+      "date": "2026-02-07"
     }
+  ]
+}
   ]
 }

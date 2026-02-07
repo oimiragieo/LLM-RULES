@@ -604,6 +604,64 @@ Key architectural decisions within this ADR:
 
 ---
 
+## ADR-093: Config System Staleness Prevention -- Add CI Validation for Aggregate Counts
+
+**Date:** 2026-02-07
+
+**Status:** Proposed
+
+**Context:**
+
+Config System Overhaul (Pipeline #10, Tasks #106-108) discovered that configuration files with aggregate metadata become stale when their sources change:
+- `tool-manifest.json` had `totalAgents: 16` while agent-registry.json documented 49 agents
+- `rule-index-cache.json` had stale entries from merged rules (coding-style.md + patterns.md merged into code-standards.md)
+
+Regeneration scripts exist (`pnpm manifest:generate`, `pnpm generate-rule-index`) but are run manually. No CI validation prevents staleness from accumulating.
+
+**Decision:**
+
+Implement two-layer cache staleness prevention:
+
+1. **Layer 1 (Validation):** Create `validate-config-aggregates.cjs` script that:
+   - Reads each config file with aggregate metadata
+   - Counts actual items in source (agent-registry.json, .claude/rules/*.md, etc.)
+   - Compares aggregate value against actual count
+   - Reports mismatches with specific file and field that's stale
+   - Exits non-zero if any aggregate is stale
+
+2. **Layer 2 (Automation):** Integrate validation into CI pipeline:
+   - Add `validate:config-aggregates` as npm script
+   - Include in `validate:full` validation chain
+   - Run on every commit (prevent merging stale configs)
+
+3. **Layer 3 (Documentation):** Update config file headers to document:
+   - Which file is the source of truth
+   - How to regenerate if stale
+   - Example: "This file is auto-generated from agent-registry.json. Run `pnpm manifest:generate` if totalAgents is stale."
+
+**Rationale:**
+
+- Aggregates become stale easily (developers forget to regenerate after source changes)
+- No mechanism currently prevents staleness from accumulating
+- CI validation catches staleness immediately (prevents bad commit)
+- Regeneration scripts already exist; just need to integrate into validation chain
+
+**Alternatives Considered:**
+
+1. **Remove all aggregates from configs:** Rejected -- configs need to be readable without parsing sources dynamically
+2. **Make regeneration automatic on source change:** Rejected -- requires file watchers or hooks that may be fragile
+3. **Just documentation reminder:** Rejected -- Pipeline #10 shows reminders alone don't prevent staleness
+
+**Consequences:**
+
+- CI pipeline adds ~2-5 seconds for aggregate validation
+- Prevents unknown duration of staleness (tool-manifest was stale for weeks before Task #106)
+- Ensures all configs remain synchronized with sources
+
+**Architecture Plan:** (Suggested integration point: `.claude/tools/cli/validate-config-aggregates.cjs`)
+
+---
+
 ## ADR-076: Simple 50-Line Chunking for BM25-Only Mode
 
 **Date:** 2026-02-05
@@ -797,6 +855,50 @@ Overhaul template-creator SKILL.md to match the common creator pattern:
 3. Make all steps non-blocking (warnings only): Rejected because the Party Mode incident proved warnings are insufficient
 
 **Architecture Plan:** `.claude/context/plans/template-creator-overhaul-architecture-2026-02-07.md`
+
+---
+
+### ADR-093: Agent System Health Status -- Comprehensive Deep Dive
+
+**Date:** 2026-02-07
+**Status:** Accepted (Implementation Complete: 2026-02-07)
+**Pipeline:** Enterprise Pipeline #11 (Agents System Deep Dive)
+
+**Context:**
+Comprehensive 5-phase audit of all 49 agent definition files in `.claude/agents/` across 4 subdirectories (core: 9, domain: 22, specialized: 14, orchestrators: 4). Verified consistency against agent-registry.json, agent-config.json, tool-manifest.json, routing-table.cjs, capability-routing.json, and @AGENT_ROUTING_TABLE.md. Analyzed spawn-log.jsonl for actual utilization data.
+
+**Key Findings:**
+1. **100% registry consistency:** All 49 agents present in both registries, all files on disk, all paths match
+2. **0 orphans, 0 phantoms, 0 stale skill references:** Agent layer is structurally sound
+3. **14.3% utilization:** 7/49 agents spawned (developer:7, reflection-agent:3, architect:3, security-architect:3, planner:2, code-reviewer:1, qa:1)
+4. **3 stale name references** in rules/agents.md (python-backend-expert, typescript-expert, database-specialist)
+5. **Root-level router.md duplicate resolved** (known issue from previous audit is fixed)
+6. **2 agents not in keyword routing** (reflection-agent via Step 0, party-orchestrator via Party Mode -- by design)
+
+**Decision:**
+1. Fix 3 stale agent name references in rules/agents.md (✅ DONE)
+2. Prioritize ADR-079/080 implementation (enforcement block mode + enterprise workflow) over agent file changes
+3. Do NOT archive or delete any agents -- all 49 serve distinct purposes
+4. Add utilization monitoring to spawn-log.jsonl analysis
+5. Expand capability-routing.json coverage
+
+**Implementation Notes (2026-02-07):**
+- Agent layer is structurally clean: 49 agents, 100% registry consistency
+- Fixed 3 stale name references in rules/agents.md (python-backend-expert→python-pro, typescript-expert→typescript-pro, database-specialist→database-architect)
+- 5 HIGH + 3 MEDIUM security findings tracked in issues.md for future hardening (see: `.claude/context/reports/security/agents-system-security-review-2026-02-07.md`)
+- 85.7% under-utilization deferred to ADR-079/080 (orchestration problem, not agent definition problem)
+
+**Rationale:**
+- The agent definition layer is healthy; under-utilization is an orchestration problem, not an agent definition problem
+- Domain agents are intentionally demand-driven (they fire when users work in specific domains)
+- Archiving unused agents is premature; they represent capabilities the system SHOULD be using once orchestration is activated
+
+**Consequences:**
+- rules/agents.md becomes accurate
+- Future pipelines focus on orchestration activation (ADR-079/080)
+- Utilization tracking enables progress measurement
+
+**Architecture Plan:** `.claude/context/plans/agents-overhaul-architecture-2026-02-07.md`
 
 ---
 

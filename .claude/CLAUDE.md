@@ -257,6 +257,8 @@ Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesi
 
 **Note:** The `Task*` family of tools (Task, TaskList, TaskCreate, TaskUpdate, TaskGet, TaskOutput, TaskStop) are **host-provided** infrastructure tools, not implemented as scripts in the repository.
 
+**Framework Tools:** The `.claude/tools/` directory contains 66 active CLI-executable utilities across 13 categories (CLI validators, analysis, integrations, maintenance, optimization, runtime, visualization, workflow, gates, context). 25 deprecated tools archived to `_archive/`. 8 library modules relocated to `.claude/lib/` (2026-02-07 overhaul). See `.claude/context/artifacts/catalogs/tool-catalog.md` for complete inventory with wiring status.
+
 **Router Toolset (Whitelist):**
 
 - Task, TaskList, TaskCreate, TaskUpdate, TaskGet

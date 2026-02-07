@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "phaseModels": {
     "spec": "sonnet",
-    "planning": "sonnet",
+    "planning": "opus",
     "coding": "sonnet",
-    "qa": "sonnet"
+    "qa": "opus"
   },
   "phaseThinking": {
     "spec": "medium",

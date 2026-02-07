@@ -149,6 +149,190 @@
       "applicability": "Any system with 20+ tools/utilities/modules where discovery is a problem",
       "extracted_from": "Task #96 (tool catalog creation), pattern observed in 4 other catalogs",
       "date": "2026-02-07"
+    },
+    {
+      "id": "script-phantom-import-regression-pattern",
+      "name": "Script Phantom Import Regression Testing Pattern",
+      "context": "Scripts System Overhaul Pipeline #8 (Tasks #98-99) - identified and prevented phantom imports in package.json and import statements",
+      "description": "Create TDD regression tests that validate (1) all package.json scripts reference existing files, and (2) all `import`/`require` statements in script files resolve to valid paths. Two-layer validation catches phantom scripts at both entry points (npm commands) and code level (static imports). Pattern: use regex extraction + filesystem stat() to verify each reference exists.",
+      "examples": [
+        "Phantom package.json scripts: `pnpm validate:agents` referenced non-existent validation tool",
+        "Phantom import: `validate-index.mjs` imported from deleted path `.claude/tools/context/context-path-resolver.mjs`"
+      ],
+      "test_structure": [
+        "Layer 1: Extract all `node <path>` commands from package.json scripts section",
+        "Layer 2: Verify each file exists via fs.statSync()",
+        "Layer 3: Extract all `import`/`require` statements from script files",
+        "Layer 4: Resolve each import to a file and verify it exists"
+      ],
+      "applicability": "Any project with 20+ executable scripts where package.json is the discovery interface",
+      "benefits": [
+        "Prevents broken CI chains (CRITICAL: validate:full was broken at step 5)",
+        "Early detection before code review (test runs on every commit)",
+        "Self-documenting: test serves as inventory of available scripts",
+        "Catches relocations that miss consumer updates"
+      ],
+      "integration_with_other_patterns": "Extends phantom-scripts pattern from Tasks #93-94 (tools); applies to scripts/ directory",
+      "test_files": [
+        "tests/tools/phantom-scripts.test.cjs (validates package.json)",
+        "tests/scripts/script-imports.test.cjs (validates import statements) - NEW Task #99"
+      ],
+      "extracted_from": "Task #99 (script phantom import fixes), generalizes from Task #93 pattern",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "tdd-security-fix-pattern",
+      "name": "TDD Pattern for Security Vulnerability Fixes",
+      "context": "Scripts System Overhaul Pipeline #8 (Task #100) - fixed path traversal vulnerability (MEDIUM-001) in install.mjs",
+      "description": "When fixing security vulnerabilities, use TDD discipline: (1) write failing test demonstrating the vulnerability exists (RED), (2) implement the fix (GREEN), (3) verify test passes and validates the fix. The test becomes a permanent regression guard against the same vulnerability reappearing. Pattern applies to any class of security defect: path traversal, command injection, expression evaluation, credential exposure.",
+      "phases": [
+        {
+          "phase": "RED",
+          "description": "Write test case with malicious input that exploits the vulnerability. Assertion: current code fails or produces unsafe output.",
+          "example": "path traversal test: `install.mjs --target ../../../etc/passwd` should be rejected, but currently accepts it"
+        },
+        {
+          "phase": "GREEN",
+          "description": "Implement fix to prevent the vulnerability. Re-run test to verify it now passes.",
+          "example": "Add validation: reject paths with `..`, check normalized path starts with PROJECT_ROOT"
+        },
+        {
+          "phase": "VERIFY",
+          "description": "Run full test suite to ensure fix doesn't break existing functionality or introduce new vulnerabilities."
+        }
+      ],
+      "example_vulnerability": "MEDIUM-001 Path Traversal in install.mjs",
+      "vulnerability_details": {
+        "vulnerability": "User could provide target path like `../../../etc` and install to arbitrary locations",
+        "fix": "Two-layer validation: (1) reject `..` literals, (2) check resolved path starts with PROJECT_ROOT",
+        "test_cases": [
+          "Normal path: `./node_modules/` → ACCEPTED",
+          "Traversal via double-dot: `../../../etc` → REJECTED",
+          "Absolute path outside CWD: `/etc/passwd` → REJECTED (unless `--force` flag)",
+          "Safe traversal within project: `./src/../target/` → ACCEPTED (resolves to `./target/`)"
+        ],
+        "test_file": "tests/scripts/install-security.test.cjs",
+        "test_results": "4/4 pass"
+      },
+      "applicability": "Any security vulnerability (injection, traversal, exposure, overflow, etc.)",
+      "benefits": [
+        "Prevents regression: test permanently guards against this class of vulnerability",
+        "Documents the vulnerability for future maintainers",
+        "Forces developer to understand the root cause before implementation",
+        "Quality gate: test must pass before vulnerability fix is considered done"
+      ],
+      "anti_patterns": [
+        "Implementing fix without test (impossible to verify fix works)",
+        "Test that only checks the happy path (ignores edge cases)",
+        "Test that documents the vulnerability but doesn't prevent it"
+      ],
+      "extracted_from": "Task #100 (path traversal fix), proven pattern from TDD literature",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "rules-are-auto-loaded-system-prompt",
+      "name": "Rules Auto-Loading System Prompt Pattern",
+      "context": "Rules System Overhaul Pipeline #9 (Task #102-103) - discovered that rules auto-load as system prompt without explicit wiring",
+      "description": "In Claude Code, all `.claude/rules/*.md` files are automatically loaded into every conversation's system prompt. Rules do NOT require `require()`, `import`, or explicit references -- they are discovery-based via file globbing. This means: (1) rules are the most reliable enforcement layer for cross-cutting concerns (reach every conversation), (2) every line in a rule costs tokens, so rules must provide 6+ actionable directives to justify cost, (3) thin rules (3-7 lines) are noise not signal, (4) rules are complementary to CLAUDE.md (which spawned agents may not fully absorb).",
+      "why_important": "Rules auto-loading is the most reliable way to enforce mandatory agent behaviors like memory protocol and task tracking. Generic CLAUDE.md sections are not guaranteed to be read, but rules in system prompt are always available.",
+      "token_cost_analysis": {
+        "example_thin_rule": "3 lines = ~50 tokens per rule, 9 rules = ~450 tokens baseline",
+        "example_expanded_rule": "40 lines = ~350 tokens per rule, 10 rules = ~3500 tokens (7x higher cost)",
+        "recommendation": "Minimum 6+ directives per rule to justify token overhead. Generic platitudes add noise. Project-specific guidance adds signal.",
+        "case_study": "Pipeline #9 expanded thin rules from 3-8 lines to 33-54 lines (+250 tokens/rule), but coverage improved (2 new rules filled critical gaps in memory protocol and task tracking)"
+      },
+      "applicability": "Any project using Claude Code framework with auto-loaded rules",
+      "benefits": [
+        "Rules are guaranteed to reach every conversation (no opt-in required)",
+        "Can enforce mandatory agent behaviors without CLAUDE.md bloat",
+        "Rule changes propagate automatically (no re-deployment needed)",
+        "No wiring complexity (vs agents which need routing, skills which need skill-creator)"
+      ],
+      "pattern": "1) Identify mandatory cross-cutting behavior (e.g., memory protocol, task tracking). 2) Check if rule exists. 3) If not, create new rule with 6+ directives. 4) If exists and thin (<6 directives), expand with project-specific guidance. 5) Update rule-index.json. 6) Update CLAUDE.md if rule relates to enforcement hooks.",
+      "anti_patterns": [
+        "Creating 3-line rules (generic platitudes without project context)",
+        "Duplicating CLAUDE.md content in rules (redundant token use)",
+        "Leaving rules out of rule-index.json (breaks programmatic discovery)",
+        "Using rules for implementation details that change frequently (use docs instead)"
+      ],
+      "extracted_from": "Task #102-103 (rules audit), validated by learnings.md entries on thin rule expansion",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "rule-index-must-match-filesystem",
+      "name": "Rule-Index Filesystem Sync Pattern",
+      "context": "Rules System Overhaul Pipeline #9 (Task #104) - discovered rule-index.json missing workspace-conventions.md entry",
+      "description": "rule-index.json provides programmatic rule discovery (used by rule-selector skill, project-analyzer, and other tools). The index must stay in sync with filesystem. After any rule file operation (create, delete, merge, rename), verify rule-index.json reflects the change. Pattern: file deletion leaves stale index entries; file creation/rename breaks programmatic discovery; merging two files requires removing both old entries and adding merged entry.",
+      "sync_checklist": [
+        "After creating rule: add entry to rule-index.json with description, size, line_count",
+        "After deleting rule: remove entry from rule-index.json",
+        "After renaming rule: update path and name fields in rule-index.json",
+        "After merging rules: remove old entries, add new merged entry",
+        "After expanding rule content: update size and line_count fields in rule-index.json",
+        "Run `pnpm validate:config` to detect stale entries (validate-rule-index-paths.mjs checks for missing/orphan entries)"
+      ],
+      "case_study": "Pipeline #9 Task #102 found: rule-index.json had 8 entries, but 9 rules existed (workspace-conventions.md was missing). Task #103 created 2 new rules, merged 2 into 1. Task #104 updated rule-index.json to v1.3.0 with 10 rules, 100% coverage.",
+      "applicability": "Any project with programmatic rule discovery or auto-loaded rules",
+      "benefits": [
+        "Prevents blind spots in rule discovery (all rules are findable)",
+        "Enables programmatic validation (detect missing/orphan rules)",
+        "Supports metrics tracking (rule count, coverage, token cost)",
+        "Facilitates rule-selector skill (can list all available rules)"
+      ],
+      "prevention": [
+        "Add pre-commit hook that validates rule-index.json matches filesystem (detect additions/deletions)",
+        "Include rule-index.json update in PR checklist for rule changes",
+        "Periodically audit rule-index.json with `grep -l 'name.*'` vs `ls .claude/rules/*.md`"
+      ],
+      "extracted_from": "Task #104 (path conflict fixes), rule-index.json v1.3.0 update",
+      "date": "2026-02-07"
+    },
+    {
+      "id": "aggregate-metadata-staleness-detection",
+      "name": "Aggregate Metadata Staleness Detection Pattern",
+      "context": "Config System Overhaul Pipeline #10 (Task #106-108) - discovered tool-manifest.json and rule-index-cache.json with stale aggregate counts",
+      "description": "Configuration files that contain aggregate counts (e.g., totalAgents, total_rules, totalTools) become stale when their source changes (more agents added, rules merged, tools archived). Unlike rule-index.json (which is indexed per-entry), these aggregates require explicit regeneration. Pattern: identify all files with aggregate counts, create regeneration scripts, add CI validation to detect staleness.",
+      "examples": [
+        {
+          "file": "tool-manifest.json",
+          "aggregate_field": "totalAgents",
+          "should_be": 49,
+          "was_stale": 16,
+          "source": "agent-registry.json (49 agents documented)",
+          "regeneration": "node .claude/tools/cli/generate-tool-manifest.cjs",
+          "fix": "Updated generator to read agent-registry.json instead of hardcoded count"
+        },
+        {
+          "file": "rule-index-cache.json",
+          "aggregate_field": "total_rules",
+          "should_be": 10,
+          "was_stale": 9,
+          "source": ".claude/rules/*.md files (9 exist after Pipeline #9 merges)",
+          "regeneration": "pnpm generate-rule-index",
+          "fix": "Manually updated after Pipeline #9 rule merges (coding-style + patterns merged into code-standards)"
+        }
+      ],
+      "applicability": "Any config system with aggregated counts that derive from dynamic sources",
+      "pattern": [
+        "1. Identify all config files with aggregate counts",
+        "2. Document the source of truth for each aggregate",
+        "3. Create automated regeneration script for each aggregate",
+        "4. Add CI validation: compare aggregate value against actual source count",
+        "5. When source changes (e.g., agents added), regenerate aggregate immediately"
+      ],
+      "prevention": [
+        "Add `pnpm validate:config-aggregates` script that checks each aggregate against source",
+        "Document in config file header: 'This file is auto-generated from X. Run `pnpm regenerate:X` if stale.'",
+        "Include aggregate validation in CI pipeline (fail if aggregate != actual count)",
+        "When adding/removing items from source, trigger regeneration immediately (not deferred)"
+      ],
+      "gotcha": "Aggregates can become stale quickly if not regenerated immediately after source changes. Pipeline #10 found tool-manifest.json had been stale since agents were increased from 16 to 49 (possibly weeks). This suggests regeneration scripts are not being run automatically.",
+      "extracted_from": "Task #106 (audit), Task #107 (fixed phase-models.json), Task #108 (regenerated tool-manifest and rule-index)",
+      "date": "2026-02-07"
     }
+  ]
+}
+  ]
+}
   ]
 }

@@ -14,6 +14,49 @@ Each issue should include:
 
 ---
 
+## 2026-02-07: FILE_PLACEMENT_RULES.md Stale Paths Conflict with workspace-conventions.md (Pipeline #9)
+
+**Date:** 2026-02-07
+
+**Impact:** HIGH -- Agents reading FILE_PLACEMENT_RULES.md will write plans and reports to incorrect locations.
+
+**Description:**
+
+Two authoritative documents disagree on artifact paths:
+
+| Artifact | `workspace-conventions.md` (correct) | `FILE_PLACEMENT_RULES.md` (stale) |
+|----------|--------------------------------------|-----------------------------------|
+| Plans | `.claude/context/plans/` | `.claude/context/artifacts/plans/` |
+| Reports | `.claude/context/reports/{domain}/` | `.claude/context/artifacts/reports/` |
+
+`workspace-conventions.md` was established by ADR-078 (2026-02-06) and is the canonical source. ADR-081 consolidated reports to `context/reports/{domain}/`. `FILE_PLACEMENT_RULES.md` (v2.0, last updated 2026-01-31) predates both ADRs and was not updated.
+
+The `file-placement-guard.cjs` hook enforces paths from `FILE_PLACEMENT_RULES.md` (line 545-546 reference `context/artifacts/reports/` and `context/plans/`). This means the hook may incorrectly reject writes to the canonical paths.
+
+**Workaround:** None needed for rules files themselves (auto-loaded). But agents following FILE_PLACEMENT_RULES.md will write to stale paths.
+
+**Resolution:** Update FILE_PLACEMENT_RULES.md to match workspace-conventions.md paths. Update file-placement-guard.cjs if it references stale paths. See ADR-091 Phase A.
+
+---
+
+## 2026-02-07: rule-index.json Missing workspace-conventions.md (Pipeline #9)
+
+**Date:** 2026-02-07
+
+**Impact:** MEDIUM -- Programmatic rule discovery misses the most-referenced rule file.
+
+**Description:**
+
+`rule-index.json` at `.claude/context/config/rule-index.json` has `total_rules: 8` but 9 rule files exist in `.claude/rules/`. The missing entry is `workspace-conventions.md` -- which is referenced by 46+ agent definitions, all 6 creator skills, and the universal spawn template.
+
+Any system that discovers rules via rule-index.json (e.g., rule-selector skill, project-analyzer) will not see workspace-conventions. The `rule-index-cache.json` file also lacks this entry.
+
+**Workaround:** Systems that glob `.claude/rules/*.md` directly are unaffected.
+
+**Resolution:** Add workspace-conventions.md entry to rule-index.json and rule-index-cache.json. See ADR-091 Phase A, FIX-1.
+
+---
+
 ## 2026-02-07: validate:full CI Chain Broken (Pipeline #8, ADR-090)
 
 **Date:** 2026-02-07
@@ -331,6 +374,46 @@ Fix:
 
 ---
 
+## 2026-02-07: No Automated Cache Staleness Validation (Pipeline #10)
+
+**Date:** 2026-02-07
+
+**Impact:** MEDIUM -- Aggregate metadata (totalAgents, total_rules) can silently become stale without detection
+
+**Description:**
+
+Config files with aggregate counts (tool-manifest.json, rule-index-cache.json) derive their values from dynamic sources:
+- `totalAgents` in tool-manifest.json should equal agent count in agent-registry.json
+- `total_rules` in rule-index-cache.json should equal rule files in .claude/rules/
+
+When the source changes (agents added, rules merged), the aggregate can become stale if the regeneration script is not run. Example: tool-manifest.json had `totalAgents: 16` while agent-registry.json documented 49 agents (stale for unknown duration).
+
+No CI validation exists to detect this staleness. The regeneration scripts exist (`pnpm manifest:generate`, `pnpm generate-rule-index`) but are run manually on-demand.
+
+**Workaround:**
+
+Before making source changes (adding agents, merging rules), manually run the regeneration script:
+```bash
+pnpm manifest:generate
+pnpm generate-rule-index
+```
+
+**Resolution:**
+
+Add `pnpm validate:config-aggregates` script that validates all aggregate counts match their sources. Include in CI pipeline (GitHub Actions) to catch staleness before merge.
+
+Pattern: Compare aggregate value against actual source count. Fail if mismatch.
+
+**Prevention:**
+
+1. Create `validate-config-aggregates.cjs` that reads each config, checks aggregates against sources, reports mismatches
+2. Add to package.json as `validate:config-aggregates` npm script
+3. Include in CI pipeline (add to `validate:full` chain)
+4. When aggregate becomes stale, CI fails immediately
+5. Document in config file headers: "Auto-generated from X. Run `pnpm regenerate:X` if stale."
+
+---
+
 ## 2026-02-06: CRITICAL -- 94% Agent Under-Utilization (Task #35)
 
 **Date:** 2026-02-06
@@ -366,3 +449,57 @@ None. This is a systemic design gap requiring architectural changes.
 4. Implement workflow state machine (P1, 4-8 hours)
 
 **Full Report:** `.claude/context/reports/architecture/agent-utilization-audit-2026-02-06.md`
+
+---
+
+## 2026-02-07: Agents System Security Findings (Pipeline #11)
+
+**Date:** 2026-02-07
+
+**Issue:**
+
+Security review of the agents system (49 agents, routing infrastructure, model selection, tool access control) identified 5 HIGH and 3 MEDIUM severity findings requiring remediation before production deployment in security-sensitive environments.
+
+**Key Findings:**
+
+1. **HIGH-001**: Prompt injection via Task() description/prompt (no sanitization)
+2. **HIGH-002**: Model downgrade attack via explicit model: parameter (config-model-validator enforcement=warn)
+3. **HIGH-003**: Orchestrators bypass routing-guard.cjs enforcement (have Task tool without gates)
+4. **HIGH-004**: Agent registry tampering (no integrity check on agent-registry.json)
+5. **HIGH-005**: Bash whitelist bypassable via shell encoding ($IFS, backticks, quotes)
+
+**Impact:**
+
+- **HIGH**: Prompt injection can override agent instructions, exfiltrate secrets, bypass security checks
+- **HIGH**: Model downgrade reduces security review quality (opus → haiku skips extended thinking)
+- **HIGH**: Orchestrators can spawn implementation agents without planner-first or security-review gates
+- **HIGH**: Registry tampering enables privilege escalation (modify requiredTools to grant WebSearch)
+- **HIGH**: Bash encoding bypasses Router command whitelist
+
+**Workaround:**
+
+- Do NOT deploy in security-sensitive production until P1 findings fixed
+- Manually review all orchestrator spawns
+- Monitor spawn-log.jsonl for model downgrades
+- Validate agent-registry.json integrity before use
+- Restrict Router Bash access (consider removing entirely)
+
+**Resolution:**
+
+Findings documented in `.claude/context/reports/security/agents-system-security-review-2026-02-07.md`.
+
+**Remediation Plan**:
+- P1 (Security Critical): 11-17 hours (2-3 days) - FIX BEFORE PRODUCTION
+- P2 (Defense in Depth): 6-13 hours (1-2 days) - FIX BEFORE WIDER ROLLOUT
+- P3 (Hardening): 16-24 hours (2-3 days) - FIX FOR LONG-TERM SECURITY
+
+**Verdict**: APPROVED WITH CONDITIONS
+
+**Next Steps**:
+1. Create P1 mitigation tasks (5 HIGH findings)
+2. Implement prompt injection detection in routing-guard.cjs
+3. Change CONFIG_MODEL_VALIDATOR to block mode
+4. Extend routing-guard to orchestrators
+5. Add agent-registry.json integrity validation
+6. Block shell metacharacters in Bash validation
+

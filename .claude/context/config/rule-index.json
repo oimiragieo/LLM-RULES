@@ -1,13 +1,13 @@
 {
-  "version": "1.1.0",
-  "generated_at": "2026-02-06T00:55:08.593Z",
+  "version": "1.3.0",
+  "generated_at": "2026-02-07T14:30:00.000Z",
   "prebuilt": false,
-  "total_rules": 8,
-  "master_rules": 8,
+  "total_rules": 10,
+  "master_rules": 10,
   "library_rules": 0,
   "schema_version": "1.0.0",
   "versioning": {
-    "changelog": "Version 1.1.0: Added versioning metadata for skills compatibility tracking",
+    "changelog": "Version 1.3.0: Merged coding-style.md and patterns.md into code-standards.md; expanded all rules to 6+ directives",
     "increment_guide": {
       "major": "Breaking changes to index structure (e.g., renamed fields, removed properties)",
       "minor": "New rules added, rule paths changed, or new metadata fields added",
@@ -18,90 +18,112 @@
     {
       "path": ".claude/rules/agents.md",
       "name": "agents",
-      "description": "",
+      "description": "Agent quick reference with categories (core, security, orchestration, domain), routing reminders, and Router self-check gates",
       "globs": "",
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 871,
-      "line_count": 18
+      "size": 2419,
+      "line_count": 53
     },
     {
-      "path": ".claude/rules/coding-style.md",
-      "name": "coding-style",
-      "description": "",
+      "path": ".claude/rules/code-standards.md",
+      "name": "code-standards",
+      "description": "Code standards (merged from coding-style + patterns): organization, style, patterns, error handling, best practices",
       "globs": "",
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 266,
-      "line_count": 8
+      "size": 1406,
+      "line_count": 44
     },
     {
       "path": ".claude/rules/git-workflow.md",
       "name": "git-workflow",
-      "description": "",
+      "description": "Git commit and branch conventions: conventional commits, Co-Authored-By format, pre-commit requirements, branch workflow",
       "globs": "",
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 187,
-      "line_count": 7
+      "size": 1102,
+      "line_count": 34
     },
     {
       "path": ".claude/rules/hooks.md",
       "name": "hooks",
-      "description": "",
+      "description": "Hook authoring rules: stdin/stdout JSON protocol, exit codes, hook organization, graceful degradation, testing",
       "globs": "",
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 178,
-      "line_count": 6
+      "size": 1209,
+      "line_count": 35
     },
     {
-      "path": ".claude/rules/patterns.md",
-      "name": "patterns",
-      "description": "",
+      "path": ".claude/rules/memory-protocol.md",
+      "name": "memory-protocol",
+      "description": "Memory persistence requirements: read learnings.md before starting, write to learnings/decisions/issues after completing, assume interruption",
       "globs": "",
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 127,
-      "line_count": 6
+      "size": 561,
+      "line_count": 9
     },
     {
       "path": ".claude/rules/performance.md",
       "name": "performance",
-      "description": "",
+      "description": "Performance guidance: hot path optimization, token budget management, code indexing, spawn prompt efficiency, resource management",
       "globs": "",
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 146,
-      "line_count": 6
+      "size": 1032,
+      "line_count": 33
     },
     {
       "path": ".claude/rules/security.md",
       "name": "security",
-      "description": "",
+      "description": "Security rules: never commit secrets, command execution safety (spawnSync, no eval), OWASP Top 10 coverage (A06, A09, A10), references to security-architect and auth-security-expert skills",
       "globs": "",
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 195,
-      "line_count": 7
+      "size": 1139,
+      "line_count": 36
+    },
+    {
+      "path": ".claude/rules/task-tracking.md",
+      "name": "task-tracking",
+      "description": "Task tracking protocol: TaskUpdate(in_progress) at start, TaskUpdate(completed) after verification, TaskList() after completion",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 422,
+      "line_count": 8
     },
     {
       "path": ".claude/rules/testing.md",
       "name": "testing",
-      "description": "",
+      "description": "Testing rules: TDD red-green-refactor cycle, test organization (tests/ directory), node --test runner, regression test patterns, skills references",
       "globs": "",
       "priority": "",
       "technologies": ["api"],
       "type": "master",
-      "size": 243,
-      "line_count": 8
+      "size": 1123,
+      "line_count": 34
+    },
+    {
+      "path": ".claude/rules/workspace-conventions.md",
+      "name": "workspace-conventions",
+      "description": "Workspace file placement, naming conventions, provenance headers, forbidden locations (most-referenced rule file)",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 2128,
+      "line_count": 61
     }
   ],
   "technology_map": {

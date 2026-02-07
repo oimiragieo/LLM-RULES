@@ -29,8 +29,8 @@ This document defines the MANDATORY rules for where agents must place files they
 | Agent definition     | `.claude/agents/{category}/`                  |
 | Skill definition     | `.claude/skills/{name}/SKILL.md`              |
 | Workflow definition  | `.claude/workflows/{category}/`               |
-| Plan                 | `.claude/context/artifacts/plans/`            |
-| Report               | `.claude/context/artifacts/reports/`          |
+| Plan                 | `.claude/context/plans/`                      |
+| Report               | `.claude/context/reports/{domain}/`           |
 | Research report      | `.claude/context/artifacts/research-reports/` |
 | Architecture doc     | `.claude/context/artifacts/architecture/`     |
 | Schema               | `.claude/schemas/`                            |
@@ -187,7 +187,7 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 | `artifacts/database/`         | Database design artifacts      | `*.md`, `*.json`                            |
 | `artifacts/research-reports/` | Research synthesis outputs     | `*-research.md`                             |
 | `artifacts/summaries/`        | Phase summaries, checkpoints   | `*.md`                                      |
-| `plans/`                      | Planner outputs                | `*-plan.md`                                 |
+| `plans/`                      | Planner outputs (canonical)    | `*-plan-YYYY-MM-DD.md`                      |
 | `reports/`                    | Agent reports (canonical)      | `*-report-YYYY-MM-DD.md`                    |
 | `reports/security/`           | Security domain reports        | `*.md`                                      |
 | `reports/qa/`                 | QA domain reports              | `*.md`                                      |
@@ -206,7 +206,7 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 **Example Paths**:
 
 ```
-.claude/context/plans/auth-feature-plan.md
+.claude/context/plans/auth-feature-plan-2026-02-07.md
 .claude/context/reports/security/security-audit-2026-02-06.md
 .claude/context/reports/architecture/agent-utilization-audit-2026-02-06.md
 .claude/context/artifacts/research-reports/oauth-research.md
@@ -368,8 +368,8 @@ tests/fixtures/sample-agent.md            # Test fixture data
 | E2E tests                    | `tests/e2e/`                                  | `{workflow}.test.mjs`                       |
 | Test fixtures                | `tests/fixtures/`                             | Any                                         |
 | Workflows (`*.md`, `*.yaml`) | `.claude/workflows/{category}/`               | `{workflow-name}.md`                        |
-| Plans                        | `.claude/context/artifacts/plans/`            | `{feature}-plan.md`                         |
-| Reports                      | `.claude/context/artifacts/reports/`          | `{task}-report.md`                          |
+| Plans                        | `.claude/context/plans/`                      | `{feature}-plan-YYYY-MM-DD.md`              |
+| Reports                      | `.claude/context/reports/{domain}/`           | `{task}-report-YYYY-MM-DD.md`               |
 | Research                     | `.claude/context/artifacts/research-reports/` | `{topic}-research.md`                       |
 | Architecture docs            | `.claude/context/artifacts/architecture/`     | `{topic}-ARCHITECTURE.md`                   |
 | Memory                       | `.claude/context/memory/`                     | `learnings.md`, `decisions.md`, `issues.md` |
@@ -445,8 +445,8 @@ Incorrect: .claude/agents/my-agent.md (missing category)
 ### Creating a Plan
 
 ```
-Correct:   .claude/context/plans/feature-x-plan.md
-Incorrect: .claude/context/plans/feature-x-plan.md (wrong path)
+Correct:   .claude/context/plans/feature-x-plan-2026-02-07.md
+Incorrect: .claude/context/artifacts/plans/feature-x-plan.md (old path before ADR-078)
 Incorrect: .claude/context/artifacts/feature-x-plan.md (missing plans/)
 ```
 
@@ -543,7 +543,7 @@ const PLACEMENT_RULES = {
 
   // Context artifacts
   'context/plans/': /\.md$/,
-  'context/artifacts/reports/': /\.md$/,
+  'context/reports/': /\.md$/,
   'context/artifacts/research-reports/': /\.md$/,
   'context/memory/': /\.md$/,
   'context/config/': /\.(json|yaml)$/,
