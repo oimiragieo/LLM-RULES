@@ -35,6 +35,10 @@ Complete catalog of 15+ enterprise workflows for multi-agent orchestration, secu
 | Hook Consolidation   | `.claude/workflows/operations/hook-consolidation.md`                | hook consolidation      |
 | Post-Creation Valid. | `.claude/workflows/core/post-creation-validation.md`                | artifact integration    |
 | Progressive Disclos. | `.claude/workflows/progressive-disclosure-skill-workflow.md`        | requirements gathering  |
+| **Domain Development** | `.claude/workflows/domain-development-workflow.md`                | **TDD for domain agents** |
+| **Code Review**      | `.claude/workflows/code-review-workflow.md`                         | **two-pass review**     |
+| **Product Management** | `.claude/workflows/product-management-workflow.md`                | **INVEST sprint mgmt**  |
+| **Documentation**    | `.claude/workflows/documentation-workflow.md`                       | **Diataxis framework**  |
 
 ### Workflow Categories
 
@@ -64,6 +68,7 @@ Complete catalog of 15+ enterprise workflows for multi-agent orchestration, secu
 - **@EVOLUTION_WORKFLOW.md** - EVOLVE process details
 - **@SKILL_CATALOG_TABLE.md** - Skills used within workflows
 - **@AGENT_ROUTING_TABLE.md** - Agents participating in workflows
+- **@WORKFLOW_AGENT_MAP.md** - Workflow-agent mapping matrix
 
 ---
 

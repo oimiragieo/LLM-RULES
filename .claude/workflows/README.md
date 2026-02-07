@@ -45,6 +45,10 @@ Skill-specific workflows tied to individual creator skills or domain agents:
 - **architecture-review-skill-workflow.md** - Architecture review process
 - **context-compressor-skill-workflow.md** - Context compression and summarization workflows
 - **conductor-setup-workflow.md** - Context-Driven Development (CDD) setup and validation
+- **domain-development-workflow.md** - TDD workflow (Red-Green-Refactor Cycle) for all 22 domain specialist agents
+- **code-review-workflow.md** - Two-pass code review process (Pass 1: blocking, Pass 2: non-blocking)
+- **product-management-workflow.md** - INVEST user stories and sprint management for pm agent
+- **documentation-workflow.md** - Diataxis framework (Tutorial/How-to/Reference/Explanation) for technical-writer agent
 
 **When to Reference**: Use skill-specific workflows when invoking or working with particular domain agents or creator skills.
 
