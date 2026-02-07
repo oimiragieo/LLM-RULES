@@ -19,6 +19,17 @@ skills:
 
 # Party Orchestrator Agent
 
+> **⚠️ ARCHIVED DEPENDENCY WARNING (ADR-098, Pipeline #15, 2026-02-07):**
+>
+> This orchestrator depends on the `party-mode` subsystem, which was archived to `.claude/lib/_archive/party-mode/` due to zero active consumers. Party Mode functionality is currently NOT AVAILABLE.
+>
+> **To restore Party Mode:**
+> 1. `git mv .claude/lib/_archive/party-mode .claude/lib/party-mode`
+> 2. Verify all imports resolve correctly
+> 3. Run tests to ensure functionality
+>
+> **Alternative:** Use `swarm-coordinator` orchestrator for multi-agent collaboration (does not require party-mode).
+
 ## Enforcement Hooks
 
 The following hooks govern this agent's behavior at runtime:

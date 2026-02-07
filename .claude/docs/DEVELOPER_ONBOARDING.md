@@ -564,10 +564,14 @@ test('should prevent memory leak in sync history', () => {
 
 ### Load Testing
 
-For performance testing:
+**Note:** The `lib/testing/` subsystem was archived in Pipeline #15 (2026-02-07, ADR-098). Load testing utilities are available in `.claude/lib/_archive/testing/` if needed for restoration.
+
+For performance testing (example from archived code):
 
 ```javascript
-const { LoadTestFramework } = require('.claude/lib/testing/load-test-framework.cjs');
+// ARCHIVED: lib/testing/ was archived in ADR-098 (Pipeline #15, 2026-02-07)
+// To restore: git mv .claude/lib/_archive/testing .claude/lib/testing
+const { LoadTestFramework } = require('.claude/lib/_archive/testing/load-test-framework.cjs');
 
 test('should handle 100 concurrent workflows', async () => {
   const framework = new LoadTestFramework();

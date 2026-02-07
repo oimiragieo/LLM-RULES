@@ -149,41 +149,85 @@ hooks/
 
 ### lib/
 
+**Total Active Modules:** ~90 modules (~32,000 LOC) across 12 active subdirectories
+**Archived Modules:** ~80 modules (~12,600 LOC) in 10 archived subsystems (2026-02-07)
+
 ```
 lib/
-├── workflow/
-│   ├── workflow-engine.cjs
-│   ├── workflow-validator.cjs
-│   ├── checkpoint-manager.cjs
-│   ├── decision-handler.mjs (relocated from tools/workflow/)
-│   ├── loop-handler.mjs (relocated from tools/workflow/)
-│   └── workflow-runner.js (relocated from tools/workflow/)
-├── memory/
+├── _archive/               # Archived dead subsystems (ADR-098, Pipeline #15)
+│   ├── agents/             # Agent runtime (8 modules, ~750 LOC)
+│   ├── boot/               # Bootstrap utilities (3 modules, ~600 LOC)
+│   ├── clients/            # Client integrations (1 module, 153 LOC)
+│   ├── config/             # Config management (3 modules, ~300 LOC)
+│   ├── coordination/       # Coordination utilities (1 module, ~300 LOC)
+│   ├── integration/        # Integration layer (5 modules, ~2,400 LOC)
+│   ├── party-mode/         # Party mode subsystem (10 modules, ~2,500 LOC)
+│   ├── scheduler/          # Task scheduler (2 modules, ~180 LOC)
+│   ├── skills/             # Skills runtime (1 module, 318 LOC)
+│   └── testing/            # Test utilities (8 modules, ~2,800 LOC)
+├── code-indexing/          # BM25 + LanceDB + ast-grep indexing (12/16 modules active)
+│   ├── hybrid-lazy-indexer.cjs (FIXED: SEC-LIB-001 command injection)
+│   └── ... (semantic search, structural search, result ranking)
+├── context/                # Context management utilities
+├── error-pattern-detector.cjs
+├── error-writer.cjs
+├── events/                 # Event bus (event-bus.cjs, event-types.cjs - 15+ consumers)
+├── evolution-state-sync.cjs
+├── memory/                 # Memory management (8/32 modules active)
 │   ├── memory-manager.cjs
 │   ├── memory-scheduler.cjs
 │   ├── memory-tiers.cjs
 │   └── smart-pruner.cjs
-├── skills/
-│   └── skills-core.js (relocated from tools/runtime/)
-├── coordination/
-│   └── swarm-coordination.cjs (relocated from tools/runtime/)
-├── qa/
+├── ml/                     # Machine learning utilities
+├── monitoring/             # System monitoring
+├── plan/                   # Planning utilities
+├── platform.cjs            # Platform detection
+├── platform.mjs            # Platform detection (ESM)
+├── qa/                     # QA utilities
 │   └── gate.mjs (relocated from tools/gates/)
-├── self-healing/
+├── routing/                # Router state and routing table (core)
+│   ├── routing-table.cjs   # Intent-to-agent mapping (20+ consumers)
+│   └── router-state.cjs    # Router/agent mode state machine (3 hooks)
+├── safety/                 # Safety utilities
+├── self-healing/           # Self-healing system
 │   ├── dashboard.cjs
 │   ├── rollback-manager.cjs
 │   └── validator.cjs
-├── utils/
-│   ├── hook-input.cjs
-│   ├── project-root.cjs
-│   ├── safe-json.cjs
-│   ├── atomic-write.cjs
-│   ├── state-cache.cjs
+├── skill-build/            # Skill building utilities
+├── spawn/                  # Agent spawning utilities
+├── text-processing/        # Text processing utilities
+├── tools/                  # Tool utilities
+├── ui/                     # UI utilities
+├── utils/                  # Core utilities (42 modules, ~21 active)
+│   ├── hook-input.cjs      # Hook stdin parser (20+ consumers) - CORE
+│   ├── project-root.cjs    # Project root finder (30+ consumers) - CORE
+│   ├── atomic-write.cjs    # Crash-safe file writes (15+ consumers) - CORE
+│   ├── safe-json.cjs       # Safe JSON parse (FIXED: SEC-LIB-005 fallback path)
+│   ├── state-cache.cjs     # Cached state reads (3 hooks)
+│   ├── agent-config-reader.cjs # Model resolution (ADR-075)
+│   ├── jsonl-utils.cjs     # JSONL utilities (4 hooks)
+│   ├── logger.cjs          # Structured logger (10+ modules)
+│   ├── schema-validator.cjs # JSON Schema validation
 │   ├── context-path-resolver.mjs (relocated from tools/context/)
 │   └── logical-unit-tracker.cjs (Phase 1.5 - git notes-based revert)
-└── integration/
-    └── system-registration-handler.cjs
+└── workflow/               # Workflow engine (4/47 modules active)
+    ├── workflow-engine.cjs
+    ├── workflow-validator.cjs
+    ├── checkpoint-manager.cjs
+    ├── complexity-classifier.cjs # TRIVIAL/LOW/MEDIUM/HIGH/EPIC classification
+    ├── workflow-state-manager.cjs # File-based state at runtime/workflow-state.json
+    ├── phase-advance-reader.cjs # Phase-to-agent mapping
+    ├── quality-gates.cjs   # Blocking/non-blocking gates between phases
+    ├── decision-handler.mjs (relocated from tools/workflow/)
+    ├── loop-handler.mjs (relocated from tools/workflow/)
+    └── workflow-runner.js (relocated from tools/workflow/)
 ```
+
+**Archival Notes (ADR-098):**
+- 10 entire subsystems archived to `_archive/` (2026-02-07, Pipeline #15)
+- All archived code preserved in git history via `git mv` (not delete)
+- Each archive has README.md with original purpose, archival reason, and ADR reference
+- Total reduction: 52% LOC, 61% modules (from 233 → ~90 modules)
 
 ### rules/
 

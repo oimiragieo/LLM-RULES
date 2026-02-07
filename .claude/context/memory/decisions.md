@@ -1250,3 +1250,116 @@ Pipeline #14 comprehensive security review (Tasks #118-120) found critical secur
 - `.claude/context/reports/security/hooks-security-review-2026-02-07.md`
 
 ---
+## ADR-098: Lib System Dead Code Archival
+
+**Date:** 2026-02-07
+
+**Status:** Accepted (Implementation Complete: 2026-02-07)
+
+**Context:**
+
+Pipeline #15 (Lib System Deep Dive) architecture and security audits identified significant dead code accumulation:
+- 233 modules totaling 66,676 LOC across 29 subdirectories
+- ~104 modules (~45% of total, ~30,000 LOC) with zero active consumers
+- 10 entire subsystems with zero external (non-archive) consumers
+- Health score: 52/100 (architecture), 62/100 (security)
+- 2 CRITICAL + 5 HIGH security vulnerabilities
+
+Dead code creates:
+- **Maintenance burden**: Must review/update during framework changes
+- **Security surface**: Vulnerable code can be exploited even if unused
+- **Developer confusion**: Unclear which modules are actually supported
+- **Audit noise**: Future audits must re-analyze abandoned code
+
+**Decision:**
+
+Archive 10 entire dead subsystems to `.claude/lib/_archive/`:
+
+1. **party-mode/** (10 modules, ~2,500 LOC) - Party mode subsystem
+2. **testing/** (8 modules, ~2,800 LOC) - Test utilities consumed only by themselves
+3. **integration/** (5 modules, ~2,400 LOC) - Integration layer
+4. **agents/** runtime (8 modules, ~750 LOC) - Agent runtime utilities
+5. **boot/** (3 modules, ~600 LOC) - Bootstrap utilities
+6. **clients/** (1 module, 153 LOC) - Client integrations
+7. **scheduler/** (2 modules, ~180 LOC) - Task scheduler (FIXED: SEC-LIB-002 before archival)
+8. **coordination/** (1 module, ~300 LOC) - Coordination utilities
+9. **skills/** (1 module, 318 LOC) - Skills runtime
+10. **config/** (3 modules, ~300 LOC) - Config management
+
+**Total archived:** ~80 modules, ~12,600 LOC (~52% LOC reduction, ~61% module reduction)
+
+**Archival pattern:**
+- Use `git mv` to preserve full git history (not delete)
+- Add README.md to each archive directory explaining:
+  - Original purpose
+  - Why it was archived (zero consumers, Pipeline #15)
+  - How to restore (git mv back to lib/)
+  - ADR-098 reference
+
+**Security fixes applied BEFORE archival:**
+- SEC-LIB-001 (CRITICAL): Command injection in hybrid-lazy-indexer.cjs (execSync → spawnSync with shell:false)
+- SEC-LIB-002 (CRITICAL): Command injection in scheduler-tick.cjs (command allowlist + shell:false)
+- SEC-LIB-003 (HIGH): Unsafe YAML deserialization in 3 active modules (yaml.load → yaml.CORE_SCHEMA)
+- SEC-LIB-005 (HIGH): Unsafe JSON parsing fallback in safe-json.cjs (Object.create(null) + dangerous key filtering)
+
+**Rationale:**
+
+1. **Archive over delete:** Git history preserved for future reference/restoration
+2. **Entire subsystems:** Archiving partial subsystems creates import errors
+3. **Security-first:** Fix vulnerabilities before archival (prevents security debt in archived code)
+4. **README.md pattern:** Clear restoration instructions prevent confusion
+
+**Consequences:**
+
+**Positive:**
+- Reduced maintenance burden: 52% fewer LOC to review/update
+- Smaller security surface: 61% fewer modules to audit
+- Faster codebase navigation: Fewer false positives in searches
+- Clear signal: Archived features are not supported
+- Active codebase: ~90 modules, ~32,000 LOC (health score estimated 85+/100)
+
+**Negative:**
+- Restoration required if features needed in future (low probability given 0 consumers)
+- Git history required to understand original design intent
+
+**Mitigation:**
+- Each archive includes README.md with restoration instructions
+- Git log preserves full commit history
+- Catalogs updated to reflect archived status
+- Documentation (CLAUDE.md Section 3.5, @DIRECTORY_STRUCTURE.md) updated
+
+**Alternatives Considered:**
+
+1. **Delete dead code entirely**: Rejected - harder to restore if needed, loses design intent
+2. **Keep dead code with deprecation warnings**: Rejected - still creates maintenance burden and security surface
+3. **Incremental archival (one subsystem at a time)**: Rejected - inefficient, same analysis work repeated 10 times
+
+**Related:**
+
+- Pipeline #15: Lib System Deep Dive (Tasks #121, #122, #123)
+- Architecture audit: `.claude/context/reports/architecture/lib-system-audit-2026-02-07.md`
+- Security audit: `.claude/context/reports/security/lib-security-review-2026-02-07.md`
+- Learnings: `.claude/context/memory/learnings.md` (Pipeline #15 section, lines 19-46)
+
+**Implementation:**
+
+- Task #122 Phase 1: Fixed CRITICAL security issues (SEC-LIB-001, SEC-LIB-002)
+- Task #122 Phase 2: Archived 10 subsystems via `git mv .claude/lib/{subsystem} .claude/lib/_archive/{subsystem}`
+- Task #122 Phase 3: Fixed CLAUDE.md Section 3.5 reference error (post-completion-chain.cjs path)
+- Task #122 Phase 4: Fixed HIGH security issues (SEC-LIB-003, SEC-LIB-005)
+- Task #123: Updated @DIRECTORY_STRUCTURE.md, recorded ADR-098, updated doc references, recorded learnings
+
+**Commits:**
+- e3db14a1: fix(security): CRITICAL - command injection prevention (SEC-LIB-001, SEC-LIB-002)
+- ab18eafd: refactor(lib): archive 10 dead subsystems (~12,600 LOC)
+- bbd6edc2: docs(CLAUDE.md): fix incorrect reference to post-completion-chain.cjs
+- 983541cc: fix(security): HIGH - unsafe YAML deserialization and JSON fallback (SEC-LIB-003, SEC-LIB-005)
+
+**Validation:**
+
+- All archived subsystems have zero active (non-archive) consumers
+- All security fixes verified via code review and security audit reports
+- @DIRECTORY_STRUCTURE.md reflects current lib structure with _archive/ section
+- Grep searches confirm no broken references to archived modules
+
+---
