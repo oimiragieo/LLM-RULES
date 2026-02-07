@@ -98,10 +98,10 @@ const CREATOR_CONFIGS = [
   },
   {
     creator: 'template-creator',
-    patterns: [/\.claude[/\\]templates[/\\](?:agents|skills|workflows|hooks|code|schemas)[/\\]/i],
+    patterns: [/\.claude[/\\]templates[/\\]/i],
     artifactType: 'template',
     primaryFile: '*',
-    excludePatterns: [/README\.md$/i],
+    excludePatterns: [/README\.md$/i, /_archive[/\\]/i],
   },
   {
     creator: 'schema-creator',

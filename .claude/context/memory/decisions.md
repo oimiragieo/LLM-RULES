@@ -14,6 +14,177 @@ Each decision should include:
 
 ---
 
+## ADR-085: Template System Overhaul -- Advisory Resolver + Dead Template Cleanup
+
+**Date:** 2026-02-07
+
+**Status:** Proposed
+
+**Context:**
+
+Audit of `.claude/templates/` found 43 template files with only ~20% actively integrated. The spawn prompt assembler (`spawn-prompt-assembler.cjs`) and core library (`prompt-assembler.cjs`) do not read spawn template files from disk -- they programmatically generate all required spawn prompt sections. 28 templates have zero references across the codebase. The template-creator skill references directories that do not exist. No template catalog file exists.
+
+**Decision:**
+
+1. **Spawn Template Resolver (advisory):** Create `.claude/lib/spawn/spawn-template-resolver.cjs` with `resolveSpawnTemplate(agentType, options)` that returns template metadata (name, path, reason). The resolver is advisory -- it helps the Router select the right template for guidance, but does not modify the critical-path spawn-prompt-assembler hook. Selection priority: explicit override > one-shot subordinate > orchestrator > identity frontmatter > universal default.
+
+2. **Dead Template Cleanup:** Archive 14 templates to `.claude/templates/_archive/` (via `git mv`), delete 2 (html-css, general code-styles), keep and wire 12 valuable templates, upgrade 3 pending research input.
+
+3. **Template Catalog:** Create `.claude/context/artifacts/catalogs/template-catalog.md` with structured entries for all ~27 active templates including agent assignments, categories, and usage instructions.
+
+4. **Template-Creator Skill Fix:** Remove phantom directory references (hooks/, code/, schemas/), add missing categories (spawn, report, code-style), assign agents.
+
+5. **Template README Update:** Add spawn templates section, report templates section, update code-styles list, add archive documentation.
+
+**Alternatives Considered:**
+
+1. **Template content injection:** Resolver loads template content and injects it into spawn prompts. Rejected -- would duplicate sections already handled by the assembler (AVAILABLE_TOOLS, Memory, etc.).
+2. **Full template rendering engine:** Process `{{PLACEHOLDER}}` tokens programmatically. Rejected -- adds complexity without proportional value; current manual replacement is sufficient.
+3. **Delete all dead templates:** Rejected -- some have genuine reference value. Archive preserves git history.
+
+**Rationale:**
+
+- Advisory resolver is lowest risk -- no changes to the critical spawn hook path
+- Archive via `git mv` preserves full file history for restoration
+- Markdown catalog is human-readable and agent-friendly (vs JSON registry)
+- Wiring 12 templates increases active utilization from 20% to ~80%
+
+**Consequences:**
+
+- Template system goes from 20% to 80%+ utilization
+- Router gains structured template selection guidance
+- Template-creator skill becomes accurate (no phantom references)
+- 14 templates archived (restorable), 2 deleted, 3 pending upgrade
+- New catalog provides single source of truth for template discovery
+
+**Architecture Plan:** `.claude/context/plans/template-overhaul-architecture-2026-02-07.md`
+
+---
+
+## ADR-083: CI Hook Module-Resolution Checks (Hybrid Static + Dynamic)
+
+**Date:** 2026-02-07
+
+**Status:** Proposed
+
+**Context:**
+
+Commit 3487ee8b fixed three MODULE_NOT_FOUND crashes caused by hook library modules being accidentally archived during consolidation (Task #41). No mechanism exists to prevent this from recurring during future refactoring.
+
+**Decision:**
+
+Implement a hybrid hook verification script at `.claude/scripts/verify-hook-modules.cjs`:
+
+1. **Static analysis (default):** Regex-based extraction of `require()` paths from all `.cjs` files in `.claude/hooks/` (excluding `_archive/`). Resolves relative paths against the filesystem. Reports missing modules.
+2. **Dynamic verification (--deep flag):** Fork child processes to actually `require()` each hook with a 3-second timeout. Catches transitive dependency failures.
+3. **settings.json cross-reference:** Verify every registered hook command in `settings.json` points to a file that exists on disk.
+
+A supporting library at `.claude/lib/utils/require-analyzer.cjs` provides `extractRequires()` and `resolveRequirePath()`.
+
+**Alternatives Considered:**
+
+1. **Static-only:** Fast but cannot catch transitive or conditional requires. Chosen as default mode.
+2. **Dynamic-only:** Comprehensive but some hooks read stdin or call process.exit(), causing hangs/crashes. Requires child process isolation with timeouts. Chosen as opt-in.
+3. **AST parsing (acorn/babel):** More accurate than regex but adds npm dependencies. Rejected -- regex handles the literal-string require patterns used in all 39 active hooks.
+
+**Rationale:**
+
+- Static analysis covers 95%+ of cases (all hooks use literal string requires)
+- Zero new npm dependencies (uses built-in `fs`, `path`, `child_process`)
+- Fast enough for pre-commit (<500ms static, <15s dynamic)
+- JSON output mode enables CI integration
+- Cross-checks settings.json to catch "registered but deleted" hooks
+
+**Consequences:**
+
+- Future refactoring that moves/deletes hook libraries will be caught pre-commit
+- CI pipeline can enforce hook integrity on every push
+- False positives possible for dynamic requires (logged as warnings, not failures)
+
+---
+
+## ADR-084: Router Blacklist Violation Monitoring (Structured JSONL Tracking)
+
+**Date:** 2026-02-07
+
+**Status:** Proposed
+
+**Context:**
+
+The Router sometimes attempts to use blacklisted tools (Glob, Grep, etc.). The routing-guard.cjs hook catches these and either blocks or warns, but violations are logged as unstructured stderr output. There is no aggregation, no session-level counting, and no threshold alerting.
+
+**Decision:**
+
+Implement a violation tracking module at `.claude/lib/monitoring/violation-tracker.cjs`:
+
+1. **Structured recording:** Each violation is a JSONL entry in `.claude/context/metrics/router-violations.jsonl` with timestamp, tool, action, check name, router mode, and session ID.
+2. **Rotation:** Max 1000 lines with tail-trim rotation (reuses `appendJsonl` from `jsonl-utils.cjs`).
+3. **Threshold alerting:** `checkThreshold()` function detects >N violations in a time window and emits a one-time warning per routing-guard invocation.
+4. **Integration:** Lazy-loaded into `routing-guard.cjs` with graceful degradation if module is missing.
+
+**Alternatives Considered:**
+
+1. **Extend error-tracker.cjs:** Rejected -- error-tracker is for runtime errors, not policy violations. Mixing concerns would complicate analysis.
+2. **Standalone hook:** Rejected -- would require additional settings.json registration and duplicate routing-guard's violation detection logic.
+3. **In-memory only (no file):** Rejected -- each hook invocation is a separate process, so in-memory state does not persist across tool uses.
+
+**Rationale:**
+
+- JSONL format is append-friendly and matches existing metrics patterns (error-metrics.jsonl, hook-metrics.jsonl)
+- Lazy loading ensures routing-guard.cjs is not broken if violation-tracker is missing
+- Threshold alerting provides early warning of systematic Router misbehavior
+- Separate metrics file enables independent analysis of routing policy compliance
+
+**Consequences:**
+
+- Router violations become visible and analyzable over time
+- Threshold warnings surface systematic issues early
+- Adds ~1ms overhead per violation (sync file append)
+- New `.claude/lib/monitoring/` directory establishes monitoring library pattern
+
+**Architecture Plan:** `.claude/context/plans/ci-monitoring-architecture-2026-02-07.md`
+
+---
+
+## ADR-082: Hook Hardening -- Restore Archived Monitoring Modules + Fix Router-State Path
+
+**Date:** 2026-02-06
+
+**Status:** Accepted
+
+**Context:**
+
+Three hook modules are MISSING at their expected paths, causing MODULE_NOT_FOUND crashes on every hook invocation:
+
+1. `error-tracker.cjs` -- required by `error-tracker-hook.cjs` (PostToolUse), archived but not replaced
+2. `metrics-collector.cjs` -- required by `metrics-collector-hook.cjs` (PostToolUse), archived but not replaced
+3. `router-state.cjs` -- required by `user-prompt-unified.cjs` (UserPromptSubmit) at OLD path; module was relocated to `lib/routing/` but this one consumer was not updated
+
+Root cause: Hook consolidation (Task #41, commit 0e449681) archived 45 orphan hooks and relocated router-state.cjs. The two monitoring library modules were mistakenly archived even though their wrapper hooks (registered in settings.json) still require them. One consumer of router-state.cjs was missed during the path update.
+
+**Decision:**
+
+1. Restore `error-tracker.cjs` from `_archive/monitoring/` to `hooks/monitoring/` (exact copy)
+2. Restore `metrics-collector.cjs` from `_archive/monitoring/` to `hooks/monitoring/` (exact copy)
+3. Fix `user-prompt-unified.cjs` line 71: change `routingRequire('router-state.cjs')` to `libRequire(path.join('routing', 'router-state.cjs'))`
+
+**Rationale:**
+
+- Restoring archived code is lower risk than writing new implementations
+- Archived modules have proper rate limiting, validation, error handling, and match the exact interface expected by the wrapper hooks
+- The router-state path fix follows the pattern already used by all other hooks in the routing directory
+- No new dependencies, no test changes needed
+
+**Consequences:**
+
+- Error tracking and metrics collection restored on every PostToolUse event
+- Router mode reset restored on every UserPromptSubmit event (routing analysis functional)
+- Future hook consolidation efforts must verify wrapper hooks do not reference archived libraries
+
+**Architecture Plan:** `.claude/context/plans/hook-hardening-architecture-2026-02-06.md`
+
+---
+
 ## ADR-078: Workspace Conventions and Directory Reorganization
 
 **Date:** 2026-02-06
@@ -277,5 +448,71 @@ Audit found only 2 truly dead directories out of 17. Most "empty" directories ar
 
 - Task #46 (Context Directory Cleanup - comprehensive wiring audit)
 - ADR-076 (Workspace Conventions and Directory Reorganization)
+
+---
+
+## ADR-086: Template-Creator Overhaul to v2.1 Creator Standard
+
+**Date:** 2026-02-07
+
+**Status:** Accepted
+
+**Context:**
+
+The agent-studio project has six creator skills (agent-creator, skill-creator, workflow-creator, hook-creator, schema-creator, template-creator). Five have been updated to follow a consistent v2.1 pattern with research-synthesis integration, blocking post-creation steps, catalog updates, integration verification, and architecture compliance references. The template-creator remains the sole outlier.
+
+Gap analysis identified 11 specific gaps (GAP-1 through GAP-11):
+1. Missing research-synthesis invocation (Phase 0)
+2. Missing template-catalog.md update as blocking step
+3. Missing integration verification step
+4. Missing CLAUDE.md update as blocking step
+5. Missing Architecture Compliance section
+6. Missing consumer assignment step
+7. Template types table does not match filesystem
+8. Missing security considerations
+9. Weak system impact analysis (4-point vs 6-8-point)
+10. No spawn-template-resolver integration reference
+11. Missing research-synthesis mandate from CLAUDE.md Section 3
+
+**Decision:**
+
+Overhaul template-creator SKILL.md to match the common creator pattern:
+
+1. Add WARNING BOX preventing direct writes (matching skill-creator pattern)
+2. Add research-synthesis invocation as mandatory Step 0
+3. Add template-catalog.md update as blocking Step 9
+4. Add CLAUDE.md update as conditional blocking Step 10
+5. Add consumer assignment as Step 11
+6. Add integration verification as blocking Step 13
+7. Add Architecture Compliance section (ADR-076, ADR-077, SEC-TMPL-006)
+8. Add Template Security Compliance section
+9. Expand Iron Laws from 8 to 11
+10. Expand Completion Checklist from 6 to 15 items
+11. Expand System Impact Analysis from 4-point to 7-point
+12. Update Template Types table to match filesystem reality
+13. Add spawn-template-resolver cross-reference
+
+**Rationale:**
+
+- Consistency across all six creators reduces cognitive load for agents
+- Blocking steps prevent "invisible artifact" pattern (proven by Party Mode incident)
+- Template catalog integration makes templates discoverable programmatically
+- Security compliance ensures no credential leakage through template content
+- Research-synthesis mandate is a CLAUDE.md requirement, not optional
+
+**Consequences:**
+
+- Template creation workflow becomes longer (13 steps vs 9 steps)
+- Every template creation now updates the catalog (additional ~30 seconds)
+- Integration verification adds a blocking gate before completion
+- Full parity with other creators achieved
+
+**Alternatives Considered:**
+
+1. Minimal update (just add catalog step): Rejected because it would leave 10 other gaps open
+2. Merge template-creator into skill-creator: Rejected because templates serve distinct consumers and have unique validation needs
+3. Make all steps non-blocking (warnings only): Rejected because the Party Mode incident proved warnings are insufficient
+
+**Architecture Plan:** `.claude/context/plans/template-creator-overhaul-architecture-2026-02-07.md`
 
 ---

@@ -1,7 +1,8 @@
 ---
 name: template-creator
-description: Creates and manages templates for agents, skills, workflows, hooks, and code patterns. Ensures consistency across the framework. Use when creating new template types or standardizing patterns.
+description: 'Creates and registers templates for agents, skills, workflows, hooks, and code patterns. Handles post-creation catalog updates, consuming skill integration, and README registration. Use when creating new template types or standardizing patterns.'
 version: 2.1.0
+category: creator
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -10,38 +11,77 @@ tools: [Read, Write, Edit, Bash, Glob, Grep]
 # Templates should reference tools from the manifest for consistency
 # Single source of truth: .claude/config/tool-manifest.json
 assigned_agents: [planner, architect, developer]
+triggers: ["create template", "new template", "template for"]
+dependencies: [research-synthesis]
+output_paths: [".claude/templates/"]
 best_practices:
   - Include all required fields with placeholders
   - Add documentation comments in templates
   - Version templates for tracking changes
   - Include validation examples
   - Use consistent placeholder format
+  - Update template-catalog.md after every creation
+  - Sanitize spawn template placeholders
 error_handling: graceful
 streaming: supported
 output_location: .claude/templates/
 ---
 
+**Mode: Cognitive/Prompt-Driven** -- No standalone utility script; use via agent context.
+
 # Template Creator Skill
 
-Creates and manages templates for agents, skills, workflows, hooks, and code patterns. Ensures consistency across the multi-agent framework through standardized structures.
+Creates, validates, and registers templates for the multi-agent orchestration framework.
+
+```
++==============================================================+
+|  MANDATORY: Research-Synthesis MUST be invoked BEFORE         |
+|  this skill. Invoke: Skill({ skill: "research-synthesis" })   |
+|  FAILURE TO RESEARCH = UNINFORMED TEMPLATE = REJECTED         |
++==============================================================+
+|                                                               |
+|  DO NOT WRITE TEMPLATE FILES DIRECTLY!                        |
+|                                                               |
+|  This includes:                                               |
+|    - Copying archived templates                               |
+|    - Restoring from _archive/ backup                          |
+|    - "Quick" manual creation                                  |
+|                                                               |
+|  WHY: Direct writes bypass MANDATORY post-creation steps:     |
+|    1. Template catalog update (template NOT discoverable)     |
+|    2. README.md update (template INVISIBLE to consumers)      |
+|    3. Consuming skill update (template NEVER used)            |
+|    4. CLAUDE.md update (if user-invocable)                    |
+|                                                               |
+|  RESULT: Template EXISTS in filesystem but is NEVER USED.     |
+|                                                               |
+|  ENFORCEMENT: unified-creator-guard.cjs blocks direct         |
+|  template writes. Override: CREATOR_GUARD=off (DANGEROUS)     |
+|                                                               |
+|  ALWAYS invoke this skill properly:                           |
+|    Skill({ skill: "template-creator" })                       |
+|                                                               |
++==============================================================+
+```
 
 ## ROUTER UPDATE REQUIRED (CRITICAL - DO NOT SKIP)
 
-**After creating ANY template, you MUST update the appropriate documentation:**
+**After creating ANY template, you MUST update:**
 
-```
-1. Update .claude/templates/README.md with new template type
-2. Update CLAUDE.md Section 8.5 if user-invocable
-3. Update learnings.md with creation summary
-```
+1. `.claude/templates/README.md` - Add template entry
+2. `.claude/context/artifacts/catalogs/template-catalog.md` - Add catalog entry
+3. CLAUDE.md Section 2 or 8.5 if template is framework-significant or user-invocable
+4. Consuming creator skill if template standardizes an artifact type
+5. `.claude/context/memory/learnings.md` - Record creation
 
 **Verification:**
 
 ```bash
 grep "<template-name>" .claude/templates/README.md || echo "ERROR: README NOT UPDATED!"
+grep "<template-name>" .claude/context/artifacts/catalogs/template-catalog.md || echo "ERROR: CATALOG NOT UPDATED!"
 ```
 
-**WHY**: Templates not documented are invisible to other creators and will never be used.
+**WHY**: Templates not in the catalog are invisible to other creators and will never be used.
 
 ---
 
@@ -52,8 +92,10 @@ Templates ensure consistency across the multi-agent framework. This skill create
 - **Agent definitions** - Standardized agent structures
 - **Skill definitions** - Reusable capability patterns
 - **Workflow definitions** - Multi-agent orchestration patterns
-- **Hook implementations** - Pre/post execution hooks
-- **Code patterns** - Language-specific scaffolding
+- **Spawn prompts** - Agent spawn prompt templates consumed by `spawn-template-resolver.cjs`
+- **Reports** - Report document templates
+- **Code style guides** - Language-specific coding standards
+- **General documents** - ADRs, specs, checklists, and other framework documents
 
 **Core principle:** Templates are the DNA of the system. Consistent templates produce consistent, predictable agents and skills.
 
@@ -63,7 +105,7 @@ Templates ensure consistency across the multi-agent framework. This skill create
 
 - Creating a new type of artifact that will be replicated
 - Standardizing an existing pattern across the codebase
-- Adding a new template category (hooks, schemas, etc.)
+- Adding a new template category
 - Improving existing templates with better patterns
 
 **Exceptions:**
@@ -73,17 +115,31 @@ Templates ensure consistency across the multi-agent framework. This skill create
 
 ## Template Types
 
-| Type        | Location                         | Purpose                                     | Key Fields                              |
-| ----------- | -------------------------------- | ------------------------------------------- | --------------------------------------- |
-| Agent       | `.claude/templates/agents/`      | Agent definition templates (2 templates)    | name, description, tools, skills, model, enforcement_hooks, related_workflows |
-| Skill       | `.claude/templates/skills/`      | Skill definition templates (1 template)     | name, version, tools, invoked_by        |
-| Workflow    | `.claude/templates/workflows/`   | Workflow orchestration templates (1 template) | phases, agents, dependencies            |
-| Spawn       | `.claude/templates/spawn/`       | Agent spawn prompt templates (4 templates)  | subagent_type, prompt, model, task_id   |
-| Report      | `.claude/templates/reports/`     | Report document templates (5 templates)     | type, findings, recommendations         |
-| Code Style  | `.claude/templates/code-styles/` | Language style guides (3 templates)         | language, conventions, examples         |
-| Document    | `.claude/templates/` (root)      | General document templates (8+ templates)   | varies by template type                 |
+| Type       | Location                         | Count | Purpose                                | Key Consumers                  |
+| ---------- | -------------------------------- | ----- | -------------------------------------- | ------------------------------ |
+| Spawn      | `.claude/templates/spawn/`       | 4     | Agent spawn prompt templates           | router, spawn-prompt-assembler |
+| Agent      | `.claude/templates/agents/`      | 2     | Agent definition boilerplate           | agent-creator                  |
+| Skill      | `.claude/templates/skills/`      | 1     | Skill definition boilerplate           | skill-creator                  |
+| Workflow   | `.claude/templates/workflows/`   | 1     | Workflow definition boilerplate        | workflow-creator               |
+| Report     | `.claude/templates/reports/`     | 5     | Report document templates              | qa, developer, researcher      |
+| Code Style | `.claude/templates/code-styles/` | 3     | Language style guides                  | developer, code-reviewer       |
+| Document   | `.claude/templates/` (root)      | 8+    | General document templates (ADR, spec) | planner, architect, qa         |
 
-**Note:** Future categories (`hooks/`, `code/`, `schemas/`) can be created when demand arises. Currently no templates exist in these directories.
+**Cross-Reference:** See `.claude/context/artifacts/catalogs/template-catalog.md` for the complete inventory (28 active templates). For spawn template resolution logic, see `.claude/lib/spawn/spawn-template-resolver.cjs`.
+
+## Template Security Compliance
+
+**Critical Security Requirements:**
+
+1. **No Secrets (SEC-TC-007):** Templates MUST NOT include secrets, credentials, tokens, or API keys
+2. **Path Safety:** All template references MUST use relative paths (`.claude/templates/...`), never absolute paths
+3. **No Sensitive Metadata:** Templates MUST NOT expose internal system paths or user directories
+4. **No Windows Reserved Names:** Template names MUST NOT use `nul`, `con`, `prn`, `aux`, `com1`-`com9`, `lpt1`-`lpt9`
+5. **Retention Mandates (SEC-TMPL-006):** Templates flagged by SEC-TMPL-006 MUST remain at designated locations
+6. **Spawn Template Placeholder Safety (SEC-TC-001):** Spawn templates with `{{PLACEHOLDER}}` tokens in `prompt:` fields MUST reference `sanitizeSubstitutionValue()` from `prompt-factory.cjs` for value sanitization. Unsanitized placeholders in spawn prompts create a prompt injection surface. Do NOT place `{{PLACEHOLDER}}` tokens where user-provided input is directly substituted without sanitization.
+7. **No Eval/Exec:** Templates MUST NOT contain `eval()`, `exec()`, `Function()`, or other code execution patterns
+
+**Enforcement:** `unified-creator-guard.cjs` hook blocks direct template writes (default: block mode).
 
 ## The Iron Law
 
@@ -103,100 +159,113 @@ Every `{{PLACEHOLDER}}` must have a corresponding comment explaining:
 - Every required field is marked
 - Every optional field has a default
 
-## Workflow
-
-### Step -1: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
-
-**BEFORE creating any template file, check if it already exists:**
-
-1. **Check if template already exists:**
-
-   ```bash
-   test -f .claude/templates/<template-name> && echo "EXISTS" || echo "NEW"
-   ```
-
-2. **If template EXISTS:**
-   - **DO NOT proceed with creation**
-   - **Invoke template-updater workflow instead:**
-
-     ```javascript
-     Skill({
-       skill: 'template-updater',
-       args: {
-         name: '<template-name>',
-         changes: '<description of requested changes>',
-         justification: 'Update requested via template-creator',
-       },
-     });
-     ```
-
-   - **Return updater result and STOP**
-
-3. **If template is NEW:**
-   - Continue with Step 0 below
-
 ---
 
-### Step 0: Load Related Skills (FIRST)
+## Workflow Steps
 
-Invoke related creator skills for context:
+### Step 0: Research-Synthesis (MANDATORY - BLOCKING)
+
+Per CLAUDE.md Section 3 requirement, invoke `research-synthesis` BEFORE template creation:
 
 ```javascript
-Skill({ skill: 'agent-creator' }); // For agent template patterns
-Skill({ skill: 'skill-creator' }); // For skill template patterns
+Skill({ skill: 'research-synthesis' });
 ```
 
-### Step 1: Gather Template Requirements
+**Research focuses for templates:**
+
+- Search existing templates: `Glob: .claude/templates/**/*.md`
+- Review template catalog: Read `.claude/context/artifacts/catalogs/template-catalog.md`
+- Check if similar template already exists in the ecosystem
+- If creating for a new domain, research best-practice template structures via WebSearch
+
+**BLOCKING**: Template creation CANNOT proceed without research-synthesis invocation.
+
+### Step 1: Gather Requirements
 
 **Analyze the request:**
 
-1. **Template Type**: Which category (agent, skill, workflow, hook, code)?
+1. **Template Type**: Which category (spawn, agent, skill, workflow, report, code-style, document)?
 2. **Purpose**: What will this template be used for?
 3. **Required Fields**: What fields are mandatory?
 4. **Optional Fields**: What fields are optional with defaults?
 5. **Validation Rules**: What constraints apply?
+6. **Consumers**: Which creators/agents will use this template?
 
 **Example analysis:**
 
 ```
-Template Request: "Create a hook template for pre-execution validation"
-- Type: Hook
-- Purpose: Validate inputs before skill execution
-- Required: trigger, action, validation_schema
-- Optional: error_message, continue_on_failure
-- Rules: trigger must be "pre" or "post"
+Template Request: "Create a template for security audit reports"
+- Type: Report
+- Purpose: Standardize security audit report structure
+- Required: findings, severity_levels, recommendations
+- Optional: compliance_framework, remediation_timeline
+- Rules: severity must be CRITICAL|HIGH|MEDIUM|LOW
+- Consumers: security-architect, qa
 ```
 
-### Step 2: Analyze Existing Templates for Patterns
+### Step 2: Template Type Classification
 
-Search for existing patterns to ensure consistency:
+Classify the template to determine output path and validation rules:
 
-```bash
-# Find existing templates
-Glob: .claude/templates/**/*.md
+| Type       | Output Path                      | Key Fields                                                            | Validation Focus                              |
+| ---------- | -------------------------------- | --------------------------------------------------------------------- | --------------------------------------------- |
+| Spawn      | `.claude/templates/spawn/`       | subagent_type, prompt, model, task_id                                 | TaskUpdate protocol, allowed_tools, model     |
+| Agent      | `.claude/templates/agents/`      | name, description, tools, skills, model, enforcement_hooks            | Frontmatter completeness, alignment sections  |
+| Skill      | `.claude/templates/skills/`      | name, version, tools, invoked_by                                      | SKILL.md structure, memory protocol           |
+| Workflow   | `.claude/templates/workflows/`   | phases, agents, dependencies                                          | Phase ordering, agent references              |
+| Report     | `.claude/templates/reports/`     | type, findings, recommendations                                       | Finding severity, evidence requirements       |
+| Code Style | `.claude/templates/code-styles/` | language, conventions, examples                                        | Convention clarity, example quality            |
+| Document   | `.claude/templates/` (root)      | varies by template type                                                | Section completeness                          |
 
-# Check agent template patterns
-Read: .claude/templates/agents/agent-template.md
+### Step 3: Name Validation (SEC-TC-003)
 
-# Check skill template patterns
-Read: .claude/templates/skills/skill-template.md
+**BEFORE constructing the output path, validate the template name.**
 
-# Check workflow template patterns
-Read: .claude/templates/workflows/workflow-template.md
+Template name MUST match this regex:
+
+```
+/^[a-z0-9][a-z0-9-]*[a-z0-9]$/
 ```
 
-**Pattern extraction checklist:**
+**Validation rules:**
 
-- [ ] YAML frontmatter format
-- [ ] Section headings style
-- [ ] Placeholder format (`{{UPPER_CASE}}`)
-- [ ] Comment style (`<!-- OPTIONAL: -->`)
-- [ ] Memory Protocol section
-- [ ] Verification commands
+- Lowercase letters, digits, and hyphens only
+- Must start and end with a letter or digit (not a hyphen)
+- No path separators (`/`, `\`), no `..`, no special characters
+- No Windows reserved names (`nul`, `con`, `prn`, `aux`, `com1`-`com9`, `lpt1`-`lpt9`)
 
-### Step 3: Generate Template with Placeholders
+**Rejection examples:**
 
-**Placeholder Format Standard:**
+```
+REJECTED: "../hooks/malicious-hook"  (path traversal)
+REJECTED: "My Template"             (spaces, uppercase)
+REJECTED: "-leading-hyphen"         (starts with hyphen)
+REJECTED: "template_with_underscores" (underscores not allowed)
+ACCEPTED: "security-audit-report"   (valid kebab-case)
+ACCEPTED: "agent-template-v2"       (valid with version)
+```
+
+### Step 4: Determine Output Path
+
+Based on the template type classification from Step 2, construct the output path:
+
+```
+.claude/templates/<category>/<validated-template-name>.md
+```
+
+Where `<category>` is one of: `spawn/`, `agents/`, `skills/`, `workflows/`, `reports/`, `code-styles/`, or root level (no category subdirectory).
+
+**Validate the resolved path:**
+
+- Path MUST start with `.claude/templates/`
+- Path MUST NOT contain `..` segments after normalization
+- Path MUST end with `.md`
+
+### Step 5: Content Design
+
+**Design the template content following these standards:**
+
+#### Placeholder Format Standard
 
 | Placeholder Type | Format                   | Example                    |
 | ---------------- | ------------------------ | -------------------------- |
@@ -205,14 +274,14 @@ Read: .claude/templates/workflows/workflow-template.md
 | Multi-line       | `{{FIELD_NAME_BLOCK}}`   | `{{DESCRIPTION_BLOCK}}`    |
 | List item        | `{{ITEM_N}}`             | `{{TOOL_1}}`, `{{TOOL_2}}` |
 
-**Template Structure:**
+#### Template Structure
 
 ```markdown
 ---
 # YAML Frontmatter with all required fields
-name: { { NAME } }
-description: { { DESCRIPTION } }
-# ... other fields
+name: {{NAME}}
+description: {{DESCRIPTION}}
+# ... other fields with documentation comments
 ---
 
 # {{DISPLAY_NAME}}
@@ -234,43 +303,53 @@ description: { { DESCRIPTION } }
 <!-- Always include memory protocol -->
 ```
 
-### Step 4: Add Documentation Comments
+#### Security Checklist for Spawn Templates (SEC-TC-001)
+
+**If creating a SPAWN template, you MUST also verify:**
+
+- [ ] No `{{PLACEHOLDER}}` tokens inside `prompt:` fields that accept unsanitized user input
+- [ ] Reference to `sanitizeSubstitutionValue()` from `prompt-factory.cjs` included in documentation
+- [ ] TaskUpdate protocol is present in the spawn prompt body
+- [ ] `allowed_tools` array does not grant `Task` tool to non-orchestrator agents
+- [ ] No prompt override patterns (`IGNORE PREVIOUS`, `SYSTEM:`, etc.) in template body
+- [ ] Template size under 50KB
+
+#### Documentation Comments
 
 Add inline documentation for each placeholder:
 
 ```markdown
 ---
 # [REQUIRED] Unique identifier, lowercase-with-hyphens
-name: { { AGENT_NAME } }
+name: {{AGENT_NAME}}
 
 # [REQUIRED] Single line, describes what it does AND when to use it
 # Example: "Reviews mobile app UX against Apple HIG. Use for iOS UX audits."
-description: { { DESCRIPTION } }
+description: {{DESCRIPTION}}
 
 # [OPTIONAL] Default: sonnet. Options: haiku, sonnet, opus
-model: { { MODEL:sonnet } }
+model: {{MODEL:sonnet}}
 ---
-
-<!-- SECTION: Core Persona -->
-<!-- Define the agent's identity and working style -->
-
-## Core Persona
-
-**Identity**: {{IDENTITY}}
-
-<!-- Example: "Senior Python Developer", "Security Analyst" -->
 ```
 
-### Step 5: Validate Template Structure (BLOCKING)
+### Step 6: Write Template File
 
-Before writing the template file, verify ALL requirements:
+Write to the validated output path determined in Step 4:
 
-**Validation Checklist:**
+```bash
+Write: .claude/templates/<category>/<template-name>.md
+```
+
+### Step 7: Validate Template Structure (BLOCKING)
+
+**Before proceeding to registration, verify ALL requirements:**
+
+**Structural Validation:**
 
 ```
 [ ] YAML frontmatter is valid syntax
 [ ] All required fields have placeholders
-[ ] All placeholders follow naming convention
+[ ] All placeholders follow {{UPPER_CASE}} naming convention
 [ ] All placeholders have documentation comments
 [ ] POST-CREATION CHECKLIST section present
 [ ] Memory Protocol section present
@@ -278,45 +357,75 @@ Before writing the template file, verify ALL requirements:
 [ ] Example values provided where helpful
 ```
 
-**Verification Commands in Template:**
+**Security Validation (SEC-TC-007):**
 
-```bash
-# Include these in the template's POST-CREATION CHECKLIST
-grep "{{" <created-file> && echo "ERROR: Unresolved placeholders!"
+```
+[ ] No secrets, credentials, or API keys in template content
+[ ] No absolute file paths (use relative from PROJECT_ROOT)
+[ ] No eval(), exec(), Function() or code execution patterns
+[ ] No prompt override patterns ("IGNORE PREVIOUS", "SYSTEM:", etc.)
+[ ] Template size under 50KB
 ```
 
-### Step 6: Write Template File
-
-Write to appropriate location:
+**Verification Commands:**
 
 ```bash
-# Agent template
-Write: .claude/templates/agents/<template-name>.md
+# Check no unresolved placeholders from template-creator itself
+grep "{{" <created-file> | head -5  # Should show only intended placeholders
 
-# Skill template
-Write: .claude/templates/skills/<template-name>.md
+# Check YAML frontmatter is present
+head -50 <file> | grep -E "^---$" | wc -l  # Should be 2
 
-# Workflow template
-Write: .claude/templates/workflows/<template-name>.md
-
-# Spawn template
-Write: .claude/templates/spawn/<template-name>.md
-
-# Report template
-Write: .claude/templates/reports/<template-name>.md
-
-# Code style template
-Write: .claude/templates/code-styles/<template-name>.md
-
-# Document template (root level)
-Write: .claude/templates/<template-name>.md
+# Check required sections present
+grep -E "^## Memory Protocol" <file> || echo "ERROR: Missing Memory Protocol!"
 ```
 
-**Note:** Future categories (`hooks/`, `code/`, `schemas/`) can be created when demand arises.
+**BLOCKING**: Template must pass ALL validation checks before proceeding.
 
-### Step 7: Update Templates README (MANDATORY - BLOCKING)
+### Step 8: Update Template Catalog (MANDATORY - BLOCKING)
 
-After writing the template, update `.claude/templates/README.md`:
+Update the template catalog to ensure the new template is discoverable.
+
+1. **Read current catalog:**
+
+   ```bash
+   cat .claude/context/artifacts/catalogs/template-catalog.md
+   ```
+
+2. **Determine template category** based on type:
+   - Spawn (`spawn/`), Creator (`agents/`, `skills/`, `workflows/`), Document (root), Report (`reports/`), Code Style (`code-styles/`)
+
+3. **Add template entry in correct category section:**
+
+   ```markdown
+   ### <template-name>.md
+
+   | Field | Value |
+   |-------|-------|
+   | **Path** | `.claude/templates/<category>/<template-name>.md` |
+   | **Category** | <Category> Templates |
+   | **Status** | active |
+   | **Used By Agents** | <agent-list> |
+   | **Used By Skills** | <skill-list> |
+
+   **Purpose:** <Purpose description>
+   ```
+
+4. **Update Template Categories Summary table** (totals row)
+
+5. **Verify update:**
+
+   ```bash
+   grep "<template-name>" .claude/context/artifacts/catalogs/template-catalog.md || echo "ERROR: CATALOG NOT UPDATED!"
+   ```
+
+**Important:** Use `JSON.stringify()` when constructing any JSON registry entries (SEC-TC-004). Never manually concatenate strings to build JSON. The `location` field MUST be validated to start with `.claude/templates/` and contain no `..` segments.
+
+**BLOCKING**: Template must appear in catalog. Uncataloged templates are invisible.
+
+### Step 9: Update Templates README (MANDATORY - BLOCKING)
+
+After updating the catalog, update `.claude/templates/README.md`:
 
 1. **Add to appropriate section** (or create new section)
 2. **Document usage instructions**
@@ -344,184 +453,217 @@ Use when {{use case}}.
 grep "<template-name>" .claude/templates/README.md || echo "ERROR: README NOT UPDATED - BLOCKING!"
 ```
 
-### Step 8: Post-Creation Template Registration (Phase 1 Integration)
+**BLOCKING**: README must contain the template entry.
 
-**This step is CRITICAL.** After creating the template artifact, you MUST register it in the template discovery system.
+### Step 10: Update CLAUDE.md (CONDITIONAL - BLOCKING)
 
-**Phase 1 Context:** Phase 1 is responsible for discovering and cataloging templates for reuse. Templates created without registration are invisible to other creators and will never be used to standardize new artifacts.
+If the template is framework-significant or user-invocable:
 
-After template file is written and validated:
+1. **Check if template needs CLAUDE.md entry:**
+   - Is it a new spawn template? -> Update Section 2 (Spawn Templates)
+   - Is it a new creator template? -> Update relevant creator section
+   - Is it a user-invocable template? -> Update Section 8.5
 
-1. **Create/Update Template Registry Entry** in appropriate location:
-
-   If registry doesn't exist, create `.claude/context/artifacts/template-registry.json`:
-
-   ```json
-   {
-     "templates": [
-       {
-         "name": "{template-name}",
-         "id": "{template-name}",
-         "type": "{agent|skill|workflow|hook|code|schema}",
-         "category": "{subcategory if applicable}",
-         "description": "{What this template is for}",
-         "version": "1.0.0",
-         "location": ".claude/templates/{category}/{template-name}.md",
-         "placeholders": ["{PLACEHOLDER_1}", "{PLACEHOLDER_2}"],
-         "usageScenarios": ["{Scenario 1}", "{Scenario 2}"]
-       }
-     ]
-   }
-   ```
-
-2. **Document Placeholders with Usage Guide:**
-
-   For each placeholder in the template, ensure documentation exists:
+2. **If YES, add entry:**
 
    ```markdown
-   ## Template Placeholders
-
-   | Placeholder       | Description  | Format   | Example   |
-   | ----------------- | ------------ | -------- | --------- |
-   | {{PLACEHOLDER_1}} | What this is | {format} | {example} |
-   | {{PLACEHOLDER_2}} | What this is | {format} | {example} |
+   **{Template Name}:** `.claude/templates/{category}/{name}.md`
    ```
 
-3. **Register in `.claude/templates/README.md`:**
+3. **Verify:**
 
-   Add comprehensive entry to the templates catalog:
-
-   ```markdown
-   ### {Template Type} Templates (`{directory}/`)
-
-   Use when {describe use case}.
-
-   **File:** `.claude/templates/{directory}/{template-name}.md`
-
-   **Placeholders:**
-
-   - {{PLACEHOLDER_1}}: {Description}
-   - {{PLACEHOLDER_2}}: {Description}
-
-   **Usage:**
-
-   1. Copy template to `{target-path}`
-   2. Replace all `{{PLACEHOLDER_*}}` values with actual values
-   3. Validate with: `grep "{{" {file} && echo "ERROR: Unresolved placeholders!"`
-
-   **Related Templates:**
-
-   - {Related template 1}
-   - {Related template 2}
-
-   **Assigned for use by:**
-
-   - {Creator skill 1}
-   - {Creator skill 2}
+   ```bash
+   grep "<template-name>" .claude/CLAUDE.md || echo "WARNING: Template not in CLAUDE.md (may be OK if internal-only)"
    ```
 
-4. **Update Consumer Skills/Creators:**
+**Note:** Not all templates need CLAUDE.md entries. Only framework-significant ones (spawn templates, creator templates) require this step.
 
-   If this template is meant to be used by specific creators, add reference:
-   - In agent-creator.md: Add to Step 2 (Agent Definition)
-   - In skill-creator.md: Add to Step 2 (Skill Definition)
-   - In hook-creator.md: Add to Step 3 (Hook Template)
-   - In workflow-creator.md: Add to Step 4 (Workflow Definition)
+### Step 11: Assign Consumer Agents
 
-   Example:
+Templates exist to be consumed by creators and agents. After creation:
+
+1. **Identify consumers** based on template type:
+   - Agent templates -> agent-creator skill should reference
+   - Skill templates -> skill-creator skill should reference
+   - Workflow templates -> workflow-creator skill should reference
+   - Report templates -> relevant agents (qa, developer, etc.)
+   - Spawn templates -> router documentation, spawn-template-resolver
+   - Code style templates -> developer, code-reviewer
+
+2. **Update consuming skill/agent to reference the template:**
 
    ```markdown
    **Available Templates:**
-
-   - See `.claude/templates/{category}/{template-name}.md` for standardized {type} template
+   - See `.claude/templates/<category>/<template-name>.md` for standardized <type> template
    ```
 
-5. **Update Memory:**
+3. **Verify at least one consumer references the template:**
 
-   Append to `.claude/context/memory/learnings.md`:
-
-   ```markdown
-   ## Template: {template-name}
-
-   - **Type:** {agent|skill|workflow|hook|code|schema}
-   - **Purpose:** {What this template standardizes}
-   - **Placeholders:** {List key placeholders}
-   - **Discovery Path:** {How users find it}
-   - **Related Templates:** {Any related templates}
+   ```bash
+   grep -r "<template-name>" .claude/skills/ .claude/agents/ || echo "WARNING: No consumer references template"
    ```
 
-**Why this matters:** Without template registration:
+**WHY:** Templates without consumers are dead on arrival. Every template MUST have at least one consuming skill or agent.
 
-- Other creators cannot discover available templates
-- Artifacts are created inconsistently instead of using standards
-- System loses visibility into template network
-- "Invisible artifact" pattern emerges
+### Step 12: Integration Verification (BLOCKING - DO NOT SKIP)
 
-**Phase 1 Integration:** Template registry is the discovery mechanism for Phase 1, enabling creators and agents to discover standardized patterns and ensure consistent artifact creation.
+**This step verifies the artifact is properly integrated into the ecosystem.**
 
-### Step 9: System Impact Analysis (MANDATORY)
+Before calling `TaskUpdate({ status: "completed" })`, run the post-creation validation:
 
-After creating a template:
+1. **Run the integration checklist:**
 
-1. **README Update (BLOCKING)**
-   - Add to .claude/templates/README.md (Step 8 covers this)
-   - Document template purpose and placeholders
+   ```bash
+   node .claude/tools/cli/validate-integration.cjs .claude/templates/<category>/<template-name>.md
+   ```
 
-2. **Related Templates**
-   - Check if new template supersedes existing one
-   - Add cross-references if related
+2. **Verify exit code is 0** (all checks passed)
 
-3. **Consumer Documentation**
-   - Document which skills/agents should use this template
-   - Update relevant creator skill with template reference
-   - Update CLAUDE.md Section 8.5 if template is user-invocable
+3. **If exit code is 1** (one or more checks failed):
+   - Read the error output for specific failures
+   - Fix each failure:
+     - Missing README entry -> Add to `.claude/templates/README.md`
+     - Missing catalog entry -> Add to `template-catalog.md`
+     - Missing memory update -> Update `learnings.md`
+   - Re-run validation until exit code is 0
 
-**BLOCKING**: Template without README entry may not be discovered.
+4. **Only proceed when validation passes**
 
-**Analysis Format:**
+**This step is BLOCKING.** Do NOT mark task complete until validation passes.
 
-```
-[TEMPLATE-CREATOR] System Impact Analysis for: <template-name>
+**Why this matters:** The Party Mode incident showed that fully-implemented artifacts can be invisible to the Router if integration steps are missed. This validation ensures no "invisible artifact" pattern.
 
-1. README UPDATE (MANDATORY - Step 8)
-   - Added to .claude/templates/README.md
-   - Usage instructions documented
-   - Quick Reference table updated
-   - Template registry entry created
+**Reference:** `.claude/workflows/core/post-creation-validation.md`
 
-2. RELATED TEMPLATES CHECK
-   - Does this template supersede an existing one?
-   - Are there related templates that need cross-references?
-   - Update related creators if needed
-
-3. CONSUMER DOCUMENTATION
-   - Which skills/agents should use this template?
-   - Is template reference added to relevant creator skill?
-   - Is CLAUDE.md Section 8.5 update needed?
-
-4. MEMORY UPDATE
-   - Record creation in learnings.md
-   - Document any decisions in decisions.md
-```
-
-## Completion Checklist (BLOCKING)
+### Step 13: Completion Checklist (BLOCKING)
 
 **All items MUST pass before template creation is complete:**
 
 ```
-[ ] Template file created at .claude/templates/<name>.md
+[ ] Research-synthesis skill invoked (Step 0)
+[ ] Existence check passed (no duplicate template)
+[ ] Template name validates against /^[a-z0-9][a-z0-9-]*[a-z0-9]$/ (Step 3)
+[ ] Template file created at .claude/templates/<category>/<name>.md
 [ ] All placeholders use {{PLACEHOLDER_NAME}} format
-[ ] README.md in .claude/templates/ updated
+[ ] All placeholders have documentation comments
+[ ] POST-CREATION CHECKLIST section present in template
+[ ] Memory Protocol section present in template
 [ ] No hardcoded values (all configurable via placeholders)
+[ ] No secrets, credentials, or absolute paths in template (SEC-TC-007)
+[ ] No eval() or code execution patterns in template
+[ ] template-catalog.md updated with structured entry (Step 8)
+[ ] .claude/templates/README.md updated with template entry (Step 9)
+[ ] CLAUDE.md updated if template is framework-significant (Step 10)
+[ ] At least one consuming skill/agent references the template (Step 11)
+[ ] Integration verification passed (Step 12)
 [ ] Template tested with at least one real usage
-[ ] Memory files updated with learnings
+[ ] Memory files updated (learnings.md)
 ```
 
 **BLOCKING**: If ANY item fails, template creation is INCOMPLETE. Fix all issues before proceeding.
 
-### Reference Template
+---
 
-**Use `.claude/templates/agent-skill-invocation-section.md` as the canonical reference template.**
+## Architecture Compliance
+
+### File Placement (ADR-076)
+
+- Templates: `.claude/templates/{category}/` (spawn, agents, skills, workflows, reports, code-styles)
+- Archived templates: `.claude/templates/_archive/`
+- Template catalog: `.claude/context/artifacts/catalogs/template-catalog.md`
+- Tests: `tests/` (NOT in `.claude/`)
+
+### Documentation References (CLAUDE.md v2.2.1)
+
+- Reference files use @notation: @TOOL_REFERENCE.md, @SKILL_CATALOG_TABLE.md
+- Located in: `.claude/docs/@*.md`
+- See: CLAUDE.md Section 2 (Spawn Templates)
+
+### Shell Security (ADR-077)
+
+- Spawn templates MUST include: `cd "$PROJECT_ROOT" || exit 1` for background tasks
+- Environment variables control validators (block/warn/off mode)
+- See: `.claude/docs/SHELL-SECURITY-GUIDE.md`
+- Apply to: all spawn templates, background task templates
+
+### Security Compliance (ADR-085, ADR-086, SEC-TMPL-006)
+
+- Templates MUST NOT include hardcoded secrets, credentials, or API keys
+- Templates MUST use relative paths (`.claude/templates/...`), never absolute paths
+- Templates MUST NOT expose internal system paths or user directories
+- Retention mandates: security-design-checklist.md and error-recovery-template.md must remain at designated locations
+- Spawn template placeholder sanitization: reference `sanitizeSubstitutionValue()` in `prompt-factory.cjs`
+
+### Recent ADRs
+
+- ADR-075: Router Config-Aware Model Selection
+- ADR-076: File Placement Architecture Redesign
+- ADR-077: Shell Command Security Architecture
+- ADR-085: Template System Overhaul (spawn resolver + dead template cleanup)
+- ADR-086: Template-Creator Overhaul to v2.1 Creator Standard
+
+---
+
+## Iron Laws of Template Creation
+
+These rules are INVIOLABLE. Breaking them causes inconsistency across the framework.
+
+```
+1. NO TEMPLATE WITHOUT PLACEHOLDER DOCUMENTATION
+   - Every {{PLACEHOLDER}} must have an inline comment
+   - Comments explain valid values and examples
+
+2. NO TEMPLATE WITHOUT POST-CREATION CHECKLIST
+   - Users must know what to do after using template
+   - Blocking steps prevent incomplete artifacts
+
+3. NO TEMPLATE WITHOUT MEMORY PROTOCOL
+   - All templates must include Memory Protocol section
+   - Ensures artifacts created from template follow memory rules
+
+4. NO TEMPLATE WITHOUT README UPDATE
+   - Templates README must document new template
+   - Undocumented templates are invisible
+
+5. NO PLACEHOLDER WITHOUT NAMING CONVENTION
+   - Use {{UPPER_CASE_WITH_UNDERSCORES}}
+   - Never use lowercase or mixed case
+
+6. NO OPTIONAL FIELD WITHOUT DEFAULT
+   - Format: {{FIELD:default_value}}
+   - Makes templates usable without full customization
+
+7. NO TEMPLATE WITHOUT VERIFICATION COMMANDS
+   - Include commands to validate created artifacts
+   - Users can verify their work is correct
+
+8. NO AGENT TEMPLATE WITHOUT ALIGNMENT SECTIONS
+   - Agent templates MUST include {{ENFORCEMENT_HOOKS}} placeholder section
+   - Agent templates MUST include {{RELATED_WORKFLOWS}} placeholder section
+   - Agent templates MUST include Output Standards block referencing workspace-conventions
+   - Reference: @HOOK_AGENT_MAP.md and @WORKFLOW_AGENT_MAP.md for archetype sets
+
+9. NO TEMPLATE WITHOUT CATALOG ENTRY
+   - Every template MUST be registered in template-catalog.md
+   - Uncataloged templates are invisible to the system
+   - Verify: grep "<template-name>" .claude/context/artifacts/catalogs/template-catalog.md
+
+10. NO TEMPLATE WITHOUT CONSUMING SKILL/AGENT
+    - Every template MUST be referenced by at least one consuming skill or agent
+    - Templates without consumers are dead on arrival
+    - Verify: grep -r "<template-name>" .claude/skills/ .claude/agents/
+
+11. NO CREATION WITHOUT RESEARCH-SYNTHESIS
+    - Per CLAUDE.md Section 3, research-synthesis MUST be invoked before any creator
+    - Template creation is no exception
+    - Invoke: Skill({ skill: 'research-synthesis' })
+```
+
+---
+
+## Reference Template
+
+**Use `.claude/templates/spawn/universal-agent-spawn.md` as the canonical reference template.**
 
 Before finalizing any template, compare:
 
@@ -529,6 +671,10 @@ Before finalizing any template, compare:
 - [ ] Placeholders are UPPERCASE with underscores
 - [ ] Has usage examples section
 - [ ] Has integration notes
+- [ ] Has POST-CREATION CHECKLIST
+- [ ] Has Memory Protocol
+
+---
 
 ## Template Best Practices
 
@@ -581,23 +727,77 @@ grep -E "^## Memory Protocol" <file> || echo "ERROR: Missing Memory Protocol!"
 ```
 ````
 
-````
+---
+
+## System Impact Analysis (MANDATORY)
+
+After creating a template, complete this 7-point analysis:
+
+```
+[TEMPLATE-CREATOR] System Impact Analysis for: <template-name>
+
+1. README UPDATE (MANDATORY - Step 9)
+   - Added to .claude/templates/README.md
+   - Usage instructions documented
+   - Quick Reference table updated
+
+2. CATALOG UPDATE (MANDATORY - Step 8)
+   - Added to .claude/context/artifacts/catalogs/template-catalog.md
+   - Category, status, agents, skills documented
+   - Purpose clearly stated
+
+3. CLAUDE.MD UPDATE (CONDITIONAL - Step 10)
+   - Is template framework-significant? If yes, add to CLAUDE.md
+   - Spawn templates -> Section 2
+   - Creator templates -> relevant creator section
+   - User-invocable -> Section 8.5
+
+4. CONSUMER ASSIGNMENT (MANDATORY - Step 11)
+   - Which skills/agents consume this template?
+   - Is template reference added to consuming creator skill?
+   - Verify with grep across skills/ and agents/
+
+5. RELATED TEMPLATES CHECK
+   - Does this template supersede an existing one?
+   - Are there related templates that need cross-references?
+   - Should archived templates be updated or removed?
+
+6. SECURITY COMPLIANCE (SEC-TMPL-006, SEC-TC-001, SEC-TC-007)
+   - No secrets, credentials, or absolute paths
+   - Relative paths only
+   - Retention mandates respected
+   - Spawn template placeholders sanitized
+
+7. MEMORY UPDATE
+   - Record creation in learnings.md
+   - Document any decisions in decisions.md
+```
+
+---
 
 ## Workflow Integration
 
 This skill is part of the unified artifact lifecycle. For complete multi-agent orchestration:
 
 **Router Decision:** `.claude/workflows/core/router-decision.md`
+
 - How the Router discovers and invokes this skill's artifacts
 
 **Artifact Lifecycle:** `.claude/workflows/core/skill-lifecycle.md`
+
 - Discovery, creation, update, deprecation phases
 - Version management and registry updates
 - CLAUDE.md integration requirements
 
 **External Integration:** `.claude/workflows/core/external-integration.md`
+
 - Safe integration of external artifacts
 - Security review and validation phases
+
+**Spawn Template Resolver:** `.claude/lib/spawn/spawn-template-resolver.cjs`
+
+- Programmatic template selection for spawn operations
+- Template scoring and fallback logic
 
 ---
 
@@ -605,13 +805,13 @@ This skill is part of the unified artifact lifecycle. For complete multi-agent o
 
 This skill is part of the **Creator Ecosystem**. Use companion creators when needed:
 
-| Creator | When to Use | Invocation |
-|---------|-------------|------------|
-| **agent-creator** | Template needs agent integration | `Skill({ skill: 'agent-creator' })` |
-| **skill-creator** | Template needs skill integration | `Skill({ skill: 'skill-creator' })` |
-| **workflow-creator** | Template needs workflow patterns | Create in `.claude/workflows/` |
-| **schema-creator** | Template needs JSON schemas | Create in `.claude/schemas/` |
-| **hook-creator** | Template needs hooks | Create in `.claude/hooks/` |
+| Creator              | When to Use                                     | Invocation                             |
+| -------------------- | ----------------------------------------------- | -------------------------------------- |
+| **agent-creator**    | Template needs agent integration                | `Skill({ skill: 'agent-creator' })`    |
+| **skill-creator**    | Template needs skill integration                | `Skill({ skill: 'skill-creator' })`    |
+| **workflow-creator** | Template needs workflow patterns                | `Skill({ skill: 'workflow-creator' })` |
+| **schema-creator**   | Template needs JSON schemas                     | `Skill({ skill: 'schema-creator' })`   |
+| **hook-creator**     | Template needs hooks                            | `Skill({ skill: 'hook-creator' })`     |
 
 ### Integration Workflow
 
@@ -625,7 +825,70 @@ Skill({ skill: 'hook-creator' });
 // 3. Template created for new agent category
 // 4. Need to update agent-creator to recognize new category
 // Edit .claude/skills/agent-creator/SKILL.md to add category
-````
+```
+
+### Post-Creation Checklist for Ecosystem Integration
+
+After template is fully created and validated:
+
+```
+[ ] Does template need a companion skill? -> Use skill-creator
+[ ] Does template need a companion workflow? -> Use workflow-creator
+[ ] Does template supersede an existing template? -> Archive old one
+[ ] Should template be part of enterprise workflows? -> Update Section 8.6
+[ ] Does template interact with spawn-template-resolver? -> Update resolver config
+```
+
+---
+
+## File Placement & Standards
+
+### Output Location Rules
+
+This skill outputs to: `.claude/templates/`
+
+Subdirectories by type:
+
+- `spawn/` - Agent spawn prompt templates (4 templates)
+- `agents/` - Agent definition templates (2 templates)
+- `skills/` - Skill definition templates (1 template)
+- `workflows/` - Workflow definition templates (1 template)
+- `reports/` - Report document templates (5 templates)
+- `code-styles/` - Language style guides (3 templates)
+- Root level - General document templates (8+ templates)
+- `_archive/` - Archived/deprecated templates (14 templates)
+
+### Mandatory References
+
+- **File Placement**: See `.claude/docs/FILE_PLACEMENT_RULES.md`
+- **Developer Workflow**: See `.claude/docs/DEVELOPER_WORKFLOW.md`
+- **Artifact Naming**: See `.claude/docs/ARTIFACT_NAMING.md`
+- **Workspace Conventions**: See `.claude/rules/workspace-conventions.md` (output placement, naming, provenance)
+
+### Enforcement
+
+File placement is enforced by `file-placement-guard.cjs` hook.
+Invalid placements will be blocked in production mode.
+
+---
+
+## Assigned Agents
+
+This skill is typically invoked by:
+
+| Agent     | Role                       | Assignment Reason                                |
+| --------- | -------------------------- | ------------------------------------------------ |
+| planner   | Planning standardization   | Creates templates for new patterns               |
+| architect | Architecture patterns      | Creates templates for architectural artifacts    |
+| developer | Code patterns              | Creates code scaffolding templates               |
+
+**To invoke this skill:**
+
+```javascript
+Skill({ skill: 'template-creator' });
+```
+
+---
 
 ## Examples
 
@@ -635,18 +898,19 @@ Skill({ skill: 'hook-creator' });
 
 **Process:**
 
-1. **Analyze**: Report type, security focus, audit findings structure
-2. **Research**: Check existing report templates in `.claude/templates/reports/`
-3. **Design**: Structure for security audit reports
-4. **Create**: `.claude/templates/reports/security-audit-report-template.md`
+1. **Research**: Invoke `research-synthesis`, review existing report templates in `.claude/templates/reports/`
+2. **Gather**: Analyze report type, security focus, audit findings structure
+3. **Validate name**: `security-audit-report-template` matches `/^[a-z0-9][a-z0-9-]*[a-z0-9]$/`
+4. **Design**: Structure for security audit reports
+5. **Create**: `.claude/templates/reports/security-audit-report-template.md`
 
 ````markdown
 ---
 # [REQUIRED] Report identifier, lowercase-with-hyphens
-name: { { REPORT_NAME } }
+name: {{REPORT_NAME}}
 
 # [REQUIRED] What this report documents
-description: { { REPORT_DESCRIPTION } }
+description: {{REPORT_DESCRIPTION}}
 
 # [REQUIRED] Report type: audit, implementation, research, reflection, plan
 type: audit
@@ -676,17 +940,17 @@ After creating this report:
 ## Recommendations
 
 {{RECOMMENDATIONS}}
-````
 
 ## Memory Protocol (MANDATORY)
 
 **Before starting:** Read `.claude/context/memory/learnings.md`
 **After completing:** Record patterns to learnings.md
-
 ````
 
-5. **Update README**: Add to reports section in templates README
-6. **Update Memory**: Record in learnings.md
+6. **Update catalog**: Add to template-catalog.md under Report Templates
+7. **Update README**: Add to reports section in templates README
+8. **Assign consumers**: Update security-architect and qa agent references
+9. **Update memory**: Record in learnings.md
 
 ### Example 2: Creating a Spawn Template
 
@@ -694,10 +958,11 @@ After creating this report:
 
 **Process:**
 
-1. **Analyze**: Agent spawn pattern, specialized vs general-purpose
-2. **Research**: Check `.claude/templates/spawn/universal-agent-spawn.md`
-3. **Design**: Structure for specialized spawn prompts
-4. **Create**: `.claude/templates/spawn/specialized-agent-spawn.md`
+1. **Research**: Invoke `research-synthesis`, review `.claude/templates/spawn/universal-agent-spawn.md`
+2. **Gather**: Analyze spawn pattern, specialized vs general-purpose
+3. **Validate name**: `specialized-agent-spawn` matches name regex
+4. **Design**: Structure for specialized spawn prompts with security considerations (SEC-TC-001)
+5. **Create**: `.claude/templates/spawn/specialized-agent-spawn.md`
 
 ```markdown
 ---
@@ -716,35 +981,24 @@ complexity: {{COMPLEXITY:medium}}
 
 # {{AGENT_DISPLAY_NAME}} Spawn Template
 
+## Security Notice (SEC-TC-001)
+
+Placeholder values substituted into the `prompt:` field MUST be sanitized using
+`sanitizeSubstitutionValue()` from `prompt-factory.cjs` before substitution.
+This prevents prompt injection via user-provided task descriptions.
+
 ## Usage
 
 Use this template when spawning {{AGENT_TYPE}} agents.
 
 ## Spawn Pattern
 
-```javascript
 Task({
   subagent_type: '{{AGENT_TYPE}}',
   model: '{{MODEL}}',
   task_id: '{{TASK_ID}}',
-  prompt: `
-You are {{AGENT_IDENTITY}}.
-
-## Your Task (ID: {{TASK_ID}})
-{{TASK_DESCRIPTION}}
-
-## Context
-{{CONTEXT}}
-
-## Success Criteria
-{{SUCCESS_CRITERIA}}
-
-## CRITICAL: TaskUpdate Protocol
-FIRST: TaskUpdate({ taskId: "{{TASK_ID}}", status: "in_progress" })
-LAST: TaskUpdate({ taskId: "{{TASK_ID}}", status: "completed" })
-  `
+  prompt: 'You are {{AGENT_IDENTITY}}. ... TaskUpdate protocol ...'
 });
-````
 
 ## Validation
 
@@ -754,8 +1008,16 @@ After using this template:
 - [ ] Model matches agent complexity requirements
 - [ ] TaskUpdate protocol included in prompt
 - [ ] Success criteria clearly defined
-
+- [ ] No unsanitized user input in prompt field
 ```
+
+6. **Update catalog**: Add to template-catalog.md under Spawn Templates
+7. **Update README**: Add to spawn section in templates README
+8. **Update CLAUDE.md**: Add to Section 2 (Spawn Templates) if framework-standard
+9. **Assign consumers**: Update router and spawn-template-resolver references
+10. **Update memory**: Record in learnings.md
+
+---
 
 ## Troubleshooting
 
@@ -764,6 +1026,7 @@ After using this template:
 **Symptoms:** `{{PLACEHOLDER}}` appears in final file
 
 **Solution:**
+
 - Check placeholder format (double braces, UPPER_CASE)
 - Ensure user replaced all placeholders
 - Add validation command to catch unreplaced
@@ -773,131 +1036,65 @@ After using this template:
 **Symptoms:** Template exists but not found by creators
 
 **Solution:**
-- Verify README.md is updated
+
+- Verify template-catalog.md is updated (Step 8)
+- Verify README.md is updated (Step 9)
 - Check file is in correct directory
-- Run grep verification command
+- Run: `grep "<template-name>" .claude/context/artifacts/catalogs/template-catalog.md`
 
 ### Issue: Inconsistent Template Structure
 
 **Symptoms:** Different templates have different formats
 
 **Solution:**
+
 - Review existing templates before creating
 - Use this skill's patterns
+- Compare against reference template (universal-agent-spawn.md)
 - Run consistency check across templates
 
-## Verification Checklist
+### Issue: Spawn Template Injection Risk
 
-Before completing template creation:
+**Symptoms:** User-provided content in spawn template placeholder could manipulate agent behavior
 
-- [ ] Template file exists at correct path
-- [ ] YAML frontmatter is valid
-- [ ] All placeholders use `{{UPPER_CASE}}` format
-- [ ] All placeholders have documentation comments
-- [ ] POST-CREATION CHECKLIST section present
-- [ ] Memory Protocol section present
-- [ ] README.md updated
-- [ ] Verification with grep passed
-- [ ] learnings.md updated
+**Solution:**
 
-## File Placement & Standards
+- Review SEC-TC-001 guidance in this skill
+- Ensure `sanitizeSubstitutionValue()` is referenced
+- Do not place `{{PLACEHOLDER}}` tokens directly in `prompt:` fields for user input
+- Use structured task descriptions that separate user content from system instructions
 
-### Output Location Rules
-This skill outputs to: `.claude/templates/`
+### Issue: Creator Guard Blocking Template Write
 
-Subdirectories by type:
-- `agents/` - Agent definition templates (2 templates)
-- `skills/` - Skill definition templates (1 template)
-- `workflows/` - Workflow orchestration templates (1 template)
-- `spawn/` - Agent spawn prompt templates (4 templates)
-- `reports/` - Report document templates (5 templates)
-- `code-styles/` - Language style guides (3 templates)
-- Root level - General document templates (8+ templates)
+**Symptoms:** `unified-creator-guard.cjs` blocks your template write
 
-**Note:** Future categories (`hooks/`, `code/`, `schemas/`) can be created when demand arises.
+**Solution:**
 
-**Cross-Reference:** See `.claude/context/artifacts/catalogs/template-catalog.md` for the complete inventory of all templates.
-
-### Mandatory References
-- **File Placement**: See `.claude/docs/FILE_PLACEMENT_RULES.md`
-- **Developer Workflow**: See `.claude/docs/DEVELOPER_WORKFLOW.md`
-- **Artifact Naming**: See `.claude/docs/ARTIFACT_NAMING.md`
-- **Workspace Conventions**: See `.claude/rules/workspace-conventions.md` (output placement, naming, provenance)
-
-### Enforcement
-File placement is enforced by `file-placement-guard.cjs` hook.
-Invalid placements will be blocked in production mode.
+- Ensure you invoked this skill properly: `Skill({ skill: 'template-creator' })`
+- Check that the creator state is active (3-minute TTL)
+- If debugging: `CREATOR_GUARD=warn` (temporary, restore to `block` after)
+- Never use `CREATOR_GUARD=off` in production
 
 ---
 
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
-Read `.claude/context/memory/learnings.md`
+
+```bash
+cat .claude/context/memory/learnings.md
+```
+
+Check for:
+
+- Previously created templates
+- Known template patterns
+- User preferences for template behavior
 
 **After completing:**
+
 - New template pattern -> `.claude/context/memory/learnings.md`
 - Issue found -> `.claude/context/memory/issues.md`
 - Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
-
----
-
-## Iron Laws of Template Creation
-
-These rules are INVIOLABLE. Breaking them causes inconsistency across the framework.
-
-```
-
-1. NO TEMPLATE WITHOUT PLACEHOLDER DOCUMENTATION
-   - Every {{PLACEHOLDER}} must have an inline comment
-   - Comments explain valid values and examples
-
-2. NO TEMPLATE WITHOUT POST-CREATION CHECKLIST
-   - Users must know what to do after using template
-   - Blocking steps prevent incomplete artifacts
-
-3. NO TEMPLATE WITHOUT MEMORY PROTOCOL
-   - All templates must include Memory Protocol section
-   - Ensures artifacts created from template follow memory rules
-
-4. NO TEMPLATE WITHOUT README UPDATE
-   - Templates README must document new template
-   - Undocumented templates are invisible
-
-5. NO PLACEHOLDER WITHOUT NAMING CONVENTION
-   - Use {{UPPER_CASE_WITH_UNDERSCORES}}
-   - Never use lowercase or mixed case
-
-6. NO OPTIONAL FIELD WITHOUT DEFAULT
-   - Format: {{FIELD:default_value}}
-   - Makes templates usable without full customization
-
-7. NO TEMPLATE WITHOUT VERIFICATION COMMANDS
-   - Include commands to validate created artifacts
-   - Users can verify their work is correct
-
-8. NO AGENT TEMPLATE WITHOUT ALIGNMENT SECTIONS
-   - Agent templates MUST include {{ENFORCEMENT_HOOKS}} placeholder section
-   - Agent templates MUST include {{RELATED_WORKFLOWS}} placeholder section
-   - Agent templates MUST include Output Standards block referencing workspace-conventions
-   - Reference: @HOOK_AGENT_MAP.md and @WORKFLOW_AGENT_MAP.md for archetype sets
-
-````
-
-## Assigned Agents
-
-This skill is typically invoked by:
-
-| Agent | Role | Assignment Reason |
-|-------|------|-------------------|
-| planner | Planning standardization | Creates templates for new patterns |
-| architect | Architecture patterns | Creates templates for architectural artifacts |
-| developer | Code patterns | Creates code scaffolding templates |
-
-**To invoke this skill:**
-
-```javascript
-Skill({ skill: 'template-creator' });
-````
