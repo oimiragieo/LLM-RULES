@@ -342,6 +342,98 @@ CHECKS.push({
   },
 });
 
+// Check 10: Project Root Write Guard
+// Blocks writes to the project root directory except for known allowlisted files.
+// Prevents junk files (e.g., mangled paths) from being created in the root.
+CHECKS.push({
+  name: 'project-root-write-guard',
+  run: async (_toolName, toolInput) => {
+    const filePath = toolInput.file_path || toolInput.target_file || '';
+    if (!filePath) return { pass: true };
+
+    const enforcement = getEnforcementMode('PROJECT_ROOT_WRITE_GUARD', 'block');
+    if (enforcement === 'off') return { pass: true };
+
+    // Normalize the path for cross-platform comparison
+    const normalizedPath = path.resolve(filePath).replace(/\\/g, '/');
+    const normalizedRoot = PROJECT_ROOT.replace(/\\/g, '/');
+
+    // Extract the directory and filename
+    const fileDir = path.dirname(normalizedPath).replace(/\\/g, '/');
+    const fileName = path.basename(normalizedPath);
+
+    // Only check files directly in the project root (not subdirectories)
+    if (fileDir !== normalizedRoot) {
+      return { pass: true };
+    }
+
+    // Allowlist: files that legitimately live in the project root
+
+    // 1. Dotfiles (start with .) - .gitignore, .env, .eslintrc.*, .prettierrc.*, etc.
+    if (fileName.startsWith('.')) {
+      return { pass: true };
+    }
+
+    // 2. Explicit allowlist of known root files
+    const ALLOWLISTED_ROOT_FILES = [
+      'package.json',
+      'package-lock.json',
+      'pnpm-lock.yaml',
+      'pnpm-workspace.yaml',
+      'yarn.lock',
+      'tsconfig.json',
+      'jsconfig.json',
+      'README.md',
+      'CHANGELOG.md',
+      'GETTING_STARTED.md',
+      'LICENSE',
+      'LICENSE.md',
+      'config.yaml',
+      'config.yml',
+    ];
+
+    if (ALLOWLISTED_ROOT_FILES.includes(fileName)) {
+      return { pass: true };
+    }
+
+    // 3. Config file patterns (eslint, prettier, jest, babel, etc.)
+    const CONFIG_PATTERNS = [
+      /^eslint\.config\.[cm]?js$/,
+      /^jest\.config\.[cm]?js$/,
+      /^babel\.config\.[cm]?js$/,
+      /^rollup\.config\.[cm]?js$/,
+      /^vite\.config\.[cm]?js$/,
+      /^vitest\.config\.[cm]?js$/,
+      /^webpack\.config\.[cm]?js$/,
+      /^next\.config\.[cm]?js$/,
+      /^tailwind\.config\.[cm]?js$/,
+      /^postcss\.config\.[cm]?js$/,
+      /^commitlint\.config\.[cm]?js$/,
+      /^lint-staged\.config\.[cm]?js$/,
+      /^claude-with-hooks\.bat$/,
+      /^Makefile$/,
+      /^Dockerfile$/,
+      /^docker-compose\.ya?ml$/,
+      /^Procfile$/,
+    ];
+
+    const matchesConfig = CONFIG_PATTERNS.some(pattern => pattern.test(fileName));
+    if (matchesConfig) {
+      return { pass: true };
+    }
+
+    // File is not allowlisted - block or warn
+    const message = `[PROJECT-ROOT-WRITE-GUARD] BLOCKED: Writing to project root is forbidden. File: ${fileName}. ` +
+      'Use .claude/context/tmp/ for temp files or the appropriate .claude/ subdirectory.';
+
+    if (enforcement === 'warn') {
+      return { pass: true, result: 'warn', message };
+    }
+
+    return { pass: false, result: 'block', message };
+  },
+});
+
 // =============================================================================
 // MAIN EXECUTION
 // =============================================================================
