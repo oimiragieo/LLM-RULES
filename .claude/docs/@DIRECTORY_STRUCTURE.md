@@ -63,10 +63,9 @@ context/
 │   ├── summaries/           # Phase summaries, checkpoints
 │   ├── skill-catalog.md     # Master skill catalog
 │   └── ...                  # (legacy root files being migrated)
-├── backups/                 # System backups
+├── backups/                 # System backups (created on-demand by saga-coordinator.cjs for rollback checkpoints)
 ├── checkpoints/             # Workflow checkpoints
 ├── code-index/              # Code indexing data (merkle trees)
-├── code-indexing/           # Code indexing configuration
 ├── config/                  # Configuration files
 │   ├── rule-index-cache.json
 │   └── ...
@@ -84,37 +83,42 @@ context/
 │   ├── behaviour.md
 │   ├── active_context.md
 │   ├── archive/
-│   └── named/
+│   ├── named/               # Named memory API: readMemory/writeMemory (CLAUDE.md Section 8)
+│   ├── stm/                 # STM tier: session data written by user-prompt-unified.cjs
+│   ├── mtm/                 # MTM tier: (medium-term memory - future use)
+│   └── ltm/                 # LTM tier: summarized session data written by memory-tiers.cjs
 ├── metrics/
 │   ├── hook-metrics.jsonl
 │   ├── spawn-log.jsonl
 │   └── spawn-size-audit.jsonl
-├── ml/                      # ML model data
 ├── plans/                   # Planner outputs (canonical location)
-├── reports/                 # Agent reports (canonical location)
+├── reports/                 # Agent reports (canonical location - consolidated from artifacts/reports/)
 │   ├── security/
 │   ├── qa/
 │   ├── architecture/
-│   └── database/
+│   ├── database/
+│   └── reflections/
 ├── runtime/
 │   ├── router-state.json
 │   ├── compression-reminder.txt
 │   └── reflection-reminder.txt
-├── self-healing/            # Self-healing state
-├── sessions/                # Session data
+├── self-healing/            # Self-healing state (anomaly-detector and loop-state-manager write here)
+├── sessions/                # Session data (used by consensus-voting and swarm-coordinator for session state)
 ├── teams/
 │   └── [team-name].csv
 ├── tmp/                     # Temporary files (auto-cleaned 24h)
 ├── workflows/               # Workflow state data
 ├── access-stats.json        # (legacy root - stats tracking)
-├── agent-catalog.json       # (legacy root - agent catalog)
-├── agent-registry.json      # Agent registry (canonical root location)
+├── agent-catalog.json       # Generated simplified view of agent-registry.json (NOT a duplicate)
+├── agent-registry.json      # Agent registry (canonical root location - 35+ cross-cutting references)
 ├── dashboard.json           # Dashboard state
-├── evolution-state.json     # EVOLVE workflow state (canonical root location)
-└── reflection-queue.jsonl   # Reflection queue (canonical root location)
+├── evolution-state.json     # EVOLVE workflow state (canonical root location - 35+ cross-cutting references)
+└── reflection-queue.jsonl   # Reflection queue (canonical root location - 35+ cross-cutting references)
 ```
 
 **Root-level context files note:** `agent-registry.json`, `evolution-state.json`, and `reflection-queue.jsonl` remain at `.claude/context/` root because they have 30+ cross-cutting references in hooks, workflows, agents, and documentation. Moving them would cause widespread breakage. They are canonical at their current locations.
+
+**Note on agent-catalog.json:** This is a generated simplified view of `agent-registry.json` for quick reference, not a duplicate. It is auto-regenerated on commit via post-commit hook.
 
 ### config/
 
@@ -314,7 +318,9 @@ schemas/
 | `.claude/references/`     | Moved to `.claude/docs/reference/` then deleted  | 2026-02-06 |
 | `.claude/teams/`          | Moved to `.claude/context/teams/`                | 2026-02-06 |
 | `.claude/docs/archive/`   | Deleted (one-time debug fix reports)             | 2026-02-06 |
-| `.claude/docs/reference/` | Deleted (AI-generated unused reference material) | 2026-02-06 |
+| `.claude/docs/reference/`     | Deleted (AI-generated unused reference material) | 2026-02-06 |
+| `.claude/context/code-indexing/` | Deleted (zero references - active indexer uses code-index/) | 2026-02-06 |
+| `.claude/context/ml/`         | Deleted (zero references - optional ML features never activated) | 2026-02-06 |
 
 ### Moved Files (2026-02-06)
 
@@ -323,6 +329,7 @@ schemas/
 | `.claude/context/spawn-size-audit.jsonl`       | `.claude/context/metrics/spawn-size-audit.jsonl`                   | Belongs in metrics   |
 | `.claude/context/rule-index-cache.json`        | `.claude/context/config/rule-index-cache.json`                     | Belongs in config    |
 | `.claude/context/checkpoint-week4-20260128.md` | `.claude/context/artifacts/summaries/checkpoint-week4-20260128.md` | Belongs in summaries |
+| `tests/workflows/checkpoints/test-*`           | `tests/fixtures/checkpoints/test-*`                                 | Test fixtures moved  |
 
 ### File Placement Enforcement
 

@@ -214,3 +214,68 @@ for (let lineIdx = 0; lineIdx < lines.length; lineIdx += 50) {
 - File: `.claude/lib/code-indexing/index-manager.cjs`
 - Lines: ~458-466 (sync fast-path block)
 - Condition: `if (this.vectorStore.embeddingMode === 'off')`
+
+---
+
+## ADR-081: Context Directory Cleanup (2026-02-06)
+
+**Date:** 2026-02-06
+
+**Status:** Accepted
+
+**Context:**
+
+Comprehensive wiring audit (Task #46 Phases 1-2) found 17 suspicious directories/files in `.claude/context/`. Most were wired and actively used, but 2 were truly dead (zero references). Reports were scattered across two locations (`artifacts/reports/` and `reports/[domain]/`). Workflows test fixtures were misplaced in production directory.
+
+**Decision:**
+
+**Deleted** (zero references found):
+
+- `code-indexing/` — Legacy directory; active indexer uses `code-index/`
+- `ml/` — Optional ML features never activated
+
+**Moved**:
+
+- `workflows/checkpoints/test-*` → `tests/fixtures/checkpoints/` (test fixtures, not production state)
+- `artifacts/reports/` → consolidated into `reports/[domain]/` (single canonical location)
+- 28 root-level reports → organized into `reports/architecture/`, `reports/qa/`, `reports/reflections/`
+
+**Kept** (verified actively wired):
+
+- `backups/` — Created on-demand by saga-coordinator.cjs for rollback checkpoints
+- `sessions/` — Used by consensus-voting and swarm-coordinator for session state
+- `memory/stm/` — STM tier: session data written by user-prompt-unified.cjs
+- `memory/ltm/` — LTM tier: summarized session data written by memory-tiers.cjs
+- `memory/named/` — Named memory API: readMemory/writeMemory (CLAUDE.md Section 8)
+- `self-healing/` — anomaly-detector and loop-state-manager write anomaly logs/state
+- `teams/` — Party mode team definitions (swarm-coordinator)
+- `config/` — All 4 config files actively read by generators/validators
+- `agent-catalog.json` — Generated simplified view of agent-registry.json (NOT duplicate)
+- `evolution-state.json` — Evolution workflow state machine
+- `reflection-queue.jsonl` — Core reflection pipeline
+
+**Documentation Updates**:
+
+- `FILE_PLACEMENT_RULES.md` — Updated report paths to canonical `reports/[domain]/`
+- `workspace-conventions.md` — Removed "legacy reports" note; consolidated location is now standard
+- `@DIRECTORY_STRUCTURE.md` — Added explanatory comments for empty-but-wired directories, added `reports/reflections/`, noted `agent-catalog.json` is generated (not duplicate), documented deleted directories
+
+**Rationale:**
+
+Audit found only 2 truly dead directories out of 17. Most "empty" directories are on-demand (wired but waiting for trigger events). Consolidating reports to single canonical location (`reports/[domain]/`) eliminates confusion and ensures workspace-conventions compliance.
+
+**Consequences:**
+
+- ✅ **Positive:** Single canonical report location (no more artifacts/reports/ vs reports/ confusion)
+- ✅ **Positive:** Test fixtures correctly placed in tests/ directory
+- ✅ **Positive:** Documentation explains why empty directories exist (on-demand wiring)
+- ✅ **Positive:** Zero dead code in context/ (only 2 dirs deleted after comprehensive audit)
+- ⚠️ **Neutral:** agent-catalog.json clarified as generated view (not duplicate to delete)
+- ⚠️ **Neutral:** Empty directories preserved with explanations (wired for future use)
+
+**Related Tasks:**
+
+- Task #46 (Context Directory Cleanup - comprehensive wiring audit)
+- ADR-076 (Workspace Conventions and Directory Reorganization)
+
+---

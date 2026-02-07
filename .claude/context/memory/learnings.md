@@ -1,3 +1,48 @@
+## 2026-02-06: Context Directory Cleanup Findings (Task #46 Phases 1-2)
+
+**Context:** Comprehensive wiring audit of `.claude/context/` directory to identify orphaned/dead directories.
+
+**Key Findings:**
+
+1. **Only 2 Dead Directories (out of 17 audited)**:
+   - `code-indexing/` (legacy - active indexer uses `code-index/`)
+   - `ml/` (optional ML features never activated)
+   - All other "empty" directories are actively wired and waiting for trigger events
+
+2. **Empty-But-Wired Pattern**: Most empty directories are on-demand:
+   - `backups/` — Created by saga-coordinator.cjs for rollback checkpoints
+   - `sessions/` — Used by consensus-voting and swarm-coordinator
+   - `memory/stm/` — STM tier written by user-prompt-unified.cjs
+   - `memory/ltm/` — LTM tier written by memory-tiers.cjs
+   - `memory/named/` — Named memory API (readMemory/writeMemory)
+   - `self-healing/` — anomaly-detector writes logs here
+   - `teams/` — Party mode team definitions
+
+3. **Agent-Catalog.json Clarification**: This is a **generated simplified view** of agent-registry.json (auto-regenerated on commit), NOT a duplicate. Serves as quick reference for agent discovery without parsing full registry.
+
+4. **Reports Consolidation**: Moved 28 reports from root level to domain subdirectories:
+   - `reports/architecture/` (agent utilization, system design)
+   - `reports/qa/` (quality assurance, test results)
+   - `reports/reflections/` (reflection-agent outputs)
+   - Single canonical location eliminates artifacts/reports/ vs reports/ confusion
+
+5. **Test Fixtures Placement**: Workflow checkpoints test files (`test-*`) belong in `tests/fixtures/`, not in production `workflows/checkpoints/` directory.
+
+**Patterns Learned:**
+
+- **On-Demand Directory Pattern**: Empty directories are valid if code references them for future writes. Check for `fs.mkdir`, `ensureDir`, or hook/workflow references before deleting.
+- **Wiring Audit Process**: Grep for directory name in hooks, workflows, agents, lib, tools. Zero references = safe to delete. 1+ references = investigate if on-demand creation.
+- **Generated vs Duplicate Files**: `agent-catalog.json` looked like duplicate but is actually generated simplified view. Check file headers, generator scripts before assuming duplication.
+- **Canonical Location Enforcement**: When files scatter across multiple locations, consolidate to single canonical path (e.g., all reports to `reports/[domain]/`).
+
+**Impact:**
+
+- Context directory now fully documented with explanations for empty directories
+- Single canonical report location (workspace-conventions compliant)
+- Zero dead code (comprehensive audit found only 2 truly orphaned directories)
+
+---
+
 ## 2026-02-06: Task #44 COMPLETE - Workflow-Agent Alignment (Phases 1-4)
 
 **Context:** Complete workflow-agent alignment initiative - created 4 new workflows, added Related Workflows sections to all 49 agents, created cross-reference documentation, validated, and committed.

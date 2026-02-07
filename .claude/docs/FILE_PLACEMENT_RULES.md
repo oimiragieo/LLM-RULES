@@ -182,15 +182,18 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 | `artifacts/analysis/`         | Deep-dive analysis documents   | `*.md`                                      |
 | `artifacts/catalogs/`         | Catalog and registry files     | `*.md`, `*.json`                            |
 | `artifacts/database/`         | Database design artifacts      | `*.md`, `*.json`                            |
-| `artifacts/reports/`          | QA, security, audit reports    | `*-report.md`, `*-audit.md`                 |
+| `artifacts/analysis/`         | Deep-dive analysis documents   | `*.md`                                      |
+| `artifacts/catalogs/`         | Catalog and registry files     | `*.md`, `*.json`                            |
+| `artifacts/database/`         | Database design artifacts      | `*.md`, `*.json`                            |
 | `artifacts/research-reports/` | Research synthesis outputs     | `*-research.md`                             |
 | `artifacts/summaries/`        | Phase summaries, checkpoints   | `*.md`                                      |
 | `plans/`                      | Planner outputs                | `*-plan.md`                                 |
-| `reports/`                    | Agent reports (NEW canonical)  | `*-report-YYYY-MM-DD.md`                    |
+| `reports/`                    | Agent reports (canonical)      | `*-report-YYYY-MM-DD.md`                    |
 | `reports/security/`           | Security domain reports        | `*.md`                                      |
 | `reports/qa/`                 | QA domain reports              | `*.md`                                      |
 | `reports/architecture/`       | Architecture domain reports    | `*.md`                                      |
 | `reports/database/`           | Database domain reports        | `*.md`                                      |
+| `reports/reflections/`        | Reflection agent reports       | `*.md`                                      |
 | `memory/`                     | Persistent memory files        | `learnings.md`, `decisions.md`, `issues.md` |
 | `metrics/`                    | Metrics and audit logs         | `*.jsonl`, `*.json`                         |
 | `config/`                     | Configuration files            | `*.json`, `*.yaml`                          |
@@ -204,7 +207,8 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 
 ```
 .claude/context/plans/auth-feature-plan.md
-.claude/context/artifacts/reports/security-audit.md
+.claude/context/reports/security/security-audit-2026-02-06.md
+.claude/context/reports/architecture/agent-utilization-audit-2026-02-06.md
 .claude/context/artifacts/research-reports/oauth-research.md
 .claude/context/memory/learnings.md
 .claude/context/config/reflection-rubrics.json

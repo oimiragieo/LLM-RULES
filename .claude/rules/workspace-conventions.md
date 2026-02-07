@@ -7,9 +7,9 @@ Rules for file placement, naming, provenance, and cleanup in the agent-studio wo
 ### Reports
 
 - ALL agent reports go to `.claude/context/reports/`
-- Subdirectories by domain: `reports/security/`, `reports/qa/`, `reports/architecture/`, `reports/database/`
+- Subdirectories by domain: `reports/security/`, `reports/qa/`, `reports/architecture/`, `reports/database/`, `reports/reflections/`
 - Naming: `{topic}-report-{YYYY-MM-DD}.md`
-- Legacy reports in `.claude/context/artifacts/reports/` remain there (do not duplicate)
+- This is the canonical report location (consolidated from previous `artifacts/reports/` location)
 
 ### Plans
 
