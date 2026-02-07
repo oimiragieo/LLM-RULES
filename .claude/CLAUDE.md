@@ -325,7 +325,7 @@ Complex tasks use phased execution with automatic advancement:
 - `complexity-classifier.cjs` — classifies TRIVIAL/LOW/MEDIUM/HIGH/EPIC
 - `workflow-state-manager.cjs` — file-based state at `.claude/context/runtime/workflow-state.json`
 - `phase-advance-reader.cjs` — reads signals + maps phases to agent types
-- `post-completion-chain.cjs` — auto-advances phases on agent completion
+- `.claude/hooks/workflow/post-completion-chain.cjs` — auto-advances phases on agent completion
 - `quality-gates.cjs` — blocking/non-blocking gates between phases
 
 **Phase skipping by complexity:**
