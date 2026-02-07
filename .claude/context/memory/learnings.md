@@ -1,3 +1,111 @@
+## Enterprise Workflow Agent Assignment Patterns (Task #136, 2026-02-07)
+
+**Pattern:** Add explicit agent selection precedence to workflow documentation to prevent defaulting all Phase 2 tasks to developer.
+
+**What Worked:**
+
+- **3-tier precedence rule** - Task-level Target Agent (from Planner) → Domain detection → developer fallback prevents misrouting
+- **"developer is LAST RESORT" emphasis** - Clear statement that developer should ONLY be used when no other agent matches
+- **Expanded agent table** - Added 5 common non-developer task types (documentation → technical-writer, cleanup → code-simplifier, database → database-architect, infrastructure → devops)
+- **Positioned after entry criteria, before agent table** - Natural flow: "What agents do we spawn?" → "How do we pick them?" → "Here's the table"
+- **Explicit "Target Agent" field in plan tasks** - Planner specifies agent assignment per task (from Task #135), Phase 2 honors it
+
+**Key Learnings:**
+
+1. **Planner guidance → Workflow enforcement coordination** - Task #135 added agent assignment guidance to Planner, Task #136 updated Workflow to honor those assignments. Two-way alignment required.
+
+2. **Default agent = 80% underutilization** - When Phase 2 defaults everything to `developer`, 40+ specialized agents (technical-writer, code-simplifier, database-architect, etc.) never get invoked despite being perfect for the task.
+
+3. **Task-level agent assignment is most accurate** - Planner sees the actual task content ("update README") and can specify `Target Agent: technical-writer`. Domain detection can't distinguish "update Python docs" from "implement Python feature" (both Python repos).
+
+4. **Documentation tasks are the most common misroute** - "Update API docs", "Write README", "Create user guide" all should go to technical-writer, not developer. Adding explicit row in agent table makes this obvious.
+
+5. **Cleanup/refactoring has a specialist** - `code-simplifier` exists specifically for cleanup work, but defaulting to developer means it never gets used.
+
+6. **Fallback condition must be explicit** - Updated from "If no domain signal detected" to "If no domain signal detected AND no task-level agent specified" to clarify the LAST RESORT nature.
+
+**Metrics:**
+
+- Precedence tiers added: 3 (task-level → domain → fallback)
+- Agent table rows added: 5 (Target Agent, Documentation, Cleanup, Database, Infrastructure)
+- New section: "Agent Selection Precedence" (4 bullet points + rule)
+- Files modified: 1 (enterprise-workflow.md Phase 2)
+
+**Future Application:**
+
+- Apply same 3-tier precedence pattern to other workflow phases (Phase 3 Review, Phase 5 Document)
+- Check if master-orchestrator needs similar agent selection guidance
+- Track Phase 2 agent distribution in spawn logs to verify non-developer agents being used
+- Consider adding "Target Agent" validation to routing-guard.cjs (warn if missing for HIGH+ complexity)
+
+**Evidence:**
+
+- Updated file: `.claude/workflows/core/enterprise-workflow.md` (Phase 2, lines 356-396)
+- Task #136 (technical-writer agent)
+- Follows: Task #135 (Planner agent assignment guidance)
+
+---
+
+## Docs Accuracy Review Patterns (Task #130, 2026-02-07)
+
+**Pattern:** Systematic doc accuracy verification after multi-pipeline cleanup using filesystem verification.
+
+**What Worked:**
+
+- **Spot-check with filesystem verification** - For each doc claim, verify against actual state with `find`, `wc -l`, `grep -c`
+- **Progressive disclosure priority** - P1 (most referenced) → P2 (support) → P3 (reference) prevents wasted effort on low-impact docs
+- **Module count estimation pitfall** - "~90 modules" claim was 52% off (actual: 191). ALWAYS count with find, never estimate.
+- **Catalog vs on-disk comparison** - Comparing catalog entries (24) vs on-disk files (229) revealed 89% discovery gap (separate from accuracy)
+- **Tool count confusion** - SkillCatalog listed as "tool" in CLAUDE.md but is actually Node.js library per @TOOL_REFERENCE.md
+
+**Key Learnings:**
+
+1. **Estimation decay after archival** - Original "233 → ~90 modules (61% reduction)" was accurate at archival time, but actual current count is 191 (18% reduction). Archival math was "233 - 80 archived = ~150 remaining, but also deleted some" → estimation error. ALWAYS re-count post-archival.
+
+2. **Module count definition matters** - 191 modules found includes ALL .cjs/.mjs/.js files in lib/, not just top-level entry points. Different counting methods yield different numbers.
+
+3. **Catalog completeness != wiring accuracy** - Skill catalog had 24 entries vs 229 on-disk (11% completeness) but 0 broken invocations. Discoverability gap, not correctness gap.
+
+4. **Last Updated dates signal staleness** - Docs with "Last Updated: 2026-01-31" needed review after 2026-02-07 cleanups (6 days stale after 5 massive pipelines).
+
+5. **Cross-reference validation** - @DIRECTORY_STRUCTURE.md claims "~90 modules" → verify with `find | wc -l` → 191 actual → update doc + learnings.md
+
+6. **Tool catalog split** - CLAUDE.md listed SkillCatalog as 24th tool, @TOOL_REFERENCE.md says 23 tools (SkillCatalog is library). Canonical source is @TOOL_REFERENCE.md (more detailed).
+
+**Reusable Verification Script Pattern:**
+
+```bash
+# Systematic doc accuracy check
+# 1. Count actual files
+find .claude/skills -name "SKILL.md" -not -path "*/_archive/*" | wc -l
+grep -c "^##" .claude/context/artifacts/catalogs/skill-catalog.md
+
+# 2. Compare doc claim vs actual
+# 3. If mismatch → update doc + record learning
+```
+
+**Metrics:**
+
+- **Docs reviewed:** 23 total
+- **Docs updated:** 4 (CLAUDE.md, @DIRECTORY_STRUCTURE.md, @SKILL_CATALOG_TABLE.md, @TOOL_REFERENCE.md)
+- **Inaccuracies found:** 5 (module count, skill count, tool count x2, module reduction %)
+- **Verification commands:** 10 (find, wc -l, grep -c, ls)
+- **Time:** ~30min systematic review vs hours of manual reading
+
+**Future Application:**
+
+- Add pre-commit hook to verify doc counts match actual counts (fail if >10% drift)
+- Automate "find | wc -l" for common doc claims (modules, skills, hooks, agents)
+- Update @DIRECTORY_STRUCTURE.md on every archival (blocking step)
+- Use verification script pattern for other large doc sets
+
+**Evidence:**
+
+- Commit: 33465ee1 (Task #130)
+- Files updated: 4 docs, 1 auto-generated (agent-registry.json)
+- Verification: spot-checked 7 different counts, all matched post-fix
+
+---
 
 ## Data Directory Path Issue (2026-02-07)
 
@@ -301,6 +409,53 @@ grep -c "^##" .claude/context/artifacts/catalogs/skill-catalog.md
 - 11x11 cross-reference matrix with subsystem health scores
 
 
+
+---
+
+## Planner Agent Routing Guidance (Task #135, 2026-02-07)
+
+**Pattern:** Add explicit agent assignment guidance to planner agent to prevent defaulting all tasks to `developer`.
+
+**What Worked:**
+
+- Clear "Task Agent Assignment (MANDATORY)" section with agent selection table
+- Concrete example showing correct vs wrong agent assignment
+- Direct statement: "If you always say developer, 80% of our 49 agents go unused"
+- Positioned after Responsibilities, before Workflow (natural flow)
+- Includes 15 common task types mapped to correct specialist agents
+
+**Key Learnings:**
+
+1. **Planner drives agent utilization** - When Planner creates tasks, it implicitly recommends which agent should execute. If Planner doesn't specify "Target Agent: technical-writer", Router defaults to developer.
+
+2. **Agent underutilization is a routing problem, not a capability problem** - Framework has 49 specialized agents, but if tasks don't specify target agents, Router picks developer by default (CLAUDE.md Section 3 Quick Routing).
+
+3. **Documentation tasks are the most common misroute** - "Update API docs" should go to technical-writer, not developer. Same for README updates, guide writing.
+
+4. **Task description format matters** - Including "Target Agent: `agent-type`" as a structured field makes Router's job easier (clear signal vs inferring from prose).
+
+5. **Anti-patterns teach better than rules** - Showing "WRONG: developer for docs work" is clearer than just listing correct mappings.
+
+6. **Agent selection table must match @AGENT_ROUTING_TABLE.md** - Planner's guidance should align with Router's routing table to prevent conflicts.
+
+**Metrics:**
+
+- Agent types in table: 15 (covers 80%+ of common tasks)
+- Section placement: Line 116 (after Responsibilities, before Workflow)
+- Pattern: MANDATORY section + table + example + anti-pattern + rule
+
+**Future Application:**
+
+- Add similar guidance to enterprise-workflow.md (Task #136 - BLOCKED by this task)
+- Check if other orchestrators (master-orchestrator) need agent selection guidance
+- Consider adding "Target Agent" validation to TaskCreate hook (warn if missing)
+- Track planner's agent recommendations in spawn logs to measure adoption
+
+**Evidence:**
+
+- Updated file: `.claude/agents/core/planner.md` (lines 116-165)
+- Task #135 (technical-writer agent)
+- Blocks: Task #136 (enterprise workflow update)
 
 ---
 

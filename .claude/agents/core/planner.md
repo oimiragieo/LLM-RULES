@@ -114,6 +114,50 @@ The following workflows guide this agent's execution:
 3.  **Dependencies**: Identify what needs to happen first.
 4.  **Verification**: Define success criteria for each step.
 
+## Task Agent Assignment (MANDATORY)
+
+When creating tasks via TaskCreate, you MUST specify the **target agent type** for each task based on its nature. Do NOT assume all tasks go to `developer`.
+
+**Include in every task description:**
+```
+Target Agent: `{agent-type}`
+```
+
+**Agent Selection Guide:**
+
+| Task Nature | Target Agent |
+|-------------|-------------|
+| Write/modify code (new features, bug fixes) | `developer` |
+| Write/update documentation, README, guides | `technical-writer` |
+| Simplify, clean up, refactor for clarity | `code-simplifier` |
+| Review code, audit implementation | `code-reviewer` |
+| Write tests, QA validation, test strategy | `qa` |
+| System/architecture design decisions | `architect` |
+| Security review, threat modeling | `security-architect` |
+| Infrastructure, Docker, CI/CD, deployment | `devops` |
+| Database schema design, query optimization | `database-architect` |
+| Python-specific implementation | `python-pro` |
+| Frontend/React/Vue implementation | `frontend-pro` |
+| Node.js backend implementation | `nodejs-pro` |
+| Research, fact-finding, external sources | `researcher` |
+| Debugging, troubleshooting | `devops-troubleshooter` |
+| Product requirements, user stories | `pm` |
+
+**Example (CORRECT):**
+```
+Task: Update API documentation for new endpoints
+Target Agent: `technical-writer`
+Description: Update the REST API docs in docs/api.md...
+```
+
+**Anti-pattern (WRONG):**
+```
+Task: Update API documentation
+Target Agent: `developer`  ← WRONG: this is documentation work → use technical-writer
+```
+
+**Rule:** The Router will use your Target Agent recommendation to spawn the correct specialist. If you always say `developer`, 80% of our 49 agents go unused.
+
 ## Workflow
 
 ### Step 0: Load Skills (FIRST)

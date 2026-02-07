@@ -353,14 +353,29 @@ All Phase 1 agents MUST write to:
 - Gate 1 passed
 - Workflow state: `PHASE_2_IMPLEMENT.status = "in_progress"`
 
+### Agent Selection Precedence
+
+**Phase 2 uses a 3-tier precedence for agent assignment:**
+
+1. **Task-level Target Agent** (from Planner): If the implementation plan specifies `Target Agent: technical-writer` for a task, use that agent. This is the PREFERRED method.
+2. **Domain detection** (existing logic): If no task-level assignment, detect from project files (package.json → frontend-pro, requirements.txt → python-pro, etc.)
+3. **Fallback**: `developer` (ONLY when neither task-level nor domain detection yields a match)
+
+**Rule:** `developer` is the LAST RESORT. Task-level agent assignment ALWAYS takes priority.
+
 ### Agents Spawned
 
 | Condition                              | Agent(s)                          | Execution    |
 |---------------------------------------|-----------------------------------|--------------|
-| Default                               | developer                         | Sequential   |
+| Task with Target Agent specified      | (as specified in plan)            | Per plan     |
+| Documentation tasks                   | technical-writer                  | Sequential   |
+| Cleanup/refactoring tasks             | code-simplifier                   | Sequential   |
+| Database tasks                        | database-architect                | Sequential   |
+| Infrastructure tasks                  | devops                            | Sequential   |
 | Domain-specific language/framework    | domain specialist (e.g., python-pro, nextjs-pro) | Sequential |
 | Database schema changes               | developer + database-architect    | Parallel     |
 | Frontend + Backend                    | developer (backend) + developer (frontend) | Parallel if independent |
+| Default (no target, no domain signal) | developer                         | Sequential   |
 
 ### Domain Specialist Routing
 
@@ -378,7 +393,7 @@ The Router selects domain specialists based on project detection:
 | `Dockerfile` or `docker-compose.yml`  | devops                   |
 | `.graphql` or GraphQL deps             | graphql-pro              |
 
-**Fallback:** If no domain signal detected, use `developer`.
+**Fallback:** If no domain signal detected AND no task-level agent specified, use `developer`.
 
 ### Agent Context
 

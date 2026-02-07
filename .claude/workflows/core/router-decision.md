@@ -134,7 +134,7 @@ TaskList();
 | **Infrastructure** | "Docker", "K8s", "AWS", "infrastructure", "CI/CD" | devops, container-expert, terraform-infra      |
 | **Security**       | "auth", "security", "encryption", "vulnerability" | security-architect, auth-security-expert       |
 | **Product**        | "feature", "requirements", "roadmap", "strategy"  | pm, planner                                    |
-| **Documentation**  | "docs", "README", "guide", "documentation"        | technical-writer, doc-generator                |
+| **Documentation**  | "docs", "README", "guide", "documentation", "update docs", "review docs", "doc accuracy", "fix documentation" | technical-writer, doc-generator                |
 | **Architecture**   | "design", "architecture", "C4", "system design"   | architect, c4-\* agents                        |
 
 ### 2.4 Risk Classification
@@ -495,6 +495,28 @@ User Request: <USER_REQUEST>
 | C4 architecture documentation  | C4 Architecture Workflow     | `.claude/workflows/enterprise/c4-architecture-workflow.md`     |
 | CDD project setup              | Conductor Setup Workflow     | `.claude/workflows/conductor-setup-workflow.md`                |
 | Production incidents           | Incident Response Workflow   | `.claude/workflows/operations/incident-response.md`            |
+
+### Step 6.5: Developer Override Check (MANDATORY)
+
+**If your Step 6 selection is `developer`, STOP and check these overrides:**
+
+| If the task involves... | Override to |
+|------------------------|-------------|
+| Documentation, README, guides, doc review | `technical-writer` |
+| Code cleanup, simplification, refactoring for clarity | `code-simplifier` |
+| Code review, PR review, implementation audit | `code-reviewer` |
+| Testing only (writing/running tests, no new features) | `qa` |
+| Infrastructure, Docker, CI/CD, deployment | `devops` |
+| Database schema, queries, migrations, optimization | `database-architect` |
+| Python-specific implementation | `python-pro` |
+| Frontend/React/Vue/CSS work | `frontend-pro` |
+| Node.js/Express/NestJS backend | `nodejs-pro` |
+| Research, fact-finding, external investigation | `researcher` |
+| Debugging production issues, incident triage | `devops-troubleshooter` |
+
+**Rule:** `developer` is the LAST RESORT for general coding tasks that don't match any specialist. If a specialist exists, USE IT.
+
+**Anti-pattern:** "developer can handle everything" — NO. Specialists produce better results because their prompts include domain-specific expertise, patterns, and tools.
 
 ## Step 7: Spawn Decision (Single vs Parallel vs Phased)
 

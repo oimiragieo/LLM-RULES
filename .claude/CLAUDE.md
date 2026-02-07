@@ -34,10 +34,22 @@
 1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file. A PreToolUse(TaskList) guard blocks TaskList by default when pending reflections exist (override: `REFLECTION_STEP0_ENFORCEMENT=warn`). Check dashboard for `pendingReflectionRequests`.
 2. **CHECK TASKS FIRST:** `TaskList()`
 3. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
-4. **Check:** scan `.claude/agents/` for best agent match
+4. **Match:** Look up classified intent against Section 3 Quick Routing table and @AGENT_ROUTING_TABLE.md. If a specialist agent matches (docs→technical-writer, refactor→code-simplifier, etc.), use THAT agent. Do NOT default to developer unless no specialist match exists.
    **Agent discovery:** Registry-first (`.claude/context/agent-registry.json`), filesystem fallback if missing; CI enforces freshness (see `GETTING_STARTED.md`).
 5. **Select:** pick agent(s) + **resolve model from config.yaml** (see Section 5)
 6. **SPAWN:** use **Task tool** with task ID(s) and **configured model**
+
+### Common Misrouting (AVOID — check EVERY spawn)
+
+| User Request Contains | WRONG | CORRECT |
+|----------------------|-------|---------|
+| "update docs/README" | developer | **technical-writer** |
+| "clean up/refactor/simplify" | developer | **code-simplifier** |
+| "review code/PR" | developer | **code-reviewer** |
+| "run/write tests" | developer | **qa** |
+| "set up Docker/CI/deploy" | developer | **devops** |
+| "design database/schema" | developer | **database-architect** |
+| "research/investigate" | developer | **researcher** |
 
 **CRITICAL**
 
@@ -304,7 +316,27 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 > **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for complete agent routing matrix.
 
-**Quick:** Bug fixes → developer | Security → security-architect | Multi-agent → master-orchestrator | Creators → @CREATOR_SKILLS_TABLE.md
+**Quick Routing (MANDATORY — consult before EVERY spawn):**
+
+| Task Type | Agent | NOT developer |
+|-----------|-------|---------------|
+| Bug fixes, coding, new features | `developer` | — |
+| Documentation, README, guides, doc updates | `technical-writer` | YES |
+| Code cleanup, refactoring, simplification | `code-simplifier` | YES |
+| Code review, PR review, audit | `code-reviewer` | YES |
+| Testing, QA, test strategy, coverage | `qa` | YES |
+| System design, architecture decisions | `architect` | YES |
+| Security review, auth, threat modeling | `security-architect` | YES |
+| Infrastructure, Docker, CI/CD, deploy | `devops` | YES |
+| Database schema, queries, migrations | `database-architect` | YES |
+| Planning, task breakdown | `planner` | YES |
+| Product requirements, user stories | `pm` | YES |
+| Python-specific work | `python-pro` | YES |
+| Frontend/React/Vue/CSS | `frontend-pro` | YES |
+| Node.js/Express/NestJS backend | `nodejs-pro` | YES |
+| Research, external fact-finding | `researcher` | YES |
+| Debugging, troubleshooting | `devops-troubleshooter` | YES |
+
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`
 
 ### Creator Skills
