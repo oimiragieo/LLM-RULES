@@ -12,7 +12,7 @@
 
 'use strict';
 
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -222,14 +222,19 @@ class HybridLazyIndexer {
     ];
 
     try {
-      const output = execSync(
-        `"${rgPath}" "${safeQuery}" ${args.join(' ')} "${this.projectRoot}"`,
-        {
-          encoding: 'utf8',
-          timeout: options.timeout || this.config.ripgrepTimeoutMs,
-          maxBuffer: 10 * 1024 * 1024, // 10MB
-        }
-      );
+      // SEC-LIB-001 FIX: Use spawnSync with array args to prevent command injection
+      const result = spawnSync(rgPath, [safeQuery, ...args, this.projectRoot], {
+        encoding: 'utf8',
+        timeout: options.timeout || this.config.ripgrepTimeoutMs,
+        maxBuffer: 10 * 1024 * 1024, // 10MB
+        shell: false, // CRITICAL: Disable shell to prevent injection
+      });
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      const output = result.stdout || '';
 
       const results = this.parseRipgrepOutput(output);
 
@@ -403,11 +408,18 @@ class HybridLazyIndexer {
     }
 
     try {
-      const output = execSync(`tree -d -L 3 --noreport "${this.projectRoot}"`, {
+      // SEC-LIB-001 FIX: Use spawnSync with array args to prevent command injection
+      const result = spawnSync('tree', ['-d', '-L', '3', '--noreport', this.projectRoot], {
         encoding: 'utf8',
         timeout: 3000,
+        shell: false, // CRITICAL: Disable shell to prevent injection
       });
-      return output;
+
+      if (result.error || result.status !== 0) {
+        return this.manualTree();
+      }
+
+      return result.stdout || '';
     } catch {
       return this.manualTree();
     }
@@ -419,10 +431,18 @@ class HybridLazyIndexer {
 
     try {
       const rgPath = await this.getRgPath();
-      const stdout = execSync(
-        `"${rgPath}" --files -g "!node_modules/**" -g "!.git/**" "${this.projectRoot}"`,
-        { encoding: 'utf8', timeout: 5000 }
+      // SEC-LIB-001 FIX: Use spawnSync with array args to prevent command injection
+      const result = spawnSync(
+        rgPath,
+        ['--files', '-g', '!node_modules/**', '-g', '!.git/**', this.projectRoot],
+        { encoding: 'utf8', timeout: 5000, shell: false }
       );
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      const stdout = result.stdout || '';
 
       stdout.split('\n').forEach(file => {
         if (!file.trim()) return;
@@ -460,10 +480,26 @@ class HybridLazyIndexer {
   async getEntryPoints() {
     try {
       const rgPath = await this.getRgPath();
-      const output = execSync(
-        `"${rgPath}" "^export\\s+(default\\s+)?(class|function|interface|type|const)" -g "*.js" -g "*.ts" -g "*.cjs" -g "*.mjs" -n "${this.projectRoot}"`,
-        { encoding: 'utf8', timeout: 3000 }
+      // SEC-LIB-001 FIX: Use spawnSync with array args to prevent command injection
+      const result = spawnSync(
+        rgPath,
+        [
+          '^export\\s+(default\\s+)?(class|function|interface|type|const)',
+          '-g', '*.js',
+          '-g', '*.ts',
+          '-g', '*.cjs',
+          '-g', '*.mjs',
+          '-n',
+          this.projectRoot
+        ],
+        { encoding: 'utf8', timeout: 3000, shell: false }
       );
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      const output = result.stdout || '';
 
       return output
         .split('\n')
@@ -483,10 +519,25 @@ class HybridLazyIndexer {
   async getDependencies() {
     try {
       const rgPath = await this.getRgPath();
-      const output = execSync(
-        `"${rgPath}" "^import .* from" -g "*.js" -g "*.ts" -g "*.cjs" -g "*.mjs" "${this.projectRoot}"`,
-        { encoding: 'utf8', timeout: 3000 }
+      // SEC-LIB-001 FIX: Use spawnSync with array args to prevent command injection
+      const result = spawnSync(
+        rgPath,
+        [
+          '^import .* from',
+          '-g', '*.js',
+          '-g', '*.ts',
+          '-g', '*.cjs',
+          '-g', '*.mjs',
+          this.projectRoot
+        ],
+        { encoding: 'utf8', timeout: 3000, shell: false }
       );
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      const output = result.stdout || '';
 
       const imports = {};
       output.split('\n').forEach(line => {
