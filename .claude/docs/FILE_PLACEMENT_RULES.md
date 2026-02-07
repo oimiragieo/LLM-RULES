@@ -204,7 +204,8 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 | `memory/named/`               | Named memory API storage       | `*.md`, `*.json`                            |
 | `metrics/`                    | Metrics and audit logs         | `*.jsonl`, `*.json`                         |
 | `config/`                     | Configuration files            | `*.json`, `*.yaml`                          |
-| `runtime/`                    | Temporary runtime state        | `*.json`                                    |
+| `runtime/`                    | Temporary runtime state        | `*.json`, `*.jsonl`                         |
+| `runtime/checkpoints/`        | Workflow checkpoints           | `*.json`                                    |
 | `data/`                       | Code index data files          | `*.db`, `*.sqlite`, `*.json`, `*.lance`     |
 | `code-index/`                 | Code indexing metadata         | `*.json`, `*.jsonl`                         |
 | `self-healing/`               | Anomaly detection and recovery | `*.json`, `*.jsonl`                         |

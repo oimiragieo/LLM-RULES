@@ -99,7 +99,7 @@ class TransactionalStateManager {
   constructor(checkpointManager = null, journalPath = null, options = {}) {
     this.checkpointManager = checkpointManager;
     this.journalPath =
-      journalPath || path.join(__dirname, '../../context/workflows/transactions.jsonl');
+      journalPath || path.join(__dirname, '../../context/runtime/transactions.jsonl');
     this.options = {
       timeout: options.timeout || DEFAULT_TIMEOUT,
       checkpointInterval: options.checkpointInterval || DEFAULT_CHECKPOINT_INTERVAL,
