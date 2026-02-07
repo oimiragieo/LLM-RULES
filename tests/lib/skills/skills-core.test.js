@@ -21,7 +21,7 @@ import {
   resolveSkillPath,
   stripFrontmatter,
   loadSkill,
-} from './skills-core.js';
+} from '../../../.claude/lib/skills/skills-core.js';
 
 describe('skills-core', () => {
   describe('extractFrontmatter', () => {

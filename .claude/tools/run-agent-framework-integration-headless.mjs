@@ -130,19 +130,18 @@ function testTools() {
     }
     logTest('Tools directory exists', true);
 
-    // Check critical tools
-    const criticalTools = [
-      'workflow_runner.js',
-      'workflow/decision-handler.mjs',
-      'workflow/loop-handler.mjs',
+    // Check critical tools (some moved from tools/ to lib/ in Phase C)
+    const criticalLibModules = [
+      { name: 'workflow-runner.js', path: resolve(rootDir, '.claude/lib/workflow/workflow-runner.js') },
+      { name: 'decision-handler.mjs', path: resolve(rootDir, '.claude/lib/workflow/decision-handler.mjs') },
+      { name: 'loop-handler.mjs', path: resolve(rootDir, '.claude/lib/workflow/loop-handler.mjs') },
     ];
 
-    for (const tool of criticalTools) {
-      const toolPath = resolve(toolsDir, tool);
-      if (existsSync(toolPath)) {
-        logTest(`Critical tool ${tool} exists`, true);
+    for (const mod of criticalLibModules) {
+      if (existsSync(mod.path)) {
+        logTest(`Critical module ${mod.name} exists`, true);
       } else {
-        logTest(`Critical tool ${tool} exists`, false);
+        logTest(`Critical module ${mod.name} exists`, false);
       }
     }
   } catch (error) {
@@ -257,7 +256,7 @@ function testWorkflowRunner() {
   console.log('\n[Workflow] Testing workflow runner functionality...');
 
   try {
-    const runnerPath = resolve(rootDir, '.claude/tools/workflow_runner.js');
+    const runnerPath = resolve(rootDir, '.claude/lib/workflow/workflow-runner.js');
     if (!existsSync(runnerPath)) {
       logTest('Workflow runner exists', false);
       return;
@@ -281,7 +280,7 @@ async function testDecisionHandler() {
   console.log('\n[Decision] Testing decision handler...');
 
   try {
-    const handlerPath = resolve(rootDir, '.claude/tools/workflow/decision-handler.mjs');
+    const handlerPath = resolve(rootDir, '.claude/lib/workflow/decision-handler.mjs');
     if (!existsSync(handlerPath)) {
       logTest('Decision handler exists', false);
       return;
@@ -305,7 +304,7 @@ async function testLoopHandler() {
   console.log('\n[Loop] Testing loop handler...');
 
   try {
-    const handlerPath = resolve(rootDir, '.claude/tools/workflow/loop-handler.mjs');
+    const handlerPath = resolve(rootDir, '.claude/lib/workflow/loop-handler.mjs');
     if (!existsSync(handlerPath)) {
       logTest('Loop handler exists', false);
       return;

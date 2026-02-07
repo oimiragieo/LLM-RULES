@@ -5,7 +5,7 @@
  * Executes workflows defined in .claude/workflows/
  *
  * Usage:
- *   node .claude/tools/workflow_runner.js <workflow-name> [options]
+ *   node .claude/lib/workflow/workflow-runner.js <workflow-name> [options]
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -15,13 +15,13 @@ import { load } from 'js-yaml';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const rootDir = resolve(__dirname, '../..');
+const rootDir = resolve(__dirname, '../../..');
 
 const args = process.argv.slice(2);
 const workflowName = args[0];
 
 if (!workflowName) {
-  console.error('Usage: node .claude/tools/workflow_runner.js <workflow-name> [options]');
+  console.error('Usage: node .claude/lib/workflow/workflow-runner.js <workflow-name> [options]');
   process.exit(1);
 }
 
