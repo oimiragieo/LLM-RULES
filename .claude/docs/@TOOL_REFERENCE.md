@@ -8,7 +8,7 @@
 
 ## PURPOSE
 
-Comprehensive catalog of all available tools in the agent-studio framework, including core tools (22 total), MCP tools, tool categories, agent tool mappings, and validation enforcement.
+Comprehensive catalog of all available tools in the agent-studio framework, including core tools (23 total), MCP tools, tool categories, agent tool mappings, and validation enforcement.
 
 ---
 

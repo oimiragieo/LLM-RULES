@@ -2,13 +2,13 @@
 
 **Source:** CLAUDE.md Section 8.5
 **Version:** v2.2.1
-**Last Updated:** 2026-01-31
+**Last Updated:** 2026-02-07
 
 ---
 
 ## PURPOSE
 
-Complete catalog of 30+ workflow enhancement skills available via `Skill()` tool for improving agent workflows, testing, research, and development processes.
+Complete catalog of 89 active skills (87 maintained + 1 deprecated alias + 1 scientific parent) available via `Skill()` tool for improving agent workflows, testing, research, and development processes. 214 dead skills archived to `.claude/skills/_archive/dead/` (Pipeline #16B, 2026-02-07).
 
 ---
 

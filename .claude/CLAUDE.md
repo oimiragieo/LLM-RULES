@@ -253,9 +253,9 @@ Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesi
 
 > **REFERENCE:** See **@TOOL_REFERENCE.md** for comprehensive tool catalog.
 
-24 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, SkillCatalog, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit, MemoryRecord).
+23 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit, MemoryRecord).
 
-**Note:** The `Task*` family of tools (Task, TaskList, TaskCreate, TaskUpdate, TaskGet, TaskOutput, TaskStop) are **host-provided** infrastructure tools, not implemented as scripts in the repository.
+**Note:** The `Task*` family of tools (Task, TaskList, TaskCreate, TaskUpdate, TaskGet, TaskOutput, TaskStop) are **host-provided** infrastructure tools, not implemented as scripts in the repository. SkillCatalog is a Node.js library (not a host-provided tool).
 
 **Framework Tools:** The `.claude/tools/` directory contains 66 active CLI-executable utilities across 13 categories (CLI validators, analysis, integrations, maintenance, optimization, runtime, visualization, workflow, gates, context). 25 deprecated tools archived to `_archive/`. 8 library modules relocated to `.claude/lib/` (2026-02-07 overhaul). See `.claude/context/artifacts/catalogs/tool-catalog.md` for complete inventory with wiring status.
 

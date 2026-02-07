@@ -1,8 +1,8 @@
 # Directory Structure Reference
 
 **Source:** CLAUDE.md Section 9
-**Version:** v2.4.0
-**Last Updated:** 2026-02-06
+**Version:** v2.4.1
+**Last Updated:** 2026-02-07
 
 ---
 
@@ -149,7 +149,7 @@ hooks/
 
 ### lib/
 
-**Total Active Modules:** ~90 modules (~32,000 LOC) across 12 active subdirectories
+**Total Active Modules:** 191 modules (~32,000 LOC est.) across 21 active subdirectories
 **Archived Modules:** ~80 modules (~12,600 LOC) in 10 archived subsystems (2026-02-07)
 
 ```
@@ -223,11 +223,12 @@ lib/
     └── workflow-runner.js (relocated from tools/workflow/)
 ```
 
-**Archival Notes (ADR-098):**
-- 10 entire subsystems archived to `_archive/` (2026-02-07, Pipeline #15)
+**Archival Notes (ADR-098, Pipeline #15):**
+- 10 entire subsystems archived to `_archive/` (2026-02-07)
 - All archived code preserved in git history via `git mv` (not delete)
 - Each archive has README.md with original purpose, archival reason, and ADR reference
-- Total reduction: 52% LOC, 61% modules (from 233 → ~90 modules)
+- Module count before archival: 233 → Current active: 191 (18% reduction post-archival)
+- LOC reduction: 66,676 → ~32,000 (52% LOC reduction)
 
 ### rules/
 
@@ -346,7 +347,7 @@ templates/
 
 JSON Schema definitions for framework artifact validation:
 
-**Total Active Schemas:** 27 (25 archived in `_archive/`)
+**Total Active Schemas:** 27 (25 archived in `_archive/` as of 2026-02-07)
 **Actively Validated (Ajv):** 8 schemas with runtime validation
 **Documentation Reference:** 16 schemas as structural templates
 **Optional Validation:** 3 schemas with paths defined but validation skipped
