@@ -448,6 +448,13 @@ function generateManifest(options = {}) {
     };
   }
 
+  // Count total agents from agent-registry.json
+  let totalAgents = Object.keys(agentDefaults).length; // fallback
+  if (fs.existsSync(AGENT_REGISTRY_PATH)) {
+    const registry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+    totalAgents = Object.keys(registry.agents || {}).length;
+  }
+
   const manifest = {
     version: '1.0.0',
     generatedAt: new Date().toISOString(),
@@ -455,7 +462,7 @@ function generateManifest(options = {}) {
       totalTools: CORE_TOOLS.length + MCP_TOOLS.length,
       totalCoreTools: CORE_TOOLS.length,
       totalMcpTools: MCP_TOOLS.length,
-      totalAgents: Object.keys(agentDefaults).length,
+      totalAgents: totalAgents,
       lastValidated: new Date().toISOString(),
       source: '.claude/CLAUDE.md sections 1.1-1.4',
     },

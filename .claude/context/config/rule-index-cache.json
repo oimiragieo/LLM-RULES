@@ -1,42 +1,52 @@
 {
   ".claude/rules/agents.md": {
-    "mtime": "1770183649564.533",
-    "hash": "f1a43147c1b5a298",
-    "indexed_at": "2026-02-05T20:53:13.611Z"
+    "mtime": "1770483050526.9539",
+    "hash": "16b10970d91d69be",
+    "indexed_at": "2026-02-07T17:27:08.627Z"
   },
-  ".claude/rules/coding-style.md": {
-    "mtime": "1770183649571.6418",
-    "hash": "d49c542e067eb1e6",
-    "indexed_at": "2026-02-05T20:53:13.619Z"
+  ".claude/rules/code-standards.md": {
+    "mtime": "1770483033590.4177",
+    "hash": "50bacef61cffe71f",
+    "indexed_at": "2026-02-07T17:27:08.628Z"
   },
   ".claude/rules/git-workflow.md": {
-    "mtime": "1770183649577.317",
-    "hash": "c234b4f0f236cdac",
-    "indexed_at": "2026-02-05T20:53:13.626Z"
+    "mtime": "1770483072385.5688",
+    "hash": "9816ac006c557f17",
+    "indexed_at": "2026-02-07T17:27:08.628Z"
   },
   ".claude/rules/hooks.md": {
-    "mtime": "1770183649582.3745",
-    "hash": "bab4c851e2833a3a",
-    "indexed_at": "2026-02-05T20:53:13.632Z"
+    "mtime": "1770483083528.7942",
+    "hash": "8c0b2cd97bb492c4",
+    "indexed_at": "2026-02-07T17:27:08.628Z"
   },
-  ".claude/rules/patterns.md": {
-    "mtime": "1770183649589.1958",
-    "hash": "8537cac944fda4b0",
-    "indexed_at": "2026-02-05T20:53:13.638Z"
+  ".claude/rules/memory-protocol.md": {
+    "mtime": "1770482808438.6455",
+    "hash": "675002e55c971ad5",
+    "indexed_at": "2026-02-07T17:27:08.629Z"
   },
   ".claude/rules/performance.md": {
-    "mtime": "1770183649594.7302",
-    "hash": "b524b4308bc5d016",
-    "indexed_at": "2026-02-05T20:53:13.644Z"
+    "mtime": "1770483105450.7349",
+    "hash": "ff553ba0cbd794c7",
+    "indexed_at": "2026-02-07T17:27:08.629Z"
   },
   ".claude/rules/security.md": {
-    "mtime": "1770183649603.443",
-    "hash": "19e63bb2f56f37cc",
-    "indexed_at": "2026-02-05T20:53:13.650Z"
+    "mtime": "1770483061779.529",
+    "hash": "2c59ecdf61c2088c",
+    "indexed_at": "2026-02-07T17:27:08.629Z"
+  },
+  ".claude/rules/task-tracking.md": {
+    "mtime": "1770482816258.7605",
+    "hash": "5cd5a7535423eff5",
+    "indexed_at": "2026-02-07T17:27:08.629Z"
   },
   ".claude/rules/testing.md": {
-    "mtime": "1770183649609.0413",
-    "hash": "2d2738b2402da0b9",
-    "indexed_at": "2026-02-05T20:53:13.657Z"
+    "mtime": "1770483094173.9126",
+    "hash": "1d669bfcb01004a5",
+    "indexed_at": "2026-02-07T17:27:08.630Z"
+  },
+  ".claude/rules/workspace-conventions.md": {
+    "mtime": "1770430624577.768",
+    "hash": "5eaa6049b47975a7",
+    "indexed_at": "2026-02-07T17:27:08.630Z"
   }
 }

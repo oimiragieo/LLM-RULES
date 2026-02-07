@@ -1,3 +1,38 @@
+## 2026-02-07: Config System Security Review (Pipeline #10 - COMPLETE)
+
+**Context:** Security review of configuration system for Pipeline #10 (17 config files, ~2,500 lines).
+
+**Key Learnings:**
+
+1. **Environment variable security override pattern is acceptable with secure defaults.** User can disable all enforcement hooks via `.env` modification (`CREATOR_GUARD=off`, `SECURITY_REVIEW_ENFORCEMENT=off`, etc.), but this is an intentional design trade-off for debugging flexibility. **Mitigation:** All defaults are secure (`block` mode), .env is gitignored, and comprehensive documentation warns users. **Pattern:** Accept security overrides when: (1) defaults are secure, (2) file is gitignored, (3) risks are documented.
+
+2. **Config files need the same path validation as code execution.** Config loading hooks (user-prompt-unified.cjs, spawn-prompt-assembler.cjs) read YAML/JSON from paths specified in environment variables without validating paths are within PROJECT_ROOT. **Pattern:** ANY file read from user-controlled path MUST use `validatePathWithinProject()` to prevent arbitrary file reads.
+
+3. **settings.json hook registration creates arbitrary code execution vector.** Any modification to settings.json can execute arbitrary Node.js scripts without path validation. **Pattern:** Hook executors should validate all command paths against whitelist of allowed directories (`.claude/hooks/`, `.claude/lib/`). Applies to ANY plugin/hook registration system.
+
+4. **Hardcoded absolute paths in config leak reconnaissance data.** `.env` contains `PROJECT_ROOT=C:\dev\projects\agent-studio` which reveals exact drive, directory structure, and path patterns. If accidentally committed, aids attacker reconnaissance. **Pattern:** Use relative paths or placeholders in config templates. Runtime detection is safer than hardcoded absolutes.
+
+5. **Config system security score (92/100) exceeds tools (88/100) but trails scripts (95/100).** Config security is strong due to: (1) zero hardcoded secrets, (2) environment variable-based credentials, (3) .gitignore protection, (4) secure defaults, (5) comprehensive documentation. Primary gap: lack of integrity checks on settings.json (no hash/signature validation).
+
+6. **.env.example as comprehensive security documentation is a best practice.** 1,112 lines with 24 numbered sections, each variable documented with purpose/default/risks. Security-relevant variables marked "CRITICAL". This documentation prevents misconfiguration through ignorance and serves as inline security training.
+
+**Findings:**
+- **MEDIUM-001:** Environment variable override risk (user can disable all security enforcement)
+- **LOW-001:** Missing config path validation (arbitrary file read via environment variables)
+- **LOW-002:** Hardcoded Windows paths leak project structure
+- **LOW-003:** settings.json arbitrary hook execution (no path whitelist)
+
+**Verdict:** ✅ APPROVED (92/100, 0 CRITICAL, 0 HIGH, 1 MEDIUM, 3 LOW)
+
+**Evidence:**
+- Security report: `.claude/context/reports/security/config-system-security-review-2026-02-07.md`
+- Analyzed: 17 config files (~2,500 lines)
+- Zero hardcoded secrets found
+- .env properly gitignored
+- All enforcement defaults secure (`block` mode)
+
+---
+
 ## 2026-02-07: Rules System Overhaul Implementation (Pipeline #9 - Complete)
 
 **Context:** Rules system overhaul (Pipeline #9, Task #105): create critical rules, merge, expand all, fix path conflicts, update registries.
@@ -679,5 +714,75 @@
 - Security report: `.claude/context/reports/security/scripts-system-security-review-2026-02-07.md`
 - Analyzed: 31 script files, ~2,800 LOC
 - Verdict: APPROVED (Security Score: 95/100)
+
+---
+
+## Config System Overhaul (Pipeline #10 - 2026-02-07)
+
+### P1 Bug: Config Source Contradictions (Task #107)
+
+**Issue:** The system has dual model resolution paths that contradicted each other:
+- **Primary:** `agent-config-reader.cjs` → config.yaml → frontmatter → COMPLEXITY_DEFAULTS → "sonnet"
+- **Secondary:** `phase-config.cjs` → phase-models.json → defaults
+
+When these disagreed (config.yaml says planner=opus, phase-models.json says planning=sonnet), the wrong model got selected depending on which path was invoked.
+
+**Fix:** Updated phase-models.json to align with config.yaml:
+- `planning` phase: sonnet → opus
+- `qa` phase: sonnet → opus
+
+**Pattern:** Always verify config sources agree. Grep for all references to a setting when updating one source.
+
+### Cache Regeneration After System Overhauls (Task #108)
+
+**Issue:** Config files with aggregate metadata (`totalAgents: 16` in tool-manifest.json) go stale when aggregated sources change (49 agents now exist). Rule caches (rule-index-cache.json) go stale when files are renamed/merged (still had coding-style.md, patterns.md from Pipeline #9).
+
+**Pattern:** After any system overhaul that renames/merges files or changes counts, regenerate all caches:
+1. tool-manifest.json: `pnpm manifest:generate`
+2. rule-index-cache.json: regenerate script or manual update
+3. agent-registry.json: `pnpm gen:agent-registry`
+
+**Fix Applied:**
+1. Updated generate-tool-manifest.cjs to read totalAgents from agent-registry.json (not just agentDefaults count)
+2. Manually regenerated rule-index-cache.json to remove stale entries and add current files
+
+### Config Authority Hierarchy (confirmed)
+
+`.env` > `config.yaml` > `agent-config.json` > `phase-models.json` > `COMPLEXITY_DEFAULTS` > `"sonnet"` fallback
+
+Key function: `resolveAgentModel()` in `agent-config-reader.cjs`
+
+## Pipeline #10: Config System Deep Dive (2026-02-07)
+
+### Key Findings
+
+1. **Dead Config Detection Pattern:**
+   To find dead configs, grep for the filename (not just file path) across all `.cjs`, `.mjs`, `.js`, and `.md` files. Zero matches = dead config. But also check for **phantom references**: a config file's own header may claim consumers that are archived or that hardcode the data instead of reading the file. Example: `command-allowlist.yaml` has a header claiming `command-allowlist-validator.cjs` reads it, but that validator was archived in Pipeline #7 and `command-allowlist.cjs` (the library) hardcodes the data in JavaScript.
+
+2. **Dual Model Resolution Paths:**
+   The system has two model resolution paths that can contradict each other:
+   - **Primary:** `agent-config-reader.cjs` resolves by agent type (config.yaml -> frontmatter -> COMPLEXITY_DEFAULTS -> "sonnet")
+   - **Secondary:** `phase-config.cjs` resolves by workflow phase (phase-models.json -> defaults)
+   When these disagree (e.g., config.yaml says planner=opus but phase-models.json says planning=sonnet), the wrong model gets selected depending on which path is invoked. Keep these in sync.
+
+3. **Config File Inventory (20 files, 4 locations):**
+   - `.claude/config/` -- 13 files (runtime config, read by `require()` and `readFileSync()`)
+   - `.claude/context/config/` -- 4 files (derived/contextual config, read by generators and agent Read tool)
+   - `.claude/config.yaml` -- unified source of truth (read by 11+ consumers)
+   - `.env` / `.env.example` -- 115+ environment variables (highest precedence)
+
+4. **Config Authority Hierarchy:**
+   `.env` > `config.yaml` > `agent-config.json` > `phase-models.json` > `COMPLEXITY_DEFAULTS` > `"sonnet"` fallback. The key function is `resolveAgentModel()` in `agent-config-reader.cjs`.
+
+5. **Stale Metadata Pattern:**
+   Config files with aggregate metadata (like `totalAgents: 16` in `tool-manifest.json`) go stale when the aggregated source changes (49 agents now exist). These need regeneration scripts, and ideally a CI check that validates counts match reality.
+
+6. **Cache Staleness After Rule Merges:**
+   `rule-index-cache.json` had an entry for `coding-style.md` which was merged into `code-standards.md` in Pipeline #9. Caches that use file paths as keys become stale when files are renamed or merged. Regeneration after such operations is essential.
+
+**Evidence:**
+- Architecture plan: `.claude/context/plans/config-overhaul-architecture-2026-02-07.md`
+- Audited: 20 config files, 17+ consumer modules
+- Decision: ADR-092 (Config System Overhaul)
 
 ---

@@ -799,3 +799,49 @@ Overhaul template-creator SKILL.md to match the common creator pattern:
 **Architecture Plan:** `.claude/context/plans/template-creator-overhaul-architecture-2026-02-07.md`
 
 ---
+
+### ADR-092: Config System Overhaul -- Dead Config Cleanup + Stale Value Fixes
+
+**Date:** 2026-02-07
+**Status:** Accepted (Implementation Complete: 2026-02-07)
+**Pipeline:** Enterprise Pipeline #10 (Config System Deep Dive)
+
+**Context:**
+Comprehensive audit of all configuration files across `.claude/config/` (13 files), `.claude/context/config/` (4 files), `.claude/config.yaml`, and `.env.example`. Found 4 dead configs with zero consumers, 3 configs with stale values, and 1 duplicate data source.
+
+**Decision:**
+
+1. Archive 4 dead configs to `.claude/config/_archive/` via `git mv`:
+   - `command-allowlist.yaml` (validator archived, library hardcodes data)
+   - `contexts/claude-code.yml` (zero consumers)
+   - `modes/editing.yml` (zero consumers)
+   - `modes/planning.yml` (zero consumers)
+2. Fix `phase-models.json`: change `planning` model from `"sonnet"` to `"opus"`, `qa` model from `"sonnet"` to `"opus"` (align with config.yaml)
+3. Regenerate `tool-manifest.json` via `node .claude/tools/cli/generate-tool-manifest.cjs` (fixes stale agent count 16 -> 49)
+4. Regenerate `rule-index-cache.json` via `pnpm generate-rule-index` (removes stale `coding-style.md` entry)
+
+**Rationale:**
+- Dead configs create false expectations (command-allowlist.yaml header claims a validator reads it)
+- Stale phase-models.json causes enterprise workflow to select sonnet instead of opus for planning/QA phases
+- Stale tool-manifest metadata is misleading (reports 16 agents when 49 exist)
+- Archive via `git mv` preserves history (proven pattern from Pipelines #3, #6, #7)
+
+**Consequences:**
+- Config directory goes from 13 to 9 active files (+ 4 archived)
+- Phase-based model resolution becomes consistent with agent-type-based resolution
+- Tool manifest accurately reflects current agent count
+- Rule index cache reflects Pipeline #9 rule merges
+
+**Alternatives Considered:**
+1. Delete dead configs outright: Rejected because `git mv` to archive preserves history and is safer
+2. Leave stale values with documentation notes: Rejected because stale phase-models.json actively causes wrong model selection
+3. Merge phase-models.json into config.yaml: Rejected because phase-config.cjs is a distinct resolution path for enterprise workflows
+
+**Architecture Plan:** `.claude/context/plans/config-overhaul-architecture-2026-02-07.md`
+
+**Implementation:**
+- Task #107: Fixed phase-models.json P1 model contradiction (planning/qa: sonnet → opus), archived 4 dead configs
+- Task #108: Regenerated tool-manifest.json (totalAgents: 16 → 49, updated generator to read agent-registry), regenerated rule-index-cache.json (removed coding-style.md, patterns.md entries, added current files)
+- Commits: 75f3417f (Task #108)
+
+---
