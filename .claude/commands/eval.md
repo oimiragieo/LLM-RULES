@@ -1,19 +1,6 @@
 ---
 description: Run eval harness for regression checks
+disable-model-invocation: true
 ---
 
-# Eval Command
-
-Run the eval harness for regression checks.
-
-## Steps
-
-1. Select the eval suite
-2. Run the evals
-3. Summarize pass/fail and any regressions
-
-## Output
-
-- Eval results summary
-- Regression notes
-- Suggested fixes
+Invoke the qa-workflow skill and follow it exactly as presented to you. Focus on running the eval/regression test suite and summarizing pass/fail results.

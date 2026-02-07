@@ -272,6 +272,17 @@ schemas/
 └── skill-repo-rag-output.schema.json
 ```
 
+### commands/
+
+User-facing slash commands (thin delegators to skills):
+
+| Path | Purpose |
+|------|---------|
+| `.claude/commands/` | User-facing slash commands (thin delegators to skills) |
+| `.claude/commands/*.md` | Individual command definitions |
+
+See `.claude/context/artifacts/catalogs/command-catalog.md` for the full catalog.
+
 **Track Metadata Schema** (SPEC-007):
 
 - **Path**: `.claude/schemas/track-metadata.schema.json`
@@ -307,7 +318,6 @@ schemas/
 
 | Old Path                  | Status                                           | Date       |
 | ------------------------- | ------------------------------------------------ | ---------- |
-| `.claude/commands/`       | Deleted (was empty)                              | 2026-01-28 |
 | `.claude/temp/`           | Deleted (was empty)                              | 2026-01-28 |
 | `.claude/tests/`          | Moved to root `tests/` directory                 | 2026-01-28 |
 | `.claude/scripts/`        | Consolidated into `.claude/lib/workflow/`        | 2026-01-28 |

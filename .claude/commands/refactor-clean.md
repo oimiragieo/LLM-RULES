@@ -1,20 +1,6 @@
 ---
-description: Safe refactoring and cleanup
+description: Safe refactoring and dead code cleanup
+disable-model-invocation: true
 ---
 
-# Refactor Clean Command
-
-Perform a safe refactor with verification.
-
-## Steps
-
-1. Identify refactor scope
-2. Make small, verifiable changes
-3. Keep tests passing
-4. Remove dead code and unused imports
-
-## Output
-
-- Summary of changes
-- Tests run
-- Any follow-ups
+Invoke the code-quality-expert skill and follow it exactly as presented to you. Focus on safe refactoring, removing dead code, and cleaning up unused imports while keeping tests green.

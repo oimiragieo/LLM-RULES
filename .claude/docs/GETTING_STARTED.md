@@ -167,14 +167,18 @@ The skill catalog contains **426 skills** organized into 20+ categories. Browse 
 
 ## Slash Commands (Quick Actions)
 
-Agent Studio ships with command shortcuts under `.claude/commands/` for common workflows:
+Agent Studio ships with command shortcuts under `.claude/commands/` for common workflows.
+All behavioral commands delegate to skills -- the command is a thin shim, the skill is the source of truth.
 
-- **/verify**, **/checkpoint**, **/learn**, **/orchestrate**
-- **/tdd**, **/code-review**, **/test-coverage**, **/eval**
-- **/build-fix**, **/refactor-clean**, **/e2e**, **/setup-pm**
-- **/add-todo**, **/check-todos**
+**Planning:** `/brainstorm`, `/write-plan`, `/execute-plan`
+**Development:** `/tdd`, `/debug`, `/build-fix`
+**Quality:** `/code-review`, `/verify`, `/test-coverage`, `/e2e`, `/eval`, `/refactor-clean`
+**Security:** `/security-review`
+**Context:** `/compress`, `/learn`
+**Analysis:** `/analyze`
+**Setup:** `/setup-pm`
 
-These commands are documentation-driven prompts that guide the Router and agents through consistent workflows.
+See the [Command Catalog](.claude/context/artifacts/catalogs/command-catalog.md) for full details.
 
 ## Memory: Nothing Gets Forgotten
 

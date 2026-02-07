@@ -1,20 +1,6 @@
 ---
-description: Diagnose and fix build failures
+description: Diagnose and fix build failures using systematic debugging
+disable-model-invocation: true
 ---
 
-# Build Fix Command
-
-Diagnose and fix build failures.
-
-## Steps
-
-1. Run the build command
-2. Capture and summarize errors
-3. Apply targeted fixes
-4. Re-run build to confirm
-
-## Output
-
-- Root cause summary
-- Fixes applied
-- Build status
+Invoke the debugging skill and follow it exactly as presented to you. The specific problem is a build failure -- start by running the build command to reproduce the error, then follow the 4-phase debugging process.

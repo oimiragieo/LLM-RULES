@@ -1,20 +1,6 @@
 ---
-description: Analyze test coverage and gaps
+description: Analyze test coverage and identify gaps
+disable-model-invocation: true
 ---
 
-# Test Coverage Command
-
-Analyze test coverage and identify gaps.
-
-## Steps
-
-1. Run coverage tooling for this project
-2. Summarize coverage by package/module
-3. Identify low-coverage areas
-4. Suggest tests to add
-
-## Output
-
-- Coverage summary
-- Gaps and priorities
-- Suggested tests
+Invoke the tdd skill and follow it exactly as presented to you. Focus specifically on analyzing test coverage, identifying low-coverage areas, and suggesting tests to add.

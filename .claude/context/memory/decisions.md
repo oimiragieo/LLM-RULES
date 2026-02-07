@@ -14,6 +14,45 @@ Each decision should include:
 
 ---
 
+## ADR-087: Commands System Overhaul -- Thin Delegator Pattern + Command Catalog
+
+**Date:** 2026-02-07
+
+**Status:** Accepted
+
+**Context:**
+
+17 command files exist in `.claude/commands/`. Only 3 properly delegate to skills (brainstorm, write-plan, execute-plan). 7 are thin stubs duplicating skill content. 4 reference dead infrastructure (`.claude/todos/`, `.claude/checkpoints.log`). 1 duplicates Router functionality. Documentation in `@DIRECTORY_STRUCTURE.md` falsely claims the directory was "Deleted (was empty)" on 2026-01-28. `CLAUDE.md` has zero references to commands.
+
+**Decision:**
+
+1. **Canonical pattern is thin delegator:** All commands that have a corresponding skill use the 3-line delegator pattern (`disable-model-invocation: true` + `Invoke the {skill} skill`).
+2. **Delete 4 dead commands:** `/checkpoint` (dead infra), `/orchestrate` (redundant with Router), `/add-todo` (dead infra), `/check-todos` (dead infra).
+3. **Convert 8 thin stubs** to proper skill delegators (build-fix, code-review, e2e, eval, refactor-clean, tdd, test-coverage, verify).
+4. **Enrich `/learn`** to use memory protocol instead of dead `skills/learned/` directory.
+5. **Add 4 new commands:** `/debug` (debugging), `/security-review` (security-architect), `/compress` (context-compressor), `/analyze` (project-analyzer).
+6. **Create command catalog** at `.claude/context/artifacts/catalogs/command-catalog.md`.
+7. **Fix documentation** in `@DIRECTORY_STRUCTURE.md`, `CLAUDE.md`, `router.md`, `capability-routing.json`, `GETTING_STARTED.md`.
+8. **Commands remain NOT creator-guarded** (by design, per security review).
+
+**Rationale:**
+
+- Thin delegators make skills the single source of truth for behavior
+- Dead infrastructure references confuse agents and waste context
+- New commands surface existing high-value skills that users cannot easily discover
+- Command catalog provides discoverability parallel to skill-catalog and template-catalog
+
+**Consequences:**
+
+- 17 commands become 17 (delete 4, add 4) with 100% functional
+- All behavioral commands delegate to skills (single source of truth)
+- Documentation accurately reflects reality
+- Users can discover commands through the catalog
+
+**Architecture Plan:** `.claude/context/plans/commands-overhaul-architecture-2026-02-07.md`
+
+---
+
 ## ADR-085: Template System Overhaul -- Advisory Resolver + Dead Template Cleanup
 
 **Date:** 2026-02-07

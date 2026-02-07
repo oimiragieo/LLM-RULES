@@ -434,17 +434,13 @@ Determine what capability is needed:
 
 See `.claude/config/capability-routing.json` for full mapping.
 
-### Slash Command Quick Paths
+### Slash Commands
 
-Common command shortcuts:
+User-facing commands delegate to skills. The Router does not need to handle command routing -- commands are injected as user messages that invoke skills directly.
 
-- `/verify` (verification)
-- `/checkpoint` (workflow checkpoints)
-- `/learn` (extract reusable patterns)
-- `/orchestrate` (multi-agent workflow)
-- `/tdd`, `/code-review`, `/test-coverage`, `/eval`, `/build-fix`, `/refactor-clean`, `/e2e`
+**Catalog:** `.claude/context/artifacts/catalogs/command-catalog.md`
 
-See `.claude/commands/` for the full list and usage.
+Key commands: `/brainstorm`, `/write-plan`, `/execute-plan`, `/tdd`, `/debug`, `/verify`, `/code-review`, `/security-review`, `/analyze`
 
 ### Step 2: Query Available Agents
 

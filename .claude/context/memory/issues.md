@@ -14,6 +14,109 @@ Each issue should include:
 
 ---
 
+## 2026-02-07: Template-Creator Skill Security Findings (Task #76)
+
+**Date:** 2026-02-07
+
+**Issue:**
+
+Security review of the template-creator skill overhaul identified 2 HIGH and 3 MEDIUM severity findings.
+
+**Key Findings:**
+
+1. **SEC-TC-001 [HIGH]**: Spawn template prompt injection via placeholder content. The template-creator teaches agents to create spawn templates with `{{PLACEHOLDER}}` tokens inside `Task()` prompt fields. These tokens are substituted with user-derived content WITHOUT sanitization at the Router level (SEC-TMPL-004 fix only covers `prompt-factory.cjs`, not Router-level substitution).
+
+2. **SEC-TC-002 [HIGH]**: Creator-guard hook regex for templates only covers `agents|skills|workflows|hooks|code|schemas` subdirectories. Does NOT cover `spawn/`, `reports/`, `code-styles/`, or root-level templates. This means the most security-critical templates (spawn templates) are UNPROTECTED by the creator guard.
+
+3. **SEC-TC-003 [MEDIUM]**: No template name path traversal prevention. Template names from user requests could contain `../` sequences to write files outside `.claude/templates/`.
+
+4. **SEC-TC-004 [MEDIUM]**: Template registry JSON injection. No guidance to use `JSON.stringify()` for registry entries; manual construction could introduce malformed JSON.
+
+5. **SEC-TC-005 [MEDIUM]**: Creator state file at `.claude/context/runtime/active-creators.json` has no integrity protection. Any agent with Write access to runtime directory can bypass creator guard.
+
+**Impact:**
+
+- SEC-TC-002 is the most operationally significant: spawn templates can be written directly without triggering the creator guard
+- SEC-TC-001 is the most architecturally significant: creates an injection pathway from user input to agent instructions
+
+**Workaround:**
+
+SEC-TC-002: Manually verify spawn template changes via git diff before committing.
+
+**Resolution:**
+
+Findings documented in `.claude/context/reports/security/template-creator-security-review-2026-02-07.md`. Verdict: APPROVED WITH CONDITIONS. SEC-TC-002 is MUST-FIX before deployment.
+
+---
+
+## 2026-02-07: Template System Security Findings (Task #63)
+
+**Date:** 2026-02-07
+
+**Issue:**
+
+Security review of the template loading, rendering, archival, and catalog systems identified 1 HIGH and 3 MEDIUM severity findings that require mitigation.
+
+**Key Findings:**
+
+1. **SEC-TMPL-001 [HIGH]**: Path traversal in `getPresetRuleSnippet()` (`prompt-assembler.cjs` line 96). Uses `path.resolve(projectRoot, preset.ruleSnippetPath)` without validating that the resolved path stays within PROJECT_ROOT. A compromised `presets.json` could read arbitrary files (`.env`, SSH keys, etc.) and inject their content into spawn prompts.
+
+2. **SEC-TMPL-002 [MEDIUM]**: Orchestrator spawn validation bypass in `spawn-prompt-validator.cjs`. `isOrchestratorSpawn()` uses partial string matching on `description` field, allowing any spawn with "master-orchestrator" anywhere in its description to skip ALL validation.
+
+3. **SEC-TMPL-003 [MEDIUM]**: Fail-open error handling in `spawn-prompt-assembler.cjs`. On ANY error, the hook exits with code 0 (allow) and the original un-assembled prompt is used, lacking safety instructions (TaskUpdate warning, workspace conventions, memory rules).
+
+4. **SEC-TMPL-004 [MEDIUM]**: No input sanitization in template placeholder substitution in `prompt-factory.cjs`. Substitution values from context/mode config files are not sanitized for nested template placeholders or instruction injection.
+
+**Impact:**
+
+- SEC-TMPL-001 is the most serious: enables file content exfiltration through spawn prompts
+- SEC-TMPL-002 could bypass spawn prompt validation
+- SEC-TMPL-003 degrades safety on assembler failures
+- SEC-TMPL-004 theoretical injection through compromised config files
+
+**Workaround:**
+
+SEC-TMPL-001: Do not modify `presets.json` with untrusted `ruleSnippetPath` values.
+
+**Resolution:**
+
+Findings documented in `.claude/context/reports/security/template-system-security-review-2026-02-07.md`. Verdict: APPROVED WITH CONDITIONS. SEC-TMPL-001 is MUST-FIX before template system overhaul implementation.
+
+---
+
+## 2026-02-07: Security Review Findings for CI Module-Resolution and Blacklist Monitoring (Task #54)
+
+**Date:** 2026-02-07
+
+**Issue:**
+
+Security review of two proposed features (CI module-resolution checker, router blacklist violation monitor) identified 1 CRITICAL and 3 HIGH findings that must be addressed before implementation.
+
+**Key Findings:**
+
+1. **SEC-CI-001 [CRITICAL]**: If the proposed `verify-hook-modules.cjs` uses dynamic `require()` to test hook resolution, malicious hooks could execute arbitrary code in CI context, accessing CI secrets and environment variables. MUST use static analysis only.
+
+2. **SEC-MON-002 [HIGH]**: Router blacklist violation logs could capture sensitive prompt content (passwords, API keys, PII) in plaintext JSONL files. MUST never log raw prompt content.
+
+3. **SEC-MON-001 [HIGH]**: Tool names and context in violation logs could enable log injection. MUST validate against known-tool whitelist and truncate fields to 500 chars max.
+
+4. **SEC-CI-002 [HIGH]**: Hook file discovery could follow symlinks outside project root. MUST validate paths with `validatePathWithinProject()`.
+
+**Impact:**
+
+- Blocks implementation until CRITICAL and HIGH findings are addressed in the design
+- Affects both Feature 1 (CI checker) and Feature 2 (blacklist monitor)
+
+**Workaround:**
+
+None needed -- features are not yet implemented. Findings are preemptive design constraints.
+
+**Resolution:**
+
+Findings documented in `.claude/context/reports/security/ci-monitoring-security-review-2026-02-07.md`. Implementation must address all MUST-FIX items. Verdict: APPROVED WITH CONDITIONS.
+
+---
+
 ## 2026-02-05: Code Indexer OOM Due to BM25 Index Storing Full Chunk Text
 
 **Date:** 2026-02-05 (Updated after systematic investigation)
@@ -125,6 +228,48 @@ Cannot complete indexing without one of these changes:
 - **Solution ready**: Option B (reduce flushSize, aggressive GC) as 30-minute quick fix
 - **Permanent fix**: Option A (streaming BM25 with SQLite) as 4-6 hour permanent solution
 - **Next action**: Apply Option B quick fix to unblock full indexing
+
+---
+
+## 2026-02-06: CRITICAL -- 3 Missing Hook Modules Crash Every Hook Invocation (Task #47)
+
+**Date:** 2026-02-06
+
+**Issue:**
+
+Three hook modules are MISSING at their expected require paths, causing `MODULE_NOT_FOUND` crashes:
+
+1. `.claude/hooks/monitoring/error-tracker.cjs` -- required by `error-tracker-hook.cjs` wrapper (PostToolUse)
+2. `.claude/hooks/monitoring/metrics-collector.cjs` -- required by `metrics-collector-hook.cjs` wrapper (PostToolUse)
+3. `.claude/hooks/routing/router-state.cjs` -- required by `user-prompt-unified.cjs` line 71 via `routingRequire()`
+
+**Root Cause:**
+
+Hook consolidation (Task #41, commit 0e449681) archived 45 orphan hooks and relocated `router-state.cjs`:
+- `error-tracker.cjs` and `metrics-collector.cjs` were library modules (not standalone hooks) that wrapper hooks still require. They were mistakenly archived.
+- `router-state.cjs` was relocated from `hooks/routing/` to `lib/routing/`. Seven consumers were updated but `user-prompt-unified.cjs` was missed.
+
+**Impact:**
+
+- Error tracking completely broken (crashes silently on every PostToolUse)
+- Metrics collection completely broken (crashes silently on every PostToolUse)
+- Router mode reset fails on every user prompt (routing analysis broken)
+
+**Workaround:**
+
+None. The wrapper hooks catch the MODULE_NOT_FOUND error and exit(0), so they do not block tool use, but monitoring and routing analysis data is completely lost.
+
+**Resolution:**
+
+Architecture plan created: `.claude/context/plans/hook-hardening-architecture-2026-02-06.md`
+ADR-082 recorded in decisions.md.
+
+Fix:
+1. Restore `error-tracker.cjs` from `_archive/monitoring/`
+2. Restore `metrics-collector.cjs` from `_archive/monitoring/`
+3. Change line 71 of `user-prompt-unified.cjs` from `routingRequire('router-state.cjs')` to `libRequire(path.join('routing', 'router-state.cjs'))`
+
+**Estimated fix time:** 15-30 minutes (developer agent)
 
 ---
 

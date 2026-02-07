@@ -426,6 +426,29 @@ Skill({ skill: 'debugging' });
 
 ---
 
+## 7.1) COMMANDS (SLASH COMMANDS)
+
+Commands are user-facing shortcuts that delegate to skills. They live in `.claude/commands/` and are auto-discovered by Claude Code as `/commandname`.
+
+**Pattern:** All commands use thin delegation:
+```yaml
+---
+disable-model-invocation: true
+---
+Invoke the {skill-name} skill and follow it exactly as presented to you
+```
+
+**Catalog:** `.claude/context/artifacts/catalogs/command-catalog.md`
+
+**Key Commands:** `/brainstorm` (design), `/tdd` (development), `/debug` (debugging), `/verify` (verification), `/security-review` (security), `/code-review` (review)
+
+**Commands vs Skills vs Agents:**
+- **Commands** = user types `/name` (entry point)
+- **Skills** = agent invokes `Skill({ skill: "name" })` (behavior)
+- **Agents** = Router spawns `Task({ ... })` (execution)
+
+---
+
 ## 8) MEMORY PERSISTENCE
 
 All spawned agents:
