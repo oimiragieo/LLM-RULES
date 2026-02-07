@@ -644,6 +644,8 @@ Each skill directory should contain:
 - **File Placement**: See `.claude/docs/FILE_PLACEMENT_RULES.md`
 - **Developer Workflow**: See `.claude/docs/DEVELOPER_WORKFLOW.md`
 - **Artifact Naming**: See `.claude/docs/ARTIFACT_NAMING.md`
+- **Workspace Conventions**: See `.claude/rules/workspace-conventions.md` (output placement, naming, provenance)
+- **Skill Catalog**: See `@.claude/docs/@SKILL_CATALOG_TABLE.md` for proper categorization
 
 ### Enforcement
 
@@ -781,7 +783,13 @@ Based on skill domain and purpose, auto-assign to matching agents.
    a. Read agent file
    b. Check if agent has YAML frontmatter with `skills:` array
    c. Add skill to `skills:` array if not present
-   d. Update agent file using Edit tool
+   d. Determine tier placement (primary/supporting/on-demand based on relevance)
+   e. Update agent file using Edit tool
+
+**Tier Placement Guide:**
+- **Primary**: Skill is core to the agent's domain (always loaded in Step 0)
+- **Supporting**: Skill is frequently useful but not always needed
+- **On-demand**: Skill is only loaded for specific task types
 4. **Record assignments** in skill's SKILL.md under "Assigned Agents" section
 
 **Matching Rules:**

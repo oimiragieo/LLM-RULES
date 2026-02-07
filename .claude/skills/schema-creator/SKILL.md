@@ -898,6 +898,7 @@ Schema naming convention:
 - **File Placement**: See `.claude/docs/FILE_PLACEMENT_RULES.md`
 - **Developer Workflow**: See `.claude/docs/DEVELOPER_WORKFLOW.md`
 - **Artifact Naming**: See `.claude/docs/ARTIFACT_NAMING.md`
+- **Workspace Conventions**: See `.claude/rules/workspace-conventions.md` (output placement, naming, provenance)
 
 ### Enforcement
 

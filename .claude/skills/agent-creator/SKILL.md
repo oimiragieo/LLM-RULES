@@ -197,7 +197,11 @@ Grep: "<related-term>" in .claude/skills/
    - If agent does security → consider: security-related skills
    - If agent does documentation → consider: doc-generator, diagram-generator
    - **ALL agents** should include: task-management-protocol (for task tracking)
-4. **Include ALL relevant skills** in the agent's frontmatter
+4. **Include ALL relevant skills** in the agent's frontmatter using 3-tier mapping:
+   - **Primary skills**: Core to this agent's domain (always loaded)
+   - **Supporting skills**: Used frequently but not always
+   - **On-demand skills**: Loaded only when specific task requires it
+   - Reference: Task #39 skill-agent mapping for existing tier assignments
 
 ### Step 4: Determine Agent Configuration
 
@@ -274,6 +278,52 @@ context_files:
 ---
 
 # <Agent Title>
+
+## Enforcement Hooks
+
+The following hooks govern this agent's behavior at runtime:
+
+<!-- AGENT-CREATOR: Populate this table based on the agent's archetype.
+     Reference: .claude/docs/@HOOK_AGENT_MAP.md Section 2 "Agent Archetype Hook Sets"
+
+     Determine archetype by agent's tools:
+     - Has Task but NO Write/Edit/Bash → Router or Orchestrator archetype
+     - Has Write/Edit/Bash → Implementer archetype
+     - Has Read/Grep/Glob but NO Write/Edit → Reviewer archetype
+     - Has Write/Edit but NO Bash → Documenter archetype
+     - Has WebSearch/WebFetch + Read → Researcher archetype
+
+     Then copy the appropriate hook table from @HOOK_AGENT_MAP.md Section 2. -->
+
+| Hook | Event | Purpose | Override |
+|------|-------|---------|----------|
+| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| <!-- Add archetype-specific hooks from @HOOK_AGENT_MAP.md --> | | | |
+
+See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
+
+## Related Workflows
+
+The following workflows guide this agent's execution:
+
+<!-- AGENT-CREATOR: Populate this table based on the agent's archetype.
+     Reference: .claude/docs/@WORKFLOW_AGENT_MAP.md Section 2 "Agent Archetype Workflow Sets"
+
+     All agents get: enterprise-workflow, reflection-workflow, workspace-conventions
+     Then add archetype-specific workflows from @WORKFLOW_AGENT_MAP.md Section 2. -->
+
+| Workflow | Path | When to Use |
+|----------|------|-------------|
+| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| <!-- Add archetype-specific workflows from @WORKFLOW_AGENT_MAP.md --> | | |
+
+**Output Standards** (from workspace-conventions):
+- Reports: `.claude/context/reports/`
+- Plans: `.claude/context/plans/`
+- Artifacts: `.claude/context/artifacts/[category]/`
+- Naming: lowercase kebab-case with ISO date suffix
+- Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
 
 ## Core Persona
 **Identity**: <Role title>
@@ -484,7 +534,7 @@ Before finalizing any agent, compare against python-pro.md structure:
 
 ```
 
-[ ] Has all sections python-pro has (Core Persona, Capabilities, Workflow, Response Approach, Behavioral Traits, Example Interactions, Skill Invocation Protocol, Memory Protocol)
+[ ] Has all sections python-pro has (Core Persona, Enforcement Hooks, Related Workflows, Capabilities, Workflow, Response Approach, Behavioral Traits, Example Interactions, Skill Invocation Protocol, Output Standards, Memory Protocol)
 [ ] Section order matches python-pro
 [ ] Level of detail is comparable
 [ ] Behavioral Traits has 10+ items (domain-specific)
@@ -634,6 +684,30 @@ grep "<agent-name>" .claude/lib/routing/routing-table.cjs || echo "ERROR: Agent 
 **BLOCKING**: If routing-table update fails, agent creation is INCOMPLETE. The agent will never be discovered by the Router.
 
 **Why this is mandatory**: The routing table drives router-enforcer scoring. Without keyword registration, the Router's scoring algorithm cannot consider this agent for any request.
+
+### Step 7.6: Populate Alignment Sections (MANDATORY - BLOCKING)
+
+**After writing the agent file, you MUST populate the Enforcement Hooks and Related Workflows sections.**
+
+1. **Determine agent archetype** based on tools array:
+   - Router: Has Task but NOT Write/Edit/Bash
+   - Implementer: Has Write/Edit + Bash
+   - Reviewer: Has Read/Grep/Glob but NOT Write/Edit
+   - Documenter: Has Write/Edit but NOT Bash
+   - Orchestrator: Has Task tool, operates as coordinator
+   - Researcher: Has WebSearch/WebFetch + Read
+
+2. **Read hook archetype set** from `@.claude/docs/@HOOK_AGENT_MAP.md` Section 2
+3. **Read workflow archetype set** from `@.claude/docs/@WORKFLOW_AGENT_MAP.md` Section 2
+4. **Edit the agent file** to replace placeholder rows in both tables with the actual archetype-appropriate hooks and workflows
+
+**Verification:**
+```bash
+grep "Enforcement Hooks" .claude/agents/<category>/<agent-name>.md || echo "ERROR: Missing Enforcement Hooks section!"
+grep "Related Workflows" .claude/agents/<category>/<agent-name>.md || echo "ERROR: Missing Related Workflows section!"
+```
+
+**BLOCKING**: Agent creation is INCOMPLETE without populated alignment sections.
 
 ### Step 8: Create Workflow & Update Memory
 
@@ -866,6 +940,8 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
 7. NO CREATION WITHOUT SYSTEM IMPACT ANALYSIS
    - Update CLAUDE.md routing table (MANDATORY)
    - Update router.md agent tables (MANDATORY)
+   - Populate Enforcement Hooks section from @HOOK_AGENT_MAP.md (MANDATORY)
+   - Populate Related Workflows section from @WORKFLOW_AGENT_MAP.md (MANDATORY)
    - Check if new workflows are needed
    - Check if related agents need skill updates
    - Document all system changes made
@@ -1017,6 +1093,9 @@ grep "<agent-name>" .claude/lib/routing/routing-table.cjs || echo "ERROR: Agent 
 [ ] Behavioral Traits section present with 10+ domain-specific traits (Iron Law #10)
 [ ] Example Interactions section present with 8+ examples (Iron Law #10)
 [ ] Compared against python-pro.md reference agent structure
+[ ] Enforcement Hooks section populated (archetype-matched from @HOOK_AGENT_MAP.md)
+[ ] Related Workflows section populated (archetype-matched from @WORKFLOW_AGENT_MAP.md)
+[ ] Output Standards block present with workspace-conventions references
 ```
 
 **BLOCKING**: If ANY item fails, agent creation is INCOMPLETE. Fix all issues before proceeding.

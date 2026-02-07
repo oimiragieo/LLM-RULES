@@ -75,7 +75,7 @@ Templates ensure consistency across the multi-agent framework. This skill create
 
 | Type     | Location                       | Purpose                          | Key Fields                              |
 | -------- | ------------------------------ | -------------------------------- | --------------------------------------- |
-| Agent    | `.claude/templates/agents/`    | Agent definition templates       | name, description, tools, skills, model |
+| Agent    | `.claude/templates/agents/`    | Agent definition templates       | name, description, tools, skills, model, enforcement_hooks, related_workflows |
 | Skill    | `.claude/templates/skills/`    | Skill definition templates       | name, version, tools, invoked_by        |
 | Workflow | `.claude/templates/workflows/` | Workflow orchestration templates | phases, agents, dependencies            |
 | Hook     | `.claude/templates/hooks/`     | Hook implementation templates    | trigger, action, validation             |
@@ -803,6 +803,7 @@ Subdirectories by type:
 - **File Placement**: See `.claude/docs/FILE_PLACEMENT_RULES.md`
 - **Developer Workflow**: See `.claude/docs/DEVELOPER_WORKFLOW.md`
 - **Artifact Naming**: See `.claude/docs/ARTIFACT_NAMING.md`
+- **Workspace Conventions**: See `.claude/rules/workspace-conventions.md` (output placement, naming, provenance)
 
 ### Enforcement
 File placement is enforced by `file-placement-guard.cjs` hook.
@@ -857,6 +858,12 @@ These rules are INVIOLABLE. Breaking them causes inconsistency across the framew
 7. NO TEMPLATE WITHOUT VERIFICATION COMMANDS
    - Include commands to validate created artifacts
    - Users can verify their work is correct
+
+8. NO AGENT TEMPLATE WITHOUT ALIGNMENT SECTIONS
+   - Agent templates MUST include {{ENFORCEMENT_HOOKS}} placeholder section
+   - Agent templates MUST include {{RELATED_WORKFLOWS}} placeholder section
+   - Agent templates MUST include Output Standards block referencing workspace-conventions
+   - Reference: @HOOK_AGENT_MAP.md and @WORKFLOW_AGENT_MAP.md for archetype sets
 
 ````
 

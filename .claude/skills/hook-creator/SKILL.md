@@ -63,6 +63,14 @@ This skill creates hooks for the Claude Code framework:
 | Routing | `.claude/hooks/routing/` | Enforce router-first protocol           | On UserPromptSubmit    |
 | Session | `.claude/hooks/session/` | Initialize/cleanup sessions             | Session start/end      |
 
+## Hook-Agent Archetype Reference
+
+When creating hooks, determine which agent archetypes will be governed by the new hook. See `.claude/docs/@HOOK_AGENT_MAP.md` for:
+- **Section 1**: Full hook-agent matrix
+- **Section 2**: Archetype hook sets (Router, Implementer, Reviewer, Documenter, Orchestrator, Researcher)
+
+After creating a hook, you MUST add it to both the matrix AND update affected agents' `## Enforcement Hooks` sections.
+
 ## Claude Code Hook Types
 
 | Hook Event         | When Triggered            | Use Case                                |
@@ -415,6 +423,12 @@ After creating a hook:
 
 5. MEMORY UPDATED
    [ ] Added to learnings.md with hook summary
+
+6. HOOK-AGENT MAP UPDATED (MANDATORY)
+   [ ] Added new hook to @HOOK_AGENT_MAP.md Section 1 matrix
+   [ ] Determined which agent archetypes are affected (based on hook trigger/tool target)
+   [ ] Updated affected agents' `## Enforcement Hooks` sections
+   [ ] Verified: `grep "<hook-name>" .claude/docs/@HOOK_AGENT_MAP.md || echo "ERROR: Hook not in agent map!"`
 ```
 
 **BLOCKING**: If ANY item above is missing, hook creation is INCOMPLETE.
@@ -966,6 +980,8 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
 8. NO CREATION WITHOUT SYSTEM IMPACT ANALYSIS
    - Check if hook requires settings.json registration
    - Check if hook requires config.yaml registration
+   - Update @HOOK_AGENT_MAP.md with new hook row (MANDATORY)
+   - Update affected agents' Enforcement Hooks sections (MANDATORY)
    - Check if related hooks need updating
    - Document all system changes made
 ```

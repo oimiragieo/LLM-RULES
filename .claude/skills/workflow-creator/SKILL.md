@@ -80,6 +80,14 @@ grep "{workflow-name}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md SECTION 8.6 N
 | Rapid      | `.claude/workflows/rapid/`      | Quick, focused task automation        | fix, refactor, review                |
 | Custom     | `.claude/workflows/`            | Project-specific patterns             | conductor-setup                      |
 
+## Workflow-Agent Archetype Reference
+
+When creating workflows, determine which agent archetypes will use the workflow. See `.claude/docs/@WORKFLOW_AGENT_MAP.md` for:
+- **Section 1**: Full workflow-agent matrix
+- **Section 2**: Archetype workflow sets (Router/Orchestrator, Implementer, Reviewer, Documenter, Researcher, Domain)
+
+After creating a workflow, you MUST add it to both the matrix AND update affected agents' `## Related Workflows` sections.
+
 ## Workflow Creation Process
 
 ### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
@@ -473,6 +481,12 @@ grep "{workflow-name}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED -
    - Does this duplicate existing workflow functionality?
    - Should existing workflows reference this one?
    - Are there workflow dependencies to document?
+
+6. WORKFLOW-AGENT MAP UPDATED (MANDATORY)
+   - Added new workflow to @WORKFLOW_AGENT_MAP.md Section 1 matrix
+   - Determined which agent archetypes use this workflow
+   - Updated affected agents' `## Related Workflows` sections
+   - Verified: `grep "<workflow-name>" .claude/docs/@WORKFLOW_AGENT_MAP.md || echo "ERROR: Workflow not in agent map!"`
 ```
 
 ### Validation Checklist (Run After Every Creation) - BLOCKING
@@ -687,6 +701,8 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
 7. NO CREATION WITHOUT SYSTEM IMPACT ANALYSIS
    - Check if new agents are needed
    - Check if new skills are needed
+   - Update @WORKFLOW_AGENT_MAP.md with new workflow row (MANDATORY)
+   - Update affected agents' Related Workflows sections (MANDATORY)
    - Document all system changes made
 
 8. NO AGENT SPAWN WITHOUT MODEL VALIDATION
