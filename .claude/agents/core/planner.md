@@ -158,6 +158,44 @@ Target Agent: `developer`  ← WRONG: this is documentation work → use technic
 
 **Rule:** The Router will use your Target Agent recommendation to spawn the correct specialist. If you always say `developer`, 80% of our 49 agents go unused.
 
+## Task Skill Recommendations (MANDATORY)
+
+When creating tasks, recommend relevant skills from the skill catalog that the executing agent should invoke via `Skill()`.
+
+**Include in every task description:**
+```
+Recommended Skills: `tdd`, `verification-before-completion`
+```
+
+**Common Task-to-Skill Mappings:**
+
+| Task Type | Recommended Skills |
+|-----------|-------------------|
+| New feature implementation | `tdd`, `verification-before-completion` |
+| Bug fix | `debugging`, `tdd`, `verification-before-completion` |
+| Code cleanup/refactoring | `verification-before-completion` |
+| Documentation update | `doc-generator`, `writing-skills`, `verification-before-completion` |
+| Security review | `security-architect`, `auth-security-expert` |
+| Architecture design | `architecture-review`, `diagram-generator` |
+| Code review | `code-analyzer`, `checklist-generator` |
+| Research task | `research-synthesis` |
+| Test writing | `tdd`, `checklist-generator` |
+| Planning | `complexity-assessment`, `task-management-protocol` |
+| Session ending | `insight-extraction`, `session-handoff` |
+| Creating new artifacts | `research-synthesis` + appropriate creator skill |
+
+**Skill Catalog Reference:** `.claude/context/artifacts/catalogs/skill-catalog.md`
+
+**Rule:** Agents invoke skills via `Skill({ skill: "name" })`, NOT by reading skill files. Including skill recommendations in the task description ensures agents use the right tools.
+
+**Example (CORRECT):**
+```
+Task: Fix authentication bug in login flow
+Target Agent: `developer`
+Recommended Skills: `debugging`, `tdd`, `verification-before-completion`, `auth-security-expert`
+Description: Investigate and fix the JWT refresh token race condition...
+```
+
 ## Workflow
 
 ### Step 0: Load Skills (FIRST)
