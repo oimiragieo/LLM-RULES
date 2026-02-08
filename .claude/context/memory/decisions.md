@@ -14,6 +14,114 @@ Each decision should include:
 
 ---
 
+## ADR-100: Cross-Artifact Integration System (COMPLETE)
+
+**Date:** 2026-02-08 (Final Completion)
+
+**Status:** ACCEPTED & FULLY IMPLEMENTED (All 15 tasks complete, Phase 6 DevOps wiring verified, 95% deployment readiness)
+
+**Summary:** Complete end-to-end integration framework for artifact discovery, relationship tracking, gap detection, and remediation. The 15-task enterprise pipeline (Tasks #1-15 spanning Feb 4-8) successfully demonstrated:
+
+- **Phase 0-1:** Architecture design + security review + implementation planning
+- **Phase 2:** Core library implementation (artifact-graph.cjs, 479 lines, 11 tests)
+- **Phase 3:** Integration into agents (reflection-agent Step 4.5, evolution-orchestrator Phase E)
+- **Phase 4:** Integration into workflows (evolution-workflow Phase 6 actions)
+- **Phase 5:** Integration into system hooks (post-creation-integration.cjs queues entries)
+- **Phase 6:** Integration into Router (Step 0.5 queue checking, 11 artifact-integration keywords) ← Task #12
+
+**Key Achievements:**
+- 5 integration points fully wired and verified (reflection → evolution → post-creation → router → artifact-integrator)
+- 65 integration tests (100% pass rate)
+- Zero missed integration gaps (5/5 checklist items complete)
+- Zero design rework (plan-to-deployment without iteration)
+- Non-blocking operational pattern (20ms overhead, integration runs in parallel)
+- 3 new patterns extracted (non-blocking integration, intent-driven closure, enterprise pipeline)
+
+**Deployment Verdict:** READY FOR PRODUCTION (95% confidence, 0 critical blockers)
+
+---
+
+## ADR-102: Memory Management System Rebuild (Rotator + Pruner + Cold Storage)
+
+**Date:** 2026-02-08
+
+**Status:** Accepted (Architecture + Security designs complete, Implementation plan ready)
+
+**Context:**
+
+Memory files (learnings.md, decisions.md, issues.md) grow unbounded, with issues.md reaching 53KB and archives reaching 463KB. Three previously archived modules (memory-rotator, smart-pruner, cold-storage) had valid designs but were never integrated. The memory-scheduler.cjs has disabled stubs where these should be wired. This is CRITICAL issue C-003 from the performance analysis (40% context budget consumption).
+
+**Decision:**
+
+Design and implement a simplified 3-component memory management system:
+
+1. **memory-rotator.cjs** (~120 lines): Section-based rotation when files exceed 20KB. Parses markdown into semantic sections (delimited by `---` or `## `), preserves `[PERMANENT]` entries, archives to `archive/{file}-YYYY-MM.md`. Triggered both by `sync-memory-index.cjs` hook (on write) and by `memory-scheduler.cjs` (weekly).
+
+2. **smart-pruner.cjs** (~100 lines): Jaccard word-similarity deduplication (threshold 0.5) and resolved-entry pruning (30-day age). No embedding dependencies. Preserves `[PERMANENT]` entries. Runs weekly via scheduler.
+
+3. **cold-storage.cjs** (~80 lines): 3-tier system (HOT/WARM/COLD). Moves warm archives older than 30 days to plain JSONL files in `archive/cold/`. No gzip (simplicity over space). Provides cross-tier search.
+
+**Key Design Choices:**
+
+- Section-based over line-based rotation (preserves semantic units)
+- Jaccard over embeddings for dedup (zero dependencies, deterministic)
+- Plain JSONL over gzip for cold storage (debuggable, Windows-safe)
+- Hook + scheduler dual triggering (immediate + batch)
+- All writes via atomic-write.cjs with proper-lockfile
+
+**Rationale:**
+
+- Previous implementations failed due to over-engineering (combined ~900 lines) and lack of integration
+- New design is ~300 lines total (67% reduction), focused on integration
+- Addresses C-003 (context budget) by keeping active files under 20KB each
+- Each module under 150 lines constraint ensures maintainability
+
+**Consequences:**
+
+- Active memory footprint drops from ~82KB to ~60KB max (27% reduction)
+- Eliminates unbounded growth that previously consumed 40% of context budget
+- Archives become searchable via `searchArchives()` and `searchCold()`
+- `memory-scheduler.cjs` stubs become functional
+- `checkAndArchiveLearnings()` in memory-manager.cjs should be deprecated long-term in favor of rotator
+
+**Architecture Design:** `.claude/context/reports/architecture/memory-management-design-2026-02-08.md`
+
+---
+
+## ADR-088: Check 7 Specialist-Override Architecture Review
+
+**Date:** 2026-02-07
+
+**Status:** Accepted (conditional)
+
+**Context:**
+Check 7 (checkSpecialistOverride) was added to routing-guard.cjs via TDD to enforce the specialist-first routing law documented in CLAUDE.md. This is a post-hoc architecture review.
+
+**Decision:**
+
+1. Check 7 design is architecturally sound in intent, placement (last check), and scope (developer-only).
+2. MUST remain at warn-default until keyword precision is improved (substring matching produces false positives).
+3. Escalation to block-default requires: (a) word-boundary matching implemented, (b) 30 days violation-tracker data, (c) <10% false positive rate, (d) Router respects warnings >80% of the time.
+4. Keyword map stays hardcoded until matching strategy stabilizes.
+5. First-match-wins behavior is acceptable as a hint; scoring system is a future improvement.
+
+**Rationale:**
+
+- Warn-mode provides runtime enforcement without blocking legitimate developer work
+- Substring matching with keywords like "document", "deploy", "migration" produces too many false positives for block mode
+- Check placement (last in runAllChecks) correctly prioritizes safety > structure > quality
+
+**Consequences:**
+
+- Positive: First runtime enforcement of specialist-first routing (was documentary only)
+- Positive: Violation tracking enables data-driven promotion decisions
+- Negative: Warn-mode may cause alert fatigue if false positive rate is high
+- Risk: Without R1 fixes, escalating to block would break legitimate developer workflows
+
+**Report:** `.claude/context/reports/architecture/specialist-override-review-2026-02-07.md`
+
+---
+
 ## ADR-087: Commands System Overhaul -- Thin Delegator Pattern + Command Catalog
 
 **Date:** 2026-02-07
@@ -359,3 +467,105 @@ Key architectural decisions within this ADR:
 **Implementation Plan:** `.claude/context/plans/enterprise-orchestration-plan-2026-02-06.md`
 **Workflow Document:** `.claude/workflows/core/enterprise-workflow.md`
 **Depends On:** ADR-079 (Agent Utilization Remediation Strategy)
+
+---
+
+## ADR-101: Specialist-First Routing Enforcement
+
+**Date:** 2026-02-07
+
+**Status:** Accepted
+
+**Context:**
+
+Router defaults to `developer` for 80%+ of tasks, leaving 49 specialist agents underutilized. The routing table and Step 6.5 "Developer Override Check" exist in documentation but are not programmatically enforced.
+
+**Decision:**
+
+1. Add `checkSpecialistOverride()` (Check 7) to routing-guard.cjs that warns when developer is spawned for specialist-matchable tasks
+2. Add "SPECIALIST-FIRST ROUTING LAW" as an iron law in CLAUDE.md
+3. Strengthen Step 6.5 in router-decision.md to be mandatory
+
+**Enforcement:**
+
+SPECIALIST_ROUTING_ENFORCEMENT=warn (default), escalate to block after validation
+
+**Consequences:**
+
+Router receives programmatic feedback when misrouting. Combined with planner's Target Agent annotations, this creates a two-layer specialist matching system.
+
+---
+
+## ADR-103: Test-Driven Integration Boundary Verification
+
+**Date:** 2026-02-08
+
+**Status:** Proposed
+
+**Context:**
+
+Task #9 (Memory Management System Rebuild) implemented 4 modules with 41 passing unit tests. Task #13 (Bug Fix) discovered 2 integration bugs that the unit tests had missed:
+
+1. `pruneResult.entriesRemoved` vs actual `pruneResult.removed` (field name mismatch)
+2. `{ similarityThreshold: 0.6 }` vs actual `{ threshold: 0.6 }` (parameter key mismatch)
+
+Both bugs were found by **human code review**, not automated tests. This revealed that TDD's strength (module isolation) created a blind spot for integration contract mismatches.
+
+**Problem:**
+
+Unit tests validate internal module logic by mocking external dependencies. These mocks are based on test assumptions, not actual implementations. When Module A's test assumes Module B returns `{ removed: count }`, but Module B actually returns `{ entriesRemoved: count }`, the unit tests pass but integration fails. The mismatch only appears when code paths actually execute together (real integration, no mocks).
+
+**Decision:**
+
+1. **Extend TDD to include "Integration Verification Phase"**
+   - After unit tests pass, write integration tests using REAL modules (not mocks)
+   - Test actual function contracts: parameter names, return field names, error cases
+   - Before declaring feature complete, verify integration with actual callee interfaces
+
+2. **Document contracts explicitly for integration points**
+   - Each integration boundary must define expected parameters and return values
+   - Example: `const PRUNER_CONTRACT = { deduplicate: { params: { entries: 'array', threshold: 'number' }, returns: { removed: 'number' } } }`
+   - Add runtime validation to detect contract violations immediately
+
+3. **Create integration test template for multi-module systems**
+   - Location: TDD skill + new test template directory
+   - Template shows: load real modules → call with production parameters → verify contracts
+   - Include checklist: parameter names, field names, error cases, bidirectional error handling
+
+4. **Update TDD skill and spawn templates**
+   - Add "Integration Verification Phase" to TDD guidance
+   - Document when to use integration tests vs unit tests
+   - Include examples of contract violation detection
+
+**Rationale:**
+
+- Integration bugs caught during development (TDD phase) instead of code review (detection lag)
+- False confidence eliminated: passing tests actually mean integration works
+- Tests become contract specifications (executable documentation)
+- Future refactoring won't break contracts silently (contract validation would fail immediately)
+- Small cost (integration tests are 10-20% of unit test time) with high benefit (catch bugs early)
+
+**Consequences:**
+
+- **Positive:** Integration bugs caught immediately during development (not in code review)
+- **Positive:** Test suite becomes true quality gate (passing tests guarantee integration)
+- **Positive:** Contracts documented and validated automatically
+- **Positive:** Future developers won't repeat Task #9→Task #13 pattern
+- **Negative:** Slightly longer TDD cycle (add 20-30 minutes for integration verification per feature)
+- **Negative:** Some integration tests will be harder to write (e.g., system-level contracts)
+- **Mitigated:** Template reduces boilerplate, most integration tests are simple
+
+**Implementation Plan:**
+
+1. Immediately: Create integration test template for memory management modules (fix Task #9 gap)
+2. Update TDD skill with Integration Verification Phase section
+3. Add integration contract patterns to patterns.json
+4. Document lesson in issue tracker
+5. Future multi-module features (workflow, routing, etc.) should follow this pattern
+
+**Cross-References:**
+
+- Task #9: Memory Management System Rebuild (missed integration verification)
+- Task #13: Bug Fix - 2 Wiring Bugs (discovered by code review, not tests)
+- learnings.md: "TDD Integration Boundary Testing Gap"
+- issues.md: "Unit Test Isolation Can Hide Integration Bugs"

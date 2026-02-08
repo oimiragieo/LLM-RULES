@@ -171,5 +171,75 @@
       "extracted_from": "Task #106 findings in learnings.md ('Phantom References' section)",
       "date": "2026-02-07"
     }
-  ]
+  ],
+  {
+    "id": "systemic-json-parse-vulnerability-memory",
+    "gotcha": "38 raw JSON.parse() calls across memory subsystem lack prototype pollution protection",
+    "context": "Memory Management Rebuild Security Review (Task #7B, 2026-02-08)",
+    "why_it_happens": "JSON.parse() by default allows __proto__, constructor, and prototype keys in parsed objects. If an attacker controls JSON content (e.g., via memory file injection), they can pollute the prototype chain. The memory subsystem has 38 instances: memory-manager.cjs (11), memory-tiers.cjs (3), memory-scheduler.cjs (3), contextual-memory.cjs (4), memory-dashboard.cjs (3), plus new components being rebuilt.",
+    "affected_files": [
+      "memory-manager.cjs (11 instances)",
+      "memory-tiers.cjs (3 instances)",
+      "memory-scheduler.cjs (3 instances)",
+      "contextual-memory.cjs (4 instances)",
+      "memory-dashboard.cjs (3 instances)",
+      "gotchas.json (pruner will parse this)",
+      "patterns.json (pruner will parse this)"
+    ],
+    "trigger": "Parsing JSON from memory files without prototype pollution protection",
+    "solution": "Use safeJSONParse() utility (MF-001 from security review). Implementation: reviver function strips __proto__, constructor, prototype keys. Grep for 'JSON.parse' across memory subsystem should return zero matches after fix.",
+    "cross_references": [
+      "SEC-CTX-001: Inconsistent safeJSONParse usage across context layer",
+      "SEC-LIB-005: safe-json.cjs fallback to plain JSON.parse defeats purpose",
+      "SEC-LIB-006: spawn-prompt-assembler uses plain JSON.parse for registries",
+      "T-MEM-002 (HIGH): JSON prototype pollution in memory rebuild components"
+    ],
+    "must_fix": "YES - HIGH severity, blocks memory rebuild implementation",
+    "extracted_from": "Task #7B Security Review, T-MEM-002 threat model entry",
+    "date": "2026-02-08"
+  },
+  {
+    "id": "sensitive-data-in-memory-archives",
+    "gotcha": "Cold storage archives preserve sensitive data (API keys, JWTs, emails) indefinitely without scrubbing",
+    "context": "Memory Management Rebuild Security Review (Task #7B, 2026-02-08), Finding I-MEM-001 (HIGH)",
+    "why_it_happens": "Memory entries (learnings, decisions, issues) can embed secrets when documenting bugs or solutions. Example: 'Fix: Changed API key from sk-REDACTED to sk-NEWKEY'. When cold storage compresses old entries, it archives the secret permanently. No scrubbing layer exists.",
+    "examples": [
+      "Learnings: 'Fixed auth by updating JWT secret: eyJhbGc...'",
+      "Decisions: 'ADR-042: Use API key sk-proj-abc123 for OpenAI'",
+      "Issues: 'Email notifications failing for admin@company.com'"
+    ],
+    "trigger": "Archiving memory entries containing API keys, JWTs, emails, passwords embedded in text",
+    "solution": "Implement scrubSensitiveContent() utility (MF-003 from security review). Regex patterns: API keys (sk-[a-zA-Z0-9]{32,}), JWTs (eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+), emails ([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}). Replace with [REDACTED-API-KEY], [REDACTED-JWT], [REDACTED-EMAIL].",
+    "false_positive_risk": "High - may redact legitimate content like 'contact support@example.com'. Solution: whitelist known safe domains or provide restore manifest.",
+    "must_fix": "YES - HIGH severity (I-MEM-001), blocks cold storage implementation",
+    "extracted_from": "Task #7B Security Review, I-MEM-001 threat model entry, MF-003 mitigation",
+    "date": "2026-02-08"
+  },
+  {
+    "id": "config-key-translation-silent-failures",
+    "gotcha": "Configuration file key names don't match function parameter names, causing config values to be silently ignored",
+    "context": "Code Review Task #10, Phase 4 finding C2: memory-scheduler.cjs config.yaml inconsistency",
+    "why_it_happens": "Configuration-driven systems create translation layers: (1) config.yaml uses one key name (similarity_threshold), (2) scheduler translates to another (similarityThreshold), (3) function parameter expects yet another (threshold). Each translation layer is a failure risk. Missing one translation causes config to silently not reach the function.",
+    "examples": [
+      "config.yaml: memory.pruning.similarity_threshold = 0.6",
+      "memory-scheduler.cjs line 420: deduplicateFile(path, { similarityThreshold: 0.6 })",
+      "smart-pruner.cjs: deduplicateFile(path, { threshold }) - expects 'threshold', not 'similarityThreshold'",
+      "Result: config specifies 0.6, code uses default 0.5. Silent failure."
+    ],
+    "trigger": "Adding configuration-driven options to functions without verifying key names align across all layers",
+    "symptom": "Config value appears to be set, but function behaves as if it wasn't set. No error or warning. Silent failure.",
+    "solution": "Three approaches: (1) Keep config keys aligned with function parameter names (best), (2) Create explicit config-to-options mapper with tests validating all config keys are used, (3) Add runtime validation that config key names match function parameters",
+    "detection_pattern": "Code review: inspect config.yaml keys vs function parameter names. Test: validate config value actually changes function behavior (not just ignored).",
+    "applicability": "Any system where developers can: (1) add new config options, (2) change function parameters independently, (3) not notice if config key doesn't reach function",
+    "prevention": [
+      "Document the translation chain: config.yaml → code parameter → function parameter",
+      "Add automated validation: all config keys in memory section should have corresponding function parameters",
+      "Include in code review checklist: 'Does config key name match function parameter name?'",
+      "Write integration tests that validate config value changes behavior (don't just test function works)"
+    ],
+    "risk_level": "MEDIUM - affects feature behavior but not system stability. Config feature doesn't work as intended.",
+    "extracted_from": "Task #10 Code Review (C2: Option Name Mismatch), Task #11 QA Validation confirmed",
+    "date": "2026-02-08"
+  }
+]
 }

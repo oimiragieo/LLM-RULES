@@ -3,23 +3,29 @@
  * Routing Guard - Unified Router Enforcement Hook
  * ================================================
  *
- * Consolidates 5 routing hooks into a single guard for 80% spawn reduction:
+ * Consolidates 7 routing checks into a single guard:
  *
- * | Original Hook              | Check                                    |
- * |----------------------------|------------------------------------------|
- * | router-self-check.cjs      | Blocks Router from blacklisted tools     |
- * | planner-first-guard.cjs    | Ensures PLANNER spawned for complex tasks|
- * | task-create-guard.cjs      | Blocks TaskCreate without PLANNER        |
- * | security-review-guard.cjs  | Requires security review for impl agents |
- * | router-write-guard.cjs     | Blocks direct writes without Task        |
+ * | Check | Name                       | Purpose                                      |
+ * |-------|----------------------------|----------------------------------------------|
+ * | 0     | router-bash-check          | Blocks non-whitelisted Bash commands         |
+ * | 1     | router-self-check          | Blocks Router from blacklisted tools         |
+ * | 2     | planner-first-guard        | Ensures PLANNER spawned for complex tasks    |
+ * | 3     | task-create-guard          | Blocks TaskCreate without PLANNER            |
+ * | 4     | security-review-guard      | Requires security review for impl agents     |
+ * | 5     | router-write-guard         | Blocks direct writes without Task            |
+ * | 6     | memory-pressure-check      | Blocks Task spawning under memory pressure   |
+ * | 7     | specialist-override        | Warns developer spawn for specialist tasks   |
  *
- * Trigger: PreToolUse (matches: Task|TaskCreate|Edit|Write|NotebookEdit|Glob|Grep|WebSearch)
+ * Trigger: PreToolUse (matches: Task|TaskCreate|Edit|Write|NotebookEdit|Glob|Grep|WebSearch|Bash)
  *
  * ENFORCEMENT MODES:
+ * - ROUTER_BASH_GUARD=block|warn|off (default: block)
  * - ROUTER_SELF_CHECK=block|warn|off (default: block)
  * - PLANNER_FIRST_ENFORCEMENT=block|warn|off (default: block)
  * - SECURITY_REVIEW_ENFORCEMENT=block|warn|off (default: block)
  * - ROUTER_WRITE_GUARD=block|warn|off (default: block)
+ * - MEMORY_SPAWN_THROTTLING=true|false (default: true)
+ * - SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off (default: warn)
  *
  * Exit codes:
  * - 0: Allow operation
@@ -182,6 +188,233 @@ const WRITE_TOOLS = ['Edit', 'Write', 'NotebookEdit'];
  * From security-review-guard.cjs
  */
 const IMPLEMENTATION_AGENTS = ['developer', 'qa', 'devops'];
+
+/**
+ * Specialist keyword map - maps specialist agent names to trigger keywords
+ * Check 7: Warns when developer is spawned for tasks that match specialist keywords
+ *
+ * ADR-088: Uses contextual phrases (not single words) to reduce false positives.
+ * Matched with word-boundary regex to prevent substring matches.
+ */
+const SPECIALIST_KEYWORD_MAP = {
+  'technical-writer': [
+    'write documentation',
+    'update documentation',
+    'update docs',
+    'update readme',
+    'write docs',
+    'api documentation',
+    'create docs',
+    'document the api',
+    'generate documentation',
+    'fix documentation',
+    'review documentation',
+  ],
+  'code-simplifier': [
+    'refactor for clarity',
+    'clean up code',
+    'simplify code',
+    'reduce complexity',
+    'code cleanup',
+    'improve readability',
+    'simplify the',
+    'refactor the',
+    'clean up the',
+  ],
+  'code-reviewer': [
+    'review code',
+    'code review',
+    'pr review',
+    'review the pr',
+    'review the implementation',
+    'audit code',
+    'review pull request',
+  ],
+  qa: [
+    'write tests',
+    'run tests',
+    'test strategy',
+    'test coverage',
+    'test suite',
+    'qa validation',
+    'add tests',
+    'fix tests',
+    'run the tests',
+    'test plan',
+  ],
+  devops: [
+    'set up docker',
+    'configure ci',
+    'deploy to production',
+    'deploy to staging',
+    'set up deployment',
+    'kubernetes config',
+    'pipeline config',
+    'ci/cd pipeline',
+    'infrastructure setup',
+    'helm chart',
+  ],
+  'database-architect': [
+    'database schema',
+    'schema migration',
+    'database migration',
+    'query optimization',
+    'data model design',
+    'create migration',
+    'optimize queries',
+  ],
+  researcher: [
+    'research options',
+    'investigate options',
+    'compare alternatives',
+    'fact-find',
+    'research best practices',
+    'explore approaches',
+  ],
+  'devops-troubleshooter': [
+    'debug production',
+    'troubleshoot the',
+    'diagnose issue',
+    'investigate outage',
+  ],
+  'incident-responder': [
+    'production incident',
+    'handle outage',
+    'incident response',
+    'production outage',
+    'sre practices',
+    'on-call handoff',
+    'handle the incident',
+    'incident affecting',
+  ],
+  architect: [
+    'design the architecture',
+    'system design',
+    'architectural decision',
+    'choose tech stack',
+    'design the system',
+    'architecture review',
+    'system architecture',
+    'migrating to microservices',
+  ],
+  'security-architect': [
+    'security review',
+    'threat model',
+    'security audit',
+    'vulnerability assessment',
+    'penetration test',
+    'owasp review',
+    'audit of the',
+    'security of the',
+  ],
+  pm: [
+    'user stories',
+    'product requirements',
+    'feature roadmap',
+    'sprint planning',
+    'product backlog',
+    'acceptance criteria',
+    'write user stories',
+    'product requirements for',
+  ],
+  planner: [
+    'break down this',
+    'task breakdown',
+    'break down the',
+    'decompose this',
+    'split this into',
+    'plan the implementation',
+  ],
+  'mobile-ux-reviewer': [
+    'ux review',
+    'accessibility audit',
+    'usability review',
+    'mobile ux',
+    'hig compliance',
+    'design critique',
+    'ux review of',
+    'accessibility of',
+  ],
+  'c4-context': [
+    'c4 context diagram',
+    'system context diagram',
+    'c4 system context',
+    'context diagram for',
+  ],
+  'c4-container': [
+    'c4 container diagram',
+    'container architecture',
+    'c4 deployment',
+    'deployment architecture',
+  ],
+  'c4-component': [
+    'c4 component diagram',
+    'component architecture',
+    'component boundaries',
+    'component diagram for',
+  ],
+  'c4-code': [
+    'c4 code diagram',
+    'code-level architecture',
+    'c4 code documentation',
+    'code documentation for',
+  ],
+  'data-engineer': [
+    'data pipeline',
+    'etl pipeline',
+    'data transformation',
+    'data validation pipeline',
+    'analytics pipeline',
+    'data infrastructure',
+    'build the data pipeline',
+  ],
+  'ai-ml-specialist': [
+    'train model',
+    'machine learning model',
+    'deep learning',
+    'model deployment',
+    'mlops pipeline',
+    'fine-tune model',
+    'train the',
+    'recommendation model',
+  ],
+  'web3-blockchain-expert': [
+    'smart contract',
+    'solidity contract',
+    'defi protocol',
+    'blockchain integration',
+    'token contract',
+    'web3 integration',
+    'write the solidity',
+  ],
+  'scientific-research-expert': [
+    'genomic analysis',
+    'computational biology',
+    'scientific workflow',
+    'cheminformatics analysis',
+    'research methodology',
+    'scientific computing',
+    'genomic analysis workflow',
+    'variant calling',
+  ],
+  'gamedev-pro': [
+    'game development',
+    'game physics',
+    'game mechanics',
+    'unity project',
+    'unreal engine project',
+    'godot project',
+    'game physics for',
+  ],
+  'reverse-engineer': [
+    'reverse engineer',
+    'reverse engineering',
+    'decompile the',
+    'analyze the legacy',
+    'understand the legacy',
+    'reverse engineer the legacy',
+  ],
+};
 
 /**
  * Patterns to detect PLANNER agent spawns
@@ -800,6 +1033,91 @@ function checkMemoryPressure(toolName) {
 }
 
 // =============================================================================
+// CHECK 7: SPECIALIST OVERRIDE (warns developer spawn for specialist tasks)
+// =============================================================================
+
+/**
+ * Check 7: Specialist Override Check (warns when developer is spawned for specialist tasks)
+ *
+ * Detects when 'developer' agent is spawned for tasks that match specialist keywords
+ * (documentation, refactoring, testing, deployment, etc.). Encourages specialist-first routing.
+ *
+ * Environment Variables:
+ *   SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off (default: warn)
+ *
+ * @param {string} toolName - Tool being used
+ * @param {Object} toolInput - Tool input containing prompt and description
+ * @returns {{ pass: boolean, result?: string, message?: string }}
+ */
+function checkSpecialistOverride(toolName, toolInput = {}) {
+  // Only applies to Task tool
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+
+  const enforcement = getEnforcementMode('SPECIALIST_ROUTING_ENFORCEMENT', 'warn');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  // Only check developer spawns
+  const prompt = (toolInput.prompt || '').toLowerCase();
+  const isDeveloperSpawn =
+    prompt.includes('you are developer') || prompt.includes('you are the developer');
+
+  if (!isDeveloperSpawn) {
+    return { pass: true };
+  }
+
+  // Scan combined prompt + description for specialist keywords
+  const description = (toolInput.description || '').toLowerCase();
+  const combined = `${prompt} ${description}`;
+
+  // Find matching specialist (ADR-088: word-boundary matching to reduce false positives)
+  for (const [specialist, phrases] of Object.entries(SPECIALIST_KEYWORD_MAP)) {
+    for (const phrase of phrases) {
+      // Escape regex special chars in phrase, then add word boundaries
+      const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp('\\b' + escaped + '\\b', 'i');
+
+      if (regex.test(combined)) {
+        // Found a match - developer is being used for specialist work
+        const message = `[SPECIALIST-OVERRIDE] Developer spawn detected for ${specialist} task.
+Keyword: "${phrase}"
+Suggestion: Use ${specialist} agent instead for better results.
+
+Developer should be LAST RESORT. Specialists have domain-specific prompts and skills.`;
+
+        // Record violation in violation-tracker
+        const tracker = getViolationTracker();
+        if (tracker) {
+          tracker.recordViolation({
+            tool: 'Task',
+            action: enforcement === 'block' ? 'blocked' : 'warned',
+            checkName: 'specialist-override',
+            routerMode: 'router',
+            sessionId: process.env.CLAUDE_SESSION_ID || 'unknown',
+            metadata: {
+              keyword: phrase,
+              suggestedSpecialist: specialist,
+            },
+          });
+        }
+
+        if (enforcement === 'block') {
+          return { pass: false, result: 'block', message };
+        } else {
+          return { pass: true, result: 'warn', message };
+        }
+      }
+    }
+  }
+
+  // No specialist keywords found - allow
+  return { pass: true };
+}
+
+// =============================================================================
 // MAIN EXECUTION
 // =============================================================================
 
@@ -877,6 +1195,15 @@ function runAllChecks(toolName, toolInput) {
   const memoryCheck = checkMemoryPressure(toolName);
   if (!memoryCheck.pass) {
     return { pass: false, result: memoryCheck.result, message: memoryCheck.message };
+  }
+
+  // Check 7: Specialist Override Check (warn when developer is used for specialist tasks)
+  const specialistCheck = checkSpecialistOverride(toolName, toolInput);
+  if (!specialistCheck.pass) {
+    return { pass: false, result: specialistCheck.result, message: specialistCheck.message };
+  }
+  if (specialistCheck.result === 'warn') {
+    console.warn(specialistCheck.message);
   }
 
   // All checks passed
@@ -1069,6 +1396,7 @@ if (require.main === module) {
  * @property {Function} checkSecurityReview - Check security review requirements
  * @property {Function} checkRouterWrite - Check direct write restrictions
  * @property {Function} checkMemoryPressure - Check memory pressure before agent spawning
+ * @property {Function} checkSpecialistOverride - Check specialist-first routing (Check 7)
  * @property {Function} isPlannerSpawn - Detect if spawn is a PLANNER agent
  * @property {Function} isSecuritySpawn - Detect if spawn is security-related
  * @property {Function} isImplementationAgentSpawn - Detect if spawn is implementation agent
@@ -1083,6 +1411,7 @@ if (require.main === module) {
  * @property {Array<string>} WRITE_TOOLS - Edit/Write operations that require agent context
  * @property {Array<string>} IMPLEMENTATION_AGENTS - Agents that perform implementation
  * @property {Array<string>} ROUTER_BASH_WHITELIST - Allowed bash commands (git only)
+ * @property {Object} SPECIALIST_KEYWORD_MAP - Maps specialist agents to trigger keywords
  */
 
 // Export for testing
@@ -1096,6 +1425,7 @@ module.exports = {
   checkSecurityReview,
   checkRouterWrite,
   checkMemoryPressure,
+  checkSpecialistOverride,
   isPlannerSpawn,
   isSecuritySpawn,
   isImplementationAgentSpawn,
@@ -1114,4 +1444,5 @@ module.exports = {
   WRITE_TOOLS,
   IMPLEMENTATION_AGENTS,
   ROUTER_BASH_WHITELIST,
+  SPECIALIST_KEYWORD_MAP,
 };

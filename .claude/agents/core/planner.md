@@ -124,23 +124,43 @@ Target Agent: `{agent-type}`
 
 **Agent Selection Guide:**
 
-| Task Nature                                 | Target Agent            |
-| ------------------------------------------- | ----------------------- |
-| Write/modify code (new features, bug fixes) | `developer`             |
-| Write/update documentation, README, guides  | `technical-writer`      |
-| Simplify, clean up, refactor for clarity    | `code-simplifier`       |
-| Review code, audit implementation           | `code-reviewer`         |
-| Write tests, QA validation, test strategy   | `qa`                    |
-| System/architecture design decisions        | `architect`             |
-| Security review, threat modeling            | `security-architect`    |
-| Infrastructure, Docker, CI/CD, deployment   | `devops`                |
-| Database schema design, query optimization  | `database-architect`    |
-| Python-specific implementation              | `python-pro`            |
-| Frontend/React/Vue implementation           | `frontend-pro`          |
-| Node.js backend implementation              | `nodejs-pro`            |
-| Research, fact-finding, external sources    | `researcher`            |
-| Debugging, troubleshooting                  | `devops-troubleshooter` |
-| Product requirements, user stories          | `pm`                    |
+| Task Nature                                 | Target Agent                 |
+| ------------------------------------------- | ---------------------------- |
+| Write/modify code (new features, bug fixes) | `developer`                  |
+| Write/update documentation, README, guides  | `technical-writer`           |
+| Simplify, clean up, refactor for clarity    | `code-simplifier`            |
+| Review code, audit implementation           | `code-reviewer`              |
+| Write tests, QA validation, test strategy   | `qa`                         |
+| System/architecture design decisions        | `architect`                  |
+| Security review, threat modeling            | `security-architect`         |
+| Infrastructure, Docker, CI/CD, deployment   | `devops`                     |
+| Database schema design, query optimization  | `database-architect`         |
+| Python-specific implementation              | `python-pro`                 |
+| Frontend/React/Vue implementation           | `frontend-pro`               |
+| Node.js backend implementation              | `nodejs-pro`                 |
+| Research, fact-finding, external sources    | `researcher`                 |
+| Debugging, troubleshooting                  | `devops-troubleshooter`      |
+| Product requirements, user stories          | `pm`                         |
+| TypeScript-specific implementation          | `typescript-pro`             |
+| Go/Golang implementation                    | `golang-pro`                 |
+| Rust implementation                         | `rust-pro`                   |
+| Java/Spring Boot implementation             | `java-pro`                   |
+| PHP/Laravel implementation                  | `php-pro`                    |
+| Next.js App Router work                     | `nextjs-pro`                 |
+| SvelteKit/Svelte work                       | `sveltekit-expert`           |
+| GraphQL API implementation                  | `graphql-pro`                |
+| iOS/Swift development                       | `ios-pro`                    |
+| Android/Kotlin development                  | `android-pro`                |
+| React Native/Expo mobile                    | `expo-mobile-developer`      |
+| Tauri desktop development                   | `tauri-desktop-developer`    |
+| ML/AI model development                     | `ai-ml-specialist`           |
+| Blockchain/Solidity/DeFi                    | `web3-blockchain-expert`     |
+| Game development (Unity/Unreal/Godot)       | `gamedev-pro`                |
+| Data pipelines, ETL, analytics              | `data-engineer`              |
+| Scientific research, computational biology  | `scientific-research-expert` |
+| C4 architecture documentation               | `c4-context` / `c4-code`     |
+| Mobile UX review, accessibility audit       | `mobile-ux-reviewer`         |
+| Active production incident                  | `incident-responder`         |
 
 **Example (CORRECT):**
 
@@ -158,6 +178,24 @@ Target Agent: `developer`  ← WRONG: this is documentation work → use technic
 ```
 
 **Rule:** The Router will use your Target Agent recommendation to spawn the correct specialist. If you always say `developer`, 80% of our 49 agents go unused.
+
+## Agent Discovery Protocol (MANDATORY)
+
+Before assigning Target Agents to tasks, read the routing card:
+
+```
+Read('.claude/docs/AGENT_ROUTING_CARD.md')
+```
+
+This contains ALL 49 agents organized by category. Your Agent Selection Guide below covers common cases, but the routing card covers ALL cases including:
+
+- 8 language specialists (python-pro, golang-pro, rust-pro, etc.)
+- 4 framework specialists (frontend-pro, nextjs-pro, sveltekit-expert, graphql-pro)
+- 4 mobile/desktop specialists (ios-pro, android-pro, expo-mobile-developer, tauri-desktop-developer)
+- 5 domain specialists (ai-ml-specialist, web3-blockchain-expert, gamedev-pro, data-engineer, scientific-research-expert)
+- 4 C4 architecture agents (c4-context, c4-container, c4-component, c4-code)
+
+**Rule:** If the task involves a specific technology/language/framework, check the routing card for a matching specialist BEFORE defaulting to `developer`.
 
 ## Task Skill Recommendations (MANDATORY)
 
@@ -252,7 +290,7 @@ Skill({ skill: 'context-compressor' }); // Memory-efficient patterns
 
 After Phase 0 complete and constitution checkpoint passed:
 
-1.  **Read Context**: Scan relevant files using `Grep`, `Glob`, and `Read` **IN PARALLEL**. Do not wait for one to finish before starting the next if gathering info.
+1.  **Read Context**: Scan relevant files using `Grep`, `Glob`, and `Read` **IN PARALLEL**. Do not wait for one to finish before starting the next if gathering info. Read the agent routing card: `.claude/docs/AGENT_ROUTING_CARD.md` (for agent assignment).
 2.  **Think**: Use `Skill({ skill: 'sequential-thinking' })` to model the solution.
 3.  **Draft Plan**: Create a markdown plan following the plan template.
 4.  **Review**: Ensure no steps are missing (e.g., tests, migrations).

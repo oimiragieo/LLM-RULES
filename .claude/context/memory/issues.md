@@ -101,6 +101,8 @@ Setting `HOOK_FAIL_OPEN=true` converts routing-guard, pre-task-unified, unified-
 
 **Resolution:** Replace with per-hook specific overrides requiring config file (not env var).
 
+**OAuth Intersection (2026-02-08):** This issue is a P1 prerequisite for OAuth deployment. If HOOK_FAIL_OPEN=true is set when OAuth auth-enforcement-hook is active, ALL security enforcement (including authentication) is bypassed. The consolidated security assessment at `.claude/context/reports/security/oauth2-security-assessment-2026-02-08.md` lists this as the #1 prerequisite fix (Phase 1, Task 1.2).
+
 ---
 
 ## 2026-02-07: HIGH -- 21 Environment Variable Overrides for Security Controls (Pipeline #14, SEC-HOOK-003)
@@ -1005,3 +1007,193 @@ Require stack:
 - Pipeline #15: Lib System Deep Dive
 
 **Status: RESOLVED (2026-02-07)** — Fixed by inlining `getDefaultTools()` function directly into agent-registry-generator.cjs at line 33. Pre-commit hook now works correctly.
+
+---
+
+## 2026-02-08: 277 Pre-Existing Test Failures (Task #6, Framework Test Suite)
+
+**Date:** 2026-02-08
+
+**Issue:** Full test suite shows 277 failing tests out of 1914 total (14.5% failure rate). All failures are pre-existing (confirmed by comparing against Task #5 baseline).
+
+**Impact:** MEDIUM -- Failures indicate pre-existing bugs/dead code in test suite that should be categorized and remediated systematically.
+
+**Categories (from system-diagnostics-2026-02-08.md):**
+
+1. **Module Not Found** (28 failures) -- Test imports of archived/relocated modules
+2. **Assertion Failures** (164 failures) -- Actual test logic failures
+3. **Hook Execution Errors** (45 failures) -- Errors in hook test execution
+4. **Timeout Failures** (32 failures) -- Tests exceeding timeout limits
+5. **Unknown/Other** (8 failures) -- Categorization incomplete
+
+**Root Causes:**
+
+- **Dead module imports** (Phase #15): Tests importing archived modules (party-mode, integration, agents-runtime, etc.) fail with MODULE_NOT_FOUND. Partial fix in Task #3 (test archival) but some stragglers remain.
+- **Hook consolidation breakage**: 6→2 unified hooks in Task #4 may have changed behavior in ways that break some tests
+- **Complex fixture dependencies**: Some tests have deep fixture setup chains that fail partway through
+- **Timeout issues**: Long-running tests without clear completion signals
+
+**Workaround:** None needed for core functionality (dead code does not affect active features).
+
+**Resolution Path:**
+
+1. **P0 (Immediate)**: Continue archival validation -- ensure no orphaned test imports from Phase #15 remain
+2. **P1 (This Sprint)**: Categorize 277 failures by root cause and prioritize by impact
+3. **P2 (Next Sprint)**: Fix top 20 failures (likely quick wins: archived imports, timeout adjustments)
+4. **P3 (Backlog)**: Systematic remediation of remaining failures (estimated 4-6 hours for 50% reduction)
+
+**Related Tasks:**
+
+- Task #3: Dead code archival (moved tests to _archive/)
+- Task #4: Hook consolidation (unified 6→2)
+- Task #6: Test suite regression validation (established baseline)
+
+**Measurement:** Baseline: 1574/1914 pass (82.2%). Target: 1700+/1914 pass (88%+) after remediation.
+
+---
+
+## 2026-02-08: Memory Management Rebuild Security Findings (Task #7B)
+
+**Date:** 2026-02-08
+
+**Impact:** HIGH -- 3 HIGH, 4 MEDIUM, 3 LOW findings in memory management rebuild components
+
+**Description:**
+
+Security review of the three memory management components being rebuilt from archived modules (Memory Rotator, Smart Pruner, Cold Storage) identified systemic vulnerabilities that must be addressed during implementation.
+
+**Key Findings (HIGH):**
+
+1. **T-MEM-001 (HIGH)**: Archive path injection in Memory Rotator. Constructed archive paths could be manipulated if date values contain path separators. Mitigation: validate all archive paths with `validatePathWithinProject()`.
+
+2. **T-MEM-002 (HIGH)**: JSON prototype pollution across all memory modules. 38 instances of raw `JSON.parse()` without prototype pollution protection in the active memory subsystem (memory-manager.cjs, memory-tiers.cjs, memory-scheduler.cjs, contextual-memory.cjs, memory-dashboard.cjs). Cross-references: SEC-CTX-001, SEC-LIB-005, SEC-LIB-006.
+
+3. **I-MEM-001 (HIGH)**: Sensitive data persists in cold storage archives. Entries containing API keys, tokens, JWTs, or PII are compressed and archived indefinitely without scrubbing.
+
+**Must-Fix Mitigations (Blocking for Implementation):**
+
+- **MF-001**: Create shared `safeJSONParse()` in `.claude/lib/utils/safe-json-parse.cjs`. Use reviver to strip `__proto__`, `constructor`, `prototype` keys.
+- **MF-002**: Use `atomicWriteSync()` for ALL file writes. Create backup via `createBackup()` before any truncation.
+- **MF-003**: Implement `scrubSensitiveContent()` utility to redact API keys, JWTs, emails before cold storage compression.
+
+**Additional Findings (MEDIUM):**
+
+- T-MEM-004: No integrity verification (HMAC/checksum) on compressed cold archives
+- T-MEM-005: Race condition in read-modify-write (concurrent scheduler + agent writes)
+- R-MEM-001: No audit trail for pruned/rotated/archived entries
+- D-MEM-001: Archive files grow without bound (no size limits)
+
+**Recommended Mitigations:**
+
+- RF-001: Archive path validation with `validatePathWithinProject()`
+- RF-002: File locking via `atomicWriteAsync()` with `proper-lockfile`
+- RF-003: Pruning audit manifest (`.claude/context/memory/archive/prune-manifest-YYYY-MM-DD.json`)
+- RF-004: Configurable archive size bounds (default 50MB, FIFO deletion)
+
+**Cross-References:**
+
+- SEC-CTX-001 (Inconsistent safeJSONParse) -- MF-001 addresses this systemically
+- SEC-LIB-005 (safe-json.cjs fallback) -- MF-001 provides proper alternative
+- SEC-CTX-003 (Memory file integrity) -- extends to archive files
+- SEC-LIB-002 (scheduler shell:true) -- E-MEM-002 related finding
+- D-WF-001 (State file locking gap) -- RF-002 addresses for memory files
+
+**Full Report:** `.claude/context/reports/security/memory-management-security-review-2026-02-08.md`
+
+**Verdict:** APPROVED WITH CONDITIONS -- Must-fix items MF-001, MF-002, MF-003 block implementation.
+
+---
+
+## 2026-02-08: Unit Test Isolation Can Hide Integration Bugs (Systemic Pattern - Tasks #9-13)
+
+**Date:** 2026-02-08
+
+**Issue:**
+
+Test-Driven Development uses module isolation (mocking external dependencies) to validate internal logic. This is excellent for unit testing but can create a blind spot for integration contract mismatches. Task #9 implemented 4 memory management modules with 41 passing unit tests, but Task #13 discovered 2 integration bugs that NO unit test caught:
+
+1. Memory-scheduler assumed `pruneResult.entriesRemoved` but smart-pruner returns `pruneResult.removed`
+2. Memory-scheduler passed `{ similarityThreshold: 0.6 }` but smart-pruner expects `{ threshold: 0.6 }`
+
+**Why Tests Missed It:**
+
+- Smart-pruner unit tests: verified `{ removed: count }` is returned ✓ PASS
+- Memory-scheduler unit tests: mocked pruner to return `{ entriesRemoved: count }` ✓ PASS
+- Integration test: missing (no test exercised real pruner + real scheduler together)
+- Result: 41/41 tests pass, but integration fails when code runs
+
+**Root Cause:**
+
+Unit tests validate **internal module logic** by mocking external dependencies based on **test assumptions**. If test assumptions don't match actual implementation, the mismatch only appears during real integration, where mocks are bypassed.
+
+**Impact:**
+
+- FALSE CONFIDENCE: "41 tests pass" suggests integration is validated, but it isn't
+- DELAYED DETECTION: bugs found in code review (Task #13), not development (Task #9)
+- HUMAN BURDEN: code review must catch integration bugs that tests should catch
+- RISK: if code review is skipped, integration bugs ship to production
+
+**Workaround:**
+
+Always include human code review of integration boundaries, checking:
+- Parameter names match actual function signatures
+- Return field names match actual returned objects
+- Error handling is bidirectional (caller + callee)
+
+**Resolution (Medium-term):**
+
+Add explicit "Integration Verification" phase to TDD workflow:
+
+1. **Unit Test Phase:** Validate internal module logic (continue current practice)
+2. **Integration Verification Phase (NEW):** Test real modules together without mocks
+   - Load actual Module B (not mock)
+   - Call with production-like parameters
+   - Verify return values have expected field names
+   - Verify error paths work bidirectionally
+3. **Contract Documentation:** Define expected parameters/fields explicitly
+   ```javascript
+   const PRUNER_CONTRACT = {
+     deduplicate: {
+       params: { entries: 'array', threshold: 'number' },
+       returns: { removed: 'number', timestamp: 'string' }
+     }
+   };
+   ```
+
+**Prevention:**
+
+1. Create integration test template for multi-module systems
+2. Update TDD skill: "Integration Verification Phase" section
+3. Add integration contract patterns to patterns.json
+4. Include "verify integration contracts" in code review checklist
+
+**Related ADRs:** ADR-102 (memory management rebuild), decisions.md entry "Test-Driven Integration Boundary Verification"
+
+**Systemic Scope:** This pattern affects ALL multi-module features in the framework (memory, workflow, routing, config). Any feature with >1 module should include integration verification tests.
+
+---
+
+## 2026-02-08: Code Simplification Analysis -- Framework Complexity (Task #2)
+
+**Date:** 2026-02-08
+
+**Impact:** HIGH -- Framework has accumulated 11,830 lines of dead code and significant structural complexity
+
+**Description:**
+
+Comprehensive code simplification analysis identified:
+
+1. **22 dead workflow modules** (~5,258 lines) in `.claude/lib/workflow/` -- never imported by any active code
+2. **7 dead memory modules** (~2,648 lines) in `.claude/lib/memory/` -- zero active consumers
+3. **ML subsystem** (1,652 lines) always disabled by feature flag
+4. **3 dead self-healing modules** (~1,372 lines) unreferenced
+5. **Triple keyword-to-agent mapping** -- 6 overlapping routing structures across 3 files
+6. **Triple agent registry** -- same 49 agents described in 3 JSON files (6,522 lines)
+7. **14 hooks fire per Write operation** -- each spawning a Node.js process
+8. **13 configuration sources** with 5-level model resolution precedence
+
+**Workaround:** None needed for functionality -- dead code does not affect behavior. But it increases cognitive load and maintenance burden.
+
+**Resolution:** See full report at `.claude/context/reports/architecture/code-simplification-analysis-2026-02-08.md` with prioritized 5-phase action plan.
+
+**Priority:** P1 for dead code archival (zero risk), P2 for consolidation work.

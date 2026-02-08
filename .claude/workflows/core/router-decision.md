@@ -513,9 +513,9 @@ User Request: <USER_REQUEST>
 | CDD project setup              | Conductor Setup Workflow     | `.claude/workflows/conductor-setup-workflow.md`                |
 | Production incidents           | Incident Response Workflow   | `.claude/workflows/operations/incident-response.md`            |
 
-### Step 6.5: Developer Override Check (MANDATORY)
+### Step 6.5: Developer Override Check (MANDATORY — IRON LAW)
 
-**If your Step 6 selection is `developer`, STOP and check these overrides:**
+**STOP. If your Step 6 selection is `developer`, you MUST check this table before proceeding. Developer is the LAST RESORT.**
 
 | If the task involves...                               | Override to             |
 | ----------------------------------------------------- | ----------------------- |
@@ -534,6 +534,16 @@ User Request: <USER_REQUEST>
 **Rule:** `developer` is the LAST RESORT for general coding tasks that don't match any specialist. If a specialist exists, USE IT.
 
 **Anti-pattern:** "developer can handle everything" — NO. Specialists produce better results because their prompts include domain-specific expertise, patterns, and tools.
+
+### Step 6.6: Read Planner Target Agent (When Tasks Exist)
+
+When spawning an agent for an existing task (from TaskGet), check the task description for `Target Agent:` annotation.
+
+**If present:** Use the planner's recommended agent type. The planner has already analyzed the task and assigned the correct specialist.
+
+**If absent:** Apply Step 6.5 manually.
+
+**Rule:** Do NOT override the planner's specialist recommendation with `developer` unless the recommendation is clearly wrong.
 
 ## Step 7: Spawn Decision (Single vs Parallel vs Phased)
 
@@ -1254,6 +1264,8 @@ Do something specific.
 - [ ] Task() calls include task ID if tasks exist
 - [ ] Parallel agents spawned in single response (if applicable)
 - [ ] Model selection appropriate for complexity/risk
+- [ ] Did I check Step 6.5 specialist override before spawning developer?
+- [ ] Did I read planner's Target Agent recommendation from task metadata?
 
 ## Final Deliverables
 

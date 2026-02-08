@@ -42,17 +42,28 @@
 5. **Select:** pick agent(s) + **resolve model from config.yaml** (see Section 5)
 6. **SPAWN:** use **Task tool** with task ID(s) and **configured model**
 
-### Common Misrouting (AVOID — check EVERY spawn)
+### SPECIALIST-FIRST ROUTING LAW (IRON LAW)
 
-| User Request Contains        | WRONG     | CORRECT                |
-| ---------------------------- | --------- | ---------------------- |
-| "update docs/README"         | developer | **technical-writer**   |
-| "clean up/refactor/simplify" | developer | **code-simplifier**    |
-| "review code/PR"             | developer | **code-reviewer**      |
-| "run/write tests"            | developer | **qa**                 |
-| "set up Docker/CI/deploy"    | developer | **devops**             |
-| "design database/schema"     | developer | **database-architect** |
-| "research/investigate"       | developer | **researcher**         |
+**Developer is the LAST RESORT.** If a specialist agent matches the task, the specialist MUST be used.
+
+Before spawning `developer`, Router MUST check Step 6.5 in router-decision.md. If ANY specialist keyword matches, use that specialist instead.
+
+**Enforcement:** `routing-guard.cjs` Check 7 (`SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, default: warn)
+
+**Why:** 49 agents exist. Using developer for docs/review/test/refactor/deploy tasks wastes specialist expertise and produces inferior results. Specialists have domain-specific prompts, skills, and patterns.
+
+### Common Misrouting (MANDATORY CHECK — verify EVERY spawn)
+
+| User Request Contains        | WRONG     | CORRECT                   |
+| ---------------------------- | --------- | ------------------------- |
+| "update docs/README"         | developer | **technical-writer**      |
+| "clean up/refactor/simplify" | developer | **code-simplifier**       |
+| "review code/PR"             | developer | **code-reviewer**         |
+| "run/write tests"            | developer | **qa**                    |
+| "set up Docker/CI/deploy"    | developer | **devops**                |
+| "design database/schema"     | developer | **database-architect**    |
+| "research/investigate"       | developer | **researcher**            |
+| "debug production/incident"  | developer | **devops-troubleshooter** |
 
 **CRITICAL**
 
@@ -261,7 +272,11 @@ Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesi
 - `post-creation-integration.cjs` - Detects creator completions, queues integration analysis (PostToolUse TaskUpdate, default: warn)
 
 **Enforcement Modes:** block (default) | warn | off
-**Override:** `PLANNER_FIRST_ENFORCEMENT=warn`, `CREATOR_GUARD=off`, `SECURITY_REVIEW_ENFORCEMENT=off`
+**Override:** `PLANNER_FIRST_ENFORCEMENT=warn`, `CREATOR_GUARD=off`, `SECURITY_REVIEW_ENFORCEMENT=off`, `SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`
+
+**Specialist Override Check:**
+
+- `routing-guard.cjs` Check 7 - Specialist override enforcement (PreToolUse Task, default: warn)
 
 ---
 
@@ -447,7 +462,7 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 
 **Router NEVER:** execute complex tasks, edit code, use blacklisted tools, explore codebase directly, run implementation commands, create/modify files, bypass self-check.
 
-**Router ALWAYS:** pass gates, spawn via Task, include task IDs, TaskList() first, whitelist-only tools.
+**Router ALWAYS:** pass gates, spawn via Task, include task IDs, TaskList() first, whitelist-only tools, check specialist match (Step 6.5) before defaulting to developer.
 
 ---
 
