@@ -1,0 +1,130 @@
+{
+  "version": "1.0.0",
+  "description": "Ecosystem impact graph mapping artifact types to their required downstream integrations",
+  "lastUpdated": "2026-02-08",
+  "artifactTypes": {
+    "agent": {
+      "mustHave": [
+        { "action": "update-routing-table", "target": ".claude/lib/routing/routing-table.cjs", "description": "Add routing keywords for new agent" },
+        { "action": "update-agent-registry", "target": ".claude/context/agent-registry.json", "description": "Register agent in agent-registry.json" },
+        { "action": "update-agent-config", "target": ".claude/context/runtime/agent-config.json", "description": "Add agent to runtime config" },
+        { "action": "update-claude-md", "target": ".claude/CLAUDE.md", "description": "Add agent to routing table in CLAUDE.md Section 3" }
+      ],
+      "shouldHave": [
+        { "action": "assign-skills", "trigger": "skill-creator", "condition": "Agent needs specialized skills" },
+        { "action": "create-hooks", "trigger": "hook-creator", "condition": "Agent needs custom enforcement hooks" },
+        { "action": "create-workflows", "trigger": "workflow-creator", "condition": "Agent needs custom workflows" },
+        { "action": "create-commands", "trigger": "command-creator", "condition": "Agent should be invocable via slash command" }
+      ],
+      "niceToHave": [
+        { "action": "add-identity", "target": ".claude/templates/spawn/agent-identity-integration.md", "description": "Add personality frontmatter" },
+        { "action": "add-test", "target": "tests/agents/", "description": "Add agent behavior tests" }
+      ]
+    },
+    "skill": {
+      "mustHave": [
+        { "action": "update-claude-md", "target": ".claude/CLAUDE.md", "description": "Reference skill in CLAUDE.md Section 7 or 8.5" },
+        { "action": "update-skill-catalog", "target": ".claude/context/artifacts/catalogs/skill-catalog.md", "description": "Add entry to skill catalog" },
+        { "action": "assign-to-agent", "target": ".claude/context/agent-registry.json", "description": "Assign skill to at least one agent" },
+        { "action": "update-skill-index", "target": ".claude/context/artifacts/catalogs/skill-index.md", "description": "Add to skill index if it exists" }
+      ],
+      "shouldHave": [
+        { "action": "create-command", "trigger": "command-creator", "condition": "Skill should be user-invocable via /command" },
+        { "action": "validate-schema", "target": ".claude/schemas/skill-definition.schema.json", "description": "Validate frontmatter against schema" }
+      ],
+      "niceToHave": [
+        { "action": "add-test", "target": "tests/skills/", "description": "Add skill behavior tests" },
+        { "action": "update-memory", "target": ".claude/context/memory/learnings.md", "description": "Record skill creation in learnings" }
+      ]
+    },
+    "hook": {
+      "mustHave": [
+        { "action": "register-in-settings", "target": ".claude/settings.json", "description": "Register hook in settings.json hooks array" },
+        { "action": "update-hook-agent-map", "target": ".claude/docs/@HOOK_AGENT_MAP.md", "description": "Add hook to hook-agent mapping" },
+        { "action": "add-test", "target": "tests/hooks/", "description": "Create test file for the hook" }
+      ],
+      "shouldHave": [
+        { "action": "update-enforcement-hooks", "target": ".claude/docs/@ENFORCEMENT_HOOKS.md", "description": "Document in enforcement hooks reference" },
+        { "action": "update-hooks-reference", "target": ".claude/docs/HOOKS_REFERENCE.md", "description": "Add to hooks reference documentation" }
+      ],
+      "niceToHave": [
+        { "action": "update-memory", "target": ".claude/context/memory/learnings.md", "description": "Record hook creation pattern" }
+      ]
+    },
+    "workflow": {
+      "mustHave": [
+        { "action": "update-claude-md", "target": ".claude/CLAUDE.md", "description": "Reference workflow in CLAUDE.md Section 8.6" },
+        { "action": "update-workflow-agent-map", "target": ".claude/docs/@WORKFLOW_AGENT_MAP.md", "description": "Map workflow to responsible agents" }
+      ],
+      "shouldHave": [
+        { "action": "update-agent-workflows", "trigger": "agent-creator", "condition": "Agents need workflow section updates" },
+        { "action": "create-command", "trigger": "command-creator", "condition": "Workflow should be user-invocable" }
+      ],
+      "niceToHave": [
+        { "action": "add-diagram", "target": ".claude/context/artifacts/diagrams/", "description": "Create workflow diagram" },
+        { "action": "update-memory", "target": ".claude/context/memory/decisions.md", "description": "Record workflow design decisions" }
+      ]
+    },
+    "template": {
+      "mustHave": [
+        { "action": "update-template-catalog", "target": ".claude/context/artifacts/catalogs/template-catalog.md", "description": "Add entry to template catalog" },
+        { "action": "add-readme", "target": "README.md in template directory", "description": "Document template usage" },
+        { "action": "verify-consumers", "target": "consuming skills/workflows", "description": "Ensure at least one consumer references the template" }
+      ],
+      "shouldHave": [
+        { "action": "add-placeholders-doc", "description": "Document all placeholder variables" }
+      ],
+      "niceToHave": [
+        { "action": "add-test", "target": "tests/templates/", "description": "Add template rendering tests" }
+      ]
+    },
+    "schema": {
+      "mustHave": [
+        { "action": "update-schema-catalog", "target": ".claude/context/artifacts/catalogs/schema-catalog.md", "description": "Add entry to schema catalog" }
+      ],
+      "shouldHave": [
+        { "action": "wire-validator", "description": "Wire schema to a validation hook or creator" },
+        { "action": "add-test", "target": "tests/schemas/", "description": "Add schema validation tests" }
+      ],
+      "niceToHave": [
+        { "action": "update-memory", "target": ".claude/context/memory/learnings.md", "description": "Record schema design decisions" }
+      ]
+    },
+    "command": {
+      "mustHave": [
+        { "action": "update-command-catalog", "target": ".claude/context/artifacts/catalogs/command-catalog.md", "description": "Add entry to command catalog" },
+        { "action": "verify-backing-skill", "description": "Ensure backing skill exists in .claude/skills/" }
+      ],
+      "shouldHave": [
+        { "action": "update-claude-md", "target": ".claude/CLAUDE.md", "description": "Add to CLAUDE.md Section 7.1 key commands list" }
+      ],
+      "niceToHave": [
+        { "action": "add-test", "target": "tests/commands/", "description": "Add command invocation tests" }
+      ]
+    },
+    "rule": {
+      "mustHave": [
+        { "action": "validate-content-structure", "description": "Ensure rule has heading, bullet points, and actionable items" }
+      ],
+      "shouldHave": [
+        { "action": "check-conflict", "description": "Check for conflicts with existing rules in .claude/rules/" }
+      ],
+      "niceToHave": [
+        { "action": "update-memory", "target": ".claude/context/memory/decisions.md", "description": "Record rule rationale as ADR" }
+      ]
+    },
+    "tool": {
+      "mustHave": [
+        { "action": "update-tool-catalog", "target": ".claude/context/artifacts/catalogs/tool-catalog.md", "description": "Add entry to tool catalog" }
+      ],
+      "shouldHave": [
+        { "action": "add-package-script", "target": "package.json", "description": "Add npm script for CLI-invocable tools" },
+        { "action": "wire-to-skill", "trigger": "skill-creator", "condition": "Tool should be skill-backed" }
+      ],
+      "niceToHave": [
+        { "action": "add-test", "target": "tests/tools/", "description": "Add tool behavior tests" },
+        { "action": "update-memory", "target": ".claude/context/memory/learnings.md", "description": "Record tool creation pattern" }
+      ]
+    }
+  }
+}
