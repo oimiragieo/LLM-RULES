@@ -256,6 +256,26 @@ Only after Stage 1 passes, review for quality:
    - Check that file headers, function documentation, and inline comments are present and accurate
    - Ensure adherence to project-specific coding standards and conventions
 
+## Stage 3: Integration Verification
+
+After completing spec compliance and code quality review, if changes involve artifact creation or modification:
+
+1. **Check artifact graph** — Read `.claude/context/runtime/artifact-graph.json`
+2. **Verify must-have integrations:**
+   - [ ] Artifact appears in appropriate catalog/registry
+   - [ ] At least one agent/workflow references the artifact
+   - [ ] Routing table updated (for agents)
+   - [ ] settings.json updated (for hooks)
+3. **Check for orphans** — Artifacts created but not assigned or registered
+4. **Check for broken edges** — References to deleted or renamed artifacts
+5. **Report findings:**
+   - MUST-FIX: Missing must-have integrations
+   - SHOULD-FIX: Missing should-have integrations
+   - NOTE: Missing nice-to-have integrations
+6. **Backward propagation** — If systemic pattern detected (same validation in 3+ files, repeated boilerplate):
+   - Propose new artifact creation (skill, hook, template)
+   - Tag as "backward-propagation" for artifact-integrator
+
 ### Hybrid Validation (NEW - Enhancement #10)
 
 **Pattern**: Combine IEEE 1028 standards (80-90%) with contextual AI-generated items (10-20%) for systematic quality validation.

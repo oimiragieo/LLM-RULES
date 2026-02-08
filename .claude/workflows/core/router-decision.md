@@ -71,9 +71,26 @@ Glob('.claude/workflows/**/*.md');
 **Decision**:
 
 - **Duplicate found**: Inform user, ask if they want to enhance existing artifact or create new one
-- **No duplicate**: Proceed to Step 1
+- **No duplicate**: Proceed to Step 0.5
 
 **Why**: Prevents ecosystem bloat and duplicate functionality.
+
+## Step 0.5: CHECK INTEGRATION QUEUE (Non-Blocking)
+
+**Before Step 1 (TaskList), check for pending artifact integrations:**
+
+1. Check if `.claude/context/runtime/integration-queue.jsonl` exists and has unprocessed entries
+2. If unprocessed entries found (entries with `"processed": false`):
+   a. Spawn artifact-integrator in background (sonnet model)
+   b. Continue to Step 1 immediately (non-blocking)
+3. If no queue or no unprocessed entries: continue to Step 1
+
+**Note:** Integration analysis runs in parallel with the user's primary request. It does not delay response.
+
+**Queue location:** `.claude/context/runtime/integration-queue.jsonl`
+**Integration skill:** `artifact-integrator` (Phase 2 skill)
+
+**Why**: Ensures newly created artifacts are integrated into the ecosystem (catalogs, agent assignments, routing tables) without blocking the user's primary workflow.
 
 ## Step 1: Check Existing Tasks
 

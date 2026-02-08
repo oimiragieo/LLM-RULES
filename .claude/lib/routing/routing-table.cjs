@@ -1597,6 +1597,21 @@ const INTENT_KEYWORDS = {
     'bibtex',
   ],
 
+  // === ARTIFACT INTEGRATION INTENT (Phase 2 integration analysis) ===
+  'artifact-integration': [
+    'integrate artifact',
+    'missing integration',
+    'orphan artifact',
+    'artifact not discovered',
+    'not in catalog',
+    'not assigned to agent',
+    'artifact graph',
+    'integration check',
+    'integration health',
+    'artifact dependency',
+    'cross-artifact',
+  ],
+
   // === WEB3/BLOCKCHAIN INTENT (routes to web3-blockchain-expert) ===
   web3: [
     'web3',
@@ -1751,6 +1766,9 @@ const INTENT_TO_AGENT = {
   master_orchestrator: 'master-orchestrator',
   swarm_coordinator: 'swarm-coordinator',
   evolution_orchestrator: 'evolution-orchestrator',
+
+  // Artifact Integration (routes to architect for integration analysis)
+  'artifact-integration': 'architect',
 
   // Scientific intent (dedicated agent with 139 scientific sub-skills)
   scientific: 'scientific-research-expert',

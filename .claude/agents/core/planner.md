@@ -23,15 +23,12 @@ extended_thinking: true
 priority: high
 context_strategy: lazy_load
 skills:
-  - brainstorming
   - checklist-generator
   - complexity-assessment
   - context-compressor
   - plan-generator
-  - progressive-disclosure
   - sequential-thinking
   - spec-gathering
-  - task-breakdown
   - task-management-protocol
   - verification-before-completion
 
@@ -648,6 +645,28 @@ Constitution Checkpoint Results:
 [After fixing]
 ✅ All 4 gates pass → Proceed to Phase 1
 ```
+
+## Gate 5: Artifact Dependency Planning (MANDATORY)
+
+Before finalizing any implementation plan, check:
+
+1. **Creates artifacts?** Does this task create new skills, agents, hooks, workflows, templates, or schemas?
+   - If YES: Include integration tasks in the plan (catalog entry, agent assignment, routing)
+   - Order integration tasks AFTER creation tasks
+   - Reference artifact-integrator skill for deep analysis
+
+2. **Modifies artifacts?** Does this task modify existing artifacts?
+   - If YES: Check artifact-graph.json for dependents via `getImpactRadius()`
+   - Include update/review tasks for all direct dependents
+
+3. **Deletes/archives artifacts?** Does this task remove artifacts?
+   - If YES: Check artifact-graph.json for consumers
+   - Include migration tasks for affected consumers
+
+4. For each artifact task, specify:
+   - Target Creator: which creator skill handles it
+   - Integration Level: must-have / should-have / nice-to-have
+   - Dependencies: what must complete before this task starts
 
 ## Commit Checkpoint Pattern (NEW - Enhancement #9)
 

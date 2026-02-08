@@ -8,6 +8,8 @@
 
 This workflow ensures that all created artifacts are properly integrated into the ecosystem before being considered complete. It addresses the gap identified in the Party Mode incident where a fully-implemented feature was invisible to the Router due to missing CLAUDE.md routing entry.
 
+**Source of Truth:** Integration status for all artifacts is tracked in `.claude/context/data/artifact-graph.json`. This graph represents the dependency relationships and integration completion state for every artifact in the ecosystem.
+
 ## When to Use
 
 - **MANDATORY** after ANY artifact creation via creator skills
@@ -268,6 +270,69 @@ This step is BLOCKING. Do NOT mark task complete until validation passes.
 
 ---
 
+## Artifact Graph Integration
+
+After completing the integration checklist, update the artifact graph to reflect the new artifact's status:
+
+### Step: Update Artifact Graph
+
+```bash
+# Use the artifact-graph library to record the artifact
+# This updates .claude/context/data/artifact-graph.json
+
+node -e "
+const ArtifactGraph = require('./.claude/lib/workflow/artifact-graph.cjs');
+const graph = new ArtifactGraph('./.claude/context/data/artifact-graph.json');
+
+// Add artifact node
+graph.addNode({
+  id: '{type}:{name}',
+  type: '{artifact-type}',
+  name: '{artifact-name}',
+  created: new Date().toISOString()
+});
+
+// Add integration edges as you complete checklist items
+graph.addEdge('{type}:{name}', 'agent:{assigned-agent}', 'assigned-to');
+
+graph.save();
+"
+```
+
+**Note:** The artifact-graph provides a canonical view of all artifact integrations and dependencies. This graph is automatically updated by the `post-creation-integration.cjs` hook (see below), but manual updates ensure accuracy.
+
+---
+
+## Automated Integration Detection
+
+The system includes automated hooks that detect incomplete integrations:
+
+### post-creation-integration.cjs Hook
+
+**Location:** `.claude/hooks/workflow/post-creation-integration.cjs`
+
+**Behavior:**
+
+- Fires automatically when any creator task completes (PostToolUse on TaskUpdate)
+- Detects creator completions via metadata or pattern matching
+- Runs quick integration check using artifact-graph.cjs library
+- Queues incomplete integrations to `.claude/context/runtime/integration-queue.jsonl`
+- Never blocks (advisory mode) - allows task to complete while flagging gaps
+
+### artifact-integrator Skill
+
+**Reference:** `.claude/skills/artifact-integrator/SKILL.md`
+
+**Purpose:** Automated integration analysis and remediation for artifacts with gaps. Use this skill when:
+
+- You need comprehensive integration analysis across all artifact relationships
+- You want to generate integration tasks for incomplete artifacts
+- You're auditing the ecosystem for integration health
+
+The artifact-integrator skill uses the artifact-graph library to identify missing integrations and generate detailed remediation tasks.
+
+---
+
 ## Session Reminder Hook
 
 A session hook reminds agents about recently created artifacts that may need integration verification:
@@ -315,6 +380,10 @@ Track these metrics to measure workflow effectiveness:
 
 ## Related Documents
 
+- **Artifact Graph System:** `.claude/lib/workflow/artifact-graph.cjs` (library for managing artifact relationships and integration status)
+- **Artifact Graph CLI Tool:** `.claude/tools/cli/bootstrap-artifact-graph.cjs` (tool for building/updating the graph)
+- **Integration Hook:** `.claude/hooks/workflow/post-creation-integration.cjs` (auto-detects incomplete integrations)
+- **Artifact Integrator Skill:** `.claude/skills/artifact-integrator/SKILL.md` (remediation workflows)
 - **Research Report:** `.claude/context/artifacts/research-reports/artifact-integration-best-practices-20260128.md`
 - **Validation Tool:** `.claude/tools/cli/validate-integration.cjs`
 - **Reminder Hook:** `.claude/hooks/session/post-creation-reminder.cjs`
