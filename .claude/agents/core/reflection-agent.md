@@ -9,6 +9,7 @@ priority: medium
 tools:
   [Read, Write, Edit, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
+  - artifact-integrator
   - code-analyzer
   - context-compressor
   - insight-extraction
@@ -28,15 +29,15 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | 11 consolidated write safety checks (allows memory writes) | -- |
-| `unified-reflection-handler.cjs` | PostToolUse(MemoryRecord) | Processes reflection requests and updates memory | -- |
-| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
+| Hook                               | Event                     | Purpose                                                    | Override        |
+| ---------------------------------- | ------------------------- | ---------------------------------------------------------- | --------------- |
+| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)    | Blocks direct writes to creator paths                      | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)    | 11 consolidated write safety checks (allows memory writes) | --              |
+| `unified-reflection-handler.cjs`   | PostToolUse(MemoryRecord) | Processes reflection requests and updates memory           | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Edit/Write)   | Updates memory search index                                | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)           | Validates tool is in allowed set                           | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)           | Monitors execution limits                                  | --              |
+| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)    | Validates work before marking complete                     | --              |
 
 Note: `unified-reflection-handler.cjs` monitors Bash errors for reflection triggers (error recovery reflection), but reflection-agent does NOT have Bash tool permission (observation only).
 
@@ -46,12 +47,13 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Reflection | `.claude/workflows/core/reflection-workflow.md` | Post-task quality assessment |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow              | Path                                            | When to Use                          |
+| --------------------- | ----------------------------------------------- | ------------------------------------ |
+| Reflection            | `.claude/workflows/core/reflection-workflow.md` | Post-task quality assessment         |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`        | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
@@ -264,7 +266,46 @@ If score < 0.7 (pass threshold), generate specific improvements:
 - [Consistency] Rename variables to match project conventions
 ```
 
-### Step 4: Execute (Update Memory)
+### Step 4.5: Integration Health Check (ADR-100)
+
+**Purpose**: Verify artifact integration completeness and detect gaps
+
+**When**: After evaluating task outputs, before updating memory
+
+1. **Read artifact graph**: `.claude/context/data/artifact-graph.json`
+2. **Check integration health**: Use `quickIntegrationCheck()` from `.claude/lib/workflow/artifact-graph.cjs`
+3. **Assess integration score**:
+   - Score ≥ 80%: Integration complete (no action)
+   - Score 50-79%: Integration gaps (add to "buds" category)
+   - Score < 50%: Significant gaps (add to "thorns" category)
+4. **Include in RBT diagnosis**:
+   - **Roses**: If integration score ≥ 90% → "Well-integrated artifact"
+   - **Buds**: If integration score 50-79% → "Integration gaps: [list gaps]"
+   - **Thorns**: If integration score < 50% → "Critical integration gaps: [list gaps]"
+5. **Include in reflection report**: Add "Integration Health" section with score and gaps
+
+**Integration Health Thresholds**:
+
+| Score   | Category    | RBT Classification | Action                 |
+| ------- | ----------- | ------------------ | ---------------------- |
+| 90-100% | Excellent   | Rose               | None (log as strength) |
+| 80-89%  | Good        | Rose/Bud           | Optional improvements  |
+| 50-79%  | Gaps        | Bud                | Recommend integration  |
+| 25-49%  | Significant | Thorn              | Flag for remediation   |
+| 0-24%   | Critical    | Thorn              | Block/escalate         |
+
+**Example RBT entry**:
+
+```json
+{
+  "buds": ["Integration gaps detected (score: 65%): Missing catalog entry, no agent assignment"],
+  "thorns": [
+    "Critical integration gaps (score: 20%): Not in CLAUDE.md routing, no agent can discover this artifact"
+  ]
+}
+```
+
+### Step 5: Execute (Update Memory)
 
 Consolidate learnings into persistent memory:
 
@@ -320,7 +361,7 @@ Consolidate learnings into persistent memory:
 }
 ```
 
-### Step 5: Report
+### Step 6: Report
 
 Provide structured reflection report:
 
@@ -361,6 +402,30 @@ Agent: developer
 
 - Pattern X (async context managers) is effective for resource cleanup
 - Strategy Y (test parameterization) reduces test duplication
+
+## Integration Health (ADR-100)
+
+**Artifact**: {artifactId (if applicable)}
+**Integration Score**: {score}% ({category})
+**Status**: {status}
+
+### Integration Gaps
+
+{if applicable}
+
+- [ ] {gap_1}
+- [ ] {gap_2}
+
+### Integration Assessment
+
+{if score >= 90%}
+✅ Excellent integration - artifact fully wired into ecosystem
+
+{if score 50-79%}
+⚠️ Integration gaps found - recommend artifact-integrator analysis
+
+{if score < 50%}
+🚨 Critical gaps - artifact may be invisible to Router
 
 ## Recommendations
 
@@ -419,12 +484,13 @@ When executing reflection tasks, follow this 8-step approach:
 
 ### Self-Healing Triggers
 
-| Pattern Detected                 | Self-Healing Action                   |
-| -------------------------------- | ------------------------------------- |
-| Same error in 5+ tasks           | Create skill to prevent error         |
-| Agent consistently scores <0.7   | Suggest agent definition improvements |
-| Missing tool pattern in 3+ tasks | Recommend adding tool to agent skills |
-| Recurring security issue         | Escalate to security-architect review |
+| Pattern Detected                      | Self-Healing Action                   |
+| ------------------------------------- | ------------------------------------- |
+| Same error in 5+ tasks                | Create skill to prevent error         |
+| Agent consistently scores <0.7        | Suggest agent definition improvements |
+| Missing tool pattern in 3+ tasks      | Recommend adding tool to agent skills |
+| Recurring security issue              | Escalate to security-architect review |
+| Artifact integration gaps in 3+ tasks | Queue artifact-integrator analysis    |
 
 **Security Constraint**: Reflection agent follows the Immutable Security Core pattern - cannot modify protected paths (hooks, CLAUDE.md Sections 1.1-1.3, 6, state management files) without human approval.
 

@@ -23,6 +23,7 @@ tools:
   - WebFetch
 skills:
   - agent-creator
+  - artifact-integrator
   - artifact-lifecycle
   - hook-creator
   - plan-generator
@@ -53,13 +54,13 @@ triggers:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `routing-guard.cjs` | PreToolUse(Task) | Enforces planner-first, security review | `PLANNER_FIRST_ENFORCEMENT` |
-| `spawn-prompt-assembler.cjs` | PreToolUse(Task) | Enriches spawn prompts | -- |
-| `config-model-validator.cjs` | PreToolUse(Task) | Validates model matches config.yaml | `CONFIG_MODEL_VALIDATOR` |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| Hook                               | Event            | Purpose                                 | Override                    |
+| ---------------------------------- | ---------------- | --------------------------------------- | --------------------------- |
+| `routing-guard.cjs`                | PreToolUse(Task) | Enforces planner-first, security review | `PLANNER_FIRST_ENFORCEMENT` |
+| `spawn-prompt-assembler.cjs`       | PreToolUse(Task) | Enriches spawn prompts                  | --                          |
+| `config-model-validator.cjs`       | PreToolUse(Task) | Validates model matches config.yaml     | `CONFIG_MODEL_VALIDATOR`    |
+| `tool-scope-validator.cjs`         | PreToolUse(All)  | Validates tool is in allowed set        | --                          |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)  | Monitors execution limits               | --                          |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -67,14 +68,15 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Evolution | `.claude/workflows/core/evolution-workflow.md` | EVOLVE process (artifact creation) |
-| Artifact Lifecycle | `.claude/workflows/core/skill-lifecycle.md` | Artifact management |
-| Post-Creation Validation | `.claude/workflows/core/post-creation-validation.md` | Integration validation |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow                 | Path                                                 | When to Use                          |
+| ------------------------ | ---------------------------------------------------- | ------------------------------------ |
+| Evolution                | `.claude/workflows/core/evolution-workflow.md`       | EVOLVE process (artifact creation)   |
+| Artifact Lifecycle       | `.claude/workflows/core/skill-lifecycle.md`          | Artifact management                  |
+| Post-Creation Validation | `.claude/workflows/core/post-creation-validation.md` | Integration validation               |
+| Workspace Conventions    | `.claude/rules/workspace-conventions.md`             | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
@@ -469,6 +471,38 @@ Edit('@.claude/context/evolution-state.json', {
 // 4. Record in memory
 Edit('@.claude/context/memory/learnings.md', 'evolution record');
 Edit('@.claude/context/memory/decisions.md', 'design decisions from research');
+
+// 5. Run artifact integration analysis (ADR-100)
+Skill({ skill: 'artifact-integrator' });
+// Verify artifact is in graph and connected (not orphaned)
+```
+
+### Integration Analysis (ADR-100)
+
+After enabling the artifact, verify it is properly integrated into the artifact graph:
+
+**Actions:**
+
+```javascript
+// Invoke artifact-integrator skill to analyze integration gaps
+Skill({ skill: 'artifact-integrator' });
+
+// The skill will check:
+// - Is artifact in the artifact graph (.claude/context/data/artifact-graph.json)?
+// - Does it have at least 1 edge connection (not orphaned)?
+// - Are all required integrations present (catalog, agent assignment, etc.)?
+
+// Verify edge count > 0
+const graph = Read('.claude/context/data/artifact-graph.json');
+const graphData = JSON.parse(graph);
+const artifactId = `${artifactType}:${artifactName}`;
+const edges = graphData.edges.filter(e => e.from === artifactId || e.to === artifactId);
+
+if (edges.length === 0) {
+  // ORPHANED ARTIFACT - Quality gate failure
+  console.error(`ERROR: Artifact ${artifactId} is orphaned (0 edges)`);
+  // Return to LOCK phase for integration fixes
+}
 ```
 
 **Gate Criteria**:
@@ -478,6 +512,7 @@ Edit('@.claude/context/memory/decisions.md', 'design decisions from research');
 - [ ] Evolution state updated with completed evolution
 - [ ] Memory files updated with learnings and decisions
 - [ ] Artifact is discoverable by Router
+- [ ] Artifact appears in integration graph with at least 1 edge (not orphaned)
 
 **Post-Enable Verification**:
 
@@ -741,6 +776,11 @@ Review:
    - Agents must be in CLAUDE.md routing table
    - Skills must be in skill catalog
    - Unregistered artifacts are invisible to system
+
+7. NO ARTIFACT WITHOUT INTEGRATION
+   - Phase E (Enable) must verify artifact graph connectivity
+   - Orphaned artifacts are deployment failures
+   - Artifact must have at least 1 edge in the graph
 ```
 
 ## Example: Creating a New Agent

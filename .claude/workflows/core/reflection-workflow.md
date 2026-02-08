@@ -415,6 +415,84 @@ For significant decisions, create lightweight ADRs:
 
 ---
 
+## Phase 5.5: Integration Health Check (ADR-100)
+
+**Purpose**: Verify artifact integration completeness for created artifacts
+
+**When**: After learning extraction, before memory update (for tasks involving artifact creation)
+
+### 5.5.1 Integration Assessment
+
+```javascript
+function checkIntegrationHealth(context, task) {
+  // Only run for creator completions
+  if (!isCreatorTask(task)) {
+    return { skip: true };
+  }
+
+  const artifactId = extractArtifactId(task);
+  const graphPath = '.claude/context/data/artifact-graph.json';
+
+  // Use quickIntegrationCheck from artifact-graph.cjs
+  const { gaps, status, score } = quickIntegrationCheck(artifactId, graphPath);
+
+  return {
+    artifactId,
+    integrationScore: score || 0,
+    status,
+    gaps,
+    category: classifyIntegrationHealth(score)
+  };
+}
+
+function classifyIntegrationHealth(score) {
+  if (score >= 90) return 'excellent';
+  if (score >= 80) return 'good';
+  if (score >= 50) return 'gaps';
+  if (score >= 25) return 'significant';
+  return 'critical';
+}
+```
+
+### 5.5.2 Integration RBT Classification
+
+Map integration health to RBT categories:
+
+| Integration Score | RBT Category | Description |
+|-------------------|--------------|-------------|
+| 90-100% | **Rose** | "Well-integrated artifact with complete routing/catalog/agent assignment" |
+| 80-89% | **Rose/Bud** | "Good integration, minor gaps: [list]" |
+| 50-79% | **Bud** | "Integration gaps found: [list]" |
+| 25-49% | **Thorn** | "Significant integration gaps: [list]" |
+| 0-24% | **Thorn** | "Critical integration gaps (artifact may be invisible): [list]" |
+
+### 5.5.3 Integration Health Output
+
+Include integration assessment in reflection report:
+
+```markdown
+## Integration Health (ADR-100)
+
+**Artifact**: {artifactId}
+**Integration Score**: {score}% ({category})
+**Status**: {status}
+
+### Integration Gaps
+
+{for each gap}
+- [ ] {gap.type}: {gap.description}
+
+### Recommended Actions
+
+{if score < 80%}
+1. Invoke artifact-integrator skill for remediation
+2. Add missing catalog entries
+3. Update routing keywords
+4. Assign to at least one agent
+```
+
+---
+
 ## Phase 6: Memory Update
 
 **Purpose**: Persist learnings into appropriate memory files.

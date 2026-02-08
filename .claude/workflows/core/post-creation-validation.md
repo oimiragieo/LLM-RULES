@@ -227,6 +227,88 @@ Ask Router: "I need help with <artifact-domain>"
 
 ---
 
+## Step 11: Trigger Reflection for Integration Assessment
+
+**Purpose**: Connect creation → integration → reflection feedback loop
+
+**When**: After artifact integration validation completes (regardless of pass/fail)
+
+### 11.1 Reflection Trigger Logic
+
+```javascript
+// After completing Steps 1-10 (integration checklist)
+function triggerReflectionForArtifact(artifactId, validationResult) {
+  const reflectionRequest = {
+    taskId: getCurrentTaskId(),
+    trigger: 'artifact_creation',
+    artifactId,
+    timestamp: new Date().toISOString(),
+    priority: 'medium',
+    context: {
+      validationResult,
+      integrationScore: validationResult.score,
+      gaps: validationResult.gaps
+    }
+  };
+
+  // Queue for reflection-agent
+  appendToQueue('.claude/context/runtime/reflection-spawn-request.json', reflectionRequest);
+}
+```
+
+### 11.2 Reflection Assessment Focus
+
+When reflection-agent processes artifact creation tasks, it should assess:
+
+1. **Integration Completeness** (via Step 4.5 in reflection-agent.md):
+   - Read artifact graph
+   - Run `quickIntegrationCheck()`
+   - Classify integration health (excellent/good/gaps/significant/critical)
+
+2. **Creation Quality**:
+   - Artifact follows framework patterns
+   - Documentation complete
+   - No placeholder text
+
+3. **Learnings Extraction**:
+   - What integration steps were challenging?
+   - What could improve the creator workflow?
+   - Should we add validation reminders?
+
+### 11.3 Integration Health in RBT Diagnosis
+
+The reflection report will include integration health in the RBT framework:
+
+```markdown
+## RBT Diagnosis
+
+### Roses (Strengths)
+- Artifact created with complete documentation
+- All tests passing
+
+### Buds (Growth Opportunities)
+- Integration score: 65% (gaps: catalog entry, agent assignment)
+- Could improve: Add catalog entry immediately after file creation
+
+### Thorns (Issues)
+- Critical integration gap: No routing keywords added to CLAUDE.md
+- Artifact is invisible to Router until fixed
+```
+
+### 11.4 Self-Healing Trigger
+
+If reflection detects recurring integration gaps across 3+ artifact creations:
+
+```markdown
+**Self-Healing Recommendation**: Pattern detected - creators frequently miss catalog updates.
+Consider:
+1. Add blocking validation to creator skills
+2. Create pre-completion checklist reminder
+3. Invoke artifact-integrator automatically after creator completion
+```
+
+---
+
 ## Validation CLI Tool
 
 Use the automated validation tool:

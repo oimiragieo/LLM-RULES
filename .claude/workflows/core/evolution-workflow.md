@@ -679,6 +679,10 @@ Edit('.claude/context/evolution-state.json', {
 // 6. Record in memory files
 Edit('.claude/context/memory/learnings.md', 'evolution record');
 Edit('.claude/context/memory/decisions.md', 'ADR for design decisions');
+
+// 7. Run artifact integration analysis (ADR-100)
+Skill({ skill: 'artifact-integrator' });
+// Verify artifact is in graph and connected
 ```
 
 **Post-Enable Verification**:
@@ -702,6 +706,7 @@ grep "<workflow-name>" .claude/CLAUDE.md || echo "FAILED: Not in workflow table"
 - [ ] Evolution state updated with completed evolution
 - [ ] Memory files updated with learnings and decisions
 - [ ] Artifact is discoverable by Router (grep verification passes)
+- [ ] Artifact appears in integration graph with at least 1 edge (not orphaned)
 
 **Failure Mode**:
 
@@ -720,6 +725,8 @@ const gate6 = {
   learningsRecorded: true, // learnings.md updated
   decisionsRecorded: true, // decisions.md updated
   discoverableByRouter: true, // grep verification passes
+  artifactInGraph: true, // Artifact node exists in graph
+  artifactNotOrphaned: true, // At least 1 edge connection
 };
 const gate6Passed = Object.values(gate6).every(v => v === true);
 ```
@@ -843,6 +850,8 @@ These rules are INVIOLABLE. Violations break the workflow.
     },
     "researchReport": "path/to/report.md",
     "artifactPath": "path/to/artifact",
+    "integrationStatus": "pending|connected|orphaned",
+    "integrationEdges": 0,
     "blockedReason": null,
     "blockedAt": null,
     "recommendedAction": null
