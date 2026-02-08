@@ -213,14 +213,15 @@ Hooks execute in registration order within each event. Understanding execution o
 3. `windows-null-sanitizer.cjs` - Prevent reserved names
 4. `routing-guard.cjs` - Router bash whitelist
 
-### PreToolUse (Write/Edit)
+### PreToolUse (Write/Edit/NotebookEdit)
 
-1. `unified-creator-guard.cjs` - Block creator path writes
-2. `unified-pre-write-hook.cjs` - 11 consolidated checks
-3. `evolution-state-guard.cjs` - Protect evolution state
-4. `research-enforcement.cjs` - Enforce research
-5. `quality-gate-validator.cjs` - Workflow gates
-6. `conflict-detector.cjs` (Write only) - Detect conflicts
+1. `routing-guard.cjs` - Block Router writes (except allowed paths)
+2. `unified-creator-guard.cjs` - Block creator path writes
+3. `unified-pre-write-hook.cjs` - 11 consolidated checks
+4. `evolution-state-guard.cjs` - Protect evolution state
+5. `research-enforcement.cjs` - Enforce research
+6. `quality-gate-validator.cjs` - Workflow gates
+7. `conflict-detector.cjs` (Write only) - Detect conflicts
 
 ### PreToolUse (Task)
 
