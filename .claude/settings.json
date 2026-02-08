@@ -30,15 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session/session-cleanup.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/monitoring/execution-limit-monitor-hook.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/tool-scope-validator.cjs"
+            "command": "node .claude/hooks/routing/pre-tool-unified.cjs"
           }
         ]
       },
@@ -182,15 +174,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/monitoring/metrics-collector-hook.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/monitoring/error-tracker-hook.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/self-healing/anomaly-detector.cjs"
+            "command": "node .claude/hooks/metrics/post-tool-metrics-unified.cjs"
           }
         ]
       },
