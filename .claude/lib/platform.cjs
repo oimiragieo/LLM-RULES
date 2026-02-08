@@ -32,11 +32,7 @@ function _isGitBash() {
  * in Git Bash (MINGW) or cmd.exe/PowerShell. This constant auto-detects.
  */
 const NULL_DEVICE =
-  process.platform === 'win32'
-    ? _isGitBash()
-      ? '/dev/null'
-      : 'NUL'
-    : '/dev/null';
+  process.platform === 'win32' ? (_isGitBash() ? '/dev/null' : 'NUL') : '/dev/null';
 
 /**
  * Whether the current platform is Windows.

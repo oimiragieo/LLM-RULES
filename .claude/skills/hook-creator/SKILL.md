@@ -66,6 +66,7 @@ This skill creates hooks for the Claude Code framework:
 ## Hook-Agent Archetype Reference
 
 When creating hooks, determine which agent archetypes will be governed by the new hook. See `.claude/docs/@HOOK_AGENT_MAP.md` for:
+
 - **Section 1**: Full hook-agent matrix
 - **Section 2**: Archetype hook sets (Router, Implementer, Reviewer, Documenter, Orchestrator, Researcher)
 

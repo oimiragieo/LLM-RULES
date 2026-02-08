@@ -5,7 +5,13 @@ const assert = require('node:assert');
 const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const SCHEMA_VALIDATOR_PATH = path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs');
+const SCHEMA_VALIDATOR_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'lib',
+  'utils',
+  'schema-validator.cjs'
+);
 const SCHEMA_PATH = path.join(PROJECT_ROOT, '.claude', 'schemas', 'skill-definition.schema.json');
 
 // =============================================================================
@@ -73,6 +79,8 @@ test('short description fails validation (minLength)', () => {
 
 test('create.cjs _SCHEMA_PATH references existing schema file', () => {
   const fs = require('fs');
-  assert.ok(fs.existsSync(SCHEMA_PATH),
-    'skill-definition.schema.json should exist at expected path');
+  assert.ok(
+    fs.existsSync(SCHEMA_PATH),
+    'skill-definition.schema.json should exist at expected path'
+  );
 });

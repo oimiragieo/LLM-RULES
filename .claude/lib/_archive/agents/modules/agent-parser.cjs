@@ -116,7 +116,10 @@ class AgentParser {
    */
   validateDefinition(definition) {
     const schemaPath = path.join(
-      PROJECT_ROOT, '.claude', 'schemas', 'agent-definition.schema.json'
+      PROJECT_ROOT,
+      '.claude',
+      'schemas',
+      'agent-definition.schema.json'
     );
     return validateData(definition, schemaPath);
   }

@@ -35,11 +35,9 @@ function log(levelName, message, meta, component) {
 
   const output = format(levelName, message, meta, component);
 
-  if (levelScore >= LEVELS.warn) {
-    console.error(output);
-  } else {
-    console.log(output);
-  }
+  // Always use stderr for log output to avoid polluting stdout,
+  // which hooks use for structured JSON responses
+  console.error(output);
 }
 
 class Logger {

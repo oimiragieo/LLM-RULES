@@ -11,6 +11,7 @@
 **ADR Reference:** See ADR-098 (Lib System Overhaul - Pipeline #15)
 
 **Modules Archived:**
+
 - production-agent.cjs
 - worker-agent.cjs
 - bootstrap.cjs

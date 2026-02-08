@@ -2,28 +2,28 @@
 
 ## Core Agents
 
-| Agent              | Purpose                 | When to Use                 |
-| ------------------ | ----------------------- | --------------------------- |
-| router             | Route work to agents    | Every request (automatic)   |
-| planner            | Implementation planning | Complex features, refactors |
-| architect          | System design           | Architectural decisions     |
-| developer          | TDD implementation      | New features, bug fixes     |
-| code-reviewer      | Code review             | After writing code          |
-| qa                 | Testing strategy        | Test execution, quality     |
+| Agent         | Purpose                 | When to Use                 |
+| ------------- | ----------------------- | --------------------------- |
+| router        | Route work to agents    | Every request (automatic)   |
+| planner       | Implementation planning | Complex features, refactors |
+| architect     | System design           | Architectural decisions     |
+| developer     | TDD implementation      | New features, bug fixes     |
+| code-reviewer | Code review             | After writing code          |
+| qa            | Testing strategy        | Test execution, quality     |
 
 ## Security & Documentation
 
-| Agent              | Purpose             | When to Use            |
-| ------------------ | ------------------- | ---------------------- |
-| security-architect | Security analysis   | Auth, payment, PII     |
-| technical-writer   | Documentation       | Docs and guides        |
+| Agent              | Purpose           | When to Use        |
+| ------------------ | ----------------- | ------------------ |
+| security-architect | Security analysis | Auth, payment, PII |
+| technical-writer   | Documentation     | Docs and guides    |
 
 ## Orchestration
 
-| Agent                | Purpose                 | When to Use               |
-| -------------------- | ----------------------- | ------------------------- |
-| master-orchestrator  | Multi-agent coordination| Complex multi-phase work  |
-| evolution-orchestrator| Framework evolution    | Adding new capabilities   |
+| Agent                  | Purpose                  | When to Use              |
+| ---------------------- | ------------------------ | ------------------------ |
+| master-orchestrator    | Multi-agent coordination | Complex multi-phase work |
+| evolution-orchestrator | Framework evolution      | Adding new capabilities  |
 
 ## Domain Specialists
 

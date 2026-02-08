@@ -211,7 +211,7 @@ function getViolationStats(options = {}) {
     // Filter by time window
     const now = Date.now();
     const windowMs = windowMinutes * 60 * 1000;
-    const recentEntries = allEntries.filter((entry) => {
+    const recentEntries = allEntries.filter(entry => {
       const timestamp = new Date(entry.timestamp).getTime();
       return now - timestamp <= windowMs;
     });

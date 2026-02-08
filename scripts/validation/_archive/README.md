@@ -9,12 +9,14 @@ This directory contains validation scripts that are no longer active but are pre
 **Reason:** Overlapping functionality with `validate-rule-index-paths.mjs` (subset/superset relationship).
 
 **Issues:**
+
 - Had phantom import: `.claude/tools/context/context-path-resolver.mjs` (old path from pre-Pipeline #7)
 - Only validated paths in rule-index.json
 - `validate-rule-index-paths.mjs` validates paths AND version compatibility (superset)
 - Root wrapper `scripts/validate-index.mjs` now delegates to superset
 
 **What happened:**
+
 - Root wrapper updated to delegate to `validate-rule-index-paths.mjs`
 - Implementation archived to avoid confusion
 - `pnpm validate:index` npm script still works (delegates to superset)

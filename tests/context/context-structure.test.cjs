@@ -31,11 +31,17 @@ describe('Context Structure - Pipeline #12 Cleanup', () => {
         if (!entry.isDirectory()) return false;
 
         // Check for patterns like: impl-plan-kHwypz, qa-report-c05Ene, test-plan-DCyOsO
-        const hasHashPattern = /-(kHwypz|WuHjJL|c05Ene|eiwkdm|EjOE7P|DCyOsO|zHYXQi)$/.test(entry.name);
+        const hasHashPattern = /-(kHwypz|WuHjJL|c05Ene|eiwkdm|EjOE7P|DCyOsO|zHYXQi)$/.test(
+          entry.name
+        );
         return hasHashPattern;
       });
 
-      assert.equal(hashNamedDirs.length, 0, `Found ${hashNamedDirs.length} hash-named directories: ${hashNamedDirs.map(d => d.name).join(', ')}`);
+      assert.equal(
+        hashNamedDirs.length,
+        0,
+        `Found ${hashNamedDirs.length} hash-named directories: ${hashNamedDirs.map(d => d.name).join(', ')}`
+      );
     });
 
     it('workflows directory does not exist', () => {
@@ -47,12 +53,20 @@ describe('Context Structure - Pipeline #12 Cleanup', () => {
   describe('Duplicate file deletion', () => {
     it('no duplicate dependency-report.json at artifacts root', () => {
       const duplicatePath = path.join(CONTEXT_DIR, 'artifacts/dependency-report.json');
-      assert.equal(fs.existsSync(duplicatePath), false, 'duplicate dependency-report.json should not exist');
+      assert.equal(
+        fs.existsSync(duplicatePath),
+        false,
+        'duplicate dependency-report.json should not exist'
+      );
     });
 
     it('no duplicate knowledge-base-index.csv at artifacts root', () => {
       const duplicatePath = path.join(CONTEXT_DIR, 'artifacts/knowledge-base-index.csv');
-      assert.equal(fs.existsSync(duplicatePath), false, 'duplicate knowledge-base-index.csv should not exist');
+      assert.equal(
+        fs.existsSync(duplicatePath),
+        false,
+        'duplicate knowledge-base-index.csv should not exist'
+      );
     });
   });
 
@@ -89,13 +103,11 @@ describe('Context Structure - Pipeline #12 Cleanup', () => {
         'audit-logs',
         'audits',
         'risk-assessments',
-        'tasks'
+        'tasks',
       ];
 
       const entries = fs.readdirSync(archiveDir, { withFileTypes: true });
-      const archivedDirs = entries
-        .filter(e => e.isDirectory())
-        .map(e => e.name);
+      const archivedDirs = entries.filter(e => e.isDirectory()).map(e => e.name);
 
       expectedArchived.forEach(dirName => {
         assert.ok(archivedDirs.includes(dirName), `${dirName} should be archived`);
@@ -147,7 +159,7 @@ describe('Context Structure - Pipeline #12 Cleanup', () => {
         path.join(CONTEXT_DIR, 'artifacts/reflections'),
         path.join(CONTEXT_DIR, 'artifacts/reports'),
         path.join(CONTEXT_DIR, 'artifacts/security-reviews'),
-        path.join(CONTEXT_DIR, 'artifacts/qa-reports')
+        path.join(CONTEXT_DIR, 'artifacts/qa-reports'),
       ];
 
       possiblyEmptyDirs.forEach(dirPath => {

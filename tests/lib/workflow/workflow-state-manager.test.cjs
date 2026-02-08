@@ -25,7 +25,10 @@ const {
 } = require(path.join(__dirname, '../../../.claude/lib/workflow/workflow-state-manager.cjs'));
 
 // Test state file path
-const TEST_STATE_FILE = path.join(__dirname, '../../../.claude/context/runtime/test-workflow-state.json');
+const TEST_STATE_FILE = path.join(
+  __dirname,
+  '../../../.claude/context/runtime/test-workflow-state.json'
+);
 
 describe('WorkflowStateManager', () => {
   beforeEach(() => {
@@ -187,13 +190,19 @@ describe('WorkflowStateManager', () => {
       advancePhase(workflowId, 'PHASE_1_DESIGN', TEST_STATE_FILE);
       recordAgent(workflowId, 'PHASE_1_DESIGN', 'architect', '50', TEST_STATE_FILE);
 
-      markAgentComplete(workflowId, 'PHASE_1_DESIGN', 'architect', {
-        artifacts: ['.claude/context/plans/test-design.md']
-      }, TEST_STATE_FILE);
+      markAgentComplete(
+        workflowId,
+        'PHASE_1_DESIGN',
+        'architect',
+        {
+          artifacts: ['.claude/context/plans/test-design.md'],
+        },
+        TEST_STATE_FILE
+      );
 
       const state = JSON.parse(fs.readFileSync(TEST_STATE_FILE, 'utf8'));
       assert.deepStrictEqual(state.phases.PHASE_1_DESIGN.agents.architect.artifacts, [
-        '.claude/context/plans/test-design.md'
+        '.claude/context/plans/test-design.md',
       ]);
     });
   });
@@ -205,7 +214,13 @@ describe('WorkflowStateManager', () => {
       recordAgent(workflowId, 'PHASE_1_DESIGN', 'planner', '1', TEST_STATE_FILE);
       recordAgent(workflowId, 'PHASE_1_DESIGN', 'architect', '2', TEST_STATE_FILE);
       markAgentComplete(workflowId, 'PHASE_1_DESIGN', 'planner', { plan: 'done' }, TEST_STATE_FILE);
-      markAgentComplete(workflowId, 'PHASE_1_DESIGN', 'architect', { design: 'done' }, TEST_STATE_FILE);
+      markAgentComplete(
+        workflowId,
+        'PHASE_1_DESIGN',
+        'architect',
+        { design: 'done' },
+        TEST_STATE_FILE
+      );
 
       const result = evaluateGate(workflowId, 'PHASE_1_DESIGN', TEST_STATE_FILE);
 
@@ -266,12 +281,24 @@ describe('WorkflowStateManager', () => {
       advancePhase(workflowId, 'PHASE_1_DESIGN', TEST_STATE_FILE);
       recordAgent(workflowId, 'PHASE_1_DESIGN', 'planner', '1', TEST_STATE_FILE);
       recordAgent(workflowId, 'PHASE_1_DESIGN', 'architect', '2', TEST_STATE_FILE);
-      markAgentComplete(workflowId, 'PHASE_1_DESIGN', 'planner', {
-        artifacts: ['.claude/context/plans/impl-plan.md']
-      }, TEST_STATE_FILE);
-      markAgentComplete(workflowId, 'PHASE_1_DESIGN', 'architect', {
-        artifacts: ['.claude/context/plans/design.md']
-      }, TEST_STATE_FILE);
+      markAgentComplete(
+        workflowId,
+        'PHASE_1_DESIGN',
+        'planner',
+        {
+          artifacts: ['.claude/context/plans/impl-plan.md'],
+        },
+        TEST_STATE_FILE
+      );
+      markAgentComplete(
+        workflowId,
+        'PHASE_1_DESIGN',
+        'architect',
+        {
+          artifacts: ['.claude/context/plans/design.md'],
+        },
+        TEST_STATE_FILE
+      );
 
       const artifacts = getPhaseArtifacts(workflowId, 'PHASE_1_DESIGN', TEST_STATE_FILE);
 

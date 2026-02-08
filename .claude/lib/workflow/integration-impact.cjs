@@ -11,110 +11,110 @@ const INTEGRATION_RULES = {
     {
       gapType: 'catalog-entry',
       priority: 'must-have',
-      taskSubject: (name) => `Add ${name} to skill-catalog.md`,
+      taskSubject: name => `Add ${name} to skill-catalog.md`,
       taskAgent: 'technical-writer',
       taskCreator: null,
-      taskPriority: 'P1'
+      taskPriority: 'P1',
     },
     {
       gapType: 'agent-assignment',
       priority: 'must-have',
-      taskSubject: (name) => `Assign ${name} skill to relevant agent`,
+      taskSubject: name => `Assign ${name} skill to relevant agent`,
       taskAgent: 'agent-creator',
       taskCreator: 'agent-creator',
-      taskPriority: 'P1'
+      taskPriority: 'P1',
     },
     {
       gapType: 'enforcement-hook',
       priority: 'should-have',
-      taskSubject: (name) => `Create enforcement hook for ${name}`,
+      taskSubject: name => `Create enforcement hook for ${name}`,
       taskAgent: 'hook-creator',
       taskCreator: 'hook-creator',
-      taskPriority: 'P2'
-    }
+      taskPriority: 'P2',
+    },
   ],
   agent: [
     {
       gapType: 'registry-entry',
       priority: 'must-have',
-      taskSubject: (name) => `Add ${name} to agent-registry.json`,
+      taskSubject: name => `Add ${name} to agent-registry.json`,
       taskAgent: 'technical-writer',
       taskCreator: null,
-      taskPriority: 'P1'
+      taskPriority: 'P1',
     },
     {
       gapType: 'routing-keywords',
       priority: 'must-have',
-      taskSubject: (name) => `Add routing keywords for ${name}`,
+      taskSubject: name => `Add routing keywords for ${name}`,
       taskAgent: 'router',
       taskCreator: null,
-      taskPriority: 'P1'
+      taskPriority: 'P1',
     },
     {
       gapType: 'claude-md-entry',
       priority: 'should-have',
-      taskSubject: (name) => `Update CLAUDE.md routing table for ${name}`,
+      taskSubject: name => `Update CLAUDE.md routing table for ${name}`,
       taskAgent: 'technical-writer',
       taskCreator: null,
-      taskPriority: 'P2'
-    }
+      taskPriority: 'P2',
+    },
   ],
   hook: [
     {
       gapType: 'settings-registration',
       priority: 'must-have',
-      taskSubject: (name) => `Register ${name} hook in settings.json`,
+      taskSubject: name => `Register ${name} hook in settings.json`,
       taskAgent: 'devops',
       taskCreator: null,
-      taskPriority: 'P1'
+      taskPriority: 'P1',
     },
     {
       gapType: 'docs-entry',
       priority: 'should-have',
-      taskSubject: (name) => `Document ${name} in @ENFORCEMENT_HOOKS.md`,
+      taskSubject: name => `Document ${name} in @ENFORCEMENT_HOOKS.md`,
       taskAgent: 'technical-writer',
       taskCreator: null,
-      taskPriority: 'P2'
-    }
+      taskPriority: 'P2',
+    },
   ],
   workflow: [
     {
       gapType: 'registry-entry',
       priority: 'must-have',
-      taskSubject: (name) => `Add ${name} to workflow registry`,
+      taskSubject: name => `Add ${name} to workflow registry`,
       taskAgent: 'technical-writer',
       taskCreator: null,
-      taskPriority: 'P1'
+      taskPriority: 'P1',
     },
     {
       gapType: 'agent-mapping',
       priority: 'must-have',
-      taskSubject: (name) => `Add agent mapping for ${name} workflow`,
+      taskSubject: name => `Add agent mapping for ${name} workflow`,
       taskAgent: 'workflow-creator',
       taskCreator: 'workflow-creator',
-      taskPriority: 'P1'
-    }
+      taskPriority: 'P1',
+    },
   ],
   template: [
     {
       gapType: 'catalog-entry',
       priority: 'must-have',
-      taskSubject: (name) => `Add ${name} to template-catalog.md`,
+      taskSubject: name => `Add ${name} to template-catalog.md`,
       taskAgent: 'technical-writer',
       taskCreator: null,
-      taskPriority: 'P1'
-    }
+      taskPriority: 'P1',
+    },
   ],
   schema: [
     {
       gapType: 'catalog-entry',
       priority: 'must-have',
-      taskSubject: (name) => `Add ${name} to schema-catalog.md`,
+      taskSubject: name => `Add ${name} to schema-catalog.md`,
       taskAgent: 'technical-writer',
       taskCreator: null,
-      taskPriority: 'P1'
-    }
-  ]
+      taskPriority: 'P1',
+    },
+  ],
 };
 
 /**
@@ -124,7 +124,7 @@ const EDGE_TO_GAP_MAP = {
   skill: {
     references: 'catalog-entry',
     'assigned-to': 'agent-assignment',
-    'enforced-by': 'enforcement-hook'
+    'enforced-by': 'enforcement-hook',
   },
   agent: {
     references: 'registry-entry',
@@ -132,18 +132,18 @@ const EDGE_TO_GAP_MAP = {
   },
   hook: {
     // settings-registration is file-based, not edge-based
-    references: 'docs-entry'
+    references: 'docs-entry',
   },
   workflow: {
     references: 'registry-entry',
     // agent-mapping is file-based
   },
   template: {
-    references: 'catalog-entry'
+    references: 'catalog-entry',
   },
   schema: {
-    references: 'catalog-entry'
-  }
+    references: 'catalog-entry',
+  },
 };
 
 /**
@@ -167,7 +167,7 @@ function analyzeImpact({ artifactId, changeType, graphPath }) {
       directDependents: [],
       missingIntegrations: [],
       proposedTasks: [],
-      impactScore: 0
+      impactScore: 0,
     };
   }
 
@@ -180,7 +180,7 @@ function analyzeImpact({ artifactId, changeType, graphPath }) {
       directDependents: [],
       missingIntegrations: [],
       proposedTasks: [],
-      impactScore: 0
+      impactScore: 0,
     };
   }
 
@@ -192,10 +192,9 @@ function analyzeImpact({ artifactId, changeType, graphPath }) {
   const outgoingEdges = graph.getEdges(artifactId, 'outgoing');
 
   // For updated/deleted: find dependents (nodes that use this artifact)
-  const directDependents = [...new Set([
-    ...incomingEdges.map(e => e.from),
-    ...outgoingEdges.map(e => e.to)
-  ])];
+  const directDependents = [
+    ...new Set([...incomingEdges.map(e => e.from), ...outgoingEdges.map(e => e.to)]),
+  ];
 
   let missingIntegrations = [];
   let proposedTasks = [];
@@ -203,28 +202,31 @@ function analyzeImpact({ artifactId, changeType, graphPath }) {
 
   if (changeType === 'created') {
     // Analyze missing integrations for created artifacts
-    const integrationResult = _analyzeCreatedArtifact(artifactId, artifactType, artifactName, graph);
+    const integrationResult = _analyzeCreatedArtifact(
+      artifactId,
+      artifactType,
+      artifactName,
+      graph
+    );
     missingIntegrations = integrationResult.missingIntegrations;
     proposedTasks = integrationResult.proposedTasks;
     impactScore = integrationResult.impactScore;
-
   } else if (changeType === 'updated') {
     // Propose review tasks for each dependent
     proposedTasks = directDependents.map(dependentId => ({
       subject: `Review ${dependentId} for compatibility with updated ${artifactName}`,
       agent: 'code-reviewer',
       priority: 'P2',
-      creator: null
+      creator: null,
     }));
     impactScore = 0; // Updates don't have integration gaps
-
   } else if (changeType === 'deleted') {
     // Propose migration tasks for consumers
     proposedTasks = directDependents.map(dependentId => ({
       subject: `Migrate ${dependentId} away from deleted ${artifactName}`,
       agent: 'developer',
       priority: 'P1',
-      creator: null
+      creator: null,
     }));
     impactScore = 0; // Deletions don't have integration gaps
   }
@@ -235,7 +237,7 @@ function analyzeImpact({ artifactId, changeType, graphPath }) {
     directDependents,
     missingIntegrations,
     proposedTasks,
-    impactScore
+    impactScore,
   };
 }
 
@@ -278,7 +280,11 @@ function _analyzeCreatedArtifact(artifactId, artifactType, artifactName, graph) 
     }
 
     // Special handling for file-based checks (always unknown from graph alone)
-    if (['routing-keywords', 'settings-registration', 'agent-mapping', 'claude-md-entry'].includes(gapType)) {
+    if (
+      ['routing-keywords', 'settings-registration', 'agent-mapping', 'claude-md-entry'].includes(
+        gapType
+      )
+    ) {
       // These require file inspection, mark as unknown (treated as missing for now)
       status = 'missing';
     }
@@ -287,7 +293,7 @@ function _analyzeCreatedArtifact(artifactId, artifactType, artifactName, graph) 
       type: gapType,
       target: null, // Could be enhanced to detect specific target
       priority,
-      status
+      status,
     });
 
     // Generate proposed task if missing
@@ -296,7 +302,7 @@ function _analyzeCreatedArtifact(artifactId, artifactType, artifactName, graph) 
         subject: taskSubject(artifactName),
         agent: taskAgent,
         priority: taskPriority,
-        creator: taskCreator
+        creator: taskCreator,
       });
     }
   }
@@ -307,7 +313,7 @@ function _analyzeCreatedArtifact(artifactId, artifactType, artifactName, graph) 
   return {
     missingIntegrations,
     proposedTasks,
-    impactScore
+    impactScore,
   };
 }
 
@@ -347,8 +353,8 @@ function analyzeBatch(entries, graphPath) {
         total: 0,
         fullyIntegrated: 0,
         needsWork: 0,
-        avgScore: 0
-      }
+        avgScore: 0,
+      },
     };
   }
 
@@ -356,16 +362,14 @@ function analyzeBatch(entries, graphPath) {
     analyzeImpact({
       artifactId: entry.artifactId,
       changeType: entry.changeType,
-      graphPath
+      graphPath,
     })
   );
 
   const total = results.length;
   const fullyIntegrated = results.filter(r => r.impactScore === 0).length;
   const needsWork = total - fullyIntegrated;
-  const avgScore = total > 0
-    ? results.reduce((sum, r) => sum + r.impactScore, 0) / total
-    : 0;
+  const avgScore = total > 0 ? results.reduce((sum, r) => sum + r.impactScore, 0) / total : 0;
 
   return {
     results,
@@ -373,8 +377,8 @@ function analyzeBatch(entries, graphPath) {
       total,
       fullyIntegrated,
       needsWork,
-      avgScore
-    }
+      avgScore,
+    },
   };
 }
 
@@ -395,7 +399,10 @@ function generateReport(impactResult) {
 
   // Missing integrations
   report += `### Missing Integrations\n`;
-  if (missingIntegrations.length === 0 || missingIntegrations.every(m => m.status === 'satisfied')) {
+  if (
+    missingIntegrations.length === 0 ||
+    missingIntegrations.every(m => m.status === 'satisfied')
+  ) {
     report += `None - artifact is fully integrated.\n\n`;
   } else {
     report += `| # | Integration | Priority | Status |\n`;

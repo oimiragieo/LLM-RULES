@@ -393,6 +393,7 @@ For the complete template catalog with agent assignments and cross-references, s
 **Catalog:** `.claude/context/artifacts/catalogs/template-catalog.md`
 
 This catalog provides:
+
 - Full template inventory with descriptions
 - Agent assignment matrix (which agents use which templates)
 - Template dependencies and relationships

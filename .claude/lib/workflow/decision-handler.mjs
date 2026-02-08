@@ -31,7 +31,9 @@ class SafeExpressionParser {
     const result = this.parseExpression();
     this.skipWhitespace();
     if (this.pos < this.length) {
-      throw new Error(`Unexpected character at position ${this.pos}: '${this.expression[this.pos]}'`);
+      throw new Error(
+        `Unexpected character at position ${this.pos}: '${this.expression[this.pos]}'`
+      );
     }
     return result;
   }
@@ -84,15 +86,24 @@ class SafeExpressionParser {
     if (op) {
       const right = this.parsePrimary();
       switch (op) {
-        case '===': return left === right;
-        case '!==': return left !== right;
-        case '==': return left == right; // eslint-disable-line eqeqeq -- intentional loose equality for workflow expressions
-        case '!=': return left != right; // eslint-disable-line eqeqeq -- intentional loose inequality for workflow expressions
-        case '>=': return left >= right;
-        case '<=': return left <= right;
-        case '>': return left > right;
-        case '<': return left < right;
-        default: throw new Error(`Unknown operator: ${op}`);
+        case '===':
+          return left === right;
+        case '!==':
+          return left !== right;
+        case '==':
+          return left == right; // eslint-disable-line eqeqeq -- intentional loose equality for workflow expressions
+        case '!=':
+          return left != right; // eslint-disable-line eqeqeq -- intentional loose inequality for workflow expressions
+        case '>=':
+          return left >= right;
+        case '<=':
+          return left <= right;
+        case '>':
+          return left > right;
+        case '<':
+          return left < right;
+        default:
+          throw new Error(`Unknown operator: ${op}`);
       }
     }
     return left;
@@ -141,7 +152,9 @@ class SafeExpressionParser {
     if (this.matchWord('undefined')) return undefined;
 
     // Reject anything else (identifiers, function calls, etc.)
-    throw new Error(`Unexpected token at position ${this.pos}: '${this.expression.slice(this.pos, this.pos + 20)}'`);
+    throw new Error(
+      `Unexpected token at position ${this.pos}: '${this.expression.slice(this.pos, this.pos + 20)}'`
+    );
   }
 
   parseStringLiteral(quote) {
@@ -153,12 +166,23 @@ class SafeExpressionParser {
         this.pos += 1;
         const escaped = this.expression[this.pos];
         switch (escaped) {
-          case "'": str += "'"; break;
-          case '"': str += '"'; break;
-          case '\\': str += '\\'; break;
-          case 'n': str += '\n'; break;
-          case 't': str += '\t'; break;
-          default: str += escaped;
+          case "'":
+            str += "'";
+            break;
+          case '"':
+            str += '"';
+            break;
+          case '\\':
+            str += '\\';
+            break;
+          case 'n':
+            str += '\n';
+            break;
+          case 't':
+            str += '\t';
+            break;
+          default:
+            str += escaped;
         }
         this.pos += 1;
         continue;
@@ -176,12 +200,20 @@ class SafeExpressionParser {
   parseNumber() {
     const start = this.pos;
     if (this.expression[this.pos] === '-') this.pos += 1;
-    while (this.pos < this.length && this.expression[this.pos] >= '0' && this.expression[this.pos] <= '9') {
+    while (
+      this.pos < this.length &&
+      this.expression[this.pos] >= '0' &&
+      this.expression[this.pos] <= '9'
+    ) {
       this.pos += 1;
     }
     if (this.pos < this.length && this.expression[this.pos] === '.') {
       this.pos += 1;
-      while (this.pos < this.length && this.expression[this.pos] >= '0' && this.expression[this.pos] <= '9') {
+      while (
+        this.pos < this.length &&
+        this.expression[this.pos] >= '0' &&
+        this.expression[this.pos] <= '9'
+      ) {
         this.pos += 1;
       }
     }

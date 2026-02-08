@@ -13,34 +13,43 @@ These hooks have been superseded by consolidated versions and are no longer regi
 ## Archived Hooks by Category
 
 ### audit/ (1)
+
 - `git-notes-audit.cjs` - Git notes auditing (superseded by audit system consolidation)
 
 ### cost-tracking/ (1)
+
 - `llm-usage-tracker.cjs` - LLM token usage tracking (superseded by metrics-collector-hook)
 
 ### evolution/ (2)
+
 - `evolution-audit.cjs` - Evolution workflow auditing (superseded by quality-gate-validator)
 - `unified-evolution-guard.cjs` - Evolution guards (superseded by evolution-state-guard)
 
 ### git/ (1)
+
 - `regenerate-registries.cjs` - Registry regeneration (superseded by post-commit CI)
 
 ### memory/ (2)
+
 - `format-memory.cjs` - Memory formatting (superseded by memory-manager)
 - `planning-progress-tracker.cjs` - Planning progress tracking (superseded by workflow-state-manager)
 
 ### monitoring/ (3)
+
 - `error-tracker.cjs` - Error tracking library (**RESTORED** to hooks/monitoring/ on 2026-02-06; required by error-tracker-hook.cjs wrapper)
 - `execution-limit-monitor.cjs` - Execution limits (superseded by execution-limit-monitor-hook.cjs)
 - `metrics-collector.cjs` - Metrics collection library (**RESTORED** to hooks/monitoring/ on 2026-02-06; required by metrics-collector-hook.cjs wrapper)
 
 ### post-tool-use/ (1)
+
 - `incremental-indexer.cjs` - Incremental code indexing (superseded by code-index-updater)
 
 ### reflection/ (1)
+
 - `error-summary-extractor.cjs` - Error summarization (superseded by unified-reflection-handler)
 
 ### routing/ (13)
+
 - `agent-context-tracker.cjs` - Agent context tracking (superseded by post-task-unified)
 - `agent-health-hook.cjs` - Agent health monitoring (superseded by anomaly-detector)
 - `context-mode-tool-guard.cjs` - Context mode validation (superseded by tool-scope-validator)
@@ -56,6 +65,7 @@ These hooks have been superseded by consolidated versions and are no longer regi
 - `tool-availability-validator.cjs` - Tool availability checks (superseded by tool-scope-validator)
 
 ### safety/ (10)
+
 - `bash-cwd-validator.cjs` - Bash CWD validation (superseded by bash-command-validator)
 - `command-allowlist-validator.cjs` - Command allowlist (superseded by bash-command-validator)
 - `enforce-claude-md-update.cjs` - CLAUDE.md enforcement (superseded by unified-pre-write-hook)
@@ -68,23 +78,28 @@ These hooks have been superseded by consolidated versions and are no longer regi
 - `write-content-scanner.cjs` - Write content scanning (superseded by unified-pre-write-hook)
 
 ### self-healing/ (1)
+
 - `auto-rerouter.cjs` - Automatic rerouting (superseded by anomaly-detector)
 
 ### session/ (1)
+
 - `post-creation-reminder.cjs` - Post-creation reminders (superseded by state-reset)
 
 ### skills/ (4)
+
 - `duplicate-detector.cjs` - Duplicate skill detection (functionality removed)
 - `metadata-validator.cjs` - Skill metadata validation (functionality removed)
 - `rule-structure-validator.cjs` - Skill rule structure validation (functionality removed)
 - `rule-validator.cjs` - Skill rule validation (functionality removed)
 
 ### validation/ (3)
+
 - `agent-tools-validator.cjs` - Agent tool validation (superseded by tool-scope-validator)
 - `plan-evolution-guard.cjs` - Plan evolution guard (superseded by quality-gate-validator)
 - `track-analytics-validator.cjs` - Analytics tracking (superseded by metrics-collector-hook)
 
 ### Root Level (1)
+
 - `statusline.cjs` - Status line display (functionality removed)
 
 ## Total: 45 Archived Hooks
@@ -94,6 +109,7 @@ These hooks have been superseded by consolidated versions and are no longer regi
 If you need to restore an archived hook:
 
 1. Move file back to original location:
+
    ```bash
    git mv .claude/hooks/_archive/{category}/{file} .claude/hooks/{category}/{file}
    ```

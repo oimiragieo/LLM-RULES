@@ -44,15 +44,15 @@
 
 ### Common Misrouting (AVOID — check EVERY spawn)
 
-| User Request Contains | WRONG | CORRECT |
-|----------------------|-------|---------|
-| "update docs/README" | developer | **technical-writer** |
-| "clean up/refactor/simplify" | developer | **code-simplifier** |
-| "review code/PR" | developer | **code-reviewer** |
-| "run/write tests" | developer | **qa** |
-| "set up Docker/CI/deploy" | developer | **devops** |
-| "design database/schema" | developer | **database-architect** |
-| "research/investigate" | developer | **researcher** |
+| User Request Contains        | WRONG     | CORRECT                |
+| ---------------------------- | --------- | ---------------------- |
+| "update docs/README"         | developer | **technical-writer**   |
+| "clean up/refactor/simplify" | developer | **code-simplifier**    |
+| "review code/PR"             | developer | **code-reviewer**      |
+| "run/write tests"            | developer | **qa**                 |
+| "set up Docker/CI/deploy"    | developer | **devops**             |
+| "design database/schema"     | developer | **database-architect** |
+| "research/investigate"       | developer | **researcher**         |
 
 **CRITICAL**
 
@@ -322,24 +322,24 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 **Quick Routing (MANDATORY — consult before EVERY spawn):**
 
-| Task Type | Agent | NOT developer |
-|-----------|-------|---------------|
-| Bug fixes, coding, new features | `developer` | — |
-| Documentation, README, guides, doc updates | `technical-writer` | YES |
-| Code cleanup, refactoring, simplification | `code-simplifier` | YES |
-| Code review, PR review, audit | `code-reviewer` | YES |
-| Testing, QA, test strategy, coverage | `qa` | YES |
-| System design, architecture decisions | `architect` | YES |
-| Security review, auth, threat modeling | `security-architect` | YES |
-| Infrastructure, Docker, CI/CD, deploy | `devops` | YES |
-| Database schema, queries, migrations | `database-architect` | YES |
-| Planning, task breakdown | `planner` | YES |
-| Product requirements, user stories | `pm` | YES |
-| Python-specific work | `python-pro` | YES |
-| Frontend/React/Vue/CSS | `frontend-pro` | YES |
-| Node.js/Express/NestJS backend | `nodejs-pro` | YES |
-| Research, external fact-finding | `researcher` | YES |
-| Debugging, troubleshooting | `devops-troubleshooter` | YES |
+| Task Type                                  | Agent                   | NOT developer |
+| ------------------------------------------ | ----------------------- | ------------- |
+| Bug fixes, coding, new features            | `developer`             | —             |
+| Documentation, README, guides, doc updates | `technical-writer`      | YES           |
+| Code cleanup, refactoring, simplification  | `code-simplifier`       | YES           |
+| Code review, PR review, audit              | `code-reviewer`         | YES           |
+| Testing, QA, test strategy, coverage       | `qa`                    | YES           |
+| System design, architecture decisions      | `architect`             | YES           |
+| Security review, auth, threat modeling     | `security-architect`    | YES           |
+| Infrastructure, Docker, CI/CD, deploy      | `devops`                | YES           |
+| Database schema, queries, migrations       | `database-architect`    | YES           |
+| Planning, task breakdown                   | `planner`               | YES           |
+| Product requirements, user stories         | `pm`                    | YES           |
+| Python-specific work                       | `python-pro`            | YES           |
+| Frontend/React/Vue/CSS                     | `frontend-pro`          | YES           |
+| Node.js/Express/NestJS backend             | `nodejs-pro`            | YES           |
+| Research, external fact-finding            | `researcher`            | YES           |
+| Debugging, troubleshooting                 | `devops-troubleshooter` | YES           |
 
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`
 
@@ -368,13 +368,13 @@ Complex tasks use phased execution with automatic advancement:
 
 **Phase skipping by complexity:**
 
-| Complexity | Phases                                | Agents |
-| ---------- | ------------------------------------- | ------ |
-| TRIVIAL    | Implement → Review                    | 2      |
-| LOW        | Design → Implement → Review           | 4      |
+| Complexity | Phases                                 | Agents |
+| ---------- | -------------------------------------- | ------ |
+| TRIVIAL    | Implement → Review                     | 2      |
+| LOW        | Design → Implement → Review            | 4      |
 | MEDIUM     | Design → Implement → Review → Document | 6      |
-| HIGH       | All except Dynamic Creation           | 8+     |
-| EPIC       | All 8 phases                          | 12+    |
+| HIGH       | All except Dynamic Creation            | 8+     |
+| EPIC       | All 8 phases                           | 12+    |
 
 See `enterprise-workflow.md` for full workflow specification.
 See `router-decision.md` Step 7.5 for integration details.
@@ -471,6 +471,7 @@ Skill({ skill: 'debugging' });
 Commands are user-facing shortcuts that delegate to skills. They live in `.claude/commands/` and are auto-discovered by Claude Code as `/commandname`.
 
 **Pattern:** All commands use thin delegation:
+
 ```yaml
 ---
 disable-model-invocation: true
@@ -483,6 +484,7 @@ Invoke the {skill-name} skill and follow it exactly as presented to you
 **Key Commands:** `/brainstorm` (design), `/tdd` (development), `/debug` (debugging), `/verify` (verification), `/security-review` (security), `/code-review` (review)
 
 **Commands vs Skills vs Agents:**
+
 - **Commands** = user types `/name` (entry point)
 - **Skills** = agent invokes `Skill({ skill: "name" })` (behavior)
 - **Agents** = Router spawns `Task({ ... })` (execution)

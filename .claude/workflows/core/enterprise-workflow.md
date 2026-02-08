@@ -12,6 +12,7 @@
 ## Purpose
 
 This workflow solves the "developer collapse" problem where 94% of agents are never spawned because:
+
 1. No post-completion chain exists (developer finishes and nothing follows)
 2. Enforcement hooks default to `warn` not `block`
 3. No workflow state machine tracks multi-phase execution
@@ -156,6 +157,7 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 **Duration:** Immediate (single Router turn)
 
 ### Entry Criteria
+
 - User submits a request
 - No active workflow in progress (or user explicitly starts new work)
 
@@ -165,12 +167,12 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 2. **TaskList()** -- check for pending/in-progress work
 3. **Classify request** across 4 dimensions:
 
-| Dimension    | Values                               | How to Determine                                 |
-|-------------|--------------------------------------|--------------------------------------------------|
-| Intent       | bug-fix, feature, refactor, investigate, docs, test, deploy, architecture, security, review | Keyword matching from routing-table.cjs |
-| Complexity   | TRIVIAL, LOW, MEDIUM, HIGH, EPIC     | See complexity rubric below                       |
-| Domain       | frontend, backend, mobile, data, infra, security, product, docs, architecture | Framework/language detection |
-| Risk         | LOW, MEDIUM, HIGH, CRITICAL          | See risk rubric below                             |
+| Dimension  | Values                                                                                      | How to Determine                        |
+| ---------- | ------------------------------------------------------------------------------------------- | --------------------------------------- |
+| Intent     | bug-fix, feature, refactor, investigate, docs, test, deploy, architecture, security, review | Keyword matching from routing-table.cjs |
+| Complexity | TRIVIAL, LOW, MEDIUM, HIGH, EPIC                                                            | See complexity rubric below             |
+| Domain     | frontend, backend, mobile, data, infra, security, product, docs, architecture               | Framework/language detection            |
+| Risk       | LOW, MEDIUM, HIGH, CRITICAL                                                                 | See risk rubric below                   |
 
 4. **Check capability gaps** -- does the needed agent/skill exist?
    - If NOT: route to Phase 0.5 (Dynamic Creation)
@@ -180,27 +182,28 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 
 ### Complexity Rubric
 
-| Complexity | Indicators                                                      | Phase Path                           |
-|-----------|----------------------------------------------------------------|--------------------------------------|
-| TRIVIAL    | Single file, < 10 lines, no dependencies, obvious fix          | Phase 2 -> Phase 4                   |
-| LOW        | Single module, clear scope, < 3 files                          | Phase 1 (planner only) -> 2 -> 3 (code-reviewer only) -> 4 |
-| MEDIUM     | Multiple modules, some unknowns, 3-10 files                    | Phase 1 (planner + architect) -> 2 -> 3 -> 4 -> 5 |
-| HIGH       | Cross-cutting, many unknowns, 10+ files, architecture impact   | All phases (1 through 6)            |
-| EPIC       | System-wide impact, new subsystem, breaking changes             | All phases with orchestrator coordination |
+| Complexity | Indicators                                                   | Phase Path                                                 |
+| ---------- | ------------------------------------------------------------ | ---------------------------------------------------------- |
+| TRIVIAL    | Single file, < 10 lines, no dependencies, obvious fix        | Phase 2 -> Phase 4                                         |
+| LOW        | Single module, clear scope, < 3 files                        | Phase 1 (planner only) -> 2 -> 3 (code-reviewer only) -> 4 |
+| MEDIUM     | Multiple modules, some unknowns, 3-10 files                  | Phase 1 (planner + architect) -> 2 -> 3 -> 4 -> 5          |
+| HIGH       | Cross-cutting, many unknowns, 10+ files, architecture impact | All phases (1 through 6)                                   |
+| EPIC       | System-wide impact, new subsystem, breaking changes          | All phases with orchestrator coordination                  |
 
 ### Risk Rubric
 
-| Risk     | Indicators                                                      | Additional Agents Required           |
-|---------|----------------------------------------------------------------|--------------------------------------|
-| LOW      | Read-only, docs, tests, non-critical paths                      | None                                 |
-| MEDIUM   | Code changes, refactoring, new features in non-critical paths   | architect (design review)            |
-| HIGH     | Auth, payments, data migration, external integrations           | security-architect (mandatory)       |
-| CRITICAL | Production deploy, security fixes, data deletion, breaking API  | security-architect + QA (mandatory)  |
+| Risk     | Indicators                                                     | Additional Agents Required          |
+| -------- | -------------------------------------------------------------- | ----------------------------------- |
+| LOW      | Read-only, docs, tests, non-critical paths                     | None                                |
+| MEDIUM   | Code changes, refactoring, new features in non-critical paths  | architect (design review)           |
+| HIGH     | Auth, payments, data migration, external integrations          | security-architect (mandatory)      |
+| CRITICAL | Production deploy, security fixes, data deletion, breaking API | security-architect + QA (mandatory) |
 
 6. **Create workflow state** and write to `workflow-state.json`
 7. **Advance to appropriate phase**
 
 ### Exit Criteria
+
 - Classification complete
 - Workflow state file created
 - Phase path determined
@@ -216,12 +219,14 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 **Duration:** 1-3 Router turns
 
 ### Entry Criteria
+
 - Phase 0 classification found a capability gap
 - No existing agent/skill matches the request domain
 
 ### Actions
 
 1. **Spawn researcher** to gather best practices:
+
    ```
    Agent: researcher
    Task: Research best practices for {capability}
@@ -230,6 +235,7 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
    ```
 
 2. **Spawn planner** to define the creation tasks:
+
    ```
    Agent: planner
    Task: Plan creation of {agent|skill|workflow} for {capability}
@@ -237,6 +243,7 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
    ```
 
 3. **Spawn creator** (via appropriate creator skill):
+
    ```
    Agent: general-purpose
    Skills: research-synthesis -> {agent-creator|skill-creator|workflow-creator}
@@ -246,12 +253,14 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 4. **Resume Phase 0** with new capability available
 
 ### Exit Criteria
+
 - New agent/skill/workflow created and registered
 - CLAUDE.md updated with routing references
 - Catalogs/registries updated
 - Phase 0 re-entered with capability gap resolved
 
 ### Quality Gate: Creator Validation
+
 - [ ] Artifact passes schema validation
 - [ ] CLAUDE.md routing references updated
 - [ ] Catalog/registry entries added
@@ -265,39 +274,44 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 **Duration:** 1 Router turn (parallel agent spawns)
 
 ### Entry Criteria
+
 - Phase 0 complete, complexity >= LOW
 - Workflow state: `PHASE_1_DESIGN.status = "in_progress"`
 
 ### Agents Spawned (Varies by Complexity)
 
-| Complexity | Agents Spawned                                | Execution    |
-|-----------|-----------------------------------------------|--------------|
-| LOW        | planner                                       | Single       |
-| MEDIUM     | planner + architect                           | Parallel     |
-| HIGH       | planner + architect + security-architect      | Parallel     |
-| EPIC       | planner + architect + security-architect + researcher | Parallel |
+| Complexity | Agents Spawned                                        | Execution |
+| ---------- | ----------------------------------------------------- | --------- |
+| LOW        | planner                                               | Single    |
+| MEDIUM     | planner + architect                                   | Parallel  |
+| HIGH       | planner + architect + security-architect              | Parallel  |
+| EPIC       | planner + architect + security-architect + researcher | Parallel  |
 
 ### Agent Responsibilities
 
 **Planner** (always present):
+
 - Break request into implementation tasks with acceptance criteria
 - Define task dependencies and ordering
 - Estimate effort per task
 - Output: `.claude/context/plans/{feature}-impl-plan-{date}.md`
 
 **Architect** (MEDIUM+):
+
 - System design, component boundaries, API contracts
 - Data model design, integration points
 - Technology decisions with rationale
 - Output: `.claude/context/plans/{feature}-design-{date}.md`
 
 **Security-Architect** (HIGH+ or any auth/security request):
+
 - Threat model (STRIDE analysis)
 - Authentication/authorization design
 - Data flow security review
 - Output: `.claude/context/reports/security/{feature}-threat-model-{date}.md`
 
 **Researcher** (EPIC or when domain is unfamiliar):
+
 - Gather external best practices
 - Find relevant patterns and prior art
 - Check documentation for APIs/libraries
@@ -306,6 +320,7 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 ### Agent Context Sharing
 
 All Phase 1 agents receive:
+
 ```
 ## Shared Context
 - Request: {original user request}
@@ -315,6 +330,7 @@ All Phase 1 agents receive:
 ```
 
 All Phase 1 agents MUST write to:
+
 ```
 ## Mandatory Outputs
 - Primary artifact (plan/design/report) to location specified above
@@ -324,21 +340,22 @@ All Phase 1 agents MUST write to:
 ```
 
 ### Exit Criteria
+
 - ALL spawned agents have called TaskUpdate(completed)
 - All required artifacts exist at specified paths
 - No conflicting recommendations between agents
 
 ### Quality Gate 1: DESIGN APPROVED
 
-| Check                                      | Required For | Blocking? |
-|--------------------------------------------|-------------|-----------|
-| Implementation plan exists with tasks      | ALL          | YES       |
-| Each task has acceptance criteria           | LOW+         | YES       |
-| Architecture document exists               | MEDIUM+      | YES       |
-| No conflicting agent recommendations       | MEDIUM+      | YES       |
-| Threat model exists                        | HIGH+        | YES       |
-| Research report with 3+ sources            | EPIC         | YES       |
-| All Phase 1 agents completed               | ALL          | YES       |
+| Check                                 | Required For | Blocking? |
+| ------------------------------------- | ------------ | --------- |
+| Implementation plan exists with tasks | ALL          | YES       |
+| Each task has acceptance criteria     | LOW+         | YES       |
+| Architecture document exists          | MEDIUM+      | YES       |
+| No conflicting agent recommendations  | MEDIUM+      | YES       |
+| Threat model exists                   | HIGH+        | YES       |
+| Research report with 3+ sources       | EPIC         | YES       |
+| All Phase 1 agents completed          | ALL          | YES       |
 
 **If gate fails:** Router identifies which check failed and re-spawns the appropriate agent with corrective instructions.
 
@@ -350,6 +367,7 @@ All Phase 1 agents MUST write to:
 **Duration:** 1+ Router turns (may need multiple if plan has sequential tasks)
 
 ### Entry Criteria
+
 - Gate 1 passed
 - Workflow state: `PHASE_2_IMPLEMENT.status = "in_progress"`
 
@@ -365,33 +383,33 @@ All Phase 1 agents MUST write to:
 
 ### Agents Spawned
 
-| Condition                              | Agent(s)                          | Execution    |
-|---------------------------------------|-----------------------------------|--------------|
-| Task with Target Agent specified      | (as specified in plan)            | Per plan     |
-| Documentation tasks                   | technical-writer                  | Sequential   |
-| Cleanup/refactoring tasks             | code-simplifier                   | Sequential   |
-| Database tasks                        | database-architect                | Sequential   |
-| Infrastructure tasks                  | devops                            | Sequential   |
-| Domain-specific language/framework    | domain specialist (e.g., python-pro, nextjs-pro) | Sequential |
-| Database schema changes               | developer + database-architect    | Parallel     |
-| Frontend + Backend                    | developer (backend) + developer (frontend) | Parallel if independent |
-| Default (no target, no domain signal) | developer                         | Sequential   |
+| Condition                             | Agent(s)                                         | Execution               |
+| ------------------------------------- | ------------------------------------------------ | ----------------------- |
+| Task with Target Agent specified      | (as specified in plan)                           | Per plan                |
+| Documentation tasks                   | technical-writer                                 | Sequential              |
+| Cleanup/refactoring tasks             | code-simplifier                                  | Sequential              |
+| Database tasks                        | database-architect                               | Sequential              |
+| Infrastructure tasks                  | devops                                           | Sequential              |
+| Domain-specific language/framework    | domain specialist (e.g., python-pro, nextjs-pro) | Sequential              |
+| Database schema changes               | developer + database-architect                   | Parallel                |
+| Frontend + Backend                    | developer (backend) + developer (frontend)       | Parallel if independent |
+| Default (no target, no domain signal) | developer                                        | Sequential              |
 
 ### Domain Specialist Routing
 
 The Router selects domain specialists based on project detection:
 
-| Detection Signal                        | Agent                    |
-|----------------------------------------|--------------------------|
-| `package.json` with React/Vue/Angular  | frontend-pro             |
-| `next.config.js` or `app/` directory   | nextjs-pro               |
-| `requirements.txt` or `pyproject.toml` | python-pro               |
-| `Cargo.toml`                           | rust-pro                 |
-| `go.mod`                               | golang-pro               |
-| `*.swift` or Xcode project             | ios-pro                  |
-| `build.gradle` or `pom.xml`           | java-pro                 |
-| `Dockerfile` or `docker-compose.yml`  | devops                   |
-| `.graphql` or GraphQL deps             | graphql-pro              |
+| Detection Signal                       | Agent        |
+| -------------------------------------- | ------------ |
+| `package.json` with React/Vue/Angular  | frontend-pro |
+| `next.config.js` or `app/` directory   | nextjs-pro   |
+| `requirements.txt` or `pyproject.toml` | python-pro   |
+| `Cargo.toml`                           | rust-pro     |
+| `go.mod`                               | golang-pro   |
+| `*.swift` or Xcode project             | ios-pro      |
+| `build.gradle` or `pom.xml`            | java-pro     |
+| `Dockerfile` or `docker-compose.yml`   | devops       |
+| `.graphql` or GraphQL deps             | graphql-pro  |
 
 **Fallback:** If no domain signal detected AND no task-level agent specified, use `developer`.
 
@@ -416,6 +434,7 @@ The Router selects domain specialists based on project detection:
 ```
 
 ### Exit Criteria
+
 - All planned implementation tasks completed
 - All agents called TaskUpdate(completed)
 - Tests exist for new code
@@ -423,13 +442,13 @@ The Router selects domain specialists based on project detection:
 
 ### Quality Gate 2: TESTS PASS
 
-| Check                                      | Required For | Blocking? |
-|--------------------------------------------|-------------|-----------|
-| All planned tasks have completed TaskUpdate | ALL          | YES       |
-| Test files exist for new code              | ALL          | YES       |
-| Tests pass (agent-verified, not assumed)   | ALL          | YES       |
-| Implementation matches plan                | MEDIUM+      | YES       |
-| No TODO/FIXME/HACK markers in new code    | HIGH+        | NO (warning) |
+| Check                                       | Required For | Blocking?    |
+| ------------------------------------------- | ------------ | ------------ |
+| All planned tasks have completed TaskUpdate | ALL          | YES          |
+| Test files exist for new code               | ALL          | YES          |
+| Tests pass (agent-verified, not assumed)    | ALL          | YES          |
+| Implementation matches plan                 | MEDIUM+      | YES          |
+| No TODO/FIXME/HACK markers in new code      | HIGH+        | NO (warning) |
 
 **If gate fails:** Router re-spawns developer with the failing test output and instructions to fix.
 
@@ -441,21 +460,23 @@ The Router selects domain specialists based on project detection:
 **Duration:** 1 Router turn (parallel agent spawns)
 
 ### Entry Criteria
+
 - Gate 2 passed
 - Workflow state: `PHASE_3_REVIEW.status = "in_progress"`
 
 ### Agents Spawned (Varies by Complexity)
 
-| Complexity | Agents Spawned                                | Execution |
-|-----------|-----------------------------------------------|-----------|
-| LOW        | code-reviewer                                 | Single    |
-| MEDIUM     | code-reviewer + qa                            | Parallel  |
-| HIGH       | code-reviewer + qa + security-architect       | Parallel  |
-| EPIC       | code-reviewer + qa + security-architect + architect | Parallel |
+| Complexity | Agents Spawned                                      | Execution |
+| ---------- | --------------------------------------------------- | --------- |
+| LOW        | code-reviewer                                       | Single    |
+| MEDIUM     | code-reviewer + qa                                  | Parallel  |
+| HIGH       | code-reviewer + qa + security-architect             | Parallel  |
+| EPIC       | code-reviewer + qa + security-architect + architect | Parallel  |
 
 ### Agent Responsibilities
 
 **Code-Reviewer** (always present):
+
 - Code quality, patterns, maintainability
 - SOLID principles adherence
 - DRY violations, dead code, complexity
@@ -463,6 +484,7 @@ The Router selects domain specialists based on project detection:
 - Output: `.claude/context/reports/qa/{feature}-code-review-{date}.md`
 
 **QA** (MEDIUM+):
+
 - Test coverage analysis
 - Edge case identification
 - Regression test verification
@@ -471,6 +493,7 @@ The Router selects domain specialists based on project detection:
 - Output: `.claude/context/reports/qa/{feature}-qa-report-{date}.md`
 
 **Security-Architect** (HIGH+ or any auth/security):
+
 - Implementation matches threat model
 - No new vulnerabilities introduced
 - OWASP Top 10 verification
@@ -478,6 +501,7 @@ The Router selects domain specialists based on project detection:
 - Output: `.claude/context/reports/security/{feature}-security-review-{date}.md`
 
 **Architect** (EPIC):
+
 - Implementation matches architecture design
 - No architectural drift
 - Component boundaries respected
@@ -506,6 +530,7 @@ The Router selects domain specialists based on project detection:
 ```
 
 ### Exit Criteria
+
 - ALL review agents have called TaskUpdate(completed)
 - All review reports exist
 - No CRITICAL findings remain unresolved
@@ -513,7 +538,7 @@ The Router selects domain specialists based on project detection:
 ### Quality Gate 3: REVIEWS PASS
 
 | Check                                      | Required For | Blocking? |
-|--------------------------------------------|-------------|-----------|
+| ------------------------------------------ | ------------ | --------- |
 | All review agents completed                | ALL          | YES       |
 | Zero CRITICAL findings                     | ALL          | YES       |
 | Code-reviewer approved                     | ALL          | YES       |
@@ -522,6 +547,7 @@ The Router selects domain specialists based on project detection:
 | Architecture review passed                 | EPIC         | YES       |
 
 **If gate fails with CRITICAL findings:**
+
 1. Router re-spawns developer with the review findings
 2. Developer fixes issues
 3. Router re-enters Phase 3 (review the fixes)
@@ -535,14 +561,15 @@ The Router selects domain specialists based on project detection:
 **Duration:** 1 Router turn
 
 ### Entry Criteria
+
 - Gate 3 passed
 - Workflow state: `PHASE_4_DEPLOY.status = "in_progress"`
 
 ### Agents Spawned
 
-| Agent   | Responsibility                                    |
-|---------|--------------------------------------------------|
-| devops  | Lint, format, commit, push, verify CI passes     |
+| Agent  | Responsibility                               |
+| ------ | -------------------------------------------- |
+| devops | Lint, format, commit, push, verify CI passes |
 
 ### Agent Context
 
@@ -567,17 +594,18 @@ The Router selects domain specialists based on project detection:
 ```
 
 ### Exit Criteria
+
 - Code committed and pushed
 - CI checks pass
 
 ### Quality Gate 4: CI PASSES
 
-| Check                                      | Required For | Blocking? |
-|--------------------------------------------|-------------|-----------|
-| Lint passes                                | ALL          | YES       |
-| All tests pass in CI                       | ALL          | YES       |
-| No merge conflicts                        | ALL          | YES       |
-| Commit message follows conventions         | ALL          | NO (warning) |
+| Check                              | Required For | Blocking?    |
+| ---------------------------------- | ------------ | ------------ |
+| Lint passes                        | ALL          | YES          |
+| All tests pass in CI               | ALL          | YES          |
+| No merge conflicts                 | ALL          | YES          |
+| Commit message follows conventions | ALL          | NO (warning) |
 
 **If gate fails:** DevOps agent fixes lint/test issues and retries (max 3 attempts). If still failing, escalate to user.
 
@@ -589,14 +617,15 @@ The Router selects domain specialists based on project detection:
 **Duration:** 1 Router turn
 
 ### Entry Criteria
+
 - Gate 4 passed
 - Workflow state: `PHASE_5_DOCUMENT.status = "in_progress"`
 
 ### Agents Spawned
 
-| Agent            | Responsibility                                    |
-|-----------------|--------------------------------------------------|
-| technical-writer | Update docs, README, API docs, CHANGELOG          |
+| Agent            | Responsibility                           |
+| ---------------- | ---------------------------------------- |
+| technical-writer | Update docs, README, API docs, CHANGELOG |
 
 ### Agent Context
 
@@ -620,17 +649,18 @@ The Router selects domain specialists based on project detection:
 ```
 
 ### Exit Criteria
+
 - Documentation updated
 - Agent called TaskUpdate(completed)
 
 ### Quality Gate 5: DOCS MATCH IMPLEMENTATION
 
-| Check                                      | Required For | Blocking? |
-|--------------------------------------------|-------------|-----------|
-| README updated (if public API changed)     | MEDIUM+      | NO (warning) |
-| CHANGELOG updated                          | MEDIUM+      | NO (warning) |
-| API docs match implementation              | HIGH+        | YES       |
-| Architecture diagrams current              | EPIC         | YES       |
+| Check                                  | Required For | Blocking?    |
+| -------------------------------------- | ------------ | ------------ |
+| README updated (if public API changed) | MEDIUM+      | NO (warning) |
+| CHANGELOG updated                      | MEDIUM+      | NO (warning) |
+| API docs match implementation          | HIGH+        | YES          |
+| Architecture diagrams current          | EPIC         | YES          |
 
 **If gate fails:** Router re-spawns technical-writer with specific gaps to fill.
 
@@ -642,14 +672,15 @@ The Router selects domain specialists based on project detection:
 **Duration:** 1 Router turn
 
 ### Entry Criteria
+
 - Gate 5 passed (or Phase 5 skipped)
 - Workflow state: `PHASE_6_REFLECT.status = "in_progress"`
 
 ### Agents Spawned
 
-| Agent            | Responsibility                                    |
-|-----------------|--------------------------------------------------|
-| reflection-agent | Extract learnings, update memory files            |
+| Agent            | Responsibility                         |
+| ---------------- | -------------------------------------- |
+| reflection-agent | Extract learnings, update memory files |
 
 ### Agent Context
 
@@ -675,22 +706,24 @@ The Router selects domain specialists based on project detection:
 ```
 
 ### Exit Criteria
+
 - Memory files updated
 - Agent called TaskUpdate(completed)
 
 ### Quality Gate 6: LEARNINGS RECORDED
 
-| Check                                      | Required For | Blocking? |
-|--------------------------------------------|-------------|-----------|
-| At least 1 learning recorded               | HIGH+        | NO (warning) |
+| Check                                       | Required For | Blocking?    |
+| ------------------------------------------- | ------------ | ------------ |
+| At least 1 learning recorded                | HIGH+        | NO (warning) |
 | Decisions recorded for architecture changes | HIGH+        | NO (warning) |
-| Issues recorded for unresolved problems    | ALL          | NO (warning) |
+| Issues recorded for unresolved problems     | ALL          | NO (warning) |
 
 **Gate 6 is non-blocking.** Reflection is valuable but should not prevent workflow completion.
 
 ### Workflow Completion
 
 After Gate 6 (or after Phase 5 if Phase 6 is skipped):
+
 1. Update workflow state: `currentPhase = "COMPLETE"`
 2. Report completion to user with summary:
    - Phases executed
@@ -749,17 +782,17 @@ No phases skipped. Master-orchestrator coordinates if multiple subsystems affect
 
 ### Artifact Locations (Per Workspace Conventions)
 
-| Artifact Type              | Location                                          | Producer         |
-|---------------------------|---------------------------------------------------|------------------|
-| Implementation plan        | `.claude/context/plans/{feature}-impl-plan-{date}.md` | planner          |
-| Architecture design        | `.claude/context/plans/{feature}-design-{date}.md`    | architect        |
-| Threat model               | `.claude/context/reports/security/{feature}-threat-model-{date}.md` | security-architect |
-| Research report            | `.claude/context/artifacts/research-reports/{feature}-research-{date}.md` | researcher |
-| Code review report         | `.claude/context/reports/qa/{feature}-code-review-{date}.md` | code-reviewer |
-| QA report                  | `.claude/context/reports/qa/{feature}-qa-report-{date}.md` | qa |
-| Security review            | `.claude/context/reports/security/{feature}-security-review-{date}.md` | security-architect |
-| Architecture review        | `.claude/context/reports/architecture/{feature}-arch-review-{date}.md` | architect |
-| Deployment log             | `.claude/context/reports/{feature}-deploy-log-{date}.md` | devops |
+| Artifact Type       | Location                                                                  | Producer           |
+| ------------------- | ------------------------------------------------------------------------- | ------------------ |
+| Implementation plan | `.claude/context/plans/{feature}-impl-plan-{date}.md`                     | planner            |
+| Architecture design | `.claude/context/plans/{feature}-design-{date}.md`                        | architect          |
+| Threat model        | `.claude/context/reports/security/{feature}-threat-model-{date}.md`       | security-architect |
+| Research report     | `.claude/context/artifacts/research-reports/{feature}-research-{date}.md` | researcher         |
+| Code review report  | `.claude/context/reports/qa/{feature}-code-review-{date}.md`              | code-reviewer      |
+| QA report           | `.claude/context/reports/qa/{feature}-qa-report-{date}.md`                | qa                 |
+| Security review     | `.claude/context/reports/security/{feature}-security-review-{date}.md`    | security-architect |
+| Architecture review | `.claude/context/reports/architecture/{feature}-arch-review-{date}.md`    | architect          |
+| Deployment log      | `.claude/context/reports/{feature}-deploy-log-{date}.md`                  | devops             |
 
 ### Handoff Metadata via TaskUpdate
 
@@ -767,18 +800,18 @@ Every agent MUST include structured metadata in TaskUpdate(completed):
 
 ```javascript
 TaskUpdate({
-  taskId: "X",
-  status: "completed",
+  taskId: 'X',
+  status: 'completed',
   metadata: {
     // Universal fields (all agents)
-    summary: "One-line description of what was done",
-    phase: "PHASE_1_DESIGN",
-    workflowId: "wf-2026-02-06-001",
+    summary: 'One-line description of what was done',
+    phase: 'PHASE_1_DESIGN',
+    workflowId: 'wf-2026-02-06-001',
 
     // Discovery fields
-    filesModified: ["path/to/file1.ts", "path/to/file2.ts"],
-    filesCreated: ["path/to/new.ts"],
-    outputArtifacts: [".claude/context/plans/feature-plan.md"],
+    filesModified: ['path/to/file1.ts', 'path/to/file2.ts'],
+    filesCreated: ['path/to/new.ts'],
+    outputArtifacts: ['.claude/context/plans/feature-plan.md'],
 
     // Review fields (Phase 3 agents)
     criticalFindings: 0,
@@ -791,12 +824,12 @@ TaskUpdate({
     testCount: 15,
 
     // Deploy fields (Phase 4)
-    commitHash: "abc123",
-    branch: "feature/oauth2",
+    commitHash: 'abc123',
+    branch: 'feature/oauth2',
     ciPassed: true,
 
-    completedAt: new Date().toISOString()
-  }
+    completedAt: new Date().toISOString(),
+  },
 });
 ```
 
@@ -812,11 +845,13 @@ TaskUpdate({
 ### Memory Protocol (All Agents, All Phases)
 
 **Before starting work:**
+
 ```
 Read .claude/context/memory/learnings.md
 ```
 
 **After completing work (in addition to TaskUpdate):**
+
 ```
 Append to .claude/context/memory/learnings.md  (new patterns)
 Append to .claude/context/memory/decisions.md  (ADRs for design choices)
@@ -829,20 +864,20 @@ Append to .claude/context/memory/issues.md     (blockers, workarounds)
 
 ### Hook Changes (Block Mode by Default)
 
-| Hook                         | Current Default | Required Default | Purpose                              |
-|-----------------------------|-----------------|------------------|--------------------------------------|
-| routing-guard.cjs            | warn            | **block**        | Enforce planner-first for complex tasks |
-| security-review enforcement  | off             | **block**        | Enforce security-architect for auth/security |
-| unified-creator-guard.cjs    | block           | block            | Enforce creator workflow (keep as-is)  |
-| spawn-prompt-validator.cjs   | warn            | **block**        | Validate spawn prompts contain required fields |
+| Hook                        | Current Default | Required Default | Purpose                                        |
+| --------------------------- | --------------- | ---------------- | ---------------------------------------------- |
+| routing-guard.cjs           | warn            | **block**        | Enforce planner-first for complex tasks        |
+| security-review enforcement | off             | **block**        | Enforce security-architect for auth/security   |
+| unified-creator-guard.cjs   | block           | block            | Enforce creator workflow (keep as-is)          |
+| spawn-prompt-validator.cjs  | warn            | **block**        | Validate spawn prompts contain required fields |
 
 ### New Hooks Required
 
-| Hook                            | Type        | Purpose                                           |
-|--------------------------------|-------------|---------------------------------------------------|
-| post-completion-chain.cjs       | PostToolUse | On TaskUpdate(completed), trigger next phase       |
-| workflow-state-validator.cjs    | PreToolUse  | Validate Router follows workflow state machine     |
-| intent-agent-match.cjs          | PreToolUse  | Prevent spawning developer when intent maps elsewhere |
+| Hook                         | Type        | Purpose                                               |
+| ---------------------------- | ----------- | ----------------------------------------------------- |
+| post-completion-chain.cjs    | PostToolUse | On TaskUpdate(completed), trigger next phase          |
+| workflow-state-validator.cjs | PreToolUse  | Validate Router follows workflow state machine        |
+| intent-agent-match.cjs       | PreToolUse  | Prevent spawning developer when intent maps elsewhere |
 
 ### Post-Completion Chain Hook Logic
 
@@ -863,6 +898,7 @@ Then:
 ### Agent Fails to Complete
 
 If an agent does not call TaskUpdate(completed) within a reasonable time:
+
 1. Router checks TaskList() for stuck tasks
 2. Router re-spawns the agent with context from the previous attempt
 3. Maximum 2 retries before escalating to user
@@ -884,6 +920,7 @@ If an agent does not call TaskUpdate(completed) within a reasonable time:
 ### Conflicting Agent Recommendations (Phase 1)
 
 If Phase 1 agents produce conflicting recommendations:
+
 1. Spawn planner in "consolidation mode" to resolve conflicts
 2. Planner reviews all Phase 1 artifacts and produces unified plan
 3. If planner cannot resolve: escalate to user via AskUserQuestion
@@ -962,6 +999,7 @@ sequenceDiagram
 ### Relationship to router-decision.md
 
 This workflow **replaces** the ad-hoc Step 7.3 Planning Orchestration Matrix in router-decision.md. The Router should:
+
 1. Follow Steps 0-6 of router-decision.md (classification, self-check, agent selection)
 2. Then follow THIS workflow for phase execution (Step 7+)
 
@@ -984,18 +1022,19 @@ CLAUDE.md Section 3.5 references this workflow. The Router reads CLAUDE.md, whic
 
 ## Summary: Agents Activated Per Phase
 
-| Phase              | Agents                                               | Always | Conditional                    |
-|-------------------|------------------------------------------------------|--------|--------------------------------|
-| Phase 0 (Triage)  | Router                                               | Yes    | --                              |
-| Phase 0.5 (Create)| researcher, planner, creator                         | No     | Capability gap detected         |
-| Phase 1 (Design)  | planner, architect, security-architect, researcher   | planner| architect (MED+), security (HIGH+), researcher (EPIC) |
-| Phase 2 (Implement)| developer, domain specialist, database-architect    | developer | domain (when detected), database (schema changes) |
-| Phase 3 (Review)  | code-reviewer, qa, security-architect, architect     | code-reviewer | qa (MED+), security (HIGH+), architect (EPIC) |
-| Phase 4 (Deploy)  | devops                                               | Yes    | --                              |
-| Phase 5 (Document)| technical-writer                                     | Yes    | --                              |
-| Phase 6 (Reflect) | reflection-agent                                     | Yes    | --                              |
+| Phase               | Agents                                             | Always        | Conditional                                           |
+| ------------------- | -------------------------------------------------- | ------------- | ----------------------------------------------------- |
+| Phase 0 (Triage)    | Router                                             | Yes           | --                                                    |
+| Phase 0.5 (Create)  | researcher, planner, creator                       | No            | Capability gap detected                               |
+| Phase 1 (Design)    | planner, architect, security-architect, researcher | planner       | architect (MED+), security (HIGH+), researcher (EPIC) |
+| Phase 2 (Implement) | developer, domain specialist, database-architect   | developer     | domain (when detected), database (schema changes)     |
+| Phase 3 (Review)    | code-reviewer, qa, security-architect, architect   | code-reviewer | qa (MED+), security (HIGH+), architect (EPIC)         |
+| Phase 4 (Deploy)    | devops                                             | Yes           | --                                                    |
+| Phase 5 (Document)  | technical-writer                                   | Yes           | --                                                    |
+| Phase 6 (Reflect)   | reflection-agent                                   | Yes           | --                                                    |
 
 **Total unique agents activated:** 12 (vs 1 today)
+
 - Core: planner, developer, qa, architect, technical-writer, reflection-agent (6)
 - Specialized: code-reviewer, security-architect, devops, database-architect, researcher (5)
 - Domain: context-dependent (23 available)

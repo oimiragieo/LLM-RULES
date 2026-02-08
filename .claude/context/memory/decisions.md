@@ -280,12 +280,14 @@ Implement a 4-phase remediation strategy:
 4. **Phase 4 (Long-term):** Add Router intent-to-agent enforcement that prevents spawning `developer` when the classified intent maps to a different agent.
 
 **Rationale:**
+
 - Phase 1 is zero-code (env var changes) and immediately activates planner + security-architect
 - Phase 2 activates 5 more agents (code-reviewer, qa, technical-writer, reflection-agent, architect)
 - Phase 3 fixes the reflection/learning loop
 - Phase 4 prevents regression to developer-only routing
 
 **Consequences:**
+
 - Agent spawn costs will increase (more agents = more API calls)
 - Task completion will take longer (multi-phase review)
 - Quality and security will significantly improve

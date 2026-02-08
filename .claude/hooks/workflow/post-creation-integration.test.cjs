@@ -5,10 +5,19 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { isCreatorCompletion, processCreatorCompletion } = require('./post-creation-integration.cjs');
+const {
+  isCreatorCompletion,
+  processCreatorCompletion,
+} = require('./post-creation-integration.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
-const QUEUE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
+const QUEUE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'integration-queue.jsonl'
+);
 
 test('isCreatorCompletion detects skill-creator metadata', () => {
   const input = {
@@ -17,10 +26,10 @@ test('isCreatorCompletion detects skill-creator metadata', () => {
       input: {
         status: 'completed',
         metadata: {
-          creatorType: 'skill'
-        }
-      }
-    }
+          creatorType: 'skill',
+        },
+      },
+    },
   };
 
   const result = isCreatorCompletion(input);
@@ -35,10 +44,10 @@ test('isCreatorCompletion detects skill creation via subject pattern', () => {
       input: {
         status: 'completed',
         metadata: {
-          subject: 'Create new skill for ripgrep'
-        }
-      }
-    }
+          subject: 'Create new skill for ripgrep',
+        },
+      },
+    },
   };
 
   const result = isCreatorCompletion(input);
@@ -53,10 +62,10 @@ test('isCreatorCompletion returns false for non-completed status', () => {
       input: {
         status: 'in_progress',
         metadata: {
-          creatorType: 'skill'
-        }
-      }
-    }
+          creatorType: 'skill',
+        },
+      },
+    },
   };
 
   const result = isCreatorCompletion(input);
@@ -70,10 +79,10 @@ test('isCreatorCompletion returns false for non-creator tasks', () => {
       input: {
         status: 'completed',
         metadata: {
-          subject: 'Fix bug in authentication'
-        }
-      }
-    }
+          subject: 'Fix bug in authentication',
+        },
+      },
+    },
   };
 
   const result = isCreatorCompletion(input);
@@ -94,10 +103,10 @@ test('processCreatorCompletion writes to queue when gaps found', async () => {
         taskId: '7',
         metadata: {
           creatorType: 'skill',
-          artifactId: 'skill:test-skill'
-        }
-      }
-    }
+          artifactId: 'skill:test-skill',
+        },
+      },
+    },
   };
 
   await processCreatorCompletion(hookData);

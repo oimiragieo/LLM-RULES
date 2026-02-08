@@ -75,12 +75,15 @@ function buildContextModePrompt(options = {}) {
     const sanitizedContextPrompt = sanitizeSubstitutionValue(contextPrompt);
     const sanitizedModePrompts = sanitizeSubstitutionValue(modePrompts);
 
+    fragmentBody = fragmentBody.replace(/\{\{\s*available_tools\s*\}\}/gi, sanitizedToolNames);
     fragmentBody = fragmentBody.replace(
-      /\{\{\s*available_tools\s*\}\}/gi,
-      sanitizedToolNames
+      /\{\{\s*context_system_prompt\s*\}\}/gi,
+      sanitizedContextPrompt
     );
-    fragmentBody = fragmentBody.replace(/\{\{\s*context_system_prompt\s*\}\}/gi, sanitizedContextPrompt);
-    fragmentBody = fragmentBody.replace(/\{\{\s*mode_system_prompts\s*\}\}/gi, sanitizedModePrompts);
+    fragmentBody = fragmentBody.replace(
+      /\{\{\s*mode_system_prompts\s*\}\}/gi,
+      sanitizedModePrompts
+    );
   }
 
   const promptFragment = fragmentBody ? `## Context / Mode\n\n${fragmentBody}` : '';

@@ -40,7 +40,7 @@ const PHASE_PATHS = {
     'PHASE_1_DESIGN',
     'PHASE_2_IMPLEMENT',
     'PHASE_3_REVIEW',
-    'PHASE_4_DEPLOY'
+    'PHASE_4_DEPLOY',
   ],
   MEDIUM: [
     'PHASE_0_TRIAGE',
@@ -48,7 +48,7 @@ const PHASE_PATHS = {
     'PHASE_2_IMPLEMENT',
     'PHASE_3_REVIEW',
     'PHASE_4_DEPLOY',
-    'PHASE_5_DOCUMENT'
+    'PHASE_5_DOCUMENT',
   ],
   HIGH: [
     'PHASE_0_TRIAGE',
@@ -57,7 +57,7 @@ const PHASE_PATHS = {
     'PHASE_3_REVIEW',
     'PHASE_4_DEPLOY',
     'PHASE_5_DOCUMENT',
-    'PHASE_6_REFLECT'
+    'PHASE_6_REFLECT',
   ],
   EPIC: [
     'PHASE_0_TRIAGE',
@@ -66,7 +66,7 @@ const PHASE_PATHS = {
     'PHASE_3_REVIEW',
     'PHASE_4_DEPLOY',
     'PHASE_5_DOCUMENT',
-    'PHASE_6_REFLECT'
+    'PHASE_6_REFLECT',
   ],
 };
 

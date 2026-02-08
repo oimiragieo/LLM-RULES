@@ -1,14 +1,17 @@
 <!-- Agent: developer | Task: #44 | Session: 2026-02-06 -->
 
 ---
+
 name: code-review-workflow
 description: Two-pass code review process for systematic quality validation.
 triggers:
-  - pull request created
-  - code review requested
-  - PHASE_3_REVIEW in enterprise workflow
-agents:
-  - code-reviewer
+
+- pull request created
+- code review requested
+- PHASE_3_REVIEW in enterprise workflow
+  agents:
+- code-reviewer
+
 ---
 
 # Code Review Workflow
@@ -114,13 +117,13 @@ Pass 1 findings block merge. Pass 2 findings generate recommendations.
 
 **Edge Case Categories:**
 
-| Category          | Examples                                      |
-| ----------------- | --------------------------------------------- |
-| **Input**         | Empty, null, undefined, whitespace-only       |
-| **Numeric**       | Zero, negative, MAX_INT, MIN_INT              |
-| **Collections**   | Empty array, single item, large dataset (10k+)|
-| **Async**         | Timeout, network failure, concurrent requests |
-| **Database**      | Constraint violation, deadlock, connection loss|
+| Category        | Examples                                        |
+| --------------- | ----------------------------------------------- |
+| **Input**       | Empty, null, undefined, whitespace-only         |
+| **Numeric**     | Zero, negative, MAX_INT, MIN_INT                |
+| **Collections** | Empty array, single item, large dataset (10k+)  |
+| **Async**       | Timeout, network failure, concurrent requests   |
+| **Database**    | Constraint violation, deadlock, connection loss |
 
 **Output format:**
 
@@ -344,13 +347,13 @@ Skill({ skill: 'code-analyzer' });
 
 **Good vs Bad Naming:**
 
-| Bad                     | Good                      |
-| ----------------------- | ------------------------- |
-| `data`                  | `userProfile`             |
-| `temp`                  | `processedItems`          |
-| `flag`                  | `isAuthenticated`         |
-| `doStuff()`             | `validateAndSaveUser()`   |
-| `Manager`               | `UserAccountManager`      |
+| Bad         | Good                    |
+| ----------- | ----------------------- |
+| `data`      | `userProfile`           |
+| `temp`      | `processedItems`        |
+| `flag`      | `isAuthenticated`       |
+| `doStuff()` | `validateAndSaveUser()` |
+| `Manager`   | `UserAccountManager`    |
 
 **Output format:**
 
@@ -385,12 +388,12 @@ Skill({ skill: 'code-analyzer' });
 
 **Documentation Levels:**
 
-| Level          | Required Documentation                      |
-| -------------- | ------------------------------------------- |
-| **Public API** | Full docstring (params, returns, examples)  |
-| **Internal**   | Brief comment explaining purpose            |
-| **Complex**    | Comment explaining "why" (not "what")       |
-| **Breaking**   | CHANGELOG entry with migration guide        |
+| Level          | Required Documentation                     |
+| -------------- | ------------------------------------------ |
+| **Public API** | Full docstring (params, returns, examples) |
+| **Internal**   | Brief comment explaining purpose           |
+| **Complex**    | Comment explaining "why" (not "what")      |
+| **Breaking**   | CHANGELOG entry with migration guide       |
 
 **Output format:**
 
@@ -491,16 +494,16 @@ Escalate to architect agent for review if any of these apply:
 
 ### Severity Levels
 
-| Severity   | Description                               | Action Required |
-| ---------- | ----------------------------------------- | --------------- |
-| CRITICAL   | Security vulnerability, data loss risk    | BLOCK merge     |
-| HIGH       | Logic error, missing requirement          | BLOCK merge     |
-| MEDIUM     | Edge case missing, code quality issue     | Recommend fix   |
-| LOW        | Style inconsistency, minor improvement    | Optional        |
+| Severity | Description                            | Action Required |
+| -------- | -------------------------------------- | --------------- |
+| CRITICAL | Security vulnerability, data loss risk | BLOCK merge     |
+| HIGH     | Logic error, missing requirement       | BLOCK merge     |
+| MEDIUM   | Edge case missing, code quality issue  | Recommend fix   |
+| LOW      | Style inconsistency, minor improvement | Optional        |
 
 ### Finding Template
 
-```markdown
+````markdown
 ### {Category} ({Severity})
 
 **File:** {path/to/file.ts:line}
@@ -520,6 +523,8 @@ Escalate to architect agent for review if any of these apply:
 // AFTER
 {recommended code}
 ```
+````
+
 ```
 
 ## Success Criteria
@@ -572,3 +577,4 @@ Read `.claude/context/memory/learnings.md`
 - Review decision rationale → `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+```

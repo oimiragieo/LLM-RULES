@@ -9,29 +9,29 @@ This directory contains templates that have been archived as part of the templat
 
 ## Archived Templates
 
-| Original Path | Archived Path | Reason | Date |
-|--------------|---------------|--------|------|
-| `spawn/bash-safe-background.md` | `_archive/spawn/bash-safe-background.md` | Superseded by universal-agent-spawn.md | 2026-02-07 |
-| `spawn/router-task-template.md` | `_archive/spawn/router-task-template.md` | Superseded by universal-agent-spawn.md | 2026-02-07 |
-| `claude-md-template.md` | `_archive/claude-md-template.md` | Unused - no active references found | 2026-02-07 |
-| `project-brief.md` | `_archive/project-brief.md` | Unused - no active references found | 2026-02-07 |
-| `prd.md` | `_archive/prd.md` | Unused - no active references found | 2026-02-07 |
-| `ui-spec.md` | `_archive/ui-spec.md` | Unused - no active references found | 2026-02-07 |
-| `planning/findings.md` | `_archive/planning/findings.md` | Unused - no active references found | 2026-02-07 |
-| `planning/progress.md` | `_archive/planning/progress.md` | Unused - no active references found | 2026-02-07 |
-| `planning/task_plan.md` | `_archive/planning/task_plan.md` | Unused - no active references found | 2026-02-07 |
-| `examples/example-adr-050.md` | `_archive/examples/example-adr-050.md` | Unused - no active references found | 2026-02-07 |
-| `examples/example-specification.md` | `_archive/examples/example-specification.md` | Unused - no active references found | 2026-02-07 |
-| `code-styles/dart.md` | `_archive/code-styles/dart.md` | Unused - no Dart code in project | 2026-02-07 |
-| `code-styles/csharp.md` | `_archive/code-styles/csharp.md` | Unused - no C# code in project | 2026-02-07 |
-| `code-styles/go.md` | `_archive/code-styles/go.md` | Unused - no Go code in project | 2026-02-07 |
+| Original Path                       | Archived Path                                | Reason                                 | Date       |
+| ----------------------------------- | -------------------------------------------- | -------------------------------------- | ---------- |
+| `spawn/bash-safe-background.md`     | `_archive/spawn/bash-safe-background.md`     | Superseded by universal-agent-spawn.md | 2026-02-07 |
+| `spawn/router-task-template.md`     | `_archive/spawn/router-task-template.md`     | Superseded by universal-agent-spawn.md | 2026-02-07 |
+| `claude-md-template.md`             | `_archive/claude-md-template.md`             | Unused - no active references found    | 2026-02-07 |
+| `project-brief.md`                  | `_archive/project-brief.md`                  | Unused - no active references found    | 2026-02-07 |
+| `prd.md`                            | `_archive/prd.md`                            | Unused - no active references found    | 2026-02-07 |
+| `ui-spec.md`                        | `_archive/ui-spec.md`                        | Unused - no active references found    | 2026-02-07 |
+| `planning/findings.md`              | `_archive/planning/findings.md`              | Unused - no active references found    | 2026-02-07 |
+| `planning/progress.md`              | `_archive/planning/progress.md`              | Unused - no active references found    | 2026-02-07 |
+| `planning/task_plan.md`             | `_archive/planning/task_plan.md`             | Unused - no active references found    | 2026-02-07 |
+| `examples/example-adr-050.md`       | `_archive/examples/example-adr-050.md`       | Unused - no active references found    | 2026-02-07 |
+| `examples/example-specification.md` | `_archive/examples/example-specification.md` | Unused - no active references found    | 2026-02-07 |
+| `code-styles/dart.md`               | `_archive/code-styles/dart.md`               | Unused - no Dart code in project       | 2026-02-07 |
+| `code-styles/csharp.md`             | `_archive/code-styles/csharp.md`             | Unused - no C# code in project         | 2026-02-07 |
+| `code-styles/go.md`                 | `_archive/code-styles/go.md`                 | Unused - no Go code in project         | 2026-02-07 |
 
 ## Deleted Templates (Not Archived)
 
-| Template Path | Reason | Date |
-|--------------|--------|------|
-| `code-styles/html-css.md` | No HTML/CSS in project - deleted via `git rm` | 2026-02-07 |
-| `code-styles/general.md` | Overlap with `.claude/rules/code-standards.md` - deleted via `git rm` | 2026-02-07 |
+| Template Path             | Reason                                                                | Date       |
+| ------------------------- | --------------------------------------------------------------------- | ---------- |
+| `code-styles/html-css.md` | No HTML/CSS in project - deleted via `git rm`                         | 2026-02-07 |
+| `code-styles/general.md`  | Overlap with `.claude/rules/code-standards.md` - deleted via `git rm` | 2026-02-07 |
 
 ## Templates Explicitly Retained (Per Security Review)
 

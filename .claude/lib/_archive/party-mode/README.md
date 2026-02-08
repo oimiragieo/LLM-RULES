@@ -11,6 +11,7 @@
 **ADR Reference:** See ADR-098 (Lib System Overhaul - Pipeline #15)
 
 **Modules Archived:**
+
 - consensus/response-aggregator.cjs (341 lines)
 - orchestration/lifecycle-manager.cjs (~300 lines)
 - orchestration/round-manager.cjs (~250 lines)

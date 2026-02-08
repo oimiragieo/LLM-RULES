@@ -12,7 +12,9 @@ const assert = require('assert');
 const path = require('path');
 const { describe, it } = require('node:test');
 
-const { classifyRequest } = require(path.join(__dirname, '../../../.claude/lib/workflow/complexity-classifier.cjs'));
+const { classifyRequest } = require(
+  path.join(__dirname, '../../../.claude/lib/workflow/complexity-classifier.cjs')
+);
 
 describe('ComplexityClassifier', () => {
   describe('TRIVIAL complexity', () => {
@@ -34,7 +36,11 @@ describe('ComplexityClassifier', () => {
 
     it('should return phase path for TRIVIAL', () => {
       const result = classifyRequest('fix typo');
-      assert.deepStrictEqual(result.phasePath, ['PHASE_0_TRIAGE', 'PHASE_2_IMPLEMENT', 'PHASE_4_DEPLOY']);
+      assert.deepStrictEqual(result.phasePath, [
+        'PHASE_0_TRIAGE',
+        'PHASE_2_IMPLEMENT',
+        'PHASE_4_DEPLOY',
+      ]);
     });
   });
 
@@ -56,7 +62,7 @@ describe('ComplexityClassifier', () => {
         'PHASE_1_DESIGN',
         'PHASE_2_IMPLEMENT',
         'PHASE_3_REVIEW',
-        'PHASE_4_DEPLOY'
+        'PHASE_4_DEPLOY',
       ]);
     });
   });
@@ -85,7 +91,7 @@ describe('ComplexityClassifier', () => {
         'PHASE_2_IMPLEMENT',
         'PHASE_3_REVIEW',
         'PHASE_4_DEPLOY',
-        'PHASE_5_DOCUMENT'
+        'PHASE_5_DOCUMENT',
       ]);
     });
   });
@@ -122,7 +128,7 @@ describe('ComplexityClassifier', () => {
         'PHASE_3_REVIEW',
         'PHASE_4_DEPLOY',
         'PHASE_5_DOCUMENT',
-        'PHASE_6_REFLECT'
+        'PHASE_6_REFLECT',
       ]);
     });
   });
@@ -152,7 +158,7 @@ describe('ComplexityClassifier', () => {
         'PHASE_3_REVIEW',
         'PHASE_4_DEPLOY',
         'PHASE_5_DOCUMENT',
-        'PHASE_6_REFLECT'
+        'PHASE_6_REFLECT',
       ]);
     });
   });
@@ -217,7 +223,8 @@ describe('ComplexityClassifier', () => {
     });
 
     it('should handle very long request', () => {
-      const longRequest = 'migrate the entire authentication system from JWT to OAuth2 and update all services to use the new token format and add refresh token support and implement token rotation and add security logging and update documentation';
+      const longRequest =
+        'migrate the entire authentication system from JWT to OAuth2 and update all services to use the new token format and add refresh token support and implement token rotation and add security logging and update documentation';
       const result = classifyRequest(longRequest);
       assert.strictEqual(result.complexity, 'EPIC'); // Has "migrate"
       assert.strictEqual(result.risk, 'HIGH'); // Has "authentication"

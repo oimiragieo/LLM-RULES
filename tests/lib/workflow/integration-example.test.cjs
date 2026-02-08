@@ -12,7 +12,9 @@ const path = require('path');
 const fs = require('fs');
 const { describe, it, beforeEach, afterEach } = require('node:test');
 
-const { classifyRequest } = require(path.join(__dirname, '../../../.claude/lib/workflow/complexity-classifier.cjs'));
+const { classifyRequest } = require(
+  path.join(__dirname, '../../../.claude/lib/workflow/complexity-classifier.cjs')
+);
 const {
   createWorkflow,
   getActiveWorkflow,
@@ -24,7 +26,10 @@ const {
   getPhaseArtifacts,
 } = require(path.join(__dirname, '../../../.claude/lib/workflow/workflow-state-manager.cjs'));
 
-const TEST_STATE_FILE = path.join(__dirname, '../../../.claude/context/runtime/test-integration-workflow.json');
+const TEST_STATE_FILE = path.join(
+  __dirname,
+  '../../../.claude/context/runtime/test-integration-workflow.json'
+);
 
 describe('Integration: Complexity Classifier + Workflow State Manager', () => {
   beforeEach(() => {
@@ -52,7 +57,7 @@ describe('Integration: Complexity Classifier + Workflow State Manager', () => {
       'PHASE_2_IMPLEMENT',
       'PHASE_3_REVIEW',
       'PHASE_4_DEPLOY',
-      'PHASE_5_DOCUMENT'
+      'PHASE_5_DOCUMENT',
     ]);
 
     // Step 2: Router creates workflow
@@ -65,13 +70,25 @@ describe('Integration: Complexity Classifier + Workflow State Manager', () => {
     recordAgent(workflowId, 'PHASE_1_DESIGN', 'architect', '102', TEST_STATE_FILE);
 
     // Step 4: Agents complete their work
-    markAgentComplete(workflowId, 'PHASE_1_DESIGN', 'planner', {
-      artifacts: ['.claude/context/plans/auth-refactor-impl-plan.md']
-    }, TEST_STATE_FILE);
+    markAgentComplete(
+      workflowId,
+      'PHASE_1_DESIGN',
+      'planner',
+      {
+        artifacts: ['.claude/context/plans/auth-refactor-impl-plan.md'],
+      },
+      TEST_STATE_FILE
+    );
 
-    markAgentComplete(workflowId, 'PHASE_1_DESIGN', 'architect', {
-      artifacts: ['.claude/context/plans/auth-refactor-design.md']
-    }, TEST_STATE_FILE);
+    markAgentComplete(
+      workflowId,
+      'PHASE_1_DESIGN',
+      'architect',
+      {
+        artifacts: ['.claude/context/plans/auth-refactor-design.md'],
+      },
+      TEST_STATE_FILE
+    );
 
     // Step 5: Evaluate quality gate
     const gate1 = evaluateGate(workflowId, 'PHASE_1_DESIGN', TEST_STATE_FILE);
@@ -87,11 +104,17 @@ describe('Integration: Complexity Classifier + Workflow State Manager', () => {
 
     // Step 7: Developer implements
     recordAgent(workflowId, 'PHASE_2_IMPLEMENT', 'developer', '103', TEST_STATE_FILE);
-    markAgentComplete(workflowId, 'PHASE_2_IMPLEMENT', 'developer', {
-      filesModified: ['src/auth/auth.service.ts', 'src/auth/auth.controller.ts'],
-      testsAdded: true,
-      testsPassing: true
-    }, TEST_STATE_FILE);
+    markAgentComplete(
+      workflowId,
+      'PHASE_2_IMPLEMENT',
+      'developer',
+      {
+        filesModified: ['src/auth/auth.service.ts', 'src/auth/auth.controller.ts'],
+        testsAdded: true,
+        testsPassing: true,
+      },
+      TEST_STATE_FILE
+    );
 
     // Step 8: Evaluate gate 2
     const gate2 = evaluateGate(workflowId, 'PHASE_2_IMPLEMENT', TEST_STATE_FILE);
@@ -116,7 +139,11 @@ describe('Integration: Complexity Classifier + Workflow State Manager', () => {
     assert.ok(classification.phasePath.includes('PHASE_6_REFLECT'));
 
     // Create workflow
-    const workflowId = createWorkflow('add OAuth2 authentication', classification.complexity, TEST_STATE_FILE);
+    const workflowId = createWorkflow(
+      'add OAuth2 authentication',
+      classification.complexity,
+      TEST_STATE_FILE
+    );
 
     // Advance to PHASE_1_DESIGN with security-architect
     advancePhase(workflowId, 'PHASE_1_DESIGN', TEST_STATE_FILE);
@@ -125,9 +152,15 @@ describe('Integration: Complexity Classifier + Workflow State Manager', () => {
     recordAgent(workflowId, 'PHASE_1_DESIGN', 'security-architect', '203', TEST_STATE_FILE);
 
     // Security architect completes threat model
-    markAgentComplete(workflowId, 'PHASE_1_DESIGN', 'security-architect', {
-      artifacts: ['.claude/context/reports/security/oauth2-threat-model.md']
-    }, TEST_STATE_FILE);
+    markAgentComplete(
+      workflowId,
+      'PHASE_1_DESIGN',
+      'security-architect',
+      {
+        artifacts: ['.claude/context/reports/security/oauth2-threat-model.md'],
+      },
+      TEST_STATE_FILE
+    );
 
     // Other agents complete
     markAgentComplete(workflowId, 'PHASE_1_DESIGN', 'planner', {}, TEST_STATE_FILE);
@@ -150,7 +183,7 @@ describe('Integration: Complexity Classifier + Workflow State Manager', () => {
     assert.deepStrictEqual(classification.phasePath, [
       'PHASE_0_TRIAGE',
       'PHASE_2_IMPLEMENT',
-      'PHASE_4_DEPLOY'
+      'PHASE_4_DEPLOY',
     ]);
 
     // Only 3 phases for TRIVIAL (no design, no review, no documentation, no reflection)

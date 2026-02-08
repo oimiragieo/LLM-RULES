@@ -161,7 +161,9 @@ function evaluateGate3(workflowState, projectRoot, result) {
 
     // Check for critical findings
     if (typeof metadata.criticalFindings === 'number' && metadata.criticalFindings > 0) {
-      result.blocking.push(`Review agent ${agentName} found ${metadata.criticalFindings} critical findings`);
+      result.blocking.push(
+        `Review agent ${agentName} found ${metadata.criticalFindings} critical findings`
+      );
       result.passed = false;
     }
 

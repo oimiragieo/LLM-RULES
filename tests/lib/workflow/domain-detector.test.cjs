@@ -124,7 +124,9 @@ describe('domain-detector', () => {
 
   it('should calculate confidence based on signal density', () => {
     loadModule();
-    const strongSignal = detectDomains('authentication authorization credentials security vulnerability OWASP JWT tokens');
+    const strongSignal = detectDomains(
+      'authentication authorization credentials security vulnerability OWASP JWT tokens'
+    );
     const weakSignal = detectDomains('update the code');
 
     assert.ok(strongSignal.confidence > weakSignal.confidence);
@@ -149,7 +151,9 @@ describe('domain-detector', () => {
   it('should return highest scoring domain as primary', () => {
     loadModule();
     // Security has many high-weight keywords
-    const result = detectDomains('authentication authorization vulnerability OWASP security credentials');
+    const result = detectDomains(
+      'authentication authorization vulnerability OWASP security credentials'
+    );
 
     assert.strictEqual(result.primaryDomain, 'security');
     // Security should have highest score

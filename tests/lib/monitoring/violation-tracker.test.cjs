@@ -7,7 +7,12 @@ const path = require('path');
 const os = require('os');
 
 // Module under test
-const { recordViolation, getViolationStats, checkThreshold, _resetForTesting } = require('../../../.claude/lib/monitoring/violation-tracker.cjs');
+const {
+  recordViolation,
+  getViolationStats,
+  checkThreshold,
+  _resetForTesting,
+} = require('../../../.claude/lib/monitoring/violation-tracker.cjs');
 
 describe('recordViolation', () => {
   let tempDir;
@@ -78,12 +83,36 @@ describe('recordViolation', () => {
 
   it('appends multiple violations as separate lines', () => {
     const violations = [
-      { timestamp: new Date().toISOString(), tool: 'Grep', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' },
-      { timestamp: new Date().toISOString(), tool: 'Glob', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' },
-      { timestamp: new Date().toISOString(), tool: 'Write', action: 'block', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' },
+      {
+        timestamp: new Date().toISOString(),
+        tool: 'Grep',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      {
+        timestamp: new Date().toISOString(),
+        tool: 'Glob',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      {
+        timestamp: new Date().toISOString(),
+        tool: 'Write',
+        action: 'block',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
     ];
 
-    violations.forEach((v) => recordViolation(v, metricsFile));
+    violations.forEach(v => recordViolation(v, metricsFile));
 
     const content = fs.readFileSync(metricsFile, 'utf8');
     const lines = content.trim().split('\n');
@@ -300,15 +329,18 @@ describe('rotation', () => {
   it('trims JSONL file when it exceeds maxLines (default 2000)', () => {
     // Write 2100 violations
     for (let i = 0; i < 2100; i++) {
-      recordViolation({
-        timestamp: new Date().toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      }, metricsFile);
+      recordViolation(
+        {
+          timestamp: new Date().toISOString(),
+          tool: 'Grep',
+          action: 'warn',
+          checkName: 'routerSelfCheck',
+          routerMode: 'router',
+          taskSpawned: false,
+          sessionId: 'test',
+        },
+        metricsFile
+      );
     }
 
     const content = fs.readFileSync(metricsFile, 'utf8');
@@ -324,15 +356,18 @@ describe('rotation', () => {
 
     // Write 60 violations
     for (let i = 0; i < 60; i++) {
-      recordViolation({
-        timestamp: new Date().toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      }, metricsFile);
+      recordViolation(
+        {
+          timestamp: new Date().toISOString(),
+          tool: 'Grep',
+          action: 'warn',
+          checkName: 'routerSelfCheck',
+          routerMode: 'router',
+          taskSpawned: false,
+          sessionId: 'test',
+        },
+        metricsFile
+      );
     }
 
     const content = fs.readFileSync(metricsFile, 'utf8');
@@ -380,15 +415,18 @@ describe('rate limiting', () => {
 
     // Attempt to record 5100 violations rapidly
     for (let i = 0; i < 5100; i++) {
-      recordViolation({
-        timestamp: new Date().toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      }, metricsFile);
+      recordViolation(
+        {
+          timestamp: new Date().toISOString(),
+          tool: 'Grep',
+          action: 'warn',
+          checkName: 'routerSelfCheck',
+          routerMode: 'router',
+          taskSpawned: false,
+          sessionId: 'test',
+        },
+        metricsFile
+      );
     }
 
     const content = fs.readFileSync(metricsFile, 'utf8');
@@ -426,11 +464,66 @@ describe('getViolationStats', () => {
 
   it('returns count and breakdown by tool', () => {
     // Write 5 violations (3 Grep, 2 Glob)
-    recordViolation({ timestamp: new Date().toISOString(), tool: 'Grep', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
-    recordViolation({ timestamp: new Date().toISOString(), tool: 'Grep', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
-    recordViolation({ timestamp: new Date().toISOString(), tool: 'Grep', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
-    recordViolation({ timestamp: new Date().toISOString(), tool: 'Glob', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
-    recordViolation({ timestamp: new Date().toISOString(), tool: 'Glob', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
+    recordViolation(
+      {
+        timestamp: new Date().toISOString(),
+        tool: 'Grep',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
+    recordViolation(
+      {
+        timestamp: new Date().toISOString(),
+        tool: 'Grep',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
+    recordViolation(
+      {
+        timestamp: new Date().toISOString(),
+        tool: 'Grep',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
+    recordViolation(
+      {
+        timestamp: new Date().toISOString(),
+        tool: 'Glob',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
+    recordViolation(
+      {
+        timestamp: new Date().toISOString(),
+        tool: 'Glob',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
 
     const stats = getViolationStats({ metricsFile });
 
@@ -444,10 +537,32 @@ describe('getViolationStats', () => {
     const old = new Date(now.getTime() - 2 * 60 * 60 * 1000); // 2 hours ago
 
     // Write old violation
-    recordViolation({ timestamp: old.toISOString(), tool: 'Grep', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
+    recordViolation(
+      {
+        timestamp: old.toISOString(),
+        tool: 'Grep',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
 
     // Write recent violation
-    recordViolation({ timestamp: now.toISOString(), tool: 'Glob', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
+    recordViolation(
+      {
+        timestamp: now.toISOString(),
+        tool: 'Glob',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
 
     const stats = getViolationStats({ metricsFile, windowMinutes: 60 });
 
@@ -506,7 +621,18 @@ describe('checkThreshold', () => {
   it('returns exceeded: false when under threshold', () => {
     // Write 3 violations
     for (let i = 0; i < 3; i++) {
-      recordViolation({ timestamp: new Date().toISOString(), tool: 'Grep', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
+      recordViolation(
+        {
+          timestamp: new Date().toISOString(),
+          tool: 'Grep',
+          action: 'warn',
+          checkName: 'routerSelfCheck',
+          routerMode: 'router',
+          taskSpawned: false,
+          sessionId: 'test',
+        },
+        metricsFile
+      );
     }
 
     const result = checkThreshold({ metricsFile, threshold: 5 });
@@ -519,7 +645,18 @@ describe('checkThreshold', () => {
   it('returns exceeded: true when over threshold', () => {
     // Write 7 violations
     for (let i = 0; i < 7; i++) {
-      recordViolation({ timestamp: new Date().toISOString(), tool: 'Grep', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
+      recordViolation(
+        {
+          timestamp: new Date().toISOString(),
+          tool: 'Grep',
+          action: 'warn',
+          checkName: 'routerSelfCheck',
+          routerMode: 'router',
+          taskSpawned: false,
+          sessionId: 'test',
+        },
+        metricsFile
+      );
     }
 
     const result = checkThreshold({ metricsFile, threshold: 5 });
@@ -534,11 +671,44 @@ describe('checkThreshold', () => {
     const old = new Date(now.getTime() - 40 * 60 * 1000); // 40 minutes ago
 
     // Write old violation (outside 30-min window)
-    recordViolation({ timestamp: old.toISOString(), tool: 'Grep', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
+    recordViolation(
+      {
+        timestamp: old.toISOString(),
+        tool: 'Grep',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
 
     // Write 2 recent violations
-    recordViolation({ timestamp: now.toISOString(), tool: 'Grep', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
-    recordViolation({ timestamp: now.toISOString(), tool: 'Glob', action: 'warn', checkName: 'routerSelfCheck', routerMode: 'router', taskSpawned: false, sessionId: 'test' }, metricsFile);
+    recordViolation(
+      {
+        timestamp: now.toISOString(),
+        tool: 'Grep',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
+    recordViolation(
+      {
+        timestamp: now.toISOString(),
+        tool: 'Glob',
+        action: 'warn',
+        checkName: 'routerSelfCheck',
+        routerMode: 'router',
+        taskSpawned: false,
+        sessionId: 'test',
+      },
+      metricsFile
+    );
 
     const result = checkThreshold({ metricsFile, threshold: 2, windowMs: 30 * 60 * 1000 });
 

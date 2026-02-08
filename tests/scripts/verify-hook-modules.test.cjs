@@ -85,7 +85,7 @@ describe('verify-hook-modules', () => {
       const targetFile = path.join(hooksDir, 'monitoring', 'existing.cjs');
 
       fs.writeFileSync(hookFile, "const x = require('./existing.cjs');");
-      fs.writeFileSync(targetFile, "module.exports = {};");
+      fs.writeFileSync(targetFile, 'module.exports = {};');
 
       // Should exit with code 0 and show [PASS]
       const output = execSync(`node ${SCRIPT_PATH}`, {
@@ -235,9 +235,7 @@ describe('verify-hook-modules', () => {
         assert.fail('Expected script to exit with code 1');
       } catch (err) {
         const output = err.stdout || err.stderr || '';
-        assert.ok(
-          output.includes('MISSING') || output.includes('nonexistent.cjs')
-        );
+        assert.ok(output.includes('MISSING') || output.includes('nonexistent.cjs'));
       }
     });
 

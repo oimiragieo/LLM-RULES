@@ -16,7 +16,11 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
-const { processTaskCompletion, WORKFLOW_STATE_FILE, PHASE_ADVANCE_FILE } = require('../../.claude/hooks/workflow/post-completion-chain.cjs');
+const {
+  processTaskCompletion,
+  WORKFLOW_STATE_FILE,
+  PHASE_ADVANCE_FILE,
+} = require('../../.claude/hooks/workflow/post-completion-chain.cjs');
 
 // Test utilities
 let testsFailed = 0;
@@ -76,7 +80,10 @@ async function testPassThroughNoWorkflow() {
   };
 
   const result = await processTaskCompletion(hookData);
-  assert(Object.keys(result.result || {}).length === 0, 'Should pass through when no workflow exists');
+  assert(
+    Object.keys(result.result || {}).length === 0,
+    'Should pass through when no workflow exists'
+  );
 }
 
 // Test 3: Mark agent complete when TaskUpdate(completed) matches workflow agent
@@ -245,7 +252,8 @@ async function testNoAdvanceOnGateFailure() {
     'Agent should still be marked complete'
   );
   assert(
-    updatedState.phases.PHASE_2_IMPLEMENT.gate && updatedState.phases.PHASE_2_IMPLEMENT.gate.passed === false,
+    updatedState.phases.PHASE_2_IMPLEMENT.gate &&
+      updatedState.phases.PHASE_2_IMPLEMENT.gate.passed === false,
     'Gate should be marked as failed'
   );
 }

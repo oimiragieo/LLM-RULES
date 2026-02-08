@@ -206,21 +206,76 @@ function extractTaskDescription(toolInput) {
 }
 
 /**
- * Extract agent type from prompt/description
+ * Extract agent type from tool input, prompt, or description
+ * @param {string} prompt - Task prompt
+ * @param {string} description - Task description
+ * @param {Object} toolInput - Full tool input (optional, for subagent_type field)
  */
-function extractAgentType(prompt, description) {
+function extractAgentType(prompt, description, toolInput = null) {
+  // FIRST: Check if subagent_type is directly provided in tool_input
+  if (toolInput && toolInput.subagent_type) {
+    return toolInput.subagent_type.toLowerCase();
+  }
+
   const combined = `${prompt} ${description}`.toLowerCase();
 
+  // Comprehensive agent list from agent-registry.json (49 agents)
+  // Sorted longest-first to prevent partial matches (e.g., 'security-architect' before 'architect')
   const agentTypes = [
+    // Orchestrators (longest first)
+    'evolution-orchestrator',
+    'master-orchestrator',
+    'party-orchestrator',
+    'swarm-coordinator',
+    // Specialized (longest first)
+    'tauri-desktop-developer',
+    'expo-mobile-developer',
+    'devops-troubleshooter',
+    'security-architect',
+    'incident-responder',
+    'reverse-engineer',
+    'database-architect',
+    'conductor-validator',
+    'code-simplifier',
+    'code-reviewer',
+    'technical-writer',
+    'reflection-agent',
+    'context-compressor',
+    'ai-ml-specialist',
+    'mobile-ux-reviewer',
+    'scientific-research',
+    'web3-blockchain',
+    // Domain specialists
+    'android',
+    'data-engineer',
+    'fastapi',
+    'frontend',
+    'gamedev',
+    'golang',
+    'graphql',
+    'ios',
+    'java',
+    'nextjs',
+    'nodejs',
+    'php',
+    'python',
+    'rust',
+    'sveltekit',
+    'typescript',
+    // C4 diagrams
+    'c4-component',
+    'c4-container',
+    'c4-context',
+    'c4-code',
+    // Core agents
+    'researcher',
+    'devops',
+    'architect',
     'developer',
     'planner',
-    'architect',
+    'router',
+    'pm',
     'qa',
-    'security-architect',
-    'devops',
-    'technical-writer',
-    'evolution-orchestrator',
-    'reflection-agent',
   ];
 
   for (const type of agentTypes) {
@@ -478,7 +533,7 @@ This is a safety mechanism to prevent infinite loops.`;
   }
 
   // Check 4b: Pattern Detection
-  const agentType = extractAgentType(prompt, description);
+  const agentType = extractAgentType(prompt, description, toolInput);
   const spawnAction = `spawn:${agentType}`;
   const threshold = getPatternThreshold();
 
@@ -549,7 +604,7 @@ function updateLoopStateAfterAllow(hookInput) {
     const prompt = toolInput.prompt || '';
     const description = toolInput.description || '';
 
-    const agentType = extractAgentType(prompt, description);
+    const agentType = extractAgentType(prompt, description, toolInput);
     loopStateManager.recordSpawn(agentType);
 
     if (isEvolutionTrigger(prompt)) {

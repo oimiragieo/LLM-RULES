@@ -31,8 +31,20 @@ const { evaluateGate } = require('../../lib/workflow/quality-gates.cjs');
 
 // Resolve project root
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
-const WORKFLOW_STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'workflow-state.json');
-const PHASE_ADVANCE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'phase-advance.json');
+const WORKFLOW_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'workflow-state.json'
+);
+const PHASE_ADVANCE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'phase-advance.json'
+);
 
 /**
  * Phase progression map
@@ -55,128 +67,130 @@ async function processTaskCompletion(hookData) {
   const toolName = hookData?.toolUse?.tool;
   const toolInput = hookData?.toolUse?.input || {};
 
-    // Only process TaskUpdate completions
-    if (toolName !== 'TaskUpdate') {
-      console.error('[post-completion-chain] Not a TaskUpdate, passing through');
-      console.log(formatResult({}));
-      return { result: {} };
-    }
-
-    if (toolInput.status !== 'completed') {
-      console.error('[post-completion-chain] Status not completed:', toolInput.status);
-      console.log(formatResult({}));
-      return { result: {} };
-    }
-
-    // Read workflow state
-    if (!fs.existsSync(WORKFLOW_STATE_FILE)) {
-      // No active workflow
-      console.error('[post-completion-chain] No workflow state file found');
-      console.log(formatResult({}));
-      return { result: {} };
-    }
-
-    console.error('[post-completion-chain] Processing completion for task:', toolInput.taskId);
-
-    const workflowState = JSON.parse(fs.readFileSync(WORKFLOW_STATE_FILE, 'utf8'));
-    const currentPhase = workflowState.currentPhase;
-
-    if (!currentPhase || currentPhase === 'COMPLETE') {
-      console.log(formatResult({}));
-      return { result: {} };
-    }
-
-    // Find which agent this task belongs to
-    const phaseData = workflowState.phases?.[currentPhase];
-    if (!phaseData || !phaseData.agents) {
-      console.log(formatResult({}));
-      return { result: {} };
-    }
-
-    const completedTaskId = toolInput.taskId;
-    let matchedAgentName = null;
-
-    for (const [agentName, agentData] of Object.entries(phaseData.agents)) {
-      if (agentData.taskId === completedTaskId) {
-        matchedAgentName = agentName;
-        break;
-      }
-    }
-
-    if (!matchedAgentName) {
-      // Task doesn't belong to current phase
-      console.log(formatResult({}));
-      return { result: {} };
-    }
-
-    // Mark agent as complete and store metadata
-    phaseData.agents[matchedAgentName].status = 'completed';
-    if (toolInput.metadata) {
-      phaseData.agents[matchedAgentName].metadata = toolInput.metadata;
-    }
-    phaseData.agents[matchedAgentName].completedAt = new Date().toISOString();
-
-    // Check if all agents in phase are complete
-    const allAgentsComplete = Object.values(phaseData.agents).every(agent => agent.status === 'completed');
-
-    if (!allAgentsComplete) {
-      // Still waiting for other agents
-      atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
-      console.log(formatResult({}));
-      return { result: {} };
-    }
-
-    // All agents complete - evaluate quality gate
-    const gateResult = evaluateGate(currentPhase, workflowState);
-
-    // Record gate result
-    phaseData.gate = {
-      passed: gateResult.passed,
-      blocking: gateResult.blocking,
-      warnings: gateResult.warnings,
-      evaluatedAt: new Date().toISOString(),
-    };
-
-    // Update phase status
-    phaseData.status = 'completed';
-
-    // Save updated workflow state
-    atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
-
-    if (!gateResult.passed) {
-      // Gate failed - do not advance
-      console.error('Quality gate failed:', JSON.stringify(gateResult, null, 2));
-      console.log(formatResult({}));
-      return { result: {} };
-    }
-
-    // Gate passed - determine next phase
-    const nextPhase = PHASE_PROGRESSION[currentPhase];
-
-    if (!nextPhase || nextPhase === 'COMPLETE') {
-      // Workflow complete
-      workflowState.currentPhase = 'COMPLETE';
-      workflowState.completedAt = new Date().toISOString();
-      atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
-      console.log(formatResult({}));
-      return { result: {} };
-    }
-
-    // Write phase-advance signal for Router to read
-    const phaseAdvanceSignal = {
-      workflowId: workflowState.workflowId,
-      advanceTo: nextPhase,
-      previousPhase: currentPhase,
-      gatePassed: true,
-      gateResults: gateResult,
-      timestamp: new Date().toISOString(),
-    };
-
-    atomicWriteJSONSync(PHASE_ADVANCE_FILE, phaseAdvanceSignal);
-
-    // Pass through
+  // Only process TaskUpdate completions
+  if (toolName !== 'TaskUpdate') {
+    console.error('[post-completion-chain] Not a TaskUpdate, passing through');
     console.log(formatResult({}));
     return { result: {} };
+  }
+
+  if (toolInput.status !== 'completed') {
+    console.error('[post-completion-chain] Status not completed:', toolInput.status);
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
+  // Read workflow state
+  if (!fs.existsSync(WORKFLOW_STATE_FILE)) {
+    // No active workflow
+    console.error('[post-completion-chain] No workflow state file found');
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
+  console.error('[post-completion-chain] Processing completion for task:', toolInput.taskId);
+
+  const workflowState = JSON.parse(fs.readFileSync(WORKFLOW_STATE_FILE, 'utf8'));
+  const currentPhase = workflowState.currentPhase;
+
+  if (!currentPhase || currentPhase === 'COMPLETE') {
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
+  // Find which agent this task belongs to
+  const phaseData = workflowState.phases?.[currentPhase];
+  if (!phaseData || !phaseData.agents) {
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
+  const completedTaskId = toolInput.taskId;
+  let matchedAgentName = null;
+
+  for (const [agentName, agentData] of Object.entries(phaseData.agents)) {
+    if (agentData.taskId === completedTaskId) {
+      matchedAgentName = agentName;
+      break;
+    }
+  }
+
+  if (!matchedAgentName) {
+    // Task doesn't belong to current phase
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
+  // Mark agent as complete and store metadata
+  phaseData.agents[matchedAgentName].status = 'completed';
+  if (toolInput.metadata) {
+    phaseData.agents[matchedAgentName].metadata = toolInput.metadata;
+  }
+  phaseData.agents[matchedAgentName].completedAt = new Date().toISOString();
+
+  // Check if all agents in phase are complete
+  const allAgentsComplete = Object.values(phaseData.agents).every(
+    agent => agent.status === 'completed'
+  );
+
+  if (!allAgentsComplete) {
+    // Still waiting for other agents
+    atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
+  // All agents complete - evaluate quality gate
+  const gateResult = evaluateGate(currentPhase, workflowState);
+
+  // Record gate result
+  phaseData.gate = {
+    passed: gateResult.passed,
+    blocking: gateResult.blocking,
+    warnings: gateResult.warnings,
+    evaluatedAt: new Date().toISOString(),
+  };
+
+  // Update phase status
+  phaseData.status = 'completed';
+
+  // Save updated workflow state
+  atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
+
+  if (!gateResult.passed) {
+    // Gate failed - do not advance
+    console.error('Quality gate failed:', JSON.stringify(gateResult, null, 2));
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
+  // Gate passed - determine next phase
+  const nextPhase = PHASE_PROGRESSION[currentPhase];
+
+  if (!nextPhase || nextPhase === 'COMPLETE') {
+    // Workflow complete
+    workflowState.currentPhase = 'COMPLETE';
+    workflowState.completedAt = new Date().toISOString();
+    atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
+  // Write phase-advance signal for Router to read
+  const phaseAdvanceSignal = {
+    workflowId: workflowState.workflowId,
+    advanceTo: nextPhase,
+    previousPhase: currentPhase,
+    gatePassed: true,
+    gateResults: gateResult,
+    timestamp: new Date().toISOString(),
+  };
+
+  atomicWriteJSONSync(PHASE_ADVANCE_FILE, phaseAdvanceSignal);
+
+  // Pass through
+  console.log(formatResult({}));
+  return { result: {} };
 }
 
 /**

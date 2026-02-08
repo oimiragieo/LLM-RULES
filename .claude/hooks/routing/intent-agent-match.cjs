@@ -41,17 +41,45 @@ const {
  */
 const INTENT_PATTERNS = {
   security: {
-    keywords: ['auth', 'credential', 'permission', 'vulnerability', 'OWASP', 'security', 'password', 'token', 'encrypt', 'decrypt'],
+    keywords: [
+      'auth',
+      'credential',
+      'permission',
+      'vulnerability',
+      'OWASP',
+      'security',
+      'password',
+      'token',
+      'encrypt',
+      'decrypt',
+    ],
     agents: ['security-architect'],
     weight: 10,
   },
   testing: {
-    keywords: ['test', 'coverage', 'regression', 'assertion', 'unit test', 'integration test', 'e2e', 'qa'],
+    keywords: [
+      'test',
+      'coverage',
+      'regression',
+      'assertion',
+      'unit test',
+      'integration test',
+      'e2e',
+      'qa',
+    ],
     agents: ['qa'],
     weight: 8,
   },
   architecture: {
-    keywords: ['design', 'schema', 'database', 'migration', 'scalability', 'architecture', 'system design'],
+    keywords: [
+      'design',
+      'schema',
+      'database',
+      'migration',
+      'scalability',
+      'architecture',
+      'system design',
+    ],
     agents: ['architect'],
     weight: 9,
   },

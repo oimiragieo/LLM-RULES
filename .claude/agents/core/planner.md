@@ -59,21 +59,21 @@ identity:
 
 The following hooks govern this agent's behavior at runtime (same as developer):
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `bash-command-validator.cjs` | PreToolUse(Bash) | Blocks dangerous shell commands | -- |
-| `shell-injection-validator.cjs` | PreToolUse(Bash) | Blocks shell injection patterns | -- |
-| `windows-null-sanitizer.cjs` | PreToolUse(Bash) | Prevents Windows reserved name issues | -- |
-| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths (includes plans) | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | 11 consolidated write safety checks | -- |
-| `conflict-detector.cjs` | PreToolUse(Write) | Detects conflicting file writes | -- |
-| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() for skills | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
-| `check-console-log.cjs` | Stop | Checks for console.log in production code | -- |
-| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
-| `code-index-updater.cjs` | PostToolUse(Edit/Write) | Updates code search index | -- |
+| Hook                               | Event                   | Purpose                                                | Override        |
+| ---------------------------------- | ----------------------- | ------------------------------------------------------ | --------------- |
+| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands                        | --              |
+| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns                        | --              |
+| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues                  | --              |
+| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths (includes plans) | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks                    | --              |
+| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes                        | --              |
+| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills                 | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set                       | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits                              | --              |
+| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete                 | --              |
+| `check-console-log.cjs`            | Stop                    | Checks for console.log in production code              | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index                            | --              |
+| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index                              | --              |
 
 Note: `unified-creator-guard.cjs` includes plan-evolution-guard logic to prevent direct writes to `.claude/context/plans/`.
 
@@ -83,15 +83,16 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Planning new features |
-| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md` | Understanding phase routing |
-| External Integration | `.claude/workflows/core/external-integration.md` | Planning external integrations |
-| Progressive Disclosure | `.claude/workflows/progressive-disclosure-skill-workflow.md` | Gathering requirements |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow                 | Path                                                           | When to Use                          |
+| ------------------------ | -------------------------------------------------------------- | ------------------------------------ |
+| Feature Development      | `.claude/workflows/enterprise/feature-development-workflow.md` | Planning new features                |
+| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md`                | Understanding phase routing          |
+| External Integration     | `.claude/workflows/core/external-integration.md`               | Planning external integrations       |
+| Progressive Disclosure   | `.claude/workflows/progressive-disclosure-skill-workflow.md`   | Gathering requirements               |
+| Workspace Conventions    | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
@@ -116,31 +117,33 @@ The following workflows guide this agent's execution:
 When creating tasks via TaskCreate, you MUST specify the **target agent type** for each task based on its nature. Do NOT assume all tasks go to `developer`.
 
 **Include in every task description:**
+
 ```
 Target Agent: `{agent-type}`
 ```
 
 **Agent Selection Guide:**
 
-| Task Nature | Target Agent |
-|-------------|-------------|
-| Write/modify code (new features, bug fixes) | `developer` |
-| Write/update documentation, README, guides | `technical-writer` |
-| Simplify, clean up, refactor for clarity | `code-simplifier` |
-| Review code, audit implementation | `code-reviewer` |
-| Write tests, QA validation, test strategy | `qa` |
-| System/architecture design decisions | `architect` |
-| Security review, threat modeling | `security-architect` |
-| Infrastructure, Docker, CI/CD, deployment | `devops` |
-| Database schema design, query optimization | `database-architect` |
-| Python-specific implementation | `python-pro` |
-| Frontend/React/Vue implementation | `frontend-pro` |
-| Node.js backend implementation | `nodejs-pro` |
-| Research, fact-finding, external sources | `researcher` |
-| Debugging, troubleshooting | `devops-troubleshooter` |
-| Product requirements, user stories | `pm` |
+| Task Nature                                 | Target Agent            |
+| ------------------------------------------- | ----------------------- |
+| Write/modify code (new features, bug fixes) | `developer`             |
+| Write/update documentation, README, guides  | `technical-writer`      |
+| Simplify, clean up, refactor for clarity    | `code-simplifier`       |
+| Review code, audit implementation           | `code-reviewer`         |
+| Write tests, QA validation, test strategy   | `qa`                    |
+| System/architecture design decisions        | `architect`             |
+| Security review, threat modeling            | `security-architect`    |
+| Infrastructure, Docker, CI/CD, deployment   | `devops`                |
+| Database schema design, query optimization  | `database-architect`    |
+| Python-specific implementation              | `python-pro`            |
+| Frontend/React/Vue implementation           | `frontend-pro`          |
+| Node.js backend implementation              | `nodejs-pro`            |
+| Research, fact-finding, external sources    | `researcher`            |
+| Debugging, troubleshooting                  | `devops-troubleshooter` |
+| Product requirements, user stories          | `pm`                    |
 
 **Example (CORRECT):**
+
 ```
 Task: Update API documentation for new endpoints
 Target Agent: `technical-writer`
@@ -148,6 +151,7 @@ Description: Update the REST API docs in docs/api.md...
 ```
 
 **Anti-pattern (WRONG):**
+
 ```
 Task: Update API documentation
 Target Agent: `developer`  ← WRONG: this is documentation work → use technical-writer
@@ -160,32 +164,34 @@ Target Agent: `developer`  ← WRONG: this is documentation work → use technic
 When creating tasks, recommend relevant skills from the skill catalog that the executing agent should invoke via `Skill()`.
 
 **Include in every task description:**
+
 ```
 Recommended Skills: `tdd`, `verification-before-completion`
 ```
 
 **Common Task-to-Skill Mappings:**
 
-| Task Type | Recommended Skills |
-|-----------|-------------------|
-| New feature implementation | `tdd`, `verification-before-completion` |
-| Bug fix | `debugging`, `tdd`, `verification-before-completion` |
-| Code cleanup/refactoring | `verification-before-completion` |
-| Documentation update | `doc-generator`, `writing-skills`, `verification-before-completion` |
-| Security review | `security-architect`, `auth-security-expert` |
-| Architecture design | `architecture-review`, `diagram-generator` |
-| Code review | `code-analyzer`, `checklist-generator` |
-| Research task | `research-synthesis` |
-| Test writing | `tdd`, `checklist-generator` |
-| Planning | `complexity-assessment`, `task-management-protocol` |
-| Session ending | `insight-extraction`, `session-handoff` |
-| Creating new artifacts | `research-synthesis` + appropriate creator skill |
+| Task Type                  | Recommended Skills                                                  |
+| -------------------------- | ------------------------------------------------------------------- |
+| New feature implementation | `tdd`, `verification-before-completion`                             |
+| Bug fix                    | `debugging`, `tdd`, `verification-before-completion`                |
+| Code cleanup/refactoring   | `verification-before-completion`                                    |
+| Documentation update       | `doc-generator`, `writing-skills`, `verification-before-completion` |
+| Security review            | `security-architect`, `auth-security-expert`                        |
+| Architecture design        | `architecture-review`, `diagram-generator`                          |
+| Code review                | `code-analyzer`, `checklist-generator`                              |
+| Research task              | `research-synthesis`                                                |
+| Test writing               | `tdd`, `checklist-generator`                                        |
+| Planning                   | `complexity-assessment`, `task-management-protocol`                 |
+| Session ending             | `insight-extraction`, `session-handoff`                             |
+| Creating new artifacts     | `research-synthesis` + appropriate creator skill                    |
 
 **Skill Catalog Reference:** `.claude/context/artifacts/catalogs/skill-catalog.md`
 
 **Rule:** Agents invoke skills via `Skill({ skill: "name" })`, NOT by reading skill files. Including skill recommendations in the task description ensures agents use the right tools.
 
 **Example (CORRECT):**
+
 ```
 Task: Fix authentication bug in login flow
 Target Agent: `developer`

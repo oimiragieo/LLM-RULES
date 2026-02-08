@@ -115,12 +115,12 @@ echo '{"toolUse":{"tool":"TaskUpdate","input":{"status":"completed","taskId":"7"
 
 ### Graceful Degradation
 
-| Scenario | Behavior |
-|----------|----------|
-| Graph file missing | Returns `{ gaps: ['graph-unavailable'], status: 'unknown' }` |
-| Node not in graph | Returns `{ gaps: ['not-in-graph'], status: 'unknown' }` |
-| Hook error | Logs to stderr, returns `{ allow: true }`, exits 0 |
-| Queue rotation fails | Logs to stderr, continues (rotation is optimization) |
+| Scenario             | Behavior                                                     |
+| -------------------- | ------------------------------------------------------------ |
+| Graph file missing   | Returns `{ gaps: ['graph-unavailable'], status: 'unknown' }` |
+| Node not in graph    | Returns `{ gaps: ['not-in-graph'], status: 'unknown' }`      |
+| Hook error           | Logs to stderr, returns `{ allow: true }`, exits 0           |
+| Queue rotation fails | Logs to stderr, continues (rotation is optimization)         |
 
 ### Edge Cases
 
@@ -156,18 +156,23 @@ node --test .claude/hooks/workflow/post-creation-integration*.test.cjs
 ## Integration Points
 
 **Reads:**
+
 - `.claude/context/data/artifact-graph.json` (via ArtifactGraph library)
 
 **Writes:**
+
 - `.claude/context/runtime/integration-queue.jsonl` (append-only)
 
 **Dependencies:**
+
 - `.claude/lib/workflow/artifact-graph.cjs` (ArtifactGraph library)
 
 **Hook Type:**
+
 - PostToolUse on TaskUpdate
 
 **Registration:**
+
 - Add to `.claude/settings.json` (pending)
 
 ## Future Enhancements

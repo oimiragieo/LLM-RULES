@@ -12,9 +12,12 @@ const fs = require('fs');
 const os = require('os');
 
 // Import the function under test
-const { getPresetRuleSnippet, _clearCache } = require('../../../.claude/lib/spawn/prompt-assembler.cjs');
+const {
+  getPresetRuleSnippet,
+  _clearCache,
+} = require('../../../.claude/lib/spawn/prompt-assembler.cjs');
 
-test('SEC-TMPL-001: getPresetRuleSnippet path traversal tests', async (t) => {
+test('SEC-TMPL-001: getPresetRuleSnippet path traversal tests', async t => {
   let tmpDir;
   let presetConfigPath;
 
@@ -55,9 +58,9 @@ test('SEC-TMPL-001: getPresetRuleSnippet path traversal tests', async (t) => {
     const presetsConfig = {
       presets: {
         malicious: {
-          ruleSnippetPath: '../../../../../../tmp/sensitive-data.txt'
-        }
-      }
+          ruleSnippetPath: '../../../../../../tmp/sensitive-data.txt',
+        },
+      },
     };
     fs.writeFileSync(presetConfigPath, JSON.stringify(presetsConfig));
 
@@ -72,9 +75,9 @@ test('SEC-TMPL-001: getPresetRuleSnippet path traversal tests', async (t) => {
     const presetsConfig = {
       presets: {
         absolute: {
-          ruleSnippetPath: absolutePath
-        }
-      }
+          ruleSnippetPath: absolutePath,
+        },
+      },
     };
     fs.writeFileSync(presetConfigPath, JSON.stringify(presetsConfig));
 
@@ -88,9 +91,9 @@ test('SEC-TMPL-001: getPresetRuleSnippet path traversal tests', async (t) => {
     const presetsConfig = {
       presets: {
         safe: {
-          ruleSnippetPath: 'rules/safe.txt'
-        }
-      }
+          ruleSnippetPath: 'rules/safe.txt',
+        },
+      },
     };
     fs.writeFileSync(presetConfigPath, JSON.stringify(presetsConfig));
 
@@ -110,9 +113,9 @@ test('SEC-TMPL-001: getPresetRuleSnippet path traversal tests', async (t) => {
       presets: {
         relative: {
           // This resolves to tmpDir/a/valid.txt (inside project)
-          ruleSnippetPath: 'a/b/../valid.txt'
-        }
-      }
+          ruleSnippetPath: 'a/b/../valid.txt',
+        },
+      },
     };
     fs.writeFileSync(presetConfigPath, JSON.stringify(presetsConfig));
 

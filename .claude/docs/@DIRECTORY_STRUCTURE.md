@@ -224,6 +224,7 @@ lib/
 ```
 
 **Archival Notes (ADR-098, Pipeline #15):**
+
 - 10 entire subsystems archived to `_archive/` (2026-02-07)
 - All archived code preserved in git history via `git mv` (not delete)
 - Each archive has README.md with original purpose, archival reason, and ADR reference
@@ -298,6 +299,7 @@ tools/
 ```
 
 **Recently Relocated (2026-02-07):**
+
 - `skills-core.js` → `lib/skills/`
 - `swarm-coordination.cjs` → `lib/coordination/`
 - `context-path-resolver.mjs` → `lib/utils/`
@@ -307,6 +309,7 @@ tools/
 - `workflow-runner.js` → `lib/workflow/`
 
 **Empty directories (archived tools):**
+
 - `maintenance/` - Files moved to `_archive/` (archive-memory, compact-lancedb)
 - `visualization/render-graphs/` - Moved to `_archive/`
 
@@ -374,10 +377,10 @@ schemas/
 
 User-facing slash commands (thin delegators to skills):
 
-| Path | Purpose |
-|------|---------|
-| `.claude/commands/` | User-facing slash commands (thin delegators to skills) |
-| `.claude/commands/*.md` | Individual command definitions |
+| Path                    | Purpose                                                |
+| ----------------------- | ------------------------------------------------------ |
+| `.claude/commands/`     | User-facing slash commands (thin delegators to skills) |
+| `.claude/commands/*.md` | Individual command definitions                         |
 
 See `.claude/context/artifacts/catalogs/command-catalog.md` for the full catalog.
 
@@ -414,21 +417,21 @@ See `.claude/context/artifacts/catalogs/command-catalog.md` for the full catalog
 
 ### Deleted/Deprecated Directories
 
-| Old Path                  | Status                                           | Date       |
-| ------------------------- | ------------------------------------------------ | ---------- |
-| `.claude/temp/`           | Deleted (was empty)                              | 2026-01-28 |
-| `.claude/tests/`          | Moved to root `tests/` directory                 | 2026-01-28 |
-| `.claude/scripts/`        | Consolidated into `.claude/lib/workflow/`        | 2026-01-28 |
-| `.claude/data/`           | Moved to `.claude/context/data/`                 | 2026-02-06 |
-| `.claude/staging/`        | Deleted (test artifacts and temp files)          | 2026-02-06 |
-| `.claude/audit/`          | Deleted (one-time audit reports)                 | 2026-02-06 |
-| `.claude/archive/`        | Deleted (outdated hooks and libs)                | 2026-02-06 |
-| `.claude/references/`     | Moved to `.claude/docs/reference/` then deleted  | 2026-02-06 |
-| `.claude/teams/`          | Moved to `.claude/context/teams/`                | 2026-02-06 |
-| `.claude/docs/archive/`   | Deleted (one-time debug fix reports)             | 2026-02-06 |
-| `.claude/docs/reference/`     | Deleted (AI-generated unused reference material) | 2026-02-06 |
-| `.claude/context/code-indexing/` | Deleted (zero references - active indexer uses code-index/) | 2026-02-06 |
-| `.claude/context/ml/`         | Deleted (zero references - optional ML features never activated) | 2026-02-06 |
+| Old Path                         | Status                                                           | Date       |
+| -------------------------------- | ---------------------------------------------------------------- | ---------- |
+| `.claude/temp/`                  | Deleted (was empty)                                              | 2026-01-28 |
+| `.claude/tests/`                 | Moved to root `tests/` directory                                 | 2026-01-28 |
+| `.claude/scripts/`               | Consolidated into `.claude/lib/workflow/`                        | 2026-01-28 |
+| `.claude/data/`                  | Moved to `.claude/context/data/`                                 | 2026-02-06 |
+| `.claude/staging/`               | Deleted (test artifacts and temp files)                          | 2026-02-06 |
+| `.claude/audit/`                 | Deleted (one-time audit reports)                                 | 2026-02-06 |
+| `.claude/archive/`               | Deleted (outdated hooks and libs)                                | 2026-02-06 |
+| `.claude/references/`            | Moved to `.claude/docs/reference/` then deleted                  | 2026-02-06 |
+| `.claude/teams/`                 | Moved to `.claude/context/teams/`                                | 2026-02-06 |
+| `.claude/docs/archive/`          | Deleted (one-time debug fix reports)                             | 2026-02-06 |
+| `.claude/docs/reference/`        | Deleted (AI-generated unused reference material)                 | 2026-02-06 |
+| `.claude/context/code-indexing/` | Deleted (zero references - active indexer uses code-index/)      | 2026-02-06 |
+| `.claude/context/ml/`            | Deleted (zero references - optional ML features never activated) | 2026-02-06 |
 
 ### Moved Files (2026-02-06)
 
@@ -437,7 +440,7 @@ See `.claude/context/artifacts/catalogs/command-catalog.md` for the full catalog
 | `.claude/context/spawn-size-audit.jsonl`       | `.claude/context/metrics/spawn-size-audit.jsonl`                   | Belongs in metrics   |
 | `.claude/context/rule-index-cache.json`        | `.claude/context/config/rule-index-cache.json`                     | Belongs in config    |
 | `.claude/context/checkpoint-week4-20260128.md` | `.claude/context/artifacts/summaries/checkpoint-week4-20260128.md` | Belongs in summaries |
-| `tests/workflows/checkpoints/test-*`           | `tests/fixtures/checkpoints/test-*`                                 | Test fixtures moved  |
+| `tests/workflows/checkpoints/test-*`           | `tests/fixtures/checkpoints/test-*`                                | Test fixtures moved  |
 
 ### File Placement Enforcement
 

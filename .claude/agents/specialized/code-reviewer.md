@@ -37,13 +37,13 @@ hooks: {}
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `bash-command-validator.cjs` | PreToolUse(Bash) | Blocks dangerous shell commands | -- |
-| `shell-injection-validator.cjs` | PreToolUse(Bash) | Blocks shell injection patterns | -- |
-| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| Hook                               | Event            | Purpose                          | Override |
+| ---------------------------------- | ---------------- | -------------------------------- | -------- |
+| `bash-command-validator.cjs`       | PreToolUse(Bash) | Blocks dangerous shell commands  | --       |
+| `shell-injection-validator.cjs`    | PreToolUse(Bash) | Blocks shell injection patterns  | --       |
+| `validate-skill-invocation.cjs`    | PreToolUse(Read) | Warns about Read vs Skill()      | --       |
+| `tool-scope-validator.cjs`         | PreToolUse(All)  | Validates tool is in allowed set | --       |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)  | Monitors execution limits        | --       |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -51,14 +51,15 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Code Review | `.claude/workflows/code-review-workflow.md` | Code review process (two-pass) |
-| Architecture Review | `.claude/workflows/architecture-review-skill-workflow.md` | Architecture assessments |
-| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Code review gate |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow              | Path                                                           | When to Use                          |
+| --------------------- | -------------------------------------------------------------- | ------------------------------------ |
+| Code Review           | `.claude/workflows/code-review-workflow.md`                    | Code review process (two-pass)       |
+| Architecture Review   | `.claude/workflows/architecture-review-skill-workflow.md`      | Architecture assessments             |
+| Feature Development   | `.claude/workflows/enterprise/feature-development-workflow.md` | Code review gate                     |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
@@ -91,6 +92,7 @@ pnpm search:file src/components/Button.tsx 1 50
 ```
 
 **When to use hybrid search:**
+
 - Finding similar patterns across codebase (consistency checks)
 - Discovering anti-patterns or code smells
 - Understanding project structure before review
@@ -114,6 +116,7 @@ Skill({ skill: 'ripgrep', args: '-P await.*\\((?!.*catch)' });
 ```
 
 **When to use ripgrep skill:**
+
 - PCRE2 regex features (lookahead, lookbehind)
 - Custom file type filtering beyond .js/.ts/.cjs/.mjs
 - Pipeline integration with other CLI tools
@@ -278,6 +281,7 @@ After completing spec compliance and code quality review, if changes involve art
 When reviewing code, watch for systemic patterns that indicate a missing artifact:
 
 **Triggers:**
+
 - Same validation logic copied in 3+ files → Propose new shared validation hook
 - Same code pattern repeated across agents → Propose new skill
 - Same boilerplate in multiple workflows → Propose new template
@@ -313,6 +317,7 @@ When a systemic pattern is detected, add to review findings:
 This signals the artifact-integrator to evaluate and potentially queue artifact creation.
 
 **Integration with artifact-integrator:**
+
 - Backward propagation entries are added to integration queue with `changeType: "backward-propagation"`
 - artifact-integrator validates the pattern exists (checks mentioned files)
 - If >= 3 instances confirmed, queues for creator skill invocation

@@ -15,8 +15,11 @@ test('AgentParser exports validateDefinition method', () => {
   delete require.cache[require.resolve(PARSER_PATH)];
   const { AgentParser } = require(PARSER_PATH);
   const parser = new AgentParser();
-  assert.strictEqual(typeof parser.validateDefinition, 'function',
-    'Should expose validateDefinition method');
+  assert.strictEqual(
+    typeof parser.validateDefinition,
+    'function',
+    'Should expose validateDefinition method'
+  );
 });
 
 test('validateDefinition validates conforming agent definition', () => {

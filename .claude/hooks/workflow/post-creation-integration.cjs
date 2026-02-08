@@ -29,7 +29,13 @@ const path = require('path');
 // Resolve project root
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const GRAPH_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'artifact-graph.json');
-const QUEUE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
+const QUEUE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'integration-queue.jsonl'
+);
 const MAX_QUEUE_LINES = 500;
 const ENFORCEMENT_MODE = process.env.INTEGRATION_ENFORCEMENT || 'warn';
 
@@ -61,7 +67,11 @@ function isCreatorCompletion(hookData) {
     { pattern: /creat(e|ed|ing)\s+(new\s+)?workflow/i, type: 'workflow' },
     { pattern: /creat(e|ed|ing)\s+(new\s+)?template/i, type: 'template' },
     { pattern: /creat(e|ed|ing)\s+(new\s+)?schema/i, type: 'schema' },
-    { pattern: /skill-creator|agent-creator|hook-creator|workflow-creator|template-creator|schema-creator/i, type: 'unknown' },
+    {
+      pattern:
+        /skill-creator|agent-creator|hook-creator|workflow-creator|template-creator|schema-creator/i,
+      type: 'unknown',
+    },
   ];
 
   for (const { pattern, type } of creatorPatterns) {
@@ -103,7 +113,7 @@ function quickIntegrationCheck(artifactId, graphPath) {
     return {
       gaps: result.missing || [],
       status: result.integrated ? 'fully-integrated' : 'partially-integrated',
-      score: result.score
+      score: result.score,
     };
   } catch (_err) {
     // Graceful degradation if graph not available
@@ -145,7 +155,7 @@ function appendToQueue(artifactId, creatorType, gaps) {
     source: 'post-creation-integration.cjs',
     gaps,
     priority: 'P1',
-    processed: false
+    processed: false,
   };
 
   // Ensure queue directory exists
@@ -172,20 +182,25 @@ function rotateQueue() {
     }
 
     const content = fs.readFileSync(QUEUE_PATH, 'utf8');
-    const lines = content.trim().split('\n').filter(line => line.trim());
+    const lines = content
+      .trim()
+      .split('\n')
+      .filter(line => line.trim());
 
     if (lines.length <= MAX_QUEUE_LINES) {
       return; // No rotation needed
     }
 
     // Parse all entries
-    const entries = lines.map(line => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
+    const entries = lines
+      .map(line => {
+        try {
+          return JSON.parse(line);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
 
     // Keep: all unprocessed + most recent processed (up to limit)
     const unprocessed = entries.filter(e => !e.processed);
@@ -251,8 +266,12 @@ async function processCreatorCompletion(hookData) {
   const check = quickIntegrationCheck(artifactId, GRAPH_PATH);
 
   // Log to stderr
-  process.stderr.write(`[post-creation-integration] Detected ${detection.creatorType} completion: ${artifactId}\n`);
-  process.stderr.write(`[post-creation-integration] Integration status: ${check.status}, gaps: ${check.gaps.join(', ')}\n`);
+  process.stderr.write(
+    `[post-creation-integration] Detected ${detection.creatorType} completion: ${artifactId}\n`
+  );
+  process.stderr.write(
+    `[post-creation-integration] Integration status: ${check.status}, gaps: ${check.gaps.join(', ')}\n`
+  );
 
   // Queue if gaps found
   if (check.gaps.length > 0 && check.status !== 'fully-integrated') {
@@ -264,9 +283,10 @@ async function processCreatorCompletion(hookData) {
   const hasMustHaveGaps = check.gaps.length > 0 && check.status !== 'fully-integrated';
   const shouldBlock = ENFORCEMENT_MODE === 'block' && hasMustHaveGaps;
 
-  const message = check.gaps.length > 0
-    ? `⚠️ Artifact ${artifactId} has ${check.gaps.length} missing integration(s): ${check.gaps.join(', ')}. Queued for integration analysis.`
-    : `✅ Artifact ${artifactId} appears fully integrated.`;
+  const message =
+    check.gaps.length > 0
+      ? `⚠️ Artifact ${artifactId} has ${check.gaps.length} missing integration(s): ${check.gaps.join(', ')}. Queued for integration analysis.`
+      : `✅ Artifact ${artifactId} appears fully integrated.`;
 
   if (shouldBlock) {
     process.stdout.write(formatResult({ allow: false, message: `BLOCKED: ${message}` }));

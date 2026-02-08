@@ -13,12 +13,7 @@ function runTaskCommand(command, projectRoot) {
   // SEC-LIB-002 FIX: Implement command allowlist to prevent arbitrary command execution
   // NOTE: This scheduler subsystem is deprecated and will be archived.
   // If re-enabled, implement proper command validation or HMAC integrity verification.
-  const ALLOWED_COMMANDS = [
-    'npm',
-    'pnpm',
-    'node',
-    'git',
-  ];
+  const ALLOWED_COMMANDS = ['npm', 'pnpm', 'node', 'git'];
 
   // Extract the base command (first word before space or entire command)
   const baseCommand = command.split(/\s+/)[0];

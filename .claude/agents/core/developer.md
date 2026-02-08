@@ -26,21 +26,16 @@ tools:
 # Note: Git operations use Bash tool (git commands); MCP tools optional (agents use Skill fallbacks)
 skills:
   - checklist-generator
-  - chrome-browser
   - code-analyzer
   - code-quality-expert
   - code-semantic-search
   - code-structural-search
   - code-style-validator
-  - commit-validator
   - context-compressor
   - debugging
-  - dependency-analyzer
   - git-expert
-  - github-mcp
   - ripgrep
   - security-architect
-  - smart-revert
   - task-management-protocol
   - tdd
   - verification-before-completion
@@ -70,21 +65,21 @@ identity:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `bash-command-validator.cjs` | PreToolUse(Bash) | Blocks dangerous shell commands | -- |
-| `shell-injection-validator.cjs` | PreToolUse(Bash) | Blocks shell injection patterns | -- |
-| `windows-null-sanitizer.cjs` | PreToolUse(Bash) | Prevents Windows reserved name issues | -- |
-| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | 11 consolidated write safety checks | -- |
-| `conflict-detector.cjs` | PreToolUse(Write) | Detects conflicting file writes | -- |
-| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() for skills | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
-| `check-console-log.cjs` | Stop | Checks for console.log in production code | -- |
-| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
-| `code-index-updater.cjs` | PostToolUse(Edit/Write) | Updates code search index | -- |
+| Hook                               | Event                   | Purpose                                   | Override        |
+| ---------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
+| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
+| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
+| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
+| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
+| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes           | --              |
+| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set          | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits                 | --              |
+| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
+| `check-console-log.cjs`            | Stop                    | Checks for console.log in production code | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index               | --              |
+| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index                 | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -92,14 +87,15 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Implementing features (TDD) |
-| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md` | Understanding phase routing |
-| Hook Consolidation | `.claude/workflows/operations/hook-consolidation.md` | Modifying hook infrastructure |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow                 | Path                                                           | When to Use                          |
+| ------------------------ | -------------------------------------------------------------- | ------------------------------------ |
+| Feature Development      | `.claude/workflows/enterprise/feature-development-workflow.md` | Implementing features (TDD)          |
+| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md`                | Understanding phase routing          |
+| Hook Consolidation       | `.claude/workflows/operations/hook-consolidation.md`           | Modifying hook infrastructure        |
+| Workspace Conventions    | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`

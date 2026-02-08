@@ -23,8 +23,20 @@ describe('Evolution Integration Wiring (Task #15)', () => {
   let workflowContent;
 
   before(() => {
-    const orchestratorPath = path.join(PROJECT_ROOT, '.claude', 'agents', 'orchestrators', 'evolution-orchestrator.md');
-    const workflowPath = path.join(PROJECT_ROOT, '.claude', 'workflows', 'core', 'evolution-workflow.md');
+    const orchestratorPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'agents',
+      'orchestrators',
+      'evolution-orchestrator.md'
+    );
+    const workflowPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'workflows',
+      'core',
+      'evolution-workflow.md'
+    );
 
     assert.ok(fs.existsSync(orchestratorPath), 'evolution-orchestrator.md must exist');
     assert.ok(fs.existsSync(workflowPath), 'evolution-workflow.md must exist');
@@ -40,7 +52,11 @@ describe('Evolution Integration Wiring (Task #15)', () => {
       assert.ok(frontmatterMatch, 'evolution-orchestrator.md must have YAML frontmatter');
 
       const frontmatter = frontmatterMatch[1];
-      assert.match(frontmatter, /artifact-integrator/, 'artifact-integrator must be in skills array');
+      assert.match(
+        frontmatter,
+        /artifact-integrator/,
+        'artifact-integrator must be in skills array'
+      );
     });
 
     it('should mention Integration Analysis or ADR-100 in Phase E', () => {
@@ -138,7 +154,9 @@ describe('Evolution Integration Wiring (Task #15)', () => {
       const phase6Section = workflowContent.match(/### Phase 6: ENABLE.*?(?=###|$)/s);
       assert.ok(phase6Section, 'Phase 6: ENABLE section must exist');
 
-      const gateValidationSection = phase6Section[0].match(/\*\*Gate Validation Script\*\*.*?(?=\*\*|$)/s);
+      const gateValidationSection = phase6Section[0].match(
+        /\*\*Gate Validation Script\*\*.*?(?=\*\*|$)/s
+      );
       assert.ok(gateValidationSection, 'Gate Validation Script must exist in Phase 6');
 
       assert.match(
@@ -189,7 +207,8 @@ describe('Evolution Integration Wiring (Task #15)', () => {
     });
 
     it('should reference ADR-100 in integration sections', () => {
-      const hasADR100 = /ADR-100|ADR 100/i.test(orchestratorContent) || /ADR-100|ADR 100/i.test(workflowContent);
+      const hasADR100 =
+        /ADR-100|ADR 100/i.test(orchestratorContent) || /ADR-100|ADR 100/i.test(workflowContent);
       assert.ok(hasADR100, 'At least one file must reference ADR-100');
     });
   });

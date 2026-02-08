@@ -28,20 +28,24 @@ const { execFileSync } = require('node:child_process');
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // Source modules under test
-const { ArtifactGraph } = require(path.resolve(PROJECT_ROOT, '.claude/lib/workflow/artifact-graph.cjs'));
-const { analyzeImpact, analyzeBatch, generateReport } = require(path.resolve(PROJECT_ROOT, '.claude/lib/workflow/integration-impact.cjs'));
-const {
-  isCreatorCompletion,
-  quickIntegrationCheck,
-  extractArtifactId
-} = require(path.resolve(PROJECT_ROOT, '.claude/hooks/workflow/post-creation-integration.cjs'));
-const {
-  loadGraph,
-  loadQueue
-} = require(path.resolve(PROJECT_ROOT, '.claude/tools/cli/integration-health-dashboard.cjs'));
+const { ArtifactGraph } = require(
+  path.resolve(PROJECT_ROOT, '.claude/lib/workflow/artifact-graph.cjs')
+);
+const { analyzeImpact, analyzeBatch, generateReport } = require(
+  path.resolve(PROJECT_ROOT, '.claude/lib/workflow/integration-impact.cjs')
+);
+const { isCreatorCompletion, quickIntegrationCheck, extractArtifactId } = require(
+  path.resolve(PROJECT_ROOT, '.claude/hooks/workflow/post-creation-integration.cjs')
+);
+const { loadGraph, loadQueue } = require(
+  path.resolve(PROJECT_ROOT, '.claude/tools/cli/integration-health-dashboard.cjs')
+);
 
 // CLI paths
-const DASHBOARD_CLI = path.resolve(PROJECT_ROOT, '.claude/tools/cli/integration-health-dashboard.cjs');
+const DASHBOARD_CLI = path.resolve(
+  PROJECT_ROOT,
+  '.claude/tools/cli/integration-health-dashboard.cjs'
+);
 const BOOTSTRAP_CLI = path.resolve(PROJECT_ROOT, '.claude/tools/cli/bootstrap-artifact-graph.cjs');
 
 // ============================================================================
@@ -83,22 +87,22 @@ function buildTestGraph(graphPath) {
 
   graph.addNode('skill:rate-limiter', {
     type: 'skill',
-    path: '.claude/skills/rate-limiter/SKILL.md'
+    path: '.claude/skills/rate-limiter/SKILL.md',
   });
 
   graph.addNode('skill:tdd', {
     type: 'skill',
-    path: '.claude/skills/tdd/SKILL.md'
+    path: '.claude/skills/tdd/SKILL.md',
   });
 
   graph.addNode('agent:developer', {
     type: 'agent',
-    path: '.claude/agents/core/developer.md'
+    path: '.claude/agents/core/developer.md',
   });
 
   graph.addNode('catalog:skill-catalog', {
     type: 'catalog',
-    path: '.claude/context/artifacts/catalogs/skill-catalog.md'
+    path: '.claude/context/artifacts/catalogs/skill-catalog.md',
   });
 
   // tdd skill is fully integrated: catalog entry + agent assignment
@@ -131,7 +135,7 @@ describe('Test 1: Full Creation-to-Analysis Flow', () => {
     // Step 2: Add a skill node (orphan -- no catalog or agent edges)
     graph.addNode('skill:api-validator', {
       type: 'skill',
-      path: '.claude/skills/api-validator/SKILL.md'
+      path: '.claude/skills/api-validator/SKILL.md',
     });
     graph.save();
 
@@ -139,7 +143,7 @@ describe('Test 1: Full Creation-to-Analysis Flow', () => {
     const impact = analyzeImpact({
       artifactId: 'skill:api-validator',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     // Step 4: Verify missing integrations returned
@@ -179,14 +183,14 @@ describe('Test 1: Full Creation-to-Analysis Flow', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('agent:test-runner', {
       type: 'agent',
-      path: '.claude/agents/specialized/test-runner.md'
+      path: '.claude/agents/specialized/test-runner.md',
     });
     graph.save();
 
     const impact = analyzeImpact({
       artifactId: 'agent:test-runner',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     // Agents need registry-entry and routing-keywords
@@ -202,20 +206,23 @@ describe('Test 1: Full Creation-to-Analysis Flow', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('hook:rate-limiter', {
       type: 'hook',
-      path: '.claude/hooks/safety/rate-limiter.cjs'
+      path: '.claude/hooks/safety/rate-limiter.cjs',
     });
     graph.save();
 
     const impact = analyzeImpact({
       artifactId: 'hook:rate-limiter',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     const missingTypes = impact.missingIntegrations
       .filter(m => m.status === 'missing')
       .map(m => m.type);
-    assert.ok(missingTypes.includes('settings-registration'), 'Hook should need settings registration');
+    assert.ok(
+      missingTypes.includes('settings-registration'),
+      'Hook should need settings registration'
+    );
     assert.ok(impact.impactScore > 0, 'Hook without integrations should have score > 0');
   });
 });
@@ -243,10 +250,10 @@ describe('Test 2: Hook Detection -> Queue -> Analysis', () => {
           status: 'completed',
           metadata: {
             creatorType: 'skill',
-            artifactName: 'rate-limiter'
-          }
-        }
-      }
+            artifactName: 'rate-limiter',
+          },
+        },
+      },
     };
 
     const detection = isCreatorCompletion(hookData);
@@ -261,10 +268,10 @@ describe('Test 2: Hook Detection -> Queue -> Analysis', () => {
         input: {
           status: 'completed',
           metadata: {
-            summary: 'Created new agent for Python testing'
-          }
-        }
-      }
+            summary: 'Created new agent for Python testing',
+          },
+        },
+      },
     };
 
     const detection = isCreatorCompletion(hookData);
@@ -279,10 +286,10 @@ describe('Test 2: Hook Detection -> Queue -> Analysis', () => {
         input: {
           status: 'in_progress',
           metadata: {
-            creatorType: 'skill'
-          }
-        }
-      }
+            creatorType: 'skill',
+          },
+        },
+      },
     };
 
     const detection = isCreatorCompletion(hookData);
@@ -296,10 +303,10 @@ describe('Test 2: Hook Detection -> Queue -> Analysis', () => {
         input: {
           status: 'completed',
           metadata: {
-            summary: 'Fixed a bug in the login form'
-          }
-        }
-      }
+            summary: 'Fixed a bug in the login form',
+          },
+        },
+      },
     };
 
     const detection = isCreatorCompletion(hookData);
@@ -312,10 +319,10 @@ describe('Test 2: Hook Detection -> Queue -> Analysis', () => {
         tool: 'TaskUpdate',
         input: {
           metadata: {
-            artifactId: 'skill:rate-limiter'
-          }
-        }
-      }
+            artifactId: 'skill:rate-limiter',
+          },
+        },
+      },
     };
 
     const artifactId = extractArtifactId(hookData, 'skill');
@@ -328,10 +335,10 @@ describe('Test 2: Hook Detection -> Queue -> Analysis', () => {
         tool: 'TaskUpdate',
         input: {
           metadata: {
-            artifactName: 'rate-limiter'
-          }
-        }
-      }
+            artifactName: 'rate-limiter',
+          },
+        },
+      },
     };
 
     const artifactId = extractArtifactId(hookData, 'skill');
@@ -343,7 +350,7 @@ describe('Test 2: Hook Detection -> Queue -> Analysis', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:rate-limiter', {
       type: 'skill',
-      path: '.claude/skills/rate-limiter/SKILL.md'
+      path: '.claude/skills/rate-limiter/SKILL.md',
     });
     graph.save();
 
@@ -356,7 +363,7 @@ describe('Test 2: Hook Detection -> Queue -> Analysis', () => {
       source: 'test',
       gaps: ['catalog-entry', 'agent-assignment'],
       priority: 'P1',
-      processed: false
+      processed: false,
     };
     fs.writeFileSync(env.queuePath, JSON.stringify(queueEntry) + '\n', 'utf8');
 
@@ -365,7 +372,10 @@ describe('Test 2: Hook Detection -> Queue -> Analysis', () => {
     const batchResult = analyzeBatch(entries, env.graphPath);
 
     assert.strictEqual(batchResult.summary.total, 1, 'Should have 1 entry');
-    assert.ok(batchResult.summary.needsWork > 0, `needsWork should be > 0, got: ${batchResult.summary.needsWork}`);
+    assert.ok(
+      batchResult.summary.needsWork > 0,
+      `needsWork should be > 0, got: ${batchResult.summary.needsWork}`
+    );
     assert.strictEqual(batchResult.results.length, 1, 'Should have 1 result');
     assert.ok(batchResult.results[0].impactScore > 0, 'Impact score should be > 0');
   });
@@ -410,10 +420,19 @@ describe('Test 3: Dashboard Output Formats', () => {
     // Verify structure
     assert.ok(parsed.summary, 'JSON output should have summary field');
     assert.ok(typeof parsed.summary.total === 'number', 'summary.total should be a number');
-    assert.ok(typeof parsed.summary.fullyIntegrated === 'number', 'summary.fullyIntegrated should be number');
-    assert.ok(typeof parsed.summary.partiallyIntegrated === 'number', 'summary.partiallyIntegrated should be number');
+    assert.ok(
+      typeof parsed.summary.fullyIntegrated === 'number',
+      'summary.fullyIntegrated should be number'
+    );
+    assert.ok(
+      typeof parsed.summary.partiallyIntegrated === 'number',
+      'summary.partiallyIntegrated should be number'
+    );
     assert.ok(typeof parsed.summary.orphaned === 'number', 'summary.orphaned should be number');
-    assert.ok(typeof parsed.summary.integrationHealth === 'number', 'summary.integrationHealth should be number');
+    assert.ok(
+      typeof parsed.summary.integrationHealth === 'number',
+      'summary.integrationHealth should be number'
+    );
 
     assert.ok(Array.isArray(parsed.byType), 'byType should be an array');
     assert.ok(Array.isArray(parsed.topConnected), 'topConnected should be an array');
@@ -436,7 +455,10 @@ describe('Test 3: Dashboard Output Formats', () => {
 
     assert.ok(result.includes('graph TD'), 'Mermaid output should contain "graph TD"');
     assert.ok(result.includes('classDef'), 'Mermaid output should contain "classDef"');
-    assert.ok(result.includes('classDef integrated'), 'Mermaid output should have integrated class');
+    assert.ok(
+      result.includes('classDef integrated'),
+      'Mermaid output should have integrated class'
+    );
     assert.ok(result.includes('classDef orphaned'), 'Mermaid output should have orphaned class');
   });
 
@@ -447,7 +469,10 @@ describe('Test 3: Dashboard Output Formats', () => {
       { encoding: 'utf8', timeout: 15000 }
     );
 
-    assert.ok(result.includes('Artifact Integration Health Dashboard'), 'Text should contain dashboard title');
+    assert.ok(
+      result.includes('Artifact Integration Health Dashboard'),
+      'Text should contain dashboard title'
+    );
     assert.ok(result.includes('Summary:'), 'Text should contain Summary section');
     assert.ok(result.includes('By Type:'), 'Text should contain By Type section');
     assert.ok(result.includes('Queue Status:'), 'Text should contain Queue Status section');
@@ -465,7 +490,7 @@ describe('Test 3: Dashboard Output Formats', () => {
         );
       },
       // execFileSync throws when the child exits with non-zero code
-      (err) => err.status !== 0,
+      err => err.status !== 0,
       'Should exit with non-zero status for missing graph'
     );
   });
@@ -490,14 +515,16 @@ describe('Test 4: Graph Bootstrap Consistency', () => {
     const outputPath = path.join(env.tempDir, 'bootstrapped-graph.json');
 
     // Run bootstrap CLI with --output to temp directory
-    const result = execFileSync(
-      process.execPath,
-      [BOOTSTRAP_CLI, '--output', outputPath],
-      { encoding: 'utf8', timeout: 30000 }
-    );
+    const result = execFileSync(process.execPath, [BOOTSTRAP_CLI, '--output', outputPath], {
+      encoding: 'utf8',
+      timeout: 30000,
+    });
 
     // Verify it ran successfully (output contains completion message)
-    assert.ok(result.includes('Bootstrap complete'), `Bootstrap should complete, output: ${result.slice(0, 200)}`);
+    assert.ok(
+      result.includes('Bootstrap complete'),
+      `Bootstrap should complete, output: ${result.slice(0, 200)}`
+    );
 
     // Verify the graph file was created
     assert.ok(fs.existsSync(outputPath), 'Graph file should exist after bootstrap');
@@ -508,26 +535,19 @@ describe('Test 4: Graph Bootstrap Consistency', () => {
 
     // The graph should already exist from the previous test (before/after wraps both)
     // Re-run bootstrap to ensure it's fresh
-    execFileSync(
-      process.execPath,
-      [BOOTSTRAP_CLI, '--output', outputPath],
-      { encoding: 'utf8', timeout: 30000 }
-    );
+    execFileSync(process.execPath, [BOOTSTRAP_CLI, '--output', outputPath], {
+      encoding: 'utf8',
+      timeout: 30000,
+    });
 
     const graph = new ArtifactGraph(outputPath);
 
     // Verify node count > 200 (based on known codebase: 275+ artifacts)
     const stats = graph.getStats();
-    assert.ok(
-      stats.nodeCount > 200,
-      `Node count should be > 200, got: ${stats.nodeCount}`
-    );
+    assert.ok(stats.nodeCount > 200, `Node count should be > 200, got: ${stats.nodeCount}`);
 
     // Verify edge count > 500 (based on known codebase: 1092 edges)
-    assert.ok(
-      stats.edgeCount > 500,
-      `Edge count should be > 500, got: ${stats.edgeCount}`
-    );
+    assert.ok(stats.edgeCount > 500, `Edge count should be > 500, got: ${stats.edgeCount}`);
   });
 
   it('should ensure all nodes have valid type and path fields', () => {
@@ -535,17 +555,26 @@ describe('Test 4: Graph Bootstrap Consistency', () => {
 
     // Ensure graph exists
     if (!fs.existsSync(outputPath)) {
-      execFileSync(
-        process.execPath,
-        [BOOTSTRAP_CLI, '--output', outputPath],
-        { encoding: 'utf8', timeout: 30000 }
-      );
+      execFileSync(process.execPath, [BOOTSTRAP_CLI, '--output', outputPath], {
+        encoding: 'utf8',
+        timeout: 30000,
+      });
     }
 
     const graph = new ArtifactGraph(outputPath);
     const allNodes = graph.getAllNodes();
 
-    const validTypes = ['skill', 'agent', 'hook', 'workflow', 'template', 'schema', 'rule', 'catalog', 'registry'];
+    const validTypes = [
+      'skill',
+      'agent',
+      'hook',
+      'workflow',
+      'template',
+      'schema',
+      'rule',
+      'catalog',
+      'registry',
+    ];
 
     for (const node of allNodes) {
       assert.ok(node.type, `Node ${node.id} should have a type`);
@@ -562,11 +591,10 @@ describe('Test 4: Graph Bootstrap Consistency', () => {
     const outputPath = path.join(env.tempDir, 'bootstrapped-graph.json');
 
     if (!fs.existsSync(outputPath)) {
-      execFileSync(
-        process.execPath,
-        [BOOTSTRAP_CLI, '--output', outputPath],
-        { encoding: 'utf8', timeout: 30000 }
-      );
+      execFileSync(process.execPath, [BOOTSTRAP_CLI, '--output', outputPath], {
+        encoding: 'utf8',
+        timeout: 30000,
+      });
     }
 
     const graph = new ArtifactGraph(outputPath);
@@ -575,10 +603,7 @@ describe('Test 4: Graph Bootstrap Consistency', () => {
 
     const ids = new Set();
     for (const node of allNodes) {
-      assert.ok(
-        idPattern.test(node.id),
-        `Node ID "${node.id}" should match {type}:{name} pattern`
-      );
+      assert.ok(idPattern.test(node.id), `Node ID "${node.id}" should match {type}:{name} pattern`);
       assert.ok(!ids.has(node.id), `Duplicate node ID detected: ${node.id}`);
       ids.add(node.id);
     }
@@ -616,7 +641,7 @@ describe('Test 5: Blocking Enforcement Mode', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:test-blocker', {
       type: 'skill',
-      path: '.claude/skills/test-blocker/SKILL.md'
+      path: '.claude/skills/test-blocker/SKILL.md',
     });
     graph.save();
 
@@ -624,7 +649,7 @@ describe('Test 5: Blocking Enforcement Mode', () => {
     const impact = analyzeImpact({
       artifactId: 'skill:test-blocker',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     // Verify it produces a result that would trigger blocking
@@ -648,15 +673,15 @@ describe('Test 5: Blocking Enforcement Mode', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:integrated', {
       type: 'skill',
-      path: '.claude/skills/integrated/SKILL.md'
+      path: '.claude/skills/integrated/SKILL.md',
     });
     graph.addNode('catalog:skill-catalog', {
       type: 'catalog',
-      path: '.claude/context/artifacts/catalogs/skill-catalog.md'
+      path: '.claude/context/artifacts/catalogs/skill-catalog.md',
     });
     graph.addNode('agent:developer', {
       type: 'agent',
-      path: '.claude/agents/core/developer.md'
+      path: '.claude/agents/core/developer.md',
     });
     // Add required edges (catalog reference + agent assignment)
     graph.addEdge('skill:integrated', 'catalog:skill-catalog', 'references');
@@ -666,7 +691,7 @@ describe('Test 5: Blocking Enforcement Mode', () => {
     const impact = analyzeImpact({
       artifactId: 'skill:integrated',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     // The enforcement-hook gap is still missing (should-have), so score will be > 0
@@ -703,19 +728,19 @@ describe('Test 6: Impact Score Calculation', () => {
     // Skill with all integrations satisfied
     graph.addNode('skill:perfect', {
       type: 'skill',
-      path: '.claude/skills/perfect/SKILL.md'
+      path: '.claude/skills/perfect/SKILL.md',
     });
     graph.addNode('catalog:skill-catalog', {
       type: 'catalog',
-      path: '.claude/context/artifacts/catalogs/skill-catalog.md'
+      path: '.claude/context/artifacts/catalogs/skill-catalog.md',
     });
     graph.addNode('agent:developer', {
       type: 'agent',
-      path: '.claude/agents/core/developer.md'
+      path: '.claude/agents/core/developer.md',
     });
     graph.addNode('hook:guard', {
       type: 'hook',
-      path: '.claude/hooks/safety/guard.cjs'
+      path: '.claude/hooks/safety/guard.cjs',
     });
 
     // Must-have: catalog + agent assignment
@@ -730,7 +755,7 @@ describe('Test 6: Impact Score Calculation', () => {
     const impact = analyzeImpact({
       artifactId: 'skill:perfect',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     // The must-have integrations (catalog-entry, agent-assignment) should be satisfied
@@ -757,14 +782,14 @@ describe('Test 6: Impact Score Calculation', () => {
     // Completely orphan skill -- no edges at all
     graph.addNode('skill:orphan', {
       type: 'skill',
-      path: '.claude/skills/orphan/SKILL.md'
+      path: '.claude/skills/orphan/SKILL.md',
     });
     graph.save();
 
     const impact = analyzeImpact({
       artifactId: 'skill:orphan',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     // Skill has 3 integration rules:
@@ -786,11 +811,11 @@ describe('Test 6: Impact Score Calculation', () => {
 
     graph.addNode('skill:partial', {
       type: 'skill',
-      path: '.claude/skills/partial/SKILL.md'
+      path: '.claude/skills/partial/SKILL.md',
     });
     graph.addNode('catalog:skill-catalog', {
       type: 'catalog',
-      path: '.claude/context/artifacts/catalogs/skill-catalog.md'
+      path: '.claude/context/artifacts/catalogs/skill-catalog.md',
     });
 
     // Add catalog edge but not agent-assignment
@@ -800,7 +825,7 @@ describe('Test 6: Impact Score Calculation', () => {
     const impact = analyzeImpact({
       artifactId: 'skill:partial',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     // Missing: agent-assignment (must-have, 0.3) + enforcement-hook (should-have, 0.1) = 0.4
@@ -819,14 +844,14 @@ describe('Test 6: Impact Score Calculation', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:existing', {
       type: 'skill',
-      path: '.claude/skills/existing/SKILL.md'
+      path: '.claude/skills/existing/SKILL.md',
     });
     graph.save();
 
     const impact = analyzeImpact({
       artifactId: 'skill:existing',
       changeType: 'updated',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     // Updates don't have integration gaps per the spec
@@ -837,14 +862,14 @@ describe('Test 6: Impact Score Calculation', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:removed', {
       type: 'skill',
-      path: '.claude/skills/removed/SKILL.md'
+      path: '.claude/skills/removed/SKILL.md',
     });
     graph.save();
 
     const impact = analyzeImpact({
       artifactId: 'skill:removed',
       changeType: 'deleted',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     assert.strictEqual(impact.impactScore, 0, 'Deleted artifacts should have impactScore 0');
@@ -857,7 +882,7 @@ describe('Test 6: Impact Score Calculation', () => {
     const impact = analyzeImpact({
       artifactId: 'skill:nonexistent',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     assert.strictEqual(impact.impactScore, 0, 'Unknown artifact should have impactScore 0');
@@ -883,21 +908,27 @@ describe('Test 7: Report Generation', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:report-test', {
       type: 'skill',
-      path: '.claude/skills/report-test/SKILL.md'
+      path: '.claude/skills/report-test/SKILL.md',
     });
     graph.save();
 
     const impact = analyzeImpact({
       artifactId: 'skill:report-test',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     const report = generateReport(impact);
 
     // Verify markdown sections exist
-    assert.ok(report.includes('Impact Score'), `Report should contain "Impact Score", got: ${report.slice(0, 200)}`);
-    assert.ok(report.includes('Missing Integrations'), 'Report should contain "Missing Integrations"');
+    assert.ok(
+      report.includes('Impact Score'),
+      `Report should contain "Impact Score", got: ${report.slice(0, 200)}`
+    );
+    assert.ok(
+      report.includes('Missing Integrations'),
+      'Report should contain "Missing Integrations"'
+    );
     assert.ok(report.includes('Proposed Tasks'), 'Report should contain "Proposed Tasks"');
 
     // Verify artifact ID appears in report
@@ -911,15 +942,15 @@ describe('Test 7: Report Generation', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:integrated', {
       type: 'skill',
-      path: '.claude/skills/integrated/SKILL.md'
+      path: '.claude/skills/integrated/SKILL.md',
     });
     graph.addNode('catalog:skill-catalog', {
       type: 'catalog',
-      path: '.claude/context/artifacts/catalogs/skill-catalog.md'
+      path: '.claude/context/artifacts/catalogs/skill-catalog.md',
     });
     graph.addNode('agent:developer', {
       type: 'agent',
-      path: '.claude/agents/core/developer.md'
+      path: '.claude/agents/core/developer.md',
     });
     graph.addEdge('skill:integrated', 'catalog:skill-catalog', 'references');
     graph.addEdge('skill:integrated', 'agent:developer', 'assigned-to');
@@ -928,13 +959,16 @@ describe('Test 7: Report Generation', () => {
     const impact = analyzeImpact({
       artifactId: 'skill:integrated',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     const report = generateReport(impact);
 
     assert.ok(report.includes('Impact Score'), 'Report should contain "Impact Score"');
-    assert.ok(report.includes('Missing Integrations'), 'Report should contain "Missing Integrations"');
+    assert.ok(
+      report.includes('Missing Integrations'),
+      'Report should contain "Missing Integrations"'
+    );
     assert.ok(report.includes('Proposed Tasks'), 'Report should contain "Proposed Tasks"');
     assert.ok(report.includes('skill:integrated'), 'Report should contain artifact ID');
   });
@@ -943,14 +977,14 @@ describe('Test 7: Report Generation', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:orphan', {
       type: 'skill',
-      path: '.claude/skills/orphan/SKILL.md'
+      path: '.claude/skills/orphan/SKILL.md',
     });
     graph.save();
 
     const impact = analyzeImpact({
       artifactId: 'skill:orphan',
       changeType: 'created',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     const report = generateReport(impact);
@@ -973,11 +1007,11 @@ describe('Test 7: Report Generation', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:shared', {
       type: 'skill',
-      path: '.claude/skills/shared/SKILL.md'
+      path: '.claude/skills/shared/SKILL.md',
     });
     graph.addNode('agent:consumer', {
       type: 'agent',
-      path: '.claude/agents/core/consumer.md'
+      path: '.claude/agents/core/consumer.md',
     });
     graph.addEdge('skill:shared', 'agent:consumer', 'assigned-to');
     graph.save();
@@ -985,7 +1019,7 @@ describe('Test 7: Report Generation', () => {
     const impact = analyzeImpact({
       artifactId: 'skill:shared',
       changeType: 'updated',
-      graphPath: env.graphPath
+      graphPath: env.graphPath,
     });
 
     const report = generateReport(impact);
@@ -1002,7 +1036,7 @@ describe('Test 7: Report Generation', () => {
       directDependents: [],
       missingIntegrations: [],
       proposedTasks: [],
-      impactScore: 0
+      impactScore: 0,
     };
 
     const report = generateReport(impact);
@@ -1051,7 +1085,7 @@ describe('quickIntegrationCheck', () => {
     const graph = new ArtifactGraph(env.graphPath);
     graph.addNode('skill:orphan', {
       type: 'skill',
-      path: '.claude/skills/orphan/SKILL.md'
+      path: '.claude/skills/orphan/SKILL.md',
     });
     graph.save();
 
@@ -1146,13 +1180,9 @@ describe('Dashboard helper functions', () => {
   it('should load queue from file', () => {
     const entries = [
       { artifactId: 'skill:a', processed: false, timestamp: new Date().toISOString() },
-      { artifactId: 'skill:b', processed: true, timestamp: new Date().toISOString() }
+      { artifactId: 'skill:b', processed: true, timestamp: new Date().toISOString() },
     ];
-    fs.writeFileSync(
-      env.queuePath,
-      entries.map(e => JSON.stringify(e)).join('\n') + '\n',
-      'utf8'
-    );
+    fs.writeFileSync(env.queuePath, entries.map(e => JSON.stringify(e)).join('\n') + '\n', 'utf8');
 
     const queue = loadQueue(env.queuePath);
     assert.strictEqual(queue.length, 2, 'Should load 2 queue entries');

@@ -11,6 +11,7 @@
 **ADR Reference:** See ADR-098 (Lib System Overhaul - Pipeline #15)
 
 **Modules Archived:**
+
 - factory.cjs
 - base-agent.cjs
 - developer.cjs

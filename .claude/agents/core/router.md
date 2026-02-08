@@ -29,18 +29,18 @@ skills:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `routing-guard.cjs` | PreToolUse(Task/Bash/Glob/Grep/WebSearch) | Enforces planner-first, security review, bash whitelist, tool blacklist | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT` |
-| `intent-agent-match.cjs` | PreToolUse(Task) | Warns when spawned agent mismatches intent | `INTENT_AGENT_ENFORCEMENT` |
-| `spawn-prompt-assembler.cjs` | PreToolUse(Task) | Enriches spawn prompts with memory/constitution | -- |
-| `config-model-validator.cjs` | PreToolUse(Task) | Validates model matches config.yaml | `CONFIG_MODEL_VALIDATOR` |
-| `spawn-prompt-validator.cjs` | PreToolUse(Task) | Validates spawn prompt structure | `SPAWN_PROMPT_VALIDATOR` |
-| `reflection-step0-guard.cjs` | PreToolUse(TaskList) | Blocks TaskList when pending reflections | `REFLECTION_STEP0_ENFORCEMENT` |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `user-prompt-unified.cjs` | UserPromptSubmit | Router analysis, token monitoring | -- |
-| `state-reset.cjs` | UserPromptSubmit | Resets router state per prompt | -- |
+| Hook                               | Event                                     | Purpose                                                                 | Override                                                   |
+| ---------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `routing-guard.cjs`                | PreToolUse(Task/Bash/Glob/Grep/WebSearch) | Enforces planner-first, security review, bash whitelist, tool blacklist | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT` |
+| `intent-agent-match.cjs`           | PreToolUse(Task)                          | Warns when spawned agent mismatches intent                              | `INTENT_AGENT_ENFORCEMENT`                                 |
+| `spawn-prompt-assembler.cjs`       | PreToolUse(Task)                          | Enriches spawn prompts with memory/constitution                         | --                                                         |
+| `config-model-validator.cjs`       | PreToolUse(Task)                          | Validates model matches config.yaml                                     | `CONFIG_MODEL_VALIDATOR`                                   |
+| `spawn-prompt-validator.cjs`       | PreToolUse(Task)                          | Validates spawn prompt structure                                        | `SPAWN_PROMPT_VALIDATOR`                                   |
+| `reflection-step0-guard.cjs`       | PreToolUse(TaskList)                      | Blocks TaskList when pending reflections                                | `REFLECTION_STEP0_ENFORCEMENT`                             |
+| `tool-scope-validator.cjs`         | PreToolUse(All)                           | Validates tool is in allowed set                                        | --                                                         |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)                           | Monitors execution limits                                               | --                                                         |
+| `user-prompt-unified.cjs`          | UserPromptSubmit                          | Router analysis, token monitoring                                       | --                                                         |
+| `state-reset.cjs`                  | UserPromptSubmit                          | Resets router state per prompt                                          | --                                                         |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -48,14 +48,15 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Router Decision | `.claude/workflows/core/router-decision.md` | Every user request (master routing) |
-| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md` | Phase management |
-| Evolution | `.claude/workflows/core/evolution-workflow.md` | Capability gap detection |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow                 | Path                                            | When to Use                          |
+| ------------------------ | ----------------------------------------------- | ------------------------------------ |
+| Router Decision          | `.claude/workflows/core/router-decision.md`     | Every user request (master routing)  |
+| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md` | Phase management                     |
+| Evolution                | `.claude/workflows/core/evolution-workflow.md`  | Capability gap detection             |
+| Workspace Conventions    | `.claude/rules/workspace-conventions.md`        | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`

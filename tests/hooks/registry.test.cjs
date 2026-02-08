@@ -186,15 +186,23 @@ describe('registry', () => {
 
   describe('SEC-CRITICAL: eval and exec must NOT be in SAFE_COMMANDS_ALLOWLIST', () => {
     test('eval is NOT in allowlist (security critical)', () => {
-      const { SAFE_COMMANDS_ALLOWLIST } = require('../../.claude/hooks/safety/validators/registry.cjs');
-      assert.ok(!SAFE_COMMANDS_ALLOWLIST.includes('eval'),
-        'eval MUST NOT be in SAFE_COMMANDS_ALLOWLIST - it enables arbitrary code execution');
+      const {
+        SAFE_COMMANDS_ALLOWLIST,
+      } = require('../../.claude/hooks/safety/validators/registry.cjs');
+      assert.ok(
+        !SAFE_COMMANDS_ALLOWLIST.includes('eval'),
+        'eval MUST NOT be in SAFE_COMMANDS_ALLOWLIST - it enables arbitrary code execution'
+      );
     });
 
     test('exec is NOT in allowlist (security critical)', () => {
-      const { SAFE_COMMANDS_ALLOWLIST } = require('../../.claude/hooks/safety/validators/registry.cjs');
-      assert.ok(!SAFE_COMMANDS_ALLOWLIST.includes('exec'),
-        'exec MUST NOT be in SAFE_COMMANDS_ALLOWLIST - it enables arbitrary code execution');
+      const {
+        SAFE_COMMANDS_ALLOWLIST,
+      } = require('../../.claude/hooks/safety/validators/registry.cjs');
+      assert.ok(
+        !SAFE_COMMANDS_ALLOWLIST.includes('exec'),
+        'exec MUST NOT be in SAFE_COMMANDS_ALLOWLIST - it enables arbitrary code execution'
+      );
     });
   });
 

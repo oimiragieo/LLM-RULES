@@ -20,7 +20,7 @@ const phaseAdvanceReader = require('../../../.claude/lib/workflow/phase-advance-
 const TEST_DIR = path.join(__dirname, '.test-phase-advance');
 const PHASE_ADVANCE_FILE = path.join(TEST_DIR, 'phase-advance.json');
 
-test('phase-advance-reader tests', async (t) => {
+test('phase-advance-reader tests', async t => {
   // Setup
   t.beforeEach(() => {
     if (fs.existsSync(TEST_DIR)) {
@@ -78,15 +78,21 @@ test('phase-advance-reader tests', async (t) => {
     });
   });
 
-  await t.test('getNextPhaseAgents() returns planner+architect for PHASE_1_DESIGN LOW complexity', () => {
-    const agents = phaseAdvanceReader.getNextPhaseAgents('PHASE_1_DESIGN', 'LOW');
-    assert.deepStrictEqual(agents.sort(), ['architect', 'planner'].sort());
-  });
+  await t.test(
+    'getNextPhaseAgents() returns planner+architect for PHASE_1_DESIGN LOW complexity',
+    () => {
+      const agents = phaseAdvanceReader.getNextPhaseAgents('PHASE_1_DESIGN', 'LOW');
+      assert.deepStrictEqual(agents.sort(), ['architect', 'planner'].sort());
+    }
+  );
 
-  await t.test('getNextPhaseAgents() returns planner+architect+security-architect for PHASE_1_DESIGN HIGH complexity', () => {
-    const agents = phaseAdvanceReader.getNextPhaseAgents('PHASE_1_DESIGN', 'HIGH');
-    assert.deepStrictEqual(agents.sort(), ['architect', 'planner', 'security-architect'].sort());
-  });
+  await t.test(
+    'getNextPhaseAgents() returns planner+architect+security-architect for PHASE_1_DESIGN HIGH complexity',
+    () => {
+      const agents = phaseAdvanceReader.getNextPhaseAgents('PHASE_1_DESIGN', 'HIGH');
+      assert.deepStrictEqual(agents.sort(), ['architect', 'planner', 'security-architect'].sort());
+    }
+  );
 
   await t.test('getNextPhaseAgents() returns developer for PHASE_2_IMPLEMENT', () => {
     const agents = phaseAdvanceReader.getNextPhaseAgents('PHASE_2_IMPLEMENT', 'MEDIUM');

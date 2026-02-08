@@ -195,6 +195,7 @@ Audit of both `scripts/` (project root, 30 files) and `.claude/scripts/` (framew
 **Implementation (2026-02-07):**
 
 **Phase A (Task #99 - completed):**
+
 - Fixed GAP-1 (CRITICAL): validate-index.mjs phantom import
 - Fixed GAP-2: validate-all-references.mjs phantom paths
 - Fixed GAP-3: Archived dead benchmark-ml-performance.cjs
@@ -202,12 +203,14 @@ Audit of both `scripts/` (project root, 30 files) and `.claude/scripts/` (framew
 - Created TDD regression test: `tests/scripts/script-imports.test.cjs`
 
 **Phase B (Task #100 - completed):**
+
 - Fixed GAP-5: Added 3 package.json scripts (`verify:deps`, `test:count`, `verify:hooks`)
 - Fixed MEDIUM-001: Path traversal validation in install.mjs with TDD test
 - Fixed GAP-6: Windows compatibility note in validate-sync.sh
 - Fixed typo: `_statSync` → `statSync` in install.mjs
 
 **Evidence:**
+
 - Task #99: 2 scripts fixed, 2 scripts archived, 1 test created (passes)
 - Task #100: 3 package.json entries added, 1 security fix with test (4/4 tests pass), 1 documentation fix
 - Learnings recorded: `.claude/context/memory/learnings.md`
@@ -215,6 +218,7 @@ Audit of both `scripts/` (project root, 30 files) and `.claude/scripts/` (framew
 **Architecture Plan:** `.claude/context/plans/scripts-overhaul-architecture-2026-02-07.md` (note: plan document not found, but work completed per ADR)
 
 **Reflection (Task #102):**
+
 - Batch reflection completed 2026-02-07
 - Overall score: 0.9725 / 1.0 (EXCELLENT)
 - All 6 gaps verified as fixed
@@ -264,17 +268,20 @@ Audit of `.claude/tools/` found 88 source files across 13 subdirectories. Only 2
 **Implementation (2026-02-07):**
 
 **Phase A (Task #93):**
+
 - Deleted 3 stub files via `git rm`
 - Deleted 3 `__pycache__/` directories
 - Removed 12 phantom package.json scripts (referencing 9 missing files)
 - Created TDD regression test: `tests/tools/phantom-scripts.test.cjs` (prevents future phantom scripts)
 
 **Phase B (Task #94):**
+
 - Archived 25 dead tools to `.claude/tools/_archive/` via `git mv`
 - Created `.claude/tools/_archive/README.md` with restoration instructions
 - History preserved for all archived tools
 
 **Phase C (Task #95):**
+
 - Relocated 8 library modules from `tools/` to `lib/` via `git mv`:
   - `skills-core.js` → `lib/skills/`
   - `swarm-coordination.cjs` → `lib/coordination/`
@@ -289,12 +296,14 @@ Audit of `.claude/tools/` found 88 source files across 13 subdirectories. Only 2
 - Commit: `789f849c` (45 files changed, 946 insertions, 297 deletions)
 
 **Phase D (Task #96):**
+
 - Created `.claude/context/artifacts/catalogs/tool-catalog.md` (complete inventory with wiring status)
 - Rewrote `.claude/tools/README.md` with accurate inventory, relocated modules section, archived tools section
 - Updated `.claude/docs/@DIRECTORY_STRUCTURE.md` tools section with current structure
 - Updated `.claude/CLAUDE.md` Section 1.4 to reference tool catalog
 
 **Evidence:**
+
 - Tool catalog: 66 active + 25 archived + 8 relocated = 99 total tools documented
 - Learnings recorded: `.claude/context/memory/learnings.md` (phantom script prevention pattern, security patterns)
 - All tests pass: `pnpm test:tools` (4/4 pass)

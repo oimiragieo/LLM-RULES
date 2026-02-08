@@ -54,12 +54,8 @@
       "type": "sequential",
       "description": "This workflow demonstrates how to use the chrome-browser skill.",
       "phases": 1,
-      "requiredAgents": [
-        "developer"
-      ],
-      "triggers": [
-        "evolution"
-      ],
+      "requiredAgents": ["developer"],
+      "triggers": ["evolution"],
       "status": "active"
     },
     "code-review-workflow": {
@@ -68,13 +64,8 @@
       "type": "phased",
       "description": "Two-pass code review workflow (Pass 1: blocking checks for spec/logic/security; Pass 2: non-blocking quality suggestions)",
       "phases": 2,
-      "requiredAgents": [
-        "code-reviewer"
-      ],
-      "triggers": [
-        "high_complexity",
-        "security_sensitive"
-      ],
+      "requiredAgents": ["code-reviewer"],
+      "triggers": ["high_complexity", "security_sensitive"],
       "status": "active"
     },
     "conductor-setup-workflow": {
@@ -83,16 +74,8 @@
       "type": "phased",
       "description": "Orchestrates the full project setup using Context-Driven Development methodology. Guides users through product definition, tech stack selection, workflow customization, and initial track generation.",
       "phases": 6,
-      "requiredAgents": [
-        "planner",
-        "developer",
-        "architect",
-        "code-reviewer",
-        "router"
-      ],
-      "triggers": [
-        "multi_agent"
-      ],
+      "requiredAgents": ["planner", "developer", "architect", "code-reviewer", "router"],
+      "triggers": ["multi_agent"],
       "status": "active"
     },
     "consensus-voting-workflow": {
@@ -110,12 +93,7 @@
         "code-reviewer",
         "router"
       ],
-      "triggers": [
-        "high_complexity",
-        "security_sensitive",
-        "multi_agent",
-        "reflection"
-      ],
+      "triggers": ["high_complexity", "security_sensitive", "multi_agent", "reflection"],
       "status": "active"
     },
     "context-compressor-workflow": {
@@ -124,13 +102,7 @@
       "type": "phased",
       "description": "Systematic workflow for optimizing context in long-running sessions. This workflow enables agents to work efficiently within token limits by intelligently compressing verbose content while preservi...",
       "phases": 4,
-      "requiredAgents": [
-        "architect",
-        "qa",
-        "technical-writer",
-        "code-reviewer",
-        "router"
-      ],
+      "requiredAgents": ["architect", "qa", "technical-writer", "code-reviewer", "router"],
       "triggers": [
         "high_complexity",
         "security_sensitive",
@@ -208,12 +180,7 @@
         "code-reviewer",
         "router"
       ],
-      "triggers": [
-        "high_complexity",
-        "security_sensitive",
-        "multi_agent",
-        "reflection"
-      ],
+      "triggers": ["high_complexity", "security_sensitive", "multi_agent", "reflection"],
       "status": "active"
     },
     "post-creation-validation-workflow": {
@@ -222,15 +189,8 @@
       "type": "sequential",
       "description": "Version: 1.0.0",
       "phases": 1,
-      "requiredAgents": [
-        "technical-writer",
-        "router"
-      ],
-      "triggers": [
-        "evolution",
-        "incident",
-        "reflection"
-      ],
+      "requiredAgents": ["technical-writer", "router"],
+      "triggers": ["evolution", "incident", "reflection"],
       "status": "active"
     },
     "reflection-workflow": {
@@ -250,13 +210,7 @@
         "router",
         "reflection-agent"
       ],
-      "triggers": [
-        "high_complexity",
-        "security_sensitive",
-        "evolution",
-        "incident",
-        "reflection"
-      ],
+      "triggers": ["high_complexity", "security_sensitive", "evolution", "incident", "reflection"],
       "status": "active"
     },
     "router-decision-workflow": {
@@ -320,12 +274,8 @@
       "type": "phased",
       "description": "Diataxis framework for technical documentation (Tutorial, How-to, Reference, Explanation)",
       "phases": 4,
-      "requiredAgents": [
-        "technical-writer"
-      ],
-      "triggers": [
-        "reflection"
-      ],
+      "requiredAgents": ["technical-writer"],
+      "triggers": ["reflection"],
       "status": "active"
     },
     "domain-development-workflow": {
@@ -346,9 +296,7 @@
         "php-pro",
         "fastapi-pro"
       ],
-      "triggers": [
-        "high_complexity"
-      ],
+      "triggers": ["high_complexity"],
       "status": "active"
     },
     "c4-architecture-documentation-workflow": {
@@ -357,16 +305,8 @@
       "type": "phased",
       "description": "Generate comprehensive C4 architecture documentation for an existing repository/codebase using a bottom-up analysis approach.",
       "phases": 4,
-      "requiredAgents": [
-        "architect",
-        "technical-writer",
-        "code-reviewer",
-        "router"
-      ],
-      "triggers": [
-        "high_complexity",
-        "security_sensitive"
-      ],
+      "requiredAgents": ["architect", "technical-writer", "code-reviewer", "router"],
+      "triggers": ["high_complexity", "security_sensitive"],
       "status": "active"
     },
     "enterprise-feature-development-workflow": {
@@ -433,12 +373,7 @@
         "technical-writer",
         "code-reviewer"
       ],
-      "triggers": [
-        "security_sensitive",
-        "multi_agent",
-        "incident",
-        "reflection"
-      ],
+      "triggers": ["security_sensitive", "multi_agent", "incident", "reflection"],
       "status": "active"
     },
     "qa-bounded-loop-workflow": {
@@ -447,10 +382,7 @@
       "type": "sequential",
       "description": "This workflow defines a bounded QA loop for a plan directory containing",
       "phases": 1,
-      "requiredAgents": [
-        "qa",
-        "code-reviewer"
-      ],
+      "requiredAgents": ["qa", "code-reviewer"],
       "triggers": [],
       "status": "active"
     },
@@ -460,9 +392,7 @@
       "type": "phased",
       "description": "INVEST criteria for user stories, sprint planning, backlog refinement, and prioritization (RICE, MoSCoW)",
       "phases": 5,
-      "requiredAgents": [
-        "pm"
-      ],
+      "requiredAgents": ["pm"],
       "triggers": [],
       "status": "active"
     },
@@ -472,12 +402,8 @@
       "type": "sequential",
       "description": "This workflow demonstrates how to use the progressive-disclosure skill.",
       "phases": 1,
-      "requiredAgents": [
-        "developer"
-      ],
-      "triggers": [
-        "evolution"
-      ],
+      "requiredAgents": ["developer"],
+      "triggers": ["evolution"],
       "status": "active"
     },
     "security-architect-workflow": {
@@ -510,12 +436,8 @@
       "type": "sequential",
       "description": "This workflow demonstrates how to use the template-renderer skill.",
       "phases": 1,
-      "requiredAgents": [
-        "developer"
-      ],
-      "triggers": [
-        "evolution"
-      ],
+      "requiredAgents": ["developer"],
+      "triggers": ["evolution"],
       "status": "active"
     },
     "agent-creator": {
@@ -524,17 +446,8 @@
       "type": "state-machine",
       "description": "Executable workflow for creating new agents following the EVOLVE state machine",
       "phases": 28,
-      "requiredAgents": [
-        "qa",
-        "router",
-        "evolution-orchestrator"
-      ],
-      "triggers": [
-        "security_sensitive",
-        "multi_agent",
-        "evolution",
-        "reflection"
-      ],
+      "requiredAgents": ["qa", "router", "evolution-orchestrator"],
+      "triggers": ["security_sensitive", "multi_agent", "evolution", "reflection"],
       "status": "active"
     },
     "hook-creator-workflow": {
@@ -543,13 +456,8 @@
       "type": "phased",
       "description": "Create, validate, and register hooks following the EVOLVE process",
       "phases": 45,
-      "requiredAgents": [
-        "technical-writer"
-      ],
-      "triggers": [
-        "high_complexity",
-        "evolution"
-      ],
+      "requiredAgents": ["technical-writer"],
+      "triggers": ["high_complexity", "evolution"],
       "status": "active"
     },
     "schema-creator-workflow": {
@@ -559,10 +467,7 @@
       "description": "Create, validate, and register JSON schemas following the EVOLVE process",
       "phases": 41,
       "requiredAgents": [],
-      "triggers": [
-        "high_complexity",
-        "evolution"
-      ],
+      "triggers": ["high_complexity", "evolution"],
       "status": "active"
     },
     "skill-creator-workflow": {
@@ -580,12 +485,7 @@
         "devops",
         "technical-writer"
       ],
-      "triggers": [
-        "high_complexity",
-        "security_sensitive",
-        "evolution",
-        "reflection"
-      ],
+      "triggers": ["high_complexity", "security_sensitive", "evolution", "reflection"],
       "status": "active"
     },
     "template-creator-workflow": {
@@ -595,10 +495,7 @@
       "description": "Create, validate, and register templates following the EVOLVE process",
       "phases": 40,
       "requiredAgents": [],
-      "triggers": [
-        "high_complexity",
-        "evolution"
-      ],
+      "triggers": ["high_complexity", "evolution"],
       "status": "active"
     },
     "workflow-creator-workflow": {
@@ -608,10 +505,7 @@
       "description": "Create, validate, and register workflows following the EVOLVE process",
       "phases": 40,
       "requiredAgents": [],
-      "triggers": [
-        "high_complexity",
-        "evolution"
-      ],
+      "triggers": ["high_complexity", "evolution"],
       "status": "active"
     },
     "agent-updater-workflow": {
@@ -620,15 +514,8 @@
       "type": "phased",
       "description": "Update existing agents following the EVOLVE process with backup and validation",
       "phases": 37,
-      "requiredAgents": [
-        "qa",
-        "code-reviewer"
-      ],
-      "triggers": [
-        "high_complexity",
-        "evolution",
-        "reflection"
-      ],
+      "requiredAgents": ["qa", "code-reviewer"],
+      "triggers": ["high_complexity", "evolution", "reflection"],
       "status": "active"
     },
     "hook-updater-workflow": {
@@ -637,13 +524,8 @@
       "type": "phased",
       "description": "Update existing hooks following the EVOLVE process with backup and validation",
       "phases": 39,
-      "requiredAgents": [
-        "technical-writer",
-        "code-reviewer"
-      ],
-      "triggers": [
-        "evolution"
-      ],
+      "requiredAgents": ["technical-writer", "code-reviewer"],
+      "triggers": ["evolution"],
       "status": "active"
     },
     "schema-updater-workflow": {
@@ -653,9 +535,7 @@
       "description": "Update existing JSON schemas following the EVOLVE process with backup and validation",
       "phases": 41,
       "requiredAgents": [],
-      "triggers": [
-        "evolution"
-      ],
+      "triggers": ["evolution"],
       "status": "active"
     },
     "skill-updater-workflow": {
@@ -664,15 +544,8 @@
       "type": "phased",
       "description": "Update existing skills following the EVOLVE process with backup and validation",
       "phases": 37,
-      "requiredAgents": [
-        "qa",
-        "code-reviewer"
-      ],
-      "triggers": [
-        "high_complexity",
-        "evolution",
-        "reflection"
-      ],
+      "requiredAgents": ["qa", "code-reviewer"],
+      "triggers": ["high_complexity", "evolution", "reflection"],
       "status": "active"
     },
     "template-updater-workflow": {
@@ -681,12 +554,8 @@
       "type": "phased",
       "description": "Update existing templates following the EVOLVE process with backup and validation",
       "phases": 39,
-      "requiredAgents": [
-        "code-reviewer"
-      ],
-      "triggers": [
-        "evolution"
-      ],
+      "requiredAgents": ["code-reviewer"],
+      "triggers": ["evolution"],
       "status": "active"
     },
     "workflow-updater-workflow": {
@@ -695,12 +564,8 @@
       "type": "phased",
       "description": "Update existing workflows following the EVOLVE process with backup and validation",
       "phases": 39,
-      "requiredAgents": [
-        "code-reviewer"
-      ],
-      "triggers": [
-        "evolution"
-      ],
+      "requiredAgents": ["code-reviewer"],
+      "triggers": ["evolution"],
       "status": "active"
     }
   }

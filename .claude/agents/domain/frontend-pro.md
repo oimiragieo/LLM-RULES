@@ -45,18 +45,18 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `bash-command-validator.cjs` | PreToolUse(Bash) | Blocks dangerous shell commands | -- |
-| `shell-injection-validator.cjs` | PreToolUse(Bash) | Blocks shell injection patterns | -- |
-| `windows-null-sanitizer.cjs` | PreToolUse(Bash) | Prevents Windows reserved name issues | -- |
-| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | Consolidated write safety checks | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
-| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
-| `code-index-updater.cjs` | PostToolUse(Edit/Write) | Updates code search index | -- |
+| Hook                               | Event                   | Purpose                                | Override        |
+| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
+| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
+| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
+| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
+| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index              | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -64,13 +64,14 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Domain Development | `.claude/workflows/domain-development-workflow.md` | TDD development cycle |
-| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | End-to-end feature work |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow              | Path                                                           | When to Use                          |
+| --------------------- | -------------------------------------------------------------- | ------------------------------------ |
+| Domain Development    | `.claude/workflows/domain-development-workflow.md`             | TDD development cycle                |
+| Feature Development   | `.claude/workflows/enterprise/feature-development-workflow.md` | End-to-end feature work              |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`

@@ -1,14 +1,17 @@
 <!-- Agent: developer | Task: #44 | Session: 2026-02-06 -->
 
 ---
+
 name: documentation-workflow
 description: Diataxis framework for creating tutorials, how-to guides, reference docs, and explanations.
 triggers:
-  - documentation request
-  - PHASE_5_DOCUMENT in enterprise workflow
-  - API documentation needed
-agents:
-  - technical-writer
+
+- documentation request
+- PHASE_5_DOCUMENT in enterprise workflow
+- API documentation needed
+  agents:
+- technical-writer
+
 ---
 
 # Documentation Workflow
@@ -19,12 +22,12 @@ Systematic documentation creation using the Diataxis framework: Tutorials, How-t
 
 The Diataxis framework organizes documentation into 4 types based on user intent:
 
-| Type          | User Intent              | Focus        | Example |
-| ------------- | ------------------------ | ------------ | ------- |
-| **Tutorial**  | Learning                 | Education    | "Getting Started with API" |
-| **How-to**    | Solving a specific problem| Task        | "How to Reset User Password" |
-| **Reference** | Finding precise information| Information | "API Endpoint Reference" |
-| **Explanation**| Understanding concepts   | Understanding| "Authentication Architecture" |
+| Type            | User Intent                 | Focus         | Example                       |
+| --------------- | --------------------------- | ------------- | ----------------------------- |
+| **Tutorial**    | Learning                    | Education     | "Getting Started with API"    |
+| **How-to**      | Solving a specific problem  | Task          | "How to Reset User Password"  |
+| **Reference**   | Finding precise information | Information   | "API Endpoint Reference"      |
+| **Explanation** | Understanding concepts      | Understanding | "Authentication Architecture" |
 
 ## Diataxis Framework
 
@@ -61,7 +64,7 @@ Teach users how to accomplish a goal through hands-on practice.
 
 ### Tutorial Template
 
-```markdown
+````markdown
 # {Tutorial Title}
 
 **Goal:** By the end of this tutorial, you will {specific learning outcome}.
@@ -97,6 +100,7 @@ Teach users how to accomplish a goal through hands-on practice.
 ```{language}
 {Code or output user should see}
 ```
+````
 
 **Why this works:** {Brief explanation}
 
@@ -117,7 +121,8 @@ Teach users how to accomplish a goal through hands-on practice.
 
 - Try: {Extension activity}
 - Read: {Link to related how-to or explanation}
-```
+
+````
 
 ### Tutorial Example: API Authentication
 
@@ -154,9 +159,11 @@ Your API key is your secret credential. Keep it safe!
 
 **Expected Output:**
 
-```
+````
+
 sk_live_abc123...
-```
+
+````
 
 **Why this works:** API keys authenticate your application without requiring your password.
 
@@ -172,7 +179,7 @@ sk_live_abc123...
 ```bash
 curl -X POST https://api.example.com/auth/token \
   -H "Authorization: Bearer YOUR_API_KEY"
-```
+````
 
 **Expected Output:**
 
@@ -221,7 +228,8 @@ curl https://api.example.com/user/me \
 
 - Try: Make a POST request to create a resource
 - Read: [API Reference](link) for all endpoints
-```
+
+````
 
 ## Type 2: How-to Guides
 
@@ -259,7 +267,7 @@ Provide step-by-step instructions to solve a specific problem.
 
 ```{language}
 {Code example}
-```
+````
 
 ### 2. {Action Verb}
 
@@ -284,7 +292,8 @@ Provide step-by-step instructions to solve a specific problem.
 
 **Issue:** {Common problem}
 **Fix:** {Solution}
-```
+
+````
 
 ### How-to Example: Password Reset
 
@@ -317,7 +326,7 @@ await db.users.update(userId, {
   resetToken: resetTokenHash,
   resetTokenExpiry,
 });
-```
+````
 
 ### 2. Send Reset Email
 
@@ -372,7 +381,8 @@ await db.users.update(user.id, {
 
 **Issue:** Token expired
 **Fix:** Request new reset email (tokens expire after 1 hour)
-```
+
+````
 
 ## Type 3: Reference Documentation
 
@@ -423,7 +433,7 @@ Provide precise, comprehensive information for lookup.
 {
   "field": "type (description)"
 }
-```
+````
 
 ## Response
 
@@ -475,7 +485,8 @@ const data = await response.json();
 ## Rate Limits
 
 - {X} requests per {time period}
-```
+
+````
 
 ### Reference Example: User API
 
@@ -518,7 +529,7 @@ Requires Bearer token in Authorization header.
   "name": "John Doe",
   "created_at": "2026-01-01T00:00:00Z"
 }
-```
+````
 
 ### Error Responses
 
@@ -560,7 +571,8 @@ const user = await response.json();
 ## Rate Limits
 
 - 100 requests per minute per API key
-```
+
+````
 
 ## Type 4: Explanation Documentation
 
@@ -620,7 +632,7 @@ Clarify concepts, design decisions, and architecture.
 
 - {Link to related explanation}
 - {Link to reference docs}
-```
+````
 
 ### Explanation Example: JWT Authentication
 
@@ -638,8 +650,8 @@ Traditional session-based authentication requires a shared session store (Redis,
 ## How It Works
 
 ### Token Lifecycle
-
 ```
+
 1. User logs in with credentials
    ↓
 2. Server validates credentials
@@ -657,16 +669,19 @@ Traditional session-based authentication requires a shared session store (Redis,
 8. Server verifies signature and claims
    ↓
 9. Server grants access if valid
+
 ```
 
 ### Token Structure
 
 ```
+
 Header.Payload.Signature
 
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.  # Header (algorithm, type)
-eyJzdWIiOiJ1c2VyXzEyMyIsImlhdCI6MTYxNjI0MjQwMH0.  # Payload (claims)
-SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c  # Signature (HMAC-SHA256)
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9. # Header (algorithm, type)
+eyJzdWIiOiJ1c2VyXzEyMyIsImlhdCI6MTYxNjI0MjQwMH0. # Payload (claims)
+SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c # Signature (HMAC-SHA256)
+
 ```
 
 ## Design Decisions
@@ -745,12 +760,12 @@ After creating documentation, run post-creation validation workflow:
 
 ### Documentation Paths
 
-| Type         | Path                                          |
-| ------------ | --------------------------------------------- |
-| **Tutorials**| `.claude/context/artifacts/docs/tutorials/`   |
-| **How-tos**  | `.claude/context/artifacts/docs/how-to/`      |
-| **Reference**| `.claude/context/artifacts/docs/reference/`   |
-| **Explanation**| `.claude/context/artifacts/docs/explanation/`|
+| Type            | Path                                          |
+| --------------- | --------------------------------------------- |
+| **Tutorials**   | `.claude/context/artifacts/docs/tutorials/`   |
+| **How-tos**     | `.claude/context/artifacts/docs/how-to/`      |
+| **Reference**   | `.claude/context/artifacts/docs/reference/`   |
+| **Explanation** | `.claude/context/artifacts/docs/explanation/` |
 
 ### File Naming
 

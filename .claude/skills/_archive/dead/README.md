@@ -61,16 +61,16 @@ Skill({ skill: "skill-creator", args: "register {skill-name}" })
 
 ## Categories Archived (by Dead Ratio)
 
-| Category | Dead/Total | Dead % | Examples |
-|----------|------------|--------|----------|
-| Framework Configuration | 26/26 | 100% | babel-configuration, tsconfig-json-rules, form-validation-with-zod |
-| Agent Behavior | 11/12 | 92% | assistant-behavior-rules, communication-tone, persona-senior-full-stack-developer |
-| Other Specialized | 21/22 | 95% | gamedev-expert (archived but restored on demand), toon-format, use-case-example |
-| Project Structure | 7/8 | 88% | folder-structure, directory-naming-convention |
-| Code Style & Linting | 15/18 | 83% | comment-usage, dry-principle (archived but restored on demand) |
-| DevOps & Infrastructure | 13/19 | 68% | aws-cloud-ops (archived but restored on demand), gcloud-cli, kubernetes-flux (archived but restored on demand) |
-| Languages | 11/16 | 69% | angular-expert, astro-expert, elixir-expert, php-expert (archived but restored on demand) |
-| Frameworks | 18/26 | 69% | angular-expert, astro-expert, chrome-extension-expert |
+| Category                | Dead/Total | Dead % | Examples                                                                                                       |
+| ----------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| Framework Configuration | 26/26      | 100%   | babel-configuration, tsconfig-json-rules, form-validation-with-zod                                             |
+| Agent Behavior          | 11/12      | 92%    | assistant-behavior-rules, communication-tone, persona-senior-full-stack-developer                              |
+| Other Specialized       | 21/22      | 95%    | gamedev-expert (archived but restored on demand), toon-format, use-case-example                                |
+| Project Structure       | 7/8        | 88%    | folder-structure, directory-naming-convention                                                                  |
+| Code Style & Linting    | 15/18      | 83%    | comment-usage, dry-principle (archived but restored on demand)                                                 |
+| DevOps & Infrastructure | 13/19      | 68%    | aws-cloud-ops (archived but restored on demand), gcloud-cli, kubernetes-flux (archived but restored on demand) |
+| Languages               | 11/16      | 69%    | angular-expert, astro-expert, elixir-expert, php-expert (archived but restored on demand)                      |
+| Frameworks              | 18/26      | 69%    | angular-expert, astro-expert, chrome-extension-expert                                                          |
 
 ## Preserved Skills (87 active)
 

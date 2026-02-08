@@ -24,13 +24,13 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `unified-creator-guard.cjs` | PreToolUse(Write) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs` | PreToolUse(Write) | Consolidated write safety checks | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `sync-memory-index.cjs` | PostToolUse(Write) | Updates memory search index | -- |
+| Hook                               | Event              | Purpose                               | Override        |
+| ---------------------------------- | ------------------ | ------------------------------------- | --------------- |
+| `unified-creator-guard.cjs`        | PreToolUse(Write)  | Blocks direct writes to creator paths | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write)  | Consolidated write safety checks      | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)    | Validates tool is in allowed set      | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)    | Monitors execution limits             | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Write) | Updates memory search index           | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -38,12 +38,13 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| C4 Architecture | `.claude/workflows/enterprise/c4-architecture-workflow.md` | C4 system context documentation |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow              | Path                                                       | When to Use                          |
+| --------------------- | ---------------------------------------------------------- | ------------------------------------ |
+| C4 Architecture       | `.claude/workflows/enterprise/c4-architecture-workflow.md` | C4 system context documentation      |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`                   | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`

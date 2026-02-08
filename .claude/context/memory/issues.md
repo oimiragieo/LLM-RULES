@@ -39,6 +39,7 @@ This file tracks blockers, workarounds, and unresolved problems.
 Prompt injection appears in Pipelines #11 (agents), #12 (context), #13 (workflows), #16 (skills). This is a SYSTEMIC issue requiring centralized `sanitizePromptContent()` utility (see ADR-095).
 
 **Reports:**
+
 - Security audit: `.claude/context/reports/security/skills-security-review-2026-02-07.md`
 - Architecture audit: `.claude/context/reports/architecture/skills-system-audit-2026-02-07.md`
 - ADR-099: Skills system cleanup decisions
@@ -163,6 +164,7 @@ A file named `nul` (0 bytes) exists at `.claude/context/nul`. This is a Windows 
 The QA workflow skill creates working directories in `.claude/context/plans/` with random hash suffixes (e.g., `impl-plan-kHwypz/`, `qa-report-c05Ene/`, `test-plan-DCyOsO/`). These are never cleaned up after the QA workflow completes. All 7 directories have 0 consumers (confirmed by grep across entire `.claude/`). They violate workspace-conventions.md naming rules (not kebab-case, no date suffix, random hash identifiers).
 
 **Orphaned directories:**
+
 1. `plans/impl-plan-kHwypz/`
 2. `plans/progress-WuHjJL/`
 3. `plans/qa-report-c05Ene/`
@@ -174,6 +176,7 @@ The QA workflow skill creates working directories in `.claude/context/plans/` wi
 **Workaround:** Delete manually.
 
 **Resolution:**
+
 1. Delete 7 orphaned directories (immediate, ADR-094 P1-002)
 2. Add cleanup logic to QA workflow skill (ADR-094 P3-011, prevents recurrence)
 
@@ -206,6 +209,7 @@ The `.claude/context/data/` directory contains 37 files (LanceDB vector store, S
 **Description:**
 
 ADR-081 consolidated reports from `artifacts/reports/` to `reports/{domain}/`. However, 15 files remain in the old artifact locations:
+
 - `artifacts/reflections/` (5 files) should be in `reports/reflections/`
 - `artifacts/security-reviews/` (9 files) should be in `reports/security/`
 - `artifacts/qa-reports/` (1 file) should be in `reports/qa/`
@@ -247,10 +251,10 @@ Of these, `error-reports/` and `error-summaries/` are actively wired (written by
 
 Two authoritative documents disagree on artifact paths:
 
-| Artifact | `workspace-conventions.md` (correct) | `FILE_PLACEMENT_RULES.md` (stale) |
-|----------|--------------------------------------|-----------------------------------|
-| Plans | `.claude/context/plans/` | `.claude/context/artifacts/plans/` |
-| Reports | `.claude/context/reports/{domain}/` | `.claude/context/artifacts/reports/` |
+| Artifact | `workspace-conventions.md` (correct) | `FILE_PLACEMENT_RULES.md` (stale)    |
+| -------- | ------------------------------------ | ------------------------------------ |
+| Plans    | `.claude/context/plans/`             | `.claude/context/artifacts/plans/`   |
+| Reports  | `.claude/context/reports/{domain}/`  | `.claude/context/artifacts/reports/` |
 
 `workspace-conventions.md` was established by ADR-078 (2026-02-06) and is the canonical source. ADR-081 consolidated reports to `context/reports/{domain}/`. `FILE_PLACEMENT_RULES.md` (v2.0, last updated 2026-01-31) predates both ADRs and was not updated.
 
@@ -318,6 +322,7 @@ Security review of the `.claude/tools/` system (77 executable files, 15,203 LOC)
 4. **SEC-TOOL-004 [MEDIUM]**: GitHub token exposure in `github/executor.py` passes credentials as Docker environment variables (visible in process list and logs).
 
 **Additional Findings (LOW):**
+
 - SEC-TOOL-005: Secrets logged by security-lint.cjs
 - SEC-TOOL-006: No confirmation prompts for file deletion
 - SEC-TOOL-007: Unbounded resource consumption in project analyzer
@@ -572,6 +577,7 @@ Three hook modules are MISSING at their expected require paths, causing `MODULE_
 **Root Cause:**
 
 Hook consolidation (Task #41, commit 0e449681) archived 45 orphan hooks and relocated `router-state.cjs`:
+
 - `error-tracker.cjs` and `metrics-collector.cjs` were library modules (not standalone hooks) that wrapper hooks still require. They were mistakenly archived.
 - `router-state.cjs` was relocated from `hooks/routing/` to `lib/routing/`. Seven consumers were updated but `user-prompt-unified.cjs` was missed.
 
@@ -591,6 +597,7 @@ Architecture plan created: `.claude/context/plans/hook-hardening-architecture-20
 ADR-082 recorded in decisions.md.
 
 Fix:
+
 1. Restore `error-tracker.cjs` from `_archive/monitoring/`
 2. Restore `metrics-collector.cjs` from `_archive/monitoring/`
 3. Change line 71 of `user-prompt-unified.cjs` from `routingRequire('router-state.cjs')` to `libRequire(path.join('routing', 'router-state.cjs'))`
@@ -610,6 +617,7 @@ Fix:
 **Description:**
 
 Config files with aggregate counts (tool-manifest.json, rule-index-cache.json) derive their values from dynamic sources:
+
 - `totalAgents` in tool-manifest.json should equal agent count in agent-registry.json
 - `total_rules` in rule-index-cache.json should equal rule files in .claude/rules/
 
@@ -620,6 +628,7 @@ No CI validation exists to detect this staleness. The regeneration scripts exist
 **Workaround:**
 
 Before making source changes (adding agents, merging rules), manually run the regeneration script:
+
 ```bash
 pnpm manifest:generate
 pnpm generate-rule-index
@@ -649,6 +658,7 @@ Pattern: Compare aggregate value against actual source count. Fail if mismatch.
 The multi-agent orchestration framework declares 49 agents but only 1 (developer) is routinely spawned. 46 agents have never been spawned in recorded history. The routing infrastructure (routing-table.cjs, INTENT_KEYWORDS, DISAMBIGUATION_RULES) is correct, but enforcement hooks default to `warn` mode, allowing the Router to collapse all requests to `developer`.
 
 **Impact:**
+
 - No QA review after code changes
 - No security review for auth/credential code
 - No architectural review before implementation
@@ -660,6 +670,7 @@ The multi-agent orchestration framework declares 49 agents but only 1 (developer
 - The planner-first gate for complex tasks is bypassed
 
 **Root Causes:**
+
 1. `PLANNER_FIRST_ENFORCEMENT=warn` (should be `block`)
 2. `SECURITY_REVIEW_ENFORCEMENT` not enforced by default
 3. No PostToolUse hook on TaskUpdate(completed) to trigger follow-up agents
@@ -670,6 +681,7 @@ The multi-agent orchestration framework declares 49 agents but only 1 (developer
 None. This is a systemic design gap requiring architectural changes.
 
 **Resolution Path:**
+
 1. Change enforcement defaults from `warn` to `block` (P0, 15 min)
 2. Create post-completion workflow chain hook (P0, 2-4 hours)
 3. Fix reflection deadlock (P1, 1-2 hours)
@@ -716,6 +728,7 @@ Security review of the agents system (49 agents, routing infrastructure, model s
 Findings documented in `.claude/context/reports/security/agents-system-security-review-2026-02-07.md`.
 
 **Remediation Plan**:
+
 - P1 (Security Critical): 11-17 hours (2-3 days) - FIX BEFORE PRODUCTION
 - P2 (Defense in Depth): 6-13 hours (1-2 days) - FIX BEFORE WIDER ROLLOUT
 - P3 (Hardening): 16-24 hours (2-3 days) - FIX FOR LONG-TERM SECURITY
@@ -723,6 +736,7 @@ Findings documented in `.claude/context/reports/security/agents-system-security-
 **Verdict**: APPROVED WITH CONDITIONS
 
 **Next Steps**:
+
 1. Create P1 mitigation tasks (5 HIGH findings)
 2. Implement prompt injection detection in routing-guard.cjs
 3. Change CONFIG_MODEL_VALIDATOR to block mode
@@ -755,6 +769,7 @@ None needed for new conversations (Task #109 fixed the source). Agents that read
 **Resolution:**
 
 ✅ **FIXED** in Task #109:
+
 1. Updated rules/agents.md with 3 corrected agent names
 2. Updated ADR-093 status to "Accepted"
 3. Recorded learnings in decisions.md
@@ -787,11 +802,12 @@ Security review of `.claude/workflows/` subsystem (54 files across 7 subdirector
    - ROUTER_SELF_CHECK, PLANNER_FIRST_ENFORCEMENT, SECURITY_REVIEW_ENFORCEMENT
    - ROUTER_WRITE_GUARD, ROUTER_BASH_GUARD, EVOLUTION_STATE_GUARD
    - CREATOR_GUARD, HOOK_FAIL_OPEN
-   Setting `HOOK_FAIL_OPEN=true` bypasses ALL routing-guard checks simultaneously (line 1041-1043 of routing-guard.cjs).
+     Setting `HOOK_FAIL_OPEN=true` bypasses ALL routing-guard checks simultaneously (line 1041-1043 of routing-guard.cjs).
 
 5. **E-WF-002 (HIGH)**: Complexity downgrade bypass. TRIVIAL and LOW complexity classification in enterprise-workflow.md skip security review entirely (jump directly to Implement+Review). A crafted complexity classification can bypass all security gates. The complexity-classifier.cjs itself is not integrity-protected.
 
 **Additional Findings (MEDIUM):**
+
 - S-WF-002: Agent type detection via string matching (easily spoofable)
 - T-WF-003: Evolution state file manipulation (partially mitigated by state-guard)
 - T-WF-004: Quality gate result falsification (self-reported metrics, not independently verified)
@@ -800,18 +816,21 @@ Security review of `.claude/workflows/` subsystem (54 files across 7 subdirector
 
 **Cross-Pipeline Pattern:**
 Prompt injection appears in ALL three deep-dive pipelines:
+
 - Pipeline #11 (Agents): HIGH-001 -- Task() prompt/description injection
 - Pipeline #12 (Context): SEC-CTX-002 -- Reflection spawn prompt injection
 - Pipeline #13 (Workflows): I-WF-001 -- Spawn template content injection
-This is a SYSTEMIC issue requiring a centralized `sanitizePromptContent()` utility.
+  This is a SYSTEMIC issue requiring a centralized `sanitizePromptContent()` utility.
 
 **Workaround:**
+
 - Do NOT deploy in adversarial environments until HIGH findings are remediated
 - Monitor `workflow-state.json` and `phase-advance.json` for unexpected modifications
 - Avoid setting HOOK_FAIL_OPEN=true in any environment
 - Manually verify complexity classifications for security-sensitive tasks
 
 **Resolution Path:**
+
 - P1 (5 HIGH findings): Centralized prompt sanitization, HMAC state integrity, phase-advance authentication, env var hardening, complexity classification integrity
 - P2 (5 MEDIUM findings): Structured agent detection, schema validation, quality gate independence, audit trail restoration, file locking
 - P3 (4 LOW findings): Rate limiting, workflow documentation, incident response auth, creator YAML hardening
@@ -918,7 +937,6 @@ Command injection pattern: `execSync` with string interpolation appears in hybri
 
 **Full Report:** `.claude/context/reports/security/lib-security-review-2026-02-07.md`
 
-
 ## 2026-02-07: NEW -- 3 Command Injection Vulnerabilities (Semgrep Scan, Task #131)
 
 **Date:** 2026-02-07
@@ -940,10 +958,12 @@ Semgrep security scan identified 3 NEW command injection vulnerabilities using u
 **Workaround:** Variables are internally controlled (not user input), but pattern is still unsafe.
 
 **Resolution:**
+
 1. Replace `execSync` with `spawnSync` using array args and `shell: false`
 2. Pattern: `spawnSync(process.execPath, [scriptPath, arg1, arg2], { shell: false })`
 
 **Status: RESOLVED (2026-02-07)** — Fixed in Task #129:
+
 - pre-completion-validation.cjs: Changed to `spawnSync(process.execPath, [VALIDATION_SCRIPT, artifactPath], { shell: false })`
 - run-workflow-tests.cjs: Changed to `spawnSync(process.execPath, [testFile], { shell: false })`
 - contextual-memory.cjs: Already safe (uses `spawn` with array args)
@@ -955,6 +975,7 @@ Semgrep security scan identified 3 NEW command injection vulnerabilities using u
 **Issue**: `.claude/lib/tools/agent-registry-generator.cjs` tries to require `../agents/agent-config.cjs` which was archived to `_archive/agents/` in Task #122 (Pipeline #15).
 
 **Error**:
+
 ```
 Error: Cannot find module '../agents/agent-config.cjs'
 Require stack:
@@ -969,6 +990,7 @@ Require stack:
 **Workaround**: Use `git commit --no-verify` to bypass hooks when committing documentation-only changes.
 
 **Permanent Fix Needed**:
+
 1. Check if `getDefaultTools()` from agent-config.cjs is actually needed
 2. If yes: Move agent-config.cjs out of `_archive/agents/` to a non-archived location
 3. If no: Remove the import from agent-registry-generator.cjs
@@ -977,9 +999,9 @@ Require stack:
 **Priority**: HIGH - Blocks normal git workflow for agent modifications
 
 **Related**:
+
 - ADR-098: Lib System Dead Code Archival
 - Task #122: Archive 10 dead subsystems
 - Pipeline #15: Lib System Deep Dive
 
 **Status: RESOLVED (2026-02-07)** — Fixed by inlining `getDefaultTools()` function directly into agent-registry-generator.cjs at line 33. Pre-commit hook now works correctly.
-

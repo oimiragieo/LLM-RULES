@@ -112,11 +112,13 @@ function validateData(data, schemaPath) {
 
   return {
     valid: false,
-    errors: validate.errors ? validate.errors.map(e => ({
-      path: e.instancePath || '/',
-      message: e.message,
-      keyword: e.keyword,
-    })) : [],
+    errors: validate.errors
+      ? validate.errors.map(e => ({
+          path: e.instancePath || '/',
+          message: e.message,
+          keyword: e.keyword,
+        }))
+      : [],
   };
 }
 

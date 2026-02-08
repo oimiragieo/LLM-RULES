@@ -12,12 +12,12 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ## Wiring Status Summary
 
-| Status | Count | Description |
-|--------|-------|-------------|
-| **WIRED (Ajv)** | 8 | Actively validated via Ajv at runtime |
-| **SOFT-WIRED** | 3 | Path referenced in code, validation optional |
-| **DOCS ONLY** | 16 | Referenced in documentation or templates only |
-| **Total Active** | 27 | All schemas in `.claude/schemas/` |
+| Status           | Count | Description                                   |
+| ---------------- | ----- | --------------------------------------------- |
+| **WIRED (Ajv)**  | 8     | Actively validated via Ajv at runtime         |
+| **SOFT-WIRED**   | 3     | Path referenced in code, validation optional  |
+| **DOCS ONLY**    | 16    | Referenced in documentation or templates only |
+| **Total Active** | 27    | All schemas in `.claude/schemas/`             |
 
 ---
 
@@ -25,14 +25,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### agent-capability-card.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/agent-capability-card.schema.json` |
-| **Category** | Agent |
-| **Wiring Status** | WIRED (Ajv) |
-| **Consumer** | `.claude/scripts/generate-agent-registry.cjs` |
-| **Validation** | Advisory (validates agent capability card structure) |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                                |
+| ----------------- | ---------------------------------------------------- |
+| **Path**          | `.claude/schemas/agent-capability-card.schema.json`  |
+| **Category**      | Agent                                                |
+| **Wiring Status** | WIRED (Ajv)                                          |
+| **Consumer**      | `.claude/scripts/generate-agent-registry.cjs`        |
+| **Validation**    | Advisory (validates agent capability card structure) |
+| **$schema**       | http://json-schema.org/draft-07/schema#              |
 
 **Purpose:** Validates agent capability card structure used by agent registry generator.
 
@@ -40,14 +40,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### agent-config.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/agent-config.schema.json` |
-| **Category** | Agent |
-| **Wiring Status** | WIRED (Ajv) |
-| **Consumer** | `.claude/lib/agents/agent-config.cjs` |
-| **Validation** | Advisory via `validateConfig()` |
-| **$schema** | https://json-schema.org/draft/2020-12/schema |
+| Field             | Value                                        |
+| ----------------- | -------------------------------------------- |
+| **Path**          | `.claude/schemas/agent-config.schema.json`   |
+| **Category**      | Agent                                        |
+| **Wiring Status** | WIRED (Ajv)                                  |
+| **Consumer**      | `.claude/lib/agents/agent-config.cjs`        |
+| **Validation**    | Advisory via `validateConfig()`              |
+| **$schema**       | https://json-schema.org/draft/2020-12/schema |
 
 **Purpose:** Validates agent configuration (tools, thinking defaults, phase assignments).
 
@@ -57,14 +57,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### agent-definition.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/agent-definition.schema.json` |
-| **Category** | Agent |
-| **Wiring Status** | WIRED (Ajv) |
-| **Consumer** | `.claude/lib/agents/agent-parser.cjs` |
-| **Validation** | Advisory via `validateDefinition()` |
-| **$schema** | https://json-schema.org/draft/2020-12/schema |
+| Field             | Value                                          |
+| ----------------- | ---------------------------------------------- |
+| **Path**          | `.claude/schemas/agent-definition.schema.json` |
+| **Category**      | Agent                                          |
+| **Wiring Status** | WIRED (Ajv)                                    |
+| **Consumer**      | `.claude/lib/agents/agent-parser.cjs`          |
+| **Validation**    | Advisory via `validateDefinition()`            |
+| **$schema**       | https://json-schema.org/draft/2020-12/schema   |
 
 **Purpose:** Validates agent definition markdown frontmatter (name, description, capabilities, tools).
 
@@ -72,14 +72,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### agent-identity.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/agent-identity.schema.json` |
-| **Category** | Agent |
-| **Wiring Status** | WIRED (Ajv) |
-| **Consumer** | `.claude/lib/agents/agent-parser.cjs` |
-| **Validation** | Ajv validated (pre-existing integration) |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                        |
+| ----------------- | -------------------------------------------- |
+| **Path**          | `.claude/schemas/agent-identity.schema.json` |
+| **Category**      | Agent                                        |
+| **Wiring Status** | WIRED (Ajv)                                  |
+| **Consumer**      | `.claude/lib/agents/agent-parser.cjs`        |
+| **Validation**    | Ajv validated (pre-existing integration)     |
+| **$schema**       | http://json-schema.org/draft-07/schema#      |
 
 **Purpose:** Validates agent identity fields (personality, tone, behavior patterns) for agents with identity frontmatter.
 
@@ -89,14 +89,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### agent-spawn-params.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/agent-spawn-params.json` |
-| **Category** | Agent |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | None (documentation reference only) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                     |
+| ----------------- | ----------------------------------------- |
+| **Path**          | `.claude/schemas/agent-spawn-params.json` |
+| **Category**      | Agent                                     |
+| **Wiring Status** | DOCS ONLY                                 |
+| **Consumer**      | None (documentation reference only)       |
+| **Validation**    | Not validated at runtime                  |
+| **$schema**       | http://json-schema.org/draft-07/schema#   |
 
 **Purpose:** Documents agent spawn parameter structure for reference.
 
@@ -108,14 +108,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### skill-definition.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/skill-definition.schema.json` |
-| **Category** | Skill |
-| **Wiring Status** | WIRED (Ajv) |
-| **Consumer** | `.claude/skills/skill-creator/scripts/create.cjs` |
-| **Validation** | Advisory via `validateSkill()` using `_validateData` |
-| **$schema** | https://json-schema.org/draft/2020-12/schema |
+| Field             | Value                                                |
+| ----------------- | ---------------------------------------------------- |
+| **Path**          | `.claude/schemas/skill-definition.schema.json`       |
+| **Category**      | Skill                                                |
+| **Wiring Status** | WIRED (Ajv)                                          |
+| **Consumer**      | `.claude/skills/skill-creator/scripts/create.cjs`    |
+| **Validation**    | Advisory via `validateSkill()` using `_validateData` |
+| **$schema**       | https://json-schema.org/draft/2020-12/schema         |
 
 **Purpose:** Validates skill SKILL.md frontmatter structure (name, description, tools, integration).
 
@@ -123,14 +123,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### skill-diagram-generator-output.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/skill-diagram-generator-output.schema.json` |
-| **Category** | Skill |
-| **Wiring Status** | SOFT-WIRED |
-| **Consumer** | `.claude/skills/diagram-generator/scripts/generate.mjs` (path defined) |
-| **Validation** | Optional/skipped |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                                                  |
+| ----------------- | ---------------------------------------------------------------------- |
+| **Path**          | `.claude/schemas/skill-diagram-generator-output.schema.json`           |
+| **Category**      | Skill                                                                  |
+| **Wiring Status** | SOFT-WIRED                                                             |
+| **Consumer**      | `.claude/skills/diagram-generator/scripts/generate.mjs` (path defined) |
+| **Validation**    | Optional/skipped                                                       |
+| **$schema**       | http://json-schema.org/draft-07/schema#                                |
 
 **Purpose:** Defines output structure for skill diagram generator (Mermaid diagrams).
 
@@ -138,14 +138,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### skill-repo-rag-output.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/skill-repo-rag-output.schema.json` |
-| **Category** | Skill |
-| **Wiring Status** | SOFT-WIRED |
-| **Consumer** | `.claude/skills/repo-rag/scripts/search.mjs` (path defined) |
-| **Validation** | Optional/skipped |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                                       |
+| ----------------- | ----------------------------------------------------------- |
+| **Path**          | `.claude/schemas/skill-repo-rag-output.schema.json`         |
+| **Category**      | Skill                                                       |
+| **Wiring Status** | SOFT-WIRED                                                  |
+| **Consumer**      | `.claude/skills/repo-rag/scripts/search.mjs` (path defined) |
+| **Validation**    | Optional/skipped                                            |
+| **$schema**       | http://json-schema.org/draft-07/schema#                     |
 
 **Purpose:** Defines RAG search result structure for repository knowledge retrieval.
 
@@ -153,14 +153,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### skill-test-generator-output.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/skill-test-generator-output.schema.json` |
-| **Category** | Skill |
-| **Wiring Status** | SOFT-WIRED |
-| **Consumer** | `.cursor/skills/test-generator/scripts/generate.mjs` (path defined) |
-| **Validation** | Optional/skipped |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                                               |
+| ----------------- | ------------------------------------------------------------------- |
+| **Path**          | `.claude/schemas/skill-test-generator-output.schema.json`           |
+| **Category**      | Skill                                                               |
+| **Wiring Status** | SOFT-WIRED                                                          |
+| **Consumer**      | `.cursor/skills/test-generator/scripts/generate.mjs` (path defined) |
+| **Validation**    | Optional/skipped                                                    |
+| **$schema**       | http://json-schema.org/draft-07/schema#                             |
 
 **Purpose:** Defines test generation output structure.
 
@@ -172,14 +172,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### workflow-definition.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/workflow-definition.schema.json` |
-| **Category** | Workflow |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | None (no workflow-creator scripts exist) |
-| **Validation** | Not validated at runtime |
-| **$schema** | https://json-schema.org/draft/2020-12/schema |
+| Field             | Value                                             |
+| ----------------- | ------------------------------------------------- |
+| **Path**          | `.claude/schemas/workflow-definition.schema.json` |
+| **Category**      | Workflow                                          |
+| **Wiring Status** | DOCS ONLY                                         |
+| **Consumer**      | None (no workflow-creator scripts exist)          |
+| **Validation**    | Not validated at runtime                          |
+| **$schema**       | https://json-schema.org/draft/2020-12/schema      |
 
 **Purpose:** Defines workflow markdown structure for workflow-creator (not yet implemented).
 
@@ -189,14 +189,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### hook-definition.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/hook-definition.schema.json` |
-| **Category** | Hook |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | None (no hook-creator scripts exist) |
-| **Validation** | Not validated at runtime |
-| **$schema** | https://json-schema.org/draft/2020-12/schema |
+| Field             | Value                                         |
+| ----------------- | --------------------------------------------- |
+| **Path**          | `.claude/schemas/hook-definition.schema.json` |
+| **Category**      | Hook                                          |
+| **Wiring Status** | DOCS ONLY                                     |
+| **Consumer**      | None (no hook-creator scripts exist)          |
+| **Validation**    | Not validated at runtime                      |
+| **$schema**       | https://json-schema.org/draft/2020-12/schema  |
 
 **Purpose:** Defines hook script structure for hook-creator (not yet implemented).
 
@@ -208,14 +208,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### evolution-state.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/evolution-state.schema.json` |
-| **Category** | Evolution |
-| **Wiring Status** | WIRED (Ajv) |
-| **Consumer** | `.claude/lib/self-healing/validator.cjs` |
-| **Validation** | Advisory via `validateStateWithSchema()` |
-| **$schema** | https://json-schema.org/draft/2020-12/schema |
+| Field             | Value                                         |
+| ----------------- | --------------------------------------------- |
+| **Path**          | `.claude/schemas/evolution-state.schema.json` |
+| **Category**      | Evolution                                     |
+| **Wiring Status** | WIRED (Ajv)                                   |
+| **Consumer**      | `.claude/lib/self-healing/validator.cjs`      |
+| **Validation**    | Advisory via `validateStateWithSchema()`      |
+| **$schema**       | https://json-schema.org/draft/2020-12/schema  |
 
 **Purpose:** Validates evolution workflow state machine structure (EVOLVE phases).
 
@@ -223,14 +223,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### track-metadata.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/track-metadata.schema.json` |
-| **Category** | Project |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | `.claude/lib/conductor/conductor-gap-analyzer.cjs` (existence check only) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                                                     |
+| ----------------- | ------------------------------------------------------------------------- |
+| **Path**          | `.claude/schemas/track-metadata.schema.json`                              |
+| **Category**      | Project                                                                   |
+| **Wiring Status** | DOCS ONLY                                                                 |
+| **Consumer**      | `.claude/lib/conductor/conductor-gap-analyzer.cjs` (existence check only) |
+| **Validation**    | Not validated at runtime                                                  |
+| **$schema**       | http://json-schema.org/draft-07/schema#                                   |
 
 **Purpose:** Defines track metadata structure for conductor workflow (path check only, not validated).
 
@@ -240,14 +240,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### tool-manifest.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/tool-manifest.schema.json` |
-| **Category** | Tool |
-| **Wiring Status** | WIRED (Ajv) |
-| **Consumer** | `.claude/scripts/generate-tool-manifest.cjs` |
-| **Validation** | Advisory (pre-existing integration) |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                        |
+| ----------------- | -------------------------------------------- |
+| **Path**          | `.claude/schemas/tool-manifest.schema.json`  |
+| **Category**      | Tool                                         |
+| **Wiring Status** | WIRED (Ajv)                                  |
+| **Consumer**      | `.claude/scripts/generate-tool-manifest.cjs` |
+| **Validation**    | Advisory (pre-existing integration)          |
+| **$schema**       | http://json-schema.org/draft-07/schema#      |
 
 **Purpose:** Validates tool manifest structure for framework tool discovery.
 
@@ -257,14 +257,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### presets.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/presets.schema.json` |
-| **Category** | Template |
-| **Wiring Status** | WIRED (Ajv) |
-| **Consumer** | `.claude/lib/spawn/prompt-assembler.cjs` |
-| **Validation** | Advisory via `validatePresets()` |
-| **$schema** | https://json-schema.org/draft/2020-12/schema |
+| Field             | Value                                        |
+| ----------------- | -------------------------------------------- |
+| **Path**          | `.claude/schemas/presets.schema.json`        |
+| **Category**      | Template                                     |
+| **Wiring Status** | WIRED (Ajv)                                  |
+| **Consumer**      | `.claude/lib/spawn/prompt-assembler.cjs`     |
+| **Validation**    | Advisory via `validatePresets()`             |
+| **$schema**       | https://json-schema.org/draft/2020-12/schema |
 
 **Purpose:** Validates preset configuration structure for spawn prompt customization.
 
@@ -272,14 +272,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### adr-template.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/adr-template.schema.json` |
-| **Category** | Template |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | `.claude/templates/adr-template.md` (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                                         |
+| ----------------- | ------------------------------------------------------------- |
+| **Path**          | `.claude/schemas/adr-template.schema.json`                    |
+| **Category**      | Template                                                      |
+| **Wiring Status** | DOCS ONLY                                                     |
+| **Consumer**      | `.claude/templates/adr-template.md` (documentation reference) |
+| **Validation**    | Not validated at runtime                                      |
+| **$schema**       | http://json-schema.org/draft-07/schema#                       |
 
 **Purpose:** Defines ADR (Architecture Decision Record) template structure.
 
@@ -289,14 +289,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### plan.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/plan.schema.json` |
-| **Category** | Planning |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | Planner agent (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                   |
+| ----------------- | --------------------------------------- |
+| **Path**          | `.claude/schemas/plan.schema.json`      |
+| **Category**      | Planning                                |
+| **Wiring Status** | DOCS ONLY                               |
+| **Consumer**      | Planner agent (documentation reference) |
+| **Validation**    | Not validated at runtime                |
+| **$schema**       | http://json-schema.org/draft-07/schema# |
 
 **Purpose:** Defines plan document structure for planner agents.
 
@@ -304,14 +304,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### implementation-plan.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/implementation-plan.schema.json` |
-| **Category** | Planning |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | Planner/developer agents (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                              |
+| ----------------- | -------------------------------------------------- |
+| **Path**          | `.claude/schemas/implementation-plan.schema.json`  |
+| **Category**      | Planning                                           |
+| **Wiring Status** | DOCS ONLY                                          |
+| **Consumer**      | Planner/developer agents (documentation reference) |
+| **Validation**    | Not validated at runtime                           |
+| **$schema**       | http://json-schema.org/draft-07/schema#            |
 
 **Purpose:** Defines implementation plan structure with phases, tasks, and deliverables.
 
@@ -319,14 +319,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### phase-models.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/phase-models.schema.json` |
-| **Category** | Planning |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | Workflow state machine (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                            |
+| ----------------- | ------------------------------------------------ |
+| **Path**          | `.claude/schemas/phase-models.schema.json`       |
+| **Category**      | Planning                                         |
+| **Wiring Status** | DOCS ONLY                                        |
+| **Consumer**      | Workflow state machine (documentation reference) |
+| **Validation**    | Not validated at runtime                         |
+| **$schema**       | http://json-schema.org/draft-07/schema#          |
 
 **Purpose:** Defines phase model structure for enterprise orchestration workflow.
 
@@ -334,14 +334,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### test_plan.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/test_plan.schema.json` |
-| **Category** | Testing |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | QA agent (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                   |
+| ----------------- | --------------------------------------- |
+| **Path**          | `.claude/schemas/test_plan.schema.json` |
+| **Category**      | Testing                                 |
+| **Wiring Status** | DOCS ONLY                               |
+| **Consumer**      | QA agent (documentation reference)      |
+| **Validation**    | Not validated at runtime                |
+| **$schema**       | http://json-schema.org/draft-07/schema# |
 
 **Purpose:** Defines test plan structure for QA workflows.
 
@@ -351,14 +351,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### test-results.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/test-results.schema.json` |
-| **Category** | Testing |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | QA agent (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                      |
+| ----------------- | ------------------------------------------ |
+| **Path**          | `.claude/schemas/test-results.schema.json` |
+| **Category**      | Testing                                    |
+| **Wiring Status** | DOCS ONLY                                  |
+| **Consumer**      | QA agent (documentation reference)         |
+| **Validation**    | Not validated at runtime                   |
+| **$schema**       | http://json-schema.org/draft-07/schema#    |
 
 **Purpose:** Defines test execution results structure.
 
@@ -366,14 +366,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### product_requirements.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/product_requirements.schema.json` |
-| **Category** | Planning |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | Product manager agents (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                              |
+| ----------------- | -------------------------------------------------- |
+| **Path**          | `.claude/schemas/product_requirements.schema.json` |
+| **Category**      | Planning                                           |
+| **Wiring Status** | DOCS ONLY                                          |
+| **Consumer**      | Product manager agents (documentation reference)   |
+| **Validation**    | Not validated at runtime                           |
+| **$schema**       | http://json-schema.org/draft-07/schema#            |
 
 **Purpose:** Defines product requirements document (PRD) structure.
 
@@ -383,14 +383,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### artifact_manifest.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/artifact_manifest.schema.json` |
-| **Category** | Project |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | Artifact lifecycle management (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                                   |
+| ----------------- | ------------------------------------------------------- |
+| **Path**          | `.claude/schemas/artifact_manifest.schema.json`         |
+| **Category**      | Project                                                 |
+| **Wiring Status** | DOCS ONLY                                               |
+| **Consumer**      | Artifact lifecycle management (documentation reference) |
+| **Validation**    | Not validated at runtime                                |
+| **$schema**       | http://json-schema.org/draft-07/schema#                 |
 
 **Purpose:** Defines artifact manifest structure for lifecycle tracking.
 
@@ -402,14 +402,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### specification-template.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/specification-template.schema.json` |
-| **Category** | Architecture |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | Architect/technical-writer agents (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                                       |
+| ----------------- | ----------------------------------------------------------- |
+| **Path**          | `.claude/schemas/specification-template.schema.json`        |
+| **Category**      | Architecture                                                |
+| **Wiring Status** | DOCS ONLY                                                   |
+| **Consumer**      | Architect/technical-writer agents (documentation reference) |
+| **Validation**    | Not validated at runtime                                    |
+| **$schema**       | http://json-schema.org/draft-07/schema#                     |
 
 **Purpose:** Defines specification document template structure.
 
@@ -417,14 +417,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### system_architecture.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/system_architecture.schema.json` |
-| **Category** | Architecture |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | Architect agent (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                             |
+| ----------------- | ------------------------------------------------- |
+| **Path**          | `.claude/schemas/system_architecture.schema.json` |
+| **Category**      | Architecture                                      |
+| **Wiring Status** | DOCS ONLY                                         |
+| **Consumer**      | Architect agent (documentation reference)         |
+| **Validation**    | Not validated at runtime                          |
+| **$schema**       | http://json-schema.org/draft-07/schema#           |
 
 **Purpose:** Defines system architecture document structure.
 
@@ -434,14 +434,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### project_brief.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/project_brief.schema.json` |
-| **Category** | Planning |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | Planner/architect agents (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                              |
+| ----------------- | -------------------------------------------------- |
+| **Path**          | `.claude/schemas/project_brief.schema.json`        |
+| **Category**      | Planning                                           |
+| **Wiring Status** | DOCS ONLY                                          |
+| **Consumer**      | Planner/architect agents (documentation reference) |
+| **Validation**    | Not validated at runtime                           |
+| **$schema**       | http://json-schema.org/draft-07/schema#            |
 
 **Purpose:** Defines project brief document structure.
 
@@ -451,14 +451,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### project-analysis.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/project-analysis.schema.json` |
-| **Category** | Project |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | Analyst agents (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                          |
+| ----------------- | ---------------------------------------------- |
+| **Path**          | `.claude/schemas/project-analysis.schema.json` |
+| **Category**      | Project                                        |
+| **Wiring Status** | DOCS ONLY                                      |
+| **Consumer**      | Analyst agents (documentation reference)       |
+| **Validation**    | Not validated at runtime                       |
+| **$schema**       | http://json-schema.org/draft-07/schema#        |
 
 **Purpose:** Defines project analysis report structure.
 
@@ -466,14 +466,14 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ### ux_spec.schema.json
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/schemas/ux_spec.schema.json` |
-| **Category** | Architecture |
-| **Wiring Status** | DOCS ONLY |
-| **Consumer** | UX/design agents (documentation reference) |
-| **Validation** | Not validated at runtime |
-| **$schema** | http://json-schema.org/draft-07/schema# |
+| Field             | Value                                      |
+| ----------------- | ------------------------------------------ |
+| **Path**          | `.claude/schemas/ux_spec.schema.json`      |
+| **Category**      | Architecture                               |
+| **Wiring Status** | DOCS ONLY                                  |
+| **Consumer**      | UX/design agents (documentation reference) |
+| **Validation**    | Not validated at runtime                   |
+| **$schema**       | http://json-schema.org/draft-07/schema#    |
 
 **Purpose:** Defines UX specification document structure.
 
@@ -490,6 +490,7 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 See `.claude/schemas/_archive/README.md` for complete list and restoration instructions.
 
 **Archive Categories:**
+
 - Agile artifacts (12): epics, stories, backlogs, sprints, retrospectives (never implemented)
 - Dead infrastructure (13): capability routing, event schema, skill manifest, context definition, etc.
 
@@ -500,6 +501,7 @@ See `.claude/schemas/_archive/README.md` for complete list and restoration instr
 ### For Developers
 
 **Adding a New Schema:**
+
 1. Follow the creator workflow: invoke `Skill({ skill: "schema-creator" })` - **DO NOT** write schemas directly
 2. Use `.schema.json` suffix (e.g., `my-schema.schema.json`)
 3. Include `$schema` field (draft-07 or draft-2020-12)
@@ -508,12 +510,14 @@ See `.claude/schemas/_archive/README.md` for complete list and restoration instr
 6. Wire to Ajv validation if runtime validation is needed
 
 **Wiring a Schema to Ajv:**
+
 1. Use shared utility: `.claude/lib/utils/schema-validator.cjs`
 2. Call `validateWithSchema(schemaPath, data)` for validation
 3. Returns `{ valid, errors, skipped }` - never throws
 4. Validation is advisory only (warnings, not blockers)
 
 **Validation Best Practices:**
+
 - Always gracefully degrade if schema is missing
 - Never block operations on validation failures
 - Log validation errors as warnings
@@ -522,12 +526,14 @@ See `.claude/schemas/_archive/README.md` for complete list and restoration instr
 ### For Agents
 
 **Finding Schemas:**
+
 - Search this catalog by category or purpose
 - Check wiring status before assuming validation is active
 - DOCS ONLY schemas are reference templates only
 - WIRED schemas have actual runtime validation
 
 **Schema Categories:**
+
 - **Agent**: Agent definitions, configurations, capabilities
 - **Skill**: Skill definitions and outputs
 - **Workflow**: Workflow and hook definitions

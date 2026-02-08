@@ -702,6 +702,7 @@ grep "<agent-name>" .claude/lib/routing/routing-table.cjs || echo "ERROR: Agent 
 4. **Edit the agent file** to replace placeholder rows in both tables with the actual archetype-appropriate hooks and workflows
 
 **Verification:**
+
 ```bash
 grep "Enforcement Hooks" .claude/agents/<category>/<agent-name>.md || echo "ERROR: Missing Enforcement Hooks section!"
 grep "Related Workflows" .claude/agents/<category>/<agent-name>.md || echo "ERROR: Missing Related Workflows section!"

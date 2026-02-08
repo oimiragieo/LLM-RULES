@@ -16,7 +16,7 @@
  * If target-directory is not provided, uses current directory.
  */
 
-import { copyFileSync, mkdirSync, readdirSync, statSync, existsSync, rmSync } from 'fs';
+import { copyFileSync, mkdirSync, readdirSync, existsSync, rmSync } from 'fs';
 import { resolve, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';

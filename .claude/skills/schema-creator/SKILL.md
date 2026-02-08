@@ -116,6 +116,7 @@ Skill({ skill: 'research-synthesis' });
 ```
 
 **Research Requirements:**
+
 - Minimum 3 Exa searches for JSON Schema best practices
 - Review existing schemas in `.claude/schemas/` for patterns
 - Check schema catalog at `.claude/context/artifacts/catalogs/schema-catalog.md`
@@ -904,67 +905,76 @@ This skill is part of the **Creator Ecosystem**. Use companion creators for rela
 ### Active Schemas by Category
 
 #### Agent Schemas (5)
-| Schema                        | Wiring Status | Consumer                 |
-| ----------------------------- | ------------- | ------------------------ |
-| `agent-capability-card`       | WIRED         | generate-agent-registry  |
-| `agent-config`                | WIRED         | agent-config.cjs         |
-| `agent-definition`            | WIRED         | agent-parser.cjs         |
-| `agent-identity`              | WIRED         | agent-parser.cjs         |
-| `agent-spawn-params`          | DOCS ONLY     | Spawn prompt reference   |
+
+| Schema                  | Wiring Status | Consumer                |
+| ----------------------- | ------------- | ----------------------- |
+| `agent-capability-card` | WIRED         | generate-agent-registry |
+| `agent-config`          | WIRED         | agent-config.cjs        |
+| `agent-definition`      | WIRED         | agent-parser.cjs        |
+| `agent-identity`        | WIRED         | agent-parser.cjs        |
+| `agent-spawn-params`    | DOCS ONLY     | Spawn prompt reference  |
 
 #### Skill Schemas (4)
-| Schema                          | Wiring Status | Consumer                     |
-| ------------------------------- | ------------- | ---------------------------- |
-| `skill-definition`              | WIRED         | skill-creator/create.cjs     |
-| `skill-diagram-generator-output`| SOFT-WIRED    | diagram-generator skill      |
-| `skill-repo-rag-output`         | SOFT-WIRED    | repo-rag skill               |
-| `skill-test-generator-output`   | SOFT-WIRED    | test-generator skill         |
+
+| Schema                           | Wiring Status | Consumer                 |
+| -------------------------------- | ------------- | ------------------------ |
+| `skill-definition`               | WIRED         | skill-creator/create.cjs |
+| `skill-diagram-generator-output` | SOFT-WIRED    | diagram-generator skill  |
+| `skill-repo-rag-output`          | SOFT-WIRED    | repo-rag skill           |
+| `skill-test-generator-output`    | SOFT-WIRED    | test-generator skill     |
 
 #### Workflow & Hook Schemas (2)
-| Schema                | Wiring Status | Consumer                     |
-| --------------------- | ------------- | ---------------------------- |
-| `workflow-definition` | DOCS ONLY     | No workflow-creator scripts  |
-| `hook-definition`     | DOCS ONLY     | No hook-creator scripts      |
+
+| Schema                | Wiring Status | Consumer                    |
+| --------------------- | ------------- | --------------------------- |
+| `workflow-definition` | DOCS ONLY     | No workflow-creator scripts |
+| `hook-definition`     | DOCS ONLY     | No hook-creator scripts     |
 
 #### Evolution & Project Schemas (2)
-| Schema                | Wiring Status | Consumer                     |
-| --------------------- | ------------- | ---------------------------- |
-| `evolution-state`     | WIRED         | self-healing/validator.cjs   |
-| `track-metadata`      | DOCS ONLY     | TaskCreate metadata field    |
+
+| Schema            | Wiring Status | Consumer                   |
+| ----------------- | ------------- | -------------------------- |
+| `evolution-state` | WIRED         | self-healing/validator.cjs |
+| `track-metadata`  | DOCS ONLY     | TaskCreate metadata field  |
 
 #### Tool & Template Schemas (3)
-| Schema                | Wiring Status | Consumer                     |
-| --------------------- | ------------- | ---------------------------- |
-| `tool-manifest`       | WIRED         | generate-tool-manifest.cjs   |
-| `presets`             | WIRED         | spawn/prompt-assembler.cjs   |
-| `adr-template`        | DOCS ONLY     | ADR documentation structure  |
+
+| Schema          | Wiring Status | Consumer                    |
+| --------------- | ------------- | --------------------------- |
+| `tool-manifest` | WIRED         | generate-tool-manifest.cjs  |
+| `presets`       | WIRED         | spawn/prompt-assembler.cjs  |
+| `adr-template`  | DOCS ONLY     | ADR documentation structure |
 
 #### Planning Schemas (5)
-| Schema                      | Wiring Status | Consumer                 |
-| --------------------------- | ------------- | ------------------------ |
-| `plan`                      | DOCS ONLY     | Planning phase reference |
-| `implementation-plan`       | DOCS ONLY     | Implementation planning  |
-| `phase-models`              | DOCS ONLY     | Phase planning reference |
-| `product_requirements`      | DOCS ONLY     | Requirements gathering   |
-| `project_brief`             | DOCS ONLY     | Project initialization   |
+
+| Schema                 | Wiring Status | Consumer                 |
+| ---------------------- | ------------- | ------------------------ |
+| `plan`                 | DOCS ONLY     | Planning phase reference |
+| `implementation-plan`  | DOCS ONLY     | Implementation planning  |
+| `phase-models`         | DOCS ONLY     | Phase planning reference |
+| `product_requirements` | DOCS ONLY     | Requirements gathering   |
+| `project_brief`        | DOCS ONLY     | Project initialization   |
 
 #### Testing Schemas (2)
-| Schema            | Wiring Status | Consumer                 |
-| ----------------- | ------------- | ------------------------ |
-| `test_plan`       | DOCS ONLY     | Test planning reference  |
-| `test-results`    | DOCS ONLY     | Test execution output    |
+
+| Schema         | Wiring Status | Consumer                |
+| -------------- | ------------- | ----------------------- |
+| `test_plan`    | DOCS ONLY     | Test planning reference |
+| `test-results` | DOCS ONLY     | Test execution output   |
 
 #### Architecture Schemas (3)
-| Schema                        | Wiring Status | Consumer                     |
-| ----------------------------- | ------------- | ---------------------------- |
-| `specification-template`      | DOCS ONLY     | Specification documents      |
-| `system_architecture`         | DOCS ONLY     | Architecture documentation   |
-| `ux_spec`                     | DOCS ONLY     | UX specification documents   |
+
+| Schema                   | Wiring Status | Consumer                   |
+| ------------------------ | ------------- | -------------------------- |
+| `specification-template` | DOCS ONLY     | Specification documents    |
+| `system_architecture`    | DOCS ONLY     | Architecture documentation |
+| `ux_spec`                | DOCS ONLY     | UX specification documents |
 
 #### Project Schemas (1)
-| Schema                  | Wiring Status | Consumer                 |
-| ----------------------- | ------------- | ------------------------ |
-| `project-analysis`      | DOCS ONLY     | Project analyzer output  |
+
+| Schema             | Wiring Status | Consumer                |
+| ------------------ | ------------- | ----------------------- |
+| `project-analysis` | DOCS ONLY     | Project analyzer output |
 
 **Note:** All schemas located at `.claude/schemas/` unless otherwise specified. See schema catalog for full details on consumers, validation methods, and integration status.
 

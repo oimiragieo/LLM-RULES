@@ -22,17 +22,11 @@ tools:
     Skill,
   ]
 skills:
-  - content-creation-rules
-  - detailed-docstrings
   - diagram-generator
   - doc-generator
-  - mkdocs-specific-rules
-  - project-analyzer
   - readme
   - task-management-protocol
-  - technical-accuracy-and-usability-rules
   - verification-before-completion
-  - writing-plans
   - writing-skills
 context_files:
   - '@.claude/context/memory/learnings.md'
@@ -44,16 +38,16 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | 11 consolidated write safety checks | -- |
-| `conflict-detector.cjs` | PreToolUse(Write) | Detects conflicting file writes | -- |
-| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() for skills | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
-| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
+| Hook                               | Event                   | Purpose                                | Override        |
+| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks    | --              |
+| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes        | --              |
+| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
+| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
 
 Note: `routing-guard.cjs` ensures this agent IS spawned for documentation tasks (prevents developer collapse).
 
@@ -63,14 +57,15 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Documentation | `.claude/workflows/documentation-workflow.md` | Diataxis documentation creation |
-| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Documentation phase |
-| Post-Creation Validation | `.claude/workflows/core/post-creation-validation.md` | Ensuring doc integration |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow                 | Path                                                           | When to Use                          |
+| ------------------------ | -------------------------------------------------------------- | ------------------------------------ |
+| Documentation            | `.claude/workflows/documentation-workflow.md`                  | Diataxis documentation creation      |
+| Feature Development      | `.claude/workflows/enterprise/feature-development-workflow.md` | Documentation phase                  |
+| Post-Creation Validation | `.claude/workflows/core/post-creation-validation.md`           | Ensuring doc integration             |
+| Workspace Conventions    | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`

@@ -19,10 +19,7 @@ const path = require('path');
 /**
  * Default phase-advance signal file
  */
-const DEFAULT_PHASE_ADVANCE_FILE = path.join(
-  __dirname,
-  '../../context/runtime/phase-advance.json'
-);
+const DEFAULT_PHASE_ADVANCE_FILE = path.join(__dirname, '../../context/runtime/phase-advance.json');
 
 /**
  * Agent routing table by phase

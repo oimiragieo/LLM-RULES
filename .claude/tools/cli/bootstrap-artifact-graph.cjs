@@ -30,14 +30,16 @@ const findProjectRoot = () => {
 };
 
 const PROJECT_ROOT = findProjectRoot();
-const { ArtifactGraph } = require(path.join(PROJECT_ROOT, '.claude/lib/workflow/artifact-graph.cjs'));
+const { ArtifactGraph } = require(
+  path.join(PROJECT_ROOT, '.claude/lib/workflow/artifact-graph.cjs')
+);
 
 // Parse CLI args
 const args = process.argv.slice(2);
 const options = {
   output: path.join(PROJECT_ROOT, '.claude/context/runtime/artifact-graph.json'),
   dryRun: false,
-  verbose: false
+  verbose: false,
 };
 
 for (let i = 0; i < args.length; i++) {
@@ -160,7 +162,7 @@ function scanArtifacts() {
         id: nodeId,
         type: 'skill',
         path: normalizePath(path.relative(PROJECT_ROOT, filePath)),
-        filePath
+        filePath,
       });
     }
   }
@@ -179,7 +181,7 @@ function scanArtifacts() {
             id: nodeId,
             type: 'agent',
             path: normalizePath(path.relative(PROJECT_ROOT, filePath)),
-            filePath
+            filePath,
           });
         }
       }
@@ -199,7 +201,7 @@ function scanArtifacts() {
         id: nodeId,
         type: 'hook',
         path: normalizePath(path.relative(PROJECT_ROOT, filePath)),
-        filePath
+        filePath,
       });
     }
   }
@@ -214,7 +216,7 @@ function scanArtifacts() {
         id: nodeId,
         type: 'workflow',
         path: normalizePath(path.relative(PROJECT_ROOT, filePath)),
-        filePath
+        filePath,
       });
     }
   }
@@ -230,7 +232,7 @@ function scanArtifacts() {
           id: nodeId,
           type: 'template',
           path: normalizePath(path.relative(PROJECT_ROOT, filePath)),
-          filePath
+          filePath,
         });
       }
     }
@@ -248,7 +250,7 @@ function scanArtifacts() {
           id: nodeId,
           type: 'schema',
           path: normalizePath(path.relative(PROJECT_ROOT, filePath)),
-          filePath
+          filePath,
         });
       }
     }
@@ -266,7 +268,7 @@ function scanArtifacts() {
           id: nodeId,
           type: 'rule',
           path: normalizePath(path.relative(PROJECT_ROOT, filePath)),
-          filePath
+          filePath,
         });
       }
     }
@@ -284,7 +286,7 @@ function scanArtifacts() {
           id: nodeId,
           type: 'catalog',
           path: normalizePath(path.relative(PROJECT_ROOT, filePath)),
-          filePath
+          filePath,
         });
       }
     }
@@ -296,14 +298,20 @@ function scanArtifacts() {
 
   const registryFiles = [];
   if (fs.existsSync(contextDir)) {
-    registryFiles.push(...fs.readdirSync(contextDir)
-      .filter(f => f.endsWith('-registry.json'))
-      .map(f => path.join(contextDir, f)));
+    registryFiles.push(
+      ...fs
+        .readdirSync(contextDir)
+        .filter(f => f.endsWith('-registry.json'))
+        .map(f => path.join(contextDir, f))
+    );
   }
   if (fs.existsSync(catalogsRegistryDir)) {
-    registryFiles.push(...fs.readdirSync(catalogsRegistryDir)
-      .filter(f => f.endsWith('-registry.json'))
-      .map(f => path.join(catalogsRegistryDir, f)));
+    registryFiles.push(
+      ...fs
+        .readdirSync(catalogsRegistryDir)
+        .filter(f => f.endsWith('-registry.json'))
+        .map(f => path.join(catalogsRegistryDir, f))
+    );
   }
 
   for (const filePath of registryFiles) {
@@ -313,7 +321,7 @@ function scanArtifacts() {
         id: nodeId,
         type: 'registry',
         path: normalizePath(path.relative(PROJECT_ROOT, filePath)),
-        filePath
+        filePath,
       });
     }
   }
@@ -401,7 +409,9 @@ function detectEdges(artifacts) {
     if (artifact.type === 'catalog') {
       // Look for artifact references in markdown
       // Pattern: skill:name, agent:name, etc.
-      const references = content.matchAll(/\b(skill|agent|hook|workflow|template|schema|rule):([a-z0-9-]+)\b/gi);
+      const references = content.matchAll(
+        /\b(skill|agent|hook|workflow|template|schema|rule):([a-z0-9-]+)\b/gi
+      );
       for (const match of references) {
         const refId = `${match[1].toLowerCase()}:${match[2].toLowerCase()}`;
         if (artifactMap.has(refId)) {
@@ -417,7 +427,7 @@ function detectEdges(artifacts) {
         { pattern: /\.claude\/skills\//g, prefix: 'skill' },
         { pattern: /\.claude\/agents\//g, prefix: 'agent' },
         { pattern: /\.claude\/hooks\//g, prefix: 'hook' },
-        { pattern: /\.claude\/workflows\//g, prefix: 'workflow' }
+        { pattern: /\.claude\/workflows\//g, prefix: 'workflow' },
       ];
 
       for (const { pattern, prefix } of pathPatterns) {
@@ -426,7 +436,12 @@ function detectEdges(artifacts) {
           // This is a weak detection - best effort
           for (const target of artifacts) {
             if (target.type === prefix) {
-              edges.push({ from: target.id, to: artifact.id, type: 'enforced-by', status: 'active' });
+              edges.push({
+                from: target.id,
+                to: artifact.id,
+                type: 'enforced-by',
+                status: 'active',
+              });
             }
           }
           break; // Only add once per hook
@@ -530,7 +545,7 @@ function main() {
     graph.addNode(artifact.id, {
       type: artifact.type,
       path: artifact.path,
-      integrationStatus: 'created'
+      integrationStatus: 'created',
     });
   }
 

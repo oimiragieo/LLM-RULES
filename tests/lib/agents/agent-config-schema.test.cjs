@@ -14,8 +14,11 @@ const CONFIG_PATH = path.join(PROJECT_ROOT, '.claude', 'lib', 'agents', 'agent-c
 test('agent-config.cjs exports validateConfig method', () => {
   delete require.cache[require.resolve(CONFIG_PATH)];
   const agentConfig = require(CONFIG_PATH);
-  assert.strictEqual(typeof agentConfig.validateConfig, 'function',
-    'Should expose validateConfig method');
+  assert.strictEqual(
+    typeof agentConfig.validateConfig,
+    'function',
+    'Should expose validateConfig method'
+  );
 });
 
 test('validateConfig validates agent-config.json against schema', () => {
@@ -30,7 +33,9 @@ test('validateConfig validates agent-config.json against schema', () => {
 
 test('validateConfig validates conforming data', () => {
   delete require.cache[require.resolve(CONFIG_PATH)];
-  const { validateData } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { validateData } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
   const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'agent-config.schema.json');
 
   const validConfig = {
@@ -50,7 +55,9 @@ test('validateConfig validates conforming data', () => {
 
 test('validateConfig detects missing required fields', () => {
   delete require.cache[require.resolve(CONFIG_PATH)];
-  const { validateData } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { validateData } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
   const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'agent-config.schema.json');
 
   const invalidConfig = {
@@ -65,7 +72,9 @@ test('validateConfig detects missing required fields', () => {
 
 test('validateConfig degrades gracefully with null input', () => {
   delete require.cache[require.resolve(CONFIG_PATH)];
-  const { validateData } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { validateData } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
   const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'agent-config.schema.json');
 
   const result = validateData(null, schemaPath);

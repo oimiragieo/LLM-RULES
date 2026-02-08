@@ -27,7 +27,7 @@ function extractImportPaths(filePath, content) {
     imports.push({
       path: match[1],
       line: content.substring(0, match.index).split('\n').length,
-      type: 'import'
+      type: 'import',
     });
   }
 
@@ -37,7 +37,7 @@ function extractImportPaths(filePath, content) {
     imports.push({
       path: match[1],
       line: content.substring(0, match.index).split('\n').length,
-      type: 'require'
+      type: 'require',
     });
   }
 
@@ -54,7 +54,7 @@ function resolveImportPath(scriptPath, importPath) {
   }
 
   const scriptDir = path.dirname(scriptPath);
-  let resolved = path.resolve(scriptDir, importPath);
+  const resolved = path.resolve(scriptDir, importPath);
 
   // Try common extensions if not specified
   const extensions = ['', '.mjs', '.cjs', '.js', '.json'];
@@ -106,10 +106,7 @@ test('scripts should not have phantom imports', () => {
   const scriptsDir = path.join(PROJECT_ROOT, 'scripts');
   const claudeScriptsDir = path.join(PROJECT_ROOT, '.claude', 'scripts');
 
-  const allScripts = [
-    ...findScripts(scriptsDir),
-    ...findScripts(claudeScriptsDir)
-  ];
+  const allScripts = [...findScripts(scriptsDir), ...findScripts(claudeScriptsDir)];
 
   assert.ok(allScripts.length > 0, 'Should find at least one script file');
 
@@ -136,7 +133,7 @@ test('scripts should not have phantom imports', () => {
           line: imp.line,
           importPath: imp.path,
           resolved: relativeImport,
-          type: imp.type
+          type: imp.type,
         });
       }
     }
@@ -146,9 +143,10 @@ test('scripts should not have phantom imports', () => {
     const errorMessage = [
       `Found ${phantomImports.length} phantom import(s):`,
       '',
-      ...phantomImports.map(p =>
-        `  ${p.script}:${p.line}\n    ${p.type} "${p.importPath}"\n    → ${p.resolved} (NOT FOUND)`
-      )
+      ...phantomImports.map(
+        p =>
+          `  ${p.script}:${p.line}\n    ${p.type} "${p.importPath}"\n    → ${p.resolved} (NOT FOUND)`
+      ),
     ].join('\n');
 
     assert.fail(errorMessage);

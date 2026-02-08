@@ -1,14 +1,17 @@
 <!-- Agent: developer | Task: #44 | Session: 2026-02-06 -->
 
 ---
+
 name: product-management-workflow
 description: Sprint and backlog management using INVEST criteria and stakeholder communication.
 triggers:
-  - sprint planning
-  - backlog refinement
-  - roadmap prioritization
-agents:
-  - general-purpose (with PM context)
+
+- sprint planning
+- backlog refinement
+- roadmap prioritization
+  agents:
+- general-purpose (with PM context)
+
 ---
 
 # Product Management Workflow
@@ -31,14 +34,14 @@ This workflow provides a structured approach to product management activities:
 
 Every user story MUST satisfy INVEST criteria:
 
-| Criterion        | Description                                      | How to Verify |
-| ---------------- | ------------------------------------------------ | ------------- |
-| **Independent**  | Can be implemented without dependencies          | Check for no blocking dependencies in backlog |
-| **Negotiable**   | Details are negotiable with stakeholders         | Story describes outcome, not implementation |
-| **Valuable**     | Delivers value to user or business               | Clear "so that" clause with user benefit |
-| **Estimable**    | Team can estimate size                           | Story has enough detail for sizing |
-| **Small**        | Fits in one sprint (≤1 week)                     | Story completable in 1-5 days |
-| **Testable**     | Has clear acceptance criteria                    | Acceptance criteria are verifiable |
+| Criterion       | Description                              | How to Verify                                 |
+| --------------- | ---------------------------------------- | --------------------------------------------- |
+| **Independent** | Can be implemented without dependencies  | Check for no blocking dependencies in backlog |
+| **Negotiable**  | Details are negotiable with stakeholders | Story describes outcome, not implementation   |
+| **Valuable**    | Delivers value to user or business       | Clear "so that" clause with user benefit      |
+| **Estimable**   | Team can estimate size                   | Story has enough detail for sizing            |
+| **Small**       | Fits in one sprint (≤1 week)             | Story completable in 1-5 days                 |
+| **Testable**    | Has clear acceptance criteria            | Acceptance criteria are verifiable            |
 
 ### User Story Template
 
@@ -235,23 +238,23 @@ Capacity = 5 × 10 × 0.75 = 37.5 person-days
 
 **Fibonacci Scale:**
 
-| Story Points | Complexity  | Time Estimate |
-| ------------ | ----------- | ------------- |
-| 1            | Trivial     | <4 hours      |
-| 2            | Simple      | 4-8 hours     |
-| 3            | Medium      | 1-2 days      |
-| 5            | Complex     | 2-3 days      |
-| 8            | Very Complex| 3-5 days      |
-| 13           | Epic        | >1 week (split)|
+| Story Points | Complexity   | Time Estimate   |
+| ------------ | ------------ | --------------- |
+| 1            | Trivial      | <4 hours        |
+| 2            | Simple       | 4-8 hours       |
+| 3            | Medium       | 1-2 days        |
+| 5            | Complex      | 2-3 days        |
+| 8            | Very Complex | 3-5 days        |
+| 13           | Epic         | >1 week (split) |
 
 #### T-Shirt Sizing (Quick Estimates)
 
-| Size | Story Points | Use Case |
-| ---- | ------------ | -------- |
-| XS   | 1            | Bug fix  |
-| S    | 2-3          | Small feature |
-| M    | 5            | Medium feature |
-| L    | 8            | Large feature |
+| Size | Story Points | Use Case          |
+| ---- | ------------ | ----------------- |
+| XS   | 1            | Bug fix           |
+| S    | 2-3          | Small feature     |
+| M    | 5            | Medium feature    |
+| L    | 8            | Large feature     |
 | XL   | 13+          | Epic (must split) |
 
 ### Backlog Health Metrics
@@ -288,12 +291,12 @@ Low Value, Low Effort     │  Low Value, High Effort
 
 **RICE:** Reach × Impact × Confidence / Effort
 
-| Factor       | Scale                  | Example |
-| ------------ | ---------------------- | ------- |
-| **Reach**    | Users affected per quarter | 10,000 users |
-| **Impact**   | 0.25 (minimal) to 3 (massive) | 2 (high) |
-| **Confidence**| 0% to 100%            | 80%     |
-| **Effort**   | Person-months          | 2 months|
+| Factor         | Scale                         | Example      |
+| -------------- | ----------------------------- | ------------ |
+| **Reach**      | Users affected per quarter    | 10,000 users |
+| **Impact**     | 0.25 (minimal) to 3 (massive) | 2 (high)     |
+| **Confidence** | 0% to 100%                    | 80%          |
+| **Effort**     | Person-months                 | 2 months     |
 
 **Calculation:**
 
@@ -305,12 +308,12 @@ Higher RICE score = higher priority.
 
 ### MoSCoW Method (Qualitative)
 
-| Category        | Description                 | Action          |
-| --------------- | --------------------------- | --------------- |
-| **Must Have**   | Critical, non-negotiable    | Sprint 1        |
-| **Should Have** | Important, not critical     | Sprint 2-3      |
-| **Could Have**  | Nice-to-have                | Sprint 4+       |
-| **Won't Have**  | Out of scope                | Backlog (later) |
+| Category        | Description              | Action          |
+| --------------- | ------------------------ | --------------- |
+| **Must Have**   | Critical, non-negotiable | Sprint 1        |
+| **Should Have** | Important, not critical  | Sprint 2-3      |
+| **Could Have**  | Nice-to-have             | Sprint 4+       |
+| **Won't Have**  | Out of scope             | Backlog (later) |
 
 ## Stakeholder Communication
 

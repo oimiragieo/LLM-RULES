@@ -1,24 +1,27 @@
 <!-- Agent: developer | Task: #44 | Session: 2026-02-06 -->
 
 ---
+
 name: domain-development-workflow
 description: Common TDD workflow for all 22 domain agents with language-specific conventions.
 triggers:
-  - feature implementation
-  - bug fix
-  - domain-specific development
-agents:
-  - python-pro
-  - rust-pro
-  - typescript-pro
-  - golang-pro
-  - java-pro
-  - nodejs-pro
-  - frontend-pro
-  - nextjs-pro
-  - fastapi-pro
-  - graphql-pro
-  - all domain specialists
+
+- feature implementation
+- bug fix
+- domain-specific development
+  agents:
+- python-pro
+- rust-pro
+- typescript-pro
+- golang-pro
+- java-pro
+- nodejs-pro
+- frontend-pro
+- nextjs-pro
+- fastapi-pro
+- graphql-pro
+- all domain specialists
+
 ---
 
 # Domain Development Workflow
@@ -82,54 +85,54 @@ See Language Conventions Table below for test execution commands.
 
 ### Test Commands
 
-| Language/Framework | Test Command                  | Coverage Command                 | Linter                   |
-| ------------------ | ----------------------------- | -------------------------------- | ------------------------ |
-| **Python**         | `pytest`                      | `pytest --cov=. --cov-report=xml` | `ruff check .`           |
-| **TypeScript**     | `pnpm test` or `vitest`       | `pnpm test:coverage`             | `pnpm lint`              |
-| **JavaScript**     | `npm test` or `jest`          | `npm run test:coverage`          | `eslint .`               |
-| **Rust**           | `cargo test`                  | `cargo tarpaulin`                | `cargo clippy`           |
-| **Go**             | `go test ./...`               | `go test -cover ./...`           | `golangci-lint run`      |
-| **Java**           | `mvn test` or `gradle test`   | `mvn jacoco:report`              | `mvn checkstyle:check`   |
-| **FastAPI**        | `pytest -v`                   | `pytest --cov=app`               | `ruff check .`           |
-| **Next.js**        | `pnpm test`                   | `pnpm test:coverage`             | `pnpm lint`              |
-| **GraphQL**        | `pnpm test`                   | `pnpm test:coverage`             | `pnpm lint`              |
-| **React**          | `pnpm test`                   | `pnpm test:coverage`             | `pnpm lint`              |
-| **Node.js**        | `npm test`                    | `npm run test:coverage`          | `eslint .`               |
-| **Android**        | `./gradlew test`              | `./gradlew jacocoTestReport`     | `./gradlew lint`         |
-| **iOS**            | `xcodebuild test`             | `xcrun llvm-cov`                 | `swiftlint`              |
-| **Expo**           | `pnpm test`                   | `pnpm test:coverage`             | `pnpm lint`              |
-| **Tauri**          | `pnpm test`                   | `pnpm test:coverage`             | `pnpm lint`              |
-| **PHP**            | `./vendor/bin/phpunit`        | `phpunit --coverage-html`        | `./vendor/bin/phpcs`     |
-| **Web3/Solidity**  | `hardhat test`                | `hardhat coverage`               | `solhint contracts/**/*` |
-| **SvelteKit**      | `pnpm test`                   | `pnpm test:coverage`             | `pnpm lint`              |
+| Language/Framework | Test Command                | Coverage Command                  | Linter                   |
+| ------------------ | --------------------------- | --------------------------------- | ------------------------ |
+| **Python**         | `pytest`                    | `pytest --cov=. --cov-report=xml` | `ruff check .`           |
+| **TypeScript**     | `pnpm test` or `vitest`     | `pnpm test:coverage`              | `pnpm lint`              |
+| **JavaScript**     | `npm test` or `jest`        | `npm run test:coverage`           | `eslint .`               |
+| **Rust**           | `cargo test`                | `cargo tarpaulin`                 | `cargo clippy`           |
+| **Go**             | `go test ./...`             | `go test -cover ./...`            | `golangci-lint run`      |
+| **Java**           | `mvn test` or `gradle test` | `mvn jacoco:report`               | `mvn checkstyle:check`   |
+| **FastAPI**        | `pytest -v`                 | `pytest --cov=app`                | `ruff check .`           |
+| **Next.js**        | `pnpm test`                 | `pnpm test:coverage`              | `pnpm lint`              |
+| **GraphQL**        | `pnpm test`                 | `pnpm test:coverage`              | `pnpm lint`              |
+| **React**          | `pnpm test`                 | `pnpm test:coverage`              | `pnpm lint`              |
+| **Node.js**        | `npm test`                  | `npm run test:coverage`           | `eslint .`               |
+| **Android**        | `./gradlew test`            | `./gradlew jacocoTestReport`      | `./gradlew lint`         |
+| **iOS**            | `xcodebuild test`           | `xcrun llvm-cov`                  | `swiftlint`              |
+| **Expo**           | `pnpm test`                 | `pnpm test:coverage`              | `pnpm lint`              |
+| **Tauri**          | `pnpm test`                 | `pnpm test:coverage`              | `pnpm lint`              |
+| **PHP**            | `./vendor/bin/phpunit`      | `phpunit --coverage-html`         | `./vendor/bin/phpcs`     |
+| **Web3/Solidity**  | `hardhat test`              | `hardhat coverage`                | `solhint contracts/**/*` |
+| **SvelteKit**      | `pnpm test`                 | `pnpm test:coverage`              | `pnpm lint`              |
 
 ### Package Managers
 
-| Language/Framework | Install Command      | Add Dependency         | Remove Dependency     |
-| ------------------ | -------------------- | ---------------------- | --------------------- |
+| Language/Framework | Install Command                   | Add Dependency      | Remove Dependency     |
+| ------------------ | --------------------------------- | ------------------- | --------------------- |
 | **Python**         | `pip install -r requirements.txt` | `pip install <pkg>` | `pip uninstall <pkg>` |
-| **TypeScript/JS**  | `pnpm install`       | `pnpm add <pkg>`       | `pnpm remove <pkg>`   |
-| **Rust**           | `cargo build`        | `cargo add <pkg>`      | `cargo remove <pkg>`  |
-| **Go**             | `go mod download`    | `go get <pkg>`         | `go mod tidy`         |
-| **Java (Maven)**   | `mvn install`        | Edit `pom.xml`         | Edit `pom.xml`        |
-| **Java (Gradle)**  | `gradle build`       | Edit `build.gradle`    | Edit `build.gradle`   |
-| **PHP**            | `composer install`   | `composer require`     | `composer remove`     |
-| **Web3**           | `pnpm install`       | `pnpm add <pkg>`       | `pnpm remove <pkg>`   |
+| **TypeScript/JS**  | `pnpm install`                    | `pnpm add <pkg>`    | `pnpm remove <pkg>`   |
+| **Rust**           | `cargo build`                     | `cargo add <pkg>`   | `cargo remove <pkg>`  |
+| **Go**             | `go mod download`                 | `go get <pkg>`      | `go mod tidy`         |
+| **Java (Maven)**   | `mvn install`                     | Edit `pom.xml`      | Edit `pom.xml`        |
+| **Java (Gradle)**  | `gradle build`                    | Edit `build.gradle` | Edit `build.gradle`   |
+| **PHP**            | `composer install`                | `composer require`  | `composer remove`     |
+| **Web3**           | `pnpm install`                    | `pnpm add <pkg>`    | `pnpm remove <pkg>`   |
 
 ### Style Guides
 
-| Language           | Official Style Guide                                  |
-| ------------------ | ----------------------------------------------------- |
-| **Python**         | PEP 8                                                 |
-| **TypeScript**     | TypeScript Handbook + project .eslintrc               |
-| **JavaScript**     | Airbnb Style Guide or Standard JS                     |
-| **Rust**           | Rust Style Guide (rustfmt defaults)                   |
-| **Go**             | Effective Go                                          |
-| **Java**           | Google Java Style Guide                               |
-| **Swift**          | Swift Style Guide                                     |
-| **Kotlin**         | Kotlin Coding Conventions                             |
-| **PHP**            | PSR-12                                                |
-| **Solidity**       | Solidity Style Guide                                  |
+| Language       | Official Style Guide                    |
+| -------------- | --------------------------------------- |
+| **Python**     | PEP 8                                   |
+| **TypeScript** | TypeScript Handbook + project .eslintrc |
+| **JavaScript** | Airbnb Style Guide or Standard JS       |
+| **Rust**       | Rust Style Guide (rustfmt defaults)     |
+| **Go**         | Effective Go                            |
+| **Java**       | Google Java Style Guide                 |
+| **Swift**      | Swift Style Guide                       |
+| **Kotlin**     | Kotlin Coding Conventions               |
+| **PHP**        | PSR-12                                  |
+| **Solidity**   | Solidity Style Guide                    |
 
 ## Output Standards (Workspace Conventions)
 
@@ -138,7 +141,7 @@ All domain agents MUST follow workspace-conventions for file placement:
 ### Implementation Files
 
 - **Code**: Language-specific directory structure (src/, lib/, app/, contracts/)
-- **Tests**: Mirror source structure with test suffix (_test.go, .test.ts, test_*.py)
+- **Tests**: Mirror source structure with test suffix (_test.go, .test.ts, test_\*.py)
 - **Documentation**: Inline docstrings/comments following language conventions
 
 ### Reports and Artifacts

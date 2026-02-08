@@ -441,7 +441,7 @@ function checkIntegrationHealth(context, task) {
     integrationScore: score || 0,
     status,
     gaps,
-    category: classifyIntegrationHealth(score)
+    category: classifyIntegrationHealth(score),
   };
 }
 
@@ -458,13 +458,13 @@ function classifyIntegrationHealth(score) {
 
 Map integration health to RBT categories:
 
-| Integration Score | RBT Category | Description |
-|-------------------|--------------|-------------|
-| 90-100% | **Rose** | "Well-integrated artifact with complete routing/catalog/agent assignment" |
-| 80-89% | **Rose/Bud** | "Good integration, minor gaps: [list]" |
-| 50-79% | **Bud** | "Integration gaps found: [list]" |
-| 25-49% | **Thorn** | "Significant integration gaps: [list]" |
-| 0-24% | **Thorn** | "Critical integration gaps (artifact may be invisible): [list]" |
+| Integration Score | RBT Category | Description                                                               |
+| ----------------- | ------------ | ------------------------------------------------------------------------- |
+| 90-100%           | **Rose**     | "Well-integrated artifact with complete routing/catalog/agent assignment" |
+| 80-89%            | **Rose/Bud** | "Good integration, minor gaps: [list]"                                    |
+| 50-79%            | **Bud**      | "Integration gaps found: [list]"                                          |
+| 25-49%            | **Thorn**    | "Significant integration gaps: [list]"                                    |
+| 0-24%             | **Thorn**    | "Critical integration gaps (artifact may be invisible): [list]"           |
 
 ### 5.5.3 Integration Health Output
 
@@ -480,11 +480,13 @@ Include integration assessment in reflection report:
 ### Integration Gaps
 
 {for each gap}
+
 - [ ] {gap.type}: {gap.description}
 
 ### Recommended Actions
 
 {if score < 80%}
+
 1. Invoke artifact-integrator skill for remediation
 2. Add missing catalog entries
 3. Update routing keywords
@@ -717,14 +719,14 @@ module.exports = async ({ tool, params }) => {
 
 ## Output Locations
 
-| Output Type            | Location                                                                   |
-| ---------------------- | -------------------------------------------------------------------------- |
+| Output Type            | Location                                                                 |
+| ---------------------- | ------------------------------------------------------------------------ |
 | **Reflection Reports** | `.claude/context/reports/reflections/reflection-{taskId}-{timestamp}.md` |
-| **Reflection Log**     | `.claude/context/memory/reflection-log.jsonl`                              |
-| **Pattern Updates**    | `.claude/context/memory/learnings.md`                                      |
-| **Decision Records**   | `.claude/context/memory/decisions.md`                                      |
-| **Issue Records**      | `.claude/context/memory/issues.md`                                         |
-| **Metrics History**    | `.claude/context/memory/metrics/`                                          |
+| **Reflection Log**     | `.claude/context/memory/reflection-log.jsonl`                            |
+| **Pattern Updates**    | `.claude/context/memory/learnings.md`                                    |
+| **Decision Records**   | `.claude/context/memory/decisions.md`                                    |
+| **Issue Records**      | `.claude/context/memory/issues.md`                                       |
+| **Metrics History**    | `.claude/context/memory/metrics/`                                        |
 
 ---
 

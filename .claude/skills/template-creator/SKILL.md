@@ -11,9 +11,9 @@ tools: [Read, Write, Edit, Bash, Glob, Grep]
 # Templates should reference tools from the manifest for consistency
 # Single source of truth: .claude/config/tool-manifest.json
 assigned_agents: [planner, architect, developer]
-triggers: ["create template", "new template", "template for"]
+triggers: ['create template', 'new template', 'template for']
 dependencies: [research-synthesis]
-output_paths: [".claude/templates/"]
+output_paths: ['.claude/templates/']
 best_practices:
   - Include all required fields with placeholders
   - Add documentation comments in templates
@@ -207,15 +207,15 @@ Template Request: "Create a template for security audit reports"
 
 Classify the template to determine output path and validation rules:
 
-| Type       | Output Path                      | Key Fields                                                            | Validation Focus                              |
-| ---------- | -------------------------------- | --------------------------------------------------------------------- | --------------------------------------------- |
-| Spawn      | `.claude/templates/spawn/`       | subagent_type, prompt, model, task_id                                 | TaskUpdate protocol, allowed_tools, model     |
-| Agent      | `.claude/templates/agents/`      | name, description, tools, skills, model, enforcement_hooks            | Frontmatter completeness, alignment sections  |
-| Skill      | `.claude/templates/skills/`      | name, version, tools, invoked_by                                      | SKILL.md structure, memory protocol           |
-| Workflow   | `.claude/templates/workflows/`   | phases, agents, dependencies                                          | Phase ordering, agent references              |
-| Report     | `.claude/templates/reports/`     | type, findings, recommendations                                       | Finding severity, evidence requirements       |
-| Code Style | `.claude/templates/code-styles/` | language, conventions, examples                                        | Convention clarity, example quality            |
-| Document   | `.claude/templates/` (root)      | varies by template type                                                | Section completeness                          |
+| Type       | Output Path                      | Key Fields                                                 | Validation Focus                             |
+| ---------- | -------------------------------- | ---------------------------------------------------------- | -------------------------------------------- |
+| Spawn      | `.claude/templates/spawn/`       | subagent_type, prompt, model, task_id                      | TaskUpdate protocol, allowed_tools, model    |
+| Agent      | `.claude/templates/agents/`      | name, description, tools, skills, model, enforcement_hooks | Frontmatter completeness, alignment sections |
+| Skill      | `.claude/templates/skills/`      | name, version, tools, invoked_by                           | SKILL.md structure, memory protocol          |
+| Workflow   | `.claude/templates/workflows/`   | phases, agents, dependencies                               | Phase ordering, agent references             |
+| Report     | `.claude/templates/reports/`     | type, findings, recommendations                            | Finding severity, evidence requirements      |
+| Code Style | `.claude/templates/code-styles/` | language, conventions, examples                            | Convention clarity, example quality          |
+| Document   | `.claude/templates/` (root)      | varies by template type                                    | Section completeness                         |
 
 ### Step 3: Name Validation (SEC-TC-003)
 
@@ -279,8 +279,8 @@ Where `<category>` is one of: `spawn/`, `agents/`, `skills/`, `workflows/`, `rep
 ```markdown
 ---
 # YAML Frontmatter with all required fields
-name: {{NAME}}
-description: {{DESCRIPTION}}
+name: { { NAME } }
+description: { { DESCRIPTION } }
 # ... other fields with documentation comments
 ---
 
@@ -321,14 +321,14 @@ Add inline documentation for each placeholder:
 ```markdown
 ---
 # [REQUIRED] Unique identifier, lowercase-with-hyphens
-name: {{AGENT_NAME}}
+name: { { AGENT_NAME } }
 
 # [REQUIRED] Single line, describes what it does AND when to use it
 # Example: "Reviews mobile app UX against Apple HIG. Use for iOS UX audits."
-description: {{DESCRIPTION}}
+description: { { DESCRIPTION } }
 
 # [OPTIONAL] Default: sonnet. Options: haiku, sonnet, opus
-model: {{MODEL:sonnet}}
+model: { { MODEL:sonnet } }
 ---
 ```
 
@@ -400,13 +400,13 @@ Update the template catalog to ensure the new template is discoverable.
    ```markdown
    ### <template-name>.md
 
-   | Field | Value |
-   |-------|-------|
-   | **Path** | `.claude/templates/<category>/<template-name>.md` |
-   | **Category** | <Category> Templates |
-   | **Status** | active |
-   | **Used By Agents** | <agent-list> |
-   | **Used By Skills** | <skill-list> |
+   | Field              | Value                                             |
+   | ------------------ | ------------------------------------------------- |
+   | **Path**           | `.claude/templates/<category>/<template-name>.md` |
+   | **Category**       | <Category> Templates                              |
+   | **Status**         | active                                            |
+   | **Used By Agents** | <agent-list>                                      |
+   | **Used By Skills** | <skill-list>                                      |
 
    **Purpose:** <Purpose description>
    ```
@@ -494,6 +494,7 @@ Templates exist to be consumed by creators and agents. After creation:
 
    ```markdown
    **Available Templates:**
+
    - See `.claude/templates/<category>/<template-name>.md` for standardized <type> template
    ```
 
@@ -805,13 +806,13 @@ This skill is part of the unified artifact lifecycle. For complete multi-agent o
 
 This skill is part of the **Creator Ecosystem**. Use companion creators when needed:
 
-| Creator              | When to Use                                     | Invocation                             |
-| -------------------- | ----------------------------------------------- | -------------------------------------- |
-| **agent-creator**    | Template needs agent integration                | `Skill({ skill: 'agent-creator' })`    |
-| **skill-creator**    | Template needs skill integration                | `Skill({ skill: 'skill-creator' })`    |
-| **workflow-creator** | Template needs workflow patterns                | `Skill({ skill: 'workflow-creator' })` |
-| **schema-creator**   | Template needs JSON schemas                     | `Skill({ skill: 'schema-creator' })`   |
-| **hook-creator**     | Template needs hooks                            | `Skill({ skill: 'hook-creator' })`     |
+| Creator              | When to Use                      | Invocation                             |
+| -------------------- | -------------------------------- | -------------------------------------- |
+| **agent-creator**    | Template needs agent integration | `Skill({ skill: 'agent-creator' })`    |
+| **skill-creator**    | Template needs skill integration | `Skill({ skill: 'skill-creator' })`    |
+| **workflow-creator** | Template needs workflow patterns | `Skill({ skill: 'workflow-creator' })` |
+| **schema-creator**   | Template needs JSON schemas      | `Skill({ skill: 'schema-creator' })`   |
+| **hook-creator**     | Template needs hooks             | `Skill({ skill: 'hook-creator' })`     |
 
 ### Integration Workflow
 
@@ -876,11 +877,11 @@ Invalid placements will be blocked in production mode.
 
 This skill is typically invoked by:
 
-| Agent     | Role                       | Assignment Reason                                |
-| --------- | -------------------------- | ------------------------------------------------ |
-| planner   | Planning standardization   | Creates templates for new patterns               |
-| architect | Architecture patterns      | Creates templates for architectural artifacts    |
-| developer | Code patterns              | Creates code scaffolding templates               |
+| Agent     | Role                     | Assignment Reason                             |
+| --------- | ------------------------ | --------------------------------------------- |
+| planner   | Planning standardization | Creates templates for new patterns            |
+| architect | Architecture patterns    | Creates templates for architectural artifacts |
+| developer | Code patterns            | Creates code scaffolding templates            |
 
 **To invoke this skill:**
 
@@ -904,13 +905,13 @@ Skill({ skill: 'template-creator' });
 4. **Design**: Structure for security audit reports
 5. **Create**: `.claude/templates/reports/security-audit-report-template.md`
 
-````markdown
+```markdown
 ---
 # [REQUIRED] Report identifier, lowercase-with-hyphens
-name: {{REPORT_NAME}}
+name: { { REPORT_NAME } }
 
 # [REQUIRED] What this report documents
-description: {{REPORT_DESCRIPTION}}
+description: { { REPORT_DESCRIPTION } }
 
 # [REQUIRED] Report type: audit, implementation, research, reflection, plan
 type: audit
@@ -932,9 +933,11 @@ After creating this report:
 ## Findings
 
 ### CRITICAL
+
 {{CRITICAL_FINDINGS}}
 
 ### HIGH
+
 {{HIGH_FINDINGS}}
 
 ## Recommendations
@@ -945,7 +948,7 @@ After creating this report:
 
 **Before starting:** Read `.claude/context/memory/learnings.md`
 **After completing:** Record patterns to learnings.md
-````
+```
 
 6. **Update catalog**: Add to template-catalog.md under Report Templates
 7. **Update README**: Add to reports section in templates README
@@ -967,16 +970,16 @@ After creating this report:
 ```markdown
 ---
 # [REQUIRED] Template identifier
-name: {{TEMPLATE_NAME}}
+name: { { TEMPLATE_NAME } }
 
 # [REQUIRED] Agent type this template spawns
-agent_type: {{AGENT_TYPE}}
+agent_type: { { AGENT_TYPE } }
 
 # [REQUIRED] Recommended model: haiku, sonnet, opus
-model: {{MODEL:sonnet}}
+model: { { MODEL:sonnet } }
 
 # [OPTIONAL] Task complexity level
-complexity: {{COMPLEXITY:medium}}
+complexity: { { COMPLEXITY:medium } }
 ---
 
 # {{AGENT_DISPLAY_NAME}} Spawn Template
@@ -994,10 +997,10 @@ Use this template when spawning {{AGENT_TYPE}} agents.
 ## Spawn Pattern
 
 Task({
-  subagent_type: '{{AGENT_TYPE}}',
-  model: '{{MODEL}}',
-  task_id: '{{TASK_ID}}',
-  prompt: 'You are {{AGENT_IDENTITY}}. ... TaskUpdate protocol ...'
+subagent_type: '{{AGENT_TYPE}}',
+model: '{{MODEL}}',
+task_id: '{{TASK_ID}}',
+prompt: 'You are {{AGENT_IDENTITY}}. ... TaskUpdate protocol ...'
 });
 
 ## Validation

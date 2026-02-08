@@ -26,7 +26,13 @@ const path = require('path');
 // Resolve project root
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const GRAPH_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'artifact-graph.json');
-const QUEUE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
+const QUEUE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'integration-queue.jsonl'
+);
 
 /**
  * Parse command line arguments
@@ -36,7 +42,7 @@ function parseArgs() {
   const options = {
     format: 'text',
     graphPath: GRAPH_PATH,
-    queuePath: QUEUE_PATH
+    queuePath: QUEUE_PATH,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -96,14 +102,19 @@ function loadQueue(queuePath) {
 
   try {
     const content = fs.readFileSync(queuePath, 'utf8');
-    const lines = content.trim().split('\n').filter(line => line.trim());
-    return lines.map(line => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
+    const lines = content
+      .trim()
+      .split('\n')
+      .filter(line => line.trim());
+    return lines
+      .map(line => {
+        try {
+          return JSON.parse(line);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
   } catch (_err) {
     return [];
   }
@@ -150,7 +161,7 @@ function calculateStats(graph) {
         total: 0,
         integrated: 0,
         partial: 0,
-        orphaned: 0
+        orphaned: 0,
       };
     }
     byType[node.type].total++;
@@ -168,11 +179,9 @@ function calculateStats(graph) {
   // Top connected nodes
   const nodeDegrees = allNodes.map(node => ({
     id: node.id,
-    degree: graphInstance.getEdges(node.id, 'both').length
+    degree: graphInstance.getEdges(node.id, 'both').length,
   }));
-  const topConnected = nodeDegrees
-    .sort((a, b) => b.degree - a.degree)
-    .slice(0, 5);
+  const topConnected = nodeDegrees.sort((a, b) => b.degree - a.degree).slice(0, 5);
 
   // Top orphaned nodes
   const topOrphaned = integrationScores
@@ -188,7 +197,7 @@ function calculateStats(graph) {
     integrationHealth: stats.integrationHealth,
     byType,
     topConnected,
-    topOrphaned
+    topOrphaned,
   };
 }
 
@@ -257,26 +266,30 @@ function formatJSON(stats, queue) {
     return entryDate === date && e.processed;
   }).length;
 
-  return JSON.stringify({
-    date,
-    summary: {
-      total: stats.total,
-      fullyIntegrated: stats.fullyIntegrated,
-      partiallyIntegrated: stats.partiallyIntegrated,
-      orphaned: stats.orphaned,
-      integrationHealth: Math.round(stats.integrationHealth * 100)
+  return JSON.stringify(
+    {
+      date,
+      summary: {
+        total: stats.total,
+        fullyIntegrated: stats.fullyIntegrated,
+        partiallyIntegrated: stats.partiallyIntegrated,
+        orphaned: stats.orphaned,
+        integrationHealth: Math.round(stats.integrationHealth * 100),
+      },
+      byType: Object.entries(stats.byType).map(([type, counts]) => ({
+        type,
+        ...counts,
+      })),
+      topConnected: stats.topConnected,
+      topOrphaned: stats.topOrphaned,
+      queue: {
+        pending,
+        processedToday,
+      },
     },
-    byType: Object.entries(stats.byType).map(([type, counts]) => ({
-      type,
-      ...counts
-    })),
-    topConnected: stats.topConnected,
-    topOrphaned: stats.topOrphaned,
-    queue: {
-      pending,
-      processedToday
-    }
-  }, null, 2);
+    null,
+    2
+  );
 }
 
 /**
@@ -397,7 +410,7 @@ module.exports = {
   calculateStats,
   formatText,
   formatJSON,
-  formatMermaid
+  formatMermaid,
 };
 
 // Run as script

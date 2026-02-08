@@ -6,33 +6,33 @@
 
 ## Archived Files (25 total)
 
-| Original Path | Reason | Restoration Command |
-|---------------|--------|---------------------|
-| `architecture-validation.schema.json` | Zero references | `git mv .claude/schemas/_archive/architecture-validation.schema.json .claude/schemas/` |
-| `backlog.schema.json` | Zero references | `git mv .claude/schemas/_archive/backlog.schema.json .claude/schemas/` |
-| `capability-routing.schema.json` | Zero references | `git mv .claude/schemas/_archive/capability-routing.schema.json .claude/schemas/` |
-| `context-definition.schema.json` | Zero references | `git mv .claude/schemas/_archive/context-definition.schema.json .claude/schemas/` |
-| `database_architecture.schema.json` | Zero references | `git mv .claude/schemas/_archive/database_architecture.schema.json .claude/schemas/` |
-| `epic.schema.json` | Zero references | `git mv .claude/schemas/_archive/epic.schema.json .claude/schemas/` |
-| `epics-stories.schema.json` | Zero references | `git mv .claude/schemas/_archive/epics-stories.schema.json .claude/schemas/` |
-| `error-log-schema.json` | Zero references | `git mv .claude/schemas/_archive/error-log-schema.json .claude/schemas/` |
-| `event-schema.json` | Zero references | `git mv .claude/schemas/_archive/event-schema.json .claude/schemas/` |
-| `implementation-readiness.schema.json` | Zero references | `git mv .claude/schemas/_archive/implementation-readiness.schema.json .claude/schemas/` |
-| `mode-definition.schema.json` | Zero references | `git mv .claude/schemas/_archive/mode-definition.schema.json .claude/schemas/` |
-| `package-manager.schema.json` | Zero references | `git mv .claude/schemas/_archive/package-manager.schema.json .claude/schemas/` |
-| `retrospective.schema.json` | Zero references | `git mv .claude/schemas/_archive/retrospective.schema.json .claude/schemas/` |
-| `route_decision.schema.json` | Zero references | `git mv .claude/schemas/_archive/route_decision.schema.json .claude/schemas/` |
-| `skillcatalog-query.schema.json` | Zero references | `git mv .claude/schemas/_archive/skillcatalog-query.schema.json .claude/schemas/` |
-| `skillcatalog-response.schema.json` | Zero references | `git mv .claude/schemas/_archive/skillcatalog-response.schema.json .claude/schemas/` |
-| `skill-manifest.schema.json` | Zero references | `git mv .claude/schemas/_archive/skill-manifest.schema.json .claude/schemas/` |
-| `sprint-plan.schema.json` | Zero references | `git mv .claude/schemas/_archive/sprint-plan.schema.json .claude/schemas/` |
-| `story.schema.json` | Zero references | `git mv .claude/schemas/_archive/story.schema.json .claude/schemas/` |
-| `task-definition.schema.json` | Zero references | `git mv .claude/schemas/_archive/task-definition.schema.json .claude/schemas/` |
-| `ui-audit-report.schema.json` | Zero references | `git mv .claude/schemas/_archive/ui-audit-report.schema.json .claude/schemas/` |
-| `user_story.schema.json` | Zero references | `git mv .claude/schemas/_archive/user_story.schema.json .claude/schemas/` |
-| `workflow-patterns.schema.json` | Zero references | `git mv .claude/schemas/_archive/workflow-patterns.schema.json .claude/schemas/` |
-| `agent-tools.json` | Zero references, non-standard naming | `git mv .claude/schemas/_archive/agent-tools.json .claude/schemas/` |
-| `agent-spawn-params.json` | Zero references, non-standard naming | `git mv .claude/schemas/_archive/agent-spawn-params.json .claude/schemas/` |
+| Original Path                          | Reason                               | Restoration Command                                                                     |
+| -------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------- |
+| `architecture-validation.schema.json`  | Zero references                      | `git mv .claude/schemas/_archive/architecture-validation.schema.json .claude/schemas/`  |
+| `backlog.schema.json`                  | Zero references                      | `git mv .claude/schemas/_archive/backlog.schema.json .claude/schemas/`                  |
+| `capability-routing.schema.json`       | Zero references                      | `git mv .claude/schemas/_archive/capability-routing.schema.json .claude/schemas/`       |
+| `context-definition.schema.json`       | Zero references                      | `git mv .claude/schemas/_archive/context-definition.schema.json .claude/schemas/`       |
+| `database_architecture.schema.json`    | Zero references                      | `git mv .claude/schemas/_archive/database_architecture.schema.json .claude/schemas/`    |
+| `epic.schema.json`                     | Zero references                      | `git mv .claude/schemas/_archive/epic.schema.json .claude/schemas/`                     |
+| `epics-stories.schema.json`            | Zero references                      | `git mv .claude/schemas/_archive/epics-stories.schema.json .claude/schemas/`            |
+| `error-log-schema.json`                | Zero references                      | `git mv .claude/schemas/_archive/error-log-schema.json .claude/schemas/`                |
+| `event-schema.json`                    | Zero references                      | `git mv .claude/schemas/_archive/event-schema.json .claude/schemas/`                    |
+| `implementation-readiness.schema.json` | Zero references                      | `git mv .claude/schemas/_archive/implementation-readiness.schema.json .claude/schemas/` |
+| `mode-definition.schema.json`          | Zero references                      | `git mv .claude/schemas/_archive/mode-definition.schema.json .claude/schemas/`          |
+| `package-manager.schema.json`          | Zero references                      | `git mv .claude/schemas/_archive/package-manager.schema.json .claude/schemas/`          |
+| `retrospective.schema.json`            | Zero references                      | `git mv .claude/schemas/_archive/retrospective.schema.json .claude/schemas/`            |
+| `route_decision.schema.json`           | Zero references                      | `git mv .claude/schemas/_archive/route_decision.schema.json .claude/schemas/`           |
+| `skillcatalog-query.schema.json`       | Zero references                      | `git mv .claude/schemas/_archive/skillcatalog-query.schema.json .claude/schemas/`       |
+| `skillcatalog-response.schema.json`    | Zero references                      | `git mv .claude/schemas/_archive/skillcatalog-response.schema.json .claude/schemas/`    |
+| `skill-manifest.schema.json`           | Zero references                      | `git mv .claude/schemas/_archive/skill-manifest.schema.json .claude/schemas/`           |
+| `sprint-plan.schema.json`              | Zero references                      | `git mv .claude/schemas/_archive/sprint-plan.schema.json .claude/schemas/`              |
+| `story.schema.json`                    | Zero references                      | `git mv .claude/schemas/_archive/story.schema.json .claude/schemas/`                    |
+| `task-definition.schema.json`          | Zero references                      | `git mv .claude/schemas/_archive/task-definition.schema.json .claude/schemas/`          |
+| `ui-audit-report.schema.json`          | Zero references                      | `git mv .claude/schemas/_archive/ui-audit-report.schema.json .claude/schemas/`          |
+| `user_story.schema.json`               | Zero references                      | `git mv .claude/schemas/_archive/user_story.schema.json .claude/schemas/`               |
+| `workflow-patterns.schema.json`        | Zero references                      | `git mv .claude/schemas/_archive/workflow-patterns.schema.json .claude/schemas/`        |
+| `agent-tools.json`                     | Zero references, non-standard naming | `git mv .claude/schemas/_archive/agent-tools.json .claude/schemas/`                     |
+| `agent-spawn-params.json`              | Zero references, non-standard naming | `git mv .claude/schemas/_archive/agent-spawn-params.json .claude/schemas/`              |
 
 ## Restoration Instructions
 

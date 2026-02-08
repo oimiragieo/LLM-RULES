@@ -78,8 +78,7 @@ function isArchiveImport(importPath) {
   const normalized = importPath.replace(/\\/g, '/');
 
   // Check for archive references
-  return normalized.includes('tools/_archive/') ||
-         normalized.includes('tools\\_archive\\');
+  return normalized.includes('tools/_archive/') || normalized.includes('tools\\_archive\\');
 }
 
 test('No active code imports from _archive/', () => {
@@ -89,12 +88,7 @@ test('No active code imports from _archive/', () => {
   }
 
   // Find all active source files (exclude archive, node_modules, tests)
-  const excludeDirs = [
-    'node_modules',
-    '.git',
-    'tools/_archive',
-    'tools\\_archive'
-  ];
+  const excludeDirs = ['node_modules', '.git', 'tools/_archive', 'tools\\_archive'];
 
   const activeFiles = findSourceFiles(PROJECT_ROOT, excludeDirs);
   const violations = [];
@@ -109,7 +103,7 @@ test('No active code imports from _archive/', () => {
     if (archiveImports.length > 0) {
       violations.push({
         file: path.relative(PROJECT_ROOT, file),
-        imports: archiveImports
+        imports: archiveImports,
       });
     }
   }

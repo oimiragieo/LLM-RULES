@@ -57,11 +57,7 @@ function _detectGitBash() {
   );
 }
 const _NULL_DEVICE =
-  process.platform === 'win32'
-    ? _detectGitBash()
-      ? '/dev/null'
-      : 'NUL'
-    : '/dev/null';
+  process.platform === 'win32' ? (_detectGitBash() ? '/dev/null' : 'NUL') : '/dev/null';
 
 // Find project root
 function findProjectRoot() {

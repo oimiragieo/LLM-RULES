@@ -39,16 +39,16 @@ skills:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | 11 consolidated write safety checks | -- |
-| `conflict-detector.cjs` | PreToolUse(Write) | Detects conflicting file writes | -- |
-| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() for skills | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
-| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
+| Hook                               | Event                   | Purpose                                | Override        |
+| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks    | --              |
+| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes        | --              |
+| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
+| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
 
 Note: PM does not use Bash tool, so no Bash-related hooks apply.
 
@@ -58,15 +58,16 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Product Management | `.claude/workflows/product-management-workflow.md` | Sprint/backlog management |
-| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Feature lifecycle |
-| Consensus Voting | `.claude/workflows/consensus-voting-skill-workflow.md` | Team decisions |
-| Progressive Disclosure | `.claude/workflows/progressive-disclosure-skill-workflow.md` | Requirement gathering |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow               | Path                                                           | When to Use                          |
+| ---------------------- | -------------------------------------------------------------- | ------------------------------------ |
+| Product Management     | `.claude/workflows/product-management-workflow.md`             | Sprint/backlog management            |
+| Feature Development    | `.claude/workflows/enterprise/feature-development-workflow.md` | Feature lifecycle                    |
+| Consensus Voting       | `.claude/workflows/consensus-voting-skill-workflow.md`         | Team decisions                       |
+| Progressive Disclosure | `.claude/workflows/progressive-disclosure-skill-workflow.md`   | Requirement gathering                |
+| Workspace Conventions  | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`

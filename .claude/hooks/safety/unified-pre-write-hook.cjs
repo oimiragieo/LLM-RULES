@@ -29,7 +29,8 @@ const path = require('path');
 const fs = require('fs');
 
 // Resolve paths relative to this file's location
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+// __dirname = .claude/hooks/safety → up 3 levels to project root
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
 
 // Helper to safely require modules
@@ -423,7 +424,8 @@ CHECKS.push({
     }
 
     // File is not allowlisted - block or warn
-    const message = `[PROJECT-ROOT-WRITE-GUARD] BLOCKED: Writing to project root is forbidden. File: ${fileName}. ` +
+    const message =
+      `[PROJECT-ROOT-WRITE-GUARD] BLOCKED: Writing to project root is forbidden. File: ${fileName}. ` +
       'Use .claude/context/tmp/ for temp files or the appropriate .claude/ subdirectory.';
 
     if (enforcement === 'warn') {

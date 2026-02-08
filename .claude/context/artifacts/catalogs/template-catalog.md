@@ -14,13 +14,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### universal-agent-spawn.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/spawn/universal-agent-spawn.md` |
-| **Category** | Spawn Templates |
-| **Status** | active |
+| Field              | Value                                                                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Path**           | `.claude/templates/spawn/universal-agent-spawn.md`                                                                                         |
+| **Category**       | Spawn Templates                                                                                                                            |
+| **Status**         | active                                                                                                                                     |
 | **Used By Agents** | router (primary spawner), developer, qa, planner, architect, code-reviewer, security-architect, technical-writer (all agents as consumers) |
-| **Used By Skills** | N/A (consumed by agents, not skills) |
+| **Used By Skills** | N/A (consumed by agents, not skills)                                                                                                       |
 
 **Purpose:** Standard agent spawning template for all non-orchestrator agents (developer, qa, planner, etc.) with TaskUpdate warning box and single-purpose task handling.
 
@@ -28,13 +28,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### orchestrator-spawn.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/spawn/orchestrator-spawn.md` |
-| **Category** | Spawn Templates |
-| **Status** | active |
+| Field              | Value                                                                            |
+| ------------------ | -------------------------------------------------------------------------------- |
+| **Path**           | `.claude/templates/spawn/orchestrator-spawn.md`                                  |
+| **Category**       | Spawn Templates                                                                  |
+| **Status**         | active                                                                           |
 | **Used By Agents** | router (spawner), master-orchestrator, evolution-orchestrator, swarm-coordinator |
-| **Used By Skills** | N/A |
+| **Used By Skills** | N/A                                                                              |
 
 **Purpose:** Orchestrator-specific spawn template requiring Task tool access and opus model for multi-agent coordination.
 
@@ -42,13 +42,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### subordinate-once.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/spawn/subordinate-once.md` |
-| **Category** | Spawn Templates |
-| **Status** | active |
-| **Used By Agents** | router (spawner for one-shot tasks) |
-| **Used By Skills** | N/A |
+| Field              | Value                                         |
+| ------------------ | --------------------------------------------- |
+| **Path**           | `.claude/templates/spawn/subordinate-once.md` |
+| **Category**       | Spawn Templates                               |
+| **Status**         | active                                        |
+| **Used By Agents** | router (spawner for one-shot tasks)           |
+| **Used By Skills** | N/A                                           |
 
 **Purpose:** One-shot subordinate agent template for responding once without delegation capability.
 
@@ -56,13 +56,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### agent-identity-integration.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/spawn/agent-identity-integration.md` |
-| **Category** | Spawn Templates |
-| **Status** | active |
+| Field              | Value                                                             |
+| ------------------ | ----------------------------------------------------------------- |
+| **Path**           | `.claude/templates/spawn/agent-identity-integration.md`           |
+| **Category**       | Spawn Templates                                                   |
+| **Status**         | active                                                            |
 | **Used By Agents** | router (spawner for agents with identity/personality frontmatter) |
-| **Used By Skills** | N/A |
+| **Used By Skills** | N/A                                                               |
 
 **Purpose:** Spawn template for agents with identity fields (personality, tone, specialized behavior).
 
@@ -72,13 +72,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### agent-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/agents/agent-template.md` |
-| **Category** | Creator Templates |
-| **Status** | active |
-| **Used By Agents** | N/A (consumed by skill) |
-| **Used By Skills** | agent-creator |
+| Field              | Value                                        |
+| ------------------ | -------------------------------------------- |
+| **Path**           | `.claude/templates/agents/agent-template.md` |
+| **Category**       | Creator Templates                            |
+| **Status**         | active                                       |
+| **Used By Agents** | N/A (consumed by skill)                      |
+| **Used By Skills** | agent-creator                                |
 
 **Purpose:** Boilerplate template for creating new agent definition files with frontmatter schema and structure.
 
@@ -86,13 +86,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### agent-context-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/agents/agent-context-template.md` |
-| **Category** | Creator Templates |
-| **Status** | active |
-| **Used By Agents** | N/A (consumed by skill) |
-| **Used By Skills** | agent-creator |
+| Field              | Value                                                |
+| ------------------ | ---------------------------------------------------- |
+| **Path**           | `.claude/templates/agents/agent-context-template.md` |
+| **Category**       | Creator Templates                                    |
+| **Status**         | active                                               |
+| **Used By Agents** | N/A (consumed by skill)                              |
+| **Used By Skills** | agent-creator                                        |
 
 **Purpose:** Context section template for agent files with memory protocol, related workflows, and integration points.
 
@@ -100,13 +100,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### skill-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/skills/skill-template.md` |
-| **Category** | Creator Templates |
-| **Status** | active |
-| **Used By Agents** | N/A (consumed by skill) |
-| **Used By Skills** | skill-creator |
+| Field              | Value                                        |
+| ------------------ | -------------------------------------------- |
+| **Path**           | `.claude/templates/skills/skill-template.md` |
+| **Category**       | Creator Templates                            |
+| **Status**         | active                                       |
+| **Used By Agents** | N/A (consumed by skill)                      |
+| **Used By Skills** | skill-creator                                |
 
 **Purpose:** Boilerplate template for creating new skill files with frontmatter, post-creation checklist, and agent assignment requirements.
 
@@ -114,13 +114,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### workflow-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/workflows/workflow-template.md` |
-| **Category** | Creator Templates |
-| **Status** | active |
-| **Used By Agents** | N/A (consumed by skill) |
-| **Used By Skills** | workflow-creator |
+| Field              | Value                                              |
+| ------------------ | -------------------------------------------------- |
+| **Path**           | `.claude/templates/workflows/workflow-template.md` |
+| **Category**       | Creator Templates                                  |
+| **Status**         | active                                             |
+| **Used By Agents** | N/A (consumed by skill)                            |
+| **Used By Skills** | workflow-creator                                   |
 
 **Purpose:** Boilerplate template for creating new workflow definition files with phase structure and orchestration patterns.
 
@@ -130,13 +130,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### adr-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/adr-template.md` |
-| **Category** | Document Templates |
-| **Status** | active |
-| **Used By Agents** | architect, planner |
-| **Used By Skills** | architecture-decision-record |
+| Field              | Value                               |
+| ------------------ | ----------------------------------- |
+| **Path**           | `.claude/templates/adr-template.md` |
+| **Category**       | Document Templates                  |
+| **Status**         | active                              |
+| **Used By Agents** | architect, planner                  |
+| **Used By Skills** | architecture-decision-record        |
 
 **Purpose:** Architecture Decision Record (ADR) template following ADR-000 format with context, decision, consequences, and status tracking.
 
@@ -144,13 +144,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### plan-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/plan-template.md` |
-| **Category** | Document Templates |
-| **Status** | active |
-| **Used By Agents** | planner |
-| **Used By Skills** | task-breakdown |
+| Field              | Value                                |
+| ------------------ | ------------------------------------ |
+| **Path**           | `.claude/templates/plan-template.md` |
+| **Category**       | Document Templates                   |
+| **Status**         | active                               |
+| **Used By Agents** | planner                              |
+| **Used By Skills** | task-breakdown                       |
 
 **Purpose:** Implementation plan template with task breakdown, dependencies, and acceptance criteria.
 
@@ -158,13 +158,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### specification-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/specification-template.md` |
-| **Category** | Document Templates |
-| **Status** | active |
-| **Used By Agents** | planner, architect |
-| **Used By Skills** | spec-gathering |
+| Field              | Value                                         |
+| ------------------ | --------------------------------------------- |
+| **Path**           | `.claude/templates/specification-template.md` |
+| **Category**       | Document Templates                            |
+| **Status**         | active                                        |
+| **Used By Agents** | planner, architect                            |
+| **Used By Skills** | spec-gathering                                |
 
 **Purpose:** Feature/system specification template with requirements, user stories, technical design, and success criteria.
 
@@ -172,13 +172,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### spec-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/spec-template.md` |
-| **Category** | Document Templates |
-| **Status** | active |
-| **Used By Agents** | planner |
-| **Used By Skills** | spec-gathering |
+| Field              | Value                                |
+| ------------------ | ------------------------------------ |
+| **Path**           | `.claude/templates/spec-template.md` |
+| **Category**       | Document Templates                   |
+| **Status**         | active                               |
+| **Used By Agents** | planner                              |
+| **Used By Skills** | spec-gathering                       |
 
 **Purpose:** Lightweight specification template (alternative to specification-template.md) for rapid spec drafting.
 
@@ -186,13 +186,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### tasks-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/tasks-template.md` |
-| **Category** | Document Templates |
-| **Status** | active |
-| **Used By Agents** | planner, developer |
-| **Used By Skills** | task-breakdown |
+| Field              | Value                                 |
+| ------------------ | ------------------------------------- |
+| **Path**           | `.claude/templates/tasks-template.md` |
+| **Category**       | Document Templates                    |
+| **Status**         | active                                |
+| **Used By Agents** | planner, developer                    |
+| **Used By Skills** | task-breakdown                        |
 
 **Purpose:** Task list template with status tracking, blockers, and completion criteria.
 
@@ -200,13 +200,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### architecture.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/architecture.md` |
-| **Category** | Document Templates |
-| **Status** | active |
-| **Used By Agents** | architect, planner |
-| **Used By Skills** | c4-model, system-design |
+| Field              | Value                               |
+| ------------------ | ----------------------------------- |
+| **Path**           | `.claude/templates/architecture.md` |
+| **Category**       | Document Templates                  |
+| **Status**         | active                              |
+| **Used By Agents** | architect, planner                  |
+| **Used By Skills** | c4-model, system-design             |
 
 **Purpose:** System architecture documentation template with C4 diagrams, component descriptions, and integration points.
 
@@ -214,13 +214,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### security-design-checklist.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/security-design-checklist.md` |
-| **Category** | Document Templates |
-| **Status** | active |
-| **Used By Agents** | security-architect |
-| **Used By Skills** | security-architect |
+| Field              | Value                                            |
+| ------------------ | ------------------------------------------------ |
+| **Path**           | `.claude/templates/security-design-checklist.md` |
+| **Category**       | Document Templates                               |
+| **Status**         | active                                           |
+| **Used By Agents** | security-architect                               |
+| **Used By Skills** | security-architect                               |
 
 **Purpose:** STRIDE threat model checklist for security design validation (SEC-TMPL-006 mandated retention at root level).
 
@@ -228,13 +228,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### test-plan.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/test-plan.md` |
-| **Category** | Document Templates |
-| **Status** | active |
-| **Used By Agents** | qa, developer |
-| **Used By Skills** | tdd, qa-workflow |
+| Field              | Value                            |
+| ------------------ | -------------------------------- |
+| **Path**           | `.claude/templates/test-plan.md` |
+| **Category**       | Document Templates               |
+| **Status**         | active                           |
+| **Used By Agents** | qa, developer                    |
+| **Used By Skills** | tdd, qa-workflow                 |
 
 **Purpose:** Test plan template with test cases, coverage targets, and verification strategies.
 
@@ -242,13 +242,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### error-recovery-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/error-recovery-template.md` |
-| **Category** | Document Templates |
-| **Status** | active |
-| **Used By Agents** | developer, hook-creator |
-| **Used By Skills** | debugging, hook-creator |
+| Field              | Value                                          |
+| ------------------ | ---------------------------------------------- |
+| **Path**           | `.claude/templates/error-recovery-template.md` |
+| **Category**       | Document Templates                             |
+| **Status**         | active                                         |
+| **Used By Agents** | developer, hook-creator                        |
+| **Used By Skills** | debugging, hook-creator                        |
 
 **Purpose:** Error recovery pattern template for hook implementations and graceful failure handling (SEC-TMPL-006 mandated retention).
 
@@ -258,13 +258,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### audit-report-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/reports/audit-report-template.md` |
-| **Category** | Report Templates |
-| **Status** | active |
-| **Used By Agents** | qa, security-architect |
-| **Used By Skills** | qa-workflow, security-architect |
+| Field              | Value                                                |
+| ------------------ | ---------------------------------------------------- |
+| **Path**           | `.claude/templates/reports/audit-report-template.md` |
+| **Category**       | Report Templates                                     |
+| **Status**         | active                                               |
+| **Used By Agents** | qa, security-architect                               |
+| **Used By Skills** | qa-workflow, security-architect                      |
 
 **Purpose:** Audit report template for security/quality audits with findings classification and remediation tracking.
 
@@ -272,13 +272,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### implementation-report-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/reports/implementation-report-template.md` |
-| **Category** | Report Templates |
-| **Status** | active |
-| **Used By Agents** | developer |
-| **Used By Skills** | tdd, task-management-protocol |
+| Field              | Value                                                         |
+| ------------------ | ------------------------------------------------------------- |
+| **Path**           | `.claude/templates/reports/implementation-report-template.md` |
+| **Category**       | Report Templates                                              |
+| **Status**         | active                                                        |
+| **Used By Agents** | developer                                                     |
+| **Used By Skills** | tdd, task-management-protocol                                 |
 
 **Purpose:** Implementation report template documenting completed work, files changed, tests added, and next steps.
 
@@ -286,13 +286,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### plan-template.md (reports)
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/reports/plan-template.md` |
-| **Category** | Report Templates |
-| **Status** | active |
-| **Used By Agents** | planner |
-| **Used By Skills** | task-breakdown |
+| Field              | Value                                        |
+| ------------------ | -------------------------------------------- |
+| **Path**           | `.claude/templates/reports/plan-template.md` |
+| **Category**       | Report Templates                             |
+| **Status**         | active                                       |
+| **Used By Agents** | planner                                      |
+| **Used By Skills** | task-breakdown                               |
 
 **Purpose:** Planning phase report template with task breakdown, estimates, dependencies, and risk assessment.
 
@@ -300,13 +300,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### reflection-report-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/reports/reflection-report-template.md` |
-| **Category** | Report Templates |
-| **Status** | active |
-| **Used By Agents** | reflection-agent |
-| **Used By Skills** | reflection |
+| Field              | Value                                                     |
+| ------------------ | --------------------------------------------------------- |
+| **Path**           | `.claude/templates/reports/reflection-report-template.md` |
+| **Category**       | Report Templates                                          |
+| **Status**         | active                                                    |
+| **Used By Agents** | reflection-agent                                          |
+| **Used By Skills** | reflection                                                |
 
 **Purpose:** Reflection report template for analyzing work quality, process adherence, and improvement opportunities.
 
@@ -314,13 +314,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### research-report-template.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/reports/research-report-template.md` |
-| **Category** | Report Templates |
-| **Status** | active |
-| **Used By Agents** | researcher, evolution-orchestrator |
-| **Used By Skills** | research-synthesis |
+| Field              | Value                                                   |
+| ------------------ | ------------------------------------------------------- |
+| **Path**           | `.claude/templates/reports/research-report-template.md` |
+| **Category**       | Report Templates                                        |
+| **Status**         | active                                                  |
+| **Used By Agents** | researcher, evolution-orchestrator                      |
+| **Used By Skills** | research-synthesis                                      |
 
 **Purpose:** Research report template with sources, findings, recommendations, and confidence levels (required minimum 3 sources per EVOLVE workflow).
 
@@ -330,13 +330,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### typescript.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/code-styles/typescript.md` |
-| **Category** | Code Style Templates |
-| **Status** | active |
-| **Used By Agents** | developer, code-reviewer |
-| **Used By Skills** | tdd, code-quality-expert |
+| Field              | Value                                         |
+| ------------------ | --------------------------------------------- |
+| **Path**           | `.claude/templates/code-styles/typescript.md` |
+| **Category**       | Code Style Templates                          |
+| **Status**         | active                                        |
+| **Used By Agents** | developer, code-reviewer                      |
+| **Used By Skills** | tdd, code-quality-expert                      |
 
 **Purpose:** TypeScript coding style guide with ESLint rules, naming conventions, and best practices.
 
@@ -344,13 +344,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### javascript.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/code-styles/javascript.md` |
-| **Category** | Code Style Templates |
-| **Status** | active |
-| **Used By Agents** | developer, code-reviewer |
-| **Used By Skills** | tdd, code-quality-expert |
+| Field              | Value                                         |
+| ------------------ | --------------------------------------------- |
+| **Path**           | `.claude/templates/code-styles/javascript.md` |
+| **Category**       | Code Style Templates                          |
+| **Status**         | active                                        |
+| **Used By Agents** | developer, code-reviewer                      |
+| **Used By Skills** | tdd, code-quality-expert                      |
 
 **Purpose:** JavaScript (ES6+) coding style guide with ESLint rules, module patterns, and async best practices.
 
@@ -358,12 +358,12 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### python.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/code-styles/python.md` |
-| **Category** | Code Style Templates |
-| **Status** | active |
-| **Used By Agents** | developer, code-reviewer |
+| Field              | Value                                           |
+| ------------------ | ----------------------------------------------- |
+| **Path**           | `.claude/templates/code-styles/python.md`       |
+| **Category**       | Code Style Templates                            |
+| **Status**         | active                                          |
+| **Used By Agents** | developer, code-reviewer                        |
 | **Used By Skills** | tdd, code-quality-expert, python-backend-expert |
 
 **Purpose:** Python coding style guide following PEP 8, type hints, and pytest conventions.
@@ -374,12 +374,12 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### continuation.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/continuation.md` |
-| **Category** | Utility Templates |
-| **Status** | active |
-| **Used By Agents** | All agents |
+| Field              | Value                               |
+| ------------------ | ----------------------------------- |
+| **Path**           | `.claude/templates/continuation.md` |
+| **Category**       | Utility Templates                   |
+| **Status**         | active                              |
+| **Used By Agents** | All agents                          |
 | **Used By Skills** | session-handoff, context-compressor |
 
 **Purpose:** Session continuation template for resuming work after context limits or interruptions with state preservation.
@@ -388,13 +388,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### agent-skill-invocation-section.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/agent-skill-invocation-section.md` |
-| **Category** | Utility Templates |
-| **Status** | active |
-| **Used By Agents** | router (used by spawn-prompt-assembler) |
-| **Used By Skills** | N/A |
+| Field              | Value                                                 |
+| ------------------ | ----------------------------------------------------- |
+| **Path**           | `.claude/templates/agent-skill-invocation-section.md` |
+| **Category**       | Utility Templates                                     |
+| **Status**         | active                                                |
+| **Used By Agents** | router (used by spawn-prompt-assembler)               |
+| **Used By Skills** | N/A                                                   |
 
 **Purpose:** Reusable skill invocation instructions section for agent spawn prompts ensuring Skill() tool usage protocol.
 
@@ -402,13 +402,13 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ### README.md
 
-| Field | Value |
-|-------|-------|
-| **Path** | `.claude/templates/README.md` |
-| **Category** | Utility Templates |
-| **Status** | active |
-| **Used By Agents** | N/A (documentation) |
-| **Used By Skills** | N/A |
+| Field              | Value                         |
+| ------------------ | ----------------------------- |
+| **Path**           | `.claude/templates/README.md` |
+| **Category**       | Utility Templates             |
+| **Status**         | active                        |
+| **Used By Agents** | N/A (documentation)           |
+| **Used By Skills** | N/A                           |
 
 **Purpose:** Template system documentation and usage guide for template consumers and creators.
 
@@ -423,6 +423,7 @@ This catalog documents all active templates in the agent-studio framework with t
 **Location:** `.claude/templates/_archive/`
 
 **Categories:**
+
 - Spawn templates (2): bash-safe-background.md, router-task-template.md
 - Planning templates (3): findings.md, progress.md, task_plan.md
 - Example templates (2): example-adr-050.md, example-specification.md
@@ -438,6 +439,7 @@ This catalog documents all active templates in the agent-studio framework with t
 **To create new templates:**
 
 1. Invoke the `template-creator` skill via:
+
    ```
    Skill({ skill: "template-creator" })
    ```
@@ -470,15 +472,15 @@ Direct writes to `.claude/templates/` bypass creator workflow and create "invisi
 
 ## Template Categories Summary
 
-| Category | Count | Primary Agents | Primary Skills |
-|----------|-------|----------------|----------------|
-| **Spawn** | 4 | router | N/A |
-| **Creator** | 4 | N/A | agent-creator, skill-creator, workflow-creator |
-| **Document** | 9 | planner, architect, qa | task-breakdown, spec-gathering, architecture-decision-record |
-| **Report** | 5 | developer, qa, researcher | tdd, qa-workflow, research-synthesis |
-| **Code Style** | 3 | developer, code-reviewer | tdd, code-quality-expert |
-| **Utility** | 3 | All agents | session-handoff, context-compressor |
-| **TOTAL** | **28** | — | — |
+| Category       | Count  | Primary Agents            | Primary Skills                                               |
+| -------------- | ------ | ------------------------- | ------------------------------------------------------------ |
+| **Spawn**      | 4      | router                    | N/A                                                          |
+| **Creator**    | 4      | N/A                       | agent-creator, skill-creator, workflow-creator               |
+| **Document**   | 9      | planner, architect, qa    | task-breakdown, spec-gathering, architecture-decision-record |
+| **Report**     | 5      | developer, qa, researcher | tdd, qa-workflow, research-synthesis                         |
+| **Code Style** | 3      | developer, code-reviewer  | tdd, code-quality-expert                                     |
+| **Utility**    | 3      | All agents                | session-handoff, context-compressor                          |
+| **TOTAL**      | **28** | —                         | —                                                            |
 
 ---
 

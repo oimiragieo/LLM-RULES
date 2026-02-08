@@ -4,26 +4,29 @@ Verify all created artifacts are integrated with the framework. Artifacts create
 
 ## Must-Have Integrations (Blocking)
 
-| Artifact Type | Required Integration                        |
-| ------------- | ------------------------------------------- |
-| Skill         | Catalog entry + agent assignment            |
-| Agent         | Registry + routing keywords + CLAUDE.md     |
-| Hook          | settings.json + @ENFORCEMENT_HOOKS.md       |
-| Workflow      | Registry + @WORKFLOW_AGENT_MAP.md           |
-| Template      | Catalog entry in template-catalog.md        |
-| Schema        | Catalog entry in schema-catalog.md          |
+| Artifact Type | Required Integration                    |
+| ------------- | --------------------------------------- |
+| Skill         | Catalog entry + agent assignment        |
+| Agent         | Registry + routing keywords + CLAUDE.md |
+| Hook          | settings.json + @ENFORCEMENT_HOOKS.md   |
+| Workflow      | Registry + @WORKFLOW_AGENT_MAP.md       |
+| Template      | Catalog entry in template-catalog.md    |
+| Schema        | Catalog entry in schema-catalog.md      |
 
 ## Integration Tiers
 
 **Must-Have (blocking):**
+
 - Catalog/registry entry
 - At least one consumer (agent/workflow/command)
 
 **Should-Have (warning):**
+
 - Documentation reference (@files)
 - Enforcement mechanism (if applicable)
 
 **Nice-to-Have (informational):**
+
 - Test coverage
 - Memory updates (learnings/decisions)
 - Related templates/examples

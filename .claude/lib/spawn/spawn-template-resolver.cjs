@@ -24,7 +24,9 @@ const ORCHESTRATOR_IDS = new Set([
  * @returns {{templateName: string, templatePath: string, reason: string}} Resolved template info
  */
 function resolveSpawnTemplate(agentType, options = {}) {
-  const normalized = String(agentType || '').toLowerCase().trim();
+  const normalized = String(agentType || '')
+    .toLowerCase()
+    .trim();
 
   // Priority 1: Explicit override
   if (options.templateName) {

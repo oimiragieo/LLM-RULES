@@ -10,7 +10,7 @@
 
 const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert');
-const { mkdirSync, rmSync, existsSync, writeFileSync } = require('fs');
+const { mkdirSync, rmSync, existsSync } = require('fs');
 const { resolve, join } = require('path');
 const { execSync } = require('child_process');
 
@@ -58,7 +58,9 @@ describe('install.mjs security (MEDIUM-001)', () => {
       // Expected to fail
       const output = error.stderr || error.stdout || error.message;
       assert.ok(
-        output.includes('path traversal') || output.includes('cannot contain') || output.includes('Error'),
+        output.includes('path traversal') ||
+          output.includes('cannot contain') ||
+          output.includes('Error'),
         `Expected error about path traversal, got: ${output}`
       );
     }

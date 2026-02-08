@@ -17,8 +17,11 @@ test('validator.cjs exports validateStateWithSchema function', () => {
   // Clear require cache to get fresh module
   delete require.cache[require.resolve(VALIDATOR_PATH)];
   const validator = require(VALIDATOR_PATH);
-  assert.strictEqual(typeof validator.validateStateWithSchema, 'function',
-    'Should export validateStateWithSchema');
+  assert.strictEqual(
+    typeof validator.validateStateWithSchema,
+    'function',
+    'Should export validateStateWithSchema'
+  );
 });
 
 test('validateStateWithSchema validates valid evolution state data', () => {
@@ -87,14 +90,17 @@ test('validateState still works as before (backward compat)', () => {
   // Create a temp state file with valid data
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'validator-test-'));
   const stateFile = path.join(tmpDir, 'evolution-state.json');
-  fs.writeFileSync(stateFile, JSON.stringify({
-    version: '1.0.0',
-    state: 'idle',
-    currentEvolution: null,
-    evolutions: [],
-    patterns: [],
-    suggestions: [],
-  }));
+  fs.writeFileSync(
+    stateFile,
+    JSON.stringify({
+      version: '1.0.0',
+      state: 'idle',
+      currentEvolution: null,
+      evolutions: [],
+      patterns: [],
+      suggestions: [],
+    })
+  );
 
   const result = validateState(stateFile);
   assert.strictEqual(result.valid, true, 'Original validateState should still work');

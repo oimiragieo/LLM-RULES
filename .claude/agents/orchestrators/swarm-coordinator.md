@@ -25,13 +25,13 @@ skills:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `routing-guard.cjs` | PreToolUse(Task) | Enforces planner-first, security review | `PLANNER_FIRST_ENFORCEMENT` |
-| `spawn-prompt-assembler.cjs` | PreToolUse(Task) | Enriches spawn prompts | -- |
-| `config-model-validator.cjs` | PreToolUse(Task) | Validates model matches config.yaml | `CONFIG_MODEL_VALIDATOR` |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| Hook                               | Event            | Purpose                                 | Override                    |
+| ---------------------------------- | ---------------- | --------------------------------------- | --------------------------- |
+| `routing-guard.cjs`                | PreToolUse(Task) | Enforces planner-first, security review | `PLANNER_FIRST_ENFORCEMENT` |
+| `spawn-prompt-assembler.cjs`       | PreToolUse(Task) | Enriches spawn prompts                  | --                          |
+| `config-model-validator.cjs`       | PreToolUse(Task) | Validates model matches config.yaml     | `CONFIG_MODEL_VALIDATOR`    |
+| `tool-scope-validator.cjs`         | PreToolUse(All)  | Validates tool is in allowed set        | --                          |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)  | Monitors execution limits               | --                          |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -39,13 +39,14 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Swarm Coordination | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md` | Multi-agent swarms |
-| Consensus Voting | `.claude/workflows/consensus-voting-skill-workflow.md` | Byzantine consensus |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow              | Path                                                                | When to Use                          |
+| --------------------- | ------------------------------------------------------------------- | ------------------------------------ |
+| Swarm Coordination    | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md` | Multi-agent swarms                   |
+| Consensus Voting      | `.claude/workflows/consensus-voting-skill-workflow.md`              | Byzantine consensus                  |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`                            | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`

@@ -11,6 +11,7 @@
 **ADR Reference:** See ADR-098 (Lib System Overhaul - Pipeline #15)
 
 **Modules Archived:**
+
 - system-registration-handler.cjs (641 lines)
 - conductor-gap-analyzer.cjs (402 lines)
 - feature-compatibility.cjs (~300 lines)

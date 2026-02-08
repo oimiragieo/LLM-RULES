@@ -24,10 +24,7 @@ const path = require('path');
 /**
  * Default state file path
  */
-const DEFAULT_STATE_FILE = path.join(
-  __dirname,
-  '../../context/runtime/workflow-state.json'
-);
+const DEFAULT_STATE_FILE = path.join(__dirname, '../../context/runtime/workflow-state.json');
 
 /**
  * All possible phases
@@ -229,7 +226,13 @@ function recordAgent(workflowId, phase, agentType, taskId, stateFilePath = DEFAU
  * @param {object} metadata - Agent completion metadata
  * @param {string} stateFilePath
  */
-function markAgentComplete(workflowId, phase, agentType, metadata = {}, stateFilePath = DEFAULT_STATE_FILE) {
+function markAgentComplete(
+  workflowId,
+  phase,
+  agentType,
+  metadata = {},
+  stateFilePath = DEFAULT_STATE_FILE
+) {
   const state = readState(stateFilePath);
 
   if (!state || state.workflowId !== workflowId) {

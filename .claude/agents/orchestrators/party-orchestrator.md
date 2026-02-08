@@ -24,6 +24,7 @@ skills:
 > This orchestrator depends on the `party-mode` subsystem, which was archived to `.claude/lib/_archive/party-mode/` due to zero active consumers. Party Mode functionality is currently NOT AVAILABLE.
 >
 > **To restore Party Mode:**
+>
 > 1. `git mv .claude/lib/_archive/party-mode .claude/lib/party-mode`
 > 2. Verify all imports resolve correctly
 > 3. Run tests to ensure functionality
@@ -34,13 +35,13 @@ skills:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `routing-guard.cjs` | PreToolUse(Task) | Enforces planner-first, security review | `PLANNER_FIRST_ENFORCEMENT` |
-| `spawn-prompt-assembler.cjs` | PreToolUse(Task) | Enriches spawn prompts | -- |
-| `config-model-validator.cjs` | PreToolUse(Task) | Validates model matches config.yaml | `CONFIG_MODEL_VALIDATOR` |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| Hook                               | Event            | Purpose                                 | Override                    |
+| ---------------------------------- | ---------------- | --------------------------------------- | --------------------------- |
+| `routing-guard.cjs`                | PreToolUse(Task) | Enforces planner-first, security review | `PLANNER_FIRST_ENFORCEMENT` |
+| `spawn-prompt-assembler.cjs`       | PreToolUse(Task) | Enriches spawn prompts                  | --                          |
+| `config-model-validator.cjs`       | PreToolUse(Task) | Validates model matches config.yaml     | `CONFIG_MODEL_VALIDATOR`    |
+| `tool-scope-validator.cjs`         | PreToolUse(All)  | Validates tool is in allowed set        | --                          |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)  | Monitors execution limits               | --                          |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -48,12 +49,13 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Swarm Coordination | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md` | Party Mode coordination |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow              | Path                                                                | When to Use                          |
+| --------------------- | ------------------------------------------------------------------- | ------------------------------------ |
+| Swarm Coordination    | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md` | Party Mode coordination              |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`                            | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
@@ -430,6 +432,7 @@ If you receive a task in an excluded category, respond with routing recommendati
 ## Related Workflows
 
 <!-- `.claude/workflows/enterprise/party-mode-workflow.md` - Full Party Mode workflow (NOT YET CREATED) -->
+
 - `.claude/workflows/core/router-decision.md` - Routing logic
 - `.claude/workflows/security-architect-skill-workflow.md` - Security audits
 

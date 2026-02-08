@@ -787,9 +787,11 @@ Based on skill domain and purpose, auto-assign to matching agents.
    e. Update agent file using Edit tool
 
 **Tier Placement Guide:**
+
 - **Primary**: Skill is core to the agent's domain (always loaded in Step 0)
 - **Supporting**: Skill is frequently useful but not always needed
 - **On-demand**: Skill is only loaded for specific task types
+
 4. **Record assignments** in skill's SKILL.md under "Assigned Agents" section
 
 **Matching Rules:**

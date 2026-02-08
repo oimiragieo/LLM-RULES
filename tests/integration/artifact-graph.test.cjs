@@ -51,9 +51,14 @@ describe('ArtifactGraph', () => {
         version: '1.0.0',
         lastUpdated: '2026-02-07T10:00:00.000Z',
         nodes: {
-          'skill:tdd': { type: 'skill', path: '.claude/skills/tdd/SKILL.md', created: '2026-01-01T00:00:00.000Z', integrationStatus: 'created' }
+          'skill:tdd': {
+            type: 'skill',
+            path: '.claude/skills/tdd/SKILL.md',
+            created: '2026-01-01T00:00:00.000Z',
+            integrationStatus: 'created',
+          },
         },
-        edges: []
+        edges: [],
       };
 
       fs.writeFileSync(graphPath, JSON.stringify(existingData), 'utf8');
@@ -79,7 +84,7 @@ describe('ArtifactGraph', () => {
       const result = graph.addNode('skill:tdd', {
         type: 'skill',
         path: '.claude/skills/tdd/SKILL.md',
-        integrationStatus: 'created'
+        integrationStatus: 'created',
       });
 
       assert.strictEqual(result, true);
@@ -97,14 +102,14 @@ describe('ArtifactGraph', () => {
         type: 'skill',
         path: '.claude/skills/tdd/SKILL.md',
         created: created1,
-        integrationStatus: 'created'
+        integrationStatus: 'created',
       });
 
       // Update same node
       graph.addNode('skill:tdd', {
         type: 'skill',
         path: '.claude/skills/tdd/SKILL.md',
-        integrationStatus: 'integrated'
+        integrationStatus: 'integrated',
       });
 
       // Created timestamp should be preserved
@@ -137,11 +142,14 @@ describe('ArtifactGraph', () => {
         path: '.claude/skills/tdd/SKILL.md',
         integrationStatus: 'created',
         metadata: { custom: 'value' },
-        missingIntegrations: ['catalog-entry', 'agent-assignment']
+        missingIntegrations: ['catalog-entry', 'agent-assignment'],
       });
 
       assert.deepStrictEqual(graph.graph.nodes['skill:tdd'].metadata, { custom: 'value' });
-      assert.deepStrictEqual(graph.graph.nodes['skill:tdd'].missingIntegrations, ['catalog-entry', 'agent-assignment']);
+      assert.deepStrictEqual(graph.graph.nodes['skill:tdd'].missingIntegrations, [
+        'catalog-entry',
+        'agent-assignment',
+      ]);
     });
   });
 
@@ -150,7 +158,11 @@ describe('ArtifactGraph', () => {
       const graph = new ArtifactGraph(graphPath);
 
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
 
       // Remove skill node
@@ -170,7 +182,11 @@ describe('ArtifactGraph', () => {
   describe('getNode', () => {
     it('should return node data with id included', () => {
       const graph = new ArtifactGraph(graphPath);
-      graph.addNode('skill:tdd', { type: 'skill', path: '.claude/skills/tdd/SKILL.md', integrationStatus: 'created' });
+      graph.addNode('skill:tdd', {
+        type: 'skill',
+        path: '.claude/skills/tdd/SKILL.md',
+        integrationStatus: 'created',
+      });
 
       const node = graph.getNode('skill:tdd');
       assert.ok(node);
@@ -189,7 +205,11 @@ describe('ArtifactGraph', () => {
     it('should return all nodes', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       const nodes = graph.getAllNodes();
       assert.strictEqual(nodes.length, 2);
@@ -200,7 +220,11 @@ describe('ArtifactGraph', () => {
     it('should filter by type', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       const skills = graph.getAllNodes('skill');
       assert.strictEqual(skills.length, 1);
@@ -212,7 +236,11 @@ describe('ArtifactGraph', () => {
     it('should add edge between existing nodes', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       const result = graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
 
@@ -227,7 +255,11 @@ describe('ArtifactGraph', () => {
     it('should update existing edge instead of creating duplicate', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to', 'active');
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to', 'inactive');
@@ -256,7 +288,11 @@ describe('ArtifactGraph', () => {
     it('should remove specific edge', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
 
       const result = graph.removeEdge('skill:tdd', 'agent:developer', 'assigned-to');
@@ -268,7 +304,11 @@ describe('ArtifactGraph', () => {
     it('should return false if edge does not exist', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       assert.strictEqual(graph.removeEdge('skill:tdd', 'agent:developer', 'assigned-to'), false);
     });
@@ -278,7 +318,11 @@ describe('ArtifactGraph', () => {
     it('should get incoming edges', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
 
       const incoming = graph.getEdges('agent:developer', 'incoming');
@@ -289,7 +333,11 @@ describe('ArtifactGraph', () => {
     it('should get outgoing edges', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
 
       const outgoing = graph.getEdges('skill:tdd', 'outgoing');
@@ -300,8 +348,16 @@ describe('ArtifactGraph', () => {
     it('should get both edges by default', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
-      graph.addNode('workflow:feature-dev', { type: 'workflow', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
+      graph.addNode('workflow:feature-dev', {
+        type: 'workflow',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
       graph.addEdge('workflow:feature-dev', 'skill:tdd', 'invokes');
@@ -320,7 +376,11 @@ describe('ArtifactGraph', () => {
     it('should find related nodes through edge type (outgoing)', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
       graph.addNode('agent:qa', { type: 'agent', path: '...', integrationStatus: 'created' });
 
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
@@ -335,7 +395,11 @@ describe('ArtifactGraph', () => {
     it('should find related nodes (incoming)', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('workflow:feature-dev', { type: 'workflow', path: '...', integrationStatus: 'created' });
+      graph.addNode('workflow:feature-dev', {
+        type: 'workflow',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       graph.addEdge('workflow:feature-dev', 'skill:tdd', 'invokes');
 
@@ -347,12 +411,21 @@ describe('ArtifactGraph', () => {
     it('should remove duplicates', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       // Add multiple edges to same target (shouldn't happen in practice, but test handles it)
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
       // Manually add duplicate (bypassing addEdge dedup logic)
-      graph.graph.edges.push({ from: 'skill:tdd', to: 'agent:developer', type: 'assigned-to', status: 'active' });
+      graph.graph.edges.push({
+        from: 'skill:tdd',
+        to: 'agent:developer',
+        type: 'assigned-to',
+        status: 'active',
+      });
 
       const related = graph.getRelated('skill:tdd', 'assigned-to', 'outgoing');
       assert.strictEqual(related.length, 1); // Duplicates removed
@@ -385,7 +458,11 @@ describe('ArtifactGraph', () => {
 
     it('should return gaps for agent without registry', () => {
       const graph = new ArtifactGraph(graphPath);
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       const gaps = graph.getMissingIntegrations('agent:developer');
 
@@ -398,8 +475,16 @@ describe('ArtifactGraph', () => {
     it('should return satisfied status when edges exist', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('catalog:skill-catalog', {
+        type: 'catalog',
+        path: '...',
+        integrationStatus: 'created',
+      });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       graph.addEdge('skill:tdd', 'catalog:skill-catalog', 'references');
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
@@ -433,7 +518,11 @@ describe('ArtifactGraph', () => {
     it('should return score between 0 and 1 for partial integration', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '...', integrationStatus: 'created' });
+      graph.addNode('catalog:skill-catalog', {
+        type: 'catalog',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       // Satisfy only catalog entry (1 of 2 must-have)
       graph.addEdge('skill:tdd', 'catalog:skill-catalog', 'references');
@@ -447,8 +536,16 @@ describe('ArtifactGraph', () => {
     it('should return score 1.0 when fully integrated', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('catalog:skill-catalog', {
+        type: 'catalog',
+        path: '...',
+        integrationStatus: 'created',
+      });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       graph.addEdge('skill:tdd', 'catalog:skill-catalog', 'references');
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
@@ -466,8 +563,16 @@ describe('ArtifactGraph', () => {
 
       // Create chain: skill -> agent -> workflow
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
-      graph.addNode('workflow:feature-dev', { type: 'workflow', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
+      graph.addNode('workflow:feature-dev', {
+        type: 'workflow',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
       graph.addEdge('agent:developer', 'workflow:feature-dev', 'invokes');
@@ -483,8 +588,16 @@ describe('ArtifactGraph', () => {
       const graph = new ArtifactGraph(graphPath);
 
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
-      graph.addNode('workflow:feature-dev', { type: 'workflow', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
+      graph.addNode('workflow:feature-dev', {
+        type: 'workflow',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
       graph.addEdge('agent:developer', 'workflow:feature-dev', 'invokes');
@@ -499,7 +612,11 @@ describe('ArtifactGraph', () => {
     it('should exclude starting node from results', () => {
       const graph = new ArtifactGraph(graphPath);
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
 
@@ -536,8 +653,16 @@ describe('ArtifactGraph', () => {
   describe('save and reload', () => {
     it('should persist graph and reload with identical data', () => {
       const graph1 = new ArtifactGraph(graphPath);
-      graph1.addNode('skill:tdd', { type: 'skill', path: '.claude/skills/tdd/SKILL.md', integrationStatus: 'created' });
-      graph1.addNode('agent:developer', { type: 'agent', path: '.claude/agents/core/developer.md', integrationStatus: 'created' });
+      graph1.addNode('skill:tdd', {
+        type: 'skill',
+        path: '.claude/skills/tdd/SKILL.md',
+        integrationStatus: 'created',
+      });
+      graph1.addNode('agent:developer', {
+        type: 'agent',
+        path: '.claude/agents/core/developer.md',
+        integrationStatus: 'created',
+      });
       graph1.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
 
       // Save
@@ -581,8 +706,16 @@ describe('ArtifactGraph', () => {
       // Create 2 skills: 1 fully integrated, 1 orphan
       graph.addNode('skill:tdd', { type: 'skill', path: '...', integrationStatus: 'created' });
       graph.addNode('skill:orphan', { type: 'skill', path: '...', integrationStatus: 'created' });
-      graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '...', integrationStatus: 'created' });
-      graph.addNode('agent:developer', { type: 'agent', path: '...', integrationStatus: 'created' });
+      graph.addNode('catalog:skill-catalog', {
+        type: 'catalog',
+        path: '...',
+        integrationStatus: 'created',
+      });
+      graph.addNode('agent:developer', {
+        type: 'agent',
+        path: '...',
+        integrationStatus: 'created',
+      });
 
       // Fully integrate skill:tdd
       graph.addEdge('skill:tdd', 'catalog:skill-catalog', 'references');

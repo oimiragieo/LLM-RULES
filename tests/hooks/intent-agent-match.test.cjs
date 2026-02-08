@@ -76,7 +76,8 @@ describe('intent-agent-match hook', () => {
       tool_name: 'Task',
       tool_input: {
         subagent_type: 'security-architect',
-        prompt: 'You are security-architect. Review authentication implementation for vulnerabilities.',
+        prompt:
+          'You are security-architect. Review authentication implementation for vulnerabilities.',
       },
     };
 

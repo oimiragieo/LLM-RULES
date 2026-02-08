@@ -20,7 +20,7 @@ function runTool(args = '') {
     const result = execSync(cmd, {
       encoding: 'utf-8',
       cwd: PROJECT_ROOT,
-      stdio: ['pipe', 'pipe', 'pipe']
+      stdio: ['pipe', 'pipe', 'pipe'],
     });
     return result;
   } catch (err) {
@@ -158,7 +158,10 @@ test('8. Forward slashes: All paths use forward slashes (not backslashes)', () =
   const graph = JSON.parse(fs.readFileSync(TMP_OUTPUT, 'utf8'));
 
   for (const [id, node] of Object.entries(graph.nodes)) {
-    assert.ok(!node.path.includes('\\'), `Node ${id} path should use forward slashes: ${node.path}`);
+    assert.ok(
+      !node.path.includes('\\'),
+      `Node ${id} path should use forward slashes: ${node.path}`
+    );
   }
 });
 
@@ -196,7 +199,10 @@ test('11. Graph statistics: Calculates node count, edge count, integration healt
   assert.ok(output.includes('Graph statistics:'), 'Should show graph statistics');
   assert.ok(output.match(/Total nodes:\s+\d+/), 'Should show total nodes');
   assert.ok(output.match(/Total edges:\s+\d+/), 'Should show total edges');
-  assert.ok(output.match(/Integration health:\s+\d+\.\d+%/), 'Should show integration health percentage');
+  assert.ok(
+    output.match(/Integration health:\s+\d+\.\d+%/),
+    'Should show integration health percentage'
+  );
 });
 
 test('12. Edge types: Detects multiple edge types (assigned-to, invokes, references)', () => {
@@ -292,14 +298,8 @@ test('18. Edge validation: All edges reference existing nodes', () => {
   const graph = JSON.parse(fs.readFileSync(TMP_OUTPUT, 'utf8'));
 
   for (const edge of graph.edges) {
-    assert.ok(
-      graph.nodes[edge.from],
-      `Edge from ${edge.from} should reference existing node`
-    );
-    assert.ok(
-      graph.nodes[edge.to],
-      `Edge to ${edge.to} should reference existing node`
-    );
+    assert.ok(graph.nodes[edge.from], `Edge from ${edge.from} should reference existing node`);
+    assert.ok(graph.nodes[edge.to], `Edge to ${edge.to} should reference existing node`);
   }
 });
 

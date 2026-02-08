@@ -16,15 +16,18 @@
 ## OWASP Top 10 Coverage
 
 ### A06: Vulnerable Components
+
 - Keep dependencies updated via `pnpm audit`
 - Review CVE databases for critical packages
 
 ### A09: Security Logging Failures
+
 - Use structured logging (never log secrets)
 - Log authentication failures and access control violations
 - Protect log integrity
 
 ### A10: Server-Side Request Forgery (SSRF)
+
 - Validate and sanitize all URLs
 - Use allowlists for external requests
 - Restrict outbound network access
@@ -32,5 +35,6 @@
 ## Additional Guidance
 
 For comprehensive security review, invoke:
+
 - `security-architect` skill (STRIDE, OWASP Top 10, threat modeling)
 - `auth-security-expert` skill (OAuth 2.1, JWT patterns)

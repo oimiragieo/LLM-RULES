@@ -9,7 +9,8 @@ const path = require('path');
 
 // Regex patterns for require() extraction
 const SIMPLE_REQUIRE = /require\(\s*['"]([^'"]+)['"]\s*\)/g;
-const PATH_JOIN_REQUIRE = /require\(\s*path\.join\(\s*(['"][^'"]*['"](?:\s*,\s*['"][^'"]*['"])*)\s*\)\s*\)/g;
+const PATH_JOIN_REQUIRE =
+  /require\(\s*path\.join\(\s*(['"][^'"]*['"](?:\s*,\s*['"][^'"]*['"])*)\s*\)\s*\)/g;
 const IS_RELATIVE = /^\.\.?\//;
 
 // Node.js built-in modules (don't need resolution)
@@ -105,7 +106,7 @@ function extractRequires(filePath) {
 
       // Extract simple require() calls
       const simpleMatches = [...workingLine.matchAll(SIMPLE_REQUIRE)];
-      simpleMatches.forEach((match) => {
+      simpleMatches.forEach(match => {
         const requirePath = match[1];
         const isRelative = IS_RELATIVE.test(requirePath);
 
@@ -120,12 +121,10 @@ function extractRequires(filePath) {
 
       // Extract path.join require() calls
       const pathJoinMatches = [...workingLine.matchAll(PATH_JOIN_REQUIRE)];
-      pathJoinMatches.forEach((match) => {
+      pathJoinMatches.forEach(match => {
         // Parse path.join arguments
         const argsStr = match[1];
-        const args = argsStr
-          .split(',')
-          .map((arg) => arg.trim().replace(/^['"]|['"]$/g, ''));
+        const args = argsStr.split(',').map(arg => arg.trim().replace(/^['"]|['"]$/g, ''));
 
         const joinedPath = args.join('/');
 
@@ -183,9 +182,7 @@ function resolveRequirePath(requirePath, fromFile) {
     }
 
     // Validate resolved path is within project root
-    const realProjectRoot = fs.existsSync(projectRoot)
-      ? fs.realpathSync(projectRoot)
-      : projectRoot;
+    const realProjectRoot = fs.existsSync(projectRoot) ? fs.realpathSync(projectRoot) : projectRoot;
 
     if (!realResolved.startsWith(realProjectRoot)) {
       // Path traversal attempt - reject

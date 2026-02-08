@@ -6,7 +6,11 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const { analyzeImpact, analyzeBatch, generateReport } = require('../../.claude/lib/workflow/integration-impact.cjs');
+const {
+  analyzeImpact,
+  analyzeBatch,
+  generateReport,
+} = require('../../.claude/lib/workflow/integration-impact.cjs');
 const { ArtifactGraph } = require('../../.claude/lib/workflow/artifact-graph.cjs');
 
 /**
@@ -35,13 +39,16 @@ test('analyzeImpact - created skill with no edges (orphan)', () => {
   const { testDir, graphPath, graph } = setupTest();
 
   // Add orphan skill
-  graph.addNode('skill:rate-limiter', { type: 'skill', path: '.claude/skills/rate-limiter/SKILL.md' });
+  graph.addNode('skill:rate-limiter', {
+    type: 'skill',
+    path: '.claude/skills/rate-limiter/SKILL.md',
+  });
   graph.save();
 
   const result = analyzeImpact({
     artifactId: 'skill:rate-limiter',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   assert.strictEqual(result.artifactId, 'skill:rate-limiter');
@@ -69,19 +76,27 @@ test('analyzeImpact - created skill with catalog entry (partial integration)', (
   const { testDir, graphPath, graph } = setupTest();
 
   // Add skill + catalog + edge
-  graph.addNode('skill:rate-limiter', { type: 'skill', path: '.claude/skills/rate-limiter/SKILL.md' });
-  graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '.claude/context/artifacts/catalogs/skill-catalog.md' });
+  graph.addNode('skill:rate-limiter', {
+    type: 'skill',
+    path: '.claude/skills/rate-limiter/SKILL.md',
+  });
+  graph.addNode('catalog:skill-catalog', {
+    type: 'catalog',
+    path: '.claude/context/artifacts/catalogs/skill-catalog.md',
+  });
   graph.addEdge('skill:rate-limiter', 'catalog:skill-catalog', 'references');
   graph.save();
 
   const result = analyzeImpact({
     artifactId: 'skill:rate-limiter',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   // Catalog satisfied, agent assignment missing
-  const mustHaveGaps = result.missingIntegrations.filter(g => g.priority === 'must-have' && g.status === 'missing');
+  const mustHaveGaps = result.missingIntegrations.filter(
+    g => g.priority === 'must-have' && g.status === 'missing'
+  );
   assert.strictEqual(mustHaveGaps.length, 1); // Only agent assignment
   assert.strictEqual(mustHaveGaps[0].type, 'agent-assignment');
 
@@ -96,8 +111,14 @@ test('analyzeImpact - created skill fully integrated (score 0)', () => {
   const { testDir, graphPath, graph } = setupTest();
 
   // Add skill + catalog + agent + edges
-  graph.addNode('skill:rate-limiter', { type: 'skill', path: '.claude/skills/rate-limiter/SKILL.md' });
-  graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '.claude/context/artifacts/catalogs/skill-catalog.md' });
+  graph.addNode('skill:rate-limiter', {
+    type: 'skill',
+    path: '.claude/skills/rate-limiter/SKILL.md',
+  });
+  graph.addNode('catalog:skill-catalog', {
+    type: 'catalog',
+    path: '.claude/context/artifacts/catalogs/skill-catalog.md',
+  });
   graph.addNode('agent:developer', { type: 'agent', path: '.claude/agents/core/developer.md' });
 
   graph.addEdge('skill:rate-limiter', 'catalog:skill-catalog', 'references');
@@ -107,11 +128,13 @@ test('analyzeImpact - created skill fully integrated (score 0)', () => {
   const result = analyzeImpact({
     artifactId: 'skill:rate-limiter',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   // No must-have gaps
-  const mustHaveGaps = result.missingIntegrations.filter(g => g.priority === 'must-have' && g.status === 'missing');
+  const mustHaveGaps = result.missingIntegrations.filter(
+    g => g.priority === 'must-have' && g.status === 'missing'
+  );
   assert.strictEqual(mustHaveGaps.length, 0);
 
   // Impact score should be low (only should-have gaps remain)
@@ -126,13 +149,16 @@ test('analyzeImpact - created agent with gaps', () => {
   const { testDir, graphPath, graph } = setupTest();
 
   // Add orphan agent
-  graph.addNode('agent:python-expert', { type: 'agent', path: '.claude/agents/domain/python-expert.md' });
+  graph.addNode('agent:python-expert', {
+    type: 'agent',
+    path: '.claude/agents/domain/python-expert.md',
+  });
   graph.save();
 
   const result = analyzeImpact({
     artifactId: 'agent:python-expert',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   // Agent must-haves: registry + routing keywords
@@ -152,13 +178,16 @@ test('analyzeImpact - created hook with gaps', () => {
   const { testDir, graphPath, graph } = setupTest();
 
   // Add orphan hook
-  graph.addNode('hook:rate-limiter', { type: 'hook', path: '.claude/hooks/safety/rate-limiter.cjs' });
+  graph.addNode('hook:rate-limiter', {
+    type: 'hook',
+    path: '.claude/hooks/safety/rate-limiter.cjs',
+  });
   graph.save();
 
   const result = analyzeImpact({
     artifactId: 'hook:rate-limiter',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   // Hook must-haves: settings.json registration
@@ -179,7 +208,10 @@ test('analyzeImpact - updated skill with dependents', () => {
   graph.addNode('skill:tdd', { type: 'skill', path: '.claude/skills/tdd/SKILL.md' });
   graph.addNode('agent:developer', { type: 'agent', path: '.claude/agents/core/developer.md' });
   graph.addNode('agent:qa', { type: 'agent', path: '.claude/agents/core/qa.md' });
-  graph.addNode('workflow:feature-dev', { type: 'workflow', path: '.claude/workflows/enterprise/feature-development.md' });
+  graph.addNode('workflow:feature-dev', {
+    type: 'workflow',
+    path: '.claude/workflows/enterprise/feature-development.md',
+  });
 
   // skill:tdd → agents (assigned-to)
   graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
@@ -193,7 +225,7 @@ test('analyzeImpact - updated skill with dependents', () => {
   const result = analyzeImpact({
     artifactId: 'skill:tdd',
     changeType: 'updated',
-    graphPath
+    graphPath,
   });
 
   // Should find direct dependents (agents + workflow)
@@ -204,9 +236,19 @@ test('analyzeImpact - updated skill with dependents', () => {
 
   // Should propose review tasks for each dependent
   assert.ok(result.proposedTasks.length >= 3);
-  assert.ok(result.proposedTasks.some(t => t.subject.includes('developer') && t.subject.includes('compatibility')));
-  assert.ok(result.proposedTasks.some(t => t.subject.includes('qa') && t.subject.includes('compatibility')));
-  assert.ok(result.proposedTasks.some(t => t.subject.includes('feature-dev') && t.subject.includes('compatibility')));
+  assert.ok(
+    result.proposedTasks.some(
+      t => t.subject.includes('developer') && t.subject.includes('compatibility')
+    )
+  );
+  assert.ok(
+    result.proposedTasks.some(t => t.subject.includes('qa') && t.subject.includes('compatibility'))
+  );
+  assert.ok(
+    result.proposedTasks.some(
+      t => t.subject.includes('feature-dev') && t.subject.includes('compatibility')
+    )
+  );
 
   cleanupTest(testDir);
 });
@@ -215,7 +257,10 @@ test('analyzeImpact - deleted artifact with consumers', () => {
   const { testDir, graphPath, graph } = setupTest();
 
   // Add skill being deleted + consumers
-  graph.addNode('skill:old-pattern', { type: 'skill', path: '.claude/skills/old-pattern/SKILL.md' });
+  graph.addNode('skill:old-pattern', {
+    type: 'skill',
+    path: '.claude/skills/old-pattern/SKILL.md',
+  });
   graph.addNode('agent:developer', { type: 'agent', path: '.claude/agents/core/developer.md' });
   graph.addNode('workflow:legacy', { type: 'workflow', path: '.claude/workflows/legacy.md' });
 
@@ -226,15 +271,19 @@ test('analyzeImpact - deleted artifact with consumers', () => {
   const result = analyzeImpact({
     artifactId: 'skill:old-pattern',
     changeType: 'deleted',
-    graphPath
+    graphPath,
   });
 
   // Should find consumers (edges TO this node)
   assert.strictEqual(result.directDependents.length, 2);
 
   // Should propose migration tasks
-  assert.ok(result.proposedTasks.some(t => t.subject.includes('Migrate') && t.subject.includes('developer')));
-  assert.ok(result.proposedTasks.some(t => t.subject.includes('Migrate') && t.subject.includes('legacy')));
+  assert.ok(
+    result.proposedTasks.some(t => t.subject.includes('Migrate') && t.subject.includes('developer'))
+  );
+  assert.ok(
+    result.proposedTasks.some(t => t.subject.includes('Migrate') && t.subject.includes('legacy'))
+  );
 
   cleanupTest(testDir);
 });
@@ -245,7 +294,7 @@ test('analyzeImpact - missing graph file (graceful degradation)', () => {
   const result = analyzeImpact({
     artifactId: 'skill:test',
     changeType: 'created',
-    graphPath: path.join(testDir, 'nonexistent.json')
+    graphPath: path.join(testDir, 'nonexistent.json'),
   });
 
   // Should return empty results, not throw
@@ -266,7 +315,7 @@ test('analyzeImpact - unknown artifact in graph (graceful degradation)', () => {
   const result = analyzeImpact({
     artifactId: 'skill:nonexistent',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   // Should return empty results for unknown node
@@ -288,7 +337,7 @@ test('analyzeBatch - multiple artifacts', () => {
 
   const entries = [
     { artifactId: 'skill:skill1', changeType: 'created' },
-    { artifactId: 'skill:skill2', changeType: 'created' }
+    { artifactId: 'skill:skill2', changeType: 'created' },
   ];
 
   const result = analyzeBatch(entries, graphPath);
@@ -310,7 +359,10 @@ test('analyzeBatch - mixed integration states', () => {
 
   // skill2: fully integrated
   graph.addNode('skill:skill2', { type: 'skill', path: '.claude/skills/skill2/SKILL.md' });
-  graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '.claude/context/artifacts/catalogs/skill-catalog.md' });
+  graph.addNode('catalog:skill-catalog', {
+    type: 'catalog',
+    path: '.claude/context/artifacts/catalogs/skill-catalog.md',
+  });
   graph.addNode('agent:developer', { type: 'agent', path: '.claude/agents/core/developer.md' });
   graph.addEdge('skill:skill2', 'catalog:skill-catalog', 'references');
   graph.addEdge('skill:skill2', 'agent:developer', 'assigned-to');
@@ -319,7 +371,7 @@ test('analyzeBatch - mixed integration states', () => {
 
   const entries = [
     { artifactId: 'skill:skill1', changeType: 'created' },
-    { artifactId: 'skill:skill2', changeType: 'created' }
+    { artifactId: 'skill:skill2', changeType: 'created' },
   ];
 
   const result = analyzeBatch(entries, graphPath);
@@ -354,13 +406,16 @@ test('analyzeBatch - empty batch', () => {
 test('generateReport - orphan skill', () => {
   const { testDir, graphPath, graph } = setupTest();
 
-  graph.addNode('skill:rate-limiter', { type: 'skill', path: '.claude/skills/rate-limiter/SKILL.md' });
+  graph.addNode('skill:rate-limiter', {
+    type: 'skill',
+    path: '.claude/skills/rate-limiter/SKILL.md',
+  });
   graph.save();
 
   const impact = analyzeImpact({
     artifactId: 'skill:rate-limiter',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   const report = generateReport(impact);
@@ -380,7 +435,10 @@ test('generateReport - fully integrated artifact', () => {
   const { testDir, graphPath, graph } = setupTest();
 
   graph.addNode('skill:tdd', { type: 'skill', path: '.claude/skills/tdd/SKILL.md' });
-  graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '.claude/context/artifacts/catalogs/skill-catalog.md' });
+  graph.addNode('catalog:skill-catalog', {
+    type: 'catalog',
+    path: '.claude/context/artifacts/catalogs/skill-catalog.md',
+  });
   graph.addNode('agent:developer', { type: 'agent', path: '.claude/agents/core/developer.md' });
   graph.addEdge('skill:tdd', 'catalog:skill-catalog', 'references');
   graph.addEdge('skill:tdd', 'agent:developer', 'assigned-to');
@@ -389,7 +447,7 @@ test('generateReport - fully integrated artifact', () => {
   const impact = analyzeImpact({
     artifactId: 'skill:tdd',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   const report = generateReport(impact);
@@ -413,7 +471,7 @@ test('generateReport - updated artifact with dependents', () => {
   const impact = analyzeImpact({
     artifactId: 'skill:tdd',
     changeType: 'updated',
-    graphPath
+    graphPath,
   });
 
   const report = generateReport(impact);
@@ -436,7 +494,7 @@ test('impact score calculation - orphan (all must-haves missing)', () => {
   const result = analyzeImpact({
     artifactId: 'skill:orphan',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   // Skill has 2 must-haves: catalog (0.3) + agent assignment (0.3) + 1 should-have (0.1) = 0.7
@@ -449,14 +507,17 @@ test('impact score calculation - partial integration (1/2 must-haves)', () => {
   const { testDir, graphPath, graph } = setupTest();
 
   graph.addNode('skill:partial', { type: 'skill', path: '.claude/skills/partial/SKILL.md' });
-  graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '.claude/context/artifacts/catalogs/skill-catalog.md' });
+  graph.addNode('catalog:skill-catalog', {
+    type: 'catalog',
+    path: '.claude/context/artifacts/catalogs/skill-catalog.md',
+  });
   graph.addEdge('skill:partial', 'catalog:skill-catalog', 'references');
   graph.save();
 
   const result = analyzeImpact({
     artifactId: 'skill:partial',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   // Only 1 must-have missing: agent assignment (0.3) + 1 should-have (0.1) = 0.4
@@ -470,7 +531,10 @@ test('impact score calculation - should-have gaps only', () => {
 
   // Fully integrated must-haves, but missing should-haves
   graph.addNode('skill:almost', { type: 'skill', path: '.claude/skills/almost/SKILL.md' });
-  graph.addNode('catalog:skill-catalog', { type: 'catalog', path: '.claude/context/artifacts/catalogs/skill-catalog.md' });
+  graph.addNode('catalog:skill-catalog', {
+    type: 'catalog',
+    path: '.claude/context/artifacts/catalogs/skill-catalog.md',
+  });
   graph.addNode('agent:developer', { type: 'agent', path: '.claude/agents/core/developer.md' });
   graph.addEdge('skill:almost', 'catalog:skill-catalog', 'references');
   graph.addEdge('skill:almost', 'agent:developer', 'assigned-to');
@@ -479,7 +543,7 @@ test('impact score calculation - should-have gaps only', () => {
   const result = analyzeImpact({
     artifactId: 'skill:almost',
     changeType: 'created',
-    graphPath
+    graphPath,
   });
 
   // No must-haves missing, but 1 should-have: enforcement-hook (0.1)

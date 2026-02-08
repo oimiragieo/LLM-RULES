@@ -257,14 +257,14 @@ DREAD is a risk assessment model for prioritizing security threats. Score each S
 
 For each threat identified in STRIDE analysis, calculate DREAD score:
 
-| Factor                  | Score (1-10) | Description                                                  |
-| ----------------------- | ------------ | ------------------------------------------------------------ |
-| **D**amage Potential    | 1-10         | How much damage will be caused if exploited?                 |
-| **R**eproducibility     | 1-10         | How easy is it to reproduce the attack?                      |
-| **E**xploitability      | 1-10         | How much effort is required to exploit?                      |
-| **A**ffected Users      | 1-10         | How many users will be impacted?                             |
-| **D**iscoverability     | 1-10         | How easy is it to discover the vulnerability?                |
-| **TOTAL DREAD Score**   | Sum / 5      | Average score (1-10). Higher score = higher priority fix.   |
+| Factor                | Score (1-10) | Description                                               |
+| --------------------- | ------------ | --------------------------------------------------------- |
+| **D**amage Potential  | 1-10         | How much damage will be caused if exploited?              |
+| **R**eproducibility   | 1-10         | How easy is it to reproduce the attack?                   |
+| **E**xploitability    | 1-10         | How much effort is required to exploit?                   |
+| **A**ffected Users    | 1-10         | How many users will be impacted?                          |
+| **D**iscoverability   | 1-10         | How easy is it to discover the vulnerability?             |
+| **TOTAL DREAD Score** | Sum / 5      | Average score (1-10). Higher score = higher priority fix. |
 
 ### Scoring Guidelines
 
@@ -307,14 +307,14 @@ For each threat identified in STRIDE analysis, calculate DREAD score:
 
 **Threat:** Template injection attack (STRIDE: Tampering)
 
-| Factor              | Score | Reasoning                                              |
-| ------------------- | ----- | ------------------------------------------------------ |
-| Damage              | 9     | Could execute arbitrary code                           |
-| Reproducibility     | 10    | Works every time with malicious template               |
-| Exploitability      | 7     | Requires understanding of template syntax              |
-| Affected Users      | 8     | All users of template rendering feature                |
-| Discoverability     | 6     | Requires code review or fuzzing to find                |
-| **DREAD Score**     | 8.0   | **HIGH PRIORITY** - Implement token whitelist controls |
+| Factor          | Score | Reasoning                                              |
+| --------------- | ----- | ------------------------------------------------------ |
+| Damage          | 9     | Could execute arbitrary code                           |
+| Reproducibility | 10    | Works every time with malicious template               |
+| Exploitability  | 7     | Requires understanding of template syntax              |
+| Affected Users  | 8     | All users of template rendering feature                |
+| Discoverability | 6     | Requires code review or fuzzing to find                |
+| **DREAD Score** | 8.0   | **HIGH PRIORITY** - Implement token whitelist controls |
 
 **Priority Mapping:**
 
@@ -331,22 +331,22 @@ ASVS provides a framework for testing web application security controls. Map eac
 
 ### ASVS Categories (V1-V14)
 
-| Category | Description                         | STRIDE Mapping           |
-| -------- | ----------------------------------- | ------------------------ |
-| **V1**   | Architecture, Design and Modeling   | All categories           |
-| **V2**   | Authentication                      | S (Spoofing)             |
-| **V3**   | Session Management                  | S (Spoofing), E (Elevation) |
-| **V4**   | Access Control                      | E (Elevation of Privilege) |
-| **V5**   | Validation, Sanitization, Encoding  | T (Tampering), I (Info Disclosure) |
-| **V6**   | Stored Cryptography                 | I (Information Disclosure) |
-| **V7**   | Error Handling and Logging          | R (Repudiation), I (Info Disclosure) |
-| **V8**   | Data Protection                     | I (Information Disclosure) |
-| **V9**   | Communication                       | I (Information Disclosure) |
-| **V10**  | Malicious Code                      | T (Tampering)            |
-| **V11**  | Business Logic                      | T (Tampering), E (Elevation) |
-| **V12**  | Files and Resources                 | T (Tampering), D (DoS)   |
-| **V13**  | API and Web Service                 | All categories           |
-| **V14**  | Configuration                       | E (Elevation), D (DoS)   |
+| Category | Description                        | STRIDE Mapping                       |
+| -------- | ---------------------------------- | ------------------------------------ |
+| **V1**   | Architecture, Design and Modeling  | All categories                       |
+| **V2**   | Authentication                     | S (Spoofing)                         |
+| **V3**   | Session Management                 | S (Spoofing), E (Elevation)          |
+| **V4**   | Access Control                     | E (Elevation of Privilege)           |
+| **V5**   | Validation, Sanitization, Encoding | T (Tampering), I (Info Disclosure)   |
+| **V6**   | Stored Cryptography                | I (Information Disclosure)           |
+| **V7**   | Error Handling and Logging         | R (Repudiation), I (Info Disclosure) |
+| **V8**   | Data Protection                    | I (Information Disclosure)           |
+| **V9**   | Communication                      | I (Information Disclosure)           |
+| **V10**  | Malicious Code                     | T (Tampering)                        |
+| **V11**  | Business Logic                     | T (Tampering), E (Elevation)         |
+| **V12**  | Files and Resources                | T (Tampering), D (DoS)               |
+| **V13**  | API and Web Service                | All categories                       |
+| **V14**  | Configuration                      | E (Elevation), D (DoS)               |
 
 ### STRIDE to ASVS Mapping
 

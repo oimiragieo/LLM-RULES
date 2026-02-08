@@ -14,40 +14,40 @@ This document provides a comprehensive mapping between workflows and agent arche
 
 This table shows which workflows are referenced by which agent archetypes. Workflows provide execution guidance, decision matrices, and coordination patterns.
 
-| Workflow | Router | Implementer | Reviewer | Documenter | Orchestrator | Researcher | Domain |
-|----------|--------|-------------|----------|------------|--------------|------------|--------|
-| **Core Workflows (8)** |
-| router-decision | x | | | | | | |
-| enterprise-workflow | x | x | x | x | x | x | x |
-| evolution-workflow | x | | | | x | | |
-| reflection-workflow | x | x | x | x | x | x | x |
-| feature-development-workflow | x | x | x | x | | | x |
-| skill-lifecycle | | | | | x | | |
-| post-creation-validation | | | | | x | | |
-| external-integration | | x | | | | | x |
-| **Enterprise Workflows (3)** |
-| c4-architecture-workflow | | x | | x | | | |
-| swarm-coordination-skill-workflow | | | | | x | | |
-| qa-bounded-loop | | | x | | | | |
-| **Operations Workflows (3)** |
-| incident-response | | x | | | | | |
-| hook-consolidation | | x | | | | | |
-| progressive-disclosure-skill-workflow | x | x | | | | | |
-| **Domain Workflows (1)** |
-| domain-development-workflow | | | | | | | x |
-| **Skill-Specific Workflows (12)** |
-| architecture-review-skill-workflow | | x | | | | | |
-| security-architect-skill-workflow | | x | | | | | |
-| database-architect-skill-workflow | | x | | | | | |
-| context-compressor-skill-workflow | x | x | x | x | x | x | x |
-| consensus-voting-skill-workflow | | | | | x | | |
-| chrome-browser-skill-workflow | | x | x | | | | |
-| conductor-setup-workflow | | x | | | | | |
-| template-renderer-skill-workflow | | x | | x | | | |
-| code-review-workflow | | | x | | | | |
-| product-management-workflow | x | | | | | | |
-| documentation-workflow | | | | x | | | |
-| template-renderer-skill-workflow | | x | | x | | | |
+| Workflow                              | Router | Implementer | Reviewer | Documenter | Orchestrator | Researcher | Domain |
+| ------------------------------------- | ------ | ----------- | -------- | ---------- | ------------ | ---------- | ------ |
+| **Core Workflows (8)**                |
+| router-decision                       | x      |             |          |            |              |            |        |
+| enterprise-workflow                   | x      | x           | x        | x          | x            | x          | x      |
+| evolution-workflow                    | x      |             |          |            | x            |            |        |
+| reflection-workflow                   | x      | x           | x        | x          | x            | x          | x      |
+| feature-development-workflow          | x      | x           | x        | x          |              |            | x      |
+| skill-lifecycle                       |        |             |          |            | x            |            |        |
+| post-creation-validation              |        |             |          |            | x            |            |        |
+| external-integration                  |        | x           |          |            |              |            | x      |
+| **Enterprise Workflows (3)**          |
+| c4-architecture-workflow              |        | x           |          | x          |              |            |        |
+| swarm-coordination-skill-workflow     |        |             |          |            | x            |            |        |
+| qa-bounded-loop                       |        |             | x        |            |              |            |        |
+| **Operations Workflows (3)**          |
+| incident-response                     |        | x           |          |            |              |            |        |
+| hook-consolidation                    |        | x           |          |            |              |            |        |
+| progressive-disclosure-skill-workflow | x      | x           |          |            |              |            |        |
+| **Domain Workflows (1)**              |
+| domain-development-workflow           |        |             |          |            |              |            | x      |
+| **Skill-Specific Workflows (12)**     |
+| architecture-review-skill-workflow    |        | x           |          |            |              |            |        |
+| security-architect-skill-workflow     |        | x           |          |            |              |            |        |
+| database-architect-skill-workflow     |        | x           |          |            |              |            |        |
+| context-compressor-skill-workflow     | x      | x           | x        | x          | x            | x          | x      |
+| consensus-voting-skill-workflow       |        |             |          |            | x            |            |        |
+| chrome-browser-skill-workflow         |        | x           | x        |            |              |            |        |
+| conductor-setup-workflow              |        | x           |          |            |              |            |        |
+| template-renderer-skill-workflow      |        | x           |          | x          |              |            |        |
+| code-review-workflow                  |        |             | x        |            |              |            |        |
+| product-management-workflow           | x      |             |          |            |              |            |        |
+| documentation-workflow                |        |             |          | x          |              |            |        |
+| template-renderer-skill-workflow      |        | x           |          | x          |              |            |        |
 
 **Agent Archetype Definitions:**
 
@@ -70,6 +70,7 @@ Different agent archetypes reference different workflow sets based on their role
 **Agents**: router, master-orchestrator, evolution-orchestrator, swarm-coordinator, party-orchestrator
 
 **Workflows**:
+
 1. router-decision (Router only)
 2. enterprise-workflow
 3. evolution-workflow (Router, evolution-orchestrator)
@@ -85,6 +86,7 @@ Different agent archetypes reference different workflow sets based on their role
 **Agents**: developer, planner, qa, security-architect, architect, database-architect, devops, devops-troubleshooter, incident-responder, code-simplifier, conductor-validator
 
 **Workflows**:
+
 1. enterprise-workflow
 2. feature-development-workflow
 3. reflection-workflow
@@ -104,6 +106,7 @@ Different agent archetypes reference different workflow sets based on their role
 **Agents**: code-reviewer
 
 **Workflows**:
+
 1. enterprise-workflow
 2. feature-development-workflow
 3. reflection-workflow
@@ -117,10 +120,11 @@ Different agent archetypes reference different workflow sets based on their role
 **Agents**: technical-writer, c4-code, c4-component, c4-container, c4-context
 
 **Workflows**:
+
 1. enterprise-workflow
 2. feature-development-workflow
 3. reflection-workflow
-4. c4-architecture-workflow (c4-* agents only)
+4. c4-architecture-workflow (c4-\* agents only)
 5. documentation-workflow (technical-writer)
 6. context-compressor-skill-workflow
 
@@ -131,6 +135,7 @@ Different agent archetypes reference different workflow sets based on their role
 **Agents**: researcher, reverse-engineer
 
 **Workflows**:
+
 1. enterprise-workflow
 2. reflection-workflow
 3. progressive-disclosure-skill-workflow
@@ -143,6 +148,7 @@ Different agent archetypes reference different workflow sets based on their role
 **Agents**: All 22 domain specialists (python-pro, rust-pro, typescript-pro, etc.)
 
 **Workflows**:
+
 1. enterprise-workflow
 2. feature-development-workflow
 3. reflection-workflow
@@ -158,6 +164,7 @@ Different agent archetypes reference different workflow sets based on their role
 Workflows are organized into 5 categories based on their scope and purpose:
 
 ### Core Workflows (8)
+
 - `router-decision.md` - Master routing logic for multi-agent system
 - `enterprise-workflow.md` - Phased execution (Triage → Design → Implement → Review → Deploy → Document → Reflect)
 - `evolution-workflow.md` - EVOLVE process (E→V→O→L→V→E) for creating artifacts
@@ -170,6 +177,7 @@ Workflows are organized into 5 categories based on their scope and purpose:
 **Used By**: All agents (enterprise-workflow, reflection-workflow) + specialized agent types
 
 ### Enterprise Workflows (3)
+
 - `c4-architecture-workflow.md` - C4 model documentation (System Context, Containers, Components, Code)
 - `swarm-coordination-skill-workflow.md` - Multi-agent swarm patterns
 - `qa-bounded-loop.md` - QA validation with bounded fix loops
@@ -177,6 +185,7 @@ Workflows are organized into 5 categories based on their scope and purpose:
 **Used By**: Documenters (C4), Orchestrators (swarm), All agents (workspace-conventions), Reviewers (QA)
 
 ### Operations Workflows (3)
+
 - `incident-response.md` - Production incident handling
 - `hook-consolidation.md` - Hook management and consolidation
 - `progressive-disclosure-skill-workflow.md` - Requirements gathering
@@ -184,11 +193,13 @@ Workflows are organized into 5 categories based on their scope and purpose:
 **Used By**: Devops/incident teams (incident-response), Developers (hook consolidation), Router/Researchers (progressive disclosure)
 
 ### Domain Workflows (1)
+
 - `domain-development-workflow.md` - TDD workflow for all 22 domain specialists
 
 **Used By**: All 22 domain specialist agents (UNIVERSAL for domain archetype)
 
 ### Skill-Specific Workflows (12)
+
 - `architecture-review-skill-workflow.md` - Architecture review process
 - `security-architect-skill-workflow.md` - Security audit and review
 - `database-architect-skill-workflow.md` - Database design and schema workflows
@@ -210,6 +221,7 @@ Workflows are organized into 5 categories based on their scope and purpose:
 These 4 workflows were created in Task #44 Phase 1 to fill gaps in workflow-agent alignment:
 
 ### 1. domain-development-workflow.md
+
 - **Purpose**: Common TDD workflow for all 22 domain agents
 - **Key Features**:
   - Red-Green-Refactor Cycle (RGRC) with universal steps
@@ -220,6 +232,7 @@ These 4 workflows were created in Task #44 Phase 1 to fill gaps in workflow-agen
 - **Used By**: All 22 domain specialist agents (python-pro, rust-pro, typescript-pro, etc.)
 
 ### 2. code-review-workflow.md
+
 - **Purpose**: Two-pass review process for code-reviewer agent
 - **Key Features**:
   - Pass 1 (blocking): Spec compliance, logic correctness, edge cases, security (OWASP Top 10)
@@ -230,6 +243,7 @@ These 4 workflows were created in Task #44 Phase 1 to fill gaps in workflow-agen
 - **Used By**: code-reviewer agent
 
 ### 3. product-management-workflow.md
+
 - **Purpose**: INVEST criteria for user stories and sprint management
 - **Key Features**:
   - INVEST criteria (Independent, Negotiable, Valuable, Estimable, Small, Testable)
@@ -241,6 +255,7 @@ These 4 workflows were created in Task #44 Phase 1 to fill gaps in workflow-agen
 - **Used By**: pm (product manager) agent, Router (for sprint planning requests)
 
 ### 4. documentation-workflow.md
+
 - **Purpose**: Diataxis framework for technical writing
 - **Key Features**:
   - Diataxis framework: 4 documentation types (Tutorial, How-to, Reference, Explanation)

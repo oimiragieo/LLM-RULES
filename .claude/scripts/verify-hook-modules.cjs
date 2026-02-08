@@ -251,10 +251,12 @@ function formatJsonReport(results) {
     hooksScanned: results.passed + results.failed,
     passed: results.passed,
     failed: results.failed,
-    failures: results.results.filter((r) => !r.passed).map((r) => ({
-      hook: r.hook,
-      brokenRequires: r.brokenRequires,
-    })),
+    failures: results.results
+      .filter(r => !r.passed)
+      .map(r => ({
+        hook: r.hook,
+        brokenRequires: r.brokenRequires,
+      })),
     settingsCheck: results.settingsCheck,
   };
 

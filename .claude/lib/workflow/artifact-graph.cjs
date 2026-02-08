@@ -39,7 +39,7 @@ class ArtifactGraph {
       version: '1.0.0',
       lastUpdated: new Date().toISOString(),
       nodes: {},
-      edges: []
+      edges: [],
     };
   }
 
@@ -61,57 +61,63 @@ class ArtifactGraph {
       skill: {
         mustHave: [
           { type: 'references', to: 'catalog:skill-catalog', description: 'Catalog entry' },
-          { type: 'assigned-to', direction: 'outgoing', description: 'At least 1 agent assignment' }
+          {
+            type: 'assigned-to',
+            direction: 'outgoing',
+            description: 'At least 1 agent assignment',
+          },
         ],
         shouldHave: [
           { type: 'enforced-by', direction: 'incoming', description: 'Enforcement hook' },
-          { type: 'invokes', direction: 'incoming', description: 'Workflow reference' }
-        ]
+          { type: 'invokes', direction: 'incoming', description: 'Workflow reference' },
+        ],
       },
       agent: {
         mustHave: [
           { type: 'references', to: 'registry:agent-registry', description: 'Registry entry' },
-          { description: 'Routing keywords (check routing-table.cjs)' }
+          { description: 'Routing keywords (check routing-table.cjs)' },
         ],
         shouldHave: [
           { type: 'assigned-to', direction: 'incoming', description: 'Skills assigned' },
-          { description: 'Model config in config.yaml' }
-        ]
+          { description: 'Model config in config.yaml' },
+        ],
       },
       hook: {
-        mustHave: [
-          { description: 'settings.json registration (special check)' }
-        ],
+        mustHave: [{ description: 'settings.json registration (special check)' }],
         shouldHave: [
-          { type: 'references', to: 'catalog:enforcement-hooks', description: '@ENFORCEMENT_HOOKS.md entry' },
-          { description: 'Agent awareness (documented in agent files)' }
-        ]
+          {
+            type: 'references',
+            to: 'catalog:enforcement-hooks',
+            description: '@ENFORCEMENT_HOOKS.md entry',
+          },
+          { description: 'Agent awareness (documented in agent files)' },
+        ],
       },
       workflow: {
         mustHave: [
           { type: 'references', to: 'registry:workflow-registry', description: 'Registry entry' },
-          { description: 'Agent mapping (@WORKFLOW_AGENT_MAP.md)' }
+          { description: 'Agent mapping (@WORKFLOW_AGENT_MAP.md)' },
         ],
         shouldHave: [
-          { type: 'references', to: 'catalog:enterprise-workflows', description: '@ENTERPRISE_WORKFLOWS.md entry' }
-        ]
+          {
+            type: 'references',
+            to: 'catalog:enterprise-workflows',
+            description: '@ENTERPRISE_WORKFLOWS.md entry',
+          },
+        ],
       },
       template: {
         mustHave: [
-          { type: 'references', to: 'catalog:template-catalog', description: 'Catalog entry' }
+          { type: 'references', to: 'catalog:template-catalog', description: 'Catalog entry' },
         ],
-        shouldHave: [
-          { description: 'Agent/workflow consumer' }
-        ]
+        shouldHave: [{ description: 'Agent/workflow consumer' }],
       },
       schema: {
         mustHave: [
-          { type: 'references', to: 'catalog:schema-catalog', description: 'Catalog entry' }
+          { type: 'references', to: 'catalog:schema-catalog', description: 'Catalog entry' },
         ],
-        shouldHave: [
-          { description: 'Consumer wiring' }
-        ]
-      }
+        shouldHave: [{ description: 'Consumer wiring' }],
+      },
     };
 
     return rules[type] || { mustHave: [], shouldHave: [] };
@@ -138,7 +144,7 @@ class ArtifactGraph {
       created: existingNode?.created || nodeData.created || now,
       integrationStatus: nodeData.integrationStatus || 'created',
       ...(nodeData.missingIntegrations && { missingIntegrations: nodeData.missingIntegrations }),
-      ...(nodeData.metadata && { metadata: nodeData.metadata })
+      ...(nodeData.metadata && { metadata: nodeData.metadata }),
     };
 
     this.graph.lastUpdated = now;
@@ -158,9 +164,7 @@ class ArtifactGraph {
     delete this.graph.nodes[id];
 
     // Remove all edges to/from this node
-    this.graph.edges = this.graph.edges.filter(
-      edge => edge.from !== id && edge.to !== id
-    );
+    this.graph.edges = this.graph.edges.filter(edge => edge.from !== id && edge.to !== id);
 
     this.graph.lastUpdated = new Date().toISOString();
     return true;
@@ -185,7 +189,7 @@ class ArtifactGraph {
   getAllNodes(typeFilter) {
     const nodes = Object.entries(this.graph.nodes).map(([id, data]) => ({
       id,
-      ...data
+      ...data,
     }));
 
     if (typeFilter) {
@@ -262,9 +266,7 @@ class ArtifactGraph {
     } else if (direction === 'incoming') {
       return this.graph.edges.filter(edge => edge.to === nodeId);
     } else {
-      return this.graph.edges.filter(
-        edge => edge.from === nodeId || edge.to === nodeId
-      );
+      return this.graph.edges.filter(edge => edge.from === nodeId || edge.to === nodeId);
     }
   }
 
@@ -285,7 +287,7 @@ class ArtifactGraph {
     const edges = this.getEdges(nodeId, direction);
     const related = edges
       .filter(edge => edge.type === edgeType)
-      .map(edge => direction === 'outgoing' ? edge.to : edge.from);
+      .map(edge => (direction === 'outgoing' ? edge.to : edge.from));
 
     return [...new Set(related)]; // Remove duplicates
   }
@@ -308,7 +310,7 @@ class ArtifactGraph {
       checklist.push({
         item: rule.description,
         required: true,
-        status
+        status,
       });
     }
 
@@ -318,7 +320,7 @@ class ArtifactGraph {
       checklist.push({
         item: rule.description,
         required: false,
-        status
+        status,
       });
     }
 
@@ -417,7 +419,7 @@ class ArtifactGraph {
     return {
       integrated: score === 1.0,
       score,
-      missing
+      missing,
     };
   }
 
@@ -437,12 +439,12 @@ class ArtifactGraph {
       type: node.type,
       mustHave: rules.mustHave.map(rule => ({
         ...rule,
-        status: this._checkIntegrationRule(nodeId, rule)
+        status: this._checkIntegrationRule(nodeId, rule),
       })),
       shouldHave: rules.shouldHave.map(rule => ({
         ...rule,
-        status: this._checkIntegrationRule(nodeId, rule)
-      }))
+        status: this._checkIntegrationRule(nodeId, rule),
+      })),
     };
   }
 
@@ -519,7 +521,7 @@ class ArtifactGraph {
       nodeCount,
       edgeCount,
       byType,
-      integrationHealth
+      integrationHealth,
     };
   }
 }

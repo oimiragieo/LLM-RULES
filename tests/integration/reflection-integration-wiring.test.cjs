@@ -22,8 +22,20 @@ const path = require('path');
 
 // Resolve paths
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const REFLECTION_AGENT_PATH = path.join(PROJECT_ROOT, '.claude', 'agents', 'core', 'reflection-agent.md');
-const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'workflow', 'post-creation-integration.cjs');
+const REFLECTION_AGENT_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'agents',
+  'core',
+  'reflection-agent.md'
+);
+const HOOK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'workflow',
+  'post-creation-integration.cjs'
+);
 
 describe('Reflection Integration Wiring', () => {
   it('reflection-agent.md should exist', () => {

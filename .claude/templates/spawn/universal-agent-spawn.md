@@ -82,14 +82,17 @@ If this task is part of an enterprise workflow, the Router will provide:
 **Example Workflow Context**:
 
 ```
+
 Workflow ID: wf-enterprise-20260206-123456
 Current Phase: PHASE_3_REVIEW
 Phase Gate Requirements: Gate 3 (no critical security findings, code-reviewer approved)
 Input Artifacts:
-  - .claude/context/plans/payment-feature-plan-final.md (from PHASE_1_DESIGN)
-  - src/payment/payment-service.ts (from PHASE_2_IMPLEMENT)
-  - tests/payment/payment-service.test.ts (from PHASE_2_IMPLEMENT)
-Expected Output: .claude/context/reports/code-review-2026-02-06.md
+
+- .claude/context/plans/payment-feature-plan-final.md (from PHASE_1_DESIGN)
+- src/payment/payment-service.ts (from PHASE_2_IMPLEMENT)
+- tests/payment/payment-service.test.ts (from PHASE_2_IMPLEMENT)
+  Expected Output: .claude/context/reports/code-review-2026-02-06.md
+
 ```
 
 ## STEP 2.5: Skill Discovery (MANDATORY - Do This First)

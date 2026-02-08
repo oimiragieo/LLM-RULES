@@ -18,19 +18,19 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 
 ## Critical Hooks Overview
 
-| Hook                         | Location                   | Trigger                 | Default | Key Env Variables                                          |
-| ---------------------------- | -------------------------- | ----------------------- | ------- | ---------------------------------------------------------- |
-| `routing-guard.cjs`          | `.claude/hooks/routing/`   | PreToolUse(Task)        | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT` |
-| `unified-creator-guard.cjs`  | `.claude/hooks/routing/`   | PreToolUse(Write, Edit) | block   | `CREATOR_GUARD`                                            |
-| `unified-pre-write-hook.cjs` | `.claude/hooks/safety/`    | PreToolUse(Write, Edit) | block   | Multiple (11 consolidated checks)                          |
-| `bash-command-validator.cjs` | `.claude/hooks/safety/`    | PreToolUse(Bash)        | block   | `BASH_VALIDATOR_FAIL_OPEN`                                 |
-| `shell-injection-validator.cjs` | `.claude/hooks/safety/` | PreToolUse(Bash)        | block   | `SHELL_INJECTION_VALIDATOR`                                |
-| `pre-task-unified.cjs`       | `.claude/hooks/routing/`   | PreToolUse(Task)        | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`       |
-| `tool-scope-validator.cjs`   | `.claude/hooks/routing/`   | PreToolUse(All)         | warn    | `TOOL_SCOPE_VALIDATOR`                                     |
-| `reflection-step0-guard.cjs` | `.claude/hooks/reflection/`| PreToolUse(TaskList)    | warn    | `REFLECTION_STEP0_ENFORCEMENT`                             |
-| `config-model-validator.cjs` | `.claude/hooks/routing/`   | PreToolUse(Task)        | warn    | `CONFIG_MODEL_VALIDATOR`                                   |
-| `error-tracker-hook.cjs`     | `.claude/hooks/monitoring/`| PostToolUse(All)        | N/A     | None (monitoring only)                                     |
-| `post-creation-integration.cjs` | `.claude/hooks/workflow/` | PostToolUse(TaskUpdate) | warn | `INTEGRATION_ENFORCEMENT` |
+| Hook                            | Location                    | Trigger                 | Default | Key Env Variables                                          |
+| ------------------------------- | --------------------------- | ----------------------- | ------- | ---------------------------------------------------------- |
+| `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task)        | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT` |
+| `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | PreToolUse(Write, Edit) | block   | `CREATOR_GUARD`                                            |
+| `unified-pre-write-hook.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Write, Edit) | block   | Multiple (11 consolidated checks)                          |
+| `bash-command-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)        | block   | `BASH_VALIDATOR_FAIL_OPEN`                                 |
+| `shell-injection-validator.cjs` | `.claude/hooks/safety/`     | PreToolUse(Bash)        | block   | `SHELL_INJECTION_VALIDATOR`                                |
+| `pre-task-unified.cjs`          | `.claude/hooks/routing/`    | PreToolUse(Task)        | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`       |
+| `tool-scope-validator.cjs`      | `.claude/hooks/routing/`    | PreToolUse(All)         | warn    | `TOOL_SCOPE_VALIDATOR`                                     |
+| `reflection-step0-guard.cjs`    | `.claude/hooks/reflection/` | PreToolUse(TaskList)    | warn    | `REFLECTION_STEP0_ENFORCEMENT`                             |
+| `config-model-validator.cjs`    | `.claude/hooks/routing/`    | PreToolUse(Task)        | warn    | `CONFIG_MODEL_VALIDATOR`                                   |
+| `error-tracker-hook.cjs`        | `.claude/hooks/monitoring/` | PostToolUse(All)        | N/A     | None (monitoring only)                                     |
+| `post-creation-integration.cjs` | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate) | warn    | `INTEGRATION_ENFORCEMENT`                                  |
 
 ---
 
@@ -421,13 +421,13 @@ TOOL_SCOPE_VALIDATOR=off claude
 // Agent spawned with allowed_tools: ["Read", "Write", "Edit"]
 
 // ✅ ALLOWED: Write (in allowed_tools)
-Write({ file_path: "...", content: "..." })
+Write({ file_path: '...', content: '...' });
 
 // ✅ ALLOWED: Read (always allowed)
-Read({ file_path: "..." })
+Read({ file_path: '...' });
 
 // ❌ BLOCKED/WARNED: Bash (not in allowed_tools)
-Bash({ command: "npm test" })
+Bash({ command: 'npm test' });
 // Warning: "Tool Bash not in allowed_tools: [Read, Write, Edit]"
 ```
 
@@ -527,17 +527,17 @@ agents:
 ```javascript
 // ✅ ALLOWED: Model matches config.yaml
 Task({
-  subagent_type: "planner",
-  model: "claude-opus-4-5-20251101",  // Matches config
-  prompt: "..."
-})
+  subagent_type: 'planner',
+  model: 'claude-opus-4-5-20251101', // Matches config
+  prompt: '...',
+});
 
 // ❌ BLOCKED/WARNED: Model mismatch
 Task({
-  subagent_type: "planner",
-  model: "claude-sonnet-4-5",  // Mismatch (should be opus)
-  prompt: "..."
-})
+  subagent_type: 'planner',
+  model: 'claude-sonnet-4-5', // Mismatch (should be opus)
+  prompt: '...',
+});
 // Warning: "Model mismatch for planner: expected claude-opus-4-5-20251101, got claude-sonnet-4-5"
 ```
 
@@ -656,11 +656,11 @@ Well under 100ms budget for non-blocking hooks.
 
 ## Enforcement Modes
 
-| Mode    | Behavior                        | Use Case                         |
-| ------- | ------------------------------- | -------------------------------- |
+| Mode    | Behavior                        | Use Case                                |
+| ------- | ------------------------------- | --------------------------------------- |
 | `block` | Prevents action, throws error   | Production (default for security hooks) |
-| `warn`  | Logs warning but allows action  | Development, debugging           |
-| `off`   | Disables enforcement completely | Emergency fixes only (dangerous) |
+| `warn`  | Logs warning but allows action  | Development, debugging                  |
+| `off`   | Disables enforcement completely | Emergency fixes only (dangerous)        |
 
 ---
 

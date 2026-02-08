@@ -98,10 +98,7 @@ test('all phaseModels keys are valid', () => {
   const actualPhases = Object.keys(phaseModels.phaseModels);
 
   actualPhases.forEach(phase => {
-    assert.ok(
-      validPhases.includes(phase),
-      `Invalid phase "${phase}" in phaseModels`
-    );
+    assert.ok(validPhases.includes(phase), `Invalid phase "${phase}" in phaseModels`);
   });
 });
 

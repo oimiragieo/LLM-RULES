@@ -196,13 +196,15 @@ function postToolUse(tool, params, result, context) {
         paramsSize: (() => {
           // SEC-RESTORE-001: Cap JSON.stringify output at 10KB
           const paramsStr = JSON.stringify(params);
-          const cappedParams = paramsStr.length > 10240 ? paramsStr.slice(0, 10240) + '...[truncated]' : paramsStr;
+          const cappedParams =
+            paramsStr.length > 10240 ? paramsStr.slice(0, 10240) + '...[truncated]' : paramsStr;
           return cappedParams.length;
         })(),
         resultSize: (() => {
           // SEC-RESTORE-001: Cap JSON.stringify output at 10KB
           const resultStr = JSON.stringify(result);
-          const cappedResult = resultStr.length > 10240 ? resultStr.slice(0, 10240) + '...[truncated]' : resultStr;
+          const cappedResult =
+            resultStr.length > 10240 ? resultStr.slice(0, 10240) + '...[truncated]' : resultStr;
           return cappedResult.length;
         })(),
       },

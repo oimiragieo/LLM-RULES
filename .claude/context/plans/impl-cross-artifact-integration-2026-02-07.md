@@ -139,21 +139,22 @@ This plan modifies 20+ files across 3 phases. Per Enhancement #9, commit checkpo
 
 ### Phase 1 Tasks
 
-| # | Task | Target Agent | Complexity | Dependencies | Est. Time |
-|---|------|-------------|------------|-------------|-----------|
-| 1.1 | Create artifact-graph schema | `developer` | LOW | None | 1-2 hrs |
-| 1.2 | Create artifact-graph.cjs library | `developer` | MEDIUM | 1.1 | 3-4 hrs |
-| 1.3 | Create bootstrap-artifact-graph.cjs tool | `developer` | MEDIUM | 1.2 | 3-4 hrs |
-| 1.4 | Run bootstrap to populate initial graph | `devops` | TRIVIAL | 1.3 | 15 min |
-| 1.5 | Create post-creation-integration.cjs hook | `developer` | MEDIUM | 1.2 | 3-4 hrs |
-| 1.6 | Register hook in settings.json | `devops` | TRIVIAL | 1.5 | 15 min |
-| 1.7 | Create artifact-integration.md rule | `technical-writer` | LOW | None | 1 hr |
-| 1.8 | Add integration-queue.jsonl rotation | `developer` | LOW | 1.5 | 1 hr |
-| 1.9 | Tests for artifact-graph.cjs | `qa` | MEDIUM | 1.2 | 2-3 hrs |
-| 1.10 | Tests for post-creation-integration.cjs | `qa` | MEDIUM | 1.5 | 2-3 hrs |
-| 1.11 | Tests for bootstrap-artifact-graph.cjs | `qa` | LOW | 1.3 | 1-2 hrs |
+| #    | Task                                      | Target Agent       | Complexity | Dependencies | Est. Time |
+| ---- | ----------------------------------------- | ------------------ | ---------- | ------------ | --------- |
+| 1.1  | Create artifact-graph schema              | `developer`        | LOW        | None         | 1-2 hrs   |
+| 1.2  | Create artifact-graph.cjs library         | `developer`        | MEDIUM     | 1.1          | 3-4 hrs   |
+| 1.3  | Create bootstrap-artifact-graph.cjs tool  | `developer`        | MEDIUM     | 1.2          | 3-4 hrs   |
+| 1.4  | Run bootstrap to populate initial graph   | `devops`           | TRIVIAL    | 1.3          | 15 min    |
+| 1.5  | Create post-creation-integration.cjs hook | `developer`        | MEDIUM     | 1.2          | 3-4 hrs   |
+| 1.6  | Register hook in settings.json            | `devops`           | TRIVIAL    | 1.5          | 15 min    |
+| 1.7  | Create artifact-integration.md rule       | `technical-writer` | LOW        | None         | 1 hr      |
+| 1.8  | Add integration-queue.jsonl rotation      | `developer`        | LOW        | 1.5          | 1 hr      |
+| 1.9  | Tests for artifact-graph.cjs              | `qa`               | MEDIUM     | 1.2          | 2-3 hrs   |
+| 1.10 | Tests for post-creation-integration.cjs   | `qa`               | MEDIUM     | 1.5          | 2-3 hrs   |
+| 1.11 | Tests for bootstrap-artifact-graph.cjs    | `qa`               | LOW        | 1.3          | 1-2 hrs   |
 
 **Parallel Groups:**
+
 - **Group A (sequential):** 1.1 -> 1.2 -> 1.3 -> 1.4
 - **Group B (after 1.2):** 1.5 -> 1.6, 1.5 -> 1.8
 - **Group C (independent):** 1.7 (can start immediately)
@@ -187,10 +188,24 @@ This plan modifies 20+ files across 3 phases. Per Enhancement #9, commit checkpo
         "type": "object",
         "required": ["type", "path", "created", "integrationStatus"],
         "properties": {
-          "type": { "enum": ["skill", "agent", "hook", "workflow", "template", "schema", "rule", "catalog", "registry"] },
+          "type": {
+            "enum": [
+              "skill",
+              "agent",
+              "hook",
+              "workflow",
+              "template",
+              "schema",
+              "rule",
+              "catalog",
+              "registry"
+            ]
+          },
           "path": { "type": "string" },
           "created": { "type": "string", "format": "date-time" },
-          "integrationStatus": { "enum": ["created", "partially-integrated", "fully-integrated", "needs-update"] },
+          "integrationStatus": {
+            "enum": ["created", "partially-integrated", "fully-integrated", "needs-update"]
+          },
           "missingIntegrations": { "type": "array", "items": { "type": "string" } }
         }
       }
@@ -203,7 +218,18 @@ This plan modifies 20+ files across 3 phases. Per Enhancement #9, commit checkpo
         "properties": {
           "from": { "type": "string" },
           "to": { "type": "string" },
-          "type": { "enum": ["assigned-to", "enforced-by", "invokes", "depends-on", "triggers", "references", "validates", "templates"] },
+          "type": {
+            "enum": [
+              "assigned-to",
+              "enforced-by",
+              "invokes",
+              "depends-on",
+              "triggers",
+              "references",
+              "validates",
+              "templates"
+            ]
+          },
           "status": { "enum": ["active", "missing", "proposed", "deprecated"] }
         }
       }
@@ -215,6 +241,7 @@ This plan modifies 20+ files across 3 phases. Per Enhancement #9, commit checkpo
 **Node ID Convention:** `{type}:{name}` (e.g., `skill:tdd`, `agent:developer`, `hook:routing-guard`)
 
 **Acceptance Criteria:**
+
 - [ ] Schema file exists at `.claude/schemas/artifact-graph.schema.json`
 - [ ] Schema validates the example graph from ADR-100 Section 4.1
 - [ ] Schema rejects invalid data (missing required fields, invalid enum values)
@@ -266,22 +293,24 @@ class ArtifactGraph {
 
 **Integration Checklist Rules (by artifact type):**
 
-| Artifact Type | Must-Have | Should-Have | Nice-to-Have |
-|--------------|-----------|-------------|--------------|
-| Skill | Catalog entry, 1+ agent assignment | Enforcement hook, workflow reference | Template, schema |
-| Agent | Registry entry, routing keywords | Skills assigned, model config | Workflow, template |
-| Hook | settings.json registration | @ENFORCEMENT_HOOKS.md entry | Tests, agent awareness |
-| Workflow | Registry entry, agent mapping | @ENTERPRISE_WORKFLOWS.md entry | Template, tests |
-| Template | Catalog entry | Agent/workflow reference | Schema validation |
-| Schema | Catalog entry | Consumer wiring (Ajv) | Documentation |
+| Artifact Type | Must-Have                          | Should-Have                          | Nice-to-Have           |
+| ------------- | ---------------------------------- | ------------------------------------ | ---------------------- |
+| Skill         | Catalog entry, 1+ agent assignment | Enforcement hook, workflow reference | Template, schema       |
+| Agent         | Registry entry, routing keywords   | Skills assigned, model config        | Workflow, template     |
+| Hook          | settings.json registration         | @ENFORCEMENT_HOOKS.md entry          | Tests, agent awareness |
+| Workflow      | Registry entry, agent mapping      | @ENTERPRISE_WORKFLOWS.md entry       | Template, tests        |
+| Template      | Catalog entry                      | Agent/workflow reference             | Schema validation      |
+| Schema        | Catalog entry                      | Consumer wiring (Ajv)                | Documentation          |
 
 **Implementation Notes:**
+
 - Use `atomicWriteJSONSync()` pattern for safe writes (or `fs.writeFileSync` with temp + rename)
 - Graph file at `.claude/context/runtime/artifact-graph.json`
 - File size ~50-80KB for ~268 nodes -- trivially small, no performance concerns
 - All operations are synchronous (graph is small enough)
 
 **Acceptance Criteria:**
+
 - [ ] Module exports `ArtifactGraph` class
 - [ ] All CRUD operations work (add/remove/get nodes and edges)
 - [ ] `getMissingIntegrations()` correctly identifies gaps per artifact type
@@ -318,14 +347,14 @@ class ArtifactGraph {
 
 **Edge Detection Logic:**
 
-| Edge Type | Detection Method |
-|-----------|-----------------|
-| `assigned-to` | Grep agent files for `Skill({ skill: '<name>' })` patterns |
-| `invokes` | Grep workflow files for `Skill({ skill: '<name>' })` patterns |
+| Edge Type     | Detection Method                                              |
+| ------------- | ------------------------------------------------------------- |
+| `assigned-to` | Grep agent files for `Skill({ skill: '<name>' })` patterns    |
+| `invokes`     | Grep workflow files for `Skill({ skill: '<name>' })` patterns |
 | `enforced-by` | Grep hook files for artifact path patterns in CREATOR_CONFIGS |
-| `references` | Grep catalog/doc files for artifact name mentions |
-| `validates` | Grep schema files for `$ref` or consumer patterns |
-| `templates` | Grep template files for artifact generation targets |
+| `references`  | Grep catalog/doc files for artifact name mentions             |
+| `validates`   | Grep schema files for `$ref` or consumer patterns             |
+| `templates`   | Grep template files for artifact generation targets           |
 
 **CLI Interface:**
 
@@ -338,10 +367,12 @@ node .claude/tools/cli/bootstrap-artifact-graph.cjs [options]
 ```
 
 **Package.json Scripts:**
+
 - `pnpm graph:bootstrap` -- run bootstrap
 - `pnpm graph:health` -- print graph stats
 
 **Acceptance Criteria:**
+
 - [ ] Tool scans all 9 artifact directories
 - [ ] Creates nodes with correct `{type}:{name}` IDs
 - [ ] Detects skill-to-agent assignment edges via grep
@@ -364,11 +395,13 @@ node .claude/tools/cli/bootstrap-artifact-graph.cjs [options]
 **Recommended Skills:** `verification-before-completion`
 
 **Command:**
+
 ```bash
 node .claude/tools/cli/bootstrap-artifact-graph.cjs --verbose
 ```
 
 **Acceptance Criteria:**
+
 - [ ] `.claude/context/runtime/artifact-graph.json` exists and is valid JSON
 - [ ] Node count >= 200 (88 skills + 49 agents + 36 hooks + 41 workflows + 27 templates + 27 schemas + rules + catalogs)
 - [ ] Edge count >= 300
@@ -424,7 +457,7 @@ function quickIntegrationCheck(artifactId, graph) {
 
   return {
     gaps: mustHaves.map(c => c.item),
-    status: mustHaves.length === 0 ? 'fully-integrated' : 'partially-integrated'
+    status: mustHaves.length === 0 ? 'fully-integrated' : 'partially-integrated',
   };
 }
 ```
@@ -434,17 +467,26 @@ function quickIntegrationCheck(artifactId, graph) {
 When gaps detected, append to `.claude/context/runtime/integration-queue.jsonl`:
 
 ```jsonl
-{"timestamp":"2026-02-07T10:30:00Z","artifactId":"skill:rate-limiter","changeType":"created","source":"post-creation-integration.cjs","priority":"P1","processed":false}
+{
+  "timestamp": "2026-02-07T10:30:00Z",
+  "artifactId": "skill:rate-limiter",
+  "changeType": "created",
+  "source": "post-creation-integration.cjs",
+  "priority": "P1",
+  "processed": false
+}
 ```
 
 **Output:**
 
 Hook always returns `{ allow: true }` (advisory). Warning message includes:
+
 - Artifact ID
 - Number of missing must-have integrations
 - Queue entry created (yes/no)
 
 **Acceptance Criteria:**
+
 - [ ] Hook detects TaskUpdate with status "completed" for creator tasks
 - [ ] Hook correctly identifies creator completions via metadata, subject patterns, or file patterns
 - [ ] Hook reads artifact-graph.json and performs quick integration check
@@ -466,6 +508,7 @@ Hook always returns `{ allow: true }` (advisory). Warning message includes:
 **Recommended Skills:** `verification-before-completion`
 
 **Registration:**
+
 ```json
 {
   "type": "command",
@@ -477,6 +520,7 @@ Hook always returns `{ allow: true }` (advisory). Warning message includes:
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Hook registered in `.claude/settings.json`
 - [ ] Hook fires on TaskUpdate PostToolUse events
 - [ ] No conflict with existing `post-completion-chain.cjs` hook
@@ -516,17 +560,18 @@ Hook always returns `{ allow: true }` (advisory). Warning message includes:
 
 ## Quick Reference
 
-| Artifact | Must-Have Integration |
-|----------|---------------------|
-| Skill | Catalog entry + agent assignment |
-| Agent | Registry entry + routing keywords |
-| Hook | settings.json registration |
-| Workflow | Registry entry + agent mapping |
-| Template | Catalog entry |
-| Schema | Catalog entry |
+| Artifact | Must-Have Integration             |
+| -------- | --------------------------------- |
+| Skill    | Catalog entry + agent assignment  |
+| Agent    | Registry entry + routing keywords |
+| Hook     | settings.json registration        |
+| Workflow | Registry entry + agent mapping    |
+| Template | Catalog entry                     |
+| Schema   | Catalog entry                     |
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Rule file exists at `.claude/rules/artifact-integration.md`
 - [ ] Content is concise and actionable (auto-loaded into every conversation)
 - [ ] Covers must-have/should-have/nice-to-have tiers
@@ -545,11 +590,13 @@ Hook always returns `{ allow: true }` (advisory). Warning message includes:
 **Recommended Skills:** `verification-before-completion`
 
 **Specification:**
+
 - Max 500 lines in `integration-queue.jsonl`
 - Use same rotation pattern as `reflection-queue.jsonl`
 - Reuse `appendJsonl` from `jsonl-utils.cjs` if available
 
 **Acceptance Criteria:**
+
 - [ ] Queue file is capped at 500 lines
 - [ ] Old entries are trimmed when cap exceeded
 - [ ] Rotation does not lose unprocessed entries (processed: false)
@@ -580,6 +627,7 @@ Hook always returns `{ allow: true }` (advisory). Warning message includes:
 11. **getStats:** Returns accurate counts
 
 **Acceptance Criteria:**
+
 - [ ] All test cases pass with `node --test`
 - [ ] Tests are deterministic (no shared state)
 - [ ] Tests create/clean up temp files (no pollution)
@@ -607,6 +655,7 @@ Hook always returns `{ allow: true }` (advisory). Warning message includes:
 8. **Performance:** Completes in < 100ms for typical input
 
 **Acceptance Criteria:**
+
 - [ ] All test cases pass
 - [ ] Tests mock filesystem appropriately
 - [ ] No side effects on real graph file
@@ -631,6 +680,7 @@ Hook always returns `{ allow: true }` (advisory). Warning message includes:
 5. **Empty directories:** Handles missing artifact directories gracefully
 
 **Acceptance Criteria:**
+
 - [ ] All test cases pass
 - [ ] Tests use fixture directories (not production artifacts)
 
@@ -689,20 +739,21 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
 ### Phase 2 Tasks
 
-| # | Task | Target Agent | Complexity | Dependencies | Est. Time |
-|---|------|-------------|------------|-------------|-----------|
-| 2.1 | Create integration-impact.cjs library | `developer` | MEDIUM | 1.2, 1.4 | 3-4 hrs |
-| 2.2 | Create artifact-integrator skill | `developer` + `skill-creator` | HIGH | 2.1 | 4-6 hrs |
-| 2.3 | Add Planner Gate 5 | `technical-writer` | LOW | 2.1 | 1-2 hrs |
-| 2.4 | Add Code-Reviewer Stage 3 | `technical-writer` | LOW | 2.1 | 1-2 hrs |
-| 2.5 | Add Router Step 0.5 (integration queue check) | `developer` | MEDIUM | 2.2 | 2-3 hrs |
-| 2.6 | Add routing keywords for artifact integration | `developer` | LOW | None (after 1.4) | 1 hr |
-| 2.7 | Update post-creation-validation.md | `technical-writer` | LOW | 2.1 | 1 hr |
-| 2.8 | Tests for integration-impact.cjs | `qa` | MEDIUM | 2.1 | 2-3 hrs |
-| 2.9 | Tests for artifact-integrator skill flow | `qa` | MEDIUM | 2.2 | 2-3 hrs |
-| 2.10 | Integration E2E test (create -> detect -> analyze) | `qa` | HIGH | 2.5 | 3-4 hrs |
+| #    | Task                                               | Target Agent                  | Complexity | Dependencies     | Est. Time |
+| ---- | -------------------------------------------------- | ----------------------------- | ---------- | ---------------- | --------- |
+| 2.1  | Create integration-impact.cjs library              | `developer`                   | MEDIUM     | 1.2, 1.4         | 3-4 hrs   |
+| 2.2  | Create artifact-integrator skill                   | `developer` + `skill-creator` | HIGH       | 2.1              | 4-6 hrs   |
+| 2.3  | Add Planner Gate 5                                 | `technical-writer`            | LOW        | 2.1              | 1-2 hrs   |
+| 2.4  | Add Code-Reviewer Stage 3                          | `technical-writer`            | LOW        | 2.1              | 1-2 hrs   |
+| 2.5  | Add Router Step 0.5 (integration queue check)      | `developer`                   | MEDIUM     | 2.2              | 2-3 hrs   |
+| 2.6  | Add routing keywords for artifact integration      | `developer`                   | LOW        | None (after 1.4) | 1 hr      |
+| 2.7  | Update post-creation-validation.md                 | `technical-writer`            | LOW        | 2.1              | 1 hr      |
+| 2.8  | Tests for integration-impact.cjs                   | `qa`                          | MEDIUM     | 2.1              | 2-3 hrs   |
+| 2.9  | Tests for artifact-integrator skill flow           | `qa`                          | MEDIUM     | 2.2              | 2-3 hrs   |
+| 2.10 | Integration E2E test (create -> detect -> analyze) | `qa`                          | HIGH       | 2.5              | 3-4 hrs   |
 
 **Parallel Groups:**
+
 - **Group A (sequential):** 2.1 -> 2.2 -> 2.5
 - **Group B (after 2.1):** 2.3, 2.4, 2.7, 2.8 (all can run in parallel)
 - **Group C (independent):** 2.6 (can start after Phase 1)
@@ -726,8 +777,8 @@ const { analyzeImpact } = require('./integration-impact.cjs');
 
 const impact = analyzeImpact({
   artifactId: 'skill:rate-limiter',
-  changeType: 'created',    // created | updated | deleted
-  graphPath: GRAPH_PATH      // path to artifact-graph.json
+  changeType: 'created', // created | updated | deleted
+  graphPath: GRAPH_PATH, // path to artifact-graph.json
 });
 
 // Returns:
@@ -746,6 +797,7 @@ const impact = analyzeImpact({
 ```
 
 **Impact Score Calculation:**
+
 - Must-have gaps: +0.3 each (capped at 0.9)
 - Should-have gaps: +0.1 each (capped at 0.3)
 - Nice-to-have gaps: +0.05 each (capped at 0.1)
@@ -753,6 +805,7 @@ const impact = analyzeImpact({
 - Score 0.0 = fully integrated, Score 1.0 = completely orphaned
 
 **Acceptance Criteria:**
+
 - [ ] `analyzeImpact()` returns correct missing integrations for each artifact type
 - [ ] `proposedTasks` includes correct creator skill for each gap
 - [ ] Impact score is 0.0 for fully-integrated artifacts
@@ -787,16 +840,19 @@ The `artifact-integrator` skill, when invoked, performs:
 4. **Output:** Integration analysis report + proposed TaskCreate entries
 
 **Skill Inputs:**
+
 - `artifactId` (optional) -- analyze specific artifact
 - `queue` (default) -- process entire queue
 
 **Skill Outputs:**
+
 - Integration analysis report (markdown)
 - Proposed tasks (structured, ready for TaskCreate)
 
 **Agent Assignment:** architect, planner, developer (all should be able to invoke this)
 
 **Acceptance Criteria:**
+
 - [ ] SKILL.md exists at `.claude/skills/artifact-integrator/SKILL.md`
 - [ ] Skill is in skill-catalog.md
 - [ ] Skill is assigned to at least architect, planner, developer
@@ -842,6 +898,7 @@ Before finalizing any implementation plan, check:
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Gate 5 section added to planner.md after existing gates
 - [ ] Gate covers create, modify, and delete scenarios
 - [ ] References artifact-graph.json as data source
@@ -885,6 +942,7 @@ After completing code quality (Stage 1) and design (Stage 2) review:
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Stage 3 section added to code-reviewer.md
 - [ ] Stage covers integration verification for artifact changes
 - [ ] References artifact-graph.json for checking
@@ -897,6 +955,7 @@ After completing code quality (Stage 1) and design (Stage 2) review:
 **What:** Update router behavior to check the integration queue after reflection check and before TaskList.
 
 **Files:**
+
 - `.claude/workflows/core/router-decision.md` (documentation update)
 - Router behavior guidance (CLAUDE.md reference or inline in router-decision.md)
 
@@ -919,6 +978,7 @@ with the user's primary request.
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Router-decision.md updated with Step 0.5 documentation
 - [ ] Step is non-blocking (parallel with user request)
 - [ ] Only triggers when unprocessed entries exist
@@ -948,6 +1008,7 @@ with the user's primary request.
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Keywords added to routing-table.cjs
 - [ ] Routes to architect agent (appropriate for integration analysis)
 - [ ] Keywords cover common user phrases about integration issues
@@ -964,12 +1025,14 @@ with the user's primary request.
 **Recommended Skills:** `writing-skills`, `verification-before-completion`
 
 **Changes:**
+
 - Add reference to artifact-graph.json as the source of truth for integration status
 - Add step: "After completing checklist, update artifact-graph.json via artifact-graph.cjs library"
 - Cross-reference the artifact-integrator skill
 - Note that the post-creation-integration.cjs hook now automates parts of this workflow
 
 **Acceptance Criteria:**
+
 - [ ] post-creation-validation.md references artifact-graph.json
 - [ ] Workflow updated to include graph update step
 - [ ] Cross-references artifact-integrator skill
@@ -997,6 +1060,7 @@ with the user's primary request.
 8. **Impact score bounds:** Never < 0.0 or > 1.0
 
 **Acceptance Criteria:**
+
 - [ ] All test cases pass
 - [ ] Tests use fixture graph data (not production)
 
@@ -1020,6 +1084,7 @@ with the user's primary request.
 5. **Dependency ordering:** Tasks are ordered correctly (schema before artifact before catalog)
 
 **Acceptance Criteria:**
+
 - [ ] All test cases pass
 - [ ] Tests use fixture queue and graph data
 
@@ -1044,6 +1109,7 @@ with the user's primary request.
 6. Verify graph update after integration completes
 
 **Acceptance Criteria:**
+
 - [ ] Full flow executes without errors
 - [ ] Each step produces expected output
 - [ ] Test is deterministic and isolated
@@ -1100,21 +1166,22 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
 ### Phase 3 Tasks
 
-| # | Task | Target Agent | Complexity | Dependencies | Est. Time |
-|---|------|-------------|------------|-------------|-----------|
-| 3.1 | Add backward propagation to code-reviewer | `developer` | MEDIUM | 2.4 | 2-3 hrs |
-| 3.2 | Add backward propagation to architect | `developer` | MEDIUM | 2.4 | 2-3 hrs |
-| 3.3 | Add backward propagation to artifact-integrator | `developer` | MEDIUM | 2.2, 3.1 | 2-3 hrs |
-| 3.4 | Change must-haves from warning to blocking | `developer` | LOW | 2.5 | 1-2 hrs |
-| 3.5 | Create integration health dashboard | `developer` | MEDIUM | 2.1 | 2-3 hrs |
-| 3.6 | Add graph visualization (mermaid) to dashboard | `developer` | LOW | 3.5 | 1-2 hrs |
-| 3.7 | Update CLAUDE.md with integration protocol | `technical-writer` | LOW | All Phase 2 | 1-2 hrs |
-| 3.8 | Update @ENFORCEMENT_HOOKS.md | `technical-writer` | LOW | 1.5 | 1 hr |
-| 3.9 | Update @CREATOR_SKILLS_TABLE.md | `technical-writer` | LOW | 2.2 | 1 hr |
-| 3.10 | End-to-end integration test (full system) | `qa` | HIGH | 3.3, 3.4 | 3-4 hrs |
-| 3.11 | Evolution and Reflection Check | `reflection-agent` | LOW | 3.10 | 1 hr |
+| #    | Task                                            | Target Agent       | Complexity | Dependencies | Est. Time |
+| ---- | ----------------------------------------------- | ------------------ | ---------- | ------------ | --------- |
+| 3.1  | Add backward propagation to code-reviewer       | `developer`        | MEDIUM     | 2.4          | 2-3 hrs   |
+| 3.2  | Add backward propagation to architect           | `developer`        | MEDIUM     | 2.4          | 2-3 hrs   |
+| 3.3  | Add backward propagation to artifact-integrator | `developer`        | MEDIUM     | 2.2, 3.1     | 2-3 hrs   |
+| 3.4  | Change must-haves from warning to blocking      | `developer`        | LOW        | 2.5          | 1-2 hrs   |
+| 3.5  | Create integration health dashboard             | `developer`        | MEDIUM     | 2.1          | 2-3 hrs   |
+| 3.6  | Add graph visualization (mermaid) to dashboard  | `developer`        | LOW        | 3.5          | 1-2 hrs   |
+| 3.7  | Update CLAUDE.md with integration protocol      | `technical-writer` | LOW        | All Phase 2  | 1-2 hrs   |
+| 3.8  | Update @ENFORCEMENT_HOOKS.md                    | `technical-writer` | LOW        | 1.5          | 1 hr      |
+| 3.9  | Update @CREATOR_SKILLS_TABLE.md                 | `technical-writer` | LOW        | 2.2          | 1 hr      |
+| 3.10 | End-to-end integration test (full system)       | `qa`               | HIGH       | 3.3, 3.4     | 3-4 hrs   |
+| 3.11 | Evolution and Reflection Check                  | `reflection-agent` | LOW        | 3.10         | 1 hr      |
 
 **Parallel Groups:**
+
 - **Group A:** 3.1, 3.2 (parallel, both add backward propagation)
 - **Group B:** 3.3 (after 3.1)
 - **Group C:** 3.4 (independent, after Phase 2)
@@ -1136,27 +1203,45 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
 **Detection Patterns:**
 
-| Review Finding | Proposed Artifact | Creator |
-|---------------|-------------------|---------|
-| Same validation logic in 3+ files | New skill (extract + centralize) | skill-creator |
-| Missing security check pattern | New enforcement hook | hook-creator |
-| Repeated agent spawn boilerplate | New spawn template | template-creator |
-| Undocumented API pattern | New workflow | workflow-creator |
-| Unvalidated data structure | New JSON schema | schema-creator |
-| Missing domain expertise | New domain agent | agent-creator |
+| Review Finding                    | Proposed Artifact                | Creator          |
+| --------------------------------- | -------------------------------- | ---------------- |
+| Same validation logic in 3+ files | New skill (extract + centralize) | skill-creator    |
+| Missing security check pattern    | New enforcement hook             | hook-creator     |
+| Repeated agent spawn boilerplate  | New spawn template               | template-creator |
+| Undocumented API pattern          | New workflow                     | workflow-creator |
+| Unvalidated data structure        | New JSON schema                  | schema-creator   |
+| Missing domain expertise          | New domain agent                 | agent-creator    |
 
 **Queue Entry Format:**
 
 ```jsonl
-{"timestamp":"...","type":"backward-propagation","source":"code-reviewer","finding":"Auth validation duplicated in 5 endpoints","proposedArtifact":{"type":"skill","name":"auth-validator","rationale":"Centralize auth validation"},"evidence":["src/api/users.ts:45","src/api/orders.ts:23"],"priority":"P2","processed":false}
+{
+  "timestamp": "...",
+  "type": "backward-propagation",
+  "source": "code-reviewer",
+  "finding": "Auth validation duplicated in 5 endpoints",
+  "proposedArtifact": {
+    "type": "skill",
+    "name": "auth-validator",
+    "rationale": "Centralize auth validation"
+  },
+  "evidence": [
+    "src/api/users.ts:45",
+    "src/api/orders.ts:23"
+  ],
+  "priority": "P2",
+  "processed": false
+}
 ```
 
 **Safeguards:**
+
 - Minimum 3 occurrences before proposing
 - Must include evidence (file paths/line numbers)
 - HIGH complexity proposals require user confirmation
 
 **Acceptance Criteria:**
+
 - [ ] Code-reviewer can detect systemic patterns (3+ occurrences)
 - [ ] Backward propagation entries written to integration queue
 - [ ] Entries include evidence and rationale
@@ -1174,12 +1259,14 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 **Recommended Skills:** `verification-before-completion`
 
 **Specification:** Same pattern as Task 3.1 but triggered during architecture reviews instead of code reviews. The architect focuses on:
+
 - Missing workflow patterns
 - Missing domain agents
 - Missing schema definitions
 - Cross-cutting concerns that need skills
 
 **Acceptance Criteria:**
+
 - [ ] Architect agent documentation includes backward propagation guidance
 - [ ] Same queue format as code-reviewer
 - [ ] Same safeguards (3+ threshold, evidence required)
@@ -1206,6 +1293,7 @@ When queue entry has `type: "backward-propagation"`:
 5. If HIGH complexity: flag for user confirmation via AskUserQuestion
 
 **Acceptance Criteria:**
+
 - [ ] Integrator processes backward-propagation queue entries
 - [ ] Deduplication check against existing graph
 - [ ] Cool-down period enforced (24 hours)
@@ -1226,19 +1314,23 @@ When queue entry has `type: "backward-propagation"`:
 **Specification:**
 
 Add an environment variable toggle:
+
 ```
 INTEGRATION_ENFORCEMENT=block  (default: warn)
 ```
 
 When `block`:
+
 - Must-have integration gaps return `{ allow: false, message: "..." }`
 - Should-have and nice-to-have remain advisory
 - Error message includes specific missing integrations
 
 When `warn` (default during rollout):
+
 - All gaps are advisory (current behavior)
 
 **Acceptance Criteria:**
+
 - [ ] Environment variable `INTEGRATION_ENFORCEMENT` controls behavior
 - [ ] `block` mode prevents completion of creator tasks with must-have gaps
 - [ ] `warn` mode preserves current advisory behavior
@@ -1293,6 +1385,7 @@ Queue Status:
 **Package.json:** `pnpm graph:health`
 
 **Acceptance Criteria:**
+
 - [ ] Dashboard reads artifact-graph.json and produces formatted report
 - [ ] Includes per-type breakdown
 - [ ] Includes top connected and top orphaned lists
@@ -1311,16 +1404,19 @@ Queue Status:
 **Recommended Skills:** `verification-before-completion`
 
 **Specification:**
+
 ```bash
 node .claude/tools/cli/integration-health-dashboard.cjs --mermaid > graph.md
 ```
 
 Outputs a Mermaid `graph TD` with:
+
 - Nodes colored by integration status (green=integrated, yellow=partial, red=orphaned)
 - Edges labeled by type
 - Subgraphs by artifact type
 
 **Acceptance Criteria:**
+
 - [ ] `--mermaid` flag produces valid Mermaid markdown
 - [ ] Nodes are colored by status
 - [ ] Output is renderable in GitHub/GitLab/Mermaid Live Editor
@@ -1337,12 +1433,14 @@ Outputs a Mermaid `graph TD` with:
 **Recommended Skills:** `writing-skills`, `verification-before-completion`
 
 **Changes:**
+
 - Add to Section 3 (after Creator Skills): Brief reference to artifact-integrator skill
 - Add to Section 8.5 (Workflow Enhancement Skills): artifact-integrator entry
 - Add to Section 1.3 (Enforcement Hooks): post-creation-integration.cjs reference
 - Add note about Router Step 0.5 to Section 0
 
 **Acceptance Criteria:**
+
 - [ ] CLAUDE.md references artifact-integrator skill
 - [ ] CLAUDE.md references post-creation-integration.cjs hook
 - [ ] CLAUDE.md mentions Router Step 0.5
@@ -1360,11 +1458,13 @@ Outputs a Mermaid `graph TD` with:
 **Recommended Skills:** `writing-skills`, `verification-before-completion`
 
 **Addition:**
+
 - Hook name, event type (PostToolUse), trigger (TaskUpdate)
 - Enforcement mode (warn/block), env var (INTEGRATION_ENFORCEMENT)
 - Purpose, examples, troubleshooting
 
 **Acceptance Criteria:**
+
 - [ ] Hook documented in @ENFORCEMENT_HOOKS.md
 - [ ] Includes environment variable override
 - [ ] Follows existing documentation pattern
@@ -1381,11 +1481,13 @@ Outputs a Mermaid `graph TD` with:
 **Recommended Skills:** `writing-skills`, `verification-before-completion`
 
 **Changes:**
+
 - Add "Post-Creation Integration" row showing hook -> queue -> integrator flow
 - Note that integration analysis is automatic (not manual)
 - Reference artifact-integrator skill
 
 **Acceptance Criteria:**
+
 - [ ] Integration flow documented in creator skills table
 - [ ] Clear that post-creation integration is now automated
 
@@ -1410,6 +1512,7 @@ Outputs a Mermaid `graph TD` with:
 6. **No regression:** Existing creator workflows still function
 
 **Acceptance Criteria:**
+
 - [ ] All 6 test scenarios pass
 - [ ] Tests are deterministic and isolated
 - [ ] No regression in existing hook/creator behavior
@@ -1430,6 +1533,7 @@ Outputs a Mermaid `graph TD` with:
 **Target Agent:** `reflection-agent`
 
 **Acceptance Criteria:**
+
 - [ ] Reflection-agent spawned and completed
 - [ ] Learnings extracted to `.claude/context/memory/learnings.md`
 - [ ] Evolution opportunities logged if any detected
@@ -1477,26 +1581,26 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
 ## Risk Analysis
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Graph becomes stale | MEDIUM | MEDIUM | Re-bootstrap script (`pnpm graph:bootstrap`), hook monitoring |
-| Integration analysis spawns too many agents | LOW | HIGH | Batch analysis (max 3 per run), cool-down timer |
-| Hook fails silently | MEDIUM | LOW | Error tracking via error-tracker-hook, stderr logging |
-| Backward propagation creates unnecessary artifacts | LOW | MEDIUM | 3+ occurrence threshold, user confirmation for HIGH |
-| Graph file grows too large | LOW | LOW | 268 artifacts = ~80KB, far below any limit |
-| Context window overhead | MEDIUM | MEDIUM | Load graph only when needed, not every prompt |
-| Circular dependency in integration tasks | LOW | HIGH | Cycle detection in planner Gate 5 |
-| Existing creators break with new hook | LOW | HIGH | Hook is advisory (Phase 1-2), never blocks |
+| Risk                                               | Likelihood | Impact | Mitigation                                                    |
+| -------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------- |
+| Graph becomes stale                                | MEDIUM     | MEDIUM | Re-bootstrap script (`pnpm graph:bootstrap`), hook monitoring |
+| Integration analysis spawns too many agents        | LOW        | HIGH   | Batch analysis (max 3 per run), cool-down timer               |
+| Hook fails silently                                | MEDIUM     | LOW    | Error tracking via error-tracker-hook, stderr logging         |
+| Backward propagation creates unnecessary artifacts | LOW        | MEDIUM | 3+ occurrence threshold, user confirmation for HIGH           |
+| Graph file grows too large                         | LOW        | LOW    | 268 artifacts = ~80KB, far below any limit                    |
+| Context window overhead                            | MEDIUM     | MEDIUM | Load graph only when needed, not every prompt                 |
+| Circular dependency in integration tasks           | LOW        | HIGH   | Cycle detection in planner Gate 5                             |
+| Existing creators break with new hook              | LOW        | HIGH   | Hook is advisory (Phase 1-2), never blocks                    |
 
 ## Success Metrics
 
-| Metric | Current | Phase 1 Target | Phase 2 Target | Phase 3 Target |
-|--------|---------|---------------|----------------|----------------|
-| Post-creation steps completed | ~30% | 60% | 75% | 90% |
-| Orphan artifact rate | ~70% | 40% | 20% | < 10% |
-| Cross-creator triggers per creation | 0 | 1-2 | 2-3 | 2-4 |
-| Artifact graph coverage | 0% | 80% | 90% | 100% |
-| Integration analysis latency | N/A | < 30s | < 20s | < 15s |
+| Metric                              | Current | Phase 1 Target | Phase 2 Target | Phase 3 Target |
+| ----------------------------------- | ------- | -------------- | -------------- | -------------- |
+| Post-creation steps completed       | ~30%    | 60%            | 75%            | 90%            |
+| Orphan artifact rate                | ~70%    | 40%            | 20%            | < 10%          |
+| Cross-creator triggers per creation | 0       | 1-2            | 2-3            | 2-4            |
+| Artifact graph coverage             | 0%      | 80%            | 90%            | 100%           |
+| Integration analysis latency        | N/A     | < 30s          | < 20s          | < 15s          |
 
 ---
 
@@ -1504,42 +1608,42 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
 ### New Files (11)
 
-| File | Phase | Type |
-|------|-------|------|
-| `.claude/schemas/artifact-graph.schema.json` | 1 | Schema |
-| `.claude/lib/workflow/artifact-graph.cjs` | 1 | Library |
-| `.claude/tools/cli/bootstrap-artifact-graph.cjs` | 1 | Tool |
-| `.claude/context/runtime/artifact-graph.json` | 1 | Data |
-| `.claude/hooks/workflow/post-creation-integration.cjs` | 1 | Hook |
-| `.claude/context/runtime/integration-queue.jsonl` | 1 | Data |
-| `.claude/rules/artifact-integration.md` | 1 | Rule |
-| `.claude/lib/workflow/integration-impact.cjs` | 2 | Library |
-| `.claude/skills/artifact-integrator/SKILL.md` | 2 | Skill |
-| `.claude/tools/cli/integration-health-dashboard.cjs` | 3 | Tool |
-| `tests/integration/artifact-graph.test.cjs` | 1 | Test |
-| `tests/hooks/post-creation-integration.test.cjs` | 1 | Test |
-| `tests/tools/bootstrap-artifact-graph.test.cjs` | 1 | Test |
-| `tests/integration/integration-impact.test.cjs` | 2 | Test |
-| `tests/skills/artifact-integrator.test.cjs` | 2 | Test |
-| `tests/integration/cross-artifact-e2e.test.cjs` | 2 | Test |
-| `tests/integration/cross-artifact-full-e2e.test.cjs` | 3 | Test |
+| File                                                   | Phase | Type    |
+| ------------------------------------------------------ | ----- | ------- |
+| `.claude/schemas/artifact-graph.schema.json`           | 1     | Schema  |
+| `.claude/lib/workflow/artifact-graph.cjs`              | 1     | Library |
+| `.claude/tools/cli/bootstrap-artifact-graph.cjs`       | 1     | Tool    |
+| `.claude/context/runtime/artifact-graph.json`          | 1     | Data    |
+| `.claude/hooks/workflow/post-creation-integration.cjs` | 1     | Hook    |
+| `.claude/context/runtime/integration-queue.jsonl`      | 1     | Data    |
+| `.claude/rules/artifact-integration.md`                | 1     | Rule    |
+| `.claude/lib/workflow/integration-impact.cjs`          | 2     | Library |
+| `.claude/skills/artifact-integrator/SKILL.md`          | 2     | Skill   |
+| `.claude/tools/cli/integration-health-dashboard.cjs`   | 3     | Tool    |
+| `tests/integration/artifact-graph.test.cjs`            | 1     | Test    |
+| `tests/hooks/post-creation-integration.test.cjs`       | 1     | Test    |
+| `tests/tools/bootstrap-artifact-graph.test.cjs`        | 1     | Test    |
+| `tests/integration/integration-impact.test.cjs`        | 2     | Test    |
+| `tests/skills/artifact-integrator.test.cjs`            | 2     | Test    |
+| `tests/integration/cross-artifact-e2e.test.cjs`        | 2     | Test    |
+| `tests/integration/cross-artifact-full-e2e.test.cjs`   | 3     | Test    |
 
 ### Modified Files (12)
 
-| File | Phase | Change |
-|------|-------|--------|
-| `.claude/settings.json` | 1 | Register post-creation-integration.cjs |
-| `package.json` | 1 | Add graph:bootstrap, graph:health scripts |
-| `.claude/agents/core/planner.md` | 2 | Add Gate 5 |
-| `.claude/agents/specialized/code-reviewer.md` | 2, 3 | Add Stage 3, backward propagation |
-| `.claude/agents/core/architect.md` | 3 | Add backward propagation |
-| `.claude/workflows/core/router-decision.md` | 2 | Add Step 0.5 |
-| `.claude/workflows/core/post-creation-validation.md` | 2 | Reference graph |
-| `.claude/lib/routing/routing-table.cjs` | 2 | Add keywords |
-| `.claude/context/artifacts/catalogs/skill-catalog.md` | 2 | Add artifact-integrator |
-| `.claude/CLAUDE.md` | 3 | Add integration references |
-| `.claude/docs/@ENFORCEMENT_HOOKS.md` | 3 | Document hook |
-| `.claude/docs/@CREATOR_SKILLS_TABLE.md` | 3 | Add integration flow |
+| File                                                  | Phase | Change                                    |
+| ----------------------------------------------------- | ----- | ----------------------------------------- |
+| `.claude/settings.json`                               | 1     | Register post-creation-integration.cjs    |
+| `package.json`                                        | 1     | Add graph:bootstrap, graph:health scripts |
+| `.claude/agents/core/planner.md`                      | 2     | Add Gate 5                                |
+| `.claude/agents/specialized/code-reviewer.md`         | 2, 3  | Add Stage 3, backward propagation         |
+| `.claude/agents/core/architect.md`                    | 3     | Add backward propagation                  |
+| `.claude/workflows/core/router-decision.md`           | 2     | Add Step 0.5                              |
+| `.claude/workflows/core/post-creation-validation.md`  | 2     | Reference graph                           |
+| `.claude/lib/routing/routing-table.cjs`               | 2     | Add keywords                              |
+| `.claude/context/artifacts/catalogs/skill-catalog.md` | 2     | Add artifact-integrator                   |
+| `.claude/CLAUDE.md`                                   | 3     | Add integration references                |
+| `.claude/docs/@ENFORCEMENT_HOOKS.md`                  | 3     | Document hook                             |
+| `.claude/docs/@CREATOR_SKILLS_TABLE.md`               | 3     | Add integration flow                      |
 
 **Total:** 29 files (17 new + 12 modified)
 
@@ -1547,13 +1651,13 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Parallel? | Commit Checkpoint |
-|-------|-------|-----------|-----------|-------------------|
-| 1: Foundation | 11 | 2-3 days | Partial | Yes (after Phase 1) |
-| 2: Enhancement | 10 | 3-4 days | Partial | Yes (after Phase 2) |
-| 3: Full System | 11 | 2-3 days | Yes (mostly) | Yes (after Phase 3) |
-| **Total** | **32** | **7-10 days** | | 3 checkpoints |
+| Phase          | Tasks  | Est. Time     | Parallel?    | Commit Checkpoint   |
+| -------------- | ------ | ------------- | ------------ | ------------------- |
+| 1: Foundation  | 11     | 2-3 days      | Partial      | Yes (after Phase 1) |
+| 2: Enhancement | 10     | 3-4 days      | Partial      | Yes (after Phase 2) |
+| 3: Full System | 11     | 2-3 days      | Yes (mostly) | Yes (after Phase 3) |
+| **Total**      | **32** | **7-10 days** |              | 3 checkpoints       |
 
 ---
 
-*End of implementation plan.*
+_End of implementation plan._

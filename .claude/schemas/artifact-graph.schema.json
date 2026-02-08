@@ -47,12 +47,7 @@
             "description": "ISO 8601 timestamp of artifact creation"
           },
           "integrationStatus": {
-            "enum": [
-              "created",
-              "partially-integrated",
-              "fully-integrated",
-              "needs-update"
-            ],
+            "enum": ["created", "partially-integrated", "fully-integrated", "needs-update"],
             "description": "Current integration state of the artifact"
           },
           "missingIntegrations": {
@@ -99,12 +94,7 @@
             "description": "Relationship type between artifacts"
           },
           "status": {
-            "enum": [
-              "active",
-              "missing",
-              "proposed",
-              "deprecated"
-            ],
+            "enum": ["active", "missing", "proposed", "deprecated"],
             "description": "Edge status indicating relationship state"
           },
           "metadata": {

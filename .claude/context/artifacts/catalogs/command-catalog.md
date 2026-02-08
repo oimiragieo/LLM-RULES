@@ -12,25 +12,25 @@ This catalog documents all slash commands in the agent-studio framework with the
 
 ## Quick Reference
 
-| Command | Description | Delegates To | Category |
-|---------|-------------|-------------|----------|
-| `/brainstorm` | Explore ideas and design collaboratively | `brainstorming` | Planning |
-| `/write-plan` | Create implementation plan with tasks | `writing-plans` | Planning |
-| `/execute-plan` | Execute plan in batches with checkpoints | `executing-plans` | Planning |
-| `/tdd` | Test-driven development with Iron Laws | `tdd` | Development |
-| `/debug` | Systematic debugging with root cause | `debugging` | Development |
-| `/build-fix` | Diagnose and fix build failures | `debugging` | Development |
-| `/code-review` | Request focused code review | `requesting-code-review` | Quality |
-| `/verify` | Comprehensive verification before completion | `verification-before-completion` | Quality |
-| `/test-coverage` | Analyze coverage and identify gaps | `tdd` | Quality |
-| `/e2e` | End-to-end testing workflow | `qa-workflow` | Quality |
-| `/eval` | Regression test suite execution | `qa-workflow` | Quality |
-| `/refactor-clean` | Safe refactoring and cleanup | `code-quality-expert` | Quality |
-| `/security-review` | OWASP/STRIDE security analysis | `security-architect` | Security |
-| `/compress` | Compress context to reduce tokens | `context-compressor` | Context |
-| `/learn` | Extract session patterns to memory | `context-compressor` + memory | Context |
-| `/analyze` | Project structure and health analysis | `project-analyzer` | Analysis |
-| `/setup-pm` | Configure package manager | standalone script | Setup |
+| Command            | Description                                  | Delegates To                     | Category    |
+| ------------------ | -------------------------------------------- | -------------------------------- | ----------- |
+| `/brainstorm`      | Explore ideas and design collaboratively     | `brainstorming`                  | Planning    |
+| `/write-plan`      | Create implementation plan with tasks        | `writing-plans`                  | Planning    |
+| `/execute-plan`    | Execute plan in batches with checkpoints     | `executing-plans`                | Planning    |
+| `/tdd`             | Test-driven development with Iron Laws       | `tdd`                            | Development |
+| `/debug`           | Systematic debugging with root cause         | `debugging`                      | Development |
+| `/build-fix`       | Diagnose and fix build failures              | `debugging`                      | Development |
+| `/code-review`     | Request focused code review                  | `requesting-code-review`         | Quality     |
+| `/verify`          | Comprehensive verification before completion | `verification-before-completion` | Quality     |
+| `/test-coverage`   | Analyze coverage and identify gaps           | `tdd`                            | Quality     |
+| `/e2e`             | End-to-end testing workflow                  | `qa-workflow`                    | Quality     |
+| `/eval`            | Regression test suite execution              | `qa-workflow`                    | Quality     |
+| `/refactor-clean`  | Safe refactoring and cleanup                 | `code-quality-expert`            | Quality     |
+| `/security-review` | OWASP/STRIDE security analysis               | `security-architect`             | Security    |
+| `/compress`        | Compress context to reduce tokens            | `context-compressor`             | Context     |
+| `/learn`           | Extract session patterns to memory           | `context-compressor` + memory    | Context     |
+| `/analyze`         | Project structure and health analysis        | `project-analyzer`               | Analysis    |
+| `/setup-pm`        | Configure package manager                    | standalone script                | Setup       |
 
 ---
 
@@ -334,6 +334,7 @@ The following commands were removed during the 2026-02-07 overhaul (architecture
 ### `/orchestrate` (DELETED)
 
 **Reason:** Duplicates Router enterprise orchestration. The Router already implements:
+
 - Feature workflow: `planner -> developer -> code-reviewer -> security-architect`
 - Bugfix workflow: via enterprise orchestration phases
 - Refactor workflow: `architect -> developer -> code-reviewer`
@@ -372,11 +373,11 @@ Agent (spawned by Router) executes the work
 
 **Commands vs Skills vs Agents:**
 
-| Layer | Purpose | Invocation |
-|-------|---------|------------|
-| **Commands** | User entry point | User types `/name` |
-| **Skills** | Structured behavior | Agent invokes `Skill({ skill: "name" })` |
-| **Agents** | Execution context | Router spawns `Task({ subagent_type: "type" })` |
+| Layer        | Purpose             | Invocation                                      |
+| ------------ | ------------------- | ----------------------------------------------- |
+| **Commands** | User entry point    | User types `/name`                              |
+| **Skills**   | Structured behavior | Agent invokes `Skill({ skill: "name" })`        |
+| **Agents**   | Execution context   | Router spawns `Task({ subagent_type: "type" })` |
 
 Commands are thin shims that delegate to skills. Skills are the source of truth for behavior. Agents are the execution context that invokes skills.
 
@@ -391,16 +392,17 @@ Commands are NOT creator-guarded (by design). However, follow these guidelines:
 1. **Identify the target skill.** Every command should delegate to an existing skill. If no skill exists, create the skill first.
 
 2. **Use the canonical pattern:**
+
    ```yaml
    ---
    description: One-line description
    disable-model-invocation: true
    ---
-
    Invoke the {skill-name} skill and follow it exactly as presented to you
    ```
 
 3. **Add context hints for focused delegation.** If the command should focus on a specific aspect of a skill, add a context hint:
+
    ```yaml
    Invoke the {skill-name} skill and follow it exactly as presented to you. Focus specifically on {aspect}.
    ```

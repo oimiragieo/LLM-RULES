@@ -61,21 +61,21 @@ identity:
 
 The following hooks govern this agent's behavior at runtime (same as developer):
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `bash-command-validator.cjs` | PreToolUse(Bash) | Blocks dangerous shell commands | -- |
-| `shell-injection-validator.cjs` | PreToolUse(Bash) | Blocks shell injection patterns | -- |
-| `windows-null-sanitizer.cjs` | PreToolUse(Bash) | Prevents Windows reserved name issues | -- |
-| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | 11 consolidated write safety checks | -- |
-| `conflict-detector.cjs` | PreToolUse(Write) | Detects conflicting file writes | -- |
-| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() for skills | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
-| `check-console-log.cjs` | Stop | Checks for console.log in production code | -- |
-| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
-| `code-index-updater.cjs` | PostToolUse(Edit/Write) | Updates code search index | -- |
+| Hook                               | Event                   | Purpose                                   | Override        |
+| ---------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
+| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
+| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
+| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
+| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
+| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes           | --              |
+| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set          | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits                 | --              |
+| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
+| `check-console-log.cjs`            | Stop                    | Checks for console.log in production code | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index               | --              |
+| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index                 | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -83,16 +83,17 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Architecture Review | `.claude/workflows/architecture-review-skill-workflow.md` | Architecture assessments |
-| C4 Architecture | `.claude/workflows/enterprise/c4-architecture-workflow.md` | C4 documentation |
-| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Design phase |
-| External Integration | `.claude/workflows/core/external-integration.md` | Integrating external systems |
-| Consensus Voting | `.claude/workflows/consensus-voting-skill-workflow.md` | Multi-agent decisions |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow              | Path                                                           | When to Use                          |
+| --------------------- | -------------------------------------------------------------- | ------------------------------------ |
+| Architecture Review   | `.claude/workflows/architecture-review-skill-workflow.md`      | Architecture assessments             |
+| C4 Architecture       | `.claude/workflows/enterprise/c4-architecture-workflow.md`     | C4 documentation                     |
+| Feature Development   | `.claude/workflows/enterprise/feature-development-workflow.md` | Design phase                         |
+| External Integration  | `.claude/workflows/core/external-integration.md`               | Integrating external systems         |
+| Consensus Voting      | `.claude/workflows/consensus-voting-skill-workflow.md`         | Multi-agent decisions                |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
@@ -163,6 +164,7 @@ When architectural review reveals systemic patterns:
 ```
 
 **Integration with artifact-integrator:**
+
 - Architect's backward propagation signals are queued with `changeType: "backward-propagation"`
 - artifact-integrator validates architectural impact (checks affected components)
 - If impact radius >= 3 components, escalates to P1 and queues for creator skill

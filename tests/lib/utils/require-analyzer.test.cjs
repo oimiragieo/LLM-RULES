@@ -7,7 +7,10 @@ const path = require('path');
 const os = require('os');
 
 // Module under test (will fail - does not exist yet)
-const { extractRequires, resolveRequirePath } = require('../../../.claude/lib/utils/require-analyzer.cjs');
+const {
+  extractRequires,
+  resolveRequirePath,
+} = require('../../../.claude/lib/utils/require-analyzer.cjs');
 
 describe('extractRequires', () => {
   let tempDir;
@@ -92,13 +95,13 @@ const c = require('./c.cjs');`;
 
     assert.ok(result.requires);
     // Should extract all requires but mark them as non-relative
-    result.requires.forEach((req) => {
+    result.requires.forEach(req => {
       assert.equal(req.isRelative, false);
     });
   });
 
   it('skips dynamic requires (variables)', () => {
-    const content = "require(someVar); require(`template-${x}`);";
+    const content = 'require(someVar); require(`template-${x}`);';
     tempFile = path.join(tempDir, 'test6.cjs');
     fs.writeFileSync(tempFile, content);
 

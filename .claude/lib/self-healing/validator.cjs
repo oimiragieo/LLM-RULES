@@ -414,7 +414,12 @@ function validateMemory(memoryFile, options = {}) {
  * @returns {{ valid: boolean, errors: Array|null, skipped?: boolean }}
  */
 function validateStateWithSchema(stateData) {
-  const schemaPath = path.join(getProjectRoot(), '.claude', 'schemas', 'evolution-state.schema.json');
+  const schemaPath = path.join(
+    getProjectRoot(),
+    '.claude',
+    'schemas',
+    'evolution-state.schema.json'
+  );
   return validateData(stateData, schemaPath);
 }
 

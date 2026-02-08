@@ -83,6 +83,7 @@ grep "{workflow-name}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md SECTION 8.6 N
 ## Workflow-Agent Archetype Reference
 
 When creating workflows, determine which agent archetypes will use the workflow. See `.claude/docs/@WORKFLOW_AGENT_MAP.md` for:
+
 - **Section 1**: Full workflow-agent matrix
 - **Section 2**: Archetype workflow sets (Router/Orchestrator, Implementer, Reviewer, Documenter, Researcher, Domain)
 

@@ -297,7 +297,7 @@
           "issue": "3 stale agent names in rules/agents.md",
           "stale_names": ["python-backend-expert", "typescript-expert", "database-specialist"],
           "correct_names": ["python-pro", "typescript-pro", "database-architect"],
-          "source": "agent-registry.json (49 agents, authority)")
+          "source": "agent-registry.json (49 agents, authority)"
         }
       ],
       "applicability": "Any multi-agent system where agent names can change or agent counts can increase. Useful for: framework audits, agent renames, agent deprecations.",

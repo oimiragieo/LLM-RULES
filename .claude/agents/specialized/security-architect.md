@@ -41,18 +41,18 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `bash-command-validator.cjs` | PreToolUse(Bash) | Blocks dangerous shell commands | -- |
-| `shell-injection-validator.cjs` | PreToolUse(Bash) | Blocks shell injection patterns | -- |
-| `windows-null-sanitizer.cjs` | PreToolUse(Bash) | Prevents Windows reserved name issues | -- |
-| `unified-creator-guard.cjs` | PreToolUse(Write/Edit) | Blocks direct writes to creator paths | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs` | PreToolUse(Write/Edit) | Consolidated write safety checks | -- |
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | -- |
-| `sync-memory-index.cjs` | PostToolUse(Edit/Write) | Updates memory search index | -- |
-| `code-index-updater.cjs` | PostToolUse(Edit/Write) | Updates code search index | -- |
+| Hook                               | Event                   | Purpose                                | Override        |
+| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
+| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
+| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
+| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
+| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index              | --              |
 
 **Note:** `routing-guard.cjs` security review enforcement ensures this agent IS spawned for security work.
 
@@ -62,15 +62,16 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Security Audit | `.claude/workflows/security-architect-skill-workflow.md` | Security assessments |
-| Architecture Review | `.claude/workflows/architecture-review-skill-workflow.md` | Architecture security review |
-| Feature Development | `.claude/workflows/enterprise/feature-development-workflow.md` | Security review gate |
-| External Integration | `.claude/workflows/core/external-integration.md` | Integration security |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow              | Path                                                           | When to Use                          |
+| --------------------- | -------------------------------------------------------------- | ------------------------------------ |
+| Security Audit        | `.claude/workflows/security-architect-skill-workflow.md`       | Security assessments                 |
+| Architecture Review   | `.claude/workflows/architecture-review-skill-workflow.md`      | Architecture security review         |
+| Feature Development   | `.claude/workflows/enterprise/feature-development-workflow.md` | Security review gate                 |
+| External Integration  | `.claude/workflows/core/external-integration.md`               | Integration security                 |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
@@ -225,6 +226,7 @@ pnpm search:file src/auth/jwt.ts 1 100
 ```
 
 **When to use hybrid search:**
+
 - Finding authentication/authorization patterns
 - Discovering SQL injection, XSS, CSRF patterns
 - Locating crypto usage across codebase
@@ -238,7 +240,10 @@ For **advanced security patterns** with complex regex:
 
 ```javascript
 // Find hardcoded secrets (lookahead for common patterns)
-Skill({ skill: 'ripgrep', args: '-P (API_KEY|SECRET|TOKEN|PASSWORD)\\s*[=:]\\s*["\'][A-Za-z0-9+/=]{16,}' });
+Skill({
+  skill: 'ripgrep',
+  args: '-P (API_KEY|SECRET|TOKEN|PASSWORD)\\s*[=:]\\s*["\'][A-Za-z0-9+/=]{16,}',
+});
 
 // Find SQL injection risks (lookahead)
 Skill({ skill: 'ripgrep', args: '-P (execute|query).*(?=.*\\+|\\$\\{)' });
@@ -248,6 +253,7 @@ Skill({ skill: 'ripgrep', args: '-P (?<!\\.)innerHTML\\s*=' });
 ```
 
 **When to use ripgrep skill:**
+
 - PCRE2 regex features (lookahead, lookbehind)
 - Complex vulnerability patterns
 - Custom security policy checks

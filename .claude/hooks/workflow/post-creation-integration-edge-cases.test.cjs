@@ -3,7 +3,11 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { isCreatorCompletion, quickIntegrationCheck, extractArtifactId } = require('./post-creation-integration.cjs');
+const {
+  isCreatorCompletion,
+  quickIntegrationCheck,
+  extractArtifactId,
+} = require('./post-creation-integration.cjs');
 
 // Edge Case 1: Hook gracefully degrades when graph file is missing
 test('quickIntegrationCheck returns graph-unavailable when graph missing', () => {
@@ -23,10 +27,10 @@ test('isCreatorCompletion detects all creator types', () => {
         input: {
           status: 'completed',
           metadata: {
-            subject: `Create new ${type} for testing`
-          }
-        }
-      }
+            subject: `Create new ${type} for testing`,
+          },
+        },
+      },
     };
 
     const result = isCreatorCompletion(input);
@@ -43,10 +47,10 @@ test('isCreatorCompletion detects skill-creator in subject', () => {
       input: {
         status: 'completed',
         metadata: {
-          subject: 'Invoke skill-creator to add ripgrep skill'
-        }
-      }
-    }
+          subject: 'Invoke skill-creator to add ripgrep skill',
+        },
+      },
+    },
   };
 
   const result = isCreatorCompletion(input);
@@ -59,9 +63,9 @@ test('extractArtifactId constructs ID when metadata missing', () => {
   const hookData = {
     toolUse: {
       input: {
-        metadata: {} // No artifactId or artifactName
-      }
-    }
+        metadata: {}, // No artifactId or artifactName
+      },
+    },
   };
 
   const result = extractArtifactId(hookData, 'skill');
@@ -75,10 +79,10 @@ test('extractArtifactId prefers explicit artifactId', () => {
       input: {
         metadata: {
           artifactId: 'skill:explicit-id',
-          artifactName: 'should-not-use-this'
-        }
-      }
-    }
+          artifactName: 'should-not-use-this',
+        },
+      },
+    },
   };
 
   const result = extractArtifactId(hookData, 'skill');
@@ -93,9 +97,9 @@ test('processCreatorCompletion passes through non-TaskUpdate tools', async () =>
     toolUse: {
       tool: 'TaskCreate', // Not TaskUpdate
       input: {
-        status: 'completed'
-      }
-    }
+        status: 'completed',
+      },
+    },
   };
 
   const result = await processCreatorCompletion(hookData);
@@ -110,10 +114,10 @@ test('isCreatorCompletion ignores in_progress tasks', () => {
       input: {
         status: 'in_progress',
         metadata: {
-          creatorType: 'skill'
-        }
-      }
-    }
+          creatorType: 'skill',
+        },
+      },
+    },
   };
 
   const result = isCreatorCompletion(input);
@@ -128,10 +132,10 @@ test('isCreatorCompletion ignores blocked tasks', () => {
       input: {
         status: 'blocked',
         metadata: {
-          creatorType: 'skill'
-        }
-      }
-    }
+          creatorType: 'skill',
+        },
+      },
+    },
   };
 
   const result = isCreatorCompletion(input);

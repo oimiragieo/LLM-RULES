@@ -59,12 +59,16 @@ test('package.json scripts should not reference missing files', () => {
 
   // Assert no phantom scripts exist
   if (phantomScripts.length > 0) {
-    const errorMessage = `Found ${phantomScripts.length} phantom script(s) referencing missing files:\n\n` +
-      phantomScripts.map(p =>
-        `  - Script: "${p.script}"\n` +
-        `    Missing file: ${p.missingFile}\n` +
-        `    Command: ${p.command}`
-      ).join('\n\n');
+    const errorMessage =
+      `Found ${phantomScripts.length} phantom script(s) referencing missing files:\n\n` +
+      phantomScripts
+        .map(
+          p =>
+            `  - Script: "${p.script}"\n` +
+            `    Missing file: ${p.missingFile}\n` +
+            `    Command: ${p.command}`
+        )
+        .join('\n\n');
 
     assert.fail(errorMessage);
   }

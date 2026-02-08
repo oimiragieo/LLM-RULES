@@ -11,9 +11,11 @@ const TEMPLATES_DIR = path.join(PROJECT_ROOT, '.claude', 'templates', 'spawn');
 // Will be required after module is created
 let resolveSpawnTemplate, ORCHESTRATOR_IDS;
 
-test('spawn-template-resolver', async (t) => {
+test('spawn-template-resolver', async t => {
   await t.test('setup - require module', () => {
-    const module = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'spawn', 'spawn-template-resolver.cjs'));
+    const module = require(
+      path.join(PROJECT_ROOT, '.claude', 'lib', 'spawn', 'spawn-template-resolver.cjs')
+    );
     resolveSpawnTemplate = module.resolveSpawnTemplate;
     ORCHESTRATOR_IDS = module.ORCHESTRATOR_IDS;
   });
@@ -28,16 +30,19 @@ test('spawn-template-resolver', async (t) => {
     assert.strictEqual(result.reason, 'explicit_override');
   });
 
-  await t.test('2. Explicit templateName override (file missing) falls through to next priority', () => {
-    const result = resolveSpawnTemplate('developer', {
-      templateName: 'nonexistent-template.md',
-      oneShot: true,
-    });
+  await t.test(
+    '2. Explicit templateName override (file missing) falls through to next priority',
+    () => {
+      const result = resolveSpawnTemplate('developer', {
+        templateName: 'nonexistent-template.md',
+        oneShot: true,
+      });
 
-    // Should fall through to oneShot priority
-    assert.strictEqual(result.templateName, 'subordinate-once.md');
-    assert.strictEqual(result.reason, 'one_shot_mode');
-  });
+      // Should fall through to oneShot priority
+      assert.strictEqual(result.templateName, 'subordinate-once.md');
+      assert.strictEqual(result.reason, 'one_shot_mode');
+    }
+  );
 
   await t.test('3. oneShot: true returns subordinate-once.md', () => {
     const result = resolveSpawnTemplate('developer', { oneShot: true });
@@ -47,21 +52,27 @@ test('spawn-template-resolver', async (t) => {
     assert.strictEqual(result.reason, 'one_shot_mode');
   });
 
-  await t.test('4. Known orchestrator subagent_type: "master-orchestrator" returns orchestrator-spawn.md', () => {
-    const result = resolveSpawnTemplate('master-orchestrator');
+  await t.test(
+    '4. Known orchestrator subagent_type: "master-orchestrator" returns orchestrator-spawn.md',
+    () => {
+      const result = resolveSpawnTemplate('master-orchestrator');
 
-    assert.strictEqual(result.templateName, 'orchestrator-spawn.md');
-    assert.strictEqual(result.templatePath, path.join(TEMPLATES_DIR, 'orchestrator-spawn.md'));
-    assert.strictEqual(result.reason, 'orchestrator_agent');
-  });
+      assert.strictEqual(result.templateName, 'orchestrator-spawn.md');
+      assert.strictEqual(result.templatePath, path.join(TEMPLATES_DIR, 'orchestrator-spawn.md'));
+      assert.strictEqual(result.reason, 'orchestrator_agent');
+    }
+  );
 
-  await t.test('5. Known orchestrator subagent_type: "router" returns orchestrator-spawn.md', () => {
-    const result = resolveSpawnTemplate('router');
+  await t.test(
+    '5. Known orchestrator subagent_type: "router" returns orchestrator-spawn.md',
+    () => {
+      const result = resolveSpawnTemplate('router');
 
-    assert.strictEqual(result.templateName, 'orchestrator-spawn.md');
-    assert.strictEqual(result.templatePath, path.join(TEMPLATES_DIR, 'orchestrator-spawn.md'));
-    assert.strictEqual(result.reason, 'orchestrator_agent');
-  });
+      assert.strictEqual(result.templateName, 'orchestrator-spawn.md');
+      assert.strictEqual(result.templatePath, path.join(TEMPLATES_DIR, 'orchestrator-spawn.md'));
+      assert.strictEqual(result.reason, 'orchestrator_agent');
+    }
+  );
 
   await t.test('6. category: "orchestrator" returns orchestrator-spawn.md', () => {
     const result = resolveSpawnTemplate('custom-agent', {
@@ -76,7 +87,10 @@ test('spawn-template-resolver', async (t) => {
     const result = resolveSpawnTemplate('developer', { hasIdentity: true });
 
     assert.strictEqual(result.templateName, 'agent-identity-integration.md');
-    assert.strictEqual(result.templatePath, path.join(TEMPLATES_DIR, 'agent-identity-integration.md'));
+    assert.strictEqual(
+      result.templatePath,
+      path.join(TEMPLATES_DIR, 'agent-identity-integration.md')
+    );
     assert.strictEqual(result.reason, 'identity_frontmatter');
   });
 

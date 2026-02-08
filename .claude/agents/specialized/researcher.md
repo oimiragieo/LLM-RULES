@@ -42,11 +42,11 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
-| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() | -- |
+| Hook                               | Event            | Purpose                          | Override |
+| ---------------------------------- | ---------------- | -------------------------------- | -------- |
+| `tool-scope-validator.cjs`         | PreToolUse(All)  | Validates tool is in allowed set | --       |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)  | Monitors execution limits        | --       |
+| `validate-skill-invocation.cjs`    | PreToolUse(Read) | Warns about Read vs Skill()      | --       |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -54,13 +54,14 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
-| Evolution | `.claude/workflows/core/evolution-workflow.md` | Pre-creation research (Phase O) |
-| External Integration | `.claude/workflows/core/external-integration.md` | External source evaluation |
-| Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
+| Workflow              | Path                                             | When to Use                          |
+| --------------------- | ------------------------------------------------ | ------------------------------------ |
+| Evolution             | `.claude/workflows/core/evolution-workflow.md`   | Pre-creation research (Phase O)      |
+| External Integration  | `.claude/workflows/core/external-integration.md` | External source evaluation           |
+| Workspace Conventions | `.claude/rules/workspace-conventions.md`         | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
+
 - Reports: `.claude/context/reports/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
@@ -99,6 +100,7 @@ pnpm search:file examples/auth.ts 1 100
 ```
 
 **When to use hybrid search:**
+
 - Researching implementation patterns ("show me auth examples")
 - Understanding framework/library usage across codebase
 - Finding similar implementations for comparison
@@ -122,6 +124,7 @@ Skill({ skill: 'ripgrep', args: 'async\\s+function\\s+\\w+.*\\{' });
 ```
 
 **When to use ripgrep skill:**
+
 - Exact syntax pattern research
 - PCRE2 regex for complex queries
 - Framework-specific pattern analysis

@@ -282,18 +282,18 @@ def process_point(point):
 
 ## Quick Reference Card
 
-| Feature                | Modern (3.12+)                  | Legacy                                |
-| ---------------------- | ------------------------------- | ------------------------------------- |
-| **Linter**             | `ruff`                          | `flake8`, `pylint`                    |
-| **Package Manager**    | `uv`                            | `pip`, `poetry`                       |
-| **Union Types**        | `int \| str`                    | `Union[int, str]`                     |
-| **Optional**           | `str \| None`                   | `Optional[str]`                       |
-| **Type Aliases**       | `type Point = tuple[int, int]`  | `Point = Tuple[int, int]`             |
-| **Generics**           | `class Stack[T]: ...`           | `class Stack(Generic[T]): ...`        |
-| **Docstrings**         | Google-style                    | Google-style (no change)              |
-| **String Formatting**  | f-strings                       | f-strings (available since 3.6)       |
-| **Pattern Matching**   | `match/case`                    | `if/elif/else` chains                 |
-| **Line Length**        | 88 chars (Ruff/Black)           | 80 chars (Google)                     |
+| Feature               | Modern (3.12+)                 | Legacy                          |
+| --------------------- | ------------------------------ | ------------------------------- |
+| **Linter**            | `ruff`                         | `flake8`, `pylint`              |
+| **Package Manager**   | `uv`                           | `pip`, `poetry`                 |
+| **Union Types**       | `int \| str`                   | `Union[int, str]`               |
+| **Optional**          | `str \| None`                  | `Optional[str]`                 |
+| **Type Aliases**      | `type Point = tuple[int, int]` | `Point = Tuple[int, int]`       |
+| **Generics**          | `class Stack[T]: ...`          | `class Stack(Generic[T]): ...`  |
+| **Docstrings**        | Google-style                   | Google-style (no change)        |
+| **String Formatting** | f-strings                      | f-strings (available since 3.6) |
+| **Pattern Matching**  | `match/case`                   | `if/elif/else` chains           |
+| **Line Length**       | 88 chars (Ruff/Black)          | 80 chars (Google)               |
 
 ---
 

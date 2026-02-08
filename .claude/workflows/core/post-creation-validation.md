@@ -247,8 +247,8 @@ function triggerReflectionForArtifact(artifactId, validationResult) {
     context: {
       validationResult,
       integrationScore: validationResult.score,
-      gaps: validationResult.gaps
-    }
+      gaps: validationResult.gaps,
+    },
   };
 
   // Queue for reflection-agent
@@ -283,14 +283,17 @@ The reflection report will include integration health in the RBT framework:
 ## RBT Diagnosis
 
 ### Roses (Strengths)
+
 - Artifact created with complete documentation
 - All tests passing
 
 ### Buds (Growth Opportunities)
+
 - Integration score: 65% (gaps: catalog entry, agent assignment)
 - Could improve: Add catalog entry immediately after file creation
 
 ### Thorns (Issues)
+
 - Critical integration gap: No routing keywords added to CLAUDE.md
 - Artifact is invisible to Router until fixed
 ```
@@ -302,6 +305,7 @@ If reflection detects recurring integration gaps across 3+ artifact creations:
 ```markdown
 **Self-Healing Recommendation**: Pattern detected - creators frequently miss catalog updates.
 Consider:
+
 1. Add blocking validation to creator skills
 2. Create pre-completion checklist reminder
 3. Invoke artifact-integrator automatically after creator completion

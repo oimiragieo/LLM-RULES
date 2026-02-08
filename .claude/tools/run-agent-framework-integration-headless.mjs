@@ -132,8 +132,14 @@ function testTools() {
 
     // Check critical tools (some moved from tools/ to lib/ in Phase C)
     const criticalLibModules = [
-      { name: 'workflow-runner.js', path: resolve(rootDir, '.claude/lib/workflow/workflow-runner.js') },
-      { name: 'decision-handler.mjs', path: resolve(rootDir, '.claude/lib/workflow/decision-handler.mjs') },
+      {
+        name: 'workflow-runner.js',
+        path: resolve(rootDir, '.claude/lib/workflow/workflow-runner.js'),
+      },
+      {
+        name: 'decision-handler.mjs',
+        path: resolve(rootDir, '.claude/lib/workflow/decision-handler.mjs'),
+      },
       { name: 'loop-handler.mjs', path: resolve(rootDir, '.claude/lib/workflow/loop-handler.mjs') },
     ];
 

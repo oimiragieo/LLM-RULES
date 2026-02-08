@@ -485,12 +485,16 @@ class HybridLazyIndexer {
         rgPath,
         [
           '^export\\s+(default\\s+)?(class|function|interface|type|const)',
-          '-g', '*.js',
-          '-g', '*.ts',
-          '-g', '*.cjs',
-          '-g', '*.mjs',
+          '-g',
+          '*.js',
+          '-g',
+          '*.ts',
+          '-g',
+          '*.cjs',
+          '-g',
+          '*.mjs',
           '-n',
-          this.projectRoot
+          this.projectRoot,
         ],
         { encoding: 'utf8', timeout: 3000, shell: false }
       );
@@ -524,11 +528,15 @@ class HybridLazyIndexer {
         rgPath,
         [
           '^import .* from',
-          '-g', '*.js',
-          '-g', '*.ts',
-          '-g', '*.cjs',
-          '-g', '*.mjs',
-          this.projectRoot
+          '-g',
+          '*.js',
+          '-g',
+          '*.ts',
+          '-g',
+          '*.cjs',
+          '-g',
+          '*.mjs',
+          this.projectRoot,
         ],
         { encoding: 'utf8', timeout: 3000, shell: false }
       );

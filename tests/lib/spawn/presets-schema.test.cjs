@@ -6,7 +6,13 @@ const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const ASSEMBLER_PATH = path.join(PROJECT_ROOT, '.claude', 'lib', 'spawn', 'prompt-assembler.cjs');
-const SCHEMA_VALIDATOR_PATH = path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs');
+const SCHEMA_VALIDATOR_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'lib',
+  'utils',
+  'schema-validator.cjs'
+);
 const SCHEMA_PATH = path.join(PROJECT_ROOT, '.claude', 'schemas', 'presets.schema.json');
 
 // =============================================================================
@@ -16,8 +22,11 @@ const SCHEMA_PATH = path.join(PROJECT_ROOT, '.claude', 'schemas', 'presets.schem
 test('prompt-assembler.cjs exports validatePresets method', () => {
   delete require.cache[require.resolve(ASSEMBLER_PATH)];
   const assembler = require(ASSEMBLER_PATH);
-  assert.strictEqual(typeof assembler.validatePresets, 'function',
-    'Should expose validatePresets method');
+  assert.strictEqual(
+    typeof assembler.validatePresets,
+    'function',
+    'Should expose validatePresets method'
+  );
 });
 
 test('validatePresets validates presets.json against schema', () => {

@@ -18,7 +18,9 @@ test('schema-validator module loads', () => {
 });
 
 test('createValidator returns compiled validator for valid schema', () => {
-  const { createValidator } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { createValidator } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
 
   const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'evolution-state.schema.json');
   const validator = createValidator(schemaPath);
@@ -28,14 +30,18 @@ test('createValidator returns compiled validator for valid schema', () => {
 });
 
 test('createValidator returns null for non-existent schema', () => {
-  const { createValidator } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { createValidator } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
 
   const validator = createValidator('/non/existent/path.schema.json');
   assert.strictEqual(validator, null, 'Should return null for missing schema');
 });
 
 test('validateData returns valid=true for conforming data', () => {
-  const { validateData } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { validateData } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
 
   const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'evolution-state.schema.json');
   const validData = {
@@ -53,7 +59,9 @@ test('validateData returns valid=true for conforming data', () => {
 });
 
 test('validateData returns valid=false for non-conforming data', () => {
-  const { validateData } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { validateData } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
 
   const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'evolution-state.schema.json');
   const invalidData = {
@@ -68,7 +76,9 @@ test('validateData returns valid=false for non-conforming data', () => {
 });
 
 test('validateData returns valid=true when schema path is missing (graceful degradation)', () => {
-  const { validateData } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { validateData } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
 
   const result = validateData({ anything: true }, '/non/existent/schema.json');
   assert.strictEqual(result.valid, true, 'Should degrade gracefully to valid');
@@ -77,7 +87,9 @@ test('validateData returns valid=true when schema path is missing (graceful degr
 });
 
 test('validateData returns valid=true when data is null (graceful degradation)', () => {
-  const { validateData } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { validateData } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
 
   const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'evolution-state.schema.json');
   const result = validateData(null, schemaPath);
@@ -86,7 +98,9 @@ test('validateData returns valid=true when data is null (graceful degradation)',
 });
 
 test('createValidator caches compiled validators', () => {
-  const { createValidator } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs'));
+  const { createValidator } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'schema-validator.cjs')
+  );
 
   const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', 'evolution-state.schema.json');
   const v1 = createValidator(schemaPath);

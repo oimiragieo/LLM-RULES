@@ -18,10 +18,7 @@ const _SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.jso
 const _REMINDER_PATH = path.join(RUNTIME_DIR, 'reflection-reminder.txt');
 
 test('Task 1.2: reflection-step0-guard has max pending limit (5)', async () => {
-  const guardPath = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/reflection/reflection-step0-guard.cjs'
-  );
+  const guardPath = path.join(PROJECT_ROOT, '.claude/hooks/reflection/reflection-step0-guard.cjs');
   const content = fs.readFileSync(guardPath, 'utf8');
 
   // Should contain a MAX_PENDING constant or similar check
@@ -39,10 +36,7 @@ test('Task 1.2: reflection-step0-guard has max pending limit (5)', async () => {
 });
 
 test('Task 1.2: reflection-step0-guard default mode is "warn" not "block"', async () => {
-  const guardPath = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/reflection/reflection-step0-guard.cjs'
-  );
+  const guardPath = path.join(PROJECT_ROOT, '.claude/hooks/reflection/reflection-step0-guard.cjs');
   const content = fs.readFileSync(guardPath, 'utf8');
 
   // Find getEnforcementMode call
@@ -58,16 +52,13 @@ test('Task 1.2: reflection-step0-guard default mode is "warn" not "block"', asyn
 });
 
 test('Task 1.2: reflection-step0-guard emits warning instead of blocking by default', async () => {
-  const guardPath = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/reflection/reflection-step0-guard.cjs'
-  );
+  const guardPath = path.join(PROJECT_ROOT, '.claude/hooks/reflection/reflection-step0-guard.cjs');
   const content = fs.readFileSync(guardPath, 'utf8');
 
   // Behavior check: should NOT block indefinitely
   // Should contain logic to allow TaskList after noting pending reflections
   const hasAllowLogic =
-    content.includes('process.exit(0)') && content.includes('formatResult(\'warn\'');
+    content.includes('process.exit(0)') && content.includes("formatResult('warn'");
 
   assert.ok(
     hasAllowLogic,
