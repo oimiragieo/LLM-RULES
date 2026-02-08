@@ -144,6 +144,11 @@
   "optionalDependencies": {
     "onnxruntime-node-gpu": "^1.21.0"
   },
+  "pnpm": {
+    "overrides": {
+      "tar": ">=7.5.7"
+    }
+  },
   "devDependencies": {
     "@types/node": "^20.19.30",
     "@vscode/ripgrep": "^1.17.0",
