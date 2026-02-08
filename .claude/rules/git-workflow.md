@@ -22,6 +22,8 @@
 
 ## Pre-Commit Requirements
 
+- Run lint: `pnpm lint:fix` (all must pass with 0 errors)
+- Run format: `pnpm format` (no changes produced)
 - Run tests: `pnpm test` (all must pass)
 - Validate commit messages via `commit-validator` skill
 - Security scan via pre-commit hooks

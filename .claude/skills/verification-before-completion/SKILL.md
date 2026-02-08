@@ -50,15 +50,17 @@ Skip any step = lying, not verifying
 
 ## Common Failures
 
-| Claim                 | Requires                        | Not Sufficient                 |
-| --------------------- | ------------------------------- | ------------------------------ |
-| Tests pass            | Test command output: 0 failures | Previous run, "should pass"    |
-| Linter clean          | Linter output: 0 errors         | Partial check, extrapolation   |
-| Build succeeds        | Build command: exit 0           | Linter passing, logs look good |
-| Bug fixed             | Test original symptom: passes   | Code changed, assumed fixed    |
-| Regression test works | Red-green cycle verified        | Test passes once               |
-| Agent completed       | VCS diff shows changes          | Agent reports "success"        |
-| Requirements met      | Line-by-line checklist          | Tests passing                  |
+| Claim                 | Requires                               | Not Sufficient                 |
+| --------------------- | -------------------------------------- | ------------------------------ |
+| Tests pass            | Test command output: 0 failures        | Previous run, "should pass"    |
+| Linter clean          | `pnpm lint:fix` output: 0 errors       | Partial check, extrapolation   |
+| Format clean          | `pnpm format` output: no changes       | Visual inspection, assumption  |
+| Build succeeds        | Build command: exit 0                  | Linter passing, logs look good |
+| Bug fixed             | Test original symptom: passes          | Code changed, assumed fixed    |
+| Regression test works | Red-green cycle verified               | Test passes once               |
+| Agent completed       | VCS diff shows changes                 | Agent reports "success"        |
+| Requirements met      | Line-by-line checklist                 | Tests passing                  |
+| Code quality gates    | `pnpm lint:fix` + `pnpm format` passed | Tests passing                  |
 
 ## Red Flags - STOP
 
@@ -105,6 +107,13 @@ WRONG: "I've written a regression test" (without red-green verification)
 ```
 CORRECT: [Run build] [See: exit 0] "Build passes"
 WRONG: "Linter passed" (linter doesn't check compilation)
+```
+
+**Lint and Format (BLOCKING GATE):**
+
+```
+CORRECT: [Run pnpm lint:fix] [See: 0 errors] [Run pnpm format] [See: no changes] "Lint and format clean"
+WRONG: "Code looks formatted" / "No obvious lint issues" / "Should be clean"
 ```
 
 **Requirements:**

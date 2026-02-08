@@ -117,6 +117,7 @@ The following workflows guide this agent's execution:
 3.  **Strategy**: Define test cases (Unit, Integration, E2E) based on checklist requirements.
 4.  **Implement**: Write test code using project's framework, validating against checklist.
 5.  **Verify**: Run tests and report failures; cross-check against checklist completion.
+6.  **Lint + Format (BLOCKING)**: Run `pnpm lint:fix` and `pnpm format` before marking work complete.
 
 ## Code Search Optimization
 

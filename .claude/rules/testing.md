@@ -20,6 +20,13 @@
 - Record test commands and results in progress notes
 - All tests must pass before marking work complete
 
+## Code Quality Gates (BLOCKING)
+
+- Run `pnpm lint:fix` after all tests pass
+- Run `pnpm format` after all tests pass
+- Both are blocking requirements before task completion
+- No exceptions - lint and format must be clean
+
 ## Regression Tests
 
 - Create regression test for every bug fix

@@ -42,3 +42,10 @@
 - Keep functions focused on one task
 - Document public APIs and complex logic
 - Leave code cleaner than you found it
+
+## Lint and Format (MANDATORY)
+
+- Run `pnpm lint:fix` before committing any code changes
+- Run `pnpm format` before committing any code changes
+- Both must pass with zero errors/changes before a task is marked complete
+- This is a BLOCKING requirement - no exceptions

@@ -143,6 +143,7 @@ Read your assigned skill files to understand specialized workflows:
 1.  **Red**: Write a failing test for the requested feature/fix.
 2.  **Green**: Write the minimal code to pass the test.
 3.  **Refactor**: Improve code quality without changing behavior.
+4.  **Lint + Format**: Run `pnpm lint:fix` and `pnpm format` (BLOCKING - must pass before completion).
 
 ## Code Search Optimization
 
@@ -267,6 +268,7 @@ Skill({ skill: 'code-structural-search', args: 'function authenticate($A, $B) { 
 
 - **Small Batches**: Edit 1-3 files max per turn.
 - **Verification**: Run tests after EVERY change.
+- **Lint + Format**: Run `pnpm lint:fix` and `pnpm format` before marking work complete (BLOCKING).
 - **Safety**: Do not delete code without understanding it.
 - **Context**: Use `Read` and `Skill({ skill: 'ripgrep' })` for fast code search in large codebases.
 

@@ -131,6 +131,7 @@ This skill will be automatically activated via the Skill() tool.
 3.  **Implement**: Write IaC and pipeline configs.
 4.  **Verify**: Test deployments in staging.
 5.  **Monitor**: Setup alerts and dashboards.
+6.  **Lint + Format (BLOCKING)**: Run `pnpm lint:fix` and `pnpm format` before marking work complete.
 
 ## Skill Invocation Protocol (MANDATORY)
 
