@@ -654,6 +654,41 @@ Invalid placements will be blocked in production mode.
 
 ---
 
+## Post-Creation Integration
+
+After skill creation, run integration checklist:
+
+```javascript
+const {
+  runIntegrationChecklist,
+  queueCrossCreatorReview,
+} = require('.claude/lib/creator-commons.cjs');
+
+// 1. Run integration checklist
+const result = await runIntegrationChecklist(
+  'skill',
+  '.claude/skills/<category>/<skill-name>/SKILL.md'
+);
+
+// 2. Queue cross-creator review (detects companion artifacts needed)
+await queueCrossCreatorReview('skill', '.claude/skills/<category>/<skill-name>/SKILL.md', {
+  artifactName: '<skill-name>',
+  createdBy: 'skill-creator',
+});
+
+// 3. Review impact report
+// Check result.mustHave for failures - address before marking complete
+```
+
+**Integration verification:**
+
+- [ ] Skill added to skill-catalog.md
+- [ ] Skill added to CLAUDE.md (if user-invocable)
+- [ ] Skill assigned to at least one agent
+- [ ] No broken cross-references
+
+---
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
@@ -684,7 +719,7 @@ Check for:
 
 ### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
 
-**This step prevents duplicate skills and delegates updates to the skill-updater workflow.**
+**This step prevents duplicate skills and delegates updates to the artifact-updater workflow.**
 
 1. **Check if skill already exists:**
 
@@ -694,17 +729,13 @@ Check for:
 
 2. **If skill EXISTS:**
    - **DO NOT proceed with creation**
-   - **Invoke skill-updater workflow instead:**
+   - **Invoke artifact-updater workflow instead:**
 
      ```javascript
      // Delegate to updater
      Skill({
-       skill: 'skill-updater',
-       args: {
-         name: '<skill-name>',
-         changes: '<description of requested changes>',
-         justification: 'Update requested via skill-creator',
-       },
+       skill: 'artifact-updater',
+       args: '--type skill --path .claude/skills/<category>/<skill-name>/SKILL.md --changes "<description of requested changes>"',
      });
      ```
 
@@ -721,7 +752,7 @@ Check for:
 - Duplicate catalog entries
 - Overwriting custom modifications
 
-The skill-updater workflow safely handles updates with:
+The artifact-updater workflow safely handles updates with:
 
 - Backup before modification
 - Protected section validation

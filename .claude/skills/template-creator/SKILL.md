@@ -1101,3 +1101,21 @@ Check for:
 - Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+---
+
+## Post-Creation Integration
+
+After creation completes, run the ecosystem integration checklist:
+
+1. Call `runIntegrationChecklist(artifactType, artifactPath)` from `.claude/lib/creators/creator-commons.cjs`
+2. Call `queueCrossCreatorReview(artifactType, artifactPath)` from `.claude/lib/creators/creator-commons.cjs`
+3. Review the impact report — address all `mustHave` items before marking task complete
+4. Log any `shouldHave` items as follow-up tasks
+
+**Integration verification:**
+
+- [ ] Template added to template-catalog.md
+- [ ] Template README exists at template location
+- [ ] Template assigned to consuming skill(s)
+- [ ] Template examples provided

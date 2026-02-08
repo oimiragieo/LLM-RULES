@@ -139,11 +139,11 @@ Skill({ skill: 'research-synthesis' });
 
 2. **If schema EXISTS:**
    - **DO NOT proceed with creation**
-   - **Invoke schema-updater workflow instead:**
+   - **Invoke artifact-updater workflow instead:**
 
      ```javascript
      Skill({
-       skill: 'schema-updater',
+       skill: 'artifact-updater',
        args: {
          name: '<schema-name>',
          changes: '<description of requested changes>',
@@ -1102,3 +1102,19 @@ ls -la .claude/schemas/*.schema.json
 ```
 
 **BLOCKING**: If ANY item fails, schema creation is INCOMPLETE. All items must pass before proceeding.
+
+---
+
+## Post-Creation Integration
+
+After creation completes, run the ecosystem integration checklist:
+1. Call `runIntegrationChecklist(artifactType, artifactPath)` from `.claude/lib/creators/creator-commons.cjs`
+2. Call `queueCrossCreatorReview(artifactType, artifactPath)` from `.claude/lib/creators/creator-commons.cjs`
+3. Review the impact report — address all `mustHave` items before marking task complete
+4. Log any `shouldHave` items as follow-up tasks
+
+**Integration verification:**
+- [ ] Schema added to schema-catalog.md
+- [ ] Schema validator wired (if applicable)
+- [ ] Schema referenced by consuming artifacts
+- [ ] Schema has test data examples

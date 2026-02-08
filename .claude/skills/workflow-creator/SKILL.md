@@ -103,11 +103,11 @@ After creating a workflow, you MUST add it to both the matrix AND update affecte
 
 2. **If workflow EXISTS:**
    - **DO NOT proceed with creation**
-   - **Invoke workflow-updater workflow instead:**
+   - **Invoke artifact-updater workflow instead:**
 
      ```javascript
      Skill({
-       skill: 'workflow-updater',
+       skill: 'artifact-updater',
        args: {
          name: '<workflow-name>',
          changes: '<description of requested changes>',
@@ -916,3 +916,21 @@ Check for:
 - Architecture decision -> Append to `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+---
+
+## Post-Creation Integration
+
+After creation completes, run the ecosystem integration checklist:
+
+1. Call `runIntegrationChecklist(artifactType, artifactPath)` from `.claude/lib/creators/creator-commons.cjs`
+2. Call `queueCrossCreatorReview(artifactType, artifactPath)` from `.claude/lib/creators/creator-commons.cjs`
+3. Review the impact report — address all `mustHave` items before marking task complete
+4. Log any `shouldHave` items as follow-up tasks
+
+**Integration verification:**
+
+- [ ] Workflow added to @WORKFLOW_AGENT_MAP.md
+- [ ] Workflow referenced in CLAUDE.md (if enterprise workflow)
+- [ ] Workflow assigned to at least one agent
+- [ ] Workflow catalog entry added (if applicable)

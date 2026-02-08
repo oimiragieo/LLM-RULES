@@ -94,16 +94,12 @@ After creating a hook, you MUST add it to both the matrix AND update affected ag
 
 2. **If hook EXISTS:**
    - **DO NOT proceed with creation**
-   - **Invoke hook-updater workflow instead:**
+   - **Invoke artifact-updater workflow instead:**
 
      ```javascript
      Skill({
-       skill: 'hook-updater',
-       args: {
-         name: '<hook-name>',
-         changes: '<description of requested changes>',
-         justification: 'Update requested via hook-creator',
-       },
+       skill: 'artifact-updater',
+       args: '--type hook --path .claude/hooks/<category>/<hook-name>.cjs --changes "<description of requested changes>"',
      });
      ```
 

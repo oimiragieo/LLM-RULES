@@ -74,17 +74,13 @@ grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md ROUTING TABLE NO
 
 2. **If agent EXISTS:**
    - **DO NOT proceed with creation**
-   - **Invoke agent-updater workflow instead:**
+   - **Invoke artifact-updater workflow instead:**
 
      ```javascript
      // Delegate to updater
      Skill({
-       skill: 'agent-updater',
-       args: {
-         name: '<agent-name>',
-         changes: '<description of requested changes>',
-         justification: 'Update requested via agent-creator',
-       },
+       skill: 'artifact-updater',
+       args: '--type agent --path .claude/agents/<category>/<agent-name>.md --changes "<description of requested changes>"',
      });
      ```
 
@@ -94,7 +90,7 @@ grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md ROUTING TABLE NO
 3. **If agent is NEW:**
    - Continue to Step 1 below (verification and creation steps)
 
-**Why this matters:** The agent-updater workflow safely handles updates with backup, protected section validation, registry synchronization, and version tracking.
+**Why this matters:** The artifact-updater workflow safely handles updates with validation, integration checklist verification, and cross-creator review queueing.
 
 ### Step 1: Verify No Existing Agent
 
@@ -1240,6 +1236,38 @@ This skill is part of the unified artifact lifecycle. For complete multi-agent o
 
 - Safe integration of external artifacts
 - Security review and validation phases
+
+---
+
+## Post-Creation Integration
+
+After agent creation, run integration checklist:
+
+```javascript
+const {
+  runIntegrationChecklist,
+  queueCrossCreatorReview,
+} = require('.claude/lib/creator-commons.cjs');
+
+// 1. Run integration checklist
+const result = await runIntegrationChecklist('agent', '.claude/agents/<category>/<agent-name>.md');
+
+// 2. Queue cross-creator review (detects companion artifacts needed)
+await queueCrossCreatorReview('agent', '.claude/agents/<category>/<agent-name>.md', {
+  artifactName: '<agent-name>',
+  createdBy: 'agent-creator',
+});
+
+// 3. Review impact report
+// Check result.mustHave for failures - address before marking complete
+```
+
+**Integration verification:**
+
+- [ ] Agent added to CLAUDE.md routing table (Section 3)
+- [ ] Agent added to agent-registry.json
+- [ ] Agent assigned at least one skill
+- [ ] Agent category correct (core/domain/specialized/orchestrator)
 
 ---
 
