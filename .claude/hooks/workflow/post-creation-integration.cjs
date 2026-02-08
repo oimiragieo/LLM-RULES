@@ -122,6 +122,23 @@ function quickIntegrationCheck(artifactId, graphPath) {
 }
 
 /**
+ * Run ecosystem impact analysis using ecosystem-impact-analyzer.cjs
+ * @param {string} creatorType - Type of creator (skill, agent, hook, etc.)
+ * @param {string} artifactPath - Path to created artifact
+ * @returns {Object|null} Impact analysis report or null if unavailable
+ */
+function runEcosystemImpactAnalysis(creatorType, artifactPath) {
+  try {
+    const impactAnalyzer = require('../../lib/creators/ecosystem-impact-analyzer.cjs');
+    const report = impactAnalyzer.analyzeImpact(creatorType, artifactPath);
+    return report;
+  } catch (_err) {
+    // Graceful degradation if analyzer not available
+    return null;
+  }
+}
+
+/**
  * Extract artifact ID from task metadata
  * @param {Object} hookData - Hook input data
  * @param {string} creatorType - Type of creator
@@ -156,6 +173,39 @@ function appendToQueue(artifactId, creatorType, gaps) {
     gaps,
     priority: 'P1',
     processed: false,
+  };
+
+  // Ensure queue directory exists
+  const queueDir = path.dirname(QUEUE_PATH);
+  if (!fs.existsSync(queueDir)) {
+    fs.mkdirSync(queueDir, { recursive: true });
+  }
+
+  // Append to queue
+  fs.appendFileSync(QUEUE_PATH, JSON.stringify(entry) + '\n', 'utf8');
+
+  // Rotate if needed
+  rotateQueue();
+}
+
+/**
+ * Append entry to integration queue with impact report
+ * @param {string} artifactId - Artifact ID
+ * @param {string} creatorType - Creator type
+ * @param {string[]} gaps - Missing integrations
+ * @param {Object|null} impactReport - Ecosystem impact analysis report
+ */
+function appendToQueueWithImpact(artifactId, creatorType, gaps, impactReport) {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    artifactId,
+    creatorType,
+    changeType: 'created',
+    source: 'post-creation-integration.cjs',
+    gaps,
+    priority: 'P1',
+    processed: false,
+    impactReport: impactReport || null,
   };
 
   // Ensure queue directory exists
@@ -262,8 +312,14 @@ async function processCreatorCompletion(hookData) {
   // Extract artifact ID
   const artifactId = extractArtifactId(hookData, detection.creatorType);
 
-  // Quick integration check
+  // Extract artifact path from metadata
+  const artifactPath = _toolInput.metadata?.artifactPath || artifactId;
+
+  // Quick integration check (artifact-graph)
   const check = quickIntegrationCheck(artifactId, GRAPH_PATH);
+
+  // Run ecosystem impact analysis
+  const impactReport = runEcosystemImpactAnalysis(detection.creatorType, artifactPath);
 
   // Log to stderr
   process.stderr.write(
@@ -273,9 +329,17 @@ async function processCreatorCompletion(hookData) {
     `[post-creation-integration] Integration status: ${check.status}, gaps: ${check.gaps.join(', ')}\n`
   );
 
+  if (impactReport) {
+    const mustHavePending = impactReport.mustHave.filter(item => item.status === 'pending');
+    process.stderr.write(
+      `[post-creation-integration] Ecosystem impact: ${mustHavePending.length}/${impactReport.mustHave.length} mustHave items pending\n`
+    );
+  }
+
   // Queue if gaps found
   if (check.gaps.length > 0 && check.status !== 'fully-integrated') {
-    appendToQueue(artifactId, detection.creatorType, check.gaps);
+    // Include impact report in queue entry
+    appendToQueueWithImpact(artifactId, detection.creatorType, check.gaps, impactReport);
     process.stderr.write('[post-creation-integration] Queued for integration analysis\n');
   }
 
@@ -343,6 +407,8 @@ module.exports = {
   quickIntegrationCheck,
   extractArtifactId,
   appendToQueue,
+  appendToQueueWithImpact,
+  runEcosystemImpactAnalysis,
   rotateQueue,
   processCreatorCompletion,
   GRAPH_PATH,
