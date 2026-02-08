@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "artifact-graph.schema.json",
+  "title": "Artifact Relationship Graph",
+  "description": "Directed graph tracking artifacts and their integration relationships",
+  "type": "object",
+  "required": ["version", "lastUpdated", "nodes", "edges"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the graph data structure"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last graph update"
+    },
+    "nodes": {
+      "type": "object",
+      "description": "Map of artifact ID to node data. IDs use format {type}:{name}",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type", "path", "created", "integrationStatus"],
+        "properties": {
+          "type": {
+            "enum": [
+              "skill",
+              "agent",
+              "hook",
+              "workflow",
+              "template",
+              "schema",
+              "rule",
+              "catalog",
+              "registry"
+            ],
+            "description": "Artifact type classification"
+          },
+          "path": {
+            "type": "string",
+            "description": "Relative path from project root"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of artifact creation"
+          },
+          "integrationStatus": {
+            "enum": [
+              "created",
+              "partially-integrated",
+              "fully-integrated",
+              "needs-update"
+            ],
+            "description": "Current integration state of the artifact"
+          },
+          "missingIntegrations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of missing must-have integration items"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Optional metadata (description, version, etc.)",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Directed edges representing relationships between artifacts",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "type", "status"],
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Source artifact ID (format: {type}:{name})"
+          },
+          "to": {
+            "type": "string",
+            "description": "Target artifact ID (format: {type}:{name})"
+          },
+          "type": {
+            "enum": [
+              "assigned-to",
+              "enforced-by",
+              "invokes",
+              "depends-on",
+              "triggers",
+              "references",
+              "validates",
+              "templates"
+            ],
+            "description": "Relationship type between artifacts"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "missing",
+              "proposed",
+              "deprecated"
+            ],
+            "description": "Edge status indicating relationship state"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Optional edge metadata (priority, notes, etc.)",
+            "additionalProperties": true
+          }
+        }
+      }
+    }
+  }
+}

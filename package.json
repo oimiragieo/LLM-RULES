@@ -99,7 +99,9 @@
     "verify:deps": "node scripts/verify-dependencies.mjs",
     "verify:hooks": "node .claude/scripts/verify-hook-modules.cjs",
     "test:count": "node scripts/testing/count-all-tests.mjs",
-    "gpu:check": "node .claude/tools/cli/check-gpu.cjs"
+    "gpu:check": "node .claude/tools/cli/check-gpu.cjs",
+    "graph:bootstrap": "node .claude/tools/cli/bootstrap-artifact-graph.cjs",
+    "graph:health": "node .claude/tools/cli/bootstrap-artifact-graph.cjs --dry-run"
   },
   "keywords": [
     "claude",

@@ -218,6 +218,11 @@
           {
             "type": "command",
             "command": "node .claude/hooks/workflow/post-completion-chain.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow/post-creation-integration.cjs",
+            "timeout": 5000
           }
         ]
       },
