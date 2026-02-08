@@ -1236,3 +1236,106 @@ Comprehensive code simplification analysis identified:
 **Resolution:** See full report at `.claude/context/reports/architecture/code-simplification-analysis-2026-02-08.md` with prioritized 5-phase action plan.
 
 **Priority:** P1 for dead code archival (zero risk), P2 for consolidation work.
+
+---
+
+### SEC-ROUTER-001: routing-guard.cjs Not Registered for Edit|Write|NotebookEdit (CRITICAL)
+
+**Date:** 2026-02-08 | **Task:** #28 | **Agent:** security-architect
+
+**Description:**
+
+`routing-guard.cjs` contains logic to block Router from using blacklisted tools (Check 1: Router Self-Check) including Edit, Write, and NotebookEdit. However, in `settings.json`, the `Edit|Write|NotebookEdit` matcher (line 68) does NOT include `routing-guard.cjs` in its hook list. The hook is only registered for `Bash`, `Glob|Grep|WebSearch`, and `TaskCreate` matchers. This means:
+
+- Check 1 (Router Self-Check / BLACKLISTED_TOOLS) never fires for write operations
+- Check 5 (Router Write Guard / checkRouterWrite) never fires for write operations
+- The code at lines 156 and 440-444 of routing-guard.cjs is dead for write tools
+
+**STRIDE Classification:** Elevation of Privilege -- Router can bypass its own tool restrictions for write operations.
+
+**Mitigating Factors:**
+
+- `unified-creator-guard.cjs` blocks writes to creator artifact paths (skills, agents, hooks, workflows)
+- `unified-pre-write-hook.cjs` enforces file placement rules
+- Router behavioral compliance (CLAUDE.md instructions) provides soft enforcement
+- Write operations to `.claude/context/runtime/` and `.claude/context/memory/` are allowed by design via `ALWAYS_ALLOWED_WRITE_PATTERNS`
+
+**Workaround:** None currently. Relies on behavioral compliance and partial coverage from other hooks.
+
+**Resolution:** Add `routing-guard.cjs` to the `Edit|Write|NotebookEdit` matcher in `settings.json`. The code in routing-guard.cjs already handles these tools via `ALL_WATCHED_TOOLS` -- only the registration is missing.
+
+**Priority:** P0 -- CRITICAL. Registration fix is a single line change with zero risk.
+
+---
+
+### SEC-ROUTER-002: TaskList-First Flag Tracked But Never Enforced (MEDIUM)
+
+**Date:** 2026-02-08 | **Task:** #28 | **Agent:** security-architect
+
+**Description:**
+
+The `taskListCalledSincePrompt` flag has full infrastructure:
+
+- Setter: `task-list-tracker.cjs` (PostToolUse TaskList) calls `routerState.setTaskListCalled()`
+- Getter: `router-state.cjs` has `isTaskListCalledSincePrompt()`
+- Reset: `state-reset.cjs` resets to `false` on each UserPromptSubmit
+
+However, NO enforcement hook checks this flag before allowing `Task()` spawns. The `pre-task-unified.cjs` hook (PreToolUse Task) does NOT call `isTaskListCalledSincePrompt()`. Router can spawn agents without calling TaskList() first, violating the CLAUDE.md protocol ("FIRST ROUTING TOOL CALL MUST BE TaskList()").
+
+**STRIDE Classification:** Tampering -- Router can skip mandatory state synchronization step, potentially spawning duplicate agents or missing completed tasks.
+
+**Workaround:** Behavioral compliance via CLAUDE.md instructions. The flag infrastructure exists and works correctly -- only the enforcement gate is missing.
+
+**Resolution:** Add a check in `pre-task-unified.cjs` that reads `isTaskListCalledSincePrompt()` before allowing Task() calls. Use `TASKLIST_FIRST_ENFORCEMENT` env var with default `warn` mode.
+
+**Priority:** P2 -- MEDIUM. The behavioral protocol is generally followed; enforcement would prevent edge-case violations.
+
+---
+
+### SEC-ROUTER-003: Environment Variable Kill Switches Lack Audit Logging (HIGH)
+
+**Date:** 2026-02-08 | **Task:** #28 | **Agent:** security-architect
+
+**Description:**
+
+12 environment variable kill switches can individually disable security enforcement checks. While most use `auditSecurityOverride()` from `hook-input.cjs` (line 409) for logging, three lack audit calls:
+
+- `SECURITY_REVIEW_ENFORCEMENT` (routing-guard.cjs Check 4)
+- `MEMORY_SPAWN_THROTTLING` (routing-guard.cjs Check 6)
+- `SPECIALIST_ROUTING_ENFORCEMENT` (routing-guard.cjs Check 7)
+
+Additionally, `HOOK_FAIL_OPEN=true` (routing-guard.cjs line 1368) converts the entire hook from fail-closed to fail-open, with no audit logging when activated.
+
+**STRIDE Classification:** Repudiation -- Security checks can be silently disabled without trace.
+
+**Workaround:** Monitor `.claude/context/runtime/audit-log.jsonl` for gaps in enforcement events. Missing entries for known checks indicate override usage.
+
+**Resolution:** Add `auditSecurityOverride()` calls to the three missing checks. Add audit logging for `HOOK_FAIL_OPEN` activation. Consider a "canary" mechanism that detects when all enforcement is disabled simultaneously.
+
+**Priority:** P1 -- HIGH. Silent security bypass without audit trail violates defense-in-depth.
+
+---
+
+### SEC-ROUTER-004: router-state.json Version Field Uses Non-Monotonic Reset (LOW)
+
+**Date:** 2026-02-08 | **Task:** #28 | **Agent:** security-architect
+
+**Description:**
+
+`state-reset.cjs` (line 85) sets `version: Date.now() % 10000` during UserPromptSubmit reset. This modulo operation means:
+
+- Version is not monotonically increasing (can decrease across resets)
+- Collision probability: ~0.01% per reset (10000 possible values)
+- `saveStateWithRetry()` in router-state.cjs uses version for optimistic concurrency
+
+However, since state is fully reset on each prompt and only one agent writes at a time during router mode, the practical impact is negligible. The version field primarily guards against concurrent writes during agent execution, where `enterAgentMode()` increments the version properly.
+
+**STRIDE Classification:** Tampering -- Theoretical version collision could allow stale write to succeed.
+
+**Workaround:** Not needed. The double-reset pattern (state-reset.cjs + user-prompt-unified.cjs) and single-writer-during-routing constraint make this a theoretical rather than practical risk.
+
+**Resolution:** Consider using `Date.now()` without modulo, or a monotonic counter persisted across resets.
+
+**Priority:** P3 -- LOW. Theoretical risk only; no practical exploit path identified.
+
+**Full Report:** See `.claude/context/reports/security/router-enforcement-security-review-2026-02-08.md` for complete STRIDE analysis, race condition analysis, and 6 detailed recommendations (R-1 through R-6).

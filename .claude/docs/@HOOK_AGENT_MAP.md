@@ -21,7 +21,7 @@ This table shows which hooks apply to which agent archetypes. Hooks are triggere
 | `execution-limit-monitor-hook.cjs`                                              | x      | x           | x        | x          | x            | x          |
 | `tool-scope-validator.cjs`                                                      | x      | x           | x        | x          | x            | x          |
 | **Router / Task Tools**                                                         |
-| `routing-guard.cjs` (Task, TaskCreate, Bash, Glob, Grep, WebSearch)             | x      | x           | x        |            | x            | x          |
+| `routing-guard.cjs` (Task, TaskCreate, Edit, Write, NotebookEdit, Bash, Glob, Grep, WebSearch) | x      | x           | x        |            | x            | x          |
 | `intent-agent-match.cjs` (PreToolUse Task)                                      | x      |             |          |            | x            |            |
 | `spawn-prompt-assembler.cjs` (PreToolUse Task)                                  | x      |             |          |            | x            |            |
 | `pre-task-unified.cjs` (PreToolUse Task)                                        | x      |             |          |            | x            |            |
@@ -87,9 +87,10 @@ These environment variables control hook enforcement modes. Set them in `.env` t
 | `CONFIG_MODEL_VALIDATOR`       | config-model-validator.cjs | warn    | block/warn/off | Validate model matches config.yaml                          |
 | `INTENT_AGENT_ENFORCEMENT`     | intent-agent-match.cjs     | block   | block/warn/off | Match intent to correct agent type                          |
 | `TOOL_SCOPE_VALIDATOR`         | tool-scope-validator.cjs   | warn    | block/warn/off | Validate tool in agent's allowed set                        |
-| `ROUTER_WRITE_GUARD`           | routing-guard.cjs          | block   | block/warn/off | Block Router from using Write/Edit                          |
+| `ROUTER_WRITE_GUARD`           | routing-guard.cjs          | block   | block/warn/off | Block Router from using Write/Edit/NotebookEdit             |
 | `ROUTER_SELF_CHECK`            | routing-guard.cjs          | block   | block/warn/off | Enforce Router self-check gates                             |
-| `TASKLIST_FIRST_ENFORCEMENT`   | pre-task-unified.cjs       | block   | block/warn/off | Enforce TaskList() before Task()                            |
+| `TASKLIST_FIRST_ENFORCEMENT`   | routing-guard.cjs          | warn    | block/warn/off | Enforce TaskList() before Task()                            |
+| `STATE_STALE_THRESHOLD_MS`     | routing-guard.cjs          | 600000  | number         | State staleness threshold (ms)                              |
 | `RESEARCH_ENFORCEMENT`         | research-enforcement.cjs   | block   | block/warn/off | Enforce research-synthesis before creators                  |
 
 **Enforcement Modes:**

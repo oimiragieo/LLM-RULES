@@ -490,3 +490,77 @@ The ecosystem creation protocol plan follows a clean dependency DAG with no cycl
 - **Tier 3 (Steps 8-12):** Features (new skills, Post-Creation integration) → depends on Tier 2
 
 Each tier depends only on prior tiers. No backtracking, no rework loops. This is the pattern to follow: Security → Infrastructure → Features.
+
+---
+
+## Router Enforcement Hook Registration Gap Pattern (Task #28, 2026-02-08)
+
+**Key Finding:** A hook can contain complete enforcement logic for a tool but never fire because `settings.json` does not register it for that tool's matcher. The code in `routing-guard.cjs` handles Edit/Write/NotebookEdit via `ALL_WATCHED_TOOLS` and `BLACKLISTED_TOOLS`, but the hook is only registered for Bash, Glob|Grep|WebSearch, and TaskCreate matchers.
+
+**Pattern:** When auditing hook enforcement, always check BOTH:
+
+1. The hook's internal tool matching logic (which tools it handles)
+2. The `settings.json` PreToolUse matcher registration (which tools trigger it)
+
+A mismatch between these two means dead enforcement code.
+
+**Related Pattern:** Flag infrastructure without enforcement gates. The `taskListCalledSincePrompt` flag has setter (task-list-tracker.cjs), getter (router-state.cjs), and reset (state-reset.cjs) -- but no hook reads the flag before allowing Task() spawns. Infrastructure without enforcement is security theater.
+
+**Audit Checklist for Hook Security:**
+
+1. Is the hook registered in settings.json for all tools it claims to handle?
+2. Do all env var kill switches call `auditSecurityOverride()`?
+3. Does the hook have a `HOOK_FAIL_OPEN` path that silently degrades?
+4. Are state flags (like `taskListCalledSincePrompt`) actually checked before critical operations?
+
+---
+
+## Router Enforcement Hardening QA (Task #33, 2026-02-08)
+
+**Pattern:** Comprehensive QA validation with 100% test pass rate confirms implementation quality and catches pre-existing failures.
+
+**Completed:** QA validation of 5 router enforcement fixes (Tasks #27-33):
+
+### Test Execution Strategy
+
+**New enforcement tests:** 33/33 passing (100%)
+
+- Fix 1: routing-guard blocks Edit/Write/NotebookEdit (10 tests)
+- Fix 4a: state-reset includes required fields (6 tests)
+- Fix 4b: applyStaleDetection staleness detection (8 tests)
+- Fix 3 / Check 8: checkTaskListFirstGate (9 tests)
+
+**Regression tests:** 91/91 passing (100%)
+
+- Unified creator guard: 26 tests (infrastructure + schema validation)
+- Memory management: 37 tests (rotation, pruning, cold storage, scrubbing)
+- Creator infrastructure: 28 tests (commons, impact analyzer)
+
+**Total:** 124/124 enforcement tests passing (100%)
+
+### Key Learnings
+
+1. **Hook Registration Order is Critical:** routing-guard.cjs must be FIRST hook in Edit|Write|NotebookEdit matcher (line 72 in settings.json) to block router writes BEFORE creator guard checks. Order matters: routing-guard → creator-guard → pre-write.
+
+2. **Always-Allowed Paths Exemption:** Router needs to write to `.claude/context/memory/` and `.claude/context/runtime/` for legitimate state management. These paths are exempted from routing enforcement but still go through creator guard (which allows them).
+
+3. **Staleness Detection Prevents Bypass:** State files older than 10 minutes (600s default threshold) automatically force router mode, preventing stale "agent" mode from bypassing enforcement. Invalid timestamps (null, malformed) also trigger fallback.
+
+4. **Pre-Existing Test Failures Don't Block:** Full suite has 846 failing tests out of 4084, but all 124 enforcement tests pass. Pre-existing failures in unrelated suites (GPU usage, workflow engine) are out of scope for this task.
+
+5. **Environment Variable Overrides for Tuning:** STATE_STALE_THRESHOLD_MS and TASKLIST_FIRST_ENFORCEMENT allow teams to tune enforcement strictness per environment (dev: warn, prod: block).
+
+6. **Lint/Format Must Pass Before Completion (TDD Iron Law):** pnpm lint:fix (0 errors) and pnpm format (0 changes) are BLOCKING requirements before marking task complete. This is verification-before-completion principle applied.
+
+7. **Test Execution Time Matters:** 124 enforcement tests complete in <5s, making them suitable for pre-commit hook integration. Fast tests = high confidence without slowing developer workflow.
+
+8. **Edge Case Coverage Catches Bypasses:** Tests for invalid timestamps, null values, environment variable overrides, and agent mode exemption ensure enforcement cannot be bypassed through malformed state or edge conditions.
+
+### Files Modified
+
+- Created `.claude/context/reports/qa/enforcement-hardening-qa-2026-02-08.md` (comprehensive QA report)
+- Verified `.claude/settings.json` hook registration structure (routing-guard FIRST)
+
+### Next Phase
+
+DevOps (Task #34) - Lint, format, commit and push (already verified clean)

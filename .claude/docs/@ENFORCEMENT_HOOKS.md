@@ -18,9 +18,9 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 
 ## Critical Hooks Overview
 
-| Hook                            | Location                    | Trigger                 | Default | Key Env Variables                                          |
-| ------------------------------- | --------------------------- | ----------------------- | ------- | ---------------------------------------------------------- |
-| `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task)        | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT` |
+| Hook                            | Location                    | Trigger                                           | Default | Key Env Variables                                                                                   |
+| ------------------------------- | --------------------------- | ------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task, Edit, Write, NotebookEdit)       | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
 | `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | PreToolUse(Write, Edit) | block   | `CREATOR_GUARD`                                            |
 | `unified-pre-write-hook.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Write, Edit) | block   | Multiple (11 consolidated checks)                          |
 | `bash-command-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)        | block   | `BASH_VALIDATOR_FAIL_OPEN`                                 |
@@ -37,7 +37,7 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 ## 1. routing-guard.cjs
 
 **Location:** `.claude/hooks/routing/routing-guard.cjs`
-**Event Type:** PreToolUse(Task)
+**Event Type:** PreToolUse(Task), PreToolUse(Edit), PreToolUse(Write), PreToolUse(NotebookEdit)
 **Default Enforcement:** block
 **Purpose:** Enforces router-first protocol and CLAUDE.md Gates 1-3
 
@@ -71,6 +71,23 @@ This hook consolidates multiple router enforcement policies:
    - Ensures documentation requests route to technical-writer
    - Part of routing-guard.cjs enforcement
 
+6. **Router write/edit guard**
+   - Blocks Router from using Write/Edit/NotebookEdit (except allowed paths)
+   - Enforces tool restrictions in CLAUDE.md Section 1.1
+   - Allows writes to `.claude/context/memory/` and `.claude/context/runtime/` for state management
+
+7. **State staleness detection**
+   - Detects stale state files (older than `STATE_STALE_THRESHOLD_MS`)
+   - Forces router mode if state file is stale
+   - Default threshold: 600000ms (10 minutes)
+   - Invalid timestamps force fallback to router mode
+
+8. **TaskList-first gate** (`TASKLIST_FIRST_ENFORCEMENT`)
+   - Requires TaskList() called before Task() spawns
+   - Default: `warn`
+   - Override: `TASKLIST_FIRST_ENFORCEMENT=block|off`
+   - Enforces CLAUDE.md Section 0 routing protocol
+
 ### Environment Variables
 
 ```bash
@@ -82,6 +99,12 @@ SECURITY_REVIEW_ENFORCEMENT=block|warn|off  # Default: block
 
 # Router self-check (cannot be disabled)
 ROUTER_SELF_CHECK=block|warn  # Default: block (off not allowed)
+
+# TaskList-first gate
+TASKLIST_FIRST_ENFORCEMENT=block|warn|off  # Default: warn
+
+# State staleness threshold
+STATE_STALE_THRESHOLD_MS=number  # Default: 600000 (10 minutes)
 ```
 
 ---
@@ -734,7 +757,10 @@ Hooks are registered in `.claude/settings.json`:
 PLANNER_FIRST_ENFORCEMENT=block|warn|off        # Default: block
 SECURITY_REVIEW_ENFORCEMENT=block|warn|off      # Default: block
 ROUTER_SELF_CHECK=block|warn                    # Default: block (off not allowed)
-TASKLIST_FIRST_ENFORCEMENT=block|warn|off       # Default: block
+TASKLIST_FIRST_ENFORCEMENT=block|warn|off       # Default: warn
+
+# State management
+STATE_STALE_THRESHOLD_MS=number                 # Default: 600000 (10 minutes)
 
 # Creator enforcement
 CREATOR_GUARD=block|warn|off                    # Default: block
