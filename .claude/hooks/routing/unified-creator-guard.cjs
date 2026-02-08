@@ -65,6 +65,21 @@ try {
  * 3. Add pre-execute hook to creator skill
  */
 const CREATOR_CONFIGS = [
+  // STEP 1 SECURITY FIXES: Protect critical infrastructure files
+  // These must come FIRST to match before general artifact patterns
+  {
+    creator: 'hook-creator',
+    patterns: [/\.claude[/\\]settings\.json$/i],
+    artifactType: 'config:settings',
+    primaryFile: 'settings.json',
+  },
+  {
+    creator: 'agent-creator',
+    patterns: [/\.claude[/\\]context[/\\]agent-registry\.json$/i],
+    artifactType: 'config:agent-registry',
+    primaryFile: 'agent-registry.json',
+  },
+  // Original 6 artifact types
   {
     creator: 'skill-creator',
     patterns: [/\.claude[/\\]skills[/\\][^/\\]+[/\\]SKILL\.md$/i],
@@ -109,6 +124,27 @@ const CREATOR_CONFIGS = [
     artifactType: 'schema',
     primaryFile: '*.schema.json',
   },
+  // STEP 3: New artifact types (rules, commands, tools)
+  // Initially warn-only until creators exist (Steps 10-12)
+  {
+    creator: 'rule-creator',
+    patterns: [/\.claude[/\\]rules[/\\][^/\\]+\.md$/i],
+    artifactType: 'rule',
+    primaryFile: '*.md',
+  },
+  {
+    creator: 'command-creator',
+    patterns: [/\.claude[/\\]commands[/\\][^/\\]+\.md$/i],
+    artifactType: 'command',
+    primaryFile: '*.md',
+  },
+  {
+    creator: 'tool-creator',
+    patterns: [/\.claude[/\\]tools[/\\].*\.(?:cjs|mjs)$/i],
+    artifactType: 'tool',
+    primaryFile: '*.cjs|*.mjs',
+    excludePatterns: [/\.test\.cjs$/i, /_archive[/\\]/i],
+  },
 ];
 
 /**
@@ -118,11 +154,28 @@ const CREATOR_CONFIGS = [
 const STATE_FILE = '.claude/context/runtime/active-creators.json';
 
 /**
+ * TTL bounds for creator state (HIGH-002 security fix)
+ * Minimum: 30 seconds (prevents zero-window attacks)
+ * Maximum: 10 minutes (prevents permanent bypass)
+ */
+const MIN_TTL_MS = 30 * 1000; // 30 seconds minimum
+const MAX_TTL_MS = 10 * 60 * 1000; // 10 minutes maximum
+
+/**
  * Default time-to-live for active creator state (3 minutes)
  * SEC-REMEDIATION-001: Reduced from 10 to 3 minutes to minimize
  * state tampering window while still allowing creator workflow completion.
+ * HIGH-002 FIX: Add bounds checking for CREATOR_STATE_TTL_MS env var
  */
-const DEFAULT_TTL_MS = 3 * 60 * 1000;
+const DEFAULT_TTL_MS = (() => {
+  const envVal = Number(process.env.CREATOR_STATE_TTL_MS);
+  // Invalid values (NaN, Infinity, -Infinity, 0, negative) fall back to default
+  if (!Number.isFinite(envVal) || envVal <= 0) {
+    return 3 * 60 * 1000; // 180000ms
+  }
+  // Clamp to MIN/MAX bounds
+  return Math.max(MIN_TTL_MS, Math.min(envVal, MAX_TTL_MS));
+})();
 
 /**
  * Tools that this hook monitors
@@ -304,6 +357,112 @@ function generateViolationMessage(filePath, requiredCreator, artifactType) {
 |    - Users can't discover it                                         |
 +======================================================================+
 `;
+}
+
+// =============================================================================
+// SCHEMA VALIDATION (Step 7 - Write-time schema validation, warn-only)
+// =============================================================================
+
+/**
+ * Schema file mapping: artifactType -> schema filename
+ * null means no schema exists for that type (skip validation)
+ */
+const SCHEMA_MAP = {
+  skill: 'skill-definition.schema.json',
+  agent: 'agent-definition.schema.json',
+  hook: 'hook-definition.schema.json',
+  workflow: 'workflow-definition.schema.json',
+  schema: null, // self-referential
+  'config:settings': null,
+  'config:agent-registry': 'agent-config.schema.json',
+  template: null,
+  rule: null,
+  command: null,
+  tool: null,
+};
+
+/**
+ * Validate artifact content against its schema at write time.
+ * Always runs in warn mode (never blocks).
+ *
+ * @param {string} artifactType - Type of artifact being written
+ * @param {string} content - Raw content being written (string)
+ * @returns {{ valid: boolean, errors: string[], mode: string }}
+ */
+function validateArtifactContent(artifactType, content) {
+  const result = { valid: true, errors: [], mode: 'warn' };
+
+  // Look up schema
+  const schemaFile = SCHEMA_MAP[artifactType];
+  if (schemaFile === undefined || schemaFile === null) {
+    // No schema for this type - skip validation
+    return result;
+  }
+
+  // Try to parse content as JSON
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+  } catch (_e) {
+    // Content is not JSON (e.g., markdown) - skip validation gracefully
+    return result;
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
+    return result;
+  }
+
+  // Load schema
+  const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', schemaFile);
+  if (!fs.existsSync(schemaPath)) {
+    return result;
+  }
+
+  let schema;
+  try {
+    schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+  } catch (_e) {
+    return result;
+  }
+
+  if (!schema) {
+    return result;
+  }
+
+  // Lightweight validation: check required fields
+  const requiredFields = schema.required || [];
+  for (const field of requiredFields) {
+    if (parsed[field] === undefined || parsed[field] === null) {
+      result.errors.push(`Missing required field: ${field}`);
+    }
+  }
+
+  // Validate field types where schema specifies them
+  const properties = schema.properties || {};
+  for (const [field, fieldSchema] of Object.entries(properties)) {
+    if (parsed[field] === undefined) continue;
+    const value = parsed[field];
+
+    if (fieldSchema.type === 'string' && typeof value !== 'string') {
+      result.errors.push(`Field '${field}' must be a string`);
+    }
+    if (fieldSchema.pattern && typeof value === 'string') {
+      const regex = new RegExp(fieldSchema.pattern);
+      if (!regex.test(value)) {
+        result.errors.push(`Field '${field}' does not match pattern: ${fieldSchema.pattern}`);
+      }
+    }
+    if (
+      fieldSchema.minLength &&
+      typeof value === 'string' &&
+      value.length < fieldSchema.minLength
+    ) {
+      result.errors.push(`Field '${field}' is too short (min ${fieldSchema.minLength} chars)`);
+    }
+  }
+
+  result.valid = result.errors.length === 0;
+  return result;
 }
 
 // =============================================================================
@@ -512,6 +671,9 @@ module.exports = {
   isCreatorActive,
   markCreatorActive,
   clearCreatorActive,
+  // Schema validation (Step 7)
+  validateArtifactContent,
+  SCHEMA_MAP,
   // Constants
   CREATOR_CONFIGS,
   STATE_FILE,
