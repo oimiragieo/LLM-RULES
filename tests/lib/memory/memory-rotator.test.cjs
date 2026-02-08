@@ -21,7 +21,10 @@ const FIXTURES_DIR = path.join(PROJECT_ROOT, 'tests/fixtures/memory-management')
 
 // Helper: Create temporary test directory
 function createTempDir() {
-  const tmpDir = path.join(os.tmpdir(), `memory-rotator-test-${crypto.randomBytes(4).toString('hex')}`);
+  const tmpDir = path.join(
+    os.tmpdir(),
+    `memory-rotator-test-${crypto.randomBytes(4).toString('hex')}`
+  );
   fs.mkdirSync(tmpDir, { recursive: true });
   return tmpDir;
 }
@@ -43,7 +46,10 @@ test('parseSections() - parses --- delimited sections', () => {
   assert.strictEqual(sections.length, 2, 'Should find 2 sections in sample-learnings.md');
 
   assert.ok(sections[0].content.includes('TDD Cycle'), 'First section should contain TDD');
-  assert.ok(sections[1].content.includes('Atomic Writes'), 'Second section should contain Atomic Writes');
+  assert.ok(
+    sections[1].content.includes('Atomic Writes'),
+    'Second section should contain Atomic Writes'
+  );
 });
 
 test('parseSections() - extracts dates from **Date:** pattern', () => {
@@ -159,7 +165,11 @@ test('rotateIfNeeded() - file under threshold is not rotated', () => {
 
     assert.strictEqual(result.rotated, false, 'File under threshold should not be rotated');
     assert.ok(fs.existsSync(testFile), 'Original file should still exist');
-    assert.strictEqual(fs.readFileSync(testFile, 'utf8'), content, 'File content should be unchanged');
+    assert.strictEqual(
+      fs.readFileSync(testFile, 'utf8'),
+      content,
+      'File content should be unchanged'
+    );
   } finally {
     cleanupTempDir(tmpDir);
   }
@@ -175,7 +185,7 @@ test('rotateIfNeeded() - file over threshold is rotated', () => {
     // Create a file > 20KB (15 sections of ~1.5KB each)
     let content = '# Large File\n\n';
     for (let i = 0; i < 15; i++) {
-      content += `## Section ${i}\n\n**Date:** 2026-02-0${i % 9 + 1}\n\n`;
+      content += `## Section ${i}\n\n**Date:** 2026-02-0${(i % 9) + 1}\n\n`;
       content += 'Lorem ipsum dolor sit amet '.repeat(50) + '\n\n---\n\n';
     }
     fs.writeFileSync(testFile, content);
@@ -222,7 +232,7 @@ test('rotateIfNeeded() - creates archive file with correct name', () => {
     const archiveFiles = fs.readdirSync(archiveDir);
     assert.ok(archiveFiles.length > 0, 'Archive file should be created');
 
-    const archiveFile = archiveFiles.find((f) => f.match(/^decisions-\d{4}-\d{2}\.md$/));
+    const archiveFile = archiveFiles.find(f => f.match(/^decisions-\d{4}-\d{2}\.md$/));
     assert.ok(archiveFile, 'Archive file should match format: decisions-YYYY-MM.md');
   } finally {
     cleanupTempDir(tmpDir);
@@ -250,7 +260,7 @@ This should NEVER be archived.
 `;
     // Add many more sections to exceed threshold
     for (let i = 0; i < 15; i++) {
-      content += `## Section ${i}\n\n**Date:** 2026-02-0${i % 9 + 1}\n\n`;
+      content += `## Section ${i}\n\n**Date:** 2026-02-0${(i % 9) + 1}\n\n`;
       content += 'Content '.repeat(100) + '\n\n---\n\n';
     }
     fs.writeFileSync(testFile, content);
@@ -275,8 +285,9 @@ test('rotateIfNeeded() - is idempotent (second call is no-op)', () => {
     // Create large file (25+ sections to ensure > 20KB)
     let content = '# Test\n\n';
     for (let i = 0; i < 25; i++) {
-      content += `## Section ${i}\n\n**Date:** 2026-02-0${i % 9 + 1}\n\n`;
-      content += 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(50) + '\n\n---\n\n';
+      content += `## Section ${i}\n\n**Date:** 2026-02-0${(i % 9) + 1}\n\n`;
+      content +=
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(50) + '\n\n---\n\n';
     }
     fs.writeFileSync(testFile, content);
 
@@ -291,7 +302,11 @@ test('rotateIfNeeded() - is idempotent (second call is no-op)', () => {
     assert.strictEqual(result2.rotated, false, 'Second rotation should be no-op');
 
     const contentAfterSecond = fs.readFileSync(testFile, 'utf8');
-    assert.strictEqual(contentAfterSecond, contentAfterFirst, 'File content should be unchanged on second call');
+    assert.strictEqual(
+      contentAfterSecond,
+      contentAfterFirst,
+      'File content should be unchanged on second call'
+    );
   } finally {
     cleanupTempDir(tmpDir);
   }
@@ -308,7 +323,8 @@ test('rotateIfNeeded() - auto-creates archive directory if missing', () => {
     let content = '# Test\n\n';
     for (let i = 0; i < 25; i++) {
       content += `## Section ${i}\n\n**Date:** 2026-02-01\n\n`;
-      content += 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(50) + '\n\n---\n\n';
+      content +=
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(50) + '\n\n---\n\n';
     }
     fs.writeFileSync(testFile, content);
 

@@ -1,12 +1,12 @@
 # Skill Catalog
 
-> **Total Skills: 90** (1 deprecated alias) | Last Updated: 2026-02-07
+> **Total Skills: 94** (1 deprecated alias) | Last Updated: 2026-02-08
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 **Post-Cleanup Summary:**
 
-- **Active Skills:** 88 (maintained and invoked)
+- **Active Skills:** 92 (maintained and invoked)
 - **Deprecated Aliases:** 1 (`testing-expert` → `tdd`)
 - **Scientific Parent:** 1 (`scientific-skills` with 139 sub-skills)
 - **Archived:** 214 dead skills → `.claude/skills/_archive/dead/` (see README)
@@ -28,7 +28,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | [Documentation](#documentation)                    | 4     | doc-generator, writing-skills, readme, gamedev-expert                                                                                                                            |
 | [Git & Version Control](#git--version-control)     | 1     | git-expert                                                                                                                                                                       |
 | [Code Style & Linting](#code-style--linting)       | 2     | code-style-validator, dry-principle                                                                                                                                              |
-| [Creator Tools](#creator-tools)                    | 8     | research-synthesis, agent-creator, skill-creator, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator                                          |
+| [Creator Tools](#creator-tools)                    | 12    | research-synthesis, agent-creator, skill-creator, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, artifact-updater, command-creator, rule-creator, tool-creator |
 | [Memory & Context](#memory--context)               | 6     | context-compressor, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management                                                  |
 | [Validation & Quality](#validation--quality)       | 5     | verification-before-completion, checklist-generator, response-rater, test-generator, accessibility                                                                               |
 | [Specialized Patterns](#specialized-patterns)      | 9     | thinking-tools, spec-gathering, spec-init, sequential-thinking, consensus-voting, swarm-coordination, interactive-requirements-gathering, planning-with-files, sparc-methodology |
@@ -221,6 +221,10 @@ Framework artifact creators.
 | `workflow-creator`    | Creates orchestration workflows                                         | router                        |
 | `template-creator`    | Creates templates                                                       | router                        |
 | `schema-creator`      | Creates JSON Schema validators                                          | router                        |
+| `command-creator`     | Creates thin-delegator slash commands                                   | router                        |
+| `rule-creator`        | Creates workspace convention rules                                      | router                        |
+| `tool-creator`        | Creates CLI tools and utilities                                         | router                        |
+| `artifact-updater`    | Updates existing artifacts (unified updater for all types)              | all creators                  |
 | `artifact-integrator` | Deep integration analysis for newly created artifacts                   | architect, planner, developer |
 
 **Creation Pattern:**

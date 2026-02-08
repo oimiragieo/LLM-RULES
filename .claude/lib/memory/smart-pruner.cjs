@@ -43,7 +43,7 @@ function jaccardSimilarity(textA, textB) {
       .toLowerCase()
       .replace(/[^\w\s]/g, ' ')
       .split(/\s+/)
-      .filter((w) => w.length > 0)
+      .filter(w => w.length > 0)
   );
 
   const wordsB = new Set(
@@ -51,7 +51,7 @@ function jaccardSimilarity(textA, textB) {
       .toLowerCase()
       .replace(/[^\w\s]/g, ' ')
       .split(/\s+/)
-      .filter((w) => w.length > 0)
+      .filter(w => w.length > 0)
   );
 
   if (wordsA.size === 0 && wordsB.size === 0) {
@@ -59,7 +59,7 @@ function jaccardSimilarity(textA, textB) {
   }
 
   // Calculate intersection and union
-  const intersection = new Set([...wordsA].filter((w) => wordsB.has(w)));
+  const intersection = new Set([...wordsA].filter(w => wordsB.has(w)));
   const union = new Set([...wordsA, ...wordsB]);
 
   return intersection.size / union.size;
@@ -133,7 +133,7 @@ function deduplicateFile(filePath, options = {}) {
 
   // Write back deduplicated content (if not dry run and changes exist)
   if (!dryRun && duplicatesRemoved > 0) {
-    const dedupedContent = toKeep.map((s) => s.content).join('\n\n---\n\n');
+    const dedupedContent = toKeep.map(s => s.content).join('\n\n---\n\n');
     atomicWriteSync(filePath, dedupedContent);
   }
 
@@ -171,7 +171,7 @@ function pruneResolvedEntries(filePath, options = {}) {
   const now = new Date();
   const maxAgeMs = maxAgeDays * 24 * 60 * 60 * 1000;
 
-  const toKeep = sections.filter((section) => {
+  const toKeep = sections.filter(section => {
     // Keep if not resolved
     if (!section.isResolved) {
       return true;
@@ -198,7 +198,7 @@ function pruneResolvedEntries(filePath, options = {}) {
 
   // Write back pruned content if changes exist
   if (removed > 0) {
-    const prunedContent = toKeep.map((s) => s.content).join('\n\n---\n\n');
+    const prunedContent = toKeep.map(s => s.content).join('\n\n---\n\n');
     atomicWriteSync(filePath, prunedContent);
   }
 

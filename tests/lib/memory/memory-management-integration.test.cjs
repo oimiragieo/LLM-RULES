@@ -60,7 +60,10 @@ test('Integration - Rotation pipeline (hot -> warm)', () => {
   // Verify archive file exists
   const archiveFiles = fs.readdirSync(archiveDir);
   assert.ok(archiveFiles.length > 0, 'Archive should contain files');
-  assert.ok(archiveFiles[0].startsWith('learnings-'), 'Archive file should be named learnings-YYYY-MM.md');
+  assert.ok(
+    archiveFiles[0].startsWith('learnings-'),
+    'Archive file should be named learnings-YYYY-MM.md'
+  );
 
   // Verify hot file is truncated
   const newStats = fs.statSync(largeFile);

@@ -26,11 +26,9 @@ const path = require('path');
 
 // Load modules under test
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
-const {
-  checkSpecialistOverride,
-  SPECIALIST_KEYWORD_MAP,
-  invalidateCachedState,
-} = require(path.join(PROJECT_ROOT, '.claude/hooks/routing/routing-guard.cjs'));
+const { checkSpecialistOverride, SPECIALIST_KEYWORD_MAP, invalidateCachedState } = require(
+  path.join(PROJECT_ROOT, '.claude/hooks/routing/routing-guard.cjs')
+);
 const { resolveDomainSpecialist } = require(
   path.join(PROJECT_ROOT, '.claude/lib/workflow/phase-advance-reader.cjs')
 );
@@ -284,7 +282,10 @@ describe('E2E: Specialist-First Routing — Domain Specialist Resolution', () =>
   it('should be case-insensitive', () => {
     assert.strictEqual(resolveDomainSpecialist('PYTHON data pipeline'), 'python-pro');
     assert.strictEqual(resolveDomainSpecialist('React Dashboard'), 'frontend-pro');
-    assert.strictEqual(resolveDomainSpecialist('SOLIDITY smart contract'), 'web3-blockchain-expert');
+    assert.strictEqual(
+      resolveDomainSpecialist('SOLIDITY smart contract'),
+      'web3-blockchain-expert'
+    );
   });
 });
 
@@ -314,7 +315,10 @@ describe('E2E: Cross-Module Integration (Check 7 + Domain Specialist)', () => {
     assert.ok(check7Specialists.includes('devops'), 'Check 7 covers devops');
     assert.ok(check7Specialists.includes('code-reviewer'), 'Check 7 covers code-reviewer');
     assert.ok(check7Specialists.includes('code-simplifier'), 'Check 7 covers code-simplifier');
-    assert.ok(check7Specialists.includes('database-architect'), 'Check 7 covers database-architect');
+    assert.ok(
+      check7Specialists.includes('database-architect'),
+      'Check 7 covers database-architect'
+    );
     assert.ok(check7Specialists.includes('researcher'), 'Check 7 covers researcher');
 
     // Domain specialist map covers language/framework routing (python-pro, frontend-pro, etc.)

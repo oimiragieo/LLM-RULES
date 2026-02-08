@@ -16,7 +16,8 @@ test('scrubSensitiveContent - API key pattern', () => {
 test('scrubSensitiveContent - JWT pattern', () => {
   const { scrubSensitiveContent } = require('../../../.claude/lib/utils/sensitive-scrubber.cjs');
 
-  const input = 'Token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+  const input =
+    'Token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
   const result = scrubSensitiveContent(input);
 
   assert.equal(result.scrubbed, 'Token: [JWT-REDACTED]');
@@ -25,7 +26,7 @@ test('scrubSensitiveContent - JWT pattern', () => {
 
 // RED: Test email pattern
 test('scrubSensitiveContent - email pattern', () => {
-  const { scrubSensitiveContent} = require('../../../.claude/lib/utils/sensitive-scrubber.cjs');
+  const { scrubSensitiveContent } = require('../../../.claude/lib/utils/sensitive-scrubber.cjs');
 
   const input = 'Contact: user@example.com';
   const result = scrubSensitiveContent(input);

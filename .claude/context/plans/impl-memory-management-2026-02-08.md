@@ -30,16 +30,16 @@ Before starting, the developer MUST read:
 
 **Existing utilities to use (DO NOT rewrite):**
 
-| Utility | Path | Provides |
-|---------|------|----------|
-| `atomicWriteSync()` | `.claude/lib/utils/atomic-write.cjs` | Crash-safe file writes (temp + rename) |
-| `createBackup()` | `.claude/lib/utils/atomic-write.cjs` | Pre-destructive-operation backups |
-| `restoreFromBackup()` | `.claude/lib/utils/atomic-write.cjs` | Recovery from failed writes |
-| `safeParseJSON()` | `.claude/lib/utils/safe-json.cjs` | Prototype-pollution-safe JSON parsing |
-| `safeReadJSON()` | `.claude/lib/utils/safe-json.cjs` | File read + safe parse combo |
-| `PROJECT_ROOT` | `.claude/lib/utils/project-root.cjs` | Canonical project root path |
-| `validatePathWithinProject()` | `.claude/lib/utils/project-root.cjs` | Path traversal prevention |
-| `createLogger()` | `.claude/lib/utils/logger.cjs` | Structured JSONL logging (no console.log) |
+| Utility                       | Path                                 | Provides                                  |
+| ----------------------------- | ------------------------------------ | ----------------------------------------- |
+| `atomicWriteSync()`           | `.claude/lib/utils/atomic-write.cjs` | Crash-safe file writes (temp + rename)    |
+| `createBackup()`              | `.claude/lib/utils/atomic-write.cjs` | Pre-destructive-operation backups         |
+| `restoreFromBackup()`         | `.claude/lib/utils/atomic-write.cjs` | Recovery from failed writes               |
+| `safeParseJSON()`             | `.claude/lib/utils/safe-json.cjs`    | Prototype-pollution-safe JSON parsing     |
+| `safeReadJSON()`              | `.claude/lib/utils/safe-json.cjs`    | File read + safe parse combo              |
+| `PROJECT_ROOT`                | `.claude/lib/utils/project-root.cjs` | Canonical project root path               |
+| `validatePathWithinProject()` | `.claude/lib/utils/project-root.cjs` | Path traversal prevention                 |
+| `createLogger()`              | `.claude/lib/utils/logger.cjs`       | Structured JSONL logging (no console.log) |
 
 **Hybrid search note:** For codebase exploration during implementation, prefer `pnpm search:code "<query>"` or `node .claude/lib/code-indexing/search-cli.cjs "<query>"` over raw grep when searching for patterns across many files. Use `Grep` for precise single-pattern matches in known locations.
 
@@ -51,14 +51,14 @@ Before starting, the developer MUST read:
 
 **Files to Create:**
 
-| File | Purpose | Size |
-|------|---------|------|
-| `tests/fixtures/memory-management/sample-learnings.md` | Small file under 20KB threshold | ~500 bytes |
-| `tests/fixtures/memory-management/large-decisions.md` | File over 20KB requiring rotation | ~22KB |
-| `tests/fixtures/memory-management/duplicate-issues.md` | Contains near-identical entries for dedup testing | ~2KB |
-| `tests/fixtures/memory-management/resolved-issues.md` | Contains old resolved entries for pruning | ~1KB |
-| `tests/fixtures/memory-management/permanent-entries.md` | Contains [PERMANENT] tagged entries | ~500 bytes |
-| `tests/fixtures/memory-management/sensitive-content.md` | Contains API keys, JWTs, emails for scrubber testing | ~1KB |
+| File                                                    | Purpose                                              | Size       |
+| ------------------------------------------------------- | ---------------------------------------------------- | ---------- |
+| `tests/fixtures/memory-management/sample-learnings.md`  | Small file under 20KB threshold                      | ~500 bytes |
+| `tests/fixtures/memory-management/large-decisions.md`   | File over 20KB requiring rotation                    | ~22KB      |
+| `tests/fixtures/memory-management/duplicate-issues.md`  | Contains near-identical entries for dedup testing    | ~2KB       |
+| `tests/fixtures/memory-management/resolved-issues.md`   | Contains old resolved entries for pruning            | ~1KB       |
+| `tests/fixtures/memory-management/permanent-entries.md` | Contains [PERMANENT] tagged entries                  | ~500 bytes |
+| `tests/fixtures/memory-management/sensitive-content.md` | Contains API keys, JWTs, emails for scrubber testing | ~1KB       |
 
 **Fixture Format (sample-learnings.md):**
 
@@ -83,6 +83,7 @@ All file writes should use atomicWriteSync().
 ```
 
 **Fixture Format (large-decisions.md):** 15+ sections with `## ADR-NNN` headers, each ~1.5KB, totaling >20KB. Include a mix of:
+
 - Accepted ADRs (old dates, archivable)
 - Recent ADRs (keep in active file)
 - One `[PERMANENT]` tagged ADR (must never be archived)
@@ -148,6 +149,7 @@ Reported by admin@example.com via support channel. Password was reset for user.
 ```
 
 **Acceptance Criteria:**
+
 - [ ] All 6 fixture files exist and are valid markdown
 - [ ] `large-decisions.md` is >20KB (verified by checking file size)
 - [ ] `duplicate-issues.md` has two entries with >50% word overlap
@@ -167,8 +169,8 @@ Reported by admin@example.com via support channel. Password was reset for user.
 
 **Files to Modify:**
 
-| File | Change |
-|------|--------|
+| File                              | Change                                                                              |
+| --------------------------------- | ----------------------------------------------------------------------------------- |
 | `.claude/lib/utils/safe-json.cjs` | Add `'memory-entry'` schema for cold storage JSONL entries (optional, low priority) |
 
 **Test File:** `tests/lib/utils/safe-json-memory.test.cjs`
@@ -182,6 +184,7 @@ Reported by admin@example.com via support channel. Password was reset for user.
 5. If any test fails, add minimal fix
 
 **Acceptance Criteria:**
+
 - [ ] `safeParseJSON('{"__proto__":{"polluted":true}}', null)` returns object without pollution
 - [ ] `({}).polluted` remains `undefined` after parsing
 - [ ] `safeParseJSON('invalid json', null)` returns empty object (no throw)
@@ -201,8 +204,8 @@ Reported by admin@example.com via support channel. Password was reset for user.
 
 **Files to Create:**
 
-| File | Purpose |
-|------|---------|
+| File                                       | Purpose                               |
+| ------------------------------------------ | ------------------------------------- |
 | `.claude/lib/utils/sensitive-scrubber.cjs` | `scrubSensitiveContent(text)` utility |
 
 **Test File:** `tests/lib/utils/sensitive-scrubber.test.cjs`
@@ -238,15 +241,22 @@ module.exports = { scrubSensitiveContent };
 ```javascript
 const PATTERNS = [
   // API keys and tokens (sk-, api_key=, token=, secret=, etc.)
-  { regex: /(sk-|api[_-]?key|token|secret|password|credential)[=:\s]+\S{8,}/gi, replacement: '$1=[REDACTED]' },
+  {
+    regex: /(sk-|api[_-]?key|token|secret|password|credential)[=:\s]+\S{8,}/gi,
+    replacement: '$1=[REDACTED]',
+  },
   // JWT tokens (three base64 segments separated by dots)
-  { regex: /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g, replacement: '[JWT-REDACTED]' },
+  {
+    regex: /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g,
+    replacement: '[JWT-REDACTED]',
+  },
   // Email addresses
   { regex: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, replacement: '[EMAIL-REDACTED]' },
 ];
 ```
 
 **Acceptance Criteria:**
+
 - [ ] All 6 test cases green
 - [ ] Function returns `{ scrubbed, redactionCount }` object
 - [ ] No `console.log` in production code
@@ -265,8 +275,8 @@ const PATTERNS = [
 
 **Files to Create:**
 
-| File | Purpose |
-|------|---------|
+| File                                    | Purpose                                              |
+| --------------------------------------- | ---------------------------------------------------- |
 | `.claude/lib/memory/memory-rotator.cjs` | Start with `parseSections()` + `module.exports` stub |
 
 **Test File:** `tests/lib/memory/memory-rotator.test.cjs`
@@ -298,6 +308,7 @@ function parseSections(content)
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Correctly parses `---` delimited sections
 - [ ] Correctly parses `## ` delimited sections
 - [ ] Extracts dates from `**Date:** YYYY-MM-DD` pattern
@@ -320,8 +331,8 @@ function parseSections(content)
 
 **Files to Modify:**
 
-| File | Change |
-|------|--------|
+| File                                    | Change                          |
+| --------------------------------------- | ------------------------------- |
 | `.claude/lib/memory/memory-rotator.cjs` | Add `rotateIfNeeded()` function |
 
 **Test File:** `tests/lib/memory/memory-rotator.test.cjs` (append to existing)
@@ -351,6 +362,7 @@ function parseSections(content)
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Files under threshold are untouched
 - [ ] Files over threshold are rotated with archive created
 - [ ] `[PERMANENT]` sections preserved in active file
@@ -372,8 +384,8 @@ function parseSections(content)
 
 **Files to Modify:**
 
-| File | Change |
-|------|--------|
+| File                                    | Change                                                   |
+| --------------------------------------- | -------------------------------------------------------- |
 | `.claude/lib/memory/memory-rotator.cjs` | Add `searchArchives()` function; finalize module exports |
 
 **Test File:** `tests/lib/memory/memory-rotator.test.cjs` (append)
@@ -389,6 +401,7 @@ function parseSections(content)
 7. **REFACTOR:** Optimize to avoid reading all files when early matches found
 
 **Acceptance Criteria:**
+
 - [ ] Returns matching sections from warm archives
 - [ ] Case-insensitive matching
 - [ ] Graceful handling of missing archive directory
@@ -406,8 +419,8 @@ function parseSections(content)
 
 **Files to Create:**
 
-| File | Purpose |
-|------|---------|
+| File                                  | Purpose                          |
+| ------------------------------------- | -------------------------------- |
 | `.claude/lib/memory/smart-pruner.cjs` | Deduplication and pruning module |
 
 **Test File:** `tests/lib/memory/smart-pruner.test.cjs`
@@ -433,6 +446,7 @@ function deduplicateFile(filePath, options) // returns { duplicatesFound, duplic
 ```
 
 **Dedup Algorithm:**
+
 1. Parse sections (via `require('./memory-rotator.cjs').parseSections`)
 2. For each pair, compute Jaccard similarity
 3. If similarity >= threshold (0.5), mark shorter as duplicate
@@ -440,6 +454,7 @@ function deduplicateFile(filePath, options) // returns { duplicatesFound, duplic
 5. Write back with duplicates removed (via `atomicWriteSync`)
 
 **Acceptance Criteria:**
+
 - [ ] `jaccardSimilarity` returns correct values for exact, zero, and partial overlap
 - [ ] `deduplicateFile` correctly identifies and removes near-duplicates
 - [ ] `[PERMANENT]` sections never removed
@@ -459,8 +474,8 @@ function deduplicateFile(filePath, options) // returns { duplicatesFound, duplic
 
 **Files to Modify:**
 
-| File | Change |
-|------|--------|
+| File                                  | Change                                                  |
+| ------------------------------------- | ------------------------------------------------------- |
 | `.claude/lib/memory/smart-pruner.cjs` | Add `pruneResolvedEntries()` function; finalize exports |
 
 **Test File:** `tests/lib/memory/smart-pruner.test.cjs` (append)
@@ -474,6 +489,7 @@ function deduplicateFile(filePath, options) // returns { duplicatesFound, duplic
 5. **GREEN:** Implement `pruneResolvedEntries(filePath, options)`
 
 **Acceptance Criteria:**
+
 - [ ] Old resolved entries pruned correctly
 - [ ] Recent resolved entries kept
 - [ ] `[PERMANENT]` never pruned
@@ -494,8 +510,8 @@ function deduplicateFile(filePath, options) // returns { duplicatesFound, duplic
 
 **Files to Create:**
 
-| File | Purpose |
-|------|---------|
+| File                                  | Purpose                         |
+| ------------------------------------- | ------------------------------- |
 | `.claude/lib/memory/cold-storage.cjs` | Tiered archival + search module |
 
 **Test File:** `tests/lib/memory/cold-storage.test.cjs`
@@ -517,10 +533,16 @@ function deduplicateFile(filePath, options) // returns { duplicatesFound, duplic
 **Cold JSONL Format:**
 
 ```jsonl
-{"date":"2026-01-15","source":"decisions.md","title":"ADR-075","content":"...full section text..."}
+{
+  "date": "2026-01-15",
+  "source": "decisions.md",
+  "title": "ADR-075",
+  "content": "...full section text..."
+}
 ```
 
 **Key Implementation Details:**
+
 - `archiveWarmToCold()` reads warm archive files, parses into sections via `parseSections()`
 - Each section becomes a JSONL entry with `scrubSensitiveContent()` applied
 - Original warm file deleted ONLY after successful JSONL write
@@ -528,6 +550,7 @@ function deduplicateFile(filePath, options) // returns { duplicatesFound, duplic
 - `getStorageStats()` uses `fs.statSync()` to sum file sizes per tier
 
 **Acceptance Criteria:**
+
 - [ ] Warm archives older than threshold moved to JSONL
 - [ ] Sensitive data scrubbed before JSONL write (verify: fixture API key becomes `[REDACTED]`)
 - [ ] `safeParseJSON` used for all JSON parsing (grep for `JSON.parse` returns 0)
@@ -549,8 +572,8 @@ function deduplicateFile(filePath, options) // returns { duplicatesFound, duplic
 
 **Files to Modify:**
 
-| File | Change |
-|------|--------|
+| File                                      | Change                                                                                                     |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | `.claude/lib/memory/memory-scheduler.cjs` | Wire rotator into `runPruning()`, pruner into `runDeduplication()`, cold-storage into `runArchiveOldLTM()` |
 
 **Test File:** `tests/lib/memory/memory-scheduler-integration.test.cjs`
@@ -560,6 +583,7 @@ function deduplicateFile(filePath, options) // returns { duplicatesFound, duplic
 ### 9a. Wire `runDeduplication()` (line 342-349)
 
 **Current (disabled stub):**
+
 ```javascript
 function runDeduplication(_projectRoot = PROJECT_ROOT) {
   return {
@@ -572,6 +596,7 @@ function runDeduplication(_projectRoot = PROJECT_ROOT) {
 ```
 
 **New implementation:**
+
 ```javascript
 function runDeduplication(projectRoot = PROJECT_ROOT) {
   validateProjectRoot(projectRoot);
@@ -685,7 +710,9 @@ function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
       const status = readStatus(projectRoot);
       status.lastColdArchive = result.timestamp;
       writeStatus(status, projectRoot);
-    } catch (_e) { /* ignore */ }
+    } catch (_e) {
+      /* ignore */
+    }
   }
 
   return result;
@@ -702,6 +729,7 @@ function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
 6. **VERIFY:** Run `pnpm test` to ensure no regressions
 
 **Acceptance Criteria:**
+
 - [ ] `runDeduplication()` calls `smart-pruner.deduplicateFile()` for each memory file
 - [ ] `runPruning()` calls `memory-rotator.rotateIfNeeded()` for decisions.md and issues.md
 - [ ] `runPruning()` calls `smart-pruner.pruneResolvedEntries()` for issues.md
@@ -722,8 +750,8 @@ function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
 
 **Files to Modify:**
 
-| File | Change |
-|------|--------|
+| File                                         | Change                                         |
+| -------------------------------------------- | ---------------------------------------------- |
 | `.claude/hooks/memory/sync-memory-index.cjs` | Add rotation trigger after existing sync logic |
 
 **Test File:** `tests/hooks/sync-memory-index-rotation.test.cjs`
@@ -738,7 +766,10 @@ try {
   const thresholdKB = Number(process.env.MEMORY_ROTATION_THRESHOLD_KB || 20);
   if (stats.size > thresholdKB * 1024) {
     rotator.rotateIfNeeded(absPath);
-    debugLog('sync-memory-index', `Rotation triggered for ${path.basename(absPath)} (${Math.round(stats.size / 1024)}KB)`);
+    debugLog(
+      'sync-memory-index',
+      `Rotation triggered for ${path.basename(absPath)} (${Math.round(stats.size / 1024)}KB)`
+    );
   }
 } catch (rotErr) {
   // Non-blocking: rotation failure must not break the sync hook
@@ -761,6 +792,7 @@ const CORE_MEMORY_MARKDOWN_FILES = new Set(['decisions.md', 'issues.md', 'learni
 5. **VERIFY:** Run existing sync-memory-index tests to check no regressions
 
 **Acceptance Criteria:**
+
 - [ ] Rotation triggered when file exceeds threshold after write
 - [ ] No rotation triggered for small files
 - [ ] Hook never crashes on rotation failure (always exits 0)
@@ -780,37 +812,37 @@ const CORE_MEMORY_MARKDOWN_FILES = new Set(['decisions.md', 'issues.md', 'learni
 
 **Files to Modify:**
 
-| File | Change |
-|------|--------|
+| File                  | Change                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------ |
 | `.claude/config.yaml` | Add `rotation`, `deduplication`, `cold_storage`, `pruning` under `memory_management` |
 
 **Exact YAML to Add (after line 106, under `memory_management:`):**
 
 ```yaml
-  # Memory file rotation (ADR-102)
-  rotation:
-    enabled: true
-    threshold_kb: 20
-    keep_sections: 10
-    archive_dir: archive
+# Memory file rotation (ADR-102)
+rotation:
+  enabled: true
+  threshold_kb: 20
+  keep_sections: 10
+  archive_dir: archive
 
-  # Deduplication (ADR-102)
-  deduplication:
-    enabled: true
-    similarity_threshold: 0.5
-    skip_permanent: true
+# Deduplication (ADR-102)
+deduplication:
+  enabled: true
+  similarity_threshold: 0.5
+  skip_permanent: true
 
-  # Cold storage (ADR-102)
-  cold_storage:
-    enabled: true
-    warm_max_age_days: 30
-    cold_dir: archive/cold
-    format: jsonl
+# Cold storage (ADR-102)
+cold_storage:
+  enabled: true
+  warm_max_age_days: 30
+  cold_dir: archive/cold
+  format: jsonl
 
-  # Pruning (ADR-102)
-  pruning:
-    resolved_max_age_days: 30
-    preserve_permanent: true
+# Pruning (ADR-102)
+pruning:
+  resolved_max_age_days: 30
+  preserve_permanent: true
 ```
 
 **Test:** Verify YAML is valid by reading the file back.
@@ -822,6 +854,7 @@ const CORE_MEMORY_MARKDOWN_FILES = new Set(['decisions.md', 'issues.md', 'learni
 3. **VERIFY:** `node -e "const yaml = require('js-yaml'); const fs = require('fs'); yaml.load(fs.readFileSync('.claude/config.yaml', 'utf8'))"`
 
 **Acceptance Criteria:**
+
 - [ ] YAML is valid (parseable without errors)
 - [ ] All config values match architecture design Section 6
 - [ ] No existing config sections disturbed
@@ -853,6 +886,7 @@ const CORE_MEMORY_MARKDOWN_FILES = new Set(['decisions.md', 'issues.md', 'learni
 3. **VERIFY:** Run `pnpm test` -- all tests (unit + integration) green
 
 **Acceptance Criteria:**
+
 - [ ] All 5 integration tests green
 - [ ] Full weekly maintenance cycle completes without errors
 - [ ] Sensitive data correctly scrubbed in cold storage output
@@ -866,22 +900,22 @@ const CORE_MEMORY_MARKDOWN_FILES = new Set(['decisions.md', 'issues.md', 'learni
 
 ## Summary Table
 
-| Step | Description | Files Changed | Lines (prod) | Lines (test) | Dependencies | Risk |
-|------|-------------|---------------|-------------|-------------|--------------|------|
-| 0 | Test fixtures | 6 new fixtures | 0 | ~200 fixtures | None | LOW |
-| 1 | Safe JSON verification (MF-001) | safe-json.cjs (verify) | 0-10 | ~40 | Step 0 | LOW |
-| 2 | Sensitive data scrubber (MF-003) | sensitive-scrubber.cjs (new) | ~60 | ~80 | Step 0 | MEDIUM |
-| 3 | parseSections() | memory-rotator.cjs (new) | ~40 | ~80 | Step 0 | LOW |
-| 4 | rotateIfNeeded() (MF-002) | memory-rotator.cjs | ~60 | ~100 | Step 3 | MEDIUM |
-| 5 | searchArchives() | memory-rotator.cjs | ~20 | ~50 | Step 4 | LOW |
-| 6 | jaccardSimilarity + deduplicateFile | smart-pruner.cjs (new) | ~60 | ~100 | Step 3 | LOW |
-| 7 | pruneResolvedEntries | smart-pruner.cjs | ~30 | ~60 | Step 6 | LOW |
-| 8 | cold-storage.cjs | cold-storage.cjs (new) | ~80 | ~120 | Steps 2,3,1 | MEDIUM |
-| 9 | Wire into scheduler | memory-scheduler.cjs | ~80 | ~60 | Steps 4,6,7,8 | MEDIUM |
-| 10 | Wire into hook | sync-memory-index.cjs | ~15 | ~40 | Steps 4,9 | LOW |
-| 11 | Config additions | config.yaml | ~20 | ~10 | None | NONE |
-| 12 | Integration tests | new test file | 0 | ~150 | Steps 1-11 | LOW |
-| **TOTAL** | | **10 files** | **~465** | **~1090** | | |
+| Step      | Description                         | Files Changed                | Lines (prod) | Lines (test)  | Dependencies  | Risk   |
+| --------- | ----------------------------------- | ---------------------------- | ------------ | ------------- | ------------- | ------ |
+| 0         | Test fixtures                       | 6 new fixtures               | 0            | ~200 fixtures | None          | LOW    |
+| 1         | Safe JSON verification (MF-001)     | safe-json.cjs (verify)       | 0-10         | ~40           | Step 0        | LOW    |
+| 2         | Sensitive data scrubber (MF-003)    | sensitive-scrubber.cjs (new) | ~60          | ~80           | Step 0        | MEDIUM |
+| 3         | parseSections()                     | memory-rotator.cjs (new)     | ~40          | ~80           | Step 0        | LOW    |
+| 4         | rotateIfNeeded() (MF-002)           | memory-rotator.cjs           | ~60          | ~100          | Step 3        | MEDIUM |
+| 5         | searchArchives()                    | memory-rotator.cjs           | ~20          | ~50           | Step 4        | LOW    |
+| 6         | jaccardSimilarity + deduplicateFile | smart-pruner.cjs (new)       | ~60          | ~100          | Step 3        | LOW    |
+| 7         | pruneResolvedEntries                | smart-pruner.cjs             | ~30          | ~60           | Step 6        | LOW    |
+| 8         | cold-storage.cjs                    | cold-storage.cjs (new)       | ~80          | ~120          | Steps 2,3,1   | MEDIUM |
+| 9         | Wire into scheduler                 | memory-scheduler.cjs         | ~80          | ~60           | Steps 4,6,7,8 | MEDIUM |
+| 10        | Wire into hook                      | sync-memory-index.cjs        | ~15          | ~40           | Steps 4,9     | LOW    |
+| 11        | Config additions                    | config.yaml                  | ~20          | ~10           | None          | NONE   |
+| 12        | Integration tests                   | new test file                | 0            | ~150          | Steps 1-11    | LOW    |
+| **TOTAL** |                                     | **10 files**                 | **~465**     | **~1090**     |               |        |
 
 ---
 
@@ -907,6 +941,7 @@ Step 12 (integration tests) <── All steps complete
 ```
 
 **Parallelizable groups:**
+
 - Steps 3 and 2 can run in parallel (no shared deps beyond Step 0)
 - Steps 5 and 6 can run in parallel (5 depends on 4; 6 depends on 3)
 - Step 11 can run at any time (no code dependencies)
@@ -929,14 +964,14 @@ This creates a recovery point before modifying existing scheduler and hook files
 
 ## Risk Flags
 
-| Risk | Step | Mitigation |
-|------|------|------------|
-| Regex false positives in scrubber | Step 2 | Conservative patterns; test with real code content; prefer under-scrubbing over over-scrubbing |
-| File date parsing for age-based operations | Steps 4, 8 | Use `fs.statSync().mtime` for warm archive age, not filename dates |
-| Windows path separators in archive paths | Steps 4, 5, 8 | Always use `path.join()` and `path.normalize()`; never string concatenation for paths |
-| Concurrent scheduler + hook rotation | Steps 9, 10 | `atomicWriteSync()` handles concurrent writes; size-check guard prevents double rotation |
-| Large `issues.md` (53KB) first rotation | Step 4 | Test with fixture > 20KB; verify sections are correctly split |
-| `memory-manager.cjs` still has `checkAndArchiveLearnings()` | Step 9 | Leave existing function; rotator supplements (does not replace) for now |
+| Risk                                                        | Step          | Mitigation                                                                                     |
+| ----------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------- |
+| Regex false positives in scrubber                           | Step 2        | Conservative patterns; test with real code content; prefer under-scrubbing over over-scrubbing |
+| File date parsing for age-based operations                  | Steps 4, 8    | Use `fs.statSync().mtime` for warm archive age, not filename dates                             |
+| Windows path separators in archive paths                    | Steps 4, 5, 8 | Always use `path.join()` and `path.normalize()`; never string concatenation for paths          |
+| Concurrent scheduler + hook rotation                        | Steps 9, 10   | `atomicWriteSync()` handles concurrent writes; size-check guard prevents double rotation       |
+| Large `issues.md` (53KB) first rotation                     | Step 4        | Test with fixture > 20KB; verify sections are correctly split                                  |
+| `memory-manager.cjs` still has `checkAndArchiveLearnings()` | Step 9        | Leave existing function; rotator supplements (does not replace) for now                        |
 
 ---
 
@@ -965,6 +1000,7 @@ Before marking Task #9 complete, the developer MUST verify:
 3. Check for evolution opportunities (e.g., does the new system suggest new skills or agents?)
 
 **Success Criteria:**
+
 - Reflection-agent spawned and completed
 - Learnings extracted
 - Any evolution opportunities logged

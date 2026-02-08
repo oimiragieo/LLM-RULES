@@ -52,9 +52,9 @@ function parseSections(content) {
   if (SECTION_DELIMITER_REGEX.test(content)) {
     const parts = content.split(SECTION_DELIMITER_REGEX);
     sections = parts
-      .map((part) => part.trim())
-      .filter((part) => part.length > 0)
-      .map((part) => createSectionObject(part));
+      .map(part => part.trim())
+      .filter(part => part.length > 0)
+      .map(part => createSectionObject(part));
   }
   // If no '---' delimiters, try splitting by '## ' H2 headers
   else if (H2_HEADER_REGEX.test(content)) {
@@ -179,8 +179,8 @@ function rotateIfNeeded(filePath, options = {}) {
   });
 
   // Split sections: keep N most recent + all [PERMANENT]
-  const permanentSections = sortedSections.filter((s) => s.isPermanent);
-  const nonPermanentSections = sortedSections.filter((s) => !s.isPermanent);
+  const permanentSections = sortedSections.filter(s => s.isPermanent);
+  const nonPermanentSections = sortedSections.filter(s => !s.isPermanent);
 
   const recentSections = nonPermanentSections.slice(-keepSections);
   const sectionsToArchive = nonPermanentSections.slice(0, -keepSections);
@@ -209,7 +209,7 @@ function rotateIfNeeded(filePath, options = {}) {
   }
 
   // Build archive content (append to existing file if present)
-  let archiveContent = sectionsToArchive.map((s) => s.content).join('\n\n---\n\n');
+  let archiveContent = sectionsToArchive.map(s => s.content).join('\n\n---\n\n');
 
   // Append to existing archive file if it exists
   if (fs.existsSync(archiveFilePath)) {
@@ -228,7 +228,7 @@ function rotateIfNeeded(filePath, options = {}) {
 
   // Build truncated active file content (recent + permanent)
   const keepSectionsSet = [...recentSections, ...permanentSections];
-  const truncatedContent = keepSectionsSet.map((s) => s.content).join('\n\n---\n\n');
+  const truncatedContent = keepSectionsSet.map(s => s.content).join('\n\n---\n\n');
 
   // Write truncated active file atomically
   atomicWriteSync(filePath, truncatedContent);

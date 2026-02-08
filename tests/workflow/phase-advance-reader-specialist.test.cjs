@@ -26,10 +26,7 @@ describe('resolveDomainSpecialist', () => {
       resolveDomainSpecialist('Implement Python authentication module'),
       'python-pro'
     );
-    assert.strictEqual(
-      resolveDomainSpecialist('Fix Django ORM query performance'),
-      'python-pro'
-    );
+    assert.strictEqual(resolveDomainSpecialist('Fix Django ORM query performance'), 'python-pro');
   });
 
   it('should resolve fastapi-pro for FastAPI context', () => {
@@ -44,14 +41,8 @@ describe('resolveDomainSpecialist', () => {
       resolveDomainSpecialist('Build React component for user profile'),
       'frontend-pro'
     );
-    assert.strictEqual(
-      resolveDomainSpecialist('Fix Vue router navigation bug'),
-      'frontend-pro'
-    );
-    assert.strictEqual(
-      resolveDomainSpecialist('Update CSS styles for mobile'),
-      'frontend-pro'
-    );
+    assert.strictEqual(resolveDomainSpecialist('Fix Vue router navigation bug'), 'frontend-pro');
+    assert.strictEqual(resolveDomainSpecialist('Update CSS styles for mobile'), 'frontend-pro');
   });
 
   it('should resolve typescript-pro for TypeScript context', () => {
@@ -62,32 +53,17 @@ describe('resolveDomainSpecialist', () => {
   });
 
   it('should resolve golang-pro for Go context', () => {
-    assert.strictEqual(
-      resolveDomainSpecialist('Implement Go microservice'),
-      'golang-pro'
-    );
-    assert.strictEqual(
-      resolveDomainSpecialist('Fix go routine leak'),
-      'golang-pro'
-    );
+    assert.strictEqual(resolveDomainSpecialist('Implement Go microservice'), 'golang-pro');
+    assert.strictEqual(resolveDomainSpecialist('Fix go routine leak'), 'golang-pro');
   });
 
   it('should resolve nextjs-pro for Next.js context', () => {
-    assert.strictEqual(
-      resolveDomainSpecialist('Add Next.js server action'),
-      'nextjs-pro'
-    );
-    assert.strictEqual(
-      resolveDomainSpecialist('Fix NextJS routing'),
-      'nextjs-pro'
-    );
+    assert.strictEqual(resolveDomainSpecialist('Add Next.js server action'), 'nextjs-pro');
+    assert.strictEqual(resolveDomainSpecialist('Fix NextJS routing'), 'nextjs-pro');
   });
 
   it('should resolve specialist domains', () => {
-    assert.strictEqual(
-      resolveDomainSpecialist('Train machine learning model'),
-      'ai-ml-specialist'
-    );
+    assert.strictEqual(resolveDomainSpecialist('Train machine learning model'), 'ai-ml-specialist');
     assert.strictEqual(
       resolveDomainSpecialist('Deploy PyTorch model to production'),
       'ai-ml-specialist'
@@ -96,47 +72,23 @@ describe('resolveDomainSpecialist', () => {
       resolveDomainSpecialist('Write Solidity smart contract'),
       'web3-blockchain-expert'
     );
-    assert.strictEqual(
-      resolveDomainSpecialist('Build Unity game level'),
-      'gamedev-pro'
-    );
-    assert.strictEqual(
-      resolveDomainSpecialist('Create ETL data pipeline'),
-      'data-engineer'
-    );
+    assert.strictEqual(resolveDomainSpecialist('Build Unity game level'), 'gamedev-pro');
+    assert.strictEqual(resolveDomainSpecialist('Create ETL data pipeline'), 'data-engineer');
   });
 
   it('should return null for generic task with no specialist keywords', () => {
-    assert.strictEqual(
-      resolveDomainSpecialist('Implement authentication logic'),
-      null
-    );
-    assert.strictEqual(
-      resolveDomainSpecialist('Fix bug in user service'),
-      null
-    );
+    assert.strictEqual(resolveDomainSpecialist('Implement authentication logic'), null);
+    assert.strictEqual(resolveDomainSpecialist('Fix bug in user service'), null);
   });
 
   it('should be case-insensitive', () => {
-    assert.strictEqual(
-      resolveDomainSpecialist('PYTHON script needed'),
-      'python-pro'
-    );
-    assert.strictEqual(
-      resolveDomainSpecialist('React Component'),
-      'frontend-pro'
-    );
+    assert.strictEqual(resolveDomainSpecialist('PYTHON script needed'), 'python-pro');
+    assert.strictEqual(resolveDomainSpecialist('React Component'), 'frontend-pro');
   });
 
   it('should match keywords as substrings', () => {
-    assert.strictEqual(
-      resolveDomainSpecialist('We need a Python-based solution'),
-      'python-pro'
-    );
-    assert.strictEqual(
-      resolveDomainSpecialist('frontend work required'),
-      'frontend-pro'
-    );
+    assert.strictEqual(resolveDomainSpecialist('We need a Python-based solution'), 'python-pro');
+    assert.strictEqual(resolveDomainSpecialist('frontend work required'), 'frontend-pro');
   });
 });
 

@@ -30,6 +30,7 @@ Each decision should include:
 - **Phase 6:** Integration into Router (Step 0.5 queue checking, 11 artifact-integration keywords) ← Task #12
 
 **Key Achievements:**
+
 - 5 integration points fully wired and verified (reflection → evolution → post-creation → router → artifact-integrator)
 - 65 integration tests (100% pass rate)
 - Zero missed integration gaps (5/5 checklist items complete)
@@ -569,3 +570,95 @@ Unit tests validate internal module logic by mocking external dependencies. Thes
 - Task #13: Bug Fix - 2 Wiring Bugs (discovered by code review, not tests)
 - learnings.md: "TDD Integration Boundary Testing Gap"
 - issues.md: "Unit Test Isolation Can Hide Integration Bugs"
+
+---
+
+## ADR-104: Unified Ecosystem Creation Protocol
+
+**Date:** 2026-02-08
+
+**Status:** Proposed (Phase 1A analysis complete, pending implementation)
+
+**Context:**
+
+Task #14 (Phase 1A) analyzed the complete creator ecosystem and discovered critical gaps:
+
+1. **12 artifact types exist but only 6 (50%) have creator skills.** Missing: commands, rules, tools, config entries, catalogs, @docs.
+2. **Cross-creator triggering is entirely ADVISORY.** Each creator's "Cross-Reference: Creator Ecosystem" section says "consider if companion creators are needed" but provides no enforcement, automation, or blocking mechanism.
+3. **artifact-integrator runs post-hoc**, detecting integration gaps AFTER creation rather than preventing them during creation.
+4. **5 non-existent updater skills** are referenced by creators (agent-updater, skill-updater, hook-updater, workflow-updater, schema-updater), creating dead-end workflows when Step 0 existence checks find existing artifacts.
+5. **~1,400 lines (20%) of creator SKILL.md content is duplicated** across all 6 creators (Memory Protocol, Iron Laws, Cross-Reference table, etc.).
+
+**Problem:**
+
+When an agent is created via agent-creator, the creator does NOT automatically create/update the agent's skills, hooks, workflows, templates, schemas, commands, or rules. This leads to "orphaned" artifacts -- fully created but disconnected from the broader ecosystem. The 70% orphan rate (measured by artifact-integrator) is a direct consequence of advisory-only cross-triggering.
+
+**Decision:**
+
+Implement a 4-phase Unified Ecosystem Creation Protocol:
+
+1. **Phase 1: Ecosystem Impact Graph (ecosystem-impact-graph.json)**
+   - Central configuration mapping every artifact type to its related artifact types
+   - For each relationship: trigger type (BLOCKING, ADVISORY, CONDITIONAL), suggested creator, expected outputs
+   - Example: creating an agent BLOCKING-triggers skill-creator (agent needs at least one skill), ADVISORY-triggers hook-creator (agent may need enforcement), CONDITIONAL-triggers command-creator (if agent has user-facing interaction)
+   - All 6 existing creators read this graph at creation time
+
+2. **Phase 2: Ecosystem Impact Analyzer (ecosystem-impact-analyzer.cjs)**
+   - New hook that runs BEFORE creation begins (PreToolUse on Write/Edit for creator paths)
+   - Reads ecosystem-impact-graph.json and the artifact being created
+   - Generates an "impact analysis" listing all related artifact types that need review
+   - BLOCKING triggers halt creation until companion artifacts are queued
+   - Replaces advisory "consider" with automated "you MUST" analysis
+
+3. **Phase 3: Missing Creator Skills**
+   - P1: command-creator (17 commands exist, pattern is thin-delegation YAML, straightforward)
+   - P2: rule-creator (11 rules exist, pattern is markdown with constraints)
+   - P3: tool-creator (66 tools exist, most complex due to CLI wiring requirements)
+   - Each follows the established creator pattern (research-synthesis prerequisite, post-creation steps, Iron Laws)
+
+4. **Phase 4: Shared Creator Base**
+   - Extract ~1,400 lines of duplicated content into a shared `creator-common.md` partial
+   - All 6+ creators reference the partial instead of duplicating
+   - Ensures consistency when shared patterns change (one update propagates to all)
+
+**Alternatives Considered:**
+
+1. **Keep advisory cross-triggering (status quo):** Rejected. 70% orphan rate demonstrates advisory approach fails. Agents ignore "consider" suggestions.
+2. **Make artifact-integrator blocking instead of post-hoc:** Rejected. artifact-integrator runs after creation; blocking it would mean artifacts get created but then stuck in limbo. Better to prevent gaps before creation.
+3. **Single monolithic creator that handles all artifact types:** Rejected. Would create a 10,000+ line skill, impossible to maintain. Modular creators with shared infrastructure is more maintainable.
+4. **Event-driven pub/sub between creators:** Rejected for now. Over-engineered for the current file-based architecture. The impact graph + analyzer provides equivalent functionality with simpler implementation.
+
+**Rationale:**
+
+- The impact graph is declarative and easily extensible (add new artifact types by adding JSON entries)
+- The analyzer hook leverages existing hook infrastructure (PreToolUse pattern, stdin/stdout protocol)
+- Missing creators follow established patterns (6 exemplars to copy from)
+- Shared base eliminates duplication while preserving per-creator specialization
+- Each phase delivers incremental value (Phase 1 alone improves cross-triggering visibility)
+
+**Consequences:**
+
+- **Positive:** Cross-creator triggering becomes automated and enforceable (not advisory)
+- **Positive:** New artifact types can be added by updating ecosystem-impact-graph.json (extensible)
+- **Positive:** 3 missing creators cover the most-used uncovered artifact types (commands, rules, tools)
+- **Positive:** 20% duplication across creators eliminated by shared base
+- **Positive:** Orphan rate should decrease from 70% to under 20%
+- **Negative:** Implementation requires 6 new components (graph config, analyzer hook, 3 creators, shared base)
+- **Negative:** BLOCKING cross-triggers increase creation time (more companion artifacts to review/create)
+- **Mitigated:** CONDITIONAL triggers are smart -- only fire when contextual analysis suggests need
+
+**Implementation Priority:**
+
+1. P0: ecosystem-impact-graph.json (foundation for everything else)
+2. P1: ecosystem-impact-analyzer.cjs (enforcement mechanism)
+3. P1: command-creator (highest demand missing creator)
+4. P2: rule-creator + shared creator-common.md
+5. P3: tool-creator
+
+**Cross-References:**
+
+- Task #14: Phase 1A Architecture Analysis (this ADR's source)
+- Task #16: Phase 1C Creator Skills Complexity Audit (confirms duplication findings)
+- ADR-100: Cross-Artifact Integration System (predecessor, focused on post-hoc detection)
+- Report: `.claude/context/reports/architecture/ecosystem-creation-protocol-design-2026-02-08.md`
+- Report: `.claude/context/reports/architecture/creator-skills-complexity-audit-2026-02-08.md`

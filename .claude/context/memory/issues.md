@@ -2,6 +2,44 @@
 
 This file tracks blockers, workarounds, and unresolved problems.
 
+## Creator Ecosystem Trust Boundary Vulnerabilities (Task #15, 2026-02-08)
+
+**Date:** 2026-02-08
+
+**Context:** Security review of the 6-creator ecosystem (skill, agent, hook, workflow, template, schema creators) identified 3 CRITICAL, 4 HIGH, 5 MEDIUM, 3 LOW severity issues in the trust boundary architecture.
+
+**CRITICAL Findings:**
+
+1. **CRITICAL-001: State File Spoofing** -- `active-creators.json` has no authentication. Any agent can write to it (runtime dir is in ALWAYS_ALLOWED_WRITE_PATTERNS exemption list in routing-guard.cjs line 441), then write to protected artifact paths. Complete bypass of creator guard.
+
+2. **CRITICAL-002: settings.json Not Protected** -- `settings.json` is NOT in `CREATOR_CONFIGS` in unified-creator-guard.cjs. Any agent can register malicious hooks that execute on every tool invocation. Persistent backdoor vector.
+
+3. **CRITICAL-003: agent-registry.json Not Protected** -- `agent-registry.json` is NOT in creator guard protection. Any agent can manipulate routing keywords to divert work to malicious agents. Agent supply chain attack.
+
+**HIGH Findings:**
+
+4. **HIGH-001: Non-atomic state file operations** -- `fs.writeFileSync` used instead of `atomicWriteSync` in all 6 creator pre-execute hooks. Race condition risk.
+
+5. **HIGH-002: Unbounded TTL override** -- `CREATOR_STATE_TTL_MS` env var parsed with `Number()` without bounds. Can be set to Infinity for permanent bypass.
+
+6. **HIGH-003: HOOK_FAIL_OPEN universal bypass** -- Single env var disables fail-closed behavior in 5 active hooks. Master key for security bypass.
+
+7. **HIGH-004: No content validation** -- Guard validates file path but not content. Malicious content (prompt injection) can be written to valid artifact paths.
+
+**Schema Gap:** All 6 artifact types have JSON schemas but NONE are validated at write time. Schemas are documentation-only.
+
+**Report:** `.claude/context/reports/security/creator-ecosystem-security-review-2026-02-08.md`
+
+**P0 Recommendations (immediate):**
+
+- Protect `settings.json` in unified-creator-guard
+- Protect `agent-registry.json` in unified-creator-guard
+- Add TTL bounds checking (30s min, 10min max)
+
+**Cross-References:** Expands H-001, H-002 from Pipeline #16. Confirms 38+ raw JSON.parse() pattern extends into creator hooks (12 additional instances).
+
+---
+
 ## Pipeline #16: Skills System Security (Deferred to Hardening Pipeline)
 
 **Date:** 2026-02-07
@@ -1044,7 +1082,7 @@ Require stack:
 
 **Related Tasks:**
 
-- Task #3: Dead code archival (moved tests to _archive/)
+- Task #3: Dead code archival (moved tests to \_archive/)
 - Task #4: Hook consolidation (unified 6→2)
 - Task #6: Test suite regression validation (established baseline)
 
@@ -1136,6 +1174,7 @@ Unit tests validate **internal module logic** by mocking external dependencies b
 **Workaround:**
 
 Always include human code review of integration boundaries, checking:
+
 - Parameter names match actual function signatures
 - Return field names match actual returned objects
 - Error handling is bidirectional (caller + callee)
@@ -1155,8 +1194,8 @@ Add explicit "Integration Verification" phase to TDD workflow:
    const PRUNER_CONTRACT = {
      deduplicate: {
        params: { entries: 'array', threshold: 'number' },
-       returns: { removed: 'number', timestamp: 'string' }
-     }
+       returns: { removed: 'number', timestamp: 'string' },
+     },
    };
    ```
 

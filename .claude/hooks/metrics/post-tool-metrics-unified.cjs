@@ -37,8 +37,12 @@ const { atomicWriteJSONSync } = libRequire(path.join('utils', 'atomic-write.cjs'
 const { appendJsonl } = libRequire(path.join('utils', 'jsonl-utils.cjs'));
 
 // Import monitoring modules (library-style, not CLI wrappers)
-const metricsCollector = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'monitoring', 'metrics-collector.cjs'));
-const errorTracker = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'monitoring', 'error-tracker.cjs'));
+const metricsCollector = require(
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'monitoring', 'metrics-collector.cjs')
+);
+const errorTracker = require(
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'monitoring', 'error-tracker.cjs')
+);
 
 // =============================================================================
 // Check 1: Metrics Collector (from metrics-collector-hook.cjs)
@@ -130,8 +134,20 @@ function trackErrors(hookInput) {
 // =============================================================================
 
 // Paths
-let STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'self-healing', 'anomaly-state.json');
-let ANOMALY_LOG = path.join(PROJECT_ROOT, '.claude', 'context', 'self-healing', 'anomaly-log.jsonl');
+let STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'self-healing',
+  'anomaly-state.json'
+);
+let ANOMALY_LOG = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'self-healing',
+  'anomaly-log.jsonl'
+);
 const ANOMALY_LOG_MAX_LINES = Number(process.env.ANOMALY_LOG_MAX_LINES || 2000);
 
 // History limits
@@ -546,6 +562,10 @@ module.exports = {
   detectAnomalies,
   main,
   // Anomaly functions
-  setStateFile: (filePath) => { STATE_FILE = filePath; },
-  setAnomalyLog: (filePath) => { ANOMALY_LOG = filePath; },
+  setStateFile: filePath => {
+    STATE_FILE = filePath;
+  },
+  setAnomalyLog: filePath => {
+    ANOMALY_LOG = filePath;
+  },
 };

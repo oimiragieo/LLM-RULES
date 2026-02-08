@@ -343,7 +343,8 @@ const TEST_CASES = [
   {
     id: 42,
     category: 'Orchestrator',
-    prompt: 'Coordinate the complete migration from our legacy monolith to microservices architecture across 6 teams',
+    prompt:
+      'Coordinate the complete migration from our legacy monolith to microservices architecture across 6 teams',
     expectedAgent: 'master-orchestrator',
     notExpected: 'developer',
   },
@@ -357,7 +358,8 @@ const TEST_CASES = [
   {
     id: 44,
     category: 'Orchestrator',
-    prompt: 'Party mode: have the team discuss and debate the best approach for implementing real-time notifications',
+    prompt:
+      'Party mode: have the team discuss and debate the best approach for implementing real-time notifications',
     expectedAgent: 'party-orchestrator',
     notExpected: 'developer',
   },
@@ -439,7 +441,7 @@ const toId = toIdx !== -1 ? parseInt(args[toIdx + 1], 10) : null;
 // ---------------------------------------------------------------------------
 function getFilteredCases() {
   if (caseId !== null) {
-    return TEST_CASES.filter((c) => c.id === caseId);
+    return TEST_CASES.filter(c => c.id === caseId);
   }
   if (batchId !== null) {
     const start = (batchId - 1) * BATCH_SIZE;
@@ -449,7 +451,7 @@ function getFilteredCases() {
   if (fromId !== null || toId !== null) {
     const f = fromId || 1;
     const t = toId || TEST_CASES.length;
-    return TEST_CASES.filter((c) => c.id >= f && c.id <= t);
+    return TEST_CASES.filter(c => c.id >= f && c.id <= t);
   }
   return TEST_CASES;
 }
@@ -458,7 +460,7 @@ function getFilteredCases() {
 // Run a single test case via claude CLI (returns Promise)
 // ---------------------------------------------------------------------------
 function runTestCase(tc) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const startTime = Date.now();
 
     // Build command manually to avoid spawn arg escaping issues on Windows
@@ -475,34 +477,30 @@ function runTestCase(tc) {
       '--verbose',
     ];
 
-    const child = spawn(
-      'claude',
-      cmdArgs,
-      {
-        timeout: TIMEOUT_MS,
-        cwd: path.join(__dirname, '..', '..'),
-        shell: true, // Required for Windows PATH resolution
-        env: {
-          ...process.env,
-          REFLECTION_STEP0_ENFORCEMENT: 'off',
-          PLANNER_FIRST_ENFORCEMENT: 'warn',
-          SPECIALIST_ROUTING_ENFORCEMENT: 'warn',
-        },
-      }
-    );
+    const child = spawn('claude', cmdArgs, {
+      timeout: TIMEOUT_MS,
+      cwd: path.join(__dirname, '..', '..'),
+      shell: true, // Required for Windows PATH resolution
+      env: {
+        ...process.env,
+        REFLECTION_STEP0_ENFORCEMENT: 'off',
+        PLANNER_FIRST_ENFORCEMENT: 'warn',
+        SPECIALIST_ROUTING_ENFORCEMENT: 'warn',
+      },
+    });
 
     let stdout = '';
     let stderr = '';
 
-    child.stdout.on('data', (data) => {
+    child.stdout.on('data', data => {
       stdout += data.toString();
     });
 
-    child.stderr.on('data', (data) => {
+    child.stderr.on('data', data => {
       stderr += data.toString();
     });
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
       // Parse JSON stream for agent routing signals
@@ -527,22 +525,25 @@ function runTestCase(tc) {
       try {
         const resultFile = path.join(RESULTS_DIR, `case-${tc.id}.json`);
         writeFileSync(resultFile, JSON.stringify(result, null, 2));
-      } catch (e) {
+      } catch (_e) {
         // non-critical
       }
 
       // Save full output
       try {
         const outputFile = path.join(RESULTS_DIR, `case-${tc.id}-output.txt`);
-        writeFileSync(outputFile, `=== STDOUT (stream-json) ===\n${stdout}\n\n=== STDERR ===\n${stderr}`);
-      } catch (e) {
+        writeFileSync(
+          outputFile,
+          `=== STDOUT (stream-json) ===\n${stdout}\n\n=== STDERR ===\n${stderr}`
+        );
+      } catch (_e) {
         // non-critical
       }
 
       resolve(result);
     });
 
-    child.on('error', (err) => {
+    child.on('error', err => {
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       resolve({
         id: tc.id,
@@ -560,115 +561,114 @@ function runTestCase(tc) {
 }
 
 // ---------------------------------------------------------------------------
+// Agent Detection helpers (extracted to reduce complexity)
+// ---------------------------------------------------------------------------
+function extractAgentsFromTaskBlock(block, agents) {
+  const input = block.input || {};
+  if (input.subagent_type) {
+    agents.push(input.subagent_type.toLowerCase());
+  }
+  if (input.prompt) {
+    const agentRef = input.prompt.match(
+      /\.claude\/agents\/(?:core|domain|specialized|orchestrators)\/([a-z0-9_-]+)\.md/i
+    );
+    if (agentRef) agents.push(agentRef[1].toLowerCase());
+    const identityRef = input.prompt.match(/you are (?:the )?([a-z][a-z0-9_-]*)/i);
+    if (identityRef && isKnownAgent(identityRef[1].toLowerCase())) {
+      agents.push(identityRef[1].toLowerCase());
+    }
+  }
+}
+
+function extractAgentsFromTextBlock(block, agents) {
+  const text = block.text.toLowerCase();
+  const routerMatch = text.match(
+    /\[router\][^\n]*?([\w-]+(?:-(?:pro|expert|specialist|architect|orchestrator|reviewer|writer|simplifier|responder|troubleshooter|developer|coordinator|validator|compressor|agent))\b)/i
+  );
+  if (routerMatch) agents.push(routerMatch[1].toLowerCase());
+  const spawnMatch = text.match(
+    /(?:spawn|route\s+to|routing\s+to|assign\s+to)\s+(?:the\s+)?([a-z][a-z0-9_-]*)/i
+  );
+  if (spawnMatch && isKnownAgent(spawnMatch[1])) {
+    agents.push(spawnMatch[1].toLowerCase());
+  }
+}
+
+function extractAgentsFromReadBlock(block, agents) {
+  const input = block.input || {};
+  if (input.file_path) {
+    const agentRef = input.file_path.match(
+      /agents\/(?:core|domain|specialized|orchestrators)\/([a-z0-9_-]+)\.md/i
+    );
+    if (agentRef) agents.push(agentRef[1].toLowerCase());
+  }
+}
+
+function extractAgentsFromObj(obj, agents) {
+  if (obj.type !== 'assistant' || !obj.message || !obj.message.content) return;
+  for (const block of obj.message.content) {
+    if (block.type === 'tool_use' && block.name === 'Task') {
+      extractAgentsFromTaskBlock(block, agents);
+    }
+    if (block.type === 'text') {
+      extractAgentsFromTextBlock(block, agents);
+    }
+    if (block.type === 'tool_use' && block.name === 'Read') {
+      extractAgentsFromReadBlock(block, agents);
+    }
+  }
+}
+
+function resolveSpawnedAgent(spawnedAgents, rawOutput, tc) {
+  if (spawnedAgents.length > 0) {
+    const realAgent = spawnedAgents.find(a => a !== 'router' && a !== 'general-purpose');
+    if (realAgent) return realAgent;
+    const isReflectionOnly = spawnedAgents.every(a => a === 'general-purpose' || a === 'router');
+    if (isReflectionOnly) {
+      return detectAgentFromText(rawOutput.toLowerCase(), tc);
+    }
+    return spawnedAgents[0];
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
 // Agent Detection from stream-json output (primary method)
 // ---------------------------------------------------------------------------
 function detectAgentFromStream(rawOutput, tc) {
-  // Parse each line of the JSON stream
-  const lines = rawOutput.split('\n').filter((l) => l.trim());
+  const lines = rawOutput.split('\n').filter(l => l.trim());
   const spawnedAgents = [];
 
   for (const line of lines) {
     try {
       const obj = JSON.parse(line);
-
-      // Strategy 1: Look for Task tool_use events with subagent_type
-      if (obj.type === 'assistant' && obj.message && obj.message.content) {
-        for (const block of obj.message.content) {
-          if (block.type === 'tool_use' && block.name === 'Task') {
-            const input = block.input || {};
-            if (input.subagent_type) {
-              spawnedAgents.push(input.subagent_type.toLowerCase());
-            }
-            // Also check the prompt for agent file references
-            if (input.prompt) {
-              const agentRef = input.prompt.match(
-                /\.claude\/agents\/(?:core|domain|specialized|orchestrators)\/([a-z0-9_-]+)\.md/i
-              );
-              if (agentRef) spawnedAgents.push(agentRef[1].toLowerCase());
-
-              // Check for "you are the {agent}" in prompt
-              const identityRef = input.prompt.match(
-                /you are (?:the )?([a-z][a-z0-9_-]*)/i
-              );
-              if (identityRef && isKnownAgent(identityRef[1].toLowerCase())) {
-                spawnedAgents.push(identityRef[1].toLowerCase());
-              }
-            }
-          }
-
-          // Strategy 2: Look for text content with routing decisions
-          if (block.type === 'text') {
-            const text = block.text.toLowerCase();
-            // Look for "[ROUTER]" classification
-            const routerMatch = text.match(
-              /\[router\][^\n]*?([\w-]+(?:-(?:pro|expert|specialist|architect|orchestrator|reviewer|writer|simplifier|responder|troubleshooter|developer|coordinator|validator|compressor|agent))\b)/i
-            );
-            if (routerMatch) spawnedAgents.push(routerMatch[1].toLowerCase());
-
-            // Look for "spawn {agent}" or "route to {agent}"
-            const spawnMatch = text.match(
-              /(?:spawn|route\s+to|routing\s+to|assign\s+to)\s+(?:the\s+)?([a-z][a-z0-9_-]*)/i
-            );
-            if (spawnMatch && isKnownAgent(spawnMatch[1])) {
-              spawnedAgents.push(spawnMatch[1].toLowerCase());
-            }
-          }
-        }
-      }
-
-      // Strategy 3: Look in tool_result for agent file reads
-      if (obj.type === 'assistant' && obj.message && obj.message.content) {
-        for (const block of obj.message.content) {
-          if (block.type === 'tool_use' && block.name === 'Read') {
-            const input = block.input || {};
-            if (input.file_path) {
-              const agentRef = input.file_path.match(
-                /agents\/(?:core|domain|specialized|orchestrators)\/([a-z0-9_-]+)\.md/i
-              );
-              if (agentRef) spawnedAgents.push(agentRef[1].toLowerCase());
-            }
-          }
-        }
-      }
-    } catch (e) {
+      extractAgentsFromObj(obj, spawnedAgents);
+    } catch (_e) {
       // Not valid JSON or partial line - skip
     }
   }
 
-  // If we found spawned agents, return the first non-router, non-general-purpose one
-  // (general-purpose is used for reflection agents, not real routing)
-  if (spawnedAgents.length > 0) {
-    const realAgent = spawnedAgents.find(
-      (a) => a !== 'router' && a !== 'general-purpose'
-    );
-    if (realAgent) return realAgent;
-    // If only general-purpose/router, check if it was a reflection spawn
-    // (prompt contains "REFLECTION-AGENT") - in that case, no real routing happened
-    const isReflectionOnly = spawnedAgents.every(
-      (a) => a === 'general-purpose' || a === 'router'
-    );
-    if (isReflectionOnly) {
-      // Check if there's a real routing in the text
-      return detectAgentFromText(rawOutput.toLowerCase(), tc);
-    }
-    return spawnedAgents[0];
-  }
+  const resolved = resolveSpawnedAgent(spawnedAgents, rawOutput, tc);
+  if (resolved) return resolved;
 
   // Check if the router just asked a clarifying question (no routing occurred)
-  const resultLine = rawOutput.split('\n').filter((l) => {
+  const resultLine = rawOutput.split('\n').filter(l => {
     try {
       const obj = JSON.parse(l);
       return obj.type === 'result' && obj.num_turns;
-    } catch (e) { return false; }
+    } catch (_e) {
+      return false;
+    }
   });
   if (resultLine.length > 0) {
     try {
       const result = JSON.parse(resultLine[0]);
       if (result.num_turns <= 2 && result.subtype === 'success') {
-        // Router responded in 1-2 turns without spawning - likely asked a question
         return 'NO_ROUTING';
       }
-    } catch (e) { /* ignore */ }
+    } catch (_e) {
+      /* ignore */
+    }
   }
 
   // Fallback: use text-based detection on the raw output
@@ -678,14 +678,12 @@ function detectAgentFromStream(rawOutput, tc) {
 // ---------------------------------------------------------------------------
 // Fallback text-based agent detection (only used when stream-json parsing fails)
 // ---------------------------------------------------------------------------
-function detectAgentFromText(output, tc) {
+function detectAgentFromText(output, _tc) {
   // Remove init message content (contains all agent names as a list, causes false positives)
   const cleanOutput = output.replace(/"agents"\s*:\s*\[[^\]]*\]/g, '');
 
   // Strategy 1: Look for subagent_type references in raw text
-  const taskSpawnMatch = cleanOutput.match(
-    /subagent_type[:\s]*["']([a-z0-9_-]+)["']/i
-  );
+  const taskSpawnMatch = cleanOutput.match(/subagent_type[:\s]*["']([a-z0-9_-]+)["']/i);
   if (taskSpawnMatch) return taskSpawnMatch[1].toLowerCase();
 
   // Strategy 2: Look for agent file paths being read (in tool_use input, not init)
@@ -695,9 +693,7 @@ function detectAgentFromText(output, tc) {
   if (agentFileMatch) return agentFileMatch[1].toLowerCase();
 
   // Strategy 3: Look for "you are the {agent}" in prompt content (not init)
-  const agentIdentityMatch = cleanOutput.match(
-    /you are (?:the )?(\w[\w-]*?)(?:\s+agent)?[.\s,]/i
-  );
+  const agentIdentityMatch = cleanOutput.match(/you are (?:the )?(\w[\w-]*?)(?:\s+agent)?[.\s,]/i);
   if (agentIdentityMatch) {
     const candidate = agentIdentityMatch[1].toLowerCase();
     if (isKnownAgent(candidate)) return candidate;
@@ -719,7 +715,7 @@ function detectAgentFromText(output, tc) {
 // Extract routing-relevant excerpt from stream-json output
 // ---------------------------------------------------------------------------
 function extractRoutingExcerpt(rawOutput, maxLen) {
-  const lines = rawOutput.split('\n').filter((l) => l.trim());
+  const lines = rawOutput.split('\n').filter(l => l.trim());
   const excerpts = [];
 
   for (const line of lines) {
@@ -736,7 +732,7 @@ function extractRoutingExcerpt(rawOutput, maxLen) {
           }
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // skip
     }
   }
@@ -749,18 +745,54 @@ function extractRoutingExcerpt(rawOutput, maxLen) {
 // Known agent check
 // ---------------------------------------------------------------------------
 const KNOWN_AGENTS = new Set([
-  'architect', 'developer', 'planner', 'qa', 'pm', 'technical-writer',
-  'context-compressor', 'code-reviewer', 'code-simplifier', 'security-architect',
-  'devops', 'devops-troubleshooter', 'incident-responder', 'database-architect',
-  'python-pro', 'typescript-pro', 'golang-pro', 'rust-pro', 'java-pro',
-  'php-pro', 'nodejs-pro', 'fastapi-pro', 'frontend-pro', 'nextjs-pro',
-  'sveltekit-expert', 'graphql-pro', 'ios-pro', 'android-pro',
-  'expo-mobile-developer', 'tauri-desktop-developer', 'data-engineer',
-  'ai-ml-specialist', 'web3-blockchain-expert', 'scientific-research-expert',
-  'gamedev-pro', 'mobile-ux-reviewer', 'researcher', 'c4-context',
-  'c4-container', 'c4-component', 'c4-code', 'master-orchestrator',
-  'evolution-orchestrator', 'party-orchestrator', 'swarm-coordinator',
-  'reflection-agent', 'conductor-validator', 'reverse-engineer',
+  'architect',
+  'developer',
+  'planner',
+  'qa',
+  'pm',
+  'technical-writer',
+  'context-compressor',
+  'code-reviewer',
+  'code-simplifier',
+  'security-architect',
+  'devops',
+  'devops-troubleshooter',
+  'incident-responder',
+  'database-architect',
+  'python-pro',
+  'typescript-pro',
+  'golang-pro',
+  'rust-pro',
+  'java-pro',
+  'php-pro',
+  'nodejs-pro',
+  'fastapi-pro',
+  'frontend-pro',
+  'nextjs-pro',
+  'sveltekit-expert',
+  'graphql-pro',
+  'ios-pro',
+  'android-pro',
+  'expo-mobile-developer',
+  'tauri-desktop-developer',
+  'data-engineer',
+  'ai-ml-specialist',
+  'web3-blockchain-expert',
+  'scientific-research-expert',
+  'gamedev-pro',
+  'mobile-ux-reviewer',
+  'researcher',
+  'c4-context',
+  'c4-container',
+  'c4-component',
+  'c4-code',
+  'master-orchestrator',
+  'evolution-orchestrator',
+  'party-orchestrator',
+  'swarm-coordinator',
+  'reflection-agent',
+  'conductor-validator',
+  'reverse-engineer',
 ]);
 
 function isKnownAgent(name) {
@@ -816,12 +848,8 @@ function evaluateResult(tc, actualAgent, output) {
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
-function escapeRegex(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function truncate(str, len) {
@@ -833,7 +861,7 @@ function truncate(str, len) {
 // Batch runner: runs N tests in parallel
 // ---------------------------------------------------------------------------
 async function runBatch(cases) {
-  return Promise.all(cases.map((tc) => runTestCase(tc)));
+  return Promise.all(cases.map(tc => runTestCase(tc)));
 }
 
 // ---------------------------------------------------------------------------
@@ -866,9 +894,7 @@ async function main() {
 
   if (dryRun) {
     for (const tc of cases) {
-      console.log(
-        `  [${tc.id}] (${tc.category}) "${truncate(tc.prompt, 60)}"`
-      );
+      console.log(`  [${tc.id}] (${tc.category}) "${truncate(tc.prompt, 60)}"`);
       console.log(`       Expected: ${tc.expectedAgent}`);
     }
     console.log(`\n  Total: ${cases.length} cases (dry run, no API calls)`);
@@ -898,24 +924,19 @@ async function main() {
 
     // Print batch results
     for (const r of results) {
-      const statusIcon =
-        r.status === 'PASS' ? 'PASS' : r.status === 'SKIP' ? 'SKIP' : 'FAIL';
+      const statusIcon = r.status === 'PASS' ? 'PASS' : r.status === 'SKIP' ? 'SKIP' : 'FAIL';
       console.log(
         `  [${String(r.id).padStart(2)}] ${statusIcon} | Expected: ${r.expectedAgent.padEnd(25)} | Actual: ${(r.actualAgent || 'UNKNOWN').padEnd(25)} | ${r.elapsed}`
       );
       if (r.status === 'FAIL' || r.status === 'ERROR') {
-        console.log(
-          `       Output: ${truncate(r.outputExcerpt, 200)}`
-        );
+        console.log(`       Output: ${truncate(r.outputExcerpt, 200)}`);
       }
     }
     console.log('');
 
     // Delay between batches to avoid rate limiting
     if (bIdx < batches.length - 1) {
-      console.log(
-        `  (waiting ${INTER_BATCH_DELAY_MS / 1000}s before next batch...)\n`
-      );
+      console.log(`  (waiting ${INTER_BATCH_DELAY_MS / 1000}s before next batch...)\n`);
       await sleep(INTER_BATCH_DELAY_MS);
     }
   }
@@ -923,13 +944,15 @@ async function main() {
   // ---------------------------------------------------------------------------
   // Generate Summary
   // ---------------------------------------------------------------------------
-  const passed = allResults.filter((r) => r.status === 'PASS').length;
-  const failed = allResults.filter((r) => r.status === 'FAIL').length;
-  const errors = allResults.filter((r) => r.status === 'ERROR').length;
-  const skipped = allResults.filter((r) => r.status === 'SKIP').length;
+  const passed = allResults.filter(r => r.status === 'PASS').length;
+  const failed = allResults.filter(r => r.status === 'FAIL').length;
+  const errors = allResults.filter(r => r.status === 'ERROR').length;
+  const skipped = allResults.filter(r => r.status === 'SKIP').length;
 
   console.log('='.repeat(70));
-  console.log(`  RESULTS: ${passed} PASS | ${failed} FAIL | ${errors} ERROR | ${skipped} SKIP | ${allResults.length} TOTAL`);
+  console.log(
+    `  RESULTS: ${passed} PASS | ${failed} FAIL | ${errors} ERROR | ${skipped} SKIP | ${allResults.length} TOTAL`
+  );
   console.log('='.repeat(70));
 
   // Build summary markdown
@@ -951,9 +974,7 @@ async function main() {
   }
 
   // Failures section
-  const failures = allResults.filter(
-    (r) => r.status === 'FAIL' || r.status === 'ERROR'
-  );
+  const failures = allResults.filter(r => r.status === 'FAIL' || r.status === 'ERROR');
   if (failures.length > 0) {
     summary += `\n## Failures\n\n`;
     for (const f of failures) {
@@ -968,10 +989,10 @@ async function main() {
 
   // Category breakdown
   summary += `\n## Category Breakdown\n\n`;
-  const categories = [...new Set(allResults.map((r) => r.category))];
+  const categories = [...new Set(allResults.map(r => r.category))];
   for (const cat of categories) {
-    const catResults = allResults.filter((r) => r.category === cat);
-    const catPassed = catResults.filter((r) => r.status === 'PASS').length;
+    const catResults = allResults.filter(r => r.category === cat);
+    const catPassed = catResults.filter(r => r.status === 'PASS').length;
     summary += `- **${cat}**: ${catPassed}/${catResults.length} passed\n`;
   }
 
@@ -989,7 +1010,7 @@ async function main() {
   process.exit(failed + errors > 0 ? 1 : 0);
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('Fatal error:', err);
   process.exit(2);
 });

@@ -174,10 +174,7 @@ describe('Check 7: Specialist Override', () => {
   });
 
   it('should verify SPECIALIST_KEYWORD_MAP is exported', () => {
-    assert.ok(
-      routingGuard.SPECIALIST_KEYWORD_MAP,
-      'SPECIALIST_KEYWORD_MAP should be exported'
-    );
+    assert.ok(routingGuard.SPECIALIST_KEYWORD_MAP, 'SPECIALIST_KEYWORD_MAP should be exported');
     assert.ok(
       routingGuard.SPECIALIST_KEYWORD_MAP['technical-writer'],
       'Should have technical-writer keywords'
@@ -289,10 +286,7 @@ describe('Check 7: Specialist Override', () => {
 
     assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
     assert.strictEqual(result.result, 'warn', 'Should warn for migration task');
-    assert.ok(
-      result.message.includes('database-architect'),
-      'Should suggest database-architect'
-    );
+    assert.ok(result.message.includes('database-architect'), 'Should suggest database-architect');
   });
 
   it('developer spawn with "run tests" should warn (true positive)', () => {

@@ -574,292 +574,291 @@
       ],
       "extracted_from": "Tasks #14-15 (reflection + evolution wiring), ADR-100 coordination across 5 workflows",
       "date": "2026-02-08"
-    }
-  ],
-  {
-    "id": "security-first-architecture-pattern",
-    "name": "Security-First Architecture Pattern for Memory Systems",
-    "context": "Memory Management Rebuild (Tasks #7-8, 2026-02-08)",
-    "description": "When rebuilding archived modules that handle persistent data (memory, state, config), conduct security review BEFORE implementation planning. Security findings define must-fix mitigations that block implementation. Pattern: Architect designs structure → Security-Architect identifies threats → Planner sequences implementation with security-first steps. This prevents shipping vulnerable code.",
-    "examples": [
-      {
-        "task": "Memory Management Rebuild",
-        "sequence": "Task #7A (Architect): Design 3-component system → Task #7B (Security-Architect): Identify 3 HIGH risks + must-fix mitigations → Task #8 (Planner): 12-step TDD plan with security utilities first (safeJSONParse, atomicWrites, scrubSensitive)"
-      }
-    ],
-    "applicability": "Any system handling persistent data, destructive operations (delete/move/archive), or agent-critical state (memory, config, routing, workflows)",
-    "benefits": [
-      "Prevents shipping vulnerable code (3 HIGH risks caught before implementation)",
-      "Security mitigations become blocking prerequisites (MF-001, MF-002, MF-003)",
-      "Reduces rework (no post-implementation security fixes)",
-      "Test-driven security (22 security test cases: ST-001 through ST-022)"
-    ],
-    "security_findings": [
-      "T-MEM-001 (HIGH): Archive path injection via date values containing path separators",
-      "T-MEM-002 (HIGH): JSON prototype pollution (38 instances of raw JSON.parse across memory subsystem)",
-      "I-MEM-001 (HIGH): Sensitive data persists in cold storage (API keys, JWTs, emails) without scrubbing"
-    ],
-    "must_fix_mitigations": [
-      "MF-001: Create safeJSONParse() utility to strip __proto__, constructor, prototype keys",
-      "MF-002: Use atomicWriteSync() for ALL file writes, createBackup() before truncation",
-      "MF-003: Implement scrubSensitiveContent() to redact API keys, JWTs, emails before archival"
-    ],
-    "extracted_from": "Tasks #7-8 reflection, Architecture Design + Security Review + Implementation Plan",
-    "date": "2026-02-08"
-  },
-  {
-    "id": "integration-first-design-pattern",
-    "name": "Integration-First Design Pattern for Module Rebuilds",
-    "context": "Memory Management Rebuild (Tasks #7-8, 2026-02-08) - lessons from 900-line archived modules that were never wired",
-    "description": "When rebuilding archived modules, start with integration design (how it connects to existing code) before implementation design (what it does internally). The 3 archived memory modules (rotator, pruner, cold-storage) had solid internal designs but zero integration - they were never wired into memory-scheduler.cjs or sync-memory-index.cjs hook. Pattern: Identify trigger points (hook, scheduler, CLI) → Design wiring interfaces → Then design internal logic. Integration coverage is as important as feature completeness.",
-    "key_findings": [
-      "memory-scheduler.cjs has runDeduplication() returning 'disabled (smart-pruner archived)' - ready to wire but not done",
-      "memory-scheduler.cjs has runArchiveOldLTM() importing archived cold-storage.cjs - fails silently, zero error visibility",
-      "sync-memory-index.cjs hook fires on every memory file write - ideal trigger for rotation, but not wired",
-      "issues.md at 53KB is largest memory file, needs immediate rotation, but no module triggers it",
-      "archive/learnings-2026-02.md at 463KB is unmanaged warm storage, grows unbounded"
-    ],
-    "design_principle": "Keep each module under 150 lines. Archived modules were 900 lines combined; new design is 300 lines (67% reduction) with better integration coverage.",
-    "wiring_checklist": [
-      "Identify ALL potential trigger points (hooks, schedulers, CLI commands)",
-      "Design explicit wiring interfaces (function signatures, error handling, return values)",
-      "Document wiring status in component diagram (show trigger → component → storage flow)",
-      "Add integration tests verifying wiring (trigger fires → component executes → storage updated)",
-      "Create monitoring/logging for silent failures (e.g., 'disabled' stubs should log warnings)"
-    ],
-    "applicability": "Any module restoration from _archive/, especially infrastructure modules (memory, workflow, routing, state management)",
-    "benefits": [
-      "Prevents 'orphan modules' that work internally but are never called",
-      "Integration tests catch wiring gaps before deployment",
-      "Component diagrams show end-to-end data flow (trigger → logic → storage)",
-      "Silent failure monitoring surfaces dead code paths"
-    ],
-    "anti_patterns": [
-      "Implementing internal logic before designing wiring (the archived modules' mistake)",
-      "Assuming scheduler stubs will 'just work' (verify execution path with tests)",
-      "Skipping integration tests because 'unit tests pass' (unit ≠ integration)"
-    ],
-    "extracted_from": "Task #7 Architecture Design, ADR-102 rationale, learnings.md 'Memory Management System Design Lessons'",
-    "date": "2026-02-08"
-  },
-  {
-    "id": "multi-phase-pipeline-wiring-bug-detection",
-    "name": "Multi-Phase Pipeline Validates Wiring Bugs",
-    "context": "Phase 4 Code Review (Task #10) + Phase 5 QA Validation (Task #11) of memory management system",
-    "description": "When independent code review and QA find the same bugs in different detection methods, it validates those bugs are in the wiring layer (integration interfaces) not in core logic. This pattern applies to any multi-phase review where Unit Tests are insufficient to catch integration issues. Wiring bugs manifest as: (1) Option name mismatches (caller expects X, function parameter is Y), (2) Property name mismatches (returned object has Y, caller accesses X), (3) Type mismatches (caller expects string, function returns number). Keep code review and QA independent (non-redundant) to validate findings with high confidence.",
-    "examples": [
-      {
-        "bug": "C1: Property Name Mismatch",
-        "description": "memory-scheduler.cjs line 426 accesses pruneResult.entriesRemoved but pruneResolvedEntries() returns { removed: N }",
-        "detected_by": ["code-reviewer (static inspection)", "qa (test analysis)"],
-        "impact": "Silent data corruption: undefined + number = NaN in metrics reporting"
-      },
-      {
-        "bug": "C2: Option Name Mismatch",
-        "description": "memory-scheduler.cjs line 420 passes { similarityThreshold: 0.6 } but deduplicateFile() accepts { threshold }",
-        "detected_by": ["code-reviewer (interface inspection)", "qa (config validation)"],
-        "impact": "Config value silently ignored, function uses default threshold instead of configured value"
-      }
-    ],
-    "why_unit_tests_miss_wiring_bugs": "Unit tests validate module functions work correctly in isolation. They don't validate that callers use results correctly. All 41 tests passed, but wiring bugs (C1 & C2) were only caught by code review (static inspection) and QA (integration analysis).",
-    "detection_strategy": "Keep code review and QA independent. Code review uses static inspection (does caller match function signature?). QA uses test analysis (does config value reach the function?). Bugs found by both are high-confidence must-fixes.",
-    "applicability": "Any system with: configuration-driven modules, interface-dependent components, multiple translation layers (config → code → function), integration wiring across modules",
-    "benefits": [
-      "Wiring bugs detected pre-production (not in customer reports)",
-      "Non-redundant reviews: each phase uses different detection method",
-      "High confidence: bugs found by multiple phases are real",
-      "Fast fixes: wiring bugs typically 1-2 line changes"
-    ],
-    "metrics": {
-      "memory_management_case": {
-        "total_tests": 41,
-        "tests_passed": 41,
-        "wiring_bugs_found": 2,
-        "detection_methods": 2
-      }
     },
-    "anti_patterns": [
-      "Combining code review and QA into single phase (loses redundancy)",
-      "Skipping code review because tests pass (misses interface mismatches)",
-      "Skipping QA because code review passed (misses integration failures)"
-    ],
-    "extracted_from": "Tasks #10-11 reflection, validated by independent bug discovery",
-    "date": "2026-02-08"
-  },
-  {
-    "id": "tdd-integration-boundary-verification",
-    "name": "Test-Driven Integration Boundary Verification",
-    "context": "Tasks #9-13: Memory Management Rebuild discovered 2 integration bugs that 41 unit tests missed",
-    "description": "TDD excels at unit-level validation through module isolation, but this isolation can create a blind spot for integration contract mismatches. When Module A tests calls to Module B, the unit test mocks Module B's return values based on test assumptions. If assumptions don't match actual implementation, the mismatch only appears during real integration where mocks are bypassed. Solution: Add explicit 'Integration Verification Phase' after unit tests pass, using REAL modules (not mocks) to verify contracts.",
-    "problem_scenario": "Task #9 implemented 4 memory modules with 41 passing unit tests. Task #13 discovered 2 bugs: (1) scheduler assumed pruneResult.entriesRemoved but pruner returns pruneResult.removed, (2) scheduler passed { similarityThreshold: 0.6 } but pruner expects { threshold: 0.6 }. Both bugs found by human code review, not tests.",
-    "root_cause": "Unit tests validated internal logic by mocking dependencies based on test assumptions. Integration contract mismatches (field names, parameter names) only visible when code executes together without mocks.",
-    "solution_phases": [
-      {
-        "phase": "Unit Testing (existing)",
-        "description": "Validate internal module logic with mocks/stubs. Example: test that pruner returns { removed: count }"
+    {
+      "id": "security-first-architecture-pattern",
+      "name": "Security-First Architecture Pattern for Memory Systems",
+      "context": "Memory Management Rebuild (Tasks #7-8, 2026-02-08)",
+      "description": "When rebuilding archived modules that handle persistent data (memory, state, config), conduct security review BEFORE implementation planning. Security findings define must-fix mitigations that block implementation. Pattern: Architect designs structure → Security-Architect identifies threats → Planner sequences implementation with security-first steps. This prevents shipping vulnerable code.",
+      "examples": [
+        {
+          "task": "Memory Management Rebuild",
+          "sequence": "Task #7A (Architect): Design 3-component system → Task #7B (Security-Architect): Identify 3 HIGH risks + must-fix mitigations → Task #8 (Planner): 12-step TDD plan with security utilities first (safeJSONParse, atomicWrites, scrubSensitive)"
+        }
+      ],
+      "applicability": "Any system handling persistent data, destructive operations (delete/move/archive), or agent-critical state (memory, config, routing, workflows)",
+      "benefits": [
+        "Prevents shipping vulnerable code (3 HIGH risks caught before implementation)",
+        "Security mitigations become blocking prerequisites (MF-001, MF-002, MF-003)",
+        "Reduces rework (no post-implementation security fixes)",
+        "Test-driven security (22 security test cases: ST-001 through ST-022)"
+      ],
+      "security_findings": [
+        "T-MEM-001 (HIGH): Archive path injection via date values containing path separators",
+        "T-MEM-002 (HIGH): JSON prototype pollution (38 instances of raw JSON.parse across memory subsystem)",
+        "I-MEM-001 (HIGH): Sensitive data persists in cold storage (API keys, JWTs, emails) without scrubbing"
+      ],
+      "must_fix_mitigations": [
+        "MF-001: Create safeJSONParse() utility to strip __proto__, constructor, prototype keys",
+        "MF-002: Use atomicWriteSync() for ALL file writes, createBackup() before truncation",
+        "MF-003: Implement scrubSensitiveContent() to redact API keys, JWTs, emails before archival"
+      ],
+      "extracted_from": "Tasks #7-8 reflection, Architecture Design + Security Review + Implementation Plan",
+      "date": "2026-02-08"
+    },
+    {
+      "id": "integration-first-design-pattern",
+      "name": "Integration-First Design Pattern for Module Rebuilds",
+      "context": "Memory Management Rebuild (Tasks #7-8, 2026-02-08) - lessons from 900-line archived modules that were never wired",
+      "description": "When rebuilding archived modules, start with integration design (how it connects to existing code) before implementation design (what it does internally). The 3 archived memory modules (rotator, pruner, cold-storage) had solid internal designs but zero integration - they were never wired into memory-scheduler.cjs or sync-memory-index.cjs hook. Pattern: Identify trigger points (hook, scheduler, CLI) → Design wiring interfaces → Then design internal logic. Integration coverage is as important as feature completeness.",
+      "key_findings": [
+        "memory-scheduler.cjs has runDeduplication() returning 'disabled (smart-pruner archived)' - ready to wire but not done",
+        "memory-scheduler.cjs has runArchiveOldLTM() importing archived cold-storage.cjs - fails silently, zero error visibility",
+        "sync-memory-index.cjs hook fires on every memory file write - ideal trigger for rotation, but not wired",
+        "issues.md at 53KB is largest memory file, needs immediate rotation, but no module triggers it",
+        "archive/learnings-2026-02.md at 463KB is unmanaged warm storage, grows unbounded"
+      ],
+      "design_principle": "Keep each module under 150 lines. Archived modules were 900 lines combined; new design is 300 lines (67% reduction) with better integration coverage.",
+      "wiring_checklist": [
+        "Identify ALL potential trigger points (hooks, schedulers, CLI commands)",
+        "Design explicit wiring interfaces (function signatures, error handling, return values)",
+        "Document wiring status in component diagram (show trigger → component → storage flow)",
+        "Add integration tests verifying wiring (trigger fires → component executes → storage updated)",
+        "Create monitoring/logging for silent failures (e.g., 'disabled' stubs should log warnings)"
+      ],
+      "applicability": "Any module restoration from _archive/, especially infrastructure modules (memory, workflow, routing, state management)",
+      "benefits": [
+        "Prevents 'orphan modules' that work internally but are never called",
+        "Integration tests catch wiring gaps before deployment",
+        "Component diagrams show end-to-end data flow (trigger → logic → storage)",
+        "Silent failure monitoring surfaces dead code paths"
+      ],
+      "anti_patterns": [
+        "Implementing internal logic before designing wiring (the archived modules' mistake)",
+        "Assuming scheduler stubs will 'just work' (verify execution path with tests)",
+        "Skipping integration tests because 'unit tests pass' (unit ≠ integration)"
+      ],
+      "extracted_from": "Task #7 Architecture Design, ADR-102 rationale, learnings.md 'Memory Management System Design Lessons'",
+      "date": "2026-02-08"
+    },
+    {
+      "id": "multi-phase-pipeline-wiring-bug-detection",
+      "name": "Multi-Phase Pipeline Validates Wiring Bugs",
+      "context": "Phase 4 Code Review (Task #10) + Phase 5 QA Validation (Task #11) of memory management system",
+      "description": "When independent code review and QA find the same bugs in different detection methods, it validates those bugs are in the wiring layer (integration interfaces) not in core logic. This pattern applies to any multi-phase review where Unit Tests are insufficient to catch integration issues. Wiring bugs manifest as: (1) Option name mismatches (caller expects X, function parameter is Y), (2) Property name mismatches (returned object has Y, caller accesses X), (3) Type mismatches (caller expects string, function returns number). Keep code review and QA independent (non-redundant) to validate findings with high confidence.",
+      "examples": [
+        {
+          "bug": "C1: Property Name Mismatch",
+          "description": "memory-scheduler.cjs line 426 accesses pruneResult.entriesRemoved but pruneResolvedEntries() returns { removed: N }",
+          "detected_by": ["code-reviewer (static inspection)", "qa (test analysis)"],
+          "impact": "Silent data corruption: undefined + number = NaN in metrics reporting"
+        },
+        {
+          "bug": "C2: Option Name Mismatch",
+          "description": "memory-scheduler.cjs line 420 passes { similarityThreshold: 0.6 } but deduplicateFile() accepts { threshold }",
+          "detected_by": ["code-reviewer (interface inspection)", "qa (config validation)"],
+          "impact": "Config value silently ignored, function uses default threshold instead of configured value"
+        }
+      ],
+      "why_unit_tests_miss_wiring_bugs": "Unit tests validate module functions work correctly in isolation. They don't validate that callers use results correctly. All 41 tests passed, but wiring bugs (C1 & C2) were only caught by code review (static inspection) and QA (integration analysis).",
+      "detection_strategy": "Keep code review and QA independent. Code review uses static inspection (does caller match function signature?). QA uses test analysis (does config value reach the function?). Bugs found by both are high-confidence must-fixes.",
+      "applicability": "Any system with: configuration-driven modules, interface-dependent components, multiple translation layers (config → code → function), integration wiring across modules",
+      "benefits": [
+        "Wiring bugs detected pre-production (not in customer reports)",
+        "Non-redundant reviews: each phase uses different detection method",
+        "High confidence: bugs found by multiple phases are real",
+        "Fast fixes: wiring bugs typically 1-2 line changes"
+      ],
+      "metrics": {
+        "memory_management_case": {
+          "total_tests": 41,
+          "tests_passed": 41,
+          "wiring_bugs_found": 2,
+          "detection_methods": 2
+        }
       },
-      {
-        "phase": "Integration Verification (new)",
-        "description": "Load REAL modules, call with production parameters, verify contracts match. Example: load actual pruner, verify returned object has 'removed' field, not 'entriesRemoved'"
-      },
-      {
-        "phase": "Contract Documentation (new)",
-        "description": "Define explicit contracts for integration points with parameter names, return field names, error cases"
-      }
-    ],
-    "contract_specification_example": "const PRUNER_CONTRACT = { deduplicate: { params: { entries: 'array', threshold: 'number' }, returns: { removed: 'number', timestamp: 'string' } } }",
-    "applicability": "Any multi-module feature implementation, especially when: parameters have implicit names (not enforced by type system), return values have implicit field names, contract documented in code comments not types, integration has multiple layers",
-    "benefits": [
-      "Catches integration bugs during development (not code review)",
-      "Eliminates false confidence: passing tests actually mean integration works",
-      "Tests become executable contract specifications",
-      "Future refactoring won't break contracts silently"
-    ],
-    "effort_estimate": "Integration tests add 20-30% to TDD cycle (10-15 min per feature for 3-5 integration tests)",
-    "prevention_checklist": [
-      "After writing unit tests, add integration tests using REAL modules",
-      "Verify parameter names match actual function signatures",
-      "Verify return field names match actual returned objects",
-      "Verify error handling is bidirectional (caller + callee)",
-      "Document contracts explicitly with expected types/fields",
-      "Before declaring feature complete, integration tests must pass"
-    ],
-    "anti_patterns": [
-      "Only writing unit tests with mocks (creates blind spot for integration)",
-      "Assuming contract matches just because unit tests pass",
-      "Skipping integration tests because unit tests pass",
-      "Documenting contracts in comments but not validating at runtime"
-    ],
-    "extracted_from": "Tasks #9-13, reflection on memory management rebuild",
-    "date": "2026-02-08"
-  },
-  {
-    "id": "non-blocking-operational-integration-pattern",
-    "name": "Non-Blocking Cross-Cutting Concern Integration",
-    "context": "ADR-100 Phase 6 DevOps Integration (Task #12, 2026-02-08)",
-    "description": "When integrating operational concerns (artifact integration, error tracking, metrics) into core workflow paths (Router, TaskUpdate), use non-blocking spawning to avoid introducing latency to user requests. The pattern: identify primary path latency budget (e.g., Router <1s), design new concern as spawnable task (not inline), use run_in_background: true, measure overhead (validate <100ms). Example: Router Step 0.5 spawns artifact-integrator with ~20ms overhead, enabling integration analysis without impacting user experience.",
-    "key_findings": [
-      "Router Step 0.5 check adds only ~20ms latency (file read + spawn)",
-      "Integration analysis runs in background while user's primary request proceeds",
-      "Non-blocking pattern is best for non-critical-path concerns (integration, metrics, profiling, auditing)",
-      "Critical path concerns (routing decision, task dispatch) must remain inline"
-    ],
-    "applicability": "Any framework-wide system that must be present but isn't on critical path. Examples: error tracking, metrics collection, profiling, integration analysis, audit logging.",
-    "implementation_checklist": [
-      "1. Identify primary path latency budget (e.g., Router must respond <1s)",
-      "2. Measure current path latency (baseline)",
-      "3. Design new concern as spawnable task (not inline processing)",
-      "4. Use run_in_background: true or equivalent async wrapper",
-      "5. Measure actual latency overhead (validate it's <100ms)",
-      "6. Document timeout policy for background tasks",
-      "7. Add observability (metrics, logging) for background task completion"
-    ],
-    "benefits": [
-      "Concerns are always executed (not optional)",
-      "No latency impact on user-facing paths",
-      "Enables 'good citizenship' — integration runs without impacting UX",
-      "Scales to multiple concurrent background tasks via queue"
-    ],
-    "anti_patterns": [
-      "Adding inline processing to critical path (increases latency)",
-      "Making background tasks optional (may be skipped)",
-      "No timeout on background tasks (resource accumulation)",
-      "Assuming background tasks are sequential (they may interleave)"
-    ],
-    "extracted_from": "Task #12 (Router Step 0.5 implementation), ADR-100 Phase 6",
-    "date": "2026-02-08"
-  },
-  {
-    "id": "intent-driven-operational-closure-pattern",
-    "name": "Intent-Driven Operational Workflow Closure",
-    "context": "ADR-100 Phase 6 DevOps Integration (Task #12, 2026-02-08) — routing keywords for artifact-integration intent",
-    "description": "When a system (reflection-agent) detects gaps and queues remediation work (integration-queue.jsonl), the Router must have explicit routing keywords to recognize user requests about that concern. Without keywords, user requests would default to developer (incorrect). Task #12 added 11 specific keywords (integrate artifact, orphan artifact, not in catalog, etc.) that route artifact-integration concerns to architect (correct), closing the feedback loop. Pattern: define queue entry types → create routing keywords for each type → map keywords to appropriate agent.",
-    "routing_keywords_example": [
-      "integrate artifact",
-      "missing integration",
-      "orphan artifact",
-      "not in catalog",
-      "not assigned to agent",
-      "artifact graph",
-      "integration check",
-      "integration health",
-      "artifact dependency",
-      "cross-artifact",
-      "integration wiring"
-    ],
-    "keyword_to_agent_mapping": "artifact-integration → architect",
-    "applicability": "Any multi-phase system where earlier phases queue work for later phases. Pattern ensures Router recognizes the queued work when users ask about it.",
-    "implementation_checklist": [
-      "1. When a system queues work, identify work type (e.g., 'artifact-integration')",
-      "2. List natural language phrases users would use (e.g., 'orphan artifact', 'not in catalog')",
-      "3. Create routing keywords from those phrases (extract key words, combine variants)",
-      "4. Add keywords to routing-table.cjs INTENT_KEYWORDS",
-      "5. Map intent to appropriate agent (e.g., artifact-integration → architect)",
-      "6. Document in router-decision.md which queues are routed how",
-      "7. Add CI check: keywords match queue entry types"
-    ],
-    "benefits": [
-      "Closes feedback loop: queued work → user request → Router recognition → remediation",
-      "Enables operational workflows (users can ask about gaps, get routed to fix)",
-      "Prevents default-to-developer anti-pattern (work routed to specialist)",
-      "Makes queued work discoverable (not invisible)"
-    ],
-    "anti_patterns": [
-      "Queuing work without routing keywords (work becomes invisible to Router)",
-      "Generic keywords that match many intents (false positives)",
-      "Keywords not matching natural language users would use (nobody finds the keywords)",
-      "Routing to wrong agent (artifact-integration → developer instead of architect)"
-    ],
-    "extracted_from": "Task #12 (artifact-integration keywords + Step 0.5), learnings.md Task #12 entry",
-    "date": "2026-02-08"
-  },
-  {
-    "id": "enterprise-pipeline-systematic-integration-pattern",
-    "name": "Multi-Phase Integration Pipeline with Staged Complexity",
-    "context": "ADR-100 Full Implementation (Tasks #1-15, 2026-02-08) — 6-phase systematic integration",
-    "description": "Task #12 is the final wiring phase in a 6-phase ADR-100 implementation. The systematic approach (plan → design → core → test → agent-wire → workflow-wire → router-wire → completion) prevents integration gaps. Effectiveness comes from delayed integration — each phase builds on previous phases' concrete artifacts (e.g., artifact-graph.cjs from Task #4 is used by reflection-agent wiring in Task #7). This creates a dependency DAG that naturally orders phases. The 15-task pipeline demonstrates zero missed integration points (5/5 complete), zero design rework, and 100% test pass rate (65/65 tests).",
-    "phase_dependency_chain": [
-      "Task #1-3 (Design): Architect + Security-Architect design, Planner sequences",
-      "Task #4-6 (Core+Test): Developer implements artifact-graph, QA tests, test suite validates",
-      "Task #7-9 (Agent Wiring): reflection-agent gets Step 4.5, evolution-orchestrator gets Phase E, post-creation gets trigger",
-      "Task #10-11 (Workflow Wiring): evolution-workflow gets artifact-integrator call, post-creation-integration hook populates queue",
-      "Task #12 (Router Wiring): Router Step 0.5 checks queue, keywords route to architect ← THIS TASK",
-      "Task #13-15 (Completion+Learn): artifact-integrator processes queue, diagnostics verify all points, reflection logs learnings"
-    ],
-    "effectiveness_metrics": [
-      "Total Tasks: 15",
-      "Files Modified: 42",
-      "Lines of Code: ~3,200",
-      "Test Coverage: 65 tests (100% pass)",
-      "Integration Points: 5",
-      "Agent Participation: 6 unique agents",
-      "Zero Rework: 0 design changes post-Phase 1",
-      "Execution Time: ~4 hours distributed across 8 sessions"
-    ],
-    "pipeline_health_checklist": [
-      "All tasks have clear dependencies (no tasks blocking each other)",
-      "Each task outputs artifacts that feed into subsequent tasks",
-      "Integration points explicitly wired (not assumed to auto-magically work)",
-      "Tests verify integration between phases (not just individual components)",
-      "No orphaned components (all artifact types assigned to agents)",
-      "No rework required (design phase prevents implementation surprises)",
-      "Systematic quality gates between phases (no exit without validation)"
-    ],
-    "applicability": "Any enterprise system redesign requiring multi-agent coordination and multi-phase development. Scales to larger pipelines (20+ tasks, 10+ agents).",
-    "key_insights": [
-      "Delayed integration (phase-to-phase dependencies) prevents dangling unintegrated components",
-      "Systematic phasing forces consideration of all integration points upfront",
-      "Dependency DAG ensures natural ordering without special choreography",
-      "Test-driven validation between phases catches gaps before accumulating"
-    ],
-    "anti_patterns": [
-      "Implementing 'in isolation' without wiring (the archived modules' mistake)",
-      "Sequential execution of parallel-able phases (Task #7-9 + Task #10-11 could overlap)",
-      "Deferring integration to the end (discovered gaps too late to fix)",
-      "No systematic quality gates (rework discovered late in pipeline)"
-    ],
-    "extracted_from": "Tasks #1-15 reflection (ADR-100 full pipeline), Task #12 as final routing wiring phase",
-    "date": "2026-02-08"
-  }
-]
+      "anti_patterns": [
+        "Combining code review and QA into single phase (loses redundancy)",
+        "Skipping code review because tests pass (misses interface mismatches)",
+        "Skipping QA because code review passed (misses integration failures)"
+      ],
+      "extracted_from": "Tasks #10-11 reflection, validated by independent bug discovery",
+      "date": "2026-02-08"
+    },
+    {
+      "id": "tdd-integration-boundary-verification",
+      "name": "Test-Driven Integration Boundary Verification",
+      "context": "Tasks #9-13: Memory Management Rebuild discovered 2 integration bugs that 41 unit tests missed",
+      "description": "TDD excels at unit-level validation through module isolation, but this isolation can create a blind spot for integration contract mismatches. When Module A tests calls to Module B, the unit test mocks Module B's return values based on test assumptions. If assumptions don't match actual implementation, the mismatch only appears during real integration where mocks are bypassed. Solution: Add explicit 'Integration Verification Phase' after unit tests pass, using REAL modules (not mocks) to verify contracts.",
+      "problem_scenario": "Task #9 implemented 4 memory modules with 41 passing unit tests. Task #13 discovered 2 bugs: (1) scheduler assumed pruneResult.entriesRemoved but pruner returns pruneResult.removed, (2) scheduler passed { similarityThreshold: 0.6 } but pruner expects { threshold: 0.6 }. Both bugs found by human code review, not tests.",
+      "root_cause": "Unit tests validated internal logic by mocking dependencies based on test assumptions. Integration contract mismatches (field names, parameter names) only visible when code executes together without mocks.",
+      "solution_phases": [
+        {
+          "phase": "Unit Testing (existing)",
+          "description": "Validate internal module logic with mocks/stubs. Example: test that pruner returns { removed: count }"
+        },
+        {
+          "phase": "Integration Verification (new)",
+          "description": "Load REAL modules, call with production parameters, verify contracts match. Example: load actual pruner, verify returned object has 'removed' field, not 'entriesRemoved'"
+        },
+        {
+          "phase": "Contract Documentation (new)",
+          "description": "Define explicit contracts for integration points with parameter names, return field names, error cases"
+        }
+      ],
+      "contract_specification_example": "const PRUNER_CONTRACT = { deduplicate: { params: { entries: 'array', threshold: 'number' }, returns: { removed: 'number', timestamp: 'string' } } }",
+      "applicability": "Any multi-module feature implementation, especially when: parameters have implicit names (not enforced by type system), return values have implicit field names, contract documented in code comments not types, integration has multiple layers",
+      "benefits": [
+        "Catches integration bugs during development (not code review)",
+        "Eliminates false confidence: passing tests actually mean integration works",
+        "Tests become executable contract specifications",
+        "Future refactoring won't break contracts silently"
+      ],
+      "effort_estimate": "Integration tests add 20-30% to TDD cycle (10-15 min per feature for 3-5 integration tests)",
+      "prevention_checklist": [
+        "After writing unit tests, add integration tests using REAL modules",
+        "Verify parameter names match actual function signatures",
+        "Verify return field names match actual returned objects",
+        "Verify error handling is bidirectional (caller + callee)",
+        "Document contracts explicitly with expected types/fields",
+        "Before declaring feature complete, integration tests must pass"
+      ],
+      "anti_patterns": [
+        "Only writing unit tests with mocks (creates blind spot for integration)",
+        "Assuming contract matches just because unit tests pass",
+        "Skipping integration tests because unit tests pass",
+        "Documenting contracts in comments but not validating at runtime"
+      ],
+      "extracted_from": "Tasks #9-13, reflection on memory management rebuild",
+      "date": "2026-02-08"
+    },
+    {
+      "id": "non-blocking-operational-integration-pattern",
+      "name": "Non-Blocking Cross-Cutting Concern Integration",
+      "context": "ADR-100 Phase 6 DevOps Integration (Task #12, 2026-02-08)",
+      "description": "When integrating operational concerns (artifact integration, error tracking, metrics) into core workflow paths (Router, TaskUpdate), use non-blocking spawning to avoid introducing latency to user requests. The pattern: identify primary path latency budget (e.g., Router <1s), design new concern as spawnable task (not inline), use run_in_background: true, measure overhead (validate <100ms). Example: Router Step 0.5 spawns artifact-integrator with ~20ms overhead, enabling integration analysis without impacting user experience.",
+      "key_findings": [
+        "Router Step 0.5 check adds only ~20ms latency (file read + spawn)",
+        "Integration analysis runs in background while user's primary request proceeds",
+        "Non-blocking pattern is best for non-critical-path concerns (integration, metrics, profiling, auditing)",
+        "Critical path concerns (routing decision, task dispatch) must remain inline"
+      ],
+      "applicability": "Any framework-wide system that must be present but isn't on critical path. Examples: error tracking, metrics collection, profiling, integration analysis, audit logging.",
+      "implementation_checklist": [
+        "1. Identify primary path latency budget (e.g., Router must respond <1s)",
+        "2. Measure current path latency (baseline)",
+        "3. Design new concern as spawnable task (not inline processing)",
+        "4. Use run_in_background: true or equivalent async wrapper",
+        "5. Measure actual latency overhead (validate it's <100ms)",
+        "6. Document timeout policy for background tasks",
+        "7. Add observability (metrics, logging) for background task completion"
+      ],
+      "benefits": [
+        "Concerns are always executed (not optional)",
+        "No latency impact on user-facing paths",
+        "Enables 'good citizenship' — integration runs without impacting UX",
+        "Scales to multiple concurrent background tasks via queue"
+      ],
+      "anti_patterns": [
+        "Adding inline processing to critical path (increases latency)",
+        "Making background tasks optional (may be skipped)",
+        "No timeout on background tasks (resource accumulation)",
+        "Assuming background tasks are sequential (they may interleave)"
+      ],
+      "extracted_from": "Task #12 (Router Step 0.5 implementation), ADR-100 Phase 6",
+      "date": "2026-02-08"
+    },
+    {
+      "id": "intent-driven-operational-closure-pattern",
+      "name": "Intent-Driven Operational Workflow Closure",
+      "context": "ADR-100 Phase 6 DevOps Integration (Task #12, 2026-02-08) — routing keywords for artifact-integration intent",
+      "description": "When a system (reflection-agent) detects gaps and queues remediation work (integration-queue.jsonl), the Router must have explicit routing keywords to recognize user requests about that concern. Without keywords, user requests would default to developer (incorrect). Task #12 added 11 specific keywords (integrate artifact, orphan artifact, not in catalog, etc.) that route artifact-integration concerns to architect (correct), closing the feedback loop. Pattern: define queue entry types → create routing keywords for each type → map keywords to appropriate agent.",
+      "routing_keywords_example": [
+        "integrate artifact",
+        "missing integration",
+        "orphan artifact",
+        "not in catalog",
+        "not assigned to agent",
+        "artifact graph",
+        "integration check",
+        "integration health",
+        "artifact dependency",
+        "cross-artifact",
+        "integration wiring"
+      ],
+      "keyword_to_agent_mapping": "artifact-integration → architect",
+      "applicability": "Any multi-phase system where earlier phases queue work for later phases. Pattern ensures Router recognizes the queued work when users ask about it.",
+      "implementation_checklist": [
+        "1. When a system queues work, identify work type (e.g., 'artifact-integration')",
+        "2. List natural language phrases users would use (e.g., 'orphan artifact', 'not in catalog')",
+        "3. Create routing keywords from those phrases (extract key words, combine variants)",
+        "4. Add keywords to routing-table.cjs INTENT_KEYWORDS",
+        "5. Map intent to appropriate agent (e.g., artifact-integration → architect)",
+        "6. Document in router-decision.md which queues are routed how",
+        "7. Add CI check: keywords match queue entry types"
+      ],
+      "benefits": [
+        "Closes feedback loop: queued work → user request → Router recognition → remediation",
+        "Enables operational workflows (users can ask about gaps, get routed to fix)",
+        "Prevents default-to-developer anti-pattern (work routed to specialist)",
+        "Makes queued work discoverable (not invisible)"
+      ],
+      "anti_patterns": [
+        "Queuing work without routing keywords (work becomes invisible to Router)",
+        "Generic keywords that match many intents (false positives)",
+        "Keywords not matching natural language users would use (nobody finds the keywords)",
+        "Routing to wrong agent (artifact-integration → developer instead of architect)"
+      ],
+      "extracted_from": "Task #12 (artifact-integration keywords + Step 0.5), learnings.md Task #12 entry",
+      "date": "2026-02-08"
+    },
+    {
+      "id": "enterprise-pipeline-systematic-integration-pattern",
+      "name": "Multi-Phase Integration Pipeline with Staged Complexity",
+      "context": "ADR-100 Full Implementation (Tasks #1-15, 2026-02-08) — 6-phase systematic integration",
+      "description": "Task #12 is the final wiring phase in a 6-phase ADR-100 implementation. The systematic approach (plan → design → core → test → agent-wire → workflow-wire → router-wire → completion) prevents integration gaps. Effectiveness comes from delayed integration — each phase builds on previous phases' concrete artifacts (e.g., artifact-graph.cjs from Task #4 is used by reflection-agent wiring in Task #7). This creates a dependency DAG that naturally orders phases. The 15-task pipeline demonstrates zero missed integration points (5/5 complete), zero design rework, and 100% test pass rate (65/65 tests).",
+      "phase_dependency_chain": [
+        "Task #1-3 (Design): Architect + Security-Architect design, Planner sequences",
+        "Task #4-6 (Core+Test): Developer implements artifact-graph, QA tests, test suite validates",
+        "Task #7-9 (Agent Wiring): reflection-agent gets Step 4.5, evolution-orchestrator gets Phase E, post-creation gets trigger",
+        "Task #10-11 (Workflow Wiring): evolution-workflow gets artifact-integrator call, post-creation-integration hook populates queue",
+        "Task #12 (Router Wiring): Router Step 0.5 checks queue, keywords route to architect ← THIS TASK",
+        "Task #13-15 (Completion+Learn): artifact-integrator processes queue, diagnostics verify all points, reflection logs learnings"
+      ],
+      "effectiveness_metrics": [
+        "Total Tasks: 15",
+        "Files Modified: 42",
+        "Lines of Code: ~3,200",
+        "Test Coverage: 65 tests (100% pass)",
+        "Integration Points: 5",
+        "Agent Participation: 6 unique agents",
+        "Zero Rework: 0 design changes post-Phase 1",
+        "Execution Time: ~4 hours distributed across 8 sessions"
+      ],
+      "pipeline_health_checklist": [
+        "All tasks have clear dependencies (no tasks blocking each other)",
+        "Each task outputs artifacts that feed into subsequent tasks",
+        "Integration points explicitly wired (not assumed to auto-magically work)",
+        "Tests verify integration between phases (not just individual components)",
+        "No orphaned components (all artifact types assigned to agents)",
+        "No rework required (design phase prevents implementation surprises)",
+        "Systematic quality gates between phases (no exit without validation)"
+      ],
+      "applicability": "Any enterprise system redesign requiring multi-agent coordination and multi-phase development. Scales to larger pipelines (20+ tasks, 10+ agents).",
+      "key_insights": [
+        "Delayed integration (phase-to-phase dependencies) prevents dangling unintegrated components",
+        "Systematic phasing forces consideration of all integration points upfront",
+        "Dependency DAG ensures natural ordering without special choreography",
+        "Test-driven validation between phases catches gaps before accumulating"
+      ],
+      "anti_patterns": [
+        "Implementing 'in isolation' without wiring (the archived modules' mistake)",
+        "Sequential execution of parallel-able phases (Task #7-9 + Task #10-11 could overlap)",
+        "Deferring integration to the end (discovered gaps too late to fix)",
+        "No systematic quality gates (rework discovered late in pipeline)"
+      ],
+      "extracted_from": "Tasks #1-15 reflection (ADR-100 full pipeline), Task #12 as final routing wiring phase",
+      "date": "2026-02-08"
+    }
+  ]
 }

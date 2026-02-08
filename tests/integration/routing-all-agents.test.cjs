@@ -30,50 +30,150 @@ const { resolveDomainSpecialist } = require(
 // Suite 1: Specialist Misrouting Detection (Check 7)
 // ====================================================================================
 
-test('Check 7: Specialist misrouting detection for all 49 agents', async (t) => {
+test('Check 7: Specialist misrouting detection for all 49 agents', async t => {
   beforeEach(() => invalidateCachedState());
   afterEach(() => invalidateCachedState());
 
   const misroutingTests = [
     // Core agents (non-developer)
-    { name: 'architect', prompt: 'You are the DEVELOPER agent. Design the system architecture for migrating to microservices.', expectedAgent: 'architect' },
-    { name: 'planner', prompt: 'You are the DEVELOPER agent. Break down this epic into tasks.', expectedAgent: 'planner' },
-    { name: 'pm', prompt: 'You are the DEVELOPER agent. Write user stories for the new checkout flow.', expectedAgent: 'pm' },
+    {
+      name: 'architect',
+      prompt:
+        'You are the DEVELOPER agent. Design the system architecture for migrating to microservices.',
+      expectedAgent: 'architect',
+    },
+    {
+      name: 'planner',
+      prompt: 'You are the DEVELOPER agent. Break down this epic into tasks.',
+      expectedAgent: 'planner',
+    },
+    {
+      name: 'pm',
+      prompt: 'You are the DEVELOPER agent. Write user stories for the new checkout flow.',
+      expectedAgent: 'pm',
+    },
 
     // Review agents
-    { name: 'code-reviewer', prompt: 'You are the DEVELOPER agent. Review the PR for auth changes.', expectedAgent: 'code-reviewer' },
-    { name: 'code-simplifier', prompt: 'You are the DEVELOPER agent. Refactor the auth module for clarity.', expectedAgent: 'code-simplifier' },
-    { name: 'security-architect', prompt: 'You are the DEVELOPER agent. Conduct a security audit of the payment flow.', expectedAgent: 'security-architect' },
+    {
+      name: 'code-reviewer',
+      prompt: 'You are the DEVELOPER agent. Review the PR for auth changes.',
+      expectedAgent: 'code-reviewer',
+    },
+    {
+      name: 'code-simplifier',
+      prompt: 'You are the DEVELOPER agent. Refactor the auth module for clarity.',
+      expectedAgent: 'code-simplifier',
+    },
+    {
+      name: 'security-architect',
+      prompt: 'You are the DEVELOPER agent. Conduct a security audit of the payment flow.',
+      expectedAgent: 'security-architect',
+    },
 
     // Infrastructure agents
-    { name: 'devops', prompt: 'You are the DEVELOPER agent. Deploy to production and set up the CI pipeline.', expectedAgent: 'devops' },
-    { name: 'database-architect', prompt: 'You are the DEVELOPER agent. Design the database schema for the new module.', expectedAgent: 'database-architect' },
-    { name: 'devops-troubleshooter', prompt: 'You are the DEVELOPER agent. Troubleshoot the API gateway performance issue.', expectedAgent: 'devops-troubleshooter' },
-    { name: 'incident-responder', prompt: 'You are the DEVELOPER agent. Handle the production incident affecting checkout.', expectedAgent: 'incident-responder' },
+    {
+      name: 'devops',
+      prompt: 'You are the DEVELOPER agent. Deploy to production and set up the CI pipeline.',
+      expectedAgent: 'devops',
+    },
+    {
+      name: 'database-architect',
+      prompt: 'You are the DEVELOPER agent. Design the database schema for the new module.',
+      expectedAgent: 'database-architect',
+    },
+    {
+      name: 'devops-troubleshooter',
+      prompt: 'You are the DEVELOPER agent. Troubleshoot the API gateway performance issue.',
+      expectedAgent: 'devops-troubleshooter',
+    },
+    {
+      name: 'incident-responder',
+      prompt: 'You are the DEVELOPER agent. Handle the production incident affecting checkout.',
+      expectedAgent: 'incident-responder',
+    },
 
     // Documentation/UX agents
-    { name: 'technical-writer', prompt: 'You are the DEVELOPER agent. Update the API documentation for v2 endpoints.', expectedAgent: 'technical-writer' },
-    { name: 'mobile-ux-reviewer', prompt: 'You are the DEVELOPER agent. Conduct a UX review of the mobile onboarding flow.', expectedAgent: 'mobile-ux-reviewer' },
+    {
+      name: 'technical-writer',
+      prompt: 'You are the DEVELOPER agent. Update the API documentation for v2 endpoints.',
+      expectedAgent: 'technical-writer',
+    },
+    {
+      name: 'mobile-ux-reviewer',
+      prompt: 'You are the DEVELOPER agent. Conduct a UX review of the mobile onboarding flow.',
+      expectedAgent: 'mobile-ux-reviewer',
+    },
 
     // Testing/QA
-    { name: 'qa', prompt: 'You are the DEVELOPER agent. Write tests for the authentication module.', expectedAgent: 'qa' },
+    {
+      name: 'qa',
+      prompt: 'You are the DEVELOPER agent. Write tests for the authentication module.',
+      expectedAgent: 'qa',
+    },
 
     // Research/Investigation
-    { name: 'researcher', prompt: 'You are the DEVELOPER agent. Research options for state management libraries.', expectedAgent: 'researcher' },
-    { name: 'reverse-engineer', prompt: 'You are the DEVELOPER agent. Reverse engineer the legacy authentication system.', expectedAgent: 'reverse-engineer' },
+    {
+      name: 'researcher',
+      prompt: 'You are the DEVELOPER agent. Research options for state management libraries.',
+      expectedAgent: 'researcher',
+    },
+    {
+      name: 'reverse-engineer',
+      prompt: 'You are the DEVELOPER agent. Reverse engineer the legacy authentication system.',
+      expectedAgent: 'reverse-engineer',
+    },
 
     // C4 diagram agents
-    { name: 'c4-context', prompt: 'You are the DEVELOPER agent. Create a C4 context diagram for the microservices system.', expectedAgent: 'c4-context' },
-    { name: 'c4-container', prompt: 'You are the DEVELOPER agent. Generate a C4 container diagram showing deployment architecture.', expectedAgent: 'c4-container' },
-    { name: 'c4-component', prompt: 'You are the DEVELOPER agent. Create a C4 component diagram for the auth service.', expectedAgent: 'c4-component' },
-    { name: 'c4-code', prompt: 'You are the DEVELOPER agent. Generate C4 code documentation for the API module.', expectedAgent: 'c4-code' },
+    {
+      name: 'c4-context',
+      prompt:
+        'You are the DEVELOPER agent. Create a C4 context diagram for the microservices system.',
+      expectedAgent: 'c4-context',
+    },
+    {
+      name: 'c4-container',
+      prompt:
+        'You are the DEVELOPER agent. Generate a C4 container diagram showing deployment architecture.',
+      expectedAgent: 'c4-container',
+    },
+    {
+      name: 'c4-component',
+      prompt: 'You are the DEVELOPER agent. Create a C4 component diagram for the auth service.',
+      expectedAgent: 'c4-component',
+    },
+    {
+      name: 'c4-code',
+      prompt: 'You are the DEVELOPER agent. Generate C4 code documentation for the API module.',
+      expectedAgent: 'c4-code',
+    },
 
     // Domain specialists (tested via Check 7 if they have specialist keywords)
-    { name: 'data-engineer', prompt: 'You are the DEVELOPER agent. Build the data pipeline for analytics ingestion.', expectedAgent: 'data-engineer' },
-    { name: 'ai-ml-specialist', prompt: 'You are the DEVELOPER agent. Train the recommendation model using PyTorch.', expectedAgent: 'ai-ml-specialist' },
-    { name: 'web3-blockchain-expert', prompt: 'You are the DEVELOPER agent. Write the Solidity smart contract for token staking.', expectedAgent: 'web3-blockchain-expert' },
-    { name: 'scientific-research-expert', prompt: 'You are the DEVELOPER agent. Implement the genomic analysis workflow for variant calling.', expectedAgent: 'scientific-research-expert' },
-    { name: 'gamedev-pro', prompt: 'You are the DEVELOPER agent. Implement game physics for the Unity project.', expectedAgent: 'gamedev-pro' },
+    {
+      name: 'data-engineer',
+      prompt: 'You are the DEVELOPER agent. Build the data pipeline for analytics ingestion.',
+      expectedAgent: 'data-engineer',
+    },
+    {
+      name: 'ai-ml-specialist',
+      prompt: 'You are the DEVELOPER agent. Train the recommendation model using PyTorch.',
+      expectedAgent: 'ai-ml-specialist',
+    },
+    {
+      name: 'web3-blockchain-expert',
+      prompt: 'You are the DEVELOPER agent. Write the Solidity smart contract for token staking.',
+      expectedAgent: 'web3-blockchain-expert',
+    },
+    {
+      name: 'scientific-research-expert',
+      prompt:
+        'You are the DEVELOPER agent. Implement the genomic analysis workflow for variant calling.',
+      expectedAgent: 'scientific-research-expert',
+    },
+    {
+      name: 'gamedev-pro',
+      prompt: 'You are the DEVELOPER agent. Implement game physics for the Unity project.',
+      expectedAgent: 'gamedev-pro',
+    },
   ];
 
   for (const { name, prompt, expectedAgent } of misroutingTests) {
@@ -91,14 +191,25 @@ test('Check 7: Specialist misrouting detection for all 49 agents', async (t) => 
   // Correct developer routing (should NOT warn)
   const correctDeveloperTests = [
     { name: 'bug fix', prompt: 'You are the DEVELOPER agent. Fix the null pointer in getUser().' },
-    { name: 'feature implementation', prompt: 'You are the DEVELOPER agent. Implement the caching layer for API responses.' },
-    { name: 'code implementation', prompt: 'You are the DEVELOPER agent. Implement the payment service using async/await patterns.' },
+    {
+      name: 'feature implementation',
+      prompt: 'You are the DEVELOPER agent. Implement the caching layer for API responses.',
+    },
+    {
+      name: 'code implementation',
+      prompt:
+        'You are the DEVELOPER agent. Implement the payment service using async/await patterns.',
+    },
   ];
 
   for (const { name, prompt } of correctDeveloperTests) {
     await t.test(`Check 7: Developer routing correct - ${name}`, () => {
       const result = checkSpecialistOverride('Task', { prompt });
-      assert.strictEqual(result.message, undefined, `Developer routing for "${name}" should not warn, but got: ${result.message}`);
+      assert.strictEqual(
+        result.message,
+        undefined,
+        `Developer routing for "${name}" should not warn, but got: ${result.message}`
+      );
     });
   }
 });
@@ -107,7 +218,7 @@ test('Check 7: Specialist misrouting detection for all 49 agents', async (t) => 
 // Suite 2: Domain Specialist Resolution (phase-advance-reader)
 // ====================================================================================
 
-test('Domain specialist resolution for all technology specialists', async (t) => {
+test('Domain specialist resolution for all technology specialists', async t => {
   const domainTests = [
     // Language specialists
     { context: 'Build a Python async data pipeline with asyncio', expected: 'python-pro' },
@@ -150,7 +261,11 @@ test('Domain specialist resolution for all technology specialists', async (t) =>
   for (const { context, expected } of domainTests) {
     await t.test(`Domain specialist: ${context?.slice(0, 40) || 'null/empty'}`, () => {
       const resolved = resolveDomainSpecialist(context);
-      assert.strictEqual(resolved, expected, `Expected ${expected}, got ${resolved} for context: ${context}`);
+      assert.strictEqual(
+        resolved,
+        expected,
+        `Expected ${expected}, got ${resolved} for context: ${context}`
+      );
     });
   }
 });
@@ -159,22 +274,29 @@ test('Domain specialist resolution for all technology specialists', async (t) =>
 // Suite 3: Cross-Module Integration
 // ====================================================================================
 
-test('Cross-module integration: Check 7 and domain specialist coverage', async (t) => {
+test('Cross-module integration: Check 7 and domain specialist coverage', async t => {
   await t.test('Check 7 and domain specialist cover complementary sets', () => {
     // Check 7 should catch core agent misrouting (qa, devops, technical-writer, etc.)
     // Domain specialist should resolve language/framework specialists (python-pro, frontend-pro, etc.)
     // Together they should cover most of the 49 agents
 
-    const check7Result = checkSpecialistOverride('Task', { prompt: 'You are the DEVELOPER agent. Write tests for auth.' });
+    const check7Result = checkSpecialistOverride('Task', {
+      prompt: 'You are the DEVELOPER agent. Write tests for auth.',
+    });
     const domainSpecialist = resolveDomainSpecialist('Build a Python API');
 
     assert.ok(check7Result.message, 'Check 7 should catch QA misrouting');
-    assert.strictEqual(domainSpecialist, 'python-pro', 'Domain specialist should resolve python-pro');
+    assert.strictEqual(
+      domainSpecialist,
+      'python-pro',
+      'Domain specialist should resolve python-pro'
+    );
   });
 
   await t.test('No conflicts between Check 7 and domain specialist', () => {
     // Verify that both can coexist without conflict
-    const pythonPrompt = 'You are the DEVELOPER agent. Build a Python FastAPI service and write tests for it.';
+    const pythonPrompt =
+      'You are the DEVELOPER agent. Build a Python FastAPI service and write tests for it.';
 
     const check7Result = checkSpecialistOverride('Task', { prompt: pythonPrompt });
     const domainSpecialist = resolveDomainSpecialist(pythonPrompt);
@@ -184,6 +306,10 @@ test('Cross-module integration: Check 7 and domain specialist coverage', async (
     // - Domain specialist resolves to fastapi-pro (FastAPI)
 
     assert.ok(check7Result.message, 'Check 7 should warn about tests keyword');
-    assert.strictEqual(domainSpecialist, 'fastapi-pro', 'Domain specialist should resolve fastapi-pro');
+    assert.strictEqual(
+      domainSpecialist,
+      'fastapi-pro',
+      'Domain specialist should resolve fastapi-pro'
+    );
   });
 });

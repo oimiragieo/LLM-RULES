@@ -4160,159 +4160,58 @@
   },
   "index": {
     "byCapability": {
-      "architect": [
-        "architect"
-      ],
-      "context-compressor": [
-        "context-compressor"
-      ],
-      "developer": [
-        "developer"
-      ],
-      "planner": [
-        "planner"
-      ],
-      "pm": [
-        "pm"
-      ],
-      "qa": [
-        "qa"
-      ],
-      "reflection-agent": [
-        "reflection-agent"
-      ],
-      "router": [
-        "router"
-      ],
-      "technical-writer": [
-        "technical-writer"
-      ],
-      "c4-code": [
-        "c4-code"
-      ],
-      "c4-component": [
-        "c4-component"
-      ],
-      "c4-container": [
-        "c4-container"
-      ],
-      "c4-context": [
-        "c4-context"
-      ],
-      "code-reviewer": [
-        "code-reviewer"
-      ],
-      "code-simplifier": [
-        "code-simplifier"
-      ],
-      "conductor-validator": [
-        "conductor-validator"
-      ],
-      "database-architect": [
-        "database-architect"
-      ],
-      "devops-troubleshooter": [
-        "devops-troubleshooter"
-      ],
-      "devops": [
-        "devops"
-      ],
-      "incident-responder": [
-        "incident-responder"
-      ],
-      "researcher": [
-        "researcher"
-      ],
-      "reverse-engineer": [
-        "reverse-engineer"
-      ],
-      "security-architect": [
-        "security-architect"
-      ],
-      "ai-ml-specialist": [
-        "ai-ml-specialist"
-      ],
-      "android": [
-        "android-pro"
-      ],
-      "data-engineer": [
-        "data-engineer"
-      ],
-      "expo-mobile-developer": [
-        "expo-mobile-developer"
-      ],
-      "fastapi": [
-        "fastapi-pro"
-      ],
-      "frontend": [
-        "frontend-pro"
-      ],
-      "gamedev": [
-        "gamedev-pro"
-      ],
-      "golang": [
-        "golang-pro"
-      ],
-      "graphql": [
-        "graphql-pro"
-      ],
-      "ios": [
-        "ios-pro"
-      ],
-      "java": [
-        "java-pro"
-      ],
-      "mobile-ux-reviewer": [
-        "mobile-ux-reviewer"
-      ],
-      "nextjs": [
-        "nextjs-pro"
-      ],
-      "nodejs": [
-        "nodejs-pro"
-      ],
-      "php": [
-        "php-pro"
-      ],
-      "python": [
-        "python-pro"
-      ],
-      "rust": [
-        "rust-pro"
-      ],
-      "scientific-research": [
-        "scientific-research-expert"
-      ],
-      "sveltekit": [
-        "sveltekit-expert"
-      ],
-      "tauri-desktop-developer": [
-        "tauri-desktop-developer"
-      ],
-      "typescript": [
-        "typescript-pro"
-      ],
-      "web3-blockchain": [
-        "web3-blockchain-expert"
-      ],
-      "evolution-orchestrator": [
-        "evolution-orchestrator"
-      ],
-      "master-orchestrator": [
-        "master-orchestrator"
-      ],
-      "party-orchestrator": [
-        "party-orchestrator"
-      ],
-      "swarm-coordinator": [
-        "swarm-coordinator"
-      ]
+      "architect": ["architect"],
+      "context-compressor": ["context-compressor"],
+      "developer": ["developer"],
+      "planner": ["planner"],
+      "pm": ["pm"],
+      "qa": ["qa"],
+      "reflection-agent": ["reflection-agent"],
+      "router": ["router"],
+      "technical-writer": ["technical-writer"],
+      "c4-code": ["c4-code"],
+      "c4-component": ["c4-component"],
+      "c4-container": ["c4-container"],
+      "c4-context": ["c4-context"],
+      "code-reviewer": ["code-reviewer"],
+      "code-simplifier": ["code-simplifier"],
+      "conductor-validator": ["conductor-validator"],
+      "database-architect": ["database-architect"],
+      "devops-troubleshooter": ["devops-troubleshooter"],
+      "devops": ["devops"],
+      "incident-responder": ["incident-responder"],
+      "researcher": ["researcher"],
+      "reverse-engineer": ["reverse-engineer"],
+      "security-architect": ["security-architect"],
+      "ai-ml-specialist": ["ai-ml-specialist"],
+      "android": ["android-pro"],
+      "data-engineer": ["data-engineer"],
+      "expo-mobile-developer": ["expo-mobile-developer"],
+      "fastapi": ["fastapi-pro"],
+      "frontend": ["frontend-pro"],
+      "gamedev": ["gamedev-pro"],
+      "golang": ["golang-pro"],
+      "graphql": ["graphql-pro"],
+      "ios": ["ios-pro"],
+      "java": ["java-pro"],
+      "mobile-ux-reviewer": ["mobile-ux-reviewer"],
+      "nextjs": ["nextjs-pro"],
+      "nodejs": ["nodejs-pro"],
+      "php": ["php-pro"],
+      "python": ["python-pro"],
+      "rust": ["rust-pro"],
+      "scientific-research": ["scientific-research-expert"],
+      "sveltekit": ["sveltekit-expert"],
+      "tauri-desktop-developer": ["tauri-desktop-developer"],
+      "typescript": ["typescript-pro"],
+      "web3-blockchain": ["web3-blockchain-expert"],
+      "evolution-orchestrator": ["evolution-orchestrator"],
+      "master-orchestrator": ["master-orchestrator"],
+      "party-orchestrator": ["party-orchestrator"],
+      "swarm-coordinator": ["swarm-coordinator"]
     },
     "byDomain": {
-      "security": [
-        "architect",
-        "party-orchestrator"
-      ],
+      "security": ["architect", "party-orchestrator"],
       "code": [
         "context-compressor",
         "developer",
@@ -4350,32 +4249,13 @@
         "typescript-pro",
         "web3-blockchain-expert"
       ],
-      "planning": [
-        "planner",
-        "pm"
-      ],
-      "documentation": [
-        "technical-writer"
-      ],
-      "architecture": [
-        "c4-container",
-        "c4-context",
-        "database-architect"
-      ],
-      "devops": [
-        "devops"
-      ],
-      "research": [
-        "researcher"
-      ],
-      "mobile": [
-        "mobile-ux-reviewer"
-      ],
-      "orchestration": [
-        "evolution-orchestrator",
-        "master-orchestrator",
-        "swarm-coordinator"
-      ]
+      "planning": ["planner", "pm"],
+      "documentation": ["technical-writer"],
+      "architecture": ["c4-container", "c4-context", "database-architect"],
+      "devops": ["devops"],
+      "research": ["researcher"],
+      "mobile": ["mobile-ux-reviewer"],
+      "orchestration": ["evolution-orchestrator", "master-orchestrator", "swarm-coordinator"]
     },
     "byCategory": {
       "core": [

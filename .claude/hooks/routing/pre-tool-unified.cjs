@@ -138,7 +138,13 @@ function checkSessionCleanup() {
 // Check 2: Execution Limit Monitor (from execution-limit-monitor-hook.cjs)
 // =============================================================================
 
-const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'execution-limits.json');
+const STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'execution-limits.json'
+);
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const EVENTS_FILE = path.join(METRICS_DIR, 'execution-limit-events.jsonl');
 const EXECUTION_LIMIT_EVENTS_MAX_LINES = Number(

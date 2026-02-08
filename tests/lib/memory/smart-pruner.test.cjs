@@ -19,7 +19,10 @@ const FIXTURES_DIR = path.join(PROJECT_ROOT, 'tests/fixtures/memory-management')
 
 // Helper: Create temporary test directory
 function createTempDir() {
-  const tmpDir = path.join(os.tmpdir(), `smart-pruner-test-${crypto.randomBytes(4).toString('hex')}`);
+  const tmpDir = path.join(
+    os.tmpdir(),
+    `smart-pruner-test-${crypto.randomBytes(4).toString('hex')}`
+  );
   fs.mkdirSync(tmpDir, { recursive: true });
   return tmpDir;
 }
@@ -276,7 +279,10 @@ This was resolved over 30 days ago.
 
     const finalContent = fs.readFileSync(testFile, 'utf8');
     assert.ok(finalContent.includes('[PERMANENT]'), '[PERMANENT] resolved entry should be kept');
-    assert.ok(!finalContent.includes('Normal Bug'), 'Non-permanent resolved entry should be removed');
+    assert.ok(
+      !finalContent.includes('Normal Bug'),
+      'Non-permanent resolved entry should be removed'
+    );
   } finally {
     cleanupTempDir(tmpDir);
   }

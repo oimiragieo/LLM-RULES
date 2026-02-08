@@ -110,7 +110,9 @@ JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ik
   assert.ok(!coldContent.includes('sk-1234567890abcdef'), 'Should not contain API key');
   assert.ok(!coldContent.includes('user@example.com'), 'Should not contain email');
   assert.ok(
-    !coldContent.includes('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ'),
+    !coldContent.includes(
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ'
+    ),
     'Should not contain JWT'
   );
 

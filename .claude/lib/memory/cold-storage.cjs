@@ -19,7 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
-const { safeParseJSON } = require('../utils/safe-json.cjs');
+
 const { scrubSensitiveContent } = require('../utils/sensitive-scrubber.cjs');
 
 // Default options
@@ -54,8 +54,8 @@ function archiveWarmToCold(memoryDir, opts = {}) {
   if (fs.existsSync(archiveDir)) {
     archiveFiles = fs
       .readdirSync(archiveDir)
-      .filter((f) => f.endsWith('.md') && f.includes('-20')) // Match pattern: learnings-2026-01.md
-      .map((f) => path.join(archiveDir, f));
+      .filter(f => f.endsWith('.md') && f.includes('-20')) // Match pattern: learnings-2026-01.md
+      .map(f => path.join(archiveDir, f));
   }
 
   let archivedFileCount = 0;
@@ -92,7 +92,7 @@ function archiveWarmToCold(memoryDir, opts = {}) {
     const coldFile = path.join(coldDir, `cold-${yearMonth}.jsonl`);
 
     // Append entries to cold JSONL (one JSON object per line)
-    const jsonlEntries = sections.map((section) => JSON.stringify(section)).join('\n') + '\n';
+    const jsonlEntries = sections.map(section => JSON.stringify(section)).join('\n') + '\n';
 
     // Append to cold file (or create if doesn't exist)
     if (fs.existsSync(coldFile)) {
@@ -201,7 +201,7 @@ function getStorageStats(memoryDir) {
   let warmFiles = 0;
   let warmBytes = 0;
   if (fs.existsSync(archiveDir)) {
-    const files = fs.readdirSync(archiveDir).filter((f) => f.endsWith('.md'));
+    const files = fs.readdirSync(archiveDir).filter(f => f.endsWith('.md'));
     warmFiles = files.length;
     for (const file of files) {
       warmBytes += fs.statSync(path.join(archiveDir, file)).size;
@@ -212,7 +212,7 @@ function getStorageStats(memoryDir) {
   let coldFiles = 0;
   let coldBytes = 0;
   if (fs.existsSync(coldDir)) {
-    const files = fs.readdirSync(coldDir).filter((f) => f.endsWith('.jsonl'));
+    const files = fs.readdirSync(coldDir).filter(f => f.endsWith('.jsonl'));
     coldFiles = files.length;
     for (const file of files) {
       coldBytes += fs.statSync(path.join(coldDir, file)).size;
@@ -232,7 +232,7 @@ function getStorageStats(memoryDir) {
  * @param {string} query - Search query
  * @returns {Array} Empty array (stub)
  */
-function searchCold(query) {
+function searchCold(_query) {
   // Stub: return empty array
   return [];
 }
