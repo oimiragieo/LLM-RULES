@@ -109,12 +109,15 @@ const newEntry = `| /${commandName} | ${description} | ${args.skill} |`;
 ### Step 4: Run Post-Creation Integration
 
 ```javascript
-const { runIntegrationChecklist, queueCrossCreatorReview } = require('.claude/lib/creator-commons.cjs');
+const {
+  runIntegrationChecklist,
+  queueCrossCreatorReview,
+} = require('.claude/lib/creator-commons.cjs');
 
 await runIntegrationChecklist('command', commandPath);
 await queueCrossCreatorReview('command', commandPath, {
   artifactName: commandName,
-  createdBy: 'command-creator'
+  createdBy: 'command-creator',
 });
 ```
 
@@ -123,7 +126,10 @@ await queueCrossCreatorReview('command', commandPath, {
 After command creation, run integration checklist:
 
 ```javascript
-const { runIntegrationChecklist, queueCrossCreatorReview } = require('.claude/lib/creator-commons.cjs');
+const {
+  runIntegrationChecklist,
+  queueCrossCreatorReview,
+} = require('.claude/lib/creator-commons.cjs');
 
 // 1. Run integration checklist
 const result = await runIntegrationChecklist('command', '.claude/commands/<command-name>.md');
@@ -131,7 +137,7 @@ const result = await runIntegrationChecklist('command', '.claude/commands/<comma
 // 2. Queue cross-creator review
 await queueCrossCreatorReview('command', '.claude/commands/<command-name>.md', {
   artifactName: '<command-name>',
-  createdBy: 'command-creator'
+  createdBy: 'command-creator',
 });
 
 // 3. Review impact report
@@ -139,6 +145,7 @@ await queueCrossCreatorReview('command', '.claude/commands/<command-name>.md', {
 ```
 
 **Integration verification:**
+
 - [ ] Command added to command-catalog.md
 - [ ] Target skill exists and is valid
 - [ ] Command file has proper YAML frontmatter
@@ -151,7 +158,7 @@ await queueCrossCreatorReview('command', '.claude/commands/<command-name>.md', {
 ```javascript
 Skill({
   skill: 'command-creator',
-  args: '--name tdd --skill tdd --description "Test-driven development workflow"'
+  args: '--name tdd --skill tdd --description "Test-driven development workflow"',
 });
 ```
 
@@ -160,7 +167,7 @@ Skill({
 ```javascript
 Skill({
   skill: 'command-creator',
-  args: '--name debug --skill debugging --description "Systematic debugging workflow"'
+  args: '--name debug --skill debugging --description "Systematic debugging workflow"',
 });
 ```
 
@@ -175,6 +182,7 @@ Skill({
 Read `.claude/context/memory/learnings.md`
 
 **After completing:**
+
 - New command pattern → `.claude/context/memory/learnings.md`
 - Command creation issue → `.claude/context/memory/issues.md`
 - Delegation decision → `.claude/context/memory/decisions.md`

@@ -1108,12 +1108,14 @@ ls -la .claude/schemas/*.schema.json
 ## Post-Creation Integration
 
 After creation completes, run the ecosystem integration checklist:
+
 1. Call `runIntegrationChecklist(artifactType, artifactPath)` from `.claude/lib/creators/creator-commons.cjs`
 2. Call `queueCrossCreatorReview(artifactType, artifactPath)` from `.claude/lib/creators/creator-commons.cjs`
 3. Review the impact report — address all `mustHave` items before marking task complete
 4. Log any `shouldHave` items as follow-up tasks
 
 **Integration verification:**
+
 - [ ] Schema added to schema-catalog.md
 - [ ] Schema validator wired (if applicable)
 - [ ] Schema referenced by consuming artifacts

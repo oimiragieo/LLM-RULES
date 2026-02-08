@@ -60,12 +60,18 @@ describe('validatePostCreation', () => {
 
   it('returns passed when artifact has provenance header', () => {
     const artifactPath = path.join(TMP_DIR, 'test-skill.md');
-    fs.writeFileSync(artifactPath, '<!-- Agent: developer | Task: #1 | Session: 2026-02-08 -->\n# Test Skill\n');
+    fs.writeFileSync(
+      artifactPath,
+      '<!-- Agent: developer | Task: #1 | Session: 2026-02-08 -->\n# Test Skill\n'
+    );
 
     const result = validatePostCreation('skill', artifactPath);
 
     assert.ok(Array.isArray(result.passed), 'result.passed should be an array');
-    assert.ok(result.passed.some(p => p.includes('provenance')), 'should have provenance check in passed');
+    assert.ok(
+      result.passed.some(p => p.includes('provenance')),
+      'should have provenance check in passed'
+    );
   });
 
   it('returns failed when artifact missing provenance header', () => {
@@ -75,7 +81,10 @@ describe('validatePostCreation', () => {
     const result = validatePostCreation('skill', artifactPath);
 
     assert.ok(Array.isArray(result.failed), 'result.failed should be an array');
-    assert.ok(result.failed.some(f => f.includes('provenance')), 'should have provenance check in failed');
+    assert.ok(
+      result.failed.some(f => f.includes('provenance')),
+      'should have provenance check in failed'
+    );
   });
 
   it('returns failed when artifact file does not exist', () => {
@@ -83,12 +92,18 @@ describe('validatePostCreation', () => {
 
     const result = validatePostCreation('skill', artifactPath);
 
-    assert.ok(result.failed.some(f => f.includes('exist')), 'should report file does not exist');
+    assert.ok(
+      result.failed.some(f => f.includes('exist')),
+      'should report file does not exist'
+    );
   });
 
   it('returns correct structure with passed, failed, warnings arrays', () => {
     const artifactPath = path.join(TMP_DIR, 'test-agent.md');
-    fs.writeFileSync(artifactPath, '<!-- Agent: developer | Task: #1 | Session: 2026-02-08 -->\n# Agent\n');
+    fs.writeFileSync(
+      artifactPath,
+      '<!-- Agent: developer | Task: #1 | Session: 2026-02-08 -->\n# Agent\n'
+    );
 
     const result = validatePostCreation('agent', artifactPath);
 
@@ -226,7 +241,10 @@ describe('validateSchema', () => {
     const result = validateSchema('unknown-type', { anything: 'goes' });
 
     assert.strictEqual(result.valid, true);
-    assert.ok(result.warnings && result.warnings.length > 0, 'should have warnings about missing schema');
+    assert.ok(
+      result.warnings && result.warnings.length > 0,
+      'should have warnings about missing schema'
+    );
   });
 
   it('handles malformed content gracefully', () => {
@@ -252,7 +270,10 @@ describe('runIntegrationChecklist', () => {
 
   it('returns structured result with passed, failed, warnings', () => {
     const artifactPath = path.join(TMP_DIR, 'test-artifact.md');
-    fs.writeFileSync(artifactPath, '<!-- Agent: dev | Task: #1 | Session: 2026-02-08 -->\n# Test\n');
+    fs.writeFileSync(
+      artifactPath,
+      '<!-- Agent: dev | Task: #1 | Session: 2026-02-08 -->\n# Test\n'
+    );
 
     const result = runIntegrationChecklist('skill', artifactPath);
 
@@ -274,7 +295,10 @@ describe('runIntegrationChecklist', () => {
 
   it('runs all checks and aggregates results', () => {
     const artifactPath = path.join(TMP_DIR, 'good-artifact.md');
-    fs.writeFileSync(artifactPath, '<!-- Agent: dev | Task: #1 | Session: 2026-02-08 -->\n# Good\n');
+    fs.writeFileSync(
+      artifactPath,
+      '<!-- Agent: dev | Task: #1 | Session: 2026-02-08 -->\n# Good\n'
+    );
 
     const result = runIntegrationChecklist('agent', artifactPath);
 

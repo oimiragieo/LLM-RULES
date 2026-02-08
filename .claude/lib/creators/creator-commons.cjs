@@ -97,7 +97,9 @@ function validatePostCreation(artifactType, artifactPath, _options = {}) {
     if (PROVENANCE_REGEX.test(firstLine)) {
       passed.push('provenance header present');
     } else {
-      failed.push('Missing provenance header (expected: <!-- Agent: {type} | Task: #{id} | Session: {date} -->)');
+      failed.push(
+        'Missing provenance header (expected: <!-- Agent: {type} | Task: #{id} | Session: {date} -->)'
+      );
     }
 
     // Check 3: Non-empty content
@@ -131,9 +133,7 @@ function updateCatalog(catalogPath, entry) {
 
   try {
     const existing = fs.readFileSync(catalogPath, 'utf8');
-    const newContent = existing.endsWith('\n')
-      ? existing + entry
-      : existing + '\n' + entry;
+    const newContent = existing.endsWith('\n') ? existing + entry : existing + '\n' + entry;
 
     fs.writeFileSync(catalogPath, newContent, 'utf8');
     return { success: true };
@@ -156,7 +156,8 @@ function updateCatalog(catalogPath, entry) {
  * @returns {{ success: boolean, error?: string }}
  */
 function queueCrossCreatorReview(artifactType, artifactPath, options = {}) {
-  const queuePath = options.queuePath ||
+  const queuePath =
+    options.queuePath ||
     path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
 
   const entry = {
@@ -212,12 +213,20 @@ function validateSchema(artifactType, content) {
 
   if (schemaFile === undefined) {
     // Unknown artifact type - pass with warning
-    return { valid: true, errors: [], warnings: ['No schema mapping for artifact type: ' + artifactType] };
+    return {
+      valid: true,
+      errors: [],
+      warnings: ['No schema mapping for artifact type: ' + artifactType],
+    };
   }
 
   if (schemaFile === null) {
     // Artifact type explicitly has no schema - pass with warning
-    return { valid: true, errors: [], warnings: ['No schema defined for artifact type: ' + artifactType] };
+    return {
+      valid: true,
+      errors: [],
+      warnings: ['No schema defined for artifact type: ' + artifactType],
+    };
   }
 
   // Load schema
@@ -276,7 +285,11 @@ function validateSchema(artifactType, content) {
     }
 
     // MinLength for strings
-    if (fieldSchema.minLength && typeof value === 'string' && value.length < fieldSchema.minLength) {
+    if (
+      fieldSchema.minLength &&
+      typeof value === 'string' &&
+      value.length < fieldSchema.minLength
+    ) {
       errors.push(`Field '${field}' is too short (min ${fieldSchema.minLength} chars)`);
     }
   }

@@ -32,9 +32,11 @@ This plan implements the Unified Ecosystem Creation Protocol designed in Phase 1
 **Recommended Skills:** `tdd`, `verification-before-completion`
 
 **Files to Modify:**
+
 - `.claude/hooks/routing/unified-creator-guard.cjs` -- Add 2 new entries to CREATOR_CONFIGS array
 
 **Changes:**
+
 1. Add `CREATOR_CONFIGS` entry for `settings.json`:
    ```javascript
    {
@@ -55,6 +57,7 @@ This plan implements the Unified Ecosystem Creation Protocol designed in Phase 1
    ```
 
 **Test Requirements:**
+
 - Test that writes to `.claude/settings.json` are BLOCKED unless hook-creator is active
 - Test that writes to `.claude/context/agent-registry.json` are BLOCKED unless agent-creator is active
 - Test that existing creator paths still work (regression)
@@ -72,16 +75,20 @@ This plan implements the Unified Ecosystem Creation Protocol designed in Phase 1
 **Recommended Skills:** `tdd`, `verification-before-completion`
 
 **Files to Modify:**
+
 - `.claude/hooks/routing/unified-creator-guard.cjs` -- Modify DEFAULT_TTL_MS initialization
 
 **Changes:**
 Replace:
+
 ```javascript
 const DEFAULT_TTL_MS = 3 * 60 * 1000;
 ```
+
 With a bounded version that reads env var with min/max enforcement:
+
 ```javascript
-const MIN_TTL_MS = 30 * 1000;   // 30 seconds minimum
+const MIN_TTL_MS = 30 * 1000; // 30 seconds minimum
 const MAX_TTL_MS = 10 * 60 * 1000; // 10 minutes maximum
 const DEFAULT_TTL_MS = (() => {
   const envVal = Number(process.env.CREATOR_STATE_TTL_MS);
@@ -91,6 +98,7 @@ const DEFAULT_TTL_MS = (() => {
 ```
 
 **Test Requirements:**
+
 - Test default TTL is 180000ms when no env var set
 - Test `CREATOR_STATE_TTL_MS=Infinity` clamps to MAX_TTL_MS (600000)
 - Test `CREATOR_STATE_TTL_MS=-1` falls back to default
@@ -110,10 +118,12 @@ const DEFAULT_TTL_MS = (() => {
 **Recommended Skills:** `tdd`, `verification-before-completion`
 
 **Files to Modify:**
+
 - `.claude/hooks/routing/unified-creator-guard.cjs` -- Add 3 new CREATOR_CONFIGS entries
 
 **Changes:**
 Add entries for the 3 unguarded artifact types:
+
 ```javascript
 {
   creator: 'rule-creator',
@@ -137,12 +147,15 @@ Add entries for the 3 unguarded artifact types:
 ```
 
 **IMPORTANT:** Since these creators do not exist yet (created in Steps 10-12), set enforcement to `warn` mode for these 3 types until creators are available. Add a `warnOnlyCreators` array:
+
 ```javascript
 const WARN_ONLY_CREATORS = ['rule-creator', 'command-creator', 'tool-creator'];
 ```
+
 When `findRequiredCreator()` returns a creator in `WARN_ONLY_CREATORS`, issue a warning instead of blocking.
 
 **Test Requirements:**
+
 - Test that writing to `.claude/rules/new-rule.md` triggers warn (not block)
 - Test that writing to `.claude/commands/new-cmd.md` triggers warn (not block)
 - Test that writing to `.claude/tools/cli/new-tool.cjs` triggers warn (not block)
@@ -162,9 +175,11 @@ When `findRequiredCreator()` returns a creator in `WARN_ONLY_CREATORS`, issue a 
 **Recommended Skills:** `tdd`, `verification-before-completion`
 
 **Files to Create:**
+
 - `.claude/lib/creators/creator-commons.cjs` (~200 lines)
 
 **Responsibilities:**
+
 1. **`validatePostCreation(artifactType, artifactPath, options)`** -- Runs a common post-creation checklist:
    - Verify file exists at `artifactPath`
    - Verify provenance header is present
@@ -192,6 +207,7 @@ When `findRequiredCreator()` returns a creator in `WARN_ONLY_CREATORS`, issue a 
    - Returns structured pass/fail results
 
 **Test Requirements:**
+
 - Unit tests for each of the 5 functions
 - Test `validatePostCreation` detects missing provenance header
 - Test `updateCatalog` appends to existing catalog
@@ -212,6 +228,7 @@ When `findRequiredCreator()` returns a creator in `WARN_ONLY_CREATORS`, issue a 
 **Recommended Skills:** `verification-before-completion`
 
 **Files to Create:**
+
 - `.claude/context/runtime/ecosystem-impact-graph.json`
 
 **Content:** Use the schema designed in the architecture report (Section 4.2), covering all 9 artifact types with their mustHave, shouldHave, and niceToHave downstream actions. Include:
@@ -227,6 +244,7 @@ When `findRequiredCreator()` returns a creator in `WARN_ONLY_CREATORS`, issue a 
 - **tool** -> mustHave: tool-catalog; shouldHave: package.json script, skill wiring
 
 **Test Requirements:**
+
 - Validate JSON is well-formed
 - Validate all artifact types are present
 - Validate structure matches expected schema (version, artifactTypes, each with mustHave/shouldHave arrays)
@@ -244,9 +262,11 @@ When `findRequiredCreator()` returns a creator in `WARN_ONLY_CREATORS`, issue a 
 **Recommended Skills:** `tdd`, `verification-before-completion`
 
 **Files to Create:**
+
 - `.claude/lib/creators/ecosystem-impact-analyzer.cjs` (~150 lines)
 
 **Responsibilities:**
+
 1. **`analyzeImpact(artifactType, artifactPath, artifactContent)`** -- Main entry point:
    - Loads ecosystem-impact-graph.json
    - Looks up the artifact type
@@ -272,6 +292,7 @@ When `findRequiredCreator()` returns a creator in `WARN_ONLY_CREATORS`, issue a 
 3. **`generateImpactSummary(impactReport)`** -- Human-readable markdown summary of impact analysis
 
 **Test Requirements:**
+
 - Test analyzeImpact for agent type returns correct mustHave/shouldHave lists
 - Test analyzeImpact for skill type returns command suggestion in shouldHave
 - Test checkMustHaveCompletion detects missing catalog entry
@@ -291,12 +312,14 @@ When `findRequiredCreator()` returns a creator in `WARN_ONLY_CREATORS`, issue a 
 **Recommended Skills:** `tdd`, `verification-before-completion`
 
 **Files to Modify:**
+
 - `.claude/hooks/routing/unified-creator-guard.cjs` -- Add content validation after path validation passes
 
 **Changes:**
 After the existing `findRequiredCreator` + `isCreatorActive` check passes (allowing the write), add a PostToolUse content validation step. This validates that the written content matches the expected schema for that artifact type.
 
 Implementation approach: Add a new function `validateArtifactContent(artifactType, content)`:
+
 1. Load the schema for the artifact type from `.claude/schemas/`
 2. For markdown artifacts (skills, agents, workflows): extract YAML frontmatter and validate required fields
 3. For JSON artifacts (schemas, registries): validate against JSON schema
@@ -304,19 +327,21 @@ Implementation approach: Add a new function `validateArtifactContent(artifactTyp
 5. On validation failure: log warning (not block -- content validation starts in warn mode)
 
 Schema mapping:
+
 ```javascript
 const SCHEMA_MAP = {
-  'skill': 'skill-definition.schema.json',
-  'agent': 'agent-definition.schema.json',
-  'hook': 'hook-definition.schema.json',
-  'workflow': 'workflow-definition.schema.json',
-  'schema': null, // self-referential
+  skill: 'skill-definition.schema.json',
+  agent: 'agent-definition.schema.json',
+  hook: 'hook-definition.schema.json',
+  workflow: 'workflow-definition.schema.json',
+  schema: null, // self-referential
   'config:settings': null, // no schema yet
   'config:agent-registry': 'agent-config.schema.json',
 };
 ```
 
 **Test Requirements:**
+
 - Test that a skill SKILL.md with valid frontmatter passes validation
 - Test that a skill SKILL.md missing required `name` field triggers warning
 - Test that a JSON schema with valid structure passes
@@ -336,11 +361,13 @@ const SCHEMA_MAP = {
 **Recommended Skills:** `verification-before-completion`
 
 **Files to Create:**
+
 - `.claude/skills/artifact-updater/SKILL.md` (~250 lines)
 
 **NOTE:** This step creates the skill content file only. The skill MUST be integrated via the proper creator workflow. However, since the artifact-updater IS a skill being created, the developer should invoke `Skill({ skill: 'skill-creator' })` to create it properly. If skill-creator cannot be used (circular dependency), create manually and document the integration gap for artifact-integrator to handle.
 
 **Skill Design:**
+
 1. **Input:** artifact type (agent|skill|hook|workflow|template|schema) + artifact path
 2. **Determine update scope:** Read existing artifact, diff with intended changes
 3. **Delegate to appropriate creator in "update mode":**
@@ -353,12 +380,14 @@ const SCHEMA_MAP = {
    - Update memory (learnings.md)
 
 **Why unified instead of 5 separate updaters:**
+
 - Single skill reduces maintenance burden
 - Parameterized by artifact type -- one set of update logic
 - Delegates to specialized creators when needed (they know their specific post-steps)
 - Eliminates 5 ghost skill references in existing creators
 
 **Test Requirements:**
+
 - Verify skill file structure matches skill-definition.schema.json
 - Verify skill has correct frontmatter (name, version, assigned agents)
 
@@ -375,6 +404,7 @@ const SCHEMA_MAP = {
 **Recommended Skills:** `verification-before-completion`
 
 **Files to Modify:**
+
 - `.claude/skills/skill-creator/SKILL.md` -- Add reference to creator-commons for post-creation validation
 - `.claude/skills/agent-creator/SKILL.md` -- Add reference to creator-commons
 - `.claude/skills/hook-creator/SKILL.md` -- Add reference to creator-commons
@@ -383,6 +413,7 @@ const SCHEMA_MAP = {
 - `.claude/skills/schema-creator/SKILL.md` -- Add reference to creator-commons
 
 **Changes for each creator:**
+
 1. **Replace Step 0 updater delegation:** Change "delegate to {type}-updater" to "delegate to artifact-updater"
    - Replace: `Skill({ skill: 'agent-updater' })` -> `Skill({ skill: 'artifact-updater', args: 'agent' })`
    - This fixes all 5 dead-end updater references
@@ -398,6 +429,7 @@ const SCHEMA_MAP = {
 **NOTE:** This is an incremental enhancement, NOT a rewrite. The creator SKILL.md files are updated with 3 targeted changes each, not restructured.
 
 **Test Requirements:**
+
 - Verify each modified SKILL.md still has valid frontmatter
 - Verify "artifact-updater" replaces all 5 ghost updater references (grep verification)
 - Verify "consider if companion" advisory language is replaced (grep verification)
@@ -415,9 +447,11 @@ const SCHEMA_MAP = {
 **Recommended Skills:** `verification-before-completion`
 
 **Files to Create:**
+
 - `.claude/skills/command-creator/SKILL.md` (~200 lines)
 
 **Skill Design (follows ADR-087 thin-delegator pattern):**
+
 1. **Step 0:** Check if command already exists -> delegate to artifact-updater
 2. **Step 1:** Identify backing skill (required -- every command must delegate to a skill)
 3. **Step 2:** Generate command file content:
@@ -437,6 +471,7 @@ const SCHEMA_MAP = {
 **Post-Creation Steps:** Uses creator-commons.cjs for validation and catalog update
 
 **Test Requirements:**
+
 - Verify SKILL.md has valid frontmatter
 - Verify thin-delegator YAML pattern is documented correctly
 
@@ -453,9 +488,11 @@ const SCHEMA_MAP = {
 **Recommended Skills:** `verification-before-completion`
 
 **Files to Create:**
+
 - `.claude/skills/rule-creator/SKILL.md` (~180 lines)
 
 **Skill Design:**
+
 1. **Step 0:** Check if rule already exists -> delegate to artifact-updater
 2. **Step 1:** Determine rule content (headings, actionable items, constraints)
 3. **Step 2:** Validate no conflict with existing rules (read all `.claude/rules/*.md`)
@@ -467,6 +504,7 @@ const SCHEMA_MAP = {
 **NOTE:** Rules are auto-loaded by Claude Code from `.claude/rules/` -- no catalog/registry update needed. The rule-creator's primary value is content validation and conflict detection.
 
 **Test Requirements:**
+
 - Verify SKILL.md has valid frontmatter
 - Verify rule structure validation catches rules without headings
 
@@ -483,9 +521,11 @@ const SCHEMA_MAP = {
 **Recommended Skills:** `verification-before-completion`
 
 **Files to Create:**
+
 - `.claude/skills/tool-creator/SKILL.md` (~220 lines)
 
 **Skill Design:**
+
 1. **Step 0:** Check if tool already exists -> delegate to artifact-updater
 2. **Step 1:** Determine tool category (cli, analysis, integrations, maintenance, etc.)
 3. **Step 2:** Generate tool script skeleton with proper exports
@@ -497,6 +537,7 @@ const SCHEMA_MAP = {
 9. **Step 8:** Run creator-commons `queueCrossCreatorReview()`
 
 **Test Requirements:**
+
 - Verify SKILL.md has valid frontmatter
 - Verify tool categories match existing `.claude/tools/` subdirectories
 
@@ -513,10 +554,12 @@ const SCHEMA_MAP = {
 **Recommended Skills:** `tdd`, `verification-before-completion`
 
 **Files to Modify:**
+
 - `.claude/hooks/workflow/post-creation-integration.cjs` -- Add ecosystem-impact-analyzer call after creator completion detection
 
 **Changes:**
 When `isCreatorCompletion()` detects a creator task completion:
+
 1. Load ecosystem-impact-analyzer.cjs
 2. Call `analyzeImpact(artifactType, artifactPath)`
 3. Write impact analysis results to integration-queue.jsonl (existing queue)
@@ -524,6 +567,7 @@ When `isCreatorCompletion()` detects a creator task completion:
 5. If any mustHave items are incomplete, add a warning to the hook output
 
 **Integration pattern (lazy-load, graceful degradation):**
+
 ```javascript
 let impactAnalyzer;
 try {
@@ -542,6 +586,7 @@ if (impactAnalyzer) {
 ```
 
 **Test Requirements:**
+
 - Test that creator completion triggers impact analysis
 - Test that mustHave items with 'pending' status are queued
 - Test graceful degradation when ecosystem-impact-analyzer is not available
@@ -560,10 +605,12 @@ if (impactAnalyzer) {
 **Recommended Skills:** `verification-before-completion`
 
 **Files to Modify:**
+
 - `.claude/hooks/routing/unified-creator-guard.cjs` -- Remove entries from WARN_ONLY_CREATORS for creators that now exist
 
 **Changes:**
 After Steps 10-12 create the 3 new creator skills:
+
 1. Remove `'command-creator'` from `WARN_ONLY_CREATORS` (command-creator now exists)
 2. Remove `'rule-creator'` from `WARN_ONLY_CREATORS` (rule-creator now exists)
 3. Remove `'tool-creator'` from `WARN_ONLY_CREATORS` (tool-creator now exists)
@@ -571,6 +618,7 @@ After Steps 10-12 create the 3 new creator skills:
 This promotes enforcement from warn to block for all 9 artifact types.
 
 **Test Requirements:**
+
 - Test that writing to `.claude/rules/test.md` is now BLOCKED (not warned)
 - Test that writing to `.claude/commands/test.md` is now BLOCKED (not warned)
 - Test that writing to `.claude/tools/cli/test.cjs` is now BLOCKED (not warned)
@@ -589,6 +637,7 @@ This promotes enforcement from warn to block for all 9 artifact types.
 **Recommended Skills:** `tdd`, `verification-before-completion`, `checklist-generator`
 
 **Verification Checklist:**
+
 1. [ ] **Security:** `settings.json` writes blocked without hook-creator active
 2. [ ] **Security:** `agent-registry.json` writes blocked without agent-creator active
 3. [ ] **Security:** TTL bounds enforced (30s-10min range)
@@ -608,6 +657,7 @@ This promotes enforcement from warn to block for all 9 artifact types.
 **Test Command:** `pnpm test` (all tests must pass)
 
 **Commit Checkpoint:** If all 15 verification items pass, commit with:
+
 ```
 feat: implement unified ecosystem creation protocol (ADR-104)
 
@@ -659,6 +709,7 @@ Step 15 (verify + commit) <--- needs ALL
 ```
 
 **Parallelizable groups:**
+
 - Group A (parallel): Steps 1, 2, 4, 5
 - Group B (after A): Steps 3, 6, 7, 8
 - Group C (after B): Steps 9, 10, 11, 12, 13
@@ -668,20 +719,21 @@ Step 15 (verify + commit) <--- needs ALL
 
 ## Risk Assessment
 
-| Risk | Impact | Likelihood | Mitigation |
-|------|--------|-----------|------------|
-| Guard changes break existing creator workflows | HIGH | MEDIUM | Run regression tests after Steps 1-3; test all 6 existing creator paths |
-| Schema validation produces false positives | MEDIUM | MEDIUM | Start in warn mode (not block); tune before promoting to block |
-| creator-commons introduces coupling | MEDIUM | LOW | Keep commons functions stateless; use dependency injection for file paths |
-| Impact graph becomes stale | LOW | MEDIUM | Graph is declarative JSON; validate on every read; log unknown artifact types |
-| New creators conflict with existing manual creation patterns | MEDIUM | LOW | WARN_ONLY_CREATORS pattern allows gradual enforcement |
-| Circular dependency: creating skills via skill-creator | LOW | LOW | Document manual creation as fallback for bootstrap scenarios |
+| Risk                                                         | Impact | Likelihood | Mitigation                                                                    |
+| ------------------------------------------------------------ | ------ | ---------- | ----------------------------------------------------------------------------- |
+| Guard changes break existing creator workflows               | HIGH   | MEDIUM     | Run regression tests after Steps 1-3; test all 6 existing creator paths       |
+| Schema validation produces false positives                   | MEDIUM | MEDIUM     | Start in warn mode (not block); tune before promoting to block                |
+| creator-commons introduces coupling                          | MEDIUM | LOW        | Keep commons functions stateless; use dependency injection for file paths     |
+| Impact graph becomes stale                                   | LOW    | MEDIUM     | Graph is declarative JSON; validate on every read; log unknown artifact types |
+| New creators conflict with existing manual creation patterns | MEDIUM | LOW        | WARN_ONLY_CREATORS pattern allows gradual enforcement                         |
+| Circular dependency: creating skills via skill-creator       | LOW    | LOW        | Document manual creation as fallback for bootstrap scenarios                  |
 
 ---
 
 ## Files Created/Modified Summary
 
 **New files (8):**
+
 1. `.claude/lib/creators/creator-commons.cjs` (~200 lines)
 2. `.claude/lib/creators/ecosystem-impact-analyzer.cjs` (~150 lines)
 3. `.claude/context/runtime/ecosystem-impact-graph.json` (~100 lines)
@@ -692,6 +744,7 @@ Step 15 (verify + commit) <--- needs ALL
 8. Tests: `tests/lib/creators/creator-commons.test.cjs` + `ecosystem-impact-analyzer.test.cjs`
 
 **Modified files (8):**
+
 1. `.claude/hooks/routing/unified-creator-guard.cjs` (Steps 1, 2, 3, 7, 14)
 2. `.claude/hooks/workflow/post-creation-integration.cjs` (Step 13)
 3. `.claude/skills/skill-creator/SKILL.md` (Step 9 -- updater reference + commons)
@@ -710,16 +763,19 @@ Step 15 (verify + commit) <--- needs ALL
 Since this plan modifies 16 files, a commit checkpoint is REQUIRED after Phase 1 (Steps 1-7, security + infrastructure) before proceeding to Phase 2 (Steps 8-14, features).
 
 **Checkpoint 1 (after Step 7):**
+
 ```
 checkpoint: security fixes + shared infrastructure for ecosystem protocol
 ```
 
 **Checkpoint 2 (after Step 14):**
+
 ```
 checkpoint: new creators + analyzer integration complete
 ```
 
 **Final commit (Step 15):**
+
 ```
 feat: implement unified ecosystem creation protocol (ADR-104)
 ```
@@ -731,11 +787,13 @@ feat: implement unified ecosystem creation protocol (ADR-104)
 **Purpose:** Quality assessment and learning extraction
 
 **Tasks:**
+
 1. Spawn reflection-agent to analyze completed work
 2. Extract learnings and update memory files
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Success Criteria:**
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected

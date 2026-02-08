@@ -76,14 +76,20 @@ describe('analyzeImpact', () => {
     const result = analyzeImpact('hook', '.claude/hooks/safety/test-hook.cjs');
 
     assert.ok(typeof result.completionScore === 'number', 'completionScore should be a number');
-    assert.ok(result.completionScore >= 0 && result.completionScore <= 1, 'score should be between 0 and 1');
+    assert.ok(
+      result.completionScore >= 0 && result.completionScore <= 1,
+      'score should be between 0 and 1'
+    );
   });
 
   it('returns correct items for hook type', () => {
     const result = analyzeImpact('hook', '.claude/hooks/routing/test-hook.cjs');
 
     const mustActions = result.mustHave.map(item => item.action);
-    assert.ok(mustActions.includes('register-in-settings'), 'hook should require settings.json registration');
+    assert.ok(
+      mustActions.includes('register-in-settings'),
+      'hook should require settings.json registration'
+    );
     assert.ok(mustActions.includes('add-test'), 'hook should require test file');
   });
 });
@@ -125,6 +131,9 @@ describe('checkMustHaveCompletion', () => {
     assert.ok(typeof result.complete === 'boolean');
     // Schema has update-schema-catalog as mustHave
     // Since we haven't updated the catalog, it should be missing
-    assert.ok(result.missing.length > 0 || result.present.length > 0, 'should have checked at least one item');
+    assert.ok(
+      result.missing.length > 0 || result.present.length > 0,
+      'should have checked at least one item'
+    );
   });
 });

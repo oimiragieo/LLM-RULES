@@ -49,7 +49,11 @@ describe('unified-creator-guard - TTL Bounds Checking', () => {
 
       const { DEFAULT_TTL_MS } = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
-      assert.strictEqual(DEFAULT_TTL_MS, 180000, 'Infinity should use default (not max) for security');
+      assert.strictEqual(
+        DEFAULT_TTL_MS,
+        180000,
+        'Infinity should use default (not max) for security'
+      );
     });
 
     it('should clamp very large values to MAX_TTL_MS (600000ms)', () => {

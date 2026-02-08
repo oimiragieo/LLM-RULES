@@ -70,19 +70,19 @@ module.exports = { main };
 
 ## Tool Categories
 
-| Category      | Purpose                        | Examples                  |
-|---------------|--------------------------------|---------------------------|
-| `cli`         | Command-line utilities         | validators, formatters    |
-| `analysis`    | Code analysis tools            | complexity, dependencies  |
-| `validation`  | Validation scripts             | schema, lint              |
-| `integrations`| External integration tools     | API clients, webhooks     |
-| `maintenance` | Framework maintenance          | cleanup, migration        |
-| `optimization`| Performance optimization       | indexing, caching         |
-| `runtime`     | Runtime utilities              | config readers, loaders   |
-| `visualization`| Diagram and graph generation  | mermaid, graphviz         |
-| `workflow`    | Workflow automation            | task runners, orchestrators|
-| `gates`       | Quality gates and checks       | coverage, security        |
-| `context`     | Context management             | compression, handoff      |
+| Category        | Purpose                      | Examples                    |
+| --------------- | ---------------------------- | --------------------------- |
+| `cli`           | Command-line utilities       | validators, formatters      |
+| `analysis`      | Code analysis tools          | complexity, dependencies    |
+| `validation`    | Validation scripts           | schema, lint                |
+| `integrations`  | External integration tools   | API clients, webhooks       |
+| `maintenance`   | Framework maintenance        | cleanup, migration          |
+| `optimization`  | Performance optimization     | indexing, caching           |
+| `runtime`       | Runtime utilities            | config readers, loaders     |
+| `visualization` | Diagram and graph generation | mermaid, graphviz           |
+| `workflow`      | Workflow automation          | task runners, orchestrators |
+| `gates`         | Quality gates and checks     | coverage, security          |
+| `context`       | Context management           | compression, handoff        |
 
 ## Creation Workflow
 
@@ -93,7 +93,19 @@ module.exports = { main };
 const toolName = args.name.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
 // Validate category exists
-const validCategories = ['cli', 'analysis', 'validation', 'integrations', 'maintenance', 'optimization', 'runtime', 'visualization', 'workflow', 'gates', 'context'];
+const validCategories = [
+  'cli',
+  'analysis',
+  'validation',
+  'integrations',
+  'maintenance',
+  'optimization',
+  'runtime',
+  'visualization',
+  'workflow',
+  'gates',
+  'context',
+];
 
 if (!validCategories.includes(args.category)) {
   throw new Error(`Invalid category. Must be one of: ${validCategories.join(', ')}`);
@@ -151,13 +163,16 @@ const newEntry = `| ${toolName} | ${args.description} | .claude/tools/${args.cat
 ### Step 4: Run Post-Creation Integration
 
 ```javascript
-const { runIntegrationChecklist, queueCrossCreatorReview } = require('.claude/lib/creator-commons.cjs');
+const {
+  runIntegrationChecklist,
+  queueCrossCreatorReview,
+} = require('.claude/lib/creator-commons.cjs');
 
 await runIntegrationChecklist('tool', toolPath);
 await queueCrossCreatorReview('tool', toolPath, {
   artifactName: toolName,
   createdBy: 'tool-creator',
-  category: args.category
+  category: args.category,
 });
 ```
 
@@ -166,7 +181,10 @@ await queueCrossCreatorReview('tool', toolPath, {
 After tool creation, run integration checklist:
 
 ```javascript
-const { runIntegrationChecklist, queueCrossCreatorReview } = require('.claude/lib/creator-commons.cjs');
+const {
+  runIntegrationChecklist,
+  queueCrossCreatorReview,
+} = require('.claude/lib/creator-commons.cjs');
 
 // 1. Run integration checklist
 const result = await runIntegrationChecklist('tool', '.claude/tools/<category>/<tool-name>.cjs');
@@ -175,7 +193,7 @@ const result = await runIntegrationChecklist('tool', '.claude/tools/<category>/<
 await queueCrossCreatorReview('tool', '.claude/tools/<category>/<tool-name>.cjs', {
   artifactName: '<tool-name>',
   createdBy: 'tool-creator',
-  category: '<category>'
+  category: '<category>',
 });
 
 // 3. Review impact report
@@ -183,6 +201,7 @@ await queueCrossCreatorReview('tool', '.claude/tools/<category>/<tool-name>.cjs'
 ```
 
 **Integration verification:**
+
 - [ ] Tool added to tool-catalog.md under correct category
 - [ ] Tool file is executable (Unix) or runnable (Windows)
 - [ ] Tool has help text and usage examples
@@ -203,7 +222,7 @@ const validateSchema = async () => {
 const main = async () => {
   await validateSchema();
 };
-"`
+"`,
 });
 ```
 
@@ -221,7 +240,7 @@ const main = async () => {
   const [,, filePath] = process.argv;
   await analyzeComplexity(filePath);
 };
-"`
+"`,
 });
 ```
 
@@ -236,6 +255,7 @@ const main = async () => {
 Read `.claude/context/memory/learnings.md`
 
 **After completing:**
+
 - New tool pattern → `.claude/context/memory/learnings.md`
 - Tool creation issue → `.claude/context/memory/issues.md`
 - Category decision → `.claude/context/memory/decisions.md`

@@ -97,7 +97,9 @@ if (!args.content || args.content.trim().length === 0) {
 const rulePath = `.claude/rules/${ruleName}.md`;
 
 // Format content as markdown
-const content = args.content.startsWith('#') ? args.content : `# ${ruleName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}\n\n${args.content}`;
+const content = args.content.startsWith('#')
+  ? args.content
+  : `# ${ruleName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}\n\n${args.content}`;
 
 await writeFile(rulePath, content);
 ```
@@ -117,12 +119,15 @@ if (!fileExists) {
 ### Step 4: Run Post-Creation Integration
 
 ```javascript
-const { runIntegrationChecklist, queueCrossCreatorReview } = require('.claude/lib/creator-commons.cjs');
+const {
+  runIntegrationChecklist,
+  queueCrossCreatorReview,
+} = require('.claude/lib/creator-commons.cjs');
 
 await runIntegrationChecklist('rule', rulePath);
 await queueCrossCreatorReview('rule', rulePath, {
   artifactName: ruleName,
-  createdBy: 'rule-creator'
+  createdBy: 'rule-creator',
 });
 ```
 
@@ -131,7 +136,10 @@ await queueCrossCreatorReview('rule', rulePath, {
 After rule creation, run integration checklist:
 
 ```javascript
-const { runIntegrationChecklist, queueCrossCreatorReview } = require('.claude/lib/creator-commons.cjs');
+const {
+  runIntegrationChecklist,
+  queueCrossCreatorReview,
+} = require('.claude/lib/creator-commons.cjs');
 
 // 1. Run integration checklist
 const result = await runIntegrationChecklist('rule', '.claude/rules/<rule-name>.md');
@@ -139,7 +147,7 @@ const result = await runIntegrationChecklist('rule', '.claude/rules/<rule-name>.
 // 2. Queue cross-creator review
 await queueCrossCreatorReview('rule', '.claude/rules/<rule-name>.md', {
   artifactName: '<rule-name>',
-  createdBy: 'rule-creator'
+  createdBy: 'rule-creator',
 });
 
 // 3. Review impact report
@@ -147,6 +155,7 @@ await queueCrossCreatorReview('rule', '.claude/rules/<rule-name>.md', {
 ```
 
 **Integration verification:**
+
 - [ ] Rule file created in `.claude/rules/`
 - [ ] Rule is auto-discovered by Claude Code
 - [ ] Rule content is clear and actionable
@@ -167,7 +176,7 @@ Skill({
 
 ## Style
 - Favor immutability; avoid in-place mutation
-- Validate inputs and handle errors explicitly"`
+- Validate inputs and handle errors explicitly"`,
 });
 ```
 
@@ -184,7 +193,7 @@ Skill({
 
 ## Branch Workflow
 - Create feature branches from main
-- Never force-push to main/master"`
+- Never force-push to main/master"`,
 });
 ```
 
@@ -199,6 +208,7 @@ Skill({
 Read `.claude/context/memory/learnings.md`
 
 **After completing:**
+
 - New rule pattern → `.claude/context/memory/learnings.md`
 - Rule creation issue → `.claude/context/memory/issues.md`
 - Guideline decision → `.claude/context/memory/decisions.md`

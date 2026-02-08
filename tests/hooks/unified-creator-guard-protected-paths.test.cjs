@@ -94,7 +94,11 @@ describe('unified-creator-guard - Protected Infrastructure Files', () => {
 
       assert.ok(result, 'agent-registry.json should require a creator');
       assert.strictEqual(result.creator, 'agent-creator', 'Should require agent-creator');
-      assert.strictEqual(result.artifactType, 'config:agent-registry', 'Should be config:agent-registry type');
+      assert.strictEqual(
+        result.artifactType,
+        'config:agent-registry',
+        'Should be config:agent-registry type'
+      );
     });
 
     it('should block writes to agent-registry.json when agent-creator is not active', () => {

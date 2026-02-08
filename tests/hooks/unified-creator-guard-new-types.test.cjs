@@ -184,7 +184,10 @@ describe('unified-creator-guard - New Artifact Types (rules, commands, tools)', 
 
   describe('CREATOR_CONFIGS structure verification', () => {
     it('should have at least 9 creator configurations (6 original + 3 new)', () => {
-      assert.ok(CREATOR_CONFIGS.length >= 9, `Should have at least 9 configs, got ${CREATOR_CONFIGS.length}`);
+      assert.ok(
+        CREATOR_CONFIGS.length >= 9,
+        `Should have at least 9 configs, got ${CREATOR_CONFIGS.length}`
+      );
     });
 
     it('should include rule-creator configuration', () => {

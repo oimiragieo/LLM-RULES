@@ -51,17 +51,17 @@ Unified workflow for updating existing artifacts across all creator types. Repla
 
 Determine what type of artifact is being updated based on file path:
 
-| Path Pattern | Artifact Type | Creator Skill |
-|--------------|---------------|---------------|
-| `.claude/skills/**/SKILL.md` | skill | skill-creator |
-| `.claude/agents/**/*.md` | agent | agent-creator |
-| `.claude/hooks/**/*.cjs` | hook | hook-creator |
-| `.claude/workflows/**/*.md` | workflow | workflow-creator |
-| `.claude/templates/**/*` | template | template-creator |
-| `.claude/schemas/**/*.json` | schema | schema-creator |
-| `.claude/commands/*.md` | command | command-creator |
-| `.claude/rules/*.md` | rule | rule-creator |
-| `.claude/tools/**/*.{cjs,mjs}` | tool | tool-creator |
+| Path Pattern                   | Artifact Type | Creator Skill    |
+| ------------------------------ | ------------- | ---------------- |
+| `.claude/skills/**/SKILL.md`   | skill         | skill-creator    |
+| `.claude/agents/**/*.md`       | agent         | agent-creator    |
+| `.claude/hooks/**/*.cjs`       | hook          | hook-creator     |
+| `.claude/workflows/**/*.md`    | workflow      | workflow-creator |
+| `.claude/templates/**/*`       | template      | template-creator |
+| `.claude/schemas/**/*.json`    | schema        | schema-creator   |
+| `.claude/commands/*.md`        | command       | command-creator  |
+| `.claude/rules/*.md`           | rule          | rule-creator     |
+| `.claude/tools/**/*.{cjs,mjs}` | tool          | tool-creator     |
 
 ### Step 2: Load and Validate Existing Artifact
 
@@ -85,6 +85,7 @@ async function loadArtifact(artifactPath) {
 Based on change type:
 
 **Frontmatter Update:**
+
 ```javascript
 // Parse YAML frontmatter
 // Update specified fields
@@ -93,6 +94,7 @@ Based on change type:
 ```
 
 **Content Update:**
+
 ```javascript
 // Load full content
 // Apply requested modifications
@@ -101,6 +103,7 @@ Based on change type:
 ```
 
 **Deprecation:**
+
 ```javascript
 // Add deprecation notice to frontmatter
 // Add deprecation warning to content
@@ -117,11 +120,15 @@ const result = await runIntegrationChecklist(artifactType, artifactPath);
 
 // Check for failures
 if (result.mustHave.some(item => !item.passed)) {
-  console.error('Post-update integration failed:', result.mustHave.filter(i => !i.passed));
+  console.error(
+    'Post-update integration failed:',
+    result.mustHave.filter(i => !i.passed)
+  );
 }
 ```
 
 Integration checklist verifies:
+
 - Catalog/registry entry still exists and is valid
 - CLAUDE.md references updated if needed
 - Agent assignments still valid
@@ -137,7 +144,7 @@ if (isBreakingChange(changes)) {
   await queueCrossCreatorReview(artifactType, artifactPath, {
     changeType: 'update',
     description: changeDescription,
-    breakingChanges: true
+    breakingChanges: true,
   });
 }
 ```
@@ -147,26 +154,31 @@ if (isBreakingChange(changes)) {
 Changes that require cross-creator review:
 
 **Skills:**
+
 - Removing or renaming a skill
 - Changing skill frontmatter `name` field
 - Removing required arguments
 
 **Agents:**
+
 - Changing agent routing keywords
 - Modifying agent type (core/domain/specialized)
 - Removing assigned skills
 
 **Hooks:**
+
 - Changing hook lifecycle (PreToolUse → PostToolUse)
 - Modifying validation logic (blocking → non-blocking)
 - Removing environment variable support
 
 **Workflows:**
+
 - Removing workflow phases
 - Changing phase dependencies
 - Modifying quality gates
 
 **Schemas:**
+
 - Removing required fields
 - Changing field types
 - Making fields non-nullable
@@ -214,6 +226,7 @@ Skill({
 Read `.claude/context/memory/learnings.md`
 
 **After completing:**
+
 - New update pattern → `.claude/context/memory/learnings.md`
 - Update issue found → `.claude/context/memory/issues.md`
 - Breaking change decision → `.claude/context/memory/decisions.md`

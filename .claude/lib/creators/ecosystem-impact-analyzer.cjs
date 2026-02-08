@@ -21,7 +21,11 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 // Path to the impact graph data file
 const IMPACT_GRAPH_PATH = path.join(
-  PROJECT_ROOT, '.claude', 'context', 'data', 'ecosystem-impact-graph.json'
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'data',
+  'ecosystem-impact-graph.json'
 );
 
 /**
@@ -156,7 +160,8 @@ function checkMustHaveCompletion(artifactType, artifactPath) {
   }
 
   // Extract artifact name from path for catalog lookups
-  const artifactName = path.basename(artifactPath, path.extname(artifactPath))
+  const artifactName = path
+    .basename(artifactPath, path.extname(artifactPath))
     .replace(/\.schema$/, '') // Remove .schema from schema files
     .replace(/^SKILL$/, '') // Remove SKILL for skill files
     .toLowerCase();

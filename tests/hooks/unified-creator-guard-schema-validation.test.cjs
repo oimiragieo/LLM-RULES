@@ -22,8 +22,11 @@ const guard = require('../../.claude/hooks/routing/unified-creator-guard.cjs');
 
 describe('validateArtifactContent', () => {
   it('is exported as a function', () => {
-    assert.strictEqual(typeof guard.validateArtifactContent, 'function',
-      'validateArtifactContent should be exported');
+    assert.strictEqual(
+      typeof guard.validateArtifactContent,
+      'function',
+      'validateArtifactContent should be exported'
+    );
   });
 
   it('returns valid:true for skill with valid frontmatter fields', () => {
@@ -87,9 +90,9 @@ describe('validateArtifactContent', () => {
 
   it('validates JSON schema artifacts correctly', () => {
     const content = JSON.stringify({
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "title": "Test Schema",
-      "type": "object",
+      $schema: 'https://json-schema.org/draft/2020-12/schema',
+      title: 'Test Schema',
+      type: 'object',
     });
 
     // Schema type has no validation (self-referential)
