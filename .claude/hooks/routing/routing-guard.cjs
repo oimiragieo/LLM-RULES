@@ -108,12 +108,58 @@ function getViolationTracker() {
 let _cachedRouterState = null;
 
 /**
+ * Check if state is stale (lastReset too old).
+ * If stale, treat as router mode regardless of stored values.
+ * This is a safety net if state-reset.cjs fails to run.
+ *
+ * Environment: STATE_STALE_THRESHOLD_MS (default: 600000 = 10 min)
+ *
+ * @param {Object} state - Router state object
+ * @returns {Object} State object (possibly overridden to router mode)
+ */
+function applyStaleDetection(state) {
+  const thresholdMs = parseInt(process.env.STATE_STALE_THRESHOLD_MS || '600000', 10);
+  if (isNaN(thresholdMs) || thresholdMs <= 0) {
+    return state; // Invalid threshold, skip detection
+  }
+
+  if (!state.lastReset) {
+    // No lastReset timestamp -- treat as stale
+    console.error(
+      `[routing-guard] Stale state detected (no lastReset timestamp). Forcing router mode.`
+    );
+    return { ...state, mode: 'router', taskSpawned: false };
+  }
+
+  const resetTime = new Date(state.lastReset).getTime();
+  if (isNaN(resetTime)) {
+    // Invalid timestamp -- treat as stale
+    console.error(
+      `[routing-guard] Stale state detected (invalid lastReset: ${state.lastReset}). Forcing router mode.`
+    );
+    return { ...state, mode: 'router', taskSpawned: false };
+  }
+
+  const ageMs = Date.now() - resetTime;
+  if (ageMs > thresholdMs) {
+    console.error(
+      `[routing-guard] Stale state detected (age: ${Math.round(ageMs / 1000)}s, threshold: ${Math.round(thresholdMs / 1000)}s). Forcing router mode.`
+    );
+    return { ...state, mode: 'router', taskSpawned: false };
+  }
+
+  return state;
+}
+
+/**
  * Get cached router state (single read per invocation)
  * PERF-001: Reduces 4 file reads to 1 per routing-guard invocation.
+ * Applies staleness detection as safety net.
  */
 function getCachedRouterState() {
   if (_cachedRouterState === null) {
-    _cachedRouterState = routerState.getState();
+    const rawState = routerState.getState();
+    _cachedRouterState = applyStaleDetection(rawState);
   }
   return _cachedRouterState;
 }
@@ -1118,6 +1164,66 @@ Developer should be LAST RESORT. Specialists have domain-specific prompts and sk
 }
 
 // =============================================================================
+// CHECK 8: TASKLIST-FIRST GATE (requires TaskList before other tools)
+// =============================================================================
+
+/**
+ * Check 8: TaskList-First Gate
+ * Blocks routing-guard-watched tools until TaskList() is called in current prompt cycle.
+ *
+ * Environment: TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: warn)
+ *
+ * Exempt: Only applies in router mode (not agent mode).
+ * Does NOT apply to: Read, TaskList, TaskGet, TaskUpdate, AskUserQuestion
+ * (those are whitelisted and never reach routing-guard anyway).
+ *
+ * NOTE: Default is WARN (not block) for safe rollout. Switch to block after
+ * 1 session with no false positives.
+ *
+ * @param {string} toolName - Tool being used
+ * @returns {{ pass: boolean, result?: string, message?: string }}
+ */
+function checkTaskListFirstGate(toolName) {
+  const enforcement = getEnforcementMode('TASKLIST_FIRST_ENFORCEMENT', 'warn');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  // Only applies in router mode
+  const state = getCachedRouterState();
+  if (state.mode === 'agent' || state.taskSpawned) {
+    return { pass: true };
+  }
+
+  // Check if TaskList was already called
+  if (state.taskListCalledSincePrompt) {
+    return { pass: true };
+  }
+
+  // Router is using a tool without calling TaskList first
+  const message = `[TASKLIST-FIRST VIOLATION] Router must call TaskList() before using ${toolName}.
+Call TaskList() first to check existing tasks, then proceed with your operation.`;
+
+  // Record violation
+  const tracker = getViolationTracker();
+  if (tracker) {
+    tracker.recordViolation({
+      tool: toolName,
+      action: enforcement === 'block' ? 'blocked' : 'warned',
+      checkName: 'tasklist-first-gate',
+      routerMode: 'router',
+      sessionId: process.env.CLAUDE_SESSION_ID || 'unknown',
+    });
+  }
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  } else {
+    return { pass: true, result: 'warn', message };
+  }
+}
+
+// =============================================================================
 // MAIN EXECUTION
 // =============================================================================
 
@@ -1128,6 +1234,15 @@ Developer should be LAST RESORT. Specialists have domain-specific prompts and sk
  * @returns {{ pass: boolean, result: string, message: string }}
  */
 function runAllChecks(toolName, toolInput) {
+  // Check 8: TaskList-First Gate (must come first -- protocol compliance)
+  const taskListCheck = checkTaskListFirstGate(toolName);
+  if (!taskListCheck.pass) {
+    return { pass: false, result: taskListCheck.result, message: taskListCheck.message };
+  }
+  if (taskListCheck.result === 'warn') {
+    console.warn(taskListCheck.message);
+  }
+
   // Check 0: Router Bash Check (ADR-030 - must come first for Bash commands)
   const bashCheck = checkRouterBash(toolName, toolInput);
   if (!bashCheck.pass) {
@@ -1426,12 +1541,15 @@ module.exports = {
   checkRouterWrite,
   checkMemoryPressure,
   checkSpecialistOverride,
+  checkTaskListFirstGate,
   isPlannerSpawn,
   isSecuritySpawn,
   isImplementationAgentSpawn,
   isAlwaysAllowedWrite,
   isWhitelistedBashCommand,
   extractTaskIdFromPrompt,
+  // Staleness detection (Fix 4b)
+  applyStaleDetection,
   // PERF-001: Cache management
   getCachedRouterState,
   invalidateCachedState,

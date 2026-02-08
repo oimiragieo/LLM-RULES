@@ -69,6 +69,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/routing-guard.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/routing/unified-creator-guard.cjs"
           },
           {

@@ -57,6 +57,7 @@ function resetState() {
     taskSpawnedAt: null,
     taskDescription: null,
     sessionId: sessionId,
+    taskListCalledSincePrompt: false,
     complexity: 'trivial',
     requiresPlannerFirst: false,
     plannerSpawned: false,
@@ -66,6 +67,7 @@ function resetState() {
     lastTaskUpdateTaskId: null,
     lastTaskUpdateStatus: null,
     taskUpdatesThisSession: 0,
+    currentSpawnTaskId: null,
     version: Date.now() % 10000, // Simple version tracking
   };
 
@@ -91,7 +93,11 @@ function main() {
     process.exit(0);
   } catch (err) {
     // Error - but don't block user prompt (fail-open for usability)
-    console.error(`[state-reset.cjs] Error resetting state: ${err.message}`);
+    // Staleness detection in routing-guard.cjs (Fix 4b) provides safety net
+    console.error(`[state-reset.cjs] CRITICAL: State reset failed: ${err.message}`);
+    console.error(
+      `[state-reset.cjs] Router enforcement may use stale state. Staleness detection active as safety net.`
+    );
     process.exit(0);
   }
 }
