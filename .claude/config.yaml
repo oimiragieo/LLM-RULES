@@ -55,6 +55,16 @@ monitoring:
   dashboard:
     refreshIntervalMs: 5000 # Refresh every 5 seconds in live mode
 
+# --- Memory Management Configuration ---
+memory:
+  rotation:
+    threshold_kb: 20 # Rotate hot memory files when they exceed 20KB
+    max_age_days: 30 # Archive warm files older than 30 days to cold storage
+  pruning:
+    similarity_threshold: 0.6 # Cosine similarity threshold for deduplication (0.6 = 60% similar)
+  cold_storage:
+    max_age_days: 30 # Archive warm storage to cold after 30 days
+
 # --- Feature Flags (Gradual Rollout System) ---
 # Controls for safe, gradual rollout of new features
 # Priority: Environment Variables > Config File > Runtime API

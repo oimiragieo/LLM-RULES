@@ -1,533 +1,325 @@
 #!/usr/bin/env node
 /**
- * Memory Rotator Tests
- * ====================
- *
- * Comprehensive test suite for memory-rotator.cjs
+ * Tests for memory-rotator.cjs
+ * Step 3: parseSections() tests (TDD RED phase)
+ * Step 4: rotateIfNeeded() tests (TDD RED phase)
  */
 
 'use strict';
 
-const assert = require('assert');
-const fs = require('fs');
-const path = require('path');
+const { test } = require('node:test');
+const assert = require('node:assert');
+const fs = require('node:fs');
+const path = require('node:path');
 const os = require('os');
+const crypto = require('crypto');
 
-// ============================================================================
-// Test Setup
-// ============================================================================
+const PROJECT_ROOT = path.resolve(__dirname, '../../../');
 
-// Create isolated test directory
-const TEST_DIR = path.join(os.tmpdir(), `memory-rotator-test-${Date.now()}`);
-const TEST_MEMORY_DIR = path.join(TEST_DIR, '.claude', 'context', 'memory');
+// Test fixtures path
+const FIXTURES_DIR = path.join(PROJECT_ROOT, 'tests/fixtures/memory-management');
 
-function setupTestEnv() {
-  if (fs.existsSync(TEST_DIR)) {
-    fs.rmSync(TEST_DIR, { recursive: true, force: true });
+// Helper: Create temporary test directory
+function createTempDir() {
+  const tmpDir = path.join(os.tmpdir(), `memory-rotator-test-${crypto.randomBytes(4).toString('hex')}`);
+  fs.mkdirSync(tmpDir, { recursive: true });
+  return tmpDir;
+}
+
+// Helper: Clean up temporary directory
+function cleanupTempDir(tmpDir) {
+  if (fs.existsSync(tmpDir)) {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
   }
-  fs.mkdirSync(TEST_MEMORY_DIR, { recursive: true });
 }
 
-function cleanupTestEnv() {
-  if (fs.existsSync(TEST_DIR)) {
-    fs.rmSync(TEST_DIR, { recursive: true, force: true });
+test('parseSections() - parses --- delimited sections', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+
+  const content = fs.readFileSync(path.join(FIXTURES_DIR, 'sample-learnings.md'), 'utf8');
+  const sections = rotator.parseSections(content);
+
+  assert.ok(Array.isArray(sections), 'parseSections should return array');
+  assert.strictEqual(sections.length, 2, 'Should find 2 sections in sample-learnings.md');
+
+  assert.ok(sections[0].content.includes('TDD Cycle'), 'First section should contain TDD');
+  assert.ok(sections[1].content.includes('Atomic Writes'), 'Second section should contain Atomic Writes');
+});
+
+test('parseSections() - extracts dates from **Date:** pattern', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+
+  const content = fs.readFileSync(path.join(FIXTURES_DIR, 'sample-learnings.md'), 'utf8');
+  const sections = rotator.parseSections(content);
+
+  assert.strictEqual(sections[0].date, '2026-02-08', 'First section date should be 2026-02-08');
+  assert.strictEqual(sections[1].date, '2026-02-07', 'Second section date should be 2026-02-07');
+});
+
+test('parseSections() - detects [PERMANENT] tag', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+
+  const content = `# Test
+
+## Entry [PERMANENT]
+
+**Date:** 2026-02-08
+
+This should never be archived.
+
+---`;
+
+  const sections = rotator.parseSections(content);
+
+  assert.strictEqual(sections[0].isPermanent, true, 'Should detect [PERMANENT] tag');
+});
+
+test('parseSections() - detects **Status: RESOLVED**', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+
+  const content = `# Issues
+
+## Bug Fix
+
+**Date:** 2026-02-08
+**Status: RESOLVED**
+
+Bug was fixed.
+
+---`;
+
+  const sections = rotator.parseSections(content);
+
+  assert.strictEqual(sections[0].isResolved, true, 'Should detect RESOLVED status');
+});
+
+test('parseSections() - handles empty content', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+
+  const sections = rotator.parseSections('');
+
+  assert.ok(Array.isArray(sections), 'Should return array for empty content');
+  assert.strictEqual(sections.length, 0, 'Should return empty array for empty content');
+});
+
+test('parseSections() - handles malformed content (no delimiters)', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+
+  const content = 'This is just plain text with no section markers.';
+  const sections = rotator.parseSections(content);
+
+  assert.ok(Array.isArray(sections), 'Should return array');
+  assert.strictEqual(sections.length, 1, 'Should return single section for undelimited content');
+  assert.ok(sections[0].content.includes('plain text'), 'Should contain the original content');
+});
+
+test('parseSections() - parses ## H2 header delimited content', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+
+  const content = `# Main Title
+
+## Section One
+
+**Date:** 2026-02-01
+
+Content for section one.
+
+## Section Two
+
+**Date:** 2026-02-02
+
+Content for section two.`;
+
+  const sections = rotator.parseSections(content);
+
+  assert.ok(Array.isArray(sections), 'Should return array');
+  assert.strictEqual(sections.length, 2, 'Should find 2 sections with H2 headers');
+
+  assert.ok(sections[0].title.includes('Section One'), 'First section should have title');
+  assert.ok(sections[1].title.includes('Section Two'), 'Second section should have title');
+
+  assert.strictEqual(sections[0].date, '2026-02-01', 'First section should have correct date');
+  assert.strictEqual(sections[1].date, '2026-02-02', 'Second section should have correct date');
+});
+
+// ========================================================================
+// Step 4: rotateIfNeeded() tests (TDD RED phase)
+// ========================================================================
+
+test('rotateIfNeeded() - file under threshold is not rotated', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+  const tmpDir = createTempDir();
+
+  try {
+    const testFile = path.join(tmpDir, 'small-file.md');
+    const content = '# Small File\n\nThis is under 20KB.';
+    fs.writeFileSync(testFile, content);
+
+    const result = rotator.rotateIfNeeded(testFile, { thresholdKB: 20 });
+
+    assert.strictEqual(result.rotated, false, 'File under threshold should not be rotated');
+    assert.ok(fs.existsSync(testFile), 'Original file should still exist');
+    assert.strictEqual(fs.readFileSync(testFile, 'utf8'), content, 'File content should be unchanged');
+  } finally {
+    cleanupTempDir(tmpDir);
   }
-}
-
-// Mock PROJECT_ROOT for tests
-const originalProjectRoot = process.env.PROJECT_ROOT;
-process.env.PROJECT_ROOT = TEST_DIR;
-
-// Load module AFTER setting environment
-const rotator = require('../../../.claude/lib/memory/memory-rotator.cjs');
-
-// ============================================================================
-// Test Fixtures
-// ============================================================================
-
-const SAMPLE_DECISIONS = `# Architecture Decision Records
-
-## [ADR-001] Use TypeScript for Backend
-
-**Date**: 2025-11-01
-**Status**: Accepted
-
-Decision to use TypeScript instead of JavaScript for backend services.
-
-## [ADR-002] Adopt Microservices Architecture
-
-**Date**: 2025-12-15
-**Status**: Accepted
-
-Transition from monolith to microservices for better scalability.
-
-## [ADR-003] Use PostgreSQL as Primary Database
-
-**Date**: 2026-01-10
-**Status**: Accepted
-
-PostgreSQL chosen for ACID compliance and relational data modeling.
-
-## [ADR-004] Implement JWT Authentication
-
-**Date**: 2026-01-25
-**Status**: Accepted
-
-JWT tokens for stateless authentication across services.
-`;
-
-const SAMPLE_ISSUES = `# Known Issues
-
-### Database Connection Pool Exhaustion
-
-**Status**: RESOLVED
-**Date**: 2025-11-15
-**Resolved**: 2025-11-20
-
-Connection pool was exhausting under high load. Fixed by increasing pool size.
-
-### Memory Leak in Worker Process
-
-**Status**: OPEN
-**Date**: 2026-01-15
-
-Worker process shows memory leak pattern under sustained load. Investigating.
-
-### API Rate Limiting Not Working
-
-**Status**: RESOLVED
-**Date**: 2026-01-20
-**Resolved**: 2026-01-22
-
-Rate limiter was not properly initialized. Fixed in PR #123.
-
-### Circular Dependency in Module Loader
-
-**Status**: OPEN
-**Date**: 2026-01-28
-
-Module loader has circular dependency causing initialization issues.
-`;
-
-// ============================================================================
-// Tests: Utility Functions
-// ============================================================================
-
-function testCountLines() {
-  console.log('TEST: countLines()');
-
-  setupTestEnv();
-
-  const testFile = path.join(TEST_MEMORY_DIR, 'test.txt');
-  fs.writeFileSync(testFile, 'line 1\nline 2\nline 3\n');
-
-  const count = rotator.countLines(testFile);
-  assert.strictEqual(count, 4, 'Should count 4 lines (including trailing newline)');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: countLines()');
-}
-
-function testGetCurrentYearMonth() {
-  console.log('TEST: getCurrentYearMonth()');
-
-  const yearMonth = rotator.getCurrentYearMonth();
-  assert.match(yearMonth, /^\d{4}-\d{2}$/, 'Should return YYYY-MM format');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: getCurrentYearMonth()');
-}
-
-function testGetAgeDays() {
-  console.log('TEST: getAgeDays()');
-
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-  const twoMonthsAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-  assert.strictEqual(rotator.getAgeDays(today), 0, 'Today should be 0 days old');
-  assert.strictEqual(rotator.getAgeDays(yesterday), 1, 'Yesterday should be 1 day old');
-  assert.ok(rotator.getAgeDays(twoMonthsAgo) >= 59, 'Two months ago should be ~60 days old');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: getAgeDays()');
-}
-
-function testParseDate() {
-  console.log('TEST: parseDate()');
-
-  const iso = rotator.parseDate('2026-01-28');
-  assert.ok(iso instanceof Date, 'Should parse ISO date');
-  assert.strictEqual(iso.getFullYear(), 2026);
-
-  const us = rotator.parseDate('01/28/2026');
-  assert.ok(us instanceof Date, 'Should parse US date format');
-  assert.strictEqual(us.getFullYear(), 2026);
-
-  const invalid = rotator.parseDate('invalid');
-  assert.strictEqual(invalid, null, 'Should return null for invalid date');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: parseDate()');
-}
-
-// ============================================================================
-// Tests: ADR Parsing
-// ============================================================================
-
-function testParseDecisions() {
-  console.log('TEST: parseDecisions()');
-
-  setupTestEnv();
-
-  const decisionsPath = path.join(TEST_MEMORY_DIR, 'decisions.md');
-  fs.writeFileSync(decisionsPath, SAMPLE_DECISIONS);
-
-  const adrs = rotator.parseDecisions(decisionsPath);
-
-  assert.strictEqual(adrs.length, 4, 'Should parse 4 ADRs');
-  assert.strictEqual(adrs[0].number, 1, 'First ADR should be ADR-001');
-  assert.strictEqual(adrs[0].title, 'Use TypeScript for Backend');
-  assert.strictEqual(adrs[0].date, '2025-11-01');
-  assert.ok(adrs[0].lines > 0, 'ADR should have content lines');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: parseDecisions()');
-}
-
-function testSelectADRsToArchive() {
-  console.log('TEST: selectADRsToArchive()');
-
-  setupTestEnv();
-
-  const decisionsPath = path.join(TEST_MEMORY_DIR, 'decisions.md');
-  fs.writeFileSync(decisionsPath, SAMPLE_DECISIONS);
-
-  const adrs = rotator.parseDecisions(decisionsPath);
-  const { toArchive, toKeep } = rotator.selectADRsToArchive(adrs, 60);
-
-  // ADRs from 2025-11 should be archived (60+ days old)
-  // ADRs from 2026-01 should be kept (< 60 days old)
-  assert.ok(toArchive.length > 0, 'Should have ADRs to archive');
-  assert.ok(toKeep.length > 0, 'Should have ADRs to keep');
-
-  // Verify old ADRs are in toArchive
-  const adr1 = toArchive.find(a => a.number === 1);
-  assert.ok(adr1, 'ADR-001 (Nov 2025) should be archived');
-
-  // Verify recent ADRs are in toKeep
-  const adr4 = toKeep.find(a => a.number === 4);
-  assert.ok(adr4, 'ADR-004 (Jan 2026) should be kept');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: selectADRsToArchive()');
-}
-
-// ============================================================================
-// Tests: Issue Parsing
-// ============================================================================
-
-function testParseIssues() {
-  console.log('TEST: parseIssues()');
-
-  setupTestEnv();
-
-  const issuesPath = path.join(TEST_MEMORY_DIR, 'issues.md');
-  fs.writeFileSync(issuesPath, SAMPLE_ISSUES);
-
-  const issues = rotator.parseIssues(issuesPath);
-
-  assert.strictEqual(issues.length, 4, 'Should parse 4 issues');
-  assert.strictEqual(issues[0].title, 'Database Connection Pool Exhaustion');
-  assert.strictEqual(issues[0].status, 'RESOLVED');
-  assert.strictEqual(issues[0].date, '2025-11-20');
-
-  assert.strictEqual(issues[1].title, 'Memory Leak in Worker Process');
-  assert.strictEqual(issues[1].status, 'OPEN');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: parseIssues()');
-}
-
-function testSelectIssuesToArchive() {
-  console.log('TEST: selectIssuesToArchive()');
-
-  setupTestEnv();
-
-  const issuesPath = path.join(TEST_MEMORY_DIR, 'issues.md');
-  fs.writeFileSync(issuesPath, SAMPLE_ISSUES);
-
-  const issues = rotator.parseIssues(issuesPath);
-  const { toArchive, toKeep } = rotator.selectIssuesToArchive(issues, 7);
-
-  // Only RESOLVED issues older than 7 days should be archived
-  // OPEN issues should always be kept
-  assert.ok(toKeep.length >= 2, 'Should keep at least 2 issues (OPEN ones)');
-
-  // Verify OPEN issues are kept
-  const openIssues = toKeep.filter(i => i.status === 'OPEN');
-  assert.strictEqual(openIssues.length, 2, 'All OPEN issues should be kept');
-
-  // Verify old RESOLVED issues are archived
-  const oldResolved = toArchive.find(i => i.title === 'Database Connection Pool Exhaustion');
-  assert.ok(oldResolved, 'Old RESOLVED issue should be archived');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: selectIssuesToArchive()');
-}
-
-// ============================================================================
-// Tests: Rotation Operations
-// ============================================================================
-
-function testCheckRotationNeeded() {
-  console.log('TEST: checkRotationNeeded()');
-
-  setupTestEnv();
-
-  // Create file with known line count
-  const testFile = path.join(TEST_MEMORY_DIR, 'test.md');
-  const lines = new Array(1600).fill('test line').join('\n');
-  fs.writeFileSync(testFile, lines);
-
-  const result = rotator.checkRotationNeeded(testFile, 1500);
-
-  assert.strictEqual(result.needsRotation, true, 'Should need rotation (1600 > 1500)');
-  assert.ok(result.lineCount >= 1600, 'Should report correct line count');
-  assert.strictEqual(result.threshold, 'WARNING', 'Should be in WARNING threshold');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: checkRotationNeeded()');
-}
-
-function testRotateDecisionsDryRun() {
-  console.log('TEST: rotateDecisions (dry-run)');
-
-  setupTestEnv();
-
-  const decisionsPath = path.join(TEST_MEMORY_DIR, 'decisions.md');
-  fs.writeFileSync(decisionsPath, SAMPLE_DECISIONS);
-
-  const result = rotator.rotateDecisions(true, TEST_DIR);
-
-  assert.strictEqual(result.success, true, 'Dry run should succeed');
-  assert.strictEqual(result.dryRun, true);
-  assert.ok(result.archivedCount > 0, 'Should have ADRs to archive');
-  assert.ok(result.keptCount > 0, 'Should have ADRs to keep');
-
-  // Verify original file is unchanged
-  const content = fs.readFileSync(decisionsPath, 'utf8');
-  assert.strictEqual(content, SAMPLE_DECISIONS, 'Original file should be unchanged in dry-run');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: rotateDecisions (dry-run)');
-}
-
-function testRotateDecisions() {
-  console.log('TEST: rotateDecisions (execute)');
-
-  setupTestEnv();
-
-  const decisionsPath = path.join(TEST_MEMORY_DIR, 'decisions.md');
-  fs.writeFileSync(decisionsPath, SAMPLE_DECISIONS);
-
-  const result = rotator.rotateDecisions(false, TEST_DIR);
-
-  assert.strictEqual(result.success, true, 'Rotation should succeed');
-  assert.strictEqual(result.dryRun, false);
-  assert.ok(result.archivedCount > 0, 'Should have archived ADRs');
-  assert.ok(result.archivePath, 'Should have archive path');
-
-  // Verify archive file was created
-  assert.ok(fs.existsSync(result.archivePath), 'Archive file should exist');
-
-  // Verify active file was updated
-  const activeContent = fs.readFileSync(decisionsPath, 'utf8');
-  assert.ok(activeContent.includes('NOTICE'), 'Active file should have archival notice');
-  assert.ok(activeContent.includes('ADR-004'), 'Active file should contain recent ADR');
-
-  // Verify archive contains old ADRs
-  const archiveContent = fs.readFileSync(result.archivePath, 'utf8');
-  assert.ok(archiveContent.includes('ADR-001'), 'Archive should contain ADR-001');
-  assert.ok(archiveContent.includes('ARCHIVED'), 'Archive should have archive header');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: rotateDecisions (execute)');
-}
-
-function testRotateIssuesDryRun() {
-  console.log('TEST: rotateIssues (dry-run)');
-
-  setupTestEnv();
-
-  const issuesPath = path.join(TEST_MEMORY_DIR, 'issues.md');
-  fs.writeFileSync(issuesPath, SAMPLE_ISSUES);
-
-  const result = rotator.rotateIssues(true, TEST_DIR);
-
-  assert.strictEqual(result.success, true, 'Dry run should succeed');
-  assert.strictEqual(result.dryRun, true);
-  assert.ok(result.archivedCount >= 0, 'Should report archived count');
-  assert.ok(result.keptCount > 0, 'Should have issues to keep (OPEN ones)');
-
-  // Verify original file is unchanged
-  const content = fs.readFileSync(issuesPath, 'utf8');
-  assert.strictEqual(content, SAMPLE_ISSUES, 'Original file should be unchanged in dry-run');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: rotateIssues (dry-run)');
-}
-
-function testRotateIssues() {
-  console.log('TEST: rotateIssues (execute)');
-
-  setupTestEnv();
-
-  const issuesPath = path.join(TEST_MEMORY_DIR, 'issues.md');
-  fs.writeFileSync(issuesPath, SAMPLE_ISSUES);
-
-  const result = rotator.rotateIssues(false, TEST_DIR);
-
-  assert.strictEqual(result.success, true, 'Rotation should succeed');
-  assert.strictEqual(result.dryRun, false);
-
-  // Verify active file contains OPEN issues
-  const activeContent = fs.readFileSync(issuesPath, 'utf8');
-  assert.ok(
-    activeContent.includes('Memory Leak in Worker Process'),
-    'Active file should contain OPEN issue'
-  );
-  assert.ok(activeContent.includes('Circular Dependency'), 'Active file should contain OPEN issue');
-
-  // If archive was created, verify it contains only RESOLVED issues
-  if (result.archivePath && fs.existsSync(result.archivePath)) {
-    const archiveContent = fs.readFileSync(result.archivePath, 'utf8');
-    assert.ok(archiveContent.includes('ARCHIVED'), 'Archive should have header');
-  }
-
-  cleanupTestEnv();
-  console.log('✅ PASS: rotateIssues (execute)');
-}
-
-function testCheckAll() {
-  console.log('TEST: checkAll()');
-
-  setupTestEnv();
-
-  const decisionsPath = path.join(TEST_MEMORY_DIR, 'decisions.md');
-  const issuesPath = path.join(TEST_MEMORY_DIR, 'issues.md');
-
-  // Create large files to trigger rotation
-  const largeContent = new Array(1600).fill('test line').join('\n');
-  fs.writeFileSync(decisionsPath, largeContent);
-  fs.writeFileSync(issuesPath, largeContent);
-
-  const result = rotator.checkAll(TEST_DIR);
-
-  assert.ok(result.timestamp, 'Should have timestamp');
-  assert.strictEqual(result.files.length, 2, 'Should check 2 files');
-  assert.strictEqual(result.needsRotation, true, 'Should need rotation for large files');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: checkAll()');
-}
-
-function testRotateAll() {
-  console.log('TEST: rotateAll()');
-
-  setupTestEnv();
-
-  const decisionsPath = path.join(TEST_MEMORY_DIR, 'decisions.md');
-  const issuesPath = path.join(TEST_MEMORY_DIR, 'issues.md');
-
-  // Create files with old content (to trigger rotation)
-  fs.writeFileSync(decisionsPath, SAMPLE_DECISIONS);
-  fs.writeFileSync(issuesPath, SAMPLE_ISSUES);
-
-  // Run rotation (files are small but have old dates, so some content will be archived)
-  const result = rotator.rotateAll(false, TEST_DIR);
-
-  assert.ok(result.timestamp, 'Should have timestamp');
-  assert.strictEqual(result.dryRun, false);
-  assert.ok(result.rotations.length > 0, 'Should have rotation results');
-
-  cleanupTestEnv();
-  console.log('✅ PASS: rotateAll()');
-}
-
-// ============================================================================
-// Test Runner
-// ============================================================================
-
-function runAllTests() {
-  console.log('\n======================================');
-  console.log('Memory Rotator Test Suite');
-  console.log('======================================\n');
-
-  const tests = [
-    // Utility tests
-    testCountLines,
-    testGetCurrentYearMonth,
-    testGetAgeDays,
-    testParseDate,
-
-    // ADR parsing tests
-    testParseDecisions,
-    testSelectADRsToArchive,
-
-    // Issue parsing tests
-    testParseIssues,
-    testSelectIssuesToArchive,
-
-    // Rotation tests
-    testCheckRotationNeeded,
-    testRotateDecisionsDryRun,
-    testRotateDecisions,
-    testRotateIssuesDryRun,
-    testRotateIssues,
-    testCheckAll,
-    testRotateAll,
-  ];
-
-  let passed = 0;
-  let failed = 0;
-
-  for (const test of tests) {
-    try {
-      test();
-      passed++;
-    } catch (error) {
-      failed++;
-      console.error(`\n❌ FAIL: ${test.name}`);
-      console.error(error.message);
-      console.error(error.stack);
+});
+
+test('rotateIfNeeded() - file over threshold is rotated', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+  const tmpDir = createTempDir();
+
+  try {
+    const testFile = path.join(tmpDir, 'large-file.md');
+
+    // Create a file > 20KB (15 sections of ~1.5KB each)
+    let content = '# Large File\n\n';
+    for (let i = 0; i < 15; i++) {
+      content += `## Section ${i}\n\n**Date:** 2026-02-0${i % 9 + 1}\n\n`;
+      content += 'Lorem ipsum dolor sit amet '.repeat(50) + '\n\n---\n\n';
     }
+    fs.writeFileSync(testFile, content);
+
+    const initialSize = fs.statSync(testFile).size;
+    assert.ok(initialSize > 20 * 1024, 'Test file should be over 20KB');
+
+    const result = rotator.rotateIfNeeded(testFile, { thresholdKB: 20, keepSections: 5 });
+
+    assert.strictEqual(result.rotated, true, 'File over threshold should be rotated');
+    assert.ok(result.archivedBytes > 0, 'Should report archived bytes');
+    assert.ok(result.sectionsArchived > 0, 'Should report sections archived');
+    assert.ok(fs.existsSync(testFile), 'Active file should still exist');
+
+    const finalSize = fs.statSync(testFile).size;
+    assert.ok(finalSize < initialSize, 'Active file should be smaller after rotation');
+  } finally {
+    cleanupTempDir(tmpDir);
   }
+});
 
-  console.log('\n======================================');
-  console.log('Test Summary');
-  console.log('======================================');
-  console.log(`✅ Passed: ${passed}`);
-  console.log(`❌ Failed: ${failed}`);
-  console.log(`Total: ${tests.length}`);
+test('rotateIfNeeded() - creates archive file with correct name', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+  const tmpDir = createTempDir();
 
-  // Restore original PROJECT_ROOT
-  if (originalProjectRoot) {
-    process.env.PROJECT_ROOT = originalProjectRoot;
-  } else {
-    delete process.env.PROJECT_ROOT;
+  try {
+    const testFile = path.join(tmpDir, 'decisions.md');
+
+    // Create large file
+    let content = '# Decisions\n\n';
+    for (let i = 0; i < 15; i++) {
+      content += `## ADR-00${i}\n\n**Date:** 2026-02-01\n\n`;
+      content += 'Decision content '.repeat(100) + '\n\n---\n\n';
+    }
+    fs.writeFileSync(testFile, content);
+
+    rotator.rotateIfNeeded(testFile, { thresholdKB: 20, keepSections: 5 });
+
+    // Check archive directory exists
+    const archiveDir = path.join(tmpDir, 'archive');
+    assert.ok(fs.existsSync(archiveDir), 'Archive directory should be created');
+
+    // Check archive file exists with correct name format: decisions-YYYY-MM.md
+    const archiveFiles = fs.readdirSync(archiveDir);
+    assert.ok(archiveFiles.length > 0, 'Archive file should be created');
+
+    const archiveFile = archiveFiles.find((f) => f.match(/^decisions-\d{4}-\d{2}\.md$/));
+    assert.ok(archiveFile, 'Archive file should match format: decisions-YYYY-MM.md');
+  } finally {
+    cleanupTempDir(tmpDir);
   }
+});
 
-  // Final cleanup
-  cleanupTestEnv();
+test('rotateIfNeeded() - [PERMANENT] sections are never archived', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+  const tmpDir = createTempDir();
 
-  process.exit(failed > 0 ? 1 : 0);
-}
+  try {
+    const testFile = path.join(tmpDir, 'test.md');
 
-if (require.main === module) {
-  runAllTests();
-}
+    // Create file with [PERMANENT] section plus others
+    let content = `# Test
 
-module.exports = {
-  runAllTests,
-};
+## Important Entry [PERMANENT]
+
+**Date:** 2026-01-01
+
+This should NEVER be archived.
+
+---
+
+`;
+    // Add many more sections to exceed threshold
+    for (let i = 0; i < 15; i++) {
+      content += `## Section ${i}\n\n**Date:** 2026-02-0${i % 9 + 1}\n\n`;
+      content += 'Content '.repeat(100) + '\n\n---\n\n';
+    }
+    fs.writeFileSync(testFile, content);
+
+    rotator.rotateIfNeeded(testFile, { thresholdKB: 20, keepSections: 2 });
+
+    const finalContent = fs.readFileSync(testFile, 'utf8');
+    assert.ok(finalContent.includes('[PERMANENT]'), '[PERMANENT] section should be kept');
+    assert.ok(finalContent.includes('Important Entry'), 'PERMANENT section content should be kept');
+  } finally {
+    cleanupTempDir(tmpDir);
+  }
+});
+
+test('rotateIfNeeded() - is idempotent (second call is no-op)', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+  const tmpDir = createTempDir();
+
+  try {
+    const testFile = path.join(tmpDir, 'test.md');
+
+    // Create large file (25+ sections to ensure > 20KB)
+    let content = '# Test\n\n';
+    for (let i = 0; i < 25; i++) {
+      content += `## Section ${i}\n\n**Date:** 2026-02-0${i % 9 + 1}\n\n`;
+      content += 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(50) + '\n\n---\n\n';
+    }
+    fs.writeFileSync(testFile, content);
+
+    // First rotation
+    const result1 = rotator.rotateIfNeeded(testFile, { thresholdKB: 20, keepSections: 5 });
+    assert.strictEqual(result1.rotated, true, 'First rotation should occur');
+
+    const contentAfterFirst = fs.readFileSync(testFile, 'utf8');
+
+    // Second rotation on already-rotated file
+    const result2 = rotator.rotateIfNeeded(testFile, { thresholdKB: 20, keepSections: 5 });
+    assert.strictEqual(result2.rotated, false, 'Second rotation should be no-op');
+
+    const contentAfterSecond = fs.readFileSync(testFile, 'utf8');
+    assert.strictEqual(contentAfterSecond, contentAfterFirst, 'File content should be unchanged on second call');
+  } finally {
+    cleanupTempDir(tmpDir);
+  }
+});
+
+test('rotateIfNeeded() - auto-creates archive directory if missing', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+  const tmpDir = createTempDir();
+
+  try {
+    const testFile = path.join(tmpDir, 'test.md');
+
+    // Create large file (25+ sections to ensure > 20KB)
+    let content = '# Test\n\n';
+    for (let i = 0; i < 25; i++) {
+      content += `## Section ${i}\n\n**Date:** 2026-02-01\n\n`;
+      content += 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(50) + '\n\n---\n\n';
+    }
+    fs.writeFileSync(testFile, content);
+
+    // Ensure archive directory doesn't exist
+    const archiveDir = path.join(tmpDir, 'archive');
+    assert.ok(!fs.existsSync(archiveDir), 'Archive directory should not exist before rotation');
+
+    rotator.rotateIfNeeded(testFile, { thresholdKB: 20, keepSections: 5 });
+
+    assert.ok(fs.existsSync(archiveDir), 'Archive directory should be auto-created');
+  } finally {
+    cleanupTempDir(tmpDir);
+  }
+});

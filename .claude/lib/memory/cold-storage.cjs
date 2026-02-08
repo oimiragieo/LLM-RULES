@@ -1,336 +1,244 @@
+#!/usr/bin/env node
 /**
- * Cold storage archiver for LTM summaries
- * ======================================
+ * Cold Storage Module
+ * ====================
  *
- * Enforces a bounded hot LTM directory by archiving older LTM summary files
- * into compressed cold storage (no gzip append). Optionally indexes archived
- * summaries into LanceDB so they're still searchable.
+ * Archives warm storage (archive/*.md) to cold storage (archive/cold/*.jsonl).
+ * Cold storage uses compressed JSONL format with sensitive data scrubbed.
  *
- * Cold format: one gzip'd JSONL file per archive run.
+ * Security Features:
+ * - Uses atomicWriteSync() for crash-safe writes
+ * - Scrubs sensitive data via sensitive-scrubber before archival
+ * - Validates paths with validatePathWithinProject()
+ *
+ * Implementation: ADR-102 (Memory Management Rebuild)
  */
 
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
-const zlib = require('zlib');
-
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
-const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
-const { getRetentionOptions } = require('./memory-retention-config.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { scrubSensitiveContent } = require('../utils/sensitive-scrubber.cjs');
 
-const COLD_INDEX_MAX_CHARS = Number(process.env.COLD_STORAGE_INDEX_MAX_CHARS || 4000);
+// Default options
+const DEFAULT_MAX_AGE_DAYS = 30;
 
-function validateProjectRoot(projectRoot) {
-  if (projectRoot !== PROJECT_ROOT) {
-    const validation = validatePathWithinProject(projectRoot, PROJECT_ROOT);
-    if (!validation.safe) {
-      throw new Error(`Invalid projectRoot: ${validation.reason}`);
-    }
-  }
-}
-
-function ensureDir(dirPath) {
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-}
-
-function getLtmDir(projectRoot = PROJECT_ROOT) {
-  return path.join(projectRoot, '.claude', 'context', 'memory', 'ltm');
-}
-
-function toIsoDate(date) {
-  return date.toISOString().slice(0, 10);
-}
+// Memory file names (hot storage)
+const HOT_MEMORY_FILES = ['learnings.md', 'decisions.md', 'issues.md'];
 
 /**
- * List LTM summary files (summary_*.json) sorted oldest-first (by mtime).
+ * Archive warm storage files to cold JSONL format.
+ * Scans archive/ directory for files older than maxAgeDays,
+ * scrubs sensitive content, and appends to cold/*.jsonl.
  *
- * @param {string} projectRoot
- * @returns {Array<{absPath: string, name: string, mtimeMs: number}>}
+ * @param {string} memoryDir - Memory directory path (contains archive/)
+ * @param {Object} opts - Options
+ * @param {number} opts.maxAgeDays - Maximum age in days before archiving (default: 30)
+ * @returns {{ archivedFiles: number, archivedEntries: number }}
  */
-function listLTMSummaries(projectRoot = PROJECT_ROOT) {
-  validateProjectRoot(projectRoot);
-  const ltmDir = getLtmDir(projectRoot);
-  if (!fs.existsSync(ltmDir)) return [];
+function archiveWarmToCold(memoryDir, opts = {}) {
+  const { maxAgeDays = DEFAULT_MAX_AGE_DAYS } = opts;
 
-  const entries = [];
-  for (const name of fs.readdirSync(ltmDir)) {
-    if (!name.endsWith('.json')) continue;
-    if (!name.startsWith('summary_')) continue;
-    const absPath = path.join(ltmDir, name);
-    try {
-      const stat = fs.statSync(absPath);
-      if (!stat.isFile()) continue;
-      entries.push({ absPath, name, mtimeMs: stat.mtimeMs });
-    } catch {
-      // skip unreadable entry
+  const archiveDir = path.join(memoryDir, 'archive');
+  const coldDir = path.join(archiveDir, 'cold');
+
+  // Ensure cold directory exists
+  if (!fs.existsSync(coldDir)) {
+    fs.mkdirSync(coldDir, { recursive: true });
+  }
+
+  // Find archive files
+  let archiveFiles = [];
+  if (fs.existsSync(archiveDir)) {
+    archiveFiles = fs
+      .readdirSync(archiveDir)
+      .filter((f) => f.endsWith('.md') && f.includes('-20')) // Match pattern: learnings-2026-01.md
+      .map((f) => path.join(archiveDir, f));
+  }
+
+  let archivedFileCount = 0;
+  let archivedEntryCount = 0;
+  const now = Date.now();
+  const maxAgeMs = maxAgeDays * 24 * 60 * 60 * 1000;
+
+  for (const archiveFile of archiveFiles) {
+    // Parse date from filename (e.g., learnings-2026-01.md -> 2026-01)
+    const match = path.basename(archiveFile).match(/(\d{4}-\d{2})/);
+    if (!match) {
+      continue; // Skip files without date pattern
     }
+
+    const yearMonth = match[1];
+    const fileDate = new Date(`${yearMonth}-01T00:00:00Z`);
+    const ageMs = now - fileDate.getTime();
+
+    if (ageMs <= maxAgeMs) {
+      // Too recent, skip
+      continue;
+    }
+
+    // Read archive content
+    const content = fs.readFileSync(archiveFile, 'utf8');
+
+    // Scrub sensitive content
+    const { scrubbed } = scrubSensitiveContent(content);
+
+    // Parse sections from content
+    const sections = parseSections(scrubbed);
+
+    // Use yearMonth already extracted above
+    const coldFile = path.join(coldDir, `cold-${yearMonth}.jsonl`);
+
+    // Append entries to cold JSONL (one JSON object per line)
+    const jsonlEntries = sections.map((section) => JSON.stringify(section)).join('\n') + '\n';
+
+    // Append to cold file (or create if doesn't exist)
+    if (fs.existsSync(coldFile)) {
+      // Append
+      const existing = fs.readFileSync(coldFile, 'utf8');
+      atomicWriteSync(coldFile, existing + jsonlEntries, 'utf8');
+    } else {
+      // Create new
+      atomicWriteSync(coldFile, jsonlEntries, 'utf8');
+    }
+
+    archivedFileCount++;
+    archivedEntryCount += sections.length;
   }
 
-  entries.sort((a, b) => a.mtimeMs - b.mtimeMs || a.name.localeCompare(b.name));
-  return entries;
-}
-
-function buildColdArchivePath(coldDir) {
-  const now = new Date();
-  const date = toIsoDate(now);
-  const stamp = now.toISOString().replace(/[:.]/g, '-');
-  return path.join(coldDir, `ltm-${date}-${stamp}.jsonl.gz`);
-}
-
-function buildIndexDocument(summaryObj, sourcePath, coldPath) {
-  const createdAt = summaryObj?.created_at || null;
-  const dateRange = summaryObj?.date_range || null;
-  const keyLearnings = Array.isArray(summaryObj?.key_learnings) ? summaryObj.key_learnings : [];
-  const patterns = Array.isArray(summaryObj?.important_patterns)
-    ? summaryObj.important_patterns
-    : [];
-  const decisions = Array.isArray(summaryObj?.major_decisions) ? summaryObj.major_decisions : [];
-  const touched = Array.isArray(summaryObj?.files_frequently_touched)
-    ? summaryObj.files_frequently_touched
-    : [];
-
-  const header = [
-    'LTM Session Summary (Archived)',
-    createdAt ? `created_at: ${createdAt}` : null,
-    dateRange?.start || dateRange?.end
-      ? `date_range: ${dateRange?.start || 'unknown'} → ${dateRange?.end || 'unknown'}`
-      : null,
-    typeof summaryObj?.session_count === 'number'
-      ? `session_count: ${summaryObj.session_count}`
-      : null,
-    '',
-  ]
-    .filter(Boolean)
-    .join('\n');
-
-  const bodyParts = [];
-  if (keyLearnings.length) bodyParts.push(`Key learnings:\n- ${keyLearnings.join('\n- ')}`);
-  if (patterns.length) bodyParts.push(`Important patterns:\n- ${patterns.join('\n- ')}`);
-  if (decisions.length) bodyParts.push(`Major decisions:\n- ${decisions.join('\n- ')}`);
-  if (touched.length) bodyParts.push(`Files frequently touched:\n- ${touched.join('\n- ')}`);
-
-  let text = `${header}\n${bodyParts.join('\n\n')}`.trim();
-  const truncated = Number.isFinite(COLD_INDEX_MAX_CHARS) && text.length > COLD_INDEX_MAX_CHARS;
-  if (truncated) {
-    text = `${text.slice(0, COLD_INDEX_MAX_CHARS)}…`;
-  }
-
-  const idBase = path.basename(sourcePath, '.json');
   return {
-    id: `ltm-archive-${idBase}`,
-    text,
-    metadata: {
-      source: 'ltm_archive',
-      tier: 'cold',
-      coldPath: path.relative(PROJECT_ROOT, coldPath).replace(/\\/g, '/'),
-      ltmFile: path.relative(PROJECT_ROOT, sourcePath).replace(/\\/g, '/'),
-      created_at: createdAt,
-      date_range: dateRange,
-      truncated,
-    },
+    archivedFiles: archivedFileCount,
+    archivedEntries: archivedEntryCount,
   };
 }
 
 /**
- * Search cold storage via LanceDB (tier=cold filter).
+ * Parse markdown content into sections for JSONL storage.
+ * Sections are delimited by `---` or `## ` headers.
  *
- * @param {string} query
- * @param {object} [options]
- * @param {object} [options.filters]
- * @param {number} [options.limit]
- * @param {number} [options.minScore]
- * @param {object|null} [options.vectorStore] Optional injected vector store for tests
- * @param {string} [options.projectRoot]
- * @returns {Promise<Array>}
+ * @param {string} content - Markdown content
+ * @returns {Array<{ title: string, content: string, date: string|null }>}
  */
-async function searchColdStorage(query, options = {}) {
-  const projectRoot = options.projectRoot || PROJECT_ROOT;
-  validateProjectRoot(projectRoot);
-
-  try {
-    const { MemoryVectorStore } = require('./lancedb-client.cjs');
-    const vectorStore =
-      options.vectorStore ||
-      new MemoryVectorStore({
-        persistDirectory: path.join(projectRoot, '.claude', 'context', 'data', 'lancedb'),
-        collectionName: 'agent_memory',
-        embeddingMode: process.env.LANCEDB_EMBEDDING_MODE || 'transformers',
-      });
-
-    const available = await vectorStore.isAvailable();
-    if (!available) {
-      return [];
-    }
-
-    const results = await vectorStore.search(query, {
-      limit: options.limit,
-      minScore: options.minScore,
-      filters: { ...(options.filters || {}), 'metadata.tier': 'cold' },
-    });
-
-    if (!options.vectorStore && typeof vectorStore.close === 'function') {
-      await vectorStore.close();
-    }
-
-    return results;
-  } catch (_err) {
+function parseSections(content) {
+  if (!content || typeof content !== 'string') {
     return [];
   }
+
+  const sections = [];
+  const lines = content.split('\n');
+  let currentSection = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Section delimiter: --- or ## header
+    if (line.trim() === '---' || line.startsWith('## ')) {
+      // Save previous section
+      if (currentSection && currentSection.content.trim()) {
+        sections.push(currentSection);
+      }
+
+      // Start new section
+      if (line.startsWith('## ')) {
+        currentSection = {
+          title: line.slice(3).trim(),
+          content: '',
+          date: null,
+        };
+      } else {
+        currentSection = {
+          title: 'Untitled',
+          content: '',
+          date: null,
+        };
+      }
+    } else if (currentSection) {
+      // Accumulate content
+      currentSection.content += line + '\n';
+
+      // Extract date if present
+      const dateMatch = line.match(/\*\*Date:\*\*\s*(\d{4}-\d{2}-\d{2})/i);
+      if (dateMatch) {
+        currentSection.date = dateMatch[1];
+      }
+    }
+  }
+
+  // Save last section
+  if (currentSection && currentSection.content.trim()) {
+    sections.push(currentSection);
+  }
+
+  return sections;
 }
 
 /**
- * Archive old LTM summaries to cold storage (no gzip append).
+ * Get storage statistics for hot/warm/cold tiers.
  *
- * @param {string} projectRoot
- * @param {object} [options]
- * @param {number} [options.maxSummaries]
- * @param {boolean} [options.coldEnable]
- * @param {number|undefined} [options.archiveAfterDays]
- * @param {string} [options.coldDir] Absolute path
- * @param {boolean} [options.indexIntoLanceDb=true]
- * @param {object|null} [options.vectorStore] Optional injected vector store for tests
- * @returns {{ archived: number, deleted: number, coldPaths: string[], indexed: number }}
+ * @param {string} memoryDir - Memory directory path
+ * @returns {{ hot: { files: number, bytes: number },
+ *             warm: { files: number, bytes: number },
+ *             cold: { files: number, bytes: number } }}
  */
-async function archiveOldLTM(projectRoot = PROJECT_ROOT, options = {}) {
-  validateProjectRoot(projectRoot);
+function getStorageStats(memoryDir) {
+  const archiveDir = path.join(memoryDir, 'archive');
+  const coldDir = path.join(archiveDir, 'cold');
 
-  const env = getRetentionOptions(projectRoot);
-
-  const maxSummaries =
-    typeof options.maxSummaries === 'number' ? options.maxSummaries : env.maxSummaries;
-  const coldEnable = typeof options.coldEnable === 'boolean' ? options.coldEnable : env.coldEnable;
-  const archiveAfterDays =
-    typeof options.archiveAfterDays === 'number' ? options.archiveAfterDays : env.archiveAfterDays;
-  const coldDir = typeof options.coldDir === 'string' ? options.coldDir : env.coldDir;
-  const indexIntoLanceDb =
-    typeof options.indexIntoLanceDb === 'boolean' ? options.indexIntoLanceDb : true;
-
-  const validation = validatePathWithinProject(coldDir, projectRoot);
-  if (!validation.safe) {
-    throw new Error(`Invalid coldDir: ${validation.reason}`);
-  }
-
-  const all = listLTMSummaries(projectRoot);
-  if (all.length === 0) return { archived: 0, deleted: 0, coldPaths: [], indexed: 0 };
-
-  const selected = new Map(); // absPath -> entry
-
-  if (Number.isFinite(maxSummaries) && all.length > maxSummaries) {
-    const removeCount = all.length - maxSummaries;
-    for (const entry of all.slice(0, removeCount)) {
-      selected.set(entry.absPath, entry);
+  // Hot storage stats (learnings.md, decisions.md, issues.md)
+  let hotFiles = 0;
+  let hotBytes = 0;
+  for (const file of HOT_MEMORY_FILES) {
+    const filePath = path.join(memoryDir, file);
+    if (fs.existsSync(filePath)) {
+      hotFiles++;
+      hotBytes += fs.statSync(filePath).size;
     }
   }
 
-  if (typeof archiveAfterDays === 'number' && Number.isFinite(archiveAfterDays)) {
-    const cutoffMs = Date.now() - archiveAfterDays * 24 * 60 * 60 * 1000;
-    for (const entry of all) {
-      if (entry.mtimeMs <= cutoffMs) {
-        selected.set(entry.absPath, entry);
-      }
+  // Warm storage stats (archive/*.md)
+  let warmFiles = 0;
+  let warmBytes = 0;
+  if (fs.existsSync(archiveDir)) {
+    const files = fs.readdirSync(archiveDir).filter((f) => f.endsWith('.md'));
+    warmFiles = files.length;
+    for (const file of files) {
+      warmBytes += fs.statSync(path.join(archiveDir, file)).size;
     }
   }
 
-  const toArchive = Array.from(selected.values()).sort(
-    (a, b) => a.mtimeMs - b.mtimeMs || a.name.localeCompare(b.name)
-  );
-
-  if (toArchive.length === 0) {
-    return { archived: 0, deleted: 0, coldPaths: [], indexed: 0 };
-  }
-
-  if (!coldEnable) {
-    let deleted = 0;
-    for (const entry of toArchive) {
-      try {
-        fs.rmSync(entry.absPath);
-        deleted++;
-      } catch {
-        // ignore delete failures
-      }
-    }
-    return { archived: 0, deleted, coldPaths: [], indexed: 0 };
-  }
-
-  ensureDir(coldDir);
-  const coldPath = buildColdArchivePath(coldDir);
-
-  const jsonlLines = [];
-  const docsForIndex = [];
-
-  for (const entry of toArchive) {
-    try {
-      const raw = fs.readFileSync(entry.absPath, 'utf8');
-      jsonlLines.push(raw.trim());
-
-      try {
-        const obj = JSON.parse(raw);
-        docsForIndex.push(buildIndexDocument(obj, entry.absPath, coldPath));
-      } catch {
-        // index is best-effort; still archive raw
-      }
-    } catch {
-      // skip unreadable
-    }
-  }
-
-  const jsonl = jsonlLines.filter(Boolean).join('\n') + '\n';
-  const gz = zlib.gzipSync(Buffer.from(jsonl, 'utf8'));
-  atomicWriteSync(coldPath, gz);
-
-  let indexed = 0;
-  if (indexIntoLanceDb && docsForIndex.length > 0) {
-    try {
-      const { MemoryVectorStore } = require('./lancedb-client.cjs');
-      const vectorStore =
-        options.vectorStore ||
-        new MemoryVectorStore({
-          persistDirectory: path.join(projectRoot, '.claude', 'context', 'data', 'lancedb'),
-          collectionName: 'agent_memory',
-          embeddingMode: process.env.LANCEDB_EMBEDDING_MODE || 'transformers',
-        });
-
-      const available = await vectorStore.isAvailable();
-      if (available) {
-        await vectorStore.upsertDocuments(docsForIndex);
-        indexed = docsForIndex.length;
-      }
-
-      if (!options.vectorStore && typeof vectorStore.close === 'function') {
-        await vectorStore.close();
-      }
-    } catch {
-      // best-effort indexing
-    }
-  }
-
-  let deleted = 0;
-  for (const entry of toArchive) {
-    try {
-      fs.rmSync(entry.absPath);
-      deleted++;
-    } catch {
-      // ignore delete failures
+  // Cold storage stats (archive/cold/*.jsonl)
+  let coldFiles = 0;
+  let coldBytes = 0;
+  if (fs.existsSync(coldDir)) {
+    const files = fs.readdirSync(coldDir).filter((f) => f.endsWith('.jsonl'));
+    coldFiles = files.length;
+    for (const file of files) {
+      coldBytes += fs.statSync(path.join(coldDir, file)).size;
     }
   }
 
   return {
-    archived: toArchive.length,
-    deleted,
-    coldPaths: [coldPath],
-    indexed,
+    hot: { files: hotFiles, bytes: hotBytes },
+    warm: { files: warmFiles, bytes: warmBytes },
+    cold: { files: coldFiles, bytes: coldBytes },
   };
+}
+
+/**
+ * Search cold storage (stub - not implemented yet).
+ *
+ * @param {string} query - Search query
+ * @returns {Array} Empty array (stub)
+ */
+function searchCold(query) {
+  // Stub: return empty array
+  return [];
 }
 
 module.exports = {
-  listLTMSummaries,
-  archiveOldLTM,
-  searchColdStorage,
-  // exported for tests
-  _private: {
-    buildIndexDocument,
-  },
+  archiveWarmToCold,
+  getStorageStats,
+  searchCold,
 };

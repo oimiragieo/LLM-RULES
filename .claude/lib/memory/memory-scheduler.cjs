@@ -11,7 +11,6 @@
  *
  * Integration points:
  * - memory-tiers.cjs (STM/MTM/LTM operations)
- * - smart-pruner.cjs (deduplication, pruning)
  * - memory-dashboard.cjs (metrics, health scores)
  * - memory-manager.cjs (archival, pruning)
  */
@@ -21,7 +20,8 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.cjs');
+const { atomicWriteSync } = require('../utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
 // CRITICAL-001 FIX: Path traversal prevention
@@ -120,7 +120,8 @@ function readStatus(projectRoot = PROJECT_ROOT) {
   const statusPath = getStatusPath(projectRoot);
   try {
     if (fs.existsSync(statusPath)) {
-      return JSON.parse(fs.readFileSync(statusPath, 'utf8'));
+      const content = fs.readFileSync(statusPath, 'utf8');
+      return safeParseJSON(content, null);
     }
   } catch (e) {
     logger.debug('readStatus failed', { error: e.message });
@@ -290,7 +291,7 @@ function runExtraction(projectRoot = PROJECT_ROOT) {
     } else {
       try {
         result.success = true;
-        result.details = output ? JSON.parse(output) : { status: 'ok' };
+        result.details = output ? safeParseJSON(output, null) : { status: 'ok' };
       } catch (parseErr) {
         result.success = false;
         result.details = `memory-extract JSON parse failed: ${parseErr.message}${
@@ -298,6 +299,54 @@ function runExtraction(projectRoot = PROJECT_ROOT) {
         }`;
       }
     }
+  } catch (e) {
+    result.details = e.message;
+  }
+
+  return result;
+}
+
+/**
+ * Run rotation task (hot -> warm archival when files exceed threshold)
+ */
+function runRotation(projectRoot = PROJECT_ROOT) {
+  validateProjectRoot(projectRoot);
+  const libDir = getLibDir(projectRoot);
+  const memoryRotator = safeRequire(path.join(libDir, 'memory-rotator.cjs'));
+
+  const result = {
+    type: 'rotation',
+    timestamp: new Date().toISOString(),
+    success: false,
+    details: null,
+  };
+
+  if (!memoryRotator) {
+    result.details = 'memory-rotator.cjs not available';
+    return result;
+  }
+
+  try {
+    const memoryDir = getMemoryDir(projectRoot);
+    const memoryFiles = ['learnings.md', 'decisions.md', 'issues.md'];
+    let totalRotated = 0;
+
+    for (const file of memoryFiles) {
+      const filePath = path.join(memoryDir, file);
+      if (!fs.existsSync(filePath)) continue;
+
+      // Rotate if file exceeds threshold
+      const rotateResult = memoryRotator.rotateIfNeeded(filePath, { thresholdKB: 20 });
+      if (rotateResult.rotated) {
+        totalRotated++;
+      }
+    }
+
+    result.success = true;
+    result.details = {
+      filesChecked: memoryFiles.length,
+      filesRotated: totalRotated,
+    };
   } catch (e) {
     result.details = e.message;
   }
@@ -338,23 +387,18 @@ function runSummarization(projectRoot = PROJECT_ROOT) {
 }
 
 /**
- * Run deduplication task
+ * Run deduplication task (uses smart-pruner)
  */
 function runDeduplication(projectRoot = PROJECT_ROOT) {
-  // CRITICAL-001-MEMORY FIX: Validate projectRoot
   validateProjectRoot(projectRoot);
   const libDir = getLibDir(projectRoot);
   const smartPruner = safeRequire(path.join(libDir, 'smart-pruner.cjs'));
-  const entityLinks = safeRequire(path.join(libDir, 'memory-entity-links.cjs'));
-  const memoryDir = getMemoryDir(projectRoot);
 
   const result = {
     type: 'deduplication',
     timestamp: new Date().toISOString(),
     success: false,
-    patterns: { original: 0, deduplicated: 0 },
-    gotchas: { original: 0, deduplicated: 0 },
-    relationshipsCleaned: 0,
+    details: null,
   };
 
   if (!smartPruner) {
@@ -363,45 +407,32 @@ function runDeduplication(projectRoot = PROJECT_ROOT) {
   }
 
   try {
-    // Deduplicate patterns
-    const patternsPath = path.join(memoryDir, 'patterns.json');
-    if (fs.existsSync(patternsPath)) {
-      const patterns = JSON.parse(fs.readFileSync(patternsPath, 'utf8'));
-      result.patterns.original = patterns.length;
+    const memoryDir = getMemoryDir(projectRoot);
+    const memoryFiles = ['learnings.md', 'decisions.md', 'issues.md'];
+    let totalDeduped = 0;
+    let totalPruned = 0;
 
-      const patternsResult = smartPruner.deduplicateAndPrune(patterns, {
-        targetCount: patterns.length, // Don't prune count, just dedupe
-        similarityThreshold: 0.4,
-      });
+    for (const file of memoryFiles) {
+      const filePath = path.join(memoryDir, file);
+      if (!fs.existsSync(filePath)) continue;
 
-      if (patternsResult.deduplicated > 0) {
-        atomicWriteJSONSync(patternsPath, patternsResult.kept);
+      // Deduplicate file
+      const dedupResult = smartPruner.deduplicateFile(filePath, { threshold: 0.6 });
+      totalDeduped += dedupResult.duplicatesRemoved;
+
+      // Prune resolved entries (for issues.md)
+      if (file === 'issues.md') {
+        const pruneResult = smartPruner.pruneResolvedEntries(filePath);
+        totalPruned += pruneResult.removed;
       }
-      result.patterns.deduplicated = patternsResult.deduplicated;
-    }
-
-    // Deduplicate gotchas
-    const gotchasPath = path.join(memoryDir, 'gotchas.json');
-    if (fs.existsSync(gotchasPath)) {
-      const gotchas = JSON.parse(fs.readFileSync(gotchasPath, 'utf8'));
-      result.gotchas.original = gotchas.length;
-
-      const gotchasResult = smartPruner.deduplicateAndPrune(gotchas, {
-        targetCount: gotchas.length, // Don't prune count, just dedupe
-        similarityThreshold: 0.4,
-      });
-
-      if (gotchasResult.deduplicated > 0) {
-        atomicWriteJSONSync(gotchasPath, gotchasResult.kept);
-      }
-      result.gotchas.deduplicated = gotchasResult.deduplicated;
     }
 
     result.success = true;
-    if (entityLinks && typeof entityLinks.cleanupOrphanedRelationships === 'function') {
-      const cleanup = entityLinks.cleanupOrphanedRelationships(projectRoot);
-      result.relationshipsCleaned = cleanup?.deleted || 0;
-    }
+    result.details = {
+      filesProcessed: memoryFiles.length,
+      duplicatesRemoved: totalDeduped,
+      resolvedIssuesPruned: totalPruned,
+    };
   } catch (e) {
     result.details = e.message;
   }
@@ -449,13 +480,13 @@ function runPruning(projectRoot = PROJECT_ROOT) {
 }
 
 /**
- * Run LTM cold archiving task (best-effort).
- *
- * Implemented via a child Node process so the scheduler remains synchronous.
+ * Run warm -> cold archiving task.
+ * Archives old warm storage files to cold JSONL format with sensitive scrubbing.
  */
 function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
-  // CRITICAL-001-MEMORY FIX: Validate projectRoot
   validateProjectRoot(projectRoot);
+  const libDir = getLibDir(projectRoot);
+  const coldStorage = safeRequire(path.join(libDir, 'cold-storage.cjs'));
 
   const result = {
     type: 'archiveOldLTM',
@@ -464,59 +495,27 @@ function runArchiveOldLTM(projectRoot = PROJECT_ROOT) {
     details: null,
   };
 
-  // Construct absolute paths for requirements (JSON.stringify makes paths safe for any characters)
-  const coldStoragePath = path.join(projectRoot, '.claude', 'lib', 'memory', 'cold-storage.cjs');
-  const retentionConfigPath = path.join(
-    projectRoot,
-    '.claude',
-    'lib',
-    'memory',
-    'memory-retention-config.cjs'
-  );
-
-  const script = `
-  import { archiveOldLTM } from ${JSON.stringify(coldStoragePath)};
-  import { getRetentionOptions } from ${JSON.stringify(retentionConfigPath)};
-
-  const projectRoot = ${JSON.stringify(projectRoot)};
-  const options = getRetentionOptions(projectRoot);
-
-  try {
-    const details = await archiveOldLTM(projectRoot, options);
-    process.stdout.write(JSON.stringify({ success: true, details }));
-  } catch (err) {
-    process.stdout.write(JSON.stringify({ success: false, details: err && err.message ? err.message : String(err) }));
-  }
-  `;
-
-  const proc = spawnSync(process.execPath, ['--input-type=module', '-e', script], {
-    cwd: projectRoot,
-    env: process.env,
-    encoding: 'utf8',
-  });
-
-  if (proc.error) {
-    result.details = proc.error.message;
+  if (!coldStorage) {
+    result.details = 'cold-storage.cjs not available';
     return result;
   }
 
   try {
-    const parsed = JSON.parse(String(proc.stdout || '').trim() || '{}');
-    result.success = Boolean(parsed.success);
-    result.details = parsed.details ?? null;
-  } catch (e) {
-    result.details = `Failed to parse archiver output: ${e.message}`;
-  }
+    const memoryDir = getMemoryDir(projectRoot);
+    const archiveResult = coldStorage.archiveWarmToCold(memoryDir, { maxAgeDays: 30 });
 
-  // Record lastColdArchive for reporting (best-effort).
-  if (result.success) {
-    try {
-      const status = readStatus(projectRoot);
-      status.lastColdArchive = result.timestamp;
-      writeStatus(status, projectRoot);
-    } catch (_e) {
-      // ignore status write failures
-    }
+    result.success = true;
+    result.details = {
+      archivedFiles: archiveResult.archivedFiles,
+      archivedEntries: archiveResult.archivedEntries,
+    };
+
+    // Record lastColdArchive for reporting
+    const status = readStatus(projectRoot);
+    status.lastColdArchive = result.timestamp;
+    writeStatus(status, projectRoot);
+  } catch (e) {
+    result.details = e.message;
   }
 
   return result;
@@ -593,6 +592,8 @@ function runTask(taskName, projectRoot = PROJECT_ROOT) {
       return runHealthCheck(projectRoot);
     case 'metricsLog':
       return runMetricsLog(projectRoot);
+    case 'rotation':
+      return runRotation(projectRoot);
     case 'summarization':
       return runSummarization(projectRoot);
     case 'deduplication':
@@ -700,6 +701,7 @@ function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
   tasks.push(runMetricsLog(projectRoot));
 
   // Run weekly tasks
+  tasks.push(runRotation(projectRoot));
   tasks.push(runSummarization(projectRoot));
   tasks.push(runDeduplication(projectRoot));
   tasks.push(runPruning(projectRoot));
@@ -936,6 +938,7 @@ module.exports = {
   runHealthCheck,
   runMetricsLog,
   runExtraction,
+  runRotation,
   runSummarization,
   runDeduplication,
   runPruning,
