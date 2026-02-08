@@ -97,12 +97,25 @@ function trimOldReflections(requests) {
   return trimmed;
 }
 
+/**
+ * Check if pending reflection requests exist
+ * Primary check: spawn-request.json array length > 0
+ * Secondary check: reminder.txt file exists
+ * @returns {boolean} True if reflections are pending
+ */
 function hasPendingReflections() {
+  // Primary trigger: check spawn-request.json content (source of truth)
+  const requests = readSpawnRequests(SPAWN_REQUEST_PATH);
+  if (Array.isArray(requests) && requests.length > 0) {
+    return true;
+  }
+
+  // Secondary trigger: reminder.txt existence (legacy/fallback)
   if (fs.existsSync(REMINDER_PATH)) {
     return true;
   }
-  const requests = readSpawnRequests(SPAWN_REQUEST_PATH);
-  return Array.isArray(requests) && requests.length > 0;
+
+  return false;
 }
 
 async function main() {
@@ -112,9 +125,9 @@ async function main() {
       process.exit(0);
     }
 
-    // Task 1.2: Changed default from 'block' to 'warn' to prevent deadlock
-    // Router can proceed with TaskList after emitting warning about pending reflections
-    const mode = getEnforcementMode('REFLECTION_STEP0_ENFORCEMENT', 'warn');
+    // Default to 'block' to enforce Step 0 reflection processing before TaskList
+    // Set REFLECTION_STEP0_ENFORCEMENT=warn to soften enforcement
+    const mode = getEnforcementMode('REFLECTION_STEP0_ENFORCEMENT', 'block');
     if (mode === 'off') {
       process.exit(0);
     }
@@ -151,10 +164,17 @@ async function main() {
       }
     }
 
+    // Count pending requests for detailed message
+    const pendingCount = requests.length;
+
     const message =
-      'Pending reflection requests exist. Perform Step 0 before TaskList: read ' +
-      'reflection-reminder.txt, review reflection-spawn-request.json, spawn reflection-agent, then clear files. ' +
-      'Set REFLECTION_STEP0_ENFORCEMENT=warn to soften enforcement.';
+      `${pendingCount} pending reflection request(s) in reflection-spawn-request.json. ` +
+      'STEP 0 REQUIRED: (1) Read reflection-spawn-request.json, ' +
+      '(2) Spawn reflection-agent for each request (or first batch), ' +
+      '(3) Clear/trim spawn-request.json, ' +
+      '(4) Delete reflection-reminder.txt if exists, ' +
+      'THEN proceed to TaskList(). ' +
+      'Set REFLECTION_STEP0_ENFORCEMENT=warn to allow with warning.';
 
     auditLog('reflection-step0-guard', {
       level: mode === 'block' ? 'error' : 'warn',
