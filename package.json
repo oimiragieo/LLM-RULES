@@ -101,7 +101,8 @@
     "test:count": "node scripts/testing/count-all-tests.mjs",
     "gpu:check": "node .claude/tools/cli/check-gpu.cjs",
     "graph:bootstrap": "node .claude/tools/cli/bootstrap-artifact-graph.cjs",
-    "graph:health": "node .claude/tools/cli/bootstrap-artifact-graph.cjs --dry-run"
+    "graph:health": "node .claude/tools/cli/bootstrap-artifact-graph.cjs --dry-run",
+    "graph:dashboard": "node .claude/tools/cli/integration-health-dashboard.cjs"
   },
   "keywords": [
     "claude",

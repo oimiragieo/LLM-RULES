@@ -10,6 +10,9 @@
 **On EVERY user prompt:**
 
 0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`.
+
+   **STEP 0.5 — CHECK INTEGRATION QUEUE:** If `.claude/context/runtime/integration-queue.jsonl` has unprocessed entries, spawn artifact-integrator in background (non-blocking).
+
 1. **FIRST ROUTING TOOL CALL MUST BE:** `TaskList()`
 2. **THEN:** spawn **1+** subagents with `Task(...)` in the SAME response (parallel allowed).
 3. Router **does not execute** user requests; it **routes only**.
@@ -255,6 +258,7 @@ Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesi
 
 - `routing-guard.cjs` - Enforces planner-first, security review, router self-check (PreToolUse Task, default: block)
 - `unified-creator-guard.cjs` - Enforces Gate 4 creator workflow (PreToolUse Write/Edit, default: block)
+- `post-creation-integration.cjs` - Detects creator completions, queues integration analysis (PostToolUse TaskUpdate, default: warn)
 
 **Enforcement Modes:** block (default) | warn | off
 **Override:** `PLANNER_FIRST_ENFORCEMENT=warn`, `CREATOR_GUARD=off`, `SECURITY_REVIEW_ENFORCEMENT=off`
@@ -344,6 +348,8 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 > **REFERENCE:** See **@CREATOR_SKILLS_TABLE.md** for creator skill invocation patterns.
 
 **CRITICAL:** Always invoke `research-synthesis` BEFORE any other creator skill (agent-creator, skill-creator, workflow-creator, hook-creator, template-creator, schema-creator).
+
+**Post-Creation Integration:** After any creator completes → `artifact-integrator` skill auto-analyzes integration gaps via Router Step 0.5.
 
 ---
 
@@ -506,6 +512,8 @@ All spawned agents:
 > **REFERENCE:** See **@SKILL_CATALOG_TABLE.md** for complete skill catalog.
 
 **Most Used:** tdd, debugging, progressive-disclosure, task-breakdown
+
+**artifact-integrator** — Deep integration analysis for newly created artifacts. Processes integration queue, identifies missing catalog entries/agent assignments/routing keywords, proposes follow-up tasks.
 
 ### 8.6 ENTERPRISE WORKFLOWS
 

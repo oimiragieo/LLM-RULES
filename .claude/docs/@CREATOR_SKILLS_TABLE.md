@@ -25,6 +25,7 @@ Complete mapping of creator skills invoked via `Skill()` tool for creating new a
 | **New hook**            | `hook-creator`\*       | `.claude/skills/hook-creator/SKILL.md`       |
 | **New template**        | `template-creator`\*   | `.claude/skills/template-creator/SKILL.md`   |
 | **New schema**          | `schema-creator`\*     | `.claude/skills/schema-creator/SKILL.md`     |
+| **After ANY creation** | `artifact-integrator` | Post-creation hook → integration-queue.jsonl → artifact-integrator → follow-up tasks |
 
 \*Spawn a general-purpose agent that invokes the skill via `Skill({ skill: "..." })`.
 
@@ -56,6 +57,10 @@ Skill({ skill: 'skill-creator' }); // Missing research phase
 **Hook:** `research-enforcement.cjs` blocks creation without research
 
 **Override:** `RESEARCH_ENFORCEMENT=warn|off` (default: `block`)
+
+### Post-Creation Integration (ADR-100)
+
+**Post-Creation Integration (ADR-100):** All creator skills now trigger automatic integration analysis via the `post-creation-integration.cjs` hook. The `artifact-integrator` skill processes the queue and proposes follow-up tasks for missing catalog entries, agent assignments, and routing updates.
 
 ---
 

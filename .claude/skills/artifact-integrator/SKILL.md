@@ -60,6 +60,80 @@ For each artifact with missing integrations:
 **Nice-to-Have — Note but don't create tasks:**
 - Missing templates, optional docs
 
+### Step 3.5: Backward Propagation Processing (ADR-100 Phase 3.1-3.3)
+
+When processing backward propagation signals from code-reviewer or architect:
+
+**Detection:**
+- Queue entries with `changeType: "backward-propagation"`
+- Review findings containing `BACKWARD_PROPAGATION` section
+- Pattern reports indicating systemic duplication
+
+**Validation:**
+1. **Verify the pattern exists** (check mentioned files/components)
+   - Read each affected file to confirm pattern duplication
+   - Count actual instances (not just claimed instances)
+   - Validate pattern similarity (not just superficially similar)
+
+2. **Assess if a new artifact is warranted**
+   - Threshold: >= 3 instances of identical or near-identical pattern
+   - Impact: Would artifact reduce duplication by 50%+ LOC?
+   - Maintenance: Would centralization improve maintainability?
+
+3. **If warranted, queue for creation:**
+   - Write entry to `integration-queue.jsonl` with `changeType: "backward-propagation"`
+   - Set `proposedArtifact` field with type and suggested name
+   - Set priority based on impact:
+     - P1 (3-5 instances, security/critical patterns)
+     - P2 (6+ instances, quality/consistency patterns)
+   - Include validation evidence (file paths, LOC counts, pattern excerpts)
+
+4. **Report back in integration analysis report:**
+
+```markdown
+## Backward Propagation Analysis
+
+**Pattern**: <validated pattern description>
+**Instances Found**: <actual count> (claimed: <original count>)
+**Proposed Artifact**: <type>:<name>
+**Justification**: <why centralization is beneficial>
+**Priority**: P1 | P2
+**Next Steps**: Queued for creator skill invocation
+```
+
+**Example Queue Entry:**
+
+```jsonl
+{
+  "artifactId": "hook:jwt-validation",
+  "changeType": "backward-propagation",
+  "timestamp": "2026-02-08T10:30:00Z",
+  "processed": false,
+  "source": "code-reviewer",
+  "pattern": "Manual JWT validation logic duplicated in 4 route handlers",
+  "affectedFiles": ["routes/auth.ts", "routes/api.ts", "routes/admin.ts", "routes/user.ts"],
+  "validatedInstances": 4,
+  "estimatedLOCReduction": 120,
+  "priority": "P1",
+  "proposedArtifact": {
+    "type": "hook",
+    "name": "jwt-validation",
+    "rationale": "Centralize JWT validation for consistent security enforcement"
+  }
+}
+```
+
+**Rejection Criteria:**
+- Pattern found in < 3 files (insufficient duplication)
+- Pattern variations are too different (not truly duplicated)
+- Existing artifact already handles this pattern (orphaned/underutilized)
+- LOC reduction < 30 lines (insufficient benefit)
+
+**Integration with Creator Skills:**
+- Validated backward propagation entries trigger creator skill invocation
+- Creator skills (skill-creator, hook-creator, template-creator, schema-creator) consume queue entries
+- After creation, artifact-integrator processes the newly created artifact for standard integrations
+
 ### Step 4: Update Graph
 After creating integration tasks:
 - Add edges for newly discovered relationships

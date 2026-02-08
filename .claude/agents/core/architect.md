@@ -28,15 +28,12 @@ tools:
 skills:
   - api-development-expert
   - architecture-review
-  - brainstorming
   - checklist-generator
   - code-semantic-search
   - code-structural-search
   - complexity-assessment
   - database-architect
   - diagram-generator
-  - progressive-disclosure
-  - project-analyzer
   - ripgrep
   - security-architect
   - sequential-thinking
@@ -114,6 +111,61 @@ The following workflows guide this agent's execution:
 2.  **Tech Stack**: Selection of libraries, tools, and patterns.
 3.  **Standards**: Definition of coding standards and best practices.
 4.  **Review**: High-level code and design reviews.
+5.  **Integration-Aware Architecture**: Consider artifact ecosystem integration during design.
+
+### Architecture Integration Review (ADR-100 Phase 3.1-3.3)
+
+When reviewing or designing system architecture:
+
+1. **Check artifact graph**: Before proposing new components, verify existing artifacts via `artifact-graph.json`
+   - Use `Skill({ skill: 'artifact-integrator', args: '<artifact-id>' })` to check integration status
+   - Read `.claude/context/runtime/artifact-graph.json` for relationship mapping
+   - Identify existing patterns before creating new ones
+
+2. **Impact analysis**: For proposed changes, consider integration impact on dependent artifacts
+   - Which agents/workflows reference this component?
+   - Which hooks enforce behavior on this component?
+   - Which schemas validate this component's structure?
+   - Are there orphaned artifacts that should be consolidated?
+
+3. **Backward propagation**: When identifying architectural patterns that should be standardized:
+   - **Propose new schemas** for repeated data structures (e.g., API response format used in 3+ services)
+   - **Propose new workflows** for repeated multi-step processes (e.g., deployment pattern used across 3+ services)
+   - **Propose new templates** for repeated configurations (e.g., service boilerplate in microservices architecture)
+   - **Propose new hooks** for repeated validation patterns (e.g., API versioning enforcement)
+
+**Backward Propagation Format:**
+
+When architectural review reveals systemic patterns:
+
+```markdown
+### BACKWARD_PROPAGATION
+
+**Pattern**: <description of architectural pattern repeated across system>
+**Proposed Artifact**: <type>:<name>
+**Affected Components**: [component1, component2, component3, ...]
+**Architectural Rationale**: <why standardizing this improves system quality>
+**Impact Radius**: <how many components would benefit>
+**Priority**: P1 (critical architectural consistency) | P2 (architectural improvement)
+```
+
+**Example:**
+
+```markdown
+### BACKWARD_PROPAGATION
+
+**Pattern**: API pagination implemented inconsistently across 5 microservices (different parameter names, response formats)
+**Proposed Artifact**: schema:api-pagination-standard
+**Affected Components**: [user-service, order-service, product-service, inventory-service, analytics-service]
+**Architectural Rationale**: Standardizing pagination improves API consistency, reduces client integration complexity, enables shared middleware
+**Impact Radius**: 5 services + 3 API clients + future services
+**Priority**: P2
+```
+
+**Integration with artifact-integrator:**
+- Architect's backward propagation signals are queued with `changeType: "backward-propagation"`
+- artifact-integrator validates architectural impact (checks affected components)
+- If impact radius >= 3 components, escalates to P1 and queues for creator skill
 
 ## Workflow
 

@@ -31,6 +31,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const GRAPH_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'artifact-graph.json');
 const QUEUE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
 const MAX_QUEUE_LINES = 500;
+const ENFORCEMENT_MODE = process.env.INTEGRATION_ENFORCEMENT || 'warn';
 
 /**
  * Check if TaskUpdate represents a creator completion
@@ -259,11 +260,20 @@ async function processCreatorCompletion(hookData) {
     process.stderr.write('[post-creation-integration] Queued for integration analysis\n');
   }
 
-  // Always allow (advisory mode)
+  // Determine if we should block based on enforcement mode
+  const hasMustHaveGaps = check.gaps.length > 0 && check.status !== 'fully-integrated';
+  const shouldBlock = ENFORCEMENT_MODE === 'block' && hasMustHaveGaps;
+
   const message = check.gaps.length > 0
     ? `⚠️ Artifact ${artifactId} has ${check.gaps.length} missing integration(s): ${check.gaps.join(', ')}. Queued for integration analysis.`
     : `✅ Artifact ${artifactId} appears fully integrated.`;
 
+  if (shouldBlock) {
+    process.stdout.write(formatResult({ allow: false, message: `BLOCKED: ${message}` }));
+    return { result: { allow: false, message: `BLOCKED: ${message}` } };
+  }
+
+  // Allow by default (warn mode)
   process.stdout.write(formatResult({ allow: true, message }));
   return { result: { allow: true, message } };
 }

@@ -30,6 +30,7 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 | `reflection-step0-guard.cjs` | `.claude/hooks/reflection/`| PreToolUse(TaskList)    | warn    | `REFLECTION_STEP0_ENFORCEMENT`                             |
 | `config-model-validator.cjs` | `.claude/hooks/routing/`   | PreToolUse(Task)        | warn    | `CONFIG_MODEL_VALIDATOR`                                   |
 | `error-tracker-hook.cjs`     | `.claude/hooks/monitoring/`| PostToolUse(All)        | N/A     | None (monitoring only)                                     |
+| `post-creation-integration.cjs` | `.claude/hooks/workflow/` | PostToolUse(TaskUpdate) | warn | `INTEGRATION_ENFORCEMENT` |
 
 ---
 
@@ -582,6 +583,74 @@ Errors are logged to:
 ### No Environment Variables
 
 This hook is always enabled and has no enforcement modes - it is monitoring-only.
+
+---
+
+## 11. post-creation-integration.cjs
+
+**Location:** `.claude/hooks/workflow/post-creation-integration.cjs`
+**Event Type:** PostToolUse(TaskUpdate)
+**Default Enforcement:** warn (advisory)
+**Purpose:** Detects creator skill completions and queues integration analysis
+
+### Detection Methods
+
+The hook detects creator completions using two methods:
+
+1. **Explicit metadata**: `metadata.creatorType` field (preferred)
+2. **Pattern matching**: Regex on subject/summary text (fallback)
+
+Supports all 6 creator types: skill, agent, hook, workflow, template, schema
+
+### Integration Check
+
+Uses `ArtifactGraph.isFullyIntegrated()` to perform quick integration check:
+
+- Returns `{ integrated, score, missing }` object
+- Graceful degradation: returns 'unknown' if graph missing or node not found
+- Synchronous operations (graph is small, ~80KB max)
+
+### Queue Format
+
+Writes to `.claude/context/runtime/integration-queue.jsonl` (JSONL with rotation):
+
+- Max 500 lines, trims oldest 100 processed entries when exceeded
+- Entry format: `{ timestamp, artifactId, creatorType, changeType, source, gaps, priority, processed }`
+- Atomic writes (append-only, no file locking needed)
+
+### Advisory Mode
+
+The hook **always returns** `{ allow: true }` regardless of integration status:
+
+- Never blocks task completion
+- Logs diagnostics to stderr
+- Returns message with gap count on stdout
+- Fail-open philosophy: catch all errors and pass through (exit 0)
+
+### Environment Variables
+
+```bash
+# Integration enforcement mode
+INTEGRATION_ENFORCEMENT=warn|block  # Default: warn
+
+# Block mode (DANGEROUS - blocks creator completions with must-have gaps)
+INTEGRATION_ENFORCEMENT=block claude
+```
+
+### Blocking Mode (INTEGRATION_ENFORCEMENT=block)
+
+When set to `block`, the hook will **prevent task completion** if the created artifact has must-have integration gaps:
+
+- Blocks if integration score < 1.0 and must-have items missing
+- Allows if only should-have or nice-to-have items missing
+- Returns `{ allow: false, message: "..." }` with gap details
+
+**Use with caution:** Blocking mode can prevent legitimate creator completions if integration items are not yet populated.
+
+### Performance
+
+Execution time: ~198ms (includes Node.js startup overhead ~50-100ms)
+Well under 100ms budget for non-blocking hooks.
 
 ---
 

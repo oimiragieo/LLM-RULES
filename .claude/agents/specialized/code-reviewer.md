@@ -272,9 +272,50 @@ After completing spec compliance and code quality review, if changes involve art
    - MUST-FIX: Missing must-have integrations
    - SHOULD-FIX: Missing should-have integrations
    - NOTE: Missing nice-to-have integrations
-6. **Backward propagation** — If systemic pattern detected (same validation in 3+ files, repeated boilerplate):
-   - Propose new artifact creation (skill, hook, template)
-   - Tag as "backward-propagation" for artifact-integrator
+
+#### 3.6 Backward Propagation (ADR-100 Phase 3.1-3.3)
+
+When reviewing code, watch for systemic patterns that indicate a missing artifact:
+
+**Triggers:**
+- Same validation logic copied in 3+ files → Propose new shared validation hook
+- Same code pattern repeated across agents → Propose new skill
+- Same boilerplate in multiple workflows → Propose new template
+- Missing error handling pattern → Propose enforcement hook
+- Repeated database access pattern → Propose database library/helper
+- Repeated API request pattern → Propose API client skill
+
+**Action:**
+When a systemic pattern is detected, add to review findings:
+
+```markdown
+### BACKWARD_PROPAGATION
+
+**Pattern**: <description of repeated pattern>
+**Proposed Artifact**: <type>:<name>
+**Affected Files**: [file1, file2, file3, ...]
+**Rationale**: <why this should be a shared artifact>
+**Priority**: P1 (3-5 instances) | P2 (6+ instances)
+```
+
+**Example:**
+
+```markdown
+### BACKWARD_PROPAGATION
+
+**Pattern**: Manual JWT validation logic duplicated in 4 route handlers
+**Proposed Artifact**: hook:jwt-validation
+**Affected Files**: [routes/auth.ts, routes/api.ts, routes/admin.ts, routes/user.ts]
+**Rationale**: Centralizing JWT validation ensures consistent security enforcement and reduces code duplication (DRY violation)
+**Priority**: P1
+```
+
+This signals the artifact-integrator to evaluate and potentially queue artifact creation.
+
+**Integration with artifact-integrator:**
+- Backward propagation entries are added to integration queue with `changeType: "backward-propagation"`
+- artifact-integrator validates the pattern exists (checks mentioned files)
+- If >= 3 instances confirmed, queues for creator skill invocation
 
 ### Hybrid Validation (NEW - Enhancement #10)
 
