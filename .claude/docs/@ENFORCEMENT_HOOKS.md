@@ -677,6 +677,226 @@ Well under 100ms budget for non-blocking hooks.
 
 ---
 
+## 12. SEC-ICE-001: Artifact Name Validation
+
+**Location:** `.claude/lib/creators/companion-check.cjs` (library, not hook)
+**Scope:** All creator skills
+**Default Enforcement:** block (validation failure prevents creation)
+**Purpose:** Prevents path traversal attacks via malicious artifact names
+
+### Threat Model
+
+Malicious artifact names can exploit path construction to write files outside intended directories:
+
+```javascript
+// Attack attempt
+artifactName: '../../etc/passwd';
+// Would construct: .claude/skills/../../etc/passwd → /etc/passwd
+
+// Attack attempt
+artifactName: '..\\..\\Windows\\System32\\config';
+// Would construct: .claude\skills\..\..\Windows\System32\config
+```
+
+### Validation Rules
+
+Artifact names MUST match strict regex: `^[a-z0-9][a-z0-9-]*[a-z0-9]$`
+
+**Allowed:**
+
+- Lowercase letters (a-z)
+- Numbers (0-9)
+- Hyphens (-) as separators
+- Must start and end with alphanumeric (no leading/trailing hyphens)
+
+**Blocked:**
+
+- Path separators (`/`, `\`)
+- Parent directory references (`..`)
+- Uppercase letters (consistency)
+- Special characters (except hyphens)
+- Leading/trailing hyphens
+
+### Implementation
+
+All 9 creator skills call `isValidArtifactName(name)` before path construction:
+
+```javascript
+const { isValidArtifactName } = require('.claude/lib/creators/companion-check.cjs');
+
+if (!isValidArtifactName(artifactName)) {
+  throw new Error(`Invalid artifact name: ${artifactName}`);
+}
+```
+
+### Test Coverage
+
+22 tests across 3 functions:
+
+- `isValidArtifactName()` - 10 tests (valid/invalid names)
+- `normalizePath()` - 6 tests (Windows backslash, Unix forward slash)
+- `isPathWithinProject()` - 6 tests (path traversal detection)
+
+### Examples
+
+```javascript
+// ✅ ALLOWED
+isValidArtifactName('my-skill'); // true
+isValidArtifactName('auth-middleware'); // true
+isValidArtifactName('skill2024'); // true
+
+// ❌ BLOCKED
+isValidArtifactName('my_skill'); // false (underscore)
+isValidArtifactName('../passwd'); // false (parent ref)
+isValidArtifactName('My-Skill'); // false (uppercase)
+isValidArtifactName('-leading'); // false (leading hyphen)
+```
+
+---
+
+## 13. SEC-ICE-002: Auto-Spawn Amplification Limits
+
+**Location:** `.claude/lib/creators/companion-check.cjs` (library, not hook)
+**Scope:** Companion matrix auto-spawn logic
+**Default Enforcement:** block (limits enforced before auto-spawning)
+**Purpose:** Prevents recursive companion spawning creating exponential agent proliferation
+
+### Threat Model
+
+Without limits, companion auto-spawning can create amplification attacks:
+
+```
+User creates skill A
+  → Auto-spawns agent B (companion, depth 1)
+    → Auto-spawns skill C (companion, depth 2)
+      → Auto-spawns agent D (companion, depth 3) ← BLOCKED
+      → Auto-spawns skill E (companion, depth 3) ← BLOCKED
+      → ... (exponential growth)
+```
+
+**Attack vectors:**
+
+- Depth amplification: A → B → C → D → ... (unbounded depth)
+- Per-event amplification: A → (B, C, D, E, F, ...) (unbounded breadth)
+- Cycle amplification: A → B → A → B → ... (infinite loop)
+
+### Protection Layers
+
+#### 1. Depth Limit
+
+**Maximum 2 levels** of auto-spawn:
+
+```
+creator → companion (depth 1) → sub-companion (depth 2) → STOP
+```
+
+**Why 2?**
+
+- Depth 1: Primary companions (catalog, agent assignment)
+- Depth 2: Secondary companions (examples, documentation)
+- Depth 3+: Manual review (prevents runaway recursion)
+
+#### 2. Per-Event Cap
+
+**Maximum 5 auto-spawns** per creation event:
+
+```
+create skill → auto-spawn 5 must-have companions → STOP
+```
+
+**Why 5?**
+
+- Typical artifact has 2-3 must-have companions
+- Cap allows for 5 even in complex cases
+- Prevents single event from spawning 10-50 agents
+
+#### 3. Cycle Detection
+
+**DAG tracking** prevents circular dependencies:
+
+```
+skill-creator → agent-creator → skill-creator (BLOCKED - cycle detected)
+hook-creator → settings.json → schema-creator (ALLOWED - no cycle)
+```
+
+Uses breadth-first search to detect cycles before spawning.
+
+#### 4. Kill Switch
+
+**Environment variable `AUTO_SPAWN_COMPANIONS=off`** disables all auto-spawning:
+
+```bash
+# Disable auto-spawn completely (manual review only)
+AUTO_SPAWN_COMPANIONS=off claude
+```
+
+**Use cases:**
+
+- Emergency: Auto-spawn misbehaving
+- Development: Testing without side effects
+- Manual control: User wants full oversight
+
+### Implementation
+
+Auto-spawn checks run in this order (fail-fast):
+
+```javascript
+// 1. Kill switch (highest priority)
+if (process.env.AUTO_SPAWN_COMPANIONS === 'off') return false;
+
+// 2. Depth limit
+if (currentDepth >= 2) return false;
+
+// 3. Per-event cap
+if (spawnsThisEvent >= 5) return false;
+
+// 4. Cycle detection
+if (detectsCycle(currentPath, companion)) return false;
+
+// All checks passed → allow auto-spawn
+return true;
+```
+
+### Test Coverage
+
+6 tests covering all protection layers:
+
+- Kill switch enforcement (1 test)
+- Depth limit enforcement (2 tests)
+- Per-event cap enforcement (1 test)
+- Cycle detection (2 tests)
+
+### Environment Variables
+
+```bash
+# Kill switch (disable all auto-spawning)
+AUTO_SPAWN_COMPANIONS=on|off  # Default: on
+
+# Auto-spawn depth limit
+AUTO_SPAWN_DEPTH_LIMIT=number  # Default: 2
+
+# Auto-spawn per-event cap
+AUTO_SPAWN_EVENT_CAP=number  # Default: 5
+```
+
+### Examples
+
+```bash
+# Normal operation (limits enforced)
+# User creates skill A → 2 must-have companions auto-spawned (within limits)
+
+# Emergency: Disable auto-spawn
+AUTO_SPAWN_COMPANIONS=off claude
+
+# Conservative: Lower depth limit to 1
+AUTO_SPAWN_DEPTH_LIMIT=1 claude
+
+# Permissive: Raise per-event cap to 10 (not recommended)
+AUTO_SPAWN_EVENT_CAP=10 claude
+```
+
+---
+
 ## Enforcement Modes
 
 | Mode    | Behavior                        | Use Case                                |

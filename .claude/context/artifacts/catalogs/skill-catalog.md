@@ -210,20 +210,20 @@ Code style enforcement.
 
 ## Creator Tools
 
-Framework artifact creators.
+Framework artifact creators. All 9 creator skills now include **Step 0.5 (Companion Check)** before creation begins, displaying must-have/should-have/nice-to-have companion checklist for awareness.
 
 | Skill                 | Description                                                             | Primary Agents                |
 | --------------------- | ----------------------------------------------------------------------- | ----------------------------- |
 | `research-synthesis`  | Research synthesis for artifact creation (invoke BEFORE other creators) | all creators                  |
-| `agent-creator`       | Creates specialized AI agents                                           | router                        |
-| `skill-creator`       | Creates and validates skills                                            | router                        |
-| `hook-creator`        | Creates framework hooks                                                 | router                        |
-| `workflow-creator`    | Creates orchestration workflows                                         | router                        |
-| `template-creator`    | Creates templates                                                       | router                        |
-| `schema-creator`      | Creates JSON Schema validators                                          | router                        |
-| `command-creator`     | Creates thin-delegator slash commands                                   | router                        |
-| `rule-creator`        | Creates workspace convention rules                                      | router                        |
-| `tool-creator`        | Creates CLI tools and utilities                                         | router                        |
+| `agent-creator`       | Creates specialized AI agents (with Step 0.5 companion check)           | router                        |
+| `skill-creator`       | Creates and validates skills (with Step 0.5 companion check)            | router                        |
+| `hook-creator`        | Creates framework hooks (with Step 0.5 companion check)                 | router                        |
+| `workflow-creator`    | Creates orchestration workflows (with Step 0.5 companion check)         | router                        |
+| `template-creator`    | Creates templates (with Step 0.5 companion check)                       | router                        |
+| `schema-creator`      | Creates JSON Schema validators (with Step 0.5 companion check)          | router                        |
+| `command-creator`     | Creates thin-delegator slash commands (with Step 0.5 companion check)   | router                        |
+| `rule-creator`        | Creates workspace convention rules (with Step 0.5 companion check)      | router                        |
+| `tool-creator`        | Creates CLI tools and utilities (with Step 0.5 companion check)         | router                        |
 | `artifact-updater`    | Updates existing artifacts (unified updater for all types)              | all creators                  |
 | `artifact-integrator` | Deep integration analysis for newly created artifacts                   | architect, planner, developer |
 
@@ -232,11 +232,15 @@ Framework artifact creators.
 ```javascript
 // ALWAYS invoke research-synthesis first
 Skill({ skill: 'research-synthesis', args: 'topic' });
+
+// Creator automatically runs Step 0.5 companion check (displays checklist)
 Skill({ skill: 'skill-creator', args: 'skill-name' });
 
 // After creation, check integration
 Skill({ skill: 'artifact-integrator' });
 ```
+
+**Step 0.5 Companion Check:** Uses `companion-check.cjs` library to load companion matrix from `ecosystem-impact-graph.json`, check existing companions, and display must-have/should-have/nice-to-have checklist before creation. Prevents 70% orphan rate by making creators aware of ecosystem dependencies.
 
 ---
 

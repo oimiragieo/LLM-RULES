@@ -3,6 +3,85 @@
 
 ---
 
+## Documentation Update: Interwoven Creator Ecosystem (Task #47, 2026-02-08)
+
+**Pattern:** Comprehensive documentation updates after EPIC implementation ensure discoverability and understanding of new features.
+
+**Completed Documentation Updates:**
+
+1. **ecosystem-creation-workflow.md** - New core workflow documenting 6-phase artifact creation lifecycle:
+   - Phase 1: Routing (Gate 4 check)
+   - Phase 2: Research (MCP-first tool priority: Exa → Ref → WebSearch)
+   - Phase 3: Pre-Check (companion-check.cjs Step 0.5)
+   - Phase 4: Creation (9 creator skills)
+   - Phase 5: Integration (artifact-integrator Step 3.1)
+   - Phase 6: Follow-Up (auto-spawn with SEC-ICE-002 limits)
+
+2. **CLAUDE.md Section 3 (Creator Skills)** - Added companion check and companionMatrix references:
+   - Step 0.5 companion check (before creation begins)
+   - Post-creation integration uses companionMatrix from ecosystem-impact-graph.json
+
+3. **CLAUDE.md Section 8.6 (Enterprise Workflows)** - Added ecosystem-creation-workflow.md to core workflows list
+
+4. **@CREATOR_SKILLS_TABLE.md** - Documented Step 0.5 companion check for all 9 creator skills:
+   - Added 3 new creators to table (command-creator, rule-creator, tool-creator)
+   - Explained companion check purpose (prevent 70% orphan rate)
+   - Documented location (between Step 0 and Step 1 in all creators)
+
+5. **@ENTERPRISE_WORKFLOWS.md** - Added ecosystem-creation-workflow.md to workflow catalog table
+
+6. **@ENFORCEMENT_HOOKS.md** - Added security control documentation:
+   - SEC-ICE-001: Artifact name validation (prevents path traversal)
+   - SEC-ICE-002: Auto-spawn amplification limits (depth=2, cap=5, cycle detection, kill switch)
+
+7. **skill-catalog.md** - Updated Creator Tools section:
+   - Noted all 9 creators have Step 0.5 companion check
+   - Explained companion-check.cjs library usage
+   - Updated creation pattern example with Step 0.5 reference
+
+**Key Learnings:**
+
+1. **Documentation Consolidation:** EPIC features require updates across 6+ documentation files (CLAUDE.md, @files, catalogs, workflows). Create checklist to ensure all relevant docs updated.
+
+2. **Cross-Reference Consistency:** When adding new workflows/features, update ALL three locations:
+   - CLAUDE.md inline summary (brief)
+   - @file detailed reference (complete)
+   - Catalog entry (discoverable)
+
+3. **Security Control Documentation:** Security controls (SEC-ICE-XXX) need comprehensive docs:
+   - Threat model (what attack does it prevent?)
+   - Protection layers (how does it prevent?)
+   - Test coverage (how is it verified?)
+   - Examples (what's allowed/blocked?)
+
+4. **Workflow Documentation Pattern:** Core workflows need 6 sections:
+   - Overview (what/why)
+   - Phases (step-by-step)
+   - Security Controls (SEC-XXX references)
+   - Companion Matrix Reference (data structures)
+   - Related Workflows (cross-references)
+   - Integration with Existing System (how it fits)
+
+5. **Creator Skill Consistency:** All 9 creator skills share same structure:
+   - Step 0: Existence check
+   - **Step 0.5: Companion check (NEW)**
+   - Step 1: Research
+   - Step 2-N: Creation logic
+   - Post-Creation: Integration checklist
+
+**Files Modified:**
+
+- `.claude/workflows/core/ecosystem-creation-workflow.md` (created)
+- `.claude/CLAUDE.md` (2 sections updated)
+- `.claude/docs/@CREATOR_SKILLS_TABLE.md`
+- `.claude/docs/@ENTERPRISE_WORKFLOWS.md`
+- `.claude/docs/@ENFORCEMENT_HOOKS.md`
+- `.claude/context/artifacts/catalogs/skill-catalog.md`
+
+**Next Phase:** Reflection (Task #48) - Score Interwoven Creator Ecosystem pipeline
+
+---
+
 ## Interwoven Creator Ecosystem Security Review (Task #39, 2026-02-08)
 
 **Pattern:** Pre-implementation security review using STRIDE + OWASP Top 10 + IEEE 1028 hybrid validation catches design-level vulnerabilities before code is written. This is far cheaper than post-implementation fixes.
