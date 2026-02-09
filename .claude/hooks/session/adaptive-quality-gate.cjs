@@ -17,7 +17,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const RUNTIME_DIR = path.join(__dirname, '..', '..', 'context', 'runtime');
+// Allow tests to override runtime directory via env var
+const RUNTIME_DIR =
+  process.env.CLAUDE_RUNTIME_DIR || path.join(__dirname, '..', '..', 'context', 'runtime');
 const COUNTER_FILE = path.join(RUNTIME_DIR, 'edit-counter.json');
 const METRICS_FILE = path.join(RUNTIME_DIR, 'session-metrics.json');
 
@@ -91,19 +93,25 @@ function determineThresholds() {
 function checkThresholds(count, thresholds, counter) {
   // First threshold
   if (count === thresholds.first && !counter.firstThresholdHit) {
-    console.error(`[Quality Gate] ${count} edits made. Consider running: pnpm lint:fix && pnpm format`);
+    console.error(
+      `[Quality Gate] ${count} edits made. Consider running: pnpm lint:fix && pnpm format`
+    );
     return { ...counter, firstThresholdHit: true };
   }
 
   // Second threshold
   if (count === thresholds.second && !counter.secondThresholdHit) {
-    console.error(`[Quality Gate] ${count} edits made. Strongly recommend running: pnpm lint:fix && pnpm format && pnpm test`);
+    console.error(
+      `[Quality Gate] ${count} edits made. Strongly recommend running: pnpm lint:fix && pnpm format && pnpm test`
+    );
     return { ...counter, secondThresholdHit: true };
   }
 
   // Repeat threshold (after second, at intervals of repeat)
   if (count > thresholds.second && (count - thresholds.second) % thresholds.repeat === 0) {
-    console.error(`[Quality Gate] ${count} edits since last checkpoint. Run quality checks: pnpm lint:fix && pnpm format && pnpm test`);
+    console.error(
+      `[Quality Gate] ${count} edits since last checkpoint. Run quality checks: pnpm lint:fix && pnpm format && pnpm test`
+    );
   }
 
   return counter;
