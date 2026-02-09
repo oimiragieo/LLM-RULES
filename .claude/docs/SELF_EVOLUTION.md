@@ -1,4 +1,5 @@
 <!-- Agent: technical-writer | Task: #9 | Session: 2026-02-09 -->
+
 # Self-Evolution Guide
 
 **Last Updated:** 2026-02-09
@@ -33,14 +34,14 @@ The framework supports self-evolution of:
 
 Each artifact type has a dedicated creator skill:
 
-| Artifact Type | Creator Skill       | Purpose                                    |
-|---------------|---------------------|-------------------------------------------|
-| Agents        | `agent-creator`     | Create specialized agent definitions      |
-| Skills        | `skill-creator`     | Create reusable skills and convert MCPs   |
-| Hooks         | `hook-creator`      | Create runtime enforcement hooks          |
-| Workflows     | `workflow-creator`  | Create multi-step process definitions     |
-| Templates     | `template-creator`  | Create standardized document templates    |
-| Schemas       | `schema-creator`    | Create JSON validation schemas            |
+| Artifact Type | Creator Skill      | Purpose                                 |
+| ------------- | ------------------ | --------------------------------------- |
+| Agents        | `agent-creator`    | Create specialized agent definitions    |
+| Skills        | `skill-creator`    | Create reusable skills and convert MCPs |
+| Hooks         | `hook-creator`     | Create runtime enforcement hooks        |
+| Workflows     | `workflow-creator` | Create multi-step process definitions   |
+| Templates     | `template-creator` | Create standardized document templates  |
+| Schemas       | `schema-creator`   | Create JSON validation schemas          |
 
 **Important:** Always invoke `research-synthesis` skill BEFORE any creator skill to gather domain knowledge and verify the need.
 
@@ -49,11 +50,13 @@ Each artifact type has a dedicated creator skill:
 Creating an artifact is only the first step. Proper integration ensures discoverability:
 
 **Must-Have Integration (Blocking):**
+
 - Catalog/registry entry (makes artifact discoverable)
 - At least one consumer (agent, workflow, or command)
 - Routing keywords (enables auto-discovery by router)
 
 **Should-Have Integration (Warning):**
+
 - Documentation reference in @files
 - Test coverage for executable artifacts
 

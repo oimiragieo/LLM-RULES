@@ -35,18 +35,6 @@ skills:
   - template-creator
   - verification-before-completion
   - workflow-creator
-context_files:
-  - '@.claude/context/memory/learnings.md'
-  - '@.claude/context/memory/decisions.md'
-  - '@.claude/context/evolution-state.json'
-triggers:
-  - 'create new agent'
-  - 'create new skill'
-  - 'need a .*agent'
-  - 'need a .*skill'
-  - 'no matching agent'
-  - 'capability gap'
-  - 'evolve'
 ---
 
 # Evolution Orchestrator
