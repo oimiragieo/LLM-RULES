@@ -204,6 +204,7 @@ Grep: "<related-term>" in .claude/skills/
    - If agent does planning → consider: plan-generator, sequential-thinking, diagram-generator
    - If agent does security → consider: security-related skills
    - If agent does documentation → consider: doc-generator, diagram-generator
+   - **ALL code-interacting agents** should include: ripgrep, code-semantic-search, code-structural-search (for hybrid code search)
    - **ALL agents** should include: task-management-protocol (for task tracking)
 4. **Include ALL relevant skills** in the agent's frontmatter using 3-tier mapping:
    - **Primary skills**: Core to this agent's domain (always loaded)

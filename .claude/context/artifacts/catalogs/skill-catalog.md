@@ -44,19 +44,19 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 Essential development workflow skills.
 
-| Skill                            | Description                                                                           | Primary Agents           |
-| -------------------------------- | ------------------------------------------------------------------------------------- | ------------------------ |
-| `tdd`                            | Test-Driven Development with Iron Laws. **Includes deprecated alias: testing-expert** | developer, qa            |
-| `debugging`                      | Systematic 4-phase debugging with root cause investigation                            | developer                |
-| `ripgrep`                        | Enhanced code search with ES module support (.mjs, .cjs, .mts, .cts)                  | developer, code-reviewer |
-| `code-quality-expert`            | Clean code principles, style guides, refactoring patterns                             | code-reviewer, developer |
-| `code-analyzer`                  | Static code analysis and complexity metrics                                           | code-reviewer, architect |
-| `code-semantic-search`           | Semantic code search using Phase 1 vectors + Phase 2 hybrid                           | developer, architect     |
-| `code-structural-search`         | AST-based pattern matching with ast-grep                                              | developer, code-reviewer |
-| `code-style-validator`           | Programmatic AST-based style validation                                               | code-reviewer            |
-| `dry-principle`                  | Don't Repeat Yourself enforcement                                                     | code-reviewer            |
-| `verification-before-completion` | Gate function preventing unverified claims                                            | all agents               |
-| `best-practices-guidelines`      | Cross-cutting best practices                                                          | all agents               |
+| Skill                            | Description                                                                           | Primary Agents                 |
+| -------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------ |
+| `tdd`                            | Test-Driven Development with Iron Laws. **Includes deprecated alias: testing-expert** | developer, qa                  |
+| `debugging`                      | Systematic 4-phase debugging with root cause investigation                            | developer                      |
+| `ripgrep`                        | Enhanced code search with ES module support (.mjs, .cjs, .mts, .cts)                  | 36+ agents (all domain agents) |
+| `code-quality-expert`            | Clean code principles, style guides, refactoring patterns                             | code-reviewer, developer       |
+| `code-analyzer`                  | Static code analysis and complexity metrics                                           | code-reviewer, architect       |
+| `code-semantic-search`           | Semantic code search using Phase 1 vectors + Phase 2 hybrid                           | 36+ agents (all domain agents) |
+| `code-structural-search`         | AST-based pattern matching with ast-grep                                              | 36+ agents (all domain agents) |
+| `code-style-validator`           | Programmatic AST-based style validation                                               | code-reviewer                  |
+| `dry-principle`                  | Don't Repeat Yourself enforcement                                                     | code-reviewer                  |
+| `verification-before-completion` | Gate function preventing unverified claims                                            | all agents                     |
+| `best-practices-guidelines`      | Cross-cutting best practices                                                          | all agents                     |
 
 **Invocation:**
 
@@ -351,14 +351,14 @@ Incident management skills.
 
 ## Search
 
-Advanced search capabilities.
+Advanced search capabilities. All 3 search skills (ripgrep, code-semantic-search, code-structural-search) are now assigned to 36+ agents (all domain-level agents across all tiers).
 
-| Skill                    | Description                                | Primary Agents           |
-| ------------------------ | ------------------------------------------ | ------------------------ |
-| `ripgrep`                | Text search with PCRE2 regex               | developer                |
-| `code-semantic-search`   | Semantic search (Phase 1 + Phase 2 hybrid) | developer, architect     |
-| `code-structural-search` | AST pattern matching                       | developer, code-reviewer |
-| `frontend-expert`        | Frontend code search                       | frontend-pro             |
+| Skill                    | Description                                | Primary Agents                 |
+| ------------------------ | ------------------------------------------ | ------------------------------ |
+| `ripgrep`                | Text search with PCRE2 regex               | 36+ agents (all domain agents) |
+| `code-semantic-search`   | Semantic search (Phase 1 + Phase 2 hybrid) | 36+ agents (all domain agents) |
+| `code-structural-search` | AST pattern matching                       | 36+ agents (all domain agents) |
+| `frontend-expert`        | Frontend code search                       | frontend-pro                   |
 
 ---
 
