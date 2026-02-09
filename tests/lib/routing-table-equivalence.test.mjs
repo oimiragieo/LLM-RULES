@@ -19,10 +19,7 @@ describe('Routing Table Equivalence Tests', () => {
       ];
 
       for (const key of requiredKeys) {
-        assert.ok(
-          Object.hasOwn(routingTable, key),
-          `Missing required export: ${key}`
-        );
+        assert.ok(Object.hasOwn(routingTable, key), `Missing required export: ${key}`);
       }
     });
 
@@ -135,10 +132,7 @@ describe('Routing Table Equivalence Tests', () => {
           'string',
           `Keyword "${keyword}" should map to a string agent name`
         );
-        assert.ok(
-          agentNames.has(agent),
-          `Keyword "${keyword}" maps to unknown agent "${agent}"`
-        );
+        assert.ok(agentNames.has(agent), `Keyword "${keyword}" maps to unknown agent "${agent}"`);
       }
     });
 
@@ -260,10 +254,7 @@ describe('Routing Table Equivalence Tests', () => {
           'string',
           `Intent "${intent}" should map to a string agent name`
         );
-        assert.ok(
-          agentNames.has(agent),
-          `Intent "${intent}" maps to unknown agent "${agent}"`
-        );
+        assert.ok(agentNames.has(agent), `Intent "${intent}" maps to unknown agent "${agent}"`);
       }
     });
 
@@ -374,11 +365,7 @@ describe('Routing Table Equivalence Tests', () => {
         );
 
         for (const rule of ruleArray) {
-          assert.equal(
-            typeof rule,
-            'object',
-            `Each rule for "${keyword}" should be an object`
-          );
+          assert.equal(typeof rule, 'object', `Each rule for "${keyword}" should be an object`);
           assert.ok(
             Array.isArray(rule.condition),
             `Rule for "${keyword}" should have a "condition" array`
@@ -491,10 +478,7 @@ describe('Routing Table Equivalence Tests', () => {
         totalKeywords += keywords.length;
       }
       // Simplified: ~350 total keywords after Phase 3.3 reduction (from ~1570)
-      assert.ok(
-        totalKeywords >= 200,
-        `Expected at least 200 total keywords, got ${totalKeywords}`
-      );
+      assert.ok(totalKeywords >= 200, `Expected at least 200 total keywords, got ${totalKeywords}`);
     });
 
     it('should have all intent categories map to arrays', () => {
@@ -531,10 +515,7 @@ describe('Routing Table Equivalence Tests', () => {
       const entries = Object.entries(routingTable.ROUTING_PATTERNS);
 
       for (const [agent, patterns] of entries) {
-        assert.ok(
-          Array.isArray(patterns),
-          `Patterns for agent "${agent}" should be an array`
-        );
+        assert.ok(Array.isArray(patterns), `Patterns for agent "${agent}" should be an array`);
         assert.ok(
           patterns.length > 0,
           `Patterns for agent "${agent}" should have at least one pattern`
@@ -624,15 +605,19 @@ describe('Routing Table Equivalence Tests', () => {
 
     it('should match pattern examples correctly', () => {
       const developerPatterns = routingTable.ROUTING_PATTERNS.developer;
-      const implementPattern = developerPatterns.find((p) => p.pattern.test('implement authentication'));
+      const implementPattern = developerPatterns.find(p =>
+        p.pattern.test('implement authentication')
+      );
       assert.ok(implementPattern, 'Should match "implement authentication" for developer');
 
       const qaPatterns = routingTable.ROUTING_PATTERNS.qa;
-      const testPattern = qaPatterns.find((p) => p.pattern.test('test the login flow'));
+      const testPattern = qaPatterns.find(p => p.pattern.test('test the login flow'));
       assert.ok(testPattern, 'Should match "test the login flow" for qa');
 
       const architectPatterns = routingTable.ROUTING_PATTERNS.architect;
-      const designPattern = architectPatterns.find((p) => p.pattern.test('design a microservice architecture'));
+      const designPattern = architectPatterns.find(p =>
+        p.pattern.test('design a microservice architecture')
+      );
       assert.ok(designPattern, 'Should match "design a microservice architecture" for architect');
     });
   });
@@ -662,17 +647,19 @@ describe('Routing Table Equivalence Tests', () => {
     });
 
     it('should include "reactjs" pattern', () => {
-      const reactjsPattern = routingTable.ROUTING_PREFIX_PATTERNS.find((p) => p.pattern === 'reactjs');
+      const reactjsPattern = routingTable.ROUTING_PREFIX_PATTERNS.find(
+        p => p.pattern === 'reactjs'
+      );
       assert.ok(reactjsPattern, 'Should have "reactjs" prefix pattern');
     });
 
     it('should include "nextjs" pattern', () => {
-      const nextjsPattern = routingTable.ROUTING_PREFIX_PATTERNS.find((p) => p.pattern === 'nextjs');
+      const nextjsPattern = routingTable.ROUTING_PREFIX_PATTERNS.find(p => p.pattern === 'nextjs');
       assert.ok(nextjsPattern, 'Should have "nextjs" prefix pattern');
     });
 
     it('should include "nodejs" pattern', () => {
-      const nodejsPattern = routingTable.ROUTING_PREFIX_PATTERNS.find((p) => p.pattern === 'nodejs');
+      const nodejsPattern = routingTable.ROUTING_PREFIX_PATTERNS.find(p => p.pattern === 'nodejs');
       assert.ok(nodejsPattern, 'Should have "nodejs" prefix pattern');
     });
   });

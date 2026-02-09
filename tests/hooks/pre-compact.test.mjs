@@ -35,19 +35,25 @@ describe('PreCompact Hook', () => {
   it('should create snapshot file with correct structure', () => {
     // Setup: Create source files
     fs.writeFileSync(EDIT_COUNTER_FILE, JSON.stringify({ count: 15 }));
-    fs.writeFileSync(SESSION_METRICS_FILE, JSON.stringify({
-      corrections_count: 3,
-      prompt_count: 20
-    }));
-    fs.writeFileSync(DRIFT_STATE_FILE, JSON.stringify({
-      originalIntent: 'Fix auth bug',
-      editCount: 8
-    }));
+    fs.writeFileSync(
+      SESSION_METRICS_FILE,
+      JSON.stringify({
+        corrections_count: 3,
+        prompt_count: 20,
+      })
+    );
+    fs.writeFileSync(
+      DRIFT_STATE_FILE,
+      JSON.stringify({
+        originalIntent: 'Fix auth bug',
+        editCount: 8,
+      })
+    );
 
     // Run hook
     const result = spawnSync('node', [HOOK_PATH], {
       input: JSON.stringify({ tool: 'Test', args: {} }),
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
 
     // Verify exit code
@@ -60,10 +66,22 @@ describe('PreCompact Hook', () => {
     const snapshot = JSON.parse(fs.readFileSync(SNAPSHOT_FILE, 'utf8'));
     assert.ok(snapshot.timestamp, 'Snapshot should have timestamp');
     assert.equal(snapshot.editCount, 15, 'Snapshot should have editCount from edit-counter');
-    assert.equal(snapshot.correctionCount, 3, 'Snapshot should have correctionCount from session-metrics');
+    assert.equal(
+      snapshot.correctionCount,
+      3,
+      'Snapshot should have correctionCount from session-metrics'
+    );
     assert.equal(snapshot.promptCount, 20, 'Snapshot should have promptCount from session-metrics');
-    assert.equal(snapshot.originalIntent, 'Fix auth bug', 'Snapshot should have originalIntent from drift-state');
-    assert.equal(snapshot.driftEditCount, 8, 'Snapshot should have driftEditCount from drift-state');
+    assert.equal(
+      snapshot.originalIntent,
+      'Fix auth bug',
+      'Snapshot should have originalIntent from drift-state'
+    );
+    assert.equal(
+      snapshot.driftEditCount,
+      8,
+      'Snapshot should have driftEditCount from drift-state'
+    );
 
     // Clean up source files
     fs.unlinkSync(EDIT_COUNTER_FILE);
@@ -82,7 +100,7 @@ describe('PreCompact Hook', () => {
     // Run hook
     const result = spawnSync('node', [HOOK_PATH], {
       input: JSON.stringify({ tool: 'Test', args: {} }),
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
 
     // Verify exit code (should not crash)
@@ -107,25 +125,31 @@ describe('PreCompact Hook', () => {
       correctionCount: 1,
       promptCount: 10,
       originalIntent: 'Old intent',
-      driftEditCount: 2
+      driftEditCount: 2,
     };
     fs.writeFileSync(SNAPSHOT_FILE, JSON.stringify(initialSnapshot));
 
     // Create new source files
     fs.writeFileSync(EDIT_COUNTER_FILE, JSON.stringify({ count: 20 }));
-    fs.writeFileSync(SESSION_METRICS_FILE, JSON.stringify({
-      corrections_count: 5,
-      prompt_count: 30
-    }));
-    fs.writeFileSync(DRIFT_STATE_FILE, JSON.stringify({
-      originalIntent: 'New intent',
-      editCount: 12
-    }));
+    fs.writeFileSync(
+      SESSION_METRICS_FILE,
+      JSON.stringify({
+        corrections_count: 5,
+        prompt_count: 30,
+      })
+    );
+    fs.writeFileSync(
+      DRIFT_STATE_FILE,
+      JSON.stringify({
+        originalIntent: 'New intent',
+        editCount: 12,
+      })
+    );
 
     // Run hook
     const result = spawnSync('node', [HOOK_PATH], {
       input: JSON.stringify({ tool: 'Test', args: {} }),
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
 
     assert.equal(result.status, 0);
@@ -147,14 +171,14 @@ describe('PreCompact Hook', () => {
     // Test with valid input
     const result1 = spawnSync('node', [HOOK_PATH], {
       input: JSON.stringify({ tool: 'Test', args: {} }),
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
     assert.equal(result1.status, 0, 'Should exit 0 with valid input');
 
     // Test with malformed input (should still exit 0)
     const result2 = spawnSync('node', [HOOK_PATH], {
       input: 'not json',
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
     assert.equal(result2.status, 0, 'Should exit 0 even with malformed input');
   });
@@ -164,7 +188,7 @@ describe('PreCompact Hook', () => {
 
     const result = spawnSync('node', [HOOK_PATH], {
       input: input,
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
 
     assert.equal(result.status, 0);
@@ -180,7 +204,7 @@ describe('PreCompact Hook', () => {
     // Run hook
     const result = spawnSync('node', [HOOK_PATH], {
       input: JSON.stringify({ tool: 'Test', args: {} }),
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
 
     // Should not crash
@@ -200,14 +224,17 @@ describe('PreCompact Hook', () => {
   it('should log to stderr (not stdout)', () => {
     // Create source files
     fs.writeFileSync(EDIT_COUNTER_FILE, JSON.stringify({ count: 10 }));
-    fs.writeFileSync(SESSION_METRICS_FILE, JSON.stringify({
-      corrections_count: 2,
-      prompt_count: 15
-    }));
+    fs.writeFileSync(
+      SESSION_METRICS_FILE,
+      JSON.stringify({
+        corrections_count: 2,
+        prompt_count: 15,
+      })
+    );
 
     const result = spawnSync('node', [HOOK_PATH], {
       input: JSON.stringify({ tool: 'Test', args: {} }),
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
 
     // Verify stderr contains log message
@@ -226,7 +253,7 @@ describe('PreCompact Hook', () => {
 
     const result = spawnSync('node', [HOOK_PATH], {
       input: JSON.stringify({ tool: 'Test', args: {} }),
-      encoding: 'utf8'
+      encoding: 'utf8',
     });
 
     assert.equal(result.status, 0);

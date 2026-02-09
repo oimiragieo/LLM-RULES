@@ -107,7 +107,11 @@ describe('Correction Detection', () => {
 
       // Assert
       assert.strictEqual(result.status, 0, 'Hook should exit 0 (non-blocking)');
-      assert.match(result.stderr, /Correction Detected/i, 'stderr should contain correction warning');
+      assert.match(
+        result.stderr,
+        /Correction Detected/i,
+        'stderr should contain correction warning'
+      );
 
       const metrics = readMetrics();
       assert.ok(metrics, 'session-metrics.json should be created');
@@ -126,7 +130,11 @@ describe('Correction Detection', () => {
 
       // Assert
       assert.strictEqual(result.status, 0, 'Hook should exit 0 (non-blocking)');
-      assert.match(result.stderr, /Correction Detected/i, 'stderr should contain correction warning');
+      assert.match(
+        result.stderr,
+        /Correction Detected/i,
+        'stderr should contain correction warning'
+      );
 
       const metrics = readMetrics();
       assert.ok(metrics, 'session-metrics.json should be created');
@@ -144,7 +152,11 @@ describe('Correction Detection', () => {
 
       // Assert
       assert.strictEqual(result.status, 0, 'Hook should exit 0 (non-blocking)');
-      assert.match(result.stderr, /Correction Detected/i, 'stderr should contain correction warning');
+      assert.match(
+        result.stderr,
+        /Correction Detected/i,
+        'stderr should contain correction warning'
+      );
 
       const metrics = readMetrics();
       assert.ok(metrics, 'session-metrics.json should be created');
@@ -162,7 +174,11 @@ describe('Correction Detection', () => {
 
       // Assert
       assert.strictEqual(result.status, 0, 'Hook should exit 0 (non-blocking)');
-      assert.match(result.stderr, /Correction Detected/i, 'stderr should contain correction warning');
+      assert.match(
+        result.stderr,
+        /Correction Detected/i,
+        'stderr should contain correction warning'
+      );
 
       const metrics = readMetrics();
       assert.ok(metrics, 'session-metrics.json should be created');
@@ -256,17 +272,18 @@ describe('Correction Detection', () => {
   describe('Counter Increment', () => {
     it('should increment correction count on multiple corrections', () => {
       // Arrange: Start with initial count
-      fs.writeFileSync(
-        METRICS_FILE,
-        JSON.stringify({ corrections_count: 2, prompt_count: 10 })
-      );
+      fs.writeFileSync(METRICS_FILE, JSON.stringify({ corrections_count: 2, prompt_count: 10 }));
 
       // Act
       const result = runHookWithPrompt("no, that's wrong");
 
       // Assert
       assert.strictEqual(result.status, 0, 'Hook should exit 0 (non-blocking)');
-      assert.match(result.stderr, /Correction Detected/i, 'stderr should contain correction warning');
+      assert.match(
+        result.stderr,
+        /Correction Detected/i,
+        'stderr should contain correction warning'
+      );
       assert.match(result.stderr, /total: 3/i, 'stderr should show total count of 3');
 
       const metrics = readMetrics();
@@ -288,7 +305,11 @@ describe('Correction Detection', () => {
 
       // Assert
       assert.strictEqual(result.status, 0, 'Hook should exit 0 (non-blocking)');
-      assert.match(result.stderr, /Correction Detected/i, 'stderr should contain correction warning');
+      assert.match(
+        result.stderr,
+        /Correction Detected/i,
+        'stderr should contain correction warning'
+      );
 
       const metrics = readMetrics();
       assert.ok(metrics, 'session-metrics.json should be created');

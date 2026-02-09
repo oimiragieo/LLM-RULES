@@ -255,10 +255,7 @@ test('"switch to" pattern resets intent', () => {
   runHook('Add JWT tokens');
   // Reset with "switch to"
   const { state } = runAndGetState('Switch to working on the frontend components');
-  assertTrue(
-    state.originalIntent.includes('frontend'),
-    'Intent should reflect new task'
-  );
+  assertTrue(state.originalIntent.includes('frontend'), 'Intent should reflect new task');
 });
 
 test('"new task" pattern resets intent', () => {
