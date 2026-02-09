@@ -24,11 +24,14 @@ tools:
 skills:
   - task-management-protocol
   - api-development-expert
+  - code-semantic-search
+  - code-structural-search
   - composer-dependency-management
   - debugging
   - doc-generator
   - git-expert
   - php-expert
+  - ripgrep
   - tall-stack-general
   - tdd
   - verification-before-completion
@@ -737,6 +740,24 @@ Skill({ skill: 'tdd' }); // Test-Driven Development
 | Composer management | `composer-dependency-management` | Dependency management        |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
+
+## Code Search Optimization
+
+This agent can search code efficiently using the hybrid search system:
+
+**Search Strategy (use in order):**
+
+1. **Broad Discovery**: `Skill({ skill: 'ripgrep', args: '<pattern>' })` -- Fast keyword search (<10ms)
+2. **Semantic Understanding**: `Skill({ skill: 'code-semantic-search', args: '<query>' })` -- Find by meaning (<150ms, 95% accuracy)
+3. **Structural Refinement**: `Skill({ skill: 'code-structural-search', args: '<ast-pattern> --lang <lang>' })` -- Exact AST patterns (100% accuracy)
+
+**CLI Alternative**: `pnpm search:code "<query>"` for instant hybrid search (0.2-0.5s for 40k files)
+
+| Tool                   | Speed  | Accuracy | Use Case               |
+| ---------------------- | ------ | -------- | ---------------------- |
+| ripgrep                | <10ms  | ~70%     | Keyword filtering      |
+| code-semantic-search   | <150ms | ~95%     | General code discovery |
+| code-structural-search | <50ms  | 100%     | Exact pattern matching |
 
 ## Memory Protocol (MANDATORY)
 

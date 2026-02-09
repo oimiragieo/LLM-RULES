@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-08T21:44:38.561Z",
+  "generatedAt": "2026-02-09T01:15:51.646Z",
   "metadata": {
     "totalAgents": 49,
     "healthyAgents": 49,
     "degradedAgents": 0,
     "unavailableAgents": 0,
-    "lastHealthCheck": "2026-02-08T21:44:38.561Z",
-    "lastFullScan": "2026-02-08T21:44:38.561Z"
+    "lastHealthCheck": "2026-02-09T01:15:51.646Z",
+    "lastFullScan": "2026-02-09T01:15:51.646Z"
   },
   "agents": {
     "architect": {
@@ -90,14 +90,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.557Z",
+        "lastUpdate": "2026-02-09T01:15:51.643Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-08T21:44:38.558Z",
-        "updatedAt": "2026-02-08T21:44:38.558Z"
+        "createdAt": "2026-02-09T01:15:51.643Z",
+        "updatedAt": "2026-02-09T01:15:51.643Z"
       }
     },
     "context-compressor": {
@@ -157,14 +157,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.558Z",
+        "lastUpdate": "2026-02-09T01:15:51.644Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.558Z",
-        "updatedAt": "2026-02-08T21:44:38.558Z"
+        "createdAt": "2026-02-09T01:15:51.644Z",
+        "updatedAt": "2026-02-09T01:15:51.644Z"
       }
     },
     "developer": {
@@ -247,14 +247,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.558Z",
+        "lastUpdate": "2026-02-09T01:15:51.644Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-08T21:44:38.559Z",
-        "updatedAt": "2026-02-08T21:44:38.559Z"
+        "createdAt": "2026-02-09T01:15:51.644Z",
+        "updatedAt": "2026-02-09T01:15:51.644Z"
       }
     },
     "planner": {
@@ -271,13 +271,13 @@
             "planner",
             "refactors",
             "checklist-generator",
+            "code-semantic-search",
             "complexity-assessment",
             "context-compressor",
             "plan-generator",
+            "ripgrep",
             "sequential-thinking",
-            "spec-gathering",
-            "task-management-protocol",
-            "verification-before-completion"
+            "spec-gathering"
           ],
           "requiredTools": [
             "Read",
@@ -297,9 +297,11 @@
           ],
           "skills": [
             "checklist-generator",
+            "code-semantic-search",
             "complexity-assessment",
             "context-compressor",
             "plan-generator",
+            "ripgrep",
             "sequential-thinking",
             "spec-gathering",
             "task-management-protocol",
@@ -310,9 +312,11 @@
             "planner",
             "refactors",
             "checklist-generator",
+            "code-semantic-search",
             "complexity-assessment",
             "context-compressor",
             "plan-generator",
+            "ripgrep",
             "sequential-thinking",
             "spec-gathering",
             "task-management-protocol",
@@ -330,14 +334,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.559Z",
+        "lastUpdate": "2026-02-09T01:15:51.644Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-08T21:44:38.559Z",
-        "updatedAt": "2026-02-08T21:44:38.559Z"
+        "createdAt": "2026-02-09T01:15:51.644Z",
+        "updatedAt": "2026-02-09T01:15:51.644Z"
       }
     },
     "pm": {
@@ -353,14 +357,14 @@
           "triggerPhrases": [
             "planning",
             "checklist-generator",
+            "code-semantic-search",
             "consensus-voting",
             "jira-pm",
             "linear-pm",
             "plan-generator",
             "progressive-disclosure",
-            "sequential-thinking",
-            "slack-notifications",
-            "spec-writing"
+            "ripgrep",
+            "sequential-thinking"
           ],
           "requiredTools": [
             "Read",
@@ -376,25 +380,27 @@
           ],
           "skills": [
             "checklist-generator",
+            "code-semantic-search",
             "consensus-voting",
             "jira-pm",
             "linear-pm",
             "plan-generator",
             "progressive-disclosure",
+            "ripgrep",
             "sequential-thinking",
-            "slack-notifications",
-            "spec-writing",
-            "task-breakdown"
+            "slack-notifications"
           ],
           "examples": [],
           "tags": [
             "planning",
             "checklist-generator",
+            "code-semantic-search",
             "consensus-voting",
             "jira-pm",
             "linear-pm",
             "plan-generator",
             "progressive-disclosure",
+            "ripgrep",
             "sequential-thinking",
             "slack-notifications",
             "spec-writing",
@@ -414,14 +420,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.559Z",
+        "lastUpdate": "2026-02-09T01:15:51.644Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.559Z",
-        "updatedAt": "2026-02-08T21:44:38.559Z"
+        "createdAt": "2026-02-09T01:15:51.644Z",
+        "updatedAt": "2026-02-09T01:15:51.644Z"
       }
     },
     "qa": {
@@ -504,14 +510,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.559Z",
+        "lastUpdate": "2026-02-09T01:15:51.644Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-08T21:44:38.559Z",
-        "updatedAt": "2026-02-08T21:44:38.559Z"
+        "createdAt": "2026-02-09T01:15:51.644Z",
+        "updatedAt": "2026-02-09T01:15:51.644Z"
       }
     },
     "reflection-agent": {
@@ -582,14 +588,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.559Z",
+        "lastUpdate": "2026-02-09T01:15:51.644Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.559Z",
-        "updatedAt": "2026-02-08T21:44:38.559Z"
+        "createdAt": "2026-02-09T01:15:51.644Z",
+        "updatedAt": "2026-02-09T01:15:51.644Z"
       }
     },
     "router": {
@@ -657,14 +663,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.559Z",
+        "lastUpdate": "2026-02-09T01:15:51.644Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.559Z",
-        "updatedAt": "2026-02-08T21:44:38.559Z"
+        "createdAt": "2026-02-09T01:15:51.644Z",
+        "updatedAt": "2026-02-09T01:15:51.644Z"
       }
     },
     "technical-writer": {
@@ -736,14 +742,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.559Z",
+        "lastUpdate": "2026-02-09T01:15:51.644Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.559Z",
-        "updatedAt": "2026-02-08T21:44:38.559Z"
+        "createdAt": "2026-02-09T01:15:51.644Z",
+        "updatedAt": "2026-02-09T01:15:51.644Z"
       }
     },
     "c4-code": {
@@ -812,14 +818,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.559Z",
+        "lastUpdate": "2026-02-09T01:15:51.644Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.559Z",
-        "updatedAt": "2026-02-08T21:44:38.559Z"
+        "createdAt": "2026-02-09T01:15:51.644Z",
+        "updatedAt": "2026-02-09T01:15:51.644Z"
       }
     },
     "c4-component": {
@@ -840,6 +846,7 @@
             "code-analyzer",
             "diagram-generator",
             "doc-generator",
+            "ripgrep",
             "verification-before-completion"
           ],
           "requiredTools": [
@@ -861,6 +868,7 @@
             "code-analyzer",
             "diagram-generator",
             "doc-generator",
+            "ripgrep",
             "verification-before-completion"
           ],
           "examples": [],
@@ -872,6 +880,7 @@
             "code-analyzer",
             "diagram-generator",
             "doc-generator",
+            "ripgrep",
             "verification-before-completion"
           ]
         }
@@ -886,14 +895,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "c4-container": {
@@ -913,6 +922,7 @@
             "doc-generator",
             "architecture-review",
             "api-development-expert",
+            "ripgrep",
             "verification-before-completion",
             "diagram-generator"
           ],
@@ -934,6 +944,7 @@
             "doc-generator",
             "architecture-review",
             "api-development-expert",
+            "ripgrep",
             "verification-before-completion",
             "diagram-generator"
           ],
@@ -945,6 +956,7 @@
             "doc-generator",
             "architecture-review",
             "api-development-expert",
+            "ripgrep",
             "verification-before-completion",
             "diagram-generator"
           ]
@@ -960,14 +972,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "c4-context": {
@@ -987,6 +999,7 @@
             "task-management-protocol",
             "doc-generator",
             "architecture-review",
+            "ripgrep",
             "verification-before-completion",
             "diagram-generator",
             "project-analyzer"
@@ -1008,6 +1021,7 @@
             "task-management-protocol",
             "doc-generator",
             "architecture-review",
+            "ripgrep",
             "verification-before-completion",
             "diagram-generator",
             "project-analyzer"
@@ -1020,6 +1034,7 @@
             "task-management-protocol",
             "doc-generator",
             "architecture-review",
+            "ripgrep",
             "verification-before-completion",
             "diagram-generator",
             "project-analyzer"
@@ -1036,14 +1051,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "code-reviewer": {
@@ -1123,14 +1138,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "code-simplifier": {
@@ -1210,14 +1225,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "conductor-validator": {
@@ -1237,10 +1252,10 @@
             "implementation",
             "task-management-protocol",
             "context-driven-development",
+            "ripgrep",
             "track-management",
             "workflow-patterns",
-            "verification-before-completion",
-            "rule-auditor"
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
@@ -1258,6 +1273,7 @@
           "skills": [
             "task-management-protocol",
             "context-driven-development",
+            "ripgrep",
             "track-management",
             "workflow-patterns",
             "verification-before-completion",
@@ -1271,6 +1287,7 @@
             "implementation",
             "task-management-protocol",
             "context-driven-development",
+            "ripgrep",
             "track-management",
             "workflow-patterns",
             "verification-before-completion",
@@ -1288,14 +1305,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "database-architect": {
@@ -1316,9 +1333,9 @@
             "designing",
             "task-management-protocol",
             "architecture-review",
+            "code-semantic-search",
             "data-expert",
-            "database-architect",
-            "database-expert"
+            "database-architect"
           ],
           "requiredTools": [
             "Read",
@@ -1336,14 +1353,14 @@
           "skills": [
             "task-management-protocol",
             "architecture-review",
+            "code-semantic-search",
             "data-expert",
             "database-architect",
             "database-expert",
             "diagram-generator",
             "doc-generator",
-            "sequential-thinking",
-            "text-to-sql",
-            "verification-before-completion"
+            "ripgrep",
+            "sequential-thinking"
           ],
           "examples": [],
           "tags": [
@@ -1354,14 +1371,14 @@
             "designing",
             "task-management-protocol",
             "architecture-review",
+            "code-semantic-search",
             "data-expert",
             "database-architect",
             "database-expert",
             "diagram-generator",
             "doc-generator",
-            "sequential-thinking",
-            "text-to-sql",
-            "verification-before-completion"
+            "ripgrep",
+            "sequential-thinking"
           ]
         }
       ],
@@ -1375,14 +1392,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "devops-troubleshooter": {
@@ -1403,9 +1420,9 @@
             "aws-cloud-ops",
             "chrome-browser",
             "cloud-devops-expert",
+            "code-semantic-search",
             "container-expert",
-            "context-compressor",
-            "incident-runbook-templates"
+            "context-compressor"
           ],
           "requiredTools": [
             "Read",
@@ -1425,12 +1442,12 @@
             "aws-cloud-ops",
             "chrome-browser",
             "cloud-devops-expert",
+            "code-semantic-search",
             "container-expert",
             "context-compressor",
             "debugging",
             "incident-runbook-templates",
-            "logging-module-usage",
-            "postmortem-writing"
+            "logging-module-usage"
           ],
           "examples": [],
           "tags": [
@@ -1441,14 +1458,14 @@
             "aws-cloud-ops",
             "chrome-browser",
             "cloud-devops-expert",
+            "code-semantic-search",
             "container-expert",
             "context-compressor",
             "incident-runbook-templates",
             "logging-module-usage",
             "postmortem-writing",
             "recovery",
-            "sentry-monitoring",
-            "smart-debug"
+            "ripgrep"
           ]
         }
       ],
@@ -1462,14 +1479,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "devops": {
@@ -1487,12 +1504,12 @@
             "design",
             "deployment",
             "task-management-protocol",
+            "code-semantic-search",
             "dependency-analyzer",
             "git-expert",
             "github-mcp",
             "architecture-review",
-            "aws-cloud-ops",
-            "ci-cd-implementation-rule"
+            "aws-cloud-ops"
           ],
           "requiredTools": [
             "Read",
@@ -1509,6 +1526,7 @@
           ],
           "skills": [
             "task-management-protocol",
+            "code-semantic-search",
             "dependency-analyzer",
             "git-expert",
             "github-mcp",
@@ -1516,8 +1534,7 @@
             "aws-cloud-ops",
             "ci-cd-implementation-rule",
             "cloud-devops-expert",
-            "configuration-management",
-            "consensus-voting"
+            "configuration-management"
           ],
           "examples": [],
           "tags": [
@@ -1525,6 +1542,7 @@
             "design",
             "deployment",
             "task-management-protocol",
+            "code-semantic-search",
             "dependency-analyzer",
             "git-expert",
             "github-mcp",
@@ -1534,8 +1552,7 @@
             "cloud-devops-expert",
             "configuration-management",
             "consensus-voting",
-            "container-expert",
-            "containerization-rules"
+            "container-expert"
           ]
         }
       ],
@@ -1549,14 +1566,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "incident-responder": {
@@ -1573,13 +1590,13 @@
             "incident",
             "responder",
             "task-management-protocol",
+            "code-semantic-search",
             "configuration-management",
             "container-expert",
             "debugging",
             "incident-runbook-templates",
             "logging-module-usage",
-            "on-call-handoff-patterns",
-            "postmortem-writing"
+            "on-call-handoff-patterns"
           ],
           "requiredTools": [
             "Read",
@@ -1596,6 +1613,7 @@
           ],
           "skills": [
             "task-management-protocol",
+            "code-semantic-search",
             "configuration-management",
             "container-expert",
             "debugging",
@@ -1603,14 +1621,14 @@
             "logging-module-usage",
             "on-call-handoff-patterns",
             "postmortem-writing",
-            "recovery",
-            "sentry-monitoring"
+            "recovery"
           ],
           "examples": [],
           "tags": [
             "incident",
             "responder",
             "task-management-protocol",
+            "code-semantic-search",
             "configuration-management",
             "container-expert",
             "debugging",
@@ -1619,10 +1637,9 @@
             "on-call-handoff-patterns",
             "postmortem-writing",
             "recovery",
+            "ripgrep",
             "sentry-monitoring",
-            "slack-notifications",
-            "smart-debug",
-            "verification-before-completion"
+            "slack-notifications"
           ]
         }
       ],
@@ -1636,14 +1653,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "researcher": {
@@ -1723,14 +1740,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "reverse-engineer": {
@@ -1810,14 +1827,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "security-architect": {
@@ -1897,14 +1914,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "ai-ml-specialist": {
@@ -1922,12 +1939,12 @@
             "deployment",
             "task-management-protocol",
             "ai-ml-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "comprehensive-type-annotations",
             "data-expert",
             "debugging",
-            "git-expert",
-            "jupyter-notebook-best-practices",
-            "logging-module-usage"
+            "git-expert"
           ],
           "requiredTools": [
             "Read",
@@ -1947,14 +1964,14 @@
           "skills": [
             "task-management-protocol",
             "ai-ml-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "comprehensive-type-annotations",
             "data-expert",
             "debugging",
             "git-expert",
             "jupyter-notebook-best-practices",
-            "logging-module-usage",
-            "python-backend-expert",
-            "scientific-skills"
+            "logging-module-usage"
           ],
           "examples": [],
           "tags": [
@@ -1962,6 +1979,8 @@
             "deployment",
             "task-management-protocol",
             "ai-ml-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "comprehensive-type-annotations",
             "data-expert",
             "debugging",
@@ -1969,9 +1988,8 @@
             "jupyter-notebook-best-practices",
             "logging-module-usage",
             "python-backend-expert",
-            "scientific-skills",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep",
+            "scientific-skills"
           ]
         }
       ],
@@ -1985,14 +2003,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "android-pro": {
@@ -2012,10 +2030,10 @@
             "design",
             "task-management-protocol",
             "android-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
-            "git-expert",
-            "mobile-first-design-rules",
-            "mobile-ui-development-rule"
+            "git-expert"
           ],
           "requiredTools": [
             "Read",
@@ -2035,12 +2053,14 @@
           "skills": [
             "task-management-protocol",
             "android-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "mobile-first-design-rules",
             "mobile-ui-development-rule",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep",
+            "tdd"
           ],
           "examples": [],
           "tags": [
@@ -2050,10 +2070,13 @@
             "design",
             "task-management-protocol",
             "android-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "mobile-first-design-rules",
             "mobile-ui-development-rule",
+            "ripgrep",
             "tdd",
             "verification-before-completion"
           ]
@@ -2069,14 +2092,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "data-engineer": {
@@ -2094,12 +2117,12 @@
             "engineer",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "data-expert",
             "database-expert",
             "debugging",
-            "diagram-generator",
-            "git-expert",
-            "pandas-data-manipulation-rules"
+            "diagram-generator"
           ],
           "requiredTools": [
             "Read",
@@ -2118,15 +2141,15 @@
           ],
           "skills": [
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "data-expert",
             "database-expert",
             "debugging",
             "diagram-generator",
             "git-expert",
             "pandas-data-manipulation-rules",
-            "python-backend-expert",
-            "tdd",
-            "text-to-sql"
+            "python-backend-expert"
           ],
           "examples": [],
           "tags": [
@@ -2134,6 +2157,8 @@
             "engineer",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "data-expert",
             "database-expert",
             "debugging",
@@ -2141,9 +2166,8 @@
             "git-expert",
             "pandas-data-manipulation-rules",
             "python-backend-expert",
-            "tdd",
-            "text-to-sql",
-            "verification-before-completion"
+            "ripgrep",
+            "tdd"
           ]
         }
       ],
@@ -2157,14 +2181,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "expo-mobile-developer": {
@@ -2183,11 +2207,11 @@
             "developer",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "expo-framework-rule",
-            "expo-mobile-app-rule",
-            "git-expert",
-            "mobile-ui-development-rule"
+            "expo-mobile-app-rule"
           ],
           "requiredTools": [
             "Read",
@@ -2206,15 +2230,15 @@
           ],
           "skills": [
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "expo-framework-rule",
             "expo-mobile-app-rule",
             "git-expert",
             "mobile-ui-development-rule",
             "react-expert",
-            "react-native-skills-vercel",
-            "tdd",
-            "typescript-expert"
+            "react-native-skills-vercel"
           ],
           "examples": [],
           "tags": [
@@ -2223,6 +2247,8 @@
             "developer",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "expo-framework-rule",
             "expo-mobile-app-rule",
@@ -2230,9 +2256,7 @@
             "mobile-ui-development-rule",
             "react-expert",
             "react-native-skills-vercel",
-            "tdd",
-            "typescript-expert",
-            "verification-before-completion"
+            "ripgrep"
           ]
         }
       ],
@@ -2246,14 +2270,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "fastapi-pro": {
@@ -2272,11 +2296,11 @@
             "build",
             "task-management-protocol",
             "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "comprehensive-type-annotations",
             "database-expert",
-            "debugging",
-            "form-validation-with-zod",
-            "git-expert"
+            "debugging"
           ],
           "requiredTools": [
             "Read",
@@ -2296,14 +2320,14 @@
           "skills": [
             "task-management-protocol",
             "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "comprehensive-type-annotations",
             "database-expert",
             "debugging",
             "form-validation-with-zod",
             "git-expert",
-            "python-backend-expert",
-            "security-architect",
-            "tdd"
+            "python-backend-expert"
           ],
           "examples": [],
           "tags": [
@@ -2312,15 +2336,16 @@
             "build",
             "task-management-protocol",
             "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "comprehensive-type-annotations",
             "database-expert",
             "debugging",
             "form-validation-with-zod",
             "git-expert",
             "python-backend-expert",
-            "security-architect",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep",
+            "security-architect"
           ]
         }
       ],
@@ -2334,14 +2359,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "frontend-pro": {
@@ -2363,8 +2388,8 @@
             "task-management-protocol",
             "accessibility",
             "build-tools-expert",
-            "debugging",
-            "frontend-expert"
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -2383,13 +2408,13 @@
             "task-management-protocol",
             "accessibility",
             "build-tools-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "frontend-expert",
             "git-expert",
             "html-tailwind-css-and-javascript-expert-rule",
-            "react-expert",
-            "state-management-expert",
-            "styling-expert"
+            "react-expert"
           ],
           "examples": [],
           "tags": [
@@ -2401,13 +2426,13 @@
             "task-management-protocol",
             "accessibility",
             "build-tools-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "frontend-expert",
             "git-expert",
             "html-tailwind-css-and-javascript-expert-rule",
-            "react-expert",
-            "state-management-expert",
-            "styling-expert"
+            "react-expert"
           ]
         }
       ],
@@ -2421,14 +2446,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "gamedev-pro": {
@@ -2448,10 +2473,10 @@
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "cpp",
-            "debugging",
-            "gamedev-expert",
-            "git-expert"
+            "debugging"
           ],
           "requiredTools": [
             "Read",
@@ -2472,12 +2497,13 @@
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "cpp",
             "debugging",
             "gamedev-expert",
             "git-expert",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep"
           ],
           "examples": [],
           "tags": [
@@ -2487,10 +2513,13 @@
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "cpp",
             "debugging",
             "gamedev-expert",
             "git-expert",
+            "ripgrep",
             "tdd",
             "verification-before-completion"
           ]
@@ -2506,14 +2535,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.560Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.560Z",
-        "updatedAt": "2026-02-08T21:44:38.560Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "golang-pro": {
@@ -2534,9 +2563,9 @@
             "api-development-expert",
             "build-tools-expert",
             "code-quality-expert",
-            "debugging",
-            "git-expert",
-            "go-expert"
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging"
           ],
           "requiredTools": [
             "Read",
@@ -2558,11 +2587,12 @@
             "api-development-expert",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "go-expert",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep"
           ],
           "examples": [],
           "tags": [
@@ -2573,9 +2603,12 @@
             "api-development-expert",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "go-expert",
+            "ripgrep",
             "tdd",
             "verification-before-completion"
           ]
@@ -2591,14 +2624,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "graphql-pro": {
@@ -2620,8 +2653,8 @@
             "task-management-protocol",
             "api-development-expert",
             "code-quality-expert",
-            "debugging",
-            "git-expert"
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -2642,12 +2675,13 @@
             "task-management-protocol",
             "api-development-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "graphql-expert",
-            "tdd",
-            "typescript-expert",
-            "verification-before-completion"
+            "ripgrep",
+            "tdd"
           ],
           "examples": [],
           "tags": [
@@ -2659,12 +2693,13 @@
             "task-management-protocol",
             "api-development-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "graphql-expert",
-            "tdd",
-            "typescript-expert",
-            "verification-before-completion"
+            "ripgrep",
+            "tdd"
           ]
         }
       ],
@@ -2678,14 +2713,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "ios-pro": {
@@ -2703,12 +2738,12 @@
             "pro",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "ios-expert",
-            "mobile-first-design-rules",
-            "mobile-ui-development-rule",
-            "tdd"
+            "mobile-first-design-rules"
           ],
           "requiredTools": [
             "Read",
@@ -2727,13 +2762,15 @@
           ],
           "skills": [
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "ios-expert",
             "mobile-first-design-rules",
             "mobile-ui-development-rule",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep",
+            "tdd"
           ],
           "examples": [],
           "tags": [
@@ -2741,11 +2778,14 @@
             "pro",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "ios-expert",
             "mobile-first-design-rules",
             "mobile-ui-development-rule",
+            "ripgrep",
             "tdd",
             "verification-before-completion"
           ]
@@ -2761,14 +2801,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "java-pro": {
@@ -2787,11 +2827,11 @@
             "building",
             "task-management-protocol",
             "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "doc-generator",
-            "dto-conventions",
-            "git-expert",
-            "java-expert"
+            "dto-conventions"
           ],
           "requiredTools": [
             "Read",
@@ -2811,14 +2851,14 @@
           "skills": [
             "task-management-protocol",
             "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "doc-generator",
             "dto-conventions",
             "git-expert",
             "java-expert",
-            "restcontroller-conventions",
-            "service-class-conventions",
-            "tdd"
+            "restcontroller-conventions"
           ],
           "examples": [],
           "tags": [
@@ -2827,15 +2867,16 @@
             "building",
             "task-management-protocol",
             "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "doc-generator",
             "dto-conventions",
             "git-expert",
             "java-expert",
             "restcontroller-conventions",
-            "service-class-conventions",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep",
+            "service-class-conventions"
           ]
         }
       ],
@@ -2849,14 +2890,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "mobile-ux-reviewer": {
@@ -2878,8 +2919,8 @@
             "task-management-protocol",
             "accessibility",
             "checklist-generator",
-            "design-and-user-experience-guidelines",
-            "diagram-generator"
+            "code-semantic-search",
+            "design-and-user-experience-guidelines"
           ],
           "requiredTools": [
             "Read",
@@ -2900,13 +2941,13 @@
             "task-management-protocol",
             "accessibility",
             "checklist-generator",
+            "code-semantic-search",
             "design-and-user-experience-guidelines",
             "diagram-generator",
             "doc-generator",
             "mobile-first-design-rules",
             "mobile-ui-development-rule",
-            "verification-before-completion",
-            "visual-and-observational-rules"
+            "ripgrep"
           ],
           "examples": [],
           "tags": [
@@ -2918,13 +2959,13 @@
             "task-management-protocol",
             "accessibility",
             "checklist-generator",
+            "code-semantic-search",
             "design-and-user-experience-guidelines",
             "diagram-generator",
             "doc-generator",
             "mobile-first-design-rules",
             "mobile-ui-development-rule",
-            "verification-before-completion",
-            "visual-and-observational-rules"
+            "ripgrep"
           ]
         }
       ],
@@ -2938,14 +2979,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.645Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.645Z",
+        "updatedAt": "2026-02-09T01:15:51.645Z"
       }
     },
     "nextjs-pro": {
@@ -2963,12 +3004,12 @@
             "pro",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "nextjs-expert",
-            "react-best-practices-vercel",
-            "react-expert",
-            "state-management-expert"
+            "react-best-practices-vercel"
           ],
           "requiredTools": [
             "Read",
@@ -2987,15 +3028,15 @@
           ],
           "skills": [
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "nextjs-expert",
             "react-best-practices-vercel",
             "react-expert",
-            "state-management-expert",
-            "styling-expert",
-            "tdd",
-            "typescript-expert"
+            "ripgrep",
+            "state-management-expert"
           ],
           "examples": [],
           "tags": [
@@ -3003,16 +3044,17 @@
             "pro",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "nextjs-expert",
             "react-best-practices-vercel",
             "react-expert",
+            "ripgrep",
             "state-management-expert",
             "styling-expert",
-            "tdd",
-            "typescript-expert",
-            "verification-before-completion"
+            "tdd"
           ]
         }
       ],
@@ -3026,14 +3068,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "nodejs-pro": {
@@ -3054,9 +3096,9 @@
             "api-development-expert",
             "async-operations",
             "code-quality-expert",
-            "debugging",
-            "git-expert",
-            "nodejs-expert"
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging"
           ],
           "requiredTools": [
             "Read",
@@ -3078,12 +3120,12 @@
             "api-development-expert",
             "async-operations",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "nodejs-expert",
-            "tdd",
-            "typescript-expert",
-            "verification-before-completion"
+            "ripgrep"
           ],
           "examples": [],
           "tags": [
@@ -3094,12 +3136,14 @@
             "api-development-expert",
             "async-operations",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
             "nodejs-expert",
+            "ripgrep",
             "tdd",
-            "typescript-expert",
-            "verification-before-completion"
+            "typescript-expert"
           ]
         }
       ],
@@ -3113,14 +3157,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "php-pro": {
@@ -3139,11 +3183,11 @@
             "building",
             "task-management-protocol",
             "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "composer-dependency-management",
             "debugging",
-            "doc-generator",
-            "git-expert",
-            "php-expert"
+            "doc-generator"
           ],
           "requiredTools": [
             "Read",
@@ -3163,14 +3207,14 @@
           "skills": [
             "task-management-protocol",
             "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "composer-dependency-management",
             "debugging",
             "doc-generator",
             "git-expert",
             "php-expert",
-            "tall-stack-general",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep"
           ],
           "examples": [],
           "tags": [
@@ -3179,14 +3223,16 @@
             "building",
             "task-management-protocol",
             "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "composer-dependency-management",
             "debugging",
             "doc-generator",
             "git-expert",
             "php-expert",
+            "ripgrep",
             "tall-stack-general",
-            "tdd",
-            "verification-before-completion"
+            "tdd"
           ]
         }
       ],
@@ -3200,14 +3246,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "python-pro": {
@@ -3226,11 +3272,11 @@
             "task-management-protocol",
             "api-development-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "comprehensive-type-annotations",
             "comprehensive-unit-testing-with-pytest",
-            "debugging",
-            "git-expert",
-            "prioritize-python-3-10-features"
+            "debugging"
           ],
           "requiredTools": [
             "Read",
@@ -3251,13 +3297,13 @@
             "task-management-protocol",
             "api-development-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "comprehensive-type-annotations",
             "comprehensive-unit-testing-with-pytest",
             "debugging",
             "git-expert",
-            "prioritize-python-3-10-features",
-            "python-backend-expert",
-            "tdd"
+            "prioritize-python-3-10-features"
           ],
           "examples": [],
           "tags": [
@@ -3266,14 +3312,16 @@
             "task-management-protocol",
             "api-development-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "comprehensive-type-annotations",
             "comprehensive-unit-testing-with-pytest",
             "debugging",
             "git-expert",
             "prioritize-python-3-10-features",
             "python-backend-expert",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep",
+            "tdd"
           ]
         }
       ],
@@ -3287,14 +3335,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "rust-pro": {
@@ -3313,11 +3361,11 @@
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
-            "rust-expert",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -3338,11 +3386,13 @@
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
+            "ripgrep",
             "rust-expert",
-            "tdd",
-            "verification-before-completion"
+            "tdd"
           ],
           "examples": [],
           "tags": [
@@ -3351,8 +3401,11 @@
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
+            "ripgrep",
             "rust-expert",
             "tdd",
             "verification-before-completion"
@@ -3369,14 +3422,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "scientific-research-expert": {
@@ -3396,10 +3449,10 @@
             "reviews",
             "task-management-protocol",
             "arxiv-mcp",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
-            "diagram-generator",
-            "doc-generator",
-            "jupyter-notebook-best-practices"
+            "diagram-generator"
           ],
           "requiredTools": [
             "Read",
@@ -3419,14 +3472,14 @@
           "skills": [
             "task-management-protocol",
             "arxiv-mcp",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "diagram-generator",
             "doc-generator",
             "jupyter-notebook-best-practices",
             "python-backend-expert",
-            "research-synthesis",
-            "scientific-skills",
-            "tdd"
+            "research-synthesis"
           ],
           "examples": [],
           "tags": [
@@ -3436,15 +3489,15 @@
             "reviews",
             "task-management-protocol",
             "arxiv-mcp",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "diagram-generator",
             "doc-generator",
             "jupyter-notebook-best-practices",
             "python-backend-expert",
             "research-synthesis",
-            "scientific-skills",
-            "tdd",
-            "verification-before-completion"
+            "ripgrep"
           ]
         }
       ],
@@ -3458,14 +3511,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "sveltekit-expert": {
@@ -3483,12 +3536,12 @@
             "expert",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "form-and-actions-in-sveltekit",
             "git-expert",
-            "seo-and-meta-tags-in-sveltekit",
-            "styling-expert",
-            "svelte-expert"
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -3507,15 +3560,15 @@
           ],
           "skills": [
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "form-and-actions-in-sveltekit",
             "git-expert",
+            "ripgrep",
             "seo-and-meta-tags-in-sveltekit",
             "styling-expert",
-            "svelte-expert",
-            "tdd",
-            "typescript-expert",
-            "verification-before-completion"
+            "svelte-expert"
           ],
           "examples": [],
           "tags": [
@@ -3523,15 +3576,17 @@
             "expert",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "form-and-actions-in-sveltekit",
             "git-expert",
+            "ripgrep",
             "seo-and-meta-tags-in-sveltekit",
             "styling-expert",
             "svelte-expert",
             "tdd",
-            "typescript-expert",
-            "verification-before-completion"
+            "typescript-expert"
           ]
         }
       ],
@@ -3545,14 +3600,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "tauri-desktop-developer": {
@@ -3571,11 +3626,11 @@
             "developer",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
-            "rust-expert",
-            "tauri-native-api-integration",
-            "tauri-security-rules"
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -3594,15 +3649,15 @@
           ],
           "skills": [
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
+            "ripgrep",
             "rust-expert",
             "tauri-native-api-integration",
             "tauri-security-rules",
-            "tauri-svelte-typescript-general",
-            "tauri-svelte-ui-components",
-            "tdd",
-            "typescript-expert"
+            "tauri-svelte-typescript-general"
           ],
           "examples": [],
           "tags": [
@@ -3611,16 +3666,16 @@
             "developer",
             "building",
             "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
+            "ripgrep",
             "rust-expert",
             "tauri-native-api-integration",
             "tauri-security-rules",
             "tauri-svelte-typescript-general",
-            "tauri-svelte-ui-components",
-            "tdd",
-            "typescript-expert",
-            "verification-before-completion"
+            "tauri-svelte-ui-components"
           ]
         }
       ],
@@ -3634,14 +3689,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "typescript-pro": {
@@ -3660,11 +3715,11 @@
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
-            "state-management-expert",
-            "tdd",
-            "tsconfig-json-rules"
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -3685,13 +3740,13 @@
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
+            "ripgrep",
             "state-management-expert",
-            "tdd",
-            "tsconfig-json-rules",
-            "typescript-expert",
-            "verification-before-completion"
+            "tdd"
           ],
           "examples": [],
           "tags": [
@@ -3700,8 +3755,11 @@
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
+            "ripgrep",
             "state-management-expert",
             "tdd",
             "tsconfig-json-rules",
@@ -3720,14 +3778,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "web3-blockchain-expert": {
@@ -3749,8 +3807,8 @@
             "task-management-protocol",
             "auth-security-expert",
             "code-quality-expert",
-            "debugging",
-            "git-expert"
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -3771,12 +3829,13 @@
             "task-management-protocol",
             "auth-security-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
+            "ripgrep",
             "security-architect",
-            "tdd",
-            "verification-before-completion",
-            "web3-expert"
+            "tdd"
           ],
           "examples": [],
           "tags": [
@@ -3788,12 +3847,13 @@
             "task-management-protocol",
             "auth-security-expert",
             "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
             "debugging",
             "git-expert",
+            "ripgrep",
             "security-architect",
-            "tdd",
-            "verification-before-completion",
-            "web3-expert"
+            "tdd"
           ]
         }
       ],
@@ -3807,14 +3867,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "evolution-orchestrator": {
@@ -3837,7 +3897,7 @@
             "hook-creator",
             "plan-generator",
             "research-synthesis",
-            "schema-creator"
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -3862,10 +3922,10 @@
             "hook-creator",
             "plan-generator",
             "research-synthesis",
+            "ripgrep",
             "schema-creator",
             "skill-creator",
-            "task-management-protocol",
-            "template-creator"
+            "task-management-protocol"
           ],
           "examples": [],
           "tags": [
@@ -3878,12 +3938,12 @@
             "hook-creator",
             "plan-generator",
             "research-synthesis",
+            "ripgrep",
             "schema-creator",
             "skill-creator",
             "task-management-protocol",
             "template-creator",
-            "verification-before-completion",
-            "workflow-creator"
+            "verification-before-completion"
           ]
         }
       ],
@@ -3897,14 +3957,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "master-orchestrator": {
@@ -3951,10 +4011,10 @@
             "plan-generator",
             "recovery",
             "response-rater",
+            "ripgrep",
             "sequential-thinking",
             "subagent-driven-development",
-            "swarm-coordination",
-            "task-management-protocol"
+            "swarm-coordination"
           ],
           "examples": [],
           "tags": [
@@ -3968,11 +4028,11 @@
             "plan-generator",
             "recovery",
             "response-rater",
+            "ripgrep",
             "sequential-thinking",
             "subagent-driven-development",
             "swarm-coordination",
-            "task-management-protocol",
-            "track-management"
+            "task-management-protocol"
           ]
         }
       ],
@@ -3986,14 +4046,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "party-orchestrator": {
@@ -4013,10 +4073,10 @@
             "context-compressor",
             "dispatching-parallel-agents",
             "party-mode",
+            "ripgrep",
             "security-architect",
             "swarm-coordination",
-            "task-management-protocol",
-            "verification-before-completion"
+            "task-management-protocol"
           ],
           "requiredTools": [
             "Read",
@@ -4036,6 +4096,7 @@
             "context-compressor",
             "dispatching-parallel-agents",
             "party-mode",
+            "ripgrep",
             "security-architect",
             "swarm-coordination",
             "task-management-protocol",
@@ -4049,6 +4110,7 @@
             "context-compressor",
             "dispatching-parallel-agents",
             "party-mode",
+            "ripgrep",
             "security-architect",
             "swarm-coordination",
             "task-management-protocol",
@@ -4066,14 +4128,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     },
     "swarm-coordinator": {
@@ -4093,10 +4155,10 @@
             "context-compressor",
             "dispatching-parallel-agents",
             "plan-generator",
+            "ripgrep",
             "subagent-driven-development",
             "swarm-coordination",
-            "task-management-protocol",
-            "verification-before-completion"
+            "task-management-protocol"
           ],
           "requiredTools": [
             "Task",
@@ -4117,6 +4179,7 @@
             "context-compressor",
             "dispatching-parallel-agents",
             "plan-generator",
+            "ripgrep",
             "subagent-driven-development",
             "swarm-coordination",
             "task-management-protocol",
@@ -4130,6 +4193,7 @@
             "context-compressor",
             "dispatching-parallel-agents",
             "plan-generator",
+            "ripgrep",
             "subagent-driven-development",
             "swarm-coordination",
             "task-management-protocol",
@@ -4147,71 +4211,172 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-08T21:44:38.561Z",
+        "lastUpdate": "2026-02-09T01:15:51.646Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-08T21:44:38.561Z",
-        "updatedAt": "2026-02-08T21:44:38.561Z"
+        "createdAt": "2026-02-09T01:15:51.646Z",
+        "updatedAt": "2026-02-09T01:15:51.646Z"
       }
     }
   },
   "index": {
     "byCapability": {
-      "architect": ["architect"],
-      "context-compressor": ["context-compressor"],
-      "developer": ["developer"],
-      "planner": ["planner"],
-      "pm": ["pm"],
-      "qa": ["qa"],
-      "reflection-agent": ["reflection-agent"],
-      "router": ["router"],
-      "technical-writer": ["technical-writer"],
-      "c4-code": ["c4-code"],
-      "c4-component": ["c4-component"],
-      "c4-container": ["c4-container"],
-      "c4-context": ["c4-context"],
-      "code-reviewer": ["code-reviewer"],
-      "code-simplifier": ["code-simplifier"],
-      "conductor-validator": ["conductor-validator"],
-      "database-architect": ["database-architect"],
-      "devops-troubleshooter": ["devops-troubleshooter"],
-      "devops": ["devops"],
-      "incident-responder": ["incident-responder"],
-      "researcher": ["researcher"],
-      "reverse-engineer": ["reverse-engineer"],
-      "security-architect": ["security-architect"],
-      "ai-ml-specialist": ["ai-ml-specialist"],
-      "android": ["android-pro"],
-      "data-engineer": ["data-engineer"],
-      "expo-mobile-developer": ["expo-mobile-developer"],
-      "fastapi": ["fastapi-pro"],
-      "frontend": ["frontend-pro"],
-      "gamedev": ["gamedev-pro"],
-      "golang": ["golang-pro"],
-      "graphql": ["graphql-pro"],
-      "ios": ["ios-pro"],
-      "java": ["java-pro"],
-      "mobile-ux-reviewer": ["mobile-ux-reviewer"],
-      "nextjs": ["nextjs-pro"],
-      "nodejs": ["nodejs-pro"],
-      "php": ["php-pro"],
-      "python": ["python-pro"],
-      "rust": ["rust-pro"],
-      "scientific-research": ["scientific-research-expert"],
-      "sveltekit": ["sveltekit-expert"],
-      "tauri-desktop-developer": ["tauri-desktop-developer"],
-      "typescript": ["typescript-pro"],
-      "web3-blockchain": ["web3-blockchain-expert"],
-      "evolution-orchestrator": ["evolution-orchestrator"],
-      "master-orchestrator": ["master-orchestrator"],
-      "party-orchestrator": ["party-orchestrator"],
-      "swarm-coordinator": ["swarm-coordinator"]
+      "architect": [
+        "architect"
+      ],
+      "context-compressor": [
+        "context-compressor"
+      ],
+      "developer": [
+        "developer"
+      ],
+      "planner": [
+        "planner"
+      ],
+      "pm": [
+        "pm"
+      ],
+      "qa": [
+        "qa"
+      ],
+      "reflection-agent": [
+        "reflection-agent"
+      ],
+      "router": [
+        "router"
+      ],
+      "technical-writer": [
+        "technical-writer"
+      ],
+      "c4-code": [
+        "c4-code"
+      ],
+      "c4-component": [
+        "c4-component"
+      ],
+      "c4-container": [
+        "c4-container"
+      ],
+      "c4-context": [
+        "c4-context"
+      ],
+      "code-reviewer": [
+        "code-reviewer"
+      ],
+      "code-simplifier": [
+        "code-simplifier"
+      ],
+      "conductor-validator": [
+        "conductor-validator"
+      ],
+      "database-architect": [
+        "database-architect"
+      ],
+      "devops-troubleshooter": [
+        "devops-troubleshooter"
+      ],
+      "devops": [
+        "devops"
+      ],
+      "incident-responder": [
+        "incident-responder"
+      ],
+      "researcher": [
+        "researcher"
+      ],
+      "reverse-engineer": [
+        "reverse-engineer"
+      ],
+      "security-architect": [
+        "security-architect"
+      ],
+      "ai-ml-specialist": [
+        "ai-ml-specialist"
+      ],
+      "android": [
+        "android-pro"
+      ],
+      "data-engineer": [
+        "data-engineer"
+      ],
+      "expo-mobile-developer": [
+        "expo-mobile-developer"
+      ],
+      "fastapi": [
+        "fastapi-pro"
+      ],
+      "frontend": [
+        "frontend-pro"
+      ],
+      "gamedev": [
+        "gamedev-pro"
+      ],
+      "golang": [
+        "golang-pro"
+      ],
+      "graphql": [
+        "graphql-pro"
+      ],
+      "ios": [
+        "ios-pro"
+      ],
+      "java": [
+        "java-pro"
+      ],
+      "mobile-ux-reviewer": [
+        "mobile-ux-reviewer"
+      ],
+      "nextjs": [
+        "nextjs-pro"
+      ],
+      "nodejs": [
+        "nodejs-pro"
+      ],
+      "php": [
+        "php-pro"
+      ],
+      "python": [
+        "python-pro"
+      ],
+      "rust": [
+        "rust-pro"
+      ],
+      "scientific-research": [
+        "scientific-research-expert"
+      ],
+      "sveltekit": [
+        "sveltekit-expert"
+      ],
+      "tauri-desktop-developer": [
+        "tauri-desktop-developer"
+      ],
+      "typescript": [
+        "typescript-pro"
+      ],
+      "web3-blockchain": [
+        "web3-blockchain-expert"
+      ],
+      "evolution-orchestrator": [
+        "evolution-orchestrator"
+      ],
+      "master-orchestrator": [
+        "master-orchestrator"
+      ],
+      "party-orchestrator": [
+        "party-orchestrator"
+      ],
+      "swarm-coordinator": [
+        "swarm-coordinator"
+      ]
     },
     "byDomain": {
-      "security": ["architect", "party-orchestrator"],
+      "security": [
+        "architect",
+        "party-orchestrator"
+      ],
       "code": [
         "context-compressor",
         "developer",
@@ -4249,13 +4414,32 @@
         "typescript-pro",
         "web3-blockchain-expert"
       ],
-      "planning": ["planner", "pm"],
-      "documentation": ["technical-writer"],
-      "architecture": ["c4-container", "c4-context", "database-architect"],
-      "devops": ["devops"],
-      "research": ["researcher"],
-      "mobile": ["mobile-ux-reviewer"],
-      "orchestration": ["evolution-orchestrator", "master-orchestrator", "swarm-coordinator"]
+      "planning": [
+        "planner",
+        "pm"
+      ],
+      "documentation": [
+        "technical-writer"
+      ],
+      "architecture": [
+        "c4-container",
+        "c4-context",
+        "database-architect"
+      ],
+      "devops": [
+        "devops"
+      ],
+      "research": [
+        "researcher"
+      ],
+      "mobile": [
+        "mobile-ux-reviewer"
+      ],
+      "orchestration": [
+        "evolution-orchestrator",
+        "master-orchestrator",
+        "swarm-coordinator"
+      ]
     },
     "byCategory": {
       "core": [
