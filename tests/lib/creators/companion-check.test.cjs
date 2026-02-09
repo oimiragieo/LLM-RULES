@@ -9,7 +9,7 @@ const {
   loadCompanionMatrix,
   checkCompanions,
   formatCompanionChecklist,
-  getAutoSpawnSuggestions
+  getAutoSpawnSuggestions,
 } = require('../../../.claude/lib/creators/companion-check.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
@@ -32,10 +32,7 @@ describe('companion-check', () => {
     });
 
     it('should throw error if graph file not found', () => {
-      assert.throws(
-        () => loadCompanionMatrix('/nonexistent/path.json'),
-        /not found/
-      );
+      assert.throws(() => loadCompanionMatrix('/nonexistent/path.json'), /not found/);
     });
 
     it('should throw error if companionMatrix key missing', () => {
@@ -45,10 +42,7 @@ describe('companion-check', () => {
       try {
         fs.writeFileSync(tempFile, JSON.stringify({ version: '1.0.0' }));
 
-        assert.throws(
-          () => loadCompanionMatrix(tempFile),
-          /companionMatrix key not found/
-        );
+        assert.throws(() => loadCompanionMatrix(tempFile), /companionMatrix key not found/);
       } finally {
         fs.rmSync(tempDir, { recursive: true, force: true });
       }
@@ -67,29 +61,17 @@ describe('companion-check', () => {
     });
 
     it('should reject path traversal attempts', () => {
-      assert.throws(
-        () => checkCompanions('skill', '../../../etc/passwd'),
-        /path traversal/
-      );
+      assert.throws(() => checkCompanions('skill', '../../../etc/passwd'), /path traversal/);
     });
 
     it('should reject Windows reserved names', () => {
-      assert.throws(
-        () => checkCompanions('skill', 'nul'),
-        /reserved name/
-      );
+      assert.throws(() => checkCompanions('skill', 'nul'), /reserved name/);
 
-      assert.throws(
-        () => checkCompanions('skill', 'con'),
-        /reserved name/
-      );
+      assert.throws(() => checkCompanions('skill', 'con'), /reserved name/);
     });
 
     it('should reject empty artifact names', () => {
-      assert.throws(
-        () => checkCompanions('skill', ''),
-        /Invalid artifact name/
-      );
+      assert.throws(() => checkCompanions('skill', ''), /Invalid artifact name/);
     });
   });
 
@@ -164,21 +146,20 @@ describe('companion-check', () => {
     it('should count summary correctly', () => {
       const result = checkCompanions('skill', 'tdd', { projectRoot: PROJECT_ROOT });
 
-      const totalChecks = result.required.length + result.recommended.length + result.optional.length;
+      const totalChecks =
+        result.required.length + result.recommended.length + result.optional.length;
       assert.strictEqual(result.summary.total, totalChecks);
 
-      const foundCount = [...result.required, ...result.recommended, ...result.optional]
-        .filter(c => c.exists).length;
+      const foundCount = [...result.required, ...result.recommended, ...result.optional].filter(
+        c => c.exists
+      ).length;
       assert.strictEqual(result.summary.found, foundCount);
 
       assert.strictEqual(result.summary.found + result.summary.missing, result.summary.total);
     });
 
     it('should throw error for unknown artifact type', () => {
-      assert.throws(
-        () => checkCompanions('unknown-type', 'test'),
-        /Unknown artifact type/
-      );
+      assert.throws(() => checkCompanions('unknown-type', 'test'), /Unknown artifact type/);
     });
   });
 

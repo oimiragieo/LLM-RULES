@@ -47,7 +47,9 @@ function checkCompanions(artifactType, artifactName, opts = {}) {
 
   // SEC-ICE-001: Validate artifact name
   if (!isValidArtifactName(artifactName)) {
-    throw new Error(`Invalid artifact name: ${artifactName} (path traversal or reserved name detected)`);
+    throw new Error(
+      `Invalid artifact name: ${artifactName} (path traversal or reserved name detected)`
+    );
   }
 
   const matrix = loadCompanionMatrix(opts.graphPath);
@@ -66,8 +68,8 @@ function checkCompanions(artifactType, artifactName, opts = {}) {
     summary: {
       total: 0,
       found: 0,
-      missing: 0
-    }
+      missing: 0,
+    },
   };
 
   // Check each companion category
@@ -101,11 +103,13 @@ function runCompanionCheck(companion, artifactName, projectRoot) {
   const checkResult = {
     ...companion,
     exists: false,
-    details: ''
+    details: '',
   };
 
   const targetPath = companion.target ? companion.target.replace(/\{name\}/g, artifactName) : '';
-  const pattern = companion.pattern ? companion.pattern.replace(/\{name\}/g, artifactName) : artifactName;
+  const pattern = companion.pattern
+    ? companion.pattern.replace(/\{name\}/g, artifactName)
+    : artifactName;
 
   try {
     switch (companion.check) {
@@ -158,9 +162,7 @@ function runCompanionCheck(companion, artifactName, projectRoot) {
  * Check if a file exists
  */
 function checkFileExists(targetPath, projectRoot) {
-  const fullPath = path.isAbsolute(targetPath)
-    ? targetPath
-    : path.join(projectRoot, targetPath);
+  const fullPath = path.isAbsolute(targetPath) ? targetPath : path.join(projectRoot, targetPath);
   return fs.existsSync(fullPath);
 }
 
@@ -179,9 +181,7 @@ function checkGrepInFile(targetPath, pattern, projectRoot) {
     return false;
   }
 
-  const fullPath = path.isAbsolute(targetPath)
-    ? targetPath
-    : path.join(projectRoot, targetPath);
+  const fullPath = path.isAbsolute(targetPath) ? targetPath : path.join(projectRoot, targetPath);
 
   return checkGrepInSingleFile(fullPath, pattern);
 }
@@ -204,9 +204,7 @@ function checkGrepInSingleFile(filePath, pattern) {
  * Check if a key exists in a JSON file
  */
 function checkJSONKeyExists(targetPath, key, projectRoot) {
-  const fullPath = path.isAbsolute(targetPath)
-    ? targetPath
-    : path.join(projectRoot, targetPath);
+  const fullPath = path.isAbsolute(targetPath) ? targetPath : path.join(projectRoot, targetPath);
 
   if (!fs.existsSync(fullPath)) {
     return false;
@@ -261,9 +259,7 @@ function globSync(pattern, projectRoot) {
   const baseDir = extractBaseDir(pattern);
   const regexPattern = globToRegex(pattern);
 
-  const searchDir = path.isAbsolute(baseDir)
-    ? baseDir
-    : path.join(projectRoot, baseDir);
+  const searchDir = path.isAbsolute(baseDir) ? baseDir : path.join(projectRoot, baseDir);
 
   if (!fs.existsSync(searchDir)) {
     return results;
@@ -448,7 +444,7 @@ function getAutoSpawnSuggestions(result, opts = {}) {
         artifactName: result.artifactName,
         description: companion.description,
         target: companion.target,
-        depth: currentDepth
+        depth: currentDepth,
       });
     }
   }
@@ -460,5 +456,5 @@ module.exports = {
   loadCompanionMatrix,
   checkCompanions,
   formatCompanionChecklist,
-  getAutoSpawnSuggestions
+  getAutoSpawnSuggestions,
 };

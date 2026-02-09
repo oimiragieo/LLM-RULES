@@ -194,8 +194,7 @@ async function runTests() {
     });
 
     await test('should reject path outside project', () => {
-      const testPath =
-        process.platform === 'win32' ? 'C:/other/path' : '/home/user/other/path';
+      const testPath = process.platform === 'win32' ? 'C:/other/path' : '/home/user/other/path';
       const result = pathHelpers.isPathWithinProject(testPath, projectRoot);
       assertEqual(result, false, 'should reject path outside project');
     });
@@ -224,15 +223,15 @@ async function runTests() {
     });
 
     await test('should block interpolation of invalid name', () => {
-      const result = pathHelpers.interpolateArtifactName('.claude/skills/{name}/SKILL.md', '../hack');
+      const result = pathHelpers.interpolateArtifactName(
+        '.claude/skills/{name}/SKILL.md',
+        '../hack'
+      );
       assertEqual(result, null, 'should return null for invalid name');
     });
 
     await test('should handle multiple placeholders', () => {
-      const result = pathHelpers.interpolateArtifactName(
-        '.claude/{name}/test-{name}.md',
-        'agent'
-      );
+      const result = pathHelpers.interpolateArtifactName('.claude/{name}/test-{name}.md', 'agent');
       assertEqual(result, '.claude/agent/test-agent.md', 'should interpolate both');
     });
 

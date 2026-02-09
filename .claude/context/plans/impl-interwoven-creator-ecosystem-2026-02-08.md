@@ -16,6 +16,7 @@
 Implement the Interwoven Creator Ecosystem: a companion artifact tracking system that reduces orphaned artifact rate from ~70% to <20%. The plan is structured in 6 phases with a commit checkpoint after Phase 3 (10+ files threshold met).
 
 **Key Deliverables:**
+
 - Pre-work simplification (shared utilities)
 - `companion-check.cjs` library module with security hardening
 - `companionMatrix` in `ecosystem-impact-graph.json`
@@ -39,15 +40,18 @@ Implement the Interwoven Creator Ecosystem: a companion artifact tracking system
 ### Step 0.1: Extract `safeParseJSON` to Shared Utility
 
 **Files to create:**
+
 - `.claude/lib/utils/safe-json.cjs`
 
 **Files to modify:**
+
 - `.claude/lib/creators/creator-commons.cjs` (replace inline safeParseJSON with import)
 - `.claude/lib/creators/ecosystem-impact-analyzer.cjs` (replace inline safeParseJSON with import)
 
 **Detailed Changes:**
 
 1. Create `.claude/lib/utils/safe-json.cjs`:
+
    ```javascript
    'use strict';
    /**
@@ -96,11 +100,13 @@ Implement the Interwoven Creator Ecosystem: a companion artifact tracking system
 ### Step 0.2: Extract Path Normalization to Shared Utility
 
 **Files to create:**
+
 - `.claude/lib/utils/path-helpers.cjs`
 
 **Detailed Changes:**
 
 1. Create `.claude/lib/utils/path-helpers.cjs`:
+
    ```javascript
    'use strict';
    const path = require('path');
@@ -161,8 +167,9 @@ Implement the Interwoven Creator Ecosystem: a companion artifact tracking system
    function isPathWithinProject(resolvedPath, projectRoot) {
      const normalizedResolved = normalizePath(path.resolve(resolvedPath));
      const normalizedRoot = normalizePath(path.resolve(projectRoot));
-     return normalizedResolved.startsWith(normalizedRoot + '/') ||
-            normalizedResolved === normalizedRoot;
+     return (
+       normalizedResolved.startsWith(normalizedRoot + '/') || normalizedResolved === normalizedRoot
+     );
    }
 
    module.exports = {
@@ -198,6 +205,7 @@ node --test tests/lib/utils/path-helpers.test.cjs
 ```
 
 **Success Criteria:**
+
 - [ ] `safe-json.cjs` created with `safeParseJSON` function
 - [ ] `path-helpers.cjs` created with 5 functions including SEC-ICE-001 validators
 - [ ] Both `creator-commons.cjs` and `ecosystem-impact-analyzer.cjs` import from shared utility
@@ -217,6 +225,7 @@ node --test tests/lib/utils/path-helpers.test.cjs
 ### Step 1.1: Add `companionMatrix` to ecosystem-impact-graph.json
 
 **Files to modify:**
+
 - `.claude/context/data/ecosystem-impact-graph.json`
 
 **Detailed Changes:**
@@ -265,6 +274,7 @@ node --test tests/lib/creators/ecosystem-impact-analyzer.test.cjs
 ```
 
 **Success Criteria:**
+
 - [ ] `companionMatrix` key exists with 9 artifact types
 - [ ] Each type has `required`, `recommended`, `optional` arrays
 - [ ] Each companion has all 6 fields: `companionType`, `relationship`, `checkStrategy`, `checkTarget`, `autoCreate`, `creatorSkill`
@@ -285,6 +295,7 @@ node --test tests/lib/creators/ecosystem-impact-analyzer.test.cjs
 ### Step 2.1: Create companion-check.cjs
 
 **Files to create:**
+
 - `.claude/lib/creators/companion-check.cjs`
 
 **Detailed Changes:**
@@ -297,7 +308,11 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
-const { isValidArtifactName, isPathWithinProject, normalizePath } = require('../utils/path-helpers.cjs');
+const {
+  isValidArtifactName,
+  isPathWithinProject,
+  normalizePath,
+} = require('../utils/path-helpers.cjs');
 
 // Constants for SEC-ICE-002 auto-spawn limits
 const MAX_AUTO_SPAWN_DEPTH = 2;
@@ -353,7 +368,9 @@ const CHECK_STRATEGIES = {
     try {
       const content = fs.readFileSync(fullPath, 'utf8');
       return content.toLowerCase().includes(artifactName.toLowerCase());
-    } catch (_err) { return false; }
+    } catch (_err) {
+      return false;
+    }
   },
   'json-key-exists': (resolvedTarget, artifactName, projectRoot) => {
     const fullPath = path.resolve(projectRoot, resolvedTarget);
@@ -362,7 +379,9 @@ const CHECK_STRATEGIES = {
     try {
       const json = safeParseJSON(fs.readFileSync(fullPath, 'utf8'));
       return json && artifactName in json;
-    } catch (_err) { return false; }
+    } catch (_err) {
+      return false;
+    }
   },
   'glob-match': (resolvedTarget, artifactName, projectRoot) => {
     // Simple glob check using fs.readdirSync + pattern matching
@@ -377,7 +396,9 @@ const CHECK_STRATEGIES = {
     try {
       const content = fs.readFileSync(fullPath, 'utf8');
       return content.includes(artifactName);
-    } catch (_err) { return false; }
+    } catch (_err) {
+      return false;
+    }
   },
 };
 ```
@@ -401,6 +422,7 @@ function interpolateTarget(template, artifactName) {
 ### Step 2.2: Create companion-check tests
 
 **Files to create:**
+
 - `tests/lib/creators/companion-check.test.cjs`
 
 **Test Categories (minimum 20 tests):**
@@ -454,6 +476,7 @@ node --test tests/lib/creators/companion-check.test.cjs
 ```
 
 **Success Criteria:**
+
 - [ ] `companion-check.cjs` exports `checkCompanions`, `formatCompanionChecklist`, `loadCompanionMatrix`, `validateAutoSpawnLimits`
 - [ ] SEC-ICE-001: artifact names validated before any path construction
 - [ ] SEC-ICE-001: all resolved paths validated within PROJECT_ROOT
@@ -485,6 +508,7 @@ git commit -m "feat: add companion-check library and shared utilities for Interw
 ### Step 3.1: Add Step 0.5 to All 9 Creator Skills
 
 **Files to modify (9 files):**
+
 1. `.claude/skills/agent-creator/SKILL.md`
 2. `.claude/skills/skill-creator/SKILL.md`
 3. `.claude/skills/hook-creator/SKILL.md`
@@ -513,6 +537,7 @@ This step is informational (does not block creation) but ensures awareness of th
 ```
 
 Replace `{ARTIFACT_TYPE}` with the appropriate type for each creator:
+
 - agent-creator -> `'agent'`
 - skill-creator -> `'skill'`
 - hook-creator -> `'hook'`
@@ -540,6 +565,7 @@ If artifact exists, delegate to `artifact-updater`. If new, continue to Step 0.5
 ### Step 3.2: Update research-synthesis SKILL.md with Tool Priority
 
 **Files to modify:**
+
 - `.claude/skills/research-synthesis/SKILL.md`
 
 **Detailed Changes:**
@@ -551,9 +577,9 @@ Add a "Tool Priority" section (as specified in architecture report Section 8.1):
 
 Use tools in this priority order:
 
-1. **mcp__Exa__web_search_exa** - Preferred for web research (better quality, structured results)
-2. **mcp__Exa__get_code_context_exa** - Preferred for code examples and context
-3. **mcp__Ref__ref_search_documentation** - Preferred for official documentation lookup
+1. **mcp**Exa**web_search_exa** - Preferred for web research (better quality, structured results)
+2. **mcp**Exa**get_code_context_exa** - Preferred for code examples and context
+3. **mcp**Ref**ref_search_documentation** - Preferred for official documentation lookup
 4. **WebSearch** - Fallback when MCP tools are unavailable
 5. **WebFetch** - Fallback for fetching specific URLs
 
@@ -565,6 +591,7 @@ Use tools in this priority order:
 ### Step 3.3: Update agent-creator Step 2 with MCP Tool References
 
 **Files to modify:**
+
 - `.claude/skills/agent-creator/SKILL.md` (already modified in 3.1)
 
 **Detailed Changes:**
@@ -594,6 +621,7 @@ pnpm test
 ```
 
 **Success Criteria:**
+
 - [ ] All 9 creator skills contain "Step 0.5: Companion Check" section
 - [ ] All 9 creator skills have simplified Step 0 (3-line reference)
 - [ ] `research-synthesis/SKILL.md` has "Tool Priority" section
@@ -613,6 +641,7 @@ pnpm test
 ### Step 4.1: Add Step 3.1 to artifact-integrator SKILL.md
 
 **Files to modify:**
+
 - `.claude/skills/artifact-integrator/SKILL.md`
 
 **Detailed Changes:**
@@ -628,15 +657,16 @@ After generating the standard integration plan (Step 3), check companions:
 2. For each artifact processed from integration-queue.jsonl:
    a. Run `checkCompanions(artifactType, artifactName)`
    b. For REQUIRED missing companions:
-      - If `autoCreate: true` AND `creatorSkill` is set: propose TaskCreate (subject to auto-spawn limits)
-      - If `autoCreate: false`: Create advisory task noting the gap
-   c. For RECOMMENDED missing companions:
-      - Create advisory tasks (lower priority)
-   d. Include companion checklist in the integration report
+   - If `autoCreate: true` AND `creatorSkill` is set: propose TaskCreate (subject to auto-spawn limits)
+   - If `autoCreate: false`: Create advisory task noting the gap
+     c. For RECOMMENDED missing companions:
+   - Create advisory tasks (lower priority)
+     d. Include companion checklist in the integration report
 
 **Auto-Spawn Safety (SEC-ICE-002 - MANDATORY):**
 
 Before proposing ANY auto-spawn of a creator:
+
 1. Check `AUTO_COMPANION_SPAWN` env var (default: `warn`)
    - `off`: Do NOT auto-spawn. Only create advisory tasks.
    - `warn`: Log warning + create advisory tasks (do not auto-spawn)
@@ -664,6 +694,7 @@ pnpm test
 ```
 
 **Success Criteria:**
+
 - [ ] artifact-integrator SKILL.md contains "Step 3.1: Companion Matrix Analysis"
 - [ ] Auto-spawn safety section present with all 5 SEC-ICE-002 controls
 - [ ] Deduplication strategy documented
@@ -682,6 +713,7 @@ pnpm test
 ### Step 5.1: Create ecosystem-creation-workflow.md
 
 **Files to create:**
+
 - `.claude/workflows/core/ecosystem-creation-workflow.md`
 
 **Content:** Use the full workflow specification from the architecture report Section 9 (lines 813-912), including:
@@ -699,6 +731,7 @@ pnpm test
 ### Step 5.2: Update CLAUDE.md and Router References (ADVISORY)
 
 **Files to modify:**
+
 - `.claude/CLAUDE.md` -- Add reference to ecosystem-creation-workflow in Section 8.6 Enterprise Workflows
 - `.claude/docs/@ENTERPRISE_WORKFLOWS.md` -- Add ecosystem-creation-workflow entry
 
@@ -716,6 +749,7 @@ pnpm test
 ```
 
 **Success Criteria:**
+
 - [ ] `ecosystem-creation-workflow.md` exists with all 6 phases documented
 - [ ] Mermaid sequence diagram included
 - [ ] Integration points table present
@@ -752,6 +786,7 @@ Both MUST produce zero errors and zero changes. These are BLOCKING requirements 
 ### Step 6.3: Verify Security Requirements
 
 Manually verify:
+
 - [ ] SEC-ICE-001: `isValidArtifactName()` called before ANY path construction in companion-check.cjs
 - [ ] SEC-ICE-001: `isPathWithinProject()` called for ALL resolved paths
 - [ ] SEC-ICE-002: `MAX_AUTO_SPAWN_DEPTH = 2` constant defined
@@ -765,6 +800,7 @@ Manually verify:
 ### Phase 6 Verification Gate
 
 **Success Criteria:**
+
 - [ ] All tests pass (0 failures)
 - [ ] `pnpm lint:fix` produces 0 errors
 - [ ] `pnpm format` produces 0 changes
@@ -785,6 +821,7 @@ Manually verify:
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Spawn Command:**
+
 ```
 Task({
   subagent_type: "reflection-agent",
@@ -794,6 +831,7 @@ Task({
 ```
 
 **Success Criteria:**
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
@@ -804,45 +842,45 @@ Task({
 
 ### Files to Create (3)
 
-| # | File | Phase | Purpose |
-|---|------|-------|---------|
-| 1 | `.claude/lib/utils/safe-json.cjs` | 0.1 | Shared safe JSON parser |
-| 2 | `.claude/lib/utils/path-helpers.cjs` | 0.2 | Shared path utilities + SEC-ICE-001 validators |
-| 3 | `.claude/lib/creators/companion-check.cjs` | 2.1 | Pre-creation companion checker |
+| #   | File                                       | Phase | Purpose                                        |
+| --- | ------------------------------------------ | ----- | ---------------------------------------------- |
+| 1   | `.claude/lib/utils/safe-json.cjs`          | 0.1   | Shared safe JSON parser                        |
+| 2   | `.claude/lib/utils/path-helpers.cjs`       | 0.2   | Shared path utilities + SEC-ICE-001 validators |
+| 3   | `.claude/lib/creators/companion-check.cjs` | 2.1   | Pre-creation companion checker                 |
 
 ### Files to Create (Tests) (3)
 
-| # | File | Phase | Tests |
-|---|------|-------|-------|
-| 1 | `tests/lib/utils/safe-json.test.cjs` | 0.1 | 3 tests |
-| 2 | `tests/lib/utils/path-helpers.test.cjs` | 0.2 | 8 tests |
-| 3 | `tests/lib/creators/companion-check.test.cjs` | 2.2 | 20+ tests |
+| #   | File                                          | Phase | Tests     |
+| --- | --------------------------------------------- | ----- | --------- |
+| 1   | `tests/lib/utils/safe-json.test.cjs`          | 0.1   | 3 tests   |
+| 2   | `tests/lib/utils/path-helpers.test.cjs`       | 0.2   | 8 tests   |
+| 3   | `tests/lib/creators/companion-check.test.cjs` | 2.2   | 20+ tests |
 
 ### Files to Create (Docs) (1)
 
-| # | File | Phase | Purpose |
-|---|------|-------|---------|
-| 1 | `.claude/workflows/core/ecosystem-creation-workflow.md` | 5.1 | Unified creation workflow |
+| #   | File                                                    | Phase | Purpose                   |
+| --- | ------------------------------------------------------- | ----- | ------------------------- |
+| 1   | `.claude/workflows/core/ecosystem-creation-workflow.md` | 5.1   | Unified creation workflow |
 
 ### Files to Modify (15)
 
-| # | File | Phase | Change |
-|---|------|-------|--------|
-| 1 | `.claude/lib/creators/creator-commons.cjs` | 0.1 | Import safeParseJSON from shared utility |
-| 2 | `.claude/lib/creators/ecosystem-impact-analyzer.cjs` | 0.1 | Import safeParseJSON from shared utility |
-| 3 | `.claude/context/data/ecosystem-impact-graph.json` | 1.1 | Add companionMatrix (9 artifact types) |
-| 4 | `.claude/skills/agent-creator/SKILL.md` | 3.1-3.3 | Step 0 simplification + Step 0.5 + MCP tools |
-| 5 | `.claude/skills/skill-creator/SKILL.md` | 3.1 | Step 0 simplification + Step 0.5 |
-| 6 | `.claude/skills/hook-creator/SKILL.md` | 3.1 | Step 0 simplification + Step 0.5 |
-| 7 | `.claude/skills/workflow-creator/SKILL.md` | 3.1 | Step 0 simplification + Step 0.5 |
-| 8 | `.claude/skills/creators/command-creator/SKILL.md` | 3.1 | Step 0 simplification + Step 0.5 |
-| 9 | `.claude/skills/creators/rule-creator/SKILL.md` | 3.1 | Step 0 simplification + Step 0.5 |
-| 10 | `.claude/skills/creators/tool-creator/SKILL.md` | 3.1 | Step 0 simplification + Step 0.5 |
-| 11 | `.claude/skills/template-creator/SKILL.md` | 3.1 | Step 0 simplification + Step 0.5 |
-| 12 | `.claude/skills/schema-creator/SKILL.md` | 3.1 | Step 0 simplification + Step 0.5 |
-| 13 | `.claude/skills/research-synthesis/SKILL.md` | 3.2 | Add Tool Priority section |
-| 14 | `.claude/skills/artifact-integrator/SKILL.md` | 4.1 | Add Step 3.1 companion matrix analysis |
-| 15 | `.claude/CLAUDE.md` | 5.2 | Add ecosystem-creation-workflow reference |
+| #   | File                                                 | Phase   | Change                                       |
+| --- | ---------------------------------------------------- | ------- | -------------------------------------------- |
+| 1   | `.claude/lib/creators/creator-commons.cjs`           | 0.1     | Import safeParseJSON from shared utility     |
+| 2   | `.claude/lib/creators/ecosystem-impact-analyzer.cjs` | 0.1     | Import safeParseJSON from shared utility     |
+| 3   | `.claude/context/data/ecosystem-impact-graph.json`   | 1.1     | Add companionMatrix (9 artifact types)       |
+| 4   | `.claude/skills/agent-creator/SKILL.md`              | 3.1-3.3 | Step 0 simplification + Step 0.5 + MCP tools |
+| 5   | `.claude/skills/skill-creator/SKILL.md`              | 3.1     | Step 0 simplification + Step 0.5             |
+| 6   | `.claude/skills/hook-creator/SKILL.md`               | 3.1     | Step 0 simplification + Step 0.5             |
+| 7   | `.claude/skills/workflow-creator/SKILL.md`           | 3.1     | Step 0 simplification + Step 0.5             |
+| 8   | `.claude/skills/creators/command-creator/SKILL.md`   | 3.1     | Step 0 simplification + Step 0.5             |
+| 9   | `.claude/skills/creators/rule-creator/SKILL.md`      | 3.1     | Step 0 simplification + Step 0.5             |
+| 10  | `.claude/skills/creators/tool-creator/SKILL.md`      | 3.1     | Step 0 simplification + Step 0.5             |
+| 11  | `.claude/skills/template-creator/SKILL.md`           | 3.1     | Step 0 simplification + Step 0.5             |
+| 12  | `.claude/skills/schema-creator/SKILL.md`             | 3.1     | Step 0 simplification + Step 0.5             |
+| 13  | `.claude/skills/research-synthesis/SKILL.md`         | 3.2     | Add Tool Priority section                    |
+| 14  | `.claude/skills/artifact-integrator/SKILL.md`        | 4.1     | Add Step 3.1 companion matrix analysis       |
+| 15  | `.claude/CLAUDE.md`                                  | 5.2     | Add ecosystem-creation-workflow reference    |
 
 **Total: 22 files (7 created + 15 modified)**
 
@@ -862,6 +900,7 @@ Phase 1 (matrix data) ──┘                                ├── Phase 4
 ```
 
 **Parallelism:**
+
 - Phase 0.1 and 0.2 can run in parallel
 - Phase 0.1/0.2 and Phase 1 can run in parallel
 - Phase 3 and Phase 4 can run in parallel (after Phase 2)
@@ -872,31 +911,31 @@ Phase 1 (matrix data) ──┘                                ├── Phase 4
 
 ## Risk Assessment
 
-| Risk | Impact | Likelihood | Mitigation |
-|------|--------|-----------|------------|
-| Path traversal via artifact names | HIGH | MEDIUM | SEC-ICE-001: strict regex validation + project root check |
-| Auto-spawn amplification | HIGH | LOW | SEC-ICE-002: depth 2, cap 5, cycle detection, kill switch |
-| Circular companion dependencies | MEDIUM | LOW | autoCreate: false for cross-type, dedup in integrator |
-| Stale companion matrix | LOW | MEDIUM | Version controlled in git, schema validation on load |
-| Test regressions | MEDIUM | LOW | Full test suite run before commit |
-| Creator skill update errors | LOW | LOW | Template-based Step 0.5 text reduces variation risk |
+| Risk                              | Impact | Likelihood | Mitigation                                                |
+| --------------------------------- | ------ | ---------- | --------------------------------------------------------- |
+| Path traversal via artifact names | HIGH   | MEDIUM     | SEC-ICE-001: strict regex validation + project root check |
+| Auto-spawn amplification          | HIGH   | LOW        | SEC-ICE-002: depth 2, cap 5, cycle detection, kill switch |
+| Circular companion dependencies   | MEDIUM | LOW        | autoCreate: false for cross-type, dedup in integrator     |
+| Stale companion matrix            | LOW    | MEDIUM     | Version controlled in git, schema validation on load      |
+| Test regressions                  | MEDIUM | LOW        | Full test suite run before commit                         |
+| Creator skill update errors       | LOW    | LOW        | Template-based Step 0.5 text reduces variation risk       |
 
 ---
 
 ## Timeline Summary
 
-| Phase | Tasks | Files | Est. Time | Parallel? |
-|-------|-------|-------|-----------|-----------|
-| 0: Pre-Work | 2 | 4 create + 2 modify | 30 min | Partial (0.1 ∥ 0.2) |
-| 1: Matrix Data | 1 | 1 modify | 15 min | Yes (∥ Phase 0) |
-| CHECKPOINT | - | - | 5 min | - |
-| 2: Library | 2 | 2 create | 45 min | No (after 0+1) |
-| 3: Creator Skills | 3 | 10 modify | 30 min | Partial (after 2) |
-| 4: Integrator | 1 | 1 modify | 15 min | Yes (∥ Phase 3) |
-| 5: Workflow Docs | 2 | 2 create + 1 modify | 20 min | No (after 3+4) |
-| 6: Quality Gates | 3 | 0 (testing) | 15 min | No (final) |
-| FINAL: Reflection | 1 | 0 | 15 min | No (after 6) |
-| **Total** | **15** | **22 files** | **~3 hours** | |
+| Phase             | Tasks  | Files               | Est. Time    | Parallel?           |
+| ----------------- | ------ | ------------------- | ------------ | ------------------- |
+| 0: Pre-Work       | 2      | 4 create + 2 modify | 30 min       | Partial (0.1 ∥ 0.2) |
+| 1: Matrix Data    | 1      | 1 modify            | 15 min       | Yes (∥ Phase 0)     |
+| CHECKPOINT        | -      | -                   | 5 min        | -                   |
+| 2: Library        | 2      | 2 create            | 45 min       | No (after 0+1)      |
+| 3: Creator Skills | 3      | 10 modify           | 30 min       | Partial (after 2)   |
+| 4: Integrator     | 1      | 1 modify            | 15 min       | Yes (∥ Phase 3)     |
+| 5: Workflow Docs  | 2      | 2 create + 1 modify | 20 min       | No (after 3+4)      |
+| 6: Quality Gates  | 3      | 0 (testing)         | 15 min       | No (final)          |
+| FINAL: Reflection | 1      | 0                   | 15 min       | No (after 6)        |
+| **Total**         | **15** | **22 files**        | **~3 hours** |                     |
 
 ---
 
@@ -905,6 +944,7 @@ Phase 1 (matrix data) ──┘                                ├── Phase 4
 The following TaskCreate calls should be used to execute this plan:
 
 ### Task 1: Pre-Work Simplification (Phase 0)
+
 ```
 Target Agent: `code-simplifier`
 Recommended Skills: `verification-before-completion`
@@ -912,6 +952,7 @@ Description: Extract safeParseJSON to .claude/lib/utils/safe-json.cjs and path u
 ```
 
 ### Task 2: Companion Matrix Data (Phase 1)
+
 ```
 Target Agent: `developer`
 Recommended Skills: `tdd`, `verification-before-completion`
@@ -919,6 +960,7 @@ Description: Add companionMatrix to ecosystem-impact-graph.json with all 9 artif
 ```
 
 ### Task 3: companion-check.cjs Library (Phase 2)
+
 ```
 Target Agent: `developer`
 Recommended Skills: `tdd`, `verification-before-completion`
@@ -926,6 +968,7 @@ Description: Create .claude/lib/creators/companion-check.cjs with checkCompanion
 ```
 
 ### Task 4: Creator Skill Updates (Phase 3)
+
 ```
 Target Agent: `developer`
 Recommended Skills: `verification-before-completion`
@@ -933,6 +976,7 @@ Description: Add Step 0.5 Companion Check to all 9 creator skills. Simplify Step
 ```
 
 ### Task 5: artifact-integrator Enhancement (Phase 4)
+
 ```
 Target Agent: `developer`
 Recommended Skills: `verification-before-completion`
@@ -940,6 +984,7 @@ Description: Add Step 3.1 Companion Matrix Analysis to artifact-integrator SKILL
 ```
 
 ### Task 6: Workflow Documentation (Phase 5)
+
 ```
 Target Agent: `technical-writer`
 Recommended Skills: `doc-generator`, `writing-skills`, `verification-before-completion`
@@ -947,6 +992,7 @@ Description: Create .claude/workflows/core/ecosystem-creation-workflow.md with 6
 ```
 
 ### Task 7: Quality Gates (Phase 6)
+
 ```
 Target Agent: `qa`
 Recommended Skills: `tdd`, `verification-before-completion`, `checklist-generator`

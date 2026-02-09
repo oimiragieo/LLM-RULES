@@ -1,216 +1,3 @@
-# Architecture Decision Records
-
-> Older entries archived to `archive/decisions-2026-02.md`. This file contains recent decisions only.
-
-## Format
-
-Each decision should include:
-
-- Date
-- Decision made
-- Context/problem
-- Rationale
-- Consequences
-
----
-
-## ADR-103: Interwoven Creator Ecosystem with Research-First Protocol
-
-**Date:** 2026-02-08
-
-**Status:** PROPOSED (Architecture design complete, pending implementation)
-
-**Context:**
-
-The current creator ecosystem suffers from an "orphaned artifact" problem: when a creator skill produces an artifact (agent, skill, hook, etc.), companion artifacts are often missed, leaving the new artifact partially integrated. The ecosystem-impact-graph.json describes downstream integration targets but lacks the concept of companion artifacts -- artifacts that should be co-created alongside the primary one. There is no pre-creation checkpoint, and the research-first protocol does not enforce MCP tool priority.
-
-**Decision:**
-
-1. Add a `companionMatrix` to `ecosystem-impact-graph.json` defining bidirectional companion relationships for all 9 artifact types (agent, skill, hook, workflow, command, rule, tool, template, schema) with required/recommended/optional tiers.
-
-2. Create `companion-check.cjs` library module in `.claude/lib/creators/` with `checkCompanions()`, `formatCompanionChecklist()`, and `loadCompanionMatrix()` functions. Uses 5 check strategies (file-exists, grep-in-file, json-key-exists, glob-match, settings-registered).
-
-3. Add "Step 0.5: Companion Check" to all 9 creator skills (between existence check and creation).
-
-4. Enhance artifact-integrator with "Step 3.1: Companion Matrix Analysis" to run companion checks post-creation and create follow-up tasks for missing companions.
-
-5. Enhance research-synthesis with explicit MCP tool priority (Exa > Ref > WebSearch fallback).
-
-6. Create `ecosystem-creation-workflow.md` documenting the full 6-phase creation lifecycle.
-
-**Key Design Choices:**
-
-- Library module (not hook) for companion-check -- hooks fire on all writes, causing false positives
-- Additive JSON (companionMatrix alongside existing artifactTypes) -- single source of truth
-- autoCreate: true only for tests (prevents circular creation loops)
-- Check strategies are pure functions with graceful degradation
-
-**Rationale:**
-
-- Pre-creation awareness reduces orphan rate from ~70% to projected <20%
-- Data-driven companion matrix is extensible without code changes
-- Research-first with MCP tools produces higher-quality, more structured research
-- Unified workflow documentation eliminates tribal knowledge scattered across 12+ files
-
-**Consequences:**
-
-- 16 files modified/created (2 new, 14 modified)
-- All 9 creator skills gain Step 0.5 (companion check)
-- artifact-integrator gains companion-aware gap analysis
-- research-synthesis explicitly prefers MCP tools over WebSearch
-
-**Architecture Design:** `.claude/context/reports/architecture/interwoven-creator-ecosystem-design-2026-02-08.md`
-
----
-
-## ADR-100: Cross-Artifact Integration System (COMPLETE)
-
-**Date:** 2026-02-08 (Final Completion)
-
-**Status:** ACCEPTED & FULLY IMPLEMENTED (All 15 tasks complete, Phase 6 DevOps wiring verified, 95% deployment readiness)
-
-**Summary:** Complete end-to-end integration framework for artifact discovery, relationship tracking, gap detection, and remediation. The 15-task enterprise pipeline (Tasks #1-15 spanning Feb 4-8) successfully demonstrated:
-
-- **Phase 0-1:** Architecture design + security review + implementation planning
-- **Phase 2:** Core library implementation (artifact-graph.cjs, 479 lines, 11 tests)
-- **Phase 3:** Integration into agents (reflection-agent Step 4.5, evolution-orchestrator Phase E)
-- **Phase 4:** Integration into workflows (evolution-workflow Phase 6 actions)
-- **Phase 5:** Integration into system hooks (post-creation-integration.cjs queues entries)
-- **Phase 6:** Integration into Router (Step 0.5 queue checking, 11 artifact-integration keywords) ← Task #12
-
-**Key Achievements:**
-
-- 5 integration points fully wired and verified (reflection → evolution → post-creation → router → artifact-integrator)
-- 65 integration tests (100% pass rate)
-- Zero missed integration gaps (5/5 checklist items complete)
-- Zero design rework (plan-to-deployment without iteration)
-- Non-blocking operational pattern (20ms overhead, integration runs in parallel)
-- 3 new patterns extracted (non-blocking integration, intent-driven closure, enterprise pipeline)
-
-**Deployment Verdict:** READY FOR PRODUCTION (95% confidence, 0 critical blockers)
-
----
-
-## ADR-102: Memory Management System Rebuild (Rotator + Pruner + Cold Storage)
-
-**Date:** 2026-02-08
-
-**Status:** Accepted (Architecture + Security designs complete, Implementation plan ready)
-
-**Context:**
-
-Memory files (learnings.md, decisions.md, issues.md) grow unbounded, with issues.md reaching 53KB and archives reaching 463KB. Three previously archived modules (memory-rotator, smart-pruner, cold-storage) had valid designs but were never integrated. The memory-scheduler.cjs has disabled stubs where these should be wired. This is CRITICAL issue C-003 from the performance analysis (40% context budget consumption).
-
-**Decision:**
-
-Design and implement a simplified 3-component memory management system:
-
-1. **memory-rotator.cjs** (~120 lines): Section-based rotation when files exceed 20KB. Parses markdown into semantic sections (delimited by `---` or `## `), preserves `[PERMANENT]` entries, archives to `archive/{file}-YYYY-MM.md`. Triggered both by `sync-memory-index.cjs` hook (on write) and by `memory-scheduler.cjs` (weekly).
-
-2. **smart-pruner.cjs** (~100 lines): Jaccard word-similarity deduplication (threshold 0.5) and resolved-entry pruning (30-day age). No embedding dependencies. Preserves `[PERMANENT]` entries. Runs weekly via scheduler.
-
-3. **cold-storage.cjs** (~80 lines): 3-tier system (HOT/WARM/COLD). Moves warm archives older than 30 days to plain JSONL files in `archive/cold/`. No gzip (simplicity over space). Provides cross-tier search.
-
-**Key Design Choices:**
-
-- Section-based over line-based rotation (preserves semantic units)
-- Jaccard over embeddings for dedup (zero dependencies, deterministic)
-- Plain JSONL over gzip for cold storage (debuggable, Windows-safe)
-- Hook + scheduler dual triggering (immediate + batch)
-- All writes via atomic-write.cjs with proper-lockfile
-
-**Rationale:**
-
-- Previous implementations failed due to over-engineering (combined ~900 lines) and lack of integration
-- New design is ~300 lines total (67% reduction), focused on integration
-- Addresses C-003 (context budget) by keeping active files under 20KB each
-- Each module under 150 lines constraint ensures maintainability
-
-**Consequences:**
-
-- Active memory footprint drops from ~82KB to ~60KB max (27% reduction)
-- Eliminates unbounded growth that previously consumed 40% of context budget
-- Archives become searchable via `searchArchives()` and `searchCold()`
-- `memory-scheduler.cjs` stubs become functional
-- `checkAndArchiveLearnings()` in memory-manager.cjs should be deprecated long-term in favor of rotator
-
-**Architecture Design:** `.claude/context/reports/architecture/memory-management-design-2026-02-08.md`
-
----
-
-## ADR-088: Check 7 Specialist-Override Architecture Review
-
-**Date:** 2026-02-07
-
-**Status:** Accepted (conditional)
-
-**Context:**
-Check 7 (checkSpecialistOverride) was added to routing-guard.cjs via TDD to enforce the specialist-first routing law documented in CLAUDE.md. This is a post-hoc architecture review.
-
-**Decision:**
-
-1. Check 7 design is architecturally sound in intent, placement (last check), and scope (developer-only).
-2. MUST remain at warn-default until keyword precision is improved (substring matching produces false positives).
-3. Escalation to block-default requires: (a) word-boundary matching implemented, (b) 30 days violation-tracker data, (c) <10% false positive rate, (d) Router respects warnings >80% of the time.
-4. Keyword map stays hardcoded until matching strategy stabilizes.
-5. First-match-wins behavior is acceptable as a hint; scoring system is a future improvement.
-
-**Rationale:**
-
-- Warn-mode provides runtime enforcement without blocking legitimate developer work
-- Substring matching with keywords like "document", "deploy", "migration" produces too many false positives for block mode
-- Check placement (last in runAllChecks) correctly prioritizes safety > structure > quality
-
-**Consequences:**
-
-- Positive: First runtime enforcement of specialist-first routing (was documentary only)
-- Positive: Violation tracking enables data-driven promotion decisions
-- Negative: Warn-mode may cause alert fatigue if false positive rate is high
-- Risk: Without R1 fixes, escalating to block would break legitimate developer workflows
-
-**Report:** `.claude/context/reports/architecture/specialist-override-review-2026-02-07.md`
-
----
-
-## ADR-087: Commands System Overhaul -- Thin Delegator Pattern + Command Catalog
-
-**Date:** 2026-02-07
-
-**Status:** Accepted
-
-**Context:**
-
-17 command files exist in `.claude/commands/`. Only 3 properly delegate to skills (brainstorm, write-plan, execute-plan). 7 are thin stubs duplicating skill content. 4 reference dead infrastructure (`.claude/todos/`, `.claude/checkpoints.log`). 1 duplicates Router functionality. Documentation in `@DIRECTORY_STRUCTURE.md` falsely claims the directory was "Deleted (was empty)" on 2026-01-28. `CLAUDE.md` has zero references to commands.
-
-**Decision:**
-
-1. **Canonical pattern is thin delegator:** All commands that have a corresponding skill use the 3-line delegator pattern (`disable-model-invocation: true` + `Invoke the {skill} skill`).
-2. **Delete 4 dead commands:** `/checkpoint` (dead infra), `/orchestrate` (redundant with Router), `/add-todo` (dead infra), `/check-todos` (dead infra).
-3. **Convert 8 thin stubs** to proper skill delegators (build-fix, code-review, e2e, eval, refactor-clean, tdd, test-coverage, verify).
-4. **Enrich `/learn`** to use memory protocol instead of dead `skills/learned/` directory.
-5. **Add 4 new commands:** `/debug` (debugging), `/security-review` (security-architect), `/compress` (context-compressor), `/analyze` (project-analyzer).
-6. **Create command catalog** at `.claude/context/artifacts/catalogs/command-catalog.md`.
-7. **Fix documentation** in `@DIRECTORY_STRUCTURE.md`, `CLAUDE.md`, `router.md`, `capability-routing.json`, `GETTING_STARTED.md`.
-8. **Commands remain NOT creator-guarded** (by design, per security review).
-
-**Rationale:**
-
-- Thin delegators make skills the single source of truth for behavior
-- Dead infrastructure references confuse agents and waste context
-- New commands surface existing high-value skills that users cannot easily discover
-- Command catalog provides discoverability parallel to skill-catalog and template-catalog
-
-**Consequences:**
-
-- 17 commands become 17 (delete 4, add 4) with 100% functional
-- All behavioral commands delegate to skills (single source of truth)
-- Documentation accurately reflects reality
-- Users can discover commands through the catalog
-
-**Architecture Plan:** `.claude/context/plans/commands-overhaul-architecture-2026-02-07.md`
-
----
-
 ## ADR-085: Template System Overhaul -- Advisory Resolver + Dead Template Cleanup
 
 **Date:** 2026-02-07
@@ -343,183 +130,6 @@ Implement a violation tracking module at `.claude/lib/monitoring/violation-track
 
 ---
 
-## ADR-082: Hook Hardening -- Restore Archived Monitoring Modules + Fix Router-State Path
-
-**Date:** 2026-02-06
-
-**Status:** Accepted
-
-**Context:**
-
-Three hook modules are MISSING at their expected paths, causing MODULE_NOT_FOUND crashes on every hook invocation:
-
-1. `error-tracker.cjs` -- required by `error-tracker-hook.cjs` (PostToolUse), archived but not replaced
-2. `metrics-collector.cjs` -- required by `metrics-collector-hook.cjs` (PostToolUse), archived but not replaced
-3. `router-state.cjs` -- required by `user-prompt-unified.cjs` (UserPromptSubmit) at OLD path; module was relocated to `lib/routing/` but this one consumer was not updated
-
-Root cause: Hook consolidation (Task #41, commit 0e449681) archived 45 orphan hooks and relocated router-state.cjs. The two monitoring library modules were mistakenly archived even though their wrapper hooks (registered in settings.json) still require them. One consumer of router-state.cjs was missed during the path update.
-
-**Decision:**
-
-1. Restore `error-tracker.cjs` from `_archive/monitoring/` to `hooks/monitoring/` (exact copy)
-2. Restore `metrics-collector.cjs` from `_archive/monitoring/` to `hooks/monitoring/` (exact copy)
-3. Fix `user-prompt-unified.cjs` line 71: change `routingRequire('router-state.cjs')` to `libRequire(path.join('routing', 'router-state.cjs'))`
-
-**Rationale:**
-
-- Restoring archived code is lower risk than writing new implementations
-- Archived modules have proper rate limiting, validation, error handling, and match the exact interface expected by the wrapper hooks
-- The router-state path fix follows the pattern already used by all other hooks in the routing directory
-- No new dependencies, no test changes needed
-
-**Consequences:**
-
-- Error tracking and metrics collection restored on every PostToolUse event
-- Router mode reset restored on every UserPromptSubmit event (routing analysis functional)
-- Future hook consolidation efforts must verify wrapper hooks do not reference archived libraries
-
-**Architecture Plan:** `.claude/context/plans/hook-hardening-architecture-2026-02-06.md`
-
----
-
-## ADR-078: Workspace Conventions and Directory Reorganization
-
-**Date:** 2026-02-06
-
-**Status:** Accepted
-
-**Context:**
-Deep audit (Task #19) found 55+ misplaced files in `.claude/context/artifacts/` root, no naming convention, no provenance tracking, and inconsistent report placement. Research (Task #20) identified industry best practices for agent workspace organization.
-
-**Decision:**
-
-1. Establish `.claude/rules/workspace-conventions.md` as the canonical workspace rules file
-2. Create new directory structure: `reports/{domain}/`, `artifacts/{analysis,catalogs,summaries,database}/`
-3. Adopt kebab-case naming with ISO 8601 date suffixes: `{name}-{YYYY-MM-DD}.{ext}`
-4. Require provenance headers on all generated files: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
-5. Move `spawn-size-audit.jsonl` to `metrics/`, `rule-index-cache.json` to `config/`
-6. Keep `evolution-state.json`, `reflection-queue.jsonl`, and `agent-registry.json` at context root (35+ cross-cutting references each)
-7. Inject workspace conventions into the spawn template so all agents know the rules
-
-**Rationale:**
-
-- Flat structure (Option A) chosen over nested because it is simpler and easier to enforce
-- Files with deep cross-cutting references (evolution-state.json has 35+ refs in hooks, workflows, agents) are too risky to move; pragmatic decision to document as canonical
-- Provenance headers enable traceability without complex metadata systems
-- Rules placed in `.claude/rules/` which Claude Code auto-loads as project instructions
-
-**Consequences:**
-
-- All new agent-generated files will follow naming and placement conventions
-- Spawn template instructs every agent on correct file locations
-- Legacy files in `artifacts/` root remain for now (Task #22 handles migration)
-- Three root-level context files documented as canonical exceptions
-
----
-
-## ADR-079: Agent Utilization Remediation Strategy
-
-**Date:** 2026-02-06
-
-**Status:** Proposed (pending implementation)
-
-**Context:**
-Audit (Task #35) found that 94% of agents (46/49) have never been spawned. The Router collapses all requests to `developer` because enforcement hooks default to `warn` and no post-completion workflow chain exists.
-
-**Decision:**
-Implement a 4-phase remediation strategy:
-
-1. **Phase 1 (Immediate):** Change enforcement defaults to `block` mode for `PLANNER_FIRST_ENFORCEMENT` and `SECURITY_REVIEW_ENFORCEMENT`. This forces the Router to spawn planner for complex tasks and security-architect for security-sensitive tasks.
-
-2. **Phase 2 (Short-term):** Create a PostToolUse hook on TaskUpdate(completed) that triggers follow-up agent spawns: code-reviewer for implementation tasks, qa for code changes, technical-writer for documentation changes, and reflection-agent for all completions.
-
-3. **Phase 3 (Medium-term):** Fix the reflection deadlock by making Step 0 either spawn reflection-agent automatically or make reflections asynchronous. Implement a workflow state machine in `.claude/context/runtime/workflow-state.json`.
-
-4. **Phase 4 (Long-term):** Add Router intent-to-agent enforcement that prevents spawning `developer` when the classified intent maps to a different agent.
-
-**Rationale:**
-
-- Phase 1 is zero-code (env var changes) and immediately activates planner + security-architect
-- Phase 2 activates 5 more agents (code-reviewer, qa, technical-writer, reflection-agent, architect)
-- Phase 3 fixes the reflection/learning loop
-- Phase 4 prevents regression to developer-only routing
-
-**Consequences:**
-
-- Agent spawn costs will increase (more agents = more API calls)
-- Task completion will take longer (multi-phase review)
-- Quality and security will significantly improve
-- The multi-agent architecture will finally be utilized as designed
-
-**Full Analysis:** `.claude/context/reports/architecture/agent-utilization-audit-2026-02-06.md`
-
----
-
-## ADR-080: Enterprise Orchestration Workflow State Machine
-
-**Date:** 2026-02-06
-
-**Status:** Accepted
-
-**Context:**
-Agent utilization audit (Task #35, ADR-079) established that 94% of agents are never spawned. The Router collapses all requests to `developer` due to: (1) enforcement hooks defaulting to `warn`, (2) no post-completion workflow chain, (3) no workflow state machine, and (4) no phase-based execution model. Research (Task #36) identified that LangGraph-style state machines with CrewAI-style role-based teams and quality gates between phases represent industry best practices for enterprise multi-agent orchestration in 2026.
-
-**Decision:**
-Implement a 7-phase enterprise orchestration workflow state machine that the Router MUST follow for every request:
-
-1. **Phase 0: TRIAGE** -- Router classifies request (intent, complexity, domain, risk) and determines phase path
-2. **Phase 0.5: DYNAMIC CREATION** -- When capability gap detected, create missing agents/skills via EVOLVE workflow
-3. **Phase 1: DESIGN** -- Parallel spawn of planner + architect + security-architect (varies by complexity)
-4. **Phase 2: IMPLEMENT** -- Developer + domain specialist following the plan from Phase 1
-5. **Phase 3: REVIEW** -- Parallel spawn of code-reviewer + qa + security-architect
-6. **Phase 4: DEPLOY** -- DevOps agent: lint, format, commit, push, CI verification
-7. **Phase 5: DOCUMENT** -- Technical-writer updates docs, README, CHANGELOG
-8. **Phase 6: REFLECT** -- Reflection-agent extracts learnings and updates memory
-
-Key architectural decisions within this ADR:
-
-- **Complexity-based phase skipping:** TRIVIAL tasks skip to Phase 2+4 only; LOW adds Phase 1+3; MEDIUM adds Phase 5; HIGH runs all phases; EPIC adds orchestrator coordination
-- **Persistent state in workflow-state.json:** Router reads this file every turn to know which phase to advance to. Survives context resets.
-- **Quality gates between every phase:** Blocking checks prevent advancement; non-blocking checks generate warnings
-- **Post-completion chain hook:** PostToolUse on TaskUpdate(completed) automatically triggers next phase advancement
-- **Enforcement hooks in block mode by default:** `PLANNER_FIRST_ENFORCEMENT=block`, `SECURITY_REVIEW_ENFORCEMENT=block`, `SPAWN_PROMPT_VALIDATOR=block`
-- **Intent-to-agent enforcement:** New hook prevents spawning `developer` when classified intent maps to a different agent
-- **Agent handoff via artifacts + TaskUpdate metadata:** Agents communicate through files at workspace-convention-compliant paths plus structured metadata in TaskUpdate calls
-
-**Alternatives Considered:**
-
-1. **Keep current ad-hoc routing (status quo):** Rejected. 94% agent under-utilization makes the multi-agent architecture pointless. No quality gates, no post-implementation review.
-2. **Full LangGraph runtime integration:** Rejected. Would require a Python runtime and external dependency. The existing Task/TaskUpdate infrastructure provides equivalent state management capability.
-3. **CrewAI-only approach (role-based, no state machine):** Rejected. CrewAI crews lack quality gates between phases. State machine ensures each phase completes before the next begins.
-4. **Event-driven architecture (pub/sub between agents):** Rejected for now. The file-based blackboard pattern (workflow-state.json + artifact files) is simpler and works within Claude Code's single-conversation model. Event-driven could be added later as an optimization.
-
-**Rationale:**
-
-- The hybrid approach (LangGraph state machine + CrewAI role-based teams) combines the strengths of both frameworks
-- File-based state (workflow-state.json) survives context resets -- critical for long-running workflows
-- Quality gates enforce multi-agent collaboration rather than making it optional
-- Complexity-based phase skipping prevents overhead for simple tasks (TRIVIAL tasks still get just developer + devops)
-- The design uses ONLY existing infrastructure (Task, TaskUpdate, TaskList, file system) -- no new external dependencies
-- Block-mode enforcement is the single highest-impact change: it immediately forces the Router to use planner and security-architect
-
-**Consequences:**
-
-- **Positive:** Agent utilization increases from 2% to 24%+ (12 unique agent types activated)
-- **Positive:** Every code change gets at least one independent review (code-reviewer, qa, or security-architect)
-- **Positive:** Architectural decisions are captured in design documents before implementation
-- **Positive:** Memory system (learnings, decisions, issues) is actively maintained by reflection-agent
-- **Positive:** Workflow state survives interruptions -- no lost progress on context reset
-- **Negative:** API costs increase (3-10 agents per request vs 1 today)
-- **Negative:** Task completion time increases (multi-phase review adds latency)
-- **Negative:** Router complexity increases (must manage state machine transitions)
-- **Mitigated:** Complexity-based skipping keeps simple tasks fast (TRIVIAL: 2 agents, 1-2 turns)
-
-**Implementation Plan:** `.claude/context/plans/enterprise-orchestration-plan-2026-02-06.md`
-**Workflow Document:** `.claude/workflows/core/enterprise-workflow.md`
-**Depends On:** ADR-079 (Agent Utilization Remediation Strategy)
-
----
-
 ## ADR-101: Specialist-First Routing Enforcement
 
 **Date:** 2026-02-07
@@ -543,6 +153,83 @@ SPECIALIST_ROUTING_ENFORCEMENT=warn (default), escalate to block after validatio
 **Consequences:**
 
 Router receives programmatic feedback when misrouting. Combined with planner's Target Agent annotations, this creates a two-layer specialist matching system.
+
+---
+
+## ADR-103: Interwoven Creator Ecosystem with Research-First Protocol
+
+**Date:** 2026-02-08
+
+**Status:** PROPOSED (Architecture design complete, pending implementation)
+
+**Context:**
+
+The current creator ecosystem suffers from an "orphaned artifact" problem: when a creator skill produces an artifact (agent, skill, hook, etc.), companion artifacts are often missed, leaving the new artifact partially integrated. The ecosystem-impact-graph.json describes downstream integration targets but lacks the concept of companion artifacts -- artifacts that should be co-created alongside the primary one. There is no pre-creation checkpoint, and the research-first protocol does not enforce MCP tool priority.
+
+**Decision:**
+
+1. Add a `companionMatrix` to `ecosystem-impact-graph.json` defining bidirectional companion relationships for all 9 artifact types (agent, skill, hook, workflow, command, rule, tool, template, schema) with required/recommended/optional tiers.
+
+2. Create `companion-check.cjs` library module in `.claude/lib/creators/` with `checkCompanions()`, `formatCompanionChecklist()`, and `loadCompanionMatrix()` functions. Uses 5 check strategies (file-exists, grep-in-file, json-key-exists, glob-match, settings-registered).
+
+3. Add "Step 0.5: Companion Check" to all 9 creator skills (between existence check and creation).
+
+4. Enhance artifact-integrator with "Step 3.1: Companion Matrix Analysis" to run companion checks post-creation and create follow-up tasks for missing companions.
+
+5. Enhance research-synthesis with explicit MCP tool priority (Exa > Ref > WebSearch fallback).
+
+6. Create `ecosystem-creation-workflow.md` documenting the full 6-phase creation lifecycle.
+
+**Key Design Choices:**
+
+- Library module (not hook) for companion-check -- hooks fire on all writes, causing false positives
+- Additive JSON (companionMatrix alongside existing artifactTypes) -- single source of truth
+- autoCreate: true only for tests (prevents circular creation loops)
+- Check strategies are pure functions with graceful degradation
+
+**Rationale:**
+
+- Pre-creation awareness reduces orphan rate from ~70% to projected <20%
+- Data-driven companion matrix is extensible without code changes
+- Research-first with MCP tools produces higher-quality, more structured research
+- Unified workflow documentation eliminates tribal knowledge scattered across 12+ files
+
+**Consequences:**
+
+- 16 files modified/created (2 new, 14 modified)
+- All 9 creator skills gain Step 0.5 (companion check)
+- artifact-integrator gains companion-aware gap analysis
+- research-synthesis explicitly prefers MCP tools over WebSearch
+
+**Architecture Design:** `.claude/context/reports/architecture/interwoven-creator-ecosystem-design-2026-02-08.md`
+
+---
+
+## ADR-100: Cross-Artifact Integration System (COMPLETE)
+
+**Date:** 2026-02-08 (Final Completion)
+
+**Status:** ACCEPTED & FULLY IMPLEMENTED (All 15 tasks complete, Phase 6 DevOps wiring verified, 95% deployment readiness)
+
+**Summary:** Complete end-to-end integration framework for artifact discovery, relationship tracking, gap detection, and remediation. The 15-task enterprise pipeline (Tasks #1-15 spanning Feb 4-8) successfully demonstrated:
+
+- **Phase 0-1:** Architecture design + security review + implementation planning
+- **Phase 2:** Core library implementation (artifact-graph.cjs, 479 lines, 11 tests)
+- **Phase 3:** Integration into agents (reflection-agent Step 4.5, evolution-orchestrator Phase E)
+- **Phase 4:** Integration into workflows (evolution-workflow Phase 6 actions)
+- **Phase 5:** Integration into system hooks (post-creation-integration.cjs queues entries)
+- **Phase 6:** Integration into Router (Step 0.5 queue checking, 11 artifact-integration keywords) ← Task #12
+
+**Key Achievements:**
+
+- 5 integration points fully wired and verified (reflection → evolution → post-creation → router → artifact-integrator)
+- 65 integration tests (100% pass rate)
+- Zero missed integration gaps (5/5 checklist items complete)
+- Zero design rework (plan-to-deployment without iteration)
+- Non-blocking operational pattern (20ms overhead, integration runs in parallel)
+- 3 new patterns extracted (non-blocking integration, intent-driven closure, enterprise pipeline)
+
+**Deployment Verdict:** READY FOR PRODUCTION (95% confidence, 0 critical blockers)
 
 ---
 
@@ -801,48 +488,47 @@ This is now the preferred multi-specialist analysis pattern for the framework.
 
 ---
 
-## Ecosystem Creation Protocol Sequencing Decision (Task #17, 2026-02-08)
+## ADR-102: Memory Management System Rebuild (Rotator + Pruner + Cold Storage)
 
-**Status:** Accepted
+**Date:** 2026-02-08
 
-**Decision:** Implement the 15-step ecosystem creation protocol in three tiers, with each tier validated before proceeding to the next:
+**Status:** Accepted (Architecture + Security designs complete, Implementation plan ready)
 
-- **Tier 1 (Steps 1-3):** Security fixes for 3 CRITICAL vulnerabilities
-  - CRITICAL-002: Protect settings.json (requires hook-creator active state)
-  - CRITICAL-003: Protect agent-registry.json (requires agent-creator active state)
-  - HIGH-002: Add TTL bounds checking (30s min, 10min max)
-  - Status: No dependencies, can proceed immediately
+**Context:**
 
-- **Tier 2 (Steps 4-7):** Infrastructure libraries and schema validation
-  - creator-commons.cjs (unified post-creation workflow)
-  - ecosystem-impact-analyzer.cjs (integration gap detection)
-  - Schema write-time validation (connect existing schemas)
-  - Status: Depends on Tier 1 security fixes
+Memory files (learnings.md, decisions.md, issues.md) grow unbounded, with issues.md reaching 53KB and archives reaching 463KB. Three previously archived modules (memory-rotator, smart-pruner, cold-storage) had valid designs but were never integrated. The memory-scheduler.cjs has disabled stubs where these should be wired. This is CRITICAL issue C-003 from the performance analysis (40% context budget consumption).
 
-- **Tier 3 (Steps 8-12):** New creators and Post-Creation integration
-  - artifact-updater skill (replaces 5 ghost updaters)
-  - command-creator, rule-creator, tool-creator skills
-  - Post-Creation sections in 6 existing creators
-  - Status: Depends on Tier 2 infrastructure
+**Decision:**
+
+Design and implement a simplified 3-component memory management system:
+
+1. **memory-rotator.cjs** (~120 lines): Section-based rotation when files exceed 20KB. Parses markdown into semantic sections (delimited by `---` or `## `), preserves `[PERMANENT]` entries, archives to `archive/{file}-YYYY-MM.md`. Triggered both by `sync-memory-index.cjs` hook (on write) and by `memory-scheduler.cjs` (weekly).
+
+2. **smart-pruner.cjs** (~100 lines): Jaccard word-similarity deduplication (threshold 0.5) and resolved-entry pruning (30-day age). No embedding dependencies. Preserves `[PERMANENT]` entries. Runs weekly via scheduler.
+
+3. **cold-storage.cjs** (~80 lines): 3-tier system (HOT/WARM/COLD). Moves warm archives older than 30 days to plain JSONL files in `archive/cold/`. No gzip (simplicity over space). Provides cross-tier search.
+
+**Key Design Choices:**
+
+- Section-based over line-based rotation (preserves semantic units)
+- Jaccard over embeddings for dedup (zero dependencies, deterministic)
+- Plain JSONL over gzip for cold storage (debuggable, Windows-safe)
+- Hook + scheduler dual triggering (immediate + batch)
+- All writes via atomic-write.cjs with proper-lockfile
 
 **Rationale:**
 
-1. **Security-first:** Vulnerabilities fixed before feature work begins
-2. **Zero rework:** Tier 1 doesn't depend on anything; Tier 2 and 3 follow clean DAG
-3. **Measurable progress:** Each tier is independently deployable
-4. **Risk mitigation:** High-risk security issues isolated to Tier 1 for early validation
+- Previous implementations failed due to over-engineering (combined ~900 lines) and lack of integration
+- New design is ~300 lines total (67% reduction), focused on integration
+- Addresses C-003 (context budget) by keeping active files under 20KB each
+- Each module under 150 lines constraint ensures maintainability
 
 **Consequences:**
 
-- **Positive:** Clear sequence prevents rework, risk concentrated early
-- **Positive:** Independent tier completion allows parallel team work if needed
-- **Negative:** Total elapsed time may be longer (3 sequential tiers vs 1 monolithic implementation)
-- **Mitigated:** Each tier takes 1-2 days; total 3-6 days is acceptable for enterprise feature
+- Active memory footprint drops from ~82KB to ~60KB max (27% reduction)
+- Eliminates unbounded growth that previously consumed 40% of context budget
+- Archives become searchable via `searchArchives()` and `searchCold()`
+- `memory-scheduler.cjs` stubs become functional
+- `checkAndArchiveLearnings()` in memory-manager.cjs should be deprecated long-term in favor of rotator
 
-**Comparison to Alternatives:**
-
-1. **Monolithic implementation (all 15 steps at once):** Rejected. If Tier 1 security fixes reveal architecture gaps, entire implementation must rework.
-2. **Feature-first (Tier 3 then Tier 2 then Tier 1):** Rejected. Deploying features with known CRITICAL vulnerabilities is unacceptable.
-3. **Parallel all tiers (start Tier 2 before Tier 1 complete):** Rejected. Tier 2 depends on Tier 1 security fixes; coupling would add rework risk.
-
-**Dependencies:** Tasks #18-21 execute this plan with explicit verification milestones between tiers
+**Architecture Design:** `.claude/context/reports/architecture/memory-management-design-2026-02-08.md`

@@ -87,9 +87,28 @@ function isValidArtifactName(name) {
 
   // Windows reserved names (case-insensitive check)
   const WINDOWS_RESERVED = [
-    'con', 'prn', 'aux', 'nul',
-    'com1', 'com2', 'com3', 'com4', 'com5', 'com6', 'com7', 'com8', 'com9',
-    'lpt1', 'lpt2', 'lpt3', 'lpt4', 'lpt5', 'lpt6', 'lpt7', 'lpt8', 'lpt9'
+    'con',
+    'prn',
+    'aux',
+    'nul',
+    'com1',
+    'com2',
+    'com3',
+    'com4',
+    'com5',
+    'com6',
+    'com7',
+    'com8',
+    'com9',
+    'lpt1',
+    'lpt2',
+    'lpt3',
+    'lpt4',
+    'lpt5',
+    'lpt6',
+    'lpt7',
+    'lpt8',
+    'lpt9',
   ];
 
   if (WINDOWS_RESERVED.includes(name.toLowerCase())) {
@@ -133,8 +152,7 @@ function isPathWithinProject(resolvedPath, projectRoot) {
 
     // Path must start with root + separator, OR be exactly root
     return (
-      normalizedResolved.startsWith(normalizedRoot + '/') ||
-      normalizedResolved === normalizedRoot
+      normalizedResolved.startsWith(normalizedRoot + '/') || normalizedResolved === normalizedRoot
     );
   } catch (_err) {
     // path.resolve can throw on invalid paths
