@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-09T01:16:14.372Z",
+  "generatedAt": "2026-02-09T02:44:40.223Z",
   "metadata": {
-    "totalAgents": 49,
-    "healthyAgents": 49,
+    "totalAgents": 59,
+    "healthyAgents": 59,
     "degradedAgents": 0,
     "unavailableAgents": 0,
-    "lastHealthCheck": "2026-02-09T01:16:14.372Z",
-    "lastFullScan": "2026-02-09T01:16:14.372Z"
+    "lastHealthCheck": "2026-02-09T02:44:40.223Z",
+    "lastFullScan": "2026-02-09T02:44:40.223Z"
   },
   "agents": {
     "architect": {
@@ -90,14 +90,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.368Z",
+        "lastUpdate": "2026-02-09T02:44:40.218Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-09T01:16:14.369Z",
-        "updatedAt": "2026-02-09T01:16:14.369Z"
+        "createdAt": "2026-02-09T02:44:40.219Z",
+        "updatedAt": "2026-02-09T02:44:40.219Z"
       }
     },
     "context-compressor": {
@@ -157,14 +157,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.369Z",
+        "lastUpdate": "2026-02-09T02:44:40.219Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.369Z",
-        "updatedAt": "2026-02-09T01:16:14.369Z"
+        "createdAt": "2026-02-09T02:44:40.219Z",
+        "updatedAt": "2026-02-09T02:44:40.219Z"
       }
     },
     "developer": {
@@ -247,14 +247,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.369Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-09T01:16:14.369Z",
-        "updatedAt": "2026-02-09T01:16:14.369Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "planner": {
@@ -334,14 +334,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.369Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-09T01:16:14.369Z",
-        "updatedAt": "2026-02-09T01:16:14.369Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "pm": {
@@ -420,14 +420,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "qa": {
@@ -510,14 +510,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "reflection-agent": {
@@ -588,14 +588,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "router": {
@@ -663,14 +663,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "technical-writer": {
@@ -742,14 +742,103 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
+      }
+    },
+    "accessibility-tester": {
+      "id": "accessibility-tester",
+      "displayName": "accessibility-tester",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/accessibility-tester.md",
+      "capabilities": [
+        {
+          "name": "accessibility-tester",
+          "domain": "code",
+          "description": "Senior Accessibility Engineer. Performs WCAG 2.2 Level AA compliance testing, screen reader compatibility validation, keyboard navigation auditing, and inclusive design verification with actionable...",
+          "triggerPhrases": [
+            "accessibility",
+            "tester",
+            "testing",
+            "auditing",
+            "design",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "accessibility",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "code-analyzer",
+            "context-compressor"
+          ],
+          "examples": [],
+          "tags": [
+            "accessibility",
+            "tester",
+            "testing",
+            "auditing",
+            "design",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "code-analyzer",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "2.0.0",
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "c4-code": {
@@ -818,14 +907,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "c4-component": {
@@ -895,14 +984,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "c4-container": {
@@ -972,14 +1061,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "c4-context": {
@@ -1051,14 +1140,98 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
+      }
+    },
+    "chaos-engineer": {
+      "id": "chaos-engineer",
+      "displayName": "chaos-engineer",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/chaos-engineer.md",
+      "capabilities": [
+        {
+          "name": "chaos-engineer",
+          "domain": "code",
+          "description": "Senior Chaos Engineer. Designs and executes controlled failure injection experiments, validates resilience patterns (circuit breakers, retries, bulkheads), and measures system reliability through h...",
+          "triggerPhrases": [
+            "chaos",
+            "engineer",
+            "designs",
+            "validates",
+            "testing",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "context-compressor"
+          ],
+          "examples": [],
+          "tags": [
+            "chaos",
+            "engineer",
+            "designs",
+            "validates",
+            "testing",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "2.0.0",
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "code-reviewer": {
@@ -1138,14 +1311,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.220Z",
+        "updatedAt": "2026-02-09T02:44:40.220Z"
       }
     },
     "code-simplifier": {
@@ -1225,14 +1398,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "conductor-validator": {
@@ -1305,14 +1478,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "database-architect": {
@@ -1392,14 +1565,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "devops-troubleshooter": {
@@ -1479,14 +1652,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "devops": {
@@ -1566,14 +1739,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.370Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.370Z",
-        "updatedAt": "2026-02-09T01:16:14.370Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "incident-responder": {
@@ -1653,14 +1826,186 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
+      }
+    },
+    "penetration-tester": {
+      "id": "penetration-tester",
+      "displayName": "penetration-tester",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/penetration-tester.md",
+      "capabilities": [
+        {
+          "name": "penetration-tester",
+          "domain": "security",
+          "description": "Senior Penetration Testing Specialist. Performs authorized ethical hacking, OWASP Top 10 testing, vulnerability scanning, and security assessment with CVSS scoring and remediation guidance. Require...",
+          "triggerPhrases": [
+            "penetration",
+            "tester",
+            "testing",
+            "security-architect",
+            "auth-security-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "security-architect",
+            "auth-security-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "context-compressor"
+          ],
+          "examples": [],
+          "tags": [
+            "penetration",
+            "tester",
+            "testing",
+            "security-architect",
+            "auth-security-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "2.0.0",
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
+      }
+    },
+    "performance-engineer": {
+      "id": "performance-engineer",
+      "displayName": "performance-engineer",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/performance-engineer.md",
+      "capabilities": [
+        {
+          "name": "performance-engineer",
+          "domain": "code",
+          "description": "Data-driven performance engineer specializing in application profiling, load testing, bottleneck identification, and optimization validation. Profiles before guessing, measures before claiming impr...",
+          "triggerPhrases": [
+            "performance",
+            "engineer",
+            "testing",
+            "code-analyzer",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "debugging",
+            "ripgrep",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "code-analyzer",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "debugging",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "performance",
+            "engineer",
+            "testing",
+            "code-analyzer",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "debugging",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "researcher": {
@@ -1740,14 +2085,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "reverse-engineer": {
@@ -1827,14 +2172,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "security-architect": {
@@ -1914,14 +2259,103 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
+      }
+    },
+    "sre-engineer": {
+      "id": "sre-engineer",
+      "displayName": "sre-engineer",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/sre-engineer.md",
+      "capabilities": [
+        {
+          "name": "sre-engineer",
+          "domain": "code",
+          "description": "Proactive reliability engineer specializing in SLO/SLI definition, error budget management, production readiness reviews, toil reduction, and observability design. Measures everything, assumes noth...",
+          "triggerPhrases": [
+            "sre",
+            "engineer",
+            "reviews",
+            "design",
+            "code-semantic-search",
+            "context-compressor",
+            "debugging",
+            "incident-runbook-templates",
+            "on-call-handoff-patterns",
+            "postmortem-writing"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "code-semantic-search",
+            "context-compressor",
+            "debugging",
+            "incident-runbook-templates",
+            "on-call-handoff-patterns",
+            "postmortem-writing",
+            "ripgrep",
+            "sentry-monitoring",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "sre",
+            "engineer",
+            "reviews",
+            "design",
+            "code-semantic-search",
+            "context-compressor",
+            "debugging",
+            "incident-runbook-templates",
+            "on-call-handoff-patterns",
+            "postmortem-writing",
+            "ripgrep",
+            "sentry-monitoring",
+            "task-management-protocol",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "ai-ml-specialist": {
@@ -2003,14 +2437,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "android-pro": {
@@ -2092,14 +2526,104 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
+      }
+    },
+    "api-designer": {
+      "id": "api-designer",
+      "displayName": "api-designer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/api-designer.md",
+      "capabilities": [
+        {
+          "name": "api-designer",
+          "domain": "security",
+          "description": "Contract-first API architect. Designs REST, GraphQL, and gRPC APIs with OpenAPI specs, versioning strategies, and security review coordination. Follows standards-driven design with backward compati...",
+          "triggerPhrases": [
+            "api",
+            "designer",
+            "designs",
+            "review",
+            "design",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "doc-generator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "doc-generator",
+            "diagram-generator",
+            "ripgrep",
+            "security-architect",
+            "spec-gathering",
+            "task-management-protocol"
+          ],
+          "examples": [],
+          "tags": [
+            "api",
+            "designer",
+            "designs",
+            "review",
+            "design",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "doc-generator",
+            "diagram-generator",
+            "ripgrep",
+            "security-architect",
+            "spec-gathering",
+            "task-management-protocol"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "data-engineer": {
@@ -2181,14 +2705,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "expo-mobile-developer": {
@@ -2270,14 +2794,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "fastapi-pro": {
@@ -2359,14 +2883,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "frontend-pro": {
@@ -2446,14 +2970,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.221Z",
+        "updatedAt": "2026-02-09T02:44:40.221Z"
       }
     },
     "gamedev-pro": {
@@ -2535,14 +3059,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "golang-pro": {
@@ -2624,14 +3148,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "graphql-pro": {
@@ -2713,14 +3237,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "ios-pro": {
@@ -2801,14 +3325,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "java-pro": {
@@ -2890,14 +3414,273 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
+      }
+    },
+    "llm-architect": {
+      "id": "llm-architect",
+      "displayName": "llm-architect",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/llm-architect.md",
+      "capabilities": [
+        {
+          "name": "llm-architect",
+          "domain": "architecture",
+          "description": "Senior LLM Systems Architect specializing in RAG pipeline design, model serving architecture, multi-model orchestration, guardrails, and cost optimization for production AI systems.",
+          "triggerPhrases": [
+            "llm",
+            "architect",
+            "design",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "architecture-review",
+            "verification-before-completion",
+            "task-management-protocol",
+            "sequential-thinking"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "architecture-review",
+            "verification-before-completion",
+            "task-management-protocol",
+            "sequential-thinking",
+            "doc-generator",
+            "diagram-generator",
+            "ai-ml-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "llm",
+            "architect",
+            "design",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "architecture-review",
+            "verification-before-completion",
+            "task-management-protocol",
+            "sequential-thinking",
+            "doc-generator",
+            "diagram-generator",
+            "ai-ml-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
+      }
+    },
+    "mcp-developer": {
+      "id": "mcp-developer",
+      "displayName": "mcp-developer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/mcp-developer.md",
+      "capabilities": [
+        {
+          "name": "mcp-developer",
+          "domain": "code",
+          "description": "Senior MCP Protocol Engineer specializing in Model Context Protocol server and client implementation, transport configuration, tool schema design, and Claude Desktop/Code integration using TDD meth...",
+          "triggerPhrases": [
+            "mcp",
+            "developer",
+            "implementation",
+            "design",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "git-expert",
+            "code-analyzer"
+          ],
+          "examples": [],
+          "tags": [
+            "mcp",
+            "developer",
+            "implementation",
+            "design",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "git-expert",
+            "code-analyzer"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
+      }
+    },
+    "microservices-architect": {
+      "id": "microservices-architect",
+      "displayName": "microservices-architect",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/microservices-architect.md",
+      "capabilities": [
+        {
+          "name": "microservices-architect",
+          "domain": "architecture",
+          "description": "Distributed systems architect specializing in service decomposition via DDD, event-driven architecture, saga patterns, and inter-service communication design. Uses extended thinking for complex dom...",
+          "triggerPhrases": [
+            "microservices",
+            "architect",
+            "design",
+            "architecture-review",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "diagram-generator",
+            "ripgrep",
+            "sequential-thinking"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "architecture-review",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "diagram-generator",
+            "ripgrep",
+            "sequential-thinking",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "microservices",
+            "architect",
+            "design",
+            "architecture-review",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "diagram-generator",
+            "ripgrep",
+            "sequential-thinking",
+            "task-management-protocol",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "mobile-ux-reviewer": {
@@ -2979,14 +3762,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "nextjs-pro": {
@@ -3068,14 +3851,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "nodejs-pro": {
@@ -3157,14 +3940,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "php-pro": {
@@ -3246,14 +4029,101 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
+      }
+    },
+    "prompt-engineer": {
+      "id": "prompt-engineer",
+      "displayName": "prompt-engineer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/prompt-engineer.md",
+      "capabilities": [
+        {
+          "name": "prompt-engineer",
+          "domain": "code",
+          "description": "Senior Prompt Engineering Specialist who designs, tests, and optimizes LLM prompts using systematic A/B testing, token efficiency analysis, and structured output design for production AI systems.",
+          "triggerPhrases": [
+            "prompt",
+            "engineer",
+            "designs",
+            "tests",
+            "optimizes",
+            "testing",
+            "design",
+            "advanced-elicitation",
+            "code-semantic-search",
+            "ripgrep"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "advanced-elicitation",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "code-analyzer",
+            "code-structural-search",
+            "git-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "prompt",
+            "engineer",
+            "designs",
+            "tests",
+            "optimizes",
+            "testing",
+            "design",
+            "advanced-elicitation",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "code-analyzer",
+            "code-structural-search",
+            "git-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "python-pro": {
@@ -3335,14 +4205,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "rust-pro": {
@@ -3422,14 +4292,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "scientific-research-expert": {
@@ -3511,14 +4381,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "sveltekit-expert": {
@@ -3600,14 +4470,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "tauri-desktop-developer": {
@@ -3689,14 +4559,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "typescript-pro": {
@@ -3778,14 +4648,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "web3-blockchain-expert": {
@@ -3867,14 +4737,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "evolution-orchestrator": {
@@ -3957,14 +4827,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "master-orchestrator": {
@@ -4046,14 +4916,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "party-orchestrator": {
@@ -4128,14 +4998,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     },
     "swarm-coordinator": {
@@ -4211,14 +5081,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-09T01:16:14.371Z",
+        "lastUpdate": "2026-02-09T02:44:40.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-09T01:16:14.371Z",
-        "updatedAt": "2026-02-09T01:16:14.371Z"
+        "createdAt": "2026-02-09T02:44:40.222Z",
+        "updatedAt": "2026-02-09T02:44:40.222Z"
       }
     }
   },
@@ -4251,6 +5121,9 @@
       "technical-writer": [
         "technical-writer"
       ],
+      "accessibility-tester": [
+        "accessibility-tester"
+      ],
       "c4-code": [
         "c4-code"
       ],
@@ -4262,6 +5135,9 @@
       ],
       "c4-context": [
         "c4-context"
+      ],
+      "chaos-engineer": [
+        "chaos-engineer"
       ],
       "code-reviewer": [
         "code-reviewer"
@@ -4284,6 +5160,12 @@
       "incident-responder": [
         "incident-responder"
       ],
+      "penetration-tester": [
+        "penetration-tester"
+      ],
+      "performance-engineer": [
+        "performance-engineer"
+      ],
       "researcher": [
         "researcher"
       ],
@@ -4293,11 +5175,17 @@
       "security-architect": [
         "security-architect"
       ],
+      "sre-engineer": [
+        "sre-engineer"
+      ],
       "ai-ml-specialist": [
         "ai-ml-specialist"
       ],
       "android": [
         "android-pro"
+      ],
+      "api-designer": [
+        "api-designer"
       ],
       "data-engineer": [
         "data-engineer"
@@ -4326,6 +5214,15 @@
       "java": [
         "java-pro"
       ],
+      "llm-architect": [
+        "llm-architect"
+      ],
+      "mcp-developer": [
+        "mcp-developer"
+      ],
+      "microservices-architect": [
+        "microservices-architect"
+      ],
       "mobile-ux-reviewer": [
         "mobile-ux-reviewer"
       ],
@@ -4337,6 +5234,9 @@
       ],
       "php": [
         "php-pro"
+      ],
+      "prompt-engineer": [
+        "prompt-engineer"
       ],
       "python": [
         "python-pro"
@@ -4375,6 +5275,8 @@
     "byDomain": {
       "security": [
         "architect",
+        "penetration-tester",
+        "api-designer",
         "party-orchestrator"
       ],
       "code": [
@@ -4383,15 +5285,19 @@
         "qa",
         "reflection-agent",
         "router",
+        "accessibility-tester",
         "c4-code",
         "c4-component",
+        "chaos-engineer",
         "code-reviewer",
         "code-simplifier",
         "conductor-validator",
         "devops-troubleshooter",
         "incident-responder",
+        "performance-engineer",
         "reverse-engineer",
         "security-architect",
+        "sre-engineer",
         "ai-ml-specialist",
         "android-pro",
         "data-engineer",
@@ -4403,9 +5309,11 @@
         "graphql-pro",
         "ios-pro",
         "java-pro",
+        "mcp-developer",
         "nextjs-pro",
         "nodejs-pro",
         "php-pro",
+        "prompt-engineer",
         "python-pro",
         "rust-pro",
         "scientific-research-expert",
@@ -4424,7 +5332,9 @@
       "architecture": [
         "c4-container",
         "c4-context",
-        "database-architect"
+        "database-architect",
+        "llm-architect",
+        "microservices-architect"
       ],
       "devops": [
         "devops"
@@ -4454,10 +5364,12 @@
         "technical-writer"
       ],
       "specialized": [
+        "accessibility-tester",
         "c4-code",
         "c4-component",
         "c4-container",
         "c4-context",
+        "chaos-engineer",
         "code-reviewer",
         "code-simplifier",
         "conductor-validator",
@@ -4465,13 +5377,17 @@
         "devops-troubleshooter",
         "devops",
         "incident-responder",
+        "penetration-tester",
+        "performance-engineer",
         "researcher",
         "reverse-engineer",
-        "security-architect"
+        "security-architect",
+        "sre-engineer"
       ],
       "domain": [
         "ai-ml-specialist",
         "android-pro",
+        "api-designer",
         "data-engineer",
         "expo-mobile-developer",
         "fastapi-pro",
@@ -4481,10 +5397,14 @@
         "graphql-pro",
         "ios-pro",
         "java-pro",
+        "llm-architect",
+        "mcp-developer",
+        "microservices-architect",
         "mobile-ux-reviewer",
         "nextjs-pro",
         "nodejs-pro",
         "php-pro",
+        "prompt-engineer",
         "python-pro",
         "rust-pro",
         "scientific-research-expert",
@@ -4512,10 +5432,12 @@
       "reflection-agent",
       "router",
       "technical-writer",
+      "accessibility-tester",
       "c4-code",
       "c4-component",
       "c4-container",
       "c4-context",
+      "chaos-engineer",
       "code-reviewer",
       "code-simplifier",
       "conductor-validator",
@@ -4523,11 +5445,15 @@
       "devops-troubleshooter",
       "devops",
       "incident-responder",
+      "penetration-tester",
+      "performance-engineer",
       "researcher",
       "reverse-engineer",
       "security-architect",
+      "sre-engineer",
       "ai-ml-specialist",
       "android-pro",
+      "api-designer",
       "data-engineer",
       "expo-mobile-developer",
       "fastapi-pro",
@@ -4537,10 +5463,14 @@
       "graphql-pro",
       "ios-pro",
       "java-pro",
+      "llm-architect",
+      "mcp-developer",
+      "microservices-architect",
       "mobile-ux-reviewer",
       "nextjs-pro",
       "nodejs-pro",
       "php-pro",
+      "prompt-engineer",
       "python-pro",
       "rust-pro",
       "scientific-research-expert",
