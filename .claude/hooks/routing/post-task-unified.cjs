@@ -1,18 +1,19 @@
 #!/usr/bin/env node
 /**
- * Unified PostToolUse(Task) Hook
+ * Unified PostToolUse(Task|TaskList) Hook
  *
  * Canonical place for workflow learning extraction and task-output memory extraction.
- * Consolidates 5 hooks into a single process for better performance:
+ * Consolidates 6 hooks into a single process for better performance:
  * 1. agent-context-tracker.cjs - Agent mode tracking
  * 2. Workflow learning + session/task-output memory extraction (canonical; archived hooks in .claude/archive/hooks/memory/)
  * 3. task-completion-guard.cjs - Task completion warning
  * 4. evolution-audit.cjs - Evolution auditing
+ * 5. task-list-tracker.cjs - TaskList() call tracking
  *
  * Event: PostToolUse
- * Matcher: Task
+ * Matcher: Task|TaskList
  *
- * Performance: Reduces 5 processes to 1, consolidates shared I/O
+ * Performance: Reduces 6 processes to 1, consolidates shared I/O
  *
  * Exit codes:
  * - 0: Always allow (this is a post-tool hook, never blocks)
@@ -460,7 +461,23 @@ function runTaskCompletionGuard(toolOutput) {
 }
 
 // =============================================================================
-// 5. Evolution Audit Logic
+// 5. TaskList Tracking Logic (from task-list-tracker.cjs)
+// =============================================================================
+
+/**
+ * Run TaskList tracking
+ * Records that TaskList() was called since the last UserPromptSubmit.
+ * Used by PreToolUse(Task) (pre-task-unified.cjs) to enforce TaskList-first.
+ */
+function runTaskListTracking() {
+  routerState.setTaskListCalled();
+  if (process.env.DEBUG_HOOKS) {
+    console.error('[post-task-unified] TaskList() call recorded');
+  }
+}
+
+// =============================================================================
+// 6. Evolution Audit Logic
 // =============================================================================
 
 /**
@@ -604,9 +621,29 @@ async function main() {
       return;
     }
 
-    // Validate this is a Task tool call
+    // Validate this is a Task or TaskList tool call
     const toolName = getToolName(hookInput);
-    if (toolName !== 'Task') {
+    if (toolName !== 'Task' && toolName !== 'TaskList') {
+      process.exit(0);
+      return;
+    }
+
+    // Handle TaskList tracking (early exit if TaskList)
+    if (toolName === 'TaskList') {
+      runTaskListTracking();
+      try {
+        await eventBus.emit(EventTypes.TOOL_COMPLETED, {
+          type: EventTypes.TOOL_COMPLETED,
+          timestamp: new Date().toISOString(),
+          toolName: 'TaskList',
+          duration: Date.now() - startTime,
+          output: {
+            status: 'ok',
+          },
+        });
+      } catch (_err) {
+        // Best-effort
+      }
       process.exit(0);
       return;
     }
@@ -658,7 +695,8 @@ async function main() {
     // 4. Task completion guard
     runTaskCompletionGuard(toolOutputStr);
 
-    // 5. Evolution audit
+    // 5. TaskList tracking (handled earlier, see line ~620)
+    // 6. Evolution audit
     runEvolutionAudit();
 
     // Best-effort: decrement spawn depth after Task tool returns.

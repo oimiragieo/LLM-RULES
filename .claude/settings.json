@@ -142,10 +142,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/intent-agent-match.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/routing/spawn-prompt-assembler.cjs"
           },
           {
@@ -154,7 +150,7 @@
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/config-model-validator.cjs"
+            "command": "node .claude/hooks/routing/routing-guard.cjs"
           },
           {
             "type": "command",
@@ -165,10 +161,6 @@
       {
         "matcher": "TaskUpdate",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/task-status-enforcement.cjs"
-          },
           {
             "type": "command",
             "command": "node .claude/hooks/validation/pre-completion-validation.cjs"
@@ -195,20 +187,11 @@
         ]
       },
       {
-        "matcher": "Task",
+        "matcher": "Task|TaskList",
         "hooks": [
           {
             "type": "command",
             "command": "node .claude/hooks/routing/post-task-unified.cjs"
-          }
-        ]
-      },
-      {
-        "matcher": "TaskList",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/task-list-tracker.cjs"
           }
         ]
       },

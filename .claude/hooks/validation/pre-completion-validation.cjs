@@ -2,21 +2,27 @@
 /**
  * pre-completion-validation.cjs
  *
- * PreToolUse hook that validates artifact integration before allowing
- * TaskUpdate(status: "completed").
+ * PreToolUse hook that validates artifact integration and task status transitions
+ * before allowing TaskUpdate.
  *
  * WHEN IT RUNS:
  * - Before TaskUpdate tool execution
- * - Only when status is being set to "completed"
  *
  * WHAT IT DOES:
- * - Detects if task involves artifact creation
- * - Runs integration validation
- * - Blocks completion if validation fails
+ * - Validates task status transitions (pending → in_progress → completed)
+ * - Detects if task involves artifact creation (when status: "completed")
+ * - Runs integration validation (when status: "completed")
+ * - Blocks invalid transitions or incomplete integration
  * - Provides clear remediation steps
  *
  * Part of the Post-Creation Validation Workflow.
  * @see .claude/workflows/core/post-creation-validation.md
+ *
+ * MERGED FROM:
+ * - task-status-enforcement.cjs (2026-02-09)
+ *
+ * ENVIRONMENT VARIABLES:
+ * - TASK_STATUS_ENFORCEMENT: 'block' (default) | 'warn' | 'off'
  */
 
 const fs = require('fs');
@@ -25,6 +31,11 @@ const { spawnSync } = require('child_process');
 
 // Use shared utility for project root
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const {
+  getEnforcementMode,
+  auditLog,
+  auditSecurityOverride,
+} = require('../../lib/utils/hook-input.cjs');
 
 // Paths
 const VALIDATION_SCRIPT = path.join(
@@ -34,6 +45,118 @@ const VALIDATION_SCRIPT = path.join(
   'cli',
   'validate-integration.cjs'
 );
+const TASK_STATUS_FILE = path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.json');
+
+// Valid status values
+const VALID_STATUSES = ['pending', 'in_progress', 'completed', 'deleted'];
+
+// Valid transitions from current status to new status
+const VALID_TRANSITIONS = {
+  pending: ['in_progress', 'deleted'],
+  in_progress: ['completed', 'deleted'],
+  completed: [], // Cannot transition from completed (terminal state)
+  deleted: [], // Cannot transition from deleted (terminal state)
+};
+
+/**
+ * Read current task status from file
+ * @param {string} taskId - Task ID to look up
+ * @returns {string} Current status ('pending' if not found)
+ */
+function readTaskStatus(taskId) {
+  try {
+    if (fs.existsSync(TASK_STATUS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(TASK_STATUS_FILE, 'utf8'));
+      return data[taskId] || 'pending';
+    }
+  } catch (_err) {
+    // File doesn't exist or invalid JSON - treat as pending
+  }
+  return 'pending';
+}
+
+/**
+ * Write task status to file
+ * @param {string} taskId - Task ID to update
+ * @param {string} status - New status
+ */
+function writeTaskStatus(taskId, status) {
+  try {
+    let data = {};
+    if (fs.existsSync(TASK_STATUS_FILE)) {
+      const content = fs.readFileSync(TASK_STATUS_FILE, 'utf8');
+      if (content.trim()) {
+        data = JSON.parse(content);
+      }
+    }
+
+    data[taskId] = status;
+
+    // Ensure directory exists
+    const dir = path.dirname(TASK_STATUS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    fs.writeFileSync(TASK_STATUS_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    // Best effort - don't fail hook if file write fails
+    auditLog('pre-completion-validation', 'error', {
+      error: 'Failed to write task status',
+      message: err.message,
+    });
+  }
+}
+
+/**
+ * Check if transition is valid
+ * @param {string} currentStatus - Current task status
+ * @param {string} newStatus - New status being set
+ * @returns {boolean} True if valid, false otherwise
+ */
+function isValidTransition(currentStatus, newStatus) {
+  // Normalize to lowercase
+  const current = (currentStatus || 'pending').toLowerCase();
+  const newStat = (newStatus || '').toLowerCase();
+
+  // Invalid if new status is not recognized
+  if (!VALID_STATUSES.includes(newStat)) {
+    return false;
+  }
+
+  // Check transition table
+  const allowedTransitions = VALID_TRANSITIONS[current] || [];
+  return allowedTransitions.includes(newStat);
+}
+
+/**
+ * Get transition error message
+ * @param {string} taskId - Task ID
+ * @param {string} currentStatus - Current task status
+ * @param {string} newStatus - New status being set
+ * @returns {string} Error message
+ */
+function getTransitionError(taskId, currentStatus, newStatus) {
+  const messages = {
+    pending: {
+      completed:
+        'Task cannot go from pending → completed (must go through in_progress first). Use TaskUpdate({ taskId, status: "in_progress" }) before marking complete.',
+    },
+    completed: {
+      _default: `Task ${taskId} is already completed. Cannot change status from completed → ${newStatus}.`,
+    },
+    deleted: {
+      _default: `Task ${taskId} is deleted. Cannot change status from deleted → ${newStatus}.`,
+    },
+  };
+
+  const statusMessages = messages[currentStatus];
+  if (statusMessages) {
+    return statusMessages[newStatus] || statusMessages._default || 'Invalid transition';
+  }
+
+  return `Invalid task status transition: ${taskId} from ${currentStatus} → ${newStatus}`;
+}
 
 /**
  * Extract task metadata from TaskUpdate parameters.
@@ -141,9 +264,104 @@ function main(hookInput) {
       process.exit(0);
     }
 
+    // ============================================================
+    // CHECK 1: TASK STATUS TRANSITION VALIDATION
+    // ============================================================
+    const taskStatusMode = getEnforcementMode('TASK_STATUS_ENFORCEMENT', 'block');
+
+    // If task status enforcement is not disabled, validate status transition
+    if (taskStatusMode !== 'off') {
+      // Extract taskId and status (support both taskId and task_id)
+      const taskId = params.taskId || params.task_id;
+      const newStatus = params.status;
+
+      // Only validate if we have taskId and status
+      if (taskId && newStatus) {
+        // Normalize status
+        const normalizedStatus = newStatus.toLowerCase();
+
+        // Check if status is valid
+        if (!VALID_STATUSES.includes(normalizedStatus)) {
+          const message = `Invalid status value: "${newStatus}". Valid statuses: ${VALID_STATUSES.join(', ')}`;
+
+          auditLog('pre-completion-validation', taskStatusMode === 'block' ? 'block' : 'warn', {
+            check: 'task-status-enforcement',
+            taskId,
+            newStatus,
+            reason: 'Invalid status value',
+          });
+
+          if (taskStatusMode === 'block') {
+            console.log(JSON.stringify({ allow: false, message }));
+            process.exit(0);
+          } else {
+            console.warn(`[WARN] ${message}`);
+          }
+        } else {
+          // Get current status
+          const currentStatus = readTaskStatus(taskId);
+
+          // Check if transition is valid
+          const isValid = isValidTransition(currentStatus, normalizedStatus);
+
+          // Special case: in_progress → in_progress (idempotent but warn)
+          if (currentStatus === 'in_progress' && normalizedStatus === 'in_progress') {
+            auditLog('pre-completion-validation', 'warn', {
+              check: 'task-status-enforcement',
+              taskId,
+              currentStatus,
+              newStatus: normalizedStatus,
+              reason: 'Idempotent transition (already in_progress)',
+            });
+            console.warn(
+              `[WARN] Task ${taskId} is already in_progress. Redundant TaskUpdate call detected.`
+            );
+            // Allow through - idempotent
+          } else if (!isValid) {
+            const message = getTransitionError(taskId, currentStatus, normalizedStatus);
+
+            auditLog('pre-completion-validation', taskStatusMode === 'block' ? 'block' : 'warn', {
+              check: 'task-status-enforcement',
+              taskId,
+              currentStatus,
+              newStatus: normalizedStatus,
+              reason: 'Invalid transition',
+            });
+
+            if (taskStatusMode === 'block') {
+              console.log(JSON.stringify({ allow: false, message }));
+              process.exit(0);
+            } else {
+              console.warn(`[WARN] ${message}`);
+            }
+          } else {
+            // Valid transition - update status file
+            writeTaskStatus(taskId, normalizedStatus);
+
+            auditLog('pre-completion-validation', 'allow', {
+              check: 'task-status-enforcement',
+              taskId,
+              currentStatus,
+              newStatus: normalizedStatus,
+            });
+          }
+        }
+      }
+    } else {
+      auditSecurityOverride(
+        'pre-completion-validation',
+        'TASK_STATUS_ENFORCEMENT',
+        'off',
+        'Task status transitions not validated'
+      );
+    }
+
+    // ============================================================
+    // CHECK 2: ARTIFACT INTEGRATION VALIDATION (only for "completed")
+    // ============================================================
     // Only intercept when status is being set to "completed"
     if (params.status !== 'completed') {
-      // Not completing a task - allow
+      // Not completing a task - allow (status validation passed above)
       console.log(JSON.stringify({ allow: true }));
       process.exit(0);
     }
