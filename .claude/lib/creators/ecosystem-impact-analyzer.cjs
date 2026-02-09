@@ -18,6 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // Path to the impact graph data file
 const IMPACT_GRAPH_PATH = path.join(
@@ -28,29 +29,7 @@ const IMPACT_GRAPH_PATH = path.join(
   'ecosystem-impact-graph.json'
 );
 
-/**
- * Safe JSON parse with prototype pollution prevention
- * @param {string} str - JSON string
- * @returns {Object|null} Parsed object or null
- */
-function safeParseJSON(str) {
-  try {
-    const parsed = JSON.parse(str);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      const clean = Object.create(null);
-      for (const key of Object.keys(parsed)) {
-        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
-          continue;
-        }
-        clean[key] = parsed[key];
-      }
-      return Object.assign({}, clean);
-    }
-    return parsed;
-  } catch (_e) {
-    return null;
-  }
-}
+// NOTE: safeParseJSON imported from ../utils/safe-json.cjs (SEC-ICE-005 remediation)
 
 /**
  * Load the ecosystem impact graph from disk.

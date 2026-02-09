@@ -16,6 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // Schema file mapping: artifactType -> schema filename
 const SCHEMA_MAP = {
@@ -35,30 +36,8 @@ const SCHEMA_MAP = {
 // Provenance header regex: <!-- Agent: {type} | Task: #{id} | Session: {date} -->
 const PROVENANCE_REGEX = /^<!--\s*Agent:\s*\S+\s*\|\s*Task:\s*#?\S+\s*\|\s*Session:\s*\S+\s*-->/;
 
-/**
- * Safe JSON parse with prototype pollution prevention
- * @param {string} str - JSON string
- * @returns {Object|null} Parsed object or null
- */
-function safeParseJSON(str) {
-  try {
-    const parsed = JSON.parse(str);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      // Prevent prototype pollution
-      const clean = Object.create(null);
-      for (const key of Object.keys(parsed)) {
-        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
-          continue;
-        }
-        clean[key] = parsed[key];
-      }
-      return Object.assign({}, clean);
-    }
-    return parsed;
-  } catch (_e) {
-    return null;
-  }
-}
+// NOTE: safeParseJSON imported from ../utils/safe-json.cjs (SEC-ICE-005 remediation)
+// Re-exported below for backward compatibility
 
 // =============================================================================
 // 1. validatePostCreation
