@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-static-analysis-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-static-analysis-output.schema.json",
   "title": "Static Analysis Skill Output",
   "description": "Verifiable output from the static-analysis skill proving CodeQL/Semgrep scanning occurred with SARIF-structured results",
   "type": "object",
@@ -24,11 +24,18 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["name", "version", "rule_sets"],
+        "required": [
+          "name",
+          "version",
+          "rule_sets"
+        ],
         "properties": {
           "name": {
             "type": "string",
-            "enum": ["codeql", "semgrep"],
+            "enum": [
+              "codeql",
+              "semgrep"
+            ],
             "description": "Tool name"
           },
           "version": {
@@ -37,7 +44,9 @@
           },
           "rule_sets": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "description": "Rule sets or query suites executed"
           }
         },
@@ -50,20 +59,60 @@
       "minItems": 1,
       "items": {
         "type": "string",
-        "enum": ["javascript", "typescript", "python", "java", "go", "c", "cpp", "csharp", "ruby", "swift", "php", "kotlin"]
+        "enum": [
+          "javascript",
+          "typescript",
+          "python",
+          "java",
+          "go",
+          "c",
+          "cpp",
+          "csharp",
+          "ruby",
+          "swift",
+          "php",
+          "kotlin"
+        ]
       }
     },
     "findings_summary": {
       "type": "object",
-      "required": ["total", "critical", "high", "medium", "low"],
+      "required": [
+        "total",
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
       "properties": {
-        "total": { "type": "number", "minimum": 0 },
-        "critical": { "type": "number", "minimum": 0 },
-        "high": { "type": "number", "minimum": 0 },
-        "medium": { "type": "number", "minimum": 0 },
-        "low": { "type": "number", "minimum": 0 },
-        "informational": { "type": "number", "minimum": 0 },
-        "false_positives": { "type": "number", "minimum": 0 }
+        "total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "critical": {
+          "type": "number",
+          "minimum": 0
+        },
+        "high": {
+          "type": "number",
+          "minimum": 0
+        },
+        "medium": {
+          "type": "number",
+          "minimum": 0
+        },
+        "low": {
+          "type": "number",
+          "minimum": 0
+        },
+        "informational": {
+          "type": "number",
+          "minimum": 0
+        },
+        "false_positives": {
+          "type": "number",
+          "minimum": 0
+        }
       },
       "additionalProperties": false
     },
@@ -72,19 +121,70 @@
       "description": "Individual security findings",
       "items": {
         "type": "object",
-        "required": ["rule_id", "severity", "message", "file", "line"],
+        "required": [
+          "rule_id",
+          "severity",
+          "message",
+          "file",
+          "line"
+        ],
         "properties": {
-          "rule_id": { "type": "string", "description": "Rule or query identifier" },
-          "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"] },
-          "message": { "type": "string", "description": "Finding description" },
-          "file": { "type": "string", "description": "File path where finding occurs" },
-          "line": { "type": "number", "minimum": 1, "description": "Line number" },
-          "column": { "type": "number", "minimum": 1, "description": "Column number" },
-          "cwe": { "type": "string", "description": "CWE identifier (e.g., CWE-089)" },
-          "owasp": { "type": "string", "description": "OWASP category (e.g., A03:2021)" },
-          "confidence": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] },
-          "remediation": { "type": "string", "description": "Suggested fix" },
-          "false_positive": { "type": "boolean", "default": false }
+          "rule_id": {
+            "type": "string",
+            "description": "Rule or query identifier"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "CRITICAL",
+              "HIGH",
+              "MEDIUM",
+              "LOW",
+              "INFORMATIONAL"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Finding description"
+          },
+          "file": {
+            "type": "string",
+            "description": "File path where finding occurs"
+          },
+          "line": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Line number"
+          },
+          "column": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Column number"
+          },
+          "cwe": {
+            "type": "string",
+            "description": "CWE identifier (e.g., CWE-089)"
+          },
+          "owasp": {
+            "type": "string",
+            "description": "OWASP category (e.g., A03:2021)"
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "remediation": {
+            "type": "string",
+            "description": "Suggested fix"
+          },
+          "false_positive": {
+            "type": "boolean",
+            "default": false
+          }
         },
         "additionalProperties": false
       }
@@ -96,9 +196,18 @@
     "scan_metadata": {
       "type": "object",
       "properties": {
-        "files_scanned": { "type": "number", "minimum": 0 },
-        "scan_duration_ms": { "type": "number", "minimum": 0 },
-        "rules_evaluated": { "type": "number", "minimum": 0 }
+        "files_scanned": {
+          "type": "number",
+          "minimum": 0
+        },
+        "scan_duration_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "rules_evaluated": {
+          "type": "number",
+          "minimum": 0
+        }
       },
       "additionalProperties": false
     },

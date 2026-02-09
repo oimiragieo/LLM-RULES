@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-09T18:27:07.352Z",
+  "generatedAt": "2026-02-09T19:22:06.010Z",
   "metadata": {
     "totalAgents": 59,
     "healthyAgents": 59,
     "degradedAgents": 0,
     "unavailableAgents": 0,
     "lastHealthCheck": "2026-02-09T18:27:07.352Z",
-    "lastFullScan": "2026-02-09T18:27:07.352Z"
+    "lastFullScan": "2026-02-09T19:22:06.010Z"
   },
   "agents": {
     "architect": {
@@ -1243,7 +1243,11 @@
             "checklist-generator",
             "code-analyzer",
             "code-quality-expert",
-            "code-semantic-search"
+            "code-semantic-search",
+            "static-analysis",
+            "variant-analysis",
+            "differential-review",
+            "insecure-defaults"
           ],
           "requiredTools": [
             "Read",
@@ -1268,7 +1272,11 @@
             "code-style-validator",
             "dry-principle",
             "git-expert",
-            "ripgrep"
+            "ripgrep",
+            "static-analysis",
+            "variant-analysis",
+            "differential-review",
+            "insecure-defaults"
           ],
           "examples": [],
           "tags": [
@@ -1307,7 +1315,7 @@
       "metadata": {
         "version": "1.0.0",
         "createdAt": "2026-02-09T18:27:07.349Z",
-        "updatedAt": "2026-02-09T18:27:07.349Z"
+        "updatedAt": "2026-02-09T19:22:06.010Z"
       }
     },
     "code-simplifier": {
@@ -1671,7 +1679,9 @@
             "git-expert",
             "github-mcp",
             "architecture-review",
-            "aws-cloud-ops"
+            "aws-cloud-ops",
+            "semgrep-rule-creator",
+            "insecure-defaults"
           ],
           "requiredTools": [
             "Read",
@@ -1696,7 +1706,9 @@
             "aws-cloud-ops",
             "ci-cd-implementation-rule",
             "cloud-devops-expert",
-            "configuration-management"
+            "configuration-management",
+            "semgrep-rule-creator",
+            "insecure-defaults"
           ],
           "examples": [],
           "tags": [
@@ -1735,7 +1747,7 @@
       "metadata": {
         "version": "1.0.0",
         "createdAt": "2026-02-09T18:27:07.349Z",
-        "updatedAt": "2026-02-09T18:27:07.349Z"
+        "updatedAt": "2026-02-09T19:22:06.010Z"
       }
     },
     "incident-responder": {
@@ -1845,7 +1857,9 @@
             "code-structural-search",
             "ripgrep",
             "verification-before-completion",
-            "task-management-protocol"
+            "task-management-protocol",
+            "static-analysis",
+            "variant-analysis"
           ],
           "requiredTools": [
             "Read",
@@ -1873,7 +1887,9 @@
             "task-management-protocol",
             "tdd",
             "debugging",
-            "context-compressor"
+            "context-compressor",
+            "static-analysis",
+            "variant-analysis"
           ],
           "examples": [],
           "tags": [
@@ -1910,7 +1926,7 @@
       "metadata": {
         "version": "2.0.0",
         "createdAt": "2026-02-09T18:27:07.349Z",
-        "updatedAt": "2026-02-09T18:27:07.349Z"
+        "updatedAt": "2026-02-09T19:22:06.010Z"
       }
     },
     "performance-engineer": {
@@ -2188,7 +2204,12 @@
             "task-management-protocol",
             "auth-security-expert",
             "binary-analysis-patterns",
-            "checklist-generator"
+            "checklist-generator",
+            "static-analysis",
+            "variant-analysis",
+            "differential-review",
+            "semgrep-rule-creator",
+            "insecure-defaults"
           ],
           "requiredTools": [
             "Read",
@@ -2213,7 +2234,12 @@
             "code-structural-search",
             "doc-generator",
             "memory-forensics",
-            "protocol-reverse-engineering"
+            "protocol-reverse-engineering",
+            "static-analysis",
+            "variant-analysis",
+            "differential-review",
+            "semgrep-rule-creator",
+            "insecure-defaults"
           ],
           "examples": [],
           "tags": [
@@ -2252,7 +2278,7 @@
       "metadata": {
         "version": "1.0.0",
         "createdAt": "2026-02-09T18:27:07.350Z",
-        "updatedAt": "2026-02-09T18:27:07.350Z"
+        "updatedAt": "2026-02-09T19:22:06.006Z"
       }
     },
     "sre-engineer": {

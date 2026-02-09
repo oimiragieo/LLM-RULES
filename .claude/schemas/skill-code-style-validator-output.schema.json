@@ -1,10 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-code-style-validator-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-code-style-validator-output.schema.json",
   "title": "Code Style Validator Skill Output",
   "description": "Validates output from code-style-validator skill - AST-based style validation",
   "type": "object",
-  "required": ["skillName", "version", "timestamp", "output"],
+  "required": [
+    "skillName",
+    "version",
+    "timestamp",
+    "output"
+  ],
   "properties": {
     "skillName": {
       "type": "string",
@@ -24,13 +29,23 @@
     "output": {
       "type": "object",
       "description": "Style validation results",
-      "required": ["violations", "score", "autoFixable"],
+      "required": [
+        "violations",
+        "score",
+        "autoFixable"
+      ],
       "properties": {
         "violations": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["rule", "severity", "file", "line", "message"],
+            "required": [
+              "rule",
+              "severity",
+              "file",
+              "line",
+              "message"
+            ],
             "properties": {
               "rule": {
                 "type": "string",
@@ -38,17 +53,43 @@
               },
               "severity": {
                 "type": "string",
-                "enum": ["error", "warning", "info"]
+                "enum": [
+                  "error",
+                  "warning",
+                  "info"
+                ]
               },
-              "file": { "type": "string" },
-              "line": { "type": "number", "minimum": 1 },
-              "column": { "type": "number", "minimum": 1 },
-              "message": { "type": "string" },
-              "suggestion": { "type": "string" },
-              "autoFixable": { "type": "boolean", "default": false },
+              "file": {
+                "type": "string"
+              },
+              "line": {
+                "type": "number",
+                "minimum": 1
+              },
+              "column": {
+                "type": "number",
+                "minimum": 1
+              },
+              "message": {
+                "type": "string"
+              },
+              "suggestion": {
+                "type": "string"
+              },
+              "autoFixable": {
+                "type": "boolean",
+                "default": false
+              },
               "category": {
                 "type": "string",
-                "enum": ["naming", "indentation", "spacing", "imports", "structure", "comments"]
+                "enum": [
+                  "naming",
+                  "indentation",
+                  "spacing",
+                  "imports",
+                  "structure",
+                  "comments"
+                ]
               }
             }
           },
@@ -56,7 +97,9 @@
         },
         "score": {
           "type": "object",
-          "required": ["overall"],
+          "required": [
+            "overall"
+          ],
           "properties": {
             "overall": {
               "type": "number",
@@ -67,19 +110,46 @@
             "byCategory": {
               "type": "object",
               "properties": {
-                "naming": { "type": "number", "minimum": 0, "maximum": 100 },
-                "indentation": { "type": "number", "minimum": 0, "maximum": 100 },
-                "spacing": { "type": "number", "minimum": 0, "maximum": 100 },
-                "imports": { "type": "number", "minimum": 0, "maximum": 100 },
-                "structure": { "type": "number", "minimum": 0, "maximum": 100 },
-                "comments": { "type": "number", "minimum": 0, "maximum": 100 }
+                "naming": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "indentation": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "spacing": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "imports": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "structure": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "comments": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
               }
             }
           }
         },
         "autoFixable": {
           "type": "object",
-          "required": ["count", "percentage"],
+          "required": [
+            "count",
+            "percentage"
+          ],
           "properties": {
             "count": {
               "type": "number",
@@ -94,39 +164,73 @@
             },
             "rules": {
               "type": "array",
-              "items": { "type": "string" },
+              "items": {
+                "type": "string"
+              },
               "description": "Rules with auto-fix capability"
             }
           }
         },
         "summary": {
           "type": "object",
-          "required": ["totalViolations", "filesChecked"],
+          "required": [
+            "totalViolations",
+            "filesChecked"
+          ],
           "properties": {
-            "totalViolations": { "type": "number", "minimum": 0 },
-            "errors": { "type": "number", "minimum": 0 },
-            "warnings": { "type": "number", "minimum": 0 },
-            "info": { "type": "number", "minimum": 0 },
-            "filesChecked": { "type": "number", "minimum": 0 },
-            "filesWithViolations": { "type": "number", "minimum": 0 }
+            "totalViolations": {
+              "type": "number",
+              "minimum": 0
+            },
+            "errors": {
+              "type": "number",
+              "minimum": 0
+            },
+            "warnings": {
+              "type": "number",
+              "minimum": 0
+            },
+            "info": {
+              "type": "number",
+              "minimum": 0
+            },
+            "filesChecked": {
+              "type": "number",
+              "minimum": 0
+            },
+            "filesWithViolations": {
+              "type": "number",
+              "minimum": 0
+            }
           }
         },
         "validationMetadata": {
           "type": "object",
           "properties": {
-            "styleGuide": { "type": "string" },
+            "styleGuide": {
+              "type": "string"
+            },
             "rulesChecked": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
             "toolsUsed": {
               "type": "array",
               "items": {
                 "type": "object",
-                "required": ["name", "version"],
+                "required": [
+                  "name",
+                  "version"
+                ],
                 "properties": {
-                  "name": { "type": "string" },
-                  "version": { "type": "string" }
+                  "name": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  }
                 }
               }
             }

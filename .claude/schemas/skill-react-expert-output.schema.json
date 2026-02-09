@@ -91,5 +91,6 @@
       "additionalProperties": false
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$id": "https://agent-studio.dev/schemas/skill-react-expert-output.schema.json"
 }

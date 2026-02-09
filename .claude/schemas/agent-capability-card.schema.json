@@ -4,24 +4,41 @@
   "title": "Agent Capability Card",
   "description": "Schema for agent capability publication - enables dynamic discovery and health-aware routing",
   "type": "object",
-  "required": ["id", "capabilities", "health"],
+  "required": [
+    "id",
+    "capabilities",
+    "health"
+  ],
   "properties": {
     "id": {
       "type": "string",
       "description": "Agent ID (must match agent filename without .md extension)",
       "pattern": "^[a-z][a-z0-9-]*$",
       "maxLength": 100,
-      "examples": ["developer", "code-reviewer", "frontend-pro"]
+      "examples": [
+        "developer",
+        "code-reviewer",
+        "frontend-pro"
+      ]
     },
     "displayName": {
       "type": "string",
       "description": "Human-readable agent name",
       "maxLength": 200,
-      "examples": ["Developer Agent", "Code Reviewer", "Frontend Pro"]
+      "examples": [
+        "Developer Agent",
+        "Code Reviewer",
+        "Frontend Pro"
+      ]
     },
     "category": {
       "type": "string",
-      "enum": ["core", "specialized", "domain", "orchestrator"],
+      "enum": [
+        "core",
+        "specialized",
+        "domain",
+        "orchestrator"
+      ],
       "description": "Agent category based on directory location"
     },
     "filePath": {
@@ -52,7 +69,11 @@
   "$defs": {
     "Capability": {
       "type": "object",
-      "required": ["name", "domain", "description"],
+      "required": [
+        "name",
+        "domain",
+        "description"
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -89,34 +110,68 @@
         "triggerPhrases": {
           "type": "array",
           "maxItems": 50,
-          "items": { "type": "string", "maxLength": 200 },
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          },
           "description": "Router keywords that trigger this capability",
-          "examples": [["code review", "review PR", "analyze code"]]
+          "examples": [
+            [
+              "code review",
+              "review PR",
+              "analyze code"
+            ]
+          ]
         },
         "requiredTools": {
           "type": "array",
           "maxItems": 100,
-          "items": { "type": "string", "maxLength": 100 },
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
           "description": "Tools needed for this capability",
-          "examples": [["Read", "Write", "Edit", "Bash"]]
+          "examples": [
+            [
+              "Read",
+              "Write",
+              "Edit",
+              "Bash"
+            ]
+          ]
         },
         "skills": {
           "type": "array",
           "maxItems": 100,
-          "items": { "type": "string", "maxLength": 100 },
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
           "description": "Skills used for this capability",
-          "examples": [["tdd", "code-reviewer", "debugging"]]
+          "examples": [
+            [
+              "tdd",
+              "code-reviewer",
+              "debugging"
+            ]
+          ]
         },
         "examples": {
           "type": "array",
           "maxItems": 50,
-          "items": { "type": "string", "maxLength": 500 },
+          "items": {
+            "type": "string",
+            "maxLength": 500
+          },
           "description": "Example user prompts or scenarios (A2A AgentSkill.examples); used for semantic prototype generation and discovery"
         },
         "tags": {
           "type": "array",
           "maxItems": 50,
-          "items": { "type": "string", "maxLength": 100 },
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
           "description": "Keywords describing this capability (A2A AgentSkill.tags); used for keyword scoring in routing"
         }
       },
@@ -146,7 +201,11 @@
         },
         "preferredModel": {
           "type": "string",
-          "enum": ["haiku", "sonnet", "opus"],
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ],
           "default": "sonnet",
           "description": "Preferred model for this agent"
         }
@@ -155,12 +214,18 @@
     },
     "Health": {
       "type": "object",
-      "required": ["status"],
+      "required": [
+        "status"
+      ],
       "description": "Real-time health status for routing decisions",
       "properties": {
         "status": {
           "type": "string",
-          "enum": ["healthy", "degraded", "unavailable"],
+          "enum": [
+            "healthy",
+            "degraded",
+            "unavailable"
+          ],
           "description": "Current health status"
         },
         "consecutiveFailures": {
@@ -185,7 +250,7 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "default": 1.0,
+          "default": 1,
           "description": "Success rate (successCount / total)"
         },
         "averageExecutionMs": {
@@ -199,22 +264,34 @@
           "description": "Timestamp of last health update"
         },
         "isolatedAt": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time",
           "description": "When agent was isolated (null if not isolated)"
         },
         "isolationReason": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Why isolated (e.g., '3 consecutive failures: timeout')",
           "maxLength": 500
         },
         "lastSuccessAt": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time",
           "description": "Timestamp of last successful completion"
         },
         "lastFailureAt": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time",
           "description": "Timestamp of last failure"
         }
@@ -246,13 +323,19 @@
         "references": {
           "type": "array",
           "maxItems": 50,
-          "items": { "type": "string", "maxLength": 500 },
+          "items": {
+            "type": "string",
+            "maxLength": 500
+          },
           "description": "Related documentation or ADRs"
         },
         "dependencies": {
           "type": "array",
           "maxItems": 50,
-          "items": { "type": "string", "maxLength": 100 },
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
           "description": "Other agents this agent depends on"
         }
       },
@@ -270,17 +353,48 @@
           "name": "implementation",
           "domain": "code",
           "description": "TDD-focused code implementation with Red-Green-Refactor",
-          "triggerPhrases": ["implement", "code", "develop", "build", "create feature"],
-          "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-          "skills": ["tdd", "debugging", "git-expert"]
+          "triggerPhrases": [
+            "implement",
+            "code",
+            "develop",
+            "build",
+            "create feature"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob"
+          ],
+          "skills": [
+            "tdd",
+            "debugging",
+            "git-expert"
+          ]
         },
         {
           "name": "bug-fix",
           "domain": "code",
           "description": "Fix bugs using systematic debugging and TDD",
-          "triggerPhrases": ["fix bug", "debug", "resolve issue", "error"],
-          "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep"],
-          "skills": ["debugging", "tdd"]
+          "triggerPhrases": [
+            "fix bug",
+            "debug",
+            "resolve issue",
+            "error"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep"
+          ],
+          "skills": [
+            "debugging",
+            "tdd"
+          ]
         }
       ],
       "constraints": {
@@ -292,7 +406,7 @@
         "consecutiveFailures": 0,
         "successCount": 0,
         "failureCount": 0,
-        "successRate": 1.0,
+        "successRate": 1,
         "lastUpdate": "2026-01-31T12:00:00.000Z",
         "isolatedAt": null,
         "isolationReason": null
@@ -303,5 +417,6 @@
         "updatedAt": "2026-01-31T12:00:00.000Z"
       }
     }
-  ]
+  ],
+  "additionalProperties": false
 }

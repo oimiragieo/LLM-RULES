@@ -1,10 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-dry-principle-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-dry-principle-output.schema.json",
   "title": "DRY Principle Skill Output",
   "description": "Validates output from dry-principle skill - Don't Repeat Yourself analysis",
   "type": "object",
-  "required": ["skillName", "version", "timestamp", "output"],
+  "required": [
+    "skillName",
+    "version",
+    "timestamp",
+    "output"
+  ],
   "properties": {
     "skillName": {
       "type": "string",
@@ -24,17 +29,30 @@
     "output": {
       "type": "object",
       "description": "DRY analysis results",
-      "required": ["duplicates", "refactoringSuggestions"],
+      "required": [
+        "duplicates",
+        "refactoringSuggestions"
+      ],
       "properties": {
         "duplicates": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["type", "occurrences", "locations"],
+            "required": [
+              "type",
+              "occurrences",
+              "locations"
+            ],
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["code_block", "function", "logic", "constants", "configuration"]
+                "enum": [
+                  "code_block",
+                  "function",
+                  "logic",
+                  "constants",
+                  "configuration"
+                ]
               },
               "occurrences": {
                 "type": "number",
@@ -46,11 +64,22 @@
                 "minItems": 2,
                 "items": {
                   "type": "object",
-                  "required": ["file", "lineStart"],
+                  "required": [
+                    "file",
+                    "lineStart"
+                  ],
                   "properties": {
-                    "file": { "type": "string" },
-                    "lineStart": { "type": "number", "minimum": 1 },
-                    "lineEnd": { "type": "number", "minimum": 1 }
+                    "file": {
+                      "type": "string"
+                    },
+                    "lineStart": {
+                      "type": "number",
+                      "minimum": 1
+                    },
+                    "lineEnd": {
+                      "type": "number",
+                      "minimum": 1
+                    }
                   }
                 },
                 "description": "Locations where duplication occurs"
@@ -73,30 +102,55 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["priority", "strategy", "description"],
+            "required": [
+              "priority",
+              "strategy",
+              "description"
+            ],
             "properties": {
               "priority": {
                 "type": "string",
-                "enum": ["high", "medium", "low"]
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ]
               },
               "strategy": {
                 "type": "string",
-                "enum": ["extract_function", "extract_constant", "extract_class", "parameterize", "use_inheritance", "use_composition"]
+                "enum": [
+                  "extract_function",
+                  "extract_constant",
+                  "extract_class",
+                  "parameterize",
+                  "use_inheritance",
+                  "use_composition"
+                ]
               },
-              "description": { "type": "string" },
+              "description": {
+                "type": "string"
+              },
               "affectedFiles": {
                 "type": "array",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               },
               "estimatedReduction": {
                 "type": "number",
                 "minimum": 0,
                 "description": "Estimated lines of code reduction"
               },
-              "rationale": { "type": "string" },
+              "rationale": {
+                "type": "string"
+              },
               "effort": {
                 "type": "string",
-                "enum": ["low", "medium", "high"]
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ]
               }
             }
           },
@@ -105,10 +159,23 @@
         "summary": {
           "type": "object",
           "properties": {
-            "totalDuplicates": { "type": "number", "minimum": 0 },
-            "duplicatedLines": { "type": "number", "minimum": 0 },
-            "percentageDuplicated": { "type": "number", "minimum": 0, "maximum": 100 },
-            "filesAffected": { "type": "number", "minimum": 0 }
+            "totalDuplicates": {
+              "type": "number",
+              "minimum": 0
+            },
+            "duplicatedLines": {
+              "type": "number",
+              "minimum": 0
+            },
+            "percentageDuplicated": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "filesAffected": {
+              "type": "number",
+              "minimum": 0
+            }
           }
         },
         "dryScore": {

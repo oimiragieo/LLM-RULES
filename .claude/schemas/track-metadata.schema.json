@@ -4,31 +4,64 @@
   "title": "Track Metadata Schema",
   "description": "Schema for enriched task/track metadata enabling spec-driven development with comprehensive tracking, effort estimation, and phase management",
   "type": "object",
-  "required": ["trackId", "type", "status"],
+  "required": [
+    "trackId",
+    "type",
+    "status"
+  ],
   "properties": {
     "trackId": {
       "type": "string",
       "pattern": "^[a-z0-9_-]+_[0-9]{8}$",
       "description": "Unique track identifier in format: shortname_YYYYMMDD (e.g., user-auth_20260129)",
-      "examples": ["user-auth_20260129", "api-cache_20260130", "login-crash_20260201"]
+      "examples": [
+        "user-auth_20260129",
+        "api-cache_20260130",
+        "login-crash_20260201"
+      ]
     },
     "type": {
       "type": "string",
-      "enum": ["feature", "bug", "chore", "refactor", "docs"],
+      "enum": [
+        "feature",
+        "bug",
+        "chore",
+        "refactor",
+        "docs"
+      ],
       "description": "Type of work being tracked",
-      "examples": ["feature"]
+      "examples": [
+        "feature"
+      ]
     },
     "status": {
       "type": "string",
-      "enum": ["new", "in_progress", "review", "completed", "cancelled"],
+      "enum": [
+        "new",
+        "in_progress",
+        "review",
+        "completed",
+        "cancelled"
+      ],
       "description": "Current status of the track",
-      "examples": ["in_progress"]
+      "examples": [
+        "in_progress"
+      ]
     },
     "phaseState": {
       "type": "string",
-      "enum": ["draft", "spec_review", "plan_ready", "implementation", "qa", "deployed"],
+      "enum": [
+        "draft",
+        "spec_review",
+        "plan_ready",
+        "implementation",
+        "qa",
+        "deployed"
+      ],
       "description": "Current phase in spec-driven workflow (Context -> Spec -> Plan -> Implement -> Verify flow)",
-      "examples": ["implementation"]
+      "examples": [
+        "implementation"
+      ]
     },
     "estimatedEffort": {
       "type": "object",
@@ -110,9 +143,16 @@
     },
     "priority": {
       "type": "string",
-      "enum": ["low", "medium", "high", "critical"],
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
       "description": "Business priority of this track",
-      "examples": ["high"]
+      "examples": [
+        "high"
+      ]
     },
     "classification": {
       "type": "array",
@@ -131,14 +171,21 @@
         ]
       },
       "uniqueItems": true,
-      "examples": [["security", "performance"]]
+      "examples": [
+        [
+          "security",
+          "performance"
+        ]
+      ]
     },
     "description": {
       "type": "string",
       "minLength": 10,
       "maxLength": 2000,
       "description": "User-friendly description of what this track accomplishes",
-      "examples": ["Implement user authentication with JWT tokens"]
+      "examples": [
+        "Implement user authentication with JWT tokens"
+      ]
     },
     "acceptance_criteria": {
       "type": "array",
@@ -150,7 +197,11 @@
         "maxLength": 500
       },
       "examples": [
-        ["API response time reduced by 50%", "Cache hit rate > 80%", "All tests passing"]
+        [
+          "API response time reduced by 50%",
+          "Cache hit rate > 80%",
+          "All tests passing"
+        ]
       ]
     },
     "dependencies": {
@@ -162,25 +213,38 @@
         "pattern": "^[a-z0-9_-]+_[0-9]{8}$",
         "maxLength": 100
       },
-      "examples": [["redis-setup_20260128", "db-migration_20260127"]]
+      "examples": [
+        [
+          "redis-setup_20260128",
+          "db-migration_20260127"
+        ]
+      ]
     },
     "created_at": {
       "type": "string",
       "format": "date-time",
       "description": "ISO 8601 timestamp when track was created",
-      "examples": ["2026-01-29T10:00:00Z"]
+      "examples": [
+        "2026-01-29T10:00:00Z"
+      ]
     },
     "updated_at": {
       "type": "string",
       "format": "date-time",
       "description": "ISO 8601 timestamp when track was last updated",
-      "examples": ["2026-01-29T15:30:00Z"]
+      "examples": [
+        "2026-01-29T15:30:00Z"
+      ]
     },
     "assignee": {
       "type": "string",
       "description": "Agent or person assigned to this track",
       "maxLength": 100,
-      "examples": ["developer", "qa", "planner"]
+      "examples": [
+        "developer",
+        "qa",
+        "planner"
+      ]
     },
     "blocked_by": {
       "type": "array",
@@ -191,7 +255,11 @@
         "pattern": "^[a-z0-9_-]+_[0-9]{8}$",
         "maxLength": 100
       },
-      "examples": [["api-design_20260128"]]
+      "examples": [
+        [
+          "api-design_20260128"
+        ]
+      ]
     },
     "blocks": {
       "type": "array",
@@ -202,7 +270,12 @@
         "pattern": "^[a-z0-9_-]+_[0-9]{8}$",
         "maxLength": 100
       },
-      "examples": [["api-docs_20260130", "integration-tests_20260131"]]
+      "examples": [
+        [
+          "api-docs_20260130",
+          "integration-tests_20260131"
+        ]
+      ]
     },
     "metrics": {
       "type": "object",
@@ -261,7 +334,7 @@
       }
     }
   },
-  "additionalProperties": true,
+  "additionalProperties": false,
   "examples": [
     {
       "trackId": "user-auth_20260129",
@@ -270,7 +343,10 @@
       "phaseState": "implementation",
       "description": "Implement user authentication with JWT tokens",
       "priority": "high",
-      "classification": ["security", "ux"],
+      "classification": [
+        "security",
+        "ux"
+      ],
       "estimatedEffort": {
         "days": 5,
         "breakdown": {
@@ -295,12 +371,16 @@
         "Refresh tokens work correctly",
         "All authentication tests pass"
       ],
-      "dependencies": ["db-schema_20260128"],
+      "dependencies": [
+        "db-schema_20260128"
+      ],
       "created_at": "2026-01-29T10:00:00Z",
       "updated_at": "2026-01-29T15:30:00Z",
       "assignee": "developer",
       "blocked_by": [],
-      "blocks": ["api-docs_20260130"]
+      "blocks": [
+        "api-docs_20260130"
+      ]
     },
     {
       "trackId": "login-crash_20260129",
@@ -309,7 +389,10 @@
       "phaseState": "qa",
       "description": "Fix crash when user enters invalid email format",
       "priority": "critical",
-      "classification": ["security", "ux"],
+      "classification": [
+        "security",
+        "ux"
+      ],
       "acceptance_criteria": [
         "No crashes on invalid email input",
         "User-friendly error messages displayed",
@@ -322,7 +405,9 @@
       "status": "new",
       "description": "Update dependencies to latest stable versions",
       "priority": "low",
-      "classification": ["technical-debt"]
+      "classification": [
+        "technical-debt"
+      ]
     }
   ]
 }

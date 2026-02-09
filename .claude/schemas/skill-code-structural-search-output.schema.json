@@ -1,10 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-code-structural-search-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-code-structural-search-output.schema.json",
   "title": "Code Structural Search Skill Output",
   "description": "Validates output from code-structural-search skill - AST-based pattern matching",
   "type": "object",
-  "required": ["skillName", "version", "timestamp", "output"],
+  "required": [
+    "skillName",
+    "version",
+    "timestamp",
+    "output"
+  ],
   "properties": {
     "skillName": {
       "type": "string",
@@ -24,22 +29,50 @@
     "output": {
       "type": "object",
       "description": "Structural search results",
-      "required": ["matches", "patterns", "astNodes"],
+      "required": [
+        "matches",
+        "patterns",
+        "astNodes"
+      ],
       "properties": {
         "matches": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["file", "lineStart", "pattern", "code"],
+            "required": [
+              "file",
+              "lineStart",
+              "pattern",
+              "code"
+            ],
             "properties": {
-              "file": { "type": "string" },
-              "lineStart": { "type": "number", "minimum": 1 },
-              "lineEnd": { "type": "number", "minimum": 1 },
-              "column": { "type": "number", "minimum": 1 },
-              "pattern": { "type": "string" },
-              "code": { "type": "string" },
-              "nodeType": { "type": "string" },
-              "context": { "type": "string" }
+              "file": {
+                "type": "string"
+              },
+              "lineStart": {
+                "type": "number",
+                "minimum": 1
+              },
+              "lineEnd": {
+                "type": "number",
+                "minimum": 1
+              },
+              "column": {
+                "type": "number",
+                "minimum": 1
+              },
+              "pattern": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "nodeType": {
+                "type": "string"
+              },
+              "context": {
+                "type": "string"
+              }
             }
           },
           "description": "Structural pattern matches found"
@@ -48,14 +81,26 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["pattern", "matchCount"],
+            "required": [
+              "pattern",
+              "matchCount"
+            ],
             "properties": {
-              "pattern": { "type": "string" },
-              "matchCount": { "type": "number", "minimum": 0 },
-              "description": { "type": "string" },
+              "pattern": {
+                "type": "string"
+              },
+              "matchCount": {
+                "type": "number",
+                "minimum": 0
+              },
+              "description": {
+                "type": "string"
+              },
               "files": {
                 "type": "array",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               }
             }
           },
@@ -65,22 +110,38 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["nodeType", "count"],
+            "required": [
+              "nodeType",
+              "count"
+            ],
             "properties": {
               "nodeType": {
                 "type": "string",
                 "description": "AST node type (e.g., FunctionDeclaration, ClassDeclaration)"
               },
-              "count": { "type": "number", "minimum": 0 },
+              "count": {
+                "type": "number",
+                "minimum": 0
+              },
               "examples": {
                 "type": "array",
                 "items": {
                   "type": "object",
-                  "required": ["file", "line"],
+                  "required": [
+                    "file",
+                    "line"
+                  ],
                   "properties": {
-                    "file": { "type": "string" },
-                    "line": { "type": "number", "minimum": 1 },
-                    "snippet": { "type": "string" }
+                    "file": {
+                      "type": "string"
+                    },
+                    "line": {
+                      "type": "number",
+                      "minimum": 1
+                    },
+                    "snippet": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -91,24 +152,53 @@
         "searchMetadata": {
           "type": "object",
           "properties": {
-            "query": { "type": "string" },
-            "language": { "type": "string" },
+            "query": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
             "tool": {
               "type": "string",
-              "enum": ["ast-grep", "tree-sitter", "babel"]
+              "enum": [
+                "ast-grep",
+                "tree-sitter",
+                "babel"
+              ]
             },
-            "filesScanned": { "type": "number", "minimum": 0 },
-            "searchDurationMs": { "type": "number", "minimum": 0 }
+            "filesScanned": {
+              "type": "number",
+              "minimum": 0
+            },
+            "searchDurationMs": {
+              "type": "number",
+              "minimum": 0
+            }
           }
         },
         "summary": {
           "type": "object",
-          "required": ["totalMatches", "filesMatched"],
+          "required": [
+            "totalMatches",
+            "filesMatched"
+          ],
           "properties": {
-            "totalMatches": { "type": "number", "minimum": 0 },
-            "filesMatched": { "type": "number", "minimum": 0 },
-            "patternsMatched": { "type": "number", "minimum": 0 },
-            "uniqueNodeTypes": { "type": "number", "minimum": 0 }
+            "totalMatches": {
+              "type": "number",
+              "minimum": 0
+            },
+            "filesMatched": {
+              "type": "number",
+              "minimum": 0
+            },
+            "patternsMatched": {
+              "type": "number",
+              "minimum": 0
+            },
+            "uniqueNodeTypes": {
+              "type": "number",
+              "minimum": 0
+            }
           }
         }
       },

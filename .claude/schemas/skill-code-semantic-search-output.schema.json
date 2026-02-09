@@ -1,10 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-code-semantic-search-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-code-semantic-search-output.schema.json",
   "title": "Code Semantic Search Skill Output",
   "description": "Validates output from code-semantic-search skill - Semantic code search with relevance scores",
   "type": "object",
-  "required": ["skillName", "version", "timestamp", "output"],
+  "required": [
+    "skillName",
+    "version",
+    "timestamp",
+    "output"
+  ],
   "properties": {
     "skillName": {
       "type": "string",
@@ -24,28 +29,53 @@
     "output": {
       "type": "object",
       "description": "Semantic search results",
-      "required": ["results", "relevanceScores", "query"],
+      "required": [
+        "results",
+        "relevanceScores",
+        "query"
+      ],
       "properties": {
         "results": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["file", "snippet", "relevanceScore"],
+            "required": [
+              "file",
+              "snippet",
+              "relevanceScore"
+            ],
             "properties": {
-              "file": { "type": "string" },
-              "lineStart": { "type": "number", "minimum": 1 },
-              "lineEnd": { "type": "number", "minimum": 1 },
-              "snippet": { "type": "string", "minLength": 10 },
+              "file": {
+                "type": "string"
+              },
+              "lineStart": {
+                "type": "number",
+                "minimum": 1
+              },
+              "lineEnd": {
+                "type": "number",
+                "minimum": 1
+              },
+              "snippet": {
+                "type": "string",
+                "minLength": 10
+              },
               "relevanceScore": {
                 "type": "number",
                 "minimum": 0,
                 "maximum": 1,
                 "description": "Semantic relevance score (0-1)"
               },
-              "context": { "type": "string" },
+              "context": {
+                "type": "string"
+              },
               "matchType": {
                 "type": "string",
-                "enum": ["semantic", "hybrid", "structural"]
+                "enum": [
+                  "semantic",
+                  "hybrid",
+                  "structural"
+                ]
               }
             }
           },
@@ -53,35 +83,71 @@
         },
         "relevanceScores": {
           "type": "object",
-          "required": ["minimum", "maximum", "average"],
+          "required": [
+            "minimum",
+            "maximum",
+            "average"
+          ],
           "properties": {
-            "minimum": { "type": "number", "minimum": 0, "maximum": 1 },
-            "maximum": { "type": "number", "minimum": 0, "maximum": 1 },
-            "average": { "type": "number", "minimum": 0, "maximum": 1 },
-            "median": { "type": "number", "minimum": 0, "maximum": 1 }
+            "minimum": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "maximum": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "average": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "median": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
           },
           "description": "Relevance score distribution"
         },
         "query": {
           "type": "object",
-          "required": ["text", "mode"],
+          "required": [
+            "text",
+            "mode"
+          ],
           "properties": {
-            "text": { "type": "string", "minLength": 3 },
+            "text": {
+              "type": "string",
+              "minLength": 3
+            },
             "mode": {
               "type": "string",
-              "enum": ["hybrid", "semantic-only", "structural-only"]
+              "enum": [
+                "hybrid",
+                "semantic-only",
+                "structural-only"
+              ]
             },
-            "language": { "type": "string" },
+            "language": {
+              "type": "string"
+            },
             "filters": {
               "type": "object",
               "properties": {
                 "fileTypes": {
                   "type": "array",
-                  "items": { "type": "string" }
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "directories": {
                   "type": "array",
-                  "items": { "type": "string" }
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -90,24 +156,47 @@
         "searchMetadata": {
           "type": "object",
           "properties": {
-            "totalResults": { "type": "number", "minimum": 0 },
-            "filesScanned": { "type": "number", "minimum": 0 },
-            "searchDurationMs": { "type": "number", "minimum": 0 },
-            "embeddingModel": { "type": "string" },
-            "indexUsed": { "type": "boolean" }
+            "totalResults": {
+              "type": "number",
+              "minimum": 0
+            },
+            "filesScanned": {
+              "type": "number",
+              "minimum": 0
+            },
+            "searchDurationMs": {
+              "type": "number",
+              "minimum": 0
+            },
+            "embeddingModel": {
+              "type": "string"
+            },
+            "indexUsed": {
+              "type": "boolean"
+            }
           }
         },
         "patterns": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["description", "occurrences"],
+            "required": [
+              "description",
+              "occurrences"
+            ],
             "properties": {
-              "description": { "type": "string" },
-              "occurrences": { "type": "number", "minimum": 1 },
+              "description": {
+                "type": "string"
+              },
+              "occurrences": {
+                "type": "number",
+                "minimum": 1
+              },
               "files": {
                 "type": "array",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               }
             }
           },

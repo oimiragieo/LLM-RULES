@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-differential-review-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-differential-review-output.schema.json",
   "title": "Differential Review Skill Output",
   "description": "Verifiable output from the differential-review skill proving security-focused diff analysis occurred",
   "type": "object",
@@ -20,17 +20,36 @@
     },
     "diff_reference": {
       "type": "object",
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["pull_request", "commit", "branch_diff", "patch"],
+          "enum": [
+            "pull_request",
+            "commit",
+            "branch_diff",
+            "patch"
+          ],
           "description": "Type of diff analyzed"
         },
-        "pr_number": { "type": "number", "description": "Pull request number (if applicable)" },
-        "commit_sha": { "type": "string", "description": "Commit SHA (if applicable)" },
-        "base_ref": { "type": "string", "description": "Base branch or commit" },
-        "head_ref": { "type": "string", "description": "Head branch or commit" }
+        "pr_number": {
+          "type": "number",
+          "description": "Pull request number (if applicable)"
+        },
+        "commit_sha": {
+          "type": "string",
+          "description": "Commit SHA (if applicable)"
+        },
+        "base_ref": {
+          "type": "string",
+          "description": "Base branch or commit"
+        },
+        "head_ref": {
+          "type": "string",
+          "description": "Head branch or commit"
+        }
       },
       "additionalProperties": false
     },
@@ -40,13 +59,38 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["path", "priority", "additions", "deletions"],
+        "required": [
+          "path",
+          "priority",
+          "additions",
+          "deletions"
+        ],
         "properties": {
-          "path": { "type": "string", "description": "File path" },
-          "priority": { "type": "string", "enum": ["P0", "P1", "P2", "P3"] },
-          "additions": { "type": "number", "minimum": 0 },
-          "deletions": { "type": "number", "minimum": 0 },
-          "security_relevant": { "type": "boolean", "description": "Whether changes are security-relevant" }
+          "path": {
+            "type": "string",
+            "description": "File path"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "additions": {
+            "type": "number",
+            "minimum": 0
+          },
+          "deletions": {
+            "type": "number",
+            "minimum": 0
+          },
+          "security_relevant": {
+            "type": "boolean",
+            "description": "Whether changes are security-relevant"
+          }
         },
         "additionalProperties": false
       }
@@ -55,10 +99,22 @@
       "type": "object",
       "description": "Before/after security posture comparison",
       "properties": {
-        "input_validation_change": { "type": "string", "description": "Net change in validation checks" },
-        "auth_coverage_change": { "type": "string", "description": "Net change in auth-protected routes" },
-        "secrets_exposure_change": { "type": "string", "description": "Net change in secrets exposure" },
-        "dependency_risk_change": { "type": "string", "description": "Net change in dependency risk" }
+        "input_validation_change": {
+          "type": "string",
+          "description": "Net change in validation checks"
+        },
+        "auth_coverage_change": {
+          "type": "string",
+          "description": "Net change in auth-protected routes"
+        },
+        "secrets_exposure_change": {
+          "type": "string",
+          "description": "Net change in secrets exposure"
+        },
+        "dependency_risk_change": {
+          "type": "string",
+          "description": "Net change in dependency risk"
+        }
       },
       "additionalProperties": false
     },
@@ -67,9 +123,24 @@
       "description": "Security findings from diff review",
       "items": {
         "type": "object",
-        "required": ["severity", "category", "description", "file", "line"],
+        "required": [
+          "severity",
+          "category",
+          "description",
+          "file",
+          "line"
+        ],
         "properties": {
-          "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"] },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "CRITICAL",
+              "HIGH",
+              "MEDIUM",
+              "LOW",
+              "INFO"
+            ]
+          },
           "category": {
             "type": "string",
             "enum": [
@@ -85,20 +156,47 @@
               "security_regression"
             ]
           },
-          "description": { "type": "string", "description": "Finding description" },
-          "file": { "type": "string", "description": "File path" },
-          "line": { "type": "number", "minimum": 1, "description": "Line number in diff" },
-          "cwe": { "type": "string", "description": "CWE identifier" },
-          "owasp": { "type": "string", "description": "OWASP category" },
-          "is_regression": { "type": "boolean", "description": "Whether this is a security regression" },
-          "remediation": { "type": "string", "description": "Suggested fix" }
+          "description": {
+            "type": "string",
+            "description": "Finding description"
+          },
+          "file": {
+            "type": "string",
+            "description": "File path"
+          },
+          "line": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Line number in diff"
+          },
+          "cwe": {
+            "type": "string",
+            "description": "CWE identifier"
+          },
+          "owasp": {
+            "type": "string",
+            "description": "OWASP category"
+          },
+          "is_regression": {
+            "type": "boolean",
+            "description": "Whether this is a security regression"
+          },
+          "remediation": {
+            "type": "string",
+            "description": "Suggested fix"
+          }
         },
         "additionalProperties": false
       }
     },
     "verdict": {
       "type": "string",
-      "enum": ["APPROVE", "APPROVE_WITH_CONDITIONS", "REQUEST_CHANGES", "BLOCK"],
+      "enum": [
+        "APPROVE",
+        "APPROVE_WITH_CONDITIONS",
+        "REQUEST_CHANGES",
+        "BLOCK"
+      ],
       "description": "Overall security verdict for the diff"
     },
     "verdict_rationale": {
@@ -111,9 +209,16 @@
       "items": {
         "type": "object",
         "properties": {
-          "tool": { "type": "string" },
-          "findings_count": { "type": "number", "minimum": 0 },
-          "passed": { "type": "boolean" }
+          "tool": {
+            "type": "string"
+          },
+          "findings_count": {
+            "type": "number",
+            "minimum": 0
+          },
+          "passed": {
+            "type": "boolean"
+          }
         },
         "additionalProperties": false
       }

@@ -547,6 +547,83 @@ Two agent definition files have duplicate YAML keys causing parse failures at ev
 
 ---
 
+### ARCH-EXP-001: Skill Expansion Context Overload -- 105 Rules Files Auto-Loaded (CRITICAL)
+
+**Date:** 2026-02-09 | **Agent:** architect | **Task:** #17
+
+**Description:**
+
+The skill-centric universal expansion created 94 new rules files in `.claude/rules/`, bringing the total to 105. Claude Code auto-loads ALL `.claude/rules/*.md` files into context on every prompt. At ~7,337 lines total, this approaches or exceeds the reliable attention window (32K tokens). Context quality degrades as the model must process 105 rules files per interaction.
+
+**Impact:** CRITICAL -- More rules paradoxically means less compliance. Attention degradation causes rules to be ignored.
+
+**Resolution:** Move skill-specific rules out of `.claude/rules/` into `.claude/skills/{name}/rules.md`. Keep `.claude/rules/` for the 11 framework-level rules that apply universally.
+
+**Priority:** P0 -- Most urgent finding from architecture review.
+
+**Full Report:** `.claude/context/reports/architecture-review-skill-expansion-2026-02-09.md`
+
+---
+
+### ARCH-EXP-002: 55 Hollow Schema Stubs (61% of Skill Output Schemas) (HIGH)
+
+**Date:** 2026-02-09 | **Agent:** architect | **Task:** #17
+
+**Description:**
+
+55 of 90 skill output schemas contain only `{status, output}` with no output constraints. They validate nothing meaningful. They are structurally incompatible with the 35 meaningful schemas that use `{skillName, version, timestamp, output}`. Zero runtime consumers validate against any of these schemas (88/90 have no consumers).
+
+**Impact:** HIGH -- False sense of validation coverage. Two incompatible schema archetypes create confusion. Maintenance burden without value.
+
+**Resolution:** (a) Standardize on single envelope schema, (b) Create base schema with `$ref`, (c) Delete or consolidate hollow stubs into a single generic schema.
+
+**Priority:** P1
+
+**Full Report:** `.claude/context/reports/architecture-review-skill-expansion-2026-02-09.md`
+
+---
+
+### ARCH-EXP-003: No Governance Automation for 299 New Files (HIGH)
+
+**Date:** 2026-02-09 | **Agent:** architect | **Task:** #17
+
+**Description:**
+
+299 new files (90 schemas, 105 rules, 104 commands) have no automated ownership, freshness checks, consistency validation, or lifecycle management. Manual governance has already produced two incompatible schema archetypes. At this scale, manual governance will fail and files will drift from skill implementations.
+
+**Impact:** HIGH -- Technical debt compounds over time as schemas drift from actual skill output.
+
+**Resolution:** Create automated validation: schema consistency checker, rules quality scorer, lifecycle tracker.
+
+**Priority:** P1
+
+---
+
+### SEC-SCHEMA-003: Four Schema Envelope Variants Discovered (MEDIUM)
+
+**Date:** 2026-02-09 | **Agent:** security-architect | **Task:** #5
+
+**Description:**
+
+Planning documents for schema standardization describe only 2 envelope structures, but examination of actual schemas reveals 4 variants:
+
+1. **Structure A** (14 schemas): `{skillName, version, timestamp, output}` -- pre-existing Tier 1 schemas (tdd, debugging, code-analyzer)
+2. **Structure B** (55+ schemas): `{status, output}` -- new batch expansion stubs
+3. **Structure C** (5 schemas): Flat domain-specific (no wrapper) -- Trail of Bits security schemas (differential-review, insecure-defaults, static-analysis, variant-analysis, semgrep-rule-creator)
+4. **Structure A-variant** (3 schemas): `{skillName, version, timestamp, result}` -- uses `result` instead of `output` (frontend-expert)
+
+Additionally, `skill-plan-generator-output.schema.json` (210 lines, Tier 1 gold standard) is missing `$id` entirely.
+
+**Impact:** MEDIUM -- Envelope migration that only accounts for 2 variants will break or mishandle the other 2. Trail of Bits security schemas (Structure C, highest quality) could lose validation depth if force-migrated to Structure B.
+
+**Resolution:** ADR for schema envelope MUST document all 4 variants. Trail of Bits schemas may need explicit exemption or careful preservation during migration.
+
+**Priority:** P1 -- Must be addressed in ADR before envelope migration begins.
+
+**Full Report:** `.claude/context/reports/security/schema-standardization-security-review-2026-02-09.md`
+
+---
+
 ### SEC-FND-003: Runtime State Files Lack Integrity Verification (CRITICAL)
 
 **Date:** 2026-02-09 | **Agent:** security-architect

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-semgrep-rule-creator-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-semgrep-rule-creator-output.schema.json",
   "title": "Semgrep Rule Creator Skill Output",
   "description": "Verifiable output from the semgrep-rule-creator skill proving custom rule authoring occurred with testing",
   "type": "object",
@@ -27,36 +27,89 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["rule_id", "severity", "languages", "detection_goal", "rule_file_path"],
+        "required": [
+          "rule_id",
+          "severity",
+          "languages",
+          "detection_goal",
+          "rule_file_path"
+        ],
         "properties": {
-          "rule_id": { "type": "string", "description": "Unique rule identifier in kebab-case" },
-          "severity": { "type": "string", "enum": ["ERROR", "WARNING", "INFO"] },
+          "rule_id": {
+            "type": "string",
+            "description": "Unique rule identifier in kebab-case"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "ERROR",
+              "WARNING",
+              "INFO"
+            ]
+          },
           "languages": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "description": "Target programming languages"
           },
-          "detection_goal": { "type": "string", "description": "What the rule detects" },
+          "detection_goal": {
+            "type": "string",
+            "description": "What the rule detects"
+          },
           "cwe": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "description": "CWE identifiers the rule covers"
           },
           "owasp": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "description": "OWASP categories the rule covers"
           },
-          "confidence": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] },
-          "impact": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "impact": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
           "pattern_type": {
             "type": "string",
-            "enum": ["pattern", "pattern-either", "patterns", "taint"],
+            "enum": [
+              "pattern",
+              "pattern-either",
+              "patterns",
+              "taint"
+            ],
             "description": "Primary pattern operator used"
           },
-          "has_fix": { "type": "boolean", "description": "Whether rule includes a fix suggestion" },
-          "rule_file_path": { "type": "string", "description": "Path to the rule YAML file" },
-          "test_file_path": { "type": "string", "description": "Path to the test file" }
+          "has_fix": {
+            "type": "boolean",
+            "description": "Whether rule includes a fix suggestion"
+          },
+          "rule_file_path": {
+            "type": "string",
+            "description": "Path to the rule YAML file"
+          },
+          "test_file_path": {
+            "type": "string",
+            "description": "Path to the test file"
+          }
         },
         "additionalProperties": false
       }
@@ -65,10 +118,21 @@
       "type": "object",
       "description": "Test execution results",
       "properties": {
-        "total_test_cases": { "type": "number", "minimum": 0 },
-        "true_positives_tested": { "type": "number", "minimum": 0 },
-        "true_negatives_tested": { "type": "number", "minimum": 0 },
-        "all_tests_passed": { "type": "boolean" },
+        "total_test_cases": {
+          "type": "number",
+          "minimum": 0
+        },
+        "true_positives_tested": {
+          "type": "number",
+          "minimum": 0
+        },
+        "true_negatives_tested": {
+          "type": "number",
+          "minimum": 0
+        },
+        "all_tests_passed": {
+          "type": "boolean"
+        },
         "validation_passed": {
           "type": "boolean",
           "description": "Whether semgrep --validate passed"
@@ -80,9 +144,22 @@
       "type": "object",
       "description": "Rule pack metadata if rules are grouped",
       "properties": {
-        "name": { "type": "string" },
-        "category": { "type": "string", "enum": ["security", "correctness", "performance", "best-practice"] },
-        "rules_count": { "type": "number", "minimum": 1 }
+        "name": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "security",
+            "correctness",
+            "performance",
+            "best-practice"
+          ]
+        },
+        "rules_count": {
+          "type": "number",
+          "minimum": 1
+        }
       },
       "additionalProperties": false
     },

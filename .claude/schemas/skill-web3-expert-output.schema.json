@@ -133,5 +133,6 @@
       "additionalProperties": false
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$id": "https://agent-studio.dev/schemas/skill-web3-expert-output.schema.json"
 }

@@ -109,5 +109,6 @@
       "additionalProperties": false
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$id": "https://agent-studio.dev/schemas/skill-android-expert-output.schema.json"
 }

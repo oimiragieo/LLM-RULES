@@ -1,10 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-verification-before-completion-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-verification-before-completion-output.schema.json",
   "title": "Verification Before Completion Skill Output",
   "description": "Validates output from verification-before-completion skill - Evidence-based completion gates",
   "type": "object",
-  "required": ["skillName", "version", "timestamp", "output"],
+  "required": [
+    "skillName",
+    "version",
+    "timestamp",
+    "output"
+  ],
   "properties": {
     "skillName": {
       "type": "string",
@@ -24,14 +29,23 @@
     "output": {
       "type": "object",
       "description": "Verification results",
-      "required": ["evidence", "gates", "verdict"],
+      "required": [
+        "evidence",
+        "gates",
+        "verdict"
+      ],
       "properties": {
         "evidence": {
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["claim", "command", "output", "verified"],
+            "required": [
+              "claim",
+              "command",
+              "output",
+              "verified"
+            ],
             "properties": {
               "claim": {
                 "type": "string",
@@ -59,55 +73,102 @@
         },
         "gates": {
           "type": "object",
-          "required": ["testsPass", "lintClean", "formatClean"],
+          "required": [
+            "testsPass",
+            "lintClean",
+            "formatClean"
+          ],
           "properties": {
             "testsPass": {
               "type": "object",
-              "required": ["passed", "evidence"],
+              "required": [
+                "passed",
+                "evidence"
+              ],
               "properties": {
-                "passed": { "type": "boolean" },
-                "evidence": { "type": "string" },
-                "failureCount": { "type": "number", "minimum": 0 }
+                "passed": {
+                  "type": "boolean"
+                },
+                "evidence": {
+                  "type": "string"
+                },
+                "failureCount": {
+                  "type": "number",
+                  "minimum": 0
+                }
               }
             },
             "lintClean": {
               "type": "object",
-              "required": ["passed", "evidence"],
+              "required": [
+                "passed",
+                "evidence"
+              ],
               "properties": {
-                "passed": { "type": "boolean" },
-                "evidence": { "type": "string" },
-                "errorCount": { "type": "number", "minimum": 0 }
+                "passed": {
+                  "type": "boolean"
+                },
+                "evidence": {
+                  "type": "string"
+                },
+                "errorCount": {
+                  "type": "number",
+                  "minimum": 0
+                }
               }
             },
             "formatClean": {
               "type": "object",
-              "required": ["passed", "evidence"],
+              "required": [
+                "passed",
+                "evidence"
+              ],
               "properties": {
-                "passed": { "type": "boolean" },
-                "evidence": { "type": "string" },
-                "filesChanged": { "type": "number", "minimum": 0 }
+                "passed": {
+                  "type": "boolean"
+                },
+                "evidence": {
+                  "type": "string"
+                },
+                "filesChanged": {
+                  "type": "number",
+                  "minimum": 0
+                }
               }
             },
             "buildSucceeds": {
               "type": "object",
               "properties": {
-                "passed": { "type": "boolean" },
-                "evidence": { "type": "string" },
-                "exitCode": { "type": "number" }
+                "passed": {
+                  "type": "boolean"
+                },
+                "evidence": {
+                  "type": "string"
+                },
+                "exitCode": {
+                  "type": "number"
+                }
               }
             },
             "regressionTestVerified": {
               "type": "object",
               "properties": {
-                "redGreenCycleVerified": { "type": "boolean" },
-                "evidence": { "type": "string" }
+                "redGreenCycleVerified": {
+                  "type": "boolean"
+                },
+                "evidence": {
+                  "type": "string"
+                }
               }
             }
           }
         },
         "verdict": {
           "type": "object",
-          "required": ["readyForCompletion", "reasoning"],
+          "required": [
+            "readyForCompletion",
+            "reasoning"
+          ],
           "properties": {
             "readyForCompletion": {
               "type": "boolean",
@@ -120,7 +181,9 @@
             },
             "blockers": {
               "type": "array",
-              "items": { "type": "string" },
+              "items": {
+                "type": "string"
+              },
               "description": "Reasons preventing completion"
             }
           }
@@ -129,11 +192,20 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["requirement", "verified"],
+            "required": [
+              "requirement",
+              "verified"
+            ],
             "properties": {
-              "requirement": { "type": "string" },
-              "verified": { "type": "boolean" },
-              "evidence": { "type": "string" }
+              "requirement": {
+                "type": "string"
+              },
+              "verified": {
+                "type": "boolean"
+              },
+              "evidence": {
+                "type": "string"
+              }
             }
           },
           "description": "Requirements verification checklist"

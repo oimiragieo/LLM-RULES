@@ -75,5 +75,6 @@
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$id": "https://agent-studio.dev/schemas/skill-interactive-requirements-gathering-output.schema.json"
 }

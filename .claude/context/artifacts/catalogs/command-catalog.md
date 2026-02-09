@@ -3,8 +3,8 @@
 # Command Catalog
 
 **Last Updated:** 2026-02-09
-**Total Commands:** 12
-**Pattern:** Thin delegators to skills (10 delegators, 1 enriched, 1 standalone)
+**Total Commands:** 81
+**Pattern:** Thin delegators to skills (79 delegators, 1 enriched, 1 standalone)
 
 This catalog documents all slash commands in the agent-studio framework with their skill delegations and usage contexts.
 
@@ -12,20 +12,84 @@ This catalog documents all slash commands in the agent-studio framework with the
 
 ## Quick Reference
 
-| Command            | Description                                  | Delegates To                     | Category    |
-| ------------------ | -------------------------------------------- | -------------------------------- | ----------- |
-| `/write-plan`      | Create implementation plan with tasks        | `plan-generator`                 | Planning    |
-| `/tdd`             | Test-driven development with Iron Laws       | `tdd`                            | Development |
-| `/debug`           | Systematic debugging with root cause         | `debugging`                      | Development |
-| `/build-fix`       | Diagnose and fix build failures              | `debugging`                      | Development |
-| `/verify`          | Comprehensive verification before completion | `verification-before-completion` | Quality     |
-| `/test-coverage`   | Analyze coverage and identify gaps           | `tdd`                            | Quality     |
-| `/refactor-clean`  | Safe refactoring and cleanup                 | `code-quality-expert`            | Quality     |
-| `/security-review` | OWASP/STRIDE security analysis               | `security-architect`             | Security    |
-| `/compress`        | Compress context to reduce tokens            | `context-compressor`             | Context     |
-| `/learn`           | Extract session patterns to memory           | `context-compressor` + memory    | Context     |
-| `/analyze`         | Project structure and health analysis        | `code-analyzer`                  | Analysis    |
-| `/setup-pm`        | Configure package manager                    | standalone script                | Setup       |
+| Command                               | Description                                  | Delegates To                         | Category     |
+| ------------------------------------- | -------------------------------------------- | ------------------------------------ | ------------ |
+| `/agent-creator`                      | Create specialized AI agents                 | `agent-creator`                      | Creator      |
+| `/analyze`                            | Project structure and health analysis        | `code-analyzer`                      | Analysis     |
+| `/android-expert`                     | Android/Kotlin/Jetpack Compose               | `android-expert`                     | Mobile       |
+| `/api-development-expert`             | API design and development                   | `api-development-expert`             | Development  |
+| `/architecture-review`                | Architecture validation                      | `architecture-review`                | Architecture |
+| `/artifact-integrator`                | Integration analysis for artifacts           | `artifact-integrator`                | Creator      |
+| `/auth-security-expert`               | OAuth, JWT, authentication security          | `auth-security-expert`               | Security     |
+| `/build-fix`                          | Diagnose and fix build failures              | `debugging`                          | Development  |
+| `/checklist-generator`                | Generate validation checklists               | `checklist-generator`                | Quality      |
+| `/code-analyzer`                      | Static code analysis                         | `code-analyzer`                      | Analysis     |
+| `/code-quality-expert`                | Code quality and refactoring                 | `code-quality-expert`                | Development  |
+| `/code-semantic-search`               | Semantic code search                         | `code-semantic-search`               | Search       |
+| `/code-structural-search`             | AST-based code search                        | `code-structural-search`             | Search       |
+| `/complexity-assessment`              | Task complexity classification               | `complexity-assessment`              | Planning     |
+| `/compress`                           | Compress context to reduce tokens            | `context-compressor`                 | Context      |
+| `/container-expert`                   | Docker/container expertise                   | `container-expert`                   | DevOps       |
+| `/context-driven-development`         | Context as managed artifacts                 | `context-driven-development`         | Context      |
+| `/data-expert`                        | Data processing and transformation           | `data-expert`                        | Data         |
+| `/database-expert`                    | Database patterns and optimization           | `database-expert`                    | Data         |
+| `/debug`                              | Systematic debugging with root cause         | `debugging`                          | Development  |
+| `/debugging`                          | Systematic debugging                         | `debugging`                          | Development  |
+| `/differential-review`                | Differential code review                     | `differential-review`                | Security     |
+| `/docker-compose`                     | Docker Compose orchestration                 | `docker-compose`                     | DevOps       |
+| `/expo-framework-rule`                | Expo framework patterns                      | `expo-framework-rule`                | Mobile       |
+| `/frontend-expert`                    | Frontend development patterns                | `frontend-expert`                    | Frontend     |
+| `/gamedev-expert`                     | Game development expertise                   | `gamedev-expert`                     | Gaming       |
+| `/go-expert`                          | Go language expertise                        | `go-expert`                          | Languages    |
+| `/graphql-expert`                     | GraphQL API design                           | `graphql-expert`                     | Frameworks   |
+| `/hook-creator`                       | Create framework hooks                       | `hook-creator`                       | Creator      |
+| `/incident-runbook-templates`         | Incident response runbooks                   | `incident-runbook-templates`         | DevOps       |
+| `/insecure-defaults`                  | Insecure defaults detection                  | `insecure-defaults`                  | Security     |
+| `/insight-extraction`                 | Extract session learnings                    | `insight-extraction`                 | Context      |
+| `/interactive-requirements-gathering` | A/B/C/D/E questionnaire framework            | `interactive-requirements-gathering` | Planning     |
+| `/ios-expert`                         | iOS/SwiftUI expertise                        | `ios-expert`                         | Mobile       |
+| `/java-expert`                        | Java/Spring Boot expertise                   | `java-expert`                        | Languages    |
+| `/k8s-manifest-generator`             | Kubernetes manifest generation               | `k8s-manifest-generator`             | DevOps       |
+| `/learn`                              | Extract session patterns to memory           | `context-compressor` + memory        | Context      |
+| `/mobile-first-design-rules`          | Mobile-first design patterns                 | `mobile-first-design-rules`          | Mobile       |
+| `/nextjs-expert`                      | Next.js expertise                            | `nextjs-expert`                      | Frameworks   |
+| `/nodejs-expert`                      | Node.js expertise                            | `nodejs-expert`                      | Languages    |
+| `/php-expert`                         | PHP expertise                                | `php-expert`                         | Languages    |
+| `/plan-generator`                     | Implementation plan generation               | `plan-generator`                     | Planning     |
+| `/planning-with-files`                | File-based planning workflow                 | `planning-with-files`                | Planning     |
+| `/postmortem-writing`                 | Blameless postmortem writing                 | `postmortem-writing`                 | DevOps       |
+| `/prd-generator`                      | Product requirements document generation     | `prd-generator`                      | Planning     |
+| `/project-onboarding`                 | New codebase onboarding                      | `project-onboarding`                 | Integration  |
+| `/python-backend-expert`              | Python backend expertise                     | `python-backend-expert`              | Languages    |
+| `/react-expert`                       | React expertise                              | `react-expert`                       | Frameworks   |
+| `/refactor-clean`                     | Safe refactoring and cleanup                 | `code-quality-expert`                | Quality      |
+| `/response-rater`                     | Plan and response quality audits             | `response-rater`                     | Validation   |
+| `/schema-creator`                     | Create JSON Schema validators                | `schema-creator`                     | Creator      |
+| `/security-architect`                 | Comprehensive security analysis              | `security-architect`                 | Security     |
+| `/security-review`                    | OWASP/STRIDE security analysis               | `security-architect`                 | Security     |
+| `/semgrep-rule-creator`               | Semgrep rule creation                        | `semgrep-rule-creator`               | Security     |
+| `/sentry-monitoring`                  | Sentry error tracking setup                  | `sentry-monitoring`                  | DevOps       |
+| `/session-handoff`                    | Handoff document creation                    | `session-handoff`                    | Context      |
+| `/setup-pm`                           | Configure package manager                    | standalone script                    | Setup        |
+| `/skill-creator`                      | Create and validate skills                   | `skill-creator`                      | Creator      |
+| `/spec-gathering`                     | Requirements gathering                       | `spec-gathering`                     | Planning     |
+| `/spec-init`                          | Unified spec creation                        | `spec-init`                          | Planning     |
+| `/static-analysis`                    | Static code analysis                         | `static-analysis`                    | Security     |
+| `/svelte-expert`                      | Svelte expertise                             | `svelte-expert`                      | Frameworks   |
+| `/tauri-native-api-integration`       | Tauri native API integration                 | `tauri-native-api-integration`       | Mobile       |
+| `/tdd`                                | Test-driven development with Iron Laws       | `tdd`                                | Development  |
+| `/template-creator`                   | Create templates                             | `template-creator`                   | Creator      |
+| `/terraform-infra`                    | Terraform infrastructure as code             | `terraform-infra`                    | DevOps       |
+| `/test-coverage`                      | Analyze coverage and identify gaps           | `tdd`                                | Quality      |
+| `/text-to-sql`                        | Natural language to SQL conversion           | `text-to-sql`                        | Data         |
+| `/thinking-tools`                     | Self-reflection patterns                     | `thinking-tools`                     | Patterns     |
+| `/typescript-expert`                  | TypeScript expertise                         | `typescript-expert`                  | Languages    |
+| `/variant-analysis`                   | Variant analysis for security                | `variant-analysis`                   | Security     |
+| `/verify`                             | Comprehensive verification before completion | `verification-before-completion`     | Quality      |
+| `/verification-before-completion`     | Pre-completion gate                          | `verification-before-completion`     | Quality      |
+| `/web3-expert`                        | Solidity/Ethereum expertise                  | `web3-expert`                        | Languages    |
+| `/workflow-creator`                   | Create orchestration workflows               | `workflow-creator`                   | Creator      |
+| `/write-plan`                         | Create implementation plan with tasks        | `plan-generator`                     | Planning     |
 
 ---
 

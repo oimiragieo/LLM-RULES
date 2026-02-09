@@ -4,7 +4,10 @@
   "title": "Workflow Definition Schema",
   "description": "Schema for validating Claude Code workflow definition files",
   "type": "object",
-  "required": ["name", "steps"],
+  "required": [
+    "name",
+    "steps"
+  ],
   "unevaluatedProperties": false,
   "properties": {
     "name": {
@@ -20,7 +23,11 @@
     },
     "category": {
       "type": "string",
-      "enum": ["rapid", "enterprise", "operations"],
+      "enum": [
+        "rapid",
+        "enterprise",
+        "operations"
+      ],
       "description": "Workflow category"
     },
     "steps": {
@@ -36,7 +43,9 @@
           },
           {
             "type": "object",
-            "required": ["id"],
+            "required": [
+              "id"
+            ],
             "unevaluatedProperties": false,
             "properties": {
               "id": {
@@ -58,19 +67,28 @@
               "skills": {
                 "type": "array",
                 "maxItems": 50,
-                "items": { "type": "string", "maxLength": 100 },
+                "items": {
+                  "type": "string",
+                  "maxLength": 100
+                },
                 "description": "Skills to load for this step"
               },
               "inputs": {
                 "type": "array",
                 "maxItems": 50,
-                "items": { "type": "string", "maxLength": 200 },
+                "items": {
+                  "type": "string",
+                  "maxLength": 200
+                },
                 "description": "Required inputs for this step"
               },
               "outputs": {
                 "type": "array",
                 "maxItems": 50,
-                "items": { "type": "string", "maxLength": 200 },
+                "items": {
+                  "type": "string",
+                  "maxLength": 200
+                },
                 "description": "Outputs produced by this step"
               },
               "validation": {
@@ -111,19 +129,28 @@
         "entry": {
           "type": "array",
           "maxItems": 20,
-          "items": { "type": "string", "maxLength": 100 },
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
           "description": "Hooks to run when workflow starts"
         },
         "exit": {
           "type": "array",
           "maxItems": 20,
-          "items": { "type": "string", "maxLength": 100 },
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
           "description": "Hooks to run when workflow completes"
         },
         "error": {
           "type": "array",
           "maxItems": 20,
-          "items": { "type": "string", "maxLength": 100 },
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
           "description": "Hooks to run on workflow error"
         }
       },
@@ -132,7 +159,10 @@
     "agents": {
       "type": "array",
       "maxItems": 100,
-      "items": { "type": "string", "maxLength": 100 },
+      "items": {
+        "type": "string",
+        "maxLength": 100
+      },
       "description": "Agents that can execute this workflow"
     },
     "timeout": {
@@ -150,7 +180,11 @@
   "examples": [
     {
       "name": "fix",
-      "steps": ["reproduce", "fix", "verify"]
+      "steps": [
+        "reproduce",
+        "fix",
+        "verify"
+      ]
     },
     {
       "name": "code-review",
@@ -161,13 +195,17 @@
           "id": "analyze",
           "description": "Analyze the code changes",
           "agent": "developer",
-          "skills": ["code-analyzer"]
+          "skills": [
+            "code-analyzer"
+          ]
         },
         {
           "id": "review",
           "description": "Review for quality and security",
           "agent": "architect",
-          "skills": ["code-analyzer"]
+          "skills": [
+            "code-analyzer"
+          ]
         },
         {
           "id": "approve",
@@ -176,9 +214,14 @@
         }
       ],
       "hooks": {
-        "entry": ["review-start-logger"],
-        "exit": ["review-complete-notifier"]
+        "entry": [
+          "review-start-logger"
+        ],
+        "exit": [
+          "review-complete-notifier"
+        ]
       }
     }
-  ]
+  ],
+  "additionalProperties": false
 }

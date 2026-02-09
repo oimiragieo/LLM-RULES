@@ -1,6 +1,6 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://agent-studio.dev/schemas/skill-skill-creator-output.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-skill-creator-output.schema.json",
   "title": "Skill Creator Output",
   "description": "Schema for skill creation artifacts",
   "type": "object",

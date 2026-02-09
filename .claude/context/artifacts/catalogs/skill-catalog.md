@@ -1,12 +1,12 @@
 # Skill Catalog
 
-> **Total Skills: 95** (1 deprecated alias) | Last Updated: 2026-02-09
+> **Total Skills: 100** (1 deprecated alias) | Last Updated: 2026-02-09
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 **Post-Cleanup Summary:**
 
-- **Active Skills:** 93 (maintained and invoked)
+- **Active Skills:** 98 (maintained and invoked)
 - **Deprecated Aliases:** 1 (`testing-expert` → `tdd`)
 - **Scientific Parent:** 1 (`scientific-skills` with 139 sub-skills)
 - **Archived:** 214 dead skills → `.claude/skills/_archive/dead/` (see README)
@@ -19,7 +19,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | -------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [Core Development](#core-development)              | 11    | tdd, debugging, ripgrep, code-quality-expert, code-analyzer                                                                                                                                            |
 | [Planning & Architecture](#planning--architecture) | 9     | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator                                                                                                           |
-| [Security](#security)                              | 6     | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics                                                                                                                   |
+| [Security](#security)                              | 11    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults                  |
 | [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                             |
 | [Languages](#languages)                            | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                        |
 | [Frameworks](#frameworks)                          | 6     | react-expert, nextjs-expert, svelte-expert, graphql-expert                                                                                                                                             |
@@ -98,6 +98,11 @@ Security analysis and validation.
 | `memory-forensics`             | Memory acquisition and artifact extraction      | security-architect |
 | `protocol-reverse-engineering` | Network protocol analysis                       | security-architect |
 | `accessibility`                | WCAG 2.1 AA compliance, semantic HTML, ARIA     | frontend-expert    |
+| `static-analysis`              | CodeQL and Semgrep SARIF analysis               | security-architect |
+| `variant-analysis`             | Discover vulnerability variants                 | security-architect |
+| `differential-review`          | Security-focused diff/PR review                 | security-architect |
+| `semgrep-rule-creator`         | Create custom Semgrep rules                     | security-architect |
+| `insecure-defaults`            | Detect hardcoded credentials, fail-open configs | security-architect |
 
 ---
 

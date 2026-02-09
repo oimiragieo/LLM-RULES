@@ -1,3 +1,48 @@
+## ADR-091: JSON Schema Domain Standardization -- agent-studio.dev
+
+**Date:** 2026-02-09
+
+**Status:** Accepted
+
+**Context:**
+
+All JSON schemas in `.claude/schemas/` previously used inconsistent $id domains (some used localhost, some had no $id, some used example.com). This prevents proper schema validation, IDE autocompletion, and cross-schema references.
+
+**Decision:**
+
+Standardize all schema $id fields to use `https://agent-studio.dev/schemas/{filename}` domain. This establishes a canonical namespace for all agent-studio schemas.
+
+**Examples:**
+- `skill-tdd-output.schema.json` → $id: `https://agent-studio.dev/schemas/skill-tdd-output.schema.json`
+- `skill-debugging-output.schema.json` → $id: `https://agent-studio.dev/schemas/skill-debugging-output.schema.json`
+
+**Alternatives Considered:**
+
+1. **localhost domain:** Rejected. Not globally addressable, breaks cross-repository references.
+2. **No $id field:** Rejected. Required for proper JSON Schema validation and IDE tooling.
+3. **example.com domain:** Rejected. Not owned by project, violates RFC 2606 guidance for non-example use.
+
+**Rationale:**
+
+- agent-studio.dev is the project's canonical domain
+- Provides globally unique identifiers for all schemas
+- Enables future schema hosting/documentation website
+- Follows JSON Schema best practices (https://json-schema.org/understanding-json-schema/structuring.html#id)
+
+**Consequences:**
+
+- All 78 schemas now have consistent, globally unique $id values
+- Future tooling can resolve schema references via domain
+- Enables potential future schema registry/documentation site at agent-studio.dev/schemas/
+
+**Implementation:**
+
+- Phase 2, Task 2.2 of schema standardization plan (2026-02-09)
+- Modified 57 schemas (21 already compliant)
+- Verified via automated script: 78/78 schemas now use agent-studio.dev domain
+
+---
+
 ## ADR-090: ACCS Integration Strategy -- Catalog Discovery + Selective Agent Adoption
 
 **Date:** 2026-02-09
@@ -1013,3 +1058,47 @@ Additionally:
 **Alternatives Considered**: Docker Compose (no self-healing/scaling), Nomad (smaller ecosystem), AWS ECS (vendor lock-in), Serverless (cold starts unacceptable for CLI).
 
 **Architecture Document**: `.claude/context/plans/monolith-to-microservices-architecture-2026-02-09.md`
+
+---
+
+## ADR-095: Canonical Skill Output Schema Standard
+
+**Date:** 2026-02-09
+
+**Status:** Proposed (Architecture Design Complete, Pending Implementation)
+
+**Context:**
+
+Skill expansion created 87 output schemas with two incompatible envelope structures (Structure A: skillName/version/timestamp/output used by 19 pre-existing schemas; Structure B: status/output used by 68 new schemas). Additionally, 70/87 schemas lacked `additionalProperties:false`, 12 were hollow stubs, and `$id` domains were inconsistent (claude-code.anthropic.com vs agent-studio.dev vs missing).
+
+**Decision:**
+
+1. **Canonical envelope**: Structure B (`{status: enum, output: object}`) with `additionalProperties: false` at root and output levels.
+2. **JSON Schema version**: Draft-07 (`http://json-schema.org/draft-07/schema#`). Migration to 2020-12 deferred (zero features from 2020-12 are used; migration cost: 464 breaking edits).
+3. **$id domain**: `https://agent-studio.dev/schemas/skill-{name}-output.schema.json`
+4. **Generic base**: `generic-skill-output-base.schema.json` for skills without domain-specific output (replaces 12 hollow stubs via deletion, not $ref).
+5. **Mandatory constraints**: All schemas must have `additionalProperties: false` at root. Schemas with defined output properties must also have it on the output object.
+
+**Alternatives Considered:**
+
+1. **Structure A as canonical**: Rejected. Only 22% adoption; more complex (4 required root fields vs 2); migration cost 3.5x higher (68 schemas vs 19).
+2. **Draft 2020-12 migration**: Rejected. 464 breaking edits for zero feature benefit. All schemas use only Draft-07 keywords.
+3. **$ref pattern for stubs**: Rejected. Draft-07 `$ref` replaces entire object (no composition with sibling keywords); no runtime resolver exists; file deletion is simpler.
+4. **Keep both structures**: Rejected. Bifurcation prevents generic validation logic; maintenance burden doubles.
+
+**Migration Sub-Categories:**
+
+- A1 (14 schemas): Standard skillName/version/timestamp/output -- remove metadata, add status
+- A2 (5 schemas): Variant using `result` instead of `output` -- rename + remove metadata + add status
+- A3 (5 schemas): Trail of Bits flat security schemas -- wrap existing properties in `output`, add status at root
+
+**Consequences:**
+
+- All 75 active schemas use identical envelope structure
+- 12 hollow stubs deleted, replaced by catalog reference to base schema
+- `additionalProperties: false` prevents typo-based schema bypass
+- Consistent `$id` prevents future `$ref` resolution issues
+- Creator rules updated to enforce standard on new schemas
+- Total effort: 8-12 hours across 4 implementation phases
+
+**Architecture Document:** `.claude/context/plans/schema-standardization-architecture-2026-02-09.md`

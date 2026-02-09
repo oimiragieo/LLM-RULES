@@ -1,12 +1,18 @@
-<!-- Agent: developer | Task: #90 | Session: 2026-02-07 -->
+<!-- Agent: developer | Task: #7 | Session: 2026-02-09 -->
 
 # Schema Catalog
 
-**Last Updated:** 2026-02-07
-**Total Active Schemas:** 27
-**Archived Schemas:** 25 (see `.claude/schemas/_archive/README.md`)
+**Last Updated:** 2026-02-09
+**Total Active Schemas:** 103
+**Archived Schemas:** 37 (see `.claude/schemas/_archive/README.md` + 12 hollow stubs deleted in Phase 1)
 
 This catalog documents all active JSON schemas in the agent-studio framework with their wiring status, consumers, and validation categories.
+
+**Phase 2 Standardization Complete (2026-02-09):**
+- All 103 schemas use JSON Schema Draft-07 (`$schema: http://json-schema.org/draft-07/schema#`)
+- All 78 skill schemas use canonical `$id: https://agent-studio.dev/schemas/{filename}`
+- All schemas have `additionalProperties: false` for security (SEC-SCHEMA-001)
+- 12 hollow stub schemas deleted (swarm-coordination, consensus-voting, binary-analysis-patterns, memory-forensics, protocol-reverse-engineering, ai-ml-expert, scientific-skills, writing-skills, git-expert, doc-generator, readme, summarize-changes)
 
 ---
 
@@ -16,8 +22,18 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 | ---------------- | ----- | --------------------------------------------- |
 | **WIRED (Ajv)**  | 8     | Actively validated via Ajv at runtime         |
 | **SOFT-WIRED**   | 3     | Path referenced in code, validation optional  |
-| **DOCS ONLY**    | 16    | Referenced in documentation or templates only |
-| **Total Active** | 27    | All schemas in `.claude/schemas/`             |
+| **DOCS ONLY**    | 92    | Referenced in documentation or templates only |
+| **Total Active** | 103   | All schemas in `.claude/schemas/`             |
+
+## Schema Categories
+
+| Category       | Count | Pattern                   |
+| -------------- | ----- | ------------------------- |
+| **Agent**      | 4     | `agent-*.schema.json`     |
+| **Skill**      | 78    | `skill-*-output.schema.json` |
+| **Hook**       | 1     | `hook-*.schema.json`      |
+| **Workflow**   | 1     | `workflow-*.schema.json`  |
+| **Other**      | 19    | Various                   |
 
 ---
 
@@ -102,7 +118,7 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ---
 
-## 2. Skill Schemas (4 schemas)
+## 2. Skill Schemas (75 schemas)
 
 ### skill-definition.schema.json
 
@@ -163,6 +179,88 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 **Purpose:** Defines test generation output structure.
 
 **Note:** Consumer is in `.cursor/` directory, not `.claude/`.
+
+---
+
+### Skill Output Schemas (71 schemas)
+
+All skill output schemas follow the pattern: `skill-{name}-output.schema.json`
+
+| Schema Name                                                 | Skill                              | Category     |
+| ----------------------------------------------------------- | ---------------------------------- | ------------ |
+| skill-agent-creator-output.schema.json                      | agent-creator                      | Creator      |
+| skill-android-expert-output.schema.json                     | android-expert                     | Mobile       |
+| skill-api-development-expert-output.schema.json             | api-development-expert             | Development  |
+| skill-architecture-review-output.schema.json                | architecture-review                | Architecture |
+| skill-artifact-integrator-output.schema.json                | artifact-integrator                | Creator      |
+| skill-auth-security-expert-output.schema.json               | auth-security-expert               | Security     |
+| skill-best-practices-guidelines-output.schema.json          | best-practices-guidelines          | Development  |
+| skill-checklist-generator-output.schema.json                | checklist-generator                | Validation   |
+| skill-code-analyzer-output.schema.json                      | code-analyzer                      | Development  |
+| skill-code-quality-expert-output.schema.json                | code-quality-expert                | Development  |
+| skill-code-semantic-search-output.schema.json               | code-semantic-search               | Search       |
+| skill-code-structural-search-output.schema.json             | code-structural-search             | Search       |
+| skill-code-style-validator-output.schema.json               | code-style-validator               | Development  |
+| skill-complexity-assessment-output.schema.json              | complexity-assessment              | Planning     |
+| skill-container-expert-output.schema.json                   | container-expert                   | DevOps       |
+| skill-context-driven-development-output.schema.json         | context-driven-development         | Context      |
+| skill-data-expert-output.schema.json                        | data-expert                        | Data         |
+| skill-database-expert-output.schema.json                    | database-expert                    | Data         |
+| skill-debugging-output.schema.json                          | debugging                          | Development  |
+| skill-differential-review-output.schema.json                | differential-review                | Security     |
+| skill-docker-compose-output.schema.json                     | docker-compose                     | DevOps       |
+| skill-dry-principle-output.schema.json                      | dry-principle                      | Development  |
+| skill-expo-framework-rule-output.schema.json                | expo-framework-rule                | Mobile       |
+| skill-frontend-expert-output.schema.json                    | frontend-expert                    | Frontend     |
+| skill-gamedev-expert-output.schema.json                     | gamedev-expert                     | Gaming       |
+| skill-go-expert-output.schema.json                          | go-expert                          | Languages    |
+| skill-graphql-expert-output.schema.json                     | graphql-expert                     | Frameworks   |
+| skill-hook-creator-output.schema.json                       | hook-creator                       | Creator      |
+| skill-incident-runbook-templates-output.schema.json         | incident-runbook-templates         | DevOps       |
+| skill-insecure-defaults-output.schema.json                  | insecure-defaults                  | Security     |
+| skill-insight-extraction-output.schema.json                 | insight-extraction                 | Context      |
+| skill-interactive-requirements-gathering-output.schema.json | interactive-requirements-gathering | Planning     |
+| skill-ios-expert-output.schema.json                         | ios-expert                         | Mobile       |
+| skill-java-expert-output.schema.json                        | java-expert                        | Languages    |
+| skill-k8s-manifest-generator-output.schema.json             | k8s-manifest-generator             | DevOps       |
+| skill-mobile-first-design-rules-output.schema.json          | mobile-first-design-rules          | Mobile       |
+| skill-nextjs-expert-output.schema.json                      | nextjs-expert                      | Frameworks   |
+| skill-nodejs-expert-output.schema.json                      | nodejs-expert                      | Languages    |
+| skill-php-expert-output.schema.json                         | php-expert                         | Languages    |
+| skill-plan-generator-output.schema.json                     | plan-generator                     | Planning     |
+| skill-planning-with-files-output.schema.json                | planning-with-files                | Planning     |
+| skill-postmortem-writing-output.schema.json                 | postmortem-writing                 | DevOps       |
+| skill-prd-generator-output.schema.json                      | prd-generator                      | Planning     |
+| skill-project-onboarding-output.schema.json                 | project-onboarding                 | Integration  |
+| skill-python-backend-expert-output.schema.json              | python-backend-expert              | Languages    |
+| skill-react-expert-output.schema.json                       | react-expert                       | Frameworks   |
+| skill-response-rater-output.schema.json                     | response-rater                     | Validation   |
+| skill-ripgrep-output.schema.json                            | ripgrep                            | Search       |
+| skill-schema-creator-output.schema.json                     | schema-creator                     | Creator      |
+| skill-security-architect-output.schema.json                 | security-architect                 | Security     |
+| skill-semgrep-rule-creator-output.schema.json               | semgrep-rule-creator               | Security     |
+| skill-sentry-monitoring-output.schema.json                  | sentry-monitoring                  | DevOps       |
+| skill-session-handoff-output.schema.json                    | session-handoff                    | Context      |
+| skill-skill-creator-output.schema.json                      | skill-creator                      | Creator      |
+| skill-spec-gathering-output.schema.json                     | spec-gathering                     | Planning     |
+| skill-spec-init-output.schema.json                          | spec-init                          | Planning     |
+| skill-static-analysis-output.schema.json                    | static-analysis                    | Security     |
+| skill-svelte-expert-output.schema.json                      | svelte-expert                      | Frameworks   |
+| skill-tauri-native-api-integration-output.schema.json       | tauri-native-api-integration       | Mobile       |
+| skill-tdd-output.schema.json                                | tdd                                | Development  |
+| skill-template-creator-output.schema.json                   | template-creator                   | Creator      |
+| skill-terraform-infra-output.schema.json                    | terraform-infra                    | DevOps       |
+| skill-text-to-sql-output.schema.json                        | text-to-sql                        | Data         |
+| skill-thinking-tools-output.schema.json                     | thinking-tools                     | Patterns     |
+| skill-typescript-expert-output.schema.json                  | typescript-expert                  | Languages    |
+| skill-variant-analysis-output.schema.json                   | variant-analysis                   | Security     |
+| skill-verification-before-completion-output.schema.json     | verification-before-completion     | Validation   |
+| skill-web3-expert-output.schema.json                        | web3-expert                        | Languages    |
+| skill-workflow-creator-output.schema.json                   | workflow-creator                   | Creator      |
+
+**Wiring Status:** DOCS ONLY (all skill output schemas are templates)
+**$schema:** http://json-schema.org/draft-07/schema#
+**Purpose:** Validate structured outputs from skill invocations
 
 ---
 

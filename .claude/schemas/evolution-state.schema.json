@@ -4,7 +4,13 @@
   "title": "Evolution State",
   "description": "Tracks the state of self-evolution operations in the Claude Code Enterprise Framework",
   "type": "object",
-  "required": ["version", "state", "evolutions", "patterns", "suggestions"],
+  "required": [
+    "version",
+    "state",
+    "evolutions",
+    "patterns",
+    "suggestions"
+  ],
   "properties": {
     "version": {
       "type": "string",
@@ -27,25 +33,38 @@
       "description": "Current state of the evolution system. Terminal states: blocked (evolution cannot proceed due to conflict/error), aborted (evolution was explicitly cancelled)"
     },
     "currentEvolution": {
-      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/activeEvolution" }],
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/activeEvolution"
+        }
+      ],
       "description": "Currently active evolution operation, or null if idle"
     },
     "evolutions": {
       "type": "array",
       "maxItems": 1000,
-      "items": { "$ref": "#/$defs/completedEvolution" },
+      "items": {
+        "$ref": "#/$defs/completedEvolution"
+      },
       "description": "History of completed evolutions"
     },
     "patterns": {
       "type": "array",
       "maxItems": 500,
-      "items": { "$ref": "#/$defs/pattern" },
+      "items": {
+        "$ref": "#/$defs/pattern"
+      },
       "description": "Extracted patterns from codebase usage"
     },
     "suggestions": {
       "type": "array",
       "maxItems": 200,
-      "items": { "$ref": "#/$defs/suggestion" },
+      "items": {
+        "$ref": "#/$defs/suggestion"
+      },
       "description": "Suggested evolutions based on patterns"
     },
     "lastUpdated": {
@@ -57,7 +76,14 @@
   "$defs": {
     "activeEvolution": {
       "type": "object",
-      "required": ["id", "type", "name", "trigger", "phase", "startedAt"],
+      "required": [
+        "id",
+        "type",
+        "name",
+        "trigger",
+        "phase",
+        "startedAt"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -66,7 +92,14 @@
         },
         "type": {
           "type": "string",
-          "enum": ["agent", "skill", "workflow", "hook", "schema", "template"],
+          "enum": [
+            "agent",
+            "skill",
+            "workflow",
+            "hook",
+            "schema",
+            "template"
+          ],
           "description": "Type of artifact being evolved"
         },
         "name": {
@@ -83,13 +116,22 @@
         },
         "phase": {
           "type": "string",
-          "enum": ["evaluate", "validate", "obtain", "lock", "verify", "enable"],
+          "enum": [
+            "evaluate",
+            "validate",
+            "obtain",
+            "lock",
+            "verify",
+            "enable"
+          ],
           "description": "Current phase of the evolution process"
         },
         "research": {
           "type": "array",
           "maxItems": 100,
-          "items": { "$ref": "#/$defs/researchEntry" },
+          "items": {
+            "$ref": "#/$defs/researchEntry"
+          },
           "default": [],
           "description": "Research gathered during evolution"
         },
@@ -99,7 +141,15 @@
           "description": "When this evolution started"
         },
         "blockedReason": {
-          "oneOf": [{ "type": "null" }, { "type": "string", "maxLength": 2000 }],
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "maxLength": 2000
+            }
+          ],
           "description": "Reason if evolution is blocked, null otherwise"
         },
         "metadata": {
@@ -112,7 +162,12 @@
     "researchEntry": {
       "type": "object",
       "unevaluatedProperties": false,
-      "required": ["query", "source", "findings", "timestamp"],
+      "required": [
+        "query",
+        "source",
+        "findings",
+        "timestamp"
+      ],
       "properties": {
         "query": {
           "type": "string",
@@ -145,7 +200,13 @@
     "completedEvolution": {
       "type": "object",
       "unevaluatedProperties": false,
-      "required": ["id", "type", "name", "createdAt", "filesCreated"],
+      "required": [
+        "id",
+        "type",
+        "name",
+        "createdAt",
+        "filesCreated"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -154,7 +215,14 @@
         },
         "type": {
           "type": "string",
-          "enum": ["agent", "skill", "workflow", "hook", "schema", "template"],
+          "enum": [
+            "agent",
+            "skill",
+            "workflow",
+            "hook",
+            "schema",
+            "template"
+          ],
           "description": "Type of artifact evolved"
         },
         "name": {
@@ -180,13 +248,19 @@
         "filesCreated": {
           "type": "array",
           "maxItems": 100,
-          "items": { "type": "string", "maxLength": 500 },
+          "items": {
+            "type": "string",
+            "maxLength": 500
+          },
           "description": "List of files created during evolution"
         },
         "filesModified": {
           "type": "array",
           "maxItems": 100,
-          "items": { "type": "string", "maxLength": 500 },
+          "items": {
+            "type": "string",
+            "maxLength": 500
+          },
           "description": "List of files modified during evolution"
         },
         "researchSources": {
@@ -208,8 +282,13 @@
           "type": "object",
           "unevaluatedProperties": false,
           "properties": {
-            "canRollback": { "type": "boolean" },
-            "rollbackCommit": { "type": "string", "maxLength": 100 }
+            "canRollback": {
+              "type": "boolean"
+            },
+            "rollbackCommit": {
+              "type": "string",
+              "maxLength": 100
+            }
           },
           "description": "Information for rolling back this evolution"
         }
@@ -218,7 +297,12 @@
     "pattern": {
       "type": "object",
       "unevaluatedProperties": false,
-      "required": ["id", "description", "frequency", "lastSeen"],
+      "required": [
+        "id",
+        "description",
+        "frequency",
+        "lastSeen"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -232,7 +316,13 @@
         },
         "category": {
           "type": "string",
-          "enum": ["usage", "error", "request", "workflow", "integration"],
+          "enum": [
+            "usage",
+            "error",
+            "request",
+            "workflow",
+            "integration"
+          ],
           "description": "Category of the pattern"
         },
         "frequency": {
@@ -257,14 +347,20 @@
         },
         "examples": {
           "type": "array",
-          "items": { "type": "string", "maxLength": 500 },
+          "items": {
+            "type": "string",
+            "maxLength": 500
+          },
           "maxItems": 5,
           "description": "Example occurrences of this pattern"
         },
         "relatedPatterns": {
           "type": "array",
           "maxItems": 50,
-          "items": { "type": "string", "maxLength": 100 },
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
           "description": "IDs of related patterns"
         }
       }
@@ -272,7 +368,13 @@
     "suggestion": {
       "type": "object",
       "unevaluatedProperties": false,
-      "required": ["id", "type", "name", "reason", "confidence"],
+      "required": [
+        "id",
+        "type",
+        "name",
+        "reason",
+        "confidence"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -281,7 +383,14 @@
         },
         "type": {
           "type": "string",
-          "enum": ["agent", "skill", "workflow", "hook", "schema", "template"],
+          "enum": [
+            "agent",
+            "skill",
+            "workflow",
+            "hook",
+            "schema",
+            "template"
+          ],
           "description": "Type of artifact suggested"
         },
         "name": {
@@ -303,12 +412,20 @@
         "basedOnPatterns": {
           "type": "array",
           "maxItems": 50,
-          "items": { "type": "string", "maxLength": 100 },
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
           "description": "Pattern IDs that led to this suggestion"
         },
         "priority": {
           "type": "string",
-          "enum": ["low", "medium", "high", "critical"],
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
           "default": "medium",
           "description": "Priority level of the suggestion"
         },
@@ -319,7 +436,12 @@
         },
         "status": {
           "type": "string",
-          "enum": ["pending", "accepted", "rejected", "implemented"],
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected",
+            "implemented"
+          ],
           "default": "pending",
           "description": "Current status of the suggestion"
         },
@@ -330,5 +452,6 @@
         }
       }
     }
-  }
+  },
+  "additionalProperties": false
 }

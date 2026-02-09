@@ -1,10 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-best-practices-guidelines-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-best-practices-guidelines-output.schema.json",
   "title": "Best Practices Guidelines Skill Output",
   "description": "Validates output from best-practices-guidelines skill - Compliance checking and recommendations",
   "type": "object",
-  "required": ["skillName", "version", "timestamp", "output"],
+  "required": [
+    "skillName",
+    "version",
+    "timestamp",
+    "output"
+  ],
   "properties": {
     "skillName": {
       "type": "string",
@@ -24,11 +29,18 @@
     "output": {
       "type": "object",
       "description": "Best practices compliance results",
-      "required": ["compliance", "violations", "recommendations"],
+      "required": [
+        "compliance",
+        "violations",
+        "recommendations"
+      ],
       "properties": {
         "compliance": {
           "type": "object",
-          "required": ["overall", "categories"],
+          "required": [
+            "overall",
+            "categories"
+          ],
           "properties": {
             "overall": {
               "type": "number",
@@ -39,12 +51,36 @@
             "categories": {
               "type": "object",
               "properties": {
-                "codeOrganization": { "type": "number", "minimum": 0, "maximum": 100 },
-                "naming": { "type": "number", "minimum": 0, "maximum": 100 },
-                "errorHandling": { "type": "number", "minimum": 0, "maximum": 100 },
-                "testing": { "type": "number", "minimum": 0, "maximum": 100 },
-                "documentation": { "type": "number", "minimum": 0, "maximum": 100 },
-                "security": { "type": "number", "minimum": 0, "maximum": 100 }
+                "codeOrganization": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "naming": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "errorHandling": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "testing": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "documentation": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "security": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
               }
             }
           }
@@ -53,7 +89,12 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["guideline", "severity", "file", "description"],
+            "required": [
+              "guideline",
+              "severity",
+              "file",
+              "description"
+            ],
             "properties": {
               "guideline": {
                 "type": "string",
@@ -61,12 +102,26 @@
               },
               "severity": {
                 "type": "string",
-                "enum": ["critical", "high", "medium", "low"]
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
               },
-              "file": { "type": "string" },
-              "line": { "type": "number", "minimum": 1 },
-              "description": { "type": "string" },
-              "correctExample": { "type": "string" },
+              "file": {
+                "type": "string"
+              },
+              "line": {
+                "type": "number",
+                "minimum": 1
+              },
+              "description": {
+                "type": "string"
+              },
+              "correctExample": {
+                "type": "string"
+              },
               "reference": {
                 "type": "string",
                 "format": "uri",
@@ -80,22 +135,42 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["priority", "guideline", "action"],
+            "required": [
+              "priority",
+              "guideline",
+              "action"
+            ],
             "properties": {
               "priority": {
                 "type": "string",
-                "enum": ["high", "medium", "low"]
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ]
               },
-              "guideline": { "type": "string" },
-              "action": { "type": "string" },
-              "benefit": { "type": "string" },
+              "guideline": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "benefit": {
+                "type": "string"
+              },
               "effort": {
                 "type": "string",
-                "enum": ["low", "medium", "high"]
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ]
               },
               "files": {
                 "type": "array",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               }
             }
           },
@@ -105,19 +180,33 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["pattern", "file"],
+            "required": [
+              "pattern",
+              "file"
+            ],
             "properties": {
-              "pattern": { "type": "string" },
-              "file": { "type": "string" },
-              "line": { "type": "number", "minimum": 1 },
-              "description": { "type": "string" }
+              "pattern": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              },
+              "line": {
+                "type": "number",
+                "minimum": 1
+              },
+              "description": {
+                "type": "string"
+              }
             }
           },
           "description": "Examples of compliant patterns found"
         },
         "guidelinesChecked": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Guidelines evaluated"
         }
       },

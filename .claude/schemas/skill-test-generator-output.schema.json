@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-test-generator-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-test-generator-output.schema.json",
   "title": "Test Generator Skill Output Verification",
   "description": "Verifiable output from the test-generator skill that proves test creation occurred",
   "type": "object",
@@ -23,7 +23,12 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["path", "test_type", "test_cases_count", "lines_of_code"],
+        "required": [
+          "path",
+          "test_type",
+          "test_cases_count",
+          "lines_of_code"
+        ],
         "properties": {
           "path": {
             "type": "string",
@@ -31,7 +36,14 @@
           },
           "test_type": {
             "type": "string",
-            "enum": ["unit", "integration", "e2e", "component", "api", "snapshot"],
+            "enum": [
+              "unit",
+              "integration",
+              "e2e",
+              "component",
+              "api",
+              "snapshot"
+            ],
             "description": "Type of test file generated"
           },
           "test_cases_count": {
@@ -61,11 +73,24 @@
       "type": "string",
       "pattern": "^\\d+%$",
       "description": "Target code coverage percentage (e.g., '80%')",
-      "examples": ["80%", "90%", "100%"]
+      "examples": [
+        "80%",
+        "90%",
+        "100%"
+      ]
     },
     "framework_used": {
       "type": "string",
-      "enum": ["jest", "vitest", "cypress", "playwright", "mocha", "jasmine", "pytest", "junit"],
+      "enum": [
+        "jest",
+        "vitest",
+        "cypress",
+        "playwright",
+        "mocha",
+        "jasmine",
+        "pytest",
+        "junit"
+      ],
       "description": "Test framework used for generation"
     },
     "test_suite_structure": {
@@ -106,7 +131,12 @@
       "items": {
         "type": "string"
       },
-      "examples": ["Arrange-Act-Assert", "Given-When-Then", "Page Object Model", "Test fixtures"]
+      "examples": [
+        "Arrange-Act-Assert",
+        "Given-When-Then",
+        "Page Object Model",
+        "Test fixtures"
+      ]
     },
     "dependencies_detected": {
       "type": "array",
@@ -121,7 +151,12 @@
       "items": {
         "type": "string"
       },
-      "examples": ["null/undefined inputs", "empty arrays", "boundary values", "error conditions"]
+      "examples": [
+        "null/undefined inputs",
+        "empty arrays",
+        "boundary values",
+        "error conditions"
+      ]
     },
     "test_configuration": {
       "type": "object",

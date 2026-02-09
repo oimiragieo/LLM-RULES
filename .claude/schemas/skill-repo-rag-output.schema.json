@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-repo-rag-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-repo-rag-output.schema.json",
   "title": "Repo RAG Skill Output Verification",
   "description": "Verifiable output from the repo-rag skill that proves codebase search and semantic retrieval occurred",
   "type": "object",
@@ -25,7 +25,12 @@
     },
     "query_type": {
       "type": "string",
-      "enum": ["semantic", "keyword", "pattern", "hybrid"],
+      "enum": [
+        "semantic",
+        "keyword",
+        "pattern",
+        "hybrid"
+      ],
       "description": "Type of search performed"
     },
     "results_count": {
@@ -46,7 +51,10 @@
       "description": "Code patterns discovered matching query",
       "items": {
         "type": "object",
-        "required": ["pattern", "occurrences"],
+        "required": [
+          "pattern",
+          "occurrences"
+        ],
         "properties": {
           "pattern": {
             "type": "string",
@@ -73,7 +81,11 @@
       "description": "Semantically relevant matches with relevance scores",
       "items": {
         "type": "object",
-        "required": ["file", "relevance_score", "snippet"],
+        "required": [
+          "file",
+          "relevance_score",
+          "snippet"
+        ],
         "properties": {
           "file": {
             "type": "string",
@@ -102,7 +114,12 @@
           },
           "match_type": {
             "type": "string",
-            "enum": ["exact", "semantic", "fuzzy", "pattern"],
+            "enum": [
+              "exact",
+              "semantic",
+              "fuzzy",
+              "pattern"
+            ],
             "description": "Type of match"
           },
           "context": {

@@ -3,21 +3,50 @@
   "$id": "https://claude-code.anthropic.com/schemas/implementation-plan",
   "title": "Implementation Plan",
   "type": "object",
-  "required": ["feature", "status"],
+  "required": [
+    "feature",
+    "status"
+  ],
   "properties": {
-    "feature": { "type": "string" },
-    "phases": { "type": "array", "items": { "type": "object" } },
-    "subtasks": { "type": "array", "items": { "type": "object" } },
+    "feature": {
+      "type": "string"
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "subtasks": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
     "qa_signoff": {
       "type": "object",
       "properties": {
-        "status": { "enum": ["approved", "rejected", "fixes_applied"] },
-        "qa_session": { "type": "integer" },
-        "ready_for_qa_revalidation": { "type": "boolean" }
+        "status": {
+          "enum": [
+            "approved",
+            "rejected",
+            "fixes_applied"
+          ]
+        },
+        "qa_session": {
+          "type": "integer"
+        },
+        "ready_for_qa_revalidation": {
+          "type": "boolean"
+        }
       }
     },
-    "status": { "type": "string" },
-    "planStatus": { "type": "string" }
+    "status": {
+      "type": "string"
+    },
+    "planStatus": {
+      "type": "string"
+    }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

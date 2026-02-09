@@ -1,10 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-ripgrep-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-ripgrep-output.schema.json",
   "title": "Ripgrep Skill Output",
   "description": "Validates output from ripgrep skill - Fast code search results",
   "type": "object",
-  "required": ["skillName", "version", "timestamp", "output"],
+  "required": [
+    "skillName",
+    "version",
+    "timestamp",
+    "output"
+  ],
   "properties": {
     "skillName": {
       "type": "string",
@@ -24,28 +29,50 @@
     "output": {
       "type": "object",
       "description": "Ripgrep search results",
-      "required": ["matches", "files", "patterns"],
+      "required": [
+        "matches",
+        "files",
+        "patterns"
+      ],
       "properties": {
         "matches": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["file", "line", "content"],
+            "required": [
+              "file",
+              "line",
+              "content"
+            ],
             "properties": {
-              "file": { "type": "string" },
-              "line": { "type": "number", "minimum": 1 },
-              "column": { "type": "number", "minimum": 1 },
-              "content": { "type": "string" },
+              "file": {
+                "type": "string"
+              },
+              "line": {
+                "type": "number",
+                "minimum": 1
+              },
+              "column": {
+                "type": "number",
+                "minimum": 1
+              },
+              "content": {
+                "type": "string"
+              },
               "context": {
                 "type": "object",
                 "properties": {
                   "before": {
                     "type": "array",
-                    "items": { "type": "string" }
+                    "items": {
+                      "type": "string"
+                    }
                   },
                   "after": {
                     "type": "array",
-                    "items": { "type": "string" }
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -55,18 +82,31 @@
         },
         "files": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Files containing matches"
         },
         "patterns": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["pattern", "matchCount"],
+            "required": [
+              "pattern",
+              "matchCount"
+            ],
             "properties": {
-              "pattern": { "type": "string" },
-              "matchCount": { "type": "number", "minimum": 0 },
-              "fileCount": { "type": "number", "minimum": 0 }
+              "pattern": {
+                "type": "string"
+              },
+              "matchCount": {
+                "type": "number",
+                "minimum": 0
+              },
+              "fileCount": {
+                "type": "number",
+                "minimum": 0
+              }
             }
           },
           "description": "Patterns searched and their match counts"
@@ -74,32 +114,61 @@
         "searchMetadata": {
           "type": "object",
           "properties": {
-            "query": { "type": "string" },
+            "query": {
+              "type": "string"
+            },
             "fileTypes": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
             "directoryFilters": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
             "excludePatterns": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
-            "caseSensitive": { "type": "boolean" },
-            "regexMode": { "type": "boolean" },
-            "pcre2Mode": { "type": "boolean" }
+            "caseSensitive": {
+              "type": "boolean"
+            },
+            "regexMode": {
+              "type": "boolean"
+            },
+            "pcre2Mode": {
+              "type": "boolean"
+            }
           }
         },
         "summary": {
           "type": "object",
-          "required": ["totalMatches", "filesMatched"],
+          "required": [
+            "totalMatches",
+            "filesMatched"
+          ],
           "properties": {
-            "totalMatches": { "type": "number", "minimum": 0 },
-            "filesMatched": { "type": "number", "minimum": 0 },
-            "filesScanned": { "type": "number", "minimum": 0 },
-            "searchDurationMs": { "type": "number", "minimum": 0 }
+            "totalMatches": {
+              "type": "number",
+              "minimum": 0
+            },
+            "filesMatched": {
+              "type": "number",
+              "minimum": 0
+            },
+            "filesScanned": {
+              "type": "number",
+              "minimum": 0
+            },
+            "searchDurationMs": {
+              "type": "number",
+              "minimum": 0
+            }
           }
         }
       },

@@ -4,12 +4,18 @@
   "title": "Agent Definition Schema",
   "description": "Schema for validating Claude Code agent definition files",
   "type": "object",
-  "required": ["frontmatter", "content"],
+  "required": [
+    "frontmatter",
+    "content"
+  ],
   "unevaluatedProperties": false,
   "properties": {
     "frontmatter": {
       "type": "object",
-      "required": ["name", "description"],
+      "required": [
+        "name",
+        "description"
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -27,7 +33,9 @@
           "oneOf": [
             {
               "type": "array",
-              "items": { "type": "string" },
+              "items": {
+                "type": "string"
+              },
               "maxItems": 100
             },
             {
@@ -40,7 +48,9 @@
         },
         "disallowedTools": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "maxItems": 100,
           "description": "Tools explicitly denied to the agent"
         },
@@ -65,24 +75,38 @@
         },
         "priority": {
           "type": "string",
-          "enum": ["lowest", "low", "medium", "high", "highest"],
+          "enum": [
+            "lowest",
+            "low",
+            "medium",
+            "high",
+            "highest"
+          ],
           "description": "Agent priority for routing decisions"
         },
         "skills": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "maxItems": 100,
           "description": "Skills to preload for the agent"
         },
         "context_files": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "maxItems": 50,
           "description": "Files to load into agent context"
         },
         "context_strategy": {
           "type": "string",
-          "enum": ["minimal", "lazy_load", "full"],
+          "enum": [
+            "minimal",
+            "lazy_load",
+            "full"
+          ],
           "description": "How to load context"
         },
         "extended_thinking": {
@@ -92,9 +116,18 @@
         "hooks": {
           "type": "object",
           "properties": {
-            "PreToolUse": { "type": "array", "maxItems": 50 },
-            "PostToolUse": { "type": "array", "maxItems": 50 },
-            "Stop": { "type": "array", "maxItems": 50 }
+            "PreToolUse": {
+              "type": "array",
+              "maxItems": 50
+            },
+            "PostToolUse": {
+              "type": "array",
+              "maxItems": 50
+            },
+            "Stop": {
+              "type": "array",
+              "maxItems": 50
+            }
           },
           "unevaluatedProperties": false,
           "description": "Hooks for tool use events"
@@ -114,13 +147,22 @@
       "frontmatter": {
         "name": "ux-reviewer",
         "description": "UX/UI expert for reviewing mobile and web applications. Use for design critiques, accessibility audits, and user experience evaluations.",
-        "tools": ["Read", "WebSearch", "WebFetch", "Write"],
+        "tools": [
+          "Read",
+          "WebSearch",
+          "WebFetch",
+          "Write"
+        ],
         "model": "sonnet",
         "temperature": 0.4,
         "priority": "medium",
-        "skills": ["diagram-generator", "doc-generator"]
+        "skills": [
+          "diagram-generator",
+          "doc-generator"
+        ]
       },
       "content": "# UX Reviewer Agent\n\n## Core Persona\n..."
     }
-  ]
+  ],
+  "additionalProperties": false
 }

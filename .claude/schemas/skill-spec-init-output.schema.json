@@ -84,5 +84,6 @@
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$id": "https://agent-studio.dev/schemas/skill-spec-init-output.schema.json"
 }

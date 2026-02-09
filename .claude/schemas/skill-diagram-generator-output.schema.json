@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-code.anthropic.com/schemas/skill-diagram-generator-output.schema.json",
+  "$id": "https://agent-studio.dev/schemas/skill-diagram-generator-output.schema.json",
   "title": "Diagram Generator Skill Output Verification",
   "description": "Verifiable output from the diagram-generator skill that proves diagram creation occurred",
   "type": "object",
@@ -50,7 +50,10 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["name", "type"],
+        "required": [
+          "name",
+          "type"
+        ],
         "properties": {
           "name": {
             "type": "string",

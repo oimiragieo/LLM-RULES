@@ -4,7 +4,11 @@
   "title": "Hook Definition Schema",
   "description": "Schema for validating Claude Code hook definition and registration",
   "type": "object",
-  "required": ["name", "type", "purpose"],
+  "required": [
+    "name",
+    "type",
+    "purpose"
+  ],
   "unevaluatedProperties": false,
   "properties": {
     "name": {
@@ -15,7 +19,12 @@
     },
     "type": {
       "type": "string",
-      "enum": ["PreToolUse", "PostToolUse", "UserPromptSubmit", "Stop"],
+      "enum": [
+        "PreToolUse",
+        "PostToolUse",
+        "UserPromptSubmit",
+        "Stop"
+      ],
       "description": "Hook trigger type"
     },
     "purpose": {
@@ -26,7 +35,15 @@
     },
     "category": {
       "type": "string",
-      "enum": ["safety", "routing", "memory", "audit", "security", "validation", "custom"],
+      "enum": [
+        "safety",
+        "routing",
+        "memory",
+        "audit",
+        "security",
+        "validation",
+        "custom"
+      ],
       "default": "custom",
       "description": "Hook category for organization"
     },
@@ -49,7 +66,9 @@
     },
     "environment": {
       "type": "object",
-      "additionalProperties": { "type": "string" },
+      "additionalProperties": {
+        "type": "string"
+      },
       "description": "Environment variables for the hook"
     },
     "exitCodes": {
@@ -71,13 +90,17 @@
     },
     "agents": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "maxItems": 100,
       "description": "Agents this hook is assigned to"
     },
     "skills": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "maxItems": 100,
       "description": "Skills this hook is associated with"
     }
@@ -92,7 +115,10 @@
       "environment": {
         "TDD_ENFORCEMENT": "warn"
       },
-      "agents": ["developer", "qa"]
+      "agents": [
+        "developer",
+        "qa"
+      ]
     },
     {
       "name": "audit-logger",
@@ -100,14 +126,20 @@
       "purpose": "Logs all tool operations to audit trail",
       "category": "audit",
       "matcher": "Edit|Write",
-      "agents": ["developer", "security-architect"]
+      "agents": [
+        "developer",
+        "security-architect"
+      ]
     },
     {
       "name": "router-enforcer",
       "type": "UserPromptSubmit",
       "purpose": "Routes user requests to appropriate agents based on intent analysis",
       "category": "routing",
-      "agents": ["router"]
+      "agents": [
+        "router"
+      ]
     }
-  ]
+  ],
+  "additionalProperties": false
 }
