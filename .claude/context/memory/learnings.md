@@ -528,5 +528,38 @@ When creating any agent that works with code (description contains "code|impleme
 - Agent Search Usage Analysis (Task #51) - Identified 78% gap
 - Hybrid Search Integration Plan (Task #52) - Designed 3-tier approach
 - Developer Implementation (Task #53) - Executed batch update
+- Code Review (Task #54) - 100% spec compliance verification
+- QA Validation (Task #55) - 100% test pass rate
+- Documentation Update (Task #57) - Updated CLAUDE.md, @AGENT_ROUTING_TABLE.md, @TOOL_REFERENCE.md, @SKILL_CATALOG_TABLE.md
+
+---
+
+## Documentation Update for Hybrid Search Integration (Task #57, 2026-02-09)
+
+**Pattern:** Documentation updates should focus on user-facing references, not exhaustive coverage in every file.
+
+**Completed:** Updated 4 documentation files to reflect hybrid search integration across 36+ agents:
+
+1. **CLAUDE.md Section 7** - Added "Hybrid Search Integration (Phase 1)" subsection explaining 3-tier skill assignment
+2. **@AGENT_ROUTING_TABLE.md** - Added note about search capabilities across all agent categories
+3. **@TOOL_REFERENCE.md** - Added cross-reference to @SKILL_CATALOG_TABLE.md for search skills
+4. **@SKILL_CATALOG_TABLE.md** - Added code-semantic-search and code-structural-search to skill table
+
+**Key Insight:** agent-registry.json is auto-generated and already reflects search skills (verified python-pro, architect have skills arrays with code-semantic-search, code-structural-search, ripgrep). No manual registry updates needed.
+
+**Documentation Scope Decision:**
+
+- Focus on user entry points (CLAUDE.md, routing table) where users discover capabilities
+- Add cross-references to detailed catalogs (skill-catalog.md) rather than duplicating content
+- Trust auto-generated files (agent-registry.json) to stay fresh via CI
+
+**Files Modified:**
+
+- `.claude/CLAUDE.md` - Section 7 hybrid search integration note
+- `.claude/docs/@AGENT_ROUTING_TABLE.md` - Search capabilities note
+- `.claude/docs/@TOOL_REFERENCE.md` - Cross-reference to skill catalog
+- `.claude/docs/@SKILL_CATALOG_TABLE.md` - Added search skills, updated count to 94
+
+**Verification:** All 4 files updated successfully, no lint/format issues.
 
 ---
