@@ -2,13 +2,13 @@
 
 **Source:** CLAUDE.md Section 8.5
 **Version:** v2.2.1
-**Last Updated:** 2026-02-07
+**Last Updated:** 2026-02-09
 
 ---
 
 ## PURPOSE
 
-Complete catalog of 89 active skills (87 maintained + 1 deprecated alias + 1 scientific parent) available via `Skill()` tool for improving agent workflows, testing, research, and development processes. 214 dead skills archived to `.claude/skills/_archive/dead/` (Pipeline #16B, 2026-02-07).
+Complete catalog of 94 active skills (92 maintained + 1 deprecated alias + 1 scientific parent) available via `Skill()` tool for improving agent workflows, testing, research, and development processes. Includes hybrid search integration (code-semantic-search, code-structural-search, ripgrep) deployed across 36+ agents. 214 dead skills archived to `.claude/skills/_archive/dead/` (Pipeline #16B, 2026-02-07).
 
 ---
 
@@ -37,6 +37,8 @@ Complete catalog of 89 active skills (87 maintained + 1 deprecated alias + 1 sci
 | `insight-extraction`                 | capture learnings                                          |
 | `qa-workflow`                        | systematic test/fix loops                                  |
 | `ripgrep`                            | enhanced search for .mjs/.cjs/.mts/.cts                    |
+| `code-semantic-search`               | semantic code search (hybrid: vectors + BM25)              |
+| `code-structural-search`             | AST-based pattern matching (ast-grep)                      |
 | `chrome-browser`                     | browser automation/testing                                 |
 | `arxiv-mcp`                          | arXiv search/retrieve                                      |
 | `checklist-generator`                | quality checklists (IEEE + contextual)                     |
