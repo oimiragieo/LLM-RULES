@@ -69,7 +69,7 @@ Before coordinating any multi-agent work, read the full agent catalog:
 Read('.claude/docs/AGENT_ROUTING_CARD.md')
 ```
 
-**49 agents are available.** Do NOT default to `developer` for implementation. Match the task domain to the correct specialist:
+**59 agents are available.** Do NOT default to `developer` for implementation. Match the task domain to the correct specialist:
 
 - Python task -> `python-pro` (not developer)
 - React/frontend -> `frontend-pro` (not developer)

@@ -587,3 +587,34 @@ When creating any agent that works with code (description contains "code|impleme
 **Verification:** All 4 files updated successfully, no lint/format issues.
 
 ---
+
+## 10 New Enterprise-Grade Agents Documentation Update (Task #65, 2026-02-09)
+
+**Pattern:** Documentation updates should be systematic and comprehensive after adding new framework capabilities.
+
+**Completed:** Updated all documentation references to reflect 10 new enterprise-grade agents (llm-architect, prompt-engineer, mcp-developer, api-designer, microservices-architect, sre-engineer, performance-engineer, penetration-tester, accessibility-tester, chaos-engineer).
+
+**Updates Made:**
+
+1. `.claude/rules/agents.md` - Updated agent count from 49 to 59
+2. `.claude/CLAUDE.md` Section 1 - Updated SPECIALIST-FIRST ROUTING LAW from "49 agents exist" to "59 agents exist"
+3. `.claude/agents/orchestrators/master-orchestrator.md` - Updated routing reminder from "49 agents available" to "59 agents available"
+
+**Verification Checklist:**
+
+- [x] `.claude/CLAUDE.md` Section 3 Quick Routing table - Already includes all 10 new agents with descriptions
+- [x] `.claude/docs/@AGENT_ROUTING_TABLE.md` - Already includes all 10 new agents with file paths
+- [x] `.claude/context/agent-registry.json` - Already has complete entries for all 10 agents (totalAgents: 59, verified via spot checks)
+- [x] `.claude/context/artifacts/catalogs/skill-catalog.md` - No agent count update needed (mentions "36+ agents" for search skills, not total count)
+
+**Key Insight:** The agent-registry.json is auto-generated and already reflects all new agents with complete definitions (id, displayName, category, filePath, capabilities, skills, tools). The registry generator correctly parsed all 10 new agent files and created comprehensive entries.
+
+**Files Modified:**
+
+- `.claude/rules/agents.md` (line 32: 49→59)
+- `.claude/CLAUDE.md` (line 54: 49→59)
+- `.claude/agents/orchestrators/master-orchestrator.md` (line 72: 49→59)
+
+**Verdict:** ✅ COMPLETE - All agent count references updated, all routing tables verified complete
+
+---

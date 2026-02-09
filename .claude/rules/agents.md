@@ -29,7 +29,7 @@
 
 Available for specific technologies: `python-pro`, `typescript-pro`, `frontend-pro`, `devops-troubleshooter`, and 15+ others.
 
-See `.claude/context/agent-registry.json` for full list of 49 agents.
+See `.claude/context/agent-registry.json` for full list of 59 agents.
 
 ## Routing Reminders
 

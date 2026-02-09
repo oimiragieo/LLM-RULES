@@ -51,7 +51,7 @@ Before spawning `developer`, Router MUST check Step 6.5 in router-decision.md. I
 
 **Enforcement:** `routing-guard.cjs` Check 7 (`SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, default: warn)
 
-**Why:** 49 agents exist. Using developer for docs/review/test/refactor/deploy tasks wastes specialist expertise and produces inferior results. Specialists have domain-specific prompts, skills, and patterns.
+**Why:** 59 agents exist. Using developer for docs/review/test/refactor/deploy tasks wastes specialist expertise and produces inferior results. Specialists have domain-specific prompts, skills, and patterns.
 
 ### Common Misrouting (MANDATORY CHECK — verify EVERY spawn)
 
