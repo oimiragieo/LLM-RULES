@@ -618,3 +618,47 @@ When creating any agent that works with code (description contains "code|impleme
 **Verdict:** ✅ COMPLETE - All agent count references updated, all routing tables verified complete
 
 ---
+
+## Agent Data Validation Strategy (Task #73, 2026-02-09)
+
+**Pattern:** For agents (YAML+Markdown data files, not executable code), use structural validation via automated scripts instead of unit tests.
+
+**Completed:** QA validation of 10 remediated agents with 100% pass rate across all quality gates.
+
+**Key Findings:**
+
+1. **Structural Validation Over Unit Tests:**
+   - Agents are data files (YAML frontmatter + Markdown body), not code
+   - Test suite properly returns 0 tests (empty by design)
+   - Use automated YAML parsing script to validate structure
+   - Check required fields: name, description, capabilities, identity
+
+2. **Multi-Layered Quality Gates:**
+   - Test Suite: 0/0 pass (validation via script, not unit tests)
+   - Lint: 0 errors (ESLint on project, not agent files)
+   - Format: 0 changes (Prettier on project, not agent files)
+   - YAML Validation: 10/10 agents valid (automated script)
+   - Integration: Agent count, registry, documentation verified
+
+3. **Temp File Cleanup Critical:**
+   - Windows path separator issue created malformed filename (`C:devprojects...`)
+   - Lint errors (7) from temp file, not production code
+   - Always remove temp files before lint/format gates
+   - Consider `.gitignore` entry for malformed temp files
+
+4. **Registry Auto-Generation:**
+   - Agent registry (`.claude/context/agent-registry.json`) auto-generates via CI
+   - Spot checks confirm new agents present with complete metadata
+   - No manual registry updates needed (trust auto-generation)
+
+5. **Documentation Consistency:**
+   - Agent count must update in 3 places: rules/agents.md, CLAUDE.md, master-orchestrator.md
+   - Verification checklist prevents missing updates
+
+**Application:** For future agent remediations, follow same multi-layer validation pattern. Structural validation (YAML parsing) + integration checks (registry, docs) are sufficient. Unit tests not needed for data files.
+
+**Metrics:** 5/5 quality gates passed, 10/10 agents validated, 0 test failures, 0 lint errors, 0 format changes, 59 agents total (matches expected count).
+
+**Report:** `.claude/context/reports/qa/agent-remediation-qa-2026-02-09.md`
+
+---

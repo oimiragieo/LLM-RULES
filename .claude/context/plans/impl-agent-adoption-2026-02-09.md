@@ -31,6 +31,7 @@ Adopt 10 new specialist agents from the ACCS repository analysis, organized into
 **Parallel OK:** Yes (each agent is independent)
 
 These 3 agents must be created via `Skill({ skill: 'agent-creator' })` which handles:
+
 - Agent .md file creation
 - Registry entry in agent-registry.json
 - Routing keyword registration
@@ -102,6 +103,7 @@ These 3 agents must be created via `Skill({ skill: 'agent-creator' })` which han
 **Parallel OK:** Yes (each agent is independent; spawn multiple in parallel batches)
 
 **Context Limit Strategy:** Creating 7 agents in a single developer session will exceed context limits. Split into 2 sub-batches:
+
 - **Batch 2A (4 agents):** api-designer, microservices-architect, sre-engineer, performance-engineer
 - **Batch 2B (3 agents):** penetration-tester, accessibility-tester, chaos-engineer
 
@@ -402,25 +404,25 @@ Task({
 
 ## Risks
 
-| Risk | Impact | Mitigation | Rollback |
-|------|--------|------------|----------|
-| Agent-creator skill fails mid-batch | Medium | Commit after each batch (Phase 3.0 checkpoint) | `git revert HEAD` |
-| Routing keyword conflicts with existing agents | Medium | Disambiguation rules for all ambiguous keywords | Remove conflicting entries from routing-table.cjs |
-| Context limit hit during 7-agent batch | High | Split into Batch 2A (4) and Batch 2B (3) | Complete remaining agents in new session |
-| New agents break existing routing tests | Low | Run `pnpm test` in Phase 4.5 | Fix failing tests or adjust routing keywords |
-| Agent definitions too long (not checklist format) | Medium | Explicit constraint: checklist format, no prose paragraphs, no prompt fiction | Code review in Phase 4.4 |
+| Risk                                              | Impact | Mitigation                                                                    | Rollback                                          |
+| ------------------------------------------------- | ------ | ----------------------------------------------------------------------------- | ------------------------------------------------- |
+| Agent-creator skill fails mid-batch               | Medium | Commit after each batch (Phase 3.0 checkpoint)                                | `git revert HEAD`                                 |
+| Routing keyword conflicts with existing agents    | Medium | Disambiguation rules for all ambiguous keywords                               | Remove conflicting entries from routing-table.cjs |
+| Context limit hit during 7-agent batch            | High   | Split into Batch 2A (4) and Batch 2B (3)                                      | Complete remaining agents in new session          |
+| New agents break existing routing tests           | Low    | Run `pnpm test` in Phase 4.5                                                  | Fix failing tests or adjust routing keywords      |
+| Agent definitions too long (not checklist format) | Medium | Explicit constraint: checklist format, no prose paragraphs, no prompt fiction | Code review in Phase 4.4                          |
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Parallel? |
-|-------|-------|-----------|-----------|
-| Phase 1: P0 Agents | 3 | 2-3 hours | Yes |
-| Phase 2: P1 Agents | 7 | 4-5 hours | Yes (2 batches) |
-| Phase 3: Integration | 6 | 1-2 hours | No |
-| Phase 4: Verification | 5 | 1-2 hours | Partial |
-| Phase 5: Documentation | 3 | 30-45 min | Yes |
-| Phase FINAL: Reflection | 1 | 15-30 min | N/A |
-| **Total** | **25+** | **8-12 hours** | |
+| Phase                   | Tasks   | Est. Time      | Parallel?       |
+| ----------------------- | ------- | -------------- | --------------- |
+| Phase 1: P0 Agents      | 3       | 2-3 hours      | Yes             |
+| Phase 2: P1 Agents      | 7       | 4-5 hours      | Yes (2 batches) |
+| Phase 3: Integration    | 6       | 1-2 hours      | No              |
+| Phase 4: Verification   | 5       | 1-2 hours      | Partial         |
+| Phase 5: Documentation  | 3       | 30-45 min      | Yes             |
+| Phase FINAL: Reflection | 1       | 15-30 min      | N/A             |
+| **Total**               | **25+** | **8-12 hours** |                 |
 
 ## Explicit Exclusions (What NOT to Do)
 
@@ -507,22 +509,26 @@ context_files:
 ## Quality Checklist (IEEE 1028 + Contextual)
 
 ### Code Quality
+
 - [ ] All new files follow kebab-case naming
 - [ ] Provenance headers on all generated files
 - [ ] No console.log in production code
 
 ### Testing
+
 - [ ] Routing table loads without errors
 - [ ] Agent registry validates
 - [ ] No new test failures
 
 ### Documentation
+
 - [ ] AGENT_ROUTING_CARD.md updated
 - [ ] @AGENT_ROUTING_TABLE.md updated
 - [ ] CLAUDE.md routing table updated
 - [ ] ADR-090 status updated
 
 ### Framework-Specific (AI-Generated)
+
 - [ ] Each agent has search skills (Tier 2-3)
 - [ ] Each agent has memory protocol
 - [ ] Each agent has TaskUpdate protocol
