@@ -3,7 +3,7 @@
  * Routing Guard - Unified Router Enforcement Hook
  * ================================================
  *
- * Consolidates 7 routing checks into a single guard:
+ * Consolidates 12 routing checks into a single guard:
  *
  * | Check | Name                       | Purpose                                      |
  * |-------|----------------------------|----------------------------------------------|
@@ -15,6 +15,10 @@
  * | 5     | router-write-guard         | Blocks direct writes without Task            |
  * | 6     | memory-pressure-check      | Blocks Task spawning under memory pressure   |
  * | 7     | specialist-override        | Warns developer spawn for specialist tasks   |
+ * | 8     | task-list-first-gate       | Requires TaskList() before other tools       |
+ * | 9     | creator-intent-guard       | Blocks Task spawn without creator skill      |
+ * | 10    | intent-agent-match         | Validates agent matches detected intent      |
+ * | 11    | config-model-validator     | Validates spawn model matches config.yaml    |
  *
  * Trigger: PreToolUse (matches: Task|TaskCreate|Edit|Write|NotebookEdit|Glob|Grep|WebSearch|Bash)
  *
@@ -26,6 +30,10 @@
  * - ROUTER_WRITE_GUARD=block|warn|off (default: block)
  * - MEMORY_SPAWN_THROTTLING=true|false (default: true)
  * - SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off (default: warn)
+ * - TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: warn)
+ * - CREATOR_ROUTING_ENFORCEMENT=block|warn|off (default: block)
+ * - INTENT_AGENT_MATCH=warn|block|off (default: warn)
+ * - CONFIG_MODEL_VALIDATOR=block|warn|off (default: warn)
  *
  * Exit codes:
  * - 0: Allow operation
@@ -1370,6 +1378,369 @@ function checkCreatorIntentGuard(toolName, toolInput = {}) {
 }
 
 // =============================================================================
+// CHECK 10: INTENT-AGENT MATCH (validates agent matches detected intent)
+// =============================================================================
+
+/**
+ * Intent categories with their keyword signals and recommended agents
+ * Merged from intent-agent-match.cjs
+ */
+const INTENT_PATTERNS = {
+  security: {
+    keywords: [
+      'auth',
+      'credential',
+      'permission',
+      'vulnerability',
+      'OWASP',
+      'security',
+      'password',
+      'token',
+      'encrypt',
+      'decrypt',
+    ],
+    agents: ['security-architect'],
+    weight: 10,
+  },
+  testing: {
+    keywords: [
+      'test',
+      'coverage',
+      'regression',
+      'assertion',
+      'unit test',
+      'integration test',
+      'e2e',
+      'qa',
+    ],
+    agents: ['qa'],
+    weight: 8,
+  },
+  architecture: {
+    keywords: [
+      'design',
+      'schema',
+      'database',
+      'migration',
+      'scalability',
+      'architecture',
+      'system design',
+    ],
+    agents: ['architect'],
+    weight: 9,
+  },
+  documentation: {
+    keywords: ['docs', 'readme', 'guide', 'tutorial', 'API reference', 'documentation', 'API doc'],
+    agents: ['technical-writer'],
+    weight: 7,
+  },
+  deployment: {
+    keywords: ['deploy', 'CI/CD', 'pipeline', 'docker', 'kubernetes', 'k8s', 'deployment'],
+    agents: ['devops'],
+    weight: 8,
+  },
+  planning: {
+    keywords: ['plan', 'strategy', 'roadmap', 'breakdown', 'planning'],
+    agents: ['planner'],
+    weight: 9,
+  },
+};
+
+/**
+ * Detect intent signals in the prompt text
+ * @param {string} text - The prompt text to analyze
+ * @returns {{ detectedSignals: string[], suggestedAgents: string[] }}
+ */
+function detectIntent(text) {
+  const normalized = text.toLowerCase();
+  const detectedSignals = [];
+  const suggestedAgents = new Set();
+
+  for (const [_intent, config] of Object.entries(INTENT_PATTERNS)) {
+    for (const keyword of config.keywords) {
+      if (normalized.includes(keyword.toLowerCase())) {
+        detectedSignals.push(keyword);
+        for (const agent of config.agents) {
+          suggestedAgents.add(agent);
+        }
+      }
+    }
+  }
+
+  return {
+    detectedSignals: [...new Set(detectedSignals)],
+    suggestedAgents: Array.from(suggestedAgents),
+  };
+}
+
+/**
+ * Check if the spawned agent type matches the detected intent
+ * @param {string} subagentType - The agent being spawned
+ * @param {string[]} suggestedAgents - The agents suggested by intent analysis
+ * @returns {boolean} True if match or no suggestion, false if mismatch
+ */
+function agentMatchesIntent(subagentType, suggestedAgents) {
+  if (suggestedAgents.length === 0) {
+    return true; // No specific intent detected, any agent is ok
+  }
+
+  return suggestedAgents.includes(subagentType);
+}
+
+/**
+ * Check 10: Intent-Agent Match Check (validates spawned agent matches intent)
+ * Merged from intent-agent-match.cjs
+ *
+ * Environment: INTENT_AGENT_MATCH=warn|block|off (default: warn)
+ *
+ * @param {string} toolName - Tool being used
+ * @param {Object} toolInput - Tool input containing prompt and subagent_type
+ * @returns {{ pass: boolean, result?: string, message?: string }}
+ */
+function checkIntentAgentMatch(toolName, toolInput = {}) {
+  // Only applies to Task tool
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+
+  const enforcement = getEnforcementMode('INTENT_AGENT_MATCH', 'warn');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  const subagentType = toolInput.subagent_type || 'general-purpose';
+  const prompt = toolInput.prompt || '';
+
+  // Detect intent signals in the prompt
+  const { detectedSignals, suggestedAgents } = detectIntent(prompt);
+
+  // Check if spawned agent matches detected intent
+  if (!agentMatchesIntent(subagentType, suggestedAgents)) {
+    const reason = `Intent signals [${detectedSignals.join(', ')}] detected but spawning '${subagentType}' instead of including '${suggestedAgents.join("' or '")}'`;
+    const message = `[INTENT-AGENT MATCH] ${reason}`;
+
+    // Record violation in violation-tracker
+    const tracker = getViolationTracker();
+    if (tracker) {
+      tracker.recordViolation({
+        tool: 'Task',
+        action: enforcement === 'block' ? 'blocked' : 'warned',
+        checkName: 'intent-agent-match',
+        routerMode: 'router',
+        sessionId: process.env.CLAUDE_SESSION_ID || 'unknown',
+        metadata: {
+          detectedSignals,
+          suggestedAgents,
+          spawnedAgent: subagentType,
+        },
+      });
+    }
+
+    if (enforcement === 'block') {
+      return { pass: false, result: 'block', message };
+    } else {
+      return { pass: true, result: 'warn', message };
+    }
+  }
+
+  // All good
+  return { pass: true };
+}
+
+// =============================================================================
+// CHECK 11: CONFIG MODEL VALIDATOR (validates spawn model matches config.yaml)
+// =============================================================================
+
+/**
+ * Extract agent type from spawn prompt.
+ * Supports multiple patterns used in Agent-Studio spawn templates.
+ * Merged from config-model-validator.cjs
+ *
+ * @param {string|null|undefined} prompt - Spawn prompt text
+ * @returns {string|null} Agent type (lowercase) or null
+ */
+function extractAgentTypeFromPrompt(prompt) {
+  if (!prompt || typeof prompt !== 'string') {
+    return null;
+  }
+
+  const promptLower = prompt.toLowerCase();
+
+  // Pattern 1: "You are PLANNER" or "You are the PLANNER"
+  const youAreMatch = promptLower.match(/you are (?:the )?([a-z][-a-z0-9]*)/i);
+  if (youAreMatch) {
+    return youAreMatch[1].toLowerCase();
+  }
+
+  // Pattern 2: Agent file path reference
+  const pathMatch = prompt.match(
+    /\.claude\/agents\/(?:core|specialized|domain|orchestrators)\/([^/.]+)\.md/i
+  );
+  if (pathMatch) {
+    return pathMatch[1].toLowerCase();
+  }
+
+  // Pattern 3: subagent_type hint (used in Task() calls)
+  const subagentMatch = prompt.match(/\[?subagent_type:\s*([a-z][-a-z0-9]*)\]?/i);
+  if (subagentMatch) {
+    return subagentMatch[1].toLowerCase();
+  }
+
+  return null;
+}
+
+/**
+ * Extract model from Task tool input.
+ * Merged from config-model-validator.cjs
+ *
+ * @param {Object|null|undefined} toolInput - Task tool input
+ * @returns {string|null} Model string or null
+ */
+function extractModelFromToolInput(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') {
+    return null;
+  }
+
+  const model = toolInput.model;
+  if (!model || typeof model !== 'string') {
+    return null;
+  }
+
+  return model.trim();
+}
+
+/**
+ * Check 11: Config Model Validator (validates spawn model matches config.yaml)
+ * Merged from config-model-validator.cjs
+ *
+ * Environment: CONFIG_MODEL_VALIDATOR=block|warn|off (default: warn)
+ *
+ * @param {string} toolName - Tool being used
+ * @param {Object} toolInput - Tool input containing prompt and model
+ * @returns {{ pass: boolean, result?: string, message?: string }}
+ */
+function checkConfigModelValidator(toolName, toolInput = {}) {
+  // Only applies to Task tool
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+
+  const enforcement = getEnforcementMode('CONFIG_MODEL_VALIDATOR', 'warn');
+  if (enforcement === 'off') {
+    auditSecurityOverride(
+      'routing-guard',
+      'CONFIG_MODEL_VALIDATOR',
+      'off',
+      'Model configuration validation disabled'
+    );
+    return { pass: true };
+  }
+
+  // Extract agent type from prompt
+  const prompt = toolInput?.prompt || '';
+  const agentType = extractAgentTypeFromPrompt(prompt);
+
+  if (!agentType) {
+    // Cannot determine agent type - allow (no validation possible)
+    return { pass: true };
+  }
+
+  // Extract spawn model
+  const spawnModel = extractModelFromToolInput(toolInput);
+
+  if (!spawnModel) {
+    // No model specified in spawn - allow (Router should use config)
+    return { pass: true };
+  }
+
+  // Resolve configured model (need to lazy-load to avoid circular dependency)
+  let resolveAgentModel, getShorthand;
+  try {
+    const agentConfigReader = require('../../lib/utils/agent-config-reader.cjs');
+    resolveAgentModel = agentConfigReader.resolveAgentModel;
+    getShorthand = agentConfigReader.getShorthand;
+  } catch (err) {
+    // Graceful degradation - can't validate without config reader
+    auditLog('routing-guard', 'config_model_validator_error', {
+      error: 'agent-config-reader unavailable',
+      details: err.message,
+    });
+    return { pass: true };
+  }
+
+  const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+  const configResult = resolveAgentModel(agentType, PROJECT_ROOT);
+  const configuredModel = configResult.shorthand;
+  const configSource = configResult.source;
+
+  // Normalize spawn model for comparison
+  const spawnShorthand = getShorthand(spawnModel);
+
+  // Check for mismatch
+  const mismatch = spawnShorthand !== configuredModel;
+
+  if (mismatch) {
+    const message = `
++======================================================================+
+|  CONFIG MODEL VALIDATOR - MODEL MISMATCH DETECTED                    |
++======================================================================+
+|  Agent Type:       ${(agentType || 'unknown').padEnd(45)}|
+|  Spawn Model:      ${(spawnShorthand || 'none').padEnd(45)}|
+|  Configured Model: ${(configuredModel || 'none').padEnd(45)}|
+|  Config Source:    ${(configSource || 'unknown').padEnd(45)}|
+|                                                                      |
+|  The spawn model does not match the configured model.                |
+|  To fix: Use resolveAgentModel() before spawning to get the correct  |
+|  model from config.yaml.                                             |
+|                                                                      |
+|  Mode: ${enforcement.padEnd(58)}|
++======================================================================+
+`;
+
+    // Record violation in violation-tracker
+    const tracker = getViolationTracker();
+    if (tracker) {
+      tracker.recordViolation({
+        tool: 'Task',
+        action: enforcement === 'block' ? 'blocked' : 'warned',
+        checkName: 'config-model-validator',
+        routerMode: 'router',
+        sessionId: process.env.CLAUDE_SESSION_ID || 'unknown',
+        metadata: {
+          agentType,
+          spawnModel: spawnShorthand,
+          configuredModel,
+          source: configSource,
+        },
+      });
+    }
+
+    // Emit event
+    if (eventBus && enforcement === 'block') {
+      try {
+        eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Task',
+          reason: 'config_model_mismatch',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
+    }
+
+    if (enforcement === 'block') {
+      return { pass: false, result: 'block', message };
+    } else {
+      return { pass: true, result: 'warn', message };
+    }
+  }
+
+  // Models match
+  return { pass: true };
+}
+
+// =============================================================================
 // MAIN EXECUTION
 // =============================================================================
 
@@ -1474,6 +1845,24 @@ function runAllChecks(toolName, toolInput) {
   }
   if (creatorCheck.result === 'warn') {
     console.warn(creatorCheck.message);
+  }
+
+  // Check 10: Intent-Agent Match (validates spawned agent matches detected intent)
+  const intentCheck = checkIntentAgentMatch(toolName, toolInput);
+  if (!intentCheck.pass) {
+    return { pass: false, result: intentCheck.result, message: intentCheck.message };
+  }
+  if (intentCheck.result === 'warn') {
+    console.warn(intentCheck.message);
+  }
+
+  // Check 11: Config Model Validator (validates spawn model matches config.yaml)
+  const modelCheck = checkConfigModelValidator(toolName, toolInput);
+  if (!modelCheck.pass) {
+    return { pass: false, result: modelCheck.result, message: modelCheck.message };
+  }
+  if (modelCheck.result === 'warn') {
+    console.warn(modelCheck.message);
   }
 
   // All checks passed
@@ -1668,6 +2057,12 @@ if (require.main === module) {
  * @property {Function} checkMemoryPressure - Check memory pressure before agent spawning
  * @property {Function} checkSpecialistOverride - Check specialist-first routing (Check 7)
  * @property {Function} checkCreatorIntentGuard - Check creator intent routing (Check 9)
+ * @property {Function} checkIntentAgentMatch - Check intent-agent match (Check 10)
+ * @property {Function} checkConfigModelValidator - Check config model validation (Check 11)
+ * @property {Function} detectIntent - Detect intent signals in prompt (Check 10 helper)
+ * @property {Function} agentMatchesIntent - Check if agent matches intent (Check 10 helper)
+ * @property {Function} extractAgentTypeFromPrompt - Extract agent type from prompt (Check 11 helper)
+ * @property {Function} extractModelFromToolInput - Extract model from tool input (Check 11 helper)
  * @property {Function} isPlannerSpawn - Detect if spawn is a PLANNER agent
  * @property {Function} isSecuritySpawn - Detect if spawn is security-related
  * @property {Function} isImplementationAgentSpawn - Detect if spawn is implementation agent
@@ -1683,6 +2078,7 @@ if (require.main === module) {
  * @property {Array<string>} IMPLEMENTATION_AGENTS - Agents that perform implementation
  * @property {Array<string>} ROUTER_BASH_WHITELIST - Allowed bash commands (git only)
  * @property {Object} SPECIALIST_KEYWORD_MAP - Maps specialist agents to trigger keywords
+ * @property {Object} INTENT_PATTERNS - Maps intent categories to keywords and agents (Check 10)
  */
 
 // Export for testing
@@ -1699,6 +2095,12 @@ module.exports = {
   checkSpecialistOverride,
   checkTaskListFirstGate,
   checkCreatorIntentGuard,
+  checkIntentAgentMatch,
+  checkConfigModelValidator,
+  detectIntent,
+  agentMatchesIntent,
+  extractAgentTypeFromPrompt,
+  extractModelFromToolInput,
   isPlannerSpawn,
   isSecuritySpawn,
   isImplementationAgentSpawn,
@@ -1720,4 +2122,5 @@ module.exports = {
   IMPLEMENTATION_AGENTS,
   ROUTER_BASH_WHITELIST,
   SPECIALIST_KEYWORD_MAP,
+  INTENT_PATTERNS,
 };

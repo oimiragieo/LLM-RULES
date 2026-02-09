@@ -579,6 +579,92 @@ Design and implement a simplified 3-component memory management system:
 
 ---
 
+## ADR-107: Pro-Workflow Adoption Strategy (2026-02-09)
+
+**Date:** 2026-02-09
+
+**Status:** Accepted (Implemented in Task #81)
+
+**Context:**
+
+The [pro-workflow](https://github.com/gregkare/pro-workflow) reference implementation provides session quality patterns (drift detection, adaptive quality gates, correction detection, pre-compact snapshots) that could improve agent-studio's user experience. However, direct code copy would be incompatible due to different hook protocols, state management systems, and utility libraries.
+
+**Decision:**
+
+Adopt CONCEPTS from pro-workflow, rewrite all code from scratch using agent-studio patterns:
+
+1. **Drift Detection (Adopted):**
+   - Concept: Track original session intent, warn when current work drifts
+   - Implementation: `.claude/hooks/session/drift-detector.cjs` (120 lines)
+   - Uses: agent-studio's state file pattern, keyword extraction utilities
+
+2. **Adaptive Quality Gates (Adopted):**
+   - Concept: Adjust quality checkpoint frequency based on correction rate
+   - Implementation: `.claude/hooks/session/adaptive-quality-gate.cjs` (165 lines)
+   - Uses: session-metrics.json for correction detection, adaptive thresholds
+
+3. **Post-Edit Scanning (Adopted):**
+   - Concept: Scan edited files for anti-patterns (console.log, TODOs, secrets)
+   - Implementation: `.claude/hooks/session/post-edit-scanner.cjs` (130 lines)
+   - Uses: agent-studio's pattern matching utilities
+
+4. **Pre-Compact Snapshots (Adopted):**
+   - Concept: Save session state before context compaction
+   - Implementation: `.claude/hooks/session/pre-compact.cjs` (107 lines)
+   - Uses: agent-studio's state aggregation pattern
+
+5. **Routing Table Simplification (Adopted):**
+   - Concept: LLMs don't need exhaustive keyword lists
+   - Result: 2,472 → 1,030 lines (58% reduction) with identical routing
+   - Insight: INTENT_KEYWORDS reduced from 50+ to 3-5 per agent, DISAMBIGUATION_RULES reduced 38%
+
+6. **Hook Consolidation (Adopted):**
+   - Concept: Merge standalone hooks into parent hooks as new "Check N" sections
+   - Result: 4 standalone hooks consolidated into parent hooks
+   - Examples:
+     - config-model-validator.cjs → routing-guard.cjs Check 11
+     - intent-agent-match.cjs → routing-guard.cjs Check 10
+     - task-status-enforcement.cjs → pre-completion-validation.cjs
+     - task-list-tracker.cjs → post-task-unified.cjs
+
+**Alternatives Considered:**
+
+1. **Direct code copy:** Rejected. Incompatible hook protocol (stdin/stdout JSON vs function calls), different state management, different utilities.
+
+2. **Fork pro-workflow as base:** Rejected. Would require rewriting agent-studio's hook system, state management, and utilities to match pro-workflow patterns.
+
+3. **Ignore pro-workflow entirely:** Rejected. Drift detection and adaptive quality gates are genuinely valuable UX improvements.
+
+**Rationale:**
+
+- Concept adoption preserves pro-workflow's insights while maintaining agent-studio's architectural integrity
+- Rewriting from scratch ensures compatibility with existing hook protocol, state management, utilities
+- Simplification reduces maintenance burden (fewer hooks, smaller routing table)
+- Anti-regression: 74 equivalence tests ensure routing behavior unchanged
+
+**Consequences:**
+
+- **Positive:** 4 new session hooks operational, routing table 58% smaller, 4 fewer standalone hooks
+- **Positive:** Code is native agent-studio style, easier to maintain and debug
+- **Positive:** TDD with equivalence tests prevented regressions during simplification
+- **Negative:** Required ~20 hours of development time (vs ~2 hours for direct copy)
+- **Trade-off:** Quality and maintainability worth the upfront investment
+
+**Quality Metrics:**
+
+- Test coverage: 74 equivalence tests + 8 new hook tests (100% pass rate)
+- Regression testing: All routing scenarios produce identical results
+- Hook consolidation: 4 standalone hooks eliminated, settings.json simplified
+- Routing table: 58% reduction (2,472 → 1,030 lines) with identical behavior
+
+**Cross-References:**
+
+- Task #79-83: Pro-workflow adoption pipeline
+- learnings.md: "Pro-Workflow Adoption Best Practices"
+- Hook implementations: `.claude/hooks/session/*.cjs`
+
+---
+
 ## ADR-106: Creator Guard File-Existence Enforcement
 
 **Date:** 2026-02-09

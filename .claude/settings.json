@@ -20,6 +20,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/reflection/force-step0-execution.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/drift-detector.cjs"
           }
         ]
       }
@@ -90,6 +94,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/evolution/quality-gate-validator.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/adaptive-quality-gate.cjs"
           }
         ]
       },
@@ -134,10 +142,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/intent-agent-match.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/hooks/routing/spawn-prompt-assembler.cjs"
           },
           {
@@ -146,7 +150,7 @@
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/config-model-validator.cjs"
+            "command": "node .claude/hooks/routing/routing-guard.cjs"
           },
           {
             "type": "command",
@@ -157,10 +161,6 @@
       {
         "matcher": "TaskUpdate",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/task-status-enforcement.cjs"
-          },
           {
             "type": "command",
             "command": "node .claude/hooks/validation/pre-completion-validation.cjs"
@@ -187,20 +187,11 @@
         ]
       },
       {
-        "matcher": "Task",
+        "matcher": "Task|TaskList",
         "hooks": [
           {
             "type": "command",
             "command": "node .claude/hooks/routing/post-task-unified.cjs"
-          }
-        ]
-      },
-      {
-        "matcher": "TaskList",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/task-list-tracker.cjs"
           }
         ]
       },
@@ -228,6 +219,15 @@
           {
             "type": "command",
             "command": "node .claude/hooks/routing/code-index-updater.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/post-edit-scanner.cjs"
           }
         ]
       },
@@ -272,6 +272,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/validation/check-console-log.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/pre-compact.cjs"
           }
         ]
       }

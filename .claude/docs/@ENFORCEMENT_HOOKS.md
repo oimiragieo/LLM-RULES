@@ -18,20 +18,24 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 
 ## Critical Hooks Overview
 
-| Hook                               | Location                    | Trigger                                     | Default | Key Env Variables                                                                                                    |
-| ---------------------------------- | --------------------------- | ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
-| `routing-guard.cjs`                | `.claude/hooks/routing/`    | PreToolUse(Task, Edit, Write, NotebookEdit) | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
-| `unified-creator-guard.cjs`        | `.claude/hooks/routing/`    | PreToolUse(Write, Edit)                     | block   | `CREATOR_GUARD`                                                                                                      |
-| `unified-pre-write-hook.cjs`       | `.claude/hooks/safety/`     | PreToolUse(Write, Edit)                     | block   | Multiple (11 consolidated checks)                                                                                    |
-| `bash-command-validator.cjs`       | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `BASH_VALIDATOR_FAIL_OPEN`                                                                                           |
-| `shell-injection-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `SHELL_INJECTION_VALIDATOR`                                                                                          |
-| `pre-task-unified.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task)                            | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`                                                                 |
-| `tool-scope-validator.cjs`         | `.claude/hooks/routing/`    | PreToolUse(All)                             | warn    | `TOOL_SCOPE_VALIDATOR`                                                                                               |
-| `reflection-step0-guard.cjs`       | `.claude/hooks/reflection/` | PreToolUse(TaskList)                        | warn    | `REFLECTION_STEP0_ENFORCEMENT`                                                                                       |
-| `config-model-validator.cjs`       | `.claude/hooks/routing/`    | PreToolUse(Task)                            | warn    | `CONFIG_MODEL_VALIDATOR`                                                                                             |
-| `error-tracker-hook.cjs`           | `.claude/hooks/monitoring/` | PostToolUse(All)                            | N/A     | None (monitoring only)                                                                                               |
-| `post-creation-integration.cjs`    | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate)                     | warn    | `INTEGRATION_ENFORCEMENT`                                                                                            |
-| `creator-compliance-validator.cjs` | `.claude/hooks/validation/` | PreToolUse(TaskUpdate)                      | warn    | `CREATOR_COMPLIANCE_ENFORCEMENT`                                                                                     |
+| Hook                            | Location                    | Trigger                                     | Default | Key Env Variables                                                                                                    |
+| ------------------------------- | --------------------------- | ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task, Edit, Write, NotebookEdit) | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
+| `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | PreToolUse(Write, Edit)                     | block   | `CREATOR_GUARD`                                                                                                      |
+| `unified-pre-write-hook.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Write, Edit)                     | block   | Multiple (11 consolidated checks)                                                                                    |
+| `bash-command-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `BASH_VALIDATOR_FAIL_OPEN`                                                                                           |
+| `shell-injection-validator.cjs` | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `SHELL_INJECTION_VALIDATOR`                                                                                          |
+| `pre-task-unified.cjs`          | `.claude/hooks/routing/`    | PreToolUse(Task)                            | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`                                                                 |
+| `tool-scope-validator.cjs`      | `.claude/hooks/routing/`    | PreToolUse(All)                             | warn    | `TOOL_SCOPE_VALIDATOR`                                                                                               |
+| `reflection-step0-guard.cjs`    | `.claude/hooks/reflection/` | PreToolUse(TaskList)                        | warn    | `REFLECTION_STEP0_ENFORCEMENT`                                                                                       |
+| `error-tracker-hook.cjs`        | `.claude/hooks/monitoring/` | PostToolUse(All)                            | N/A     | None (monitoring only)                                                                                               |
+| `post-creation-integration.cjs` | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate)                     | warn    | `INTEGRATION_ENFORCEMENT`                                                                                            |
+| `drift-detector.cjs`            | `.claude/hooks/session/`    | UserPromptSubmit                            | N/A     | None (always enabled, informational)                                                                                 |
+| `adaptive-quality-gate.cjs`     | `.claude/hooks/session/`    | PreToolUse(Edit, Write, NotebookEdit)       | N/A     | None (always enabled, informational)                                                                                 |
+| `post-edit-scanner.cjs`         | `.claude/hooks/session/`    | PostToolUse(Edit)                           | N/A     | None (always enabled, informational)                                                                                 |
+| `pre-compact.cjs`               | `.claude/hooks/session/`    | Stop                                        | N/A     | None (always enabled, informational)                                                                                 |
+
+**Note:** `config-model-validator.cjs` and `intent-agent-match.cjs` were consolidated into `routing-guard.cjs` (Check 11 and Check 10 respectively) as of 2026-02-09. `task-status-enforcement.cjs` was consolidated into `pre-completion-validation.cjs` as of 2026-02-09. `creator-compliance-validator.cjs` was consolidated into `pre-completion-validation.cjs` as of 2026-02-09.
 
 ---
 
@@ -685,6 +689,8 @@ Well under 100ms budget for non-blocking hooks.
 **Default Enforcement:** warn
 **Purpose:** Validates post-creation integration compliance (Layer 3)
 
+**Note:** creator-compliance-validator.cjs was consolidated into `pre-completion-validation.cjs` as of 2026-02-09.
+
 ### When It Runs
 
 - Intercepts TaskUpdate when `status` is being set to `"completed"`
@@ -1126,6 +1132,150 @@ LOOP_PREVENTION_MODE=block|warn|off             # Default: block
 - **@EVOLUTION_WORKFLOW.md** - research-enforcement.cjs (Phase O)
 - **CLAUDE.md Section 1.2** - Self-check gates enforced by routing-guard.cjs
 - **CLAUDE.md Section 1.3** - Hook enforcement summary
+
+---
+
+---
+
+## 14. Session Hooks (Pro-Workflow Adoption)
+
+**Location:** `.claude/hooks/session/`
+**Event Types:** UserPromptSubmit, PreToolUse(Edit|Write), PostToolUse(Edit), Stop
+**Default Enforcement:** Non-blocking (informational only, always exit 0)
+**Purpose:** Session quality monitoring and state preservation
+
+### drift-detector.cjs
+
+**Event Type:** UserPromptSubmit
+**Purpose:** Tracks original session intent, warns on drift after 6+ edits with <20% keyword overlap
+
+**State File:** `.claude/context/runtime/drift-state.json`
+
+**Behavior:**
+
+- Captures original intent from first user prompt
+- Tracks edit count per session
+- Compares current prompt keywords with original intent
+- Warns when drift detected (6+ edits, <20% keyword overlap)
+- Always exits 0 (informational only, never blocks)
+
+**No Environment Variables** - Always enabled, informational only
+
+**Example:**
+
+```
+Session starts with "Add authentication to the app"
+... 6 edits later, prompt is "Refactor database schema"
+→ Warning: "Session drift detected: Current task diverges from original intent"
+```
+
+---
+
+### adaptive-quality-gate.cjs
+
+**Event Type:** PreToolUse(Edit|Write|NotebookEdit)
+**Purpose:** Counts edits per session, suggests quality checkpoints at adaptive thresholds
+
+**State File:** `.claude/context/runtime/edit-counter.json`
+**Metrics Input:** `.claude/context/runtime/session-metrics.json` (corrections_count, prompt_count)
+
+**Adaptive Thresholds:**
+
+- **High correction rate** (>25%): first=3, second=6, repeat=6 (more aggressive)
+- **Default**: first=5, second=10, repeat=10
+- **Low correction rate** (<5%): first=10, second=20, repeat=20 (less aggressive)
+
+**Warning Progression:**
+
+1. First threshold: "Consider running: pnpm lint:fix && pnpm format"
+2. Second threshold: "Strongly recommend running: pnpm lint:fix && pnpm format && pnpm test"
+3. Repeat threshold: Every N edits after second threshold
+
+**Hook Protocol:**
+
+- ALWAYS exits 0 (non-blocking)
+- ALWAYS passes through original input to stdout unchanged
+- Graceful degradation: malformed counter file resets to 1, missing metrics file uses defaults
+- Atomic file writes (tmp + rename)
+
+**No Environment Variables** - Always enabled, informational only
+
+---
+
+### post-edit-scanner.cjs
+
+**Event Type:** PostToolUse(Edit)
+**Purpose:** Scans edited files for console.log, TODOs, hardcoded secrets
+
+**Scan Limits:**
+
+- First 500 lines per file
+- Max 5 issues reported per invocation
+
+**Detected Patterns:**
+
+- `console.log`, `console.error`, `console.warn` (production anti-pattern)
+- `TODO`, `FIXME`, `HACK` (incomplete work)
+- Common secret patterns (API keys, tokens, passwords)
+
+**Hook Protocol:**
+
+- ALWAYS exits 0 (non-blocking)
+- ALWAYS passes through original input to stdout unchanged
+- Emits warnings to stderr
+
+**No Environment Variables** - Always enabled, informational only
+
+**Example:**
+
+```
+After editing auth.ts:
+→ Warning: "console.log found at line 45: consider using structured logging"
+→ Warning: "TODO found at line 120: incomplete implementation"
+```
+
+---
+
+### pre-compact.cjs
+
+**Event Type:** Stop
+**Purpose:** Saves session state snapshot before context compaction
+
+**State File:** `.claude/context/runtime/pre-compact-snapshot.json`
+
+**Snapshot Structure:**
+
+```json
+{
+  "timestamp": "2026-02-09T12:00:00.000Z",
+  "editCount": 42,
+  "correctionCount": 5,
+  "promptCount": 10,
+  "originalIntent": "Add authentication to the app",
+  "driftEditCount": 6
+}
+```
+
+**Source Files:**
+
+- `edit-counter.json` (editCount)
+- `session-metrics.json` (correctionCount, promptCount)
+- `drift-state.json` (originalIntent, driftEditCount)
+
+**Graceful Degradation:**
+
+- Missing source files → defaults (0 or empty string)
+- Malformed JSON → defaults (no crash)
+- Always exits 0 (non-blocking)
+
+**Hook Protocol:**
+
+- ALWAYS exits 0 (non-blocking)
+- ALWAYS passes through original input to stdout unchanged
+- Atomic file writes (tmp + rename)
+- Logs to stderr (not stdout)
+
+**No Environment Variables** - Always enabled, runs on Stop event
 
 ---
 

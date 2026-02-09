@@ -32,7 +32,7 @@ function libRequire(modulePath) {
 
 // Import shared utilities
 const { PROJECT_ROOT: _PROJECT_ROOT } = libRequire(path.join('utils', 'project-root.cjs'));
-const { parseHookInputSync } = libRequire(path.join('utils', 'hook-input.cjs'));
+const { parseHookInputAsync } = libRequire(path.join('utils', 'hook-input.cjs'));
 const { loadConfig } = libRequire(path.join('utils', 'config-loader.cjs'));
 const { appendJsonl } = libRequire(path.join('utils', 'jsonl-utils.cjs'));
 const { createLogger } = libRequire(path.join('utils', 'logger.cjs'));
@@ -86,6 +86,14 @@ const USER_PROMPT_RESULTS_MAX_LINES = Number(process.env.USER_PROMPT_RESULTS_MAX
 let agentCache = null;
 let agentCacheTime = 0;
 const AGENT_CACHE_TTL = 300000; // 5 minutes
+
+// Correction detection patterns
+const CORRECTION_PATTERNS = [
+  /^(no|nope|wrong|incorrect|that's not)/i,
+  /\b(undo|revert|roll\s*back|go back|put it back)\b/i,
+  /\b(that's not what i|i (didn't|did not) (want|ask|mean))\b/i,
+  /\b(start over|try again|do it differently)\b/i,
+];
 
 function debugLog(source, message, err) {
   if (!process.env.DEBUG_HOOKS) return;
@@ -1162,6 +1170,52 @@ function checkEvolutionTrigger(hookInput) {
 }
 
 // =============================================================================
+// Check 6: Correction Detection (Phase 2.1)
+// =============================================================================
+
+/**
+ * Detect user correction patterns in prompt.
+ * Logs corrections to session-metrics.json for adaptive quality gate thresholds.
+ * Non-blocking: always passes through, never exits non-zero.
+ *
+ * @param {string} prompt - User prompt text
+ */
+function checkCorrectionPatterns(prompt) {
+  try {
+    if (!prompt || typeof prompt !== 'string') return;
+
+    const isCorrection = CORRECTION_PATTERNS.some(p => p.test(prompt));
+    if (!isCorrection) return;
+
+    // Log correction to session metrics
+    const metricsFile = path.join(RUNTIME_DIR, 'session-metrics.json');
+    let metrics = { corrections_count: 0, prompt_count: 0 };
+    try {
+      if (fs.existsSync(metricsFile)) {
+        metrics = JSON.parse(fs.readFileSync(metricsFile, 'utf8'));
+      }
+    } catch (_) {
+      /* use defaults */
+    }
+
+    metrics.corrections_count = (metrics.corrections_count || 0) + 1;
+    metrics.lastCorrectionAt = new Date().toISOString();
+
+    // Atomic write
+    const tmpFile = metricsFile + '.tmp';
+    fs.writeFileSync(tmpFile, JSON.stringify(metrics, null, 2));
+    fs.renameSync(tmpFile, metricsFile);
+
+    process.stderr.write(
+      `[Correction Detected] User correction pattern found (total: ${metrics.corrections_count})\n`
+    );
+  } catch (err) {
+    // Non-blocking: fail silently
+    process.stderr.write(`[correction-detection] Error: ${err.message}\n`);
+  }
+}
+
+// =============================================================================
 // Check 5: Memory Health Check (merged logic)
 // =============================================================================
 
@@ -1508,6 +1562,10 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
 
   recordUserPromptResult(result);
 
+  // Correction detection (additive — runs after all existing checks)
+  const userPrompt = input?.prompt || input?.message || '';
+  checkCorrectionPatterns(userPrompt);
+
   return result;
 }
 
@@ -1518,7 +1576,7 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
 async function main() {
   const startTime = Date.now();
   try {
-    const hookInput = parseHookInputSync();
+    const hookInput = await parseHookInputAsync();
 
     if (process.env.SCHEDULER_TICK_ON_PROMPT === 'on') {
       try {
@@ -1581,7 +1639,7 @@ module.exports = {
   runAllChecks,
 
   // Helper exports for testing
-  parseHookInput: parseHookInputSync,
+  parseHookInput: parseHookInputAsync,
   detectTriggers,
   detectPlanningRequirement,
   scoreAgents,
