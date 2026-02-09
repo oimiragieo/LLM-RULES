@@ -7,11 +7,13 @@
 Integrate hybrid search skills (ripgrep, code-semantic-search, code-structural-search) across all 49 agents based on Phase 1 findings. Currently only 11/49 agents (22%) have search skills. This plan adds search capabilities to the remaining 38 agents in a tiered approach, updates the skill catalog, adds search-first guidance, and updates the agent-creator to prevent future gaps.
 
 **Phase 1 Reports Referenced:**
+
 - Architecture review: `.claude/context/reports/architecture/hybrid-search-integration-review-2026-02-09.md`
 - QA validation: `.claude/context/reports/qa/hybrid-search-validation-2026-02-09.md`
 - Agent search usage: `.claude/context/reports/architecture/agent-search-usage-analysis-2026-02-09.md`
 
 **Key Metrics:**
+
 - 40/41 search tests passing (97.6%)
 - 78% of agents (38/49) missing search skills
 - Domain specialists 70x slower for code discovery than core agents
@@ -24,11 +26,11 @@ Integrate hybrid search skills (ripgrep, code-semantic-search, code-structural-s
 
 Agents receive search skills based on how they interact with code:
 
-| Tier | Skills Added | Criteria | Agent Count |
-|------|-------------|----------|-------------|
-| **Tier 3** (Full) | `ripgrep`, `code-semantic-search`, `code-structural-search` | Writes/modifies code, analyzes code patterns | 22 agents |
-| **Tier 2** (Discovery) | `ripgrep`, `code-semantic-search` | Explores code but does not analyze AST patterns | 8 agents |
-| **Tier 1** (Basic) | `ripgrep` | Needs text search but not semantic/structural | 8 agents |
+| Tier                   | Skills Added                                                | Criteria                                        | Agent Count |
+| ---------------------- | ----------------------------------------------------------- | ----------------------------------------------- | ----------- |
+| **Tier 3** (Full)      | `ripgrep`, `code-semantic-search`, `code-structural-search` | Writes/modifies code, analyzes code patterns    | 22 agents   |
+| **Tier 2** (Discovery) | `ripgrep`, `code-semantic-search`                           | Explores code but does not analyze AST patterns | 8 agents    |
+| **Tier 1** (Basic)     | `ripgrep`                                                   | Needs text search but not semantic/structural   | 8 agents    |
 
 **Rationale**: Not every agent needs AST pattern matching. Orchestrators need to find files but not parse code structure. Domain specialists need all three for code-level work.
 
@@ -59,6 +61,7 @@ Update the agent-creator skill to include a search skill checklist during new ag
 #### Agents to Update (Tier 3: ripgrep + code-semantic-search + code-structural-search)
 
 **Backend Specialists (6):**
+
 1. `python-pro` (`.claude/agents/domain/python-pro.md`)
 2. `nodejs-pro` (`.claude/agents/domain/nodejs-pro.md`)
 3. `fastapi-pro` (`.claude/agents/domain/fastapi-pro.md`)
@@ -66,40 +69,25 @@ Update the agent-creator skill to include a search skill checklist during new ag
 5. `java-pro` (`.claude/agents/domain/java-pro.md`)
 6. `php-pro` (`.claude/agents/domain/php-pro.md`)
 
-**Frontend Specialists (4):**
-7. `frontend-pro` (`.claude/agents/domain/frontend-pro.md`)
-8. `nextjs-pro` (`.claude/agents/domain/nextjs-pro.md`)
-9. `sveltekit-expert` (`.claude/agents/domain/sveltekit-expert.md`)
-10. `typescript-pro` (`.claude/agents/domain/typescript-pro.md`)
+**Frontend Specialists (4):** 7. `frontend-pro` (`.claude/agents/domain/frontend-pro.md`) 8. `nextjs-pro` (`.claude/agents/domain/nextjs-pro.md`) 9. `sveltekit-expert` (`.claude/agents/domain/sveltekit-expert.md`) 10. `typescript-pro` (`.claude/agents/domain/typescript-pro.md`)
 
-**Mobile/Desktop Specialists (4):**
-11. `android-pro` (`.claude/agents/domain/android-pro.md`)
-12. `ios-pro` (`.claude/agents/domain/ios-pro.md`)
-13. `expo-mobile-developer` (`.claude/agents/domain/expo-mobile-developer.md`)
-14. `tauri-desktop-developer` (`.claude/agents/domain/tauri-desktop-developer.md`)
+**Mobile/Desktop Specialists (4):** 11. `android-pro` (`.claude/agents/domain/android-pro.md`) 12. `ios-pro` (`.claude/agents/domain/ios-pro.md`) 13. `expo-mobile-developer` (`.claude/agents/domain/expo-mobile-developer.md`) 14. `tauri-desktop-developer` (`.claude/agents/domain/tauri-desktop-developer.md`)
 
-**Data/Specialist Domains (5):**
-15. `data-engineer` (`.claude/agents/domain/data-engineer.md`)
-16. `ai-ml-specialist` (`.claude/agents/domain/ai-ml-specialist.md`)
-17. `web3-blockchain-expert` (`.claude/agents/domain/web3-blockchain-expert.md`)
-18. `scientific-research-expert` (`.claude/agents/domain/scientific-research-expert.md`)
-19. `gamedev-pro` (`.claude/agents/domain/gamedev-pro.md`)
+**Data/Specialist Domains (5):** 15. `data-engineer` (`.claude/agents/domain/data-engineer.md`) 16. `ai-ml-specialist` (`.claude/agents/domain/ai-ml-specialist.md`) 17. `web3-blockchain-expert` (`.claude/agents/domain/web3-blockchain-expert.md`) 18. `scientific-research-expert` (`.claude/agents/domain/scientific-research-expert.md`) 19. `gamedev-pro` (`.claude/agents/domain/gamedev-pro.md`)
 
-**Other Code-Working Specialists (3):**
-20. `graphql-pro` (`.claude/agents/domain/graphql-pro.md`)
-21. `mobile-ux-reviewer` (`.claude/agents/specialized/mobile-ux-reviewer.md`)
-22. `reverse-engineer` -- SKIP (already has all 3 skills)
+**Other Code-Working Specialists (3):** 20. `graphql-pro` (`.claude/agents/domain/graphql-pro.md`) 21. `mobile-ux-reviewer` (`.claude/agents/specialized/mobile-ux-reviewer.md`) 22. `reverse-engineer` -- SKIP (already has all 3 skills)
 
 **Effective count: 21 agents** (reverse-engineer already has search skills)
 
 #### Changes Per Agent
 
 **Frontmatter** -- Add three skills to the `skills:` list:
+
 ```yaml
 skills:
-  - code-semantic-search    # ADD
-  - code-structural-search  # ADD
-  - ripgrep                 # ADD
+  - code-semantic-search # ADD
+  - code-structural-search # ADD
+  - ripgrep # ADD
   # ... existing skills remain
 ```
 
@@ -118,11 +106,11 @@ This agent can search code efficiently using the hybrid search system:
 
 **CLI Alternative**: `pnpm search:code "<query>"` for instant hybrid search (0.2-0.5s for 40k files)
 
-| Tool                   | Speed  | Accuracy | Use Case                  |
-| ---------------------- | ------ | -------- | ------------------------- |
-| ripgrep                | <10ms  | ~70%     | Keyword filtering         |
-| code-semantic-search   | <150ms | ~95%     | General code discovery    |
-| code-structural-search | <50ms  | 100%     | Exact pattern matching    |
+| Tool                   | Speed  | Accuracy | Use Case               |
+| ---------------------- | ------ | -------- | ---------------------- |
+| ripgrep                | <10ms  | ~70%     | Keyword filtering      |
+| code-semantic-search   | <150ms | ~95%     | General code discovery |
+| code-structural-search | <50ms  | 100%     | Exact pattern matching |
 ```
 
 #### Phase 1 Verification Gate
@@ -164,10 +152,11 @@ node -e "const fs=require('fs'); const files=fs.readdirSync('.claude/agents/doma
 #### Changes Per Agent
 
 **Frontmatter** -- Add two skills:
+
 ```yaml
 skills:
-  - code-semantic-search  # ADD
-  - ripgrep               # ADD
+  - code-semantic-search # ADD
+  - ripgrep # ADD
   # ... existing skills remain
 ```
 
@@ -206,27 +195,24 @@ grep -l "ripgrep" .claude/agents/core/planner.md .claude/agents/core/technical-w
 #### Agents to Update (Tier 1: ripgrep only)
 
 **Orchestrators (3):**
+
 1. `master-orchestrator` (`.claude/agents/orchestrators/master-orchestrator.md`)
 2. `evolution-orchestrator` (`.claude/agents/orchestrators/evolution-orchestrator.md`)
 3. `swarm-coordinator` (`.claude/agents/orchestrators/swarm-coordinator.md`)
 
-**C4 Architecture Agents (3):**
-4. `c4-context` (`.claude/agents/specialized/c4-context.md`)
-5. `c4-container` (`.claude/agents/specialized/c4-container.md`)
-6. `c4-component` (`.claude/agents/specialized/c4-component.md`)
+**C4 Architecture Agents (3):** 4. `c4-context` (`.claude/agents/specialized/c4-context.md`) 5. `c4-container` (`.claude/agents/specialized/c4-container.md`) 6. `c4-component` (`.claude/agents/specialized/c4-component.md`)
 
-**Other (2):**
-7. `c4-code` (`.claude/agents/specialized/c4-code.md`) -- already has ripgrep + structural; ADD code-semantic-search only
-8. `party-orchestrator` (`.claude/agents/orchestrators/party-orchestrator.md`)
+**Other (2):** 7. `c4-code` (`.claude/agents/specialized/c4-code.md`) -- already has ripgrep + structural; ADD code-semantic-search only 8. `party-orchestrator` (`.claude/agents/orchestrators/party-orchestrator.md`)
 
 **Effective count: 8 agents** (c4-code gets semantic search added to existing ripgrep/structural)
 
 #### Changes Per Agent
 
 **Frontmatter** -- Add ripgrep (and code-semantic-search for c4-code):
+
 ```yaml
 skills:
-  - ripgrep  # ADD
+  - ripgrep # ADD
   # ... existing skills remain
 ```
 
@@ -264,11 +250,11 @@ grep -l "ripgrep" .claude/agents/specialized/c4-*.md | wc -l
 
 Update the Search section's "Primary Agents" column:
 
-| Skill | Current Primary Agents | New Primary Agents |
-|-------|----------------------|-------------------|
-| `ripgrep` | developer, code-reviewer | **all agents** (49/49) |
-| `code-semantic-search` | developer, architect | **developer, architect, qa, code-reviewer, code-simplifier, security-architect, researcher, reverse-engineer, planner, technical-writer, devops, devops-troubleshooter, database-architect, pm, incident-responder, c4-code, + 21 domain specialists** |
-| `code-structural-search` | developer, code-reviewer | **developer, architect, qa, code-reviewer, code-simplifier, security-architect, researcher, reverse-engineer, c4-code, + 21 domain specialists** |
+| Skill                    | Current Primary Agents   | New Primary Agents                                                                                                                                                                                                                                     |
+| ------------------------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ripgrep`                | developer, code-reviewer | **all agents** (49/49)                                                                                                                                                                                                                                 |
+| `code-semantic-search`   | developer, architect     | **developer, architect, qa, code-reviewer, code-simplifier, security-architect, researcher, reverse-engineer, planner, technical-writer, devops, devops-troubleshooter, database-architect, pm, incident-responder, c4-code, + 21 domain specialists** |
+| `code-structural-search` | developer, code-reviewer | **developer, architect, qa, code-reviewer, code-simplifier, security-architect, researcher, reverse-engineer, c4-code, + 21 domain specialists**                                                                                                       |
 
 For space efficiency, use shorthand like "all code-working agents (30+)" in the catalog table.
 
@@ -338,11 +324,13 @@ Add a "Search Skills Checklist" step to the agent creation workflow:
 Check if the new agent works with code (description contains any of: code, implementation, debugging, infrastructure, deployment, analysis, development, programming, architecture):
 
 If YES, add to frontmatter skills:
+
 - `ripgrep` (always)
 - `code-semantic-search` (if agent explores or discovers code)
 - `code-structural-search` (if agent analyzes or modifies code patterns)
 
 If NO (pure documentation, research, or orchestration agent):
+
 - `ripgrep` (always -- all agents benefit from text search)
 ```
 
@@ -413,6 +401,7 @@ grep -rl "code-structural-search" .claude/agents/ | grep -v _archive | wc -l
 #### Task 6.3: Spot-Check 3 Agent Files
 
 Read and verify YAML parsability + correct skill assignment for:
+
 1. One domain agent (e.g., `python-pro.md`)
 2. One specialized agent (e.g., `devops.md`)
 3. One orchestrator (e.g., `master-orchestrator.md`)
@@ -452,6 +441,7 @@ git commit -m "feat: add hybrid search skills to 36 agents (78% coverage gap fix
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Spawn Command**:
+
 ```
 Task({
   subagent_type: "reflection-agent",
@@ -470,29 +460,29 @@ Task({
 
 ## Risk Assessment
 
-| Risk | Impact | Mitigation | Rollback |
-|------|--------|------------|----------|
-| YAML syntax error in frontmatter | HIGH -- agent file unparseable | Verify YAML after each edit; spot-check | `git checkout -- .claude/agents/<file>` |
-| Body section placed incorrectly | LOW -- cosmetic, does not affect skills | Follow consistent pattern (after last section, before Memory Protocol) | Manual fix |
-| Skill name typo in frontmatter | MEDIUM -- skill invocation fails silently | Use exact names: `ripgrep`, `code-semantic-search`, `code-structural-search` | Grep + fix |
-| Existing agent content overwritten | HIGH -- loss of agent-specific guidance | Use Edit tool (not Write) for modifications | `git checkout -- <file>` |
-| Too many files changed, merge conflict | LOW -- no parallel development on agent files | Commit checkpoint after Phase 5 | `git stash` |
+| Risk                                   | Impact                                        | Mitigation                                                                   | Rollback                                |
+| -------------------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------- |
+| YAML syntax error in frontmatter       | HIGH -- agent file unparseable                | Verify YAML after each edit; spot-check                                      | `git checkout -- .claude/agents/<file>` |
+| Body section placed incorrectly        | LOW -- cosmetic, does not affect skills       | Follow consistent pattern (after last section, before Memory Protocol)       | Manual fix                              |
+| Skill name typo in frontmatter         | MEDIUM -- skill invocation fails silently     | Use exact names: `ripgrep`, `code-semantic-search`, `code-structural-search` | Grep + fix                              |
+| Existing agent content overwritten     | HIGH -- loss of agent-specific guidance       | Use Edit tool (not Write) for modifications                                  | `git checkout -- <file>`                |
+| Too many files changed, merge conflict | LOW -- no parallel development on agent files | Commit checkpoint after Phase 5                                              | `git stash`                             |
 
 ---
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Files Changed | Parallel? |
-|-------|-------|-----------|--------------|-----------|
-| Phase 1 | 21 agent updates (Tier 3) | ~45 min | 21 files | Yes (internal) |
-| Phase 2 | 7 agent updates (Tier 2) | ~20 min | 7 files | Yes (internal) |
-| Phase 3 | 8 agent updates (Tier 1) | ~15 min | 8 files | Yes (internal) |
-| Phase 4 | Catalog + search-first | ~20 min | 4 files | No |
-| Phase 5 | Agent-creator + perf table | ~15 min | 2 files | No |
-| Phase 6 | Quality gates + verify | ~15 min | 0 files | No |
-| Checkpoint | Commit | ~2 min | N/A | No |
-| Phase FINAL | Reflection | ~10 min | Memory files | No |
-| **Total** | **~36 agents + 6 support files** | **~142 min** | **~42 files** | |
+| Phase       | Tasks                            | Est. Time    | Files Changed | Parallel?      |
+| ----------- | -------------------------------- | ------------ | ------------- | -------------- |
+| Phase 1     | 21 agent updates (Tier 3)        | ~45 min      | 21 files      | Yes (internal) |
+| Phase 2     | 7 agent updates (Tier 2)         | ~20 min      | 7 files       | Yes (internal) |
+| Phase 3     | 8 agent updates (Tier 1)         | ~15 min      | 8 files       | Yes (internal) |
+| Phase 4     | Catalog + search-first           | ~20 min      | 4 files       | No             |
+| Phase 5     | Agent-creator + perf table       | ~15 min      | 2 files       | No             |
+| Phase 6     | Quality gates + verify           | ~15 min      | 0 files       | No             |
+| Checkpoint  | Commit                           | ~2 min       | N/A           | No             |
+| Phase FINAL | Reflection                       | ~10 min      | Memory files  | No             |
+| **Total**   | **~36 agents + 6 support files** | **~142 min** | **~42 files** |                |
 
 ---
 
@@ -501,31 +491,37 @@ Task({
 The following tasks map to the existing task list:
 
 **Task #53 (Developer)**: Implement Phases 1-6 of this plan
+
 - Target Agent: `developer`
 - Recommended Skills: `ripgrep`, `verification-before-completion`
 - Scope: 36 agent file updates + 4 catalog/skill updates + 2 search-first additions
 - Verification: Lint/format pass, agent counts match, YAML valid
 
 **Task #54 (Code-Reviewer)**: Review all changes from Task #53
+
 - Target Agent: `code-reviewer`
 - Recommended Skills: `code-analyzer`, `checklist-generator`
 - Focus: YAML consistency, search section formatting, no accidental content deletion
 
 **Task #55 (QA)**: Final validation
+
 - Target Agent: `qa`
 - Recommended Skills: `verification-before-completion`, `checklist-generator`
 - Focus: Run search tests (40/41 should still pass), verify agent file integrity
 
 **Task #56 (DevOps)**: Commit and push
+
 - Target Agent: `devops`
 - Recommended Skills: `git-expert`, `verification-before-completion`
 
 **Task #57 (Technical-Writer)**: Update documentation
+
 - Target Agent: `technical-writer`
 - Recommended Skills: `doc-generator`, `writing-skills`
 - Focus: Update any architecture docs referencing search coverage
 
 **Task #58 (Reflection)**: Session reflection
+
 - Target Agent: `reflection-agent`
 - Recommended Skills: `insight-extraction`
 
@@ -566,6 +562,7 @@ skills:
 ### Batch Efficiency
 
 Group edits by directory:
+
 1. All `.claude/agents/domain/*.md` files (21 files -- Tier 3)
 2. All `.claude/agents/core/*.md` files (3 files -- Tier 2: planner, technical-writer, pm)
 3. All `.claude/agents/specialized/*.md` files (4 files -- Tier 2: devops, troubleshooter, database-architect, incident-responder)
@@ -589,11 +586,11 @@ This agent can search code efficiently using the hybrid search system:
 
 **CLI Alternative**: `pnpm search:code "<query>"` for instant hybrid search (0.2-0.5s for 40k files)
 
-| Tool                   | Speed  | Accuracy | Use Case                  |
-| ---------------------- | ------ | -------- | ------------------------- |
-| ripgrep                | <10ms  | ~70%     | Keyword filtering         |
-| code-semantic-search   | <150ms | ~95%     | General code discovery    |
-| code-structural-search | <50ms  | 100%     | Exact pattern matching    |
+| Tool                   | Speed  | Accuracy | Use Case               |
+| ---------------------- | ------ | -------- | ---------------------- |
+| ripgrep                | <10ms  | ~70%     | Keyword filtering      |
+| code-semantic-search   | <150ms | ~95%     | General code discovery |
+| code-structural-search | <50ms  | 100%     | Exact pattern matching |
 ```
 
 **Tier 2 Body Section** (for discovery agents):

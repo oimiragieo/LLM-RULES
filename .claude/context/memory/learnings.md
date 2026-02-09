@@ -534,6 +534,30 @@ When creating any agent that works with code (description contains "code|impleme
 
 ---
 
+## External Architecture Comparison: ACCS vs AS (2026-02-09)
+
+**Finding:** Comprehensive comparison of VoltAgent/awesome-claude-code-subagents (128 agents, catalog architecture) vs agent-studio (49 agents, enterprise orchestration architecture) reveals complementary patterns.
+
+**Key Takeaways:**
+
+1. **ACCS is a library, AS is a framework.** ACCS optimizes for breadth/simplicity (copy file, use agent); AS optimizes for depth/governance (routing, enforcement, memory, evolution). They are complementary, not competitive.
+
+2. **ACCS has 2.6x more agents but no runtime infrastructure.** 128 agents vs 49, but ACCS has zero enforcement hooks, zero memory persistence, zero task tracking, zero skill composition. Many ACCS agents describe fictional capabilities in their prompts ("Managing 2.3M contexts with 47ms retrieval").
+
+3. **Prompt fiction anti-pattern:** ACCS agents include elaborate JSON communication protocols and performance metrics that are not implemented. AS should ensure agent descriptions always match actual capabilities (implemented infrastructure or delegated skills).
+
+4. **ACCS distribution model is superior:** Plugin marketplace (.claude-plugin/marketplace.json), interactive installer, agent-installer meta-agent, catalog slash commands. AS lacks all of these. Agent discovery is a genuine gap.
+
+5. **Worth adopting from ACCS (P1):** Agent catalog slash commands, category README documentation with Quick Selection Guide tables.
+
+6. **Worth adopting from ACCS (P2):** Plugin marketplace metadata, 7 genuinely useful agent types (chaos-engineer, accessibility-tester, performance-engineer, llm-architect, legacy-modernizer, mcp-developer, compliance-auditor), tool assignment philosophy documentation.
+
+7. **AS advantages to protect:** Enforcement hooks, memory persistence, skill composition, task tracking, creator lifecycle. These are the core differentiators.
+
+**Report:** `.claude/context/reports/architecture/awesome-claude-code-comparison-2026-02-09.md`
+
+---
+
 ## Documentation Update for Hybrid Search Integration (Task #57, 2026-02-09)
 
 **Pattern:** Documentation updates should focus on user-facing references, not exhaustive coverage in every file.

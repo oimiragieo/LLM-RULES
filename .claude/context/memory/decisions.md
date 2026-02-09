@@ -1,3 +1,47 @@
+## ADR-090: ACCS Integration Strategy -- Catalog Discovery + Selective Agent Adoption
+
+**Date:** 2026-02-09
+
+**Status:** Proposed
+
+**Context:**
+
+Comparison of VoltAgent/awesome-claude-code-subagents (128 agents, catalog architecture) against agent-studio (49 agents, enterprise orchestration) reveals complementary patterns. ACCS has superior agent discovery UX and broader domain coverage. AS has superior runtime infrastructure (enforcement, memory, skills, task tracking). See full report at `.claude/context/reports/architecture/awesome-claude-code-comparison-2026-02-09.md`.
+
+**Decision:**
+
+1. **Agent Catalog Discovery (P1):** Create `.claude/commands/agent-catalog/` with search, list, fetch slash commands. Use `agent-registry.json` as data source. Modeled after ACCS `subagent-catalog` tool pattern.
+
+2. **Category README Documentation (P1):** Add README.md files to `.claude/agents/core/`, `.claude/agents/domain/`, `.claude/agents/specialized/`, `.claude/agents/orchestrators/` with Quick Selection Guide tables and Common Combinations sections. Modeled after ACCS category README pattern.
+
+3. **Selective Agent Adoption (P2):** Create 7 new agents via agent-creator workflow: chaos-engineer, accessibility-tester, performance-engineer, llm-architect, legacy-modernizer, mcp-developer, compliance-auditor. These fill genuine capability gaps. Do NOT adopt ACCS agents that duplicate existing AS capabilities (context-manager, agent-organizer, multi-agent-coordinator, task-distributor, performance-monitor, error-coordinator, knowledge-synthesizer).
+
+4. **Do NOT adopt ACCS patterns that conflict with AS architecture:** No removal of enforcement hooks. No prompt-fiction (capabilities described without implementation). No communication protocols without infrastructure.
+
+**Alternatives Considered:**
+
+1. **Wholesale import of ACCS agents:** Rejected. ACCS agents lack memory protocol, task tracking, skill invocation. Importing them directly would create 128 agents that bypass all AS enforcement and quality gates.
+
+2. **Fork ACCS as base, add AS infrastructure:** Rejected. ACCS lacks the directory structure, hook system, and workflow engine. Starting from ACCS would require more work than enhancing AS.
+
+3. **Ignore ACCS entirely:** Rejected. Agent catalog discovery and category documentation patterns are genuinely valuable improvements.
+
+**Rationale:**
+
+- Agent discovery is a real usability gap in AS
+- Category documentation reduces misrouting
+- 7 selected agents fill genuine capability gaps without redundancy
+- Preserving AS enforcement/memory/skills is non-negotiable
+
+**Consequences:**
+
+- Users gain slash-command agent discovery
+- Category READMEs reduce routing confusion
+- 7 new agents expand capability coverage by ~14%
+- No breaking changes to existing architecture
+
+---
+
 ## ADR-085: Template System Overhaul -- Advisory Resolver + Dead Template Cleanup
 
 **Date:** 2026-02-07
