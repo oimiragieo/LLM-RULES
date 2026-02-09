@@ -25,6 +25,9 @@ Complete mapping of creator skills invoked via `Skill()` tool for creating new a
 | **New hook**            | `hook-creator`\*       | `.claude/skills/hook-creator/SKILL.md`                                               |
 | **New template**        | `template-creator`\*   | `.claude/skills/template-creator/SKILL.md`                                           |
 | **New schema**          | `schema-creator`\*     | `.claude/skills/schema-creator/SKILL.md`                                             |
+| **New command**         | `command-creator`\*    | `.claude/skills/creators/command-creator/SKILL.md`                                   |
+| **New rule**            | `rule-creator`\*       | `.claude/skills/creators/rule-creator/SKILL.md`                                      |
+| **New tool**            | `tool-creator`\*       | `.claude/skills/creators/tool-creator/SKILL.md`                                      |
 | **After ANY creation**  | `artifact-integrator`  | Post-creation hook → integration-queue.jsonl → artifact-integrator → follow-up tasks |
 
 \*Spawn a general-purpose agent that invokes the skill via `Skill({ skill: "..." })`.
@@ -39,6 +42,21 @@ This ensures:
 - Minimum 3 external sources consulted
 - Research report generated + saved
 - Design decisions have documented rationale
+
+### Step 0.5: Companion Check
+
+**ALL creator skills now include Step 0.5 (companion check) before creation begins.**
+
+This step uses `companion-check.cjs` library to:
+
+- Load companion matrix from `ecosystem-impact-graph.json`
+- Check which companions already exist for this artifact type
+- Display must-have / should-have / nice-to-have companion checklist
+- Provide awareness of integration requirements BEFORE creation
+
+**Purpose:** Prevent 70% orphan rate by making creators aware of ecosystem dependencies.
+
+**Location:** Between Step 0 (existence check) and Step 1 (research) in all 9 creator skills.
 
 ### Invocation Pattern
 

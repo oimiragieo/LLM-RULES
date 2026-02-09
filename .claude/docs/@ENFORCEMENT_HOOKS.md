@@ -18,19 +18,19 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 
 ## Critical Hooks Overview
 
-| Hook                            | Location                    | Trigger                                           | Default | Key Env Variables                                                                                   |
-| ------------------------------- | --------------------------- | ------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
-| `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task, Edit, Write, NotebookEdit)       | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
-| `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | PreToolUse(Write, Edit) | block   | `CREATOR_GUARD`                                            |
-| `unified-pre-write-hook.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Write, Edit) | block   | Multiple (11 consolidated checks)                          |
-| `bash-command-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)        | block   | `BASH_VALIDATOR_FAIL_OPEN`                                 |
-| `shell-injection-validator.cjs` | `.claude/hooks/safety/`     | PreToolUse(Bash)        | block   | `SHELL_INJECTION_VALIDATOR`                                |
-| `pre-task-unified.cjs`          | `.claude/hooks/routing/`    | PreToolUse(Task)        | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`       |
-| `tool-scope-validator.cjs`      | `.claude/hooks/routing/`    | PreToolUse(All)         | warn    | `TOOL_SCOPE_VALIDATOR`                                     |
-| `reflection-step0-guard.cjs`    | `.claude/hooks/reflection/` | PreToolUse(TaskList)    | warn    | `REFLECTION_STEP0_ENFORCEMENT`                             |
-| `config-model-validator.cjs`    | `.claude/hooks/routing/`    | PreToolUse(Task)        | warn    | `CONFIG_MODEL_VALIDATOR`                                   |
-| `error-tracker-hook.cjs`        | `.claude/hooks/monitoring/` | PostToolUse(All)        | N/A     | None (monitoring only)                                     |
-| `post-creation-integration.cjs` | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate) | warn    | `INTEGRATION_ENFORCEMENT`                                  |
+| Hook                            | Location                    | Trigger                                     | Default | Key Env Variables                                                                                                    |
+| ------------------------------- | --------------------------- | ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task, Edit, Write, NotebookEdit) | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
+| `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | PreToolUse(Write, Edit)                     | block   | `CREATOR_GUARD`                                                                                                      |
+| `unified-pre-write-hook.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Write, Edit)                     | block   | Multiple (11 consolidated checks)                                                                                    |
+| `bash-command-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `BASH_VALIDATOR_FAIL_OPEN`                                                                                           |
+| `shell-injection-validator.cjs` | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `SHELL_INJECTION_VALIDATOR`                                                                                          |
+| `pre-task-unified.cjs`          | `.claude/hooks/routing/`    | PreToolUse(Task)                            | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`                                                                 |
+| `tool-scope-validator.cjs`      | `.claude/hooks/routing/`    | PreToolUse(All)                             | warn    | `TOOL_SCOPE_VALIDATOR`                                                                                               |
+| `reflection-step0-guard.cjs`    | `.claude/hooks/reflection/` | PreToolUse(TaskList)                        | warn    | `REFLECTION_STEP0_ENFORCEMENT`                                                                                       |
+| `config-model-validator.cjs`    | `.claude/hooks/routing/`    | PreToolUse(Task)                            | warn    | `CONFIG_MODEL_VALIDATOR`                                                                                             |
+| `error-tracker-hook.cjs`        | `.claude/hooks/monitoring/` | PostToolUse(All)                            | N/A     | None (monitoring only)                                                                                               |
+| `post-creation-integration.cjs` | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate)                     | warn    | `INTEGRATION_ENFORCEMENT`                                                                                            |
 
 ---
 

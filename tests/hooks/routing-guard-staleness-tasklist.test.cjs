@@ -206,7 +206,10 @@ describe('Fix 3 / Check 8: checkTaskListFirstGate', () => {
 
   it('should warn when Glob used in router mode without TaskList first (default warn)', () => {
     assert.ok(routingGuard, 'Module should be loadable');
-    assert.ok(typeof routingGuard.checkTaskListFirstGate === 'function', 'checkTaskListFirstGate should be exported');
+    assert.ok(
+      typeof routingGuard.checkTaskListFirstGate === 'function',
+      'checkTaskListFirstGate should be exported'
+    );
 
     // Default enforcement is warn
     delete process.env.TASKLIST_FIRST_ENFORCEMENT;

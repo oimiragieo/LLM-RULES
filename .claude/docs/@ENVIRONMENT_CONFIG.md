@@ -48,17 +48,17 @@ All environment-specific settings are managed through the `.env` file located at
 
 ### Enforcement Mode Variables
 
-| Variable                       | Values         | Default | Purpose                                       |
-| ------------------------------ | -------------- | ------- | --------------------------------------------- |
-| `PLANNER_FIRST_ENFORCEMENT`    | block/warn/off | block   | Enforce planner-first routing                 |
-| `CREATOR_GUARD`                | block/warn/off | block   | Enforce creator workflow (Gate 4)             |
-| `SPAWN_PROMPT_VALIDATOR`       | block/warn/off | warn    | Validate spawn prompts                        |
-| `ROUTER_WRITE_GUARD`           | block/warn/off | block   | Block router writes                           |
-| `SECURITY_REVIEW_ENFORCEMENT`  | block/warn/off | block   | Enforce security reviews                      |
-| `RESEARCH_ENFORCEMENT`         | block/warn/off | block   | Enforce research before creation              |
-| `REFLECTION_STEP0_ENFORCEMENT` | block/warn/off | block   | Enforce reflection Step 0 guard               |
-| `TASKLIST_FIRST_ENFORCEMENT`   | block/warn/off | warn    | Enforce TaskList() before Task()              |
-| `STATE_STALE_THRESHOLD_MS`     | number         | 600000  | State staleness threshold in ms (10 minutes)  |
+| Variable                       | Values         | Default | Purpose                                      |
+| ------------------------------ | -------------- | ------- | -------------------------------------------- |
+| `PLANNER_FIRST_ENFORCEMENT`    | block/warn/off | block   | Enforce planner-first routing                |
+| `CREATOR_GUARD`                | block/warn/off | block   | Enforce creator workflow (Gate 4)            |
+| `SPAWN_PROMPT_VALIDATOR`       | block/warn/off | warn    | Validate spawn prompts                       |
+| `ROUTER_WRITE_GUARD`           | block/warn/off | block   | Block router writes                          |
+| `SECURITY_REVIEW_ENFORCEMENT`  | block/warn/off | block   | Enforce security reviews                     |
+| `RESEARCH_ENFORCEMENT`         | block/warn/off | block   | Enforce research before creation             |
+| `REFLECTION_STEP0_ENFORCEMENT` | block/warn/off | block   | Enforce reflection Step 0 guard              |
+| `TASKLIST_FIRST_ENFORCEMENT`   | block/warn/off | warn    | Enforce TaskList() before Task()             |
+| `STATE_STALE_THRESHOLD_MS`     | number         | 600000  | State staleness threshold in ms (10 minutes) |
 
 **Enforcement Modes:**
 

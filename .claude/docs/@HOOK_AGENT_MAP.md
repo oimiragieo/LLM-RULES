@@ -14,53 +14,53 @@ This document provides a comprehensive mapping between enforcement hooks and age
 
 This table shows which hooks apply to which agent archetypes. Hooks are triggered by tool usage, so the mapping follows tool permissions.
 
-| Hook                                                                            | Router | Implementer | Reviewer | Documenter | Orchestrator | Researcher |
-| ------------------------------------------------------------------------------- | ------ | ----------- | -------- | ---------- | ------------ | ---------- |
-| **Universal (PreToolUse All)**                                                  |
-| `session-cleanup.cjs`                                                           | x      | x           | x        | x          | x            | x          |
-| `execution-limit-monitor-hook.cjs`                                              | x      | x           | x        | x          | x            | x          |
-| `tool-scope-validator.cjs`                                                      | x      | x           | x        | x          | x            | x          |
-| **Router / Task Tools**                                                         |
+| Hook                                                                                           | Router | Implementer | Reviewer | Documenter | Orchestrator | Researcher |
+| ---------------------------------------------------------------------------------------------- | ------ | ----------- | -------- | ---------- | ------------ | ---------- |
+| **Universal (PreToolUse All)**                                                                 |
+| `session-cleanup.cjs`                                                                          | x      | x           | x        | x          | x            | x          |
+| `execution-limit-monitor-hook.cjs`                                                             | x      | x           | x        | x          | x            | x          |
+| `tool-scope-validator.cjs`                                                                     | x      | x           | x        | x          | x            | x          |
+| **Router / Task Tools**                                                                        |
 | `routing-guard.cjs` (Task, TaskCreate, Edit, Write, NotebookEdit, Bash, Glob, Grep, WebSearch) | x      | x           | x        |            | x            | x          |
-| `intent-agent-match.cjs` (PreToolUse Task)                                      | x      |             |          |            | x            |            |
-| `spawn-prompt-assembler.cjs` (PreToolUse Task)                                  | x      |             |          |            | x            |            |
-| `pre-task-unified.cjs` (PreToolUse Task)                                        | x      |             |          |            | x            |            |
-| `config-model-validator.cjs` (PreToolUse Task)                                  | x      |             |          |            | x            |            |
-| `spawn-prompt-validator.cjs` (PreToolUse Task)                                  | x      |             |          |            | x            |            |
-| `reflection-step0-guard.cjs` (PreToolUse TaskList)                              | x      | x           | x        | x          | x            | x          |
-| `task-status-enforcement.cjs` (PreToolUse TaskUpdate)                           | x      | x           | x        | x          | x            | x          |
-| `pre-completion-validation.cjs` (PreToolUse TaskUpdate)                         |        | x           | x        | x          |              | x          |
-| **Bash Tools (Implementers Only)**                                              |
-| `bash-command-validator.cjs` (PreToolUse Bash)                                  |        | x           | x        |            |              | x          |
-| `shell-injection-validator.cjs` (PreToolUse Bash)                               |        | x           | x        |            |              | x          |
-| `windows-null-sanitizer.cjs` (PreToolUse Bash)                                  |        | x           | x        |            |              | x          |
-| **Write/Edit Tools (Implementers + Documenters)**                               |
-| `unified-creator-guard.cjs` (PreToolUse Write/Edit)                             |        | x           |          | x          |              |            |
-| `unified-pre-write-hook.cjs` (PreToolUse Write/Edit)                            |        | x           |          | x          |              |            |
-| `evolution-state-guard.cjs` (PreToolUse Write/Edit)                             |        | x           |          | x          |              |            |
-| `research-enforcement.cjs` (PreToolUse Write/Edit)                              |        | x           |          | x          |              |            |
-| `quality-gate-validator.cjs` (PreToolUse Write/Edit, TaskUpdate)                |        | x           |          | x          |              |            |
-| `conflict-detector.cjs` (PreToolUse Write)                                      |        | x           |          | x          |              |            |
-| **Read Tools (All with Read Access)**                                           |
-| `validate-skill-invocation.cjs` (PreToolUse Read)                               | x      | x           | x        | x          | x            | x          |
-| **PostToolUse Hooks (Monitoring)**                                              |
-| `metrics-collector-hook.cjs` (PostToolUse All)                                  | x      | x           | x        | x          | x            | x          |
-| `error-tracker-hook.cjs` (PostToolUse All)                                      | x      | x           | x        | x          | x            | x          |
-| `anomaly-detector.cjs` (PostToolUse All)                                        | x      | x           | x        | x          | x            | x          |
-| `post-task-unified.cjs` (PostToolUse Task)                                      | x      |             |          |            | x            |            |
-| `task-list-tracker.cjs` (PostToolUse TaskList)                                  | x      | x           | x        | x          | x            | x          |
-| `post-completion-chain.cjs` (PostToolUse TaskUpdate)                            |        | x           | x        | x          |              | x          |
-| `sync-memory-index.cjs` (PostToolUse Write/Edit/MemoryRecord)                   |        | x           |          | x          |              |            |
-| `code-index-updater.cjs` (PostToolUse Write/Edit)                               |        | x           |          | x          |              |            |
-| **Reflection Hooks**                                                            |
-| `unified-reflection-handler.cjs` (PostToolUse Task/TaskUpdate/Bash, SessionEnd) | x      | x           | x        | x          | x            | x          |
-| `reflection-queue-processor.cjs` (SessionEnd)                                   | x      | x           | x        | x          | x            | x          |
-| **User Prompt Hooks (Router Only)**                                             |
-| `state-reset.cjs` (UserPromptSubmit)                                            | x      |             |          |            |              |            |
-| `user-prompt-unified.cjs` (UserPromptSubmit)                                    | x      |             |          |            |              |            |
-| `force-step0-execution.cjs` (UserPromptSubmit)                                  | x      |             |          |            |              |            |
-| **Stop Hooks**                                                                  |
-| `check-console-log.cjs` (Stop)                                                  | x      | x           | x        | x          | x            | x          |
+| `intent-agent-match.cjs` (PreToolUse Task)                                                     | x      |             |          |            | x            |            |
+| `spawn-prompt-assembler.cjs` (PreToolUse Task)                                                 | x      |             |          |            | x            |            |
+| `pre-task-unified.cjs` (PreToolUse Task)                                                       | x      |             |          |            | x            |            |
+| `config-model-validator.cjs` (PreToolUse Task)                                                 | x      |             |          |            | x            |            |
+| `spawn-prompt-validator.cjs` (PreToolUse Task)                                                 | x      |             |          |            | x            |            |
+| `reflection-step0-guard.cjs` (PreToolUse TaskList)                                             | x      | x           | x        | x          | x            | x          |
+| `task-status-enforcement.cjs` (PreToolUse TaskUpdate)                                          | x      | x           | x        | x          | x            | x          |
+| `pre-completion-validation.cjs` (PreToolUse TaskUpdate)                                        |        | x           | x        | x          |              | x          |
+| **Bash Tools (Implementers Only)**                                                             |
+| `bash-command-validator.cjs` (PreToolUse Bash)                                                 |        | x           | x        |            |              | x          |
+| `shell-injection-validator.cjs` (PreToolUse Bash)                                              |        | x           | x        |            |              | x          |
+| `windows-null-sanitizer.cjs` (PreToolUse Bash)                                                 |        | x           | x        |            |              | x          |
+| **Write/Edit Tools (Implementers + Documenters)**                                              |
+| `unified-creator-guard.cjs` (PreToolUse Write/Edit)                                            |        | x           |          | x          |              |            |
+| `unified-pre-write-hook.cjs` (PreToolUse Write/Edit)                                           |        | x           |          | x          |              |            |
+| `evolution-state-guard.cjs` (PreToolUse Write/Edit)                                            |        | x           |          | x          |              |            |
+| `research-enforcement.cjs` (PreToolUse Write/Edit)                                             |        | x           |          | x          |              |            |
+| `quality-gate-validator.cjs` (PreToolUse Write/Edit, TaskUpdate)                               |        | x           |          | x          |              |            |
+| `conflict-detector.cjs` (PreToolUse Write)                                                     |        | x           |          | x          |              |            |
+| **Read Tools (All with Read Access)**                                                          |
+| `validate-skill-invocation.cjs` (PreToolUse Read)                                              | x      | x           | x        | x          | x            | x          |
+| **PostToolUse Hooks (Monitoring)**                                                             |
+| `metrics-collector-hook.cjs` (PostToolUse All)                                                 | x      | x           | x        | x          | x            | x          |
+| `error-tracker-hook.cjs` (PostToolUse All)                                                     | x      | x           | x        | x          | x            | x          |
+| `anomaly-detector.cjs` (PostToolUse All)                                                       | x      | x           | x        | x          | x            | x          |
+| `post-task-unified.cjs` (PostToolUse Task)                                                     | x      |             |          |            | x            |            |
+| `task-list-tracker.cjs` (PostToolUse TaskList)                                                 | x      | x           | x        | x          | x            | x          |
+| `post-completion-chain.cjs` (PostToolUse TaskUpdate)                                           |        | x           | x        | x          |              | x          |
+| `sync-memory-index.cjs` (PostToolUse Write/Edit/MemoryRecord)                                  |        | x           |          | x          |              |            |
+| `code-index-updater.cjs` (PostToolUse Write/Edit)                                              |        | x           |          | x          |              |            |
+| **Reflection Hooks**                                                                           |
+| `unified-reflection-handler.cjs` (PostToolUse Task/TaskUpdate/Bash, SessionEnd)                | x      | x           | x        | x          | x            | x          |
+| `reflection-queue-processor.cjs` (SessionEnd)                                                  | x      | x           | x        | x          | x            | x          |
+| **User Prompt Hooks (Router Only)**                                                            |
+| `state-reset.cjs` (UserPromptSubmit)                                                           | x      |             |          |            |              |            |
+| `user-prompt-unified.cjs` (UserPromptSubmit)                                                   | x      |             |          |            |              |            |
+| `force-step0-execution.cjs` (UserPromptSubmit)                                                 | x      |             |          |            |              |            |
+| **Stop Hooks**                                                                                 |
+| `check-console-log.cjs` (Stop)                                                                 | x      | x           | x        | x          | x            | x          |
 
 **Agent Archetype Definitions:**
 
