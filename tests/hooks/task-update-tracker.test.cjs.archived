@@ -8,7 +8,7 @@
 'use strict';
 
 const _assert = require('assert');
-const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
 // Test utilities
 let testsPassed = 0;

@@ -171,7 +171,7 @@ describe('checkRouterModeReset', () => {
 
   it('should reset state for normal prompts', () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
-    const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+    const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
     // Clear any existing state
     routerState.resetToRouterMode();
@@ -188,7 +188,7 @@ describe('checkRouterModeReset', () => {
   // ===========================================================================
   it('should ALWAYS reset to router mode on new user prompt, even after recent task (ROUTING-002 fix)', () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
-    const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+    const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
     // Simulate: Task was spawned 5 minutes ago (within the old 30-minute window)
     routerState.enterAgentMode('Previous task from user');
@@ -231,7 +231,7 @@ describe('checkRouterModeReset', () => {
 
   it('should allow Glob to be blocked after state reset (end-to-end ROUTING-002)', () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
-    const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+    const routerState = require('../../.claude/lib/routing/router-state.cjs');
     const routingGuard = require('../../.claude/hooks/routing/routing-guard.cjs');
 
     // Step 1: Simulate previous session's agent mode
@@ -561,7 +561,7 @@ describe('backward compatibility', () => {
 describe('ROUTING-003: Session Boundary Detection', () => {
   it('should reset state when session ID changes (stale state from previous session)', () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
-    const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+    const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
     // Step 1: Simulate state from PREVIOUS session
     // This mimics what happens when state file persists between sessions
@@ -626,7 +626,7 @@ describe('ROUTING-003: Session Boundary Detection', () => {
 
   it('should reset state when previous sessionId is null and current is set', () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
-    const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+    const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
     // Step 1: Simulate state with null sessionId (common case)
     routerState.enterAgentMode('Task with null sessionId');
@@ -674,7 +674,7 @@ describe('ROUTING-003: Session Boundary Detection', () => {
 
   it('should NOT flag session boundary when sessionId matches', () => {
     const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
-    const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+    const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
     // Set up state with matching session ID
     const sessionId = 'same-session-12345';

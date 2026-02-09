@@ -17,7 +17,7 @@ const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
 
 const { checkRouterModeReset } = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
-const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
 let originalStateContent = null;
 

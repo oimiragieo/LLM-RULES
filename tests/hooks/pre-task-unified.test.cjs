@@ -17,7 +17,7 @@ const assert = require('node:assert');
 const path = require('path');
 const fs = require('fs');
 const { clearAllCache } = require('../../.claude/lib/utils/state-cache.cjs');
-const routerState = require('../../.claude/hooks/routing/router-state.cjs');
+const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
 // Prevent process.exit from actually exiting during tests
 const originalExit = process.exit;

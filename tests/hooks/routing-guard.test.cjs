@@ -27,7 +27,7 @@ let routingGuard;
 let routerState;
 try {
   routingGuard = require('../../.claude/hooks/routing/routing-guard.cjs');
-  routerState = require('../../.claude/hooks/routing/router-state.cjs');
+  routerState = require('../../.claude/lib/routing/router-state.cjs');
 } catch (_err) {
   routingGuard = null;
   routerState = null;
