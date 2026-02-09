@@ -49,6 +49,62 @@
 
 ---
 
+## 2026-02-09: Security Lint False Positive Fix (TDD Implementation)
+
+**Context:** Pre-commit security hook blocked legitimate commits with false positives:
+1. SEC-012/SEC-013 detecting `eval()` and `new Function()` in documentation/memory files
+2. SEC-020 detecting `http://` in `.schema.json` files (JSON Schema standard URIs)
+
+**Solution Applied (Test-Driven Development):**
+
+1. **RED Phase:** Wrote 5 failing tests:
+   - `testSkipsEvalInDocumentationMarkdown()` - .md files should not flag eval mentions
+   - `testSkipsEvalInMemoryJson()` - .json files should not flag eval mentions
+   - `testSkipsHttpInSchemaJson()` - .schema.json files should not flag http:// URIs
+   - `testStillScansEvalInCodeFiles()` - .js files SHOULD still flag eval
+   - `testStillScansHttpInCodeFiles()` - .js files SHOULD still flag http://
+
+2. **GREEN Phase:** Fixed security-lint.cjs:
+   - Added `codeOnly: true` flag to SEC-012 and SEC-013 rules
+   - Created `isCodeFile()` helper checking extensions: `.js`, `.cjs`, `.mjs`, `.ts`, `.tsx`, `.jsx`, `.py`, `.rb`, `.go`, `.rs`
+   - Modified `scanFile()` to skip `codeOnly` rules for non-code files
+   - Added special case: skip SEC-020 for `.schema.json` files
+   - Added README.md exclusion (documentation that references patterns)
+   - Fixed `/archive/` exclusion (was only checking `/_archive/`)
+
+3. **Verification:** All 25 tests pass, lint clean, format clean, commit succeeded
+
+**Key Learnings:**
+
+1. **Rule Scope Distinction:**
+   - **Code injection patterns** (eval, Function constructor): Only scan actual code files
+   - **Secrets/credentials patterns** (API keys, passwords): Scan ALL files (can leak in any file type)
+   - **Protocol patterns** (http:// vs https://): Context-dependent (schemas need http:// for URIs)
+
+2. **Extension-Based Filtering vs Path-Based:**
+   - Extension filtering: More precise, avoids false positives in docs
+   - Path filtering: Too broad, can miss edge cases
+   - Combine both: Extension for code patterns, path for test/archived files
+
+3. **Schema URI Convention:**
+   - JSON Schema `$schema` field uses `http://json-schema.org/...` by convention
+   - Not a security issue (schemas are local files, not HTTP requests)
+   - Exception needed for `.schema.json` files on SEC-020
+
+4. **Test Coverage for False Positives:**
+   - Must test BOTH sides: false positives (should not flag) AND true positives (should still flag)
+   - Without "still scans code files" tests, could accidentally disable all scanning
+
+**Files Modified:**
+- `.claude/tools/cli/security-lint.cjs`: Added codeOnly flag, isCodeFile(), schema/README exclusions
+- `tests/tools/cli/security-lint.test.cjs`: Added 5 new tests (20 → 25 total)
+
+**Cross-Reference:**
+- TDD skill: `.claude/skills/tdd/SKILL.md` (Red-Green-Refactor cycle)
+- Security rules: `.claude/rules/security.md` (OWASP Top 10)
+
+**Memory Takeaway:** Security linters need context-aware exclusions. Code injection patterns (eval, Function) should only scan code files, not documentation. JSON Schema URIs conventionally use `http://` - not a security risk. Always test both false positives AND true positives to ensure exclusions don't disable scanning entirely.
+
 ## Schema Security Hardening (2026-02-09)
 
 **Context:** Task #1 - Schemas Modernization Phase. Hardening 27 schemas with maxLength/maxItems bounds to prevent DoS attacks.
