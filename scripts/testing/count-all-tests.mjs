@@ -11,6 +11,7 @@ let totalTests = 0;
 let totalPass = 0;
 let totalFail = 0;
 let totalSkip = 0;
+const failedFiles = [];
 
 const results = [];
 
@@ -42,6 +43,17 @@ for (const file of testFiles) {
     });
   } catch (error) {
     console.error(`Error running ${file}:`, error.message);
+    // Track failed files - they count as 0 passing tests
+    failedFiles.push(file.replace(/^tests[\\/]/, ''));
+    results.push({
+      file: file.replace(/^tests[\\/]/, ''),
+      tests: 0,
+      pass: 0,
+      fail: 0,
+      skip: 0,
+      passRate: '0.0',
+      error: true,
+    });
   }
 }
 
@@ -52,7 +64,7 @@ console.log('|-----------|-------|------|------|------|-----------|');
 results
   .sort((a, b) => a.file.localeCompare(b.file))
   .forEach(r => {
-    const icon = r.fail > 0 ? '❌' : r.tests === r.pass ? '✅' : '⚠️';
+    const icon = r.error ? '💥' : r.fail > 0 ? '❌' : r.tests === r.pass ? '✅' : '⚠️';
     console.log(
       `| ${icon} ${r.file.padEnd(45)} | ${r.tests.toString().padStart(5)} | ${r.pass.toString().padStart(4)} | ${r.fail.toString().padStart(4)} | ${r.skip.toString().padStart(4)} | ${r.passRate}% |`
     );
@@ -64,11 +76,22 @@ console.log(
 );
 
 console.log(`\n## Summary Stats\n`);
+console.log(`- Total test files: ${testFiles.length}`);
+console.log(`- Failed to load/run: ${failedFiles.length}`);
+if (failedFiles.length > 0) {
+  console.log(`  - Failed files: ${failedFiles.join(', ')}`);
+}
 console.log(`- Total tests: ${totalTests}`);
-console.log(`- Passing: ${totalPass} (${((totalPass / totalTests) * 100).toFixed(1)}%)`);
-console.log(`- Failing: ${totalFail} (${((totalFail / totalTests) * 100).toFixed(1)}%)`);
-console.log(`- Skipped: ${totalSkip} (${((totalSkip / totalTests) * 100).toFixed(1)}%)`);
+console.log(
+  `- Passing: ${totalPass} (${totalTests > 0 ? ((totalPass / totalTests) * 100).toFixed(1) : '0.0'}%)`
+);
+console.log(
+  `- Failing: ${totalFail} (${totalTests > 0 ? ((totalFail / totalTests) * 100).toFixed(1) : '0.0'}%)`
+);
+console.log(
+  `- Skipped: ${totalSkip} (${totalTests > 0 ? ((totalSkip / totalTests) * 100).toFixed(1) : '0.0'}%)`
+);
 console.log(`- Target: 95%+ pass rate`);
 console.log(
-  `- Status: ${(totalPass / totalTests) * 100 >= 95 ? '✅ TARGET MET' : `⚠️ NEEDS ${Math.ceil(totalTests * 0.95 - totalPass)} MORE PASSING`}`
+  `- Status: ${totalTests > 0 && (totalPass / totalTests) * 100 >= 95 ? '✅ TARGET MET' : `⚠️ NEEDS ${totalTests > 0 ? Math.ceil(totalTests * 0.95 - totalPass) : 'N/A'} MORE PASSING`}`
 );

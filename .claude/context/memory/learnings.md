@@ -1,3 +1,47 @@
+## Test Cleanup - Obsolete Test Removal (2026-02-09)
+
+**Finding**: 6 test files were testing modules/features that were archived or never implemented.
+
+**Removed Tests**:
+1. `tests/hooks/bash-cwd-validator.test.cjs` - Hook functionality consolidated into `pre-tool-unified.cjs` during 2026-02-08 consolidation
+2. `tests/git-notes-audit.test.cjs` - Module archived to stub (only `verifyNote()` remains, test expected `execute()`, `computeVerificationHash()`, etc.)
+3. `tests/code-styleguides.test.cjs` - Expected `.claude/context/artifacts/code-styleguides/` directory that was never created
+4. `tests/agents/memory-integration.test.cjs` - Tested archived agent modules (`orchestrator.cjs`, `factory.cjs`, `base-agent.cjs` in `.claude/lib/_archive/agents/`)
+5. `tests/lib/spawn/prompt-factory-security.test.cjs` - Tested archived spawn module
+6. `tests/lib/spawn/prompt-factory.test.cjs` - Tested archived spawn module
+
+**Resolution**: Removed all 6 obsolete test files. Tests were failing because modules were archived (moved to `_archive/`) or features were never implemented.
+
+**Quality Gates**: ✅ `pnpm lint:fix` passed (0 errors), ✅ `pnpm format` passed (no changes)
+
+**Test Suite Status**: 1,869 tests total, 1,718 passing (92%), 134 failing (8% pre-existing), 122 test files remaining
+
+**Pattern**: When archiving modules, check for dependent tests via `grep -r "module-name" tests/` and remove/update them. Test discovery:
+```bash
+grep -r "orchestrator.cjs\|factory.cjs\|base-agent.cjs" tests/ --include="*.test.cjs" -l
+```
+
+**Why Tests Failed**:
+- **Import errors**: Tests importing archived modules throw `MODULE_NOT_FOUND`
+- **Missing files**: Tests expecting files that don't exist throw `ENOENT`
+- **Stub mismatches**: Tests expecting full API from stub modules throw `TypeError: X is not a function`
+
+**Cross-Reference**: Hook consolidation documented in git log (2026-02-08), agent module archival in `.claude/lib/_archive/agents/README.md`
+
+---
+
+## Agent Config Sync (2026-02-09)
+
+**Finding**: agent-config.json had 49 agents while agent-registry.json had 59 agents (10 missing).
+
+**Missing agents**: accessibility-tester, api-designer, chaos-engineer, llm-architect, mcp-developer, microservices-architect, penetration-tester, performance-engineer, prompt-engineer, sre-engineer
+
+**Resolution**: Added all 10 missing agents to agent-config.json with sensible defaults (sonnet for standard agents, opus for complex/architect/security agents). All agents verified to exist on disk. Model resolution tested successfully via `resolveAgentModel()`.
+
+**Pattern**: When agent-registry.json is updated (e.g., by agent-creator), agent-config.json must be synced manually. Consider adding automated sync validation in CI or pre-commit hooks.
+
+---
+
 - Vector-only: 100ms, 85% accuracy (semantic similarity)
 - Hybrid (BM25+vector+rerank): 150ms, 95% accuracy
 - Current: BM25 implemented but disabled (LANCEDB_EMBEDDING_MODE=off)
@@ -52,6 +96,7 @@
 ## 2026-02-09: Security Lint False Positive Fix (TDD Implementation)
 
 **Context:** Pre-commit security hook blocked legitimate commits with false positives:
+
 1. SEC-012/SEC-013 detecting `eval()` and `new Function()` in documentation/memory files
 2. SEC-020 detecting `http://` in `.schema.json` files (JSON Schema standard URIs)
 
@@ -96,10 +141,12 @@
    - Without "still scans code files" tests, could accidentally disable all scanning
 
 **Files Modified:**
+
 - `.claude/tools/cli/security-lint.cjs`: Added codeOnly flag, isCodeFile(), schema/README exclusions
 - `tests/tools/cli/security-lint.test.cjs`: Added 5 new tests (20 → 25 total)
 
 **Cross-Reference:**
+
 - TDD skill: `.claude/skills/tdd/SKILL.md` (Red-Green-Refactor cycle)
 - Security rules: `.claude/rules/security.md` (OWASP Top 10)
 

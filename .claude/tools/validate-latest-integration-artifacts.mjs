@@ -47,14 +47,32 @@ function validateSchemaFiles() {
 }
 
 function main() {
-  if (jsonOutput) {
-    console.log('{}');
-    return;
-  }
-
   log('🔍 Validating Latest Integration Artifacts\n');
 
   const schemasValid = validateSchemaFiles();
+
+  if (jsonOutput) {
+    // JSON mode: return actual validation results
+    const schemasDir = resolve(rootDir, '.claude/schemas');
+    const schemaFiles = existsSync(schemasDir)
+      ? readdirSync(schemasDir).filter(f => f.endsWith('.json'))
+      : [];
+
+    console.log(
+      JSON.stringify(
+        {
+          success: schemasValid,
+          totalSchemas: schemaFiles.length,
+          validSchemas: schemasValid ? schemaFiles.length : 0,
+          timestamp: new Date().toISOString(),
+        },
+        null,
+        2
+      )
+    );
+    process.exit(schemasValid ? 0 : 1);
+    return;
+  }
 
   if (schemasValid) {
     log('\n✅ All integration artifacts validated successfully!');

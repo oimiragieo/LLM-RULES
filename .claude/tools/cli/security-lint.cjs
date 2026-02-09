@@ -78,6 +78,7 @@ const CONFIG = {
     { pathSubstring: 'generate-tool-manifest.cjs', ruleId: 'SEC-030' }, // CLI diagnostic logging
     { pathSubstring: 'run-workflow-tests.cjs', ruleId: 'SEC-030' }, // CLI test suite help output (not sensitive)
     { pathSubstring: 'tests/migration/', ruleId: 'SEC-011' }, // test harness execSync with controlled input
+    { pathSubstring: 'count-all-tests.mjs', ruleId: 'SEC-011' }, // internal test counter with controlled input
   ],
 
   // Severity levels
@@ -185,6 +186,7 @@ const SECURITY_RULES = [
     pattern: /['"`]http:\/\/(?!localhost|127\.0\.0\.1)/gi,
     description: 'HTTP URL detected (non-localhost)',
     fix: 'Use HTTPS for secure communication',
+    codeOnly: true, // Only scan code files - HTTP refs in docs/memory are informational
   },
   {
     id: 'SEC-021',

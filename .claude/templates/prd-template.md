@@ -27,17 +27,17 @@ We'll know we're right when [measurable outcome].
 ## Success Metrics
 
 | Metric | Target | How Measured |
-|--------|--------|--------------|
-| ... | ... | ... |
+| ------ | ------ | ------------ |
+| ...    | ...    | ...          |
 
 ## Core Capabilities (MoSCoW)
 
 | Priority | Capability | Rationale |
-|----------|-----------|-----------|
-| Must | ... | ... |
-| Should | ... | ... |
-| Could | ... | ... |
-| Won't | ... | ... |
+| -------- | ---------- | --------- |
+| Must     | ...        | ...       |
+| Should   | ...        | ...       |
+| Could    | ...        | ...       |
+| Won't    | ...        | ...       |
 
 ## Users & Context
 
@@ -63,16 +63,16 @@ We'll know we're right when [measurable outcome].
 
 ## Implementation Phases
 
-| # | Phase | Description | Status | Parallel | Depends | Plan Link |
-|---|-------|-------------|--------|----------|---------|-----------|
-| 1 | ... | ... | pending | No | - | - |
-| 2 | ... | ... | pending | No | 1 | - |
+| #   | Phase | Description | Status  | Parallel | Depends | Plan Link |
+| --- | ----- | ----------- | ------- | -------- | ------- | --------- |
+| 1   | ...   | ...         | pending | No       | -       | -         |
+| 2   | ...   | ...         | pending | No       | 1       | -         |
 
 ## Decisions Log
 
 | Decision | Choice | Alternatives | Rationale |
-|----------|--------|-------------|-----------|
-| ... | ... | ... | ... |
+| -------- | ------ | ------------ | --------- |
+| ...      | ...    | ...          | ...       |
 
 ## Research Summary
 
@@ -82,8 +82,8 @@ We'll know we're right when [measurable outcome].
 ## Risks
 
 | Risk | Likelihood | Mitigation |
-|------|-----------|------------|
-| ... | ... | ... |
+| ---- | ---------- | ---------- |
+| ...  | ...        | ...        |
 
 ## Open Questions
 
@@ -91,5 +91,5 @@ We'll know we're right when [measurable outcome].
 
 ---
 
-*Generated: {{DATE}}*
-*Status: {{STATUS}}*
+_Generated: {{DATE}}_
+_Status: {{STATUS}}_

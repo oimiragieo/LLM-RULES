@@ -64,15 +64,15 @@ Generate structured Product Requirements Documents (PRDs) using problem-first, h
 ```javascript
 // Use AskUserQuestion for structured gathering
 const problem = await AskUserQuestion({
-  question: "What problem does this solve? (Be specific about user pain points)"
+  question: 'What problem does this solve? (Be specific about user pain points)',
 });
 
 const evidence = await AskUserQuestion({
-  question: "What evidence shows this problem exists? (Data, feedback, metrics)"
+  question: 'What evidence shows this problem exists? (Data, feedback, metrics)',
 });
 
 const hypothesis = await AskUserQuestion({
-  question: "What measurable outcome will prove this feature solves the problem?"
+  question: 'What measurable outcome will prove this feature solves the problem?',
 });
 ```
 
@@ -162,21 +162,21 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 
 **Success Metrics:**
 
-| Metric | Target | How Measured |
-|--------|--------|--------------|
-| Session timeout complaints | -50% | Support ticket analysis |
-| Mobile DAU | +10% | Analytics dashboard |
-| Token refresh success rate | >95% | Backend logs |
+| Metric                     | Target | How Measured            |
+| -------------------------- | ------ | ----------------------- |
+| Session timeout complaints | -50%   | Support ticket analysis |
+| Mobile DAU                 | +10%   | Analytics dashboard     |
+| Token refresh success rate | >95%   | Backend logs            |
 
 **Core Capabilities (MoSCoW):**
 
-| Priority | Capability | Rationale |
-|----------|-----------|-----------|
-| Must | JWT refresh token endpoint | Required for MVP - enables session extension |
-| Must | Token rotation on refresh | Security best practice |
-| Should | Refresh token revocation | Allows user logout from all devices |
-| Could | Token usage analytics | Nice to have for monitoring |
-| Won't | Biometric auth integration | Out of scope - future consideration |
+| Priority | Capability                 | Rationale                                    |
+| -------- | -------------------------- | -------------------------------------------- |
+| Must     | JWT refresh token endpoint | Required for MVP - enables session extension |
+| Must     | Token rotation on refresh  | Security best practice                       |
+| Should   | Refresh token revocation   | Allows user logout from all devices          |
+| Could    | Token usage analytics      | Nice to have for monitoring                  |
+| Won't    | Biometric auth integration | Out of scope - future consideration          |
 
 **MoSCoW Definitions:**
 
@@ -203,13 +203,13 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 
 **Implementation Phases Table:**
 
-| # | Phase | Description | Status | Parallel | Depends | Plan Link |
-|---|-------|-------------|--------|----------|---------|-----------|
-| 1 | Design | Auth architecture design with refresh token flow | pending | No | - | - |
-| 2 | Backend API | Implement /refresh endpoint with token rotation | pending | No | 1 | - |
-| 3 | Mobile Client | Add refresh logic to mobile SDK | pending | No | 2 | - |
-| 4 | Testing | E2E tests for refresh flows | pending | Yes | 2,3 | - |
-| 5 | Monitoring | Add refresh metrics to dashboard | pending | Yes | 2 | - |
+| #   | Phase         | Description                                      | Status  | Parallel | Depends | Plan Link |
+| --- | ------------- | ------------------------------------------------ | ------- | -------- | ------- | --------- |
+| 1   | Design        | Auth architecture design with refresh token flow | pending | No       | -       | -         |
+| 2   | Backend API   | Implement /refresh endpoint with token rotation  | pending | No       | 1       | -         |
+| 3   | Mobile Client | Add refresh logic to mobile SDK                  | pending | No       | 2       | -         |
+| 4   | Testing       | E2E tests for refresh flows                      | pending | Yes      | 2,3     | -         |
+| 5   | Monitoring    | Add refresh metrics to dashboard                 | pending | Yes      | 2       | -         |
 
 **Phase Columns Explained:**
 
@@ -223,11 +223,11 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 
 **Decisions Log:**
 
-| Decision | Choice | Alternatives | Rationale |
-|----------|--------|-------------|-----------|
-| Token storage | Secure storage (Keychain/KeyStore) | Local storage, Session storage | Security requirement - tokens are sensitive |
-| Refresh strategy | Automatic on 401 | Manual user action | Better UX - transparent to user |
-| Token lifetime | Access: 1hr, Refresh: 30 days | Access: 5min, Refresh: 90 days | Balance security and UX |
+| Decision         | Choice                             | Alternatives                   | Rationale                                   |
+| ---------------- | ---------------------------------- | ------------------------------ | ------------------------------------------- |
+| Token storage    | Secure storage (Keychain/KeyStore) | Local storage, Session storage | Security requirement - tokens are sensitive |
+| Refresh strategy | Automatic on 401                   | Manual user action             | Better UX - transparent to user             |
+| Token lifetime   | Access: 1hr, Refresh: 30 days      | Access: 5min, Refresh: 90 days | Balance security and UX                     |
 
 **Research Summary:**
 
@@ -235,11 +235,13 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 ## Research Summary
 
 **Market Context:**
+
 - Auth0, Firebase use similar refresh token patterns
 - Industry standard: short-lived access + long-lived refresh
 - OWASP recommends token rotation on refresh
 
 **Technical Context:**
+
 - Existing JWT library supports refresh
 - Mobile SDK has secure storage
 - Backend already has session management
@@ -247,11 +249,11 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 
 **Risks:**
 
-| Risk | Likelihood | Mitigation |
-|------|-----------|------------|
-| Token theft | Medium | Use secure storage, rotate on refresh |
-| Refresh loop (invalid token) | Low | Add exponential backoff, max retry limit |
-| Clock skew issues | Low | Use 5min grace period for exp validation |
+| Risk                         | Likelihood | Mitigation                               |
+| ---------------------------- | ---------- | ---------------------------------------- |
+| Token theft                  | Medium     | Use secure storage, rotate on refresh    |
+| Refresh loop (invalid token) | Low        | Add exponential backoff, max retry limit |
+| Clock skew issues            | Low        | Use 5min grace period for exp validation |
 
 **Open Questions:**
 
@@ -275,13 +277,11 @@ const requiredSections = [
   'Success Metrics',
   'Core Capabilities',
   'Implementation Phases',
-  'Decisions Log'
+  'Decisions Log',
 ];
 
 // Verify all present
-const missingRequiredSections = requiredSections.filter(section =>
-  !prdContent.includes(section)
-);
+const missingRequiredSections = requiredSections.filter(section => !prdContent.includes(section));
 
 if (missingRequiredSections.length > 0) {
   throw new Error(`Missing required sections: ${missingRequiredSections.join(', ')}`);
@@ -308,7 +308,7 @@ const filename = `${featureName}-prd-${date}.md`;
 // Write to specs directory
 Write({
   file_path: `.claude/context/artifacts/specs/${filename}`,
-  content: prdContent
+  content: prdContent,
 });
 ```
 
@@ -336,10 +336,10 @@ Write({
 ```markdown
 ## Implementation Phases
 
-| # | Phase | Description | Status | Parallel | Depends | Plan Link |
-|---|-------|-------------|--------|----------|---------|-----------|
-| 1 | Design | Auth architecture | pending | No | - | - |
-| 2 | Backend | /refresh endpoint | pending | No | 1 | - |
+| #   | Phase   | Description       | Status  | Parallel | Depends | Plan Link |
+| --- | ------- | ----------------- | ------- | -------- | ------- | --------- |
+| 1   | Design  | Auth architecture | pending | No       | -       | -         |
+| 2   | Backend | /refresh endpoint | pending | No       | 1       | -         |
 ```
 
 **Planner reads PRD:**
@@ -504,25 +504,25 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 
 ## Success Metrics
 
-| Metric | Target | How Measured |
-|--------|--------|--------------|
-| Session timeout complaints | -50% | Support ticket analysis |
-| Mobile DAU | +10% | Analytics dashboard |
-| Token refresh success rate | >95% | Backend logs |
-| Forced re-auth rate | <10% | Analytics events |
+| Metric                     | Target | How Measured            |
+| -------------------------- | ------ | ----------------------- |
+| Session timeout complaints | -50%   | Support ticket analysis |
+| Mobile DAU                 | +10%   | Analytics dashboard     |
+| Token refresh success rate | >95%   | Backend logs            |
+| Forced re-auth rate        | <10%   | Analytics events        |
 
 ## Core Capabilities (MoSCoW)
 
-| Priority | Capability | Rationale |
-|----------|-----------|-----------|
-| Must | JWT refresh token endpoint | Required for MVP - enables session extension |
-| Must | Token rotation on refresh | Security best practice (OWASP) |
-| Must | Secure token storage (Keychain/KeyStore) | Prevent token theft |
-| Should | Refresh token revocation | Allows user logout from all devices |
-| Should | Token usage analytics | Monitoring and debugging |
-| Could | Configurable token lifetimes | Admin flexibility |
-| Won't | Biometric auth integration | Out of scope - future consideration |
-| Won't | Push notification on token expiry | Nice to have, defer to v2 |
+| Priority | Capability                               | Rationale                                    |
+| -------- | ---------------------------------------- | -------------------------------------------- |
+| Must     | JWT refresh token endpoint               | Required for MVP - enables session extension |
+| Must     | Token rotation on refresh                | Security best practice (OWASP)               |
+| Must     | Secure token storage (Keychain/KeyStore) | Prevent token theft                          |
+| Should   | Refresh token revocation                 | Allows user logout from all devices          |
+| Should   | Token usage analytics                    | Monitoring and debugging                     |
+| Could    | Configurable token lifetimes             | Admin flexibility                            |
+| Won't    | Biometric auth integration               | Out of scope - future consideration          |
+| Won't    | Push notification on token expiry        | Nice to have, defer to v2                    |
 
 ## Users & Context
 
@@ -568,16 +568,19 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 **Feasibility**: HIGH
 
 **Dependencies**:
+
 - Existing JWT library (jsonwebtoken) supports refresh
 - Mobile SDK has secure storage (Keychain/KeyStore)
 - Backend has session management infrastructure
 
 **Integration Points**:
+
 - Mobile SDK (iOS/Android) needs refresh interceptor
 - Backend needs /refresh endpoint
 - Database needs refresh token storage (w/ expiry)
 
 **Architecture Notes**:
+
 - Access token: 1 hour lifetime, stateless (JWT)
 - Refresh token: 30 days lifetime, stateful (stored in DB)
 - Token rotation: each refresh invalidates old token, issues new one
@@ -585,40 +588,43 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 
 ## Implementation Phases
 
-| # | Phase | Description | Status | Parallel | Depends | Plan Link |
-|---|-------|-------------|--------|----------|---------|-----------|
-| 1 | Design | Auth architecture design with refresh token flow | pending | No | - | - |
-| 2 | Backend API | Implement /refresh endpoint with token rotation | pending | No | 1 | - |
-| 3 | Mobile SDK | Add refresh logic to iOS/Android SDK | pending | No | 2 | - |
-| 4 | Testing | E2E tests for refresh flows | pending | Yes | 2,3 | - |
-| 5 | Monitoring | Add refresh metrics to dashboard | pending | Yes | 2 | - |
+| #   | Phase       | Description                                      | Status  | Parallel | Depends | Plan Link |
+| --- | ----------- | ------------------------------------------------ | ------- | -------- | ------- | --------- |
+| 1   | Design      | Auth architecture design with refresh token flow | pending | No       | -       | -         |
+| 2   | Backend API | Implement /refresh endpoint with token rotation  | pending | No       | 1       | -         |
+| 3   | Mobile SDK  | Add refresh logic to iOS/Android SDK             | pending | No       | 2       | -         |
+| 4   | Testing     | E2E tests for refresh flows                      | pending | Yes      | 2,3     | -         |
+| 5   | Monitoring  | Add refresh metrics to dashboard                 | pending | Yes      | 2       | -         |
 
 ## Decisions Log
 
-| Decision | Choice | Alternatives | Rationale |
-|----------|--------|-------------|-----------|
-| Token storage | Secure storage (Keychain/KeyStore) | Local storage, Session storage | Security requirement - tokens are sensitive credentials |
-| Refresh strategy | Automatic on 401 | Manual user action, Proactive refresh | Better UX - transparent to user, no extra UI |
-| Token lifetime | Access: 1hr, Refresh: 30 days | Access: 5min/90min, Refresh: 7/90 days | Balance security (short access) and UX (long refresh) |
-| Token algorithm | RS256 (asymmetric) | HS256 (symmetric) | Enables key rotation, better for distributed systems |
-| Refresh rotation | Always rotate | Rotate on suspicious activity | OWASP best practice, prevents token replay |
-| Storage location | Database | Redis, In-memory | Need persistent storage, DB already available |
+| Decision         | Choice                             | Alternatives                           | Rationale                                               |
+| ---------------- | ---------------------------------- | -------------------------------------- | ------------------------------------------------------- |
+| Token storage    | Secure storage (Keychain/KeyStore) | Local storage, Session storage         | Security requirement - tokens are sensitive credentials |
+| Refresh strategy | Automatic on 401                   | Manual user action, Proactive refresh  | Better UX - transparent to user, no extra UI            |
+| Token lifetime   | Access: 1hr, Refresh: 30 days      | Access: 5min/90min, Refresh: 7/90 days | Balance security (short access) and UX (long refresh)   |
+| Token algorithm  | RS256 (asymmetric)                 | HS256 (symmetric)                      | Enables key rotation, better for distributed systems    |
+| Refresh rotation | Always rotate                      | Rotate on suspicious activity          | OWASP best practice, prevents token replay              |
+| Storage location | Database                           | Redis, In-memory                       | Need persistent storage, DB already available           |
 
 ## Research Summary
 
 **Market Context**:
+
 - Auth0, Firebase, Okta all use refresh token pattern
 - Industry standard: short-lived access + long-lived refresh
 - OWASP recommends token rotation on every refresh
 - JWT RFC 7519 and OAuth 2.0 RFC 6749 define patterns
 
 **Technical Context**:
+
 - Existing backend uses jsonwebtoken library (supports refresh)
 - Mobile SDK has secure storage capabilities
 - Backend has session management and database for token storage
 - Average API latency: 100ms (refresh won't impact UX significantly)
 
 **Feasibility Assessment**: HIGH
+
 - All dependencies available
 - No new infrastructure required
 - Clear implementation path
@@ -626,13 +632,13 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 
 ## Risks
 
-| Risk | Likelihood | Mitigation |
-|------|-----------|------------|
-| Token theft (XSS/MITM) | Medium | Use secure storage, HTTPS only, rotate on refresh |
-| Refresh loop (invalid token) | Low | Add exponential backoff, max 3 retries, fallback to login |
-| Clock skew issues | Low | Use 5min grace period for exp validation |
-| DB performance (token lookups) | Low | Index refresh tokens, implement token cleanup job |
-| Concurrent refresh attempts | Low | Use mutex/lock during refresh, queue pending requests |
+| Risk                           | Likelihood | Mitigation                                                |
+| ------------------------------ | ---------- | --------------------------------------------------------- |
+| Token theft (XSS/MITM)         | Medium     | Use secure storage, HTTPS only, rotate on refresh         |
+| Refresh loop (invalid token)   | Low        | Add exponential backoff, max 3 retries, fallback to login |
+| Clock skew issues              | Low        | Use 5min grace period for exp validation                  |
+| DB performance (token lookups) | Low        | Index refresh tokens, implement token cleanup job         |
+| Concurrent refresh attempts    | Low        | Use mutex/lock during refresh, queue pending requests     |
 
 ## Open Questions
 
@@ -643,8 +649,8 @@ We'll know we're right when session timeout complaints drop by 50% and mobile DA
 
 ---
 
-*Generated: 2026-02-09*
-*Status: Draft*
+_Generated: 2026-02-09_
+_Status: Draft_
 ```
 
 ## Related Skills
