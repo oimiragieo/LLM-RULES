@@ -216,7 +216,7 @@ describe('Embedding Generator Tests', () => {
   });
 
   describe('39.5: Caching', () => {
-    test('getCacheKey generates MD5 hash', () => {
+    test('getCacheKey generates SHA256 hash', () => {
       const gen = new EmbeddingGenerator();
       const key1 = gen.getCacheKey('test');
       const key2 = gen.getCacheKey('test');
@@ -224,7 +224,7 @@ describe('Embedding Generator Tests', () => {
 
       assert.equal(key1, key2, 'Same text should produce same key');
       assert.notEqual(key1, key3, 'Different text should produce different key');
-      assert.equal(key1.length, 32, 'MD5 hash should be 32 characters');
+      assert.equal(key1.length, 64, 'SHA256 hash should be 64 characters');
     });
 
     test('cache stores and retrieves embeddings', { timeout: 60000 }, async () => {

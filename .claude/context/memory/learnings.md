@@ -60,6 +60,7 @@ The archived example shows a method (line 307-314) that accesses directly. The t
 - No existing API documentation
 
 **Project Type**: AI agent framework with:
+
 - Agent definitions (`.claude/agents/`)
 - Skills and workflows (`.claude/skills/`, `.claude/workflows/`)
 - Hooks and tools (`.claude/hooks/`, `.claude/tools/`)
@@ -128,3 +129,83 @@ The archived example shows a method (line 307-314) that accesses directly. The t
 6. API design for payment/inventory/shipping services
 
 **Memory Takeaway**: Product specifications for checkout features require comprehensive coverage of: core flow (cart → payment → confirmation), alternative user paths (guest vs authenticated), error handling (payment, inventory, session), compliance requirements (PCI DSS, GDPR, WCAG), and performance targets. User stories should use Given-When-Then format with specific, measurable acceptance criteria. Include priority levels (Must/Should/Nice-to-Have) and effort estimates for roadmap planning. Document edge cases separately as they often span multiple user stories.
+
+## 2026-02-09: Comprehensive Auth & Authorization Security Audit
+
+**Context**: Full security audit of the authentication, authorization, and enforcement infrastructure covering STRIDE threat modeling, OWASP Top 10, OWASP Agentic AI Top 10 (ASI01/ASI02/ASI06), hook security, memory poisoning, and tool access control.
+
+**Overall Risk Rating**: HIGH
+
+**Key Findings (21 total: 4 Critical, 6 High, 6 Medium, 3 Low, 2 Info)**:
+
+1. **HOOK_FAIL_OPEN Master Kill Switch (CRITICAL, SEC-HOOK-001)**: Single env var `HOOK_FAIL_OPEN=true` disables ALL 5 active enforcement hooks simultaneously (routing-guard:2027, pre-task-unified:779, unified-creator-guard:644, unified-pre-write-hook:511, research-enforcement:195). No access control or tamper-resistant audit trail.
+
+2. **29 Raw JSON.parse in Memory Subsystem (CRITICAL, SEC-MEM-001)**: 10 memory lib files use raw `JSON.parse` without prototype pollution protection. `safeJSONParse` exists in hook-input.cjs but is only used in 2 files. Highest-count file: memory-manager.cjs (11 instances).
+
+3. **Memory Poisoning via Unsanitized Writes (HIGH, SEC-MEM-002, ASI06)**: No content sanitization on memory file writes. All agents read memory as trusted input. Malicious content propagates indefinitely through learnings.md/decisions.md/issues.md.
+
+4. **String-Based Agent Detection Spoofable (HIGH, SEC-ROUTE-001)**: `isPlannerSpawn()` and `isSecuritySpawn()` use `.toLowerCase().includes()` on prompt content (routing-guard.cjs:559-570). Including planner/security keywords in prompt text bypasses gates.
+
+5. **ALWAYS_ALLOWED_WRITE_PATTERNS Too Broad (HIGH, SEC-WRITE-001)**: routing-guard.cjs:533-537 allows ALL writes to `runtime/` and `memory/` directories, enabling any agent to modify state/memory files.
+
+**Positive Findings**:
+
+- Fail-closed default (SEC-008) is properly implemented across all enforcement hooks
+- No `shell:true` in any `child_process.spawn` calls (verified via grep)
+- `eval` and `exec` removed from bash safe commands allowlist
+- Path traversal prevention via `validatePathWithinProject()` is consistently used
+
+**Report**: `.claude/context/reports/security/auth-security-audit-2026-02-09.md`
+
+**Memory Takeaway**: Security audits of multi-agent frameworks must prioritize: (1) enforcement bypass mechanisms (kill switches, env var overrides), (2) shared state integrity (runtime JSON files, memory markdown files), (3) identity verification (agent type detection must use structured metadata, not string matching), (4) memory system as primary attack surface for persistent compromise (ASI06). The most dangerous pattern is a single point of failure that disables multiple independent security controls simultaneously.
+
+## 2026-02-09: Memory Profiling Analysis -- OOM Root Causes Identified
+
+**Context**: Static memory profiling of entire codebase to identify OOM crash root causes.
+
+**Report**: `.claude/context/reports/performance-memory-profiling-analysis-2026-02-09.md`
+
+**Root Cause**: Code indexing subsystem loads ENTIRE BM25 corpus into RAM (`this.documents[]` in bm25-indexer.cjs:91, 50-200MB), serializes to single JSON string (doubling peak memory at vector-store.cjs:176), while async pipeline fragments V8 heap via Promise.race pattern (index-manager.cjs:523-648). Combined with tree-sitter grammars (10-80MB) and ML models (25-100MB), total exceeds 4GB default heap.
+
+**Key Findings (6 CRITICAL, 8 HIGH, 5 MEDIUM)**:
+
+1. **BM25Indexer.documents[] unbounded** (C1): No maxDocuments, stores all term frequencies in memory
+2. **BM25 serialization spike** (C6): JSON.stringify of entire index doubles peak memory
+3. **EmbeddingGenerator.cache unbounded** (C4): new Map() grows without eviction limit
+4. **Async pipeline Promise.race** (C3): V8 heap fragmentation, OOMs at 600+ files
+5. **14+ hook processes per Write** (H3-H4): Each spawns full Node.js process (120-215MB total)
+6. **LanceDB shared stores never evicted** (H2): static Map persists across session
+
+**Proven Working Path**: BM25-only sync fast-path: 1330 files, 19.5s, 120MB peak RSS. The architecture works within bounds when the async pipeline is avoided.
+
+**Memory Takeaway**: Always add max size limits to in-memory caches/collections. Use streaming serialization for large data structures (never JSON.stringify entire corpus). Promise.race with growing Sets causes V8 heap fragmentation. Module-level singletons (new Map(), new EventBus()) persist for session lifetime and need cleanup methods. Tree-sitter grammars are 5-20MB each in native memory (not tracked by V8 heap stats). When code:index:reindex needs --max-old-space-size=32768, the architecture is broken, not the heap limit.
+
+## 2026-02-09: Auth/AuthZ Penetration Test Assessment (14 Findings)
+
+**Context**: Authorized internal penetration test of agent-studio authentication and authorization system. Assessed 10 security-critical files across hooks, routing, memory subsystems.
+
+**Report**: `.claude/context/reports/security/auth-pentest-assessment-2026-02-09.md`
+
+**Key Findings (2 CRITICAL, 5 HIGH, 5 MEDIUM, 2 LOW)**:
+
+1. **CRIT-001 (CVSS 9.1)**: `HOOK_FAIL_OPEN=true` env var bypasses ALL security hooks. Present in routing-guard.cjs, unified-pre-write-hook.cjs, unified-creator-guard.cjs. Single env var defeats entire security framework.
+
+2. **CRIT-002 (CVSS 9.0)**: 11+ env var overrides can individually disable each security check. Setting all to `off` collapses entire framework security.
+
+3. **HIGH-001 (CVSS 8.1)**: router-state.json tampering enables privilege escalation. Any agent with write access to `.claude/context/runtime/` can set `mode: "agent"` to bypass all routing checks.
+
+4. **HIGH-002 (CVSS 7.5)**: active-creators.json state file forgery bypasses creator guard. TTL read from untrusted file.
+
+5. **HIGH-003 (CVSS 7.3)**: Memory file poisoning (OWASP ASI06). All agents read learnings.md before every task. Malicious entries can instruct agents to disable security.
+
+6. **HIGH-004 (CVSS 7.2)**: Shell injection validator has only 7 patterns. Misses dd, mkfs, find -delete, language wrappers (python -c, node -e).
+
+7. **HIGH-005 (CVSS 7.0)**: `source` and `.` in SAFE_COMMANDS_ALLOWLIST enable arbitrary code execution via sourced scripts.
+
+**Positive Security Observations**: Fail-closed defaults, prototype pollution protection (safeJSONParse), atomic writes, optimistic concurrency, deny-by-default commands, defense-in-depth layering, TTL bounds on creator state.
+
+**STRIDE Mapping**: Elevation of Privilege (CRITICAL), Tampering (HIGH), Spoofing (HIGH), DoS (MEDIUM), Info Disclosure (LOW), Repudiation (LOW).
+
+**OWASP Agentic AI**: ASI01 (Agent Goal Hijacking via memory poisoning), ASI02 (Tool Misuse via env var bypass), ASI06 (Memory Poisoning via learnings.md).
+
+**Memory Takeaway**: File-based state management (router-state.json, active-creators.json) is inherently vulnerable to tampering when any agent can write to the state directory. Environment variable overrides create a "kill switch" anti-pattern where each security layer can be independently disabled. Memory protocol (read learnings.md before every task) creates a persistent cross-session attack surface. Defense: sign state files, restrict runtime directory writes, sanitize memory entries, consider removing `off` mode for security-critical checks.

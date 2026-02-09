@@ -19,11 +19,11 @@ const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude/context/agent-regis
 const agentConfig = JSON.parse(fs.readFileSync(AGENT_CONFIG_PATH, 'utf8'));
 const agentRegistry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
 
-test('agent-config.json should have ALL 49 agents from registry', () => {
+test('agent-config.json should have ALL 59 agents from registry', () => {
   const configAgents = Object.keys(agentConfig.agents || {});
   const registryAgents = Object.keys(agentRegistry.agents || {});
 
-  // This test should FAIL initially (8 agents vs 49 agents)
+  // This test should FAIL initially (8 agents vs 59 agents)
   assert.strictEqual(
     configAgents.length,
     registryAgents.length,

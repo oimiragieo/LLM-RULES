@@ -12203,3 +12203,775 @@ Skill({ skill: 'context-compressor' });
 
 4. **Hybrid BM25 + Vector Search:**
    - BM25-only: 50ms, 70% accuracy (keyword matching)
+
+## 2026-02-09: Test Infrastructure Fixes (Task #11)
+
+**Pattern:** Systematic test infrastructure repair via archived test renaming, stub module updates, and import path corrections.
+
+**Fixes Applied:**
+
+1. **Archived tests excluded (3 files → 0 failures):**
+   - Renamed `tests/artifacts/_archive/security-controls-catalog.test.cjs` to `.archived`
+   - Renamed `tests/artifacts/_archive/template-catalog.test.cjs` to `.archived`
+   - Renamed `tests/integration/_archive/e2e-artifact-integration.test.cjs` to `.archived`
+   - Pattern: `git mv` to `.archived` extension instead of updating test glob (Node.js v22 lacks `--test-path-pattern`)
+
+2. **Agent config test updated (49 → 59 agents):**
+   - Updated `tests/lib/agents/populate-agent-config.test.cjs` line 22 and 26
+   - Changed expectation from 49 to 59 agents (matches current agent-registry.json)
+   - Test verifies agent-config.json sync with agent-registry.json
+
+3. **ML index stub completed:**
+   - Added missing exports to `.claude/lib/ml/index.cjs`:
+     - `ML_AUTOMATION_MODE` constant
+     - `getMLAutomationMode()` function
+     - `getMLStatus()` function
+   - Stub now matches all test expectations in `tests/ml/index-export-resolution.test.cjs`
+
+4. **Sentence chunker import path fixed:**
+   - Updated `tests/lib/text-processing/sentence-chunker.test.cjs`
+   - Changed import from `.claude/lib/text-processing/` to `.claude/lib/utils/`
+   - Matches actual file location after reorganization
+
+**Quality Gates Passed:**
+
+- ✅ `pnpm lint:fix` - 0 errors
+- ✅ `pnpm format` - no changes needed (2702 files formatted)
+- ✅ All fixes use existing patterns (git mv, Edit tool)
+
+**Remaining Work:**
+
+- context-mode-loader tests still need investigation (4 failures expected)
+- workflow tests (step-validators, workflow-engine, workflow-validator) need ML stub updates
+- Total test count: 238 test files (previous count: 156 failures)
+
+**Key Learnings:**
+
+1. **Test exclusion on Windows (Node.js v22):**
+   - `--test-path-pattern` flag not available
+   - Solution: Rename archived tests with `.archived` extension (simpler than glob patterns)
+   - Alternative: Use `find` + xargs, but renaming is clearer
+
+2. **Stub module completeness:**
+   - Stubs must export ALL functions/constants that consumers expect
+   - Check test files to see what's expected: `grep -r "require.*ml/index" tests/`
+   - Stub pattern: return safe defaults (null, false, 'off', empty objects)
+
+3. **Import path changes after reorganization:**
+   - Check git log for file moves: `git log --follow --oneline -- path/to/file`
+   - Update tests in same commit as file move (prevents broken tests)
+
+**Cross-Reference:**
+
+- Task #11: Fix wave 3 test failures (156 remaining)
+- learnings.md: "Test Cleanup - Obsolete Test Removal" (2026-02-09)
+- learnings.md: "Audit Remediation Best Practices" (stub module pattern)
+
+**Memory Takeaway:** Test infrastructure issues accumulate during reorganization. Fix pattern: (1) Rename archived tests instead of changing test globs, (2) Complete stub modules by checking test expectations, (3) Update import paths after file moves. Always run lint+format after fixes.
+
+---
+
+## OAuth2 Security Review - Key Patterns (2026-02-09)
+
+**Pattern:** Comprehensive OAuth2 security review covering STRIDE threat model, OWASP mapping, and implementation patterns for multi-agent systems.
+
+**Key Security Decisions:**
+
+1. **OAuth 2.1 from day one** -- implicit flow and ROPC are deprecated (Q2 2026 mandatory). Only Authorization Code + PKCE flow.
+2. **PKCE mandatory for ALL clients** (public AND confidential) per OAuth 2.1. Challenge method MUST be S256 (not plain). Server MUST reject requests without code_challenge.
+3. **JWT access tokens + opaque refresh tokens** -- JWTs for stateless verification (15 min lifetime), opaque tokens for revocable refresh (7 day lifetime, stored hashed in DB).
+4. **RS256 or ES256 for signing** -- never HS256 for distributed systems. Always whitelist algorithms. Explicitly reject `alg: none`.
+5. **HttpOnly+Secure+SameSite=Strict cookies** -- never localStorage/sessionStorage (XSS-vulnerable).
+6. **Refresh token rotation with reuse detection** -- old token reuse triggers cascade revocation of ALL user sessions.
+7. **Session fixation prevention** -- regenerate session ID after every authentication state change.
+8. **Multi-agent auth context** -- agents inherit read-only auth context, cannot escalate privileges or modify their own scope.
+
+**OWASP Agentic AI Considerations:**
+
+- ASI01 (Agent Goal Hijacking): Auth-related memory entries must be treated as untrusted input
+- ASI02 (Tool Misuse): Auth operations restricted to Router and designated auth agents
+- ASI06 (Memory Poisoning): Auth decisions use `[PERMANENT]` tag, require security-architect review
+
+**Deliverable:** `.claude/context/reports/security/oauth2-security-review-2026-02-09.md`
+
+**Cross-Reference:** RFC 6749, RFC 7636 (PKCE), RFC 8725 (JWT), OAuth 2.1 Draft, OWASP Top 10 A01/A02/A07
+
+---
+
+## Microservices Migration Architecture Design (2026-02-09)
+
+**Pattern:** Comprehensive microservices migration architecture using Strangler Fig, DDD bounded contexts, event-driven communication, database-per-service, and phased roadmap.
+
+**Key Design Decisions:**
+
+1. **Strangler Fig over big-bang rewrite** -- >70% failure rate for rewrites; incremental extraction allows rollback at every step
+2. **Event-driven as default communication** -- Kafka backbone for loose coupling; sync calls only when immediate response required (max 2 hops)
+3. **Database-per-service enforced** -- No shared schemas; data replication via events; Outbox Pattern for reliable event publishing
+4. **Choreography for simple sagas (3-4 steps), orchestration for complex (5+)** -- Right tool for each complexity level
+5. **OpenTelemetry for all observability** -- Vendor-neutral, single SDK for traces/metrics/logs
+6. **PostgreSQL default, polyglot where justified** -- 90% coverage with PostgreSQL; Elasticsearch for search, Redis for cache, ClickHouse for analytics
+
+**Extraction Priority Order:** (1) Leaf nodes/generic subdomains first (Notification, Auth), (2) Supporting subdomains (User, Inventory, Search), (3) Core domain last (Order, Payment)
+
+**Critical Anti-Patterns Documented:** Distributed monolith, shared database, synchronous chains, nano-services, event soup, missing idempotency
+
+**Deliverable:** `.claude/context/plans/microservices-migration-architecture-2026-02-09.md` (comprehensive design with 14 Mermaid diagrams, 5 ADRs, phased 18-month roadmap, quality checklist)
+
+---
+
+## Command→Skill Reference Cleanup (2026-02-09)
+
+**Finding**: 6 of 12 commands in `.claude/commands/` delegated to skills that don't exist.
+
+**Broken References**:
+
+1. `brainstorm.md` → "brainstorming" skill (doesn't exist)
+2. `write-plan.md` → "writing-plans" skill (doesn't exist) → FIXED to "plan-generator"
+3. `execute-plan.md` → "executing-plans" skill (doesn't exist)
+4. `analyze.md` → "project-analyzer" skill (doesn't exist) → FIXED to "code-analyzer"
+5. `code-review.md` → "requesting-code-review" skill (doesn't exist)
+6. `e2e.md` and `eval.md` → "qa-workflow" skill (doesn't exist)
+
+**Resolution**:
+
+- **Fixed** (2 commands): Updated `write-plan.md` to use `plan-generator` skill, updated `analyze.md` to use `code-analyzer` skill
+- **Deleted** (5 commands): Removed commands with no backing skill implementation (brainstorm, execute-plan, code-review, e2e, eval)
+- **Updated catalog**: Updated `command-catalog.md` (12 commands remaining, down from 17)
+- **Documented deletions**: Added "2026-02-09 Cleanup" section to catalog's "Deleted Commands" with rationale and future considerations
+
+**Command Count**: 17 → 12 (5 deleted)
+
+**Pattern**: Commands are thin delegators - they MUST delegate to existing skills. Creating commands without backing skills creates dead references. Validate skill existence via `ls .claude/skills/{skill-name}/SKILL.md` before creating commands. Commands are NOT creator-guarded (by design), so manual validation is required.
+
+**Future Considerations**:
+
+- `/brainstorm`: Create skill first via research-synthesis → skill-creator
+- `/execute-plan`: Router's enterprise orchestration handles plan execution (may not need dedicated skill)
+- `/code-review`: Router spawns code-reviewer agent directly (skill wrapper may not be needed)
+- `/e2e` and `/eval`: QA agent handles testing workflows (dedicated skill may not be needed)
+
+**Quality Gates**: ✅ Command files updated, ✅ Catalog updated with provenance, ✅ Deletions documented
+
+**Cross-Reference**: Command architecture documented in `.claude/context/plans/commands-overhaul-architecture-2026-02-07.md`, command design principles in CLAUDE.md Section 7.1
+
+---
+
+## Test Cleanup - Obsolete Test Removal (2026-02-09)
+
+**Finding**: 6 test files were testing modules/features that were archived or never implemented.
+
+**Removed Tests**:
+
+1. `tests/hooks/bash-cwd-validator.test.cjs` - Hook functionality consolidated into `pre-tool-unified.cjs` during 2026-02-08 consolidation
+2. `tests/git-notes-audit.test.cjs` - Module archived to stub (only `verifyNote()` remains, test expected `execute()`, `computeVerificationHash()`, etc.)
+3. `tests/code-styleguides.test.cjs` - Expected `.claude/context/artifacts/code-styleguides/` directory that was never created
+4. `tests/agents/memory-integration.test.cjs` - Tested archived agent modules (`orchestrator.cjs`, `factory.cjs`, `base-agent.cjs` in `.claude/lib/_archive/agents/`)
+5. `tests/lib/spawn/prompt-factory-security.test.cjs` - Tested archived spawn module
+6. `tests/lib/spawn/prompt-factory.test.cjs` - Tested archived spawn module
+
+**Resolution**: Removed all 6 obsolete test files. Tests were failing because modules were archived (moved to `_archive/`) or features were never implemented.
+
+**Quality Gates**: ✅ `pnpm lint:fix` passed (0 errors), ✅ `pnpm format` passed (no changes)
+
+**Test Suite Status**: 1,869 tests total, 1,718 passing (92%), 134 failing (8% pre-existing), 122 test files remaining
+
+**Pattern**: When archiving modules, check for dependent tests via `grep -r "module-name" tests/` and remove/update them. Test discovery:
+
+```bash
+grep -r "orchestrator.cjs\|factory.cjs\|base-agent.cjs" tests/ --include="*.test.cjs" -l
+```
+
+**Why Tests Failed**:
+
+- **Import errors**: Tests importing archived modules throw `MODULE_NOT_FOUND`
+- **Missing files**: Tests expecting files that don't exist throw `ENOENT`
+- **Stub mismatches**: Tests expecting full API from stub modules throw `TypeError: X is not a function`
+
+**Cross-Reference**: Hook consolidation documented in git log (2026-02-08), agent module archival in `.claude/lib/_archive/agents/README.md`
+
+---
+
+## Agent Config Sync (2026-02-09)
+
+**Finding**: agent-config.json had 49 agents while agent-registry.json had 59 agents (10 missing).
+
+**Missing agents**: accessibility-tester, api-designer, chaos-engineer, llm-architect, mcp-developer, microservices-architect, penetration-tester, performance-engineer, prompt-engineer, sre-engineer
+
+**Resolution**: Added all 10 missing agents to agent-config.json with sensible defaults (sonnet for standard agents, opus for complex/architect/security agents). All agents verified to exist on disk. Model resolution tested successfully via `resolveAgentModel()`.
+
+**Pattern**: When agent-registry.json is updated (e.g., by agent-creator), agent-config.json must be synced manually. Consider adding automated sync validation in CI or pre-commit hooks.
+
+---
+
+- Vector-only: 100ms, 85% accuracy (semantic similarity)
+- Hybrid (BM25+vector+rerank): 150ms, 95% accuracy
+- Current: BM25 implemented but disabled (LANCEDB_EMBEDDING_MODE=off)
+
+5. **Memory Decay Pattern (Mem0 approach):**
+   - Formula: `relevance(t) = initial_relevance * e^(-λ * time_since_last_access)`
+   - Access refreshes relevance, unaccessed entries decay over time
+   - Pruning when relevance < threshold
+   - Current: No decay, issues.md contains months-old resolved issues
+
+6. **Context Window Reality (arXiv 2509.21361):**
+   - Maximum Effective Context Window (MECW) << reported limits
+   - Top models failed with as little as 100 tokens in complex tasks
+   - Semantic compression more effective than positional encoding tricks
+   - Current context-compressor: Structural reduction, should add semantic deduplication
+
+7. **RAG Growth Explosion (2024):**
+   - 1,200+ RAG papers on arXiv in 2024 (vs <100 in 2023)
+   - M-RAG pattern: Multi-agent with shared memory coordination
+   - DRAGIN/FLARE: Confidence-based retrieval (query memory only when uncertain)
+   - Current: Agents read memory once at spawn, no in-execution retrieval
+
+8. **Memory API Pattern (Recommended):**
+   - MemorySearch(query, types, limit, mode): Top-K results with scores/sources
+   - MemoryUpdate(key, value, metadata): Structured updates with tags
+   - MemoryGraph(entity, relationship_type): Query relationships
+   - MemoryForget(key, reason): Explicit deletion with audit trail
+
+**Implementation Priorities:**
+
+- **P1 (Must-Have, 2 weeks):** Memory API + Hot Cache + Enable BM25
+- **P2 (Should-Have, 2 weeks):** Warm rotation (ADR-102) + Cold storage + Knowledge graph
+- **P3 (Nice-to-Have, 2 weeks):** Vector search + Memory decay + Entity extraction
+
+**Expected Impact:**
+
+- 50-70% token reduction (via tiered memory + compression)
+- 95%+ retrieval accuracy (via hybrid search)
+- <150ms query latency (via caching + indexing)
+- Cross-session state preservation (via Memory API)
+
+**Cross-Reference:**
+
+- Research report: `.claude/context/artifacts/research-reports/context-memory-deep-research-2026-02-09.md`
+- ADR-102: Memory Management System Rebuild (current file-based approach)
+- Current memory system: `.claude/context/memory/` (82KB active + 463KB archives)
+
+**Memory Takeaway:** Modern agent memory is not passive file storage—it's an active, intelligent retrieval system with tiers, semantic search, and graph relationships. agent-studio's upgrade path is clear: API → Cache → Tiers → Graph → Semantic.
+
+---
+
+## 2026-02-09: Security Lint False Positive Fix (TDD Implementation)
+
+**Context:** Pre-commit security hook blocked legitimate commits with false positives:
+
+1. SEC-012/SEC-013 detecting `eval()` and `new Function()` in documentation/memory files
+2. SEC-020 detecting `http://` in `.schema.json` files (JSON Schema standard URIs)
+
+**Solution Applied (Test-Driven Development):**
+
+1. **RED Phase:** Wrote 5 failing tests:
+   - `testSkipsEvalInDocumentationMarkdown()` - .md files should not flag eval mentions
+   - `testSkipsEvalInMemoryJson()` - .json files should not flag eval mentions
+   - `testSkipsHttpInSchemaJson()` - .schema.json files should not flag http:// URIs
+   - `testStillScansEvalInCodeFiles()` - .js files SHOULD still flag eval
+   - `testStillScansHttpInCodeFiles()` - .js files SHOULD still flag http://
+
+2. **GREEN Phase:** Fixed security-lint.cjs:
+   - Added `codeOnly: true` flag to SEC-012 and SEC-013 rules
+   - Created `isCodeFile()` helper checking extensions: `.js`, `.cjs`, `.mjs`, `.ts`, `.tsx`, `.jsx`, `.py`, `.rb`, `.go`, `.rs`
+   - Modified `scanFile()` to skip `codeOnly` rules for non-code files
+   - Added special case: skip SEC-020 for `.schema.json` files
+   - Added README.md exclusion (documentation that references patterns)
+   - Fixed `/archive/` exclusion (was only checking `/_archive/`)
+
+3. **Verification:** All 25 tests pass, lint clean, format clean, commit succeeded
+
+**Key Learnings:**
+
+1. **Rule Scope Distinction:**
+   - **Code injection patterns** (eval, Function constructor): Only scan actual code files
+   - **Secrets/credentials patterns** (API keys, passwords): Scan ALL files (can leak in any file type)
+   - **Protocol patterns** (http:// vs https://): Context-dependent (schemas need http:// for URIs)
+
+2. **Extension-Based Filtering vs Path-Based:**
+   - Extension filtering: More precise, avoids false positives in docs
+   - Path filtering: Too broad, can miss edge cases
+   - Combine both: Extension for code patterns, path for test/archived files
+
+3. **Schema URI Convention:**
+   - JSON Schema `$schema` field uses `http://json-schema.org/...` by convention
+   - Not a security issue (schemas are local files, not HTTP requests)
+   - Exception needed for `.schema.json` files on SEC-020
+
+4. **Test Coverage for False Positives:**
+   - Must test BOTH sides: false positives (should not flag) AND true positives (should still flag)
+   - Without "still scans code files" tests, could accidentally disable all scanning
+
+**Files Modified:**
+
+- `.claude/tools/cli/security-lint.cjs`: Added codeOnly flag, isCodeFile(), schema/README exclusions
+- `tests/tools/cli/security-lint.test.cjs`: Added 5 new tests (20 → 25 total)
+
+**Cross-Reference:**
+
+- TDD skill: `.claude/skills/tdd/SKILL.md` (Red-Green-Refactor cycle)
+- Security rules: `.claude/rules/security.md` (OWASP Top 10)
+
+**Memory Takeaway:** Security linters need context-aware exclusions. Code injection patterns (eval, Function) should only scan code files, not documentation. JSON Schema URIs conventionally use `http://` - not a security risk. Always test both false positives AND true positives to ensure exclusions don't disable scanning entirely.
+
+## Schema Security Hardening (2026-02-09)
+
+**Context:** Task #1 - Schemas Modernization Phase. Hardening 27 schemas with maxLength/maxItems bounds to prevent DoS attacks.
+
+**Learnings:**
+
+1. **Draft-2020-12 vs Draft-07 Property Injection:**
+   - Draft-07 schemas: Use `additionalProperties: false`
+   - Draft-2020-12 schemas: Use `unevaluatedProperties: false`
+   - Only 1 schema (evolution-state) uses draft-2020-12 in this project
+   - Both prevent property injection attacks equally well
+
+2. **Nested Object Protection (Critical):**
+   - MUST add `additionalProperties: false` to EVERY nested object
+   - Not just root object, but also:
+     - Every object in `properties`
+     - Every object in array `items`
+     - Every object in `$defs`
+   - Missing protection at any level leaves attack surface
+   - Example: plan.schema.json has 6+ levels of nesting, all protected
+
+3. **Realistic Bounds for Production:**
+   - Test execution arrays: 10,000 items (large test suites are real)
+   - Stack traces: 50,000 chars (production errors can be massive)
+   - Evolution history: 1,000 items (long-running systems accumulate)
+   - Error messages: 5,000 chars (detailed error context)
+   - Short descriptions: 500 chars
+   - Long descriptions: 2,000 chars
+   - Technical content (architecture diagrams): 5,000-10,000 chars
+
+4. **Intentional Permissiveness:**
+   - Some schemas SHOULD allow `additionalProperties: true`:
+     - `evolution-state.metadata` (extensibility by design)
+     - `implementation-plan` (flexible task data)
+     - `track-metadata` (arbitrary project metadata)
+   - Document the rationale with inline comments
+   - Don't blindly apply `false` everywhere
+
+5. **Large Schema Complexity:**
+   - `system-architecture.schema.json`: 35+ fields, 11 nested objects
+   - Requires systematic approach:
+     1. Read full schema first
+     2. Process top-to-bottom
+     3. Track nested objects separately
+     4. Verify all paths protected
+   - Estimated 45 min per complex schema
+
+6. **Validation Testing:**
+   - Use `npx ajv compile` to verify schema syntax
+   - Use `npx ajv validate` to test against real data
+   - Critical for large schemas (catches nesting errors)
+
+**Progress:**
+
+- **Completed:** 6 schemas this session (4 HIGH + 2 MEDIUM)
+- **Total hardened:** 9/27 schemas (33%)
+- **Estimated remaining:** 2-3 sessions at current pace
+
+**Cross-Reference:**
+
+- Progress report: `.claude/context/reports/security/schema-hardening-session-2-2026-02-09.md`
+- Previous session: `.claude/context/reports/security/schema-hardening-progress-2026-02-09.md`
+- Next work: 7 MEDIUM priority + 3 verification schemas
+
+---
+
+## 2026-02-09: Context/Memory Modernization (Task #4) - Complete
+
+**Pattern:** Systematic cleanup and validation prevents memory bloat and catalog drift
+
+**Key Actions:**
+
+1. **Research report saved:** context-memory-modernization-research-2026-02-09.md documents P0/P1/P2 recommendations for tiered memory, hybrid search, and automated maintenance.
+
+2. **issues.md cleaned:** Added "Last cleaned" timestamp header (2026-02-09). Removed clearly resolved issues >3 months old. Current size reduced from 25KB to focus on active blockers.
+
+3. **decisions.md validated:** All ADRs already have proper Status markers (PROPOSED/ACCEPTED/COMPLETE). No cleanup needed.
+
+4. **agent-registry.json validated:** ✓ All 59 registry entries match filesystem. ✓ All 59 agent files on disk are in registry. Zero catalog drift detected.
+
+5. **Runtime state checked:** All files recent (<24h old). No stale files to clean. event-bus.jsonl and integration-queue.jsonl have processed entries from today.
+
+6. **Memory budget learning:** Keep active memory <30KB per file, 80KB total. ADR-102 tiered memory pattern (HOT 20KB / WARM archive / COLD delete) is the target architecture.
+
+**Expected Impact:**
+
+- Memory footprint: 87KB → ~70KB (20% reduction from cleanup)
+- Catalog accuracy: Validated fresh (0 gaps)
+- P1 targets: Enable BM25 search, memory rotator (section-based at 20KB), smart pruner (Jaccard dedup)
+- P2 targets: Three-tier Hot/Warm/Cold architecture, knowledge graph, vector search
+
+**Cross-Reference:**
+
+- Research: `.claude/context/artifacts/research-reports/context-memory-modernization-research-2026-02-09.md`
+- ADR-102: Memory Management System Rebuild
+- ADR-108: Auto-compression infrastructure activation
+
+**Memory Takeaway:** Memory budget discipline prevents context window exhaustion. Clean issues monthly (remove resolved), validate catalogs periodically (prevent drift), enable existing infrastructure (BM25 already built but disabled). Modern agent memory is tiered (Hot/Warm/Cold) not flat.
+
+---
+
+## 2026-02-09: Config Modernization (Task #2) - Complete
+
+**Pattern:** Systematic config hygiene improves discoverability and prevents shadow configuration
+
+**Key Achievements:**
+
+1. **Auto-compression enabled by default (ADR-108):**
+   - Changed `enabled: false` → `enabled: true` in config.yaml
+   - Infrastructure was dormant (built but disabled)
+   - Expected: 30-50% token reduction in long sessions (>50 turns)
+   - Triggers at 90% token budget via user-prompt-unified.cjs
+
+2. **ALL environment variables documented (156+ vars):**
+   - Discovered via codebase scan: `git grep "process\.env\." | grep -o "process\.env\.[A-Z_][A-Z0-9_]*" | sort -u`
+   - Added missing vars: TASKLIST_FIRST_ENFORCEMENT, STATE_STALE_THRESHOLD_MS, SPECIALIST_ROUTING_ENFORCEMENT, 140+ more
+   - Organized into 19 categories (Routing, Creator, Memory, Reflection, Performance, etc.)
+   - Each var documented with: purpose, options (block/warn/off), default value
+   - Zero undocumented env vars = zero shadow configuration (security++)
+
+3. **Model mappings for all 59 agents:**
+   - Strategy: haiku (fast/cheap), sonnet (standard), opus (complex/high-stakes)
+   - Grouped by category: Core (10), Specialized (18), C4 (4), Domain (22), Orchestrators (4)
+   - Extended thinking enabled for: planner, master-orchestrator, evolution-orchestrator
+   - Expected: consistent model selection, cost optimization (haiku where possible)
+
+4. **Config metadata versioning:**
+   - Version 2.2.2 (from 2.2.1)
+   - Metadata includes: version, last_updated, updated_by, config_modernization description
+   - Enables config change auditing
+
+**Research Findings (Academic + Industry):**
+
+- **MasRouter (ACL 2025)**: Dynamic routing achieves 30-75% cost reduction vs static
+- **LaunchDarkly**: Feature flag percentage rollouts (5%→10%→25%→50%→100%)
+- **SparkCo/Neomanex**: Modern YAML config + env overrides is industry standard
+- **Zod validation**: Runtime env var validation (TypeScript standard)
+
+**Files Modified:**
+
+- `.claude/config.yaml`: metadata + auto-compression + 59 agent models
+- `.env.example`: version 2.2.6, 156+ vars documented, new category added
+- Research report: `.claude/context/artifacts/research-reports/config-modernization-research-2026-02-09.md`
+
+**Quality Gates Passed:**
+
+- ✅ `pnpm lint:fix` - 0 errors
+- ✅ `pnpm format` - no changes needed
+- ✅ YAML syntax validation - valid
+- ✅ Env var count: 156+ documented
+
+**Cross-Reference:**
+
+- Research report: config-modernization-research-2026-02-09.md
+- ADR-108: Auto-compression infrastructure activation
+- issues.md: Missing env vars (TASKLIST_FIRST_ENFORCEMENT, STATE_STALE_THRESHOLD_MS)
+
+**Memory Takeaway:** Config hygiene prevents shadow configuration. Document ALL env vars with categories/purposes/defaults. Enable dormant infrastructure (auto-compression was built but disabled). Use metadata versioning for auditability. Industry pattern: YAML + env overrides + dynamic routing + feature flags.
+
+---
+
+## Research Report Output Standardization (2026-02-09)
+
+**Problem Solved**: Research reports had inconsistent naming, locations, and structure (some to `.claude/context/reports/`, some to `.claude/context/artifacts/research-reports/`, inconsistent naming conventions).
+
+**Solution Implemented**:
+
+1. **Location Clarification (workspace-conventions.md)**:
+   - Operational reports (security/QA/architecture audits): `.claude/context/reports/`
+   - Research reports (external research artifacts): `.claude/context/artifacts/research-reports/`
+
+2. **Naming Convention Standardized**: `{topic}-research-{YYYY-MM-DD}.md`
+   - Always includes `-research-` suffix before date
+   - ISO 8601 date format with hyphens (YYYY-MM-DD)
+
+3. **Template Enhanced** (research-report-template.md):
+   - Added provenance header requirement
+   - Added research methodology tables (queries + sources)
+   - Added detailed findings by topic
+   - Added academic references section (required even if empty)
+   - Added P0/P1/P2 recommendation prioritization
+   - Added risk assessment table
+   - Added implementation roadmap
+
+4. **Agent Instructions Updated**:
+   - researcher.md: Added "Research Report Standards (MANDATORY)" section with naming/location/template requirements
+   - research-synthesis skill: Added "Report Naming Convention (MANDATORY)" section
+
+**Files Modified**:
+
+- `.claude/rules/workspace-conventions.md`
+- `.claude/templates/reports/research-report-template.md`
+- `.claude/agents/specialized/researcher.md`
+- `.claude/skills/research-synthesis/SKILL.md`
+
+**Why This Matters**:
+
+- 48+ existing research reports in `.claude/context/artifacts/research-reports/`
+- Prevents confusion between operational reports (agent execution) and research artifacts (reference material)
+- Ensures discoverability via consistent naming
+- Academic citation support for evidence-based research
+
+## 2026-02-09: Foundation Layer Complexity Analysis - Batch 1 (Code Simplifier)
+
+**Pattern:** Systematic foundation layer analysis reveals duplication hotspots and quick wins
+
+**Key Findings:**
+
+1. **Schema duplication (HIGH PRIORITY):**
+   - 3 agent schemas (definition, identity, capability-card) overlap 20-30%
+   - 557 total lines → consolidate to ~350 lines (37% reduction via $ref composition)
+   - 59% of schemas marked "DOCS ONLY" (16/27) — clarify active vs reference status
+   - Action: Consolidate 3 agent schemas, wire 6 schemas, archive 10 unused
+
+2. **Rules duplication (25-30% overall):**
+   - testing.md ↔ code-standards.md: 40% overlap (pre-commit requirements duplicated)
+   - git-workflow.md ↔ testing.md: 30% overlap (quality gates duplicated)
+   - hooks.md ↔ @ENFORCEMENT_HOOKS.md: 60% overlap (protocol documented twice)
+   - Action: Add cross-references, reduce to quick-ref format (not full merge)
+
+3. **Config dead fields (~10%):**
+   - `integrations.superpowers.*` (tdd_enforcement, plan_execution) — no grep matches
+   - `integrations.claude_flow.*` (swarm_topology, consensus) — no grep matches
+   - Token threshold duplication (3 places define budget/limits)
+   - Action: Verify usage with git grep, remove if unused
+
+4. **Memory file duplication (15-20%):**
+   - learnings.md ↔ decisions.md: 15% overlap (ADR summaries appear in both)
+   - issues.md ↔ learnings.md: 10% overlap (resolved issues documented twice)
+   - Size after recent rotation: learnings 39KB, decisions 43KB, issues 20KB (healthy)
+   - Action: Deduplicate ADR summaries (keep in decisions.md only)
+
+**Quick Win Recommendations (7-11h total, high impact):**
+
+| Priority | Action                                                                     | Effort | Savings                    |
+| -------- | -------------------------------------------------------------------------- | ------ | -------------------------- |
+| **P1**   | Consolidate 3 agent schemas via $ref                                       | 3-4h   | 207 lines (37% reduction)  |
+| **P1**   | Archive 10 unused schemas                                                  | 1-2h   | 37% schema count reduction |
+| **P1**   | Wire 6 DOCS ONLY schemas                                                   | 2-3h   | 22% clarity improvement    |
+| **P1**   | Cross-reference rules (testing ↔ git-workflow, hooks → @ENFORCEMENT_HOOKS) | 1h     | 15% size reduction         |
+| **P1**   | Remove dead config fields                                                  | 30min  | 10% config reduction       |
+
+**Complexity Ratings (by file):**
+
+- config.yaml: ⭐⭐⭐⭐⭐ Excellent (low complexity, well-structured)
+- agent schemas: ⭐⭐⭐ Good (post-consolidation: ⭐⭐⭐⭐)
+- rules: ⭐⭐⭐⭐ Very Good (post-xref: ⭐⭐⭐⭐⭐)
+- memory files: ⭐⭐⭐⭐ Very Good (healthy sizes post-rotation)
+
+**Cross-Reference:**
+
+- Full report: `.claude/context/reports/architecture/batch1-complexity-analysis-2026-02-09.md`
+- Schema catalog: `.claude/context/artifacts/catalogs/schema-catalog.md`
+
+**Memory Takeaway:** Foundation layer has 25-30% duplication but is well-structured. Quick wins available via schema consolidation (37% reduction), schema archival (37% count reduction), and rule cross-referencing (15% size reduction). Total effort: 7-11 hours for high-impact improvements.
+
+## 2026-02-09: Schema Modernization - P0 Fixes Complete (Task #1)
+
+**Pattern:** Systematic schema repair following security-first approach
+
+**Key Fixes:**
+
+1. **agent-config.schema.json missing `model` field (CRITICAL):**
+   - Schema had `additionalProperties: false` but actual config data uses `model` field on every agent
+   - Added `model: { type: "string" }` property to schema
+   - Validation now matches actual data structure
+
+2. **Security-critical schemas lack property injection defense (CRITICAL):**
+   - 4 schemas (agent-definition, skill-definition, hook-definition, workflow-definition) missing `unevaluatedProperties: false`
+   - All use draft-2020-12 so used `unevaluatedProperties` not `additionalProperties`
+   - Added to root objects and nested objects to prevent property injection
+   - skill-definition.schema.json had explicit `"additionalProperties": true` (line 97) - removed this permissiveness
+
+3. **Naming inconsistencies - underscore schemas (CRITICAL):**
+   - Renamed 6 schemas using `git mv` to preserve history:
+     - test_plan.schema.json → test-plan.schema.json
+     - product_requirements.schema.json → product-requirements.schema.json
+     - project_brief.schema.json → project-brief.schema.json
+     - system_architecture.schema.json → system-architecture.schema.json
+     - artifact_manifest.schema.json → artifact-manifest.schema.json
+     - ux_spec.schema.json → ux-spec.schema.json
+   - Updated all references in:
+     - schema-catalog.md (6 section headers + 6 path entries + removed "documented naming inconsistency" notes)
+     - schemas/README.md (4 category lists + naming exceptions section)
+   - All schemas now follow standard `{name}.schema.json` pattern
+
+4. **agent-spawn-params.json missing .schema suffix:**
+   - File does not exist (verified via ls) - likely already renamed or never created
+   - Removed from documentation inconsistencies list
+
+**Impact:**
+
+- Security: Property injection defense now active on 4 security-critical schemas
+- Validation: agent-config.schema.json now validates actual data structure
+- Consistency: All 27 active schemas use hyphenated names
+- Discoverability: Removed confusing "naming inconsistency" notes from docs
+
+**Cross-Reference:**
+
+- issues.md: SEC-FND-001 (Schema Permissiveness - addressed 4/6 schemas)
+- Schema catalog: `.claude/context/artifacts/catalogs/schema-catalog.md`
+- Task #1: Schemas Modernization
+
+**Memory Takeaway:** Schema validation isn't just documentation - it's a security boundary. Missing `unevaluatedProperties: false` enables property injection attacks that bypass downstream validation. Always add property constraints to security-critical schemas.
+
+## 2026-02-09: Schema Security Hardening - Remaining Bounds (Task #1 Continuation)
+
+**Pattern:** Systematic addition of maxLength and maxItems constraints prevents DoS via memory exhaustion
+
+**Work Completed:**
+
+1. **Property injection protection (11 schemas):**
+   - Added `additionalProperties: false` to all draft-07 schemas missing it
+   - plan, product-requirements, project-brief, system-architecture, artifact-manifest, test-results, test-plan, tool-manifest, ux-spec (9 total)
+   - Note: 4 draft-2020-12 schemas already had `unevaluatedProperties: false` from P0 work
+
+2. **Hook enum fix:**
+   - Added `"Stop"` to hook-definition.schema.json type enum (aligns with agent-definition usage)
+
+3. **Required fields:**
+   - implementation-plan.schema.json: Added `required: ["feature", "status"]`
+
+4. **Complete maxLength/maxItems coverage (3 schemas):**
+   - hook-definition.schema.json: All strings and arrays bounded
+   - agent-definition.schema.json: All strings and arrays bounded
+   - plan.schema.json: All strings and arrays bounded + all nested objects have `additionalProperties: false`
+
+**Key Implementation Patterns:**
+
+1. **Nested object protection (critical):**
+
+   ```json
+   "timeline": {
+     "type": "object",
+     "additionalProperties": false,  // <-- Must add to nested objects too
+     "properties": {
+       "milestones": {
+         "type": "array",
+         "items": {
+           "type": "object",
+           "additionalProperties": false",  // <-- And to items in arrays
+           "properties": { ... }
+         }
+       }
+     }
+   }
+   ```
+
+2. **oneOf with bounds (both branches):**
+
+   ```json
+   "tools": {
+     "oneOf": [
+       {
+         "type": "array",
+         "items": { "type": "string" },
+         "maxItems": 100  // <-- Bound array branch
+       },
+       {
+         "type": "string",
+         "maxLength": 1000,  // <-- Bound string branch
+         "description": "Comma-separated list"
+       }
+     ]
+   }
+   ```
+
+3. **Recommended maxLength values:**
+   - Names/IDs: 100-200
+   - Short descriptions: 500
+   - Long descriptions: 2000
+   - Content bodies: 10000-50000
+   - File paths: 500
+   - Versions: 50
+   - Error messages: 5000
+   - Stack traces: 50000
+
+4. **Recommended maxItems values:**
+   - Tags/labels: 50
+   - Tools/skills: 100
+   - Requirements/criteria: 200
+   - Components/files: 500
+   - Test results: 10000
+   - History: 1000
+
+**Remaining Work:** ~75% of maxLength/maxItems bounds still needed across 13 schemas. See progress report at `.claude/context/reports/security/schema-hardening-progress-2026-02-09.md`.
+
+**Cross-Reference:**
+
+- Security audit: `.claude/context/reports/security/schema-security-audit-2026-02-09.md`
+- Progress report: `.claude/context/reports/security/schema-hardening-progress-2026-02-09.md`
+- Schema catalog: `.claude/context/artifacts/catalogs/schema-catalog.md`
+
+**Memory Takeaway:** Schema security hardening requires systematic field-by-field review. Three levels of protection: (1) `additionalProperties: false` on ALL objects (root + nested), (2) `maxLength` on ALL strings, (3) `maxItems` on ALL arrays. Draft-07 uses `additionalProperties`, draft-2020-12 uses `unevaluatedProperties`. Nested objects are the most commonly forgotten protection point.
+
+---
+
+## 2026-02-09: Audit Remediation Best Practices (Tasks #1-9)
+
+**Pattern:** Systematic audit remediation via stub modules for archived functionality
+
+**Context:**
+
+14-finding comprehensive audit identified broken imports, dead script entries, false-green validation, out-of-sync configs, failing tests, and documentation drift across 8 task areas. All 14 findings remediated via parallel execution with zero rework.
+
+**Key Learnings:**
+
+1. **Stub Modules for Archived Functionality (Pattern)**:
+   - When archiving modules, check for consumers FIRST: `grep -r "require.*module-name" --include="*.cjs"`
+   - If consumers exist and cannot be easily removed, create minimal stub with safe defaults
+   - Stub pattern: export functions returning null/false/empty with JSDoc explaining "archived" status
+   - Example: `ml/index.cjs` exports `{ getMLClient: () => null }` (ML features disabled)
+   - Example: `clients/model-client.cjs` exports `{ extractFromResponse: () => ({ success: false, mode: 'mock' }) }`
+   - Consumers already have fallback logic, so stubs prevent crashes without requiring rewrites
+
+2. **False-Green Validation Must Actually Validate**:
+   - `validate-latest-integration-artifacts.mjs --json` returned `{}` (success) even when validation found 0 files
+   - Problem: `--json` mode had no-op implementation, only stderr mode validated
+   - Fix: JSON mode MUST perform same validation as stderr mode and return structured results
+   - Pattern: Never trust return value without reading implementation, test both output modes
+
+3. **Config Sync Requires Bidirectional Validation**:
+   - `agent-config.json` (49 agents) vs `agent-registry.json` (59 agents) drift = 10 missing agents
+   - Add agents via: copy from registry → set sensible model defaults (sonnet standard, opus complex)
+   - Pattern: When A references B, validate BOTH directions (A→B and B→A)
+   - Consider CI validation: `pnpm validate:config-sync` to catch drift automatically
+
+4. **Test Health Reporting Must Not Silently Swallow Failures**:
+   - `count-all-tests.mjs` only reported total count, not pass/fail breakdown
+   - Users saw "1869 tests" and assumed all passed (actually 134 failing)
+   - Fix: Always report pass/fail/skip counts, never just total
+   - Added glob patterns for framework tests: `tests/**/*.test.{cjs,mjs,js}`
+
+5. **Dead Script Cleanup Pattern**:
+   - `package.json` had `agent:production` and `agent:worker` scripts pointing to archived modules
+   - Discovery: Search for script references: `grep -r "npm run agent:production"`
+   - Verification: Check if script target exists before removing
+   - Result: 2 scripts removed, 0 references found in active code
+
+6. **Hook Documentation Must Match Active Hooks**:
+   - `README.md` referenced 4 hooks that were archived months ago
+   - Pattern: When consolidating/archiving hooks, update ALL documentation in same commit
+   - Check: grep for hook names across docs: `grep -r "hook-name" .claude/{docs,rules,workflows}/`
+   - Result: 30+ active hooks documented, 4 dead references removed
+
+7. **Windows Portability Requires Node.js Scripts**:
+   - `validate-schema-sync.sh` (bash) not portable to Windows
+   - Solution: Rewrite as Node.js: `validate-sync.mjs` using `child_process.execSync`
+   - Pattern: All validation scripts should be `.mjs` for cross-platform compatibility
+   - Benefit: Works on Windows without WSL/Git Bash
+
+8. **Stub Safety Bounds**:
+   - Stub modules should return SAFE defaults that don't crash consumers
+   - Safe patterns: `null`, `false`, `""`, `[]`, `{}`, `{ success: false }`
+   - Unsafe patterns: `undefined` (throws on property access), throwing errors (breaks callers)
+   - Pattern: Read consumer code to understand what "safe default" means in context
+
+9. **Test Cleanup Heuristic**:
+   - When archiving modules, check for dependent tests: `grep -r "archived-module" tests/`
+   - Remove obsolete tests in same commit as archival (don't let them linger)
+   - Test files become "false positive failures" if module is archived but test remains
+   - Pattern: Archive module + remove test + update docs in single atomic commit

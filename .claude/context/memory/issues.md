@@ -1,5 +1,51 @@
 <!-- Last Cleaned: 2026-02-09 - Removed resolved issues >3 months old -->
 
+## 2026-02-09: Active Stub Modules (Deferred Consumer Refactoring)
+
+**Issue:** 4 stub modules exist for archived functionality. Stubs prevent crashes but indicate deferred refactoring work.
+
+**Stub Inventory:**
+
+1. **`.claude/lib/ml/index.cjs` (ML Pipeline Stub)**
+   - Exports: `getMLClient()` → returns `null`
+   - Consumers: Pattern detection, anomaly detection (both expect null when ML disabled)
+   - Refactoring path: Remove ML feature flags from consumers, delete stub
+   - Effort: 2-3 hours
+
+2. **`.claude/lib/clients/model-client.cjs` (LLM Client Stub)**
+   - Exports: `extractFromResponse()` → returns `{ success: false, mode: 'mock' }`
+   - Consumers: Memory extraction pipeline (falls back to mock mode)
+   - Refactoring path: Rewrite memory extraction to use native LLM calls, delete stub
+   - Effort: 4-6 hours
+
+3. **`.claude/hooks/audit/git-notes-audit.cjs` (Git Notes Hook Stub)**
+   - Exports: `verifyNote()` → returns `{ valid: true }` (no-op verification)
+   - Consumers: Possibly audit hook chain (needs verification)
+   - Refactoring path: Remove from hook chain or fully implement, delete stub
+   - Effort: 1-2 hours
+
+4. **`.claude/lib/memory/_archive/` modules (3 archived, now stubbed)**
+   - memory-rotator.cjs, smart-pruner.cjs, cold-storage.cjs
+   - Status: Currently archived, Task #7B will rebuild from scratch
+   - No stub needed (consumers removed during archival)
+
+**Impact:** LOW - Stubs work as intended, consumers handle disabled features gracefully
+
+**Workaround:** None needed. Stubs are functioning correctly.
+
+**Resolution Path:**
+
+1. **Audit stub usage:** `grep -r "ml/index\|model-client\|git-notes-audit" --include="*.cjs"`
+2. **Refactor consumers:** Rewrite to not depend on archived features
+3. **Remove stubs:** After consumers no longer import them
+4. **Verify:** Grep again to confirm zero references
+
+**Priority:** P3 (technical debt, not blocking functionality)
+
+**Cross-Reference:** ADR-110 (Stub Module Pattern), learnings.md "Stub Modules for Archived Functionality"
+
+---
+
 ## 2026-02-09: Schema Security Audit -- 11 Schemas Missing Property Injection Protection
 
 **Date:** 2026-02-09
@@ -365,6 +411,46 @@ However, since state is fully reset on each prompt and only one agent writes at 
 **Priority:** P3 -- LOW. Theoretical risk only; no practical exploit path identified.
 
 **Full Report:** See `.claude/context/reports/security/router-enforcement-security-review-2026-02-08.md` for complete STRIDE analysis, race condition analysis, and 6 detailed recommendations (R-1 through R-6).
+
+---
+
+### PENTEST-2026-02-09: 14 Findings from Auth/AuthZ Penetration Test (2 CRITICAL, 5 HIGH)
+
+**Date:** 2026-02-09 | **Agent:** penetration-tester
+
+**Description:**
+
+Authorized internal penetration test identified 14 vulnerabilities in the hook enforcement, state management, memory, and command validation layers. Full report: `.claude/context/reports/security/auth-pentest-assessment-2026-02-09.md`
+
+**P0 (CRITICAL - Fix Immediately):**
+
+- **CRIT-001**: Remove `HOOK_FAIL_OPEN` env var from all hooks (routing-guard.cjs:2027, unified-pre-write-hook.cjs:511, unified-creator-guard.cjs:644)
+- **CRIT-002**: Restrict env var `=off` overrides -- consider removing `off` mode for ROUTER_BASH_GUARD, SHELL_INJECTION_VALIDATOR, ROUTER_SELF_CHECK
+
+**P1 (HIGH - Fix This Sprint):**
+
+- **HIGH-001**: Protect router-state.json from agent writes (add to write-protected paths)
+- **HIGH-002**: Enforce TTL bounds in `isCreatorActive()`, sign active-creators.json entries
+- **HIGH-003**: Implement memory entry sanitization (strip instruction-like content from learnings.md)
+- **HIGH-004**: Expand shell-injection-validator patterns (add dd, mkfs, find -delete, python -c, node -e)
+- **HIGH-005**: Remove `source` and `.` from SAFE_COMMANDS_ALLOWLIST in registry.cjs:143-144
+
+**P2 (MEDIUM - Fix Next Sprint):**
+
+- **MED-001**: Add edit-level protection for security-critical artifacts
+- **MED-002**: Sanitize array elements in hook-input.cjs sanitizeObject()
+- **MED-003**: Fix NaN handling in staleness threshold, enforce max threshold
+- **MED-004**: Expand write content scanner with dynamic require/import detection
+- **MED-005**: Reduce git log max count from 99 to single digit
+
+**P3 (LOW - Backlog):**
+
+- **LOW-001**: Change ROUTER_DEBUG default to disabled
+- **LOW-002**: Add fallback logging when violation tracker unavailable
+
+**Impact:** HIGH overall risk rating. File-based state management is the systemic vulnerability -- all state files writable by any agent.
+
+**Cross-References:** SEC-ROUTER-001 (routing-guard registration gap - related), SEC-ROUTER-003 (audit logging gaps - related), SEC-FND-003 (runtime state file integrity - overlapping)
 
 ---
 

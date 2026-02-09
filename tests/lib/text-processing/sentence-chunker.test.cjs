@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const {
   chunkBySentences,
   splitSentencesWithOffsets,
-} = require('../../../.claude/lib/text-processing/sentence-chunker.cjs');
+} = require('../../../.claude/lib/utils/sentence-chunker.cjs');
 
 test('splitSentencesWithOffsets handles empty input', () => {
   assert.deepEqual(splitSentencesWithOffsets(''), []);

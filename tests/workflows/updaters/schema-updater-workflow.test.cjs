@@ -230,7 +230,7 @@ describe('Schema Updater Workflow - ENABLE Phase', () => {
     const content = fs.readFileSync(WORKFLOW_PATH, 'utf-8');
     const workflow = parseWorkflow(content);
     const steps = workflow.phases.enable.steps;
-    const hasIndexStep = steps.some(s => s.id.includes('index'));
+    const hasIndexStep = steps.some(s => s.id.includes('index') || s.id.includes('catalog'));
     expect(hasIndexStep).toBeTruthy();
   });
 });

@@ -665,6 +665,88 @@ Adopt CONCEPTS from pro-workflow, rewrite all code from scratch using agent-stud
 
 ---
 
+## ADR-110: Stub Modules for Archived Functionality
+
+**Date:** 2026-02-09
+
+**Status:** ACCEPTED (proven by Tasks #1-9 audit remediation)
+
+**Context:**
+
+When refactoring/consolidating code, modules are often archived to `_archive/` directories. However, consumers of these modules may still exist in active code. Removing all references is time-consuming and risky. Direct archival without consumer updates causes MODULE_NOT_FOUND crashes.
+
+**Problem:**
+
+Tasks #1-9 audit found 3 cases where archived modules had active consumers:
+
+1. `ml/index.cjs` - archived ML pipeline still imported by code expecting ML features
+2. `clients/model-client.cjs` - archived LLM client still imported by memory extraction pipeline
+3. `hooks/audit/git-notes-audit.cjs` - archived audit hook still referenced in hook chain
+
+**Decision:**
+
+Create minimal stub modules at the original import path that:
+
+1. Export the same function names as the original module
+2. Return safe defaults (null, false, empty objects, { success: false })
+3. Include JSDoc comments explaining "archived" status and fallback behavior
+4. Rely on consumers' existing fallback logic to handle disabled functionality
+
+**Example Implementation:**
+
+```javascript
+// .claude/lib/ml/index.cjs (STUB)
+/**
+ * ML features disabled (archived).
+ * Returns null for all ML clients.
+ */
+function getMLClient() {
+  return null;
+}
+
+module.exports = { getMLClient };
+```
+
+**Alternatives Considered:**
+
+1. **Remove all consumer references:** Rejected. Time-consuming, risky, requires understanding all call sites and their fallback logic.
+2. **Throw errors from stubs:** Rejected. Breaks consumers without existing error handling, causes crashes.
+3. **Return undefined:** Rejected. Causes `TypeError: Cannot read property 'X' of undefined` when consumers access properties.
+4. **Full reimplementation:** Rejected. Defeats purpose of archival.
+
+**Rationale:**
+
+- Minimal risk: Stubs preserve API surface, consumers already have fallback logic
+- Fast implementation: ~20 lines per stub vs hours of consumer refactoring
+- Clear intent: JSDoc documents "archived/disabled" status
+- Gradual migration: Stubs buy time to refactor consumers properly later
+- Safe defaults: null/false/empty prevent crashes while signaling "feature disabled"
+
+**Consequences:**
+
+- **Positive:** Zero crashes from archived modules, fast remediation (4 stubs in <1 hour)
+- **Positive:** Consumers' existing fallback logic activates (e.g., "ML disabled, skipping pattern detection")
+- **Positive:** Clear upgrade path: grep for stub usage → refactor consumers → remove stub
+- **Negative:** Stubs hide the true cost of archival (deferred consumer refactoring)
+- **Negative:** Stubs can persist indefinitely if no one audits/removes them
+- **Mitigated:** Document stub locations in issues.md, tag with "STUB - remove after consumer refactoring"
+
+**Guidelines:**
+
+1. **Check for consumers FIRST:** `grep -r "require.*module-name" --include="*.cjs"`
+2. **Choose safe defaults:** null (ML disabled), false (feature off), "" (empty), [] (no results), {} (no data), { success: false, mode: 'mock' }
+3. **Document in stub:** JSDoc explaining archived status and expected consumer fallback
+4. **Document in issues.md:** Create entry "STUB: module-name - remove after refactoring consumers"
+5. **Test stub loads:** `node -e "require('./path/to/stub.cjs')"` (no crash = success)
+
+**Cross-References:**
+
+- Tasks #1-9: Audit remediation pipeline (proven pattern)
+- learnings.md: "Stub Modules for Archived Functionality (Pattern)"
+- issues.md: Should add "STUB inventory" section listing all active stubs
+
+---
+
 ## ADR-106: Creator Guard File-Existence Enforcement
 
 **Date:** 2026-02-09
@@ -816,3 +898,118 @@ Additionally:
 - Reflection: `.claude/context/reports/reflections/enterprise-improvement-reflection-2026-02-09.md`
 - QA: `.claude/context/reports/qa/enterprise-improvement-qa-2026-02-09.md`
 - ADR-108: Zero-Regression Enterprise Improvement Plan (predecessor)
+
+---
+
+## ADR-M001: gRPC over REST for Inter-Service Communication (Microservices Migration)
+
+**Date**: 2026-02-09
+**Status**: PROPOSED
+
+**Context**: Monolith-to-microservices migration requires synchronous inter-service communication for routing decisions, policy checks, config reads, and memory access.
+
+**Decision**: Use gRPC (HTTP/2 + Protobuf) for all synchronous inter-service communication.
+
+**Rationale**: Binary Protobuf is 10x smaller and 3-5x faster than JSON serialization. Proto files serve as enforceable API contracts with code generation. HTTP/2 multiplexing reduces connection overhead. Native Node.js support via `@grpc/grpc-js`.
+
+**Alternatives Considered**: REST (simpler but slower, no type safety), GraphQL (overkill for service-to-service).
+
+**Consequences**: Requires `.proto` file management, team must learn Protobuf IDL, debugging requires gRPC-aware tools.
+
+---
+
+## ADR-M002: Event Sourcing for Memory Service (Microservices Migration)
+
+**Date**: 2026-02-09
+**Status**: PROPOSED
+
+**Context**: Memory data (learnings, decisions, issues) is append-only markdown. Database migration must choose between CRUD and event sourcing.
+
+**Decision**: Use event sourcing with PostgreSQL as event store and materialized views for read models.
+
+**Rationale**: Memory is naturally append-only. Preserves complete history for decay/archival (ADR-102). Supports tiered memory model. Enables CQRS: fast reads from materialized views, reliable writes as events. Audit trail built-in.
+
+**Alternatives Considered**: CRUD PostgreSQL (loses history), MongoDB (operational burden).
+
+**Consequences**: 50-100ms eventual consistency lag between write and read. Event schema evolution needs management. Snapshot strategy needed for large event streams.
+
+---
+
+## ADR-M003: NATS over Kafka for Async Messaging (Microservices Migration)
+
+**Date**: 2026-02-09
+**Status**: PROPOSED
+
+**Context**: Async event distribution needed for observability, artifact integration, and cross-service notifications (~100 msgs/sec).
+
+**Decision**: Use NATS with JetStream for persistent messaging.
+
+**Rationale**: Single binary with zero external deps (vs Kafka ZooKeeper). 10M+ msgs/sec capacity. JetStream provides at-least-once delivery. ~15MB RAM footprint (vs Kafka ~1GB). Lightweight and Kubernetes-native.
+
+**Alternatives Considered**: Kafka (operationally heavy for our scale), RabbitMQ (AMQP complexity), Redis Streams (mixing cache and queue is risky).
+
+---
+
+## ADR-M004: Strangler Fig Migration Pattern (Microservices Migration)
+
+**Date**: 2026-02-09
+**Status**: PROPOSED
+
+**Context**: Monolith has 200+ modules, 59 agents, 1,869 tests. Migration approach must balance speed with risk.
+
+**Decision**: Strangler Fig pattern with incremental service extraction over 9 months in 4 phases.
+
+**Extraction Order**: (1) Code Intelligence + Observability, (2) Configuration + Memory, (3) Policy Enforcement + Artifact Lifecycle, (4) Orchestration core.
+
+**Rationale**: Each phase independently rollback-able. Features continue shipping during migration. Dual-write periods prove correctness. Proven industry pattern (Newman, Fowler).
+
+**Consequences**: 9-month timeline. Maintaining dual systems adds operational burden. Requires discipline to not skip validation stages.
+
+---
+
+## ADR-M005: Policy-as-Data for Hook Migration (Microservices Migration)
+
+**Date**: 2026-02-09
+**Status**: PROPOSED
+
+**Context**: 30+ imperative `.cjs` hook files implement policy as code. Migration must decide between keeping imperative hooks or converting to declarative rules.
+
+**Decision**: Convert hooks to declarative JSON policy rules evaluated by Policy Enforcement service.
+
+**Rationale**: Hot-reloadable without redeployment. Auditable (rules are data). Composable and testable with input/output pairs. O(n) lookup performance.
+
+**Alternatives Considered**: Keep imperative hooks (not distributable), OPA/Rego (steep learning curve), WebAssembly rules (complex toolchain).
+
+**Consequences**: Must convert 30+ hooks. Complex hooks (routing-guard, 11 checks) need hybrid approach. Loss of arbitrary code execution (mitigated by escape hatch).
+
+---
+
+## ADR-M006: Database Selection for Microservices
+
+**Date**: 2026-02-09
+**Status**: PROPOSED
+
+**Context**: Target architecture requires persistent storage for 7 services with different access patterns.
+
+**Decision**: PostgreSQL (primary relational), Redis (cache + sessions), LanceDB (vectors, already in project), TimescaleDB (time-series metrics).
+
+**Rationale**: PostgreSQL is battle-tested, supports JSONB, team familiarity. Redis provides sub-ms cache. LanceDB already a dependency. TimescaleDB is a PG extension (same ops tooling).
+
+**Alternatives Considered**: MongoDB (no team experience), DynamoDB (vendor lock-in), ClickHouse (more ops complexity), Milvus (heavier than LanceDB).
+
+---
+
+## ADR-M007: Kubernetes (K3s dev) for Container Orchestration
+
+**Date**: 2026-02-09
+**Status**: PROPOSED
+
+**Context**: Migrated services need container orchestration ranging from simple Docker Compose to full Kubernetes.
+
+**Decision**: Kubernetes with K3s for development (~512MB RAM) and managed K8s for production.
+
+**Rationale**: Built-in service discovery, self-healing, HPA scaling, ConfigMaps/Secrets, vast ecosystem (Helm, operators). K3s makes local development lightweight.
+
+**Alternatives Considered**: Docker Compose (no self-healing/scaling), Nomad (smaller ecosystem), AWS ECS (vendor lock-in), Serverless (cold starts unacceptable for CLI).
+
+**Architecture Document**: `.claude/context/plans/monolith-to-microservices-architecture-2026-02-09.md`
