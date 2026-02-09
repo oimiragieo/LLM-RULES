@@ -31,7 +31,19 @@ test -f .claude/rules/<rule-name>.md && echo "EXISTS" || echo "NEW"
 
 If EXISTS → invoke `Skill({ skill: "artifact-updater", args: "--type rule --path .claude/rules/<rule-name>.md --changes '...'" })`
 
-If NEW → continue with creation.
+If NEW → continue with Step 0.5.
+
+## Step 0.5: Companion Check
+
+Before proceeding with creation, run the ecosystem companion check:
+
+1. Use `companion-check.cjs` from `.claude/lib/creators/companion-check.cjs`
+2. Call `checkCompanions("rule", "{rule-name}")` to identify companion artifacts
+3. Review the companion checklist — note which required/recommended companions are missing
+4. Plan to create or verify missing companions after this artifact is complete
+5. Include companion findings in post-creation integration notes
+
+This step is **informational** (does not block creation) but ensures the full artifact ecosystem is considered.
 
 ## When to Use
 

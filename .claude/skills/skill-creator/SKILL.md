@@ -763,6 +763,20 @@ The artifact-updater workflow safely handles updates with:
 
 ---
 
+### Step 0.5: Companion Check
+
+Before proceeding with creation, run the ecosystem companion check:
+
+1. Use `companion-check.cjs` from `.claude/lib/creators/companion-check.cjs`
+2. Call `checkCompanions("skill", "{skill-name}")` to identify companion artifacts
+3. Review the companion checklist — note which required/recommended companions are missing
+4. Plan to create or verify missing companions after this artifact is complete
+5. Include companion findings in post-creation integration notes
+
+This step is **informational** (does not block creation) but ensures the full artifact ecosystem is considered.
+
+---
+
 ## MANDATORY POST-CREATION STEPS (BLOCKING)
 
 After creating ANY skill file, you MUST complete these steps in order. Skill creation is INCOMPLETE until all steps pass.

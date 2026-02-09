@@ -365,7 +365,9 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 **CRITICAL:** Always invoke `research-synthesis` BEFORE any other creator skill (agent-creator, skill-creator, workflow-creator, hook-creator, template-creator, schema-creator).
 
-**Post-Creation Integration:** After any creator completes → `artifact-integrator` skill auto-analyzes integration gaps via Router Step 0.5.
+**Companion Check (Step 0.5):** All creator skills include companion-check.cjs step before creation begins. Displays must-have/should-have/nice-to-have companion checklist for awareness. See ecosystem-creation-workflow.md for full lifecycle.
+
+**Post-Creation Integration:** After any creator completes → `artifact-integrator` skill auto-analyzes integration gaps via Router Step 0.5. Uses companionMatrix from ecosystem-impact-graph.json to detect missing companions.
 
 ---
 
@@ -537,7 +539,7 @@ All spawned agents:
 
 > **REFERENCE:** See **@ENTERPRISE_WORKFLOWS.md** for complete workflow catalog.
 
-**Core:** router-decision.md (master routing) | enterprise-workflow.md (multi-phase execution) | evolution-workflow.md (EVOLVE) | enterprise/feature-development-workflow.md
+**Core:** router-decision.md (master routing) | enterprise-workflow.md (multi-phase execution) | evolution-workflow.md (EVOLVE) | ecosystem-creation-workflow.md (artifact creation lifecycle) | enterprise/feature-development-workflow.md
 
 ---
 

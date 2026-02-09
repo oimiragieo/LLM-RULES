@@ -68,6 +68,61 @@ For each artifact with missing integrations:
 
 - Missing templates, optional docs
 
+### Step 3.1: Companion Matrix Analysis (Interwoven Creator Ecosystem)
+
+For each artifact analyzed, run companion matrix validation to identify missing ecosystem companions:
+
+**Analysis:**
+
+1. Use `companion-check.cjs` from `.claude/lib/creators/companion-check.cjs`
+2. Call `checkCompanions(artifactType, artifactName)` to get companion matrix
+3. Parse the companion checklist into categories:
+   - **Required companions** (must-have for artifact completeness)
+   - **Recommended companions** (should-have for best practices)
+   - **Optional companions** (nice-to-have for full integration)
+
+**Task Generation:**
+
+- For each **missing required companion** → Create P1 task: "Create {companion-type}:{companion-name} for {artifact-name}"
+- For each **missing recommended companion** → Create P2 task: "Consider creating {companion-type}:{companion-name} for {artifact-name}"
+- For **missing optional companions** → Note in report but don't create tasks
+
+**Safety Limits (SEC-ICE-002):**
+
+- **Max auto-spawned tasks per artifact**: 3 (prevent cascade creation)
+- **Max total companion tasks per integration run**: 10 (prevent batch explosion)
+- If limits exceeded, queue remaining companions for manual review with warning in report
+
+**Example:**
+
+```markdown
+### Companion Matrix Analysis: skill:rate-limiter
+
+**Required Companions (MISSING):**
+
+- [ ] hook:rate-limit-validator (validates rate limit headers) — **TASK CREATED** (P1)
+- [ ] schema:rate-limit-config (validates configuration) — **TASK CREATED** (P1)
+
+**Recommended Companions (MISSING):**
+
+- [ ] template:rate-limit-pattern (template for rate limiting implementations) — **TASK CREATED** (P2)
+
+**Optional Companions (MISSING):**
+
+- [ ] workflow:rate-limit-setup (onboarding workflow) — noted for future consideration
+
+**Safety Check:**
+
+- Auto-spawned tasks: 3 (within limit of 3 per artifact)
+- Total companion tasks this run: 8 (within limit of 10)
+```
+
+**Integration with Companion Check:**
+
+- Companion matrix data sourced from `ecosystem-impact-graph.json`
+- Uses same `companion-check.cjs` library invoked by creator skills at Step 0.5
+- Ensures bidirectional consistency: creators check companions at creation, integrator validates companions post-creation
+
 ### Step 3.5: Backward Propagation Processing (ADR-100 Phase 3.1-3.3)
 
 When processing backward propagation signals from code-reviewer or architect:

@@ -92,6 +92,18 @@ grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md ROUTING TABLE NO
 
 **Why this matters:** The artifact-updater workflow safely handles updates with validation, integration checklist verification, and cross-creator review queueing.
 
+### Step 0.5: Companion Check
+
+Before proceeding with creation, run the ecosystem companion check:
+
+1. Use `companion-check.cjs` from `.claude/lib/creators/companion-check.cjs`
+2. Call `checkCompanions("agent", "{agent-name}")` to identify companion artifacts
+3. Review the companion checklist — note which required/recommended companions are missing
+4. Plan to create or verify missing companions after this artifact is complete
+5. Include companion findings in post-creation integration notes
+
+This step is **informational** (does not block creation) but ensures the full artifact ecosystem is considered.
+
 ### Step 1: Verify No Existing Agent
 
 ```bash

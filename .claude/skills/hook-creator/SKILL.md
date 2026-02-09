@@ -106,7 +106,21 @@ After creating a hook, you MUST add it to both the matrix AND update affected ag
    - **Return updater result and STOP**
 
 3. **If hook is NEW:**
-   - Continue with Step 1 below
+   - Continue with Step 0.5 below
+
+---
+
+### Step 0.5: Companion Check
+
+Before proceeding with creation, run the ecosystem companion check:
+
+1. Use `companion-check.cjs` from `.claude/lib/creators/companion-check.cjs`
+2. Call `checkCompanions("hook", "{hook-name}")` to identify companion artifacts
+3. Review the companion checklist — note which required/recommended companions are missing
+4. Plan to create or verify missing companions after this artifact is complete
+5. Include companion findings in post-creation integration notes
+
+This step is **informational** (does not block creation) but ensures the full artifact ecosystem is considered.
 
 ---
 
