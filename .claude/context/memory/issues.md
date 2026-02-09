@@ -2,6 +2,34 @@
 
 This file tracks blockers, workarounds, and unresolved problems.
 
+## Interwoven Creator Ecosystem Security Findings (Task #39, 2026-02-08)
+
+**Date:** 2026-02-08
+
+**Context:** Pre-implementation security review of the Interwoven Creator Ecosystem with Research-First Protocol. 6 findings identified (2 HIGH, 3 MEDIUM, 1 LOW). Verdict: APPROVED WITH CONDITIONS (72/100 score).
+
+**HIGH Findings (BLOCKING - must fix before implementation):**
+
+1. **SEC-ICE-001: Artifact Name Path Traversal in companion-check.cjs** -- Artifact names sourced from companionMatrix could contain `../` sequences, enabling path traversal when constructing file paths for existence checks. Mitigation: validate names with `^[a-z0-9][a-z0-9-]*[a-z0-9]$` regex before any path construction.
+
+2. **SEC-ICE-002: Auto-Spawn Amplification** -- Unbounded recursive creator spawning via auto-propose/spawn follow-up creators. Worst case: single creation triggers 60+ spawns (~3M tokens). Mitigation: depth limit of 2, per-event spawn cap of 5, cycle detection via Set, cooldown of 30s, ECOSYSTEM_AUTO_SPAWN=off kill switch.
+
+**MEDIUM Findings:**
+
+3. **SEC-ICE-003: Integration Queue Unbounded Growth** -- `appendToQueueWithImpact()` serializes full impactReport without size limits. Malicious or malformed impact data could bloat integration-queue.jsonl. Mitigation: cap serialized entry at 10KB, validate impactReport schema.
+
+4. **SEC-ICE-004: Research Tool Data Injection** -- External data from Exa/MCP flows into creator spawn prompts. Untrusted content could inject malicious instructions. Mitigation: sanitize external content (strip control chars, limit to 2KB per source), add `[EXTERNAL DATA]` prefix markers.
+
+5. **SEC-ICE-005: safeParseJSON Duplication** -- Two independent copies of safeParseJSON (creator-commons.cjs and ecosystem-impact-analyzer.cjs). Inconsistency risk if one is patched but not the other. Mitigation: extract to shared utility module.
+
+**LOW Findings:**
+
+6. **SEC-ICE-006: Companion Matrix Schema Drift** -- companionMatrix added to ecosystem-impact-graph.json without formal JSON schema validation. Mitigation: extend existing schema to cover companionMatrix structure.
+
+**Report:** `.claude/context/reports/security/interwoven-creator-ecosystem-security-2026-02-08.md`
+
+---
+
 ## Creator Ecosystem Trust Boundary Vulnerabilities (Task #15, 2026-02-08)
 
 **Date:** 2026-02-08
@@ -1048,6 +1076,50 @@ Require stack:
 
 ---
 
+## 2026-02-08: Missing .env.example Updates for Enforcement Variables (Task #36 Reflection)
+
+**Date:** 2026-02-08
+
+**Issue:** New enforcement environment variables (TASKLIST_FIRST_ENFORCEMENT, STATE_STALE_THRESHOLD_MS) added by Tasks #27-35 are not documented in `.env.example`. Developers won't know about these tunables without reading enforcement documentation.
+
+**Impact:** MEDIUM -- Reduces discoverability of enforcement configuration options. Developers may not tune enforcement strictness appropriately for their environment.
+
+**Workaround:** Read @ENFORCEMENT_HOOKS.md or routing-guard.cjs source code for variable definitions.
+
+**Resolution:** Add to `.env.example`:
+
+```bash
+# Router Enforcement Configuration
+TASKLIST_FIRST_ENFORCEMENT=warn  # Options: block, warn, off (default: warn)
+STATE_STALE_THRESHOLD_MS=600000  # 10 minutes in milliseconds (default: 600000)
+```
+
+**Priority:** P1 -- Quick fix, high value for developer experience.
+
+---
+
+## 2026-02-08: SEC-ROUTER-003 Audit Logging Missing for 3 Env Vars (Task #28 Deferred)
+
+**Date:** 2026-02-08
+
+**Issue:** Three environment variable kill switches (SECURITY_REVIEW_ENFORCEMENT, MEMORY_SPAWN_THROTTLING, SPECIALIST_ROUTING_ENFORCEMENT) lack `auditSecurityOverride()` calls. Security checks can be silently disabled without audit trail.
+
+**Impact:** HIGH -- Violates defense-in-depth principle. Silent security bypass without trace in audit logs.
+
+**Workaround:** Monitor `.claude/context/runtime/audit-log.jsonl` for gaps in enforcement events. Missing entries for known checks indicate override usage.
+
+**Resolution:** Add `auditSecurityOverride()` calls to the three missing checks in routing-guard.cjs:
+
+- Check 4: SECURITY_REVIEW_ENFORCEMENT (line ~350)
+- Check 6: MEMORY_SPAWN_THROTTLING (line ~450)
+- Check 7: SPECIALIST_ROUTING_ENFORCEMENT (line ~500)
+
+**Priority:** P1 -- Audit trail completeness is critical for security monitoring.
+
+**Status:** Deferred in Task #28 (security review), documented for follow-up hardening pipeline.
+
+---
+
 ## 2026-02-08: 277 Pre-Existing Test Failures (Task #6, Framework Test Suite)
 
 **Date:** 2026-02-08
@@ -1087,6 +1159,55 @@ Require stack:
 - Task #6: Test suite regression validation (established baseline)
 
 **Measurement:** Baseline: 1574/1914 pass (82.2%). Target: 1700+/1914 pass (88%+) after remediation.
+
+---
+
+## 2026-02-08: .env.example Missing Enforcement Variables (Task #36 Reflection, P1)
+
+**Date:** 2026-02-08
+
+**Issue:** New enforcement environment variables (TASKLIST_FIRST_ENFORCEMENT, STATE_STALE_THRESHOLD_MS) added by Tasks #27-35 are not documented in `.env.example`. Developers cannot discover these tunables without reading source code.
+
+**Impact:** MEDIUM -- Reduces discoverability of enforcement configuration. Teams may not appropriately tune enforcement strictness for their environment.
+
+**Workaround:** Read routing-guard.cjs or @ENFORCEMENT_HOOKS.md for variable definitions.
+
+**Resolution:** Add to `.env.example`:
+
+```bash
+# Router Enforcement Configuration (Task #36)
+TASKLIST_FIRST_ENFORCEMENT=warn       # Options: block, warn, off (default: warn)
+STATE_STALE_THRESHOLD_MS=600000       # 10 minutes in milliseconds (default: 600000)
+```
+
+**Priority:** P1 -- Quick fix, high developer experience value.
+
+**Status:** Open (pending Task #35 or dedicated docs update task)
+
+---
+
+## 2026-02-08: SEC-ROUTER-003 Audit Logging Incomplete for 3 Env Vars (Task #28 Deferred, P1)
+
+**Date:** 2026-02-08
+
+**Issue:** Three environment variable kill switches (SECURITY_REVIEW_ENFORCEMENT, MEMORY_SPAWN_THROTTLING, SPECIALIST_ROUTING_ENFORCEMENT) plus HOOK_FAIL_OPEN lack `auditSecurityOverride()` logging. Security checks can be disabled without audit trail.
+
+**Impact:** HIGH -- Violates defense-in-depth. Silent security bypass without trace.
+
+**Workaround:** Monitor `.claude/context/runtime/audit-log.jsonl` for gaps. Missing entries indicate override usage.
+
+**Resolution:**
+
+1. Add `auditSecurityOverride()` calls to routing-guard.cjs checks:
+   - Check 4: SECURITY_REVIEW_ENFORCEMENT (line ~350)
+   - Check 6: MEMORY_SPAWN_THROTTLING (line ~450)
+   - Check 7: SPECIALIST_ROUTING_ENFORCEMENT (line ~500)
+
+2. Add audit logging for HOOK_FAIL_OPEN activation (line 1368)
+
+**Priority:** P1 -- Audit trail completeness is security-critical.
+
+**Status:** Open (documented in router-enforcement-security-review-2026-02-08.md)
 
 ---
 
