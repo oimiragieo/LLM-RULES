@@ -2,9 +2,9 @@
 
 # Command Catalog
 
-**Last Updated:** 2026-02-07
-**Total Commands:** 17
-**Pattern:** Thin delegators to skills (15 delegators, 1 enriched, 1 standalone)
+**Last Updated:** 2026-02-09
+**Total Commands:** 12
+**Pattern:** Thin delegators to skills (10 delegators, 1 enriched, 1 standalone)
 
 This catalog documents all slash commands in the agent-studio framework with their skill delegations and usage contexts.
 
@@ -14,49 +14,31 @@ This catalog documents all slash commands in the agent-studio framework with the
 
 | Command            | Description                                  | Delegates To                     | Category    |
 | ------------------ | -------------------------------------------- | -------------------------------- | ----------- |
-| `/brainstorm`      | Explore ideas and design collaboratively     | `brainstorming`                  | Planning    |
-| `/write-plan`      | Create implementation plan with tasks        | `writing-plans`                  | Planning    |
-| `/execute-plan`    | Execute plan in batches with checkpoints     | `executing-plans`                | Planning    |
+| `/write-plan`      | Create implementation plan with tasks        | `plan-generator`                 | Planning    |
 | `/tdd`             | Test-driven development with Iron Laws       | `tdd`                            | Development |
 | `/debug`           | Systematic debugging with root cause         | `debugging`                      | Development |
 | `/build-fix`       | Diagnose and fix build failures              | `debugging`                      | Development |
-| `/code-review`     | Request focused code review                  | `requesting-code-review`         | Quality     |
 | `/verify`          | Comprehensive verification before completion | `verification-before-completion` | Quality     |
 | `/test-coverage`   | Analyze coverage and identify gaps           | `tdd`                            | Quality     |
-| `/e2e`             | End-to-end testing workflow                  | `qa-workflow`                    | Quality     |
-| `/eval`            | Regression test suite execution              | `qa-workflow`                    | Quality     |
 | `/refactor-clean`  | Safe refactoring and cleanup                 | `code-quality-expert`            | Quality     |
 | `/security-review` | OWASP/STRIDE security analysis               | `security-architect`             | Security    |
 | `/compress`        | Compress context to reduce tokens            | `context-compressor`             | Context     |
 | `/learn`           | Extract session patterns to memory           | `context-compressor` + memory    | Context     |
-| `/analyze`         | Project structure and health analysis        | `project-analyzer`               | Analysis    |
+| `/analyze`         | Project structure and health analysis        | `code-analyzer`                  | Analysis    |
 | `/setup-pm`        | Configure package manager                    | standalone script                | Setup       |
 
 ---
 
 ## Categories
 
-### Planning (3 commands)
+### Planning (1 command)
 
-Commands for ideation, planning, and execution coordination.
-
-#### `/brainstorm`
-
-**Pattern:** Delegator
-**Delegates To:** `brainstorming` skill
-**Usage:** Explore ideas, design alternatives, and collaborative problem-solving.
-
-```bash
-# Example
-/brainstorm
-```
-
-Invokes the `brainstorming` skill to facilitate structured ideation sessions with divergent thinking, idea clustering, and evaluation phases.
+Commands for planning and task breakdown.
 
 #### `/write-plan`
 
 **Pattern:** Delegator
-**Delegates To:** `writing-plans` skill
+**Delegates To:** `plan-generator` skill
 **Usage:** Create implementation plans with task breakdown, dependencies, and acceptance criteria.
 
 ```bash
@@ -64,20 +46,7 @@ Invokes the `brainstorming` skill to facilitate structured ideation sessions wit
 /write-plan
 ```
 
-Invokes the `writing-plans` skill to generate structured implementation plans following the task breakdown methodology.
-
-#### `/execute-plan`
-
-**Pattern:** Delegator
-**Delegates To:** `executing-plans` skill
-**Usage:** Execute plans in batches with progress tracking and checkpoints.
-
-```bash
-# Example
-/execute-plan
-```
-
-Invokes the `executing-plans` skill for systematic plan execution with batch processing and verification gates.
+Invokes the `plan-generator` skill to generate structured implementation plans following the task breakdown methodology.
 
 ---
 
@@ -126,22 +95,9 @@ Invokes the `debugging` skill with specific focus on build failures. Start by ru
 
 ---
 
-### Quality (5 commands)
+### Quality (3 commands)
 
 Commands for quality assurance, testing, refactoring, and verification.
-
-#### `/code-review`
-
-**Pattern:** Delegator
-**Delegates To:** `requesting-code-review` skill
-**Usage:** Request focused code review of recent changes.
-
-```bash
-# Example
-/code-review
-```
-
-Invokes the `requesting-code-review` skill to dispatch the code-reviewer agent with proper context scoping.
 
 #### `/verify`
 
@@ -168,32 +124,6 @@ Invokes the `verification-before-completion` skill with the Iron Law: NO COMPLET
 ```
 
 Invokes the `tdd` skill with specific focus on analyzing test coverage, identifying low-coverage areas, and suggesting tests to add.
-
-#### `/e2e`
-
-**Pattern:** Delegator
-**Delegates To:** `qa-workflow` skill (with E2E focus)
-**Usage:** Run end-to-end testing workflow.
-
-```bash
-# Example
-/e2e
-```
-
-Invokes the `qa-workflow` skill with focus on end-to-end test execution for critical user flows.
-
-#### `/eval`
-
-**Pattern:** Delegator
-**Delegates To:** `qa-workflow` skill (with eval focus)
-**Usage:** Run eval harness for regression checks.
-
-```bash
-# Example
-/eval
-```
-
-Invokes the `qa-workflow` skill with focus on running the eval/regression test suite and summarizing pass/fail results.
 
 #### `/refactor-clean`
 
@@ -270,7 +200,7 @@ Commands for project analysis and health checks.
 #### `/analyze`
 
 **Pattern:** Delegator
-**Delegates To:** `project-analyzer` skill
+**Delegates To:** `code-analyzer` skill
 **Usage:** Analyze project structure, tech stack, and health.
 
 ```bash
@@ -278,7 +208,7 @@ Commands for project analysis and health checks.
 /analyze
 ```
 
-Invokes the `project-analyzer` skill for project-wide analysis including structure discovery, dependency health, and technical debt assessment.
+Invokes the `code-analyzer` skill for project-wide analysis including structure discovery, dependency health, and technical debt assessment.
 
 ---
 
@@ -323,15 +253,17 @@ These principles govern command creation and maintenance (from architecture Sect
 
 ## Deleted Commands
 
-The following commands were removed during the 2026-02-07 overhaul (architecture ADR-087):
+The following commands were removed during framework evolution:
 
-### `/checkpoint` (DELETED)
+### 2026-02-07 Overhaul (ADR-087)
+
+#### `/checkpoint` (DELETED)
 
 **Reason:** References `.claude/checkpoints.log` which does not exist. No backing infrastructure.
 
 **Future consideration:** If checkpoint functionality is needed, create a `checkpoint` skill first, then a `/checkpoint` command that delegates to it.
 
-### `/orchestrate` (DELETED)
+#### `/orchestrate` (DELETED)
 
 **Reason:** Duplicates Router enterprise orchestration. The Router already implements:
 
@@ -343,15 +275,47 @@ The following commands were removed during the 2026-02-07 overhaul (architecture
 
 Users should describe their task to the Router, which handles orchestration automatically. A `/orchestrate` command that bypasses the Router creates conflicting behavior.
 
-### `/add-todo` (DELETED)
+#### `/add-todo` (DELETED)
 
 **Reason:** References `.claude/todos/pending/`, `.claude/todos/done/`, and `.claude/state/current-task.json` -- none of which exist. The framework uses `TaskCreate()` / `TaskList()` / `TaskUpdate()` for task management, which is a fundamentally different mechanism.
 
 **Future consideration:** If a user-facing todo system is desired, it should integrate with the existing `Task*` tools rather than creating a parallel filesystem-based system.
 
-### `/check-todos` (DELETED)
+#### `/check-todos` (DELETED)
 
 **Reason:** Same dead infrastructure references as `/add-todo`. Uses non-existent directories and files.
+
+### 2026-02-09 Cleanup (Task #13)
+
+#### `/brainstorm` (DELETED)
+
+**Reason:** Delegates to `brainstorming` skill which doesn't exist. No backing skill implementation.
+
+**Future consideration:** If brainstorming functionality is needed, create the skill first via `research-synthesis` → `skill-creator`, then add the command.
+
+#### `/execute-plan` (DELETED)
+
+**Reason:** Delegates to `executing-plans` skill which doesn't exist. No backing skill implementation.
+
+**Future consideration:** Plan execution is handled by the Router's enterprise orchestration workflow. If a dedicated execution skill is needed, create it first.
+
+#### `/code-review` (DELETED)
+
+**Reason:** Delegates to `requesting-code-review` skill which doesn't exist. No backing skill implementation.
+
+**Future consideration:** Code review is handled by spawning the `code-reviewer` agent via the Router. If a skill wrapper is desired, create it first.
+
+#### `/e2e` (DELETED)
+
+**Reason:** Delegates to `qa-workflow` skill which doesn't exist. No backing skill implementation.
+
+**Future consideration:** E2E testing should be handled by the `qa` agent. If a dedicated skill is needed, create it first.
+
+#### `/eval` (DELETED)
+
+**Reason:** Delegates to `qa-workflow` skill which doesn't exist (same as `/e2e`). No backing skill implementation.
+
+**Future consideration:** Eval/regression testing should be handled by the `qa` agent. If a dedicated skill is needed, create it first.
 
 ---
 
