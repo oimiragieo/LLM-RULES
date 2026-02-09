@@ -5,89 +5,109 @@
   "description": "Schema for hook creation artifacts",
   "type": "object",
   "required": [
-    "hookName",
-    "hookPath",
-    "hookMode",
-    "artifactsCreated",
-    "integrationsCompleted"
+    "status",
+    "output"
   ],
   "properties": {
-    "hookName": {
-      "type": "string",
-      "description": "Name of created hook",
-      "pattern": "^[a-z][a-z0-9-]*\\.cjs$"
-    },
-    "hookPath": {
-      "type": "string",
-      "description": "Path to hook file",
-      "pattern": "^\\.claude/hooks/[a-z]+/[a-z][a-z0-9-]*\\.cjs$"
-    },
-    "hookMode": {
+    "status": {
       "type": "string",
       "enum": [
-        "PreToolUse",
-        "PostToolUse"
+        "success",
+        "partial",
+        "failed"
       ],
-      "description": "Hook execution phase"
+      "description": "Execution status of the skill"
     },
-    "priority": {
-      "type": "number",
-      "description": "Hook execution priority",
-      "minimum": 1,
-      "maximum": 100
-    },
-    "enforcementMode": {
-      "type": "string",
-      "enum": [
-        "block",
-        "warn",
-        "off"
-      ],
-      "default": "warn",
-      "description": "Hook enforcement level"
-    },
-    "artifactsCreated": {
+    "output": {
       "type": "object",
-      "required": [
-        "hookFile",
-        "settingsRegistration",
-        "documentation"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "hookFile": {
-          "type": "boolean"
+        "hookName": {
+          "type": "string",
+          "description": "Name of created hook",
+          "pattern": "^[a-z][a-z0-9-]*\\.cjs$"
         },
-        "settingsRegistration": {
-          "type": "boolean"
+        "hookPath": {
+          "type": "string",
+          "description": "Path to hook file",
+          "pattern": "^\\.claude/hooks/[a-z]+/[a-z][a-z0-9-]*\\.cjs$"
         },
-        "documentation": {
-          "type": "boolean"
+        "hookMode": {
+          "type": "string",
+          "enum": [
+            "PreToolUse",
+            "PostToolUse"
+          ],
+          "description": "Hook execution phase"
+        },
+        "priority": {
+          "type": "number",
+          "description": "Hook execution priority",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "enforcementMode": {
+          "type": "string",
+          "enum": [
+            "block",
+            "warn",
+            "off"
+          ],
+          "default": "warn",
+          "description": "Hook enforcement level"
+        },
+        "artifactsCreated": {
+          "type": "object",
+          "required": [
+            "hookFile",
+            "settingsRegistration",
+            "documentation"
+          ],
+          "properties": {
+            "hookFile": {
+              "type": "boolean"
+            },
+            "settingsRegistration": {
+              "type": "boolean"
+            },
+            "documentation": {
+              "type": "boolean"
+            }
+          }
+        },
+        "integrationsCompleted": {
+          "type": "object",
+          "required": [
+            "enforcementHooksMdUpdated",
+            "tested",
+            "performanceValidated"
+          ],
+          "properties": {
+            "enforcementHooksMdUpdated": {
+              "type": "boolean"
+            },
+            "tested": {
+              "type": "boolean"
+            },
+            "performanceValidated": {
+              "type": "boolean"
+            }
+          }
+        },
+        "executionTimeMs": {
+          "type": "number",
+          "description": "Measured execution time in milliseconds",
+          "maximum": 100
         }
-      }
-    },
-    "integrationsCompleted": {
-      "type": "object",
+      },
+      "additionalProperties": false,
       "required": [
-        "enforcementHooksMdUpdated",
-        "tested",
-        "performanceValidated"
-      ],
-      "properties": {
-        "enforcementHooksMdUpdated": {
-          "type": "boolean"
-        },
-        "tested": {
-          "type": "boolean"
-        },
-        "performanceValidated": {
-          "type": "boolean"
-        }
-      }
-    },
-    "executionTimeMs": {
-      "type": "number",
-      "description": "Measured execution time in milliseconds",
-      "maximum": 100
+        "hookName",
+        "hookPath",
+        "hookMode",
+        "artifactsCreated",
+        "integrationsCompleted"
+      ]
     }
   },
   "additionalProperties": false

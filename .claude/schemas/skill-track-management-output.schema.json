@@ -5,103 +5,123 @@
   "description": "Schema for track management methodology output",
   "type": "object",
   "required": [
-    "trackName",
-    "phase",
-    "tasks"
+    "status",
+    "output"
   ],
   "properties": {
-    "trackName": {
-      "type": "string",
-      "pattern": "^[a-z0-9-]+_[0-9]{8}$",
-      "description": "Track identifier with date suffix"
-    },
-    "phase": {
+    "status": {
       "type": "string",
       "enum": [
-        "specification",
-        "planning",
-        "implementation",
-        "complete"
+        "success",
+        "partial",
+        "failed"
       ],
-      "description": "Current track phase"
+      "description": "Execution status of the skill"
     },
-    "tasks": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "taskId",
-          "status"
-        ],
-        "properties": {
-          "taskId": {
-            "type": "string"
-          },
-          "subject": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "in_progress",
-              "complete",
-              "skipped",
-              "blocked"
-            ]
-          },
-          "commitSHA": {
-            "type": "string",
-            "pattern": "^[a-f0-9]{7,40}$"
-          },
-          "blocker": {
-            "type": "string"
-          },
-          "skipReason": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "specification": {
+    "output": {
       "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "requirements": {
+        "trackName": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+_[0-9]{8}$",
+          "description": "Track identifier with date suffix"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "specification",
+            "planning",
+            "implementation",
+            "complete"
+          ],
+          "description": "Current track phase"
+        },
+        "tasks": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "required": [
+              "taskId",
+              "status"
+            ],
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "in_progress",
+                  "complete",
+                  "skipped",
+                  "blocked"
+                ]
+              },
+              "commitSHA": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{7,40}$"
+              },
+              "blocker": {
+                "type": "string"
+              },
+              "skipReason": {
+                "type": "string"
+              }
+            }
           }
         },
-        "constraints": {
-          "type": "array",
-          "items": {
-            "type": "string"
+        "specification": {
+          "type": "object",
+          "properties": {
+            "requirements": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "scope": {
+              "type": "string"
+            }
           }
         },
-        "scope": {
-          "type": "string"
+        "plan": {
+          "type": "object",
+          "properties": {
+            "phases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "estimatedDuration": {
+              "type": "string"
+            }
+          }
         }
-      }
-    },
-    "plan": {
-      "type": "object",
-      "properties": {
-        "phases": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "dependencies": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "estimatedDuration": {
-          "type": "string"
-        }
-      }
+      },
+      "additionalProperties": false,
+      "required": [
+        "trackName",
+        "phase",
+        "tasks"
+      ]
     }
   },
   "additionalProperties": false

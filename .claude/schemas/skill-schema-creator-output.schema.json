@@ -5,90 +5,110 @@
   "description": "Schema for schema creation artifacts",
   "type": "object",
   "required": [
-    "schemaName",
-    "schemaPath",
-    "schemaType",
-    "artifactsCreated"
+    "status",
+    "output"
   ],
   "properties": {
-    "schemaName": {
-      "type": "string",
-      "description": "Name of created schema",
-      "pattern": "^[a-z][a-z0-9-]*\\.schema\\.json$"
-    },
-    "schemaPath": {
-      "type": "string",
-      "description": "Path to schema file",
-      "pattern": "^\\.claude/schemas/[a-z][a-z0-9-]*\\.schema\\.json$"
-    },
-    "schemaType": {
+    "status": {
       "type": "string",
       "enum": [
-        "skill-output",
-        "agent-config",
-        "hook-protocol",
-        "task-metadata",
-        "custom"
+        "success",
+        "partial",
+        "failed"
       ],
-      "description": "Schema category"
+      "description": "Execution status of the skill"
     },
-    "schemaId": {
-      "type": "string",
-      "format": "uri",
-      "description": "Unique $id for schema"
-    },
-    "artifactsCreated": {
+    "output": {
       "type": "object",
-      "required": [
-        "schemaFile",
-        "catalogEntry",
-        "consumingComponentDoc"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "schemaFile": {
-          "type": "boolean"
+        "schemaName": {
+          "type": "string",
+          "description": "Name of created schema",
+          "pattern": "^[a-z][a-z0-9-]*\\.schema\\.json$"
         },
-        "catalogEntry": {
-          "type": "boolean"
+        "schemaPath": {
+          "type": "string",
+          "description": "Path to schema file",
+          "pattern": "^\\.claude/schemas/[a-z][a-z0-9-]*\\.schema\\.json$"
         },
-        "consumingComponentDoc": {
-          "type": "boolean"
+        "schemaType": {
+          "type": "string",
+          "enum": [
+            "skill-output",
+            "agent-config",
+            "hook-protocol",
+            "task-metadata",
+            "custom"
+          ],
+          "description": "Schema category"
+        },
+        "schemaId": {
+          "type": "string",
+          "format": "uri",
+          "description": "Unique $id for schema"
+        },
+        "artifactsCreated": {
+          "type": "object",
+          "required": [
+            "schemaFile",
+            "catalogEntry",
+            "consumingComponentDoc"
+          ],
+          "properties": {
+            "schemaFile": {
+              "type": "boolean"
+            },
+            "catalogEntry": {
+              "type": "boolean"
+            },
+            "consumingComponentDoc": {
+              "type": "boolean"
+            }
+          }
+        },
+        "integrationsCompleted": {
+          "type": "object",
+          "required": [
+            "validated",
+            "requiredFieldsDefined",
+            "descriptionsComplete"
+          ],
+          "properties": {
+            "validated": {
+              "type": "boolean",
+              "description": "Schema validates correctly"
+            },
+            "requiredFieldsDefined": {
+              "type": "boolean"
+            },
+            "descriptionsComplete": {
+              "type": "boolean"
+            }
+          }
+        },
+        "consumingComponents": {
+          "type": "array",
+          "description": "Components that use this schema",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requiredFields": {
+          "type": "array",
+          "description": "Required fields in schema",
+          "items": {
+            "type": "string"
+          }
         }
-      }
-    },
-    "integrationsCompleted": {
-      "type": "object",
+      },
+      "additionalProperties": false,
       "required": [
-        "validated",
-        "requiredFieldsDefined",
-        "descriptionsComplete"
-      ],
-      "properties": {
-        "validated": {
-          "type": "boolean",
-          "description": "Schema validates correctly"
-        },
-        "requiredFieldsDefined": {
-          "type": "boolean"
-        },
-        "descriptionsComplete": {
-          "type": "boolean"
-        }
-      }
-    },
-    "consumingComponents": {
-      "type": "array",
-      "description": "Components that use this schema",
-      "items": {
-        "type": "string"
-      }
-    },
-    "requiredFields": {
-      "type": "array",
-      "description": "Required fields in schema",
-      "items": {
-        "type": "string"
-      }
+        "schemaName",
+        "schemaPath",
+        "schemaType",
+        "artifactsCreated"
+      ]
     }
   },
   "additionalProperties": false

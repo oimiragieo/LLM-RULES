@@ -3,96 +3,108 @@
   "title": "PHP Expert Output",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "php-expert"
-    },
-    "version": {
-      "type": "string"
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "language",
-        "framework",
-        "codeGenerated"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "language": {
-          "const": "PHP"
-        },
-        "framework": {
-          "type": "string",
-          "enum": [
-            "Laravel",
-            "Symfony",
-            "WordPress",
-            "Drupal",
-            "Other"
-          ]
-        },
-        "phpVersion": {
-          "type": "string",
-          "description": "PHP version (e.g., '8.3')"
-        },
-        "codeGenerated": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "file",
-              "content"
-            ],
-            "properties": {
-              "file": {
-                "type": "string"
-              },
-              "content": {
-                "type": "string"
-              },
-              "classType": {
-                "type": "string",
-                "enum": [
-                  "controller",
-                  "model",
-                  "service",
-                  "middleware",
-                  "migration",
-                  "other"
-                ]
-              }
-            }
-          }
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "composer": {
+        "output": {
           "type": "object",
+          "required": [
+            "language",
+            "framework",
+            "codeGenerated"
+          ],
           "properties": {
-            "dependencies": {
+            "language": {
+              "const": "PHP"
+            },
+            "framework": {
+              "type": "string",
+              "enum": [
+                "Laravel",
+                "Symfony",
+                "WordPress",
+                "Drupal",
+                "Other"
+              ]
+            },
+            "phpVersion": {
+              "type": "string",
+              "description": "PHP version (e.g., '8.3')"
+            },
+            "codeGenerated": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "content"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "classType": {
+                    "type": "string",
+                    "enum": [
+                      "controller",
+                      "model",
+                      "service",
+                      "middleware",
+                      "migration",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            "recommendations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "composer": {
+              "type": "object",
+              "properties": {
+                "dependencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "tests": {
               "type": "array",
               "items": {
                 "type": "string"
               }
             }
-          }
-        },
-        "tests": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

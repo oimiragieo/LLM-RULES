@@ -3,96 +3,108 @@
   "title": "Svelte Expert Output",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "svelte-expert"
-    },
-    "version": {
-      "type": "string"
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "language",
-        "framework",
-        "codeGenerated"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "language": {
-          "type": "string",
-          "enum": [
-            "TypeScript",
-            "JavaScript"
-          ]
-        },
-        "framework": {
-          "const": "Svelte"
-        },
-        "svelteVersion": {
-          "type": "string",
-          "description": "Svelte version (e.g., '5')"
-        },
-        "codeGenerated": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "file",
-              "content"
-            ],
-            "properties": {
-              "file": {
-                "type": "string"
-              },
-              "content": {
-                "type": "string"
-              },
-              "componentType": {
-                "type": "string",
-                "enum": [
-                  "component",
-                  "page",
-                  "layout",
-                  "store",
-                  "server-load"
-                ]
-              },
-              "runes": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                },
-                "description": "Svelte 5 runes used"
-              }
-            }
-          }
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "routing": {
+        "output": {
           "type": "object",
+          "required": [
+            "language",
+            "framework",
+            "codeGenerated"
+          ],
           "properties": {
-            "sveltekit": {
-              "type": "boolean"
+            "language": {
+              "type": "string",
+              "enum": [
+                "TypeScript",
+                "JavaScript"
+              ]
             },
-            "routes": {
+            "framework": {
+              "const": "Svelte"
+            },
+            "svelteVersion": {
+              "type": "string",
+              "description": "Svelte version (e.g., '5')"
+            },
+            "codeGenerated": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "content"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "componentType": {
+                    "type": "string",
+                    "enum": [
+                      "component",
+                      "page",
+                      "layout",
+                      "store",
+                      "server-load"
+                    ]
+                  },
+                  "runes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Svelte 5 runes used"
+                  }
+                }
+              }
+            },
+            "recommendations": {
               "type": "array",
               "items": {
                 "type": "string"
               }
+            },
+            "routing": {
+              "type": "object",
+              "properties": {
+                "sveltekit": {
+                  "type": "boolean"
+                },
+                "routes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
-          }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

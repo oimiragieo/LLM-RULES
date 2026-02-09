@@ -5,245 +5,46 @@
   "description": "Output schema for blameless postmortems with root cause analysis, timelines, and action items",
   "type": "object",
   "required": [
-    "skillName",
-    "timestamp",
-    "result"
+    "status",
+    "output"
   ],
   "properties": {
-    "skillName": {
+    "status": {
       "type": "string",
-      "const": "postmortem-writing"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "default": "1.0.0"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "result": {
-      "type": "object",
-      "required": [
-        "incident",
-        "timeline",
-        "rootCause"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
       ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "incident": {
+        "metadata": {
           "type": "object",
-          "required": [
-            "title",
-            "severity",
-            "startTime",
-            "endTime"
-          ],
           "properties": {
-            "title": {
+            "author": {
               "type": "string"
             },
-            "summary": {
-              "type": "string"
-            },
-            "severity": {
-              "type": "string",
-              "enum": [
-                "P0",
-                "P1",
-                "P2",
-                "P3",
-                "P4"
-              ]
-            },
-            "startTime": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "endTime": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "duration": {
-              "type": "string"
-            },
-            "impact": {
-              "type": "object",
-              "properties": {
-                "usersAffected": {
-                  "type": "integer"
-                },
-                "servicesAffected": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "revenueImpact": {
-                  "type": "number"
-                }
-              }
-            }
-          }
-        },
-        "timeline": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "timestamp",
-              "event"
-            ],
-            "properties": {
-              "timestamp": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "event": {
-                "type": "string"
-              },
-              "actor": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "rootCause": {
-          "type": "object",
-          "required": [
-            "proximateCause",
-            "rootCause"
-          ],
-          "properties": {
-            "proximateCause": {
-              "type": "string"
-            },
-            "rootCause": {
-              "type": "string"
-            },
-            "contributingFactors": {
+            "reviewers": {
               "type": "array",
               "items": {
                 "type": "string"
               }
             },
-            "fiveWhys": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "whatWentWell": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "whatWentPoorly": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "actionItems": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "title",
-              "owner",
-              "type",
-              "priority",
-              "dueDate"
-            ],
-            "properties": {
-              "title": {
-                "type": "string"
-              },
-              "description": {
-                "type": "string"
-              },
-              "owner": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "prevent",
-                  "detect",
-                  "correct"
-                ]
-              },
-              "priority": {
-                "type": "string",
-                "enum": [
-                  "P0",
-                  "P1",
-                  "P2",
-                  "P3",
-                  "P4"
-                ]
-              },
-              "dueDate": {
-                "type": "string",
-                "format": "date"
-              },
-              "trackingTicket": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "lessonsLearned": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "metrics": {
-          "type": "object",
-          "properties": {
-            "mttr": {
-              "type": "number",
-              "description": "Mean Time To Recover (minutes)"
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
             },
-            "mttd": {
-              "type": "number",
-              "description": "Mean Time To Detect (minutes)"
-            },
-            "customersImpacted": {
-              "type": "integer"
-            },
-            "incidentCost": {
-              "type": "number"
+            "agent": {
+              "type": "string"
             }
           }
         }
       },
       "additionalProperties": false
-    },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "author": {
-          "type": "string"
-        },
-        "reviewers": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "agent": {
-          "type": "string"
-        }
-      }
     }
   },
   "additionalProperties": false

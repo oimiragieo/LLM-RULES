@@ -4,95 +4,107 @@
   "description": "Output structure for response-rater skill",
   "type": "object",
   "required": [
-    "contentType",
-    "rubric",
-    "dimensionScores",
-    "overallScore",
-    "threshold",
-    "result",
-    "recommendations"
+    "status",
+    "output"
   ],
   "properties": {
-    "contentType": {
+    "status": {
       "type": "string",
       "enum": [
-        "plan",
-        "response",
-        "document"
-      ]
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
-    "rubric": {
-      "type": "string",
-      "description": "Which rubric was used (plan or response)"
-    },
-    "dimensionScores": {
-      "type": "array",
-      "minItems": 4,
-      "items": {
-        "type": "object",
-        "required": [
-          "dimension",
-          "score",
-          "justification"
-        ],
-        "properties": {
-          "dimension": {
-            "type": "string"
-          },
-          "score": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 10
-          },
-          "weight": {
-            "type": "number",
-            "description": "Weight percentage (e.g., 0.20 for 20%)"
-          },
-          "justification": {
-            "type": "string"
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "contentType": {
+          "type": "string",
+          "enum": [
+            "plan",
+            "response",
+            "document"
+          ]
+        },
+        "rubric": {
+          "type": "string",
+          "description": "Which rubric was used (plan or response)"
+        },
+        "dimensionScores": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "object",
+            "required": [
+              "dimension",
+              "score",
+              "justification"
+            ],
+            "properties": {
+              "dimension": {
+                "type": "string"
+              },
+              "score": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "weight": {
+                "type": "number",
+                "description": "Weight percentage (e.g., 0.20 for 20%)"
+              },
+              "justification": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "overallScore": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Weighted average of dimension scores"
+        },
+        "threshold": {
+          "type": "number",
+          "description": "Minimum score required (7 standard, 8 enterprise, 9 critical)"
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "priority",
+              "recommendation"
+            ],
+            "properties": {
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "recommendation": {
+                "type": "string"
+              }
+            }
           }
         }
-      }
-    },
-    "overallScore": {
-      "type": "number",
-      "minimum": 1,
-      "maximum": 10,
-      "description": "Weighted average of dimension scores"
-    },
-    "threshold": {
-      "type": "number",
-      "description": "Minimum score required (7 standard, 8 enterprise, 9 critical)"
-    },
-    "result": {
-      "type": "string",
-      "enum": [
-        "pass",
-        "fail"
+      },
+      "additionalProperties": false,
+      "required": [
+        "contentType",
+        "rubric",
+        "dimensionScores",
+        "overallScore",
+        "threshold",
+        "recommendations"
       ]
-    },
-    "recommendations": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "priority",
-          "recommendation"
-        ],
-        "properties": {
-          "priority": {
-            "type": "string",
-            "enum": [
-              "high",
-              "medium",
-              "low"
-            ]
-          },
-          "recommendation": {
-            "type": "string"
-          }
-        }
-      }
     }
   },
   "additionalProperties": false,

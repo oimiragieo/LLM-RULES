@@ -4,188 +4,199 @@
   "description": "Validates output from complexity-assessment skill",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "complexity-assessment"
-    },
-    "version": {
+    "status": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "workflowType",
-        "complexityTier",
-        "justification",
-        "recommendedWorkflow",
-        "validationDepth",
-        "riskFactors"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "workflowType": {
-          "type": "string",
-          "enum": [
-            "FEATURE",
-            "REFACTOR",
-            "INVESTIGATION",
-            "MIGRATION",
-            "SIMPLE"
-          ],
-          "description": "Type of work being requested"
-        },
-        "complexityTier": {
-          "type": "string",
-          "enum": [
-            "SIMPLE",
-            "STANDARD",
-            "COMPLEX",
-            "EPIC"
-          ],
-          "description": "Complexity level of the task"
-        },
-        "justification": {
+        "output": {
           "type": "object",
           "required": [
-            "fileCount",
-            "serviceCount",
-            "reasoning"
+            "workflowType",
+            "complexityTier",
+            "justification",
+            "recommendedWorkflow",
+            "validationDepth",
+            "riskFactors"
           ],
           "properties": {
-            "fileCount": {
+            "workflowType": {
+              "type": "string",
+              "enum": [
+                "FEATURE",
+                "REFACTOR",
+                "INVESTIGATION",
+                "MIGRATION",
+                "SIMPLE"
+              ],
+              "description": "Type of work being requested"
+            },
+            "complexityTier": {
+              "type": "string",
+              "enum": [
+                "SIMPLE",
+                "STANDARD",
+                "COMPLEX",
+                "EPIC"
+              ],
+              "description": "Complexity level of the task"
+            },
+            "justification": {
               "type": "object",
               "required": [
-                "estimated",
-                "basis"
+                "fileCount",
+                "serviceCount",
+                "reasoning"
               ],
               "properties": {
-                "estimated": {
+                "fileCount": {
+                  "type": "object",
+                  "required": [
+                    "estimated",
+                    "basis"
+                  ],
+                  "properties": {
+                    "estimated": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "Estimated number of files affected"
+                    },
+                    "basis": {
+                      "type": "string",
+                      "enum": [
+                        "scanned",
+                        "analyzed",
+                        "estimated"
+                      ],
+                      "description": "How file count was determined"
+                    }
+                  }
+                },
+                "serviceCount": {
                   "type": "integer",
                   "minimum": 1,
-                  "description": "Estimated number of files affected"
+                  "description": "Number of services/areas affected"
                 },
-                "basis": {
+                "hasExternalIntegrations": {
+                  "type": "boolean",
+                  "description": "Does task involve external APIs/services?"
+                },
+                "hasInfrastructureChanges": {
+                  "type": "boolean",
+                  "description": "Does task require infrastructure changes?"
+                },
+                "hasNewDependencies": {
+                  "type": "boolean",
+                  "description": "Does task add new dependencies?"
+                },
+                "reasoning": {
                   "type": "string",
-                  "enum": [
-                    "scanned",
-                    "analyzed",
-                    "estimated"
-                  ],
-                  "description": "How file count was determined"
+                  "minLength": 50,
+                  "description": "Detailed explanation of complexity tier"
                 }
               }
             },
-            "serviceCount": {
-              "type": "integer",
-              "minimum": 1,
-              "description": "Number of services/areas affected"
-            },
-            "hasExternalIntegrations": {
-              "type": "boolean",
-              "description": "Does task involve external APIs/services?"
-            },
-            "hasInfrastructureChanges": {
-              "type": "boolean",
-              "description": "Does task require infrastructure changes?"
-            },
-            "hasNewDependencies": {
-              "type": "boolean",
-              "description": "Does task add new dependencies?"
-            },
-            "reasoning": {
+            "recommendedWorkflow": {
               "type": "string",
-              "minLength": 50,
-              "description": "Detailed explanation of complexity tier"
-            }
-          }
-        },
-        "recommendedWorkflow": {
-          "type": "string",
-          "description": "Suggested workflow pattern",
-          "minLength": 10
-        },
-        "validationDepth": {
-          "type": "string",
-          "enum": [
-            "spot-check",
-            "standard",
-            "comprehensive",
-            "multi-phase"
-          ],
-          "description": "QA validation level required"
-        },
-        "riskFactors": {
-          "type": "object",
-          "required": [
-            "hasUnfamiliarTech",
-            "hiddenComplexity",
-            "dependencies"
-          ],
-          "properties": {
-            "hasUnfamiliarTech": {
-              "type": "boolean",
-              "description": "Are there unfamiliar technologies involved?"
+              "description": "Suggested workflow pattern",
+              "minLength": 10
             },
-            "unfamiliarTechList": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "List of unfamiliar technologies"
-            },
-            "hiddenComplexity": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "List of hidden complexity factors"
-            },
-            "dependencies": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "List of dependencies/blockers"
-            },
-            "rollbackComplexity": {
+            "validationDepth": {
               "type": "string",
               "enum": [
-                "trivial",
-                "moderate",
-                "difficult",
-                "impossible"
+                "spot-check",
+                "standard",
+                "comprehensive",
+                "multi-phase"
               ],
-              "description": "How easy is rollback if something fails?"
-            }
-          }
-        },
-        "estimatedEffort": {
-          "type": "object",
-          "properties": {
-            "minHours": {
-              "type": "number",
-              "minimum": 0
+              "description": "QA validation level required"
             },
-            "maxHours": {
-              "type": "number",
-              "minimum": 0
+            "riskFactors": {
+              "type": "object",
+              "required": [
+                "hasUnfamiliarTech",
+                "hiddenComplexity",
+                "dependencies"
+              ],
+              "properties": {
+                "hasUnfamiliarTech": {
+                  "type": "boolean",
+                  "description": "Are there unfamiliar technologies involved?"
+                },
+                "unfamiliarTechList": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "List of unfamiliar technologies"
+                },
+                "hiddenComplexity": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "List of hidden complexity factors"
+                },
+                "dependencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "List of dependencies/blockers"
+                },
+                "rollbackComplexity": {
+                  "type": "string",
+                  "enum": [
+                    "trivial",
+                    "moderate",
+                    "difficult",
+                    "impossible"
+                  ],
+                  "description": "How easy is rollback if something fails?"
+                }
+              }
             },
-            "confidence": {
-              "type": "string",
-              "enum": [
-                "low",
-                "medium",
-                "high"
-              ]
+            "estimatedEffort": {
+              "type": "object",
+              "properties": {
+                "minHours": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "maxHours": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "confidence": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ]
+                }
+              }
             }
-          }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

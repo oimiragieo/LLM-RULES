@@ -5,27 +5,10 @@
   "description": "Validates output from tdd skill invocation - Test-Driven Development cycle verification",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
-    "timestamp",
-    "output"
+    "output",
+    "status"
   ],
   "properties": {
-    "skillName": {
-      "type": "string",
-      "const": "tdd",
-      "description": "Must be 'tdd' to verify correct skill was used"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "Skill version (semantic versioning)"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time",
-      "description": "ISO 8601 timestamp of execution"
-    },
     "output": {
       "type": "object",
       "description": "TDD cycle execution results",
@@ -146,6 +129,15 @@
         }
       },
       "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     }
   },
   "additionalProperties": false

@@ -4,18 +4,10 @@
   "description": "Validates output from plan-generator skill - structured executable plans",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
-    "output"
+    "output",
+    "status"
   ],
   "properties": {
-    "skillName": {
-      "const": "plan-generator"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
-    },
     "output": {
       "type": "object",
       "required": [
@@ -231,6 +223,15 @@
         }
       },
       "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     }
   },
   "additionalProperties": false,

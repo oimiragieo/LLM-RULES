@@ -5,95 +5,108 @@
   "description": "Schema for agent creation artifacts",
   "type": "object",
   "required": [
-    "agentName",
-    "agentType",
-    "agentPath",
-    "artifactsCreated",
-    "integrationsCompleted"
+    "status",
+    "output"
   ],
   "properties": {
-    "agentName": {
-      "type": "string",
-      "description": "Name of created agent (kebab-case)",
-      "pattern": "^[a-z][a-z0-9-]*$"
-    },
-    "agentType": {
+    "status": {
       "type": "string",
       "enum": [
-        "core",
-        "domain",
-        "specialized",
-        "orchestrator"
+        "success",
+        "partial",
+        "failed"
       ],
-      "description": "Agent classification"
+      "description": "Execution status of the skill"
     },
-    "agentPath": {
-      "type": "string",
-      "description": "Path to agent file",
-      "pattern": "^\\.claude/agents/(core|domain|specialized|orchestrators)/[a-z][a-z0-9-]*\\.md$"
-    },
-    "model": {
-      "type": "string",
-      "enum": [
-        "haiku",
-        "sonnet",
-        "opus"
-      ],
-      "description": "Configured model for agent"
-    },
-    "artifactsCreated": {
+    "output": {
       "type": "object",
-      "required": [
-        "agentFile",
-        "registryEntry",
-        "routingKeywords"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "agentFile": {
-          "type": "boolean"
+        "agentName": {
+          "type": "string",
+          "description": "Name of created agent (kebab-case)",
+          "pattern": "^[a-z][a-z0-9-]*$"
         },
-        "registryEntry": {
-          "type": "boolean"
+        "agentType": {
+          "type": "string",
+          "enum": [
+            "core",
+            "domain",
+            "specialized",
+            "orchestrator"
+          ],
+          "description": "Agent classification"
+        },
+        "agentPath": {
+          "type": "string",
+          "description": "Path to agent file",
+          "pattern": "^\\.claude/agents/(core|domain|specialized|orchestrators)/[a-z][a-z0-9-]*\\.md$"
+        },
+        "model": {
+          "type": "string",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ],
+          "description": "Configured model for agent"
+        },
+        "artifactsCreated": {
+          "type": "object",
+          "required": [
+            "agentFile",
+            "registryEntry",
+            "routingKeywords"
+          ],
+          "properties": {
+            "agentFile": {
+              "type": "boolean"
+            },
+            "registryEntry": {
+              "type": "boolean"
+            },
+            "routingKeywords": {
+              "type": "boolean"
+            }
+          }
+        },
+        "integrationsCompleted": {
+          "type": "object",
+          "required": [
+            "skillsAssigned",
+            "routingTableUpdated",
+            "catalogUpdated"
+          ],
+          "properties": {
+            "skillsAssigned": {
+              "type": "boolean"
+            },
+            "routingTableUpdated": {
+              "type": "boolean"
+            },
+            "catalogUpdated": {
+              "type": "boolean"
+            }
+          }
+        },
+        "assignedSkills": {
+          "type": "array",
+          "description": "Skills assigned to agent",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 3
         },
         "routingKeywords": {
-          "type": "boolean"
+          "type": "array",
+          "description": "Keywords that route to this agent",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
         }
-      }
-    },
-    "integrationsCompleted": {
-      "type": "object",
-      "required": [
-        "skillsAssigned",
-        "routingTableUpdated",
-        "catalogUpdated"
-      ],
-      "properties": {
-        "skillsAssigned": {
-          "type": "boolean"
-        },
-        "routingTableUpdated": {
-          "type": "boolean"
-        },
-        "catalogUpdated": {
-          "type": "boolean"
-        }
-      }
-    },
-    "assignedSkills": {
-      "type": "array",
-      "description": "Skills assigned to agent",
-      "items": {
-        "type": "string"
       },
-      "minItems": 3
-    },
-    "routingKeywords": {
-      "type": "array",
-      "description": "Keywords that route to this agent",
-      "items": {
-        "type": "string"
-      },
-      "minItems": 1
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

@@ -5,82 +5,39 @@
   "description": "Output schema for Expo Framework development including routing, native modules, and EAS",
   "type": "object",
   "required": [
-    "skillName",
-    "timestamp",
-    "result"
+    "status",
+    "output"
   ],
   "properties": {
-    "skillName": {
+    "status": {
       "type": "string",
-      "const": "expo-framework-rule"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "default": "1.0.0"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "result": {
-      "type": "object",
-      "required": [
-        "type"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
       ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "project-setup",
-            "routing",
-            "native-module",
-            "optimization"
-          ]
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "category",
-              "recommendation"
-            ],
-            "properties": {
-              "category": {
-                "type": "string"
-              },
-              "recommendation": {
-                "type": "string"
-              },
-              "priority": {
-                "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
-              }
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "duration": {
+              "type": "number"
+            },
+            "expoSdkVersion": {
+              "type": "string"
+            },
+            "agent": {
+              "type": "string"
             }
           }
         }
       },
       "additionalProperties": false
-    },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "duration": {
-          "type": "number"
-        },
-        "expoSdkVersion": {
-          "type": "string"
-        },
-        "agent": {
-          "type": "string"
-        }
-      }
     }
   },
   "additionalProperties": false

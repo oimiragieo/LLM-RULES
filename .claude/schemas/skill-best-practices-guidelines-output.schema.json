@@ -5,27 +5,10 @@
   "description": "Validates output from best-practices-guidelines skill - Compliance checking and recommendations",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
-    "timestamp",
-    "output"
+    "output",
+    "status"
   ],
   "properties": {
-    "skillName": {
-      "type": "string",
-      "const": "best-practices-guidelines",
-      "description": "Must be 'best-practices-guidelines' to verify correct skill was used"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "Skill version (semantic versioning)"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time",
-      "description": "ISO 8601 timestamp of execution"
-    },
     "output": {
       "type": "object",
       "description": "Best practices compliance results",
@@ -211,6 +194,15 @@
         }
       },
       "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     }
   },
   "additionalProperties": false

@@ -4,325 +4,336 @@
   "description": "Output schema for project-onboarding skill",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "project-onboarding"
-    },
-    "version": {
+    "status": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "projectName",
-        "projectType",
-        "structure",
-        "commands",
-        "workflow",
-        "namedMemories"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "projectName": {
-          "type": "string"
-        },
-        "projectType": {
-          "type": "string",
-          "enum": [
-            "monorepo",
-            "polyrepo",
-            "microservices",
-            "library",
-            "application",
-            "cli-tool"
-          ]
-        },
-        "structure": {
+        "output": {
           "type": "object",
           "required": [
-            "directories",
-            "keyFiles"
+            "projectName",
+            "projectType",
+            "structure",
+            "commands",
+            "workflow",
+            "namedMemories"
           ],
           "properties": {
-            "directories": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "path",
-                  "purpose"
-                ],
-                "properties": {
-                  "path": {
-                    "type": "string"
-                  },
-                  "purpose": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "keyFiles": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "path",
-                  "purpose"
-                ],
-                "properties": {
-                  "path": {
-                    "type": "string"
-                  },
-                  "purpose": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "commands": {
-          "type": "object",
-          "required": [
-            "build",
-            "test"
-          ],
-          "properties": {
-            "build": {
-              "type": "object",
-              "required": [
-                "command",
-                "description"
-              ],
-              "properties": {
-                "command": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                },
-                "expectedOutput": {
-                  "type": "string"
-                }
-              }
-            },
-            "test": {
-              "type": "object",
-              "required": [
-                "command",
-                "description"
-              ],
-              "properties": {
-                "command": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                },
-                "expectedOutput": {
-                  "type": "string"
-                }
-              }
-            },
-            "lint": {
-              "type": "object",
-              "properties": {
-                "command": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                }
-              }
-            },
-            "format": {
-              "type": "object",
-              "properties": {
-                "command": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                }
-              }
-            },
-            "dev": {
-              "type": "object",
-              "properties": {
-                "command": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                }
-              }
-            },
-            "deploy": {
-              "type": "object",
-              "properties": {
-                "command": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "technologies": {
-          "type": "object",
-          "properties": {
-            "framework": {
+            "projectName": {
               "type": "string"
             },
-            "language": {
-              "type": "string"
-            },
-            "packageManager": {
-              "type": "string"
-            },
-            "testFramework": {
-              "type": "string"
-            },
-            "buildTool": {
-              "type": "string"
-            }
-          }
-        },
-        "workflow": {
-          "type": "object",
-          "required": [
-            "branchingStrategy",
-            "codeReview"
-          ],
-          "properties": {
-            "branchingStrategy": {
+            "projectType": {
               "type": "string",
               "enum": [
-                "gitflow",
-                "trunk-based",
-                "feature-branch",
-                "custom"
+                "monorepo",
+                "polyrepo",
+                "microservices",
+                "library",
+                "application",
+                "cli-tool"
               ]
             },
-            "branchNaming": {
-              "type": "string",
-              "description": "Branch naming convention"
-            },
-            "commitFormat": {
-              "type": "string",
-              "description": "Commit message format (e.g., Conventional Commits)"
-            },
-            "codeReview": {
+            "structure": {
               "type": "object",
+              "required": [
+                "directories",
+                "keyFiles"
+              ],
               "properties": {
-                "required": {
-                  "type": "boolean"
+                "directories": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "path",
+                      "purpose"
+                    ],
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "purpose": {
+                        "type": "string"
+                      }
+                    }
+                  }
                 },
-                "minApprovals": {
-                  "type": "integer"
-                },
-                "ciRequired": {
-                  "type": "boolean"
+                "keyFiles": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "path",
+                      "purpose"
+                    ],
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "purpose": {
+                        "type": "string"
+                      }
+                    }
+                  }
                 }
               }
             },
-            "testingRequirements": {
+            "commands": {
+              "type": "object",
+              "required": [
+                "build",
+                "test"
+              ],
+              "properties": {
+                "build": {
+                  "type": "object",
+                  "required": [
+                    "command",
+                    "description"
+                  ],
+                  "properties": {
+                    "command": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "expectedOutput": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "test": {
+                  "type": "object",
+                  "required": [
+                    "command",
+                    "description"
+                  ],
+                  "properties": {
+                    "command": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "expectedOutput": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "lint": {
+                  "type": "object",
+                  "properties": {
+                    "command": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "format": {
+                  "type": "object",
+                  "properties": {
+                    "command": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "dev": {
+                  "type": "object",
+                  "properties": {
+                    "command": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "deploy": {
+                  "type": "object",
+                  "properties": {
+                    "command": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "technologies": {
               "type": "object",
               "properties": {
-                "minCoverage": {
-                  "type": "integer"
+                "framework": {
+                  "type": "string"
                 },
-                "requiredTests": {
-                  "type": "array",
-                  "items": {
+                "language": {
+                  "type": "string"
+                },
+                "packageManager": {
+                  "type": "string"
+                },
+                "testFramework": {
+                  "type": "string"
+                },
+                "buildTool": {
+                  "type": "string"
+                }
+              }
+            },
+            "workflow": {
+              "type": "object",
+              "required": [
+                "branchingStrategy",
+                "codeReview"
+              ],
+              "properties": {
+                "branchingStrategy": {
+                  "type": "string",
+                  "enum": [
+                    "gitflow",
+                    "trunk-based",
+                    "feature-branch",
+                    "custom"
+                  ]
+                },
+                "branchNaming": {
+                  "type": "string",
+                  "description": "Branch naming convention"
+                },
+                "commitFormat": {
+                  "type": "string",
+                  "description": "Commit message format (e.g., Conventional Commits)"
+                },
+                "codeReview": {
+                  "type": "object",
+                  "properties": {
+                    "required": {
+                      "type": "boolean"
+                    },
+                    "minApprovals": {
+                      "type": "integer"
+                    },
+                    "ciRequired": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "testingRequirements": {
+                  "type": "object",
+                  "properties": {
+                    "minCoverage": {
+                      "type": "integer"
+                    },
+                    "requiredTests": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "description",
+                  "example"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "example": {
                     "type": "string"
                   }
                 }
               }
-            }
-          }
-        },
-        "patterns": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "name",
-              "description",
-              "example"
-            ],
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "description": {
-                "type": "string"
-              },
-              "example": {
-                "type": "string"
+            },
+            "gotchas": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "issue",
+                  "solution"
+                ],
+                "properties": {
+                  "issue": {
+                    "type": "string"
+                  },
+                  "solution": {
+                    "type": "string"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "all",
+                      "windows",
+                      "macos",
+                      "linux"
+                    ]
+                  }
+                }
               }
-            }
-          }
-        },
-        "gotchas": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "issue",
-              "solution"
-            ],
-            "properties": {
-              "issue": {
-                "type": "string"
+            },
+            "namedMemories": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "path",
+                  "purpose"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "purpose": {
+                    "type": "string"
+                  }
+                }
               },
-              "solution": {
-                "type": "string"
-              },
-              "platform": {
-                "type": "string",
-                "enum": [
-                  "all",
-                  "windows",
-                  "macos",
-                  "linux"
-                ]
-              }
-            }
-          }
-        },
-        "namedMemories": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "name",
-              "path",
-              "purpose"
-            ],
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "path": {
-                "type": "string"
-              },
-              "purpose": {
-                "type": "string"
-              }
+              "description": "Named memory entries created during onboarding"
             }
           },
-          "description": "Named memory entries created during onboarding"
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

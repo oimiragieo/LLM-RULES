@@ -5,190 +5,42 @@
   "description": "Output schema for container expert skill including Docker, Kubernetes, Helm, and service mesh configurations",
   "type": "object",
   "required": [
-    "skillName",
-    "timestamp",
-    "result"
+    "status",
+    "output"
   ],
   "properties": {
-    "skillName": {
+    "status": {
       "type": "string",
-      "const": "container-expert"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "default": "1.0.0"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "result": {
-      "type": "object",
-      "required": [
-        "type"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
       ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "dockerfile",
-            "compose",
-            "k8s-manifest",
-            "helm-chart",
-            "istio-config",
-            "knative-service"
-          ]
-        },
-        "dockerConfig": {
+        "metadata": {
           "type": "object",
           "properties": {
-            "baseImage": {
-              "type": "string"
+            "duration": {
+              "type": "number"
             },
-            "multiStage": {
-              "type": "boolean"
-            },
-            "nonRootUser": {
-              "type": "boolean"
-            },
-            "healthCheck": {
-              "type": "boolean"
-            },
-            "optimizations": {
+            "filesAnalyzed": {
               "type": "array",
               "items": {
                 "type": "string"
               }
-            }
-          }
-        },
-        "k8sConfig": {
-          "type": "object",
-          "properties": {
-            "resourceLimits": {
-              "type": "boolean"
             },
-            "probes": {
-              "type": "object",
-              "properties": {
-                "liveness": {
-                  "type": "boolean"
-                },
-                "readiness": {
-                  "type": "boolean"
-                }
-              }
-            },
-            "securityContext": {
-              "type": "object"
-            }
-          }
-        },
-        "istioConfig": {
-          "type": "object",
-          "properties": {
-            "trafficManagement": {
-              "type": "boolean"
-            },
-            "mutualTLS": {
-              "type": "boolean"
-            },
-            "circuitBreaker": {
-              "type": "boolean"
-            }
-          }
-        },
-        "knativeConfig": {
-          "type": "object",
-          "properties": {
-            "autoScaling": {
-              "type": "boolean"
-            },
-            "scaleToZero": {
-              "type": "boolean"
-            },
-            "minScale": {
-              "type": "integer"
-            },
-            "maxScale": {
-              "type": "integer"
-            }
-          }
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "category",
-              "recommendation"
-            ],
-            "properties": {
-              "category": {
-                "type": "string"
-              },
-              "recommendation": {
-                "type": "string"
-              },
-              "priority": {
-                "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
-              }
-            }
-          }
-        },
-        "securityFindings": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "issue",
-              "severity"
-            ],
-            "properties": {
-              "issue": {
-                "type": "string"
-              },
-              "severity": {
-                "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
-              },
-              "remediation": {
-                "type": "string"
-              }
+            "agent": {
+              "type": "string"
             }
           }
         }
       },
       "additionalProperties": false
-    },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "duration": {
-          "type": "number"
-        },
-        "filesAnalyzed": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "agent": {
-          "type": "string"
-        }
-      }
     }
   },
   "additionalProperties": false

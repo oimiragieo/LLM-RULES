@@ -4,103 +4,123 @@
   "description": "Output structure for prd-generator skill execution",
   "type": "object",
   "required": [
-    "prdFile",
-    "featureName",
-    "hypothesisStatement",
-    "phases",
-    "validationResult"
+    "status",
+    "output"
   ],
   "properties": {
-    "prdFile": {
+    "status": {
       "type": "string",
-      "description": "Path to generated PRD file",
-      "pattern": "^\\.claude/context/artifacts/specs/[a-z0-9-]+-prd-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.md$"
-    },
-    "featureName": {
-      "type": "string",
-      "description": "Feature name derived from problem statement"
-    },
-    "hypothesisStatement": {
-      "type": "string",
-      "description": "Key hypothesis with measurable outcome"
-    },
-    "phases": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "required": [
-          "phase",
-          "description",
-          "status",
-          "depends"
-        ],
-        "properties": {
-          "phase": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "in_progress",
-              "completed",
-              "blocked"
-            ]
-          },
-          "parallel": {
-            "type": "boolean"
-          },
-          "depends": {
-            "type": "string",
-            "description": "Comma-separated phase numbers"
-          },
-          "planLink": {
-            "type": "string",
-            "description": "Link to implementation plan"
-          }
-        }
-      }
-    },
-    "validationResult": {
-      "type": "object",
-      "required": [
-        "isValid",
-        "missingSections"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
       ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "isValid": {
-          "type": "boolean"
+        "prdFile": {
+          "type": "string",
+          "description": "Path to generated PRD file",
+          "pattern": "^\\.claude/context/artifacts/specs/[a-z0-9-]+-prd-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.md$"
         },
-        "missingSections": {
+        "featureName": {
+          "type": "string",
+          "description": "Feature name derived from problem statement"
+        },
+        "hypothesisStatement": {
+          "type": "string",
+          "description": "Key hypothesis with measurable outcome"
+        },
+        "phases": {
           "type": "array",
+          "minItems": 1,
           "items": {
-            "type": "string"
+            "type": "object",
+            "required": [
+              "phase",
+              "description",
+              "status",
+              "depends"
+            ],
+            "properties": {
+              "phase": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "in_progress",
+                  "completed",
+                  "blocked"
+                ]
+              },
+              "parallel": {
+                "type": "boolean"
+              },
+              "depends": {
+                "type": "string",
+                "description": "Comma-separated phase numbers"
+              },
+              "planLink": {
+                "type": "string",
+                "description": "Link to implementation plan"
+              }
+            }
+          }
+        },
+        "validationResult": {
+          "type": "object",
+          "required": [
+            "isValid",
+            "missingSections"
+          ],
+          "properties": {
+            "isValid": {
+              "type": "boolean"
+            },
+            "missingSections": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "moscowBreakdown": {
+          "type": "object",
+          "properties": {
+            "must": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "should": {
+              "type": "integer"
+            },
+            "could": {
+              "type": "integer"
+            },
+            "wont": {
+              "type": "integer",
+              "minimum": 1
+            }
           }
         }
-      }
-    },
-    "moscowBreakdown": {
-      "type": "object",
-      "properties": {
-        "must": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "should": {
-          "type": "integer"
-        },
-        "could": {
-          "type": "integer"
-        },
-        "wont": {
-          "type": "integer",
-          "minimum": 1
-        }
-      }
+      },
+      "additionalProperties": false,
+      "required": [
+        "prdFile",
+        "featureName",
+        "hypothesisStatement",
+        "phases",
+        "validationResult"
+      ]
     }
   },
   "additionalProperties": false,

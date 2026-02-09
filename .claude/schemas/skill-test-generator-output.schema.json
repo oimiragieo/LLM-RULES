@@ -5,181 +5,189 @@
   "description": "Verifiable output from the test-generator skill that proves test creation occurred",
   "type": "object",
   "required": [
-    "skill_name",
-    "test_files_generated",
-    "test_cases_count",
-    "framework_used",
-    "timestamp"
+    "status",
+    "output"
   ],
   "properties": {
-    "skill_name": {
-      "type": "string",
-      "const": "test-generator",
-      "description": "Must be 'test-generator' to verify correct skill was used"
-    },
-    "test_files_generated": {
-      "type": "array",
-      "description": "Test files created (proof of generation)",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "required": [
-          "path",
-          "test_type",
-          "test_cases_count",
-          "lines_of_code"
-        ],
-        "properties": {
-          "path": {
-            "type": "string",
-            "description": "Absolute path to generated test file"
-          },
-          "test_type": {
-            "type": "string",
-            "enum": [
-              "unit",
-              "integration",
-              "e2e",
-              "component",
-              "api",
-              "snapshot"
-            ],
-            "description": "Type of test file generated"
-          },
-          "test_cases_count": {
-            "type": "number",
-            "minimum": 1,
-            "description": "Number of test cases in this file"
-          },
-          "lines_of_code": {
-            "type": "number",
-            "minimum": 1,
-            "description": "Lines of test code generated"
-          },
-          "source_file": {
-            "type": "string",
-            "description": "Source file being tested (if applicable)"
-          }
-        },
-        "additionalProperties": false
-      }
-    },
-    "test_cases_count": {
-      "type": "number",
-      "minimum": 1,
-      "description": "Total number of test cases generated across all files"
-    },
-    "coverage_target": {
-      "type": "string",
-      "pattern": "^\\d+%$",
-      "description": "Target code coverage percentage (e.g., '80%')",
-      "examples": [
-        "80%",
-        "90%",
-        "100%"
-      ]
-    },
-    "framework_used": {
+    "status": {
       "type": "string",
       "enum": [
-        "jest",
-        "vitest",
-        "cypress",
-        "playwright",
-        "mocha",
-        "jasmine",
-        "pytest",
-        "junit"
+        "success",
+        "partial",
+        "failed"
       ],
-      "description": "Test framework used for generation"
+      "description": "Execution status of the skill"
     },
-    "test_suite_structure": {
+    "output": {
       "type": "object",
-      "description": "Breakdown of test cases by category",
+      "description": "Skill-specific output data",
       "properties": {
-        "unit_tests": {
-          "type": "number",
-          "minimum": 0
-        },
-        "integration_tests": {
-          "type": "number",
-          "minimum": 0
-        },
-        "e2e_tests": {
-          "type": "number",
-          "minimum": 0
-        },
-        "component_tests": {
-          "type": "number",
-          "minimum": 0
-        }
-      },
-      "additionalProperties": false
-    },
-    "assertions_generated": {
-      "type": "number",
-      "minimum": 1,
-      "description": "Total number of assertions across all tests"
-    },
-    "mocking_used": {
-      "type": "boolean",
-      "description": "Whether mocks/stubs were generated"
-    },
-    "test_patterns_applied": {
-      "type": "array",
-      "description": "Testing patterns used in generation",
-      "items": {
-        "type": "string"
-      },
-      "examples": [
-        "Arrange-Act-Assert",
-        "Given-When-Then",
-        "Page Object Model",
-        "Test fixtures"
-      ]
-    },
-    "dependencies_detected": {
-      "type": "array",
-      "description": "Dependencies identified from source code",
-      "items": {
-        "type": "string"
-      }
-    },
-    "edge_cases_covered": {
-      "type": "array",
-      "description": "Edge cases identified and tested",
-      "items": {
-        "type": "string"
-      },
-      "examples": [
-        "null/undefined inputs",
-        "empty arrays",
-        "boundary values",
-        "error conditions"
-      ]
-    },
-    "test_configuration": {
-      "type": "object",
-      "description": "Test configuration files generated",
-      "properties": {
-        "config_file": {
-          "type": "string",
-          "description": "Path to test config file (jest.config.js, etc.)"
-        },
-        "setup_files": {
+        "test_files_generated": {
           "type": "array",
+          "description": "Test files created (proof of generation)",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "test_type",
+              "test_cases_count",
+              "lines_of_code"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Absolute path to generated test file"
+              },
+              "test_type": {
+                "type": "string",
+                "enum": [
+                  "unit",
+                  "integration",
+                  "e2e",
+                  "component",
+                  "api",
+                  "snapshot"
+                ],
+                "description": "Type of test file generated"
+              },
+              "test_cases_count": {
+                "type": "number",
+                "minimum": 1,
+                "description": "Number of test cases in this file"
+              },
+              "lines_of_code": {
+                "type": "number",
+                "minimum": 1,
+                "description": "Lines of test code generated"
+              },
+              "source_file": {
+                "type": "string",
+                "description": "Source file being tested (if applicable)"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "test_cases_count": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Total number of test cases generated across all files"
+        },
+        "coverage_target": {
+          "type": "string",
+          "pattern": "^\\d+%$",
+          "description": "Target code coverage percentage (e.g., '80%')",
+          "examples": [
+            "80%",
+            "90%",
+            "100%"
+          ]
+        },
+        "framework_used": {
+          "type": "string",
+          "enum": [
+            "jest",
+            "vitest",
+            "cypress",
+            "playwright",
+            "mocha",
+            "jasmine",
+            "pytest",
+            "junit"
+          ],
+          "description": "Test framework used for generation"
+        },
+        "test_suite_structure": {
+          "type": "object",
+          "description": "Breakdown of test cases by category",
+          "properties": {
+            "unit_tests": {
+              "type": "number",
+              "minimum": 0
+            },
+            "integration_tests": {
+              "type": "number",
+              "minimum": 0
+            },
+            "e2e_tests": {
+              "type": "number",
+              "minimum": 0
+            },
+            "component_tests": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "assertions_generated": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Total number of assertions across all tests"
+        },
+        "mocking_used": {
+          "type": "boolean",
+          "description": "Whether mocks/stubs were generated"
+        },
+        "test_patterns_applied": {
+          "type": "array",
+          "description": "Testing patterns used in generation",
           "items": {
             "type": "string"
           },
-          "description": "Setup/teardown files generated"
+          "examples": [
+            "Arrange-Act-Assert",
+            "Given-When-Then",
+            "Page Object Model",
+            "Test fixtures"
+          ]
+        },
+        "dependencies_detected": {
+          "type": "array",
+          "description": "Dependencies identified from source code",
+          "items": {
+            "type": "string"
+          }
+        },
+        "edge_cases_covered": {
+          "type": "array",
+          "description": "Edge cases identified and tested",
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            "null/undefined inputs",
+            "empty arrays",
+            "boundary values",
+            "error conditions"
+          ]
+        },
+        "test_configuration": {
+          "type": "object",
+          "description": "Test configuration files generated",
+          "properties": {
+            "config_file": {
+              "type": "string",
+              "description": "Path to test config file (jest.config.js, etc.)"
+            },
+            "setup_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Setup/teardown files generated"
+            }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time",
-      "description": "ISO 8601 timestamp of test generation"
+      "additionalProperties": false,
+      "required": [
+        "test_files_generated",
+        "test_cases_count",
+        "framework_used"
+      ]
     }
   },
   "additionalProperties": false

@@ -4,233 +4,244 @@
   "description": "Output schema for planning-with-files skill",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "planning-with-files"
-    },
-    "version": {
+    "status": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "taskId",
-        "planFile",
-        "findingsFile",
-        "progressFile"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "taskId": {
-          "type": "string"
-        },
-        "planFile": {
+        "output": {
           "type": "object",
           "required": [
-            "path",
-            "status",
-            "lastUpdated",
-            "steps"
+            "taskId",
+            "planFile",
+            "findingsFile",
+            "progressFile"
           ],
           "properties": {
-            "path": {
-              "type": "string",
-              "description": "Absolute path to task_plan.md"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "in_progress",
-                "blocked",
-                "complete"
-              ]
-            },
-            "lastUpdated": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "objective": {
+            "taskId": {
               "type": "string"
             },
-            "steps": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "number",
-                  "description",
-                  "status"
-                ],
-                "properties": {
-                  "number": {
-                    "type": "integer"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "status": {
-                    "type": "string",
-                    "enum": [
-                      "not_started",
-                      "in_progress",
-                      "done",
-                      "blocked"
-                    ]
-                  },
-                  "dependencies": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer"
+            "planFile": {
+              "type": "object",
+              "required": [
+                "path",
+                "status",
+                "lastUpdated",
+                "steps"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Absolute path to task_plan.md"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "in_progress",
+                    "blocked",
+                    "complete"
+                  ]
+                },
+                "lastUpdated": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "objective": {
+                  "type": "string"
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "number",
+                      "description",
+                      "status"
+                    ],
+                    "properties": {
+                      "number": {
+                        "type": "integer"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "not_started",
+                          "in_progress",
+                          "done",
+                          "blocked"
+                        ]
+                      },
+                      "dependencies": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "blockers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "blocker": {
+                        "type": "string"
+                      },
+                      "needs": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "nextAction": {
+                  "type": "string",
+                  "description": "Single immediate next step"
+                }
+              }
+            },
+            "findingsFile": {
+              "type": "object",
+              "required": [
+                "path",
+                "lastUpdated",
+                "findings"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Absolute path to findings.md"
+                },
+                "lastUpdated": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "findings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "date",
+                      "context",
+                      "finding",
+                      "impact"
+                    ],
+                    "properties": {
+                      "date": {
+                        "type": "string"
+                      },
+                      "context": {
+                        "type": "string"
+                      },
+                      "finding": {
+                        "type": "string"
+                      },
+                      "impact": {
+                        "type": "string"
+                      },
+                      "action": {
+                        "type": "string"
+                      }
                     }
                   }
                 }
               }
             },
-            "blockers": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "blocker": {
-                    "type": "string"
-                  },
-                  "needs": {
-                    "type": "string"
+            "progressFile": {
+              "type": "object",
+              "required": [
+                "path",
+                "lastUpdated",
+                "completed"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Absolute path to progress.md"
+                },
+                "lastUpdated": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "completed": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "date",
+                      "step",
+                      "duration",
+                      "evidence"
+                    ],
+                    "properties": {
+                      "date": {
+                        "type": "string"
+                      },
+                      "step": {
+                        "type": "string"
+                      },
+                      "duration": {
+                        "type": "string"
+                      },
+                      "evidence": {
+                        "type": "string"
+                      },
+                      "notes": {
+                        "type": "string"
+                      }
+                    }
                   }
+                },
+                "percentComplete": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
-            "nextAction": {
-              "type": "string",
-              "description": "Single immediate next step"
-            }
-          }
-        },
-        "findingsFile": {
-          "type": "object",
-          "required": [
-            "path",
-            "lastUpdated",
-            "findings"
-          ],
-          "properties": {
-            "path": {
-              "type": "string",
-              "description": "Absolute path to findings.md"
-            },
-            "lastUpdated": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "findings": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "date",
-                  "context",
-                  "finding",
-                  "impact"
-                ],
-                "properties": {
-                  "date": {
-                    "type": "string"
-                  },
-                  "context": {
-                    "type": "string"
-                  },
-                  "finding": {
-                    "type": "string"
-                  },
-                  "impact": {
-                    "type": "string"
-                  },
-                  "action": {
-                    "type": "string"
-                  }
+            "summary": {
+              "type": "object",
+              "properties": {
+                "totalSteps": {
+                  "type": "integer"
+                },
+                "completedSteps": {
+                  "type": "integer"
+                },
+                "blockedSteps": {
+                  "type": "integer"
+                },
+                "findingsCount": {
+                  "type": "integer"
+                },
+                "estimatedCompletion": {
+                  "type": "string"
                 }
               }
             }
-          }
-        },
-        "progressFile": {
-          "type": "object",
-          "required": [
-            "path",
-            "lastUpdated",
-            "completed"
-          ],
-          "properties": {
-            "path": {
-              "type": "string",
-              "description": "Absolute path to progress.md"
-            },
-            "lastUpdated": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "completed": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "date",
-                  "step",
-                  "duration",
-                  "evidence"
-                ],
-                "properties": {
-                  "date": {
-                    "type": "string"
-                  },
-                  "step": {
-                    "type": "string"
-                  },
-                  "duration": {
-                    "type": "string"
-                  },
-                  "evidence": {
-                    "type": "string"
-                  },
-                  "notes": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "percentComplete": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100
-            }
-          }
-        },
-        "summary": {
-          "type": "object",
-          "properties": {
-            "totalSteps": {
-              "type": "integer"
-            },
-            "completedSteps": {
-              "type": "integer"
-            },
-            "blockedSteps": {
-              "type": "integer"
-            },
-            "findingsCount": {
-              "type": "integer"
-            },
-            "estimatedCompletion": {
-              "type": "string"
-            }
-          }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

@@ -5,185 +5,205 @@
   "description": "Schema for TDD workflow patterns with task lifecycle tracking",
   "type": "object",
   "required": [
-    "phase",
-    "tasks",
-    "qualityGates",
-    "checkpoints"
+    "status",
+    "output"
   ],
   "properties": {
-    "phase": {
+    "status": {
       "type": "string",
       "enum": [
-        "planning",
-        "implementation",
-        "review",
-        "checkpoint",
-        "complete"
+        "success",
+        "partial",
+        "failed"
       ],
-      "description": "Current phase of workflow"
+      "description": "Execution status of the skill"
     },
-    "tasks": {
-      "type": "array",
-      "description": "Tasks with TDD lifecycle tracking",
-      "items": {
-        "type": "object",
-        "required": [
-          "taskId",
-          "status",
-          "lifecycle"
-        ],
-        "properties": {
-          "taskId": {
-            "type": "string"
-          },
-          "subject": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "in_progress",
-              "completed",
-              "skipped",
-              "blocked"
-            ]
-          },
-          "lifecycle": {
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "phase": {
+          "type": "string",
+          "enum": [
+            "planning",
+            "implementation",
+            "review",
+            "checkpoint",
+            "complete"
+          ],
+          "description": "Current phase of workflow"
+        },
+        "tasks": {
+          "type": "array",
+          "description": "Tasks with TDD lifecycle tracking",
+          "items": {
             "type": "object",
+            "required": [
+              "taskId",
+              "status",
+              "lifecycle"
+            ],
             "properties": {
-              "redComplete": {
-                "type": "boolean"
+              "taskId": {
+                "type": "string"
               },
-              "greenComplete": {
-                "type": "boolean"
+              "subject": {
+                "type": "string"
               },
-              "refactorComplete": {
-                "type": "boolean"
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "in_progress",
+                  "completed",
+                  "skipped",
+                  "blocked"
+                ]
               },
-              "coverageVerified": {
+              "lifecycle": {
+                "type": "object",
+                "properties": {
+                  "redComplete": {
+                    "type": "boolean"
+                  },
+                  "greenComplete": {
+                    "type": "boolean"
+                  },
+                  "refactorComplete": {
+                    "type": "boolean"
+                  },
+                  "coverageVerified": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "commitSHA": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{7,40}$"
+              },
+              "deviations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "qualityGates": {
+          "type": "object",
+          "required": [
+            "passingTests",
+            "coverage",
+            "styleCompliance"
+          ],
+          "properties": {
+            "passingTests": {
+              "type": "boolean"
+            },
+            "coverage": {
+              "type": "object",
+              "properties": {
+                "current": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "target": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              }
+            },
+            "styleCompliance": {
+              "type": "boolean"
+            },
+            "documentation": {
+              "type": "boolean"
+            },
+            "typeSafety": {
+              "type": "boolean"
+            },
+            "lintErrors": {
+              "type": "number",
+              "minimum": 0
+            },
+            "securityAudit": {
+              "type": "boolean"
+            }
+          }
+        },
+        "checkpoints": {
+          "type": "array",
+          "description": "Phase checkpoints with verification status",
+          "items": {
+            "type": "object",
+            "required": [
+              "phase",
+              "status"
+            ],
+            "properties": {
+              "phase": {
+                "type": "string"
+              },
+              "commitSHA": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{7,40}$"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "verified",
+                  "rejected"
+                ]
+              },
+              "userApproval": {
                 "type": "boolean"
               }
             }
-          },
-          "commitSHA": {
-            "type": "string",
-            "pattern": "^[a-f0-9]{7,40}$"
-          },
-          "deviations": {
-            "type": "array",
-            "items": {
-              "type": "string"
+          }
+        },
+        "gitNotes": {
+          "type": "array",
+          "description": "Rich git notes attached to commits",
+          "items": {
+            "type": "object",
+            "properties": {
+              "commitSHA": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "filesChanged": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "decisions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           }
         }
-      }
-    },
-    "qualityGates": {
-      "type": "object",
+      },
+      "additionalProperties": false,
       "required": [
-        "passingTests",
-        "coverage",
-        "styleCompliance"
-      ],
-      "properties": {
-        "passingTests": {
-          "type": "boolean"
-        },
-        "coverage": {
-          "type": "object",
-          "properties": {
-            "current": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 100
-            },
-            "target": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 100
-            }
-          }
-        },
-        "styleCompliance": {
-          "type": "boolean"
-        },
-        "documentation": {
-          "type": "boolean"
-        },
-        "typeSafety": {
-          "type": "boolean"
-        },
-        "lintErrors": {
-          "type": "number",
-          "minimum": 0
-        },
-        "securityAudit": {
-          "type": "boolean"
-        }
-      }
-    },
-    "checkpoints": {
-      "type": "array",
-      "description": "Phase checkpoints with verification status",
-      "items": {
-        "type": "object",
-        "required": [
-          "phase",
-          "status"
-        ],
-        "properties": {
-          "phase": {
-            "type": "string"
-          },
-          "commitSHA": {
-            "type": "string",
-            "pattern": "^[a-f0-9]{7,40}$"
-          },
-          "date": {
-            "type": "string",
-            "format": "date"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "verified",
-              "rejected"
-            ]
-          },
-          "userApproval": {
-            "type": "boolean"
-          }
-        }
-      }
-    },
-    "gitNotes": {
-      "type": "array",
-      "description": "Rich git notes attached to commits",
-      "items": {
-        "type": "object",
-        "properties": {
-          "commitSHA": {
-            "type": "string"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "filesChanged": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "decisions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      }
+        "phase",
+        "tasks",
+        "qualityGates",
+        "checkpoints"
+      ]
     }
   },
   "additionalProperties": false

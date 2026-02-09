@@ -5,104 +5,218 @@
   "description": "Verifiable output from the insecure-defaults skill proving credential detection and configuration auditing occurred",
   "type": "object",
   "required": [
-    "skill_name",
-    "scan_scope",
-    "findings_summary",
-    "findings",
-    "timestamp"
+    "status",
+    "output"
   ],
   "properties": {
-    "skill_name": {
+    "status": {
       "type": "string",
-      "const": "insecure-defaults",
-      "description": "Must be 'insecure-defaults' to verify correct skill was used"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
-    "scan_scope": {
+    "output": {
       "type": "object",
+      "description": "Domain-specific output for insecure-defaults",
       "required": [
-        "directories_scanned"
+        "scan_scope",
+        "findings_summary",
+        "findings"
       ],
       "properties": {
-        "directories_scanned": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "minItems": 1,
-          "description": "Directories that were scanned"
-        },
-        "file_types_checked": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "File extensions included in scan"
-        },
-        "config_files_audited": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Configuration files specifically audited"
-        }
-      },
-      "additionalProperties": false
-    },
-    "findings_summary": {
-      "type": "object",
-      "required": [
-        "total",
-        "categories"
-      ],
-      "properties": {
-        "total": {
-          "type": "number",
-          "minimum": 0
-        },
-        "critical": {
-          "type": "number",
-          "minimum": 0
-        },
-        "high": {
-          "type": "number",
-          "minimum": 0
-        },
-        "medium": {
-          "type": "number",
-          "minimum": 0
-        },
-        "low": {
-          "type": "number",
-          "minimum": 0
-        },
-        "categories": {
+        "scan_scope": {
           "type": "object",
+          "required": [
+            "directories_scanned"
+          ],
           "properties": {
-            "hardcoded_credentials": {
+            "directories_scanned": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "description": "Directories that were scanned"
+            },
+            "file_types_checked": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "File extensions included in scan"
+            },
+            "config_files_audited": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Configuration files specifically audited"
+            }
+          },
+          "additionalProperties": false
+        },
+        "findings_summary": {
+          "type": "object",
+          "required": [
+            "total",
+            "categories"
+          ],
+          "properties": {
+            "total": {
               "type": "number",
               "minimum": 0
             },
-            "fail_open_patterns": {
+            "critical": {
               "type": "number",
               "minimum": 0
             },
-            "insecure_config": {
+            "high": {
               "type": "number",
               "minimum": 0
             },
-            "weak_crypto": {
+            "medium": {
               "type": "number",
               "minimum": 0
             },
-            "missing_security_headers": {
+            "low": {
               "type": "number",
               "minimum": 0
             },
-            "default_credentials": {
+            "categories": {
+              "type": "object",
+              "properties": {
+                "hardcoded_credentials": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "fail_open_patterns": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "insecure_config": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "weak_crypto": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "missing_security_headers": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "default_credentials": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "disabled_security_features": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "findings": {
+          "type": "array",
+          "description": "Individual insecure default findings",
+          "items": {
+            "type": "object",
+            "required": [
+              "category",
+              "severity",
+              "description",
+              "file"
+            ],
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "hardcoded_credentials",
+                  "fail_open",
+                  "insecure_config",
+                  "weak_crypto",
+                  "missing_security_headers",
+                  "default_credentials",
+                  "disabled_security_features",
+                  "overly_permissive"
+                ]
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "CRITICAL",
+                  "HIGH",
+                  "MEDIUM",
+                  "LOW"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the finding"
+              },
+              "file": {
+                "type": "string",
+                "description": "File path"
+              },
+              "line": {
+                "type": "number",
+                "minimum": 1,
+                "description": "Line number (if applicable)"
+              },
+              "cwe": {
+                "type": "string",
+                "description": "CWE identifier"
+              },
+              "owasp": {
+                "type": "string",
+                "description": "OWASP category"
+              },
+              "current_value": {
+                "type": "string",
+                "description": "Current insecure value (redacted if credential)"
+              },
+              "recommended_value": {
+                "type": "string",
+                "description": "Secure alternative value or approach"
+              },
+              "remediation": {
+                "type": "string",
+                "description": "How to fix the finding"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "configuration_audit": {
+          "type": "object",
+          "description": "Configuration audit checklist results",
+          "properties": {
+            "credentials_clean": {
+              "type": "boolean"
+            },
+            "network_secure": {
+              "type": "boolean"
+            },
+            "auth_secure": {
+              "type": "boolean"
+            },
+            "error_handling_secure": {
+              "type": "boolean"
+            },
+            "infrastructure_secure": {
+              "type": "boolean"
+            },
+            "checklist_items_passed": {
               "type": "number",
               "minimum": 0
             },
-            "disabled_security_features": {
+            "checklist_items_total": {
               "type": "number",
               "minimum": 0
             }
@@ -111,112 +225,6 @@
         }
       },
       "additionalProperties": false
-    },
-    "findings": {
-      "type": "array",
-      "description": "Individual insecure default findings",
-      "items": {
-        "type": "object",
-        "required": [
-          "category",
-          "severity",
-          "description",
-          "file"
-        ],
-        "properties": {
-          "category": {
-            "type": "string",
-            "enum": [
-              "hardcoded_credentials",
-              "fail_open",
-              "insecure_config",
-              "weak_crypto",
-              "missing_security_headers",
-              "default_credentials",
-              "disabled_security_features",
-              "overly_permissive"
-            ]
-          },
-          "severity": {
-            "type": "string",
-            "enum": [
-              "CRITICAL",
-              "HIGH",
-              "MEDIUM",
-              "LOW"
-            ]
-          },
-          "description": {
-            "type": "string",
-            "description": "Description of the finding"
-          },
-          "file": {
-            "type": "string",
-            "description": "File path"
-          },
-          "line": {
-            "type": "number",
-            "minimum": 1,
-            "description": "Line number (if applicable)"
-          },
-          "cwe": {
-            "type": "string",
-            "description": "CWE identifier"
-          },
-          "owasp": {
-            "type": "string",
-            "description": "OWASP category"
-          },
-          "current_value": {
-            "type": "string",
-            "description": "Current insecure value (redacted if credential)"
-          },
-          "recommended_value": {
-            "type": "string",
-            "description": "Secure alternative value or approach"
-          },
-          "remediation": {
-            "type": "string",
-            "description": "How to fix the finding"
-          }
-        },
-        "additionalProperties": false
-      }
-    },
-    "configuration_audit": {
-      "type": "object",
-      "description": "Configuration audit checklist results",
-      "properties": {
-        "credentials_clean": {
-          "type": "boolean"
-        },
-        "network_secure": {
-          "type": "boolean"
-        },
-        "auth_secure": {
-          "type": "boolean"
-        },
-        "error_handling_secure": {
-          "type": "boolean"
-        },
-        "infrastructure_secure": {
-          "type": "boolean"
-        },
-        "checklist_items_passed": {
-          "type": "number",
-          "minimum": 0
-        },
-        "checklist_items_total": {
-          "type": "number",
-          "minimum": 0
-        }
-      },
-      "additionalProperties": false
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time",
-      "description": "ISO 8601 timestamp of scan execution"
     }
   },
   "additionalProperties": false

@@ -4,322 +4,333 @@
   "description": "Validates output from auth-security-expert skill",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "auth-security-expert"
-    },
-    "version": {
+    "status": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "oauth21Compliance",
-        "jwtSecurity",
-        "tokenManagement",
-        "passwordSecurity",
-        "sessionManagement",
-        "findings"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "oauth21Compliance": {
+        "output": {
           "type": "object",
           "required": [
-            "compliant",
-            "checks"
+            "oauth21Compliance",
+            "jwtSecurity",
+            "tokenManagement",
+            "passwordSecurity",
+            "sessionManagement",
+            "findings"
           ],
           "properties": {
-            "compliant": {
-              "type": "boolean",
-              "description": "Overall OAuth 2.1 compliance"
-            },
-            "checks": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "requirement",
-                  "standard",
-                  "found",
-                  "compliant"
-                ],
-                "properties": {
-                  "requirement": {
-                    "type": "string",
-                    "enum": [
-                      "Grant Types",
-                      "PKCE",
-                      "Redirect URIs",
-                      "Token Lifetime",
-                      "State Parameter",
-                      "Secure Token Storage"
-                    ]
-                  },
-                  "standard": {
-                    "type": "string",
-                    "description": "OAuth 2.1 standard"
-                  },
-                  "found": {
-                    "type": "string",
-                    "description": "What was found in the code"
-                  },
-                  "compliant": {
-                    "type": "boolean"
-                  },
-                  "issue": {
-                    "type": "string",
-                    "description": "Issue description if not compliant"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "jwtSecurity": {
-          "type": "object",
-          "required": [
-            "compliant",
-            "checks"
-          ],
-          "properties": {
-            "compliant": {
-              "type": "boolean",
-              "description": "Overall RFC 8725 compliance"
-            },
-            "checks": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "requirement",
-                  "standard",
-                  "found",
-                  "compliant"
-                ],
-                "properties": {
-                  "requirement": {
-                    "type": "string",
-                    "enum": [
-                      "Algorithm",
-                      "Signature Validation",
-                      "Expiry (exp)",
-                      "Audience (aud)",
-                      "Not Before (nbf)",
-                      "Token Storage"
-                    ]
-                  },
-                  "standard": {
-                    "type": "string",
-                    "description": "RFC 8725 standard"
-                  },
-                  "found": {
-                    "type": "string",
-                    "description": "What was found in the code"
-                  },
-                  "compliant": {
-                    "type": "boolean"
-                  },
-                  "issue": {
-                    "type": "string",
-                    "description": "Issue description if not compliant"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tokenManagement": {
-          "type": "object",
-          "required": [
-            "accessToken",
-            "refreshToken"
-          ],
-          "properties": {
-            "accessToken": {
+            "oauth21Compliance": {
               "type": "object",
               "required": [
-                "lifetime",
-                "storage",
-                "rotation"
+                "compliant",
+                "checks"
               ],
               "properties": {
-                "lifetime": {
-                  "type": "string",
-                  "description": "Token lifetime"
+                "compliant": {
+                  "type": "boolean",
+                  "description": "Overall OAuth 2.1 compliance"
                 },
-                "storage": {
-                  "type": "string",
-                  "description": "Where tokens are stored"
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "requirement",
+                      "standard",
+                      "found",
+                      "compliant"
+                    ],
+                    "properties": {
+                      "requirement": {
+                        "type": "string",
+                        "enum": [
+                          "Grant Types",
+                          "PKCE",
+                          "Redirect URIs",
+                          "Token Lifetime",
+                          "State Parameter",
+                          "Secure Token Storage"
+                        ]
+                      },
+                      "standard": {
+                        "type": "string",
+                        "description": "OAuth 2.1 standard"
+                      },
+                      "found": {
+                        "type": "string",
+                        "description": "What was found in the code"
+                      },
+                      "compliant": {
+                        "type": "boolean"
+                      },
+                      "issue": {
+                        "type": "string",
+                        "description": "Issue description if not compliant"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "jwtSecurity": {
+              "type": "object",
+              "required": [
+                "compliant",
+                "checks"
+              ],
+              "properties": {
+                "compliant": {
+                  "type": "boolean",
+                  "description": "Overall RFC 8725 compliance"
                 },
-                "rotation": {
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "requirement",
+                      "standard",
+                      "found",
+                      "compliant"
+                    ],
+                    "properties": {
+                      "requirement": {
+                        "type": "string",
+                        "enum": [
+                          "Algorithm",
+                          "Signature Validation",
+                          "Expiry (exp)",
+                          "Audience (aud)",
+                          "Not Before (nbf)",
+                          "Token Storage"
+                        ]
+                      },
+                      "standard": {
+                        "type": "string",
+                        "description": "RFC 8725 standard"
+                      },
+                      "found": {
+                        "type": "string",
+                        "description": "What was found in the code"
+                      },
+                      "compliant": {
+                        "type": "boolean"
+                      },
+                      "issue": {
+                        "type": "string",
+                        "description": "Issue description if not compliant"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "tokenManagement": {
+              "type": "object",
+              "required": [
+                "accessToken",
+                "refreshToken"
+              ],
+              "properties": {
+                "accessToken": {
+                  "type": "object",
+                  "required": [
+                    "lifetime",
+                    "storage",
+                    "rotation"
+                  ],
+                  "properties": {
+                    "lifetime": {
+                      "type": "string",
+                      "description": "Token lifetime"
+                    },
+                    "storage": {
+                      "type": "string",
+                      "description": "Where tokens are stored"
+                    },
+                    "rotation": {
+                      "type": "string",
+                      "description": "Rotation strategy"
+                    },
+                    "compliant": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "refreshToken": {
+                  "type": "object",
+                  "required": [
+                    "lifetime",
+                    "rotation",
+                    "revocation"
+                  ],
+                  "properties": {
+                    "lifetime": {
+                      "type": "string"
+                    },
+                    "rotation": {
+                      "type": "string"
+                    },
+                    "revocation": {
+                      "type": "string",
+                      "description": "Revocation mechanism"
+                    },
+                    "compliant": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "passwordSecurity": {
+              "type": "object",
+              "required": [
+                "algorithm",
+                "costFactor",
+                "saltStrategy",
+                "compliant"
+              ],
+              "properties": {
+                "algorithm": {
                   "type": "string",
-                  "description": "Rotation strategy"
+                  "description": "Hashing algorithm used"
+                },
+                "costFactor": {
+                  "type": "integer",
+                  "description": "Cost factor (for bcrypt)"
+                },
+                "saltStrategy": {
+                  "type": "string",
+                  "description": "Salt generation strategy"
+                },
+                "compliant": {
+                  "type": "boolean"
+                },
+                "issues": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "sessionManagement": {
+              "type": "object",
+              "properties": {
+                "timeout": {
+                  "type": "string"
+                },
+                "secureCookies": {
+                  "type": "boolean"
+                },
+                "httpOnlyCookies": {
+                  "type": "boolean"
+                },
+                "csrfProtection": {
+                  "type": "boolean"
                 },
                 "compliant": {
                   "type": "boolean"
                 }
               }
             },
-            "refreshToken": {
-              "type": "object",
-              "required": [
-                "lifetime",
-                "rotation",
-                "revocation"
-              ],
-              "properties": {
-                "lifetime": {
-                  "type": "string"
-                },
-                "rotation": {
-                  "type": "string"
-                },
-                "revocation": {
-                  "type": "string",
-                  "description": "Revocation mechanism"
-                },
-                "compliant": {
-                  "type": "boolean"
+            "findings": {
+              "type": "array",
+              "description": "Security findings",
+              "items": {
+                "type": "object",
+                "required": [
+                  "severity",
+                  "category",
+                  "description",
+                  "remediation"
+                ],
+                "properties": {
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "CRITICAL",
+                      "HIGH",
+                      "MEDIUM",
+                      "LOW"
+                    ]
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "OAuth 2.1 Violation",
+                      "JWT RFC 8725 Violation",
+                      "Weak Password Hashing",
+                      "Token Storage",
+                      "Session Management",
+                      "Rate Limiting",
+                      "CSRF"
+                    ]
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 20
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "File/line where issue exists"
+                  },
+                  "remediation": {
+                    "type": "string",
+                    "minLength": 20
+                  }
+                }
+              }
+            },
+            "recommendations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "priority",
+                  "recommendation"
+                ],
+                "properties": {
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "recommendation": {
+                    "type": "string"
+                  },
+                  "effort": {
+                    "type": "string",
+                    "enum": [
+                      "trivial",
+                      "small",
+                      "medium",
+                      "large"
+                    ]
+                  }
                 }
               }
             }
-          }
-        },
-        "passwordSecurity": {
-          "type": "object",
-          "required": [
-            "algorithm",
-            "costFactor",
-            "saltStrategy",
-            "compliant"
-          ],
-          "properties": {
-            "algorithm": {
-              "type": "string",
-              "description": "Hashing algorithm used"
-            },
-            "costFactor": {
-              "type": "integer",
-              "description": "Cost factor (for bcrypt)"
-            },
-            "saltStrategy": {
-              "type": "string",
-              "description": "Salt generation strategy"
-            },
-            "compliant": {
-              "type": "boolean"
-            },
-            "issues": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "sessionManagement": {
-          "type": "object",
-          "properties": {
-            "timeout": {
-              "type": "string"
-            },
-            "secureCookies": {
-              "type": "boolean"
-            },
-            "httpOnlyCookies": {
-              "type": "boolean"
-            },
-            "csrfProtection": {
-              "type": "boolean"
-            },
-            "compliant": {
-              "type": "boolean"
-            }
-          }
-        },
-        "findings": {
-          "type": "array",
-          "description": "Security findings",
-          "items": {
-            "type": "object",
-            "required": [
-              "severity",
-              "category",
-              "description",
-              "remediation"
-            ],
-            "properties": {
-              "severity": {
-                "type": "string",
-                "enum": [
-                  "CRITICAL",
-                  "HIGH",
-                  "MEDIUM",
-                  "LOW"
-                ]
-              },
-              "category": {
-                "type": "string",
-                "enum": [
-                  "OAuth 2.1 Violation",
-                  "JWT RFC 8725 Violation",
-                  "Weak Password Hashing",
-                  "Token Storage",
-                  "Session Management",
-                  "Rate Limiting",
-                  "CSRF"
-                ]
-              },
-              "description": {
-                "type": "string",
-                "minLength": 20
-              },
-              "location": {
-                "type": "string",
-                "description": "File/line where issue exists"
-              },
-              "remediation": {
-                "type": "string",
-                "minLength": 20
-              }
-            }
-          }
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "priority",
-              "recommendation"
-            ],
-            "properties": {
-              "priority": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "recommendation": {
-                "type": "string"
-              },
-              "effort": {
-                "type": "string",
-                "enum": [
-                  "trivial",
-                  "small",
-                  "medium",
-                  "large"
-                ]
-              }
-            }
-          }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

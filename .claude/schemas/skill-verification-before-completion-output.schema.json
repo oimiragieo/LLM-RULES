@@ -5,27 +5,10 @@
   "description": "Validates output from verification-before-completion skill - Evidence-based completion gates",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
-    "timestamp",
-    "output"
+    "output",
+    "status"
   ],
   "properties": {
-    "skillName": {
-      "type": "string",
-      "const": "verification-before-completion",
-      "description": "Must be 'verification-before-completion' to verify correct skill was used"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "Skill version (semantic versioning)"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time",
-      "description": "ISO 8601 timestamp of execution"
-    },
     "output": {
       "type": "object",
       "description": "Verification results",
@@ -212,6 +195,15 @@
         }
       },
       "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     }
   },
   "additionalProperties": false

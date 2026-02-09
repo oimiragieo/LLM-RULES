@@ -4,262 +4,273 @@
   "description": "Validates output from security-architect skill",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "security-architect"
-    },
-    "version": {
+    "status": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "threatModel",
-        "owaspAnalysis",
-        "findings",
-        "remediationSteps",
-        "securityPatterns"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "threatModel": {
+        "output": {
           "type": "object",
           "required": [
-            "categories"
+            "threatModel",
+            "owaspAnalysis",
+            "findings",
+            "remediationSteps",
+            "securityPatterns"
           ],
           "properties": {
-            "categories": {
+            "threatModel": {
+              "type": "object",
+              "required": [
+                "categories"
+              ],
+              "properties": {
+                "categories": {
+                  "type": "array",
+                  "description": "STRIDE threat categories",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "threat",
+                      "identified",
+                      "mitigations"
+                    ],
+                    "properties": {
+                      "threat": {
+                        "type": "string",
+                        "enum": [
+                          "Spoofing",
+                          "Tampering",
+                          "Repudiation",
+                          "Information Disclosure",
+                          "Denial of Service",
+                          "Elevation of Privilege"
+                        ]
+                      },
+                      "identified": {
+                        "type": "boolean",
+                        "description": "Was this threat identified in the system?"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "Description of the threat if identified"
+                      },
+                      "mitigations": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Mitigations in place or recommended"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "owaspAnalysis": {
+              "type": "object",
+              "required": [
+                "categories"
+              ],
+              "properties": {
+                "categories": {
+                  "type": "array",
+                  "description": "OWASP Top 10 analysis",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "name",
+                      "vulnerable",
+                      "findings"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^A\\d{2}$",
+                        "description": "OWASP ID (A01-A10)"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Vulnerability name"
+                      },
+                      "vulnerable": {
+                        "type": "boolean",
+                        "description": "Is system vulnerable to this?"
+                      },
+                      "findings": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Specific findings if vulnerable"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "findings": {
               "type": "array",
-              "description": "STRIDE threat categories",
+              "description": "Security findings categorized by severity",
               "items": {
                 "type": "object",
                 "required": [
-                  "threat",
-                  "identified",
-                  "mitigations"
+                  "severity",
+                  "category",
+                  "description",
+                  "location",
+                  "remediation"
                 ],
                 "properties": {
-                  "threat": {
+                  "severity": {
                     "type": "string",
                     "enum": [
-                      "Spoofing",
-                      "Tampering",
-                      "Repudiation",
-                      "Information Disclosure",
-                      "Denial of Service",
-                      "Elevation of Privilege"
+                      "CRITICAL",
+                      "HIGH",
+                      "MEDIUM",
+                      "LOW"
                     ]
                   },
-                  "identified": {
-                    "type": "boolean",
-                    "description": "Was this threat identified in the system?"
+                  "category": {
+                    "type": "string",
+                    "description": "Finding category (injection, auth, crypto, etc.)"
                   },
                   "description": {
                     "type": "string",
-                    "description": "Description of the threat if identified"
+                    "minLength": 20,
+                    "description": "What the security issue is"
                   },
-                  "mitigations": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "Mitigations in place or recommended"
+                  "location": {
+                    "type": "string",
+                    "description": "File/line where issue exists"
+                  },
+                  "impact": {
+                    "type": "string",
+                    "description": "Potential impact if exploited"
+                  },
+                  "remediation": {
+                    "type": "string",
+                    "minLength": 20,
+                    "description": "How to fix the issue"
+                  },
+                  "cve": {
+                    "type": "string",
+                    "description": "CVE number if applicable"
                   }
                 }
               }
-            }
-          }
-        },
-        "owaspAnalysis": {
-          "type": "object",
-          "required": [
-            "categories"
-          ],
-          "properties": {
-            "categories": {
+            },
+            "remediationSteps": {
               "type": "array",
-              "description": "OWASP Top 10 analysis",
+              "description": "Prioritized remediation steps",
               "items": {
                 "type": "object",
                 "required": [
-                  "id",
-                  "name",
-                  "vulnerable",
-                  "findings"
+                  "priority",
+                  "step",
+                  "relatedFindings"
                 ],
                 "properties": {
-                  "id": {
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Priority ranking (1 = highest)"
+                  },
+                  "step": {
                     "type": "string",
-                    "pattern": "^A\\d{2}$",
-                    "description": "OWASP ID (A01-A10)"
+                    "minLength": 20,
+                    "description": "Remediation action"
                   },
-                  "name": {
+                  "effort": {
                     "type": "string",
-                    "description": "Vulnerability name"
+                    "enum": [
+                      "trivial",
+                      "small",
+                      "medium",
+                      "large"
+                    ]
                   },
-                  "vulnerable": {
-                    "type": "boolean",
-                    "description": "Is system vulnerable to this?"
-                  },
-                  "findings": {
+                  "relatedFindings": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "integer"
                     },
-                    "description": "Specific findings if vulnerable"
+                    "description": "Indices of findings this step remediates"
+                  }
+                }
+              }
+            },
+            "securityPatterns": {
+              "type": "object",
+              "description": "Recommended security patterns",
+              "properties": {
+                "authentication": {
+                  "type": "string",
+                  "description": "Recommended auth pattern"
+                },
+                "authorization": {
+                  "type": "string",
+                  "description": "Recommended authz pattern"
+                },
+                "encryption": {
+                  "type": "string",
+                  "description": "Recommended encryption approach"
+                },
+                "inputValidation": {
+                  "type": "string",
+                  "description": "Recommended validation approach"
+                },
+                "secretsManagement": {
+                  "type": "string",
+                  "description": "Recommended secrets management"
+                }
+              }
+            },
+            "complianceNotes": {
+              "type": "object",
+              "description": "Compliance considerations",
+              "properties": {
+                "soc2": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "gdpr": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "hipaa": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
                   }
                 }
               }
             }
-          }
-        },
-        "findings": {
-          "type": "array",
-          "description": "Security findings categorized by severity",
-          "items": {
-            "type": "object",
-            "required": [
-              "severity",
-              "category",
-              "description",
-              "location",
-              "remediation"
-            ],
-            "properties": {
-              "severity": {
-                "type": "string",
-                "enum": [
-                  "CRITICAL",
-                  "HIGH",
-                  "MEDIUM",
-                  "LOW"
-                ]
-              },
-              "category": {
-                "type": "string",
-                "description": "Finding category (injection, auth, crypto, etc.)"
-              },
-              "description": {
-                "type": "string",
-                "minLength": 20,
-                "description": "What the security issue is"
-              },
-              "location": {
-                "type": "string",
-                "description": "File/line where issue exists"
-              },
-              "impact": {
-                "type": "string",
-                "description": "Potential impact if exploited"
-              },
-              "remediation": {
-                "type": "string",
-                "minLength": 20,
-                "description": "How to fix the issue"
-              },
-              "cve": {
-                "type": "string",
-                "description": "CVE number if applicable"
-              }
-            }
-          }
-        },
-        "remediationSteps": {
-          "type": "array",
-          "description": "Prioritized remediation steps",
-          "items": {
-            "type": "object",
-            "required": [
-              "priority",
-              "step",
-              "relatedFindings"
-            ],
-            "properties": {
-              "priority": {
-                "type": "integer",
-                "minimum": 1,
-                "description": "Priority ranking (1 = highest)"
-              },
-              "step": {
-                "type": "string",
-                "minLength": 20,
-                "description": "Remediation action"
-              },
-              "effort": {
-                "type": "string",
-                "enum": [
-                  "trivial",
-                  "small",
-                  "medium",
-                  "large"
-                ]
-              },
-              "relatedFindings": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Indices of findings this step remediates"
-              }
-            }
-          }
-        },
-        "securityPatterns": {
-          "type": "object",
-          "description": "Recommended security patterns",
-          "properties": {
-            "authentication": {
-              "type": "string",
-              "description": "Recommended auth pattern"
-            },
-            "authorization": {
-              "type": "string",
-              "description": "Recommended authz pattern"
-            },
-            "encryption": {
-              "type": "string",
-              "description": "Recommended encryption approach"
-            },
-            "inputValidation": {
-              "type": "string",
-              "description": "Recommended validation approach"
-            },
-            "secretsManagement": {
-              "type": "string",
-              "description": "Recommended secrets management"
-            }
-          }
-        },
-        "complianceNotes": {
-          "type": "object",
-          "description": "Compliance considerations",
-          "properties": {
-            "soc2": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "gdpr": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "hipaa": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

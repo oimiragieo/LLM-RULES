@@ -5,91 +5,100 @@
   "description": "Schema for skill creation artifacts",
   "type": "object",
   "required": [
-    "skillName",
-    "skillPath",
-    "artifactsCreated",
-    "integrationsCompleted"
+    "status",
+    "output"
   ],
   "properties": {
-    "skillName": {
+    "status": {
       "type": "string",
-      "description": "Name of created skill (kebab-case)",
-      "pattern": "^[a-z][a-z0-9-]*$"
-    },
-    "skillPath": {
-      "type": "string",
-      "description": "Path to skill directory",
-      "pattern": "^\\.claude/skills/[a-z][a-z0-9-]*/$"
-    },
-    "artifactsCreated": {
-      "type": "object",
-      "required": [
-        "skillMd",
-        "rules",
-        "schema",
-        "command"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
       ],
-      "properties": {
-        "skillMd": {
-          "type": "boolean",
-          "description": "SKILL.md created"
-        },
-        "rules": {
-          "type": "boolean",
-          "description": "Rules file created"
-        },
-        "schema": {
-          "type": "boolean",
-          "description": "Output schema created"
-        },
-        "command": {
-          "type": "boolean",
-          "description": "Command file created"
-        }
-      }
+      "description": "Execution status of the skill"
     },
-    "integrationsCompleted": {
+    "output": {
       "type": "object",
-      "required": [
-        "catalogUpdated",
-        "agentAssigned",
-        "claudeMdUpdated"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "catalogUpdated": {
-          "type": "boolean",
-          "description": "Skill catalog entry added"
+        "skillPath": {
+          "type": "string",
+          "description": "Path to skill directory",
+          "pattern": "^\\.claude/skills/[a-z][a-z0-9-]*/$"
         },
-        "agentAssigned": {
-          "type": "boolean",
-          "description": "At least one agent assigned"
+        "artifactsCreated": {
+          "type": "object",
+          "required": [
+            "skillMd",
+            "rules",
+            "schema",
+            "command"
+          ],
+          "properties": {
+            "skillMd": {
+              "type": "boolean",
+              "description": "SKILL.md created"
+            },
+            "rules": {
+              "type": "boolean",
+              "description": "Rules file created"
+            },
+            "schema": {
+              "type": "boolean",
+              "description": "Output schema created"
+            },
+            "command": {
+              "type": "boolean",
+              "description": "Command file created"
+            }
+          }
         },
-        "claudeMdUpdated": {
-          "type": "boolean",
-          "description": "CLAUDE.md routing updated (if applicable)"
+        "integrationsCompleted": {
+          "type": "object",
+          "required": [
+            "catalogUpdated",
+            "agentAssigned",
+            "claudeMdUpdated"
+          ],
+          "properties": {
+            "catalogUpdated": {
+              "type": "boolean",
+              "description": "Skill catalog entry added"
+            },
+            "agentAssigned": {
+              "type": "boolean",
+              "description": "At least one agent assigned"
+            },
+            "claudeMdUpdated": {
+              "type": "boolean",
+              "description": "CLAUDE.md routing updated (if applicable)"
+            }
+          }
+        },
+        "assignedAgents": {
+          "type": "array",
+          "description": "List of agents assigned this skill",
+          "items": {
+            "type": "string"
+          }
+        },
+        "routingKeywords": {
+          "type": "array",
+          "description": "Keywords that route to this skill",
+          "items": {
+            "type": "string"
+          }
+        },
+        "companionsNeeded": {
+          "type": "array",
+          "description": "Companion artifacts needed (hooks, templates, etc.)",
+          "items": {
+            "type": "string"
+          }
         }
-      }
-    },
-    "assignedAgents": {
-      "type": "array",
-      "description": "List of agents assigned this skill",
-      "items": {
-        "type": "string"
-      }
-    },
-    "routingKeywords": {
-      "type": "array",
-      "description": "Keywords that route to this skill",
-      "items": {
-        "type": "string"
-      }
-    },
-    "companionsNeeded": {
-      "type": "array",
-      "description": "Companion artifacts needed (hooks, templates, etc.)",
-      "items": {
-        "type": "string"
-      }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

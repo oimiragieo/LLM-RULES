@@ -5,109 +5,129 @@
   "description": "Schema for workflow creation artifacts",
   "type": "object",
   "required": [
-    "workflowName",
-    "workflowPath",
-    "phases",
-    "artifactsCreated",
-    "integrationsCompleted"
+    "status",
+    "output"
   ],
   "properties": {
-    "workflowName": {
+    "status": {
       "type": "string",
-      "description": "Name of created workflow (kebab-case)",
-      "pattern": "^[a-z][a-z0-9-]*$"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
-    "workflowPath": {
-      "type": "string",
-      "description": "Path to workflow file",
-      "pattern": "^\\.claude/workflows/[a-z]+/[a-z][a-z0-9-]*\\.md$"
-    },
-    "phases": {
-      "type": "array",
-      "description": "Workflow phases",
-      "items": {
-        "type": "object",
-        "required": [
-          "name",
-          "agents",
-          "outputs"
-        ],
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "agents": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "outputs": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "gates": {
-            "type": "array",
-            "items": {
-              "type": "string"
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "workflowName": {
+          "type": "string",
+          "description": "Name of created workflow (kebab-case)",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "workflowPath": {
+          "type": "string",
+          "description": "Path to workflow file",
+          "pattern": "^\\.claude/workflows/[a-z]+/[a-z][a-z0-9-]*\\.md$"
+        },
+        "phases": {
+          "type": "array",
+          "description": "Workflow phases",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "agents",
+              "outputs"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "agents": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "outputs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "gates": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           }
+        },
+        "artifactsCreated": {
+          "type": "object",
+          "required": [
+            "workflowFile",
+            "documentationUpdated",
+            "agentMapUpdated"
+          ],
+          "properties": {
+            "workflowFile": {
+              "type": "boolean"
+            },
+            "documentationUpdated": {
+              "type": "boolean"
+            },
+            "agentMapUpdated": {
+              "type": "boolean"
+            }
+          }
+        },
+        "integrationsCompleted": {
+          "type": "object",
+          "required": [
+            "enterpriseWorkflowsUpdated",
+            "qualityGatesDefined",
+            "tested"
+          ],
+          "properties": {
+            "enterpriseWorkflowsUpdated": {
+              "type": "boolean"
+            },
+            "qualityGatesDefined": {
+              "type": "boolean"
+            },
+            "tested": {
+              "type": "boolean"
+            }
+          }
+        },
+        "participatingAgents": {
+          "type": "array",
+          "description": "Agents participating in workflow",
+          "items": {
+            "type": "string"
+          }
+        },
+        "qualityGates": {
+          "type": "array",
+          "description": "Quality gates defined",
+          "items": {
+            "type": "string"
+          }
         }
-      }
-    },
-    "artifactsCreated": {
-      "type": "object",
+      },
+      "additionalProperties": false,
       "required": [
-        "workflowFile",
-        "documentationUpdated",
-        "agentMapUpdated"
-      ],
-      "properties": {
-        "workflowFile": {
-          "type": "boolean"
-        },
-        "documentationUpdated": {
-          "type": "boolean"
-        },
-        "agentMapUpdated": {
-          "type": "boolean"
-        }
-      }
-    },
-    "integrationsCompleted": {
-      "type": "object",
-      "required": [
-        "enterpriseWorkflowsUpdated",
-        "qualityGatesDefined",
-        "tested"
-      ],
-      "properties": {
-        "enterpriseWorkflowsUpdated": {
-          "type": "boolean"
-        },
-        "qualityGatesDefined": {
-          "type": "boolean"
-        },
-        "tested": {
-          "type": "boolean"
-        }
-      }
-    },
-    "participatingAgents": {
-      "type": "array",
-      "description": "Agents participating in workflow",
-      "items": {
-        "type": "string"
-      }
-    },
-    "qualityGates": {
-      "type": "array",
-      "description": "Quality gates defined",
-      "items": {
-        "type": "string"
-      }
+        "workflowName",
+        "workflowPath",
+        "phases",
+        "artifactsCreated",
+        "integrationsCompleted"
+      ]
     }
   },
   "additionalProperties": false

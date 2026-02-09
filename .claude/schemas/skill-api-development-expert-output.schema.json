@@ -5,106 +5,36 @@
   "description": "Output schema for REST API development including design, OpenAPI, and best practices",
   "type": "object",
   "required": [
-    "skillName",
-    "timestamp",
-    "result"
+    "status",
+    "output"
   ],
   "properties": {
-    "skillName": {
+    "status": {
       "type": "string",
-      "const": "api-development-expert"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "default": "1.0.0"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "result": {
-      "type": "object",
-      "required": [
-        "type"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
       ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "design",
-            "openapi-spec",
-            "security-review",
-            "optimization"
-          ]
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "category",
-              "recommendation"
-            ],
-            "properties": {
-              "category": {
-                "type": "string"
-              },
-              "recommendation": {
-                "type": "string"
-              },
-              "priority": {
-                "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
-              }
-            }
-          }
-        },
-        "securityFindings": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "finding",
-              "severity"
-            ],
-            "properties": {
-              "finding": {
-                "type": "string"
-              },
-              "severity": {
-                "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
-              },
-              "remediation": {
-                "type": "string"
-              }
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "duration": {
+              "type": "number"
+            },
+            "agent": {
+              "type": "string"
             }
           }
         }
       },
       "additionalProperties": false
-    },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "duration": {
-          "type": "number"
-        },
-        "agent": {
-          "type": "string"
-        }
-      }
     }
   },
   "additionalProperties": false

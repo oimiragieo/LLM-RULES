@@ -3,83 +3,95 @@
   "title": "Go Expert Output",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "go-expert"
-    },
-    "version": {
-      "type": "string"
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "language",
-        "codeGenerated"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "language": {
-          "const": "Go"
-        },
-        "goVersion": {
-          "type": "string",
-          "description": "Go version (e.g., '1.22')"
-        },
-        "codeGenerated": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "file",
-              "content"
-            ],
-            "properties": {
-              "file": {
-                "type": "string"
-              },
-              "content": {
-                "type": "string"
-              },
-              "package": {
-                "type": "string"
-              },
-              "exports": {
-                "type": "array",
-                "items": {
-                  "type": "string"
+        "output": {
+          "type": "object",
+          "required": [
+            "language",
+            "codeGenerated"
+          ],
+          "properties": {
+            "language": {
+              "const": "Go"
+            },
+            "goVersion": {
+              "type": "string",
+              "description": "Go version (e.g., '1.22')"
+            },
+            "codeGenerated": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "content"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "package": {
+                    "type": "string"
+                  },
+                  "exports": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
-            }
-          }
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "concurrency": {
-          "type": "object",
-          "properties": {
-            "goroutines": {
-              "type": "integer"
             },
-            "channels": {
-              "type": "integer"
+            "recommendations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "concurrency": {
+              "type": "object",
+              "properties": {
+                "goroutines": {
+                  "type": "integer"
+                },
+                "channels": {
+                  "type": "integer"
+                }
+              }
+            },
+            "tests": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
-          }
-        },
-        "tests": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

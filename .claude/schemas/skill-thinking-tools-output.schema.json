@@ -4,78 +4,89 @@
   "description": "Output schema for thinking-tools skill",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "thinking-tools"
-    },
-    "version": {
+    "status": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "checkpoint",
-        "timestamp",
-        "result"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "checkpoint": {
-          "type": "string",
-          "enum": [
-            "collected-information",
-            "task-adherence",
-            "completion"
-          ]
-        },
-        "timestamp": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "result": {
+        "output": {
           "type": "object",
           "required": [
-            "passed",
-            "findings"
+            "checkpoint",
+            "timestamp",
+            "result"
           ],
           "properties": {
-            "passed": {
-              "type": "boolean"
+            "checkpoint": {
+              "type": "string",
+              "enum": [
+                "collected-information",
+                "task-adherence",
+                "completion"
+              ]
             },
-            "findings": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "question",
-                  "answer",
-                  "concern"
-                ],
-                "properties": {
-                  "question": {
-                    "type": "string"
-                  },
-                  "answer": {
-                    "type": "string"
-                  },
-                  "concern": {
-                    "type": "boolean"
+            "timestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "result": {
+              "type": "object",
+              "required": [
+                "passed",
+                "findings"
+              ],
+              "properties": {
+                "passed": {
+                  "type": "boolean"
+                },
+                "findings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "question",
+                      "answer",
+                      "concern"
+                    ],
+                    "properties": {
+                      "question": {
+                        "type": "string"
+                      },
+                      "answer": {
+                        "type": "string"
+                      },
+                      "concern": {
+                        "type": "boolean"
+                      }
+                    }
                   }
+                },
+                "action": {
+                  "type": "string",
+                  "description": "What to do based on checkpoint result"
                 }
               }
-            },
-            "action": {
-              "type": "string",
-              "description": "What to do based on checkpoint result"
             }
-          }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

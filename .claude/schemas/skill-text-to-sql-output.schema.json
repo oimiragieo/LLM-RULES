@@ -5,147 +5,36 @@
   "description": "Output schema for text-to-SQL conversion with validation and security checks",
   "type": "object",
   "required": [
-    "skillName",
-    "timestamp",
-    "result"
+    "status",
+    "output"
   ],
   "properties": {
-    "skillName": {
+    "status": {
       "type": "string",
-      "const": "text-to-sql"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "default": "1.0.0"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "result": {
-      "type": "object",
-      "required": [
-        "naturalLanguage",
-        "sql"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
       ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "naturalLanguage": {
-          "type": "string"
-        },
-        "sql": {
-          "type": "string"
-        },
-        "isParameterized": {
-          "type": "boolean"
-        },
-        "isReadOnly": {
-          "type": "boolean"
-        },
-        "explanation": {
-          "type": "string"
-        },
-        "validation": {
+        "metadata": {
           "type": "object",
           "properties": {
-            "syntaxValid": {
-              "type": "boolean"
+            "duration": {
+              "type": "number"
             },
-            "securityChecksPassed": {
-              "type": "boolean"
-            },
-            "issues": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "severity",
-                  "message"
-                ],
-                "properties": {
-                  "severity": {
-                    "type": "string",
-                    "enum": [
-                      "error",
-                      "warning",
-                      "info"
-                    ]
-                  },
-                  "message": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "securityFindings": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "finding",
-              "severity"
-            ],
-            "properties": {
-              "finding": {
-                "type": "string"
-              },
-              "severity": {
-                "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
-              },
-              "remediation": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "category",
-              "recommendation"
-            ],
-            "properties": {
-              "category": {
-                "type": "string"
-              },
-              "recommendation": {
-                "type": "string"
-              },
-              "priority": {
-                "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
-              }
+            "agent": {
+              "type": "string"
             }
           }
         }
       },
       "additionalProperties": false
-    },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "duration": {
-          "type": "number"
-        },
-        "agent": {
-          "type": "string"
-        }
-      }
     }
   },
   "additionalProperties": false

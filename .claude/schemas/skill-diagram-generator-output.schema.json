@@ -5,162 +5,170 @@
   "description": "Verifiable output from the diagram-generator skill that proves diagram creation occurred",
   "type": "object",
   "required": [
-    "skill_name",
-    "diagram_type",
-    "mermaid_syntax",
-    "output_file",
-    "entities_included",
-    "timestamp"
+    "status",
+    "output"
   ],
   "properties": {
-    "skill_name": {
-      "type": "string",
-      "const": "diagram-generator",
-      "description": "Must be 'diagram-generator' to verify correct skill was used"
-    },
-    "diagram_type": {
+    "status": {
       "type": "string",
       "enum": [
-        "architecture",
-        "sequence",
-        "flow",
-        "erd",
-        "class",
-        "state",
-        "gantt",
-        "user-journey",
-        "c4-context",
-        "c4-container",
-        "c4-component"
+        "success",
+        "partial",
+        "failed"
       ],
-      "description": "Type of diagram generated"
+      "description": "Execution status of the skill"
     },
-    "mermaid_syntax": {
-      "type": "string",
-      "minLength": 10,
-      "description": "Complete Mermaid diagram syntax (proof of generation)"
-    },
-    "output_file": {
-      "type": "string",
-      "description": "Path to generated diagram file (.md or .mmd)"
-    },
-    "entities_included": {
-      "type": "array",
-      "description": "Entities/components included in diagram (proves analysis)",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "required": [
-          "name",
-          "type"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Entity name"
-          },
-          "type": {
-            "type": "string",
-            "description": "Entity type (component, service, database, etc.)"
-          },
-          "relationships": {
-            "type": "array",
-            "items": {
-              "type": "string"
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "diagram_type": {
+          "type": "string",
+          "enum": [
+            "architecture",
+            "sequence",
+            "flow",
+            "erd",
+            "class",
+            "state",
+            "gantt",
+            "user-journey",
+            "c4-context",
+            "c4-container",
+            "c4-component"
+          ],
+          "description": "Type of diagram generated"
+        },
+        "mermaid_syntax": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Complete Mermaid diagram syntax (proof of generation)"
+        },
+        "output_file": {
+          "type": "string",
+          "description": "Path to generated diagram file (.md or .mmd)"
+        },
+        "entities_included": {
+          "type": "array",
+          "description": "Entities/components included in diagram (proves analysis)",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Entity name"
+              },
+              "type": {
+                "type": "string",
+                "description": "Entity type (component, service, database, etc.)"
+              },
+              "relationships": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Related entities"
+              }
             },
-            "description": "Related entities"
+            "additionalProperties": false
           }
         },
-        "additionalProperties": false
-      }
-    },
-    "relationships_mapped": {
-      "type": "number",
-      "minimum": 0,
-      "description": "Number of relationships/connections in diagram"
-    },
-    "layers_included": {
-      "type": "array",
-      "description": "Architectural layers or diagram sections",
-      "items": {
-        "type": "string"
-      },
-      "examples": [
-        "Presentation Layer",
-        "Business Logic Layer",
-        "Data Access Layer",
-        "Infrastructure"
-      ]
-    },
-    "source_files_analyzed": {
-      "type": "array",
-      "description": "Source files analyzed to create diagram",
-      "items": {
-        "type": "string"
-      }
-    },
-    "diagram_metadata": {
-      "type": "object",
-      "description": "Additional diagram information",
-      "properties": {
-        "title": {
-          "type": "string",
-          "description": "Diagram title"
-        },
-        "description": {
-          "type": "string",
-          "description": "Diagram description"
-        },
-        "complexity_score": {
-          "type": "number",
-          "minimum": 1,
-          "maximum": 10,
-          "description": "Complexity rating (1-10)"
-        },
-        "node_count": {
-          "type": "number",
-          "minimum": 1,
-          "description": "Total number of nodes in diagram"
-        },
-        "edge_count": {
+        "relationships_mapped": {
           "type": "number",
           "minimum": 0,
-          "description": "Total number of edges/connections"
+          "description": "Number of relationships/connections in diagram"
+        },
+        "layers_included": {
+          "type": "array",
+          "description": "Architectural layers or diagram sections",
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            "Presentation Layer",
+            "Business Logic Layer",
+            "Data Access Layer",
+            "Infrastructure"
+          ]
+        },
+        "source_files_analyzed": {
+          "type": "array",
+          "description": "Source files analyzed to create diagram",
+          "items": {
+            "type": "string"
+          }
+        },
+        "diagram_metadata": {
+          "type": "object",
+          "description": "Additional diagram information",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Diagram title"
+            },
+            "description": {
+              "type": "string",
+              "description": "Diagram description"
+            },
+            "complexity_score": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10,
+              "description": "Complexity rating (1-10)"
+            },
+            "node_count": {
+              "type": "number",
+              "minimum": 1,
+              "description": "Total number of nodes in diagram"
+            },
+            "edge_count": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Total number of edges/connections"
+            }
+          },
+          "additionalProperties": false
+        },
+        "rendered_output": {
+          "type": "object",
+          "description": "Rendered diagram outputs",
+          "properties": {
+            "svg_path": {
+              "type": "string",
+              "description": "Path to SVG output (if rendered)"
+            },
+            "png_path": {
+              "type": "string",
+              "description": "Path to PNG output (if rendered)"
+            },
+            "pdf_path": {
+              "type": "string",
+              "description": "Path to PDF output (if rendered)"
+            }
+          },
+          "additionalProperties": false
+        },
+        "mermaid_version": {
+          "type": "string",
+          "description": "Mermaid syntax version used"
+        },
+        "validation_passed": {
+          "type": "boolean",
+          "description": "Whether Mermaid syntax validation passed"
         }
       },
-      "additionalProperties": false
-    },
-    "rendered_output": {
-      "type": "object",
-      "description": "Rendered diagram outputs",
-      "properties": {
-        "svg_path": {
-          "type": "string",
-          "description": "Path to SVG output (if rendered)"
-        },
-        "png_path": {
-          "type": "string",
-          "description": "Path to PNG output (if rendered)"
-        },
-        "pdf_path": {
-          "type": "string",
-          "description": "Path to PDF output (if rendered)"
-        }
-      },
-      "additionalProperties": false
-    },
-    "mermaid_version": {
-      "type": "string",
-      "description": "Mermaid syntax version used"
-    },
-    "validation_passed": {
-      "type": "boolean",
-      "description": "Whether Mermaid syntax validation passed"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time",
-      "description": "ISO 8601 timestamp of diagram generation"
+      "additionalProperties": false,
+      "required": [
+        "diagram_type",
+        "mermaid_syntax",
+        "output_file",
+        "entities_included"
+      ]
     }
   },
   "additionalProperties": false

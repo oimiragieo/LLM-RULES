@@ -5,25 +5,22 @@
   "description": "Output schema for frontend development including UI/UX, responsive design, and accessibility",
   "type": "object",
   "required": [
-    "skillName",
-    "timestamp",
-    "result"
+    "status",
+    "output"
   ],
   "properties": {
-    "skillName": {
-      "type": "string",
-      "const": "frontend-expert"
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "number"
+        },
+        "agent": {
+          "type": "string"
+        }
+      }
     },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "default": "1.0.0"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "result": {
+    "output": {
       "type": "object",
       "required": [
         "type"
@@ -119,16 +116,14 @@
       },
       "additionalProperties": false
     },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "duration": {
-          "type": "number"
-        },
-        "agent": {
-          "type": "string"
-        }
-      }
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     }
   },
   "additionalProperties": false

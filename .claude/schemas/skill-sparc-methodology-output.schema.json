@@ -5,168 +5,188 @@
   "description": "Schema for SPARC development methodology tracking",
   "type": "object",
   "required": [
-    "currentPhase",
-    "phases",
-    "qualityGates"
+    "status",
+    "output"
   ],
   "properties": {
-    "currentPhase": {
+    "status": {
       "type": "string",
       "enum": [
-        "specification",
-        "architecture",
-        "refinement",
-        "review",
-        "completion"
+        "success",
+        "partial",
+        "failed"
       ],
-      "description": "Current SPARC phase"
+      "description": "Execution status of the skill"
     },
-    "phases": {
+    "output": {
       "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "specification": {
+        "currentPhase": {
+          "type": "string",
+          "enum": [
+            "specification",
+            "architecture",
+            "refinement",
+            "review",
+            "completion"
+          ],
+          "description": "Current SPARC phase"
+        },
+        "phases": {
           "type": "object",
           "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "in_progress",
-                "complete"
-              ]
-            },
-            "requirements": {
-              "type": "array",
-              "items": {
-                "type": "string"
+            "specification": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "in_progress",
+                    "complete"
+                  ]
+                },
+                "requirements": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "constraints": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "successMetrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
               }
             },
-            "constraints": {
-              "type": "array",
-              "items": {
-                "type": "string"
+            "architecture": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "in_progress",
+                    "complete"
+                  ]
+                },
+                "components": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "interfaces": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
               }
             },
-            "successMetrics": {
-              "type": "array",
-              "items": {
-                "type": "string"
+            "refinement": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "in_progress",
+                    "complete"
+                  ]
+                },
+                "tddCycles": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "testsPassing": {
+                  "type": "boolean"
+                },
+                "coverage": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              }
+            },
+            "review": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "in_progress",
+                    "complete"
+                  ]
+                },
+                "codeReview": {
+                  "type": "boolean"
+                },
+                "securityReview": {
+                  "type": "boolean"
+                },
+                "performanceReview": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "completion": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "in_progress",
+                    "complete"
+                  ]
+                },
+                "integrationTesting": {
+                  "type": "boolean"
+                },
+                "documentationComplete": {
+                  "type": "boolean"
+                },
+                "deploymentReady": {
+                  "type": "boolean"
+                }
               }
             }
           }
         },
-        "architecture": {
+        "qualityGates": {
           "type": "object",
           "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "in_progress",
-                "complete"
-              ]
-            },
-            "components": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "interfaces": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "refinement": {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "in_progress",
-                "complete"
-              ]
-            },
-            "tddCycles": {
-              "type": "number",
-              "minimum": 0
-            },
-            "testsPassing": {
+            "allTestsPassing": {
               "type": "boolean"
             },
-            "coverage": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 100
-            }
-          }
-        },
-        "review": {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "in_progress",
-                "complete"
-              ]
-            },
-            "codeReview": {
+            "coverageTarget": {
               "type": "boolean"
             },
-            "securityReview": {
+            "securityClean": {
               "type": "boolean"
             },
-            "performanceReview": {
-              "type": "boolean"
-            }
-          }
-        },
-        "completion": {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "in_progress",
-                "complete"
-              ]
-            },
-            "integrationTesting": {
-              "type": "boolean"
-            },
-            "documentationComplete": {
-              "type": "boolean"
-            },
-            "deploymentReady": {
+            "performanceBaseline": {
               "type": "boolean"
             }
           }
         }
-      }
-    },
-    "qualityGates": {
-      "type": "object",
-      "properties": {
-        "allTestsPassing": {
-          "type": "boolean"
-        },
-        "coverageTarget": {
-          "type": "boolean"
-        },
-        "securityClean": {
-          "type": "boolean"
-        },
-        "performanceBaseline": {
-          "type": "boolean"
-        }
-      }
+      },
+      "additionalProperties": false,
+      "required": [
+        "currentPhase",
+        "phases",
+        "qualityGates"
+      ]
     }
   },
   "additionalProperties": false

@@ -5,204 +5,43 @@
   "description": "Output schema for incident response runbooks with procedures, escalation paths, and recovery actions",
   "type": "object",
   "required": [
-    "skillName",
-    "timestamp",
-    "result"
+    "status",
+    "output"
   ],
   "properties": {
-    "skillName": {
+    "status": {
       "type": "string",
-      "const": "incident-runbook-templates"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "default": "1.0.0"
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "result": {
-      "type": "object",
-      "required": [
-        "incidentType",
-        "severity"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
       ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "incidentType": {
-          "type": "string",
-          "examples": [
-            "service-outage",
-            "security-breach",
-            "performance-degradation",
-            "data-loss"
-          ]
-        },
-        "severity": {
-          "type": "string",
-          "enum": [
-            "P0",
-            "P1",
-            "P2",
-            "P3",
-            "P4"
-          ]
-        },
-        "runbook": {
-          "type": "object",
-          "required": [
-            "detection",
-            "triage",
-            "mitigation"
-          ],
-          "properties": {
-            "detection": {
-              "type": "object",
-              "properties": {
-                "symptoms": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "alerts": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "diagnosticCommands": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "triage": {
-              "type": "object",
-              "properties": {
-                "steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "expectedOutputs": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "decisionTree": {
-                  "type": "string"
-                }
-              }
-            },
-            "mitigation": {
-              "type": "object",
-              "properties": {
-                "immediateActions": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "rollbackProcedure": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "failoverSteps": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "escalation": {
-              "type": "object",
-              "properties": {
-                "triggers": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "contacts": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "role": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "contact": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "communication": {
-              "type": "object",
-              "properties": {
-                "statusPageTemplate": {
-                  "type": "string"
-                },
-                "internalNotification": {
-                  "type": "string"
-                },
-                "externalNotification": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "testing": {
+        "metadata": {
           "type": "object",
           "properties": {
-            "lastTested": {
+            "author": {
+              "type": "string"
+            },
+            "lastUpdated": {
               "type": "string",
               "format": "date-time"
             },
-            "testResults": {
+            "version": {
               "type": "string"
             },
-            "nextReviewDate": {
-              "type": "string",
-              "format": "date"
+            "agent": {
+              "type": "string"
             }
           }
         }
       },
       "additionalProperties": false
-    },
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "author": {
-          "type": "string"
-        },
-        "lastUpdated": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "version": {
-          "type": "string"
-        },
-        "agent": {
-          "type": "string"
-        }
-      }
     }
   },
   "additionalProperties": false

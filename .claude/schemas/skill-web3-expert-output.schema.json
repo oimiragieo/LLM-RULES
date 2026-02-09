@@ -3,134 +3,146 @@
   "title": "Web3 Expert Output",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "web3-expert"
-    },
-    "version": {
-      "type": "string"
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "language",
-        "framework",
-        "codeGenerated"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "language": {
-          "type": "string",
-          "enum": [
-            "Solidity",
-            "Vyper",
-            "Rust",
-            "Other"
-          ]
-        },
-        "framework": {
-          "type": "string",
-          "enum": [
-            "Hardhat",
-            "Foundry",
-            "Truffle",
-            "Anchor",
-            "Other"
-          ]
-        },
-        "solidityVersion": {
-          "type": "string",
-          "description": "Solidity version (e.g., '0.8.28')"
-        },
-        "codeGenerated": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "file",
-              "content"
-            ],
-            "properties": {
-              "file": {
+        "output": {
+          "type": "object",
+          "required": [
+            "language",
+            "framework",
+            "codeGenerated"
+          ],
+          "properties": {
+            "language": {
+              "type": "string",
+              "enum": [
+                "Solidity",
+                "Vyper",
+                "Rust",
+                "Other"
+              ]
+            },
+            "framework": {
+              "type": "string",
+              "enum": [
+                "Hardhat",
+                "Foundry",
+                "Truffle",
+                "Anchor",
+                "Other"
+              ]
+            },
+            "solidityVersion": {
+              "type": "string",
+              "description": "Solidity version (e.g., '0.8.28')"
+            },
+            "codeGenerated": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "content"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "contractType": {
+                    "type": "string",
+                    "enum": [
+                      "token",
+                      "nft",
+                      "defi",
+                      "governance",
+                      "proxy",
+                      "library",
+                      "other"
+                    ]
+                  },
+                  "standards": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "ERC standards implemented (e.g., ERC20, ERC721)"
+                  }
+                }
+              }
+            },
+            "recommendations": {
+              "type": "array",
+              "items": {
                 "type": "string"
-              },
-              "content": {
-                "type": "string"
-              },
-              "contractType": {
-                "type": "string",
-                "enum": [
-                  "token",
-                  "nft",
-                  "defi",
-                  "governance",
-                  "proxy",
-                  "library",
-                  "other"
-                ]
-              },
-              "standards": {
-                "type": "array",
-                "items": {
-                  "type": "string"
+              }
+            },
+            "security": {
+              "type": "object",
+              "properties": {
+                "audited": {
+                  "type": "boolean"
                 },
-                "description": "ERC standards implemented (e.g., ERC20, ERC721)"
+                "vulnerabilities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "mitigations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
               }
-            }
-          }
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "security": {
-          "type": "object",
-          "properties": {
-            "audited": {
-              "type": "boolean"
             },
-            "vulnerabilities": {
+            "tests": {
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "description": "Test files created"
             },
-            "mitigations": {
-              "type": "array",
-              "items": {
-                "type": "string"
+            "gasOptimization": {
+              "type": "object",
+              "properties": {
+                "estimatedGas": {
+                  "type": "integer"
+                },
+                "optimizations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
               }
             }
-          }
-        },
-        "tests": {
-          "type": "array",
-          "items": {
-            "type": "string"
           },
-          "description": "Test files created"
-        },
-        "gasOptimization": {
-          "type": "object",
-          "properties": {
-            "estimatedGas": {
-              "type": "integer"
-            },
-            "optimizations": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

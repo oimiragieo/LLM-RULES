@@ -5,71 +5,91 @@
   "description": "Schema for template creation artifacts",
   "type": "object",
   "required": [
-    "templateName",
-    "templatePath",
-    "placeholders",
-    "artifactsCreated"
+    "status",
+    "output"
   ],
   "properties": {
-    "templateName": {
-      "type": "string",
-      "description": "Name of created template (kebab-case)",
-      "pattern": "^[a-z][a-z0-9-]*$"
-    },
-    "templatePath": {
-      "type": "string",
-      "description": "Path to template file",
-      "pattern": "^\\.claude/templates/[a-z]+/"
-    },
-    "templateType": {
+    "status": {
       "type": "string",
       "enum": [
-        "spawn",
-        "artifact",
-        "code"
+        "success",
+        "partial",
+        "failed"
       ],
-      "description": "Template category"
+      "description": "Execution status of the skill"
     },
-    "placeholders": {
-      "type": "array",
-      "description": "Placeholders in template",
-      "items": {
-        "type": "string",
-        "pattern": "^<[A-Z_]+>$"
-      }
-    },
-    "artifactsCreated": {
+    "output": {
       "type": "object",
-      "required": [
-        "templateFile",
-        "catalogEntry",
-        "consumingSkillDoc"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "templateFile": {
-          "type": "boolean"
+        "templateName": {
+          "type": "string",
+          "description": "Name of created template (kebab-case)",
+          "pattern": "^[a-z][a-z0-9-]*$"
         },
-        "catalogEntry": {
-          "type": "boolean"
+        "templatePath": {
+          "type": "string",
+          "description": "Path to template file",
+          "pattern": "^\\.claude/templates/[a-z]+/"
         },
-        "consumingSkillDoc": {
-          "type": "boolean"
+        "templateType": {
+          "type": "string",
+          "enum": [
+            "spawn",
+            "artifact",
+            "code"
+          ],
+          "description": "Template category"
+        },
+        "placeholders": {
+          "type": "array",
+          "description": "Placeholders in template",
+          "items": {
+            "type": "string",
+            "pattern": "^<[A-Z_]+>$"
+          }
+        },
+        "artifactsCreated": {
+          "type": "object",
+          "required": [
+            "templateFile",
+            "catalogEntry",
+            "consumingSkillDoc"
+          ],
+          "properties": {
+            "templateFile": {
+              "type": "boolean"
+            },
+            "catalogEntry": {
+              "type": "boolean"
+            },
+            "consumingSkillDoc": {
+              "type": "boolean"
+            }
+          }
+        },
+        "consumingSkills": {
+          "type": "array",
+          "description": "Skills that use this template",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validationRules": {
+          "type": "array",
+          "description": "Rules for validating template output",
+          "items": {
+            "type": "string"
+          }
         }
-      }
-    },
-    "consumingSkills": {
-      "type": "array",
-      "description": "Skills that use this template",
-      "items": {
-        "type": "string"
-      }
-    },
-    "validationRules": {
-      "type": "array",
-      "description": "Rules for validating template output",
-      "items": {
-        "type": "string"
-      }
+      },
+      "additionalProperties": false,
+      "required": [
+        "templateName",
+        "templatePath",
+        "placeholders",
+        "artifactsCreated"
+      ]
     }
   },
   "additionalProperties": false

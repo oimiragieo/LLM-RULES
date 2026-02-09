@@ -3,84 +3,95 @@
   "title": "TypeScript Expert Output",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "typescript-expert"
-    },
-    "version": {
+    "status": {
       "type": "string",
-      "description": "Skill version"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "language",
-        "framework",
-        "codeGenerated"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "language": {
-          "const": "TypeScript"
-        },
-        "framework": {
-          "type": "string",
-          "description": "Framework used (React, Vue, Angular, Node.js, etc.)"
-        },
-        "codeGenerated": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "file",
-              "content"
-            ],
-            "properties": {
-              "file": {
-                "type": "string",
-                "description": "File path"
+        "output": {
+          "type": "object",
+          "required": [
+            "language",
+            "framework",
+            "codeGenerated"
+          ],
+          "properties": {
+            "language": {
+              "const": "TypeScript"
+            },
+            "framework": {
+              "type": "string",
+              "description": "Framework used (React, Vue, Angular, Node.js, etc.)"
+            },
+            "codeGenerated": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "content"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "description": "File path"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Generated TypeScript code"
+                  },
+                  "types": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Types/interfaces defined"
+                  }
+                }
+              }
+            },
+            "recommendations": {
+              "type": "array",
+              "items": {
+                "type": "string"
               },
-              "content": {
-                "type": "string",
-                "description": "Generated TypeScript code"
-              },
-              "types": {
-                "type": "array",
-                "items": {
-                  "type": "string"
+              "description": "TypeScript best practice recommendations"
+            },
+            "typeSafety": {
+              "type": "object",
+              "properties": {
+                "strictMode": {
+                  "type": "boolean"
                 },
-                "description": "Types/interfaces defined"
+                "anyUsage": {
+                  "type": "integer",
+                  "description": "Number of 'any' types used"
+                },
+                "genericTypes": {
+                  "type": "integer"
+                }
               }
             }
-          }
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "string"
           },
-          "description": "TypeScript best practice recommendations"
-        },
-        "typeSafety": {
-          "type": "object",
-          "properties": {
-            "strictMode": {
-              "type": "boolean"
-            },
-            "anyUsage": {
-              "type": "integer",
-              "description": "Number of 'any' types used"
-            },
-            "genericTypes": {
-              "type": "integer"
-            }
-          }
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

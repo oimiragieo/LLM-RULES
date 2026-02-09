@@ -3,17 +3,10 @@
   "title": "React Expert Output",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "react-expert"
-    },
-    "version": {
-      "type": "string"
-    },
     "output": {
       "type": "object",
       "required": [
@@ -89,6 +82,15 @@
         }
       },
       "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     }
   },
   "additionalProperties": false,

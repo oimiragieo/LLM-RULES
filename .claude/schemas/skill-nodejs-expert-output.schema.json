@@ -3,96 +3,108 @@
   "title": "Node.js Expert Output",
   "type": "object",
   "required": [
-    "skillName",
-    "version",
+    "status",
     "output"
   ],
   "properties": {
-    "skillName": {
-      "const": "nodejs-expert"
-    },
-    "version": {
-      "type": "string"
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
-      "required": [
-        "language",
-        "framework",
-        "codeGenerated"
-      ],
+      "description": "Skill-specific output data",
       "properties": {
-        "language": {
-          "const": "TypeScript"
-        },
-        "framework": {
-          "type": "string",
-          "enum": [
-            "Express",
-            "NestJS",
-            "Fastify",
-            "Koa",
-            "Other"
-          ]
-        },
-        "codeGenerated": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "file",
-              "content"
-            ],
-            "properties": {
-              "file": {
-                "type": "string"
-              },
-              "content": {
-                "type": "string"
-              },
-              "moduleType": {
-                "type": "string",
-                "enum": [
-                  "controller",
-                  "service",
-                  "middleware",
-                  "module",
-                  "dto",
-                  "entity",
-                  "other"
-                ]
-              }
-            }
-          }
-        },
-        "recommendations": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "architecture": {
+        "output": {
           "type": "object",
+          "required": [
+            "language",
+            "framework",
+            "codeGenerated"
+          ],
           "properties": {
-            "modular": {
-              "type": "boolean"
+            "language": {
+              "const": "TypeScript"
             },
-            "modules": {
+            "framework": {
+              "type": "string",
+              "enum": [
+                "Express",
+                "NestJS",
+                "Fastify",
+                "Koa",
+                "Other"
+              ]
+            },
+            "codeGenerated": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "content"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "moduleType": {
+                    "type": "string",
+                    "enum": [
+                      "controller",
+                      "service",
+                      "middleware",
+                      "module",
+                      "dto",
+                      "entity",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            },
+            "recommendations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "architecture": {
+              "type": "object",
+              "properties": {
+                "modular": {
+                  "type": "boolean"
+                },
+                "modules": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "tests": {
               "type": "array",
               "items": {
                 "type": "string"
               }
             }
-          }
-        },
-        "tests": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          },
+          "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "output"
+      ]
     }
   },
   "additionalProperties": false,

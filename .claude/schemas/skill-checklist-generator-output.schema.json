@@ -4,62 +4,82 @@
   "description": "Output structure for checklist-generator skill",
   "type": "object",
   "required": [
-    "checklistMarkdown",
-    "detectedContext",
-    "totalItems",
-    "ieeeBaseCount",
-    "contextualCount"
+    "status",
+    "output"
   ],
   "properties": {
-    "checklistMarkdown": {
+    "status": {
       "type": "string",
-      "description": "Complete checklist in markdown format with checkboxes"
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
     },
-    "detectedContext": {
+    "output": {
       "type": "object",
+      "description": "Skill-specific output data",
       "properties": {
-        "framework": {
-          "type": "array",
-          "items": {
-            "type": "string"
+        "checklistMarkdown": {
+          "type": "string",
+          "description": "Complete checklist in markdown format with checkboxes"
+        },
+        "detectedContext": {
+          "type": "object",
+          "properties": {
+            "framework": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "language": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         },
-        "language": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "totalItems": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
         },
-        "patterns": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "ieeeBaseCount": {
+          "type": "integer",
+          "description": "Number of IEEE 1028 base items"
+        },
+        "contextualCount": {
+          "type": "integer",
+          "description": "Number of contextual AI-generated items"
+        },
+        "contextualPercentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 25,
+          "description": "Percentage of contextual items (should be 10-20%)"
+        },
+        "generated": {
+          "type": "string",
+          "format": "date-time"
         }
-      }
-    },
-    "totalItems": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 50
-    },
-    "ieeeBaseCount": {
-      "type": "integer",
-      "description": "Number of IEEE 1028 base items"
-    },
-    "contextualCount": {
-      "type": "integer",
-      "description": "Number of contextual AI-generated items"
-    },
-    "contextualPercentage": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 25,
-      "description": "Percentage of contextual items (should be 10-20%)"
-    },
-    "generated": {
-      "type": "string",
-      "format": "date-time"
+      },
+      "additionalProperties": false,
+      "required": [
+        "checklistMarkdown",
+        "detectedContext",
+        "totalItems",
+        "ieeeBaseCount",
+        "contextualCount"
+      ]
     }
   },
   "additionalProperties": false,
