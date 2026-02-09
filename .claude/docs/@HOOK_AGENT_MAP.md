@@ -22,13 +22,10 @@ This table shows which hooks apply to which agent archetypes. Hooks are triggere
 | `tool-scope-validator.cjs`                                                                     | x      | x           | x        | x          | x            | x          |
 | **Router / Task Tools**                                                                        |
 | `routing-guard.cjs` (Task, TaskCreate, Edit, Write, NotebookEdit, Bash, Glob, Grep, WebSearch) | x      | x           | x        |            | x            | x          |
-| `intent-agent-match.cjs` (PreToolUse Task)                                                     | x      |             |          |            | x            |            |
 | `spawn-prompt-assembler.cjs` (PreToolUse Task)                                                 | x      |             |          |            | x            |            |
 | `pre-task-unified.cjs` (PreToolUse Task)                                                       | x      |             |          |            | x            |            |
-| `config-model-validator.cjs` (PreToolUse Task)                                                 | x      |             |          |            | x            |            |
 | `spawn-prompt-validator.cjs` (PreToolUse Task)                                                 | x      |             |          |            | x            |            |
 | `reflection-step0-guard.cjs` (PreToolUse TaskList)                                             | x      | x           | x        | x          | x            | x          |
-| `task-status-enforcement.cjs` (PreToolUse TaskUpdate)                                          | x      | x           | x        | x          | x            | x          |
 | `pre-completion-validation.cjs` (PreToolUse TaskUpdate)                                        |        | x           | x        | x          |              | x          |
 | **Bash Tools (Implementers Only)**                                                             |
 | `bash-command-validator.cjs` (PreToolUse Bash)                                                 |        | x           | x        |            |              | x          |
@@ -48,7 +45,6 @@ This table shows which hooks apply to which agent archetypes. Hooks are triggere
 | `error-tracker-hook.cjs` (PostToolUse All)                                                     | x      | x           | x        | x          | x            | x          |
 | `anomaly-detector.cjs` (PostToolUse All)                                                       | x      | x           | x        | x          | x            | x          |
 | `post-task-unified.cjs` (PostToolUse Task)                                                     | x      |             |          |            | x            |            |
-| `task-list-tracker.cjs` (PostToolUse TaskList)                                                 | x      | x           | x        | x          | x            | x          |
 | `post-completion-chain.cjs` (PostToolUse TaskUpdate)                                           |        | x           | x        | x          |              | x          |
 | `sync-memory-index.cjs` (PostToolUse Write/Edit/MemoryRecord)                                  |        | x           |          | x          |              |            |
 | `code-index-updater.cjs` (PostToolUse Write/Edit)                                              |        | x           |          | x          |              |            |
@@ -59,6 +55,11 @@ This table shows which hooks apply to which agent archetypes. Hooks are triggere
 | `state-reset.cjs` (UserPromptSubmit)                                                           | x      |             |          |            |              |            |
 | `user-prompt-unified.cjs` (UserPromptSubmit)                                                   | x      |             |          |            |              |            |
 | `force-step0-execution.cjs` (UserPromptSubmit)                                                 | x      |             |          |            |              |            |
+| **Session Hooks (System-Wide)**                                                                |
+| `drift-detector.cjs` (UserPromptSubmit)                                                        | x      | x           | x        | x          | x            | x          |
+| `adaptive-quality-gate.cjs` (PreToolUse Edit, Write, NotebookEdit)                             | x      | x           | x        | x          | x            | x          |
+| `post-edit-scanner.cjs` (PostToolUse Edit)                                                     | x      | x           | x        | x          | x            | x          |
+| `pre-compact.cjs` (Stop)                                                                       | x      | x           | x        | x          | x            | x          |
 | **Stop Hooks**                                                                                 |
 | `check-console-log.cjs` (Stop)                                                                 | x      | x           | x        | x          | x            | x          |
 
@@ -85,7 +86,6 @@ These environment variables control hook enforcement modes. Set them in `.env` t
 | `REFLECTION_STEP0_ENFORCEMENT` | reflection-step0-guard.cjs | warn    | block/warn/off | Block TaskList when pending reflections                     |
 | `SPAWN_PROMPT_VALIDATOR`       | spawn-prompt-validator.cjs | warn    | block/warn/off | Validate spawn prompt structure                             |
 | `CONFIG_MODEL_VALIDATOR`       | config-model-validator.cjs | warn    | block/warn/off | Validate model matches config.yaml                          |
-| `INTENT_AGENT_ENFORCEMENT`     | intent-agent-match.cjs     | block   | block/warn/off | Match intent to correct agent type                          |
 | `TOOL_SCOPE_VALIDATOR`         | tool-scope-validator.cjs   | warn    | block/warn/off | Validate tool in agent's allowed set                        |
 | `ROUTER_WRITE_GUARD`           | routing-guard.cjs          | block   | block/warn/off | Block Router from using Write/Edit/NotebookEdit             |
 | `ROUTER_SELF_CHECK`            | routing-guard.cjs          | block   | block/warn/off | Enforce Router self-check gates                             |
@@ -119,19 +119,16 @@ TOOL_SCOPE_VALIDATOR=warn
 
 Hooks are organized into 10 categories based on their primary function:
 
-### Routing Hooks (11)
+### Routing Hooks (8)
 
-- `routing-guard.cjs` - Planner-first, security review, Router tool blacklist
-- `intent-agent-match.cjs` - Warns when spawned agent mismatches detected intent
+- `routing-guard.cjs` - Planner-first, security review, Router tool blacklist, intent-agent match, config model validation (Checks 10-11)
 - `spawn-prompt-assembler.cjs` - Enriches spawn prompts with context
 - `pre-task-unified.cjs` - TaskList-first enforcement, documentation routing
-- `config-model-validator.cjs` - Validates model matches config.yaml
 - `tool-scope-validator.cjs` - Validates tool within agent's allowed set
-- `task-status-enforcement.cjs` - Validates TaskUpdate status transitions
 - `post-task-unified.cjs` - Post-Task coordination
-- `task-list-tracker.cjs` - Tracks TaskList calls
 - `code-index-updater.cjs` - Updates code search index after edits
 - `unified-creator-guard.cjs` - Blocks direct writes to creator output paths
+- `pre-completion-validation.cjs` - Validates completion quality, task status, creator compliance
 
 ### Safety Hooks (5)
 
@@ -169,10 +166,14 @@ Hooks are organized into 10 categories based on their primary function:
 
 - `post-completion-chain.cjs` - Auto-advances workflow phases
 
-### Session Hooks (2)
+### Session Hooks (6)
 
 - `state-reset.cjs` - Resets router state per prompt
 - `session-cleanup.cjs` - Session housekeeping
+- `drift-detector.cjs` - Tracks intent drift across edits
+- `adaptive-quality-gate.cjs` - Adaptive quality checkpoint reminders
+- `post-edit-scanner.cjs` - Scans for console.log, TODOs, secrets
+- `pre-compact.cjs` - Snapshots session state before compaction
 
 ### Validation Hooks (2)
 

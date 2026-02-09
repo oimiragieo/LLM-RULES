@@ -1,3 +1,48 @@
+## 2026-02-09: Pro-Workflow Adoption Best Practices (Task #83)
+
+**Pattern:** Adopt CONCEPTS not CODE when integrating reference implementations
+
+**Key Learnings:**
+
+1. **Routing table keyword reduction:**
+   - Original: 2,472 lines with 50+ keywords per agent
+   - Simplified: 1,030 lines (58% reduction) with identical routing behavior
+   - Insight: LLMs don't need exhaustive synonym lists; 3-5 core keywords per agent is sufficient
+   - The router matches on intent, not exact keyword matches
+
+2. **Hook consolidation pattern:**
+   - Standalone hooks can be merged into parent hooks as new "Check N" sections
+   - Example: `config-model-validator.cjs` → `routing-guard.cjs` Check 11
+   - Example: `intent-agent-match.cjs` → `routing-guard.cjs` Check 10
+   - Example: `task-status-enforcement.cjs` → `pre-completion-validation.cjs`
+   - Example: `task-list-tracker.cjs` → `post-task-unified.cjs`
+   - Benefits: Fewer hook registrations, simpler settings.json, easier maintenance
+   - Guideline: If Hook A and Hook B always fire together for the same event, merge them
+
+3. **Test isolation for hooks:**
+   - Hooks that write state files (edit-counter.json, drift-state.json, etc.) need test isolation
+   - Use temp directories + env var override (CLAUDE_RUNTIME_DIR) to prevent test interference
+   - Pattern: `process.env.CLAUDE_RUNTIME_DIR = tempDir; const hook = require('hook.cjs'); ...`
+   - Prevents test state pollution and allows parallel test execution
+
+4. **Batch test failures ≠ real regressions:**
+   - When hooks are refactored, batch test runs (`pnpm test`) may fail due to process isolation issues
+   - Always verify individual test suites first: `node --test tests/hooks/routing-guard.test.mjs`
+   - If individual tests pass but batch fails → investigation required, likely test cleanup issue
+   - Don't assume batch failure = real regression without verification
+
+5. **Pro-workflow adoption strategy:**
+   - Adopt concepts (drift detection, adaptive quality gates, correction detection) NOT code
+   - Rewrite from scratch using project-specific utilities and patterns
+   - Why: Direct code copy incompatible with different hook protocols, state management, utilities
+   - Result: Better integration, maintainability, and consistency with existing codebase
+
+**Cross-Reference:**
+- ADR-107: Pro-Workflow Adoption Strategy (decisions.md)
+- Task #81: Pro-workflow adoption implementation
+
+---
+
 ## 2026-02-09: PreCompact State Preservation Hook (Task #81 Phase 2.2)
 
 **Pattern:** Snapshot session state before context compaction
