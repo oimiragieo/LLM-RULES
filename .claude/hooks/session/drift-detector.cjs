@@ -109,7 +109,7 @@ function extractKeywords(text) {
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, ' ')
         .split(/\s+/)
-        .filter((w) => w.length >= 3 && !STOP_WORDS.has(w))
+        .filter(w => w.length >= 3 && !STOP_WORDS.has(w))
     ),
   ];
 }
@@ -125,7 +125,7 @@ function calculateOverlap(keywords1, keywords2) {
   const set1 = new Set(keywords1);
   const set2 = new Set(keywords2);
 
-  const intersection = new Set([...set1].filter((x) => set2.has(x)));
+  const intersection = new Set([...set1].filter(x => set2.has(x)));
   const union = new Set([...set1, ...set2]);
 
   return intersection.size / union.size;
@@ -175,7 +175,7 @@ function getState() {
  * Check if prompt matches new-intent pattern
  */
 function matchesNewIntentPattern(prompt) {
-  return NEW_INTENT_PATTERNS.some((pattern) => pattern.test(prompt));
+  return NEW_INTENT_PATTERNS.some(pattern => pattern.test(prompt));
 }
 
 /**

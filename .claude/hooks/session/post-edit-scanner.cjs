@@ -20,38 +20,54 @@ const SCAN_RULES = [
   {
     name: 'console.log',
     pattern: /console\.(log|debug|info)\s*\(/,
-    exclude: /^\s*(\/\/|\/\*|\*)/,  // skip comments
+    exclude: /^\s*(\/\/|\/\*|\*)/, // skip comments
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.cjs'],
-    message: 'console.log() detected - remove before committing'
+    message: 'console.log() detected - remove before committing',
   },
   {
     name: 'print()',
     pattern: /\bprint\s*\(/,
-    exclude: /^\s*#/,  // skip Python comments
+    exclude: /^\s*#/, // skip Python comments
     extensions: ['.py'],
-    message: 'print() detected - use logging instead'
+    message: 'print() detected - use logging instead',
   },
   {
     name: 'TODO/FIXME',
     pattern: /\b(TODO|FIXME|XXX|HACK)\b/i,
-    exclude: null,  // always report
-    extensions: null,  // all files
-    message: 'TODO/FIXME marker found - address or create task'
+    exclude: null, // always report
+    extensions: null, // all files
+    message: 'TODO/FIXME marker found - address or create task',
   },
   {
     name: 'hardcoded-secret',
     pattern: /(api[_-]?key|secret|password|token)\s*[:=]\s*['"][^'"]{8,}/i,
-    exclude: /^\s*(\/\/|#|\/\*|\*)/,  // skip comments
-    extensions: null,  // all files
-    message: 'Possible hardcoded secret detected'
-  }
+    exclude: /^\s*(\/\/|#|\/\*|\*)/, // skip comments
+    extensions: null, // all files
+    message: 'Possible hardcoded secret detected',
+  },
 ];
 
 // Binary file extensions to skip
 const BINARY_EXTENSIONS = new Set([
-  '.png', '.jpg', '.gif', '.ico', '.woff', '.woff2',
-  '.ttf', '.eot', '.pdf', '.zip', '.gz', '.tar', '.exe', '.dll', '.so', '.dylib',
-  '.db', '.sqlite', '.lance'
+  '.png',
+  '.jpg',
+  '.gif',
+  '.ico',
+  '.woff',
+  '.woff2',
+  '.ttf',
+  '.eot',
+  '.pdf',
+  '.zip',
+  '.gz',
+  '.tar',
+  '.exe',
+  '.dll',
+  '.so',
+  '.dylib',
+  '.db',
+  '.sqlite',
+  '.lance',
 ]);
 
 const MAX_ISSUES = 5;
@@ -106,7 +122,9 @@ function main() {
         // Report issues to stderr if found
         if (issues.length > 0) {
           const displayPath = filePath.replace(/\\/g, '/');
-          process.stderr.write(`\n[Post-Edit Scanner] ${issues.length} issue(s) in ${displayPath}:\n`);
+          process.stderr.write(
+            `\n[Post-Edit Scanner] ${issues.length} issue(s) in ${displayPath}:\n`
+          );
 
           for (const issue of issues) {
             process.stderr.write(`  Line ${issue.line}: ${issue.message}\n`);
@@ -168,7 +186,7 @@ function scanFile(filePath) {
         issues.push({
           line: lineNum,
           rule: rule.name,
-          message: rule.message
+          message: rule.message,
         });
 
         break; // One issue per line

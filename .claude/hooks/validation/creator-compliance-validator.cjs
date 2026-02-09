@@ -124,7 +124,13 @@ function checkInFile(filename, artifactName) {
  */
 function queueIntegrationTasks(violations) {
   try {
-    const queuePath = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
+    const queuePath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'context',
+      'runtime',
+      'integration-queue.jsonl'
+    );
 
     // Ensure directory exists
     const queueDir = path.dirname(queuePath);

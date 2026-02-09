@@ -59,11 +59,11 @@ function main() {
     const editCounter = safeReadJSON(EDIT_COUNTER_FILE, { count: 0 });
     const sessionMetrics = safeReadJSON(SESSION_METRICS_FILE, {
       corrections_count: 0,
-      prompt_count: 0
+      prompt_count: 0,
     });
     const driftState = safeReadJSON(DRIFT_STATE_FILE, {
       originalIntent: '',
-      editCount: 0
+      editCount: 0,
     });
 
     // Build snapshot
