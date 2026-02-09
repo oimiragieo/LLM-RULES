@@ -506,14 +506,31 @@ function validateCreatorWorkflow(toolName, toolInput) {
     return { pass: true }; // Not a protected artifact
   }
 
+  // LAYER 2A FIX: Distinguish "creating new artifact" from "editing existing artifact"
+  const fullPath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
+  const fileExists = fs.existsSync(fullPath);
+
+  // Edit tool always targets existing files - allow without creator token
+  if (toolName === 'Edit') {
+    return { pass: true };
+  }
+
+  // Write to existing file = editing, not creating - allow without creator token
+  if (toolName === 'Write' && fileExists) {
+    return { pass: true };
+  }
+
+  // Write to new file at creator output path - REQUIRE creator token
   // Check if the required creator is active
   const creatorState = isCreatorActive(required.creator);
 
   if (creatorState.active) {
+    // LAYER 2B: Refresh TTL on each successful write to support batch operations
+    markCreatorActive(required.creator, creatorState.artifactName);
     return { pass: true }; // Creator workflow is active - allow
   }
 
-  // VIOLATION: Direct write without creator workflow
+  // VIOLATION: Direct write to NEW file without creator workflow
   const message = generateViolationMessage(filePath, required.creator, required.artifactType);
 
   if (enforcement === 'block') {

@@ -260,6 +260,19 @@ Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesi
 
 (Also see `.claude/workflows/core/router-decision.md` Step 4 for the full routing workflow.)
 
+**Batch Creation (IRON LAW):**
+When creating multiple artifacts of the same type (e.g., "create 10 agents"), the Router MUST:
+
+1. Detect batch creation intent (detected automatically by user-prompt-unified.cjs)
+2. Spawn a master-orchestrator or evolution-orchestrator
+3. The orchestrator invokes the appropriate creator skill for EACH artifact
+4. NEVER spawn N developers to write N artifacts directly
+
+**Enforcement:**
+
+- `CREATOR_ROUTING_ENFORCEMENT=block|warn|off` (default: warn) — blocks non-creator spawns when creator intent detected
+- `CREATOR_COMPLIANCE_ENFORCEMENT=block|warn|off` (default: warn) — validates post-creation integration
+
 ---
 
 ## 1.3 ENFORCEMENT HOOKS

@@ -18,19 +18,20 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 
 ## Critical Hooks Overview
 
-| Hook                            | Location                    | Trigger                                     | Default | Key Env Variables                                                                                                    |
-| ------------------------------- | --------------------------- | ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
-| `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task, Edit, Write, NotebookEdit) | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
-| `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | PreToolUse(Write, Edit)                     | block   | `CREATOR_GUARD`                                                                                                      |
-| `unified-pre-write-hook.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Write, Edit)                     | block   | Multiple (11 consolidated checks)                                                                                    |
-| `bash-command-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `BASH_VALIDATOR_FAIL_OPEN`                                                                                           |
-| `shell-injection-validator.cjs` | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `SHELL_INJECTION_VALIDATOR`                                                                                          |
-| `pre-task-unified.cjs`          | `.claude/hooks/routing/`    | PreToolUse(Task)                            | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`                                                                 |
-| `tool-scope-validator.cjs`      | `.claude/hooks/routing/`    | PreToolUse(All)                             | warn    | `TOOL_SCOPE_VALIDATOR`                                                                                               |
-| `reflection-step0-guard.cjs`    | `.claude/hooks/reflection/` | PreToolUse(TaskList)                        | warn    | `REFLECTION_STEP0_ENFORCEMENT`                                                                                       |
-| `config-model-validator.cjs`    | `.claude/hooks/routing/`    | PreToolUse(Task)                            | warn    | `CONFIG_MODEL_VALIDATOR`                                                                                             |
-| `error-tracker-hook.cjs`        | `.claude/hooks/monitoring/` | PostToolUse(All)                            | N/A     | None (monitoring only)                                                                                               |
-| `post-creation-integration.cjs` | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate)                     | warn    | `INTEGRATION_ENFORCEMENT`                                                                                            |
+| Hook                               | Location                    | Trigger                                     | Default | Key Env Variables                                                                                                    |
+| ---------------------------------- | --------------------------- | ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `routing-guard.cjs`                | `.claude/hooks/routing/`    | PreToolUse(Task, Edit, Write, NotebookEdit) | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
+| `unified-creator-guard.cjs`        | `.claude/hooks/routing/`    | PreToolUse(Write, Edit)                     | block   | `CREATOR_GUARD`                                                                                                      |
+| `unified-pre-write-hook.cjs`       | `.claude/hooks/safety/`     | PreToolUse(Write, Edit)                     | block   | Multiple (11 consolidated checks)                                                                                    |
+| `bash-command-validator.cjs`       | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `BASH_VALIDATOR_FAIL_OPEN`                                                                                           |
+| `shell-injection-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `SHELL_INJECTION_VALIDATOR`                                                                                          |
+| `pre-task-unified.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task)                            | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`                                                                 |
+| `tool-scope-validator.cjs`         | `.claude/hooks/routing/`    | PreToolUse(All)                             | warn    | `TOOL_SCOPE_VALIDATOR`                                                                                               |
+| `reflection-step0-guard.cjs`       | `.claude/hooks/reflection/` | PreToolUse(TaskList)                        | warn    | `REFLECTION_STEP0_ENFORCEMENT`                                                                                       |
+| `config-model-validator.cjs`       | `.claude/hooks/routing/`    | PreToolUse(Task)                            | warn    | `CONFIG_MODEL_VALIDATOR`                                                                                             |
+| `error-tracker-hook.cjs`           | `.claude/hooks/monitoring/` | PostToolUse(All)                            | N/A     | None (monitoring only)                                                                                               |
+| `post-creation-integration.cjs`    | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate)                     | warn    | `INTEGRATION_ENFORCEMENT`                                                                                            |
+| `creator-compliance-validator.cjs` | `.claude/hooks/validation/` | PreToolUse(TaskUpdate)                      | warn    | `CREATOR_COMPLIANCE_ENFORCEMENT`                                                                                     |
 
 ---
 
@@ -677,7 +678,112 @@ Well under 100ms budget for non-blocking hooks.
 
 ---
 
-## 12. SEC-ICE-001: Artifact Name Validation
+## 12. creator-compliance-validator.cjs
+
+**Location:** `.claude/hooks/validation/creator-compliance-validator.cjs`
+**Event Type:** PreToolUse(TaskUpdate)
+**Default Enforcement:** warn
+**Purpose:** Validates post-creation integration compliance (Layer 3)
+
+### When It Runs
+
+- Intercepts TaskUpdate when `status` is being set to `"completed"`
+- Only checks tasks that modified/created artifact files (agents, skills, hooks, workflows, templates, schemas)
+- Graceful degradation: allows completion if no artifact files detected
+
+### Compliance Checks
+
+Validates required integrations per artifact type:
+
+| Artifact Type | Required Integration   | Check Method               |
+| ------------- | ---------------------- | -------------------------- |
+| Agent         | agent-registry.json    | Search for agent name      |
+| Agent         | routing-table.cjs      | Search for routing keyword |
+| Agent         | CLAUDE.md              | Search for agent reference |
+| Skill         | skill-catalog.md       | Search for skill name      |
+| Hook          | settings.json          | Search for hook path       |
+| Workflow      | @WORKFLOW_AGENT_MAP.md | Search for workflow name   |
+| Template      | template-catalog.md    | Search for template name   |
+| Schema        | schema-catalog.md      | Search for schema name     |
+
+### Detection Logic
+
+1. Extracts `metadata.filesCreated` and `metadata.filesModified` from TaskUpdate
+2. Filters files matching creator output paths (`.claude/agents/**`, `.claude/skills/**`, etc.)
+3. For each creator file, extracts artifact name and checks required integrations
+4. Returns violations list with details
+
+### Environment Variables
+
+```bash
+# Creator compliance enforcement mode
+CREATOR_COMPLIANCE_ENFORCEMENT=block|warn|off  # Default: warn
+
+# Warn mode (logs violations, queues integration tasks)
+CREATOR_COMPLIANCE_ENFORCEMENT=warn claude
+
+# Block mode (prevents task completion until integrations complete)
+CREATOR_COMPLIANCE_ENFORCEMENT=block claude
+
+# Off mode (disables compliance checking)
+CREATOR_COMPLIANCE_ENFORCEMENT=off claude
+```
+
+### Integration Queue
+
+In warn mode, violations are queued to `.claude/context/runtime/integration-queue.jsonl`:
+
+```json
+{
+  "timestamp": "2026-02-08T12:00:00.000Z",
+  "artifactPath": ".claude/agents/domain/python-expert.md",
+  "artifactType": "agent",
+  "missingIntegration": "registry",
+  "detail": "NOT found in agent-registry.json",
+  "source": "creator-compliance-validator",
+  "processed": false
+}
+```
+
+Router Step 0.5 checks this queue and spawns `artifact-integrator` if unprocessed entries exist.
+
+### Example
+
+```javascript
+// ❌ BLOCKED: Agent created but not in registry
+TaskUpdate({
+  taskId: '5',
+  status: 'completed',
+  metadata: {
+    filesCreated: ['.claude/agents/domain/python-expert.md'],
+  },
+});
+// Block message: "CREATOR COMPLIANCE VIOLATION - python-expert not found in agent-registry.json"
+
+// ✅ ALLOWED: All integrations present
+TaskUpdate({
+  taskId: '5',
+  status: 'completed',
+  metadata: {
+    filesCreated: ['.claude/agents/domain/python-expert.md'],
+  },
+});
+// After: agent-creator updated agent-registry.json, routing-table.cjs, CLAUDE.md
+```
+
+### Fail-Open Safety
+
+If the hook encounters errors during validation:
+
+- Logs error to stderr
+- Allows task completion (fail-open)
+- Returns `{ allow: true }` with error message
+
+This prevents blocking legitimate completions due to validation bugs.
+
+---
+
+## 13. SEC-ICE-001: Artifact Name Validation
 
 **Location:** `.claude/lib/creators/companion-check.cjs` (library, not hook)
 **Scope:** All creator skills

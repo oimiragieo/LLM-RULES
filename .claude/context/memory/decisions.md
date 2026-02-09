@@ -576,3 +576,55 @@ Design and implement a simplified 3-component memory management system:
 - `checkAndArchiveLearnings()` in memory-manager.cjs should be deprecated long-term in favor of rotator
 
 **Architecture Design:** `.claude/context/reports/architecture/memory-management-design-2026-02-08.md`
+
+---
+
+## ADR-106: Creator Guard File-Existence Enforcement
+
+**Date:** 2026-02-09
+
+**Status:** Proposed
+
+**Context:**
+
+unified-creator-guard.cjs blocks ALL writes to creator output paths (agents, skills, hooks, workflows, templates, schemas, rules, commands, tools) without a creator token in `active-creators.json`. This causes false positives when developers legitimately edit existing artifacts (e.g., adding search skill references to 10 agents). The workaround is `CREATOR_GUARD=warn` or `CREATOR_GUARD=off`, which also disables enforcement for new artifact creation -- the actual risk.
+
+**Decision:**
+
+Replace state-file-only authorization with a file-existence check as the primary enforcement mechanism:
+
+1. **Edit tool**: Always ALLOW (Edit inherently targets existing files)
+2. **Write tool + file EXISTS on disk**: ALLOW (overwriting existing artifact = edit, not creation)
+3. **Write tool + file does NOT exist on disk**: REQUIRE creator token (new artifact creation)
+
+Additionally:
+
+- Add creator-intent keywords to routing-guard.cjs SPECIALIST_KEYWORD_MAP (Check 7) for early detection at routing layer
+- Add batch creation detection heuristic for multi-artifact creation requests
+- Retain state file mechanism as secondary signal (not primary enforcement)
+
+**Alternatives Considered:**
+
+1. **Keep current approach (block all writes)**: Rejected -- causes 40%+ false positive rate, pushes users to disable enforcement entirely.
+2. **Tool-only distinction (allow Edit, block Write)**: Partially correct but misses Write-to-existing-file (legitimate overwrite). File-existence check is more precise.
+3. **Routing-only enforcement (prevent developer spawn for creation)**: Insufficient as sole defense -- developer-within-orchestrator patterns bypass routing layer.
+4. **Per-artifact token (track specific artifact being created)**: Over-engineered. File-existence check achieves the same goal with zero state management overhead.
+
+**Rationale:**
+
+- File existence is the simplest, most reliable signal for distinguishing "create" from "edit"
+- Eliminates false positives for legitimate edits (the primary pain point)
+- Retains enforcement for new artifact creation (the actual risk: invisible artifacts)
+- Reduces dependency on state file coordination (no TTL, no pre-execute hooks on critical path)
+- Defense-in-depth: routing layer (early), hook layer (safety net), post-creation (audit)
+
+**Consequences:**
+
+- False positive rate drops from ~40% to ~0% for legitimate edits
+- True positive rate remains 100% for new artifact creation
+- CREATOR_GUARD=block becomes safe to use as default (no workaround pressure)
+- Creator pre-execute hooks become optional (still useful for enhanced logging)
+- Small risk: Write-overwrite of existing artifact bypasses creator workflow (mitigated by post-creation integration detection and the fact that Edit is the normal tool for modifications)
+- Code change: ~35 lines modified, ~20 lines added
+
+**Architecture Report:** `.claude/context/reports/architecture/creator-enforcement-architecture-2026-02-09.md`

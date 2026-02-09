@@ -185,6 +185,24 @@ function checkRouterModeReset(hookInput) {
     routerState.saveStateWithRetry({ preset: process.env.AGENT_PRESET });
   }
 
+  // CREATOR-ROUTING-001: Detect creator intent in user prompt
+  // Sets flags in router-state.json for downstream routing-guard enforcement
+  const creatorIntent = detectCreatorIntent(userPrompt);
+  if (creatorIntent.detected) {
+    routerState.saveStateWithRetry({
+      creatorIntentDetected: true,
+      detectedCreatorType: creatorIntent.type,
+      requiredCreatorSkill: creatorIntent.skill,
+      batchCreation: creatorIntent.isBatch || false,
+    });
+
+    if (process.env.ROUTER_DEBUG === 'true') {
+      console.log(
+        `[user-prompt-unified:creator] Creator intent detected: ${creatorIntent.type}${creatorIntent.isBatch ? ' (batch)' : ''}`
+      );
+    }
+  }
+
   if (process.env.ROUTER_DEBUG === 'true') {
     console.log('[user-prompt-unified:reset] State reset to router mode (ROUTING-002 fix)');
     if (result.sessionBoundaryDetected) {
@@ -239,6 +257,53 @@ const COMPLEXITY_KEYWORDS = {
     'system-wide',
   ],
 };
+
+/**
+ * Creator intent patterns for artifact creation detection
+ * Used to detect when user wants to create artifacts (agents, skills, hooks, etc.)
+ */
+const CREATOR_INTENT_PATTERNS = [
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(agent|agents)\b/i,
+    type: 'agent-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(skill|skills)\b/i,
+    type: 'skill-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(hook|hooks)\b/i,
+    type: 'hook-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(workflow|workflows)\b/i,
+    type: 'workflow-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(template|templates)\b/i,
+    type: 'template-creator',
+  },
+  {
+    pattern: /\b(create|add|build|make|generate)\s+(\d+\s+)?(new\s+)?(schema|schemas)\b/i,
+    type: 'schema-creator',
+  },
+];
+
+/**
+ * Detect creator intent in user prompt
+ * @param {string} userPrompt - User's prompt text
+ * @returns {{ detected: boolean, type?: string, isBatch?: boolean, skill?: string }}
+ */
+function detectCreatorIntent(userPrompt) {
+  for (const { pattern, type } of CREATOR_INTENT_PATTERNS) {
+    const match = userPrompt.match(pattern);
+    if (match) {
+      const isBatch = !!match[2]; // captured digit group (e.g., "10 agents")
+      return { detected: true, type, isBatch, skill: type };
+    }
+  }
+  return { detected: false };
+}
 
 // =============================================================================
 // Token Monitoring + Auto-Compression (config.yaml)

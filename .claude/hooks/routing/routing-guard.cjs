@@ -460,6 +460,45 @@ const SPECIALIST_KEYWORD_MAP = {
     'understand the legacy',
     'reverse engineer the legacy',
   ],
+  // Creator skills - enforce creator workflow for artifact creation
+  'agent-creator': [
+    'create agent',
+    'create an agent',
+    'new agent',
+    'add agent',
+    'build agent',
+    'make agent',
+    'restore agent',
+    'create agents',
+    'create multiple agents',
+    'batch create agents',
+  ],
+  'skill-creator': [
+    'create skill',
+    'create a skill',
+    'new skill',
+    'add skill',
+    'build skill',
+    'restore skill',
+    'create skills',
+  ],
+  'hook-creator': [
+    'create hook',
+    'create a hook',
+    'new hook',
+    'add hook',
+    'build hook',
+    'create hooks',
+  ],
+  'workflow-creator': [
+    'create workflow',
+    'create a workflow',
+    'new workflow',
+    'add workflow',
+    'create workflows',
+  ],
+  'template-creator': ['create template', 'create a template', 'new template', 'add template'],
+  'schema-creator': ['create schema', 'create a schema', 'new schema', 'add schema'],
 };
 
 /**
@@ -1224,6 +1263,113 @@ Call TaskList() first to check existing tasks, then proceed with your operation.
 }
 
 // =============================================================================
+// CHECK 9: CREATOR INTENT GUARD (blocks Task spawn for creator work)
+// =============================================================================
+
+/**
+ * Check 9: Creator Intent Guard
+ * Blocks Task() spawn when creator intent detected but spawn lacks creator skill reference.
+ *
+ * Environment: CREATOR_ROUTING_ENFORCEMENT=block|warn|off (default: block)
+ *
+ * Detects creator intent from router-state.json (set by user-prompt-unified.cjs).
+ * If user requested artifact creation (agent, skill, hook, etc.), ensures the
+ * spawned agent invokes the appropriate creator skill rather than writing directly.
+ *
+ * @param {string} toolName - Tool being used
+ * @param {Object} toolInput - Tool input containing prompt and description
+ * @returns {{ pass: boolean, result?: string, message?: string }}
+ */
+function checkCreatorIntentGuard(toolName, toolInput = {}) {
+  // Only applies to Task tool
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+
+  const enforcement = getEnforcementMode('CREATOR_ROUTING_ENFORCEMENT', 'block');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  // Check if creator intent was detected in user prompt
+  const state = getCachedRouterState();
+  if (!state.creatorIntentDetected) {
+    return { pass: true };
+  }
+
+  // Creator intent was detected - check if this spawn includes creator skill
+  const prompt = (toolInput.prompt || '').toLowerCase();
+  const description = (toolInput.description || '').toLowerCase();
+  const combined = `${prompt} ${description}`;
+
+  const creatorSkills = [
+    'agent-creator',
+    'skill-creator',
+    'hook-creator',
+    'workflow-creator',
+    'template-creator',
+    'schema-creator',
+  ];
+
+  const hasCreatorSkill = creatorSkills.some(skill => combined.includes(skill));
+
+  if (hasCreatorSkill) {
+    return { pass: true };
+  }
+
+  // Violation: spawning a non-creator agent for creator work
+  const creatorType = state.detectedCreatorType || 'creator';
+  const requiredSkill = state.requiredCreatorSkill || creatorType;
+
+  const message = `
++======================================================================+
+|  CREATOR ROUTING VIOLATION                                           |
++======================================================================+
+|  Creator intent detected: ${creatorType.padEnd(40)}|
+|  You are spawning a non-creator agent for artifact creation.         |
+|                                                                      |
+|  Artifact creation MUST use creator skills to ensure:                |
+|    - CLAUDE.md is updated with routing/documentation                 |
+|    - Relevant catalogs are updated for discoverability               |
+|    - Related agents are assigned the artifact                        |
+|    - Proper validation and testing occurs                            |
+|                                                                      |
+|  CORRECT APPROACH: Spawn general-purpose agent with creator skill    |
+|                                                                      |
+|  Task({                                                              |
+|    subagent_type: 'general-purpose',                                 |
+|    prompt: \`You are a general-purpose agent.                         |
+|      Invoke Skill({ skill: "${requiredSkill}" }) and follow it...\`   |
+|  })                                                                  |
+|                                                                      |
++======================================================================+
+`;
+
+  // Record violation
+  const tracker = getViolationTracker();
+  if (tracker) {
+    tracker.recordViolation({
+      tool: 'Task',
+      action: enforcement === 'block' ? 'blocked' : 'warned',
+      checkName: 'creator-intent-guard',
+      routerMode: 'router',
+      sessionId: process.env.CLAUDE_SESSION_ID || 'unknown',
+      metadata: {
+        detectedType: creatorType,
+        requiredSkill,
+        batchCreation: state.batchCreation || false,
+      },
+    });
+  }
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  } else {
+    return { pass: true, result: 'warn', message };
+  }
+}
+
+// =============================================================================
 // MAIN EXECUTION
 // =============================================================================
 
@@ -1319,6 +1465,15 @@ function runAllChecks(toolName, toolInput) {
   }
   if (specialistCheck.result === 'warn') {
     console.warn(specialistCheck.message);
+  }
+
+  // Check 9: Creator Intent Guard (blocks Task spawn for creator work without creator skill)
+  const creatorCheck = checkCreatorIntentGuard(toolName, toolInput);
+  if (!creatorCheck.pass) {
+    return { pass: false, result: creatorCheck.result, message: creatorCheck.message };
+  }
+  if (creatorCheck.result === 'warn') {
+    console.warn(creatorCheck.message);
   }
 
   // All checks passed
@@ -1512,6 +1667,7 @@ if (require.main === module) {
  * @property {Function} checkRouterWrite - Check direct write restrictions
  * @property {Function} checkMemoryPressure - Check memory pressure before agent spawning
  * @property {Function} checkSpecialistOverride - Check specialist-first routing (Check 7)
+ * @property {Function} checkCreatorIntentGuard - Check creator intent routing (Check 9)
  * @property {Function} isPlannerSpawn - Detect if spawn is a PLANNER agent
  * @property {Function} isSecuritySpawn - Detect if spawn is security-related
  * @property {Function} isImplementationAgentSpawn - Detect if spawn is implementation agent
@@ -1542,6 +1698,7 @@ module.exports = {
   checkMemoryPressure,
   checkSpecialistOverride,
   checkTaskListFirstGate,
+  checkCreatorIntentGuard,
   isPlannerSpawn,
   isSecuritySpawn,
   isImplementationAgentSpawn,

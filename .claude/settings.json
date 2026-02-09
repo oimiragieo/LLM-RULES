@@ -167,6 +167,10 @@
           },
           {
             "type": "command",
+            "command": "node .claude/hooks/validation/creator-compliance-validator.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/evolution/quality-gate-validator.cjs"
           }
         ]
