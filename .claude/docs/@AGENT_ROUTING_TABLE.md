@@ -78,6 +78,10 @@ Complete agent routing matrix mapping request types to agent definitions across 
 
 - `.claude/lib/routing/routing-table.cjs` (INTENT_KEYWORDS, INTENT_TO_AGENT, DISAMBIGUATION_RULES)
 
+**Hybrid Search Integration (Phase 1):**
+
+All agents have code search capabilities via integrated search skills. Domain agents (Python, TypeScript, Go, etc.) have all 3 search skills (`code-semantic-search`, `code-structural-search`, `ripgrep`), specialized agents have 2 skills (semantic + ripgrep), and orchestrators have 1 skill (ripgrep only). Three core agents (`developer`, `code-reviewer`, `code-simplifier`) include search-first protocol in their workflows.
+
 ---
 
 ## RELATED REFERENCES

@@ -482,6 +482,23 @@ Skill({ skill: 'debugging' });
 **Skill Catalog:** `.claude/context/artifacts/catalogs/skill-catalog.md`
 **Discovery:** read catalog → search category/keyword → `Skill({ skill: "<name>" })`
 
+### Hybrid Search Integration (Phase 1)
+
+**All agents have code search capabilities** via integrated search skills:
+
+- **36+ agents** (all domain agents): `code-semantic-search`, `code-structural-search`, `ripgrep`
+- **9 specialized agents**: `code-semantic-search`, `ripgrep` (structural search not needed)
+- **8 orchestrators/C4 agents**: `ripgrep` only (high-level coordination)
+
+**Search-first protocol** for 3 core agents (`developer`, `code-reviewer`, `code-simplifier`):
+
+1. Search existing code before writing new code
+2. Use semantic search for pattern discovery
+3. Use structural search for precise code matching
+4. Use ripgrep for fast keyword searches
+
+**Agent-creator integration:** New agents are guided to include search skills based on their domain (code-focused agents get all 3 search skills).
+
 ---
 
 ## 7.1) COMMANDS (SLASH COMMANDS)

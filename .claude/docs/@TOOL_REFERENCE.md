@@ -393,6 +393,7 @@ Task({ subagent_type: best.id, prompt: ... });
 
 - **@ENFORCEMENT_HOOKS.md** - tool-availability-validator.cjs enforcement
 - **@AGENT_ROUTING_TABLE.md** - Agent-specific toolset mappings
+- **@SKILL_CATALOG_TABLE.md** - Search skills (code-semantic-search, code-structural-search, ripgrep) available across 36+ agents
 
 ---
 
