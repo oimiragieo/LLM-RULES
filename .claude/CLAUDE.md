@@ -338,24 +338,34 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 **Quick Routing (MANDATORY — consult before EVERY spawn):**
 
-| Task Type                                  | Agent                   | NOT developer |
-| ------------------------------------------ | ----------------------- | ------------- |
-| Bug fixes, coding, new features            | `developer`             | —             |
-| Documentation, README, guides, doc updates | `technical-writer`      | YES           |
-| Code cleanup, refactoring, simplification  | `code-simplifier`       | YES           |
-| Code review, PR review, audit              | `code-reviewer`         | YES           |
-| Testing, QA, test strategy, coverage       | `qa`                    | YES           |
-| System design, architecture decisions      | `architect`             | YES           |
-| Security review, auth, threat modeling     | `security-architect`    | YES           |
-| Infrastructure, Docker, CI/CD, deploy      | `devops`                | YES           |
-| Database schema, queries, migrations       | `database-architect`    | YES           |
-| Planning, task breakdown                   | `planner`               | YES           |
-| Product requirements, user stories         | `pm`                    | YES           |
-| Python-specific work                       | `python-pro`            | YES           |
-| Frontend/React/Vue/CSS                     | `frontend-pro`          | YES           |
-| Node.js/Express/NestJS backend             | `nodejs-pro`            | YES           |
-| Research, external fact-finding            | `researcher`            | YES           |
-| Debugging, troubleshooting                 | `devops-troubleshooter` | YES           |
+| Task Type                                    | Agent                     | NOT developer |
+| -------------------------------------------- | ------------------------- | ------------- |
+| Bug fixes, coding, new features              | `developer`               | —             |
+| Documentation, README, guides, doc updates   | `technical-writer`        | YES           |
+| Code cleanup, refactoring, simplification    | `code-simplifier`         | YES           |
+| Code review, PR review, audit                | `code-reviewer`           | YES           |
+| Testing, QA, test strategy, coverage         | `qa`                      | YES           |
+| System design, architecture decisions        | `architect`               | YES           |
+| Security review, auth, threat modeling       | `security-architect`      | YES           |
+| Infrastructure, Docker, CI/CD, deploy        | `devops`                  | YES           |
+| Database schema, queries, migrations         | `database-architect`      | YES           |
+| Planning, task breakdown                     | `planner`                 | YES           |
+| Product requirements, user stories           | `pm`                      | YES           |
+| Python-specific work                         | `python-pro`              | YES           |
+| Frontend/React/Vue/CSS                       | `frontend-pro`            | YES           |
+| Node.js/Express/NestJS backend               | `nodejs-pro`              | YES           |
+| Research, external fact-finding              | `researcher`              | YES           |
+| Debugging, troubleshooting                   | `devops-troubleshooter`   | YES           |
+| Performance testing, profiling, load testing | `performance-engineer`    | YES           |
+| Security testing, pentesting, vulnerability  | `penetration-tester`      | YES           |
+| API design, OpenAPI, contracts               | `api-designer`            | YES           |
+| Accessibility, WCAG, a11y                    | `accessibility-tester`    | YES           |
+| LLM architecture, RAG, model serving         | `llm-architect`           | YES           |
+| MCP servers, protocol development            | `mcp-developer`           | YES           |
+| Microservices, distributed systems           | `microservices-architect` | YES           |
+| SRE, SLOs, reliability                       | `sre-engineer`            | YES           |
+| Chaos engineering, resilience testing        | `chaos-engineer`          | YES           |
+| Prompt optimization, prompt engineering      | `prompt-engineer`         | YES           |
 
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`
 

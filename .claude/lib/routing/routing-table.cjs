@@ -136,6 +136,23 @@ const ROUTING_TABLE = {
   machinelearning: 'ai-ml-specialist',
   deeplearning: 'ai-ml-specialist',
   neural: 'ai-ml-specialist',
+  // LLM Architecture
+  llm: 'llm-architect',
+  rag: 'llm-architect',
+  langchain: 'llm-architect',
+  llamaindex: 'llm-architect',
+  embedding: 'llm-architect',
+  tokenization: 'llm-architect',
+  promptengineering: 'llm-architect',
+  // Prompt Engineering
+  prompt: 'prompt-engineer',
+  systemprompt: 'prompt-engineer',
+  fewshot: 'prompt-engineer',
+  // MCP
+  mcp: 'mcp-developer',
+  mcpserver: 'mcp-developer',
+  mcpclient: 'mcp-developer',
+  modelcontextprotocol: 'mcp-developer',
   // Game Development
   game: 'gamedev-pro',
   gamedev: 'gamedev-pro',
@@ -169,6 +186,75 @@ const ROUTING_TABLE = {
   // Incident Response
   oncall: 'incident-responder',
   pagerduty: 'incident-responder',
+  // API Design
+  'api-design': 'api-designer',
+  openapi: 'api-designer',
+  'rest-design': 'api-designer',
+  'graphql-schema': 'api-designer',
+  'grpc-proto': 'api-designer',
+  'api-versioning': 'api-designer',
+  'api-contract': 'api-designer',
+  'endpoint-design': 'api-designer',
+  'resource-modeling': 'api-designer',
+  'api-documentation': 'api-designer',
+  // Microservices Architecture
+  'service-mesh': 'microservices-architect',
+  istio: 'microservices-architect',
+  linkerd: 'microservices-architect',
+  'event-driven': 'microservices-architect',
+  saga: 'microservices-architect',
+  cqrs: 'microservices-architect',
+  'event-sourcing': 'microservices-architect',
+  'service-decomposition': 'microservices-architect',
+  'bounded-context': 'microservices-architect',
+  'domain-driven': 'microservices-architect',
+  'distributed-system': 'microservices-architect',
+  // SRE
+  slo: 'sre-engineer',
+  sli: 'sre-engineer',
+  sla: 'sre-engineer',
+  'error-budget': 'sre-engineer',
+  'production-readiness': 'sre-engineer',
+  'capacity-planning': 'sre-engineer',
+  toil: 'sre-engineer',
+  runbook: 'sre-engineer',
+  // Performance Engineering
+  profiling: 'performance-engineer',
+  'load-test': 'performance-engineer',
+  benchmark: 'performance-engineer',
+  bottleneck: 'performance-engineer',
+  'core-web-vitals': 'performance-engineer',
+  'bundle-size': 'performance-engineer',
+  'memory-leak': 'performance-engineer',
+  // Penetration Testing
+  pentest: 'penetration-tester',
+  'penetration-test': 'penetration-tester',
+  'security-test': 'penetration-tester',
+  'vulnerability-scan': 'penetration-tester',
+  'owasp-test': 'penetration-tester',
+  'ethical-hack': 'penetration-tester',
+  exploit: 'penetration-tester',
+  'xss-test': 'penetration-tester',
+  'sql-injection-test': 'penetration-tester',
+  'auth-bypass': 'penetration-tester',
+  // Accessibility Testing
+  wcag: 'accessibility-tester',
+  a11y: 'accessibility-tester',
+  'screen-reader': 'accessibility-tester',
+  'keyboard-navigation': 'accessibility-tester',
+  'color-contrast': 'accessibility-tester',
+  'focus-management': 'accessibility-tester',
+  'alt-text': 'accessibility-tester',
+  'semantic-html': 'accessibility-tester',
+  // Chaos Engineering
+  'chaos-engineering': 'chaos-engineer',
+  'failure-injection': 'chaos-engineer',
+  'resilience-test': 'chaos-engineer',
+  'circuit-breaker-test': 'chaos-engineer',
+  'game-day': 'chaos-engineer',
+  'blast-radius': 'chaos-engineer',
+  'steady-state': 'chaos-engineer',
+  'fault-tolerance': 'chaos-engineer',
 };
 
 // Prefix/pattern routing for short-form tech tokens or frameworks
@@ -1409,7 +1495,232 @@ const INTENT_KEYWORDS = {
     'save system',
   ],
 
-  // === AI/ML INTENT (routes to python-pro with ai-ml-expert skill) ===
+  // === LLM ARCHITECT INTENT (LLM system architecture) ===
+  llm_architect: [
+    'llm architecture',
+    'rag pipeline',
+    'retrieval augmented generation',
+    'langchain',
+    'llamaindex',
+    'vector database',
+    'embedding model',
+    'prompt template',
+    'prompt chain',
+    'agent framework',
+    'context window',
+    'token optimization',
+    'model routing',
+    'fine-tuning strategy',
+    'llm gateway',
+    'semantic search pipeline',
+    'chunking strategy',
+    'knowledge base',
+    'llm orchestration',
+    'vllm',
+    'text-generation-inference',
+    'model serving architecture',
+    'multi-model',
+    'guardrails',
+  ],
+
+  // === PROMPT ENGINEER INTENT (Prompt optimization) ===
+  prompt_engineer: [
+    'prompt engineering',
+    'prompt optimization',
+    'prompt design',
+    'system prompt',
+    'few-shot',
+    'few shot',
+    'chain of thought',
+    'cot',
+    'structured output',
+    'prompt template',
+    'prompt testing',
+    'prompt benchmark',
+    'token reduction',
+    'prompt compression',
+    'prompt injection defense',
+    'jailbreak prevention',
+    'output format',
+    'xml tags',
+    'function calling',
+    'tool use prompt',
+    'meta-prompt',
+    'prompt chain',
+  ],
+
+  // === MCP DEVELOPER INTENT (Model Context Protocol) ===
+  mcp_developer: [
+    'mcp',
+    'model context protocol',
+    'mcp server',
+    'mcp client',
+    'mcp tool',
+    'mcp resource',
+    'mcp prompt',
+    'stdio transport',
+    'sse transport',
+    'tool registration',
+    'mcp sdk',
+    '@modelcontextprotocol',
+    'mcp inspector',
+    'claude desktop mcp',
+    'mcp config',
+  ],
+
+  // === API DESIGNER INTENT (API design, contracts, OpenAPI) ===
+  api_designer: [
+    'api design',
+    'api-design',
+    'openapi',
+    'swagger',
+    'rest design',
+    'rest-design',
+    'graphql schema',
+    'graphql-schema',
+    'grpc proto',
+    'grpc-proto',
+    'api versioning',
+    'api-versioning',
+    'api contract',
+    'api-contract',
+    'endpoint design',
+    'endpoint-design',
+    'resource modeling',
+    'resource-modeling',
+    'api gateway',
+    'api-gateway',
+    'api documentation',
+    'api-documentation',
+  ],
+
+  // === MICROSERVICES ARCHITECT INTENT (Microservices, distributed systems) ===
+  microservices_architect: [
+    'microservices',
+    'service mesh',
+    'service-mesh',
+    'istio',
+    'linkerd',
+    'event driven',
+    'event-driven',
+    'saga',
+    'cqrs',
+    'event sourcing',
+    'event-sourcing',
+    'service decomposition',
+    'service-decomposition',
+    'bounded context',
+    'bounded-context',
+    'domain driven',
+    'domain-driven',
+    'distributed system',
+    'distributed-system',
+  ],
+
+  // === SRE ENGINEER INTENT (SRE, reliability engineering) ===
+  sre_engineer: [
+    'sre',
+    'site reliability',
+    'site-reliability',
+    'slo',
+    'sli',
+    'sla',
+    'error budget',
+    'error-budget',
+    'production readiness',
+    'production-readiness',
+    'capacity planning',
+    'capacity-planning',
+    'toil',
+    'runbook',
+    'observability',
+    'on call',
+    'on-call',
+  ],
+
+  // === PERFORMANCE ENGINEER INTENT (Performance, profiling, optimization) ===
+  performance_engineer: [
+    'performance',
+    'profiling',
+    'load test',
+    'load-test',
+    'benchmark',
+    'bottleneck',
+    'latency',
+    'throughput',
+    'core web vitals',
+    'core-web-vitals',
+    'bundle size',
+    'bundle-size',
+    'memory leak',
+    'memory-leak',
+    'concurrency',
+  ],
+
+  // === PENETRATION TESTER INTENT (Security testing, pentesting) ===
+  penetration_tester: [
+    'pentest',
+    'penetration test',
+    'penetration-test',
+    'security test',
+    'security-test',
+    'vulnerability scan',
+    'vulnerability-scan',
+    'owasp test',
+    'owasp-test',
+    'ethical hack',
+    'ethical-hack',
+    'exploit',
+    'xss test',
+    'xss-test',
+    'sql injection test',
+    'sql-injection-test',
+    'auth bypass',
+    'auth-bypass',
+  ],
+
+  // === ACCESSIBILITY TESTER INTENT (Accessibility, WCAG, a11y) ===
+  accessibility_tester: [
+    'accessibility',
+    'wcag',
+    'a11y',
+    'screen reader',
+    'screen-reader',
+    'aria',
+    'keyboard navigation',
+    'keyboard-navigation',
+    'color contrast',
+    'color-contrast',
+    'focus management',
+    'focus-management',
+    'alt text',
+    'alt-text',
+    'semantic html',
+    'semantic-html',
+  ],
+
+  // === CHAOS ENGINEER INTENT (Chaos engineering, resilience testing) ===
+  chaos_engineer: [
+    'chaos',
+    'chaos engineering',
+    'chaos-engineering',
+    'failure injection',
+    'failure-injection',
+    'resilience test',
+    'resilience-test',
+    'circuit breaker test',
+    'circuit-breaker-test',
+    'game day',
+    'game-day',
+    'blast radius',
+    'blast-radius',
+    'steady state',
+    'steady-state',
+    'fault tolerance',
+    'fault-tolerance',
+  ],
+
+  // === AI/ML INTENT (routes to ai-ml-specialist for training/MLOps) ===
   ai_ml: [
     'ai',
     'artificial intelligence',
@@ -1428,13 +1739,6 @@ const INTENT_KEYWORDS = {
     'computer vision',
     'cv',
     'transformer',
-    'llm',
-    'large language model',
-    'embedding',
-    'vector',
-    'rag',
-    'retrieval augmented',
-    'fine-tuning',
     'huggingface',
     'pytorch',
     'tensorflow',
@@ -1773,8 +2077,38 @@ const INTENT_TO_AGENT = {
   // Scientific intent (dedicated agent with 139 scientific sub-skills)
   scientific: 'scientific-research-expert',
 
+  // LLM Architecture intent (LLM system design, RAG pipelines, model serving)
+  llm_architect: 'llm-architect',
+
+  // Prompt Engineering intent (prompt optimization, few-shot design, token reduction)
+  prompt_engineer: 'prompt-engineer',
+
+  // MCP Developer intent (Model Context Protocol server/client implementation)
+  mcp_developer: 'mcp-developer',
+
   // AI/ML intent (dedicated agent for deep learning, MLOps, model deployment)
   ai_ml: 'ai-ml-specialist',
+
+  // API Design intent (OpenAPI, REST, gRPC, GraphQL schemas)
+  api_designer: 'api-designer',
+
+  // Microservices Architecture intent (service mesh, event-driven, distributed systems)
+  microservices_architect: 'microservices-architect',
+
+  // SRE intent (SLO/SLI/SLA, error budgets, production readiness)
+  sre_engineer: 'sre-engineer',
+
+  // Performance Engineering intent (profiling, load testing, bottlenecks)
+  performance_engineer: 'performance-engineer',
+
+  // Penetration Testing intent (security testing, vulnerability scanning, OWASP testing)
+  penetration_tester: 'penetration-tester',
+
+  // Accessibility Testing intent (WCAG, a11y, screen reader testing)
+  accessibility_tester: 'accessibility-tester',
+
+  // Chaos Engineering intent (failure injection, resilience testing)
+  chaos_engineer: 'chaos-engineer',
 
   // Data Science intent (routes to data-engineer)
   data_science: 'data-engineer',
@@ -1797,6 +2131,19 @@ const INTENT_TO_AGENT = {
 };
 
 const DISAMBIGUATION_RULES = {
+  // "llm" could be llm-architect (architecture) or ai-ml-specialist (training)
+  llm: [
+    {
+      condition: ['architecture', 'pipeline', 'rag', 'serving', 'design', 'system'],
+      prefer: 'llm-architect',
+      deprioritize: 'ai-ml-specialist',
+    },
+    {
+      condition: ['training', 'fine-tune', 'dataset', 'pytorch', 'tensorflow'],
+      prefer: 'ai-ml-specialist',
+      deprioritize: 'llm-architect',
+    },
+  ],
   // "design" could be architect (system design) or planner (design plan)
   design: [
     {
@@ -1991,6 +2338,89 @@ const DISAMBIGUATION_RULES = {
       condition: ['web', 'browser', 'next', 'performance', 'bundle'],
       prefer: 'frontend-pro',
       deprioritize: 'expo-mobile-developer',
+    },
+  ],
+  // "performance" could be performance-engineer (optimization/profiling/load-test) or developer (general development)
+  performance: [
+    {
+      condition: ['optimization', 'profiling', 'load-test', 'benchmark', 'bottleneck', 'latency'],
+      prefer: 'performance-engineer',
+      deprioritize: 'developer',
+    },
+    {
+      condition: ['code', 'implement', 'feature', 'bug'],
+      prefer: 'developer',
+      deprioritize: 'performance-engineer',
+    },
+  ],
+  // "security-test" could be penetration-tester (testing/pentest/exploit) or security-architect (architecture/design/review)
+  'security-test': [
+    {
+      condition: ['testing', 'pentest', 'exploit', 'vulnerability', 'owasp-test'],
+      prefer: 'penetration-tester',
+      deprioritize: 'security-architect',
+    },
+    {
+      condition: ['architecture', 'design', 'review', 'threat-model'],
+      prefer: 'security-architect',
+      deprioritize: 'penetration-tester',
+    },
+  ],
+  // "accessibility" could be accessibility-tester (testing/audit/wcag) or frontend-pro (frontend implementation)
+  accessibility: [
+    {
+      condition: ['testing', 'audit', 'wcag', 'screen-reader', 'compliance'],
+      prefer: 'accessibility-tester',
+      deprioritize: 'frontend-pro',
+    },
+    {
+      condition: ['implement', 'frontend', 'component', 'ui', 'react'],
+      prefer: 'frontend-pro',
+      deprioritize: 'accessibility-tester',
+    },
+  ],
+  // "microservices" could be microservices-architect (architecture/decomposition/patterns) or architect (general architecture)
+  microservices: [
+    {
+      condition: ['architecture', 'decomposition', 'service-mesh', 'event-driven', 'saga', 'cqrs'],
+      prefer: 'microservices-architect',
+      deprioritize: 'architect',
+    },
+    {
+      condition: ['general', 'system', 'design'],
+      prefer: 'architect',
+      deprioritize: 'microservices-architect',
+    },
+  ],
+  // "sre" could be sre-engineer (reliability/slo/error-budget) or devops (deployment/infrastructure) or incident-responder (incidents)
+  sre: [
+    {
+      condition: ['reliability', 'slo', 'sli', 'error-budget', 'toil', 'runbook'],
+      prefer: 'sre-engineer',
+      deprioritize: 'devops',
+    },
+    {
+      condition: ['deployment', 'infrastructure', 'ci-cd', 'kubernetes'],
+      prefer: 'devops',
+      deprioritize: 'sre-engineer',
+    },
+    {
+      condition: ['incident', 'outage', 'emergency', 'production-down'],
+      prefer: 'incident-responder',
+      deprioritize: 'sre-engineer',
+    },
+  ],
+  // "chaos" could be chaos-engineer (experiments/failure-injection) or sre-engineer (resilience design)
+  chaos: [
+    {
+      condition: ['experiments', 'failure-injection', 'game-day', 'chaos-engineering'],
+      prefer: 'chaos-engineer',
+      deprioritize: 'sre-engineer',
+    },
+    {
+      condition: ['resilience', 'design', 'architecture', 'fault-tolerance'],
+      prefer: 'sre-engineer',
+      deprioritize: 'chaos-engineer',
     },
   ],
   // "component" could be composition-patterns or frontend-pro performance

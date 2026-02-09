@@ -60,6 +60,16 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | AI/ML/Deep Learning                                                        | `ai-ml-specialist`           | `.claude/agents/domain/ai-ml-specialist.md`              |
 | Web3/Blockchain/DeFi                                                       | `web3-blockchain-expert`     | `.claude/agents/domain/web3-blockchain-expert.md`        |
 | Game development                                                           | `gamedev-pro`                | `.claude/agents/domain/gamedev-pro.md`                   |
+| LLM architecture/RAG/model serving                                         | `llm-architect`              | `.claude/agents/domain/llm-architect.md`                 |
+| Prompt engineering/optimization                                            | `prompt-engineer`            | `.claude/agents/domain/prompt-engineer.md`               |
+| MCP server/client development                                              | `mcp-developer`              | `.claude/agents/domain/mcp-developer.md`                 |
+| API design/OpenAPI/contracts                                               | `api-designer`               | `.claude/agents/specialized/api-designer.md`             |
+| Microservices/distributed systems                                          | `microservices-architect`    | `.claude/agents/specialized/microservices-architect.md`  |
+| SRE/reliability/SLOs                                                       | `sre-engineer`               | `.claude/agents/specialized/sre-engineer.md`             |
+| Performance/profiling/optimization                                         | `performance-engineer`       | `.claude/agents/specialized/performance-engineer.md`     |
+| Penetration testing/security testing                                       | `penetration-tester`         | `.claude/agents/specialized/penetration-tester.md`       |
+| Accessibility testing/WCAG                                                 | `accessibility-tester`       | `.claude/agents/specialized/accessibility-tester.md`     |
+| Chaos engineering/resilience                                               | `chaos-engineer`             | `.claude/agents/specialized/chaos-engineer.md`           |
 | Project orchestration                                                      | `master-orchestrator`        | `.claude/agents/orchestrators/master-orchestrator.md`    |
 | Swarm coordination                                                         | `swarm-coordinator`          | `.claude/agents/orchestrators/swarm-coordinator.md`      |
 | Self-evolution                                                             | `evolution-orchestrator`     | `.claude/agents/orchestrators/evolution-orchestrator.md` |
