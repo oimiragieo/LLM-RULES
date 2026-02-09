@@ -79,24 +79,24 @@ All validation is **advisory only** - failures generate warnings but never block
 - `plan.schema.json` (DOCS ONLY)
 - `implementation-plan.schema.json` (DOCS ONLY)
 - `phase-models.schema.json` (DOCS ONLY)
-- `product_requirements.schema.json` (DOCS ONLY)
-- `project_brief.schema.json` (DOCS ONLY)
+- `product-requirements.schema.json` (DOCS ONLY)
+- `project-brief.schema.json` (DOCS ONLY)
 
 ### Testing Schemas (2)
 
-- `test_plan.schema.json` (DOCS ONLY)
+- `test-plan.schema.json` (DOCS ONLY)
 - `test-results.schema.json` (DOCS ONLY)
 
 ### Architecture Schemas (4)
 
 - `specification-template.schema.json` (DOCS ONLY)
-- `system_architecture.schema.json` (DOCS ONLY)
-- `ux_spec.schema.json` (DOCS ONLY)
+- `system-architecture.schema.json` (DOCS ONLY)
+- `ux-spec.schema.json` (DOCS ONLY)
 
 ### Project Schemas (1)
 
 - `project-analysis.schema.json` (DOCS ONLY)
-- `artifact_manifest.schema.json` (DOCS ONLY)
+- `artifact-manifest.schema.json` (DOCS ONLY)
 
 ---
 
@@ -104,15 +104,7 @@ All validation is **advisory only** - failures generate warnings but never block
 
 **Standard Pattern:** `{name}.schema.json`
 
-**Exceptions (documented inconsistencies):**
-
-- `agent-spawn-params.json` (missing `.schema` suffix)
-- `test_plan.schema.json` (uses underscore)
-- `product_requirements.schema.json` (uses underscore)
-- `project_brief.schema.json` (uses underscore)
-- `system_architecture.schema.json` (uses underscore)
-- `ux_spec.schema.json` (uses underscore)
-- `artifact_manifest.schema.json` (uses underscore)
+**All schemas now follow the standard pattern** (`{name}.schema.json`)
 
 ---
 

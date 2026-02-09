@@ -10,7 +10,8 @@
     "analysis_id": {
       "type": "string",
       "pattern": "^analysis-[a-z0-9-]+$",
-      "description": "Unique identifier for this analysis run"
+      "description": "Unique identifier for this analysis run",
+      "maxLength": 100
     },
     "project_type": {
       "type": "string",
@@ -35,12 +36,14 @@
     },
     "project_root": {
       "type": "string",
-      "description": "Absolute path to project root directory"
+      "description": "Absolute path to project root directory",
+      "maxLength": 500
     },
     "stats": {
       "type": "object",
       "required": ["total_files", "total_lines", "languages"],
       "description": "Quantitative project statistics",
+      "additionalProperties": false,
       "properties": {
         "total_files": {
           "type": "integer",
@@ -85,10 +88,12 @@
           "items": {
             "type": "object",
             "required": ["path", "lines"],
+            "additionalProperties": false,
             "properties": {
               "path": {
                 "type": "string",
-                "description": "Relative file path"
+                "description": "Relative file path",
+                "maxLength": 500
               },
               "lines": {
                 "type": "integer",
@@ -102,17 +107,21 @@
     "frameworks": {
       "type": "array",
       "description": "Detected frameworks and libraries",
+      "maxItems": 200,
       "items": {
         "type": "object",
         "required": ["name", "category", "confidence"],
+        "additionalProperties": false,
         "properties": {
           "name": {
             "type": "string",
-            "description": "Framework or library name"
+            "description": "Framework or library name",
+            "maxLength": 100
           },
           "version": {
             "type": "string",
-            "description": "Detected version (if available)"
+            "description": "Detected version (if available)",
+            "maxLength": 50
           },
           "category": {
             "type": "string",
@@ -160,16 +169,20 @@
       "type": "object",
       "required": ["root_directories", "entry_points"],
       "description": "Project structure analysis",
+      "additionalProperties": false,
       "properties": {
         "root_directories": {
           "type": "array",
           "description": "Top-level directories",
+          "maxItems": 200,
           "items": {
             "type": "object",
             "required": ["name", "purpose"],
+            "additionalProperties": false,
             "properties": {
               "name": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 200
               },
               "purpose": {
                 "type": "string",
@@ -196,12 +209,15 @@
         "entry_points": {
           "type": "array",
           "description": "Application entry points",
+          "maxItems": 100,
           "items": {
             "type": "object",
             "required": ["path", "type"],
+            "additionalProperties": false,
             "properties": {
               "path": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500
               },
               "type": {
                 "type": "string",
@@ -237,6 +253,7 @@
     "dependencies": {
       "type": "object",
       "description": "Dependency analysis",
+      "additionalProperties": false,
       "properties": {
         "production": {
           "type": "integer",
@@ -251,13 +268,15 @@
         "outdated": {
           "type": "array",
           "description": "Outdated dependencies",
+          "maxItems": 500,
           "items": {
             "type": "object",
             "required": ["name", "current", "latest"],
+            "additionalProperties": false,
             "properties": {
-              "name": { "type": "string" },
-              "current": { "type": "string" },
-              "latest": { "type": "string" },
+              "name": { "type": "string", "maxLength": 100 },
+              "current": { "type": "string", "maxLength": 50 },
+              "latest": { "type": "string", "maxLength": 50 },
               "breaking": { "type": "boolean" }
             }
           }
@@ -265,16 +284,18 @@
         "vulnerabilities": {
           "type": "array",
           "description": "Known security vulnerabilities",
+          "maxItems": 1000,
           "items": {
             "type": "object",
             "required": ["package", "severity"],
+            "additionalProperties": false,
             "properties": {
-              "package": { "type": "string" },
+              "package": { "type": "string", "maxLength": 100 },
               "severity": {
                 "type": "string",
                 "enum": ["low", "medium", "high", "critical"]
               },
-              "advisory": { "type": "string" }
+              "advisory": { "type": "string", "maxLength": 2000 }
             }
           }
         }
@@ -283,26 +304,30 @@
     "code_quality": {
       "type": "object",
       "description": "Code quality indicators",
+      "additionalProperties": false,
       "properties": {
         "linting": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "configured": { "type": "boolean" },
-            "tool": { "type": "string" },
+            "tool": { "type": "string", "maxLength": 100 },
             "issues_count": { "type": "integer", "minimum": 0 }
           }
         },
         "formatting": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "configured": { "type": "boolean" },
-            "tool": { "type": "string" }
+            "tool": { "type": "string", "maxLength": 100 }
           }
         },
         "testing": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
-            "framework": { "type": "string" },
+            "framework": { "type": "string", "maxLength": 100 },
             "test_files": { "type": "integer", "minimum": 0 },
             "coverage_configured": { "type": "boolean" },
             "coverage_percent": { "type": "number", "minimum": 0, "maximum": 100 }
@@ -310,6 +335,7 @@
         },
         "type_safety": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "typescript": { "type": "boolean" },
             "strict_mode": { "type": "boolean" },
@@ -321,27 +347,33 @@
     "patterns_detected": {
       "type": "array",
       "description": "Common patterns and anti-patterns detected",
+      "maxItems": 500,
       "items": {
         "type": "object",
         "required": ["pattern", "type", "locations"],
+        "additionalProperties": false,
         "properties": {
           "pattern": {
             "type": "string",
-            "description": "Name of the pattern"
+            "description": "Name of the pattern",
+            "maxLength": 200
           },
           "type": {
             "type": "string",
             "enum": ["good-practice", "anti-pattern", "neutral"]
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1000
           },
           "locations": {
             "type": "array",
-            "items": { "type": "string" }
+            "maxItems": 100,
+            "items": { "type": "string", "maxLength": 500 }
           },
           "recommendation": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1000
           }
         }
       }
@@ -349,6 +381,7 @@
     "tech_debt": {
       "type": "object",
       "description": "Technical debt indicators",
+      "additionalProperties": false,
       "properties": {
         "score": {
           "type": "number",
@@ -358,9 +391,11 @@
         },
         "indicators": {
           "type": "array",
+          "maxItems": 500,
           "items": {
             "type": "object",
             "required": ["category", "severity", "description"],
+            "additionalProperties": false,
             "properties": {
               "category": {
                 "type": "string",
@@ -379,7 +414,7 @@
                 "type": "string",
                 "enum": ["low", "medium", "high", "critical"]
               },
-              "description": { "type": "string" },
+              "description": { "type": "string", "maxLength": 1000 },
               "remediation_effort": {
                 "type": "string",
                 "enum": ["trivial", "minor", "moderate", "major", "massive"]
@@ -392,9 +427,11 @@
     "recommendations": {
       "type": "array",
       "description": "Prioritized improvement recommendations",
+      "maxItems": 200,
       "items": {
         "type": "object",
         "required": ["priority", "category", "title", "description"],
+        "additionalProperties": false,
         "properties": {
           "priority": {
             "type": "string",
@@ -412,8 +449,8 @@
               "dependencies"
             ]
           },
-          "title": { "type": "string" },
-          "description": { "type": "string" },
+          "title": { "type": "string", "maxLength": 200 },
+          "description": { "type": "string", "maxLength": 2000 },
           "effort": {
             "type": "string",
             "enum": ["trivial", "minor", "moderate", "major", "massive"]
@@ -428,14 +465,16 @@
     "metadata": {
       "type": "object",
       "description": "Analysis metadata",
+      "additionalProperties": false,
       "properties": {
-        "analyzer_version": { "type": "string" },
+        "analyzer_version": { "type": "string", "maxLength": 50 },
         "analysis_duration_ms": { "type": "integer", "minimum": 0 },
         "files_analyzed": { "type": "integer", "minimum": 0 },
         "files_skipped": { "type": "integer", "minimum": 0 },
         "errors": {
           "type": "array",
-          "items": { "type": "string" }
+          "maxItems": 500,
+          "items": { "type": "string", "maxLength": 1000 }
         }
       }
     }

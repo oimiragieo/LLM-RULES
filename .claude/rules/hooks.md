@@ -14,6 +14,53 @@
 - Exit codes: `0` = allow, `2` = block
 - Never use blocking operations or network calls in pre-commit hooks
 
+## Chain-of-Responsibility Pattern
+
+**Pattern**: Hooks execute in priority order, each can pass/block/transform.
+
+**Implementation**:
+
+- Hooks registered in `.claude/settings.json` with priority
+- Execution order: routing → safety → validation
+- Early exit on first block (no wasted execution)
+
+**Example**:
+
+```javascript
+// Priority 1: routing-guard.cjs (checks planner-first)
+// Priority 2: unified-creator-guard.cjs (checks creator paths)
+// Priority 3: unified-pre-write-hook.cjs (checks file safety)
+```
+
+## Performance Budget
+
+**Target**: Hooks should complete in <100ms.
+
+**Why**: Hooks block tool execution. Slow hooks = slow agent workflows.
+
+**Monitoring**: `post-tool-metrics-unified.cjs` tracks hook execution time
+
+**Red Flags**:
+
+- Hook >500ms: Investigate immediately
+- Hook >1s: Disable or refactor
+
+## Hook Categories
+
+**Pre-Action Hooks** (validation, guard):
+
+- Validate inputs before tool execution
+- Block unsafe operations
+- Example: `routing-guard.cjs`, `unified-creator-guard.cjs`
+
+**Post-Action Hooks** (metrics, logging):
+
+- Record metrics after tool execution
+- Log completions, errors
+- Example: `post-tool-metrics-unified.cjs`
+
+**Why Separate**: Pre-action is blocking (must be fast), post-action is async (can be slower)
+
 ## Hook Organization
 
 - Hooks live in `.claude/hooks/` organized by concern:
@@ -30,6 +77,21 @@
 - Add graceful degradation (try/catch wrapping)
 - Document hook behavior in frontmatter
 
+## Consolidated Hooks (2026-02-08)
+
+**Major consolidation**: 6 wildcard hooks consolidated into 2:
+
+- `pre-tool-unified.cjs` - 11 safety checks (path validation, Windows compatibility, file safety)
+- `post-tool-metrics-unified.cjs` - Metrics collection, logging
+
+**Benefits**: Reduced hook overhead from 6 checks to 2, faster execution
+
 ## Reference Documentation
 
 See `.claude/docs/HOOKS_REFERENCE.md` for comprehensive hook authoring guide.
+
+## Related References
+
+- `@ENFORCEMENT_HOOKS.md` - Complete hook catalog and enforcement modes
+- `@HOOK_AGENT_MAP.md` - Hook-agent mapping matrix
+- `.claude/hooks/` - Hook implementation directory

@@ -31,6 +31,36 @@ Verify all created artifacts are integrated with the framework. Artifacts create
 - Memory updates (learnings/decisions)
 - Related templates/examples
 
+## AI-Driven Dependency Graphs
+
+**Implementation**: `artifact-graph.json` tracks relationships between artifacts.
+
+**Structure**:
+
+```json
+{
+  "nodes": [
+    { "id": "skill:tdd", "type": "skill" },
+    { "id": "agent:developer", "type": "agent" }
+  ],
+  "edges": [{ "from": "agent:developer", "to": "skill:tdd", "relationship": "uses" }],
+  "companionMatrix": {
+    "skill:tdd": {
+      "mustHave": ["agent:developer", "agent:qa"],
+      "shouldHave": ["skill:verification-before-completion"]
+    }
+  }
+}
+```
+
+**Benefits**:
+
+- Detect orphaned artifacts (no incoming edges)
+- Find missing companions (mustHave not satisfied)
+- Visualize ecosystem impact
+
+**Tool**: `.claude/tools/analysis/artifact-graph-builder.mjs`
+
 ## Post-Creation Protocol
 
 After creating ANY artifact:
@@ -49,3 +79,10 @@ When creating one artifact reveals need for another:
 - Do not ignore missing dependencies
 
 Missing integrations = 70% orphan rate (current measurement).
+
+## Related References
+
+- `.claude/workflows/creation/ecosystem-creation-workflow.md` - Complete artifact creation lifecycle
+- `artifact-integrator` skill - Deep integration analysis
+- `artifact-graph.json` - Dependency graph database
+- `.claude/tools/analysis/artifact-graph-builder.mjs` - Graph generation tool

@@ -3,13 +3,16 @@
   "title": "Product Requirements Schema",
   "description": "Schema for product requirements documents",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "documentTitle": {
       "type": "string",
+      "maxLength": 200,
       "description": "Full document title"
     },
     "version": {
       "type": "string",
+      "maxLength": 50,
       "description": "Document version"
     },
     "date": {
@@ -19,6 +22,7 @@
     },
     "author": {
       "type": "string",
+      "maxLength": 100,
       "description": "Document author"
     },
     "status": {
@@ -28,42 +32,53 @@
     },
     "executiveSummary": {
       "type": "string",
+      "maxLength": 2000,
       "description": "High-level product summary"
     },
     "productOverview": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "productVision": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "targetAudience": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 1000
         },
         "keyFeatures": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "valueProposition": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 1000
         }
       }
     },
     "requirements": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "functionalRequirements": {
           "type": "array",
+          "maxItems": 200,
           "items": {
             "type": "object",
+            "additionalProperties": false,
             "properties": {
               "id": {
                 "type": "string",
                 "pattern": "^FR-\\d+$"
               },
               "description": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 1000
               },
               "priority": {
                 "type": "string",
@@ -71,8 +86,10 @@
               },
               "acceptanceCriteria": {
                 "type": "array",
+                "maxItems": 50,
                 "items": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 500
                 }
               }
             },
@@ -81,29 +98,38 @@
         },
         "nonFunctionalRequirements": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "performance": {
               "type": "array",
+              "maxItems": 50,
               "items": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500
               }
             },
             "security": {
               "type": "array",
+              "maxItems": 50,
               "items": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500
               }
             },
             "usability": {
               "type": "array",
+              "maxItems": 50,
               "items": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500
               }
             },
             "compatibility": {
               "type": "array",
+              "maxItems": 50,
               "items": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500
               }
             }
           }
@@ -112,25 +138,33 @@
     },
     "userStories": {
       "type": "array",
+      "maxItems": 200,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "epic": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           },
           "asA": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 200
           },
           "iWant": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           },
           "soThat": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           },
           "acceptanceCriteria": {
             "type": "array",
+            "maxItems": 50,
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 500
             }
           },
           "priority": {
@@ -146,68 +180,89 @@
     },
     "technicalSpecifications": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "architecture": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "technologyStack": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "frontend": {
               "type": "array",
+              "maxItems": 50,
               "items": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 100
               }
             },
             "backend": {
               "type": "array",
+              "maxItems": 50,
               "items": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 100
               }
             },
             "database": {
               "type": "array",
+              "maxItems": 50,
               "items": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 100
               }
             },
             "infrastructure": {
               "type": "array",
+              "maxItems": 50,
               "items": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 100
               }
             }
           }
         },
         "apis": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "dataModels": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 5000
         }
       }
     },
     "timeline": {
       "type": "array",
+      "maxItems": 50,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "phase": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           },
           "duration": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           },
           "deliverables": {
             "type": "array",
+            "maxItems": 50,
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 200
             }
           },
           "keyDates": {
             "type": "array",
+            "maxItems": 50,
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 200
             }
           }
         }
@@ -215,23 +270,30 @@
     },
     "successMetrics": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "businessMetrics": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "technicalMetrics": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "userMetrics": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         }
       }

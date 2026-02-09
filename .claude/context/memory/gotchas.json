@@ -239,6 +239,47 @@
       "risk_level": "MEDIUM - affects feature behavior but not system stability. Config feature doesn't work as intended.",
       "extracted_from": "Task #10 Code Review (C2: Option Name Mismatch), Task #11 QA Validation confirmed",
       "date": "2026-02-08"
+    },
+    {
+      "id": "research-synthesis-too-large-for-spawn",
+      "gotcha": "Research-synthesis skill (~15KB) is too large to embed in spawn prompts, causing turn exhaustion in researcher agents",
+      "context": "Enterprise Improvement Pipeline #12 (Tasks #9-16, 2026-02-09) - 4 parallel researchers experienced context budget issues",
+      "why_it_happens": "When research-synthesis is embedded in the spawn prompt, it consumes ~15KB of the researcher agent's context budget. This leaves insufficient room for actual research (web searches, file reads, analysis). The agent hits maximum tool calls before completing research.",
+      "trigger": "Spawning researcher agents with research-synthesis skill content embedded in the Task() prompt",
+      "solution": "Three mitigation options: (1) Create 'research-lite' variant (~3-5KB) with essential guidance only, (2) Invoke research-synthesis via Skill() tool post-spawn instead of embedding in prompt, (3) Split research-synthesis into sub-skills (web-research, code-research, synthesis). Option 2 is lowest effort.",
+      "impact": "Reduced research quality and completeness in some researchers due to early termination",
+      "extracted_from": "Pipeline #12 Task #16 reflection, observed during Tasks #1-4 research phase",
+      "date": "2026-02-09"
+    },
+    {
+      "id": "code-reviewer-no-write-tool",
+      "gotcha": "Code-reviewer agent cannot save review reports to files because Write is not in its allowed tool set",
+      "context": "Enterprise Improvement Pipeline #12 (Task #14) - code review report communicated via TaskUpdate metadata",
+      "why_it_happens": "The code-reviewer agent definition does not include Write in its tool permissions. This is by design (reviewers should not modify code), but it also prevents saving review reports to .claude/context/reports/.",
+      "trigger": "Code-reviewer completing a review and needing to save a persistent report",
+      "solution": "Add Write to code-reviewer's allowed tools with path restriction: only allow writes to .claude/context/reports/ directories. This preserves the 'no code modification' constraint while enabling report persistence.",
+      "impact": "Review reports are ephemeral (exist only in task metadata), not searchable, and not accessible to other agents or future sessions",
+      "extracted_from": "Pipeline #12 Task #16 reflection, observed during Task #14 code review",
+      "date": "2026-02-09"
+    },
+    {
+      "id": "creator-compliance-false-positives-on-edits",
+      "gotcha": "Creator compliance validator fires false positives when existing agent files are EDITED (not created), generating spurious integration queue entries",
+      "context": "Enterprise Improvement Pipeline #12 (Tasks #11-12) - 6 false-positive entries in integration-queue.jsonl for agents already in registry",
+      "why_it_happens": "creator-compliance-validator.cjs checks if an artifact exists in its registry after a TaskUpdate(completed). If the check uses the file path but the registry uses a different key format, or if the validator doesn't distinguish between 'edit existing' and 'create new', it reports missing integration for existing artifacts.",
+      "trigger": "Editing (not creating) agent files via developer agent, where developer task completion triggers creator compliance check",
+      "solution": "ADR-106 (file-existence check) addresses this. The validator should check: (1) Does the artifact file already exist on disk? (2) If yes, this is an EDIT, not a creation -- skip compliance check. Alternatively, the integration queue entries should be filtered to exclude edits.",
+      "impact": "6 false-positive queue entries cluttering integration-queue.jsonl, creating noise for artifact-integrator",
+      "affected_files": [
+        ".claude/agents/core/planner.md",
+        ".claude/agents/core/developer.md",
+        ".claude/agents/core/pm.md",
+        ".claude/agents/core/qa.md",
+        ".claude/agents/specialized/code-reviewer.md",
+        ".claude/agents/orchestrators/master-orchestrator.md"
+      ],
+      "extracted_from": "Pipeline #12 Task #16 reflection, integration-queue.jsonl inspection",
+      "date": "2026-02-09"
     }
   ]
 }

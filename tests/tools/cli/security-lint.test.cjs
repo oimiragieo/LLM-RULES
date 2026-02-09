@@ -318,6 +318,83 @@ function testShouldSkipScanningFunction() {
   );
 }
 
+function testSkipsEvalInDocumentationMarkdown() {
+  // .md files in docs/skills/agents should not be scanned for eval() or new Function()
+  const content = `# Security Rules
+
+Do NOT use \`eval()\` or \`new Function()\` in production code.
+
+Example of what NOT to do:
+\`\`\`javascript
+const result = eval(userInput); // BAD
+const fn = new Function('x', 'return x * 2'); // BAD
+\`\`\`
+`;
+  const filePath = createTestFile(content, '.md');
+
+  const findings = scanFile(filePath);
+  const codeInjectionFindings = findings.filter(
+    f => f.ruleId === 'SEC-012' || f.ruleId === 'SEC-013'
+  );
+  assert(codeInjectionFindings.length === 0, 'Should not flag eval/Function in .md docs');
+}
+
+function testSkipsEvalInMemoryJson() {
+  // Memory/learnings JSON files should not be scanned for eval() or new Function()
+  const content = `{
+  "patterns": [
+    "Avoid eval() for dynamic code execution",
+    "Never use new Function() with untrusted input"
+  ]
+}`;
+  const filePath = createTestFile(content, '.json');
+
+  const findings = scanFile(filePath);
+  const codeInjectionFindings = findings.filter(
+    f => f.ruleId === 'SEC-012' || f.ruleId === 'SEC-013'
+  );
+  assert(
+    codeInjectionFindings.length === 0,
+    'Should not flag eval/Function mentions in .json docs'
+  );
+}
+
+function testSkipsHttpInSchemaJson() {
+  // .schema.json files use http://json-schema.org/ URIs by convention
+  const content = `{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" }
+  }
+}`;
+  const filePath = createTestFile(content, '.schema.json');
+
+  const findings = scanFile(filePath);
+  const httpFindings = findings.filter(f => f.ruleId === 'SEC-020');
+  assert(httpFindings.length === 0, 'Should not flag http:// in .schema.json files');
+}
+
+function testStillScansEvalInCodeFiles() {
+  // Code files (.js, .ts, etc.) should still be scanned for eval()
+  const content = `const result = eval(userInput);`;
+  const filePath = createTestFile(content, '.js');
+
+  const findings = scanFile(filePath);
+  const evalFindings = findings.filter(f => f.ruleId === 'SEC-012');
+  assert(evalFindings.length > 0, 'Should still detect eval() in .js files');
+}
+
+function testStillScansHttpInCodeFiles() {
+  // Code files should still be scanned for http:// (non-localhost)
+  const content = `const url = "http://example.com/api";`;
+  const filePath = createTestFile(content, '.js');
+
+  const findings = scanFile(filePath);
+  const httpFindings = findings.filter(f => f.ruleId === 'SEC-020');
+  assert(httpFindings.length > 0, 'Should still detect http:// in .js files');
+}
+
 // =============================================================================
 // Main Test Runner
 // =============================================================================
@@ -348,6 +425,11 @@ function main() {
     ['Skips security-lint test files', testSkipsSecurityLintTestFiles],
     ['Does not skip regular test files', testDoesNotSkipRegularTestFiles],
     ['shouldSkipScanning function works correctly', testShouldSkipScanningFunction],
+    ['Skips eval() in documentation .md files', testSkipsEvalInDocumentationMarkdown],
+    ['Skips eval() in memory .json files', testSkipsEvalInMemoryJson],
+    ['Skips http:// in .schema.json files', testSkipsHttpInSchemaJson],
+    ['Still scans eval() in code files', testStillScansEvalInCodeFiles],
+    ['Still scans http:// in code files', testStillScansHttpInCodeFiles],
   ];
 
   let passed = 0;

@@ -22,15 +22,9 @@ skills:
   - checklist-generator
   - code-semantic-search
   - consensus-voting
-  - jira-pm
-  - linear-pm
   - plan-generator
-  - progressive-disclosure
   - ripgrep
   - sequential-thinking
-  - slack-notifications
-  - spec-writing
-  - task-breakdown
   - task-management-protocol
   - verification-before-completion
 ---
@@ -90,6 +84,34 @@ The following workflows guide this agent's execution:
 4. **Stakeholder Communication**: Keep stakeholders informed with regular updates.
 5. **Metrics & KPIs**: Define and track product success metrics.
 6. **Consensus Building**: Facilitate decision-making using voting and alignment tools.
+
+## PRD Workflow (Structured Product Requirements)
+
+**When to create PRD**: HIGH/EPIC complexity features requiring cross-team coordination.
+**When to skip**: LOW/MEDIUM complexity features with clear, self-contained scope.
+
+### PRD Template
+
+Use the structured PRD template at `.claude/templates/prd-template.md` for all PRDs.
+
+**Required Sections:**
+
+- Problem Statement + Evidence (validates "why" before "how")
+- Key Hypothesis (testable assumption with measurable outcome)
+- MoSCoW Capabilities (Must/Should/Could/Won't with rationale)
+- Implementation Phases table (Status/Depends/Plan Link columns)
+- Decisions Log (Decision/Choice/Alternatives/Rationale)
+- Success Metrics (Metric/Target/How Measured)
+
+**Output Location:** `.claude/context/artifacts/specs/{feature-name}-prd-{YYYY-MM-DD}.md`
+
+### PRD-to-Plan Handoff
+
+After PRD is created:
+
+1. Planner reads PRD -> selects next pending phase -> creates plan
+2. Planner updates PRD phases table with plan link
+3. Developer reads plan (linked to PRD) for full context
 
 ## Code Search
 

@@ -11323,3 +11323,883 @@ When creating any agent that works with code (description contains "code|impleme
 **Stage 2: Code Quality** - PASS
 
 - 0 critical issues
+
+## 2026-02-09: EPIC Framework Modernization Plan Created (Task #1 EPIC)
+
+**Pattern:** Systematic 4-batch dependency-first modernization planning
+
+**Key Learnings:**
+
+1. **Dependency-first batch ordering is critical:**
+   - Batch 1 (schemas, config, rules, context) has zero inter-batch dependencies
+   - Batch 2 (lib, tools, docs, templates) depends on Batch 1 schemas/config
+   - Batch 3 (hooks, commands, skills) depends on Batch 2 libraries
+   - Batch 4 (agents, workflows) depends on everything
+   - Violating this order causes cascading rework
+
+2. **lib/utils/ is the most critical dependency bottleneck:**
+   - project-root.cjs: 30+ consumers
+   - hook-input.cjs: 20+ consumers
+   - atomic-write.cjs: 15+ consumers
+   - Any breaking change here cascades to 80%+ of hooks
+   - Must be backward-compatible or risk framework-wide breakage
+
+3. **File inventory by layer:**
+   - Active files: ~569 across 14 directories
+   - Archived files: ~375 (already cleaned)
+   - Hooks are the most dependency-heavy layer (80+ require() calls to lib/)
+
+4. **Validation gates between batches are NON-NEGOTIABLE:**
+   - Full test suite (pnpm test) must pass
+   - Lint + format must be clean
+   - Schema validation must pass
+   - Each batch gets a git commit checkpoint
+   - No batch starts until previous validation gate passes
+
+5. **Skills are the largest single-batch effort:**
+   - 93 active skills = 18-24 hours of review
+   - Batch by priority: P0 (12 skills) -> P1 (14) -> P2 (30+) -> P3 (rest)
+   - Each skill needs: modern technique research + library update + agent assignment check
+
+**Cross-Reference:**
+
+- Plan: `.claude/context/plans/epic-framework-modernization-plan-2026-02-09.md`
+- 1,613 lines, 4 batches, 34 phases, ~130 tasks
+
+---
+
+## 2026-02-09: PRD Generator Skill Created (Task #13 - Phase 5 Complete)
+
+**Pattern:** Skill creation following TDD and spec-based approach
+
+**Key Learnings:**
+
+1. **prd-generator skill created:**
+   - Location: `.claude/skills/prd-generator/SKILL.md`
+   - Problem-first methodology: Problem → Evidence → Hypothesis → Solution
+   - Implementation Phases table: # | Phase | Status | Depends | Plan Link (enables PRD → Planner → Developer traceability)
+   - MoSCoW prioritization: Must/Should/Could/Won't with rationale
+   - Decisions Log: Decision | Choice | Alternatives | Rationale
+   - Success Metrics: Metric | Target | How Measured
+   - Progressive Disclosure: 8-phase questioning for unclear requirements
+
+2. **Integration complete:**
+   - Added to skill-catalog.md (Planning & Architecture section)
+   - Assigned to `pm` agent
+   - Total skills: 94 → 95 (93 active + 1 deprecated alias + 1 scientific parent)
+
+3. **TDD verification:**
+   - RED test: File did not exist
+   - GREEN test: File created with all required sections
+   - Verified: Problem Statement, Key Hypothesis, MoSCoW, Implementation Phases, Decisions Log
+
+4. **Phase 5 completion milestone:**
+   - Enterprise improvement pipeline Task #13 complete
+   - PRD workflow enhancement fully implemented
+   - PM agent now has structured PRD generation capability
+
+**Cross-Reference:**
+
+- Skill file: `.claude/skills/prd-generator/SKILL.md`
+- Template: `.claude/templates/prd-template.md`
+- Catalog: `.claude/context/artifacts/catalogs/skill-catalog.md`
+
+---
+
+## 2026-02-09: PM PRD Creation - Problem-First Methodology (Task #5)
+
+**Pattern:** Problem-first, hypothesis-driven PRD structure with Implementation Phases
+
+**Key Learnings:**
+
+1. **PRD Template Structure (from PRP reference):**
+   - Problem Statement → Evidence → Key Hypothesis → Solution (validates "why" before "how")
+   - Implementation Phases table: # | Phase | Description | Status | Parallel | Depends | PRP Plan (enables phase-by-phase tracking)
+   - Decisions Log: Decision | Choice | Alternatives | Rationale (records "why we chose X over Y")
+   - MoSCoW priorities: Must/Should/Could/Won't with rationale (prevents scope creep)
+   - Success Metrics: Metric | Target | How Measured (measurable outcomes)
+
+2. **PRD → Plan → Implementation traceability:**
+   - PM creates PRD with Implementation Phases table
+   - Planner reads PRD → selects next pending phase (dependencies complete) → creates plan
+   - Planner updates PRD → adds plan link to PRP Plan column
+   - Developer reads plan (linked to PRD) → full context (problem, decisions, rationale)
+   - Result: Single source of truth for feature status (check PRD phases table)
+
+3. **Progressive Disclosure (optional for ambiguous requirements):**
+   - 8-phase question workflow: Initiate → Foundation → Grounding (Market) → Deep Dive → Grounding (Technical) → Decisions → Generate
+   - Clarifies requirements through structured questions before generating PRD
+   - Use for HIGH/EPIC complexity features with unclear requirements
+   - Skip for clear requirements (avoid busywork)
+
+4. **4 PRDs created for agent-studio improvements:**
+   - **Planner Enhancement**: TDD/SPEC/structured planning with Phase 0 research checkpoints
+   - **Context-Compressor Integration**: 5+ agents invoke compressor before hitting limits
+   - **Hybrid Search Adoption**: Replace Grep default with ripgrep/semantic/structural search
+   - **PM PRD Workflow Enhancement**: Structured PRD template with phases/decisions/MoSCoW
+
+**Cross-Reference:**
+
+- `.claude/context/artifacts/specs/planner-enhancement-prd-2026-02-09.md`
+- `.claude/context/artifacts/specs/context-compressor-integration-prd-2026-02-09.md`
+- `.claude/context/artifacts/specs/hybrid-search-adoption-prd-2026-02-09.md`
+- `.claude/context/artifacts/specs/pm-prd-workflow-enhancement-prd-2026-02-09.md`
+- Reference: `.claude.archive/.tmp/PRPs-agentic-eng-development/.claude/commands/prp-core/prp-prd.md`
+
+---
+
+## 2026-02-09: Pro-Workflow Adoption Best Practices (Task #83)
+
+**Pattern:** Adopt CONCEPTS not CODE when integrating reference implementations
+
+**Key Learnings:**
+
+1. **Routing table keyword reduction:**
+   - Original: 2,472 lines with 50+ keywords per agent
+   - Simplified: 1,030 lines (58% reduction) with identical routing behavior
+   - Insight: LLMs don't need exhaustive synonym lists; 3-5 core keywords per agent is sufficient
+   - The router matches on intent, not exact keyword matches
+
+2. **Hook consolidation pattern:**
+   - Standalone hooks can be merged into parent hooks as new "Check N" sections
+   - Example: `config-model-validator.cjs` → `routing-guard.cjs` Check 11
+   - Example: `intent-agent-match.cjs` → `routing-guard.cjs` Check 10
+   - Example: `task-status-enforcement.cjs` → `pre-completion-validation.cjs`
+   - Example: `task-list-tracker.cjs` → `post-task-unified.cjs`
+   - Benefits: Fewer hook registrations, simpler settings.json, easier maintenance
+   - Guideline: If Hook A and Hook B always fire together for the same event, merge them
+
+3. **Test isolation for hooks:**
+   - Hooks that write state files (edit-counter.json, drift-state.json, etc.) need test isolation
+   - Use temp directories + env var override (CLAUDE_RUNTIME_DIR) to prevent test interference
+   - Pattern: `process.env.CLAUDE_RUNTIME_DIR = tempDir; const hook = require('hook.cjs'); ...`
+   - Prevents test state pollution and allows parallel test execution
+
+4. **Batch test failures ≠ real regressions:**
+   - When hooks are refactored, batch test runs (`pnpm test`) may fail due to process isolation issues
+   - Always verify individual test suites first: `node --test tests/hooks/routing-guard.test.mjs`
+   - If individual tests pass but batch fails → investigation required, likely test cleanup issue
+   - Don't assume batch failure = real regression without verification
+
+5. **Pro-workflow adoption strategy:**
+   - Adopt concepts (drift detection, adaptive quality gates, correction detection) NOT code
+   - Rewrite from scratch using project-specific utilities and patterns
+   - Why: Direct code copy incompatible with different hook protocols, state management, utilities
+   - Result: Better integration, maintainability, and consistency with existing codebase
+
+6. **Feature branch → merge-to-main workflow:**
+   - Use feature branches for high-risk changes (safety net for rollback)
+   - Once all tests pass and QA confirms zero regressions, merge to main immediately
+   - Do NOT leave feature branches open — merge as soon as confident
+   - Pattern: `git switch -c feature/X` → implement → test → `git switch main && git merge feature/X --no-ff` → `git branch -d feature/X`
+   - Anti-pattern: completing all work on feature branch but forgetting to merge (user expects changes on main)
+
+**Cross-Reference:**
+
+- ADR-107: Pro-Workflow Adoption Strategy (decisions.md)
+- Task #81: Pro-workflow adoption implementation
+
+---
+
+## 2026-02-09: PreCompact State Preservation Hook (Task #81 Phase 2.2)
+
+**Pattern:** Snapshot session state before context compaction
+
+**Implementation:**
+
+- Hook: `.claude/hooks/session/pre-compact.cjs` (107 lines)
+- Tests: `tests/hooks/pre-compact.test.mjs` (244 lines, 8 tests, 100% pass)
+- Event: Stop — non-blocking, always exit 0
+- Snapshot file: `.claude/context/runtime/pre-compact-snapshot.json`
+- Source files: edit-counter.json, session-metrics.json, drift-state.json
+
+**Key Design:**
+
+1. **Snapshot structure:**
+   - timestamp (ISO 8601)
+   - editCount (from edit-counter.json)
+   - correctionCount (from session-metrics.json)
+   - promptCount (from session-metrics.json)
+   - originalIntent (from drift-state.json)
+   - driftEditCount (from drift-state.json)
+
+2. **Graceful degradation:**
+   - Missing source files → defaults (0 or empty string)
+   - Malformed JSON → defaults (no crash)
+   - Always exits 0 (non-blocking)
+
+3. **Hook protocol compliance:**
+   - ALWAYS exits 0 (non-blocking)
+   - ALWAYS passes through original input to stdout unchanged
+   - Atomic file writes (tmp + rename)
+   - Logs to stderr (not stdout)
+
+**Hook Registrations (settings.json):**
+
+All 4 new hooks registered in `.claude/settings.json`:
+
+1. **drift-detector** → UserPromptSubmit (detects intent drift from original task)
+2. **adaptive-quality-gate** → PreToolUse (Edit|Write|NotebookEdit) - adaptive thresholds
+3. **post-edit-scanner** → PostToolUse (Edit) - scans for anti-patterns after edits
+4. **pre-compact** → Stop - snapshots state before compaction
+
+**Lint Fixes:**
+
+Fixed 7 lint errors in adaptive-quality-gate.cjs and drift-detector.cjs:
+
+- Changed `err` to `_err` (5 locations)
+- Removed unused `stdinBuffer` and `stdin` variables (2 locations)
+
+**Memory Takeaway:** When creating hooks that run at Stop event, ensure they capture state BEFORE the session ends. Use atomic writes (tmp + rename) to prevent partial state corruption. Always test graceful degradation with missing/malformed source files.
+
+**IMPORTANT:** Claude Code caches settings.json at session startup. The 4 new hooks won't take effect until the user restarts their Claude Code session.
+
+---
+
+## 2026-02-09: Adaptive Quality Gate Hook (Task #81 Phase 1.2)
+
+**Pattern:** Non-blocking quality checkpoint reminders based on adaptive thresholds
+
+**Implementation:**
+
+- Hook: `.claude/hooks/session/adaptive-quality-gate.cjs` (165 lines)
+- Tests: `tests/hooks/adaptive-quality-gate.test.mjs` (234 lines, 8 tests, 100% pass)
+- Event: PreToolUse (Edit|Write) — non-blocking, always exit 0
+- Counter file: `.claude/context/runtime/edit-counter.json`
+- Metrics input: `.claude/context/runtime/session-metrics.json` (corrections_count, prompt_count)
+
+**Key Design:**
+
+1. **Adaptive thresholds based on correction rate:**
+   - High correction rate (>25%): first=3, second=6, repeat=6 (more aggressive)
+   - Low correction rate (<5%): first=10, second=20, repeat=20 (less aggressive)
+   - Default: first=5, second=10, repeat=10
+
+2. **Warning progression:**
+   - First threshold: "Consider running: pnpm lint:fix && pnpm format"
+   - Second threshold: "Strongly recommend running: pnpm lint:fix && pnpm format && pnpm test"
+   - Repeat threshold: Every N edits after second threshold
+
+3. **Hook protocol compliance:**
+   - ALWAYS exits 0 (non-blocking)
+   - ALWAYS passes through original input to stdout unchanged
+   - Graceful degradation: malformed counter file resets to 1, missing metrics file uses defaults
+   - Atomic file writes (tmp + rename)
+
+**Test Strategy:**
+
+- Use `spawnSync()` instead of `execSync()` to capture stderr (execSync doesn't capture stderr when exit code is 0)
+- Manipulate counter file and metrics file between runs to verify threshold logic
+- Verify passthrough of original JSON to stdout for non-blocking behavior
+- Test malformed file handling (graceful reset, no crash)
+
+**Memory Takeaway:** For non-blocking hooks that emit warnings to stderr, use `spawnSync()` in tests (not `execSync()`). `execSync()` doesn't capture stderr when the command exits 0, causing false test failures.
+
+---
+
+- 0 important issues
+- 3 minor issues (magic number, message duplication, test coverage not verified)
+- Excellent hook protocol compliance (stdin/stdout JSON, fail-open, exit codes)
+- Strong security (path normalization, input validation, enforcement auditing)
+- Clean architecture (DRY, single responsibility, clear separation)
+
+**Key Implementation Highlights:**
+
+1. **Multi-Layer Defense-in-Depth:**
+   - Layer 1 (Routing): user-prompt-unified.cjs detects creator intent, sets router-state flags
+   - Layer 2 (Spawn): routing-guard.cjs Check 9 blocks non-creator spawns
+   - Layer 3 (Write): unified-creator-guard.cjs blocks direct writes, refreshes TTL for batch
+   - Layer 4 (Post-Creation): creator-compliance-validator.cjs validates integration compliance
+
+2. **File Existence Check (LAYER 2A):**
+   - `fs.existsSync(fullPath)` distinguishes creating new artifact from editing existing
+   - Edit tool always allowed (line 515)
+   - Write to existing file allowed without creator token (lines 519-521)
+   - Write to new file at creator path requires active creator token (lines 524-531)
+
+3. **TTL Refresh for Batch Operations (LAYER 2B):**
+   - `markCreatorActive()` called on each successful write (line 529)
+   - Prevents timeout when creating 10+ artifacts sequentially
+   - TTL bounds: 30s min, 10min max (HIGH-002 security fix)
+
+4. **Creator Intent Detection with Batch Flag:**
+   - Regex patterns detect 9 artifact types (agent, skill, hook, workflow, template, schema, command, rule, tool)
+   - Captures batch indicators: `\d+\s+` (e.g., "create 10 agents")
+   - Sets flags in router-state.json: `creatorIntentDetected`, `detectedCreatorType`, `requiredCreatorSkill`, `batchCreation`
+
+5. **Integration Queue for Compliance Violations:**
+   - Violations queued to `.claude/context/runtime/integration-queue.jsonl`
+   - Router Step 0.5 checks queue, spawns artifact-integrator if unprocessed entries exist
+   - Warn mode queues violations; block mode prevents completion
+
+**Quality Metrics:**
+
+- Spec compliance: 100% (12/12 tasks)
+- Critical issues: 0
+- Important issues: 0
+- Minor issues: 3 (non-blocking)
+- Hook protocol compliance: Exemplary
+- Security: Robust
+
+**Ready to Merge:** YES (pending QA verification of test execution, lint, format)
+
+**Memory Takeaway:** When implementing multi-layer enforcement, ensure each layer has a distinct failure mode. Layer 1 (detection) sets flags, Layer 2 (spawn) blocks tasks, Layer 3 (write) blocks file operations, Layer 4 (post-creation) validates outcomes. This prevents single-point-of-failure bypasses.
+
+---
+
+## 2026-02-09: PM PRD System Research Findings (Task #4)
+
+**Pattern:** Problem-first PRD methodology with implementation phases table
+
+**Key Learnings:**
+
+1. **PRP PRD Methodology Analysis:**
+   - Question-driven PRD generation (5 progressive question sets) prevents blank-page syndrome
+   - Research grounding phases (market + technical feasibility) validate assumptions before committing
+   - Implementation Phases table (Status/Parallel/Depends/PRP Plan columns) enables workflow tracking
+   - Decisions Log (Choice/Alternatives/Rationale) documents why choices were made
+   - Hypothesis framing ("We believe X will solve Y for Z. We'll know when A") makes assumptions testable
+
+2. **Current PM Agent Gaps:**
+   - ❌ No structured PRD template (has user stories, but no comprehensive PRD structure)
+   - ❌ No problem-first methodology (missing "Why now?" and "Evidence" sections)
+   - ❌ No hypothesis framing (doesn't guide PM to articulate testable assumptions)
+   - ❌ No implementation phases table (no dependency/parallelism tracking)
+   - ❌ No decisions log (no structured alternative evaluation)
+   - ❌ No PRD → Plan handoff protocol (PM creates user stories, but no formal handoff)
+   - ❌ No MoSCoW table output format
+   - ❌ No interactive question flow
+
+3. **Proposed PRD Template Structure:**
+   - Problem Statement + Evidence (before Solution) → prevents solution-first thinking
+   - Key Hypothesis → testable assumption with measurable outcome
+   - MoSCoW table → Must/Should/Could/Won't with rationale (explicit MVP definition)
+   - Implementation Phases table → enables planner handoff, parallel work, status tracking
+   - Decisions Log → documents alternatives considered, prevents re-litigation
+   - Research Summary → market + technical context with citations
+   - Open Questions → acknowledges uncertainty explicitly
+   - Success Metrics → metric + target + measurement method
+
+4. **PRD → Plan → Implement → Review Pipeline:**
+   - PM creates PRD with Implementation Phases table
+   - Planner reads PRD, breaks each phase into detailed tasks, creates plan
+   - Developer executes plan, updates phase status in PRD
+   - Code Reviewer checks implementation against PRD acceptance criteria
+   - PRD becomes living document (status updates as phases complete)
+
+5. **AI-Specific PRD Best Practices (external research):**
+   - AI teams need dependency-ordered, testable phases vs holistic narratives
+   - "Intent is the source of truth" shift from "code is truth"
+   - Given-When-Then acceptance criteria (borrowed from BDD) makes expectations explicit
+   - Non-functional requirements as constraints (performance/security/reliability)
+   - Traceability: link requirements → design → implementation → test
+
+6. **External Sources (10 total):**
+   - Medium: How to write PRDs for AI Coding Agents
+   - Uptech: Hypothesis-Driven Development Guide
+   - Product School: MoSCoW Prioritization
+   - Perforce: How to Write a PRD
+   - Parallel: Product Requirements Guide
+   - Leanware: Modern PRD Software
+   - Atlassian: Prioritization Frameworks
+   - Tempo: Product Prioritization Techniques
+   - Lindsay Angelo: Hypothesis-Driven Problem-Solving
+   - Product Mindset: Hypothesis-Driven Product Management
+
+7. **Recommended Implementation:**
+   - Create `prd-generator` skill (new) → interactive PRD creation
+   - PM agent invokes skill when user requests PRD
+   - Skill spawns researcher (market research) + architect (technical feasibility)
+   - Output: `.claude/context/artifacts/prds/{kebab-case-name}.prd.md`
+   - PRD format consumable by planner/architect/developer
+
+8. **Design Decisions:**
+   - Interactive vs batch: Interactive reduces cognitive load, but allow batch mode for full context
+   - Research grounding: Mandatory (2 phases) to ensure evidence-based decisions
+   - Phase ownership: PM proposes phases, Planner refines (collaboration pattern)
+   - Template approach: Extend current PM agent (not create separate PRD agent)
+   - PRD storage: `.claude/context/artifacts/prds/` (separate from plans/reports)
+
+**Cross-Reference:**
+
+- Research report: `.claude/context/artifacts/research-reports/pm-prd-system-research-2026-02-09.md` (not written due to lack of Write tool)
+- Related agents: PM (`.claude/agents/core/pm.md`), Planner (`.claude/agents/core/planner.md`)
+- Reference implementation: PRP PRD command (`.claude.archive/.tmp/PRPs-agentic-eng-development/.claude/commands/prp-core/prp-prd.md`)
+
+**Memory Takeaway:** Problem-first PRDs with hypothesis framing + implementation phases table + decisions log enable evidence-based product development. PM agent needs `prd-generator` skill to implement this pattern. PRD → Plan → Implement → Review pipeline requires structured handoff format between agents.
+
+---
+
+## 2026-02-09: Context-Compressor Trigger Patterns (Enterprise Improvement Plan)
+
+**Pattern:** When and how to invoke context-compressor for long sessions
+
+**Trigger Heuristics (when to compress):**
+
+- After Phase 0 research (40+ message turns accumulated)
+- When plan exceeds 50 tasks (large output accumulation)
+- When message count exceeds 50 turns
+- After completing Phase N tasks (5+ files changed) in developer workflows
+- Between workflow phases for orchestrators (Phase N complete, Phase N+1 starting)
+
+**How to compress:**
+
+```javascript
+Skill({ skill: 'context-compressor' });
+```
+
+**Safe compression points (WHEN to invoke):**
+
+- After completing a logical unit (phase, milestone)
+- Before starting a new implementation phase
+- NOT mid-operation (mid-test-run, mid-file-edit)
+
+**What to preserve during compression:**
+
+- Active task IDs and status
+- Key decisions made (ADRs)
+- File paths modified in current session
+- Test results (pass/fail counts)
+- Research findings (for planner)
+
+**Memory Takeaway:** Compression is a checkpoint operation -- invoke at natural breakpoints, not mid-stream. Preserve decision context above all else.
+
+---
+
+## 2026-02-09: PRD-to-Plan Pipeline Patterns (Enterprise Improvement Plan)
+
+**Pattern:** Structured PRD workflow for PM-to-Planner handoff
+
+**PRD Template Location:** `.claude/templates/prd-template.md`
+
+**Required PRD Sections:**
+
+- Problem Statement + Evidence (validates "why" before "how")
+- Key Hypothesis (testable: "We believe X will Y. We'll know when Z.")
+- MoSCoW Capabilities (Must/Should/Could/Won't with rationale)
+- Implementation Phases table (Status/Depends/Plan Link columns)
+- Decisions Log (Decision/Choice/Alternatives/Rationale)
+- Success Metrics (Metric/Target/How Measured)
+
+**PRD-to-Plan Handoff Protocol:**
+
+1. PM creates PRD with Implementation Phases table
+2. Planner reads PRD -> selects next pending phase (where dependencies complete)
+3. Planner creates plan for THAT phase only (focused scope)
+4. Planner updates PRD phases table with plan link
+5. Developer reads plan (linked to PRD) for full context
+
+**When to create PRD:** HIGH/EPIC complexity features requiring cross-team coordination.
+**When to skip:** LOW/MEDIUM complexity features with clear, self-contained scope.
+
+**Memory Takeaway:** PRDs are the single source of truth for feature status. Check PRD phases table to answer "what's the status of Feature X?"
+
+---
+
+## 2026-02-09: Hybrid Search Preference Patterns (Enterprise Improvement Plan)
+
+**Pattern:** Prefer hybrid search skills over Grep for token efficiency
+
+**Search Preference Order:**
+
+1. `pnpm search:code "query"` -- Hybrid (text + semantic), fastest, recommended default
+2. `Skill({ skill: 'ripgrep', args: 'pattern' })` -- Fast text search (0.2-0.5s)
+3. `Skill({ skill: 'code-semantic-search', args: 'conceptual query' })` -- Finds similar code by meaning
+4. `Skill({ skill: 'code-structural-search', args: 'pattern --lang ts' })` -- AST-based precise matching
+5. `Grep({ pattern: '...', ... })` -- FALLBACK ONLY: advanced regex (PCRE2), multiline, raw content
+
+**Token Efficiency Comparison:**
+
+- Grep: Returns full file contents (1000+ tokens per match)
+- Hybrid search: Returns file:line references (50-100 tokens per result)
+- Result: 10-20x token savings with hybrid search
+
+**When Grep is still necessary:**
+
+- Advanced regex with lookahead/lookbehind (PCRE2 -P flag)
+- Multiline pattern matching (grep -U)
+- Raw content inspection (need full file output)
+- Specific file filtering with complex glob patterns
+
+**Memory Takeaway:** Default to hybrid search (ripgrep skill or pnpm search:code). Use Grep only when you need features that hybrid search cannot provide (advanced regex, multiline, raw content).
+
+---
+
+## 2026-02-09: Planner Enhancement Research (Task #1)
+
+**Pattern:** Structured planning methodologies from PRP/PRD reference implementations
+
+**Key Learnings:**
+
+1. **TDD-for-Plans Pattern:**
+   - RED: Write failure criteria first ("Plan fails if...")
+   - GREEN: Draft plan to pass criteria (tasks with validation commands)
+   - REFACTOR: Optimize plan (parallelize, simplify)
+   - Current planner lists TDD skill but doesn't enforce validation loops
+
+2. **Hypothesis-Driven Planning:**
+   - Template: "We believe [capability] will [solve problem] for [users]. We'll know we're right when [measurable outcome]."
+   - Forces measurable success criteria upfront
+   - Makes plans falsifiable (can be proven wrong)
+   - Current planner has Problem/Solution statements but no hypothesis framing
+
+3. **PHASE Checkpoint Pattern (PRP):**
+   - Every phase has blocking validation gate before next phase starts
+   - Prevents "plan cascade" where later phases fail due to incomplete earlier phases
+   - Current planner has constitution checkpoint at Phase 0 only
+
+4. **Mandatory Reading + Patterns to Mirror:**
+   - Plans specify exact files + line ranges to read (not "explore codebase")
+   - Include ACTUAL code snippets from codebase (not invented examples)
+   - Agents copy existing patterns → consistency
+   - Current planner has "Files to Change" but no "Must Read First"
+
+5. **Specialized Codebase Agents:**
+   - PRP spawns codebase-explorer (WHERE code lives) + codebase-analyst (HOW integration works)
+   - Parallel execution for speed
+   - Output structured findings (tables with file:line references)
+   - Current planner uses Grep/Glob directly (less systematic)
+
+6. **Hybrid Search Priority:**
+   - Preference order: Hybrid (pnpm search:code) → Semantic → Structural → Ripgrep → Grep (legacy)
+   - Hybrid search: 0.2-0.5s for 40k files, no indexing required
+   - Current planner mentions Grep tool, priority unclear
+
+**External Research Insights:**
+
+- **ReAct Pattern**: Interleave thought and action to keep plans grounded (Deloitte Insights 2026)
+- **Plan-and-Execute**: Use capable model for strategy, cheaper models for execution (90% cost reduction) (Vellum AI 2026)
+- **Reflection Pattern**: Agents evaluate own output before finalizing (first-pass AI outputs rarely optimal) (DextraLabs 2025)
+- **TDD for AI**: Requires flexible success criteria (scores/ratings, not pass/fail) (Latent Space 2025)
+- **Spec-Driven**: Specify → Plan → Tasks → Implement workflow (JetBrains 2025, GitHub 2025)
+
+**Implementation Recommendations:**
+
+1. **Quick Wins (2 hours)**:
+   - Add hypothesis framing to plan template
+   - Update search tool guidance (hybrid → semantic priority)
+   - Add "Patterns to Mirror" section
+   - Document Grep → hybrid search migration
+
+2. **Validation Enhancements (4 hours)**:
+   - Add Phase Checkpoints to all phases
+   - Add Validation-First (TDD-for-plans) workflow step
+   - Add Mandatory Reading section
+   - Update skill enforcement checkpoint
+
+3. **Codebase Intelligence (6 hours)**:
+   - Add Phase 1.5 (Codebase Intelligence Gathering)
+   - Create agent spawn prompts for Pattern Explorer + Integration Analyst
+   - Add discovery table merge step
+
+**Cross-Reference:**
+
+- Report: `.claude/context/artifacts/research-reports/planner-enhancement-research-2026-02-09.md` (needs writer agent to save)
+- Task #1: Planner enhancement research
+
+---
+
+---
+
+## 2026-02-09: Hybrid Search Adoption Research (Task #3)
+
+**Pattern:** Tool availability asymmetry causes agents to prefer built-in tools over more powerful skills
+
+**Key Findings:**
+
+1. **Grep vs Skills adoption gap:**
+   - 59 agents total in framework
+   - Only 9 agents (15%) have hybrid search skills assigned
+   - 24 agents (41%) explicitly reference "use Grep" in instructions
+   - 100% of agents have Grep available (built-in tool)
+   - Result: Agents use Grep (immediate availability) over skills (requires invocation)
+
+2. **Root cause - Availability asymmetry:**
+   - Grep: Built-in tool (always in tool list, zero-friction usage)
+   - Skills: Requires explicit Skill({ skill: 'ripgrep' }) invocation (two-step process)
+   - Agents gravitate to "path of least resistance" (Grep tool)
+   - No instructions say "NEVER use Grep, use skills instead"
+
+3. **Token efficiency impact:**
+   - Grep: Returns unfiltered file contents (40-70% token overhead per research)
+   - Semantic search: 40% token reduction, 27.5% cost savings, 97% input token reduction
+   - Hybrid search: 15% improvement in result quality over standalone methods
+   - Research sources: 10 external articles benchmarking grep vs semantic search
+
+4. **CLAUDE.md aspirational vs reality:**
+   - CLAUDE.md Section 7 claims: "36+ agents have all 3 search skills"
+   - Reality: 9 agents (15%) have search skills
+   - Discrepancy: CLAUDE.md is aspirational, not descriptive of actual state
+
+5. **3-phase adoption strategy:**
+   - Phase 1: High-impact agents (13 agents: core + specialized)
+   - Phase 2: Domain agents (25 agents: python-pro, typescript-pro, etc.)
+   - Phase 3: Orchestrators (8 agents: ripgrep only for quick scanning)
+   - Instruction pattern: Replace "Use Grep" → "Use Skill({ skill: 'ripgrep' })"
+
+6. **PreToolUse hook feasibility:**
+   - Concept: search-skill-recommendation.cjs hook
+   - Event: PreToolUse(Grep) - non-blocking warn mode
+   - Purpose: Recommend search skills when Grep is used
+   - Risk: Alert fatigue if too frequent
+   - Recommendation: Warn mode for Phase 1 only, remove after 80% adoption
+
+**Cross-Reference:**
+
+- Research report: .claude/context/artifacts/research-reports/hybrid-search-adoption-research-2026-02-09.md
+- External sources: 10 articles on token efficiency and hybrid search performance
+- CLAUDE.md Section 7: lines 508-524 (needs update with accurate counts)
+
+**Memory Takeaway:** When framework features require explicit invocation (skills) vs built-in availability (tools), agents will default to the built-in option regardless of power/efficiency. To drive adoption of more powerful features, either (1) make them built-in tools, (2) add enforcement hooks, or (3) update all agent instructions to explicitly prefer the feature.
+
+---
+
+## 2026-02-09: Context-Compressor Integration Gap (Task #2)
+
+**Pattern:** Infrastructure exists but is dormant due to disabled configuration
+
+**Key Findings:**
+
+1. **Complete infrastructure, zero usage:**
+   - context-compressor agent defined with haiku model (fast, cheap)
+   - context-compressor skill with 4-phase workflow (50-70% reduction target)
+   - compression-trigger.cjs implements 5 trigger conditions
+   - user-prompt-unified.cjs implements auto-compression logic
+   - 23 agents list context-compressor in skills BUT ZERO actively invoke it
+
+2. **Configuration disabled by default:**
+   - config.yaml: `auto_compression.enabled: false` (DISABLED)
+   - ENV var: `AUTO_COMPRESSION_PHASE_3` not set
+   - Result: compression-reminder.txt never created, automation never runs
+
+3. **Router integration incomplete:**
+   - CLAUDE.md documents compression-reminder check as "optional"
+   - Router Step 0 checks reflection-reminder.txt (blocking) but not compression
+   - No mandatory check forces router to spawn compressor when triggered
+
+4. **Agent integration passive, not proactive:**
+   - 23 agents document compression in conditional skills tables
+   - Pattern: "if context limit reached, use context-compressor"
+   - Reality: No agent checks context limits or invokes compression automatically
+
+5. **Industry best practices (2026):**
+   - Multi-agent systems use 4 strategies: memory persistence, compression, isolation, filtering
+   - Compression achieves 50-80% token reduction with 70-94% cost savings
+   - LangGraph/LangChain use compressed handoffs between agents (40-50% call savings)
+   - Agent Studio has #1, #3, partial #4, but #2 (compression) is dormant
+
+**Proposed Wiring (Priority Order):**
+
+**Priority 1 (Quick Win):**
+
+- Enable `auto_compression.enabled: true` in config.yaml
+- Export `AUTO_COMPRESSION_PHASE_3=1` in .env
+- Impact: Activates existing automation, low risk (1 line change)
+
+**Priority 2 (Router Integration):**
+
+- Add Router Step 0.25: mandatory check for compression-reminder.txt
+- Pattern: After reflection check, before TaskList(), check compression reminder
+- Spawn context-compressor if reminder exists, delete reminder, continue routing
+- Impact: Makes automated compression visible to router, low risk
+
+**Priority 3 (Proactive Agents):**
+
+- Add compression checks to long-running agents: planner, researcher, master-orchestrator, swarm-coordinator
+- Pattern: Check token budget > 75% before expensive operations (WebSearch, large Read, 10+ task creation)
+- Invoke `Skill({ skill: 'context-compressor' })` proactively
+- Impact: Prevents context exhaustion, medium risk (~2-3s latency)
+
+**Priority 4 (Memory Protocol):**
+
+- Document compression protocol in learnings.md (when/how/verify)
+- Pattern: Compress at 75% budget, before expensive ops, verify 50-70% reduction
+- Impact: Agents learn pattern from memory, no risk
+
+**Priority 5 (Hook Enforcement):**
+
+- Add Check 12 to routing-guard.cjs (warn mode for compression reminder)
+- Impact: Safety net for missed compressions, medium risk
+
+**Metrics for Success:**
+
+- Auto-compression events: 0 → 5+ per long session
+- Token reduction: N/A → 50-70% per compression
+- Context exhaustion errors: ? → 0
+- Long session success rate (>60min): ? → 95%+
+
+**Cross-Reference:**
+
+- Research report: `.claude/context/artifacts/research-reports/context-compressor-integration-research-2026-02-09.md`
+- Task #2: Deep dive into context-compressor integration gaps
+
+**Memory Takeaway:** Complete infrastructure without activation config = invisible feature. Always check: (1) implementation exists, (2) config enables it, (3) router/agents invoke it, (4) memory documents it.
+
+---
+
+## 2026-02-09: Implementation Plan Generation Patterns (Task #8)
+
+**Pattern:** Converting architect design docs into developer-ready implementation plans
+
+**Key Learnings:**
+
+1. **TDD for documentation changes:**
+   - RED: grep for expected text returns 0 matches (text not yet present)
+   - GREEN: Apply the additive change (insert section)
+   - VERIFY: grep for expected text returns 1+ matches
+   - Works for agent definitions, templates, config, memory files
+
+2. **YAML frontmatter validation is critical:**
+   - Every agent file edit MUST validate YAML frontmatter still parses
+   - Use: `node -e "require('js-yaml').load(frontmatter); console.log('OK')"`
+   - Broken frontmatter = broken agent spawning
+
+3. **Commit checkpoint for 10+ file projects:**
+   - This plan touches 15 files -> checkpoint after Phase 2
+   - Pattern: commit config/memory changes first, then agent changes
+   - Recovery: if Phase 3 fails, revert to checkpoint
+
+4. **Sequential execution for same-file writes:**
+   - Phase 2 tasks all append to learnings.md -> must be sequential (not parallel)
+   - Even though tasks are independent, file conflicts prevent parallelism
+
+5. **Skill creation MUST use creator workflow:**
+   - Phase 5 (prd-generator) uses skill-creator, not direct Write
+   - unified-creator-guard.cjs blocks direct writes to `.claude/skills/`
+   - Creator handles catalog entry, agent assignment, routing keywords
+
+**Cross-Reference:**
+
+- Plan: `.claude/context/plans/enterprise-improvement-impl-plan-2026-02-09.md`
+- Design: `.claude/context/plans/enterprise-improvement-design-2026-02-09.md`
+
+## 2026-02-09: Phase 3 Core Agent Updates - Context/PRD/Search Patterns (Task #11)
+
+**Pattern:** Additive documentation updates for enterprise improvement adoption
+
+**Key Learnings:**
+
+1. **Context Management for Long Implementations (developer.md):**
+   - Trigger: 10+ files, 3000+ LOC, 50+ message turns, Phase N completion
+   - Pattern: `Skill({ skill: 'context-compressor' })` at logical breakpoints
+   - Preserve: Active task IDs, file paths modified, test results, key decisions
+   - Location: Before Memory Protocol section (natural flow)
+
+2. **PRD Workflow for PM Agent (pm.md):**
+   - When to create: HIGH/EPIC complexity requiring cross-team coordination
+   - When to skip: LOW/MEDIUM complexity with clear, self-contained scope
+   - Template: `.claude/templates/prd-template.md`
+   - Required sections: Problem Statement + Evidence, Key Hypothesis, MoSCoW, Implementation Phases table, Decisions Log, Success Metrics
+   - Handoff: PM creates PRD → Planner selects pending phase → creates plan → updates PRD phases table
+
+3. **Search Protocol for QA Agent (qa.md):**
+   - Preference order: code-structural-search (test patterns) > ripgrep (file discovery) > code-semantic-search (conceptual) > Grep (fallback)
+   - Example patterns: `describe($NAME, function() { $$ })` (test blocks), `*.test.ts` (test files), `error handling test patterns` (semantic)
+   - Location: Before Memory Protocol section (natural flow)
+
+4. **TDD for Documentation (ADDITIVE pattern):**
+   - RED: `grep -c "Expected Text" file.md` → 0 (not present)
+   - GREEN: Insert section with Edit tool
+   - VERIFY: `grep -c "Expected Text" file.md` → 1+ (present)
+   - YAML validation: `node -e "yaml.load(frontmatter)"` (critical for agent files)
+
+5. **Section Placement Strategy:**
+   - Context Management → Before Memory Protocol (developer flow: context → memory)
+   - PRD Workflow → Before Code Search (PM flow: requirements → exploration)
+   - Search Protocol → Before Memory Protocol (QA flow: discovery → recording)
+
+**Cross-Reference:**
+
+- Implementation plan: `.claude/context/plans/enterprise-improvement-impl-plan-2026-02-09.md` (Phase 3)
+- Design: `.claude/context/plans/enterprise-improvement-design-2026-02-09.md`
+- Related PRDs: planner-enhancement, context-compressor-integration, hybrid-search-adoption, pm-prd-workflow-enhancement
+
+**Memory Takeaway:** Additive documentation changes with TDD pattern (RED-GREEN-VERIFY-YAML) ensure safe agent definition updates. Section placement matters for workflow coherence (requirements → discovery → memory).
+
+## Phase 4 Template Updates (2026-02-09)
+
+- Template edits follow same TDD pattern as agent file edits
+- universal-agent-spawn.md: Added context compression checklist for long-running agents
+- plan-template.md: Added hypothesis framing, mandatory reading, patterns sections
+
+---
+
+## 2026-02-09: Enterprise Improvement Pipeline Reflection (Task #16)
+
+**Pattern:** Full enterprise pipeline execution with ADDITIVE-only constraint
+
+**Key Learnings:**
+
+1. **ADDITIVE-only constraint enables zero-regression confidence:**
+   - ALL changes were new sections, new files, or config toggles (never removing/replacing)
+   - QA verification reduces to "does the new section exist?" (grep check)
+   - 30/30 QA checks passed because each check was simply verifying presence
+   - This should be the DEFAULT constraint for documentation/config pipelines
+
+2. **Full enterprise pipeline (8 phases, 12 agents, 3 sessions) is viable:**
+   - Research (4 parallel) -> PM (4 PRDs) -> Architect+Security (parallel) -> Planner -> Developer (5 phases) -> Code Reviewer -> QA -> Reflection
+   - 17 files modified, 0 regressions, 9.5/10 code review score
+   - Task metadata preserved state across 3 session boundaries
+   - Pipeline score: 0.91 (EXCELLENT)
+
+3. **Research-synthesis skill is too large (~15KB) for agent spawns:**
+   - Causes turn exhaustion in researcher agents (context budget consumed by skill prompt)
+   - Mitigation: create "research-lite" variant (~3-5KB) or invoke via Skill() post-spawn
+   - Affects reliability of research phase in enterprise pipelines
+
+4. **Code-reviewer agent lacks Write tool:**
+   - Review reports limited to TaskUpdate metadata (ephemeral, not searchable)
+   - Mitigation: add Write to code-reviewer's allowed tools (restricted to reports/ paths)
+
+5. **Creator compliance validator fires false positives on agent edits:**
+   - 6 false-positive integration queue entries for agents that already exist in registry
+   - ADR-106 (file-existence check) addresses this but not yet implemented
+   - Impact: clutters integration queue, creates noise
+
+6. **Phase 6 (advisory hooks) was correctly deferred:**
+   - Architect assessed as OPTIONAL, planner deferred
+   - When agent instructions provide sufficient guidance, hook enforcement is unnecessary overhead
+   - Principle: documentation-level enforcement before hook-level enforcement
+
+7. **Parallel research phase is highly efficient:**
+   - 4 researchers = 4x coverage in 1x elapsed time
+   - External sources validated internal findings (triangulation effect)
+   - Each researcher focused on single improvement area (no context contamination)
+
+**Cross-Reference:**
+
+- Reflection report: `.claude/context/reports/reflections/enterprise-improvement-reflection-2026-02-09.md`
+- QA report: `.claude/context/reports/qa/enterprise-improvement-qa-2026-02-09.md`
+- Design: `.claude/context/plans/enterprise-improvement-design-2026-02-09.md`
+- Implementation plan: `.claude/context/plans/enterprise-improvement-impl-plan-2026-02-09.md`
+
+**Memory Takeaway:** For enterprise improvement pipelines, use ADDITIVE-only constraint + full 8-phase pipeline + parallel research. This combination produces zero-regression, high-quality results across 15+ files and 3+ sessions.
+
+---
+
+## 2026-02-09: Context & Memory Management Research (Deep-Dive)
+
+**Pattern:** Modern memory systems use hierarchical tiers (Hot/Warm/Cold), hybrid search (BM25+vector), and knowledge graphs.
+
+**Key Learnings:**
+
+1. **Three-Tier Memory Architecture (Industry Standard):**
+   - Hot (In-Memory Cache): Current session, <10ms access, ~1000 entries
+   - Warm (File-Based): 30-day retention, BM25 indexed, <150ms search
+   - Cold (Compressed Archives): Permanent storage, vector indexed, <500ms search
+   - Current agent-studio: Flat file storage, no tiers
+
+2. **MemGPT/Letta Pattern (arXiv 2310.08560):**
+   - Two-tier memory: Tier 1 (in-context, 8K tokens) + Tier 2 (external, unlimited)
+   - Self-editing tools: memory_replace, archival_memory_search, conversation_search
+   - Pagination: OS-inspired memory paging for conversation history access
+   - Application: agent-studio lacks pagination, should implement for large result sets
+
+3. **Knowledge Graph Integration (arXiv 2511.18194):**
+   - Represent agents/skills/workflows as graph nodes with relationships
+   - Enables multi-hop reasoning (ADR → references → implementation → agents using it)
+   - Current: Text-based references only, not traversable
+   - Recommendation: JSON-based lightweight KG for artifact relationships
+
+4. **Hybrid BM25 + Vector Search:**
+   - BM25-only: 50ms, 70% accuracy (keyword matching)

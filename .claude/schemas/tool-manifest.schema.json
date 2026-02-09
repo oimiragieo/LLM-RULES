@@ -5,11 +5,13 @@
   "description": "Schema for .claude/config/tool-manifest.json - tool availability and constraints for spawn validation",
   "type": "object",
   "required": ["version", "tools"],
+  "additionalProperties": false,
   "properties": {
     "version": {
       "type": "string",
       "description": "Manifest schema version",
-      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "maxLength": 50
     },
     "generatedAt": {
       "type": "string",
@@ -18,13 +20,14 @@
     },
     "metadata": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "totalTools": { "type": "integer" },
         "totalCoreTools": { "type": "integer" },
         "totalMcpTools": { "type": "integer" },
         "totalAgents": { "type": "integer" },
         "lastValidated": { "type": "string", "format": "date-time" },
-        "source": { "type": "string" }
+        "source": { "type": "string", "maxLength": 100 }
       }
     },
     "tools": {
@@ -34,21 +37,24 @@
         "core": {
           "type": "array",
           "description": "Core tools available to agents",
+          "maxItems": 100,
           "items": {
             "type": "object",
             "required": ["name"],
+            "additionalProperties": false,
             "properties": {
-              "name": { "type": "string" },
-              "category": { "type": "string" },
-              "description": { "type": "string" },
+              "name": { "type": "string", "maxLength": 100 },
+              "category": { "type": "string", "maxLength": 100 },
+              "description": { "type": "string", "maxLength": 500 },
               "status": { "type": "string", "enum": ["available", "unavailable"] },
               "mandatory": { "type": "boolean" },
               "availability": {
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
-                  "agents": { "type": "string" },
-                  "orchestrators": { "type": "string" },
-                  "router": { "type": "string" }
+                  "agents": { "type": "string", "maxLength": 100 },
+                  "orchestrators": { "type": "string", "maxLength": 100 },
+                  "router": { "type": "string", "maxLength": 100 }
                 }
               },
               "canEdit": { "type": "boolean", "default": false },
@@ -60,20 +66,23 @@
         "mcp": {
           "type": "array",
           "description": "MCP tools (optional server configuration)",
+          "maxItems": 100,
           "items": {
             "type": "object",
             "required": ["name"],
+            "additionalProperties": false,
             "properties": {
-              "name": { "type": "string" },
-              "category": { "type": "string" },
-              "description": { "type": "string" },
-              "status": { "type": "string" },
-              "mcp_server": { "type": "string" },
-              "fallback": { "type": "string" },
-              "fallback_status": { "type": "string" },
+              "name": { "type": "string", "maxLength": 100 },
+              "category": { "type": "string", "maxLength": 100 },
+              "description": { "type": "string", "maxLength": 500 },
+              "status": { "type": "string", "maxLength": 100 },
+              "mcp_server": { "type": "string", "maxLength": 200 },
+              "fallback": { "type": "string", "maxLength": 100 },
+              "fallback_status": { "type": "string", "maxLength": 100 },
               "fallback_tools": {
                 "type": "array",
-                "items": { "type": "string" }
+                "maxItems": 50,
+                "items": { "type": "string", "maxLength": 100 }
               },
               "canEdit": { "type": "boolean", "default": false },
               "optional": { "type": "boolean", "default": false },
@@ -85,13 +94,15 @@
           "type": "object",
           "additionalProperties": {
             "type": "array",
-            "items": { "type": "string" }
+            "maxItems": 100,
+            "items": { "type": "string", "maxLength": 100 }
           }
         }
       }
     },
     "constraints": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "maxToolsPerAgent": { "type": "integer", "minimum": 1, "maximum": 30 },
         "maxToolsPerOrchestrator": { "type": "integer", "minimum": 1, "maximum": 30 }
@@ -99,11 +110,13 @@
     },
     "validation": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "reservedTools": { "type": "object" },
         "mandatory": {
           "type": "array",
-          "items": { "type": "string" }
+          "maxItems": 100,
+          "items": { "type": "string", "maxLength": 100 }
         },
         "agentDefaults": { "type": "object" }
       }

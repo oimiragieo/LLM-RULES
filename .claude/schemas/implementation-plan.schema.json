@@ -3,6 +3,7 @@
   "$id": "https://claude-code.anthropic.com/schemas/implementation-plan",
   "title": "Implementation Plan",
   "type": "object",
+  "required": ["feature", "status"],
   "properties": {
     "feature": { "type": "string" },
     "phases": { "type": "array", "items": { "type": "object" } },

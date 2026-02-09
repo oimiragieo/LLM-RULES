@@ -18,12 +18,8 @@ skills:
   - code-structural-search
   - code-style-validator
   - dry-principle
-  - function-length-and-responsibility
   - git-expert
-  - receiving-code-review
-  - requesting-code-review
   - ripgrep
-  - rule-auditor
   - security-architect
   - verification-before-completion
 context_files:
@@ -499,6 +495,17 @@ Skill({ skill: 'code-quality-expert' }); // Best practices review
 | Requesting review          | `requesting-code-review`         | Dispatch review requests           |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
+
+## Search Protocol
+
+**PREFER** hybrid search skills over Grep for code review:
+
+| What You Need             | Use This               | Example                                                                                          |
+| ------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------ |
+| Similar code patterns     | code-semantic-search   | `Skill({ skill: 'code-semantic-search', args: 'error handling patterns' })`                      |
+| Exact code structure      | code-structural-search | `Skill({ skill: 'code-structural-search', args: 'class $NAME extends $BASE { $$ } --lang ts' })` |
+| Fast keyword search       | ripgrep                | `Skill({ skill: 'ripgrep', args: 'pattern' })`                                                   |
+| Advanced regex (fallback) | Grep                   | Use only for PCRE2 lookahead/lookbehind patterns                                                 |
 
 ## Memory Protocol (MANDATORY)
 

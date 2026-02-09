@@ -96,6 +96,7 @@ const CONFIG = {
 /**
  * Security rules to check
  * Each rule has: id, name, severity, pattern, description, fix
+ * Optional: codeOnly (boolean) - only scan code files, not docs
  */
 const SECURITY_RULES = [
   // Secrets & Credentials
@@ -140,7 +141,7 @@ const SECURITY_RULES = [
     fix: 'Use environment variables for JWT secrets',
   },
 
-  // Injection Vulnerabilities
+  // Injection Vulnerabilities (CODE ONLY - not in docs)
   {
     id: 'SEC-010',
     name: 'SQL Injection Risk',
@@ -164,6 +165,7 @@ const SECURITY_RULES = [
     pattern: /\beval\s*\(/g,
     description: 'eval() usage detected - potential code injection',
     fix: 'Avoid eval(); use safer alternatives',
+    codeOnly: true, // Only scan code files, not .md/.json docs
   },
   {
     id: 'SEC-013',
@@ -172,6 +174,7 @@ const SECURITY_RULES = [
     pattern: /new\s+Function\s*\(/g,
     description: 'Function constructor usage - similar to eval()',
     fix: 'Avoid dynamic function creation',
+    codeOnly: true, // Only scan code files, not .md/.json docs
   },
 
   // Insecure Patterns
@@ -383,12 +386,21 @@ function shouldSkipScanning(filePath, content) {
 
   const normalized = normalizePathForMatch(filePath);
 
-  // Skip archived hooks (superseded code, no longer active)
-  if (normalized.includes('/_archive/') || normalized.includes('\\archive\\')) {
+  // Skip archived files (superseded code, no longer active)
+  if (
+    normalized.includes('/_archive/') ||
+    normalized.includes('/archive/') ||
+    normalized.includes('\\archive\\')
+  ) {
     return true;
   }
 
   const fileName = path.basename(filePath);
+
+  // Skip README files (documentation that may reference patterns)
+  if (fileName === 'README.md') {
+    return true;
+  }
 
   // Skip security-lint.cjs itself (contains security patterns as rule definitions)
   if (fileName === 'security-lint.cjs' && content.includes('SECURITY_RULES')) {
@@ -405,6 +417,17 @@ function shouldSkipScanning(filePath, content) {
   }
 
   return false;
+}
+
+/**
+ * Check if file is a code file (not documentation)
+ * @param {string} filePath - File path
+ * @returns {boolean} Whether file is code
+ */
+function isCodeFile(filePath) {
+  const codeExtensions = ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx', '.py', '.rb', '.go', '.rs'];
+  const ext = path.extname(filePath).toLowerCase();
+  return codeExtensions.includes(ext);
 }
 
 /**
@@ -428,8 +451,21 @@ function scanFile(filePath) {
     return findings;
   }
 
+  const ext = path.extname(filePath).toLowerCase();
+  const isCode = isCodeFile(filePath);
+
   // Check each rule
   for (const rule of SECURITY_RULES) {
+    // Skip codeOnly rules for non-code files (.md, .json)
+    if (rule.codeOnly && !isCode) {
+      continue;
+    }
+
+    // Skip SEC-020 (http://) for .schema.json files (JSON Schema URIs)
+    if (rule.id === 'SEC-020' && ext === '.json' && filePath.endsWith('.schema.json')) {
+      continue;
+    }
+
     // Create fresh regex to reset lastIndex
     const pattern = new RegExp(rule.pattern.source, rule.pattern.flags);
 
@@ -617,6 +653,7 @@ module.exports = {
   shouldScanFile,
   shouldSkipScanning,
   normalizePathForMatch,
+  isCodeFile,
   CONFIG,
 };
 

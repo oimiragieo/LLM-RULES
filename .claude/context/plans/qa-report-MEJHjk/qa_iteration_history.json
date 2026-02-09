@@ -1,0 +1,10 @@
+[
+  {
+    "iteration": 1,
+    "timestamp": "2026-02-09T08:04:12.435Z",
+    "verdict": "rejected",
+    "issues_summary": [
+      "Issue A"
+    ]
+  }
+]

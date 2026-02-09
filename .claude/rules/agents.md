@@ -31,6 +31,43 @@ Available for specific technologies: `python-pro`, `typescript-pro`, `frontend-p
 
 See `.claude/context/agent-registry.json` for full list of 59 agents.
 
+## Specialist-First Routing Law (IRON LAW)
+
+**Developer is the LAST RESORT.** If a specialist agent matches the task, the specialist MUST be used.
+
+**Common Misrouting** (verify EVERY spawn):
+
+| User Request           | WRONG     | CORRECT                   |
+| ---------------------- | --------- | ------------------------- |
+| "update docs"          | developer | **technical-writer**      |
+| "refactor/clean up"    | developer | **code-simplifier**       |
+| "review code"          | developer | **code-reviewer**         |
+| "run tests"            | developer | **qa**                    |
+| "deploy/Docker/CI"     | developer | **devops**                |
+| "design database"      | developer | **database-architect**    |
+| "research/investigate" | developer | **researcher**            |
+| "debug production"     | developer | **devops-troubleshooter** |
+
+**Why**: 59 agents exist. Specialists have domain-specific prompts, skills, and patterns. Using developer for specialist work produces inferior results.
+
+## Intent Classification (Semantic Matching)
+
+**Pattern**: Route by semantic intent, not just keywords.
+
+**Implementation**:
+
+- `fuzzy-intent-matcher.cjs` - Semantic similarity scoring
+- `routing-table.cjs` - Intent → Agent mapping
+- `routing-guard.cjs` - Enforcement hook (warns on misrouting)
+
+**Example**:
+
+```
+User: "improve code readability"
+Intent: "refactor" (semantic match)
+Agent: code-simplifier (NOT developer)
+```
+
 ## Routing Reminders
 
 - Complex request (multi-step, architecture) → **planner** (mandatory)
@@ -51,3 +88,10 @@ Before spawning, Router checks 4 gates:
 2. **Security**: Auth/credentials/PII? → Include **security-architect**
 3. **Tool**: Need blacklisted tools? → Spawn appropriate agent
 4. **Creator**: Creating skills/agents/hooks? → Invoke creator skill first
+
+## Related References
+
+- `@AGENT_ROUTING_TABLE.md` - Complete agent routing matrix
+- `.claude/lib/routing/routing-table.cjs` - Source of truth for routing
+- `.claude/lib/routing/fuzzy-intent-matcher.cjs` - Semantic intent matching
+- `routing-guard.cjs` - Enforcement hook for specialist routing

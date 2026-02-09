@@ -216,6 +216,24 @@ If no agents match capability:
 3. Fall back to domain-based lookup
 4. Use hardcoded default from `.claude/config/capability-routing.json`
 
+## Context Management (Multi-Phase Workflows)
+
+For workflows with 3+ phases:
+
+**When to compress:**
+
+- Between workflow phases (Phase N complete, Phase N+1 starting)
+- When accumulated agent outputs exceed 50 message turns
+- After aggregating results from parallel agent spawns
+
+**How to compress:**
+
+```javascript
+Skill({ skill: 'context-compressor' });
+```
+
+**What to preserve:** Phase summaries, agent outputs, active decisions, remaining phases
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting any task:**

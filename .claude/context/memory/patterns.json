@@ -859,6 +859,128 @@
       ],
       "extracted_from": "Tasks #1-15 reflection (ADR-100 full pipeline), Task #12 as final routing wiring phase",
       "date": "2026-02-08"
+    },
+    {
+      "id": "additive-only-zero-regression-pattern",
+      "name": "ADDITIVE-Only Constraint for Zero-Regression Pipelines",
+      "context": "Enterprise Improvement Pipeline #12 (Tasks #9-16, 2026-02-09) - 4-area improvement across 17 files",
+      "description": "When modifying agent definitions, templates, documentation, or configuration, constrain ALL changes to ADDITIVE-only: new sections, new files, or config toggles. Never remove or replace existing content. This constraint transforms QA verification from 'did existing behavior change?' (full regression) to 'does the new section exist?' (grep check). Pipeline #12 achieved 30/30 QA checks with zero regressions using this constraint across 17 files.",
+      "why_it_works": "QA verification becomes deterministic: grep for expected text returns 1+ matches (PASS) or 0 matches (FAIL). No complex behavioral testing needed. No risk of breaking existing functionality because nothing existing is touched.",
+      "applicability": "Documentation/config pipelines, agent definition updates, template enhancements, skill creation, memory file updates. NOT suitable for bug fixes, security patches, or performance optimization (which require modifying existing code).",
+      "implementation_checklist": [
+        "1. Define all changes as ADDITIVE (new sections only) or CONFIG (toggle values)",
+        "2. Verify no existing content is removed, replaced, or reworded",
+        "3. Use TDD-for-documentation: RED (grep returns 0) -> GREEN (insert section) -> VERIFY (grep returns 1+)",
+        "4. Validate YAML frontmatter after each agent file edit",
+        "5. QA checks: verify each new section exists at expected location"
+      ],
+      "metrics": {
+        "pipeline_12_results": {
+          "files_modified": 17,
+          "qa_checks": "30/30 PASS",
+          "regressions": 0,
+          "code_review_score": "9.5/10",
+          "pipeline_score": 0.91
+        }
+      },
+      "benefits": [
+        "Zero-regression guarantee (nothing existing is modified)",
+        "Deterministic QA verification (grep-based, not behavioral)",
+        "Rollback simplicity (remove added sections, restore config values)",
+        "Cross-session safety (no state to corrupt between sessions)"
+      ],
+      "anti_patterns": [
+        "Using ADDITIVE for bug fixes (bugs require modifying existing code)",
+        "Using ADDITIVE for security patches (vulnerable code must be replaced)",
+        "Replacing existing sections 'to improve them' (breaks zero-regression guarantee)",
+        "Mixing ADDITIVE and non-ADDITIVE changes in same pipeline (defeats the constraint)"
+      ],
+      "extracted_from": "Pipeline #12 reflection (Task #16), ADR-108, QA report enterprise-improvement-qa-2026-02-09.md",
+      "date": "2026-02-09"
+    },
+    {
+      "id": "full-enterprise-improvement-pipeline",
+      "name": "8-Phase Enterprise Improvement Pipeline",
+      "context": "Enterprise Improvement Pipeline #12 (Tasks #9-16, 2026-02-09) - proven at scale with 4 improvement areas",
+      "description": "Full enterprise improvement pipeline using 8 sequential phases with parallel sub-phases. Pattern: Research (parallel) -> PM (PRDs) -> Architect+Security (parallel) -> Planner -> Developer (sequential phases) -> Code Reviewer -> QA -> Reflection. Each phase produces artifacts consumed by the next phase. Pipeline survived 3 session transitions via task metadata and memory file state preservation.",
+      "phases": [
+        {
+          "phase": "1. Research",
+          "agents": "N researchers (parallel, 1 per area)",
+          "output": "Research reports in .claude/context/artifacts/research-reports/",
+          "key_insight": "Parallel execution provides Nx coverage in 1x time"
+        },
+        {
+          "phase": "2. PM",
+          "agents": "1 PM agent",
+          "output": "PRDs in .claude/context/artifacts/specs/",
+          "key_insight": "Problem-first methodology prevents solution-first thinking"
+        },
+        {
+          "phase": "3. Architect + Security",
+          "agents": "architect + security-architect (parallel)",
+          "output": "Design document + security review",
+          "key_insight": "Parallel domain-specific analysis catches more issues"
+        },
+        {
+          "phase": "4. Planner",
+          "agents": "1 planner",
+          "output": "Implementation plan in .claude/context/plans/",
+          "key_insight": "ADDITIVE-only constraint simplifies planning"
+        },
+        {
+          "phase": "5. Developer",
+          "agents": "1 developer (sequential phases)",
+          "output": "Modified files",
+          "key_insight": "Sequential phases avoid file merge conflicts"
+        },
+        {
+          "phase": "6. Code Reviewer",
+          "agents": "1 code-reviewer",
+          "output": "Review score and findings",
+          "key_insight": "Thorough upstream phases produce clean reviews"
+        },
+        {
+          "phase": "7. QA",
+          "agents": "1 QA agent",
+          "output": "QA report in .claude/context/reports/qa/",
+          "key_insight": "ADDITIVE constraint enables grep-based verification"
+        },
+        {
+          "phase": "8. Reflection",
+          "agents": "1 reflection agent",
+          "output": "Reflection report + memory updates",
+          "key_insight": "Learning extraction preserves knowledge across sessions"
+        }
+      ],
+      "effectiveness_metrics": {
+        "pipeline_12": {
+          "improvement_areas": 4,
+          "files_modified": 17,
+          "agent_spawns": 12,
+          "sessions": 3,
+          "qa_checks": "30/30 PASS",
+          "regressions": 0,
+          "code_review": "9.5/10",
+          "pipeline_score": 0.91,
+          "threshold": "EXCELLENT"
+        }
+      },
+      "applicability": "Enterprise improvements spanning 10+ files, 3+ improvement areas, requiring cross-cutting changes to agents/templates/skills/config",
+      "benefits": [
+        "Proven zero-regression execution pattern",
+        "Cross-session state preservation via task metadata + memory",
+        "Parallel phases reduce elapsed time (research, architect+security)",
+        "8 quality checkpoints prevent downstream issues"
+      ],
+      "anti_patterns": [
+        "Skipping research phase (leads to uninformed design decisions)",
+        "Skipping PM phase (leads to solution-first thinking)",
+        "Parallelizing developer phase (causes file merge conflicts)",
+        "Skipping reflection phase (learnings lost, patterns not extracted)"
+      ],
+      "extracted_from": "Pipeline #12 reflection (Task #16), ADR-108, ADR-109",
+      "date": "2026-02-09"
     }
   ]
 }

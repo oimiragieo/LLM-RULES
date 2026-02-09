@@ -12,23 +12,16 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, T
 skills:
   - task-management-protocol
   - auth-security-expert
-  - authentication-flow-rules
   - binary-analysis-patterns
   - checklist-generator
-  - chrome-browser
   - code-analyzer
   - code-semantic-search
   - code-structural-search
-  - dependency-analyzer
   - doc-generator
-  - explaining-rules
   - memory-forensics
   - protocol-reverse-engineering
-  - repo-rag
   - ripgrep
-  - rule-auditor
   - security-architect
-  - template-renderer
   - verification-before-completion
   - web3-expert
 context_files:

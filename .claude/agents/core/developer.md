@@ -384,6 +384,24 @@ Invoke based on task context:
 - Use `Write` for new files.
 - Use `Bash` (type: `bash_20250124`) to run tests (npm test, pytest, etc.).
 
+## Context Management (Long Implementations)
+
+For multi-file implementations (10+ files, 3000+ LOC):
+
+**When to compress:**
+
+- After completing a logical unit (Phase N tasks, 5+ files changed)
+- Before starting next implementation phase
+- When message count exceeds 50 turns
+
+**How to compress:**
+
+```javascript
+Skill({ skill: 'context-compressor' });
+```
+
+**What to preserve:** Active task IDs, file paths modified, test results, key decisions
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting any task:**

@@ -507,11 +507,12 @@ Skill({ skill: 'debugging' });
 
 ### Hybrid Search Integration (Phase 1)
 
-**All agents have code search capabilities** via integrated search skills:
+**Agents with code search capabilities** via integrated search skills:
 
-- **36+ agents** (all domain agents): `code-semantic-search`, `code-structural-search`, `ripgrep`
-- **9 specialized agents**: `code-semantic-search`, `ripgrep` (structural search not needed)
-- **8 orchestrators/C4 agents**: `ripgrep` only (high-level coordination)
+- **Current state**: 9 agents have search skills assigned (Phase 1 target: 13+ core agents)
+- **Phase 1 agents** (core + high-impact): developer, code-reviewer, code-simplifier, planner, qa, architect, database-architect, devops, devops-troubleshooter, incident-responder, security-architect, technical-writer, context-compressor
+- **Phase 2 target**: 25+ domain agents (python-pro, typescript-pro, etc.)
+- **Phase 3 target**: 8 orchestrators (ripgrep only for quick scanning)
 
 **Search-first protocol** for 3 core agents (`developer`, `code-reviewer`, `code-simplifier`):
 

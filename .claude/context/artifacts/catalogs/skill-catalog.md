@@ -1,12 +1,12 @@
 # Skill Catalog
 
-> **Total Skills: 94** (1 deprecated alias) | Last Updated: 2026-02-08
+> **Total Skills: 95** (1 deprecated alias) | Last Updated: 2026-02-09
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 **Post-Cleanup Summary:**
 
-- **Active Skills:** 92 (maintained and invoked)
+- **Active Skills:** 93 (maintained and invoked)
 - **Deprecated Aliases:** 1 (`testing-expert` → `tdd`)
 - **Scientific Parent:** 1 (`scientific-skills` with 139 sub-skills)
 - **Archived:** 214 dead skills → `.claude/skills/_archive/dead/` (see README)
@@ -18,7 +18,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | Category                                           | Count | Key Skills                                                                                                                                                                                             |
 | -------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [Core Development](#core-development)              | 11    | tdd, debugging, ripgrep, code-quality-expert, code-analyzer                                                                                                                                            |
-| [Planning & Architecture](#planning--architecture) | 8     | plan-generator, architecture-review, complexity-assessment, diagram-generator                                                                                                                          |
+| [Planning & Architecture](#planning--architecture) | 9     | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator                                                                                                           |
 | [Security](#security)                              | 6     | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics                                                                                                                   |
 | [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                             |
 | [Languages](#languages)                            | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                        |
@@ -75,6 +75,7 @@ Design and planning skills.
 | Skill                   | Description                                                             | Primary Agents     |
 | ----------------------- | ----------------------------------------------------------------------- | ------------------ |
 | `plan-generator`        | Structured implementation plans with dependencies                       | planner            |
+| `prd-generator`         | Hypothesis-driven PRDs with Implementation Phases tracking              | pm                 |
 | `architecture-review`   | Architecture validation and design review                               | architect          |
 | `complexity-assessment` | AI-based task complexity classification                                 | router, planner    |
 | `diagram-generator`     | Mermaid architecture and flow diagrams                                  | architect, planner |

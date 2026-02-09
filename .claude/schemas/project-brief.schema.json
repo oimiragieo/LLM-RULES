@@ -3,14 +3,17 @@
   "title": "Project Brief Schema",
   "description": "Schema for project brief documents",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "projectName": {
       "type": "string",
-      "description": "Name of the project"
+      "description": "Name of the project",
+      "maxLength": 200
     },
     "version": {
       "type": "string",
-      "description": "Document version"
+      "description": "Document version",
+      "maxLength": 50
     },
     "date": {
       "type": "string",
@@ -19,26 +22,33 @@
     },
     "author": {
       "type": "string",
-      "description": "Document author"
+      "description": "Document author",
+      "maxLength": 100
     },
     "executiveSummary": {
       "type": "string",
-      "description": "High-level project summary"
+      "description": "High-level project summary",
+      "maxLength": 2000
     },
     "scope": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "inScope": {
           "type": "array",
+          "maxItems": 100,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           },
           "description": "What's included in the project"
         },
         "outOfScope": {
           "type": "array",
+          "maxItems": 100,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           },
           "description": "What's not included in the project"
         }
@@ -46,36 +56,46 @@
     },
     "objectives": {
       "type": "array",
+      "maxItems": 50,
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 500
       },
       "description": "Project objectives"
     },
     "stakeholders": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "productOwner": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100
         },
         "technicalLead": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100
         },
         "teamMembers": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           }
         },
         "keyStakeholders": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           }
         }
       }
     },
     "timeline": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "startDate": {
           "type": "string",
@@ -87,64 +107,81 @@
         },
         "keyMilestones": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 200
           }
         }
       }
     },
     "successCriteria": {
       "type": "array",
+      "maxItems": 50,
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 500
       },
       "description": "How success will be measured"
     },
     "risks": {
       "type": "array",
+      "maxItems": 100,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           },
           "mitigation": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         }
       }
     },
     "assumptions": {
       "type": "array",
+      "maxItems": 50,
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 500
       },
       "description": "Key assumptions"
     },
     "resourcesRequired": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "team": {
           "type": "string",
-          "description": "Team size and composition"
+          "description": "Team size and composition",
+          "maxLength": 500
         },
         "technology": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           },
           "description": "Required technologies"
         },
         "budget": {
           "type": "string",
-          "description": "Estimated budget"
+          "description": "Estimated budget",
+          "maxLength": 200
         }
       }
     },
     "nextSteps": {
       "type": "array",
+      "maxItems": 50,
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 200
       },
       "description": "Immediate next actions"
     }

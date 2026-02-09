@@ -1,3 +1,30 @@
+<!-- Last Cleaned: 2026-02-09 - Removed resolved issues >3 months old -->
+
+## 2026-02-09: Schema Security Audit -- 11 Schemas Missing Property Injection Protection
+
+**Date:** 2026-02-09
+
+**Issue:** Security audit of 28 active schemas found 11 schemas missing `additionalProperties: false`, enabling property injection. Additionally, 16 schemas have unbounded string fields and 19 have unbounded array fields, creating potential memory exhaustion vectors from misbehaving agents.
+
+**Impact:** MEDIUM -- Internal schemas only, not public API. Risk limited to framework contributors and spawned agents.
+
+**Key Findings:**
+
+- 11 schemas need `additionalProperties: false` (HIGH priority)
+- 47 unbounded string fields across 16 schemas need `maxLength` (MEDIUM)
+- 38 unbounded array fields across 19 schemas need `maxItems` (MEDIUM)
+- 2 schemas have explicit `additionalProperties: true` (deliberate but should be documented)
+- `hook-definition` missing `Stop` in type enum
+- `implementation-plan` has no required fields at all
+- 0 ReDoS-vulnerable patterns found (all safe)
+- 0 external $ref references (all local)
+
+**Report:** `.claude/context/reports/security/schema-security-audit-2026-02-09.md`
+
+**Workaround:** None needed immediately -- these are internal schemas. Fix during Schema Modernization task.
+
+---
+
 ## 2026-02-08: 277 Pre-Existing Test Failures (Task #6, Framework Test Suite)
 
 **Date:** 2026-02-08
@@ -338,3 +365,119 @@ However, since state is fully reset on each prompt and only one agent writes at 
 **Priority:** P3 -- LOW. Theoretical risk only; no practical exploit path identified.
 
 **Full Report:** See `.claude/context/reports/security/router-enforcement-security-review-2026-02-08.md` for complete STRIDE analysis, race condition analysis, and 6 detailed recommendations (R-1 through R-6).
+
+---
+
+### SEC-LOG-001: Debug Log Information Disclosure via Verbose Hook Payloads (CRITICAL)
+
+**Date:** 2026-02-09 | **Agent:** security-architect
+
+**Description:**
+
+Claude Code debug logs in `.tmp/*.txt` contain verbose hook payloads that expose:
+
+1. **Full file contents** via `originalFile` field in PostToolUse Edit/Write payloads (98 instances)
+2. **Configuration templates** including `.env.example` with secret placeholder names (ANTHROPIC_API_KEY, WEBHOOK_SECRET)
+3. **Session permission mode** (`bypassPermissions: true/false`) in 383 log entries
+4. **User identity/paths** (`C:\Users\oimir\`) in transcript and config file paths (383+ entries)
+5. **Internal enforcement architecture** -- ADR numbers, whitelisted commands, hook names in 896 BLOCKED/VIOLATION messages
+
+**STRIDE Classification:** Information Disclosure (HIGH) + Repudiation (MEDIUM for permission changes)
+
+**Positive Findings:** Enforcement hooks are working correctly (896 blocks), no actual credentials leaked, loop prevention functional (54 blocks), permission denied events minimal (4 total).
+
+**Impact:** HIGH -- If debug logs are committed to VCS, shared in issue reports, or stored in accessible locations, attackers gain complete map of security architecture, configuration variables, file contents, and session metadata.
+
+**Resolution:**
+
+- P0: Implement hook payload content redaction (strip `originalFile`, truncate `tool_input`)
+- P0: Add `.tmp/*.txt` to `.gitignore`
+- P1: Add log sanitizer for secret patterns
+- P1: Implement `LOG_REDACTION_LEVEL` config variable
+
+**Full Report:** `.claude/context/reports/security/debug-log-security-assessment-2026-02-09.md`
+
+---
+
+### SEC-LOG-002: Agent YAML Frontmatter Parse Failures (LOW)
+
+**Date:** 2026-02-09 | **Agent:** security-architect
+
+**Description:**
+
+Two agent definition files have duplicate YAML keys causing parse failures at every session startup:
+
+- `prompt-engineer.md` (line 56): Map keys must be unique
+- `mcp-developer.md` (line 57): Map keys must be unique
+
+**Impact:** LOW -- Malformed frontmatter could cause incorrect model selection or missing capability assignments if duplicate keys have conflicting values.
+
+**Resolution:** Fix duplicate YAML keys in both agent files. Add YAML schema validation to CI pipeline.
+
+---
+
+### SEC-FND-001: Schema Permissiveness Allows Property Injection (CRITICAL)
+
+**Date:** 2026-02-09 | **Agent:** security-architect
+
+**Description:**
+
+6 of 14 active schemas (43%) lack `additionalProperties: false`, including the most security-critical ones: agent-definition, hook-definition, skill-definition, workflow-definition, plan, and implementation-plan. The skill-definition schema explicitly sets `"additionalProperties": true`. This means injected properties (including `__proto__`, `bypassEnforcement`, or `systemPromptOverride`) pass schema validation and could be trusted by downstream consumers.
+
+**Impact:** CRITICAL -- Property injection through schema-validated data could alter agent behavior or grant unintended capabilities.
+
+**Resolution:**
+
+1. Add `"additionalProperties": false` to root and nested objects in all security-critical schemas
+2. Exception: Keep `additionalProperties: true` only on explicit `metadata` objects
+3. Audit existing data for extra properties before enforcing
+
+**Priority:** P0
+
+**Full Report:** `.claude/context/reports/security/batch1-foundations-security-review-2026-02-09.md`
+
+---
+
+### SEC-FND-002: No Prompt Injection Defense in Rules or Schemas (HIGH)
+
+**Date:** 2026-02-09 | **Agent:** security-architect
+
+**Description:**
+
+`rules/security.md` covers traditional injection vectors (SQL injection, XSS, eval()) but has zero coverage for prompt injection -- the primary attack vector in LLM multi-agent systems. Memory files (learnings.md, decisions.md) are read by all agents before starting work. An adversarial entry could instruct agents to disable enforcement, exfiltrate data, or execute arbitrary commands. No sanitization is performed on memory writes.
+
+**Impact:** HIGH -- Memory poisoning could compromise all subsequent agent operations.
+
+**Resolution:**
+
+1. Add "Prompt Injection Defense" section to rules/security.md
+2. Implement memory content sanitization utility
+3. Add provenance markers to memory entries
+4. Treat memory entries as untrusted input in agent instructions
+
+**Priority:** P1
+
+**Full Report:** `.claude/context/reports/security/batch1-foundations-security-review-2026-02-09.md`
+
+---
+
+### SEC-FND-003: Runtime State Files Lack Integrity Verification (CRITICAL)
+
+**Date:** 2026-02-09 | **Agent:** security-architect
+
+**Description:**
+
+10 runtime state files in `.claude/context/runtime/` (including router-state.json, reflection-spawn-request.json, session-metrics.json) have no integrity verification (HMAC, checksum, or digital signature). Any agent with Write tool access can modify these files to manipulate framework behavior. The reflection-spawn-request.json is particularly dangerous as it can trigger arbitrary agent spawns via the Router Step 0 mechanism.
+
+**Impact:** CRITICAL -- Compromised agent can manipulate routing enforcement, trigger mass spawns, or suppress compliance validation.
+
+**Resolution:**
+
+1. Add SHA-256 checksum field to critical state files (router-state.json, reflection-spawn-request.json)
+2. Validate checksum before trusting state file content
+3. Add max-entry limits and timestamp validation for reflection-spawn-request.json
+4. Create JSON schemas for all runtime state files
+
+**Priority:** P1
+
+**Full Report:** `.claude/context/reports/security/batch1-foundations-security-review-2026-02-09.md`

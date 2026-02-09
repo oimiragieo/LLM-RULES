@@ -130,6 +130,25 @@ Before creating ANY artifact:
 
 ---
 
+#### Hypothesis Framing
+
+For each major technical decision, state:
+"We believe [approach] will [achieve outcome]. We'll know when [metric]."
+
+#### Mandatory Reading
+
+Before planning, agents MUST read these files:
+
+- [List specific files with line ranges]
+- [Include code snippets to mirror]
+
+#### Patterns to Mirror
+
+Copy these existing patterns from the codebase:
+
+- [Pattern 1: file path + description]
+- [Pattern 2: file path + description]
+
 ### Phase 1: {{PHASE_1_NAME}} ({{PHASE_1_TYPE}})
 
 **Purpose**: {{PHASE_1_PURPOSE}}

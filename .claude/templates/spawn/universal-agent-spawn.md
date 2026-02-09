@@ -339,6 +339,14 @@ See \`.claude/docs/SHELL-SECURITY-GUIDE.md\` for complete guide.
 });
 ```
 
+## Context Compression (Long Tasks)
+
+If your task involves 50+ messages, 10+ file changes, or multi-phase work:
+
+- [ ] Check if context-compressor needed at safe checkpoints
+- [ ] Invoke `Skill({ skill: 'context-compressor' })` between phases or after logical units
+- [ ] Preserve: active task IDs, key decisions, file paths, test results
+
 ## Model Selection Guide
 
 | Task Type                                 | Model    | Justification         |

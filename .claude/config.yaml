@@ -1,6 +1,13 @@
 # Unified Enterprise AI Framework Configuration
 # Merges capabilities from Legacy, Superpowers, and Claude-Flow
 
+# --- Metadata (Version Tracking) ---
+metadata:
+  version: '2.2.2'
+  last_updated: '2026-02-09'
+  updated_by: 'developer-agent'
+  config_modernization: 'Task #2 - Auto-compression enabled, env vars documented, agent models expanded'
+
 # --- Router Configuration (The Gatekeeper) ---
 agent_routing:
   router:
@@ -111,12 +118,13 @@ memory_management:
 
   # Auto-compression config (Phase 3)
   auto_compression:
-    enabled: false # Best-effort auto-trigger via user-prompt-unified when enabled
+    enabled: true # ENABLED BY DEFAULT (ADR-108: dormant infrastructure activated)
     trigger_threshold: 0.90 # Compress at 90% budget (estimated)
     max_compressions_per_session: 5
 
 # --- Core Agents Definition (Pointers) ---
 agents:
+  # Core agents (framework coordination)
   router:
     path: .claude/agents/core/router.md
     model: claude-haiku-4-5
@@ -132,4 +140,184 @@ agents:
     model: claude-opus-4-5-20251101
   architect:
     path: .claude/agents/core/architect.md
+    model: claude-opus-4-5-20251101
+  pm:
+    path: .claude/agents/core/pm.md
+    model: claude-sonnet-4-5
+  technical-writer:
+    path: .claude/agents/core/technical-writer.md
+    model: claude-sonnet-4-5
+  context-compressor:
+    path: .claude/agents/core/context-compressor.md
+    model: claude-haiku-4-5
+  reflection-agent:
+    path: .claude/agents/core/reflection-agent.md
+    model: claude-sonnet-4-5
+
+  # Specialized agents (high-stakes decisions)
+  security-architect:
+    path: .claude/agents/specialized/security-architect.md
+    model: claude-opus-4-5-20251101
+  code-reviewer:
+    path: .claude/agents/specialized/code-reviewer.md
+    model: claude-sonnet-4-5
+  code-simplifier:
+    path: .claude/agents/specialized/code-simplifier.md
+    model: claude-sonnet-4-5
+  database-architect:
+    path: .claude/agents/specialized/database-architect.md
+    model: claude-opus-4-5-20251101
+  devops:
+    path: .claude/agents/specialized/devops.md
+    model: claude-sonnet-4-5
+  devops-troubleshooter:
+    path: .claude/agents/specialized/devops-troubleshooter.md
+    model: claude-sonnet-4-5
+  incident-responder:
+    path: .claude/agents/specialized/incident-responder.md
+    model: claude-opus-4-5-20251101
+  researcher:
+    path: .claude/agents/specialized/researcher.md
+    model: claude-sonnet-4-5
+  reverse-engineer:
+    path: .claude/agents/specialized/reverse-engineer.md
+    model: claude-sonnet-4-5
+  sre-engineer:
+    path: .claude/agents/specialized/sre-engineer.md
+    model: claude-sonnet-4-5
+  chaos-engineer:
+    path: .claude/agents/specialized/chaos-engineer.md
+    model: claude-sonnet-4-5
+  penetration-tester:
+    path: .claude/agents/specialized/penetration-tester.md
+    model: claude-opus-4-5-20251101
+  performance-engineer:
+    path: .claude/agents/specialized/performance-engineer.md
+    model: claude-sonnet-4-5
+  accessibility-tester:
+    path: .claude/agents/specialized/accessibility-tester.md
+    model: claude-sonnet-4-5
+  conductor-validator:
+    path: .claude/agents/specialized/conductor-validator.md
+    model: claude-haiku-4-5
+
+  # C4 model agents (diagramming)
+  c4-code:
+    path: .claude/agents/specialized/c4-code.md
+    model: claude-haiku-4-5
+  c4-component:
+    path: .claude/agents/specialized/c4-component.md
+    model: claude-haiku-4-5
+  c4-container:
+    path: .claude/agents/specialized/c4-container.md
+    model: claude-haiku-4-5
+  c4-context:
+    path: .claude/agents/specialized/c4-context.md
+    model: claude-haiku-4-5
+
+  # Domain specialists (technology-specific)
+  python-pro:
+    path: .claude/agents/domain/python-pro.md
+    model: claude-sonnet-4-5
+  typescript-pro:
+    path: .claude/agents/domain/typescript-pro.md
+    model: claude-sonnet-4-5
+  frontend-pro:
+    path: .claude/agents/domain/frontend-pro.md
+    model: claude-sonnet-4-5
+  nodejs-pro:
+    path: .claude/agents/domain/nodejs-pro.md
+    model: claude-sonnet-4-5
+  nextjs-pro:
+    path: .claude/agents/domain/nextjs-pro.md
+    model: claude-sonnet-4-5
+  fastapi-pro:
+    path: .claude/agents/domain/fastapi-pro.md
+    model: claude-sonnet-4-5
+  golang-pro:
+    path: .claude/agents/domain/golang-pro.md
+    model: claude-sonnet-4-5
+  rust-pro:
+    path: .claude/agents/domain/rust-pro.md
+    model: claude-sonnet-4-5
+  java-pro:
+    path: .claude/agents/domain/java-pro.md
+    model: claude-sonnet-4-5
+  php-pro:
+    path: .claude/agents/domain/php-pro.md
+    model: claude-sonnet-4-5
+  ios-pro:
+    path: .claude/agents/domain/ios-pro.md
+    model: claude-sonnet-4-5
+  android-pro:
+    path: .claude/agents/domain/android-pro.md
+    model: claude-sonnet-4-5
+  expo-mobile-developer:
+    path: .claude/agents/domain/expo-mobile-developer.md
+    model: claude-sonnet-4-5
+  tauri-desktop-developer:
+    path: .claude/agents/domain/tauri-desktop-developer.md
+    model: claude-sonnet-4-5
+  gamedev-pro:
+    path: .claude/agents/domain/gamedev-pro.md
+    model: claude-sonnet-4-5
+  sveltekit-expert:
+    path: .claude/agents/domain/sveltekit-expert.md
+    model: claude-sonnet-4-5
+
+  # API/Architecture specialists
+  api-designer:
+    path: .claude/agents/domain/api-designer.md
+    model: claude-sonnet-4-5
+  graphql-pro:
+    path: .claude/agents/domain/graphql-pro.md
+    model: claude-sonnet-4-5
+  microservices-architect:
+    path: .claude/agents/domain/microservices-architect.md
+    model: claude-opus-4-5-20251101
+
+  # AI/ML specialists
+  llm-architect:
+    path: .claude/agents/domain/llm-architect.md
+    model: claude-opus-4-5-20251101
+  ai-ml-specialist:
+    path: .claude/agents/domain/ai-ml-specialist.md
+    model: claude-sonnet-4-5
+  prompt-engineer:
+    path: .claude/agents/domain/prompt-engineer.md
+    model: claude-sonnet-4-5
+  mcp-developer:
+    path: .claude/agents/domain/mcp-developer.md
+    model: claude-sonnet-4-5
+
+  # Data specialists
+  data-engineer:
+    path: .claude/agents/domain/data-engineer.md
+    model: claude-sonnet-4-5
+
+  # Emerging tech specialists
+  web3-blockchain-expert:
+    path: .claude/agents/domain/web3-blockchain-expert.md
+    model: claude-sonnet-4-5
+  scientific-research-expert:
+    path: .claude/agents/domain/scientific-research-expert.md
+    model: claude-sonnet-4-5
+  mobile-ux-reviewer:
+    path: .claude/agents/domain/mobile-ux-reviewer.md
+    model: claude-sonnet-4-5
+
+  # Orchestrators (complex coordination - require opus)
+  master-orchestrator:
+    path: .claude/agents/orchestrators/master-orchestrator.md
+    model: claude-opus-4-5-20251101
+    extended_thinking: true
+  evolution-orchestrator:
+    path: .claude/agents/orchestrators/evolution-orchestrator.md
+    model: claude-opus-4-5-20251101
+    extended_thinking: true
+  party-orchestrator:
+    path: .claude/agents/orchestrators/party-orchestrator.md
+    model: claude-opus-4-5-20251101
+  swarm-coordinator:
+    path: .claude/agents/orchestrators/swarm-coordinator.md
     model: claude-opus-4-5-20251101

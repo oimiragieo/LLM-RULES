@@ -6,10 +6,28 @@ Rules for file placement, naming, provenance, and cleanup in the agent-studio wo
 
 ### Reports
 
-- ALL agent reports go to `.claude/context/reports/`
+**Operational Reports** (agent execution reports):
+
+- Location: `.claude/context/reports/`
 - Subdirectories by domain: `reports/security/`, `reports/qa/`, `reports/architecture/`, `reports/database/`, `reports/reflections/`
 - Naming: `{topic}-report-{YYYY-MM-DD}.md`
+- Types: Security audits, QA reports, architecture reviews, reflection reports
 - This is the canonical report location (consolidated from previous `artifacts/reports/` location)
+
+**Research Reports** (external research artifacts):
+
+- Location: `.claude/context/artifacts/research-reports/`
+- Naming: `{topic}-research-{YYYY-MM-DD}.md` (note: includes `-research-` suffix before date)
+- Pattern: Descriptive kebab-case name + `-research-` + ISO date
+- Types: External research, technique analysis, best practice studies, technology comparisons
+- These are reference artifacts, not operational reports
+- Must include provenance header: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
+**Examples**:
+
+- `rules-modernization-research-2026-02-09.md`
+- `owasp-agentic-ai-research-2026-02-09.md`
+- `tdd-best-practices-research-2026-02-09.md`
 
 ### Plans
 
@@ -62,6 +80,8 @@ All agent-generated files must include a provenance header as the first line:
 - NEVER write temp files outside `.claude/context/tmp/`
 - NEVER place reports in `.claude/context/artifacts/` root (use subdirectories)
 
-## Detailed Reference
+## Related References
 
-See `.claude/docs/FILE_PLACEMENT_RULES.md` for the complete placement specification with enforcement hooks.
+- `.claude/docs/FILE_PLACEMENT_RULES.md` - Complete placement specification with enforcement hooks
+- `unified-pre-write-hook.cjs` - File safety validation hook
+- `workspace-conventions` - This file (quick reference)

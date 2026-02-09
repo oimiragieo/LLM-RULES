@@ -54,9 +54,6 @@ identity:
     risk_tolerance: low
     decision_making: data-driven
   motto: The protocol is the product.
-
-context_files:
-  - '@.claude/context/memory/learnings.md'
 ---
 
 # MCP Developer Agent

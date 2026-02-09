@@ -261,27 +261,22 @@ Read({ file_path: '.claude/{category}/{similar_artifact}' });
 
 ### Step 4: Synthesize Findings
 
-Output a structured research report in the following format:
+Output a structured research report following `.claude/templates/reports/research-report-template.md`:
 
-```markdown
-## Research Report: {Artifact Name}
+**File Location**: `.claude/context/artifacts/research-reports/{topic}-research-{YYYY-MM-DD}.md`
 
-**Date**: {YYYY-MM-DD}
-**Researcher**: research-synthesis skill
-**Artifact Type**: {type}
-**Domain**: {domain}
+**Required Sections**:
 
----
+1. **Provenance Header**: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+2. **Executive Summary**: 2-3 sentence overview of key findings
+3. **Research Methodology**: Query table + sources consulted table
+4. **Detailed Findings**: By topic with key insights, evidence, relevance
+5. **Academic References**: arXiv papers, academic sources (include even if empty)
+6. **Practical Recommendations**: P0/P1/P2 prioritization
+7. **Risk Assessment**: Risk table with impact/probability/mitigation
+8. **Implementation Roadmap**: Next steps and timeline
 
-### Research Queries Executed
-
-| #   | Query       | Tool      | Sources Found | Key Finding     |
-| --- | ----------- | --------- | ------------- | --------------- |
-| 1   | "{query_1}" | Exa       | 5             | {brief_finding} |
-| 2   | "{query_2}" | WebSearch | 3             | {brief_finding} |
-| 3   | "{query_3}" | Exa Code  | 4             | {brief_finding} |
-
----
+**For artifact creation research, also include**:
 
 ### Existing Codebase Patterns
 
@@ -297,8 +292,6 @@ Output a structured research report in the following format:
 - Tools: {convention}
 - Output: {convention}
 
----
-
 ### Best Practices Identified
 
 | #   | Practice   | Source               | Confidence | Rationale        |
@@ -313,8 +306,6 @@ Output a structured research report in the following format:
 - **Medium**: Single authoritative source or multiple secondary sources
 - **Low**: Limited evidence, requires validation
 
----
-
 ### Design Decisions
 
 | Decision     | Rationale | Source   | Alternatives Considered    |
@@ -322,8 +313,6 @@ Output a structured research report in the following format:
 | {decision_1} | {why}     | {source} | {what_else_was_considered} |
 | {decision_2} | {why}     | {source} | {what_else_was_considered} |
 | {decision_3} | {why}     | {source} | {what_else_was_considered} |
-
----
 
 ### Recommended Implementation
 
@@ -345,18 +334,6 @@ Output a structured research report in the following format:
 - Existing artifacts: {list}
 - External tools: {list}
 
----
-
-### Risk Assessment
-
-| Risk     | Likelihood | Impact | Mitigation       |
-| -------- | ---------- | ------ | ---------------- |
-| {risk_1} | Medium     | High   | {how_to_prevent} |
-| {risk_2} | Low        | Medium | {how_to_prevent} |
-| {risk_3} | High       | Low    | {how_to_prevent} |
-
----
-
 ### Quality Gate Checklist
 
 Before proceeding to artifact creation, verify:
@@ -367,15 +344,14 @@ Before proceeding to artifact creation, verify:
 - [ ] All design decisions have rationale and source
 - [ ] Risk assessment completed with mitigations
 - [ ] Recommended implementation path documented
-
----
+- [ ] Report saved with correct naming: `{topic}-research-{YYYY-MM-DD}.md`
+- [ ] Provenance header included
 
 ### Next Steps
 
 1. **Invoke creator skill**: `Skill({ skill: "{creator_skill}" })`
 2. **Use this report as input**: Reference decisions above
 3. **Validate against checklist**: Before marking complete
-```
 
 ## Integration with Creator Skills
 
@@ -524,6 +500,25 @@ Research is complete when ALL items pass:
 - Research reports: `.claude/context/artifacts/research-reports/`
 - Temporary notes: `.claude/context/tmp/research/`
 - Memory updates: `.claude/context/memory/learnings.md`
+
+## Report Naming Convention (MANDATORY)
+
+**Format**: `{topic}-research-{YYYY-MM-DD}.md`
+
+- Topic: kebab-case descriptive name
+- Always includes `-research-` suffix before date
+- Date: ISO 8601 with hyphens (YYYY-MM-DD)
+
+**Examples**:
+
+- ✓ `oauth2-security-research-2026-02-09.md`
+- ✓ `json-schema-patterns-research-2026-02-09.md`
+- ✓ `slack-integration-best-practices-research-2026-02-09.md`
+- ✗ `agent-keywords-core.md` (missing date)
+- ✗ `oauth2-auth-2026-02-09.md` (missing `-research-` suffix)
+- ✗ `bmad-method-analysis-20260128-104050.md` (wrong date format)
+
+**Template**: Use `.claude/templates/reports/research-report-template.md` for all research reports
 
 ## Examples
 

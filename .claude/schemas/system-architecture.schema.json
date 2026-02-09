@@ -3,13 +3,16 @@
   "title": "System Architecture Schema",
   "description": "Schema for system architecture documents",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "documentTitle": {
       "type": "string",
+      "maxLength": 200,
       "description": "Full document title"
     },
     "version": {
       "type": "string",
+      "maxLength": 50,
       "description": "Document version"
     },
     "date": {
@@ -19,6 +22,7 @@
     },
     "author": {
       "type": "string",
+      "maxLength": 100,
       "description": "Document author"
     },
     "status": {
@@ -28,103 +32,135 @@
     },
     "introduction": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "purpose": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "scope": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "audience": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 500
         },
         "references": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         }
       }
     },
     "systemOverview": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "businessContext": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "goals": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "stakeholders": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 200
           }
         },
         "constraints": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "assumptions": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         }
       }
     },
     "architecturePrinciples": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "designPrinciples": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "technologyPrinciples": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "operationalPrinciples": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         }
       }
     },
     "systemArchitecture": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "highLevelArchitecture": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 5000
         },
         "components": {
           "type": "array",
+          "maxItems": 100,
           "items": {
             "type": "object",
+            "additionalProperties": false,
             "properties": {
               "name": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 100
               },
               "responsibilities": {
                 "type": "array",
+                "maxItems": 50,
                 "items": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 500
                 }
               },
               "interfaces": {
                 "type": "array",
+                "maxItems": 50,
                 "items": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 200
                 }
               }
             },
@@ -133,45 +169,59 @@
         },
         "interfaces": {
           "type": "array",
+          "maxItems": 100,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "flows": {
           "type": "array",
+          "maxItems": 100,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1000
           }
         }
       }
     },
     "componentArchitecture": {
       "type": "array",
+      "maxItems": 100,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           },
           "purpose": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           },
           "responsibilities": {
             "type": "array",
+            "maxItems": 50,
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 500
             }
           },
           "interfaces": {
             "type": "array",
+            "maxItems": 50,
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 200
             }
           },
           "dependencies": {
             "type": "array",
+            "maxItems": 100,
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 100
             }
           }
         },
@@ -180,107 +230,139 @@
     },
     "dataArchitecture": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "dataModel": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 5000
         },
         "dataStorage": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "dataFlow": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 5000
         },
         "dataSecurity": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         }
       }
     },
     "securityArchitecture": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "principles": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "authentication": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "authorization": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "dataProtection": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "controls": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         }
       }
     },
     "deploymentArchitecture": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "environments": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           }
         },
         "infrastructure": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "strategy": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "configurationManagement": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         }
       }
     },
     "performance": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "requirements": {
           "type": "array",
+          "maxItems": 50,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
         },
         "scalability": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "monitoring": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         }
       }
     },
     "monitoring": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "logging": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "monitoring": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "alerting": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         },
         "troubleshooting": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 2000
         }
       }
     }

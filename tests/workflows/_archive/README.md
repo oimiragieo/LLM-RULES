@@ -13,6 +13,7 @@ This directory contains tests for workflow functionality that has been archived.
 ## Why Archived?
 
 These tests reference modules that have been archived:
+
 - `.claude/lib/workflow/workflow-composer.cjs` → archived
 
 These workflow features were part of an earlier state machine implementation that has since been replaced or deprecated.
@@ -20,6 +21,7 @@ These workflow features were part of an earlier state machine implementation tha
 ## Restoration
 
 If you need to restore any of these tests:
+
 1. Restore the corresponding archived code from `.claude/lib/_archive/workflow/`
 2. Rename the test file back to `*.test.cjs`
 3. Update import paths to match restored code location

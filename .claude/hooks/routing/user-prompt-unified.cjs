@@ -160,7 +160,7 @@ function checkRouterModeReset(hookInput) {
   if (sessionChanged) {
     result.sessionBoundaryDetected = true;
     if (process.env.ROUTER_DEBUG === 'true') {
-      console.log(
+      console.error(
         `[user-prompt-unified:reset] Session boundary detected: ${stateSessionId} -> ${currentSessionId}`
       );
     }
@@ -205,19 +205,19 @@ function checkRouterModeReset(hookInput) {
     });
 
     if (process.env.ROUTER_DEBUG === 'true') {
-      console.log(
+      console.error(
         `[user-prompt-unified:creator] Creator intent detected: ${creatorIntent.type}${creatorIntent.isBatch ? ' (batch)' : ''}`
       );
     }
   }
 
   if (process.env.ROUTER_DEBUG === 'true') {
-    console.log('[user-prompt-unified:reset] State reset to router mode (ROUTING-002 fix)');
+    console.error('[user-prompt-unified:reset] State reset to router mode (ROUTING-002 fix)');
     if (result.sessionBoundaryDetected) {
-      console.log('[user-prompt-unified:reset] Session ID updated for ROUTING-003 fix');
+      console.error('[user-prompt-unified:reset] Session ID updated for ROUTING-003 fix');
     }
     if (process.env.AGENT_PRESET) {
-      console.log(
+      console.error(
         `[user-prompt-unified:reset] Preset set to ${process.env.AGENT_PRESET} (PRESET-001)`
       );
     }
@@ -851,7 +851,7 @@ async function checkRouterEnforcement(hookInput) {
           });
         }
       }
-      console.log(
+      console.error(
         `[user-prompt-unified] Semantic fallback: ${semanticCandidates
           .map(candidate => `${candidate.agent} (${candidate.score.toFixed(2)})`)
           .join(', ')}`
@@ -861,34 +861,34 @@ async function checkRouterEnforcement(hookInput) {
 
   // Output routing info if clear recommendation
   if (candidates.length > 0 && candidates[0].score > 2) {
-    console.log('\n+--------------------------------------------------+');
-    console.log('| ROUTER ANALYSIS                                  |');
-    console.log('+--------------------------------------------------+');
-    console.log(`| Intent: ${intent.padEnd(39)} |`);
-    console.log(`| Complexity: ${planningReq.complexity.padEnd(36)} |`);
-    console.log('| Recommended agents:                              |');
+    console.error('\n+--------------------------------------------------+');
+    console.error('| ROUTER ANALYSIS                                  |');
+    console.error('+--------------------------------------------------+');
+    console.error(`| Intent: ${intent.padEnd(39)} |`);
+    console.error(`| Complexity: ${planningReq.complexity.padEnd(36)} |`);
+    console.error('| Recommended agents:                              |');
     for (let i = 0; i < Math.min(3, candidates.length); i++) {
       const c = candidates[i];
       if (c.score > 0) {
         const line = `|  ${i + 1}. ${c.agent.name} (score: ${c.score})`.padEnd(50) + '|';
-        console.log(line);
+        console.error(line);
       }
     }
 
     if (planningReq.multiAgentRequired) {
-      console.log('+--------------------------------------------------+');
-      console.log('| MULTI-AGENT PLANNING REQUIRED                    |');
+      console.error('+--------------------------------------------------+');
+      console.error('| MULTI-AGENT PLANNING REQUIRED                    |');
       if (planningReq.requiresArchitectReview) {
-        console.log('|  -> Architect review: REQUIRED                   |');
+        console.error('|  -> Architect review: REQUIRED                   |');
       }
       if (planningReq.requiresSecurityReview) {
-        console.log('|  -> Security review: REQUIRED                    |');
+        console.error('|  -> Security review: REQUIRED                    |');
       }
     }
 
-    console.log('|                                                  |');
-    console.log('| Use Task tool to spawn: ' + candidates[0].agent.name.padEnd(24) + '|');
-    console.log('+--------------------------------------------------+\n');
+    console.error('|                                                  |');
+    console.error('| Use Task tool to spawn: ' + candidates[0].agent.name.padEnd(24) + '|');
+    console.error('+--------------------------------------------------+\n');
   }
 
   return result;
@@ -952,29 +952,29 @@ function checkMemoryReminder(hookInput, projectRoot = PROJECT_ROOT) {
   result.show = true;
 
   // Output reminder
-  console.log('\n+--------------------------------------------------+');
-  console.log('| MEMORY PROTOCOL REMINDER                         |');
-  console.log('+--------------------------------------------------+');
-  console.log('| Read memory files BEFORE starting work:          |');
-  console.log('|                                                  |');
+  console.error('\n+--------------------------------------------------+');
+  console.error('| MEMORY PROTOCOL REMINDER                         |');
+  console.error('+--------------------------------------------------+');
+  console.error('| Read memory files BEFORE starting work:          |');
+  console.error('|                                                  |');
 
   for (const file of result.files) {
     if (file.exists && file.lines > 5) {
       const status = `${file.lines} lines, ${file.modified}`;
-      console.log(`|  - ${file.name.padEnd(20)} (${status.padEnd(20)})|`);
+      console.error(`|  - ${file.name.padEnd(20)} (${status.padEnd(20)})|`);
     }
   }
 
-  console.log('|                                                  |');
-  console.log('| Path: .claude/context/memory/                    |');
-  console.log('|                                                  |');
-  console.log('| "If it is not in memory, it did not happen."    |');
-  console.log('+--------------------------------------------------+');
-  console.log('| SKILL PROTOCOL REMINDER                          |');
-  console.log('+--------------------------------------------------+');
-  console.log('| Invoke relevant skills BEFORE responding.        |');
-  console.log('| When in doubt, use Skill tool (skill-discovery). |');
-  console.log('+--------------------------------------------------+\n');
+  console.error('|                                                  |');
+  console.error('| Path: .claude/context/memory/                    |');
+  console.error('|                                                  |');
+  console.error('| "If it is not in memory, it did not happen."    |');
+  console.error('+--------------------------------------------------+');
+  console.error('| SKILL PROTOCOL REMINDER                          |');
+  console.error('+--------------------------------------------------+');
+  console.error('| Invoke relevant skills BEFORE responding.        |');
+  console.error('| When in doubt, use Skill tool (skill-discovery). |');
+  console.error('+--------------------------------------------------+\n');
 
   return result;
 }
@@ -1162,7 +1162,10 @@ function checkEvolutionTrigger(hookInput) {
     result.suggestionAdded = true;
 
     if (process.env.DEBUG_HOOKS) {
-      console.log('[user-prompt-unified:evolution] Evolution trigger detected:', triggers[0].match);
+      console.error(
+        '[user-prompt-unified:evolution] Evolution trigger detected:',
+        triggers[0].match
+      );
     }
   }
 
@@ -1292,20 +1295,20 @@ function checkMemoryHealth(hookInput, projectRoot = PROJECT_ROOT) {
 
     // Output if warnings or actions
     if (result.warnings.length > 0 || result.autoActions.length > 0) {
-      console.log('[MEMORY HEALTH CHECK]');
+      console.error('[MEMORY HEALTH CHECK]');
       if (result.warnings.length > 0) {
-        console.log('Warnings:');
+        console.error('Warnings:');
         for (const warning of result.warnings) {
-          console.log(`  - ${warning}`);
+          console.error(`  - ${warning}`);
         }
       }
       if (result.autoActions.length > 0) {
-        console.log('Auto-actions taken:');
+        console.error('Auto-actions taken:');
         for (const action of result.autoActions) {
-          console.log(`  - ${action}`);
+          console.error(`  - ${action}`);
         }
       }
-      console.log('');
+      console.error('');
     }
   } catch (e) {
     if (process.env.DEBUG_HOOKS) {

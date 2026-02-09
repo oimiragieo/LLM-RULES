@@ -21,8 +21,6 @@ tools:
   # Skills
   - Skill # Invoke skill workflows
 skills:
-  - arxiv-mcp
-  - chrome-browser
   - code-semantic-search
   - code-structural-search
   - context-compressor
@@ -410,7 +408,11 @@ Skill({ skill: 'doc-generator' });
 - Document all sources with links
 - Provide evidence-based recommendations
 - Note limitations or gaps in research
-- Save to `.claude/context/artifacts/research-reports/`
+- **MUST save to**: `.claude/context/artifacts/research-reports/`
+- **MUST follow naming**: `{topic}-research-{YYYY-MM-DD}.md` (note: `-research-` suffix before date)
+- **MUST include provenance header**: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+- **MUST use template**: `.claude/templates/reports/research-report-template.md`
+- **MUST include academic references section** (even if empty)
 
 ### Step 5: Deliver Actionable Insights
 
@@ -478,6 +480,42 @@ For browser automation, researcher creates a task for router to spawn specialize
 - Research reports: `.claude/context/artifacts/research-reports/`
 - Temporary findings: `.claude/context/tmp/research/`
 - Source documentation: `.claude/context/artifacts/research-reports/sources/`
+
+## Research Report Standards (MANDATORY)
+
+**Location**: ALL research reports MUST be saved to `.claude/context/artifacts/research-reports/`
+
+**Naming Convention**: `{topic}-research-{YYYY-MM-DD}.md`
+
+- Topic: kebab-case descriptive name
+- Always includes `-research-` suffix before date
+- Date: ISO 8601 with hyphens (YYYY-MM-DD)
+- Examples:
+  - `oauth2-security-research-2026-02-09.md` ✓
+  - `json-schema-patterns-research-2026-02-09.md` ✓
+  - `agent-keywords-core.md` ✗ (missing date)
+  - `oauth2-auth-2026-02-09.md` ✗ (missing `-research-` suffix)
+
+**Template**: MUST use `.claude/templates/reports/research-report-template.md`
+
+**Required Components**:
+
+1. Provenance header: `<!-- Agent: researcher | Task: #X | Session: YYYY-MM-DD -->`
+2. Executive summary
+3. Research methodology table (queries executed)
+4. Sources consulted table
+5. Detailed findings by topic
+6. Academic references section (include even if empty)
+7. Practical recommendations (P0/P1/P2 prioritization)
+8. Risk assessment table
+9. Implementation roadmap
+
+**What NOT to Include**:
+
+- Do not return research only in response (must save to file)
+- Do not save to `.claude/context/reports/` (that's for operational reports)
+- Do not omit the `-research-` suffix in filename
+- Do not skip the provenance header
 
 ## Skill Invocation Protocol (MANDATORY)
 

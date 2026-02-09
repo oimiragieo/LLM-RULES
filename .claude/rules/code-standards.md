@@ -43,9 +43,68 @@
 - Document public APIs and complex logic
 - Leave code cleaner than you found it
 
+## AI-Generated Code Review (Multi-Layered)
+
+**Layer 1: Automated Linting** (catches syntax, style)
+
+- ESLint, Prettier, TypeScript compiler
+- Runs on every file save
+
+**Layer 2: AI Code Review** (catches logic, patterns)
+
+- `code-reviewer` agent reviews PRs
+- Checks for: logic errors, security issues, performance problems
+- Identifies code smells and anti-patterns
+
+**Layer 3: Human Architecture Review** (catches design issues)
+
+- Human reviews: API design, architecture decisions
+- Focus: Does this solve the right problem?
+
+**Pattern**: Automate the trivial, AI reviews the tactical, humans review the strategic.
+
+## Hybrid Search Commands
+
+**Code Search Tools**:
+
+- `pnpm search:code "pattern"` - Semantic + BM25 hybrid search
+- `pnpm search:structure "class:MyClass"` - Structural code search (AST-based)
+- `pnpm search:file "filename"` - Fast filename search
+
+**When to Use**:
+
+- Semantic search: Find similar patterns, discover existing solutions
+- Structural search: Precise code matching (all uses of interface X)
+- File search: Locate files by name
+
+**Skills**:
+
+- `code-semantic-search` - Semantic code search skill
+- `code-structural-search` - Structural (AST) search skill
+- `ripgrep` - Fast text search skill
+
+**Example**:
+
+```bash
+# Find all authentication patterns
+pnpm search:code "JWT token validation"
+
+# Find all classes implementing UserInterface
+pnpm search:structure "class:*:implements:UserInterface"
+
+# Find config files
+pnpm search:file "config"
+```
+
 ## Lint and Format (MANDATORY)
 
 - Run `pnpm lint:fix` before committing any code changes
 - Run `pnpm format` before committing any code changes
 - Both must pass with zero errors/changes before a task is marked complete
 - This is a BLOCKING requirement - no exceptions
+
+## Related References
+
+- `.claude/agents/specialized/code-reviewer.md` - Code review agent
+- `.claude/skills/code-semantic-search/SKILL.md` - Semantic search skill
+- `.claude/skills/code-structural-search/SKILL.md` - Structural search skill

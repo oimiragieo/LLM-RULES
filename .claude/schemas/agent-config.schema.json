@@ -6,15 +6,20 @@
   "type": "object",
   "required": ["version", "agents"],
   "properties": {
-    "version": { "type": "string" },
+    "version": { "type": "string", "maxLength": 50 },
     "agents": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "tools": { "type": "array", "items": { "type": "string" } },
-          "thinkingDefault": { "type": "string" },
-          "phase": { "type": "string" }
+          "tools": {
+            "type": "array",
+            "maxItems": 100,
+            "items": { "type": "string", "maxLength": 100 }
+          },
+          "thinkingDefault": { "type": "string", "maxLength": 100 },
+          "phase": { "type": "string", "maxLength": 100 },
+          "model": { "type": "string", "maxLength": 100 }
         },
         "additionalProperties": false
       }

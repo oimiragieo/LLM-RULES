@@ -32,16 +32,19 @@
     },
     "evolutions": {
       "type": "array",
+      "maxItems": 1000,
       "items": { "$ref": "#/$defs/completedEvolution" },
       "description": "History of completed evolutions"
     },
     "patterns": {
       "type": "array",
+      "maxItems": 500,
       "items": { "$ref": "#/$defs/pattern" },
       "description": "Extracted patterns from codebase usage"
     },
     "suggestions": {
       "type": "array",
+      "maxItems": 200,
       "items": { "$ref": "#/$defs/suggestion" },
       "description": "Suggested evolutions based on patterns"
     },
@@ -75,6 +78,7 @@
         "trigger": {
           "type": "string",
           "minLength": 1,
+          "maxLength": 500,
           "description": "What triggered this evolution (user request, pattern detection, etc.)"
         },
         "phase": {
@@ -84,6 +88,7 @@
         },
         "research": {
           "type": "array",
+          "maxItems": 100,
           "items": { "$ref": "#/$defs/researchEntry" },
           "default": [],
           "description": "Research gathered during evolution"
@@ -94,7 +99,7 @@
           "description": "When this evolution started"
         },
         "blockedReason": {
-          "oneOf": [{ "type": "null" }, { "type": "string" }],
+          "oneOf": [{ "type": "null" }, { "type": "string", "maxLength": 2000 }],
           "description": "Reason if evolution is blocked, null otherwise"
         },
         "metadata": {
@@ -106,18 +111,22 @@
     },
     "researchEntry": {
       "type": "object",
+      "unevaluatedProperties": false,
       "required": ["query", "source", "findings", "timestamp"],
       "properties": {
         "query": {
           "type": "string",
+          "maxLength": 500,
           "description": "Research query or question"
         },
         "source": {
           "type": "string",
+          "maxLength": 200,
           "description": "Source of research (web, codebase, documentation, etc.)"
         },
         "findings": {
           "type": "string",
+          "maxLength": 5000,
           "description": "Summary of research findings"
         },
         "timestamp": {
@@ -135,6 +144,7 @@
     },
     "completedEvolution": {
       "type": "object",
+      "unevaluatedProperties": false,
       "required": ["id", "type", "name", "createdAt", "filesCreated"],
       "properties": {
         "id": {
@@ -149,14 +159,17 @@
         },
         "name": {
           "type": "string",
+          "maxLength": 100,
           "description": "Name of the artifact"
         },
         "description": {
           "type": "string",
+          "maxLength": 500,
           "description": "Brief description of what was evolved"
         },
         "trigger": {
           "type": "string",
+          "maxLength": 500,
           "description": "What triggered this evolution"
         },
         "createdAt": {
@@ -166,12 +179,14 @@
         },
         "filesCreated": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 100,
+          "items": { "type": "string", "maxLength": 500 },
           "description": "List of files created during evolution"
         },
         "filesModified": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 100,
+          "items": { "type": "string", "maxLength": 500 },
           "description": "List of files modified during evolution"
         },
         "researchSources": {
@@ -191,9 +206,10 @@
         },
         "rollbackInfo": {
           "type": "object",
+          "unevaluatedProperties": false,
           "properties": {
             "canRollback": { "type": "boolean" },
-            "rollbackCommit": { "type": "string" }
+            "rollbackCommit": { "type": "string", "maxLength": 100 }
           },
           "description": "Information for rolling back this evolution"
         }
@@ -201,6 +217,7 @@
     },
     "pattern": {
       "type": "object",
+      "unevaluatedProperties": false,
       "required": ["id", "description", "frequency", "lastSeen"],
       "properties": {
         "id": {
@@ -210,6 +227,7 @@
         },
         "description": {
           "type": "string",
+          "maxLength": 500,
           "description": "Human-readable pattern description"
         },
         "category": {
@@ -234,23 +252,26 @@
         },
         "suggestedAction": {
           "type": "string",
+          "maxLength": 500,
           "description": "Recommended action based on pattern"
         },
         "examples": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "maxLength": 500 },
           "maxItems": 5,
           "description": "Example occurrences of this pattern"
         },
         "relatedPatterns": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 50,
+          "items": { "type": "string", "maxLength": 100 },
           "description": "IDs of related patterns"
         }
       }
     },
     "suggestion": {
       "type": "object",
+      "unevaluatedProperties": false,
       "required": ["id", "type", "name", "reason", "confidence"],
       "properties": {
         "id": {
@@ -265,10 +286,12 @@
         },
         "name": {
           "type": "string",
+          "maxLength": 100,
           "description": "Suggested name for the artifact"
         },
         "reason": {
           "type": "string",
+          "maxLength": 500,
           "description": "Why this suggestion is being made"
         },
         "confidence": {
@@ -279,7 +302,8 @@
         },
         "basedOnPatterns": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 50,
+          "items": { "type": "string", "maxLength": 100 },
           "description": "Pattern IDs that led to this suggestion"
         },
         "priority": {
@@ -301,6 +325,7 @@
         },
         "implementedBy": {
           "type": "string",
+          "maxLength": 100,
           "description": "Evolution ID if this suggestion was implemented"
         }
       }

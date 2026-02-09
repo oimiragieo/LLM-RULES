@@ -53,9 +53,6 @@ identity:
     risk_tolerance: low
     decision_making: data-driven
   motto: Every token counts — measure, test, iterate.
-
-context_files:
-  - '@.claude/context/memory/learnings.md'
 ---
 
 # Prompt Engineer Agent

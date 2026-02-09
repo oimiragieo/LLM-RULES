@@ -15,6 +15,7 @@ This directory contains tests for Phase 4 workflow functionality that has been a
 ## Why Archived?
 
 These tests reference modules that have been archived:
+
 - `.claude/lib/workflow/workflow-composer.cjs` → archived
 - `.claude/lib/workflow/fan-out-fan-in.cjs` → archived
 
@@ -23,6 +24,7 @@ These workflow features were part of an earlier implementation that has since be
 ## Restoration
 
 If you need to restore any of these tests:
+
 1. Restore the corresponding archived code from `.claude/lib/_archive/workflow/`
 2. Rename the test file back to `*.test.cjs`
 3. Update import paths to match restored code location

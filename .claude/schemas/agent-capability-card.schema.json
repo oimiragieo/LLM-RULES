@@ -10,11 +10,13 @@
       "type": "string",
       "description": "Agent ID (must match agent filename without .md extension)",
       "pattern": "^[a-z][a-z0-9-]*$",
+      "maxLength": 100,
       "examples": ["developer", "code-reviewer", "frontend-pro"]
     },
     "displayName": {
       "type": "string",
       "description": "Human-readable agent name",
+      "maxLength": 200,
       "examples": ["Developer Agent", "Code Reviewer", "Frontend Pro"]
     },
     "category": {
@@ -25,11 +27,13 @@
     "filePath": {
       "type": "string",
       "description": "Relative path to agent definition file",
-      "pattern": "^\\.claude/agents/(core|specialized|domain|orchestrators)/[a-z0-9-]+\\.md$"
+      "pattern": "^\\.claude/agents/(core|specialized|domain|orchestrators)/[a-z0-9-]+\\.md$",
+      "maxLength": 500
     },
     "capabilities": {
       "type": "array",
       "minItems": 1,
+      "maxItems": 50,
       "description": "List of capabilities this agent provides",
       "items": {
         "$ref": "#/$defs/Capability"
@@ -53,7 +57,8 @@
         "name": {
           "type": "string",
           "description": "Capability name (e.g., 'code-review', 'implementation', 'testing')",
-          "pattern": "^[a-z][a-z0-9-]*$"
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "maxLength": 100
         },
         "domain": {
           "type": "string",
@@ -83,30 +88,35 @@
         },
         "triggerPhrases": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 50,
+          "items": { "type": "string", "maxLength": 200 },
           "description": "Router keywords that trigger this capability",
           "examples": [["code review", "review PR", "analyze code"]]
         },
         "requiredTools": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 100,
+          "items": { "type": "string", "maxLength": 100 },
           "description": "Tools needed for this capability",
           "examples": [["Read", "Write", "Edit", "Bash"]]
         },
         "skills": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 100,
+          "items": { "type": "string", "maxLength": 100 },
           "description": "Skills used for this capability",
           "examples": [["tdd", "code-reviewer", "debugging"]]
         },
         "examples": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 50,
+          "items": { "type": "string", "maxLength": 500 },
           "description": "Example user prompts or scenarios (A2A AgentSkill.examples); used for semantic prototype generation and discovery"
         },
         "tags": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 50,
+          "items": { "type": "string", "maxLength": 100 },
           "description": "Keywords describing this capability (A2A AgentSkill.tags); used for keyword scoring in routing"
         }
       },
@@ -125,12 +135,14 @@
         "rateLimit": {
           "type": "string",
           "pattern": "^[0-9]+/(second|minute|hour)$",
-          "description": "Rate limit for spawn requests (e.g., '10/minute')"
+          "description": "Rate limit for spawn requests (e.g., '10/minute')",
+          "maxLength": 50
         },
         "maxTaskSize": {
           "type": "string",
           "pattern": "^[0-9]+(KB|MB)$",
-          "description": "Maximum input size for tasks (e.g., '50KB')"
+          "description": "Maximum input size for tasks (e.g., '50KB')",
+          "maxLength": 50
         },
         "preferredModel": {
           "type": "string",
@@ -193,7 +205,8 @@
         },
         "isolationReason": {
           "type": ["string", "null"],
-          "description": "Why isolated (e.g., '3 consecutive failures: timeout')"
+          "description": "Why isolated (e.g., '3 consecutive failures: timeout')",
+          "maxLength": 500
         },
         "lastSuccessAt": {
           "type": ["string", "null"],
@@ -215,7 +228,8 @@
         "version": {
           "type": "string",
           "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-          "description": "Agent definition version"
+          "description": "Agent definition version",
+          "maxLength": 50
         },
         "createdAt": {
           "type": "string",
@@ -226,16 +240,19 @@
           "format": "date-time"
         },
         "author": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100
         },
         "references": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 50,
+          "items": { "type": "string", "maxLength": 500 },
           "description": "Related documentation or ADRs"
         },
         "dependencies": {
           "type": "array",
-          "items": { "type": "string" },
+          "maxItems": 50,
+          "items": { "type": "string", "maxLength": 100 },
           "description": "Other agents this agent depends on"
         }
       },

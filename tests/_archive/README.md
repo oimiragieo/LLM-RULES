@@ -20,6 +20,7 @@ This directory contains tests for functionality that has been archived or remove
 ## Why Archived?
 
 These tests reference modules that have been:
+
 - Moved to `.claude/lib/_archive/`
 - Removed from the codebase during cleanup
 - Deprecated and replaced with newer implementations
@@ -27,6 +28,7 @@ These tests reference modules that have been:
 ## Restoration
 
 If you need to restore any of these tests:
+
 1. Restore the corresponding archived code from `.claude/lib/_archive/` or `.claude/tools/_archive/`
 2. Rename the test file back to `*.test.cjs`
 3. Update import paths to match restored code location

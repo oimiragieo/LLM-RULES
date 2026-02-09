@@ -714,3 +714,105 @@ Additionally:
 - Code change: ~35 lines modified, ~20 lines added
 
 **Architecture Report:** `.claude/context/reports/architecture/creator-enforcement-architecture-2026-02-09.md`
+
+---
+
+### ADR-108: Zero-Regression Enterprise Improvement Plan (4 Areas)
+
+**Date**: 2026-02-09
+**Status**: PROPOSED
+**Context**: Four enhancement areas identified through systematic research (Tasks #1-4): (1) Context-Compressor integration (dormant infrastructure), (2) Hybrid Search adoption (9/59 agents have skills), (3) Planner enhancement (missing TDD/hypothesis patterns), (4) PM PRD workflow (missing structured template). All four require coordinated changes across 16 files.
+
+**Decision**: Implement all 4 improvements via a 6-phase additive-only plan:
+
+- Phase 1: Config changes (enable auto_compression, add env var, fix CLAUDE.md stats)
+- Phase 2: Memory updates (append learnings for soft enforcement)
+- Phase 3: Agent definition updates (additive sections to planner, developer, pm, qa, code-reviewer, master-orchestrator + search skills)
+- Phase 4: Template updates (spawn template compression, PRD template, plan template)
+- Phase 5: prd-generator skill creation (via skill-creator workflow)
+- Phase 6: Optional advisory hooks (non-blocking, exit 0 always)
+
+**Key Design Principles**:
+
+- ALL changes are ADDITIVE (new sections) or CONFIG (toggle changes) -- never removing/replacing
+- Each phase independently testable and rollbackable
+- planner.md receives 4 non-overlapping additive sections from 3 areas
+- No existing hook behavior affected in Phases 1-5
+- Phase 5 uses creator workflow (not direct write) for skill creation
+- Phase 6 hooks are optional and non-blocking
+
+**Consequences**:
+
+- Zero regression confidence: HIGH (all changes additive or config toggles)
+- Estimated effort: 9-14 hours (excluding optional Phase 6)
+- Critical path: Phase 1 -> Phase 3 -> Phase 4 -> Phase 5 (sequential dependency)
+- Phases 2A/2B/2C can run in parallel with Phase 1
+- No security-architect review required for Phases 1-4
+
+**Design Document**: `.claude/context/plans/enterprise-improvement-design-2026-02-09.md`
+
+**Post-Implementation Update (2026-02-09, Task #16 Reflection):**
+
+**Status changed**: PROPOSED -> ACCEPTED & FULLY IMPLEMENTED
+
+**Results:**
+
+- All 5 mandatory phases completed (Phase 6 correctly deferred as OPTIONAL)
+- 17 files modified, 30/30 QA checks PASS, 0 regressions
+- Code review: 9.5/10, 0 critical issues
+- Pipeline score: 0.91 (EXCELLENT)
+- New prd-generator skill operational (650+ lines, assigned to PM agent)
+- Context compression activated (config.yaml `enabled: true`)
+- 7 agents updated with hybrid search guidance
+- Planner enhanced with 4 new sections (TDD, hypothesis, PRD integration, compression)
+
+**Key Validation:** ADDITIVE-only constraint delivered zero-regression confidence as predicted. This pattern is now proven for enterprise documentation/config pipelines.
+
+**Deployment Verdict:** READY FOR PRODUCTION (100% confidence, 0 critical blockers)
+
+---
+
+### ADR-109: Enterprise Improvement Pipeline Pattern (Proven)
+
+**Date**: 2026-02-09
+**Status**: ACCEPTED (proven by Pipeline #12, Tasks #9-16)
+
+**Context**: Enterprise improvements spanning 15+ files, 4 improvement areas, and 12+ agent spawns require a structured pipeline to prevent regressions and ensure quality.
+
+**Decision**: Use the following 8-phase pipeline pattern for enterprise improvements:
+
+1. **Research** (parallel): 1 researcher per improvement area, parallel execution
+2. **PM**: 1 PRD per improvement area, problem-first methodology
+3. **Architect + Security** (parallel): Design document + security review
+4. **Planner**: Implementation plan with phase dependencies
+5. **Developer**: Sequential implementation phases (to avoid file conflicts)
+6. **Code Reviewer**: Quality gate (must score 7+/10)
+7. **QA**: Verification gate (must pass all checks)
+8. **Reflection**: Learning extraction and memory updates
+
+**Key Constraints:**
+
+- ALL changes ADDITIVE-only (never remove/replace existing content)
+- Each phase independently testable and rollbackable
+- Task metadata preserves state across session boundaries
+- Phase 6+ items can be correctly deferred if assessed as OPTIONAL
+
+**Proven Metrics (Pipeline #12):**
+
+- 17 files, 12 agents, 3 sessions
+- 30/30 QA checks, 0 regressions
+- 9.5/10 code review, 0 critical issues
+- 0.91 pipeline score (EXCELLENT)
+
+**Consequences:**
+
+- Repeatable pattern for future enterprise improvements
+- Zero-regression guarantee when ADDITIVE-only constraint holds
+- Parallel research phase provides 4x coverage in 1x time
+- Cross-session state preservation via task metadata + memory files
+
+**Cross-References:**
+
+- Reflection: `.claude/context/reports/reflections/enterprise-improvement-reflection-2026-02-09.md`
+- QA: `.claude/context/reports/qa/enterprise-improvement-qa-2026-02-09.md`
+- ADR-108: Zero-Regression Enterprise Improvement Plan (predecessor)

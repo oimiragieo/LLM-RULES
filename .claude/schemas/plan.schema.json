@@ -3,13 +3,16 @@
   "title": "Plan Schema",
   "description": "Schema for project planning documents",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "title": {
       "type": "string",
+      "maxLength": 200,
       "description": "Plan title"
     },
     "version": {
       "type": "string",
+      "maxLength": 50,
       "description": "Plan version"
     },
     "date": {
@@ -19,34 +22,43 @@
     },
     "author": {
       "type": "string",
+      "maxLength": 200,
       "description": "Plan author"
     },
     "objectives": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 500
       },
+      "maxItems": 50,
       "description": "Plan objectives"
     },
     "scope": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "inScope": {
           "type": "array",
           "items": {
-            "type": "string"
-          }
+            "type": "string",
+            "maxLength": 500
+          },
+          "maxItems": 100
         },
         "outOfScope": {
           "type": "array",
           "items": {
-            "type": "string"
-          }
+            "type": "string",
+            "maxLength": 500
+          },
+          "maxItems": 100
         }
       }
     },
     "timeline": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "startDate": {
           "type": "string",
@@ -60,20 +72,24 @@
           "type": "array",
           "items": {
             "type": "object",
+            "additionalProperties": false,
             "properties": {
               "name": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 200
               },
               "date": {
                 "type": "string",
                 "format": "date"
               },
               "description": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 2000
               }
             },
             "required": ["name", "date"]
-          }
+          },
+          "maxItems": 50
         }
       }
     },
@@ -81,15 +97,19 @@
       "type": "array",
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 200
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 2000
           },
           "priority": {
             "type": "string",
@@ -100,22 +120,26 @@
             "enum": ["pending", "in-progress", "completed", "blocked"]
           },
           "assignee": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 200
           },
           "estimatedHours": {
             "type": "number"
           }
         },
         "required": ["id", "title"]
-      }
+      },
+      "maxItems": 500
     },
     "risks": {
       "type": "array",
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           },
           "probability": {
             "type": "string",
@@ -126,10 +150,12 @@
             "enum": ["high", "medium", "low"]
           },
           "mitigation": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1000
           }
         }
-      }
+      },
+      "maxItems": 50
     }
   },
   "required": ["title", "objectives"]

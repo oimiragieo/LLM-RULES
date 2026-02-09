@@ -49,9 +49,7 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 | **Validation**    | Advisory via `validateConfig()`              |
 | **$schema**       | https://json-schema.org/draft/2020-12/schema |
 
-**Purpose:** Validates agent configuration (tools, thinking defaults, phase assignments).
-
-**Note:** Current schema has `additionalProperties: false` which excludes the `model` field used in actual data. Schema should be updated to include `model` field.
+**Purpose:** Validates agent configuration (tools, thinking defaults, phase assignments, model selection).
 
 ---
 
@@ -332,11 +330,11 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ---
 
-### test_plan.schema.json
+### test-plan.schema.json
 
 | Field             | Value                                   |
 | ----------------- | --------------------------------------- |
-| **Path**          | `.claude/schemas/test_plan.schema.json` |
+| **Path**          | `.claude/schemas/test-plan.schema.json` |
 | **Category**      | Testing                                 |
 | **Wiring Status** | DOCS ONLY                               |
 | **Consumer**      | QA agent (documentation reference)      |
@@ -344,8 +342,6 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 | **$schema**       | http://json-schema.org/draft-07/schema# |
 
 **Purpose:** Defines test plan structure for QA workflows.
-
-**Note:** Uses underscore instead of hyphen (documented naming inconsistency).
 
 ---
 
@@ -364,11 +360,11 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ---
 
-### product_requirements.schema.json
+### product-requirements.schema.json
 
 | Field             | Value                                              |
 | ----------------- | -------------------------------------------------- |
-| **Path**          | `.claude/schemas/product_requirements.schema.json` |
+| **Path**          | `.claude/schemas/product-requirements.schema.json` |
 | **Category**      | Planning                                           |
 | **Wiring Status** | DOCS ONLY                                          |
 | **Consumer**      | Product manager agents (documentation reference)   |
@@ -377,15 +373,13 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 **Purpose:** Defines product requirements document (PRD) structure.
 
-**Note:** Uses underscore instead of hyphen (documented naming inconsistency).
-
 ---
 
-### artifact_manifest.schema.json
+### artifact-manifest.schema.json
 
 | Field             | Value                                                   |
 | ----------------- | ------------------------------------------------------- |
-| **Path**          | `.claude/schemas/artifact_manifest.schema.json`         |
+| **Path**          | `.claude/schemas/artifact-manifest.schema.json`         |
 | **Category**      | Project                                                 |
 | **Wiring Status** | DOCS ONLY                                               |
 | **Consumer**      | Artifact lifecycle management (documentation reference) |
@@ -393,8 +387,6 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 | **$schema**       | http://json-schema.org/draft-07/schema#                 |
 
 **Purpose:** Defines artifact manifest structure for lifecycle tracking.
-
-**Note:** Uses underscore instead of hyphen (documented naming inconsistency).
 
 ---
 
@@ -415,11 +407,11 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ---
 
-### system_architecture.schema.json
+### system-architecture.schema.json
 
 | Field             | Value                                             |
 | ----------------- | ------------------------------------------------- |
-| **Path**          | `.claude/schemas/system_architecture.schema.json` |
+| **Path**          | `.claude/schemas/system-architecture.schema.json` |
 | **Category**      | Architecture                                      |
 | **Wiring Status** | DOCS ONLY                                         |
 | **Consumer**      | Architect agent (documentation reference)         |
@@ -428,15 +420,13 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 **Purpose:** Defines system architecture document structure.
 
-**Note:** Uses underscore instead of hyphen (documented naming inconsistency).
-
 ---
 
-### project_brief.schema.json
+### project-brief.schema.json
 
 | Field             | Value                                              |
 | ----------------- | -------------------------------------------------- |
-| **Path**          | `.claude/schemas/project_brief.schema.json`        |
+| **Path**          | `.claude/schemas/project-brief.schema.json`        |
 | **Category**      | Planning                                           |
 | **Wiring Status** | DOCS ONLY                                          |
 | **Consumer**      | Planner/architect agents (documentation reference) |
@@ -444,8 +434,6 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 | **$schema**       | http://json-schema.org/draft-07/schema#            |
 
 **Purpose:** Defines project brief document structure.
-
-**Note:** Uses underscore instead of hyphen (documented naming inconsistency).
 
 ---
 
@@ -464,11 +452,11 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ---
 
-### ux_spec.schema.json
+### ux-spec.schema.json
 
 | Field             | Value                                      |
 | ----------------- | ------------------------------------------ |
-| **Path**          | `.claude/schemas/ux_spec.schema.json`      |
+| **Path**          | `.claude/schemas/ux-spec.schema.json`      |
 | **Category**      | Architecture                               |
 | **Wiring Status** | DOCS ONLY                                  |
 | **Consumer**      | UX/design agents (documentation reference) |
@@ -476,8 +464,6 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 | **$schema**       | http://json-schema.org/draft-07/schema#    |
 
 **Purpose:** Defines UX specification document structure.
-
-**Note:** Uses underscore instead of hyphen (documented naming inconsistency).
 
 ---
 

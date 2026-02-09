@@ -348,7 +348,7 @@ function logAnomaly(anomaly) {
     appendJsonl(ANOMALY_LOG, entry, { maxLines: ANOMALY_LOG_MAX_LINES });
 
     if (process.env.DEBUG_HOOKS) {
-      console.log('[post-tool-unified:anomaly] Logged anomaly:', anomaly.type);
+      console.error('[post-tool-unified:anomaly] Logged anomaly:', anomaly.type);
     }
   } catch (e) {
     if (process.env.DEBUG_HOOKS) {

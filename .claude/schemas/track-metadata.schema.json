@@ -117,6 +117,7 @@
     "classification": {
       "type": "array",
       "description": "Tags for categorizing the track (multiple classifications allowed)",
+      "maxItems": 20,
       "items": {
         "type": "string",
         "enum": [
@@ -135,15 +136,18 @@
     "description": {
       "type": "string",
       "minLength": 10,
+      "maxLength": 2000,
       "description": "User-friendly description of what this track accomplishes",
       "examples": ["Implement user authentication with JWT tokens"]
     },
     "acceptance_criteria": {
       "type": "array",
       "description": "List of acceptance criteria that define when this track is complete",
+      "maxItems": 50,
       "items": {
         "type": "string",
-        "minLength": 1
+        "minLength": 1,
+        "maxLength": 500
       },
       "examples": [
         ["API response time reduced by 50%", "Cache hit rate > 80%", "All tests passing"]
@@ -152,9 +156,11 @@
     "dependencies": {
       "type": "array",
       "description": "Other track IDs that this track depends on (must be completed first)",
+      "maxItems": 50,
       "items": {
         "type": "string",
-        "pattern": "^[a-z0-9_-]+_[0-9]{8}$"
+        "pattern": "^[a-z0-9_-]+_[0-9]{8}$",
+        "maxLength": 100
       },
       "examples": [["redis-setup_20260128", "db-migration_20260127"]]
     },
@@ -173,23 +179,28 @@
     "assignee": {
       "type": "string",
       "description": "Agent or person assigned to this track",
+      "maxLength": 100,
       "examples": ["developer", "qa", "planner"]
     },
     "blocked_by": {
       "type": "array",
       "description": "Track IDs that are blocking this track from progressing",
+      "maxItems": 50,
       "items": {
         "type": "string",
-        "pattern": "^[a-z0-9_-]+_[0-9]{8}$"
+        "pattern": "^[a-z0-9_-]+_[0-9]{8}$",
+        "maxLength": 100
       },
       "examples": [["api-design_20260128"]]
     },
     "blocks": {
       "type": "array",
       "description": "Track IDs that are blocked by this track (cannot start until this completes)",
+      "maxItems": 50,
       "items": {
         "type": "string",
-        "pattern": "^[a-z0-9_-]+_[0-9]{8}$"
+        "pattern": "^[a-z0-9_-]+_[0-9]{8}$",
+        "maxLength": 100
       },
       "examples": [["api-docs_20260130", "integration-tests_20260131"]]
     },
@@ -226,6 +237,7 @@
     "reporting": {
       "type": "object",
       "description": "Reporting metadata for generated analytics reports",
+      "additionalProperties": false,
       "properties": {
         "generatedAt": {
           "type": "string",
@@ -234,17 +246,19 @@
         },
         "lastReportPath": {
           "type": "string",
-          "description": "File path to the most recent analytics report"
+          "description": "File path to the most recent analytics report",
+          "maxLength": 500
         },
         "insights": {
           "type": "array",
           "description": "Auto-generated insights about track performance",
+          "maxItems": 100,
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1000
           }
         }
-      },
-      "additionalProperties": false
+      }
     }
   },
   "additionalProperties": true,

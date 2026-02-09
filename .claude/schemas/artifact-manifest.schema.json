@@ -3,37 +3,47 @@
   "title": "Artifact Manifest Schema",
   "description": "Schema for artifact manifest documents",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "manifestVersion": {
       "type": "string",
+      "maxLength": 50,
       "description": "Version of the manifest format"
     },
     "project": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 100
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 50
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 500
         }
       },
       "required": ["name", "version"]
     },
     "artifacts": {
       "type": "array",
+      "maxItems": 500,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
+            "maxLength": 100,
             "description": "Unique identifier for the artifact"
           },
           "name": {
             "type": "string",
+            "maxLength": 100,
             "description": "Human-readable name"
           },
           "type": {
@@ -43,14 +53,17 @@
           },
           "path": {
             "type": "string",
+            "maxLength": 500,
             "description": "Relative path to the artifact"
           },
           "description": {
             "type": "string",
+            "maxLength": 500,
             "description": "Description of the artifact"
           },
           "version": {
             "type": "string",
+            "maxLength": 50,
             "description": "Version of the artifact"
           },
           "created": {
@@ -65,6 +78,7 @@
           },
           "author": {
             "type": "string",
+            "maxLength": 100,
             "description": "Author/creator of the artifact"
           },
           "status": {
@@ -74,15 +88,19 @@
           },
           "tags": {
             "type": "array",
+            "maxItems": 50,
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 100
             },
             "description": "Tags for categorization"
           },
           "dependencies": {
             "type": "array",
+            "maxItems": 100,
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 100
             },
             "description": "IDs of artifacts this one depends on"
           },
@@ -92,6 +110,7 @@
           },
           "checksum": {
             "type": "string",
+            "maxLength": 100,
             "description": "Checksum for integrity verification"
           },
           "size": {
@@ -104,15 +123,19 @@
     },
     "relationships": {
       "type": "array",
+      "maxItems": 500,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "from": {
             "type": "string",
+            "maxLength": 100,
             "description": "Source artifact ID"
           },
           "to": {
             "type": "string",
+            "maxLength": 100,
             "description": "Target artifact ID"
           },
           "type": {
@@ -122,6 +145,7 @@
           },
           "description": {
             "type": "string",
+            "maxLength": 500,
             "description": "Description of the relationship"
           }
         },
@@ -131,49 +155,65 @@
     },
     "workflows": {
       "type": "array",
+      "maxItems": 100,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 100
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           },
           "steps": {
             "type": "array",
+            "maxItems": 50,
             "items": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "id": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 100
                 },
                 "name": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 100
                 },
                 "description": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 500
                 },
                 "artifacts": {
                   "type": "array",
+                  "maxItems": 100,
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100
                   },
                   "description": "Artifact IDs involved in this step"
                 },
                 "inputs": {
                   "type": "array",
+                  "maxItems": 50,
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100
                   }
                 },
                 "outputs": {
                   "type": "array",
+                  "maxItems": 50,
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100
                   }
                 }
               },
@@ -187,6 +227,7 @@
     },
     "metadata": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "created": {
           "type": "string",
@@ -198,10 +239,12 @@
         },
         "generator": {
           "type": "string",
+          "maxLength": 100,
           "description": "Tool that generated this manifest"
         },
         "environment": {
           "type": "string",
+          "maxLength": 100,
           "description": "Environment where manifest was generated"
         }
       }

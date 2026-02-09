@@ -69,6 +69,7 @@
     },
     "tags": {
       "type": "array",
+      "maxItems": 50,
       "description": "Categorization tags for organizing and searching specifications",
       "items": {
         "type": "string",
@@ -96,6 +97,7 @@
     },
     "stakeholders": {
       "type": "array",
+      "maxItems": 50,
       "description": "List of stakeholders involved in or affected by this specification",
       "items": {
         "type": "string",
@@ -106,6 +108,7 @@
     },
     "dependencies": {
       "type": "array",
+      "maxItems": 100,
       "description": "External or internal dependencies required for implementation",
       "items": {
         "type": "string",
@@ -118,6 +121,7 @@
     },
     "related_specifications": {
       "type": "array",
+      "maxItems": 50,
       "description": "References to related or dependent specifications",
       "items": {
         "type": "string",
@@ -132,11 +136,13 @@
       "properties": {
         "PROJECT_NAME": {
           "type": "string",
-          "description": "Name of the project"
+          "description": "Name of the project",
+          "maxLength": 200
         },
         "AUTHOR": {
           "type": "string",
-          "description": "Author name"
+          "description": "Author name",
+          "maxLength": 100
         },
         "DATE": {
           "type": "string",
@@ -146,11 +152,13 @@
         "VERSION": {
           "type": "string",
           "description": "Version number",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "maxLength": 50
         },
         "FEATURE_NAME": {
           "type": "string",
-          "description": "Name of the feature being specified"
+          "description": "Name of the feature being specified",
+          "maxLength": 200
         }
       },
       "additionalProperties": false

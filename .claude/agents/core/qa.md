@@ -27,15 +27,11 @@ tools:
 # Note: Git operations use Bash tool; sequential-thinking via Skill({ skill: 'sequential-thinking' })
 skills:
   - checklist-generator
-  - chrome-browser
   - code-analyzer
   - code-semantic-search
   - code-structural-search
-  - comprehensive-unit-testing-with-pytest
   - debugging
-  - qa-workflow
   - ripgrep
-  - rule-auditor
   - task-management-protocol
   - tdd
   - test-generator
@@ -275,6 +271,17 @@ Invoke based on task context:
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
+
+## Search Protocol
+
+**PREFER** hybrid search skills over Grep for code discovery:
+
+| What You Need             | Use This               | Example                                                                                            |
+| ------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------- |
+| Test patterns             | code-structural-search | `Skill({ skill: 'code-structural-search', args: 'describe($NAME, function() { $$ }) --lang ts' })` |
+| Test file discovery       | ripgrep                | `Skill({ skill: 'ripgrep', args: '*.test.ts' })`                                                   |
+| Conceptual test patterns  | code-semantic-search   | `Skill({ skill: 'code-semantic-search', args: 'error handling test patterns' })`                   |
+| Advanced regex (fallback) | Grep                   | `Grep({ pattern: 'complex-regex', ... })`                                                          |
 
 ## Memory Protocol (MANDATORY)
 

@@ -5,6 +5,7 @@
   "description": "Schema for validating Claude Code agent definition files",
   "type": "object",
   "required": ["frontmatter", "content"],
+  "unevaluatedProperties": false,
   "properties": {
     "frontmatter": {
       "type": "object",
@@ -13,6 +14,7 @@
         "name": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9-]*$",
+          "maxLength": 100,
           "description": "Agent name in lowercase-with-hyphens format"
         },
         "description": {
@@ -25,10 +27,12 @@
           "oneOf": [
             {
               "type": "array",
-              "items": { "type": "string" }
+              "items": { "type": "string" },
+              "maxItems": 100
             },
             {
               "type": "string",
+              "maxLength": 1000,
               "description": "Comma-separated list of tools"
             }
           ],
@@ -37,6 +41,7 @@
         "disallowedTools": {
           "type": "array",
           "items": { "type": "string" },
+          "maxItems": 100,
           "description": "Tools explicitly denied to the agent"
         },
         "model": {
@@ -66,11 +71,13 @@
         "skills": {
           "type": "array",
           "items": { "type": "string" },
+          "maxItems": 100,
           "description": "Skills to preload for the agent"
         },
         "context_files": {
           "type": "array",
           "items": { "type": "string" },
+          "maxItems": 50,
           "description": "Files to load into agent context"
         },
         "context_strategy": {
@@ -85,17 +92,20 @@
         "hooks": {
           "type": "object",
           "properties": {
-            "PreToolUse": { "type": "array" },
-            "PostToolUse": { "type": "array" },
-            "Stop": { "type": "array" }
+            "PreToolUse": { "type": "array", "maxItems": 50 },
+            "PostToolUse": { "type": "array", "maxItems": 50 },
+            "Stop": { "type": "array", "maxItems": 50 }
           },
+          "unevaluatedProperties": false,
           "description": "Hooks for tool use events"
         }
-      }
+      },
+      "unevaluatedProperties": false
     },
     "content": {
       "type": "string",
       "minLength": 100,
+      "maxLength": 50000,
       "description": "Markdown content with agent instructions"
     }
   },

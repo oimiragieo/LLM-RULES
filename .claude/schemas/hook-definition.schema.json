@@ -5,15 +5,17 @@
   "description": "Schema for validating Claude Code hook definition and registration",
   "type": "object",
   "required": ["name", "type", "purpose"],
+  "unevaluatedProperties": false,
   "properties": {
     "name": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9-]*$",
+      "maxLength": 100,
       "description": "Hook name in lowercase-with-hyphens format"
     },
     "type": {
       "type": "string",
-      "enum": ["PreToolUse", "PostToolUse", "UserPromptSubmit"],
+      "enum": ["PreToolUse", "PostToolUse", "UserPromptSubmit", "Stop"],
       "description": "Hook trigger type"
     },
     "purpose": {
@@ -30,6 +32,7 @@
     },
     "matcher": {
       "type": "string",
+      "maxLength": 500,
       "description": "Regex pattern for matching tool names (e.g., 'Edit|Write|Bash')"
     },
     "priority": {
@@ -51,6 +54,7 @@
     },
     "exitCodes": {
       "type": "object",
+      "unevaluatedProperties": false,
       "properties": {
         "allow": {
           "type": "integer",
@@ -68,11 +72,13 @@
     "agents": {
       "type": "array",
       "items": { "type": "string" },
+      "maxItems": 100,
       "description": "Agents this hook is assigned to"
     },
     "skills": {
       "type": "array",
       "items": { "type": "string" },
+      "maxItems": 100,
       "description": "Skills this hook is associated with"
     }
   },
