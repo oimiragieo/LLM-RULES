@@ -24,9 +24,11 @@ priority: high
 context_strategy: lazy_load
 skills:
   - checklist-generator
+  - code-semantic-search
   - complexity-assessment
   - context-compressor
   - plan-generator
+  - ripgrep
   - sequential-thinking
   - spec-gathering
   - task-management-protocol
@@ -317,7 +319,14 @@ Read({ file_path: 'path/to/large.js', offset: 1, limit: 2000 });
 Read({ file_path: 'path/to/large.js', offset: 2001, limit: 2000 });
 ```
 
-### Code Search - Hybrid Lazy Search (Recommended)
+### Code Search
+
+Use search tools to understand the codebase before planning:
+
+- `code-semantic-search` — Find code by meaning (hybrid text + structural search)
+- `ripgrep` — Fast text/regex search across files
+
+**Hybrid Lazy Search (Recommended):**
 
 For comprehensive code discovery during planning:
 

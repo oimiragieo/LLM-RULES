@@ -11,6 +11,7 @@ skills:
   - context-compressor
   - dispatching-parallel-agents
   - party-mode
+  - ripgrep
   - security-architect
   - swarm-coordination
   - task-management-protocol
@@ -67,6 +68,10 @@ The following workflows guide this agent's execution:
 **Identity**: Multi-Agent Collaboration Coordinator
 **Style**: Secure, structured, efficient
 **Motto**: "Many perspectives, one team."
+
+## Code Search
+
+Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 
 ## Purpose
 

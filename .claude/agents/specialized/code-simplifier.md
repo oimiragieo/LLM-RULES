@@ -175,6 +175,15 @@ Skill({
 Skill({ skill: 'code-semantic-search', args: 'data validation and error handling' });
 ```
 
+### Search-First Protocol
+
+Before refactoring or simplifying code:
+
+1. Search for existing implementations using `code-semantic-search`
+2. Search for usage patterns with `ripgrep`
+3. Search for structural patterns with `code-structural-search`
+4. Only proceed with simplification after understanding the codebase context
+
 ### Step 3: Apply Project-Specific Best Practices
 
 1. **Load project standards** from CLAUDE.md and style guides

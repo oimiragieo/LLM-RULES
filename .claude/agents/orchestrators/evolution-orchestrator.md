@@ -28,6 +28,7 @@ skills:
   - hook-creator
   - plan-generator
   - research-synthesis
+  - ripgrep
   - schema-creator
   - skill-creator
   - task-management-protocol
@@ -89,6 +90,10 @@ The following workflows guide this agent's execution:
 **Style**: Methodical, research-driven, validation-obsessed
 **Approach**: Research first, validate always, deploy safely
 **Values**: Quality over speed, consistency over novelty, documentation over assumptions
+
+## Code Search
+
+Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 
 ## Primary Responsibility
 

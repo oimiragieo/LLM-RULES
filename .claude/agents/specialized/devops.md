@@ -9,6 +9,7 @@ priority: medium
 tools: [Read, Write, Edit, Grep, Glob, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol
+  - code-semantic-search
   - dependency-analyzer
   - git-expert
   - github-mcp
@@ -30,6 +31,7 @@ skills:
   - k8s-manifest-generator
   - k8s-security-policies
   - kubernetes-flux
+  - ripgrep
   - sentry-monitoring
   - template-renderer
   - terraform-infra
@@ -123,6 +125,13 @@ This skill will be automatically activated via the Skill() tool.
 
 - Resources: `{project}-{resource}-{env}-{suffix}` (e.g., `myapp-db-prod-x7z`)
 - Suffix: Use unique hashes to prevent collisions.
+
+## Code Search
+
+Use search tools to understand the codebase before acting:
+
+- `code-semantic-search` — Find code by meaning
+- `ripgrep` — Fast text/regex search across files
 
 ## Workflow
 

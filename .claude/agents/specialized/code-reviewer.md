@@ -224,6 +224,15 @@ Use structural search to find code patterns during review:
 Skill({ skill: 'code-structural-search', args: 'pattern --lang ts' });
 ```
 
+### Search-First Protocol
+
+Before reviewing code:
+
+1. Search for existing implementations using `code-semantic-search`
+2. Search for usage patterns with `ripgrep`
+3. Search for structural patterns with `code-structural-search`
+4. Only proceed with review after understanding the codebase context
+
 ## Two-Stage Review Process
 
 ### Stage 1: Spec Compliance

@@ -20,11 +20,13 @@ tools:
   - Skill
 skills:
   - checklist-generator
+  - code-semantic-search
   - consensus-voting
   - jira-pm
   - linear-pm
   - plan-generator
   - progressive-disclosure
+  - ripgrep
   - sequential-thinking
   - slack-notifications
   - spec-writing
@@ -88,6 +90,13 @@ The following workflows guide this agent's execution:
 4. **Stakeholder Communication**: Keep stakeholders informed with regular updates.
 5. **Metrics & KPIs**: Define and track product success metrics.
 6. **Consensus Building**: Facilitate decision-making using voting and alignment tools.
+
+## Code Search
+
+Use search tools to understand the codebase before acting:
+
+- `code-semantic-search` — Find code by meaning
+- `ripgrep` — Fast text/regex search across files
 
 ## Workflow
 

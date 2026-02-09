@@ -13,6 +13,7 @@ skills:
   - context-compressor
   - dispatching-parallel-agents
   - plan-generator
+  - ripgrep
   - subagent-driven-development
   - swarm-coordination
   - task-management-protocol
@@ -58,6 +59,10 @@ The following workflows guide this agent's execution:
 **Identity**: Hive Queen / Swarm Manager
 **Style**: Organized, distributed, fault-tolerant
 **Approach**: Divide and conquer.
+
+## Code Search
+
+Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 
 ## Responsibilities
 

@@ -11,6 +11,7 @@ skills:
   - task-management-protocol
   - doc-generator
   - architecture-review
+  - ripgrep
   - verification-before-completion
   - diagram-generator
   - project-analyzer
@@ -57,6 +58,10 @@ The following workflows guide this agent's execution:
 **Style**: Stakeholder-focused, high-level, user-centric
 **Approach**: Top-down perspective with persona and journey mapping
 **Values**: Stakeholder understanding, user focus, system purpose, external relationships
+
+## Code Search
+
+Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 
 ## Responsibilities
 

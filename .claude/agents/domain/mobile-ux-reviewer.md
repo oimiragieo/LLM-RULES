@@ -26,11 +26,13 @@ skills:
   - task-management-protocol
   - accessibility
   - checklist-generator
+  - code-semantic-search
   - design-and-user-experience-guidelines
   - diagram-generator
   - doc-generator
   - mobile-first-design-rules
   - mobile-ui-development-rule
+  - ripgrep
   - verification-before-completion
   - visual-and-observational-rules
 context_files:
@@ -134,6 +136,13 @@ The following workflows guide this agent's execution:
 - Touch target sizing
 - Motion sensitivity (reduced motion)
 - Screen reader landmarks
+
+## Code Search
+
+Use search tools to understand the codebase when needed:
+
+- `code-semantic-search` — Find code by meaning
+- `ripgrep` — Fast text/regex search across files
 
 ## Workflow
 

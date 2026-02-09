@@ -18,6 +18,7 @@ tools:
 skills:
   - task-management-protocol
   - context-driven-development
+  - ripgrep
   - track-management
   - workflow-patterns
   - verification-before-completion
@@ -61,6 +62,10 @@ The following workflows guide this agent's execution:
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix
 - Provenance: `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
+
+## Code Search
+
+Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 
 ## Core Responsibilities
 

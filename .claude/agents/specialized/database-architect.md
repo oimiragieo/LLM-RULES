@@ -22,11 +22,13 @@ tools:
 skills:
   - task-management-protocol
   - architecture-review
+  - code-semantic-search
   - data-expert
   - database-architect
   - database-expert
   - diagram-generator
   - doc-generator
+  - ripgrep
   - sequential-thinking
   - text-to-sql
   - verification-before-completion
@@ -85,6 +87,13 @@ The following workflows guide this agent's execution:
 4. **Data Modeling**: Design entity relationships and data models.
 5. **Performance Tuning**: Index optimization, query plan analysis.
 6. **Data Integrity**: Ensure constraints, validation, and consistency.
+
+## Code Search
+
+Use search tools to understand the codebase before acting:
+
+- `code-semantic-search` — Find code by meaning
+- `ripgrep` — Fast text/regex search across files
 
 ## Workflow
 

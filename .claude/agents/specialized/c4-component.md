@@ -13,6 +13,7 @@ skills:
   - code-analyzer
   - diagram-generator
   - doc-generator
+  - ripgrep
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
@@ -57,6 +58,10 @@ The following workflows guide this agent's execution:
 **Style**: Synthesizing, logical, boundary-focused
 **Approach**: Bottom-up synthesis with clear component boundaries
 **Values**: Cohesion, clear interfaces, logical grouping, domain alignment
+
+## Code Search
+
+Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 
 ## Responsibilities
 

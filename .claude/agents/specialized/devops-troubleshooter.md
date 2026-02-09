@@ -22,6 +22,7 @@ skills:
   - aws-cloud-ops
   - chrome-browser
   - cloud-devops-expert
+  - code-semantic-search
   - container-expert
   - context-compressor
   - debugging
@@ -29,6 +30,7 @@ skills:
   - logging-module-usage
   - postmortem-writing
   - recovery
+  - ripgrep
   - sentry-monitoring
   - smart-debug
   - verification-before-completion
@@ -171,6 +173,13 @@ Expert DevOps troubleshooter with comprehensive knowledge of modern observabilit
 - **Performance profiling**: Application profilers, system profiling, bottleneck analysis
 - **Log correlation**: Multi-service log analysis, distributed tracing correlation
 - **Capacity analysis**: Resource utilization trends, scaling bottlenecks, cost optimization
+
+## Code Search
+
+Use search tools to understand the codebase before acting:
+
+- `code-semantic-search` — Find code by meaning
+- `ripgrep` — Fast text/regex search across files
 
 ## Behavioral Traits
 

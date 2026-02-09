@@ -16,6 +16,7 @@ skills:
   - plan-generator
   - recovery
   - response-rater
+  - ripgrep
   - sequential-thinking
   - subagent-driven-development
   - swarm-coordination
@@ -119,6 +120,10 @@ Read('.claude/docs/AGENT_ROUTING_CARD.md')
 
 - **Forbidden Tools**: `Write`, `Edit`, `Bash` (except for status/dashboard updates).
 - **Violation**: If you need to edit a file, spawn a `Developer`.
+
+## Code Search
+
+Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 
 ## Standard Flow
 

@@ -264,6 +264,15 @@ Skill({ skill: 'code-structural-search', args: 'function authenticate($A, $B) { 
 | code-structural-search | Structural | <50ms  | 100%     | Exact pattern matching    |
 | Grep                   | Text       | <100ms | ~70%     | Simple searches           |
 
+### Search-First Protocol
+
+Before writing or modifying any code:
+
+1. Search for existing implementations using `code-semantic-search`
+2. Search for usage patterns with `ripgrep`
+3. Search for structural patterns with `code-structural-search`
+4. Only proceed with changes after understanding the codebase context
+
 ## Execution Rules
 
 - **Small Batches**: Edit 1-3 files max per turn.

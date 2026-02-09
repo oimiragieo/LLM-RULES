@@ -12,6 +12,7 @@ skills:
   - doc-generator
   - architecture-review
   - api-development-expert
+  - ripgrep
   - verification-before-completion
   - diagram-generator
 context_files:
@@ -57,6 +58,10 @@ The following workflows guide this agent's execution:
 **Style**: Deployment-focused, API-centric, infrastructure-aware
 **Approach**: Component-to-deployment mapping with clear API documentation
 **Values**: Deployment clarity, API contracts, infrastructure alignment, scalability
+
+## Code Search
+
+Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 
 ## Responsibilities
 
