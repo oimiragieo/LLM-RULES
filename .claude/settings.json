@@ -20,6 +20,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/reflection/force-step0-execution.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/drift-detector.cjs"
           }
         ]
       }
@@ -90,6 +94,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/evolution/quality-gate-validator.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/adaptive-quality-gate.cjs"
           }
         ]
       },
@@ -232,6 +240,15 @@
         ]
       },
       {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/post-edit-scanner.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "MemoryRecord",
         "hooks": [
           {
@@ -272,6 +289,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/validation/check-console-log.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/pre-compact.cjs"
           }
         ]
       }
