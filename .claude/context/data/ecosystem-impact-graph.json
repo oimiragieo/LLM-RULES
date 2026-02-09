@@ -1,7 +1,347 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Ecosystem impact graph mapping artifact types to their required downstream integrations",
   "lastUpdated": "2026-02-08",
+  "companionMatrix": {
+    "agent": {
+      "required": [
+        {
+          "type": "registry-entry",
+          "check": "json-key-exists",
+          "target": ".claude/context/agent-registry.json",
+          "pattern": "{name}",
+          "description": "Agent must be registered in agent-registry.json"
+        },
+        {
+          "type": "routing-keywords",
+          "check": "grep-in-file",
+          "target": ".claude/lib/routing/routing-table.cjs",
+          "pattern": "{name}",
+          "description": "Agent must have routing keywords in routing-table.cjs"
+        }
+      ],
+      "recommended": [
+        {
+          "type": "skill-assignment",
+          "check": "glob-match",
+          "target": ".claude/skills/**/*{name}*",
+          "pattern": "**/*{name}*",
+          "description": "Agent should have assigned skills"
+        },
+        {
+          "type": "claude-md-entry",
+          "check": "grep-in-file",
+          "target": ".claude/CLAUDE.md",
+          "pattern": "{name}",
+          "description": "Agent should be referenced in CLAUDE.md routing table"
+        }
+      ],
+      "optional": [
+        {
+          "type": "command",
+          "check": "file-exists",
+          "target": ".claude/commands/{name}.md",
+          "pattern": "{name}",
+          "description": "Agent may have a slash command"
+        },
+        {
+          "type": "tests",
+          "check": "glob-match",
+          "target": "tests/**/*{name}*",
+          "pattern": "**/*{name}*",
+          "description": "Agent may have behavior tests"
+        }
+      ]
+    },
+    "skill": {
+      "required": [
+        {
+          "type": "catalog-entry",
+          "check": "grep-in-file",
+          "target": ".claude/context/artifacts/catalogs/skill-catalog.md",
+          "pattern": "{name}",
+          "description": "Skill must be cataloged in skill-catalog.md"
+        },
+        {
+          "type": "agent-assignment",
+          "check": "grep-in-file",
+          "target": ".claude/agents/**/*.md",
+          "pattern": "{name}",
+          "description": "Skill must be assigned to at least one agent"
+        }
+      ],
+      "recommended": [
+        {
+          "type": "command",
+          "check": "file-exists",
+          "target": ".claude/commands/{name}.md",
+          "pattern": "{name}",
+          "description": "Skill should have a user-invocable command"
+        }
+      ],
+      "optional": [
+        {
+          "type": "tests",
+          "check": "glob-match",
+          "target": "tests/**/*{name}*",
+          "pattern": "**/*{name}*",
+          "description": "Skill may have behavior tests"
+        },
+        {
+          "type": "schema",
+          "check": "file-exists",
+          "target": ".claude/schemas/skill-{name}.json",
+          "pattern": "skill-{name}",
+          "description": "Skill may have a JSON schema"
+        }
+      ]
+    },
+    "hook": {
+      "required": [
+        {
+          "type": "settings-registration",
+          "check": "settings-registered",
+          "target": ".claude/settings.json",
+          "pattern": "{name}",
+          "description": "Hook must be registered in settings.json hooks array"
+        },
+        {
+          "type": "enforcement-docs",
+          "check": "grep-in-file",
+          "target": ".claude/docs/@ENFORCEMENT_HOOKS.md",
+          "pattern": "{name}",
+          "description": "Hook must be documented in ENFORCEMENT_HOOKS.md"
+        }
+      ],
+      "recommended": [
+        {
+          "type": "tests",
+          "check": "glob-match",
+          "target": "tests/**/*{name}*",
+          "pattern": "**/*{name}*",
+          "description": "Hook should have behavior tests"
+        }
+      ],
+      "optional": [
+        {
+          "type": "hook-agent-map",
+          "check": "grep-in-file",
+          "target": ".claude/docs/@HOOK_AGENT_MAP.md",
+          "pattern": "{name}",
+          "description": "Hook may be mapped to agents"
+        }
+      ]
+    },
+    "workflow": {
+      "required": [
+        {
+          "type": "workflow-registry",
+          "check": "grep-in-file",
+          "target": ".claude/docs/@ENTERPRISE_WORKFLOWS.md",
+          "pattern": "{name}",
+          "description": "Workflow must be registered in ENTERPRISE_WORKFLOWS.md"
+        }
+      ],
+      "recommended": [
+        {
+          "type": "agent-map",
+          "check": "grep-in-file",
+          "target": ".claude/docs/@WORKFLOW_AGENT_MAP.md",
+          "pattern": "{name}",
+          "description": "Workflow should be mapped to responsible agents"
+        },
+        {
+          "type": "triggering-conditions",
+          "check": "grep-in-file",
+          "target": ".claude/workflows/core/router-decision.md",
+          "pattern": "{name}",
+          "description": "Workflow should have triggering conditions in router-decision.md"
+        }
+      ],
+      "optional": [
+        {
+          "type": "tests",
+          "check": "glob-match",
+          "target": "tests/**/*{name}*",
+          "pattern": "**/*{name}*",
+          "description": "Workflow may have behavior tests"
+        }
+      ]
+    },
+    "command": {
+      "required": [
+        {
+          "type": "skill-linkage",
+          "check": "grep-in-file",
+          "target": ".claude/commands/{name}.md",
+          "pattern": "skill",
+          "description": "Command must reference a backing skill"
+        },
+        {
+          "type": "catalog-entry",
+          "check": "grep-in-file",
+          "target": ".claude/context/artifacts/catalogs/command-catalog.md",
+          "pattern": "{name}",
+          "description": "Command must be cataloged in command-catalog.md"
+        }
+      ],
+      "recommended": [
+        {
+          "type": "claude-md-entry",
+          "check": "grep-in-file",
+          "target": ".claude/CLAUDE.md",
+          "pattern": "{name}",
+          "description": "Command should be referenced in CLAUDE.md Section 7.1"
+        }
+      ],
+      "optional": [
+        {
+          "type": "tests",
+          "check": "glob-match",
+          "target": "tests/**/*{name}*",
+          "pattern": "**/*{name}*",
+          "description": "Command may have invocation tests"
+        }
+      ]
+    },
+    "rule": {
+      "required": [
+        {
+          "type": "rules-directory",
+          "check": "file-exists",
+          "target": ".claude/rules/{name}.md",
+          "pattern": "{name}",
+          "description": "Rule must exist in .claude/rules/ directory"
+        }
+      ],
+      "recommended": [
+        {
+          "type": "agent-acknowledgment",
+          "check": "grep-in-file",
+          "target": ".claude/agents/**/*.md",
+          "pattern": "{name}",
+          "description": "Rule should be acknowledged by relevant agents"
+        },
+        {
+          "type": "enforcement-hook",
+          "check": "grep-in-file",
+          "target": ".claude/hooks/**/*.cjs",
+          "pattern": "{name}",
+          "description": "Rule should have an enforcement hook"
+        }
+      ],
+      "optional": [
+        {
+          "type": "claude-md-entry",
+          "check": "grep-in-file",
+          "target": ".claude/CLAUDE.md",
+          "pattern": "{name}",
+          "description": "Rule may be referenced in CLAUDE.md"
+        }
+      ]
+    },
+    "tool": {
+      "required": [
+        {
+          "type": "tool-catalog-entry",
+          "check": "grep-in-file",
+          "target": ".claude/context/artifacts/catalogs/tool-catalog.md",
+          "pattern": "{name}",
+          "description": "Tool must be cataloged in tool-catalog.md"
+        }
+      ],
+      "recommended": [
+        {
+          "type": "agent-awareness",
+          "check": "grep-in-file",
+          "target": ".claude/agents/**/*.md",
+          "pattern": "{name}",
+          "description": "Tool should be known to relevant agents"
+        },
+        {
+          "type": "tests",
+          "check": "glob-match",
+          "target": "tests/**/*{name}*",
+          "pattern": "**/*{name}*",
+          "description": "Tool should have behavior tests"
+        }
+      ],
+      "optional": [
+        {
+          "type": "documentation",
+          "check": "grep-in-file",
+          "target": ".claude/docs/**/*.md",
+          "pattern": "{name}",
+          "description": "Tool may have reference documentation"
+        }
+      ]
+    },
+    "template": {
+      "required": [
+        {
+          "type": "template-catalog-entry",
+          "check": "grep-in-file",
+          "target": ".claude/context/artifacts/catalogs/template-catalog.md",
+          "pattern": "{name}",
+          "description": "Template must be cataloged in template-catalog.md"
+        }
+      ],
+      "recommended": [
+        {
+          "type": "consuming-skill",
+          "check": "grep-in-file",
+          "target": ".claude/skills/**/SKILL.md",
+          "pattern": "{name}",
+          "description": "Template should be consumed by at least one skill"
+        }
+      ],
+      "optional": [
+        {
+          "type": "tests",
+          "check": "glob-match",
+          "target": "tests/**/*{name}*",
+          "pattern": "**/*{name}*",
+          "description": "Template may have rendering tests"
+        }
+      ]
+    },
+    "schema": {
+      "required": [
+        {
+          "type": "schema-catalog-entry",
+          "check": "grep-in-file",
+          "target": ".claude/context/artifacts/catalogs/schema-catalog.md",
+          "pattern": "{name}",
+          "description": "Schema must be cataloged in schema-catalog.md"
+        }
+      ],
+      "recommended": [
+        {
+          "type": "validating-hook",
+          "check": "grep-in-file",
+          "target": ".claude/hooks/**/*.cjs",
+          "pattern": "{name}",
+          "description": "Schema should have a validation hook"
+        },
+        {
+          "type": "consuming-skill",
+          "check": "grep-in-file",
+          "target": ".claude/skills/**/SKILL.md",
+          "pattern": "{name}",
+          "description": "Schema should be consumed by at least one skill"
+        }
+      ],
+      "optional": [
+        {
+          "type": "tests",
+          "check": "glob-match",
+          "target": "tests/**/*{name}*",
+          "pattern": "**/*{name}*",
+          "description": "Schema may have validation tests"
+        }
+      ]
+    }
+  },
   "artifactTypes": {
     "agent": {
       "mustHave": [
