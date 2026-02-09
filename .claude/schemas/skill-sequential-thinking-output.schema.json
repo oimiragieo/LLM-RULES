@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-sequential-thinking-output.schema.json",
+  "title": "Sequential Thinking Output",
+  "description": "Schema for sequential thinking skill output with chain of thought progression",
+  "type": "object",
+  "required": [
+    "thoughts",
+    "finalHypothesis",
+    "verified"
+  ],
+  "properties": {
+    "thoughts": {
+      "type": "array",
+      "description": "Sequence of thinking steps",
+      "items": {
+        "type": "object",
+        "required": [
+          "thoughtNumber",
+          "thought",
+          "nextThoughtNeeded"
+        ],
+        "properties": {
+          "thoughtNumber": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "thought": {
+            "type": "string",
+            "description": "Current thinking step content"
+          },
+          "totalThoughts": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Estimated total thoughts needed"
+          },
+          "nextThoughtNeeded": {
+            "type": "boolean",
+            "description": "Whether another thought step is needed"
+          },
+          "isRevision": {
+            "type": "boolean",
+            "description": "If this thought revises previous thinking"
+          },
+          "revisesThought": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Which thought number is being reconsidered"
+          },
+          "branchFromThought": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Branching point thought number"
+          },
+          "branchId": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "description": "Identifier for current branch"
+          },
+          "needsMoreThoughts": {
+            "type": "boolean",
+            "description": "If more thoughts needed at the 'end'"
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "finalHypothesis": {
+      "type": "string",
+      "description": "Final solution hypothesis generated"
+    },
+    "verified": {
+      "type": "boolean",
+      "description": "Whether hypothesis was verified against chain of thought"
+    },
+    "branches": {
+      "type": "array",
+      "description": "Alternative branches explored",
+      "items": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string"
+          },
+          "branchPoint": {
+            "type": "integer"
+          },
+          "outcome": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "revisions": {
+      "type": "array",
+      "description": "Revisions made during thinking",
+      "items": {
+        "type": "object",
+        "properties": {
+          "revisedThought": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

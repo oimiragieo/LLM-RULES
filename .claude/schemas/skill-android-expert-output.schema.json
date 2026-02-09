@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Android Expert Output",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "android-expert"
+    },
+    "version": {
+      "type": "string"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "language",
+        "framework",
+        "codeGenerated"
+      ],
+      "properties": {
+        "language": {
+          "const": "Kotlin"
+        },
+        "framework": {
+          "type": "string",
+          "enum": [
+            "Jetpack Compose",
+            "XML Views",
+            "Combined"
+          ]
+        },
+        "androidVersion": {
+          "type": "string",
+          "description": "Minimum Android API level (e.g., '24')"
+        },
+        "codeGenerated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "content"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "componentType": {
+                "type": "string",
+                "enum": [
+                  "composable",
+                  "viewmodel",
+                  "repository",
+                  "entity",
+                  "usecase",
+                  "di",
+                  "other"
+                ]
+              },
+              "annotations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "architecture": {
+          "type": "object",
+          "properties": {
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "MVVM",
+                "MVI",
+                "MVP",
+                "Other"
+              ]
+            },
+            "layers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

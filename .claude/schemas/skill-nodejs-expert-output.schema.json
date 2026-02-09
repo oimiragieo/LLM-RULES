@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Node.js Expert Output",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "nodejs-expert"
+    },
+    "version": {
+      "type": "string"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "language",
+        "framework",
+        "codeGenerated"
+      ],
+      "properties": {
+        "language": {
+          "const": "TypeScript"
+        },
+        "framework": {
+          "type": "string",
+          "enum": [
+            "Express",
+            "NestJS",
+            "Fastify",
+            "Koa",
+            "Other"
+          ]
+        },
+        "codeGenerated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "content"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "moduleType": {
+                "type": "string",
+                "enum": [
+                  "controller",
+                  "service",
+                  "middleware",
+                  "module",
+                  "dto",
+                  "entity",
+                  "other"
+                ]
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "architecture": {
+          "type": "object",
+          "properties": {
+            "modular": {
+              "type": "boolean"
+            },
+            "modules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

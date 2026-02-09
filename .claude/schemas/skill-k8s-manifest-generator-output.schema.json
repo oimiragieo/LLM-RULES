@@ -1,0 +1,226 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-k8s-manifest-generator-output.schema.json",
+  "title": "K8s Manifest Generator Skill Output",
+  "description": "Output schema for Kubernetes manifest generation with best practices and security standards",
+  "type": "object",
+  "required": [
+    "skillName",
+    "timestamp",
+    "result"
+  ],
+  "properties": {
+    "skillName": {
+      "type": "string",
+      "const": "k8s-manifest-generator"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "deployment",
+            "service",
+            "configmap",
+            "secret",
+            "ingress",
+            "statefulset"
+          ]
+        },
+        "manifests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "namespace": {
+                "type": "string"
+              },
+              "yaml": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "resourceLimits": {
+              "type": "boolean"
+            },
+            "probes": {
+              "type": "object",
+              "properties": {
+                "liveness": {
+                  "type": "boolean"
+                },
+                "readiness": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "securityContext": {
+              "type": "object",
+              "properties": {
+                "runAsNonRoot": {
+                  "type": "boolean"
+                },
+                "readOnlyRootFilesystem": {
+                  "type": "boolean"
+                },
+                "capabilities": {
+                  "type": "object"
+                }
+              }
+            },
+            "highAvailability": {
+              "type": "object",
+              "properties": {
+                "replicas": {
+                  "type": "integer"
+                },
+                "podDisruptionBudget": {
+                  "type": "boolean"
+                },
+                "antiAffinity": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "syntaxValid": {
+              "type": "boolean"
+            },
+            "securityChecksPassed": {
+              "type": "boolean"
+            },
+            "bestPracticesFollowed": {
+              "type": "boolean"
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "severity",
+                  "message"
+                ],
+                "properties": {
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "error",
+                      "warning",
+                      "info"
+                    ]
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "manifest": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "securityFindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "finding",
+              "severity"
+            ],
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "manifest": {
+                "type": "string"
+              },
+              "remediation": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "category",
+              "recommendation"
+            ],
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "recommendation": {
+                "type": "string"
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "number"
+        },
+        "kubernetesVersion": {
+          "type": "string"
+        },
+        "agent": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

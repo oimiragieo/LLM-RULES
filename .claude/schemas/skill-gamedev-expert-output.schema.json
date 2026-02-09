@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Game Development Expert Output",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "gamedev-expert"
+    },
+    "version": {
+      "type": "string"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "language",
+        "framework",
+        "codeGenerated"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "enum": [
+            "Ruby",
+            "C#",
+            "C++",
+            "Other"
+          ]
+        },
+        "framework": {
+          "type": "string",
+          "enum": [
+            "DragonRuby",
+            "Unity",
+            "Unreal",
+            "Godot",
+            "Other"
+          ]
+        },
+        "codeGenerated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "content"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "componentType": {
+                "type": "string",
+                "enum": [
+                  "game-logic",
+                  "entity",
+                  "system",
+                  "scene",
+                  "ui",
+                  "asset",
+                  "other"
+                ]
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gameDesign": {
+          "type": "object",
+          "properties": {
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "entities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "performance": {
+          "type": "object",
+          "properties": {
+            "optimizations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

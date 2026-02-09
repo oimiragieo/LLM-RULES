@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-workflow-patterns-output.schema.json",
+  "title": "Workflow Patterns Output",
+  "description": "Schema for TDD workflow patterns with task lifecycle tracking",
+  "type": "object",
+  "required": [
+    "phase",
+    "tasks",
+    "qualityGates",
+    "checkpoints"
+  ],
+  "properties": {
+    "phase": {
+      "type": "string",
+      "enum": [
+        "planning",
+        "implementation",
+        "review",
+        "checkpoint",
+        "complete"
+      ],
+      "description": "Current phase of workflow"
+    },
+    "tasks": {
+      "type": "array",
+      "description": "Tasks with TDD lifecycle tracking",
+      "items": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "status",
+          "lifecycle"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "in_progress",
+              "completed",
+              "skipped",
+              "blocked"
+            ]
+          },
+          "lifecycle": {
+            "type": "object",
+            "properties": {
+              "redComplete": {
+                "type": "boolean"
+              },
+              "greenComplete": {
+                "type": "boolean"
+              },
+              "refactorComplete": {
+                "type": "boolean"
+              },
+              "coverageVerified": {
+                "type": "boolean"
+              }
+            }
+          },
+          "commitSHA": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{7,40}$"
+          },
+          "deviations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "qualityGates": {
+      "type": "object",
+      "required": [
+        "passingTests",
+        "coverage",
+        "styleCompliance"
+      ],
+      "properties": {
+        "passingTests": {
+          "type": "boolean"
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "current": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "target": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "styleCompliance": {
+          "type": "boolean"
+        },
+        "documentation": {
+          "type": "boolean"
+        },
+        "typeSafety": {
+          "type": "boolean"
+        },
+        "lintErrors": {
+          "type": "number",
+          "minimum": 0
+        },
+        "securityAudit": {
+          "type": "boolean"
+        }
+      }
+    },
+    "checkpoints": {
+      "type": "array",
+      "description": "Phase checkpoints with verification status",
+      "items": {
+        "type": "object",
+        "required": [
+          "phase",
+          "status"
+        ],
+        "properties": {
+          "phase": {
+            "type": "string"
+          },
+          "commitSHA": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{7,40}$"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "verified",
+              "rejected"
+            ]
+          },
+          "userApproval": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "gitNotes": {
+      "type": "array",
+      "description": "Rich git notes attached to commits",
+      "items": {
+        "type": "object",
+        "properties": {
+          "commitSHA": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "filesChanged": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "decisions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

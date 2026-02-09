@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Web3 Expert Output",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "web3-expert"
+    },
+    "version": {
+      "type": "string"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "language",
+        "framework",
+        "codeGenerated"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "enum": [
+            "Solidity",
+            "Vyper",
+            "Rust",
+            "Other"
+          ]
+        },
+        "framework": {
+          "type": "string",
+          "enum": [
+            "Hardhat",
+            "Foundry",
+            "Truffle",
+            "Anchor",
+            "Other"
+          ]
+        },
+        "solidityVersion": {
+          "type": "string",
+          "description": "Solidity version (e.g., '0.8.28')"
+        },
+        "codeGenerated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "content"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "contractType": {
+                "type": "string",
+                "enum": [
+                  "token",
+                  "nft",
+                  "defi",
+                  "governance",
+                  "proxy",
+                  "library",
+                  "other"
+                ]
+              },
+              "standards": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "ERC standards implemented (e.g., ERC20, ERC721)"
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "security": {
+          "type": "object",
+          "properties": {
+            "audited": {
+              "type": "boolean"
+            },
+            "vulnerabilities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mitigations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Test files created"
+        },
+        "gasOptimization": {
+          "type": "object",
+          "properties": {
+            "estimatedGas": {
+              "type": "integer"
+            },
+            "optimizations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

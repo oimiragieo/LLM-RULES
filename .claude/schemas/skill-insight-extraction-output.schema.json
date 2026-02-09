@@ -1,0 +1,186 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Insight Extraction Output",
+  "description": "Output schema for insight-extraction skill",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "insight-extraction"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "sessionId",
+        "timestamp",
+        "insights"
+      ],
+      "properties": {
+        "sessionId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "insights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "category",
+              "name",
+              "context",
+              "insight",
+              "impact"
+            ],
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "pattern",
+                  "technical",
+                  "process",
+                  "decision"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "description": "Short name for the insight"
+              },
+              "context": {
+                "type": "string",
+                "description": "When/where this applies"
+              },
+              "insight": {
+                "type": "string",
+                "description": "What was learned"
+              },
+              "example": {
+                "type": "string",
+                "description": "Concrete example"
+              },
+              "impact": {
+                "type": "string",
+                "description": "Why this matters"
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Tags for categorization (code, workflow, architecture)"
+              },
+              "related": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Related decisions, files, or insights"
+              },
+              "scope": {
+                "type": "string",
+                "enum": [
+                  "project-specific",
+                  "universal"
+                ],
+                "description": "Applicability scope"
+              }
+            }
+          }
+        },
+        "patterns": {
+          "type": "object",
+          "properties": {
+            "successful": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "pattern": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "unsuccessful": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "pattern": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "alternative": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "technicalDiscoveries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "discovery": {
+                "type": "string"
+              },
+              "component": {
+                "type": "string"
+              },
+              "implication": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "memoryUpdates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "section",
+              "content"
+            ],
+            "properties": {
+              "file": {
+                "type": "string",
+                "enum": [
+                  "learnings.md",
+                  "decisions.md",
+                  "issues.md"
+                ]
+              },
+              "section": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "Proposed memory file updates"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,203 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Artifact Integrator Output",
+  "description": "Output schema for artifact-integrator skill - integration analysis results",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "artifact-integrator"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "artifactId",
+        "artifactType",
+        "integrationStatus",
+        "mustHave",
+        "shouldHave",
+        "niceToHave"
+      ],
+      "properties": {
+        "artifactId": {
+          "type": "string",
+          "description": "Unique identifier (e.g., 'skill:tdd', 'agent:developer')"
+        },
+        "artifactType": {
+          "type": "string",
+          "enum": [
+            "skill",
+            "agent",
+            "hook",
+            "workflow",
+            "template",
+            "schema"
+          ]
+        },
+        "integrationStatus": {
+          "type": "string",
+          "enum": [
+            "integrated",
+            "partial",
+            "orphaned"
+          ],
+          "description": "Overall integration status"
+        },
+        "mustHave": {
+          "type": "object",
+          "required": [
+            "catalogEntry",
+            "consumers"
+          ],
+          "properties": {
+            "catalogEntry": {
+              "type": "boolean",
+              "description": "Present in catalog/registry"
+            },
+            "consumers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of consumers (agents/workflows/commands)"
+            },
+            "routingKeywords": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Keywords for discovery (agents only)"
+            },
+            "schemaValidation": {
+              "type": "boolean",
+              "description": "Schema exists and validates (if applicable)"
+            }
+          }
+        },
+        "shouldHave": {
+          "type": "object",
+          "properties": {
+            "documentationReference": {
+              "type": "boolean",
+              "description": "Referenced in @files or CLAUDE.md"
+            },
+            "enforcementMechanism": {
+              "type": "boolean",
+              "description": "Hook enforcement exists (hooks only)"
+            },
+            "usageExamples": {
+              "type": "boolean",
+              "description": "Examples present in consumers"
+            },
+            "crossReferences": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Related artifacts"
+            }
+          }
+        },
+        "niceToHave": {
+          "type": "object",
+          "properties": {
+            "testCoverage": {
+              "type": "boolean",
+              "description": "Tests exist for artifact"
+            },
+            "memoryUpdates": {
+              "type": "boolean",
+              "description": "Learnings/decisions recorded"
+            },
+            "templates": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Related templates or examples"
+            },
+            "diagrams": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Visual documentation"
+            }
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "tier",
+              "gap",
+              "recommendation"
+            ],
+            "properties": {
+              "tier": {
+                "type": "string",
+                "enum": [
+                  "must-have",
+                  "should-have",
+                  "nice-to-have"
+                ]
+              },
+              "gap": {
+                "type": "string",
+                "description": "Description of missing integration"
+              },
+              "recommendation": {
+                "type": "string",
+                "description": "How to fix the gap"
+              }
+            }
+          }
+        },
+        "companions": {
+          "type": "object",
+          "properties": {
+            "mustHave": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required companion artifacts"
+            },
+            "shouldHave": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Recommended companions"
+            },
+            "present": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Companions that exist"
+            },
+            "missing": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Companions that should be created"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

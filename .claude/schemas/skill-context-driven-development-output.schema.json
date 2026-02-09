@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Context-Driven Development Output",
+  "description": "Output schema for context-driven-development skill",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "context-driven-development"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "contextArtifacts",
+        "healthCheck"
+      ],
+      "properties": {
+        "contextArtifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "type",
+              "size",
+              "lastUpdated",
+              "health"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Relative path to context artifact"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "config",
+                  "memory",
+                  "agent",
+                  "workflow",
+                  "skill",
+                  "schema"
+                ]
+              },
+              "size": {
+                "type": "integer",
+                "description": "File size in bytes"
+              },
+              "lastUpdated": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "health": {
+                "type": "string",
+                "enum": [
+                  "healthy",
+                  "stale",
+                  "oversized",
+                  "missing"
+                ]
+              }
+            }
+          }
+        },
+        "healthCheck": {
+          "type": "object",
+          "required": [
+            "status",
+            "issues"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "healthy",
+                "warnings",
+                "critical"
+              ]
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "severity",
+                  "artifact",
+                  "issue",
+                  "recommendation"
+                ],
+                "properties": {
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "critical",
+                      "warning",
+                      "info"
+                    ]
+                  },
+                  "artifact": {
+                    "type": "string"
+                  },
+                  "issue": {
+                    "type": "string"
+                  },
+                  "recommendation": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "vocabularyConsistency": {
+          "type": "object",
+          "properties": {
+            "terms": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "term": {
+                    "type": "string"
+                  },
+                  "variants": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "canonical": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "inconsistencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "rotationNeeded": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "artifact": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "recommendedAction": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

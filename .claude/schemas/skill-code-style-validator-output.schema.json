@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/skill-code-style-validator-output.schema.json",
+  "title": "Code Style Validator Skill Output",
+  "description": "Validates output from code-style-validator skill - AST-based style validation",
+  "type": "object",
+  "required": ["skillName", "version", "timestamp", "output"],
+  "properties": {
+    "skillName": {
+      "type": "string",
+      "const": "code-style-validator",
+      "description": "Must be 'code-style-validator' to verify correct skill was used"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Skill version (semantic versioning)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of execution"
+    },
+    "output": {
+      "type": "object",
+      "description": "Style validation results",
+      "required": ["violations", "score", "autoFixable"],
+      "properties": {
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rule", "severity", "file", "line", "message"],
+            "properties": {
+              "rule": {
+                "type": "string",
+                "description": "Style rule identifier"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["error", "warning", "info"]
+              },
+              "file": { "type": "string" },
+              "line": { "type": "number", "minimum": 1 },
+              "column": { "type": "number", "minimum": 1 },
+              "message": { "type": "string" },
+              "suggestion": { "type": "string" },
+              "autoFixable": { "type": "boolean", "default": false },
+              "category": {
+                "type": "string",
+                "enum": ["naming", "indentation", "spacing", "imports", "structure", "comments"]
+              }
+            }
+          },
+          "description": "Style violations found"
+        },
+        "score": {
+          "type": "object",
+          "required": ["overall"],
+          "properties": {
+            "overall": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Overall style compliance score"
+            },
+            "byCategory": {
+              "type": "object",
+              "properties": {
+                "naming": { "type": "number", "minimum": 0, "maximum": 100 },
+                "indentation": { "type": "number", "minimum": 0, "maximum": 100 },
+                "spacing": { "type": "number", "minimum": 0, "maximum": 100 },
+                "imports": { "type": "number", "minimum": 0, "maximum": 100 },
+                "structure": { "type": "number", "minimum": 0, "maximum": 100 },
+                "comments": { "type": "number", "minimum": 0, "maximum": 100 }
+              }
+            }
+          }
+        },
+        "autoFixable": {
+          "type": "object",
+          "required": ["count", "percentage"],
+          "properties": {
+            "count": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Number of violations that can be auto-fixed"
+            },
+            "percentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Percentage of violations that can be auto-fixed"
+            },
+            "rules": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Rules with auto-fix capability"
+            }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "required": ["totalViolations", "filesChecked"],
+          "properties": {
+            "totalViolations": { "type": "number", "minimum": 0 },
+            "errors": { "type": "number", "minimum": 0 },
+            "warnings": { "type": "number", "minimum": 0 },
+            "info": { "type": "number", "minimum": 0 },
+            "filesChecked": { "type": "number", "minimum": 0 },
+            "filesWithViolations": { "type": "number", "minimum": 0 }
+          }
+        },
+        "validationMetadata": {
+          "type": "object",
+          "properties": {
+            "styleGuide": { "type": "string" },
+            "rulesChecked": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "toolsUsed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "version"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "version": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

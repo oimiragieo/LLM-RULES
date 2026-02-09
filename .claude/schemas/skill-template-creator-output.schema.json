@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-template-creator-output.json",
+  "title": "Template Creator Output",
+  "description": "Schema for template creation artifacts",
+  "type": "object",
+  "required": [
+    "templateName",
+    "templatePath",
+    "placeholders",
+    "artifactsCreated"
+  ],
+  "properties": {
+    "templateName": {
+      "type": "string",
+      "description": "Name of created template (kebab-case)",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "templatePath": {
+      "type": "string",
+      "description": "Path to template file",
+      "pattern": "^\\.claude/templates/[a-z]+/"
+    },
+    "templateType": {
+      "type": "string",
+      "enum": [
+        "spawn",
+        "artifact",
+        "code"
+      ],
+      "description": "Template category"
+    },
+    "placeholders": {
+      "type": "array",
+      "description": "Placeholders in template",
+      "items": {
+        "type": "string",
+        "pattern": "^<[A-Z_]+>$"
+      }
+    },
+    "artifactsCreated": {
+      "type": "object",
+      "required": [
+        "templateFile",
+        "catalogEntry",
+        "consumingSkillDoc"
+      ],
+      "properties": {
+        "templateFile": {
+          "type": "boolean"
+        },
+        "catalogEntry": {
+          "type": "boolean"
+        },
+        "consumingSkillDoc": {
+          "type": "boolean"
+        }
+      }
+    },
+    "consumingSkills": {
+      "type": "array",
+      "description": "Skills that use this template",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validationRules": {
+      "type": "array",
+      "description": "Rules for validating template output",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

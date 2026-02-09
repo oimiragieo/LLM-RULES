@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Java Expert Output",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "java-expert"
+    },
+    "version": {
+      "type": "string"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "language",
+        "framework",
+        "codeGenerated"
+      ],
+      "properties": {
+        "language": {
+          "const": "Java"
+        },
+        "framework": {
+          "type": "string",
+          "enum": [
+            "Spring Boot",
+            "Jakarta EE",
+            "Quarkus",
+            "Micronaut",
+            "Other"
+          ]
+        },
+        "javaVersion": {
+          "type": "string",
+          "description": "Java version (e.g., '21')"
+        },
+        "codeGenerated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "content"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "classType": {
+                "type": "string",
+                "enum": [
+                  "controller",
+                  "service",
+                  "repository",
+                  "entity",
+                  "dto",
+                  "config",
+                  "other"
+                ]
+              },
+              "annotations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "modernFeatures": {
+          "type": "object",
+          "properties": {
+            "records": {
+              "type": "integer"
+            },
+            "patternMatching": {
+              "type": "boolean"
+            },
+            "virtualThreads": {
+              "type": "boolean"
+            }
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

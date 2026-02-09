@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-agent-creator-output.json",
+  "title": "Agent Creator Output",
+  "description": "Schema for agent creation artifacts",
+  "type": "object",
+  "required": [
+    "agentName",
+    "agentType",
+    "agentPath",
+    "artifactsCreated",
+    "integrationsCompleted"
+  ],
+  "properties": {
+    "agentName": {
+      "type": "string",
+      "description": "Name of created agent (kebab-case)",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "agentType": {
+      "type": "string",
+      "enum": [
+        "core",
+        "domain",
+        "specialized",
+        "orchestrator"
+      ],
+      "description": "Agent classification"
+    },
+    "agentPath": {
+      "type": "string",
+      "description": "Path to agent file",
+      "pattern": "^\\.claude/agents/(core|domain|specialized|orchestrators)/[a-z][a-z0-9-]*\\.md$"
+    },
+    "model": {
+      "type": "string",
+      "enum": [
+        "haiku",
+        "sonnet",
+        "opus"
+      ],
+      "description": "Configured model for agent"
+    },
+    "artifactsCreated": {
+      "type": "object",
+      "required": [
+        "agentFile",
+        "registryEntry",
+        "routingKeywords"
+      ],
+      "properties": {
+        "agentFile": {
+          "type": "boolean"
+        },
+        "registryEntry": {
+          "type": "boolean"
+        },
+        "routingKeywords": {
+          "type": "boolean"
+        }
+      }
+    },
+    "integrationsCompleted": {
+      "type": "object",
+      "required": [
+        "skillsAssigned",
+        "routingTableUpdated",
+        "catalogUpdated"
+      ],
+      "properties": {
+        "skillsAssigned": {
+          "type": "boolean"
+        },
+        "routingTableUpdated": {
+          "type": "boolean"
+        },
+        "catalogUpdated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "assignedSkills": {
+      "type": "array",
+      "description": "Skills assigned to agent",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 3
+    },
+    "routingKeywords": {
+      "type": "array",
+      "description": "Keywords that route to this agent",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}

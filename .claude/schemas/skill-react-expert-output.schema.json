@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "React Expert Output",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "react-expert"
+    },
+    "version": {
+      "type": "string"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "language",
+        "framework",
+        "codeGenerated"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "enum": [
+            "TypeScript",
+            "JavaScript"
+          ]
+        },
+        "framework": {
+          "const": "React"
+        },
+        "reactVersion": {
+          "type": "string",
+          "description": "React version (e.g., '19')"
+        },
+        "codeGenerated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "content",
+              "componentType"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "componentType": {
+                "type": "string",
+                "enum": [
+                  "functional",
+                  "custom-hook",
+                  "context"
+                ]
+              },
+              "hooks": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Hooks used in component"
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "performance": {
+          "type": "object",
+          "properties": {
+            "memoizedComponents": {
+              "type": "integer"
+            },
+            "customHooks": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

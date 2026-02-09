@@ -1,0 +1,211 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-sentry-monitoring-output.schema.json",
+  "title": "Sentry Monitoring Skill Output",
+  "description": "Output schema for Sentry monitoring configuration and analysis",
+  "type": "object",
+  "required": [
+    "skillName",
+    "timestamp",
+    "result"
+  ],
+  "properties": {
+    "skillName": {
+      "type": "string",
+      "const": "sentry-monitoring"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "configuration",
+            "analysis",
+            "alert-review"
+          ]
+        },
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "dsn": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string"
+            },
+            "sampleRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "tracesSampleRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "releaseTracking": {
+              "type": "boolean"
+            },
+            "userContextEnabled": {
+              "type": "boolean"
+            },
+            "breadcrumbsEnabled": {
+              "type": "boolean"
+            },
+            "beforeSendHook": {
+              "type": "boolean"
+            }
+          }
+        },
+        "errorAnalysis": {
+          "type": "object",
+          "properties": {
+            "totalErrors": {
+              "type": "integer"
+            },
+            "uniqueIssues": {
+              "type": "integer"
+            },
+            "criticalErrors": {
+              "type": "integer"
+            },
+            "topErrors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "message",
+                  "count"
+                ],
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "count": {
+                    "type": "integer"
+                  },
+                  "firstSeen": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "lastSeen": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "performanceMetrics": {
+          "type": "object",
+          "properties": {
+            "avgResponseTime": {
+              "type": "number"
+            },
+            "p95ResponseTime": {
+              "type": "number"
+            },
+            "slowestTransactions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "duration": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "securityFindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "issue",
+              "severity"
+            ],
+            "properties": {
+              "issue": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "remediation": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "category",
+              "recommendation"
+            ],
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "recommendation": {
+                "type": "string"
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "number"
+        },
+        "timeRange": {
+          "type": "string"
+        },
+        "agent": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

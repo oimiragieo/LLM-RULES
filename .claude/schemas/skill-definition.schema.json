@@ -4,7 +4,10 @@
   "title": "Skill Definition Schema",
   "description": "Schema for validating Claude Code skill definitions (SKILL.md frontmatter)",
   "type": "object",
-  "required": ["name", "description"],
+  "required": [
+    "name",
+    "description"
+  ],
   "unevaluatedProperties": false,
   "properties": {
     "name": {
@@ -28,13 +31,22 @@
     },
     "model": {
       "type": "string",
-      "enum": ["sonnet", "opus", "haiku", "inherit"],
+      "enum": [
+        "sonnet",
+        "opus",
+        "haiku",
+        "inherit"
+      ],
       "default": "sonnet",
       "description": "Preferred model for this skill"
     },
     "invoked_by": {
       "type": "string",
-      "enum": ["user", "agent", "both"],
+      "enum": [
+        "user",
+        "agent",
+        "both"
+      ],
       "default": "both",
       "description": "Who can invoke this skill"
     },
@@ -82,13 +94,21 @@
     },
     "error_handling": {
       "type": "string",
-      "enum": ["graceful", "strict", "warn"],
+      "enum": [
+        "graceful",
+        "strict",
+        "warn"
+      ],
       "default": "graceful",
       "description": "How errors are handled"
     },
     "streaming": {
       "type": "string",
-      "enum": ["supported", "required", "disabled"],
+      "enum": [
+        "supported",
+        "required",
+        "disabled"
+      ],
       "default": "supported",
       "description": "Streaming output support"
     },
@@ -107,5 +127,6 @@
       "description": "Original MCP server name if converted",
       "maxLength": 200
     }
-  }
+  },
+  "additionalProperties": false
 }

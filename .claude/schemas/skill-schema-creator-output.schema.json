@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-schema-creator-output.json",
+  "title": "Schema Creator Output",
+  "description": "Schema for schema creation artifacts",
+  "type": "object",
+  "required": [
+    "schemaName",
+    "schemaPath",
+    "schemaType",
+    "artifactsCreated"
+  ],
+  "properties": {
+    "schemaName": {
+      "type": "string",
+      "description": "Name of created schema",
+      "pattern": "^[a-z][a-z0-9-]*\\.schema\\.json$"
+    },
+    "schemaPath": {
+      "type": "string",
+      "description": "Path to schema file",
+      "pattern": "^\\.claude/schemas/[a-z][a-z0-9-]*\\.schema\\.json$"
+    },
+    "schemaType": {
+      "type": "string",
+      "enum": [
+        "skill-output",
+        "agent-config",
+        "hook-protocol",
+        "task-metadata",
+        "custom"
+      ],
+      "description": "Schema category"
+    },
+    "schemaId": {
+      "type": "string",
+      "format": "uri",
+      "description": "Unique $id for schema"
+    },
+    "artifactsCreated": {
+      "type": "object",
+      "required": [
+        "schemaFile",
+        "catalogEntry",
+        "consumingComponentDoc"
+      ],
+      "properties": {
+        "schemaFile": {
+          "type": "boolean"
+        },
+        "catalogEntry": {
+          "type": "boolean"
+        },
+        "consumingComponentDoc": {
+          "type": "boolean"
+        }
+      }
+    },
+    "integrationsCompleted": {
+      "type": "object",
+      "required": [
+        "validated",
+        "requiredFieldsDefined",
+        "descriptionsComplete"
+      ],
+      "properties": {
+        "validated": {
+          "type": "boolean",
+          "description": "Schema validates correctly"
+        },
+        "requiredFieldsDefined": {
+          "type": "boolean"
+        },
+        "descriptionsComplete": {
+          "type": "boolean"
+        }
+      }
+    },
+    "consumingComponents": {
+      "type": "array",
+      "description": "Components that use this schema",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requiredFields": {
+      "type": "array",
+      "description": "Required fields in schema",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

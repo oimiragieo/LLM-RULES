@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/skill-code-structural-search-output.schema.json",
+  "title": "Code Structural Search Skill Output",
+  "description": "Validates output from code-structural-search skill - AST-based pattern matching",
+  "type": "object",
+  "required": ["skillName", "version", "timestamp", "output"],
+  "properties": {
+    "skillName": {
+      "type": "string",
+      "const": "code-structural-search",
+      "description": "Must be 'code-structural-search' to verify correct skill was used"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Skill version (semantic versioning)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of execution"
+    },
+    "output": {
+      "type": "object",
+      "description": "Structural search results",
+      "required": ["matches", "patterns", "astNodes"],
+      "properties": {
+        "matches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["file", "lineStart", "pattern", "code"],
+            "properties": {
+              "file": { "type": "string" },
+              "lineStart": { "type": "number", "minimum": 1 },
+              "lineEnd": { "type": "number", "minimum": 1 },
+              "column": { "type": "number", "minimum": 1 },
+              "pattern": { "type": "string" },
+              "code": { "type": "string" },
+              "nodeType": { "type": "string" },
+              "context": { "type": "string" }
+            }
+          },
+          "description": "Structural pattern matches found"
+        },
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["pattern", "matchCount"],
+            "properties": {
+              "pattern": { "type": "string" },
+              "matchCount": { "type": "number", "minimum": 0 },
+              "description": { "type": "string" },
+              "files": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "description": "Patterns searched and their match counts"
+        },
+        "astNodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["nodeType", "count"],
+            "properties": {
+              "nodeType": {
+                "type": "string",
+                "description": "AST node type (e.g., FunctionDeclaration, ClassDeclaration)"
+              },
+              "count": { "type": "number", "minimum": 0 },
+              "examples": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["file", "line"],
+                  "properties": {
+                    "file": { "type": "string" },
+                    "line": { "type": "number", "minimum": 1 },
+                    "snippet": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "description": "AST node types found"
+        },
+        "searchMetadata": {
+          "type": "object",
+          "properties": {
+            "query": { "type": "string" },
+            "language": { "type": "string" },
+            "tool": {
+              "type": "string",
+              "enum": ["ast-grep", "tree-sitter", "babel"]
+            },
+            "filesScanned": { "type": "number", "minimum": 0 },
+            "searchDurationMs": { "type": "number", "minimum": 0 }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "required": ["totalMatches", "filesMatched"],
+          "properties": {
+            "totalMatches": { "type": "number", "minimum": 0 },
+            "filesMatched": { "type": "number", "minimum": 0 },
+            "patternsMatched": { "type": "number", "minimum": 0 },
+            "uniqueNodeTypes": { "type": "number", "minimum": 0 }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

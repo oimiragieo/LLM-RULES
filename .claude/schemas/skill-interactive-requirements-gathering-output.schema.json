@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "interactive-requirements-gathering Output Schema",
+  "description": "Output structure for interactive requirements gathering",
+  "type": "object",
+  "required": [
+    "questionsAsked",
+    "answers",
+    "generatedContent"
+  ],
+  "properties": {
+    "questionsAsked": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "question",
+          "type",
+          "response"
+        ],
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "additive",
+              "exclusive"
+            ]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "response": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "answers": {
+      "type": "object",
+      "description": "Key-value pairs of answers extracted from responses",
+      "additionalProperties": true
+    },
+    "generatedContent": {
+      "type": "string",
+      "description": "Content generated from selected answers only"
+    },
+    "userApproved": {
+      "type": "boolean",
+      "description": "Whether user approved the generated content"
+    },
+    "stateFile": {
+      "type": "string",
+      "description": "Path to state persistence file for resuming"
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

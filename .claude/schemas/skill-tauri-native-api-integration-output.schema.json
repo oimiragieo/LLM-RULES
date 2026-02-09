@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-tauri-native-api-integration-output.schema.json",
+  "title": "Tauri Native API Integration Skill Output",
+  "description": "Output schema for Tauri native API integration with type safety and security",
+  "type": "object",
+  "required": [
+    "skillName",
+    "timestamp",
+    "result"
+  ],
+  "properties": {
+    "skillName": {
+      "type": "string",
+      "const": "tauri-native-api-integration"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "command-setup",
+            "ipc-review",
+            "security-audit"
+          ]
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "category",
+              "recommendation"
+            ],
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "recommendation": {
+                "type": "string"
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              }
+            }
+          }
+        },
+        "securityFindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "finding",
+              "severity"
+            ],
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "remediation": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "number"
+        },
+        "tauriVersion": {
+          "type": "string"
+        },
+        "agent": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

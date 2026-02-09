@@ -1,0 +1,237 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Plan Generator Output",
+  "description": "Validates output from plan-generator skill - structured executable plans",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "plan-generator"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "planId",
+        "title",
+        "executiveSummary",
+        "objectives",
+        "phases",
+        "risks",
+        "timelineSummary"
+      ],
+      "properties": {
+        "planId": {
+          "type": "string",
+          "description": "Unique plan identifier",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "Plan title",
+          "minLength": 5,
+          "maxLength": 100
+        },
+        "executiveSummary": {
+          "type": "string",
+          "description": "2-3 sentence overview",
+          "minLength": 50,
+          "maxLength": 500
+        },
+        "objectives": {
+          "type": "array",
+          "description": "Clear measurable goals",
+          "minItems": 1,
+          "maxItems": 7,
+          "items": {
+            "type": "string",
+            "minLength": 10
+          }
+        },
+        "phases": {
+          "type": "array",
+          "description": "Execution phases (<=7 total)",
+          "minItems": 1,
+          "maxItems": 7,
+          "items": {
+            "type": "object",
+            "required": [
+              "phaseNumber",
+              "title",
+              "dependencies",
+              "parallelOk",
+              "tasks",
+              "errorHandling",
+              "verificationGate"
+            ],
+            "properties": {
+              "phaseNumber": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "title": {
+                "type": "string",
+                "minLength": 5
+              },
+              "dependencies": {
+                "type": "array",
+                "description": "Phase numbers this depends on, or empty for no deps",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "parallelOk": {
+                "type": "string",
+                "enum": [
+                  "Yes",
+                  "No",
+                  "Partial"
+                ],
+                "description": "Can tasks run concurrently?"
+              },
+              "tasks": {
+                "type": "array",
+                "description": "Executable tasks (<=7 per phase)",
+                "minItems": 1,
+                "maxItems": 7,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "taskId",
+                    "description",
+                    "timeEstimate",
+                    "command",
+                    "verify"
+                  ],
+                  "properties": {
+                    "taskId": {
+                      "type": "string",
+                      "description": "Task ID in N.M format",
+                      "pattern": "^\\d+\\.\\d+$"
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 10
+                    },
+                    "timeEstimate": {
+                      "type": "string",
+                      "description": "Time estimate with unit",
+                      "pattern": "^~?\\d+\\s?(min|hour|hr)s?$"
+                    },
+                    "command": {
+                      "type": "string",
+                      "description": "Executable command",
+                      "minLength": 5
+                    },
+                    "verify": {
+                      "type": "string",
+                      "description": "Command to verify success",
+                      "minLength": 5
+                    },
+                    "rollback": {
+                      "type": "string",
+                      "description": "Command to undo (if destructive)"
+                    },
+                    "parallelOk": {
+                      "type": "boolean",
+                      "description": "Can run concurrently with other tasks?"
+                    }
+                  }
+                }
+              },
+              "errorHandling": {
+                "type": "string",
+                "description": "What to do if tasks fail",
+                "minLength": 20
+              },
+              "verificationGate": {
+                "type": "string",
+                "description": "Commands to run before proceeding to next phase",
+                "minLength": 10
+              }
+            }
+          }
+        },
+        "risks": {
+          "type": "array",
+          "description": "Identified risks with mitigation",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "required": [
+              "risk",
+              "impact",
+              "mitigation"
+            ],
+            "properties": {
+              "risk": {
+                "type": "string",
+                "minLength": 10
+              },
+              "impact": {
+                "type": "string",
+                "enum": [
+                  "High",
+                  "Medium",
+                  "Low"
+                ]
+              },
+              "mitigation": {
+                "type": "string",
+                "minLength": 10
+              },
+              "rollback": {
+                "type": "string",
+                "description": "Rollback command if risk occurs"
+              }
+            }
+          }
+        },
+        "timelineSummary": {
+          "type": "object",
+          "required": [
+            "totalPhases",
+            "totalTasks",
+            "estimatedTime"
+          ],
+          "properties": {
+            "totalPhases": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7
+            },
+            "totalTasks": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "estimatedTime": {
+              "type": "string",
+              "description": "Total estimated time",
+              "pattern": "^\\d+\\s?(min|hour|hr)s?$"
+            },
+            "parallelPotential": {
+              "type": "string",
+              "description": "How much can be parallelized",
+              "enum": [
+                "None",
+                "Low",
+                "Medium",
+                "High"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

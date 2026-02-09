@@ -1,0 +1,283 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Architecture Review Output",
+  "description": "Validates output from architecture-review skill",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "architecture-review"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "architectureAssessment",
+        "antiPatterns",
+        "nfrCompliance",
+        "riskAnalysis",
+        "recommendations"
+      ],
+      "properties": {
+        "architectureAssessment": {
+          "type": "object",
+          "required": [
+            "overallRating",
+            "summary"
+          ],
+          "properties": {
+            "overallRating": {
+              "type": "string",
+              "enum": [
+                "strong",
+                "adequate",
+                "weak",
+                "critical-issues"
+              ],
+              "description": "Overall architecture quality"
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 50,
+              "description": "Executive summary of architecture quality"
+            }
+          }
+        },
+        "antiPatterns": {
+          "type": "array",
+          "description": "Detected anti-patterns",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "severity",
+              "description",
+              "location",
+              "fix"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Anti-pattern name"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "minLength": 20,
+                "description": "What the anti-pattern is"
+              },
+              "location": {
+                "type": "string",
+                "description": "Where in the design this occurs"
+              },
+              "impact": {
+                "type": "string",
+                "description": "Impact on system"
+              },
+              "fix": {
+                "type": "string",
+                "minLength": 20,
+                "description": "How to fix it"
+              }
+            }
+          }
+        },
+        "nfrCompliance": {
+          "type": "object",
+          "required": [
+            "compliant",
+            "categories"
+          ],
+          "properties": {
+            "compliant": {
+              "type": "boolean",
+              "description": "Does design meet all NFRs?"
+            },
+            "categories": {
+              "type": "array",
+              "description": "NFR categories reviewed",
+              "items": {
+                "type": "object",
+                "required": [
+                  "category",
+                  "requirement",
+                  "designApproach",
+                  "compliant"
+                ],
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "performance",
+                      "security",
+                      "scalability",
+                      "availability",
+                      "maintainability"
+                    ]
+                  },
+                  "requirement": {
+                    "type": "string",
+                    "description": "The NFR requirement"
+                  },
+                  "designApproach": {
+                    "type": "string",
+                    "description": "How design addresses this NFR"
+                  },
+                  "compliant": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "partial",
+                      "no"
+                    ]
+                  },
+                  "gaps": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Gaps if not fully compliant"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "riskAnalysis": {
+          "type": "array",
+          "description": "Technical risks identified",
+          "items": {
+            "type": "object",
+            "required": [
+              "risk",
+              "impact",
+              "probability",
+              "mitigation"
+            ],
+            "properties": {
+              "risk": {
+                "type": "string",
+                "description": "Risk description"
+              },
+              "impact": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "probability": {
+                "type": "string",
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "mitigation": {
+                "type": "string",
+                "description": "Mitigation strategy"
+              },
+              "contingency": {
+                "type": "string",
+                "description": "Contingency plan if risk occurs"
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "description": "Prioritized recommendations",
+          "items": {
+            "type": "object",
+            "required": [
+              "priority",
+              "recommendation",
+              "rationale"
+            ],
+            "properties": {
+              "priority": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Priority ranking (1 = highest)"
+              },
+              "recommendation": {
+                "type": "string",
+                "minLength": 20,
+                "description": "What to change"
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 20,
+                "description": "Why this change is needed"
+              },
+              "effort": {
+                "type": "string",
+                "enum": [
+                  "trivial",
+                  "small",
+                  "medium",
+                  "large"
+                ],
+                "description": "Implementation effort"
+              }
+            }
+          }
+        },
+        "tradeoffs": {
+          "type": "array",
+          "description": "Documented design trade-offs",
+          "items": {
+            "type": "object",
+            "required": [
+              "decision",
+              "advantages",
+              "disadvantages"
+            ],
+            "properties": {
+              "decision": {
+                "type": "string",
+                "description": "The design decision"
+              },
+              "advantages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "disadvantages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rationale": {
+                "type": "string",
+                "description": "Why this trade-off was chosen"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

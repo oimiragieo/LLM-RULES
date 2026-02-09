@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Thinking Tools Output",
+  "description": "Output schema for thinking-tools skill",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "thinking-tools"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "checkpoint",
+        "timestamp",
+        "result"
+      ],
+      "properties": {
+        "checkpoint": {
+          "type": "string",
+          "enum": [
+            "collected-information",
+            "task-adherence",
+            "completion"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "result": {
+          "type": "object",
+          "required": [
+            "passed",
+            "findings"
+          ],
+          "properties": {
+            "passed": {
+              "type": "boolean"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "question",
+                  "answer",
+                  "concern"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "answer": {
+                    "type": "string"
+                  },
+                  "concern": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "action": {
+              "type": "string",
+              "description": "What to do based on checkpoint result"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/skill-best-practices-guidelines-output.schema.json",
+  "title": "Best Practices Guidelines Skill Output",
+  "description": "Validates output from best-practices-guidelines skill - Compliance checking and recommendations",
+  "type": "object",
+  "required": ["skillName", "version", "timestamp", "output"],
+  "properties": {
+    "skillName": {
+      "type": "string",
+      "const": "best-practices-guidelines",
+      "description": "Must be 'best-practices-guidelines' to verify correct skill was used"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Skill version (semantic versioning)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of execution"
+    },
+    "output": {
+      "type": "object",
+      "description": "Best practices compliance results",
+      "required": ["compliance", "violations", "recommendations"],
+      "properties": {
+        "compliance": {
+          "type": "object",
+          "required": ["overall", "categories"],
+          "properties": {
+            "overall": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Overall compliance percentage"
+            },
+            "categories": {
+              "type": "object",
+              "properties": {
+                "codeOrganization": { "type": "number", "minimum": 0, "maximum": 100 },
+                "naming": { "type": "number", "minimum": 0, "maximum": 100 },
+                "errorHandling": { "type": "number", "minimum": 0, "maximum": 100 },
+                "testing": { "type": "number", "minimum": 0, "maximum": 100 },
+                "documentation": { "type": "number", "minimum": 0, "maximum": 100 },
+                "security": { "type": "number", "minimum": 0, "maximum": 100 }
+              }
+            }
+          }
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["guideline", "severity", "file", "description"],
+            "properties": {
+              "guideline": {
+                "type": "string",
+                "description": "Best practice guideline violated"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "file": { "type": "string" },
+              "line": { "type": "number", "minimum": 1 },
+              "description": { "type": "string" },
+              "correctExample": { "type": "string" },
+              "reference": {
+                "type": "string",
+                "format": "uri",
+                "description": "Link to guideline documentation"
+              }
+            }
+          },
+          "description": "Best practice violations found"
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["priority", "guideline", "action"],
+            "properties": {
+              "priority": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "guideline": { "type": "string" },
+              "action": { "type": "string" },
+              "benefit": { "type": "string" },
+              "effort": {
+                "type": "string",
+                "enum": ["low", "medium", "high"]
+              },
+              "files": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "description": "Improvement recommendations"
+        },
+        "compliantPatterns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["pattern", "file"],
+            "properties": {
+              "pattern": { "type": "string" },
+              "file": { "type": "string" },
+              "line": { "type": "number", "minimum": 1 },
+              "description": { "type": "string" }
+            }
+          },
+          "description": "Examples of compliant patterns found"
+        },
+        "guidelinesChecked": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Guidelines evaluated"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/generic-skill-output-base.schema.json",
+  "title": "Generic Skill Output Base",
+  "description": "Base schema for skills without domain-specific output validation. Skills using this schema intentionally accept any structured output. When a skill develops domain-specific output needs, replace the $ref with a full schema.",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data. This base schema accepts any properties. Override with domain-specific schema when output structure is known.",
+      "minProperties": 0
+    }
+  },
+  "additionalProperties": false
+}

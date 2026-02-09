@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/skill-variant-analysis-output.schema.json",
+  "title": "Variant Analysis Skill Output",
+  "description": "Verifiable output from the variant-analysis skill proving pattern-based vulnerability discovery occurred",
+  "type": "object",
+  "required": [
+    "skill_name",
+    "seed_vulnerability",
+    "variants_found",
+    "variants",
+    "timestamp"
+  ],
+  "properties": {
+    "skill_name": {
+      "type": "string",
+      "const": "variant-analysis",
+      "description": "Must be 'variant-analysis' to verify correct skill was used"
+    },
+    "seed_vulnerability": {
+      "type": "object",
+      "required": ["id", "bug_class", "cwe", "pattern_description"],
+      "properties": {
+        "id": { "type": "string", "description": "CVE ID, bug report ID, or internal identifier" },
+        "bug_class": { "type": "string", "description": "Vulnerability class (e.g., SQL injection, XSS)" },
+        "cwe": { "type": "string", "description": "CWE identifier" },
+        "pattern_description": { "type": "string", "description": "Abstract description of the vulnerable pattern" },
+        "source_file": { "type": "string", "description": "File containing the original vulnerability" },
+        "source_line": { "type": "number", "minimum": 1, "description": "Line number of original vulnerability" }
+      },
+      "additionalProperties": false
+    },
+    "analysis_scope": {
+      "type": "object",
+      "properties": {
+        "repositories": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Repositories scanned"
+        },
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Languages analyzed"
+        },
+        "tools_used": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["codeql", "semgrep", "ast-grep", "manual"] },
+          "description": "Analysis tools used"
+        }
+      },
+      "additionalProperties": false
+    },
+    "variants_found": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total number of variants discovered"
+    },
+    "variants": {
+      "type": "array",
+      "description": "Discovered variant instances",
+      "items": {
+        "type": "object",
+        "required": ["variant_id", "file", "line", "confidence", "similarity_level"],
+        "properties": {
+          "variant_id": { "type": "string", "description": "Unique variant identifier (e.g., V-001)" },
+          "file": { "type": "string", "description": "File containing the variant" },
+          "line": { "type": "number", "minimum": 1, "description": "Line number" },
+          "confidence": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] },
+          "similarity_level": {
+            "type": "string",
+            "enum": ["exact", "local", "structural", "semantic"],
+            "description": "How structurally similar to the seed"
+          },
+          "exploitability": {
+            "type": "string",
+            "enum": ["CONFIRMED", "LIKELY", "NEEDS_INVESTIGATION", "UNLIKELY"],
+            "description": "Assessment of exploitability"
+          },
+          "description": { "type": "string", "description": "Description of the variant" },
+          "remediation": { "type": "string", "description": "Suggested fix" },
+          "false_positive": { "type": "boolean", "default": false }
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "critical_variants": { "type": "number", "minimum": 0 },
+        "high_confidence": { "type": "number", "minimum": 0 },
+        "medium_confidence": { "type": "number", "minimum": 0 },
+        "low_confidence": { "type": "number", "minimum": 0 },
+        "false_positives": { "type": "number", "minimum": 0 },
+        "estimated_remediation_hours": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of analysis execution"
+    }
+  },
+  "additionalProperties": false
+}

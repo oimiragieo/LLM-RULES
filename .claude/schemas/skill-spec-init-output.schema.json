@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "spec-init Output Schema",
+  "description": "Output structure for spec-init skill execution",
+  "type": "object",
+  "required": [
+    "specFile",
+    "trackId",
+    "type",
+    "questionsAsked",
+    "validationResult"
+  ],
+  "properties": {
+    "specFile": {
+      "type": "string",
+      "description": "Path to generated spec file",
+      "pattern": "^\\.claude/context/artifacts/specs/[a-z0-9-]+-spec-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.md$"
+    },
+    "trackId": {
+      "type": "string",
+      "description": "Auto-generated tracking ID",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "feature",
+        "bug",
+        "chore",
+        "refactor",
+        "docs"
+      ],
+      "description": "Detected spec type"
+    },
+    "questionsAsked": {
+      "type": "integer",
+      "description": "Number of questions asked before optimal stop",
+      "minimum": 1,
+      "maximum": 12
+    },
+    "validationResult": {
+      "type": "object",
+      "required": [
+        "isValid",
+        "missingSections"
+      ],
+      "properties": {
+        "isValid": {
+          "type": "boolean",
+          "description": "Whether spec passed validation"
+        },
+        "missingSections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of required sections that are missing"
+        }
+      }
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Suggested next steps (e.g., invoke plan-generator)"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "new",
+            "in_progress",
+            "completed"
+          ],
+          "default": "new"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,278 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Session Handoff Output",
+  "description": "Output schema for session-handoff skill",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "session-handoff"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "sessionId",
+        "timestamp",
+        "context",
+        "currentState",
+        "progress",
+        "nextStep",
+        "keyFiles"
+      ],
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "Unique session identifier"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "context": {
+          "type": "object",
+          "required": [
+            "taskId",
+            "subject",
+            "phase"
+          ],
+          "properties": {
+            "taskId": {
+              "type": "string",
+              "description": "Associated task ID"
+            },
+            "subject": {
+              "type": "string",
+              "description": "What's being worked on"
+            },
+            "phase": {
+              "type": "string",
+              "description": "Current phase (design/implement/test/review)"
+            },
+            "complexity": {
+              "type": "string",
+              "enum": [
+                "trivial",
+                "low",
+                "medium",
+                "high",
+                "epic"
+              ]
+            }
+          }
+        },
+        "currentState": {
+          "type": "object",
+          "required": [
+            "status",
+            "description"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "in_progress",
+                "blocked",
+                "paused",
+                "ready_for_review"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "description": "Exact state description (not vague)"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "uncommittedChanges": {
+              "type": "boolean"
+            },
+            "lastCommand": {
+              "type": "string",
+              "description": "Last command executed"
+            }
+          }
+        },
+        "progress": {
+          "type": "object",
+          "required": [
+            "completed",
+            "evidence"
+          ],
+          "properties": {
+            "completed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "item",
+                  "evidence"
+                ],
+                "properties": {
+                  "item": {
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "percentComplete": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "nextStep": {
+          "type": "object",
+          "required": [
+            "action",
+            "command"
+          ],
+          "properties": {
+            "action": {
+              "type": "string",
+              "description": "Single immediate next action (not list)"
+            },
+            "command": {
+              "type": "string",
+              "description": "Command to execute for next step"
+            },
+            "expectedOutcome": {
+              "type": "string"
+            }
+          }
+        },
+        "keyFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "purpose"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Absolute file path"
+              },
+              "purpose": {
+                "type": "string",
+                "description": "Why this file is important"
+              },
+              "modified": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "decisionsMade": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "decision",
+              "rationale"
+            ],
+            "properties": {
+              "decision": {
+                "type": "string"
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "alternatives": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "blocker",
+              "type",
+              "needsFrom"
+            ],
+            "properties": {
+              "blocker": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "dependency",
+                  "permission",
+                  "information",
+                  "external"
+                ]
+              },
+              "needsFrom": {
+                "type": "string"
+              },
+              "workaround": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "artifacts": {
+          "type": "object",
+          "properties": {
+            "created": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "modified": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "deleted": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "verificationCommands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "string"
+              },
+              "purpose": {
+                "type": "string"
+              },
+              "expectedOutput": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

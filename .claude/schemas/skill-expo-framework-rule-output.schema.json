@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-expo-framework-rule-output.schema.json",
+  "title": "Expo Framework Rule Skill Output",
+  "description": "Output schema for Expo Framework development including routing, native modules, and EAS",
+  "type": "object",
+  "required": [
+    "skillName",
+    "timestamp",
+    "result"
+  ],
+  "properties": {
+    "skillName": {
+      "type": "string",
+      "const": "expo-framework-rule"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "project-setup",
+            "routing",
+            "native-module",
+            "optimization"
+          ]
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "category",
+              "recommendation"
+            ],
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "recommendation": {
+                "type": "string"
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "number"
+        },
+        "expoSdkVersion": {
+          "type": "string"
+        },
+        "agent": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

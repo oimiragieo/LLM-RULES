@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/skill-tdd-output.schema.json",
+  "title": "TDD Skill Output",
+  "description": "Validates output from tdd skill invocation - Test-Driven Development cycle verification",
+  "type": "object",
+  "required": ["skillName", "version", "timestamp", "output"],
+  "properties": {
+    "skillName": {
+      "type": "string",
+      "const": "tdd",
+      "description": "Must be 'tdd' to verify correct skill was used"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Skill version (semantic versioning)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of execution"
+    },
+    "output": {
+      "type": "object",
+      "description": "TDD cycle execution results",
+      "required": ["testResults", "redGreenRefactorCycle", "coverage"],
+      "properties": {
+        "testResults": {
+          "type": "object",
+          "required": ["total", "passed", "failed", "skipped"],
+          "properties": {
+            "total": { "type": "number", "minimum": 0 },
+            "passed": { "type": "number", "minimum": 0 },
+            "failed": { "type": "number", "minimum": 0 },
+            "skipped": { "type": "number", "minimum": 0 },
+            "testFiles": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Test files executed"
+            }
+          }
+        },
+        "redGreenRefactorCycle": {
+          "type": "object",
+          "required": ["redPhaseVerified", "greenPhaseVerified", "refactorPhaseCompleted"],
+          "properties": {
+            "redPhaseVerified": {
+              "type": "boolean",
+              "description": "Test failed before implementation"
+            },
+            "greenPhaseVerified": {
+              "type": "boolean",
+              "description": "Test passed after minimal implementation"
+            },
+            "refactorPhaseCompleted": {
+              "type": "boolean",
+              "description": "Code refactored while keeping tests green"
+            },
+            "cycleCount": {
+              "type": "number",
+              "minimum": 1,
+              "description": "Number of TDD cycles completed"
+            }
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "required": ["percentage"],
+          "properties": {
+            "percentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Code coverage percentage"
+            },
+            "linesCovered": { "type": "number", "minimum": 0 },
+            "linesTotal": { "type": "number", "minimum": 0 },
+            "branchesCovered": { "type": "number", "minimum": 0 },
+            "branchesTotal": { "type": "number", "minimum": 0 }
+          }
+        },
+        "lintAndFormatPassed": {
+          "type": "boolean",
+          "description": "pnpm lint:fix and pnpm format completed successfully"
+        },
+        "filesModified": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Production files created/modified"
+        },
+        "filesCreated": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Test files created"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TypeScript Expert Output",
+  "type": "object",
+  "required": [
+    "skillName",
+    "version",
+    "output"
+  ],
+  "properties": {
+    "skillName": {
+      "const": "typescript-expert"
+    },
+    "version": {
+      "type": "string",
+      "description": "Skill version"
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "language",
+        "framework",
+        "codeGenerated"
+      ],
+      "properties": {
+        "language": {
+          "const": "TypeScript"
+        },
+        "framework": {
+          "type": "string",
+          "description": "Framework used (React, Vue, Angular, Node.js, etc.)"
+        },
+        "codeGenerated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "content"
+            ],
+            "properties": {
+              "file": {
+                "type": "string",
+                "description": "File path"
+              },
+              "content": {
+                "type": "string",
+                "description": "Generated TypeScript code"
+              },
+              "types": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Types/interfaces defined"
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "TypeScript best practice recommendations"
+        },
+        "typeSafety": {
+          "type": "object",
+          "properties": {
+            "strictMode": {
+              "type": "boolean"
+            },
+            "anyUsage": {
+              "type": "integer",
+              "description": "Number of 'any' types used"
+            },
+            "genericTypes": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
