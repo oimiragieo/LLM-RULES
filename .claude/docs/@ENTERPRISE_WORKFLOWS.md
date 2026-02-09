@@ -14,13 +14,14 @@ Complete catalog of 18+ enterprise workflows for multi-agent orchestration, secu
 
 ## CONTENT
 
-| Workflow                | Path                                                                | Purpose                   |
-| ----------------------- | ------------------------------------------------------------------- | ------------------------- |
-| Router Decision         | `.claude/workflows/core/router-decision.md`                         | master routing            |
-| **Enterprise Workflow** | `.claude/workflows/core/enterprise-workflow.md`                     | **multi-phase execution** |
-| External Integration    | `.claude/workflows/core/external-integration.md`                    | safe integration          |
-| Artifact Lifecycle      | `.claude/workflows/core/skill-lifecycle.md`                         | create/update/deprecate   |
-| Feature Development     | `.claude/workflows/enterprise/feature-development-workflow.md`      | end-to-end                |
+| Workflow                | Path                                                                | Purpose                         |
+| ----------------------- | ------------------------------------------------------------------- | ------------------------------- |
+| Router Decision         | `.claude/workflows/core/router-decision.md`                         | master routing                  |
+| **Enterprise Workflow** | `.claude/workflows/core/enterprise-workflow.md`                     | **multi-phase execution**       |
+| **Ecosystem Creation**  | `.claude/workflows/core/ecosystem-creation-workflow.md`             | **artifact creation lifecycle** |
+| External Integration    | `.claude/workflows/core/external-integration.md`                    | safe integration                |
+| Artifact Lifecycle      | `.claude/workflows/core/skill-lifecycle.md`                         | create/update/deprecate         |
+| Feature Development     | `.claude/workflows/enterprise/feature-development-workflow.md`      | end-to-end                      |
 | C4 Architecture         | `.claude/workflows/enterprise/c4-architecture-workflow.md`          | C4 docs                   |
 | Conductor Setup         | `.claude/workflows/conductor-setup-workflow.md`                     | CDD setup                 |
 | Incident Response       | `.claude/workflows/operations/incident-response.md`                 | prod incidents            |
@@ -46,6 +47,7 @@ Complete catalog of 18+ enterprise workflows for multi-agent orchestration, secu
 
 - `router-decision.md` - Master routing logic (source of truth)
 - `enterprise-workflow.md` - **Multi-phase execution (Triage → Design → Implement → Review → Deploy → Document → Reflect)**
+- `ecosystem-creation-workflow.md` - **Artifact creation lifecycle (Routing → Research → Pre-Check → Creation → Integration → Follow-Up)**
 - `evolution-workflow.md` - EVOLVE process (E→V→O→L→V→E)
 - `external-integration.md` - Safe integration of external systems
 - `skill-lifecycle.md` - Artifact creation, updates, deprecation
