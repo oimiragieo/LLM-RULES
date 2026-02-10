@@ -8,6 +8,24 @@
 - `MUST` constrain scope with globs/file types for repo-wide scans
 - `SHOULD` enable semantic mode only when lexical search is weak or intent-heavy
 - `SHOULD` prefer smaller, ranked outputs when context/token budget matters
+- `SHOULD` rely on wrapper auto-discovery for binaries (node_modules/.bin, Scoop shims, PATH) before hardcoding paths
+
+## Search Mode Selection (MANDATORY)
+
+| Mode                             | Primary use                                 | Determinism                 | Latency tendency   | Contract                         |
+| -------------------------------- | ------------------------------------------- | --------------------------- | ------------------ | -------------------------------- | ---------------------- |
+| `pnpm search:code "query"`       | Discovery and mixed intent                  | High                        | Fast               | Default first step               |
+| `pnpm search:code "ast:pattern"` | Structural intent (shape query)             | High                        | Moderate           | Only for structural requests     |
+| `pnpm search:structure`          | Architecture map and dependency orientation | High                        | Fast               | Run before large cross-cut edits |
+| `rg -F "literal"`                | Exact symbol/literal anchors                | Highest                     | Fastest            | Required before risky edits      |
+| `rga "query"`                    | Non-code content search                     | High                        | Medium             | Use when docs/pdf/archive matter |
+| `rg                              | rga -> fzf`                                 | Human interactive narrowing | Operator-dependent | Interactive                      | Optional UX layer only |
+
+Enforcement:
+
+- Agents `MUST NOT` depend on `fzf` for required automated search paths.
+- Agents `MUST` keep unattended flows non-interactive and reproducible.
+- Agents `SHOULD` choose `ast:` mode only when lexical intent is insufficient.
 
 ## Best Practices
 
@@ -16,6 +34,34 @@
 - Use literal search (`-F`) when pattern has no regex intent
 - Exclude large directories with `-g "!node_modules/**"` (and similar project excludes)
 - Prefer repository-relative paths in follow-up commands for reproducibility
+
+### fzf Integration (SHOULD for Interactive Triage)
+
+`fzf` is an interactive narrowing layer for `rg`/`rga` output.
+
+- `SHOULD` use `rg|rga -> fzf` when result sets are large and operator selection is needed.
+- `MUST` keep backend search deterministic (`rg -F`, scoped globs) before piping into `fzf`.
+- `MUST NOT` treat `fzf` as semantic retrieval; it is selection UX, not ranking intelligence.
+- `MUST NOT` make `fzf` a blocking dependency for CI/agent automation.
+
+Examples:
+
+```bash
+# rg + fzf + preview
+rg --line-number --no-heading --color=always "auth|token|session" . \
+  | fzf --ansi --delimiter ":" \
+    --preview "bat --color=always --style=numbers --highlight-line {2} {1}"
+
+# rga + fzf for document-like formats
+rga --line-number --no-heading --color=always "invoice|receipt|policy" . \
+  | fzf --ansi --delimiter ":" \
+    --preview "bat --color=always --style=numbers --line-range=:300 {1}"
+
+# ast-grep + fzf for structural triage
+ast-grep -p 'function $NAME($$$) { $$$ }' --lang javascript --files-with-matches . \
+  | fzf --ansi --delimiter ":" \
+    --preview "bat --color=always --style=numbers --line-range=:220 {}"
+```
 
 ## Recommended: Hybrid Lazy Code Search (Instant, No Batch Indexing)
 

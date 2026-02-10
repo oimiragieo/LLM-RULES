@@ -45,6 +45,67 @@ pnpm search:structure
 pnpm search:file src/auth.ts 1 50
 ```
 
+### Search Mode Contract (Deterministic)
+
+| Mode                             | Use when                                          | Latency tendency               | Determinism | Output/token impact             |
+| -------------------------------- | ------------------------------------------------- | ------------------------------ | ----------- | ------------------------------- | -------------------- |
+| `pnpm search:code "query"`       | Concept discovery, unknown implementation paths   | Fast                           | High        | Compact ranked output           |
+| `pnpm search:code "ast:pattern"` | Structural pattern intent (AST shape)             | Moderate                       | High        | Compact + structure-aware       |
+| `pnpm search:structure`          | System map: entrypoints, dependencies, boundaries | Fast                           | High        | Very low                        |
+| `rg -F "literal"`                | Exact symbol/literal lookup and anchor checks     | Fastest                        | Highest     | Potentially large unless scoped |
+| `rga "query"`                    | Non-code assets (pdf/docs/archive)                | Slower than `rg`               | High        | Can be high noise               |
+| `rg                              | rga -> fzf`                                       | Manual narrowing and selection | Interactive | Operator-dependent              | Good human triage UX |
+
+Required selection behavior:
+
+- Agents must default to `pnpm search:code` for discovery.
+- Agents must use `rg -F` before edits/refactors to validate exact anchors.
+- Agents should use `ast:` only for explicitly structural requests.
+- `fzf` stays optional for human-in-the-loop workflows; do not require it for automation.
+
+### Interactive Narrowing with fzf (Operator UX)
+
+When result sets are large, use `fzf` to interactively narrow `rg`/`rga` output.
+
+```bash
+# rg + fzf + file preview
+rg --line-number --no-heading --color=always "auth|token|session" . \
+  | fzf --ansi --delimiter ":" \
+    --preview "bat --color=always --style=numbers --highlight-line {2} {1}"
+
+# rga (documents/archives) + fzf
+rga --line-number --no-heading --color=always "invoice|receipt|policy" . \
+  | fzf --ansi --delimiter ":" \
+    --preview "bat --color=always --style=numbers --line-range=:300 {1}"
+```
+
+Advanced interactive ripgrep launcher pattern:
+
+```bash
+: | rg_prefix='rg --column --line-number --no-heading --color=always --smart-case' \
+  fzf --ansi --disabled \
+      --bind 'start:reload:$rg_prefix ""' \
+      --bind 'change:reload:$rg_prefix {q} || true'
+```
+
+Usage contract:
+
+- Use `fzf` for operator selection/narrowing, not as a replacement for search backends.
+- Keep `pnpm search:code` as default for agent discovery/ranking workflows.
+- Use `rg`/`rga` + `fzf` for interactive triage and manual result picking.
+
+Structural + interactive workflow (human triage):
+
+```bash
+# Structural candidates (ast-grep)
+ast-grep -p 'function $NAME($$$) { $$$ }' --lang javascript --files-with-matches .
+
+# Narrow candidates interactively
+ast-grep -p 'function $NAME($$$) { $$$ }' --lang javascript --files-with-matches . \
+  | fzf --ansi --delimiter ":" \
+    --preview "bat --color=always --style=numbers --line-range=:220 {}"
+```
+
 ### How It Works
 
 1. Pre-prompt hook analyzes repository structure using ripgrep (~0.5s)
@@ -56,6 +117,12 @@ pnpm search:file src/auth.ts 1 50
 ### Configuration
 
 ```bash
+# Optional binary overrides (normally auto-detected)
+RG_BIN=/path/to/rg
+AST_GREP_BIN=/path/to/ast-grep
+RGA_BIN=/path/to/rga
+FZF_BIN=/path/to/fzf
+
 # Disable semantic search (text-only, fastest)
 HYBRID_EMBEDDINGS=off
 

@@ -270,6 +270,20 @@ class IndexManager {
     return files;
   }
 
+  _collectMerkleFilePaths(node, basePath = '') {
+    if (!node) return [];
+    if (node.type === 'file') {
+      return basePath ? [basePath.replace(/\\/g, '/')] : [];
+    }
+    const children = node.children || {};
+    const results = [];
+    for (const [name, child] of Object.entries(children)) {
+      const childPath = basePath ? `${basePath}/${name}` : name;
+      results.push(...this._collectMerkleFilePaths(child, childPath));
+    }
+    return results;
+  }
+
   /**
    * NEW: Load checkpoint if exists
    */
@@ -682,7 +696,12 @@ class IndexManager {
     );
     const merkleTree = new MerkleTree(this.options.projectRoot, this.options.excludePatterns);
     await merkleTree.build();
-    await merkleTree.save(merklePath);
+    if (merkleTree.root) {
+      await merkleTree.save(merklePath);
+    } else {
+      // No indexable files remain; remove stale Merkle snapshot if present.
+      await fs.rm(merklePath, { force: true }).catch(() => {});
+    }
 
     // Clear checkpoint on success
     await this._clearCheckpoint();
@@ -716,6 +735,25 @@ class IndexManager {
 
     const newTree = new MerkleTree(this.options.projectRoot, this.options.excludePatterns);
     await newTree.build();
+
+    if (!newTree.root) {
+      const oldFiles = this._collectMerkleFilePaths(oldTree);
+      for (const filePath of oldFiles) {
+        const fullPath = path.join(this.options.projectRoot, filePath);
+        await this.vectorStore.deleteFile(fullPath);
+      }
+      await fs.rm(merklePath, { force: true }).catch(() => {});
+      return {
+        updateType: 'incremental',
+        filesAdded: 0,
+        filesModified: 0,
+        filesDeleted: oldFiles.length,
+        chunksAdded: 0,
+        chunksUpdated: 0,
+        chunksDeleted: oldFiles.length,
+        timeMs: Date.now() - startTime,
+      };
+    }
 
     const diff = MerkleTree.diff(oldTree, newTree.root, '');
 

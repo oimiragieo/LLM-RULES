@@ -15,6 +15,8 @@
 const { spawnSync } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
+const { AstGrepSearch } = require('./ast-grep-wrapper.cjs');
+const { resolveRipgrepBinary } = require('../utils/binary-resolver.cjs');
 
 // Lazy-loaded modules
 let LanceDB = null;
@@ -50,6 +52,14 @@ class HybridLazyIndexer {
       // Lazy loading
       cacheExpiryMs: options.cacheExpiryMs || 30000, // 30s
       debug: options.debug === true || process.env.HYBRID_SEARCH_DEBUG === 'true',
+
+      // Optional ast-grep refinement for structural queries
+      astGrepRefinementEnabled:
+        options.astGrepRefinementEnabled !== false &&
+        process.env.HYBRID_AST_GREP_REFINEMENT !== 'off',
+      astGrepTimeoutMs: options.astGrepTimeoutMs || 1200,
+      astGrepMaxCandidateFiles: options.astGrepMaxCandidateFiles || 40,
+      astGrepScoreBoost: options.astGrepScoreBoost || 0.35,
     };
 
     // In-memory caches
@@ -69,6 +79,17 @@ class HybridLazyIndexer {
     // ripgrep path cache (resolved once)
     this._rgPathPromise = null;
     this._rgPath = options.rgPath || null;
+
+    this._astGrep = new AstGrepSearch({
+      projectRoot: this.projectRoot,
+      timeout: this.config.astGrepTimeoutMs,
+      binPath: options.astGrepBinPath || process.env.AST_GREP_BIN || 'ast-grep',
+    });
+    this._astGrepAvailable = null;
+    this._astGrepCheckPromise = null;
+    this._astGrepBinCandidates = this.getAstGrepBinCandidates(
+      options.astGrepBinPath || process.env.AST_GREP_BIN
+    );
   }
 
   // ============================================================================
@@ -105,7 +126,15 @@ class HybridLazyIndexer {
     }
 
     // 3. Fuse results using Reciprocal Rank Fusion
-    const fused = this.fuseResults(textResults, semanticResults, limit);
+    let fused = this.fuseResults(textResults, semanticResults, limit);
+
+    // 4. Optional structural refinement with ast-grep (only for structural-looking queries)
+    if (this.shouldRunAstGrepRefinement(query, textResults, fused)) {
+      fused = await this.refineWithAstGrep(query, fused, {
+        limit,
+        textResults,
+      });
+    }
 
     if (this.config.debug) {
       console.log(
@@ -131,6 +160,235 @@ class HybridLazyIndexer {
     if (isSymbolHeavy && textResults.length > 0) return false;
 
     return true;
+  }
+
+  /**
+   * Gate ast-grep refinement to avoid latency regressions on normal text queries.
+   */
+  shouldRunAstGrepRefinement(query, textResults = [], fusedResults = []) {
+    if (!this.config.astGrepRefinementEnabled) return false;
+    if (!query || typeof query !== 'string') return false;
+    if (query.length < 8) return false;
+    if (!this.looksStructuralQuery(query)) return false;
+
+    // If explicit ast: query, allow refinement even without text/fused candidates.
+    if (String(query).trim().toLowerCase().startsWith('ast:')) return true;
+
+    // Keep refinement narrow for non-ast-prefixed structural queries.
+    if (textResults.length === 0 && fusedResults.length === 0) return false;
+    return true;
+  }
+
+  looksStructuralQuery(query) {
+    const q = String(query || '').trim();
+    if (!q) return false;
+
+    // Explicit structural opt-in.
+    if (q.toLowerCase().startsWith('ast:')) return true;
+
+    // Ast-grep meta variables are strong signal of structural pattern intent.
+    if (/\$\$\$|\$[A-Z_][A-Z0-9_]*/.test(q)) return true;
+
+    return false;
+  }
+
+  async isAstGrepAvailable() {
+    if (this._astGrepAvailable !== null) return this._astGrepAvailable;
+    if (this._astGrepCheckPromise) return this._astGrepCheckPromise;
+
+    this._astGrepCheckPromise = (async () => {
+      for (const binPath of this._astGrepBinCandidates) {
+        this._astGrep.binPath = binPath;
+        try {
+          const available = await this._astGrep.isAvailable();
+          if (available) {
+            this._astGrepAvailable = true;
+            return true;
+          }
+        } catch {
+          // try next candidate
+        }
+      }
+      this._astGrepAvailable = false;
+      return false;
+    })();
+
+    return this._astGrepCheckPromise;
+  }
+
+  getAstGrepBinCandidates(preferredBinPath) {
+    const candidates = [];
+    const push = value => {
+      if (!value || typeof value !== 'string') return;
+      if (!candidates.includes(value)) candidates.push(value);
+    };
+
+    push(preferredBinPath);
+
+    // npm package bin (preferred for deterministic workspace behavior)
+    try {
+      const astGrepPkgPath = require.resolve('@ast-grep/cli/package.json');
+      const cliDir = path.dirname(astGrepPkgPath);
+      const binDir = path.join(cliDir, 'node_modules', '.bin');
+      if (process.platform === 'win32') {
+        push(path.join(this.projectRoot, 'node_modules', '.bin', 'ast-grep.CMD'));
+        push(path.join(this.projectRoot, 'node_modules', '.bin', 'ast-grep.cmd'));
+        push(path.join(binDir, 'ast-grep.cmd'));
+        push(path.join(binDir, 'ast-grep.CMD'));
+        push(path.join(binDir, 'ast-grep'));
+      } else {
+        push(path.join(this.projectRoot, 'node_modules', '.bin', 'ast-grep'));
+        push(path.join(binDir, 'ast-grep'));
+      }
+    } catch {
+      // ignore
+    }
+
+    // Global fallbacks
+    if (process.platform === 'win32') {
+      const userProfile = process.env.USERPROFILE;
+      if (userProfile) {
+        push(path.join(userProfile, 'scoop', 'shims', 'ast-grep.exe'));
+        push(path.join(userProfile, 'scoop', 'shims', 'sg.exe'));
+      }
+    }
+    push('ast-grep');
+    push('sg');
+
+    return candidates;
+  }
+
+  normalizeFilePath(filePath) {
+    if (!filePath || typeof filePath !== 'string') return null;
+    return path.isAbsolute(filePath)
+      ? path.normalize(filePath)
+      : path.normalize(path.join(this.projectRoot, filePath));
+  }
+
+  toRelativeIfInsideProject(filePath) {
+    const abs = this.normalizeFilePath(filePath);
+    if (!abs) return null;
+    const rel = path.relative(this.projectRoot, abs);
+    if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return null;
+    return rel.replace(/\\/g, '/');
+  }
+
+  inferStructuralLanguage(query, candidateFiles = []) {
+    const q = String(query || '').toLowerCase();
+    if (q.includes('interface ') || q.includes(': ') || q.includes('type ')) return 'typescript';
+    if (q.includes('def ') || q.includes('self')) return 'python';
+    if (q.includes('fn ') || q.includes('impl ')) return 'rust';
+    if (q.includes('func ') || q.includes('package ')) return 'go';
+
+    const counts = new Map();
+    for (const file of candidateFiles) {
+      const lang = this._astGrep.detectLanguage(file);
+      if (!lang) continue;
+      counts.set(lang, (counts.get(lang) || 0) + 1);
+    }
+    if (counts.size === 0) return 'javascript';
+
+    let bestLang = 'javascript';
+    let bestCount = -1;
+    for (const [lang, count] of counts.entries()) {
+      if (count > bestCount) {
+        bestLang = lang;
+        bestCount = count;
+      }
+    }
+    return bestLang;
+  }
+
+  extractStructuralPattern(query) {
+    const q = String(query || '').trim();
+    if (q.toLowerCase().startsWith('ast:')) return q.slice(4).trim();
+    return q;
+  }
+
+  async refineWithAstGrep(query, fusedResults, options = {}) {
+    try {
+      const available = await this.isAstGrepAvailable();
+      if (!available) return fusedResults;
+
+      const pattern = this.extractStructuralPattern(query);
+      if (!pattern) return fusedResults;
+
+      const candidateFiles = fusedResults
+        .map(r => r.file)
+        .filter(Boolean)
+        .slice(0, this.config.astGrepMaxCandidateFiles);
+      const include = candidateFiles.map(f => this.toRelativeIfInsideProject(f)).filter(Boolean);
+      const explicitAstQuery = String(query || '')
+        .trim()
+        .toLowerCase()
+        .startsWith('ast:');
+      if (include.length === 0 && !explicitAstQuery) return fusedResults;
+
+      const language = this.inferStructuralLanguage(pattern, candidateFiles);
+      const structuralMatches = await this._astGrep.search(pattern, language, {
+        ...(include.length > 0 ? { include } : {}),
+        maxResults: Math.max((options.limit || 20) * 3, 50),
+      });
+
+      if (!Array.isArray(structuralMatches) || structuralMatches.length === 0) {
+        return fusedResults;
+      }
+
+      const matchedFiles = new Set(
+        structuralMatches.map(m => this.normalizeFilePath(m.filePath)).filter(Boolean)
+      );
+      const boosted = fusedResults.map(result => {
+        const normalized = this.normalizeFilePath(result.file);
+        const matched = normalized && matchedFiles.has(normalized);
+        if (!matched) return result;
+        return {
+          ...result,
+          structuralScore: 1,
+          totalScore: (result.totalScore || 0) + this.config.astGrepScoreBoost,
+          type: `${result.type}+ast`,
+        };
+      });
+
+      // If ast-grep finds structural matches not present in fused results,
+      // surface them as deterministic structural entries.
+      const existingFiles = new Set(
+        boosted.map(r => this.normalizeFilePath(r.file)).filter(Boolean)
+      );
+      const added = [];
+      for (const [rank, match] of structuralMatches.entries()) {
+        const normalized = this.normalizeFilePath(match.filePath);
+        if (!normalized || existingFiles.has(normalized)) continue;
+        existingFiles.add(normalized);
+
+        const baseScore = this.config.astGrepScoreBoost * (1 / (1 + rank));
+        added.push({
+          file: normalized,
+          type: 'ast',
+          textScore: 0,
+          semanticScore: 0,
+          structuralScore: 1,
+          totalScore: baseScore,
+          textMatches: [
+            {
+              line: match.lineStart || 1,
+              text: match.code || '',
+            },
+          ],
+        });
+      }
+
+      const combined = [...boosted, ...added];
+
+      return combined
+        .sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0))
+        .slice(0, options.limit || 20);
+    } catch (err) {
+      // Structural refinement is optional; fail-open to preserve baseline behavior.
+      if (this.config.debug) {
+        console.error('[hybrid-search] ast-grep refinement skipped:', err.message);
+      }
+      return fusedResults;
+    }
   }
 
   /**
@@ -199,15 +457,23 @@ class HybridLazyIndexer {
     if (this._rgPath) return this._rgPath;
     if (this._rgPathPromise) return this._rgPathPromise;
 
-    // Get ripgrep binary path from @vscode/ripgrep
+    // Resolve ripgrep from npm package, Scoop shims, node_modules/.bin, then PATH.
     this._rgPathPromise = (async () => {
+      let vscodeRgPath = null;
       try {
         const { rgPath } = await import('@vscode/ripgrep');
-        this._rgPath = rgPath;
+        vscodeRgPath = rgPath;
       } catch {
-        // Fallback to just 'rg' if package not available
-        this._rgPath = 'rg';
+        // Ignore and continue with resolver fallbacks.
       }
+      this._rgPath =
+        resolveRipgrepBinary({
+          projectRoot: this.projectRoot,
+          preferredPath: this._rgPath || process.env.RG_BIN,
+          vscodeRgPath,
+        }) ||
+        vscodeRgPath ||
+        'rg';
       return this._rgPath;
     })();
 

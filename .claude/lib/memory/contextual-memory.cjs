@@ -11,6 +11,7 @@ const { EntityQuery } = require('./entity-query.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
+const { resolveRipgrepBinary, resolveAstGrepBinary } = require('../utils/binary-resolver.cjs');
 
 const logger = createLogger('contextual-memory');
 
@@ -589,21 +590,23 @@ class ContextualMemory {
    * @returns {string|null} Path to ripgrep binary or null if unavailable
    */
   _getRipgrepPath() {
+    if (this._resolvedRipgrepPath !== undefined) return this._resolvedRipgrepPath;
+
+    let vscodeRgPath = null;
     try {
       const { rgPath } = require('@vscode/ripgrep');
-      return rgPath;
+      vscodeRgPath = rgPath;
     } catch {
-      // Fallback to bundled binary if npm package not available
-      const bundledPath = path.join(
-        process.cwd(),
-        'bin',
-        process.platform === 'win32' ? 'rg.exe' : 'rg'
-      );
-      if (fs.existsSync(bundledPath)) {
-        return bundledPath;
-      }
-      return null;
+      // Ignore and use resolver fallbacks.
     }
+
+    this._resolvedRipgrepPath = resolveRipgrepBinary({
+      projectRoot: this.config.projectRoot || process.cwd(),
+      preferredPath: process.env.RG_BIN,
+      vscodeRgPath,
+    });
+
+    return this._resolvedRipgrepPath;
   }
 
   /**
@@ -612,26 +615,12 @@ class ContextualMemory {
    * @returns {string|null} Path to ast-grep binary or null if unavailable
    */
   _getAstGrepPath() {
-    try {
-      const astGrepPkgPath = require.resolve('@ast-grep/cli');
-      const binDir = path.join(path.dirname(astGrepPkgPath), '../.bin');
-      const binName = process.platform === 'win32' ? 'ast-grep.cmd' : 'ast-grep';
-      const binPath = path.join(binDir, binName);
-      if (fs.existsSync(binPath)) {
-        return binPath;
-      }
-      // Try without .cmd extension on Windows
-      if (process.platform === 'win32') {
-        const altPath = path.join(binDir, 'ast-grep');
-        if (fs.existsSync(altPath)) {
-          return altPath;
-        }
-      }
-    } catch {
-      // Package not installed, try global or bundled
-    }
-    // Fallback to global installation check
-    return 'ast-grep';
+    if (this._resolvedAstGrepPath !== undefined) return this._resolvedAstGrepPath;
+    this._resolvedAstGrepPath = resolveAstGrepBinary({
+      projectRoot: this.config.projectRoot || process.cwd(),
+      preferredPath: process.env.AST_GREP_BIN,
+    });
+    return this._resolvedAstGrepPath || 'ast-grep';
   }
 
   /**

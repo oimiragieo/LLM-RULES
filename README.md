@@ -150,6 +150,24 @@ Guidance:
 - Use `pnpm search:structure` for structure-oriented lookup.
 - Use `rg` directly for strict literal/symbol matches and exact filters.
 
+### Search Mode Comparison
+
+| Tool/Mode                        | What it does best                                   | Latency profile                                                      | Determinism                 | Token/output profile                    |
+| -------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------- | --------------------------- | --------------------------------------- | ----------------------------------------------- |
+| `pnpm search:code "query"`       | Conceptual discovery and ranked candidates          | Fast (`~0.2-0.7s` on this repo)                                      | High                        | Compact ranked output (good for agents) |
+| `pnpm search:code "ast:pattern"` | Structural intent with optional ast-grep refinement | Moderate (`~0.18s` warm daemon baseline, higher for explicit `ast:`) | High if pattern is explicit | Compact, structure-aware candidates     |
+| `pnpm search:structure`          | Repo map, entrypoints, dependency orientation       | Fast one-shot structure pass                                         | High                        | Very low output volume                  |
+| `rg -F "literal"`                | Exact symbol/literal lookup                         | Fastest (`~15-35ms` measured)                                        | Highest                     | Larger raw output unless scoped         |
+| `rga "query"`                    | Cross-file search (pdf/docs/archives)               | Slower than `rg`                                                     | High                        | Can be noisy; scope early               |
+| `rg                              | rga -> fzf`                                         | Human interactive narrowing/selection                                | Interactive                 | Operator-dependent                      | Great for manual triage, not default agent path |
+
+Selection contract:
+
+- Agents should default to `pnpm search:code` for discovery.
+- Use `rg -F` for exact anchors before edits/refactors.
+- Use `ast:` only when the question is structural (shape/pattern), not plain text intent.
+- Keep `fzf` optional and human-in-the-loop; do not make it a hard dependency of automated wrappers.
+
 ### Perf Runbook (Daemon + Prewarm)
 
 Use daemon mode for repeated searches in active sessions.
@@ -240,7 +258,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
 ```
 
-Install ripgrep-all + fuzzy finder:
+Install ripgrep-all + fuzzy finder + ast-grep:
 
 ```powershell
 # Install rga (ripgrep-all)
@@ -248,6 +266,9 @@ scoop install rga
 
 # Install fzf
 scoop install fzf
+
+# Install ast-grep (includes `sg` shim)
+scoop install ast-grep
 ```
 
 Verify install:
@@ -255,12 +276,75 @@ Verify install:
 ```powershell
 rga --version
 fzf --version
+sg --version
 ```
+
+Runtime discovery behavior:
+
+- Search wrappers auto-discover binaries from `node_modules/.bin`, Scoop shims, and PATH.
+- If your shell PATH is stale after install, wrappers still resolve common Scoop shim paths.
+- You can force specific binaries with env overrides (`RG_BIN`, `AST_GREP_BIN`, `RGA_BIN`, `FZF_BIN`).
+
+### fzf Workflows (Interactive Narrowing)
+
+`fzf` is most useful as an interactive selector on top of `rg`/`rga` output.
+It improves usability and reduces noise, but does not replace search engines.
+For AI/automation, keep `fzf` optional; interactive prompts are non-deterministic for unattended runs.
+
+Quick file+line picker with preview:
+
+```powershell
+rg --line-number --no-heading --color=always "auth|token|session" . `
+  | fzf --ansi --delimiter ":" `
+    --preview "bat --color=always --style=numbers --highlight-line {2} {1}"
+```
+
+Search inside office/pdf/archive content (via `rga`) and narrow interactively:
+
+```powershell
+rga --line-number --no-heading --color=always "invoice|receipt|policy" . `
+  | fzf --ansi --delimiter ":" `
+    --preview "bat --color=always --style=numbers --line-range=:300 {1}"
+```
+
+Advanced interactive ripgrep launcher (`fzf` reload pattern):
+
+```bash
+: | rg_prefix='rg --column --line-number --no-heading --color=always --smart-case' \
+  fzf --ansi --disabled \
+      --bind 'start:reload:$rg_prefix ""' \
+      --bind 'change:reload:$rg_prefix {q} || true'
+```
+
+AST + RG + fzf (structural triage workflow):
+
+```powershell
+# 1) Structural file candidates
+ast-grep -p "function `$NAME(`$$$) { `$$$ }" --lang javascript --files-with-matches . `
+  | fzf --ansi --delimiter ":" `
+    --preview "bat --color=always --style=numbers --line-range=:220 {}"
+
+# 2) Then run exact literal checks inside chosen files
+rg -F "function " <chosen-file>
+```
+
+Wrapper policy:
+
+- Keep `pnpm search:code` non-interactive and deterministic for agents.
+- Offer `fzf` as an optional terminal UX layer for humans doing investigative triage.
+- Prefer `pnpm search:structure` or `pnpm search:code "ast:..."` for agent structural queries; use `sg` directly for manual structural audits.
 
 Sources:
 
 - `https://scoop.sh/`
 - `https://github.com/phiresky/ripgrep-all?tab=readme-ov-file#scoop`
+- `https://github.com/junegunn/fzf` (interactive ripgrep + reload)
+- `https://junegunn.github.io/fzf/tips/ripgrep-integration/` (official rg+fzf pattern)
+- `https://github.com/phiresky/ripgrep-all` (rga + fzf integration notes)
+- `https://github.com/phiresky/ripgrep-all/wiki/fzf-Integration` (`rga-fzf` notes)
+- `https://ast-grep.github.io/guide/pattern-syntax.html` (ast-grep pattern language)
+- `https://ast-grep.github.io/reference/cli.html` (ast-grep CLI options)
+- `https://github.com/sharkdp/bat` (fzf preview examples)
 
 ## Operational Notes
 

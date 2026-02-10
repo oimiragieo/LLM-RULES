@@ -19,6 +19,7 @@ import fs from 'fs';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
+const { resolveRipgrepBinary } = require('../../../lib/utils/binary-resolver.cjs');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,13 +42,23 @@ function findProjectRoot() {
 const PROJECT_ROOT = findProjectRoot();
 
 // Get ripgrep binary path from @vscode/ripgrep npm package
-let rgPath;
+let vscodeRgPath = null;
 try {
   const { rgPath: npmRgPath } = require('@vscode/ripgrep');
-  rgPath = npmRgPath;
+  vscodeRgPath = npmRgPath;
 } catch (_err) {
-  console.error('❌ @vscode/ripgrep package not found.');
-  console.error('   Install with: pnpm add @vscode/ripgrep');
+  // Continue with resolver fallbacks (Scoop shims / node_modules/.bin / PATH).
+}
+
+const rgPath = resolveRipgrepBinary({
+  projectRoot: PROJECT_ROOT,
+  preferredPath: process.env.RG_BIN,
+  vscodeRgPath,
+});
+
+if (!rgPath) {
+  console.error('❌ Unable to resolve ripgrep binary.');
+  console.error('   Install @vscode/ripgrep or ensure rg is available (Scoop/PATH).');
   process.exit(1);
 }
 
