@@ -43,4 +43,3 @@ test('getMode defaults to block and validates values', () => {
   if (original === undefined) delete process.env.HYBRID_GREP_ENFORCEMENT;
   else process.env.HYBRID_GREP_ENFORCEMENT = original;
 });
-

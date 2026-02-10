@@ -192,7 +192,7 @@ This component contains the following code-level elements:
 
 ## Execution Rules
 
-- **Tools**: Use Read, Grep, Glob for analysis
+- **Tools**: Use Read, hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`), and Glob for analysis
 - **Output**: Write component documentation to specified location
 - **Synthesis**: Group related code files into logical components
 - **Interfaces**: Document all component interfaces completely

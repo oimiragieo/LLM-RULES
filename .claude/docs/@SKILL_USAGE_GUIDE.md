@@ -50,7 +50,9 @@ Task: Search for code
 
 ## Skill-by-Skill Guide
 
-### 1. Grep (Built-in Tool)
+### 1. Grep (Built-in Tool, Fallback Only)
+
+Prefer `pnpm search:code` or `Skill({ skill: 'ripgrep' })` for multi-file/codebase search. Use `Grep` only as fallback (advanced regex edge cases or explicit single-file checks).
 
 **When to use**:
 

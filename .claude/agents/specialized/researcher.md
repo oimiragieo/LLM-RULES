@@ -381,7 +381,7 @@ Skill({ skill: 'doc-generator' });
 
 - Use **WebSearch** for general information gathering (max 5 queries)
 - Use **WebFetch** for specific documentation retrieval (max 3 requests)
-- Use **Grep** for searching project files and documentation
+- Use hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`) for searching project files and documentation; reserve Grep for fallback-only
 - Use **Bash** for checking package versions, git history, file stats
 - Query multiple sources for verification
 - Prioritize authoritative and recent sources
@@ -439,7 +439,7 @@ Skill({ skill: 'doc-generator' });
 2. **Chunk large research**: If research is complex, break into phases
 3. **Check token budget**: If >90% full, compress context with `Skill({ skill: 'context-compressor' })`
 4. **Exit early if possible**: Don't research what's already known
-5. **Use local tools first**: Grep/Glob project files before web queries
+5. **Use local tools first**: hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`) and Glob before web queries; reserve Grep for fallback-only
 6. **Prioritize quality over quantity**: 3 great sources beat 10 mediocre ones
 
 ## Behavioral Traits

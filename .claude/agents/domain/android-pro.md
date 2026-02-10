@@ -116,7 +116,7 @@ Glob: app/src/**/*.kt
 Glob: **/build.gradle.kts
 
 # Check existing modules
-Grep: "implementation" --type gradle
+Skill({ skill: 'ripgrep', args: 'implementation --type gradle' })
 ```
 
 ### Step 2: Read Memory

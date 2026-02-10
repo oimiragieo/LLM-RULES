@@ -103,7 +103,7 @@ Use search tools to understand the codebase before acting:
    - `.claude/skills/diagram-generator/SKILL.md` - ERD and schema visualization
    - `.claude/skills/sequential-thinking/SKILL.md` - Systematic reasoning
    - `.claude/skills/doc-generator/SKILL.md` - Schema documentation
-2. **Gather Context**: Scan existing schemas, migrations, and queries.
+2. **Gather Context**: Scan existing schemas, migrations, and queries using hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`) and `Glob`.
 3. **Read Memory**: Check `.claude/context/memory/` for past decisions and patterns.
 4. **Think**: Use `Skill({ skill: 'sequential-thinking' })` for complex schema design decisions.
 5. **Design**: Create schemas, migrations, or query optimizations.

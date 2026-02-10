@@ -224,7 +224,7 @@ Follow this structure for C4 Context-level documentation:
 
 ## Execution Rules
 
-- **Tools**: Use Read, Grep, Glob for analysis
+- **Tools**: Use Read, hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`), and Glob for analysis
 - **Output**: Write context documentation to specified location
 - **Personas**: Identify ALL personas (human AND programmatic)
 - **Journeys**: Document user journeys for key features

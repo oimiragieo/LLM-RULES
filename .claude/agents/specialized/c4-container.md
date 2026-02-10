@@ -199,7 +199,7 @@ This container deploys the following components:
 
 ## Execution Rules
 
-- **Tools**: Use Read, Grep, Glob for analysis
+- **Tools**: Use Read, hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`), and Glob for analysis
 - **Output**: Write container documentation and API specs to specified location
 - **APIs**: Create OpenAPI 3.1+ specifications for all container APIs
 - **Deployment**: Link to actual deployment configs (Dockerfiles, K8s manifests)

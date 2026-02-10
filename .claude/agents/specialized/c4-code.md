@@ -180,7 +180,7 @@ Follow this structure for C4 Code-level documentation:
 
 ## Execution Rules
 
-- **Tools**: Use Read, Grep, Glob for code analysis
+- **Tools**: Use Read, hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`), and Glob for code analysis
 - **Output**: Write documentation to specified location
 - **Completeness**: Document ALL significant code elements
 - **Accuracy**: Ensure function signatures are complete and correct
