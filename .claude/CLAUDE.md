@@ -298,7 +298,7 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 
 > **REFERENCE:** See **@TOOL_REFERENCE.md** for comprehensive tool catalog.
 
-23 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit, MemoryRecord).
+23 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit, MemoryRecord). For code search, prefer hybrid search (`pnpm search:code`, `ripgrep`, semantic/structural skills); treat `Grep` as fallback-only.
 
 **Note:** The `Task*` family of tools (Task, TaskList, TaskCreate, TaskUpdate, TaskGet, TaskOutput, TaskStop) are **host-provided** infrastructure tools, not implemented as scripts in the repository. SkillCatalog is a Node.js library (not a host-provided tool).
 
@@ -333,6 +333,7 @@ See Section 1.1 for Router Tool Restrictions enforcement.
 **Identity:** `.claude/templates/spawn/agent-identity-integration.md` (agents with personality frontmatter)
 **Subordinate (one-shot):** `.claude/templates/spawn/subordinate-once.md` (respond once; no delegation)
 **Core Tools:** Read, Write, Edit, Bash, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
+**Search Policy:** Prefer hybrid search (`pnpm search:code`, `Skill({ skill: 'ripgrep' })`, semantic/structural skills). Use `Grep` only for fallback edge cases (advanced PCRE or explicit single-file checks).
 
 ### Golden-Path Example
 

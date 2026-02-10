@@ -180,7 +180,7 @@ Verify cross-artifact consistency.
 
 1. **Use Glob** to find all relevant files and directories
 2. **Use Read** to check file contents and structure
-3. **Use Grep** to search for specific patterns and markers
+3. **Use hybrid search first** (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`) to find specific patterns and markers; use Grep only as fallback for advanced regex/single-file targeting
 4. **Use Bash** only for directory existence checks (e.g., `ls -la`)
 
 ## Output Format
@@ -325,3 +325,11 @@ cat C:/dev/projects/agent-studio/@.claude/context\memory\learnings.md
 - Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

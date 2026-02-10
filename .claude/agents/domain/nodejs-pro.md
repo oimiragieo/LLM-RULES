@@ -101,7 +101,7 @@ The following workflows guide this agent's execution:
    - `.claude/skills/debugging/SKILL.md` - Debugging techniques
    - `.claude/skills/typescript-expert/SKILL.md` - TypeScript best practices
    - `.claude/skills/verification-before-completion/SKILL.md` - Quality gates
-2. **Gather Context**: Use `Grep`, `Glob` to understand project structure and dependencies.
+2. **Gather Context**: Use hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`) and `Glob` to understand project structure and dependencies. Reserve `Grep` for fallback-only.
 3. **Read Memory**: Check `.claude/context/memory/` for past decisions and patterns.
 4. **Think**: Use `Skill({ skill: 'sequential-thinking' })` for complex architecture decisions.
 5. **Develop**: Build features using TDD approach.
@@ -691,3 +691,11 @@ Before completing any task, verify:
 - [ ] Security best practices followed
 - [ ] Code follows project conventions
 - [ ] Decisions recorded in memory
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

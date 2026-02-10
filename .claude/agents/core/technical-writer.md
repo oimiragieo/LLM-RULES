@@ -264,3 +264,11 @@ TaskList();
 1. **NEVER** complete work without calling TaskUpdate({ status: "completed" })
 2. **ALWAYS** include summary metadata when completing
 3. **ALWAYS** call TaskList() after completion to find next work
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

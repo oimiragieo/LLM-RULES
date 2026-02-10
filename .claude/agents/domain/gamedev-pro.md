@@ -439,3 +439,11 @@ TaskList();
 1. **LAW 1**: ALWAYS call TaskUpdate({ status: "in_progress" }) when starting
 2. **LAW 2**: ALWAYS call TaskUpdate({ status: "completed", metadata: {...} }) when done
 3. **LAW 3**: ALWAYS call TaskList() after completion to find next work
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

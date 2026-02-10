@@ -473,3 +473,11 @@ Before completing any task, verify:
 - [ ] Documentation updated
 - [ ] Security considerations reviewed
 - [ ] Decisions recorded in memory
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

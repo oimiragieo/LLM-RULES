@@ -17,6 +17,7 @@ Comprehensive catalog of all available tools in the agent-studio framework, incl
 ### Core Tools (Always Available - No Configuration Required)
 
 These tools are built into Claude Code and work immediately:
+For code search workflows, prefer hybrid search (`pnpm search:code`, `ripgrep`, semantic/structural skills); treat `Grep` as fallback-only.
 
 | Tool                | Category        | Purpose                                     | Availability                   |
 | ------------------- | --------------- | ------------------------------------------- | ------------------------------ |
@@ -232,7 +233,7 @@ MCP (Model Context Protocol) tools require server configuration in `.claude/sett
 **Always Available (No restrictions):**
 
 - File I/O: Read, Write, Edit
-- Search: Glob, Grep
+- Search: Glob, Grep (fallback-only for code discovery; prefer hybrid search path)
 - Task Management: TaskCreate, TaskUpdate, TaskList, TaskGet, TaskOutput, TaskStop
 - Capability: Skill, AvailableAgents
 - Research: WebSearch, WebFetch

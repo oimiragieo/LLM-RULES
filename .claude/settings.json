@@ -60,6 +60,15 @@
         ]
       },
       {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/hybrid-search-enforcer.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "Glob|Grep|WebSearch",
         "hooks": [
           {

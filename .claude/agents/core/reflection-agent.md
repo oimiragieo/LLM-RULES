@@ -640,3 +640,11 @@ Full research report: `.claude/context/artifacts/research-reports/reflection-age
 ## Version History
 
 - **v1.0.0** (2026-01-25): Initial release with RECE loop, rubric scoring, RBT diagnosis, memory consolidation
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

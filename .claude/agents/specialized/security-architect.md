@@ -8,7 +8,7 @@ context_strategy: full
 priority: high
 extended_thinking: true
 tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
-# Note: Use Grep for code search, Glob for file discovery; sequential-thinking via Skill({ skill: 'sequential-thinking' }); MCP tools optional (use Skill fallbacks)
+# Note: Prefer hybrid search (`pnpm search:code`, `ripgrep`, semantic/structural skills) for code discovery. Use Grep only as last-resort fallback.
 skills:
   - task-management-protocol
   - auth-security-expert
@@ -314,3 +314,11 @@ Review past security decisions, threat models, and compliance requirements.
 **During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 
 > ⚠️ **ASSUME INTERRUPTION**: Your context may reset. If it's not in memory, it didn't happen.
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

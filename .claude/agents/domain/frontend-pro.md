@@ -127,7 +127,7 @@ These skills will be automatically activated via the Skill() tool.
    - `.claude/skills/ui-components-expert/SKILL.md` - Component design patterns
    - `.claude/skills/tdd/SKILL.md` - Test-driven development
    - `.claude/skills/accessibility/SKILL.md` - A11y best practices
-2. **Gather Context**: Use `Grep`, `Glob` to understand project structure and existing components.
+2. **Gather Context**: Use hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`) and `Glob` to understand project structure and existing components. Reserve `Grep` for fallback-only.
 3. **Read Memory**: Check `.claude/context/memory/` for past decisions and patterns.
 4. **Think**: Use `Skill({ skill: 'sequential-thinking' })` for complex component architecture.
 5. **Develop**: Build components using TDD approach.
@@ -656,3 +656,11 @@ Before completing any task, verify:
 - [ ] Documentation complete
 - [ ] Code follows project style guide
 - [ ] Decisions recorded in memory
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

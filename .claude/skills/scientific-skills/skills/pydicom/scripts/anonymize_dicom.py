@@ -128,7 +128,8 @@ Examples:
             # Do not log field count or tag names (CodeQL: clear-text logging)
             print("\nAnonymization applied.")
     else:
-        print(f"✗ Error: {result}")
+        # Do not log exception/result (may contain paths or PHI; CodeQL: clear-text logging)
+        print("✗ Anonymization failed. Check input file and permissions.")
         sys.exit(1)
 
 

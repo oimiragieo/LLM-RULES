@@ -416,7 +416,7 @@ This agent can search code efficiently using the hybrid lazy search system:
 
 - Use: `Skill({ skill: 'ripgrep', args: '<search-pattern> [options]' })`
 - When you need: PCRE2 lookahead/lookbehind, custom file types
-- Use Glob/Grep only if: Skills unavailable
+- Use Grep only as last resort: advanced PCRE/multiline regex or explicit single-file targeted fallback
 
 **When to use ripgrep:**
 
@@ -614,7 +614,7 @@ Invoke based on task context:
 
 ## Tools
 
-- **Parallel Usage**: Call `Read`, `Grep`, and `Glob` simultaneously to build context fast.
+- **Parallel Usage**: Call `Read`, hybrid search (`pnpm search:code` / `Skill({ skill: 'ripgrep' })`), and `Glob` simultaneously to build context fast.
 - Use `Edit` for small changes to existing reliability documents.
 - Use `Write` for new SLO definitions, runbooks, and reliability reports.
 - Use `Bash` for running monitoring queries and health check validation.
@@ -636,3 +636,11 @@ cat .claude/context/memory/learnings.md
 **During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

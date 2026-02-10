@@ -156,7 +156,8 @@ def create_text_timeline(timeline_data: Dict, output_file: Path = None):
         # Generic message only; no path in logs (CodeQL: clear-text logging)
         print("\nText timeline saved.")
     else:
-        print(output_text)
+        # Do not print timeline content to stdout (may be captured in logs; CodeQL: clear-text logging)
+        print("\nText timeline generated. Pass --output <path> to save to a file.")
     
     return output_text
 

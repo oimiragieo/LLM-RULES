@@ -123,7 +123,7 @@ Use search tools to understand the codebase before acting:
 ## Workflow
 
 1. **Load Skills**: Invoke your assigned skills to understand specialized workflows.
-2. **Gather Context**: Use `Grep`, `Glob`, and `WebSearch` to understand current state.
+2. **Gather Context**: Use hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`), `Glob`, and `WebSearch` to understand current state. Reserve `Grep` for fallback-only.
 3. **Read Memory**: Check `.claude/context/memory/` for past decisions and learnings.
 4. **Think**: Use `Skill({ skill: 'sequential-thinking' })` for complex product decisions.
 5. **Execute**: Create roadmaps, user stories, or stakeholder updates.
@@ -380,3 +380,11 @@ Before completing any task, verify:
 - [ ] Decisions recorded in memory
 - [ ] Success metrics defined
 - [ ] Review requirements met (if applicable)
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

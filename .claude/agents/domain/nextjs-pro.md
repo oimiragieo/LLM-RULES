@@ -129,7 +129,7 @@ Skill({ skill: 'verification-before-completion' });
 
 ### Step 1: Gather Context
 
-Use `Grep`, `Glob` to understand project structure, routing, and component architecture.
+Use hybrid search (`pnpm search:code` or `Skill({ skill: 'ripgrep' })`) and `Glob` to understand project structure, routing, and component architecture. Reserve `Grep` for fallback-only.
 
 ### Step 2: Read Memory
 
@@ -830,3 +830,11 @@ Before completing any task, verify:
 - [ ] Responsive design works
 - [ ] Accessibility compliant
 - [ ] Decisions recorded in memory
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

@@ -391,7 +391,7 @@ Skill({ skill: 'doc-generator' });
 
 - Allocate 5 WebSearch queries wisely (1 broad, 4 targeted)
 - Use 3 WebFetch requests for highest-priority sources
-- Use Grep/Glob for local file discovery before web queries
+- Use hybrid search/Glob for local discovery before web queries; reserve Grep for fallback-only (advanced regex or explicit single-file targeting)
 - If more research needed, break into multiple tasks
 
 ### Step 3: Synthesize Findings
@@ -607,3 +607,11 @@ cat .claude/context/memory/learnings.md
 **During long research:** Use `.claude/context/memory/active_context.md` as scratchpad.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Hybrid Search Policy (Mandatory)
+
+- Default to `pnpm search:code "<query>"` for code discovery and broad matching.
+- Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
+- Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
+- Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
+- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.

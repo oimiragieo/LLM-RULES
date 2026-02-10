@@ -15,8 +15,8 @@ Task: Search for code
     +---> [Q1] Know exact text/keyword?
     |         |
     |         +---> YES: Simple keyword (1-2 words)
-    |         |         -> Use: Grep tool (built-in)
-    |         |         -> Speed: Fast (ms), Accuracy: 70%
+    |         |         -> Use: pnpm search:code "<keyword>"
+    |         |         -> Speed: Fast (ms), Accuracy: High
     |         |
     |         +---> YES: Complex regex (PCRE2, lookahead)
     |         |         -> Use: Skill({ skill: 'ripgrep' })
@@ -179,7 +179,7 @@ Skill({ skill: 'code-structural-search', args: 'try { \$\$ } catch (\$ERR) { \$\
 ```
 Known exact name? YES
 Complex regex? NO
--> Use Grep: Grep({ pattern: 'TaskUpdate' })
+-> Use hybrid: pnpm search:code "TaskUpdate"
 ```
 
 ### Scenario 2: "Find all error handling patterns"

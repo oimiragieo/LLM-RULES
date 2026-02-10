@@ -26,6 +26,7 @@ Enforcement:
 - Agents `MUST NOT` depend on `fzf` for required automated search paths.
 - Agents `MUST` keep unattended flows non-interactive and reproducible.
 - Agents `SHOULD` choose `ast:` mode only when lexical intent is insufficient.
+- Agents `MUST` treat `Grep` as fallback-only; default enforcement is handled by `hybrid-search-enforcer` PreToolUse hook.
 
 ## Best Practices
 

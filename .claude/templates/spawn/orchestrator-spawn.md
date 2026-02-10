@@ -94,7 +94,7 @@ Examples:
 **If YES (exact keyword):**
 ```
 
-- Simple keyword (1-2 words): Use Grep tool
+- Simple keyword (1-2 words): Use `pnpm search:code "<keyword>"`
 - Complex regex (PCRE2, lookahead, etc.): Use Skill({ skill: 'ripgrep', args: '...' })
 
 ```
@@ -113,17 +113,19 @@ Q2: Are you searching for a CONCEPT/MEANING?
 
 | What You Want | Tool | Speed | Accuracy | Example |
 |---------------|------|-------|----------|---------|
-| Exact text match | Grep | Fast | 70% | `grep "TaskUpdate"` |
+| Exact text match | `pnpm search:code` | Fast | 90% | `pnpm search:code "TaskUpdate"` |
 | Complex regex + ES modules | ripgrep | Fast | 85% | `Skill({ skill: 'ripgrep', args: '-P "foo(?=bar)"' })` |
 | Find by meaning/concept | code-semantic-search | Medium | 95% | `Skill({ skill: 'code-semantic-search', args: 'find auth logic' })` |
 | Find by code structure | code-structural-search | Medium | 100% | `Skill({ skill: 'code-structural-search', args: 'function $NAME($A, $B) { $$ }' })` |
 | File pattern matching | Glob | Fast | 100% | `Glob({ pattern: "**/*.ts" })` |
 
-### When NOT to Use Skills
+### Grep Fallback Policy (MANDATORY)
 
-- File listing/glob patterns -> Use Glob tool (faster)
-- Single-file simple searches -> Use Grep tool
-- When you already know the exact file -> Use Read tool directly
+- Use Grep only as last resort:
+  - advanced PCRE patterns (lookahead/lookbehind/backrefs/multiline), or
+  - explicit single-file targeted searches.
+- For all discovery and broad matching, use hybrid search first.
+- When you already know the exact file, prefer `Read` directly.
 
 ---
 
