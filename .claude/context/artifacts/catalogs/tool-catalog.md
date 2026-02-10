@@ -56,7 +56,7 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 | ---------------------- | -------- | ------------------------------ | ----------------------- |
 | `detect-orphans.mjs`   | `cli/`   | Find orphaned files/references | Not scripted            |
 | `validate-commit.mjs`  | `cli/`   | Validate commit messages       | skill: commit-validator |
-| `tool_search.mjs`      | `cli/`   | Search for tools by capability | Not scripted            |
+| `tool_search.mjs`      | `cli/`   | Search for tools by capability | Deprecated: use SkillCatalog.search() instead |
 | `git-notes-verify.cjs` | `cli/`   | Audit trail verification       | Not scripted            |
 
 ### Analysis
@@ -68,7 +68,7 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 | `project-analyzer/`   | `analysis/` | Analyze project structure and tech stack        | skill: code-analyzer |
 | `ecosystem-assessor/` | `analysis/` | Assess ecosystem health (hooks, MCPs)           | Not scripted         |
 | `find-polluter/`      | `analysis/` | Find test pollution sources                     | skill: debugging     |
-| `repo-rag/`           | `analysis/` | Repository RAG (retrieval-augmented generation) | Not scripted         |
+| `repo-rag/`           | `analysis/` | Repository RAG (retrieval-augmented generation) | Experimental: not production-ready, use code-semantic-search skill instead |
 
 ### Integrations
 
@@ -88,7 +88,7 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 | Directory/Tool         | Location        | Purpose                          | Wiring Status |
 | ---------------------- | --------------- | -------------------------------- | ------------- |
 | `token-optimizer/`     | `optimization/` | Monitor and optimize token usage | Not scripted  |
-| `sequential-thinking/` | `optimization/` | Step-by-step reasoning helper    | Not scripted  |
+| `sequential-thinking/` | `optimization/` | Step-by-step reasoning helper    | MCP skill: mcp__sequential-thinking__sequentialthinking |
 
 ### Runtime
 

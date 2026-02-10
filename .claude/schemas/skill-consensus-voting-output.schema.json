@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-consensus-voting-output.json",
+  "title": "Consensus Voting Skill Output",
+  "description": "Output structure for consensus-voting skill implementing Byzantine consensus protocols",
+  "type": "object",
+  "required": ["status", "output"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failed"],
+      "description": "Execution status of the voting session"
+    },
+    "output": {
+      "type": "object",
+      "description": "Voting results and consensus data",
+      "required": [
+        "topic",
+        "votingSession",
+        "votes",
+        "results",
+        "consensusReached"
+      ],
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "Topic or decision being voted on"
+        },
+        "votingSession": {
+          "type": "object",
+          "description": "Voting session configuration",
+          "required": ["quorum", "threshold", "protocol"],
+          "properties": {
+            "quorum": {
+              "type": "number",
+              "minimum": 1,
+              "description": "Minimum number of votes required"
+            },
+            "threshold": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Agreement threshold (0.0-1.0)"
+            },
+            "protocol": {
+              "type": "string",
+              "enum": ["simple-majority", "supermajority", "unanimous", "weighted", "ranked-choice"],
+              "description": "Voting protocol used"
+            },
+            "weights": {
+              "type": "object",
+              "description": "Vote weight by agent type",
+              "additionalProperties": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "votes": {
+          "type": "array",
+          "description": "Individual votes from agents",
+          "items": {
+            "type": "object",
+            "required": ["agent", "vote", "rationale", "confidence"],
+            "properties": {
+              "agent": {
+                "type": "string",
+                "description": "Agent identifier"
+              },
+              "vote": {
+                "type": "string",
+                "description": "Vote selection"
+              },
+              "rationale": {
+                "type": "string",
+                "description": "Reasoning for vote"
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Vote confidence (0.0-1.0)"
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Applied vote weight"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "results": {
+          "type": "object",
+          "description": "Aggregated voting results",
+          "required": ["weighted", "quorumMet", "decision"],
+          "properties": {
+            "weighted": {
+              "type": "object",
+              "description": "Weighted vote totals by option",
+              "additionalProperties": {
+                "type": "object",
+                "required": ["score", "percentage"],
+                "properties": {
+                  "score": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "percentage": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "quorumMet": {
+              "type": "boolean",
+              "description": "Whether minimum participation was achieved"
+            },
+            "decision": {
+              "type": ["string", "null"],
+              "description": "Final decision if consensus reached"
+            }
+          },
+          "additionalProperties": false
+        },
+        "consensusReached": {
+          "type": "boolean",
+          "description": "Whether voting threshold was met"
+        },
+        "conflictResolution": {
+          "type": "object",
+          "description": "Applied conflict resolution strategy if no consensus",
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": ["expert-override", "re-vote", "escalate"],
+              "description": "Resolution strategy used"
+            },
+            "outcome": {
+              "type": "string",
+              "description": "Resolution outcome"
+            },
+            "dissentingOpinions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["agent", "position"],
+                "properties": {
+                  "agent": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "string"
+                  },
+                  "concerns": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Voting session completion timestamp"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

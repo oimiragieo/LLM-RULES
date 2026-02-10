@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-ai-ml-expert-output.json",
+  "title": "AI/ML Expert Output",
+  "description": "Validation schema for ai-ml-expert skill output",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "analysis_type": {
+          "type": "string",
+          "enum": [
+            "code_review",
+            "architecture_guidance",
+            "pattern_recommendation",
+            "model_optimization",
+            "framework_integration",
+            "best_practices"
+          ],
+          "description": "Type of AI/ML analysis performed"
+        },
+        "domain": {
+          "type": "string",
+          "enum": [
+            "pytorch",
+            "langchain",
+            "llm_integration",
+            "scientific_computing",
+            "tensorflow",
+            "transformers",
+            "general"
+          ],
+          "description": "Specific AI/ML domain analyzed"
+        },
+        "findings": {
+          "type": "array",
+          "description": "Issues or recommendations discovered",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "required": [
+              "severity",
+              "category",
+              "description"
+            ],
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low",
+                  "info"
+                ],
+                "description": "Finding severity"
+              },
+              "category": {
+                "type": "string",
+                "description": "Category of finding (e.g., 'performance', 'best-practice', 'architecture')"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed description of the finding"
+              },
+              "file_path": {
+                "type": "string",
+                "description": "File where issue was found"
+              },
+              "line_number": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Line number of the issue"
+              },
+              "recommendation": {
+                "type": "string",
+                "description": "Suggested fix or improvement"
+              },
+              "code_example": {
+                "type": "string",
+                "description": "Code example showing the recommended approach"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "description": "Actionable recommendations with priorities",
+          "items": {
+            "type": "object",
+            "required": [
+              "priority",
+              "title",
+              "description"
+            ],
+            "properties": {
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ],
+                "description": "Recommendation priority"
+              },
+              "title": {
+                "type": "string",
+                "description": "Brief title of the recommendation"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed explanation"
+              },
+              "implementation_steps": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Step-by-step implementation guide"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "patterns_applied": {
+          "type": "array",
+          "description": "AI/ML patterns or best practices identified",
+          "items": {
+            "type": "string"
+          }
+        },
+        "frameworks_analyzed": {
+          "type": "array",
+          "description": "AI/ML frameworks found in the codebase",
+          "items": {
+            "type": "string"
+          }
+        },
+        "files_reviewed": {
+          "type": "array",
+          "description": "Files that were analyzed",
+          "items": {
+            "type": "string"
+          }
+        },
+        "summary": {
+          "type": "string",
+          "description": "Executive summary of the analysis"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "analysis_type",
+        "domain",
+        "findings"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

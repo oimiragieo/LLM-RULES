@@ -29,7 +29,6 @@ Complete catalog of 18+ enterprise workflows for multi-agent orchestration, secu
 | Reflection Workflow     | `.claude/workflows/core/reflection-workflow.md`                     | quality + learnings             |
 | Security Audit          | `.claude/workflows/security-architect-skill-workflow.md`            | security audit                  |
 | Architecture Review     | `.claude/workflows/architecture-review-skill-workflow.md`           | arch review                     |
-| Chrome Browser          | `.claude/workflows/chrome-browser-skill-workflow.md`                | browser automation              |
 | Consensus Voting        | `.claude/workflows/consensus-voting-skill-workflow.md`              | consensus                       |
 | Swarm Coordination      | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md` | swarm patterns                  |
 | Database Design         | `.claude/workflows/database-architect-skill-workflow.md`            | schema workflows                |

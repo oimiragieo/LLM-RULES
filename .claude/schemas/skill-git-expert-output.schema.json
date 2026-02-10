@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-git-expert-output.json",
+  "title": "Git Expert Output",
+  "description": "Validation schema for git-expert skill output",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "required": [
+        "operationType",
+        "commandsExecuted"
+      ],
+      "properties": {
+        "operationType": {
+          "type": "string",
+          "enum": [
+            "status-check",
+            "commit",
+            "branch",
+            "merge",
+            "rebase",
+            "pull",
+            "push",
+            "reset",
+            "restore",
+            "stash",
+            "log",
+            "diff",
+            "cherry-pick",
+            "tag"
+          ],
+          "description": "Type of git operation performed"
+        },
+        "commandsExecuted": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "command",
+              "exitCode"
+            ],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "Git command that was executed"
+              },
+              "exitCode": {
+                "type": "integer",
+                "description": "Exit code (0 = success)"
+              },
+              "output": {
+                "type": "string",
+                "description": "Command output"
+              },
+              "duration": {
+                "type": "number",
+                "description": "Execution time in milliseconds"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Git commands executed during operation"
+        },
+        "repositoryState": {
+          "type": "object",
+          "properties": {
+            "currentBranch": {
+              "type": "string"
+            },
+            "stagedFiles": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "modifiedFiles": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "untrackedFiles": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "ahead": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Commits ahead of remote"
+            },
+            "behind": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Commits behind remote"
+            },
+            "conflicts": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "commitDetails": {
+          "type": "object",
+          "properties": {
+            "commitHash": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{7,40}$"
+            },
+            "commitMessage": {
+              "type": "string"
+            },
+            "author": {
+              "type": "string"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "filesChanged": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "insertions": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "deletions": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "branchDetails": {
+          "type": "object",
+          "properties": {
+            "branchName": {
+              "type": "string"
+            },
+            "baseBranch": {
+              "type": "string"
+            },
+            "trackingRemote": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "safetyChecks": {
+          "type": "object",
+          "properties": {
+            "noForceUsed": {
+              "type": "boolean",
+              "description": "Confirmed no --force flag used"
+            },
+            "noSecretsCommitted": {
+              "type": "boolean",
+              "description": "Verified no secrets in commit"
+            },
+            "testsPassedBeforePush": {
+              "type": "boolean",
+              "description": "Tests ran successfully before push"
+            }
+          },
+          "additionalProperties": false
+        },
+        "tokenOptimization": {
+          "type": "object",
+          "properties": {
+            "usedShortStatus": {
+              "type": "boolean",
+              "description": "Used git status -s for token efficiency"
+            },
+            "usedCachedDiff": {
+              "type": "boolean",
+              "description": "Used git diff --cached"
+            },
+            "usedOnelineLog": {
+              "type": "boolean",
+              "description": "Used git log --oneline"
+            }
+          },
+          "additionalProperties": false
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "command",
+              "error"
+            ],
+            "properties": {
+              "command": {
+                "type": "string"
+              },
+              "error": {
+                "type": "string"
+              },
+              "suggestion": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Errors encountered during git operations"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

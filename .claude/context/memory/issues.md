@@ -1,4 +1,45 @@
-<!-- Last Cleaned: 2026-02-09 - Removed resolved issues >3 months old -->
+<!-- Last Cleaned: 2026-02-10 - Added Task #22 integration gap -->
+
+## 2026-02-10: Integration Health Gaps in Task #22 (Wave 16B)
+
+**Issue**: 3 CLI tools wired to package.json scripts (detect:orphans, verify:git-notes, assess:ecosystem) but not integrated per ADR-100
+
+**Trigger**: Reflection-agent assessed Task #22 completion and detected missing artifact-graph.json entries and tool-catalog.md status updates
+
+**Details**:
+- Tools successfully wired to package.json (fully functional)
+- Integration Health Score: 65% (Category: Gaps, requires integration analysis)
+- Missing: artifact-graph.json registration, tool-catalog.md status update, Router keywords
+
+**Solution**: Queue artifact-integrator task to:
+1. Add 3 tool entries to artifact-graph.json
+2. Update tool-catalog.md with wiring status (change from "reference-only" to "package.json wired")
+3. Create Router keywords for natural language discovery (e.g., "detect orphaned skills" → detect:orphans)
+4. Verify integration completeness per ADR-100 Step 4.5
+
+**Prevention**: Include integration assessment in Wave completion checklist for all developer tasks
+
+**Priority**: P2 (functional, not blocking, but should be addressed in next integration sweep)
+
+**Related**: ADR-100 Cross-Artifact Integration System, Task #22 Wave 16B
+
+---
+
+## 2026-02-09: CRITICAL - Context Overflow From Parallel Heavy Agents
+
+**Issue**: Router spawned 5+ heavy review agents (code-reviewer, QA, security-architect, devops, architect) simultaneously. Each returned 125k-165k token results inline. Total context exceeded 200k tokens. Autocompact failed (context already over threshold). Session crashed.
+
+**Impact**: HIGH - 52 minutes of work lost, all review results lost, session required restart
+
+**Workaround**:
+- Max 2 heavy agents in parallel (IRON LAW)
+- Agents write reports to files, return only file path + 5-line summary
+- Sequential review waves, not parallel blast
+- Use haiku model for straightforward reviews
+
+**Resolution**: Permanent routing rule change. See learnings.md "Context Overflow Prevention"
+
+**Priority**: P0 (session stability)
 
 ## 2026-02-09: Active Stub Modules (Deferred Consumer Refactoring)
 

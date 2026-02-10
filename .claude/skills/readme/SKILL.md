@@ -1,73 +1,255 @@
 ---
 name: readme
-description: Angular Novo Elements .cursorrules prompt file
-version: 1.0.0
-model: sonnet
-invoked_by: both
-user_invocable: true
-tools: [Read, Write, Edit, Bash]
-
-best_practices:
-  - Follow the guidelines consistently
-  - Apply rules during code review
-  - Use as reference when writing new code
-error_handling: graceful
-streaming: supported
+description: Use when creating, updating, or generating README and documentation files for projects and libraries
 ---
 
 # Readme Skill
 
 <identity>
-You are a coding standards expert specializing in readme.
-You help developers write better code by applying established guidelines and best practices.
+Readme specialist focused on creating clear, comprehensive README files and project documentation. Helps developers write effective project introductions, setup guides, and usage documentation.
 </identity>
 
 <capabilities>
-- Review code for guideline compliance
-- Suggest improvements based on best practices
-- Explain why certain patterns are preferred
-- Help refactor code to meet standards
+- Generate comprehensive README files from project context
+- Create clear installation and setup instructions
+- Write usage examples and API documentation
+- Document project structure and architecture
+- Generate table of contents and navigation
+- Create contributing guidelines and troubleshooting sections
+- Optimize readability with formatting and visual structure
 </capabilities>
 
-<instructions>
-When reviewing or writing code, apply these guidelines:
+## When to Use
 
-# Angular Novo Elements .cursorrules prompt file
+Use this skill when:
 
-Author: Dan Donathan
+- Creating a new README or documentation file
+- Updating existing README with new features
+- Documenting project setup, installation, or configuration
+- Writing usage examples and API references
+- Generating contributing guidelines or quick-start guides
+- Improving documentation clarity and structure
 
-## What you can build
+## Core Workflow
 
-Code Refactoring Tool: Develop an intelligent code refactoring tool that adheres to the principles outlined in the .cursorrules file. This tool can automatically detect code smells, suggest improvements for code simplification, and ensure best practices like DRY, KISS, and the Boy-Scout Rule are applied.Unit Test Generator: Create a tool that automatically generates unit tests for Angular components, ensuring all new code is thoroughly tested before merging. The tool should analyze existing code and create tests that cover a wide range of edge cases.Real-Time Code Review System: Build a platform that provides real-time feedback during code writing, highlighting areas where the principles like YAGNI, Curly’s Law, and the Principle of Least Astonishment can be applied to improve code quality.Angular Component Analyzer: Develop a service that analyzes standalone Angular components and provides insights into their integration with Novo Elements. It should check for best practices, compatibility issues, and optimization opportunities.Code Maintenance Dashboard: Construct a dashboard for tracking the maintainability of a codebase. It should use metrics to evaluate cleanliness, adherence to rules like DRY and Curly’s Law, and offer suggestions for improvement, making code maintenance easier.Project Structure Optimizer: Design a tool that suggests optimal file and directory structures for Angular projects using Novo Elements, ensuring the project remains clear, organized, and free from clutter.Automated Documentation Generator: Develop a generator that creates comprehensive and easy-to-understand documentation for Angular projects, focusing on clarifying code functionality and expected behavior to follow the Principle of Least Astonishment.Debugging Assistant: Create an AI-powered debugging assistant that helps identify and resolve issues by generating detailed logs and providing potential fixes, based on the debugging and testing rules from .cursorrules.Code Quality Checker: Implement a service that checks code against the provided style and formatting guidelines in real-time, ensuring consistent naming conventions and the use of up-to-date libraries.Premature Optimization Detector: Develop a tool that analyzes code for unnecessary optimizations and advises developers on when to focus on critical efficiencies, in line with the concept that premature optimization is the root of all evil.
+### Step 1: Gather Project Information
 
-## Benefits
+Analyze the project to understand:
 
-## Synopsis
+1. **Project Purpose**: What problem does it solve?
+2. **Target Audience**: Who are the users (developers, users, contributors)?
+3. **Key Features**: What makes this project special?
+4. **Technical Stack**: Languages, frameworks, dependencies
+5. **Project Structure**: How is code organized?
 
-This prompt is useful for Angular developers working with standalone components and Novo Elements, providing guidelines to ensure efficient, maintainable code that adheres to modern best practices.
+### Step 2: Create README Structure
 
-## Overview of .cursorrules prompt
+Use this standard structure:
 
-The .cursorrules file outlines a set of coding standards and principles to guide developers in creating optimal, production-ready code. It emphasizes preserving existing code structures, verifying changes, and delivering concise solutions. Key coding principles such as DRY (Don't Repeat Yourself), KISS (Keep It Simple Stupid), and YAGNI (You Aren't Gonna Need It) are highlighted to maintain code quality and avoid unnecessary complexity. It also includes specific rules for debugging, testing, and maintaining project structure, while integrating Angular with standalone components and Novo Elements. The file aims for thorough testing, clear documentation, and minimal diffs in code changes to meet specified project requirements efficiently.
+```markdown
+# Project Name
 
-</instructions>
+Brief description (1-2 sentences)
 
-<examples>
-Example usage:
+## Features
+
+- Feature 1
+- Feature 2
+- Feature 3
+
+## Installation
+
+[Setup instructions]
+
+## Quick Start
+
+[Basic usage example]
+
+## Documentation
+
+[Link to detailed docs]
+
+## API Reference
+
+[Key endpoints/functions]
+
+## Examples
+
+[Working examples]
+
+## Configuration
+
+[Setup options]
+
+## Troubleshooting
+
+[Common issues and solutions]
+
+## Contributing
+
+[How to contribute]
+
+## License
+
+[License information]
 ```
-User: "Review this code for readme compliance"
-Agent: [Analyzes code against guidelines and provides specific feedback]
+
+### Step 3: Write Clear Content
+
+- **Be specific**: Use concrete examples, not vague descriptions
+- **Show, don't tell**: Include code examples and screenshots
+- **Progressive disclosure**: Start simple, add complexity gradually
+- **Organize logically**: Group related information
+- **Use formatting**: Headers, lists, code blocks for readability
+
+### Step 4: Add Examples
+
+Include practical, working examples:
+
+- Installation examples
+- Basic usage snippets
+- Complex feature demonstrations
+- Common use cases
+- Copy-paste ready code
+
+### Step 5: Verify Quality
+
+Check before completing:
+
+- [ ] Clear project purpose in first paragraph
+- [ ] Installation instructions are complete
+- [ ] Examples are runnable
+- [ ] Table of contents matches sections
+- [ ] All links work
+- [ ] Formatting is consistent
+- [ ] No typos or grammar errors
+
+## README Components Reference
+
+### Project Title and Description
+
+```markdown
+# Project Name
+
+One-liner explaining what this project does.
+
+Long paragraph (2-3 sentences) describing problem solved and approach.
 ```
-</examples>
+
+### Features Section
+
+```markdown
+## Features
+
+- ✅ Feature with emoji for visual interest
+- ✅ Key capability with brief description
+- ✅ Unique advantage over alternatives
+```
+
+### Installation
+
+```markdown
+## Installation
+
+### Requirements
+
+- Node.js 18+
+- pnpm 8+
+
+### Steps
+
+\`\`\`bash
+pnpm install project-name
+\`\`\`
+```
+
+### Quick Start
+
+Keep this minimal (5-10 lines of code max):
+
+```markdown
+## Quick Start
+
+\`\`\`javascript
+import { feature } from 'project-name';
+
+const result = feature({ option: 'value' });
+console.log(result);
+\`\`\`
+```
+
+### Examples
+
+Make examples realistic and copy-paste ready:
+
+```markdown
+## Examples
+
+### Basic Usage
+
+\`\`\`typescript
+// Simple example with real output
+const instance = new MyClass();
+instance.doSomething(); // Output: expected result
+\`\`\`
+
+### Advanced Configuration
+
+\`\`\`typescript
+// Complex example showing options
+const instance = new MyClass({
+  option1: true,
+  option2: 'value'
+});
+\`\`\`
+```
+
+## Best Practices
+
+1. **Lead with value**: First paragraph should answer "why should I use this?"
+2. **Show working examples**: Code examples should be runnable
+3. **Keep installation simple**: Complex setup gets a dedicated guide
+4. **Document dependencies**: List what's required upfront
+5. **Include screenshots**: Visual examples for UI projects
+6. **Write for skimmers**: Use headers so people can scan content
+7. **Link to detailed docs**: README is overview, link to full documentation
+8. **Keep it current**: Update README when adding features
+9. **Be honest about limitations**: What's not covered or not supported
+10. **Include contributing guidelines**: How to report issues or submit PRs
+
+## Anti-Patterns
+
+| Pattern | Problem | Fix |
+|---------|---------|-----|
+| Wall of text | Impossible to scan | Use headers and lists |
+| Missing setup | Readers can't install | Include step-by-step instructions |
+| No examples | Unclear how to use | Add working code examples |
+| Outdated info | Misleads users | Update with releases |
+| Too detailed | Overwhelming | Link to full docs instead |
+| No table of contents | Hard to navigate | Add section links at top |
+| Broken links | Poor user experience | Test all external links |
+| Marketing fluff | Lacks substance | Focus on what it does, not hype |
+
+## Integration Points
+
+**Related Skills**:
+- `doc-generator` - Automated documentation from code
+- `writing-skills` - Writing quality guidelines
+- `technical-writer` - Professional documentation agent
+
+**Related Agents**:
+- `technical-writer` - Uses this skill for documentation
+- `developer` - Writes README for new projects
 
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
+Read `.claude/context/memory/learnings.md`
 
-```bash
-cat .claude/context/memory/learnings.md
-```
+**After completing:**
 
-**After completing:** Record any new patterns or exceptions discovered.
+- New pattern → `.claude/context/memory/learnings.md`
+- Issue found → `.claude/context/memory/issues.md`
+- Decision made → `.claude/context/memory/decisions.md`
 
-> ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+> ASSUME INTERRUPTION: If it's not in memory, it didn't happen.

@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-writing-skills-output.json",
+  "title": "Writing Skills Output",
+  "description": "Validation schema for writing-skills skill output",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "required": [
+        "skillFile",
+        "tddCycle",
+        "frontmatterValid"
+      ],
+      "properties": {
+        "skillFile": {
+          "type": "string",
+          "description": "Path to created/modified SKILL.md file"
+        },
+        "tddCycle": {
+          "type": "object",
+          "required": [
+            "redPhaseCompleted",
+            "greenPhaseCompleted",
+            "refactorPhaseCompleted"
+          ],
+          "properties": {
+            "redPhaseCompleted": {
+              "type": "boolean",
+              "description": "Baseline scenario run without skill (agent failed)"
+            },
+            "greenPhaseCompleted": {
+              "type": "boolean",
+              "description": "Minimal skill written and agent now complies"
+            },
+            "refactorPhaseCompleted": {
+              "type": "boolean",
+              "description": "Loopholes closed and skill is bulletproof"
+            },
+            "rationalizationsFound": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Rationalizations identified during testing"
+            },
+            "rationalizationsPlugged": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of rationalizations explicitly countered"
+            }
+          },
+          "additionalProperties": false
+        },
+        "frontmatterValid": {
+          "type": "boolean",
+          "description": "Whether YAML frontmatter meets requirements"
+        },
+        "frontmatter": {
+          "type": "object",
+          "required": [
+            "name",
+            "description"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9-]+$",
+              "description": "Skill name (letters, numbers, hyphens only)"
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 1024,
+              "description": "Third-person description starting with 'Use when...'"
+            }
+          },
+          "additionalProperties": false
+        },
+        "csoOptimized": {
+          "type": "object",
+          "properties": {
+            "descriptionStartsWithUseWhen": {
+              "type": "boolean",
+              "description": "Whether description focuses on trigger conditions"
+            },
+            "keywordCoverage": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Keywords included for search optimization"
+            },
+            "wordCount": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Total word count of skill"
+            },
+            "tokenEfficient": {
+              "type": "boolean",
+              "description": "Whether skill meets token efficiency targets"
+            }
+          },
+          "additionalProperties": false
+        },
+        "structureValid": {
+          "type": "object",
+          "properties": {
+            "hasOverview": {
+              "type": "boolean"
+            },
+            "hasWhenToUse": {
+              "type": "boolean"
+            },
+            "hasCorePattern": {
+              "type": "boolean"
+            },
+            "hasQuickReference": {
+              "type": "boolean"
+            },
+            "hasCommonMistakes": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "testingResults": {
+          "type": "object",
+          "properties": {
+            "pressureScenariosRun": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of pressure scenarios tested"
+            },
+            "complianceRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Percentage of scenarios where agent complied with skill"
+            },
+            "loopholesIdentified": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "loopholesClosed": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "supportingFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional files created (examples, tools, references)"
+        },
+        "deploymentChecklist": {
+          "type": "object",
+          "properties": {
+            "testedWithSubagents": {
+              "type": "boolean"
+            },
+            "rationalizationTableComplete": {
+              "type": "boolean"
+            },
+            "redFlagsListComplete": {
+              "type": "boolean"
+            },
+            "committedToGit": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

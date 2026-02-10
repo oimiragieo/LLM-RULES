@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-swarm-coordination-output.json",
+  "title": "Swarm Coordination Skill Output",
+  "description": "Output structure for swarm-coordination skill managing parallel agent execution",
+  "type": "object",
+  "required": ["status", "output"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failed"],
+      "description": "Execution status of the swarm coordination"
+    },
+    "output": {
+      "type": "object",
+      "description": "Swarm coordination results and metrics",
+      "required": [
+        "coordinationPattern",
+        "agentsSpawned",
+        "aggregatedResults",
+        "executionMetrics"
+      ],
+      "properties": {
+        "coordinationPattern": {
+          "type": "string",
+          "enum": ["fan-out-fan-in", "pipeline", "queen-worker", "parallel-independent"],
+          "description": "Coordination pattern used for agent execution"
+        },
+        "agentsSpawned": {
+          "type": "array",
+          "description": "Agents spawned in the swarm",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["agentType", "taskId", "status"],
+            "properties": {
+              "agentType": {
+                "type": "string",
+                "description": "Type of agent spawned"
+              },
+              "taskId": {
+                "type": "string",
+                "description": "Task ID for this agent"
+              },
+              "description": {
+                "type": "string",
+                "description": "Task description"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["spawned", "in_progress", "completed", "failed"],
+                "description": "Agent execution status"
+              },
+              "spawnedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "completedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "aggregatedResults": {
+          "type": "object",
+          "description": "Combined results from all agents",
+          "required": ["summary", "findings"],
+          "properties": {
+            "summary": {
+              "type": "string",
+              "description": "High-level summary of swarm execution"
+            },
+            "findings": {
+              "type": "array",
+              "description": "Key findings from all agents",
+              "items": {
+                "type": "object",
+                "required": ["agent", "finding"],
+                "properties": {
+                  "agent": {
+                    "type": "string"
+                  },
+                  "finding": {
+                    "type": "string"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low", "info"]
+                  },
+                  "category": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "recommendations": {
+              "type": "array",
+              "description": "Consolidated recommendations",
+              "items": {
+                "type": "object",
+                "required": ["recommendation", "priority"],
+                "properties": {
+                  "recommendation": {
+                    "type": "string"
+                  },
+                  "priority": {
+                    "type": "string",
+                    "enum": ["high", "medium", "low"]
+                  },
+                  "fromAgents": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "artifacts": {
+              "type": "array",
+              "description": "Output artifacts from agents",
+              "items": {
+                "type": "object",
+                "required": ["path", "agent"],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "File path to artifact"
+                  },
+                  "agent": {
+                    "type": "string",
+                    "description": "Agent that produced artifact"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["report", "plan", "diagram", "spec", "code"]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "executionMetrics": {
+          "type": "object",
+          "description": "Performance metrics for swarm execution",
+          "required": ["totalAgents", "successfulAgents", "failedAgents"],
+          "properties": {
+            "totalAgents": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Total number of agents spawned"
+            },
+            "successfulAgents": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Agents that completed successfully"
+            },
+            "failedAgents": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Agents that failed"
+            },
+            "parallelismAchieved": {
+              "type": "boolean",
+              "description": "Whether agents executed in parallel"
+            },
+            "executionTime": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "end": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "durationSeconds": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            },
+            "speedup": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Speedup factor vs sequential execution"
+            }
+          },
+          "additionalProperties": false
+        },
+        "failureHandling": {
+          "type": "object",
+          "description": "How failures were handled",
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": ["graceful-degradation", "retry", "escalate"],
+              "description": "Failure handling strategy"
+            },
+            "failedTasks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["taskId", "error"],
+                "properties": {
+                  "taskId": {
+                    "type": "string"
+                  },
+                  "agent": {
+                    "type": "string"
+                  },
+                  "error": {
+                    "type": "string"
+                  },
+                  "recovery": {
+                    "type": "string",
+                    "description": "Recovery action taken"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

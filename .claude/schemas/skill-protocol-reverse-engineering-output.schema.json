@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-protocol-reverse-engineering-output.json",
+  "title": "Protocol Reverse Engineering Output",
+  "description": "Validation schema for protocol-reverse-engineering skill output",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "analysis_type": {
+          "type": "string",
+          "enum": [
+            "packet_capture",
+            "protocol_dissection",
+            "message_format_analysis",
+            "state_machine_reconstruction",
+            "protocol_specification",
+            "fuzzing_harness"
+          ],
+          "description": "Type of protocol analysis performed"
+        },
+        "protocol_info": {
+          "type": "object",
+          "description": "Information about the analyzed protocol",
+          "required": [
+            "name",
+            "transport_layer"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Protocol name (discovered or assigned)"
+            },
+            "transport_layer": {
+              "type": "string",
+              "enum": [
+                "TCP",
+                "UDP",
+                "HTTP",
+                "HTTPS",
+                "WebSocket",
+                "custom"
+              ],
+              "description": "Underlying transport protocol"
+            },
+            "default_port": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535,
+              "description": "Default port number"
+            },
+            "encryption": {
+              "type": "string",
+              "enum": [
+                "none",
+                "TLS",
+                "custom"
+              ],
+              "description": "Encryption mechanism"
+            },
+            "protocol_type": {
+              "type": "string",
+              "enum": [
+                "text-based",
+                "binary",
+                "hybrid"
+              ],
+              "description": "Protocol encoding type"
+            }
+          },
+          "additionalProperties": false
+        },
+        "capture_details": {
+          "type": "object",
+          "description": "Traffic capture information",
+          "properties": {
+            "pcap_file": {
+              "type": "string",
+              "description": "Path to packet capture file"
+            },
+            "packet_count": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Total packets captured"
+            },
+            "capture_duration_seconds": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Capture duration"
+            },
+            "source_addresses": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Unique source IP addresses"
+            },
+            "destination_addresses": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Unique destination IP addresses"
+            }
+          },
+          "additionalProperties": false
+        },
+        "message_formats": {
+          "type": "array",
+          "description": "Discovered message formats",
+          "items": {
+            "type": "object",
+            "required": [
+              "message_type",
+              "structure"
+            ],
+            "properties": {
+              "message_type": {
+                "type": "string",
+                "description": "Message type identifier (e.g., 'login request', '0x01')"
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "client_to_server",
+                  "server_to_client",
+                  "bidirectional"
+                ],
+                "description": "Message direction"
+              },
+              "structure": {
+                "type": "array",
+                "description": "Field definitions",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "offset",
+                    "size",
+                    "name",
+                    "type"
+                  ],
+                  "properties": {
+                    "offset": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "Byte offset from message start"
+                    },
+                    "size": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "Field size in bytes"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Field name"
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "Data type (e.g., 'uint32_be', 'string', 'bytes')"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Field purpose"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "example_hex": {
+                "type": "string",
+                "description": "Example message in hex"
+              },
+              "frequency": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Number of times this message type was observed"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "state_machine": {
+          "type": "object",
+          "description": "Protocol state machine",
+          "properties": {
+            "states": {
+              "type": "array",
+              "description": "Protocol states",
+              "items": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "State name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "State description"
+                  },
+                  "entry_condition": {
+                    "type": "string",
+                    "description": "How to enter this state"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "transitions": {
+              "type": "array",
+              "description": "State transitions",
+              "items": {
+                "type": "object",
+                "required": [
+                  "from_state",
+                  "to_state",
+                  "trigger"
+                ],
+                "properties": {
+                  "from_state": {
+                    "type": "string",
+                    "description": "Starting state"
+                  },
+                  "to_state": {
+                    "type": "string",
+                    "description": "Destination state"
+                  },
+                  "trigger": {
+                    "type": "string",
+                    "description": "Message that causes transition"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "diagram_path": {
+              "type": "string",
+              "description": "Path to state machine diagram"
+            }
+          },
+          "additionalProperties": false
+        },
+        "protocol_patterns": {
+          "type": "array",
+          "description": "Identified protocol patterns",
+          "items": {
+            "type": "object",
+            "required": [
+              "pattern_type",
+              "description"
+            ],
+            "properties": {
+              "pattern_type": {
+                "type": "string",
+                "description": "Pattern category (e.g., 'handshake', 'keep-alive', 'framing')"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed description"
+              },
+              "example_sequence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Example message sequence"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "security_findings": {
+          "type": "array",
+          "description": "Security issues discovered",
+          "items": {
+            "type": "object",
+            "required": [
+              "severity",
+              "type",
+              "description"
+            ],
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low",
+                  "info"
+                ],
+                "description": "Finding severity"
+              },
+              "type": {
+                "type": "string",
+                "description": "Issue type (e.g., 'no encryption', 'weak authentication')"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed description"
+              },
+              "cwe_id": {
+                "type": "string",
+                "pattern": "^CWE-[0-9]+$",
+                "description": "CWE identifier if applicable"
+              },
+              "recommendation": {
+                "type": "string",
+                "description": "Recommended mitigation"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "protocol_specification": {
+          "type": "object",
+          "description": "Generated protocol documentation",
+          "properties": {
+            "specification_path": {
+              "type": "string",
+              "description": "Path to markdown specification"
+            },
+            "wireshark_dissector_path": {
+              "type": "string",
+              "description": "Path to Wireshark dissector (if generated)"
+            },
+            "kaitai_struct_path": {
+              "type": "string",
+              "description": "Path to Kaitai Struct definition (if generated)"
+            }
+          },
+          "additionalProperties": false
+        },
+        "tools_used": {
+          "type": "array",
+          "description": "Analysis tools employed",
+          "items": {
+            "type": "string"
+          }
+        },
+        "analysis_duration_seconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total analysis time"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Executive summary of protocol analysis"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "analysis_type",
+        "protocol_info"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

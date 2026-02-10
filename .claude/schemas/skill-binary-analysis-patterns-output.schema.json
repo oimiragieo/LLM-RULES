@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-binary-analysis-patterns-output.json",
+  "title": "Binary Analysis Patterns Output",
+  "description": "Validation schema for binary-analysis-patterns skill output",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "analysis_type": {
+          "type": "string",
+          "enum": [
+            "disassembly",
+            "decompilation",
+            "control_flow_analysis",
+            "pattern_recognition",
+            "function_identification",
+            "vulnerability_detection",
+            "malware_analysis"
+          ],
+          "description": "Type of binary analysis performed"
+        },
+        "target_binary": {
+          "type": "object",
+          "description": "Information about the analyzed binary",
+          "required": [
+            "file_path",
+            "architecture",
+            "file_type"
+          ],
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "Path to the binary file"
+            },
+            "architecture": {
+              "type": "string",
+              "enum": [
+                "x86",
+                "x86-64",
+                "ARM",
+                "ARM64",
+                "MIPS",
+                "PowerPC",
+                "RISC-V"
+              ],
+              "description": "CPU architecture"
+            },
+            "file_type": {
+              "type": "string",
+              "enum": [
+                "ELF",
+                "PE",
+                "Mach-O",
+                "raw"
+              ],
+              "description": "Binary file format"
+            },
+            "compiler": {
+              "type": "string",
+              "description": "Detected compiler (e.g., 'GCC', 'Clang', 'MSVC')"
+            },
+            "stripped": {
+              "type": "boolean",
+              "description": "Whether symbols are stripped"
+            },
+            "file_size_bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Binary file size"
+            }
+          },
+          "additionalProperties": false
+        },
+        "functions_identified": {
+          "type": "array",
+          "description": "Functions discovered in the binary",
+          "items": {
+            "type": "object",
+            "required": [
+              "address",
+              "name"
+            ],
+            "properties": {
+              "address": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]+$",
+                "description": "Function start address (hex)"
+              },
+              "name": {
+                "type": "string",
+                "description": "Function name (or auto-generated)"
+              },
+              "size_bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Function size in bytes"
+              },
+              "calling_convention": {
+                "type": "string",
+                "description": "Detected calling convention (e.g., 'System V AMD64', 'Microsoft x64')"
+              },
+              "prototype": {
+                "type": "string",
+                "description": "Function prototype if reconstructed"
+              },
+              "complexity_score": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Cyclomatic complexity"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "control_flow_graphs": {
+          "type": "array",
+          "description": "Control flow analysis results",
+          "items": {
+            "type": "object",
+            "required": [
+              "function_name",
+              "basic_block_count"
+            ],
+            "properties": {
+              "function_name": {
+                "type": "string",
+                "description": "Function analyzed"
+              },
+              "basic_block_count": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Number of basic blocks"
+              },
+              "edge_count": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Number of control flow edges"
+              },
+              "cyclomatic_complexity": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Cyclomatic complexity"
+              },
+              "graph_output_file": {
+                "type": "string",
+                "description": "Path to generated CFG visualization"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "patterns_detected": {
+          "type": "array",
+          "description": "Code patterns and idioms identified",
+          "items": {
+            "type": "object",
+            "required": [
+              "pattern_type",
+              "description"
+            ],
+            "properties": {
+              "pattern_type": {
+                "type": "string",
+                "description": "Pattern category (e.g., 'prologue', 'string copy', 'crypto operation')"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed description of the pattern"
+              },
+              "locations": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-fA-F]+$"
+                },
+                "description": "Addresses where pattern was found"
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Detection confidence (0-1)"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "vulnerabilities": {
+          "type": "array",
+          "description": "Potential vulnerabilities discovered",
+          "items": {
+            "type": "object",
+            "required": [
+              "severity",
+              "type",
+              "description",
+              "location"
+            ],
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ],
+                "description": "Vulnerability severity"
+              },
+              "type": {
+                "type": "string",
+                "description": "Vulnerability type (e.g., 'buffer overflow', 'use-after-free')"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed vulnerability description"
+              },
+              "location": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]+$",
+                "description": "Address of vulnerable code"
+              },
+              "cwe_id": {
+                "type": "string",
+                "pattern": "^CWE-[0-9]+$",
+                "description": "CWE identifier"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "disassembly_output": {
+          "type": "object",
+          "description": "Disassembly output files",
+          "properties": {
+            "full_disassembly_path": {
+              "type": "string",
+              "description": "Path to full disassembly listing"
+            },
+            "decompiled_code_path": {
+              "type": "string",
+              "description": "Path to decompiled pseudocode (if available)"
+            },
+            "cfg_diagrams_path": {
+              "type": "string",
+              "description": "Path to control flow graph diagrams"
+            }
+          },
+          "additionalProperties": false
+        },
+        "tools_used": {
+          "type": "array",
+          "description": "Analysis tools employed",
+          "items": {
+            "type": "string"
+          }
+        },
+        "summary": {
+          "type": "string",
+          "description": "Executive summary of binary analysis findings"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "analysis_type",
+        "target_binary"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

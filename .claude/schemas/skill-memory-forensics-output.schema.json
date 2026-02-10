@@ -1,0 +1,361 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-memory-forensics-output.json",
+  "title": "Memory Forensics Output",
+  "description": "Validation schema for memory-forensics skill output",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "analysis_type": {
+          "type": "string",
+          "enum": [
+            "process_analysis",
+            "network_connections",
+            "malware_detection",
+            "artifact_extraction",
+            "timeline_reconstruction",
+            "credential_extraction",
+            "full_forensic_analysis"
+          ],
+          "description": "Type of memory forensics analysis performed"
+        },
+        "memory_dump": {
+          "type": "object",
+          "description": "Information about the analyzed memory dump",
+          "required": [
+            "file_path",
+            "os_type"
+          ],
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "Path to the memory dump file"
+            },
+            "os_type": {
+              "type": "string",
+              "enum": [
+                "Windows",
+                "Linux",
+                "macOS",
+                "Unknown"
+              ],
+              "description": "Operating system"
+            },
+            "os_version": {
+              "type": "string",
+              "description": "Detected OS version"
+            },
+            "architecture": {
+              "type": "string",
+              "enum": [
+                "x86",
+                "x86-64",
+                "ARM",
+                "ARM64"
+              ],
+              "description": "CPU architecture"
+            },
+            "dump_size_bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Memory dump file size"
+            },
+            "acquisition_time": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the memory was captured (if known)"
+            },
+            "acquisition_method": {
+              "type": "string",
+              "description": "Tool used to acquire memory (e.g., 'WinPmem', 'LiME')"
+            }
+          },
+          "additionalProperties": false
+        },
+        "processes_found": {
+          "type": "array",
+          "description": "Processes identified in memory",
+          "items": {
+            "type": "object",
+            "required": [
+              "pid",
+              "name"
+            ],
+            "properties": {
+              "pid": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Process ID"
+              },
+              "ppid": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Parent process ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "Process name"
+              },
+              "path": {
+                "type": "string",
+                "description": "Full path to executable"
+              },
+              "command_line": {
+                "type": "string",
+                "description": "Command line arguments"
+              },
+              "creation_time": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Process creation time"
+              },
+              "suspicious": {
+                "type": "boolean",
+                "description": "Whether process is flagged as suspicious"
+              },
+              "suspicious_reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Reasons for suspicion"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "network_connections": {
+          "type": "array",
+          "description": "Network connections active in memory",
+          "items": {
+            "type": "object",
+            "required": [
+              "protocol",
+              "local_address",
+              "remote_address"
+            ],
+            "properties": {
+              "protocol": {
+                "type": "string",
+                "enum": [
+                  "TCP",
+                  "UDP",
+                  "TCPv6",
+                  "UDPv6"
+                ],
+                "description": "Network protocol"
+              },
+              "local_address": {
+                "type": "string",
+                "description": "Local IP:port"
+              },
+              "remote_address": {
+                "type": "string",
+                "description": "Remote IP:port"
+              },
+              "state": {
+                "type": "string",
+                "description": "Connection state (e.g., 'ESTABLISHED', 'LISTENING')"
+              },
+              "pid": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Associated process ID"
+              },
+              "process_name": {
+                "type": "string",
+                "description": "Associated process name"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "malware_indicators": {
+          "type": "array",
+          "description": "Malware indicators of compromise (IOCs)",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "value",
+              "severity"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "process_injection",
+                  "hidden_process",
+                  "rootkit",
+                  "suspicious_network",
+                  "malicious_code",
+                  "persistence_mechanism",
+                  "credential_theft"
+                ],
+                "description": "IOC type"
+              },
+              "value": {
+                "type": "string",
+                "description": "IOC value (e.g., hash, IP, registry key)"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ],
+                "description": "Threat severity"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed description of the indicator"
+              },
+              "location": {
+                "type": "string",
+                "description": "Where in memory this was found"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "artifacts_extracted": {
+          "type": "array",
+          "description": "Forensic artifacts extracted from memory",
+          "items": {
+            "type": "object",
+            "required": [
+              "artifact_type",
+              "description"
+            ],
+            "properties": {
+              "artifact_type": {
+                "type": "string",
+                "enum": [
+                  "file",
+                  "registry_key",
+                  "credential",
+                  "encryption_key",
+                  "browser_history",
+                  "clipboard_data",
+                  "screenshot",
+                  "certificate"
+                ],
+                "description": "Type of artifact"
+              },
+              "description": {
+                "type": "string",
+                "description": "Artifact description"
+              },
+              "output_path": {
+                "type": "string",
+                "description": "Path where artifact was saved"
+              },
+              "hash_sha256": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{64}$",
+                "description": "SHA-256 hash of the artifact"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "description": "Timeline of events reconstructed from memory",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "event_type",
+              "description"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Event timestamp"
+              },
+              "event_type": {
+                "type": "string",
+                "description": "Type of event (e.g., 'process_start', 'network_connect')"
+              },
+              "description": {
+                "type": "string",
+                "description": "Event description"
+              },
+              "pid": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Associated process ID"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "volatility_plugins_used": {
+          "type": "array",
+          "description": "Volatility plugins executed",
+          "items": {
+            "type": "string"
+          }
+        },
+        "report_files": {
+          "type": "object",
+          "description": "Generated report files",
+          "properties": {
+            "full_report_path": {
+              "type": "string",
+              "description": "Path to comprehensive forensics report"
+            },
+            "process_list_path": {
+              "type": "string",
+              "description": "Path to process listing"
+            },
+            "network_list_path": {
+              "type": "string",
+              "description": "Path to network connections listing"
+            },
+            "timeline_path": {
+              "type": "string",
+              "description": "Path to timeline CSV"
+            }
+          },
+          "additionalProperties": false
+        },
+        "analysis_duration_seconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total analysis time"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Executive summary of forensic findings"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "analysis_type",
+        "memory_dump"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

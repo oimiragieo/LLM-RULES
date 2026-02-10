@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://agent-studio.dev/schemas/agent-identity.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/agent-identity.schema.json",
   "title": "Agent Identity Schema",
   "description": "Defines structured identity fields for agents (role, goal, backstory) inspired by crewAI, adapted for Agent-Studio's specialized agent architecture.",
   "version": "1.0.0",

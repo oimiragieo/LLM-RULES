@@ -1,0 +1,261 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-context-compressor-output.schema.json",
+  "title": "Context Compressor Skill Output",
+  "description": "Validates output from context-compressor skill invocation - context compression and summarization",
+  "type": "object",
+  "required": [
+    "output",
+    "status"
+  ],
+  "properties": {
+    "output": {
+      "type": "object",
+      "description": "Context compression execution results",
+      "required": [
+        "compressedContext",
+        "compressionStats"
+      ],
+      "properties": {
+        "compressedContext": {
+          "type": "object",
+          "description": "Compressed context structure",
+          "required": [
+            "sessionSummary"
+          ],
+          "properties": {
+            "sessionSummary": {
+              "type": "string",
+              "description": "Overall session summary in markdown"
+            },
+            "decisionsMade": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "decision",
+                  "rationale"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Decision identifier (e.g., 'D1', 'D2')"
+                  },
+                  "decision": {
+                    "type": "string",
+                    "description": "What was decided"
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "description": "Why this decision was made"
+                  }
+                }
+              },
+              "description": "Extracted decisions with rationale"
+            },
+            "filesModified": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "status"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "File path"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "new",
+                      "updated",
+                      "deleted"
+                    ],
+                    "description": "File change status"
+                  },
+                  "summary": {
+                    "type": "string",
+                    "description": "Brief summary of changes"
+                  }
+                }
+              },
+              "description": "Files created/modified with status"
+            },
+            "codeSummaries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "location",
+                  "summary"
+                ],
+                "properties": {
+                  "location": {
+                    "type": "string",
+                    "description": "Code location (file:line or file:function)"
+                  },
+                  "summary": {
+                    "type": "string",
+                    "description": "Compressed code summary"
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Key dependencies"
+                  }
+                }
+              },
+              "description": "Compressed code summaries"
+            },
+            "errorSummaries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "message",
+                  "location"
+                ],
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "Compressed error message"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Error location (file:line)"
+                  },
+                  "cause": {
+                    "type": "string",
+                    "description": "Root cause summary"
+                  }
+                }
+              },
+              "description": "Compressed error summaries"
+            },
+            "openItems": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Remaining open tasks/items"
+            },
+            "nextSteps": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Immediate next steps"
+            }
+          },
+          "additionalProperties": false
+        },
+        "compressionStats": {
+          "type": "object",
+          "required": [
+            "originalTokenCount",
+            "compressedTokenCount",
+            "compressionRatio"
+          ],
+          "properties": {
+            "originalTokenCount": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Estimated original token count"
+            },
+            "compressedTokenCount": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Estimated compressed token count"
+            },
+            "compressionRatio": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Compression ratio (0-1, lower is better)"
+            },
+            "compressionPercentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Percentage of tokens reduced"
+            },
+            "contentTypes": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "conversation": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "documentation": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "errors": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "logs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "description": "Token counts by content type compressed"
+            }
+          },
+          "additionalProperties": false
+        },
+        "validationChecks": {
+          "type": "object",
+          "properties": {
+            "decisionsPreserved": {
+              "type": "boolean",
+              "description": "All decisions captured with rationale"
+            },
+            "locationsRetained": {
+              "type": "boolean",
+              "description": "File paths and line numbers retained"
+            },
+            "errorCausesDocumented": {
+              "type": "boolean",
+              "description": "Error causes (not just symptoms) documented"
+            },
+            "nextStepsClear": {
+              "type": "boolean",
+              "description": "Next steps are clear and actionable"
+            },
+            "canResumeWork": {
+              "type": "boolean",
+              "description": "Work can be resumed from compressed context"
+            }
+          },
+          "description": "Validation checks for compression quality"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when compression was performed"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    }
+  },
+  "additionalProperties": false
+}

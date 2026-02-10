@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-research-synthesis-output.json",
+  "title": "Research Synthesis Skill Output",
+  "description": "Output structure for research-synthesis skill gathering best practices before artifact creation",
+  "type": "object",
+  "required": ["status", "output"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failed"],
+      "description": "Execution status of the research session"
+    },
+    "output": {
+      "type": "object",
+      "description": "Research findings and synthesis",
+      "required": [
+        "researchTopic",
+        "queries",
+        "sources",
+        "synthesis",
+        "designDecisions"
+      ],
+      "properties": {
+        "researchTopic": {
+          "type": "string",
+          "description": "Topic being researched"
+        },
+        "artifactType": {
+          "type": "string",
+          "enum": ["agent", "skill", "workflow", "hook", "schema", "template", "feature", "architecture"],
+          "description": "Type of artifact this research supports"
+        },
+        "queries": {
+          "type": "array",
+          "description": "Research queries executed",
+          "minItems": 3,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["query", "tool", "resultsCount"],
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "Search query"
+              },
+              "tool": {
+                "type": "string",
+                "enum": ["exa", "websearch", "webfetch", "grep"],
+                "description": "Tool used for query"
+              },
+              "resultsCount": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Number of results returned"
+              },
+              "executedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "sources": {
+          "type": "array",
+          "description": "External sources consulted",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["title", "type"],
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Source title or description"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "Source URL if available"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["documentation", "article", "github", "stackoverflow", "academic", "blog", "code-example"],
+                "description": "Source type"
+              },
+              "relevance": {
+                "type": "string",
+                "enum": ["high", "medium", "low"],
+                "description": "Relevance to research topic"
+              },
+              "keyTakeaways": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Key points from this source"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "codebasePatterns": {
+          "type": "array",
+          "description": "Existing patterns found in codebase",
+          "items": {
+            "type": "object",
+            "required": ["pattern", "location"],
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "Pattern description"
+              },
+              "location": {
+                "type": "string",
+                "description": "File path or location"
+              },
+              "usage": {
+                "type": "string",
+                "description": "How pattern is used"
+              },
+              "shouldAdopt": {
+                "type": "boolean",
+                "description": "Whether to adopt this pattern"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "synthesis": {
+          "type": "object",
+          "description": "Synthesized research findings",
+          "required": ["bestPractices", "recommendations"],
+          "properties": {
+            "bestPractices": {
+              "type": "array",
+              "description": "Identified best practices",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["practice", "rationale"],
+                "properties": {
+                  "practice": {
+                    "type": "string",
+                    "description": "Best practice description"
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "description": "Why this is a best practice"
+                  },
+                  "sources": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Supporting sources"
+                  },
+                  "priority": {
+                    "type": "string",
+                    "enum": ["must-have", "should-have", "nice-to-have"]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "recommendations": {
+              "type": "array",
+              "description": "Implementation recommendations",
+              "items": {
+                "type": "string"
+              }
+            },
+            "antiPatterns": {
+              "type": "array",
+              "description": "Patterns to avoid",
+              "items": {
+                "type": "object",
+                "required": ["pattern", "reason"],
+                "properties": {
+                  "pattern": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "alternative": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "designDecisions": {
+          "type": "array",
+          "description": "Design decisions with rationale",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["decision", "rationale"],
+            "properties": {
+              "decision": {
+                "type": "string",
+                "description": "Design decision made"
+              },
+              "rationale": {
+                "type": "string",
+                "description": "Why this decision was made"
+              },
+              "alternatives": {
+                "type": "array",
+                "description": "Alternatives considered",
+                "items": {
+                  "type": "object",
+                  "required": ["option", "rejected"],
+                  "properties": {
+                    "option": {
+                      "type": "string"
+                    },
+                    "rejected": {
+                      "type": "string",
+                      "description": "Why alternative was rejected"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "risks": {
+                "type": "array",
+                "description": "Risks and mitigations",
+                "items": {
+                  "type": "object",
+                  "required": ["risk", "mitigation"],
+                  "properties": {
+                    "risk": {
+                      "type": "string"
+                    },
+                    "mitigation": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": ["critical", "high", "medium", "low"]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "reportLocation": {
+          "type": "string",
+          "description": "Path to full research report",
+          "pattern": "^\\.claude/context/artifacts/research-reports/.*\\.md$"
+        },
+        "reportSize": {
+          "type": "object",
+          "description": "Report size metrics",
+          "properties": {
+            "sizeKB": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 20,
+              "description": "Report size in KB (must be under 20KB)"
+            },
+            "withinLimit": {
+              "type": "boolean",
+              "description": "Whether report is within 20KB limit"
+            }
+          },
+          "additionalProperties": false
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Research completion timestamp"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,319 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-database-architect-output.schema.json",
+  "title": "Database Architect Skill Output Verification",
+  "description": "Verifiable output from the database-architect skill that proves database design occurred",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "database_type": {
+          "type": "string",
+          "enum": [
+            "postgresql",
+            "mysql",
+            "mongodb",
+            "redis",
+            "other"
+          ],
+          "description": "Target database type"
+        },
+        "schema_design": {
+          "type": "object",
+          "description": "Schema design details",
+          "properties": {
+            "tables": {
+              "type": "array",
+              "description": "Database tables or collections",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "columns"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "columns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "type"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "nullable": {
+                          "type": "boolean"
+                        },
+                        "default": {
+                          "type": "string"
+                        },
+                        "primary_key": {
+                          "type": "boolean"
+                        },
+                        "foreign_key": {
+                          "type": "object",
+                          "properties": {
+                            "references_table": {
+                              "type": "string"
+                            },
+                            "references_column": {
+                              "type": "string"
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "indexes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "columns"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "columns": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "unique": {
+                          "type": "boolean"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "btree",
+                            "hash",
+                            "gin",
+                            "gist"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "normalization_level": {
+              "type": "string",
+              "enum": [
+                "1NF",
+                "2NF",
+                "3NF",
+                "BCNF"
+              ]
+            },
+            "denormalizations": {
+              "type": "array",
+              "description": "Intentional denormalizations with justification",
+              "items": {
+                "type": "object",
+                "required": [
+                  "description",
+                  "justification"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "justification": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "tables"
+          ]
+        },
+        "index_strategy": {
+          "type": "object",
+          "description": "Index planning and rationale",
+          "properties": {
+            "indexes_planned": {
+              "type": "number",
+              "minimum": 0
+            },
+            "query_patterns_analyzed": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "covering_indexes": {
+              "type": "array",
+              "description": "Indexes that cover entire queries",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "migration_scripts": {
+          "type": "object",
+          "description": "Migration script details",
+          "properties": {
+            "migration_files": {
+              "type": "array",
+              "description": "Generated migration files",
+              "items": {
+                "type": "object",
+                "required": [
+                  "filename",
+                  "description",
+                  "has_up_migration",
+                  "has_down_migration"
+                ],
+                "properties": {
+                  "filename": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "has_up_migration": {
+                    "type": "boolean"
+                  },
+                  "has_down_migration": {
+                    "type": "boolean"
+                  },
+                  "zero_downtime": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "rollback_tested": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "performance_considerations": {
+          "type": "object",
+          "description": "Performance optimization strategies",
+          "properties": {
+            "query_optimization": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "partitioning_strategy": {
+              "type": "string"
+            },
+            "caching_recommendations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "connection_pooling": {
+              "type": "object",
+              "properties": {
+                "recommended_pool_size": {
+                  "type": "number"
+                },
+                "timeout_settings": {
+                  "type": "object"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "er_diagram": {
+          "type": "object",
+          "description": "Entity-Relationship diagram",
+          "properties": {
+            "diagram_file": {
+              "type": "string",
+              "description": "Path to ER diagram file (Mermaid or image)"
+            },
+            "relationships_mapped": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "summary": {
+          "type": "object",
+          "description": "Design summary",
+          "properties": {
+            "total_tables": {
+              "type": "number",
+              "minimum": 1
+            },
+            "total_indexes": {
+              "type": "number",
+              "minimum": 0
+            },
+            "total_migrations": {
+              "type": "number",
+              "minimum": 0
+            },
+            "estimated_data_volume": {
+              "type": "string"
+            },
+            "scalability_notes": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "total_tables"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "database_type",
+        "schema_design",
+        "summary"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-doc-generator-output.json",
+  "title": "Doc Generator Output",
+  "description": "Validation schema for doc-generator skill output",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "required": [
+        "documentationType",
+        "outputFile",
+        "sectionsGenerated"
+      ],
+      "properties": {
+        "documentationType": {
+          "type": "string",
+          "enum": [
+            "api-documentation",
+            "developer-guide",
+            "architecture-docs",
+            "user-manual",
+            "openapi-spec"
+          ],
+          "description": "Type of documentation generated"
+        },
+        "outputFile": {
+          "type": "string",
+          "description": "Path to generated documentation file"
+        },
+        "sectionsGenerated": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "sectionTitle",
+              "content"
+            ],
+            "properties": {
+              "sectionTitle": {
+                "type": "string",
+                "description": "Title of the documentation section"
+              },
+              "content": {
+                "type": "string",
+                "description": "Content of the section"
+              },
+              "subsections": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of subsection titles"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Documentation sections that were generated"
+        },
+        "sourceFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Source code files analyzed for documentation"
+        },
+        "examplesIncluded": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of code examples included"
+        },
+        "troubleshootingGuides": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Troubleshooting guides included"
+        },
+        "apiEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "method",
+              "path"
+            ],
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+                "description": "HTTP method"
+              },
+              "path": {
+                "type": "string",
+                "description": "API endpoint path"
+              },
+              "description": {
+                "type": "string",
+                "description": "Endpoint description"
+              },
+              "parameters": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Query/path parameters"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "API endpoints documented (for API documentation type)"
+        },
+        "completenessChecks": {
+          "type": "object",
+          "properties": {
+            "allEndpointsDocumented": {
+              "type": "boolean",
+              "description": "Whether all API endpoints are documented"
+            },
+            "examplesValidated": {
+              "type": "boolean",
+              "description": "Whether code examples were tested"
+            },
+            "linksValidated": {
+              "type": "boolean",
+              "description": "Whether documentation links are valid"
+            }
+          },
+          "additionalProperties": false
+        },
+        "generated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of generation"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-summarize-changes-output.json",
+  "title": "Summarize Changes Output",
+  "description": "Validation schema for summarize-changes skill output",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "required": [
+        "overview",
+        "changesMade"
+      ],
+      "properties": {
+        "overview": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 500,
+          "description": "1-2 sentence high-level description of what was accomplished"
+        },
+        "changesMade": {
+          "type": "object",
+          "properties": {
+            "newFiles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "purpose"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "purpose": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "modifiedFiles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "changes"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "changes": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "deletedFiles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "reason"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "technicalDetails": {
+          "type": "object",
+          "properties": {
+            "keyDecisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "decision",
+                  "rationale"
+                ],
+                "properties": {
+                  "decision": {
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "dependenciesAdded": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "package",
+                  "version",
+                  "reason"
+                ],
+                "properties": {
+                  "package": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "dependenciesRemoved": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "package",
+                  "reason"
+                ],
+                "properties": {
+                  "package": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "breakingChanges": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of breaking changes or empty array if none"
+        },
+        "migrationRequired": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Migration steps required or empty array if none"
+        },
+        "verificationChecklist": {
+          "type": "object",
+          "required": [
+            "unitTestsPass",
+            "integrationTestsPass"
+          ],
+          "properties": {
+            "unitTestsPass": {
+              "type": "boolean"
+            },
+            "integrationTestsPass": {
+              "type": "boolean"
+            },
+            "manualTestingPerformed": {
+              "type": "boolean"
+            },
+            "documentationUpdated": {
+              "type": "boolean"
+            },
+            "noConsoleErrors": {
+              "type": "boolean"
+            },
+            "performanceAcceptable": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "relatedIssues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Issue numbers or PR references (e.g., 'Fixes #123')"
+        },
+        "commitMessage": {
+          "type": "object",
+          "required": [
+            "type",
+            "scope",
+            "description"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "feat",
+                "fix",
+                "refactor",
+                "docs",
+                "test",
+                "chore",
+                "perf"
+              ]
+            },
+            "scope": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            },
+            "footer": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "generated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

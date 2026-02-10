@@ -1,0 +1,282 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-accessibility-output.schema.json",
+  "title": "Accessibility Skill Output Verification",
+  "description": "Verifiable output from the accessibility skill that proves accessibility review occurred",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "wcag_level": {
+          "type": "string",
+          "enum": [
+            "A",
+            "AA",
+            "AAA"
+          ],
+          "description": "Target WCAG compliance level"
+        },
+        "files_reviewed": {
+          "type": "array",
+          "description": "Files reviewed for accessibility",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "semantic_html_check": {
+          "type": "object",
+          "description": "Semantic HTML usage assessment",
+          "properties": {
+            "passed": {
+              "type": "boolean"
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "line",
+                  "issue",
+                  "severity"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "line": {
+                    "type": "number"
+                  },
+                  "issue": {
+                    "type": "string"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "CRITICAL",
+                      "HIGH",
+                      "MEDIUM",
+                      "LOW"
+                    ]
+                  },
+                  "suggestion": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "passed",
+            "issues"
+          ]
+        },
+        "aria_attributes_check": {
+          "type": "object",
+          "description": "ARIA attributes assessment",
+          "properties": {
+            "passed": {
+              "type": "boolean"
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "line",
+                  "issue",
+                  "severity"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "line": {
+                    "type": "number"
+                  },
+                  "issue": {
+                    "type": "string"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "CRITICAL",
+                      "HIGH",
+                      "MEDIUM",
+                      "LOW"
+                    ]
+                  },
+                  "suggestion": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "passed",
+            "issues"
+          ]
+        },
+        "keyboard_navigation_check": {
+          "type": "object",
+          "description": "Keyboard navigation assessment",
+          "properties": {
+            "passed": {
+              "type": "boolean"
+            },
+            "tab_order_logical": {
+              "type": "boolean"
+            },
+            "focus_indicators_visible": {
+              "type": "boolean"
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "passed"
+          ]
+        },
+        "color_contrast_check": {
+          "type": "object",
+          "description": "Color contrast assessment",
+          "properties": {
+            "passed": {
+              "type": "boolean"
+            },
+            "failures": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "element",
+                  "foreground",
+                  "background",
+                  "ratio",
+                  "required_ratio"
+                ],
+                "properties": {
+                  "element": {
+                    "type": "string"
+                  },
+                  "foreground": {
+                    "type": "string"
+                  },
+                  "background": {
+                    "type": "string"
+                  },
+                  "ratio": {
+                    "type": "string"
+                  },
+                  "required_ratio": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "passed"
+          ]
+        },
+        "screen_reader_support": {
+          "type": "object",
+          "description": "Screen reader compatibility",
+          "properties": {
+            "alt_text_present": {
+              "type": "boolean"
+            },
+            "aria_labels_present": {
+              "type": "boolean"
+            },
+            "live_regions_appropriate": {
+              "type": "boolean"
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "summary": {
+          "type": "object",
+          "description": "Review summary",
+          "properties": {
+            "total_issues": {
+              "type": "number",
+              "minimum": 0
+            },
+            "critical_issues": {
+              "type": "number",
+              "minimum": 0
+            },
+            "high_issues": {
+              "type": "number",
+              "minimum": 0
+            },
+            "medium_issues": {
+              "type": "number",
+              "minimum": 0
+            },
+            "low_issues": {
+              "type": "number",
+              "minimum": 0
+            },
+            "compliance_status": {
+              "type": "string",
+              "enum": [
+                "COMPLIANT",
+                "NON_COMPLIANT",
+                "PARTIAL_COMPLIANCE"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "total_issues",
+            "compliance_status"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "wcag_level",
+        "files_reviewed",
+        "summary"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

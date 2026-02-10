@@ -1,0 +1,379 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-on-call-handoff-patterns-output.schema.json",
+  "title": "On-Call Handoff Patterns Skill Output Verification",
+  "description": "Verifiable output from the on-call-handoff-patterns skill that proves handoff documentation occurred",
+  "type": "object",
+  "required": [
+    "status",
+    "output"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status of the skill"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "handoff_type": {
+          "type": "string",
+          "enum": [
+            "standard",
+            "incident",
+            "quick",
+            "emergency"
+          ],
+          "description": "Type of handoff performed"
+        },
+        "handoff_document": {
+          "type": "object",
+          "description": "Handoff document details",
+          "properties": {
+            "outgoing_engineer": {
+              "type": "string"
+            },
+            "incoming_engineer": {
+              "type": "string"
+            },
+            "handoff_time": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "shift_duration": {
+              "type": "string",
+              "description": "Duration of the shift being handed off"
+            },
+            "team": {
+              "type": "string"
+            },
+            "document_file": {
+              "type": "string",
+              "description": "Path to handoff document"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "outgoing_engineer",
+            "incoming_engineer",
+            "handoff_time"
+          ]
+        },
+        "active_incidents": {
+          "type": "array",
+          "description": "Active incidents during handoff",
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "severity",
+              "status",
+              "impact"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "SEV1",
+                  "SEV2",
+                  "SEV3",
+                  "SEV4"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "investigating",
+                  "mitigating",
+                  "recovering",
+                  "resolved"
+                ]
+              },
+              "impact": {
+                "type": "string"
+              },
+              "started_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "incident_channel": {
+                "type": "string"
+              },
+              "incident_commander": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "ongoing_investigations": {
+          "type": "array",
+          "description": "Ongoing investigations",
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "ticket_id",
+              "status"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "ticket_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "investigating",
+                  "monitoring",
+                  "blocked"
+                ]
+              },
+              "started_at": {
+                "type": "string",
+                "format": "date"
+              },
+              "impact": {
+                "type": "string"
+              },
+              "context": {
+                "type": "string"
+              },
+              "next_steps": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "resources": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "recent_changes": {
+          "type": "object",
+          "description": "Recent system changes",
+          "properties": {
+            "deployments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "service",
+                  "version",
+                  "time"
+                ],
+                "properties": {
+                  "service": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  },
+                  "time": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "config_changes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "description",
+                  "time"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "time": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "infrastructure_changes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "description",
+                  "time"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "time": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "known_issues": {
+          "type": "array",
+          "description": "Known issues and workarounds",
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "issue",
+              "workaround"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "issue": {
+                "type": "string"
+              },
+              "workaround": {
+                "type": "string"
+              },
+              "ticket": {
+                "type": "string"
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2",
+                  "P3",
+                  "P4"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "upcoming_events": {
+          "type": "array",
+          "description": "Scheduled events to monitor",
+          "items": {
+            "type": "object",
+            "required": [
+              "date",
+              "event",
+              "impact"
+            ],
+            "properties": {
+              "date": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "event": {
+                "type": "string"
+              },
+              "impact": {
+                "type": "string"
+              },
+              "contact": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "handoff_checklist": {
+          "type": "object",
+          "description": "Handoff checklist completion status",
+          "properties": {
+            "outgoing_complete": {
+              "type": "boolean"
+            },
+            "incoming_complete": {
+              "type": "boolean"
+            },
+            "sync_call_completed": {
+              "type": "boolean"
+            },
+            "alerting_verified": {
+              "type": "boolean"
+            },
+            "access_verified": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "summary": {
+          "type": "object",
+          "description": "Handoff summary",
+          "properties": {
+            "total_active_incidents": {
+              "type": "number",
+              "minimum": 0
+            },
+            "total_investigations": {
+              "type": "number",
+              "minimum": 0
+            },
+            "total_recent_changes": {
+              "type": "number",
+              "minimum": 0
+            },
+            "total_known_issues": {
+              "type": "number",
+              "minimum": 0
+            },
+            "total_upcoming_events": {
+              "type": "number",
+              "minimum": 0
+            },
+            "shift_health": {
+              "type": "string",
+              "enum": [
+                "quiet",
+                "normal",
+                "busy",
+                "incident"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "shift_health"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "handoff_type",
+        "handoff_document",
+        "summary"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

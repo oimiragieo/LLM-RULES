@@ -96,7 +96,10 @@
     "gpu:check": "node .claude/tools/cli/check-gpu.cjs",
     "graph:bootstrap": "node .claude/tools/cli/bootstrap-artifact-graph.cjs",
     "graph:health": "node .claude/tools/cli/bootstrap-artifact-graph.cjs --dry-run",
-    "graph:dashboard": "node .claude/tools/cli/integration-health-dashboard.cjs"
+    "graph:dashboard": "node .claude/tools/cli/integration-health-dashboard.cjs",
+    "detect:orphans": "node .claude/tools/_archive/detect-orphans.mjs",
+    "verify:git-notes": "node .claude/tools/cli/git-notes-verify.cjs",
+    "assess:ecosystem": "node .claude/tools/analysis/ecosystem-assessor/assess-ecosystem.mjs"
   },
   "keywords": [
     "claude",
