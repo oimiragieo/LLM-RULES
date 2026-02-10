@@ -76,34 +76,36 @@ class MetadataExtractor:
         return m.group(1) if m else None
 
     def _parse_url(self, url: str) -> Tuple[str, str]:
-        """Parse URL to extract identifier type and value."""
+        """Parse URL to extract identifier type and value. Uses allowlisted hosts only (CodeQL: URL sanitization)."""
         parsed = urlparse(url)
-        
-        # DOI URLs - sanitize path-derived DOI
-        if 'doi.org' in parsed.netloc:
+        host = (parsed.netloc or '').lower().split(':')[0]
+
+        # DOI URLs - allowlist exact host, sanitize path-derived DOI
+        if host == 'doi.org':
             doi = self._sanitize_doi(parsed.path.lstrip('/'))
             if doi:
                 return ('doi', doi)
-        
-        # PubMed URLs - extract digits only
-        if 'pubmed.ncbi.nlm.nih.gov' in parsed.netloc or 'ncbi.nlm.nih.gov/pubmed' in url:
-            pmid = re.search(r'/(\d+)', parsed.path)
+
+        # PubMed URLs - allowlist exact hosts, extract digits from path only
+        if host == 'pubmed.ncbi.nlm.nih.gov' or (host == 'ncbi.nlm.nih.gov' and parsed.path.startswith('/pubmed')):
+            pmid = re.search(r'/(\d+)(?:\D|$)', parsed.path)
             if pmid and pmid.group(1).isdigit():
                 return ('pmid', pmid.group(1))
-        
-        # arXiv URLs - extract strict id pattern only
-        if 'arxiv.org' in parsed.netloc:
-            arxiv_id = re.search(r'/abs/(\d{4}\.\d{4,5})(?:v\d+)?$', parsed.path)
+
+        # arXiv URLs - allowlist exact host, extract strict id from path only
+        if host == 'arxiv.org':
+            arxiv_id = re.search(r'/abs/(\d{4}\.\d{4,5})(?:v\d+)?(?:\D|$)', parsed.path)
             if arxiv_id:
                 return ('arxiv', arxiv_id.group(1))
-        
-        # Nature, Science, Cell, etc. - try to extract DOI from URL
-        doi_match = re.search(r'(10\.\d{4,}/[a-zA-Z0-9.\-/_\()]+)', url)
-        if doi_match:
-            doi = self._sanitize_doi(doi_match.group(1))
-            if doi:
-                return ('doi', doi)
-        
+
+        # Other HTTPS URLs - extract DOI only from path (no raw url substring)
+        if parsed.scheme == 'https' and parsed.path:
+            doi_match = re.search(r'(10\.\d{4,}/[a-zA-Z0-9.\-/_\()]+)', parsed.path)
+            if doi_match:
+                doi = self._sanitize_doi(doi_match.group(1))
+                if doi:
+                    return ('doi', doi)
+
         return ('url', url)
     
     def extract_from_doi(self, doi: str) -> Optional[Dict]:

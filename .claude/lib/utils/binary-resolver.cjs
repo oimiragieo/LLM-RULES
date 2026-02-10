@@ -111,7 +111,11 @@ function resolveRipgrepBinary(options = {}) {
     preferredPath: preferred,
     extraCandidates: [
       options.vscodeRgPath,
-      path.join(options.projectRoot || process.cwd(), 'bin', process.platform === 'win32' ? 'rg.exe' : 'rg'),
+      path.join(
+        options.projectRoot || process.cwd(),
+        'bin',
+        process.platform === 'win32' ? 'rg.exe' : 'rg'
+      ),
     ],
   });
 }
@@ -132,4 +136,3 @@ module.exports = {
   resolveRipgrepBinary,
   resolveAstGrepBinary,
 };
-

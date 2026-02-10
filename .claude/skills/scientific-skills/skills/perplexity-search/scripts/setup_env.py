@@ -50,6 +50,11 @@ def create_env_file(api_key: str, env_file: str = ".env") -> bool:
                 f.write('\n')
             f.write(f'OPENROUTER_API_KEY={api_key}\n')
 
+        # Restrict to user-only read/write (CodeQL: clear-text storage of sensitive information)
+        try:
+            env_path.chmod(0o600)
+        except OSError:
+            pass
         print(f"✓ API key saved to {env_file}")
         return True
 
@@ -80,8 +85,8 @@ def validate_setup() -> bool:
         print()
         return False
     else:
-        # Mask the key for display (never log full key)
-        masked_key = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else "***"
+        # Mask the key for display; never log full key (CodeQL: clear-text logging of sensitive information)
+        masked_key = (api_key[:4] + "..." + api_key[-4:]) if len(api_key) > 8 else "***"
         print(f"✓ OPENROUTER_API_KEY is set ({masked_key})")
 
     # Check for LiteLLM

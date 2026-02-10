@@ -4,6 +4,7 @@ Treatment Timeline Generator
 Generates visual treatment timelines from treatment plan files.
 """
 
+import os
 import sys
 import re
 import argparse
@@ -151,6 +152,11 @@ def create_text_timeline(timeline_data: Dict, output_file: Path = None):
     if output_file:
         with open(output_file, 'w') as f:
             f.write(output_text)
+        # Restrict permissions; output may contain treatment info (CodeQL: clear-text storage)
+        try:
+            os.chmod(output_file, 0o600)
+        except OSError:
+            pass
         # Log only basename to avoid leaking full path (CodeQL: clear-text logging)
         print(f"\nText timeline saved to: {Path(output_file).name}")
     else:
@@ -259,7 +265,12 @@ def create_visual_timeline(timeline_data: Dict, output_file: Path, start_date: s
     
     # Save
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    print(f"\nVisual timeline saved to: {output_file}")
+    try:
+        os.chmod(output_file, 0o600)
+    except OSError:
+        pass
+    # Log only basename to avoid leaking full path (CodeQL: clear-text logging)
+    print(f"\nVisual timeline saved to: {Path(output_file).name}")
     
     # Close plot
     plt.close()

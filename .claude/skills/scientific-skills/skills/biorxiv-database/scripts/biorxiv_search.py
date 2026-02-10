@@ -15,17 +15,21 @@ from typing import List, Dict, Optional, Any
 import time
 import sys
 import re
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 
 def _sanitize_doi_for_path(doi: str) -> Optional[str]:
-    """Return DOI safe for URL path (digits, dots, slash only; CodeQL: URL sanitization)."""
+    """Return DOI safe for URL path (allowlist host; CodeQL: URL sanitization)."""
     if not doi or not isinstance(doi, str):
         return None
-    # Extract DOI suffix after doi.org/ or use as-is if already 10.xxxx/...
-    if "doi.org/" in doi:
-        doi = doi.split("doi.org/")[-1]
     doi = doi.strip()
+    # If it looks like a URL, parse and allowlist doi.org host only
+    if doi.startswith("http://") or doi.startswith("https://"):
+        parsed = urlparse(doi)
+        host = (parsed.netloc or "").lower().split(":")[0]
+        if host != "doi.org":
+            return None
+        doi = parsed.path.lstrip("/")
     if not re.match(r"^10\.\d{4,}/[a-zA-Z0-9.\-/]+$", doi):
         return None
     return doi
