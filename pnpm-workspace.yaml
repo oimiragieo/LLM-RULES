@@ -1,3 +1,7 @@
+# Root package (required; avoids "packages field missing or empty" in CI)
+packages:
+  - '.'
+
 onlyBuiltDependencies:
   - '@vscode/ripgrep'
   - onnxruntime-node
