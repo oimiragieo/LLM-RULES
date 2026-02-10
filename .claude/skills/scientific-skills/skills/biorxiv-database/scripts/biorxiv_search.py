@@ -14,7 +14,21 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Any
 import time
 import sys
+import re
 from urllib.parse import quote
+
+
+def _sanitize_doi_for_path(doi: str) -> Optional[str]:
+    """Return DOI safe for URL path (digits, dots, slash only; CodeQL: URL sanitization)."""
+    if not doi or not isinstance(doi, str):
+        return None
+    # Extract DOI suffix after doi.org/ or use as-is if already 10.xxxx/...
+    if "doi.org/" in doi:
+        doi = doi.split("doi.org/")[-1]
+    doi = doi.strip()
+    if not re.match(r"^10\.\d{4,}/[a-zA-Z0-9.\-/]+$", doi):
+        return None
+    return doi
 
 
 class BioRxivSearcher:
@@ -126,10 +140,9 @@ class BioRxivSearcher:
         Returns:
             Dictionary with paper details
         """
-        # Clean DOI if full URL was provided
-        if 'doi.org' in doi:
-            doi = doi.split('doi.org/')[-1]
-
+        doi = _sanitize_doi_for_path(doi)
+        if not doi:
+            return {}
         self._log(f"Fetching details for DOI: {doi}")
         endpoint = f"details/biorxiv/{doi}"
 
@@ -239,11 +252,10 @@ class BioRxivSearcher:
         Returns:
             True if download successful, False otherwise
         """
-        # Clean DOI
-        if 'doi.org' in doi:
-            doi = doi.split('doi.org/')[-1]
-
-        # Construct PDF URL
+        doi = _sanitize_doi_for_path(doi)
+        if not doi:
+            return False
+        # Construct PDF URL (DOI already sanitized)
         pdf_url = f"https://www.biorxiv.org/content/{doi}v1.full.pdf"
 
         self._log(f"Downloading PDF from: {pdf_url}")

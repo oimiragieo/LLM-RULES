@@ -63,8 +63,8 @@ async function main() {
       await indexer.getRgPath();
       await indexer.initLanceDB();
       if (process.env.HYBRID_EMBEDDINGS !== 'off') {
-    try {
-      await indexer.semanticSearch('function', { limit: 1 });
+        try {
+          await indexer.semanticSearch('function', { limit: 1 });
         } catch (_err) {
           // Fail-open: daemon still serves text search even if semantic warmup fails
           void _err;

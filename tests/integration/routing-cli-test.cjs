@@ -464,10 +464,11 @@ function runTestCase(tc) {
     const startTime = Date.now();
 
     // Build command manually to avoid spawn arg escaping issues on Windows
-    // Use double quotes around the prompt to preserve spaces and special chars
+    // Use double quotes around the prompt; escape backslash first, then double-quote (CodeQL: incomplete escaping)
+    const escapedPrompt = tc.prompt.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     const cmdArgs = [
       '-p',
-      `"${tc.prompt.replace(/"/g, '\\"')}"`, // Escape internal quotes, wrap in quotes
+      `"${escapedPrompt}"`,
       '-d',
       '--dangerously-skip-permissions',
       '--max-turns',

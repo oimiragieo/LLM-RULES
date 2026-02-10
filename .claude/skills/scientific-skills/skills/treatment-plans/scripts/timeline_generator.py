@@ -151,7 +151,8 @@ def create_text_timeline(timeline_data: Dict, output_file: Path = None):
     if output_file:
         with open(output_file, 'w') as f:
             f.write(output_text)
-        print(f"\nText timeline saved to: {output_file}")
+        # Log only basename to avoid leaking full path (CodeQL: clear-text logging)
+        print(f"\nText timeline saved to: {Path(output_file).name}")
     else:
         print(output_text)
     

@@ -5,10 +5,26 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 // Script under test (will fail - does not exist yet)
 const SCRIPT_PATH = path.join(__dirname, '../../.claude/scripts/verify-hook-modules.cjs');
+// Run node via spawnSync (no shell) to avoid CodeQL "shell command built from env"
+function runScript(args = [], options = {}) {
+  const { encoding = 'utf8', ...rest } = options;
+  const result = spawnSync(process.execPath, [SCRIPT_PATH, ...args], {
+    encoding,
+    ...rest,
+  });
+  if (result.status !== 0) {
+    const err = new Error(result.stderr || result.error || `Exit ${result.status}`);
+    err.status = result.status;
+    err.stdout = result.stdout;
+    err.stderr = result.stderr;
+    throw err;
+  }
+  return result.stdout;
+}
 
 describe('verify-hook-modules', () => {
   let tempDir;
@@ -54,10 +70,7 @@ describe('verify-hook-modules', () => {
       fs.writeFileSync(hookFile, "const x = require('fs');");
 
       // Execute script - should succeed with built-in fs module
-      const output = execSync(`node ${SCRIPT_PATH}`, {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const output = runScript([], { cwd: tempDir });
       assert.ok(output.includes('test-hook.cjs'));
     });
 
@@ -70,10 +83,7 @@ describe('verify-hook-modules', () => {
       fs.writeFileSync(archivedHook, "const y = require('./missing.cjs');");
 
       // Script should not report archived hook as broken
-      const output = execSync(`node ${SCRIPT_PATH}`, {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const output = runScript([], { cwd: tempDir });
       // Active hook should be scanned
       assert.ok(output.includes('active.cjs'));
       // Archived hook should NOT be scanned
@@ -88,10 +98,7 @@ describe('verify-hook-modules', () => {
       fs.writeFileSync(targetFile, 'module.exports = {};');
 
       // Should exit with code 0 and show [PASS]
-      const output = execSync(`node ${SCRIPT_PATH}`, {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const output = runScript([], { cwd: tempDir });
       assert.ok(output.includes('[PASS]') || output.includes('passed'));
     });
 
@@ -101,7 +108,7 @@ describe('verify-hook-modules', () => {
 
       // Should exit with code 1 and show [FAIL]
       try {
-        execSync(`node ${SCRIPT_PATH}`, { cwd: tempDir, encoding: 'utf8' });
+        runScript([], { cwd: tempDir });
         assert.fail('Expected script to exit with code 1');
       } catch (err) {
         // Exit code 1 is expected
@@ -129,10 +136,7 @@ describe('verify-hook-modules', () => {
       fs.writeFileSync(settingsFile, JSON.stringify(settings, null, 2));
 
       // Should verify settings.json hooks exist and pass (exit code 0)
-      const output = execSync(`node ${SCRIPT_PATH}`, {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const output = runScript([], { cwd: tempDir });
       // Should process the registered hook
       assert.ok(output.includes('test-hook.cjs'));
     });
@@ -154,11 +158,7 @@ describe('verify-hook-modules', () => {
       fs.writeFileSync(hookFile, "const x = require('./missing.cjs');");
 
       try {
-        execSync(`node ${SCRIPT_PATH}`, {
-          cwd: tempDir,
-          encoding: 'utf8',
-          stdio: 'pipe',
-        });
+        runScript([], { cwd: tempDir, stdio: 'pipe' });
       } catch (err) {
         const output = err.stdout || err.stderr || '';
         // Error output should not contain absolute paths
@@ -173,10 +173,7 @@ describe('verify-hook-modules', () => {
       const hookFile = path.join(hooksDir, 'monitoring', 'json-test.cjs');
       fs.writeFileSync(hookFile, "const x = require('fs');");
 
-      const output = execSync(`node ${SCRIPT_PATH} --json`, {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const output = runScript(['--json'], { cwd: tempDir });
 
       const result = JSON.parse(output);
 
@@ -193,10 +190,7 @@ describe('verify-hook-modules', () => {
       fs.writeFileSync(hookFile, "const x = require('./missing.cjs');");
 
       try {
-        execSync(`node ${SCRIPT_PATH} --json`, {
-          cwd: tempDir,
-          encoding: 'utf8',
-        });
+        runScript(['--json'], { cwd: tempDir });
         assert.fail('Expected script to exit with code 1');
       } catch (err) {
         const output = err.stdout || '';
@@ -228,10 +222,7 @@ describe('verify-hook-modules', () => {
       fs.writeFileSync(settingsFile, JSON.stringify(settings, null, 2));
 
       try {
-        execSync(`node ${SCRIPT_PATH}`, {
-          cwd: tempDir,
-          encoding: 'utf8',
-        });
+        runScript([], { cwd: tempDir });
         assert.fail('Expected script to exit with code 1');
       } catch (err) {
         const output = err.stdout || err.stderr || '';
@@ -243,10 +234,7 @@ describe('verify-hook-modules', () => {
       fs.writeFileSync(settingsFile, '{ invalid json }');
 
       try {
-        execSync(`node ${SCRIPT_PATH}`, {
-          cwd: tempDir,
-          stdio: 'pipe',
-        });
+        runScript([], { cwd: tempDir, stdio: 'pipe' });
         assert.fail('Expected script to exit with code 1');
       } catch (err) {
         // Exit code 1 is expected for parse errors
@@ -263,10 +251,7 @@ describe('verify-hook-modules', () => {
 
       // On Windows, permission changes don't work the same way
       // So we'll just verify that valid hooks are still reported
-      const output = execSync(`node ${SCRIPT_PATH}`, {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const output = runScript([], { cwd: tempDir });
 
       // Should still report valid hook
       assert.ok(output.includes('valid.cjs'));
@@ -276,10 +261,7 @@ describe('verify-hook-modules', () => {
       const hookFile = path.join(hooksDir, 'monitoring', 'summary-test.cjs');
       fs.writeFileSync(hookFile, "const x = require('fs');");
 
-      const output = execSync(`node ${SCRIPT_PATH}`, {
-        cwd: tempDir,
-        encoding: 'utf8',
-      });
+      const output = runScript([], { cwd: tempDir });
 
       // Should include summary line
       assert.ok(output.includes('Summary') || output.includes('passed'));

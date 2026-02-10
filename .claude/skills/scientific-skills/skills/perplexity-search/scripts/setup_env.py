@@ -45,7 +45,7 @@ def create_env_file(api_key: str, env_file: str = ".env") -> bool:
             # Write existing content (excluding old OPENROUTER_API_KEY)
             f.writelines(existing_content)
 
-            # Add new API key
+            # Add new API key (env file is gitignored; user-controlled storage)
             if existing_content and not existing_content[-1].endswith('\n'):
                 f.write('\n')
             f.write(f'OPENROUTER_API_KEY={api_key}\n')
@@ -80,7 +80,7 @@ def validate_setup() -> bool:
         print()
         return False
     else:
-        # Mask the key for display
+        # Mask the key for display (never log full key)
         masked_key = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else "***"
         print(f"✓ OPENROUTER_API_KEY is set ({masked_key})")
 
@@ -153,8 +153,8 @@ Get your OpenRouter API key from:
             print("Next steps:")
             print(f"1. Load the environment variables:")
             print(f"   source {args.env_file}")
-            print("2. Or export directly:")
-            print(f"   export OPENROUTER_API_KEY={args.api_key}")
+            print("2. Or export directly (do not paste your key into shared logs):")
+            print("   export OPENROUTER_API_KEY=<your-key>")
             print("3. Test the setup:")
             print("   python perplexity_search.py --check-setup")
             print()

@@ -117,17 +117,15 @@ Examples:
         print(f"Error: Input file '{args.input}' not found")
         sys.exit(1)
 
-    # Anonymize the file
-    print(f"Anonymizing: {args.input}")
+    # Anonymize the file (log basename only to avoid PHI in paths; CodeQL: clear-text logging)
+    print(f"Anonymizing: {Path(args.input).name}")
     success, result = anonymize_dicom(args.input, args.output,
                                      args.patient_id, args.patient_name)
 
     if success:
-        print(f"✓ Successfully anonymized DICOM file: {args.output}")
+        print(f"✓ Successfully anonymized DICOM file: {Path(args.output).name}")
         if args.verbose:
-            print(f"\nAnonymized {len(result)} fields:")
-            for item in result:
-                print(f"  - {item}")
+            print(f"\nAnonymized {len(result)} fields (tag names only)")
     else:
         print(f"✗ Error: {result}")
         sys.exit(1)

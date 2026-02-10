@@ -85,6 +85,7 @@ Comprehensive audit of all 59 agents and their 600+ associated artifacts (93 ski
 #### Wave Strategy
 
 Each wave spawns 1-2 `researcher` agents (haiku model) that:
+
 1. Read agent markdown files for the wave's category
 2. Extract: name, type, model, skills[], routing keywords
 3. Cross-reference against agent-registry.json entries
@@ -210,6 +211,7 @@ Total agents audited == 59 (or adjusted count from filesystem scan)
 #### Phase 2 Error Handling
 
 If matrix consolidation fails:
+
 1. Check if all 5 wave reports exist (Phase 1 gate)
 2. Re-read missing reports
 3. Retry consolidation
@@ -236,15 +238,15 @@ Each agent row has: skills_count, rules_count, schemas_count, commands_count, wo
 
 #### Gap Categories
 
-| Gap Type | Description | Severity |
-|----------|-------------|----------|
-| Agent with <3 skills | Agent too underpowered | HIGH |
-| Agent missing from routing-table | Agent undiscoverable | CRITICAL |
-| Skill not assigned to any agent | Orphaned skill | MEDIUM |
-| Agent missing rules file | No behavioral guidance | HIGH |
-| Command with no backing skill | Dead command | LOW |
-| Schema with no consumer | Orphaned schema | LOW |
-| Workflow with no assigned agent | Unexecutable workflow | HIGH |
+| Gap Type                         | Description            | Severity |
+| -------------------------------- | ---------------------- | -------- |
+| Agent with <3 skills             | Agent too underpowered | HIGH     |
+| Agent missing from routing-table | Agent undiscoverable   | CRITICAL |
+| Skill not assigned to any agent  | Orphaned skill         | MEDIUM   |
+| Agent missing rules file         | No behavioral guidance | HIGH     |
+| Command with no backing skill    | Dead command           | LOW      |
+| Schema with no consumer          | Orphaned schema        | LOW      |
+| Workflow with no assigned agent  | Unexecutable workflow  | HIGH     |
 
 #### Tasks
 
@@ -290,6 +292,7 @@ Each agent row has: skills_count, rules_count, schemas_count, commands_count, wo
 #### Phase 3 Error Handling
 
 If gap analysis produces >200 gaps:
+
 1. Prioritize by severity (CRITICAL first)
 2. Group by fix type (batch-fixable vs individual)
 3. Consider splitting Phase 5 into multiple sub-phases
@@ -324,14 +327,14 @@ git add .claude/context/reports/ecosystem-audit/ && git commit -m "checkpoint: e
 
 #### Diagram Specifications
 
-| Diagram | Type | Scope | Max Nodes |
-|---------|------|-------|-----------|
-| System Overview | graph TB | All 59 agents grouped by category | ~80 |
-| Core Agent Ecosystem | graph LR | 9 core agents + their skills/hooks/workflows | ~60 |
-| Review Pipeline | sequenceDiagram | code-reviewer -> qa -> security-architect flow | ~20 |
-| Orchestrator Topology | graph TB | 4 orchestrators + their agent coordination | ~40 |
-| Skill Distribution | graph TB | Skills -> Agent assignments (heat map style) | ~100 |
-| Artifact Dependency | graph TB | Agent -> Skill -> Hook -> Schema relationships | ~80 |
+| Diagram               | Type            | Scope                                          | Max Nodes |
+| --------------------- | --------------- | ---------------------------------------------- | --------- |
+| System Overview       | graph TB        | All 59 agents grouped by category              | ~80       |
+| Core Agent Ecosystem  | graph LR        | 9 core agents + their skills/hooks/workflows   | ~60       |
+| Review Pipeline       | sequenceDiagram | code-reviewer -> qa -> security-architect flow | ~20       |
+| Orchestrator Topology | graph TB        | 4 orchestrators + their agent coordination     | ~40       |
+| Skill Distribution    | graph TB        | Skills -> Agent assignments (heat map style)   | ~100      |
+| Artifact Dependency   | graph TB        | Agent -> Skill -> Hook -> Schema relationships | ~80       |
 
 #### Tasks
 
@@ -395,14 +398,14 @@ All diagrams reference agents from the ecosystem matrix (Phase 2)
 
 Fixes are batched by type for efficiency:
 
-| Fix Type | Agent | Model | Batch Size |
-|----------|-------|-------|------------|
-| Add skills to agent frontmatter | developer | sonnet | 10 agents/wave |
-| Add routing keywords | developer | sonnet | 10 agents/wave |
-| Update skill-catalog.md | technical-writer | haiku | All at once |
-| Update agent-registry.json | developer | sonnet | Full rebuild |
-| Create missing rules files | technical-writer | haiku | 5 files/wave |
-| Update @AGENT_ROUTING_TABLE.md | technical-writer | haiku | All at once |
+| Fix Type                        | Agent            | Model  | Batch Size     |
+| ------------------------------- | ---------------- | ------ | -------------- |
+| Add skills to agent frontmatter | developer        | sonnet | 10 agents/wave |
+| Add routing keywords            | developer        | sonnet | 10 agents/wave |
+| Update skill-catalog.md         | technical-writer | haiku  | All at once    |
+| Update agent-registry.json      | developer        | sonnet | Full rebuild   |
+| Create missing rules files      | technical-writer | haiku  | 5 files/wave   |
+| Update @AGENT_ROUTING_TABLE.md  | technical-writer | haiku  | All at once    |
 
 #### Tasks
 
@@ -446,6 +449,7 @@ Fixes are batched by type for efficiency:
 #### Phase 5 Error Handling
 
 If remediation causes test failures:
+
 1. Rollback to Phase 3 checkpoint commit
 2. Fix the specific issue
 3. Re-apply non-conflicting remediations
@@ -532,6 +536,7 @@ All 6 diagrams referenced in report
 3. Check for evolution opportunities (new agents/skills needed)
 
 **Spawn Command**:
+
 ```
 Task({
   subagent_type: "reflection-agent",
@@ -541,6 +546,7 @@ Task({
 ```
 
 **Success Criteria**:
+
 - Reflection-agent spawned and completed
 - Learnings extracted to `.claude/context/memory/learnings.md`
 - Evolution opportunities logged if any detected
@@ -549,64 +555,64 @@ Task({
 
 ## Risks
 
-| Risk | Impact | Mitigation | Rollback |
-|------|--------|------------|----------|
-| Context overflow from too many parallel agents | HIGH | Max 2 heavy agents per wave; all reports to files | Kill agents, restart wave |
-| Agent files have inconsistent frontmatter formats | MEDIUM | Normalize during Phase 1 extraction | Manual reading fallback |
-| Gap count exceeds 200 (overwhelming remediation) | HIGH | Prioritize CRITICAL/HIGH only; defer LOW to follow-up task | Skip Phase 5, deliver gap report only |
-| Registry rebuild breaks existing routing | HIGH | Git checkpoint before Phase 5 | `git checkout -- .claude/context/agent-registry.json` |
-| Mermaid diagrams exceed readability limits (200+ nodes) | MEDIUM | Split into focused sub-diagrams | Reduce scope per diagram |
-| Phase 5 remediation introduces regressions | MEDIUM | Run `pnpm test` after each wave | Rollback to Phase 3 checkpoint |
+| Risk                                                    | Impact | Mitigation                                                 | Rollback                                              |
+| ------------------------------------------------------- | ------ | ---------------------------------------------------------- | ----------------------------------------------------- |
+| Context overflow from too many parallel agents          | HIGH   | Max 2 heavy agents per wave; all reports to files          | Kill agents, restart wave                             |
+| Agent files have inconsistent frontmatter formats       | MEDIUM | Normalize during Phase 1 extraction                        | Manual reading fallback                               |
+| Gap count exceeds 200 (overwhelming remediation)        | HIGH   | Prioritize CRITICAL/HIGH only; defer LOW to follow-up task | Skip Phase 5, deliver gap report only                 |
+| Registry rebuild breaks existing routing                | HIGH   | Git checkpoint before Phase 5                              | `git checkout -- .claude/context/agent-registry.json` |
+| Mermaid diagrams exceed readability limits (200+ nodes) | MEDIUM | Split into focused sub-diagrams                            | Reduce scope per diagram                              |
+| Phase 5 remediation introduces regressions              | MEDIUM | Run `pnpm test` after each wave                            | Rollback to Phase 3 checkpoint                        |
 
 ## Timeline Summary
 
-| Phase | Tasks | Est. Time | Parallel? | Model Budget |
-|-------|-------|-----------|-----------|--------------|
-| 0: Research | 4 | ~25 min | No | (planner - already done) |
-| 1: Data Collection | 10 (5 waves x 2) | ~3 hours | Partial | haiku |
-| 2: Cross-Reference | 3 | ~1.5 hours | Yes | sonnet |
-| 3: Gap Analysis | 4 | ~2 hours | Partial | opus + sonnet |
-| --- CHECKPOINT --- | 1 | ~5 min | No | --- |
-| 4: Diagrams | 6 | ~2 hours | Yes | sonnet |
-| 5: Remediation | 6 | ~4 hours | Partial | sonnet + haiku |
-| 6: Final Report | 3 | ~1.5 hours | No | sonnet + haiku |
-| FINAL: Reflection | 1 | ~30 min | No | sonnet |
-| **Total** | **38** | **~15 hours** | | |
+| Phase              | Tasks            | Est. Time     | Parallel? | Model Budget             |
+| ------------------ | ---------------- | ------------- | --------- | ------------------------ |
+| 0: Research        | 4                | ~25 min       | No        | (planner - already done) |
+| 1: Data Collection | 10 (5 waves x 2) | ~3 hours      | Partial   | haiku                    |
+| 2: Cross-Reference | 3                | ~1.5 hours    | Yes       | sonnet                   |
+| 3: Gap Analysis    | 4                | ~2 hours      | Partial   | opus + sonnet            |
+| --- CHECKPOINT --- | 1                | ~5 min        | No        | ---                      |
+| 4: Diagrams        | 6                | ~2 hours      | Yes       | sonnet                   |
+| 5: Remediation     | 6                | ~4 hours      | Partial   | sonnet + haiku           |
+| 6: Final Report    | 3                | ~1.5 hours    | No        | sonnet + haiku           |
+| FINAL: Reflection  | 1                | ~30 min       | No        | sonnet                   |
+| **Total**          | **38**           | **~15 hours** |           |                          |
 
 ## Agent Assignments Summary
 
-| Phase | Agent Type | Model | Count |
-|-------|-----------|-------|-------|
-| 0 | planner | opus | 1 |
-| 1 | researcher | haiku | 10 spawns (5 waves x 2) |
-| 2 | architect + researcher | sonnet + haiku | 3 spawns |
-| 3 | architect + researcher | opus + sonnet + haiku | 4 spawns |
-| 4 | architect | sonnet | 6 spawns (3 parallel pairs) |
-| 5 | developer + technical-writer | sonnet + haiku | 6 spawns |
-| 6 | technical-writer + researcher | sonnet + haiku | 3 spawns |
-| FINAL | reflection-agent | sonnet | 1 spawn |
-| **Total** | | | **34 agent spawns** |
+| Phase     | Agent Type                    | Model                 | Count                       |
+| --------- | ----------------------------- | --------------------- | --------------------------- |
+| 0         | planner                       | opus                  | 1                           |
+| 1         | researcher                    | haiku                 | 10 spawns (5 waves x 2)     |
+| 2         | architect + researcher        | sonnet + haiku        | 3 spawns                    |
+| 3         | architect + researcher        | opus + sonnet + haiku | 4 spawns                    |
+| 4         | architect                     | sonnet                | 6 spawns (3 parallel pairs) |
+| 5         | developer + technical-writer  | sonnet + haiku        | 6 spawns                    |
+| 6         | technical-writer + researcher | sonnet + haiku        | 3 spawns                    |
+| FINAL     | reflection-agent              | sonnet                | 1 spawn                     |
+| **Total** |                               |                       | **34 agent spawns**         |
 
 ## Output Artifacts
 
-| Artifact | Location | Phase |
-|----------|----------|-------|
-| Wave reports (5) | `.claude/context/reports/ecosystem-audit/wave-*.md` | 1 |
-| Agent-ecosystem matrix | `.claude/context/reports/ecosystem-audit/agent-ecosystem-matrix.md` | 2 |
-| Artifact-consumer map | `.claude/context/reports/ecosystem-audit/artifact-consumer-map.md` | 2 |
-| Agent gaps report | `.claude/context/reports/ecosystem-audit/agent-gaps.md` | 3 |
-| Orphaned artifacts report | `.claude/context/reports/ecosystem-audit/orphaned-artifacts.md` | 3 |
-| Integrity check report | `.claude/context/reports/ecosystem-audit/integrity-check.md` | 3 |
-| Gap summary | `.claude/context/reports/ecosystem-audit/gap-summary.md` | 3 |
-| System overview diagram | `.claude/context/artifacts/diagrams/ecosystem-overview-2026-02-09.mmd` | 4 |
-| Core agent ecosystem diagram | `.claude/context/artifacts/diagrams/core-agent-ecosystem-2026-02-09.mmd` | 4 |
-| Review pipeline diagram | `.claude/context/artifacts/diagrams/review-pipeline-2026-02-09.mmd` | 4 |
-| Orchestrator topology diagram | `.claude/context/artifacts/diagrams/orchestrator-topology-2026-02-09.mmd` | 4 |
-| Skill distribution diagram | `.claude/context/artifacts/diagrams/skill-distribution-2026-02-09.mmd` | 4 |
-| Artifact dependency diagram | `.claude/context/artifacts/diagrams/artifact-dependencies-2026-02-09.mmd` | 4 |
-| Ecosystem harmony report | `.claude/context/reports/ecosystem-audit/ecosystem-harmony-report-2026-02-09.md` | 6 |
-| Health metrics JSON | `.claude/context/reports/ecosystem-audit/health-metrics.json` | 6 |
-| **Total: 17 artifacts** | | |
+| Artifact                      | Location                                                                         | Phase |
+| ----------------------------- | -------------------------------------------------------------------------------- | ----- |
+| Wave reports (5)              | `.claude/context/reports/ecosystem-audit/wave-*.md`                              | 1     |
+| Agent-ecosystem matrix        | `.claude/context/reports/ecosystem-audit/agent-ecosystem-matrix.md`              | 2     |
+| Artifact-consumer map         | `.claude/context/reports/ecosystem-audit/artifact-consumer-map.md`               | 2     |
+| Agent gaps report             | `.claude/context/reports/ecosystem-audit/agent-gaps.md`                          | 3     |
+| Orphaned artifacts report     | `.claude/context/reports/ecosystem-audit/orphaned-artifacts.md`                  | 3     |
+| Integrity check report        | `.claude/context/reports/ecosystem-audit/integrity-check.md`                     | 3     |
+| Gap summary                   | `.claude/context/reports/ecosystem-audit/gap-summary.md`                         | 3     |
+| System overview diagram       | `.claude/context/artifacts/diagrams/ecosystem-overview-2026-02-09.mmd`           | 4     |
+| Core agent ecosystem diagram  | `.claude/context/artifacts/diagrams/core-agent-ecosystem-2026-02-09.mmd`         | 4     |
+| Review pipeline diagram       | `.claude/context/artifacts/diagrams/review-pipeline-2026-02-09.mmd`              | 4     |
+| Orchestrator topology diagram | `.claude/context/artifacts/diagrams/orchestrator-topology-2026-02-09.mmd`        | 4     |
+| Skill distribution diagram    | `.claude/context/artifacts/diagrams/skill-distribution-2026-02-09.mmd`           | 4     |
+| Artifact dependency diagram   | `.claude/context/artifacts/diagrams/artifact-dependencies-2026-02-09.mmd`        | 4     |
+| Ecosystem harmony report      | `.claude/context/reports/ecosystem-audit/ecosystem-harmony-report-2026-02-09.md` | 6     |
+| Health metrics JSON           | `.claude/context/reports/ecosystem-audit/health-metrics.json`                    | 6     |
+| **Total: 17 artifacts**       |                                                                                  |       |
 
 ## Execution Notes
 

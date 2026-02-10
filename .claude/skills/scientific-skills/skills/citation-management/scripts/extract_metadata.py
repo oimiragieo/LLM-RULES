@@ -67,31 +67,42 @@ class MetadataExtractor:
         
         return ('unknown', identifier)
     
+    def _sanitize_doi(self, raw: str) -> Optional[str]:
+        """Return DOI string only if it matches safe DOI pattern (CodeQL: URL sanitization)."""
+        if not raw or not isinstance(raw, str):
+            return None
+        # DOI format: 10.xxxx/yyy (alphanumeric, dots, slashes, hyphens only)
+        m = re.match(r'^(10\.\d{4,}/[a-zA-Z0-9.\-/_\()]+)$', raw.strip())
+        return m.group(1) if m else None
+
     def _parse_url(self, url: str) -> Tuple[str, str]:
         """Parse URL to extract identifier type and value."""
         parsed = urlparse(url)
         
-        # DOI URLs
+        # DOI URLs - sanitize path-derived DOI
         if 'doi.org' in parsed.netloc:
-            doi = parsed.path.lstrip('/')
-            return ('doi', doi)
+            doi = self._sanitize_doi(parsed.path.lstrip('/'))
+            if doi:
+                return ('doi', doi)
         
-        # PubMed URLs
+        # PubMed URLs - extract digits only
         if 'pubmed.ncbi.nlm.nih.gov' in parsed.netloc or 'ncbi.nlm.nih.gov/pubmed' in url:
             pmid = re.search(r'/(\d+)', parsed.path)
-            if pmid:
+            if pmid and pmid.group(1).isdigit():
                 return ('pmid', pmid.group(1))
         
-        # arXiv URLs
+        # arXiv URLs - extract strict id pattern only
         if 'arxiv.org' in parsed.netloc:
-            arxiv_id = re.search(r'/abs/(\d{4}\.\d{4,5})', parsed.path)
+            arxiv_id = re.search(r'/abs/(\d{4}\.\d{4,5})(?:v\d+)?$', parsed.path)
             if arxiv_id:
                 return ('arxiv', arxiv_id.group(1))
         
         # Nature, Science, Cell, etc. - try to extract DOI from URL
-        doi_match = re.search(r'10\.\d{4,}/[^\s/]+', url)
+        doi_match = re.search(r'(10\.\d{4,}/[a-zA-Z0-9.\-/_\()]+)', url)
         if doi_match:
-            return ('doi', doi_match.group())
+            doi = self._sanitize_doi(doi_match.group(1))
+            if doi:
+                return ('doi', doi)
         
         return ('url', url)
     
