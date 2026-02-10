@@ -1,4 +1,5 @@
 ---
+description: Generate API docs, developer guides, and user manuals from code
 disable-model-invocation: true
 ---
 

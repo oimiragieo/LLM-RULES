@@ -1,4 +1,5 @@
 ---
+description: Invoke the auth-security expert skill for OAuth 2.1, JWT, and encryption
 disable-model-invocation: true
 ---
 

@@ -1,4 +1,5 @@
 ---
+description: Invoke the test-generator skill for unit, integration, and E2E tests
 disable-model-invocation: true
 ---
 

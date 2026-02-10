@@ -1,4 +1,5 @@
 ---
+description: Use advanced elicitation for meta-cognitive reasoning and refined outputs
 disable-model-invocation: true
 ---
 

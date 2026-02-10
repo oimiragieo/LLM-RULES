@@ -1,4 +1,5 @@
 ---
+description: Create incident response runbooks with procedures and escalation paths
 disable-model-invocation: true
 ---
 

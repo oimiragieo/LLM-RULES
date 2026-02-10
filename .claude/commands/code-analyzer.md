@@ -1,4 +1,5 @@
 ---
+description: Invoke the code-analyzer skill for static analysis and complexity metrics
 disable-model-invocation: true
 ---
 

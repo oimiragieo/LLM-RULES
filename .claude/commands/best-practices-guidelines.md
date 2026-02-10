@@ -1,4 +1,5 @@
 ---
+description: Apply best practices for REST, responsive design, Zod, and dependencies
 disable-model-invocation: true
 ---
 

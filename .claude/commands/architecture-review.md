@@ -1,4 +1,5 @@
 ---
+description: Invoke the architecture-review skill for design validation and anti-patterns
 disable-model-invocation: true
 ---
 

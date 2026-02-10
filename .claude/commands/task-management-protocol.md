@@ -1,4 +1,5 @@
 ---
+description: Task synchronization, context handoff, and cross-session coordination
 disable-model-invocation: true
 ---
 

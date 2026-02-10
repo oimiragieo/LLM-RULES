@@ -1,4 +1,5 @@
 ---
+description: Invoke the binary-analysis-patterns skill for disassembly and static analysis
 disable-model-invocation: true
 ---
 

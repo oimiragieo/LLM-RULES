@@ -1,4 +1,5 @@
 ---
+description: Invoke the Python backend expert skill for Django, FastAPI, and Flask
 disable-model-invocation: true
 ---
 

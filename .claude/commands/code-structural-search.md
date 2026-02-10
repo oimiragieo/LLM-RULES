@@ -1,4 +1,5 @@
 ---
+description: Use ast-grep for AST-based code pattern matching
 disable-model-invocation: true
 ---
 

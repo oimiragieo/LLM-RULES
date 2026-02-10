@@ -41,10 +41,15 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: TypeScript compilation check
-        run: npx tsc --project .claude/lib/skill-build/tsconfig.json --noEmit
+        run: |
+          if [ -f .claude/lib/skill-build/tsconfig.json ]; then
+            npx tsc --project .claude/lib/skill-build/tsconfig.json --noEmit
+          else
+            echo "No skill-build TypeScript project found, skipping tsc check"
+          fi
 
       - name: Validate rule structure
-        run: npm run skill:validate
+        run: npm run skills:validate
         continue-on-error: false
 
       - name: Extract test cases

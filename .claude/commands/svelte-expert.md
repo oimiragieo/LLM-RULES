@@ -1,4 +1,5 @@
 ---
+description: Invoke the Svelte/SvelteKit expert skill for components and stores
 disable-model-invocation: true
 ---
 

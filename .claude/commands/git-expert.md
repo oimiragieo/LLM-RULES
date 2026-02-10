@@ -1,4 +1,5 @@
 ---
+description: Advanced Git operations and complex git workflows via CLI
 disable-model-invocation: true
 ---
 

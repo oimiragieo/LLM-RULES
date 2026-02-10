@@ -1,4 +1,5 @@
 ---
+description: Prepare handoff documents for new conversations and session continuation
 disable-model-invocation: true
 ---
 

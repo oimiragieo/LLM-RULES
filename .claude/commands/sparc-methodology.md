@@ -1,4 +1,5 @@
 ---
+description: SPARC development methodology with multi-agent orchestration
 disable-model-invocation: true
 ---
 

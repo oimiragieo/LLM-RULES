@@ -1,4 +1,5 @@
 ---
+description: Requirements gathering workflow for specification creation
 disable-model-invocation: true
 ---
 

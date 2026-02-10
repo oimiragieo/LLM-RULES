@@ -1,4 +1,5 @@
 ---
+description: Run CodeQL and Semgrep static analysis with SARIF output
 disable-model-invocation: true
 ---
 

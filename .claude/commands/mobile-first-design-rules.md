@@ -1,4 +1,5 @@
 ---
+description: Mobile-first design and responsive typography with Tailwind
 disable-model-invocation: true
 ---
 

@@ -1,4 +1,5 @@
 ---
+description: Invoke the Node.js expert skill for Express, NestJS, and async patterns
 disable-model-invocation: true
 ---
 

@@ -1,4 +1,5 @@
 ---
+description: Generate architecture, database, and system diagrams with Mermaid
 disable-model-invocation: true
 ---
 

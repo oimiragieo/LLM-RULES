@@ -1,4 +1,5 @@
 ---
+description: Generate context-aware quality checklists for code review and QA
 disable-model-invocation: true
 ---
 

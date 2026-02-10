@@ -1,4 +1,5 @@
 ---
+description: Invoke the frontend expert skill for UI/UX and responsive design
 disable-model-invocation: true
 ---
 

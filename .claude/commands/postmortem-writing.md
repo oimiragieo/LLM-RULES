@@ -1,4 +1,5 @@
 ---
+description: Write blameless postmortems with root cause analysis and action items
 disable-model-invocation: true
 ---
 

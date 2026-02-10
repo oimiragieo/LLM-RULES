@@ -1,4 +1,5 @@
 ---
+description: Semantic code search using vector embeddings and hybrid search
 disable-model-invocation: true
 ---
 

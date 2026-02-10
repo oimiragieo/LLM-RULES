@@ -1,4 +1,5 @@
 ---
+description: Invoke the workflow-creator skill to create multi-agent workflows
 disable-model-invocation: true
 ---
 

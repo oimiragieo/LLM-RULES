@@ -1,4 +1,5 @@
 ---
+description: Invoke the code-quality expert skill for clean code and refactoring
 disable-model-invocation: true
 ---
 

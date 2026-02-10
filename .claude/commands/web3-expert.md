@@ -1,4 +1,5 @@
 ---
+description: Invoke the Web3/blockchain expert skill for Solidity and smart contracts
 disable-model-invocation: true
 ---
 

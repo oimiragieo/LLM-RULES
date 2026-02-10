@@ -1,4 +1,5 @@
 ---
+description: Multi-agent swarm coordination, task distribution, and result aggregation
 disable-model-invocation: true
 ---
 

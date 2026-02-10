@@ -1,4 +1,5 @@
 ---
+description: Structured thinking patterns for agent self-reflection and validation
 disable-model-invocation: true
 ---
 

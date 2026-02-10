@@ -1,4 +1,5 @@
 ---
+description: Invoke the agent-creator skill to create specialized agents
 disable-model-invocation: true
 ---
 

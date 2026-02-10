@@ -1,4 +1,5 @@
 ---
+description: Sentry error tracking and performance monitoring integration
 disable-model-invocation: true
 ---
 

@@ -1,4 +1,5 @@
 ---
+description: Invoke the Android expert skill for Jetpack Compose and Kotlin
 disable-model-invocation: true
 ---
 

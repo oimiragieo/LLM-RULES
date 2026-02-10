@@ -1,4 +1,5 @@
 ---
+description: Invoke the template-creator skill to create and register templates
 disable-model-invocation: true
 ---
 

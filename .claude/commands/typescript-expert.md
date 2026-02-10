@@ -1,4 +1,5 @@
 ---
+description: Invoke the TypeScript/JavaScript expert skill for types and tooling
 disable-model-invocation: true
 ---
 

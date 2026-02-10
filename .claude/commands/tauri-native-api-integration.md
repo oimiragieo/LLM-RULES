@@ -1,4 +1,5 @@
 ---
+description: Rules for integrating Tauri native APIs in the frontend
 disable-model-invocation: true
 ---
 

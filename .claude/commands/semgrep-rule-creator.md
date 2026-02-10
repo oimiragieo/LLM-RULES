@@ -1,4 +1,5 @@
 ---
+description: Create custom Semgrep rules for vulnerabilities and coding standards
 disable-model-invocation: true
 ---
 

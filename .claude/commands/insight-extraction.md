@@ -1,4 +1,5 @@
 ---
+description: Extract actionable insights from completed coding sessions
 disable-model-invocation: true
 ---
 

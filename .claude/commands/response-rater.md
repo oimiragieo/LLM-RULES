@@ -1,4 +1,5 @@
 ---
+description: Rate responses and plans against quality rubrics and multi-agent consensus
 disable-model-invocation: true
 ---
 

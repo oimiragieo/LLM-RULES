@@ -1,4 +1,5 @@
 ---
+description: Invoke the artifact-integrator skill for deep integration analysis
 disable-model-invocation: true
 ---
 

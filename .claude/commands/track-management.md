@@ -1,4 +1,5 @@
 ---
+description: Track management for features, bugs, and refactors through spec and implementation
 disable-model-invocation: true
 ---
 

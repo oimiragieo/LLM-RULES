@@ -1,4 +1,5 @@
 ---
+description: Network protocol reverse engineering and packet analysis
 disable-model-invocation: true
 ---
 

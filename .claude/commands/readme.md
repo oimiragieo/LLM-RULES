@@ -1,4 +1,5 @@
 ---
+description: Invoke the readme skill for README and documentation generation
 disable-model-invocation: true
 ---
 

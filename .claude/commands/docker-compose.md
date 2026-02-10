@@ -1,4 +1,5 @@
 ---
+description: Docker Compose container orchestration and management
 disable-model-invocation: true
 ---
 

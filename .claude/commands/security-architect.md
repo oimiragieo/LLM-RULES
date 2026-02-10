@@ -1,4 +1,5 @@
 ---
+description: Security architecture, threat modeling, and OWASP analysis
 disable-model-invocation: true
 ---
 

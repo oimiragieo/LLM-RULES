@@ -1,4 +1,5 @@
 ---
+description: Create production-ready Kubernetes manifests and K8s resources
 disable-model-invocation: true
 ---
 

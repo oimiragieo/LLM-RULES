@@ -1,4 +1,5 @@
 ---
+description: Generate Product Requirements Documents with hypothesis-driven methodology
 disable-model-invocation: true
 ---
 

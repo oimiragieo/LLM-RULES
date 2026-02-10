@@ -1,4 +1,5 @@
 ---
+description: Enforce Don't Repeat Yourself to avoid duplication and improve maintainability
 disable-model-invocation: true
 ---
 

@@ -1,4 +1,5 @@
 ---
+description: Context-Driven Development for managed project context and AI alignment
 disable-model-invocation: true
 ---
 

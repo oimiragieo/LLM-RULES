@@ -1,4 +1,5 @@
 ---
+description: Invoke the PHP expert skill for Laravel, WordPress, and Drupal
 disable-model-invocation: true
 ---
 

@@ -1,4 +1,5 @@
 ---
+description: On-call shift handoffs, context transfer, and escalation procedures
 disable-model-invocation: true
 ---
 

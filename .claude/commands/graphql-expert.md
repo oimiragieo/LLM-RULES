@@ -1,4 +1,5 @@
 ---
+description: Invoke the GraphQL expert skill for schema design and Apollo
 disable-model-invocation: true
 ---
 

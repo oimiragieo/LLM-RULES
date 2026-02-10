@@ -1,4 +1,5 @@
 ---
+description: Detect hardcoded credentials, default passwords, and insecure defaults
 disable-model-invocation: true
 ---
 

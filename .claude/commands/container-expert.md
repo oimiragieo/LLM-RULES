@@ -1,4 +1,5 @@
 ---
+description: Invoke the container expert skill for Docker, Kubernetes, and Helm
 disable-model-invocation: true
 ---
 

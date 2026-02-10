@@ -1,4 +1,5 @@
 ---
+description: Invoke the database-architect skill for schema design and optimization
 disable-model-invocation: true
 ---
 

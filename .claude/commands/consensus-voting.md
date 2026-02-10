@@ -1,4 +1,5 @@
 ---
+description: Byzantine consensus voting for multi-agent decision making
 disable-model-invocation: true
 ---
 

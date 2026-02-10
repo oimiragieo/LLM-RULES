@@ -1,4 +1,5 @@
 ---
+description: Guided project onboarding and persistent knowledge memories for agents
 disable-model-invocation: true
 ---
 

@@ -1,4 +1,5 @@
 ---
+description: Memory forensics with Volatility and artifact extraction from RAM
 disable-model-invocation: true
 ---
 

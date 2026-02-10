@@ -1,4 +1,5 @@
 ---
+description: Invoke the hook-creator skill to create and register hooks
 disable-model-invocation: true
 ---
 

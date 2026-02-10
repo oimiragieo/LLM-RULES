@@ -1,4 +1,5 @@
 ---
+description: TDD task implementation patterns, red-green-refactor, and verification
 disable-model-invocation: true
 ---
 

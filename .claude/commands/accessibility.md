@@ -1,4 +1,5 @@
 ---
+description: Ensure accessibility in UI (WCAG, semantic HTML, keyboard navigation)
 disable-model-invocation: true
 ---
 

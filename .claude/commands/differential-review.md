@@ -1,4 +1,5 @@
 ---
+description: Security-focused review of code diffs and pull requests
 disable-model-invocation: true
 ---
 

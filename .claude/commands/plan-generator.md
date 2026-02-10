@@ -1,4 +1,5 @@
 ---
+description: Invoke the plan-generator skill to create structured plans from requirements
 disable-model-invocation: true
 ---
 

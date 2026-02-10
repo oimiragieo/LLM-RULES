@@ -1,4 +1,5 @@
 ---
+description: Research best practices and synthesize into design decisions before creation
 disable-model-invocation: true
 ---
 

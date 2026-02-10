@@ -1,4 +1,5 @@
 ---
+description: Unified skill for structured, interactive spec creation
 disable-model-invocation: true
 ---
 

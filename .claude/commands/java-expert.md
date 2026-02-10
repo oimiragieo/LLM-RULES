@@ -1,4 +1,5 @@
 ---
+description: Invoke the Java/Spring Boot expert skill for REST and microservices
 disable-model-invocation: true
 ---
 

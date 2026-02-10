@@ -1,4 +1,5 @@
 ---
+description: Discover vulnerability variants with CodeQL and Semgrep pattern matching
 disable-model-invocation: true
 ---
 

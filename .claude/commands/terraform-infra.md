@@ -1,4 +1,5 @@
 ---
+description: Terraform infrastructure operations with safety controls
 disable-model-invocation: true
 ---
 

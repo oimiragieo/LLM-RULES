@@ -1,4 +1,5 @@
 ---
+description: Convert natural language queries to SQL for databases and reporting
 disable-model-invocation: true
 ---
 

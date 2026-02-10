@@ -1,4 +1,5 @@
 ---
+description: Gate function preventing unverified completion claims before task sign-off
 disable-model-invocation: true
 ---
 

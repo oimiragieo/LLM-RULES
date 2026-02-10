@@ -1,4 +1,5 @@
 ---
+description: Scientific research toolkit and specialized skills for research workflows
 disable-model-invocation: true
 ---
 

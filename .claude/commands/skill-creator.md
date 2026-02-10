@@ -1,4 +1,5 @@
 ---
+description: Invoke the skill-creator skill to create and validate skills
 disable-model-invocation: true
 ---
 

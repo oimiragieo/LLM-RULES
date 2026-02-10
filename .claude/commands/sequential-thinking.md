@@ -1,4 +1,5 @@
 ---
+description: Sequential thinking and structured problem solving with revision
 disable-model-invocation: true
 ---
 

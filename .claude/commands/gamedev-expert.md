@@ -1,4 +1,5 @@
 ---
+description: Invoke the gamedev expert skill for DragonRuby, Unity, and game mechanics
 disable-model-invocation: true
 ---
 

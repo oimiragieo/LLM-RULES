@@ -1,4 +1,5 @@
 ---
+description: Systematic 4-phase debugging with root cause investigation
 disable-model-invocation: true
 ---
 

@@ -1,4 +1,5 @@
 ---
+description: Summarize code changes after completing tasks with actionable summaries
 disable-model-invocation: true
 ---
 

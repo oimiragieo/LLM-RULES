@@ -1,4 +1,5 @@
 ---
+description: Invoke the database expert skill for Prisma, Supabase, and SQL
 disable-model-invocation: true
 ---
 

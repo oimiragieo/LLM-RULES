@@ -1,4 +1,5 @@
 ---
+description: Expo Framework guidelines for Views, Blueprints, and Extensions
 disable-model-invocation: true
 ---
 

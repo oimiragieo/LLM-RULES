@@ -1,4 +1,5 @@
 ---
+description: Invoke the AI/ML expert skill for PyTorch, LangChain, and LLM integration
 disable-model-invocation: true
 ---
 

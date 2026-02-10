@@ -1,4 +1,5 @@
 ---
+description: Structured questionnaire framework for gathering requirements
 disable-model-invocation: true
 ---
 
