@@ -229,6 +229,39 @@ Common controls:
 
 See `.env.example` and `.claude/docs/@ENVIRONMENT_CONFIG.md`.
 
+## Windows Search Tooling (Scoop)
+
+If you want fast local terminal search tooling on Windows (non-admin), install `rga` and `fzf` via Scoop.
+
+Install Scoop (non-admin PowerShell):
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+```
+
+Install ripgrep-all + fuzzy finder:
+
+```powershell
+# Install rga (ripgrep-all)
+scoop install rga
+
+# Install fzf
+scoop install fzf
+```
+
+Verify install:
+
+```powershell
+rga --version
+fzf --version
+```
+
+Sources:
+
+- `https://scoop.sh/`
+- `https://github.com/phiresky/ripgrep-all?tab=readme-ov-file#scoop`
+
 ## Operational Notes
 
 - `.claude/context/` stores runtime artifacts and persistent operational memory.
