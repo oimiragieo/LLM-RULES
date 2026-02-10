@@ -96,6 +96,10 @@ importers:
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
+    optionalDependencies:
+      onnxruntime-node-gpu:
+        specifier: ^1.14.0
+        version: 1.14.0
 
 packages:
 
@@ -2235,6 +2239,9 @@ packages:
 
   onnxruntime-common@1.21.0:
     resolution: {integrity: sha512-Q632iLLrtCAVOTO65dh2+mNbQir/QNTVBG3h/QdZBpns7mZ0RYbLRBgGABPbpU9351AgYy7SJf1WaeVwMrBFPQ==}
+
+  onnxruntime-node-gpu@1.14.0:
+    resolution: {integrity: sha512-12vkY4f/O3d+iZBzIsX4iezK1uqqOUoGFUiqaCpryildA3MAV2lv8MZTCiQq9r0sa8HvL1PPs/jsqaPqOaxHTA==}
 
   onnxruntime-node@1.14.0:
     resolution: {integrity: sha512-5ba7TWomIV/9b6NH/1x/8QEeowsb+jBEvFzU6z0T4mNsFwdPqXeFUM7uxC6QeSRkEbWu3qEB0VMjrvzN/0S9+w==}
@@ -4982,6 +4989,11 @@ snapshots:
   onnxruntime-common@1.14.0: {}
 
   onnxruntime-common@1.21.0: {}
+
+  onnxruntime-node-gpu@1.14.0:
+    dependencies:
+      onnxruntime-common: 1.14.0
+    optional: true
 
   onnxruntime-node@1.14.0:
     dependencies:
