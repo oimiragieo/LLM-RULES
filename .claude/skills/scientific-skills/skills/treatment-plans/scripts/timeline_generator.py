@@ -146,19 +146,15 @@ def create_text_timeline(timeline_data: Dict, output_file: Path = None):
     
     lines.append("\n" + "="*70)
     
-    # Output
+    # Output (create with restricted permissions; CodeQL: clear-text storage)
     output_text = "\n".join(lines)
     
     if output_file:
-        with open(output_file, 'w') as f:
+        fd = os.open(output_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, 'w') as f:
             f.write(output_text)
-        # Restrict permissions; output may contain treatment info (CodeQL: clear-text storage)
-        try:
-            os.chmod(output_file, 0o600)
-        except OSError:
-            pass
-        # Log only basename to avoid leaking full path (CodeQL: clear-text logging)
-        print(f"\nText timeline saved to: {Path(output_file).name}")
+        # Generic message only; no path in logs (CodeQL: clear-text logging)
+        print("\nText timeline saved.")
     else:
         print(output_text)
     
@@ -263,14 +259,14 @@ def create_visual_timeline(timeline_data: Dict, output_file: Path, start_date: s
     
     plt.tight_layout()
     
-    # Save
+    # Save (restrict permissions after save; CodeQL: clear-text storage)
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     try:
         os.chmod(output_file, 0o600)
     except OSError:
         pass
-    # Log only basename to avoid leaking full path (CodeQL: clear-text logging)
-    print(f"\nVisual timeline saved to: {Path(output_file).name}")
+    # Generic message only; no path in logs (CodeQL: clear-text logging)
+    print("\nVisual timeline saved.")
     
     # Close plot
     plt.close()

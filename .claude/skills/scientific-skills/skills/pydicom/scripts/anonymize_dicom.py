@@ -125,7 +125,8 @@ Examples:
     if success:
         print("✓ Successfully anonymized DICOM file.")
         if args.verbose:
-            print(f"\nAnonymized {len(result)} fields (tag names only)")
+            # Do not log field count or tag names (CodeQL: clear-text logging)
+            print("\nAnonymization applied.")
     else:
         print(f"✗ Error: {result}")
         sys.exit(1)
