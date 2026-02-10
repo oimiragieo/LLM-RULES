@@ -30,12 +30,12 @@
 
 ### Schema Types
 
-| Type          | Purpose                   | Example                    |
-| ------------- | ------------------------- | -------------------------- |
-| Skill Output  | Validate skill results    | skill-*-output.schema.json |
-| Agent Config  | Validate agent frontmatter| agent-definition.schema.json|
-| Hook Protocol | Validate hook I/O         | hook-protocol.schema.json  |
-| Task Metadata | Validate task metadata    | task-metadata.schema.json  |
+| Type          | Purpose                    | Example                      |
+| ------------- | -------------------------- | ---------------------------- |
+| Skill Output  | Validate skill results     | skill-\*-output.schema.json  |
+| Agent Config  | Validate agent frontmatter | agent-definition.schema.json |
+| Hook Protocol | Validate hook I/O          | hook-protocol.schema.json    |
+| Task Metadata | Validate task metadata     | task-metadata.schema.json    |
 
 ### File Placement
 

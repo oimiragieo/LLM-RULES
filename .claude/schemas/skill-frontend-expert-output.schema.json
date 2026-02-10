@@ -4,10 +4,7 @@
   "title": "Frontend Expert Skill Output",
   "description": "Output schema for frontend development including UI/UX, responsive design, and accessibility",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "metadata": {
       "type": "object",
@@ -22,26 +19,17 @@
     },
     "output": {
       "type": "object",
-      "required": [
-        "type"
-      ],
+      "required": ["type"],
       "properties": {
         "type": {
           "type": "string",
-          "enum": [
-            "component-design",
-            "accessibility-review",
-            "performance-audit"
-          ]
+          "enum": ["component-design", "accessibility-review", "performance-audit"]
         },
         "recommendations": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "category",
-              "recommendation"
-            ],
+            "required": ["category", "recommendation"],
             "properties": {
               "category": {
                 "type": "string"
@@ -51,12 +39,7 @@
               },
               "priority": {
                 "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
+                "enum": ["critical", "high", "medium", "low"]
               }
             }
           }
@@ -65,22 +48,14 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "finding",
-              "severity"
-            ],
+            "required": ["finding", "severity"],
             "properties": {
               "finding": {
                 "type": "string"
               },
               "severity": {
                 "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
+                "enum": ["critical", "high", "medium", "low"]
               },
               "remediation": {
                 "type": "string"
@@ -118,11 +93,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

@@ -31,11 +31,16 @@ class HybridLazyIndexer {
       // ripgrep settings
       maxRipgrepResults: options.maxRipgrepResults || 100,
       ripgrepTimeoutMs: options.ripgrepTimeoutMs || 5000,
+      maxRipgrepMatchesPerFile: options.maxRipgrepMatchesPerFile || 3,
+      maxRipgrepCacheEntries: options.maxRipgrepCacheEntries || 256,
 
       // Embedding settings
       embeddingEnabled: options.embeddingEnabled !== false,
       embedBatchSize: options.embedBatchSize || 32,
       maxConcurrentEmbeds: options.maxConcurrentEmbeds || 4,
+      semanticCacheExpiryMs: options.semanticCacheExpiryMs || 30000,
+      maxSemanticCacheEntries: options.maxSemanticCacheEntries || 128,
+      maxEmbeddingCacheEntries: options.maxEmbeddingCacheEntries || 128,
 
       // Hybrid scoring
       rrfK: options.rrfK || 60,
@@ -44,12 +49,15 @@ class HybridLazyIndexer {
 
       // Lazy loading
       cacheExpiryMs: options.cacheExpiryMs || 30000, // 30s
+      debug: options.debug === true || process.env.HYBRID_SEARCH_DEBUG === 'true',
     };
 
     // In-memory caches
     this.ripgrepCache = new Map();
     this.structureCache = null;
     this.structureCacheTime = 0;
+    this.semanticCache = new Map();
+    this.embeddingCache = new Map();
 
     // Background embedding queue
     this.embedQueue = [];
@@ -57,6 +65,10 @@ class HybridLazyIndexer {
 
     // Initialization state
     this.lanceDBInitialized = false;
+
+    // ripgrep path cache (resolved once)
+    this._rgPathPromise = null;
+    this._rgPath = options.rgPath || null;
   }
 
   // ============================================================================
@@ -81,7 +93,7 @@ class HybridLazyIndexer {
 
     // 2. If embeddings enabled and available, run semantic search
     let semanticResults = [];
-    if (this.config.embeddingEnabled && query.length > 10) {
+    if (this.shouldRunSemanticSearch(query, textResults)) {
       try {
         semanticResults = await this.semanticSearch(query, {
           limit: Math.max(limit * 2, 50),
@@ -95,13 +107,30 @@ class HybridLazyIndexer {
     // 3. Fuse results using Reciprocal Rank Fusion
     const fused = this.fuseResults(textResults, semanticResults, limit);
 
-    console.log(
-      `[hybrid-search] "${query.slice(0, 30)}..." - ` +
-        `${textResults.length} text + ${semanticResults.length} semantic = ${fused.length} fused ` +
-        `(${Date.now() - startTime}ms)`
-    );
+    if (this.config.debug) {
+      console.log(
+        `[hybrid-search] "${query.slice(0, 30)}..." - ` +
+          `${textResults.length} text + ${semanticResults.length} semantic = ${fused.length} fused ` +
+          `(${Date.now() - startTime}ms)`
+      );
+    }
 
     return fused;
+  }
+
+  /**
+   * Heuristic gate for semantic search.
+   * Skips semantic for symbol-heavy literal queries when text matches already exist.
+   */
+  shouldRunSemanticSearch(query, textResults = []) {
+    if (!this.config.embeddingEnabled) return false;
+    if (query.length <= 10) return false;
+
+    // Symbol-heavy queries are usually exact lookups where semantic adds latency.
+    const isSymbolHeavy = /[()[\]{}<>:=]/.test(query);
+    if (isSymbolHeavy && textResults.length > 0) return false;
+
+    return true;
   }
 
   /**
@@ -167,19 +196,39 @@ class HybridLazyIndexer {
   // ============================================================================
 
   async getRgPath() {
+    if (this._rgPath) return this._rgPath;
+    if (this._rgPathPromise) return this._rgPathPromise;
+
     // Get ripgrep binary path from @vscode/ripgrep
-    try {
-      const { rgPath } = await import('@vscode/ripgrep');
-      return rgPath;
-    } catch {
-      // Fallback to just 'rg' if package not available
-      return 'rg';
-    }
+    this._rgPathPromise = (async () => {
+      try {
+        const { rgPath } = await import('@vscode/ripgrep');
+        this._rgPath = rgPath;
+      } catch {
+        // Fallback to just 'rg' if package not available
+        this._rgPath = 'rg';
+      }
+      return this._rgPath;
+    })();
+
+    return this._rgPathPromise;
+  }
+
+  /**
+   * Heuristic: determine if query should be treated as regex.
+   * Natural-language and symbol lookups are faster/safer as fixed-string (-F).
+   * @param {string} query
+   * @returns {boolean}
+   */
+  isRegexQuery(query) {
+    if (!query || typeof query !== 'string') return false;
+    // Regex metacharacters likely indicate intentional regex usage.
+    return /[\\^$.*+?()[\]{}|]/.test(query);
   }
 
   async ripgrepSearch(query, options = {}) {
     const cacheKey = `rg:${query}:${options.limit}`;
-    const cached = this.ripgrepCache.get(cacheKey);
+    const cached = this.getCacheEntry(this.ripgrepCache, cacheKey);
     if (cached && Date.now() - cached.time < this.config.cacheExpiryMs) {
       return cached.results;
     }
@@ -187,18 +236,14 @@ class HybridLazyIndexer {
     // Get ripgrep path
     const rgPath = await this.getRgPath();
 
-    // Escape query for shell
-    const safeQuery = query.replace(/"/g, '\\"');
-
     // Build ripgrep command
     // Note: @vscode/ripgrep may not have all type definitions, use -g patterns instead
     const args = [
       '--json', // JSON output
-      '--context',
-      '2', // 2 lines of context
+      '--no-config', // Avoid user-level rg config noise/overhead
       '--max-count',
-      String(options.limit || 50),
-      '-i', // Case insensitive
+      String(options.maxMatchesPerFile || this.config.maxRipgrepMatchesPerFile),
+      '-S', // Smart case (faster than always -i, better precision)
       '-g',
       '*.js',
       '-g',
@@ -221,9 +266,14 @@ class HybridLazyIndexer {
       '!*.map',
     ];
 
+    const queryText = query;
+    const useRegex = this.isRegexQuery(queryText);
+    const matcherArgs = useRegex ? [] : ['-F'];
+    const searchArgs = [...matcherArgs, ...args, queryText, this.projectRoot];
+
     try {
       // SEC-LIB-001 FIX: Use spawnSync with array args to prevent command injection
-      const result = spawnSync(rgPath, [safeQuery, ...args, this.projectRoot], {
+      let result = spawnSync(rgPath, searchArgs, {
         encoding: 'utf8',
         timeout: options.timeout || this.config.ripgrepTimeoutMs,
         maxBuffer: 10 * 1024 * 1024, // 10MB
@@ -234,12 +284,33 @@ class HybridLazyIndexer {
         throw result.error;
       }
 
+      // Fallback: treat query as literal when regex parsing fails (e.g., TaskUpdate()
+      if (
+        result.status === 2 &&
+        typeof result.stderr === 'string' &&
+        result.stderr.toLowerCase().includes('regex parse error')
+      ) {
+        result = spawnSync(rgPath, ['-F', ...args, queryText, this.projectRoot], {
+          encoding: 'utf8',
+          timeout: options.timeout || this.config.ripgrepTimeoutMs,
+          maxBuffer: 10 * 1024 * 1024,
+          shell: false,
+        });
+      }
+
       const output = result.stdout || '';
 
-      const results = this.parseRipgrepOutput(output);
+      const results = this.parseRipgrepOutput(output, {
+        maxFiles: options.limit || this.config.maxRipgrepResults,
+      });
 
       // Cache results
-      this.ripgrepCache.set(cacheKey, { results, time: Date.now() });
+      this.setCacheEntry(
+        this.ripgrepCache,
+        cacheKey,
+        { results, time: Date.now() },
+        this.config.maxRipgrepCacheEntries
+      );
 
       return results;
     } catch (err) {
@@ -251,12 +322,14 @@ class HybridLazyIndexer {
     }
   }
 
-  parseRipgrepOutput(output) {
-    const lines = output.trim().split('\n');
+  parseRipgrepOutput(output, options = {}) {
+    const lines = output ? output.split('\n') : [];
     const results = [];
     let current = null;
+    const maxFiles = options.maxFiles || this.config.maxRipgrepResults;
 
     for (const line of lines) {
+      if (!line) continue;
       try {
         const data = JSON.parse(line);
 
@@ -275,6 +348,7 @@ class HybridLazyIndexer {
             score: 1.0, // Will be re-ranked
           });
           current = null;
+          if (results.length >= maxFiles) break;
         }
       } catch {
         // Skip invalid JSON lines
@@ -290,6 +364,12 @@ class HybridLazyIndexer {
 
   async semanticSearch(query, options = {}) {
     if (!this.config.embeddingEnabled) return [];
+    const limit = options.limit || 20;
+    const cacheKey = `sem:${query}:${limit}`;
+    const cached = this.getCacheEntry(this.semanticCache, cacheKey);
+    if (cached && Date.now() - cached.time < this.config.semanticCacheExpiryMs) {
+      return cached.results;
+    }
 
     // Lazy initialize LanceDB
     await this.initLanceDB();
@@ -300,21 +380,41 @@ class HybridLazyIndexer {
     }
 
     // Generate query embedding
-    const queryVector = await this.embed(query);
+    const queryVector = await this.getCachedQueryEmbedding(query);
 
     // Search LanceDB
-    const results = await this.table
-      .vectorSearch(queryVector)
-      .limit(options.limit || 20)
-      .toArray();
+    const results = await this.table.vectorSearch(queryVector).limit(limit).toArray();
 
-    return results.map(r => ({
-      file: r.metadata?.filePath || r.filePath,
-      type: 'semantic',
-      line: r.metadata?.lineStart || 1,
-      text: r.text || r.content,
-      score: 1 - (r._distance || 0),
-    }));
+    const normalized = results.map(r => {
+      const metadata = this.parseMetadata(r.metadata);
+      return {
+        file: metadata.filePath || r.filePath || 'unknown',
+        type: 'semantic',
+        line: metadata.lineStart || r.lineStart || 1,
+        text: r.text || r.content,
+        score: 1 - (r._distance || 0),
+      };
+    });
+    this.setCacheEntry(
+      this.semanticCache,
+      cacheKey,
+      { results: normalized, time: Date.now() },
+      this.config.maxSemanticCacheEntries
+    );
+    return normalized;
+  }
+
+  parseMetadata(metadata) {
+    if (!metadata) return {};
+    if (typeof metadata === 'string') {
+      try {
+        return JSON.parse(metadata);
+      } catch {
+        return {};
+      }
+    }
+    if (typeof metadata === 'object') return metadata;
+    return {};
   }
 
   async embed(text) {
@@ -326,6 +426,22 @@ class HybridLazyIndexer {
 
     const output = await Embedder(text, { pooling: 'mean', normalize: true });
     return Array.from(output.data);
+  }
+
+  async getCachedQueryEmbedding(query) {
+    const key = `q:${query}`;
+    const cached = this.getCacheEntry(this.embeddingCache, key);
+    if (cached && Date.now() - cached.time < this.config.semanticCacheExpiryMs) {
+      return cached.vector;
+    }
+    const vector = await this.embed(query);
+    this.setCacheEntry(
+      this.embeddingCache,
+      key,
+      { vector, time: Date.now() },
+      this.config.maxEmbeddingCacheEntries
+    );
+    return vector;
   }
 
   async initLanceDB() {
@@ -682,8 +798,29 @@ class HybridLazyIndexer {
   // UTILITIES
   // ============================================================================
 
+  getCacheEntry(cache, key) {
+    const value = cache.get(key);
+    if (!value) return null;
+    // LRU touch: move key to end
+    cache.delete(key);
+    cache.set(key, value);
+    return value;
+  }
+
+  setCacheEntry(cache, key, value, maxEntries) {
+    if (cache.has(key)) cache.delete(key);
+    cache.set(key, value);
+    while (cache.size > maxEntries) {
+      const oldestKey = cache.keys().next().value;
+      if (oldestKey === undefined) break;
+      cache.delete(oldestKey);
+    }
+  }
+
   clearCache() {
     this.ripgrepCache.clear();
+    this.semanticCache.clear();
+    this.embeddingCache.clear();
     this.structureCache = null;
     this.structureCacheTime = 0;
   }
@@ -691,6 +828,8 @@ class HybridLazyIndexer {
   getStats() {
     return {
       ripgrepCacheSize: this.ripgrepCache.size,
+      semanticCacheSize: this.semanticCache.size,
+      embeddingCacheSize: this.embeddingCache.size,
       embedQueueLength: this.embedQueue.length,
       structureCached: !!this.structureCache,
       lanceDBConnected: !!this.table,

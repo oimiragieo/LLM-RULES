@@ -10,12 +10,14 @@
 ## When to Use
 
 **Always:**
+
 - Finding authentication logic without knowing function names
 - Searching for error handling patterns
 - Locating database queries
 - Finding similar code to a concept
 
 **Don't Use:**
+
 - Exact text matching (use Grep instead)
 - File name searches (use Glob instead)
 - Simple keyword searches (use ripgrep instead)
@@ -31,7 +33,7 @@
 ### Mode Selection
 
 | Mode            | Speed  | Accuracy | Best For          |
-|-----------------|--------|----------|-------------------|
+| --------------- | ------ | -------- | ----------------- |
 | Hybrid          | <150ms | 95%      | General search    |
 | Semantic-only   | <50ms  | 85%      | Concepts          |
 | Structural-only | <50ms  | 100%     | Exact patterns    |
@@ -40,25 +42,28 @@
 ## Usage Patterns
 
 ### Basic Hybrid Search (Recommended)
+
 ```javascript
 Skill({ skill: 'code-semantic-search', args: 'find authentication logic' });
 ```
 
 ### Fast Conceptual Search
+
 ```javascript
 Skill({
   skill: 'code-semantic-search',
   args: 'error handling',
-  options: { mode: 'semantic-only' }
+  options: { mode: 'semantic-only' },
 });
 ```
 
 ### Exact Pattern Matching
+
 ```javascript
 Skill({
   skill: 'code-semantic-search',
   args: 'find function authenticate',
-  options: { mode: 'structural-only' }
+  options: { mode: 'structural-only' },
 });
 ```
 

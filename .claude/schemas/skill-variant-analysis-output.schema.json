@@ -4,37 +4,21 @@
   "title": "Variant Analysis Skill Output",
   "description": "Verifiable output from the variant-analysis skill proving pattern-based vulnerability discovery occurred",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
       "description": "Domain-specific output for variant-analysis",
-      "required": [
-        "seed_vulnerability",
-        "variants_found",
-        "variants"
-      ],
+      "required": ["seed_vulnerability", "variants_found", "variants"],
       "properties": {
         "seed_vulnerability": {
           "type": "object",
-          "required": [
-            "id",
-            "bug_class",
-            "cwe",
-            "pattern_description"
-          ],
+          "required": ["id", "bug_class", "cwe", "pattern_description"],
           "properties": {
             "id": {
               "type": "string",
@@ -85,12 +69,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "codeql",
-                  "semgrep",
-                  "ast-grep",
-                  "manual"
-                ]
+                "enum": ["codeql", "semgrep", "ast-grep", "manual"]
               },
               "description": "Analysis tools used"
             }
@@ -107,13 +86,7 @@
           "description": "Discovered variant instances",
           "items": {
             "type": "object",
-            "required": [
-              "variant_id",
-              "file",
-              "line",
-              "confidence",
-              "similarity_level"
-            ],
+            "required": ["variant_id", "file", "line", "confidence", "similarity_level"],
             "properties": {
               "variant_id": {
                 "type": "string",
@@ -130,30 +103,16 @@
               },
               "confidence": {
                 "type": "string",
-                "enum": [
-                  "HIGH",
-                  "MEDIUM",
-                  "LOW"
-                ]
+                "enum": ["HIGH", "MEDIUM", "LOW"]
               },
               "similarity_level": {
                 "type": "string",
-                "enum": [
-                  "exact",
-                  "local",
-                  "structural",
-                  "semantic"
-                ],
+                "enum": ["exact", "local", "structural", "semantic"],
                 "description": "How structurally similar to the seed"
               },
               "exploitability": {
                 "type": "string",
-                "enum": [
-                  "CONFIRMED",
-                  "LIKELY",
-                  "NEEDS_INVESTIGATION",
-                  "UNLIKELY"
-                ],
+                "enum": ["CONFIRMED", "LIKELY", "NEEDS_INVESTIGATION", "UNLIKELY"],
                 "description": "Assessment of exploitability"
               },
               "description": {

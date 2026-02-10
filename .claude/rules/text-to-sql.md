@@ -27,7 +27,7 @@
 ## Query Optimization
 
 - Use indexes on filter columns
-- Avoid SELECT * (specify columns)
+- Avoid SELECT \* (specify columns)
 - Use EXISTS instead of COUNT for boolean checks
 - Apply filters early in query
 - Use query planner hints when needed

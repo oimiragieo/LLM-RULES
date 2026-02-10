@@ -4,18 +4,11 @@
   "title": "Sequential Thinking Output",
   "description": "Schema for sequential thinking skill output with chain of thought progression",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -27,11 +20,7 @@
           "description": "Sequence of thinking steps",
           "items": {
             "type": "object",
-            "required": [
-              "thoughtNumber",
-              "thought",
-              "nextThoughtNeeded"
-            ],
+            "required": ["thoughtNumber", "thought", "nextThoughtNeeded"],
             "properties": {
               "thoughtNumber": {
                 "type": "integer",
@@ -120,11 +109,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "thoughts",
-        "finalHypothesis",
-        "verified"
-      ]
+      "required": ["thoughts", "finalHypothesis", "verified"]
     }
   },
   "additionalProperties": false

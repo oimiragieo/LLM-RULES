@@ -20,21 +20,21 @@ Rules are quick-reference files (<100 lines) that provide actionable guidelines 
 
 ## Quick Reference by Domain
 
-| Domain          | Count | Key Rules                                                                                    |
-| --------------- | ----- | -------------------------------------------------------------------------------------------- |
-| Core Framework  | 11    | agents, artifact-integration, code-standards, git-workflow, hooks, memory-protocol, testing  |
-| Development     | 11    | tdd, debugging, verification-before-completion, code-analyzer, code-quality-expert           |
-| Security        | 10    | security, security-architect, auth-security-expert, static-analysis, variant-analysis        |
-| Search          | 4     | ripgrep, code-semantic-search, code-structural-search, research-synthesis                    |
-| Languages       | 9     | typescript, python, react, nodejs, go, java, php, web3, gamedev                              |
-| Infrastructure  | 8     | container, docker-compose, terraform, k8s, sentry-monitoring                                 |
-| Mobile          | 5     | ios, android, expo, tauri, mobile-first-design                                               |
-| Planning        | 7     | plan-generator, complexity-assessment, prd-generator, spec-gathering, spec-init              |
-| Creator Tools   | 7     | skill-creator, agent-creator, hook-creator, workflow-creator, schema-creator, template       |
-| Data            | 3     | database, data-expert, text-to-sql                                                           |
-| Context/Memory  | 3     | context-driven-development, session-handoff, insight-extraction                              |
-| Validation      | 3     | checklist-generator, response-rater, thinking-tools                                          |
-| Other           | 5     | frontend, graphql, api-development, artifact-integrator, project-onboarding                  |
+| Domain         | Count | Key Rules                                                                                   |
+| -------------- | ----- | ------------------------------------------------------------------------------------------- |
+| Core Framework | 11    | agents, artifact-integration, code-standards, git-workflow, hooks, memory-protocol, testing |
+| Development    | 11    | tdd, debugging, verification-before-completion, code-analyzer, code-quality-expert          |
+| Security       | 10    | security, security-architect, auth-security-expert, static-analysis, variant-analysis       |
+| Search         | 4     | ripgrep, code-semantic-search, code-structural-search, research-synthesis                   |
+| Languages      | 9     | typescript, python, react, nodejs, go, java, php, web3, gamedev                             |
+| Infrastructure | 8     | container, docker-compose, terraform, k8s, sentry-monitoring                                |
+| Mobile         | 5     | ios, android, expo, tauri, mobile-first-design                                              |
+| Planning       | 7     | plan-generator, complexity-assessment, prd-generator, spec-gathering, spec-init             |
+| Creator Tools  | 7     | skill-creator, agent-creator, hook-creator, workflow-creator, schema-creator, template      |
+| Data           | 3     | database, data-expert, text-to-sql                                                          |
+| Context/Memory | 3     | context-driven-development, session-handoff, insight-extraction                             |
+| Validation     | 3     | checklist-generator, response-rater, thinking-tools                                         |
+| Other          | 5     | frontend, graphql, api-development, artifact-integrator, project-onboarding                 |
 
 ---
 
@@ -209,19 +209,19 @@ Essential framework operation rules.
 
 Core development workflow rules.
 
-| Rule Name                             | Skill                             | Purpose                                  |
-| ------------------------------------- | --------------------------------- | ---------------------------------------- |
-| `tdd.md`                              | `tdd`                             | Test-Driven Development with Iron Laws   |
-| `debugging.md`                        | `debugging`                       | Systematic 4-phase debugging             |
-| `verification-before-completion.md`   | `verification-before-completion`  | Pre-completion gate function             |
-| `code-analyzer.md`                    | `code-analyzer`                   | Static code analysis and metrics         |
-| `code-quality-expert.md`              | `code-quality-expert`             | Clean code principles                    |
-| `best-practices-guidelines.md`        | `best-practices-guidelines`       | Cross-cutting best practices             |
-| `dry-principle.md`                    | `dry-principle`                   | Don't Repeat Yourself enforcement        |
-| `ripgrep.md`                          | `ripgrep`                         | Enhanced code search                     |
-| `code-semantic-search.md`             | `code-semantic-search`            | Semantic code search                     |
-| `code-structural-search.md`           | `code-structural-search`          | AST-based pattern matching               |
-| `code-style-validator.md`             | `code-style-validator`            | Programmatic AST-based style validation  |
+| Rule Name                           | Skill                            | Purpose                                 |
+| ----------------------------------- | -------------------------------- | --------------------------------------- |
+| `tdd.md`                            | `tdd`                            | Test-Driven Development with Iron Laws  |
+| `debugging.md`                      | `debugging`                      | Systematic 4-phase debugging            |
+| `verification-before-completion.md` | `verification-before-completion` | Pre-completion gate function            |
+| `code-analyzer.md`                  | `code-analyzer`                  | Static code analysis and metrics        |
+| `code-quality-expert.md`            | `code-quality-expert`            | Clean code principles                   |
+| `best-practices-guidelines.md`      | `best-practices-guidelines`      | Cross-cutting best practices            |
+| `dry-principle.md`                  | `dry-principle`                  | Don't Repeat Yourself enforcement       |
+| `ripgrep.md`                        | `ripgrep`                        | Enhanced code search                    |
+| `code-semantic-search.md`           | `code-semantic-search`           | Semantic code search                    |
+| `code-structural-search.md`         | `code-structural-search`         | AST-based pattern matching              |
+| `code-style-validator.md`           | `code-style-validator`           | Programmatic AST-based style validation |
 
 ---
 
@@ -229,16 +229,16 @@ Core development workflow rules.
 
 Security analysis and validation rules.
 
-| Rule Name                    | Skill                        | Purpose                                  |
-| ---------------------------- | ---------------------------- | ---------------------------------------- |
-| `security.md`                | N/A                          | OWASP Top 10, Agentic AI Top 10          |
-| `security-architect.md`      | `security-architect`         | OWASP, STRIDE, threat modeling           |
-| `auth-security-expert.md`    | `auth-security-expert`       | OAuth 2.1, JWT, encryption               |
-| `static-analysis.md`         | `static-analysis`            | Static code analysis for security        |
-| `variant-analysis.md`        | `variant-analysis`           | Variant analysis for vulnerabilities     |
-| `differential-review.md`     | `differential-review`        | Differential code review                 |
-| `semgrep-rule-creator.md`    | `semgrep-rule-creator`       | Semgrep rule creation                    |
-| `insecure-defaults.md`       | `insecure-defaults`          | Insecure defaults detection              |
+| Rule Name                 | Skill                  | Purpose                              |
+| ------------------------- | ---------------------- | ------------------------------------ |
+| `security.md`             | N/A                    | OWASP Top 10, Agentic AI Top 10      |
+| `security-architect.md`   | `security-architect`   | OWASP, STRIDE, threat modeling       |
+| `auth-security-expert.md` | `auth-security-expert` | OAuth 2.1, JWT, encryption           |
+| `static-analysis.md`      | `static-analysis`      | Static code analysis for security    |
+| `variant-analysis.md`     | `variant-analysis`     | Variant analysis for vulnerabilities |
+| `differential-review.md`  | `differential-review`  | Differential code review             |
+| `semgrep-rule-creator.md` | `semgrep-rule-creator` | Semgrep rule creation                |
+| `insecure-defaults.md`    | `insecure-defaults`    | Insecure defaults detection          |
 
 ---
 
@@ -246,12 +246,12 @@ Security analysis and validation rules.
 
 Code search and discovery rules.
 
-| Rule Name                    | Skill                        | Purpose                                  |
-| ---------------------------- | ---------------------------- | ---------------------------------------- |
-| `ripgrep.md`                 | `ripgrep`                    | PCRE2 regex text search                  |
-| `code-semantic-search.md`    | `code-semantic-search`       | Semantic code search (vectors + BM25)    |
-| `code-structural-search.md`  | `code-structural-search`     | AST-based structural search              |
-| `research-synthesis.md`      | `research-synthesis`         | Research synthesis for artifact creation |
+| Rule Name                   | Skill                    | Purpose                                  |
+| --------------------------- | ------------------------ | ---------------------------------------- |
+| `ripgrep.md`                | `ripgrep`                | PCRE2 regex text search                  |
+| `code-semantic-search.md`   | `code-semantic-search`   | Semantic code search (vectors + BM25)    |
+| `code-structural-search.md` | `code-structural-search` | AST-based structural search              |
+| `research-synthesis.md`     | `research-synthesis`     | Research synthesis for artifact creation |
 
 ---
 
@@ -259,17 +259,17 @@ Code search and discovery rules.
 
 Language-specific expertise rules.
 
-| Rule Name                    | Skill                        | Purpose                                  |
-| ---------------------------- | ---------------------------- | ---------------------------------------- |
-| `typescript-expert.md`       | `typescript-expert`          | TypeScript patterns                      |
-| `python-backend-expert.md`   | `python-backend-expert`      | Python backend (Django, FastAPI, Flask)  |
-| `react-expert.md`            | `react-expert`               | React hooks, state management            |
-| `nodejs-expert.md`           | `nodejs-expert`              | Node.js, Express, NestJS                 |
-| `go-expert.md`               | `go-expert`                  | Go APIs, gRPC, concurrency               |
-| `java-expert.md`             | `java-expert`                | Java and Spring Boot                     |
-| `php-expert.md`              | `php-expert`                 | PHP, Laravel, WordPress                  |
-| `web3-expert.md`             | `web3-expert`                | Solidity, Ethereum, smart contracts      |
-| `gamedev-expert.md`          | `gamedev-expert`             | Game development                         |
+| Rule Name                  | Skill                   | Purpose                                 |
+| -------------------------- | ----------------------- | --------------------------------------- |
+| `typescript-expert.md`     | `typescript-expert`     | TypeScript patterns                     |
+| `python-backend-expert.md` | `python-backend-expert` | Python backend (Django, FastAPI, Flask) |
+| `react-expert.md`          | `react-expert`          | React hooks, state management           |
+| `nodejs-expert.md`         | `nodejs-expert`         | Node.js, Express, NestJS                |
+| `go-expert.md`             | `go-expert`             | Go APIs, gRPC, concurrency              |
+| `java-expert.md`           | `java-expert`           | Java and Spring Boot                    |
+| `php-expert.md`            | `php-expert`            | PHP, Laravel, WordPress                 |
+| `web3-expert.md`           | `web3-expert`           | Solidity, Ethereum, smart contracts     |
+| `gamedev-expert.md`        | `gamedev-expert`        | Game development                        |
 
 ---
 
@@ -277,15 +277,15 @@ Language-specific expertise rules.
 
 DevOps and infrastructure rules.
 
-| Rule Name                        | Skill                            | Purpose                                  |
-| -------------------------------- | -------------------------------- | ---------------------------------------- |
-| `container-expert.md`            | `container-expert`               | Docker, Kubernetes, Helm                 |
-| `docker-compose.md`              | `docker-compose`                 | Docker Compose orchestration             |
-| `terraform-infra.md`             | `terraform-infra`                | Terraform with safety controls           |
-| `k8s-manifest-generator.md`      | `k8s-manifest-generator`         | Production-ready K8s manifests           |
-| `sentry-monitoring.md`           | `sentry-monitoring`              | Error tracking and monitoring            |
-| `incident-runbook-templates.md`  | `incident-runbook-templates`     | Incident response runbooks               |
-| `postmortem-writing.md`          | `postmortem-writing`             | Blameless postmortem writing             |
+| Rule Name                       | Skill                        | Purpose                        |
+| ------------------------------- | ---------------------------- | ------------------------------ |
+| `container-expert.md`           | `container-expert`           | Docker, Kubernetes, Helm       |
+| `docker-compose.md`             | `docker-compose`             | Docker Compose orchestration   |
+| `terraform-infra.md`            | `terraform-infra`            | Terraform with safety controls |
+| `k8s-manifest-generator.md`     | `k8s-manifest-generator`     | Production-ready K8s manifests |
+| `sentry-monitoring.md`          | `sentry-monitoring`          | Error tracking and monitoring  |
+| `incident-runbook-templates.md` | `incident-runbook-templates` | Incident response runbooks     |
+| `postmortem-writing.md`         | `postmortem-writing`         | Blameless postmortem writing   |
 
 ---
 
@@ -293,13 +293,13 @@ DevOps and infrastructure rules.
 
 Mobile development rules.
 
-| Rule Name                            | Skill                                | Purpose                                  |
-| ------------------------------------ | ------------------------------------ | ---------------------------------------- |
-| `ios-expert.md`                      | `ios-expert`                         | SwiftUI, UIKit, Apple frameworks         |
-| `android-expert.md`                  | `android-expert`                     | Jetpack Compose, Kotlin, Material Design |
-| `expo-framework-rule.md`             | `expo-framework-rule`                | Expo framework patterns                  |
-| `tauri-native-api-integration.md`    | `tauri-native-api-integration`       | Tauri native APIs                        |
-| `mobile-first-design-rules.md`       | `mobile-first-design-rules`          | Mobile-first design patterns             |
+| Rule Name                         | Skill                          | Purpose                                  |
+| --------------------------------- | ------------------------------ | ---------------------------------------- |
+| `ios-expert.md`                   | `ios-expert`                   | SwiftUI, UIKit, Apple frameworks         |
+| `android-expert.md`               | `android-expert`               | Jetpack Compose, Kotlin, Material Design |
+| `expo-framework-rule.md`          | `expo-framework-rule`          | Expo framework patterns                  |
+| `tauri-native-api-integration.md` | `tauri-native-api-integration` | Tauri native APIs                        |
+| `mobile-first-design-rules.md`    | `mobile-first-design-rules`    | Mobile-first design patterns             |
 
 ---
 
@@ -307,15 +307,15 @@ Mobile development rules.
 
 Design and planning rules.
 
-| Rule Name                                   | Skill                                   | Purpose                                  |
-| ------------------------------------------- | --------------------------------------- | ---------------------------------------- |
-| `plan-generator.md`                         | `plan-generator`                        | Implementation plans with dependencies   |
-| `complexity-assessment.md`                  | `complexity-assessment`                 | AI-based task complexity classification  |
-| `prd-generator.md`                          | `prd-generator`                         | Hypothesis-driven PRDs                   |
-| `spec-gathering.md`                         | `spec-gathering`                        | Requirements gathering workflow          |
-| `spec-init.md`                              | `spec-init`                             | Unified spec creation process            |
-| `interactive-requirements-gathering.md`     | `interactive-requirements-gathering`    | A/B/C/D/E questionnaire framework        |
-| `planning-with-files.md`                    | `planning-with-files`                   | Manus-style file-based planning          |
+| Rule Name                               | Skill                                | Purpose                                 |
+| --------------------------------------- | ------------------------------------ | --------------------------------------- |
+| `plan-generator.md`                     | `plan-generator`                     | Implementation plans with dependencies  |
+| `complexity-assessment.md`              | `complexity-assessment`              | AI-based task complexity classification |
+| `prd-generator.md`                      | `prd-generator`                      | Hypothesis-driven PRDs                  |
+| `spec-gathering.md`                     | `spec-gathering`                     | Requirements gathering workflow         |
+| `spec-init.md`                          | `spec-init`                          | Unified spec creation process           |
+| `interactive-requirements-gathering.md` | `interactive-requirements-gathering` | A/B/C/D/E questionnaire framework       |
+| `planning-with-files.md`                | `planning-with-files`                | Manus-style file-based planning         |
 
 ---
 
@@ -323,15 +323,15 @@ Design and planning rules.
 
 Framework artifact creators.
 
-| Rule Name                    | Skill                        | Purpose                                  |
-| ---------------------------- | ---------------------------- | ---------------------------------------- |
-| `skill-creator.md`           | `skill-creator`              | Create and validate skills               |
-| `agent-creator.md`           | `agent-creator`              | Create specialized AI agents             |
-| `hook-creator.md`            | `hook-creator`               | Create framework hooks                   |
-| `workflow-creator.md`        | `workflow-creator`           | Create orchestration workflows           |
-| `schema-creator.md`          | `schema-creator`             | Create JSON Schema validators            |
-| `template-creator.md`        | `template-creator`           | Create templates                         |
-| `artifact-integrator.md`     | `artifact-integrator`        | Deep integration analysis                |
+| Rule Name                | Skill                 | Purpose                        |
+| ------------------------ | --------------------- | ------------------------------ |
+| `skill-creator.md`       | `skill-creator`       | Create and validate skills     |
+| `agent-creator.md`       | `agent-creator`       | Create specialized AI agents   |
+| `hook-creator.md`        | `hook-creator`        | Create framework hooks         |
+| `workflow-creator.md`    | `workflow-creator`    | Create orchestration workflows |
+| `schema-creator.md`      | `schema-creator`      | Create JSON Schema validators  |
+| `template-creator.md`    | `template-creator`    | Create templates               |
+| `artifact-integrator.md` | `artifact-integrator` | Deep integration analysis      |
 
 ---
 
@@ -339,11 +339,11 @@ Framework artifact creators.
 
 Data processing and database rules.
 
-| Rule Name                    | Skill                        | Purpose                                  |
-| ---------------------------- | ---------------------------- | ---------------------------------------- |
-| `database-expert.md`         | `database-expert`            | Prisma, Supabase, SQL/NoSQL patterns     |
-| `data-expert.md`             | `data-expert`                | Data parsing, transformation, validation |
-| `text-to-sql.md`             | `text-to-sql`                | Natural language to SQL conversion       |
+| Rule Name            | Skill             | Purpose                                  |
+| -------------------- | ----------------- | ---------------------------------------- |
+| `database-expert.md` | `database-expert` | Prisma, Supabase, SQL/NoSQL patterns     |
+| `data-expert.md`     | `data-expert`     | Data parsing, transformation, validation |
+| `text-to-sql.md`     | `text-to-sql`     | Natural language to SQL conversion       |
 
 ---
 
@@ -351,11 +351,11 @@ Data processing and database rules.
 
 Context and memory management rules.
 
-| Rule Name                            | Skill                                | Purpose                                  |
-| ------------------------------------ | ------------------------------------ | ---------------------------------------- |
-| `context-driven-development.md`      | `context-driven-development`         | Context as managed artifacts             |
-| `session-handoff.md`                 | `session-handoff`                    | Handoff document creation                |
-| `insight-extraction.md`              | `insight-extraction`                 | Extract session learnings                |
+| Rule Name                       | Skill                        | Purpose                      |
+| ------------------------------- | ---------------------------- | ---------------------------- |
+| `context-driven-development.md` | `context-driven-development` | Context as managed artifacts |
+| `session-handoff.md`            | `session-handoff`            | Handoff document creation    |
+| `insight-extraction.md`         | `insight-extraction`         | Extract session learnings    |
 
 ---
 
@@ -363,11 +363,11 @@ Context and memory management rules.
 
 Quality validation rules.
 
-| Rule Name                    | Skill                        | Purpose                                  |
-| ---------------------------- | ---------------------------- | ---------------------------------------- |
-| `checklist-generator.md`     | `checklist-generator`        | IEEE 1028 + contextual checklists        |
-| `response-rater.md`          | `response-rater`             | Plan and response quality audits         |
-| `thinking-tools.md`          | `thinking-tools`             | Self-reflection patterns                 |
+| Rule Name                | Skill                 | Purpose                           |
+| ------------------------ | --------------------- | --------------------------------- |
+| `checklist-generator.md` | `checklist-generator` | IEEE 1028 + contextual checklists |
+| `response-rater.md`      | `response-rater`      | Plan and response quality audits  |
+| `thinking-tools.md`      | `thinking-tools`      | Self-reflection patterns          |
 
 ---
 
@@ -375,13 +375,13 @@ Quality validation rules.
 
 Miscellaneous specialized rules.
 
-| Rule Name                    | Skill                        | Purpose                                  |
-| ---------------------------- | ---------------------------- | ---------------------------------------- |
-| `frontend-expert.md`         | `frontend-expert`            | UI/UX patterns, responsive design        |
-| `graphql-expert.md`          | `graphql-expert`             | GraphQL schema, Apollo Client/Server     |
-| `api-development-expert.md`  | `api-development-expert`     | API design patterns                      |
-| `artifact-integrator.md`     | `artifact-integrator`        | Artifact integration analysis            |
-| `project-onboarding.md`      | `project-onboarding`         | New codebase onboarding                  |
+| Rule Name                   | Skill                    | Purpose                              |
+| --------------------------- | ------------------------ | ------------------------------------ |
+| `frontend-expert.md`        | `frontend-expert`        | UI/UX patterns, responsive design    |
+| `graphql-expert.md`         | `graphql-expert`         | GraphQL schema, Apollo Client/Server |
+| `api-development-expert.md` | `api-development-expert` | API design patterns                  |
+| `artifact-integrator.md`    | `artifact-integrator`    | Artifact integration analysis        |
+| `project-onboarding.md`     | `project-onboarding`     | New codebase onboarding              |
 
 ---
 

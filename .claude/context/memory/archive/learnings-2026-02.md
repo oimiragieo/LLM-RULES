@@ -13288,6 +13288,7 @@ Catalog updates are CRITICAL after batch artifact creation. Without catalog entr
 **Architecture Score**: C+ | **Security Score**: B | **Overall Score**: 0.72/1.0 (barely passes 0.7 threshold)
 
 **Trade-off Analysis**:
+
 - **Coverage**: ✅ Complete (every skill has SKILL.md + rule + schema + command)
 - **Consistency**: ✅ Excellent (uniform structure, predictable locations)
 - **Validation**: ❌ Weak (61% schemas don't validate structure)
@@ -13334,6 +13335,7 @@ Catalog updates are CRITICAL after batch artifact creation. Without catalog entr
    - Fail: Command is generic template (consider deletion)
 
 **Remediation Priorities**:
+
 - **P0 (Security)**: Add `additionalProperties:false` to 70 schemas (2-3 hours)
 - **P1 (Quality)**: Delete/mark 55 hollow stubs (4-5 hours)
 - **P2 (Maintenance)**: Prune commands for non-user-facing skills (2 hours)
@@ -13341,17 +13343,20 @@ Catalog updates are CRITICAL after batch artifact creation. Without catalog entr
 **Pattern Recognition**:
 
 **Anti-Pattern**: "Batch Creation Without Quality Gates"
+
 - Symptom: All artifacts created, catalogs updated, but most don't work
 - Detection: High file count, low validation rate
 - Fix: Add quality checkpoints every 10 artifacts during creation
 
 **Anti-Pattern**: "Hollow Stubs" (Invisible Maintenance Burden)
+
 - Symptom: File exists in catalog but provides no functionality
 - Detection: Schema only has `{type:object}`, command is generic template
 - Impact: False confidence (agents think validation exists when it doesn't)
 - Fix: Delete stubs OR mark as templates/placeholders explicitly
 
 **Best Practice**: "Tiered Artifact Creation"
+
 - Principle: Match artifact depth to skill complexity and usage
 - Implementation: Define tiers before batch creation starts
 - Quality gate: Validate every 10th artifact, adjust tier assignment if needed
@@ -13469,6 +13474,7 @@ Catalog updates are CRITICAL after batch artifact creation. Without catalog entr
 **Weakest Dimension**: Schema quality - 63% hollow stubs
 
 **Recommendations** (prioritized):
+
 1. Create single `skill-default-output.schema.json` to replace 55 identical stubs (LOW effort, HIGH impact)
 2. Update catalogs with 22 orphaned entries (LOW effort, MEDIUM impact)
 3. Address context overload via selective rules loading (MEDIUM effort, HIGH impact)
@@ -13499,6 +13505,7 @@ Catalog updates are CRITICAL after batch artifact creation. Without catalog entr
 **Cross-Review Agreement Pattern**: When 3+ independent reviews flag the same finding, confidence is very high. Infrastructure (DevOps) found zero critical issues -- quality problems are structural/design debt, not operational risk.
 
 **Prioritized Fix Plan**: `.claude/context/plans/skill-expansion-fix-priorities-2026-02-09.md`
+
 - Tier 1 (Immediate, ~4h): Consolidate stubs, add additionalProperties:false, fix orphans
 - Tier 2 (Sprint, ~6h): ADR, delete stub rules, standardize $id domain
 - Tier 3 (2 sprints, ~8h): Enhance security schemas, complete companions
@@ -13571,6 +13578,7 @@ Catalog updates are CRITICAL after batch artifact creation. Without catalog entr
 **Methodology Validation**:
 
 Test triage as a learning tool:
+
 - ✅ Root causes identified for 100% of failures (quantifiable)
 - ✅ Effort estimates provided (sprint planning enabled)
 - ✅ Prioritization clear (P0 infrastructure, P1 schema, P2 features)
@@ -13598,6 +13606,7 @@ Test triage as a learning tool:
 **Critical Discovery**: The planning documents describe only 2 envelope structures, but actual examination of schemas reveals 4 variants. The Trail of Bits security schemas use a flat structure (Structure C) not captured in any planning document. Migration must account for all 4 variants.
 
 **Conditions for Full Approval**:
+
 1. Implement additionalProperties:false BEFORE any other schema changes
 2. Preserve security-adjacent rules (enhance, do not delete)
 3. Document all 4 envelope variants in ADR
@@ -13633,6 +13642,7 @@ Test triage as a learning tool:
 The expansion created 299 artifacts (90 schemas, 86 rules, 92 commands) with 100% coverage (every skill has all artifact types) but 61% schema quality failure rate:
 
 **Quality Metrics**:
+
 - **Rules files**: ✅ Excellent (86/86 present, consistent structure, actionable content)
 - **Command files**: ✅ Excellent (92/92 present, thin-delegation pattern enforced)
 - **Schema files**: ❌ Weak (55/87 are hollow stubs validating nothing, only `{status, output}`)
@@ -13653,4 +13663,3 @@ The expansion created 299 artifacts (90 schemas, 86 rules, 92 commands) with 100
 
 3. **Throughput Optimized, Quality Sacrificed**:
    - Goal: "Every skill has SKILL.md + rule + schema + command"
-

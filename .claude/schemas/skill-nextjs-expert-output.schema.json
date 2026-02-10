@@ -2,18 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Next.js Expert Output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "output": {
       "type": "object",
-      "required": [
-        "language",
-        "framework",
-        "codeGenerated"
-      ],
+      "required": ["language", "framework", "codeGenerated"],
       "properties": {
         "language": {
           "const": "TypeScript"
@@ -29,11 +22,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "file",
-              "content",
-              "componentType"
-            ],
+            "required": ["file", "content", "componentType"],
             "properties": {
               "file": {
                 "type": "string"
@@ -43,22 +32,11 @@
               },
               "componentType": {
                 "type": "string",
-                "enum": [
-                  "page",
-                  "layout",
-                  "server-component",
-                  "client-component",
-                  "api-route"
-                ]
+                "enum": ["page", "layout", "server-component", "client-component", "api-route"]
               },
               "rendering": {
                 "type": "string",
-                "enum": [
-                  "SSR",
-                  "SSG",
-                  "ISR",
-                  "CSR"
-                ]
+                "enum": ["SSR", "SSG", "ISR", "CSR"]
               }
             }
           }
@@ -88,11 +66,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

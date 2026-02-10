@@ -4,27 +4,17 @@
   "title": "Summarize Changes Output",
   "description": "Validation schema for summarize-changes skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
       "description": "Skill-specific output data",
-      "required": [
-        "overview",
-        "changesMade"
-      ],
+      "required": ["overview", "changesMade"],
       "properties": {
         "overview": {
           "type": "string",
@@ -39,10 +29,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "path",
-                  "purpose"
-                ],
+                "required": ["path", "purpose"],
                 "properties": {
                   "path": {
                     "type": "string"
@@ -58,10 +45,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "path",
-                  "changes"
-                ],
+                "required": ["path", "changes"],
                 "properties": {
                   "path": {
                     "type": "string"
@@ -77,10 +61,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "path",
-                  "reason"
-                ],
+                "required": ["path", "reason"],
                 "properties": {
                   "path": {
                     "type": "string"
@@ -102,10 +83,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "decision",
-                  "rationale"
-                ],
+                "required": ["decision", "rationale"],
                 "properties": {
                   "decision": {
                     "type": "string"
@@ -121,11 +99,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "package",
-                  "version",
-                  "reason"
-                ],
+                "required": ["package", "version", "reason"],
                 "properties": {
                   "package": {
                     "type": "string"
@@ -144,10 +118,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "package",
-                  "reason"
-                ],
+                "required": ["package", "reason"],
                 "properties": {
                   "package": {
                     "type": "string"
@@ -178,10 +149,7 @@
         },
         "verificationChecklist": {
           "type": "object",
-          "required": [
-            "unitTestsPass",
-            "integrationTestsPass"
-          ],
+          "required": ["unitTestsPass", "integrationTestsPass"],
           "properties": {
             "unitTestsPass": {
               "type": "boolean"
@@ -213,23 +181,11 @@
         },
         "commitMessage": {
           "type": "object",
-          "required": [
-            "type",
-            "scope",
-            "description"
-          ],
+          "required": ["type", "scope", "description"],
           "properties": {
             "type": {
               "type": "string",
-              "enum": [
-                "feat",
-                "fix",
-                "refactor",
-                "docs",
-                "test",
-                "chore",
-                "perf"
-              ]
+              "enum": ["feat", "fix", "refactor", "docs", "test", "chore", "perf"]
             },
             "scope": {
               "type": "string"

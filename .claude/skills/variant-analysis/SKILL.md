@@ -77,12 +77,12 @@ Transform the seed into a query pattern:
 
 ### Abstraction Levels
 
-| Level | Description | Example |
-|-------|-------------|---------|
-| **Exact** | Same function, same file | `searchUsers(req.query.q)` |
-| **Local** | Same pattern, different function | Any `db.query("..."+userInput)` |
-| **Structural** | Same dataflow shape | Any source-to-sink without sanitization |
-| **Semantic** | Same bug class, any syntax | Any SQL injection variant |
+| Level          | Description                      | Example                                 |
+| -------------- | -------------------------------- | --------------------------------------- |
+| **Exact**      | Same function, same file         | `searchUsers(req.query.q)`              |
+| **Local**      | Same pattern, different function | Any `db.query("..."+userInput)`         |
+| **Structural** | Same dataflow shape              | Any source-to-sink without sanitization |
+| **Semantic**   | Same bug class, any syntax       | Any SQL injection variant               |
 
 ### CodeQL Pattern Template
 
@@ -226,13 +226,13 @@ sg -p 'db.query("..." + $X)' --lang js
 
 For each discovered instance, classify:
 
-| Factor | Question | Impact on Priority |
-|--------|----------|-------------------|
-| **Reachability** | Can an attacker reach this code path? | Critical if reachable |
-| **Exploitability** | Can the vulnerability be exploited? | Critical if exploitable |
-| **Impact** | What damage can exploitation cause? | Based on CIA triad |
-| **Confidence** | How certain is this a true positive? | HIGH/MEDIUM/LOW |
-| **Similarity** | How structurally close to seed? | Higher = higher confidence |
+| Factor             | Question                              | Impact on Priority         |
+| ------------------ | ------------------------------------- | -------------------------- |
+| **Reachability**   | Can an attacker reach this code path? | Critical if reachable      |
+| **Exploitability** | Can the vulnerability be exploited?   | Critical if exploitable    |
+| **Impact**         | What damage can exploitation cause?   | Based on CIA triad         |
+| **Confidence**     | How certain is this a true positive?  | HIGH/MEDIUM/LOW            |
+| **Similarity**     | How structurally close to seed?       | Higher = higher confidence |
 
 ### Variant Family Tracking
 
@@ -240,9 +240,11 @@ For each discovered instance, classify:
 ## Variant Family: CWE-089 SQL Injection
 
 ### Seed: CVE-XXXX (src/api/users.js:42)
+
 - Pattern: request.param -> string concat -> db.query()
 
 ### Variants Found:
+
 1. **V-001** src/api/products.js:78 (HIGH confidence)
    - Same pattern, different endpoint
    - Exploitable: YES
@@ -272,18 +274,22 @@ For each discovered instance, classify:
 **Tools**: CodeQL, Semgrep, manual review
 
 ### Executive Summary
+
 - Variants found: X
 - Critical: X | High: X | Medium: X | Low: X
 - False positives: X
 - Estimated remediation effort: X hours
 
 ### Variant Details
+
 [For each variant: location, classification, remediation]
 
 ### Pattern Evolution
+
 [How the pattern varies across the codebase]
 
 ### Recommendations
+
 1. Fix all CRITICAL/HIGH variants immediately
 2. Add regression tests for each variant
 3. Add CI/CD checks to prevent pattern recurrence
@@ -296,20 +302,20 @@ For each discovered instance, classify:
 
 ### Injection Variants
 
-| Seed Pattern | Variant Discovery Query |
-|-------------|------------------------|
-| SQL injection via concatenation | `source -> string.concat -> db.query` |
-| Command injection via interpolation | `source -> template.literal -> exec` |
-| XSS via innerHTML | `source -> assignment -> innerHTML` |
-| Path traversal via user path | `source -> path.join -> fs.read` |
+| Seed Pattern                        | Variant Discovery Query               |
+| ----------------------------------- | ------------------------------------- |
+| SQL injection via concatenation     | `source -> string.concat -> db.query` |
+| Command injection via interpolation | `source -> template.literal -> exec`  |
+| XSS via innerHTML                   | `source -> assignment -> innerHTML`   |
+| Path traversal via user path        | `source -> path.join -> fs.read`      |
 
 ### Authentication Variants
 
-| Seed Pattern | Variant Discovery Query |
-|-------------|------------------------|
+| Seed Pattern       | Variant Discovery Query                 |
+| ------------------ | --------------------------------------- |
 | Missing auth check | `route.handler without auth.middleware` |
-| Weak comparison | `password == input (not timing-safe)` |
-| Token reuse | `token.generate without uniqueness` |
+| Weak comparison    | `password == input (not timing-safe)`   |
+| Token reuse        | `token.generate without uniqueness`     |
 
 ## Related Skills
 

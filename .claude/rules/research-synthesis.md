@@ -22,17 +22,21 @@
 # {Topic} Research Report
 
 ## Sources
+
 - [Source 1 with URL]
 - [Source 2 with URL]
 - [Source 3 with URL]
 
 ## Findings
+
 Key patterns discovered
 
 ## Design Decisions
+
 How findings influence creation
 
 ## Recommendations
+
 What to implement
 ```
 

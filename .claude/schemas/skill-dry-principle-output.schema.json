@@ -4,38 +4,22 @@
   "title": "DRY Principle Skill Output",
   "description": "Validates output from dry-principle skill - Don't Repeat Yourself analysis",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "DRY analysis results",
-      "required": [
-        "duplicates",
-        "refactoringSuggestions"
-      ],
+      "required": ["duplicates", "refactoringSuggestions"],
       "properties": {
         "duplicates": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "type",
-              "occurrences",
-              "locations"
-            ],
+            "required": ["type", "occurrences", "locations"],
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "code_block",
-                  "function",
-                  "logic",
-                  "constants",
-                  "configuration"
-                ]
+                "enum": ["code_block", "function", "logic", "constants", "configuration"]
               },
               "occurrences": {
                 "type": "number",
@@ -47,10 +31,7 @@
                 "minItems": 2,
                 "items": {
                   "type": "object",
-                  "required": [
-                    "file",
-                    "lineStart"
-                  ],
+                  "required": ["file", "lineStart"],
                   "properties": {
                     "file": {
                       "type": "string"
@@ -85,19 +66,11 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "priority",
-              "strategy",
-              "description"
-            ],
+            "required": ["priority", "strategy", "description"],
             "properties": {
               "priority": {
                 "type": "string",
-                "enum": [
-                  "high",
-                  "medium",
-                  "low"
-                ]
+                "enum": ["high", "medium", "low"]
               },
               "strategy": {
                 "type": "string",
@@ -129,11 +102,7 @@
               },
               "effort": {
                 "type": "string",
-                "enum": [
-                  "low",
-                  "medium",
-                  "high"
-                ]
+                "enum": ["low", "medium", "high"]
               }
             }
           },
@@ -172,11 +141,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

@@ -3,18 +3,11 @@
   "title": "interactive-requirements-gathering Output Schema",
   "description": "Output structure for interactive requirements gathering",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -25,21 +18,14 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "question",
-              "type",
-              "response"
-            ],
+            "required": ["question", "type", "response"],
             "properties": {
               "question": {
                 "type": "string"
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "additive",
-                  "exclusive"
-                ]
+                "enum": ["additive", "exclusive"]
               },
               "options": {
                 "type": "array",
@@ -88,11 +74,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "questionsAsked",
-        "answers",
-        "generatedContent"
-      ]
+      "required": ["questionsAsked", "answers", "generatedContent"]
     }
   },
   "additionalProperties": false,

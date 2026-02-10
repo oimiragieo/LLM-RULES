@@ -118,18 +118,19 @@ If you haven't completed Phase 1, you cannot propose fixes.
 ## Supporting Techniques
 
 Available in `.claude/skills/debugging/`:
+
 - **root-cause-tracing.md** - Trace bugs backward through call stack
 - **defense-in-depth.md** - Add validation at multiple layers
 - **condition-based-waiting.md** - Replace arbitrary timeouts with condition polling
 
 ## When Stuck
 
-| Problem              | Solution                            |
-|----------------------|-------------------------------------|
-| Don't know how to test | Write wished-for API first       |
-| Test too complicated | Design too complicated. Simplify. |
-| Must mock everything | Code too coupled. Dependency injection. |
-| Test setup huge      | Extract helpers. Still complex? Simplify design. |
+| Problem                | Solution                                         |
+| ---------------------- | ------------------------------------------------ |
+| Don't know how to test | Write wished-for API first                       |
+| Test too complicated   | Design too complicated. Simplify.                |
+| Must mock everything   | Code too coupled. Dependency injection.          |
+| Test setup huge        | Extract helpers. Still complex? Simplify design. |
 
 ## Related Skills
 

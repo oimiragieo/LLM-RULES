@@ -11,6 +11,7 @@
 ## Queen/Worker Topology
 
 **Queen (Orchestrator)**:
+
 - Spawns worker agents
 - Distributes tasks
 - Aggregates results
@@ -18,6 +19,7 @@
 - Reports to user
 
 **Workers (Specialists)**:
+
 - Execute assigned tasks
 - Use structured handoff format
 - Report results to Queen
@@ -55,24 +57,29 @@ Queen waits for all workers to complete, then aggregates:
 ## Swarm Results: Code Review
 
 ### Worker 1 (auth.ts)
+
 - Issues: 3 (2 HIGH, 1 MEDIUM)
 - Summary: Missing input validation
 
 ### Worker 2 (user.ts)
+
 - Issues: 1 (LOW)
 - Summary: Minor naming inconsistency
 
 ### Worker 3 (api.ts)
+
 - Issues: 5 (1 CRITICAL, 4 HIGH)
 - Summary: SQL injection vulnerability
 
 ### Aggregated Findings
+
 - **CRITICAL**: 1 (SQL injection in api.ts)
 - **HIGH**: 6 (2 in auth.ts, 4 in api.ts)
 - **MEDIUM**: 1 (auth.ts)
 - **LOW**: 1 (user.ts)
 
 ### Recommendations
+
 1. Fix CRITICAL SQL injection immediately (api.ts)
 2. Address HIGH priority issues before merge
 3. MEDIUM/LOW can be follow-up tasks
@@ -91,23 +98,28 @@ All workers use this format for reporting results:
 **Duration**: [Xm Ys]
 
 ### Context
+
 - **Task**: [What was done]
 - **Files**: [List of files touched]
 - **Scope**: [What was included/excluded]
 
 ### Findings
+
 - [Key finding 1 with severity]
 - [Key finding 2 with severity]
 
 ### Recommendations
+
 - [Action item 1 with priority]
 - [Action item 2 with priority]
 
 ### Artifacts
+
 - [Path to output file 1]
 - [Path to output file 2]
 
 ### Blockers (if any)
+
 - [Blocker description and what's needed]
 ```
 
@@ -117,13 +129,13 @@ All workers use this format for reporting results:
 
 ### Failure Types
 
-| Failure Type      | Detection                  | Recovery                         |
-| ----------------- | -------------------------- | -------------------------------- |
-| Worker crash      | No TaskUpdate(completed)   | Re-spawn worker for that task    |
-| Worker timeout    | Exceeds expected duration  | Kill and re-spawn                |
-| Partial failure   | Worker reports PARTIAL     | Aggregate what succeeded         |
-| Invalid output    | Schema validation fails    | Request clarification or re-work |
-| Queen crash       | (No recovery, requires restart) | Prevent with robust error handling |
+| Failure Type    | Detection                       | Recovery                           |
+| --------------- | ------------------------------- | ---------------------------------- |
+| Worker crash    | No TaskUpdate(completed)        | Re-spawn worker for that task      |
+| Worker timeout  | Exceeds expected duration       | Kill and re-spawn                  |
+| Partial failure | Worker reports PARTIAL          | Aggregate what succeeded           |
+| Invalid output  | Schema validation fails         | Request clarification or re-work   |
+| Queen crash     | (No recovery, requires restart) | Prevent with robust error handling |
 
 ### Graceful Degradation
 
@@ -142,27 +154,27 @@ ELSE
 
 ## Anti-Patterns
 
-| Anti-Pattern                    | Problem                           | Fix                                        |
-| ------------------------------- | --------------------------------- | ------------------------------------------ |
-| Sequential spawning             | No parallelism, slow execution    | Spawn all workers in single message        |
-| Cross-worker communication      | Coordination chaos (O(N²))        | All communication through Queen            |
-| No failure handling             | One crash kills entire swarm      | Implement failure detection and recovery   |
-| Unbounded parallelism           | >10 workers causes coordination overhead | Limit to 5-7 workers per fan-out      |
-| Free-form reporting             | Hard to aggregate                 | Use structured handoff template            |
-| No timeout limits               | Hung worker blocks forever        | Set timeouts, kill and re-spawn            |
-| Equal priority for all tasks    | Critical work delayed             | Prioritize workers for critical tasks      |
+| Anti-Pattern                 | Problem                                  | Fix                                      |
+| ---------------------------- | ---------------------------------------- | ---------------------------------------- |
+| Sequential spawning          | No parallelism, slow execution           | Spawn all workers in single message      |
+| Cross-worker communication   | Coordination chaos (O(N²))               | All communication through Queen          |
+| No failure handling          | One crash kills entire swarm             | Implement failure detection and recovery |
+| Unbounded parallelism        | >10 workers causes coordination overhead | Limit to 5-7 workers per fan-out         |
+| Free-form reporting          | Hard to aggregate                        | Use structured handoff template          |
+| No timeout limits            | Hung worker blocks forever               | Set timeouts, kill and re-spawn          |
+| Equal priority for all tasks | Critical work delayed                    | Prioritize workers for critical tasks    |
 
 ## Performance Characteristics
 
 **Speedup from parallelism**:
 
-| Workers | Ideal Speedup | Actual Speedup | Reason for Gap          |
-| ------- | ------------- | -------------- | ----------------------- |
-| 2       | 2.0x          | 1.8x           | Spawn overhead          |
-| 3       | 3.0x          | 2.6x           | Coordination overhead   |
-| 5       | 5.0x          | 3.8x           | Aggregation complexity  |
-| 7       | 7.0x          | 4.5x           | Diminishing returns     |
-| 10      | 10.0x         | 4.2x           | Overhead dominates      |
+| Workers | Ideal Speedup | Actual Speedup | Reason for Gap         |
+| ------- | ------------- | -------------- | ---------------------- |
+| 2       | 2.0x          | 1.8x           | Spawn overhead         |
+| 3       | 3.0x          | 2.6x           | Coordination overhead  |
+| 5       | 5.0x          | 3.8x           | Aggregation complexity |
+| 7       | 7.0x          | 4.5x           | Diminishing returns    |
+| 10      | 10.0x         | 4.2x           | Overhead dominates     |
 
 **Sweet spot**: 3-5 workers for most swarm tasks.
 

@@ -14,13 +14,7 @@
     "output": {
       "type": "object",
       "description": "Voting results and consensus data",
-      "required": [
-        "topic",
-        "votingSession",
-        "votes",
-        "results",
-        "consensusReached"
-      ],
+      "required": ["topic", "votingSession", "votes", "results", "consensusReached"],
       "properties": {
         "topic": {
           "type": "string",
@@ -44,7 +38,13 @@
             },
             "protocol": {
               "type": "string",
-              "enum": ["simple-majority", "supermajority", "unanimous", "weighted", "ranked-choice"],
+              "enum": [
+                "simple-majority",
+                "supermajority",
+                "unanimous",
+                "weighted",
+                "ranked-choice"
+              ],
               "description": "Voting protocol used"
             },
             "weights": {

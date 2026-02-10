@@ -4,27 +4,17 @@
   "title": "README Generator Output",
   "description": "Validation schema for readme skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
       "description": "Skill-specific output data",
-      "required": [
-        "readmeFile",
-        "sectionsIncluded"
-      ],
+      "required": ["readmeFile", "sectionsIncluded"],
       "properties": {
         "readmeFile": {
           "type": "string",
@@ -61,21 +51,11 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "type",
-              "url"
-            ],
+            "required": ["type", "url"],
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "build",
-                  "coverage",
-                  "version",
-                  "license",
-                  "downloads",
-                  "dependencies"
-                ]
+                "enum": ["build", "coverage", "version", "license", "downloads", "dependencies"]
               },
               "url": {
                 "type": "string",

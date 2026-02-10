@@ -4,35 +4,20 @@
   "title": "Code Analyzer Skill Output",
   "description": "Validates output from code-analyzer skill - Static analysis and metrics",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Code analysis results",
-      "required": [
-        "metrics",
-        "complexity",
-        "issues",
-        "recommendations"
-      ],
+      "required": ["metrics", "complexity", "issues", "recommendations"],
       "properties": {
         "metrics": {
           "type": "object",
-          "required": [
-            "loc",
-            "filesAnalyzed"
-          ],
+          "required": ["loc", "filesAnalyzed"],
           "properties": {
             "loc": {
               "type": "object",
-              "required": [
-                "total",
-                "source",
-                "comments"
-              ],
+              "required": ["total", "source", "comments"],
               "properties": {
                 "total": {
                   "type": "number",
@@ -66,10 +51,7 @@
         },
         "complexity": {
           "type": "object",
-          "required": [
-            "average",
-            "hotspots"
-          ],
+          "required": ["average", "hotspots"],
           "properties": {
             "average": {
               "type": "number",
@@ -85,11 +67,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "file",
-                  "function",
-                  "complexity"
-                ],
+                "required": ["file", "function", "complexity"],
                 "properties": {
                   "file": {
                     "type": "string"
@@ -115,32 +93,15 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "type",
-              "severity",
-              "file",
-              "description"
-            ],
+            "required": ["type", "severity", "file", "description"],
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "complexity",
-                  "duplication",
-                  "smell",
-                  "antipattern",
-                  "vulnerability"
-                ]
+                "enum": ["complexity", "duplication", "smell", "antipattern", "vulnerability"]
               },
               "severity": {
                 "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low",
-                  "info"
-                ]
+                "enum": ["critical", "high", "medium", "low", "info"]
               },
               "file": {
                 "type": "string"
@@ -163,18 +124,11 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "priority",
-              "action"
-            ],
+            "required": ["priority", "action"],
             "properties": {
               "priority": {
                 "type": "string",
-                "enum": [
-                  "high",
-                  "medium",
-                  "low"
-                ]
+                "enum": ["high", "medium", "low"]
               },
               "action": {
                 "type": "string"
@@ -211,11 +165,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

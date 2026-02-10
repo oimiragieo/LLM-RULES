@@ -4,28 +4,17 @@
   "title": "Writing Skills Output",
   "description": "Validation schema for writing-skills skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
       "description": "Skill-specific output data",
-      "required": [
-        "skillFile",
-        "tddCycle",
-        "frontmatterValid"
-      ],
+      "required": ["skillFile", "tddCycle", "frontmatterValid"],
       "properties": {
         "skillFile": {
           "type": "string",
@@ -33,11 +22,7 @@
         },
         "tddCycle": {
           "type": "object",
-          "required": [
-            "redPhaseCompleted",
-            "greenPhaseCompleted",
-            "refactorPhaseCompleted"
-          ],
+          "required": ["redPhaseCompleted", "greenPhaseCompleted", "refactorPhaseCompleted"],
           "properties": {
             "redPhaseCompleted": {
               "type": "boolean",
@@ -72,10 +57,7 @@
         },
         "frontmatter": {
           "type": "object",
-          "required": [
-            "name",
-            "description"
-          ],
+          "required": ["name", "description"],
           "properties": {
             "name": {
               "type": "string",

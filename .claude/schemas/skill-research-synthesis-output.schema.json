@@ -14,13 +14,7 @@
     "output": {
       "type": "object",
       "description": "Research findings and synthesis",
-      "required": [
-        "researchTopic",
-        "queries",
-        "sources",
-        "synthesis",
-        "designDecisions"
-      ],
+      "required": ["researchTopic", "queries", "sources", "synthesis", "designDecisions"],
       "properties": {
         "researchTopic": {
           "type": "string",
@@ -28,7 +22,16 @@
         },
         "artifactType": {
           "type": "string",
-          "enum": ["agent", "skill", "workflow", "hook", "schema", "template", "feature", "architecture"],
+          "enum": [
+            "agent",
+            "skill",
+            "workflow",
+            "hook",
+            "schema",
+            "template",
+            "feature",
+            "architecture"
+          ],
           "description": "Type of artifact this research supports"
         },
         "queries": {
@@ -81,7 +84,15 @@
               },
               "type": {
                 "type": "string",
-                "enum": ["documentation", "article", "github", "stackoverflow", "academic", "blog", "code-example"],
+                "enum": [
+                  "documentation",
+                  "article",
+                  "github",
+                  "stackoverflow",
+                  "academic",
+                  "blog",
+                  "code-example"
+                ],
                 "description": "Source type"
               },
               "relevance": {

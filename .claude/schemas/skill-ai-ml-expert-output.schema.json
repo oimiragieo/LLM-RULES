@@ -4,18 +4,11 @@
   "title": "AI/ML Expert Output",
   "description": "Validation schema for ai-ml-expert skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -53,21 +46,11 @@
           "minItems": 0,
           "items": {
             "type": "object",
-            "required": [
-              "severity",
-              "category",
-              "description"
-            ],
+            "required": ["severity", "category", "description"],
             "properties": {
               "severity": {
                 "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low",
-                  "info"
-                ],
+                "enum": ["critical", "high", "medium", "low", "info"],
                 "description": "Finding severity"
               },
               "category": {
@@ -104,19 +87,11 @@
           "description": "Actionable recommendations with priorities",
           "items": {
             "type": "object",
-            "required": [
-              "priority",
-              "title",
-              "description"
-            ],
+            "required": ["priority", "title", "description"],
             "properties": {
               "priority": {
                 "type": "string",
-                "enum": [
-                  "high",
-                  "medium",
-                  "low"
-                ],
+                "enum": ["high", "medium", "low"],
                 "description": "Recommendation priority"
               },
               "title": {
@@ -165,11 +140,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "analysis_type",
-        "domain",
-        "findings"
-      ]
+      "required": ["analysis_type", "domain", "findings"]
     }
   },
   "additionalProperties": false

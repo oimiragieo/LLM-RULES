@@ -176,6 +176,18 @@ const ROUTING_TABLE = {
   context: 'context-compressor',
   summarize: 'context-compressor',
   token: 'context-compressor',
+  // PM (Product Manager)
+  prd: 'pm',
+  backlog: 'pm',
+  userstory: 'pm',
+  sprint: 'pm',
+  roadmap: 'pm',
+  prioritization: 'pm',
+  product: 'pm',
+  // Reflection Agent
+  reflection: 'reflection-agent',
+  retrospective: 'reflection-agent',
+  insight: 'reflection-agent',
   // Context-Driven
   conductor: 'conductor-validator',
   cdd: 'conductor-validator',
@@ -292,6 +304,7 @@ const ROUTING_PATTERNS = {
     { pattern: /\b(incident|outage|emergency|production\s+down)\b/i, priority: 10 },
   ],
   'code-reviewer': [{ pattern: /^(review|pr\s+review|code\s+review)\b/i, priority: 10 }],
+  pm: [{ pattern: /^(prd|product\s*req|user\s*stor|backlog|sprint|prioriti)/i, priority: 3 }],
 };
 
 const INTENT_KEYWORDS = {

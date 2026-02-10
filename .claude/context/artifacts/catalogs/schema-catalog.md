@@ -9,6 +9,7 @@
 This catalog documents all active JSON schemas in the agent-studio framework with their wiring status, consumers, and validation categories.
 
 **Phase 2 Standardization Complete (2026-02-09):**
+
 - All 103 schemas use JSON Schema Draft-07 (`$schema: http://json-schema.org/draft-07/schema#`)
 - All 78 skill schemas use canonical `$id: https://agent-studio.dev/schemas/{filename}`
 - All schemas have `additionalProperties: false` for security (SEC-SCHEMA-001)
@@ -27,13 +28,13 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 
 ## Schema Categories
 
-| Category       | Count | Pattern                   |
-| -------------- | ----- | ------------------------- |
-| **Agent**      | 4     | `agent-*.schema.json`     |
-| **Skill**      | 78    | `skill-*-output.schema.json` |
-| **Hook**       | 1     | `hook-*.schema.json`      |
-| **Workflow**   | 1     | `workflow-*.schema.json`  |
-| **Other**      | 19    | Various                   |
+| Category     | Count | Pattern                      |
+| ------------ | ----- | ---------------------------- |
+| **Agent**    | 4     | `agent-*.schema.json`        |
+| **Skill**    | 78    | `skill-*-output.schema.json` |
+| **Hook**     | 1     | `hook-*.schema.json`         |
+| **Workflow** | 1     | `workflow-*.schema.json`     |
+| **Other**    | 19    | Various                      |
 
 ---
 

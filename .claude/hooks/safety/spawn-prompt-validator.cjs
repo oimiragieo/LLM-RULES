@@ -33,6 +33,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const path = require('path');
 
 // Required imports
 const {
@@ -246,6 +247,99 @@ const MAX_PROMPT_LENGTH = 500000; // 500KB (conservative limit)
  */
 const PROMPT_LENGTH_WARNING = 100000; // 100KB
 
+/**
+ * Build required spawn prompt prefix when required elements are missing.
+ * Mirrors router spawn template requirements.
+ *
+ * @param {string|number|null} taskId - Task ID if available
+ * @param {string} description - Task description
+ * @returns {string} Required prefix fragment
+ */
+function buildRequiredPrefixFragment(taskId, description) {
+  const taskIdValue = taskId != null ? String(taskId) : '0';
+  const subject = (description || 'Task').slice(0, 120);
+  const projectRoot = process.env.PROJECT_ROOT || process.cwd() || path.resolve('.');
+
+  return `+======================================================================+
+|  WARNING: TASK TRACKING REQUIRED - READ THIS FIRST                   |
++======================================================================+
+|  Your Task ID: ${taskIdValue}                                                   |
+|                                                                      |
+|  BEFORE doing ANY work, run:                                         |
+|  TaskUpdate({ taskId: "${taskIdValue}", status: "in_progress" });               |
+|                                                                      |
+|  AFTER completing work, run:                                         |
+|  TaskUpdate({ taskId: "${taskIdValue}", status: "completed",                    |
+|    metadata: { summary: "...", filesModified: [...] }                |
+|  });                                                                 |
+|                                                                      |
+|  THEN check for more work:                                           |
+|  TaskList();                                                         |
+|                                                                      |
+|  FAILURE TO UPDATE TASK STATUS BREAKS THE ENTIRE SYSTEM              |
+|  YOU WILL BE EVALUATED ON: Task status updates, not just output      |
++======================================================================+
+
+## PROJECT CONTEXT (CRITICAL)
+PROJECT_ROOT: ${projectRoot}
+
+All file operations MUST use relative paths from PROJECT_ROOT.
+- Agents: .claude/agents/
+- Skills: .claude/skills/
+- Context: .claude/context/
+
+## Your Assigned Task
+Task ID: ${taskIdValue}
+Subject: ${subject}`;
+}
+
+/**
+ * Ensure required spawn prompt elements are present before strict validation.
+ * This reduces retry loops when router emits partial Task() prompts.
+ *
+ * @param {Object} toolInput - Task tool input
+ * @param {Object} validation - Initial validation result
+ * @returns {{ toolInput: Object, modified: boolean, reason?: string }}
+ */
+function autoNormalizeSpawnInput(toolInput, validation) {
+  if (!toolInput || typeof toolInput !== 'object') {
+    return { toolInput, modified: false };
+  }
+
+  const missingRequired = Array.isArray(validation?.missingRequired)
+    ? validation.missingRequired
+    : [];
+  const needsPrefix =
+    missingRequired.includes('TaskUpdate Warning Box') ||
+    missingRequired.includes('Task ID Reference');
+  const prompt = typeof toolInput.prompt === 'string' ? toolInput.prompt : '';
+
+  // Nothing to fix
+  if (!needsPrefix || !prompt) {
+    return { toolInput, modified: false };
+  }
+
+  const taskId = toolInput.task_id || toolInput.id || null;
+  const description = toolInput.description || '';
+  const prefix = buildRequiredPrefixFragment(taskId, description);
+
+  // Ensure TaskUpdate and TaskList are present in allowed tools for spawned agent contract
+  const existingAllowed = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
+  const allowedSet = new Set(existingAllowed);
+  allowedSet.add('TaskUpdate');
+  allowedSet.add('TaskList');
+
+  return {
+    toolInput: {
+      ...toolInput,
+      prompt: `${prefix}\n\n${prompt}`,
+      allowed_tools: Array.from(allowedSet),
+    },
+    modified: true,
+    reason: 'missing_required_spawn_fields',
+  };
+}
+
 // =============================================================================
 // VALIDATION LOGIC
 // =============================================================================
@@ -427,7 +521,23 @@ async function main() {
     }
 
     // Validate prompt
-    const validation = validatePrompt(prompt);
+    let validation = validatePrompt(prompt);
+
+    // Auto-fix missing required spawn fields, then re-validate.
+    const normalized = autoNormalizeSpawnInput(toolInput, validation);
+    if (normalized.modified) {
+      validation = validatePrompt(normalized.toolInput.prompt || '');
+      auditLog('spawn-prompt-validator', 'autofix_attempted', {
+        reason: normalized.reason,
+        validAfterAutofix: validation.isValid,
+        missingRequiredAfterAutofix: validation.missingRequired || [],
+      });
+
+      if (validation.isValid) {
+        console.log(JSON.stringify({ tool_input: normalized.toolInput }));
+        process.exit(0);
+      }
+    }
 
     const executionMs = Date.now() - startTime;
 
@@ -529,6 +639,8 @@ if (require.main === module) {
 module.exports = {
   main,
   validatePrompt,
+  autoNormalizeSpawnInput,
+  buildRequiredPrefixFragment,
   normalizeUnicode,
   safeRegexTest,
   isOrchestratorSpawn,

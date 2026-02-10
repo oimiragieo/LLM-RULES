@@ -4,18 +4,11 @@
   "title": "Protocol Reverse Engineering Output",
   "description": "Validation schema for protocol-reverse-engineering skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -37,10 +30,7 @@
         "protocol_info": {
           "type": "object",
           "description": "Information about the analyzed protocol",
-          "required": [
-            "name",
-            "transport_layer"
-          ],
+          "required": ["name", "transport_layer"],
           "properties": {
             "name": {
               "type": "string",
@@ -48,14 +38,7 @@
             },
             "transport_layer": {
               "type": "string",
-              "enum": [
-                "TCP",
-                "UDP",
-                "HTTP",
-                "HTTPS",
-                "WebSocket",
-                "custom"
-              ],
+              "enum": ["TCP", "UDP", "HTTP", "HTTPS", "WebSocket", "custom"],
               "description": "Underlying transport protocol"
             },
             "default_port": {
@@ -66,20 +49,12 @@
             },
             "encryption": {
               "type": "string",
-              "enum": [
-                "none",
-                "TLS",
-                "custom"
-              ],
+              "enum": ["none", "TLS", "custom"],
               "description": "Encryption mechanism"
             },
             "protocol_type": {
               "type": "string",
-              "enum": [
-                "text-based",
-                "binary",
-                "hybrid"
-              ],
+              "enum": ["text-based", "binary", "hybrid"],
               "description": "Protocol encoding type"
             }
           },
@@ -125,10 +100,7 @@
           "description": "Discovered message formats",
           "items": {
             "type": "object",
-            "required": [
-              "message_type",
-              "structure"
-            ],
+            "required": ["message_type", "structure"],
             "properties": {
               "message_type": {
                 "type": "string",
@@ -136,11 +108,7 @@
               },
               "direction": {
                 "type": "string",
-                "enum": [
-                  "client_to_server",
-                  "server_to_client",
-                  "bidirectional"
-                ],
+                "enum": ["client_to_server", "server_to_client", "bidirectional"],
                 "description": "Message direction"
               },
               "structure": {
@@ -148,12 +116,7 @@
                 "description": "Field definitions",
                 "items": {
                   "type": "object",
-                  "required": [
-                    "offset",
-                    "size",
-                    "name",
-                    "type"
-                  ],
+                  "required": ["offset", "size", "name", "type"],
                   "properties": {
                     "offset": {
                       "type": "integer",
@@ -203,10 +166,7 @@
               "description": "Protocol states",
               "items": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "description"
-                ],
+                "required": ["name", "description"],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -229,11 +189,7 @@
               "description": "State transitions",
               "items": {
                 "type": "object",
-                "required": [
-                  "from_state",
-                  "to_state",
-                  "trigger"
-                ],
+                "required": ["from_state", "to_state", "trigger"],
                 "properties": {
                   "from_state": {
                     "type": "string",
@@ -263,10 +219,7 @@
           "description": "Identified protocol patterns",
           "items": {
             "type": "object",
-            "required": [
-              "pattern_type",
-              "description"
-            ],
+            "required": ["pattern_type", "description"],
             "properties": {
               "pattern_type": {
                 "type": "string",
@@ -292,21 +245,11 @@
           "description": "Security issues discovered",
           "items": {
             "type": "object",
-            "required": [
-              "severity",
-              "type",
-              "description"
-            ],
+            "required": ["severity", "type", "description"],
             "properties": {
               "severity": {
                 "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low",
-                  "info"
-                ],
+                "enum": ["critical", "high", "medium", "low", "info"],
                 "description": "Finding severity"
               },
               "type": {
@@ -367,10 +310,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "analysis_type",
-        "protocol_info"
-      ]
+      "required": ["analysis_type", "protocol_info"]
     }
   },
   "additionalProperties": false

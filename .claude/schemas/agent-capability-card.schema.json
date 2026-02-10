@@ -4,41 +4,24 @@
   "title": "Agent Capability Card",
   "description": "Schema for agent capability publication - enables dynamic discovery and health-aware routing",
   "type": "object",
-  "required": [
-    "id",
-    "capabilities",
-    "health"
-  ],
+  "required": ["id", "capabilities", "health"],
   "properties": {
     "id": {
       "type": "string",
       "description": "Agent ID (must match agent filename without .md extension)",
       "pattern": "^[a-z][a-z0-9-]*$",
       "maxLength": 100,
-      "examples": [
-        "developer",
-        "code-reviewer",
-        "frontend-pro"
-      ]
+      "examples": ["developer", "code-reviewer", "frontend-pro"]
     },
     "displayName": {
       "type": "string",
       "description": "Human-readable agent name",
       "maxLength": 200,
-      "examples": [
-        "Developer Agent",
-        "Code Reviewer",
-        "Frontend Pro"
-      ]
+      "examples": ["Developer Agent", "Code Reviewer", "Frontend Pro"]
     },
     "category": {
       "type": "string",
-      "enum": [
-        "core",
-        "specialized",
-        "domain",
-        "orchestrator"
-      ],
+      "enum": ["core", "specialized", "domain", "orchestrator"],
       "description": "Agent category based on directory location"
     },
     "filePath": {
@@ -69,11 +52,7 @@
   "$defs": {
     "Capability": {
       "type": "object",
-      "required": [
-        "name",
-        "domain",
-        "description"
-      ],
+      "required": ["name", "domain", "description"],
       "properties": {
         "name": {
           "type": "string",
@@ -115,13 +94,7 @@
             "maxLength": 200
           },
           "description": "Router keywords that trigger this capability",
-          "examples": [
-            [
-              "code review",
-              "review PR",
-              "analyze code"
-            ]
-          ]
+          "examples": [["code review", "review PR", "analyze code"]]
         },
         "requiredTools": {
           "type": "array",
@@ -131,14 +104,7 @@
             "maxLength": 100
           },
           "description": "Tools needed for this capability",
-          "examples": [
-            [
-              "Read",
-              "Write",
-              "Edit",
-              "Bash"
-            ]
-          ]
+          "examples": [["Read", "Write", "Edit", "Bash"]]
         },
         "skills": {
           "type": "array",
@@ -148,13 +114,7 @@
             "maxLength": 100
           },
           "description": "Skills used for this capability",
-          "examples": [
-            [
-              "tdd",
-              "code-reviewer",
-              "debugging"
-            ]
-          ]
+          "examples": [["tdd", "code-reviewer", "debugging"]]
         },
         "examples": {
           "type": "array",
@@ -201,11 +161,7 @@
         },
         "preferredModel": {
           "type": "string",
-          "enum": [
-            "haiku",
-            "sonnet",
-            "opus"
-          ],
+          "enum": ["haiku", "sonnet", "opus"],
           "default": "sonnet",
           "description": "Preferred model for this agent"
         }
@@ -214,18 +170,12 @@
     },
     "Health": {
       "type": "object",
-      "required": [
-        "status"
-      ],
+      "required": ["status"],
       "description": "Real-time health status for routing decisions",
       "properties": {
         "status": {
           "type": "string",
-          "enum": [
-            "healthy",
-            "degraded",
-            "unavailable"
-          ],
+          "enum": ["healthy", "degraded", "unavailable"],
           "description": "Current health status"
         },
         "consecutiveFailures": {
@@ -264,34 +214,22 @@
           "description": "Timestamp of last health update"
         },
         "isolatedAt": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "date-time",
           "description": "When agent was isolated (null if not isolated)"
         },
         "isolationReason": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "description": "Why isolated (e.g., '3 consecutive failures: timeout')",
           "maxLength": 500
         },
         "lastSuccessAt": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "date-time",
           "description": "Timestamp of last successful completion"
         },
         "lastFailureAt": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "date-time",
           "description": "Timestamp of last failure"
         }
@@ -353,48 +291,17 @@
           "name": "implementation",
           "domain": "code",
           "description": "TDD-focused code implementation with Red-Green-Refactor",
-          "triggerPhrases": [
-            "implement",
-            "code",
-            "develop",
-            "build",
-            "create feature"
-          ],
-          "requiredTools": [
-            "Read",
-            "Write",
-            "Edit",
-            "Bash",
-            "Grep",
-            "Glob"
-          ],
-          "skills": [
-            "tdd",
-            "debugging",
-            "git-expert"
-          ]
+          "triggerPhrases": ["implement", "code", "develop", "build", "create feature"],
+          "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+          "skills": ["tdd", "debugging", "git-expert"]
         },
         {
           "name": "bug-fix",
           "domain": "code",
           "description": "Fix bugs using systematic debugging and TDD",
-          "triggerPhrases": [
-            "fix bug",
-            "debug",
-            "resolve issue",
-            "error"
-          ],
-          "requiredTools": [
-            "Read",
-            "Write",
-            "Edit",
-            "Bash",
-            "Grep"
-          ],
-          "skills": [
-            "debugging",
-            "tdd"
-          ]
+          "triggerPhrases": ["fix bug", "debug", "resolve issue", "error"],
+          "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep"],
+          "skills": ["debugging", "tdd"]
         }
       ],
       "constraints": {

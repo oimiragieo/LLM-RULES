@@ -3,18 +3,11 @@
   "title": "Session Handoff Output",
   "description": "Output schema for session-handoff skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -43,11 +36,7 @@
             },
             "context": {
               "type": "object",
-              "required": [
-                "taskId",
-                "subject",
-                "phase"
-              ],
+              "required": ["taskId", "subject", "phase"],
               "properties": {
                 "taskId": {
                   "type": "string",
@@ -63,31 +52,17 @@
                 },
                 "complexity": {
                   "type": "string",
-                  "enum": [
-                    "trivial",
-                    "low",
-                    "medium",
-                    "high",
-                    "epic"
-                  ]
+                  "enum": ["trivial", "low", "medium", "high", "epic"]
                 }
               }
             },
             "currentState": {
               "type": "object",
-              "required": [
-                "status",
-                "description"
-              ],
+              "required": ["status", "description"],
               "properties": {
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "in_progress",
-                    "blocked",
-                    "paused",
-                    "ready_for_review"
-                  ]
+                  "enum": ["in_progress", "blocked", "paused", "ready_for_review"]
                 },
                 "description": {
                   "type": "string",
@@ -107,19 +82,13 @@
             },
             "progress": {
               "type": "object",
-              "required": [
-                "completed",
-                "evidence"
-              ],
+              "required": ["completed", "evidence"],
               "properties": {
                 "completed": {
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "item",
-                      "evidence"
-                    ],
+                    "required": ["item", "evidence"],
                     "properties": {
                       "item": {
                         "type": "string"
@@ -139,10 +108,7 @@
             },
             "nextStep": {
               "type": "object",
-              "required": [
-                "action",
-                "command"
-              ],
+              "required": ["action", "command"],
               "properties": {
                 "action": {
                   "type": "string",
@@ -161,10 +127,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "path",
-                  "purpose"
-                ],
+                "required": ["path", "purpose"],
                 "properties": {
                   "path": {
                     "type": "string",
@@ -184,10 +147,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "decision",
-                  "rationale"
-                ],
+                "required": ["decision", "rationale"],
                 "properties": {
                   "decision": {
                     "type": "string"
@@ -208,23 +168,14 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "blocker",
-                  "type",
-                  "needsFrom"
-                ],
+                "required": ["blocker", "type", "needsFrom"],
                 "properties": {
                   "blocker": {
                     "type": "string"
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "dependency",
-                      "permission",
-                      "information",
-                      "external"
-                    ]
+                    "enum": ["dependency", "permission", "information", "external"]
                   },
                   "needsFrom": {
                     "type": "string"
@@ -280,9 +231,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

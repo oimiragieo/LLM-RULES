@@ -4,18 +4,11 @@
   "title": "Sentry Monitoring Skill Output",
   "description": "Output schema for Sentry monitoring configuration and analysis",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

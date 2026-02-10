@@ -4,26 +4,16 @@
   "title": "Best Practices Guidelines Skill Output",
   "description": "Validates output from best-practices-guidelines skill - Compliance checking and recommendations",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Best practices compliance results",
-      "required": [
-        "compliance",
-        "violations",
-        "recommendations"
-      ],
+      "required": ["compliance", "violations", "recommendations"],
       "properties": {
         "compliance": {
           "type": "object",
-          "required": [
-            "overall",
-            "categories"
-          ],
+          "required": ["overall", "categories"],
           "properties": {
             "overall": {
               "type": "number",
@@ -72,12 +62,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "guideline",
-              "severity",
-              "file",
-              "description"
-            ],
+            "required": ["guideline", "severity", "file", "description"],
             "properties": {
               "guideline": {
                 "type": "string",
@@ -85,12 +70,7 @@
               },
               "severity": {
                 "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ]
+                "enum": ["critical", "high", "medium", "low"]
               },
               "file": {
                 "type": "string"
@@ -118,19 +98,11 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "priority",
-              "guideline",
-              "action"
-            ],
+            "required": ["priority", "guideline", "action"],
             "properties": {
               "priority": {
                 "type": "string",
-                "enum": [
-                  "high",
-                  "medium",
-                  "low"
-                ]
+                "enum": ["high", "medium", "low"]
               },
               "guideline": {
                 "type": "string"
@@ -143,11 +115,7 @@
               },
               "effort": {
                 "type": "string",
-                "enum": [
-                  "low",
-                  "medium",
-                  "high"
-                ]
+                "enum": ["low", "medium", "high"]
               },
               "files": {
                 "type": "array",
@@ -163,10 +131,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "pattern",
-              "file"
-            ],
+            "required": ["pattern", "file"],
             "properties": {
               "pattern": {
                 "type": "string"
@@ -197,11 +162,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

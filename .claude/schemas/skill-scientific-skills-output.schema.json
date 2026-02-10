@@ -4,18 +4,11 @@
   "title": "Scientific Skills Output",
   "description": "Validation schema for scientific-skills skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -61,10 +54,7 @@
           "description": "Scientific databases queried",
           "items": {
             "type": "object",
-            "required": [
-              "database_name",
-              "query_count"
-            ],
+            "required": ["database_name", "query_count"],
             "properties": {
               "database_name": {
                 "type": "string",
@@ -196,10 +186,7 @@
           "description": "Visualization outputs",
           "items": {
             "type": "object",
-            "required": [
-              "type",
-              "file_path"
-            ],
+            "required": ["type", "file_path"],
             "properties": {
               "type": {
                 "type": "string",
@@ -223,11 +210,7 @@
           "properties": {
             "language": {
               "type": "string",
-              "enum": [
-                "python",
-                "R",
-                "julia"
-              ],
+              "enum": ["python", "R", "julia"],
               "description": "Programming language"
             },
             "file_path": {
@@ -255,11 +238,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "workflow_type",
-        "category",
-        "skills_invoked"
-      ]
+      "required": ["workflow_type", "category", "skills_invoked"]
     }
   },
   "additionalProperties": false

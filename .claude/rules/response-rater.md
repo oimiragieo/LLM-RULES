@@ -25,6 +25,7 @@
 ## Rubrics
 
 **For Plans:**
+
 - Completeness (20%) - All required sections present
 - Feasibility (20%) - Plan is realistic and achievable
 - Risk Mitigation (20%) - Risks identified with mitigations
@@ -32,6 +33,7 @@
 - Integration (20%) - Fits with existing systems
 
 **For Responses:**
+
 - Correctness (25%) - Technically accurate
 - Completeness (25%) - Addresses all requirements
 - Clarity (25%) - Easy to understand

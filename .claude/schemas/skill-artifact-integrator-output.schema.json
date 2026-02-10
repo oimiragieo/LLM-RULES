@@ -3,18 +3,11 @@
   "title": "Artifact Integrator Output",
   "description": "Output schema for artifact-integrator skill - integration analysis results",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -38,30 +31,16 @@
             },
             "artifactType": {
               "type": "string",
-              "enum": [
-                "skill",
-                "agent",
-                "hook",
-                "workflow",
-                "template",
-                "schema"
-              ]
+              "enum": ["skill", "agent", "hook", "workflow", "template", "schema"]
             },
             "integrationStatus": {
               "type": "string",
-              "enum": [
-                "integrated",
-                "partial",
-                "orphaned"
-              ],
+              "enum": ["integrated", "partial", "orphaned"],
               "description": "Overall integration status"
             },
             "mustHave": {
               "type": "object",
-              "required": [
-                "catalogEntry",
-                "consumers"
-              ],
+              "required": ["catalogEntry", "consumers"],
               "properties": {
                 "catalogEntry": {
                   "type": "boolean",
@@ -142,19 +121,11 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "tier",
-                  "gap",
-                  "recommendation"
-                ],
+                "required": ["tier", "gap", "recommendation"],
                 "properties": {
                   "tier": {
                     "type": "string",
-                    "enum": [
-                      "must-have",
-                      "should-have",
-                      "nice-to-have"
-                    ]
+                    "enum": ["must-have", "should-have", "nice-to-have"]
                   },
                   "gap": {
                     "type": "string",
@@ -205,9 +176,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

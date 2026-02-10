@@ -4,18 +4,11 @@
   "title": "Skill Creator Output",
   "description": "Schema for skill creation artifacts",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -29,12 +22,7 @@
         },
         "artifactsCreated": {
           "type": "object",
-          "required": [
-            "skillMd",
-            "rules",
-            "schema",
-            "command"
-          ],
+          "required": ["skillMd", "rules", "schema", "command"],
           "properties": {
             "skillMd": {
               "type": "boolean",
@@ -56,11 +44,7 @@
         },
         "integrationsCompleted": {
           "type": "object",
-          "required": [
-            "catalogUpdated",
-            "agentAssigned",
-            "claudeMdUpdated"
-          ],
+          "required": ["catalogUpdated", "agentAssigned", "claudeMdUpdated"],
           "properties": {
             "catalogUpdated": {
               "type": "boolean",

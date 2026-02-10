@@ -24,18 +24,11 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": [
-          "name",
-          "version",
-          "rule_sets"
-        ],
+        "required": ["name", "version", "rule_sets"],
         "properties": {
           "name": {
             "type": "string",
-            "enum": [
-              "codeql",
-              "semgrep"
-            ],
+            "enum": ["codeql", "semgrep"],
             "description": "Tool name"
           },
           "version": {
@@ -77,13 +70,7 @@
     },
     "findings_summary": {
       "type": "object",
-      "required": [
-        "total",
-        "critical",
-        "high",
-        "medium",
-        "low"
-      ],
+      "required": ["total", "critical", "high", "medium", "low"],
       "properties": {
         "total": {
           "type": "number",
@@ -121,13 +108,7 @@
       "description": "Individual security findings",
       "items": {
         "type": "object",
-        "required": [
-          "rule_id",
-          "severity",
-          "message",
-          "file",
-          "line"
-        ],
+        "required": ["rule_id", "severity", "message", "file", "line"],
         "properties": {
           "rule_id": {
             "type": "string",
@@ -135,13 +116,7 @@
           },
           "severity": {
             "type": "string",
-            "enum": [
-              "CRITICAL",
-              "HIGH",
-              "MEDIUM",
-              "LOW",
-              "INFORMATIONAL"
-            ]
+            "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"]
           },
           "message": {
             "type": "string",
@@ -171,11 +146,7 @@
           },
           "confidence": {
             "type": "string",
-            "enum": [
-              "HIGH",
-              "MEDIUM",
-              "LOW"
-            ]
+            "enum": ["HIGH", "MEDIUM", "LOW"]
           },
           "remediation": {
             "type": "string",

@@ -4,18 +4,11 @@
   "title": "Hook Creator Output",
   "description": "Schema for hook creation artifacts",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -34,10 +27,7 @@
         },
         "hookMode": {
           "type": "string",
-          "enum": [
-            "PreToolUse",
-            "PostToolUse"
-          ],
+          "enum": ["PreToolUse", "PostToolUse"],
           "description": "Hook execution phase"
         },
         "priority": {
@@ -48,21 +38,13 @@
         },
         "enforcementMode": {
           "type": "string",
-          "enum": [
-            "block",
-            "warn",
-            "off"
-          ],
+          "enum": ["block", "warn", "off"],
           "default": "warn",
           "description": "Hook enforcement level"
         },
         "artifactsCreated": {
           "type": "object",
-          "required": [
-            "hookFile",
-            "settingsRegistration",
-            "documentation"
-          ],
+          "required": ["hookFile", "settingsRegistration", "documentation"],
           "properties": {
             "hookFile": {
               "type": "boolean"
@@ -77,11 +59,7 @@
         },
         "integrationsCompleted": {
           "type": "object",
-          "required": [
-            "enforcementHooksMdUpdated",
-            "tested",
-            "performanceValidated"
-          ],
+          "required": ["enforcementHooksMdUpdated", "tested", "performanceValidated"],
           "properties": {
             "enforcementHooksMdUpdated": {
               "type": "boolean"
@@ -101,13 +79,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "hookName",
-        "hookPath",
-        "hookMode",
-        "artifactsCreated",
-        "integrationsCompleted"
-      ]
+      "required": ["hookName", "hookPath", "hookMode", "artifactsCreated", "integrationsCompleted"]
     }
   },
   "additionalProperties": false

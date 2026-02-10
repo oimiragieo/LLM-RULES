@@ -14,12 +14,7 @@
     "output": {
       "type": "object",
       "description": "Swarm coordination results and metrics",
-      "required": [
-        "coordinationPattern",
-        "agentsSpawned",
-        "aggregatedResults",
-        "executionMetrics"
-      ],
+      "required": ["coordinationPattern", "agentsSpawned", "aggregatedResults", "executionMetrics"],
       "properties": {
         "coordinationPattern": {
           "type": "string",

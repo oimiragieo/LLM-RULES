@@ -11,6 +11,7 @@
 ## When to Use
 
 Use doc-generator when:
+
 - Generating API documentation from code
 - Creating developer guides for libraries/frameworks
 - Documenting architecture from system design
@@ -22,6 +23,7 @@ Use doc-generator when:
 ### Documentation Types
 
 **API Documentation**:
+
 - Endpoint references with request/response examples
 - Parameter descriptions with types and constraints
 - Error codes and handling
@@ -29,6 +31,7 @@ Use doc-generator when:
 - Rate limiting details
 
 **Developer Guides**:
+
 - Installation and setup instructions
 - Quick start with minimal example
 - Core concepts and architecture
@@ -36,6 +39,7 @@ Use doc-generator when:
 - Common use cases
 
 **Architecture Docs**:
+
 - System overview with diagrams
 - Component relationships
 - Data flows
@@ -43,6 +47,7 @@ Use doc-generator when:
 - Deployment architecture
 
 **User Manuals**:
+
 - Feature descriptions
 - Step-by-step guides
 - Screenshots and visual aids
@@ -59,10 +64,12 @@ Brief description (1-2 sentences)
 ## Installation
 
 ### Requirements
+
 - Requirement 1
 - Requirement 2
 
 ### Steps
+
 \`\`\`bash
 installation command
 \`\`\`
@@ -94,9 +101,11 @@ example usage
 ## Examples
 
 ### Use Case 1
+
 [Detailed example with explanation]
 
 ### Use Case 2
+
 [Another common scenario]
 
 ## Troubleshooting
@@ -105,6 +114,7 @@ example usage
 **Solution**: How to fix it
 
 ## See Also
+
 - [Related documentation]
 ```
 
@@ -118,14 +128,14 @@ example usage
 
 ## Anti-Patterns
 
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| No examples | Unclear how to use | Add working code examples |
-| Outdated docs | Misleads users | Auto-regenerate from code |
-| Incomplete setup | Users can't get started | Full installation instructions |
-| No error handling | Users get stuck | Document common errors |
-| Technical jargon | Excludes beginners | Define terms or link to glossary |
-| Walls of text | Hard to scan | Use headers, lists, tables |
+| Pattern           | Problem                 | Fix                              |
+| ----------------- | ----------------------- | -------------------------------- |
+| No examples       | Unclear how to use      | Add working code examples        |
+| Outdated docs     | Misleads users          | Auto-regenerate from code        |
+| Incomplete setup  | Users can't get started | Full installation instructions   |
+| No error handling | Users get stuck         | Document common errors           |
+| Technical jargon  | Excludes beginners      | Define terms or link to glossary |
+| Walls of text     | Hard to scan            | Use headers, lists, tables       |
 
 ## Workflow
 
@@ -161,16 +171,19 @@ example usage
 ## Integration Points
 
 **Related Skills**:
+
 - `readme` - README file generation
 - `writing-skills` - Writing quality guidelines
 - `diagram-generator` - Architecture diagrams
 
 **Related Agents**:
+
 - `technical-writer` - Uses this skill for documentation
 - `developer` - Generates inline documentation
 - `architect` - Creates architecture docs
 
 **Related Workflows**:
+
 - Feature development - Documentation phase
 - API design - Generate API docs from spec
 - Architecture review - Document design decisions

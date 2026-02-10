@@ -3,18 +3,11 @@
   "title": "Context-Driven Development Output",
   "description": "Output schema for context-driven-development skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -23,22 +16,13 @@
       "properties": {
         "output": {
           "type": "object",
-          "required": [
-            "contextArtifacts",
-            "healthCheck"
-          ],
+          "required": ["contextArtifacts", "healthCheck"],
           "properties": {
             "contextArtifacts": {
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "path",
-                  "type",
-                  "size",
-                  "lastUpdated",
-                  "health"
-                ],
+                "required": ["path", "type", "size", "lastUpdated", "health"],
                 "properties": {
                   "path": {
                     "type": "string",
@@ -46,14 +30,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "config",
-                      "memory",
-                      "agent",
-                      "workflow",
-                      "skill",
-                      "schema"
-                    ]
+                    "enum": ["config", "memory", "agent", "workflow", "skill", "schema"]
                   },
                   "size": {
                     "type": "integer",
@@ -65,49 +42,28 @@
                   },
                   "health": {
                     "type": "string",
-                    "enum": [
-                      "healthy",
-                      "stale",
-                      "oversized",
-                      "missing"
-                    ]
+                    "enum": ["healthy", "stale", "oversized", "missing"]
                   }
                 }
               }
             },
             "healthCheck": {
               "type": "object",
-              "required": [
-                "status",
-                "issues"
-              ],
+              "required": ["status", "issues"],
               "properties": {
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "healthy",
-                    "warnings",
-                    "critical"
-                  ]
+                  "enum": ["healthy", "warnings", "critical"]
                 },
                 "issues": {
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "severity",
-                      "artifact",
-                      "issue",
-                      "recommendation"
-                    ],
+                    "required": ["severity", "artifact", "issue", "recommendation"],
                     "properties": {
                       "severity": {
                         "type": "string",
-                        "enum": [
-                          "critical",
-                          "warning",
-                          "info"
-                        ]
+                        "enum": ["critical", "warning", "info"]
                       },
                       "artifact": {
                         "type": "string"
@@ -176,9 +132,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

@@ -3,18 +3,11 @@
   "title": "Thinking Tools Output",
   "description": "Output schema for thinking-tools skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -23,19 +16,11 @@
       "properties": {
         "output": {
           "type": "object",
-          "required": [
-            "checkpoint",
-            "timestamp",
-            "result"
-          ],
+          "required": ["checkpoint", "timestamp", "result"],
           "properties": {
             "checkpoint": {
               "type": "string",
-              "enum": [
-                "collected-information",
-                "task-adherence",
-                "completion"
-              ]
+              "enum": ["collected-information", "task-adherence", "completion"]
             },
             "timestamp": {
               "type": "string",
@@ -43,10 +28,7 @@
             },
             "result": {
               "type": "object",
-              "required": [
-                "passed",
-                "findings"
-              ],
+              "required": ["passed", "findings"],
               "properties": {
                 "passed": {
                   "type": "boolean"
@@ -55,11 +37,7 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "question",
-                      "answer",
-                      "concern"
-                    ],
+                    "required": ["question", "answer", "concern"],
                     "properties": {
                       "question": {
                         "type": "string"
@@ -84,9 +62,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

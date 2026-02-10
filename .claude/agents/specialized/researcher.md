@@ -6,6 +6,7 @@ model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
 priority: medium
+extended_thinking: true
 tools:
   # Core research tools (READ-ONLY - no Write/Edit for security)
   - Read # Read files from filesystem

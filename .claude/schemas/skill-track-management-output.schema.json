@@ -4,18 +4,11 @@
   "title": "Track Management Output",
   "description": "Schema for track management methodology output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -29,22 +22,14 @@
         },
         "phase": {
           "type": "string",
-          "enum": [
-            "specification",
-            "planning",
-            "implementation",
-            "complete"
-          ],
+          "enum": ["specification", "planning", "implementation", "complete"],
           "description": "Current track phase"
         },
         "tasks": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "taskId",
-              "status"
-            ],
+            "required": ["taskId", "status"],
             "properties": {
               "taskId": {
                 "type": "string"
@@ -54,13 +39,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "pending",
-                  "in_progress",
-                  "complete",
-                  "skipped",
-                  "blocked"
-                ]
+                "enum": ["pending", "in_progress", "complete", "skipped", "blocked"]
               },
               "commitSHA": {
                 "type": "string",
@@ -117,11 +96,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "trackName",
-        "phase",
-        "tasks"
-      ]
+      "required": ["trackName", "phase", "tasks"]
     }
   },
   "additionalProperties": false

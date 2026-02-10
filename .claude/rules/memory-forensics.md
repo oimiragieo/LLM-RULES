@@ -11,6 +11,7 @@
 ## When to Use
 
 Use memory-forensics when:
+
 - Analyzing memory dumps from incident response
 - Investigating malware in RAM captures
 - Extracting volatile evidence (running processes, network connections)
@@ -22,12 +23,14 @@ Use memory-forensics when:
 ### Memory Acquisition
 
 **Tools for Acquisition**:
+
 - **Windows**: WinPmem, DumpIt, FTK Imager, Magnet RAM Capture
 - **Linux**: avml, LiME (Linux Memory Extractor)
 - **macOS**: OSXPmem
 - **Volatility**: Memory acquisition plugins
 
 **Acquisition Commands**:
+
 ```bash
 # Windows (WinPmem)
 winpmem_mini_x64.exe memdump.raw
@@ -42,6 +45,7 @@ sha256sum memory.raw > memory.raw.sha256
 ### Memory Analysis Workflow
 
 **Step 1: Profile Identification**
+
 ```bash
 # Identify OS profile
 volatility -f memory.raw imageinfo
@@ -51,6 +55,7 @@ vol -f memory.raw windows.info
 ```
 
 **Step 2: Process Analysis**
+
 ```bash
 # List running processes
 volatility -f memory.raw --profile=Win10x64 pslist
@@ -65,6 +70,7 @@ volatility -f memory.raw --profile=Win10x64 procdump -p <PID> -D output/
 ```
 
 **Step 3: Network Artifacts**
+
 ```bash
 # Network connections
 volatility -f memory.raw --profile=Win10x64 netscan
@@ -75,6 +81,7 @@ volatility -f memory.raw --profile=Win10x64 netscan --output=json
 ```
 
 **Step 4: Malware Detection**
+
 ```bash
 # Detect code injection
 volatility -f memory.raw --profile=Win10x64 malfind
@@ -88,6 +95,7 @@ volatility -f memory.raw --profile=Win10x64 idt
 ```
 
 **Step 5: Registry Hives**
+
 ```bash
 # List registry hives in memory
 volatility -f memory.raw --profile=Win10x64 hivelist
@@ -100,6 +108,7 @@ volatility -f memory.raw --profile=Win10x64 printkey -K "SOFTWARE\Microsoft\Wind
 ```
 
 **Step 6: File Extraction**
+
 ```bash
 # List open files
 volatility -f memory.raw --profile=Win10x64 filescan
@@ -112,6 +121,7 @@ volatility -f memory.raw --profile=Win10x64 filescan | grep -i ".doc\|.pdf\|.exe
 ```
 
 **Step 7: Credential Extraction**
+
 ```bash
 # Extract password hashes
 volatility -f memory.raw --profile=Win10x64 hashdump
@@ -125,14 +135,14 @@ volatility -f memory.raw --profile=Win10x64 lsadump
 
 ## Anti-Patterns
 
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| No acquisition verification | Corrupted dump | Always hash and verify |
-| Wrong profile | Failed analysis | Use imageinfo first |
-| Single tool reliance | Missed artifacts | Use multiple tools (Volatility, Rekall, MemProcFS) |
-| No timeline | Lost context | Create timeline with timeliner |
-| Analyzing on live system | Evidence contamination | Work on forensic copy |
-| No documentation | Lost chain of custody | Document every step |
+| Pattern                     | Problem                | Fix                                                |
+| --------------------------- | ---------------------- | -------------------------------------------------- |
+| No acquisition verification | Corrupted dump         | Always hash and verify                             |
+| Wrong profile               | Failed analysis        | Use imageinfo first                                |
+| Single tool reliance        | Missed artifacts       | Use multiple tools (Volatility, Rekall, MemProcFS) |
+| No timeline                 | Lost context           | Create timeline with timeliner                     |
+| Analyzing on live system    | Evidence contamination | Work on forensic copy                              |
+| No documentation            | Lost chain of custody  | Document every step                                |
 
 ## Tool Integration
 
@@ -181,44 +191,47 @@ rekall -f memory.raw netstat
 
 ### Process Artifacts
 
-| Artifact | Command | Purpose |
-|----------|---------|---------|
-| Process list | `pslist`, `pstree` | Running processes |
-| Hidden processes | `psxview` | Rootkit detection |
-| Process memory | `memdump` | Extract process memory |
-| Loaded DLLs | `dlllist` | Identify injected DLLs |
-| Process handles | `handles` | Open files, registry keys |
+| Artifact         | Command            | Purpose                   |
+| ---------------- | ------------------ | ------------------------- |
+| Process list     | `pslist`, `pstree` | Running processes         |
+| Hidden processes | `psxview`          | Rootkit detection         |
+| Process memory   | `memdump`          | Extract process memory    |
+| Loaded DLLs      | `dlllist`          | Identify injected DLLs    |
+| Process handles  | `handles`          | Open files, registry keys |
 
 ### Network Artifacts
 
-| Artifact | Command | Purpose |
-|----------|---------|---------|
-| Active connections | `netscan` | Current network activity |
-| Connection history | `connscan` | Terminated connections |
-| DNS cache | `dns_cache` (plugin) | Resolve domain queries |
+| Artifact           | Command              | Purpose                  |
+| ------------------ | -------------------- | ------------------------ |
+| Active connections | `netscan`            | Current network activity |
+| Connection history | `connscan`           | Terminated connections   |
+| DNS cache          | `dns_cache` (plugin) | Resolve domain queries   |
 
 ### Malware Artifacts
 
-| Artifact | Command | Purpose |
-|----------|---------|---------|
-| Code injection | `malfind` | Detect injected code |
-| Rootkit hooks | `ssdt`, `idt` | Detect kernel hooks |
-| Driver list | `driverscan` | Find malicious drivers |
-| Mutexes | `mutantscan` | Malware indicators |
+| Artifact       | Command       | Purpose                |
+| -------------- | ------------- | ---------------------- |
+| Code injection | `malfind`     | Detect injected code   |
+| Rootkit hooks  | `ssdt`, `idt` | Detect kernel hooks    |
+| Driver list    | `driverscan`  | Find malicious drivers |
+| Mutexes        | `mutantscan`  | Malware indicators     |
 
 ## Integration Points
 
 **Related Skills**:
+
 - `binary-analysis-patterns` - Analyze extracted executables
 - `protocol-reverse-engineering` - Analyze network artifacts
 - `variant-analysis` - Find similar malware patterns
 
 **Related Agents**:
+
 - `security-architect` - Threat modeling from findings
 - `penetration-tester` - Post-exploitation analysis
 - `incident-responder` - Incident investigation
 
 **Related Workflows**:
+
 - Incident response - Memory analysis phase
 - Malware analysis - Dynamic analysis from memory
 - Threat hunting - Memory-based IOC detection

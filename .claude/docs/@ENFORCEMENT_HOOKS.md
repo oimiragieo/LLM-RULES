@@ -1164,17 +1164,20 @@ LOOP_PREVENTION_MODE=block|warn|off             # Default: block
 **Pattern:** `^[a-z][a-z0-9-]*$` (kebab-case, lowercase, starts with letter)
 
 **Examples:**
+
 - ✅ `python-pro`, `mobile-ux-reviewer`, `c4-context`
 - ❌ `Python-Pro` (uppercase), `_mobile` (underscore), `2-agents` (starts with number)
 
 ### Conflict Detection
 
 The hook:
+
 1. Extracts artifact name from file path
 2. Searches existing artifacts in the same category
 3. Blocks write if name already exists
 
 **Message Format:**
+
 ```
 [NAMING CONFLICT] Artifact "python-expert" already exists in agents.
 Choose a unique name or enhance the existing artifact.
@@ -1192,6 +1195,7 @@ CONFLICT_DETECTOR=off claude
 ```
 
 **Why Enforcement Matters:**
+
 - Prevents accidental overwrites of existing artifacts
 - Enforces consistent naming conventions across all artifacts
 - Guides creators to enhance existing artifacts instead of creating duplicates
@@ -1213,11 +1217,13 @@ Matches paths: `.claude/skills/{skill-name}/SKILL.md`
 ### Hook Behavior
 
 When agent uses `Read()` on a SKILL.md file:
+
 - Extracts skill name from path
 - Returns warning message (exit 0, non-blocking)
 - Suggests using `Skill({ skill: "{name}" })` instead
 
 **Message Format:**
+
 ```
 Consider using Skill({ skill: "tdd" }) instead of reading SKILL.md directly.
 Reading is allowed for reference, but Skill() tool applies the workflow.
@@ -1226,10 +1232,12 @@ Reading is allowed for reference, but Skill() tool applies the workflow.
 ### Why This Matters
 
 **Reading vs Invoking:**
+
 - `Read('SKILL.md')` - Gets content but doesn't apply workflow context
 - `Skill({ skill: 'name' })` - Loads skill and applies it to current task
 
 **Use Cases:**
+
 - ✅ Reading for reference: Allowed (warning shown)
 - ✅ Invoking skill: Use Skill() tool (proper workflow)
 
@@ -1280,11 +1288,13 @@ CODE_INDEX_DEBOUNCE_MS=5000  # Default: 5000ms
 ### Integration with Memory
 
 Best-effort updates to `codebase_map.json`:
+
 - Records discovered files for memory system
 - Skips `.claude/context/` files (internal state)
 - Fails gracefully if memory system unavailable
 
 **Why This Matters:**
+
 - Keeps code index fresh without manual intervention
 - Enables semantic search on recently modified code
 - Debouncing prevents excessive indexing during rapid edits
@@ -1304,6 +1314,7 @@ Best-effort updates to `codebase_map.json`:
 **File:** `.claude/context/runtime/router-state.json`
 
 **Reset Fields:**
+
 - `mode: 'router'` (always starts in router mode)
 - `taskSpawned: false` (prevents bypass of routing protocol)
 - `taskListCalledSincePrompt: false` (enforces TaskList-first)
@@ -1314,22 +1325,26 @@ Best-effort updates to `codebase_map.json`:
 - `securitySpawned: false` (resets security tracking)
 
 **Preserved Fields:**
+
 - `sessionId` (maintains session continuity)
 
 ### Why This Matters
 
 **Problem Solved (PROC-007):**
+
 - Prevents stale `taskSpawned: true` from bypassing routing protocol
 - Ensures every user prompt starts with clean state
 - Prevents enforcement drift across multiple prompts
 
 **Remediation Pattern:**
+
 - Part of PROC-007 Option A (state reset on every prompt)
 - Complements Fix 4b (staleness detection in routing-guard.cjs)
 - Fail-open on errors (logs error but doesn't block prompt)
 
 **Safety Net:**
 If state reset fails, routing-guard.cjs detects stale state via:
+
 - `STATE_STALE_THRESHOLD_MS` (default: 600000ms / 10 minutes)
 - Invalid timestamps trigger fallback to router mode
 

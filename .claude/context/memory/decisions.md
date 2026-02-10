@@ -13,6 +13,7 @@ All JSON schemas in `.claude/schemas/` previously used inconsistent $id domains 
 Standardize all schema $id fields to use `https://agent-studio.dev/schemas/{filename}` domain. This establishes a canonical namespace for all agent-studio schemas.
 
 **Examples:**
+
 - `skill-tdd-output.schema.json` → $id: `https://agent-studio.dev/schemas/skill-tdd-output.schema.json`
 - `skill-debugging-output.schema.json` → $id: `https://agent-studio.dev/schemas/skill-debugging-output.schema.json`
 
@@ -1058,6 +1059,28 @@ Additionally:
 **Alternatives Considered**: Docker Compose (no self-healing/scaling), Nomad (smaller ecosystem), AWS ECS (vendor lock-in), Serverless (cold starts unacceptable for CLI).
 
 **Architecture Document**: `.claude/context/plans/monolith-to-microservices-architecture-2026-02-09.md`
+
+---
+
+### ADR-110: Ecosystem Audit Results and Remediation (2026-02-09)
+
+**Context**: Completed EPIC-level audit of entire agent-studio ecosystem
+
+**Decision**:
+
+- Archive non-functional agents (party-orchestrator → \_archive/)
+- Add ROUTING_TABLE entries for agents with only INTENT_KEYWORDS (pm, reflection-agent)
+- Enable extended_thinking for complex analysis agents (code-reviewer, code-simplifier, researcher, penetration-tester, performance-engineer, microservices-architect, api-designer)
+- Quarterly audit cadence recommended
+
+**Status**: Accepted
+
+**Consequences**:
+
+- 58 active agents (down from 59)
+- 10 routing keywords added to routing-table.cjs
+- 7 agents gained extended_thinking capability
+- 61 gaps remain (0 CRITICAL, 13 HIGH, 48 MEDIUM) — prioritized in Phase 6 report
 
 ---
 

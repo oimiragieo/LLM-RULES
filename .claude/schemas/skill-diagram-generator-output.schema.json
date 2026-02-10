@@ -4,18 +4,11 @@
   "title": "Diagram Generator Skill Output Verification",
   "description": "Verifiable output from the diagram-generator skill that proves diagram creation occurred",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -54,10 +47,7 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": [
-              "name",
-              "type"
-            ],
+            "required": ["name", "type"],
             "properties": {
               "name": {
                 "type": "string",
@@ -163,12 +153,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "diagram_type",
-        "mermaid_syntax",
-        "output_file",
-        "entities_included"
-      ]
+      "required": ["diagram_type", "mermaid_syntax", "output_file", "entities_included"]
     }
   },
   "additionalProperties": false

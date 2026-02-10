@@ -3,18 +3,11 @@
   "title": "Auth Security Expert Output",
   "description": "Validates output from auth-security-expert skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -34,10 +27,7 @@
           "properties": {
             "oauth21Compliance": {
               "type": "object",
-              "required": [
-                "compliant",
-                "checks"
-              ],
+              "required": ["compliant", "checks"],
               "properties": {
                 "compliant": {
                   "type": "boolean",
@@ -47,12 +37,7 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "requirement",
-                      "standard",
-                      "found",
-                      "compliant"
-                    ],
+                    "required": ["requirement", "standard", "found", "compliant"],
                     "properties": {
                       "requirement": {
                         "type": "string",
@@ -87,10 +72,7 @@
             },
             "jwtSecurity": {
               "type": "object",
-              "required": [
-                "compliant",
-                "checks"
-              ],
+              "required": ["compliant", "checks"],
               "properties": {
                 "compliant": {
                   "type": "boolean",
@@ -100,12 +82,7 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "requirement",
-                      "standard",
-                      "found",
-                      "compliant"
-                    ],
+                    "required": ["requirement", "standard", "found", "compliant"],
                     "properties": {
                       "requirement": {
                         "type": "string",
@@ -140,18 +117,11 @@
             },
             "tokenManagement": {
               "type": "object",
-              "required": [
-                "accessToken",
-                "refreshToken"
-              ],
+              "required": ["accessToken", "refreshToken"],
               "properties": {
                 "accessToken": {
                   "type": "object",
-                  "required": [
-                    "lifetime",
-                    "storage",
-                    "rotation"
-                  ],
+                  "required": ["lifetime", "storage", "rotation"],
                   "properties": {
                     "lifetime": {
                       "type": "string",
@@ -172,11 +142,7 @@
                 },
                 "refreshToken": {
                   "type": "object",
-                  "required": [
-                    "lifetime",
-                    "rotation",
-                    "revocation"
-                  ],
+                  "required": ["lifetime", "rotation", "revocation"],
                   "properties": {
                     "lifetime": {
                       "type": "string"
@@ -197,12 +163,7 @@
             },
             "passwordSecurity": {
               "type": "object",
-              "required": [
-                "algorithm",
-                "costFactor",
-                "saltStrategy",
-                "compliant"
-              ],
+              "required": ["algorithm", "costFactor", "saltStrategy", "compliant"],
               "properties": {
                 "algorithm": {
                   "type": "string",
@@ -252,21 +213,11 @@
               "description": "Security findings",
               "items": {
                 "type": "object",
-                "required": [
-                  "severity",
-                  "category",
-                  "description",
-                  "remediation"
-                ],
+                "required": ["severity", "category", "description", "remediation"],
                 "properties": {
                   "severity": {
                     "type": "string",
-                    "enum": [
-                      "CRITICAL",
-                      "HIGH",
-                      "MEDIUM",
-                      "LOW"
-                    ]
+                    "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
                   },
                   "category": {
                     "type": "string",
@@ -299,10 +250,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "priority",
-                  "recommendation"
-                ],
+                "required": ["priority", "recommendation"],
                 "properties": {
                   "priority": {
                     "type": "integer",
@@ -313,12 +261,7 @@
                   },
                   "effort": {
                     "type": "string",
-                    "enum": [
-                      "trivial",
-                      "small",
-                      "medium",
-                      "large"
-                    ]
+                    "enum": ["trivial", "small", "medium", "large"]
                   }
                 }
               }
@@ -328,9 +271,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

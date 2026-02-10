@@ -26,14 +26,16 @@
 **Revising a thought**: Mark `isRevision: true` and `revisesThought: N`
 
 ```javascript
-mcp__sequential-thinking__sequentialthinking({
-  thought: 'Actually, my assumption in thought 3 was wrong. The bug is not in the auth module but in the API layer.',
-  thoughtNumber: 6,
-  totalThoughts: 10,
-  isRevision: true,
-  revisesThought: 3,
-  nextThoughtNeeded: true
-});
+mcp__sequential -
+  thinking__sequentialthinking({
+    thought:
+      'Actually, my assumption in thought 3 was wrong. The bug is not in the auth module but in the API layer.',
+    thoughtNumber: 6,
+    totalThoughts: 10,
+    isRevision: true,
+    revisesThought: 3,
+    nextThoughtNeeded: true,
+  });
 ```
 
 **Effect**: Thought 6 updates understanding from thought 3. Downstream thoughts (4, 5) may be invalidated.
@@ -41,52 +43,60 @@ mcp__sequential-thinking__sequentialthinking({
 ### Branching Rules
 
 **When to branch**:
+
 - Exploring multiple hypotheses
 - Uncertain which approach is correct
 - Want to compare alternatives before choosing
 
 **Branch syntax**:
+
 ```javascript
 // Branch from thought 5 to explore alternative
-mcp__sequential-thinking__sequentialthinking({
-  thought: 'Let me explore the caching approach instead of database optimization.',
-  thoughtNumber: 1,  // First thought in branch
-  totalThoughts: 5,
-  branchFromThought: 5,
-  branchId: 'caching-approach',
-  nextThoughtNeeded: true
-});
+mcp__sequential -
+  thinking__sequentialthinking({
+    thought: 'Let me explore the caching approach instead of database optimization.',
+    thoughtNumber: 1, // First thought in branch
+    totalThoughts: 5,
+    branchFromThought: 5,
+    branchId: 'caching-approach',
+    nextThoughtNeeded: true,
+  });
 ```
 
 **Merging branches**: Return to main line with synthesis thought:
+
 ```javascript
 // After exploring branches, synthesize
-mcp__sequential-thinking__sequentialthinking({
-  thought: 'Comparing both approaches: caching wins for read-heavy, database optimization for write-heavy. Recommend caching based on usage pattern.',
-  thoughtNumber: 12,
-  totalThoughts: 12,
-  nextThoughtNeeded: false  // Done
-});
+mcp__sequential -
+  thinking__sequentialthinking({
+    thought:
+      'Comparing both approaches: caching wins for read-heavy, database optimization for write-heavy. Recommend caching based on usage pattern.',
+    thoughtNumber: 12,
+    totalThoughts: 12,
+    nextThoughtNeeded: false, // Done
+  });
 ```
 
 ## Optimal Stopping Criteria
 
 **When to set `nextThoughtNeeded: false`**:
 
-| Criterion               | Threshold                           |
-| ----------------------- | ----------------------------------- |
-| Hypothesis verified     | Solution tested and confirmed       |
-| Confidence              | ≥85% confident in recommendation    |
-| Alternatives explored   | Considered ≥2 approaches            |
-| Blockers identified     | Clear path forward OR escalation    |
-| Completeness            | All requirements addressed          |
+| Criterion             | Threshold                        |
+| --------------------- | -------------------------------- |
+| Hypothesis verified   | Solution tested and confirmed    |
+| Confidence            | ≥85% confident in recommendation |
+| Alternatives explored | Considered ≥2 approaches         |
+| Blockers identified   | Clear path forward OR escalation |
+| Completeness          | All requirements addressed       |
 
 **Don't stop prematurely**:
+
 - Just because reached estimated `totalThoughts`
 - Before testing hypothesis
 - Without considering alternatives
 
 **Adjust `totalThoughts` upward** if:
+
 - Problem more complex than initially assessed
 - New information revealed during exploration
 - Hypothesis failed, need to explore alternatives
@@ -105,19 +115,20 @@ mcp__sequential-thinking__sequentialthinking({
 
 ## Anti-Patterns
 
-| Anti-Pattern                  | Problem                            | Fix                                      |
-| ----------------------------- | ---------------------------------- | ---------------------------------------- |
-| Fixed thought count           | Stops at estimate even if unclear  | Adjust `totalThoughts` dynamically       |
-| No branching                  | Commits to first approach          | Explore alternatives via branches        |
-| No revision                   | Doesn't update when wrong          | Mark revisions explicitly                |
-| Premature stopping            | Stops before hypothesis verified   | Continue until verification complete     |
-| No uncertainty markers        | Overconfident recommendations      | Mark tentative vs confident thoughts     |
-| Linear only                   | Forces sequential when parallel better | Use branches for parallel exploration|
-| Ignoring failed hypotheses    | Doesn't learn from wrong paths     | Document why hypotheses failed           |
+| Anti-Pattern               | Problem                                | Fix                                   |
+| -------------------------- | -------------------------------------- | ------------------------------------- |
+| Fixed thought count        | Stops at estimate even if unclear      | Adjust `totalThoughts` dynamically    |
+| No branching               | Commits to first approach              | Explore alternatives via branches     |
+| No revision                | Doesn't update when wrong              | Mark revisions explicitly             |
+| Premature stopping         | Stops before hypothesis verified       | Continue until verification complete  |
+| No uncertainty markers     | Overconfident recommendations          | Mark tentative vs confident thoughts  |
+| Linear only                | Forces sequential when parallel better | Use branches for parallel exploration |
+| Ignoring failed hypotheses | Doesn't learn from wrong paths         | Document why hypotheses failed        |
 
 ## Thought Quality Standards
 
 **Each thought should**:
+
 - State one clear idea or step
 - Build on OR revise previous thoughts
 - Identify assumptions being made
@@ -125,11 +136,13 @@ mcp__sequential-thinking__sequentialthinking({
 - Lead toward testable hypothesis
 
 **Example of good thought**:
+
 ```
 Thought 5: Based on the profiler data (thought 3), the bottleneck is the N+1 query pattern in the user fetching loop. Hypothesis: Adding eager loading will reduce query count from 1000+ to <10. Confidence: 80% (need to verify with test query).
 ```
 
 **Example of bad thought**:
+
 ```
 Thought 5: Make it faster.
 ```

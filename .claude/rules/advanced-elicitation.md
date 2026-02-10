@@ -20,23 +20,23 @@ Use when you want to improve response quality through meta-cognitive reasoning. 
 
 ## Available Methods
 
-| Method                 | Use Case                                   |
-| ---------------------- | ------------------------------------------ |
-| **First Principles**   | Complex system design, architecture        |
-| **Pre-Mortem**         | Planning major changes, risk mitigation    |
-| **Socratic**           | Requirements analysis, specification       |
-| **Red Team/Blue Team** | Security reviews, adversarial testing      |
-| **Inversion**          | Risk identification, avoiding pitfalls     |
-| **Second-Order**       | Strategic decisions, long-term planning    |
-| **SWOT**               | Strategic planning, competitive analysis   |
-| **Opportunity Cost**   | Prioritization, resource allocation        |
-| **Analogical**         | Innovation, learning from history          |
-| **Constraint**         | Innovation, breaking assumptions           |
-| **FMEA**               | Engineering design, safety-critical        |
-| **Bias Check**         | Decision-making, self-critique             |
-| **Base Rate**          | Estimation, reality-checking optimism      |
-| **Steelmanning**       | Proposal review, intellectual honesty      |
-| **Time Horizon Shift** | Long-term planning, trade-off analysis     |
+| Method                 | Use Case                                 |
+| ---------------------- | ---------------------------------------- |
+| **First Principles**   | Complex system design, architecture      |
+| **Pre-Mortem**         | Planning major changes, risk mitigation  |
+| **Socratic**           | Requirements analysis, specification     |
+| **Red Team/Blue Team** | Security reviews, adversarial testing    |
+| **Inversion**          | Risk identification, avoiding pitfalls   |
+| **Second-Order**       | Strategic decisions, long-term planning  |
+| **SWOT**               | Strategic planning, competitive analysis |
+| **Opportunity Cost**   | Prioritization, resource allocation      |
+| **Analogical**         | Innovation, learning from history        |
+| **Constraint**         | Innovation, breaking assumptions         |
+| **FMEA**               | Engineering design, safety-critical      |
+| **Bias Check**         | Decision-making, self-critique           |
+| **Base Rate**          | Estimation, reality-checking optimism    |
+| **Steelmanning**       | Proposal review, intellectual honesty    |
+| **Time Horizon Shift** | Long-term planning, trade-off analysis   |
 
 ## Usage
 

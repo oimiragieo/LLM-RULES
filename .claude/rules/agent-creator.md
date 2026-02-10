@@ -13,9 +13,9 @@
 
 ```markdown
 ---
-name: {agent-name}
-type: {core|domain|specialized|orchestrator}
-model: {haiku|sonnet|opus}
+name: { agent-name }
+type: { core|domain|specialized|orchestrator }
+model: { haiku|sonnet|opus }
 skills: [list-of-skills]
 ---
 
@@ -27,17 +27,18 @@ skills: [list-of-skills]
 <workflow>Step-by-step process</workflow>
 
 ## Memory Protocol (MANDATORY)
+
 [Standard memory protocol]
 ```
 
 ### Agent Types
 
-| Type         | Purpose                    | Model   | Example           |
-| ------------ | -------------------------- | ------- | ----------------- |
-| core         | Framework infrastructure   | sonnet  | router, planner   |
-| domain       | Technology specialists     | sonnet  | typescript-expert |
-| specialized  | Niche expertise            | opus    | security-architect|
-| orchestrator | Multi-agent coordination   | opus    | master-orch       |
+| Type         | Purpose                  | Model  | Example            |
+| ------------ | ------------------------ | ------ | ------------------ |
+| core         | Framework infrastructure | sonnet | router, planner    |
+| domain       | Technology specialists   | sonnet | typescript-expert  |
+| specialized  | Niche expertise          | opus   | security-architect |
+| orchestrator | Multi-agent coordination | opus   | master-orch        |
 
 ### File Placement
 

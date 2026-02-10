@@ -11,12 +11,14 @@
 ## Svelte 5 Standards
 
 ### Reactivity
+
 - Use runes for controlling reactivity (replaces `$:` reactive declarations)
 - Runes provide explicit control over state and effects
 - Use `bind:value` for two-way data binding
 - Treat event handlers as properties for simpler integration
 
 ### Component Structure
+
 - Use snippets and render tags for reusable markup chunks
 - Reduce duplication with snippets
 - Keep components small and focused

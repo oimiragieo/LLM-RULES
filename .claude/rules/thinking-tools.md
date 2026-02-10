@@ -11,27 +11,33 @@
 ## Three Thinking Tools
 
 ### 1. Think About Collected Information
+
 **When**: After gathering research, reading docs, exploring code
 **Purpose**: Validate research quality before proceeding
 **Questions**:
+
 - Is information relevant to the task?
 - Are sources credible and current?
 - Do I have enough context to proceed?
 - What gaps remain?
 
 ### 2. Think About Task Adherence
+
 **When**: Mid-implementation, before major decisions
 **Purpose**: Prevent scope creep and ensure alignment
 **Questions**:
+
 - Am I solving the actual problem?
 - Have I drifted from the requirements?
 - Is this change within scope?
 - Should I ask user before proceeding?
 
 ### 3. Think About Whether You Are Done
+
 **When**: Before claiming completion
 **Purpose**: Ensure quality gates passed
 **Questions**:
+
 - Do tests pass (with evidence)?
 - Is code linted and formatted?
 - Are requirements fully met?

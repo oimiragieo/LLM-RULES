@@ -4,27 +4,17 @@
   "title": "Git Expert Output",
   "description": "Validation schema for git-expert skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
       "description": "Skill-specific output data",
-      "required": [
-        "operationType",
-        "commandsExecuted"
-      ],
+      "required": ["operationType", "commandsExecuted"],
       "properties": {
         "operationType": {
           "type": "string",
@@ -51,10 +41,7 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": [
-              "command",
-              "exitCode"
-            ],
+            "required": ["command", "exitCode"],
             "properties": {
               "command": {
                 "type": "string",
@@ -199,10 +186,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "command",
-              "error"
-            ],
+            "required": ["command", "error"],
             "properties": {
               "command": {
                 "type": "string"

@@ -11,6 +11,7 @@
 ## Onboarding Checklist
 
 ### Phase 1: Structure Discovery
+
 - [ ] Identify project type (monorepo, polyrepo, microservices)
 - [ ] Map directory structure (src, tests, docs, config)
 - [ ] Locate build configuration (package.json, pom.xml, Cargo.toml)
@@ -18,6 +19,7 @@
 - [ ] Identify CI/CD configuration (.github, .gitlab-ci.yml)
 
 ### Phase 2: Command Discovery
+
 - [ ] Build command (pnpm build, cargo build, mvn package)
 - [ ] Test command (pnpm test, pytest, go test)
 - [ ] Lint command (pnpm lint, flake8, cargo clippy)
@@ -26,6 +28,7 @@
 - [ ] Deploy command (if applicable)
 
 ### Phase 3: Workflow Understanding
+
 - [ ] Branching strategy (gitflow, trunk-based)
 - [ ] Code review process
 - [ ] Testing requirements
@@ -33,6 +36,7 @@
 - [ ] Deployment process
 
 ### Phase 4: Persistent Memory Creation
+
 - [ ] Create `.claude/context/memory/named/project-structure.md`
 - [ ] Create `.claude/context/memory/named/build-commands.md`
 - [ ] Create `.claude/context/memory/named/testing-workflow.md`
@@ -52,29 +56,35 @@
 # Project Onboarding: [Project Name]
 
 ## Quick Start
+
 - Build: `[command]`
 - Test: `[command]`
 - Lint: `[command]`
 - Dev: `[command]`
 
 ## Project Structure
+
 [Directory tree with annotations]
 
 ## Key Technologies
+
 - Framework: [e.g., React, FastAPI]
 - Language: [e.g., TypeScript, Python]
 - Package Manager: [e.g., pnpm, poetry]
 - Test Framework: [e.g., Vitest, pytest]
 
 ## Development Workflow
+
 1. [Step-by-step workflow]
 2. [Include branch naming, commit format]
 
 ## Common Patterns
+
 - [Pattern 1 with example]
 - [Pattern 2 with example]
 
 ## Gotchas
+
 - [Common mistake and how to avoid it]
 ```
 

@@ -3,18 +3,11 @@
   "title": "Planning with Files Output",
   "description": "Output schema for planning-with-files skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -23,24 +16,14 @@
       "properties": {
         "output": {
           "type": "object",
-          "required": [
-            "taskId",
-            "planFile",
-            "findingsFile",
-            "progressFile"
-          ],
+          "required": ["taskId", "planFile", "findingsFile", "progressFile"],
           "properties": {
             "taskId": {
               "type": "string"
             },
             "planFile": {
               "type": "object",
-              "required": [
-                "path",
-                "status",
-                "lastUpdated",
-                "steps"
-              ],
+              "required": ["path", "status", "lastUpdated", "steps"],
               "properties": {
                 "path": {
                   "type": "string",
@@ -48,11 +31,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "in_progress",
-                    "blocked",
-                    "complete"
-                  ]
+                  "enum": ["in_progress", "blocked", "complete"]
                 },
                 "lastUpdated": {
                   "type": "string",
@@ -65,11 +44,7 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "number",
-                      "description",
-                      "status"
-                    ],
+                    "required": ["number", "description", "status"],
                     "properties": {
                       "number": {
                         "type": "integer"
@@ -79,12 +54,7 @@
                       },
                       "status": {
                         "type": "string",
-                        "enum": [
-                          "not_started",
-                          "in_progress",
-                          "done",
-                          "blocked"
-                        ]
+                        "enum": ["not_started", "in_progress", "done", "blocked"]
                       },
                       "dependencies": {
                         "type": "array",
@@ -117,11 +87,7 @@
             },
             "findingsFile": {
               "type": "object",
-              "required": [
-                "path",
-                "lastUpdated",
-                "findings"
-              ],
+              "required": ["path", "lastUpdated", "findings"],
               "properties": {
                 "path": {
                   "type": "string",
@@ -135,12 +101,7 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "date",
-                      "context",
-                      "finding",
-                      "impact"
-                    ],
+                    "required": ["date", "context", "finding", "impact"],
                     "properties": {
                       "date": {
                         "type": "string"
@@ -164,11 +125,7 @@
             },
             "progressFile": {
               "type": "object",
-              "required": [
-                "path",
-                "lastUpdated",
-                "completed"
-              ],
+              "required": ["path", "lastUpdated", "completed"],
               "properties": {
                 "path": {
                   "type": "string",
@@ -182,12 +139,7 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "date",
-                      "step",
-                      "duration",
-                      "evidence"
-                    ],
+                    "required": ["date", "step", "duration", "evidence"],
                     "properties": {
                       "date": {
                         "type": "string"
@@ -239,9 +191,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

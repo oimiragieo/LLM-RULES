@@ -4,29 +4,18 @@
   "title": "Ripgrep Skill Output",
   "description": "Validates output from ripgrep skill - Fast code search results",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Ripgrep search results",
-      "required": [
-        "matches",
-        "files",
-        "patterns"
-      ],
+      "required": ["matches", "files", "patterns"],
       "properties": {
         "matches": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "file",
-              "line",
-              "content"
-            ],
+            "required": ["file", "line", "content"],
             "properties": {
               "file": {
                 "type": "string"
@@ -74,10 +63,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "pattern",
-              "matchCount"
-            ],
+            "required": ["pattern", "matchCount"],
             "properties": {
               "pattern": {
                 "type": "string"
@@ -131,10 +117,7 @@
         },
         "summary": {
           "type": "object",
-          "required": [
-            "totalMatches",
-            "filesMatched"
-          ],
+          "required": ["totalMatches", "filesMatched"],
           "properties": {
             "totalMatches": {
               "type": "number",
@@ -159,11 +142,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

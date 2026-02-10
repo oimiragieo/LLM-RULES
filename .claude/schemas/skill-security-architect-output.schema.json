@@ -3,18 +3,11 @@
   "title": "Security Architect Output",
   "description": "Validates output from security-architect skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -33,20 +26,14 @@
           "properties": {
             "threatModel": {
               "type": "object",
-              "required": [
-                "categories"
-              ],
+              "required": ["categories"],
               "properties": {
                 "categories": {
                   "type": "array",
                   "description": "STRIDE threat categories",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "threat",
-                      "identified",
-                      "mitigations"
-                    ],
+                    "required": ["threat", "identified", "mitigations"],
                     "properties": {
                       "threat": {
                         "type": "string",
@@ -81,21 +68,14 @@
             },
             "owaspAnalysis": {
               "type": "object",
-              "required": [
-                "categories"
-              ],
+              "required": ["categories"],
               "properties": {
                 "categories": {
                   "type": "array",
                   "description": "OWASP Top 10 analysis",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "id",
-                      "name",
-                      "vulnerable",
-                      "findings"
-                    ],
+                    "required": ["id", "name", "vulnerable", "findings"],
                     "properties": {
                       "id": {
                         "type": "string",
@@ -127,22 +107,11 @@
               "description": "Security findings categorized by severity",
               "items": {
                 "type": "object",
-                "required": [
-                  "severity",
-                  "category",
-                  "description",
-                  "location",
-                  "remediation"
-                ],
+                "required": ["severity", "category", "description", "location", "remediation"],
                 "properties": {
                   "severity": {
                     "type": "string",
-                    "enum": [
-                      "CRITICAL",
-                      "HIGH",
-                      "MEDIUM",
-                      "LOW"
-                    ]
+                    "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
                   },
                   "category": {
                     "type": "string",
@@ -178,11 +147,7 @@
               "description": "Prioritized remediation steps",
               "items": {
                 "type": "object",
-                "required": [
-                  "priority",
-                  "step",
-                  "relatedFindings"
-                ],
+                "required": ["priority", "step", "relatedFindings"],
                 "properties": {
                   "priority": {
                     "type": "integer",
@@ -196,12 +161,7 @@
                   },
                   "effort": {
                     "type": "string",
-                    "enum": [
-                      "trivial",
-                      "small",
-                      "medium",
-                      "large"
-                    ]
+                    "enum": ["trivial", "small", "medium", "large"]
                   },
                   "relatedFindings": {
                     "type": "array",
@@ -268,9 +228,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

@@ -2,18 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Svelte Expert Output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -22,18 +15,11 @@
       "properties": {
         "output": {
           "type": "object",
-          "required": [
-            "language",
-            "framework",
-            "codeGenerated"
-          ],
+          "required": ["language", "framework", "codeGenerated"],
           "properties": {
             "language": {
               "type": "string",
-              "enum": [
-                "TypeScript",
-                "JavaScript"
-              ]
+              "enum": ["TypeScript", "JavaScript"]
             },
             "framework": {
               "const": "Svelte"
@@ -46,10 +32,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "file",
-                  "content"
-                ],
+                "required": ["file", "content"],
                 "properties": {
                   "file": {
                     "type": "string"
@@ -59,13 +42,7 @@
                   },
                   "componentType": {
                     "type": "string",
-                    "enum": [
-                      "component",
-                      "page",
-                      "layout",
-                      "store",
-                      "server-load"
-                    ]
+                    "enum": ["component", "page", "layout", "store", "server-load"]
                   },
                   "runes": {
                     "type": "array",
@@ -102,9 +79,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

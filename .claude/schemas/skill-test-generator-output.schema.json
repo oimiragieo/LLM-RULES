@@ -4,18 +4,11 @@
   "title": "Test Generator Skill Output Verification",
   "description": "Verifiable output from the test-generator skill that proves test creation occurred",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -28,12 +21,7 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": [
-              "path",
-              "test_type",
-              "test_cases_count",
-              "lines_of_code"
-            ],
+            "required": ["path", "test_type", "test_cases_count", "lines_of_code"],
             "properties": {
               "path": {
                 "type": "string",
@@ -41,14 +29,7 @@
               },
               "test_type": {
                 "type": "string",
-                "enum": [
-                  "unit",
-                  "integration",
-                  "e2e",
-                  "component",
-                  "api",
-                  "snapshot"
-                ],
+                "enum": ["unit", "integration", "e2e", "component", "api", "snapshot"],
                 "description": "Type of test file generated"
               },
               "test_cases_count": {
@@ -78,11 +59,7 @@
           "type": "string",
           "pattern": "^\\d+%$",
           "description": "Target code coverage percentage (e.g., '80%')",
-          "examples": [
-            "80%",
-            "90%",
-            "100%"
-          ]
+          "examples": ["80%", "90%", "100%"]
         },
         "framework_used": {
           "type": "string",
@@ -183,11 +160,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "test_files_generated",
-        "test_cases_count",
-        "framework_used"
-      ]
+      "required": ["test_files_generated", "test_cases_count", "framework_used"]
     }
   },
   "additionalProperties": false

@@ -4,29 +4,17 @@
   "title": "Static Analysis Skill Output",
   "description": "Verifiable output from the static-analysis skill proving CodeQL/Semgrep scanning occurred with SARIF-structured results",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
       "description": "Domain-specific output for static-analysis",
-      "required": [
-        "tools_used",
-        "languages_scanned",
-        "findings_summary",
-        "findings"
-      ],
+      "required": ["tools_used", "languages_scanned", "findings_summary", "findings"],
       "properties": {
         "tools_used": {
           "type": "array",
@@ -34,18 +22,11 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": [
-              "name",
-              "version",
-              "rule_sets"
-            ],
+            "required": ["name", "version", "rule_sets"],
             "properties": {
               "name": {
                 "type": "string",
-                "enum": [
-                  "codeql",
-                  "semgrep"
-                ],
+                "enum": ["codeql", "semgrep"],
                 "description": "Tool name"
               },
               "version": {
@@ -87,13 +68,7 @@
         },
         "findings_summary": {
           "type": "object",
-          "required": [
-            "total",
-            "critical",
-            "high",
-            "medium",
-            "low"
-          ],
+          "required": ["total", "critical", "high", "medium", "low"],
           "properties": {
             "total": {
               "type": "number",
@@ -131,13 +106,7 @@
           "description": "Individual security findings",
           "items": {
             "type": "object",
-            "required": [
-              "rule_id",
-              "severity",
-              "message",
-              "file",
-              "line"
-            ],
+            "required": ["rule_id", "severity", "message", "file", "line"],
             "properties": {
               "rule_id": {
                 "type": "string",
@@ -145,13 +114,7 @@
               },
               "severity": {
                 "type": "string",
-                "enum": [
-                  "CRITICAL",
-                  "HIGH",
-                  "MEDIUM",
-                  "LOW",
-                  "INFORMATIONAL"
-                ]
+                "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"]
               },
               "message": {
                 "type": "string",
@@ -181,11 +144,7 @@
               },
               "confidence": {
                 "type": "string",
-                "enum": [
-                  "HIGH",
-                  "MEDIUM",
-                  "LOW"
-                ]
+                "enum": ["HIGH", "MEDIUM", "LOW"]
               },
               "remediation": {
                 "type": "string",

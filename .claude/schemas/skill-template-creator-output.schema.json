@@ -4,18 +4,11 @@
   "title": "Template Creator Output",
   "description": "Schema for template creation artifacts",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -34,11 +27,7 @@
         },
         "templateType": {
           "type": "string",
-          "enum": [
-            "spawn",
-            "artifact",
-            "code"
-          ],
+          "enum": ["spawn", "artifact", "code"],
           "description": "Template category"
         },
         "placeholders": {
@@ -51,11 +40,7 @@
         },
         "artifactsCreated": {
           "type": "object",
-          "required": [
-            "templateFile",
-            "catalogEntry",
-            "consumingSkillDoc"
-          ],
+          "required": ["templateFile", "catalogEntry", "consumingSkillDoc"],
           "properties": {
             "templateFile": {
               "type": "boolean"
@@ -84,12 +69,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "templateName",
-        "templatePath",
-        "placeholders",
-        "artifactsCreated"
-      ]
+      "required": ["templateName", "templatePath", "placeholders", "artifactsCreated"]
     }
   },
   "additionalProperties": false

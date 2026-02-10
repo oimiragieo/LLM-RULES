@@ -18,6 +18,7 @@
 ## Output Standards
 
 ### Required Specification Elements
+
 1. **Feature Overview**: What the feature does (2-3 sentences)
 2. **User Stories**: As [role], I want [goal], so that [benefit]
 3. **Functional Requirements**: What the system must do
@@ -41,36 +42,38 @@ Acceptance Criteria:
 
 ### Requirement Types
 
-| Type                 | Focus                      | Examples                                |
-| -------------------- | -------------------------- | --------------------------------------- |
-| Functional           | What system does           | "User can upload images", "API returns JSON" |
-| Non-Functional       | Quality attributes         | "Response time <100ms", "99.9% uptime"  |
-| Performance          | Speed, throughput          | "Handles 1000 req/sec", "Loads in 2s"   |
-| Security             | Auth, encryption, privacy  | "OAuth 2.1", "Encrypt PII at rest"      |
-| Usability            | User experience            | "3 clicks or less", "Mobile-responsive" |
-| Scalability          | Growth capacity            | "Scales to 10x users", "Horizontal scaling" |
+| Type           | Focus                     | Examples                                     |
+| -------------- | ------------------------- | -------------------------------------------- |
+| Functional     | What system does          | "User can upload images", "API returns JSON" |
+| Non-Functional | Quality attributes        | "Response time <100ms", "99.9% uptime"       |
+| Performance    | Speed, throughput         | "Handles 1000 req/sec", "Loads in 2s"        |
+| Security       | Auth, encryption, privacy | "OAuth 2.1", "Encrypt PII at rest"           |
+| Usability      | User experience           | "3 clicks or less", "Mobile-responsive"      |
+| Scalability    | Growth capacity           | "Scales to 10x users", "Horizontal scaling"  |
 
 ## Anti-Patterns
 
-| Anti-Pattern                  | Problem                         | Fix                                    |
-| ----------------------------- | ------------------------------- | -------------------------------------- |
-| Vague requirements            | "Make it fast" is not measurable| Specify: "Response time <100ms"        |
-| No edge cases                 | Missing error handling          | Document: empty input, bad data, timeouts |
-| No NFRs                       | Quality attributes forgotten    | Add: performance, security, scalability |
-| Assumptions not documented    | Hidden constraints              | Explicitly list all assumptions        |
-| No acceptance criteria        | Can't tell when done            | Add testable conditions                |
-| "Should" instead of "must"    | Ambiguous priority              | Use "must" for required, "may" for optional |
-| Implementation details in spec| Spec tells HOW, not WHAT        | Focus on behavior, not implementation  |
+| Anti-Pattern                   | Problem                          | Fix                                         |
+| ------------------------------ | -------------------------------- | ------------------------------------------- |
+| Vague requirements             | "Make it fast" is not measurable | Specify: "Response time <100ms"             |
+| No edge cases                  | Missing error handling           | Document: empty input, bad data, timeouts   |
+| No NFRs                        | Quality attributes forgotten     | Add: performance, security, scalability     |
+| Assumptions not documented     | Hidden constraints               | Explicitly list all assumptions             |
+| No acceptance criteria         | Can't tell when done             | Add testable conditions                     |
+| "Should" instead of "must"     | Ambiguous priority               | Use "must" for required, "may" for optional |
+| Implementation details in spec | Spec tells HOW, not WHAT         | Focus on behavior, not implementation       |
 
 ## Integration Points
 
 ### Agents Using This Skill
+
 - **planner** (after spec): Creates plan from specification
 - **pm**: Gathers requirements from stakeholders
 - **analyst**: Business requirement analysis
 - **qa**: Derives test cases from acceptance criteria
 
 ### Related Skills
+
 - **spec-init**: Interactive requirements gathering
 - **interactive-requirements-gathering**: Structured questionnaire
 - **prd-generator**: Creates PRD from specification
@@ -78,6 +81,7 @@ Acceptance Criteria:
 - **plan-generator**: Creates implementation plan from spec
 
 ### Workflows
+
 - **feature-development-workflow.md**: Spec gathering in Triage phase
 - **enterprise-workflow.md**: Requirements gathering before Design
 - **sparc-methodology.md**: Specification as first SPARC phase
@@ -85,6 +89,7 @@ Acceptance Criteria:
 ## Specification Checklist
 
 Before finalizing specification, verify:
+
 - [ ] Feature overview is clear (2-3 sentences)
 - [ ] At least one user story per role/persona
 - [ ] Functional requirements are testable
@@ -101,13 +106,13 @@ Before finalizing specification, verify:
 
 Use this template for non-functional requirements:
 
-| Category   | Requirement                  | Measurement             | Priority |
-| ---------- | ---------------------------- | ----------------------- | -------- |
-| Performance| API response time            | 95th percentile <100ms  | Must     |
-| Security   | Authentication               | OAuth 2.1 + JWT         | Must     |
-| Scalability| Concurrent users             | 1000 users              | Must     |
-| Availability| Uptime                       | 99.9% (8h downtime/year)| Must     |
-| Usability  | Time to complete task        | <2 minutes              | Should   |
+| Category     | Requirement           | Measurement              | Priority |
+| ------------ | --------------------- | ------------------------ | -------- |
+| Performance  | API response time     | 95th percentile <100ms   | Must     |
+| Security     | Authentication        | OAuth 2.1 + JWT          | Must     |
+| Scalability  | Concurrent users      | 1000 users               | Must     |
+| Availability | Uptime                | 99.9% (8h downtime/year) | Must     |
+| Usability    | Time to complete task | <2 minutes               | Should   |
 
 ## Iron Law
 
@@ -118,6 +123,7 @@ NO IMPLEMENTATION WITHOUT SPECIFICATION FOR STANDARD+ COMPLEXITY
 STANDARD and higher complexity tasks must have a specification before implementation begins.
 
 ## Related References
+
 - `.claude/skills/spec-gathering/SKILL.md` - Full skill documentation
 - `spec-init` skill - Interactive spec creation
 - `prd-generator` skill - PRD creation from spec

@@ -3,18 +3,11 @@
   "title": "Complexity Assessment Output",
   "description": "Validates output from complexity-assessment skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -34,39 +27,21 @@
           "properties": {
             "workflowType": {
               "type": "string",
-              "enum": [
-                "FEATURE",
-                "REFACTOR",
-                "INVESTIGATION",
-                "MIGRATION",
-                "SIMPLE"
-              ],
+              "enum": ["FEATURE", "REFACTOR", "INVESTIGATION", "MIGRATION", "SIMPLE"],
               "description": "Type of work being requested"
             },
             "complexityTier": {
               "type": "string",
-              "enum": [
-                "SIMPLE",
-                "STANDARD",
-                "COMPLEX",
-                "EPIC"
-              ],
+              "enum": ["SIMPLE", "STANDARD", "COMPLEX", "EPIC"],
               "description": "Complexity level of the task"
             },
             "justification": {
               "type": "object",
-              "required": [
-                "fileCount",
-                "serviceCount",
-                "reasoning"
-              ],
+              "required": ["fileCount", "serviceCount", "reasoning"],
               "properties": {
                 "fileCount": {
                   "type": "object",
-                  "required": [
-                    "estimated",
-                    "basis"
-                  ],
+                  "required": ["estimated", "basis"],
                   "properties": {
                     "estimated": {
                       "type": "integer",
@@ -75,11 +50,7 @@
                     },
                     "basis": {
                       "type": "string",
-                      "enum": [
-                        "scanned",
-                        "analyzed",
-                        "estimated"
-                      ],
+                      "enum": ["scanned", "analyzed", "estimated"],
                       "description": "How file count was determined"
                     }
                   }
@@ -115,21 +86,12 @@
             },
             "validationDepth": {
               "type": "string",
-              "enum": [
-                "spot-check",
-                "standard",
-                "comprehensive",
-                "multi-phase"
-              ],
+              "enum": ["spot-check", "standard", "comprehensive", "multi-phase"],
               "description": "QA validation level required"
             },
             "riskFactors": {
               "type": "object",
-              "required": [
-                "hasUnfamiliarTech",
-                "hiddenComplexity",
-                "dependencies"
-              ],
+              "required": ["hasUnfamiliarTech", "hiddenComplexity", "dependencies"],
               "properties": {
                 "hasUnfamiliarTech": {
                   "type": "boolean",
@@ -158,12 +120,7 @@
                 },
                 "rollbackComplexity": {
                   "type": "string",
-                  "enum": [
-                    "trivial",
-                    "moderate",
-                    "difficult",
-                    "impossible"
-                  ],
+                  "enum": ["trivial", "moderate", "difficult", "impossible"],
                   "description": "How easy is rollback if something fails?"
                 }
               }
@@ -181,11 +138,7 @@
                 },
                 "confidence": {
                   "type": "string",
-                  "enum": [
-                    "low",
-                    "medium",
-                    "high"
-                  ]
+                  "enum": ["low", "medium", "high"]
                 }
               }
             }
@@ -194,9 +147,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

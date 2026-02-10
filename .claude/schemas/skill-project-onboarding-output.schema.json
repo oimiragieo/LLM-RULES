@@ -3,18 +3,11 @@
   "title": "Project Onboarding Output",
   "description": "Output schema for project-onboarding skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -48,19 +41,13 @@
             },
             "structure": {
               "type": "object",
-              "required": [
-                "directories",
-                "keyFiles"
-              ],
+              "required": ["directories", "keyFiles"],
               "properties": {
                 "directories": {
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "path",
-                      "purpose"
-                    ],
+                    "required": ["path", "purpose"],
                     "properties": {
                       "path": {
                         "type": "string"
@@ -75,10 +62,7 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "path",
-                      "purpose"
-                    ],
+                    "required": ["path", "purpose"],
                     "properties": {
                       "path": {
                         "type": "string"
@@ -93,17 +77,11 @@
             },
             "commands": {
               "type": "object",
-              "required": [
-                "build",
-                "test"
-              ],
+              "required": ["build", "test"],
               "properties": {
                 "build": {
                   "type": "object",
-                  "required": [
-                    "command",
-                    "description"
-                  ],
+                  "required": ["command", "description"],
                   "properties": {
                     "command": {
                       "type": "string"
@@ -118,10 +96,7 @@
                 },
                 "test": {
                   "type": "object",
-                  "required": [
-                    "command",
-                    "description"
-                  ],
+                  "required": ["command", "description"],
                   "properties": {
                     "command": {
                       "type": "string"
@@ -202,19 +177,11 @@
             },
             "workflow": {
               "type": "object",
-              "required": [
-                "branchingStrategy",
-                "codeReview"
-              ],
+              "required": ["branchingStrategy", "codeReview"],
               "properties": {
                 "branchingStrategy": {
                   "type": "string",
-                  "enum": [
-                    "gitflow",
-                    "trunk-based",
-                    "feature-branch",
-                    "custom"
-                  ]
+                  "enum": ["gitflow", "trunk-based", "feature-branch", "custom"]
                 },
                 "branchNaming": {
                   "type": "string",
@@ -258,11 +225,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "description",
-                  "example"
-                ],
+                "required": ["name", "description", "example"],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -280,10 +243,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "issue",
-                  "solution"
-                ],
+                "required": ["issue", "solution"],
                 "properties": {
                   "issue": {
                     "type": "string"
@@ -293,12 +253,7 @@
                   },
                   "platform": {
                     "type": "string",
-                    "enum": [
-                      "all",
-                      "windows",
-                      "macos",
-                      "linux"
-                    ]
+                    "enum": ["all", "windows", "macos", "linux"]
                   }
                 }
               }
@@ -307,11 +262,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "path",
-                  "purpose"
-                ],
+                "required": ["name", "path", "purpose"],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -331,9 +282,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

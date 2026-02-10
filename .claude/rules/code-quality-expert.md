@@ -15,13 +15,16 @@
 - Keep constants at the top of the file or in a dedicated constants file
 
 **Example:**
+
 ```typescript
 // ❌ BAD
-if (status === 200) { }
+if (status === 200) {
+}
 
 // ✅ GOOD
 const HTTP_OK = 200;
-if (status === HTTP_OK) { }
+if (status === HTTP_OK) {
+}
 ```
 
 ## Meaningful Names
@@ -31,6 +34,7 @@ if (status === HTTP_OK) { }
 - Avoid abbreviations unless they're universally understood
 
 **Example:**
+
 ```typescript
 // ❌ BAD
 const d = new Date();
@@ -48,6 +52,7 @@ const authenticatedUser = getUser();
 - Document APIs, complex algorithms, and non-obvious side effects
 
 **Example:**
+
 ```typescript
 // ❌ BAD
 // Increment counter by 1
@@ -65,6 +70,7 @@ await delay(1000);
 - If a function needs a comment to explain what it does, it should be split
 
 **Example:**
+
 ```typescript
 // ❌ BAD
 function processUserDataAndSendEmail(user) {
@@ -91,6 +97,7 @@ function notifyUser(user) {
 - Maintain single sources of truth
 
 **Example:**
+
 ```typescript
 // ❌ BAD
 const result1 = await fetch(url1).then(r => r.json());
@@ -117,6 +124,7 @@ const result2 = await fetchJSON(url2);
 - Move nested conditionals into well-named functions
 
 **Example:**
+
 ```typescript
 // ❌ BAD
 if (user && user.age >= 18 && user.verified) {

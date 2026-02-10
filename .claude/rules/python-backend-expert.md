@@ -11,6 +11,7 @@
 ## Framework Standards
 
 ### Django
+
 - Use class-based views for HTMX responses
 - Utilize form and model form classes for handling and validation
 - Use middleware judiciously for cross-cutting concerns (auth, logging, caching)
@@ -18,12 +19,14 @@
 - Use Django ORM for database operations
 
 ### FastAPI
+
 - Use Pydantic models for request/response validation
 - Implement dependency injection for shared logic
 - Use async/await for I/O-bound operations
 - Follow OpenAPI/Swagger documentation standards
 
 ### Database Migrations
+
 - Use Alembic for database migrations
 - Write reversible migration scripts
 - Test migrations on staging before production

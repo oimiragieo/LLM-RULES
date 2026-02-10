@@ -50,6 +50,17 @@ const { createLogger } = require('../utils/logger.cjs');
 
 const logger = createLogger('lancedb-client');
 
+const TYPED_METADATA_FIELDS = {
+  filePath: 'meta_filePath',
+  language: 'meta_language',
+  type: 'meta_type',
+  lineStart: 'meta_lineStart',
+  lineEnd: 'meta_lineEnd',
+  name: 'meta_name',
+  signature: 'meta_signature',
+  tokenCount: 'meta_tokenCount',
+};
+
 /**
  * @typedef {Object} EmbeddingStatus
  * @property {'unknown'|'ready'|'unavailable'|'disabled'} status
@@ -127,6 +138,7 @@ class MemoryVectorStore {
       mode: this.config.embeddingMode,
       reason: null,
     };
+    this._typedMetadataSupported = null;
     // GPU detection state
     this.device = 'cpu'; // Default to CPU
     this.gpuDetected = false;
@@ -590,11 +602,13 @@ class MemoryVectorStore {
       }
       const text = doc.text || doc.content || '';
       const metadataObj = typeof doc.metadata === 'object' && doc.metadata ? doc.metadata : {};
+      const typedMetadata = this._toTypedMetadataColumns(metadataObj);
       return {
         id: doc.id || `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         vector,
         text,
         metadata: JSON.stringify(metadataObj),
+        ...typedMetadata,
         timestamp: Date.now(),
       };
     });
@@ -605,8 +619,29 @@ class MemoryVectorStore {
       if (Array.isArray(firstVector)) {
         this._tableVectorDim = firstVector.length;
       }
+      this._typedMetadataSupported = true;
     } else {
-      await this.table.add(data);
+      try {
+        await this.table.add(data);
+        if (this._typedMetadataSupported === null) {
+          this._typedMetadataSupported = true;
+        }
+      } catch (err) {
+        // Existing tables may predate typed metadata columns; retry with legacy row shape.
+        const message = err instanceof Error ? err.message : String(err);
+        if (this._typedMetadataSupported === false || !/schema|column|field|arrow/i.test(message)) {
+          throw err;
+        }
+        this._typedMetadataSupported = false;
+        const legacyData = data.map(row => {
+          const clone = { ...row };
+          for (const col of Object.values(TYPED_METADATA_FIELDS)) {
+            delete clone[col];
+          }
+          return clone;
+        });
+        await this.table.add(legacyData);
+      }
     }
   }
 
@@ -671,18 +706,25 @@ class MemoryVectorStore {
       if (typeof options.filters === 'string') {
         searchBuilder = searchBuilder.where(options.filters);
       } else if (typeof options.filters === 'object') {
-        // Minimal adapter for common Chroma-style filters (metadata stored as JSON string).
-        // Example: { type: 'learning' } -> metadata LIKE '%"type":"learning"%'
-        const clauses = [];
-        for (const [key, value] of Object.entries(options.filters)) {
-          // metadata is stored as a JSON string; quote characters are safe inside a single-quoted SQL string.
-          // Escape only the SQL string delimiter.
-          const k = String(key).replace(/'/g, "''");
-          const v = String(value).replace(/'/g, "''");
-          clauses.push(`metadata LIKE '%"${k}":"${v}"%'`);
-        }
-        if (clauses.length > 0) {
-          searchBuilder = searchBuilder.where(clauses.join(' AND '));
+        const typedClause = this._shouldUseTypedFilters(options.filters, options)
+          ? this._buildTypedWhereClause(options.filters)
+          : null;
+        if (typedClause && this._typedMetadataSupported !== false) {
+          try {
+            searchBuilder = searchBuilder.where(typedClause);
+            this._typedMetadataSupported = true;
+          } catch {
+            this._typedMetadataSupported = false;
+            const legacyClause = this._buildLegacyMetadataWhereClause(options.filters);
+            if (legacyClause) {
+              searchBuilder = searchBuilder.where(legacyClause);
+            }
+          }
+        } else {
+          const legacyClause = this._buildLegacyMetadataWhereClause(options.filters);
+          if (legacyClause) {
+            searchBuilder = searchBuilder.where(legacyClause);
+          }
         }
       }
     }
@@ -712,7 +754,6 @@ class MemoryVectorStore {
 
   /**
    * Delete documents by metadata match.
-   * Uses a LIKE filter on the JSON-encoded metadata column.
    *
    * @param {string} field
    * @param {string|number|boolean} value
@@ -722,16 +763,88 @@ class MemoryVectorStore {
     if (!this.isInitialized) await this.initialize();
     if (!this.table) return false;
 
-    const k = String(field).replace(/'/g, "''");
-    const v = String(value).replace(/'/g, "''");
-    const clause = `metadata LIKE '%"${k}":"${v}"%'`;
+    const typedColumn = TYPED_METADATA_FIELDS[field];
+    let clause = null;
+    if (typedColumn && this._typedMetadataSupported !== false) {
+      clause = `${typedColumn} = ${this._toSqlLiteral(value)}`;
+    } else {
+      const k = String(field).replace(/'/g, "''");
+      const v = String(value).replace(/'/g, "''");
+      clause = `metadata LIKE '%"${k}":"${v}"%'`;
+    }
 
     try {
       await this.table.delete(clause);
+      if (typedColumn) this._typedMetadataSupported = true;
       return true;
     } catch (_e) {
+      if (typedColumn) {
+        try {
+          const k = String(field).replace(/'/g, "''");
+          const v = String(value).replace(/'/g, "''");
+          await this.table.delete(`metadata LIKE '%"${k}":"${v}"%'`);
+          this._typedMetadataSupported = false;
+          return true;
+        } catch (_fallbackErr) {
+          // fallback delete failed; caller will get false
+          void _fallbackErr;
+        }
+      }
       return false;
     }
+  }
+
+  _toSqlLiteral(value) {
+    if (value === null || value === undefined) return 'NULL';
+    if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+    if (typeof value === 'boolean') return value ? 'TRUE' : 'FALSE';
+    return `'${String(value).replace(/'/g, "''")}'`;
+  }
+
+  _toTypedMetadataColumns(metadata) {
+    const m = typeof metadata === 'object' && metadata ? metadata : {};
+    return {
+      // LanceDB schema inference requires concrete scalar types at table creation.
+      // Use sentinel defaults so columns are always inferable.
+      meta_filePath: m.filePath ? String(m.filePath) : '',
+      meta_language: m.language ? String(m.language) : '',
+      meta_type: m.type ? String(m.type) : '',
+      meta_lineStart: Number.isFinite(m.lineStart) ? Number(m.lineStart) : -1,
+      meta_lineEnd: Number.isFinite(m.lineEnd) ? Number(m.lineEnd) : -1,
+      meta_name: m.name ? String(m.name) : '',
+      meta_signature: m.signature ? String(m.signature) : '',
+      meta_tokenCount: Number.isFinite(m.tokenCount) ? Number(m.tokenCount) : -1,
+    };
+  }
+
+  _buildTypedWhereClause(filters) {
+    if (!filters || typeof filters !== 'object') return null;
+    const clauses = [];
+    for (const [key, value] of Object.entries(filters)) {
+      const column = TYPED_METADATA_FIELDS[key];
+      if (!column) return null;
+      clauses.push(`${column} = ${this._toSqlLiteral(value)}`);
+    }
+    return clauses.length > 0 ? clauses.join(' AND ') : null;
+  }
+
+  _shouldUseTypedFilters(filters, options = {}) {
+    if (!filters || typeof filters !== 'object') return false;
+    const forceTyped = options.typedFilters === true || process.env.LANCEDB_TYPED_FILTERS === 'on';
+    if (forceTyped) return true;
+    // Default heuristic: typed filters are most valuable for numeric columns.
+    return ['lineStart', 'lineEnd', 'tokenCount'].some(key => key in filters);
+  }
+
+  _buildLegacyMetadataWhereClause(filters) {
+    if (!filters || typeof filters !== 'object') return null;
+    const clauses = [];
+    for (const [key, value] of Object.entries(filters)) {
+      const k = String(key).replace(/'/g, "''");
+      const v = String(value).replace(/'/g, "''");
+      clauses.push(`metadata LIKE '%"${k}":"${v}"%'`);
+    }
+    return clauses.length > 0 ? clauses.join(' AND ') : null;
   }
 
   /**

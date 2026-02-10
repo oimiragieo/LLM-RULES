@@ -523,6 +523,75 @@ function checkToolScope(hookInput, toolName) {
 }
 
 // =============================================================================
+// Check 4: Read Safety Guard (prevents EISDIR and large unchunked reads)
+// =============================================================================
+
+const READ_CHUNK_GUARD_BYTES = Number(process.env.READ_CHUNK_GUARD_BYTES || 120000);
+
+function hasReadWindow(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return false;
+  const numeric = value => Number.isFinite(Number(value)) && Number(value) >= 0;
+  return (
+    numeric(toolInput.offset) ||
+    numeric(toolInput.limit) ||
+    numeric(toolInput.start_line) ||
+    numeric(toolInput.end_line) ||
+    numeric(toolInput.startLine) ||
+    numeric(toolInput.endLine)
+  );
+}
+
+function resolveReadPath(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return null;
+  const raw = toolInput.file_path || toolInput.filePath || toolInput.path || null;
+  if (!raw || typeof raw !== 'string') return null;
+  return path.isAbsolute(raw) ? raw : path.resolve(PROJECT_ROOT, raw);
+}
+
+function checkReadSafety(toolName, toolInput) {
+  if (toolName !== 'Read') {
+    return { checked: false, reason: 'not_read_tool' };
+  }
+
+  try {
+    const targetPath = resolveReadPath(toolInput);
+    if (!targetPath || !fs.existsSync(targetPath)) {
+      return { checked: true, action: 'allow' };
+    }
+
+    const stats = fs.statSync(targetPath);
+
+    if (stats.isDirectory()) {
+      return {
+        checked: true,
+        action: 'block',
+        message:
+          `[READ SAFETY] "${targetPath}" is a directory. ` +
+          'Use Glob/rg --files for directory listing, then Read a specific file.',
+      };
+    }
+
+    // If file is large and caller did not request a window, force chunked read.
+    if (stats.size > READ_CHUNK_GUARD_BYTES && !hasReadWindow(toolInput)) {
+      return {
+        checked: true,
+        action: 'block',
+        message:
+          `[READ SAFETY] Large file (${stats.size} bytes) requires chunked Read. ` +
+          'Retry with offset/limit (or start_line/end_line), e.g. offset: 0, limit: 4000.',
+      };
+    }
+
+    return { checked: true, action: 'allow' };
+  } catch (err) {
+    if (process.env.DEBUG_HOOKS) {
+      console.error('[pre-tool-unified:read-safety] Error:', err.message);
+    }
+    return { checked: false, error: err.message };
+  }
+}
+
+// =============================================================================
 // Combined Runner
 // =============================================================================
 
@@ -573,6 +642,23 @@ function main() {
       process.exit(2);
     }
 
+    // Check 4: Read Safety Guard
+    const readSafety = checkReadSafety(toolName, toolInput);
+    if (readSafety.action === 'block') {
+      console.log(formatResult('block', readSafety.message));
+      try {
+        eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName,
+          reason: 'read_safety_violation',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
+      process.exit(2);
+    }
+
     // All checks passed
     process.exit(0);
   } catch (err) {
@@ -593,5 +679,8 @@ module.exports = {
   checkSessionCleanup,
   checkExecutionLimit,
   checkToolScope,
+  checkReadSafety,
+  hasReadWindow,
+  resolveReadPath,
   main,
 };

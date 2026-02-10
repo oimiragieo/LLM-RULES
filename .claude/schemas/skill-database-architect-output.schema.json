@@ -4,18 +4,11 @@
   "title": "Database Architect Skill Output Verification",
   "description": "Verifiable output from the database-architect skill that proves database design occurred",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -24,13 +17,7 @@
       "properties": {
         "database_type": {
           "type": "string",
-          "enum": [
-            "postgresql",
-            "mysql",
-            "mongodb",
-            "redis",
-            "other"
-          ],
+          "enum": ["postgresql", "mysql", "mongodb", "redis", "other"],
           "description": "Target database type"
         },
         "schema_design": {
@@ -43,10 +30,7 @@
               "minItems": 1,
               "items": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "columns"
-                ],
+                "required": ["name", "columns"],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -55,10 +39,7 @@
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "required": [
-                        "name",
-                        "type"
-                      ],
+                      "required": ["name", "type"],
                       "properties": {
                         "name": {
                           "type": "string"
@@ -95,10 +76,7 @@
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "required": [
-                        "name",
-                        "columns"
-                      ],
+                      "required": ["name", "columns"],
                       "properties": {
                         "name": {
                           "type": "string"
@@ -114,12 +92,7 @@
                         },
                         "type": {
                           "type": "string",
-                          "enum": [
-                            "btree",
-                            "hash",
-                            "gin",
-                            "gist"
-                          ]
+                          "enum": ["btree", "hash", "gin", "gist"]
                         }
                       },
                       "additionalProperties": false
@@ -131,22 +104,14 @@
             },
             "normalization_level": {
               "type": "string",
-              "enum": [
-                "1NF",
-                "2NF",
-                "3NF",
-                "BCNF"
-              ]
+              "enum": ["1NF", "2NF", "3NF", "BCNF"]
             },
             "denormalizations": {
               "type": "array",
               "description": "Intentional denormalizations with justification",
               "items": {
                 "type": "object",
-                "required": [
-                  "description",
-                  "justification"
-                ],
+                "required": ["description", "justification"],
                 "properties": {
                   "description": {
                     "type": "string"
@@ -160,9 +125,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "tables"
-          ]
+          "required": ["tables"]
         },
         "index_strategy": {
           "type": "object",
@@ -197,12 +160,7 @@
               "description": "Generated migration files",
               "items": {
                 "type": "object",
-                "required": [
-                  "filename",
-                  "description",
-                  "has_up_migration",
-                  "has_down_migration"
-                ],
+                "required": ["filename", "description", "has_up_migration", "has_down_migration"],
                 "properties": {
                   "filename": {
                     "type": "string"
@@ -302,17 +260,11 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "total_tables"
-          ]
+          "required": ["total_tables"]
         }
       },
       "additionalProperties": false,
-      "required": [
-        "database_type",
-        "schema_design",
-        "summary"
-      ]
+      "required": ["database_type", "schema_design", "summary"]
     }
   },
   "additionalProperties": false

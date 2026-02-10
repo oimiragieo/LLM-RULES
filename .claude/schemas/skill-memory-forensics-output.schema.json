@@ -4,18 +4,11 @@
   "title": "Memory Forensics Output",
   "description": "Validation schema for memory-forensics skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -38,10 +31,7 @@
         "memory_dump": {
           "type": "object",
           "description": "Information about the analyzed memory dump",
-          "required": [
-            "file_path",
-            "os_type"
-          ],
+          "required": ["file_path", "os_type"],
           "properties": {
             "file_path": {
               "type": "string",
@@ -49,12 +39,7 @@
             },
             "os_type": {
               "type": "string",
-              "enum": [
-                "Windows",
-                "Linux",
-                "macOS",
-                "Unknown"
-              ],
+              "enum": ["Windows", "Linux", "macOS", "Unknown"],
               "description": "Operating system"
             },
             "os_version": {
@@ -63,12 +48,7 @@
             },
             "architecture": {
               "type": "string",
-              "enum": [
-                "x86",
-                "x86-64",
-                "ARM",
-                "ARM64"
-              ],
+              "enum": ["x86", "x86-64", "ARM", "ARM64"],
               "description": "CPU architecture"
             },
             "dump_size_bytes": {
@@ -93,10 +73,7 @@
           "description": "Processes identified in memory",
           "items": {
             "type": "object",
-            "required": [
-              "pid",
-              "name"
-            ],
+            "required": ["pid", "name"],
             "properties": {
               "pid": {
                 "type": "integer",
@@ -145,20 +122,11 @@
           "description": "Network connections active in memory",
           "items": {
             "type": "object",
-            "required": [
-              "protocol",
-              "local_address",
-              "remote_address"
-            ],
+            "required": ["protocol", "local_address", "remote_address"],
             "properties": {
               "protocol": {
                 "type": "string",
-                "enum": [
-                  "TCP",
-                  "UDP",
-                  "TCPv6",
-                  "UDPv6"
-                ],
+                "enum": ["TCP", "UDP", "TCPv6", "UDPv6"],
                 "description": "Network protocol"
               },
               "local_address": {
@@ -191,11 +159,7 @@
           "description": "Malware indicators of compromise (IOCs)",
           "items": {
             "type": "object",
-            "required": [
-              "type",
-              "value",
-              "severity"
-            ],
+            "required": ["type", "value", "severity"],
             "properties": {
               "type": {
                 "type": "string",
@@ -216,12 +180,7 @@
               },
               "severity": {
                 "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ],
+                "enum": ["critical", "high", "medium", "low"],
                 "description": "Threat severity"
               },
               "description": {
@@ -241,10 +200,7 @@
           "description": "Forensic artifacts extracted from memory",
           "items": {
             "type": "object",
-            "required": [
-              "artifact_type",
-              "description"
-            ],
+            "required": ["artifact_type", "description"],
             "properties": {
               "artifact_type": {
                 "type": "string",
@@ -282,11 +238,7 @@
           "description": "Timeline of events reconstructed from memory",
           "items": {
             "type": "object",
-            "required": [
-              "timestamp",
-              "event_type",
-              "description"
-            ],
+            "required": ["timestamp", "event_type", "description"],
             "properties": {
               "timestamp": {
                 "type": "string",
@@ -351,10 +303,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "analysis_type",
-        "memory_dump"
-      ]
+      "required": ["analysis_type", "memory_dump"]
     }
   },
   "additionalProperties": false

@@ -11,16 +11,19 @@
 ## DragonRuby Standards
 
 ### Naming Conventions
+
 - Use snake_case for file names, method names, variables
 - Use CamelCase for class and module names
 - Follow DragonRuby naming conventions
 
 ### Syntax and Formatting
+
 - Follow Ruby Style Guide (https://rubystyle.guide/)
 - Use Ruby's expressive syntax (unless, ||=, &.)
 - Prefer single quotes for strings unless interpolation needed
 
 ### Error Handling
+
 - Use exceptions for exceptional cases (not control flow)
 - Implement proper error logging
 - Provide user-friendly error messages

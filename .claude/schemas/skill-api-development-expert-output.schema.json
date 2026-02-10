@@ -4,18 +4,11 @@
   "title": "API Development Expert Skill Output",
   "description": "Output schema for REST API development including design, OpenAPI, and best practices",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

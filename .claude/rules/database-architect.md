@@ -19,6 +19,7 @@
 ## Output Standards
 
 ### Required Database Design Elements
+
 1. **Schema Design**: Normalized structure (3NF) with primary/foreign keys
 2. **Index Strategy**: Indexes based on query patterns
 3. **Migration Scripts**: Versioned, reversible migrations
@@ -108,12 +109,12 @@ CREATE INDEX idx_orders_covering ON orders(user_id) INCLUDE (status, created_at)
 
 **Index Anti-Patterns:**
 
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| Index every column | Slows writes, wastes space | Index only queried columns |
-| No indexes | Slow queries (table scans) | Add indexes on WHERE/JOIN columns |
-| Over-indexing | Write performance penalty | Remove unused indexes |
-| Wrong index order | Index not used | Most selective column first |
+| Anti-Pattern       | Problem                    | Fix                               |
+| ------------------ | -------------------------- | --------------------------------- |
+| Index every column | Slows writes, wastes space | Index only queried columns        |
+| No indexes         | Slow queries (table scans) | Add indexes on WHERE/JOIN columns |
+| Over-indexing      | Write performance penalty  | Remove unused indexes             |
+| Wrong index order  | Index not used             | Most selective column first       |
 
 ## Migration Standards
 
@@ -175,12 +176,12 @@ GROUP BY u.email;
 
 **Optimization Patterns:**
 
-| Pattern | When to Use | Example |
-|---------|-------------|---------|
-| **Index Scan** | Small result set | `WHERE id = 'abc'` |
-| **Bitmap Index Scan** | Medium result set | `WHERE status IN ('pending', 'shipped')` |
-| **Seq Scan** | Large result set or no index | Full table scan (avoid if possible) |
-| **Covering Index** | Read-heavy queries | `INDEX (user_id) INCLUDE (email, name)` |
+| Pattern               | When to Use                  | Example                                  |
+| --------------------- | ---------------------------- | ---------------------------------------- |
+| **Index Scan**        | Small result set             | `WHERE id = 'abc'`                       |
+| **Bitmap Index Scan** | Medium result set            | `WHERE status IN ('pending', 'shipped')` |
+| **Seq Scan**          | Large result set or no index | Full table scan (avoid if possible)      |
+| **Covering Index**    | Read-heavy queries           | `INDEX (user_id) INCLUDE (email, name)`  |
 
 **Avoid N+1 Queries:**
 
@@ -193,7 +194,7 @@ for (const user of users) {
 
 // ✅ GOOD - Single query with join
 const users = await db.users.findAll({
-  include: [{ model: db.orders }]
+  include: [{ model: db.orders }],
 });
 ```
 
@@ -201,13 +202,13 @@ const users = await db.users.findAll({
 
 ### Normalization Levels
 
-| Level | Description | When to Use |
-|-------|-------------|-------------|
-| **1NF** | Atomic values, no repeating groups | Always minimum |
-| **2NF** | No partial dependencies | Always |
-| **3NF** | No transitive dependencies | Default target |
-| **BCNF** | Every determinant is a candidate key | Rarely needed |
-| **4NF/5NF** | Eliminate multi-valued dependencies | Very rare |
+| Level       | Description                          | When to Use    |
+| ----------- | ------------------------------------ | -------------- |
+| **1NF**     | Atomic values, no repeating groups   | Always minimum |
+| **2NF**     | No partial dependencies              | Always         |
+| **3NF**     | No transitive dependencies           | Default target |
+| **BCNF**    | Every determinant is a candidate key | Rarely needed  |
+| **4NF/5NF** | Eliminate multi-valued dependencies  | Very rare      |
 
 **When to Denormalize:**
 
@@ -240,15 +241,15 @@ GROUP BY u.email, u.name;
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| No foreign keys | Data integrity issues | Add REFERENCES constraints |
-| No indexes | Slow queries | Add indexes on WHERE/JOIN columns |
-| VARCHAR(255) everywhere | Wastes space | Use appropriate lengths |
-| Premature denormalization | Complexity without proof | Normalize first, denormalize with data |
-| No migrations | Schema drift | Version all schema changes |
-| Direct schema modifications | No rollback | Always use migrations |
-| Storing JSON in VARCHAR | No type safety | Use JSONB or separate tables |
+| Anti-Pattern                | Problem                  | Fix                                    |
+| --------------------------- | ------------------------ | -------------------------------------- |
+| No foreign keys             | Data integrity issues    | Add REFERENCES constraints             |
+| No indexes                  | Slow queries             | Add indexes on WHERE/JOIN columns      |
+| VARCHAR(255) everywhere     | Wastes space             | Use appropriate lengths                |
+| Premature denormalization   | Complexity without proof | Normalize first, denormalize with data |
+| No migrations               | Schema drift             | Version all schema changes             |
+| Direct schema modifications | No rollback              | Always use migrations                  |
+| Storing JSON in VARCHAR     | No type safety           | Use JSONB or separate tables           |
 
 ## Database-Specific Best Practices
 
@@ -295,16 +296,16 @@ ALTER TABLE users CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ```javascript
 // Define schema validation
-db.createCollection("users", {
+db.createCollection('users', {
   validator: {
     $jsonSchema: {
-      required: ["email", "created_at"],
+      required: ['email', 'created_at'],
       properties: {
-        email: { bsonType: "string" },
-        created_at: { bsonType: "date" }
-      }
-    }
-  }
+        email: { bsonType: 'string' },
+        created_at: { bsonType: 'date' },
+      },
+    },
+  },
 });
 
 // Create indexes for common queries
@@ -315,6 +316,7 @@ db.orders.createIndex({ user_id: 1, created_at: -1 });
 ## Testing Checklist
 
 Before finalizing database design, verify:
+
 - [ ] All tables have primary keys
 - [ ] Foreign keys enforce referential integrity
 - [ ] Indexes planned for WHERE/JOIN/ORDER BY columns
@@ -340,17 +342,20 @@ All schema changes must use versioned migrations with rollback capability.
 ## Integration Points
 
 ### Agents Using This Skill
+
 - **database-architect** (primary): Database design and optimization
 - **developer** (secondary): Implements schema changes via migrations
 - **code-reviewer**: Reviews migration scripts
 - **devops**: Executes migrations in production
 
 ### Related Skills
+
 - **data-expert**: Data processing and transformation
 - **text-to-sql**: Natural language to SQL queries
 - **security-architect**: Database security review
 
 ### Workflows
+
 - **feature-development-workflow.md**: Database design in Design phase
 - **migration-workflow.md**: Schema migration procedures
 

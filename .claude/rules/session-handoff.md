@@ -11,6 +11,7 @@
 ## Handoff Document Structure
 
 ### Required Sections
+
 1. **Session Context** - What was being worked on
 2. **Current State** - Exact state of work (not "almost done", but specific)
 3. **Progress** - What was completed with evidence
@@ -21,6 +22,7 @@
 8. **Artifacts** - Files created/modified during session
 
 ### Optional Sections
+
 - **Context References** - Links to relevant docs/ADRs
 - **Commands to Run** - Verification commands
 - **Environment State** - Branch, pending commits, etc.
@@ -37,6 +39,7 @@
 ## Handoff Triggers
 
 Create handoff when:
+
 - Session approaching context limit (150K+ tokens)
 - Complex multi-phase work not yet complete
 - Need to switch agents/contexts

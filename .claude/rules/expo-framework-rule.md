@@ -28,7 +28,7 @@
 
 - File-based routing (app/index.tsx, app/profile.tsx)
 - Dynamic routes with [id].tsx
-- Layouts with _layout.tsx
+- Layouts with \_layout.tsx
 - Nested navigation with folder structure
 - Type-safe navigation with useRouter hooks
 

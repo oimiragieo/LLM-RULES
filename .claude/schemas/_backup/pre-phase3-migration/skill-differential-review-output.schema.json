@@ -20,18 +20,11 @@
     },
     "diff_reference": {
       "type": "object",
-      "required": [
-        "type"
-      ],
+      "required": ["type"],
       "properties": {
         "type": {
           "type": "string",
-          "enum": [
-            "pull_request",
-            "commit",
-            "branch_diff",
-            "patch"
-          ],
+          "enum": ["pull_request", "commit", "branch_diff", "patch"],
           "description": "Type of diff analyzed"
         },
         "pr_number": {
@@ -59,12 +52,7 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": [
-          "path",
-          "priority",
-          "additions",
-          "deletions"
-        ],
+        "required": ["path", "priority", "additions", "deletions"],
         "properties": {
           "path": {
             "type": "string",
@@ -72,12 +60,7 @@
           },
           "priority": {
             "type": "string",
-            "enum": [
-              "P0",
-              "P1",
-              "P2",
-              "P3"
-            ]
+            "enum": ["P0", "P1", "P2", "P3"]
           },
           "additions": {
             "type": "number",
@@ -123,23 +106,11 @@
       "description": "Security findings from diff review",
       "items": {
         "type": "object",
-        "required": [
-          "severity",
-          "category",
-          "description",
-          "file",
-          "line"
-        ],
+        "required": ["severity", "category", "description", "file", "line"],
         "properties": {
           "severity": {
             "type": "string",
-            "enum": [
-              "CRITICAL",
-              "HIGH",
-              "MEDIUM",
-              "LOW",
-              "INFO"
-            ]
+            "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
           },
           "category": {
             "type": "string",
@@ -191,12 +162,7 @@
     },
     "verdict": {
       "type": "string",
-      "enum": [
-        "APPROVE",
-        "APPROVE_WITH_CONDITIONS",
-        "REQUEST_CHANGES",
-        "BLOCK"
-      ],
+      "enum": ["APPROVE", "APPROVE_WITH_CONDITIONS", "REQUEST_CHANGES", "BLOCK"],
       "description": "Overall security verdict for the diff"
     },
     "verdict_rationale": {

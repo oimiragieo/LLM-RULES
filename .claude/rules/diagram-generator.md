@@ -20,6 +20,7 @@ graph BT  # Bottom-to-top (rare)
 ```
 
 **When to use**:
+
 - TB: System architecture, component hierarchies
 - LR: Data flows, pipelines, sequences
 - RL/BT: Special cases only
@@ -51,15 +52,15 @@ A -->|Label| B   # Alternative label syntax
 
 ## Diagram Type Selection Matrix
 
-| Need to Show          | Diagram Type | Syntax          | Max Nodes | Best For                |
-| --------------------- | ------------ | --------------- | --------- | ----------------------- |
-| System components     | Graph        | `graph TB`      | 150       | Architecture overview   |
-| API interactions      | Sequence     | `sequenceDiagram` | 20 calls  | Request/response flows  |
-| Database schema       | ER           | `erDiagram`     | 30 tables | Entity relationships    |
-| Object model          | Class        | `classDiagram`  | 40 classes| OOP structure           |
-| State machine         | State        | `stateDiagram-v2` | 25 states | Lifecycle management    |
-| Decision flow         | Flowchart    | `flowchart TB`  | 50 nodes  | Business logic          |
-| Project timeline      | Gantt        | `gantt`         | 30 tasks  | Scheduling              |
+| Need to Show      | Diagram Type | Syntax            | Max Nodes  | Best For               |
+| ----------------- | ------------ | ----------------- | ---------- | ---------------------- |
+| System components | Graph        | `graph TB`        | 150        | Architecture overview  |
+| API interactions  | Sequence     | `sequenceDiagram` | 20 calls   | Request/response flows |
+| Database schema   | ER           | `erDiagram`       | 30 tables  | Entity relationships   |
+| Object model      | Class        | `classDiagram`    | 40 classes | OOP structure          |
+| State machine     | State        | `stateDiagram-v2` | 25 states  | Lifecycle management   |
+| Decision flow     | Flowchart    | `flowchart TB`    | 50 nodes   | Business logic         |
+| Project timeline  | Gantt        | `gantt`           | 30 tasks   | Scheduling             |
 
 ## Node Count Limits
 
@@ -102,11 +103,13 @@ Option 3: Overview + Details
 **Naming convention**: `{subject}-{type}-{YYYY-MM-DD}.mmd`
 
 Examples:
+
 - `authentication-architecture-2026-02-09.mmd`
 - `user-database-schema-2026-02-09.mmd`
 - `api-request-sequence-2026-02-09.mmd`
 
 **File organization**:
+
 ```
 .claude/context/artifacts/diagrams/
   architecture/
@@ -120,15 +123,15 @@ Examples:
 
 ## Anti-Patterns
 
-| Anti-Pattern                  | Problem                             | Fix                                       |
-| ----------------------------- | ----------------------------------- | ----------------------------------------- |
-| >200 nodes in single diagram  | Unreadable, cognitive overload      | Split into multiple focused diagrams      |
-| No diagram type specified     | Defaults to flowchart (may be wrong)| Explicitly choose type based on content   |
-| Inconsistent node shapes      | Confusing semantics                 | Use shape conventions consistently        |
-| No labels on connections      | Unclear relationships               | Label all non-obvious connections         |
-| Analyzing 5000+ files at once | Memory exhaustion, context explosion| Chunk into <1000 file batches            |
-| Free-form text instead of Mermaid | Not renderable, not portable    | Use Mermaid syntax exclusively            |
-| No legend for symbols         | Ambiguous meaning                   | Add legend for custom shapes/colors       |
+| Anti-Pattern                      | Problem                              | Fix                                     |
+| --------------------------------- | ------------------------------------ | --------------------------------------- |
+| >200 nodes in single diagram      | Unreadable, cognitive overload       | Split into multiple focused diagrams    |
+| No diagram type specified         | Defaults to flowchart (may be wrong) | Explicitly choose type based on content |
+| Inconsistent node shapes          | Confusing semantics                  | Use shape conventions consistently      |
+| No labels on connections          | Unclear relationships                | Label all non-obvious connections       |
+| Analyzing 5000+ files at once     | Memory exhaustion, context explosion | Chunk into <1000 file batches           |
+| Free-form text instead of Mermaid | Not renderable, not portable         | Use Mermaid syntax exclusively          |
+| No legend for symbols             | Ambiguous meaning                    | Add legend for custom shapes/colors     |
 
 ## Integration Points
 

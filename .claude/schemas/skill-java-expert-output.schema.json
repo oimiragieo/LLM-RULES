@@ -2,18 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Java Expert Output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -22,24 +15,14 @@
       "properties": {
         "output": {
           "type": "object",
-          "required": [
-            "language",
-            "framework",
-            "codeGenerated"
-          ],
+          "required": ["language", "framework", "codeGenerated"],
           "properties": {
             "language": {
               "const": "Java"
             },
             "framework": {
               "type": "string",
-              "enum": [
-                "Spring Boot",
-                "Jakarta EE",
-                "Quarkus",
-                "Micronaut",
-                "Other"
-              ]
+              "enum": ["Spring Boot", "Jakarta EE", "Quarkus", "Micronaut", "Other"]
             },
             "javaVersion": {
               "type": "string",
@@ -49,10 +32,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "file",
-                  "content"
-                ],
+                "required": ["file", "content"],
                 "properties": {
                   "file": {
                     "type": "string"
@@ -112,9 +92,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

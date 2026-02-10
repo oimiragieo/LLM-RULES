@@ -63,6 +63,7 @@ Before writing a rule, clearly define:
 
 ```markdown
 ## Rule: [rule-id]
+
 - **Detect**: [description of what to find]
 - **Why**: [security impact / quality concern]
 - **Languages**: [javascript, typescript, python, etc.]
@@ -82,15 +83,15 @@ rules:
     message: >
       Clear description of what was found and why it matters.
       Include remediation guidance in the message.
-    severity: ERROR  # ERROR, WARNING, INFO
+    severity: ERROR # ERROR, WARNING, INFO
     languages: [javascript, typescript]
     metadata:
       cwe:
         - CWE-089
       owasp:
         - A03:2021
-      confidence: HIGH  # HIGH, MEDIUM, LOW
-      impact: HIGH       # HIGH, MEDIUM, LOW
+      confidence: HIGH # HIGH, MEDIUM, LOW
+      impact: HIGH # HIGH, MEDIUM, LOW
       category: security
       subcategory:
         - vuln
@@ -108,61 +109,61 @@ rules:
 #### Simple Pattern Match
 
 ```yaml
-    pattern: |
-      eval($X)
+pattern: |
+  eval($X)
 ```
 
 #### Pattern with Alternatives (OR)
 
 ```yaml
-    pattern-either:
-      - pattern: eval($X)
-      - pattern: new Function($X)
-      - pattern: setTimeout($X, ...)
-      - pattern: setInterval($X, ...)
+pattern-either:
+  - pattern: eval($X)
+  - pattern: new Function($X)
+  - pattern: setTimeout($X, ...)
+  - pattern: setInterval($X, ...)
 ```
 
 #### Pattern with Exclusions (AND NOT)
 
 ```yaml
-    patterns:
-      - pattern: $DB.query($QUERY)
-      - pattern-not: $DB.query($QUERY, $PARAMS)
-      - pattern-not: $DB.query($QUERY, [...])
+patterns:
+  - pattern: $DB.query($QUERY)
+  - pattern-not: $DB.query($QUERY, $PARAMS)
+  - pattern-not: $DB.query($QUERY, [...])
 ```
 
 #### Pattern Inside Context
 
 ```yaml
-    patterns:
-      - pattern: $RES.send($DATA)
-      - pattern-inside: |
-          app.$METHOD($PATH, function($REQ, $RES) {
-            ...
-          })
-      - pattern-not-inside: |
-          app.$METHOD($PATH, authenticate, function($REQ, $RES) {
-            ...
-          })
+patterns:
+  - pattern: $RES.send($DATA)
+  - pattern-inside: |
+      app.$METHOD($PATH, function($REQ, $RES) {
+        ...
+      })
+  - pattern-not-inside: |
+      app.$METHOD($PATH, authenticate, function($REQ, $RES) {
+        ...
+      })
 ```
 
 #### Metavariable Constraints
 
 ```yaml
-    patterns:
-      - pattern: crypto.createHash($ALGO)
-      - metavariable-regex:
-          metavariable: $ALGO
-          regex: (md5|sha1|MD5|SHA1)
-      - focus-metavariable: $ALGO
+patterns:
+  - pattern: crypto.createHash($ALGO)
+  - metavariable-regex:
+      metavariable: $ALGO
+      regex: (md5|sha1|MD5|SHA1)
+  - focus-metavariable: $ALGO
 ```
 
 ```yaml
-    patterns:
-      - pattern: setTimeout($FUNC, $TIME)
-      - metavariable-comparison:
-          metavariable: $TIME
-          comparison: $TIME > 60000
+patterns:
+  - pattern: setTimeout($FUNC, $TIME)
+  - metavariable-comparison:
+      metavariable: $TIME
+      comparison: $TIME > 60000
 ```
 
 ### Taint Mode Rules (Advanced)
@@ -170,25 +171,25 @@ rules:
 For tracking data flow from sources to sinks:
 
 ```yaml
-    mode: taint
-    pattern-sources:
-      - patterns:
-          - pattern: $REQ.query.$PARAM
-      - patterns:
-          - pattern: $REQ.body.$PARAM
-      - patterns:
-          - pattern: $REQ.params.$PARAM
-    pattern-sinks:
-      - patterns:
-          - pattern: $DB.query($SINK, ...)
-          - focus-metavariable: $SINK
-    pattern-sanitizers:
-      - patterns:
-          - pattern: escape($X)
-      - patterns:
-          - pattern: sanitize($X)
-      - patterns:
-          - pattern: $DB.query($QUERY, [...])
+mode: taint
+pattern-sources:
+  - patterns:
+      - pattern: $REQ.query.$PARAM
+  - patterns:
+      - pattern: $REQ.body.$PARAM
+  - patterns:
+      - pattern: $REQ.params.$PARAM
+pattern-sinks:
+  - patterns:
+      - pattern: $DB.query($SINK, ...)
+      - focus-metavariable: $SINK
+pattern-sanitizers:
+  - patterns:
+      - pattern: escape($X)
+  - patterns:
+      - pattern: sanitize($X)
+  - patterns:
+      - pattern: $DB.query($QUERY, [...])
 ```
 
 ## Step 3: Common Rule Templates
@@ -331,16 +332,16 @@ Create a test file alongside the rule:
 
 ```javascript
 // ruleid: sql-injection-string-concat
-db.query("SELECT * FROM users WHERE id = " + userId);
+db.query('SELECT * FROM users WHERE id = ' + userId);
 
 // ruleid: sql-injection-string-concat
 db.query(`SELECT * FROM users WHERE id = ${userId}`);
 
 // ok: sql-injection-string-concat
-db.query("SELECT * FROM users WHERE id = $1", [userId]);
+db.query('SELECT * FROM users WHERE id = $1', [userId]);
 
 // ok: sql-injection-string-concat
-db.query("SELECT * FROM users WHERE id = ?", [userId]);
+db.query('SELECT * FROM users WHERE id = ?', [userId]);
 ```
 
 ### Running Tests
@@ -393,19 +394,19 @@ semgrep --validate --config=rules/
 
 ## Semgrep Pattern Syntax Reference
 
-| Syntax | Meaning | Example |
-|--------|---------|---------|
-| `$X` | Single metavariable | `eval($X)` |
-| `$...X` | Multiple metavariable args | `func($...ARGS)` |
-| `...` | Ellipsis (any statements) | `if (...) { ... }` |
-| `<... $X ...>` | Deep expression match | `<... eval($X) ...>` |
-| `pattern-either` | OR operator | Match any of N patterns |
-| `pattern-not` | NOT operator | Exclude specific patterns |
-| `pattern-inside` | Context requirement | Must be inside this pattern |
-| `pattern-not-inside` | Context exclusion | Must NOT be inside this |
-| `metavariable-regex` | Regex constraint | Constrain $X to match regex |
-| `metavariable-comparison` | Numeric constraint | `$X > 100` |
-| `focus-metavariable` | Narrow match location | Report only $X location |
+| Syntax                    | Meaning                    | Example                     |
+| ------------------------- | -------------------------- | --------------------------- |
+| `$X`                      | Single metavariable        | `eval($X)`                  |
+| `$...X`                   | Multiple metavariable args | `func($...ARGS)`            |
+| `...`                     | Ellipsis (any statements)  | `if (...) { ... }`          |
+| `<... $X ...>`            | Deep expression match      | `<... eval($X) ...>`        |
+| `pattern-either`          | OR operator                | Match any of N patterns     |
+| `pattern-not`             | NOT operator               | Exclude specific patterns   |
+| `pattern-inside`          | Context requirement        | Must be inside this pattern |
+| `pattern-not-inside`      | Context exclusion          | Must NOT be inside this     |
+| `metavariable-regex`      | Regex constraint           | Constrain $X to match regex |
+| `metavariable-comparison` | Numeric constraint         | `$X > 100`                  |
+| `focus-metavariable`      | Narrow match location      | Report only $X location     |
 
 ## Related Skills
 

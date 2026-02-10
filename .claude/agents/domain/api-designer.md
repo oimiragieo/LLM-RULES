@@ -6,6 +6,7 @@ model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 priority: high
+extended_thinking: true
 tools:
   [
     Read,

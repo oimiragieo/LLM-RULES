@@ -106,13 +106,13 @@ codeql database analyze codeql-db \
 
 ### Key CodeQL Query Packs
 
-| Language   | Security Pack                        | Quality Pack                            |
-|-----------|--------------------------------------|----------------------------------------|
+| Language   | Security Pack                        | Quality Pack                                |
+| ---------- | ------------------------------------ | ------------------------------------------- |
 | JavaScript | `codeql/javascript-queries:Security` | `codeql/javascript-queries:Maintainability` |
-| Python     | `codeql/python-queries:Security`     | `codeql/python-queries:Maintainability`    |
-| Java       | `codeql/java-queries:Security`       | `codeql/java-queries:Maintainability`      |
-| Go         | `codeql/go-queries:Security`         | `codeql/go-queries:Maintainability`        |
-| C/C++      | `codeql/cpp-queries:Security`        | `codeql/cpp-queries:Maintainability`       |
+| Python     | `codeql/python-queries:Security`     | `codeql/python-queries:Maintainability`     |
+| Java       | `codeql/java-queries:Security`       | `codeql/java-queries:Maintainability`       |
+| Go         | `codeql/go-queries:Security`         | `codeql/go-queries:Maintainability`         |
+| C/C++      | `codeql/cpp-queries:Security`        | `codeql/cpp-queries:Maintainability`        |
 
 ## Step 3: Semgrep Analysis
 
@@ -141,18 +141,18 @@ semgrep scan --config=./semgrep-rules/ --sarif --output=semgrep-results.sarif
 
 ### Key Semgrep Rule Sets
 
-| Rule Set           | Purpose                            |
-|--------------------|------------------------------------|
-| `p/security-audit` | Comprehensive security checks      |
-| `p/owasp-top-ten`  | OWASP Top 10 vulnerability checks  |
-| `p/secrets`         | Hardcoded secrets detection        |
-| `p/ci`              | CI-optimized rule set              |
-| `p/default`         | General-purpose rules              |
-| `p/r2c-security-audit` | Trail of Bits security rules   |
-| `p/javascript`      | JavaScript-specific rules          |
-| `p/typescript`      | TypeScript-specific rules          |
-| `p/python`          | Python-specific rules              |
-| `p/golang`          | Go-specific rules                  |
+| Rule Set               | Purpose                           |
+| ---------------------- | --------------------------------- |
+| `p/security-audit`     | Comprehensive security checks     |
+| `p/owasp-top-ten`      | OWASP Top 10 vulnerability checks |
+| `p/secrets`            | Hardcoded secrets detection       |
+| `p/ci`                 | CI-optimized rule set             |
+| `p/default`            | General-purpose rules             |
+| `p/r2c-security-audit` | Trail of Bits security rules      |
+| `p/javascript`         | JavaScript-specific rules         |
+| `p/typescript`         | TypeScript-specific rules         |
+| `p/python`             | Python-specific rules             |
+| `p/golang`             | Go-specific rules                 |
 
 ## Step 4: SARIF Output Processing
 
@@ -203,12 +203,12 @@ jq -r '.runs[].results[] | [.ruleId, .level, .locations[0].physicalLocation.arti
 
 ### Severity Classification
 
-| SARIF Level | Severity | Action Required |
-|------------|----------|-----------------|
-| `error`    | CRITICAL/HIGH | Immediate fix before merge |
-| `warning`  | MEDIUM | Fix within sprint |
-| `note`     | LOW | Track and fix when convenient |
-| `none`     | INFORMATIONAL | Review and acknowledge |
+| SARIF Level | Severity      | Action Required               |
+| ----------- | ------------- | ----------------------------- |
+| `error`     | CRITICAL/HIGH | Immediate fix before merge    |
+| `warning`   | MEDIUM        | Fix within sprint             |
+| `note`      | LOW           | Track and fix when convenient |
+| `none`      | INFORMATIONAL | Review and acknowledge        |
 
 ### False Positive Assessment
 
@@ -230,20 +230,23 @@ For each finding, evaluate:
 **Scope**: [project/directory]
 
 ### Summary
+
 | Severity | Count | Fixed | False Positive | Remaining |
-|----------|-------|-------|----------------|-----------|
+| -------- | ----- | ----- | -------------- | --------- |
 | CRITICAL | X     | X     | X              | X         |
 | HIGH     | X     | X     | X              | X         |
 | MEDIUM   | X     | X     | X              | X         |
 | LOW      | X     | X     | X              | X         |
 
 ### Critical Findings
+
 1. **[Rule ID]**: [Description]
    - File: [path:line]
    - Impact: [description]
    - Remediation: [code fix]
 
 ### Recommendations
+
 - [Prioritized list of actions]
 ```
 
@@ -276,7 +279,7 @@ jobs:
           config: >-
             p/security-audit
             p/owasp-top-ten
-          generateSarif: "1"
+          generateSarif: '1'
       - uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
@@ -286,14 +289,14 @@ jobs:
 
 ## OWASP Mapping
 
-| OWASP Category | CodeQL Queries | Semgrep Rules |
-|---------------|---------------|--------------|
-| A01: Broken Access Control | `Security/CWE-284` | `p/owasp-top-ten` |
-| A02: Cryptographic Failures | `Security/CWE-327` | `p/secrets` |
-| A03: Injection | `Security/CWE-089`, `CWE-078` | `p/security-audit` |
-| A07: Auth Failures | `Security/CWE-287` | `p/owasp-top-ten` |
-| A09: Logging Failures | `Security/CWE-117` | `p/security-audit` |
-| A10: SSRF | `Security/CWE-918` | `p/owasp-top-ten` |
+| OWASP Category              | CodeQL Queries                | Semgrep Rules      |
+| --------------------------- | ----------------------------- | ------------------ |
+| A01: Broken Access Control  | `Security/CWE-284`            | `p/owasp-top-ten`  |
+| A02: Cryptographic Failures | `Security/CWE-327`            | `p/secrets`        |
+| A03: Injection              | `Security/CWE-089`, `CWE-078` | `p/security-audit` |
+| A07: Auth Failures          | `Security/CWE-287`            | `p/owasp-top-ten`  |
+| A09: Logging Failures       | `Security/CWE-117`            | `p/security-audit` |
+| A10: SSRF                   | `Security/CWE-918`            | `p/owasp-top-ten`  |
 
 ## Related Skills
 

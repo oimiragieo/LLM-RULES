@@ -11,6 +11,7 @@
 ## When to Use
 
 Use scientific-skills when:
+
 - Working on scientific research tasks
 - Need access to specialized databases (PubMed, ChEMBL, UniProt, PDB)
 - Performing bioinformatics or cheminformatics analysis
@@ -24,6 +25,7 @@ Use scientific-skills when:
 ### Skill Categories
 
 **Scientific Databases (28+ skills)**:
+
 - PubChem, ChEMBL, UniProt, PDB, DrugBank (compound/protein databases)
 - KEGG, Reactome, String (pathway and interaction databases)
 - ClinVar, COSMIC, GWAS (clinical and genomic databases)
@@ -31,6 +33,7 @@ Use scientific-skills when:
 - BioRxiv, ClinicalTrials.gov (preprints and trials)
 
 **Python Analysis Libraries (55+ skills)**:
+
 - RDKit (cheminformatics), Scanpy (single-cell), BioPython (computational biology)
 - PyTorch Lightning, scikit-learn, transformers (machine learning)
 - DeepChem, ESM, Datamol (chemistry and protein ML)
@@ -38,6 +41,7 @@ Use scientific-skills when:
 - Matplotlib, Seaborn, Plotly (visualization)
 
 **Workflows**:
+
 - `literature-review` - 7-phase systematic reviews with PRISMA flow
 - `hypothesis-generation` - 8-step hypothesis development
 - `drug-discovery` - RDKit + ChEMBL molecular screening
@@ -48,11 +52,13 @@ Use scientific-skills when:
 ### Invocation Patterns
 
 **Main catalog**:
+
 ```javascript
 Skill({ skill: 'scientific-skills' }); // Load full catalog
 ```
 
 **Specific sub-skills**:
+
 ```javascript
 Skill({ skill: 'scientific-skills/rdkit' }); // Cheminformatics
 Skill({ skill: 'scientific-skills/scanpy' }); // Single-cell analysis
@@ -62,14 +68,14 @@ Skill({ skill: 'scientific-skills/literature-review' }); // Literature review
 
 ## Anti-Patterns
 
-| Pattern | Problem | Fix |
-|---------|---------|-----|
+| Pattern               | Problem                   | Fix                                    |
+| --------------------- | ------------------------- | -------------------------------------- |
 | Skip database queries | Analyzing without context | Query databases first (PubMed, ChEMBL) |
-| Manual workflows | Inefficient, error-prone | Use built-in workflows |
-| Poor documentation | Irreproducible research | Document all analysis steps |
-| No visualization | Hard to interpret results | Use plotting skills |
-| Ignore literature | Reinvent solutions | Use literature-review skill first |
-| Single-tool analysis | Incomplete picture | Chain multiple skills |
+| Manual workflows      | Inefficient, error-prone  | Use built-in workflows                 |
+| Poor documentation    | Irreproducible research   | Document all analysis steps            |
+| No visualization      | Hard to interpret results | Use plotting skills                    |
+| Ignore literature     | Reinvent solutions        | Use literature-review skill first      |
+| Single-tool analysis  | Incomplete picture        | Chain multiple skills                  |
 
 ## Common Workflows
 
@@ -116,17 +122,20 @@ Skill({ skill: 'scientific-skills/scanpy' });
 ## Integration Points
 
 **Related Agents**:
+
 - `data-engineer` - Works with polars, dask, vaex, zarr-python
 - `python-pro` - Uses all Python-based scientific skills
 - `database-architect` - Database skills for schema design
 - `technical-writer` - Uses literature-review, scientific-writing
 
 **Related Skills**:
+
 - `data-expert` - Data manipulation and transformation
 - `machine-learning` - Statistical analysis integration
 - `visualization` - Publication-quality figures
 
 **Related Workflows**:
+
 - Research workflow - Literature review → Hypothesis → Experiment → Analysis
 - Publication workflow - Analysis → Writing → Figure generation
 

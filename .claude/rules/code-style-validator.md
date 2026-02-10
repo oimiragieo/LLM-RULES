@@ -27,6 +27,7 @@
 ### Validation Checks
 
 **Naming Conventions:**
+
 - Variables: camelCase (JS/TS) or snake_case (Python)
 - Functions: camelCase (JS/TS) or snake_case (Python)
 - Classes: PascalCase
@@ -34,12 +35,14 @@
 - Private: prefix with underscore
 
 **Formatting:**
+
 - Indentation: 2 spaces (JS/TS) or 4 spaces (Python)
 - Line length: 88-100 characters
 - Trailing commas: Yes (JS/TS)
 - Semicolons: Consistent usage
 
 **Structure:**
+
 - Import order: external, internal, relative
 - Function length: < 50 lines
 - File organization: exports, helpers, types
@@ -47,6 +50,7 @@
 ## Integration
 
 ### Pre-commit Hook
+
 ```bash
 #!/bin/bash
 # .git/hooks/pre-commit
@@ -61,6 +65,7 @@ done
 ```
 
 ### CI/CD Pipeline
+
 ```yaml
 # .github/workflows/code-style.yml
 - name: Validate code style

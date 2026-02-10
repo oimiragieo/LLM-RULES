@@ -4,13 +4,7 @@
   "title": "Insecure Defaults Skill Output",
   "description": "Verifiable output from the insecure-defaults skill proving credential detection and configuration auditing occurred",
   "type": "object",
-  "required": [
-    "skill_name",
-    "scan_scope",
-    "findings_summary",
-    "findings",
-    "timestamp"
-  ],
+  "required": ["skill_name", "scan_scope", "findings_summary", "findings", "timestamp"],
   "properties": {
     "skill_name": {
       "type": "string",
@@ -19,9 +13,7 @@
     },
     "scan_scope": {
       "type": "object",
-      "required": [
-        "directories_scanned"
-      ],
+      "required": ["directories_scanned"],
       "properties": {
         "directories_scanned": {
           "type": "array",
@@ -50,10 +42,7 @@
     },
     "findings_summary": {
       "type": "object",
-      "required": [
-        "total",
-        "categories"
-      ],
+      "required": ["total", "categories"],
       "properties": {
         "total": {
           "type": "number",
@@ -117,12 +106,7 @@
       "description": "Individual insecure default findings",
       "items": {
         "type": "object",
-        "required": [
-          "category",
-          "severity",
-          "description",
-          "file"
-        ],
+        "required": ["category", "severity", "description", "file"],
         "properties": {
           "category": {
             "type": "string",
@@ -139,12 +123,7 @@
           },
           "severity": {
             "type": "string",
-            "enum": [
-              "CRITICAL",
-              "HIGH",
-              "MEDIUM",
-              "LOW"
-            ]
+            "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
           },
           "description": {
             "type": "string",

@@ -1,6 +1,6 @@
-   - Achievement: ✅ Coverage 100%
-   - Cost: ❌ Depth sacrificed (63% hollow schemas, 70 missing security controls)
-   - Trade-off: Coverage > Depth in batch mode
+- Achievement: ✅ Coverage 100%
+- Cost: ❌ Depth sacrificed (63% hollow schemas, 70 missing security controls)
+- Trade-off: Coverage > Depth in batch mode
 
 ---
 
@@ -8,9 +8,10 @@
 
 **Context**: Task #22 wired 3 CLI tools from different directory hierarchies to package.json scripts for developer discoverability.
 
-**Key Insight**: Tools can originate from _archive/, cli/, or analysis/ directories. Wiring process is systematic: identify location → verify file exists → determine entry point type → add package.json script → document usage.
+**Key Insight**: Tools can originate from \_archive/, cli/, or analysis/ directories. Wiring process is systematic: identify location → verify file exists → determine entry point type → add package.json script → document usage.
 
 **Why This Works**:
+
 - Inventory-first verification prevents phantom scripts (pattern from Tasks #93-94)
 - Package.json scripts make tools discoverable via `pnpm --list-scripts` (more discoverable than tool-catalog.md alone)
 - Mixed origins are valid as long as verification happens pre-wiring
@@ -22,6 +23,36 @@
 **Quality Metric**: Task #22 scored 0.89/1.0 (EXCELLENT) on reflection rubric
 
 **Memory Takeaway**: CLI tool wiring can be accomplished systematically with inventory-first verification. Integration completeness (per ADR-100) is separate from functional wiring and requires follow-up analysis.
+
+---
+
+## 2026-02-10: EPIC Plan Orchestration Pattern - Task #25 (Reflection)
+
+**Context**: Task #25 created comprehensive EPIC-complexity plan with 7 phases, 38 tasks, 34 agent spawns, ~15 hours estimated. Plan properly structured per enterprise-workflow.md (Design → Implement → Review → Deploy → Document → Reflect). Quality score: 0.87/1.0 (EXCELLENT).
+
+**Key Pattern**: EPIC plans require:
+
+1. Phase-gated execution (sequential phases with quality gates)
+2. Wave-based agent spawning (max 2 heavy agents/wave to prevent context overflow)
+3. Integration follow-up (0.87 is PASS but not 1.0; expect 90-95% integration health post-execution)
+4. Artifact consolidation per phase (prevent per-task artifacts; consolidate to phase summaries)
+
+**Why This Works**:
+
+- 7-phase structure aligns with complexity-classifier.cjs EPIC tier (all phases enabled)
+- 38 tasks (~5.4 tasks/phase) keeps cognitive load manageable per phase
+- 34 agent spawns indicates proper specialist routing (not defaulting to developer)
+- Quality gates between phases prevent downstream failures
+
+**Application**: Use this pattern for all EPIC-complexity requests going forward
+
+**Risk Mitigation - CRITICAL**:
+
+- Context overflow: Sequential agent waves, not parallel bulk spawn
+- Integration gaps: Queue artifact-integrator post-phase-completion (not end-of-plan)
+- Quality degradation: Use verification-before-completion at phase transitions, not task-by-task
+
+**Memory Takeaway**: EPIC plans score 0.85-0.90 on rubric when properly scaffolded. Success depends entirely on execution discipline: wave-based spawning, phase-gated quality, and post-phase integration analysis.
 
 ---
 
@@ -39,11 +70,11 @@
 
 **Better Approach - Tiered Artifact Creation**:
 
-| Tier | Skills | Artifact Depth | Effort | Quality |
-|------|--------|---|---|---|
-| **Tier 1** | Complex (tdd, debugging, security) | Full (SKILL.md + rule + schema + command + workflow) | High | ✅ A+ |
-| **Tier 2** | Domain (typescript-expert, python-pro) | Standard (SKILL.md + rule + lightweight schema) | Medium | ✅ A |
-| **Tier 3** | Simple (helper skills) | Minimal (SKILL.md + rule only) | Low | ✅ A |
+| Tier       | Skills                                 | Artifact Depth                                       | Effort | Quality |
+| ---------- | -------------------------------------- | ---------------------------------------------------- | ------ | ------- |
+| **Tier 1** | Complex (tdd, debugging, security)     | Full (SKILL.md + rule + schema + command + workflow) | High   | ✅ A+   |
+| **Tier 2** | Domain (typescript-expert, python-pro) | Standard (SKILL.md + rule + lightweight schema)      | Medium | ✅ A    |
+| **Tier 3** | Simple (helper skills)                 | Minimal (SKILL.md + rule only)                       | Low    | ✅ A    |
 
 Apply tiering BEFORE batch creation starts, not after. Prevents mechanical template application to all skills equally.
 
@@ -92,6 +123,29 @@ Apply tiering BEFORE batch creation starts, not after. Prevents mechanical templ
 **Memory Takeaway**: Thin rule stubs are solved by systematic depth-adding pipeline. Batch processing with intermediate quality gates beats end-of-batch review. Template standardization prevents future consistency drift. Memory Protocol verification prevents duplicate work.
 
 **Files Enhanced**: `.claude/rules/readme.md`, `.claude/rules/scientific-skills.md`, `.claude/rules/summarize-changes.md`, `.claude/rules/doc-generator.md`, `.claude/rules/git-expert.md`, `.claude/rules/memory-forensics.md`
+
+---
+
+### [ARCHITECTURE] EPIC Ecosystem Audit Patterns (2026-02-09)
+
+**Context**: Completed full audit of 58-agent ecosystem across 16+ sessions
+
+**Insights**:
+
+1. Wave-based data collection (max 2 parallel agents) prevents context overflow
+2. Early-write protocol (partial results after every ~15 items) prevents total data loss on compaction
+3. sonnet model is reliable for data collection; haiku fails at compaction recovery
+4. general-purpose agent type is required for report writing (researcher lacks Write tool)
+5. Gap analysis can contain inaccuracies — always verify CRITICAL gaps against source of truth before remediation
+6. Integration scoring formula: routing (25%) + skills (25%) + model (25%) + type (25%)
+7. 98.2% baseline integration across 58 agents — ecosystem is well-connected
+8. Extended thinking coverage improved from 15.3% to 27.1% (9→16 agents)
+9. ROUTING_TABLE entries provide highest-priority routing; INTENT_KEYWORDS are fallback semantic matching
+10. party-orchestrator was the only truly non-functional agent (referencing archived subsystem)
+
+**Impact**: Establishes patterns for future EPIC audits and ecosystem maintenance
+
+**Related**: Phase 6 final harmony report, ADR-102 (memory management)
 
 ---
 

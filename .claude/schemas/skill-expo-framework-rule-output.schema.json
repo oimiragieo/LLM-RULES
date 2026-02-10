@@ -4,18 +4,11 @@
   "title": "Expo Framework Rule Skill Output",
   "description": "Output schema for Expo Framework development including routing, native modules, and EAS",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

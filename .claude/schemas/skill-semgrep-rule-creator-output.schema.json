@@ -4,27 +4,17 @@
   "title": "Semgrep Rule Creator Skill Output",
   "description": "Verifiable output from the semgrep-rule-creator skill proving custom rule authoring occurred with testing",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
       "description": "Domain-specific output for semgrep-rule-creator",
-      "required": [
-        "rules_created",
-        "rules"
-      ],
+      "required": ["rules_created", "rules"],
       "properties": {
         "rules_created": {
           "type": "number",
@@ -37,13 +27,7 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": [
-              "rule_id",
-              "severity",
-              "languages",
-              "detection_goal",
-              "rule_file_path"
-            ],
+            "required": ["rule_id", "severity", "languages", "detection_goal", "rule_file_path"],
             "properties": {
               "rule_id": {
                 "type": "string",
@@ -51,11 +35,7 @@
               },
               "severity": {
                 "type": "string",
-                "enum": [
-                  "ERROR",
-                  "WARNING",
-                  "INFO"
-                ]
+                "enum": ["ERROR", "WARNING", "INFO"]
               },
               "languages": {
                 "type": "array",
@@ -84,28 +64,15 @@
               },
               "confidence": {
                 "type": "string",
-                "enum": [
-                  "HIGH",
-                  "MEDIUM",
-                  "LOW"
-                ]
+                "enum": ["HIGH", "MEDIUM", "LOW"]
               },
               "impact": {
                 "type": "string",
-                "enum": [
-                  "HIGH",
-                  "MEDIUM",
-                  "LOW"
-                ]
+                "enum": ["HIGH", "MEDIUM", "LOW"]
               },
               "pattern_type": {
                 "type": "string",
-                "enum": [
-                  "pattern",
-                  "pattern-either",
-                  "patterns",
-                  "taint"
-                ],
+                "enum": ["pattern", "pattern-either", "patterns", "taint"],
                 "description": "Primary pattern operator used"
               },
               "has_fix": {
@@ -159,12 +126,7 @@
             },
             "category": {
               "type": "string",
-              "enum": [
-                "security",
-                "correctness",
-                "performance",
-                "best-practice"
-              ]
+              "enum": ["security", "correctness", "performance", "best-practice"]
             },
             "rules_count": {
               "type": "number",

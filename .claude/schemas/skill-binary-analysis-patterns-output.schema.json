@@ -4,18 +4,11 @@
   "title": "Binary Analysis Patterns Output",
   "description": "Validation schema for binary-analysis-patterns skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -38,11 +31,7 @@
         "target_binary": {
           "type": "object",
           "description": "Information about the analyzed binary",
-          "required": [
-            "file_path",
-            "architecture",
-            "file_type"
-          ],
+          "required": ["file_path", "architecture", "file_type"],
           "properties": {
             "file_path": {
               "type": "string",
@@ -50,25 +39,12 @@
             },
             "architecture": {
               "type": "string",
-              "enum": [
-                "x86",
-                "x86-64",
-                "ARM",
-                "ARM64",
-                "MIPS",
-                "PowerPC",
-                "RISC-V"
-              ],
+              "enum": ["x86", "x86-64", "ARM", "ARM64", "MIPS", "PowerPC", "RISC-V"],
               "description": "CPU architecture"
             },
             "file_type": {
               "type": "string",
-              "enum": [
-                "ELF",
-                "PE",
-                "Mach-O",
-                "raw"
-              ],
+              "enum": ["ELF", "PE", "Mach-O", "raw"],
               "description": "Binary file format"
             },
             "compiler": {
@@ -92,10 +68,7 @@
           "description": "Functions discovered in the binary",
           "items": {
             "type": "object",
-            "required": [
-              "address",
-              "name"
-            ],
+            "required": ["address", "name"],
             "properties": {
               "address": {
                 "type": "string",
@@ -133,10 +106,7 @@
           "description": "Control flow analysis results",
           "items": {
             "type": "object",
-            "required": [
-              "function_name",
-              "basic_block_count"
-            ],
+            "required": ["function_name", "basic_block_count"],
             "properties": {
               "function_name": {
                 "type": "string",
@@ -170,10 +140,7 @@
           "description": "Code patterns and idioms identified",
           "items": {
             "type": "object",
-            "required": [
-              "pattern_type",
-              "description"
-            ],
+            "required": ["pattern_type", "description"],
             "properties": {
               "pattern_type": {
                 "type": "string",
@@ -206,21 +173,11 @@
           "description": "Potential vulnerabilities discovered",
           "items": {
             "type": "object",
-            "required": [
-              "severity",
-              "type",
-              "description",
-              "location"
-            ],
+            "required": ["severity", "type", "description", "location"],
             "properties": {
               "severity": {
                 "type": "string",
-                "enum": [
-                  "critical",
-                  "high",
-                  "medium",
-                  "low"
-                ],
+                "enum": ["critical", "high", "medium", "low"],
                 "description": "Vulnerability severity"
               },
               "type": {
@@ -277,10 +234,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "analysis_type",
-        "target_binary"
-      ]
+      "required": ["analysis_type", "target_binary"]
     }
   },
   "additionalProperties": false

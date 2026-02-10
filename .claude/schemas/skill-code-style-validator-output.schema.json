@@ -4,31 +4,18 @@
   "title": "Code Style Validator Skill Output",
   "description": "Validates output from code-style-validator skill - AST-based style validation",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Style validation results",
-      "required": [
-        "violations",
-        "score",
-        "autoFixable"
-      ],
+      "required": ["violations", "score", "autoFixable"],
       "properties": {
         "violations": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "rule",
-              "severity",
-              "file",
-              "line",
-              "message"
-            ],
+            "required": ["rule", "severity", "file", "line", "message"],
             "properties": {
               "rule": {
                 "type": "string",
@@ -36,11 +23,7 @@
               },
               "severity": {
                 "type": "string",
-                "enum": [
-                  "error",
-                  "warning",
-                  "info"
-                ]
+                "enum": ["error", "warning", "info"]
               },
               "file": {
                 "type": "string"
@@ -65,14 +48,7 @@
               },
               "category": {
                 "type": "string",
-                "enum": [
-                  "naming",
-                  "indentation",
-                  "spacing",
-                  "imports",
-                  "structure",
-                  "comments"
-                ]
+                "enum": ["naming", "indentation", "spacing", "imports", "structure", "comments"]
               }
             }
           },
@@ -80,9 +56,7 @@
         },
         "score": {
           "type": "object",
-          "required": [
-            "overall"
-          ],
+          "required": ["overall"],
           "properties": {
             "overall": {
               "type": "number",
@@ -129,10 +103,7 @@
         },
         "autoFixable": {
           "type": "object",
-          "required": [
-            "count",
-            "percentage"
-          ],
+          "required": ["count", "percentage"],
           "properties": {
             "count": {
               "type": "number",
@@ -156,10 +127,7 @@
         },
         "summary": {
           "type": "object",
-          "required": [
-            "totalViolations",
-            "filesChecked"
-          ],
+          "required": ["totalViolations", "filesChecked"],
           "properties": {
             "totalViolations": {
               "type": "number",
@@ -203,10 +171,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "version"
-                ],
+                "required": ["name", "version"],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -224,11 +189,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

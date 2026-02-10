@@ -3,18 +3,11 @@
   "title": "Spec Gathering Output",
   "description": "Validates output from spec-gathering skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -45,12 +38,7 @@
               "minItems": 1,
               "items": {
                 "type": "object",
-                "required": [
-                  "role",
-                  "goal",
-                  "benefit",
-                  "acceptanceCriteria"
-                ],
+                "required": ["role", "goal", "benefit", "acceptanceCriteria"],
                 "properties": {
                   "role": {
                     "type": "string",
@@ -69,11 +57,7 @@
                     "minItems": 1,
                     "items": {
                       "type": "object",
-                      "required": [
-                        "given",
-                        "when",
-                        "then"
-                      ],
+                      "required": ["given", "when", "then"],
                       "properties": {
                         "given": {
                           "type": "string",
@@ -98,11 +82,7 @@
               "minItems": 1,
               "items": {
                 "type": "object",
-                "required": [
-                  "id",
-                  "description",
-                  "priority"
-                ],
+                "required": ["id", "description", "priority"],
                 "properties": {
                   "id": {
                     "type": "string",
@@ -116,11 +96,7 @@
                   },
                   "priority": {
                     "type": "string",
-                    "enum": [
-                      "must",
-                      "should",
-                      "may"
-                    ]
+                    "enum": ["must", "should", "may"]
                   }
                 }
               }
@@ -129,22 +105,11 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "category",
-                  "requirement",
-                  "measurement",
-                  "priority"
-                ],
+                "required": ["category", "requirement", "measurement", "priority"],
                 "properties": {
                   "category": {
                     "type": "string",
-                    "enum": [
-                      "performance",
-                      "security",
-                      "scalability",
-                      "availability",
-                      "usability"
-                    ]
+                    "enum": ["performance", "security", "scalability", "availability", "usability"]
                   },
                   "requirement": {
                     "type": "string",
@@ -156,11 +121,7 @@
                   },
                   "priority": {
                     "type": "string",
-                    "enum": [
-                      "must",
-                      "should",
-                      "may"
-                    ]
+                    "enum": ["must", "should", "may"]
                   }
                 }
               }
@@ -178,10 +139,7 @@
               "minItems": 1,
               "items": {
                 "type": "object",
-                "required": [
-                  "scenario",
-                  "expectedBehavior"
-                ],
+                "required": ["scenario", "expectedBehavior"],
                 "properties": {
                   "scenario": {
                     "type": "string",
@@ -214,19 +172,11 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "type",
-                  "description"
-                ],
+                "required": ["type", "description"],
                 "properties": {
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "external-service",
-                      "internal-service",
-                      "library",
-                      "infrastructure"
-                    ]
+                    "enum": ["external-service", "internal-service", "library", "infrastructure"]
                   },
                   "description": {
                     "type": "string"
@@ -239,9 +189,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

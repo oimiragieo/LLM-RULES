@@ -4,25 +4,17 @@
   "title": "Context Compressor Skill Output",
   "description": "Validates output from context-compressor skill invocation - context compression and summarization",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Context compression execution results",
-      "required": [
-        "compressedContext",
-        "compressionStats"
-      ],
+      "required": ["compressedContext", "compressionStats"],
       "properties": {
         "compressedContext": {
           "type": "object",
           "description": "Compressed context structure",
-          "required": [
-            "sessionSummary"
-          ],
+          "required": ["sessionSummary"],
           "properties": {
             "sessionSummary": {
               "type": "string",
@@ -32,11 +24,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "id",
-                  "decision",
-                  "rationale"
-                ],
+                "required": ["id", "decision", "rationale"],
                 "properties": {
                   "id": {
                     "type": "string",
@@ -58,10 +46,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "path",
-                  "status"
-                ],
+                "required": ["path", "status"],
                 "properties": {
                   "path": {
                     "type": "string",
@@ -69,11 +54,7 @@
                   },
                   "status": {
                     "type": "string",
-                    "enum": [
-                      "new",
-                      "updated",
-                      "deleted"
-                    ],
+                    "enum": ["new", "updated", "deleted"],
                     "description": "File change status"
                   },
                   "summary": {
@@ -88,10 +69,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "location",
-                  "summary"
-                ],
+                "required": ["location", "summary"],
                 "properties": {
                   "location": {
                     "type": "string",
@@ -116,10 +94,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "message",
-                  "location"
-                ],
+                "required": ["message", "location"],
                 "properties": {
                   "message": {
                     "type": "string",
@@ -156,11 +131,7 @@
         },
         "compressionStats": {
           "type": "object",
-          "required": [
-            "originalTokenCount",
-            "compressedTokenCount",
-            "compressionRatio"
-          ],
+          "required": ["originalTokenCount", "compressedTokenCount", "compressionRatio"],
           "properties": {
             "originalTokenCount": {
               "type": "number",
@@ -249,11 +220,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

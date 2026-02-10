@@ -40,6 +40,7 @@ You are an accessibility expert specializing in WCAG 2.1 compliance, semantic HT
 Review component structure for proper semantic elements:
 
 **Check for:**
+
 - `<header>`, `<nav>`, `<main>`, `<article>`, `<section>`, `<aside>`, `<footer>` instead of generic `<div>`
 - `<button>` for clickable elements (not `<div onclick>`)
 - `<a>` for navigation links
@@ -47,6 +48,7 @@ Review component structure for proper semantic elements:
 - Proper heading hierarchy (`<h1>` through `<h6>`)
 
 **Example:**
+
 ```html
 <!-- ❌ BAD -->
 <div class="header">
@@ -69,20 +71,22 @@ Add ARIA attributes ONLY when semantic HTML is insufficient:
 
 **Common Patterns:**
 
-| Use Case | ARIA Attributes | Example |
-|----------|-----------------|---------|
-| Custom button | `role="button"`, `tabindex="0"` | `<div role="button" tabindex="0">` |
-| Modal dialog | `role="dialog"`, `aria-modal="true"` | `<div role="dialog" aria-modal="true">` |
-| Alert | `role="alert"`, `aria-live="assertive"` | `<div role="alert">Error occurred</div>` |
-| Tab panel | `role="tabpanel"`, `aria-labelledby` | `<div role="tabpanel" aria-labelledby="tab-1">` |
+| Use Case      | ARIA Attributes                         | Example                                         |
+| ------------- | --------------------------------------- | ----------------------------------------------- |
+| Custom button | `role="button"`, `tabindex="0"`         | `<div role="button" tabindex="0">`              |
+| Modal dialog  | `role="dialog"`, `aria-modal="true"`    | `<div role="dialog" aria-modal="true">`         |
+| Alert         | `role="alert"`, `aria-live="assertive"` | `<div role="alert">Error occurred</div>`        |
+| Tab panel     | `role="tabpanel"`, `aria-labelledby`    | `<div role="tabpanel" aria-labelledby="tab-1">` |
 
 **Rules:**
+
 - Don't add redundant ARIA (`<button role="button">` is unnecessary)
 - Use `aria-label` for icon buttons without text
 - Use `aria-hidden="true"` for decorative elements
 - Use `aria-live` regions for dynamic content
 
 **Example:**
+
 ```html
 <!-- Icon button needs aria-label -->
 <button aria-label="Close dialog">
@@ -90,9 +94,7 @@ Add ARIA attributes ONLY when semantic HTML is insufficient:
 </button>
 
 <!-- Dynamic content needs live region -->
-<div role="alert" aria-live="assertive">
-  Form submitted successfully
-</div>
+<div role="alert" aria-live="assertive">Form submitted successfully</div>
 ```
 
 ### Step 3: Keyboard Navigation Test
@@ -100,6 +102,7 @@ Add ARIA attributes ONLY when semantic HTML is insufficient:
 Verify all interactive elements are keyboard accessible:
 
 **Requirements:**
+
 - Tab: Navigate forward through interactive elements
 - Shift+Tab: Navigate backward
 - Enter/Space: Activate buttons and links
@@ -107,12 +110,14 @@ Verify all interactive elements are keyboard accessible:
 - Escape: Close dialogs and menus
 
 **Focus Management:**
+
 - Trap focus within modals (prevent tabbing outside)
 - Return focus to trigger element when closing modal
 - Skip to main content link for screen reader users
 - Visible focus indicators (`:focus` styles)
 
 **Example:**
+
 ```javascript
 // Focus trap in modal
 function openModal(modal) {
@@ -123,13 +128,11 @@ function openModal(modal) {
 }
 
 function trapFocus(container) {
-  const focusableElements = container.querySelectorAll(
-    'button, input, select, textarea, a[href]'
-  );
+  const focusableElements = container.querySelectorAll('button, input, select, textarea, a[href]');
   const firstElement = focusableElements[0];
   const lastElement = focusableElements[focusableElements.length - 1];
 
-  container.addEventListener('keydown', (e) => {
+  container.addEventListener('keydown', e => {
     if (e.key === 'Tab') {
       if (e.shiftKey && document.activeElement === firstElement) {
         lastElement.focus();
@@ -149,31 +152,41 @@ Check all text meets WCAG contrast ratios:
 
 **Standards:**
 
-| Text Size | WCAG AA | WCAG AAA |
-|-----------|---------|----------|
-| Normal text (< 18pt) | 4.5:1 | 7:1 |
-| Large text (≥ 18pt or 14pt bold) | 3:1 | 4.5:1 |
-| UI components | 3:1 | - |
+| Text Size                        | WCAG AA | WCAG AAA |
+| -------------------------------- | ------- | -------- |
+| Normal text (< 18pt)             | 4.5:1   | 7:1      |
+| Large text (≥ 18pt or 14pt bold) | 3:1     | 4.5:1    |
+| UI components                    | 3:1     | -        |
 
 **Tools:**
+
 - WebAIM Contrast Checker
 - Browser DevTools color picker
 - Grayscale test (convert to grayscale to verify readability)
 
 **Example:**
+
 ```css
 /* ❌ BAD - Insufficient contrast */
-.text { color: #777; background: #fff; } /* 4.47:1 - fails AA */
+.text {
+  color: #777;
+  background: #fff;
+} /* 4.47:1 - fails AA */
 
 /* ✅ GOOD - Sufficient contrast */
-.text { color: #595959; background: #fff; } /* 7:1 - passes AAA */
+.text {
+  color: #595959;
+  background: #fff;
+} /* 7:1 - passes AAA */
 
 /* ✅ GOOD - Don't rely on color alone */
 .error {
   color: #d00;
   border-left: 4px solid #d00; /* Visual indicator beyond color */
 }
-.error::before { content: "⚠️ "; } /* Icon indicator */
+.error::before {
+  content: '⚠️ ';
+} /* Icon indicator */
 ```
 
 ### Step 5: Screen Reader Support
@@ -181,17 +194,19 @@ Check all text meets WCAG contrast ratios:
 Ensure proper screen reader experience:
 
 **Alt Text for Images:**
+
 ```html
 <!-- ❌ BAD - Missing or redundant alt -->
-<img src="logo.png">
-<img src="decorative.png" alt="decorative image">
+<img src="logo.png" />
+<img src="decorative.png" alt="decorative image" />
 
 <!-- ✅ GOOD -->
-<img src="logo.png" alt="Company Logo">
-<img src="decorative.png" alt="" role="presentation">
+<img src="logo.png" alt="Company Logo" />
+<img src="decorative.png" alt="" role="presentation" />
 ```
 
 **ARIA Labels for Icon Buttons:**
+
 ```html
 <!-- ❌ BAD - No label for screen readers -->
 <button><i class="icon-delete"></i></button>
@@ -203,16 +218,13 @@ Ensure proper screen reader experience:
 ```
 
 **Live Regions for Dynamic Content:**
+
 ```html
 <!-- Announce errors immediately -->
-<div role="alert" aria-live="assertive">
-  Error: Invalid email address
-</div>
+<div role="alert" aria-live="assertive">Error: Invalid email address</div>
 
 <!-- Announce status updates politely -->
-<div aria-live="polite" aria-atomic="true">
-  Loading results... 3 of 10 loaded
-</div>
+<div aria-live="polite" aria-atomic="true">Loading results... 3 of 10 loaded</div>
 ```
 
 ### Step 6: Form Accessibility
@@ -220,12 +232,14 @@ Ensure proper screen reader experience:
 Ensure all form inputs are properly labeled and validated:
 
 **Requirements:**
+
 - All inputs have associated `<label>` elements
 - Use `<fieldset>` and `<legend>` for grouped inputs
 - Show validation errors with `aria-describedby`
 - Required fields marked with `aria-required="true"` or `required` attribute
 
 **Example:**
+
 ```html
 <!-- ✅ GOOD Form Structure -->
 <form>
@@ -233,19 +247,13 @@ Ensure all form inputs are properly labeled and validated:
     <legend>Personal Information</legend>
 
     <label for="name">Name (required)</label>
-    <input
-      id="name"
-      type="text"
-      required
-      aria-required="true"
-      aria-describedby="name-error"
-    >
+    <input id="name" type="text" required aria-required="true" aria-describedby="name-error" />
     <span id="name-error" role="alert" class="error" aria-live="polite">
       <!-- Error message appears here -->
     </span>
 
     <label for="email">Email</label>
-    <input id="email" type="email" aria-describedby="email-hint">
+    <input id="email" type="email" aria-describedby="email-hint" />
     <span id="email-hint" class="hint">We'll never share your email</span>
   </fieldset>
 </form>
@@ -254,12 +262,13 @@ Ensure all form inputs are properly labeled and validated:
 ### Step 7: Generate Accessibility Report
 
 Document findings with:
+
 - Total issues found (categorized by severity)
 - WCAG level compliance status (A, AA, AAA)
 - Specific violations with line numbers
 - Recommended fixes with code examples
 - Testing performed (automated + manual)
-</instructions>
+  </instructions>
 
 <examples>
 ## Usage Examples
@@ -272,6 +281,7 @@ Skill({ skill: 'accessibility' });
 
 **Input**: React component with custom modal
 **Output**:
+
 - Semantic HTML recommendations
 - ARIA attributes needed
 - Keyboard navigation issues
@@ -286,6 +296,7 @@ Skill({ skill: 'accessibility', args: 'color-contrast' });
 
 **Input**: CSS file with color definitions
 **Output**:
+
 - List of failing contrast ratios
 - Recommended color adjustments
 - Before/after contrast scores
@@ -298,16 +309,19 @@ Skill({ skill: 'accessibility', args: 'forms' });
 
 **Input**: Form component
 **Output**:
+
 - Label associations verified
 - Required field indicators
 - Error message patterns
 - Keyboard submission support
-</examples>
+  </examples>
 
 <best_practices>
+
 ## Best Practices
 
 ### DO
+
 - Use semantic HTML as foundation (header, nav, main, article)
 - Add ARIA only when semantic HTML insufficient
 - Test with real screen readers (NVDA, JAWS, VoiceOver)
@@ -319,6 +333,7 @@ Skill({ skill: 'accessibility', args: 'forms' });
 - Announce dynamic content with aria-live
 
 ### DON'T
+
 - Use `<div>` for everything (no semantic meaning)
 - Put click handlers on non-interactive elements
 - Forget alt text on images
@@ -331,14 +346,14 @@ Skill({ skill: 'accessibility', args: 'forms' });
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| `<div onclick>` | Not keyboard accessible | Use `<button>` |
-| No alt text | Screen readers can't describe | Add meaningful `alt` attribute |
-| Color-only info | Color blind users miss it | Add text/icons |
-| No focus indicators | Users lost in navigation | Add `:focus` styles |
-| Auto-play media | Disruptive for screen readers | Add controls, pause option |
-| `<div>` for everything | No semantic structure | Use semantic HTML |
+| Anti-Pattern           | Problem                       | Fix                            |
+| ---------------------- | ----------------------------- | ------------------------------ |
+| `<div onclick>`        | Not keyboard accessible       | Use `<button>`                 |
+| No alt text            | Screen readers can't describe | Add meaningful `alt` attribute |
+| Color-only info        | Color blind users miss it     | Add text/icons                 |
+| No focus indicators    | Users lost in navigation      | Add `:focus` styles            |
+| Auto-play media        | Disruptive for screen readers | Add controls, pause option     |
+| `<div>` for everything | No semantic structure         | Use semantic HTML              |
 
 ## Testing Checklist
 
@@ -358,11 +373,12 @@ Before finalizing accessibility review:
 - [ ] Tested with screen reader (NVDA, JAWS, VoiceOver)
 - [ ] Tested with keyboard only (no mouse)
 - [ ] Tested with browser zoom (200%)
-</best_practices>
+      </best_practices>
 
 ## Integration Points
 
 ### Agents Using This Skill
+
 - **developer**: Implements accessible components
 - **code-reviewer**: Reviews accessibility in PRs
 - **qa**: Tests accessibility compliance
@@ -370,11 +386,13 @@ Before finalizing accessibility review:
 - **react-pro**: React-specific accessibility patterns
 
 ### Related Skills
+
 - **frontend-expert**: UI component patterns
 - **react-expert**: React accessibility patterns
 - **mobile-first-design-rules**: Touch accessibility
 
 ### Workflows
+
 - **feature-development-workflow.md**: Accessibility review in Review phase
 - **code-review-workflow.md**: Accessibility checklist
 
@@ -394,6 +412,7 @@ cat .claude/context/memory/learnings.md
 ```
 
 Check for:
+
 - Previously discovered accessibility patterns
 - Common accessibility issues in this codebase
 - Project-specific accessibility requirements

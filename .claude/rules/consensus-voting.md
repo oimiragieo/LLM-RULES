@@ -12,13 +12,13 @@
 
 ### Protocol Types
 
-| Protocol       | Use Case                           | Threshold | Quorum |
-| -------------- | ---------------------------------- | --------- | ------ |
-| Simple Majority| Routine decisions                  | >50%      | 50%    |
-| Supermajority  | Significant changes                | ≥66%      | 75%    |
-| Unanimous      | Critical/irreversible decisions    | 100%      | 100%   |
-| Weighted       | Specialized expertise required     | Variable  | 66%    |
-| Ranked Choice  | Multiple alternatives              | Runoff    | 75%    |
+| Protocol        | Use Case                        | Threshold | Quorum |
+| --------------- | ------------------------------- | --------- | ------ |
+| Simple Majority | Routine decisions               | >50%      | 50%    |
+| Supermajority   | Significant changes             | ≥66%      | 75%    |
+| Unanimous       | Critical/irreversible decisions | 100%      | 100%   |
+| Weighted        | Specialized expertise required  | Variable  | 66%    |
+| Ranked Choice   | Multiple alternatives           | Runoff    | 75%    |
 
 ### Weighted Voting Standards
 
@@ -26,10 +26,10 @@ Assign weights based on domain expertise:
 
 ```yaml
 weights:
-  database-architect: 2.0  # Domain expert
-  security-architect: 1.5  # Secondary expertise
-  developer: 1.0           # General expertise
-  qa: 0.8                  # Peripheral expertise
+  database-architect: 2.0 # Domain expert
+  security-architect: 1.5 # Secondary expertise
+  developer: 1.0 # General expertise
+  qa: 0.8 # Peripheral expertise
 ```
 
 **Weight justification required**: Document why each agent receives their weight.
@@ -76,15 +76,15 @@ When automated consensus fails:
 
 ## Anti-Patterns
 
-| Anti-Pattern                     | Problem                              | Fix                                          |
-| -------------------------------- | ------------------------------------ | -------------------------------------------- |
-| No quorum requirement            | Small group decides for all          | Set minimum participation threshold          |
-| Equal weights for all            | Ignores domain expertise             | Weight votes by expertise                    |
-| Discarding dissent               | Loses valuable perspectives          | Document all rationales (majority + minority)|
-| No confidence scoring            | Binary votes lose nuance             | Include confidence (0.0-1.0) with each vote  |
-| Immediate decision on split vote | Rushed decisions on ambiguity        | Re-vote with deliberation or escalate        |
-| No audit trail                   | Can't trace why decision was made    | Log all votes, weights, rationales           |
-| Allowing abstentions             | Agents avoid difficult decisions     | Require votes from all participants          |
+| Anti-Pattern                     | Problem                           | Fix                                           |
+| -------------------------------- | --------------------------------- | --------------------------------------------- |
+| No quorum requirement            | Small group decides for all       | Set minimum participation threshold           |
+| Equal weights for all            | Ignores domain expertise          | Weight votes by expertise                     |
+| Discarding dissent               | Loses valuable perspectives       | Document all rationales (majority + minority) |
+| No confidence scoring            | Binary votes lose nuance          | Include confidence (0.0-1.0) with each vote   |
+| Immediate decision on split vote | Rushed decisions on ambiguity     | Re-vote with deliberation or escalate         |
+| No audit trail                   | Can't trace why decision was made | Log all votes, weights, rationales            |
+| Allowing abstentions             | Agents avoid difficult decisions  | Require votes from all participants           |
 
 ## Byzantine Fault Tolerance
 
@@ -137,10 +137,10 @@ When automated consensus fails:
 
 ### Weighted Results
 
-| Option     | Weighted Score | Percentage |
-| ---------- | -------------- | ---------- |
-| Option A   | X.XX           | XX.X%      |
-| Option B   | Y.YY           | YY.Y%      |
+| Option   | Weighted Score | Percentage |
+| -------- | -------------- | ---------- |
+| Option A | X.XX           | XX.X%      |
+| Option B | Y.YY           | YY.Y%      |
 
 ### Decision
 

@@ -4,18 +4,11 @@
   "title": "Terraform Infrastructure Skill Output",
   "description": "Output schema for Terraform infrastructure generation and validation",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

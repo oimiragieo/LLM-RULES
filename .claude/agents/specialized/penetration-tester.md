@@ -6,6 +6,7 @@ model: opus
 temperature: 0.4
 context_strategy: lazy_load
 priority: high
+extended_thinking: true
 tools:
   [
     Read,

@@ -46,6 +46,7 @@
 
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const {
   parseHookInputAsync,
@@ -103,6 +104,54 @@ function getViolationTracker() {
     violationTracker = null;
   }
   return violationTracker;
+}
+
+const ROUTING_RUNTIME_DIR = path.join(__dirname, '..', '..', 'context', 'runtime');
+const BLOCK_DEDUPE_STATE_PATH = path.join(ROUTING_RUNTIME_DIR, 'routing-block-dedupe.json');
+const BLOCK_DEDUPE_THRESHOLD = Number(process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD || 2);
+const BLOCK_DEDUPE_WINDOW_MS = Number(process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS || 90000);
+
+function getBlockDedupeState() {
+  try {
+    if (!fs.existsSync(BLOCK_DEDUPE_STATE_PATH)) return {};
+    const raw = fs.readFileSync(BLOCK_DEDUPE_STATE_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (_err) {
+    return {};
+  }
+}
+
+function setBlockDedupeState(state) {
+  try {
+    fs.mkdirSync(ROUTING_RUNTIME_DIR, { recursive: true });
+    fs.writeFileSync(BLOCK_DEDUPE_STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+  } catch (_err) {
+    // Best-effort: dedupe is optimization only.
+  }
+}
+
+function registerBlockAttempt(checkName, toolName) {
+  const now = Date.now();
+  const sessionId = process.env.CLAUDE_SESSION_ID || null;
+  if (!sessionId) {
+    return { count: 1, dedupe: false };
+  }
+  const key = `${sessionId}:${checkName}:${toolName}`;
+  const state = getBlockDedupeState();
+  const entry = state[key] || { count: 0, lastAt: 0 };
+  const withinWindow = now - Number(entry.lastAt || 0) <= BLOCK_DEDUPE_WINDOW_MS;
+  const count = withinWindow ? Number(entry.count || 0) + 1 : 1;
+  state[key] = { count, lastAt: now };
+  setBlockDedupeState(state);
+  return { count, dedupe: count >= BLOCK_DEDUPE_THRESHOLD };
+}
+
+function compactFallbackMessage(title, toolName, count, fallback) {
+  return (
+    `[${title}] Repeated block (${count}x) for ${toolName}. ` +
+    `Do not retry the same tool call. Spawn an agent via Task() tool. Fallback: ${fallback}`
+  );
 }
 
 // =============================================================================
@@ -675,6 +724,21 @@ function checkRouterBash(toolName, toolInput = {}) {
 
   // Router is using non-whitelisted Bash command - VIOLATION
   const truncatedCmd = command.length > 50 ? command.slice(0, 47) + '...' : command;
+  const dedupe = registerBlockAttempt('router-bash-check', toolName);
+  if (dedupe.dedupe) {
+    const fallback =
+      "Task({ subagent_type: 'general-purpose', description: 'Run bash command safely', prompt: 'Use Bash for the required command and report results.' })";
+    const message = compactFallbackMessage(
+      'ROUTER BASH VIOLATION BLOCKED (ADR-030)',
+      truncatedCmd || 'bash',
+      dedupe.count,
+      fallback
+    );
+    if (enforcement === 'block') {
+      return { pass: false, result: 'block', message };
+    }
+    return { pass: true, result: 'warn', message };
+  }
   const message = `
 +======================================================================+
 |  ROUTER BASH VIOLATION BLOCKED (ADR-030)                             |
@@ -807,7 +871,12 @@ function checkRouterSelfCheck(toolName, toolInput = {}) {
 
   // Router is using blacklisted tool directly - violation
   debugLog('BLOCK: Router using blacklisted tool', { tool: toolName, enforcement });
-  const message = `[ROUTER SELF-CHECK VIOLATION] Router attempted to use blacklisted tool: ${toolName}
+  const dedupe = registerBlockAttempt('router-self-check', toolName);
+  const message = dedupe.dedupe
+    ? `[ROUTER SELF-CHECK VIOLATION] Router attempted to use blacklisted tool: ${toolName}. ` +
+      `Repeated block (${dedupe.count}x). Spawn an agent via Task() tool to perform this operation. ` +
+      `Fallback: Task({ subagent_type: 'general-purpose', description: 'Handle blocked operation', prompt: 'Perform the requested operation and report results.' })`
+    : `[ROUTER SELF-CHECK VIOLATION] Router attempted to use blacklisted tool: ${toolName}
 Spawn an agent via Task() tool to perform this operation.`;
 
   // Record violation in violation-tracker
@@ -1248,7 +1317,15 @@ function checkTaskListFirstGate(toolName) {
   }
 
   // Router is using a tool without calling TaskList first
-  const message = `[TASKLIST-FIRST VIOLATION] Router must call TaskList() before using ${toolName}.
+  const dedupe = registerBlockAttempt('tasklist-first-gate', toolName);
+  const message = dedupe.dedupe
+    ? compactFallbackMessage(
+        'TASKLIST-FIRST VIOLATION',
+        toolName,
+        dedupe.count,
+        'TaskList() once, then continue with Task()/tool call'
+      )
+    : `[TASKLIST-FIRST VIOLATION] Router must call TaskList() before using ${toolName}.
 Call TaskList() first to check existing tasks, then proceed with your operation.`;
 
   // Record violation

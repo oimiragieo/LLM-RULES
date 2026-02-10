@@ -198,8 +198,8 @@ instance.doSomething(); // Output: expected result
 \`\`\`typescript
 // Complex example showing options
 const instance = new MyClass({
-  option1: true,
-  option2: 'value'
+option1: true,
+option2: 'value'
 });
 \`\`\`
 ```
@@ -219,25 +219,27 @@ const instance = new MyClass({
 
 ## Anti-Patterns
 
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| Wall of text | Impossible to scan | Use headers and lists |
-| Missing setup | Readers can't install | Include step-by-step instructions |
-| No examples | Unclear how to use | Add working code examples |
-| Outdated info | Misleads users | Update with releases |
-| Too detailed | Overwhelming | Link to full docs instead |
-| No table of contents | Hard to navigate | Add section links at top |
-| Broken links | Poor user experience | Test all external links |
-| Marketing fluff | Lacks substance | Focus on what it does, not hype |
+| Pattern              | Problem               | Fix                               |
+| -------------------- | --------------------- | --------------------------------- |
+| Wall of text         | Impossible to scan    | Use headers and lists             |
+| Missing setup        | Readers can't install | Include step-by-step instructions |
+| No examples          | Unclear how to use    | Add working code examples         |
+| Outdated info        | Misleads users        | Update with releases              |
+| Too detailed         | Overwhelming          | Link to full docs instead         |
+| No table of contents | Hard to navigate      | Add section links at top          |
+| Broken links         | Poor user experience  | Test all external links           |
+| Marketing fluff      | Lacks substance       | Focus on what it does, not hype   |
 
 ## Integration Points
 
 **Related Skills**:
+
 - `doc-generator` - Automated documentation from code
 - `writing-skills` - Writing quality guidelines
 - `technical-writer` - Professional documentation agent
 
 **Related Agents**:
+
 - `technical-writer` - Uses this skill for documentation
 - `developer` - Writes README for new projects
 

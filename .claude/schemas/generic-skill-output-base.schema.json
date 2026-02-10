@@ -4,18 +4,11 @@
   "title": "Generic Skill Output Base",
   "description": "Base schema for skills without domain-specific output validation. Skills using this schema intentionally accept any structured output. When a skill develops domain-specific output needs, replace the $ref with a full schema.",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

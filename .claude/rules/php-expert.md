@@ -18,6 +18,7 @@
 - Use Laravel Mix/Vite for asset compilation
 
 ### Laravel Naming Conventions
+
 - File names: kebab-case (my-class-file.php)
 - Class names: PascalCase (MyClass)
 - Method names: camelCase (myMethod)
@@ -25,6 +26,7 @@
 - Constants: SCREAMING_SNAKE_CASE (MY_CONSTANT)
 
 ### Laravel Package Development
+
 - Use spatie/laravel-package-tools boilerplate
 - Implement Pint configuration for code styling
 - Prefer helpers over facades

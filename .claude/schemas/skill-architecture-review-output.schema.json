@@ -3,18 +3,11 @@
   "title": "Architecture Review Output",
   "description": "Validates output from architecture-review skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -33,19 +26,11 @@
           "properties": {
             "architectureAssessment": {
               "type": "object",
-              "required": [
-                "overallRating",
-                "summary"
-              ],
+              "required": ["overallRating", "summary"],
               "properties": {
                 "overallRating": {
                   "type": "string",
-                  "enum": [
-                    "strong",
-                    "adequate",
-                    "weak",
-                    "critical-issues"
-                  ],
+                  "enum": ["strong", "adequate", "weak", "critical-issues"],
                   "description": "Overall architecture quality"
                 },
                 "summary": {
@@ -60,13 +45,7 @@
               "description": "Detected anti-patterns",
               "items": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "severity",
-                  "description",
-                  "location",
-                  "fix"
-                ],
+                "required": ["name", "severity", "description", "location", "fix"],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -74,12 +53,7 @@
                   },
                   "severity": {
                     "type": "string",
-                    "enum": [
-                      "critical",
-                      "high",
-                      "medium",
-                      "low"
-                    ]
+                    "enum": ["critical", "high", "medium", "low"]
                   },
                   "description": {
                     "type": "string",
@@ -104,10 +78,7 @@
             },
             "nfrCompliance": {
               "type": "object",
-              "required": [
-                "compliant",
-                "categories"
-              ],
+              "required": ["compliant", "categories"],
               "properties": {
                 "compliant": {
                   "type": "boolean",
@@ -118,12 +89,7 @@
                   "description": "NFR categories reviewed",
                   "items": {
                     "type": "object",
-                    "required": [
-                      "category",
-                      "requirement",
-                      "designApproach",
-                      "compliant"
-                    ],
+                    "required": ["category", "requirement", "designApproach", "compliant"],
                     "properties": {
                       "category": {
                         "type": "string",
@@ -145,11 +111,7 @@
                       },
                       "compliant": {
                         "type": "string",
-                        "enum": [
-                          "yes",
-                          "partial",
-                          "no"
-                        ]
+                        "enum": ["yes", "partial", "no"]
                       },
                       "gaps": {
                         "type": "array",
@@ -168,12 +130,7 @@
               "description": "Technical risks identified",
               "items": {
                 "type": "object",
-                "required": [
-                  "risk",
-                  "impact",
-                  "probability",
-                  "mitigation"
-                ],
+                "required": ["risk", "impact", "probability", "mitigation"],
                 "properties": {
                   "risk": {
                     "type": "string",
@@ -181,20 +138,11 @@
                   },
                   "impact": {
                     "type": "string",
-                    "enum": [
-                      "critical",
-                      "high",
-                      "medium",
-                      "low"
-                    ]
+                    "enum": ["critical", "high", "medium", "low"]
                   },
                   "probability": {
                     "type": "string",
-                    "enum": [
-                      "high",
-                      "medium",
-                      "low"
-                    ]
+                    "enum": ["high", "medium", "low"]
                   },
                   "mitigation": {
                     "type": "string",
@@ -212,11 +160,7 @@
               "description": "Prioritized recommendations",
               "items": {
                 "type": "object",
-                "required": [
-                  "priority",
-                  "recommendation",
-                  "rationale"
-                ],
+                "required": ["priority", "recommendation", "rationale"],
                 "properties": {
                   "priority": {
                     "type": "integer",
@@ -235,12 +179,7 @@
                   },
                   "effort": {
                     "type": "string",
-                    "enum": [
-                      "trivial",
-                      "small",
-                      "medium",
-                      "large"
-                    ],
+                    "enum": ["trivial", "small", "medium", "large"],
                     "description": "Implementation effort"
                   }
                 }
@@ -251,11 +190,7 @@
               "description": "Documented design trade-offs",
               "items": {
                 "type": "object",
-                "required": [
-                  "decision",
-                  "advantages",
-                  "disadvantages"
-                ],
+                "required": ["decision", "advantages", "disadvantages"],
                 "properties": {
                   "decision": {
                     "type": "string",
@@ -285,9 +220,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

@@ -38,7 +38,7 @@ A track is a logical work unit (feature, bug fix, major refactor) that moves thr
 ## Task States
 
 - `[ ]` - Pending
-- `[~]` - In Progress  
+- `[~]` - In Progress
 - `[x]` - Complete (with commit SHA)
 - `[-]` - Skipped (with reason)
 - `[!]` - Blocked (with blocker description)

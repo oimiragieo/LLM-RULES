@@ -4,18 +4,11 @@
   "title": "Container Expert Skill Output",
   "description": "Output schema for container expert skill including Docker, Kubernetes, Helm, and service mesh configurations",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

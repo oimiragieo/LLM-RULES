@@ -3,18 +3,11 @@
   "title": "response-rater Output Schema",
   "description": "Output structure for response-rater skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -23,11 +16,7 @@
       "properties": {
         "contentType": {
           "type": "string",
-          "enum": [
-            "plan",
-            "response",
-            "document"
-          ]
+          "enum": ["plan", "response", "document"]
         },
         "rubric": {
           "type": "string",
@@ -38,11 +27,7 @@
           "minItems": 4,
           "items": {
             "type": "object",
-            "required": [
-              "dimension",
-              "score",
-              "justification"
-            ],
+            "required": ["dimension", "score", "justification"],
             "properties": {
               "dimension": {
                 "type": "string"
@@ -76,18 +61,11 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "priority",
-              "recommendation"
-            ],
+            "required": ["priority", "recommendation"],
             "properties": {
               "priority": {
                 "type": "string",
-                "enum": [
-                  "high",
-                  "medium",
-                  "low"
-                ]
+                "enum": ["high", "medium", "low"]
               },
               "recommendation": {
                 "type": "string"

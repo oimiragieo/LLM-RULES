@@ -13,12 +13,14 @@
 ### Capture Strategy
 
 **Tools**:
+
 - `tcpdump` / `tshark` - Command-line packet capture
 - `Wireshark` - Interactive analysis
 - `mitmproxy` - TLS interception for HTTPS
 - `Burp Suite` - Web application protocols
 
 **Capture filters** (reduce noise):
+
 ```bash
 # Capture only traffic to/from specific host
 tcpdump -i eth0 host 192.168.1.100
@@ -37,6 +39,7 @@ tcpdump -i eth0 'tcp[tcpflags] & tcp-syn != 0'
 **Best practice**: Capture target protocol in isolation (no background traffic).
 
 **Technique**:
+
 1. Set up controlled environment (VM, container)
 2. Disable unrelated services
 3. Generate minimal test cases (login, logout, single action)
@@ -50,12 +53,14 @@ tcpdump -i eth0 'tcp[tcpflags] & tcp-syn != 0'
 ## Protocol States
 
 ### State: INIT
+
 - **Entry**: Connection established
 - **Transitions**:
   - SEND ClientHello → WAIT_SERVER_HELLO
   - Timeout → ERROR
 
 ### State: WAIT_SERVER_HELLO
+
 - **Entry**: ClientHello sent
 - **Transitions**:
   - RECV ServerHello → AUTHENTICATED
@@ -63,6 +68,7 @@ tcpdump -i eth0 'tcp[tcpflags] & tcp-syn != 0'
   - Timeout (30s) → ERROR
 
 ### State: AUTHENTICATED
+
 - **Entry**: Handshake complete
 - **Transitions**:
   - SEND Request → WAIT_RESPONSE
@@ -102,30 +108,32 @@ sequenceDiagram
 
 ### Header (Common to all messages)
 
-| Offset | Size | Type   | Name        | Description              |
-| ------ | ---- | ------ | ----------- | ------------------------ |
-| 0      | 1    | uint8  | magic       | Always 0xAB              |
-| 1      | 1    | uint8  | msg_type    | Message type (see table) |
-| 2      | 2    | uint16 | length      | Payload length (big-endian)|
-| 4      | N    | bytes  | payload     | Message-specific data    |
+| Offset | Size | Type   | Name     | Description                 |
+| ------ | ---- | ------ | -------- | --------------------------- |
+| 0      | 1    | uint8  | magic    | Always 0xAB                 |
+| 1      | 1    | uint8  | msg_type | Message type (see table)    |
+| 2      | 2    | uint16 | length   | Payload length (big-endian) |
+| 4      | N    | bytes  | payload  | Message-specific data       |
 
 ### Message Types
 
-| Type | Hex  | Name         | Direction | Purpose           |
-| ---- | ---- | ------------ | --------- | ----------------- |
-| 1    | 0x01 | ClientHello  | C→S       | Initiate session  |
-| 2    | 0x02 | ServerHello  | S→C       | Accept session    |
-| 3    | 0x03 | Auth         | C→S       | Authenticate user |
-| 4    | 0x04 | AuthOK       | S→C       | Auth successful   |
+| Type | Hex  | Name        | Direction | Purpose           |
+| ---- | ---- | ----------- | --------- | ----------------- |
+| 1    | 0x01 | ClientHello | C→S       | Initiate session  |
+| 2    | 0x02 | ServerHello | S→C       | Accept session    |
+| 3    | 0x03 | Auth        | C→S       | Authenticate user |
+| 4    | 0x04 | AuthOK      | S→C       | Auth successful   |
 
 ## Patterns
 
 ### Length Fields
+
 - **Position**: Offset 2 (after magic + type)
 - **Encoding**: Big-endian uint16
 - **Semantics**: Payload bytes (excludes header)
 
 ### Checksums
+
 - **Position**: Last 4 bytes of message
 - **Algorithm**: CRC32
 - **Coverage**: Entire message excluding checksum field
@@ -177,15 +185,15 @@ seq:
 
 ## Anti-Patterns
 
-| Anti-Pattern                     | Problem                            | Fix                                        |
-| -------------------------------- | ---------------------------------- | ------------------------------------------ |
-| Analyzing single packet          | Miss context/session state         | Capture full session flows                 |
-| No state machine                 | Can't validate message sequences   | Model protocol as state machine            |
-| Guessing field semantics         | Incorrect assumptions              | Test hypotheses with crafted packets       |
-| Hardcoding offsets               | Breaks with variable-length fields | Use length fields dynamically              |
-| No endianness awareness          | Misinterpret multi-byte values     | Document endianness (big vs little)        |
-| Ignoring checksums               | Can't validate message integrity   | Identify and reverse checksum algorithm    |
-| Text instead of hex              | Loss of precision for binary       | Use hex dumps with ASCII side panel        |
+| Anti-Pattern             | Problem                            | Fix                                     |
+| ------------------------ | ---------------------------------- | --------------------------------------- |
+| Analyzing single packet  | Miss context/session state         | Capture full session flows              |
+| No state machine         | Can't validate message sequences   | Model protocol as state machine         |
+| Guessing field semantics | Incorrect assumptions              | Test hypotheses with crafted packets    |
+| Hardcoding offsets       | Breaks with variable-length fields | Use length fields dynamically           |
+| No endianness awareness  | Misinterpret multi-byte values     | Document endianness (big vs little)     |
+| Ignoring checksums       | Can't validate message integrity   | Identify and reverse checksum algorithm |
+| Text instead of hex      | Loss of precision for binary       | Use hex dumps with ASCII side panel     |
 
 ## Integration Points
 

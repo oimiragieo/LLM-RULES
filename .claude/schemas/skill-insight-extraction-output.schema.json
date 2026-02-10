@@ -3,18 +3,11 @@
   "title": "Insight Extraction Output",
   "description": "Output schema for insight-extraction skill",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -23,11 +16,7 @@
       "properties": {
         "output": {
           "type": "object",
-          "required": [
-            "sessionId",
-            "timestamp",
-            "insights"
-          ],
+          "required": ["sessionId", "timestamp", "insights"],
           "properties": {
             "sessionId": {
               "type": "string"
@@ -40,22 +29,11 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "category",
-                  "name",
-                  "context",
-                  "insight",
-                  "impact"
-                ],
+                "required": ["category", "name", "context", "insight", "impact"],
                 "properties": {
                   "category": {
                     "type": "string",
-                    "enum": [
-                      "pattern",
-                      "technical",
-                      "process",
-                      "decision"
-                    ]
+                    "enum": ["pattern", "technical", "process", "decision"]
                   },
                   "name": {
                     "type": "string",
@@ -93,10 +71,7 @@
                   },
                   "scope": {
                     "type": "string",
-                    "enum": [
-                      "project-specific",
-                      "universal"
-                    ],
+                    "enum": ["project-specific", "universal"],
                     "description": "Applicability scope"
                   }
                 }
@@ -159,19 +134,11 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "file",
-                  "section",
-                  "content"
-                ],
+                "required": ["file", "section", "content"],
                 "properties": {
                   "file": {
                     "type": "string",
-                    "enum": [
-                      "learnings.md",
-                      "decisions.md",
-                      "issues.md"
-                    ]
+                    "enum": ["learnings.md", "decisions.md", "issues.md"]
                   },
                   "section": {
                     "type": "string"
@@ -188,9 +155,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "output"
-      ]
+      "required": ["output"]
     }
   },
   "additionalProperties": false,

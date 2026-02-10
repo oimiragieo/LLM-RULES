@@ -6,7 +6,7 @@ model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 priority: high
-extended_thinking: false
+extended_thinking: true
 tools: [Read, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 disallowedTools: [Write, Edit]
 skills:

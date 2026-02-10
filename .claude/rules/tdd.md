@@ -11,30 +11,37 @@ Write code before the test? Delete it. Start over. No exceptions.
 ## Red-Green-Refactor Cycle
 
 ### RED - Write Failing Test
+
 - Write one minimal test showing what should happen
 - Test one behavior
 - Clear name describes behavior
 - Real code (no mocks unless unavoidable)
 
 ### Verify RED - Watch It Fail
+
 **MANDATORY. Never skip.**
+
 - Confirm test fails (not errors)
 - Failure message is expected
 - Fails because feature missing (not typos)
 
 ### GREEN - Minimal Code
+
 - Write simplest code to pass the test
 - Just enough to pass
 - No features beyond the test
 - No refactoring other code
 
 ### Verify GREEN - Watch It Pass
+
 **MANDATORY.**
+
 - Confirm test passes
 - Other tests still pass
 - Output pristine (no errors, warnings)
 
 ### REFACTOR - Clean Up
+
 - After green only
 - Remove duplication
 - Improve names
@@ -44,12 +51,14 @@ Write code before the test? Delete it. Start over. No exceptions.
 ## When to Use
 
 **Always:**
+
 - New features
 - Bug fixes
 - Refactoring
 - Behavior changes
 
 **Exceptions** (ask your human partner):
+
 - Throwaway prototypes
 - Generated code
 - Configuration files
@@ -67,15 +76,15 @@ Write code before the test? Delete it. Start over. No exceptions.
 
 ## Common Rationalizations
 
-| Excuse                              | Reality                                    |
-|-------------------------------------|--------------------------------------------|
-| "Too simple to test"                | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after"                   | Tests passing immediately prove nothing.   |
-| "Already manually tested"           | Ad-hoc does not equal systematic.          |
-| "Deleting X hours is wasteful"      | Sunk cost fallacy. Keep = technical debt.  |
-| "Need to explore first"             | Fine. Throw away exploration, start TDD.   |
-| "Test hard = design unclear"        | Listen to test. Hard to test = hard to use.|
-| "TDD will slow me down"             | TDD faster than debugging.                 |
+| Excuse                         | Reality                                     |
+| ------------------------------ | ------------------------------------------- |
+| "Too simple to test"           | Simple code breaks. Test takes 30 seconds.  |
+| "I'll test after"              | Tests passing immediately prove nothing.    |
+| "Already manually tested"      | Ad-hoc does not equal systematic.           |
+| "Deleting X hours is wasteful" | Sunk cost fallacy. Keep = technical debt.   |
+| "Need to explore first"        | Fine. Throw away exploration, start TDD.    |
+| "Test hard = design unclear"   | Listen to test. Hard to test = hard to use. |
+| "TDD will slow me down"        | TDD faster than debugging.                  |
 
 ## Pre-Completion Requirements (BLOCKING)
 

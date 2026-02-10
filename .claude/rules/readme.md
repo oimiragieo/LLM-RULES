@@ -28,10 +28,12 @@ One-liner explaining what this project does.
 ## Installation
 
 ### Requirements
+
 - Dependency 1
 - Dependency 2
 
 ### Steps
+
 \`\`\`bash
 pnpm install project-name
 \`\`\`
@@ -76,36 +78,40 @@ const result = feature({ option: 'value' });
 
 ## Anti-Patterns
 
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| Wall of text | Impossible to scan | Use headers and lists |
-| Missing setup | Readers can't install | Step-by-step instructions |
-| No examples | Unclear how to use | Add working code examples |
-| Outdated info | Misleads users | Update with releases |
-| Too detailed | Overwhelming | Link to full docs instead |
-| No table of contents | Hard to navigate | Add section links at top |
-| Broken links | Poor user experience | Test all external links |
-| Marketing fluff | Lacks substance | Focus on what it does, not hype |
-| Vague descriptions | "This library is great" | Specific: "Reduces API response time 40%" |
+| Pattern              | Problem                 | Fix                                       |
+| -------------------- | ----------------------- | ----------------------------------------- |
+| Wall of text         | Impossible to scan      | Use headers and lists                     |
+| Missing setup        | Readers can't install   | Step-by-step instructions                 |
+| No examples          | Unclear how to use      | Add working code examples                 |
+| Outdated info        | Misleads users          | Update with releases                      |
+| Too detailed         | Overwhelming            | Link to full docs instead                 |
+| No table of contents | Hard to navigate        | Add section links at top                  |
+| Broken links         | Poor user experience    | Test all external links                   |
+| Marketing fluff      | Lacks substance         | Focus on what it does, not hype           |
+| Vague descriptions   | "This library is great" | Specific: "Reduces API response time 40%" |
 
 ## Integration Points
 
 **Related Skills**:
+
 - `doc-generator` - Automated documentation from code
 - `writing-skills` - Writing quality guidelines
 - `technical-writer` - Professional documentation agent
 
 **Related Agents**:
+
 - `technical-writer` - Uses this skill for documentation
 - `developer` - Writes README for new projects
 
 **Related Workflows**:
+
 - Documentation workflow - README generation phase
 - Project onboarding - README is first touchpoint
 
 ## Quality Checklist
 
 Before completing README, verify:
+
 - [ ] Clear project purpose in first paragraph
 - [ ] Installation instructions complete and tested
 - [ ] Examples are runnable (copy-paste ready)

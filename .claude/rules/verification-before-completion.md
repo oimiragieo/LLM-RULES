@@ -26,15 +26,15 @@ Skip any step = lying, not verifying
 
 ## Common Failures
 
-| Claim                 | Requires                               | Not Sufficient                |
-|-----------------------|----------------------------------------|-------------------------------|
-| Tests pass            | Test command output: 0 failures        | Previous run, "should pass"   |
-| Linter clean          | `pnpm lint:fix` output: 0 errors       | Partial check, extrapolation  |
-| Format clean          | `pnpm format` output: no changes       | Visual inspection, assumption |
-| Build succeeds        | Build command: exit 0                  | Linter passing                |
-| Bug fixed             | Test original symptom: passes          | Code changed, assumed fixed   |
-| Regression test works | Red-green cycle verified               | Test passes once              |
-| Requirements met      | Line-by-line checklist                 | Tests passing                 |
+| Claim                 | Requires                         | Not Sufficient                |
+| --------------------- | -------------------------------- | ----------------------------- |
+| Tests pass            | Test command output: 0 failures  | Previous run, "should pass"   |
+| Linter clean          | `pnpm lint:fix` output: 0 errors | Partial check, extrapolation  |
+| Format clean          | `pnpm format` output: no changes | Visual inspection, assumption |
+| Build succeeds        | Build command: exit 0            | Linter passing                |
+| Bug fixed             | Test original symptom: passes    | Code changed, assumed fixed   |
+| Regression test works | Red-green cycle verified         | Test passes once              |
+| Requirements met      | Line-by-line checklist           | Tests passing                 |
 
 ## Red Flags - STOP
 
@@ -49,24 +49,28 @@ Skip any step = lying, not verifying
 ## Key Patterns
 
 **Tests:**
+
 ```
 CORRECT: [Run test command] [See: 34/34 pass] "All tests pass"
 WRONG: "Should pass now" / "Looks correct"
 ```
 
 **Regression tests (TDD Red-Green):**
+
 ```
 CORRECT: Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
 WRONG: "I've written a regression test" (without red-green verification)
 ```
 
 **Lint and Format (BLOCKING GATE):**
+
 ```
 CORRECT: [Run pnpm lint:fix] [See: 0 errors] [Run pnpm format] [See: no changes] "Lint and format clean"
 WRONG: "Code looks formatted" / "No obvious lint issues"
 ```
 
 **Requirements:**
+
 ```
 CORRECT: Re-read plan → Create checklist → Verify each → Report gaps or completion
 WRONG: "Tests pass, phase complete"
@@ -75,6 +79,7 @@ WRONG: "Tests pass, phase complete"
 ## When To Apply
 
 **ALWAYS before:**
+
 - ANY variation of success/completion claims
 - ANY expression of satisfaction
 - ANY positive statement about work state

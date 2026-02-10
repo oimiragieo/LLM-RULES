@@ -4,18 +4,11 @@
   "title": "K8s Manifest Generator Skill Output",
   "description": "Output schema for Kubernetes manifest generation with best practices and security standards",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

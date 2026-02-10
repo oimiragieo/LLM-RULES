@@ -4,29 +4,18 @@
   "title": "Code Semantic Search Skill Output",
   "description": "Validates output from code-semantic-search skill - Semantic code search with relevance scores",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Semantic search results",
-      "required": [
-        "results",
-        "relevanceScores",
-        "query"
-      ],
+      "required": ["results", "relevanceScores", "query"],
       "properties": {
         "results": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "file",
-              "snippet",
-              "relevanceScore"
-            ],
+            "required": ["file", "snippet", "relevanceScore"],
             "properties": {
               "file": {
                 "type": "string"
@@ -54,11 +43,7 @@
               },
               "matchType": {
                 "type": "string",
-                "enum": [
-                  "semantic",
-                  "hybrid",
-                  "structural"
-                ]
+                "enum": ["semantic", "hybrid", "structural"]
               }
             }
           },
@@ -66,11 +51,7 @@
         },
         "relevanceScores": {
           "type": "object",
-          "required": [
-            "minimum",
-            "maximum",
-            "average"
-          ],
+          "required": ["minimum", "maximum", "average"],
           "properties": {
             "minimum": {
               "type": "number",
@@ -97,10 +78,7 @@
         },
         "query": {
           "type": "object",
-          "required": [
-            "text",
-            "mode"
-          ],
+          "required": ["text", "mode"],
           "properties": {
             "text": {
               "type": "string",
@@ -108,11 +86,7 @@
             },
             "mode": {
               "type": "string",
-              "enum": [
-                "hybrid",
-                "semantic-only",
-                "structural-only"
-              ]
+              "enum": ["hybrid", "semantic-only", "structural-only"]
             },
             "language": {
               "type": "string"
@@ -163,10 +137,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "description",
-              "occurrences"
-            ],
+            "required": ["description", "occurrences"],
             "properties": {
               "description": {
                 "type": "string"
@@ -190,11 +161,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

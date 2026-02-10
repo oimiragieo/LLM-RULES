@@ -4,18 +4,11 @@
   "title": "Incident Runbook Templates Skill Output",
   "description": "Output schema for incident response runbooks with procedures, escalation paths, and recovery actions",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

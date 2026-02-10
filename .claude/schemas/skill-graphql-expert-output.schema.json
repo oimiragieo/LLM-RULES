@@ -4,18 +4,11 @@
   "title": "GraphQL Expert Skill Output",
   "description": "Output schema for GraphQL development including schema design, Apollo, and optimization",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

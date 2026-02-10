@@ -11,22 +11,26 @@
 ## Context Artifacts
 
 ### Configuration Context
+
 - `.claude/config.yaml` - Agent models, settings, feature flags
 - `.env.example` - Environment variable templates
 - `package.json` - Dependencies, scripts, metadata
 
 ### Memory Context
+
 - `.claude/context/memory/learnings.md` - Patterns and solutions
 - `.claude/context/memory/decisions.md` - ADRs and architecture choices
 - `.claude/context/memory/issues.md` - Known blockers and workarounds
 - `.claude/context/memory/named/` - Topic-specific persistent notes
 
 ### Agent Context
+
 - `.claude/agents/**/*.md` - Agent definitions and capabilities
 - `.claude/context/agent-registry.json` - Agent discovery and routing
 - `.claude/skills/**/*.md` - Reusable agent behaviors
 
 ### Workflow Context
+
 - `.claude/workflows/**/*.md` - Multi-agent orchestration patterns
 - `.claude/context/workflow-state.json` - Runtime workflow state
 

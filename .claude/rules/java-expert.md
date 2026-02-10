@@ -11,16 +11,19 @@
 ## Modern Java Features (Java 21+)
 
 ### Virtual Threads (Project Loom)
+
 - Use `Executors.newVirtualThreadPerTaskExecutor()` for I/O-bound tasks
 - Enable in Spring Boot 3.2+ via `spring.threads.virtual.enabled=true`
 - Dramatically improves scalability for concurrent connections
 
 ### Pattern Matching
+
 - Use pattern matching for switch statements
 - Implement record patterns for destructuring
 - Use pattern matching for instanceof checks
 
 ### Records
+
 - Use records for immutable data transfer objects
 - Implement sealed interfaces for exhaustive pattern matching
 - Keep records simple and focused

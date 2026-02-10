@@ -36,12 +36,15 @@ const { EventTypes } = require('../../lib/events/event-types.cjs');
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
 const REMINDER_PATH = path.join(RUNTIME_DIR, 'reflection-reminder.txt');
+const STEP0_STATE_PATH = path.join(RUNTIME_DIR, 'reflection-step0-state.json');
 
 /**
  * Maximum pending reflections before auto-clearing oldest entries
  * Prevents deadlock when reflection queue grows unbounded
  */
 const MAX_PENDING_REFLECTIONS = 5;
+const STEP0_REPEAT_WINDOW_MS = Number(process.env.REFLECTION_STEP0_REPEAT_WINDOW_MS || 120000);
+const STEP0_REPEAT_THRESHOLD = Number(process.env.REFLECTION_STEP0_REPEAT_THRESHOLD || 2);
 
 /** Log to stderr only (stdout reserved for single formatResult line). */
 function stderrLog(message, meta = {}) {
@@ -118,6 +121,37 @@ function hasPendingReflections() {
   return false;
 }
 
+function readStep0State() {
+  try {
+    if (!fs.existsSync(STEP0_STATE_PATH)) return {};
+    const parsed = JSON.parse(fs.readFileSync(STEP0_STATE_PATH, 'utf8'));
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (_err) {
+    return {};
+  }
+}
+
+function writeStep0State(state) {
+  try {
+    fs.mkdirSync(RUNTIME_DIR, { recursive: true });
+    fs.writeFileSync(STEP0_STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+  } catch (_err) {
+    // Best-effort
+  }
+}
+
+function registerStep0Block(pendingCount) {
+  const state = readStep0State();
+  const now = Date.now();
+  const key = `${process.env.CLAUDE_SESSION_ID || 'unknown'}:${pendingCount}`;
+  const current = state[key] || { count: 0, lastAt: 0 };
+  const withinWindow = now - Number(current.lastAt || 0) <= STEP0_REPEAT_WINDOW_MS;
+  const count = withinWindow ? Number(current.count || 0) + 1 : 1;
+  state[key] = { count, lastAt: now };
+  writeStep0State(state);
+  return count;
+}
+
 async function main() {
   const startTime = Date.now();
   try {
@@ -150,7 +184,7 @@ async function main() {
     }
 
     // Task 1.2: Auto-trim old reflections if count > MAX_PENDING_REFLECTIONS
-    const requests = readSpawnRequests(SPAWN_REQUEST_PATH);
+    let requests = readSpawnRequests(SPAWN_REQUEST_PATH);
     if (requests.length > MAX_PENDING_REFLECTIONS) {
       const trimmed = trimOldReflections(requests);
       try {
@@ -159,6 +193,7 @@ async function main() {
           before: requests.length,
           after: trimmed.length,
         });
+        requests = trimmed;
       } catch (err) {
         stderrLog('trim_failed', { error: err.message });
       }
@@ -166,15 +201,19 @@ async function main() {
 
     // Count pending requests for detailed message
     const pendingCount = requests.length;
+    const repeatCount = registerStep0Block(pendingCount);
 
     const message =
-      `${pendingCount} pending reflection request(s) in reflection-spawn-request.json. ` +
-      'STEP 0 REQUIRED: (1) Read reflection-spawn-request.json, ' +
-      '(2) Spawn reflection-agent for each request (or first batch), ' +
-      '(3) Clear/trim spawn-request.json, ' +
-      '(4) Delete reflection-reminder.txt if exists, ' +
-      'THEN proceed to TaskList(). ' +
-      'Set REFLECTION_STEP0_ENFORCEMENT=warn to allow with warning.';
+      repeatCount >= STEP0_REPEAT_THRESHOLD
+        ? `[REFLECTION STEP0] ${pendingCount} pending reflection request(s). Repeated block (${repeatCount}x). ` +
+          'Do not retry TaskList yet. Process first batch in reflection-spawn-request.json, then call TaskList().'
+        : `${pendingCount} pending reflection request(s) in reflection-spawn-request.json. ` +
+          'STEP 0 REQUIRED: (1) Read reflection-spawn-request.json, ' +
+          '(2) Spawn reflection-agent for each request (or first batch), ' +
+          '(3) Clear/trim spawn-request.json, ' +
+          '(4) Delete reflection-reminder.txt if exists, ' +
+          'THEN proceed to TaskList(). ' +
+          'Set REFLECTION_STEP0_ENFORCEMENT=warn to allow with warning.';
 
     auditLog('reflection-step0-guard', {
       level: mode === 'block' ? 'error' : 'warn',

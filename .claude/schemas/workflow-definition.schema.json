@@ -4,10 +4,7 @@
   "title": "Workflow Definition Schema",
   "description": "Schema for validating Claude Code workflow definition files",
   "type": "object",
-  "required": [
-    "name",
-    "steps"
-  ],
+  "required": ["name", "steps"],
   "unevaluatedProperties": false,
   "properties": {
     "name": {
@@ -23,11 +20,7 @@
     },
     "category": {
       "type": "string",
-      "enum": [
-        "rapid",
-        "enterprise",
-        "operations"
-      ],
+      "enum": ["rapid", "enterprise", "operations"],
       "description": "Workflow category"
     },
     "steps": {
@@ -43,9 +36,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "id"
-            ],
+            "required": ["id"],
             "unevaluatedProperties": false,
             "properties": {
               "id": {
@@ -180,11 +171,7 @@
   "examples": [
     {
       "name": "fix",
-      "steps": [
-        "reproduce",
-        "fix",
-        "verify"
-      ]
+      "steps": ["reproduce", "fix", "verify"]
     },
     {
       "name": "code-review",
@@ -195,17 +182,13 @@
           "id": "analyze",
           "description": "Analyze the code changes",
           "agent": "developer",
-          "skills": [
-            "code-analyzer"
-          ]
+          "skills": ["code-analyzer"]
         },
         {
           "id": "review",
           "description": "Review for quality and security",
           "agent": "architect",
-          "skills": [
-            "code-analyzer"
-          ]
+          "skills": ["code-analyzer"]
         },
         {
           "id": "approve",
@@ -214,12 +197,8 @@
         }
       ],
       "hooks": {
-        "entry": [
-          "review-start-logger"
-        ],
-        "exit": [
-          "review-complete-notifier"
-        ]
+        "entry": ["review-start-logger"],
+        "exit": ["review-complete-notifier"]
       }
     }
   ],

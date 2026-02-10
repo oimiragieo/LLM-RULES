@@ -17,19 +17,21 @@ Templates use `<PLACEHOLDER>` syntax for substitution:
 # <TITLE>
 
 ## Overview
+
 <DESCRIPTION>
 
 ## Usage
+
 <USAGE_PATTERN>
 ```
 
 ### Template Types
 
-| Type     | Purpose                  | Example                       |
-| -------- | ------------------------ | ----------------------------- |
-| Spawn    | Agent spawn prompts      | universal-agent-spawn.md      |
-| Artifact | Skill/workflow structure | skill-template.md             |
-| Code     | Code patterns            | typescript-service-template.ts|
+| Type     | Purpose                  | Example                        |
+| -------- | ------------------------ | ------------------------------ |
+| Spawn    | Agent spawn prompts      | universal-agent-spawn.md       |
+| Artifact | Skill/workflow structure | skill-template.md              |
+| Code     | Code patterns            | typescript-service-template.ts |
 
 ### File Placement
 

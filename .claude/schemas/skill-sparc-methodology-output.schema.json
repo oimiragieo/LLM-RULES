@@ -4,18 +4,11 @@
   "title": "SPARC Methodology Output",
   "description": "Schema for SPARC development methodology tracking",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -24,13 +17,7 @@
       "properties": {
         "currentPhase": {
           "type": "string",
-          "enum": [
-            "specification",
-            "architecture",
-            "refinement",
-            "review",
-            "completion"
-          ],
+          "enum": ["specification", "architecture", "refinement", "review", "completion"],
           "description": "Current SPARC phase"
         },
         "phases": {
@@ -41,11 +28,7 @@
               "properties": {
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "in_progress",
-                    "complete"
-                  ]
+                  "enum": ["pending", "in_progress", "complete"]
                 },
                 "requirements": {
                   "type": "array",
@@ -72,11 +55,7 @@
               "properties": {
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "in_progress",
-                    "complete"
-                  ]
+                  "enum": ["pending", "in_progress", "complete"]
                 },
                 "components": {
                   "type": "array",
@@ -97,11 +76,7 @@
               "properties": {
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "in_progress",
-                    "complete"
-                  ]
+                  "enum": ["pending", "in_progress", "complete"]
                 },
                 "tddCycles": {
                   "type": "number",
@@ -122,11 +97,7 @@
               "properties": {
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "in_progress",
-                    "complete"
-                  ]
+                  "enum": ["pending", "in_progress", "complete"]
                 },
                 "codeReview": {
                   "type": "boolean"
@@ -144,11 +115,7 @@
               "properties": {
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "in_progress",
-                    "complete"
-                  ]
+                  "enum": ["pending", "in_progress", "complete"]
                 },
                 "integrationTesting": {
                   "type": "boolean"
@@ -182,11 +149,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "currentPhase",
-        "phases",
-        "qualityGates"
-      ]
+      "required": ["currentPhase", "phases", "qualityGates"]
     }
   },
   "additionalProperties": false

@@ -152,7 +152,7 @@ try {
   if (!isAuthorized) return res.status(403).send('Forbidden');
 } catch (err) {
   console.error('Auth error:', err);
-  return res.status(500).send('Internal error');  // DENY on error
+  return res.status(500).send('Internal error'); // DENY on error
 }
 ```
 
@@ -211,20 +211,20 @@ rules:
 
 ### Common Insecure Defaults
 
-| Category | Insecure Default | Secure Alternative |
-|----------|-----------------|-------------------|
-| **CORS** | `origin: '*'` | Explicit allowed origins |
-| **Debug** | `debug: true` in production | `debug: false` |
-| **Binding** | `0.0.0.0` (all interfaces) | `127.0.0.1` or specific IP |
-| **TLS** | `rejectUnauthorized: false` | `rejectUnauthorized: true` |
-| **Cookies** | `secure: false`, `httpOnly: false` | `secure: true`, `httpOnly: true` |
-| **Session** | `secret: 'keyboard cat'` | Random secret from env var |
-| **Crypto** | MD5, SHA1, DES, RC4 | SHA-256+, AES-256, ChaCha20 |
-| **Permissions** | `0777` file permissions | `0644` or `0600` |
-| **JWT** | `algorithm: 'none'` | `algorithm: 'RS256'` or `'ES256'` |
-| **Rate limit** | No rate limiting | Rate limiting enabled |
-| **CSRF** | CSRF protection disabled | CSRF protection enabled |
-| **Helmet** | No security headers | Helmet middleware enabled |
+| Category        | Insecure Default                   | Secure Alternative                |
+| --------------- | ---------------------------------- | --------------------------------- |
+| **CORS**        | `origin: '*'`                      | Explicit allowed origins          |
+| **Debug**       | `debug: true` in production        | `debug: false`                    |
+| **Binding**     | `0.0.0.0` (all interfaces)         | `127.0.0.1` or specific IP        |
+| **TLS**         | `rejectUnauthorized: false`        | `rejectUnauthorized: true`        |
+| **Cookies**     | `secure: false`, `httpOnly: false` | `secure: true`, `httpOnly: true`  |
+| **Session**     | `secret: 'keyboard cat'`           | Random secret from env var        |
+| **Crypto**      | MD5, SHA1, DES, RC4                | SHA-256+, AES-256, ChaCha20       |
+| **Permissions** | `0777` file permissions            | `0644` or `0600`                  |
+| **JWT**         | `algorithm: 'none'`                | `algorithm: 'RS256'` or `'ES256'` |
+| **Rate limit**  | No rate limiting                   | Rate limiting enabled             |
+| **CSRF**        | CSRF protection disabled           | CSRF protection enabled           |
+| **Helmet**      | No security headers                | Helmet middleware enabled         |
 
 ### Semgrep Rules for Insecure Config
 
@@ -328,6 +328,7 @@ find . -name "*.tf" -o -name "*.tfvars" \
 ## Configuration Security Audit
 
 ### Credentials
+
 - [ ] No hardcoded passwords in source code
 - [ ] No API keys in source code
 - [ ] No private keys committed
@@ -336,24 +337,28 @@ find . -name "*.tf" -o -name "*.tfvars" \
 - [ ] .env.example has placeholder values only
 
 ### Network
+
 - [ ] Not binding to 0.0.0.0 in production
 - [ ] TLS/SSL enabled for all connections
 - [ ] Certificate verification enabled
 - [ ] CORS restricted to known origins
 
 ### Authentication
+
 - [ ] Session secret is random and from env var
 - [ ] JWT algorithm is not 'none'
 - [ ] Password hashing uses bcrypt/argon2 (not MD5/SHA1)
 - [ ] Cookie settings: secure, httpOnly, sameSite
 
 ### Error Handling
+
 - [ ] Auth errors deny access (fail-secure)
 - [ ] No empty catch blocks in security paths
 - [ ] Stack traces not exposed in production
 - [ ] Default error handler returns 500, not 200
 
 ### Infrastructure
+
 - [ ] Debug mode disabled in production
 - [ ] File permissions are restrictive
 - [ ] Default admin accounts disabled/changed
@@ -372,18 +377,21 @@ find . -name "*.tf" -o -name "*.tfvars" \
 **Scope**: [project/repository]
 
 ### Summary
-| Category | Findings | Critical | High | Medium | Low |
-|----------|----------|----------|------|--------|-----|
-| Hardcoded credentials | X | X | X | X | X |
-| Fail-open patterns | X | X | X | X | X |
-| Insecure config | X | X | X | X | X |
-| Weak crypto | X | X | X | X | X |
-| **Total** | **X** | **X** | **X** | **X** | **X** |
+
+| Category              | Findings | Critical | High  | Medium | Low   |
+| --------------------- | -------- | -------- | ----- | ------ | ----- |
+| Hardcoded credentials | X        | X        | X     | X      | X     |
+| Fail-open patterns    | X        | X        | X     | X      | X     |
+| Insecure config       | X        | X        | X     | X      | X     |
+| Weak crypto           | X        | X        | X     | X      | X     |
+| **Total**             | **X**    | **X**    | **X** | **X**  | **X** |
 
 ### Critical Findings
+
 [Detailed findings with remediation]
 
 ### Recommended Secure Defaults
+
 [Project-specific secure configuration template]
 ```
 
@@ -393,16 +401,16 @@ find . -name "*.tf" -o -name "*.tfvars" \
 
 When auditing for default credentials, check against known defaults:
 
-| Product/Service | Default Username | Default Password |
-|----------------|-----------------|-----------------|
-| PostgreSQL | `postgres` | `postgres` |
-| MySQL | `root` | (empty) |
-| MongoDB | (none) | (none - no auth) |
-| Redis | (none) | (none - no auth) |
-| RabbitMQ | `guest` | `guest` |
-| Elasticsearch | `elastic` | `changeme` |
-| Jenkins | `admin` | (from initial setup) |
-| Grafana | `admin` | `admin` |
+| Product/Service | Default Username | Default Password     |
+| --------------- | ---------------- | -------------------- |
+| PostgreSQL      | `postgres`       | `postgres`           |
+| MySQL           | `root`           | (empty)              |
+| MongoDB         | (none)           | (none - no auth)     |
+| Redis           | (none)           | (none - no auth)     |
+| RabbitMQ        | `guest`          | `guest`              |
+| Elasticsearch   | `elastic`        | `changeme`           |
+| Jenkins         | `admin`          | (from initial setup) |
+| Grafana         | `admin`          | `admin`              |
 
 **Rule**: If your application ships with any of these defaults, flag as CRITICAL.
 

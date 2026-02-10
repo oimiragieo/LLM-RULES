@@ -1011,12 +1011,19 @@
         {
           "phase": "Memory Protocol",
           "content": "Mandatory footer with memory file update instructions",
-          "example": 'Before starting, read .claude/context/memory/learnings.md. After completing, update memory files.'
+          "example": "Before starting, read .claude/context/memory/learnings.md. After completing, update memory files."
         }
       ],
       "case_study": {
         "files_enhanced": 6,
-        "stubs": ["readme", "scientific-skills", "summarize-changes", "doc-generator", "git-expert", "memory-forensics"],
+        "stubs": [
+          "readme",
+          "scientific-skills",
+          "summarize-changes",
+          "doc-generator",
+          "git-expert",
+          "memory-forensics"
+        ],
         "baseline_scores": "3-4/10 (hollow specs)",
         "final_scores": "10/10 (excellent specs)",
         "overall_quality": 0.915,
@@ -1141,7 +1148,7 @@
         "Batch remediation without verification (assume fixes work, but verify each)",
         "Post-audit remediation without quality gates (rushed fixes introduce new bugs)",
         "Calling framework 'production-ready' without zero critical blockers"
-      },
+      ],
       "maintenance_recommendations": [
         "P1: Decompose Wave 17 roadmap into SMART sub-waves (17A: monitoring, 17B: performance, 17C: evolution)",
         "P1: Verify post-remediation score (95% is estimated, run formal health check)",
@@ -1176,8 +1183,17 @@
         }
       ],
       "applicability": "All new hooks and when documenting existing hooks. Critical for maintainability and discoverability.",
-      "benefits": ["Hooks are discoverable by developers", "Enforcement modes are clear", "Registration state is validated", "Documentation prevents misuse"],
-      "anti_patterns": ["Hooks without registration", "Registration without documentation", "Documentation without implementation"],
+      "benefits": [
+        "Hooks are discoverable by developers",
+        "Enforcement modes are clear",
+        "Registration state is validated",
+        "Documentation prevents misuse"
+      ],
+      "anti_patterns": [
+        "Hooks without registration",
+        "Registration without documentation",
+        "Documentation without implementation"
+      ],
       "extracted_from": "Task #21 (Wave 16A Hook Documentation), reflection analysis",
       "date": "2026-02-10"
     },
@@ -1201,8 +1217,17 @@
         }
       ],
       "applicability": "Every artifact creation or update. Non-negotiable for maintainability.",
-      "benefits": ["Artifacts are discoverable", "Prevents invisible artifacts", "Reduces maintenance debt", "Improves developer experience"],
-      "anti_patterns": ["Catalog entry without docs", "Documentation without catalog", "Partial updates"],
+      "benefits": [
+        "Artifacts are discoverable",
+        "Prevents invisible artifacts",
+        "Reduces maintenance debt",
+        "Improves developer experience"
+      ],
+      "anti_patterns": [
+        "Catalog entry without docs",
+        "Documentation without catalog",
+        "Partial updates"
+      ],
       "extracted_from": "Task #21 (Wave 16A), reflection analysis",
       "date": "2026-02-10"
     },
@@ -1222,8 +1247,16 @@
       ],
       "detection_method": "Grep registrations → verify files exist → report missing",
       "applicability": "Regular audits (quarterly or per-phase) to maintain system cleanliness",
-      "benefits": ["Prevents stale references in code", "Detects registration debt", "Enables cleanup", "Improves system reliability"],
-      "anti_patterns": ["Ignoring orphan references", "Only creating new artifacts without cleanup"],
+      "benefits": [
+        "Prevents stale references in code",
+        "Detects registration debt",
+        "Enables cleanup",
+        "Improves system reliability"
+      ],
+      "anti_patterns": [
+        "Ignoring orphan references",
+        "Only creating new artifacts without cleanup"
+      ],
       "extracted_from": "Task #21 (Wave 16A), reflection analysis",
       "date": "2026-02-10"
     }

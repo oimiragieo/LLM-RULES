@@ -15,31 +15,36 @@
 # {Workflow Name}
 
 ## Overview
+
 Purpose and when to use
 
 ## Phases
+
 ### Phase 1: {Name}
+
 - Agents: [list]
 - Inputs: [requirements]
 - Outputs: [artifacts]
 - Gates: [quality checks]
 
 ## Agent Coordination
+
 How agents interact
 
 ## Quality Gates
+
 What must pass before advancing
 ```
 
 ### Workflow Types
 
-| Type       | Purpose                   | Example                 |
-| ---------- | ------------------------- | ----------------------- |
-| Core       | Framework operations      | router-decision.md      |
-| Enterprise | Multi-phase development   | feature-development.md  |
-| Creation   | Artifact creation         | ecosystem-creation.md   |
-| Security   | Security workflows        | security-review.md      |
-| Operations | Operational procedures    | incident-response.md    |
+| Type       | Purpose                 | Example                |
+| ---------- | ----------------------- | ---------------------- |
+| Core       | Framework operations    | router-decision.md     |
+| Enterprise | Multi-phase development | feature-development.md |
+| Creation   | Artifact creation       | ecosystem-creation.md  |
+| Security   | Security workflows      | security-review.md     |
+| Operations | Operational procedures  | incident-response.md   |
 
 ### File Placement
 

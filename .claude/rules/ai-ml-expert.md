@@ -19,6 +19,7 @@
 ## Output Standards
 
 ### Required ML Rule Elements
+
 1. **Model Architecture**: Clear design choices with justification
 2. **Training Strategy**: Data splits, loss functions, optimization approach
 3. **Validation Approach**: Cross-validation, test set methodology
@@ -54,32 +55,35 @@
 
 ## Anti-Patterns
 
-| Anti-Pattern                     | Problem                              | Fix                                           |
-| -------------------------------- | ------------------------------------ | --------------------------------------------- |
-| Ignoring class imbalance         | Model biased to majority class      | Use stratified sampling, weighted loss        |
-| No validation set                | Overfitting undetected              | Hold out 10-20% for validation                |
-| Optimizing single metric         | Missing failure modes               | Use multiple metrics (precision, recall, F1)  |
-| No baseline                      | Can't assess model quality          | Establish simple baseline (heuristic, random) |
-| Using accuracy alone             | Misleading for imbalanced data      | Use F1, precision-recall, ROC-AUC             |
-| Data leakage (test in train)     | Inflated performance estimates      | Rigorous split: test never seen during train  |
-| No error analysis                | Can't improve strategically         | Analyze failure cases by error type           |
-| Premature optimization           | Wasting resources                   | Profile first, optimize hot paths             |
+| Anti-Pattern                 | Problem                        | Fix                                           |
+| ---------------------------- | ------------------------------ | --------------------------------------------- |
+| Ignoring class imbalance     | Model biased to majority class | Use stratified sampling, weighted loss        |
+| No validation set            | Overfitting undetected         | Hold out 10-20% for validation                |
+| Optimizing single metric     | Missing failure modes          | Use multiple metrics (precision, recall, F1)  |
+| No baseline                  | Can't assess model quality     | Establish simple baseline (heuristic, random) |
+| Using accuracy alone         | Misleading for imbalanced data | Use F1, precision-recall, ROC-AUC             |
+| Data leakage (test in train) | Inflated performance estimates | Rigorous split: test never seen during train  |
+| No error analysis            | Can't improve strategically    | Analyze failure cases by error type           |
+| Premature optimization       | Wasting resources              | Profile first, optimize hot paths             |
 
 ## Integration Points
 
 ### Agents Using This Rule
+
 - **developer**: Implements ML models, data pipelines
 - **researcher**: Investigates novel architectures, papers
 - **architect**: Designs ML system architecture
 - **security-architect**: Reviews data privacy, model security
 
 ### Related Skills
+
 - **python-backend-expert**: NumPy, Pandas, Scikit-learn
 - **performance-engineer**: GPU optimization, inference serving
 - **data-expert**: Data validation, preprocessing, quality
 - **testing**: ML-specific test strategies
 
 ### Workflows
+
 - **feature-development-workflow.md**: ML feature development phase
 - **enterprise-workflow.md**: Production ML deployment gates
 - **research-synthesis**: Prior art investigation for new models

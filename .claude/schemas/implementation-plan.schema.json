@@ -3,10 +3,7 @@
   "$id": "https://claude-code.anthropic.com/schemas/implementation-plan",
   "title": "Implementation Plan",
   "type": "object",
-  "required": [
-    "feature",
-    "status"
-  ],
+  "required": ["feature", "status"],
   "properties": {
     "feature": {
       "type": "string"
@@ -27,11 +24,7 @@
       "type": "object",
       "properties": {
         "status": {
-          "enum": [
-            "approved",
-            "rejected",
-            "fixes_applied"
-          ]
+          "enum": ["approved", "rejected", "fixes_applied"]
         },
         "qa_session": {
           "type": "integer"

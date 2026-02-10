@@ -4,18 +4,11 @@
   "title": "Mobile-First Design Rules Skill Output",
   "description": "Output schema for mobile-first design patterns including responsive layouts and touch interactions",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

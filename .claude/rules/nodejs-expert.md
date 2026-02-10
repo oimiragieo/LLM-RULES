@@ -11,6 +11,7 @@
 ## NestJS Standards
 
 ### Module Structure
+
 - One module per main domain/route
 - One controller for its route (and secondary controllers for sub-routes)
 - A models folder with data types
@@ -19,16 +20,19 @@
 - A services module with business logic and persistence (one service per entity)
 
 ### Core Module
+
 - Global filters for exception handling
 - Global middlewares for request management
 - Guards for permission management
 - Interceptors for request management
 
 ### Shared Module
+
 - Utilities and shared business logic
 - Services shared between modules
 
 ### Testing
+
 - Use standard Jest framework for testing
 - Write tests for each controller and service
 - Write end-to-end tests for each API module

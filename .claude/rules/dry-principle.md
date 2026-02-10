@@ -11,11 +11,12 @@
 
 **Definition**: Every piece of knowledge must have a single, unambiguous, authoritative representation within a system.
 
-**Key Insight**: DRY is about reducing repetition of *information* and *knowledge*, not just code.
+**Key Insight**: DRY is about reducing repetition of _information_ and _knowledge_, not just code.
 
 ## When to Apply DRY
 
 ### Code Duplication
+
 ```typescript
 // ❌ BAD - Repeated validation logic
 function createUser(data) {
@@ -45,6 +46,7 @@ function updateUser(data) {
 ```
 
 ### Configuration Duplication
+
 ```typescript
 // ❌ BAD - Repeated configuration
 const API_URL_DEV = 'https://dev.api.example.com';
@@ -53,12 +55,12 @@ const API_URL_PROD = 'https://api.example.com';
 
 // ✅ GOOD - Single source of truth
 // config.ts
-export const API_URL = process.env.NODE_ENV === 'production'
-  ? 'https://api.example.com'
-  : 'https://dev.api.example.com';
+export const API_URL =
+  process.env.NODE_ENV === 'production' ? 'https://api.example.com' : 'https://dev.api.example.com';
 ```
 
 ### Business Logic Duplication
+
 ```typescript
 // ❌ BAD - Repeated business rules
 function canPurchase(user) {
@@ -86,6 +88,7 @@ function canVote(user) {
 ## When NOT to Apply DRY
 
 ### Coincidental Similarity
+
 ```typescript
 // DON'T extract - these are coincidentally similar
 function formatUserName(user) {
@@ -100,6 +103,7 @@ function formatProductName(product) {
 These serve different purposes even if they look similar. Extracting would couple unrelated concepts.
 
 ### Premature Abstraction
+
 Wait until you have 3+ instances of duplication before extracting. The "Rule of Three":
 
 1. First time: Write it
@@ -109,15 +113,19 @@ Wait until you have 3+ instances of duplication before extracting. The "Rule of 
 ## Levels of DRY
 
 ### 1. Function Level
+
 Extract repeated code blocks into functions.
 
 ### 2. Module Level
+
 Share common utilities across files.
 
 ### 3. Package Level
+
 Create shared libraries for cross-project code.
 
 ### 4. Data Level
+
 Single source of truth for data and configuration.
 
 ## DRY vs WET
@@ -125,6 +133,7 @@ Single source of truth for data and configuration.
 **WET** = Write Everything Twice (or "We Enjoy Typing")
 
 WET code has:
+
 - Repeated logic
 - Multiple sources of truth
 - High maintenance cost
@@ -133,19 +142,25 @@ WET code has:
 ## Best Practices
 
 ### Extract Constants
+
 ```typescript
 // ❌ BAD
-if (status === 200) { }
-if (status === 404) { }
+if (status === 200) {
+}
+if (status === 404) {
+}
 
 // ✅ GOOD
 const HTTP_OK = 200;
 const HTTP_NOT_FOUND = 404;
-if (status === HTTP_OK) { }
-if (status === HTTP_NOT_FOUND) { }
+if (status === HTTP_OK) {
+}
+if (status === HTTP_NOT_FOUND) {
+}
 ```
 
 ### Extract Utility Functions
+
 ```typescript
 // ❌ BAD
 const result1 = await fetch(url1).then(r => r.json());
@@ -161,34 +176,44 @@ const result2 = await fetchJSON(url2);
 ```
 
 ### Use Inheritance/Composition
+
 ```typescript
 // ❌ BAD - Repeated validation in multiple classes
 class User {
-  validateEmail() { /* ... */ }
+  validateEmail() {
+    /* ... */
+  }
 }
 class Admin {
-  validateEmail() { /* ... */ } // Duplicate
+  validateEmail() {
+    /* ... */
+  } // Duplicate
 }
 
 // ✅ GOOD - Shared base class
 class Entity {
-  validateEmail() { /* ... */ }
+  validateEmail() {
+    /* ... */
+  }
 }
-class User extends Entity { }
-class Admin extends Entity { }
+class User extends Entity {}
+class Admin extends Entity {}
 ```
 
 ### Configuration as Code
+
 Store configuration in one place (environment variables, config files).
 
 ## Anti-Patterns
 
 ### Over-DRYing
+
 - Extracting too early (before pattern is clear)
 - Creating unnecessary abstractions
 - Coupling unrelated code
 
 ### Under-DRYing
+
 - Copy-paste programming
 - Multiple sources of truth
 - Repeated business logic
@@ -196,6 +221,7 @@ Store configuration in one place (environment variables, config files).
 ## Measuring DRY Violations
 
 Tools to detect duplication:
+
 - **jscpd** (JavaScript Copy/Paste Detector)
 - **PMD** (Java)
 - **pylint** (Python)

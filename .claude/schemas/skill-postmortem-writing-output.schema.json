@@ -4,18 +4,11 @@
   "title": "Postmortem Writing Skill Output",
   "description": "Output schema for blameless postmortems with root cause analysis, timelines, and action items",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {

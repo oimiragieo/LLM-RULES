@@ -11,24 +11,28 @@
 ## Extraction Categories
 
 ### Pattern Insights
+
 - Recurring code patterns discovered
 - Architectural patterns that worked/failed
 - Testing patterns that caught bugs
 - Workflow patterns that were efficient
 
 ### Technical Insights
+
 - Performance optimizations discovered
 - Library/API behaviors learned
 - Platform-specific gotchas
 - Integration challenges solved
 
 ### Process Insights
+
 - Workflow improvements
 - Tool usage patterns
 - Communication patterns
 - Collaboration patterns
 
 ### Decision Insights
+
 - Why certain approaches were chosen
 - Alternatives considered and rejected
 - Trade-offs made
@@ -72,17 +76,18 @@
 
 ### Automatic Triggers
 
-| Trigger                  | When                                      | Extract To        |
-| ------------------------ | ----------------------------------------- | ----------------- |
-| Task completion          | Every completed task (if learnings exist) | learnings.md      |
-| Bug fix                  | Root cause identified and fixed           | learnings.md      |
-| Decision made            | Architecture or design decision           | decisions.md      |
-| Blocker encountered      | Unresolved issue or workaround applied    | issues.md         |
-| Pattern discovered       | Reusable pattern identified               | learnings.md      |
+| Trigger             | When                                      | Extract To   |
+| ------------------- | ----------------------------------------- | ------------ |
+| Task completion     | Every completed task (if learnings exist) | learnings.md |
+| Bug fix             | Root cause identified and fixed           | learnings.md |
+| Decision made       | Architecture or design decision           | decisions.md |
+| Blocker encountered | Unresolved issue or workaround applied    | issues.md    |
+| Pattern discovered  | Reusable pattern identified               | learnings.md |
 
 ### Manual Triggers
 
 Extract insights when:
+
 - Session ending with valuable learnings
 - Unexpected behavior encountered (document gotchas)
 - Performance optimization discovered
@@ -148,12 +153,12 @@ Tag insights by domain for easier discovery:
 
 ### Memory File Selection
 
-| Memory File      | Content Type                                  |
-| ---------------- | --------------------------------------------- |
-| `learnings.md`   | Patterns, techniques, optimizations           |
-| `decisions.md`   | Architecture decisions, trade-offs            |
-| `issues.md`      | Known blockers, workarounds, gotchas          |
-| `named/*.md`     | Project-specific persistent knowledge        |
+| Memory File    | Content Type                          |
+| -------------- | ------------------------------------- |
+| `learnings.md` | Patterns, techniques, optimizations   |
+| `decisions.md` | Architecture decisions, trade-offs    |
+| `issues.md`    | Known blockers, workarounds, gotchas  |
+| `named/*.md`   | Project-specific persistent knowledge |
 
 ### Cross-Referencing Pattern
 
@@ -169,6 +174,7 @@ Tag insights by domain for easier discovery:
 **Impact**: 1330 files in 19.5s (vs OOM at 600 files)
 
 **Related**:
+
 - Decision: ADR-105 (BM25-only mode architecture)
 - Issue: Async pipeline OOM (resolved by sync fast-path)
 - Learning: Lazy IDF calculation deferred to search time

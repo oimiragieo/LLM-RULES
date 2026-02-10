@@ -11,18 +11,21 @@
 ## Integration Tiers
 
 ### Must-Have (Blocking)
+
 - Catalog/registry entry (skill-catalog, agent-registry, etc.)
 - At least one consumer assigned (agent, workflow, or command)
 - Routing keywords for discovery (agents only)
 - Valid schema validation (if applicable)
 
 ### Should-Have (Warning)
+
 - Documentation reference in @files or CLAUDE.md
 - Enforcement mechanism (hooks only)
 - Usage examples in consumers
 - Related artifact cross-references
 
 ### Nice-to-Have (Informational)
+
 - Test coverage for the artifact
 - Memory updates (learnings/decisions)
 - Related templates or examples

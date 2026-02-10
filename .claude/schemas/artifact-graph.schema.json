@@ -4,12 +4,7 @@
   "title": "Artifact Relationship Graph",
   "description": "Directed graph tracking artifacts and their integration relationships",
   "type": "object",
-  "required": [
-    "version",
-    "lastUpdated",
-    "nodes",
-    "edges"
-  ],
+  "required": ["version", "lastUpdated", "nodes", "edges"],
   "properties": {
     "version": {
       "type": "string",
@@ -26,12 +21,7 @@
       "description": "Map of artifact ID to node data. IDs use format {type}:{name}",
       "additionalProperties": {
         "type": "object",
-        "required": [
-          "type",
-          "path",
-          "created",
-          "integrationStatus"
-        ],
+        "required": ["type", "path", "created", "integrationStatus"],
         "properties": {
           "type": {
             "enum": [
@@ -57,12 +47,7 @@
             "description": "ISO 8601 timestamp of artifact creation"
           },
           "integrationStatus": {
-            "enum": [
-              "created",
-              "partially-integrated",
-              "fully-integrated",
-              "needs-update"
-            ],
+            "enum": ["created", "partially-integrated", "fully-integrated", "needs-update"],
             "description": "Current integration state of the artifact"
           },
           "missingIntegrations": {
@@ -85,12 +70,7 @@
       "description": "Directed edges representing relationships between artifacts",
       "items": {
         "type": "object",
-        "required": [
-          "from",
-          "to",
-          "type",
-          "status"
-        ],
+        "required": ["from", "to", "type", "status"],
         "properties": {
           "from": {
             "type": "string",
@@ -114,12 +94,7 @@
             "description": "Relationship type between artifacts"
           },
           "status": {
-            "enum": [
-              "active",
-              "missing",
-              "proposed",
-              "deprecated"
-            ],
+            "enum": ["active", "missing", "proposed", "deprecated"],
             "description": "Edge status indicating relationship state"
           },
           "metadata": {

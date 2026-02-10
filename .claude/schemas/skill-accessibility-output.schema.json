@@ -4,18 +4,11 @@
   "title": "Accessibility Skill Output Verification",
   "description": "Verifiable output from the accessibility skill that proves accessibility review occurred",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -24,11 +17,7 @@
       "properties": {
         "wcag_level": {
           "type": "string",
-          "enum": [
-            "A",
-            "AA",
-            "AAA"
-          ],
+          "enum": ["A", "AA", "AAA"],
           "description": "Target WCAG compliance level"
         },
         "files_reviewed": {
@@ -50,12 +39,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "file",
-                  "line",
-                  "issue",
-                  "severity"
-                ],
+                "required": ["file", "line", "issue", "severity"],
                 "properties": {
                   "file": {
                     "type": "string"
@@ -68,12 +52,7 @@
                   },
                   "severity": {
                     "type": "string",
-                    "enum": [
-                      "CRITICAL",
-                      "HIGH",
-                      "MEDIUM",
-                      "LOW"
-                    ]
+                    "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
                   },
                   "suggestion": {
                     "type": "string"
@@ -84,10 +63,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "passed",
-            "issues"
-          ]
+          "required": ["passed", "issues"]
         },
         "aria_attributes_check": {
           "type": "object",
@@ -100,12 +76,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "file",
-                  "line",
-                  "issue",
-                  "severity"
-                ],
+                "required": ["file", "line", "issue", "severity"],
                 "properties": {
                   "file": {
                     "type": "string"
@@ -118,12 +89,7 @@
                   },
                   "severity": {
                     "type": "string",
-                    "enum": [
-                      "CRITICAL",
-                      "HIGH",
-                      "MEDIUM",
-                      "LOW"
-                    ]
+                    "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
                   },
                   "suggestion": {
                     "type": "string"
@@ -134,10 +100,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "passed",
-            "issues"
-          ]
+          "required": ["passed", "issues"]
         },
         "keyboard_navigation_check": {
           "type": "object",
@@ -160,9 +123,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "passed"
-          ]
+          "required": ["passed"]
         },
         "color_contrast_check": {
           "type": "object",
@@ -175,13 +136,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "element",
-                  "foreground",
-                  "background",
-                  "ratio",
-                  "required_ratio"
-                ],
+                "required": ["element", "foreground", "background", "ratio", "required_ratio"],
                 "properties": {
                   "element": {
                     "type": "string"
@@ -204,9 +159,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "passed"
-          ]
+          "required": ["passed"]
         },
         "screen_reader_support": {
           "type": "object",
@@ -256,26 +209,15 @@
             },
             "compliance_status": {
               "type": "string",
-              "enum": [
-                "COMPLIANT",
-                "NON_COMPLIANT",
-                "PARTIAL_COMPLIANCE"
-              ]
+              "enum": ["COMPLIANT", "NON_COMPLIANT", "PARTIAL_COMPLIANCE"]
             }
           },
           "additionalProperties": false,
-          "required": [
-            "total_issues",
-            "compliance_status"
-          ]
+          "required": ["total_issues", "compliance_status"]
         }
       },
       "additionalProperties": false,
-      "required": [
-        "wcag_level",
-        "files_reviewed",
-        "summary"
-      ]
+      "required": ["wcag_level", "files_reviewed", "summary"]
     }
   },
   "additionalProperties": false

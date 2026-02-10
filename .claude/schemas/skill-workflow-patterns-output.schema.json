@@ -4,18 +4,11 @@
   "title": "Workflow Patterns Output",
   "description": "Schema for TDD workflow patterns with task lifecycle tracking",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -24,13 +17,7 @@
       "properties": {
         "phase": {
           "type": "string",
-          "enum": [
-            "planning",
-            "implementation",
-            "review",
-            "checkpoint",
-            "complete"
-          ],
+          "enum": ["planning", "implementation", "review", "checkpoint", "complete"],
           "description": "Current phase of workflow"
         },
         "tasks": {
@@ -38,11 +25,7 @@
           "description": "Tasks with TDD lifecycle tracking",
           "items": {
             "type": "object",
-            "required": [
-              "taskId",
-              "status",
-              "lifecycle"
-            ],
+            "required": ["taskId", "status", "lifecycle"],
             "properties": {
               "taskId": {
                 "type": "string"
@@ -52,13 +35,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "pending",
-                  "in_progress",
-                  "completed",
-                  "skipped",
-                  "blocked"
-                ]
+                "enum": ["pending", "in_progress", "completed", "skipped", "blocked"]
               },
               "lifecycle": {
                 "type": "object",
@@ -92,11 +69,7 @@
         },
         "qualityGates": {
           "type": "object",
-          "required": [
-            "passingTests",
-            "coverage",
-            "styleCompliance"
-          ],
+          "required": ["passingTests", "coverage", "styleCompliance"],
           "properties": {
             "passingTests": {
               "type": "boolean"
@@ -139,10 +112,7 @@
           "description": "Phase checkpoints with verification status",
           "items": {
             "type": "object",
-            "required": [
-              "phase",
-              "status"
-            ],
+            "required": ["phase", "status"],
             "properties": {
               "phase": {
                 "type": "string"
@@ -157,11 +127,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "pending",
-                  "verified",
-                  "rejected"
-                ]
+                "enum": ["pending", "verified", "rejected"]
               },
               "userApproval": {
                 "type": "boolean"
@@ -198,12 +164,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "phase",
-        "tasks",
-        "qualityGates",
-        "checkpoints"
-      ]
+      "required": ["phase", "tasks", "qualityGates", "checkpoints"]
     }
   },
   "additionalProperties": false

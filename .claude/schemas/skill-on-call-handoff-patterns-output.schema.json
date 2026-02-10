@@ -4,18 +4,11 @@
   "title": "On-Call Handoff Patterns Skill Output Verification",
   "description": "Verifiable output from the on-call-handoff-patterns skill that proves handoff documentation occurred",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -24,12 +17,7 @@
       "properties": {
         "handoff_type": {
           "type": "string",
-          "enum": [
-            "standard",
-            "incident",
-            "quick",
-            "emergency"
-          ],
+          "enum": ["standard", "incident", "quick", "emergency"],
           "description": "Type of handoff performed"
         },
         "handoff_document": {
@@ -59,44 +47,25 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "outgoing_engineer",
-            "incoming_engineer",
-            "handoff_time"
-          ]
+          "required": ["outgoing_engineer", "incoming_engineer", "handoff_time"]
         },
         "active_incidents": {
           "type": "array",
           "description": "Active incidents during handoff",
           "items": {
             "type": "object",
-            "required": [
-              "title",
-              "severity",
-              "status",
-              "impact"
-            ],
+            "required": ["title", "severity", "status", "impact"],
             "properties": {
               "title": {
                 "type": "string"
               },
               "severity": {
                 "type": "string",
-                "enum": [
-                  "SEV1",
-                  "SEV2",
-                  "SEV3",
-                  "SEV4"
-                ]
+                "enum": ["SEV1", "SEV2", "SEV3", "SEV4"]
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "investigating",
-                  "mitigating",
-                  "recovering",
-                  "resolved"
-                ]
+                "enum": ["investigating", "mitigating", "recovering", "resolved"]
               },
               "impact": {
                 "type": "string"
@@ -120,11 +89,7 @@
           "description": "Ongoing investigations",
           "items": {
             "type": "object",
-            "required": [
-              "title",
-              "ticket_id",
-              "status"
-            ],
+            "required": ["title", "ticket_id", "status"],
             "properties": {
               "title": {
                 "type": "string"
@@ -134,11 +99,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "investigating",
-                  "monitoring",
-                  "blocked"
-                ]
+                "enum": ["investigating", "monitoring", "blocked"]
               },
               "started_at": {
                 "type": "string",
@@ -174,11 +135,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "service",
-                  "version",
-                  "time"
-                ],
+                "required": ["service", "version", "time"],
                 "properties": {
                   "service": {
                     "type": "string"
@@ -201,10 +158,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "description",
-                  "time"
-                ],
+                "required": ["description", "time"],
                 "properties": {
                   "description": {
                     "type": "string"
@@ -221,10 +175,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "description",
-                  "time"
-                ],
+                "required": ["description", "time"],
                 "properties": {
                   "description": {
                     "type": "string"
@@ -245,11 +196,7 @@
           "description": "Known issues and workarounds",
           "items": {
             "type": "object",
-            "required": [
-              "title",
-              "issue",
-              "workaround"
-            ],
+            "required": ["title", "issue", "workaround"],
             "properties": {
               "title": {
                 "type": "string"
@@ -265,13 +212,7 @@
               },
               "priority": {
                 "type": "string",
-                "enum": [
-                  "P0",
-                  "P1",
-                  "P2",
-                  "P3",
-                  "P4"
-                ]
+                "enum": ["P0", "P1", "P2", "P3", "P4"]
               }
             },
             "additionalProperties": false
@@ -282,11 +223,7 @@
           "description": "Scheduled events to monitor",
           "items": {
             "type": "object",
-            "required": [
-              "date",
-              "event",
-              "impact"
-            ],
+            "required": ["date", "event", "impact"],
             "properties": {
               "date": {
                 "type": "string",
@@ -353,26 +290,15 @@
             },
             "shift_health": {
               "type": "string",
-              "enum": [
-                "quiet",
-                "normal",
-                "busy",
-                "incident"
-              ]
+              "enum": ["quiet", "normal", "busy", "incident"]
             }
           },
           "additionalProperties": false,
-          "required": [
-            "shift_health"
-          ]
+          "required": ["shift_health"]
         }
       },
       "additionalProperties": false,
-      "required": [
-        "handoff_type",
-        "handoff_document",
-        "summary"
-      ]
+      "required": ["handoff_type", "handoff_document", "summary"]
     }
   },
   "additionalProperties": false

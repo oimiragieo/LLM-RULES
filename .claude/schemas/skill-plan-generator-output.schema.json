@@ -3,10 +3,7 @@
   "title": "Plan Generator Output",
   "description": "Validates output from plan-generator skill - structured executable plans",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
@@ -82,11 +79,7 @@
               },
               "parallelOk": {
                 "type": "string",
-                "enum": [
-                  "Yes",
-                  "No",
-                  "Partial"
-                ],
+                "enum": ["Yes", "No", "Partial"],
                 "description": "Can tasks run concurrently?"
               },
               "tasks": {
@@ -96,13 +89,7 @@
                 "maxItems": 7,
                 "items": {
                   "type": "object",
-                  "required": [
-                    "taskId",
-                    "description",
-                    "timeEstimate",
-                    "command",
-                    "verify"
-                  ],
+                  "required": ["taskId", "description", "timeEstimate", "command", "verify"],
                   "properties": {
                     "taskId": {
                       "type": "string",
@@ -158,11 +145,7 @@
           "minItems": 0,
           "items": {
             "type": "object",
-            "required": [
-              "risk",
-              "impact",
-              "mitigation"
-            ],
+            "required": ["risk", "impact", "mitigation"],
             "properties": {
               "risk": {
                 "type": "string",
@@ -170,11 +153,7 @@
               },
               "impact": {
                 "type": "string",
-                "enum": [
-                  "High",
-                  "Medium",
-                  "Low"
-                ]
+                "enum": ["High", "Medium", "Low"]
               },
               "mitigation": {
                 "type": "string",
@@ -189,11 +168,7 @@
         },
         "timelineSummary": {
           "type": "object",
-          "required": [
-            "totalPhases",
-            "totalTasks",
-            "estimatedTime"
-          ],
+          "required": ["totalPhases", "totalTasks", "estimatedTime"],
           "properties": {
             "totalPhases": {
               "type": "integer",
@@ -212,12 +187,7 @@
             "parallelPotential": {
               "type": "string",
               "description": "How much can be parallelized",
-              "enum": [
-                "None",
-                "Low",
-                "Medium",
-                "High"
-              ]
+              "enum": ["None", "Low", "Medium", "High"]
             }
           }
         }
@@ -226,11 +196,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

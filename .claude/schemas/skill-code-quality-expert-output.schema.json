@@ -4,26 +4,16 @@
   "title": "Code Quality Expert Skill Output",
   "description": "Validates output from code-quality-expert skill - Code quality assessment and improvement suggestions",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Code quality assessment results",
-      "required": [
-        "score",
-        "issues",
-        "refactoringSuggestions"
-      ],
+      "required": ["score", "issues", "refactoringSuggestions"],
       "properties": {
         "score": {
           "type": "object",
-          "required": [
-            "overall",
-            "categories"
-          ],
+          "required": ["overall", "categories"],
           "properties": {
             "overall": {
               "type": "number",
@@ -33,11 +23,7 @@
             },
             "categories": {
               "type": "object",
-              "required": [
-                "readability",
-                "maintainability",
-                "consistency"
-              ],
+              "required": ["readability", "maintainability", "consistency"],
               "properties": {
                 "readability": {
                   "type": "number",
@@ -72,32 +58,15 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "category",
-              "severity",
-              "description",
-              "file"
-            ],
+            "required": ["category", "severity", "description", "file"],
             "properties": {
               "category": {
                 "type": "string",
-                "enum": [
-                  "naming",
-                  "structure",
-                  "duplication",
-                  "coupling",
-                  "complexity",
-                  "style"
-                ]
+                "enum": ["naming", "structure", "duplication", "coupling", "complexity", "style"]
               },
               "severity": {
                 "type": "string",
-                "enum": [
-                  "critical",
-                  "major",
-                  "minor",
-                  "info"
-                ]
+                "enum": ["critical", "major", "minor", "info"]
               },
               "description": {
                 "type": "string"
@@ -124,19 +93,11 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "priority",
-              "type",
-              "description"
-            ],
+            "required": ["priority", "type", "description"],
             "properties": {
               "priority": {
                 "type": "string",
-                "enum": [
-                  "high",
-                  "medium",
-                  "low"
-                ]
+                "enum": ["high", "medium", "low"]
               },
               "type": {
                 "type": "string",
@@ -168,11 +129,7 @@
               },
               "effort": {
                 "type": "string",
-                "enum": [
-                  "low",
-                  "medium",
-                  "high"
-                ]
+                "enum": ["low", "medium", "high"]
               }
             }
           },
@@ -182,11 +139,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "practice",
-              "file",
-              "description"
-            ],
+            "required": ["practice", "file", "description"],
             "properties": {
               "practice": {
                 "type": "string"
@@ -221,11 +174,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

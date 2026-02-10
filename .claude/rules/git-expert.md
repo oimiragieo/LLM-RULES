@@ -11,6 +11,7 @@
 ## When to Use
 
 Use git-expert when:
+
 - Performing advanced Git operations (interactive rebase, cherry-pick, bisect)
 - Recovering from Git mistakes (lost commits, broken history)
 - Optimizing Git workflows for teams
@@ -22,6 +23,7 @@ Use git-expert when:
 ### Branching Strategies
 
 **Gitflow**:
+
 ```bash
 # Feature branch from develop
 git checkout develop
@@ -34,6 +36,7 @@ git branch -d feature/feature-name
 ```
 
 **Trunk-Based Development**:
+
 ```bash
 # Short-lived feature branch
 git checkout main
@@ -46,6 +49,7 @@ git branch -d feature-short-lived
 ```
 
 **Feature Branches**:
+
 ```bash
 # Long-running feature
 git checkout -b feature/big-feature
@@ -60,6 +64,7 @@ git merge feature/big-feature
 ### Advanced Workflows
 
 **Interactive Rebase**:
+
 ```bash
 # Rewrite last 3 commits
 git rebase -i HEAD~3
@@ -80,6 +85,7 @@ pick ghi789 Keep this
 ```
 
 **Cherry-Pick**:
+
 ```bash
 # Pick specific commit from another branch
 git cherry-pick abc123
@@ -92,6 +98,7 @@ git cherry-pick -n abc123
 ```
 
 **Stash Workflows**:
+
 ```bash
 # Save work in progress
 git stash push -m "WIP: feature description"
@@ -110,6 +117,7 @@ git stash branch feature-from-stash stash@{1}
 ```
 
 **Bisect for Bug Hunting**:
+
 ```bash
 # Start bisect
 git bisect start
@@ -126,6 +134,7 @@ git bisect reset  # return to original state
 ```
 
 **Reflog Recovery**:
+
 ```bash
 # View reflog (all HEAD movements)
 git reflog
@@ -142,14 +151,14 @@ git reset --hard HEAD@{5}  # from before rebase
 
 ## Anti-Patterns
 
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| Force push to main | Destroys team history | Never force push to shared branches |
-| No branch strategy | Chaotic collaboration | Adopt gitflow or trunk-based |
-| Large commits | Hard to review/revert | Small, focused commits |
-| No descriptive messages | Lost context | Use conventional commits |
-| Committing secrets | Security breach | Use .gitignore, scan with tools |
-| Working directly on main | No isolation | Always use feature branches |
+| Pattern                  | Problem               | Fix                                 |
+| ------------------------ | --------------------- | ----------------------------------- |
+| Force push to main       | Destroys team history | Never force push to shared branches |
+| No branch strategy       | Chaotic collaboration | Adopt gitflow or trunk-based        |
+| Large commits            | Hard to review/revert | Small, focused commits              |
+| No descriptive messages  | Lost context          | Use conventional commits            |
+| Committing secrets       | Security breach       | Use .gitignore, scan with tools     |
+| Working directly on main | No isolation          | Always use feature branches         |
 
 ## Common Commands
 
@@ -209,16 +218,19 @@ git log --since="2 weeks ago" --until="yesterday"
 ## Integration Points
 
 **Related Skills**:
+
 - `git-workflow` - Commit conventions and pre-commit requirements
 - `code-reviewer` - PR review workflow
 - `verification-before-completion` - Pre-commit validation
 
 **Related Agents**:
+
 - `developer` - Uses Git for version control
 - `code-reviewer` - Reviews Git diffs
 - `devops` - Manages Git workflows in CI/CD
 
 **Related Workflows**:
+
 - TDD workflow - Commit after each red-green-refactor cycle
 - Feature workflow - Git branching strategy
 - Release workflow - Tagging and versioning
@@ -226,6 +238,7 @@ git log --since="2 weeks ago" --until="yesterday"
 ## Safety Protocols
 
 **Before force operations**:
+
 ```bash
 # Always backup before force push
 git push origin feature-branch --force-with-lease
@@ -237,6 +250,7 @@ git push origin main
 ```
 
 **Before destructive resets**:
+
 ```bash
 # Create backup branch first
 git branch backup-before-reset

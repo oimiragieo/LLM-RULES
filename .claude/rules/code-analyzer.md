@@ -10,22 +10,26 @@
 ## Key Metrics
 
 ### Cyclomatic Complexity
+
 - Measures decision paths in code
 - Target: <10 per function (ESLint default: 20)
 - Count: if, while, for, case, &&, ||, ?:, catch
 - High complexity = hard to test, error-prone
 
 ### Lines of Code (LOC)
+
 - Physical lines in file
 - Target: <300 lines per file, <50 per function
 - High LOC = difficult to maintain
 
 ### Maintainability Index
+
 - Composite metric: complexity + LOC + Halstead volume
 - Scale: 0-100 (higher = more maintainable)
 - Target: >65 for production code
 
 ### Code Duplication
+
 - Repeated code blocks
 - Target: <5% duplication
 - Use jscpd or similar tools
@@ -33,6 +37,7 @@
 ## ESLint Complexity Rules
 
 Configure in `.eslintrc.json`:
+
 ```json
 {
   "rules": {
@@ -50,27 +55,33 @@ Configure in `.eslintrc.json`:
 ## Analysis Process
 
 ### 1. Project-Wide Analysis
+
 ```bash
 node .claude/tools/analysis/project-analyzer/analyzer.mjs
 ```
 
 Output shows:
+
 - Total files, LOC, complexity
 - Hotspots (files with highest complexity)
 - Duplication report
 - Maintainability scores
 
 ### 2. Filter by Threshold
+
 - Focus on files with complexity >15
 - Prioritize files with high complexity AND high churn (frequently changed)
 
 ### 3. Drill Into Hotspots
+
 Analyze specific files/functions:
+
 - Which functions have highest complexity?
 - What's driving the complexity? (nested loops, conditionals)
 - Can it be simplified? (extract functions, guard clauses)
 
 ### 4. Track Over Time
+
 - Run analysis weekly
 - Graph complexity trends
 - Alert on degradation
@@ -79,6 +90,7 @@ Analyze specific files/functions:
 ## Common Complexity Sources
 
 ### Optional Chaining and Default Params
+
 ```typescript
 // Each ? adds a branch
 user?.profile?.settings?.theme ?? 'default';
@@ -86,6 +98,7 @@ user?.profile?.settings?.theme ?? 'default';
 ```
 
 ### Deeply Nested Conditionals
+
 ```typescript
 // ❌ BAD - Complexity: 5
 if (user) {
@@ -117,12 +130,14 @@ if (canEdit(user)) {
 ## Integration
 
 ### Pre-commit Hook
+
 ```bash
 # Run analysis on changed files
 node .claude/tools/analysis/project-analyzer/analyzer.mjs --changed
 ```
 
 ### CI Pipeline
+
 ```yaml
 # Block PR if complexity exceeds threshold
 - name: Check complexity

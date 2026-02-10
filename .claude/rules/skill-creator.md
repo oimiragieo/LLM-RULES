@@ -21,6 +21,7 @@
 <best_practices>Do/don't guidelines</best_practices>
 
 ## Memory Protocol (MANDATORY)
+
 [Standard memory protocol section]
 ```
 

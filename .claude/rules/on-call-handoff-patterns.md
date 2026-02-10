@@ -19,6 +19,7 @@
 ## Output Standards
 
 ### Required Handoff Elements
+
 1. **Active Incidents**: Currently broken systems with severity and status
 2. **Ongoing Investigations**: Issues being debugged with next steps
 3. **Recent Changes**: Deployments, config changes, infrastructure updates
@@ -27,7 +28,7 @@
 
 ### Handoff Document Structure
 
-```markdown
+````markdown
 # On-Call Handoff: [Team Name]
 
 **Outgoing**: @name ([date] to [date])
@@ -39,6 +40,7 @@
 ## Active Incidents
 
 ### [None | Incident Title] (SEV[1-4])
+
 **Status**: [Investigating | Mitigating | Resolved]
 **Impact**: [Specific user impact]
 **Current State**: [What's happening now]
@@ -50,6 +52,7 @@
 ## Ongoing Investigations
 
 ### [Issue Title] (TICKET-ID)
+
 **Status**: [Status]
 **Started**: [Date]
 **Impact**: [Impact level]
@@ -62,6 +65,7 @@
 ## Resolved This Shift
 
 ### [Issue Title] ([Date])
+
 - **Duration**: [time]
 - **Root Cause**: [Brief explanation]
 - **Resolution**: [What fixed it]
@@ -73,14 +77,17 @@
 ## Recent Changes
 
 ### Deployments
+
 | Service | Version | Time | Notes |
-|---------|---------|------|-------|
-| ... | ... | ... | ... |
+| ------- | ------- | ---- | ----- |
+| ...     | ...     | ...  | ...   |
 
 ### Configuration Changes
+
 - [Date]: [Change description]
 
 ### Infrastructure
+
 - [Date]: [Infrastructure change]
 
 ---
@@ -88,6 +95,7 @@
 ## Known Issues & Workarounds
 
 ### [Issue Title]
+
 **Issue**: [Description]
 **Workaround**: [How to handle]
 **Ticket**: [Link]
@@ -97,25 +105,26 @@
 ## Upcoming Events
 
 | Date | Event | Impact | Contact |
-|------|-------|--------|---------|
-| ... | ... | ... | ... |
+| ---- | ----- | ------ | ------- |
+| ...  | ...   | ...    | ...     |
 
 ---
 
 ## Escalation Reminders
 
-| Issue Type | First Escalation | Second Escalation |
-|------------|------------------|-------------------|
-| Payment | @payments-oncall | @payments-manager |
-| Auth | @auth-oncall | @security-team |
-| Database | @dba-team | @infra-manager |
-| Unknown/severe | @engineering-manager | @vp-engineering |
+| Issue Type     | First Escalation     | Second Escalation |
+| -------------- | -------------------- | ----------------- |
+| Payment        | @payments-oncall     | @payments-manager |
+| Auth           | @auth-oncall         | @security-team    |
+| Database       | @dba-team            | @infra-manager    |
+| Unknown/severe | @engineering-manager | @vp-engineering   |
 
 ---
 
 ## Quick Reference
 
 ### Common Commands
+
 ```bash
 # Service health
 kubectl get pods -A | grep -v Running
@@ -126,8 +135,10 @@ kubectl get events --sort-by='.lastTimestamp' | tail -20
 # Database connections
 psql -c "SELECT count(*) FROM pg_stat_activity;"
 ```
+````
 
 ### Important Links
+
 - [Runbooks](https://...)
 - [Service Catalog](https://...)
 - [Incident Slack](https://...)
@@ -138,6 +149,7 @@ psql -c "SELECT count(*) FROM pg_stat_activity;"
 ## Handoff Checklist
 
 ### Outgoing Engineer
+
 - [x] Document active incidents
 - [x] Document ongoing investigations
 - [x] List recent changes
@@ -146,12 +158,14 @@ psql -c "SELECT count(*) FROM pg_stat_activity;"
 - [x] Sync with incoming engineer
 
 ### Incoming Engineer
+
 - [ ] Read this document
 - [ ] Join sync call
 - [ ] Verify PagerDuty routing
 - [ ] Verify Slack notifications
 - [ ] Check VPN/access working
 - [ ] Review critical dashboards
+
 ```
 
 ## Handoff Timing Standards
@@ -159,6 +173,7 @@ psql -c "SELECT count(*) FROM pg_stat_activity;"
 **Recommended**: 30 minutes overlap between shifts
 
 ```
+
 Overlap Period:
 ├── 15 min: Outgoing writes handoff document
 └── 15 min: Sync call with incoming
@@ -167,7 +182,8 @@ Incoming Preparation:
 ├── 15 min: Review handoff document
 ├── 15 min: Sync call with outgoing
 └── 5 min: Verify alerting setup
-```
+
+````
 
 ## Incident Handoff Pattern (Mid-Incident)
 
@@ -224,7 +240,7 @@ When handing off during an active incident:
 - [ ] Access to dashboards
 - [ ] Understand current state
 - [ ] Know escalation path
-```
+````
 
 ## Async Handoff Pattern (Quick Handoff)
 
@@ -234,22 +250,27 @@ For routine handoffs with minimal activity:
 # Quick Handoff: @outgoing → @incoming
 
 ## TL;DR
+
 - [Status summary: No active incidents | X investigations ongoing]
 - [Key watch item]
 - [Upcoming event to monitor]
 
 ## Watch List
+
 1. [Item 1 with why it needs attention]
 2. [Item 2 with why it needs attention]
 
 ## Recent
+
 - [Recent change 1]
 - [Recent change 2]
 
 ## Coming Up
+
 - [Date Time] - [Event] ([Expected impact])
 
 ## Questions?
+
 I'll be available on Slack until [time] today.
 ```
 
@@ -261,6 +282,7 @@ I'll be available on Slack until [time] today.
 ## Pre-Shift Checklist
 
 ### Access Verification
+
 - [ ] VPN working
 - [ ] kubectl access to all clusters
 - [ ] Database read access
@@ -268,18 +290,21 @@ I'll be available on Slack until [time] today.
 - [ ] PagerDuty app installed and logged in
 
 ### Alerting Setup
+
 - [ ] PagerDuty schedule shows you as primary
 - [ ] Phone notifications enabled
 - [ ] Slack notifications for incident channels
 - [ ] Test alert received and acknowledged
 
 ### Knowledge Refresh
+
 - [ ] Review recent incidents (past 2 weeks)
 - [ ] Check service changelog
 - [ ] Skim critical runbooks
 - [ ] Know escalation contacts
 
 ### Environment Ready
+
 - [ ] Laptop charged and accessible
 - [ ] Phone charged
 - [ ] Quiet space available for calls
@@ -292,18 +317,21 @@ I'll be available on Slack until [time] today.
 ## Daily On-Call Routine
 
 ### Morning (start of day)
+
 - [ ] Check overnight alerts
 - [ ] Review dashboards for anomalies
 - [ ] Check for any P0/P1 tickets created
 - [ ] Skim incident channels for context
 
 ### Throughout Day
+
 - [ ] Respond to alerts within SLA
 - [ ] Document investigation progress
 - [ ] Update team on significant issues
 - [ ] Triage incoming pages
 
 ### End of Day
+
 - [ ] Hand off any active issues
 - [ ] Update investigation docs
 - [ ] Note anything for next shift
@@ -315,6 +343,7 @@ I'll be available on Slack until [time] today.
 
 ```markdown
 ## Post-Shift Checklist
+
 - [ ] Complete handoff document
 - [ ] Sync with incoming on-call
 - [ ] Verify PagerDuty routing changed
@@ -331,18 +360,21 @@ I'll be available on Slack until [time] today.
 ## Escalation Triggers
 
 ### Immediate Escalation
+
 - SEV1 incident declared
 - Data breach suspected
 - Unable to diagnose within 30 min
 - Customer or legal escalation received
 
 ### Consider Escalation
+
 - Issue spans multiple teams
 - Requires expertise you don't have
 - Business impact exceeds threshold
 - You're uncertain about next steps
 
 ### How to Escalate
+
 1. Page the appropriate escalation path
 2. Provide brief context in Slack
 3. Stay engaged until escalation acknowledges
@@ -351,56 +383,67 @@ I'll be available on Slack until [time] today.
 
 ## Anti-Patterns
 
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| Async handoff only | Context loss causes incidents | Always do sync call (15 min minimum) |
-| No documentation | New on-call blind | Write detailed handoff document |
-| Skipping verification | Alerting broken during incident | Test alerts before incidents |
-| Hero culture | Burnout and poor decisions | Escalate early when uncertain |
-| Blame individuals | Fear culture, hidden issues | Focus on system improvements |
-| No postmortems | Repeat incidents | Write postmortem for every incident |
-| Disappeared after handoff | New on-call struggles alone | Stay available for questions |
+| Anti-Pattern              | Problem                         | Fix                                  |
+| ------------------------- | ------------------------------- | ------------------------------------ |
+| Async handoff only        | Context loss causes incidents   | Always do sync call (15 min minimum) |
+| No documentation          | New on-call blind               | Write detailed handoff document      |
+| Skipping verification     | Alerting broken during incident | Test alerts before incidents         |
+| Hero culture              | Burnout and poor decisions      | Escalate early when uncertain        |
+| Blame individuals         | Fear culture, hidden issues     | Focus on system improvements         |
+| No postmortems            | Repeat incidents                | Write postmortem for every incident  |
+| Disappeared after handoff | New on-call struggles alone     | Stay available for questions         |
 
 ## Iron Laws
 
 ### 1. The Documentation Law
+
 ```
 NO HANDOFF WITHOUT WRITTEN DOCUMENTATION
 ```
+
 Sync call alone is insufficient. Document everything.
 
 ### 2. The Escalation Law
+
 ```
 ESCALATE WITHIN 30 MINUTES IF STUCK
 ```
+
 Spending hours stuck helps no one. Escalate early.
 
 ### 3. The Blameless Law
+
 ```
 NO BLAME IN INCIDENT RESPONSE OR POSTMORTEMS
 ```
+
 Focus on systems, not people. Blame prevents learning.
 
 ### 4. The Testing Law
+
 ```
 TEST ALERTING SETUP BEFORE SHIFT, NOT DURING INCIDENT
 ```
+
 Verify everything works while calm, not under stress.
 
 ## Integration Points
 
 ### Agents Using This Skill
+
 - **devops-troubleshooter** (primary): On-call incident response
 - **incident-responder**: Structured incident management
 - **devops**: Operational procedures
 - **sre-engineer**: SLO tracking and on-call rotation
 
 ### Related Skills
+
 - **incident-runbook-templates**: Runbook creation for known issues
 - **postmortem-writing**: Post-incident analysis and learnings
 - **sentry-monitoring**: Error tracking and alerting
 
 ### Workflows
+
 - **incident-response-workflow.md**: Structured incident handling
 - **operational-procedures.md**: Standard operating procedures
 

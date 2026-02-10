@@ -4,19 +4,12 @@
   "title": "Task Management Protocol Skill Output",
   "description": "Validates output from task-management-protocol skill invocation - task synchronization and context handoff",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Task management protocol execution results",
-      "required": [
-        "taskId",
-        "operation",
-        "metadata"
-      ],
+      "required": ["taskId", "operation", "metadata"],
       "properties": {
         "taskId": {
           "type": "string",
@@ -41,12 +34,7 @@
           "properties": {
             "status": {
               "type": "string",
-              "enum": [
-                "not_started",
-                "in_progress",
-                "blocked",
-                "completed"
-              ],
+              "enum": ["not_started", "in_progress", "blocked", "completed"],
               "description": "Current task status"
             },
             "progress": {
@@ -80,12 +68,7 @@
             },
             "blockerType": {
               "type": "string",
-              "enum": [
-                "dependency",
-                "permission",
-                "information",
-                "external"
-              ],
+              "enum": ["dependency", "permission", "information", "external"],
               "description": "Type of blocker encountered"
             },
             "needsFrom": {
@@ -180,11 +163,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

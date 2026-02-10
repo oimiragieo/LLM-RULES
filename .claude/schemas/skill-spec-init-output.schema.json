@@ -3,18 +3,11 @@
   "title": "spec-init Output Schema",
   "description": "Output structure for spec-init skill execution",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -33,13 +26,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "feature",
-            "bug",
-            "chore",
-            "refactor",
-            "docs"
-          ],
+          "enum": ["feature", "bug", "chore", "refactor", "docs"],
           "description": "Detected spec type"
         },
         "questionsAsked": {
@@ -50,10 +37,7 @@
         },
         "validationResult": {
           "type": "object",
-          "required": [
-            "isValid",
-            "missingSections"
-          ],
+          "required": ["isValid", "missingSections"],
           "properties": {
             "isValid": {
               "type": "boolean",
@@ -84,24 +68,14 @@
             },
             "status": {
               "type": "string",
-              "enum": [
-                "new",
-                "in_progress",
-                "completed"
-              ],
+              "enum": ["new", "in_progress", "completed"],
               "default": "new"
             }
           }
         }
       },
       "additionalProperties": false,
-      "required": [
-        "specFile",
-        "trackId",
-        "type",
-        "questionsAsked",
-        "validationResult"
-      ]
+      "required": ["specFile", "trackId", "type", "questionsAsked", "validationResult"]
     }
   },
   "additionalProperties": false,

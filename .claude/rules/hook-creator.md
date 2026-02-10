@@ -24,7 +24,7 @@
 
 async function preToolUse(input) {
   // Validation logic
-  return { allow: true/false, message: 'reason' };
+  return { allow: true / false, message: 'reason' };
 }
 
 // Export for registration
@@ -33,12 +33,12 @@ module.exports = { preToolUse }; // or { postToolUse }
 
 ### Hook Categories
 
-| Category   | Purpose                  | Examples                     |
-| ---------- | ------------------------ | ---------------------------- |
-| routing    | Agent routing validation | routing-guard.cjs            |
-| safety     | File safety, paths       | unified-creator-guard.cjs    |
-| validation | Input/output validation  | spawn-prompt-validator.cjs   |
-| reflection | Reflection enforcement   | reflection-step0-guard.cjs   |
+| Category   | Purpose                  | Examples                   |
+| ---------- | ------------------------ | -------------------------- |
+| routing    | Agent routing validation | routing-guard.cjs          |
+| safety     | File safety, paths       | unified-creator-guard.cjs  |
+| validation | Input/output validation  | spawn-prompt-validator.cjs |
+| reflection | Reflection enforcement   | reflection-step0-guard.cjs |
 
 ### File Placement
 

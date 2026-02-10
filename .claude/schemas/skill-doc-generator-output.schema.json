@@ -4,28 +4,17 @@
   "title": "Doc Generator Output",
   "description": "Validation schema for doc-generator skill output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
       "type": "object",
       "description": "Skill-specific output data",
-      "required": [
-        "documentationType",
-        "outputFile",
-        "sectionsGenerated"
-      ],
+      "required": ["documentationType", "outputFile", "sectionsGenerated"],
       "properties": {
         "documentationType": {
           "type": "string",
@@ -47,10 +36,7 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": [
-              "sectionTitle",
-              "content"
-            ],
+            "required": ["sectionTitle", "content"],
             "properties": {
               "sectionTitle": {
                 "type": "string",
@@ -95,10 +81,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "method",
-              "path"
-            ],
+            "required": ["method", "path"],
             "properties": {
               "method": {
                 "type": "string",

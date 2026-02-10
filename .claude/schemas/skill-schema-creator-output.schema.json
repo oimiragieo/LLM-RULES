@@ -4,18 +4,11 @@
   "title": "Schema Creator Output",
   "description": "Schema for schema creation artifacts",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -34,13 +27,7 @@
         },
         "schemaType": {
           "type": "string",
-          "enum": [
-            "skill-output",
-            "agent-config",
-            "hook-protocol",
-            "task-metadata",
-            "custom"
-          ],
+          "enum": ["skill-output", "agent-config", "hook-protocol", "task-metadata", "custom"],
           "description": "Schema category"
         },
         "schemaId": {
@@ -50,11 +37,7 @@
         },
         "artifactsCreated": {
           "type": "object",
-          "required": [
-            "schemaFile",
-            "catalogEntry",
-            "consumingComponentDoc"
-          ],
+          "required": ["schemaFile", "catalogEntry", "consumingComponentDoc"],
           "properties": {
             "schemaFile": {
               "type": "boolean"
@@ -69,11 +52,7 @@
         },
         "integrationsCompleted": {
           "type": "object",
-          "required": [
-            "validated",
-            "requiredFieldsDefined",
-            "descriptionsComplete"
-          ],
+          "required": ["validated", "requiredFieldsDefined", "descriptionsComplete"],
           "properties": {
             "validated": {
               "type": "boolean",
@@ -103,12 +82,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "schemaName",
-        "schemaPath",
-        "schemaType",
-        "artifactsCreated"
-      ]
+      "required": ["schemaName", "schemaPath", "schemaType", "artifactsCreated"]
     }
   },
   "additionalProperties": false

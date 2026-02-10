@@ -4,27 +4,16 @@
   "title": "Debugging Skill Output",
   "description": "Validates output from debugging skill invocation - Systematic debugging process verification",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Debugging investigation results",
-      "required": [
-        "rootCause",
-        "investigation",
-        "fix",
-        "verification"
-      ],
+      "required": ["rootCause", "investigation", "fix", "verification"],
       "properties": {
         "rootCause": {
           "type": "object",
-          "required": [
-            "identified",
-            "description"
-          ],
+          "required": ["identified", "description"],
           "properties": {
             "identified": {
               "type": "boolean",
@@ -47,21 +36,14 @@
         },
         "investigation": {
           "type": "object",
-          "required": [
-            "phasesCompleted"
-          ],
+          "required": ["phasesCompleted"],
           "properties": {
             "phasesCompleted": {
               "type": "array",
               "minItems": 1,
               "items": {
                 "type": "string",
-                "enum": [
-                  "root_cause",
-                  "pattern_analysis",
-                  "hypothesis",
-                  "implementation"
-                ]
+                "enum": ["root_cause", "pattern_analysis", "hypothesis", "implementation"]
               },
               "description": "Debugging phases completed"
             },
@@ -69,19 +51,11 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "type",
-                  "description"
-                ],
+                "required": ["type", "description"],
                 "properties": {
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "logs",
-                      "traces",
-                      "diffs",
-                      "diagnostics"
-                    ]
+                    "enum": ["logs", "traces", "diffs", "diagnostics"]
                   },
                   "description": {
                     "type": "string"
@@ -102,10 +76,7 @@
         },
         "fix": {
           "type": "object",
-          "required": [
-            "applied",
-            "description"
-          ],
+          "required": ["applied", "description"],
           "properties": {
             "applied": {
               "type": "boolean",
@@ -130,10 +101,7 @@
         },
         "verification": {
           "type": "object",
-          "required": [
-            "verified",
-            "method"
-          ],
+          "required": ["verified", "method"],
           "properties": {
             "verified": {
               "type": "boolean",
@@ -141,11 +109,7 @@
             },
             "method": {
               "type": "string",
-              "enum": [
-                "test",
-                "manual",
-                "both"
-              ],
+              "enum": ["test", "manual", "both"],
               "description": "Verification method used"
             },
             "testsPassing": {
@@ -167,11 +131,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

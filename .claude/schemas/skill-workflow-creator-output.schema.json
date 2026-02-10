@@ -4,18 +4,11 @@
   "title": "Workflow Creator Output",
   "description": "Schema for workflow creation artifacts",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -37,11 +30,7 @@
           "description": "Workflow phases",
           "items": {
             "type": "object",
-            "required": [
-              "name",
-              "agents",
-              "outputs"
-            ],
+            "required": ["name", "agents", "outputs"],
             "properties": {
               "name": {
                 "type": "string"
@@ -69,11 +58,7 @@
         },
         "artifactsCreated": {
           "type": "object",
-          "required": [
-            "workflowFile",
-            "documentationUpdated",
-            "agentMapUpdated"
-          ],
+          "required": ["workflowFile", "documentationUpdated", "agentMapUpdated"],
           "properties": {
             "workflowFile": {
               "type": "boolean"
@@ -88,11 +73,7 @@
         },
         "integrationsCompleted": {
           "type": "object",
-          "required": [
-            "enterpriseWorkflowsUpdated",
-            "qualityGatesDefined",
-            "tested"
-          ],
+          "required": ["enterpriseWorkflowsUpdated", "qualityGatesDefined", "tested"],
           "properties": {
             "enterpriseWorkflowsUpdated": {
               "type": "boolean"

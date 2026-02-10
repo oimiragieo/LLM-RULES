@@ -5,6 +5,7 @@ model: opus
 temperature: 0.3
 context_strategy: lazy_load
 priority: medium
+extended_thinking: true
 tools: [Read, Write, Edit, Bash, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol

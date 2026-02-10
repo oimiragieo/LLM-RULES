@@ -4,18 +4,11 @@
   "title": "Agent Creator Output",
   "description": "Schema for agent creation artifacts",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -29,12 +22,7 @@
         },
         "agentType": {
           "type": "string",
-          "enum": [
-            "core",
-            "domain",
-            "specialized",
-            "orchestrator"
-          ],
+          "enum": ["core", "domain", "specialized", "orchestrator"],
           "description": "Agent classification"
         },
         "agentPath": {
@@ -44,20 +32,12 @@
         },
         "model": {
           "type": "string",
-          "enum": [
-            "haiku",
-            "sonnet",
-            "opus"
-          ],
+          "enum": ["haiku", "sonnet", "opus"],
           "description": "Configured model for agent"
         },
         "artifactsCreated": {
           "type": "object",
-          "required": [
-            "agentFile",
-            "registryEntry",
-            "routingKeywords"
-          ],
+          "required": ["agentFile", "registryEntry", "routingKeywords"],
           "properties": {
             "agentFile": {
               "type": "boolean"
@@ -72,11 +52,7 @@
         },
         "integrationsCompleted": {
           "type": "object",
-          "required": [
-            "skillsAssigned",
-            "routingTableUpdated",
-            "catalogUpdated"
-          ],
+          "required": ["skillsAssigned", "routingTableUpdated", "catalogUpdated"],
           "properties": {
             "skillsAssigned": {
               "type": "boolean"

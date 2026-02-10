@@ -4,28 +4,16 @@
   "title": "TDD Skill Output",
   "description": "Validates output from tdd skill invocation - Test-Driven Development cycle verification",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "TDD cycle execution results",
-      "required": [
-        "testResults",
-        "redGreenRefactorCycle",
-        "coverage"
-      ],
+      "required": ["testResults", "redGreenRefactorCycle", "coverage"],
       "properties": {
         "testResults": {
           "type": "object",
-          "required": [
-            "total",
-            "passed",
-            "failed",
-            "skipped"
-          ],
+          "required": ["total", "passed", "failed", "skipped"],
           "properties": {
             "total": {
               "type": "number",
@@ -54,11 +42,7 @@
         },
         "redGreenRefactorCycle": {
           "type": "object",
-          "required": [
-            "redPhaseVerified",
-            "greenPhaseVerified",
-            "refactorPhaseCompleted"
-          ],
+          "required": ["redPhaseVerified", "greenPhaseVerified", "refactorPhaseCompleted"],
           "properties": {
             "redPhaseVerified": {
               "type": "boolean",
@@ -81,9 +65,7 @@
         },
         "coverage": {
           "type": "object",
-          "required": [
-            "percentage"
-          ],
+          "required": ["percentage"],
           "properties": {
             "percentage": {
               "type": "number",
@@ -132,11 +114,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

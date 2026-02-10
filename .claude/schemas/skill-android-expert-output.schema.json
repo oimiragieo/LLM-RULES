@@ -2,29 +2,18 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Android Expert Output",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "output": {
       "type": "object",
-      "required": [
-        "language",
-        "framework",
-        "codeGenerated"
-      ],
+      "required": ["language", "framework", "codeGenerated"],
       "properties": {
         "language": {
           "const": "Kotlin"
         },
         "framework": {
           "type": "string",
-          "enum": [
-            "Jetpack Compose",
-            "XML Views",
-            "Combined"
-          ]
+          "enum": ["Jetpack Compose", "XML Views", "Combined"]
         },
         "androidVersion": {
           "type": "string",
@@ -34,10 +23,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "file",
-              "content"
-            ],
+            "required": ["file", "content"],
             "properties": {
               "file": {
                 "type": "string"
@@ -77,12 +63,7 @@
           "properties": {
             "pattern": {
               "type": "string",
-              "enum": [
-                "MVVM",
-                "MVI",
-                "MVP",
-                "Other"
-              ]
+              "enum": ["MVVM", "MVI", "MVP", "Other"]
             },
             "layers": {
               "type": "array",
@@ -103,11 +84,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

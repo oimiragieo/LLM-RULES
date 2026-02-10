@@ -7,11 +7,13 @@
 **Trigger**: Reflection-agent assessed Task #22 completion and detected missing artifact-graph.json entries and tool-catalog.md status updates
 
 **Details**:
+
 - Tools successfully wired to package.json (fully functional)
 - Integration Health Score: 65% (Category: Gaps, requires integration analysis)
 - Missing: artifact-graph.json registration, tool-catalog.md status update, Router keywords
 
 **Solution**: Queue artifact-integrator task to:
+
 1. Add 3 tool entries to artifact-graph.json
 2. Update tool-catalog.md with wiring status (change from "reference-only" to "package.json wired")
 3. Create Router keywords for natural language discovery (e.g., "detect orphaned skills" → detect:orphans)
@@ -25,6 +27,43 @@
 
 ---
 
+## 2026-02-10: EPIC Plan Execution Context Risk - Task #25
+
+**Issue**: Task #25 EPIC plan includes 34 agent spawns across 7 phases. Sequential execution with heavy agents (code-reviewer, security-architect, architect) without wave-limiting could trigger context overflow (each agent returns 125k-165k tokens inline).
+
+**Trigger**: All 34 agents completing in parallel or overlapping spawns → inline result concatenation → >200k tokens → autocompact fails → session crash
+
+**Prevention Strategy**:
+
+1. Execute plan phases sequentially (Design → Implement → Review → Deploy), NOT phase-parallel
+2. Within each phase, use wave-based spawning:
+   - Wave 1: Implementation agents (developer, database-architect) — report to `.claude/context/reports/`
+   - Wave 2: Review agents (code-reviewer, QA, security-architect) — separate spawns, max 2 concurrent
+   - Wave 3: Infrastructure/Documentation agents (devops, technical-writer) — cleanup phase
+3. Each wave completes before next starts
+4. Each agent writes to `.claude/context/reports/` subdirectory (not inline)
+5. Router reads report files, consolidates 5-bullet summary (500 chars max)
+
+**Example Execution**:
+
+```
+Phase: Implement
+  Wave 1: developer + database-architect → .claude/context/reports/impl/dev-db.md
+  Wait for completion
+Phase: Review
+  Wave 1: code-reviewer + security-architect (separate spawns) → .claude/context/reports/review/*.md
+  Wave 2: architect (solo) → .claude/context/reports/review/arch.md
+  Wait for completion
+```
+
+**Solution**: Update enterprise-workflow.md Phase Advance section to mandate wave-based spawning for EPIC+ plans
+
+**Priority**: P1 (prevents session crashes; known failure mode from 2026-02-09)
+
+**Related**: Task #25 EPIC Plan, 2026-02-09 Context Overflow Incident
+
+---
+
 ## 2026-02-09: CRITICAL - Context Overflow From Parallel Heavy Agents
 
 **Issue**: Router spawned 5+ heavy review agents (code-reviewer, QA, security-architect, devops, architect) simultaneously. Each returned 125k-165k token results inline. Total context exceeded 200k tokens. Autocompact failed (context already over threshold). Session crashed.
@@ -32,6 +71,7 @@
 **Impact**: HIGH - 52 minutes of work lost, all review results lost, session required restart
 
 **Workaround**:
+
 - Max 2 heavy agents in parallel (IRON LAW)
 - Agents write reports to files, return only file path + 5-line summary
 - Sequential review waves, not parallel blast
@@ -685,3 +725,33 @@ Additionally, `skill-plan-generator-output.schema.json` (210 lines, Tier 1 gold 
 **Priority:** P1
 
 **Full Report:** `.claude/context/reports/security/batch1-foundations-security-review-2026-02-09.md`
+
+---
+
+## Remaining Ecosystem Gaps (2026-02-09)
+
+**Context**: EPIC ecosystem audit Phase 6 identified 61 remaining gaps across 58 agents after remediating 10 CRITICAL/HIGH priority items in Phase 5.
+
+**Gap Distribution**:
+
+- 0 CRITICAL (all remediated in Phase 5)
+- 13 HIGH priority
+- 48 MEDIUM priority
+
+**Key Patterns**:
+
+1. **Extended Thinking**: 13 complex analysis agents lack extended_thinking capability (code-reviewer, code-simplifier, researcher, penetration-tester, performance-engineer, microservices-architect, api-designer, accessibility-tester, devops-troubleshooter, context-compressor, database-architect, incident-responder, sre-engineer)
+2. **ROUTING_TABLE Gaps**: 10 agents rely solely on INTENT_KEYWORDS without ROUTING_TABLE entries for priority routing
+3. **Skill Assignments**: Several specialist agents missing core skills (ripgrep, code-semantic-search, code-structural-search for code-focused agents)
+4. **Model Mismatches**: config.yaml vs frontmatter discrepancies for 8 agents
+
+**Priority Actions** (from Phase 6 recommendations):
+
+1. Enable extended_thinking for 7 complex analysis agents (code-reviewer, code-simplifier, researcher, penetration-tester, performance-engineer, microservices-architect, api-designer)
+2. Add ROUTING_TABLE entries for pm and reflection-agent
+3. Quarterly audit cadence to prevent gap accumulation
+4. Monitor integration health via artifact-integrator
+
+**Full Details**: `.claude/context/reports/ecosystem-audit/phase-6-final-harmony-report.md` (Section 5.1: Remaining Gaps Analysis)
+
+**Status**: Tracked for future remediation waves

@@ -11,7 +11,7 @@ tools: [Read, Write, Edit]
 # Ripgrep Skill
 
 <identity>
-Enhanced code search with ripgrep binary. NOTE: Prefer `pnpm search:code` for hybrid text+semantic search - it's faster and requires no setup.
+Enhanced code search with ripgrep binary. NOTE: Prefer `pnpm search:code` for discovery/ranking and smaller output payloads; prefer raw `rg` for fastest exact literal matching.
 </identity>
 
 <capabilities>
@@ -21,12 +21,19 @@ Enhanced code search with ripgrep binary. NOTE: Prefer `pnpm search:code` for hy
 - Integration with .gitignore and custom ignore patterns
 </capabilities>
 
-## ⚡ RECOMMENDED: Hybrid Lazy Search (New)
+## ⚡ RECOMMENDED: Hybrid Lazy Code Search (Instant, No Batch Indexing)
 
-For **instant code search** without batch indexing, use the new hybrid system:
+Use the hybrid lazy search system for day-to-day code discovery:
+
+- **Instant**: search works immediately with no warm-up indexing pass
+- **No upfront indexing**: Search immediately with no multi-hour batch index build
+- **Lazy embeddings**: Semantic vectors update incrementally in background as files are edited
+- **Hybrid scoring**: Reciprocal Rank Fusion (RRF) combines text matches + semantic similarity
+
+### Search Commands
 
 ```bash
-# Text search (ripgrep-based, 0.2-0.5s for 40k files)
+# Search code instantly (ripgrep-based)
 pnpm search:code "authentication logic"
 pnpm search:code "export class User"
 pnpm search:code "import react"
@@ -34,21 +41,230 @@ pnpm search:code "import react"
 # View project structure
 pnpm search:structure
 
-# Get file content
+# Get file content with line numbers
 pnpm search:file src/auth.ts 1 50
 ```
 
-**Why use this instead of raw ripgrep?**
+### How It Works
 
-- **Instant**: No batch indexing required (0s startup)
-- **Hybrid scoring**: Combines text (ripgrep) + semantic (embeddings) search
-- **Pre-prompt hook**: Automatically analyzes structure on each prompt
-- **Background embeddings**: Incremental updates as files change
+1. Pre-prompt hook analyzes repository structure using ripgrep (~0.5s)
+2. `search:code` executes fast text matching via ripgrep
+3. Optional semantic embeddings add similarity-based ranking
+4. Post-edit hook incrementally embeds only changed files
+5. RRF merges text and semantic rankings into a single ordered result set
+
+### Configuration
+
+```bash
+# Disable semantic search (text-only, fastest)
+HYBRID_EMBEDDINGS=off
+
+# Enable semantic search (requires LanceDB)
+HYBRID_EMBEDDINGS=on
+
+# Disable daemon transport (direct CLI execution)
+HYBRID_SEARCH_DAEMON=off
+
+# Auto-prewarm daemon on startup
+HYBRID_DAEMON_PREWARM=true
+
+# Daemon idle timeout in ms (default 600000)
+HYBRID_DAEMON_IDLE_MS=600000
+```
+
+### Daemon + Prewarm Runbook
+
+```bash
+# Start, verify, prewarm
+pnpm search:daemon:start
+pnpm search:daemon:status
+pnpm search:daemon:prewarm
+
+# Search (daemon path)
+pnpm search:code "authentication logic"
+
+# Stop daemon
+pnpm search:daemon:stop
+```
+
+Expected latency profile on this repository:
+
+- Cold daemon first query (no prewarm): ~1.35s avg
+- First query after prewarm: ~0.40s avg
+- Warm repeated daemon queries: ~0.18-0.19s
+- Direct mode (`HYBRID_SEARCH_DAEMON=off`): ~0.73s avg for repeated CLI calls
+
+### Comparison with Batch Indexing
+
+| Approach           | Startup   | First Search        | Memory | Disk   |
+| ------------------ | --------- | ------------------- | ------ | ------ |
+| Old Batch Indexing | 2+ hours  | Instant after index | 8-16GB | 2-5GB  |
+| Hybrid Lazy Search | 0 seconds | ~0.5s               | <500MB | <100MB |
+
+### Measured Performance and Output (This Repo)
+
+Using the same 5 queries on this repository:
+
+| Mode                                         | Avg Latency | Avg Output Bytes | Best Use Case                      |
+| -------------------------------------------- | ----------- | ---------------- | ---------------------------------- |
+| `pnpm search:code` (`HYBRID_EMBEDDINGS=off`) | ~227ms      | ~461 bytes       | Fast discovery with compact output |
+| `pnpm search:code` (`HYBRID_EMBEDDINGS=on`)  | ~734ms      | ~512 bytes       | Semantic/concept queries           |
+| Raw `rg` literal search                      | ~35ms       | ~2478 bytes      | Exact symbol/literal lookup        |
+
+Interpretation:
+
+- Raw `rg` is fastest for exact literal/symbol lookups
+- Hybrid search returns significantly smaller output payloads (often lower token pressure)
+- Embeddings improve semantic recall, but add latency
+
+### Decision Rule (Practical)
+
+Use `pnpm search:code` when:
+
+- Query is conceptual/natural language (`"auth flow for refresh tokens"`)
+- You need ranked results and concise context for agent prompts
+- You want lower output volume by default
+
+Use raw `rg` when:
+
+- Query is an exact symbol/literal (`TaskUpdate(`, `HybridLazyIndexer`, exact export names)
+- You need the fastest possible lookup time
+- You need advanced regex/PCRE2 behavior
+
+### Measured by File Size (This Repo)
+
+Sample size: 4 small files (0.5-5KB), 4 large files (30-109KB), literal token queries.
+
+| Bucket      | `search:code` off | `search:code` on | `rg_repo`       | `rg_file`      |
+| ----------- | ----------------- | ---------------- | --------------- | -------------- |
+| Small files | ~230ms / ~2707B   | ~600ms / ~2965B  | ~34ms / ~17075B | ~15ms / ~1156B |
+| Large files | ~228ms / ~2354B   | ~475ms / ~2847B  | ~35ms / ~17811B | ~15ms / ~6564B |
+
+Takeaways:
+
+- `rg_file` is fastest and best for targeted file-level checks.
+- `rg_repo` remains fastest for repo-wide literal scans, but emits much larger output payloads.
+- `search:code` has steadier latency across file sizes and typically lower output volume for prompt usage.
+
+### Real-World Scenario Playbook (Tested Patterns)
+
+Use these scenario patterns to choose the right search path quickly.
+
+#### Scenario 1: Incident Triage (Unknown Root Cause)
+
+Goal: find likely hotspots for a production symptom quickly without flooding context.
+
+```bash
+# 1) Start broad and semantic
+pnpm search:code "task status not updating after completion"
+
+# 2) Pivot to exact symbol checks once candidates appear
+pnpm search:code "TaskUpdate("
+```
+
+Pattern:
+
+- Start with `search:code` for intent-level recall.
+- Narrow with literal/symbol queries once candidate files are identified.
+
+#### Scenario 2: Fast Exact Lookup (You Know the Identifier)
+
+Goal: locate exact definitions/usages as fast as possible.
+
+```bash
+# Repo-wide exact literal (stable example in this repo)
+rg -F "TaskUpdate(" -g "*.cjs" -g "*.js" -g "*.ts" .
+
+# Single-file exact lookup (fastest path)
+rg -F "spawnSync" .claude/skills/skill-creator/scripts/create.cjs
+```
+
+Pattern:
+
+- Use raw `rg -F` for exact symbol searches, especially for large files or known paths.
+
+#### Scenario 3: Safe Refactor Prep
+
+Goal: enumerate callsites before renaming or behavior changes.
+
+```bash
+# 1) Gather broad callsites
+pnpm search:code "TaskUpdate completed status workflow"
+
+# 2) Confirm exact callsites and edge usage
+rg -F "TaskUpdate(" -g "*.cjs" -g "*.js" -g "*.ts"
+```
+
+Pattern:
+
+- Hybrid first to find semantic variants.
+- Raw `rg` second for deterministic callsite inventory.
+
+#### Scenario 4: Security Audit Sweep
+
+Goal: detect risky patterns and confirm exact high-confidence matches.
+
+```bash
+# Concept discovery (broad)
+pnpm search:code "command injection shell true spawn"
+
+# Exact dangerous usage checks
+rg -F "shell: true" -g "*.cjs" -g "*.js"
+rg -F "spawnSync(" -g "*.cjs" -g "*.js"
+```
+
+Pattern:
+
+- Hybrid surfaces related risky code.
+- Exact `rg` validates actionable matches for remediation.
+
+#### Scenario 5: Architecture Onboarding (New Contributor/Agent)
+
+Goal: understand structure before making changes.
+
+```bash
+# High-level map
+pnpm search:structure
+
+# Focused concept entry points
+pnpm search:code "routing guard task lifecycle"
+pnpm search:code "memory scheduler session context"
+```
+
+Pattern:
+
+- Use structure first, then concept search by subsystem intent.
+
+#### Scenario 6: Token-Constrained Agent Workflow
+
+Goal: minimize prompt/context bloat while maintaining retrieval quality.
+
+```bash
+# Keep semantic off by default for speed and concise output
+HYBRID_EMBEDDINGS=off pnpm search:code "workflow task completion guard"
+
+# Enable semantic only when lexical matches are weak
+HYBRID_EMBEDDINGS=on pnpm search:code "why task completion silently fails"
+```
+
+Pattern:
+
+- Default to `HYBRID_EMBEDDINGS=off`.
+- Turn on embeddings only for intent-heavy or poor lexical queries.
+- If `HYBRID_EMBEDDINGS=off` returns no hits, re-run immediately with `HYBRID_EMBEDDINGS=on`.
+
+### Reusable Query Patterns
+
+- Concept query: `"authentication flow refresh token validation"`
+- Mixed query: `"TaskUpdate completed status"`
+- Exact query: `"TaskUpdate("` (prefer `rg -F` when speed is critical)
+- Structure query: use `pnpm search:structure` before large edits
+- File drill-down: `pnpm search:file <path> <startLine> <endLine>`
 
 **Only use raw ripgrep (below) for:**
 
 - Advanced PCRE2 regex patterns (lookahead/lookbehind)
-- Custom file type filtering not supported by search:code
+- Custom file type filtering not supported by `search:code`
 - Pipeline integration with other CLI tools
 
 <instructions>

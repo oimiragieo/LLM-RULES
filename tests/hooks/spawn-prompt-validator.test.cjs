@@ -2,6 +2,8 @@ const { describe, test } = require('node:test');
 const assert = require('node:assert');
 const {
   validatePrompt,
+  autoNormalizeSpawnInput,
+  buildRequiredPrefixFragment,
   normalizeUnicode,
   safeRegexTest,
   isOrchestratorSpawn,
@@ -180,6 +182,49 @@ Do some work
     assert.strictEqual(result.isValid, false);
     assert.strictEqual(result.score, 0);
     assert.ok(result.error.includes('SEC-DOS-001'));
+  });
+});
+
+describe('autoNormalizeSpawnInput()', () => {
+  test('should prepend required prefix when required fields are missing', () => {
+    const toolInput = {
+      task_id: '42',
+      description: 'Fix routing',
+      prompt: 'Implement changes quickly.',
+      allowed_tools: ['Read', 'Write'],
+    };
+    const initial = validatePrompt(toolInput.prompt);
+    assert.strictEqual(initial.isValid, false);
+    assert.ok(initial.missingRequired?.length > 0);
+
+    const normalized = autoNormalizeSpawnInput(toolInput, initial);
+    assert.strictEqual(normalized.modified, true);
+    assert.ok(normalized.toolInput.prompt.includes('TASK TRACKING REQUIRED'));
+    assert.ok(normalized.toolInput.prompt.includes('Task ID: 42'));
+    assert.ok(normalized.toolInput.allowed_tools.includes('TaskUpdate'));
+    assert.ok(normalized.toolInput.allowed_tools.includes('TaskList'));
+
+    const after = validatePrompt(normalized.toolInput.prompt);
+    assert.strictEqual(after.isValid, true);
+  });
+
+  test('should not modify when no required fields are missing', () => {
+    const prompt = createValidPrompt();
+    const toolInput = { task_id: '7', prompt, allowed_tools: ['TaskUpdate', 'TaskList'] };
+    const initial = validatePrompt(prompt);
+    assert.strictEqual(initial.isValid, true);
+
+    const normalized = autoNormalizeSpawnInput(toolInput, initial);
+    assert.strictEqual(normalized.modified, false);
+  });
+});
+
+describe('buildRequiredPrefixFragment()', () => {
+  test('should include task id and project context', () => {
+    const prefix = buildRequiredPrefixFragment('123', 'Task title');
+    assert.ok(prefix.includes('Task ID: 123'));
+    assert.ok(prefix.includes('PROJECT_ROOT:'));
+    assert.ok(prefix.includes('TASK TRACKING REQUIRED'));
   });
 });
 

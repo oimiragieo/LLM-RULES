@@ -4,30 +4,18 @@
   "title": "Code Structural Search Skill Output",
   "description": "Validates output from code-structural-search skill - AST-based pattern matching",
   "type": "object",
-  "required": [
-    "output",
-    "status"
-  ],
+  "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "Structural search results",
-      "required": [
-        "matches",
-        "patterns",
-        "astNodes"
-      ],
+      "required": ["matches", "patterns", "astNodes"],
       "properties": {
         "matches": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "file",
-              "lineStart",
-              "pattern",
-              "code"
-            ],
+            "required": ["file", "lineStart", "pattern", "code"],
             "properties": {
               "file": {
                 "type": "string"
@@ -64,10 +52,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "pattern",
-              "matchCount"
-            ],
+            "required": ["pattern", "matchCount"],
             "properties": {
               "pattern": {
                 "type": "string"
@@ -93,10 +78,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "nodeType",
-              "count"
-            ],
+            "required": ["nodeType", "count"],
             "properties": {
               "nodeType": {
                 "type": "string",
@@ -110,10 +92,7 @@
                 "type": "array",
                 "items": {
                   "type": "object",
-                  "required": [
-                    "file",
-                    "line"
-                  ],
+                  "required": ["file", "line"],
                   "properties": {
                     "file": {
                       "type": "string"
@@ -143,11 +122,7 @@
             },
             "tool": {
               "type": "string",
-              "enum": [
-                "ast-grep",
-                "tree-sitter",
-                "babel"
-              ]
+              "enum": ["ast-grep", "tree-sitter", "babel"]
             },
             "filesScanned": {
               "type": "number",
@@ -161,10 +136,7 @@
         },
         "summary": {
           "type": "object",
-          "required": [
-            "totalMatches",
-            "filesMatched"
-          ],
+          "required": ["totalMatches", "filesMatched"],
           "properties": {
             "totalMatches": {
               "type": "number",
@@ -189,11 +161,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     }
   },

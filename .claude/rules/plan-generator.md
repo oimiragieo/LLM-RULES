@@ -17,7 +17,9 @@
 ## Output Standards
 
 ### Mandatory Task Elements
+
 Every task must include:
+
 1. Checkbox (`- [ ]`) for progress tracking
 2. ID in N.M format for reference
 3. Time estimate (`(~X min)`)
@@ -27,14 +29,18 @@ Every task must include:
 7. Parallel marker (`[⚡ parallel OK]`) if concurrent execution allowed
 
 ### Mandatory Phase Elements
+
 Every phase must include:
+
 1. Dependencies (phase numbers or "None")
 2. Parallel OK (Yes/No/Partial)
 3. Error handling section (what to do if tasks fail)
 4. Verification gate (commands to run before proceeding)
 
 ### Mandatory Plan Elements
+
 Every plan must include:
+
 1. Executive summary (2-3 sentences)
 2. Objectives (clear, measurable goals)
 3. Phases with tasks (structured as above)
@@ -57,11 +63,13 @@ Every plan must include:
 ## Integration Points
 
 ### Agents Using This Skill
+
 - **planner** (primary): Generates plans from requirements
 - **master-orchestrator**: Creates multi-phase execution plans
 - **architect**: Creates architecture implementation plans
 
 ### Related Skills
+
 - **complexity-assessment**: Determines plan complexity level
 - **task-breakdown**: Breaks large tasks into atomic units
 - **template-renderer**: Formats plans using templates
@@ -69,6 +77,7 @@ Every plan must include:
 - **architecture-review**: Reviews architectural plans
 
 ### Workflows
+
 - **feature-development-workflow.md**: Uses plan-generator in Design phase
 - **enterprise-workflow.md**: Uses plan-generator for phased execution
 - **migration-workflow.md**: Uses plan-generator for migration plans
@@ -76,6 +85,7 @@ Every plan must include:
 ## Quality Checklist
 
 Before finalizing any plan, verify:
+
 - [ ] Can I copy-paste every command and run it?
 - [ ] Does every verify command have clear pass/fail output?
 - [ ] Is there a rollback for every destructive operation?
@@ -89,30 +99,39 @@ Before finalizing any plan, verify:
 ## Iron Laws
 
 ### 1. The Executable Command Law
+
 ```
 EVERY TASK MUST HAVE AN EXECUTABLE COMMAND
 ```
+
 A task without a command is not a task - it's a wish.
 
 ### 2. The Verification Law
+
 ```
 EVERY TASK MUST HAVE A VERIFICATION COMMAND
 ```
+
 Without verification, you can't confirm success.
 
 ### 3. The Rollback Law
+
 ```
 EVERY DESTRUCTIVE OPERATION MUST HAVE A ROLLBACK
 ```
+
 Without rollback, you can't recover from failures.
 
 ### 4. The Complexity Law
+
 ```
 <=7 PHASES, <=7 TASKS PER PHASE
 ```
+
 More than 7 = cognitive overload = split the plan.
 
 ## Related References
+
 - `.claude/skills/plan-generator/SKILL.md` - Full skill documentation
 - `.claude/workflows/core/router-decision.md` - When to spawn planner
 - `complexity-assessment` skill - Determines plan complexity

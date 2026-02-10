@@ -81,17 +81,17 @@ git diff --stat HEAD~1..HEAD
 
 Prioritize review by security sensitivity:
 
-| Priority | File Patterns | Reason |
-|----------|--------------|--------|
-| **P0** | `**/auth/**`, `**/security/**`, `**/crypto/**` | Direct security code |
-| **P0** | `*.env*`, `**/config/**`, `**/secrets/**` | Configuration and secrets |
-| **P0** | `**/middleware/**`, `**/guards/**`, `**/validators/**` | Security controls |
-| **P1** | `**/api/**`, `**/routes/**`, `**/controllers/**` | Attack surface |
-| **P1** | `package.json`, `requirements.txt`, `go.mod` | Dependency changes |
-| **P1** | `Dockerfile`, `docker-compose.yml`, `*.yaml` | Infrastructure config |
-| **P2** | `**/models/**`, `**/db/**`, `**/queries/**` | Data access layer |
-| **P2** | `**/utils/**`, `**/helpers/**` | Shared utility code |
-| **P3** | `**/tests/**`, `**/docs/**` | Tests and documentation |
+| Priority | File Patterns                                          | Reason                    |
+| -------- | ------------------------------------------------------ | ------------------------- |
+| **P0**   | `**/auth/**`, `**/security/**`, `**/crypto/**`         | Direct security code      |
+| **P0**   | `*.env*`, `**/config/**`, `**/secrets/**`              | Configuration and secrets |
+| **P0**   | `**/middleware/**`, `**/guards/**`, `**/validators/**` | Security controls         |
+| **P1**   | `**/api/**`, `**/routes/**`, `**/controllers/**`       | Attack surface            |
+| **P1**   | `package.json`, `requirements.txt`, `go.mod`           | Dependency changes        |
+| **P1**   | `Dockerfile`, `docker-compose.yml`, `*.yaml`           | Infrastructure config     |
+| **P2**   | `**/models/**`, `**/db/**`, `**/queries/**`            | Data access layer         |
+| **P2**   | `**/utils/**`, `**/helpers/**`                         | Shared utility code       |
+| **P3**   | `**/tests/**`, `**/docs/**`                            | Tests and documentation   |
 
 ## Step 2: Security-Focused Diff Analysis
 
@@ -110,6 +110,7 @@ CHECK: Did the change modify input validation?
 ```
 
 **Red Flags:**
+
 - Removing or weakening regex patterns
 - Commenting out validation middleware
 - Changing `strict` mode to `loose`
@@ -128,6 +129,7 @@ CHECK: Did the change affect auth?
 ```
 
 **Red Flags:**
+
 - Routes added without authentication middleware
 - `isAdmin` checks removed or weakened
 - Token expiry extended significantly
@@ -189,7 +191,7 @@ go list -m -json all | nancy sleuth
 
 For each finding, provide a structured inline comment:
 
-```markdown
+````markdown
 **SECURITY [SEVERITY]**: [Brief description]
 
 **Location**: `file.js:42` (in diff hunk)
@@ -203,7 +205,9 @@ For each finding, provide a structured inline comment:
 + // Suggested (safe)
 + db.query("SELECT * FROM users WHERE id = $1", [userId]);
 ```
-```
+````
+
+````
 
 ### Severity Levels for Diff Findings
 
@@ -254,7 +258,7 @@ For each finding, provide a structured inline comment:
 - [ ] APPROVE WITH CONDITIONS: Minor issues, fix before deploy
 - [ ] REQUEST CHANGES: Security issues must be addressed
 - [ ] BLOCK: Critical vulnerability introduced
-```
+````
 
 ## Step 5: Automated Diff Scanning
 
@@ -312,14 +316,14 @@ jobs:
 
 ## Common Security Regressions in Diffs
 
-| Pattern | What Changed | Risk |
-|---------|-------------|------|
-| Removed `helmet()` middleware | Security headers removed | Header injection, clickjacking |
-| Changed `sameSite: 'strict'` to `'none'` | Cookie policy weakened | CSRF attacks |
-| Removed rate limiting middleware | Rate limit removed | Brute force, DoS |
-| Added `cors({ origin: '*' })` | CORS wildcard | Cross-origin attacks |
-| Removed `csrf()` middleware | CSRF protection removed | CSRF attacks |
-| Changed `httpOnly: true` to `false` | Cookie accessible to JS | XSS token theft |
+| Pattern                                  | What Changed             | Risk                           |
+| ---------------------------------------- | ------------------------ | ------------------------------ |
+| Removed `helmet()` middleware            | Security headers removed | Header injection, clickjacking |
+| Changed `sameSite: 'strict'` to `'none'` | Cookie policy weakened   | CSRF attacks                   |
+| Removed rate limiting middleware         | Rate limit removed       | Brute force, DoS               |
+| Added `cors({ origin: '*' })`            | CORS wildcard            | Cross-origin attacks           |
+| Removed `csrf()` middleware              | CSRF protection removed  | CSRF attacks                   |
+| Changed `httpOnly: true` to `false`      | Cookie accessible to JS  | XSS token theft                |
 
 ## Related Skills
 

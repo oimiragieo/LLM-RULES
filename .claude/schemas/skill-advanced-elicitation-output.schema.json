@@ -4,18 +4,11 @@
   "title": "Advanced Elicitation Output",
   "description": "Schema for advanced elicitation skill output using meta-cognitive reasoning methods",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -54,10 +47,7 @@
           "patternProperties": {
             "^[a-z][a-z0-9-]*$": {
               "type": "object",
-              "required": [
-                "findings",
-                "verdict"
-              ],
+              "required": ["findings", "verdict"],
               "properties": {
                 "findings": {
                   "type": "array",
@@ -83,11 +73,7 @@
           "description": "Concrete improvements identified",
           "items": {
             "type": "object",
-            "required": [
-              "change",
-              "rationale",
-              "impact"
-            ],
+            "required": ["change", "rationale", "impact"],
             "properties": {
               "change": {
                 "type": "string"
@@ -106,11 +92,7 @@
         },
         "confidenceLevel": {
           "type": "string",
-          "enum": [
-            "HIGH",
-            "MEDIUM",
-            "LOW"
-          ],
+          "enum": ["HIGH", "MEDIUM", "LOW"],
           "description": "Overall confidence after elicitation"
         },
         "originalContent": {
@@ -134,12 +116,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "methodsApplied",
-        "analysis",
-        "improvements",
-        "confidenceLevel"
-      ]
+      "required": ["methodsApplied", "analysis", "improvements", "confidenceLevel"]
     }
   },
   "additionalProperties": false

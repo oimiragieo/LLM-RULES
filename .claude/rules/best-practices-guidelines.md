@@ -19,6 +19,7 @@
 - Pagination for collections (`?page=1&limit=20`)
 
 **Example:**
+
 ```
 GET    /api/v1/users       - List users
 POST   /api/v1/users       - Create user
@@ -38,18 +39,25 @@ DELETE /api/v1/users/:id   - Delete user
 - Optimize images for different screen sizes
 
 **Example:**
+
 ```css
 /* Mobile first */
-.container { width: 100%; }
+.container {
+  width: 100%;
+}
 
 /* Tablet and up */
 @media (min-width: 768px) {
-  .container { width: 750px; }
+  .container {
+    width: 750px;
+  }
 }
 
 /* Desktop */
 @media (min-width: 1024px) {
-  .container { width: 960px; }
+  .container {
+    width: 960px;
+  }
 }
 ```
 
@@ -63,6 +71,7 @@ DELETE /api/v1/users/:id   - Delete user
 - Use type inference for TypeScript
 
 **Example:**
+
 ```typescript
 import { z } from 'zod';
 
@@ -88,6 +97,7 @@ const result = UserSchema.safeParse(input); // Returns result object
 - Review CVE databases for critical packages
 
 **Commands:**
+
 ```bash
 # Check for outdated packages
 pnpm outdated
@@ -171,18 +181,21 @@ pnpm audit --fix
 ## Framework-Specific Best Practices
 
 ### React
+
 - Use hooks over class components
 - Memoize expensive computations
 - Avoid prop drilling (use context)
 - Keep components small and focused
 
 ### Node.js
+
 - Use async/await over callbacks
 - Handle errors explicitly
 - Use process managers (PM2)
 - Implement graceful shutdown
 
 ### Python
+
 - Follow PEP 8 style guide
 - Use virtual environments
 - Type hints on public functions

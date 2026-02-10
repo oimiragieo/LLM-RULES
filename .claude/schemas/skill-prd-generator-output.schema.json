@@ -3,18 +3,11 @@
   "title": "prd-generator Output Schema",
   "description": "Output structure for prd-generator skill execution",
   "type": "object",
-  "required": [
-    "status",
-    "output"
-  ],
+  "required": ["status", "output"],
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status of the skill"
     },
     "output": {
@@ -39,12 +32,7 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": [
-              "phase",
-              "description",
-              "status",
-              "depends"
-            ],
+            "required": ["phase", "description", "status", "depends"],
             "properties": {
               "phase": {
                 "type": "string"
@@ -54,12 +42,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "pending",
-                  "in_progress",
-                  "completed",
-                  "blocked"
-                ]
+                "enum": ["pending", "in_progress", "completed", "blocked"]
               },
               "parallel": {
                 "type": "boolean"
@@ -77,10 +60,7 @@
         },
         "validationResult": {
           "type": "object",
-          "required": [
-            "isValid",
-            "missingSections"
-          ],
+          "required": ["isValid", "missingSections"],
           "properties": {
             "isValid": {
               "type": "boolean"
@@ -114,13 +94,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "prdFile",
-        "featureName",
-        "hypothesisStatement",
-        "phases",
-        "validationResult"
-      ]
+      "required": ["prdFile", "featureName", "hypothesisStatement", "phases", "validationResult"]
     }
   },
   "additionalProperties": false,
