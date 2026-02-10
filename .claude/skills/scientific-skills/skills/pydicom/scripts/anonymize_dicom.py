@@ -127,7 +127,7 @@ Examples:
         if args.verbose:
             print(f"\nAnonymized {len(result)} fields (tag names only)")
     else:
-        print(f"✗ Error: {result}")
+        print("✗ Error: Failed to anonymize DICOM file.")
         sys.exit(1)
 
 
