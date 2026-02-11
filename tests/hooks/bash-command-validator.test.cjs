@@ -70,6 +70,9 @@ console.log('\n=== bash-command-validator.cjs tests ===\n');
 const {
   extractCommand,
   formatBlockedMessage,
+  detectBadSubstitutionRisk,
+  detectUnsupportedRipgrepType,
+  detectBashReportWrite,
 } = require('../../.claude/hooks/safety/bash-command-validator.cjs');
 
 // Import the registry for integration tests
@@ -91,6 +94,18 @@ test('exports extractCommand function', () => {
 
 test('exports formatBlockedMessage function', () => {
   assertEqual(typeof formatBlockedMessage, 'function', 'Should export function');
+});
+
+test('exports detectBadSubstitutionRisk function', () => {
+  assertEqual(typeof detectBadSubstitutionRisk, 'function', 'Should export function');
+});
+
+test('exports detectUnsupportedRipgrepType function', () => {
+  assertEqual(typeof detectUnsupportedRipgrepType, 'function', 'Should export function');
+});
+
+test('exports detectBashReportWrite function', () => {
+  assertEqual(typeof detectBashReportWrite, 'function', 'Should export function');
 });
 
 // ============================================================
@@ -170,6 +185,59 @@ test('formatBlockedMessage handles short commands without truncation', () => {
   const shortCmd = 'ls -la';
   const msg = formatBlockedMessage(shortCmd, 'test');
   assertIncludes(msg, 'ls -la', 'Should include full short command');
+});
+
+// ============================================================
+// Runtime Error Prevention Checks
+// ============================================================
+
+console.log('\n--- Runtime Error Prevention ---');
+
+test('detectBadSubstitutionRisk flags JS template-style ${...method()} usage', () => {
+  const reason = detectBadSubstitutionRisk('echo ${c.code.substring(0, 80)}');
+  assertTrue(Boolean(reason), 'Should detect bad substitution risk');
+  assertIncludes(reason.toLowerCase(), 'bad substitution', 'Should explain failure mode');
+});
+
+test('detectBadSubstitutionRisk allows normal shell expansion', () => {
+  const reason = detectBadSubstitutionRisk('echo ${HOME}');
+  assertEqual(reason, null, 'Should allow plain shell expansion');
+});
+
+test('detectUnsupportedRipgrepType flags --type cjs', () => {
+  const reason = detectUnsupportedRipgrepType('rg -n foo --type cjs .');
+  assertTrue(Boolean(reason), 'Should detect unsupported type alias');
+  assertIncludes(reason.toLowerCase(), 'cjs', 'Should mention cjs alias');
+});
+
+test('detectUnsupportedRipgrepType flags -t cjs', () => {
+  const reason = detectUnsupportedRipgrepType('rg -n foo -t cjs .');
+  assertTrue(Boolean(reason), 'Should detect short type alias');
+});
+
+test('detectUnsupportedRipgrepType allows glob-based cjs filtering', () => {
+  const reason = detectUnsupportedRipgrepType('rg -n foo -g "*.cjs" .');
+  assertEqual(reason, null, 'Should allow glob-based approach');
+});
+
+test('detectBashReportWrite blocks redirect writes into reports path', () => {
+  const reason = detectBashReportWrite(
+    'cat summary.md > .claude/context/reports/code-quality-scan-2026-02-11.md'
+  );
+  assertTrue(Boolean(reason), 'Should block bash-based report writes');
+  assertIncludes(reason.toLowerCase(), 'write/edit', 'Should direct agent to Write/Edit');
+});
+
+test('detectBashReportWrite blocks tee writes into reports path', () => {
+  const reason = detectBashReportWrite(
+    'echo "x" | tee .claude/context/reports/test-coverage-scan-2026-02-11.md'
+  );
+  assertTrue(Boolean(reason), 'Should block tee writes into reports path');
+});
+
+test('detectBashReportWrite allows reads from reports path', () => {
+  const reason = detectBashReportWrite('cat .claude/context/reports/security-audit.md');
+  assertEqual(reason, null, 'Should allow read-only usage');
 });
 
 // ============================================================

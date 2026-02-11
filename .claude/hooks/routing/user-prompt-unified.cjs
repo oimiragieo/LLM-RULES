@@ -59,6 +59,9 @@ const { getCachedState, invalidateCache } = libRequire(path.join('utils', 'state
 const { atomicWriteJSONSync } = libRequire(path.join('utils', 'atomic-write.cjs'));
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
+const { logRouterCostRiskEvent, logRouterSloAlert } = libRequire(
+  path.join('monitoring', 'router-churn-log.cjs')
+);
 
 // Import router state module
 const routerState = libRequire(path.join('routing', 'router-state.cjs'));
@@ -77,6 +80,13 @@ const AUTO_COMPRESSION_STATE_PATH = path.join(
   'context',
   'runtime',
   'auto-compression.json'
+);
+const TOKEN_SLO_STATE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'token-slo-state.json'
 );
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const USER_PROMPT_RESULTS_PATH = path.join(RUNTIME_DIR, 'user-prompt-results.jsonl');
@@ -371,6 +381,73 @@ function writeCompressionState(state) {
   }
 }
 
+function readTokenSloState() {
+  try {
+    if (!fs.existsSync(TOKEN_SLO_STATE_PATH)) {
+      return { sessions: {} };
+    }
+    return JSON.parse(fs.readFileSync(TOKEN_SLO_STATE_PATH, 'utf8'));
+  } catch (_err) {
+    return { sessions: {} };
+  }
+}
+
+function writeTokenSloState(state) {
+  try {
+    const dir = path.dirname(TOKEN_SLO_STATE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    atomicWriteJSONSync(TOKEN_SLO_STATE_PATH, state);
+  } catch (_err) {
+    // Best-effort
+  }
+}
+
+function computeRouterCostRisk(result) {
+  const token = result?.tokenMonitoring || {};
+  const planningReq = result?.routerEnforcement?.planningReq || {};
+  const candidates = Array.isArray(result?.routerEnforcement?.candidates)
+    ? result.routerEnforcement.candidates
+    : [];
+  const topScore = candidates[0]?.score || 0;
+  const secondScore = candidates[1]?.score || 0;
+  const ambiguityGap = Math.max(0, topScore - secondScore);
+  const percent = Number(token.percentUsed || 0);
+  const complexity = planningReq?.complexity || 'normal';
+  const complexityWeight =
+    complexity === 'epic' ? 30 : complexity === 'high' ? 22 : complexity === 'medium' ? 12 : 4;
+  const ambiguityWeight = ambiguityGap <= 0.5 ? 20 : ambiguityGap <= 1.5 ? 12 : 4;
+  const tokenWeight = Math.min(45, Math.max(0, percent * 0.45));
+  const compressionWeight = result?.autoCompression?.needed ? 10 : 0;
+  const downgradeWeight = token?.downgraded ? 8 : 0;
+  const score = Math.min(
+    100,
+    Number(
+      (
+        tokenWeight +
+        complexityWeight +
+        ambiguityWeight +
+        compressionWeight +
+        downgradeWeight
+      ).toFixed(2)
+    )
+  );
+  const level = score >= 80 ? 'critical' : score >= 60 ? 'high' : score >= 35 ? 'medium' : 'low';
+
+  return {
+    score,
+    level,
+    factors: {
+      tokenPercentUsed: Number(percent.toFixed(2)),
+      complexity,
+      ambiguityGap: Number(ambiguityGap.toFixed(2)),
+      autoCompressionNeeded: Boolean(result?.autoCompression?.needed),
+      downgraded: Boolean(token?.downgraded),
+    },
+  };
+}
+
 function checkTokenMonitoring(hookInput) {
   const config = getConfig();
   const tokenMonitoring = config?.token_monitoring;
@@ -382,13 +459,82 @@ function checkTokenMonitoring(hookInput) {
   const estimate = estimateTokens(prompt);
   const maxTokens = Number(tokenMonitoring.max_session_tokens || 0);
   const hardLimit = Number(tokenMonitoring.hard_limit || 0);
+  const warningRatio = Number(tokenMonitoring.warning_ratio || 0.8);
+  const criticalRatio = Number(tokenMonitoring.critical_ratio || 0.95);
+  const breachWindowMs = Number(tokenMonitoring.breach_window_ms || 10 * 60 * 1000);
+  const downgradeAfterBreaches = Number(tokenMonitoring.downgrade_after_breaches || 3);
+  const sessionId = process.env.CLAUDE_SESSION_ID || 'unknown';
 
   const result = {
     enabled: true,
     promptTokens: estimate.tokens,
     maxTokens,
     hardLimit,
+    sessionId,
+    percentUsed:
+      maxTokens > 0 ? Number((((estimate.tokens || 0) / maxTokens) * 100).toFixed(2)) : 0,
+    status: 'ok',
+    downgraded: false,
+    breachCount: 0,
   };
+
+  const usageRatio = maxTokens > 0 ? estimate.tokens / maxTokens : 0;
+  if (hardLimit && estimate.tokens >= hardLimit) {
+    result.status = 'hard_limit_exceeded';
+  } else if (maxTokens && usageRatio >= criticalRatio) {
+    result.status = 'critical';
+  } else if (maxTokens && usageRatio >= warningRatio) {
+    result.status = 'warning';
+  }
+
+  const state = readTokenSloState();
+  const now = Date.now();
+  const previous = state.sessions[sessionId] || {
+    breachCount: 0,
+    lastBreachAt: 0,
+    downgradedUntil: 0,
+  };
+
+  const isBreach =
+    result.status === 'warning' ||
+    result.status === 'critical' ||
+    result.status === 'hard_limit_exceeded';
+  if (isBreach) {
+    const withinWindow = now - Number(previous.lastBreachAt || 0) <= breachWindowMs;
+    const breachCount = withinWindow ? Number(previous.breachCount || 0) + 1 : 1;
+    const downgraded = breachCount >= downgradeAfterBreaches;
+    const downgradedUntil = downgraded
+      ? now + breachWindowMs
+      : Number(previous.downgradedUntil || 0);
+    state.sessions[sessionId] = {
+      breachCount,
+      lastBreachAt: now,
+      downgradedUntil,
+    };
+    result.breachCount = breachCount;
+    result.downgraded = downgraded || now < Number(previous.downgradedUntil || 0);
+    writeTokenSloState(state);
+
+    logRouterSloAlert({
+      sessionId,
+      severity: result.status === 'warning' ? 'warning' : 'critical',
+      sloName: 'token_utilization',
+      value: usageRatio,
+      threshold: result.status === 'warning' ? warningRatio : criticalRatio,
+      downgraded: result.downgraded,
+      breachCount,
+    });
+  } else if (now < Number(previous.downgradedUntil || 0)) {
+    result.downgraded = true;
+    result.breachCount = Number(previous.breachCount || 0);
+  } else if (previous.breachCount || previous.lastBreachAt || previous.downgradedUntil) {
+    state.sessions[sessionId] = {
+      breachCount: 0,
+      lastBreachAt: 0,
+      downgradedUntil: 0,
+    };
+    writeTokenSloState(state);
+  }
 
   if (maxTokens && estimate.tokens >= maxTokens) {
     console.warn(
@@ -773,6 +919,8 @@ function recordUserPromptResult(result) {
             enabled: result.tokenMonitoring.enabled,
             status: result.tokenMonitoring.status,
             percentUsed: result.tokenMonitoring.percentUsed,
+            downgraded: result.tokenMonitoring.downgraded,
+            breachCount: result.tokenMonitoring.breachCount,
           }
         : undefined,
       autoCompression: result?.autoCompression
@@ -791,6 +939,13 @@ function recordUserPromptResult(result) {
               : 0,
           }
         : undefined,
+      costRisk: result?.costRisk
+        ? {
+            score: result.costRisk.score,
+            level: result.costRisk.level,
+            factors: result.costRisk.factors,
+          }
+        : undefined,
     };
     appendJsonl(USER_PROMPT_RESULTS_PATH, entry, { maxLines: USER_PROMPT_RESULTS_MAX_LINES });
   } catch (_err) {
@@ -805,7 +960,7 @@ function recordUserPromptResult(result) {
  * @param {Object} hookInput - Parsed hook input
  * @returns {Object} Result with skipped, candidates, planningReq
  */
-async function checkRouterEnforcement(hookInput) {
+async function checkRouterEnforcement(hookInput, options = {}) {
   const result = { skipped: false, candidates: [], planningReq: null, intent: 'general' };
 
   const userPrompt = hookInput?.prompt || hookInput?.message || '';
@@ -853,7 +1008,11 @@ async function checkRouterEnforcement(hookInput) {
     (classification.capability ? getAgentForCapability(classification.capability) : null);
 
   const topScore = candidates.length > 0 ? candidates[0].score : 0;
-  const semanticDisabled = process.env.SEMANTIC_ROUTING === 'off';
+  const conservativeMode = Boolean(options.conservativeMode);
+  if (conservativeMode) {
+    result.conservativeMode = true;
+  }
+  const semanticDisabled = process.env.SEMANTIC_ROUTING === 'off' || conservativeMode;
   if (!semanticDisabled && (classification.intent === 'general' || topScore <= 2)) {
     const semanticCandidates = await semanticRouter.predict(userPrompt, {
       topK: 5,
@@ -1587,10 +1746,13 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     // best-effort; ignore
   }
 
+  const tokenMonitoring = checkTokenMonitoring(input);
   const result = {
     routerModeReset: checkRouterModeReset(input),
-    routerEnforcement: await checkRouterEnforcement(input),
-    tokenMonitoring: checkTokenMonitoring(input),
+    routerEnforcement: await checkRouterEnforcement(input, {
+      conservativeMode: Boolean(tokenMonitoring?.downgraded),
+    }),
+    tokenMonitoring,
     memoryReminder: checkMemoryReminder(input, projectRoot),
     evolutionTrigger: checkEvolutionTrigger(input),
     memoryHealth: checkMemoryHealth(input, projectRoot),
@@ -1603,6 +1765,20 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     result.autoCompression = maybeAutoCompress(result.tokenMonitoring);
   } catch (_err) {
     result.autoCompression = { enabled: false };
+  }
+
+  try {
+    const risk = computeRouterCostRisk(result);
+    result.costRisk = risk;
+    logRouterCostRiskEvent({
+      sessionId: process.env.CLAUDE_SESSION_ID || null,
+      score: risk.score,
+      level: risk.level,
+      factors: risk.factors,
+      notes: tokenMonitoring?.downgraded ? 'conservative_mode' : null,
+    });
+  } catch (_err) {
+    // best-effort
   }
 
   recordUserPromptResult(result);
@@ -1675,9 +1851,11 @@ module.exports = {
   // Individual check functions
   checkRouterModeReset,
   checkRouterEnforcement,
+  checkTokenMonitoring,
   checkMemoryReminder,
   checkEvolutionTrigger,
   checkMemoryHealth,
+  computeRouterCostRisk,
 
   // Combined runner
   runAllChecks,

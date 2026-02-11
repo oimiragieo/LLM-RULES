@@ -29,7 +29,7 @@ function libRequire(modulePath) {
 }
 
 // Import shared utilities
-const { parseHookInputSync, getToolName, getToolInput, formatResult } = libRequire(
+const { parseHookInputAsync, getToolName, getToolInput, formatResult } = libRequire(
   path.join('utils', 'hook-input.cjs')
 );
 const { atomicWriteJSONSync } = libRequire(path.join('utils', 'atomic-write.cjs'));
@@ -663,9 +663,9 @@ function checkReadSafety(toolName, toolInput) {
 // Combined Runner
 // =============================================================================
 
-function main() {
+async function main() {
   try {
-    const hookInput = parseHookInputSync();
+    const hookInput = await parseHookInputAsync();
     if (!hookInput) {
       process.exit(0);
     }

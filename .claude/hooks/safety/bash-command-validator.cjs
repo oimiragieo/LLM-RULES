@@ -30,6 +30,85 @@ const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 /**
+ * Detect shell commands that commonly trigger "bad substitution" because they
+ * contain JavaScript-style template expressions inside ${...}.
+ *
+ * @param {string} command - Raw shell command
+ * @returns {string|null} Blocking reason or null when safe
+ */
+function detectBadSubstitutionRisk(command) {
+  if (!command || typeof command !== 'string') return null;
+
+  // Examples to block:
+  // - echo ${c.code.substring(0, 80)}
+  // - printf "${obj.method()}"
+  // Safe shell expansions like ${HOME} or ${var:-default} do not match.
+  const jsTemplateInShell =
+    /\$\{[^}\n]*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)+\s*\([^}\n]*\)[^}\n]*\}/;
+  if (jsTemplateInShell.test(command)) {
+    return (
+      'Potential JS template interpolation inside ${...} detected; this causes shell bad substitution. ' +
+      'Use shell-safe expansion (e.g. $VAR, ${VAR}) or precompute the value outside Bash.'
+    );
+  }
+
+  return null;
+}
+
+/**
+ * Detect unsupported ripgrep type aliases that cause runtime failures in this
+ * environment (e.g. `rg --type cjs`).
+ *
+ * @param {string} command - Raw shell command
+ * @returns {string|null} Blocking reason or null when safe
+ */
+function detectUnsupportedRipgrepType(command) {
+  if (!command || typeof command !== 'string') return null;
+  if (!/(^|\s)rg(\s|$)/.test(command)) return null;
+
+  const hasUnsupportedType =
+    /(^|\s)--type(?:=|\s+)cjs(\s|$)/i.test(command) ||
+    /(^|\s)-t\s*cjs(\s|$)/i.test(command) ||
+    /(^|\s)-tcjs(\s|$)/i.test(command);
+
+  if (!hasUnsupportedType) return null;
+
+  return (
+    'Unsupported ripgrep type alias "cjs". Use globs instead: ' +
+    '`rg -n "<pattern>" -g "*.cjs" -S <path>`.'
+  );
+}
+
+/**
+ * Block Bash-based report generation/writes so agents must use Write/Edit
+ * for deterministic artifact creation and traceable diffs.
+ *
+ * @param {string} command - Raw shell command
+ * @returns {string|null} Blocking reason or null when safe
+ */
+function detectBashReportWrite(command) {
+  if (!command || typeof command !== 'string') return null;
+
+  const reportPathPattern = /\.claude[\\/]+context[\\/]+reports[\\/]+/i;
+  if (!reportPathPattern.test(command)) return null;
+
+  const writesViaRedirection =
+    /(?:^|[\s;|&])(?:cat|echo|printf)\b[\s\S]*?(?:>>?|1>>?)\s*['"]?[^'"\s]*\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(
+      command
+    ) || /(?:>>?|1>>?)\s*['"]?[^'"\s]*\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(command);
+  const writesViaTee = /\btee\b[\s\S]*\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(command);
+  const writesViaFileOps =
+    /\b(?:cp|mv|touch)\b[\s\S]*\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(command);
+
+  if (!writesViaRedirection && !writesViaTee && !writesViaFileOps) return null;
+
+  return (
+    'Bash writes to .claude/context/reports are not allowed for task artifacts. ' +
+    'Use Write/Edit tools to create report files so hooks can validate wiring and completion.'
+  );
+}
+
+/**
  * Extract the bash command from hook input.
  *
  * @param {object} hookInput - The parsed hook context
@@ -102,6 +181,24 @@ async function main() {
       process.exit(0);
     }
 
+    const badSubstitutionReason = detectBadSubstitutionRisk(command);
+    if (badSubstitutionReason) {
+      console.error(formatBlockedMessage(command, badSubstitutionReason));
+      process.exit(2);
+    }
+
+    const ripgrepTypeReason = detectUnsupportedRipgrepType(command);
+    if (ripgrepTypeReason) {
+      console.error(formatBlockedMessage(command, ripgrepTypeReason));
+      process.exit(2);
+    }
+
+    const reportWriteReason = detectBashReportWrite(command);
+    if (reportWriteReason) {
+      console.error(formatBlockedMessage(command, reportWriteReason));
+      process.exit(2);
+    }
+
     // Validate the command using the registry
     const result = validateCommand(command);
 
@@ -166,5 +263,8 @@ module.exports = {
   main,
   extractCommand,
   formatBlockedMessage,
+  detectBadSubstitutionRisk,
+  detectUnsupportedRipgrepType,
+  detectBashReportWrite,
   parseHookInput: parseHookInputAsync,
 };

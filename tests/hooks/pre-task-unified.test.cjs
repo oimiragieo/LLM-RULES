@@ -373,6 +373,29 @@ describe('pre-task-unified.cjs', () => {
       const result = preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, true);
     });
+
+    it('should ignore stale loop state from a different session', () => {
+      process.env.CLAUDE_SESSION_ID = 'current-session';
+
+      writeState(LOOP_STATE_FILE, {
+        sessionId: 'previous-session',
+        spawnDepth: 7,
+        actionHistory: [
+          { action: 'spawn:code-reviewer', count: 9, lastAt: new Date().toISOString() },
+        ],
+      });
+
+      const input = {
+        tool_name: 'Task',
+        tool_input: {
+          prompt: 'You are CODE-REVIEWER. Run scan wave 1.',
+          description: 'Code quality bug scan',
+        },
+      };
+
+      const result = preTaskUnified.checkLoopPrevention(input);
+      assert.strictEqual(result.pass, true);
+    });
   });
 
   // ---------------------------------------------------------------------------

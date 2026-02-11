@@ -3,6 +3,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
+const { spawnSync } = require('node:child_process');
 
 const {
   checkReadSafety,
@@ -31,6 +32,40 @@ describe('pre-tool-unified read safety', () => {
       const result = checkReadSafety('Read', { file_path: tempDir });
       assert.strictEqual(result.action, 'block');
       assert.ok(result.message.includes('is a directory'));
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('main enforces read safety when hook input is provided on stdin', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-stdin-'));
+    const hookScript = path.join(
+      __dirname,
+      '..',
+      '..',
+      '.claude',
+      'hooks',
+      'routing',
+      'pre-tool-unified.cjs'
+    );
+
+    try {
+      const payload = JSON.stringify({
+        tool_name: 'Read',
+        tool_input: { file_path: tempDir },
+      });
+
+      const proc = spawnSync(process.execPath, [hookScript], {
+        cwd: path.join(__dirname, '..', '..'),
+        input: payload,
+        encoding: 'utf8',
+      });
+
+      assert.strictEqual(proc.status, 2, `Expected block exit code, got: ${proc.status}`);
+      assert.ok(
+        (proc.stdout || '').includes('[READ SAFETY]'),
+        `Expected read safety message in stdout, got: ${proc.stdout}`
+      );
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }

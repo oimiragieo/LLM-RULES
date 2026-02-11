@@ -68,6 +68,13 @@ function getMemoryManager() {
 const LEARNINGS_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
 const EVOLUTION_STATE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
 const AUDIT_LOG_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-audit.log');
+const TASKUPDATE_RECOVERY_QUEUE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'taskupdate-recovery-queue.jsonl'
+);
 
 // =============================================================================
 // 1. Agent Context Tracker Logic
@@ -440,6 +447,93 @@ function formatTaskCompletionWarning(output) {
 }
 
 /**
+ * Extract expected artifact paths from spawn prompt/instructions.
+ * Primary target: report paths under .claude/context/reports/.
+ */
+function extractExpectedArtifactPaths(toolInput) {
+  const text = `${toolInput?.prompt || ''}\n${toolInput?.description || ''}`;
+  if (!text) return [];
+
+  const results = new Set();
+  const normalizeRel = raw => {
+    const trimmed = String(raw || '')
+      .trim()
+      .replace(/^['"`]+|['"`]+$/g, '');
+    if (!trimmed) return null;
+    const normalized = trimmed.replace(/\\/g, '/');
+    // Keep project-relative paths only.
+    if (!normalized.startsWith('.claude/')) return null;
+    return normalized;
+  };
+
+  // Backticked explicit path references.
+  const backtickRe = /`([^`]*\.claude[\\/]+context[\\/]+reports[\\/][^`]+)`/gi;
+  let match;
+  while ((match = backtickRe.exec(text)) !== null) {
+    const normalized = normalizeRel(match[1]);
+    if (normalized) results.add(normalized);
+  }
+
+  // "Write ... to: <path>" style directives.
+  const writeToRe = /(?:write|save|output)[\s\S]{0,140}?\bto:\s*([^\s\n]+)/gi;
+  while ((match = writeToRe.exec(text)) !== null) {
+    const normalized = normalizeRel(match[1]);
+    if (normalized && normalized.includes('.claude/context/reports/')) {
+      results.add(normalized);
+    }
+  }
+
+  return Array.from(results);
+}
+
+function getMissingArtifacts(expectedPaths) {
+  if (!Array.isArray(expectedPaths) || expectedPaths.length === 0) return [];
+
+  const missing = [];
+  for (const relPath of expectedPaths) {
+    const abs = path.resolve(PROJECT_ROOT, relPath);
+    try {
+      const stat = fs.statSync(abs);
+      if (!stat.isFile() || stat.size === 0) {
+        missing.push(relPath);
+      }
+    } catch (_err) {
+      missing.push(relPath);
+    }
+  }
+  return missing;
+}
+
+function synthesizeRecoveryTaskUpdate(taskId, reason, retryHint, details = {}) {
+  try {
+    const dir = path.dirname(TASKUPDATE_RECOVERY_QUEUE_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+    const record = {
+      timestamp: new Date().toISOString(),
+      sessionId: process.env.CLAUDE_SESSION_ID || null,
+      taskId: taskId || null,
+      status: 'in_progress',
+      synthetic: true,
+      reason,
+      retryHint,
+      details,
+    };
+
+    fs.appendFileSync(TASKUPDATE_RECOVERY_QUEUE_PATH, `${JSON.stringify(record)}\n`, 'utf8');
+
+    if (taskId) {
+      // Keep router state coherent even when agent skipped completed update.
+      routerState.recordTaskUpdate(String(taskId), 'in_progress');
+    }
+
+    return true;
+  } catch (_err) {
+    return false;
+  }
+}
+
+/**
  * Run task completion guard
  */
 function hasMatchingCompletedTaskUpdate(taskId) {
@@ -455,11 +549,31 @@ function hasMatchingCompletedTaskUpdate(taskId) {
   return String(update.taskId) === String(taskId);
 }
 
-function runTaskCompletionGuard(toolOutput, taskId = null) {
+function runTaskCompletionGuard(toolOutput, taskId = null, toolInput = null) {
   const enforcement = process.env.TASK_COMPLETION_GUARD || 'block';
   if (enforcement === 'off') return { pass: true };
 
   if (!toolOutput || !detectsCompletion(toolOutput)) return { pass: true };
+
+  // Contract check: if prompt required report/artifact output, verify it exists.
+  const expectedArtifacts = extractExpectedArtifactPaths(toolInput);
+  const missingArtifacts = getMissingArtifacts(expectedArtifacts);
+  if (missingArtifacts.length > 0) {
+    const missingMessage =
+      '[TASK ARTIFACT CONTRACT] Completion detected but expected artifacts are missing: ' +
+      `${missingArtifacts.join(', ')}. Use Write/Edit tool to create required report file(s) before completion.`;
+    synthesizeRecoveryTaskUpdate(
+      taskId,
+      'missing_expected_artifact',
+      'Create missing artifact files with Write/Edit, then call TaskUpdate({status:"completed"}).',
+      { expectedArtifacts, missingArtifacts }
+    );
+
+    if (enforcement === 'warn') {
+      return { pass: true, result: 'warn', message: missingMessage };
+    }
+    return { pass: false, result: 'block', message: missingMessage };
+  }
 
   // Check if TaskUpdate(completed) was called recently for this task
   const wasUpdated = hasMatchingCompletedTaskUpdate(taskId);
@@ -472,6 +586,16 @@ function runTaskCompletionGuard(toolOutput, taskId = null) {
   }
 
   const warning = formatTaskCompletionWarning(toolOutput);
+  synthesizeRecoveryTaskUpdate(
+    taskId,
+    'missing_taskupdate_completed',
+    'Call TaskUpdate({ taskId, status: "completed", metadata: { summary, filesModified } }) before finishing.',
+    {
+      completionDetected: true,
+      hasRecentMatchingTaskUpdate: false,
+    }
+  );
+
   if (enforcement === 'warn') {
     console.error(warning);
     return { pass: true, result: 'warn', message: warning };
@@ -722,7 +846,7 @@ async function main() {
     runSessionMemoryExtraction(toolOutputStr);
 
     // 4. Task completion guard
-    const completionGuardResult = runTaskCompletionGuard(toolOutputStr, effectiveTaskId);
+    const completionGuardResult = runTaskCompletionGuard(toolOutputStr, effectiveTaskId, toolInput);
     if (!completionGuardResult.pass) {
       console.log(formatResult(completionGuardResult.result, completionGuardResult.message));
       process.exit(2);
@@ -811,8 +935,12 @@ module.exports = {
   // Task completion guard exports
   detectsCompletion,
   hasMatchingCompletedTaskUpdate,
+  extractExpectedArtifactPaths,
+  getMissingArtifacts,
+  synthesizeRecoveryTaskUpdate,
   runTaskCompletionGuard,
   COMPLETION_INDICATORS,
+  TASKUPDATE_RECOVERY_QUEUE_PATH,
 
   // Evolution audit exports
   isEvolutionCompletion,

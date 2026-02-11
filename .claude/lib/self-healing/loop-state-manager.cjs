@@ -151,6 +151,7 @@ function ensureStateDir(filePath) {
 
 function getState(stateFile = LOOP_STATE_FILE) {
   const defaults = getDefaultState();
+  const currentSessionId = process.env.CLAUDE_SESSION_ID || null;
 
   try {
     if (!fs.existsSync(stateFile)) {
@@ -159,6 +160,17 @@ function getState(stateFile = LOOP_STATE_FILE) {
     const content = fs.readFileSync(stateFile, 'utf8');
     const parsed = safeParseJSON(content, 'loop-state');
     const state = { ...defaults, ...parsed };
+
+    // Session boundary guard: loop-prevention counters are session-scoped.
+    // If a stale state file from a previous session is present, start fresh
+    // to avoid false-positive loop blocks on legitimate new task waves.
+    if (currentSessionId && state.sessionId && state.sessionId !== currentSessionId) {
+      return {
+        ...defaults,
+        sessionId: currentSessionId,
+      };
+    }
+
     if (!state.createdAt) state.createdAt = defaults.createdAt;
     if (!state.updatedAt) state.updatedAt = defaults.updatedAt;
     return state;

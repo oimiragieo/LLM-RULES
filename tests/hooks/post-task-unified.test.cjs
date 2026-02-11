@@ -33,6 +33,8 @@ const unifiedHook = require('../../.claude/hooks/routing/post-task-unified.cjs')
 process.exit = originalExit;
 
 describe('post-task-unified.cjs', () => {
+  let recoveryQueueBackup = null;
+
   beforeEach(() => {
     // Reset exit code
     exitCode = null;
@@ -43,11 +45,30 @@ describe('post-task-unified.cjs', () => {
     delete process.env.DEBUG_HOOKS;
     delete process.env.TASK_COMPLETION_GUARD;
     delete process.env.EVOLUTION_AUDIT;
+
+    // Backup and clear recovery queue
+    if (fs.existsSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH)) {
+      recoveryQueueBackup = fs.readFileSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH, 'utf8');
+      fs.unlinkSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH);
+    } else {
+      recoveryQueueBackup = null;
+    }
   });
 
   afterEach(() => {
     // Restore argv
     process.argv = [...originalArgv];
+
+    // Restore recovery queue
+    if (recoveryQueueBackup === null) {
+      if (fs.existsSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH)) {
+        fs.unlinkSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH);
+      }
+    } else {
+      const dir = path.dirname(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH, recoveryQueueBackup, 'utf8');
+    }
   });
 
   describe('Module exports', () => {
@@ -71,6 +92,9 @@ describe('post-task-unified.cjs', () => {
 
       // From task-completion-guard
       assert.strictEqual(typeof unifiedHook.detectsCompletion, 'function');
+      assert.strictEqual(typeof unifiedHook.extractExpectedArtifactPaths, 'function');
+      assert.strictEqual(typeof unifiedHook.getMissingArtifacts, 'function');
+      assert.strictEqual(typeof unifiedHook.synthesizeRecoveryTaskUpdate, 'function');
       assert.ok(Array.isArray(unifiedHook.COMPLETION_INDICATORS));
 
       // From evolution-audit
@@ -313,6 +337,9 @@ describe('post-task-unified.cjs', () => {
       assert.strictEqual(result.result, 'block');
       assert.ok(String(result.message || '').includes('TaskUpdate'));
 
+      const queueContent = fs.readFileSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH, 'utf8');
+      assert.ok(queueContent.includes('missing_taskupdate_completed'));
+
       routerState.getLastTaskUpdate = originalGetLast;
     });
 
@@ -348,6 +375,76 @@ describe('post-task-unified.cjs', () => {
       assert.strictEqual(result.result, 'warn');
 
       routerState.getLastTaskUpdate = originalGetLast;
+    });
+
+    it('should block when expected report artifact is missing', () => {
+      const routerState = require('../../.claude/lib/routing/router-state.cjs');
+      const originalGetLast = routerState.getLastTaskUpdate;
+      routerState.getLastTaskUpdate = () => ({
+        timestamp: Date.now(),
+        taskId: 'task-123',
+        status: 'completed',
+        count: 2,
+      });
+
+      const toolInput = {
+        prompt:
+          'Write a detailed report to: `.claude/context/reports/code-quality-scan-2026-02-11.md`',
+      };
+      const result = unifiedHook.runTaskCompletionGuard(
+        'Task completed successfully',
+        'task-123',
+        toolInput
+      );
+      assert.strictEqual(result.pass, false);
+      assert.ok(String(result.message || '').includes('missing'));
+      assert.ok(String(result.message || '').includes('.claude/context/reports/'));
+
+      const queueContent = fs.readFileSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH, 'utf8');
+      assert.ok(queueContent.includes('missing_expected_artifact'));
+
+      routerState.getLastTaskUpdate = originalGetLast;
+    });
+  });
+
+  describe('Artifact Contract Helpers', () => {
+    it('extractExpectedArtifactPaths reads report paths from prompt', () => {
+      const paths = unifiedHook.extractExpectedArtifactPaths({
+        prompt:
+          'Write report to: `.claude/context/reports/test-coverage-scan-2026-02-11.md` and include summary.',
+      });
+      assert.ok(paths.includes('.claude/context/reports/test-coverage-scan-2026-02-11.md'));
+    });
+
+    it('getMissingArtifacts returns only missing paths', () => {
+      const rel = '.claude/context/reports/tmp-post-task-unified-artifact.md';
+      const abs = path.join(unifiedHook.PROJECT_ROOT, rel);
+      const dir = path.dirname(abs);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(abs, 'ok', 'utf8');
+      try {
+        const missing = unifiedHook.getMissingArtifacts([
+          rel,
+          '.claude/context/reports/does-not-exist.md',
+        ]);
+        assert.ok(!missing.includes(rel));
+        assert.ok(missing.includes('.claude/context/reports/does-not-exist.md'));
+      } finally {
+        fs.unlinkSync(abs);
+      }
+    });
+
+    it('synthesizeRecoveryTaskUpdate appends queue entry', () => {
+      const ok = unifiedHook.synthesizeRecoveryTaskUpdate(
+        'task-42',
+        'missing_taskupdate_completed',
+        'retry',
+        { test: true }
+      );
+      assert.strictEqual(ok, true);
+      const queueContent = fs.readFileSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH, 'utf8');
+      assert.ok(queueContent.includes('task-42'));
+      assert.ok(queueContent.includes('missing_taskupdate_completed'));
     });
   });
 

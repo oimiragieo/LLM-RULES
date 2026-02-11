@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { validateMetricRow } = require('./metrics-schema.cjs');
 
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const SPAWN_LOG_PATH = path.join(METRICS_DIR, 'spawn-log.jsonl');
@@ -33,10 +34,15 @@ function trimIfNeeded(filePath) {
 function appendToFile(filePath, entry) {
   try {
     ensureDir();
-    const line = JSON.stringify({
+    const row = {
       ...entry,
       timestamp: entry.timestamp || new Date().toISOString(),
-    });
+    };
+    const validation = validateMetricRow(row);
+    if (!validation.valid) {
+      return;
+    }
+    const line = JSON.stringify(row);
     fs.appendFileSync(filePath, `${line}\n`, 'utf8');
     trimIfNeeded(filePath);
   } catch (_err) {

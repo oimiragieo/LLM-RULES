@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "windowStartedAt": "2026-02-11T07:13:31.977Z",
+  "updatedAt": "2026-02-11T07:13:36.056Z",
+  "counters": {
+    "writesTotal": 27,
+    "writesFailed": 0,
+    "readsTotal": 0,
+    "parseAttempts": 27,
+    "parseFailures": 0,
+    "lockAcquires": 26,
+    "staleTempCleanups": 0,
+    "staleTempFilesRemoved": 0
+  },
+  "histograms": {
+    "writeLatencyMs": {
+      "bucketsMs": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        3,
+        22
+      ]
+    },
+    "readLatencyMs": {
+      "bucketsMs": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "lockWaitMs": {
+      "bucketsMs": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        2,
+        22
+      ]
+    }
+  },
+  "latest": {
+    "writeLatencyMs": 2277,
+    "readLatencyMs": null,
+    "lockWaitMs": 2216,
+    "lastError": null
+  }
+}

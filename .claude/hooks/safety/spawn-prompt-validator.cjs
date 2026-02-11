@@ -18,7 +18,7 @@
  * SECURITY MITIGATIONS:
  * - VULN-001: Unicode normalization prevents homoglyph bypass
  * - VULN-002: ReDoS-safe regex patterns with bounded quantifiers
- * - VULN-003: Prompt length limit (500KB max)
+ * - VULN-003: Prompt length limit (120KB max)
  * - VULN-004: Full audit context in exception handler
  * - VULN-005: Environment override auditing
  * - VULN-006: Required tool flags validation
@@ -241,13 +241,14 @@ const WARNING_THRESHOLD = 85;
 
 /**
  * Maximum prompt length in bytes (VULN-003)
+ * Keep this conservative to prevent runaway token spend in spawned agents.
  */
-const MAX_PROMPT_LENGTH = 500000; // 500KB (conservative limit)
+const MAX_PROMPT_LENGTH = 120000; // 120KB hard limit
 
 /**
  * Warning threshold for large prompts
  */
-const PROMPT_LENGTH_WARNING = 100000; // 100KB
+const PROMPT_LENGTH_WARNING = 50000; // 50KB warning
 const COMPACTNESS_MIN = Number(process.env.SPAWN_PROMPT_COMPACTNESS_MIN || 0);
 
 // Loop-breaker state (autonomous deadlock prevention)
@@ -497,6 +498,96 @@ function ensureTaskId(toolInput, hookInput) {
   };
 }
 
+/**
+ * Attempt best-effort compaction for oversized prompts before hard block.
+ * Keeps first policy section and trims repeated boilerplate.
+ *
+ * @param {Object} toolInput - Task tool input
+ * @returns {{ toolInput: Object, modified: boolean, reason?: string, bytesSaved?: number }}
+ */
+function compactOversizedSpawnInput(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') {
+    return { toolInput, modified: false };
+  }
+  const prompt = typeof toolInput.prompt === 'string' ? toolInput.prompt : '';
+  if (!prompt || prompt.length <= MAX_PROMPT_LENGTH) {
+    return { toolInput, modified: false };
+  }
+
+  let compacted = prompt.replace(/\r\n/g, '\n');
+  compacted = compacted.replace(/\n{3,}/g, '\n\n');
+
+  // Keep first full TASK TRACKING warning box, remove duplicate copies.
+  let warningSeen = false;
+  compacted = compacted.replace(
+    /\+={10,100}\+[\s\S]{0,2200}?TASK TRACKING REQUIRED[\s\S]{0,2200}?\+={10,100}\+\n*/g,
+    match => {
+      if (!warningSeen) {
+        warningSeen = true;
+        return `${match}\n`;
+      }
+      return '\n';
+    }
+  );
+
+  // Keep first PROJECT CONTEXT section body.
+  const contextPattern = /##\s+PROJECT CONTEXT[\s\S]{0,1200}?(?=\n##\s+|\n\+={10,100}\+|$)/gi;
+  let contextSeen = false;
+  compacted = compacted.replace(contextPattern, match => {
+    if (!contextSeen) {
+      contextSeen = true;
+      return `${match}\n`;
+    }
+    return '\n';
+  });
+
+  // Collapse duplicate high-noise lines but keep first copy.
+  const seenBoilerplateLines = new Set();
+  const lines = compacted.split('\n');
+  const compactedLines = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const noisy =
+      trimmed === '+======================================================================+' ||
+      /^TaskUpdate\(\{[^}]{0,220}(in_progress|completed)/i.test(trimmed) ||
+      /^PROJECT_ROOT:\s+/i.test(trimmed);
+    if (noisy) {
+      const key = trimmed.toLowerCase();
+      if (seenBoilerplateLines.has(key)) {
+        continue;
+      }
+      seenBoilerplateLines.add(key);
+    }
+    compactedLines.push(line);
+  }
+  compacted = compactedLines
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  if (compacted.length > MAX_PROMPT_LENGTH) {
+    // Final deterministic trim that preserves both header/policy and tail task details.
+    const separator = '\n\n[...TRIMMED_BY_SPAWN_PROMPT_VALIDATOR...]\n\n';
+    const headBudget = Math.floor((MAX_PROMPT_LENGTH - separator.length) * 0.68);
+    const tailBudget = MAX_PROMPT_LENGTH - separator.length - headBudget;
+    compacted = `${compacted.slice(0, headBudget)}${separator}${compacted.slice(-tailBudget)}`;
+  }
+
+  if (!compacted || compacted.length >= prompt.length) {
+    return { toolInput, modified: false };
+  }
+
+  return {
+    toolInput: {
+      ...toolInput,
+      prompt: compacted,
+    },
+    modified: true,
+    reason: 'oversized_prompt_compaction',
+    bytesSaved: prompt.length - compacted.length,
+  };
+}
+
 // =============================================================================
 // VALIDATION LOGIC
 // =============================================================================
@@ -534,7 +625,9 @@ function validatePrompt(prompt) {
       score: 0,
       passed: [],
       failed: ['Prompt exceeds maximum length'],
-      suggestions: [`Prompt is ${prompt.length} bytes, maximum is ${MAX_PROMPT_LENGTH} (500KB)`],
+      suggestions: [
+        `Prompt is ${prompt.length} bytes, maximum is ${MAX_PROMPT_LENGTH} (${Math.round(MAX_PROMPT_LENGTH / 1000)}KB)`,
+      ],
       isValid: false,
       needsWarning: true,
       error: 'SEC-DOS-001: Prompt exceeds maximum length',
@@ -708,6 +801,186 @@ function calculatePromptCompactness(prompt) {
   };
 }
 
+function maybeExitWhenDisabled(mode, startTime) {
+  if (mode !== 'off') {
+    return false;
+  }
+
+  auditLog('spawn-prompt-validator', 'disabled', {
+    reason: 'SPAWN_PROMPT_VALIDATOR=off',
+    warning: 'Validation bypassed - security risk',
+  });
+  emitRuntimeHealth('disabled', Date.now() - startTime, { mode });
+  process.exit(0);
+}
+
+function maybeExitForNonTaskTool(toolName, startTime) {
+  if (toolName === 'Task') {
+    return false;
+  }
+
+  emitRuntimeHealth('skip_non_task', Date.now() - startTime, { toolName: toolName || null });
+  process.exit(0);
+}
+
+function maybeExitForOrchestratorSpawn(toolInput, ensuredTask, startTime) {
+  if (!isOrchestratorSpawn(toolInput)) {
+    return false;
+  }
+
+  auditLog('spawn-prompt-validator', 'skip', {
+    reason: 'orchestrator-spawn',
+    description: toolInput.description,
+  });
+  if (ensuredTask.modified) {
+    console.log(JSON.stringify({ tool_input: toolInput }));
+  }
+  emitRuntimeHealth('skip_orchestrator', Date.now() - startTime, {
+    agentType: toolInput.subagent_type || null,
+  });
+  process.exit(0);
+}
+
+function maybeLogTaskIdInjection(hookInput, toolInput, ensuredTask) {
+  if (!ensuredTask.modified) {
+    return;
+  }
+
+  auditLog('spawn-prompt-validator', 'task-id-auto-injected', {
+    sessionId: hookInput.session_id || hookInput.sessionId || 'unknown',
+    taskId: ensuredTask.taskId,
+    agentType: toolInput.subagent_type || 'unknown',
+  });
+}
+
+function buildFailureMessage(validation) {
+  return [
+    `[SPAWN-PROMPT-VALIDATOR] Spawn prompt validation failed (score: ${validation.score}/${MINIMUM_SCORE})`,
+    '',
+    validation.error || 'Missing required elements:',
+    ...validation.suggestions,
+    '',
+    'Recommendation: Use the spawn template from .claude/templates/spawn/universal-agent-spawn.md',
+  ].join('\n');
+}
+
+async function maybeHandleInvalidValidation({
+  mode,
+  validation,
+  startTime,
+  sessionId,
+  promptHash,
+}) {
+  if (validation.isValid) {
+    return false;
+  }
+
+  const message = buildFailureMessage(validation);
+
+  if (mode === 'block') {
+    const loopBreaker = registerSpawnValidationFailure(sessionId, promptHash, validation);
+    if (loopBreaker.shouldBypassBlock) {
+      const bypassMessage = `${message}
+
+[LOOP-BREAKER] Repeated identical spawn validation failures detected (${loopBreaker.count} within window).
+Temporarily degrading to warn mode for this failure fingerprint to prevent retry deadlock.`;
+      auditLog('spawn-prompt-validator', 'loop-breaker-bypass', {
+        sessionId,
+        promptHash,
+        loopBreakerCount: loopBreaker.count,
+        missingRequired: validation.missingRequired || [],
+      });
+      console.warn(bypassMessage);
+      emitRuntimeHealth('loop_breaker_warn', Date.now() - startTime, {
+        promptHash,
+        score: validation.score,
+      });
+      process.exit(0);
+    }
+    try {
+      await eventBus.emit(EventTypes.TOOL_BLOCKED, {
+        type: EventTypes.TOOL_BLOCKED,
+        timestamp: new Date().toISOString(),
+        toolName: 'Task',
+        reason: 'spawn_prompt_validation_failed',
+      });
+    } catch (_err) {
+      // Best-effort
+    }
+    console.log(formatResult('block', message));
+    emitRuntimeHealth('blocked', Date.now() - startTime, {
+      score: validation.score,
+      compactness: validation.compactness?.score ?? null,
+    });
+    process.exit(2);
+  }
+
+  // warn mode
+  console.warn(message);
+  emitRuntimeHealth('warn', Date.now() - startTime, {
+    score: validation.score,
+    compactness: validation.compactness?.score ?? null,
+  });
+  process.exit(0);
+}
+
+function maybeWarnOnLowQuality(validation, mode) {
+  if (!(validation.needsWarning && mode === 'warn')) {
+    return;
+  }
+
+  console.warn(
+    `[SPAWN-PROMPT-VALIDATOR] Spawn prompt could be improved (score: ${validation.score}/100). ` +
+      `Missing: ${validation.failed.join(', ')}`
+  );
+}
+
+function runPromptNormalizationPipeline(toolInput, initialValidation, startTime) {
+  let effectiveToolInput = toolInput;
+  let validation = initialValidation;
+
+  const normalized = autoNormalizeSpawnInput(toolInput, validation);
+  if (normalized.modified) {
+    effectiveToolInput = normalized.toolInput;
+    validation = validatePrompt(normalized.toolInput.prompt || '');
+    auditLog('spawn-prompt-validator', 'autofix_attempted', {
+      reason: normalized.reason,
+      validAfterAutofix: validation.isValid,
+      missingRequiredAfterAutofix: validation.missingRequired || [],
+    });
+
+    if (validation.isValid) {
+      console.log(JSON.stringify({ tool_input: normalized.toolInput }));
+      emitRuntimeHealth('autofix_pass', Date.now() - startTime, {
+        taskId: normalized.toolInput.task_id || null,
+      });
+      process.exit(0);
+    }
+  }
+
+  if (validation.error && validation.error.includes('SEC-DOS-001')) {
+    const compacted = compactOversizedSpawnInput(effectiveToolInput);
+    if (compacted.modified) {
+      effectiveToolInput = compacted.toolInput;
+      validation = validatePrompt(effectiveToolInput.prompt || '');
+      auditLog('spawn-prompt-validator', 'oversized-compaction-attempted', {
+        bytesSaved: compacted.bytesSaved || 0,
+        validAfterCompaction: validation.isValid,
+      });
+      if (validation.isValid) {
+        console.log(JSON.stringify({ tool_input: effectiveToolInput }));
+        emitRuntimeHealth('compaction_pass', Date.now() - startTime, {
+          bytesSaved: compacted.bytesSaved || 0,
+          finalLength: effectiveToolInput.prompt.length,
+        });
+        process.exit(0);
+      }
+    }
+  }
+
+  return { effectiveToolInput, validation };
+}
+
 // =============================================================================
 // MAIN
 // =============================================================================
@@ -725,75 +998,29 @@ async function main() {
     });
   }
 
-  // Fast path: disabled
-  if (mode === 'off') {
-    auditLog('spawn-prompt-validator', 'disabled', {
-      reason: 'SPAWN_PROMPT_VALIDATOR=off',
-      warning: 'Validation bypassed - security risk',
-    });
-    emitRuntimeHealth('disabled', Date.now() - startTime, { mode });
-    process.exit(0);
-  }
+  maybeExitWhenDisabled(mode, startTime);
 
   try {
     const hookInput = await parseHookInputAsync();
     const toolName = getToolName(hookInput);
 
-    // Only validate Task tool
-    if (toolName !== 'Task') {
-      emitRuntimeHealth('skip_non_task', Date.now() - startTime, { toolName: toolName || null });
-      process.exit(0);
-    }
+    maybeExitForNonTaskTool(toolName, startTime);
 
     const rawToolInput = getToolInput(hookInput);
     const ensuredTask = ensureTaskId(rawToolInput, hookInput);
     const toolInput = ensuredTask.toolInput;
     const prompt = toolInput.prompt || '';
 
-    if (ensuredTask.modified) {
-      auditLog('spawn-prompt-validator', 'task-id-auto-injected', {
-        sessionId: hookInput.session_id || hookInput.sessionId || 'unknown',
-        taskId: ensuredTask.taskId,
-        agentType: toolInput.subagent_type || 'unknown',
-      });
-    }
+    maybeLogTaskIdInjection(hookInput, toolInput, ensuredTask);
 
-    // Skip validation for orchestrators (different template)
-    if (isOrchestratorSpawn(toolInput)) {
-      auditLog('spawn-prompt-validator', 'skip', {
-        reason: 'orchestrator-spawn',
-        description: toolInput.description,
-      });
-      if (ensuredTask.modified) {
-        console.log(JSON.stringify({ tool_input: toolInput }));
-      }
-      emitRuntimeHealth('skip_orchestrator', Date.now() - startTime, {
-        agentType: toolInput.subagent_type || null,
-      });
-      process.exit(0);
-    }
+    maybeExitForOrchestratorSpawn(toolInput, ensuredTask, startTime);
 
-    // Validate prompt
-    let validation = validatePrompt(prompt);
-
-    // Auto-fix missing required spawn fields, then re-validate.
-    const normalized = autoNormalizeSpawnInput(toolInput, validation);
-    if (normalized.modified) {
-      validation = validatePrompt(normalized.toolInput.prompt || '');
-      auditLog('spawn-prompt-validator', 'autofix_attempted', {
-        reason: normalized.reason,
-        validAfterAutofix: validation.isValid,
-        missingRequiredAfterAutofix: validation.missingRequired || [],
-      });
-
-      if (validation.isValid) {
-        console.log(JSON.stringify({ tool_input: normalized.toolInput }));
-        emitRuntimeHealth('autofix_pass', Date.now() - startTime, {
-          taskId: normalized.toolInput.task_id || null,
-        });
-        process.exit(0);
-      }
-    }
+    const initialValidation = validatePrompt(prompt);
+    const { effectiveToolInput, validation } = runPromptNormalizationPipeline(
+      toolInput,
+      initialValidation,
+      startTime
+    );
 
     const executionMs = Date.now() - startTime;
     const sessionId =
@@ -811,82 +1038,26 @@ async function main() {
       // Enhanced fields:
       sessionId: hookInput.session_id || 'unknown',
       agentType: toolInput.subagent_type || 'unknown',
-      promptLength: prompt.length,
+      promptLength: (effectiveToolInput.prompt || '').length,
       promptHash,
       executionMs,
       missingRequired: validation.missingRequired || [],
     });
 
-    // Handle based on enforcement mode
-    if (!validation.isValid) {
-      const message = [
-        `[SPAWN-PROMPT-VALIDATOR] Spawn prompt validation failed (score: ${validation.score}/${MINIMUM_SCORE})`,
-        '',
-        validation.error || 'Missing required elements:',
-        ...validation.suggestions,
-        '',
-        'Recommendation: Use the spawn template from .claude/templates/spawn/universal-agent-spawn.md',
-      ].join('\n');
-
-      if (mode === 'block') {
-        const loopBreaker = registerSpawnValidationFailure(sessionId, promptHash, validation);
-        if (loopBreaker.shouldBypassBlock) {
-          const bypassMessage = `${message}
-
-[LOOP-BREAKER] Repeated identical spawn validation failures detected (${loopBreaker.count} within window).
-Temporarily degrading to warn mode for this failure fingerprint to prevent retry deadlock.`;
-          auditLog('spawn-prompt-validator', 'loop-breaker-bypass', {
-            sessionId,
-            promptHash,
-            loopBreakerCount: loopBreaker.count,
-            missingRequired: validation.missingRequired || [],
-          });
-          console.warn(bypassMessage);
-          emitRuntimeHealth('loop_breaker_warn', Date.now() - startTime, {
-            promptHash,
-            score: validation.score,
-          });
-          process.exit(0);
-        }
-        try {
-          await eventBus.emit(EventTypes.TOOL_BLOCKED, {
-            type: EventTypes.TOOL_BLOCKED,
-            timestamp: new Date().toISOString(),
-            toolName: 'Task',
-            reason: 'spawn_prompt_validation_failed',
-          });
-        } catch (_err) {
-          // Best-effort
-        }
-        console.log(formatResult('block', message));
-        emitRuntimeHealth('blocked', Date.now() - startTime, {
-          score: validation.score,
-          compactness: validation.compactness?.score ?? null,
-        });
-        process.exit(2);
-      } else {
-        // warn mode
-        console.warn(message);
-        emitRuntimeHealth('warn', Date.now() - startTime, {
-          score: validation.score,
-          compactness: validation.compactness?.score ?? null,
-        });
-        process.exit(0);
-      }
-    }
+    await maybeHandleInvalidValidation({
+      mode,
+      validation,
+      startTime,
+      sessionId,
+      promptHash,
+    });
 
     clearSpawnValidationFailure(sessionId, promptHash, validation);
 
-    // Passed but needs warning
-    if (validation.needsWarning && mode === 'warn') {
-      console.warn(
-        `[SPAWN-PROMPT-VALIDATOR] Spawn prompt could be improved (score: ${validation.score}/100). ` +
-          `Missing: ${validation.failed.join(', ')}`
-      );
-    }
+    maybeWarnOnLowQuality(validation, mode);
 
     if (ensuredTask.modified) {
-      console.log(JSON.stringify({ tool_input: toolInput }));
+      console.log(JSON.stringify({ tool_input: effectiveToolInput }));
     }
     emitRuntimeHealth('ok', Date.now() - startTime, {
       score: validation.score,
@@ -942,6 +1113,7 @@ module.exports = {
   hasExplicitTaskId,
   generateFallbackTaskId,
   ensureTaskId,
+  compactOversizedSpawnInput,
   buildRequiredPrefixFragment,
   normalizeUnicode,
   safeRegexTest,

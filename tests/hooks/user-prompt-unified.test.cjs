@@ -471,6 +471,63 @@ describe('checkMemoryHealth', () => {
 });
 
 // =============================================================================
+// Test: Token SLO downgrade and risk scoring
+// =============================================================================
+
+describe('token monitoring and cost risk', () => {
+  const tokenStatePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'runtime',
+    'token-slo-state.json'
+  );
+
+  beforeEach(() => {
+    if (fs.existsSync(tokenStatePath)) {
+      fs.unlinkSync(tokenStatePath);
+    }
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(tokenStatePath)) {
+      fs.unlinkSync(tokenStatePath);
+    }
+  });
+
+  it('should downgrade to conservative mode after repeated token breaches', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const largePrompt = 'x'.repeat(210000); // ~52.5k tokens by estimator
+
+    const first = unified.checkTokenMonitoring({ prompt: largePrompt });
+    const second = unified.checkTokenMonitoring({ prompt: largePrompt });
+    const third = unified.checkTokenMonitoring({ prompt: largePrompt });
+
+    assert.strictEqual(first.enabled, true);
+    assert.ok(['warning', 'critical', 'hard_limit_exceeded'].includes(first.status));
+    assert.ok(second.breachCount >= 2);
+    assert.strictEqual(third.downgraded, true);
+    assert.ok(third.breachCount >= 3);
+  });
+
+  it('should compute high cost risk when token pressure + complexity are elevated', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const risk = unified.computeRouterCostRisk({
+      tokenMonitoring: { percentUsed: 92, downgraded: true },
+      routerEnforcement: {
+        planningReq: { complexity: 'high' },
+        candidates: [{ score: 3.1 }, { score: 2.9 }],
+      },
+      autoCompression: { needed: true },
+    });
+
+    assert.ok(risk.score >= 60);
+    assert.ok(['high', 'critical'].includes(risk.level));
+    assert.strictEqual(typeof risk.factors.tokenPercentUsed, 'number');
+  });
+});
+
+// =============================================================================
 // Test: Combined runAllChecks
 // =============================================================================
 

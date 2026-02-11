@@ -97,6 +97,10 @@ local_cache/
 .claude/data/test-e2e-*.db
 .claude/data/test-*.db
 
+# SQLite WAL/shm (often locked; test and runtime artifacts)
+*.db-shm
+*.db-wal
+
 # Memory test temp directories (tests/lib/memory/)
 tests/lib/.test-memory/
 

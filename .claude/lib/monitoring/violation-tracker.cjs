@@ -16,6 +16,7 @@ const path = require('path');
 const fs = require('fs');
 const { appendJsonl } = require('../utils/jsonl-utils.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { validateMetricRow } = require('./metrics-schema.cjs');
 
 const VIOLATIONS_FILE = path.join(
   PROJECT_ROOT,
@@ -140,6 +141,7 @@ function recordViolation(violation, metricsFile) {
 
     // SEC-MON-002: Never include raw prompt content
     const sanitized = {
+      event: 'router_violation',
       timestamp: sanitizeString(violation.timestamp || new Date().toISOString(), 100),
       tool: sanitizeString(tool, 500),
       action: sanitizeString(violation.action, 500),
@@ -152,6 +154,10 @@ function recordViolation(violation, metricsFile) {
     // SEC-MON-002: Scrub secrets from command field if present
     if (violation.command) {
       sanitized.command = scrubSecrets(sanitizeString(violation.command, 500));
+    }
+    const validation = validateMetricRow(sanitized);
+    if (!validation.valid) {
+      return;
     }
 
     // Get max lines from env

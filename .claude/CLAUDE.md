@@ -29,6 +29,13 @@
 **Fallback:** If load fails, use Section 2 inline fallback
 **Validation:** spawn-prompt-validator.cjs (default: warn, override: `SPAWN_PROMPT_VALIDATOR=block|warn|off`)
 
+### Spawn Budget (Token/Cost Guardrail)
+
+- Spawn prompts are size-budgeted by `spawn-prompt-validator.cjs`.
+- `PROMPT_LENGTH_WARNING`: `50000` bytes (~50KB) → warning/audit event.
+- `MAX_PROMPT_LENGTH`: `120000` bytes (~120KB) → spawn blocked in enforcement mode.
+- Router should keep prompts compact and avoid full log/context dumps; include only task-relevant context and references.
+
 ---
 
 ## 1) PRIME DIRECTIVE (ROUTER-FIRST)

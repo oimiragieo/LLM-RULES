@@ -15,6 +15,13 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 
+function percentile(values, p) {
+  if (!Array.isArray(values) || values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.min(sorted.length - 1, Math.max(0, Math.floor(sorted.length * p)));
+  return sorted[index] || 0;
+}
+
 /**
  * Read metrics from JSONL file with time filtering
  *
@@ -58,6 +65,55 @@ async function readMetrics(file, options = {}) {
   }
 
   return metrics;
+}
+
+async function readMetricsWithStats(file, options = {}) {
+  const hours = options.hours || 24;
+  const cutoffTime = options.since
+    ? new Date(options.since).getTime()
+    : Date.now() - hours * 60 * 60 * 1000;
+
+  const metrics = [];
+  let parseErrors = 0;
+  let totalLines = 0;
+
+  if (!fs.existsSync(file)) {
+    return {
+      metrics,
+      parseErrors,
+      totalLines,
+      failedParseRate: 0,
+    };
+  }
+
+  const fileStream = fs.createReadStream(file);
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity,
+  });
+
+  for await (const line of rl) {
+    totalLines++;
+    try {
+      if (line.trim()) {
+        const metric = JSON.parse(line);
+        const metricTime = new Date(metric.timestamp).getTime();
+
+        if (metricTime >= cutoffTime) {
+          metrics.push(metric);
+        }
+      }
+    } catch (_error) {
+      parseErrors++;
+    }
+  }
+
+  return {
+    metrics,
+    parseErrors,
+    totalLines,
+    failedParseRate: totalLines > 0 ? parseErrors / totalLines : 0,
+  };
 }
 
 /**
@@ -269,11 +325,126 @@ function detectAlerts(summary, thresholds = {}) {
   return alerts;
 }
 
+function calculateRouterRollups({
+  spawnRows = [],
+  tokenRows = [],
+  churnRows = [],
+  violationRows = [],
+  hours = 24,
+}) {
+  const spawnEndRows = spawnRows.filter(row => row.event === 'spawn_end');
+  const rejected = spawnEndRows.filter(row => row.success === false).length;
+  const tokenSeries = tokenRows
+    .map(row => Number(row.output_tokens_est))
+    .filter(value => Number.isFinite(value) && value >= 0);
+  const promptLengths = spawnRows
+    .filter(row => row.event === 'spawn_start')
+    .map(row => Number(row.prompt_length))
+    .filter(value => Number.isFinite(value) && value > 0);
+
+  const violationsByRule = {};
+  for (const row of violationRows) {
+    const key = row.checkName || 'unknown';
+    violationsByRule[key] = (violationsByRule[key] || 0) + 1;
+  }
+  const topViolationRules = Object.entries(violationsByRule)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([rule, count]) => ({ rule, count }));
+
+  const blockDecisions = churnRows.filter(row => row.event === 'router_guard_decision');
+  const blockedCount = blockDecisions.filter(row => row.result === 'block').length;
+
+  return {
+    periodHours: hours,
+    tokenUsage: {
+      sampleSize: tokenSeries.length,
+      p50: percentile(tokenSeries, 0.5),
+      p95: percentile(tokenSeries, 0.95),
+      max: tokenSeries.length ? Math.max(...tokenSeries) : 0,
+    },
+    promptSize: {
+      sampleSize: promptLengths.length,
+      p95Chars: percentile(promptLengths, 0.95),
+    },
+    spawns: {
+      total: spawnEndRows.length,
+      rejected: rejected,
+      rejectRate: spawnEndRows.length > 0 ? rejected / spawnEndRows.length : 0,
+    },
+    routerDecisions: {
+      total: blockDecisions.length,
+      blocked: blockedCount,
+      blockRate: blockDecisions.length > 0 ? blockedCount / blockDecisions.length : 0,
+    },
+    violations: {
+      total: violationRows.length,
+      perHour: hours > 0 ? violationRows.length / hours : 0,
+      byRuleTop: topViolationRules,
+    },
+  };
+}
+
+async function getRouterOpsSummary(options = {}) {
+  const hours = Number(options.hours || 24);
+  const since = options.since;
+  const spawnLogFile = path.join(METRICS_DIR, 'spawn-log.jsonl');
+  const tokenBurnFile = path.join(METRICS_DIR, 'token-burn-metrics.jsonl');
+  const routerChurnFile = path.join(METRICS_DIR, 'router-churn-metrics.jsonl');
+  const violationsFile = path.join(METRICS_DIR, 'router-violations.jsonl');
+
+  const [spawn, token, churn, violations] = await Promise.all([
+    readMetricsWithStats(spawnLogFile, { hours, since }),
+    readMetricsWithStats(tokenBurnFile, { hours, since }),
+    readMetricsWithStats(routerChurnFile, { hours, since }),
+    readMetricsWithStats(violationsFile, { hours, since }),
+  ]);
+
+  return {
+    period: {
+      hours,
+      since: since || new Date(Date.now() - hours * 60 * 60 * 1000).toISOString(),
+    },
+    rollups: calculateRouterRollups({
+      spawnRows: spawn.metrics,
+      tokenRows: token.metrics,
+      churnRows: churn.metrics,
+      violationRows: violations.metrics,
+      hours,
+    }),
+    parseHealth: {
+      spawnLog: {
+        parseErrors: spawn.parseErrors,
+        totalLines: spawn.totalLines,
+        failedParseRate: spawn.failedParseRate,
+      },
+      tokenBurn: {
+        parseErrors: token.parseErrors,
+        totalLines: token.totalLines,
+        failedParseRate: token.failedParseRate,
+      },
+      routerChurn: {
+        parseErrors: churn.parseErrors,
+        totalLines: churn.totalLines,
+        failedParseRate: churn.failedParseRate,
+      },
+      violations: {
+        parseErrors: violations.parseErrors,
+        totalLines: violations.totalLines,
+        failedParseRate: violations.failedParseRate,
+      },
+    },
+  };
+}
+
 module.exports = {
   readMetrics,
+  readMetricsWithStats,
   calculateHookStats,
   calculateErrorStats,
   getMetricsSummary,
   findSlowHooks,
   detectAlerts,
+  calculateRouterRollups,
+  getRouterOpsSummary,
 };

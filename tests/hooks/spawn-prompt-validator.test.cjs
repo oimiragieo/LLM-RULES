@@ -6,6 +6,7 @@ const {
   hasExplicitTaskId,
   generateFallbackTaskId,
   ensureTaskId,
+  compactOversizedSpawnInput,
   buildRequiredPrefixFragment,
   normalizeUnicode,
   safeRegexTest,
@@ -174,7 +175,7 @@ Do some work
     assert.strictEqual(taskIdRule.required, true);
   });
 
-  test('should warn on large prompt (>100KB)', () => {
+  test('should warn on large prompt (>50KB)', () => {
     // This test verifies the warning threshold, not blocking
     // Actual audit logging would require mock
     const largePrompt = createValidPrompt() + 'A'.repeat(100000);
@@ -184,7 +185,7 @@ Do some work
     assert.ok(result.score > 0); // Not failed due to size alone
   });
 
-  test('should reject oversized prompt (>500KB) (VULN-003)', () => {
+  test('should reject oversized prompt (>120KB) (VULN-003)', () => {
     const hugePrompt = 'A'.repeat(MAX_PROMPT_LENGTH + 1);
     const result = validatePrompt(hugePrompt);
 
@@ -254,6 +255,48 @@ describe('autoNormalizeSpawnInput()', () => {
 
     const normalized = autoNormalizeSpawnInput(toolInput, initial);
     assert.strictEqual(normalized.modified, false);
+  });
+});
+
+describe('compactOversizedSpawnInput()', () => {
+  test('should compact oversized prompt below max length while preserving task markers', () => {
+    const repeatedSection = `
++======================================================================+
+|  WARNING: TASK TRACKING REQUIRED - READ THIS FIRST                   |
++======================================================================+
+|  Your Task ID: 123                                                   |
+|  TaskUpdate({ taskId: "123", status: "in_progress" });              |
+|  TaskUpdate({ taskId: "123", status: "completed" });                |
++======================================================================+
+
+## PROJECT CONTEXT (CRITICAL)
+PROJECT_ROOT: C:\\dev\\projects\\agent-studio
+`;
+    const hugePrompt = repeatedSection.repeat(300);
+    assert.ok(hugePrompt.length > MAX_PROMPT_LENGTH, 'test prompt must exceed max length');
+
+    const compacted = compactOversizedSpawnInput({
+      task_id: '123',
+      prompt: hugePrompt,
+      description: 'Test oversized compaction',
+    });
+
+    assert.strictEqual(compacted.modified, true);
+    assert.ok(compacted.toolInput.prompt.length <= MAX_PROMPT_LENGTH);
+    assert.ok(compacted.toolInput.prompt.includes('TASK TRACKING REQUIRED'));
+    assert.ok(
+      compacted.toolInput.prompt.includes('TaskUpdate({ taskId: "123", status: "in_progress" })')
+    );
+  });
+
+  test('should not modify prompt that is already within max length', () => {
+    const input = {
+      prompt: createValidPrompt(),
+      task_id: 'abc',
+    };
+    const compacted = compactOversizedSpawnInput(input);
+    assert.strictEqual(compacted.modified, false);
+    assert.strictEqual(compacted.toolInput, input);
   });
 });
 

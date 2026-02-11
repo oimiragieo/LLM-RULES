@@ -755,3 +755,153 @@ Additionally, `skill-plan-generator-output.schema.json` (210 lines, Tier 1 gold 
 **Full Details**: `.claude/context/reports/ecosystem-audit/phase-6-final-harmony-report.md` (Section 5.1: Remaining Gaps Analysis)
 
 **Status**: Tracked for future remediation waves
+
+---
+
+## 2026-02-11: CRITICAL SECURITY FINDINGS - Wave 2 Hook & Validation Audit
+
+**Date:** 2026-02-11
+**Agent:** security-architect
+**Task:** Security Audit Wave 2 - Hook Analysis
+
+**Executive Summary:**
+
+Comprehensive security audit of 6 critical hooks and validation layer identified **11 vulnerabilities** (3 CRITICAL, 4 HIGH, 5 MEDIUM) with exploitable attack paths. The safety hooks provide strong baseline security but contain **logic gaps, bypass vectors, and race condition risks** that allow adversarial agents to circumvent routing controls.
+
+**Report Location:** `.claude/context/reports/security/security-audit-wave2-2026-02-11.md`
+
+### Critical Vulnerabilities (P0 - Fix Immediately)
+
+**VUL-TAM-001: Loop-State TOCTOU Race Condition**
+- **File**: `.claude/lib/self-healing/loop-state-manager.cjs` (lines 100-123)
+- **Risk**: Loop-prevention counters can reset, enabling replay attacks
+- **Root Cause**: Lock acquisition doesn't validate ownership after `tryClaimStaleLock()` succeeds
+- **Fix**: Add unique lock ID, validate ownership before release
+- **Effort**: 2 hours
+
+**VUL-DOS-001: Whitespace Bomb DoS**
+- **File**: `.claude/hooks/routing/spawn-prompt-validator.cjs` (line 752)
+- **Risk**: OOM crash or timeout via 1M-line prompts
+- **Root Cause**: `calculatePromptCompactness()` creates unbounded arrays
+- **Fix**: Add line and map size limits (10K lines, 100K entries)
+- **Effort**: 1 hour
+
+**VUL-ELEV-001: Router Mode Bypass via Env Override**
+- **File**: `.claude/hooks/routing/routing-guard.cjs` (line 226)
+- **Risk**: Elevation of privilege - use blacklisted tools
+- **Root Cause**: `STATE_STALE_THRESHOLD_MS` env var allows overriding security threshold
+- **Fix**: Hardcode threshold, optionally allow config.yaml with bounds
+- **Effort**: 1 hour
+
+### High Priority Vulnerabilities (P1 - Fix This Week)
+
+**VUL-TAM-002: Unicode Normalization Bypass** (HIGH)
+- Homoglyph injection after Unicode normalization
+- File: spawn-prompt-validator.cjs
+- Fix: Re-validate patterns on normalized prompt
+
+**VUL-DOS-002: Regex Backtracking Loop** (HIGH)
+- Catastrophic backtracking with unbounded quantifiers
+- File: pre-tool-unified.cjs line 523
+- Fix: Manual parsing instead of complex regex
+
+**VUL-ELEV-002: Creator Intent Guard Bypass** (HIGH)
+- Can bypass by mentioning skill name without Skill() invocation
+- File: routing-guard.cjs line 1390
+- Fix: Require explicit Skill() invocation, reject if implementation agent
+
+**ASI01-SPOOF-001: Session ID Environment Override** (HIGH)
+- Session ID from env can be spoofed
+- File: loop-state-manager.cjs line 139
+- Fix: Fail closed if session ID missing, add clock skew validation
+
+### STRIDE Threat Classification
+
+- **Spoofing (S)**: 2 findings (session ID override, clock-based staleness)
+- **Tampering (T)**: 3 findings (TOCTOU race, Unicode bypass, regex DoS)
+- **Repudiation (R)**: 1 finding (audit log truncation)
+- **Information Disclosure (I)**: 1 finding (session ID leakage)
+- **Denial of Service (D)**: 2 findings (whitespace bomb, regex backtracking)
+- **Elevation of Privilege (E)**: 3 findings (env override, creator intent bypass, tool misuse)
+
+### OWASP Agentic AI Top 10 (ASI) Analysis
+
+- **ASI-01 (Goal Hijacking)**: INSUFFICIENT - No prompt injection defense (VUL-TAM-003)
+- **ASI-02 (Tool Misuse)**: MEDIUM - Tool scope enforced but semantic validation lacking
+- **ASI-06 (Memory Poisoning)**: HIGH - Memory has no content validation
+
+### Compliance Impact
+
+**SOC2 Type II**: PARTIAL (missing full command logging - VUL-REP-001)
+**GDPR**: MEDIUM RISK (session ID logged plaintext - VUL-INFO-001)
+**HIPAA**: INCOMPLETE (truncated audit trail)
+
+After remediation (all fixes): System eligible for Type II certification.
+
+### Implementation Plan
+
+**Complete plan**: `.claude/context/plans/security-remediation-plan-2026-02-11.md`
+
+**P0 Schedule** (24 hours):
+1. TOCTOU race fix + tests (2h)
+2. Whitespace bomb protection (1h)
+3. Hardcode stale threshold (1h)
+4. Run full test suite + lint + format
+5. Single commit: `fix(security): P0 critical vulnerabilities`
+
+**P1 Schedule** (1 week):
+1. Prompt injection detection (3h)
+2. Session ID sanitization (2h)
+3. Creator intent guard enhancement (3h)
+4. Tool usage audit hook (4h)
+
+**P2 Schedule** (1 month):
+1. Memory content validation
+2. Replace regex with manual parsing
+3. Command truncation audit escape
+4. Clock skew tolerance
+
+### Files Affected
+
+1. `.claude/lib/self-healing/loop-state-manager.cjs` - 3 vulnerabilities
+2. `.claude/hooks/routing/spawn-prompt-validator.cjs` - 2 vulnerabilities
+3. `.claude/hooks/routing/routing-guard.cjs` - 2 vulnerabilities
+4. `.claude/hooks/safety/bash-command-validator.cjs` - 1 vulnerability
+5. `.claude/hooks/routing/pre-tool-unified.cjs` - 1 vulnerability
+6. Create new: `.claude/hooks/validation/tool-usage-audit.cjs`
+
+### Success Criteria
+
+**P0 Complete (24h)**:
+- [ ] All 3 CRITICAL fixed
+- [ ] New tests added (100% coverage)
+- [ ] All tests passing
+- [ ] Lint/format clean
+- [ ] Single commit approved
+
+**P1 Complete (1 week)**:
+- [ ] All 4 HIGH fixed
+- [ ] Test coverage >90%
+- [ ] Audit logging verified
+- [ ] Security hooks tested under load
+
+**P2 Complete (1 month)**:
+- [ ] All 5 MEDIUM fixed
+- [ ] Compliance re-assessment
+- [ ] New security test suite maintained
+
+### Related Memory Items
+
+- PENTEST-2026-02-09 (14 pentest findings - related scope)
+- SEC-ROUTER-001 through SEC-ROUTER-004 (routing layer findings)
+- SEC-FND-001 through SEC-FND-003 (foundation findings)
+- Memory Management Rebuild (Task #7B - related scope)
+
+### Next Actions
+
+1. **Immediate**: Begin P0 remediation (2026-02-12)
+2. **Day 7**: Verify P0+P1 complete, run full audit again
+3. **Day 30**: Verify P2 complete, schedule post-remediation audit
+4. **Day 60**: Plan Wave 3 audit (remaining components: agents, skills, workflows)
+
+**Priority**: CRITICAL - All P0 items block deployment without remediation

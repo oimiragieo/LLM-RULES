@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { validateMetricRow } = require('./metrics-schema.cjs');
 
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const ROUTER_CHURN_LOG_PATH = path.join(METRICS_DIR, 'router-churn-metrics.jsonl');
@@ -37,6 +38,10 @@ function append(entry) {
       ...entry,
       timestamp: entry.timestamp || new Date().toISOString(),
     };
+    const validation = validateMetricRow(row);
+    if (!validation.valid) {
+      return;
+    }
     fs.appendFileSync(ROUTER_CHURN_LOG_PATH, `${JSON.stringify(row)}\n`, 'utf8');
     trimIfNeeded();
   } catch (_err) {
@@ -65,7 +70,41 @@ function logRouterChurnEvent({
   });
 }
 
+function logRouterCostRiskEvent({ sessionId, score, level, factors = {}, notes = null }) {
+  append({
+    event: 'router_cost_risk',
+    session_id: sessionId || null,
+    score: Number.isFinite(score) ? Number(score.toFixed(2)) : 0,
+    level: level || 'low',
+    factors: typeof factors === 'object' && factors ? factors : {},
+    notes: notes || null,
+  });
+}
+
+function logRouterSloAlert({
+  sessionId,
+  severity = 'warning',
+  sloName = 'token_utilization',
+  value = 0,
+  threshold = 0,
+  downgraded = false,
+  breachCount = 0,
+}) {
+  append({
+    event: 'router_slo_alert',
+    session_id: sessionId || null,
+    severity,
+    slo_name: sloName,
+    value: Number.isFinite(value) ? Number(value.toFixed(4)) : 0,
+    threshold: Number.isFinite(threshold) ? Number(threshold.toFixed(4)) : 0,
+    downgraded: Boolean(downgraded),
+    breach_count: Number.isFinite(breachCount) ? breachCount : 0,
+  });
+}
+
 module.exports = {
   logRouterChurnEvent,
+  logRouterCostRiskEvent,
+  logRouterSloAlert,
   ROUTER_CHURN_LOG_PATH,
 };

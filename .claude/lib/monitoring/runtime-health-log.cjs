@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { validateMetricRow } = require('./metrics-schema.cjs');
 
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const RUNTIME_HEALTH_LOG_PATH = path.join(METRICS_DIR, 'runtime-health-metrics.jsonl');
@@ -47,6 +48,10 @@ function logRuntimeHealth({ component, status = 'ok', durationMs, sessionId, ext
       external_mb: Number((mem.external / 1024 / 1024).toFixed(2)),
       ...extra,
     };
+    const validation = validateMetricRow(row);
+    if (!validation.valid) {
+      return;
+    }
     fs.appendFileSync(RUNTIME_HEALTH_LOG_PATH, `${JSON.stringify(row)}\n`, 'utf8');
     trimIfNeeded();
   } catch (_err) {
