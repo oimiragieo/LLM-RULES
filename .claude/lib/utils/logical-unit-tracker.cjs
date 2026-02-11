@@ -7,7 +7,14 @@
  * @module logical-unit-tracker
  */
 
-const { execSync } = require('node:child_process');
+const { execFileSync } = require('node:child_process');
+
+function runGit(repoPath, args, options = {}) {
+  return execFileSync('git', args, {
+    cwd: repoPath,
+    ...options,
+  });
+}
 
 /**
  * Extract task ID from git note
@@ -49,12 +56,10 @@ async function getCommits(repoPath, range) {
   try {
     // Get commit hashes, messages, dates, and authors
     // Exclude notes refs to avoid including git notes metadata commits
-    const log = execSync(
-      `git log --format="%H|||%s|||%ai|||%an" ${range} --not --glob=refs/notes/*`,
-      {
-        cwd: repoPath,
-        encoding: 'utf8',
-      }
+    const log = runGit(
+      repoPath,
+      ['log', '--format=%H|||%s|||%ai|||%an', range, '--not', '--glob=refs/notes/*'],
+      { encoding: 'utf8' }
     ).trim();
 
     if (!log) return [];
@@ -75,8 +80,7 @@ async function getCommits(repoPath, range) {
     // Get git notes for each commit
     for (const commit of commits) {
       try {
-        const note = execSync(`git notes show ${commit.hash}`, {
-          cwd: repoPath,
+        const note = runGit(repoPath, ['notes', 'show', commit.hash], {
           encoding: 'utf8',
         }).trim();
         commit.note = note;
@@ -239,16 +243,16 @@ async function revertTask(repoPath, taskId) {
 
   try {
     for (const commit of taskCommits) {
-      execSync(`git revert --no-edit ${commit.hash}`, { cwd: repoPath, stdio: 'pipe' });
+      runGit(repoPath, ['revert', '--no-edit', commit.hash], { stdio: 'pipe' });
 
       // Add git note to revert commit
-      const latestHash = execSync('git rev-parse HEAD', { cwd: repoPath, encoding: 'utf8' }).trim();
-      execSync(`git notes add -m "REVERTED-TASK-#${taskId}" ${latestHash}`, { cwd: repoPath });
+      const latestHash = runGit(repoPath, ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+      runGit(repoPath, ['notes', 'add', '-m', `REVERTED-TASK-#${taskId}`, latestHash]);
 
       // Mark original commit as reverted
       const originalNote = commit.note || '';
       const updatedNote = `${originalNote}\n[REVERTED]`;
-      execSync(`git notes add -f -m "${updatedNote}" ${commit.hash}`, { cwd: repoPath });
+      runGit(repoPath, ['notes', 'add', '-f', '-m', updatedNote, commit.hash]);
     }
 
     return {
@@ -305,4 +309,5 @@ module.exports = {
   revertTask,
   suggestReversal: checkRevertSafety, // Alias
   findTaskByName,
+  runGit,
 };

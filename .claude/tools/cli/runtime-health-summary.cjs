@@ -18,7 +18,9 @@ function parseArgs(argv) {
     json: map.get('--json') === 'true',
     requireData: map.get('--require-data') === 'true',
     assertMaxP95Ms: map.has('--assert-max-p95-ms') ? Number(map.get('--assert-max-p95-ms')) : null,
-    assertMaxHeapMb: map.has('--assert-max-heap-mb') ? Number(map.get('--assert-max-heap-mb')) : null,
+    assertMaxHeapMb: map.has('--assert-max-heap-mb')
+      ? Number(map.get('--assert-max-heap-mb'))
+      : null,
     path:
       map.get('--path') ||
       path.join(process.cwd(), '.claude', 'context', 'metrics', 'runtime-health-metrics.jsonl'),
@@ -58,9 +60,7 @@ function summarize(rows, hours) {
     total: rows.length,
     failures,
     p95Ms: Number(percentile(durations, 0.95).toFixed(3)),
-    avgHeapMb: Number(
-      (heaps.reduce((sum, v) => sum + v, 0) / (heaps.length || 1)).toFixed(3)
-    ),
+    avgHeapMb: Number((heaps.reduce((sum, v) => sum + v, 0) / (heaps.length || 1)).toFixed(3)),
     p95HeapMb: Number(percentile(heaps, 0.95).toFixed(3)),
   };
 }
@@ -70,11 +70,21 @@ function evaluate(summary, opts) {
   if (opts.requireData && summary.total === 0) {
     failures.push('No runtime health rows found.');
   }
-  if (Number.isFinite(opts.assertMaxP95Ms) && summary.total > 0 && summary.p95Ms > opts.assertMaxP95Ms) {
+  if (
+    Number.isFinite(opts.assertMaxP95Ms) &&
+    summary.total > 0 &&
+    summary.p95Ms > opts.assertMaxP95Ms
+  ) {
     failures.push(`Runtime p95 ${summary.p95Ms}ms exceeds ${opts.assertMaxP95Ms}ms threshold.`);
   }
-  if (Number.isFinite(opts.assertMaxHeapMb) && summary.total > 0 && summary.p95HeapMb > opts.assertMaxHeapMb) {
-    failures.push(`Runtime heap p95 ${summary.p95HeapMb}MB exceeds ${opts.assertMaxHeapMb}MB threshold.`);
+  if (
+    Number.isFinite(opts.assertMaxHeapMb) &&
+    summary.total > 0 &&
+    summary.p95HeapMb > opts.assertMaxHeapMb
+  ) {
+    failures.push(
+      `Runtime heap p95 ${summary.p95HeapMb}MB exceeds ${opts.assertMaxHeapMb}MB threshold.`
+    );
   }
   return failures;
 }

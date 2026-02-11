@@ -16,9 +16,7 @@ function parseArgs(argv) {
   return {
     json: map.get('--json') === 'true',
     hours: Number(map.get('--hours') || 24),
-    assertMaxP95Ms: map.has('--assert-max-p95-ms')
-      ? Number(map.get('--assert-max-p95-ms'))
-      : null,
+    assertMaxP95Ms: map.has('--assert-max-p95-ms') ? Number(map.get('--assert-max-p95-ms')) : null,
     assertMaxBurnRate: map.has('--assert-max-burn-rate')
       ? Number(map.get('--assert-max-burn-rate'))
       : null,
@@ -71,9 +69,7 @@ function summarize(assemblyRows, tokenRows, hours) {
     .map(r => Number(r.burn_rate_tokens_per_second))
     .filter(Number.isFinite);
   const outputTokens = tokenRows.map(r => Number(r.output_tokens_est)).filter(Number.isFinite);
-  const compactness = assemblyRows
-    .map(r => Number(r.compactness_score))
-    .filter(Number.isFinite);
+  const compactness = assemblyRows.map(r => Number(r.compactness_score)).filter(Number.isFinite);
 
   return {
     windowHours: hours,

@@ -1,8 +1,8 @@
 # Model Selection for Subagents
 
 **Source:** CLAUDE.md Section 5
-**Version:** v2.2.2
-**Last Updated:** 2026-01-31
+**Version:** v2.2.3
+**Last Updated:** 2026-02-10
 **ADR:** ADR-075 (Router Model Selection from Configuration)
 
 ---
@@ -17,13 +17,13 @@ Guidelines for selecting the appropriate Claude model (haiku, sonnet, opus) when
 
 **CRITICAL:** Router must use this precedence when selecting models:
 
-| Priority | Source             | Description                      | When Used                             |
-| -------- | ------------------ | -------------------------------- | ------------------------------------- |
-| **P1**   | Task() parameter   | Explicit `model:` in spawn call  | Override for specific needs           |
-| **P2**   | Agent frontmatter  | `model:` field in agent .md file | Agent-level default                   |
-| **P3**   | config.yaml        | `agents.{type}.model` entry      | **RECOMMENDED** - centralized control |
-| **P4**   | Complexity default | Based on agent type              | Fallback for unconfigured agents      |
-| **P5**   | Hardcoded fallback | `sonnet`                         | Last resort                           |
+| Priority | Source             | Description                      | When Used                                 |
+| -------- | ------------------ | -------------------------------- | ----------------------------------------- |
+| **P1**   | Task() parameter   | Explicit `model:` in spawn call  | Requested override (validated at runtime) |
+| **P2**   | Agent frontmatter  | `model:` field in agent .md file | Agent-level default                       |
+| **P3**   | config.yaml        | `agents.{type}.model` entry      | **RECOMMENDED** - centralized control     |
+| **P4**   | Complexity default | Based on agent type              | Fallback for unconfigured agents          |
+| **P5**   | Hardcoded fallback | `sonnet`                         | Last resort                               |
 
 ### How Router Reads Agent Models
 
@@ -225,13 +225,15 @@ getShorthand('sonnet'); // 'sonnet' (unchanged)
 
 ## VALIDATION HOOK
 
-`config-model-validator.cjs` validates spawn model matches config.yaml:
+Model validation is enforced by `routing-guard.cjs` (Check 11), and spawn-time correction is handled by `spawn-prompt-assembler.cjs`.
 
 **Modes:**
 
 - `CONFIG_MODEL_VALIDATOR=block` - Block spawn if mismatch
-- `CONFIG_MODEL_VALIDATOR=warn` - Log warning (DEFAULT)
+- `CONFIG_MODEL_VALIDATOR=warn` - Log warning
 - `CONFIG_MODEL_VALIDATOR=off` - Disable validation
+
+**Default:** `block`
 
 **What it validates:**
 
@@ -239,6 +241,10 @@ getShorthand('sonnet'); // 'sonnet' (unchanged)
 2. Resolves configured model from config.yaml
 3. Compares spawn model vs configured model
 4. Logs mismatch details for audit trail
+
+### Runtime Auto-Correction
+
+When a Task spawn provides an explicit model that differs from configured model, `spawn-prompt-assembler.cjs` now rewrites the spawn payload model to configured model (best-effort fail-safe) before final spawn validation.
 
 ---
 
@@ -254,12 +260,13 @@ getShorthand('sonnet'); // 'sonnet' (unchanged)
 
 ## FILES
 
-| File                                               | Purpose                            |
-| -------------------------------------------------- | ---------------------------------- |
-| `.claude/lib/utils/agent-config-reader.cjs`        | Model resolution utility           |
-| `.claude/hooks/routing/config-model-validator.cjs` | Pre-spawn validation hook          |
-| `.claude/config.yaml`                              | Source of truth for agent models   |
-| `.claude/agents/*/*.md`                            | Agent definitions with frontmatter |
+| File                                               | Purpose                                            |
+| -------------------------------------------------- | -------------------------------------------------- |
+| `.claude/lib/utils/agent-config-reader.cjs`        | Model resolution utility                           |
+| `.claude/hooks/routing/routing-guard.cjs`          | PreToolUse model validation (Check 11)             |
+| `.claude/hooks/routing/spawn-prompt-assembler.cjs` | PreToolUse model auto-correction + prompt assembly |
+| `.claude/config.yaml`                              | Source of truth for agent models                   |
+| `.claude/agents/*/*.md`                            | Agent definitions with frontmatter                 |
 
 ---
 

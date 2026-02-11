@@ -412,6 +412,20 @@ function validateArtifactContent(artifactType, content) {
     return result;
   }
 
+  // Skill definitions are frequently authored from lightweight metadata
+  // during creation workflows. Keep validation strict on core identity
+  // fields while avoiding over-coupling to evolving schema-required keys.
+  if (artifactType === 'skill') {
+    if (typeof parsed.name !== 'string' || parsed.name.trim() === '') {
+      result.errors.push('Missing required field: name');
+    }
+    if (parsed.description !== undefined && typeof parsed.description !== 'string') {
+      result.errors.push("Field 'description' must be a string");
+    }
+    result.valid = result.errors.length === 0;
+    return result;
+  }
+
   // Load schema
   const schemaPath = path.join(PROJECT_ROOT, '.claude', 'schemas', schemaFile);
   if (!fs.existsSync(schemaPath)) {
@@ -506,6 +520,11 @@ function validateCreatorWorkflow(toolName, toolInput) {
     return { pass: true }; // Not a protected artifact
   }
 
+  // Infrastructure files are always protected, even when already present.
+  const requiresAlwaysOnCreator =
+    required.artifactType === 'config:settings' ||
+    required.artifactType === 'config:agent-registry';
+
   // LAYER 2A FIX: Distinguish "creating new artifact" from "editing existing artifact"
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
   const fileExists = fs.existsSync(fullPath);
@@ -516,7 +535,7 @@ function validateCreatorWorkflow(toolName, toolInput) {
   }
 
   // Write to existing file = editing, not creating - allow without creator token
-  if (toolName === 'Write' && fileExists) {
+  if (toolName === 'Write' && fileExists && !requiresAlwaysOnCreator) {
     return { pass: true };
   }
 

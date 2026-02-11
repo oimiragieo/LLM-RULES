@@ -5,7 +5,7 @@
  * Pattern: Singleton (single global instance)
  *
  * Key Features:
- * - Async, non-blocking emission
+ * - Async emission with awaitable handler completion
  * - Priority queue support (0-100, higher executes first)
  * - Promise-based waitFor() for coordination
  * - Automatic timestamping
@@ -35,7 +35,7 @@ class EventBus {
   }
 
   /**
-   * Emit event (async, non-blocking)
+   * Emit event and await handler completion in priority order.
    * @param {string} eventType - Event type (e.g., 'AGENT_STARTED')
    * @param {object} payload - Event payload
    * @returns {Promise<void>}
@@ -61,19 +61,17 @@ class EventBus {
       .filter(sub => sub.eventType === eventType)
       .sort((a, b) => b.priority - a.priority);
 
-    // Execute handlers in priority order
-    // Use setImmediate for async, non-blocking execution
-    setImmediate(async () => {
-      for (const sub of subs) {
-        try {
-          // Handler can be sync or async
-          await sub.handler(enrichedPayload);
-        } catch (error) {
-          // Log error but don't crash the event bus
-          logger.error(`Handler error for ${eventType}`, { error: error.message });
-        }
+    // Execute handlers in priority order.
+    // emit() resolves only after handlers complete, preserving async contract.
+    for (const sub of subs) {
+      try {
+        // Handler can be sync or async
+        await sub.handler(enrichedPayload);
+      } catch (error) {
+        // Log error but don't crash the event bus
+        logger.error(`Handler error for ${eventType}`, { error: error.message });
       }
-    });
+    }
   }
 
   /**

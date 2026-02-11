@@ -21,7 +21,13 @@ function getProjectRoot() {
 
 test('router-churn-log writes metrics row', () => {
   const projectRoot = getProjectRoot();
-  const metricsPath = path.join(projectRoot, '.claude', 'context', 'metrics', 'router-churn-metrics.jsonl');
+  const metricsPath = path.join(
+    projectRoot,
+    '.claude',
+    'context',
+    'metrics',
+    'router-churn-metrics.jsonl'
+  );
   const modulePath = path.join(projectRoot, '.claude', 'lib', 'monitoring', 'router-churn-log.cjs');
   delete require.cache[modulePath];
   const { logRouterChurnEvent } = require(modulePath);

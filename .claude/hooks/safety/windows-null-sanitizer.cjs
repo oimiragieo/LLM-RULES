@@ -33,33 +33,15 @@ const isWindows = process.platform === 'win32';
  * Claude Code's Bash tool always runs in Git Bash on Windows.
  */
 function isGitBash() {
-  const shell = process.env.SHELL || '';
-  const shellNormalized = shell.replace(/\\/g, '/').toLowerCase();
-  const comspec = (process.env.ComSpec || process.env.COMSPEC || '').replace(/\\/g, '/').toLowerCase();
-  const termProgram = (process.env.TERM_PROGRAM || '').toLowerCase();
-
-  if (process.env.MSYSTEM || process.env.MINGW_PREFIX) {
+  const forceShell = (process.env.WINDOWS_NULL_SANITIZER_SHELL || '').trim().toLowerCase();
+  if (forceShell === 'cmd' || forceShell === 'powershell') {
+    return false;
+  }
+  if (forceShell === 'bash' || forceShell === 'git-bash') {
     return true;
   }
 
-  if (shellNormalized.includes('powershell') || shellNormalized.includes('pwsh')) {
-    return false;
-  }
-  if (comspec.endsWith('/cmd.exe') && !shellNormalized.includes('bash')) {
-    return false;
-  }
-
-  if (
-    shellNormalized.includes('/usr/bin/bash') ||
-    shellNormalized.endsWith('/bash') ||
-    shellNormalized.endsWith('/bash.exe') ||
-    shellNormalized.includes('/git/usr/bin/bash') ||
-    termProgram === 'mintty'
-  ) {
-    return true;
-  }
-
-  // This hook only runs for Bash tool invocations, which are Git Bash on Windows.
+  // This hook is executed only for Bash tool calls, which map to Git Bash on Windows.
   return true;
 }
 

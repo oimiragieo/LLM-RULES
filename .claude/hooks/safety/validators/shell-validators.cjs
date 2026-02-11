@@ -26,6 +26,21 @@ const SHELL_INTERPRETERS = new Set(['bash', 'sh', 'zsh']);
  */
 const DANGEROUS_PATTERNS = [
   {
+    pattern: /\|\|/,
+    name: 'OR command chaining (||)',
+    reason: 'Can execute alternate payloads after intentional failure',
+  },
+  {
+    pattern: /\r|\n/,
+    name: 'Multiline command',
+    reason: 'Can smuggle follow-up commands across lines',
+  },
+  {
+    pattern: /\$\{[^}]*\}/,
+    name: 'Parameter expansion',
+    reason: 'Can hide obfuscated payload construction and command splicing',
+  },
+  {
     pattern: /\$'/,
     name: 'ANSI-C quoting',
     reason: "Can bypass tokenizer via hex escapes (e.g., $'rm\\x20-rf\\x20/')",

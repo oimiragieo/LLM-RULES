@@ -252,7 +252,10 @@ describe('shell-validators', () => {
     test('blocks dot command after ||', () => {
       const result = checkDangerousPatterns('false || . script.sh');
       assert.strictEqual(result.valid, false);
-      assert.ok(result.error.includes('dot'));
+      assert.ok(
+        result.error.includes('dot') || result.error.includes('OR command chaining'),
+        `unexpected error message: ${result.error}`
+      );
     });
 
     test('allows relative path ./script.sh', () => {

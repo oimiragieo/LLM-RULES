@@ -423,6 +423,22 @@ test('process substitution is blocked', () => {
   assertFalse(result.valid, 'Process substitution should be blocked');
 });
 
+test('bash -c with || fallback chain is blocked', () => {
+  const result = validateCommand('bash -c "false || rm -rf /"');
+  assertFalse(result.valid, 'bash -c with || fallback should be blocked');
+});
+
+test('bash -c with multiline command is blocked', () => {
+  const result = validateCommand(`bash -c "echo safe
+rm -rf /"`);
+  assertFalse(result.valid, 'bash -c with newline-separated commands should be blocked');
+});
+
+test('bash -c with parameter expansion payload is blocked', () => {
+  const result = validateCommand('bash -c "echo ${PATH}"');
+  assertFalse(result.valid, 'bash -c with parameter expansion should be blocked');
+});
+
 // ============================================================
 // Git Command Validation
 // ============================================================

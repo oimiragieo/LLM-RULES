@@ -71,10 +71,9 @@ The `Task` tool is the primary mechanism for Router and Orchestrators to spawn s
 
 ```typescript
 Task({
-  task_id: 'task-1',
   subagent_type: string,      // REQUIRED - Agent type to spawn
   prompt: string,              // REQUIRED - Complete instructions
-  task_id?: string,           // RECOMMENDED - For spawn traceability
+  task_id?: string,           // STRONGLY RECOMMENDED - For strict TaskUpdate/task tracing
   model?: string,             // OPTIONAL - Override default model
   allowed_tools?: string[]    // OPTIONAL - Tool whitelist (auto-enriched)
 })
@@ -84,13 +83,13 @@ Task({
 
 #### Parameter Descriptions
 
-| Parameter       | Required    | Description                                                                                                                               |
-| --------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `subagent_type` | **YES**     | Must match an agent identifier (e.g., `'developer'`, `'planner'`, `'qa'`, `'architect'`). See `.claude/agents/` for available agents.     |
-| `prompt`        | **YES**     | Complete instructions for the agent. MUST include: task ID, role description, specific task details, and relevant context.                |
-| `task_id`       | Recommended | ID from `TaskCreate` or `TaskList`. Logged to `spawn-log.jsonl` for traceability. Without this, spawn tracking is incomplete.             |
-| `model`         | Optional    | Model override. Use `'haiku'`, `'sonnet'`, `'opus'` shorthands OR full model ID (e.g., `'claude-sonnet-4-5'`). See `@MODEL_SELECTION.md`. |
-| `allowed_tools` | Optional    | Tool whitelist for the agent. If omitted, `spawn-prompt-assembler.cjs` hook auto-enriches with mandatory tools (TaskUpdate, Skill, etc.). |
+| Parameter       | Required                                                 | Description                                                                                                                                                         |
+| --------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `subagent_type` | **YES**                                                  | Must match an agent identifier (e.g., `'developer'`, `'planner'`, `'qa'`, `'architect'`). See `.claude/agents/` for available agents.                               |
+| `prompt`        | **YES**                                                  | Complete instructions for the agent. MUST include: task ID, role description, specific task details, and relevant context.                                          |
+| `task_id`       | Recommended (effectively required for reliable tracking) | ID from `TaskCreate` or `TaskList`. Logged to spawn telemetry and used for strict completion tracking. If omitted, spawn hook may auto-inject a fallback `task_id`. |
+| `model`         | Optional                                                 | Model override. Use `'haiku'`, `'sonnet'`, `'opus'` shorthands OR full model ID (e.g., `'claude-sonnet-4-5'`). See `@MODEL_SELECTION.md`.                           |
+| `allowed_tools` | Optional                                                 | Tool whitelist for the agent. If omitted, `spawn-prompt-assembler.cjs` hook auto-enriches with mandatory tools (TaskUpdate, Skill, etc.).                           |
 
 ---
 
@@ -192,15 +191,13 @@ Task({ task_id: 'task-10', subagent_type: 'developer', prompt: '...' });
 
 The following hooks process `Task()` calls in order:
 
-| Hook                              | Trigger          | Purpose                                                         |
-| --------------------------------- | ---------------- | --------------------------------------------------------------- |
-| `routing-guard.cjs`               | PreToolUse(Task) | Enforces TaskList-first, planner-first, security review         |
-| `pre-task-unified.cjs`            | PreToolUse(Task) | Validates spawn parameters, loop prevention, task status        |
-| `spawn-prompt-assembler.cjs`      | PreToolUse(Task) | Auto-enriches prompt with memory, tools, and TaskUpdate warning |
-| `spawn-prompt-validator.cjs`      | PreToolUse(Task) | Validates prompt contains required sections                     |
-| `config-model-validator.cjs`      | PreToolUse(Task) | Validates model matches config.yaml                             |
-| `tool-availability-validator.cjs` | PreToolUse(Task) | Validates required tools are available                          |
-| `agent-context-pre-tracker.cjs`   | PreToolUse(Task) | Sets mode='agent' to prevent race conditions                    |
+| Hook                         | Trigger          | Purpose                                                                |
+| ---------------------------- | ---------------- | ---------------------------------------------------------------------- |
+| `routing-guard.cjs`          | PreToolUse(Task) | Enforces TaskList-first, planner/security, and config-model validation |
+| `pre-task-unified.cjs`       | PreToolUse(Task) | Validates spawn parameters, loop prevention, task status               |
+| `spawn-prompt-assembler.cjs` | PreToolUse(Task) | Auto-enriches prompt with memory, tools, and TaskUpdate warning        |
+| `spawn-prompt-validator.cjs` | PreToolUse(Task) | Validates prompt contains required sections                            |
+| `pre-tool-unified.cjs`       | PreToolUse(\*)   | Unified baseline pre-tool validation/orchestration                     |
 
 **Key Behavior:**
 

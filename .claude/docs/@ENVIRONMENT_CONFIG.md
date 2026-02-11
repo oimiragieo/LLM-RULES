@@ -48,17 +48,19 @@ All environment-specific settings are managed through the `.env` file located at
 
 ### Enforcement Mode Variables
 
-| Variable                       | Values         | Default | Purpose                                      |
-| ------------------------------ | -------------- | ------- | -------------------------------------------- |
-| `PLANNER_FIRST_ENFORCEMENT`    | block/warn/off | block   | Enforce planner-first routing                |
-| `CREATOR_GUARD`                | block/warn/off | block   | Enforce creator workflow (Gate 4)            |
-| `SPAWN_PROMPT_VALIDATOR`       | block/warn/off | warn    | Validate spawn prompts                       |
-| `ROUTER_WRITE_GUARD`           | block/warn/off | block   | Block router writes                          |
-| `SECURITY_REVIEW_ENFORCEMENT`  | block/warn/off | block   | Enforce security reviews                     |
-| `RESEARCH_ENFORCEMENT`         | block/warn/off | block   | Enforce research before creation             |
-| `REFLECTION_STEP0_ENFORCEMENT` | block/warn/off | block   | Enforce reflection Step 0 guard              |
-| `TASKLIST_FIRST_ENFORCEMENT`   | block/warn/off | warn    | Enforce TaskList() before Task()             |
-| `STATE_STALE_THRESHOLD_MS`     | number         | 600000  | State staleness threshold in ms (10 minutes) |
+| Variable                       | Values         | Default | Purpose                                                                  |
+| ------------------------------ | -------------- | ------- | ------------------------------------------------------------------------ |
+| `PLANNER_FIRST_ENFORCEMENT`    | block/warn/off | block   | Enforce planner-first routing                                            |
+| `CREATOR_GUARD`                | block/warn/off | block   | Enforce creator workflow (Gate 4)                                        |
+| `SPAWN_PROMPT_VALIDATOR`       | block/warn/off | warn    | Validate spawn prompts                                                   |
+| `CONFIG_MODEL_VALIDATOR`       | block/warn/off | block   | Enforce spawn model matches configured model                             |
+| `ROUTER_WRITE_GUARD`           | block/warn/off | block   | Block router writes                                                      |
+| `SECURITY_REVIEW_ENFORCEMENT`  | block/warn/off | block   | Enforce security reviews                                                 |
+| `TASK_COMPLETION_GUARD`        | block/warn/off | block   | Block completion-like Task output without matching TaskUpdate(completed) |
+| `RESEARCH_ENFORCEMENT`         | block/warn/off | block   | Enforce research before creation                                         |
+| `REFLECTION_STEP0_ENFORCEMENT` | block/warn/off | block   | Enforce reflection Step 0 guard                                          |
+| `TASKLIST_FIRST_ENFORCEMENT`   | block/warn/off | warn    | Enforce TaskList() before Task()                                         |
+| `STATE_STALE_THRESHOLD_MS`     | number         | 600000  | State staleness threshold in ms (10 minutes)                             |
 
 **Enforcement Modes:**
 
@@ -86,14 +88,21 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 
 ### Spawn Prompt / Memory Retrieval Variables
 
-| Variable                       | Values | Default | Purpose                                                                                |
-| ------------------------------ | ------ | ------- | -------------------------------------------------------------------------------------- |
-| `SPAWN_PROMPT_ASSEMBLER`       | on/off | on      | Enable the spawn prompt assembler hook.                                                |
-| `ALLOWED_TOOLS_ENRICHER`       | on/off | on      | Enrich allowed_tools from registry/agent-config.                                       |
-| `SPAWN_PROMPT_SEMANTIC_MEMORY` | on/off | on      | Append "Semantic Matches" section from ContextualMemory.                               |
-| `SPAWN_PROMPT_ENTITY_GRAPH`    | on/off | on      | Append entity graph (SQLite) section in spawn prompts.                                 |
-| `MEMORY_INTENT_ANALYSIS`       | on/off | off     | Enable intent-based memory query planning.                                             |
-| `SPAWN_PROMPT_MEMORY_QUERY`    | on/off | off     | Append query-driven "Relevant Memories" section; when on, replaces "Semantic Matches". |
+| Variable                           | Values     | Default    | Purpose                                                                                |
+| ---------------------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------- |
+| `SPAWN_PROMPT_ASSEMBLER`           | on/off     | on         | Enable the spawn prompt assembler hook.                                                |
+| `ALLOWED_TOOLS_ENRICHER`           | on/off     | on         | Enrich allowed_tools from registry/agent-config.                                       |
+| `SPAWN_PROMPT_SEMANTIC_MEMORY`     | on/off     | on         | Append "Semantic Matches" section from ContextualMemory.                               |
+| `SPAWN_PROMPT_ENTITY_GRAPH`        | on/off     | on         | Append entity graph (SQLite) section in spawn prompts.                                 |
+| `MEMORY_INTENT_ANALYSIS`           | on/off     | off        | Enable intent-based memory query planning.                                             |
+| `SPAWN_PROMPT_MEMORY_QUERY`        | on/off     | off        | Append query-driven "Relevant Memories" section; when on, replaces "Semantic Matches". |
+| `SPAWN_PROMPT_MAX_CHARS`           | number     | 40000      | Hard max chars for assembled spawn prompt before section trimming.                     |
+| `SPAWN_SKILL_SECTION_MODE`         | enum       | names_only | Skill section verbosity (`names_only` or `full`).                                      |
+| `SPAWN_ASSEMBLY_PROFILING`         | true/false | false      | Emit dev-only spawn assembly timing + token burn metrics.                              |
+| `SPAWN_ADAPTIVE_ENRICHMENT`        | true/false | false      | Dynamically throttle expensive prompt enrichment based on runtime metrics.             |
+| `SPAWN_ASSEMBLY_CACHE`             | on/off     | on         | Enable on-disk spawn assembly cache.                                                   |
+| `SPAWN_ASSEMBLY_CACHE_TTL_MS`      | number     | 120000     | Cache entry TTL (ms) for assembled spawn prompts.                                      |
+| `SPAWN_ASSEMBLY_CACHE_MAX_ENTRIES` | number     | 120        | Max assembled prompts retained in cache.                                               |
 
 ### Memory / Compression Variables
 
@@ -240,6 +249,9 @@ DEBUG_HOOKS=true claude
 
 # Enable query-driven memories in spawn prompts
 SPAWN_PROMPT_MEMORY_QUERY=on claude
+
+# Turn on dev-only spawn timing/token profiling
+SPAWN_ASSEMBLY_PROFILING=true claude
 
 # Enable context/mode tool guard in warn mode
 CONTEXT_MODE_TOOL_GUARD=warn claude

@@ -21,8 +21,20 @@ function getProjectRoot() {
 
 test('runtime-health-log writes runtime row', () => {
   const projectRoot = getProjectRoot();
-  const metricsPath = path.join(projectRoot, '.claude', 'context', 'metrics', 'runtime-health-metrics.jsonl');
-  const modulePath = path.join(projectRoot, '.claude', 'lib', 'monitoring', 'runtime-health-log.cjs');
+  const metricsPath = path.join(
+    projectRoot,
+    '.claude',
+    'context',
+    'metrics',
+    'runtime-health-metrics.jsonl'
+  );
+  const modulePath = path.join(
+    projectRoot,
+    '.claude',
+    'lib',
+    'monitoring',
+    'runtime-health-log.cjs'
+  );
   delete require.cache[modulePath];
   const { logRuntimeHealth } = require(modulePath);
 

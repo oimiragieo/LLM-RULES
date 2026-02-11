@@ -820,23 +820,6 @@
       ],
       "model": "claude-opus-4-5-20251101"
     },
-    "party-orchestrator": {
-      "tools": [
-        "Bash",
-        "Edit",
-        "Glob",
-        "Grep",
-        "Read",
-        "Skill",
-        "Task",
-        "TaskCreate",
-        "TaskGet",
-        "TaskList",
-        "TaskUpdate",
-        "Write"
-      ],
-      "model": "claude-opus-4-5-20251101"
-    },
     "swarm-coordinator": {
       "tools": [
         "Bash",
@@ -856,190 +839,207 @@
     },
     "accessibility-tester": {
       "tools": [
-        "Read",
-        "Write",
+        "Bash",
         "Edit",
         "Glob",
         "Grep",
-        "Bash",
-        "WebFetch",
-        "WebSearch",
-        "TaskUpdate",
-        "TaskList",
+        "Read",
+        "Skill",
         "TaskCreate",
         "TaskGet",
+        "TaskList",
         "TaskOutput",
-        "Skill"
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-sonnet-4-5"
     },
     "chaos-engineer": {
       "tools": [
-        "Read",
-        "Write",
+        "Bash",
         "Edit",
         "Glob",
         "Grep",
-        "Bash",
-        "WebFetch",
-        "WebSearch",
-        "TaskUpdate",
-        "TaskList",
+        "Read",
+        "Skill",
         "TaskCreate",
         "TaskGet",
+        "TaskList",
         "TaskOutput",
-        "Skill"
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-sonnet-4-5"
     },
     "penetration-tester": {
       "tools": [
-        "Read",
-        "Write",
+        "Bash",
         "Edit",
         "Glob",
         "Grep",
-        "Bash",
-        "WebFetch",
-        "WebSearch",
-        "TaskUpdate",
-        "TaskList",
+        "Read",
+        "Skill",
         "TaskCreate",
         "TaskGet",
+        "TaskList",
         "TaskOutput",
-        "Skill"
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-opus-4-5-20251101"
     },
     "performance-engineer": {
       "tools": [
-        "Read",
-        "Write",
+        "Bash",
         "Edit",
         "Glob",
         "Grep",
-        "Bash",
-        "WebFetch",
-        "WebSearch",
-        "TaskUpdate",
-        "TaskList",
+        "Read",
+        "Skill",
         "TaskCreate",
         "TaskGet",
+        "TaskList",
         "TaskOutput",
-        "Skill"
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-sonnet-4-5"
     },
     "sre-engineer": {
       "tools": [
-        "Read",
-        "Write",
+        "Bash",
         "Edit",
         "Glob",
         "Grep",
-        "Bash",
-        "WebFetch",
-        "WebSearch",
-        "TaskUpdate",
-        "TaskList",
+        "Read",
+        "Skill",
         "TaskCreate",
         "TaskGet",
+        "TaskList",
         "TaskOutput",
-        "Skill"
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-sonnet-4-5"
     },
     "api-designer": {
       "tools": [
-        "Read",
-        "Write",
+        "Bash",
         "Edit",
         "Glob",
         "Grep",
-        "Bash",
-        "WebFetch",
-        "WebSearch",
-        "TaskUpdate",
-        "TaskList",
+        "Read",
+        "Skill",
         "TaskCreate",
         "TaskGet",
+        "TaskList",
         "TaskOutput",
-        "Skill"
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-sonnet-4-5"
     },
     "llm-architect": {
       "tools": [
-        "Read",
-        "Write",
-        "Edit",
         "Bash",
-        "Grep",
+        "Edit",
         "Glob",
-        "WebSearch",
-        "WebFetch",
-        "TaskUpdate",
-        "TaskList",
+        "Grep",
+        "Read",
+        "Skill",
         "TaskCreate",
         "TaskGet",
-        "Skill"
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-opus-4-5-20251101"
     },
     "mcp-developer": {
       "tools": [
-        "Read",
-        "Write",
-        "Edit",
         "Bash",
-        "Grep",
+        "Edit",
         "Glob",
-        "WebSearch",
-        "WebFetch",
-        "TaskUpdate",
-        "TaskList",
+        "Grep",
+        "Read",
+        "Skill",
         "TaskCreate",
         "TaskGet",
-        "Skill"
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-sonnet-4-5"
     },
     "microservices-architect": {
       "tools": [
-        "Read",
-        "Write",
+        "Bash",
         "Edit",
         "Glob",
         "Grep",
-        "Bash",
-        "WebFetch",
-        "WebSearch",
-        "TaskUpdate",
-        "TaskList",
+        "Read",
+        "Skill",
         "TaskCreate",
         "TaskGet",
+        "TaskList",
         "TaskOutput",
-        "Skill"
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-opus-4-5-20251101"
     },
     "prompt-engineer": {
       "tools": [
-        "Read",
-        "Write",
-        "Edit",
         "Bash",
-        "Grep",
+        "Edit",
         "Glob",
-        "WebSearch",
+        "Grep",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
         "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
+    "party-orchestrator": {
+      "tools": [
+        "Read",
+        "Task",
         "TaskUpdate",
         "TaskList",
         "TaskCreate",
         "TaskGet",
-        "Skill"
+        "Skill",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     }
   },
   "thinkingBudgetMap": {

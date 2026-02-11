@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Populate agent-config.json with ALL 49 agents from agent-registry.json
+ * Populate agent-config.json with all agents from agent-registry.json
  *
  * Usage: node .claude/tools/cli/populate-agent-config.cjs
  *
  * Process:
- * 1. Read agent-registry.json (49 agents)
- * 2. Read agent-config.json (current: 8 agents)
+ * 1. Read agent-registry.json
+ * 2. Read agent-config.json
  * 3. For each registry agent:
  *    - Use existing config if present (preserve manual edits)
  *    - Otherwise, add new entry with:
@@ -69,6 +69,19 @@ function main() {
   const populationReport = [];
   let addedCount = 0;
   let updatedCount = 0;
+  let removedCount = 0;
+
+  // Prune stale agents not present in registry
+  for (const existingAgentId of existingAgents) {
+    if (!Object.prototype.hasOwnProperty.call(agentRegistry.agents || {}, existingAgentId)) {
+      delete agentConfig.agents[existingAgentId];
+      removedCount++;
+      populationReport.push({
+        agent: existingAgentId,
+        action: 'removed',
+      });
+    }
+  }
 
   for (const agentId of registryAgents) {
     const registryData = agentRegistry.agents[agentId];
@@ -152,10 +165,12 @@ function main() {
   console.log('6. Population Report:\n');
   console.log(`   Updated: ${updatedCount} existing agents`);
   console.log(`   Added: ${addedCount} new agents\n`);
+  console.log(`   Removed: ${removedCount} stale agents\n`);
 
   if (populationReport.length > 0) {
     const updated = populationReport.filter(r => r.action === 'updated');
     const added = populationReport.filter(r => r.action === 'added');
+    const removed = populationReport.filter(r => r.action === 'removed');
 
     if (updated.length > 0) {
       console.log('   Updated agents:');
@@ -172,6 +187,13 @@ function main() {
         console.log(`     ${agent}:`);
         console.log(`       - model: ${model} (from ${modelSource})`);
         console.log(`       - tools: ${toolCount} tools (from ${toolsSource})`);
+      });
+    }
+
+    if (removed.length > 0) {
+      console.log('\n   Removed stale agents:');
+      removed.forEach(({ agent }) => {
+        console.log(`     ${agent}`);
       });
     }
   }

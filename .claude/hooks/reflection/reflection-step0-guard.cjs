@@ -9,12 +9,12 @@
  * attempts TaskList before performing Step 0.
  *
  * ENFORCEMENT MODES:
- * - block (default): Block TaskList until pending reflections are handled
- * - warn: Allow TaskList but emit warning
+ * - warn (default): Allow TaskList but emit warning
+ * - block: Block TaskList until pending reflections are handled
  * - off: Disabled
  *
  * Environment:
- * - REFLECTION_STEP0_ENFORCEMENT=block|warn|off
+ * - REFLECTION_STEP0_ENFORCEMENT=warn|block|off
  * - REFLECTION_ENABLED=false to disable all reflection
  */
 
@@ -163,9 +163,8 @@ async function main() {
       process.exit(0);
     }
 
-    // Default to 'block' to enforce Step 0 reflection processing before TaskList
-    // Set REFLECTION_STEP0_ENFORCEMENT=warn to soften enforcement
-    const mode = getEnforcementMode('REFLECTION_STEP0_ENFORCEMENT', 'block');
+    // Default to 'warn' to avoid deadlocks while still surfacing Step 0 guidance.
+    const mode = getEnforcementMode('REFLECTION_STEP0_ENFORCEMENT', 'warn');
     if (mode === 'off') {
       process.exit(0);
     }

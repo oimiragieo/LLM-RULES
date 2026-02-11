@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed - Routing Reliability, Task Enforcement, and Token Efficiency (2026-02-10)
+
+#### Routing / Task Protocol
+
+- `post-task-unified.cjs` now enforces completion tracking with `TASK_COMPLETION_GUARD=block` by default.
+  - Completion-like Task output is blocked unless a matching `TaskUpdate({ taskId, status: "completed" })` is detected.
+  - Upgrades behavior from advisory/warn-only to enforceable default.
+- `routing-guard.cjs` now uses `CONFIG_MODEL_VALIDATOR=block` by default.
+  - Prevents silent model drift during Task spawns.
+- Fixed agent-type extraction bug in config-model validation:
+  - Prompts like `You are a developer` are now parsed correctly as `developer` (no false `agentType: a` mismatches).
+
+#### Spawn Prompt / Token Optimization
+
+- `spawn-prompt-assembler.cjs` now auto-corrects mismatched explicit spawn model requests to configured model as a fail-safe.
+- Added/extended spawn prompt optimization controls and observability:
+  - Prompt size budgeting (`SPAWN_PROMPT_MAX_CHARS`)
+  - Adaptive enrichment throttling (`SPAWN_ADAPTIVE_ENRICHMENT`)
+  - Assembly caching (`SPAWN_ASSEMBLY_CACHE`, TTL, max entries)
+  - Dev-only profiling and token burn metrics (`SPAWN_ASSEMBLY_PROFILING`)
+
+#### Documentation
+
+- Updated docs to reflect new defaults/behavior:
+  - `.claude/docs/@MODEL_SELECTION.md`
+  - `.claude/docs/@ENVIRONMENT_CONFIG.md`
+  - `.claude/docs/HOOKS_REFERENCE.md`
+  - `.claude/docs/@TOOL_REFERENCE.md`
+- Root `README.md` kept user-facing; release-note style details moved here to changelog.
+
+#### Validation
+
+- Verified with targeted tests:
+  - `node --test tests/hooks/post-task-unified.test.cjs`
+  - `node --test tests/hooks/config-model-validator-default.test.cjs`
+  - `node --test tests/hooks/spawn-prompt-assembler-snippet.test.cjs`
+  - `node --test tests/hooks/spawn-prompt-validator.test.cjs`
+- Lint:
+  - `pnpm lint`
+- Runtime debug verification performed against fresh logs in `C:\\Users\\oimir\\.claude\\debug`.
+
 ### Added - Sprint 2: Template Infrastructure & Security-First Design (Near-Term)
 
 #### Enhancements

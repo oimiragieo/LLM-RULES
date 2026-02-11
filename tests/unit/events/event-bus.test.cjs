@@ -167,6 +167,26 @@ async function runTests() {
       eventBus.off(sub1);
       eventBus.off(sub2);
     });
+
+    await test('should await async handlers before emit resolves', async () => {
+      const calls = [];
+      const sub = eventBus.on(EVENT_TYPE, async () => {
+        await new Promise(resolve => setTimeout(resolve, 25));
+        calls.push('done');
+      });
+
+      const started = Date.now();
+      await eventBus.emit(EVENT_TYPE, validPayload({ contract: 'awaitable' }));
+      const elapsed = Date.now() - started;
+
+      assertEqual(calls.length, 1, 'handler should complete before emit resolves');
+      assert(
+        elapsed >= 20,
+        `emit should wait for async handlers; elapsed=${elapsed}ms expected >= 20ms`
+      );
+
+      eventBus.off(sub);
+    });
   });
 
   await describe('Priority Support', async () => {

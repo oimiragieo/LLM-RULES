@@ -21,11 +21,13 @@ skills:
 # Party Orchestrator
 
 ## Purpose
+
 Coordinate collaborative multi-agent sessions using the standard Task toolchain.
 
 This agent is a **safe compatibility entrypoint** for party-orchestrator references in config and docs. It does not depend on archived runtime modules.
 
 ## Required Protocol
+
 - Call `TaskUpdate({ taskId, status: "in_progress" })` first.
 - Run `TaskList()` before spawning collaborators.
 - Spawn 2-4 focused agents in parallel when useful.
@@ -33,12 +35,14 @@ This agent is a **safe compatibility entrypoint** for party-orchestrator referen
 - Call `TaskUpdate({ taskId, status: "completed", metadata })` last.
 
 ## Operating Rules
+
 - Prefer `swarm-coordinator` patterns for multi-agent rounds.
 - Keep sessions bounded: short rounds, concrete goals, explicit ownership.
 - For security-sensitive work, always include `security-architect`.
 - If requested behavior requires archived Party Mode internals, state that those internals are unavailable and continue with standard Task orchestration.
 
 ## Example Spawn Plan
+
 1. `TaskList()`
 2. Spawn planner/architect for decomposition
 3. Spawn implementation specialists in parallel
@@ -46,7 +50,9 @@ This agent is a **safe compatibility entrypoint** for party-orchestrator referen
 5. Aggregate outcomes and finish with `TaskUpdate(completed)`
 
 ## Output Contract
+
 Return concise orchestration updates:
+
 - Active tasks and owners
 - Blockers
 - Next round actions

@@ -18,6 +18,15 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `0`: Allow operation
 - `2`: Block operation
 
+## Recent Updates (2026-02)
+
+- `post-task-unified.cjs` now enforces task completion tracking with hard-block default:
+  `TASK_COMPLETION_GUARD=block` denies completion-like Task output unless a matching `TaskUpdate({ taskId, status: "completed" })` is observed.
+- `routing-guard.cjs` model validation default is now `CONFIG_MODEL_VALIDATOR=block`.
+- Agent type extraction for model validation now correctly parses prompts such as `You are a developer`.
+- `spawn-prompt-assembler.cjs` includes model mismatch fail-safe auto-correction to configured model before final spawn validation.
+- Spawn prompt assembly now supports token/perf controls (`SPAWN_PROMPT_MAX_CHARS`, adaptive enrichment, cache, optional profiling metrics).
+
 ## Hook Events
 
 | Event              | When It Fires        | Common Uses                                                         |
@@ -63,16 +72,13 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 │       └── process-validators.cjs
 ├── routing/          # Router enforcement (ACTIVE)
 │   ├── routing-guard.cjs
-│   ├── intent-agent-match.cjs
 │   ├── spawn-prompt-assembler.cjs
 │   ├── pre-task-unified.cjs
-│   ├── config-model-validator.cjs
-│   ├── tool-scope-validator.cjs
-│   ├── task-status-enforcement.cjs
+│   ├── pre-tool-unified.cjs
 │   ├── post-task-unified.cjs
-│   ├── task-list-tracker.cjs
 │   ├── code-index-updater.cjs
-│   └── unified-creator-guard.cjs
+│   ├── unified-creator-guard.cjs
+│   └── user-prompt-unified.cjs
 ├── memory/           # Memory operations (ACTIVE)
 │   └── sync-memory-index.cjs
 ├── session/          # Session management (ACTIVE)
