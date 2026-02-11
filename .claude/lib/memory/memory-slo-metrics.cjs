@@ -274,7 +274,8 @@ function summarizeOperationalSLO(projectRoot = PROJECT_ROOT) {
   summary.pass.lockWait = summary.p95.lockWaitMs <= summary.targets.lockWaitP95Ms;
   summary.pass.parseFailures = parseFailureRate <= summary.targets.parseFailureRate;
 
-  summary.allPass = summary.pass.writeLatency && summary.pass.lockWait && summary.pass.parseFailures;
+  summary.allPass =
+    summary.pass.writeLatency && summary.pass.lockWait && summary.pass.parseFailures;
   return summary;
 }
 

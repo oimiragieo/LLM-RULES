@@ -56,4 +56,3 @@ test('formatDashboard renders operational SLOs', () => {
     cleanup();
   }
 });
-

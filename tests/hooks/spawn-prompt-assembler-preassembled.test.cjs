@@ -3,7 +3,9 @@ const path = require('node:path');
 const test = require('node:test');
 const { spawn } = require('node:child_process');
 
-const { generateRequiredPrefixFragment } = require('../../.claude/hooks/routing/spawn-prompt-assembler.cjs');
+const {
+  generateRequiredPrefixFragment,
+} = require('../../.claude/hooks/routing/spawn-prompt-assembler.cjs');
 
 const HOOK_PATH = path.resolve(
   __dirname,

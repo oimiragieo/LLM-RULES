@@ -1,4 +1,3 @@
-
 const manager = require('../../../../.claude/lib/memory/memory-manager.cjs');
 const root = process.argv[2];
 const worker = process.argv[3];

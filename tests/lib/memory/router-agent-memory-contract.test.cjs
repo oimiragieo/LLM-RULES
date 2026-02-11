@@ -84,4 +84,3 @@ test('contract: concurrent agent writes share memory without overwrite', async (
     cleanup();
   }
 });
-

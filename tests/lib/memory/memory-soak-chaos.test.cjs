@@ -80,15 +80,19 @@ function cleanup(testRoot) {
 
 function runWorker(workerScript, testRoot, workerId, count) {
   return new Promise((resolve, reject) => {
-    const proc = spawn(process.execPath, [workerScript, testRoot, String(workerId), String(count)], {
-      cwd: path.join(__dirname),
-      env: {
-        ...process.env,
-        MEMORY_FILE_LOCK_TIMEOUT_MS: '30000',
-        MEMORY_FILE_LOCK_WAIT_MS: '10',
-      },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    const proc = spawn(
+      process.execPath,
+      [workerScript, testRoot, String(workerId), String(count)],
+      {
+        cwd: path.join(__dirname),
+        env: {
+          ...process.env,
+          MEMORY_FILE_LOCK_TIMEOUT_MS: '30000',
+          MEMORY_FILE_LOCK_WAIT_MS: '10',
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      }
+    );
     let stdout = '';
     let stderr = '';
     proc.stdout.on('data', d => {
