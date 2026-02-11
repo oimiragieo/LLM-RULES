@@ -46,6 +46,16 @@ const PHASE_ADVANCE_FILE = path.join(
   'phase-advance.json'
 );
 
+function normalizeTaskUpdateFields(toolInput) {
+  const input = toolInput && typeof toolInput === 'object' ? toolInput : {};
+  const rawTaskId = input.taskId ?? input.task_id ?? input.id ?? null;
+  const rawStatus = input.status ?? null;
+  return {
+    taskId: rawTaskId != null ? String(rawTaskId) : null,
+    status: typeof rawStatus === 'string' ? rawStatus.trim().toLowerCase() : null,
+  };
+}
+
 /**
  * Phase progression map
  */
@@ -66,6 +76,7 @@ const PHASE_PROGRESSION = {
 async function processTaskCompletion(hookData) {
   const toolName = hookData?.toolUse?.tool;
   const toolInput = hookData?.toolUse?.input || {};
+  const update = normalizeTaskUpdateFields(toolInput);
 
   // Only process TaskUpdate completions
   if (toolName !== 'TaskUpdate') {
@@ -74,8 +85,8 @@ async function processTaskCompletion(hookData) {
     return { result: {} };
   }
 
-  if (toolInput.status !== 'completed') {
-    console.error('[post-completion-chain] Status not completed:', toolInput.status);
+  if (update.status !== 'completed') {
+    console.error('[post-completion-chain] Status not completed:', update.status);
     console.log(formatResult({}));
     return { result: {} };
   }
@@ -88,7 +99,7 @@ async function processTaskCompletion(hookData) {
     return { result: {} };
   }
 
-  console.error('[post-completion-chain] Processing completion for task:', toolInput.taskId);
+  console.error('[post-completion-chain] Processing completion for task:', update.taskId);
 
   const workflowState = JSON.parse(fs.readFileSync(WORKFLOW_STATE_FILE, 'utf8'));
   const currentPhase = workflowState.currentPhase;
@@ -105,7 +116,7 @@ async function processTaskCompletion(hookData) {
     return { result: {} };
   }
 
-  const completedTaskId = toolInput.taskId;
+  const completedTaskId = update.taskId;
   let matchedAgentName = null;
 
   for (const [agentName, agentData] of Object.entries(phaseData.agents)) {

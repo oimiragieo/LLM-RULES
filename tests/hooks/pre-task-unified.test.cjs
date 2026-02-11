@@ -437,6 +437,42 @@ describe('pre-task-unified.cjs', () => {
         Array.isArray(loopState.actionHistory) &&
           loopState.actionHistory.some(e => e.action === 'spawn:developer' && e.count === 1)
       );
+
+      const router = readState(ROUTER_STATE_FILE);
+      assert.strictEqual(router.currentSpawnTaskId, null);
+    });
+
+    it('should record in_progress lifecycle when task_id is provided', () => {
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: false,
+        plannerSpawned: false,
+        requiresSecurityReview: false,
+        taskListCalledSincePrompt: true,
+      });
+
+      writeState(LOOP_STATE_FILE, {
+        spawnDepth: 0,
+        actionHistory: [],
+      });
+
+      const input = {
+        tool_name: 'Task',
+        tool_input: {
+          task_id: 'task-lifecycle-1',
+          prompt: 'You are DEVELOPER. Fix a simple bug.',
+          description: 'Developer fixing bug',
+        },
+      };
+
+      const result = preTaskUnified.runAllChecks(input);
+      assert.strictEqual(result.pass, true);
+
+      const router = readState(ROUTER_STATE_FILE);
+      assert.strictEqual(router.currentSpawnTaskId, 'task-lifecycle-1');
+      assert.strictEqual(router.lastTaskUpdateTaskId, 'task-lifecycle-1');
+      assert.strictEqual(router.lastTaskUpdateStatus, 'in_progress');
+      assert.ok(Number(router.taskUpdatesThisSession || 0) >= 1);
     });
 
     it('should stop on first failure', () => {

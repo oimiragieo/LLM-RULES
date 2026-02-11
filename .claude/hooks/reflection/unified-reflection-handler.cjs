@@ -77,6 +77,17 @@ const SESSION_END_EVENTS = ['Stop', 'SessionEnd'];
 // Minimum output length for memory extraction
 const MIN_OUTPUT_LENGTH = 50;
 
+function normalizeTaskUpdateFields(toolInput) {
+  const input = toolInput && typeof toolInput === 'object' ? toolInput : {};
+  const rawTaskId = input.taskId ?? input.task_id ?? input.id ?? null;
+  const rawStatus = input.status ?? null;
+  const status = typeof rawStatus === 'string' ? rawStatus.trim().toLowerCase() : null;
+  return {
+    taskId: rawTaskId != null ? String(rawTaskId) : null,
+    status,
+  };
+}
+
 // ============================================================
 // CORE UTILITY FUNCTIONS
 // ============================================================
@@ -282,13 +293,14 @@ function detectEventType(input) {
 
   // Check for TaskUpdate
   if (toolName === 'TaskUpdate') {
+    const update = normalizeTaskUpdateFields(toolInput);
     // PERF-003 #2: Track ALL TaskUpdate calls (was in task-update-tracker.cjs)
     // Return 'task_completion' for completed status, 'task_update' for others
-    if (toolInput && toolInput.status === 'completed') {
+    if (update.taskId && update.status === 'completed') {
       return 'task_completion';
     }
     // Track non-completion updates too (in_progress, etc.)
-    if (toolInput && toolInput.taskId && toolInput.status) {
+    if (update.taskId && update.status) {
       return 'task_update';
     }
     return null;
@@ -336,20 +348,21 @@ function detectEventType(input) {
  */
 function handleTaskCompletion(input) {
   const toolInput = getToolInput(input);
+  const update = normalizeTaskUpdateFields(toolInput);
 
   // PERF-003 #2: Record TaskUpdate to router-state (was in task-update-tracker.cjs)
-  if (toolInput.taskId && toolInput.status) {
-    routerState.recordTaskUpdate(toolInput.taskId, toolInput.status);
+  if (update.taskId && update.status) {
+    routerState.recordTaskUpdate(update.taskId, update.status);
     if (process.env.DEBUG_HOOKS) {
       debugLog(
         'unified-reflection',
-        `TaskUpdate recorded: taskId=${toolInput.taskId}, status=${toolInput.status}`
+        `TaskUpdate recorded: taskId=${update.taskId}, status=${update.status}`
       );
     }
   }
 
   const entry = {
-    taskId: toolInput.taskId,
+    taskId: update.taskId,
     trigger: 'task_completion',
     timestamp: new Date().toISOString(),
     priority: 'high',
@@ -370,13 +383,14 @@ function handleTaskCompletion(input) {
  */
 function handleTaskUpdate(input) {
   const toolInput = getToolInput(input);
+  const update = normalizeTaskUpdateFields(toolInput);
 
-  if (toolInput.taskId && toolInput.status) {
-    routerState.recordTaskUpdate(toolInput.taskId, toolInput.status);
+  if (update.taskId && update.status) {
+    routerState.recordTaskUpdate(update.taskId, update.status);
     if (process.env.DEBUG_HOOKS) {
       debugLog(
         'unified-reflection',
-        `TaskUpdate recorded: taskId=${toolInput.taskId}, status=${toolInput.status}`
+        `TaskUpdate recorded: taskId=${update.taskId}, status=${update.status}`
       );
     }
   }

@@ -695,6 +695,27 @@ function updateLoopStateAfterAllow(hookInput) {
   }
 }
 
+function extractTaskIdFromTaskInput(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return null;
+  const rawTaskId = toolInput.task_id ?? toolInput.taskId ?? toolInput.id ?? null;
+  return rawTaskId != null ? String(rawTaskId) : null;
+}
+
+function updateTaskLifecycleStateAfterAllow(hookInput) {
+  try {
+    const toolInput = getToolInput(hookInput);
+    const taskId = extractTaskIdFromTaskInput(toolInput);
+    if (!taskId) return;
+
+    // Ensure the active spawn task is discoverable by post-task hooks.
+    routerState.setCurrentSpawnTaskId(taskId);
+    // Ensure progress visibility even if spawned agents delay/skip TaskUpdate.
+    routerState.recordTaskUpdate(taskId, 'in_progress');
+  } catch (err) {
+    auditLog('pre-task-unified', 'task_lifecycle_update_failed', { error: err.message });
+  }
+}
+
 // =============================================================================
 // COMBINED CHECK
 // =============================================================================
@@ -770,6 +791,7 @@ function runAllChecks(hookInput) {
 
   // All checks passed
   updateLoopStateAfterAllow(hookInput);
+  updateTaskLifecycleStateAfterAllow(hookInput);
   return { pass: true, exitCode: 0 };
 }
 

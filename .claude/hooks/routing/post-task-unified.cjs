@@ -823,6 +823,16 @@ async function main() {
       }
       logSpawnEnd({ taskId, success, errorSnippet, sessionId });
       effectiveTaskId = taskId || effectiveTaskId;
+
+      if (effectiveTaskId) {
+        try {
+          // Ensure task progress is visible even if subagent delays first TaskUpdate call.
+          routerState.recordTaskUpdate(String(effectiveTaskId), 'in_progress');
+        } catch (_trackErr) {
+          // Best-effort tracking only.
+        }
+      }
+
       // Always clear active spawn marker once Task PostToolUse runs.
       // Prevents stale task IDs from leaking into subsequent router checks.
       try {

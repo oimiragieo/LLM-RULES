@@ -681,7 +681,9 @@ function enrichAllowedTools(agentType, currentTools, prompt) {
     : (manifest.constraints?.maxToolsPerAgent ?? MAX_TOOLS_AGENT);
 
   // Extract mandatory tools from manifest (defensive fallback)
-  const mandatoryTools = manifest.validation?.mandatoryTools || ['TaskUpdate', 'Skill'];
+  const requiredCollaborationTools = ['TaskUpdate', 'TaskList'];
+  const manifestMandatory = manifest.validation?.mandatoryTools || ['TaskUpdate', 'Skill'];
+  const mandatoryTools = [...new Set([...manifestMandatory, ...requiredCollaborationTools])];
 
   let resolvedType = (agentType || '').toLowerCase();
   if (resolvedType === 'general-purpose' && prompt) {

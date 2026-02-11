@@ -189,6 +189,14 @@ describe('unified-reflection-handler.cjs', () => {
       assertEqual(hook.detectEventType(input), 'task_update');
     });
 
+    it('should detect task_completion for TaskUpdate with task_id alias', () => {
+      const input = {
+        tool_name: 'TaskUpdate',
+        tool_input: { task_id: '42', status: 'completed' },
+      };
+      assertEqual(hook.detectEventType(input), 'task_completion');
+    });
+
     it('should detect error_recovery for Bash with non-zero exit code', () => {
       const input = {
         tool_name: 'Bash',
@@ -319,6 +327,14 @@ describe('unified-reflection-handler.cjs', () => {
         tool_input: { taskId: '99', status: 'in_progress' },
       };
       // Should not throw
+      hook.handleTaskUpdate(input);
+    });
+
+    it('should not throw when task_id alias is used', () => {
+      const input = {
+        tool_name: 'TaskUpdate',
+        tool_input: { task_id: '100', status: 'in_progress' },
+      };
       hook.handleTaskUpdate(input);
     });
   });

@@ -773,6 +773,7 @@ Comprehensive security audit of 6 critical hooks and validation layer identified
 ### Critical Vulnerabilities (P0 - Fix Immediately)
 
 **VUL-TAM-001: Loop-State TOCTOU Race Condition**
+
 - **File**: `.claude/lib/self-healing/loop-state-manager.cjs` (lines 100-123)
 - **Risk**: Loop-prevention counters can reset, enabling replay attacks
 - **Root Cause**: Lock acquisition doesn't validate ownership after `tryClaimStaleLock()` succeeds
@@ -780,6 +781,7 @@ Comprehensive security audit of 6 critical hooks and validation layer identified
 - **Effort**: 2 hours
 
 **VUL-DOS-001: Whitespace Bomb DoS**
+
 - **File**: `.claude/hooks/routing/spawn-prompt-validator.cjs` (line 752)
 - **Risk**: OOM crash or timeout via 1M-line prompts
 - **Root Cause**: `calculatePromptCompactness()` creates unbounded arrays
@@ -787,6 +789,7 @@ Comprehensive security audit of 6 critical hooks and validation layer identified
 - **Effort**: 1 hour
 
 **VUL-ELEV-001: Router Mode Bypass via Env Override**
+
 - **File**: `.claude/hooks/routing/routing-guard.cjs` (line 226)
 - **Risk**: Elevation of privilege - use blacklisted tools
 - **Root Cause**: `STATE_STALE_THRESHOLD_MS` env var allows overriding security threshold
@@ -796,21 +799,25 @@ Comprehensive security audit of 6 critical hooks and validation layer identified
 ### High Priority Vulnerabilities (P1 - Fix This Week)
 
 **VUL-TAM-002: Unicode Normalization Bypass** (HIGH)
+
 - Homoglyph injection after Unicode normalization
 - File: spawn-prompt-validator.cjs
 - Fix: Re-validate patterns on normalized prompt
 
 **VUL-DOS-002: Regex Backtracking Loop** (HIGH)
+
 - Catastrophic backtracking with unbounded quantifiers
 - File: pre-tool-unified.cjs line 523
 - Fix: Manual parsing instead of complex regex
 
 **VUL-ELEV-002: Creator Intent Guard Bypass** (HIGH)
+
 - Can bypass by mentioning skill name without Skill() invocation
 - File: routing-guard.cjs line 1390
 - Fix: Require explicit Skill() invocation, reject if implementation agent
 
 **ASI01-SPOOF-001: Session ID Environment Override** (HIGH)
+
 - Session ID from env can be spoofed
 - File: loop-state-manager.cjs line 139
 - Fix: Fail closed if session ID missing, add clock skew validation
@@ -843,6 +850,7 @@ After remediation (all fixes): System eligible for Type II certification.
 **Complete plan**: `.claude/context/plans/security-remediation-plan-2026-02-11.md`
 
 **P0 Schedule** (24 hours):
+
 1. TOCTOU race fix + tests (2h)
 2. Whitespace bomb protection (1h)
 3. Hardcode stale threshold (1h)
@@ -850,12 +858,14 @@ After remediation (all fixes): System eligible for Type II certification.
 5. Single commit: `fix(security): P0 critical vulnerabilities`
 
 **P1 Schedule** (1 week):
+
 1. Prompt injection detection (3h)
 2. Session ID sanitization (2h)
 3. Creator intent guard enhancement (3h)
 4. Tool usage audit hook (4h)
 
 **P2 Schedule** (1 month):
+
 1. Memory content validation
 2. Replace regex with manual parsing
 3. Command truncation audit escape
@@ -873,6 +883,7 @@ After remediation (all fixes): System eligible for Type II certification.
 ### Success Criteria
 
 **P0 Complete (24h)**:
+
 - [ ] All 3 CRITICAL fixed
 - [ ] New tests added (100% coverage)
 - [ ] All tests passing
@@ -880,12 +891,14 @@ After remediation (all fixes): System eligible for Type II certification.
 - [ ] Single commit approved
 
 **P1 Complete (1 week)**:
+
 - [ ] All 4 HIGH fixed
 - [ ] Test coverage >90%
 - [ ] Audit logging verified
 - [ ] Security hooks tested under load
 
 **P2 Complete (1 month)**:
+
 - [ ] All 5 MEDIUM fixed
 - [ ] Compliance re-assessment
 - [ ] New security test suite maintained
