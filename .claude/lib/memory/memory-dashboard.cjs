@@ -24,6 +24,7 @@ const path = require('path');
 // BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
+const { summarizeOperationalSLO } = require('./memory-slo-metrics.cjs');
 
 const logger = createLogger('memory-dashboard');
 
@@ -149,6 +150,52 @@ function getDirSizeKB(dirPath, pattern = null) {
   } catch (_e) {
     return 0;
   }
+}
+
+function countStaleTempArtifacts(
+  memoryDir,
+  staleAgeMs = Number(process.env.MEMORY_STALE_TEMP_AGE_MS || 24 * 60 * 60 * 1000)
+) {
+  if (!fs.existsSync(memoryDir)) return 0;
+  const now = Date.now();
+  let count = 0;
+  const stack = [memoryDir];
+
+  while (stack.length > 0) {
+    const currentDir = stack.pop();
+    let entries = [];
+    try {
+      entries = fs.readdirSync(currentDir, { withFileTypes: true });
+    } catch (_e) {
+      continue;
+    }
+
+    for (const entry of entries) {
+      const filePath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(filePath);
+        continue;
+      }
+
+      const isTmpArtifact =
+        entry.name.endsWith('.tmp') ||
+        entry.name.includes('.tmp.') ||
+        entry.name.startsWith('.tmp-') ||
+        entry.name.endsWith('.lock');
+      if (!isTmpArtifact) continue;
+
+      try {
+        const stats = fs.statSync(filePath);
+        if (now - stats.mtimeMs > staleAgeMs) {
+          count += 1;
+        }
+      } catch (_e) {
+        // ignore
+      }
+    }
+  }
+
+  return count;
 }
 
 // ============================================================================
@@ -302,6 +349,8 @@ function generateRecommendations(metrics) {
  */
 function collectMetrics(projectRoot = PROJECT_ROOT) {
   const memoryDir = getMemoryDir(projectRoot);
+  const staleTempArtifacts = countStaleTempArtifacts(memoryDir);
+  const slo = summarizeOperationalSLO(projectRoot);
 
   // File metrics
   const learningsSizeKB = getFileSizeKB(path.join(memoryDir, 'learnings.md'));
@@ -383,6 +432,27 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
     legacySessionsCount: sessionsCount,
   });
 
+  if (!slo.pass.writeLatency) {
+    recommendations.push(
+      `SLO breach: write latency p95 is ${slo.p95.writeLatencyMs}ms (target <= ${slo.targets.writeP95Ms}ms)`
+    );
+  }
+  if (!slo.pass.lockWait) {
+    recommendations.push(
+      `SLO breach: lock wait p95 is ${slo.p95.lockWaitMs}ms (target <= ${slo.targets.lockWaitP95Ms}ms)`
+    );
+  }
+  if (!slo.pass.parseFailures) {
+    recommendations.push(
+      `SLO breach: parse failure rate is ${(slo.parseFailureRate * 100).toFixed(2)}% (target <= ${(slo.targets.parseFailureRate * 100).toFixed(2)}%)`
+    );
+  }
+  if (staleTempArtifacts > 0) {
+    recommendations.push(
+      `Operational hygiene: found ${staleTempArtifacts} stale temp/lock artifact(s) under memory/`
+    );
+  }
+
   return {
     timestamp: new Date().toISOString(),
     summary: {
@@ -402,6 +472,10 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
       lastWeekly,
       fileCount: coldFileCount,
       sizeKB: coldSizeKB,
+    },
+    slo: {
+      ...slo,
+      staleTempArtifacts,
     },
     files: {
       'learnings.md': {
@@ -645,6 +719,23 @@ function formatDashboard(dashboard) {
     }
   }
 
+  if (dashboard.slo) {
+    lines.push('OPERATIONAL SLOS');
+    lines.push('-'.repeat(40));
+    lines.push(
+      `  Write latency p95: ${dashboard.slo.p95.writeLatencyMs} ms (target <= ${dashboard.slo.targets.writeP95Ms} ms)`
+    );
+    lines.push(
+      `  Lock wait p95: ${dashboard.slo.p95.lockWaitMs} ms (target <= ${dashboard.slo.targets.lockWaitP95Ms} ms)`
+    );
+    lines.push(
+      `  Parse failure rate: ${(dashboard.slo.parseFailureRate * 100).toFixed(2)}% (target <= ${(dashboard.slo.targets.parseFailureRate * 100).toFixed(2)}%)`
+    );
+    lines.push(`  Stale temp artifacts: ${dashboard.slo.staleTempArtifacts}`);
+    lines.push(`  SLO status: ${dashboard.slo.allPass ? 'PASS' : 'FAIL'}`);
+    lines.push('');
+  }
+
   // Tiers
   lines.push('MEMORY TIERS');
   lines.push('-'.repeat(40));
@@ -778,4 +869,5 @@ module.exports = {
   // Helpers (for testing)
   getMemoryDir,
   getMetricsDir,
+  countStaleTempArtifacts,
 };

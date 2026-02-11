@@ -50,16 +50,12 @@ function getTmpDir() {
   return path.join(claudeDir, 'context', 'tmp');
 }
 
-function cleanupTmpFiles() {
-  const tmpDir = getTmpDir();
-
+function cleanupFilesInDir(tmpDir, maxAgeMs) {
   if (!fs.existsSync(tmpDir)) {
     return { deleted: 0, errors: 0, bytes: 0 };
   }
 
   const now = Date.now();
-  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-
   let deleted = 0;
   let errors = 0;
   let bytes = 0;
@@ -72,14 +68,10 @@ function cleanupTmpFiles() {
 
       try {
         const stats = fs.statSync(filePath);
-
-        if (stats.isDirectory()) {
-          continue;
-        }
+        if (stats.isDirectory()) continue;
 
         const age = now - stats.mtimeMs;
-
-        if (age > maxAge) {
+        if (age > maxAgeMs) {
           fs.unlinkSync(filePath);
           deleted++;
           bytes += stats.size;
@@ -90,7 +82,64 @@ function cleanupTmpFiles() {
       }
     }
   } catch (err) {
-    console.error(`[pre-tool-unified:cleanup] Error reading tmp directory: ${err.message}`);
+    console.error(`[pre-tool-unified:cleanup] Error reading ${tmpDir}: ${err.message}`);
+    errors++;
+  }
+
+  return { deleted, errors, bytes };
+}
+
+function cleanupTmpFiles() {
+  const tmpDir = getTmpDir();
+  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+  return cleanupFilesInDir(tmpDir, maxAge);
+}
+
+function cleanupMemoryTempFiles() {
+  const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
+  if (!fs.existsSync(memoryDir)) {
+    return { deleted: 0, errors: 0, bytes: 0 };
+  }
+
+  const now = Date.now();
+  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+
+  let deleted = 0;
+  let errors = 0;
+  let bytes = 0;
+
+  try {
+    const stack = [memoryDir];
+    while (stack.length > 0) {
+      const currentDir = stack.pop();
+      const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const filePath = path.join(currentDir, entry.name);
+        if (entry.isDirectory()) {
+          stack.push(filePath);
+          continue;
+        }
+
+        const stats = fs.statSync(filePath);
+        const isTmpArtifact =
+          entry.name.endsWith('.tmp') ||
+          entry.name.includes('.tmp.') ||
+          entry.name.startsWith('.tmp-');
+        if (!isTmpArtifact) {
+          continue;
+        }
+
+        const age = now - stats.mtimeMs;
+        if (age > maxAge) {
+          fs.unlinkSync(filePath);
+          deleted++;
+          bytes += stats.size;
+        }
+      }
+    }
+  } catch (err) {
+    console.error(`[pre-tool-unified:cleanup] Error reading memory dir: ${err.message}`);
     errors++;
   }
 
@@ -113,11 +162,30 @@ function checkSessionCleanup() {
 
     cleanupRan = true;
 
-    const result = cleanupTmpFiles();
+    const tmpResult = cleanupTmpFiles();
+    const memoryTmpResult = cleanupMemoryTempFiles();
+    const result = {
+      deleted: tmpResult.deleted + memoryTmpResult.deleted,
+      errors: tmpResult.errors + memoryTmpResult.errors,
+      bytes: tmpResult.bytes + memoryTmpResult.bytes,
+      tmp: tmpResult,
+      memoryTmp: memoryTmpResult,
+    };
+
+    if (result.deleted > 0) {
+      try {
+        const { recordMemoryOperation } = require('../../lib/memory/memory-slo-metrics.cjs');
+        recordMemoryOperation({
+          staleTempFilesRemoved: result.deleted,
+        });
+      } catch (_e) {
+        // Best-effort metrics only.
+      }
+    }
 
     if (result.deleted > 0) {
       console.error(
-        `[pre-tool-unified:cleanup] Cleaned ${result.deleted} file(s) (${formatBytes(result.bytes)}) from tmp/`
+        `[pre-tool-unified:cleanup] Cleaned ${result.deleted} stale temp file(s) (${formatBytes(result.bytes)}) from tmp/ + memory/`
       );
     }
 
@@ -677,6 +745,7 @@ if (require.main === module) {
 // Exports for testing
 module.exports = {
   checkSessionCleanup,
+  cleanupMemoryTempFiles,
   checkExecutionLimit,
   checkToolScope,
   checkReadSafety,

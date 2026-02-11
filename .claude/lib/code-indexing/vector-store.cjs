@@ -10,6 +10,13 @@
 const path = require('path');
 const fs = require('fs');
 
+function sleepSync(ms) {
+  const start = Date.now();
+  while (Date.now() - start < ms) {
+    // Busy wait in sync write path.
+  }
+}
+
 class VectorStore {
   constructor(options = {}) {
     const projectRoot = options.projectRoot || process.cwd();
@@ -170,12 +177,45 @@ class VectorStore {
 
       const bm25Path = path.join(this.persistDirectory, 'bm25-index.json');
       const tempPath = bm25Path + '.tmp';
+      const payload = JSON.stringify(this.bm25Index.toJSON());
 
       // Write to temp file first, then atomic rename
       try {
-        fs.writeFileSync(tempPath, JSON.stringify(this.bm25Index.toJSON()), 'utf-8');
-        // Atomic rename (overwrites existing file)
-        fs.renameSync(tempPath, bm25Path);
+        fs.writeFileSync(tempPath, payload, 'utf-8');
+
+        // Windows can throw EPERM/EBUSY when target file is briefly locked.
+        const maxAttempts = process.platform === 'win32' ? 5 : 1;
+        let lastErr = null;
+
+        for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+          try {
+            if (process.platform === 'win32' && fs.existsSync(bm25Path)) {
+              try {
+                fs.unlinkSync(bm25Path);
+              } catch (unlinkErr) {
+                if (unlinkErr.code !== 'ENOENT') {
+                  throw unlinkErr;
+                }
+              }
+            }
+
+            fs.renameSync(tempPath, bm25Path);
+            lastErr = null;
+            break;
+          } catch (err) {
+            lastErr = err;
+            const retryable =
+              err && (err.code === 'EPERM' || err.code === 'EBUSY' || err.code === 'EACCES');
+            if (!retryable || attempt === maxAttempts) {
+              break;
+            }
+            sleepSync(attempt * 25);
+          }
+        }
+
+        if (lastErr) {
+          throw lastErr;
+        }
       } catch (err) {
         // Clean up temp file if it exists
         try {

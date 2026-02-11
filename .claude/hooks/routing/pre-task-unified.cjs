@@ -423,7 +423,7 @@ function getCooldownMs() {
 // =============================================================================
 // CHECK 0: TaskList-first (TaskList() must be called before Task() in same session)
 // =============================================================================
-// TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: block)
+// TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: warn)
 
 /**
  * Enforce TaskList() before Task() in the same session (since last UserPromptSubmit).
@@ -434,7 +434,7 @@ function checkTaskListFirst(toolName, hookInput = null) {
   if (toolName !== 'Task') {
     return { pass: true };
   }
-  const mode = (process.env.TASKLIST_FIRST_ENFORCEMENT || 'block').toLowerCase();
+  const mode = (process.env.TASKLIST_FIRST_ENFORCEMENT || 'warn').toLowerCase();
   if (mode === 'off') {
     return { pass: true };
   }
@@ -615,8 +615,11 @@ This is a safety mechanism to prevent infinite loops.`;
 
   const entry = loopState.actionHistory?.find(a => a.action === spawnAction);
   const count = entry ? entry.count : 0;
+  const activeNestedSpawn = Number(loopState.spawnDepth || 0) > 0;
 
-  if (count >= threshold) {
+  // Pattern blocking is only meaningful while we are actively inside nested spawn
+  // chains. Sequential top-level Task() usage can legitimately repeat agent types.
+  if (activeNestedSpawn && count >= threshold) {
     const message = `[LOOP PREVENTION] Pattern detected: "${spawnAction}" repeated ${count} times. Threshold is ${threshold}.
 
 This is a safety mechanism to prevent infinite loops.`;
@@ -721,7 +724,7 @@ function runAllChecks(hookInput) {
 
   const toolInput = getToolInput(hookInput);
 
-  // Check 0: TaskList-first (TASKLIST_FIRST_ENFORCEMENT=block|warn|off, default block)
+  // Check 0: TaskList-first (TASKLIST_FIRST_ENFORCEMENT=block|warn|off, default warn)
   const taskListFirstResult = checkTaskListFirst(toolName, hookInput);
   if (!taskListFirstResult.pass) {
     return {

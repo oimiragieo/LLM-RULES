@@ -11,10 +11,15 @@ function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
-test('recordMemory writes pattern entry', () => {
+test('recordMemory writes pattern entry', t => {
   const baseTmp = path.join(process.cwd(), '.tmp');
   fs.mkdirSync(baseTmp, { recursive: true });
   const tmpRoot = fs.mkdtempSync(path.join(baseTmp, 'memory-record-'));
+  t.after(() => {
+    if (fs.existsSync(tmpRoot)) {
+      fs.rmSync(tmpRoot, { recursive: true, force: true });
+    }
+  });
   const result = recordMemory({
     type: 'pattern',
     text: 'Use async/await for API calls',
@@ -29,10 +34,15 @@ test('recordMemory writes pattern entry', () => {
   assert.equal(data[0].text, 'Use async/await for API calls');
 });
 
-test('recordMemory writes gotcha entry', () => {
+test('recordMemory writes gotcha entry', t => {
   const baseTmp = path.join(process.cwd(), '.tmp');
   fs.mkdirSync(baseTmp, { recursive: true });
   const tmpRoot = fs.mkdtempSync(path.join(baseTmp, 'memory-record-'));
+  t.after(() => {
+    if (fs.existsSync(tmpRoot)) {
+      fs.rmSync(tmpRoot, { recursive: true, force: true });
+    }
+  });
   const result = recordMemory({
     type: 'gotcha',
     text: 'Avoid sync fs in hooks',

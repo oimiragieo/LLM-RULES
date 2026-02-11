@@ -30,10 +30,43 @@ const ACCESS_TRACKING_MIN_INTERVAL_MS = Number(
 );
 const ACCESS_TRACKING_ENABLED =
   String(process.env.MEMORY_ACCESS_TRACKING || 'on').toLowerCase() !== 'off';
+const DEFAULT_MAX_ITEMS = {
+  gotchas: Number.parseInt(process.env.MEMORY_MAX_ITEMS_GOTCHAS || '20', 10),
+  patterns: Number.parseInt(process.env.MEMORY_MAX_ITEMS_PATTERNS || '20', 10),
+  decisions: Number.parseInt(process.env.MEMORY_MAX_ITEMS_DECISIONS || '10', 10),
+  discoveries: Number.parseInt(process.env.MEMORY_MAX_ITEMS_DISCOVERIES || '30', 10),
+  sessions: Number.parseInt(process.env.MEMORY_MAX_ITEMS_SESSIONS || '5', 10),
+};
+const DEFAULT_MAX_CHARS = {
+  gotchas: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_GOTCHAS || '2000', 10),
+  patterns: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_PATTERNS || '2000', 10),
+  decisions: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_DECISIONS || '2000', 10),
+  discoveries: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_DISCOVERIES || '3000', 10),
+  sessions: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_SESSIONS || '5000', 10),
+  legacy: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_LEGACY || '3000', 10),
+};
 
 function toSafeInt(val, fallback = 0) {
   const n = Number.parseInt(String(val), 10);
   return Number.isFinite(n) ? n : fallback;
+}
+
+function toSafePositiveInt(val, fallback) {
+  const n = Number.parseInt(String(val), 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+function isPathInside(baseDir, targetPath) {
+  const base = path.resolve(baseDir);
+  const target = path.resolve(targetPath);
+
+  if (process.platform === 'win32') {
+    const baseLower = base.toLowerCase();
+    const targetLower = target.toLowerCase();
+    return targetLower === baseLower || targetLower.startsWith(`${baseLower}${path.sep}`);
+  }
+
+  return target === base || target.startsWith(`${base}${path.sep}`);
 }
 
 function computeQualityScore(accessCount) {
@@ -318,8 +351,25 @@ class ContextualMemory {
    * @returns {Object} Memory context object
    */
   loadContextSync(options = {}) {
-    const maxItems = options.maxItems || {};
-    const maxChars = options.maxChars || {};
+    const rawMaxItems =
+      options.maxItems && typeof options.maxItems === 'object' ? options.maxItems : {};
+    const rawMaxChars =
+      options.maxChars && typeof options.maxChars === 'object' ? options.maxChars : {};
+    const maxItems = {
+      gotchas: toSafePositiveInt(rawMaxItems.gotchas, DEFAULT_MAX_ITEMS.gotchas),
+      patterns: toSafePositiveInt(rawMaxItems.patterns, DEFAULT_MAX_ITEMS.patterns),
+      decisions: toSafePositiveInt(rawMaxItems.decisions, DEFAULT_MAX_ITEMS.decisions),
+      discoveries: toSafePositiveInt(rawMaxItems.discoveries, DEFAULT_MAX_ITEMS.discoveries),
+      sessions: toSafePositiveInt(rawMaxItems.sessions, DEFAULT_MAX_ITEMS.sessions),
+    };
+    const maxChars = {
+      gotchas: toSafePositiveInt(rawMaxChars.gotchas, DEFAULT_MAX_CHARS.gotchas),
+      patterns: toSafePositiveInt(rawMaxChars.patterns, DEFAULT_MAX_CHARS.patterns),
+      decisions: toSafePositiveInt(rawMaxChars.decisions, DEFAULT_MAX_CHARS.decisions),
+      discoveries: toSafePositiveInt(rawMaxChars.discoveries, DEFAULT_MAX_CHARS.discoveries),
+      sessions: toSafePositiveInt(rawMaxChars.sessions, DEFAULT_MAX_CHARS.sessions),
+      legacy: toSafePositiveInt(rawMaxChars.legacy, DEFAULT_MAX_CHARS.legacy),
+    };
     const result = {
       gotchas: [],
       patterns: [],
@@ -703,7 +753,7 @@ class ContextualMemory {
         const lines = stdout.split('\n').filter(l => l.trim());
         for (const line of lines.slice(0, limit * 3)) {
           // Format: "path/to/file:123:  context line"
-          const match = line.match(/^([^:]+):(\d+):(.*)$/);
+          const match = line.match(/^(.+?):(\d+):(.*)$/);
           if (match) {
             const [, filePath, , content] = match;
             const rel = path.relative(memoryDir, filePath).replace(/\\/g, '/');
@@ -876,7 +926,10 @@ class ContextualMemory {
    * const content = await memory.readFile('learnings.md');
    */
   async readFile(relativePath) {
-    const filePath = path.join(this.config.memoryDir, relativePath);
+    const filePath = path.resolve(this.config.memoryDir, relativePath);
+    if (!isPathInside(this.config.memoryDir, filePath)) {
+      throw new Error('Invalid memory path: outside memory directory');
+    }
     return await fsPromises.readFile(filePath, 'utf8');
   }
 

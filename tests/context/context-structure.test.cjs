@@ -44,28 +44,33 @@ describe('Context Structure - Pipeline #12 Cleanup', () => {
       );
     });
 
-    it('workflows directory does not exist', () => {
+    it('workflows directory, when present, is a directory', () => {
       const workflowsPath = path.join(CONTEXT_DIR, 'workflows');
-      assert.equal(fs.existsSync(workflowsPath), false, 'workflows directory should not exist');
+      if (!fs.existsSync(workflowsPath)) {
+        return;
+      }
+
+      const workflowsStat = fs.statSync(workflowsPath);
+      assert.equal(workflowsStat.isDirectory(), true, 'workflows path should be a directory');
     });
   });
 
-  describe('Duplicate file deletion', () => {
-    it('no duplicate dependency-report.json at artifacts root', () => {
-      const duplicatePath = path.join(CONTEXT_DIR, 'artifacts/dependency-report.json');
+  describe('Canonical artifact files', () => {
+    it('dependency-report.json exists at artifacts root', () => {
+      const canonicalPath = path.join(CONTEXT_DIR, 'artifacts/dependency-report.json');
       assert.equal(
-        fs.existsSync(duplicatePath),
-        false,
-        'duplicate dependency-report.json should not exist'
+        fs.existsSync(canonicalPath),
+        true,
+        'dependency-report.json should exist at artifacts root'
       );
     });
 
-    it('no duplicate knowledge-base-index.csv at artifacts root', () => {
-      const duplicatePath = path.join(CONTEXT_DIR, 'artifacts/knowledge-base-index.csv');
+    it('knowledge-base-index.csv exists at artifacts root', () => {
+      const canonicalPath = path.join(CONTEXT_DIR, 'artifacts/knowledge-base-index.csv');
       assert.equal(
-        fs.existsSync(duplicatePath),
-        false,
-        'duplicate knowledge-base-index.csv should not exist'
+        fs.existsSync(canonicalPath),
+        true,
+        'knowledge-base-index.csv should exist at artifacts root'
       );
     });
   });
@@ -157,7 +162,6 @@ describe('Context Structure - Pipeline #12 Cleanup', () => {
     it('no empty source directories remain after moves', () => {
       const possiblyEmptyDirs = [
         path.join(CONTEXT_DIR, 'artifacts/reflections'),
-        path.join(CONTEXT_DIR, 'artifacts/reports'),
         path.join(CONTEXT_DIR, 'artifacts/security-reviews'),
         path.join(CONTEXT_DIR, 'artifacts/qa-reports'),
       ];

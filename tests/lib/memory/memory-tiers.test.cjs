@@ -294,6 +294,107 @@ if (require.main === module) {
         cleanupTestDir();
       }
     });
+
+    it('should summarize when MTM is exactly full before adding a new session', function () {
+      setupTestDir();
+      try {
+        const { consolidateSession, getMTMSessions } = freshRequire(
+          '../../../.claude/lib/memory/memory-tiers.cjs'
+        );
+
+        const mtmDir = path.join(MEMORY_DIR, 'mtm');
+        for (let i = 1; i <= 10; i++) {
+          const sessionData = {
+            session_id: `full-session-${String(i).padStart(3, '0')}`,
+            timestamp: new Date(Date.now() - (10 - i) * 3600000).toISOString(),
+            summary: `Full session ${i} summary`,
+          };
+          fs.writeFileSync(
+            path.join(mtmDir, `session_full_${String(i).padStart(3, '0')}.json`),
+            JSON.stringify(sessionData, null, 2)
+          );
+        }
+
+        const stmPath = path.join(MEMORY_DIR, 'stm', 'session_current.json');
+        fs.writeFileSync(
+          stmPath,
+          JSON.stringify(
+            {
+              session_id: 'full-session-011',
+              timestamp: new Date().toISOString(),
+              summary: 'Incoming session when MTM is exactly full',
+            },
+            null,
+            2
+          )
+        );
+
+        const result = consolidateSession('full-session-011', TEST_PROJECT_ROOT);
+        assert(result.success, 'Consolidation should succeed when MTM is exactly full');
+
+        const mtmSessions = getMTMSessions(TEST_PROJECT_ROOT);
+        assert(
+          mtmSessions.length <= 10,
+          `MTM should stay within cap after exact-full consolidation, got ${mtmSessions.length}`
+        );
+      } finally {
+        cleanupTestDir();
+      }
+    });
+
+    it('should emit runtime memory-tier observability events during consolidation', function () {
+      setupTestDir();
+      const previous = process.env.MEMORY_TIER_EVENT_LOG;
+      try {
+        process.env.MEMORY_TIER_EVENT_LOG = 'on';
+
+        const { consolidateSession } = freshRequire('../../../.claude/lib/memory/memory-tiers.cjs');
+        const stmPath = path.join(MEMORY_DIR, 'stm', 'session_current.json');
+        fs.writeFileSync(
+          stmPath,
+          JSON.stringify(
+            {
+              session_id: 'obs-session-001',
+              timestamp: new Date().toISOString(),
+              summary: 'Observability consolidation test',
+            },
+            null,
+            2
+          )
+        );
+
+        const result = consolidateSession('obs-session-001', TEST_PROJECT_ROOT);
+        assert(result.success, 'Consolidation should succeed');
+
+        const eventsPath = path.join(
+          TEST_PROJECT_ROOT,
+          '.claude',
+          'context',
+          'runtime',
+          'memory-tier-events.jsonl'
+        );
+        assert(fs.existsSync(eventsPath), 'Observability event file should be created');
+
+        const lines = fs
+          .readFileSync(eventsPath, 'utf8')
+          .split(/\r?\n/)
+          .filter(Boolean)
+          .map(line => JSON.parse(line));
+
+        assert(lines.length > 0, 'Event file should contain at least one event');
+        assert(
+          lines.some(event => event.event === 'consolidated_to_mtm'),
+          'Should include consolidated_to_mtm event'
+        );
+      } finally {
+        if (previous === undefined) {
+          delete process.env.MEMORY_TIER_EVENT_LOG;
+        } else {
+          process.env.MEMORY_TIER_EVENT_LOG = previous;
+        }
+        cleanupTestDir();
+      }
+    });
   });
 
   // Test Suite 3: LTM Promotion

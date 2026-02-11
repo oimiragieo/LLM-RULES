@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "windowStartedAt": "2026-02-11T04:55:54.143Z",
+  "updatedAt": "2026-02-11T04:55:54.152Z",
+  "counters": {
+    "writesTotal": 0,
+    "writesFailed": 0,
+    "readsTotal": 0,
+    "parseAttempts": 1,
+    "parseFailures": 1,
+    "lockAcquires": 0,
+    "staleTempCleanups": 0,
+    "staleTempFilesRemoved": 0
+  },
+  "histograms": {
+    "writeLatencyMs": {
+      "bucketsMs": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "readLatencyMs": {
+      "bucketsMs": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "lockWaitMs": {
+      "bucketsMs": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "latest": {
+    "writeLatencyMs": null,
+    "readLatencyMs": null,
+    "lockWaitMs": null,
+    "lastError": "patterns_parse_failed"
+  }
+}

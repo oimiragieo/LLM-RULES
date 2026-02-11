@@ -30,15 +30,55 @@ const fsp = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
 const { spawnSync } = require('child_process');
-const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.cjs');
+const {
+  atomicWriteJSONSync,
+  atomicWriteSync,
+  atomicWriteAsync: atomicWriteAsyncWithLock,
+} = require('../utils/atomic-write.cjs');
 const { createLogger } = require('../utils/logger.cjs');
+const eventBus = require('../events/event-bus.cjs');
+const { EventTypes } = require('../events/event-types.cjs');
 const { DEFAULT_AREA, isValidArea } = require('./memory-areas.cjs');
 const {
   syncJsonMemory,
   ensureEntityDbInitialized,
 } = require('../../hooks/memory/sync-memory-index.cjs');
+const { recordMemoryOperation } = require('./memory-slo-metrics.cjs');
 
 const logger = createLogger('memory-manager');
+const asyncWriteQueue = new Map();
+
+function emitMemorySavedEvent({ key, value, source }) {
+  try {
+    const maybePromise = eventBus.emit(EventTypes.MEMORY_SAVED, {
+      type: EventTypes.MEMORY_SAVED,
+      key,
+      value,
+      source,
+    });
+    if (maybePromise && typeof maybePromise.catch === 'function') {
+      maybePromise.catch(() => {});
+    }
+  } catch (_e) {
+    // Best-effort observability; do not block memory writes.
+  }
+}
+
+function emitMemoryQueriedEvent({ query, results, latency }) {
+  try {
+    const maybePromise = eventBus.emit(EventTypes.MEMORY_QUERIED, {
+      type: EventTypes.MEMORY_QUERIED,
+      query,
+      results,
+      latency,
+    });
+    if (maybePromise && typeof maybePromise.catch === 'function') {
+      maybePromise.catch(() => {});
+    }
+  } catch (_e) {
+    // Best-effort observability; do not block reads.
+  }
+}
 
 /**
  * @typedef {Object} MemoryStats
@@ -137,6 +177,109 @@ function ensureDir(dirPath) {
   }
 }
 
+function inferProjectRootFromMemoryFile(filePath) {
+  const marker = `${path.sep}.claude${path.sep}context${path.sep}memory${path.sep}`;
+  const idx = String(filePath || '').indexOf(marker);
+  if (idx > 0) {
+    return filePath.slice(0, idx);
+  }
+  return PROJECT_ROOT;
+}
+
+function sleepSync(ms) {
+  if (typeof SharedArrayBuffer !== 'undefined' && typeof Atomics !== 'undefined') {
+    try {
+      const sharedBuffer = new SharedArrayBuffer(4);
+      const int32 = new Int32Array(sharedBuffer);
+      Atomics.wait(int32, 0, 0, ms);
+      return;
+    } catch (_e) {
+      // Fall back to busy-wait for environments without Atomics.wait support.
+    }
+  }
+
+  const start = Date.now();
+  while (Date.now() - start < ms) {
+    // Busy wait fallback.
+  }
+}
+
+function withFileLockSync(filePath, callback) {
+  const lockPath = `${filePath}.lock`;
+  const waitMs = Number(process.env.MEMORY_FILE_LOCK_WAIT_MS || 20);
+  const timeoutMs = Number(process.env.MEMORY_FILE_LOCK_TIMEOUT_MS || 5000);
+  const staleMs = Number(process.env.MEMORY_FILE_LOCK_STALE_MS || timeoutMs * 2);
+  const deadline = Date.now() + timeoutMs;
+  const waitStart = Date.now();
+  let acquired = false;
+
+  while (!acquired) {
+    try {
+      fs.mkdirSync(lockPath);
+      acquired = true;
+      break;
+    } catch (err) {
+      const code = err && err.code ? err.code : '';
+      if (code !== 'EEXIST' && code !== 'EPERM' && code !== 'EBUSY') {
+        throw err;
+      }
+
+      if (code === 'EEXIST') {
+        try {
+          const stats = fs.statSync(lockPath);
+          if (Date.now() - stats.mtimeMs > staleMs) {
+            fs.rmSync(lockPath, { recursive: true, force: true });
+            continue;
+          }
+        } catch (_e) {
+          // Lock may have been released between exists and stat; retry.
+        }
+      }
+
+      if (Date.now() >= deadline) {
+        try {
+          recordMemoryOperation(
+            {
+              kind: 'write',
+              ok: false,
+              error: `lock_timeout:${path.basename(filePath)}`,
+            },
+            inferProjectRootFromMemoryFile(filePath)
+          );
+        } catch (_e) {
+          // Best-effort metrics only.
+        }
+        throw new Error(`Timed out acquiring memory file lock: ${path.basename(filePath)}`);
+      }
+
+      sleepSync(waitMs);
+    }
+  }
+
+  try {
+    recordMemoryOperation(
+      {
+        lockWaitMs: Date.now() - waitStart,
+      },
+      inferProjectRootFromMemoryFile(filePath)
+    );
+  } catch (_e) {
+    // Best-effort metrics only.
+  }
+
+  try {
+    return callback();
+  } finally {
+    if (acquired) {
+      try {
+        fs.rmSync(lockPath, { recursive: true, force: true });
+      } catch (_e) {
+        // Best-effort; stale lock cleanup handles leftovers.
+      }
+    }
+  }
+}
+
 /**
  * Create a stable ID for memory entries when one is missing.
  *
@@ -196,6 +339,10 @@ function maybeSyncMemoryJson(filePath, projectRoot = PROJECT_ROOT) {
       }
     }
   } catch (err) {
+    if (err && err.code === 'ENOENT') {
+      // Transient concurrent read/write race; skip this sync cycle without warning noise.
+      return;
+    }
     logger.warn('Memory sync failed', { file: path.basename(filePath), error: err.message });
   }
 }
@@ -311,8 +458,24 @@ function loadMemoryArray(filePath) {
   if (!fs.existsSync(filePath)) return [];
   try {
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    recordMemoryOperation(
+      {
+        parseAttempt: true,
+        parseFailure: false,
+      },
+      inferProjectRootFromMemoryFile(filePath)
+    );
     return Array.isArray(data) ? data : [];
   } catch (err) {
+    recordMemoryOperation(
+      {
+        parseAttempt: true,
+        parseFailure: true,
+        ok: false,
+        error: err?.message || String(err),
+      },
+      inferProjectRootFromMemoryFile(filePath)
+    );
     logger.warn('memory_json_parse_failed', {
       file: filePath,
       error: err?.message || String(err),
@@ -687,6 +850,7 @@ function pruneCodebaseMap(projectRoot = PROJECT_ROOT) {
  * recordGotcha({ text: 'Never use sync fs in hooks', category: 'performance' });
  */
 function recordGotcha(gotcha, projectRoot = PROJECT_ROOT) {
+  const started = Date.now();
   // CRITICAL-001-MEMORY FIX: Validate projectRoot
   validateProjectRoot(projectRoot);
   const memoryDir = getMemoryDir(projectRoot);
@@ -694,37 +858,72 @@ function recordGotcha(gotcha, projectRoot = PROJECT_ROOT) {
 
   const gotchasFile = path.join(memoryDir, 'gotchas.json');
 
-  let gotchas = [];
-  if (fs.existsSync(gotchasFile)) {
-    try {
-      gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
-    } catch (_e) {
-      gotchas = [];
-    }
+  try {
+    const wrote = withFileLockSync(gotchasFile, () => {
+      let gotchas = [];
+      if (fs.existsSync(gotchasFile)) {
+        try {
+          gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
+          recordMemoryOperation({ parseAttempt: true }, projectRoot);
+        } catch (_e) {
+          recordMemoryOperation(
+            { parseAttempt: true, parseFailure: true, ok: false, error: 'gotchas_parse_failed' },
+            projectRoot
+          );
+          gotchas = [];
+        }
+      }
+
+      // Check for duplicates (simple text match)
+      const isDuplicate = gotchas.some(
+        g =>
+          g.text.toLowerCase() === gotcha.text?.toLowerCase() ||
+          g.text.toLowerCase() === gotcha.toLowerCase?.()
+      );
+
+      if (!isDuplicate) {
+        const now = new Date().toISOString();
+        const area =
+          typeof gotcha === 'object' && gotcha ? normalizeArea(gotcha.area) : DEFAULT_AREA;
+        const entry =
+          typeof gotcha === 'string'
+            ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area }
+            : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area };
+        entry.id = buildEntryId(entry);
+
+        gotchas.push(entry);
+        atomicWriteJSONSync(gotchasFile, gotchas);
+        maybeSyncMemoryJson(gotchasFile, projectRoot);
+        emitMemorySavedEvent({
+          key: `gotchas:${entry.id}`,
+          value: { id: entry.id, area: entry.area, timestamp: entry.timestamp },
+          source: 'memory-manager.recordGotcha',
+        });
+      }
+
+      return !isDuplicate;
+    });
+    recordMemoryOperation(
+      {
+        kind: 'write',
+        ok: true,
+        writeLatencyMs: Date.now() - started,
+      },
+      projectRoot
+    );
+    return wrote;
+  } catch (err) {
+    recordMemoryOperation(
+      {
+        kind: 'write',
+        ok: false,
+        writeLatencyMs: Date.now() - started,
+        error: err?.message || String(err),
+      },
+      projectRoot
+    );
+    throw err;
   }
-
-  // Check for duplicates (simple text match)
-  const isDuplicate = gotchas.some(
-    g =>
-      g.text.toLowerCase() === gotcha.text?.toLowerCase() ||
-      g.text.toLowerCase() === gotcha.toLowerCase?.()
-  );
-
-  if (!isDuplicate) {
-    const now = new Date().toISOString();
-    const area = typeof gotcha === 'object' && gotcha ? normalizeArea(gotcha.area) : DEFAULT_AREA;
-    const entry =
-      typeof gotcha === 'string'
-        ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area }
-        : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area };
-    entry.id = buildEntryId(entry);
-
-    gotchas.push(entry);
-    atomicWriteJSONSync(gotchasFile, gotchas);
-    maybeSyncMemoryJson(gotchasFile, projectRoot);
-  }
-
-  return !isDuplicate;
 }
 
 /**
@@ -745,6 +944,7 @@ function recordGotcha(gotcha, projectRoot = PROJECT_ROOT) {
  * recordPattern({ text: 'Validate input at boundary', category: 'security' });
  */
 function recordPattern(pattern, projectRoot = PROJECT_ROOT) {
+  const started = Date.now();
   // CRITICAL-001-MEMORY FIX: Validate projectRoot
   validateProjectRoot(projectRoot);
   const memoryDir = getMemoryDir(projectRoot);
@@ -752,38 +952,72 @@ function recordPattern(pattern, projectRoot = PROJECT_ROOT) {
 
   const patternsFile = path.join(memoryDir, 'patterns.json');
 
-  let patterns = [];
-  if (fs.existsSync(patternsFile)) {
-    try {
-      patterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
-    } catch (_e) {
-      patterns = [];
-    }
+  try {
+    const wrote = withFileLockSync(patternsFile, () => {
+      let patterns = [];
+      if (fs.existsSync(patternsFile)) {
+        try {
+          patterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
+          recordMemoryOperation({ parseAttempt: true }, projectRoot);
+        } catch (_e) {
+          recordMemoryOperation(
+            { parseAttempt: true, parseFailure: true, ok: false, error: 'patterns_parse_failed' },
+            projectRoot
+          );
+          patterns = [];
+        }
+      }
+
+      // Check for duplicates
+      const isDuplicate = patterns.some(
+        p =>
+          p.text.toLowerCase() === pattern.text?.toLowerCase() ||
+          p.text.toLowerCase() === pattern.toLowerCase?.()
+      );
+
+      if (!isDuplicate) {
+        const now = new Date().toISOString();
+        const area =
+          typeof pattern === 'object' && pattern ? normalizeArea(pattern.area) : DEFAULT_AREA;
+        const entry =
+          typeof pattern === 'string'
+            ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null, area }
+            : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null, area };
+        entry.id = buildEntryId(entry);
+
+        patterns.push(entry);
+        atomicWriteJSONSync(patternsFile, patterns);
+        maybeSyncMemoryJson(patternsFile, projectRoot);
+        emitMemorySavedEvent({
+          key: `patterns:${entry.id}`,
+          value: { id: entry.id, area: entry.area, timestamp: entry.timestamp },
+          source: 'memory-manager.recordPattern',
+        });
+      }
+
+      return !isDuplicate;
+    });
+    recordMemoryOperation(
+      {
+        kind: 'write',
+        ok: true,
+        writeLatencyMs: Date.now() - started,
+      },
+      projectRoot
+    );
+    return wrote;
+  } catch (err) {
+    recordMemoryOperation(
+      {
+        kind: 'write',
+        ok: false,
+        writeLatencyMs: Date.now() - started,
+        error: err?.message || String(err),
+      },
+      projectRoot
+    );
+    throw err;
   }
-
-  // Check for duplicates
-  const isDuplicate = patterns.some(
-    p =>
-      p.text.toLowerCase() === pattern.text?.toLowerCase() ||
-      p.text.toLowerCase() === pattern.toLowerCase?.()
-  );
-
-  if (!isDuplicate) {
-    const now = new Date().toISOString();
-    const area =
-      typeof pattern === 'object' && pattern ? normalizeArea(pattern.area) : DEFAULT_AREA;
-    const entry =
-      typeof pattern === 'string'
-        ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null, area }
-        : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null, area };
-    entry.id = buildEntryId(entry);
-
-    patterns.push(entry);
-    atomicWriteJSONSync(patternsFile, patterns);
-    maybeSyncMemoryJson(patternsFile, projectRoot);
-  }
-
-  return !isDuplicate;
 }
 
 /**
@@ -811,30 +1045,37 @@ function recordDiscovery(filePath, description, category = 'general', projectRoo
 
   const mapFile = path.join(memoryDir, 'codebase_map.json');
 
-  let codebaseMap = { discovered_files: {}, last_updated: null };
-  if (fs.existsSync(mapFile)) {
-    try {
-      codebaseMap = JSON.parse(fs.readFileSync(mapFile, 'utf8'));
-    } catch (_e) {
-      codebaseMap = { discovered_files: {}, last_updated: null };
+  return withFileLockSync(mapFile, () => {
+    let codebaseMap = { discovered_files: {}, last_updated: null };
+    if (fs.existsSync(mapFile)) {
+      try {
+        codebaseMap = JSON.parse(fs.readFileSync(mapFile, 'utf8'));
+      } catch (_e) {
+        codebaseMap = { discovered_files: {}, last_updated: null };
+      }
     }
-  }
 
-  const now = new Date().toISOString();
+    const now = new Date().toISOString();
 
-  // Check if entry already exists
-  const existing = codebaseMap.discovered_files[filePath];
+    // Check if entry already exists
+    const existing = codebaseMap.discovered_files[filePath];
 
-  codebaseMap.discovered_files[filePath] = {
-    description,
-    category,
-    discovered_at: existing?.discovered_at || now, // Keep original discovery time
-    last_accessed: now, // Always update last_accessed
-  };
-  codebaseMap.last_updated = now;
+    codebaseMap.discovered_files[filePath] = {
+      description,
+      category,
+      discovered_at: existing?.discovered_at || now, // Keep original discovery time
+      last_accessed: now, // Always update last_accessed
+    };
+    codebaseMap.last_updated = now;
 
-  atomicWriteSync(mapFile, JSON.stringify(codebaseMap, null, 2) + '\n');
-  return true;
+    atomicWriteSync(mapFile, JSON.stringify(codebaseMap, null, 2) + '\n');
+    emitMemorySavedEvent({
+      key: `discoveries:${filePath}`,
+      value: { path: filePath, category, last_accessed: now },
+      source: 'memory-manager.recordDiscovery',
+    });
+    return true;
+  });
 }
 
 /**
@@ -861,14 +1102,35 @@ function recordDiscovery(filePath, description, category = 'general', projectRoo
  * console.log(memory.patterns); // [{text: '...', timestamp: '...'}]
  */
 function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
+  const started = Date.now();
   // CRITICAL-001-MEMORY FIX: Validate projectRoot
   validateProjectRoot(projectRoot);
   const { ContextualMemory } = require('./contextual-memory.cjs');
   const memory = new ContextualMemory({ projectRoot });
-  return memory.loadContextSync({
+  const result = memory.loadContextSync({
     maxItems: CONFIG.MAX_ITEMS,
     maxChars: CONFIG.MAX_CONTEXT_CHARS,
   });
+  const loadedCount =
+    (Array.isArray(result.gotchas) ? result.gotchas.length : 0) +
+    (Array.isArray(result.patterns) ? result.patterns.length : 0) +
+    (Array.isArray(result.decisions) ? result.decisions.length : 0) +
+    (Array.isArray(result.discoveries) ? result.discoveries.length : 0) +
+    (Array.isArray(result.recent_sessions) ? result.recent_sessions.length : 0);
+  emitMemoryQueriedEvent({
+    query: 'context:loadMemoryForContext',
+    results: loadedCount,
+    latency: Date.now() - started,
+  });
+  recordMemoryOperation(
+    {
+      kind: 'read',
+      ok: true,
+      readLatencyMs: Date.now() - started,
+    },
+    projectRoot
+  );
+  return result;
 }
 
 // ===========================================================================
@@ -898,38 +1160,18 @@ async function readMemoryAsync(file) {
  * @param {string} data - Content to write
  */
 async function atomicWriteAsync(filePath, data) {
-  const tmp = `${filePath}.${process.pid}.tmp`;
+  const previous = asyncWriteQueue.get(filePath) || Promise.resolve();
+  const queued = previous
+    .catch(() => {})
+    .then(() => atomicWriteAsyncWithLock(filePath, data, 'utf8'));
+
+  asyncWriteQueue.set(filePath, queued);
   try {
-    await fsp.writeFile(tmp, data, 'utf8');
-    try {
-      await fsp.rename(tmp, filePath);
-    } catch (err) {
-      if (
-        process.platform === 'win32' &&
-        (err.code === 'EPERM' || err.code === 'EACCES' || err.code === 'EBUSY')
-      ) {
-        try {
-          await fsp.unlink(filePath);
-        } catch (unlinkErr) {
-          if (unlinkErr.code !== 'ENOENT') {
-            throw unlinkErr;
-          }
-        }
-        await fsp.rename(tmp, filePath);
-      } else {
-        throw err;
-      }
+    await queued;
+  } finally {
+    if (asyncWriteQueue.get(filePath) === queued) {
+      asyncWriteQueue.delete(filePath);
     }
-  } catch (err) {
-    // Clean up temp file on error (ignore cleanup errors)
-    try {
-      await fsp.unlink(tmp);
-    } catch (e) {
-      if (process.env.MEMORY_DEBUG) {
-        logger.error('Cleanup error in atomic write', { error: e.message, path: filePath });
-      }
-    }
-    throw err;
   }
 }
 
@@ -954,45 +1196,8 @@ async function ensureDirAsync(dirPath) {
  * @returns {Promise<boolean>} True if added, false if duplicate
  */
 async function recordGotchaAsync(gotcha, projectRoot = PROJECT_ROOT) {
-  // CRITICAL-001-MEMORY FIX: Validate projectRoot
-  validateProjectRoot(projectRoot);
-  const memoryDir = getMemoryDir(projectRoot);
-  await ensureDirAsync(memoryDir);
-
-  const gotchasFile = path.join(memoryDir, 'gotchas.json');
-
-  let gotchas = [];
-  const content = await readMemoryAsync(gotchasFile);
-  if (content) {
-    try {
-      gotchas = JSON.parse(content);
-    } catch (_e) {
-      gotchas = [];
-    }
-  }
-
-  // Check for duplicates (simple text match)
-  const isDuplicate = gotchas.some(
-    g =>
-      g.text.toLowerCase() === gotcha.text?.toLowerCase() ||
-      g.text.toLowerCase() === gotcha.toLowerCase?.()
-  );
-
-  if (!isDuplicate) {
-    const now = new Date().toISOString();
-    const area = typeof gotcha === 'object' && gotcha ? normalizeArea(gotcha.area) : DEFAULT_AREA;
-    const entry =
-      typeof gotcha === 'string'
-        ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area }
-        : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area };
-    entry.id = buildEntryId(entry);
-
-    gotchas.push(entry);
-    await atomicWriteAsync(gotchasFile, JSON.stringify(gotchas, null, 2));
-    maybeSyncMemoryJson(gotchasFile, projectRoot);
-  }
-
-  return !isDuplicate;
+  // Delegate to sync lock-safe path to avoid cross-process read-modify-write races.
+  return recordGotcha(gotcha, projectRoot);
 }
 
 /**
@@ -1002,46 +1207,8 @@ async function recordGotchaAsync(gotcha, projectRoot = PROJECT_ROOT) {
  * @returns {Promise<boolean>} True if added, false if duplicate
  */
 async function recordPatternAsync(pattern, projectRoot = PROJECT_ROOT) {
-  // CRITICAL-001-MEMORY FIX: Validate projectRoot
-  validateProjectRoot(projectRoot);
-  const memoryDir = getMemoryDir(projectRoot);
-  await ensureDirAsync(memoryDir);
-
-  const patternsFile = path.join(memoryDir, 'patterns.json');
-
-  let patterns = [];
-  const content = await readMemoryAsync(patternsFile);
-  if (content) {
-    try {
-      patterns = JSON.parse(content);
-    } catch (_e) {
-      patterns = [];
-    }
-  }
-
-  // Check for duplicates
-  const isDuplicate = patterns.some(
-    p =>
-      p.text.toLowerCase() === pattern.text?.toLowerCase() ||
-      p.text.toLowerCase() === pattern.toLowerCase?.()
-  );
-
-  if (!isDuplicate) {
-    const now = new Date().toISOString();
-    const area =
-      typeof pattern === 'object' && pattern ? normalizeArea(pattern.area) : DEFAULT_AREA;
-    const entry =
-      typeof pattern === 'string'
-        ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null, area }
-        : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null, area };
-    entry.id = buildEntryId(entry);
-
-    patterns.push(entry);
-    await atomicWriteAsync(patternsFile, JSON.stringify(patterns, null, 2));
-    maybeSyncMemoryJson(patternsFile, projectRoot);
-  }
-
-  return !isDuplicate;
+  // Delegate to sync lock-safe path to avoid cross-process read-modify-write races.
+  return recordPattern(pattern, projectRoot);
 }
 
 /**
@@ -1050,14 +1217,35 @@ async function recordPatternAsync(pattern, projectRoot = PROJECT_ROOT) {
  * @returns {Promise<Object>} Memory context object
  */
 async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
+  const started = Date.now();
   // CRITICAL-001-MEMORY FIX: Validate projectRoot
   validateProjectRoot(projectRoot);
   const { ContextualMemory } = require('./contextual-memory.cjs');
   const memory = new ContextualMemory({ projectRoot });
-  return await memory.loadContext({
+  const result = await memory.loadContext({
     maxItems: CONFIG.MAX_ITEMS,
     maxChars: CONFIG.MAX_CONTEXT_CHARS,
   });
+  const loadedCount =
+    (Array.isArray(result.gotchas) ? result.gotchas.length : 0) +
+    (Array.isArray(result.patterns) ? result.patterns.length : 0) +
+    (Array.isArray(result.decisions) ? result.decisions.length : 0) +
+    (Array.isArray(result.discoveries) ? result.discoveries.length : 0) +
+    (Array.isArray(result.recent_sessions) ? result.recent_sessions.length : 0);
+  emitMemoryQueriedEvent({
+    query: 'context:loadMemoryForContextAsync',
+    results: loadedCount,
+    latency: Date.now() - started,
+  });
+  recordMemoryOperation(
+    {
+      kind: 'read',
+      ok: true,
+      readLatencyMs: Date.now() - started,
+    },
+    projectRoot
+  );
+  return result;
 }
 
 /**

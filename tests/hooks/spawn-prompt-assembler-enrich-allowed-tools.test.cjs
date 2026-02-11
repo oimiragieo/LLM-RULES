@@ -44,6 +44,18 @@ describe('enrichAllowedTools() - Mandatory Tools', () => {
     assert.strictEqual(skillCount, 1, `Expected exactly 1 Skill, got ${skillCount}`);
   });
 
+  test('should not widen explicit allowed_tools with registry defaults', () => {
+    const result = enrichAllowedTools('developer', ['TaskUpdate', 'TaskList'], 'You are DEVELOPER');
+
+    assert.ok(result.includes('TaskUpdate'));
+    assert.ok(result.includes('TaskList'));
+    assert.ok(!result.includes('Bash'), `Bash should not be injected: ${JSON.stringify(result)}`);
+    assert.ok(
+      result.length <= 3,
+      `Explicit allow-list should remain narrow, got: ${JSON.stringify(result)}`
+    );
+  });
+
   test('should include mandatory tools even when tools list is at maxTools limit', () => {
     // Create a list of tools that reaches the maxTools limit (15)
     const manyTools = [

@@ -427,6 +427,7 @@ function isEnricherDisabled() {
  */
 function appendConfigModelSection(assembled, configResult) {
   if (process.env.SPAWN_PROMPT_INJECT_CONFIG_MODEL === 'off') return assembled;
+  if (assembled.includes('### Model (from config)')) return assembled;
   try {
     const { getShorthand } = libRequire(path.join('utils', 'agent-config-reader.cjs'));
     const shorthand = configResult && getShorthand(configResult.model);
@@ -689,10 +690,12 @@ function enrichAllowedTools(agentType, currentTools, prompt) {
     else resolvedType = 'developer';
   }
 
+  const explicitToolsProvided = Array.isArray(currentTools) && currentTools.length > 0;
   const agent = agents[resolvedType];
   const registryTools = agent?.capabilities?.[0]?.requiredTools;
-  const toolsToUse =
-    Array.isArray(registryTools) && registryTools.length > 0
+  const toolsToUse = explicitToolsProvided
+    ? []
+    : Array.isArray(registryTools) && registryTools.length > 0
       ? registryTools
       : getDefaultTools(resolvedType);
 
@@ -1150,10 +1153,7 @@ async function main() {
 
     const { toolInput, basePrompt, explicitTaskId, inputPromptLength, hookSessionId } = prepared;
 
-    if (looksAssembled(basePrompt)) {
-      stderrLog('hook_end', { status: 'already_assembled' });
-      process.exit(0);
-    }
+    const alreadyAssembled = looksAssembled(basePrompt);
     perf.mark('prechecks_ms');
 
     const promptAssembler = libRequire(path.join('spawn', 'prompt-assembler.cjs'));
@@ -1190,34 +1190,38 @@ async function main() {
       configModel: toolInput.model || null,
     });
 
-    let assembled = getCachedAssembly(cacheKey);
-    const cacheHit = Boolean(assembled);
-    if (assembled) {
-      perf.mark('cache_hit_ms');
-    } else {
-      assembled = promptAssembler.assembleSpawnPrompt({
-        agentType,
-        allowedTools,
-        basePrompt,
-        skillSectionMode,
-        includeMemory: true,
-        presetId,
-      });
+    let assembled = basePrompt;
+    let cacheHit = false;
+    if (!alreadyAssembled) {
+      assembled = getCachedAssembly(cacheKey);
+      cacheHit = Boolean(assembled);
+      if (assembled) {
+        perf.mark('cache_hit_ms');
+      } else {
+        assembled = promptAssembler.assembleSpawnPrompt({
+          agentType,
+          allowedTools,
+          basePrompt,
+          skillSectionMode,
+          includeMemory: true,
+          presetId,
+        });
 
-      if (contextMode.hasContextOrMode && contextMode.promptFragment) {
-        assembled = insertContextModeSection(assembled, contextMode.promptFragment);
-      }
-      perf.mark('base_assembly_ms');
+        if (contextMode.hasContextOrMode && contextMode.promptFragment) {
+          assembled = insertContextModeSection(assembled, contextMode.promptFragment);
+        }
 
-      if (!throttleExpensive) {
-        assembled = await applySemanticMemoryToPrompt(assembled, toolInput, basePrompt);
+        if (!throttleExpensive) {
+          assembled = await applySemanticMemoryToPrompt(assembled, toolInput, basePrompt);
+        }
+        if (!throttleExpensive) {
+          assembled = await applyEntityGraphToPrompt(assembled);
+        }
       }
-      perf.mark('semantic_memory_ms');
-      if (!throttleExpensive) {
-        assembled = await applyEntityGraphToPrompt(assembled);
-      }
-      perf.mark('entity_graph_ms');
     }
+    perf.mark('base_assembly_ms');
+    perf.mark('semantic_memory_ms');
+    perf.mark('entity_graph_ms');
 
     // Append constitution and behaviour principles to every spawned agent
     const constitutionContext = loadConstitutionContext(PROJECT_ROOT);

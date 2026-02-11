@@ -322,7 +322,7 @@ describe('pre-task-unified.cjs', () => {
     it('should block when action pattern repeats too many times', () => {
       writeState(LOOP_STATE_FILE, {
         sessionId: 'test-session',
-        spawnDepth: 0,
+        spawnDepth: 1,
         actionHistory: [{ action: 'spawn:developer', count: 5, lastAt: new Date().toISOString() }],
       });
 
@@ -336,6 +336,24 @@ describe('pre-task-unified.cjs', () => {
       const result = preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, false);
       assert.ok(result.message.includes('pattern') || result.message.includes('Pattern'));
+    });
+
+    it('should allow repeated action pattern for sequential non-nested spawns', () => {
+      writeState(LOOP_STATE_FILE, {
+        sessionId: 'test-session',
+        spawnDepth: 0,
+        actionHistory: [{ action: 'spawn:developer', count: 8, lastAt: new Date().toISOString() }],
+      });
+
+      const input = {
+        tool_name: 'Task',
+        tool_input: {
+          prompt: 'You are DEVELOPER. Handle next queued task.',
+        },
+      };
+
+      const result = preTaskUnified.checkLoopPrevention(input);
+      assert.strictEqual(result.pass, true);
     });
 
     it('should pass when enforcement is off', () => {
@@ -464,6 +482,26 @@ describe('pre-task-unified.cjs', () => {
   });
 
   describe('TaskList-first loop-breaker', () => {
+    it('should warn-allow by default when TASKLIST_FIRST_ENFORCEMENT is unset', () => {
+      process.env.CLAUDE_SESSION_ID = 'tasklist-default-warn-test';
+      delete process.env.TASKLIST_FIRST_ENFORCEMENT;
+
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        taskListCalledSincePrompt: false,
+      });
+
+      const result = preTaskUnified.checkTaskListFirst('Task', {
+        session_id: 'tasklist-default-warn-test',
+      });
+
+      assert.strictEqual(result.pass, true);
+      assert.strictEqual(result.result, 'warn');
+      assert.ok(result.message.includes('TaskList() must be called before Task()'));
+
+      preTaskUnified.clearTaskListFirstViolation('tasklist-default-warn-test');
+    });
+
     it('should block initial TaskList-first violations, then warn-allow repeated loops', () => {
       process.env.CLAUDE_SESSION_ID = 'tasklist-loop-test';
       process.env.TASKLIST_FIRST_ENFORCEMENT = 'block';
@@ -500,6 +538,11 @@ describe('pre-task-unified.cjs', () => {
 
   describe('exit codes', () => {
     it('should return exit code 0 when all checks pass', () => {
+      process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
+      process.env.PLANNER_FIRST_ENFORCEMENT = 'off';
+      process.env.SECURITY_REVIEW_ENFORCEMENT = 'off';
+      process.env.LOOP_PREVENTION_MODE = 'off';
+
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: false,

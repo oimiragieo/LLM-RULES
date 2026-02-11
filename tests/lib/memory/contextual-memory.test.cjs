@@ -444,6 +444,37 @@ test('loadContextSync - respects maxItems limits', async t => {
   memory.close();
 });
 
+test('loadContextSync - applies safe default limits when options omitted', async t => {
+  setupTestDir();
+  t.after(cleanupTestDir);
+
+  const manyGotchas = [];
+  for (let i = 0; i < 60; i++) {
+    manyGotchas.push({
+      text: `Default limit gotcha ${i}`,
+      timestamp: new Date().toISOString(),
+      details: 'x'.repeat(200),
+    });
+  }
+  createGotchasFile(manyGotchas);
+
+  const { ContextualMemory } = getModule();
+  const memory = new ContextualMemory({
+    projectRoot: TEST_DIR,
+    memoryDir: TEST_MEMORY_DIR,
+    dbPath: TEST_DB_PATH,
+  });
+
+  const result = memory.loadContextSync();
+
+  // Defaults are currently 20 items / 2000 chars for gotchas.
+  assert.ok(result.gotchas.length <= 20, 'Should cap gotchas to default max item count');
+  const totalChars = result.gotchas.reduce((sum, g) => sum + JSON.stringify(g).length, 0);
+  assert.ok(totalChars <= 2000, 'Should cap gotchas by default max char budget');
+
+  memory.close();
+});
+
 // =============================================================================
 // Test Suite 3: Concurrent reads
 // =============================================================================
@@ -751,6 +782,29 @@ test('readFile - throws for non-existent file', async t => {
     memory.readFile('nonexistent.txt'),
     /ENOENT/,
     'Should throw ENOENT for missing file'
+  );
+
+  memory.close();
+});
+
+test('readFile - rejects path traversal outside memory directory', async t => {
+  setupTestDir();
+  t.after(cleanupTestDir);
+
+  const secretPath = path.join(TEST_DIR, 'outside.txt');
+  fs.writeFileSync(secretPath, 'should not be readable via memory.readFile');
+
+  const { ContextualMemory } = getModule();
+  const memory = new ContextualMemory({
+    projectRoot: TEST_DIR,
+    memoryDir: TEST_MEMORY_DIR,
+    dbPath: TEST_DB_PATH,
+  });
+
+  await assert.rejects(
+    memory.readFile('../outside.txt'),
+    /Invalid memory path/,
+    'Should reject traversal outside memory directory'
   );
 
   memory.close();

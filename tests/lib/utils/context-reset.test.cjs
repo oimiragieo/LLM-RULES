@@ -37,6 +37,6 @@ test('buildResetPlan includes full system targets', () => {
 
 test('buildResetPlan can include lancedb', () => {
   const plan = buildResetPlan('full', { includeLanceDb: true });
-  const lancedbDir = path.join(PROJECT_ROOT, '.claude', 'data', 'lancedb');
+  const lancedbDir = path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'lancedb');
   assert.ok(plan.targets.some(t => t.path === lancedbDir));
 });

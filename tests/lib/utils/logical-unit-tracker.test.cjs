@@ -12,7 +12,10 @@ const { runGit } = require('../../../.claude/lib/utils/logical-unit-tracker.cjs'
 function initRepo() {
   const repoPath = fs.mkdtempSync(path.join(os.tmpdir(), 'logical-unit-tracker-'));
   execFileSync('git', ['init'], { cwd: repoPath, stdio: 'pipe' });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoPath, stdio: 'pipe' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], {
+    cwd: repoPath,
+    stdio: 'pipe',
+  });
   execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: repoPath, stdio: 'pipe' });
   fs.writeFileSync(path.join(repoPath, 'README.md'), 'seed\n', 'utf8');
   execFileSync('git', ['add', 'README.md'], { cwd: repoPath, stdio: 'pipe' });

@@ -8,6 +8,7 @@ const {
   checkReadSafety,
   hasReadWindow,
   resolveReadPath,
+  cleanupMemoryTempFiles,
 } = require('../../.claude/hooks/routing/pre-tool-unified.cjs');
 
 describe('pre-tool-unified read safety', () => {
@@ -57,6 +58,37 @@ describe('pre-tool-unified read safety', () => {
       assert.strictEqual(result.action, 'allow');
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('cleanupMemoryTempFiles removes stale .tmp artifacts but keeps normal files', () => {
+    const memoryDir = path.join(__dirname, '..', '..', '.claude', 'context', 'memory', 'named');
+    fs.mkdirSync(memoryDir, { recursive: true });
+
+    const staleTmp = path.join(memoryDir, `cleanup-test-${Date.now()}.jsonl.tmp`);
+    const keepFile = path.join(memoryDir, `cleanup-test-${Date.now()}.md`);
+    fs.writeFileSync(staleTmp, 'temp', 'utf8');
+    fs.writeFileSync(keepFile, 'keep', 'utf8');
+
+    const oldMs = Date.now() - 26 * 60 * 60 * 1000;
+    fs.utimesSync(staleTmp, oldMs / 1000, oldMs / 1000);
+
+    try {
+      const result = cleanupMemoryTempFiles();
+      assert.ok(result.deleted >= 1);
+      assert.ok(!fs.existsSync(staleTmp));
+      assert.ok(fs.existsSync(keepFile));
+    } finally {
+      try {
+        fs.unlinkSync(staleTmp);
+      } catch (_e) {
+        // ignore if already removed
+      }
+      try {
+        fs.unlinkSync(keepFile);
+      } catch (_e) {
+        // ignore if already removed
+      }
     }
   });
 });

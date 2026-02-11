@@ -421,6 +421,33 @@ describe('routing-guard', () => {
     });
   });
 
+  describe('checkConfigModelValidator', () => {
+    it('should allow default haiku mismatch when config source is complexity-default', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+
+      process.env.CONFIG_MODEL_VALIDATOR = 'block';
+      const result = routingGuard.checkConfigModelValidator('Task', {
+        prompt: 'You are CONTROLLED. Validate memory behavior.',
+        model: 'haiku',
+      });
+
+      assert.strictEqual(result.pass, true);
+    });
+
+    it('should still block non-default model mismatches', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+
+      process.env.CONFIG_MODEL_VALIDATOR = 'block';
+      const result = routingGuard.checkConfigModelValidator('Task', {
+        prompt: 'You are CONTROLLED. Validate memory behavior.',
+        model: 'opus',
+      });
+
+      assert.strictEqual(result.pass, false);
+      assert.strictEqual(result.result, 'block');
+    });
+  });
+
   describe('checkRouterWrite', () => {
     it('should pass for non-write tools', () => {
       assert.ok(routingGuard, 'Module should be loadable');
@@ -606,6 +633,21 @@ describe('routing-guard', () => {
       assert.strictEqual(result.pass, true);
     });
 
+    it('should warn (not block) by default for non-whitelisted router Bash commands', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      assert.ok(routerState, 'Router state module should be loadable');
+
+      delete process.env.ROUTER_BASH_GUARD;
+      routerState.resetToRouterMode();
+      routerState.invalidateStateCache();
+      routingGuard.invalidateCachedState();
+
+      const result = routingGuard.checkRouterBash('Bash', { command: 'pnpm test' });
+      assert.strictEqual(result.pass, true);
+      assert.strictEqual(result.result, 'warn');
+      assert.ok(result.message.includes('ROUTER BASH VIOLATION WARNED'));
+    });
+
     it('should pass when enforcement is off', () => {
       assert.ok(routingGuard, 'Module should be loadable');
 
@@ -702,6 +744,23 @@ describe('routing-guard', () => {
 
       const result = routingGuard.checkRouterBash('Bash', { command: 'pnpm test' });
       assert.strictEqual(result.pass, true);
+    });
+
+    it('should pass when a spawned task is active even if router state reads router mode', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      assert.ok(routerState, 'Router state module should be loadable');
+
+      routerState.resetToRouterMode();
+      routerState.invalidateStateCache();
+      routingGuard.invalidateCachedState();
+      routerState.setCurrentSpawnTaskId('task-active-spawn-1');
+
+      process.env.ROUTER_BASH_GUARD = 'block';
+
+      const result = routingGuard.checkRouterBash('Bash', { command: 'pnpm test' });
+      assert.strictEqual(result.pass, true);
+
+      routerState.clearCurrentSpawnTaskId();
     });
 
     it('should include visceral message with correct format', () => {

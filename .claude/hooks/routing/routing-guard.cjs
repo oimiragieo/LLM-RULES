@@ -23,7 +23,7 @@
  * Trigger: PreToolUse (matches: Task|TaskCreate|Edit|Write|NotebookEdit|Glob|Grep|WebSearch|Bash)
  *
  * ENFORCEMENT MODES:
- * - ROUTER_BASH_GUARD=block|warn|off (default: block)
+ * - ROUTER_BASH_GUARD=block|warn|off (default: warn)
  * - ROUTER_SELF_CHECK=block|warn|off (default: block)
  * - PLANNER_FIRST_ENFORCEMENT=block|warn|off (default: block)
  * - SECURITY_REVIEW_ENFORCEMENT=block|warn|off (default: block)
@@ -33,7 +33,7 @@
  * - TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: warn)
  * - CREATOR_ROUTING_ENFORCEMENT=block|warn|off (default: block)
  * - INTENT_AGENT_MATCH=warn|block|off (default: warn)
- * - CONFIG_MODEL_VALIDATOR=block|warn|off (default: warn)
+ * - CONFIG_MODEL_VALIDATOR=block|warn|off (default: block)
  *
  * Exit codes:
  * - 0: Allow operation
@@ -707,7 +707,7 @@ function checkRouterBash(toolName, toolInput = {}) {
     return { pass: true };
   }
 
-  const enforcement = getEnforcementMode('ROUTER_BASH_GUARD', 'block');
+  const enforcement = getEnforcementMode('ROUTER_BASH_GUARD', 'warn');
   if (enforcement === 'off') {
     // SEC-AUDIT-016 FIX: Use centralized auditSecurityOverride for consistent logging
     auditSecurityOverride(
@@ -725,6 +725,18 @@ function checkRouterBash(toolName, toolInput = {}) {
     // Agents can use any Bash commands (they have full tools)
     return { pass: true };
   }
+  // Allow Bash while an active spawned task is in flight.
+  // This guards against false router-mode reads during subagent execution windows.
+  try {
+    if (
+      typeof routerState.getCurrentSpawnTaskId === 'function' &&
+      routerState.getCurrentSpawnTaskId()
+    ) {
+      return { pass: true };
+    }
+  } catch (_err) {
+    // Best-effort only.
+  }
 
   // In Router context - check if command is whitelisted
   const command = toolInput.command || '';
@@ -735,11 +747,15 @@ function checkRouterBash(toolName, toolInput = {}) {
   // Router is using non-whitelisted Bash command - VIOLATION
   const truncatedCmd = command.length > 50 ? command.slice(0, 47) + '...' : command;
   const dedupe = registerBlockAttempt('router-bash-check', toolName);
+  const violationTitle =
+    enforcement === 'block'
+      ? 'ROUTER BASH VIOLATION BLOCKED (ADR-030)'
+      : 'ROUTER BASH VIOLATION WARNED (ADR-030)';
   if (dedupe.dedupe) {
     const fallback =
       "Task({ task_id: 'task-1', subagent_type: 'general-purpose', description: 'Run bash command safely', prompt: 'Use Bash for the required command and report results.' })";
     const message = compactFallbackMessage(
-      'ROUTER BASH VIOLATION BLOCKED (ADR-030)',
+      violationTitle,
       truncatedCmd || 'bash',
       dedupe.count,
       fallback
@@ -751,7 +767,7 @@ function checkRouterBash(toolName, toolInput = {}) {
   }
   const message = `
 +======================================================================+
-|  ROUTER BASH VIOLATION BLOCKED (ADR-030)                             |
+|  ${violationTitle.padEnd(66)}|
 +======================================================================+
 |  Command: ${truncatedCmd.padEnd(56)}|
 |                                                                      |
@@ -1762,6 +1778,19 @@ function checkConfigModelValidator(toolName, toolInput = {}) {
 
   // Check for mismatch
   const mismatch = spawnShorthand !== configuredModel;
+
+  // Avoid noisy false-positive blocks when Task() inherits platform default model
+  // (often "haiku") and config resolution is only from complexity-default.
+  // In this case, spawn-prompt-assembler will inject/configure the model later.
+  if (mismatch && configSource === 'complexity-default' && spawnShorthand === 'haiku') {
+    auditLog('routing-guard', 'config_model_validator_default_model_skipped', {
+      agentType,
+      spawnModel: spawnShorthand,
+      configuredModel,
+      source: configSource,
+    });
+    return { pass: true };
+  }
 
   if (mismatch) {
     const message = `

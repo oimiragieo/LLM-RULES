@@ -31,6 +31,15 @@ const CONFIG = {
   SUMMARY_MIN_SESSIONS: 5, // Minimum sessions to summarize
 };
 
+const MEMORY_TIER_EVENTS_FILE = path.join(
+  '.claude',
+  'context',
+  'runtime',
+  'memory-tier-events.jsonl'
+);
+const MEMORY_TIER_EVENTS_MAX_BYTES = Number(process.env.MEMORY_TIER_EVENTS_MAX_BYTES || 1048576);
+let uniqueFileCounter = 0;
+
 function isStructuredSummaryEnabled() {
   const value = String(process.env.MEMORY_STRUCTURED_SUMMARY || '').toLowerCase();
   return value === '1' || value === 'true';
@@ -138,6 +147,46 @@ function getMemoryDir(projectRoot = PROJECT_ROOT) {
 function ensureDir(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
+  }
+}
+
+function buildUniqueTimestampToken() {
+  uniqueFileCounter = (uniqueFileCounter + 1) % 1000000;
+  return `${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}-${String(
+    uniqueFileCounter
+  ).padStart(6, '0')}`;
+}
+
+function shouldWriteTierEvents() {
+  return String(process.env.MEMORY_TIER_EVENT_LOG || 'on').toLowerCase() !== 'off';
+}
+
+function appendTierEvent(eventType, details = {}, projectRoot = PROJECT_ROOT) {
+  if (!shouldWriteTierEvents()) return;
+  try {
+    const eventsPath = path.join(projectRoot, MEMORY_TIER_EVENTS_FILE);
+    const eventsDir = path.dirname(eventsPath);
+    ensureDir(eventsDir);
+
+    if (fs.existsSync(eventsPath)) {
+      const stats = fs.statSync(eventsPath);
+      if (stats.size >= MEMORY_TIER_EVENTS_MAX_BYTES) {
+        const rotated = eventsPath.replace(
+          /\.jsonl$/i,
+          `.${new Date().toISOString().replace(/[:.]/g, '-')}.jsonl`
+        );
+        fs.renameSync(eventsPath, rotated);
+      }
+    }
+
+    const payload = {
+      ts: new Date().toISOString(),
+      event: eventType,
+      ...details,
+    };
+    fs.appendFileSync(eventsPath, `${JSON.stringify(payload)}\n`, 'utf8');
+  } catch (_e) {
+    // Best-effort observability only; never block memory operations.
   }
 }
 
@@ -296,6 +345,7 @@ function consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
   // Find session in STM
   const stmPath = path.join(stmDir, 'session_current.json');
   if (!fs.existsSync(stmPath)) {
+    appendTierEvent('consolidate_skipped', { reason: 'no_stm', sessionId }, projectRoot);
     return { success: false, error: 'No STM session found' };
   }
 
@@ -306,19 +356,20 @@ function consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
     if (process.env.MEMORY_DEBUG) {
       console.error('[MEMORY_DEBUG]', 'consolidateSession:', e.message);
     }
+    appendTierEvent('consolidate_failed', { reason: 'invalid_stm_json', sessionId }, projectRoot);
     return { success: false, error: 'Failed to read STM session' };
   }
 
   // Check if MTM is at capacity
   const mtmSessions = getMTMSessions(projectRoot);
   if (mtmSessions.length >= CONFIG.MTM_MAX_SESSIONS) {
-    // Trigger summarization of oldest sessions to make room
-    summarizeOldSessions(projectRoot);
+    // Trigger summarization of oldest sessions to make room for this incoming session.
+    summarizeOldSessions(projectRoot, 1);
   }
 
   // Generate MTM filename with timestamp
   const now = new Date();
-  const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const timestamp = buildUniqueTimestampToken();
   const mtmFilename = `session_${timestamp}.json`;
   const mtmPath = path.join(mtmDir, mtmFilename);
 
@@ -363,6 +414,16 @@ function consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
 
   // Clear STM
   clearSTM(projectRoot);
+
+  appendTierEvent(
+    'consolidated_to_mtm',
+    {
+      sessionId: sessionData.session_id || sessionId,
+      mtmFile: path.basename(mtmPath),
+      mtmSessionsAfter: getMTMSessions(projectRoot).length,
+    },
+    projectRoot
+  );
 
   return {
     success: true,
@@ -421,12 +482,13 @@ function promoteToLTM(sessionId, projectRoot = PROJECT_ROOT) {
   // Find session in MTM
   const found = findMTMSession(sessionId, projectRoot);
   if (!found) {
+    appendTierEvent('promote_failed', { reason: 'not_found', sessionId }, projectRoot);
     return { success: false, error: 'Session not found in MTM' };
   }
 
   // Generate LTM filename
   const now = new Date();
-  const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const timestamp = buildUniqueTimestampToken();
   const ltmFilename = `promoted_${timestamp}.json`;
   const ltmPath = path.join(ltmDir, ltmFilename);
 
@@ -446,6 +508,15 @@ function promoteToLTM(sessionId, projectRoot = PROJECT_ROOT) {
   if (fs.existsSync(found.path)) {
     fs.unlinkSync(found.path);
   }
+
+  appendTierEvent(
+    'promoted_to_ltm',
+    {
+      sessionId,
+      ltmFile: path.basename(ltmPath),
+    },
+    projectRoot
+  );
 
   return {
     success: true,
@@ -524,26 +595,50 @@ function generateSessionSummary(sessions) {
  * Summarize old sessions from MTM to LTM
  * Called when MTM exceeds max sessions
  */
-function summarizeOldSessions(projectRoot = PROJECT_ROOT) {
+function summarizeOldSessions(projectRoot = PROJECT_ROOT, incomingSessions = 0) {
   const mtmDir = getTierPath('MTM', projectRoot);
   const ltmDir = getTierPath('LTM', projectRoot);
   ensureDir(ltmDir);
 
   const sessions = getMTMSessions(projectRoot);
 
-  // Only summarize if we have more than max sessions
-  if (sessions.length <= CONFIG.MTM_MAX_SESSIONS) {
+  const normalizedIncoming = Number.isFinite(Number(incomingSessions))
+    ? Math.max(0, Number(incomingSessions))
+    : 0;
+  const effectiveCount = sessions.length + normalizedIncoming;
+
+  // Only summarize if current+incoming would exceed capacity.
+  if (effectiveCount <= CONFIG.MTM_MAX_SESSIONS) {
+    appendTierEvent(
+      'summarize_skipped',
+      {
+        reason: 'capacity_not_exceeded',
+        currentSessions: sessions.length,
+        incomingSessions: normalizedIncoming,
+      },
+      projectRoot
+    );
     return { summarized: 0, summaryPath: null };
   }
 
-  // Calculate how many to summarize (keep MTM at max)
-  const toSummarize = sessions.length - CONFIG.MTM_MAX_SESSIONS + CONFIG.SUMMARY_MIN_SESSIONS;
+  // Calculate how many to summarize (keep MTM at max with min batch summarization).
+  const toSummarize = effectiveCount - CONFIG.MTM_MAX_SESSIONS + CONFIG.SUMMARY_MIN_SESSIONS;
   const sessionsToSummarize = sessions.slice(
     0,
     Math.min(toSummarize, sessions.length - CONFIG.SUMMARY_MIN_SESSIONS)
   );
 
   if (sessionsToSummarize.length < CONFIG.SUMMARY_MIN_SESSIONS) {
+    appendTierEvent(
+      'summarize_skipped',
+      {
+        reason: 'insufficient_batch',
+        currentSessions: sessions.length,
+        incomingSessions: normalizedIncoming,
+        candidateCount: sessionsToSummarize.length,
+      },
+      projectRoot
+    );
     return { summarized: 0, summaryPath: null };
   }
 
@@ -551,8 +646,7 @@ function summarizeOldSessions(projectRoot = PROJECT_ROOT) {
   const summary = generateSessionSummary(sessionsToSummarize);
 
   // Write summary to LTM
-  const now = new Date();
-  const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const timestamp = buildUniqueTimestampToken();
   const summaryFilename = `summary_${timestamp}.json`;
   const summaryPath = path.join(ltmDir, summaryFilename);
 
@@ -565,6 +659,17 @@ function summarizeOldSessions(projectRoot = PROJECT_ROOT) {
       fs.unlinkSync(sessionPath);
     }
   }
+
+  appendTierEvent(
+    'summarized_to_ltm',
+    {
+      summarizedCount: sessionsToSummarize.length,
+      incomingSessions: normalizedIncoming,
+      ltmSummaryFile: path.basename(summaryPath),
+      mtmSessionsRemaining: getMTMSessions(projectRoot).length,
+    },
+    projectRoot
+  );
 
   return {
     summarized: sessionsToSummarize.length,

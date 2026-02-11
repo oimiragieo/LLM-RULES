@@ -583,16 +583,15 @@ if (require.main === module) {
       await it('should clean up temp file on write error', async function () {
         setupTestDir();
         try {
-          // Create a non-existent directory path to force rename error
-          const badPath = path.join(MEMORY_DIR, 'nonexistent-dir', 'file.md');
+          // Use an invalid path payload to force write failure deterministically.
+          const badPath = path.join(MEMORY_DIR, 'invalid\0file.md');
 
           delete require.cache[require.resolve('../../../.claude/lib/memory/memory-manager.cjs')];
           const { atomicWriteAsync } = require('../../../.claude/lib/memory/memory-manager.cjs');
 
-          // This should fail because parent directory doesn't exist
           await assert.rejects(
             atomicWriteAsync(badPath, 'content'),
-            /ENOENT|EPERM/,
+            /ERR_INVALID_ARG_VALUE|ERR_INVALID_ARG_TYPE|EINVAL/,
             'Should throw on bad path'
           );
 
