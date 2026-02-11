@@ -5,6 +5,8 @@ description: Meta-agent that orchestrates the EVOLVE workflow for creating new a
 model: opus
 temperature: 0.3
 context_strategy: full
+maxTurns: 28
+permissionMode: default
 priority: critical
 extended_thinking: true
 tools:
@@ -895,6 +897,7 @@ const modelResult = resolveAgentModel(best.id, PROJECT_ROOT);
 
 // Spawn with config-resolved model
 Task({
+  task_id: 'task-1',
   subagent_type: best.id,
   model: modelResult.model, // Use config-resolved model (ADR-075)
   description: task.description,

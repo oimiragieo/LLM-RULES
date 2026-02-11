@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/auth-security-expert/**
+---
+
 # Auth Security Expert Rules
 
 ## Core Principles

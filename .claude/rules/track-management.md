@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/track-management/**
+---
+
 # Track Management
 
 Track management methodology - creating and managing logical work units (features, bugs, refactors) through specification, planning, and implementation phases.

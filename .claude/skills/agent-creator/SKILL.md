@@ -743,6 +743,7 @@ The CLI outputs a Task spawn command when `--original-request` is provided:
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   description: 'ux-reviewer executing original task',
   prompt: 'You are the UX-REVIEWER agent...',
@@ -753,6 +754,7 @@ Task({
 
 ```javascript
 Task({
+  task_id: 'task-2',
   subagent_type: 'general-purpose',
   description: 'Execute task with new agent',
   prompt: 'You are <AGENT>. Read .claude/agents/domain/<name>.md and complete: <task>',

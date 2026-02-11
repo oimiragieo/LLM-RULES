@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/k8s-manifest-generator/**
+---
+
 # Kubernetes Manifest Generator Rules
 
 ## Core Principles

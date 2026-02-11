@@ -5,6 +5,8 @@ description: Security architecture, threat modeling, compliance validation, and 
 model: opus
 temperature: 0.4
 context_strategy: full
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: true
 tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]

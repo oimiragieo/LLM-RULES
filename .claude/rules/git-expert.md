@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/git-expert/**
+---
+
 # Git Expert Rules
 
 ## Core Principles

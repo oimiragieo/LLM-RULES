@@ -256,6 +256,7 @@ When spawning agents that use background Bash:
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'developer',
   description: 'Count test files in background',
   allowed_tools: ['Bash', 'TaskUpdate', 'TaskList'],

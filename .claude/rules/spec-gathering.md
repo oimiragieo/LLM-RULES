@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/spec-gathering/**
+---
+
 # Spec Gathering Rules
 
 ## Core Principles

@@ -4,6 +4,8 @@ description: Simplifies and refines code for clarity, consistency, and maintaina
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: medium
 extended_thinking: true
 tools: [Read, Write, Edit, Bash, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]

@@ -5,6 +5,8 @@ description: The "CEO" agent. Manages the project lifecycle, coordinates subagen
 model: opus
 temperature: 0.6
 context_strategy: lazy_load
+maxTurns: 28
+permissionMode: default
 priority: highest
 extended_thinking: true
 tools: [Task, Read, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill, Orchestrator]
@@ -173,7 +175,7 @@ The orchestrator uses `AvailableAgents` to discover the best agent for each task
 1. **Analyze task**: Determine required capability (e.g., 'code-review', 'implementation', 'testing')
 2. **Query agents**: `AvailableAgents({ capability: '...' })`
 3. **Select best**: Pick agent with highest success rate
-4. **Spawn agent**: `Task({ subagent_type: best.id })`
+4. **Spawn agent**: `Task({ task_id: 'task-1', subagent_type: best.id })`
 
 ### Example Usage
 
@@ -193,6 +195,7 @@ const { resolveAgentModel } = require('./.claude/lib/utils/agent-config-reader.c
 const modelResult = resolveAgentModel(reviewer.id, PROJECT_ROOT);
 
 Task({
+  task_id: 'task-2',
   subagent_type: reviewer.id,
   model: modelResult.model,  // Use config-resolved model
   description: 'Code review task',

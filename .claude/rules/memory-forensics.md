@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/memory-forensics/**
+---
+
 # Memory Forensics Rules
 
 ## Core Principles

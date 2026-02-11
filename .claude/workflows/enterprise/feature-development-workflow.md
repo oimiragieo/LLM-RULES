@@ -38,6 +38,7 @@ Orchestrate end-to-end feature development from requirements to production deplo
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   description: 'Business analysis for feature requirements',
   prompt: `You are the PLANNER agent.
@@ -74,6 +75,7 @@ Analyze feature requirements for: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-2',
   subagent_type: 'general-purpose',
   description: 'Technical architecture design',
   prompt: `You are the ARCHITECT agent.
@@ -110,6 +112,7 @@ Design technical architecture for feature: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-3',
   subagent_type: 'general-purpose',
   description: 'Security and risk assessment',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -148,6 +151,7 @@ Assess security implications and risks for feature: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-4',
   subagent_type: 'general-purpose',
   description: 'Backend services implementation',
   prompt: `You are the DEVELOPER agent.
@@ -187,6 +191,7 @@ Implement backend services for: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-5',
   subagent_type: 'general-purpose',
   description: 'Frontend components implementation',
   prompt: `You are the DEVELOPER agent.
@@ -225,6 +230,7 @@ Build frontend components for: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-6',
   subagent_type: 'general-purpose',
   description: 'Data pipelines and integration',
   prompt: `You are the DEVELOPER agent.
@@ -263,6 +269,7 @@ Build data pipelines for: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-7',
   subagent_type: 'general-purpose',
   description: 'Comprehensive test suite creation',
   prompt: `You are the QA agent.
@@ -302,6 +309,7 @@ Create comprehensive test suite for: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-8',
   subagent_type: 'general-purpose',
   description: 'Security testing and validation',
   prompt: `You are the SECURITY-ARCHITECT agent.
@@ -339,6 +347,7 @@ Perform security testing for: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-9',
   subagent_type: 'general-purpose',
   description: 'Performance optimization',
   prompt: `You are the DEVELOPER agent.
@@ -378,6 +387,7 @@ Optimize performance for: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-10',
   subagent_type: 'general-purpose',
   description: 'Deployment pipeline preparation',
   prompt: `You are the DEVOPS agent.
@@ -419,6 +429,7 @@ Prepare deployment for: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-11',
   subagent_type: 'general-purpose',
   description: 'Observability and monitoring setup',
   prompt: `You are the DEVOPS agent.
@@ -456,6 +467,7 @@ Set up observability for: $FEATURE_NAME
 
 ```javascript
 Task({
+  task_id: 'task-12',
   subagent_type: 'general-purpose',
   description: 'Comprehensive documentation generation',
   prompt: `You are the DEVELOPER agent.
@@ -532,6 +544,7 @@ If issues arise during or after deployment:
 ```javascript
 // Router spawning workflow orchestrator
 Task({
+  task_id: 'task-13',
   subagent_type: 'general-purpose',
   description: 'Orchestrating feature development workflow',
   prompt: `Execute enterprise feature development workflow.

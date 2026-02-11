@@ -70,7 +70,7 @@ Before spawning `developer`, Router MUST check Step 6.5 in router-decision.md. I
 
 - Do **NOT** "switch personas." Use `Task(...)` to create actual subagents.
 - Spawn prompts MUST include explicit task IDs **in prompt content AND Task() parameter**.
-- Task() calls MUST include `task_id` parameter (required for spawn-log.jsonl traceability).
+- Task() calls MUST include `task_id` parameter (hard-blocked by spawn hooks when missing; no fallback IDs).
 - Agents MUST invoke skills via `Skill()` tool (not just read skill files).
 
 **Routing workflow source of truth:** `.claude/workflows/core/router-decision.md`
@@ -185,8 +185,8 @@ Router: TaskCreate({ subject: "Add auth", description: "Implement JWT auth" })
 User: "Add authentication to the app"
 Router: [ROUTER] Multi-step + security-sensitive → PLANNER + SECURITY-ARCHITECT (parallel)
         TaskList();
-        Task({ subagent_type: "planner", prompt: "Design auth feature..." })
-        Task({ subagent_type: "security-architect", prompt: "Review auth design..." })
+        Task({ task_id: 'task-1', subagent_type: "planner", prompt: "Design auth feature..." })
+        Task({ task_id: 'task-2', subagent_type: "security-architect", prompt: "Review auth design..." })
 ```
 
 **Example 2: Security Check Violation**
@@ -194,15 +194,15 @@ Router: [ROUTER] Multi-step + security-sensitive → PLANNER + SECURITY-ARCHITEC
 ```
 ❌ WRONG:
 User: "Update the user authentication logic"
-Router: Task({ subagent_type: "developer", prompt: "Update auth..." })
+Router: Task({ task_id: 'task-3', subagent_type: "developer", prompt: "Update auth..." })
         [Missing security review for auth changes]
 
 ✓ CORRECT:
 User: "Update the user authentication logic"
 Router: [ROUTER] Security-sensitive change detected → DEVELOPER + SECURITY-ARCHITECT (parallel)
         TaskList();
-        Task({ subagent_type: "developer", prompt: "Update auth..." })
-        Task({ subagent_type: "security-architect", prompt: "Review auth changes..." })
+        Task({ task_id: 'task-4', subagent_type: "developer", prompt: "Update auth..." })
+        Task({ task_id: 'task-5', subagent_type: "security-architect", prompt: "Review auth changes..." })
 ```
 
 **Example 3: Tool Check Violation**
@@ -217,7 +217,7 @@ Router: Glob({ pattern: "**/*.ts" })
 User: "What TypeScript files are in the project?"
 Router: [ROUTER] Tool is blacklisted for Router → spawn agent to explore
         TaskList();
-        Task({ subagent_type: "developer", prompt: "List all TypeScript files..." })
+        Task({ task_id: 'task-6', subagent_type: "developer", prompt: "List all TypeScript files..." })
 ```
 
 **Example 4: Creator Workflow Violation (Gate 4)**
@@ -247,14 +247,14 @@ Router: Write({ file_path: ".claude/workflows/enterprise/security-audit.md", con
 User: "Create a ripgrep skill"
 Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesis → skill-creator)
         TaskList();
-        Task({ subagent_type: "general-purpose", prompt: "Invoke Skill({ skill: \"research-synthesis\" }) then Skill({ skill: \"skill-creator\" }) ..." })
+        Task({ task_id: 'task-7', subagent_type: "general-purpose", prompt: "Invoke Skill({ skill: \"research-synthesis\" }) then Skill({ skill: \"skill-creator\" }) ..." })
         [creator handles CLAUDE.md, catalogs/registries, agent assignments, validation]
 
 ✓ CORRECT:
 User: "Create a security audit workflow"
 Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesis → workflow-creator)
         TaskList();
-        Task({ subagent_type: "general-purpose", prompt: "Invoke Skill({ skill: \"research-synthesis\" }) then Skill({ skill: \"workflow-creator\" }) ..." })
+        Task({ task_id: 'task-8', subagent_type: "general-purpose", prompt: "Invoke Skill({ skill: \"research-synthesis\" }) then Skill({ skill: \"workflow-creator\" }) ..." })
         [creator handles CLAUDE.md, validation, agent coordination]
 ```
 
@@ -324,7 +324,7 @@ See Section 1.1 for Router Tool Restrictions enforcement.
 
 ### Spawn Templates
 
-> **Task Tool Signature:** `Task({ subagent_type, prompt, task_id, model? })`
+> **Task Tool Signature:** `Task({ task_id: 'task-9', subagent_type, prompt, task_id, model? })`
 > **task_id is REQUIRED** for spawn traceability (logged to spawn-log.jsonl).
 > See **@TOOL_REFERENCE.md** for full details.
 
@@ -547,7 +547,7 @@ Invoke the {skill-name} skill and follow it exactly as presented to you
 
 - **Commands** = user types `/name` (entry point)
 - **Skills** = agent invokes `Skill({ skill: "name" })` (behavior)
-- **Agents** = Router spawns `Task({ ... })` (execution)
+- **Agents** = Router spawns `Task({ task_id: 'task-10', ... })` (execution)
 
 ---
 

@@ -18,6 +18,7 @@ const path = require('path');
 const fs = require('fs');
 const { clearAllCache } = require('../../.claude/lib/utils/state-cache.cjs');
 const routerState = require('../../.claude/lib/routing/router-state.cjs');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // Prevent process.exit from actually exiting during tests
 const originalExit = process.exit;
@@ -35,6 +36,13 @@ process.exit = originalExit;
 // Test helpers
 const ROUTER_STATE_FILE = routerState.STATE_FILE;
 const LOOP_STATE_FILE = preTaskUnified.LOOP_STATE_FILE;
+const TASKLIST_LOOP_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'tasklist-first-loop-state.json'
+);
 
 function backupState(filePath) {
   if (fs.existsSync(filePath)) {
@@ -73,6 +81,7 @@ function readState(filePath) {
 describe('pre-task-unified.cjs', () => {
   let routerStateBackup = null;
   let loopStateBackup = null;
+  let tasklistLoopStateBackup = null;
   let originalEnv = {};
 
   beforeEach(() => {
@@ -80,6 +89,7 @@ describe('pre-task-unified.cjs', () => {
     // Backup state files
     routerStateBackup = backupState(ROUTER_STATE_FILE);
     loopStateBackup = backupState(LOOP_STATE_FILE);
+    tasklistLoopStateBackup = backupState(TASKLIST_LOOP_STATE_FILE);
 
     // Backup environment
     originalEnv = {
@@ -87,6 +97,7 @@ describe('pre-task-unified.cjs', () => {
       PLANNER_FIRST_ENFORCEMENT: process.env.PLANNER_FIRST_ENFORCEMENT,
       SECURITY_REVIEW_ENFORCEMENT: process.env.SECURITY_REVIEW_ENFORCEMENT,
       LOOP_PREVENTION_MODE: process.env.LOOP_PREVENTION_MODE,
+      CLAUDE_SESSION_ID: process.env.CLAUDE_SESSION_ID,
     };
 
     // Clean environment
@@ -94,6 +105,7 @@ describe('pre-task-unified.cjs', () => {
     delete process.env.PLANNER_FIRST_ENFORCEMENT;
     delete process.env.SECURITY_REVIEW_ENFORCEMENT;
     delete process.env.LOOP_PREVENTION_MODE;
+    delete process.env.CLAUDE_SESSION_ID;
 
     // Invalidate all caches before each test
     preTaskUnified.invalidateCachedState();
@@ -103,6 +115,7 @@ describe('pre-task-unified.cjs', () => {
     // Restore state files
     restoreState(ROUTER_STATE_FILE, routerStateBackup);
     restoreState(LOOP_STATE_FILE, loopStateBackup);
+    restoreState(TASKLIST_LOOP_STATE_FILE, tasklistLoopStateBackup);
 
     // Restore environment
     for (const [key, value] of Object.entries(originalEnv)) {
@@ -447,6 +460,37 @@ describe('pre-task-unified.cjs', () => {
 
       const result = preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, true);
+    });
+  });
+
+  describe('TaskList-first loop-breaker', () => {
+    it('should block initial TaskList-first violations, then warn-allow repeated loops', () => {
+      process.env.CLAUDE_SESSION_ID = 'tasklist-loop-test';
+      process.env.TASKLIST_FIRST_ENFORCEMENT = 'block';
+
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        taskListCalledSincePrompt: false,
+      });
+
+      const first = preTaskUnified.checkTaskListFirst('Task', { session_id: 'tasklist-loop-test' });
+      assert.strictEqual(first.pass, false);
+      assert.strictEqual(first.result, 'block');
+
+      const second = preTaskUnified.checkTaskListFirst('Task', {
+        session_id: 'tasklist-loop-test',
+      });
+      assert.strictEqual(second.pass, false);
+      assert.strictEqual(second.result, 'block');
+
+      const third = preTaskUnified.checkTaskListFirst('Task', {
+        session_id: 'tasklist-loop-test',
+      });
+      assert.strictEqual(third.pass, true);
+      assert.strictEqual(third.result, 'warn');
+      assert.ok(third.message.includes('LOOP-BREAKER'));
+
+      preTaskUnified.clearTaskListFirstViolation('tasklist-loop-test');
     });
   });
 

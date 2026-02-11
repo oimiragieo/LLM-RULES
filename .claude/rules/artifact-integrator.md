@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/artifact-integrator/**
+---
+
 # Artifact Integrator Rules
 
 ## Core Principles

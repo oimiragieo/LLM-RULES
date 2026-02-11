@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/graphql-expert/**
+---
+
 # GraphQL Expert Rules
 
 ## Core Principles

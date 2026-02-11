@@ -5,6 +5,8 @@ description: Expert C4 Context-level documentation specialist. Creates high-leve
 model: sonnet
 temperature: 0.3
 context_strategy: full
+maxTurns: 18
+permissionMode: default
 priority: medium
 tools: [Read, Grep, Glob, Write, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:

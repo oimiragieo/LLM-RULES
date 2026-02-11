@@ -5,6 +5,8 @@ description: Expert C4 Code-level documentation specialist. Analyzes code direct
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: medium
 tools: [Read, Grep, Glob, Write, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:

@@ -1,5 +1,8 @@
 {
   "max_tokens": 60000,
+  "env": {
+    "ENABLE_TOOL_SEARCH": "auto:5"
+  },
   "rag_enabled": true,
   "rag_threshold": 0.7,
   "auto_context_pruning": true,
@@ -11,19 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session/state-reset.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/user-prompt-unified.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/reflection/force-step0-execution.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/session/drift-detector.cjs"
+            "command": "node .claude/hooks/session/user-prompt-orchestrator.cjs"
           }
         ]
       }

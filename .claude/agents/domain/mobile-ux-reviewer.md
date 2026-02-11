@@ -5,6 +5,8 @@ description: UX/UI expert for reviewing mobile applications on iOS and Android. 
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: medium
 tools:
   [

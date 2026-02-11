@@ -13,6 +13,8 @@ model: haiku
 temperature: 0.0
 priority: highest
 context_strategy: minimal
+maxTurns: 28
+permissionMode: default
 skills:
   - agent-creator
   - skill-creator
@@ -155,6 +157,12 @@ Classify the request:
 
 ### Step 3: Spawn Agent(s) with Task Tool
 
+**Task Call Contract (MANDATORY)**:
+
+- Every `Task({ task_id: 'task-1',...})` call MUST include `task_id`.
+- Every spawned prompt MUST include matching `Task ID: <same-id>` text.
+- Missing `task_id` is blocked by spawn hooks.
+
 **CRITICAL**: Before spawning, read the agent's frontmatter to get their skills list.
 
 **Single Agent Spawn (with Task Assignment):**
@@ -165,6 +173,7 @@ TaskList();
 
 // Then spawn agent with specific task ID
 Task({
+  task_id: '3',
   subagent_type: 'general-purpose',
   description: 'Developer fixing login bug',
   prompt: `
@@ -197,12 +206,14 @@ When a task benefits from multiple perspectives or parallel work:
 ```
 // Spawn multiple agents in a SINGLE message with multiple Task calls
 Task({
+  task_id: "arch-review-1",
   subagent_type: "general-purpose",
   description: "Architect designing system",
   prompt: "You are ARCHITECT. Read @.claude/agents/core/architect.md and design..."
 })
 
 Task({
+  task_id: "sec-review-1",
   subagent_type: "general-purpose",
   description: "Security reviewing design",
   prompt: "You are SECURITY-ARCHITECT. Read @.claude/agents/specialized/security-architect.md and review..."
@@ -215,6 +226,7 @@ If no existing agent matches:
 
 ```
 Task({
+  task_id: "creator-agent-1",
   subagent_type: "general-purpose",
   description: "Creating specialized agent",
   prompt: `
@@ -238,6 +250,7 @@ If new capability/tool is required:
 
 ```
 Task({
+  task_id: "creator-skill-1",
   subagent_type: "general-purpose",
   description: "Creating new skill",
   prompt: `
@@ -288,6 +301,7 @@ Then spawn:
 
 ```
 Task({
+  task_id: 'task-2',
   subagent_type: "general-purpose",
   description: "Developer fixing login bug",
   prompt: "You are DEVELOPER. Read @.claude/agents/core/developer.md first, then fix the login form bug. Follow Memory Protocol."
@@ -313,6 +327,7 @@ Task({
 
 ```
 Task({
+  task_id: 'task-3',
   subagent_type: "general-purpose",
   model: "opus",
   description: "Planner designing payment feature",
@@ -324,6 +339,7 @@ Task({
 
 ```
 Task({
+  task_id: 'task-4',
   subagent_type: "general-purpose",
   model: "opus",
   description: "Architect reviewing payment architecture",
@@ -331,6 +347,7 @@ Task({
 })
 
 Task({
+  task_id: 'task-5',
   subagent_type: "general-purpose",
   model: "opus",
   description: "Security reviewing payment design",
@@ -342,6 +359,7 @@ Task({
 
 ```
 Task({
+  task_id: 'task-6',
   subagent_type: "general-purpose",
   description: "Planner consolidating reviews",
   prompt: "You are PLANNER. Read the reviews in @.claude/context/reports/ and update the plan to address Architect and Security feedback."
@@ -386,6 +404,7 @@ For long-running tasks, spawn in background:
 
 ```
 Task({
+  task_id: 'task-7',
   subagent_type: "general-purpose",
   description: "QA running full test suite",
   run_in_background: true,
@@ -479,6 +498,7 @@ Before spawning, verify:
 
 ```javascript
 Task({
+  task_id: 'task-8',
   subagent_type: best.id,
   prompt: assembleSpawnPrompt(best.id, userRequest),
 });
@@ -524,6 +544,7 @@ const modelResult = resolveAgentModel('developer', PROJECT_ROOT);
 // modelResult: { model: 'claude-sonnet-4-5', shorthand: 'sonnet', source: 'config.yaml' }
 
 Task({
+  task_id: 'task-9',
   subagent_type: 'general-purpose',
   model: modelResult.model, // Use config-resolved model (ADR-075)
   description: 'Developer implementing feature',

@@ -467,7 +467,7 @@ function checkExecutionLimit(hookInput, toolName, toolInput) {
 
     const message = `[EXECUTION LIMIT] ${exceeded.limitType} exceeded (${exceeded.current}/${exceeded.max}). Action: ${timeoutAction}.
 
-If this is expected, increase Task({ execution_limits: { ... } }) for this session.`;
+If this is expected, increase Task({ task_id: 'task-1', execution_limits: { ... } }) for this session.`;
 
     return { checked: true, action: 'block', message };
   } catch (err) {

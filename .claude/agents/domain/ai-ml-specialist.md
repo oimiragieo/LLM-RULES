@@ -5,6 +5,8 @@ description: AI/ML specialist for machine learning model development, deep learn
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   - Read

@@ -104,6 +104,7 @@ Orchestrate multi-agent swarms using Queen/Worker topology for massively paralle
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   description: 'Swarm initialization and task decomposition',
   prompt: `You are the SWARM-COORDINATOR agent (Queen).
@@ -155,6 +156,7 @@ Initialize swarm for: $TASK_DESCRIPTION
 ```javascript
 // Worker 1
 Task({
+  task_id: 'task-2',
   subagent_type: 'general-purpose',
   run_in_background: true,
   description: 'Swarm Worker W1 for subtask 1',
@@ -183,6 +185,7 @@ $SUBTASK_1_DESCRIPTION
 
 // Worker 2
 Task({
+  task_id: 'task-3',
   subagent_type: 'general-purpose',
   run_in_background: true,
   description: 'Swarm Worker W2 for subtask 2',
@@ -206,6 +209,7 @@ The Queen ensures even distribution of work across workers:
 
 ```javascript
 Task({
+  task_id: 'task-4',
   subagent_type: 'general-purpose',
   description: 'Load balancing check for swarm',
   prompt: `You are the SWARM-COORDINATOR agent (Queen).
@@ -260,6 +264,7 @@ For subtasks with dependencies, the Queen establishes execution order:
 
 ```javascript
 Task({
+  task_id: 'task-5',
   subagent_type: 'general-purpose',
   description: 'Monitor swarm worker execution',
   prompt: `You are the SWARM-COORDINATOR agent (Queen).
@@ -330,6 +335,7 @@ Workers report progress to shared session files:
 
 ```javascript
 Task({
+  task_id: 'task-6',
   subagent_type: 'general-purpose',
   description: 'Aggregate swarm worker results',
   prompt: `You are the SWARM-COORDINATOR agent (Queen).
@@ -375,6 +381,7 @@ When using voting consensus:
 
 ```javascript
 Task({
+  task_id: 'task-7',
   subagent_type: 'general-purpose',
   description: 'Resolve consensus for swarm decision',
   prompt: `You are the SWARM-COORDINATOR agent (Queen).
@@ -413,6 +420,7 @@ Resolve consensus for swarm: $SWARM_ID
 
 ```javascript
 Task({
+  task_id: 'task-8',
   subagent_type: 'general-purpose',
   description: 'Verify merged swarm results',
   prompt: `You are the QA agent.
@@ -517,6 +525,7 @@ function detectStall(worker) {
 
 ```javascript
 Task({
+  task_id: 'task-9',
   subagent_type: 'general-purpose',
   description: 'Replace failed worker W3',
   prompt: `You are WORKER W3-REPLACEMENT in swarm $SWARM_ID.
@@ -602,6 +611,7 @@ function calculateDelay(attempt) {
 ```javascript
 // Router spawning swarm workflow for large refactoring
 Task({
+  task_id: 'task-10',
   subagent_type: 'general-purpose',
   description: 'Orchestrating swarm for API migration',
   prompt: `Execute swarm coordination workflow.

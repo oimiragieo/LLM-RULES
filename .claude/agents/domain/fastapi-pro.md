@@ -5,6 +5,8 @@ description: Build high-performance async APIs with FastAPI, SQLAlchemy 2.0, and
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   [

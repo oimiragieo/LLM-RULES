@@ -5,6 +5,8 @@ description: Multi-agent collaboration coordinator for Party Mode. Orchestrates 
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools: [Read, Write, Edit, Task, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
@@ -199,6 +201,7 @@ for (const agent of spawnedAgents) {
   const modelResult = resolveAgentModel(agent.agentType, PROJECT_ROOT);
 
   Task({
+    task_id: 'task-1',
     subagent_type: 'general-purpose',
     model: modelResult.model, // Use config-resolved model (ADR-075)
     description: `${agent.role} agent responding to: ${userInput.slice(0, 50)}...`,

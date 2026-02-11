@@ -139,6 +139,7 @@ function generateSpawnInstruction(entry) {
 
   return `[REFLECTION-TRIGGER] Spawn reflection-agent for: ${reason}
 Task({
+  task_id: 'task-1',
   subagent_type: "reflection-agent",
   description: "Reflection: ${reason}",
   prompt: \`${taskPrompt}\`

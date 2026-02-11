@@ -246,7 +246,6 @@ function main() {
       data = fs.readFileSync(0, 'utf-8'); // Read from stdin (fd 0)
     } catch (_err) {
       // Fail-open if stdin unavailable
-      process.stdout.write(JSON.stringify({ allow: true }) + '\n');
       process.exit(0);
       return;
     }
@@ -256,8 +255,7 @@ function main() {
     try {
       input = JSON.parse(data);
     } catch (_err) {
-      // Malformed JSON - passthrough
-      process.stdout.write(data);
+      // Malformed JSON - fail-open without passthrough output
       process.exit(0);
       return;
     }
@@ -265,8 +263,7 @@ function main() {
     // Extract user prompt
     const userPrompt = input.message || input.prompt || '';
     if (!userPrompt || typeof userPrompt !== 'string') {
-      // No prompt to analyze - passthrough
-      process.stdout.write(JSON.stringify(input) + '\n');
+      // No prompt to analyze - noop
       process.exit(0);
       return;
     }
@@ -277,19 +274,11 @@ function main() {
     // Process prompt for drift detection
     processPrompt(userPrompt, sessionId);
 
-    // Always output original input (passthrough)
-    process.stdout.write(JSON.stringify(input) + '\n');
+    // Side-effect-only hook: no stdout on allow path
     process.exit(0);
   } catch (err) {
     // Fail-open on any error
     process.stderr.write(`[drift-detector] ERROR: ${err.message}\n`);
-    // Try to passthrough if possible
-    try {
-      const data = fs.readFileSync(0, 'utf-8');
-      process.stdout.write(data);
-    } catch (_err) {
-      process.stdout.write(JSON.stringify({ allow: true }) + '\n');
-    }
     process.exit(0);
   }
 }

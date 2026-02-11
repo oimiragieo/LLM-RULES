@@ -14,6 +14,14 @@ metadata:
     - data-analysis
     - scientific-writing
   skill-count: 139
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - WebSearch
+  - WebFetch
+  - Task
 ---
 
 # Claude Scientific Skills
@@ -282,6 +290,7 @@ Skill({ skill: 'scientific-skills/scientific-schematics' });
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'python-pro',
   description: 'Analyze molecular dataset with RDKit',
   prompt: `You are the PYTHON-PRO agent with scientific research expertise.

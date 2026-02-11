@@ -5,6 +5,8 @@ description: Expert C4 Component-level documentation specialist. Synthesizes C4 
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: medium
 tools: [Read, Grep, Glob, Write, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:

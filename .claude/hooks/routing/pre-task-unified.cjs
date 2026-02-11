@@ -65,6 +65,13 @@ const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
  * Loop state file path
  */
 const LOOP_STATE_FILE = loopStateManager.LOOP_STATE_FILE;
+const TASKLIST_LOOP_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'tasklist-first-loop-state.json'
+);
 
 /**
  * Default loop prevention limits
@@ -73,6 +80,12 @@ const DEFAULT_EVOLUTION_BUDGET = 3;
 const DEFAULT_COOLDOWN_MS = 300000; // 5 minutes
 const DEFAULT_DEPTH_LIMIT = 5;
 const DEFAULT_PATTERN_THRESHOLD = 3;
+const TASKLIST_LOOP_BREAKER_THRESHOLD = Number(
+  process.env.TASKLIST_FIRST_LOOP_BREAKER_THRESHOLD || 3
+);
+const TASKLIST_LOOP_BREAKER_WINDOW_MS = Number(
+  process.env.TASKLIST_FIRST_LOOP_BREAKER_WINDOW_MS || 120000
+);
 
 /**
  * Patterns to detect PLANNER agent spawns
@@ -141,6 +154,58 @@ function invalidateCachedState() {
 function getLoopState() {
   // Backward-compatible helper kept for tests/exports.
   return loopStateManager.getState();
+}
+
+function readTaskListLoopState(stateFile = TASKLIST_LOOP_STATE_FILE) {
+  try {
+    if (!fs.existsSync(stateFile)) return { sessions: {} };
+    const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      !parsed.sessions ||
+      typeof parsed.sessions !== 'object'
+    ) {
+      return { sessions: {} };
+    }
+    return parsed;
+  } catch (_err) {
+    return { sessions: {} };
+  }
+}
+
+function writeTaskListLoopState(state, stateFile = TASKLIST_LOOP_STATE_FILE) {
+  try {
+    const dir = path.dirname(stateFile);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(stateFile, JSON.stringify(state, null, 2), 'utf8');
+  } catch (_err) {
+    // Best-effort
+  }
+}
+
+function registerTaskListFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID || 'unknown') {
+  const now = Date.now();
+  const state = readTaskListLoopState();
+  const prev = state.sessions[sessionId] || { count: 0, updatedAt: 0 };
+  const withinWindow = now - Number(prev.updatedAt || 0) <= TASKLIST_LOOP_BREAKER_WINDOW_MS;
+  const next = {
+    count: withinWindow ? Number(prev.count || 0) + 1 : 1,
+    updatedAt: now,
+  };
+  state.sessions[sessionId] = next;
+  writeTaskListLoopState(state);
+  return next.count;
+}
+
+function clearTaskListFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID || 'unknown') {
+  const state = readTaskListLoopState();
+  if (state.sessions[sessionId]) {
+    delete state.sessions[sessionId];
+    writeTaskListLoopState(state);
+  }
 }
 
 // =============================================================================
@@ -365,7 +430,7 @@ function getCooldownMs() {
  * @param {string} toolName - Tool being used
  * @returns {{ pass: boolean, result?: 'block'|'warn', message?: string }}
  */
-function checkTaskListFirst(toolName) {
+function checkTaskListFirst(toolName, hookInput = null) {
   if (toolName !== 'Task') {
     return { pass: true };
   }
@@ -374,7 +439,18 @@ function checkTaskListFirst(toolName) {
     return { pass: true };
   }
   if (routerState.isTaskListCalledSincePrompt()) {
+    const sessionId =
+      hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || 'unknown';
+    clearTaskListFirstViolation(sessionId);
     return { pass: true };
+  }
+  const sessionId =
+    hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || 'unknown';
+  const repeated = registerTaskListFirstViolation(sessionId);
+  if (repeated >= TASKLIST_LOOP_BREAKER_THRESHOLD) {
+    const message = `[TASKLIST-FIRST LOOP-BREAKER] TaskList-first violation repeated ${repeated}x in this session window.
+Temporarily allowing Task spawn to avoid autonomous deadlock.`;
+    return { pass: true, result: 'warn', message };
   }
   const message =
     'TaskList() must be called before Task(). Call TaskList() first, then spawn with Task().';
@@ -446,7 +522,7 @@ function checkRoutingGuard(toolName, toolInput) {
       // Not a PLANNER spawn, but PLANNER is required
       const complexity = state.complexity || 'unknown';
       const message = `[PLANNER-FIRST VIOLATION] High/Epic complexity (${complexity}) requires PLANNER agent first.
-Spawn PLANNER first: Task({ description: 'Planner designing...', prompt: 'You are PLANNER...' })`;
+Spawn PLANNER first: Task({ task_id: 'task-1', description: 'Planner designing...', prompt: 'You are PLANNER...' })`;
 
       if (plannerEnforcement === 'block') {
         return { pass: false, result: 'block', message };
@@ -646,7 +722,7 @@ function runAllChecks(hookInput) {
   const toolInput = getToolInput(hookInput);
 
   // Check 0: TaskList-first (TASKLIST_FIRST_ENFORCEMENT=block|warn|off, default block)
-  const taskListFirstResult = checkTaskListFirst(toolName);
+  const taskListFirstResult = checkTaskListFirst(toolName, hookInput);
   if (!taskListFirstResult.pass) {
     return {
       pass: false,
@@ -818,6 +894,10 @@ module.exports = {
   isEvolutionTrigger,
   detectEvolutionType,
   getLoopState,
+  readTaskListLoopState,
+  writeTaskListLoopState,
+  registerTaskListFirstViolation,
+  clearTaskListFirstViolation,
   invalidateCachedState,
   updateLoopStateAfterAllow,
 

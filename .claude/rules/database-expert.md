@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/database-expert/**
+---
+
 # Database Expert Rules
 
 ## Core Principles

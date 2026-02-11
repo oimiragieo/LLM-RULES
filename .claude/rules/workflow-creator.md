@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/workflow-creator/**
+---
+
 # Workflow Creator Rules
 
 ## Core Principles

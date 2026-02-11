@@ -42,6 +42,7 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 
 // Use in Task() spawn:
 Task({
+  task_id: 'task-1',
   model: result.shorthand,  // 'opus'
   prompt: `You are PLANNER...`,
   ...

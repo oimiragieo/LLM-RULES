@@ -205,6 +205,7 @@ You can bias spawn prompts to a fixed **preset**: a named set of skills (and an 
 
 ```json
 Task({
+  task_id: 'task-1',
   "subagent_type": "planner",
   "prompt": "...",
   "preset_id": "planning-heavy"

@@ -323,14 +323,53 @@ function getToolOutput(input) {
 }
 
 /**
- * Format a JSON result for hook output
+ * Format a JSON result for hook output.
  *
- * @param {'allow'|'block'|'warn'} result - Hook result
+ * Runtime expects `permissionDecision` for PreToolUse deny/allow handling.
+ * We also keep legacy `result/message` fields for backwards compatibility
+ * with existing local scripts and diagnostics.
+ *
+ * @param {'allow'|'block'|'warn'|'deny'} result - Hook result
  * @param {string} [message] - Optional message
  * @returns {string} JSON string for output
  */
 function formatResult(result, message = '') {
-  return JSON.stringify({ result, message });
+  // Backwards-compatibility path: some legacy hooks still pass an object
+  // such as { allow: true, message: '' }.
+  if (result && typeof result === 'object' && !Array.isArray(result)) {
+    const allow = result.allow;
+    const explicitDecision = result.permissionDecision;
+    const inferredDecision =
+      explicitDecision || (allow === false ? 'deny' : allow === true ? 'allow' : 'allow');
+    const safeMessage =
+      typeof result.message === 'string'
+        ? result.message
+        : typeof message === 'string'
+          ? message
+          : String(message || '');
+    return JSON.stringify({
+      ...result,
+      permissionDecision: inferredDecision,
+      permissionDecisionReason: safeMessage || result.permissionDecisionReason || '',
+      message: safeMessage,
+    });
+  }
+
+  const normalized = String(result || 'allow').toLowerCase();
+  const permissionDecision = normalized === 'block' || normalized === 'deny' ? 'deny' : 'allow';
+  const safeMessage = typeof message === 'string' ? message : String(message || '');
+
+  const output = {
+    permissionDecision,
+    result: normalized,
+    message: safeMessage,
+  };
+
+  if (safeMessage) {
+    output.permissionDecisionReason = safeMessage;
+  }
+
+  return JSON.stringify(output);
 }
 
 /**

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/spec-init/**
+---
+
 # Spec Init Rules
 
 ## Core Principles

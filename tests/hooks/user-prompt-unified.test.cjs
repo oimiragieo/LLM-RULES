@@ -773,4 +773,34 @@ describe('STM writes (UserPromptSubmit)', () => {
   });
 });
 
+describe('task notification bypass', () => {
+  it('should detect task-notification payloads', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const payload = `<task-notification>
+<task-id>abc123</task-id>
+</task-notification>`;
+    assert.strictEqual(unified.isTaskNotificationPrompt(payload), true);
+    assert.strictEqual(unified.isTaskNotificationPrompt('normal user prompt'), false);
+  });
+
+  it('should skip router mode reset for task notifications', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const result = unified.checkRouterModeReset({
+      prompt: '<task-notification><task-id>abc123</task-id></task-notification>',
+    });
+    assert.strictEqual(result.skipped, true);
+    assert.strictEqual(result.reason, 'task_notification');
+  });
+
+  it('runAllChecks should short-circuit on task notifications', async () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const result = await unified.runAllChecks({
+      prompt: '<task-notification><task-id>abc123</task-id></task-notification>',
+    });
+    assert.strictEqual(result.systemNotificationBypass, true);
+    assert.strictEqual(result.routerEnforcement.skipped, true);
+    assert.strictEqual(result.routerEnforcement.reason, 'task_notification');
+  });
+});
+
 console.log('All tests defined. Running...');

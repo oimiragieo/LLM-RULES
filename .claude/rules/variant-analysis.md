@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/variant-analysis/**
+---
+
 # Variant Analysis Rules
 
 <!-- Agent: security-architect | Task: #4 | Session: 2026-02-09 -->

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/session-handoff/**
+---
+
 # Session Handoff Rules
 
 ## Core Principles

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/schema-creator/**
+---
+
 # Schema Creator Rules
 
 ## Core Principles

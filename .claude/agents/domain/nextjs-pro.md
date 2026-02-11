@@ -5,6 +5,8 @@ description: Next.js 14+ App Router expert with React Server Components, Server 
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: false
 tools:

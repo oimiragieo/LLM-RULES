@@ -5,6 +5,8 @@ description: Intelligently summarizes and compresses context (files, logs, outpu
 model: haiku
 temperature: 0.3
 context_strategy: minimal
+maxTurns: 18
+permissionMode: default
 priority: medium
 tools: [Read, Write, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 # Note: Uses Write (not Edit) to create new compressed summaries rather than modify originals

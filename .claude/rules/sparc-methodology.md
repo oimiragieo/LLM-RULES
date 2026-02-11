@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/sparc-methodology/**
+---
+
 # SPARC Methodology
 
 SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) comprehensive development methodology with multi-agent orchestration

@@ -6,7 +6,7 @@
  * Test Strategy:
  * - Run hook via execSync with JSON stdin
  * - Manipulate counter file between runs
- * - Verify stdout (passthrough) and stderr (warnings)
+ * - Verify stderr warnings and that stdout stays empty (side-effect-only hook)
  */
 
 import { spawnSync } from 'child_process';
@@ -90,9 +90,8 @@ test('First edit creates counter file with count=1', () => {
   try {
     const result = runHook(hookInput, testEnv);
 
-    // Should pass through original input
-    const parsed = JSON.parse(result.stdout);
-    assert.strictEqual(parsed.tool, 'Edit');
+    // Side-effect-only hook should not emit stdout
+    assert.strictEqual(result.stdout.trim(), '');
     assert.strictEqual(result.exitCode, 0);
 
     // Counter file should exist with count=1
@@ -121,7 +120,7 @@ test('5th edit triggers first threshold warning (default thresholds)', () => {
         assert.ok(result.stderr.includes('lint:fix'));
         assert.ok(result.stderr.includes('format'));
       }
-      // All runs should pass through
+      // All runs should remain non-blocking
       assert.strictEqual(result.exitCode, 0);
     }
 
@@ -238,7 +237,7 @@ test('Default thresholds used when no correction rate file exists', () => {
   }
 });
 
-test('Always passes through original JSON to stdout (non-blocking verification)', () => {
+test('Does not emit stdout on allow path (non-blocking verification)', () => {
   const testEnv = createTestEnv();
   try {
     const customInput = {
@@ -248,9 +247,8 @@ test('Always passes through original JSON to stdout (non-blocking verification)'
 
     const result = runHook(customInput, testEnv);
 
-    // Should pass through unchanged
-    const parsed = JSON.parse(result.stdout);
-    assert.deepStrictEqual(parsed, customInput);
+    // Side-effect-only hook should not emit stdout
+    assert.strictEqual(result.stdout.trim(), '');
     assert.strictEqual(result.exitCode, 0);
   } finally {
     testEnv.cleanup();
@@ -265,10 +263,9 @@ test('Malformed counter file resets to 1 (no crash)', () => {
 
     const result = runHook(hookInput, testEnv);
 
-    // Should not crash, should pass through
+    // Should not crash and should remain silent on stdout
     assert.strictEqual(result.exitCode, 0);
-    const parsed = JSON.parse(result.stdout);
-    assert.strictEqual(parsed.tool, 'Edit');
+    assert.strictEqual(result.stdout.trim(), '');
 
     // Counter should be reset to 1
     const counter = JSON.parse(fs.readFileSync(testEnv.counterFile, 'utf8'));

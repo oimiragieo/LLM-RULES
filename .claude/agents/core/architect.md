@@ -5,6 +5,8 @@ description: System designer. Makes high-level technical decisions, chooses stac
 model: opus
 temperature: 0.4
 context_strategy: full
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: true
 tools:

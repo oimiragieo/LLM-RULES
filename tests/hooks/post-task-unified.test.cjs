@@ -297,6 +297,60 @@ describe('post-task-unified.cjs', () => {
     });
   });
 
+  describe('Task Completion Guard Enforcement', () => {
+    it('should block by default when completion detected without matching TaskUpdate(completed)', () => {
+      const routerState = require('../../.claude/lib/routing/router-state.cjs');
+      const originalGetLast = routerState.getLastTaskUpdate;
+      routerState.getLastTaskUpdate = () => ({
+        timestamp: Date.now(),
+        taskId: 'task-other',
+        status: 'in_progress',
+        count: 1,
+      });
+
+      const result = unifiedHook.runTaskCompletionGuard('Task completed successfully', 'task-123');
+      assert.strictEqual(result.pass, false);
+      assert.strictEqual(result.result, 'block');
+      assert.ok(String(result.message || '').includes('TaskUpdate'));
+
+      routerState.getLastTaskUpdate = originalGetLast;
+    });
+
+    it('should pass when matching TaskUpdate(completed) exists', () => {
+      const routerState = require('../../.claude/lib/routing/router-state.cjs');
+      const originalGetLast = routerState.getLastTaskUpdate;
+      routerState.getLastTaskUpdate = () => ({
+        timestamp: Date.now(),
+        taskId: 'task-123',
+        status: 'completed',
+        count: 2,
+      });
+
+      const result = unifiedHook.runTaskCompletionGuard('Task completed successfully', 'task-123');
+      assert.strictEqual(result.pass, true);
+
+      routerState.getLastTaskUpdate = originalGetLast;
+    });
+
+    it('should warn (not block) when TASK_COMPLETION_GUARD=warn', () => {
+      const routerState = require('../../.claude/lib/routing/router-state.cjs');
+      const originalGetLast = routerState.getLastTaskUpdate;
+      routerState.getLastTaskUpdate = () => ({
+        timestamp: Date.now() - 5 * 60 * 1000,
+        taskId: 'task-123',
+        status: 'completed',
+        count: 2,
+      });
+      process.env.TASK_COMPLETION_GUARD = 'warn';
+
+      const result = unifiedHook.runTaskCompletionGuard('Task completed successfully', 'task-123');
+      assert.strictEqual(result.pass, true);
+      assert.strictEqual(result.result, 'warn');
+
+      routerState.getLastTaskUpdate = originalGetLast;
+    });
+  });
+
   describe('Evolution Audit', () => {
     describe('isEvolutionCompletion', () => {
       it('should detect enable phase', () => {

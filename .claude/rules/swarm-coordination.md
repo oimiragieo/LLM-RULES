@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/swarm-coordination/**
+---
+
 # Swarm Coordination Rules
 
 ## Core Principles

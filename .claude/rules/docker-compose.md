@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/docker-compose/**
+---
+
 # Docker Compose Rules
 
 ## Core Principles

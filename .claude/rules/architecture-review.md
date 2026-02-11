@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/architecture-review/**
+---
+
 # Architecture Review Rules
 
 ## Core Principles

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/python-backend-expert/**
+---
+
 # Python Backend Expert Rules
 
 ## Core Principles

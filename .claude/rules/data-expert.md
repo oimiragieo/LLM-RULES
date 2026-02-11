@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/data-expert/**
+---
+
 # Data Expert Rules
 
 ## Core Principles

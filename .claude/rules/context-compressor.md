@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/context-compressor/**
+---
+
 # Context Compressor Rules
 
 ## Core Principles

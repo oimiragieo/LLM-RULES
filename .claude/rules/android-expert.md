@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/android-expert/**
+---
+
 # Android Expert Rules
 
 ## Core Principles

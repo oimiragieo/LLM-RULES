@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/agent-creator/**
+---
+
 # Agent Creator Rules
 
 ## Core Principles
@@ -82,5 +87,5 @@ After creating an agent, MUST:
 - [ ] Add routing keywords to routing-table.cjs
 - [ ] Assign at least 3 relevant skills
 - [ ] Update CLAUDE.md routing table (if new category)
-- [ ] Test agent spawn with `Task({ subagent_type: '{agent-name}' })`
+- [ ] Test agent spawn with `Task({ task_id: 'task-1', subagent_type: '{agent-name}' })`
 - [ ] Document in @AGENT_ROUTING_TABLE.md

@@ -53,6 +53,7 @@ Before starting this workflow:
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   description: '{{TASK_DESCRIPTION}}',
   prompt: `You are the {{AGENT_NAME}} agent.
@@ -88,6 +89,7 @@ Task({
 
 ```javascript
 Task({
+  task_id: 'task-2',
   subagent_type: 'general-purpose',
   description: '{{TASK_DESCRIPTION}}',
   prompt: `You are the {{AGENT_NAME}} agent.
@@ -121,6 +123,7 @@ Task({
 ```javascript
 // Spawn both agents in parallel for efficiency
 Task({
+  task_id: 'task-3',
   subagent_type: 'general-purpose',
   description: '{{AGENT_A}} reviewing {{ARTIFACT}}',
   prompt: `You are the {{AGENT_A}} agent.
@@ -136,6 +139,7 @@ Review {{ARTIFACT}} for {{REVIEW_FOCUS_A}}.
 });
 
 Task({
+  task_id: 'task-4',
   subagent_type: 'general-purpose',
   description: '{{AGENT_B}} reviewing {{ARTIFACT}}',
   prompt: `You are the {{AGENT_B}} agent.
@@ -165,6 +169,7 @@ Review {{ARTIFACT}} for {{REVIEW_FOCUS_B}}.
 
 ```javascript
 Task({
+  task_id: 'task-5',
   subagent_type: 'general-purpose',
   description: '{{TASK_DESCRIPTION}}',
   prompt: `You are the {{AGENT_NAME}} agent.

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/planning-with-files/**
+---
+
 # Planning with Files Rules
 
 ## Core Principles

@@ -22,6 +22,13 @@ grep "router-decision" .claude\CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED!"
 
 This workflow is executed for EVERY user request. The Router MUST follow all steps in sequence without deviation.
 
+### Task Spawn Contract (Mandatory)
+
+- Router MUST call `TaskCreate(...)` before spawning work tasks.
+- Every `Task({ task_id: 'task-1',...})` call MUST include `task_id`.
+- Spawn prompt text MUST include matching `Task ID: <id>` reference.
+- Missing `task_id` is hard-blocked by spawn hooks.
+
 ```mermaid
 flowchart TD
     A[User Request] --> B{Step 0: Artifact Creation?}
@@ -182,6 +189,7 @@ TaskList();
 ```javascript
 // Route to codebase-integration skill
 Task({
+  task_id: '{created-task-id}',
   subagent_type: 'general-purpose',
   description: 'Integrating external codebase',
   prompt: `You are performing codebase integration.
@@ -431,6 +439,7 @@ Without these, the skill was NEVER invoked because Router couldn't find it.
 
 ```javascript
 Task({
+  task_id: 'task-2',
   subagent_type: 'general-purpose',
   model: 'opus',
   description: 'Party orchestrator coordinating team discussion',
@@ -556,6 +565,7 @@ When spawning an agent for an existing task (from TaskGet), check the task descr
 ```javascript
 // Example: Bug fix
 Task({
+  task_id: 'task-3',
   subagent_type: 'general-purpose',
   model: 'sonnet',
   description: 'Developer fixing login bug',
@@ -606,6 +616,7 @@ Subject: Fix login bug
 ```javascript
 // Example: Security-sensitive feature
 Task({
+  task_id: 'task-4',
   subagent_type: 'general-purpose',
   model: 'sonnet',
   description: 'Planner designing payment feature',
@@ -629,6 +640,7 @@ Design payment processing feature.
 });
 
 Task({
+  task_id: 'task-5',
   subagent_type: 'general-purpose',
   model: 'opus', // Use opus for security review
   description: 'Security reviewing payment design',
@@ -791,6 +803,7 @@ if (workflowState) {
 ```javascript
 // Spawn explorer(s) - can be parallel if independent areas
 Task({
+  task_id: 'task-6',
   subagent_type: 'general-purpose',
   description: 'Exploring codebase for feature context',
   prompt: `You are the ARCHITECT agent in exploration mode.
@@ -819,6 +832,7 @@ Explore codebase to understand {area_of_interest}.
 
 ```javascript
 Task({
+  task_id: 'task-7',
   subagent_type: 'general-purpose',
   description: 'Planner creating feature plan',
   prompt: `You are the PLANNER agent.
@@ -849,6 +863,7 @@ Create plan for {feature_name} based on exploration findings.
 ```javascript
 // Spawn BOTH reviewers in same response for parallel execution
 Task({
+  task_id: 'task-8',
   subagent_type: 'general-purpose',
   description: 'Architect reviewing plan',
   prompt: `You are the ARCHITECT agent.
@@ -871,6 +886,7 @@ Review plan for architectural concerns.
 });
 
 Task({
+  task_id: 'task-9',
   subagent_type: 'general-purpose',
   model: 'opus',
   description: 'Security reviewing plan',
@@ -901,6 +917,7 @@ Review plan for security concerns.
 ```javascript
 // For plans: Consolidate reviews
 Task({
+  task_id: 'task-10',
   subagent_type: 'general-purpose',
   description: 'Consolidating review feedback',
   prompt: `You are the PLANNER agent in consolidation mode.
@@ -926,6 +943,7 @@ Update plan based on architect and security reviews.
 
 // For implementation: Execute the plan
 Task({
+  task_id: 'task-11',
   subagent_type: 'general-purpose',
   description: 'Implementing approved plan',
   prompt: `You are the DEVELOPER agent.
@@ -957,6 +975,7 @@ Implement {feature_name} according to approved plan.
 
 ```javascript
 Task({
+  task_id: 'task-12',
   subagent_type: 'general-purpose',
   run_in_background: true,
   description: 'QA running full test suite',
@@ -995,6 +1014,7 @@ Run full test suite and report results.
 ```javascript
 // Example: Use haiku for quick syntax check
 Task({
+  task_id: 'task-13',
   subagent_type: 'general-purpose',
   model: 'haiku',
   description: 'Quick syntax validation',
@@ -1003,6 +1023,7 @@ Task({
 
 // Example: Use opus for security review
 Task({
+  task_id: 'task-14',
   subagent_type: 'general-purpose',
   model: 'opus',
   description: 'Security architecture review',
@@ -1095,6 +1116,7 @@ Ensure prompt contains:
 
 ```javascript
 Task({
+  task_id: 'task-15',
   subagent_type: agentType,
   model: selectedModel,
   description: `${agentType} ${taskDescription}`,
@@ -1202,6 +1224,7 @@ Task({
 
    ```javascript
    Task({
+     task_id: 'task-16',
      subagent_type: 'general-purpose', // REQUIRED
      description: 'Brief description', // REQUIRED
      prompt: '...', // REQUIRED
@@ -1227,10 +1250,11 @@ Task({
 
 ```javascript
 // BROKEN (missing required fields):
-Task({ prompt: 'Do something' });
+Task({ task_id: 'task-17', prompt: 'Do something' });
 
 // FIXED:
 Task({
+  task_id: 'task-18',
   subagent_type: 'general-purpose',
   description: 'Doing something specific',
   prompt: `You are the DEVELOPER agent.

@@ -5,6 +5,8 @@ description: Senior LLM Systems Architect specializing in RAG pipeline design, m
 model: opus
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   [
@@ -125,7 +127,7 @@ The following workflows guide this agent's execution:
 
 ```
 This task is better suited for [AGENT_NAME]. Please re-route via:
-Task({ prompt: "You are [AGENT_NAME]..." })
+Task({ task_id: 'task-1', prompt: "You are [AGENT_NAME]..." })
 ```
 
 ## Workflow

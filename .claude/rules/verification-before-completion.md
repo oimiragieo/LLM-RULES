@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/verification-before-completion/**
+---
+
 # Verification Before Completion Rules
 
 ## Iron Law

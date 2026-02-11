@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/code-quality-expert/**
+---
+
 # Code Quality Expert Rules
 
 ## Core Rules

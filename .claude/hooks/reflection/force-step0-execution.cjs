@@ -21,6 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { parseHookInputAsync } = require('../../lib/utils/hook-input.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
@@ -53,20 +54,46 @@ function readSpawnRequests(filePath) {
   }
 }
 
-function hasPendingReflections() {
-  // Check for reminder file
-  if (fs.existsSync(REMINDER_PATH)) {
-    stderrLog('info', 'Pending reflections detected: reminder file exists');
-    return true;
-  }
+function isTaskNotificationPrompt(hookInput) {
+  const prompt = String(hookInput?.prompt || hookInput?.message || '');
+  if (!prompt) return false;
+  return (
+    prompt.includes('<task-notification>') &&
+    prompt.includes('</task-notification>') &&
+    prompt.includes('<task-id>')
+  );
+}
 
-  // Check for spawn requests
+function getPendingReflectionState() {
   const requests = readSpawnRequests(SPAWN_REQUEST_PATH);
-  if (requests.length > 0) {
-    stderrLog('info', `Pending reflections detected: ${requests.length} spawn requests`);
-    return true;
+  const pendingCount = requests.length;
+  const reminderExists = fs.existsSync(REMINDER_PATH);
+  let cleanedStaleReminder = false;
+
+  // reminder file is advisory only; if no pending requests it must not block
+  if (pendingCount === 0 && reminderExists) {
+    try {
+      fs.unlinkSync(REMINDER_PATH);
+      cleanedStaleReminder = true;
+    } catch (_err) {
+      // best effort
+    }
   }
 
+  return {
+    pendingCount,
+    reminderExists,
+    cleanedStaleReminder,
+    hasPending: pendingCount > 0,
+  };
+}
+
+function hasPendingReflections() {
+  const state = getPendingReflectionState();
+  if (state.hasPending) {
+    stderrLog('info', `Pending reflections detected: ${state.pendingCount} spawn requests`);
+    return true;
+  }
   return false;
 }
 
@@ -79,22 +106,38 @@ function logToSpawnLog(event) {
   }
 }
 
-function main() {
+async function main() {
   // Skip if reflection system is disabled
   if (process.env.REFLECTION_ENABLED === 'false') {
     stderrLog('info', 'Reflection system disabled, skipping Step 0 check');
     process.exit(0);
   }
 
+  let hookInput = null;
+  try {
+    hookInput = await parseHookInputAsync();
+  } catch (_err) {
+    // best effort; continue without input-specific logic
+  }
+
+  if (isTaskNotificationPrompt(hookInput)) {
+    stderrLog('info', 'Skipping Step 0 check for internal task notification payload');
+    process.exit(0);
+  }
+
   stderrLog('info', 'Checking for pending reflections (Step 0)');
 
-  if (!hasPendingReflections()) {
+  const pendingState = getPendingReflectionState();
+  if (!pendingState.hasPending) {
+    if (pendingState.cleanedStaleReminder) {
+      stderrLog('info', 'Cleared stale reflection reminder (0 pending requests)');
+    }
     stderrLog('info', 'No pending reflections, proceeding with normal flow');
     process.exit(0);
   }
 
   // BLOCK: Pending reflections must be processed first
-  const requestCount = readSpawnRequests(SPAWN_REQUEST_PATH).length;
+  const requestCount = pendingState.pendingCount;
 
   stderrLog('error', 'BLOCKING: Pending reflections must be processed before proceeding', {
     reminderFileExists: fs.existsSync(REMINDER_PATH),
@@ -127,10 +170,14 @@ function main() {
 }
 
 if (require.main === module) {
-  main();
+  main().catch(() => {
+    process.exit(0);
+  });
 }
 
 module.exports = {
   hasPendingReflections,
   readSpawnRequests,
+  getPendingReflectionState,
+  isTaskNotificationPrompt,
 };

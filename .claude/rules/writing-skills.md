@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/writing-skills/**
+---
+
 # Writing Skills
 
 TDD applied to documentation - create production-ready skills. Use when authoring new skills. Includes writing style guidelines for clear prose.

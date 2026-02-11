@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/advanced-elicitation/**
+---
+
 # Advanced Elicitation
 
 Use when you want to improve response quality through meta-cognitive reasoning. Applies 15+ reasoning methods to reconsider and refine initial outputs.

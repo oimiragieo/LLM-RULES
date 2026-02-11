@@ -71,6 +71,7 @@ The `Task` tool is the primary mechanism for Router and Orchestrators to spawn s
 
 ```typescript
 Task({
+  task_id: 'task-1',
   subagent_type: string,      // REQUIRED - Agent type to spawn
   prompt: string,              // REQUIRED - Complete instructions
   task_id?: string,           // RECOMMENDED - For spawn traceability
@@ -95,14 +96,14 @@ Task({
 
 #### Common Errors and Solutions
 
-| Error                         | Cause                                  | Solution                                                     |
-| ----------------------------- | -------------------------------------- | ------------------------------------------------------------ |
-| `"Invalid tool parameters"`   | Single string passed instead of object | Use object: `Task({ subagent_type: '...', prompt: '...' })`  |
-| `"Invalid tool parameters"`   | Missing `subagent_type` property       | Always include `subagent_type` in the object                 |
-| `"Invalid tool parameters"`   | Missing `prompt` property              | Always include `prompt` in the object                        |
-| `"Invalid tool parameters"`   | Wrong property name (camelCase)        | Use `subagent_type` not `subagentType`                       |
-| `"Tool not available"`        | TaskUpdate not in allowed_tools        | Let hook auto-enrich OR add `TaskUpdate` explicitly          |
-| Spawn prompt validation fails | Missing required sections              | Include TaskUpdate warning box, task ID, and memory protocol |
+| Error                         | Cause                                  | Solution                                                                       |
+| ----------------------------- | -------------------------------------- | ------------------------------------------------------------------------------ |
+| `"Invalid tool parameters"`   | Single string passed instead of object | Use object: `Task({ task_id: 'task-2', subagent_type: '...', prompt: '...' })` |
+| `"Invalid tool parameters"`   | Missing `subagent_type` property       | Always include `subagent_type` in the object                                   |
+| `"Invalid tool parameters"`   | Missing `prompt` property              | Always include `prompt` in the object                                          |
+| `"Invalid tool parameters"`   | Wrong property name (camelCase)        | Use `subagent_type` not `subagentType`                                         |
+| `"Tool not available"`        | TaskUpdate not in allowed_tools        | Let hook auto-enrich OR add `TaskUpdate` explicitly                            |
+| Spawn prompt validation fails | Missing required sections              | Include TaskUpdate warning box, task ID, and memory protocol                   |
 
 ---
 
@@ -112,6 +113,7 @@ Task({
 
 ```javascript
 Task({
+  task_id: 'task-3',
   subagent_type: 'developer',
   prompt: 'Task [DEV-01]: Implement user login validation...',
 });
@@ -151,37 +153,37 @@ Task({
 Task('Implement authentication for the app');
 
 // ✓ CORRECT: Use object with required properties
-Task({ subagent_type: 'developer', prompt: 'Implement authentication...' });
+Task({ task_id: 'task-4', subagent_type: 'developer', prompt: 'Implement authentication...' });
 ```
 
 **2. Missing subagent_type (WRONG)**
 
 ```javascript
 // ❌ WRONG: Missing subagent_type
-Task({ prompt: 'Implement the feature...' });
+Task({ task_id: 'task-5', prompt: 'Implement the feature...' });
 
 // ✓ CORRECT: Include subagent_type
-Task({ subagent_type: 'developer', prompt: 'Implement the feature...' });
+Task({ task_id: 'task-6', subagent_type: 'developer', prompt: 'Implement the feature...' });
 ```
 
 **3. Missing prompt (WRONG)**
 
 ```javascript
 // ❌ WRONG: Missing prompt
-Task({ subagent_type: 'developer' });
+Task({ task_id: 'task-7', subagent_type: 'developer' });
 
 // ✓ CORRECT: Include prompt
-Task({ subagent_type: 'developer', prompt: 'Implement the feature...' });
+Task({ task_id: 'task-8', subagent_type: 'developer', prompt: 'Implement the feature...' });
 ```
 
 **4. Wrong Property Name - camelCase (WRONG)**
 
 ```javascript
 // ❌ WRONG: camelCase property name
-Task({ subagentType: 'developer', prompt: '...' });
+Task({ task_id: 'task-9', subagentType: 'developer', prompt: '...' });
 
 // ✓ CORRECT: snake_case property name
-Task({ subagent_type: 'developer', prompt: '...' });
+Task({ task_id: 'task-10', subagent_type: 'developer', prompt: '...' });
 ```
 
 ---
@@ -373,7 +375,7 @@ const agents = AvailableAgents({
   minSuccessRate: 0.7
 });
 const best = agents.agents[0] || agents.agents.find(a => a.recommendedAgents?.includes('code-reviewer'));
-Task({ subagent_type: best.id, prompt: ... });
+Task({ task_id: 'task-11', subagent_type: best.id, prompt: ... });
 ```
 
 ### Tool Validation and Enforcement

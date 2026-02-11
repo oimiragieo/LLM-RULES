@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/php-expert/**
+---
+
 # PHP Expert Rules
 
 ## Core Principles

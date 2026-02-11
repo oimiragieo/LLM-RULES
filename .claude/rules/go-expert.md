@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/go-expert/**
+---
+
 # Go Expert Rules
 
 ## Core Principles

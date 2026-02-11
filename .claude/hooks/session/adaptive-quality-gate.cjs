@@ -123,12 +123,10 @@ function checkThresholds(count, thresholds, counter) {
 function main() {
   try {
     // Read stdin
-    let input = '';
     const stdinBuffer = fs.readFileSync(0, 'utf8');
-    input = stdinBuffer;
 
     // Parse input JSON
-    const hookInput = JSON.parse(input);
+    JSON.parse(stdinBuffer);
 
     // Read counter
     let counter = readCounter();
@@ -146,20 +144,10 @@ function main() {
     // Write updated counter
     writeCounter(counter);
 
-    // ALWAYS output original input to stdout (passthrough)
-    console.log(JSON.stringify(hookInput));
-
-    // ALWAYS exit 0 (non-blocking)
+    // Side-effect-only hook: no stdout output on allow path
     process.exit(0);
   } catch (_err) {
-    // Fail-open: on any error, attempt to passthrough stdin
-    try {
-      const stdinBuffer = fs.readFileSync(0, 'utf8');
-      console.log(stdinBuffer);
-    } catch (_innerErr) {
-      // Last resort: output empty JSON to prevent pipeline break
-      console.log('{}');
-    }
+    // Fail-open: no stdout passthrough
     process.exit(0);
   }
 }

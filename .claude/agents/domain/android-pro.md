@@ -5,6 +5,8 @@ description: Native Android development expert for Kotlin, Jetpack Compose, and 
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   - Read

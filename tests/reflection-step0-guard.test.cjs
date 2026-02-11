@@ -6,6 +6,7 @@ const path = require('node:path');
 const {
   hasPendingReflections,
   readSpawnRequests,
+  clearReminderIfStale,
 } = require('../.claude/hooks/reflection/reflection-step0-guard.cjs');
 
 const runtimeDir = path.join(__dirname, '..', '.claude', 'context', 'runtime');
@@ -42,7 +43,7 @@ test('readSpawnRequests returns array for valid JSON', () => {
   }
 });
 
-test('hasPendingReflections detects reminder or spawn requests', () => {
+test('hasPendingReflections only uses spawn requests as source of truth', () => {
   fs.mkdirSync(runtimeDir, { recursive: true });
   const spawnSnapshot = captureFile(spawnRequestPath);
   const reminderSnapshot = captureFile(reminderPath);
@@ -57,9 +58,22 @@ test('hasPendingReflections detects reminder or spawn requests', () => {
 
     fs.unlinkSync(spawnRequestPath);
     fs.writeFileSync(reminderPath, 'pending reflections', 'utf8');
-    assert.equal(hasPendingReflections(), true);
+    assert.equal(hasPendingReflections(), false);
   } finally {
     restoreFile(spawnRequestPath, spawnSnapshot);
+    restoreFile(reminderPath, reminderSnapshot);
+  }
+});
+
+test('clearReminderIfStale removes stale reminder file', () => {
+  fs.mkdirSync(runtimeDir, { recursive: true });
+  const reminderSnapshot = captureFile(reminderPath);
+  try {
+    fs.writeFileSync(reminderPath, 'stale reminder', 'utf8');
+    assert.equal(fs.existsSync(reminderPath), true);
+    assert.equal(clearReminderIfStale(), true);
+    assert.equal(fs.existsSync(reminderPath), false);
+  } finally {
     restoreFile(reminderPath, reminderSnapshot);
   }
 });

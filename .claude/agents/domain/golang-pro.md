@@ -5,6 +5,8 @@ description: Master Go 1.21+ with modern patterns, advanced concurrency, perform
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   [

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/response-rater/**
+---
+
 # Response Rater Rules
 
 ## Core Principles

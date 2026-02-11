@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/java-expert/**
+---
+
 # Java Expert Rules
 
 ## Core Principles

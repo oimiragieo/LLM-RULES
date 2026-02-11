@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/database-architect/**
+---
+
 # Database Architect Rules
 
 ## Core Principles

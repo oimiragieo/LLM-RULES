@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/scientific-skills/**
+---
+
 # Scientific Skills Rules
 
 ## Core Principles

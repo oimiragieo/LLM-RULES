@@ -5,6 +5,8 @@ description: Scientific research expert specializing in computational biology, c
 model: opus
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   - Read

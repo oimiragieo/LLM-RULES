@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/insecure-defaults/**
+---
+
 # Insecure Defaults Rules
 
 <!-- Agent: security-architect | Task: #4 | Session: 2026-02-09 -->
@@ -27,7 +32,7 @@ Best practices for detecting and preventing insecure default configurations.
 ## Configuration Security
 
 - CORS: Never use wildcard (`*`) origin in production
-- TLS: Never disable certificate verification (`rejectUnauthorized: false`)
+- TLS: Never disable certificate verification (do not set the Node.js TLS option that disables peer verification)
 - Debug: Always disable debug mode in production configurations
 - Binding: Bind to specific interfaces, not `0.0.0.0`, in production
 - Cookies: Always set `secure: true`, `httpOnly: true`, `sameSite: 'strict'`

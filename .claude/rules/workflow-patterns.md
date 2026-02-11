@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/workflow-patterns/**
+---
+
 # Workflow Patterns
 
 TDD task implementation patterns - red-green-refactor cycle, phase checkpoints, git commits, and verification protocols for quality assurance.

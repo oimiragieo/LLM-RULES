@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/test-generator/**
+---
+
 # Test Generator Rules
 
 ## Core Principles

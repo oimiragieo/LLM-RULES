@@ -5,6 +5,8 @@ description: Database schema design, query optimization, migration planning, and
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: true
 tools:

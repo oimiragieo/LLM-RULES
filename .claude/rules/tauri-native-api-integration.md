@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/tauri-native-api-integration/**
+---
+
 # Tauri Native API Integration Rules
 
 ## Core Principles

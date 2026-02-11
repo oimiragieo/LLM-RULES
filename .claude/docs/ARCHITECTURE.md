@@ -27,6 +27,7 @@ The Router uses the Task tool to spawn agents. **CRITICAL**: Include skill loadi
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   model: 'sonnet', // or haiku/opus
   description: 'Developer fixing bug',
@@ -75,6 +76,7 @@ Without explicit skill invocation, agents won't follow their specialized workflo
 
 ```javascript
 Task({
+  task_id: 'task-2',
   prompt: `You are DEVELOPER.
 
 ## Instructions
@@ -93,8 +95,8 @@ Multiple agents can work simultaneously by including multiple Task calls in one 
 
 ```javascript
 // Both spawn in parallel
-Task({ description: 'Planner', prompt: '...' });
-Task({ description: 'Security review', prompt: '...' });
+Task({ task_id: 'task-3', description: 'Planner', prompt: '...' });
+Task({ task_id: 'task-4', description: 'Security review', prompt: '...' });
 ```
 
 ### Background Agents
@@ -103,6 +105,7 @@ Long-running tasks can spawn in background:
 
 ```javascript
 Task({
+  task_id: 'task-5',
   run_in_background: true,
   description: 'QA running tests',
   prompt: '...',
@@ -155,14 +158,15 @@ Phase 1: EXPLORE     Phase 2: PLAN        Phase 3: REVIEW       Phase 4: CONSOLI
 **Phase 1 - Exploration**: Gather context from codebases
 
 ```javascript
-Task({ description: 'Explore codebase A', prompt: '...' });
-Task({ description: 'Explore codebase B', prompt: '...' }); // Parallel
+Task({ task_id: 'task-6', description: 'Explore codebase A', prompt: '...' });
+Task({ task_id: 'task-7', description: 'Explore codebase B', prompt: '...' }); // Parallel
 ```
 
 **Phase 2 - Planning**: Create initial plan
 
 ```javascript
 Task({
+  task_id: 'task-8',
   description: 'Planner creating plan',
   prompt: '...Save plan to .claude/context/plans/',
 });
@@ -172,11 +176,13 @@ Task({
 
 ```javascript
 Task({
+  task_id: 'task-9',
   description: 'Architect reviewing plan',
   prompt:
     'Review .claude/context/plans/ for architectural concerns. Save to .claude/context/reports/architect-review.md',
 });
 Task({
+  task_id: 'task-10',
   description: 'Security reviewing plan',
   prompt:
     'Review .claude/context/plans/ for security concerns. Save to .claude/context/reports/security-review.md',
@@ -187,6 +193,7 @@ Task({
 
 ```javascript
 Task({
+  task_id: 'task-11',
   description: 'Consolidating reviews',
   prompt: 'Update plan based on reviews in .claude/context/reports/',
 });

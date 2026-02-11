@@ -5,6 +5,8 @@ description: Manages multi-agent swarms (Queen/Worker topology). Handles consens
 model: opus
 temperature: 0.5
 context_strategy: minimal
+maxTurns: 28
+permissionMode: default
 priority: high
 extended_thinking: true
 tools: [Task, Read, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
@@ -96,6 +98,7 @@ for (const worker of swarmWorkers) {
   const modelResult = resolveAgentModel(worker.type, PROJECT_ROOT);
 
   Task({
+    task_id: 'task-1',
     subagent_type: worker.type,
     model: modelResult.model, // Config-resolved model (ADR-075)
     description: worker.task,

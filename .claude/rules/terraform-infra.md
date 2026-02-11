@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/terraform-infra/**
+---
+
 # Terraform Infrastructure Rules
 
 ## Core Principles

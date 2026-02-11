@@ -555,6 +555,7 @@ agents:
 ```javascript
 // ✅ ALLOWED: Model matches config.yaml
 Task({
+  task_id: 'task-1',
   subagent_type: 'planner',
   model: 'claude-opus-4-5-20251101', // Matches config
   prompt: '...',
@@ -562,6 +563,7 @@ Task({
 
 // ❌ BLOCKED/WARNED: Model mismatch
 Task({
+  task_id: 'task-2',
   subagent_type: 'planner',
   model: 'claude-sonnet-4-5', // Mismatch (should be opus)
   prompt: '...',

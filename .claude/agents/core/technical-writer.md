@@ -5,6 +5,8 @@ description: Creates and updates documentation, user guides, API docs, and techn
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   [

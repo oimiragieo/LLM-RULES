@@ -5,6 +5,8 @@ description: Master Rust 1.75+ with modern async patterns, advanced type system 
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   [

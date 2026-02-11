@@ -929,6 +929,7 @@ Agents receive memory context in spawn prompts:
 
 ```javascript
 Task({
+  task_id: 'task-1',
   prompt: `You are DEVELOPER.
 
 ## Memory Protocol (MANDATORY)

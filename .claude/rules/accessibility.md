@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/accessibility/**
+---
+
 # Accessibility Rules
 
 ## Core Principles

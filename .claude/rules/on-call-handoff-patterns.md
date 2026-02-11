@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/on-call-handoff-patterns/**
+---
+
 # On-Call Handoff Patterns Rules
 
 ## Core Principles

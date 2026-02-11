@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/sentry-monitoring/**
+---
+
 # Sentry Monitoring Rules
 
 ## Core Principles

@@ -5,6 +5,8 @@ description: Web3, blockchain, and smart contract development expert. Specialize
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   [

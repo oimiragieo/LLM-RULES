@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/binary-analysis-patterns/**
+---
+
 # Binary Analysis Patterns Rules
 
 ## Core Principles

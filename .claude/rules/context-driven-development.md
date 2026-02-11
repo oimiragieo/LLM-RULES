@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/context-driven-development/**
+---
+
 # Context-Driven Development Rules
 
 ## Core Principles

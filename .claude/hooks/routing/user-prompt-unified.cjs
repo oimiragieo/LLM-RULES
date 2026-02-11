@@ -95,6 +95,15 @@ const CORRECTION_PATTERNS = [
   /\b(start over|try again|do it differently)\b/i,
 ];
 
+function isTaskNotificationPrompt(prompt) {
+  if (!prompt || typeof prompt !== 'string') return false;
+  return (
+    prompt.includes('<task-notification>') &&
+    prompt.includes('</task-notification>') &&
+    prompt.includes('<task-id>')
+  );
+}
+
 function debugLog(source, message, err) {
   if (!process.env.DEBUG_HOOKS) return;
   const details = err ? ` ${err.message || err}` : '';
@@ -140,6 +149,13 @@ function checkRouterModeReset(hookInput) {
   if (userPrompt && userPrompt.trim().startsWith('/')) {
     result.skipped = true;
     result.reason = 'slash_command';
+    return result;
+  }
+
+  // Internal task completion payloads should not reset/route like user requests.
+  if (isTaskNotificationPrompt(userPrompt)) {
+    result.skipped = true;
+    result.reason = 'task_notification';
     return result;
   }
 
@@ -808,6 +824,12 @@ async function checkRouterEnforcement(hookInput) {
     return result;
   }
 
+  if (isTaskNotificationPrompt(userPrompt)) {
+    result.skipped = true;
+    result.reason = 'task_notification';
+    return result;
+  }
+
   // Load agents and score
   const agents = loadAgents();
   if (agents.length === 0) {
@@ -1334,6 +1356,26 @@ function checkMemoryHealth(hookInput, projectRoot = PROJECT_ROOT) {
 // eslint-disable-next-line complexity
 async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
   const input = hookInput || {};
+  const userPrompt = input?.prompt || input?.message || '';
+
+  // Avoid recursive routing churn when internal task notifications are delivered
+  // through UserPromptSubmit. These are system payloads, not user requests.
+  if (isTaskNotificationPrompt(userPrompt)) {
+    const skipped = { skipped: true, reason: 'task_notification' };
+    const result = {
+      routerModeReset: skipped,
+      routerEnforcement: skipped,
+      tokenMonitoring: { enabled: false, ...skipped },
+      memoryReminder: { show: false, files: [], ...skipped },
+      evolutionTrigger: { detected: false, ...skipped },
+      memoryHealth: { warnings: [], autoActions: [], ...skipped },
+      stmWrite: null,
+      exitCode: 0,
+      systemNotificationBypass: true,
+    };
+    recordUserPromptResult(result);
+    return result;
+  }
 
   // Core Fundamentals: Write STM on every UserPromptSubmit (best-effort).
   // This ensures `.claude/context/memory/stm/session_current.json` stays current during the session,
@@ -1566,7 +1608,6 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
   recordUserPromptResult(result);
 
   // Correction detection (additive — runs after all existing checks)
-  const userPrompt = input?.prompt || input?.message || '';
   checkCorrectionPatterns(userPrompt);
 
   return result;
@@ -1646,6 +1687,7 @@ module.exports = {
   detectTriggers,
   detectPlanningRequirement,
   scoreAgents,
+  isTaskNotificationPrompt,
   loadAgents,
   loadAgentsFromRegistry,
   agentsFromRegistry,

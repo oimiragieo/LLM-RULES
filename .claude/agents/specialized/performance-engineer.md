@@ -5,6 +5,8 @@ description: Data-driven performance engineer specializing in application profil
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: true
 tools:
@@ -123,7 +125,7 @@ The following workflows guide this agent's execution:
 
 ```
 This task is better suited for [AGENT_NAME]. Please re-route via:
-Task({ prompt: "You are [AGENT_NAME]..." })
+Task({ task_id: 'task-1', prompt: "You are [AGENT_NAME]..." })
 ```
 
 ## Workflow

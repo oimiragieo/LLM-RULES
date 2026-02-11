@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/gamedev-expert/**
+---
+
 # Game Development Expert Rules
 
 ## Core Principles

@@ -5,6 +5,8 @@ description: Quality Assurance specialist. Writes comprehensive test suites, per
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: true
 tools:

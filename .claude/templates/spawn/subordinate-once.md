@@ -15,6 +15,7 @@ Use this template when you need a single response from a sub-agent (no delegatio
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   description: '<ROLE> respond once to <TASK>',
   allowed_tools: [

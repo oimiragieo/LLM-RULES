@@ -54,6 +54,7 @@ Analyze the source codebase to understand what can be integrated.
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'Explore',
   description: 'Analyze source codebase',
   prompt: `Analyze the codebase at <source-path> for integration.

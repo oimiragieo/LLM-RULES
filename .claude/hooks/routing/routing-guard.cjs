@@ -59,6 +59,8 @@ const {
   auditSecurityOverride,
 } = require('../../lib/utils/hook-input.cjs');
 const routerState = require('../../lib/routing/router-state.cjs');
+const { logRouterChurnEvent } = require('../../lib/monitoring/router-churn-log.cjs');
+const { logRuntimeHealth } = require('../../lib/monitoring/runtime-health-log.cjs');
 
 // Memory Monitor integration (lazy-loaded to avoid circular dependencies)
 let MemoryMonitor = null;
@@ -152,6 +154,14 @@ function compactFallbackMessage(title, toolName, count, fallback) {
     `[${title}] Repeated block (${count}x) for ${toolName}. ` +
     `Do not retry the same tool call. Spawn an agent via Task() tool. Fallback: ${fallback}`
   );
+}
+
+function extractDedupeCount(message) {
+  if (!message || typeof message !== 'string') return null;
+  const match = message.match(/\((\d+)x\)/);
+  if (!match) return null;
+  const count = Number(match[1]);
+  return Number.isFinite(count) ? count : null;
 }
 
 // =============================================================================
@@ -727,7 +737,7 @@ function checkRouterBash(toolName, toolInput = {}) {
   const dedupe = registerBlockAttempt('router-bash-check', toolName);
   if (dedupe.dedupe) {
     const fallback =
-      "Task({ subagent_type: 'general-purpose', description: 'Run bash command safely', prompt: 'Use Bash for the required command and report results.' })";
+      "Task({ task_id: 'task-1', subagent_type: 'general-purpose', description: 'Run bash command safely', prompt: 'Use Bash for the required command and report results.' })";
     const message = compactFallbackMessage(
       'ROUTER BASH VIOLATION BLOCKED (ADR-030)',
       truncatedCmd || 'bash',
@@ -758,6 +768,7 @@ function checkRouterBash(toolName, toolInput = {}) {
 |                                                                      |
 |  Example:                                                            |
 |    Task({                                                            |
+  task_id: 'task-2',
 |      subagent_type: 'general-purpose',                               |
 |      description: 'QA running tests',                                |
 |      prompt: 'You are QA. Run tests and analyze results...'          |
@@ -794,15 +805,15 @@ function checkRouterBash(toolName, toolInput = {}) {
  * is in the always-allowed list (memory files, runtime files) before blocking.
  * This allows spawned agents to write to memory even if state shows router mode.
  *
- * DEBUG: Set ROUTER_DEBUG=false to disable verbose logging (enabled by default).
+ * DEBUG: Set ROUTER_DEBUG=true to enable verbose logging (disabled by default).
  *
  * @param {string} toolName - Tool being used
  * @param {Object} [toolInput] - Tool input (required for write tools to check file path)
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
 function checkRouterSelfCheck(toolName, toolInput = {}) {
-  // PROC-007 FIX (Option D): Enable debug logging by default (opt-out via ROUTER_DEBUG=false)
-  const DEBUG = process.env.ROUTER_DEBUG !== 'false';
+  // Keep debug logging opt-in to avoid noisy hook output and token bloat.
+  const DEBUG = process.env.ROUTER_DEBUG === 'true';
 
   /**
    * Log debug message with timestamp and context
@@ -873,11 +884,8 @@ function checkRouterSelfCheck(toolName, toolInput = {}) {
   debugLog('BLOCK: Router using blacklisted tool', { tool: toolName, enforcement });
   const dedupe = registerBlockAttempt('router-self-check', toolName);
   const message = dedupe.dedupe
-    ? `[ROUTER SELF-CHECK VIOLATION] Router attempted to use blacklisted tool: ${toolName}. ` +
-      `Repeated block (${dedupe.count}x). Spawn an agent via Task() tool to perform this operation. ` +
-      `Fallback: Task({ subagent_type: 'general-purpose', description: 'Handle blocked operation', prompt: 'Perform the requested operation and report results.' })`
-    : `[ROUTER SELF-CHECK VIOLATION] Router attempted to use blacklisted tool: ${toolName}
-Spawn an agent via Task() tool to perform this operation.`;
+    ? `[ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode (${dedupe.count}x). Spawn an agent via Task().`
+    : `[ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode. Spawn an agent via Task().`;
 
   // Record violation in violation-tracker
   const tracker = getViolationTracker();
@@ -943,8 +951,7 @@ function checkPlannerFirst(toolName, toolInput) {
 
   // Not a PLANNER spawn, but PLANNER is required - violation
   const complexity = state.complexity || 'unknown';
-  const message = `[PLANNER-FIRST VIOLATION] High/Epic complexity (${complexity}) requires PLANNER agent first.
-Spawn PLANNER first: Task({ description: 'Planner designing...', prompt: 'You are PLANNER...' })`;
+  const message = `[PLANNER-FIRST VIOLATION] Complexity=${complexity}. Spawn PLANNER first via Task().`;
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -990,8 +997,7 @@ function checkTaskCreate(toolName) {
 
   // Violation: trying to create tasks without planner
   const complexity = state.complexity || 'unknown';
-  const message = `[TASK-CREATE VIOLATION] Complex task (${complexity}) requires PLANNER agent.
-Spawn PLANNER first, then PLANNER will create the tasks.`;
+  const message = `[TASK-CREATE VIOLATION] Complex task (${complexity}) requires PLANNER first.`;
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -1422,6 +1428,7 @@ function checkCreatorIntentGuard(toolName, toolInput = {}) {
 |  CORRECT APPROACH: Spawn general-purpose agent with creator skill    |
 |                                                                      |
 |  Task({                                                              |
+  task_id: 'task-5',
 |    subagent_type: 'general-purpose',                                 |
 |    prompt: \`You are a general-purpose agent.                         |
 |      Invoke Skill({ skill: "${requiredSkill}" }) and follow it...\`   |
@@ -1643,8 +1650,8 @@ function extractAgentTypeFromPrompt(prompt) {
 
   const promptLower = prompt.toLowerCase();
 
-  // Pattern 1: "You are PLANNER" or "You are the PLANNER"
-  const youAreMatch = promptLower.match(/you are (?:the )?([a-z][-a-z0-9]*)/i);
+  // Pattern 1: "You are PLANNER", "You are the PLANNER", "You are a developer"
+  const youAreMatch = promptLower.match(/you are\s+(?:(?:the|an?)\s+)?([a-z][-a-z0-9]*)/i);
   if (youAreMatch) {
     return youAreMatch[1].toLowerCase();
   }
@@ -1690,7 +1697,7 @@ function extractModelFromToolInput(toolInput) {
  * Check 11: Config Model Validator (validates spawn model matches config.yaml)
  * Merged from config-model-validator.cjs
  *
- * Environment: CONFIG_MODEL_VALIDATOR=block|warn|off (default: warn)
+ * Environment: CONFIG_MODEL_VALIDATOR=block|warn|off (default: block)
  *
  * @param {string} toolName - Tool being used
  * @param {Object} toolInput - Tool input containing prompt and model
@@ -1702,7 +1709,7 @@ function checkConfigModelValidator(toolName, toolInput = {}) {
     return { pass: true };
   }
 
-  const enforcement = getEnforcementMode('CONFIG_MODEL_VALIDATOR', 'warn');
+  const enforcement = getEnforcementMode('CONFIG_MODEL_VALIDATOR', 'block');
   if (enforcement === 'off') {
     auditSecurityOverride(
       'routing-guard',
@@ -1828,122 +1835,183 @@ function checkConfigModelValidator(toolName, toolInput = {}) {
  * @returns {{ pass: boolean, result: string, message: string }}
  */
 function runAllChecks(toolName, toolInput) {
+  const warnings = [];
+
+  const captureWarn = (checkName, checkResult) => {
+    if (checkResult.result !== 'warn') return;
+    console.warn(checkResult.message);
+    warnings.push({
+      checkName,
+      message: checkResult.message || '',
+      dedupeCount: extractDedupeCount(checkResult.message),
+    });
+  };
+
   // Check 8: TaskList-First Gate (must come first -- protocol compliance)
   const taskListCheck = checkTaskListFirstGate(toolName);
   if (!taskListCheck.pass) {
-    return { pass: false, result: taskListCheck.result, message: taskListCheck.message };
+    return {
+      pass: false,
+      result: taskListCheck.result,
+      message: taskListCheck.message,
+      checkName: 'tasklist-first-gate',
+      warnings,
+    };
   }
-  if (taskListCheck.result === 'warn') {
-    console.warn(taskListCheck.message);
-  }
+  captureWarn('tasklist-first-gate', taskListCheck);
 
   // Check 0: Router Bash Check (ADR-030 - must come first for Bash commands)
   const bashCheck = checkRouterBash(toolName, toolInput);
   if (!bashCheck.pass) {
-    return { pass: false, result: bashCheck.result, message: bashCheck.message };
+    return {
+      pass: false,
+      result: bashCheck.result,
+      message: bashCheck.message,
+      checkName: 'router-bash-check',
+      warnings,
+    };
   }
-  if (bashCheck.result === 'warn') {
-    console.warn(bashCheck.message);
-  }
+  captureWarn('router-bash-check', bashCheck);
 
   // Check 1: Router Self-Check (now receives toolInput for file path checking)
   const selfCheck = checkRouterSelfCheck(toolName, toolInput);
   if (!selfCheck.pass) {
-    return { pass: false, result: selfCheck.result, message: selfCheck.message };
+    return {
+      pass: false,
+      result: selfCheck.result,
+      message: selfCheck.message,
+      checkName: 'router-self-check',
+      warnings,
+    };
   }
-  if (selfCheck.result === 'warn') {
-    // Log warning but continue checks
-    console.warn(selfCheck.message);
-  }
+  captureWarn('router-self-check', selfCheck);
 
   // Check 2: Planner-First Guard
   const plannerCheck = checkPlannerFirst(toolName, toolInput);
   if (!plannerCheck.pass) {
-    return { pass: false, result: plannerCheck.result, message: plannerCheck.message };
+    return {
+      pass: false,
+      result: plannerCheck.result,
+      message: plannerCheck.message,
+      checkName: 'planner-first-guard',
+      warnings,
+    };
   }
   if (plannerCheck.markPlanner) {
     // Mark planner as spawned in state
     routerState.markPlannerSpawned();
   }
-  if (plannerCheck.result === 'warn') {
-    console.warn(plannerCheck.message);
-  }
+  captureWarn('planner-first-guard', plannerCheck);
 
   // Check 3: TaskCreate Guard
   const taskCreateCheck = checkTaskCreate(toolName);
   if (!taskCreateCheck.pass) {
-    return { pass: false, result: taskCreateCheck.result, message: taskCreateCheck.message };
+    return {
+      pass: false,
+      result: taskCreateCheck.result,
+      message: taskCreateCheck.message,
+      checkName: 'task-create-guard',
+      warnings,
+    };
   }
-  if (taskCreateCheck.result === 'warn') {
-    console.warn(taskCreateCheck.message);
-  }
+  captureWarn('task-create-guard', taskCreateCheck);
 
   // Check 4: Security Review Guard
   const securityCheck = checkSecurityReview(toolName, toolInput);
   if (!securityCheck.pass) {
-    return { pass: false, result: securityCheck.result, message: securityCheck.message };
+    return {
+      pass: false,
+      result: securityCheck.result,
+      message: securityCheck.message,
+      checkName: 'security-review-guard',
+      warnings,
+    };
   }
   if (securityCheck.markSecurity) {
     // Mark security as spawned in state
     routerState.markSecuritySpawned();
   }
-  if (securityCheck.result === 'warn') {
-    console.warn(securityCheck.message);
-  }
+  captureWarn('security-review-guard', securityCheck);
 
   // Check 5: Router Write Guard
   const writeCheck = checkRouterWrite(toolName, toolInput);
   if (!writeCheck.pass) {
-    return { pass: false, result: writeCheck.result, message: writeCheck.message };
+    return {
+      pass: false,
+      result: writeCheck.result,
+      message: writeCheck.message,
+      checkName: 'router-write-guard',
+      warnings,
+    };
   }
-  if (writeCheck.result === 'warn') {
-    console.warn(writeCheck.message);
-  }
+  captureWarn('router-write-guard', writeCheck);
 
   // Check 6: Memory Pressure Check (for Task tool only)
   const memoryCheck = checkMemoryPressure(toolName);
   if (!memoryCheck.pass) {
-    return { pass: false, result: memoryCheck.result, message: memoryCheck.message };
+    return {
+      pass: false,
+      result: memoryCheck.result,
+      message: memoryCheck.message,
+      checkName: 'memory-pressure-check',
+      warnings,
+    };
   }
 
   // Check 7: Specialist Override Check (warn when developer is used for specialist tasks)
   const specialistCheck = checkSpecialistOverride(toolName, toolInput);
   if (!specialistCheck.pass) {
-    return { pass: false, result: specialistCheck.result, message: specialistCheck.message };
+    return {
+      pass: false,
+      result: specialistCheck.result,
+      message: specialistCheck.message,
+      checkName: 'specialist-override',
+      warnings,
+    };
   }
-  if (specialistCheck.result === 'warn') {
-    console.warn(specialistCheck.message);
-  }
+  captureWarn('specialist-override', specialistCheck);
 
   // Check 9: Creator Intent Guard (blocks Task spawn for creator work without creator skill)
   const creatorCheck = checkCreatorIntentGuard(toolName, toolInput);
   if (!creatorCheck.pass) {
-    return { pass: false, result: creatorCheck.result, message: creatorCheck.message };
+    return {
+      pass: false,
+      result: creatorCheck.result,
+      message: creatorCheck.message,
+      checkName: 'creator-intent-guard',
+      warnings,
+    };
   }
-  if (creatorCheck.result === 'warn') {
-    console.warn(creatorCheck.message);
-  }
+  captureWarn('creator-intent-guard', creatorCheck);
 
   // Check 10: Intent-Agent Match (validates spawned agent matches detected intent)
   const intentCheck = checkIntentAgentMatch(toolName, toolInput);
   if (!intentCheck.pass) {
-    return { pass: false, result: intentCheck.result, message: intentCheck.message };
+    return {
+      pass: false,
+      result: intentCheck.result,
+      message: intentCheck.message,
+      checkName: 'intent-agent-match',
+      warnings,
+    };
   }
-  if (intentCheck.result === 'warn') {
-    console.warn(intentCheck.message);
-  }
+  captureWarn('intent-agent-match', intentCheck);
 
   // Check 11: Config Model Validator (validates spawn model matches config.yaml)
   const modelCheck = checkConfigModelValidator(toolName, toolInput);
   if (!modelCheck.pass) {
-    return { pass: false, result: modelCheck.result, message: modelCheck.message };
+    return {
+      pass: false,
+      result: modelCheck.result,
+      message: modelCheck.message,
+      checkName: 'config-model-validator',
+      warnings,
+    };
   }
-  if (modelCheck.result === 'warn') {
-    console.warn(modelCheck.message);
-  }
+  captureWarn('config-model-validator', modelCheck);
 
   // All checks passed
-  return { pass: true, result: 'allow', message: '' };
+  return { pass: true, result: 'allow', message: '', warnings };
 }
 
 /**
@@ -2030,8 +2098,32 @@ async function main() {
 
     // Run all checks
     const result = runAllChecks(toolName, toolInput);
+    const sessionId = process.env.CLAUDE_SESSION_ID || hookInput.session_id || null;
+
+    if (Array.isArray(result.warnings) && result.warnings.length > 0) {
+      for (const warning of result.warnings) {
+        logRouterChurnEvent({
+          sessionId,
+          toolName,
+          checkName: warning.checkName,
+          result: 'warn',
+          durationMs: Date.now() - startTime,
+          dedupeCount: warning.dedupeCount,
+          messageLength: warning.message ? warning.message.length : 0,
+        });
+      }
+    }
 
     if (!result.pass) {
+      logRouterChurnEvent({
+        sessionId,
+        toolName,
+        checkName: result.checkName || 'unknown',
+        result: result.result || 'block',
+        durationMs: Date.now() - startTime,
+        dedupeCount: extractDedupeCount(result.message),
+        messageLength: result.message ? result.message.length : 0,
+      });
       if (eventBus) {
         try {
           if (result.result === 'block') {
@@ -2067,10 +2159,29 @@ async function main() {
 
       // Output block/warn result
       console.log(formatResult(result.result, result.message));
+      logRuntimeHealth({
+        component: 'routing-guard',
+        status: result.result === 'block' ? 'blocked' : 'warn',
+        durationMs: Date.now() - startTime,
+        sessionId,
+        extra: {
+          tool: toolName,
+          check: result.checkName || 'unknown',
+        },
+      });
       process.exit(result.result === 'block' ? 2 : 0);
     }
 
     // All checks passed
+    logRouterChurnEvent({
+      sessionId,
+      toolName,
+      checkName: 'all-checks',
+      result: 'allow',
+      durationMs: Date.now() - startTime,
+      dedupeCount: null,
+      messageLength: 0,
+    });
     if (eventBus) {
       try {
         await eventBus.emit(EventTypes.TOOL_COMPLETED, {
@@ -2086,6 +2197,13 @@ async function main() {
         // Best-effort
       }
     }
+    logRuntimeHealth({
+      component: 'routing-guard',
+      status: 'ok',
+      durationMs: Date.now() - startTime,
+      sessionId,
+      extra: { tool: toolName },
+    });
     process.exit(0);
   } catch (err) {
     if (eventBus) {
@@ -2103,11 +2221,25 @@ async function main() {
     // SEC-008: Allow debug override for troubleshooting
     if (process.env.HOOK_FAIL_OPEN === 'true') {
       auditLog('routing-guard', 'fail_open_override', { error: err.message });
+      logRuntimeHealth({
+        component: 'routing-guard',
+        status: 'error_fail_open',
+        durationMs: Date.now() - startTime,
+        sessionId: process.env.CLAUDE_SESSION_ID || null,
+        extra: { error: err.message },
+      });
       process.exit(0);
     }
 
     // Audit log the error
     auditLog('routing-guard', 'error_fail_closed', { error: err.message });
+    logRuntimeHealth({
+      component: 'routing-guard',
+      status: 'error_fail_closed',
+      durationMs: Date.now() - startTime,
+      sessionId: process.env.CLAUDE_SESSION_ID || null,
+      extra: { error: err.message },
+    });
 
     // SEC-008: Fail closed - deny when security state unknown
     process.exit(2);

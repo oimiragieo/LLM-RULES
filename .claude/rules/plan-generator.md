@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/plan-generator/**
+---
+
 # Plan Generator Rules
 
 ## Core Principles

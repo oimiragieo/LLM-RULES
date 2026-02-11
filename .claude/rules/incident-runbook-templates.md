@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/incident-runbook-templates/**
+---
+
 # Incident Runbook Templates Rules
 
 ## Core Principles

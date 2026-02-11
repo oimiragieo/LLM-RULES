@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/hook-creator/**
+---
+
 # Hook Creator Rules
 
 ## Core Principles

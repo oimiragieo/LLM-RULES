@@ -6,6 +6,8 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 const SPAWN_LOG_PATH = path.join(METRICS_DIR, 'spawn-log.jsonl');
+const SPAWN_ASSEMBLY_METRICS_PATH = path.join(METRICS_DIR, 'spawn-assembly-metrics.jsonl');
+const TOKEN_BURN_METRICS_PATH = path.join(METRICS_DIR, 'token-burn-metrics.jsonl');
 const MAX_LINES = Number(process.env.SPAWN_LOG_MAX_LINES || 5000);
 
 function ensureDir() {
@@ -14,32 +16,42 @@ function ensureDir() {
   }
 }
 
-function trimIfNeeded() {
+function trimIfNeeded(filePath) {
   if (!Number.isFinite(MAX_LINES) || MAX_LINES <= 0) return;
   try {
-    if (!fs.existsSync(SPAWN_LOG_PATH)) return;
-    const content = fs.readFileSync(SPAWN_LOG_PATH, 'utf8');
+    if (!fs.existsSync(filePath)) return;
+    const content = fs.readFileSync(filePath, 'utf8');
     const lines = content.split('\n').filter(Boolean);
     if (lines.length <= MAX_LINES) return;
     const trimmed = lines.slice(lines.length - MAX_LINES).join('\n') + '\n';
-    fs.writeFileSync(SPAWN_LOG_PATH, trimmed, 'utf8');
+    fs.writeFileSync(filePath, trimmed, 'utf8');
   } catch (_err) {
     // best-effort
   }
 }
 
-function append(entry) {
+function appendToFile(filePath, entry) {
   try {
     ensureDir();
     const line = JSON.stringify({
       ...entry,
       timestamp: entry.timestamp || new Date().toISOString(),
     });
-    fs.appendFileSync(SPAWN_LOG_PATH, `${line}\n`, 'utf8');
-    trimIfNeeded();
+    fs.appendFileSync(filePath, `${line}\n`, 'utf8');
+    trimIfNeeded(filePath);
   } catch (_err) {
     // best-effort
   }
+}
+
+function append(entry) {
+  appendToFile(SPAWN_LOG_PATH, entry);
+}
+
+function estimateTokensFromChars(chars) {
+  const safeChars = Number.isFinite(chars) && chars > 0 ? chars : 0;
+  // Lightweight approximation for CI trend monitoring.
+  return Math.ceil(safeChars / 4);
 }
 
 function logSpawnStart({ taskId, agentType, promptLength, sessionId }) {
@@ -91,4 +103,68 @@ function logMemoryFailure({ taskId, error, sessionId }) {
   });
 }
 
-module.exports = { logSpawnStart, logSpawnEnd, logMemoryFailure };
+function logSpawnAssemblyMetric({
+  taskId,
+  agentType,
+  sessionId,
+  totalMs,
+  phases = {},
+  inputChars,
+  outputChars,
+  compactnessScore,
+}) {
+  appendToFile(SPAWN_ASSEMBLY_METRICS_PATH, {
+    event: 'spawn_assembly',
+    task_id: taskId || null,
+    agent_type: agentType || null,
+    session_id: sessionId || null,
+    total_ms: Number.isFinite(totalMs) ? Number(totalMs.toFixed(3)) : null,
+    phases,
+    input_chars: Number.isFinite(inputChars) ? inputChars : null,
+    output_chars: Number.isFinite(outputChars) ? outputChars : null,
+    compactness_score: Number.isFinite(compactnessScore) ? compactnessScore : null,
+  });
+}
+
+function logTokenBurnMetric({
+  taskId,
+  agentType,
+  sessionId,
+  source = 'spawn_prompt_assembly',
+  inputChars,
+  outputChars,
+  elapsedMs,
+}) {
+  const inChars = Number.isFinite(inputChars) ? inputChars : 0;
+  const outChars = Number.isFinite(outputChars) ? outputChars : 0;
+  const inputTokensEst = estimateTokensFromChars(inChars);
+  const outputTokensEst = estimateTokensFromChars(outChars);
+  const deltaTokensEst = outputTokensEst - inputTokensEst;
+  const elapsedSeconds = Number.isFinite(elapsedMs) && elapsedMs > 0 ? elapsedMs / 1000 : 0;
+  const burnRateTokensPerSecond =
+    elapsedSeconds > 0 ? Number((outputTokensEst / elapsedSeconds).toFixed(3)) : null;
+
+  appendToFile(TOKEN_BURN_METRICS_PATH, {
+    event: 'token_burn',
+    source,
+    task_id: taskId || null,
+    agent_type: agentType || null,
+    session_id: sessionId || null,
+    input_chars: inChars,
+    output_chars: outChars,
+    input_tokens_est: inputTokensEst,
+    output_tokens_est: outputTokensEst,
+    delta_tokens_est: deltaTokensEst,
+    elapsed_ms: Number.isFinite(elapsedMs) ? Number(elapsedMs.toFixed(3)) : null,
+    burn_rate_tokens_per_second: burnRateTokensPerSecond,
+  });
+}
+
+module.exports = {
+  logSpawnStart,
+  logSpawnEnd,
+  logMemoryFailure,
+  logSpawnAssemblyMetric,
+  logTokenBurnMetric,
+  estimateTokensFromChars,
+};

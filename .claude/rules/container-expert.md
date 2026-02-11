@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/container-expert/**
+---
+
 # Container Expert Rules
 
 ## Core Principles

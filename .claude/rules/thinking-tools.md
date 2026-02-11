@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/thinking-tools/**
+---
+
 # Thinking Tools Rules
 
 ## Core Principles

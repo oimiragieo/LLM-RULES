@@ -5,6 +5,8 @@ description: Java 21+ and Spring Boot 3.x development expert for enterprise back
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: false
 tools:

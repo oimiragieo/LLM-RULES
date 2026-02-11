@@ -111,6 +111,7 @@ function formatMissingEvolutionError() {
 
   **Spawn Command**:
   Task({
+    task_id: 'task-1',
     subagent_type: "reflection-agent",
     description: "Session reflection and learning extraction",
     prompt: "You are REFLECTION-AGENT..."

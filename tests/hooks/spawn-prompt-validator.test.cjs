@@ -3,17 +3,26 @@ const assert = require('node:assert');
 const {
   validatePrompt,
   autoNormalizeSpawnInput,
+  hasExplicitTaskId,
+  generateFallbackTaskId,
+  ensureTaskId,
   buildRequiredPrefixFragment,
   normalizeUnicode,
   safeRegexTest,
   isOrchestratorSpawn,
   isTemplateBasedSpawn,
+  calculatePromptCompactness,
+  registerSpawnValidationFailure,
+  clearSpawnValidationFailure,
+  buildLoopBreakerKey,
   VALIDATION_RULES,
   MINIMUM_SCORE,
   MAX_PROMPT_LENGTH,
 } = require('../../.claude/hooks/safety/spawn-prompt-validator.cjs');
 const {
   generateRequiredPrefixFragment,
+  hasTaskIdReference,
+  hasExplicitTaskId: assemblerHasExplicitTaskId,
 } = require('../../.claude/hooks/routing/spawn-prompt-assembler.cjs');
 
 // =============================================================================
@@ -183,6 +192,21 @@ Do some work
     assert.strictEqual(result.score, 0);
     assert.ok(result.error.includes('SEC-DOS-001'));
   });
+
+  test('should compute compactness score and detect duplicated sections', () => {
+    const prompt = `
+## PROJECT CONTEXT
+PROJECT_ROOT: /tmp
+## PROJECT CONTEXT
+PROJECT_ROOT: /tmp
+TaskUpdate({ taskId: "1", status: "in_progress" })
+TaskUpdate({ taskId: "1", status: "in_progress" })
+`;
+    const compactness = calculatePromptCompactness(prompt);
+    assert.ok(compactness.score < 100);
+    assert.ok(compactness.duplicateHeaders.length > 0);
+    assert.ok(compactness.repeatedBoilerplate.length > 0);
+  });
 });
 
 describe('autoNormalizeSpawnInput()', () => {
@@ -217,6 +241,70 @@ describe('autoNormalizeSpawnInput()', () => {
     const normalized = autoNormalizeSpawnInput(toolInput, initial);
     assert.strictEqual(normalized.modified, false);
   });
+
+  test('should not normalize missing required fields when task_id is missing', () => {
+    const toolInput = {
+      description: 'Fix routing',
+      prompt: 'Implement changes quickly.',
+      allowed_tools: ['Read', 'Write'],
+    };
+    const initial = validatePrompt(toolInput.prompt);
+    assert.strictEqual(initial.isValid, false);
+    assert.ok(initial.missingRequired?.length > 0);
+
+    const normalized = autoNormalizeSpawnInput(toolInput, initial);
+    assert.strictEqual(normalized.modified, false);
+  });
+});
+
+describe('explicit task_id enforcement helpers', () => {
+  test('validator hasExplicitTaskId returns true for string/number ids', () => {
+    assert.strictEqual(hasExplicitTaskId({ task_id: 'task-123' }), true);
+    assert.strictEqual(hasExplicitTaskId({ task_id: 123 }), true);
+    assert.strictEqual(hasExplicitTaskId({ id: 'legacy-123' }), true);
+  });
+
+  test('validator hasExplicitTaskId returns false when id is missing', () => {
+    assert.strictEqual(hasExplicitTaskId({}), false);
+    assert.strictEqual(hasExplicitTaskId({ description: 'x' }), false);
+  });
+
+  test('assembler detects alphanumeric Task ID references', () => {
+    assert.strictEqual(hasTaskIdReference('Task ID: task-123'), true);
+    assert.strictEqual(hasTaskIdReference('TaskUpdate({ taskId: "task_123" })'), true);
+  });
+
+  test('assembler explicit task id helper returns false when missing', () => {
+    assert.strictEqual(assemblerHasExplicitTaskId({ task_id: 'task-1' }), true);
+    assert.strictEqual(assemblerHasExplicitTaskId({}), false);
+  });
+
+  test('validator ensureTaskId injects fallback task_id when missing', () => {
+    const ensured = ensureTaskId(
+      { description: 'Fix routing', prompt: 'Implement changes quickly.' },
+      { session_id: 'abc123-session' }
+    );
+
+    assert.strictEqual(ensured.modified, true);
+    assert.ok(typeof ensured.taskId === 'string');
+    assert.ok(ensured.taskId.startsWith('task-abc123'));
+    assert.strictEqual(ensured.toolInput.task_id, ensured.taskId);
+  });
+
+  test('validator ensureTaskId normalizes legacy id field to task_id', () => {
+    const ensured = ensureTaskId({ id: 'legacy-42', prompt: 'Do work' }, { session_id: 's1' });
+    assert.strictEqual(ensured.modified, true);
+    assert.strictEqual(ensured.toolInput.task_id, 'legacy-42');
+    assert.strictEqual(ensured.taskId, 'legacy-42');
+  });
+
+  test('validator generateFallbackTaskId returns valid id pattern', () => {
+    const generated = generateFallbackTaskId(
+      { session_id: 'session-xyz' },
+      { description: 'Security review + fixes' }
+    );
+    assert.ok(/^task-[a-zA-Z0-9]+-[a-z0-9-]+-[a-z0-9]+$/.test(generated));
+  });
 });
 
 describe('buildRequiredPrefixFragment()', () => {
@@ -225,6 +313,35 @@ describe('buildRequiredPrefixFragment()', () => {
     assert.ok(prefix.includes('Task ID: 123'));
     assert.ok(prefix.includes('PROJECT_ROOT:'));
     assert.ok(prefix.includes('TASK TRACKING REQUIRED'));
+  });
+});
+
+describe('spawn validator loop-breaker', () => {
+  test('should build stable loop-breaker key from session/hash/failure', () => {
+    const validation = {
+      missingRequired: ['TaskUpdate Warning Box', 'Task ID Reference'],
+      failed: ['TaskUpdate Warning Box', 'Task ID Reference'],
+    };
+    const key = buildLoopBreakerKey('s1', 'abcd1234', validation);
+    assert.ok(key.includes('s1'));
+    assert.ok(key.includes('abcd1234'));
+    assert.ok(key.includes('TaskUpdate Warning Box'));
+  });
+
+  test('should trigger bypass after repeated identical failures', () => {
+    const validation = {
+      missingRequired: ['TaskUpdate Warning Box'],
+      failed: ['TaskUpdate Warning Box'],
+    };
+    const first = registerSpawnValidationFailure('test-session', 'hash1', validation);
+    const second = registerSpawnValidationFailure('test-session', 'hash1', validation);
+    const third = registerSpawnValidationFailure('test-session', 'hash1', validation);
+
+    assert.strictEqual(first.shouldBypassBlock, false);
+    assert.strictEqual(second.shouldBypassBlock, false);
+    assert.strictEqual(third.shouldBypassBlock, true);
+
+    clearSpawnValidationFailure('test-session', 'hash1', validation);
   });
 });
 

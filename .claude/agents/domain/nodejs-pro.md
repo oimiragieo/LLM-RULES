@@ -5,6 +5,8 @@ description: Node.js backend expert for Express, NestJS, and modern async patter
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: false
 tools:

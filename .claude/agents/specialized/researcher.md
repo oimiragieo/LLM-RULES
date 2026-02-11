@@ -5,6 +5,8 @@ description: Research and fact-finding specialist with web access and Exa tools.
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: medium
 extended_thinking: true
 tools:

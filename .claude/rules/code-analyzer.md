@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/code-analyzer/**
+---
+
 # Code Analyzer Rules
 
 ## Core Rules

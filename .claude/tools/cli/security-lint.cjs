@@ -74,6 +74,9 @@ const CONFIG = {
     { pathSubstring: 'memory-health-check.cjs', ruleId: 'SEC-040' }, // path.join with literal "reflection-spawn-request.json"
     { pathSubstring: 'reflection-step0-guard.cjs', ruleId: 'SEC-040' }, // path.join with literal "reflection-spawn-request"
     { pathSubstring: 'reflection-step0-guard.test.cjs', ruleId: 'SEC-040' }, // path.join with literal in test
+    { pathSubstring: 'force-step0-execution.cjs', ruleId: 'SEC-040' }, // path.join PROJECT_ROOT + constants only
+    { pathSubstring: 'force-step0-execution.test.cjs', ruleId: 'SEC-040' }, // path.join test fixture path (constants)
+    { pathSubstring: 'spawn-assembly-metrics-summary.cjs', ruleId: 'SEC-030' }, // CLI metrics summary (aggregates, not secrets)
     { pathSubstring: 'step-validators.cjs', ruleId: 'SEC-013' }, // new Function() for dynamic workflow validation (controlled input)
     { pathSubstring: 'generate-tool-manifest.cjs', ruleId: 'SEC-030' }, // CLI diagnostic logging
     { pathSubstring: 'run-workflow-tests.cjs', ruleId: 'SEC-030' }, // CLI test suite help output (not sensitive)

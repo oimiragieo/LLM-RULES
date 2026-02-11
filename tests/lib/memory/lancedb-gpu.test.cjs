@@ -11,7 +11,9 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-describe('LanceDB GPU Acceleration', () => {
+const RUN_GPU_TESTS = process.env.RUN_GPU_TESTS === '1';
+
+describe('LanceDB GPU Acceleration', { skip: !RUN_GPU_TESTS }, () => {
   let MemoryVectorStore;
   let tmpDir;
 

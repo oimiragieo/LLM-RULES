@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/web3-expert/**
+---
+
 # Web3 Expert Rules
 
 ## Core Principles

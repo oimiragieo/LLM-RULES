@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/ios-expert/**
+---
+
 # iOS Expert Rules
 
 ## Core Principles

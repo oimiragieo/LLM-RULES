@@ -12,7 +12,9 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-describe('Verify Actual GPU Usage', () => {
+const RUN_GPU_TESTS = process.env.RUN_GPU_TESTS === '1';
+
+describe('Verify Actual GPU Usage', { skip: !RUN_GPU_TESTS }, () => {
   let MemoryVectorStore;
   let tmpDir;
 

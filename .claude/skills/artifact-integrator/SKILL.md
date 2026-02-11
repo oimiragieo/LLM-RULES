@@ -293,6 +293,7 @@ This skill is invoked by:
 // Router Step 0.5 pseudocode
 if (integrationQueueHasUnprocessedEntries()) {
   Task({
+    task_id: 'task-1',
     subagent_type: 'developer',
     prompt: 'Invoke Skill({ skill: "artifact-integrator" })',
   });

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/project-onboarding/**
+---
+
 # Project Onboarding Rules
 
 ## Core Principles

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/diagram-generator/**
+---
+
 # Diagram Generator Rules
 
 ## Core Principles

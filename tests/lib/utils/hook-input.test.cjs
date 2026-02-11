@@ -342,6 +342,38 @@ describe('hook-input', () => {
     });
   });
 
+  describe('formatResult', () => {
+    it('should emit deny decision for block results', () => {
+      assert.ok(hookInput, 'Module should be loadable');
+
+      const output = JSON.parse(hookInput.formatResult('block', 'blocked for policy'));
+      assert.strictEqual(output.permissionDecision, 'deny');
+      assert.strictEqual(output.permissionDecisionReason, 'blocked for policy');
+      assert.strictEqual(output.result, 'block');
+      assert.strictEqual(output.message, 'blocked for policy');
+    });
+
+    it('should emit allow decision for warn results', () => {
+      assert.ok(hookInput, 'Module should be loadable');
+
+      const output = JSON.parse(hookInput.formatResult('warn', 'warning only'));
+      assert.strictEqual(output.permissionDecision, 'allow');
+      assert.strictEqual(output.permissionDecisionReason, 'warning only');
+      assert.strictEqual(output.result, 'warn');
+      assert.strictEqual(output.message, 'warning only');
+    });
+
+    it('should preserve object-style allow payloads from legacy hooks', () => {
+      assert.ok(hookInput, 'Module should be loadable');
+
+      const output = JSON.parse(hookInput.formatResult({ allow: true, message: 'ok' }));
+      assert.strictEqual(output.allow, true);
+      assert.strictEqual(output.permissionDecision, 'allow');
+      assert.strictEqual(output.permissionDecisionReason, 'ok');
+      assert.strictEqual(output.message, 'ok');
+    });
+  });
+
   describe('auditLog', () => {
     it('should output JSON to stderr', () => {
       assert.ok(hookInput, 'Module should be loadable');

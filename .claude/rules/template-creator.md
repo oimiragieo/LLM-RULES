@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/template-creator/**
+---
+
 # Template Creator Rules
 
 ## Core Principles

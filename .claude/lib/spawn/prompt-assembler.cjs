@@ -31,7 +31,14 @@ try {
 let TOOL_MANIFEST = null;
 let SKILL_INDEX = null;
 let PRESETS = null;
+let TOOL_LOOKUP_CACHE = null;
 const logger = createLogger('prompt-assembler');
+
+// Context-budget safeguards for injected memory sections.
+const MAX_MEMORY_ITEMS_PER_SECTION = 3;
+const MAX_MEMORY_ITEM_CHARS = 220;
+const MAX_MEMORY_SECTION_CHARS = 3500;
+const DEFAULT_SKILL_SECTION_MODE = 'full';
 
 /**
  * Load tool manifest (cached)
@@ -48,8 +55,29 @@ function getToolManifest() {
         validation: { agentDefaults: {} },
       };
     }
+    TOOL_LOOKUP_CACHE = null;
   }
   return TOOL_MANIFEST;
+}
+
+function getToolLookupCache() {
+  if (TOOL_LOOKUP_CACHE) return TOOL_LOOKUP_CACHE;
+
+  const manifest = getToolManifest();
+  const coreMap = new Map();
+  const mcpMap = new Map();
+
+  for (const tool of manifest.tools?.core || []) {
+    if (tool?.name) coreMap.set(tool.name, tool);
+  }
+
+  for (const tool of manifest.tools?.mcp || []) {
+    if (!tool?.name) continue;
+    mcpMap.set(tool.name, tool);
+  }
+
+  TOOL_LOOKUP_CACHE = { coreMap, mcpMap };
+  return TOOL_LOOKUP_CACHE;
 }
 
 /**
@@ -234,48 +262,64 @@ function formatMemorySection(memory) {
   lines.push('_Recent learnings from past sessions_');
   lines.push('');
 
+  const normalizeMemoryText = value =>
+    String(value || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  const clipMemoryText = value => {
+    const normalized = normalizeMemoryText(value);
+    if (!normalized) return '';
+    if (normalized.length <= MAX_MEMORY_ITEM_CHARS) return normalized;
+    return normalized.slice(0, MAX_MEMORY_ITEM_CHARS - 3) + '...';
+  };
+
   if (gotchas.length > 0) {
     lines.push('### Gotchas (Pitfalls to Avoid)');
-    for (const g of gotchas) {
+    for (const g of gotchas.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
       const text = typeof g === 'string' ? g : g?.text;
-      if (text) lines.push(`- ${text}`);
+      const clipped = clipMemoryText(text);
+      if (clipped) lines.push(`- ${clipped}`);
     }
     lines.push('');
   }
 
   if (patterns.length > 0) {
     lines.push('### Patterns (Reusable Solutions)');
-    for (const p of patterns) {
+    for (const p of patterns.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
       const text = typeof p === 'string' ? p : p?.text;
-      if (text) lines.push(`- ${text}`);
+      const clipped = clipMemoryText(text);
+      if (clipped) lines.push(`- ${clipped}`);
     }
     lines.push('');
   }
 
   if (decisions.length > 0) {
     lines.push('### Decisions (ADRs)');
-    for (const d of decisions) {
+    for (const d of decisions.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
       const text = typeof d === 'string' ? d : d?.text;
-      if (text) lines.push(`- ${text}`);
+      const clipped = clipMemoryText(text);
+      if (clipped) lines.push(`- ${clipped}`);
     }
     lines.push('');
   }
 
   if (discoveries.length > 0) {
     lines.push('### Recent Discoveries');
-    for (const d of discoveries) {
+    for (const d of discoveries.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
       const p = d?.path;
       const desc = d?.description;
-      if (p && desc) lines.push(`- \`${p}\`: ${desc}`);
+      const clipped = clipMemoryText(desc);
+      if (p && clipped) lines.push(`- \`${p}\`: ${clipped}`);
     }
     lines.push('');
   }
 
   if (recentSessions.length > 0) {
     lines.push('### Recent Sessions');
-    for (const s of recentSessions.slice(0, 3)) {
+    for (const s of recentSessions.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
       const n = s?.session_number ?? s?.sessionNum;
-      const summary = s?.summary || 'No summary';
+      const summary = clipMemoryText(s?.summary || 'No summary');
       if (n !== undefined && n !== null) {
         lines.push(`- Session ${n}: ${summary}`);
       } else {
@@ -285,7 +329,13 @@ function formatMemorySection(memory) {
     lines.push('');
   }
 
-  return lines.join('\n').trimEnd();
+  const section = lines.join('\n').trimEnd();
+  if (section.length <= MAX_MEMORY_SECTION_CHARS) {
+    return section;
+  }
+
+  // Final safety cap in case memory records carry unusually long content.
+  return section.slice(0, MAX_MEMORY_SECTION_CHARS - 3) + '...';
 }
 
 function loadAgentRegistry(projectRoot = PROJECT_ROOT) {
@@ -363,12 +413,11 @@ function loadAgentPromptOverrides(agentType, projectRoot = PROJECT_ROOT) {
  * @returns {Array<{name: string, description: string, status: string, fallback?: string}>}
  */
 function filterAndDescribeTools(allowedTools) {
-  const manifest = getToolManifest();
+  const { coreMap, mcpMap } = getToolLookupCache();
   const result = [];
 
   for (const toolName of allowedTools) {
-    // Look up core tools first
-    const coreTool = manifest.tools?.core?.find(t => t.name === toolName);
+    const coreTool = coreMap.get(toolName);
     if (coreTool) {
       result.push({
         name: coreTool.name,
@@ -379,10 +428,17 @@ function filterAndDescribeTools(allowedTools) {
       continue;
     }
 
-    // Check MCP tools
-    const mcpTool = manifest.tools?.mcp?.find(
-      t => t.name === toolName || t.name.startsWith(toolName.split('__')[0] + '__')
-    );
+    const mcpToolExact = mcpMap.get(toolName);
+    let mcpTool = mcpToolExact || null;
+    if (!mcpTool) {
+      const namespacePrefix = `${toolName.split('__')[0]}__`;
+      for (const [name, candidate] of mcpMap.entries()) {
+        if (name.startsWith(namespacePrefix)) {
+          mcpTool = candidate;
+          break;
+        }
+      }
+    }
     if (mcpTool) {
       result.push({
         name: toolName,
@@ -488,6 +544,16 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
   return result;
 }
 
+function normalizeSkillSectionMode(mode) {
+  const value = String(mode || DEFAULT_SKILL_SECTION_MODE)
+    .trim()
+    .toLowerCase();
+  if (value === 'names-only' || value === 'names_only' || value === 'compact') {
+    return 'names_only';
+  }
+  return 'full';
+}
+
 /**
  * Build the AVAILABLE_TOOLS section
  *
@@ -533,20 +599,34 @@ function buildToolsSection(tools) {
  * @param {Array<{name: string, description: string, category: string}>} skills
  * @returns {string} Markdown section
  */
-function buildSkillsSection(skills) {
+function buildSkillsSection(skills, options = {}) {
+  const mode = normalizeSkillSectionMode(options.skillSectionMode);
   let section = `## AVAILABLE_SKILLS\n\n`;
-  section += `Available skills matched to your agent:\n\n`;
+  section +=
+    mode === 'names_only'
+      ? 'Available skills matched to your agent (names-only mode):\n\n'
+      : `Available skills matched to your agent:\n\n`;
 
   for (const skill of skills) {
-    section += `- **${skill.name}**: ${skill.description}`;
+    section += `- **${skill.name}**`;
+    if (mode !== 'names_only') {
+      section += `: ${skill.description}`;
+    }
     if (skill.category) {
       section += ` (${skill.category})`;
     }
     section += `\n`;
-    if (skill.requiredTools?.length > 0) {
+    if (mode !== 'names_only' && skill.requiredTools?.length > 0) {
       section += `  Required Tools: ${skill.requiredTools.join(', ')}\n`;
     }
-    section += `  Usage: Skill({ skill: '${skill.name}' })\n\n`;
+    if (mode !== 'names_only') {
+      section += `  Usage: Skill({ skill: '${skill.name}' })\n`;
+    }
+    section += '\n';
+  }
+
+  if (mode === 'names_only') {
+    section += `Invoke any listed skill with: Skill({ skill: '<skill-name>' })\n`;
   }
 
   return section;
@@ -721,6 +801,7 @@ function assembleSpawnPrompt({
   basePrompt = '',
   maxToolsInPrompt = 15,
   maxSkillsInPrompt = 20,
+  skillSectionMode = DEFAULT_SKILL_SECTION_MODE,
   includeMemory = true,
   presetId = null,
 } = {}) {
@@ -753,7 +834,7 @@ function assembleSpawnPrompt({
 
   // 4. Build sections
   const toolsSection = buildToolsSection(describedTools);
-  const skillsSection = buildSkillsSection(skills);
+  const skillsSection = buildSkillsSection(skills, { skillSectionMode });
   const discoverySection = buildDiscoverySection();
 
   // 5. Inject sections into prompt
@@ -801,6 +882,7 @@ module.exports = {
   getSkillsByName,
   buildToolsSection,
   buildSkillsSection,
+  normalizeSkillSectionMode,
   buildDiscoverySection,
   injectSections,
   loadMemoryContext,

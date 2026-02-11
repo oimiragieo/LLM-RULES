@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/consensus-voting/**
+---
+
 # Consensus Voting Rules
 
 ## Core Principles

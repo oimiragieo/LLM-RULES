@@ -73,6 +73,7 @@ The Queen analyzes the problem, decomposes it into evaluation criteria, and dist
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   description: 'Queen analyzing problem for consensus voting',
   prompt: `You are the SWARM-COORDINATOR agent (Queen).
@@ -121,6 +122,7 @@ The Queen spawns all workers in a single response for parallel execution.
 ```javascript
 // Spawn all workers in parallel (same message)
 Task({
+  task_id: 'task-2',
   subagent_type: 'general-purpose',
   description: 'Worker #1 (Developer) analyzing problem',
   prompt: `You are WORKER #1 (DEVELOPER agent) in a consensus voting session.
@@ -160,6 +162,7 @@ Read: .claude/context/sessions/consensus-$SESSION_ID-problem.json
 });
 
 Task({
+  task_id: 'task-3',
   subagent_type: 'general-purpose',
   description: 'Worker #2 (Architect) analyzing problem',
   prompt: `You are WORKER #2 (ARCHITECT agent) in a consensus voting session.
@@ -195,6 +198,7 @@ Read: .claude/context/sessions/consensus-$SESSION_ID-problem.json
 });
 
 Task({
+  task_id: 'task-4',
   subagent_type: 'general-purpose',
   description: 'Worker #3 (Security Architect) analyzing problem',
   prompt: `You are WORKER #3 (SECURITY-ARCHITECT agent) in a consensus voting session.
@@ -260,6 +264,7 @@ Workers execute in parallel (Phase 1.2 spawns them simultaneously). Each worker:
 
 ```javascript
 Task({
+  task_id: 'task-5',
   subagent_type: 'general-purpose',
   description: 'Queen collecting votes and calculating consensus',
   prompt: `You are the SWARM-COORDINATOR agent (Queen).
@@ -334,6 +339,7 @@ If conflicts exist (score delta > 3 on any criterion), resolve them:
 
 ```javascript
 Task({
+  task_id: 'task-6',
   subagent_type: 'general-purpose',
   description: 'Queen resolving conflicts and synthesizing result',
   prompt: `You are the SWARM-COORDINATOR agent (Queen).
@@ -404,6 +410,7 @@ If the consensus leads to implementation:
 
 ```javascript
 Task({
+  task_id: 'task-7',
   subagent_type: 'general-purpose',
   description: 'Developer implementing consensus decision',
   prompt: `You are the DEVELOPER agent.
@@ -499,6 +506,7 @@ cp .claude/context/sessions/archive/consensus-$SESSION_ID-result.json \
 ```javascript
 // Router spawning consensus workflow for technology decision
 Task({
+  task_id: 'task-8',
   subagent_type: 'general-purpose',
   description: 'Initiating consensus voting for database selection',
   prompt: `Execute consensus voting workflow.

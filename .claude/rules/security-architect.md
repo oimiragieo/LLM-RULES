@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/security-architect/**
+---
+
 # Security Architect Rules
 
 ## Core Principles

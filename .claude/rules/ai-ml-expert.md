@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/ai-ml-expert/**
+---
+
 # AI/ML Expert Rules
 
 ## Core Principles

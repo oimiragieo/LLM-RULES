@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/sequential-thinking/**
+---
+
 # Sequential Thinking Rules
 
 ## Core Principles

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/mobile-first-design-rules/**
+---
+
 # Mobile-First Design Rules
 
 ## Core Principles

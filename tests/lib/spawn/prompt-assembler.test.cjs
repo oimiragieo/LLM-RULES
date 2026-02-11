@@ -190,6 +190,24 @@ describe('prompt-assembler', () => {
         'Should include usage example'
       );
     });
+
+    it('should support names-only skill section mode', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const skills = [
+        { name: 'tdd', description: 'Test-driven development workflow', category: 'Testing' },
+      ];
+      const section = assembler.buildSkillsSection(skills, { skillSectionMode: 'names_only' });
+
+      assert.ok(section.includes('**tdd**'), 'Should include skill name');
+      assert.ok(!section.includes('Test-driven development workflow'), 'Should omit descriptions');
+      assert.ok(
+        section.includes("Skill({ skill: '<skill-name>' })"),
+        'Should include generic invocation guidance'
+      );
+    });
   });
 
   // ======================================================================
@@ -616,6 +634,24 @@ Complete the task.`;
           'MCP tool should show unavailability or fallback'
         );
       }
+    });
+
+    it('should cap oversized memory context sections to protect token budget', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const oversized = 'X'.repeat(5000);
+      const section = assembler.formatMemorySection({
+        gotchas: [oversized, oversized, oversized, oversized],
+        patterns: [oversized],
+        decisions: [oversized],
+        discoveries: [{ path: '.claude/a.md', description: oversized }],
+        recent_sessions: [{ session_number: 1, summary: oversized }],
+      });
+
+      assert.ok(section.length <= 3500, `Section too large: ${section.length}`);
+      assert.ok(!section.includes('\n\n\n\n'), 'Should normalize noisy multi-line memory entries');
     });
   });
 

@@ -20,6 +20,8 @@
  * Controls:
  * - SPAWN_PROMPT_ASSEMBLER=off  -> disable hook (no modifications)
  * - SPAWN_PROMPT_SEMANTIC_MEMORY=on -> include semantic matches (best-effort)
+ * - SPAWN_SKILL_SECTION_MODE=names_only|full -> skill metadata verbosity
+ * - SPAWN_ASSEMBLY_PROFILING=true -> emit dev-only assembly/tokens metrics JSONL
  *
  * Output (when modifying):
  * - JSON with `tool_input` containing the modified prompt (Claude Code hook protocol).
@@ -27,6 +29,7 @@
 
 'use strict';
 
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
@@ -67,6 +70,17 @@ const _UNIVERSAL_SPAWN_TEMPLATE_PATH = path.join(
 
 const MAX_TOOLS_AGENT = 15;
 const MAX_TOOLS_ORCHESTRATOR = 18;
+const MAX_SPAWN_PROMPT_CHARS = Number(process.env.SPAWN_PROMPT_MAX_CHARS || 40000);
+const TRUNCATION_NOTICE = '\n\n[TRUNCATED FOR TOKEN BUDGET]';
+const SPAWN_CACHE_TTL_MS = Number(process.env.SPAWN_ASSEMBLY_CACHE_TTL_MS || 120000);
+const SPAWN_CACHE_MAX_ENTRIES = Number(process.env.SPAWN_ASSEMBLY_CACHE_MAX_ENTRIES || 120);
+const SPAWN_CACHE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'spawn-assembly-cache.json'
+);
 const ORCHESTRATOR_IDS = new Set([
   'router',
   'master-orchestrator',
@@ -74,6 +88,207 @@ const ORCHESTRATOR_IDS = new Set([
   'swarm-coordinator',
   'party-orchestrator',
 ]);
+const TASK_ID_REFERENCE_REGEX =
+  /Task ID:\s{0,10}[<"']?[a-zA-Z0-9_-]{1,64}|taskId:\s{0,10}[<"']?[a-zA-Z0-9_-]{1,64}/i;
+
+function isPerfHarnessEnabled() {
+  return process.env.SPAWN_ASSEMBLY_PROFILING === 'true';
+}
+
+function isAdaptiveEnrichmentEnabled() {
+  return process.env.SPAWN_ADAPTIVE_ENRICHMENT === 'true';
+}
+
+function isSpawnAssemblyCacheEnabled() {
+  return process.env.SPAWN_ASSEMBLY_CACHE !== 'off';
+}
+
+function createPerfRecorder(enabled) {
+  if (!enabled) {
+    return {
+      mark: () => {},
+      done: () => ({ totalMs: 0, phases: {} }),
+    };
+  }
+
+  const phases = {};
+  let previous = process.hrtime.bigint();
+  const started = previous;
+
+  function mark(name) {
+    const now = process.hrtime.bigint();
+    const ms = Number(now - previous) / 1e6;
+    phases[name] = Number(ms.toFixed(3));
+    previous = now;
+  }
+
+  function done() {
+    const ended = process.hrtime.bigint();
+    const totalMs = Number(ended - started) / 1e6;
+    return { totalMs: Number(totalMs.toFixed(3)), phases };
+  }
+
+  return { mark, done };
+}
+
+function getPromptFingerprint(input) {
+  const hash = crypto.createHash('sha1');
+  hash.update(
+    JSON.stringify({
+      agentType: input.agentType || 'developer',
+      presetId: input.presetId || null,
+      allowedTools: Array.isArray(input.allowedTools) ? [...input.allowedTools].sort() : [],
+      basePrompt: input.basePrompt || '',
+      contextFragment: input.contextFragment || '',
+      semanticEnabled: input.semanticEnabled !== false,
+      entityGraphEnabled: input.entityGraphEnabled !== false,
+      skillSectionMode: input.skillSectionMode || 'full',
+      configModel: input.configModel || null,
+    })
+  );
+  return hash.digest('hex');
+}
+
+function resolveSkillSectionMode() {
+  const raw = String(process.env.SPAWN_SKILL_SECTION_MODE || 'names_only')
+    .trim()
+    .toLowerCase();
+  if (raw === 'full') return 'full';
+  if (raw === 'names-only' || raw === 'names_only' || raw === 'compact') return 'names_only';
+  return 'names_only';
+}
+
+function readAssemblyCache() {
+  try {
+    if (!fs.existsSync(SPAWN_CACHE_PATH)) return { entries: {} };
+    const parsed = JSON.parse(fs.readFileSync(SPAWN_CACHE_PATH, 'utf8'));
+    return parsed && typeof parsed === 'object' && parsed.entries ? parsed : { entries: {} };
+  } catch (_err) {
+    return { entries: {} };
+  }
+}
+
+function writeAssemblyCache(cache) {
+  try {
+    const dir = path.dirname(SPAWN_CACHE_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(SPAWN_CACHE_PATH, JSON.stringify(cache, null, 2), 'utf8');
+  } catch (_err) {
+    // best-effort
+  }
+}
+
+function pruneAssemblyCache(entries) {
+  const now = Date.now();
+  const rows = Object.entries(entries || {})
+    .map(([key, value]) => ({ key, value }))
+    .filter(
+      row =>
+        row.value &&
+        typeof row.value === 'object' &&
+        typeof row.value.prompt === 'string' &&
+        Number(now - Number(row.value.createdAt || 0)) <= SPAWN_CACHE_TTL_MS
+    )
+    .sort((a, b) => Number(b.value.lastAccess || 0) - Number(a.value.lastAccess || 0));
+  return Object.fromEntries(rows.slice(0, SPAWN_CACHE_MAX_ENTRIES).map(r => [r.key, r.value]));
+}
+
+function getCachedAssembly(fingerprint) {
+  if (!isSpawnAssemblyCacheEnabled()) return null;
+  const cache = readAssemblyCache();
+  cache.entries = pruneAssemblyCache(cache.entries);
+  const entry = cache.entries[fingerprint];
+  if (!entry) {
+    writeAssemblyCache(cache);
+    return null;
+  }
+  entry.lastAccess = Date.now();
+  cache.entries[fingerprint] = entry;
+  writeAssemblyCache(cache);
+  return entry.prompt;
+}
+
+function putCachedAssembly(fingerprint, prompt) {
+  if (!isSpawnAssemblyCacheEnabled()) return;
+  const cache = readAssemblyCache();
+  const now = Date.now();
+  cache.entries = pruneAssemblyCache(cache.entries);
+  cache.entries[fingerprint] = {
+    prompt,
+    createdAt: now,
+    lastAccess: now,
+  };
+  cache.entries = pruneAssemblyCache(cache.entries);
+  writeAssemblyCache(cache);
+}
+
+function classifyPromptComplexity(toolInput, basePrompt) {
+  const description = String(toolInput?.description || '').toLowerCase();
+  const prompt = String(basePrompt || '').toLowerCase();
+  const text = `${description}\n${prompt}`;
+  const complexityKeywords = [
+    'security',
+    'architecture',
+    'migration',
+    'refactor',
+    'incident',
+    'production',
+    'orchestrator',
+    'multi-agent',
+    'consensus',
+    'database',
+    'performance',
+  ];
+  const keywordHits = complexityKeywords.filter(k => text.includes(k)).length;
+  if (basePrompt.length > 8000 || keywordHits >= 3) return 'high';
+  if (basePrompt.length > 2500 || keywordHits >= 1) return 'medium';
+  return 'low';
+}
+
+function readRecentJsonl(filePath, maxRows = 300) {
+  try {
+    if (!fs.existsSync(filePath)) return [];
+    const lines = fs.readFileSync(filePath, 'utf8').split('\n').filter(Boolean);
+    const rows = [];
+    for (const line of lines.slice(-maxRows)) {
+      try {
+        rows.push(JSON.parse(line));
+      } catch (_err) {
+        // ignore malformed rows
+      }
+    }
+    return rows;
+  } catch (_err) {
+    return [];
+  }
+}
+
+function shouldThrottleExpensiveEnrichment(toolInput, basePrompt) {
+  if (!isAdaptiveEnrichmentEnabled()) return false;
+  const complexity = classifyPromptComplexity(toolInput, basePrompt);
+  if (complexity === 'high') return false;
+  if (basePrompt.length > 20000) return true;
+
+  const metricsDir = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
+  const assemblyRows = readRecentJsonl(path.join(metricsDir, 'spawn-assembly-metrics.jsonl'));
+  const tokenRows = readRecentJsonl(path.join(metricsDir, 'token-burn-metrics.jsonl'));
+  const recentAssembly = assemblyRows
+    .map(r => Number(r.total_ms))
+    .filter(Number.isFinite)
+    .slice(-40);
+  const recentBurn = tokenRows
+    .map(r => Number(r.burn_rate_tokens_per_second))
+    .filter(Number.isFinite)
+    .slice(-40);
+
+  const avg = arr => (arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0);
+  const avgAssemblyMs = avg(recentAssembly);
+  const avgBurnRate = avg(recentBurn);
+  const maxAssemblyMs = Number(process.env.SPAWN_ADAPTIVE_MAX_ASSEMBLY_MS || 220);
+  const maxBurnRate = Number(process.env.SPAWN_ADAPTIVE_MAX_BURN_RATE || 650);
+
+  return avgAssemblyMs > maxAssemblyMs || avgBurnRate > maxBurnRate;
+}
 
 /** Log to stderr only (stdout is reserved for single JSON hook output). */
 function stderrLog(message, meta = {}) {
@@ -97,7 +312,7 @@ function stderrLog(message, meta = {}) {
  * @returns {string} The required prefix fragment
  */
 function generateRequiredPrefixFragment(taskId, description) {
-  const taskIdValue = taskId != null ? String(taskId) : '0';
+  const taskIdValue = taskId != null ? String(taskId) : 'MISSING_TASK_ID';
   const subject = (description || 'Task').slice(0, 80);
 
   return `+======================================================================+
@@ -149,8 +364,51 @@ function hasRequiredWarningBox(prompt) {
  */
 function hasTaskIdReference(prompt) {
   if (!prompt || typeof prompt !== 'string') return false;
-  // Match patterns like "Task ID: 123" or "taskId: 123" or "taskId: \"123\""
-  return /Task ID:\s{0,10}[<"']?\d{1,20}|taskId:\s{0,10}[<"']?\d{1,20}/i.test(prompt);
+  return TASK_ID_REFERENCE_REGEX.test(prompt);
+}
+
+function hasExplicitTaskId(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return false;
+  const taskId = toolInput.task_id || toolInput.id || null;
+  return typeof taskId === 'string' || typeof taskId === 'number';
+}
+
+function generateFallbackTaskId(hookInput, toolInput) {
+  const rawSessionId =
+    hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || 'session';
+  const sessionPart =
+    String(rawSessionId || '')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .slice(0, 12) || 'session';
+  const description =
+    typeof toolInput?.description === 'string' ? toolInput.description.toLowerCase() : '';
+  const hint =
+    description
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 24) || 'spawn';
+  return `task-${sessionPart}-${hint}-${Date.now().toString(36)}`;
+}
+
+function ensureTaskId(toolInput, hookInput) {
+  const currentTaskId = toolInput?.task_id || toolInput?.id || null;
+  if (typeof currentTaskId === 'string' || typeof currentTaskId === 'number') {
+    if (toolInput?.task_id != null) {
+      return { toolInput, modified: false, taskId: currentTaskId };
+    }
+    return {
+      toolInput: { ...toolInput, task_id: String(currentTaskId) },
+      modified: true,
+      taskId: String(currentTaskId),
+    };
+  }
+
+  const generatedTaskId = generateFallbackTaskId(hookInput, toolInput);
+  return {
+    toolInput: { ...toolInput, task_id: generatedTaskId },
+    modified: true,
+    taskId: generatedTaskId,
+  };
 }
 
 function isDisabled() {
@@ -167,11 +425,10 @@ function isEnricherDisabled() {
  * @param {string} agentType - Agent type for config lookup
  * @returns {string} Assembled prompt, possibly with model section appended
  */
-function appendConfigModelSection(assembled, agentType) {
+function appendConfigModelSection(assembled, configResult) {
   if (process.env.SPAWN_PROMPT_INJECT_CONFIG_MODEL === 'off') return assembled;
   try {
     const { getShorthand } = libRequire(path.join('utils', 'agent-config-reader.cjs'));
-    const configResult = resolveConfigModel(agentType);
     const shorthand = configResult && getShorthand(configResult.model);
     if (configResult && configResult.model) {
       const modelSection = [
@@ -270,13 +527,22 @@ function appendConstitutionSection(assembled, context) {
   lines.push('These principles guide all agent behavior in this framework:');
   lines.push('');
 
+  const clip = (text, max) => {
+    const normalized = String(text || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!normalized) return '';
+    if (normalized.length <= max) return normalized;
+    return normalized.slice(0, max - 3) + '...';
+  };
+
   if (constitution) {
-    lines.push(constitution.trim());
+    lines.push(clip(constitution, 1800));
   }
 
   if (behaviour) {
     if (constitution) lines.push(''); // Add spacing between sections
-    lines.push(behaviour.trim());
+    lines.push(clip(behaviour, 1200));
   }
 
   const section = lines.join('\n') + '\n';
@@ -289,6 +555,66 @@ function appendConstitutionSection(assembled, context) {
   }
 
   return assembled + `\n${section}`;
+}
+
+function removeTopLevelSection(prompt, header) {
+  if (!prompt.includes(header)) return prompt;
+  const start = prompt.indexOf(header);
+  const next = prompt.indexOf('\n## ', start + header.length);
+  if (next === -1) {
+    return prompt.slice(0, start).trimEnd();
+  }
+  return (prompt.slice(0, start) + '\n' + prompt.slice(next + 1)).trim();
+}
+
+function removeSubSection(prompt, header) {
+  if (!prompt.includes(header)) return prompt;
+  const start = prompt.indexOf(header);
+  const nextTopLevel = prompt.indexOf('\n## ', start + header.length);
+  const nextSameLevel = prompt.indexOf('\n### ', start + header.length);
+  let end = -1;
+  if (nextTopLevel !== -1 && nextSameLevel !== -1) {
+    end = Math.min(nextTopLevel, nextSameLevel);
+  } else {
+    end = Math.max(nextTopLevel, nextSameLevel);
+  }
+  if (end === -1) {
+    return prompt.slice(0, start).trimEnd();
+  }
+  return (prompt.slice(0, start) + '\n' + prompt.slice(end + 1)).trim();
+}
+
+function enforcePromptBudget(prompt) {
+  if (!prompt || typeof prompt !== 'string') return prompt;
+  if (!Number.isFinite(MAX_SPAWN_PROMPT_CHARS) || MAX_SPAWN_PROMPT_CHARS <= 0) {
+    return prompt;
+  }
+  if (prompt.length <= MAX_SPAWN_PROMPT_CHARS) return prompt;
+
+  let reduced = prompt;
+  const removalOrder = [
+    { type: 'top', header: '## Memory Context (Auto-Loaded)' },
+    { type: 'sub', header: '### Entity Graph (SQLite)' },
+    { type: 'sub', header: '### Relevant Memories (Query)' },
+    { type: 'sub', header: '### Semantic Matches (ContextualMemory)' },
+    { type: 'top', header: '## Agent Constitution' },
+    { type: 'top', header: '## Dynamic behaviour rules' },
+  ];
+
+  for (const item of removalOrder) {
+    if (reduced.length <= MAX_SPAWN_PROMPT_CHARS) break;
+    reduced =
+      item.type === 'top'
+        ? removeTopLevelSection(reduced, item.header)
+        : removeSubSection(reduced, item.header);
+  }
+
+  if (reduced.length > MAX_SPAWN_PROMPT_CHARS) {
+    const keep = Math.max(0, MAX_SPAWN_PROMPT_CHARS - TRUNCATION_NOTICE.length);
+    reduced = reduced.slice(0, keep) + TRUNCATION_NOTICE;
+  }
+
+  return reduced;
 }
 
 function loadAgentRegistry() {
@@ -762,44 +1088,73 @@ async function applyEntityGraphToPrompt(assembled) {
   }
 }
 
+function prepareTaskSpawnContext(hookInput, sessionId) {
+  if (!hookInput) return null;
+
+  const toolName = getToolName(hookInput);
+  if (toolName !== 'Task') return null;
+
+  const rawToolInput = getToolInput(hookInput);
+  if (!rawToolInput || typeof rawToolInput !== 'object') return null;
+
+  const ensuredTask = ensureTaskId(rawToolInput, hookInput);
+  const toolInput = ensuredTask.toolInput;
+  if (ensuredTask.modified) {
+    stderrLog('task_id_auto_injected', {
+      task_id: ensuredTask.taskId,
+    });
+  }
+
+  let basePrompt = toolInput.prompt;
+  if (!basePrompt || typeof basePrompt !== 'string') return null;
+
+  const explicitTaskId = toolInput.task_id || toolInput.id || null;
+  const inputPromptLength = basePrompt.length;
+
+  if (!hasRequiredWarningBox(basePrompt) || !hasTaskIdReference(basePrompt)) {
+    const description = toolInput.description || '';
+    basePrompt = generateRequiredPrefixFragment(explicitTaskId, description) + '\n\n' + basePrompt;
+    debugLog('spawn-prompt-assembler', 'Prepended required prefix fragment', {
+      hasWarningBox: hasRequiredWarningBox(toolInput.prompt),
+      hasTaskId: hasTaskIdReference(toolInput.prompt),
+      taskId: explicitTaskId,
+    });
+  }
+
+  const hookSessionId = hookInput.session_id || hookInput.sessionId || sessionId;
+  stderrLog('hook_start', {
+    session_id: hookSessionId,
+    task_id: explicitTaskId,
+  });
+
+  return {
+    toolInput,
+    basePrompt,
+    explicitTaskId,
+    inputPromptLength,
+    hookSessionId,
+  };
+}
+
 async function main() {
   const startTime = Date.now();
+  const perfEnabled = isPerfHarnessEnabled();
+  const perf = createPerfRecorder(perfEnabled);
+  const sessionId = process.env.CLAUDE_SESSION_ID || null;
   try {
     if (isDisabled()) process.exit(0);
 
     const hookInput = await parseHookInputAsync();
-    if (!hookInput) process.exit(0);
+    const prepared = prepareTaskSpawnContext(hookInput, sessionId);
+    if (!prepared) process.exit(0);
 
-    const toolName = getToolName(hookInput);
-    if (toolName !== 'Task') process.exit(0);
-
-    const toolInput = getToolInput(hookInput);
-    if (!toolInput || typeof toolInput !== 'object') process.exit(0);
-
-    let basePrompt = toolInput.prompt;
-    if (!basePrompt || typeof basePrompt !== 'string') process.exit(0);
-
-    if (!hasRequiredWarningBox(basePrompt) || !hasTaskIdReference(basePrompt)) {
-      const taskId = toolInput.task_id || toolInput.id || null;
-      const description = toolInput.description || '';
-      basePrompt = generateRequiredPrefixFragment(taskId, description) + '\n\n' + basePrompt;
-      debugLog('spawn-prompt-assembler', 'Prepended required prefix fragment', {
-        hasWarningBox: hasRequiredWarningBox(toolInput.prompt),
-        hasTaskId: hasTaskIdReference(toolInput.prompt),
-        taskId,
-      });
-    }
-
-    const sessionId = hookInput.session_id || hookInput.sessionId || null;
-    stderrLog('hook_start', {
-      session_id: sessionId,
-      task_id: toolInput.task_id || toolInput.id || null,
-    });
+    const { toolInput, basePrompt, explicitTaskId, inputPromptLength, hookSessionId } = prepared;
 
     if (looksAssembled(basePrompt)) {
       stderrLog('hook_end', { status: 'already_assembled' });
       process.exit(0);
     }
+    perf.mark('prechecks_ms');
 
     const promptAssembler = libRequire(path.join('spawn', 'prompt-assembler.cjs'));
     const agentType = toolInput.subagent_type || toolInput.agent_type || 'developer';
@@ -807,6 +1162,7 @@ async function main() {
     const rawAllowedTools = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
     const enrichedTools = enrichAllowedTools(agentType, rawAllowedTools, basePrompt);
     const contextMode = buildContextModePrompt({ role: agentType });
+    const skillSectionMode = resolveSkillSectionMode();
     let allowedTools = enrichedTools;
     if (contextMode.hasContextOrMode) {
       const activeSet = new Set(contextMode.activeToolNames);
@@ -821,20 +1177,47 @@ async function main() {
       }
     }
 
-    let assembled = promptAssembler.assembleSpawnPrompt({
+    const throttleExpensive = shouldThrottleExpensiveEnrichment(toolInput, basePrompt);
+    const cacheKey = getPromptFingerprint({
       agentType,
+      presetId,
       allowedTools,
       basePrompt,
-      includeMemory: true,
-      presetId,
+      contextFragment: contextMode.promptFragment || '',
+      semanticEnabled: !throttleExpensive,
+      entityGraphEnabled: !throttleExpensive,
+      skillSectionMode,
+      configModel: toolInput.model || null,
     });
 
-    if (contextMode.hasContextOrMode && contextMode.promptFragment) {
-      assembled = insertContextModeSection(assembled, contextMode.promptFragment);
-    }
+    let assembled = getCachedAssembly(cacheKey);
+    const cacheHit = Boolean(assembled);
+    if (assembled) {
+      perf.mark('cache_hit_ms');
+    } else {
+      assembled = promptAssembler.assembleSpawnPrompt({
+        agentType,
+        allowedTools,
+        basePrompt,
+        skillSectionMode,
+        includeMemory: true,
+        presetId,
+      });
 
-    assembled = await applySemanticMemoryToPrompt(assembled, toolInput, basePrompt);
-    assembled = await applyEntityGraphToPrompt(assembled);
+      if (contextMode.hasContextOrMode && contextMode.promptFragment) {
+        assembled = insertContextModeSection(assembled, contextMode.promptFragment);
+      }
+      perf.mark('base_assembly_ms');
+
+      if (!throttleExpensive) {
+        assembled = await applySemanticMemoryToPrompt(assembled, toolInput, basePrompt);
+      }
+      perf.mark('semantic_memory_ms');
+      if (!throttleExpensive) {
+        assembled = await applyEntityGraphToPrompt(assembled);
+      }
+      perf.mark('entity_graph_ms');
+    }
 
     // Append constitution and behaviour principles to every spawned agent
     const constitutionContext = loadConstitutionContext(PROJECT_ROOT);
@@ -846,25 +1229,44 @@ async function main() {
       const presets = loadPresets();
       assembled = appendPresetSection(assembled, agentType, activePreset, presets);
     }
+    perf.mark('context_enrichment_ms');
 
     // CONFIG-001: Inject configured model into spawn prompt so Router passes it into Task().
-    assembled = appendConfigModelSection(assembled, agentType);
-
     const configModel = resolveConfigModel(agentType);
+    assembled = appendConfigModelSection(assembled, configModel);
+    assembled = enforcePromptBudget(assembled);
+    putCachedAssembly(cacheKey, assembled);
+    perf.mark('model_and_budget_ms');
+    let selectedModel = toolInput.model || configModel?.model || toolInput.model;
+    try {
+      if (toolInput.model && configModel?.model) {
+        const { getShorthand } = libRequire(path.join('utils', 'agent-config-reader.cjs'));
+        const requested = getShorthand(toolInput.model);
+        const configured = getShorthand(configModel.model);
+        if (requested !== configured) {
+          selectedModel = configModel.model;
+          stderrLog('spawn_model_autocorrected', {
+            task_id: explicitTaskId || null,
+            agentType,
+            fromModel: toolInput.model,
+            toModel: configModel.model,
+          });
+        }
+      }
+    } catch (_e) {
+      // Best-effort fallback: keep selectedModel as-is
+    }
+
     const modifiedInput = {
       ...toolInput,
       prompt: assembled,
       allowed_tools: allowedTools,
-      model: toolInput.model || configModel?.model || toolInput.model,
+      model: selectedModel,
     };
 
     try {
       const { logSpawnStart } = libRequire(path.join('monitoring', 'spawn-log.cjs'));
-      // Generate fallback task_id if not provided (for legacy spawns)
-      const taskId =
-        toolInput.task_id ||
-        toolInput.id ||
-        `spawn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const taskId = explicitTaskId;
 
       // Store task_id in router state so spawn_end can retrieve it
       const { setCurrentSpawnTaskId } = require('../../lib/routing/router-state.cjs');
@@ -874,15 +1276,8 @@ async function main() {
         taskId,
         agentType,
         promptLength: assembled.length,
-        sessionId,
+        sessionId: hookSessionId,
       });
-      // Warn if task_id was not provided (should be required)
-      if (!toolInput.task_id && !toolInput.id) {
-        stderrLog('missing_task_id', {
-          generated: taskId,
-          message: 'Task() call missing task_id parameter - generated fallback for traceability',
-        });
-      }
     } catch (_e) {
       // best-effort
     }
@@ -897,6 +1292,36 @@ async function main() {
         failed: validation.failed,
       });
       process.exit(2);
+    }
+    perf.mark('validation_ms');
+
+    if (perfEnabled) {
+      try {
+        const { logSpawnAssemblyMetric, logTokenBurnMetric } = libRequire(
+          path.join('monitoring', 'spawn-log.cjs')
+        );
+        const perfSummary = perf.done();
+        logSpawnAssemblyMetric({
+          taskId: explicitTaskId,
+          agentType,
+          sessionId: hookSessionId,
+          totalMs: perfSummary.totalMs,
+          phases: perfSummary.phases,
+          inputChars: inputPromptLength,
+          outputChars: assembled.length,
+          compactnessScore: validation.compactness?.score,
+        });
+        logTokenBurnMetric({
+          taskId: explicitTaskId,
+          agentType,
+          sessionId: hookSessionId,
+          inputChars: inputPromptLength,
+          outputChars: assembled.length,
+          elapsedMs: perfSummary.totalMs,
+        });
+      } catch (perfErr) {
+        debugLog('spawn-prompt-assembler', 'Perf harness logging failed (ignored)', perfErr);
+      }
     }
 
     // Claude Code hook protocol: output { tool_input: { ... } } to modify tool parameters.
@@ -916,6 +1341,22 @@ async function main() {
       // Best-effort
     }
     stderrLog('hook_end', { duration_ms: Date.now() - startTime });
+    try {
+      const { logRuntimeHealth } = libRequire(path.join('monitoring', 'runtime-health-log.cjs'));
+      logRuntimeHealth({
+        component: 'spawn-prompt-assembler',
+        status: 'ok',
+        durationMs: Date.now() - startTime,
+        sessionId: hookSessionId,
+        extra: {
+          task_id: explicitTaskId || null,
+          cache_hit: cacheHit,
+          adaptive_throttled: throttleExpensive,
+        },
+      });
+    } catch (_err) {
+      // best-effort
+    }
     process.exit(0);
   } catch (err) {
     try {
@@ -929,6 +1370,18 @@ async function main() {
       // Best-effort
     }
     stderrLog('hook_failed', { error: err?.message });
+    try {
+      const { logRuntimeHealth } = libRequire(path.join('monitoring', 'runtime-health-log.cjs'));
+      logRuntimeHealth({
+        component: 'spawn-prompt-assembler',
+        status: 'error',
+        durationMs: Date.now() - startTime,
+        sessionId,
+        extra: { error: err?.message || 'unknown' },
+      });
+    } catch (_err) {
+      // best-effort
+    }
     // Fail open: if we can't assemble, don't block spawns.
     debugLog('spawn-prompt-assembler', 'Hook error (fail open)', err);
     process.exit(0);
@@ -1064,10 +1517,17 @@ module.exports = {
   generateRequiredPrefixFragment,
   hasRequiredWarningBox,
   hasTaskIdReference,
+  hasExplicitTaskId,
+  generateFallbackTaskId,
+  ensureTaskId,
   loadConstitutionContext,
   appendConstitutionSection,
   loadPresets,
   getActivePreset,
   appendPresetSection,
+  enforcePromptBudget,
+  getPromptFingerprint,
+  classifyPromptComplexity,
+  shouldThrottleExpensiveEnrichment,
   main,
 };

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/insight-extraction/**
+---
+
 # Insight Extraction Rules
 
 ## Core Principles

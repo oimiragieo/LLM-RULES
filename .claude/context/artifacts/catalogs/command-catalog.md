@@ -401,11 +401,11 @@ Agent (spawned by Router) executes the work
 
 **Commands vs Skills vs Agents:**
 
-| Layer        | Purpose             | Invocation                                      |
-| ------------ | ------------------- | ----------------------------------------------- |
-| **Commands** | User entry point    | User types `/name`                              |
-| **Skills**   | Structured behavior | Agent invokes `Skill({ skill: "name" })`        |
-| **Agents**   | Execution context   | Router spawns `Task({ subagent_type: "type" })` |
+| Layer        | Purpose             | Invocation                                                         |
+| ------------ | ------------------- | ------------------------------------------------------------------ |
+| **Commands** | User entry point    | User types `/name`                                                 |
+| **Skills**   | Structured behavior | Agent invokes `Skill({ skill: "name" })`                           |
+| **Agents**   | Execution context   | Router spawns `Task({ task_id: 'task-1', subagent_type: "type" })` |
 
 Commands are thin shims that delegate to skills. Skills are the source of truth for behavior. Agents are the execution context that invokes skills.
 

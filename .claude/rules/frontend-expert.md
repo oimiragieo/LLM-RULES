@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/frontend-expert/**
+---
+
 # Frontend Expert Rules
 
 ## Core Principles

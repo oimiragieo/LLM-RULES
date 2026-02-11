@@ -88,6 +88,31 @@ function checkDirectory(path, description) {
   return true;
 }
 
+function collectFilesRecursive(dirPath, predicate) {
+  const fullDir = resolve(rootDir, dirPath);
+  if (!existsSync(fullDir)) return [];
+
+  const results = [];
+  const walk = current => {
+    const entries = readdirSync(current, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = resolve(current, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === '_archive' || entry.name === '_backup') continue;
+        walk(fullPath);
+        continue;
+      }
+      if (predicate(fullPath)) {
+        const rel = fullPath.replace(resolve(rootDir, '.') + '\\', '').replace(/\\/g, '/');
+        results.push(rel);
+      }
+    }
+  };
+
+  walk(fullDir);
+  return results;
+}
+
 // Validate YAML file
 function validateYAML(path, description) {
   const fullPath = resolve(rootDir, path);
@@ -230,12 +255,12 @@ function validateConfig() {
   // Validate all active schema files in schemas directory exist and are valid JSON
   // Note: 12 schemas archived in 2026-02-07 (see .claude/schemas/_archive/README.md)
   const schemaFiles = [
-    'artifact_manifest.schema.json',
-    'product_requirements.schema.json',
-    'project_brief.schema.json',
-    'system_architecture.schema.json',
-    'test_plan.schema.json',
-    'ux_spec.schema.json',
+    'artifact-manifest.schema.json',
+    'product-requirements.schema.json',
+    'project-brief.schema.json',
+    'system-architecture.schema.json',
+    'test-plan.schema.json',
+    'ux-spec.schema.json',
   ];
 
   for (const schemaFile of schemaFiles) {
@@ -255,19 +280,13 @@ function validateConfig() {
 
   // 6. Validate workflow files and check referenced schemas
   console.log('\nValidating workflow files...');
-  const workflowFiles = [
-    '.claude/workflows/enterprise-track.yaml',
-    '.claude/workflows/greenfield-fullstack.yaml',
-    '.claude/workflows/brownfield-fullstack.yaml',
-    '.claude/workflows/quick-flow.yaml',
-    '.claude/workflows/code-quality-flow.yaml',
-    '.claude/workflows/performance-flow.yaml',
-    '.claude/workflows/ai-system-flow.yaml',
-    '.claude/workflows/mobile-flow.yaml',
-    '.claude/workflows/incident-flow.yaml',
-    '.claude/workflows/ui-perfection-loop.yaml',
-    '.claude/workflows/bmad-greenfield-standard.yaml',
-  ];
+  const workflowFiles = collectFilesRecursive(
+    '.claude/workflows',
+    fullPath => fullPath.endsWith('.yaml') || fullPath.endsWith('.yml')
+  );
+  if (workflowFiles.length === 0) {
+    warnings.push('No workflow files found under .claude/workflows/');
+  }
 
   const referencedSchemas = new Set();
 
@@ -632,42 +651,40 @@ function validateConfig() {
   const hookDir = '.claude/hooks';
   checkDirectory(hookDir, 'hooks directory');
 
-  // Check common hook files (shell scripts, not YAML)
-  const commonHooks = [
-    'security-pre-tool.sh', // PreToolUse hook
-    'audit-post-tool.sh', // PostToolUse hook
-    'user-prompt-submit.sh', // UserPromptSubmit hook
-    // 'notification.sh' - Optional, not supported by Python SDK (Notification event)
-    'stop.sh', // Stop hook
-    'orchestrator.mjs', // Orchestrator hook (optional)
-  ];
-
-  // Python SDK hook limitations
-  const pythonUnsupportedHooks = ['SessionStart', 'SessionEnd', 'Notification'];
-  const hookEventMapping = {
-    'security-pre-tool.sh': 'PreToolUse',
-    'audit-post-tool.sh': 'PostToolUse',
-    'user-prompt-submit.sh': 'UserPromptSubmit',
-    // 'notification.sh': 'Notification', // Not supported by Python SDK, optional hook
-    'stop.sh': 'Stop',
-    'orchestrator.mjs': 'SubagentStart', // or other events
-  };
-
-  for (const hookFile of commonHooks) {
-    const hookPath = `${hookDir}/${hookFile}`;
-    if (existsSync(resolve(rootDir, hookPath))) {
-      // Shell scripts and JS files don't need YAML validation
-      console.log(`  ✓ Hook file found: ${hookFile}`);
-
-      // Check for Python SDK compatibility
-      const eventName = hookEventMapping[hookFile];
-      if (eventName && pythonUnsupportedHooks.includes(eventName)) {
-        warnings.push(
-          `Hook ${hookFile} uses event "${eventName}" which is not supported by Python SDK. TypeScript SDK supports all hook events.`
-        );
+  // Validate hook scripts that are actually wired in settings.json
+  const settingsPathForHooks = '.claude/settings.json';
+  const referencedHookScripts = new Set();
+  if (existsSync(resolve(rootDir, settingsPathForHooks))) {
+    try {
+      const settings = JSON.parse(readFileSync(resolve(rootDir, settingsPathForHooks), 'utf-8'));
+      const hookEvents = settings?.hooks || {};
+      for (const blocks of Object.values(hookEvents)) {
+        if (!Array.isArray(blocks)) continue;
+        for (const block of blocks) {
+          const hookEntries = Array.isArray(block?.hooks) ? block.hooks : [];
+          for (const hook of hookEntries) {
+            if (typeof hook?.command !== 'string') continue;
+            const match = hook.command.match(/node\s+([^\s]+?\.(?:cjs|mjs|js))/);
+            if (match && match[1]) {
+              referencedHookScripts.add(match[1].replace(/\\/g, '/'));
+            }
+          }
+        }
       }
-    } else {
-      warnings.push(`Hook file not found (optional): ${hookPath}`);
+    } catch (error) {
+      errors.push(`Failed to parse ${settingsPathForHooks} for hook validation: ${error.message}`);
+    }
+  }
+
+  if (referencedHookScripts.size === 0) {
+    warnings.push('No hook scripts found in .claude/settings.json hook commands');
+  } else {
+    for (const hookPath of [...referencedHookScripts].sort()) {
+      if (existsSync(resolve(rootDir, hookPath))) {
+        console.log(`  ✓ Hook file found: ${hookPath}`);
+      } else {
+        errors.push(`Hook file referenced in settings.json but missing: ${hookPath}`);
+      }
     }
   }
 

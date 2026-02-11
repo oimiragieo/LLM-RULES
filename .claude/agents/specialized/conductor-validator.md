@@ -5,6 +5,8 @@ description: Validates Conductor project artifacts for completeness, consistency
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 tools:
   - Read
   - Glob

@@ -33,12 +33,34 @@ const isWindows = process.platform === 'win32';
  * Claude Code's Bash tool always runs in Git Bash on Windows.
  */
 function isGitBash() {
-  return !!(
-    process.env.MSYSTEM ||
-    process.env.MINGW_PREFIX ||
-    (process.env.SHELL && process.env.SHELL.includes('/usr/bin/bash')) ||
-    (process.env.TERM_PROGRAM && process.env.TERM_PROGRAM === 'mintty')
-  );
+  const shell = process.env.SHELL || '';
+  const shellNormalized = shell.replace(/\\/g, '/').toLowerCase();
+  const comspec = (process.env.ComSpec || process.env.COMSPEC || '').replace(/\\/g, '/').toLowerCase();
+  const termProgram = (process.env.TERM_PROGRAM || '').toLowerCase();
+
+  if (process.env.MSYSTEM || process.env.MINGW_PREFIX) {
+    return true;
+  }
+
+  if (shellNormalized.includes('powershell') || shellNormalized.includes('pwsh')) {
+    return false;
+  }
+  if (comspec.endsWith('/cmd.exe') && !shellNormalized.includes('bash')) {
+    return false;
+  }
+
+  if (
+    shellNormalized.includes('/usr/bin/bash') ||
+    shellNormalized.endsWith('/bash') ||
+    shellNormalized.endsWith('/bash.exe') ||
+    shellNormalized.includes('/git/usr/bin/bash') ||
+    termProgram === 'mintty'
+  ) {
+    return true;
+  }
+
+  // This hook only runs for Bash tool invocations, which are Git Bash on Windows.
+  return true;
 }
 
 // PERF-006/PERF-007: Use shared hook-input.cjs utility

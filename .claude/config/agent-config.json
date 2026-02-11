@@ -28,7 +28,10 @@
         "TaskCreate",
         "TaskGet",
         "TaskList",
+        "TaskOutput",
         "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
         "Write"
       ],
       "model": "claude-opus-4-5-20251101",
@@ -45,7 +48,10 @@
         "TaskCreate",
         "TaskGet",
         "TaskList",
+        "TaskOutput",
         "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
         "Write"
       ],
       "model": "claude-sonnet-4-5",
@@ -62,8 +68,10 @@
         "TaskCreate",
         "TaskGet",
         "TaskList",
+        "TaskOutput",
         "TaskUpdate",
         "WebFetch",
+        "WebSearch",
         "Write"
       ],
       "model": "claude-opus-4-5-20251101",
@@ -96,7 +104,10 @@
         "TaskCreate",
         "TaskGet",
         "TaskList",
+        "TaskOutput",
         "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
         "Write"
       ],
       "model": "claude-opus-4-5-20251101",
@@ -105,6 +116,7 @@
     "researcher": {
       "tools": [
         "Bash",
+        "Edit",
         "Glob",
         "Grep",
         "Read",
@@ -114,12 +126,14 @@
         "TaskList",
         "TaskUpdate",
         "WebFetch",
-        "WebSearch"
+        "WebSearch",
+        "Write"
       ],
       "model": "claude-sonnet-4-5"
     },
     "reflection-agent": {
       "tools": [
+        "Bash",
         "Edit",
         "Glob",
         "Grep",
@@ -197,7 +211,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-haiku-4-5"
     },
     "c4-component": {
       "tools": [
@@ -213,7 +227,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-haiku-4-5"
     },
     "c4-container": {
       "tools": [
@@ -229,7 +243,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-haiku-4-5"
     },
     "c4-context": {
       "tools": [
@@ -245,7 +259,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-haiku-4-5"
     },
     "code-simplifier": {
       "tools": [
@@ -261,7 +275,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "conductor-validator": {
       "tools": [
@@ -277,7 +291,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-haiku-4-5"
     },
     "database-architect": {
       "tools": [
@@ -341,7 +355,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "reverse-engineer": {
       "tools": [
@@ -357,7 +371,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "security-architect": {
       "tools": [
@@ -391,7 +405,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "android-pro": {
       "tools": [
@@ -463,7 +477,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "frontend-pro": {
       "tools": [
@@ -497,7 +511,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "golang-pro": {
       "tools": [
@@ -515,7 +529,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "graphql-pro": {
       "tools": [
@@ -659,7 +673,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "rust-pro": {
       "tools": [
@@ -677,7 +691,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "scientific-research-expert": {
       "tools": [
@@ -695,7 +709,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "sveltekit-expert": {
       "tools": [
@@ -749,7 +763,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "web3-blockchain-expert": {
       "tools": [
@@ -767,7 +781,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "evolution-orchestrator": {
       "tools": [
@@ -839,6 +853,193 @@
         "Write"
       ],
       "model": "claude-opus-4-5-20251101"
+    },
+    "accessibility-tester": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
+    "chaos-engineer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
+    "penetration-tester": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "model": "claude-opus-4-5-20251101"
+    },
+    "performance-engineer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
+    "sre-engineer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
+    "api-designer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
+    "llm-architect": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "WebSearch",
+        "WebFetch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ],
+      "model": "claude-opus-4-5-20251101"
+    },
+    "mcp-developer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "WebSearch",
+        "WebFetch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
+    "microservices-architect": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Bash",
+        "WebFetch",
+        "WebSearch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "TaskOutput",
+        "Skill"
+      ],
+      "model": "claude-opus-4-5-20251101"
+    },
+    "prompt-engineer": {
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob",
+        "WebSearch",
+        "WebFetch",
+        "TaskUpdate",
+        "TaskList",
+        "TaskCreate",
+        "TaskGet",
+        "Skill"
+      ],
+      "model": "claude-sonnet-4-5"
     }
   },
   "thinkingBudgetMap": {

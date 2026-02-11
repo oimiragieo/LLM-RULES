@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/complexity-assessment/**
+---
+
 # Complexity Assessment Rules
 
 ## Core Principles

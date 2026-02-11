@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/skill-creator/**
+---
+
 # Skill Creator Rules
 
 ## Core Principles

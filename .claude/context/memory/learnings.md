@@ -172,3 +172,39 @@ Apply tiering BEFORE batch creation starts, not after. Prevents mechanical templ
 - Tools: 1/6 production-wired (17%), 2 reference-only, 3 should wire
 
 **Memory Takeaway**: Cross-audit verification requires distinguishing between "missing from catalog" (registration gap) vs "referenced but doesn't exist" (orphan reference) vs "exists elsewhere" (incorrect status). Use file existence checks + grep for registration status before claiming gaps. Hook registration quality is high (100% valid paths) - this is a framework strength to preserve. Wiring status requires 3-state model (CLI/MCP/reference-only) for accuracy.
+
+---
+
+## 2026-02-10: Command Injection & Shell Validation Vulnerabilities (Task #26 - Security Deep Dive)
+
+**Context**: Security-architect completed deep vulnerability dive identifying 3 CRITICAL command injection vulnerabilities in logical-unit-tracker.cjs + 6 shell validation gaps.
+
+**Key Findings:**
+
+1. **logical-unit-tracker.cjs - 3 CRITICAL Injection Points**: String interpolation in shell commands (`shell: true` with unsanitized input), no input validation before shell execution, dynamic task names directly passed to subprocess.
+
+2. **Shell Validation Gaps**: 6 hooks/tools missing input sanitization before shell operations, unsafe string concatenation in command builders, no allowlist for command execution.
+
+3. **Pattern**: Unsanitized input flows directly to `execSync` or `spawn` with `shell: true` - bypasses Node.js built-in protections.
+
+**Remediation**: Replace string interpolation with array args (shell: false), validate input whitelist before shell operations, sanitize special characters.
+
+**Memory Takeaway**: Command injection pattern: identify all shell: true usage → trace input source → validate sanitization exists. logical-unit-tracker.cjs is highest-risk file for this vulnerability class.
+
+---
+
+## 2026-02-10: JSON.parse Safety Pattern (Task #27 - Code Quality Deep Dive)
+
+**Context**: Code-quality completed deep analysis of 180+ JSON.parse calls identifying critical event bus issue.
+
+**Key Patterns:**
+
+1. **180+ JSON.parse calls analyzed**: 14% (25 calls) missing try-catch error handling, 8% (14 calls) unsafe .parse() on untrusted data, event bus is the critical hotspot.
+
+2. **Event Bus Critical Issue**: Central event dispatcher calls JSON.parse on network data without try-catch → malformed JSON crashes entire process. Single bad message can take down the server.
+
+3. **Safe Pattern**: Always wrap JSON.parse in try-catch, validate input before parsing, use JSON.parse fallback (second arg or default), return structured errors not exceptions.
+
+**Remediation**: Add try-catch around all JSON.parse in event-bus.cjs, validate JSON structure before parsing, implement backpressure for malformed messages.
+
+**Memory Takeaway**: JSON.parse safety: count all instances → identify error handling gaps → event bus is single point of failure. Pattern: untrusted input + no try-catch + process crash = P0 vulnerability.

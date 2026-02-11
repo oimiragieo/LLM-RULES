@@ -13,7 +13,7 @@
  * Trigger: PreToolUse(Task)
  *
  * ENFORCEMENT MODES:
- * - SPAWN_PROMPT_VALIDATOR=block|warn|off (default: warn)
+ * - SPAWN_PROMPT_VALIDATOR=block|warn|off (default: block)
  *
  * SECURITY MITIGATIONS:
  * - VULN-001: Unicode normalization prevents homoglyph bypass
@@ -33,7 +33,9 @@
 'use strict';
 
 const crypto = require('crypto');
+const fs = require('fs');
 const path = require('path');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 // Required imports
 const {
@@ -180,8 +182,8 @@ const VALIDATION_RULES = [
     name: 'Task ID Reference',
     // SECURE: Simple pattern, no backtracking risk
     // Matches: "Task ID: 123", "Your Task ID: 456", "taskId: 789", etc.
-    // Allows 0-digit IDs (like "0") when taskId is null
-    pattern: /(?:Your\s+)?Task\s+ID:\s*[<"']?(?:\d+|0)[>"]?|taskId:\s*[<"']?(?:\d+|0)[>"]?/i,
+    pattern:
+      /(?:Your\s+)?Task\s+ID:\s*[<"']?[a-zA-Z0-9_-]{1,64}[>"]?|taskId:\s*[<"']?[a-zA-Z0-9_-]{1,64}[>"]?/i,
     severity: 'critical',
     suggestion: 'Include "Task ID: <ID>" or reference specific task ID',
     weight: 30,
@@ -246,6 +248,100 @@ const MAX_PROMPT_LENGTH = 500000; // 500KB (conservative limit)
  * Warning threshold for large prompts
  */
 const PROMPT_LENGTH_WARNING = 100000; // 100KB
+const COMPACTNESS_MIN = Number(process.env.SPAWN_PROMPT_COMPACTNESS_MIN || 0);
+
+// Loop-breaker state (autonomous deadlock prevention)
+const LOOP_BREAKER_STATE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'spawn-prompt-validator-loop-state.json'
+);
+const LOOP_BREAKER_THRESHOLD = Number(process.env.SPAWN_PROMPT_LOOP_BREAKER_THRESHOLD || 3);
+const LOOP_BREAKER_WINDOW_MS = Number(process.env.SPAWN_PROMPT_LOOP_BREAKER_WINDOW_MS || 120000);
+const LOOP_BREAKER_MAX_ENTRIES = Number(process.env.SPAWN_PROMPT_LOOP_BREAKER_MAX_ENTRIES || 500);
+
+function readLoopBreakerState(statePath = LOOP_BREAKER_STATE_PATH) {
+  try {
+    if (!fs.existsSync(statePath)) {
+      return { entries: {} };
+    }
+    const parsed = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      !parsed.entries ||
+      typeof parsed.entries !== 'object'
+    ) {
+      return { entries: {} };
+    }
+    return parsed;
+  } catch {
+    return { entries: {} };
+  }
+}
+
+function writeLoopBreakerState(state, statePath = LOOP_BREAKER_STATE_PATH) {
+  try {
+    const dir = path.dirname(statePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf8');
+  } catch {
+    // best effort
+  }
+}
+
+function pruneLoopBreakerEntries(entries) {
+  const items = Object.entries(entries || {}).map(([key, value]) => ({
+    key,
+    value: value || {},
+    updatedAt: Number(value?.updatedAt || 0),
+  }));
+  items.sort((a, b) => b.updatedAt - a.updatedAt);
+  return Object.fromEntries(items.slice(0, LOOP_BREAKER_MAX_ENTRIES).map(i => [i.key, i.value]));
+}
+
+function buildLoopBreakerKey(sessionId, promptHash, validation) {
+  const required = Array.isArray(validation?.missingRequired)
+    ? validation.missingRequired.join('|')
+    : 'none';
+  const failed = Array.isArray(validation?.failed) ? validation.failed.join('|') : 'none';
+  return `${sessionId || 'unknown'}:${promptHash}:${required}:${failed}`;
+}
+
+function registerSpawnValidationFailure(sessionId, promptHash, validation) {
+  const state = readLoopBreakerState();
+  const key = buildLoopBreakerKey(sessionId, promptHash, validation);
+  const now = Date.now();
+  const prev = state.entries[key] || { count: 0, firstAt: now, updatedAt: now };
+  const withinWindow = now - Number(prev.updatedAt || 0) <= LOOP_BREAKER_WINDOW_MS;
+  const next = {
+    count: withinWindow ? Number(prev.count || 0) + 1 : 1,
+    firstAt: withinWindow ? Number(prev.firstAt || now) : now,
+    updatedAt: now,
+  };
+  state.entries[key] = next;
+  state.entries = pruneLoopBreakerEntries(state.entries);
+  writeLoopBreakerState(state);
+
+  return {
+    key,
+    count: next.count,
+    shouldBypassBlock: next.count >= LOOP_BREAKER_THRESHOLD,
+  };
+}
+
+function clearSpawnValidationFailure(sessionId, promptHash, validation) {
+  const state = readLoopBreakerState();
+  const key = buildLoopBreakerKey(sessionId, promptHash, validation);
+  if (state.entries[key]) {
+    delete state.entries[key];
+    writeLoopBreakerState(state);
+  }
+}
 
 /**
  * Build required spawn prompt prefix when required elements are missing.
@@ -256,7 +352,7 @@ const PROMPT_LENGTH_WARNING = 100000; // 100KB
  * @returns {string} Required prefix fragment
  */
 function buildRequiredPrefixFragment(taskId, description) {
-  const taskIdValue = taskId != null ? String(taskId) : '0';
+  const taskIdValue = taskId != null ? String(taskId) : 'MISSING_TASK_ID';
   const subject = (description || 'Task').slice(0, 120);
   const projectRoot = process.env.PROJECT_ROOT || process.cwd() || path.resolve('.');
 
@@ -320,6 +416,9 @@ function autoNormalizeSpawnInput(toolInput, validation) {
   }
 
   const taskId = toolInput.task_id || toolInput.id || null;
+  if (!taskId) {
+    return { toolInput, modified: false };
+  }
   const description = toolInput.description || '';
   const prefix = buildRequiredPrefixFragment(taskId, description);
 
@@ -340,6 +439,64 @@ function autoNormalizeSpawnInput(toolInput, validation) {
   };
 }
 
+function hasExplicitTaskId(toolInput) {
+  const taskId = toolInput?.task_id || toolInput?.id || null;
+  return typeof taskId === 'string' || typeof taskId === 'number';
+}
+
+/**
+ * Generate a deterministic-enough fallback task ID when router omitted task_id.
+ * This is a fail-safe to preserve task tracking even if strict block mode is bypassed.
+ *
+ * @param {Object} hookInput - Parsed hook input
+ * @param {Object} toolInput - Task tool input
+ * @returns {string} Generated task ID
+ */
+function generateFallbackTaskId(hookInput, toolInput) {
+  const rawSessionId =
+    hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || 'session';
+  const sessionPart =
+    String(rawSessionId || '')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .slice(0, 12) || 'session';
+  const description =
+    typeof toolInput?.description === 'string' ? toolInput.description.toLowerCase() : '';
+  const hint =
+    description
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 24) || 'spawn';
+  return `task-${sessionPart}-${hint}-${Date.now().toString(36)}`;
+}
+
+/**
+ * Ensure Task() input includes task_id (or normalize id alias).
+ *
+ * @param {Object} toolInput - Task tool input
+ * @param {Object} hookInput - Parsed hook input
+ * @returns {{ toolInput: Object, modified: boolean, taskId: string|number|null }}
+ */
+function ensureTaskId(toolInput, hookInput) {
+  const currentTaskId = toolInput?.task_id || toolInput?.id || null;
+  if (typeof currentTaskId === 'string' || typeof currentTaskId === 'number') {
+    if (toolInput?.task_id != null) {
+      return { toolInput, modified: false, taskId: currentTaskId };
+    }
+    return {
+      toolInput: { ...toolInput, task_id: String(currentTaskId) },
+      modified: true,
+      taskId: String(currentTaskId),
+    };
+  }
+
+  const generatedTaskId = generateFallbackTaskId(hookInput, toolInput);
+  return {
+    toolInput: { ...toolInput, task_id: generatedTaskId },
+    modified: true,
+    taskId: generatedTaskId,
+  };
+}
+
 // =============================================================================
 // VALIDATION LOGIC
 // =============================================================================
@@ -353,6 +510,7 @@ function autoNormalizeSpawnInput(toolInput, validation) {
  * @returns {Object} Validation result with score, passed rules, failed rules
  */
 function validatePrompt(prompt) {
+  const compactness = calculatePromptCompactness(prompt);
   if (!prompt || typeof prompt !== 'string') {
     return {
       score: 0,
@@ -362,6 +520,7 @@ function validatePrompt(prompt) {
       isValid: false,
       needsWarning: true,
       error: 'Prompt is null or not a string',
+      compactness,
     };
   }
 
@@ -379,6 +538,7 @@ function validatePrompt(prompt) {
       isValid: false,
       needsWarning: true,
       error: 'SEC-DOS-001: Prompt exceeds maximum length',
+      compactness,
     };
   }
 
@@ -429,16 +589,27 @@ function validatePrompt(prompt) {
       needsWarning: true,
       error: `Missing required elements: ${missingRequired.join(', ')}`,
       missingRequired,
+      compactness,
     };
   }
+
+  const compactnessFails =
+    Number.isFinite(COMPACTNESS_MIN) && COMPACTNESS_MIN > 0 && compactness.score < COMPACTNESS_MIN;
 
   return {
     score,
     passed,
     failed,
     suggestions,
-    isValid: score >= MINIMUM_SCORE,
+    isValid: score >= MINIMUM_SCORE && !compactnessFails,
     needsWarning: score < WARNING_THRESHOLD,
+    compactness,
+    compactnessFails,
+    ...(compactnessFails
+      ? {
+          error: `Compactness score ${compactness.score} below threshold ${COMPACTNESS_MIN}`,
+        }
+      : {}),
   };
 }
 
@@ -473,6 +644,70 @@ function isTemplateBasedSpawn(prompt) {
   return prompt.includes('.claude/templates/spawn/') || prompt.includes('See .claude/templates');
 }
 
+function emitRuntimeHealth(status, durationMs, extra = {}) {
+  try {
+    const { logRuntimeHealth } = require('../../lib/monitoring/runtime-health-log.cjs');
+    logRuntimeHealth({
+      component: 'spawn-prompt-validator',
+      status,
+      durationMs,
+      sessionId: process.env.CLAUDE_SESSION_ID || null,
+      extra,
+    });
+  } catch (_err) {
+    // best-effort
+  }
+}
+
+function calculatePromptCompactness(prompt) {
+  if (!prompt || typeof prompt !== 'string') {
+    return { score: 0, duplicateHeaders: [], repeatedBoilerplate: [] };
+  }
+
+  const lines = prompt.split(/\r?\n/);
+  const headerCounts = new Map();
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (/^#{2,3}\s+/.test(trimmed)) {
+      headerCounts.set(trimmed, (headerCounts.get(trimmed) || 0) + 1);
+    }
+  }
+
+  const duplicateHeaders = [...headerCounts.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([header, count]) => ({ header, count }));
+
+  const boilerplatePatterns = [
+    { label: 'warning_box', regex: /TASK TRACKING REQUIRED/gi },
+    { label: 'taskupdate_in_progress', regex: /TaskUpdate\(\{[^}]{0,200}in_progress/gi },
+    { label: 'taskupdate_completed', regex: /TaskUpdate\(\{[^}]{0,200}completed/gi },
+    { label: 'project_context', regex: /##\s+PROJECT CONTEXT/gi },
+  ];
+  const repeatedBoilerplate = [];
+  for (const pattern of boilerplatePatterns) {
+    const matches = prompt.match(pattern.regex);
+    const count = matches ? matches.length : 0;
+    if (count > 1) {
+      repeatedBoilerplate.push({ label: pattern.label, count });
+    }
+  }
+
+  const duplicatePenalty = duplicateHeaders.reduce((sum, row) => sum + (row.count - 1) * 12, 0);
+  const boilerplatePenalty = repeatedBoilerplate.reduce(
+    (sum, row) => sum + (row.count - 1) * 10,
+    0
+  );
+  const lengthPenalty =
+    prompt.length > 40000 ? Math.min(30, Math.floor((prompt.length - 40000) / 5000)) : 0;
+  const rawScore = 100 - duplicatePenalty - boilerplatePenalty - lengthPenalty;
+
+  return {
+    score: Math.max(0, Math.min(100, rawScore)),
+    duplicateHeaders,
+    repeatedBoilerplate,
+  };
+}
+
 // =============================================================================
 // MAIN
 // =============================================================================
@@ -496,6 +731,7 @@ async function main() {
       reason: 'SPAWN_PROMPT_VALIDATOR=off',
       warning: 'Validation bypassed - security risk',
     });
+    emitRuntimeHealth('disabled', Date.now() - startTime, { mode });
     process.exit(0);
   }
 
@@ -505,17 +741,34 @@ async function main() {
 
     // Only validate Task tool
     if (toolName !== 'Task') {
+      emitRuntimeHealth('skip_non_task', Date.now() - startTime, { toolName: toolName || null });
       process.exit(0);
     }
 
-    const toolInput = getToolInput(hookInput);
+    const rawToolInput = getToolInput(hookInput);
+    const ensuredTask = ensureTaskId(rawToolInput, hookInput);
+    const toolInput = ensuredTask.toolInput;
     const prompt = toolInput.prompt || '';
+
+    if (ensuredTask.modified) {
+      auditLog('spawn-prompt-validator', 'task-id-auto-injected', {
+        sessionId: hookInput.session_id || hookInput.sessionId || 'unknown',
+        taskId: ensuredTask.taskId,
+        agentType: toolInput.subagent_type || 'unknown',
+      });
+    }
 
     // Skip validation for orchestrators (different template)
     if (isOrchestratorSpawn(toolInput)) {
       auditLog('spawn-prompt-validator', 'skip', {
         reason: 'orchestrator-spawn',
         description: toolInput.description,
+      });
+      if (ensuredTask.modified) {
+        console.log(JSON.stringify({ tool_input: toolInput }));
+      }
+      emitRuntimeHealth('skip_orchestrator', Date.now() - startTime, {
+        agentType: toolInput.subagent_type || null,
       });
       process.exit(0);
     }
@@ -535,23 +788,31 @@ async function main() {
 
       if (validation.isValid) {
         console.log(JSON.stringify({ tool_input: normalized.toolInput }));
+        emitRuntimeHealth('autofix_pass', Date.now() - startTime, {
+          taskId: normalized.toolInput.task_id || null,
+        });
         process.exit(0);
       }
     }
 
     const executionMs = Date.now() - startTime;
+    const sessionId =
+      hookInput.session_id || hookInput.sessionId || process.env.CLAUDE_SESSION_ID || 'unknown';
+    const promptHash = crypto.createHash('sha256').update(prompt).digest('hex').substring(0, 16);
 
     // SECURITY MITIGATION: VULN-007 - Enhanced audit log fields
     auditLog('spawn-prompt-validator', validation.isValid ? 'pass' : 'fail', {
       score: validation.score,
       passed: validation.passed,
       failed: validation.failed,
+      compactnessScore: validation.compactness?.score ?? null,
+      compactnessFails: Boolean(validation.compactnessFails),
       isTemplateBasedSpawn: isTemplateBasedSpawn(prompt),
       // Enhanced fields:
       sessionId: hookInput.session_id || 'unknown',
       agentType: toolInput.subagent_type || 'unknown',
       promptLength: prompt.length,
-      promptHash: crypto.createHash('sha256').update(prompt).digest('hex').substring(0, 16),
+      promptHash,
       executionMs,
       missingRequired: validation.missingRequired || [],
     });
@@ -568,6 +829,25 @@ async function main() {
       ].join('\n');
 
       if (mode === 'block') {
+        const loopBreaker = registerSpawnValidationFailure(sessionId, promptHash, validation);
+        if (loopBreaker.shouldBypassBlock) {
+          const bypassMessage = `${message}
+
+[LOOP-BREAKER] Repeated identical spawn validation failures detected (${loopBreaker.count} within window).
+Temporarily degrading to warn mode for this failure fingerprint to prevent retry deadlock.`;
+          auditLog('spawn-prompt-validator', 'loop-breaker-bypass', {
+            sessionId,
+            promptHash,
+            loopBreakerCount: loopBreaker.count,
+            missingRequired: validation.missingRequired || [],
+          });
+          console.warn(bypassMessage);
+          emitRuntimeHealth('loop_breaker_warn', Date.now() - startTime, {
+            promptHash,
+            score: validation.score,
+          });
+          process.exit(0);
+        }
         try {
           await eventBus.emit(EventTypes.TOOL_BLOCKED, {
             type: EventTypes.TOOL_BLOCKED,
@@ -579,13 +859,23 @@ async function main() {
           // Best-effort
         }
         console.log(formatResult('block', message));
+        emitRuntimeHealth('blocked', Date.now() - startTime, {
+          score: validation.score,
+          compactness: validation.compactness?.score ?? null,
+        });
         process.exit(2);
       } else {
         // warn mode
         console.warn(message);
+        emitRuntimeHealth('warn', Date.now() - startTime, {
+          score: validation.score,
+          compactness: validation.compactness?.score ?? null,
+        });
         process.exit(0);
       }
     }
+
+    clearSpawnValidationFailure(sessionId, promptHash, validation);
 
     // Passed but needs warning
     if (validation.needsWarning && mode === 'warn') {
@@ -595,6 +885,13 @@ async function main() {
       );
     }
 
+    if (ensuredTask.modified) {
+      console.log(JSON.stringify({ tool_input: toolInput }));
+    }
+    emitRuntimeHealth('ok', Date.now() - startTime, {
+      score: validation.score,
+      compactness: validation.compactness?.score ?? null,
+    });
     process.exit(0);
   } catch (err) {
     // SECURITY MITIGATION: VULN-004 - Full audit context in exception handler
@@ -624,10 +921,12 @@ async function main() {
         // Best-effort
       }
       console.log(formatResult('block', 'Internal validation error - fail-closed mode'));
+      emitRuntimeHealth('error_fail_closed', Date.now() - startTime, { error: err.message });
       process.exit(2);
     }
 
     // Fail open (default)
+    emitRuntimeHealth('error_fail_open', Date.now() - startTime, { error: err.message });
     process.exit(0);
   }
 }
@@ -640,11 +939,20 @@ module.exports = {
   main,
   validatePrompt,
   autoNormalizeSpawnInput,
+  hasExplicitTaskId,
+  generateFallbackTaskId,
+  ensureTaskId,
   buildRequiredPrefixFragment,
   normalizeUnicode,
   safeRegexTest,
   isOrchestratorSpawn,
   isTemplateBasedSpawn,
+  calculatePromptCompactness,
+  readLoopBreakerState,
+  writeLoopBreakerState,
+  registerSpawnValidationFailure,
+  clearSpawnValidationFailure,
+  buildLoopBreakerKey,
   VALIDATION_RULES,
   MINIMUM_SCORE,
   WARNING_THRESHOLD,

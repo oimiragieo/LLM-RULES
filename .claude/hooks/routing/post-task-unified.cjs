@@ -16,7 +16,8 @@
  * Performance: Reduces 6 processes to 1, consolidates shared I/O
  *
  * Exit codes:
- * - 0: Always allow (this is a post-tool hook, never blocks)
+ * - 0: Allow
+ * - 2: Block (when TASK_COMPLETION_GUARD=block and completion lacks TaskUpdate(completed))
  */
 
 'use strict';
@@ -34,6 +35,7 @@ const {
   getToolName,
   getToolInput,
   getToolOutput,
+  formatResult,
 } = require('../../lib/utils/hook-input.cjs');
 const { getCachedState } = require('../../lib/utils/state-cache.cjs');
 const routerState = require('../../lib/routing/router-state.cjs');
@@ -440,24 +442,48 @@ function formatTaskCompletionWarning(output) {
 /**
  * Run task completion guard
  */
-function runTaskCompletionGuard(toolOutput) {
-  const enforcement = process.env.TASK_COMPLETION_GUARD || 'warn';
-  if (enforcement === 'off') return;
+function hasMatchingCompletedTaskUpdate(taskId) {
+  const update = routerState.getLastTaskUpdate();
+  if (!update || !update.timestamp) return false;
+  if (Date.now() - update.timestamp > 120000) return false;
+  if (!update.taskId || !update.status) return false;
 
-  if (!toolOutput || !detectsCompletion(toolOutput)) return;
+  const normalizedStatus = String(update.status).toLowerCase();
+  if (normalizedStatus !== 'completed') return false;
 
-  // Check if TaskUpdate was called recently
-  const wasUpdated = routerState.wasTaskUpdateCalledRecently();
+  if (taskId == null) return true;
+  return String(update.taskId) === String(taskId);
+}
+
+function runTaskCompletionGuard(toolOutput, taskId = null) {
+  const enforcement = process.env.TASK_COMPLETION_GUARD || 'block';
+  if (enforcement === 'off') return { pass: true };
+
+  if (!toolOutput || !detectsCompletion(toolOutput)) return { pass: true };
+
+  // Check if TaskUpdate(completed) was called recently for this task
+  const wasUpdated = hasMatchingCompletedTaskUpdate(taskId);
 
   if (wasUpdated) {
     if (process.env.DEBUG_HOOKS) {
       console.error('[post-task-unified] Agent properly called TaskUpdate');
     }
-    return;
+    return { pass: true };
   }
 
-  // Warning - completion detected but no TaskUpdate
-  console.error(formatTaskCompletionWarning(toolOutput));
+  const warning = formatTaskCompletionWarning(toolOutput);
+  if (enforcement === 'warn') {
+    console.error(warning);
+    return { pass: true, result: 'warn', message: warning };
+  }
+
+  return {
+    pass: false,
+    result: 'block',
+    message:
+      warning +
+      '\nTask() output indicated completion, but no matching TaskUpdate({ taskId, status: "completed" }) was detected.',
+  };
 }
 
 // =============================================================================
@@ -652,6 +678,7 @@ async function main() {
     const toolInput = getToolInput(hookInput);
     const toolOutput = getToolOutput(hookInput) || '';
     const toolOutputStr = typeof toolOutput === 'string' ? toolOutput : '';
+    let effectiveTaskId = toolInput?.task_id || toolInput?.id || null;
 
     try {
       // Try to get task_id from toolInput first, then fallback to router state
@@ -678,6 +705,7 @@ async function main() {
         errorSnippet = toolOutput.error.message || String(toolOutput.error);
       }
       logSpawnEnd({ taskId, success, errorSnippet, sessionId });
+      effectiveTaskId = taskId || effectiveTaskId;
     } catch (_e) {
       // best-effort
     }
@@ -693,7 +721,12 @@ async function main() {
     runSessionMemoryExtraction(toolOutputStr);
 
     // 4. Task completion guard
-    runTaskCompletionGuard(toolOutputStr);
+    const completionGuardResult = runTaskCompletionGuard(toolOutputStr, effectiveTaskId);
+    if (!completionGuardResult.pass) {
+      console.log(formatResult(completionGuardResult.result, completionGuardResult.message));
+      process.exit(2);
+      return;
+    }
 
     // 5. TaskList tracking (handled earlier, see line ~620)
     // 6. Evolution audit
@@ -776,6 +809,8 @@ module.exports = {
 
   // Task completion guard exports
   detectsCompletion,
+  hasMatchingCompletedTaskUpdate,
+  runTaskCompletionGuard,
   COMPLETION_INDICATORS,
 
   // Evolution audit exports

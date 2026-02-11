@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/api-development-expert/**
+---
+
 # API Development Expert Rules
 
 ## Core Principles

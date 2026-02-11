@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/text-to-sql/**
+---
+
 # Text-to-SQL Rules
 
 ## Core Principles

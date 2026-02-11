@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/research-synthesis/**
+---
+
 # Research Synthesis Rules
 
 ## Core Principles

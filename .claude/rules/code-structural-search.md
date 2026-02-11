@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/code-structural-search/**
+---
+
 # Code Structural Search Rules
 
 ## Core Rules

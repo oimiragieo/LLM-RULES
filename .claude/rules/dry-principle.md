@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/dry-principle/**
+---
+
 # DRY Principle Rules
 
 ## Core Rules

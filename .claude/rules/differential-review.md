@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/differential-review/**
+---
+
 # Differential Review Rules
 
 <!-- Agent: security-architect | Task: #4 | Session: 2026-02-09 -->

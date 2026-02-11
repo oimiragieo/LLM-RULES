@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/expo-framework-rule/**
+---
+
 # Expo Framework Rules
 
 ## Core Principles

@@ -234,6 +234,7 @@ If any task fails:
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'reflection-agent',
   model: 'sonnet',
   description: 'Session reflection and learning extraction',

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/debugging/**
+---
+
 # Debugging Rules
 
 ## Iron Law

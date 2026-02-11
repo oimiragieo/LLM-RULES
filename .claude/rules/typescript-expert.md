@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/typescript-expert/**
+---
+
 # TypeScript Expert Rules
 
 ## Core Principles

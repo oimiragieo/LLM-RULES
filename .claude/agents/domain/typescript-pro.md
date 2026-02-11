@@ -5,6 +5,8 @@ description: Master TypeScript with advanced types, generics, and strict type sa
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 tools:
   [

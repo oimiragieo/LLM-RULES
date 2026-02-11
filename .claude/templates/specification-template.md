@@ -582,7 +582,11 @@ Skill({ skill: 'spec-writing', args: 'feature-name' });
 Skill({ skill: 'spec-critique', args: 'specification-file.md' });
 
 // Step 4: Plan implementation
-Task({ subagent_type: 'planner', prompt: 'Break down specification into tasks' });
+Task({
+  task_id: 'task-1',
+  subagent_type: 'planner',
+  prompt: 'Break down specification into tasks',
+});
 ```
 
 ### Storage Location

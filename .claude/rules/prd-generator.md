@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/prd-generator/**
+---
+
 # PRD Generator Rules
 
 ## Core Principles

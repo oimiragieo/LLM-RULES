@@ -72,6 +72,18 @@ function readSpawnRequests(filePath) {
   }
 }
 
+function clearReminderIfStale() {
+  try {
+    if (fs.existsSync(REMINDER_PATH)) {
+      fs.unlinkSync(REMINDER_PATH);
+      return true;
+    }
+  } catch (_err) {
+    // Best-effort
+  }
+  return false;
+}
+
 /**
  * Auto-clear oldest pending reflections if count exceeds MAX_PENDING_REFLECTIONS
  * Prevents deadlock by capping queue size
@@ -107,18 +119,10 @@ function trimOldReflections(requests) {
  * @returns {boolean} True if reflections are pending
  */
 function hasPendingReflections() {
-  // Primary trigger: check spawn-request.json content (source of truth)
+  // Source of truth is spawn-request.json.
+  // Reminder file is informational only and may be stale.
   const requests = readSpawnRequests(SPAWN_REQUEST_PATH);
-  if (Array.isArray(requests) && requests.length > 0) {
-    return true;
-  }
-
-  // Secondary trigger: reminder.txt existence (legacy/fallback)
-  if (fs.existsSync(REMINDER_PATH)) {
-    return true;
-  }
-
-  return false;
+  return Array.isArray(requests) && requests.length > 0;
 }
 
 function readStep0State() {
@@ -179,6 +183,8 @@ async function main() {
     stderrLog('hook_start');
 
     if (!hasPendingReflections()) {
+      // Clean stale reminder so we do not deadlock on "0 pending" conditions.
+      clearReminderIfStale();
       stderrLog('hook_end', { status: 'no_pending' });
       process.exit(0);
     }
@@ -282,4 +288,5 @@ if (require.main === module) {
 module.exports = {
   hasPendingReflections,
   readSpawnRequests,
+  clearReminderIfStale,
 };

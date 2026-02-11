@@ -5,6 +5,8 @@ description: Quality assessor and learning consolidator using RECE loop (Reflect
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: medium
 tools:
   [Read, Write, Edit, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]

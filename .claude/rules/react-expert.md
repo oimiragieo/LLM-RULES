@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/react-expert/**
+---
+
 # React Expert Rules
 
 ## Core Principles

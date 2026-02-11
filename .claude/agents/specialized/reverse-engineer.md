@@ -5,6 +5,8 @@ description: Expert reverse engineer specializing in binary analysis, disassembl
 model: opus
 temperature: 0.3
 context_strategy: full
+maxTurns: 18
+permissionMode: default
 priority: high
 tools: [Read, Write, Edit, Bash, Glob, Grep, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:

@@ -244,6 +244,7 @@ tags: [{ tag1 }, { tag2 }, workflow]
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   description: '{Task description}',
   prompt: `You are the {AGENT_NAME} agent.
@@ -282,12 +283,14 @@ Task({
 ```javascript
 // Spawn both agents in parallel for efficiency
 Task({
+  task_id: 'task-2',
   subagent_type: 'general-purpose',
   description: '{Agent A task}',
   prompt: `You are {AGENT_A}...`,
 });
 
 Task({
+  task_id: 'task-3',
   subagent_type: 'general-purpose',
   description: '{Agent B task}',
   prompt: `You are {AGENT_B}...`,
@@ -320,6 +323,7 @@ Task({
 ```javascript
 // Router spawning workflow orchestrator
 Task({
+  task_id: 'task-4',
   subagent_type: 'general-purpose',
   description: 'Orchestrating {workflow-name} workflow',
   prompt: `Execute {workflow-name} workflow.
@@ -376,12 +380,14 @@ When workflow templates spawn agents via Task tool:
 ```javascript
 // CORRECT
 Task({
+  task_id: 'task-5',
   model: 'sonnet',
   // ...
 });
 
 // WRONG - causes validation failures
 Task({
+  task_id: 'task-6',
   model: 'claude-sonnet-4-20250514',
   // ...
 });

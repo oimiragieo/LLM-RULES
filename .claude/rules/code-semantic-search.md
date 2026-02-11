@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/code-semantic-search/**
+---
+
 # Code Semantic Search Rules
 
 ## Core Rules

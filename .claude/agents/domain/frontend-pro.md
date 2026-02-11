@@ -5,6 +5,8 @@ description: Frontend development expert for React, Vue, modern CSS, component l
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: false
 tools:

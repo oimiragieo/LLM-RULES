@@ -79,6 +79,7 @@ flowchart TD
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   description: 'Analyzing current context size and composition',
   prompt: `You are the CONTEXT-COMPRESSOR agent.
@@ -210,6 +211,7 @@ Content that should be removed entirely:
 
 ```javascript
 Task({
+  task_id: 'task-2',
   subagent_type: 'general-purpose',
   description: 'Classifying context content by importance',
   prompt: `You are the CONTEXT-COMPRESSOR agent.
@@ -416,6 +418,7 @@ Progress Summary:
 
 ```javascript
 Task({
+  task_id: 'task-3',
   subagent_type: 'general-purpose',
   description: 'Executing context compression',
   prompt: `You are the CONTEXT-COMPRESSOR agent.
@@ -510,6 +513,7 @@ Save compressed context to .claude/context/memory/compressed-session.md
 
 ```javascript
 Task({
+  task_id: 'task-4',
   subagent_type: 'general-purpose',
   description: 'Validating compressed context integrity',
   prompt: `You are the CONTEXT-COMPRESSOR agent.

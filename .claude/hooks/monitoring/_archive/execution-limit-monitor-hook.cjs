@@ -378,7 +378,7 @@ function main() {
 
     const message = `[EXECUTION LIMIT] ${exceeded.limitType} exceeded (${exceeded.current}/${exceeded.max}). Action: ${timeoutAction}.
 
-If this is expected, increase Task({ execution_limits: { ... } }) for this session.`;
+If this is expected, increase Task({ task_id: 'task-1', execution_limits: { ... } }) for this session.`;
     process.stdout.write(formatResult('block', message));
     try {
       eventBus.emit(EventTypes.TOOL_BLOCKED, {

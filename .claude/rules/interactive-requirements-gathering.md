@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/interactive-requirements-gathering/**
+---
+
 # Interactive Requirements Gathering Rules
 
 ## Core Principles

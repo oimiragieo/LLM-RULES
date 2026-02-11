@@ -192,7 +192,7 @@ Router: Edit({ file_path: "app.ts", ... })
 // ERROR: Router cannot use Edit/Write tools. Spawn an agent.
 
 // CORRECT
-Router: Task({ prompt: "You are DEVELOPER. Fix bug in app.ts..." })
+Router: Task({ task_id: 'task-1', prompt: "You are DEVELOPER. Fix bug in app.ts..." })
 ```
 
 ## Memory Hooks

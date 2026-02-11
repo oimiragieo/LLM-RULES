@@ -287,7 +287,7 @@ Add JWT-based authentication with login/logout endpoints. Includes password hash
   - **Verify**: `ls -d src/auth`
 
 - [ ] **1.3** Design auth architecture (~15 min)
-  - **Command**: `Task({ agent: "architect", prompt: "Design JWT auth..." })`
+  - **Command**: `Task({ task_id: 'task-1', agent: "architect", prompt: "Design JWT auth..." })`
   - **Verify**: `ls .claude/context/artifacts/auth-design.md`
 
 #### Phase 1 Verification Gate
@@ -303,16 +303,16 @@ git branch --show-current | grep feature/auth && ls src/auth && ls .claude/conte
 #### Tasks
 
 - [ ] **2.1** Write auth endpoint tests (~10 min)
-  - **Command**: `Task({ agent: "developer", prompt: "TDD: Write failing tests for /login endpoint" })`
+  - **Command**: `Task({ task_id: 'task-2', agent: "developer", prompt: "TDD: Write failing tests for /login endpoint" })`
   - **Verify**: `npm test -- --grep "login" 2>&1 | grep -E "failing|FAIL"`
   - **Rollback**: `git checkout -- src/auth/__tests__/`
 
 - [ ] **2.2** Implement login endpoint (~15 min)
-  - **Command**: `Task({ agent: "developer", prompt: "Implement login to pass tests" })`
+  - **Command**: `Task({ task_id: 'task-3', agent: "developer", prompt: "Implement login to pass tests" })`
   - **Verify**: `npm test -- --grep "login" 2>&1 | grep -E "passing|PASS"`
 
 - [ ] **2.3** Implement logout endpoint (~10 min)
-  - **Command**: `Task({ agent: "developer", prompt: "TDD: logout endpoint" })`
+  - **Command**: `Task({ task_id: 'task-4', agent: "developer", prompt: "TDD: logout endpoint" })`
   - **Verify**: `npm test -- --grep "logout" 2>&1 | grep -E "passing|PASS"`
 
 #### Phase 2 Error Handling
@@ -337,7 +337,7 @@ npm test -- --grep "auth" && echo "All auth tests passing"
 #### Tasks
 
 - [ ] **3.1** Security audit (~20 min) [⚡ parallel OK]
-  - **Command**: `Task({ agent: "security-architect", prompt: "Audit auth implementation" })`
+  - **Command**: `Task({ task_id: 'task-5', agent: "security-architect", prompt: "Audit auth implementation" })`
   - **Verify**: `ls .claude/context/reports/security-audit.md`
 
 - [ ] **3.2** Run security tests (~5 min) [⚡ parallel OK]

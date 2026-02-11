@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/task-management-protocol/**
+---
+
 # Task Management Protocol Rules
 
 ## Core Principles

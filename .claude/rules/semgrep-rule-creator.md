@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/semgrep-rule-creator/**
+---
+
 # Semgrep Rule Creator Rules
 
 <!-- Agent: security-architect | Task: #4 | Session: 2026-02-09 -->

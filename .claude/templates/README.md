@@ -350,24 +350,14 @@ grep "<workflow-file>" .claude/CLAUDE.md
 
 **WHY:** Artifacts not in CLAUDE.md are invisible to the Router and will never be used.
 
-### Memory Protocol
+### Agent Template Defaults
 
-All templates include memory protocol sections. Ensure agents:
+The agent template is optimized for current subagent behavior:
 
-1. Read `learnings.md` before starting
-2. Record decisions to `decisions.md`
-3. Document issues in `issues.md`
-
-### Context Files
-
-All agent templates include:
-
-```yaml
-context_files:
-  - .claude/context/memory/learnings.md
-```
-
-This ensures agents automatically load institutional memory.
+1. `maxTurns` and `permissionMode` are explicitly set
+2. Tool list is minimal by default (expand per role only as needed)
+3. Skills are optional (do not preload large skill sets by default)
+4. Memory usage is demand-driven (read/write only relevant memory)
 
 ## Quick Reference
 

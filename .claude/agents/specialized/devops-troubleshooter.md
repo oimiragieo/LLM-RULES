@@ -5,6 +5,8 @@ description: Expert DevOps troubleshooter specializing in rapid incident respons
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 tools:
   - Read
   - Write

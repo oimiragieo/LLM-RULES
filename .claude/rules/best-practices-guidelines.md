@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/best-practices-guidelines/**
+---
+
 # Best Practices Guidelines
 
 ## Core Rules

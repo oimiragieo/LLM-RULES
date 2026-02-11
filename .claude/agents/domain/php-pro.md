@@ -5,6 +5,8 @@ description: PHP 8.x and Laravel 11+ development expert. Use for building modern
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: false
 tools:

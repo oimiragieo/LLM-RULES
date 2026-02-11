@@ -5,6 +5,8 @@ description: Infrastructure as Code, CI/CD pipeline design, deployment automatio
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: medium
 tools: [Read, Write, Edit, Grep, Glob, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:

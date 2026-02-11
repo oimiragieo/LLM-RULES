@@ -11,6 +11,15 @@ tags:
   - methodology
   - multi-agent
 author: Agent Studio
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Task
+  - TaskUpdate
+  - TaskList
+  - Skill
 ---
 
 # SPARC Methodology - Comprehensive Development Framework

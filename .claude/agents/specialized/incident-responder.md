@@ -5,6 +5,8 @@ description: Expert SRE incident responder specializing in rapid problem resolut
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 tools:
   - Read
   - Grep

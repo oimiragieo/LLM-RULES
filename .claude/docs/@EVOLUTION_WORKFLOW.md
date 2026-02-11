@@ -71,6 +71,7 @@ When router detects "no matching agent" or user requests new capability:
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'evolution-orchestrator',
   model: 'opus', // MUST use opus for complex reasoning
   description: 'Creating new agent/skill via EVOLVE workflow',

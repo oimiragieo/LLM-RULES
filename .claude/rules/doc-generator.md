@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/doc-generator/**
+---
+
 # Doc Generator Rules
 
 ## Core Principles

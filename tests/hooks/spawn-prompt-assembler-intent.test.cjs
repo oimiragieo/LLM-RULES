@@ -118,6 +118,7 @@ async function runHookWithIntent(capturePath) {
     const input = {
       tool_name: 'Task',
       tool_input: {
+        task_id: 'intent-test-1',
         prompt: 'Please review the system for issues.',
         description: 'Run a quick review',
         allowed_tools: ['Read', 'TaskUpdate'],

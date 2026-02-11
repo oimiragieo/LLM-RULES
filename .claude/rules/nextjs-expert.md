@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/nextjs-expert/**
+---
+
 # Next.js Expert Rules
 
 ## Core Principles

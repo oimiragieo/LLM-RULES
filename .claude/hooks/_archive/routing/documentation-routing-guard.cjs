@@ -175,6 +175,7 @@ Keywords matched: ${matchedKeywords.join(', ')}
 
 Documentation tasks should be routed to technical-writer agent:
   Task({ subagent_type: 'general-purpose', description: 'Technical writer creating docs...',
+    task_id: 'task-1',
          prompt: 'You are TECHNICAL-WRITER...' })
 
 Set DOCUMENTATION_ROUTING_GUARD=off to disable (not recommended).`;

@@ -5,6 +5,8 @@ description: Product Manager. Manages product backlogs, sprint planning, stakeho
 model: sonnet
 temperature: 0.5
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: true
 tools:

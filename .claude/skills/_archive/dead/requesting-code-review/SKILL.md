@@ -94,6 +94,7 @@ You: [Fix progress indicators]
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   model: 'sonnet',
   description: 'Code review for {DESCRIPTION}',

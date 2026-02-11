@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/summarize-changes/**
+---
+
 # Summarize Changes Rules
 
 ## Core Principles

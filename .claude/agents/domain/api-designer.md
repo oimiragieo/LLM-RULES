@@ -5,6 +5,8 @@ description: Contract-first API architect. Designs REST, GraphQL, and gRPC APIs 
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
+maxTurns: 18
+permissionMode: default
 priority: high
 extended_thinking: true
 tools:
@@ -128,7 +130,7 @@ The following workflows guide this agent's execution:
 
 ```
 This task is better suited for [AGENT_NAME]. Please re-route via:
-Task({ prompt: "You are [AGENT_NAME]..." })
+Task({ task_id: 'task-1', prompt: "You are [AGENT_NAME]..." })
 ```
 
 ## Workflow
@@ -272,7 +274,7 @@ Before finalizing any API design, coordinate security review:
 
 ```
 This API design requires security review. Please re-route via:
-Task({ prompt: "You are security-architect. Review this API design for OWASP API Security Top 10..." })
+Task({ task_id: 'task-2', prompt: "You are security-architect. Review this API design for OWASP API Security Top 10..." })
 ```
 
 ## Domain Expertise

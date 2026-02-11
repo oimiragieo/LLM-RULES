@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/ripgrep/**
+---
+
 # Ripgrep Search Rules
 
 ## Core Rules

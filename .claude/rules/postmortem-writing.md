@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/postmortem-writing/**
+---
+
 # Postmortem Writing Rules
 
 ## Core Principles

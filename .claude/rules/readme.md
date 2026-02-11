@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/readme/**
+---
+
 # Readme Rules
 
 ## Core Principles

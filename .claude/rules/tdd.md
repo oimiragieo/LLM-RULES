@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/tdd/**
+---
+
 # TDD (Test-Driven Development) Rules
 
 ## Iron Law

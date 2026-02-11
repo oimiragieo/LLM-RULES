@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/code-style-validator/**
+---
+
 # Code Style Validator Rules
 
 ## Core Rules

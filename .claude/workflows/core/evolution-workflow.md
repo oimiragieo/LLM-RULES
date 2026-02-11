@@ -885,6 +885,7 @@ These rules are INVIOLABLE. Violations break the workflow.
 
 ```javascript
 Task({
+  task_id: 'task-1',
   subagent_type: 'evolution-orchestrator',
   model: 'opus',
   description: 'Creating new graphql-schema-reviewer agent',

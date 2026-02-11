@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/protocol-reverse-engineering/**
+---
+
 # Protocol Reverse Engineering Rules
 
 ## Core Principles

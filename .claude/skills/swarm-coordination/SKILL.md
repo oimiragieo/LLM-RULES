@@ -50,12 +50,14 @@ Use the Task tool to spawn multiple agents in a single message:
 ```javascript
 // Spawn multiple agents in ONE message for parallel execution
 Task({
+  task_id: 'task-1',
   subagent_type: 'general-purpose',
   description: 'Architect reviewing design',
   prompt: 'Review architecture...',
 });
 
 Task({
+  task_id: 'task-2',
   subagent_type: 'general-purpose',
   description: 'Security reviewing design',
   prompt: 'Review security...',
@@ -156,9 +158,9 @@ Get architecture, security, and performance reviews for the new API design
 
 ```javascript
 // Spawn 3 reviewers in parallel (single message)
-Task({ description: 'Architect reviewing API', prompt: '...' });
-Task({ description: 'Security reviewing API', prompt: '...' });
-Task({ description: 'Performance reviewing API', prompt: '...' });
+Task({ task_id: 'task-3', description: 'Architect reviewing API', prompt: '...' });
+Task({ task_id: 'task-4', description: 'Security reviewing API', prompt: '...' });
+Task({ task_id: 'task-5', description: 'Performance reviewing API', prompt: '...' });
 ```
 
 **Aggregated Results**:

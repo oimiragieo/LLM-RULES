@@ -1,6 +1,13 @@
 ---
 name: readme
 description: Use when creating, updating, or generating README and documentation files for projects and libraries
+version: 1.0.0
+tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
 ---
 
 # Readme Skill

@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/svelte-expert/**
+---
+
 # Svelte Expert Rules
 
 ## Core Principles

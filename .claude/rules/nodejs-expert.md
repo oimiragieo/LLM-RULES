@@ -1,3 +1,8 @@
+---
+paths:
+  - .claude/skills/nodejs-expert/**
+---
+
 # Node.js Expert Rules
 
 ## Core Principles

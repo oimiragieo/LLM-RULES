@@ -1,6 +1,13 @@
 ---
 name: planning-with-files
 description: Manus-style file-based planning for complex tasks. Use task_plan.md, findings.md, and progress.md to maintain persistent context. Use for multi-step tasks, research, or work spanning many tool calls.
+version: 1.0.0
+tools:
+  - Read
+  - Write
+  - Edit
+  - TaskUpdate
+  - TaskList
 ---
 
 # Planning with Files - Manus-Style File-Based Planning
