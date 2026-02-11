@@ -238,6 +238,27 @@ describe('prompt-assembler', () => {
         'Should reference catalog location'
       );
     });
+
+    it('should include windows-safe search fallbacks and shell anti-pattern guidance', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const section = assembler.buildDiscoverySection();
+
+      assert.ok(
+        section.includes('If `rg` is unavailable (common on Windows), use PowerShell fallback'),
+        'Should include Windows fallback guidance when rg is unavailable'
+      );
+      assert.ok(
+        section.includes('Get-ChildItem -Recurse -File | Select-String -Pattern "needle"'),
+        'Should include PowerShell search fallback command'
+      );
+      assert.ok(
+        section.includes('Avoid brittle shell one-liners'),
+        'Should include guidance against brittle cross-shell command patterns'
+      );
+    });
   });
 
   // ======================================================================

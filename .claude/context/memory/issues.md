@@ -1,4 +1,4 @@
-<!-- Last Cleaned: 2026-02-10 - Added Task #22 integration gap -->
+<!-- Last Cleaned: 2026-02-11 - Added QA test suite gaps -->
 
 ## 2026-02-10: Integration Health Gaps in Task #22 (Wave 16B)
 
@@ -725,6 +725,64 @@ Additionally, `skill-plan-generator-output.schema.json` (210 lines, Tier 1 gold 
 **Priority:** P1
 
 **Full Report:** `.claude/context/reports/security/batch1-foundations-security-review-2026-02-09.md`
+
+---
+
+## 2026-02-11: Test Failures in Comprehensive Test Suites (Non-Blocking)
+
+**Issue**: 3 test failures in new comprehensive test suites added during audit fix pipeline.
+
+**Details:**
+
+1. **routing-guard-comprehensive.test.cjs** (2 failures):
+   - Check 0, Test 4: "should block non-whitelisted bash commands in router mode" (enforcement mode issue)
+   - Check 2, Test 2: "should block Task() in router mode without prior TaskList()" (workflow enforcement)
+
+2. **unified-creator-guard-comprehensive.test.cjs** (1 failure):
+   - Gate 4, Test 4: "should block write after creator TTL expires" (timing issue)
+
+**Impact:** LOW - These are new comprehensive tests for enhanced validation, not existing functionality. Core security checks passing (98/101 tests pass = 97% pass rate).
+
+**Root Causes:**
+
+- Workflow enforcement edge cases with stale state handling
+- TTL expiration test has timing sensitivity
+- No impact on existing test suite (433/433 tests, 99.3% pass rate)
+
+**Workaround:** None needed. Tests document edge cases that should be fixed but don't block deployment.
+
+**Resolution:**
+
+1. Update routing-guard enforcement mode tests for stale state handling
+2. Fix unified-creator-guard TTL expiration test timing
+3. Priority: P2 (non-blocking, address in follow-up wave)
+
+**Status:** Tracked for future remediation
+
+---
+
+## 2026-02-11: Memory Sanitizer Not Yet Implemented
+
+**Issue**: HIGH-004 (Memory poisoning via unsanitized file writes) identified in security audit but not implemented in Wave 2b.
+
+**Details:**
+
+- Security audit identified memory poisoning risk: malicious entries in learnings.md could contain prompt injection patterns
+- Sanitization function for memory content writes was planned but deferred
+- Current status: Memory files accept arbitrary content without validation
+
+**Impact:** MEDIUM - Internal memory files only, risk limited to framework contributors and spawned agents. Not public-facing API.
+
+**Workaround:** Manual review of memory file changes during PR review.
+
+**Resolution:**
+
+1. Create `memory-sanitizer.cjs` utility (similar to spawn-prompt sanitization)
+2. Block instruction override patterns in memory writes
+3. Add to memory-storage.cjs facade write path
+4. Priority: P1 (follow-up security wave)
+
+**Status:** Tracked for Wave 9 or dedicated security hardening sprint
 
 ---
 

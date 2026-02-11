@@ -47,6 +47,26 @@ test('checkConfigModelValidator warns when explicitly configured to warn', () =>
   }
 });
 
+test('checkConfigModelValidator downgrades to warn in bypassPermissions mode', () => {
+  try {
+    delete process.env.CONFIG_MODEL_VALIDATOR; // default is block
+
+    const result = routingGuard.checkConfigModelValidator(
+      'Task',
+      {
+        prompt: 'You are zzzunknown',
+        model: 'opus',
+      },
+      { permission_mode: 'bypassPermissions' }
+    );
+
+    assert.strictEqual(result.pass, true);
+    assert.strictEqual(result.result, 'warn');
+  } finally {
+    restoreEnv();
+  }
+});
+
 test('checkConfigModelValidator disables when set to off', () => {
   try {
     process.env.CONFIG_MODEL_VALIDATOR = 'off';

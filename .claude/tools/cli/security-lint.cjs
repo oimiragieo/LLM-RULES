@@ -76,6 +76,9 @@ const CONFIG = {
     { pathSubstring: 'reflection-step0-guard.test.cjs', ruleId: 'SEC-040' }, // path.join with literal in test
     { pathSubstring: 'force-step0-execution.cjs', ruleId: 'SEC-040' }, // path.join PROJECT_ROOT + constants only
     { pathSubstring: 'force-step0-execution.test.cjs', ruleId: 'SEC-040' }, // path.join test fixture path (constants)
+    { pathSubstring: 'pre-tool-unified.cjs', ruleId: 'SEC-040' }, // path.join REFLECTION_RUNTIME_DIR + constants only
+    { pathSubstring: 'pre-tool-unified-read-safety.test.cjs', ruleId: 'SEC-040' }, // path.join test fixture (constants)
+    { pathSubstring: 'unified-pre-write-hook.cjs', ruleId: 'SEC-012' }, // regex pattern that detects eval in content, does not call eval()
     { pathSubstring: 'spawn-assembly-metrics-summary.cjs', ruleId: 'SEC-030' }, // CLI metrics summary (aggregates, not secrets)
     { pathSubstring: 'step-validators.cjs', ruleId: 'SEC-013' }, // new Function() for dynamic workflow validation (controlled input)
     { pathSubstring: 'generate-tool-manifest.cjs', ruleId: 'SEC-030' }, // CLI diagnostic logging

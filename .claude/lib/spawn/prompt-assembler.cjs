@@ -589,6 +589,8 @@ function buildToolsSection(tools) {
   // Add mandatory tools warning
   section += `\n**CRITICAL/MANDATORY:** Call TaskUpdate({ taskId, status: "in_progress" }) when starting work.\n`;
   section += `Call TaskUpdate({ taskId, status: "completed" }) when done.\n`;
+  section +=
+    'Use Write/Edit for file creation or updates; do not use Bash redirection (`>`, `>>`, `tee`) for artifacts.\n';
 
   return section;
 }
@@ -650,11 +652,16 @@ Skill({ skill: 'debugging' });  // Invoke debugging skill
 
 ### Fast Search Defaults (Use These First)
 - Prefer ripgrep: \`rg -n "needle" path/\`
+- If \`rg\` is unavailable (common on Windows), use PowerShell fallback:
+  \`Get-ChildItem -Recurse -File | Select-String -Pattern "needle"\`
 - List files quickly: \`rg --files\` (instead of slow directory walks)
+- Windows-safe counting example:
+  \`(Get-ChildItem tests -Recurse -File -Include *.test.cjs,*.test.mjs,*.test.js,*.test.ts | Measure-Object).Count\`
 - When you need AST-aware search/refactors, prefer hybrid search:
   \`node .claude/tools/cli/index-codebase.cjs search "query"\`
   (uses semantic index + structural refinement via ast-grep when available)
 - For change awareness: \`git status --porcelain\` and \`git diff\`
+- Avoid brittle shell one-liners like \`dir ... | find /c\`, \`ls ... | wc -l\`, or commands that start with \`/c\`.
 
 ### Finding Capabilities
 For a full skill list: Read .claude/context/artifacts/catalogs/skill-catalog.md

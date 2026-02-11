@@ -44,6 +44,8 @@ const {
   ensureEntityDbInitialized,
 } = require('../../hooks/memory/sync-memory-index.cjs');
 const { recordMemoryOperation } = require('./memory-slo-metrics.cjs');
+// FIX HIGH-002: Import memory sanitizer to prevent memory poisoning
+const { sanitizeMemoryContent } = require('./memory-sanitizer.cjs');
 
 const logger = createLogger('memory-manager');
 const asyncWriteQueue = new Map();
@@ -399,20 +401,25 @@ function readMemory(name, projectRoot = PROJECT_ROOT) {
 /**
  * Write a named memory entry.
  *
+ * FIX HIGH-002: Now sanitizes content to prevent memory poisoning attacks.
+ *
  * @param {string} name - Memory name
  * @param {string} content - Memory content
  * @param {string} [projectRoot=PROJECT_ROOT] - The project root directory path
  * @returns {string} Confirmation message
+ * @throws {Error} If content contains injection patterns
  */
 function writeMemory(name, content, projectRoot = PROJECT_ROOT) {
   validateProjectRoot(projectRoot);
+  // FIX HIGH-002: Sanitize memory content before writing
+  const sanitizedContent = sanitizeMemoryContent(String(content || ''));
   const baseName = normalizeMemoryName(name);
   const filePath = path.join(getNamedMemoryDir(projectRoot), `${baseName}.md`);
   const validation = validatePathWithinProject(filePath, projectRoot);
   if (!validation.safe) {
     throw new Error(`Invalid memory path: ${validation.reason}`);
   }
-  atomicWriteSync(filePath, String(content || ''), 'utf8');
+  atomicWriteSync(filePath, sanitizedContent, 'utf8');
   return `Memory '${name}' written.`;
 }
 

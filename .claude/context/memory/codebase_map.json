@@ -5,8 +5,86 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-02-11T07:09:57.333Z"
+      "last_accessed": "2026-02-11T15:58:11.414Z"
+    },
+    ".claude/lib/memory/core/memory-storage.cjs": {
+      "description": "Memory facade storage layer (read/write memory files)",
+      "category": "memory-subsystem",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 5, Task #13"
+    },
+    ".claude/lib/memory/core/memory-query.cjs": {
+      "description": "Memory facade query layer (search, entity-query, intent-analyzer merged)",
+      "category": "memory-subsystem",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 5, Task #13"
+    },
+    ".claude/lib/memory/core/memory-extraction.cjs": {
+      "description": "Memory facade extraction layer (extractor + writer merged)",
+      "category": "memory-subsystem",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 5, Task #13"
+    },
+    ".claude/lib/memory/core/memory-lifecycle.cjs": {
+      "description": "Memory facade lifecycle layer (retention, rotation, deduplication)",
+      "category": "memory-subsystem",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 5, Task #13"
+    },
+    ".claude/lib/memory/core/index.cjs": {
+      "description": "Memory facade public API export",
+      "category": "memory-subsystem",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 5, Task #13"
+    },
+    ".claude/context/agent-registry-core.json": {
+      "description": "Agent registry core agents split file",
+      "category": "agent-registry",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 4a, Task #11"
+    },
+    ".claude/context/agent-registry-domain.json": {
+      "description": "Agent registry domain specialists split file",
+      "category": "agent-registry",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 4a, Task #11"
+    },
+    ".claude/context/agent-registry-orchestrators.json": {
+      "description": "Agent registry orchestrators split file",
+      "category": "agent-registry",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 4a, Task #11"
+    },
+    ".claude/context/agent-registry-index.json": {
+      "description": "Agent registry lookup index",
+      "category": "agent-registry",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 4a, Task #11"
+    },
+    ".claude/lib/routing/agent-registry-loader.cjs": {
+      "description": "Agent registry loader providing unified API for split registries",
+      "category": "agent-registry",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 4a, Task #11"
+    },
+    "tests/hooks/routing-guard-comprehensive.test.cjs": {
+      "description": "Comprehensive test suite for routing-guard.cjs (45 tests, 95.6% pass rate)",
+      "category": "tests",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 4b, Task #12"
+    },
+    "tests/hooks/unified-creator-guard-comprehensive.test.cjs": {
+      "description": "Comprehensive test suite for unified-creator-guard.cjs (40 tests, 97.5% pass rate)",
+      "category": "tests",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 4b, Task #12"
+    },
+    "tests/hooks/spawn-prompt-assembler-enrich-allowed-tools.test.cjs": {
+      "description": "Test suite for spawn-prompt-assembler allowed tools enrichment (13 tests, 100% pass rate)",
+      "category": "tests",
+      "discovered_at": "2026-02-11",
+      "wave": "Wave 4b, Task #12"
     }
   },
-  "last_updated": "2026-02-11T07:09:57.333Z"
+  "last_updated": "2026-02-11T15:58:11.414Z"
 }

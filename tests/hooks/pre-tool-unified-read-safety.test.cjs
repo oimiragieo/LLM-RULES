@@ -10,9 +10,32 @@ const {
   hasReadWindow,
   resolveReadPath,
   cleanupMemoryTempFiles,
+  ensureReflectionReadTarget,
+  ensureReportReadTarget,
+  ensureTaskOutputReadTarget,
+  createDirectoryListingFile,
 } = require('../../.claude/hooks/routing/pre-tool-unified.cjs');
 
 describe('pre-tool-unified read safety', () => {
+  const reflectionRuntimeDir = path.join(__dirname, '..', '..', '.claude', 'context', 'runtime');
+  const reportsDir = path.join(__dirname, '..', '..', '.claude', 'context', 'reports');
+  const reminderPath = path.join(reflectionRuntimeDir, 'reflection-reminder.txt');
+  const spawnRequestPath = path.join(reflectionRuntimeDir, 'reflection-spawn-request.json');
+
+  function withFileRestored(filePath, fn) {
+    const existed = fs.existsSync(filePath);
+    const previous = existed ? fs.readFileSync(filePath, 'utf8') : null;
+    try {
+      fn();
+    } finally {
+      if (existed) {
+        fs.writeFileSync(filePath, previous, 'utf8');
+      } else if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+  }
+
   test('hasReadWindow detects offset/limit windows', () => {
     assert.strictEqual(hasReadWindow({}), false);
     assert.strictEqual(hasReadWindow({ offset: 0 }), true);
@@ -32,6 +55,23 @@ describe('pre-tool-unified read safety', () => {
       const result = checkReadSafety('Read', { file_path: tempDir });
       assert.strictEqual(result.action, 'block');
       assert.ok(result.message.includes('is a directory'));
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('checkReadSafety rewrites directory reads in bypassPermissions mode to listing file', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-dir-bypass-'));
+    try {
+      const result = checkReadSafety(
+        'Read',
+        { file_path: tempDir },
+        { permission_mode: 'bypassPermissions' }
+      );
+      assert.strictEqual(result.action, 'rewrite');
+      assert.ok(result.rewrittenToolInput);
+      assert.ok(fs.existsSync(result.rewrittenToolInput.file_path));
+      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -84,6 +124,23 @@ describe('pre-tool-unified read safety', () => {
     }
   });
 
+  test('checkReadSafety allows large unwindowed read in bypassPermissions mode with advisory', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-file-bypass-'));
+    const filePath = path.join(tempDir, 'large.txt');
+    try {
+      fs.writeFileSync(filePath, 'a'.repeat(130000), 'utf8');
+      const result = checkReadSafety(
+        'Read',
+        { file_path: filePath },
+        { permission_mode: 'bypassPermissions' }
+      );
+      assert.strictEqual(result.action, 'allow');
+      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   test('checkReadSafety allows large file with read window', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-file-window-'));
     const filePath = path.join(tempDir, 'large.txt');
@@ -91,6 +148,92 @@ describe('pre-tool-unified read safety', () => {
       fs.writeFileSync(filePath, 'b'.repeat(130000), 'utf8');
       const result = checkReadSafety('Read', { file_path: filePath, offset: 0, limit: 4000 });
       assert.strictEqual(result.action, 'allow');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('ensureReflectionReadTarget creates missing reflection reminder file', () => {
+    withFileRestored(reminderPath, () => {
+      fs.mkdirSync(reflectionRuntimeDir, { recursive: true });
+      if (fs.existsSync(reminderPath)) fs.unlinkSync(reminderPath);
+
+      const created = ensureReflectionReadTarget(reminderPath);
+      assert.strictEqual(created, true);
+      assert.strictEqual(fs.existsSync(reminderPath), true);
+      assert.strictEqual(fs.readFileSync(reminderPath, 'utf8'), '');
+    });
+  });
+
+  test('checkReadSafety auto-heals missing reflection spawn request file', () => {
+    withFileRestored(spawnRequestPath, () => {
+      fs.mkdirSync(reflectionRuntimeDir, { recursive: true });
+      if (fs.existsSync(spawnRequestPath)) fs.unlinkSync(spawnRequestPath);
+
+      const result = checkReadSafety('Read', {
+        file_path: '.claude/context/runtime/reflection-spawn-request.json',
+      });
+
+      assert.strictEqual(result.action, 'allow');
+      assert.strictEqual(fs.existsSync(spawnRequestPath), true);
+      assert.strictEqual(fs.readFileSync(spawnRequestPath, 'utf8'), '[]\n');
+    });
+  });
+
+  test('ensureReportReadTarget creates placeholder for missing report markdown under reports dir', () => {
+    const missingReport = path.join(reportsDir, `missing-report-${Date.now()}.md`);
+    withFileRestored(missingReport, () => {
+      fs.mkdirSync(reportsDir, { recursive: true });
+      if (fs.existsSync(missingReport)) fs.unlinkSync(missingReport);
+
+      const created = ensureReportReadTarget(missingReport);
+      assert.strictEqual(created, true);
+      assert.strictEqual(fs.existsSync(missingReport), true);
+      const content = fs.readFileSync(missingReport, 'utf8');
+      assert.ok(content.includes('Missing Report Placeholder'));
+    });
+  });
+
+  test('ensureReportReadTarget does not create files outside reports dir', () => {
+    const outsidePath = path.join(__dirname, `not-a-report-${Date.now()}.md`);
+    withFileRestored(outsidePath, () => {
+      if (fs.existsSync(outsidePath)) fs.unlinkSync(outsidePath);
+
+      const created = ensureReportReadTarget(outsidePath);
+      assert.strictEqual(created, false);
+      assert.strictEqual(fs.existsSync(outsidePath), false);
+    });
+  });
+
+  test('ensureTaskOutputReadTarget creates placeholder under temp claude tasks dir', () => {
+    const taskPath = path.join(
+      os.tmpdir(),
+      'claude',
+      `read-safety-${Date.now()}`,
+      'tasks',
+      'task-output.txt'
+    );
+    withFileRestored(taskPath, () => {
+      if (fs.existsSync(taskPath)) fs.unlinkSync(taskPath);
+      const created = ensureTaskOutputReadTarget(taskPath);
+      assert.strictEqual(created, true);
+      assert.strictEqual(fs.existsSync(taskPath), true);
+      const content = fs.readFileSync(taskPath, 'utf8');
+      assert.ok(content.includes('Missing Task Output Placeholder'));
+    });
+  });
+
+  test('createDirectoryListingFile creates readable listing content', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-listing-'));
+    try {
+      fs.writeFileSync(path.join(tempDir, 'a.txt'), 'a', 'utf8');
+      fs.mkdirSync(path.join(tempDir, 'nested'));
+      const listingPath = createDirectoryListingFile(tempDir);
+      assert.ok(listingPath);
+      assert.ok(fs.existsSync(listingPath));
+      const content = fs.readFileSync(listingPath, 'utf8');
+      assert.ok(content.includes('[FILE] a.txt'));
+      assert.ok(content.includes('[DIR] nested'));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }

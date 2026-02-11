@@ -58,6 +58,43 @@ const { buildContextModePrompt } = libRequire(path.join('spawn', 'prompt-factory
 const { getDefaultTools } = libRequire(path.join('agents', 'agent-config.cjs'));
 const { validatePrompt } = hooksRequire(path.join('safety', 'spawn-prompt-validator.cjs'));
 
+// FIX HIGH-003: Spawn Prompt Injection Defense
+/**
+ * Sanitize task prompt to prevent prompt injection attacks.
+ * Blocks instruction override patterns and escapes system-like markdown.
+ * Security Control: SEC-004 (transparency markers), SEC-003 (input sanitization)
+ * @param {string} prompt - The task prompt to sanitize
+ * @returns {string} Sanitized prompt
+ */
+function sanitizeTaskPrompt(prompt) {
+  if (!prompt || typeof prompt !== 'string') {
+    return prompt;
+  }
+
+  // Remove instruction override attempts (case-insensitive)
+  const overridePatterns = [
+    /IGNORE\s+(PREVIOUS|ALL\s+PRIOR|SYSTEM)\s+INSTRUCTIONS/gi,
+    /DISREGARD\s+(EVERYTHING|ALL\s+PREVIOUS)/gi,
+    /YOU\s+ARE\s+NOW\s+A\s+[A-Z\s]+AGENT/gi,
+    /SYSTEM\s+PROMPT\s+OVERRIDE/gi,
+    /FORGET\s+(EVERYTHING|ALL\s+PREVIOUS)/gi,
+  ];
+
+  let sanitized = prompt;
+  for (const pattern of overridePatterns) {
+    sanitized = sanitized.replace(pattern, '[BLOCKED: Injection Pattern]');
+  }
+
+  // Escape markdown that looks like system instructions
+  // Pattern: # System: or ## Instruction: or ### Override:
+  sanitized = sanitized.replace(
+    /^(#{1,3}\s+)?(System|Instruction|Override|IMPORTANT|CRITICAL|MANDATORY):/gim,
+    '\\$&'
+  );
+
+  return sanitized;
+}
+
 const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
 const TOOL_MANIFEST_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'tool-manifest.json');
 const _UNIVERSAL_SPAWN_TEMPLATE_PATH = path.join(
@@ -663,6 +700,38 @@ function inferAgentFromPrompt(prompt) {
   return null;
 }
 
+function hasAnyTool(tools, candidates) {
+  if (!Array.isArray(tools) || tools.length === 0) return false;
+  const set = new Set(tools);
+  return candidates.some(candidate => set.has(candidate));
+}
+
+function isUnderProvisionedExplicitTools(currentTools, prompt) {
+  if (!Array.isArray(currentTools) || currentTools.length === 0) return false;
+
+  const functionalTools = [
+    'Read',
+    'Write',
+    'Edit',
+    'Glob',
+    'Grep',
+    'Bash',
+    'WebSearch',
+    'WebFetch',
+    'Skill',
+  ];
+  const hasFunctionalTools = hasAnyTool(currentTools, functionalTools);
+  if (!hasFunctionalTools) return true;
+
+  const promptText = String(prompt || '');
+  const requiresReportArtifact =
+    /(?:^|[\s`'"])\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(promptText) ||
+    /\b(?:write|create|save|output|generate)\b[\s\S]{0,100}\breport\b/i.test(promptText);
+  const hasArtifactWriter = hasAnyTool(currentTools, ['Write', 'Edit']);
+
+  return requiresReportArtifact && !hasArtifactWriter;
+}
+
 /**
  * Enrich allowed_tools from agent-registry when missing or partial.
  * @param {string} agentType - subagent_type or agent_type
@@ -693,19 +762,30 @@ function enrichAllowedTools(agentType, currentTools, prompt) {
   }
 
   const explicitToolsProvided = Array.isArray(currentTools) && currentTools.length > 0;
+  const explicitToolsNeedHydration =
+    explicitToolsProvided &&
+    !looksAssembled(prompt) &&
+    isUnderProvisionedExplicitTools(currentTools, prompt);
   const agent = agents[resolvedType];
   const registryTools = agent?.capabilities?.[0]?.requiredTools;
-  const toolsToUse = explicitToolsProvided
-    ? []
-    : Array.isArray(registryTools) && registryTools.length > 0
-      ? registryTools
-      : getDefaultTools(resolvedType);
-
-  // Merge current tools and registry/config tools
+  const toolsToUse =
+    !explicitToolsProvided || explicitToolsNeedHydration
+      ? Array.isArray(registryTools) && registryTools.length > 0
+        ? registryTools
+        : getDefaultTools(resolvedType)
+      : [];
   const merged = new Set([
     ...(Array.isArray(currentTools) ? currentTools : []),
     ...(Array.isArray(toolsToUse) ? toolsToUse : []),
   ]);
+
+  if (explicitToolsNeedHydration) {
+    debugLog('spawn-prompt-assembler', 'Hydrating under-provisioned explicit allowed_tools', {
+      agentType: resolvedType,
+      explicitCount: currentTools.length,
+      hydratedCount: toolsToUse.length,
+    });
+  }
 
   // CRITICAL: Always add mandatory tools (defensive fallback)
   for (const mandatoryTool of mandatoryTools) {
@@ -1112,6 +1192,9 @@ function prepareTaskSpawnContext(hookInput, sessionId) {
 
   let basePrompt = toolInput.prompt;
   if (!basePrompt || typeof basePrompt !== 'string') return null;
+
+  // FIX HIGH-003: Sanitize task prompt to prevent prompt injection
+  basePrompt = sanitizeTaskPrompt(basePrompt);
 
   const explicitTaskId = toolInput.task_id || toolInput.id || null;
   const inputPromptLength = basePrompt.length;

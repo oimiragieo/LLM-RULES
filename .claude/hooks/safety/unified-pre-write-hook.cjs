@@ -65,6 +65,22 @@ try {
 }
 const { EventTypes } = safeRequire(path.join(LIB_DIR, 'events', 'event-types.cjs'));
 
+function isRouterInvocation(hookInput = {}) {
+  const agentId = String(process.env.CLAUDE_AGENT_ID || '')
+    .trim()
+    .toLowerCase();
+  if (agentId && agentId !== 'router') {
+    return false;
+  }
+
+  const allowedTools = Array.isArray(hookInput.allowed_tools) ? hookInput.allowed_tools : null;
+  if (allowedTools && allowedTools.length > 0 && !allowedTools.includes('Task')) {
+    return false;
+  }
+
+  return true;
+}
+
 // =============================================================================
 // CHECK MODULES (loaded in-process instead of forked)
 // =============================================================================
@@ -193,14 +209,23 @@ CHECKS.push({
 // Check 5: Router Write Guard
 CHECKS.push({
   name: 'router-write-guard',
-  run: async (_toolName, _toolInput) => {
+  run: async (_toolName, _toolInput, hookInput = {}) => {
     const enforcement = getEnforcementMode('ROUTER_WRITE_GUARD', 'block');
     if (enforcement === 'off') return { pass: true };
 
-    // Check if this is a Router context (simplified - full check requires router-state)
-    const agentId = process.env.CLAUDE_AGENT_ID || 'router';
+    if (isRouterInvocation(hookInput)) {
+      const permissionMode = String(
+        hookInput.permission_mode || hookInput.permissionMode || ''
+      ).toLowerCase();
+      if (permissionMode === 'bypasspermissions') {
+        return {
+          pass: true,
+          result: 'warn',
+          message:
+            '[ROUTER-WRITE-GUARD] Router direct write detected (bypassPermissions mode). Prefer Task-spawned agent writes.',
+        };
+      }
 
-    if (agentId === 'router') {
       // Router shouldn't write directly - should spawn agent
       return {
         pass: false,
@@ -460,7 +485,7 @@ async function main() {
 
     // Run all checks sequentially
     for (const check of CHECKS) {
-      const result = await check.run(toolName, toolInput);
+      const result = await check.run(toolName, toolInput, hookInput);
 
       if (!result.pass) {
         // Emit blocked event
@@ -524,4 +549,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { CHECKS, main };
+module.exports = { CHECKS, main, isRouterInvocation };

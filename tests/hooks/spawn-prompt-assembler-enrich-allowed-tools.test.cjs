@@ -44,15 +44,16 @@ describe('enrichAllowedTools() - Mandatory Tools', () => {
     assert.strictEqual(skillCount, 1, `Expected exactly 1 Skill, got ${skillCount}`);
   });
 
-  test('should not widen explicit allowed_tools with registry defaults', () => {
+  test('should hydrate explicit under-provisioned allowed_tools for non-assembled prompts', () => {
     const result = enrichAllowedTools('developer', ['TaskUpdate', 'TaskList'], 'You are DEVELOPER');
 
     assert.ok(result.includes('TaskUpdate'));
     assert.ok(result.includes('TaskList'));
-    assert.ok(!result.includes('Bash'), `Bash should not be injected: ${JSON.stringify(result)}`);
+    assert.ok(result.includes('Read'), `Read should be injected: ${JSON.stringify(result)}`);
+    assert.ok(result.includes('Skill'), `Skill should be injected: ${JSON.stringify(result)}`);
     assert.ok(
-      result.length <= 3,
-      `Explicit allow-list should remain narrow, got: ${JSON.stringify(result)}`
+      result.length > 3,
+      `Under-provisioned allow-list should be hydrated, got: ${JSON.stringify(result)}`
     );
   });
 

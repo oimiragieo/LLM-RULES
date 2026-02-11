@@ -250,6 +250,26 @@
         ]
       }
     ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/metrics/post-tool-metrics-unified.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Task|TaskUpdate|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/reflection/unified-reflection-handler.cjs"
+          }
+        ]
+      }
+    ],
     "SessionEnd": [
       {
         "matcher": "",

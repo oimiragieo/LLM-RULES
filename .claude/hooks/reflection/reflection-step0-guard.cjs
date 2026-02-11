@@ -216,7 +216,7 @@ async function main() {
           'STEP 0 REQUIRED: (1) Read reflection-spawn-request.json, ' +
           '(2) Spawn reflection-agent for each request (or first batch), ' +
           '(3) Clear/trim spawn-request.json, ' +
-          '(4) Delete reflection-reminder.txt if exists, ' +
+          '(4) Clear reflection-reminder.txt if exists, ' +
           'THEN proceed to TaskList(). ' +
           'Set REFLECTION_STEP0_ENFORCEMENT=warn to allow with warning.';
 

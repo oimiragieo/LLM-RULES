@@ -9,6 +9,7 @@ const path = require('node:path');
 const {
   getPendingReflectionState,
   isTaskNotificationPrompt,
+  isBypassPermissionsMode,
 } = require('../../.claude/hooks/reflection/force-step0-execution.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -56,4 +57,10 @@ test('isTaskNotificationPrompt detects internal task payload', () => {
     true
   );
   assert.equal(isTaskNotificationPrompt({ prompt: 'implement login form' }), false);
+});
+
+test('isBypassPermissionsMode detects bypass permissions mode', () => {
+  assert.equal(isBypassPermissionsMode({ permission_mode: 'bypassPermissions' }), true);
+  assert.equal(isBypassPermissionsMode({ permission_mode: 'default' }), false);
+  assert.equal(isBypassPermissionsMode(null), false);
 });

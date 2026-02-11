@@ -1,0 +1,3486 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-02-11T15:23:42.409Z",
+  "metadata": {
+    "category": "domain",
+    "agentCount": 40
+  },
+  "agents": {
+    "accessibility-tester": {
+      "id": "accessibility-tester",
+      "displayName": "accessibility-tester",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/accessibility-tester.md",
+      "capabilities": [
+        {
+          "name": "accessibility-tester",
+          "domain": "code",
+          "description": "Senior Accessibility Engineer. Performs WCAG 2.2 Level AA compliance testing, screen reader compatibility validation, keyboard navigation auditing, and inclusive design verification with actionable...",
+          "triggerPhrases": [
+            "accessibility",
+            "tester",
+            "testing",
+            "auditing",
+            "design",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "accessibility",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "code-analyzer",
+            "context-compressor"
+          ],
+          "examples": [],
+          "tags": [
+            "accessibility",
+            "tester",
+            "testing",
+            "auditing",
+            "design",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "code-analyzer",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.886Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "2.0.0",
+        "createdAt": "2026-02-11T00:35:03.886Z",
+        "updatedAt": "2026-02-11T00:35:03.886Z"
+      }
+    },
+    "c4-code": {
+      "id": "c4-code",
+      "displayName": "c4-code",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/c4-code.md",
+      "capabilities": [
+        {
+          "name": "c4-code",
+          "domain": "code",
+          "description": "Expert C4 Code-level documentation specialist. Analyzes code directories to create comprehensive C4 code-level documentation including function signatures, arguments, dependencies, and code structu...",
+          "triggerPhrases": [
+            "code",
+            "analyzes",
+            "create",
+            "task-management-protocol",
+            "code-analyzer",
+            "code-structural-search",
+            "doc-generator",
+            "ripgrep",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Write",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "Edit"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "code-analyzer",
+            "code-structural-search",
+            "doc-generator",
+            "ripgrep",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "code",
+            "analyzes",
+            "create",
+            "task-management-protocol",
+            "code-analyzer",
+            "code-structural-search",
+            "doc-generator",
+            "ripgrep",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.886Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.886Z",
+        "updatedAt": "2026-02-11T00:35:03.886Z"
+      }
+    },
+    "c4-component": {
+      "id": "c4-component",
+      "displayName": "c4-component",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/c4-component.md",
+      "capabilities": [
+        {
+          "name": "c4-component",
+          "domain": "code",
+          "description": "Expert C4 Component-level documentation specialist. Synthesizes C4 Code-level documentation into Component-level architecture, defining component boundaries, interfaces, and relationships. Creates ...",
+          "triggerPhrases": [
+            "component",
+            "creates",
+            "task-management-protocol",
+            "architecture-review",
+            "code-analyzer",
+            "diagram-generator",
+            "doc-generator",
+            "ripgrep",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Write",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "Edit"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "architecture-review",
+            "code-analyzer",
+            "diagram-generator",
+            "doc-generator",
+            "ripgrep",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "component",
+            "creates",
+            "task-management-protocol",
+            "architecture-review",
+            "code-analyzer",
+            "diagram-generator",
+            "doc-generator",
+            "ripgrep",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.886Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.886Z",
+        "updatedAt": "2026-02-11T00:35:03.886Z"
+      }
+    },
+    "c4-container": {
+      "id": "c4-container",
+      "displayName": "c4-container",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/c4-container.md",
+      "capabilities": [
+        {
+          "name": "c4-container",
+          "domain": "architecture",
+          "description": "Expert C4 Container-level documentation specialist. Synthesizes Component-level documentation into Container-level architecture, mapping components to deployment units, documenting container interf...",
+          "triggerPhrases": [
+            "container",
+            "deployment",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "api-development-expert",
+            "ripgrep",
+            "verification-before-completion",
+            "diagram-generator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Write",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "Edit"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "api-development-expert",
+            "ripgrep",
+            "verification-before-completion",
+            "diagram-generator"
+          ],
+          "examples": [],
+          "tags": [
+            "container",
+            "deployment",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "api-development-expert",
+            "ripgrep",
+            "verification-before-completion",
+            "diagram-generator"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.886Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.886Z",
+        "updatedAt": "2026-02-11T00:35:03.886Z"
+      }
+    },
+    "c4-context": {
+      "id": "c4-context",
+      "displayName": "c4-context",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/c4-context.md",
+      "capabilities": [
+        {
+          "name": "c4-context",
+          "domain": "architecture",
+          "description": "Expert C4 Context-level documentation specialist. Creates high-level system context diagrams, documents personas, user journeys, system features, and external dependencies. Synthesizes container an...",
+          "triggerPhrases": [
+            "context",
+            "creates",
+            "create",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "ripgrep",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Write",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "Edit"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "ripgrep",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer"
+          ],
+          "examples": [],
+          "tags": [
+            "context",
+            "creates",
+            "create",
+            "task-management-protocol",
+            "doc-generator",
+            "architecture-review",
+            "ripgrep",
+            "verification-before-completion",
+            "diagram-generator",
+            "project-analyzer"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.886Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.886Z",
+        "updatedAt": "2026-02-11T00:35:03.886Z"
+      }
+    },
+    "chaos-engineer": {
+      "id": "chaos-engineer",
+      "displayName": "chaos-engineer",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/chaos-engineer.md",
+      "capabilities": [
+        {
+          "name": "chaos-engineer",
+          "domain": "code",
+          "description": "Senior Chaos Engineer. Designs and executes controlled failure injection experiments, validates resilience patterns (circuit breakers, retries, bulkheads), and measures system reliability through h...",
+          "triggerPhrases": [
+            "chaos",
+            "engineer",
+            "designs",
+            "validates",
+            "testing",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "context-compressor"
+          ],
+          "examples": [],
+          "tags": [
+            "chaos",
+            "engineer",
+            "designs",
+            "validates",
+            "testing",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.886Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "2.0.0",
+        "createdAt": "2026-02-11T00:35:03.886Z",
+        "updatedAt": "2026-02-11T00:35:03.886Z"
+      }
+    },
+    "database-architect": {
+      "id": "database-architect",
+      "displayName": "database-architect",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/database-architect.md",
+      "capabilities": [
+        {
+          "name": "database-architect",
+          "domain": "architecture",
+          "description": "Database schema design, query optimization, migration planning, and data modeling. Use for designing database schemas, optimizing queries, planning migrations, data consistency validation, and data...",
+          "triggerPhrases": [
+            "database",
+            "architect",
+            "design",
+            "planning",
+            "designing",
+            "task-management-protocol",
+            "architecture-review",
+            "code-semantic-search",
+            "data-expert",
+            "database-architect"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "architecture-review",
+            "code-semantic-search",
+            "data-expert",
+            "database-architect",
+            "database-expert",
+            "diagram-generator",
+            "doc-generator",
+            "ripgrep",
+            "sequential-thinking"
+          ],
+          "examples": [],
+          "tags": [
+            "database",
+            "architect",
+            "design",
+            "planning",
+            "designing",
+            "task-management-protocol",
+            "architecture-review",
+            "code-semantic-search",
+            "data-expert",
+            "database-architect",
+            "database-expert",
+            "diagram-generator",
+            "doc-generator",
+            "ripgrep",
+            "sequential-thinking"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.886Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.886Z",
+        "updatedAt": "2026-02-11T00:35:03.886Z"
+      }
+    },
+    "devops-troubleshooter": {
+      "id": "devops-troubleshooter",
+      "displayName": "devops-troubleshooter",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/devops-troubleshooter.md",
+      "capabilities": [
+        {
+          "name": "devops-troubleshooter",
+          "domain": "code",
+          "description": "Expert DevOps troubleshooter specializing in rapid incident response, advanced debugging, and modern observability. Masters log analysis, distributed tracing, Kubernetes debugging, performance opti...",
+          "triggerPhrases": [
+            "devops",
+            "troubleshooter",
+            "debugging",
+            "task-management-protocol",
+            "aws-cloud-ops",
+            "chrome-browser",
+            "cloud-devops-expert",
+            "code-semantic-search",
+            "container-expert",
+            "context-compressor"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Grep",
+            "Glob",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "aws-cloud-ops",
+            "chrome-browser",
+            "cloud-devops-expert",
+            "code-semantic-search",
+            "container-expert",
+            "context-compressor",
+            "debugging",
+            "incident-runbook-templates",
+            "logging-module-usage"
+          ],
+          "examples": [],
+          "tags": [
+            "devops",
+            "troubleshooter",
+            "debugging",
+            "task-management-protocol",
+            "aws-cloud-ops",
+            "chrome-browser",
+            "cloud-devops-expert",
+            "code-semantic-search",
+            "container-expert",
+            "context-compressor",
+            "incident-runbook-templates",
+            "logging-module-usage",
+            "postmortem-writing",
+            "recovery",
+            "ripgrep"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.886Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.886Z",
+        "updatedAt": "2026-02-11T00:35:03.886Z"
+      }
+    },
+    "incident-responder": {
+      "id": "incident-responder",
+      "displayName": "incident-responder",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/incident-responder.md",
+      "capabilities": [
+        {
+          "name": "incident-responder",
+          "domain": "code",
+          "description": "Expert SRE incident responder specializing in rapid problem resolution, modern observability, and comprehensive incident management. Masters incident command, blameless post-mortems, error budget m...",
+          "triggerPhrases": [
+            "incident",
+            "responder",
+            "task-management-protocol",
+            "code-semantic-search",
+            "configuration-management",
+            "container-expert",
+            "debugging",
+            "incident-runbook-templates",
+            "logging-module-usage",
+            "on-call-handoff-patterns"
+          ],
+          "requiredTools": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Bash",
+            "Write",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "Edit"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "code-semantic-search",
+            "configuration-management",
+            "container-expert",
+            "debugging",
+            "incident-runbook-templates",
+            "logging-module-usage",
+            "on-call-handoff-patterns",
+            "postmortem-writing",
+            "recovery"
+          ],
+          "examples": [],
+          "tags": [
+            "incident",
+            "responder",
+            "task-management-protocol",
+            "code-semantic-search",
+            "configuration-management",
+            "container-expert",
+            "debugging",
+            "incident-runbook-templates",
+            "logging-module-usage",
+            "on-call-handoff-patterns",
+            "postmortem-writing",
+            "recovery",
+            "ripgrep",
+            "sentry-monitoring",
+            "slack-notifications"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "penetration-tester": {
+      "id": "penetration-tester",
+      "displayName": "penetration-tester",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/penetration-tester.md",
+      "capabilities": [
+        {
+          "name": "penetration-tester",
+          "domain": "security",
+          "description": "Senior Penetration Testing Specialist. Performs authorized ethical hacking, OWASP Top 10 testing, vulnerability scanning, and security assessment with CVSS scoring and remediation guidance. Require...",
+          "triggerPhrases": [
+            "penetration",
+            "tester",
+            "testing",
+            "security-architect",
+            "auth-security-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "security-architect",
+            "auth-security-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "context-compressor"
+          ],
+          "examples": [],
+          "tags": [
+            "penetration",
+            "tester",
+            "testing",
+            "security-architect",
+            "auth-security-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "tdd",
+            "debugging",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "2.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "performance-engineer": {
+      "id": "performance-engineer",
+      "displayName": "performance-engineer",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/performance-engineer.md",
+      "capabilities": [
+        {
+          "name": "performance-engineer",
+          "domain": "code",
+          "description": "Data-driven performance engineer specializing in application profiling, load testing, bottleneck identification, and optimization validation. Profiles before guessing, measures before claiming impr...",
+          "triggerPhrases": [
+            "performance",
+            "engineer",
+            "testing",
+            "code-analyzer",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "debugging",
+            "ripgrep",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "code-analyzer",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "debugging",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "performance",
+            "engineer",
+            "testing",
+            "code-analyzer",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "debugging",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "sre-engineer": {
+      "id": "sre-engineer",
+      "displayName": "sre-engineer",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/sre-engineer.md",
+      "capabilities": [
+        {
+          "name": "sre-engineer",
+          "domain": "code",
+          "description": "Proactive reliability engineer specializing in SLO/SLI definition, error budget management, production readiness reviews, toil reduction, and observability design. Measures everything, assumes noth...",
+          "triggerPhrases": [
+            "sre",
+            "engineer",
+            "reviews",
+            "design",
+            "code-semantic-search",
+            "context-compressor",
+            "debugging",
+            "incident-runbook-templates",
+            "on-call-handoff-patterns",
+            "postmortem-writing"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "code-semantic-search",
+            "context-compressor",
+            "debugging",
+            "incident-runbook-templates",
+            "on-call-handoff-patterns",
+            "postmortem-writing",
+            "ripgrep",
+            "sentry-monitoring",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "sre",
+            "engineer",
+            "reviews",
+            "design",
+            "code-semantic-search",
+            "context-compressor",
+            "debugging",
+            "incident-runbook-templates",
+            "on-call-handoff-patterns",
+            "postmortem-writing",
+            "ripgrep",
+            "sentry-monitoring",
+            "task-management-protocol",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "ai-ml-specialist": {
+      "id": "ai-ml-specialist",
+      "displayName": "ai-ml-specialist",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/ai-ml-specialist.md",
+      "capabilities": [
+        {
+          "name": "ai-ml-specialist",
+          "domain": "code",
+          "description": "AI/ML specialist for machine learning model development, deep learning, MLOps, experiment tracking, and model deployment. Use for PyTorch, TensorFlow, Hugging Face, scikit-learn projects, ML pipeli...",
+          "triggerPhrases": [
+            "specialist",
+            "deployment",
+            "task-management-protocol",
+            "ai-ml-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "comprehensive-type-annotations",
+            "data-expert",
+            "debugging",
+            "git-expert"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "ai-ml-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "comprehensive-type-annotations",
+            "data-expert",
+            "debugging",
+            "git-expert",
+            "jupyter-notebook-best-practices",
+            "logging-module-usage"
+          ],
+          "examples": [],
+          "tags": [
+            "specialist",
+            "deployment",
+            "task-management-protocol",
+            "ai-ml-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "comprehensive-type-annotations",
+            "data-expert",
+            "debugging",
+            "git-expert",
+            "jupyter-notebook-best-practices",
+            "logging-module-usage",
+            "python-backend-expert",
+            "ripgrep",
+            "scientific-skills"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "android-pro": {
+      "id": "android-pro",
+      "displayName": "android-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/android-pro.md",
+      "capabilities": [
+        {
+          "name": "android",
+          "domain": "code",
+          "description": "Native Android development expert for Kotlin, Jetpack Compose, and Android SDK. Use for building native Android applications, Material Design interfaces, and Android platform integrations.",
+          "triggerPhrases": [
+            "android",
+            "pro",
+            "building",
+            "design",
+            "task-management-protocol",
+            "android-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "android-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "mobile-first-design-rules",
+            "mobile-ui-development-rule",
+            "ripgrep",
+            "tdd"
+          ],
+          "examples": [],
+          "tags": [
+            "android",
+            "pro",
+            "building",
+            "design",
+            "task-management-protocol",
+            "android-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "mobile-first-design-rules",
+            "mobile-ui-development-rule",
+            "ripgrep",
+            "tdd",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "api-designer": {
+      "id": "api-designer",
+      "displayName": "api-designer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/api-designer.md",
+      "capabilities": [
+        {
+          "name": "api-designer",
+          "domain": "security",
+          "description": "Contract-first API architect. Designs REST, GraphQL, and gRPC APIs with OpenAPI specs, versioning strategies, and security review coordination. Follows standards-driven design with backward compati...",
+          "triggerPhrases": [
+            "api",
+            "designer",
+            "designs",
+            "review",
+            "design",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "doc-generator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "doc-generator",
+            "diagram-generator",
+            "ripgrep",
+            "security-architect",
+            "spec-gathering",
+            "task-management-protocol"
+          ],
+          "examples": [],
+          "tags": [
+            "api",
+            "designer",
+            "designs",
+            "review",
+            "design",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "doc-generator",
+            "diagram-generator",
+            "ripgrep",
+            "security-architect",
+            "spec-gathering",
+            "task-management-protocol"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "data-engineer": {
+      "id": "data-engineer",
+      "displayName": "data-engineer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/data-engineer.md",
+      "capabilities": [
+        {
+          "name": "data-engineer",
+          "domain": "code",
+          "description": "Data engineering expert for ETL pipelines, data validation, analytics, and data infrastructure. Use for building data pipelines, data quality checks, data transformations, and analytics workflows.",
+          "triggerPhrases": [
+            "data",
+            "engineer",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "data-expert",
+            "database-expert",
+            "debugging",
+            "diagram-generator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "data-expert",
+            "database-expert",
+            "debugging",
+            "diagram-generator",
+            "git-expert",
+            "pandas-data-manipulation-rules",
+            "python-backend-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "data",
+            "engineer",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "data-expert",
+            "database-expert",
+            "debugging",
+            "diagram-generator",
+            "git-expert",
+            "pandas-data-manipulation-rules",
+            "python-backend-expert",
+            "ripgrep",
+            "tdd"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "expo-mobile-developer": {
+      "id": "expo-mobile-developer",
+      "displayName": "expo-mobile-developer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/expo-mobile-developer.md",
+      "capabilities": [
+        {
+          "name": "expo-mobile-developer",
+          "domain": "code",
+          "description": "Expo and React Native mobile application development expert for iOS and Android. Use for building cross-platform mobile apps, native integrations, and mobile-first user experiences.",
+          "triggerPhrases": [
+            "expo",
+            "mobile",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "expo-framework-rule",
+            "expo-mobile-app-rule"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "expo-framework-rule",
+            "expo-mobile-app-rule",
+            "git-expert",
+            "mobile-ui-development-rule",
+            "react-expert",
+            "react-native-skills-vercel"
+          ],
+          "examples": [],
+          "tags": [
+            "expo",
+            "mobile",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "expo-framework-rule",
+            "expo-mobile-app-rule",
+            "git-expert",
+            "mobile-ui-development-rule",
+            "react-expert",
+            "react-native-skills-vercel",
+            "ripgrep"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "fastapi-pro": {
+      "id": "fastapi-pro",
+      "displayName": "fastapi-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/fastapi-pro.md",
+      "capabilities": [
+        {
+          "name": "fastapi",
+          "domain": "code",
+          "description": "Build high-performance async APIs with FastAPI, SQLAlchemy 2.0, and Pydantic V2. Master microservices, WebSockets, and modern Python async patterns. Use PROACTIVELY for FastAPI development, async o...",
+          "triggerPhrases": [
+            "fastapi",
+            "pro",
+            "build",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "comprehensive-type-annotations",
+            "database-expert",
+            "debugging"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "comprehensive-type-annotations",
+            "database-expert",
+            "debugging",
+            "form-validation-with-zod",
+            "git-expert",
+            "python-backend-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "fastapi",
+            "pro",
+            "build",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "comprehensive-type-annotations",
+            "database-expert",
+            "debugging",
+            "form-validation-with-zod",
+            "git-expert",
+            "python-backend-expert",
+            "ripgrep",
+            "security-architect"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "frontend-pro": {
+      "id": "frontend-pro",
+      "displayName": "frontend-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/frontend-pro.md",
+      "capabilities": [
+        {
+          "name": "frontend",
+          "domain": "code",
+          "description": "Frontend development expert for React, Vue, modern CSS, component libraries, and UI/UX implementation. Use for building user interfaces, component libraries, responsive designs, accessibility, and ...",
+          "triggerPhrases": [
+            "frontend",
+            "pro",
+            "implementation",
+            "building",
+            "designs",
+            "task-management-protocol",
+            "accessibility",
+            "build-tools-expert",
+            "code-semantic-search",
+            "code-structural-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "accessibility",
+            "build-tools-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "frontend-expert",
+            "git-expert",
+            "html-tailwind-css-and-javascript-expert-rule",
+            "react-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "frontend",
+            "pro",
+            "implementation",
+            "building",
+            "designs",
+            "task-management-protocol",
+            "accessibility",
+            "build-tools-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "frontend-expert",
+            "git-expert",
+            "html-tailwind-css-and-javascript-expert-rule",
+            "react-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "gamedev-pro": {
+      "id": "gamedev-pro",
+      "displayName": "gamedev-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/gamedev-pro.md",
+      "capabilities": [
+        {
+          "name": "gamedev",
+          "domain": "code",
+          "description": "Master game development across Unity, Unreal Engine, and Godot with expertise in ECS architecture, game loops, shaders, physics, and cross-platform optimization. Use PROACTIVELY for game mechanics,...",
+          "triggerPhrases": [
+            "gamedev",
+            "pro",
+            "implementation",
+            "task-management-protocol",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "cpp",
+            "debugging"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "cpp",
+            "debugging",
+            "gamedev-expert",
+            "git-expert",
+            "ripgrep"
+          ],
+          "examples": [],
+          "tags": [
+            "gamedev",
+            "pro",
+            "implementation",
+            "task-management-protocol",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "cpp",
+            "debugging",
+            "gamedev-expert",
+            "git-expert",
+            "ripgrep",
+            "tdd",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "golang-pro": {
+      "id": "golang-pro",
+      "displayName": "golang-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/golang-pro.md",
+      "capabilities": [
+        {
+          "name": "golang",
+          "domain": "code",
+          "description": "Master Go 1.21+ with modern patterns, advanced concurrency, performance optimization, and production-ready microservices. Expert in the latest Go ecosystem including generics, workspaces, and cutti...",
+          "triggerPhrases": [
+            "golang",
+            "pro",
+            "design",
+            "task-management-protocol",
+            "api-development-expert",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "api-development-expert",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "go-expert",
+            "ripgrep"
+          ],
+          "examples": [],
+          "tags": [
+            "golang",
+            "pro",
+            "design",
+            "task-management-protocol",
+            "api-development-expert",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "go-expert",
+            "ripgrep",
+            "tdd",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "graphql-pro": {
+      "id": "graphql-pro",
+      "displayName": "graphql-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/graphql-pro.md",
+      "capabilities": [
+        {
+          "name": "graphql",
+          "domain": "code",
+          "description": "GraphQL API development expert with schema design, resolver patterns, performance optimization, and security. Use for building GraphQL APIs, optimizing queries, implementing subscriptions, and API ...",
+          "triggerPhrases": [
+            "graphql",
+            "pro",
+            "design",
+            "building",
+            "implementing",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "api-development-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "graphql-expert",
+            "ripgrep",
+            "tdd"
+          ],
+          "examples": [],
+          "tags": [
+            "graphql",
+            "pro",
+            "design",
+            "building",
+            "implementing",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "graphql-expert",
+            "ripgrep",
+            "tdd"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "ios-pro": {
+      "id": "ios-pro",
+      "displayName": "ios-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/ios-pro.md",
+      "capabilities": [
+        {
+          "name": "ios",
+          "domain": "code",
+          "description": "iOS/Swift development expert for iPhone, iPad, watchOS, and visionOS apps. Use for building native iOS applications, SwiftUI interfaces, UIKit components, and Apple platform integrations.",
+          "triggerPhrases": [
+            "ios",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ios-expert",
+            "mobile-first-design-rules"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ios-expert",
+            "mobile-first-design-rules",
+            "mobile-ui-development-rule",
+            "ripgrep",
+            "tdd"
+          ],
+          "examples": [],
+          "tags": [
+            "ios",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ios-expert",
+            "mobile-first-design-rules",
+            "mobile-ui-development-rule",
+            "ripgrep",
+            "tdd",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "java-pro": {
+      "id": "java-pro",
+      "displayName": "java-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/java-pro.md",
+      "capabilities": [
+        {
+          "name": "java",
+          "domain": "code",
+          "description": "Java 21+ and Spring Boot 3.x development expert for enterprise backend systems. Use for building Spring Boot microservices, REST APIs, JPA repositories, and Java enterprise applications.",
+          "triggerPhrases": [
+            "java",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "doc-generator",
+            "dto-conventions"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "doc-generator",
+            "dto-conventions",
+            "git-expert",
+            "java-expert",
+            "restcontroller-conventions"
+          ],
+          "examples": [],
+          "tags": [
+            "java",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "doc-generator",
+            "dto-conventions",
+            "git-expert",
+            "java-expert",
+            "restcontroller-conventions",
+            "ripgrep",
+            "service-class-conventions"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "llm-architect": {
+      "id": "llm-architect",
+      "displayName": "llm-architect",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/llm-architect.md",
+      "capabilities": [
+        {
+          "name": "llm-architect",
+          "domain": "architecture",
+          "description": "Senior LLM Systems Architect specializing in RAG pipeline design, model serving architecture, multi-model orchestration, guardrails, and cost optimization for production AI systems.",
+          "triggerPhrases": [
+            "llm",
+            "architect",
+            "design",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "architecture-review",
+            "verification-before-completion",
+            "task-management-protocol",
+            "sequential-thinking"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "architecture-review",
+            "verification-before-completion",
+            "task-management-protocol",
+            "sequential-thinking",
+            "doc-generator",
+            "diagram-generator",
+            "ai-ml-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "llm",
+            "architect",
+            "design",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "architecture-review",
+            "verification-before-completion",
+            "task-management-protocol",
+            "sequential-thinking",
+            "doc-generator",
+            "diagram-generator",
+            "ai-ml-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "mcp-developer": {
+      "id": "mcp-developer",
+      "displayName": "mcp-developer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/mcp-developer.md",
+      "capabilities": [
+        {
+          "name": "mcp-developer",
+          "domain": "code",
+          "description": "Senior MCP Protocol Engineer specializing in Model Context Protocol server and client implementation, transport configuration, tool schema design, and Claude Desktop/Code integration using TDD meth...",
+          "triggerPhrases": [
+            "mcp",
+            "developer",
+            "implementation",
+            "design",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "git-expert",
+            "code-analyzer"
+          ],
+          "examples": [],
+          "tags": [
+            "mcp",
+            "developer",
+            "implementation",
+            "design",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "git-expert",
+            "code-analyzer"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.887Z",
+        "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "microservices-architect": {
+      "id": "microservices-architect",
+      "displayName": "microservices-architect",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/microservices-architect.md",
+      "capabilities": [
+        {
+          "name": "microservices-architect",
+          "domain": "architecture",
+          "description": "Distributed systems architect specializing in service decomposition via DDD, event-driven architecture, saga patterns, and inter-service communication design. Uses extended thinking for complex dom...",
+          "triggerPhrases": [
+            "microservices",
+            "architect",
+            "design",
+            "architecture-review",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "diagram-generator",
+            "ripgrep",
+            "sequential-thinking"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "architecture-review",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "diagram-generator",
+            "ripgrep",
+            "sequential-thinking",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "microservices",
+            "architect",
+            "design",
+            "architecture-review",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "diagram-generator",
+            "ripgrep",
+            "sequential-thinking",
+            "task-management-protocol",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "mobile-ux-reviewer": {
+      "id": "mobile-ux-reviewer",
+      "displayName": "mobile-ux-reviewer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/mobile-ux-reviewer.md",
+      "capabilities": [
+        {
+          "name": "mobile-ux-reviewer",
+          "domain": "mobile",
+          "description": "UX/UI expert for reviewing mobile applications on iOS and Android. Use for design critiques, accessibility audits, Human Interface Guidelines compliance, and user experience evaluations.",
+          "triggerPhrases": [
+            "mobile",
+            "reviewer",
+            "reviewing",
+            "design",
+            "audits",
+            "task-management-protocol",
+            "accessibility",
+            "checklist-generator",
+            "code-semantic-search",
+            "design-and-user-experience-guidelines"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Grep",
+            "Glob",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "accessibility",
+            "checklist-generator",
+            "code-semantic-search",
+            "design-and-user-experience-guidelines",
+            "diagram-generator",
+            "doc-generator",
+            "mobile-first-design-rules",
+            "mobile-ui-development-rule",
+            "ripgrep"
+          ],
+          "examples": [],
+          "tags": [
+            "mobile",
+            "reviewer",
+            "reviewing",
+            "design",
+            "audits",
+            "task-management-protocol",
+            "accessibility",
+            "checklist-generator",
+            "code-semantic-search",
+            "design-and-user-experience-guidelines",
+            "diagram-generator",
+            "doc-generator",
+            "mobile-first-design-rules",
+            "mobile-ui-development-rule",
+            "ripgrep"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "nextjs-pro": {
+      "id": "nextjs-pro",
+      "displayName": "nextjs-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/nextjs-pro.md",
+      "capabilities": [
+        {
+          "name": "nextjs",
+          "domain": "code",
+          "description": "Next.js 14+ App Router expert with React Server Components, Server Actions, and modern full-stack patterns. Use for building Next.js applications with SSR, SSG, ISR, and React Server Components.",
+          "triggerPhrases": [
+            "nextjs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "nextjs-expert",
+            "react-best-practices-vercel"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "nextjs-expert",
+            "react-best-practices-vercel",
+            "react-expert",
+            "ripgrep",
+            "state-management-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "nextjs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "nextjs-expert",
+            "react-best-practices-vercel",
+            "react-expert",
+            "ripgrep",
+            "state-management-expert",
+            "styling-expert",
+            "tdd"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "nodejs-pro": {
+      "id": "nodejs-pro",
+      "displayName": "nodejs-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/nodejs-pro.md",
+      "capabilities": [
+        {
+          "name": "nodejs",
+          "domain": "code",
+          "description": "Node.js backend expert for Express, NestJS, and modern async patterns. Use for building REST APIs, GraphQL servers, microservices, WebSocket servers, and backend architecture using Node.js and Type...",
+          "triggerPhrases": [
+            "nodejs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "api-development-expert",
+            "async-operations",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "api-development-expert",
+            "async-operations",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "nodejs-expert",
+            "ripgrep"
+          ],
+          "examples": [],
+          "tags": [
+            "nodejs",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "api-development-expert",
+            "async-operations",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "nodejs-expert",
+            "ripgrep",
+            "tdd",
+            "typescript-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "php-pro": {
+      "id": "php-pro",
+      "displayName": "php-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/php-pro.md",
+      "capabilities": [
+        {
+          "name": "php",
+          "domain": "code",
+          "description": "PHP 8.x and Laravel 11+ development expert. Use for building modern PHP applications, REST APIs, Laravel apps, and PHP backend systems with best practices.",
+          "triggerPhrases": [
+            "php",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "composer-dependency-management",
+            "debugging",
+            "doc-generator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "composer-dependency-management",
+            "debugging",
+            "doc-generator",
+            "git-expert",
+            "php-expert",
+            "ripgrep"
+          ],
+          "examples": [],
+          "tags": [
+            "php",
+            "pro",
+            "building",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "composer-dependency-management",
+            "debugging",
+            "doc-generator",
+            "git-expert",
+            "php-expert",
+            "ripgrep",
+            "tall-stack-general",
+            "tdd"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "prompt-engineer": {
+      "id": "prompt-engineer",
+      "displayName": "prompt-engineer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/prompt-engineer.md",
+      "capabilities": [
+        {
+          "name": "prompt-engineer",
+          "domain": "code",
+          "description": "Senior Prompt Engineering Specialist who designs, tests, and optimizes LLM prompts using systematic A/B testing, token efficiency analysis, and structured output design for production AI systems.",
+          "triggerPhrases": [
+            "prompt",
+            "engineer",
+            "designs",
+            "tests",
+            "optimizes",
+            "testing",
+            "design",
+            "advanced-elicitation",
+            "code-semantic-search",
+            "ripgrep"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "advanced-elicitation",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "code-analyzer",
+            "code-structural-search",
+            "git-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "prompt",
+            "engineer",
+            "designs",
+            "tests",
+            "optimizes",
+            "testing",
+            "design",
+            "advanced-elicitation",
+            "code-semantic-search",
+            "ripgrep",
+            "verification-before-completion",
+            "task-management-protocol",
+            "code-analyzer",
+            "code-structural-search",
+            "git-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "python-pro": {
+      "id": "python-pro",
+      "displayName": "python-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/python-pro.md",
+      "capabilities": [
+        {
+          "name": "python",
+          "domain": "code",
+          "description": "Master Python 3.12+ with modern features, async programming, performance optimization, and production-ready practices. Expert in the latest Python ecosystem including uv, ruff, pydantic, and FastAP...",
+          "triggerPhrases": [
+            "python",
+            "pro",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "comprehensive-type-annotations",
+            "comprehensive-unit-testing-with-pytest",
+            "debugging"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "api-development-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "comprehensive-type-annotations",
+            "comprehensive-unit-testing-with-pytest",
+            "debugging",
+            "git-expert",
+            "prioritize-python-3-10-features"
+          ],
+          "examples": [],
+          "tags": [
+            "python",
+            "pro",
+            "task-management-protocol",
+            "api-development-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "comprehensive-type-annotations",
+            "comprehensive-unit-testing-with-pytest",
+            "debugging",
+            "git-expert",
+            "prioritize-python-3-10-features",
+            "python-backend-expert",
+            "ripgrep",
+            "tdd"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "rust-pro": {
+      "id": "rust-pro",
+      "displayName": "rust-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/rust-pro.md",
+      "capabilities": [
+        {
+          "name": "rust",
+          "domain": "code",
+          "description": "Master Rust 1.75+ with modern async patterns, advanced type system features, and production-ready systems programming. Expert in the latest Rust ecosystem including Tokio, axum, and cutting-edge cr...",
+          "triggerPhrases": [
+            "rust",
+            "pro",
+            "task-management-protocol",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "rust-expert",
+            "tdd"
+          ],
+          "examples": [],
+          "tags": [
+            "rust",
+            "pro",
+            "task-management-protocol",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "rust-expert",
+            "tdd",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "scientific-research-expert": {
+      "id": "scientific-research-expert",
+      "displayName": "scientific-research-expert",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/scientific-research-expert.md",
+      "capabilities": [
+        {
+          "name": "scientific-research",
+          "domain": "code",
+          "description": "Scientific research expert specializing in computational biology, cheminformatics, data analysis, and research methodology. Use for literature reviews, hypothesis generation, genomics/proteomics an...",
+          "triggerPhrases": [
+            "scientific",
+            "research",
+            "expert",
+            "reviews",
+            "task-management-protocol",
+            "arxiv-mcp",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "diagram-generator"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "arxiv-mcp",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "diagram-generator",
+            "doc-generator",
+            "jupyter-notebook-best-practices",
+            "python-backend-expert",
+            "research-synthesis"
+          ],
+          "examples": [],
+          "tags": [
+            "scientific",
+            "research",
+            "expert",
+            "reviews",
+            "task-management-protocol",
+            "arxiv-mcp",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "diagram-generator",
+            "doc-generator",
+            "jupyter-notebook-best-practices",
+            "python-backend-expert",
+            "research-synthesis",
+            "ripgrep"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "sveltekit-expert": {
+      "id": "sveltekit-expert",
+      "displayName": "sveltekit-expert",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/sveltekit-expert.md",
+      "capabilities": [
+        {
+          "name": "sveltekit",
+          "domain": "code",
+          "description": "SvelteKit and Svelte 5 runes expert for full-stack web apps. Use for building reactive web applications, SSR/SSG apps, form handling, SEO optimization, and full-stack development with SvelteKit.",
+          "triggerPhrases": [
+            "sveltekit",
+            "expert",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "form-and-actions-in-sveltekit",
+            "git-expert",
+            "ripgrep"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "form-and-actions-in-sveltekit",
+            "git-expert",
+            "ripgrep",
+            "seo-and-meta-tags-in-sveltekit",
+            "styling-expert",
+            "svelte-expert"
+          ],
+          "examples": [],
+          "tags": [
+            "sveltekit",
+            "expert",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "form-and-actions-in-sveltekit",
+            "git-expert",
+            "ripgrep",
+            "seo-and-meta-tags-in-sveltekit",
+            "styling-expert",
+            "svelte-expert",
+            "tdd",
+            "typescript-expert"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "tauri-desktop-developer": {
+      "id": "tauri-desktop-developer",
+      "displayName": "tauri-desktop-developer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/tauri-desktop-developer.md",
+      "capabilities": [
+        {
+          "name": "tauri-desktop-developer",
+          "domain": "code",
+          "description": "Tauri 2.0 desktop application development expert with Rust backend and web frontend integration. Use for building cross-platform desktop apps, native system integrations, and secure desktop applica...",
+          "triggerPhrases": [
+            "tauri",
+            "desktop",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "rust-expert",
+            "tauri-native-api-integration",
+            "tauri-security-rules",
+            "tauri-svelte-typescript-general"
+          ],
+          "examples": [],
+          "tags": [
+            "tauri",
+            "desktop",
+            "developer",
+            "building",
+            "task-management-protocol",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "rust-expert",
+            "tauri-native-api-integration",
+            "tauri-security-rules",
+            "tauri-svelte-typescript-general",
+            "tauri-svelte-ui-components"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "typescript-pro": {
+      "id": "typescript-pro",
+      "displayName": "typescript-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/typescript-pro.md",
+      "capabilities": [
+        {
+          "name": "typescript",
+          "domain": "code",
+          "description": "Master TypeScript with advanced types, generics, and strict type safety. Handles complex type systems, decorators, and enterprise-grade patterns. Use PROACTIVELY for TypeScript architecture, type i...",
+          "triggerPhrases": [
+            "typescript",
+            "pro",
+            "task-management-protocol",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "state-management-expert",
+            "tdd"
+          ],
+          "examples": [],
+          "tags": [
+            "typescript",
+            "pro",
+            "task-management-protocol",
+            "build-tools-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "state-management-expert",
+            "tdd",
+            "tsconfig-json-rules",
+            "typescript-expert",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "web3-blockchain-expert": {
+      "id": "web3-blockchain-expert",
+      "displayName": "web3-blockchain-expert",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/web3-blockchain-expert.md",
+      "capabilities": [
+        {
+          "name": "web3-blockchain",
+          "domain": "code",
+          "description": "Web3, blockchain, and smart contract development expert. Specializes in Solidity, DeFi protocols, security auditing, gas optimization, and multi-chain development. Use PROACTIVELY for smart contrac...",
+          "triggerPhrases": [
+            "web3",
+            "blockchain",
+            "expert",
+            "auditing",
+            "review",
+            "task-management-protocol",
+            "auth-security-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "task-management-protocol",
+            "auth-security-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "security-architect",
+            "tdd"
+          ],
+          "examples": [],
+          "tags": [
+            "web3",
+            "blockchain",
+            "expert",
+            "auditing",
+            "review",
+            "task-management-protocol",
+            "auth-security-expert",
+            "code-quality-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "debugging",
+            "git-expert",
+            "ripgrep",
+            "security-architect",
+            "tdd"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "swarm-coordinator": {
+      "id": "swarm-coordinator",
+      "displayName": "swarm-coordinator",
+      "category": "orchestrator",
+      "filePath": ".claude/agents/orchestrators/swarm-coordinator.md",
+      "capabilities": [
+        {
+          "name": "swarm-coordinator",
+          "domain": "orchestration",
+          "description": "Manages multi-agent swarms (Queen/Worker topology). Handles consensus, task distribution, and result aggregation.",
+          "triggerPhrases": [
+            "swarm",
+            "coordinator",
+            "consensus-voting",
+            "context-compressor",
+            "dispatching-parallel-agents",
+            "plan-generator",
+            "ripgrep",
+            "subagent-driven-development",
+            "swarm-coordination",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Task",
+            "Read",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "Write",
+            "Edit",
+            "Bash",
+            "Glob",
+            "Grep"
+          ],
+          "skills": [
+            "consensus-voting",
+            "context-compressor",
+            "dispatching-parallel-agents",
+            "plan-generator",
+            "ripgrep",
+            "subagent-driven-development",
+            "swarm-coordination",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "swarm",
+            "coordinator",
+            "consensus-voting",
+            "context-compressor",
+            "dispatching-parallel-agents",
+            "plan-generator",
+            "ripgrep",
+            "subagent-driven-development",
+            "swarm-coordination",
+            "task-management-protocol",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    }
+  }
+}

@@ -64,6 +64,10 @@ function isTaskNotificationPrompt(hookInput) {
   );
 }
 
+function isBypassPermissionsMode(hookInput) {
+  return Boolean(hookInput && hookInput.permission_mode === 'bypassPermissions');
+}
+
 function getPendingReflectionState() {
   const requests = readSpawnRequests(SPAWN_REQUEST_PATH);
   const pendingCount = requests.length;
@@ -139,6 +143,24 @@ async function main() {
   // BLOCK: Pending reflections must be processed first
   const requestCount = pendingState.pendingCount;
 
+  if (isBypassPermissionsMode(hookInput)) {
+    stderrLog(
+      'warn',
+      'Pending reflections detected; bypassPermissions active, emitting advisory only',
+      {
+        spawnRequestCount: requestCount,
+      }
+    );
+    logToSpawnLog({
+      event: 'step0_bypass_advisory',
+      timestamp: new Date().toISOString(),
+      reason: 'pending_reflections_bypass_mode',
+      spawn_request_count: requestCount,
+      action: 'allow_with_advisory',
+    });
+    process.exit(0);
+  }
+
   stderrLog('error', 'BLOCKING: Pending reflections must be processed before proceeding', {
     reminderFileExists: fs.existsSync(REMINDER_PATH),
     spawnRequestCount: requestCount,
@@ -161,7 +183,7 @@ async function main() {
         `STEP 0 REQUIRED: ${requestCount} pending reflection request(s) detected. ` +
         'Read .claude/context/runtime/reflection-reminder.txt and ' +
         '.claude/context/runtime/reflection-spawn-request.json, spawn reflection-agent ' +
-        'for each request (or first batch), then delete reminder file and clear spawn request file. ' +
+        'for each request (or first batch), then clear reminder file and clear spawn request file. ' +
         'See CLAUDE.md Section 0 for Step 0 protocol.',
     })
   );
@@ -180,4 +202,5 @@ module.exports = {
   readSpawnRequests,
   getPendingReflectionState,
   isTaskNotificationPrompt,
+  isBypassPermissionsMode,
 };

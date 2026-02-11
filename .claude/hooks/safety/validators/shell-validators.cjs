@@ -31,31 +31,28 @@ const DANGEROUS_PATTERNS = [
     reason: 'Can execute alternate payloads after intentional failure',
   },
   {
-    pattern: /\r|\n/,
-    name: 'Multiline command',
-    reason: 'Can smuggle follow-up commands across lines',
+    // FIX HIGH-001: Block ALL line separators including vertical tab, form feed, and null bytes
+    pattern: /[\r\n\v\f\x00]/,
+    name: 'Non-standard line separators',
+    reason: 'Vertical tab, form feed, null bytes can bypass line break detection',
   },
   {
-    pattern: /\$\{[^}]*\}/,
-    name: 'Parameter expansion',
-    reason: 'Can hide obfuscated payload construction and command splicing',
+    // FIX HIGH-001: Block ALL shell expansions (parameter and arithmetic)
+    // Stricter pattern: ${ or $( catches both parameter expansion and arithmetic expansion
+    pattern: /\$[({]/,
+    name: 'Shell expansion (parameter or arithmetic)',
+    reason: 'All shell expansions can execute arbitrary code or hide payloads',
   },
   {
-    pattern: /\$'/,
-    name: 'ANSI-C quoting',
-    reason: "Can bypass tokenizer via hex escapes (e.g., $'rm\\x20-rf\\x20/')",
+    // FIX HIGH-001: Block ANSI-C quoting ANYWHERE in command (not just at start)
+    pattern: /\$'[^']*'/,
+    name: 'ANSI-C quoting (anywhere)',
+    reason: 'ANSI-C quoting can bypass tokenizer via hex escapes anywhere in command',
   },
   {
     pattern: /`[^`]*`/,
     name: 'Backtick command substitution',
     reason: 'Command substitution can execute arbitrary code',
-  },
-  {
-    // Match $(...) but NOT $((...)) which is arithmetic expansion
-    // Negative lookahead ensures we don't match arithmetic $(( ))
-    pattern: /\$\((?!\()/,
-    name: 'Command substitution',
-    reason: 'Can execute arbitrary nested commands',
   },
   {
     // Here-strings (<<<) MUST be checked BEFORE here-documents (<<)

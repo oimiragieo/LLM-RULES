@@ -128,6 +128,10 @@ function extractCommand(hookInput) {
   return null;
 }
 
+function isBypassPermissionsMode(hookInput) {
+  return Boolean(hookInput && hookInput.permission_mode === 'bypassPermissions');
+}
+
 /**
  * Format a blocked command message for display.
  *
@@ -195,6 +199,10 @@ async function main() {
 
     const reportWriteReason = detectBashReportWrite(command);
     if (reportWriteReason) {
+      if (isBypassPermissionsMode(hookInput)) {
+        console.error(`[bash-command-validator][bypass] ${reportWriteReason}`);
+        process.exit(0);
+      }
       console.error(formatBlockedMessage(command, reportWriteReason));
       process.exit(2);
     }
@@ -266,5 +274,6 @@ module.exports = {
   detectBadSubstitutionRisk,
   detectUnsupportedRipgrepType,
   detectBashReportWrite,
+  isBypassPermissionsMode,
   parseHookInput: parseHookInputAsync,
 };

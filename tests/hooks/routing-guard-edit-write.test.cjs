@@ -153,6 +153,24 @@ describe('Fix 1: routing-guard blocks Edit/Write/NotebookEdit in router mode', (
     assert.strictEqual(result.pass, true, 'Runtime file writes always allowed');
   });
 
+  it('should classify subordinate context as non-router when allowed_tools excludes Task', () => {
+    assert.ok(routingGuard, 'Module should be loadable');
+
+    const isRouter = routingGuard.isRouterInvocation({
+      allowed_tools: ['TaskUpdate', 'TaskList', 'Read', 'Write', 'Edit'],
+    });
+    assert.strictEqual(isRouter, false, 'Subagent context should not be treated as Router');
+  });
+
+  it('should classify router context when allowed_tools includes Task', () => {
+    assert.ok(routingGuard, 'Module should be loadable');
+
+    const isRouter = routingGuard.isRouterInvocation({
+      allowed_tools: ['Task', 'TaskList', 'TaskCreate', 'Read'],
+    });
+    assert.strictEqual(isRouter, true, 'Router context should be treated as Router');
+  });
+
   // =========================================================================
   // Integration test: runAllChecks for Edit/Write
   // =========================================================================

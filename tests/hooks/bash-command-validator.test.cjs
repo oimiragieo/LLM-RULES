@@ -73,6 +73,7 @@ const {
   detectBadSubstitutionRisk,
   detectUnsupportedRipgrepType,
   detectBashReportWrite,
+  isBypassPermissionsMode,
 } = require('../../.claude/hooks/safety/bash-command-validator.cjs');
 
 // Import the registry for integration tests
@@ -106,6 +107,10 @@ test('exports detectUnsupportedRipgrepType function', () => {
 
 test('exports detectBashReportWrite function', () => {
   assertEqual(typeof detectBashReportWrite, 'function', 'Should export function');
+});
+
+test('exports isBypassPermissionsMode function', () => {
+  assertEqual(typeof isBypassPermissionsMode, 'function', 'Should export function');
 });
 
 // ============================================================
@@ -238,6 +243,12 @@ test('detectBashReportWrite blocks tee writes into reports path', () => {
 test('detectBashReportWrite allows reads from reports path', () => {
   const reason = detectBashReportWrite('cat .claude/context/reports/security-audit.md');
   assertEqual(reason, null, 'Should allow read-only usage');
+});
+
+test('isBypassPermissionsMode detects bypass permissions payloads', () => {
+  assertEqual(isBypassPermissionsMode({ permission_mode: 'bypassPermissions' }), true);
+  assertEqual(isBypassPermissionsMode({ permission_mode: 'default' }), false);
+  assertEqual(isBypassPermissionsMode(null), false);
 });
 
 // ============================================================

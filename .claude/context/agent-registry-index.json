@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "generatedAt": "2026-02-11T00:00:00.000Z",
+  "metadata": {
+    "totalAgents": 59,
+    "registryFiles": [
+      {
+        "path": "agent-registry-core.json",
+        "category": "core",
+        "agentCount": 12,
+        "description": "Core agents used in every workflow"
+      },
+      {
+        "path": "agent-registry-domain.json",
+        "category": "domain",
+        "agentCount": 40,
+        "description": "Domain and specialized agents"
+      },
+      {
+        "path": "agent-registry-orchestrators.json",
+        "category": "orchestrators",
+        "agentCount": 7,
+        "description": "Orchestration and coordination agents"
+      }
+    ]
+  }
+}
