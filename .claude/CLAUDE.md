@@ -576,6 +576,26 @@ All spawned agents:
 
 > **Assume interruption:** if it's not in memory, it didn't happen.
 
+### 8.1 Observational Memory Routing Rules
+
+Router and spawned agents must follow these runtime rules:
+
+1. **Mode + kill switch:**
+   - `MEMORY_MODE=hybrid|observational` (default: `hybrid`)
+   - `OBSERVATIONAL_MEMORY_ENABLED=on|off` (default: `on`)
+   - If kill switch is `off`, treat mode as `hybrid` regardless of `MEMORY_MODE`.
+2. **Tier behavior:**
+   - **Tier A (default):** observational summary + recent observations.
+   - **Tier B (optional depth):** semantic/entity memory only when `memory_depth=true` or prompt intent is exploratory/debug/high-uncertainty.
+3. **Section token caps (defaults):**
+   - `MEMORY_SUMMARY_BLOCK_MAX_TOKENS=400`
+   - `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS=400`
+   - `MEMORY_TIER_B_MAX_TOKENS=400`
+4. **Fallback safety:**
+   - If `observations_summary.md` and/or `observations.jsonl` are missing or empty, fall back to legacy memory section formatting (no prompt assembly failure).
+5. **Task protocol remains strict:**
+   - Memory mode does **not** relax task tracking. Spawned agents must still do FIRST `TaskUpdate(in_progress)` before work, LAST `TaskUpdate(completed)` before `TaskList()`.
+
 ### 8.5 WORKFLOW ENHANCEMENT SKILLS
 
 > **REFERENCE:** See **@SKILL_CATALOG_TABLE.md** for complete skill catalog.

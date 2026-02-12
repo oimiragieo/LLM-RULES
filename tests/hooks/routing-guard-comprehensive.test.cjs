@@ -28,7 +28,9 @@ const fs = require('fs');
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // Import hook functions
-const routingGuard = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs'));
+const routingGuard = require(
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs')
+);
 
 // Cleanup state between tests
 function cleanupState() {
@@ -41,7 +43,13 @@ function cleanupState() {
   }
 
   // Clean creator state
-  const creatorStateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'active-creators.json');
+  const creatorStateFile = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'runtime',
+    'active-creators.json'
+  );
   if (fs.existsSync(creatorStateFile)) {
     fs.unlinkSync(creatorStateFile);
   }
@@ -159,20 +167,27 @@ describe('routing-guard.cjs - Check 2: Planner-First Enforcement', () => {
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
     fs.writeFileSync(stateFile, JSON.stringify({ requiresPlannerFirst: false }));
 
-    const result = routingGuard.checkPlannerFirst('Task', { prompt: 'You are developer. Fix bug.' });
+    const result = routingGuard.checkPlannerFirst('Task', {
+      prompt: 'You are developer. Fix bug.',
+    });
     assert.equal(result.pass, true);
   });
 
   it('should block non-planner Task when planner required', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({
-      requiresPlannerFirst: true,
-      plannerSpawned: false,
-      complexity: 'HIGH'
-    }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'HIGH',
+      })
+    );
 
-    const result = routingGuard.checkPlannerFirst('Task', { prompt: 'You are developer. Fix bug.' });
+    const result = routingGuard.checkPlannerFirst('Task', {
+      prompt: 'You are developer. Fix bug.',
+    });
     assert.equal(result.pass, false);
     assert.match(result.message, /PLANNER-FIRST VIOLATION/);
   });
@@ -180,9 +195,14 @@ describe('routing-guard.cjs - Check 2: Planner-First Enforcement', () => {
   it('should allow planner spawn when planner required', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({ requiresPlannerFirst: true, plannerSpawned: false }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({ requiresPlannerFirst: true, plannerSpawned: false })
+    );
 
-    const result = routingGuard.checkPlannerFirst('Task', { prompt: 'You are planner. Create plan.' });
+    const result = routingGuard.checkPlannerFirst('Task', {
+      prompt: 'You are planner. Create plan.',
+    });
     assert.equal(result.pass, true);
     assert.equal(result.markPlanner, true);
   });
@@ -190,9 +210,14 @@ describe('routing-guard.cjs - Check 2: Planner-First Enforcement', () => {
   it('should allow Task after planner spawned', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({ requiresPlannerFirst: true, plannerSpawned: true }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({ requiresPlannerFirst: true, plannerSpawned: true })
+    );
 
-    const result = routingGuard.checkPlannerFirst('Task', { prompt: 'You are developer. Implement.' });
+    const result = routingGuard.checkPlannerFirst('Task', {
+      prompt: 'You are developer. Implement.',
+    });
     assert.equal(result.pass, true);
   });
 });
@@ -214,11 +239,14 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
   it('should block TaskCreate when planner required but not spawned', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({
-      requiresPlannerFirst: true,
-      plannerSpawned: false,
-      complexity: 'HIGH'
-    }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'HIGH',
+      })
+    );
 
     const result = routingGuard.checkTaskCreate('TaskCreate');
     assert.equal(result.pass, false);
@@ -237,19 +265,26 @@ describe('routing-guard.cjs - Check 4: Security Review Enforcement', () => {
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
     fs.writeFileSync(stateFile, JSON.stringify({ requiresSecurityReview: false }));
 
-    const result = routingGuard.checkSecurityReview('Task', { prompt: 'You are developer. Add feature.' });
+    const result = routingGuard.checkSecurityReview('Task', {
+      prompt: 'You are developer. Add feature.',
+    });
     assert.equal(result.pass, true);
   });
 
   it('should block implementation agent when security required but not spawned', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({
-      requiresSecurityReview: true,
-      securitySpawned: false
-    }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        requiresSecurityReview: true,
+        securitySpawned: false,
+      })
+    );
 
-    const result = routingGuard.checkSecurityReview('Task', { prompt: 'You are developer. Add auth.' });
+    const result = routingGuard.checkSecurityReview('Task', {
+      prompt: 'You are developer. Add auth.',
+    });
     assert.equal(result.pass, false);
     assert.match(result.message, /SEC-004/);
   });
@@ -257,9 +292,14 @@ describe('routing-guard.cjs - Check 4: Security Review Enforcement', () => {
   it('should allow security-architect spawn when required', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({ requiresSecurityReview: true, securitySpawned: false }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({ requiresSecurityReview: true, securitySpawned: false })
+    );
 
-    const result = routingGuard.checkSecurityReview('Task', { prompt: 'You are security-architect. Review.' });
+    const result = routingGuard.checkSecurityReview('Task', {
+      prompt: 'You are security-architect. Review.',
+    });
     assert.equal(result.pass, true);
     assert.equal(result.markSecurity, true);
   });
@@ -274,7 +314,7 @@ describe('routing-guard.cjs - Check 7: Specialist Override Warning', () => {
   it('should warn when developer spawned for documentation task', () => {
     const result = routingGuard.checkSpecialistOverride('Task', {
       prompt: 'You are developer. Update documentation for the API.',
-      description: 'Update docs'
+      description: 'Update docs',
     });
     assert.equal(result.pass, true);
     assert.equal(result.result, 'warn');
@@ -285,7 +325,7 @@ describe('routing-guard.cjs - Check 7: Specialist Override Warning', () => {
   it('should warn when developer spawned for refactoring task', () => {
     const result = routingGuard.checkSpecialistOverride('Task', {
       prompt: 'You are developer. Refactor the code for clarity.',
-      description: 'Refactor'
+      description: 'Refactor',
     });
     assert.equal(result.pass, true);
     assert.equal(result.result, 'warn');
@@ -295,7 +335,7 @@ describe('routing-guard.cjs - Check 7: Specialist Override Warning', () => {
   it('should warn when developer spawned for testing task', () => {
     const result = routingGuard.checkSpecialistOverride('Task', {
       prompt: 'You are developer. Write tests for the API.',
-      description: 'Add tests'
+      description: 'Add tests',
     });
     assert.equal(result.pass, true);
     assert.equal(result.result, 'warn');
@@ -305,7 +345,7 @@ describe('routing-guard.cjs - Check 7: Specialist Override Warning', () => {
   it('should allow developer for implementation tasks', () => {
     const result = routingGuard.checkSpecialistOverride('Task', {
       prompt: 'You are developer. Implement feature X.',
-      description: 'New feature'
+      description: 'New feature',
     });
     assert.equal(result.pass, true);
     assert.equal(result.result, undefined);
@@ -316,7 +356,7 @@ describe('routing-guard.cjs - Check 7: Specialist Override Warning', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', {
       prompt: 'You are developer. Update documentation.',
-      description: 'Docs'
+      description: 'Docs',
     });
     assert.equal(result.pass, false);
     assert.equal(result.result, 'block');
@@ -327,7 +367,7 @@ describe('routing-guard.cjs - Check 7: Specialist Override Warning', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', {
       prompt: 'You are developer. Update documentation.',
-      description: 'Docs'
+      description: 'Docs',
     });
     assert.equal(result.pass, true);
     assert.equal(result.result, undefined);
@@ -343,11 +383,14 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
   it('should allow tools after TaskList called', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({
-      mode: 'router',
-      taskSpawned: false,
-      taskListCalledSincePrompt: true
-    }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        mode: 'router',
+        taskSpawned: false,
+        taskListCalledSincePrompt: true,
+      })
+    );
 
     const result = routingGuard.checkTaskListFirstGate('Task');
     assert.equal(result.pass, true);
@@ -356,11 +399,14 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
   it('should block Task when TaskList not called', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({
-      mode: 'router',
-      taskSpawned: false,
-      taskListCalledSincePrompt: false
-    }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        mode: 'router',
+        taskSpawned: false,
+        taskListCalledSincePrompt: false,
+      })
+    );
 
     const result = routingGuard.checkTaskListFirstGate('Task');
     assert.equal(result.pass, true); // Default is warn
@@ -371,10 +417,13 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
   it('should allow tools in agent mode without TaskList', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({
-      mode: 'agent',
-      taskSpawned: true
-    }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        mode: 'agent',
+        taskSpawned: true,
+      })
+    );
 
     const result = routingGuard.checkTaskListFirstGate('Task');
     assert.equal(result.pass, true);
@@ -399,13 +448,18 @@ describe('routing-guard.cjs - Check 9: Creator Intent Guard', () => {
   it('should block Task when creator intent detected but no creator skill', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({
-      creatorIntentDetected: true,
-      detectedCreatorType: 'skill',
-      requiredCreatorSkill: 'skill-creator'
-    }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        creatorIntentDetected: true,
+        detectedCreatorType: 'skill',
+        requiredCreatorSkill: 'skill-creator',
+      })
+    );
 
-    const result = routingGuard.checkCreatorIntentGuard('Task', { prompt: 'You are developer. Create file.' });
+    const result = routingGuard.checkCreatorIntentGuard('Task', {
+      prompt: 'You are developer. Create file.',
+    });
     assert.equal(result.pass, false);
     assert.match(result.message, /CREATOR ROUTING VIOLATION/);
   });
@@ -413,13 +467,16 @@ describe('routing-guard.cjs - Check 9: Creator Intent Guard', () => {
   it('should allow Task when creator skill included', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
-    fs.writeFileSync(stateFile, JSON.stringify({
-      creatorIntentDetected: true,
-      requiredCreatorSkill: 'skill-creator'
-    }));
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        creatorIntentDetected: true,
+        requiredCreatorSkill: 'skill-creator',
+      })
+    );
 
     const result = routingGuard.checkCreatorIntentGuard('Task', {
-      prompt: 'Invoke Skill({ skill: "skill-creator" }) to create.'
+      prompt: 'Invoke Skill({ skill: "skill-creator" }) to create.',
     });
     assert.equal(result.pass, true);
   });
@@ -434,7 +491,7 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
   it('should allow when no intent detected', () => {
     const result = routingGuard.checkIntentAgentMatch('Task', {
       subagent_type: 'developer',
-      prompt: 'Implement feature X.'
+      prompt: 'Implement feature X.',
     });
     assert.equal(result.pass, true);
   });
@@ -442,7 +499,7 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
   it('should warn when security intent detected but not security agent', () => {
     const result = routingGuard.checkIntentAgentMatch('Task', {
       subagent_type: 'developer',
-      prompt: 'Review authentication security and check for vulnerabilities.'
+      prompt: 'Review authentication security and check for vulnerabilities.',
     });
     assert.equal(result.pass, true);
     assert.equal(result.result, 'warn');
@@ -452,7 +509,7 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
   it('should allow when intent matches agent', () => {
     const result = routingGuard.checkIntentAgentMatch('Task', {
       subagent_type: 'security-architect',
-      prompt: 'Review authentication security and check for vulnerabilities.'
+      prompt: 'Review authentication security and check for vulnerabilities.',
     });
     assert.equal(result.pass, true);
   });
@@ -462,9 +519,11 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
     const { detectedSignals, suggestedAgents } = routingGuard.detectIntent(prompt);
 
     assert.ok(detectedSignals.length > 0);
-    assert.ok(suggestedAgents.includes('security-architect') ||
-              suggestedAgents.includes('qa') ||
-              suggestedAgents.includes('technical-writer'));
+    assert.ok(
+      suggestedAgents.includes('security-architect') ||
+        suggestedAgents.includes('qa') ||
+        suggestedAgents.includes('technical-writer')
+    );
   });
 });
 
@@ -476,7 +535,7 @@ describe('routing-guard.cjs - Check 11: Config Model Validator', () => {
 
   it('should allow when no model specified in spawn', () => {
     const result = routingGuard.checkConfigModelValidator('Task', {
-      prompt: 'You are developer.'
+      prompt: 'You are developer.',
     });
     assert.equal(result.pass, true);
   });
@@ -486,7 +545,7 @@ describe('routing-guard.cjs - Check 11: Config Model Validator', () => {
     // Test skipped if reader unavailable
     const result = routingGuard.checkConfigModelValidator('Task', {
       prompt: 'You are developer.',
-      model: 'claude-sonnet-4-5'
+      model: 'claude-sonnet-4-5',
     });
     // Allow pass regardless - validation logic tested in unit tests
     assert.ok(result.pass === true || result.pass === false);
@@ -498,7 +557,9 @@ describe('routing-guard.cjs - Check 11: Config Model Validator', () => {
   });
 
   it('should extract agent type from file path reference', () => {
-    const agentType = routingGuard.extractAgentTypeFromPrompt('Read .claude/agents/core/developer.md');
+    const agentType = routingGuard.extractAgentTypeFromPrompt(
+      'Read .claude/agents/core/developer.md'
+    );
     assert.equal(agentType, 'developer');
   });
 

@@ -1405,6 +1405,13 @@ async function main() {
       allowed_tools: allowedTools,
       model: selectedModel,
     };
+    // Preserve background task UX even when callers omit the flag.
+    if (
+      modifiedInput.run_in_background === undefined &&
+      modifiedInput.runInBackground === undefined
+    ) {
+      modifiedInput.run_in_background = true;
+    }
 
     try {
       const { logSpawnStart } = libRequire(path.join('monitoring', 'spawn-log.cjs'));

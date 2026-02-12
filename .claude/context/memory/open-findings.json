@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-02-12T09:02:00.217Z",
+  "findings": [
+    {
+      "fingerprint": "53f8b59952cd882a8a0e639fd160bd80244eeacc",
+      "summary": "Command injection bypass in validator",
+      "severity": "critical",
+      "status": "open",
+      "sourceReportPath": ".claude/context/reports/tmp-post-task-unified-findings.md",
+      "createdAt": "2026-02-12T08:45:34.919Z",
+      "lastSeenAt": "2026-02-12T09:02:00.217Z",
+      "timesSeen": 13,
+      "taskIds": [
+        "task-991"
+      ],
+      "agentTypes": [
+        "code-reviewer"
+      ]
+    }
+  ]
+}

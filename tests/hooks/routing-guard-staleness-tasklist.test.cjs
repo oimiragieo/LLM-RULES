@@ -73,7 +73,7 @@ describe('Fix 4b: applyStaleDetection', () => {
     assert.strictEqual(result.taskSpawned, false, 'Stale state should force taskSpawned false');
   });
 
-  it('should force router mode when lastReset is null', () => {
+  it('should preserve active agent state when lastReset is null (backward compatibility)', () => {
     assert.ok(routingGuard, 'Module should be loadable');
 
     const state = {
@@ -82,11 +82,15 @@ describe('Fix 4b: applyStaleDetection', () => {
       lastReset: null,
     };
     const result = routingGuard.applyStaleDetection(state);
-    assert.strictEqual(result.mode, 'router', 'No lastReset should force router mode');
-    assert.strictEqual(result.taskSpawned, false, 'No lastReset should force taskSpawned false');
+    assert.strictEqual(result.mode, 'agent', 'No lastReset should preserve active agent mode');
+    assert.strictEqual(
+      result.taskSpawned,
+      true,
+      'No lastReset should preserve taskSpawned for agent mode'
+    );
   });
 
-  it('should force router mode when lastReset is an invalid date string', () => {
+  it('should preserve active agent state when lastReset is invalid (backward compatibility)', () => {
     assert.ok(routingGuard, 'Module should be loadable');
 
     const state = {
@@ -95,8 +99,12 @@ describe('Fix 4b: applyStaleDetection', () => {
       lastReset: 'invalid-date',
     };
     const result = routingGuard.applyStaleDetection(state);
-    assert.strictEqual(result.mode, 'router', 'Invalid date should force router mode');
-    assert.strictEqual(result.taskSpawned, false, 'Invalid date should force taskSpawned false');
+    assert.strictEqual(result.mode, 'agent', 'Invalid date should preserve active agent mode');
+    assert.strictEqual(
+      result.taskSpawned,
+      true,
+      'Invalid date should preserve taskSpawned for agent mode'
+    );
   });
 
   it('should respect STATE_STALE_THRESHOLD_MS env var override', () => {

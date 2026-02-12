@@ -104,6 +104,45 @@ function writeObservationalMemory(root, { summaryLength = 120, count = 3 } = {})
   fs.writeFileSync(path.join(memoryDir, 'observations.jsonl'), lines.join('\n') + '\n', 'utf8');
 }
 
+function writeOpenFindings(root) {
+  const memoryDir = path.join(root, '.claude', 'context', 'memory');
+  fs.mkdirSync(memoryDir, { recursive: true });
+  const payload = {
+    generatedAt: '2026-02-12T00:00:00.000Z',
+    findings: [
+      {
+        fingerprint: 'abc123',
+        summary: 'Command injection gap in shell validator',
+        severity: 'critical',
+        status: 'open',
+        sourceReportPath: '.claude/context/reports/security-audit.md',
+        lastSeenAt: '2026-02-12T00:00:00.000Z',
+      },
+      {
+        fingerprint: 'def456',
+        summary: 'TaskUpdate sequencing regression in router flow',
+        severity: 'high',
+        status: 'open',
+        sourceReportPath: '.claude/context/reports/codebase-audit.md',
+        lastSeenAt: '2026-02-12T00:00:00.000Z',
+      },
+      {
+        fingerprint: 'ghi789',
+        summary: 'Minor docs cleanup pending',
+        severity: 'low',
+        status: 'open',
+        sourceReportPath: '.claude/context/reports/docs-audit.md',
+        lastSeenAt: '2026-02-12T00:00:00.000Z',
+      },
+    ],
+  };
+  fs.writeFileSync(
+    path.join(memoryDir, 'open-findings.json'),
+    JSON.stringify(payload, null, 2),
+    'utf8'
+  );
+}
+
 function sectionBetween(text, startMarker, endMarker) {
   const start = text.indexOf(startMarker);
   if (start === -1) return '';
@@ -438,6 +477,64 @@ test('assembleSpawnPrompt records memory cache stability churn metrics', () => {
     assert.equal(typeof last.memory_block_hash, 'string');
     assert.equal(typeof last.churned, 'boolean');
     assert.equal(last.churned, true);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test('memory section includes open findings carryover when registry has unresolved findings', () => {
+  const root = createTempRoot();
+  try {
+    writeObservationalMemory(root, { summaryLength: 120, count: 2 });
+    writeOpenFindings(root);
+
+    const output = withEnv(
+      {
+        MEMORY_MODE: 'observational',
+        OBSERVATIONAL_MEMORY_ENABLED: 'on',
+      },
+      () =>
+        assembleSpawnPrompt({
+          agentType: 'developer',
+          allowedTools: ['Read', 'TaskUpdate', 'TaskList', 'Skill'],
+          basePrompt: BASE_PROMPT,
+          includeMemory: true,
+          projectRoot: root,
+        })
+    );
+
+    assert.ok(output.includes('### Open Findings Carryover'));
+    assert.ok(output.includes('Command injection gap in shell validator'));
+    assert.ok(output.includes('TaskUpdate sequencing regression in router flow'));
+    assert.ok(!output.includes('Minor docs cleanup pending'));
+  } finally {
+    cleanup(root);
+  }
+});
+
+test('open findings carryover severity filter can be lowered via env override', () => {
+  const root = createTempRoot();
+  try {
+    writeObservationalMemory(root, { summaryLength: 120, count: 2 });
+    writeOpenFindings(root);
+
+    const output = withEnv(
+      {
+        MEMORY_MODE: 'observational',
+        OBSERVATIONAL_MEMORY_ENABLED: 'on',
+        OPEN_FINDINGS_MIN_SEVERITY: 'low',
+      },
+      () =>
+        assembleSpawnPrompt({
+          agentType: 'developer',
+          allowedTools: ['Read', 'TaskUpdate', 'TaskList', 'Skill'],
+          basePrompt: BASE_PROMPT,
+          includeMemory: true,
+          projectRoot: root,
+        })
+    );
+
+    assert.ok(output.includes('Minor docs cleanup pending'));
   } finally {
     cleanup(root);
   }

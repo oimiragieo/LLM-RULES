@@ -675,6 +675,20 @@ Observational and Tier B sections are capped independently (estimated tokens = c
 
 The Tier B cap applies to semantic/query/entity memory subsections appended by the spawn hook.
 
+### Open findings lifecycle
+
+Audit report findings can now be promoted into structured memory and carried across sessions:
+
+- Registry file: `.claude/context/memory/open-findings.json`
+- Ingestion path: `post-task-unified.cjs` ingests expected report artifacts after successful completion checks
+- Resolution path: completion output with fix cues can transition matching findings from `open` to `resolved`
+- Prompt carryover: spawn memory includes an `Open Findings Carryover` section for unresolved items
+
+Severity filtering for carryover defaults to `high` and is configurable:
+
+- `OPEN_FINDINGS_MIN_SEVERITY=high` (default)
+- Accepted values: `critical`, `high`, `medium`, `low`
+
 ### SessionEnd compaction
 
 SessionEnd can compact recent observations into a stable summary file used by observational mode:

@@ -219,6 +219,13 @@ const EVENTS_FILE = path.join(METRICS_DIR, 'execution-limit-events.jsonl');
 const EXECUTION_LIMIT_EVENTS_MAX_LINES = Number(
   process.env.EXECUTION_LIMIT_EVENTS_MAX_LINES || 2000
 );
+const TASKUPDATE_FIRST_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'taskupdate-first-state.json'
+);
 
 const LOCK_SUFFIX = '.lock';
 const MAX_LOCK_WAIT_MS = 2000;
@@ -592,7 +599,134 @@ function checkToolScope(hookInput, toolName) {
 }
 
 // =============================================================================
-// Check 4: Read Safety Guard (prevents EISDIR and large unchunked reads)
+// Check 4: TaskUpdate-first Guard (agent sessions must mark in_progress first)
+// =============================================================================
+
+const TASKUPDATE_FIRST_WINDOW_MS = Number(
+  process.env.TASKUPDATE_FIRST_WINDOW_MS || 24 * 60 * 60 * 1000
+);
+
+function readTaskUpdateFirstState(stateFile = TASKUPDATE_FIRST_STATE_FILE) {
+  try {
+    if (!fs.existsSync(stateFile)) return { sessions: {} };
+    const parsed = safeParseJSON(fs.readFileSync(stateFile, 'utf8'), null);
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      !parsed.sessions ||
+      typeof parsed.sessions !== 'object'
+    ) {
+      return { sessions: {} };
+    }
+    return parsed;
+  } catch (_err) {
+    return { sessions: {} };
+  }
+}
+
+function writeTaskUpdateFirstState(state, stateFile = TASKUPDATE_FIRST_STATE_FILE) {
+  try {
+    ensureDir(path.dirname(stateFile));
+    atomicWriteJSONSync(stateFile, state);
+  } catch (_err) {
+    // Best-effort state tracking only.
+  }
+}
+
+function pruneTaskUpdateFirstState(state, now = Date.now()) {
+  const sessions = state && typeof state === 'object' ? state.sessions || {} : {};
+  const pruned = {};
+  for (const [sessionId, entry] of Object.entries(sessions)) {
+    const updatedAt = Number(entry?.updatedAt || 0);
+    if (updatedAt > 0 && now - updatedAt <= TASKUPDATE_FIRST_WINDOW_MS) {
+      pruned[sessionId] = entry;
+    }
+  }
+  return { sessions: pruned };
+}
+
+function extractTaskUpdateStatus(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return null;
+  const raw = toolInput.status ?? toolInput.state ?? null;
+  if (raw == null) return null;
+  return String(raw).trim().toLowerCase();
+}
+
+function extractTaskUpdateTaskId(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return null;
+  const raw = toolInput.taskId ?? toolInput.task_id ?? toolInput.id ?? null;
+  if (raw == null) return null;
+  return String(raw).trim();
+}
+
+function isAgentScopedSession(hookInput) {
+  const allowedTools = Array.isArray(hookInput?.allowed_tools) ? hookInput.allowed_tools : [];
+  if (allowedTools.includes('TaskUpdate')) return true;
+
+  // Some Claude runs omit allowed_tools in downstream subagent tool hooks.
+  // Fall back to task identifiers to keep TaskUpdate-first enforcement active.
+  const scopedTaskId = hookInput?.task_id || hookInput?.taskId || null;
+  if (typeof scopedTaskId === 'string' && scopedTaskId.trim().length > 0) return true;
+
+  return false;
+}
+
+function checkTaskUpdateFirst(
+  hookInput,
+  toolName,
+  toolInput,
+  stateFile = TASKUPDATE_FIRST_STATE_FILE
+) {
+  const mode = (process.env.TASKUPDATE_FIRST_ENFORCEMENT || 'block').toLowerCase();
+  if (mode === 'off') return { checked: false, reason: 'disabled' };
+  if (!isAgentScopedSession(hookInput)) return { checked: false, reason: 'not_agent_session' };
+
+  const sessionId =
+    hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || null;
+  if (!sessionId) return { checked: false, reason: 'missing_session' };
+
+  const now = Date.now();
+  const current = pruneTaskUpdateFirstState(readTaskUpdateFirstState(stateFile), now);
+  const currentEntry = current.sessions[sessionId] || {
+    inProgress: false,
+    taskId: null,
+    updatedAt: 0,
+  };
+
+  if (toolName === 'TaskUpdate') {
+    const status = extractTaskUpdateStatus(toolInput);
+    const taskId = extractTaskUpdateTaskId(toolInput);
+    if (status === 'in_progress' || status === 'in-progress' || status === 'completed') {
+      current.sessions[sessionId] = {
+        inProgress: true,
+        taskId: taskId || currentEntry.taskId || null,
+        updatedAt: now,
+      };
+      writeTaskUpdateFirstState(current, stateFile);
+    }
+    return { checked: true, action: 'allow' };
+  }
+
+  if (currentEntry.inProgress === true) {
+    current.sessions[sessionId] = {
+      ...currentEntry,
+      updatedAt: now,
+    };
+    writeTaskUpdateFirstState(current, stateFile);
+    return { checked: true, action: 'allow' };
+  }
+
+  const message =
+    '[TASKUPDATE-FIRST] Agent must call TaskUpdate({ taskId, status: "in_progress" }) ' +
+    `before using ${toolName}.`;
+  if (mode === 'warn') {
+    return { checked: true, action: 'allow', warning: message };
+  }
+  return { checked: true, action: 'block', message };
+}
+
+// =============================================================================
+// Check 5: Read Safety Guard (prevents EISDIR and large unchunked reads)
 // =============================================================================
 
 const READ_CHUNK_GUARD_BYTES = Number(process.env.READ_CHUNK_GUARD_BYTES || 120000);
@@ -610,6 +744,7 @@ const READ_DIR_LISTING_PATH = path.join(
   'runtime',
   'read-safety-dir-listing.txt'
 );
+const READ_DIR_LISTING_MAX_ATTEMPTS = 5;
 
 function hasReadWindow(toolInput) {
   if (!toolInput || typeof toolInput !== 'object') return false;
@@ -746,8 +881,35 @@ function createDirectoryListingFile(targetDir) {
     }
     lines.push('');
     ensureDir(path.dirname(READ_DIR_LISTING_PATH));
-    fs.writeFileSync(READ_DIR_LISTING_PATH, lines.join('\n'), 'utf8');
-    return READ_DIR_LISTING_PATH;
+
+    for (let attempt = 0; attempt < READ_DIR_LISTING_MAX_ATTEMPTS; attempt += 1) {
+      const candidatePath =
+        attempt === 0
+          ? READ_DIR_LISTING_PATH
+          : path.join(
+              path.dirname(READ_DIR_LISTING_PATH),
+              `read-safety-dir-listing-${process.pid}-${Date.now()}-${attempt}.txt`
+            );
+
+      try {
+        if (fs.existsSync(candidatePath)) {
+          const candidateStats = fs.statSync(candidatePath);
+          if (candidateStats.isDirectory()) {
+            continue;
+          }
+        }
+
+        fs.writeFileSync(candidatePath, lines.join('\n'), 'utf8');
+        const writtenStats = fs.statSync(candidatePath);
+        if (!writtenStats.isDirectory()) {
+          return candidatePath;
+        }
+      } catch (_candidateErr) {
+        // Try next candidate path.
+      }
+    }
+
+    return null;
   } catch (_err) {
     return null;
   }
@@ -790,6 +952,26 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       if (isBypassPermissionsMode(hookInput)) {
         const listingPath = createDirectoryListingFile(targetPath);
         if (listingPath) {
+          try {
+            const listingStats = fs.statSync(listingPath);
+            if (listingStats.isDirectory()) {
+              return {
+                checked: true,
+                action: 'block',
+                message:
+                  `[READ SAFETY][bypass] Generated listing path "${listingPath}" is a directory. ` +
+                  'Retry with Glob/rg --files and Read a concrete file.',
+              };
+            }
+          } catch (_statErr) {
+            return {
+              checked: true,
+              action: 'block',
+              message:
+                `[READ SAFETY][bypass] Generated listing path "${listingPath}" is unavailable. ` +
+                'Retry with Glob/rg --files and Read a concrete file.',
+            };
+          }
           const rewritten = { ...(toolInput || {}) };
           rewritten.file_path = listingPath;
           rewritten.filePath = listingPath;
@@ -805,10 +987,10 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
         }
         return {
           checked: true,
-          action: 'allow',
-          bypassWarning:
+          action: 'block',
+          message:
             `[READ SAFETY][bypass] "${targetPath}" is a directory. ` +
-            'Use Glob/rg --files for directory listing, then Read a specific file.',
+            'Unable to generate directory listing file safely. Use Glob/rg --files for directory listing, then Read a specific file.',
         };
       }
       return {
@@ -900,7 +1082,27 @@ async function main() {
       process.exit(2);
     }
 
-    // Check 4: Read Safety Guard
+    // Check 4: TaskUpdate-first Guard
+    const taskUpdateFirst = checkTaskUpdateFirst(hookInput, toolName, toolInput);
+    if (taskUpdateFirst.action === 'block') {
+      console.log(formatResult('block', taskUpdateFirst.message));
+      try {
+        eventBus.emit(EventTypes.TOOL_BLOCKED, {
+          type: EventTypes.TOOL_BLOCKED,
+          timestamp: new Date().toISOString(),
+          toolName,
+          reason: 'taskupdate_first_violation',
+        });
+      } catch (_err) {
+        // Best-effort
+      }
+      process.exit(2);
+    }
+    if (taskUpdateFirst.warning) {
+      console.warn(`[pre-tool-unified:taskupdate-first] ${taskUpdateFirst.warning}`);
+    }
+
+    // Check 5: Read Safety Guard
     const readSafety = checkReadSafety(toolName, toolInput, hookInput);
     if (readSafety.action === 'block') {
       console.log(formatResult('block', readSafety.message));
@@ -948,6 +1150,13 @@ module.exports = {
   cleanupMemoryTempFiles,
   checkExecutionLimit,
   checkToolScope,
+  checkTaskUpdateFirst,
+  readTaskUpdateFirstState,
+  writeTaskUpdateFirstState,
+  pruneTaskUpdateFirstState,
+  extractTaskUpdateStatus,
+  extractTaskUpdateTaskId,
+  isAgentScopedSession,
   checkReadSafety,
   hasReadWindow,
   resolveReadPath,

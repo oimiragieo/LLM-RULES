@@ -19,6 +19,7 @@ const {
 describe('pre-tool-unified read safety', () => {
   const reflectionRuntimeDir = path.join(__dirname, '..', '..', '.claude', 'context', 'runtime');
   const reportsDir = path.join(__dirname, '..', '..', '.claude', 'context', 'reports');
+  const defaultDirListingPath = path.join(reflectionRuntimeDir, 'read-safety-dir-listing.txt');
   const reminderPath = path.join(reflectionRuntimeDir, 'reflection-reminder.txt');
   const spawnRequestPath = path.join(reflectionRuntimeDir, 'reflection-spawn-request.json');
 
@@ -32,6 +33,33 @@ describe('pre-tool-unified read safety', () => {
         fs.writeFileSync(filePath, previous, 'utf8');
       } else if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
+      }
+    }
+  }
+
+  function withPathRestored(filePath, fn) {
+    const existed = fs.existsSync(filePath);
+    const stats = existed ? fs.statSync(filePath) : null;
+    const previous = existed && !stats.isDirectory() ? fs.readFileSync(filePath, 'utf8') : null;
+
+    try {
+      fn();
+    } finally {
+      try {
+        if (fs.existsSync(filePath)) {
+          fs.rmSync(filePath, { recursive: true, force: true });
+        }
+      } catch (_err) {
+        // Best effort restoration.
+      }
+
+      if (existed) {
+        if (stats && stats.isDirectory()) {
+          fs.mkdirSync(filePath, { recursive: true });
+        } else {
+          fs.mkdirSync(path.dirname(filePath), { recursive: true });
+          fs.writeFileSync(filePath, previous || '', 'utf8');
+        }
       }
     }
   }
@@ -244,6 +272,43 @@ describe('pre-tool-unified read safety', () => {
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
+  });
+
+  test('createDirectoryListingFile falls back when default listing path is a directory', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-listing-fallback-'));
+    withPathRestored(defaultDirListingPath, () => {
+      if (fs.existsSync(defaultDirListingPath)) {
+        fs.rmSync(defaultDirListingPath, { recursive: true, force: true });
+      }
+      fs.mkdirSync(defaultDirListingPath, { recursive: true });
+      fs.writeFileSync(path.join(tempDir, 'x.txt'), 'x', 'utf8');
+
+      const listingPath = createDirectoryListingFile(tempDir);
+      assert.ok(listingPath);
+      assert.notStrictEqual(path.resolve(listingPath), path.resolve(defaultDirListingPath));
+      assert.strictEqual(fs.statSync(listingPath).isDirectory(), false);
+    });
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test('checkReadSafety rewrite target is always a file for directory reads in bypass mode', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-rewrite-file-'));
+    withPathRestored(defaultDirListingPath, () => {
+      if (fs.existsSync(defaultDirListingPath)) {
+        fs.rmSync(defaultDirListingPath, { recursive: true, force: true });
+      }
+      fs.mkdirSync(defaultDirListingPath, { recursive: true });
+      const result = checkReadSafety(
+        'Read',
+        { file_path: tempDir },
+        { permission_mode: 'bypassPermissions' }
+      );
+
+      assert.strictEqual(result.action, 'rewrite');
+      assert.ok(result.rewrittenToolInput);
+      assert.strictEqual(fs.statSync(result.rewrittenToolInput.file_path).isDirectory(), false);
+    });
+    fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
   test('cleanupMemoryTempFiles removes stale .tmp artifacts but keeps normal files', () => {

@@ -580,6 +580,31 @@ Check for user preferences and past routing patterns.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
 
+### Observational Memory Controls
+
+- `MEMORY_MODE=hybrid|observational` (default `hybrid`)
+- `OBSERVATIONAL_MEMORY_ENABLED=on|off` (default `on`, acts as kill switch)
+- If `OBSERVATIONAL_MEMORY_ENABLED=off`, use hybrid behavior even when `MEMORY_MODE=observational`.
+
+**Tier rules:**
+
+- Tier A is the default memory path.
+- Tier B memory enrichment runs only when `memory_depth=true` or prompt intent is exploratory/debug/high-uncertainty.
+
+**Token budgets (section caps):**
+
+- `MEMORY_SUMMARY_BLOCK_MAX_TOKENS` (default `400`)
+- `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS` (default `400`)
+- `MEMORY_TIER_B_MAX_TOKENS` (default `400`)
+
+**Fallback behavior:**
+
+- If observational files are missing/empty, prompt assembly falls back to legacy memory formatting (no hard failure).
+
+**Task tracking invariant:**
+
+- Memory mode never overrides task protocol. Subagents still must call `TaskUpdate(in_progress)` before work and `TaskUpdate(completed)` before `TaskList()`.
+
 ## Hybrid Search Policy (Mandatory)
 
 - Default to `pnpm search:code "<query>"` for code discovery and broad matching.

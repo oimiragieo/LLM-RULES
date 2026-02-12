@@ -37,16 +37,21 @@ const DANGEROUS_PATTERNS = [
     reason: 'Vertical tab, form feed, null bytes can bypass line break detection',
   },
   {
-    // FIX HIGH-001: Block ALL shell expansions (parameter and arithmetic)
-    // Stricter pattern: ${ or $( catches both parameter expansion and arithmetic expansion
-    pattern: /\$[({]/,
-    name: 'Shell expansion (parameter or arithmetic)',
-    reason: 'All shell expansions can execute arbitrary code or hide payloads',
+    // Block command substitution but allow arithmetic expansion ($((...))).
+    pattern: /\$\((?!\()/,
+    name: 'Command substitution',
+    reason: 'Command substitution can execute arbitrary code',
+  },
+  {
+    // Parameter expansion can hide payloads and bypass token-based validation.
+    pattern: /\$\{[^}]*\}/,
+    name: 'Parameter expansion',
+    reason: 'Parameter expansion can hide payloads',
   },
   {
     // FIX HIGH-001: Block ANSI-C quoting ANYWHERE in command (not just at start)
     pattern: /\$'[^']*'/,
-    name: 'ANSI-C quoting (anywhere)',
+    name: 'ANSI-C quoting',
     reason: 'ANSI-C quoting can bypass tokenizer via hex escapes anywhere in command',
   },
   {

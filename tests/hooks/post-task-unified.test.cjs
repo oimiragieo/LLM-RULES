@@ -446,6 +446,95 @@ describe('post-task-unified.cjs', () => {
       assert.ok(queueContent.includes('task-42'));
       assert.ok(queueContent.includes('missing_taskupdate_completed'));
     });
+
+    it('ingestExpectedReportFindings parses and stores unresolved findings from completed report artifacts', () => {
+      const rel = '.claude/context/reports/tmp-post-task-unified-findings.md';
+      const abs = path.join(unifiedHook.PROJECT_ROOT, rel);
+      const dir = path.dirname(abs);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(
+        abs,
+        ['# Audit', 'P0 — Critical', '1. Command injection bypass in validator'].join('\n'),
+        'utf8'
+      );
+
+      try {
+        const result = unifiedHook.ingestExpectedReportFindings([rel], {
+          taskId: 'task-991',
+          agentType: 'code-reviewer',
+        });
+        assert.equal(typeof result.ingested, 'number');
+        assert.equal(result.errors.length, 0);
+
+        const findingsPath = path.join(
+          unifiedHook.PROJECT_ROOT,
+          '.claude',
+          'context',
+          'memory',
+          'open-findings.json'
+        );
+        assert.equal(fs.existsSync(findingsPath), true);
+        const payload = JSON.parse(fs.readFileSync(findingsPath, 'utf8'));
+        assert.equal(Array.isArray(payload.findings), true);
+        assert.equal(
+          payload.findings.some(f => String(f.summary).includes('Command injection')),
+          true
+        );
+      } finally {
+        fs.unlinkSync(abs);
+      }
+    });
+
+    it('resolveFindingsFromTaskCompletion marks matching findings as resolved from completion output', () => {
+      const findingsPath = path.join(
+        unifiedHook.PROJECT_ROOT,
+        '.claude',
+        'context',
+        'memory',
+        'open-findings.json'
+      );
+      const findingsDir = path.dirname(findingsPath);
+      if (!fs.existsSync(findingsDir)) fs.mkdirSync(findingsDir, { recursive: true });
+
+      const original = fs.existsSync(findingsPath) ? fs.readFileSync(findingsPath, 'utf8') : null;
+      fs.writeFileSync(
+        findingsPath,
+        JSON.stringify(
+          {
+            generatedAt: new Date().toISOString(),
+            findings: [
+              {
+                fingerprint: 'xyz123',
+                summary: 'Command injection gap in shell validator',
+                severity: 'critical',
+                status: 'open',
+                lastSeenAt: new Date().toISOString(),
+              },
+            ],
+          },
+          null,
+          2
+        ),
+        'utf8'
+      );
+
+      try {
+        const result = unifiedHook.resolveFindingsFromTaskCompletion(
+          'Fixed and patched shell validator command injection gap, added regression tests.',
+          {
+            taskId: 'task-2001',
+            agentType: 'developer',
+          }
+        );
+        assert.equal(result.resolved, 1);
+
+        const payload = JSON.parse(fs.readFileSync(findingsPath, 'utf8'));
+        assert.equal(payload.findings[0].status, 'resolved');
+      } finally {
+        if (original === null) fs.unlinkSync(findingsPath);
+        else fs.writeFileSync(findingsPath, original, 'utf8');
+      }
+    });
   });
 
   describe('Evolution Audit', () => {

@@ -1,0 +1,2506 @@
+[
+  {
+    "text": "worker-W0-pattern-0",
+    "timestamp": "2026-02-12T05:17:13.730Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "27fda41e9e41935cb78c76a7e3e677748fbd0630"
+  },
+  {
+    "text": "worker-W1-pattern-0",
+    "timestamp": "2026-02-12T05:17:13.957Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a5b2c935dd9d73dae6d93bea33c6d3d5248cda7c"
+  },
+  {
+    "text": "worker-W0-pattern-1",
+    "timestamp": "2026-02-12T05:17:14.131Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "224227c327fc52313719f4acb4bdd89fdbff4a06"
+  },
+  {
+    "text": "worker-W2-pattern-0",
+    "timestamp": "2026-02-12T05:17:14.209Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "7f0617ffef03c845806591735e92753e43366a0a"
+  },
+  {
+    "text": "worker-W1-pattern-1",
+    "timestamp": "2026-02-12T05:17:14.352Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2b0cf4e7b799903cada9d3280cb5e325f922bd4e"
+  },
+  {
+    "text": "worker-W3-pattern-0",
+    "timestamp": "2026-02-12T05:17:14.497Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c505ac081581d10c33d8fce97c855861d997770f"
+  },
+  {
+    "text": "worker-W2-pattern-1",
+    "timestamp": "2026-02-12T05:17:14.685Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "7cdf3b0e074bcc3582a45e9c3eaf17c0691a650d"
+  },
+  {
+    "text": "worker-W1-pattern-2",
+    "timestamp": "2026-02-12T05:17:14.902Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "5c095c06a41633a18f80c2bc9b0a86c73659089f"
+  },
+  {
+    "text": "worker-W0-pattern-2",
+    "timestamp": "2026-02-12T05:17:14.969Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "beb2dd4e883a9c4edc22bd8e80f17cc4e20778d0"
+  },
+  {
+    "text": "worker-W3-pattern-1",
+    "timestamp": "2026-02-12T05:17:15.031Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0fa4c7cdda815cc3a1a1b78d4832052fdebb54e5"
+  },
+  {
+    "text": "worker-W2-pattern-2",
+    "timestamp": "2026-02-12T05:17:15.371Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "94c2872b50c2c993871d8301f45ec07dfb2650be"
+  },
+  {
+    "text": "worker-W1-pattern-3",
+    "timestamp": "2026-02-12T05:17:15.429Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "78c732b1683ecaced63e38c5752cbb5f145d0076"
+  },
+  {
+    "text": "worker-W0-pattern-3",
+    "timestamp": "2026-02-12T05:17:15.467Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a57c1a46409237975e373c716f4aac29445639b6"
+  },
+  {
+    "text": "worker-W7-pattern-0",
+    "timestamp": "2026-02-12T05:17:15.546Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2406bce0542a1b168ad67b5306d356f7617f9e7f"
+  },
+  {
+    "text": "worker-W4-pattern-0",
+    "timestamp": "2026-02-12T05:17:15.628Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d7379724b88eef7d89cd4ee33409001771ec84c3"
+  },
+  {
+    "text": "worker-W3-pattern-2",
+    "timestamp": "2026-02-12T05:17:15.675Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1bfe158e4894505f86ebb70516ec9e7cb68c44a2"
+  },
+  {
+    "text": "worker-W8-pattern-0",
+    "timestamp": "2026-02-12T05:17:15.733Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f3e101f4b0916936306d3e11a7af9307a5411dd8"
+  },
+  {
+    "text": "worker-W2-pattern-3",
+    "timestamp": "2026-02-12T05:17:15.808Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f09e8c7a4b78e5df254e9e272f72b08f704b08e7"
+  },
+  {
+    "text": "worker-W6-pattern-0",
+    "timestamp": "2026-02-12T05:17:15.864Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "62395b31deb1d525b575b75afa633af5bdac6a7a"
+  },
+  {
+    "text": "worker-W9-pattern-0",
+    "timestamp": "2026-02-12T05:17:15.926Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "14d226a7063dc91904fe05475630b1c086827ea6"
+  },
+  {
+    "text": "worker-W2-pattern-4",
+    "timestamp": "2026-02-12T05:17:16.188Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "89e189f3d61b75d85d36e1960025c22564c30c8b"
+  },
+  {
+    "text": "worker-W1-pattern-4",
+    "timestamp": "2026-02-12T05:17:16.242Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d1743e937fc16e3b3563848d9243da52527f4a33"
+  },
+  {
+    "text": "worker-W3-pattern-3",
+    "timestamp": "2026-02-12T05:17:16.298Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "05099503663c29281723c3026964abde1a2ab4c3"
+  },
+  {
+    "text": "worker-W7-pattern-1",
+    "timestamp": "2026-02-12T05:17:16.349Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "20e4a6a89ade1dba896f7895fd6038836d516b70"
+  },
+  {
+    "text": "worker-W4-pattern-1",
+    "timestamp": "2026-02-12T05:17:16.447Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "62c297a70676ca584d78885615444a1d32a0e120"
+  },
+  {
+    "text": "worker-W5-pattern-0",
+    "timestamp": "2026-02-12T05:17:16.507Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "202bb479e5a28e188ae398bcfc7b6d42574e306c"
+  },
+  {
+    "text": "worker-W9-pattern-1",
+    "timestamp": "2026-02-12T05:17:16.656Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2786095e229e907d86aa91dae40fce0a8f5a95f7"
+  },
+  {
+    "text": "worker-W4-pattern-2",
+    "timestamp": "2026-02-12T05:17:16.941Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c730a9be95d454dea84fb1dc72c2a8577efe88e9"
+  },
+  {
+    "text": "worker-W7-pattern-2",
+    "timestamp": "2026-02-12T05:17:17.005Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6beb5dda738d91db66b58638d9df602fb8ef5d25"
+  },
+  {
+    "text": "worker-W3-pattern-4",
+    "timestamp": "2026-02-12T05:17:17.211Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1bb7dc517ef14eb89e60f54c00bf6528fdd1030b"
+  },
+  {
+    "text": "worker-W7-pattern-3",
+    "timestamp": "2026-02-12T05:17:17.463Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8cfd433d769635ce0c8a9c01d67a36e5dab4d6c5"
+  },
+  {
+    "text": "worker-W9-pattern-2",
+    "timestamp": "2026-02-12T05:17:17.745Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8cbd5e0ec5366163c6a45abf90e97edf2840d617"
+  },
+  {
+    "text": "worker-W7-pattern-4",
+    "timestamp": "2026-02-12T05:17:18.175Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "91d628bcb01a8f71244dd0730b3c911968de39cb"
+  },
+  {
+    "text": "worker-W3-pattern-5",
+    "timestamp": "2026-02-12T05:17:18.235Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "80ae26ad943f66d2f4e0eda371a3d7d611613fcb"
+  },
+  {
+    "text": "worker-W4-pattern-3",
+    "timestamp": "2026-02-12T05:17:18.300Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "55d1630b9cc464246ca83fdf78f5923b12343453"
+  },
+  {
+    "text": "worker-W2-pattern-5",
+    "timestamp": "2026-02-12T05:17:18.352Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d179e7f93b61dd5a8073f63aad87a38c0061f838"
+  },
+  {
+    "text": "worker-W5-pattern-1",
+    "timestamp": "2026-02-12T05:17:18.410Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "ddfa54fe75ef7fcc3391ba46b0748b4c0b2fd44c"
+  },
+  {
+    "text": "worker-W8-pattern-1",
+    "timestamp": "2026-02-12T05:17:18.470Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1ec621ac3cf3e2996ea498bd1eb3a2ca111880a5"
+  },
+  {
+    "text": "worker-W7-pattern-5",
+    "timestamp": "2026-02-12T05:17:18.929Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "713834afb9ddd58382f8068b87cc730bf22ec67d"
+  },
+  {
+    "text": "worker-W0-pattern-4",
+    "timestamp": "2026-02-12T05:17:18.993Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "e482e5e4f20880a0fa9f3be41a132606b1331d7d"
+  },
+  {
+    "text": "worker-W9-pattern-3",
+    "timestamp": "2026-02-12T05:17:19.053Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "01622699cf49629c2a74bb0e0f84b381244c6250"
+  },
+  {
+    "text": "worker-W1-pattern-5",
+    "timestamp": "2026-02-12T05:17:19.119Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0f15fcd1cb8ef892730a050a011c962071c28b75"
+  },
+  {
+    "text": "worker-W5-pattern-2",
+    "timestamp": "2026-02-12T05:17:19.177Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "47104125998ba5943641939b2c63a481430706ca"
+  },
+  {
+    "text": "worker-W2-pattern-6",
+    "timestamp": "2026-02-12T05:17:19.241Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c2e97a3b121b58ecc980e079ed4bc272cba3f465"
+  },
+  {
+    "text": "worker-W4-pattern-4",
+    "timestamp": "2026-02-12T05:17:19.305Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "40f2a91e7d0164d25b6c703bc3db943e1746f90d"
+  },
+  {
+    "text": "worker-W6-pattern-1",
+    "timestamp": "2026-02-12T05:17:19.393Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c5510f0cb7ea48b7d47c78a13dfc350fe95b421f"
+  },
+  {
+    "text": "worker-W4-pattern-5",
+    "timestamp": "2026-02-12T05:17:19.801Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "61f6e90ae9253301c8da1701df5f5f9df1d7994e"
+  },
+  {
+    "text": "worker-W3-pattern-6",
+    "timestamp": "2026-02-12T05:17:20.444Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b8f150f24094fde5e2ded2448ca5cd820e56c498"
+  },
+  {
+    "text": "worker-W5-pattern-3",
+    "timestamp": "2026-02-12T05:17:20.508Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "262a57eba64fb97ac9bad070dfae4d86af2249f6"
+  },
+  {
+    "text": "worker-W9-pattern-4",
+    "timestamp": "2026-02-12T05:17:20.565Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "cb246dc292a99368a621457b8d70e6a430bef0e0"
+  },
+  {
+    "text": "worker-W2-pattern-7",
+    "timestamp": "2026-02-12T05:17:20.620Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b7c35df2dcd245f30cfea8edf41f2b3f93c1fb07"
+  },
+  {
+    "text": "worker-W8-pattern-2",
+    "timestamp": "2026-02-12T05:17:20.683Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1f6e47e12e54528533ea9f1790fa336bccc39ef1"
+  },
+  {
+    "text": "worker-W7-pattern-6",
+    "timestamp": "2026-02-12T05:17:20.746Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "61bb70f3ccaa54c9a627b8cec4763db49c22b449"
+  },
+  {
+    "text": "worker-W1-pattern-6",
+    "timestamp": "2026-02-12T05:17:20.817Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "15321a6a654d79f5e49fbf86f84f85a9f35eb539"
+  },
+  {
+    "text": "worker-W6-pattern-2",
+    "timestamp": "2026-02-12T05:17:20.947Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "5fab4083579fe5a4aae928ef93eec9a236acd743"
+  },
+  {
+    "text": "worker-W8-pattern-3",
+    "timestamp": "2026-02-12T05:17:21.717Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "01ec5e7c33bacad97acb580adb52154124afc105"
+  },
+  {
+    "text": "worker-W4-pattern-6",
+    "timestamp": "2026-02-12T05:17:21.773Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "bb3241106bc762a5cbb82be21b609af92f26ebb9"
+  },
+  {
+    "text": "worker-W5-pattern-4",
+    "timestamp": "2026-02-12T05:17:21.828Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "3dc5e14e1d08528dd85a5714c6cbbfe1218d6bf6"
+  },
+  {
+    "text": "worker-W7-pattern-7",
+    "timestamp": "2026-02-12T05:17:21.890Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "20543f611fd7d835cb18754aac037a3f19b81bd6"
+  },
+  {
+    "text": "worker-W0-pattern-5",
+    "timestamp": "2026-02-12T05:17:21.943Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "e9cb18b316275be99f4d0bd8c065f0a2bfb88fa5"
+  },
+  {
+    "text": "worker-W2-pattern-8",
+    "timestamp": "2026-02-12T05:17:22.002Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "4caf7c79e78d6821a807b4cc2404c4fffea9904e"
+  },
+  {
+    "text": "worker-W1-pattern-7",
+    "timestamp": "2026-02-12T05:17:22.067Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "788b01443d6876358c05dc5dc5336ec8d7625a78"
+  },
+  {
+    "text": "worker-W9-pattern-5",
+    "timestamp": "2026-02-12T05:17:22.147Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "ffc8cb0200e4d5a6a9244eac85d500711253057a"
+  },
+  {
+    "text": "worker-W3-pattern-7",
+    "timestamp": "2026-02-12T05:17:22.198Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0ba58f543cc1ac919dd9469598a65098b056d159"
+  },
+  {
+    "text": "worker-W6-pattern-3",
+    "timestamp": "2026-02-12T05:17:22.416Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8448b8809df3be4659e8db94e8bf77ff0d97a2f0"
+  },
+  {
+    "text": "worker-W1-pattern-8",
+    "timestamp": "2026-02-12T05:17:23.252Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "eee35a0cb6757c5606f42d7c67116a382000346a"
+  },
+  {
+    "text": "worker-W8-pattern-4",
+    "timestamp": "2026-02-12T05:17:24.096Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "e022b72d9a3ec3c37c680f603a0ad6b9b2fc771a"
+  },
+  {
+    "text": "worker-W5-pattern-5",
+    "timestamp": "2026-02-12T05:17:24.141Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8f5c162e68c9da0fdb707b81cdc649ef195c551d"
+  },
+  {
+    "text": "worker-W2-pattern-9",
+    "timestamp": "2026-02-12T05:17:24.190Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "ad46ec9aeba25f028c334b4d315af8a66d11e39e"
+  },
+  {
+    "text": "worker-W4-pattern-7",
+    "timestamp": "2026-02-12T05:17:24.252Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "85f98644fe3f2d13529e990f9bbc8875eec486b8"
+  },
+  {
+    "text": "worker-W7-pattern-8",
+    "timestamp": "2026-02-12T05:17:24.317Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0f6fbdbe31d5af1fe037f4d375c019f3f9e37e72"
+  },
+  {
+    "text": "worker-W6-pattern-4",
+    "timestamp": "2026-02-12T05:17:24.378Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a18e2a1298650517b7de38f1fde25d27944506e9"
+  },
+  {
+    "text": "worker-W0-pattern-6",
+    "timestamp": "2026-02-12T05:17:24.444Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "dc5de426ece8b1da9780ead8962e6f93ce3e240b"
+  },
+  {
+    "text": "worker-W9-pattern-6",
+    "timestamp": "2026-02-12T05:17:24.503Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0cb1dd5ed0609357233127f56fd5a002fa62d216"
+  },
+  {
+    "text": "worker-W3-pattern-8",
+    "timestamp": "2026-02-12T05:17:24.554Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "fa7a294b406fce2efcf9b8cb92e41f080e65cc19"
+  },
+  {
+    "text": "worker-W1-pattern-9",
+    "timestamp": "2026-02-12T05:17:24.897Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "698178e3544d497e4c5bbc9e93d8521a3d1f7320"
+  },
+  {
+    "text": "worker-W8-pattern-5",
+    "timestamp": "2026-02-12T05:17:25.875Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "7449b241dbab61e132011e75284f55b05a9f084c"
+  },
+  {
+    "text": "worker-W4-pattern-8",
+    "timestamp": "2026-02-12T05:17:25.937Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8409f4412acd865e7fffa376f439e3df0f4af1dd"
+  },
+  {
+    "text": "worker-W1-pattern-10",
+    "timestamp": "2026-02-12T05:17:27.080Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "38bc3b75bf065632573e3fad551b18ef365c939d"
+  },
+  {
+    "text": "worker-W0-pattern-7",
+    "timestamp": "2026-02-12T05:17:28.205Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "07e41d5172bf64e4b5d9e574cb9c363c19a20cf2"
+  },
+  {
+    "text": "worker-W1-pattern-11",
+    "timestamp": "2026-02-12T05:17:29.678Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "885f754176ddf003b445ceaa12d575ffe50df4b7"
+  },
+  {
+    "text": "worker-W6-pattern-5",
+    "timestamp": "2026-02-12T05:17:30.691Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "13c3f6469177893fb6f6d6e2f16273139bd970c2"
+  },
+  {
+    "text": "worker-W1-pattern-12",
+    "timestamp": "2026-02-12T05:17:31.678Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a8f565a0a4de76d5e62ccfb429884252c700f3b6"
+  },
+  {
+    "text": "worker-W6-pattern-6",
+    "timestamp": "2026-02-12T05:17:32.820Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6eb8a738f4a2cc536ab1280ae04944ce50cd6964"
+  },
+  {
+    "text": "worker-W0-pattern-8",
+    "timestamp": "2026-02-12T05:17:32.882Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1e40e4fc22f916e118bbe92849f1da9ea4afc53e"
+  },
+  {
+    "text": "worker-W4-pattern-9",
+    "timestamp": "2026-02-12T05:17:32.949Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "05eea99d85c3d2d47be3a83dd70b429bea431df1"
+  },
+  {
+    "text": "worker-W7-pattern-9",
+    "timestamp": "2026-02-12T05:17:33.016Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "206a5a9cc2227d80125efeb737c652c913a1f36e"
+  },
+  {
+    "text": "worker-W8-pattern-6",
+    "timestamp": "2026-02-12T05:17:33.088Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a671917c66565b89c48200eb55e24858e8f9066f"
+  },
+  {
+    "text": "worker-W5-pattern-6",
+    "timestamp": "2026-02-12T05:17:33.169Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f548791cb0df5d73f86d40e7735f6be4868ba69b"
+  },
+  {
+    "text": "worker-W3-pattern-9",
+    "timestamp": "2026-02-12T05:17:33.233Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a49baa50e0e4fda83184145a39e3518fb3526fb0"
+  },
+  {
+    "text": "worker-W9-pattern-7",
+    "timestamp": "2026-02-12T05:17:33.301Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c225e58e6d0dc3c6763b451d2872add94431b51a"
+  },
+  {
+    "text": "worker-W2-pattern-10",
+    "timestamp": "2026-02-12T05:17:33.380Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "664d9f0c7ffccc1328b097f3b8d372b264ab9e2e"
+  },
+  {
+    "text": "worker-W1-pattern-13",
+    "timestamp": "2026-02-12T05:17:33.829Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b24f52f216e9284e8ba5fd46fd8694a4007f9d23"
+  },
+  {
+    "text": "worker-W6-pattern-7",
+    "timestamp": "2026-02-12T05:17:35.018Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b075ce1bba69dbd0619819b9ae9afb3405251094"
+  },
+  {
+    "text": "worker-W4-pattern-10",
+    "timestamp": "2026-02-12T05:17:35.085Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b368264cae7d539480817246f5e4d2c27f6080db"
+  },
+  {
+    "text": "worker-W2-pattern-11",
+    "timestamp": "2026-02-12T05:17:35.146Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "60131fdb6c157231411a0fc1cad63efe64d5637c"
+  },
+  {
+    "text": "worker-W9-pattern-8",
+    "timestamp": "2026-02-12T05:17:35.208Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b7822367b63044e98888ea4b6859a9f135d993ad"
+  },
+  {
+    "text": "worker-W7-pattern-10",
+    "timestamp": "2026-02-12T05:17:35.271Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "64d0c7bda2506ed0b0c81252068d87d76194b4b7"
+  },
+  {
+    "text": "worker-W8-pattern-7",
+    "timestamp": "2026-02-12T05:17:35.333Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "ad89c28226429d82004ee28d8ec27d45814c0b53"
+  },
+  {
+    "text": "worker-W3-pattern-10",
+    "timestamp": "2026-02-12T05:17:35.385Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "007139940a7eaf9e650ff8b24e24515f2841e6d9"
+  },
+  {
+    "text": "worker-W0-pattern-9",
+    "timestamp": "2026-02-12T05:17:35.445Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "91681d5607a3a5074b5336b8188171a26d8079c7"
+  },
+  {
+    "text": "worker-W5-pattern-7",
+    "timestamp": "2026-02-12T05:17:35.506Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "7c9f622ea2503bb1b699f4831e67b9ca19cdb9ba"
+  },
+  {
+    "text": "worker-W1-pattern-14",
+    "timestamp": "2026-02-12T05:17:36.374Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "26a728426a07771dab4ee097ca73995f28eea9fa"
+  },
+  {
+    "text": "worker-W9-pattern-9",
+    "timestamp": "2026-02-12T05:17:37.519Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8641da74b47e2f481b7f049a9bd7f83fc13de9dd"
+  },
+  {
+    "text": "worker-W1-pattern-15",
+    "timestamp": "2026-02-12T05:17:38.947Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b02964b7ed75afa1488ad7e367fa8e7e21595856"
+  },
+  {
+    "text": "worker-W3-pattern-11",
+    "timestamp": "2026-02-12T05:17:40.297Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "55230bef39accedb689f7994adfc34878fa8ef95"
+  },
+  {
+    "text": "worker-W9-pattern-10",
+    "timestamp": "2026-02-12T05:17:41.604Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6191412394009b629b558bf609bb9bcc050a9bb7"
+  },
+  {
+    "text": "worker-W1-pattern-16",
+    "timestamp": "2026-02-12T05:17:42.939Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c29d2519713de8a90f8dc43af0f9d53130738742"
+  },
+  {
+    "text": "worker-W3-pattern-12",
+    "timestamp": "2026-02-12T05:17:43.002Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2f60e5778c26b80c7b25019cbab759d79d2b8df2"
+  },
+  {
+    "text": "worker-W2-pattern-12",
+    "timestamp": "2026-02-12T05:17:43.054Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "afa9dba77f16e72ccf35b5c929d0eb0329127385"
+  },
+  {
+    "text": "worker-W8-pattern-8",
+    "timestamp": "2026-02-12T05:17:43.114Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "644aaf511417f547070f6413f5a1b11b0e0be231"
+  },
+  {
+    "text": "worker-W0-pattern-10",
+    "timestamp": "2026-02-12T05:17:43.180Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "9f32db85ef6da26b1dcc11ac29177a7027972e33"
+  },
+  {
+    "text": "worker-W6-pattern-8",
+    "timestamp": "2026-02-12T05:17:43.242Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "4e8a3fa20efe7a95f1aa926a17b4a3c03c6b99fa"
+  },
+  {
+    "text": "worker-W5-pattern-8",
+    "timestamp": "2026-02-12T05:17:43.289Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "62a97f0c8187f6fb32a497ee9cc89ea9e796026f"
+  },
+  {
+    "text": "worker-W4-pattern-11",
+    "timestamp": "2026-02-12T05:17:43.336Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "06bba4e21ad95083457839011619f0125cbc28be"
+  },
+  {
+    "text": "worker-W7-pattern-11",
+    "timestamp": "2026-02-12T05:17:43.397Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a26f4eefd74f0e7b3bf0491050695da70fbba49b"
+  },
+  {
+    "text": "worker-W9-pattern-11",
+    "timestamp": "2026-02-12T05:17:44.495Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f169427eaefec93a7352c5ba0cf5d0dc1134bebe"
+  },
+  {
+    "text": "worker-W3-pattern-13",
+    "timestamp": "2026-02-12T05:17:44.876Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f0ae716dc07984817151776c611827bb3a43e322"
+  },
+  {
+    "text": "worker-W0-pattern-11",
+    "timestamp": "2026-02-12T05:17:44.928Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "4cb968e4880141af0fd321fa07e335325978d476"
+  },
+  {
+    "text": "worker-W2-pattern-13",
+    "timestamp": "2026-02-12T05:17:44.986Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d9d201814f8beb5ed22714f1513a7a6a1e794db1"
+  },
+  {
+    "text": "worker-W5-pattern-9",
+    "timestamp": "2026-02-12T05:17:45.051Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6c441e4dcb5668ff5ab2d27a4abd3bb86af481e2"
+  },
+  {
+    "text": "worker-W7-pattern-12",
+    "timestamp": "2026-02-12T05:17:45.115Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "830e4157091ae498d84612bb07b8d656017f501a"
+  },
+  {
+    "text": "worker-W8-pattern-9",
+    "timestamp": "2026-02-12T05:17:46.201Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "425625ed44f61010d829be6bc2a359d5f2eb906a"
+  },
+  {
+    "text": "worker-W9-pattern-12",
+    "timestamp": "2026-02-12T05:17:47.594Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "7208d068e5be0c31efd48def83e76ac73e7eb44e"
+  },
+  {
+    "text": "worker-W8-pattern-10",
+    "timestamp": "2026-02-12T05:17:49.341Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "16edbe193714af43693f625d72ecfb04409d2501"
+  },
+  {
+    "text": "worker-W5-pattern-10",
+    "timestamp": "2026-02-12T05:17:50.898Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "ad8da93b6dbdade5e880d1400c2dcf70c8bd14d7"
+  },
+  {
+    "text": "worker-W9-pattern-13",
+    "timestamp": "2026-02-12T05:17:50.956Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "da3b0ab434ab343ae1f2e35b2f410159edcfdf98"
+  },
+  {
+    "text": "worker-W7-pattern-13",
+    "timestamp": "2026-02-12T05:17:51.012Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f82cd0a09b72bd8afb14fa9997e25d0dc452251a"
+  },
+  {
+    "text": "worker-W6-pattern-9",
+    "timestamp": "2026-02-12T05:17:51.078Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "93090f792bde1bdb8b4a2f4d5e28f1d64546864b"
+  },
+  {
+    "text": "worker-W2-pattern-14",
+    "timestamp": "2026-02-12T05:17:51.139Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "4126cfe072e80743b43ecb05c509b5694df90abf"
+  },
+  {
+    "text": "worker-W4-pattern-12",
+    "timestamp": "2026-02-12T05:17:51.202Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "46a23ef325aca33a1c00076f26a0f591b665d9d0"
+  },
+  {
+    "text": "worker-W0-pattern-12",
+    "timestamp": "2026-02-12T05:17:51.264Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "fc68ca801397680a03a32eea8cf51536e48e22f9"
+  },
+  {
+    "text": "worker-W3-pattern-14",
+    "timestamp": "2026-02-12T05:17:51.326Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6e76db3718dc88e02eeff5ddfc4db5c2e279f5c2"
+  },
+  {
+    "text": "worker-W1-pattern-17",
+    "timestamp": "2026-02-12T05:17:51.392Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b94cc6bcddc14b4d54e569889a479c13efd97fe3"
+  },
+  {
+    "text": "worker-W8-pattern-11",
+    "timestamp": "2026-02-12T05:17:52.492Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6a87022a1ba0b1c0b4f2104372dd0a41dee895b1"
+  },
+  {
+    "text": "worker-W3-pattern-15",
+    "timestamp": "2026-02-12T05:17:54.554Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "61ad21a1c26ce32a3afd569eee2b6a95d95c2698"
+  },
+  {
+    "text": "worker-W7-pattern-14",
+    "timestamp": "2026-02-12T05:17:54.608Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1f02b26e6d05cbeee8d1c296aae9d2b7ae85fd33"
+  },
+  {
+    "text": "worker-W2-pattern-15",
+    "timestamp": "2026-02-12T05:17:54.681Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6bd9ad2b994b41eab6b6078f4a0f38092c9430c3"
+  },
+  {
+    "text": "worker-W1-pattern-18",
+    "timestamp": "2026-02-12T05:17:54.741Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "134e0f8fc2705049a2a8365bfeac5fd868943d2c"
+  },
+  {
+    "text": "worker-W9-pattern-14",
+    "timestamp": "2026-02-12T05:17:54.803Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f899732a9e2176ab6433ae695a35c50fd943a5db"
+  },
+  {
+    "text": "worker-W4-pattern-13",
+    "timestamp": "2026-02-12T05:17:54.866Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "50575ff4a1852b352e7acc3da4c803ccc3871919"
+  },
+  {
+    "text": "worker-W5-pattern-11",
+    "timestamp": "2026-02-12T05:17:54.921Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a51f68482e9637accf2acf0fc80894efa592c92c"
+  },
+  {
+    "text": "worker-W0-pattern-13",
+    "timestamp": "2026-02-12T05:17:54.980Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0852de83cc4c25392c455075f572cc2f4bea8b36"
+  },
+  {
+    "text": "worker-W6-pattern-10",
+    "timestamp": "2026-02-12T05:17:55.041Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "89105e5f97484982f9f589d24bd7722e94e2d80e"
+  },
+  {
+    "text": "worker-W8-pattern-12",
+    "timestamp": "2026-02-12T05:17:56.407Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "51106c330876245b67b82fab0fe56741074d4597"
+  },
+  {
+    "text": "worker-W6-pattern-11",
+    "timestamp": "2026-02-12T05:17:58.066Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "15a851eaa5f16244f927faddd48cd31668b7774a"
+  },
+  {
+    "text": "worker-W7-pattern-15",
+    "timestamp": "2026-02-12T05:17:59.790Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "57a6d6dbbb4ffe754ee0bdd29adc83f1ef644564"
+  },
+  {
+    "text": "worker-W6-pattern-12",
+    "timestamp": "2026-02-12T05:18:01.757Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "7c365d57bc2dd9dae24dbcbeb58ef0b03ad6740f"
+  },
+  {
+    "text": "worker-W0-pattern-14",
+    "timestamp": "2026-02-12T05:18:01.820Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "db646ae617cc825d49174ca1d72869ea42854b5f"
+  },
+  {
+    "text": "worker-W9-pattern-15",
+    "timestamp": "2026-02-12T05:18:01.880Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f8bab08907cad1f47c48e1b3daf0a11cbe108f87"
+  },
+  {
+    "text": "worker-W8-pattern-13",
+    "timestamp": "2026-02-12T05:18:01.946Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "e6fc6b8a581c7fe27f56859c5b5ae69cc4b1bc9a"
+  },
+  {
+    "text": "worker-W3-pattern-16",
+    "timestamp": "2026-02-12T05:18:02.004Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "7a23f9ae6b7b3f1db86eeb0cf71c9dad8e3a9e4f"
+  },
+  {
+    "text": "worker-W5-pattern-12",
+    "timestamp": "2026-02-12T05:18:02.061Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "aea938cd09f3c2451d17689f5c34673c0f45e07e"
+  },
+  {
+    "text": "worker-W1-pattern-19",
+    "timestamp": "2026-02-12T05:18:02.120Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b9bf3a617dc3ea7450b2d1def5ec002a8c0f8d78"
+  },
+  {
+    "text": "worker-W2-pattern-16",
+    "timestamp": "2026-02-12T05:18:02.173Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a4308f3f41b247a90f5dd568a99a73f97edbc02e"
+  },
+  {
+    "text": "worker-W4-pattern-14",
+    "timestamp": "2026-02-12T05:18:02.234Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2fa44e0ecfc2aac8488bf5f23d30bfb558846ee8"
+  },
+  {
+    "text": "worker-W7-pattern-16",
+    "timestamp": "2026-02-12T05:18:03.586Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d290b09a75be799673def6303811e20f3cc0d2a1"
+  },
+  {
+    "text": "worker-W3-pattern-17",
+    "timestamp": "2026-02-12T05:18:05.503Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1ba4b952814086a74835c82269f829649e6e85b6"
+  },
+  {
+    "text": "worker-W9-pattern-16",
+    "timestamp": "2026-02-12T05:18:06.230Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8ee09bfc952966cbd98829731bbcf60ab242cbd3"
+  },
+  {
+    "text": "worker-W6-pattern-13",
+    "timestamp": "2026-02-12T05:18:06.280Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "15fa4cd0f1b22af72488f5a618036cc8d7256345"
+  },
+  {
+    "text": "worker-W7-pattern-17",
+    "timestamp": "2026-02-12T05:18:06.337Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f7363a6e3f61870ae1f325748c990689531f800c"
+  },
+  {
+    "text": "worker-W8-pattern-14",
+    "timestamp": "2026-02-12T05:18:06.390Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "64fb2510960b17fdc65537ffe349b1cc99ff1803"
+  },
+  {
+    "text": "worker-W2-pattern-17",
+    "timestamp": "2026-02-12T05:18:06.445Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "36abb0552d7043f4f9d4b94b79d94e37afbb5e90"
+  },
+  {
+    "text": "worker-W1-pattern-20",
+    "timestamp": "2026-02-12T05:18:06.513Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "5f9958f74cf5d585426b0d2a66a20a038d6068ce"
+  },
+  {
+    "text": "worker-W5-pattern-13",
+    "timestamp": "2026-02-12T05:18:06.572Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a2300d0f5c29d16d86cc05d17047d80eb069522f"
+  },
+  {
+    "text": "worker-W0-pattern-15",
+    "timestamp": "2026-02-12T05:18:09.029Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "cbc5ed944e33809d11eba766abaf6a3391647790"
+  },
+  {
+    "text": "worker-W3-pattern-18",
+    "timestamp": "2026-02-12T05:18:11.128Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "7c24c457791f0d0557af6a0f8654cedf68272f40"
+  },
+  {
+    "text": "worker-W7-pattern-18",
+    "timestamp": "2026-02-12T05:18:11.184Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "eb67d07ec9167d4b0074c997d8c182a7f0dc9f89"
+  },
+  {
+    "text": "worker-W6-pattern-14",
+    "timestamp": "2026-02-12T05:18:11.251Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c67f463d2bffc638ca941885a6f02be25be7a2d9"
+  },
+  {
+    "text": "worker-W2-pattern-18",
+    "timestamp": "2026-02-12T05:18:11.383Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "acafc42f2348f71582303ccce357a329f21d1307"
+  },
+  {
+    "text": "worker-W8-pattern-15",
+    "timestamp": "2026-02-12T05:18:11.454Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d7d3c190a1b56fb81d0de85fa33a4866481ecca1"
+  },
+  {
+    "text": "worker-W4-pattern-15",
+    "timestamp": "2026-02-12T05:18:11.553Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "640f75b752f411bfe6b22054df45b9f8138a3ac7"
+  },
+  {
+    "text": "worker-W1-pattern-21",
+    "timestamp": "2026-02-12T05:18:11.618Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "297b0aea8a1cd6ccb242921969e2cafb10374413"
+  },
+  {
+    "text": "worker-W5-pattern-14",
+    "timestamp": "2026-02-12T05:18:11.694Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2ac708af6ecaa5a9629321acdb3154f048d878d4"
+  },
+  {
+    "text": "worker-W9-pattern-17",
+    "timestamp": "2026-02-12T05:18:11.760Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "02f9b70b3bc0f49e92b7201f7a8f101beceac24c"
+  },
+  {
+    "text": "worker-W0-pattern-16",
+    "timestamp": "2026-02-12T05:18:13.230Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "4f22b78f5e76a9c1a6ae8bf46fab079ab454941c"
+  },
+  {
+    "text": "worker-W5-pattern-15",
+    "timestamp": "2026-02-12T05:18:15.443Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a6b2fdf01d4b91e84d0bee87ff5c866d17d91ba2"
+  },
+  {
+    "text": "worker-W3-pattern-19",
+    "timestamp": "2026-02-12T05:18:17.948Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "4b8d4ca39b601ae3449bf12486eaee932aad40be"
+  },
+  {
+    "text": "worker-W0-pattern-17",
+    "timestamp": "2026-02-12T05:18:18.004Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "e83b1606f8f137591a18db8fe31a12ed557aada2"
+  },
+  {
+    "text": "worker-W9-pattern-18",
+    "timestamp": "2026-02-12T05:18:18.074Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c83a0486dbba38a6ba22275a414c26e060eb0512"
+  },
+  {
+    "text": "worker-W4-pattern-16",
+    "timestamp": "2026-02-12T05:18:18.113Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1db9118ffb0eb0f1298d97490f83aaa7227d978d"
+  },
+  {
+    "text": "worker-W1-pattern-22",
+    "timestamp": "2026-02-12T05:18:18.186Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1c800bf6323e9a6b2db8e86912a5a2459196c2b5"
+  },
+  {
+    "text": "worker-W2-pattern-19",
+    "timestamp": "2026-02-12T05:18:18.262Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "514770e1a3660374f4879bdea806722ec26a08cd"
+  },
+  {
+    "text": "worker-W8-pattern-16",
+    "timestamp": "2026-02-12T05:18:18.330Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2942cfc3171c406720bc2d19085441ac016c66e2"
+  },
+  {
+    "text": "worker-W7-pattern-19",
+    "timestamp": "2026-02-12T05:18:18.388Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1896e91375a0a5f56a69b6b8324d5a545bd99018"
+  },
+  {
+    "text": "worker-W6-pattern-15",
+    "timestamp": "2026-02-12T05:18:18.450Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d122e1d16192edc0d2a2539fa803528e07439985"
+  },
+  {
+    "text": "worker-W5-pattern-16",
+    "timestamp": "2026-02-12T05:18:21.853Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "553cdea1b247ad5ec181d56339277d724cf5bcbc"
+  },
+  {
+    "text": "worker-W0-pattern-18",
+    "timestamp": "2026-02-12T05:18:24.612Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "80d9fffdd585a12f3f9cb00a3c27c4c005b379b7"
+  },
+  {
+    "text": "worker-W5-pattern-17",
+    "timestamp": "2026-02-12T05:18:26.849Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "ca1eab980c91950fbbc3247ae6cc599355f41a23"
+  },
+  {
+    "text": "worker-W0-pattern-19",
+    "timestamp": "2026-02-12T05:18:29.380Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "fba97a970d71d4187b2c17e0cfdb6f4a221ddc1c"
+  },
+  {
+    "text": "worker-W9-pattern-19",
+    "timestamp": "2026-02-12T05:18:29.448Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "af22ae060670d363df264e94b239432664801513"
+  },
+  {
+    "text": "worker-W8-pattern-17",
+    "timestamp": "2026-02-12T05:18:29.522Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2b4834ddf1f643541fd1b16c33565fd92f20dca9"
+  },
+  {
+    "text": "worker-W6-pattern-16",
+    "timestamp": "2026-02-12T05:18:29.587Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2eb27543080269a3a0d422ccd8480d6d383680fe"
+  },
+  {
+    "text": "worker-W7-pattern-20",
+    "timestamp": "2026-02-12T05:18:29.639Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "54844b2ecc42ab038e8ebb68985de1ef4f7bea95"
+  },
+  {
+    "text": "worker-W3-pattern-20",
+    "timestamp": "2026-02-12T05:18:29.697Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0104bda796773970c5294c4ef7e7e894574568b5"
+  },
+  {
+    "text": "worker-W2-pattern-20",
+    "timestamp": "2026-02-12T05:18:29.764Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c6bc91b7e72e73766822fe8819377cae7adceadf"
+  },
+  {
+    "text": "worker-W1-pattern-23",
+    "timestamp": "2026-02-12T05:18:29.826Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "ad9b879ed037628505803fad154a91a0d887a70e"
+  },
+  {
+    "text": "worker-W4-pattern-17",
+    "timestamp": "2026-02-12T05:18:29.890Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "ca9ef00ebdfe77a1cc655d06bf4a4a4039dd1a66"
+  },
+  {
+    "text": "worker-W5-pattern-18",
+    "timestamp": "2026-02-12T05:18:31.795Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "30798f6e772f90a1c694b727a2b1baf5f0d98cd6"
+  },
+  {
+    "text": "worker-W9-pattern-20",
+    "timestamp": "2026-02-12T05:18:32.022Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "97f1316ed73c18e5f19c787815c04b339238eb00"
+  },
+  {
+    "text": "worker-W3-pattern-21",
+    "timestamp": "2026-02-12T05:18:32.089Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0768437be2f89d6dbbf6b3ad6d51350dece0102b"
+  },
+  {
+    "text": "worker-W8-pattern-18",
+    "timestamp": "2026-02-12T05:18:34.438Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "263248671d0983001b5c9332ef35b64c0b465c3a"
+  },
+  {
+    "text": "worker-W5-pattern-19",
+    "timestamp": "2026-02-12T05:18:36.934Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "72a77444acb06d964f79f00f5be8a7319f87318a"
+  },
+  {
+    "text": "worker-W7-pattern-21",
+    "timestamp": "2026-02-12T05:18:36.986Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "132896d6bcf255ea3933b558701d19aef3f54e07"
+  },
+  {
+    "text": "worker-W3-pattern-22",
+    "timestamp": "2026-02-12T05:18:37.044Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "5400c74c4ab8fcff89e000f9f27aae0ade851a8a"
+  },
+  {
+    "text": "worker-W9-pattern-21",
+    "timestamp": "2026-02-12T05:18:37.095Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "92d50463b90c75773675a8718ab85f6b68a309ea"
+  },
+  {
+    "text": "worker-W0-pattern-20",
+    "timestamp": "2026-02-12T05:18:37.144Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a4ce4a7f3f1cdba561d49d9b56cb566aa28f1558"
+  },
+  {
+    "text": "worker-W6-pattern-17",
+    "timestamp": "2026-02-12T05:18:37.193Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6e758272e6a03d770bff390cb4583ebc51fdc4d2"
+  },
+  {
+    "text": "worker-W2-pattern-21",
+    "timestamp": "2026-02-12T05:18:37.252Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "754fcf9324c650fa0d6dbd88e0d0e2be83bc91e5"
+  },
+  {
+    "text": "worker-W4-pattern-18",
+    "timestamp": "2026-02-12T05:18:37.306Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "87e056f1bbd6ba22b41e1a75f0f7153cdb92ec27"
+  },
+  {
+    "text": "worker-W1-pattern-24",
+    "timestamp": "2026-02-12T05:18:37.361Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "73a9e4162c7f57400168a727f9b72cb7495cdc44"
+  },
+  {
+    "text": "worker-W8-pattern-19",
+    "timestamp": "2026-02-12T05:18:39.591Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b509662a262dcf029b8472ac428eacd43c0d6028"
+  },
+  {
+    "text": "worker-W5-pattern-20",
+    "timestamp": "2026-02-12T05:18:42.087Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "75ecccdd95929e47222741ecde8bafa7f04b18bd"
+  },
+  {
+    "text": "worker-W8-pattern-20",
+    "timestamp": "2026-02-12T05:18:44.733Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "16b5600d5ba74ea8340bcd29cc6db4e367e9ba1a"
+  },
+  {
+    "text": "worker-W9-pattern-22",
+    "timestamp": "2026-02-12T05:18:44.787Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "565de4d433023ac684905bbc169aa1ca0e672f07"
+  },
+  {
+    "text": "worker-W4-pattern-19",
+    "timestamp": "2026-02-12T05:18:44.842Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "966b29c5822158db0c1f5ee9c0726d2ca12409b3"
+  },
+  {
+    "text": "worker-W7-pattern-22",
+    "timestamp": "2026-02-12T05:18:44.889Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "004d0fe30c76070a8de70e24967962823642f1c9"
+  },
+  {
+    "text": "worker-W3-pattern-23",
+    "timestamp": "2026-02-12T05:18:44.952Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "76c7cc05a9667c573f2621ba237f9bb4b95742d8"
+  },
+  {
+    "text": "worker-W1-pattern-25",
+    "timestamp": "2026-02-12T05:18:45.008Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "401e0bacfb0385fe661b3d7cfc52d0caf3ca9cd9"
+  },
+  {
+    "text": "worker-W2-pattern-22",
+    "timestamp": "2026-02-12T05:18:45.046Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c6970989118e75a1178a6a91ec2ad0a717ea953e"
+  },
+  {
+    "text": "worker-W6-pattern-18",
+    "timestamp": "2026-02-12T05:18:45.095Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2b47329b76c89290f8aed8778a2ba408afdbab87"
+  },
+  {
+    "text": "worker-W0-pattern-21",
+    "timestamp": "2026-02-12T05:18:45.151Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "da5c0404756c0c58e96208fdbfce4f2ba3d1fcad"
+  },
+  {
+    "text": "worker-W5-pattern-21",
+    "timestamp": "2026-02-12T05:18:47.542Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "9f62518eeb111c542816e076bfa17ef8d63cdd94"
+  },
+  {
+    "text": "worker-W8-pattern-21",
+    "timestamp": "2026-02-12T05:18:50.335Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a103122bec3025bec483614f9fd6ffe31d581512"
+  },
+  {
+    "text": "worker-W9-pattern-23",
+    "timestamp": "2026-02-12T05:18:50.385Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8264b153a5caff2190c58463d544b5fa6879ba63"
+  },
+  {
+    "text": "worker-W3-pattern-24",
+    "timestamp": "2026-02-12T05:18:50.431Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a3351c26638bffa0103c2ff3b0e99ba9c92b32e9"
+  },
+  {
+    "text": "worker-W4-pattern-20",
+    "timestamp": "2026-02-12T05:18:50.481Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f88815fd827f935f15efe4d8c142b073f780672f"
+  },
+  {
+    "text": "worker-W2-pattern-23",
+    "timestamp": "2026-02-12T05:18:50.530Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0ba0a801362daa7a61cfe24713062d7361ec38df"
+  },
+  {
+    "text": "worker-W1-pattern-26",
+    "timestamp": "2026-02-12T05:18:50.638Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "e939266ff570d871e060b5c3c406f337cd420b48"
+  },
+  {
+    "text": "worker-W0-pattern-22",
+    "timestamp": "2026-02-12T05:18:50.702Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "feadf419cd4943623dbb04ffc740591fbfe6466b"
+  },
+  {
+    "text": "worker-W6-pattern-19",
+    "timestamp": "2026-02-12T05:18:50.765Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "9728cc65f8a537e012105d9a9ae9b5e80c2d97e9"
+  },
+  {
+    "text": "worker-W7-pattern-23",
+    "timestamp": "2026-02-12T05:18:50.820Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "103a1a007217ffa161e6338bb36042e4ae5f459d"
+  },
+  {
+    "text": "worker-W5-pattern-22",
+    "timestamp": "2026-02-12T05:18:53.222Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "46828b0b246ae76cbe1ce5c01a53e0075389c282"
+  },
+  {
+    "text": "worker-W2-pattern-24",
+    "timestamp": "2026-02-12T05:18:53.415Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2acfc52e699dac4cdd40327f5cfcbc057d3a9144"
+  },
+  {
+    "text": "worker-W8-pattern-22",
+    "timestamp": "2026-02-12T05:18:53.465Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "9741ada7d1e80f847268f0478d581e2d6ae35928"
+  },
+  {
+    "text": "worker-W7-pattern-24",
+    "timestamp": "2026-02-12T05:18:56.767Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "94a76f9bef07d25e59b74bce48ffa93132c71f46"
+  },
+  {
+    "text": "worker-W5-pattern-23",
+    "timestamp": "2026-02-12T05:18:57.115Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "32eb3bbd9090c13c36ab98a7c611a1404b48c8da"
+  },
+  {
+    "text": "worker-W2-pattern-25",
+    "timestamp": "2026-02-12T05:18:57.166Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b498fb69787d1e7731553c9cfce5840eac258a5f"
+  },
+  {
+    "text": "worker-W3-pattern-25",
+    "timestamp": "2026-02-12T05:18:57.213Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2834f9ce0f05c60f7743990048262c7145913519"
+  },
+  {
+    "text": "worker-W1-pattern-27",
+    "timestamp": "2026-02-12T05:18:57.262Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "79a4f540fbf743f1feecd7811c4f975a52e6388a"
+  },
+  {
+    "text": "worker-W0-pattern-23",
+    "timestamp": "2026-02-12T05:18:57.319Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2a0ffc58b03b5ba61676e56890eb77791f166f2f"
+  },
+  {
+    "text": "worker-W8-pattern-23",
+    "timestamp": "2026-02-12T05:19:01.504Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8ee39584a6e71d8f6f0053d5f81cb7e42c7f5d5c"
+  },
+  {
+    "text": "worker-W3-pattern-26",
+    "timestamp": "2026-02-12T05:19:06.581Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1d28283ac80065fbad9a0c56bd31a581ec4b07ea"
+  },
+  {
+    "text": "worker-W0-pattern-24",
+    "timestamp": "2026-02-12T05:19:06.649Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "1f00a70860dfa41d6c5dad399293300d02f6fc11"
+  },
+  {
+    "text": "worker-W1-pattern-28",
+    "timestamp": "2026-02-12T05:19:06.709Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6c333993e63677718a221f17d8a39cc63b90b1e2"
+  },
+  {
+    "text": "worker-W4-pattern-21",
+    "timestamp": "2026-02-12T05:19:06.761Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "20d163a580d3ba3b75c004ef9a7160b4edef4414"
+  },
+  {
+    "text": "worker-W6-pattern-20",
+    "timestamp": "2026-02-12T05:19:06.825Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "844f3d0382522900c684bb1ef0658556571011e0"
+  },
+  {
+    "text": "worker-W7-pattern-25",
+    "timestamp": "2026-02-12T05:19:06.887Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "6c8e5b698d4df3f7f58328d31b2bc9ee1f740a3a"
+  },
+  {
+    "text": "worker-W2-pattern-26",
+    "timestamp": "2026-02-12T05:19:06.948Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0dcca40139071c2f131fd96d847b44f89082b117"
+  },
+  {
+    "text": "worker-W5-pattern-24",
+    "timestamp": "2026-02-12T05:19:06.990Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "4b7a7df3164f1a68cf0ee27d7c197052f4fac2c8"
+  },
+  {
+    "text": "worker-W9-pattern-24",
+    "timestamp": "2026-02-12T05:19:07.038Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "388749afd281894ca636e56774723746d506423a"
+  },
+  {
+    "text": "worker-W8-pattern-24",
+    "timestamp": "2026-02-12T05:19:11.479Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0c0d056408f6da08eb1b0fac1b07f39d18cd316c"
+  },
+  {
+    "text": "worker-W3-pattern-27",
+    "timestamp": "2026-02-12T05:19:14.371Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d0d3004b228cb086f247c0e1d206c9f8287aa2fe"
+  },
+  {
+    "text": "worker-W6-pattern-21",
+    "timestamp": "2026-02-12T05:19:14.433Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "58bd4c9f034e1df461a8c750f20148f90b01c615"
+  },
+  {
+    "text": "worker-W0-pattern-25",
+    "timestamp": "2026-02-12T05:19:14.482Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f212a33e9efa671ff645817ef3a822de16e62fce"
+  },
+  {
+    "text": "worker-W7-pattern-26",
+    "timestamp": "2026-02-12T05:19:14.527Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "9dcbb37e45df3a68c12c0130ec2fa44e851f632b"
+  },
+  {
+    "text": "worker-W5-pattern-25",
+    "timestamp": "2026-02-12T05:19:14.580Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8604aca8accdca8f57668022c7bcb1102fcd791e"
+  },
+  {
+    "text": "worker-W9-pattern-25",
+    "timestamp": "2026-02-12T05:19:14.627Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "99264568d48f124f381d3cc303c4bf2e2d13616a"
+  },
+  {
+    "text": "worker-W1-pattern-29",
+    "timestamp": "2026-02-12T05:19:14.683Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "87d681a94af8747fe03a09419cfcd8a746784f19"
+  },
+  {
+    "text": "worker-W2-pattern-27",
+    "timestamp": "2026-02-12T05:19:14.739Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "cc69cf505edd0e266606bba548ad892cd890ec39"
+  },
+  {
+    "text": "worker-W4-pattern-22",
+    "timestamp": "2026-02-12T05:19:14.807Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8e22c0737886fbe7fc01cee8ea1260515f097710"
+  },
+  {
+    "text": "worker-W8-pattern-25",
+    "timestamp": "2026-02-12T05:19:17.012Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "ca0878c38498e1ebdb540a75b71bf1349a1a4413"
+  },
+  {
+    "text": "worker-W3-pattern-28",
+    "timestamp": "2026-02-12T05:19:19.764Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "774a588fc6e507cf63823745d24295b5438ea7d1"
+  },
+  {
+    "text": "worker-W8-pattern-26",
+    "timestamp": "2026-02-12T05:19:25.190Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a9e68ec67eced71f40741a57623a630156629b08"
+  },
+  {
+    "text": "worker-W7-pattern-27",
+    "timestamp": "2026-02-12T05:19:25.235Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a32d95e2aaf8ad23c346e65788aeb604052b928e"
+  },
+  {
+    "text": "worker-W9-pattern-26",
+    "timestamp": "2026-02-12T05:19:25.283Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "556f0313d11e75e03fa80357560f674cad82c2ae"
+  },
+  {
+    "text": "worker-W1-pattern-30",
+    "timestamp": "2026-02-12T05:19:25.345Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8828108bdd92273bb85c696bd60b6794eb8ad578"
+  },
+  {
+    "text": "worker-W5-pattern-26",
+    "timestamp": "2026-02-12T05:19:25.410Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f96b4c710d5332badeb14fc5ab781ddb98eaad33"
+  },
+  {
+    "text": "worker-W6-pattern-22",
+    "timestamp": "2026-02-12T05:19:25.475Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "99d513027a0844325411baa22c3937b5bc99f817"
+  },
+  {
+    "text": "worker-W4-pattern-23",
+    "timestamp": "2026-02-12T05:19:25.535Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "163a5f4c9278b8384c12c422b9b736e7afb1bbb6"
+  },
+  {
+    "text": "worker-W0-pattern-26",
+    "timestamp": "2026-02-12T05:19:25.588Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f50f46a88e3ca0d3f61904b13c5661527e5f245b"
+  },
+  {
+    "text": "worker-W2-pattern-28",
+    "timestamp": "2026-02-12T05:19:25.647Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b8935a3108265fdc151791d42a23906dde187978"
+  },
+  {
+    "text": "worker-W3-pattern-29",
+    "timestamp": "2026-02-12T05:19:28.163Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c43ecca47bb25caefe15053ee732d90906ac0d3f"
+  },
+  {
+    "text": "worker-W6-pattern-23",
+    "timestamp": "2026-02-12T05:19:30.379Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "df0b6f67d8fc5c3749388abb83f0d08dfa6ecc4c"
+  },
+  {
+    "text": "worker-W9-pattern-27",
+    "timestamp": "2026-02-12T05:19:33.195Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "5f8df9213f58392bc0e5281c93333d6b5cb1e8b5"
+  },
+  {
+    "text": "worker-W3-pattern-30",
+    "timestamp": "2026-02-12T05:19:37.059Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "598ba3fb23e0967b11fdc9ff95b249f6c0b60f4b"
+  },
+  {
+    "text": "worker-W6-pattern-24",
+    "timestamp": "2026-02-12T05:19:37.429Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "bc06a61fe5454362a31c9ecc1ff5dab706b649fa"
+  },
+  {
+    "text": "worker-W9-pattern-28",
+    "timestamp": "2026-02-12T05:19:37.495Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "adbf35f87dea613b94b5b45d35de78148003cc40"
+  },
+  {
+    "text": "worker-W2-pattern-29",
+    "timestamp": "2026-02-12T05:19:37.556Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "aa1a4ad82ba9ce5a336779da5a1623c786beebd9"
+  },
+  {
+    "text": "worker-W4-pattern-24",
+    "timestamp": "2026-02-12T05:19:37.619Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "bb1c0c9d7477ea15735f78baf63cfb90206ca1ce"
+  },
+  {
+    "text": "worker-W7-pattern-28",
+    "timestamp": "2026-02-12T05:19:37.670Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "9d4f86ac9f9272271325f9ffcca5dd48bcf394e4"
+  },
+  {
+    "text": "worker-W5-pattern-27",
+    "timestamp": "2026-02-12T05:19:40.333Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "da617ebab98cf3d507b78ce7cd490da6533f582a"
+  },
+  {
+    "text": "worker-W1-pattern-31",
+    "timestamp": "2026-02-12T05:19:42.638Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "aed1f11a393606bfc3d1b54724a9c163db9f193f"
+  },
+  {
+    "text": "worker-W5-pattern-28",
+    "timestamp": "2026-02-12T05:19:44.910Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "da15103d1a8c82b3026ab40c8e400abbd56163ee"
+  },
+  {
+    "text": "worker-W6-pattern-25",
+    "timestamp": "2026-02-12T05:19:44.973Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2e7a609c2ce50132e8d4e6ef2215215f78278bc9"
+  },
+  {
+    "text": "worker-W0-pattern-27",
+    "timestamp": "2026-02-12T05:19:47.300Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d117cd2fd2f95a0befc7cc80ac36c789d34481cc"
+  },
+  {
+    "text": "worker-W1-pattern-32",
+    "timestamp": "2026-02-12T05:19:47.349Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "5c3a5ee8318666f65093d852317dce4acd7f06b7"
+  },
+  {
+    "text": "worker-W2-pattern-30",
+    "timestamp": "2026-02-12T05:19:47.410Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "69df6164988cf37a59d7ebe4c549306a06260534"
+  },
+  {
+    "text": "worker-W1-pattern-33",
+    "timestamp": "2026-02-12T05:19:51.896Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "4a1e00676c84ab3d1f8087e47f48c00103854c01"
+  },
+  {
+    "text": "worker-W6-pattern-26",
+    "timestamp": "2026-02-12T05:19:51.945Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "40ba1a651f7d14ebf3ee60beb3d1f09fb946280e"
+  },
+  {
+    "text": "worker-W8-pattern-27",
+    "timestamp": "2026-02-12T05:19:52.007Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "28f44baabc8baaead1ea1bffb2e900d25018128d"
+  },
+  {
+    "text": "worker-W2-pattern-31",
+    "timestamp": "2026-02-12T05:19:56.498Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "69be4e33db176bf1ad1dedfdd4aaa7557e0244b7"
+  },
+  {
+    "text": "worker-W9-pattern-29",
+    "timestamp": "2026-02-12T05:19:56.563Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "adec1549ba92f4583094fe3092ca7011372ae3fe"
+  },
+  {
+    "text": "worker-W7-pattern-29",
+    "timestamp": "2026-02-12T05:19:56.624Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "9dc1eebabdfe8b5f9e4e0e19c323de5a00f409b9"
+  },
+  {
+    "text": "worker-W3-pattern-31",
+    "timestamp": "2026-02-12T05:19:56.689Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "26e228faa9c810aefeb2d4921ced1e348a49176f"
+  },
+  {
+    "text": "worker-W6-pattern-27",
+    "timestamp": "2026-02-12T05:19:56.765Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "78e438a3c6381247f2b23945e8bc06f95dacdd6f"
+  },
+  {
+    "text": "worker-W5-pattern-29",
+    "timestamp": "2026-02-12T05:19:56.818Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "002199f8c4bca4b2bc951c617a574f9065e2afd6"
+  },
+  {
+    "text": "worker-W4-pattern-25",
+    "timestamp": "2026-02-12T05:19:56.877Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "8e71f382e6cc50e0fcf38a4e9172a4414dd58161"
+  },
+  {
+    "text": "worker-W1-pattern-34",
+    "timestamp": "2026-02-12T05:19:56.940Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "fd458d51e3db08c6fd165357515ca536b0526c66"
+  },
+  {
+    "text": "worker-W0-pattern-28",
+    "timestamp": "2026-02-12T05:19:56.987Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "726b1359e7729c0d5bdc454a52ce6a9a7b53401f"
+  },
+  {
+    "text": "worker-W8-pattern-28",
+    "timestamp": "2026-02-12T05:20:01.134Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f52ef7af73e20c9abb07dc09654d67b930a96b70"
+  },
+  {
+    "text": "worker-W7-pattern-30",
+    "timestamp": "2026-02-12T05:20:04.077Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "2e33613ec4cc34bb51f844a1b0995c93eaa7d7f4"
+  },
+  {
+    "text": "worker-W3-pattern-32",
+    "timestamp": "2026-02-12T05:20:06.468Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0c7c4786478d1a7ad17bf35e0d314ac40a6acf63"
+  },
+  {
+    "text": "worker-W8-pattern-29",
+    "timestamp": "2026-02-12T05:20:08.868Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "b0f7824be7aff1b078b7acc6800bdf962cd0cffe"
+  },
+  {
+    "text": "worker-W9-pattern-30",
+    "timestamp": "2026-02-12T05:20:11.295Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "af476f270f8a525064ee437d65c00557e5fa0c72"
+  },
+  {
+    "text": "worker-W2-pattern-32",
+    "timestamp": "2026-02-12T05:20:11.345Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "774b2accf10fe07b33c94fea51329b5e8bdd48c1"
+  },
+  {
+    "text": "worker-W5-pattern-30",
+    "timestamp": "2026-02-12T05:20:11.393Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "554173ab3bf867dd5344c9d4177f1a805d1421f2"
+  },
+  {
+    "text": "worker-W4-pattern-26",
+    "timestamp": "2026-02-12T05:20:11.439Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "7c15ed63bbe943da9d38e11db3e6efaea3dc4684"
+  },
+  {
+    "text": "worker-W3-pattern-33",
+    "timestamp": "2026-02-12T05:20:11.497Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "41c001adb782a5cb82d9376d288685f75beb436c"
+  },
+  {
+    "text": "worker-W7-pattern-31",
+    "timestamp": "2026-02-12T05:20:11.548Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "363a0f35e41f1dee2ee71efadda49bdc7b452c18"
+  },
+  {
+    "text": "worker-W1-pattern-35",
+    "timestamp": "2026-02-12T05:20:11.610Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c5dd0327b2bbba208b94cf0424b016b65d408e61"
+  },
+  {
+    "text": "worker-W0-pattern-29",
+    "timestamp": "2026-02-12T05:20:11.661Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "f2ead5a54d5419104ef34f07fc06b2b1637efa0e"
+  },
+  {
+    "text": "worker-W6-pattern-28",
+    "timestamp": "2026-02-12T05:20:11.718Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a3936589f6d0c1f780bf83ff72f35db8b3f4f09d"
+  }
+]

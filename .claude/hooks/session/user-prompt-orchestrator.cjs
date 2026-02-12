@@ -31,7 +31,7 @@ function stderrLog(message) {
 }
 
 function runChildHook(hookPath, stdinData) {
-  const absPath = path.join(PROJECT_ROOT, hookPath);
+  const absPath = path.isAbsolute(hookPath) ? hookPath : path.join(PROJECT_ROOT, hookPath);
   return cp.spawnSync('node', [absPath], {
     input: stdinData,
     encoding: 'utf8',

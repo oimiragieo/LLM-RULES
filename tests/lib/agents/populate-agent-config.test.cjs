@@ -14,10 +14,30 @@ const path = require('path');
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 const AGENT_CONFIG_PATH = path.join(PROJECT_ROOT, '.claude/config/agent-config.json');
 const AGENT_REGISTRY_PATH = path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
+const SPLIT_REGISTRY_PATHS = [
+  path.join(PROJECT_ROOT, '.claude/context/agent-registry-core.json'),
+  path.join(PROJECT_ROOT, '.claude/context/agent-registry-domain.json'),
+  path.join(PROJECT_ROOT, '.claude/context/agent-registry-orchestrators.json'),
+];
+
+function loadAgentRegistry() {
+  if (fs.existsSync(AGENT_REGISTRY_PATH)) {
+    return JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+  }
+
+  const mergedAgents = {};
+  for (const registryPath of SPLIT_REGISTRY_PATHS) {
+    if (!fs.existsSync(registryPath)) continue;
+    const parsed = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+    Object.assign(mergedAgents, parsed.agents || {});
+  }
+
+  return { agents: mergedAgents };
+}
 
 // Read both files once at module level
 const agentConfig = JSON.parse(fs.readFileSync(AGENT_CONFIG_PATH, 'utf8'));
-const agentRegistry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+const agentRegistry = loadAgentRegistry();
 
 test('agent-config.json should have ALL 59 agents from registry', () => {
   const configAgents = Object.keys(agentConfig.agents || {});

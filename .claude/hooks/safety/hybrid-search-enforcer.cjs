@@ -47,7 +47,19 @@ function isTargetedSingleFile(toolInput) {
   return !/[*?[\]{}]/.test(path);
 }
 
+function hasUnsupportedTypeAlias(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return false;
+
+  const candidates = [toolInput.type, toolInput.file_type, toolInput.fileType];
+  return candidates.some(
+    value => typeof value === 'string' && value.trim().toLowerCase() === 'cjs'
+  );
+}
+
 function decide(toolInput) {
+  if (hasUnsupportedTypeAlias(toolInput)) {
+    return { allow: false, reason: 'unsupported_type_alias' };
+  }
   const pattern = toolInput?.pattern;
   if (hasAdvancedRegex(pattern)) {
     return { allow: true, reason: 'advanced_regex' };
@@ -63,6 +75,7 @@ function blockMessage() {
     'Grep blocked by hybrid-search-enforcer.',
     'Use hybrid search first: `pnpm search:code "<query>"` or `Skill({ skill: "ripgrep" })`.',
     'Allowed Grep fallbacks: advanced PCRE patterns or explicit single-file targeted searches.',
+    'Do not use `type: "cjs"`; use a glob/path filter like `**/*.cjs` instead.',
   ].join(' ');
 }
 
@@ -112,6 +125,7 @@ if (require.main === module) {
 module.exports = {
   hasAdvancedRegex,
   isTargetedSingleFile,
+  hasUnsupportedTypeAlias,
   decide,
   getMode,
   blockMessage,

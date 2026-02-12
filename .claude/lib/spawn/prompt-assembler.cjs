@@ -43,6 +43,8 @@ const DEFAULT_MEMORY_MODE = 'hybrid';
 const DEFAULT_SUMMARY_BLOCK_MAX_TOKENS = 400;
 const DEFAULT_RECENT_OBSERVATIONS_MAX_TOKENS = 400;
 const DEFAULT_TIER_B_MAX_TOKENS = 400;
+const DEFAULT_OPEN_FINDINGS_MAX_ITEMS = 3;
+const DEFAULT_OPEN_FINDINGS_MIN_SEVERITY = 'high';
 
 /**
  * Load tool manifest (cached)
@@ -332,6 +334,51 @@ function loadObservationalMemory(projectRoot = PROJECT_ROOT) {
   }
 
   return { summary, recentObservations };
+}
+
+function getOpenFindingsMinSeverity() {
+  const configured = String(
+    process.env.OPEN_FINDINGS_MIN_SEVERITY || DEFAULT_OPEN_FINDINGS_MIN_SEVERITY
+  )
+    .trim()
+    .toLowerCase();
+  if (['critical', 'high', 'medium', 'low', 'unknown'].includes(configured)) {
+    return configured;
+  }
+  return DEFAULT_OPEN_FINDINGS_MIN_SEVERITY;
+}
+
+function loadOpenFindings(projectRoot = PROJECT_ROOT, limit = DEFAULT_OPEN_FINDINGS_MAX_ITEMS) {
+  try {
+    const findingsRegistry = require('../memory/findings-registry.cjs');
+    if (!findingsRegistry || typeof findingsRegistry.getOpenFindings !== 'function') {
+      return [];
+    }
+    return findingsRegistry.getOpenFindings(projectRoot, {
+      limit,
+      minSeverity: getOpenFindingsMinSeverity(),
+    });
+  } catch (_err) {
+    return [];
+  }
+}
+
+function formatOpenFindingsSection(findings = []) {
+  const items = Array.isArray(findings) ? findings : [];
+  if (items.length === 0) return '';
+
+  const lines = [];
+  lines.push('### Open Findings Carryover');
+  for (const finding of items.slice(0, DEFAULT_OPEN_FINDINGS_MAX_ITEMS)) {
+    const severity = String(finding?.severity || 'unknown').toUpperCase();
+    const summary = String(finding?.summary || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!summary) continue;
+    lines.push(`- [${severity}] ${summary}`);
+  }
+  lines.push('');
+  return lines.join('\n');
 }
 
 /**
@@ -970,6 +1017,13 @@ function assembleSpawnPrompt({
     } else {
       memorySection = formatMemorySection(loadMemoryContext(projectRoot));
     }
+
+    const openFindingsSection = formatOpenFindingsSection(loadOpenFindings(projectRoot));
+    if (openFindingsSection) {
+      memorySection = memorySection
+        ? `${memorySection}\n\n${openFindingsSection.trim()}`
+        : openFindingsSection.trim();
+    }
   }
 
   // 3b. Load behaviour rules (optional)
@@ -1049,7 +1103,10 @@ module.exports = {
   getMemorySectionBudgets,
   applySectionTokenCap,
   loadObservationalMemory,
+  loadOpenFindings,
+  getOpenFindingsMinSeverity,
   formatObservationalSection,
+  formatOpenFindingsSection,
   estimateTokens,
   loadMemoryContext,
   loadBehaviourRules,

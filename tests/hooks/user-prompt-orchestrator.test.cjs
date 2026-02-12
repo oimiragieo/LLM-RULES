@@ -24,7 +24,9 @@ const cp = require('child_process');
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // Import orchestrator functions
-const orchestrator = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'session', 'user-prompt-orchestrator.cjs'));
+const orchestrator = require(
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'session', 'user-prompt-orchestrator.cjs')
+);
 
 // Mock child hook paths for testing
 const MOCK_HOOKS_DIR = path.join(PROJECT_ROOT, 'tests', 'fixtures', 'mock-hooks');
@@ -42,12 +44,16 @@ function createSuccessHook(hookPath) {
   if (!fs.existsSync(hookDir)) {
     fs.mkdirSync(hookDir, { recursive: true });
   }
-  fs.writeFileSync(hookPath, `#!/usr/bin/env node
+  fs.writeFileSync(
+    hookPath,
+    `#!/usr/bin/env node
 const fs = require('fs');
 const stdin = fs.readFileSync(0, 'utf8');
 // Success: exit 0
 process.exit(0);
-`, 'utf8');
+`,
+    'utf8'
+  );
   fs.chmodSync(hookPath, 0o755);
 }
 
@@ -57,12 +63,16 @@ function createBlockingHook(hookPath, exitCode = 2, message = 'Blocked by test h
   if (!fs.existsSync(hookDir)) {
     fs.mkdirSync(hookDir, { recursive: true });
   }
-  fs.writeFileSync(hookPath, `#!/usr/bin/env node
+  fs.writeFileSync(
+    hookPath,
+    `#!/usr/bin/env node
 const fs = require('fs');
 const stdin = fs.readFileSync(0, 'utf8');
-process.stdout.write(JSON.stringify({ block: true, message: '${message}' }) + '\n');
+process.stdout.write(JSON.stringify({ block: true, message: '${message}' }) + '\\n');
 process.exit(${exitCode});
-`, 'utf8');
+`,
+    'utf8'
+  );
   fs.chmodSync(hookPath, 0o755);
 }
 
@@ -74,9 +84,13 @@ function createErrorHook(hookPath) {
   if (!fs.existsSync(hookDir)) {
     fs.mkdirSync(hookDir, { recursive: true });
   }
-  fs.writeFileSync(hookPath, `#!/usr/bin/env node
+  fs.writeFileSync(
+    hookPath,
+    `#!/usr/bin/env node
 throw new Error('Intentional execution error');
-`, 'utf8');
+`,
+    'utf8'
+  );
   fs.chmodSync(hookPath, 0o755);
 }
 
@@ -86,12 +100,16 @@ function createStderrHook(hookPath, stderrMessage = 'Test stderr message') {
   if (!fs.existsSync(hookDir)) {
     fs.mkdirSync(hookDir, { recursive: true });
   }
-  fs.writeFileSync(hookPath, `#!/usr/bin/env node
+  fs.writeFileSync(
+    hookPath,
+    `#!/usr/bin/env node
 const fs = require('fs');
 const stdin = fs.readFileSync(0, 'utf8');
-process.stderr.write('${stderrMessage}\n');
+process.stderr.write('${stderrMessage}\\n');
 process.exit(0);
-`, 'utf8');
+`,
+    'utf8'
+  );
   fs.chmodSync(hookPath, 0o755);
 }
 
@@ -134,10 +152,14 @@ describe('user-prompt-orchestrator.cjs - runChildHook Function', () => {
     if (!fs.existsSync(hookDir)) {
       fs.mkdirSync(hookDir, { recursive: true });
     }
-    fs.writeFileSync(hookPath, `#!/usr/bin/env node
-process.stdout.write('Test output\n');
+    fs.writeFileSync(
+      hookPath,
+      `#!/usr/bin/env node
+process.stdout.write('Test output\\n');
 process.exit(0);
-`, 'utf8');
+`,
+      'utf8'
+    );
     fs.chmodSync(hookPath, 0o755);
 
     const result = orchestrator.runChildHook(hookPath, '');
@@ -161,8 +183,11 @@ process.exit(0);
 
     const result = orchestrator.runChildHook(hookPath, '');
 
-    assert.ok(result.error);
-    assert.ok(result.error.message.includes('ENOENT') || result.error.code === 'ENOENT');
+    assert.equal(result.status, 1);
+    assert.equal(result.error, undefined);
+    assert.ok(
+      result.stderr.includes('Cannot find module') || result.stderr.includes('MODULE_NOT_FOUND')
+    );
   });
 
   it('should capture non-zero exit code', () => {
@@ -178,7 +203,13 @@ process.exit(0);
 
 describe('user-prompt-orchestrator.cjs - Empty Stdin Handling', () => {
   it('should exit gracefully on empty stdin', () => {
-    const orchestratorPath = path.join(PROJECT_ROOT, '.claude', 'hooks', 'session', 'user-prompt-orchestrator.cjs');
+    const orchestratorPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'hooks',
+      'session',
+      'user-prompt-orchestrator.cjs'
+    );
 
     // Run with no stdin
     const result = cp.spawnSync('node', [orchestratorPath], {

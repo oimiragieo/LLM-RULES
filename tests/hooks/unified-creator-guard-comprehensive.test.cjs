@@ -23,7 +23,9 @@ const fs = require('fs');
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // Import hook functions
-const creatorGuard = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'));
+const creatorGuard = require(
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs')
+);
 
 // Cleanup state between tests
 function cleanupState() {
@@ -41,7 +43,7 @@ describe('unified-creator-guard.cjs - Gate 4: Skill Artifact Protection', () => 
 
   it('should block direct write to new SKILL.md', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/skills/test-skill/SKILL.md'
+      file_path: '.claude/skills/test-skill/SKILL.md',
     });
     assert.equal(result.pass, false);
     assert.equal(result.result, 'block');
@@ -53,32 +55,42 @@ describe('unified-creator-guard.cjs - Gate 4: Skill Artifact Protection', () => 
     creatorGuard.markCreatorActive('skill-creator', 'test-skill');
 
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/skills/test-skill/SKILL.md'
+      file_path: '.claude/skills/test-skill/SKILL.md',
     });
     assert.equal(result.pass, true);
   });
 
   it('should allow Edit to existing SKILL.md without creator', () => {
     const result = creatorGuard.validateCreatorWorkflow('Edit', {
-      file_path: '.claude/skills/existing-skill/SKILL.md'
+      file_path: '.claude/skills/existing-skill/SKILL.md',
     });
     assert.equal(result.pass, true);
   });
 
-  it('should block write after creator TTL expires', (t, done) => {
-    // Mark creator active with very short TTL
-    process.env.CREATOR_STATE_TTL_MS = '100'; // 100ms
-    creatorGuard.markCreatorActive('skill-creator', 'test-skill');
+  it('should block write after creator TTL expires', () => {
+    const statePath = path.join(PROJECT_ROOT, creatorGuard.STATE_FILE);
+    fs.mkdirSync(path.dirname(statePath), { recursive: true });
+    fs.writeFileSync(
+      statePath,
+      JSON.stringify(
+        {
+          'skill-creator': {
+            active: true,
+            invokedAt: new Date(Date.now() - 1000).toISOString(),
+            ttl: 100,
+            artifactName: 'test-skill',
+          },
+        },
+        null,
+        2
+      ),
+      'utf8'
+    );
 
-    // Wait for TTL to expire
-    setTimeout(() => {
-      const result = creatorGuard.validateCreatorWorkflow('Write', {
-        file_path: '.claude/skills/test-skill/SKILL.md'
-      });
-      assert.equal(result.pass, false);
-      delete process.env.CREATOR_STATE_TTL_MS;
-      done();
-    }, 150);
+    const result = creatorGuard.validateCreatorWorkflow('Write', {
+      file_path: '.claude/skills/test-skill/SKILL.md',
+    });
+    assert.equal(result.pass, false);
   });
 });
 
@@ -90,7 +102,7 @@ describe('unified-creator-guard.cjs - Gate 4: Agent Artifact Protection', () => 
 
   it('should block direct write to new agent file', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/agents/domain/python-expert.md'
+      file_path: '.claude/agents/domain/python-expert.md',
     });
     assert.equal(result.pass, false);
     assert.match(result.message, /agent-creator/);
@@ -98,21 +110,21 @@ describe('unified-creator-guard.cjs - Gate 4: Agent Artifact Protection', () => 
 
   it('should block write to core agent', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/agents/core/new-developer.md'
+      file_path: '.claude/agents/core/new-developer.md',
     });
     assert.equal(result.pass, false);
   });
 
   it('should block write to specialized agent', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/agents/specialized/database-expert.md'
+      file_path: '.claude/agents/specialized/database-expert.md',
     });
     assert.equal(result.pass, false);
   });
 
   it('should block write to orchestrator agent', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/agents/orchestrators/feature-orchestrator.md'
+      file_path: '.claude/agents/orchestrators/feature-orchestrator.md',
     });
     assert.equal(result.pass, false);
   });
@@ -121,14 +133,14 @@ describe('unified-creator-guard.cjs - Gate 4: Agent Artifact Protection', () => 
     creatorGuard.markCreatorActive('agent-creator', 'python-expert');
 
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/agents/domain/python-expert.md'
+      file_path: '.claude/agents/domain/python-expert.md',
     });
     assert.equal(result.pass, true);
   });
 
   it('should NOT block README.md in agents directory', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/agents/README.md'
+      file_path: '.claude/agents/README.md',
     });
     assert.equal(result.pass, true);
   });
@@ -142,7 +154,7 @@ describe('unified-creator-guard.cjs - Gate 4: Hook Artifact Protection', () => {
 
   it('should block direct write to new hook', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/hooks/routing/new-guard.cjs'
+      file_path: '.claude/hooks/routing/new-guard.cjs',
     });
     assert.equal(result.pass, false);
     assert.match(result.message, /hook-creator/);
@@ -150,14 +162,14 @@ describe('unified-creator-guard.cjs - Gate 4: Hook Artifact Protection', () => {
 
   it('should block write to safety hook', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/hooks/safety/validation-hook.cjs'
+      file_path: '.claude/hooks/safety/validation-hook.cjs',
     });
     assert.equal(result.pass, false);
   });
 
   it('should NOT block test files', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/hooks/routing/test-hook.test.cjs'
+      file_path: '.claude/hooks/routing/test-hook.test.cjs',
     });
     assert.equal(result.pass, true);
   });
@@ -166,7 +178,7 @@ describe('unified-creator-guard.cjs - Gate 4: Hook Artifact Protection', () => {
     creatorGuard.markCreatorActive('hook-creator', 'new-guard');
 
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/hooks/routing/new-guard.cjs'
+      file_path: '.claude/hooks/routing/new-guard.cjs',
     });
     assert.equal(result.pass, true);
   });
@@ -180,7 +192,7 @@ describe('unified-creator-guard.cjs - Gate 4: Workflow Artifact Protection', () 
 
   it('should block direct write to new workflow', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/workflows/core/new-workflow.md'
+      file_path: '.claude/workflows/core/new-workflow.md',
     });
     assert.equal(result.pass, false);
     assert.match(result.message, /workflow-creator/);
@@ -188,7 +200,7 @@ describe('unified-creator-guard.cjs - Gate 4: Workflow Artifact Protection', () 
 
   it('should block write to enterprise workflow', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/workflows/enterprise/feature-workflow.md'
+      file_path: '.claude/workflows/enterprise/feature-workflow.md',
     });
     assert.equal(result.pass, false);
   });
@@ -197,14 +209,14 @@ describe('unified-creator-guard.cjs - Gate 4: Workflow Artifact Protection', () 
     creatorGuard.markCreatorActive('workflow-creator', 'new-workflow');
 
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/workflows/core/new-workflow.md'
+      file_path: '.claude/workflows/core/new-workflow.md',
     });
     assert.equal(result.pass, true);
   });
 
   it('should NOT block README.md in workflows directory', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/workflows/README.md'
+      file_path: '.claude/workflows/README.md',
     });
     assert.equal(result.pass, true);
   });
@@ -218,7 +230,7 @@ describe('unified-creator-guard.cjs - Gate 4: Template Artifact Protection', () 
 
   it('should block direct write to new template', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/templates/spawn/new-template.md'
+      file_path: '.claude/templates/spawn/new-template.md',
     });
     assert.equal(result.pass, false);
     assert.match(result.message, /template-creator/);
@@ -228,14 +240,14 @@ describe('unified-creator-guard.cjs - Gate 4: Template Artifact Protection', () 
     creatorGuard.markCreatorActive('template-creator', 'new-template');
 
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/templates/spawn/new-template.md'
+      file_path: '.claude/templates/spawn/new-template.md',
     });
     assert.equal(result.pass, true);
   });
 
   it('should NOT block archived templates', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/templates/_archive/old-template.md'
+      file_path: '.claude/templates/_archive/old-template.md',
     });
     assert.equal(result.pass, true);
   });
@@ -249,7 +261,7 @@ describe('unified-creator-guard.cjs - Gate 4: Schema Artifact Protection', () =>
 
   it('should block direct write to new schema', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/schemas/new-artifact.schema.json'
+      file_path: '.claude/schemas/new-artifact.schema.json',
     });
     assert.equal(result.pass, false);
     assert.match(result.message, /schema-creator/);
@@ -257,7 +269,7 @@ describe('unified-creator-guard.cjs - Gate 4: Schema Artifact Protection', () =>
 
   it('should block write to schema without .schema suffix', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/schemas/config.json'
+      file_path: '.claude/schemas/config.json',
     });
     assert.equal(result.pass, false);
   });
@@ -266,7 +278,7 @@ describe('unified-creator-guard.cjs - Gate 4: Schema Artifact Protection', () =>
     creatorGuard.markCreatorActive('schema-creator', 'new-artifact');
 
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/schemas/new-artifact.schema.json'
+      file_path: '.claude/schemas/new-artifact.schema.json',
     });
     assert.equal(result.pass, true);
   });
@@ -282,7 +294,7 @@ describe('unified-creator-guard.cjs - Enforcement Modes', () => {
     process.env.CREATOR_GUARD = 'warn';
 
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/skills/test-skill/SKILL.md'
+      file_path: '.claude/skills/test-skill/SKILL.md',
     });
     assert.equal(result.pass, true);
     assert.equal(result.result, 'warn');
@@ -293,7 +305,7 @@ describe('unified-creator-guard.cjs - Enforcement Modes', () => {
     process.env.CREATOR_GUARD = 'off';
 
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/skills/test-skill/SKILL.md'
+      file_path: '.claude/skills/test-skill/SKILL.md',
     });
     assert.equal(result.pass, true);
     assert.equal(result.result, undefined);
@@ -301,7 +313,7 @@ describe('unified-creator-guard.cjs - Enforcement Modes', () => {
 
   it('should respect CREATOR_GUARD=block (default)', () => {
     const result = creatorGuard.validateCreatorWorkflow('Write', {
-      file_path: '.claude/skills/test-skill/SKILL.md'
+      file_path: '.claude/skills/test-skill/SKILL.md',
     });
     assert.equal(result.pass, false);
     assert.equal(result.result, 'block');
@@ -396,8 +408,14 @@ describe('unified-creator-guard.cjs - TTL Bounds Validation (HIGH-002)', () => {
 
   it('should enforce minimum TTL of 30 seconds', () => {
     process.env.CREATOR_STATE_TTL_MS = '1000'; // 1 second (too short)
-    delete require.cache[require.resolve(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'))];
-    const guard = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'));
+    delete require.cache[
+      require.resolve(
+        path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs')
+      )
+    ];
+    const guard = require(
+      path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs')
+    );
 
     // DEFAULT_TTL_MS should be clamped to MIN_TTL_MS (30000)
     assert.ok(guard.DEFAULT_TTL_MS >= 30000);
@@ -405,8 +423,14 @@ describe('unified-creator-guard.cjs - TTL Bounds Validation (HIGH-002)', () => {
 
   it('should enforce maximum TTL of 10 minutes', () => {
     process.env.CREATOR_STATE_TTL_MS = '3600000'; // 1 hour (too long)
-    delete require.cache[require.resolve(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'))];
-    const guard = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'));
+    delete require.cache[
+      require.resolve(
+        path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs')
+      )
+    ];
+    const guard = require(
+      path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs')
+    );
 
     // DEFAULT_TTL_MS should be clamped to MAX_TTL_MS (600000)
     assert.ok(guard.DEFAULT_TTL_MS <= 600000);
@@ -414,8 +438,14 @@ describe('unified-creator-guard.cjs - TTL Bounds Validation (HIGH-002)', () => {
 
   it('should use default TTL for invalid values', () => {
     process.env.CREATOR_STATE_TTL_MS = 'invalid';
-    delete require.cache[require.resolve(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'))];
-    const guard = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'));
+    delete require.cache[
+      require.resolve(
+        path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs')
+      )
+    ];
+    const guard = require(
+      path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs')
+    );
 
     // Should fall back to 3 minutes (180000ms)
     assert.equal(guard.DEFAULT_TTL_MS, 180000);
