@@ -16,6 +16,7 @@ const {
   extractResolutionEvidence,
   recordFindingsTrendSnapshot,
   summarizeFindingsTrend,
+  pruneStaleOpenFindings,
 } = require('../../../.claude/lib/memory/findings-registry.cjs');
 
 function createTempProjectRoot() {
@@ -339,6 +340,44 @@ test('recordFindingsTrendSnapshot and summarizeFindingsTrend provide unresolved 
     const trend = summarizeFindingsTrend(root, { days: 7 });
     assert.equal(trend.sampleCount >= 2, true);
     assert.equal(typeof trend.openDelta, 'number');
+  } finally {
+    cleanup(root);
+  }
+});
+
+test('pruneStaleOpenFindings resolves stale open findings when source report is missing', () => {
+  const root = createTempProjectRoot();
+  try {
+    const reportRel = path.join('.claude', 'context', 'reports', 'stale-findings-source.md');
+    const reportAbs = writeReport(
+      root,
+      reportRel,
+      ['# Audit', 'P0 — Critical', '1. Temporary critical finding from transient report'].join('\n')
+    );
+
+    ingestReportFindings(root, reportAbs, {
+      taskId: 'task-stale-1',
+      agentType: 'code-reviewer',
+    });
+
+    fs.unlinkSync(reportAbs);
+
+    const staleTs = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+    const registryPath = path.join(root, OPEN_FINDINGS_FILE);
+    const payload = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+    payload.findings = payload.findings.map(item => ({
+      ...item,
+      lastSeenAt: staleTs,
+      createdAt: staleTs,
+    }));
+    fs.writeFileSync(registryPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+
+    const result = pruneStaleOpenFindings(root, { maxAgeDays: 3 });
+    assert.equal(result.pruned, 1);
+
+    const summary = getFindingsSummary(root);
+    assert.equal(summary.open, 0);
+    assert.equal(summary.resolved >= 1, true);
   } finally {
     cleanup(root);
   }

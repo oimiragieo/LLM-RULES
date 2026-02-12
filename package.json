@@ -25,7 +25,7 @@
     "metrics:findings:ci": "node .claude/tools/cli/open-findings-summary.cjs --json --assert-max-open-critical 0 --assert-max-open-high 5",
     "metrics:findings:trend:summary": "node .claude/tools/cli/open-findings-trend-summary.cjs --json --days 7",
     "metrics:findings:trend:ci": "node .claude/tools/cli/open-findings-trend-summary.cjs --json --days 7 --assert-max-open-delta 10",
-    "metrics:findings:nightly": "node .claude/tools/cli/open-findings-summary.cjs --json --assert-max-open-critical 0 --assert-max-open-high 0 --assert-max-open-total 0",
+    "metrics:findings:nightly": "node .claude/tools/cli/open-findings-summary.cjs --json --prune-stale true --prune-max-age-days 3 --assert-max-open-critical 0 --assert-max-open-high 0 --assert-max-open-total 0",
     "metrics:findings:trend:nightly": "node .claude/tools/cli/open-findings-trend-summary.cjs --json --days 7 --require-data true --assert-max-open-delta 0",
     "metrics:ci": "pnpm metrics:spawn:ci && pnpm metrics:routing:ci && pnpm metrics:runtime:ci && pnpm metrics:memory:slo:ci && pnpm metrics:memory-cache:ci && pnpm metrics:findings:ci && pnpm metrics:findings:trend:ci",
     "metrics:nightly": "pnpm metrics:ci && pnpm metrics:findings:nightly && pnpm metrics:findings:trend:nightly",

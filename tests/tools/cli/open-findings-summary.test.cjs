@@ -28,6 +28,22 @@ test('parseArgs reads json and threshold flags', () => {
   assert.equal(opts.assertMaxOpenHigh, 2);
   assert.equal(opts.assertMaxOpenTotal, 3);
   assert.equal(opts.requireData, true);
+  assert.equal(opts.pruneStale, false);
+  assert.equal(opts.pruneMaxAgeDays, null);
+});
+
+test('parseArgs reads stale prune flags', () => {
+  const opts = parseArgs([
+    'node',
+    'open-findings-summary.cjs',
+    '--prune-stale',
+    'true',
+    '--prune-max-age-days',
+    '5',
+  ]);
+
+  assert.equal(opts.pruneStale, true);
+  assert.equal(opts.pruneMaxAgeDays, 5);
 });
 
 test('evaluate returns failures when thresholds are exceeded', () => {

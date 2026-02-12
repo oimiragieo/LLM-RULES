@@ -24,6 +24,7 @@ const SEVERITY_RANK = {
 const DEFAULT_RESOLUTION_MIN_OVERLAP = 2;
 const DEFAULT_RESOLUTION_MODE = 'lenient';
 const STRICT_MIN_CONFIDENCE = 0.6;
+const DEFAULT_STALE_FINDINGS_MAX_AGE_DAYS = 3;
 
 function resolveProjectRoot(projectRoot = PROJECT_ROOT) {
   if (!projectRoot || typeof projectRoot !== 'string') {
@@ -499,6 +500,47 @@ function summarizeFindingsTrend(projectRoot = PROJECT_ROOT, options = {}) {
   };
 }
 
+function pruneStaleOpenFindings(projectRoot = PROJECT_ROOT, options = {}) {
+  const root = resolveProjectRoot(projectRoot);
+  const maxAgeRaw = Number(options.maxAgeDays);
+  const maxAgeDays =
+    Number.isFinite(maxAgeRaw) && maxAgeRaw > 0
+      ? maxAgeRaw
+      : DEFAULT_STALE_FINDINGS_MAX_AGE_DAYS;
+  const cutoff = Date.now() - maxAgeDays * 24 * 60 * 60 * 1000;
+
+  const registry = loadRegistry(root);
+  let pruned = 0;
+  const now = new Date().toISOString();
+
+  for (const finding of registry.findings) {
+    if (String(finding?.status || 'open') === 'resolved') continue;
+    const sourceReportPath = String(finding?.sourceReportPath || '').trim();
+    if (!sourceReportPath) continue;
+
+    const seenTs = Date.parse(String(finding?.lastSeenAt || finding?.createdAt || ''));
+    if (!Number.isFinite(seenTs) || seenTs > cutoff) continue;
+
+    const sourceAbs = path.resolve(root, sourceReportPath);
+    const validation = validatePathWithinProject(sourceAbs, root);
+    if (!validation.safe) continue;
+    if (fs.existsSync(validation.resolvedPath)) continue;
+
+    finding.status = 'resolved';
+    finding.resolvedAt = now;
+    finding.lastSeenAt = now;
+    finding.resolvedByAgent = 'findings-pruner';
+    finding.resolutionNote = 'auto-resolved stale finding due to missing source report';
+    pruned++;
+  }
+
+  if (pruned > 0) {
+    saveRegistry(root, registry);
+  }
+
+  return { pruned, scanned: registry.findings.length, maxAgeDays };
+}
+
 module.exports = {
   OPEN_FINDINGS_FILE,
   OPEN_FINDINGS_TREND_FILE,
@@ -513,6 +555,7 @@ module.exports = {
   readFindingsTrend,
   recordFindingsTrendSnapshot,
   summarizeFindingsTrend,
+  pruneStaleOpenFindings,
   resolveFindingsFromCompletion,
   makeFingerprint,
   normalizeSummary,
@@ -522,4 +565,5 @@ module.exports = {
   DEFAULT_RESOLUTION_MIN_OVERLAP,
   DEFAULT_RESOLUTION_MODE,
   STRICT_MIN_CONFIDENCE,
+  DEFAULT_STALE_FINDINGS_MAX_AGE_DAYS,
 };

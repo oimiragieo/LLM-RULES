@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-const { getFindingsSummary } = require('../../lib/memory/findings-registry.cjs');
+const { getFindingsSummary, pruneStaleOpenFindings } = require('../../lib/memory/findings-registry.cjs');
 
 function parseArgs(argv) {
   const args = argv.slice(2);
@@ -17,6 +17,8 @@ function parseArgs(argv) {
     json: map.get('--json') === 'true',
     projectRoot: map.get('--project-root') || process.cwd(),
     requireData: map.get('--require-data') === 'true',
+    pruneStale: map.get('--prune-stale') === 'true',
+    pruneMaxAgeDays: map.has('--prune-max-age-days') ? Number(map.get('--prune-max-age-days')) : null,
     assertMaxOpenCritical: map.has('--assert-max-open-critical')
       ? Number(map.get('--assert-max-open-critical'))
       : null,
@@ -68,11 +70,17 @@ function buildSummary(projectRoot) {
 
 function main() {
   const opts = parseArgs(process.argv);
+  let pruneResult = null;
+  if (opts.pruneStale) {
+    pruneResult = pruneStaleOpenFindings(opts.projectRoot, {
+      maxAgeDays: opts.pruneMaxAgeDays,
+    });
+  }
   const summary = buildSummary(opts.projectRoot);
   const failures = evaluate(summary, opts);
 
   if (opts.json) {
-    console.log(JSON.stringify({ summary, failures }, null, 2));
+    console.log(JSON.stringify({ summary, pruneResult, failures }, null, 2));
   } else {
     console.log('Open findings summary');
     console.log(`- Total: ${summary.total}`);
@@ -80,6 +88,11 @@ function main() {
     console.log(`- Resolved: ${summary.resolved}`);
     console.log(`- Open critical: ${summary.bySeverity.critical.open}`);
     console.log(`- Open high: ${summary.bySeverity.high.open}`);
+    if (pruneResult) {
+      console.log(
+        `- Pruned stale findings: ${pruneResult.pruned} (max age days: ${pruneResult.maxAgeDays})`
+      );
+    }
     if (failures.length > 0) {
       console.log('- Threshold failures:');
       for (const failure of failures) {
