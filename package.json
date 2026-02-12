@@ -54,6 +54,7 @@
     "test:framework": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs .claude/lib/**/*.test.cjs tests/hooks/*.test.cjs tests/lib/agents/*.test.cjs tests/lib/config/*.test.cjs tests/lib/qa/*.test.cjs tests/lib/plan/*.test.cjs tests/lib/memory/*.test.cjs tests/lib/monitoring/*.test.cjs tests/lib/routing/*.test.cjs tests/lib/spawn/*.test.cjs tests/lib/text-processing/*.test.cjs tests/lib/tools/*.test.cjs tests/lib/scheduler/*.test.cjs",
     "test:framework:hooks": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs",
     "test:framework:lib": "node --test --test-concurrency=1 tests/lib/**/*.test.cjs",
+    "test:memory:ci": "node --test tests/lib/memory/observations.test.cjs tests/hooks/spawn-prompt-memory-mode.test.cjs tests/hooks/unified-reflection-handler.test.cjs",
     "test:code-indexing": "node --test --test-concurrency=1 tests/code-indexing/ripgrep-integration.test.cjs tests/code-indexing/ast-grep-wrapper.test.cjs tests/code-indexing/merkle-tree.test.cjs tests/code-indexing/incremental-indexing.test.cjs tests/code-indexing/search-tools-integration.test.cjs tests/code-indexing/vector-store-lancedb.test.cjs tests/hooks/code-index-updater.test.cjs",
     "test:all": "pnpm test && pnpm test:framework && pnpm test:tools",
     "test:ci": "node --test --test-concurrency=1 --test-reporter=spec \"tests/**/*.test.{mjs,cjs}\"",

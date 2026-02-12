@@ -1,0 +1,61 @@
+name: Memory CI
+
+on:
+  pull_request:
+    paths:
+      - '.claude/lib/memory/**'
+      - '.claude/lib/spawn/**'
+      - '.claude/hooks/reflection/**'
+      - '.claude/hooks/routing/spawn-prompt-assembler.cjs'
+      - 'tests/lib/memory/**'
+      - 'tests/hooks/spawn-prompt-memory-mode.test.cjs'
+      - 'tests/hooks/unified-reflection-handler.test.cjs'
+      - '.claude/docs/MEMORY_SYSTEM.md'
+      - '.claude/docs/@ENVIRONMENT_CONFIG.md'
+      - '.env.example'
+      - 'package.json'
+  push:
+    branches:
+      - main
+    paths:
+      - '.claude/lib/memory/**'
+      - '.claude/lib/spawn/**'
+      - '.claude/hooks/reflection/**'
+      - '.claude/hooks/routing/spawn-prompt-assembler.cjs'
+      - 'tests/lib/memory/**'
+      - 'tests/hooks/spawn-prompt-memory-mode.test.cjs'
+      - 'tests/hooks/unified-reflection-handler.test.cjs'
+      - '.claude/docs/MEMORY_SYSTEM.md'
+      - '.claude/docs/@ENVIRONMENT_CONFIG.md'
+      - '.env.example'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  memory-ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run memory CI gate
+        run: pnpm run test:memory:ci

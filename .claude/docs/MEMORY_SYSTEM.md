@@ -693,6 +693,11 @@ Spawn prompt memory assembly records hash churn at:
 
 Each entry tracks `memory_block_hash`, `previous_hash`, and `churned` (`true` when the memory block changed).
 
+### CI gate
+
+Use `pnpm run test:memory:ci` to run the memory safety/integration gate locally or in CI.  
+The workflow `.github/workflows/memory-ci.yml` runs this gate on memory-related changes.
+
 ## Keyword Search Fallback
 
 When semantic search (LanceDB) is unavailable, `ContextualMemory` falls back to keyword search with performance optimizations:
