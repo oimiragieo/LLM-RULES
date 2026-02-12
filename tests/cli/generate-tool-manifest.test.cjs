@@ -5,9 +5,9 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 
-const {
-  formatManifestJson,
-} = require(path.join('..', '..', '.claude', 'tools', 'cli', 'generate-tool-manifest.cjs'));
+const { formatManifestJson } = require(
+  path.join('..', '..', '.claude', 'tools', 'cli', 'generate-tool-manifest.cjs')
+);
 
 describe('generate-tool-manifest formatting', () => {
   it('formats JSON with resolved Prettier config and trailing newline', async () => {
