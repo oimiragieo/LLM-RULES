@@ -63,12 +63,20 @@ function writeLegacyMemory(root) {
   fs.mkdirSync(memoryDir, { recursive: true });
   fs.writeFileSync(
     path.join(memoryDir, 'gotchas.json'),
-    JSON.stringify([{ text: 'legacy-gotcha-text', timestamp: '2026-02-12T00:00:00.000Z' }], null, 2),
+    JSON.stringify(
+      [{ text: 'legacy-gotcha-text', timestamp: '2026-02-12T00:00:00.000Z' }],
+      null,
+      2
+    ),
     'utf8'
   );
   fs.writeFileSync(
     path.join(memoryDir, 'patterns.json'),
-    JSON.stringify([{ text: 'legacy-pattern-text', timestamp: '2026-02-12T00:00:00.000Z' }], null, 2),
+    JSON.stringify(
+      [{ text: 'legacy-pattern-text', timestamp: '2026-02-12T00:00:00.000Z' }],
+      null,
+      2
+    ),
     'utf8'
   );
 }
@@ -76,7 +84,11 @@ function writeLegacyMemory(root) {
 function writeObservationalMemory(root, { summaryLength = 120, count = 3 } = {}) {
   const memoryDir = path.join(root, '.claude', 'context', 'memory');
   fs.mkdirSync(memoryDir, { recursive: true });
-  fs.writeFileSync(path.join(memoryDir, 'observations_summary.md'), 'S'.repeat(summaryLength), 'utf8');
+  fs.writeFileSync(
+    path.join(memoryDir, 'observations_summary.md'),
+    'S'.repeat(summaryLength),
+    'utf8'
+  );
   const lines = [];
   for (let i = 0; i < count; i++) {
     lines.push(
@@ -99,6 +111,10 @@ function sectionBetween(text, startMarker, endMarker) {
   const end = endMarker ? afterStart.indexOf(endMarker) : -1;
   if (end === -1) return afterStart.trim();
   return afterStart.slice(0, end).trim();
+}
+
+function getMemoryCacheStabilityPath(root) {
+  return path.join(root, '.claude', 'context', 'metrics', 'memory-cache-stability.jsonl');
 }
 
 test('MEMORY_MODE=observational uses observational section and excludes legacy gotchas/patterns', () => {
@@ -213,8 +229,14 @@ test('section-based caps bound observational summary and recent observations sec
     const summary = sectionBetween(output, '### Observational summary', '### Recent observations');
     const recent = sectionBetween(output, '### Recent observations', '\n## ');
 
-    assert.ok(estimateTokens(summary) <= 31, `summary tokens exceeded cap: ${estimateTokens(summary)}`);
-    assert.ok(estimateTokens(recent) <= 21, `recent tokens exceeded cap: ${estimateTokens(recent)}`);
+    assert.ok(
+      estimateTokens(summary) <= 31,
+      `summary tokens exceeded cap: ${estimateTokens(summary)}`
+    );
+    assert.ok(
+      estimateTokens(recent) <= 21,
+      `recent tokens exceeded cap: ${estimateTokens(recent)}`
+    );
   } finally {
     cleanup(root);
   }
@@ -242,7 +264,11 @@ test('Tier B semantic section respects MEMORY_TIER_B_MAX_TOKENS cap', () => {
     appendSemanticMatches(base, results)
   );
 
-  const semanticSection = sectionBetween(output, '### Semantic Matches (ContextualMemory)', '\n## ');
+  const semanticSection = sectionBetween(
+    output,
+    '### Semantic Matches (ContextualMemory)',
+    '\n## '
+  );
   assert.ok(
     estimateTokens(semanticSection) <= 13,
     `semantic section exceeded cap: ${estimateTokens(semanticSection)}`
@@ -274,7 +300,13 @@ test('observational mode Tier B gate turns on when memory_depth=true', () => {
 });
 
 test('spawn-prompt-assembler hook e2e: observational mode returns valid modified tool_input prompt', () => {
-  const hookPath = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'spawn-prompt-assembler.cjs');
+  const hookPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'hooks',
+    'routing',
+    'spawn-prompt-assembler.cjs'
+  );
   const payload = {
     session_id: 'test-session-observational',
     tool_name: 'Task',
@@ -309,4 +341,73 @@ test('spawn-prompt-assembler hook e2e: observational mode returns valid modified
   assert.ok(typeof output.tool_input.prompt === 'string');
   assert.ok(output.tool_input.prompt.includes('## Memory Protocol'));
   assert.ok(output.tool_input.prompt.includes('PROJECT_ROOT'));
+});
+
+test('assembleSpawnPrompt records memory cache stability churn metrics', () => {
+  const root = createTempRoot();
+  try {
+    writeObservationalMemory(root, { summaryLength: 120, count: 3 });
+    const metricsPath = getMemoryCacheStabilityPath(root);
+
+    withEnv(
+      {
+        MEMORY_MODE: 'observational',
+        OBSERVATIONAL_MEMORY_ENABLED: 'on',
+      },
+      () =>
+        assembleSpawnPrompt({
+          agentType: 'developer',
+          allowedTools: ['Read', 'TaskUpdate', 'TaskList', 'Skill'],
+          basePrompt: BASE_PROMPT,
+          includeMemory: true,
+          projectRoot: root,
+        })
+    );
+
+    withEnv(
+      {
+        MEMORY_MODE: 'observational',
+        OBSERVATIONAL_MEMORY_ENABLED: 'on',
+      },
+      () =>
+        assembleSpawnPrompt({
+          agentType: 'developer',
+          allowedTools: ['Read', 'TaskUpdate', 'TaskList', 'Skill'],
+          basePrompt: BASE_PROMPT,
+          includeMemory: true,
+          projectRoot: root,
+        })
+    );
+
+    fs.writeFileSync(
+      path.join(root, '.claude', 'context', 'memory', 'observations_summary.md'),
+      'Changed summary content',
+      'utf8'
+    );
+
+    withEnv(
+      {
+        MEMORY_MODE: 'observational',
+        OBSERVATIONAL_MEMORY_ENABLED: 'on',
+      },
+      () =>
+        assembleSpawnPrompt({
+          agentType: 'developer',
+          allowedTools: ['Read', 'TaskUpdate', 'TaskList', 'Skill'],
+          basePrompt: BASE_PROMPT,
+          includeMemory: true,
+          projectRoot: root,
+        })
+    );
+
+    const lines = fs.readFileSync(metricsPath, 'utf8').split('\n').filter(Boolean);
+    assert.ok(lines.length >= 3);
+    const entries = lines.map(line => JSON.parse(line));
+    const last = entries[entries.length - 1];
+    assert.equal(typeof last.memory_block_hash, 'string');
+    assert.equal(typeof last.churned, 'boolean');
+    assert.equal(last.churned, true);
+  } finally {
+    cleanup(root);
+  }
 });

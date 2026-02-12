@@ -682,6 +682,15 @@ SessionEnd can compact recent observations into a stable summary file used by ob
 - `OBSERVATIONS_COMPACT_ON_SESSION_END=on` (default): run compaction at SessionEnd.
 - `OBSERVATIONS_COMPACT_ON_SESSION_END=off`: skip compaction.
 - `OBSERVATIONS_COMPACT_MAX=50` (default): max rows read from `observations.jsonl` for each compaction.
+- `OBSERVATIONS_DECAY_PER_HOUR=0.02` (default): recency decay for observation scoring used in prompt ranking.
+
+### Cache-stability metric
+
+Spawn prompt memory assembly records hash churn at:
+
+- `.claude/context/metrics/memory-cache-stability.jsonl`
+
+Each entry tracks `memory_block_hash`, `previous_hash`, and `churned` (`true` when the memory block changed).
 
 ## Keyword Search Fallback
 

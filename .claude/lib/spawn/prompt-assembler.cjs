@@ -238,6 +238,8 @@ function formatObservationLine(observation) {
 
 function sortObservationsForPrompt(observations) {
   return observations.slice().sort((a, b) => {
+    const scoreDelta = Number(b?.score || 0) - Number(a?.score || 0);
+    if (scoreDelta !== 0) return scoreDelta;
     const confidenceDelta = Number(b?.confidence || 0) - Number(a?.confidence || 0);
     if (confidenceDelta !== 0) return confidenceDelta;
     return Date.parse(String(b?.timestamp || 0)) - Date.parse(String(a?.timestamp || 0));
@@ -323,7 +325,8 @@ function loadObservationalMemory(projectRoot = PROJECT_ROOT) {
   let recentObservations = [];
   try {
     const observations = require('../memory/observations.cjs');
-    recentObservations = observations.readObservations(root, { limit: 10 });
+    const raw = observations.readObservations(root, { limit: 10 });
+    recentObservations = observations.scoreObservations(raw);
   } catch (_err) {
     recentObservations = [];
   }
@@ -993,6 +996,15 @@ function assembleSpawnPrompt({
     memorySection,
     behaviourSection,
   });
+
+  if (includeMemory && memorySection) {
+    try {
+      const { recordMemoryBlockChurn } = require('../memory/observations.cjs');
+      recordMemoryBlockChurn(projectRoot, memorySection);
+    } catch (_err) {
+      // Best-effort metric recording.
+    }
+  }
 
   return enhancedPrompt;
 }

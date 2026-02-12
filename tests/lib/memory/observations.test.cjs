@@ -9,8 +9,11 @@ const os = require('node:os');
 const {
   appendObservation,
   readObservations,
+  scoreObservations,
   getByTopic,
   compactObservationsToSummary,
+  recordMemoryBlockChurn,
+  MEMORY_CACHE_STABILITY_FILE,
 } = require('../../../.claude/lib/memory/observations.cjs');
 
 function createTempProjectRoot() {
@@ -23,6 +26,10 @@ function getObservationsPath(projectRoot) {
 
 function getObservationsSummaryPath(projectRoot) {
   return path.join(projectRoot, '.claude', 'context', 'memory', 'observations_summary.md');
+}
+
+function getMemoryCacheStabilityPath(projectRoot) {
+  return path.join(projectRoot, MEMORY_CACHE_STABILITY_FILE);
 }
 
 function cleanup(projectRoot) {
@@ -202,6 +209,63 @@ test('compactObservationsToSummary writes stable summary markdown from latest ob
     assert.match(summary, /auth/i);
     assert.match(summary, /routing/i);
     assert.equal(result.count, 2);
+  } finally {
+    cleanup(projectRoot);
+  }
+});
+
+test('scoreObservations ranks by confidence and recency with decay', () => {
+  const now = Date.parse('2026-02-12T12:00:00.000Z');
+  const rows = [
+    {
+      timestamp: '2026-02-12T11:00:00.000Z',
+      topic: 'routing',
+      fact: 'recent mid confidence',
+      confidence: 0.8,
+      source_session: 's1',
+    },
+    {
+      timestamp: '2026-02-12T11:30:00.000Z',
+      topic: 'memory',
+      fact: 'recent high confidence',
+      confidence: 0.95,
+      source_session: 's2',
+    },
+    {
+      timestamp: '2026-02-10T11:30:00.000Z',
+      topic: 'memory',
+      fact: 'old high confidence',
+      confidence: 0.95,
+      source_session: 's3',
+    },
+  ];
+
+  const scored = scoreObservations(rows, { nowMs: now, decayPerHour: 0.1 });
+  assert.equal(scored.length, 3);
+  assert.equal(scored[0].fact, 'recent high confidence');
+  assert.equal(scored[2].fact, 'old high confidence');
+  assert.equal(typeof scored[0].score, 'number');
+  assert.equal(typeof scored[0].recency_factor, 'number');
+});
+
+test('recordMemoryBlockChurn appends hash metrics with churned true/false', () => {
+  const projectRoot = createTempProjectRoot();
+  try {
+    const metricsPath = getMemoryCacheStabilityPath(projectRoot);
+
+    const first = recordMemoryBlockChurn(projectRoot, 'section-a');
+    const second = recordMemoryBlockChurn(projectRoot, 'section-a');
+    const third = recordMemoryBlockChurn(projectRoot, 'section-b');
+
+    assert.equal(fs.existsSync(metricsPath), true);
+    const lines = fs.readFileSync(metricsPath, 'utf8').split('\n').filter(Boolean);
+    assert.equal(lines.length, 3);
+
+    assert.equal(first.churned, false);
+    assert.equal(second.churned, false);
+    assert.equal(third.churned, true);
+    assert.equal(second.previous_hash, first.memory_block_hash);
+    assert.equal(third.previous_hash, second.memory_block_hash);
   } finally {
     cleanup(projectRoot);
   }

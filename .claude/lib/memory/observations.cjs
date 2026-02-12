@@ -2,6 +2,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
 
@@ -12,6 +13,13 @@ const OBSERVATIONS_SUMMARY_FILE = path.join(
   'memory',
   'observations_summary.md'
 );
+const MEMORY_CACHE_STABILITY_FILE = path.join(
+  '.claude',
+  'context',
+  'metrics',
+  'memory-cache-stability.jsonl'
+);
+const DEFAULT_OBSERVATION_DECAY_PER_HOUR = 0.02;
 
 function resolveProjectRoot(projectRoot = PROJECT_ROOT) {
   if (!projectRoot || typeof projectRoot !== 'string') {
@@ -36,6 +44,16 @@ function resolveObservationsSummaryPath(projectRoot = PROJECT_ROOT) {
   const validation = validatePathWithinProject(summaryPath, root);
   if (!validation.safe) {
     throw new Error(`Invalid observations summary path: ${validation.reason}`);
+  }
+  return validation.resolvedPath;
+}
+
+function resolveMemoryCacheStabilityPath(projectRoot = PROJECT_ROOT) {
+  const root = resolveProjectRoot(projectRoot);
+  const metricsPath = path.join(root, MEMORY_CACHE_STABILITY_FILE);
+  const validation = validatePathWithinProject(metricsPath, root);
+  if (!validation.safe) {
+    throw new Error(`Invalid memory cache stability path: ${validation.reason}`);
   }
   return validation.resolvedPath;
 }
@@ -119,6 +137,34 @@ function readObservations(projectRoot, options = {}) {
   return parsed.slice(-limit);
 }
 
+function getObservationDecayPerHour() {
+  const configured = Number(process.env.OBSERVATIONS_DECAY_PER_HOUR);
+  if (!Number.isFinite(configured) || configured < 0) {
+    return DEFAULT_OBSERVATION_DECAY_PER_HOUR;
+  }
+  return configured;
+}
+
+function scoreObservations(observations, options = {}) {
+  const rows = Array.isArray(observations) ? observations.slice() : [];
+  const nowMs = Number.isFinite(options.nowMs) ? options.nowMs : Date.now();
+  const decayPerHour = Number.isFinite(options.decayPerHour)
+    ? options.decayPerHour
+    : getObservationDecayPerHour();
+
+  return rows
+    .map(row => {
+      const tsMs = Date.parse(String(row?.timestamp || ''));
+      const ageHours =
+        Number.isFinite(tsMs) && tsMs <= nowMs ? (nowMs - tsMs) / (1000 * 60 * 60) : 0;
+      const recency_factor = Math.exp(-decayPerHour * ageHours);
+      const confidence = Number.isFinite(Number(row?.confidence)) ? Number(row.confidence) : 0;
+      const score = confidence * recency_factor;
+      return { ...row, recency_factor, score };
+    })
+    .sort((a, b) => Number(b?.score || 0) - Number(a?.score || 0));
+}
+
 function getByTopic(projectRoot, topic, options = {}) {
   const normalizedTopic = String(topic || '').trim();
   if (!normalizedTopic) return [];
@@ -167,14 +213,54 @@ function compactObservationsToSummary(projectRoot, options = {}) {
   return { summaryPath, summary, count: rows.length };
 }
 
+function recordMemoryBlockChurn(projectRoot, memorySectionString) {
+  const metricsPath = resolveMemoryCacheStabilityPath(projectRoot);
+  const content = String(memorySectionString || '');
+  const memory_block_hash = crypto.createHash('sha256').update(content).digest('hex');
+
+  fs.mkdirSync(path.dirname(metricsPath), { recursive: true });
+
+  let previous_hash = null;
+  if (fs.existsSync(metricsPath)) {
+    const lines = fs.readFileSync(metricsPath, 'utf8').split('\n').filter(Boolean);
+    for (let i = lines.length - 1; i >= 0; i--) {
+      try {
+        const row = JSON.parse(lines[i]);
+        if (row && typeof row.previous_hash !== 'undefined' && row.memory_block_hash) {
+          previous_hash = String(row.memory_block_hash);
+          break;
+        }
+      } catch (_err) {
+        // Skip malformed lines
+      }
+    }
+  }
+
+  const churned = previous_hash !== null ? memory_block_hash !== previous_hash : false;
+  const entry = {
+    timestamp: new Date().toISOString(),
+    memory_block_hash,
+    previous_hash,
+    churned,
+  };
+  fs.appendFileSync(metricsPath, JSON.stringify(entry) + '\n', 'utf8');
+  return entry;
+}
+
 module.exports = {
   OBSERVATIONS_FILE,
   OBSERVATIONS_SUMMARY_FILE,
+  MEMORY_CACHE_STABILITY_FILE,
+  DEFAULT_OBSERVATION_DECAY_PER_HOUR,
   appendObservation,
   readObservations,
+  scoreObservations,
   getByTopic,
   compactObservationsToSummary,
+  recordMemoryBlockChurn,
   resolveObservationsPath,
   resolveObservationsSummaryPath,
+  resolveMemoryCacheStabilityPath,
+  getObservationDecayPerHour,
   normalizeObservation,
 };
