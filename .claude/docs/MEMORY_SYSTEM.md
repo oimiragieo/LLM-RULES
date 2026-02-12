@@ -704,6 +704,8 @@ Use:
 
 - `pnpm run metrics:memory-cache:summary`
 - `pnpm run metrics:memory-cache:ci`
+- `pnpm run metrics:memory:slo:summary`
+- `pnpm run metrics:memory:slo:ci`
 
 The CI variant asserts churn/stability thresholds on `memory-cache-stability.jsonl`.
 
