@@ -68,3 +68,6 @@ jobs:
 
       - name: Run memory SLO CI checks
         run: pnpm run metrics:memory:slo:ci
+
+      - name: Run memory cache stability CI checks
+        run: pnpm run metrics:memory-cache:ci
