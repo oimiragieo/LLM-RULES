@@ -58,6 +58,37 @@ test('evaluate fails when thresholds are violated', () => {
   assert.match(failures[1], /stable rate/i);
 });
 
+test('evaluate requireData fails when no rows are present', () => {
+  const failures = summaryCli.evaluate(
+    {
+      total: 0,
+      churnRate: 0,
+      stableRate: 0,
+    },
+    {
+      requireData: true,
+    }
+  );
+
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /no memory cache stability rows found/i);
+});
+
+test('evaluate requireData passes when rows exist and no thresholds set', () => {
+  const failures = summaryCli.evaluate(
+    {
+      total: 2,
+      churnRate: 0.5,
+      stableRate: 0.5,
+    },
+    {
+      requireData: true,
+    }
+  );
+
+  assert.equal(failures.length, 0);
+});
+
 test('readRows filters malformed lines and old timestamps', () => {
   const now = Date.now();
   const oldTs = new Date(now - 30 * 60 * 60 * 1000).toISOString(); // 30h ago

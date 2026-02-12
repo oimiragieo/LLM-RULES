@@ -20,7 +20,7 @@
     "metrics:memory:slo:summary": "node .claude/tools/cli/memory-slo-summary.cjs --json",
     "metrics:memory:slo:ci": "node .claude/tools/cli/memory-slo-summary.cjs --require-data true --assert-max-write-p95-ms 120 --assert-max-lock-wait-p95-ms 40 --assert-max-parse-failure-rate 0.02 --assert-max-churn-rate 0.8 --json",
     "metrics:memory-cache:summary": "node .claude/tools/cli/memory-cache-stability-summary.cjs --hours 24",
-    "metrics:memory-cache:ci": "node .claude/tools/cli/memory-cache-stability-summary.cjs --hours 24 --assert-max-churn-rate 0.75 --assert-min-stable-rate 0.25 --json",
+    "metrics:memory-cache:ci": "node .claude/tools/cli/memory-cache-stability-summary.cjs --hours 24 --require-data true --assert-max-churn-rate 0.75 --assert-min-stable-rate 0.25 --json",
     "metrics:ci": "pnpm metrics:spawn:ci && pnpm metrics:routing:ci && pnpm metrics:runtime:ci && pnpm metrics:memory:slo:ci && pnpm metrics:memory-cache:ci",
     "validate": "node --max-old-space-size=4096 --expose-gc scripts/validate-config.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs",
     "validate:full": "pnpm validate && node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs && pnpm validate:cujs && pnpm validate:index && pnpm index-rules && pnpm validate:schemas && pnpm validate:commands",

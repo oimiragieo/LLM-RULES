@@ -708,7 +708,7 @@ Use:
 - `pnpm run metrics:memory:slo:ci`
 
 The CI variant asserts churn/stability thresholds on `memory-cache-stability.jsonl`.
-It also uses `--require-data true`, requiring at least one operational memory signal in the current metrics window.
+It also uses `--require-data true`, requiring at least one operational memory signal in the current metrics window and at least one cache-stability row in the cache metrics window.
 
 ## Keyword Search Fallback
 
