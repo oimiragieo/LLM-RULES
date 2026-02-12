@@ -23,6 +23,7 @@ function cleanup() {
 
 test('contract: STM->MTM overflow creates LTM summary and remains queryable by agents', () => {
   setup();
+  let contextualMemory = null;
   try {
     for (let i = 0; i < 14; i++) {
       memoryTiers.writeSTMEntry(
@@ -38,7 +39,8 @@ test('contract: STM->MTM overflow creates LTM summary and remains queryable by a
       assert.equal(consolidated.success, true);
     }
 
-    const mem = new ContextualMemory({ projectRoot: TEST_ROOT }).loadContextSync({
+    contextualMemory = new ContextualMemory({ projectRoot: TEST_ROOT });
+    const mem = contextualMemory.loadContextSync({
       maxItems: { sessions: 20, gotchas: 20, patterns: 20, decisions: 10, discoveries: 20 },
       maxChars: {
         sessions: 20000,
@@ -56,6 +58,13 @@ test('contract: STM->MTM overflow creates LTM summary and remains queryable by a
     assert.equal(hasLtm, true);
     assert.ok(mem.recent_sessions.some(s => String(s.summary || '').includes('agent summary')));
   } finally {
+    if (contextualMemory) {
+      try {
+        contextualMemory.close();
+      } catch (_err) {
+        // Best-effort cleanup in tests.
+      }
+    }
     cleanup();
   }
 });
