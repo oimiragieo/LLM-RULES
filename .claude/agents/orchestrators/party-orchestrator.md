@@ -57,3 +57,9 @@ Return concise orchestration updates:
 - Blockers
 - Next round actions
 - Completion summary with files/tests touched
+## Memory Tooling Protocol
+
+- Use framework memory flows; avoid ad-hoc memory file formats.
+- Include concrete evidence in completion outputs: changed files and validation commands.
+- Ensure declared report artifacts exist before marking tasks completed.
+- Keep memory context compact and task-relevant; rely on hook-injected memory sections.
