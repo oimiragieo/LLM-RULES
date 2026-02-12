@@ -61,6 +61,18 @@ function getMemoryManager() {
   return memoryManager || null;
 }
 
+let findingsRegistry = null;
+function getFindingsRegistry() {
+  if (findingsRegistry === null) {
+    try {
+      findingsRegistry = require('../../lib/memory/findings-registry.cjs');
+    } catch (_e) {
+      findingsRegistry = false;
+    }
+  }
+  return findingsRegistry || null;
+}
+
 // =============================================================================
 // Paths
 // =============================================================================
@@ -504,6 +516,65 @@ function getMissingArtifacts(expectedPaths) {
   return missing;
 }
 
+function ingestExpectedReportFindings(expectedPaths, metadata = {}) {
+  if (!Array.isArray(expectedPaths) || expectedPaths.length === 0) {
+    return { ingested: 0, errors: [] };
+  }
+
+  const registry = getFindingsRegistry();
+  if (!registry || typeof registry.ingestReportFindings !== 'function') {
+    return { ingested: 0, errors: [] };
+  }
+
+  const errors = [];
+  let ingested = 0;
+  for (const relPath of expectedPaths) {
+    try {
+      const absPath = path.resolve(PROJECT_ROOT, relPath);
+      const result = registry.ingestReportFindings(PROJECT_ROOT, absPath, metadata);
+      ingested += Number(result?.added || 0);
+    } catch (err) {
+      errors.push({
+        path: relPath,
+        error: err?.message || String(err),
+      });
+    }
+  }
+
+  return { ingested, errors };
+}
+
+function resolveFindingsFromTaskCompletion(toolOutput, metadata = {}) {
+  const text = String(toolOutput || '');
+  if (!text || text.length < 30) {
+    return { resolved: 0, reviewed: 0 };
+  }
+
+  const registry = getFindingsRegistry();
+  if (!registry || typeof registry.resolveFindingsFromCompletion !== 'function') {
+    return { resolved: 0, reviewed: 0 };
+  }
+
+  try {
+    return registry.resolveFindingsFromCompletion(PROJECT_ROOT, text, metadata);
+  } catch (_err) {
+    return { resolved: 0, reviewed: 0 };
+  }
+}
+
+function recordFindingsTrendSnapshot(source = 'post-task-unified') {
+  const registry = getFindingsRegistry();
+  if (!registry || typeof registry.recordFindingsTrendSnapshot !== 'function') {
+    return null;
+  }
+
+  try {
+    return registry.recordFindingsTrendSnapshot(PROJECT_ROOT, source);
+  } catch (_err) {
+    return null;
+  }
+}
+
 function synthesizeRecoveryTaskUpdate(taskId, reason, retryHint, details = {}) {
   try {
     const dir = path.dirname(TASKUPDATE_RECOVERY_QUEUE_PATH);
@@ -574,6 +645,16 @@ function runTaskCompletionGuard(toolOutput, taskId = null, toolInput = null) {
     }
     return { pass: false, result: 'block', message: missingMessage };
   }
+
+  ingestExpectedReportFindings(expectedArtifacts, {
+    taskId: taskId || null,
+    agentType: toolInput?.subagent_type || null,
+  });
+  resolveFindingsFromTaskCompletion(toolOutput, {
+    taskId: taskId || null,
+    agentType: toolInput?.subagent_type || null,
+  });
+  recordFindingsTrendSnapshot('post-task-guard');
 
   // Check if TaskUpdate(completed) was called recently for this task
   const wasUpdated = hasMatchingCompletedTaskUpdate(taskId);
@@ -947,6 +1028,9 @@ module.exports = {
   hasMatchingCompletedTaskUpdate,
   extractExpectedArtifactPaths,
   getMissingArtifacts,
+  ingestExpectedReportFindings,
+  resolveFindingsFromTaskCompletion,
+  recordFindingsTrendSnapshot,
   synthesizeRecoveryTaskUpdate,
   runTaskCompletionGuard,
   COMPLETION_INDICATORS,
