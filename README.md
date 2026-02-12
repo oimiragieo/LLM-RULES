@@ -129,6 +129,43 @@ pnpm validate:full
 pnpm context:reset --scope soft --force
 ```
 
+## Memory System (Current Operating Model)
+
+The memory path now supports two operating modes for spawned agents:
+
+- `MEMORY_MODE=hybrid` (default): legacy memory injection (`gotchas/patterns/decisions/...`).
+- `MEMORY_MODE=observational`: injects `observations_summary.md` + recent rows from `observations.jsonl`.
+- `OBSERVATIONAL_MEMORY_ENABLED=off`: kill switch that forces hybrid mode.
+
+Additional controls:
+
+- Section token budgets:
+  - `MEMORY_SUMMARY_BLOCK_MAX_TOKENS` (default `400`)
+  - `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS` (default `400`)
+  - `MEMORY_TIER_B_MAX_TOKENS` (default `400`)
+- Session compaction:
+  - `OBSERVATIONS_COMPACT_ON_SESSION_END=on` (default)
+  - `OBSERVATIONS_COMPACT_MAX=50` (default)
+- Contradiction tagging is deferred by default:
+  - `OBSERVATIONS_CONTRADICTION_ENABLED=off`
+  - `OBSERVATIONS_CONTRADICTION_MAX_AGE_DAYS=90`
+
+Primary reference:
+
+- `.claude/docs/MEMORY_SYSTEM.md`
+
+Operational gates:
+
+- `pnpm run test:memory:ci`
+- `pnpm run metrics:memory:slo:ci`
+- `pnpm run metrics:memory-cache:ci`
+- `pnpm run test:framework`
+
+CI workflows:
+
+- `.github/workflows/memory-ci.yml`
+- `.github/workflows/memory-mvp-gate.yml`
+
 ## Hybrid Lazy Code Search
 
 Agent Studio uses a hybrid lazy search model:

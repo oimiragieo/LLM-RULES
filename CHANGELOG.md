@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed - Observational Memory Rollout, CI Gates, and Stability Hardening (2026-02-12)
+
+#### Memory Architecture / Behavior
+
+- Added observational memory operating mode documentation and defaults:
+  - `MEMORY_MODE=hybrid|observational` (default `hybrid`)
+  - `OBSERVATIONAL_MEMORY_ENABLED=on|off` kill switch
+  - section token budgets:
+    - `MEMORY_SUMMARY_BLOCK_MAX_TOKENS` (default `400`)
+    - `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS` (default `400`)
+    - `MEMORY_TIER_B_MAX_TOKENS` (default `400`)
+- Session-end compaction behavior documented and wired:
+  - `OBSERVATIONS_COMPACT_ON_SESSION_END` (default `on`)
+  - `OBSERVATIONS_COMPACT_MAX` (default `50`)
+- Contradiction supersedes logic moved behind an explicit rollout toggle:
+  - `OBSERVATIONS_CONTRADICTION_ENABLED=off` (default, deferred)
+  - `OBSERVATIONS_CONTRADICTION_MAX_AGE_DAYS=90` when enabled
+
+#### Tests / Reliability
+
+- Added migration edge-case coverage:
+  - observational mode fallback when `observations.jsonl` exists but is empty.
+- Hardened long-running memory soak tests:
+  - bounded 10-worker contention run time
+  - explicit timeout-handle cleanup to avoid open-handle hangs.
+- Fixed `router-agent-memory-contract` test cleanup by closing `ContextualMemory` handles.
+
+#### CI / Merge Gates
+
+- Updated memory workflow to include full framework gate.
+- Added explicit MVP merge workflow:
+  - `.github/workflows/memory-mvp-gate.yml`
+  - runs: `pnpm -s lint`, `pnpm run test:memory:ci`, `pnpm run test:framework`.
+
+#### Documentation
+
+- Updated:
+  - `.claude/docs/MEMORY_SYSTEM.md`
+  - `.claude/docs/@ENVIRONMENT_CONFIG.md`
+  - `.env.example`
+  - `README.md`
+
 ### Changed - Routing Reliability, Task Enforcement, and Token Efficiency (2026-02-10)
 
 #### Routing / Task Protocol
