@@ -18,6 +18,7 @@
 'use strict';
 
 const { validateCommand } = require('./validators/registry.cjs');
+const { spawnSync } = require('child_process');
 
 // PERF-006: Use shared hook-input utility instead of duplicated 55-line parseHookInput function
 const {
@@ -52,7 +53,54 @@ function detectBadSubstitutionRisk(command) {
     );
   }
 
+  // Block dangling default-expansion patterns that trigger runtime failures:
+  // - ${VAR:-$}
+  // - ${VAR:-$   (unterminated from templating)
+  const danglingDefaultExpansion = /\$\{[A-Za-z_][\w]*:-\$(?:\}|[\s"'`]|$)/;
+  if (danglingDefaultExpansion.test(command)) {
+    return (
+      'Potential bad substitution in default expansion detected (e.g. ${VAR:-$}). ' +
+      'Use a concrete fallback value (e.g. ${VAR:-default}) or a valid variable expansion.'
+    );
+  }
+
   return null;
+}
+
+let cachedRipgrepAvailable = null;
+
+function isRipgrepAvailable() {
+  if (cachedRipgrepAvailable !== null) {
+    return cachedRipgrepAvailable;
+  }
+
+  try {
+    const result = spawnSync('rg', ['--version'], {
+      stdio: 'ignore',
+      shell: false,
+      timeout: 1000,
+    });
+    cachedRipgrepAvailable = Boolean(!result.error && result.status === 0);
+  } catch (_err) {
+    cachedRipgrepAvailable = false;
+  }
+
+  return cachedRipgrepAvailable;
+}
+
+function detectRipgrepUnavailable(command, options = {}) {
+  if (!command || typeof command !== 'string') return null;
+  if (!/(^|\s)rg(\s|$)/.test(command)) return null;
+
+  const ripgrepAvailable =
+    typeof options.ripgrepAvailable === 'boolean' ? options.ripgrepAvailable : isRipgrepAvailable();
+
+  if (ripgrepAvailable) return null;
+
+  return (
+    'ripgrep (rg) is not available in this environment. ' +
+    'Use PowerShell fallback: Get-ChildItem -Recurse <path> -File | Select-String -Pattern "<pattern>".'
+  );
 }
 
 /**
@@ -197,6 +245,12 @@ async function main() {
       process.exit(2);
     }
 
+    const ripgrepMissingReason = detectRipgrepUnavailable(command);
+    if (ripgrepMissingReason) {
+      console.error(formatBlockedMessage(command, ripgrepMissingReason));
+      process.exit(2);
+    }
+
     const reportWriteReason = detectBashReportWrite(command);
     if (reportWriteReason) {
       if (isBypassPermissionsMode(hookInput)) {
@@ -273,6 +327,7 @@ module.exports = {
   formatBlockedMessage,
   detectBadSubstitutionRisk,
   detectUnsupportedRipgrepType,
+  detectRipgrepUnavailable,
   detectBashReportWrite,
   isBypassPermissionsMode,
   parseHookInput: parseHookInputAsync,

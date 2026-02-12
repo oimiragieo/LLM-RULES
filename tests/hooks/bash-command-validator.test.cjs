@@ -72,6 +72,7 @@ const {
   formatBlockedMessage,
   detectBadSubstitutionRisk,
   detectUnsupportedRipgrepType,
+  detectRipgrepUnavailable,
   detectBashReportWrite,
   isBypassPermissionsMode,
 } = require('../../.claude/hooks/safety/bash-command-validator.cjs');
@@ -209,6 +210,12 @@ test('detectBadSubstitutionRisk allows normal shell expansion', () => {
   assertEqual(reason, null, 'Should allow plain shell expansion');
 });
 
+test('detectBadSubstitutionRisk flags dangling default expansion ${VAR:-$}', () => {
+  const reason = detectBadSubstitutionRisk('echo ${TARGET:-$}');
+  assertTrue(Boolean(reason), 'Should detect dangling default expansion');
+  assertIncludes(reason.toLowerCase(), 'bad substitution', 'Should explain bad substitution risk');
+});
+
 test('detectUnsupportedRipgrepType flags --type cjs', () => {
   const reason = detectUnsupportedRipgrepType('rg -n foo --type cjs .');
   assertTrue(Boolean(reason), 'Should detect unsupported type alias');
@@ -223,6 +230,17 @@ test('detectUnsupportedRipgrepType flags -t cjs', () => {
 test('detectUnsupportedRipgrepType allows glob-based cjs filtering', () => {
   const reason = detectUnsupportedRipgrepType('rg -n foo -g "*.cjs" .');
   assertEqual(reason, null, 'Should allow glob-based approach');
+});
+
+test('detectRipgrepUnavailable flags rg command when rg is unavailable', () => {
+  const reason = detectRipgrepUnavailable('rg -n "todo" .', { ripgrepAvailable: false });
+  assertTrue(Boolean(reason), 'Should block when ripgrep is unavailable');
+  assertIncludes(reason.toLowerCase(), 'ripgrep', 'Should mention ripgrep');
+});
+
+test('detectRipgrepUnavailable allows rg command when rg is available', () => {
+  const reason = detectRipgrepUnavailable('rg -n "todo" .', { ripgrepAvailable: true });
+  assertEqual(reason, null, 'Should allow when ripgrep is available');
 });
 
 test('detectBashReportWrite blocks redirect writes into reports path', () => {

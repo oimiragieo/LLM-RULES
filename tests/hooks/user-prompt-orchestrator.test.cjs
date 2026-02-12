@@ -19,6 +19,7 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const cp = require('child_process');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -220,5 +221,50 @@ describe('user-prompt-orchestrator.cjs - Empty Stdin Handling', () => {
 
     // Should exit 0
     assert.equal(result.status, 0);
+  });
+});
+
+describe('user-prompt-orchestrator.cjs - bootstrap read targets', () => {
+  it('creates default runtime and memory placeholders when missing', () => {
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-studio-orchestrator-'));
+
+    try {
+      orchestrator.ensureBootstrapReadTargets(tempRoot);
+
+      const spawnRequestPath = path.join(
+        tempRoot,
+        '.claude',
+        'context',
+        'runtime',
+        'reflection-spawn-request.json'
+      );
+      const reminderPath = path.join(
+        tempRoot,
+        '.claude',
+        'context',
+        'runtime',
+        'reflection-reminder.txt'
+      );
+      const openFindingsPath = path.join(
+        tempRoot,
+        '.claude',
+        'context',
+        'memory',
+        'open-findings.json'
+      );
+
+      assert.equal(fs.existsSync(spawnRequestPath), true);
+      assert.equal(fs.existsSync(reminderPath), true);
+      assert.equal(fs.existsSync(openFindingsPath), true);
+
+      const spawnRequests = JSON.parse(fs.readFileSync(spawnRequestPath, 'utf8'));
+      assert.deepEqual(spawnRequests, []);
+
+      const openFindings = JSON.parse(fs.readFileSync(openFindingsPath, 'utf8'));
+      assert.equal(Array.isArray(openFindings.findings), true);
+      assert.equal(openFindings.findings.length, 0);
+    } finally {
+      fs.rmSync(tempRoot, { recursive: true, force: true });
+    }
   });
 });

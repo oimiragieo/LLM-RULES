@@ -26,6 +26,29 @@ const HOOK_ORDER = [
   '.claude/hooks/session/drift-detector.cjs',
 ];
 
+function ensureFileIfMissing(filePath, content) {
+  if (fs.existsSync(filePath)) return;
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, content, 'utf8');
+}
+
+function ensureBootstrapReadTargets(projectRoot = PROJECT_ROOT) {
+  const runtimeDir = path.join(projectRoot, '.claude', 'context', 'runtime');
+  const memoryDir = path.join(projectRoot, '.claude', 'context', 'memory');
+
+  // Prevent noisy "Read file does not exist" errors before routing hooks have
+  // had a chance to create advisory placeholders.
+  ensureFileIfMissing(path.join(runtimeDir, 'reflection-spawn-request.json'), '[]\n');
+  ensureFileIfMissing(
+    path.join(runtimeDir, 'reflection-reminder.txt'),
+    'No pending reflection requests.\n'
+  );
+  ensureFileIfMissing(
+    path.join(memoryDir, 'open-findings.json'),
+    `${JSON.stringify({ generatedAt: new Date().toISOString(), findings: [] }, null, 2)}\n`
+  );
+}
+
 function stderrLog(message) {
   process.stderr.write(`[user-prompt-orchestrator] ${message}\n`);
 }
@@ -48,6 +71,12 @@ function main() {
     // No input available; nothing to orchestrate.
     process.exit(0);
     return;
+  }
+
+  try {
+    ensureBootstrapReadTargets();
+  } catch (err) {
+    stderrLog(`bootstrap read target creation failed: ${err.message}`);
   }
 
   for (const hookPath of HOOK_ORDER) {
@@ -89,4 +118,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { HOOK_ORDER, runChildHook };
+module.exports = { HOOK_ORDER, runChildHook, ensureBootstrapReadTargets };
