@@ -696,7 +696,7 @@ Each entry tracks `memory_block_hash`, `previous_hash`, and `churned` (`true` wh
 ### CI gate
 
 Use `pnpm run test:memory:ci` to run the memory safety/integration gate locally or in CI.  
-The workflow `.github/workflows/memory-ci.yml` runs this gate on memory-related changes.
+The workflow `.github/workflows/memory-ci.yml` runs this gate on memory-related changes, plus format/lint and memory SLO checks.
 
 ### Cache-stability summary CLI
 

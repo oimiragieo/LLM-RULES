@@ -57,5 +57,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Format check
+        run: pnpm -s format:check
+
+      - name: Lint
+        run: pnpm -s lint
+
       - name: Run memory CI gate
         run: pnpm run test:memory:ci
+
+      - name: Run memory SLO CI checks
+        run: pnpm run metrics:memory:slo:ci
