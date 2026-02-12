@@ -307,8 +307,10 @@ function ingestReportFindings(projectRoot, reportPath, metadata = {}) {
 
 function getOpenFindings(projectRoot = PROJECT_ROOT, options = {}) {
   const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 5;
-  const minSeverity = String(options.minSeverity || '').trim().toLowerCase();
-  const minRank = minSeverity ? (SEVERITY_RANK[minSeverity] || 0) : 0;
+  const minSeverity = String(options.minSeverity || '')
+    .trim()
+    .toLowerCase();
+  const minRank = minSeverity ? SEVERITY_RANK[minSeverity] || 0 : 0;
 
   const registry = loadRegistry(projectRoot);
   const openFindings = registry.findings
@@ -336,7 +338,9 @@ function resolveFindingsFromCompletion(projectRoot, completionText, metadata = {
     Number.isFinite(minOverlapRaw) && minOverlapRaw > 0
       ? Math.floor(minOverlapRaw)
       : DEFAULT_RESOLUTION_MIN_OVERLAP;
-  const resolutionMode = String(process.env.OPEN_FINDINGS_RESOLUTION_MODE || DEFAULT_RESOLUTION_MODE)
+  const resolutionMode = String(
+    process.env.OPEN_FINDINGS_RESOLUTION_MODE || DEFAULT_RESOLUTION_MODE
+  )
     .trim()
     .toLowerCase();
 
@@ -412,7 +416,8 @@ function getFindingsSummary(projectRoot = PROJECT_ROOT) {
     const bucket = Object.prototype.hasOwnProperty.call(summary.bySeverity, severity)
       ? severity
       : 'unknown';
-    const status = String(finding?.status || 'open').toLowerCase() === 'resolved' ? 'resolved' : 'open';
+    const status =
+      String(finding?.status || 'open').toLowerCase() === 'resolved' ? 'resolved' : 'open';
 
     summary.total++;
     summary[status]++;
@@ -504,9 +509,7 @@ function pruneStaleOpenFindings(projectRoot = PROJECT_ROOT, options = {}) {
   const root = resolveProjectRoot(projectRoot);
   const maxAgeRaw = Number(options.maxAgeDays);
   const maxAgeDays =
-    Number.isFinite(maxAgeRaw) && maxAgeRaw > 0
-      ? maxAgeRaw
-      : DEFAULT_STALE_FINDINGS_MAX_AGE_DAYS;
+    Number.isFinite(maxAgeRaw) && maxAgeRaw > 0 ? maxAgeRaw : DEFAULT_STALE_FINDINGS_MAX_AGE_DAYS;
   const cutoff = Date.now() - maxAgeDays * 24 * 60 * 60 * 1000;
 
   const registry = loadRegistry(root);

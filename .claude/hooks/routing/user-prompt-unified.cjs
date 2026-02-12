@@ -46,6 +46,12 @@ const { checkCompressionNeeded, triggerCompression } = libRequire(
 );
 
 const logger = createLogger('user-prompt-unified');
+let findingsRegistry = null;
+try {
+  findingsRegistry = libRequire(path.join('memory', 'findings-registry.cjs'));
+} catch (_e) {
+  findingsRegistry = null;
+}
 let memoryTiers = null;
 try {
   memoryTiers = libRequire(path.join('memory', 'memory-tiers.cjs'));
@@ -92,6 +98,10 @@ const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const USER_PROMPT_RESULTS_PATH = path.join(RUNTIME_DIR, 'user-prompt-results.jsonl');
 const USER_PROMPT_RESULTS_LOG_ENABLED = process.env.USER_PROMPT_RESULTS_LOG !== 'off';
 const USER_PROMPT_RESULTS_MAX_LINES = Number(process.env.USER_PROMPT_RESULTS_MAX_LINES || 2000);
+const FINDINGS_PROMPT_SNAPSHOT_STATE_FILE = path.join(
+  RUNTIME_DIR,
+  'findings-trend-prompt-snapshot-state.json'
+);
 // Agent cache (shared across calls within same process)
 let agentCache = null;
 let agentCacheTime = 0;
@@ -118,6 +128,54 @@ function debugLog(source, message, err) {
   if (!process.env.DEBUG_HOOKS) return;
   const details = err ? ` ${err.message || err}` : '';
   console.warn(`[${source}] ${message}${details}`);
+}
+
+function getFindingsSnapshotIntervalMs() {
+  const intervalRaw = Number(process.env.FINDINGS_TREND_SNAPSHOT_INTERVAL_MS);
+  return Number.isFinite(intervalRaw) && intervalRaw > 0 ? intervalRaw : 15 * 60 * 1000;
+}
+
+function shouldRecordPromptFindingsSnapshot(
+  nowMs = Date.now(),
+  stateFilePath = FINDINGS_PROMPT_SNAPSHOT_STATE_FILE
+) {
+  const intervalMs = getFindingsSnapshotIntervalMs();
+
+  try {
+    if (!fs.existsSync(stateFilePath)) return true;
+    const payload = JSON.parse(fs.readFileSync(stateFilePath, 'utf8'));
+    const lastRecordedMs = Number(payload?.lastRecordedMs || 0);
+    if (!Number.isFinite(lastRecordedMs)) return true;
+    return nowMs - lastRecordedMs >= intervalMs;
+  } catch (_err) {
+    return true;
+  }
+}
+
+function recordPromptFindingsTrendSnapshot(
+  projectRoot = PROJECT_ROOT,
+  stateFilePath = FINDINGS_PROMPT_SNAPSHOT_STATE_FILE
+) {
+  if (!findingsRegistry || typeof findingsRegistry.recordFindingsTrendSnapshot !== 'function') {
+    return { recorded: false, reason: 'registry_unavailable' };
+  }
+
+  const nowMs = Date.now();
+  if (!shouldRecordPromptFindingsSnapshot(nowMs, stateFilePath)) {
+    return { recorded: false, reason: 'cooldown' };
+  }
+
+  try {
+    findingsRegistry.recordFindingsTrendSnapshot(projectRoot, 'user-prompt-unified');
+    fs.mkdirSync(path.dirname(stateFilePath), { recursive: true });
+    atomicWriteJSONSync(stateFilePath, {
+      lastRecordedMs: nowMs,
+      lastRecordedAt: new Date(nowMs).toISOString(),
+    });
+    return { recorded: true };
+  } catch (err) {
+    return { recorded: false, error: err?.message || String(err) };
+  }
 }
 
 // =============================================================================
@@ -1571,6 +1629,14 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     }
   }
 
+  // Continuous findings trend telemetry outside post-task/post-tool paths.
+  // This keeps trend data fresh even in prompt flows with limited tool activity.
+  try {
+    recordPromptFindingsTrendSnapshot(projectRoot);
+  } catch (_e) {
+    // Best-effort telemetry only.
+  }
+
   // Reflection Spawn Check: If requests exist, remind Router to spawn reflection-agent.
   try {
     const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
@@ -1866,6 +1932,8 @@ module.exports = {
   detectPlanningRequirement,
   scoreAgents,
   isTaskNotificationPrompt,
+  shouldRecordPromptFindingsSnapshot,
+  recordPromptFindingsTrendSnapshot,
   loadAgents,
   loadAgentsFromRegistry,
   agentsFromRegistry,

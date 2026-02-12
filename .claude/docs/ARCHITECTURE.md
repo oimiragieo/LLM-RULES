@@ -72,6 +72,17 @@ Read('.claude/skills/tdd/SKILL.md'); // ❌ Does not apply skill
 
 Without explicit skill invocation, agents won't follow their specialized workflows (TDD, debugging methodology, etc.).
 
+### Memory and Evolution Control Loop
+
+Runtime memory is not passive storage; it is part of an active control loop:
+
+1. Reflection hooks capture events and generate structured memory updates.
+2. Memory subsystems persist/compact those updates (STM/MTM/LTM + observational files).
+3. Spawn prompt assembly injects bounded memory context into each agent task.
+4. Evolution and quality hooks use findings/memory telemetry to enforce gates and prevent drift.
+
+This loop is reinforced by strict CI/nightly checks so regressions are detected before they accumulate.
+
 **Spawn Prompt Example:**
 
 ```javascript

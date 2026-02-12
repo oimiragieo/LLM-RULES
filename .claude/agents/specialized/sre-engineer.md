@@ -646,6 +646,7 @@ cat .claude/context/memory/learnings.md
 - Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
 - Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
 - Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.
+
 ## Memory Tooling Protocol
 
 - Use framework memory flows; avoid ad-hoc memory file formats.

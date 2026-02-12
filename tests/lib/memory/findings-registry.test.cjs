@@ -109,7 +109,10 @@ test('ingestReportFindings creates open-findings registry and deduplicates repea
     const parsed = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
     assert.equal(Array.isArray(parsed.findings), true);
     assert.equal(parsed.findings.length, 2);
-    assert.equal(parsed.findings.every(f => f.status === 'open'), true);
+    assert.equal(
+      parsed.findings.every(f => f.status === 'open'),
+      true
+    );
   } finally {
     cleanup(root);
   }
@@ -209,9 +212,7 @@ test('resolveFindingsFromCompletion stores resolution evidence for files and tes
     });
     assert.equal(result.resolved, 1);
 
-    const payload = JSON.parse(
-      fs.readFileSync(path.join(root, OPEN_FINDINGS_FILE), 'utf8')
-    );
+    const payload = JSON.parse(fs.readFileSync(path.join(root, OPEN_FINDINGS_FILE), 'utf8'));
     const resolved = payload.findings.find(f => f.status === 'resolved');
     assert.equal(Boolean(resolved), true);
     assert.equal(Array.isArray(resolved.resolutionEvidence.files), true);
@@ -269,9 +270,14 @@ test('extractResolutionEvidence captures files and validation commands from comp
     'Patched shell validator in .claude/hooks/safety/shell-injection-validator.cjs and verified with pnpm run test:framework and node --test tests/hooks/post-task-unified.test.cjs'
   );
   assert.equal(evidence.files.includes('.claude/hooks/safety/shell-injection-validator.cjs'), true);
-  assert.equal(evidence.commands.some(cmd => cmd.includes('pnpm run test:framework')), true);
   assert.equal(
-    evidence.commands.some(cmd => cmd.includes('node --test tests/hooks/post-task-unified.test.cjs')),
+    evidence.commands.some(cmd => cmd.includes('pnpm run test:framework')),
+    true
+  );
+  assert.equal(
+    evidence.commands.some(cmd =>
+      cmd.includes('node --test tests/hooks/post-task-unified.test.cjs')
+    ),
     true
   );
 });

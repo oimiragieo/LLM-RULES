@@ -18,6 +18,7 @@ const assert = require('node:assert');
 const { describe, it, beforeEach, afterEach, _mock } = require('node:test');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 // Test file paths
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -84,6 +85,16 @@ describe('user-prompt-unified module exports', () => {
 
     // Main entry point
     assert.strictEqual(typeof unified.runAllChecks, 'function', 'runAllChecks should be exported');
+    assert.strictEqual(
+      typeof unified.shouldRecordPromptFindingsSnapshot,
+      'function',
+      'shouldRecordPromptFindingsSnapshot should be exported'
+    );
+    assert.strictEqual(
+      typeof unified.recordPromptFindingsTrendSnapshot,
+      'function',
+      'recordPromptFindingsTrendSnapshot should be exported'
+    );
 
     // Helper for testing
     assert.strictEqual(
@@ -91,6 +102,59 @@ describe('user-prompt-unified module exports', () => {
       'function',
       'parseHookInput should be exported'
     );
+  });
+});
+
+describe('findings trend prompt snapshots', () => {
+  it('shouldRecordPromptFindingsSnapshot returns true when state file does not exist', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'findings-snapshot-test-'));
+    const statePath = path.join(tempDir, 'snapshot-state.json');
+
+    try {
+      const shouldRecord = unified.shouldRecordPromptFindingsSnapshot(Date.now(), statePath);
+      assert.strictEqual(shouldRecord, true);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('shouldRecordPromptFindingsSnapshot returns false within cooldown window', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'findings-snapshot-test-'));
+    const statePath = path.join(tempDir, 'snapshot-state.json');
+    const nowMs = Date.now();
+
+    try {
+      fs.writeFileSync(
+        statePath,
+        JSON.stringify({
+          lastRecordedMs: nowMs - 1000,
+          lastRecordedAt: new Date(nowMs - 1000).toISOString(),
+        }),
+        'utf8'
+      );
+      const shouldRecord = unified.shouldRecordPromptFindingsSnapshot(nowMs, statePath);
+      assert.strictEqual(shouldRecord, false);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('recordPromptFindingsTrendSnapshot writes state marker when registry is available', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'findings-snapshot-test-'));
+    const statePath = path.join(tempDir, 'snapshot-state.json');
+
+    try {
+      const result = unified.recordPromptFindingsTrendSnapshot(PROJECT_ROOT, statePath);
+      assert.strictEqual(typeof result.recorded, 'boolean');
+      if (result.recorded) {
+        assert.strictEqual(fs.existsSync(statePath), true);
+      }
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 });
 

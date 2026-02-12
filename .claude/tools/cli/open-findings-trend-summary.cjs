@@ -30,7 +30,10 @@ function evaluate(summary, opts) {
     failures.push('No findings trend data available.');
   }
 
-  if (Number.isFinite(opts.assertMaxOpenDelta) && Number(summary.openDelta || 0) > opts.assertMaxOpenDelta) {
+  if (
+    Number.isFinite(opts.assertMaxOpenDelta) &&
+    Number(summary.openDelta || 0) > opts.assertMaxOpenDelta
+  ) {
     failures.push(`Open findings delta ${summary.openDelta} exceeds ${opts.assertMaxOpenDelta}.`);
   }
 

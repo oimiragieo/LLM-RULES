@@ -88,35 +88,35 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 
 ### Spawn Prompt / Memory Retrieval Variables
 
-| Variable                                  | Values     | Default    | Purpose                                                                                              |
-| ----------------------------------------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------- |
-| `SPAWN_PROMPT_ASSEMBLER`                  | on/off     | on         | Enable the spawn prompt assembler hook.                                                              |
-| `ALLOWED_TOOLS_ENRICHER`                  | on/off     | on         | Enrich allowed_tools from registry/agent-config.                                                     |
-| `SPAWN_PROMPT_SEMANTIC_MEMORY`            | on/off     | on         | Append "Semantic Matches" section from ContextualMemory.                                             |
-| `SPAWN_PROMPT_ENTITY_GRAPH`               | on/off     | on         | Append entity graph (SQLite) section in spawn prompts.                                               |
-| `MEMORY_INTENT_ANALYSIS`                  | on/off     | off        | Enable intent-based memory query planning.                                                           |
-| `SPAWN_PROMPT_MEMORY_QUERY`               | on/off     | off        | Append query-driven "Relevant Memories" section; when on, replaces "Semantic Matches".               |
-| `SPAWN_PROMPT_MAX_CHARS`                  | number     | 40000      | Hard max chars for assembled spawn prompt before section trimming.                                   |
-| `SPAWN_SKILL_SECTION_MODE`                | enum       | names_only | Skill section verbosity (`names_only` or `full`).                                                    |
-| `SPAWN_ASSEMBLY_PROFILING`                | true/false | false      | Emit dev-only spawn assembly timing + token burn metrics.                                            |
-| `SPAWN_ADAPTIVE_ENRICHMENT`               | true/false | false      | Dynamically throttle expensive prompt enrichment based on runtime metrics.                           |
-| `SPAWN_ASSEMBLY_CACHE`                    | on/off     | on         | Enable on-disk spawn assembly cache.                                                                 |
-| `SPAWN_ASSEMBLY_CACHE_TTL_MS`             | number     | 120000     | Cache entry TTL (ms) for assembled spawn prompts.                                                    |
-| `SPAWN_ASSEMBLY_CACHE_MAX_ENTRIES`        | number     | 120        | Max assembled prompts retained in cache.                                                             |
-| `MEMORY_MODE`                             | enum       | hybrid     | Memory injection mode for spawn prompts (`hybrid` or `observational`).                               |
-| `OBSERVATIONAL_MEMORY_ENABLED`            | on/off     | on         | Kill switch for observational mode; when off, `MEMORY_MODE=observational` is ignored.                |
-| `MEMORY_SUMMARY_BLOCK_MAX_TOKENS`         | number     | 400        | Token cap for observational summary subsection.                                                      |
-| `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS`   | number     | 400        | Token cap for recent observations subsection.                                                        |
-| `MEMORY_TIER_B_MAX_TOKENS`                | number     | 400        | Token cap for Tier B memory sections (semantic/query/entity).                                        |
-| `OPEN_FINDINGS_MIN_SEVERITY`              | enum       | high       | Minimum severity included in open-findings carryover (`critical/high/medium/low`).                   |
-| `OPEN_FINDINGS_RESOLUTION_MODE`           | enum       | lenient    | Auto-resolution mode for findings (`lenient` or `strict`).                                           |
-| `OPEN_FINDINGS_RESOLUTION_MIN_OVERLAP`    | number     | 2          | Minimum token overlap required before attempting finding auto-resolution.                            |
-| `FINDINGS_TREND_SNAPSHOT_INTERVAL_MS`     | number     | 900000     | Minimum interval (ms) between periodic findings trend snapshots from unified post-tool metrics hook. |
-| `OBSERVATIONS_COMPACT_ON_SESSION_END`     | on/off     | on         | Enable SessionEnd compaction from `observations.jsonl` into `observations_summary.md`.               |
-| `OBSERVATIONS_COMPACT_MAX`                | number     | 50         | Max observation rows included during SessionEnd summary compaction.                                  |
-| `OBSERVATIONS_DECAY_PER_HOUR`             | number     | 0.02       | Recency decay used in observation scoring (higher = stronger recency bias).                          |
-| `OBSERVATIONS_CONTRADICTION_ENABLED`      | on/off     | off        | Enable contradiction supersedes tagging for new observations (deferred by default).                  |
-| `OBSERVATIONS_CONTRADICTION_MAX_AGE_DAYS` | number     | 90         | Max age window for contradiction supersedes tagging within same topic.                               |
+| Variable                                  | Values     | Default    | Purpose                                                                                                               |
+| ----------------------------------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------------------- |
+| `SPAWN_PROMPT_ASSEMBLER`                  | on/off     | on         | Enable the spawn prompt assembler hook.                                                                               |
+| `ALLOWED_TOOLS_ENRICHER`                  | on/off     | on         | Enrich allowed_tools from registry/agent-config.                                                                      |
+| `SPAWN_PROMPT_SEMANTIC_MEMORY`            | on/off     | on         | Append "Semantic Matches" section from ContextualMemory.                                                              |
+| `SPAWN_PROMPT_ENTITY_GRAPH`               | on/off     | on         | Append entity graph (SQLite) section in spawn prompts.                                                                |
+| `MEMORY_INTENT_ANALYSIS`                  | on/off     | off        | Enable intent-based memory query planning.                                                                            |
+| `SPAWN_PROMPT_MEMORY_QUERY`               | on/off     | off        | Append query-driven "Relevant Memories" section; when on, replaces "Semantic Matches".                                |
+| `SPAWN_PROMPT_MAX_CHARS`                  | number     | 40000      | Hard max chars for assembled spawn prompt before section trimming.                                                    |
+| `SPAWN_SKILL_SECTION_MODE`                | enum       | names_only | Skill section verbosity (`names_only` or `full`).                                                                     |
+| `SPAWN_ASSEMBLY_PROFILING`                | true/false | false      | Emit dev-only spawn assembly timing + token burn metrics.                                                             |
+| `SPAWN_ADAPTIVE_ENRICHMENT`               | true/false | false      | Dynamically throttle expensive prompt enrichment based on runtime metrics.                                            |
+| `SPAWN_ASSEMBLY_CACHE`                    | on/off     | on         | Enable on-disk spawn assembly cache.                                                                                  |
+| `SPAWN_ASSEMBLY_CACHE_TTL_MS`             | number     | 120000     | Cache entry TTL (ms) for assembled spawn prompts.                                                                     |
+| `SPAWN_ASSEMBLY_CACHE_MAX_ENTRIES`        | number     | 120        | Max assembled prompts retained in cache.                                                                              |
+| `MEMORY_MODE`                             | enum       | hybrid     | Memory injection mode for spawn prompts (`hybrid` or `observational`).                                                |
+| `OBSERVATIONAL_MEMORY_ENABLED`            | on/off     | on         | Kill switch for observational mode; when off, `MEMORY_MODE=observational` is ignored.                                 |
+| `MEMORY_SUMMARY_BLOCK_MAX_TOKENS`         | number     | 400        | Token cap for observational summary subsection.                                                                       |
+| `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS`   | number     | 400        | Token cap for recent observations subsection.                                                                         |
+| `MEMORY_TIER_B_MAX_TOKENS`                | number     | 400        | Token cap for Tier B memory sections (semantic/query/entity).                                                         |
+| `OPEN_FINDINGS_MIN_SEVERITY`              | enum       | high       | Minimum severity included in open-findings carryover (`critical/high/medium/low`).                                    |
+| `OPEN_FINDINGS_RESOLUTION_MODE`           | enum       | lenient    | Auto-resolution mode for findings (`lenient` or `strict`).                                                            |
+| `OPEN_FINDINGS_RESOLUTION_MIN_OVERLAP`    | number     | 2          | Minimum token overlap required before attempting finding auto-resolution.                                             |
+| `FINDINGS_TREND_SNAPSHOT_INTERVAL_MS`     | number     | 900000     | Minimum interval (ms) between periodic findings trend snapshots from unified post-tool metrics and user-prompt hooks. |
+| `OBSERVATIONS_COMPACT_ON_SESSION_END`     | on/off     | on         | Enable SessionEnd compaction from `observations.jsonl` into `observations_summary.md`.                                |
+| `OBSERVATIONS_COMPACT_MAX`                | number     | 50         | Max observation rows included during SessionEnd summary compaction.                                                   |
+| `OBSERVATIONS_DECAY_PER_HOUR`             | number     | 0.02       | Recency decay used in observation scoring (higher = stronger recency bias).                                           |
+| `OBSERVATIONS_CONTRADICTION_ENABLED`      | on/off     | off        | Enable contradiction supersedes tagging for new observations (deferred by default).                                   |
+| `OBSERVATIONS_CONTRADICTION_MAX_AGE_DAYS` | number     | 90         | Max age window for contradiction supersedes tagging within same topic.                                                |
 
 ### Memory / Compression Variables
 

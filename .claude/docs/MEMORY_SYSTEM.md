@@ -109,6 +109,17 @@ An optional Step 0 guard runs on `PreToolUse(TaskList)` via `.claude/hooks/refle
 
 **Reflection queue is processed on SessionEnd by default.** The reflection-queue-processor reads `.claude/context/reflection-queue.jsonl` and writes `.claude/context/runtime/reflection-spawn-request.json`. In environments that do not emit SessionEnd, you can enable prompt-based processing by setting `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on`, which runs the processor on `UserPromptSubmit` with an interval guard (`REFLECTION_QUEUE_PROCESS_INTERVAL_MS`). The queue file is trimmed to the last N lines (default 2000) via `REFLECTION_QUEUE_MAX_LINES` to prevent unbounded growth. To run reflection manually, execute `node .claude/hooks/reflection/reflection-queue-processor.cjs`. **Headless / rare sessions:** If SessionEnd rarely or never fires (e.g. headless or long-lived sessions), set `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on` and run weekly maintenance via cron or `pnpm run memory:weekly` (or use the worker).
 
+## Reflection and Evolution Memory Flow
+
+The operational data flow is:
+
+1. **Reflection extraction**: `unified-reflection-handler.cjs` captures task/error/session events and writes queue/session artifacts.
+2. **Memory storage**: STM/MTM/LTM and observational memory (`observations.jsonl`) are updated; compaction can write `observations_summary.md`.
+3. **Spawn-time injection**: `spawn-prompt-assembler.cjs` injects memory context (hybrid or observational mode) into subagent prompts with section budgets.
+4. **Evolution decisions**: evolution and quality gates consume findings/memory signals and enforce review/quality policies before changes are accepted.
+
+This pipeline is intentionally best-effort and bounded: failures in one stage should not block normal tool execution, but they should be visible in metrics and nightly strict gates.
+
 ### Hook chain error handling
 
 Hooks run in sequence; a hook that exits non-zero may prevent subsequent hooks from running (host-dependent). Each hook should be defensive and avoid throwing; use try/catch and exit 0 for advisory checks so the chain can continue.

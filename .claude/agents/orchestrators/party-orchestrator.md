@@ -57,6 +57,7 @@ Return concise orchestration updates:
 - Blockers
 - Next round actions
 - Completion summary with files/tests touched
+
 ## Memory Tooling Protocol
 
 - Use framework memory flows; avoid ad-hoc memory file formats.
