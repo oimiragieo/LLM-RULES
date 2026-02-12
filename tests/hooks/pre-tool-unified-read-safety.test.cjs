@@ -77,6 +77,13 @@ describe('pre-tool-unified read safety', () => {
     }
   });
 
+  test('checkReadSafety blocks missing file paths to prevent host read errors', () => {
+    const missingPath = path.join(os.tmpdir(), `read-guard-missing-${Date.now()}`, 'missing.md');
+    const result = checkReadSafety('Read', { file_path: missingPath });
+    assert.strictEqual(result.action, 'block');
+    assert.ok(String(result.message || '').includes('does not exist'));
+  });
+
   test('main enforces read safety when hook input is provided on stdin', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-stdin-'));
     const hookScript = path.join(

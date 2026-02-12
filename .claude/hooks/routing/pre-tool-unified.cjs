@@ -760,11 +760,28 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
 
   try {
     const targetPath = resolveReadPath(toolInput);
+    if (!targetPath) {
+      return {
+        checked: true,
+        action: 'block',
+        message:
+          '[READ SAFETY] Missing Read target path. ' +
+          'Provide file_path/filePath/path from a prior tool result (TaskOutput/Glob/Write) before calling Read.',
+      };
+    }
+
     ensureReflectionReadTarget(targetPath);
     ensureReportReadTarget(targetPath);
     ensureTaskOutputReadTarget(targetPath);
-    if (!targetPath || !fs.existsSync(targetPath)) {
-      return { checked: true, action: 'allow' };
+    if (!fs.existsSync(targetPath)) {
+      // Never allow host Read on a missing path; this avoids noisy "file does not exist" hard failures.
+      return {
+        checked: true,
+        action: 'block',
+        message:
+          `[READ SAFETY] "${targetPath}" does not exist. ` +
+          'Use Glob/TaskOutput to discover a valid path, or generate the artifact before reading it.',
+      };
     }
 
     const stats = fs.statSync(targetPath);
