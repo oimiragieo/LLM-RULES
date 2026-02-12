@@ -20,6 +20,8 @@ const MEMORY_CACHE_STABILITY_FILE = path.join(
   'memory-cache-stability.jsonl'
 );
 const DEFAULT_OBSERVATION_DECAY_PER_HOUR = 0.02;
+const DEFAULT_CONTRADICTION_MAX_AGE_DAYS = 90;
+const MIN_CONTRADICTION_TOKEN_OVERLAP = 2;
 
 function resolveProjectRoot(projectRoot = PROJECT_ROOT) {
   if (!projectRoot || typeof projectRoot !== 'string') {
@@ -192,15 +194,30 @@ function findContradictedObservation(existingRows, newRecord) {
   if (!Array.isArray(existingRows) || existingRows.length === 0) return null;
   if (!hasContradictionCue(newRecord?.fact)) return null;
 
+  const newTs = Date.parse(String(newRecord?.timestamp || ''));
+  const maxAgeDaysRaw = Number(process.env.OBSERVATIONS_CONTRADICTION_MAX_AGE_DAYS);
+  const maxAgeDays =
+    Number.isFinite(maxAgeDaysRaw) && maxAgeDaysRaw > 0
+      ? maxAgeDaysRaw
+      : DEFAULT_CONTRADICTION_MAX_AGE_DAYS;
+  const maxAgeMs = maxAgeDays * 24 * 60 * 60 * 1000;
+
   const newTokens = new Set(tokenizeFact(newRecord.fact));
   if (newTokens.size === 0) return null;
 
   for (const row of existingRows) {
+    const rowTs = Date.parse(String(row?.timestamp || ''));
+    if (Number.isFinite(newTs) && Number.isFinite(rowTs) && newTs >= rowTs) {
+      if (newTs - rowTs > maxAgeMs) {
+        continue;
+      }
+    }
+
     const existingTokens = tokenizeFact(row?.fact);
     let overlap = 0;
     for (const token of existingTokens) {
       if (newTokens.has(token)) overlap++;
-      if (overlap >= 2) {
+      if (overlap >= MIN_CONTRADICTION_TOKEN_OVERLAP) {
         return row;
       }
     }
@@ -295,6 +312,8 @@ module.exports = {
   OBSERVATIONS_SUMMARY_FILE,
   MEMORY_CACHE_STABILITY_FILE,
   DEFAULT_OBSERVATION_DECAY_PER_HOUR,
+  DEFAULT_CONTRADICTION_MAX_AGE_DAYS,
+  MIN_CONTRADICTION_TOKEN_OVERLAP,
   appendObservation,
   readObservations,
   scoreObservations,

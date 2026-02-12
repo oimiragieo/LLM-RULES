@@ -296,3 +296,53 @@ test('appendObservation marks supersedes when a new fact contradicts same-topic 
     cleanup(projectRoot);
   }
 });
+
+test('appendObservation does not set supersedes without contradiction cues', () => {
+  const projectRoot = createTempProjectRoot();
+  try {
+    appendObservation(projectRoot, {
+      timestamp: '2026-02-10T00:00:00.000Z',
+      topic: 'auth',
+      fact: 'Use JWT bearer tokens for API auth.',
+      confidence: 0.8,
+      source_session: 's1',
+    });
+
+    const appended = appendObservation(projectRoot, {
+      timestamp: '2026-02-12T00:00:00.000Z',
+      topic: 'auth',
+      fact: 'Use JWT bearer tokens with issuer validation.',
+      confidence: 0.9,
+      source_session: 's2',
+    });
+
+    assert.equal(appended.supersedes, undefined);
+  } finally {
+    cleanup(projectRoot);
+  }
+});
+
+test('appendObservation does not set supersedes for stale historical observations', () => {
+  const projectRoot = createTempProjectRoot();
+  try {
+    appendObservation(projectRoot, {
+      timestamp: '2025-01-01T00:00:00.000Z',
+      topic: 'auth',
+      fact: 'Use JWT bearer tokens for API auth.',
+      confidence: 0.8,
+      source_session: 's1',
+    });
+
+    const appended = appendObservation(projectRoot, {
+      timestamp: '2026-02-12T00:00:00.000Z',
+      topic: 'auth',
+      fact: 'No longer use JWT bearer tokens; replaced by opaque session tokens.',
+      confidence: 0.9,
+      source_session: 's2',
+    });
+
+    assert.equal(appended.supersedes, undefined);
+  } finally {
+    cleanup(projectRoot);
+  }
+});
