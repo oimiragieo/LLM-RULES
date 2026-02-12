@@ -143,6 +143,14 @@ There are two primary metrics roots:
 
 Metrics are collected on `UserPromptSubmit` via `memory-health-check.cjs` (Phase 4). The hook loads `.claude/lib/memory/memory-dashboard.cjs`; if that module fails to load or Phase 4 throws, the hook still completes and sets `output.metricsLogged = false` and `output.metricsError` so callers know metrics did not run. A structured error is logged (`metrics_logging_error`). When dashboard load or Phase 4 fails, an optional fallback one-line JSONL entry is written to `.claude/context/memory/metrics/fallback.jsonl` with `timestamp`, `event: 'health_check'`, `status`, `warningsCount`, and optionally `metricsError`, so at least one data point exists for the run. Inspect metrics without running the full health check via `pnpm run memory:dashboard` (or `node .claude/lib/memory/memory-dashboard.cjs`; default command shows health). A separate token/budget dashboard CLI is available via `pnpm run memory:dashboard:budget` (from `.claude/tools/cli/memory-dashboard.cjs`).
 
+### Strict rollout monitoring
+
+For strict findings rollout tracking over a 3-7 day window:
+
+- `pnpm run metrics:findings:strict-rollout`
+- Uses strict mode summary + 7-day trend + stale-open checks.
+- Intended for staging/CI drift detection before production tightening.
+
 ### Auto-compression reminders (Phase 3 opt-in)
 
 When `AUTO_COMPRESSION_PHASE_3=1`, the auto-compression trigger writes a reminder file for the Router or agents to act on:
@@ -239,6 +247,14 @@ The memory system is designed to stay bounded:
 - Weekly maintenance (including `archiveOldLTM`) runs when **SessionEnd** fires (via `unified-reflection-handler.cjs` → `triggerMaintenance()` → `memory-scheduler.cjs` `runWeeklyMaintenance()`) or when **UserPromptSubmit** detects it is overdue: `user-prompt-unified.cjs` reads `.claude/context/memory/maintenance-status.json`; if `lastWeekly` is missing or older than 7 days, it invokes weekly maintenance in a child process. Timeout is configurable via `MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS` (default 60000 ms; for large repos or many LTM files, consider 120000 or higher). On timeout or non-zero exit, the hook logs a one-line warning so operators know maintenance may have been partial. Manual fallback: `pnpm run memory:weekly` (or `memory:daily`). To check last run: `pnpm run memory:status`. LTM cold archival is performed by `cold-storage.cjs` inside `runArchiveOldLTM` in the scheduler.
 - **Headless or rarely-used environments:** There is no cron or daemon. Maintenance runs only on SessionEnd or when a user prompt occurs and weekly is overdue. If SessionEnd rarely or never fires, set `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on` and run `pnpm run memory:weekly` (or `memory:daily`) on a schedule (e.g. cron) or use the worker so LTM retention and cold archival run.
 - **Optional worker runtime:** You can run the headless worker (`pnpm run agent:worker`) to execute memory maintenance, code-index incremental updates, and reflection queue processing on an interval. See GETTING_STARTED.md for how to enable it and the heartbeat file location.
+
+### Scheduled soak regimen
+
+A weekly CI soak regimen runs memory chaos/stress tests and archives a report artifact:
+
+- Workflow: `.github/workflows/memory-soak-regimen.yml`
+- Script: `pnpm run metrics:soak:run`
+- Report: `.claude/context/reports/memory-soak-regimen-latest.json`
 
 ### Tunables
 

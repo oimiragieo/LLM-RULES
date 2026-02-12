@@ -63,6 +63,14 @@ function main() {
       l.includes("invalid model 'claude-haiku-4-5'") ||
       l.includes("invalid model 'claude-haiku-4-5'")
   );
+  const readMissing = lines.filter(l =>
+    l.includes('Read tool validation error: File does not exist.')
+  );
+  const bashToolError = lines.filter(l => l.includes('Bash tool error'));
+  const badSubstitution = lines.filter(l => l.includes('Bad substitution'));
+  const maxReadMissing = Number(process.env.DEBUG_LOG_MAX_READ_MISSING || 3);
+  const maxBashToolError = Number(process.env.DEBUG_LOG_MAX_BASH_TOOL_ERROR || 3);
+  const maxBadSubstitution = Number(process.env.DEBUG_LOG_MAX_BAD_SUBSTITUTION || 2);
 
   console.log('Debug log:', logPath);
   console.log('');
@@ -111,6 +119,39 @@ function main() {
     ok = false;
   } else {
     console.log("PASS: No invalid model 'claude-haiku-4-5' for context-compressor (Part 3.1).");
+  }
+
+  if (readMissing.length > maxReadMissing) {
+    console.log(
+      `FAIL: Read missing-file noise ${readMissing.length} exceeds max ${maxReadMissing} (pre-hook MCP reads likely).`
+    );
+    ok = false;
+  } else {
+    console.log(
+      `PASS: Read missing-file noise within threshold (${readMissing.length}/${maxReadMissing}).`
+    );
+  }
+
+  if (bashToolError.length > maxBashToolError) {
+    console.log(
+      `FAIL: "Bash tool error" count ${bashToolError.length} exceeds max ${maxBashToolError}.`
+    );
+    ok = false;
+  } else {
+    console.log(
+      `PASS: "Bash tool error" noise within threshold (${bashToolError.length}/${maxBashToolError}).`
+    );
+  }
+
+  if (badSubstitution.length > maxBadSubstitution) {
+    console.log(
+      `FAIL: "Bad substitution" count ${badSubstitution.length} exceeds max ${maxBadSubstitution}.`
+    );
+    ok = false;
+  } else {
+    console.log(
+      `PASS: "Bad substitution" noise within threshold (${badSubstitution.length}/${maxBadSubstitution}).`
+    );
   }
 
   console.log('');

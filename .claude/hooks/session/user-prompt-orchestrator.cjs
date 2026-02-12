@@ -35,6 +35,7 @@ function ensureFileIfMissing(filePath, content) {
 function ensureBootstrapReadTargets(projectRoot = PROJECT_ROOT) {
   const runtimeDir = path.join(projectRoot, '.claude', 'context', 'runtime');
   const memoryDir = path.join(projectRoot, '.claude', 'context', 'memory');
+  const metricsDir = path.join(projectRoot, '.claude', 'context', 'metrics');
 
   // Prevent noisy "Read file does not exist" errors before routing hooks have
   // had a chance to create advisory placeholders.
@@ -47,6 +48,11 @@ function ensureBootstrapReadTargets(projectRoot = PROJECT_ROOT) {
     path.join(memoryDir, 'open-findings.json'),
     `${JSON.stringify({ generatedAt: new Date().toISOString(), findings: [] }, null, 2)}\n`
   );
+  ensureFileIfMissing(path.join(memoryDir, 'learnings.md'), '# Learnings\n\n');
+  ensureFileIfMissing(path.join(memoryDir, 'decisions.md'), '# Decisions\n\n');
+  ensureFileIfMissing(path.join(memoryDir, 'issues.md'), '# Issues\n\n');
+  ensureFileIfMissing(path.join(memoryDir, 'active_context.md'), '# Active Context\n\n');
+  ensureFileIfMissing(path.join(metricsDir, 'open-findings-trend.jsonl'), '');
 }
 
 function stderrLog(message) {

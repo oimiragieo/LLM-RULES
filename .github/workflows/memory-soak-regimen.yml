@@ -1,0 +1,46 @@
+name: Memory Soak Regimen
+
+on:
+  schedule:
+    - cron: '0 5 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  soak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      AGENT_STUDIO_ENV: staging
+      OPEN_FINDINGS_RESOLUTION_MODE: strict
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run memory soak regimen
+        run: pnpm run metrics:soak:run
+
+      - name: Upload soak report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-soak-regimen-report
+          path: .claude/context/reports/memory-soak-regimen-latest.json
+          if-no-files-found: error

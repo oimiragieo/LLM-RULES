@@ -252,10 +252,20 @@ describe('user-prompt-orchestrator.cjs - bootstrap read targets', () => {
         'memory',
         'open-findings.json'
       );
+      const learningsPath = path.join(tempRoot, '.claude', 'context', 'memory', 'learnings.md');
+      const trendPath = path.join(
+        tempRoot,
+        '.claude',
+        'context',
+        'metrics',
+        'open-findings-trend.jsonl'
+      );
 
       assert.equal(fs.existsSync(spawnRequestPath), true);
       assert.equal(fs.existsSync(reminderPath), true);
       assert.equal(fs.existsSync(openFindingsPath), true);
+      assert.equal(fs.existsSync(learningsPath), true);
+      assert.equal(fs.existsSync(trendPath), true);
 
       const spawnRequests = JSON.parse(fs.readFileSync(spawnRequestPath, 'utf8'));
       assert.deepEqual(spawnRequests, []);
