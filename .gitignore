@@ -29,6 +29,7 @@
 .claude/context/payloads/
 .claude/context/tasks/
 .claude/context/todos/
+.claude/context/plans/
 .claude/context/test-results/
 .claude/context/self-healing/anomaly-log.jsonl
 .claude/context/self-healing/anomaly-state.json
@@ -63,6 +64,13 @@
 
 # Metrics and staging files (auto-generated)
 .claude/lib/utils/.claude/staging/metrics/
+.claude/staging/*
+!.claude/staging/.gitkeep
+.claude/context/memory/open-findings.json
+tests/lib/memory/.test-memory-soak-chaos-*/
+tests/lib/memory/.stress-memory/.claude/context/memory/.tmp-*
+tests/lib/memory/.stress-memory/
+tests/lib/memory/.test-memory-contracts/
 *.jsonl
 
 # Memory and LanceDB data (runtime)
@@ -86,6 +94,7 @@
 # Local model cache (embedding models; too large for repo)
 local_cache/
 .claude/context/code-index/.indexing.lock
+.claude/context/code-index/hybrid-search-daemon.json
 .claude/context/rule-index-cache.json
 .claude/context/skill-summaries.json
 
@@ -256,6 +265,8 @@ tests/data/
 tests/temp/
 # Keep fixtures directory structure  (contains static test data)
 !tests/fixtures/.gitkeep
+tests/fixtures/hybrid-search-cli/
+tests/fixtures/code-indexing/hook-test/.claude/context/code-index/
 
 # Old fragmented test directories (DEPRECATED - moved to tests/)
 .test-data/

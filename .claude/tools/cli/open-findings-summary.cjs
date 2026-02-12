@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-const { getFindingsSummary, pruneStaleOpenFindings } = require('../../lib/memory/findings-registry.cjs');
+const {
+  getFindingsSummary,
+  pruneStaleOpenFindings,
+} = require('../../lib/memory/findings-registry.cjs');
 
 function parseArgs(argv) {
   const args = argv.slice(2);
@@ -18,7 +21,10 @@ function parseArgs(argv) {
     projectRoot: map.get('--project-root') || process.cwd(),
     requireData: map.get('--require-data') === 'true',
     pruneStale: map.get('--prune-stale') === 'true',
-    pruneMaxAgeDays: map.has('--prune-max-age-days') ? Number(map.get('--prune-max-age-days')) : null,
+    pruneMaxAgeDays: map.has('--prune-max-age-days')
+      ? Number(map.get('--prune-max-age-days'))
+      : null,
+    resolutionMode: map.get('--resolution-mode') || null,
     assertMaxOpenCritical: map.has('--assert-max-open-critical')
       ? Number(map.get('--assert-max-open-critical'))
       : null,
@@ -50,10 +56,15 @@ function evaluate(summary, opts) {
     Number.isFinite(opts.assertMaxOpenHigh) &&
     Number(summary.bySeverity?.high?.open || 0) > opts.assertMaxOpenHigh
   ) {
-    failures.push(`Open high findings ${summary.bySeverity.high.open} exceeds ${opts.assertMaxOpenHigh}.`);
+    failures.push(
+      `Open high findings ${summary.bySeverity.high.open} exceeds ${opts.assertMaxOpenHigh}.`
+    );
   }
 
-  if (Number.isFinite(opts.assertMaxOpenTotal) && Number(summary.open || 0) > opts.assertMaxOpenTotal) {
+  if (
+    Number.isFinite(opts.assertMaxOpenTotal) &&
+    Number(summary.open || 0) > opts.assertMaxOpenTotal
+  ) {
     failures.push(`Open findings total ${summary.open} exceeds ${opts.assertMaxOpenTotal}.`);
   }
 
@@ -70,14 +81,26 @@ function buildSummary(projectRoot) {
 
 function main() {
   const opts = parseArgs(process.argv);
-  let pruneResult = null;
-  if (opts.pruneStale) {
-    pruneResult = pruneStaleOpenFindings(opts.projectRoot, {
-      maxAgeDays: opts.pruneMaxAgeDays,
-    });
+  const previousResolutionMode = process.env.OPEN_FINDINGS_RESOLUTION_MODE;
+  if (opts.resolutionMode) {
+    process.env.OPEN_FINDINGS_RESOLUTION_MODE = String(opts.resolutionMode);
   }
-  const summary = buildSummary(opts.projectRoot);
-  const failures = evaluate(summary, opts);
+  let pruneResult = null;
+  const result = (() => {
+    if (opts.pruneStale) {
+      pruneResult = pruneStaleOpenFindings(opts.projectRoot, {
+        maxAgeDays: opts.pruneMaxAgeDays,
+      });
+    }
+    const summary = buildSummary(opts.projectRoot);
+    const failures = evaluate(summary, opts);
+    return { summary, failures };
+  })();
+  if (opts.resolutionMode) {
+    if (previousResolutionMode === undefined) delete process.env.OPEN_FINDINGS_RESOLUTION_MODE;
+    else process.env.OPEN_FINDINGS_RESOLUTION_MODE = previousResolutionMode;
+  }
+  const { summary, failures } = result;
 
   if (opts.json) {
     console.log(JSON.stringify({ summary, pruneResult, failures }, null, 2));

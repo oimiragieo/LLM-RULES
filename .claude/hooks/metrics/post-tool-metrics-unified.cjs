@@ -43,6 +43,15 @@ const metricsCollector = require(
 const errorTracker = require(
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'monitoring', 'error-tracker.cjs')
 );
+const findingsRegistry = libRequire(path.join('memory', 'findings-registry.cjs'));
+
+let FINDINGS_SNAPSHOT_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'findings-snapshot-state.json'
+);
 
 // =============================================================================
 // Check 1: Metrics Collector (from metrics-collector-hook.cjs)
@@ -523,6 +532,43 @@ function detectAnomalies(hookInput) {
   }
 }
 
+function shouldRecordFindingsSnapshot(nowMs) {
+  const intervalRaw = Number(process.env.FINDINGS_TREND_SNAPSHOT_INTERVAL_MS);
+  const intervalMs = Number.isFinite(intervalRaw) && intervalRaw > 0 ? intervalRaw : 15 * 60 * 1000;
+
+  try {
+    if (!fs.existsSync(FINDINGS_SNAPSHOT_STATE_FILE)) return true;
+    const payload = safeParseJSON(
+      fs.readFileSync(FINDINGS_SNAPSHOT_STATE_FILE, 'utf8'),
+      'findings-snapshot-state'
+    );
+    const lastRecordedMs = Number(payload?.lastRecordedMs || 0);
+    if (!Number.isFinite(lastRecordedMs)) return true;
+    return nowMs - lastRecordedMs >= intervalMs;
+  } catch (_err) {
+    return true;
+  }
+}
+
+function recordPeriodicFindingsSnapshot() {
+  const nowMs = Date.now();
+  if (!shouldRecordFindingsSnapshot(nowMs)) {
+    return { recorded: false, reason: 'cooldown' };
+  }
+
+  try {
+    findingsRegistry.recordFindingsTrendSnapshot(PROJECT_ROOT, 'post-tool-metrics-unified');
+    fs.mkdirSync(path.dirname(FINDINGS_SNAPSHOT_STATE_FILE), { recursive: true });
+    atomicWriteJSONSync(FINDINGS_SNAPSHOT_STATE_FILE, {
+      lastRecordedMs: nowMs,
+      lastRecordedAt: new Date(nowMs).toISOString(),
+    });
+    return { recorded: true };
+  } catch (err) {
+    return { recorded: false, error: err?.message || String(err) };
+  }
+}
+
 // =============================================================================
 // Combined Runner
 // =============================================================================
@@ -540,6 +586,7 @@ async function main() {
     collectMetrics(hookInput, startedAt);
     trackErrors(hookInput);
     detectAnomalies(hookInput);
+    recordPeriodicFindingsSnapshot();
 
     process.exit(0);
   } catch (err) {
@@ -560,6 +607,9 @@ module.exports = {
   collectMetrics,
   trackErrors,
   detectAnomalies,
+  shouldRecordFindingsSnapshot,
+  recordPeriodicFindingsSnapshot,
+  FINDINGS_SNAPSHOT_STATE_FILE,
   main,
   // Anomaly functions
   setStateFile: filePath => {
@@ -567,5 +617,8 @@ module.exports = {
   },
   setAnomalyLog: filePath => {
     ANOMALY_LOG = filePath;
+  },
+  setFindingsSnapshotStateFile: filePath => {
+    FINDINGS_SNAPSHOT_STATE_FILE = filePath;
   },
 };

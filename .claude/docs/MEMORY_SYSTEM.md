@@ -684,6 +684,7 @@ Audit report findings can now be promoted into structured memory and carried acr
 - Ingestion path: `post-task-unified.cjs` ingests expected report artifacts after successful completion checks
 - Resolution path: completion output with fix cues can transition matching findings from `open` to `resolved`
 - Prompt carryover: spawn memory includes an `Open Findings Carryover` section for unresolved items
+- Periodic snapshots: `post-tool-metrics-unified.cjs` records trend snapshots on a cooldown (default 15 minutes) to avoid stale trend signal
 
 Severity filtering for carryover defaults to `high` and is configurable:
 
@@ -691,11 +692,45 @@ Severity filtering for carryover defaults to `high` and is configurable:
 - Accepted values: `critical`, `high`, `medium`, `low`
 - `OPEN_FINDINGS_RESOLUTION_MODE=lenient` (default) or `strict`
 - `OPEN_FINDINGS_RESOLUTION_MIN_OVERLAP=2` (default)
+- `FINDINGS_TREND_SNAPSHOT_INTERVAL_MS=900000` (default)
 
 CLI summaries:
 
 - `pnpm metrics:findings:summary`
 - `pnpm metrics:findings:trend:summary`
+- `pnpm metrics:findings:trend:snapshot`
+- `pnpm metrics:findings:trend:baseline`
+- `pnpm metrics:findings:trend:reset`
+
+Nightly strict gates:
+
+- `pnpm metrics:nightly:strict`
+- `pnpm metrics:findings:nightly` uses stale-open prune before strict thresholds (`--prune-stale true --prune-max-age-days 3`).
+
+### Reflection and evolution memory data flow
+
+1. Reflection extraction:
+   - `unified-reflection-handler.cjs` extracts observations/learnings from task/session activity.
+2. Memory persistence:
+   - Structured memory files are updated under `.claude/context/memory/**` and compacted on SessionEnd.
+3. Findings lifecycle:
+   - `post-task-unified.cjs` ingests report findings and resolves findings from completion evidence.
+4. Spawn-time injection:
+   - `prompt-assembler.cjs` and spawn hooks inject observational/hybrid memory plus open-findings carryover.
+5. Evolution feedback loop:
+   - Evolution and orchestration workflows consume memory + findings telemetry to prioritize next fixes and reduce repeated regressions.
+
+This keeps short-term reflection, operational findings, and long-horizon evolution coupled through one memory pipeline rather than isolated files.
+
+### Transient artifact cleanup policy
+
+To keep repository churn low and avoid accidental commits of generated data:
+
+- Script: `pnpm cleanup:transient` (or dry-run: `pnpm cleanup:transient:dry-run`)
+- Targets:
+  - `.claude/staging/*`
+  - `tests/lib/memory/.test-memory-soak-chaos-*`
+- Default retention: 2 days (configurable via CLI flags)
 
 ### SessionEnd compaction
 

@@ -21,6 +21,7 @@
 'use strict';
 
 const fs = require('fs');
+const warnedSchemas = new Set();
 
 // =============================================================================
 // Schema Definitions
@@ -164,8 +165,19 @@ const SCHEMAS = {
 function safeParseJSON(content, schemaName) {
   // If no schema, do simple parse with fallback
   if (!schemaName || !SCHEMAS[schemaName]) {
-    // SEC-LIB-005 FIX: Warn when fallback path is used without schema protection
-    if (process.stderr && typeof process.stderr.write === 'function') {
+    // SEC-LIB-005 FIX: Optional warning path when fallback is used without schema protection.
+    // Keep this quiet by default to avoid noisy logs in normal operation.
+    const shouldWarnFallback =
+      String(process.env.SAFE_JSON_WARN_FALLBACK || '').toLowerCase() === 'true' ||
+      process.env.SAFE_JSON_WARN_FALLBACK === '1';
+    const warnKey = schemaName || '__missing__';
+    if (
+      shouldWarnFallback &&
+      !warnedSchemas.has(warnKey) &&
+      process.stderr &&
+      typeof process.stderr.write === 'function'
+    ) {
+      warnedSchemas.add(warnKey);
       process.stderr.write(
         `[WARN] safe-json: No schema provided for JSON parsing. Using fallback with limited protection.\n`
       );

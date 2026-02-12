@@ -1,0 +1,74 @@
+name: Nightly Memory Metrics
+
+on:
+  schedule:
+    # Periodic trend snapshots (UTC)
+    - cron: '*/30 * * * *'
+    # Nightly strict gate (UTC)
+    - cron: '20 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  findings-trend-snapshot:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/30 * * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AGENT_STUDIO_ENV: staging
+      OPEN_FINDINGS_RESOLUTION_MODE: strict
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Record periodic findings trend snapshot
+        run: pnpm run metrics:findings:trend:snapshot
+
+  nightly-strict-gate:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '20 3 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      AGENT_STUDIO_ENV: staging
+      OPEN_FINDINGS_RESOLUTION_MODE: strict
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cleanup transient artifacts
+        run: pnpm run cleanup:transient
+
+      - name: Run strict nightly memory/findings gate
+        run: pnpm run metrics:nightly:strict

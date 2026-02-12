@@ -23,6 +23,9 @@ jobs:
   memory-mvp-gate:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      AGENT_STUDIO_ENV: staging
+      OPEN_FINDINGS_RESOLUTION_MODE: strict
 
     steps:
       - name: Checkout repository
@@ -50,3 +53,6 @@ jobs:
 
       - name: Run framework test gate
         run: pnpm run test:framework
+
+      - name: Run findings summary gate (strict mode rollout)
+        run: pnpm run metrics:findings:ci

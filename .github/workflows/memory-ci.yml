@@ -38,6 +38,9 @@ jobs:
   memory-ci:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      AGENT_STUDIO_ENV: staging
+      OPEN_FINDINGS_RESOLUTION_MODE: strict
 
     steps:
       - name: Checkout repository
@@ -74,3 +77,6 @@ jobs:
 
       - name: Run memory cache stability CI checks
         run: pnpm run metrics:memory-cache:ci
+
+      - name: Run findings CI checks (strict mode rollout)
+        run: pnpm run metrics:findings:ci
