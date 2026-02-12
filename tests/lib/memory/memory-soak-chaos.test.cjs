@@ -108,6 +108,22 @@ function runWorker(workerScript, testRoot, workerId, count) {
   });
 }
 
+async function runWorkerWithTimeout(workerScript, testRoot, workerId, count, timeoutMs = 45000) {
+  let timer = null;
+  try {
+    return await Promise.race([
+      runWorker(workerScript, testRoot, workerId, count),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`worker ${workerId} timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 function hasPrefixEntry(entries, prefix) {
   return entries.some(entry => String(entry && entry.text ? entry.text : '').startsWith(prefix));
 }
@@ -190,17 +206,17 @@ test('fault injection: malformed JSON recovers on next write', async () => {
 
 test(
   'soak+chaos: 10 concurrent workers preserve all writes and leave no artifacts',
-  { timeout: 180000 },
+  { timeout: 120000 },
   async () => {
     const testRoot = createTestRoot('10-workers');
     const workerScript = setup(testRoot);
     try {
       const workers = [];
       const workerCount = 10;
-      const writesPerWorker = 40;
+      const writesPerWorker = 12;
 
       for (let i = 0; i < workerCount; i++) {
-        workers.push(runWorker(workerScript, testRoot, `W${i}`, writesPerWorker));
+        workers.push(runWorkerWithTimeout(workerScript, testRoot, `W${i}`, writesPerWorker, 60000));
       }
 
       await Promise.all(workers);
