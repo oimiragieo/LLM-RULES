@@ -680,6 +680,7 @@ The Tier B cap applies to semantic/query/entity memory subsections appended by t
 Audit report findings can now be promoted into structured memory and carried across sessions:
 
 - Registry file: `.claude/context/memory/open-findings.json`
+- Trend file: `.claude/context/metrics/open-findings-trend.jsonl`
 - Ingestion path: `post-task-unified.cjs` ingests expected report artifacts after successful completion checks
 - Resolution path: completion output with fix cues can transition matching findings from `open` to `resolved`
 - Prompt carryover: spawn memory includes an `Open Findings Carryover` section for unresolved items
@@ -688,6 +689,13 @@ Severity filtering for carryover defaults to `high` and is configurable:
 
 - `OPEN_FINDINGS_MIN_SEVERITY=high` (default)
 - Accepted values: `critical`, `high`, `medium`, `low`
+- `OPEN_FINDINGS_RESOLUTION_MODE=lenient` (default) or `strict`
+- `OPEN_FINDINGS_RESOLUTION_MIN_OVERLAP=2` (default)
+
+CLI summaries:
+
+- `pnpm metrics:findings:summary`
+- `pnpm metrics:findings:trend:summary`
 
 ### SessionEnd compaction
 
