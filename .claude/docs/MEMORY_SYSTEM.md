@@ -675,6 +675,14 @@ Observational and Tier B sections are capped independently (estimated tokens = c
 
 The Tier B cap applies to semantic/query/entity memory subsections appended by the spawn hook.
 
+### SessionEnd compaction
+
+SessionEnd can compact recent observations into a stable summary file used by observational mode:
+
+- `OBSERVATIONS_COMPACT_ON_SESSION_END=on` (default): run compaction at SessionEnd.
+- `OBSERVATIONS_COMPACT_ON_SESSION_END=off`: skip compaction.
+- `OBSERVATIONS_COMPACT_MAX=50` (default): max rows read from `observations.jsonl` for each compaction.
+
 ## Keyword Search Fallback
 
 When semantic search (LanceDB) is unavailable, `ContextualMemory` falls back to keyword search with performance optimizations:

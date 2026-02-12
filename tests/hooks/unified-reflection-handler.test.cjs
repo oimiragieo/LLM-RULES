@@ -851,6 +851,7 @@ describe('unified-reflection-handler.cjs', () => {
     it('should export SessionEnd activation helpers', () => {
       assertEqual(typeof hook.triggerEmbeddingGeneration, 'function');
       assertEqual(typeof hook.triggerMaintenance, 'function');
+      assertEqual(typeof hook.triggerObservationCompaction, 'function');
     });
 
     it('triggerEmbeddingGeneration should enqueue vector writes for modified memory files (stubbed)', async () => {
@@ -962,6 +963,99 @@ describe('unified-reflection-handler.cjs', () => {
       } finally {
         if (originalScheduler) require.cache[schedulerKey] = originalScheduler;
         else delete require.cache[schedulerKey];
+      }
+    });
+
+    it('triggerObservationCompaction should compact observations on SessionEnd by default', () => {
+      const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+      const observationsModulePath = path.resolve(
+        PROJECT_ROOT,
+        '.claude/lib/memory/observations.cjs'
+      );
+      const observationsKey = require.resolve(observationsModulePath);
+      const originalObservations = require.cache[observationsKey];
+      const originalCompactOnEnd = process.env.OBSERVATIONS_COMPACT_ON_SESSION_END;
+      const originalCompactMax = process.env.OBSERVATIONS_COMPACT_MAX;
+
+      const calls = [];
+
+      try {
+        delete process.env.OBSERVATIONS_COMPACT_ON_SESSION_END;
+        process.env.OBSERVATIONS_COMPACT_MAX = '25';
+
+        require.cache[observationsKey] = {
+          id: observationsKey,
+          filename: observationsKey,
+          loaded: true,
+          exports: {
+            compactObservationsToSummary: (root, options) => {
+              calls.push({ root, options });
+              return { summary: 'ok', count: 1 };
+            },
+          },
+        };
+
+        hook.triggerObservationCompaction();
+
+        assertEqual(calls.length, 1, 'Should compact once by default');
+        assertEqual(calls[0].root, PROJECT_ROOT);
+        assertEqual(calls[0].options.maxObservations, 25);
+      } finally {
+        if (originalObservations) require.cache[observationsKey] = originalObservations;
+        else delete require.cache[observationsKey];
+
+        if (originalCompactOnEnd !== undefined) {
+          process.env.OBSERVATIONS_COMPACT_ON_SESSION_END = originalCompactOnEnd;
+        } else {
+          delete process.env.OBSERVATIONS_COMPACT_ON_SESSION_END;
+        }
+        if (originalCompactMax !== undefined) {
+          process.env.OBSERVATIONS_COMPACT_MAX = originalCompactMax;
+        } else {
+          delete process.env.OBSERVATIONS_COMPACT_MAX;
+        }
+      }
+    });
+
+    it('triggerObservationCompaction should skip when OBSERVATIONS_COMPACT_ON_SESSION_END=off', () => {
+      const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+      const observationsModulePath = path.resolve(
+        PROJECT_ROOT,
+        '.claude/lib/memory/observations.cjs'
+      );
+      const observationsKey = require.resolve(observationsModulePath);
+      const originalObservations = require.cache[observationsKey];
+      const originalCompactOnEnd = process.env.OBSERVATIONS_COMPACT_ON_SESSION_END;
+
+      const calls = [];
+
+      try {
+        process.env.OBSERVATIONS_COMPACT_ON_SESSION_END = 'off';
+
+        require.cache[observationsKey] = {
+          id: observationsKey,
+          filename: observationsKey,
+          loaded: true,
+          exports: {
+            compactObservationsToSummary: () => {
+              calls.push(1);
+              return { summary: 'ok', count: 1 };
+            },
+          },
+        };
+
+        hook.triggerObservationCompaction();
+
+        assertEqual(calls.length, 0, 'Should not compact when disabled');
+      } finally {
+        if (originalObservations) require.cache[observationsKey] = originalObservations;
+        else delete require.cache[observationsKey];
+
+        if (originalCompactOnEnd !== undefined) {
+          process.env.OBSERVATIONS_COMPACT_ON_SESSION_END = originalCompactOnEnd;
+        } else {
+          delete process.env.OBSERVATIONS_COMPACT_ON_SESSION_END;
+        }
       }
     });
   });

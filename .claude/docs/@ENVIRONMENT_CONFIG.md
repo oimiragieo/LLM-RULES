@@ -108,6 +108,8 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 | `MEMORY_SUMMARY_BLOCK_MAX_TOKENS`       | number     | 400        | Token cap for observational summary subsection.                                        |
 | `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS` | number     | 400        | Token cap for recent observations subsection.                                          |
 | `MEMORY_TIER_B_MAX_TOKENS`              | number     | 400        | Token cap for Tier B memory sections (semantic/query/entity).                          |
+| `OBSERVATIONS_COMPACT_ON_SESSION_END`   | on/off     | on         | Enable SessionEnd compaction from `observations.jsonl` into `observations_summary.md`. |
+| `OBSERVATIONS_COMPACT_MAX`              | number     | 50         | Max observation rows included during SessionEnd summary compaction.                    |
 
 ### Memory / Compression Variables
 

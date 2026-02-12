@@ -1017,6 +1017,47 @@ function triggerMaintenance() {
 }
 
 /**
+ * Best-effort: compact observational memory into stable summary markdown.
+ *
+ * Controlled by:
+ * - OBSERVATIONS_COMPACT_ON_SESSION_END=off|false|0 to disable
+ * - OBSERVATIONS_COMPACT_MAX (default 50)
+ *
+ * @returns {void}
+ */
+function triggerObservationCompaction() {
+  if (!isEnabled()) {
+    return;
+  }
+
+  const compactToggle = String(process.env.OBSERVATIONS_COMPACT_ON_SESSION_END || 'on')
+    .trim()
+    .toLowerCase();
+  if (compactToggle === 'off' || compactToggle === 'false' || compactToggle === '0') {
+    return;
+  }
+
+  const maxObservationsRaw = Number(process.env.OBSERVATIONS_COMPACT_MAX || 50);
+  const maxObservations =
+    Number.isFinite(maxObservationsRaw) && maxObservationsRaw > 0
+      ? Math.trunc(maxObservationsRaw)
+      : 50;
+
+  try {
+    const { compactObservationsToSummary } = require('../../lib/memory/observations.cjs');
+    const result = compactObservationsToSummary(PROJECT_ROOT, { maxObservations });
+    if (process.env.DEBUG_HOOKS) {
+      debugLog('unified-reflection', 'Observation compaction complete', {
+        count: result?.count || 0,
+        summaryPath: result?.summaryPath,
+      });
+    }
+  } catch (err) {
+    debugLog('unified-reflection', 'Error running observation compaction', err);
+  }
+}
+
+/**
  * Record extracted memory items
  * @param {object} extracted - Object with patterns, gotchas, discoveries
  */
@@ -1150,6 +1191,7 @@ async function main() {
         });
         triggerMLSessionEnd(result);
         triggerMaintenance();
+        triggerObservationCompaction();
         outcome.maintenanceTriggered = true;
         break;
       }
@@ -1225,6 +1267,7 @@ module.exports = {
   triggerEmbeddingGeneration,
   triggerMLSessionEnd,
   triggerMaintenance,
+  triggerObservationCompaction,
   recordMemoryItems,
 
   // Main entry point

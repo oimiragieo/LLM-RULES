@@ -10,6 +10,7 @@ const {
   appendObservation,
   readObservations,
   getByTopic,
+  compactObservationsToSummary,
 } = require('../../../.claude/lib/memory/observations.cjs');
 
 function createTempProjectRoot() {
@@ -18,6 +19,10 @@ function createTempProjectRoot() {
 
 function getObservationsPath(projectRoot) {
   return path.join(projectRoot, '.claude', 'context', 'memory', 'observations.jsonl');
+}
+
+function getObservationsSummaryPath(projectRoot) {
+  return path.join(projectRoot, '.claude', 'context', 'memory', 'observations_summary.md');
 }
 
 function cleanup(projectRoot) {
@@ -41,10 +46,7 @@ test('appendObservation writes one JSON line and creates directory/file if missi
 
     const observationsPath = getObservationsPath(projectRoot);
     assert.equal(fs.existsSync(observationsPath), true);
-    const lines = fs
-      .readFileSync(observationsPath, 'utf8')
-      .split('\n')
-      .filter(Boolean);
+    const lines = fs.readFileSync(observationsPath, 'utf8').split('\n').filter(Boolean);
     assert.equal(lines.length, 1);
     const parsed = JSON.parse(lines[0]);
     assert.equal(parsed.topic, 'routing');
@@ -73,10 +75,7 @@ test('appendObservation handles parallel appends without corrupting lines', asyn
     await Promise.all(jobs);
 
     const observationsPath = getObservationsPath(projectRoot);
-    const lines = fs
-      .readFileSync(observationsPath, 'utf8')
-      .split('\n')
-      .filter(Boolean);
+    const lines = fs.readFileSync(observationsPath, 'utf8').split('\n').filter(Boolean);
     assert.equal(lines.length, 10);
     for (const line of lines) {
       const parsed = JSON.parse(line);
@@ -163,6 +162,46 @@ test('getByTopic returns most recent observations for a topic with limit', () =>
     const rows = getByTopic(projectRoot, 'auth', { limit: 1 });
     assert.equal(rows.length, 1);
     assert.equal(rows[0].fact, 'new auth fact');
+  } finally {
+    cleanup(projectRoot);
+  }
+});
+
+test('compactObservationsToSummary writes stable summary markdown from latest observations', () => {
+  const projectRoot = createTempProjectRoot();
+  try {
+    appendObservation(projectRoot, {
+      timestamp: '2026-02-10T00:00:00.000Z',
+      topic: 'auth',
+      fact: 'Use token refresh for long sessions.',
+      confidence: 0.8,
+      source_session: 's1',
+    });
+    appendObservation(projectRoot, {
+      timestamp: '2026-02-11T00:00:00.000Z',
+      topic: 'routing',
+      fact: 'Prefer Task updates before spawning specialists.',
+      confidence: 0.9,
+      source_session: 's2',
+    });
+    appendObservation(projectRoot, {
+      timestamp: '2026-02-12T00:00:00.000Z',
+      topic: 'auth',
+      fact: 'Rotate keys quarterly.',
+      confidence: 0.95,
+      source_session: 's3',
+    });
+
+    const result = compactObservationsToSummary(projectRoot, { maxObservations: 2 });
+    const summaryPath = getObservationsSummaryPath(projectRoot);
+    const summary = fs.readFileSync(summaryPath, 'utf8');
+
+    assert.equal(fs.existsSync(summaryPath), true);
+    assert.equal(typeof result.summary, 'string');
+    assert.match(summary, /## Observational summary/i);
+    assert.match(summary, /auth/i);
+    assert.match(summary, /routing/i);
+    assert.equal(result.count, 2);
   } finally {
     cleanup(projectRoot);
   }

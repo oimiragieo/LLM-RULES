@@ -3,8 +3,15 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
+const { atomicWriteSync } = require('../utils/atomic-write.cjs');
 
 const OBSERVATIONS_FILE = path.join('.claude', 'context', 'memory', 'observations.jsonl');
+const OBSERVATIONS_SUMMARY_FILE = path.join(
+  '.claude',
+  'context',
+  'memory',
+  'observations_summary.md'
+);
 
 function resolveProjectRoot(projectRoot = PROJECT_ROOT) {
   if (!projectRoot || typeof projectRoot !== 'string') {
@@ -19,6 +26,16 @@ function resolveObservationsPath(projectRoot = PROJECT_ROOT) {
   const validation = validatePathWithinProject(observationsPath, root);
   if (!validation.safe) {
     throw new Error(`Invalid observations path: ${validation.reason}`);
+  }
+  return validation.resolvedPath;
+}
+
+function resolveObservationsSummaryPath(projectRoot = PROJECT_ROOT) {
+  const root = resolveProjectRoot(projectRoot);
+  const summaryPath = path.join(root, OBSERVATIONS_SUMMARY_FILE);
+  const validation = validatePathWithinProject(summaryPath, root);
+  if (!validation.safe) {
+    throw new Error(`Invalid observations summary path: ${validation.reason}`);
   }
   return validation.resolvedPath;
 }
@@ -115,11 +132,49 @@ function getByTopic(projectRoot, topic, options = {}) {
     .slice(0, limit);
 }
 
+function compactObservationsToSummary(projectRoot, options = {}) {
+  const maxObservations =
+    Number.isInteger(options.maxObservations) && options.maxObservations > 0
+      ? options.maxObservations
+      : 50;
+  const summaryPath = resolveObservationsSummaryPath(projectRoot);
+  const rows = readObservations(projectRoot, { limit: maxObservations });
+
+  const byTopic = new Map();
+  for (const row of rows) {
+    const topic = String(row?.topic || 'general').trim() || 'general';
+    if (!byTopic.has(topic)) byTopic.set(topic, []);
+    byTopic.get(topic).push(row);
+  }
+
+  const lines = ['## Observational summary', '', `Generated: ${new Date().toISOString()}`, ''];
+  if (rows.length === 0) {
+    lines.push('- No observations captured yet.');
+  } else {
+    lines.push(`Source observations: ${rows.length}`, '');
+    for (const [topic, topicRows] of byTopic.entries()) {
+      const latest = topicRows[topicRows.length - 1];
+      lines.push(`### ${topic}`);
+      lines.push(`- ${String(latest?.fact || '').trim()}`);
+      lines.push(`- Entries: ${topicRows.length}`);
+      lines.push('');
+    }
+  }
+
+  const summary = lines.join('\n').trimEnd() + '\n';
+  atomicWriteSync(summaryPath, summary, 'utf8');
+
+  return { summaryPath, summary, count: rows.length };
+}
+
 module.exports = {
   OBSERVATIONS_FILE,
+  OBSERVATIONS_SUMMARY_FILE,
   appendObservation,
   readObservations,
   getByTopic,
+  compactObservationsToSummary,
   resolveObservationsPath,
+  resolveObservationsSummaryPath,
   normalizeObservation,
 };
