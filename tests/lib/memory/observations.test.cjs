@@ -270,3 +270,29 @@ test('recordMemoryBlockChurn appends hash metrics with churned true/false', () =
     cleanup(projectRoot);
   }
 });
+
+test('appendObservation marks supersedes when a new fact contradicts same-topic recent fact', () => {
+  const projectRoot = createTempProjectRoot();
+  try {
+    appendObservation(projectRoot, {
+      timestamp: '2026-02-10T00:00:00.000Z',
+      topic: 'auth',
+      fact: 'Use JWT bearer tokens for API auth.',
+      confidence: 0.8,
+      source_session: 's1',
+    });
+
+    const appended = appendObservation(projectRoot, {
+      timestamp: '2026-02-12T00:00:00.000Z',
+      topic: 'auth',
+      fact: 'No longer use JWT bearer tokens; replaced by opaque session tokens.',
+      confidence: 0.9,
+      source_session: 's2',
+    });
+
+    assert.equal(typeof appended.supersedes, 'string');
+    assert.equal(appended.supersedes, '2026-02-10T00:00:00.000Z');
+  } finally {
+    cleanup(projectRoot);
+  }
+});

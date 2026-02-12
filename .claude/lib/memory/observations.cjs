@@ -106,6 +106,11 @@ function normalizeObservation(record) {
 function appendObservation(projectRoot, record) {
   const observationsPath = resolveObservationsPath(projectRoot);
   const normalized = normalizeObservation(record);
+  const topicRows = getByTopic(projectRoot, normalized.topic, { limit: 5 });
+  const superseded = findContradictedObservation(topicRows, normalized);
+  if (superseded && !normalized.supersedes) {
+    normalized.supersedes = String(superseded.id || superseded.timestamp || '').trim();
+  }
   fs.mkdirSync(path.dirname(observationsPath), { recursive: true });
   fs.appendFileSync(observationsPath, JSON.stringify(normalized) + '\n', 'utf8');
   return normalized;
@@ -163,6 +168,44 @@ function scoreObservations(observations, options = {}) {
       return { ...row, recency_factor, score };
     })
     .sort((a, b) => Number(b?.score || 0) - Number(a?.score || 0));
+}
+
+function tokenizeFact(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(token => token.length >= 3);
+}
+
+function hasContradictionCue(text) {
+  const haystack = String(text || '').toLowerCase();
+  return (
+    haystack.includes('no longer') ||
+    haystack.includes('replaced by') ||
+    haystack.includes('deprecated') ||
+    haystack.includes('instead of')
+  );
+}
+
+function findContradictedObservation(existingRows, newRecord) {
+  if (!Array.isArray(existingRows) || existingRows.length === 0) return null;
+  if (!hasContradictionCue(newRecord?.fact)) return null;
+
+  const newTokens = new Set(tokenizeFact(newRecord.fact));
+  if (newTokens.size === 0) return null;
+
+  for (const row of existingRows) {
+    const existingTokens = tokenizeFact(row?.fact);
+    let overlap = 0;
+    for (const token of existingTokens) {
+      if (newTokens.has(token)) overlap++;
+      if (overlap >= 2) {
+        return row;
+      }
+    }
+  }
+  return null;
 }
 
 function getByTopic(projectRoot, topic, options = {}) {
@@ -262,5 +305,6 @@ module.exports = {
   resolveObservationsSummaryPath,
   resolveMemoryCacheStabilityPath,
   getObservationDecayPerHour,
+  findContradictedObservation,
   normalizeObservation,
 };
