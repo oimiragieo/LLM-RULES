@@ -21,6 +21,9 @@
 
 const fs = require('fs');
 const path = require('path');
+let prettierFormat = null;
+let prettierResolveConfig = null;
+let prettierLoadAttempted = false;
 
 // Project root detection
 const PROJECT_ROOT = process.cwd();
@@ -647,10 +650,47 @@ function validateManifest(manifestPath) {
   }
 }
 
+async function getPrettierFormat() {
+  if (typeof prettierFormat === 'function') {
+    return prettierFormat;
+  }
+  if (prettierLoadAttempted) {
+    throw new Error('Prettier formatter was not available');
+  }
+  prettierLoadAttempted = true;
+  try {
+    // Prettier v3 is ESM-only; use dynamic import from CJS.
+    const mod = await import('prettier');
+    prettierFormat = typeof mod?.format === 'function' ? mod.format : null;
+    prettierResolveConfig = typeof mod?.resolveConfig === 'function' ? mod.resolveConfig : null;
+    if (!prettierFormat) {
+      throw new Error('Prettier module loaded, but no format() function was exported');
+    }
+    return prettierFormat;
+  } catch (error) {
+    throw new Error(`Failed to load Prettier for manifest formatting: ${error.message}`);
+  }
+}
+
 /**
  * Main function
  */
-function main() {
+async function formatManifestJson(manifest) {
+  const raw = JSON.stringify(manifest, null, 2);
+  const format = await getPrettierFormat();
+  try {
+    const resolved =
+      typeof prettierResolveConfig === 'function'
+        ? await prettierResolveConfig(MANIFEST_PATH)
+        : null;
+    const formatted = await format(raw, { ...(resolved || {}), filepath: MANIFEST_PATH });
+    return formatted.endsWith('\n') ? formatted : formatted + '\n';
+  } catch (error) {
+    throw new Error(`Failed to format tool manifest with Prettier: ${error.message}`);
+  }
+}
+
+async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
   const validateOnly = args.includes('--validate');
@@ -706,7 +746,8 @@ function main() {
   }
 
   // Write manifest
-  fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2));
+  const serializedManifest = await formatManifestJson(manifest);
+  fs.writeFileSync(MANIFEST_PATH, serializedManifest, 'utf8');
 
   console.log(`Manifest generated successfully!`);
   console.log(`Output: ${MANIFEST_PATH}`);
@@ -726,7 +767,17 @@ function main() {
 
 // Run if called directly
 if (require.main === module) {
-  main();
+  main().catch(err => {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  });
 }
 
-module.exports = { generateManifest, validateManifest, CORE_TOOLS, MCP_TOOLS, TOOLSETS };
+module.exports = {
+  generateManifest,
+  validateManifest,
+  formatManifestJson,
+  CORE_TOOLS,
+  MCP_TOOLS,
+  TOOLSETS,
+};
