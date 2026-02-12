@@ -6,7 +6,13 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const PROJECT_ROOT = process.cwd();
-const METRICS_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics', 'memory-soak-regimen.jsonl');
+const METRICS_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'metrics',
+  'memory-soak-regimen.jsonl'
+);
 const REPORT_PATH = path.join(
   PROJECT_ROOT,
   '.claude',

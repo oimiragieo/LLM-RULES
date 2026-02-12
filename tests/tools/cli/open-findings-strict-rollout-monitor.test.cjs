@@ -17,12 +17,10 @@ test('parseArgs returns strict rollout defaults', () => {
 });
 
 test('evaluate reports failures for delta/stale/critical thresholds', () => {
-  const failures = evaluate(
-    { bySeverity: { critical: { open: 1 } } },
-    { openDelta: 3 },
-    2,
-    { assertMaxOpenDelta: 0, assertMaxStaleOpen: 0 }
-  );
+  const failures = evaluate({ bySeverity: { critical: { open: 1 } } }, { openDelta: 3 }, 2, {
+    assertMaxOpenDelta: 0,
+    assertMaxStaleOpen: 0,
+  });
 
   assert.equal(failures.length, 3);
   assert.match(failures.join('\n'), /delta/i);

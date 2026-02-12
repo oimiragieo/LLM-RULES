@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 'use strict';
 
-const { getOpenFindings, getFindingsSummary, summarizeFindingsTrend } = require(
-  '../../lib/memory/findings-registry.cjs'
-);
+const {
+  getOpenFindings,
+  getFindingsSummary,
+  summarizeFindingsTrend,
+} = require('../../lib/memory/findings-registry.cjs');
 
 function parseArgs(argv) {
   const args = argv.slice(2);

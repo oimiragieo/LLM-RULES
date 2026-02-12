@@ -68,7 +68,7 @@ function main() {
   );
   const bashToolError = lines.filter(l => l.includes('Bash tool error'));
   const badSubstitution = lines.filter(l => l.includes('Bad substitution'));
-  const maxReadMissing = Number(process.env.DEBUG_LOG_MAX_READ_MISSING || 3);
+  const maxReadMissing = Number(process.env.DEBUG_LOG_MAX_READ_MISSING || 6);
   const maxBashToolError = Number(process.env.DEBUG_LOG_MAX_BASH_TOOL_ERROR || 3);
   const maxBadSubstitution = Number(process.env.DEBUG_LOG_MAX_BAD_SUBSTITUTION || 2);
 

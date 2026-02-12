@@ -48,3 +48,26 @@ test('cleanupTransientArtifacts removes stale staging directories', () => {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('cleanupTransientArtifacts removes stale soak/stress temp directories', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cleanup-transient-'));
+  try {
+    const soakDir = path.join(root, 'tests', 'lib', 'memory', '.test-memory-soak-chaos-abc');
+    const stressDir = path.join(root, 'tests', 'lib', 'memory', '.test-memory-stress-abc');
+    fs.mkdirSync(soakDir, { recursive: true });
+    fs.mkdirSync(stressDir, { recursive: true });
+    fs.writeFileSync(path.join(soakDir, 'x.txt'), 'x', 'utf8');
+    fs.writeFileSync(path.join(stressDir, 'y.txt'), 'y', 'utf8');
+
+    const oldTs = (Date.now() - 10 * 24 * 60 * 60 * 1000) / 1000;
+    fs.utimesSync(soakDir, oldTs, oldTs);
+    fs.utimesSync(stressDir, oldTs, oldTs);
+
+    const result = cleanupTransientArtifacts(root, { retentionDays: 2, dryRun: false });
+    assert.equal(result.removed, 2);
+    assert.equal(fs.existsSync(soakDir), false);
+    assert.equal(fs.existsSync(stressDir), false);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

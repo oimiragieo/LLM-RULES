@@ -3,7 +3,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { parseArgs, runNodeTest } = require('../../../.claude/tools/cli/run-memory-soak-regimen.cjs');
+const {
+  parseArgs,
+  runNodeTest,
+} = require('../../../.claude/tools/cli/run-memory-soak-regimen.cjs');
 
 test('parseArgs defaults', () => {
   const parsed = parseArgs(['node', 'run-memory-soak-regimen.cjs']);

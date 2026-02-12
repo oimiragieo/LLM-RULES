@@ -36,7 +36,10 @@ function listCandidates(root) {
       const full = path.join(base, entry.name);
       if (!entry.isDirectory()) continue;
       const isStaging = base.endsWith(path.join('.claude', 'staging'));
-      const isSoakDir = entry.name.startsWith('.test-memory-soak-chaos-');
+      const isSoakDir =
+        entry.name.startsWith('.test-memory-soak-chaos-') ||
+        entry.name.startsWith('.test-memory-soak-') ||
+        entry.name.startsWith('.test-memory-stress-');
       if (isStaging || isSoakDir) {
         candidates.push(full);
       }
