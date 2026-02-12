@@ -163,6 +163,14 @@ Classify the request:
 - Every spawned prompt MUST include matching `Task ID: <same-id>` text.
 - Missing `task_id` is blocked by spawn hooks.
 
+**Memory Contract (MANDATORY):**
+
+- Spawn prompts must require completion evidence (files + validation commands).
+- For audit/report tasks, ensure agents write reports to concrete paths and only complete after artifacts exist.
+- Use findings/memory telemetry as routing context:
+  - `pnpm metrics:findings:summary`
+  - `pnpm metrics:findings:trend:summary`
+
 **CRITICAL**: Before spawning, read the agent's frontmatter to get their skills list.
 
 **Single Agent Spawn (with Task Assignment):**

@@ -59,6 +59,14 @@ Then call TaskList().`,
 - Keep each child spawn prompt short and outcome-driven.
 - Pass only the minimum tools each child needs.
 
+## Memory Coordination Protocol
+
+- Require each spawned child to report memory-safe evidence in completion output:
+  - concrete file paths touched
+  - verification commands executed
+- If children generate report files, verify artifact existence before coordinator completion.
+- Prefer centralized memory/finding flows (post-task ingestion + open-findings carryover) over custom per-agent memory files.
+
 ## MCP and Research
 
 - Add MCP tools only for tasks that require them.

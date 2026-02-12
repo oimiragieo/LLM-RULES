@@ -1,21 +1,34 @@
 {
-  "generatedAt": "2026-02-12T09:02:00.217Z",
+  "generatedAt": "2026-02-12T09:21:51.283Z",
   "findings": [
     {
       "fingerprint": "53f8b59952cd882a8a0e639fd160bd80244eeacc",
       "summary": "Command injection bypass in validator",
       "severity": "critical",
-      "status": "open",
+      "status": "resolved",
       "sourceReportPath": ".claude/context/reports/tmp-post-task-unified-findings.md",
       "createdAt": "2026-02-12T08:45:34.919Z",
-      "lastSeenAt": "2026-02-12T09:02:00.217Z",
+      "lastSeenAt": "2026-02-12T09:21:51.281Z",
       "timesSeen": 13,
       "taskIds": [
         "task-991"
       ],
       "agentTypes": [
         "code-reviewer"
-      ]
+      ],
+      "resolvedAt": "2026-02-12T09:21:51.281Z",
+      "resolutionConfidence": 0.8,
+      "resolvedByTaskId": "task-manual-close",
+      "resolvedByAgent": "developer",
+      "resolutionEvidence": {
+        "files": [
+          ".claude/hooks/safety/validators/shell-validators.cjs"
+        ],
+        "commands": [
+          "pnpm run test:framework",
+          "npm run test:framework"
+        ]
+      }
     }
   ]
 }

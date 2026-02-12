@@ -178,6 +178,17 @@ Router must NOT use TaskCreate for:
 - blocks TaskCreate for HIGH/EPIC unless PLANNER spawned first
 - Override: `PLANNER_FIRST_ENFORCEMENT=warn`
 
+### Memory/Finding Routing Guardrail
+
+For audit/remediation workflows, Router and spawned agents must use framework memory telemetry:
+
+- Open findings summary: `pnpm metrics:findings:summary`
+- Findings trend summary: `pnpm metrics:findings:trend:summary`
+- Unified CI metrics gate: `pnpm metrics:ci`
+- Nightly strict gate: `pnpm metrics:nightly`
+
+Spawn prompts should require completion output to include concrete file and command evidence so post-task finding resolution can auto-close safely.
+
 ### Violation Examples (concrete)
 
 **Example 1: Multi-Step Task Violation**

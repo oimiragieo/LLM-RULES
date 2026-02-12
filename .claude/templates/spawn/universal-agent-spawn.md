@@ -25,6 +25,15 @@ Use this template for all non-orchestrator agents.
 3. `Task(...)` with matching `task_id`.
 4. Subagent does `TaskUpdate(in_progress)` first and `TaskUpdate(completed)` last.
 
+## Memory Tooling Protocol (Required)
+
+- Read/write memory via framework tooling, not ad-hoc file edits.
+- Before final `TaskUpdate(completed)`, include memory evidence in completion text:
+  - files changed (for `resolutionEvidence.files`)
+  - validation commands run (for `resolutionEvidence.commands`)
+- When task output produces report artifacts, ensure files actually exist at declared paths before completion.
+- Keep memory sections compact and focused; rely on observational/hybrid injection from hooks.
+
 ## Minimal Spawn (Default)
 
 ```javascript
