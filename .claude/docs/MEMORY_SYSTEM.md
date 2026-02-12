@@ -650,6 +650,31 @@ Memory context is automatically injected into agent spawn prompts via `prompt-as
 - Memory injection: Pass `includeMemory: false` to `assembleSpawnPrompt()` (not recommended)
 - Semantic matches: Set `SPAWN_PROMPT_SEMANTIC_MEMORY=off` environment variable
 
+## Observational Memory Layer
+
+Spawn prompts support an observational memory path designed for cache-stable summaries:
+
+- `.claude/context/memory/observations.jsonl` (append-only structured observations)
+- `.claude/context/memory/observations_summary.md` (stable summary block)
+
+### Mode selection
+
+- `MEMORY_MODE=hybrid` (default): existing memory context behavior (`gotchas/patterns/decisions/...`).
+- `MEMORY_MODE=observational`: inject observational summary + recent observations.
+- `OBSERVATIONAL_MEMORY_ENABLED=off`: kill switch that forces hybrid behavior even when `MEMORY_MODE=observational`.
+
+If observational mode is selected but observational files are missing/empty, spawn prompt assembly falls back to the legacy/hybrid memory section to keep prompts valid.
+
+### Section-based token budgets
+
+Observational and Tier B sections are capped independently (estimated tokens = chars / 4):
+
+- `MEMORY_SUMMARY_BLOCK_MAX_TOKENS` (default `400`)
+- `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS` (default `400`)
+- `MEMORY_TIER_B_MAX_TOKENS` (default `400`)
+
+The Tier B cap applies to semantic/query/entity memory subsections appended by the spawn hook.
+
 ## Keyword Search Fallback
 
 When semantic search (LanceDB) is unavailable, `ContextualMemory` falls back to keyword search with performance optimizations:

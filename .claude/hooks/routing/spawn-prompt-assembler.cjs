@@ -109,6 +109,15 @@ const MAX_TOOLS_AGENT = 15;
 const MAX_TOOLS_ORCHESTRATOR = 18;
 const MAX_SPAWN_PROMPT_CHARS = Number(process.env.SPAWN_PROMPT_MAX_CHARS || 40000);
 const TRUNCATION_NOTICE = '\n\n[TRUNCATED FOR TOKEN BUDGET]';
+const DEFAULT_TIER_B_MAX_TOKENS = 400;
+const OBSERVATIONAL_TIER_B_KEYWORDS = [
+  'investigate',
+  'debug',
+  'explore',
+  'why',
+  'root cause',
+  'uncertain',
+];
 const SPAWN_CACHE_TTL_MS = Number(process.env.SPAWN_ASSEMBLY_CACHE_TTL_MS || 120000);
 const SPAWN_CACHE_MAX_ENTRIES = Number(process.env.SPAWN_ASSEMBLY_CACHE_MAX_ENTRIES || 120);
 const SPAWN_CACHE_PATH = path.join(
@@ -325,6 +334,35 @@ function shouldThrottleExpensiveEnrichment(toolInput, basePrompt) {
   const maxBurnRate = Number(process.env.SPAWN_ADAPTIVE_MAX_BURN_RATE || 650);
 
   return avgAssemblyMs > maxAssemblyMs || avgBurnRate > maxBurnRate;
+}
+
+function getMemoryMode() {
+  if (String(process.env.OBSERVATIONAL_MEMORY_ENABLED || 'on').toLowerCase() === 'off') {
+    return 'hybrid';
+  }
+  const mode = String(process.env.MEMORY_MODE || 'hybrid').toLowerCase();
+  return mode === 'observational' ? 'observational' : 'hybrid';
+}
+
+function isObservationalMode() {
+  return getMemoryMode() === 'observational';
+}
+
+function shouldUseTierB(toolInput, basePrompt) {
+  if (
+    toolInput?.memory_depth === true ||
+    String(toolInput?.memory_depth || '').toLowerCase() === 'true'
+  ) {
+    return true;
+  }
+
+  const searchable = [toolInput?.description, toolInput?.prompt, toolInput?.user_prompt, basePrompt]
+    .filter(value => typeof value === 'string' && value.trim().length > 0)
+    .join('\n')
+    .toLowerCase();
+
+  if (!searchable) return false;
+  return OBSERVATIONAL_TIER_B_KEYWORDS.some(keyword => searchable.includes(keyword));
 }
 
 /** Log to stderr only (stdout is reserved for single JSON hook output). */
@@ -836,6 +874,19 @@ function looksAssembled(prompt) {
   );
 }
 
+function getTierBTokenBudget() {
+  const parsed = Number(process.env.MEMORY_TIER_B_MAX_TOKENS || DEFAULT_TIER_B_MAX_TOKENS);
+  if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_TIER_B_MAX_TOKENS;
+  return Math.floor(parsed);
+}
+
+function capTierBSection(sectionMarkdown) {
+  const text = String(sectionMarkdown || '');
+  const maxChars = getTierBTokenBudget() * 4;
+  if (text.length <= maxChars) return text;
+  return text.slice(0, Math.max(0, maxChars - 3)) + '...';
+}
+
 function appendSemanticMatches(prompt, results) {
   if (!Array.isArray(results) || results.length === 0) return prompt;
 
@@ -859,7 +910,7 @@ function appendSemanticMatches(prompt, results) {
     lines.push(`- [${src}${sim}]${where}: ${snippet}${snippet.length >= 180 ? '...' : ''}`);
   }
 
-  const section = lines.join('\n').trimEnd() + '\n';
+  const section = capTierBSection(lines.join('\n').trimEnd() + '\n');
 
   // Prefer to insert inside Memory Context if present, otherwise append at end.
   const marker = '## Memory Context (Auto-Loaded)';
@@ -897,7 +948,7 @@ function appendQueryMemories(prompt, results) {
     lines.push(`- [${src}${sim}]${where}: ${snippet}${snippet.length >= 180 ? '...' : ''}`);
   }
 
-  const section = lines.join('\n').trimEnd() + '\n';
+  const section = capTierBSection(lines.join('\n').trimEnd() + '\n');
 
   const marker = '## Memory Context (Auto-Loaded)';
   if (prompt.includes(marker)) {
@@ -956,7 +1007,7 @@ function appendEntityGraph(prompt, data) {
     lines.push('');
   }
 
-  const section = lines.join('\n').trimEnd() + '\n';
+  const section = capTierBSection(lines.join('\n').trimEnd() + '\n');
 
   const marker = '## Memory Context (Auto-Loaded)';
   if (prompt.includes(marker)) {
@@ -1296,10 +1347,12 @@ async function main() {
           assembled = insertContextModeSection(assembled, contextMode.promptFragment);
         }
 
-        if (!throttleExpensive) {
+        const tierBAllowed =
+          !throttleExpensive && (!isObservationalMode() || shouldUseTierB(toolInput, basePrompt));
+        if (tierBAllowed) {
           assembled = await applySemanticMemoryToPrompt(assembled, toolInput, basePrompt);
         }
-        if (!throttleExpensive) {
+        if (tierBAllowed) {
           assembled = await applyEntityGraphToPrompt(assembled);
         }
       }
@@ -1618,5 +1671,8 @@ module.exports = {
   getPromptFingerprint,
   classifyPromptComplexity,
   shouldThrottleExpensiveEnrichment,
+  getMemoryMode,
+  isObservationalMode,
+  shouldUseTierB,
   main,
 };

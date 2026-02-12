@@ -39,6 +39,10 @@ const MAX_MEMORY_ITEMS_PER_SECTION = 3;
 const MAX_MEMORY_ITEM_CHARS = 220;
 const MAX_MEMORY_SECTION_CHARS = 3500;
 const DEFAULT_SKILL_SECTION_MODE = 'full';
+const DEFAULT_MEMORY_MODE = 'hybrid';
+const DEFAULT_SUMMARY_BLOCK_MAX_TOKENS = 400;
+const DEFAULT_RECENT_OBSERVATIONS_MAX_TOKENS = 400;
+const DEFAULT_TIER_B_MAX_TOKENS = 400;
 
 /**
  * Load tool manifest (cached)
@@ -175,13 +179,106 @@ function getSkillsByName(skillNames, maxSkills = 20) {
   return result;
 }
 
-/**
- * Load memory context for agent spawn.
- * Non-critical: failures should not prevent agent spawning.
- *
- * @returns {object} Memory context object
- */
-function loadMemoryContext() {
+function getTokenLimit(value, fallback) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
+  return Math.floor(parsed);
+}
+
+function estimateTokens(text) {
+  return Math.ceil(String(text || '').length / 4);
+}
+
+function applySectionTokenCap(sectionMarkdown, maxTokens, strategy = 'truncate') {
+  const text = String(sectionMarkdown || '');
+  const maxChars = Math.max(1, Math.floor(maxTokens * 4));
+  if (text.length <= maxChars) return text;
+  if (strategy === 'summary' || strategy === 'tierB') {
+    return text.slice(0, Math.max(0, maxChars - 3)) + '...';
+  }
+  return text.slice(0, Math.max(0, maxChars - 3)) + '...';
+}
+
+function getMemoryMode() {
+  const observationalEnabled = String(
+    process.env.OBSERVATIONAL_MEMORY_ENABLED || 'on'
+  ).toLowerCase();
+  if (observationalEnabled === 'off') {
+    return DEFAULT_MEMORY_MODE;
+  }
+  const configured = String(process.env.MEMORY_MODE || DEFAULT_MEMORY_MODE)
+    .trim()
+    .toLowerCase();
+  return configured === 'observational' ? 'observational' : DEFAULT_MEMORY_MODE;
+}
+
+function getMemorySectionBudgets() {
+  return {
+    summaryTokens: getTokenLimit(
+      process.env.MEMORY_SUMMARY_BLOCK_MAX_TOKENS,
+      DEFAULT_SUMMARY_BLOCK_MAX_TOKENS
+    ),
+    observationsTokens: getTokenLimit(
+      process.env.MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS,
+      DEFAULT_RECENT_OBSERVATIONS_MAX_TOKENS
+    ),
+    tierBTokens: getTokenLimit(process.env.MEMORY_TIER_B_MAX_TOKENS, DEFAULT_TIER_B_MAX_TOKENS),
+  };
+}
+
+function formatObservationLine(observation) {
+  const topic = String(observation?.topic || '').trim();
+  const fact = String(observation?.fact || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!fact) return '';
+  if (topic) return `- [${topic}] ${fact}`;
+  return `- ${fact}`;
+}
+
+function sortObservationsForPrompt(observations) {
+  return observations.slice().sort((a, b) => {
+    const confidenceDelta = Number(b?.confidence || 0) - Number(a?.confidence || 0);
+    if (confidenceDelta !== 0) return confidenceDelta;
+    return Date.parse(String(b?.timestamp || 0)) - Date.parse(String(a?.timestamp || 0));
+  });
+}
+
+function formatObservationalSection(summary, recentObservations = []) {
+  const budgets = getMemorySectionBudgets();
+  const normalizedSummary = String(summary || '').trim();
+  const summaryText = normalizedSummary || 'No observational summary available yet.';
+  const cappedSummary = applySectionTokenCap(summaryText, budgets.summaryTokens, 'summary');
+  const sorted = sortObservationsForPrompt(
+    Array.isArray(recentObservations) ? recentObservations : []
+  );
+  const observationLines = [];
+  for (const observation of sorted) {
+    const line = formatObservationLine(observation);
+    if (!line) continue;
+    const candidate = [...observationLines, line].join('\n');
+    if (estimateTokens(candidate) > budgets.observationsTokens) break;
+    observationLines.push(line);
+  }
+
+  const lines = [];
+  lines.push('## Observational Memory Context');
+  lines.push('_Stable summary + recent high-signal observations_');
+  lines.push('');
+  lines.push('### Observational summary');
+  lines.push(cappedSummary);
+  lines.push('');
+  lines.push('### Recent observations');
+  if (observationLines.length === 0) {
+    lines.push('- No recent observations recorded.');
+  } else {
+    lines.push(...observationLines);
+  }
+
+  return lines.join('\n');
+}
+
+function loadMemoryContext(projectRoot = PROJECT_ROOT) {
   try {
     // Local require to keep prompt assembly fast when memory is unused.
     const memoryManager = require('../memory/memory-manager.cjs');
@@ -191,7 +288,7 @@ function loadMemoryContext() {
       throw new Error('memoryManager.loadMemoryForContext is not available');
     }
 
-    return memoryManager.loadMemoryForContext();
+    return memoryManager.loadMemoryForContext(projectRoot);
   } catch (err) {
     logger.warn('memory_load_failed', { error: err?.message });
     try {
@@ -208,6 +305,30 @@ function loadMemoryContext() {
       legacy_summary: '',
     };
   }
+}
+
+function loadObservationalMemory(projectRoot = PROJECT_ROOT) {
+  const root = path.resolve(projectRoot || PROJECT_ROOT);
+  const summaryPath = path.join(root, '.claude', 'context', 'memory', 'observations_summary.md');
+
+  let summary = '';
+  if (fs.existsSync(summaryPath)) {
+    try {
+      summary = fs.readFileSync(summaryPath, 'utf8').trim();
+    } catch (_err) {
+      summary = '';
+    }
+  }
+
+  let recentObservations = [];
+  try {
+    const observations = require('../memory/observations.cjs');
+    recentObservations = observations.readObservations(root, { limit: 10 });
+  } catch (_err) {
+    recentObservations = [];
+  }
+
+  return { summary, recentObservations };
 }
 
 /**
@@ -811,6 +932,7 @@ function assembleSpawnPrompt({
   skillSectionMode = DEFAULT_SKILL_SECTION_MODE,
   includeMemory = true,
   presetId = null,
+  projectRoot = PROJECT_ROOT,
 } = {}) {
   // 1. Filter and describe tools (respecting limit)
   const toolsToShow = allowedTools.slice(0, maxToolsInPrompt);
@@ -819,21 +941,40 @@ function assembleSpawnPrompt({
   // 2. Get skills for this agent type
   let skills = getSkillsByAgent(agentType, maxSkillsInPrompt);
   if (presetId) {
-    const presetSkills = getPresetSkillNames(presetId, PROJECT_ROOT);
+    const presetSkills = getPresetSkillNames(presetId, projectRoot);
     if (presetSkills.length > 0) {
       skills = getSkillsByName(presetSkills, maxSkillsInPrompt);
     }
   }
 
   // 3. Load memory context (optional)
-  const memorySection = includeMemory ? formatMemorySection(loadMemoryContext()) : '';
+  let memorySection = '';
+  if (includeMemory) {
+    if (getMemoryMode() === 'observational') {
+      const observational = loadObservationalMemory(projectRoot);
+      const hasObservationalData =
+        String(observational.summary || '').trim().length > 0 ||
+        (Array.isArray(observational.recentObservations) &&
+          observational.recentObservations.length > 0);
+      if (hasObservationalData) {
+        memorySection = formatObservationalSection(
+          observational.summary,
+          observational.recentObservations
+        );
+      } else {
+        memorySection = formatMemorySection(loadMemoryContext(projectRoot));
+      }
+    } else {
+      memorySection = formatMemorySection(loadMemoryContext(projectRoot));
+    }
+  }
 
   // 3b. Load behaviour rules (optional)
-  const behaviourSection = formatBehaviourSection(loadBehaviourRules(PROJECT_ROOT));
+  const behaviourSection = formatBehaviourSection(loadBehaviourRules(projectRoot));
 
   // 3c. Load agent prompt overrides (optional)
-  const overrides = loadAgentPromptOverrides(agentType, PROJECT_ROOT);
-  const ruleSnippet = getPresetRuleSnippet(presetId, PROJECT_ROOT);
+  const overrides = loadAgentPromptOverrides(agentType, projectRoot);
+  const ruleSnippet = getPresetRuleSnippet(presetId, projectRoot);
   let mergedBasePrompt = overrides ? `${basePrompt}\n\n${overrides}` : basePrompt;
   if (ruleSnippet) {
     mergedBasePrompt = `## Preset Rules\n\n${ruleSnippet}\n\n${mergedBasePrompt}`;
@@ -892,6 +1033,12 @@ module.exports = {
   normalizeSkillSectionMode,
   buildDiscoverySection,
   injectSections,
+  getMemoryMode,
+  getMemorySectionBudgets,
+  applySectionTokenCap,
+  loadObservationalMemory,
+  formatObservationalSection,
+  estimateTokens,
   loadMemoryContext,
   loadBehaviourRules,
   loadPresets,

@@ -38,7 +38,7 @@ All environment-specific settings are managed through the `.env` file located at
 | **Safety**                | `LOOP_PREVENTION_MODE`, `ANOMALY_DETECTION_ENABLED`                                                                                                                                                                                                                          | Loop/anomaly thresholds                      |
 | **Routing / Context**     | `REROUTER_MODE`, `PLAN_EVOLUTION_GUARD`, `SEMANTIC_ROUTING`, `AGENT_STUDIO_CONTEXT`, `AGENT_STUDIO_MODES`                                                                                                                                                                    | Orchestration and context/mode selection     |
 | **Enforcement**           | `PLANNER_FIRST_ENFORCEMENT`, `REFLECTION_STEP0_ENFORCEMENT`                                                                                                                                                                                                                  | Guard/enforcement modes                      |
-| **Spawn Prompt / Memory** | `SPAWN_PROMPT_ASSEMBLER`, `SPAWN_PROMPT_SEMANTIC_MEMORY`, `SPAWN_PROMPT_MEMORY_QUERY`                                                                                                                                                                                        | Spawn prompt memory retrieval behavior       |
+| **Spawn Prompt / Memory** | `SPAWN_PROMPT_ASSEMBLER`, `SPAWN_PROMPT_SEMANTIC_MEMORY`, `SPAWN_PROMPT_MEMORY_QUERY`, `MEMORY_MODE`, `OBSERVATIONAL_MEMORY_ENABLED`, `MEMORY_SUMMARY_BLOCK_MAX_TOKENS`, `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS`, `MEMORY_TIER_B_MAX_TOKENS`                                 | Spawn prompt memory retrieval behavior       |
 | **Memory / Code Index**   | `LANCEDB_TABLE_CODE`, `MEMORY_ACCESS_TRACKING`, `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS`, `MEMORY_JSON_WRITE_ENFORCEMENT`, `MEMORY_EXTRACTION_RECENT_MESSAGES_LIMIT`, `MEMORY_EXTRACTION_RECENT_CHARS_LIMIT`, `MEMORY_EXTRACTION_LIST_LIMIT`, `COLD_STORAGE_INDEX_MAX_CHARS` | Code-index and memory tracking behavior      |
 | **Worker Runtime**        | `WORKER_ENABLED`, `WORKER_INTERVAL_MS`, `WORKER_TASKS`                                                                                                                                                                                                                       | Background maintenance/index/reflection loop |
 | **Model Client**          | `MODEL_CLIENT_DEFAULT_MODEL`, `MODEL_CLIENT_AGENT_TYPE`, `MODEL_CLIENT_MAX_RETRIES`, `MODEL_CLIENT_RETRY_BASE_MS`                                                                                                                                                            | LLM client defaults and retry behavior       |
@@ -88,21 +88,26 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 
 ### Spawn Prompt / Memory Retrieval Variables
 
-| Variable                           | Values     | Default    | Purpose                                                                                |
-| ---------------------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------- |
-| `SPAWN_PROMPT_ASSEMBLER`           | on/off     | on         | Enable the spawn prompt assembler hook.                                                |
-| `ALLOWED_TOOLS_ENRICHER`           | on/off     | on         | Enrich allowed_tools from registry/agent-config.                                       |
-| `SPAWN_PROMPT_SEMANTIC_MEMORY`     | on/off     | on         | Append "Semantic Matches" section from ContextualMemory.                               |
-| `SPAWN_PROMPT_ENTITY_GRAPH`        | on/off     | on         | Append entity graph (SQLite) section in spawn prompts.                                 |
-| `MEMORY_INTENT_ANALYSIS`           | on/off     | off        | Enable intent-based memory query planning.                                             |
-| `SPAWN_PROMPT_MEMORY_QUERY`        | on/off     | off        | Append query-driven "Relevant Memories" section; when on, replaces "Semantic Matches". |
-| `SPAWN_PROMPT_MAX_CHARS`           | number     | 40000      | Hard max chars for assembled spawn prompt before section trimming.                     |
-| `SPAWN_SKILL_SECTION_MODE`         | enum       | names_only | Skill section verbosity (`names_only` or `full`).                                      |
-| `SPAWN_ASSEMBLY_PROFILING`         | true/false | false      | Emit dev-only spawn assembly timing + token burn metrics.                              |
-| `SPAWN_ADAPTIVE_ENRICHMENT`        | true/false | false      | Dynamically throttle expensive prompt enrichment based on runtime metrics.             |
-| `SPAWN_ASSEMBLY_CACHE`             | on/off     | on         | Enable on-disk spawn assembly cache.                                                   |
-| `SPAWN_ASSEMBLY_CACHE_TTL_MS`      | number     | 120000     | Cache entry TTL (ms) for assembled spawn prompts.                                      |
-| `SPAWN_ASSEMBLY_CACHE_MAX_ENTRIES` | number     | 120        | Max assembled prompts retained in cache.                                               |
+| Variable                                | Values     | Default    | Purpose                                                                                |
+| --------------------------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------- |
+| `SPAWN_PROMPT_ASSEMBLER`                | on/off     | on         | Enable the spawn prompt assembler hook.                                                |
+| `ALLOWED_TOOLS_ENRICHER`                | on/off     | on         | Enrich allowed_tools from registry/agent-config.                                       |
+| `SPAWN_PROMPT_SEMANTIC_MEMORY`          | on/off     | on         | Append "Semantic Matches" section from ContextualMemory.                               |
+| `SPAWN_PROMPT_ENTITY_GRAPH`             | on/off     | on         | Append entity graph (SQLite) section in spawn prompts.                                 |
+| `MEMORY_INTENT_ANALYSIS`                | on/off     | off        | Enable intent-based memory query planning.                                             |
+| `SPAWN_PROMPT_MEMORY_QUERY`             | on/off     | off        | Append query-driven "Relevant Memories" section; when on, replaces "Semantic Matches". |
+| `SPAWN_PROMPT_MAX_CHARS`                | number     | 40000      | Hard max chars for assembled spawn prompt before section trimming.                     |
+| `SPAWN_SKILL_SECTION_MODE`              | enum       | names_only | Skill section verbosity (`names_only` or `full`).                                      |
+| `SPAWN_ASSEMBLY_PROFILING`              | true/false | false      | Emit dev-only spawn assembly timing + token burn metrics.                              |
+| `SPAWN_ADAPTIVE_ENRICHMENT`             | true/false | false      | Dynamically throttle expensive prompt enrichment based on runtime metrics.             |
+| `SPAWN_ASSEMBLY_CACHE`                  | on/off     | on         | Enable on-disk spawn assembly cache.                                                   |
+| `SPAWN_ASSEMBLY_CACHE_TTL_MS`           | number     | 120000     | Cache entry TTL (ms) for assembled spawn prompts.                                      |
+| `SPAWN_ASSEMBLY_CACHE_MAX_ENTRIES`      | number     | 120        | Max assembled prompts retained in cache.                                               |
+| `MEMORY_MODE`                           | enum       | hybrid     | Memory injection mode for spawn prompts (`hybrid` or `observational`).                 |
+| `OBSERVATIONAL_MEMORY_ENABLED`          | on/off     | on         | Kill switch for observational mode; when off, `MEMORY_MODE=observational` is ignored.  |
+| `MEMORY_SUMMARY_BLOCK_MAX_TOKENS`       | number     | 400        | Token cap for observational summary subsection.                                        |
+| `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS` | number     | 400        | Token cap for recent observations subsection.                                          |
+| `MEMORY_TIER_B_MAX_TOKENS`              | number     | 400        | Token cap for Tier B memory sections (semantic/query/entity).                          |
 
 ### Memory / Compression Variables
 
