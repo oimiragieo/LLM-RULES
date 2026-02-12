@@ -175,6 +175,37 @@ test('observational mode falls back to legacy memory section when observational 
   }
 });
 
+test('observational mode falls back to legacy memory section when observations.jsonl exists but is empty', () => {
+  const root = createTempRoot();
+  try {
+    writeLegacyMemory(root);
+    const memoryDir = path.join(root, '.claude', 'context', 'memory');
+    fs.mkdirSync(memoryDir, { recursive: true });
+    fs.writeFileSync(path.join(memoryDir, 'observations.jsonl'), '', 'utf8');
+
+    const output = withEnv(
+      {
+        MEMORY_MODE: 'observational',
+        OBSERVATIONAL_MEMORY_ENABLED: 'on',
+      },
+      () =>
+        assembleSpawnPrompt({
+          agentType: 'developer',
+          allowedTools: ['Read', 'TaskUpdate', 'TaskList', 'Skill'],
+          basePrompt: BASE_PROMPT,
+          includeMemory: true,
+          projectRoot: root,
+        })
+    );
+
+    assert.ok(output.includes('## Memory Context (Auto-Loaded)'));
+    assert.ok(output.includes('legacy-gotcha-text'));
+    assert.ok(!output.includes('## Observational Memory Context'));
+  } finally {
+    cleanup(root);
+  }
+});
+
 test('OBSERVATIONAL_MEMORY_ENABLED=off forces hybrid mode even if MEMORY_MODE=observational', () => {
   const root = createTempRoot();
   try {

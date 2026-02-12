@@ -38,6 +38,23 @@ function cleanup(projectRoot) {
   }
 }
 
+function withEnv(envMap, fn) {
+  const previous = {};
+  for (const [key, value] of Object.entries(envMap)) {
+    previous[key] = process.env[key];
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = String(value);
+  }
+  try {
+    return fn();
+  } finally {
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+}
+
 test('appendObservation writes one JSON line and creates directory/file if missing', () => {
   const projectRoot = createTempProjectRoot();
   try {
@@ -274,20 +291,22 @@ test('recordMemoryBlockChurn appends hash metrics with churned true/false', () =
 test('appendObservation marks supersedes when a new fact contradicts same-topic recent fact', () => {
   const projectRoot = createTempProjectRoot();
   try {
-    appendObservation(projectRoot, {
-      timestamp: '2026-02-10T00:00:00.000Z',
-      topic: 'auth',
-      fact: 'Use JWT bearer tokens for API auth.',
-      confidence: 0.8,
-      source_session: 's1',
-    });
+    const appended = withEnv({ OBSERVATIONS_CONTRADICTION_ENABLED: 'on' }, () => {
+      appendObservation(projectRoot, {
+        timestamp: '2026-02-10T00:00:00.000Z',
+        topic: 'auth',
+        fact: 'Use JWT bearer tokens for API auth.',
+        confidence: 0.8,
+        source_session: 's1',
+      });
 
-    const appended = appendObservation(projectRoot, {
-      timestamp: '2026-02-12T00:00:00.000Z',
-      topic: 'auth',
-      fact: 'No longer use JWT bearer tokens; replaced by opaque session tokens.',
-      confidence: 0.9,
-      source_session: 's2',
+      return appendObservation(projectRoot, {
+        timestamp: '2026-02-12T00:00:00.000Z',
+        topic: 'auth',
+        fact: 'No longer use JWT bearer tokens; replaced by opaque session tokens.',
+        confidence: 0.9,
+        source_session: 's2',
+      });
     });
 
     assert.equal(typeof appended.supersedes, 'string');
@@ -300,20 +319,22 @@ test('appendObservation marks supersedes when a new fact contradicts same-topic 
 test('appendObservation does not set supersedes without contradiction cues', () => {
   const projectRoot = createTempProjectRoot();
   try {
-    appendObservation(projectRoot, {
-      timestamp: '2026-02-10T00:00:00.000Z',
-      topic: 'auth',
-      fact: 'Use JWT bearer tokens for API auth.',
-      confidence: 0.8,
-      source_session: 's1',
-    });
+    const appended = withEnv({ OBSERVATIONS_CONTRADICTION_ENABLED: 'on' }, () => {
+      appendObservation(projectRoot, {
+        timestamp: '2026-02-10T00:00:00.000Z',
+        topic: 'auth',
+        fact: 'Use JWT bearer tokens for API auth.',
+        confidence: 0.8,
+        source_session: 's1',
+      });
 
-    const appended = appendObservation(projectRoot, {
-      timestamp: '2026-02-12T00:00:00.000Z',
-      topic: 'auth',
-      fact: 'Use JWT bearer tokens with issuer validation.',
-      confidence: 0.9,
-      source_session: 's2',
+      return appendObservation(projectRoot, {
+        timestamp: '2026-02-12T00:00:00.000Z',
+        topic: 'auth',
+        fact: 'Use JWT bearer tokens with issuer validation.',
+        confidence: 0.9,
+        source_session: 's2',
+      });
     });
 
     assert.equal(appended.supersedes, undefined);
@@ -325,8 +346,35 @@ test('appendObservation does not set supersedes without contradiction cues', () 
 test('appendObservation does not set supersedes for stale historical observations', () => {
   const projectRoot = createTempProjectRoot();
   try {
+    const appended = withEnv({ OBSERVATIONS_CONTRADICTION_ENABLED: 'on' }, () => {
+      appendObservation(projectRoot, {
+        timestamp: '2025-01-01T00:00:00.000Z',
+        topic: 'auth',
+        fact: 'Use JWT bearer tokens for API auth.',
+        confidence: 0.8,
+        source_session: 's1',
+      });
+
+      return appendObservation(projectRoot, {
+        timestamp: '2026-02-12T00:00:00.000Z',
+        topic: 'auth',
+        fact: 'No longer use JWT bearer tokens; replaced by opaque session tokens.',
+        confidence: 0.9,
+        source_session: 's2',
+      });
+    });
+
+    assert.equal(appended.supersedes, undefined);
+  } finally {
+    cleanup(projectRoot);
+  }
+});
+
+test('appendObservation leaves supersedes unset by default when contradiction feature is disabled', () => {
+  const projectRoot = createTempProjectRoot();
+  try {
     appendObservation(projectRoot, {
-      timestamp: '2025-01-01T00:00:00.000Z',
+      timestamp: '2026-02-10T00:00:00.000Z',
       topic: 'auth',
       fact: 'Use JWT bearer tokens for API auth.',
       confidence: 0.8,

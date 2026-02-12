@@ -683,7 +683,8 @@ SessionEnd can compact recent observations into a stable summary file used by ob
 - `OBSERVATIONS_COMPACT_ON_SESSION_END=off`: skip compaction.
 - `OBSERVATIONS_COMPACT_MAX=50` (default): max rows read from `observations.jsonl` for each compaction.
 - `OBSERVATIONS_DECAY_PER_HOUR=0.02` (default): recency decay for observation scoring used in prompt ranking.
-- `OBSERVATIONS_CONTRADICTION_MAX_AGE_DAYS=90` (default): contradiction supersedes matching only considers recent same-topic history.
+- `OBSERVATIONS_CONTRADICTION_ENABLED=off` (default): contradiction supersedes tagging is disabled until telemetry confirms readiness.
+- `OBSERVATIONS_CONTRADICTION_MAX_AGE_DAYS=90` (default): when contradiction tagging is enabled, matching only considers recent same-topic history.
 
 ### Cache-stability metric
 

@@ -23,6 +23,13 @@ const DEFAULT_OBSERVATION_DECAY_PER_HOUR = 0.02;
 const DEFAULT_CONTRADICTION_MAX_AGE_DAYS = 90;
 const MIN_CONTRADICTION_TOKEN_OVERLAP = 2;
 
+function isContradictionEnabled() {
+  const raw = String(process.env.OBSERVATIONS_CONTRADICTION_ENABLED || 'off')
+    .trim()
+    .toLowerCase();
+  return raw === 'on' || raw === 'true' || raw === '1';
+}
+
 function resolveProjectRoot(projectRoot = PROJECT_ROOT) {
   if (!projectRoot || typeof projectRoot !== 'string') {
     throw new Error('projectRoot is required');
@@ -108,10 +115,12 @@ function normalizeObservation(record) {
 function appendObservation(projectRoot, record) {
   const observationsPath = resolveObservationsPath(projectRoot);
   const normalized = normalizeObservation(record);
-  const topicRows = getByTopic(projectRoot, normalized.topic, { limit: 5 });
-  const superseded = findContradictedObservation(topicRows, normalized);
-  if (superseded && !normalized.supersedes) {
-    normalized.supersedes = String(superseded.id || superseded.timestamp || '').trim();
+  if (isContradictionEnabled()) {
+    const topicRows = getByTopic(projectRoot, normalized.topic, { limit: 5 });
+    const superseded = findContradictedObservation(topicRows, normalized);
+    if (superseded && !normalized.supersedes) {
+      normalized.supersedes = String(superseded.id || superseded.timestamp || '').trim();
+    }
   }
   fs.mkdirSync(path.dirname(observationsPath), { recursive: true });
   fs.appendFileSync(observationsPath, JSON.stringify(normalized) + '\n', 'utf8');
@@ -324,6 +333,7 @@ module.exports = {
   resolveObservationsSummaryPath,
   resolveMemoryCacheStabilityPath,
   getObservationDecayPerHour,
+  isContradictionEnabled,
   findContradictedObservation,
   normalizeObservation,
 };

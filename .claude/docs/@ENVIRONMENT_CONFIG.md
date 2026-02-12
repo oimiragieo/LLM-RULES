@@ -111,6 +111,7 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 | `OBSERVATIONS_COMPACT_ON_SESSION_END`     | on/off     | on         | Enable SessionEnd compaction from `observations.jsonl` into `observations_summary.md`. |
 | `OBSERVATIONS_COMPACT_MAX`                | number     | 50         | Max observation rows included during SessionEnd summary compaction.                    |
 | `OBSERVATIONS_DECAY_PER_HOUR`             | number     | 0.02       | Recency decay used in observation scoring (higher = stronger recency bias).            |
+| `OBSERVATIONS_CONTRADICTION_ENABLED`      | on/off     | off        | Enable contradiction supersedes tagging for new observations (deferred by default).    |
 | `OBSERVATIONS_CONTRADICTION_MAX_AGE_DAYS` | number     | 90         | Max age window for contradiction supersedes tagging within same topic.                 |
 
 ### Memory / Compression Variables
