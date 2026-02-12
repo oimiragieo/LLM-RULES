@@ -92,7 +92,7 @@ test('evaluate returns failures when thresholds are exceeded', () => {
       operational: {
         p95: { writeLatencyMs: 150, lockWaitMs: 80 },
         parseFailureRate: 0.1,
-        counters: { writesTotal: 10 },
+        counters: { writesTotal: 10, readsTotal: 0, parseAttempts: 0, lockAcquires: 0 },
       },
       cacheStability: {
         total: 10,
@@ -109,6 +109,53 @@ test('evaluate returns failures when thresholds are exceeded', () => {
   );
 
   assert.equal(failures.length, 4);
+});
+
+test('evaluate requireData passes with read-only operational signals', () => {
+  const failures = summaryCli.evaluate(
+    {
+      operational: {
+        p95: { writeLatencyMs: 0, lockWaitMs: 0 },
+        parseFailureRate: 0,
+        counters: { writesTotal: 0, readsTotal: 3, parseAttempts: 0, lockAcquires: 0 },
+      },
+      cacheStability: {
+        total: 0,
+        churnRate: 0,
+      },
+    },
+    {
+      requireData: true,
+      assertMaxWriteP95Ms: 120,
+      assertMaxLockWaitP95Ms: 40,
+      assertMaxParseFailureRate: 0.02,
+      assertMaxChurnRate: 0.8,
+    }
+  );
+
+  assert.equal(failures.length, 0);
+});
+
+test('evaluate requireData fails when all operational counters are zero', () => {
+  const failures = summaryCli.evaluate(
+    {
+      operational: {
+        p95: { writeLatencyMs: 0, lockWaitMs: 0 },
+        parseFailureRate: 0,
+        counters: { writesTotal: 0, readsTotal: 0, parseAttempts: 0, lockAcquires: 0 },
+      },
+      cacheStability: {
+        total: 0,
+        churnRate: 0,
+      },
+    },
+    {
+      requireData: true,
+    }
+  );
+
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /no operational memory samples/i);
 });
 
 test('buildSummary combines operational and cache stability sections', () => {

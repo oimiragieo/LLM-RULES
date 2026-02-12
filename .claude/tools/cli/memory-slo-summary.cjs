@@ -68,8 +68,15 @@ function readCacheStability(projectRoot) {
 function evaluate(summary, opts) {
   const failures = [];
 
-  if (opts.requireData && summary.operational.counters.writesTotal === 0) {
-    failures.push('No operational memory write samples found.');
+  const counters = summary?.operational?.counters || {};
+  const operationalSignalCount =
+    Number(counters.writesTotal || 0) +
+    Number(counters.readsTotal || 0) +
+    Number(counters.parseAttempts || 0) +
+    Number(counters.lockAcquires || 0);
+
+  if (opts.requireData && operationalSignalCount === 0) {
+    failures.push('No operational memory samples found.');
   }
 
   if (
