@@ -698,6 +698,15 @@ Each entry tracks `memory_block_hash`, `previous_hash`, and `churned` (`true` wh
 Use `pnpm run test:memory:ci` to run the memory safety/integration gate locally or in CI.  
 The workflow `.github/workflows/memory-ci.yml` runs this gate on memory-related changes.
 
+### Cache-stability summary CLI
+
+Use:
+
+- `pnpm run metrics:memory-cache:summary`
+- `pnpm run metrics:memory-cache:ci`
+
+The CI variant asserts churn/stability thresholds on `memory-cache-stability.jsonl`.
+
 ## Keyword Search Fallback
 
 When semantic search (LanceDB) is unavailable, `ContextualMemory` falls back to keyword search with performance optimizations:
