@@ -89,6 +89,7 @@ describe('pre-task-unified.cjs', () => {
   let routerStateBackup = null;
   let loopStateBackup = null;
   let tasklistLoopStateBackup = null;
+  let plannerLoopStateBackup = null;
   let originalEnv = {};
 
   beforeEach(() => {
@@ -97,6 +98,7 @@ describe('pre-task-unified.cjs', () => {
     routerStateBackup = backupState(ROUTER_STATE_FILE);
     loopStateBackup = backupState(LOOP_STATE_FILE);
     tasklistLoopStateBackup = backupState(TASKLIST_LOOP_STATE_FILE);
+    plannerLoopStateBackup = backupState(PLANNER_LOOP_STATE_FILE);
 
     // Backup environment
     originalEnv = {
@@ -126,6 +128,7 @@ describe('pre-task-unified.cjs', () => {
 
     // Invalidate all caches before each test
     preTaskUnified.invalidateCachedState();
+    restoreState(PLANNER_LOOP_STATE_FILE, null);
   });
 
   afterEach(() => {
@@ -133,7 +136,7 @@ describe('pre-task-unified.cjs', () => {
     restoreState(ROUTER_STATE_FILE, routerStateBackup);
     restoreState(LOOP_STATE_FILE, loopStateBackup);
     restoreState(TASKLIST_LOOP_STATE_FILE, tasklistLoopStateBackup);
-    restoreState(PLANNER_LOOP_STATE_FILE, null);
+    restoreState(PLANNER_LOOP_STATE_FILE, plannerLoopStateBackup);
 
     // Restore environment
     for (const [key, value] of Object.entries(originalEnv)) {
@@ -495,7 +498,7 @@ describe('pre-task-unified.cjs', () => {
       );
 
       const router = readState(ROUTER_STATE_FILE);
-      assert.strictEqual(router.currentSpawnTaskId, null);
+      assert.ok(router.currentSpawnTaskId == null);
     });
 
     it('should record in_progress lifecycle when task_id is provided', () => {
@@ -840,6 +843,36 @@ describe('pre-task-unified.cjs', () => {
       const second = preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
+
+      assert.strictEqual(first.pass, false);
+      assert.strictEqual(second.pass, true);
+      assert.strictEqual(second.result, 'warn');
+      assert.ok(second.message.includes('LOOP-BREAKER'));
+    });
+
+    it('uses stable env session id for loop-breaker when hook session ids vary', () => {
+      process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '2';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
+      process.env.CLAUDE_SESSION_ID = 'planner-loop-stable-env';
+
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'high',
+      });
+
+      const first = preTaskUnified.checkRoutingGuard(
+        'Task',
+        { prompt: 'You are developer. implement complex feature.' },
+        { session_id: 'ephemeral-1' }
+      );
+      const second = preTaskUnified.checkRoutingGuard(
+        'Task',
+        { prompt: 'You are developer. implement complex feature.' },
+        { session_id: 'ephemeral-2' }
+      );
 
       assert.strictEqual(first.pass, false);
       assert.strictEqual(second.pass, true);

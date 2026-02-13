@@ -284,6 +284,12 @@ function clearPlannerFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID ||
   }
 }
 
+function resolveStableSessionId(hookInput = null) {
+  return (
+    process.env.CLAUDE_SESSION_ID || hookInput?.session_id || hookInput?.sessionId || 'unknown'
+  );
+}
+
 function readAgentGuardrailsState(stateFile = AGENT_GUARDRAILS_STATE_FILE) {
   try {
     if (!fs.existsSync(stateFile)) return { sessions: {} };
@@ -560,13 +566,11 @@ function checkTaskListFirst(toolName, hookInput = null) {
     return { pass: true };
   }
   if (routerState.isTaskListCalledSincePrompt()) {
-    const sessionId =
-      hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || 'unknown';
+    const sessionId = resolveStableSessionId(hookInput);
     clearTaskListFirstViolation(sessionId);
     return { pass: true };
   }
-  const sessionId =
-    hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || 'unknown';
+  const sessionId = resolveStableSessionId(hookInput);
   const repeated = registerTaskListFirstViolation(sessionId);
   if (repeated >= TASKLIST_LOOP_BREAKER_THRESHOLD) {
     const message = `[TASKLIST-FIRST LOOP-BREAKER] TaskList-first violation repeated ${repeated}x in this session window.
@@ -637,17 +641,12 @@ function checkRoutingGuard(toolName, toolInput, hookInput = null) {
     if (isPlannerRequired && !plannerAlreadySpawned) {
       // Check if THIS spawn is a PLANNER spawn
       if (isPlannerSpawn(toolInput)) {
-        const sessionId =
-          hookInput?.session_id ||
-          hookInput?.sessionId ||
-          process.env.CLAUDE_SESSION_ID ||
-          'unknown';
+        const sessionId = resolveStableSessionId(hookInput);
         clearPlannerFirstViolation(sessionId);
         return { pass: true, markPlanner: true };
       }
 
-      const sessionId =
-        hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || 'unknown';
+      const sessionId = resolveStableSessionId(hookInput);
       const repeated = registerPlannerFirstViolation(sessionId);
       if (repeated >= getPlannerFirstLoopBreakerThreshold()) {
         const message =

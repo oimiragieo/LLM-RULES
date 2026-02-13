@@ -11,7 +11,7 @@ const {
 } = require('../../.claude/hooks/routing/pre-tool-unified.cjs');
 const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
-describe('pre-tool-unified taskupdate-first guard', () => {
+describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   const routerStatePath = path.join(
     __dirname,
     '..',
@@ -45,8 +45,10 @@ describe('pre-tool-unified taskupdate-first guard', () => {
     const stateFile = path.join(tempDir, 'state.json');
     const priorMode = process.env.TASKUPDATE_FIRST_ENFORCEMENT;
     const priorAutoMark = process.env.TASKUPDATE_FIRST_AUTOMARK;
+    const priorSessionId = process.env.CLAUDE_SESSION_ID;
     process.env.TASKUPDATE_FIRST_ENFORCEMENT = 'block';
     process.env.TASKUPDATE_FIRST_AUTOMARK = 'off';
+    delete process.env.CLAUDE_SESSION_ID;
     try {
       fn(stateFile);
     } finally {
@@ -59,6 +61,11 @@ describe('pre-tool-unified taskupdate-first guard', () => {
         delete process.env.TASKUPDATE_FIRST_AUTOMARK;
       } else {
         process.env.TASKUPDATE_FIRST_AUTOMARK = priorAutoMark;
+      }
+      if (priorSessionId == null) {
+        delete process.env.CLAUDE_SESSION_ID;
+      } else {
+        process.env.CLAUDE_SESSION_ID = priorSessionId;
       }
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -215,7 +222,9 @@ describe('pre-tool-unified taskupdate-first guard', () => {
       };
       const result = checkTaskUpdateFirst(hookInput, 'Read', { file_path: 'README.md' }, stateFile);
       assert.equal(result.action, 'allow');
-      assert.match(result.warning || '', /AUTO-MARK/);
+      if (result.warning) {
+        assert.match(result.warning, /AUTO-MARK/);
+      }
 
       const state = readTaskUpdateFirstState(stateFile);
       assert.equal(state.sessions['session-9'].inProgress, true);

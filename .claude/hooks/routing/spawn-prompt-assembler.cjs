@@ -455,6 +455,29 @@ function normalizeTaskIdReferences(prompt, taskId) {
     .replace(/(task_id\s*:\s*['"])([^'"]+)(['"])/gi, `$1${normalizedTaskId}$3`);
 }
 
+const STALE_PATH_REWRITES = Object.freeze({
+  '.claude/lib/memory/memory-query.cjs': '.claude/lib/memory/core/memory-query.cjs',
+  '.claude/lib/utils/safe-json-parse.cjs': '.claude/lib/utils/safe-json.cjs',
+  'tests/metrics/metrics-schema-contract.test.cjs':
+    'tests/lib/monitoring/metrics-schema-contract.test.cjs',
+  'tests/metrics/metrics-reader-rollups.test.cjs':
+    'tests/lib/monitoring/metrics-reader-rollups.test.cjs',
+  '.claude/context/artifacts/research-reports/p0-fix-research-2026-02-13.md':
+    '.claude/context/reports/p0-fix-research-2026-02-13.md',
+  '.claude/context/artifacts/research-reports/implementation-patterns-research-2026-02-13.md':
+    '.claude/context/reports/implementation-patterns-research-2026-02-13.md',
+});
+
+function normalizeStalePathReferences(prompt) {
+  if (!prompt || typeof prompt !== 'string') return prompt;
+
+  let normalized = prompt;
+  for (const [oldPath, newPath] of Object.entries(STALE_PATH_REWRITES)) {
+    normalized = normalized.replaceAll(oldPath, newPath);
+  }
+  return normalized;
+}
+
 function hasExplicitTaskId(toolInput) {
   if (!toolInput || typeof toolInput !== 'object') return false;
   const taskId = toolInput.task_id || toolInput.id || null;
@@ -1276,6 +1299,7 @@ function prepareTaskSpawnContext(hookInput, sessionId) {
 
   const explicitTaskId = toolInput.task_id || toolInput.id || null;
   basePrompt = normalizeTaskIdReferences(basePrompt, explicitTaskId);
+  basePrompt = normalizeStalePathReferences(basePrompt);
   const inputPromptLength = basePrompt.length;
 
   if (!hasRequiredWarningBox(basePrompt) || !hasTaskIdReference(basePrompt)) {
@@ -1695,6 +1719,7 @@ module.exports = {
   hasRequiredWarningBox,
   hasTaskIdReference,
   normalizeTaskIdReferences,
+  normalizeStalePathReferences,
   hasExplicitTaskId,
   generateFallbackTaskId,
   ensureTaskId,

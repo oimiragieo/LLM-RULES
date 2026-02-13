@@ -111,6 +111,15 @@ describe('pre-tool-unified read safety', () => {
     assert.ok(String(result.message || '').includes('does not exist'));
   });
 
+  test('checkReadSafety suggests canonical path for known stale references', () => {
+    const result = checkReadSafety('Read', {
+      file_path: '.claude/lib/memory/memory-query.cjs',
+    });
+    assert.strictEqual(result.action, 'block');
+    assert.ok(String(result.message || '').includes('Did you mean'));
+    assert.match(String(result.message || ''), /memory[\\/]+core[\\/]+memory-query\.cjs/);
+  });
+
   test('main enforces read safety when hook input is provided on stdin', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-stdin-'));
     const hookScript = path.join(

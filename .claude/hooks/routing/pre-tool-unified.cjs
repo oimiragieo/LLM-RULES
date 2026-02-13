@@ -1253,13 +1253,30 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
     ensureReportReadTarget(targetPath);
     ensureTaskOutputReadTarget(targetPath);
     if (!fs.existsSync(targetPath)) {
+      const missingPathHints = {
+        '.claude/lib/memory/memory-query.cjs': '.claude/lib/memory/core/memory-query.cjs',
+        '.claude/lib/utils/safe-json-parse.cjs': '.claude/lib/utils/safe-json.cjs',
+        'tests/metrics/metrics-schema-contract.test.cjs':
+          'tests/lib/monitoring/metrics-schema-contract.test.cjs',
+        'tests/metrics/metrics-reader-rollups.test.cjs':
+          'tests/lib/monitoring/metrics-reader-rollups.test.cjs',
+        '.claude/context/artifacts/research-reports/p0-fix-research-2026-02-13.md':
+          '.claude/context/reports/p0-fix-research-2026-02-13.md',
+        '.claude/context/artifacts/research-reports/implementation-patterns-research-2026-02-13.md':
+          '.claude/context/reports/implementation-patterns-research-2026-02-13.md',
+      };
+      const relativePath = path.relative(PROJECT_ROOT, targetPath).replace(/\\/g, '/');
+      const suggestedPath = missingPathHints[relativePath];
+      const suggestionText = suggestedPath
+        ? ` Did you mean "${path.join(PROJECT_ROOT, suggestedPath)}"?`
+        : '';
       // Never allow host Read on a missing path; this avoids noisy "file does not exist" hard failures.
       return {
         checked: true,
         action: 'block',
         message:
           `[READ SAFETY] "${targetPath}" does not exist. ` +
-          'Use Glob/TaskOutput to discover a valid path, or generate the artifact before reading it.',
+          `Use Glob/TaskOutput to discover a valid path, or generate the artifact before reading it.${suggestionText}`,
       };
     }
 
