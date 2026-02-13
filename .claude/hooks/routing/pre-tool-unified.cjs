@@ -696,7 +696,7 @@ function checkTaskUpdateFirst(
   toolInput,
   stateFile = TASKUPDATE_FIRST_STATE_FILE
 ) {
-  const mode = (process.env.TASKUPDATE_FIRST_ENFORCEMENT || 'block').toLowerCase();
+  const mode = (process.env.TASKUPDATE_FIRST_ENFORCEMENT || 'warn').toLowerCase();
   if (mode === 'off') return { checked: false, reason: 'disabled' };
   if (!isAgentScopedSession(hookInput)) return { checked: false, reason: 'not_agent_session' };
 
@@ -733,6 +733,32 @@ function checkTaskUpdateFirst(
     };
     writeTaskUpdateFirstState(current, stateFile);
     return { checked: true, action: 'allow' };
+  }
+
+  // Bootstrap fallback: pre-task hook records in_progress in router-state at spawn time.
+  // When subagent hook payloads are sparse or delayed, honor that marker to avoid deadlock.
+  try {
+    const lastTaskUpdate = routerState.getLastTaskUpdate();
+    const candidateTaskId = hookInput?.task_id || hookInput?.taskId || null;
+    const taskIdMatches =
+      !candidateTaskId ||
+      !lastTaskUpdate?.taskId ||
+      String(candidateTaskId).trim() === String(lastTaskUpdate.taskId).trim();
+    if (
+      routerState.wasTaskUpdateCalledRecently() &&
+      (lastTaskUpdate?.status === 'in_progress' || lastTaskUpdate?.status === 'in-progress') &&
+      taskIdMatches
+    ) {
+      current.sessions[sessionId] = {
+        inProgress: true,
+        taskId: String(lastTaskUpdate.taskId || candidateTaskId || ''),
+        updatedAt: now,
+      };
+      writeTaskUpdateFirstState(current, stateFile);
+      return { checked: true, action: 'allow' };
+    }
+  } catch (_err) {
+    // Best-effort fallback only.
   }
 
   const message =

@@ -171,4 +171,28 @@ describe('pre-tool-unified taskupdate-first guard', () => {
       }
     });
   });
+
+  test('allows when recent router-state TaskUpdate bootstrap marker is present', () => {
+    withTempStateFile(stateFile => {
+      withRouterState(
+        {
+          mode: 'agent',
+          taskSpawned: true,
+          sessionId: 'session-8',
+          lastTaskUpdateCall: Date.now(),
+          lastTaskUpdateTaskId: 'task-8',
+          lastTaskUpdateStatus: 'in_progress',
+          taskUpdatesThisSession: 1,
+        },
+        () => {
+          const hookInput = {
+            session_id: 'session-8',
+            task_id: 'task-8',
+          };
+          const result = checkTaskUpdateFirst(hookInput, 'Grep', { pattern: 'foo' }, stateFile);
+          assert.equal(result.action, 'allow');
+        }
+      );
+    });
+  });
 });
