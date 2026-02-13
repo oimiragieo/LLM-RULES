@@ -183,6 +183,8 @@ const SAFE_COMMANDS_ALLOWLIST = [
   'strings', // Extract strings from binary
   'sort', // Sort lines
   'uniq', // Unique lines
+  'du', // Disk usage (read-only)
+  'sleep', // Pause execution (benign timing)
 
   // Basic file operations (path validation happens in filesystem-validators.cjs)
   'mkdir',

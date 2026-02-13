@@ -852,6 +852,41 @@ test('getRegisteredCommands includes security-critical commands', () => {
 });
 
 // ============================================================
+// System Info Commands (du, time, sleep)
+// ============================================================
+
+console.log('\n--- System Info Commands: du, time, sleep ---');
+
+test('du is recognized as safe (disk usage)', () => {
+  const result = validateCommand('du -sh ./node_modules');
+  assertTrue(result.valid, 'du should be allowed (read-only disk usage)');
+});
+
+test('time is recognized as safe (timing wrapper)', () => {
+  const result = validateCommand('time npm test');
+  assertTrue(result.valid, 'time should be allowed (benign timing wrapper)');
+});
+
+test('sleep is recognized as safe (pause command)', () => {
+  const result = validateCommand('sleep 5');
+  assertTrue(result.valid, 'sleep should be allowed (benign pause)');
+});
+
+// ============================================================
+// PowerShell Security Test (should remain blocked)
+// ============================================================
+
+console.log('\n--- PowerShell Security ---');
+
+test('powershell is NOT in allowlist (security risk - shell bypass)', () => {
+  const result = validateCommand('powershell -Command "Get-Process"');
+  // PowerShell is a shell itself and could bypass bash restrictions
+  // It should be blocked (not in allowlist, no validator registered)
+  assertFalse(result.valid, 'powershell should be blocked (shell bypass risk)');
+  assertIncludes(result.error, 'Unregistered command', 'Should block unregistered command');
+});
+
+// ============================================================
 // Print Test Summary
 // ============================================================
 
