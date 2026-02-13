@@ -30,4 +30,3 @@ describe('logger sanitizer integration', () => {
     assert.ok(!payload.endpoint.includes('secret-value'));
   });
 });
-
