@@ -884,6 +884,48 @@ Additionally, `skill-plan-generator-output.schema.json` (210 lines, Tier 1 gold 
 
 ---
 
+## 2026-02-13: VUL-INTEG-001 -- CRITICAL Sanitizer Integration Bug in writeMemory()
+
+**Issue**: `sanitizeMemoryContent()` returns `{ safe, sanitized, detections }` but `memory-manager.cjs` line 415 assigns the whole object to `sanitizedContent` and passes it to `atomicWriteSync()` on line 422. Result: `[object Object]` written to file instead of actual content. The `safe` flag is never checked.
+
+**Impact**: CRITICAL -- Every `writeMemory()` call corrupts content to `[object Object]`. Sanitizer is completely non-functional in production.
+
+**Fix**: Destructure return: `const { safe, sanitized, detections } = sanitizeMemoryContent(...)`, check `safe`, use `sanitized`.
+
+**Priority**: P0 -- BLOCKING. Must fix before any deployment.
+
+**Report**: `.claude/context/reports/security/memory-security-review-2026-02-13.md`
+
+---
+
+## 2026-02-13: VUL-BYPASS-001 -- Code Block Exemption Creates Full Sanitizer Bypass
+
+**Issue**: Triple-backtick code blocks are fully exempt from scanning. Wrapping malicious payload in backticks bypasses all detection. LLMs reading memory files do not ignore code block content.
+
+**Impact**: HIGH -- Trivial bypass for memory poisoning (ASI06).
+
+**Fix**: Either remove code block exemption or scan code blocks with reduced severity.
+
+**Priority**: P1 -- Fix within 1 week.
+
+**Report**: `.claude/context/reports/security/memory-security-review-2026-02-13.md`
+
+---
+
+## 2026-02-13: VUL-BYPASS-003 -- Only 1 of 5+ Memory Write Paths Has Sanitization
+
+**Issue**: Sanitizer only protects `writeMemory()`. Four other write paths in memory-manager.cjs (archiveLearnings, writeMemoryArray, updateCodebaseMap) and direct file writes by agents bypass sanitization entirely.
+
+**Impact**: HIGH -- Incomplete protection. Attackers use any non-writeMemory() path.
+
+**Fix**: Add sanitization to all write paths + consider pre-write hook for defense-in-depth.
+
+**Priority**: P1 -- Fix within 1 week.
+
+**Report**: `.claude/context/reports/security/memory-security-review-2026-02-13.md`
+
+---
+
 ## 2026-02-13: RESOLVED - Security Fixes (Commits 1-4)
 
 **Issues Resolved:**

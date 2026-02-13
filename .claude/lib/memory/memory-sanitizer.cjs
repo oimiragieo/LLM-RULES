@@ -154,21 +154,28 @@ function sanitizeMemoryContent(content) {
   // Convert to string
   const contentStr = String(content);
 
-  // Extract code blocks (preserve legitimate code examples)
-  const { contentWithoutCode } = extractCodeBlocks(contentStr);
-
   const detections = [];
 
-  // Scan for dangerous patterns (excluding code blocks)
+  // FIX VUL-BYPASS-001: Scan ALL content including code blocks
+  // Code blocks in memory files are still read by LLMs and can contain
+  // effective prompt injection. Removed code block exemption.
+  // Scan for dangerous patterns (scan all content)
   for (const [_category, patterns] of Object.entries(DANGEROUS_PATTERNS)) {
     for (const { pattern, description } of patterns) {
       // Reset regex state
       pattern.lastIndex = 0;
 
-      if (pattern.test(contentWithoutCode)) {
+      if (pattern.test(contentStr)) {
         detections.push(description);
       }
     }
+  }
+
+  // FIX VUL-AUDIT-001: Log detections to stderr for audit trail
+  if (detections.length > 0) {
+    process.stderr.write(
+      `[memory-sanitizer] SECURITY: Detected ${detections.length} dangerous patterns: ${detections.join('; ')}\n`
+    );
   }
 
   return {

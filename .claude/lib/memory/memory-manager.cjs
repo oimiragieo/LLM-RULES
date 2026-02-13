@@ -411,15 +411,28 @@ function readMemory(name, projectRoot = PROJECT_ROOT) {
  */
 function writeMemory(name, content, projectRoot = PROJECT_ROOT) {
   validateProjectRoot(projectRoot);
-  // FIX HIGH-002: Sanitize memory content before writing
-  const sanitizedContent = sanitizeMemoryContent(String(content || ''));
+  // FIX VUL-INTEG-001 (CRITICAL): Sanitize memory content before writing
+  const result = sanitizeMemoryContent(String(content || ''));
+
+  // FIX VUL-INTEG-001: Check safe flag and use sanitized string
+  if (!result.safe) {
+    logger.warn('Memory sanitizer detected dangerous content', {
+      name,
+      detections: result.detections,
+    });
+    throw new Error(
+      `Memory write blocked: dangerous content detected (${result.detections.join(', ')})`
+    );
+  }
+
   const baseName = normalizeMemoryName(name);
   const filePath = path.join(getNamedMemoryDir(projectRoot), `${baseName}.md`);
   const validation = validatePathWithinProject(filePath, projectRoot);
   if (!validation.safe) {
     throw new Error(`Invalid memory path: ${validation.reason}`);
   }
-  atomicWriteSync(filePath, sanitizedContent, 'utf8');
+  // FIX VUL-INTEG-001: Use result.sanitized (the string), not the whole object
+  atomicWriteSync(filePath, result.sanitized, 'utf8');
   return `Memory '${name}' written.`;
 }
 
@@ -492,7 +505,27 @@ function loadMemoryArray(filePath) {
 }
 
 function writeMemoryArray(filePath, data) {
-  atomicWriteJSONSync(filePath, Array.isArray(data) ? data : []);
+  // FIX VUL-BYPASS-003 (HIGH): Sanitize JSON content before writing
+  const arrayData = Array.isArray(data) ? data : [];
+
+  // Sanitize text fields in array entries
+  for (const entry of arrayData) {
+    if (entry && typeof entry === 'object' && entry.text) {
+      const result = sanitizeMemoryContent(String(entry.text));
+      if (!result.safe) {
+        logger.warn('Memory sanitizer detected dangerous content in array entry', {
+          detections: result.detections,
+        });
+        throw new Error(
+          `Memory write blocked: dangerous content detected in array entry (${result.detections.join(', ')})`
+        );
+      }
+      // Use sanitized text
+      entry.text = result.sanitized;
+    }
+  }
+
+  atomicWriteJSONSync(filePath, arrayData);
 }
 
 function normalizeEntryIds(entries) {
@@ -704,16 +737,39 @@ function checkAndArchiveLearnings(projectRoot = PROJECT_ROOT) {
   const archiveContent = archiveLines.join('\n');
   const keepContent = keepLines.join('\n');
 
+  // FIX VUL-BYPASS-003 (HIGH): Sanitize archive and keep content
+  const archiveResult = sanitizeMemoryContent(archiveContent);
+  const keepResult = sanitizeMemoryContent(keepContent);
+
+  if (!archiveResult.safe) {
+    logger.warn('Memory sanitizer detected dangerous content in archive', {
+      detections: archiveResult.detections,
+    });
+    throw new Error(
+      `Archive blocked: dangerous content detected (${archiveResult.detections.join(', ')})`
+    );
+  }
+
+  if (!keepResult.safe) {
+    logger.warn('Memory sanitizer detected dangerous content in keep content', {
+      detections: keepResult.detections,
+    });
+    throw new Error(
+      `Archive blocked: dangerous content detected (${keepResult.detections.join(', ')})`
+    );
+  }
+
   // Create archive filename with YYYY-MM format
   const now = new Date();
   const archiveFilename = `learnings-${now.toISOString().slice(0, 7)}.md`;
   const archivePath = path.join(archiveDir, archiveFilename);
 
+  // FIX VUL-BYPASS-003: Use sanitized content
   // Append to archive (may already have content from previous archives this month)
-  fs.appendFileSync(archivePath, archiveContent + '\n\n');
+  fs.appendFileSync(archivePath, archiveResult.sanitized + '\n\n');
 
   // Write truncated content back to learnings.md
-  atomicWriteSync(learningsPath, keepContent);
+  atomicWriteSync(learningsPath, keepResult.sanitized);
 
   result.archived = true;
   result.archivedBytes = archiveContent.length;
@@ -816,10 +872,41 @@ function pruneCodebaseMap(projectRoot = PROJECT_ROOT) {
 
   result.totalPruned = initialCount - entries.length;
 
+  // FIX VUL-BYPASS-003 (HIGH): Sanitize codebase map entries before writing
   // Rebuild discovered_files object
   const newDiscoveredFiles = {};
   for (const entry of entries) {
     const { path: entryPath, _accessDate, ...info } = entry;
+
+    // Sanitize description and category fields
+    if (info.description) {
+      const descResult = sanitizeMemoryContent(String(info.description));
+      if (!descResult.safe) {
+        logger.warn('Memory sanitizer detected dangerous content in codebase_map description', {
+          path: entryPath,
+          detections: descResult.detections,
+        });
+        throw new Error(
+          `Codebase map write blocked: dangerous content in description (${descResult.detections.join(', ')})`
+        );
+      }
+      info.description = descResult.sanitized;
+    }
+
+    if (info.category) {
+      const catResult = sanitizeMemoryContent(String(info.category));
+      if (!catResult.safe) {
+        logger.warn('Memory sanitizer detected dangerous content in codebase_map category', {
+          path: entryPath,
+          detections: catResult.detections,
+        });
+        throw new Error(
+          `Codebase map write blocked: dangerous content in category (${catResult.detections.join(', ')})`
+        );
+      }
+      info.category = catResult.sanitized;
+    }
+
     newDiscoveredFiles[entryPath] = info;
   }
 
