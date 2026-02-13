@@ -186,10 +186,18 @@ let _stateCacheEnabled = false;
  * @returns {Object} State object (possibly overridden to router mode)
  */
 function applyStaleDetection(state) {
+  if (!state || typeof state !== 'object') {
+    return state;
+  }
+
   const thresholdMs = parseInt(process.env.STATE_STALE_THRESHOLD_MS || '600000', 10);
   if (isNaN(thresholdMs) || thresholdMs <= 0) {
     return state; // Invalid threshold, skip detection
   }
+  const currentSessionId = process.env.CLAUDE_SESSION_ID || null;
+  const stateSessionId = state.sessionId || null;
+  const hasSessionMismatch =
+    currentSessionId && stateSessionId && String(currentSessionId) !== String(stateSessionId);
 
   if (!state.lastReset) {
     // Backward-compatibility: older state writers may omit lastReset while still
@@ -197,11 +205,10 @@ function applyStaleDetection(state) {
     if (state.mode === 'agent' || state.taskSpawned === true) {
       return state;
     }
-    // No lastReset timestamp -- treat as stale
-    console.error(
-      `[routing-guard] Stale state detected (no lastReset timestamp). Forcing router mode.`
-    );
-    return { ...state, mode: 'router', taskSpawned: false };
+    if (hasSessionMismatch) {
+      return { ...state, mode: 'router', taskSpawned: false, sessionId: currentSessionId };
+    }
+    return state;
   }
 
   const resetTime = new Date(state.lastReset).getTime();
@@ -209,19 +216,20 @@ function applyStaleDetection(state) {
     if (state.mode === 'agent' || state.taskSpawned === true) {
       return state;
     }
-    // Invalid timestamp -- treat as stale
-    console.error(
-      `[routing-guard] Stale state detected (invalid lastReset: ${state.lastReset}). Forcing router mode.`
-    );
-    return { ...state, mode: 'router', taskSpawned: false };
+    if (hasSessionMismatch) {
+      return { ...state, mode: 'router', taskSpawned: false, sessionId: currentSessionId };
+    }
+    return state;
   }
 
   const ageMs = Date.now() - resetTime;
   if (ageMs > thresholdMs) {
-    console.error(
-      `[routing-guard] Stale state detected (age: ${Math.round(ageMs / 1000)}s, threshold: ${Math.round(thresholdMs / 1000)}s). Forcing router mode.`
-    );
-    return { ...state, mode: 'router', taskSpawned: false };
+    // Prevent false positives during long-running multi-agent sessions.
+    // Only force reset when state appears to belong to a different session.
+    if (hasSessionMismatch) {
+      return { ...state, mode: 'router', taskSpawned: false, sessionId: currentSessionId };
+    }
+    return state;
   }
 
   return state;

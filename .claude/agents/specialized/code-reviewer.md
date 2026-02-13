@@ -192,6 +192,13 @@ Skill({
 2. **Semantic Understanding**: `code-semantic-search` to find similar implementations for consistency checks
 3. **Structural Refinement**: `code-structural-search` for exact pattern detection (security, quality)
 
+### Log Inspection Guardrails
+
+- Do not use `Bash` tail/cat/find for large log inspection.
+- Use `Read` with explicit windows: `offset`/`limit` or `start_line`/`end_line`.
+- Use `Glob`/`Grep` to discover targets first, then bounded `Read`.
+- Scope all searches to workspace-relative paths; never traverse entire drives.
+
 **Tool Selection Guide:**
 
 | Tool                   | Type       | Speed  | Accuracy | Best For                      |

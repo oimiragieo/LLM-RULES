@@ -950,47 +950,12 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
 
     if (stats.isDirectory()) {
       if (isBypassPermissionsMode(hookInput)) {
-        const listingPath = createDirectoryListingFile(targetPath);
-        if (listingPath) {
-          try {
-            const listingStats = fs.statSync(listingPath);
-            if (listingStats.isDirectory()) {
-              return {
-                checked: true,
-                action: 'block',
-                message:
-                  `[READ SAFETY][bypass] Generated listing path "${listingPath}" is a directory. ` +
-                  'Retry with Glob/rg --files and Read a concrete file.',
-              };
-            }
-          } catch (_statErr) {
-            return {
-              checked: true,
-              action: 'block',
-              message:
-                `[READ SAFETY][bypass] Generated listing path "${listingPath}" is unavailable. ` +
-                'Retry with Glob/rg --files and Read a concrete file.',
-            };
-          }
-          const rewritten = { ...(toolInput || {}) };
-          rewritten.file_path = listingPath;
-          rewritten.filePath = listingPath;
-          rewritten.path = listingPath;
-          return {
-            checked: true,
-            action: 'rewrite',
-            rewrittenToolInput: rewritten,
-            bypassWarning:
-              `[READ SAFETY][bypass] "${targetPath}" is a directory. ` +
-              `Auto-rewriting Read target to generated listing file: ${listingPath}`,
-          };
-        }
         return {
           checked: true,
           action: 'block',
           message:
             `[READ SAFETY][bypass] "${targetPath}" is a directory. ` +
-            'Unable to generate directory listing file safely. Use Glob/rg --files for directory listing, then Read a specific file.',
+            'Read requires a concrete file path. Use Glob/rg --files to list files, then Read a specific file.',
         };
       }
       return {
@@ -1004,20 +969,13 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
 
     // If file is large and caller did not request a window, force chunked read.
     if (stats.size > READ_CHUNK_GUARD_BYTES && !hasReadWindow(toolInput)) {
-      if (isBypassPermissionsMode(hookInput)) {
-        return {
-          checked: true,
-          action: 'allow',
-          bypassWarning:
-            `[READ SAFETY][bypass] Large file (${stats.size} bytes) should be chunked. ` +
-            'Retry with offset/limit (or start_line/end_line), e.g. offset: 0, limit: 4000.',
-        };
-      }
       return {
         checked: true,
         action: 'block',
         message:
-          `[READ SAFETY] Large file (${stats.size} bytes) requires chunked Read. ` +
+          `${
+            isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '
+          }Large file (${stats.size} bytes) requires chunked Read. ` +
           'Retry with offset/limit (or start_line/end_line), e.g. offset: 0, limit: 4000.',
       };
     }

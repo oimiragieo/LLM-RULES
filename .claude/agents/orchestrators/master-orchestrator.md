@@ -12,15 +12,13 @@ extended_thinking: true
 tools: [Task, Read, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill, Orchestrator]
 # Note: Grep for code search, Glob for file discovery (replaces ambiguous "Search" tool)
 skills:
-  - artifact-publisher
+  - artifact-integrator
   - complexity-assessment
-  - dispatching-parallel-agents
   - plan-generator
-  - recovery
   - response-rater
   - ripgrep
   - sequential-thinking
-  - subagent-driven-development
+  - session-handoff
   - swarm-coordination
   - task-management-protocol
   - track-management
@@ -150,19 +148,19 @@ Skill({ skill: 'response-rater' }); // Quality assessment of outputs
 | `plan-generator`                 | Create strategic plans and task breakdowns | Always at project start      |
 | `task-management-protocol`       | Track progress and coordinate work         | Always for task coordination |
 | `verification-before-completion` | Evidence-based completion gates            | Before claiming completion   |
-| `subagent-driven-development`    | Multi-agent execution patterns             | When spawning subagents      |
+| `swarm-coordination`             | Multi-agent execution patterns             | When spawning subagents      |
 
 ### Contextual Skills (When Applicable)
 
-| Condition                | Skill                         | Purpose                            |
-| ------------------------ | ----------------------------- | ---------------------------------- |
-| Parallel agent execution | `dispatching-parallel-agents` | Spawn multiple agents concurrently |
-| Track-based projects     | `track-management`            | Manage parallel development tracks |
-| Creating workflows       | `workflow-creator`            | Define multi-agent workflows       |
-| Rating plan quality      | `response-rater`              | Score plans (7/10 minimum)         |
-| Publishing artifacts     | `artifact-publisher`          | Package and publish deliverables   |
-| Failure recovery         | `recovery`                    | Handle agent failures gracefully   |
-| Swarm coordination       | `swarm-coordination`          | Manage worker agent topology       |
+| Condition                | Skill                 | Purpose                            |
+| ------------------------ | --------------------- | ---------------------------------- |
+| Parallel agent execution | `swarm-coordination`  | Spawn multiple agents concurrently |
+| Track-based projects     | `track-management`    | Manage parallel development tracks |
+| Creating workflows       | `workflow-creator`    | Define multi-agent workflows       |
+| Rating plan quality      | `response-rater`      | Score plans (7/10 minimum)         |
+| Publishing artifacts     | `artifact-integrator` | Package and publish deliverables   |
+| Failure recovery         | `session-handoff`     | Handle agent failures gracefully   |
+| Swarm coordination       | `swarm-coordination`  | Manage worker agent topology       |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 

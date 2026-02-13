@@ -60,17 +60,27 @@ describe('Fix 4b: applyStaleDetection', () => {
     assert.strictEqual(result.taskSpawned, true, 'Fresh state should keep taskSpawned');
   });
 
-  it('should force router mode when state is stale (older than 10 min)', () => {
+  it('should preserve state when stale age is in the same session', () => {
     assert.ok(routingGuard, 'Module should be loadable');
 
     const state = {
       mode: 'agent',
       taskSpawned: true,
       lastReset: new Date(Date.now() - 700000).toISOString(), // 11.7 min ago
+      sessionId: 'session-abc',
     };
+    process.env.CLAUDE_SESSION_ID = 'session-abc';
     const result = routingGuard.applyStaleDetection(state);
-    assert.strictEqual(result.mode, 'router', 'Stale state should force router mode');
-    assert.strictEqual(result.taskSpawned, false, 'Stale state should force taskSpawned false');
+    assert.strictEqual(
+      result.mode,
+      'agent',
+      'Same-session stale state should not force router mode'
+    );
+    assert.strictEqual(
+      result.taskSpawned,
+      true,
+      'Same-session stale state should keep taskSpawned'
+    );
   });
 
   it('should preserve active agent state when lastReset is null (backward compatibility)', () => {
@@ -107,24 +117,26 @@ describe('Fix 4b: applyStaleDetection', () => {
     );
   });
 
-  it('should respect STATE_STALE_THRESHOLD_MS env var override', () => {
+  it('should preserve stale state when threshold is exceeded but session matches', () => {
     assert.ok(routingGuard, 'Module should be loadable');
 
     // Set a very short threshold (1 second)
     process.env.STATE_STALE_THRESHOLD_MS = '1000';
+    process.env.CLAUDE_SESSION_ID = 'session-abc';
 
     const state = {
       mode: 'agent',
       taskSpawned: true,
       lastReset: new Date(Date.now() - 2000).toISOString(), // 2 seconds ago
+      sessionId: 'session-abc',
     };
     const result = routingGuard.applyStaleDetection(state);
     assert.strictEqual(
       result.mode,
-      'router',
-      '2-second-old state should be stale with 1-second threshold'
+      'agent',
+      'Threshold exceed should not force router mode for same session'
     );
-    assert.strictEqual(result.taskSpawned, false);
+    assert.strictEqual(result.taskSpawned, true);
   });
 
   it('should skip staleness detection when threshold is 0 (invalid)', () => {
@@ -157,21 +169,22 @@ describe('Fix 4b: applyStaleDetection', () => {
     assert.strictEqual(result.taskSpawned, true);
   });
 
-  it('should preserve other state fields when forcing router mode', () => {
+  it('should force router mode on session mismatch and preserve other state fields', () => {
     assert.ok(routingGuard, 'Module should be loadable');
 
+    process.env.CLAUDE_SESSION_ID = 'session-123';
     const state = {
       mode: 'agent',
       taskSpawned: true,
       lastReset: new Date(Date.now() - 700000).toISOString(),
-      sessionId: 'session-123',
+      sessionId: 'different-session',
       complexity: 'high',
       plannerSpawned: true,
     };
     const result = routingGuard.applyStaleDetection(state);
     assert.strictEqual(result.mode, 'router', 'Should force router mode');
     assert.strictEqual(result.taskSpawned, false, 'Should force taskSpawned false');
-    assert.strictEqual(result.sessionId, 'session-123', 'Should preserve sessionId');
+    assert.strictEqual(result.sessionId, 'session-123', 'Should update sessionId');
     assert.strictEqual(result.complexity, 'high', 'Should preserve complexity');
     assert.strictEqual(result.plannerSpawned, true, 'Should preserve plannerSpawned');
   });

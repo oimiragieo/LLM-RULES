@@ -356,6 +356,44 @@ describe('pre-task-unified.cjs', () => {
       assert.strictEqual(result.pass, true);
     });
 
+    it('should allow stale repeated action pattern outside recency window', () => {
+      const staleTime = new Date(Date.now() - 31 * 60 * 1000).toISOString();
+      writeState(LOOP_STATE_FILE, {
+        sessionId: 'test-session',
+        spawnDepth: 1,
+        actionHistory: [{ action: 'spawn:developer', count: 9, lastAt: staleTime }],
+      });
+
+      const input = {
+        tool_name: 'Task',
+        tool_input: {
+          prompt: 'You are DEVELOPER. Continue with the next task.',
+        },
+      };
+
+      const result = preTaskUnified.checkLoopPrevention(input);
+      assert.strictEqual(result.pass, true);
+    });
+
+    it('should ignore malformed/empty session state and allow fresh run', () => {
+      process.env.CLAUDE_SESSION_ID = 'current-session';
+      writeState(LOOP_STATE_FILE, {
+        sessionId: '',
+        spawnDepth: 99,
+        actionHistory: [{ action: 'spawn:qa', count: 12, lastAt: new Date().toISOString() }],
+      });
+
+      const input = {
+        tool_name: 'Task',
+        tool_input: {
+          prompt: 'You are QA. Run reliability checks.',
+        },
+      };
+
+      const result = preTaskUnified.checkLoopPrevention(input);
+      assert.strictEqual(result.pass, true);
+    });
+
     it('should pass when enforcement is off', () => {
       process.env.LOOP_PREVENTION_MODE = 'off';
 

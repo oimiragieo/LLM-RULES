@@ -35,7 +35,7 @@ test('Task 1.2: reflection-step0-guard has max pending limit (5)', async () => {
   );
 });
 
-test('Task 1.2: reflection-step0-guard default mode is "warn" not "block"', async () => {
+test('Task 1.2: reflection-step0-guard default mode is "block"', async () => {
   const guardPath = path.join(PROJECT_ROOT, '.claude/hooks/reflection/reflection-step0-guard.cjs');
   const content = fs.readFileSync(guardPath, 'utf8');
 
@@ -44,11 +44,7 @@ test('Task 1.2: reflection-step0-guard default mode is "warn" not "block"', asyn
   const match = content.match(enforcementPattern);
 
   assert.ok(match, 'Should find REFLECTION_STEP0_ENFORCEMENT getEnforcementMode call');
-  assert.strictEqual(
-    match[1],
-    'warn',
-    'REFLECTION_STEP0_ENFORCEMENT default should be "warn" (not block to avoid deadlock)'
-  );
+  assert.strictEqual(match[1], 'block', 'REFLECTION_STEP0_ENFORCEMENT default should be "block"');
 });
 
 test('Task 1.2: reflection-step0-guard emits warning instead of blocking by default', async () => {

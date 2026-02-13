@@ -34,6 +34,11 @@ const LOOP_STATE_FILE = path.join(
 const LOCK_SUFFIX = '.lock';
 const MAX_LOCK_WAIT_MS = 2000;
 const LOCK_RETRY_MS = 50;
+const DEFAULT_SESSION_ID = 'session-unknown';
+const LOOP_SPAWN_DEPTH_STALE_MS = Number(process.env.LOOP_SPAWN_DEPTH_STALE_MS || 10 * 60 * 1000);
+const LOOP_ACTION_HISTORY_WINDOW_MS = Number(
+  process.env.LOOP_ACTION_HISTORY_WINDOW_MS || 30 * 60 * 1000
+);
 
 function syncSleep(ms) {
   if (typeof SharedArrayBuffer !== 'undefined' && typeof Atomics !== 'undefined') {
@@ -136,10 +141,39 @@ function getDefaultState() {
   const defaults = SCHEMAS['loop-state']?.defaults || {};
   return {
     ...defaults,
-    sessionId: process.env.CLAUDE_SESSION_ID || `session-${Date.now()}`,
+    sessionId: normalizeSessionId(process.env.CLAUDE_SESSION_ID) || DEFAULT_SESSION_ID,
     createdAt: now,
     updatedAt: now,
   };
+}
+
+function normalizeSessionId(sessionId) {
+  if (typeof sessionId !== 'string') return null;
+  const trimmed = sessionId.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function parseTimestampMs(value) {
+  if (!value || typeof value !== 'string') return 0;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function pruneActionHistory(history, nowMs = Date.now()) {
+  if (!Array.isArray(history)) return [];
+  return history
+    .filter(entry => entry && typeof entry === 'object' && typeof entry.action === 'string')
+    .filter(entry => {
+      const lastAtMs = parseTimestampMs(entry.lastAt);
+      if (lastAtMs <= 0) return false;
+      return nowMs - lastAtMs <= LOOP_ACTION_HISTORY_WINDOW_MS;
+    })
+    .map(entry => ({
+      action: entry.action,
+      count: Math.max(1, Number(entry.count || 1)),
+      lastAt: entry.lastAt,
+    }))
+    .slice(-50);
 }
 
 function ensureStateDir(filePath) {
@@ -151,7 +185,7 @@ function ensureStateDir(filePath) {
 
 function getState(stateFile = LOOP_STATE_FILE) {
   const defaults = getDefaultState();
-  const currentSessionId = process.env.CLAUDE_SESSION_ID || null;
+  const currentSessionId = normalizeSessionId(process.env.CLAUDE_SESSION_ID);
 
   try {
     if (!fs.existsSync(stateFile)) {
@@ -160,19 +194,32 @@ function getState(stateFile = LOOP_STATE_FILE) {
     const content = fs.readFileSync(stateFile, 'utf8');
     const parsed = safeParseJSON(content, 'loop-state');
     const state = { ...defaults, ...parsed };
+    const stateSessionId = normalizeSessionId(state.sessionId);
 
     // Session boundary guard: loop-prevention counters are session-scoped.
     // If a stale state file from a previous session is present, start fresh
     // to avoid false-positive loop blocks on legitimate new task waves.
-    if (currentSessionId && state.sessionId && state.sessionId !== currentSessionId) {
+    if (currentSessionId && (!stateSessionId || stateSessionId !== currentSessionId)) {
       return {
         ...defaults,
         sessionId: currentSessionId,
       };
     }
 
+    state.sessionId = stateSessionId || currentSessionId || DEFAULT_SESSION_ID;
     if (!state.createdAt) state.createdAt = defaults.createdAt;
     if (!state.updatedAt) state.updatedAt = defaults.updatedAt;
+
+    // Repair stale nested-spawn state left behind by interrupted sessions/tasks.
+    const updatedAtMs = parseTimestampMs(state.updatedAt);
+    if (
+      Number(state.spawnDepth || 0) > 0 &&
+      (updatedAtMs <= 0 || Date.now() - updatedAtMs > LOOP_SPAWN_DEPTH_STALE_MS)
+    ) {
+      state.spawnDepth = 0;
+    }
+
+    state.actionHistory = pruneActionHistory(state.actionHistory);
     return state;
   } catch (_e) {
     return defaults;
@@ -183,8 +230,14 @@ function saveState(state, stateFile = LOOP_STATE_FILE) {
   const lockAcquired = acquireLock(stateFile);
   try {
     ensureStateDir(stateFile);
+    const safeSessionId =
+      normalizeSessionId(state?.sessionId) ||
+      normalizeSessionId(process.env.CLAUDE_SESSION_ID) ||
+      DEFAULT_SESSION_ID;
     const updated = {
       ...state,
+      sessionId: safeSessionId,
+      actionHistory: pruneActionHistory(state?.actionHistory),
       updatedAt: new Date().toISOString(),
     };
     atomicWriteJSONSync(stateFile, updated);

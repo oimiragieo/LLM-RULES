@@ -13,10 +13,8 @@ tools: [Task, Read, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - consensus-voting
   - context-compressor
-  - dispatching-parallel-agents
   - plan-generator
   - ripgrep
-  - subagent-driven-development
   - swarm-coordination
   - task-management-protocol
   - verification-before-completion
@@ -134,11 +132,11 @@ Skill({ skill: 'task-management-protocol' }); // Task tracking and distribution
 
 ### Contextual Skills (When Applicable)
 
-| Condition                | Skill                         | Purpose                        |
-| ------------------------ | ----------------------------- | ------------------------------ |
-| Parallel worker dispatch | `dispatching-parallel-agents` | Spawn workers concurrently     |
-| Context limits reached   | `context-compressor`          | Compress swarm memory          |
-| Subagent execution       | `subagent-driven-development` | Multi-agent execution patterns |
+| Condition                | Skill                      | Purpose                        |
+| ------------------------ | -------------------------- | ------------------------------ |
+| Parallel worker dispatch | `swarm-coordination`       | Spawn workers concurrently     |
+| Context limits reached   | `context-compressor`       | Compress swarm memory          |
+| Subagent execution       | `task-management-protocol` | Multi-agent execution patterns |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 

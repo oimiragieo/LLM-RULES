@@ -80,6 +80,7 @@ const DEFAULT_EVOLUTION_BUDGET = 3;
 const DEFAULT_COOLDOWN_MS = 300000; // 5 minutes
 const DEFAULT_DEPTH_LIMIT = 5;
 const DEFAULT_PATTERN_THRESHOLD = 3;
+const DEFAULT_PATTERN_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
 const TASKLIST_LOOP_BREAKER_THRESHOLD = Number(
   process.env.TASKLIST_FIRST_LOOP_BREAKER_THRESHOLD || 3
 );
@@ -402,6 +403,21 @@ function getPatternThreshold() {
   return DEFAULT_PATTERN_THRESHOLD;
 }
 
+function getPatternWindowMs() {
+  const envWindowMs = process.env.LOOP_PATTERN_WINDOW_MS;
+  if (envWindowMs) {
+    const parsed = parseInt(envWindowMs, 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+  return DEFAULT_PATTERN_WINDOW_MS;
+}
+
+function parseIsoToMs(value) {
+  if (!value || typeof value !== 'string') return 0;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 function getEvolutionBudget() {
   const envBudget = process.env.LOOP_EVOLUTION_BUDGET;
   if (envBudget) {
@@ -612,14 +628,18 @@ This is a safety mechanism to prevent infinite loops.`;
   const agentType = extractAgentType(prompt, description, toolInput);
   const spawnAction = `spawn:${agentType}`;
   const threshold = getPatternThreshold();
+  const patternWindowMs = getPatternWindowMs();
 
   const entry = loopState.actionHistory?.find(a => a.action === spawnAction);
-  const count = entry ? entry.count : 0;
+  const count = entry ? Number(entry.count || 0) : 0;
+  const lastAtMs = parseIsoToMs(entry?.lastAt);
+  const hasRecentPattern = lastAtMs > 0 && Date.now() - lastAtMs <= patternWindowMs;
   const activeNestedSpawn = Number(loopState.spawnDepth || 0) > 0;
 
   // Pattern blocking is only meaningful while we are actively inside nested spawn
-  // chains. Sequential top-level Task() usage can legitimately repeat agent types.
-  if (activeNestedSpawn && count >= threshold) {
+  // chains, and only for recent repeated patterns.
+  // Sequential top-level Task() usage can legitimately repeat agent types.
+  if (activeNestedSpawn && hasRecentPattern && count >= threshold) {
     const message = `[LOOP PREVENTION] Pattern detected: "${spawnAction}" repeated ${count} times. Threshold is ${threshold}.
 
 This is a safety mechanism to prevent infinite loops.`;

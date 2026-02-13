@@ -88,7 +88,7 @@ describe('pre-tool-unified read safety', () => {
     }
   });
 
-  test('checkReadSafety rewrites directory reads in bypassPermissions mode to listing file', () => {
+  test('checkReadSafety blocks directory reads in bypassPermissions mode', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-dir-bypass-'));
     try {
       const result = checkReadSafety(
@@ -96,10 +96,9 @@ describe('pre-tool-unified read safety', () => {
         { file_path: tempDir },
         { permission_mode: 'bypassPermissions' }
       );
-      assert.strictEqual(result.action, 'rewrite');
-      assert.ok(result.rewrittenToolInput);
-      assert.ok(fs.existsSync(result.rewrittenToolInput.file_path));
-      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
+      assert.strictEqual(result.action, 'block');
+      assert.ok(String(result.message || '').includes('[READ SAFETY][bypass]'));
+      assert.ok(String(result.message || '').includes('Read requires a concrete file path'));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -159,7 +158,7 @@ describe('pre-tool-unified read safety', () => {
     }
   });
 
-  test('checkReadSafety allows large unwindowed read in bypassPermissions mode with advisory', () => {
+  test('checkReadSafety blocks large unwindowed read in bypassPermissions mode', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-file-bypass-'));
     const filePath = path.join(tempDir, 'large.txt');
     try {
@@ -169,8 +168,9 @@ describe('pre-tool-unified read safety', () => {
         { file_path: filePath },
         { permission_mode: 'bypassPermissions' }
       );
-      assert.strictEqual(result.action, 'allow');
-      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
+      assert.strictEqual(result.action, 'block');
+      assert.ok(String(result.message || '').includes('[READ SAFETY][bypass]'));
+      assert.ok(String(result.message || '').includes('requires chunked Read'));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -291,7 +291,7 @@ describe('pre-tool-unified read safety', () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test('checkReadSafety rewrite target is always a file for directory reads in bypass mode', () => {
+  test('checkReadSafety does not rewrite directory reads in bypass mode', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-rewrite-file-'));
     withPathRestored(defaultDirListingPath, () => {
       if (fs.existsSync(defaultDirListingPath)) {
@@ -304,9 +304,9 @@ describe('pre-tool-unified read safety', () => {
         { permission_mode: 'bypassPermissions' }
       );
 
-      assert.strictEqual(result.action, 'rewrite');
-      assert.ok(result.rewrittenToolInput);
-      assert.strictEqual(fs.statSync(result.rewrittenToolInput.file_path).isDirectory(), false);
+      assert.strictEqual(result.action, 'block');
+      assert.strictEqual(result.rewrittenToolInput, undefined);
+      assert.ok(String(result.message || '').includes('directory'));
     });
     fs.rmSync(tempDir, { recursive: true, force: true });
   });

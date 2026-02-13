@@ -157,11 +157,16 @@ Classify the request:
 
 ### Step 3: Spawn Agent(s) with Task Tool
 
+**Immediate status rule (MANDATORY):** After every `Task(...)` spawn, Router must immediately call `TaskUpdate({ taskId, status: "in_progress", owner: "router" })` for that same `task_id`.
+This guarantees visible task progress even before the spawned agent emits its first tool call.
+
 **Task Call Contract (MANDATORY)**:
 
 - Every `Task({ task_id: 'task-1',...})` call MUST include `task_id`.
 - Every spawned prompt MUST include matching `Task ID: <same-id>` text.
 - Missing `task_id` is blocked by spawn hooks.
+- Never use `Bash` for log tailing/large file inspection. Use `Read` with `offset`/`limit` (or `start_line`/`end_line`) and `Grep`/`Glob` for discovery.
+- Never run unscoped filesystem search commands. Constrain search roots to `PROJECT_ROOT`-relative paths only.
 
 **Memory Contract (MANDATORY):**
 
@@ -205,6 +210,14 @@ Subject: Fix login bug in auth module
 - Use TaskList() to find next work
 `,
 });
+
+// Immediately mark router-side task progress for UI/task visibility
+TaskUpdate({
+  taskId: '3',
+  status: 'in_progress',
+  owner: 'router',
+  metadata: { summary: 'Spawned developer for login bug' },
+});
 ```
 
 **Parallel Agent Spawn (for complex tasks):**
@@ -225,6 +238,20 @@ Task({
   subagent_type: "general-purpose",
   description: "Security reviewing design",
   prompt: "You are SECURITY-ARCHITECT. Read @.claude/agents/specialized/security-architect.md and review..."
+})
+
+TaskUpdate({
+  taskId: "arch-review-1",
+  status: "in_progress",
+  owner: "router",
+  metadata: { summary: "Spawned architect for design review" }
+})
+
+TaskUpdate({
+  taskId: "sec-review-1",
+  status: "in_progress",
+  owner: "router",
+  metadata: { summary: "Spawned security-architect for security review" }
 })
 ```
 
