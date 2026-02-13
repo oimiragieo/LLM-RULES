@@ -188,17 +188,26 @@ function maybeGenerateEmbeddingsForFile(absPath) {
   const timeoutMs = Number(process.env.MEMORY_EMBED_ON_EDIT_TIMEOUT_MS || 60000);
   // REMEDIATION-FIX: Use non-blocking spawn to avoid hanging the hook
   const { spawn } = require('child_process');
-  const child = spawn(process.execPath, [generatorPath, '--file', absPath], {
-    cwd: PROJECT_ROOT,
-    stdio: 'ignore',
-    detached: true, // Allow child to run after parent exits
-    timeout: timeoutMs,
-  });
+  const child = spawn(
+    process.execPath,
+    [generatorPath, '--file', absPath],
+    buildEmbeddingSpawnOptions(PROJECT_ROOT, timeoutMs)
+  );
   child.unref(); // Don't wait for child
 
   if (process.env.DEBUG_HOOKS) {
     console.warn('[sync-memory-index] Embedding generation triggered in background for', basename);
   }
+}
+
+function buildEmbeddingSpawnOptions(projectRoot, timeoutMs) {
+  return {
+    cwd: projectRoot,
+    stdio: 'ignore',
+    detached: true, // Allow child to run after parent exits
+    timeout: timeoutMs,
+    windowsHide: true, // Prevent detached console window popups on Windows
+  };
 }
 
 async function main() {
@@ -344,6 +353,7 @@ async function main() {
 module.exports = {
   syncJsonMemory,
   ensureEntityDbInitialized,
+  buildEmbeddingSpawnOptions,
   _private: {
     buildEntityId,
     qualityFromAccess,
