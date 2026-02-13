@@ -106,6 +106,36 @@ describe('error-sanitizer', () => {
       assert.ok(result.arn.includes('[REDACTED_AWS_ARN]'));
     });
 
+    it('should mask API keys in URL query params', () => {
+      const input = {
+        url: 'https://mcp.exa.ai/mcp?exaApiKey=abc123456789&apiKey=xyz987654321',
+      };
+      const result = sanitizer.sanitizeForLogging(input);
+      assert.ok(result.url.includes('exaApiKey=[REDACTED]'));
+      assert.ok(result.url.includes('apiKey=[REDACTED]'));
+      assert.ok(!result.url.includes('abc123456789'));
+      assert.ok(!result.url.includes('xyz987654321'));
+    });
+
+    it('should redact query keys without stripping trailing JSON content', () => {
+      const input = {
+        line: '{"url":"https://api.ref.tools/mcp?apiKey=secret123","headers":{"User-Agent":"claude-code/2.1.39 (cli)"}}',
+      };
+      const result = sanitizer.sanitizeForLogging(input);
+      assert.ok(result.line.includes('apiKey=[REDACTED]'));
+      assert.ok(result.line.includes('"headers":{"User-Agent":"claude-code/2.1.39 (cli)"}'));
+      assert.ok(!result.line.includes('secret123'));
+    });
+
+    it('should mask Authorization-style headers in text', () => {
+      const input = {
+        data: 'authorization: Bearer supersecrettokenvalue',
+      };
+      const result = sanitizer.sanitizeForLogging(input);
+      assert.ok(result.data.includes('authorization=[REDACTED]'));
+      assert.ok(!result.data.includes('supersecrettokenvalue'));
+    });
+
     it('should handle nested objects', () => {
       const input = {
         level1: {

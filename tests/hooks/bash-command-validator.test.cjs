@@ -74,6 +74,7 @@ const {
   detectUnsupportedRipgrepType,
   detectRipgrepUnavailable,
   detectBashReportWrite,
+  detectBrittleCrossShellCount,
   isBypassPermissionsMode,
 } = require('../../.claude/hooks/safety/bash-command-validator.cjs');
 
@@ -261,6 +262,24 @@ test('detectBashReportWrite blocks tee writes into reports path', () => {
 test('detectBashReportWrite allows reads from reports path', () => {
   const reason = detectBashReportWrite('cat .claude/context/reports/security-audit.md');
   assertEqual(reason, null, 'Should allow read-only usage');
+});
+
+test('detectBrittleCrossShellCount blocks dir/find counting pattern', () => {
+  const reason = detectBrittleCrossShellCount(
+    'dir /s /b .claude\\hooks\\*.cjs 2>/dev/null | find /c ".cjs"'
+  );
+  assertTrue(Boolean(reason), 'Should block brittle dir/find count pattern');
+  assertIncludes(reason.toLowerCase(), 'brittle', 'Should explain brittleness');
+});
+
+test('detectBrittleCrossShellCount blocks ls/wc counting pattern', () => {
+  const reason = detectBrittleCrossShellCount('ls .claude/hooks/*.cjs | wc -l');
+  assertTrue(Boolean(reason), 'Should block brittle ls/wc count pattern');
+});
+
+test('detectBrittleCrossShellCount allows safe commands', () => {
+  const reason = detectBrittleCrossShellCount('git status');
+  assertEqual(reason, null, 'Should allow safe commands');
 });
 
 test('isBypassPermissionsMode detects bypass permissions payloads', () => {

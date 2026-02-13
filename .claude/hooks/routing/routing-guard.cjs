@@ -20,7 +20,7 @@
  * | 10    | intent-agent-match         | Validates agent matches detected intent      |
  * | 11    | config-model-validator     | Validates spawn model matches config.yaml    |
  *
- * Trigger: PreToolUse (matches: Task|TaskCreate|Edit|Write|NotebookEdit|Glob|Grep|WebSearch|Bash)
+ * Trigger: PreToolUse (matches: Task|TaskCreate|TaskOutput|Edit|Write|NotebookEdit|Glob|Grep|WebSearch|Bash)
  *
  * ENFORCEMENT MODES:
  * - ROUTER_BASH_GUARD=block|warn|off (default: warn)
@@ -301,6 +301,7 @@ const ALL_WATCHED_TOOLS = [
   'Grep',
   'WebSearch',
   'Bash', // Added: Router can only use whitelisted git commands
+  'TaskOutput', // Router should not use TaskOutput directly; use TaskList/TaskGet
   // Write tools (require agent context)
   'Edit',
   'Write',
@@ -315,7 +316,15 @@ const ALL_WATCHED_TOOLS = [
  * From router-self-check.cjs
  * Note: Bash is CONDITIONALLY blacklisted - only whitelisted git commands are allowed
  */
-const BLACKLISTED_TOOLS = ['Glob', 'Grep', 'Edit', 'Write', 'NotebookEdit', 'WebSearch'];
+const BLACKLISTED_TOOLS = [
+  'Glob',
+  'Grep',
+  'Edit',
+  'Write',
+  'NotebookEdit',
+  'WebSearch',
+  'TaskOutput',
+];
 
 /**
  * Router Bash Whitelist (ADR-030)

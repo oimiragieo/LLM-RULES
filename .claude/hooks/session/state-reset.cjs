@@ -25,6 +25,7 @@ const path = require('path');
 
 // Use shared utility for project root
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const loopStateManager = require('../../lib/self-healing/loop-state-manager.cjs');
 
 // Paths
 const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
@@ -84,10 +85,25 @@ function resetState() {
 }
 
 /**
+ * Reset loop-prevention state at user-prompt boundary.
+ * This prevents stale spawnDepth from previous prompts from blocking the first
+ * Task() in a fresh prompt.
+ */
+function resetLoopState() {
+  try {
+    loopStateManager.resetState();
+  } catch (err) {
+    // Fail-open: routing state reset is still valuable even if loop reset fails.
+    console.error(`[state-reset.cjs] Loop-state reset failed: ${err.message}`);
+  }
+}
+
+/**
  * Main execution.
  */
 function main() {
   try {
+    resetLoopState();
     resetState();
     // Success - exit 0 (allow prompt to proceed)
     process.exit(0);
@@ -107,4 +123,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { resetState, getCurrentSessionId };
+module.exports = { resetState, getCurrentSessionId, resetLoopState };

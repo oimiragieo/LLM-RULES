@@ -1,9 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 
-const {
-  buildEmbeddingSpawnOptions,
-} = require('../../.claude/hooks/memory/sync-memory-index.cjs');
+const { buildEmbeddingSpawnOptions } = require('../../.claude/hooks/memory/sync-memory-index.cjs');
 
 test('buildEmbeddingSpawnOptions enables windowsHide for detached background jobs', () => {
   const opts = buildEmbeddingSpawnOptions('C:/repo', 60000);

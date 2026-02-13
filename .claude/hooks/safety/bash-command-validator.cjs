@@ -157,6 +157,37 @@ function detectBashReportWrite(command) {
 }
 
 /**
+ * Detect brittle cross-shell counting one-liners that frequently fail on Windows
+ * and can accidentally fan out to huge scans/output.
+ *
+ * @param {string} command - Raw shell command
+ * @returns {string|null} Blocking reason or null when safe
+ */
+function detectBrittleCrossShellCount(command) {
+  if (!command || typeof command !== 'string') return null;
+
+  const usesDirFindCount =
+    /(^|[\s;|&])dir\s+\/s\s+\/b\b/i.test(command) && /\|\s*find\s+\/c\b/i.test(command);
+  if (usesDirFindCount) {
+    return (
+      'Brittle cross-shell count pattern detected (`dir /s /b ... | find /c`). ' +
+      'Use PowerShell-native counting instead: ' +
+      '(Get-ChildItem -Recurse -File <path> -Filter "*.cjs" | Measure-Object).Count'
+    );
+  }
+
+  const usesLsWcCount = /\bls\b[\s\S]*\|\s*wc\s+-l\b/i.test(command);
+  if (usesLsWcCount) {
+    return (
+      'Brittle `ls ... | wc -l` pattern detected. ' +
+      'Use PowerShell-native counting: (Get-ChildItem -Recurse -File <path> | Measure-Object).Count'
+    );
+  }
+
+  return null;
+}
+
+/**
  * Extract the bash command from hook input.
  *
  * @param {object} hookInput - The parsed hook context
@@ -261,6 +292,12 @@ async function main() {
       process.exit(2);
     }
 
+    const brittleCountReason = detectBrittleCrossShellCount(command);
+    if (brittleCountReason) {
+      console.error(formatBlockedMessage(command, brittleCountReason));
+      process.exit(2);
+    }
+
     // Validate the command using the registry
     const result = validateCommand(command);
 
@@ -329,6 +366,7 @@ module.exports = {
   detectUnsupportedRipgrepType,
   detectRipgrepUnavailable,
   detectBashReportWrite,
+  detectBrittleCrossShellCount,
   isBypassPermissionsMode,
   parseHookInput: parseHookInputAsync,
 };

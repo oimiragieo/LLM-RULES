@@ -138,6 +138,15 @@
         ]
       },
       {
+        "matcher": "TaskOutput",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/routing-guard.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "Task",
         "hooks": [
           {

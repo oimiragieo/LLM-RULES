@@ -8,6 +8,8 @@
 
 'use strict';
 
+const { sanitizeForLogging } = require('./error-sanitizer.cjs');
+
 const LEVELS = {
   debug: 10,
   info: 20,
@@ -20,12 +22,14 @@ const LEVELS = {
 const CURRENT_LEVEL = LEVELS[process.env.LOG_LEVEL || 'info'] || LEVELS.info;
 
 function format(level, message, meta = {}, component = 'unknown') {
+  const safeMessage = sanitizeForLogging(typeof message === 'string' ? message : String(message));
+  const safeMeta = sanitizeForLogging(meta && typeof meta === 'object' ? meta : {});
   return JSON.stringify({
     timestamp: new Date().toISOString(),
     level,
-    message,
+    message: safeMessage,
     component,
-    ...meta,
+    ...safeMeta,
   });
 }
 

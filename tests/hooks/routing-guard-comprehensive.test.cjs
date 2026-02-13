@@ -139,6 +139,16 @@ describe('routing-guard.cjs - Check 1: Router Self-Check (Blacklisted Tools)', (
     assert.equal(result.pass, false);
   });
 
+  it('should block TaskOutput in router mode', () => {
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(stateFile, JSON.stringify({ mode: 'router', taskSpawned: false }));
+
+    const result = routingGuard.checkRouterSelfCheck('TaskOutput', {});
+    assert.equal(result.pass, false);
+    assert.match(result.message, /ROUTER SELF-CHECK VIOLATION/);
+  });
+
   it('should allow blacklisted tools in agent mode', () => {
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });

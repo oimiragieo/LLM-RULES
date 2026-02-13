@@ -9,12 +9,14 @@
 **Trigger**: Any spawned agent with Write tool access
 
 **Details**:
+
 - router-state.json controls routing enforcement (requiresPlannerFirst, requiresSecurityReview, taskListCalledSincePrompt)
 - File is writable by all agents (no protection in unified-pre-write-hook.cjs)
 - No integrity validation (checksum/HMAC)
 - Agent can set `mode: "router"` to claim Router privileges
 
 **Solution**:
+
 1. Add `.claude/context/runtime/*.json` to WRITE_PROTECTED_PATHS in unified-pre-write-hook.cjs
 2. Add SHA-256 checksum field to router-state.json schema
 3. Validate checksum before trusting state data in router-state.cjs
@@ -31,12 +33,14 @@
 **Trigger**: Agent appends malicious entry to reflection-spawn-request.json
 
 **Details**:
+
 - reflection-spawn-request.json triggers automatic agent spawns via Router Step 0
 - No validation of entries (unbounded, no timestamp expiry, prompt unsanitized)
 - Agent can inject prompt injection patterns
 - No max entry limit (DoS via mass spawns)
 
 **Solution**:
+
 1. Add max entry limit (50 entries) in reflection-queue-processor.cjs
 2. Validate timestamp age (reject entries >24h old)
 3. Sanitize prompt field using spawn-prompt-assembler.cjs sanitizeTaskPrompt()
@@ -54,6 +58,7 @@
 **Trigger**: Agent writes to learnings.md/decisions.md/issues.md
 
 **Details**:
+
 - Memory files read by ALL agents before task execution (trust without verification)
 - No input sanitization for memory writes
 - Adversarial agent can inject instruction override patterns:
@@ -63,6 +68,7 @@
 - No provenance validation (can't determine who wrote entry)
 
 **Solution**:
+
 1. Create `.claude/lib/memory/memory-sanitizer.cjs` utility
 2. Block instruction override patterns (same as spawn-prompt-assembler.cjs)
 3. Add provenance markers to all memory entries (agent type, task ID, timestamp)
@@ -82,6 +88,7 @@
 **Trigger**: Code changes to routing hooks ship without tests
 
 **Details**:
+
 - routing-guard.cjs (12 enforcement checks) has 0 test coverage
 - unified-creator-guard.cjs (creator workflow) has 0 test coverage
 - spawn-prompt-assembler.cjs (spawn construction) has 0 test coverage
@@ -89,6 +96,7 @@
 - Routing bugs ship undetected
 
 **Solution**:
+
 1. Create `tests/hooks/routing-guard.test.cjs` with 12 test scenarios (planner-first, security-review, specialist-override, TaskList-first, etc.)
 2. Create `tests/hooks/unified-creator-guard.test.cjs` (creator path blocking)
 3. Create `tests/hooks/spawn-prompt-assembler.test.cjs` (memory injection, template substitution)
@@ -105,6 +113,7 @@
 **Trigger**: Code changes to write safety hooks ship without tests
 
 **Details**:
+
 - unified-pre-write-hook.cjs (11 safety checks) has 0 test coverage
 - Windows reserved name detection untested
 - Path traversal prevention untested
@@ -113,6 +122,7 @@
 
 **Solution**:
 Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
+
 - Windows reserved names (nul, con, prn, aux, com1-9, lpt1-9)
 - Path traversal (`../../../etc/passwd`)
 - Project root writes blocked
@@ -131,12 +141,14 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 **Trigger**: Concurrent hooks read stale router state
 
 **Details**:
+
 - routing-guard.cjs line 235-253: Cache populated once, never invalidated
 - Concurrent hooks see stale state
 - `isRouterInvocation()` checks cached `mode` that may be outdated
 - Multi-agent scenarios corrupt state
 
 **Solution**:
+
 1. Invalidate cache on state change (not just on first load)
 2. Add cache TTL (5 seconds max)
 3. Use state-cache.cjs with LRU eviction
@@ -153,6 +165,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 **Trigger**: Windows-specific file operations
 
 **Details**:
+
 - unified-creator-guard.cjs line 193-219: Only converts backslashes
 - Doesn't handle:
   - Relative paths (`C:file.txt` without backslash)
@@ -162,6 +175,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
   - Reserved names in subdirectories (`logs\nul\output.txt`)
 
 **Solution**:
+
 1. Create `path-validator.cjs` with comprehensive Windows path handling
 2. Use `path.resolve()` for relative path normalization
 3. Use `path.normalize()` for `..` segments
@@ -182,6 +196,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 **Details**: 14/14 memory modules have 0 test coverage
 
 **Files**:
+
 - memory-manager.cjs
 - memory-scheduler.cjs
 - memory-rotator.cjs
@@ -208,6 +223,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 **Details**: 66/66 CLI tools have no tests
 
 **Critical Tools**:
+
 - hybrid-search.cjs
 - cuj-validator-unified.mjs
 - All metrics tools (spawn-assembly, router-churn, runtime-health, memory-slo, open-findings)
@@ -222,6 +238,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 ### ISSUE-010: Hook Overhead from Duplication
 
 **Details**:
+
 - PreToolUse(Write): 7 sequential hooks (~300ms, target <100ms)
 - Config read 20+ times on startup
 - 6 path validators (duplicate logic)
@@ -229,6 +246,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 - 5 config readers (duplicate logic)
 
 **Solution**:
+
 1. Create ConfigCache singleton
 2. Create PathValidator facade (consolidate 6 implementations)
 3. Merge routing-guard.cjs + spawn-prompt-validator.cjs
@@ -243,12 +261,14 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 **Details**: 30 configuration files slow initialization
 
 **Files**:
+
 - 9 root configs (settings.json, config.yaml, package.json, etc.)
-- 9 config/* files
-- 8 context/config/* files
+- 9 config/\* files
+- 8 context/config/\* files
 - 4 scattered config files
 
 **Solution**: Consolidate to 5 files:
+
 - agents.json (agent-config + capability-routing + routing-prototypes + presets)
 - search-config.json (code-index-config + intent-feedback)
 - capabilities.json (skill-index + tool-manifest)
@@ -264,11 +284,13 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 **Details**:
 
 1. **Memory cycle**:
+
    ```
    memory-manager.cjs → memory-extractor.cjs → memory-scheduler.cjs → memory-manager.cjs
    ```
 
 2. **Routing cycle**:
+
    ```
    routing-table.cjs → agent-registry-resolver.cjs → fuzzy-intent-matcher.cjs → routing-table.cjs
    ```
@@ -279,6 +301,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
    ```
 
 **Solution**:
+
 1. Refactor memory modules to publish-subscribe (break direct imports)
 2. Split routing-table.cjs into routing-core.cjs + routing-rules.cjs (lazy-loaded)
 3. Add circular dependency detection to CI (`npm run validate:circular`)
@@ -292,6 +315,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 ### ISSUE-013: Dead Code (12-15% Orphan Rate)
 
 **Files**:
+
 - rollback-manager.cjs (0 imports)
 - entity-extractor.cjs (0 imports)
 - brownfield-assessor.cjs (0 imports)
@@ -311,6 +335,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 ### ISSUE-014: State Management Fragmentation (8 Modules)
 
 **Files**:
+
 - workflow-state-manager.cjs (file-based)
 - router-state.cjs (in-memory)
 - state-cache.cjs (LRU cache)
@@ -331,6 +356,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 ### WORKAROUND-001: Manual Code Review for Enforcement Hooks
 
 **Until P0-1/P0-2 tests added:**
+
 - Human review REQUIRED for all changes to routing-guard.cjs, unified-creator-guard.cjs, unified-pre-write-hook.cjs
 - Run manual smoke tests (spawn developer with forbidden tools, write to creator paths, etc.)
 - Monitor error logs for hook failures
@@ -342,6 +368,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 ### WORKAROUND-002: Runtime State File Monitoring
 
 **Until ISSUE-001/ISSUE-002 fixed:**
+
 - Add audit logging for all writes to `.claude/context/runtime/*.json`
 - Monitor reflection-spawn-request.json for unexpected entries
 - Alert on router-state.json modifications during agent execution
@@ -353,6 +380,7 @@ Create `tests/hooks/unified-pre-write-hook.test.cjs` covering:
 ### WORKAROUND-003: Memory Content Manual Review
 
 **Until ISSUE-003 fixed:**
+
 - Manual review of all learnings.md/decisions.md/issues.md changes during PR review
 - Search for instruction override patterns ("IGNORE", "DISREGARD", "SET ENFORCEMENT")
 - Flag suspicious memory entries

@@ -17,21 +17,25 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
 **Decision**: Execute P0 security fixes BEFORE any other work
 
 **Sequence**:
+
 1. **Week 1 (Security)**: CRIT-SEC-001, CRIT-SEC-002, CRIT-SEC-003 (18 hours)
 2. **Week 1 (Code Quality)**: C1 (router state race), C2 (Windows paths) (4 hours)
 3. **Week 2 (Test Coverage)**: P0-1 (routing-guard), P0-2 (unified-pre-write) (12-15 hours)
 4. **Week 3-4**: P1 actions (memory tests, CLI tests, hook consolidation)
 
 **Rationale**:
+
 - Security vulnerabilities allow arbitrary agent spawns, privilege escalation, and prompt poisoning
 - CRITICAL bugs (race conditions, path bypass) risk production stability
 - Test coverage gaps prevent validation of fixes
 
 **Alternatives Considered**:
+
 - Architecture-first (config consolidation): Rejected — doesn't address security
 - Test-first (coverage before fixes): Rejected — fixes are urgent, tests can validate after
 
 **Consequences**:
+
 - Security vulnerabilities closed in 1 week
 - Framework deployable after 2 weeks (P0 complete)
 - Architecture improvements deferred to P2 (Month 2-3)
@@ -47,22 +51,26 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
 **Decision**: Implement **Write-Protected Paths + Integrity Validation** pattern
 
 **Implementation**:
+
 1. Add `.claude/context/runtime/*.json` to `WRITE_PROTECTED_PATHS` in unified-pre-write-hook.cjs
 2. Add SHA-256 checksum field to all runtime state schemas
 3. Validate checksum before trusting state data
 4. Only allow designated modules to write to protected files (router-state.cjs writes router-state.json, etc.)
 
 **Rationale**:
+
 - Simplest solution with immediate effect (4-6 hours implementation)
 - Follows existing unified-pre-write-hook.cjs pattern
 - Integrity validation (checksums) detects tampering
 
 **Alternatives Considered**:
+
 - **Database-backed state**: Rejected — requires SQLite migration (2-3 weeks), overkill for current needs
 - **In-memory state only**: Rejected — loses state across process restarts
 - **File permissions**: Rejected — Node.js fs module has limited ACL support, platform-dependent
 
 **Consequences**:
+
 - Agents can no longer modify runtime state files directly
 - State tampering detected via checksum validation
 - Small performance overhead (~5ms per state read for checksum)
@@ -79,6 +87,7 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
 **Decision**: Create `memory-sanitizer.cjs` module with **pattern blocking + provenance validation**
 
 **Implementation**:
+
 1. Block instruction override patterns (same list as spawn-prompt-assembler.cjs):
    - `IGNORE (PREVIOUS|ALL PRIOR|SYSTEM) INSTRUCTIONS`
    - `DISREGARD (EVERYTHING|ALL PREVIOUS)`
@@ -92,16 +101,19 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
 4. Treat memory content as untrusted input in agent prompts
 
 **Rationale**:
+
 - Pattern blocking is fast (<5ms overhead per write)
 - Provenance enables audit trail (who wrote this entry?)
 - Same pattern used successfully in spawn-prompt-assembler.cjs
 
 **Alternatives Considered**:
+
 - **LLM-based detection**: Rejected — too slow for hook path (200-500ms)
 - **Escape-only (no blocking)**: Rejected — escape can be bypassed with encoding tricks
 - **Memory signature validation**: Deferred to P2 — adds complexity, provenance sufficient for now
 
 **Consequences**:
+
 - Memory writes sanitized (prompt injection blocked)
 - Provenance markers enable audit trail
 - Small performance overhead (~5ms per memory write)
@@ -118,32 +130,38 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
 **Decision**: Target **90% coverage for critical paths** (not 100% overall)
 
 **Definition of "Critical Paths"**:
+
 - All enforcement hooks (routing-guard.cjs, unified-creator-guard.cjs, unified-pre-write-hook.cjs)
 - All memory subsystem modules (14 files)
 - All routing logic (router-state.cjs, routing-table.cjs, intent-classifier.cjs)
 - All CLI tools used in CI (hybrid-search, cuj-validator, metrics tools)
 
 **Timeline**:
+
 - P0 (2 weeks): Enforcement hooks (12-15 hours)
 - P1 (1 month): Memory subsystem (8-10 hours) + CLI tools (12-16 hours)
 - P2 (3 months): Remaining critical paths (orchestration, workflow, monitoring)
 
 **Rationale**:
+
 - 90% is realistic (100% is diminishing returns)
 - Focus on high-risk areas (enforcement, routing, memory, CLI)
 - Existing tests (214) cover utility/lib functions well (keep those)
 
 **Alternatives Considered**:
+
 - **100% coverage**: Rejected — unrealistic timeline (6+ months), diminishing returns
 - **70% coverage**: Rejected — too low for critical infrastructure
 - **Branch coverage instead of line coverage**: Deferred — line coverage easier to measure, branch coverage P2
 
 **Consequences**:
+
 - Test suite grows from 214 to ~400-500 tests
 - CI time increases ~2x (mitigate with parallel test execution)
 - Coverage report becomes meaningful (current 100% pass rate with 50% coverage is misleading)
 
 **Success Criteria**:
+
 - Routing hooks: 100% coverage (all 12 checks tested)
 - Memory subsystem: 90% coverage
 - CLI tools (critical): 80% coverage
@@ -160,6 +178,7 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
 **Decision**: Create **shared validation library** with memoization
 
 **Modules to Create**:
+
 1. **ConfigCache** (`.claude/lib/utils/config-cache.cjs`):
    - Singleton with lazy loading
    - LRU cache with 5-minute TTL
@@ -176,6 +195,7 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
    - Used by hooks, loggers, error trackers
 
 **Hook Consolidation**:
+
 - Merge routing-guard.cjs + spawn-prompt-validator.cjs (both validate Task() calls)
 - Split unified-pre-write-hook.cjs into 3 focused hooks:
   - path-safety-hook.cjs (path validation only)
@@ -183,22 +203,26 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
   - write-content-hook.cjs (content safety checks only)
 
 **Rationale**:
+
 - Shared library reduces duplication (6 path validators → 1 facade)
 - Memoization reduces redundant work (config read once per session, not per hook)
 - Splitting large hooks improves maintainability (11 checks in one file is too many)
 
 **Alternatives Considered**:
+
 - **Keep hooks as-is**: Rejected — 300ms latency unacceptable
 - **Merge all write hooks into one**: Rejected — single hook with 20+ checks is unmaintainable
 - **Async hook execution**: Rejected — hooks must be synchronous per protocol
 
 **Consequences**:
+
 - Hook latency reduced 40% (300ms → 180ms)
 - Config reads reduced from 20+ to 1 per session
 - Path validation faster (cached results)
 - Breaking change: Hooks now depend on shared library (document in upgrade guide)
 
 **Migration Plan**:
+
 1. Create shared libraries (ConfigCache, PathValidator, ErrorSanitizer)
 2. Add tests for shared libraries (100% coverage)
 3. Refactor hooks to use shared libraries (one hook at a time)
@@ -216,6 +240,7 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
 **Decision**: Consolidate to **5 configuration files**
 
 **Mapping**:
+
 1. **agents.json** (consolidates 5 files):
    - agent-config.json (runtime registry)
    - capability-routing.json (intent→agent mapping)
@@ -239,29 +264,34 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
    - phase-models.json (workflow phases)
 
 **Root Configs (Keep as-is)**:
+
 - settings.json (hook registrations)
 - config.yaml (agent models)
 - package.json (npm scripts, deps)
 - .env.example (environment template)
 
 **Rationale**:
+
 - Reduces config files from 30 to 5 (83% reduction)
 - Startup reads reduced from 20+ to 5
 - Single source of truth per domain (agents, search, capabilities, rules, workflow)
 - Easier to find config (no more hunting across 3 directories)
 
 **Alternatives Considered**:
+
 - **One monolithic config.json**: Rejected — too large (>5000 lines), merge conflicts worse
 - **Keep current structure**: Rejected — config sprawl will only grow
 - **Database for config**: Rejected — overkill, adds dependency
 
 **Consequences**:
+
 - Breaking change (all hooks/lib modules must update imports)
 - Migration script needed (automated conversion of old configs to new format)
 - 30-day grace period (old configs still read, warnings logged)
 - Documentation update (CONFIG_REFERENCE.md shows new structure)
 
 **Migration Plan**:
+
 1. Define schemas for 5 new config files (agents.schema.json, etc.)
 2. Create migration script (`.claude/tools/cli/migrate-configs.cjs`)
 3. Add config-loader.cjs fallback (read old files with deprecation warnings)
@@ -280,6 +310,7 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
 **Decision**: Implement **comprehensive Windows path validator** with test-driven approach
 
 **Implementation**:
+
 1. Create `path-validator.cjs` (unified path validation module)
 2. Handle all Windows edge cases:
    - **Backslashes**: Convert to forward slashes (`\` → `/`)
@@ -294,16 +325,19 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
    - Negative tests (invalid paths should be rejected)
 
 **Rationale**:
+
 - Unified module is easier to maintain than scattered checks
 - Test-driven approach prevents regressions
 - Cross-platform testing validates behavior on both Windows and Linux
 
 **Alternatives Considered**:
+
 - **Keep scattered path checks**: Rejected — already proven insufficient
 - **Use third-party library**: Rejected — no library handles all edge cases
 - **Platform-specific validation**: Rejected — cross-platform codebase requires unified approach
 
 **Consequences**:
+
 - Path validation comprehensive (all Windows edge cases handled)
 - Test suite prevents regressions (50+ tests)
 - Small performance overhead (path normalization is expensive) — mitigate with caching
@@ -341,16 +375,19 @@ Based on 4-agent audit findings (47 code bugs, 46 untested files, 14 security vu
    - config-loader is pure (no imports)
 
 **Rationale**:
+
 - Publish-subscribe is proven pattern for breaking cycles
 - Module splitting reduces coupling
 - Inversion of control clarifies dependencies
 
 **Alternatives Considered**:
+
 - **Ignore circular deps**: Rejected — causes runtime failures
 - **Merge modules**: Rejected — creates monster modules (2000+ lines)
 - **Lazy require()**: Rejected — doesn't solve root cause, just hides it
 
 **Consequences**:
+
 - Circular dependencies eliminated
 - Modules more loosely coupled (easier to test)
 - Slight complexity increase (event emitters)

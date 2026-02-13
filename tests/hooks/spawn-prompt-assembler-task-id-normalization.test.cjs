@@ -20,4 +20,3 @@ test('normalizeTaskIdReferences rewrites hardcoded task placeholders to active t
   assert.ok(output.includes("task_id: 'task-real-123'"));
   assert.equal(output.includes('task-1'), false);
 });
-

@@ -68,6 +68,11 @@ function main() {
   );
   const bashToolError = lines.filter(l => l.includes('Bash tool error'));
   const badSubstitution = lines.filter(l => l.includes('Bad substitution'));
+  const secretLeak = lines.filter(l =>
+    /(?:apiKey|exaApiKey)=(?!\[REDACTED\])[^&\s"'`]+|authorization:\s*bearer\s+(?!\[REDACTED\])[a-z0-9._-]+|x-api-key\s*[:=]\s*(?!\[REDACTED\])[^\s]+/i.test(
+      l
+    )
+  );
   const maxReadMissing = Number(process.env.DEBUG_LOG_MAX_READ_MISSING || 6);
   const maxBashToolError = Number(process.env.DEBUG_LOG_MAX_BASH_TOOL_ERROR || 3);
   const maxBadSubstitution = Number(process.env.DEBUG_LOG_MAX_BAD_SUBSTITUTION || 2);
@@ -152,6 +157,13 @@ function main() {
     console.log(
       `PASS: "Bad substitution" noise within threshold (${badSubstitution.length}/${maxBadSubstitution}).`
     );
+  }
+
+  if (secretLeak.length > 0) {
+    console.log(`FAIL: Potential secret leakage detected (${secretLeak.length} line(s)).`);
+    ok = false;
+  } else {
+    console.log('PASS: No API key/token leakage patterns detected in log.');
   }
 
   console.log('');

@@ -18,6 +18,13 @@ const { execSync } = require('child_process');
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 
 const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+const LOOP_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'self-healing',
+  'loop-state.json'
+);
 const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'session', 'state-reset.cjs');
 
 /**
@@ -50,6 +57,27 @@ function deleteState() {
   }
 }
 
+function readLoopState() {
+  if (!fs.existsSync(LOOP_STATE_FILE)) {
+    return null;
+  }
+  return JSON.parse(fs.readFileSync(LOOP_STATE_FILE, 'utf-8'));
+}
+
+function writeLoopState(state) {
+  const dir = path.dirname(LOOP_STATE_FILE);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(LOOP_STATE_FILE, JSON.stringify(state, null, 2), 'utf-8');
+}
+
+function deleteLoopState() {
+  if (fs.existsSync(LOOP_STATE_FILE)) {
+    fs.unlinkSync(LOOP_STATE_FILE);
+  }
+}
+
 /**
  * Helper: Run hook (simulates UserPromptSubmit trigger)
  */
@@ -73,11 +101,13 @@ function runHook() {
 beforeEach(() => {
   // Start with clean state
   deleteState();
+  deleteLoopState();
 });
 
 afterEach(() => {
   // Clean up after tests
   deleteState();
+  deleteLoopState();
 });
 
 // Test 1: Reset state when taskSpawned is true
@@ -244,4 +274,24 @@ test('resets TaskUpdate tracking fields', () => {
   assert.strictEqual(state.lastTaskUpdateTaskId, null);
   assert.strictEqual(state.lastTaskUpdateStatus, null);
   assert.strictEqual(state.taskUpdatesThisSession, 0);
+});
+
+// Test 8: Loop state reset to avoid stale spawn-depth blocks
+test('resets loop state spawnDepth on every reset', () => {
+  writeLoopState({
+    sessionId: 'session-unknown',
+    evolutionCount: 0,
+    lastEvolutions: {},
+    spawnDepth: 5,
+    actionHistory: [{ action: 'spawn:developer', count: 5, lastAt: new Date().toISOString() }],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+
+  const result = runHook();
+  assert.strictEqual(result.success, true);
+
+  const loopState = readLoopState();
+  assert.ok(loopState !== null);
+  assert.strictEqual(loopState.spawnDepth, 0);
 });

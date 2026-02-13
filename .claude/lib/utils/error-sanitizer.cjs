@@ -87,6 +87,19 @@ const MASKING_PATTERNS = [
     pattern: /\b(API_KEY|SECRET|TOKEN|AUTH|CREDENTIAL)[A-Z_]*\s*=\s*[^\s\n]+/gi,
     replacement: '$1=[REDACTED]',
   },
+  // Query-string/API-key style secrets in URLs
+  {
+    name: 'query_secret',
+    pattern:
+      /([?&](?:apiKey|apikey|api_key|exaApiKey|token|access_token|refresh_token)=)[^&\s"'`]+/gi,
+    replacement: '$1[REDACTED]',
+  },
+  // Header-style secret fields in text blobs
+  {
+    name: 'header_secret',
+    pattern: /\b(authorization|x-api-key)\s*[:=]\s*[^\s\n,;]+/gi,
+    replacement: '$1=[REDACTED]',
+  },
 ];
 
 /**
