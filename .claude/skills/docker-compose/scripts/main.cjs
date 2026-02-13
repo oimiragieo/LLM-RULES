@@ -61,7 +61,7 @@ Options:
   const child = spawn('docker', ['compose', ...composeArgs], {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
-    shell: true,
+    shell: false,
   });
   child.on('close', (code, signal) => {
     if (code === 127)

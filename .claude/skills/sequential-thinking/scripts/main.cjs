@@ -69,7 +69,7 @@ Options:
     const child = spawn('python', [executorPath, ...args.filter(a => a !== '--help')], {
       stdio: 'inherit',
       cwd: path.dirname(executorPath),
-      shell: true,
+      shell: false,
     });
     child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
   } else {

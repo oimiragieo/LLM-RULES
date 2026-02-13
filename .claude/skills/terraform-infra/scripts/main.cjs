@@ -63,7 +63,7 @@ Options:
     {
       stdio: 'inherit',
       cwd: PROJECT_ROOT,
-      shell: true,
+      shell: false,
     }
   );
   child.on('close', (code, signal) => {
