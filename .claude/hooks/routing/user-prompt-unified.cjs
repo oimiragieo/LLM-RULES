@@ -1875,6 +1875,188 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
 }
 
 // =============================================================================
+// Prompt Injection Detection (P1-003)
+// =============================================================================
+
+const INJECTION_PATTERNS = {
+  // Direct instruction override
+  ignoreInstructions: {
+    pattern: /ignore\s+(all\s+)?(previous|earlier|prior)\s+(instructions|rules|directives)/gi,
+    severity: 'CRITICAL',
+    category: 'instruction_override',
+  },
+  disregardRules: {
+    pattern: /disregard\s+(all\s+)?(previous|earlier|system)\s+(instructions|rules|directives)/gi,
+    severity: 'CRITICAL',
+    category: 'instruction_override',
+  },
+  systemPromptLeak: {
+    pattern: /(output|print|show|display|reveal)\s+(me\s+)?(your\s+)?(system\s+)?(prompt|instructions|rules)/gi,
+    severity: 'CRITICAL',
+    category: 'information_disclosure',
+  },
+
+  // Jailbreak patterns
+  danMode: {
+    pattern: /(enable|activate|switch\s+to)\s+(DAN|developer)\s+mode/gi,
+    severity: 'CRITICAL',
+    category: 'jailbreak',
+  },
+  evilMode: {
+    pattern: /(evil|unfiltered|unrestricted)\s+mode/gi,
+    severity: 'HIGH',
+    category: 'jailbreak',
+  },
+  pretendRole: {
+    pattern: /(pretend|act\s+as|roleplay)\s+(you\s+are|as)\s+(not\s+)?(an?\s+)?(assistant|AI|language model)/gi,
+    severity: 'HIGH',
+    category: 'jailbreak',
+  },
+
+  // Framework knowledge extraction
+  frameworkLeak: {
+    pattern: /(CLAUDE\.md|router-decision|agent\s+identity|spawn\s+prompt)/gi,
+    severity: 'HIGH',
+    category: 'information_disclosure',
+  },
+  memoryLeak: {
+    pattern: /(learnings\.md|decisions\.md|issues\.md|memory\s+files)/gi,
+    severity: 'MEDIUM',
+    category: 'information_disclosure',
+  },
+
+  // Constraint bypass
+  noRestrictions: {
+    pattern: /(no|without|ignore)\s+(restrictions|limitations|constraints|safety)/gi,
+    severity: 'HIGH',
+    category: 'constraint_bypass',
+  },
+  overrideRules: {
+    pattern: /(override|bypass|circumvent)\s+(rules|policies|guidelines)/gi,
+    severity: 'HIGH',
+    category: 'constraint_bypass',
+  },
+};
+
+/**
+ * Calculate Shannon entropy for obfuscation detection
+ * @param {string} str - Input string
+ * @returns {number} Entropy value (0-8)
+ */
+function calculateEntropy(str) {
+  if (!str || str.length === 0) {
+    return 0;
+  }
+
+  const freq = {};
+  for (const char of str) {
+    freq[char] = (freq[char] || 0) + 1;
+  }
+
+  let entropy = 0;
+  const len = str.length;
+
+  for (const count of Object.values(freq)) {
+    const p = count / len;
+    entropy -= p * Math.log2(p);
+  }
+
+  return entropy;
+}
+
+/**
+ * Detect and sanitize prompt injection patterns
+ *
+ * @param {string} userInput - Raw user prompt
+ * @returns {{safe: boolean, sanitized: string, detections: object[], blocked: boolean, reason?: string, warnings?: string}}
+ */
+function sanitizePrompt(userInput) {
+  if (!userInput || typeof userInput !== 'string') {
+    return {
+      safe: true,
+      sanitized: '',
+      detections: [],
+      blocked: false,
+    };
+  }
+
+  const detections = [];
+  let sanitized = userInput;
+
+  // Check each injection pattern
+  for (const [key, config] of Object.entries(INJECTION_PATTERNS)) {
+    const matches = userInput.match(config.pattern);
+
+    if (matches) {
+      detections.push({
+        pattern: key,
+        severity: config.severity,
+        category: config.category,
+        matches: matches.length,
+        samples: matches.slice(0, 2), // First 2 for audit
+      });
+
+      // CRITICAL = immediate block
+      if (config.severity === 'CRITICAL') {
+        logger.warn('[SECURITY] Prompt injection detected', {
+          pattern: key,
+          category: config.category,
+          matches: matches.length,
+        });
+
+        if (eventBus) {
+          eventBus.emit(EventTypes.SECURITY_VIOLATION, {
+            type: 'prompt_injection_attempt',
+            pattern: key,
+            category: config.category,
+            timestamp: new Date().toISOString(),
+          });
+        }
+
+        return {
+          safe: false,
+          sanitized: '',
+          detections,
+          blocked: true,
+          reason: `Prompt injection detected: ${config.category}`,
+        };
+      }
+
+      // HIGH/MEDIUM = sanitize pattern
+      if (config.severity === 'HIGH' || config.severity === 'MEDIUM') {
+        sanitized = sanitized.replace(config.pattern, '[REDACTED]');
+      }
+    }
+  }
+
+  // Entropy check for obfuscated instructions
+  const entropy = calculateEntropy(userInput);
+  if (entropy > 7.5 && userInput.length > 500) {
+    // High entropy + long prompt = possible encoded attack
+    detections.push({
+      pattern: 'high_entropy',
+      severity: 'MEDIUM',
+      category: 'obfuscation',
+      entropy: entropy.toFixed(2),
+    });
+
+    logger.warn('[SECURITY] High entropy prompt detected', {
+      entropy: entropy.toFixed(2),
+      length: userInput.length,
+    });
+  }
+
+  // Success: sanitized with warnings if detections exist
+  return {
+    safe: true,
+    sanitized,
+    detections,
+    blocked: false,
+    warnings: detections.length > 0 ? `Sanitized ${detections.length} injection patterns` : undefined,
+  };
+}
+
+// =============================================================================
 // Main Execution
 // =============================================================================
 
@@ -1957,6 +2139,10 @@ module.exports = {
   loadAgentsFromRegistry,
   agentsFromRegistry,
   buildHiddenSpawnSyncOptions,
+
+  // Prompt injection detection (P1-003)
+  sanitizePrompt,
+  calculateEntropy,
 
   // Constants for testing
   ROUTING_TABLE,

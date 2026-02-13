@@ -80,14 +80,14 @@ function deduplicateFile(filePath, options = {}) {
   const { threshold = DEFAULT_SIMILARITY_THRESHOLD, dryRun = false } = options;
 
   if (!fs.existsSync(filePath)) {
-    return { duplicatesFound: 0, duplicatesRemoved: 0, mergedEntries: [] };
+    return { duplicatesFound: 0, duplicatesRemoved: 0, removed: 0, mergedEntries: [] };
   }
 
   const content = fs.readFileSync(filePath, 'utf8');
   const sections = parseSections(content);
 
   if (sections.length === 0) {
-    return { duplicatesFound: 0, duplicatesRemoved: 0, mergedEntries: [] };
+    return { duplicatesFound: 0, duplicatesRemoved: 0, removed: 0, mergedEntries: [] };
   }
 
   // Build list of sections to keep, marking duplicates to remove
@@ -137,11 +137,45 @@ function deduplicateFile(filePath, options = {}) {
     atomicWriteSync(filePath, dedupedContent);
   }
 
-  return {
+  // C-002 Fix: Add canonical "removed" field + validate contract
+  const result = {
     duplicatesFound,
     duplicatesRemoved,
+    removed: duplicatesRemoved, // CANONICAL field (C-002)
     mergedEntries,
   };
+
+  validateResultContract(result, 'deduplicateFile');
+  return result;
+}
+
+/**
+ * Validate pruning/deduplication result contract (C-002 Fix)
+ * Fails loudly on contract violations
+ *
+ * @param {Object} result - Result object to validate
+ * @param {string} operation - Operation name for error messages
+ * @throws {Error} If contract violated
+ */
+function validateResultContract(result, operation) {
+  if (!result || typeof result !== 'object') {
+    throw new Error(`${operation} result must be an object`);
+  }
+
+  if (typeof result.removed !== 'number') {
+    throw new Error(
+      `Contract violation in ${operation}: missing or invalid 'removed' field. ` +
+        `Expected number, got ${typeof result.removed}. ` +
+        `Result: ${JSON.stringify(result)}`
+    );
+  }
+
+  if (result.removed < 0) {
+    throw new Error(
+      `Contract violation in ${operation}: 'removed' field must be non-negative. ` +
+        `Got: ${result.removed}`
+    );
+  }
 }
 
 /**
@@ -202,11 +236,14 @@ function pruneResolvedEntries(filePath, options = {}) {
     atomicWriteSync(filePath, prunedContent);
   }
 
-  return { removed };
+  const result = { removed };
+  validateResultContract(result, 'pruneResolvedEntries');
+  return result;
 }
 
 module.exports = {
   jaccardSimilarity,
   deduplicateFile,
   pruneResolvedEntries,
+  validateResultContract, // NEW (C-002 Fix)
 };

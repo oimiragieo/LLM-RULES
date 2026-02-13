@@ -341,6 +341,35 @@ async function processCreatorCompletion(hookData) {
     // Include impact report in queue entry
     appendToQueueWithImpact(artifactId, detection.creatorType, check.gaps, impactReport);
     process.stderr.write('[post-creation-integration] Queued for integration analysis\n');
+
+    // C-003 FIX: Auto-spawn artifact-integrator at threshold
+    const INTEGRATION_BATCH_SIZE = Number(process.env.INTEGRATION_BATCH_SIZE || 5);
+    try {
+      const {
+        getQueueSize,
+        spawnArtifactIntegrator,
+      } = require('../../lib/workflow/artifact-integrator-spawner.cjs');
+      const queueSize = getQueueSize(QUEUE_PATH);
+
+      if (queueSize >= INTEGRATION_BATCH_SIZE) {
+        process.stderr.write(
+          `[post-creation-integration] Queue size ${queueSize} ≥ threshold ${INTEGRATION_BATCH_SIZE}, auto-spawning artifact-integrator\n`
+        );
+        spawnArtifactIntegrator({
+          mode: 'batch',
+          maxEntries: queueSize,
+          background: true,
+        }).catch(err => {
+          process.stderr.write(
+            `[post-creation-integration] Failed to auto-spawn artifact-integrator: ${err.message}\n`
+          );
+        });
+      }
+    } catch (spawnErr) {
+      process.stderr.write(
+        `[post-creation-integration] Auto-spawn failed (non-blocking): ${spawnErr.message}\n`
+      );
+    }
   }
 
   // Determine if we should block based on enforcement mode
