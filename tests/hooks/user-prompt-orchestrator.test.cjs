@@ -200,6 +200,27 @@ process.exit(0);
     assert.equal(result.status, 2);
     assert.ok(result.stdout.includes('Test block message'));
   });
+
+  it('should spawn child hooks with windowsHide enabled', () => {
+    const originalSpawnSync = cp.spawnSync;
+    let captured = null;
+
+    cp.spawnSync = (cmd, args, options) => {
+      captured = { cmd, args, options };
+      return { status: 0, stdout: '', stderr: '' };
+    };
+
+    try {
+      const result = orchestrator.runChildHook('tests/fixtures/mock-hooks/fake-hook.cjs', '{}');
+      assert.equal(result.status, 0);
+      assert.ok(captured, 'spawnSync call should be captured');
+      assert.equal(captured.cmd, process.execPath);
+      assert.equal(captured.options.windowsHide, true);
+      assert.equal(captured.options.shell, false);
+    } finally {
+      cp.spawnSync = originalSpawnSync;
+    }
+  });
 });
 
 describe('user-prompt-orchestrator.cjs - Empty Stdin Handling', () => {

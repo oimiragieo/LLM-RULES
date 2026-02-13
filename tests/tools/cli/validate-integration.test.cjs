@@ -44,7 +44,7 @@ describe('validate-integration', () => {
     });
 
     it('validates known hook artifact', () => {
-      const result = validateArtifact('.claude/hooks/routing/agent-context-tracker.cjs');
+      const result = validateArtifact('.claude/hooks/routing/routing-guard.cjs');
       assert.notStrictEqual(result.exitCode, 2);
       assert.ok('passed' in result);
     });

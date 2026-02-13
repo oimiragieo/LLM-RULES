@@ -34,19 +34,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/safety/bash-command-validator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/shell-injection-validator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/windows-null-sanitizer.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/routing-guard.cjs"
+            "command": "node .claude/hooks/safety/bash-pretool-bundle.cjs"
           }
         ]
       },

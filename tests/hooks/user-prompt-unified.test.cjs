@@ -102,6 +102,28 @@ describe('user-prompt-unified module exports', () => {
       'function',
       'parseHookInput should be exported'
     );
+    assert.strictEqual(
+      typeof unified.buildHiddenSpawnSyncOptions,
+      'function',
+      'buildHiddenSpawnSyncOptions should be exported'
+    );
+  });
+});
+
+describe('buildHiddenSpawnSyncOptions', () => {
+  it('always enables windowsHide while preserving other options', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const options = unified.buildHiddenSpawnSyncOptions({
+      cwd: '/tmp/project',
+      stdio: 'ignore',
+      timeout: 1234,
+      windowsHide: false,
+    });
+
+    assert.strictEqual(options.cwd, '/tmp/project');
+    assert.strictEqual(options.stdio, 'ignore');
+    assert.strictEqual(options.timeout, 1234);
+    assert.strictEqual(options.windowsHide, true);
   });
 });
 

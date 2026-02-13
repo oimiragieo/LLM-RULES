@@ -61,11 +61,12 @@ function stderrLog(message) {
 
 function runChildHook(hookPath, stdinData) {
   const absPath = path.isAbsolute(hookPath) ? hookPath : path.join(PROJECT_ROOT, hookPath);
-  return cp.spawnSync('node', [absPath], {
+  return cp.spawnSync(process.execPath, [absPath], {
     input: stdinData,
     encoding: 'utf8',
     env: process.env,
     shell: false,
+    windowsHide: true,
   });
 }
 

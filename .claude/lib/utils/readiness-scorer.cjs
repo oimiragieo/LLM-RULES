@@ -63,13 +63,19 @@ function scoreConsistency(answers, context) {
 
   let conflicts = 0;
   const topics = {};
+  const canonicalTopic = topic => {
+    if (topic === 'db') return 'database';
+    if (topic === 'postgres' || topic === 'postgresql' || topic === 'mysql') return 'database';
+    return topic;
+  };
 
   // Group answers by topic
   answers.forEach(a => {
     const topicWords = extractTopics(a.question || a.answer);
     topicWords.forEach(topic => {
-      if (!topics[topic]) topics[topic] = [];
-      topics[topic].push(a.answer);
+      const canonical = canonicalTopic(topic);
+      if (!topics[canonical]) topics[canonical] = [];
+      topics[canonical].push(a.answer);
     });
   });
 
@@ -119,7 +125,7 @@ function scoreConsistency(answers, context) {
     });
   });
 
-  const consistency = Math.max(0, 100 - conflicts * 25); // Higher penalty per conflict
+  const consistency = Math.max(0, 100 - conflicts * 60); // Penalize true contradictions heavily
   return Math.round(consistency);
 }
 
@@ -168,7 +174,11 @@ function extractTopics(text) {
     'version',
   ];
 
-  const words = text.toLowerCase().split(/\s+/);
+  const words = text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
   return words.filter(w => keywords.includes(w) || keywords.some(k => w.includes(k)));
 }
 

@@ -130,6 +130,13 @@ function debugLog(source, message, err) {
   console.warn(`[${source}] ${message}${details}`);
 }
 
+function buildHiddenSpawnSyncOptions(base = {}) {
+  return {
+    ...base,
+    windowsHide: true,
+  };
+}
+
 function getFindingsSnapshotIntervalMs() {
   const intervalRaw = Number(process.env.FINDINGS_TREND_SNAPSHOT_INTERVAL_MS);
   return Number.isFinite(intervalRaw) && intervalRaw > 0 ? intervalRaw : 15 * 60 * 1000;
@@ -1707,11 +1714,15 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
           'reflection-queue-processor.cjs'
         );
         if (fs.existsSync(processorPath)) {
-          const result = spawnSync(process.execPath, [processorPath], {
-            cwd: PROJECT_ROOT,
-            stdio: 'ignore',
-            timeout: timeoutMs,
-          });
+          const result = spawnSync(
+            process.execPath,
+            [processorPath],
+            buildHiddenSpawnSyncOptions({
+              cwd: PROJECT_ROOT,
+              stdio: 'ignore',
+              timeout: timeoutMs,
+            })
+          );
           fs.writeFileSync(lastRunPath, String(Date.now()), 'utf8');
           if (result.status !== 0 && process.env.DEBUG_HOOKS) {
             console.warn(
@@ -1776,11 +1787,15 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
           console.warn('[user-prompt-unified] Daily maintenance triggered (date change).');
         }
         const dailyTimeoutMs = Number(process.env.MEMORY_DAILY_FALLBACK_TIMEOUT_MS || 60000);
-        const spawnResult = spawnSync(process.execPath, [schedulerPath, 'daily'], {
-          cwd: PROJECT_ROOT,
-          stdio: 'ignore',
-          timeout: dailyTimeoutMs,
-        });
+        const spawnResult = spawnSync(
+          process.execPath,
+          [schedulerPath, 'daily'],
+          buildHiddenSpawnSyncOptions({
+            cwd: PROJECT_ROOT,
+            stdio: 'ignore',
+            timeout: dailyTimeoutMs,
+          })
+        );
         if (spawnResult.signal === 'SIGTERM' || spawnResult.status !== 0) {
           console.warn(
             '[user-prompt-unified] Daily maintenance may be partial:',
@@ -1795,11 +1810,15 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
           console.warn('[user-prompt-unified] Weekly maintenance triggered (week change).');
         }
         const weeklyTimeoutMs = Number(process.env.MEMORY_WEEKLY_FALLBACK_TIMEOUT_MS || 60000);
-        const spawnResult = spawnSync(process.execPath, [schedulerPath, 'weekly'], {
-          cwd: PROJECT_ROOT,
-          stdio: 'ignore',
-          timeout: weeklyTimeoutMs,
-        });
+        const spawnResult = spawnSync(
+          process.execPath,
+          [schedulerPath, 'weekly'],
+          buildHiddenSpawnSyncOptions({
+            cwd: PROJECT_ROOT,
+            stdio: 'ignore',
+            timeout: weeklyTimeoutMs,
+          })
+        );
         if (spawnResult.signal === 'SIGTERM' || spawnResult.status !== 0) {
           console.warn(
             '[user-prompt-unified] Weekly maintenance may be partial:',
@@ -1937,6 +1956,7 @@ module.exports = {
   loadAgents,
   loadAgentsFromRegistry,
   agentsFromRegistry,
+  buildHiddenSpawnSyncOptions,
 
   // Constants for testing
   ROUTING_TABLE,

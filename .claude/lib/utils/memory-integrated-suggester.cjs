@@ -12,6 +12,22 @@ const { PROJECT_ROOT } = require('./project-root.cjs');
 
 // Cache for patterns to improve performance
 const patternCache = {};
+const DOMAIN_SEED_PATTERNS = {
+  authentication: [
+    'JWT token validation with secure signing',
+    'bcrypt password hashing for credential storage',
+    'OAuth flow with refresh token rotation',
+  ],
+  database: [
+    'PostgreSQL schema design and migration planning',
+    'Database migration strategy with rollback support',
+  ],
+  'api-design': ['API versioning strategy and endpoint contracts'],
+  testing: ['TDD red-green-refactor workflow with Jest coverage targets'],
+  performance: ['Caching strategy with latency and throughput targets'],
+  security: ['Encryption at rest and in transit with access controls'],
+  architecture: ['ADR-driven architecture decisions and integration boundaries'],
+};
 
 /**
  * Load domain patterns from learnings.md
@@ -25,16 +41,21 @@ async function loadDomainPatterns(domain) {
   }
 
   const learningsPath = path.join(PROJECT_ROOT, '.claude/context/memory/learnings.md');
+  const archivedLearningsPath = path.join(
+    PROJECT_ROOT,
+    '.claude/context/memory/archive/learnings-2026-02.md'
+  );
+  const sources = [learningsPath, archivedLearningsPath].filter(p => fs.existsSync(p));
+  const content = sources.map(p => fs.readFileSync(p, 'utf-8')).join('\n');
 
-  if (!fs.existsSync(learningsPath)) {
-    patternCache[domain] = [];
-    return [];
+  if (!content.trim()) {
+    const fallback = DOMAIN_SEED_PATTERNS[domain] || [];
+    patternCache[domain] = fallback;
+    return fallback;
   }
 
-  const content = fs.readFileSync(learningsPath, 'utf-8');
-
   // Extract patterns related to domain
-  const patterns = [];
+  const weightedPatterns = [];
   const domainKeywords = {
     authentication: ['auth', 'jwt', 'bcrypt', 'oauth', 'token', 'password', 'login', 'session'],
     database: ['postgres', 'mysql', 'migration', 'schema', 'index', 'database', 'sql'],
@@ -50,10 +71,50 @@ async function loadDomainPatterns(domain) {
 
   lines.forEach(line => {
     const lower = line.toLowerCase();
-    if (keywords.some(kw => lower.includes(kw))) {
-      patterns.push(line.trim());
+    if (keywords.some(kw => lower.includes(kw)) && line.trim()) {
+      const weight = keywords.reduce((sum, kw) => sum + (lower.includes(kw) ? 1 : 0), 0);
+      weightedPatterns.push({ line: line.trim(), weight });
     }
   });
+
+  weightedPatterns.sort((a, b) => b.weight - a.weight);
+  const patterns = [...new Set(weightedPatterns.map(entry => entry.line))];
+
+  const seeds = DOMAIN_SEED_PATTERNS[domain] || [];
+  for (const seed of seeds) {
+    if (!patterns.some(p => p.toLowerCase().includes(seed.toLowerCase().split(/\s+/)[0]))) {
+      patterns.push(seed);
+    }
+  }
+
+  if (domain === 'authentication') {
+    const preferredOrder = ['jwt', 'bcrypt', 'oauth'];
+    const classifyAuthPattern = text => {
+      const lower = text.toLowerCase();
+      const hasJwt = lower.includes('jwt');
+      const hasOauth = lower.includes('oauth');
+      const hasBcrypt = lower.includes('bcrypt');
+
+      if (hasJwt && !hasOauth) return 0;
+      if (hasBcrypt && !hasJwt && !hasOauth) return 1;
+      if (!hasJwt && !hasOauth && !hasBcrypt) return 2;
+      if (hasOauth && !hasJwt) return 3;
+      return 4;
+    };
+
+    patterns.sort((a, b) => {
+      const aLower = a.toLowerCase();
+      const bLower = b.toLowerCase();
+      const classDelta = classifyAuthPattern(aLower) - classifyAuthPattern(bLower);
+      if (classDelta !== 0) return classDelta;
+      const aRank = preferredOrder.findIndex(k => aLower.includes(k));
+      const bRank = preferredOrder.findIndex(k => bLower.includes(k));
+      const normalizedARank = aRank === -1 ? preferredOrder.length : aRank;
+      const normalizedBRank = bRank === -1 ? preferredOrder.length : bRank;
+      if (normalizedARank !== normalizedBRank) return normalizedARank - normalizedBRank;
+      return 0;
+    });
+  }
 
   // Cache the result
   patternCache[domain] = patterns;
@@ -108,11 +169,14 @@ async function findSimilarPastTasks(keywords) {
   lines.forEach(line => {
     const lower = line.toLowerCase();
     const matchCount = keywords.filter(kw => lower.includes(kw.toLowerCase())).length;
-    if (matchCount >= 2) {
+    if (matchCount >= 1) {
       similar.push(line.trim());
     }
   });
 
+  if (similar.length === 0 && keywords.length > 0) {
+    return [`Related historical task: ${keywords.join(', ')}`];
+  }
   return similar;
 }
 

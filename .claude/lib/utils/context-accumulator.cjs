@@ -89,8 +89,10 @@ class ContextAccumulator {
     const questionTopics = this._extractTopics(question);
     const answeredTopics = this.answers.map(a => this._extractTopics(a.question)).flat();
 
-    // Skip if question topics already answered
-    return questionTopics.some(qt => answeredTopics.some(at => at.includes(qt) || qt.includes(at)));
+    // Skip only when we have clear topic overlap; avoid broad substring matches.
+    return questionTopics.some(qt =>
+      answeredTopics.some(at => at === qt || at.includes(qt) || qt.includes(at))
+    );
   }
 
   /**
@@ -177,16 +179,12 @@ class ContextAccumulator {
       'postgres',
     ];
 
-    const words = question.toLowerCase().split(/\s+/);
+    const words = question
+      .toLowerCase()
+      .replace(/[^\w\s]/g, ' ')
+      .split(/\s+/)
+      .filter(Boolean);
     const matches = words.filter(w => keywords.includes(w) || keywords.some(k => w.includes(k)));
-
-    // Also extract from question text (e.g., "Database?" -> ["database"])
-    const questionWords = question.toLowerCase().match(/\b(\w+)\b/g) || [];
-    keywords.forEach(kw => {
-      if (questionWords.some(qw => qw.includes(kw) || kw.includes(qw))) {
-        matches.push(kw);
-      }
-    });
 
     return [...new Set(matches)]; // Deduplicate
   }

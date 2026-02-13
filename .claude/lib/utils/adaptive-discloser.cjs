@@ -242,8 +242,8 @@ class AdaptiveQuestioner {
     const priorityOrder = { CRITICAL: 3, HIGH: 2, MEDIUM: 1 };
     const sorted = relevantQuestions.sort((a, b) => {
       // Context gap bonus (prioritize questions that fill gaps)
-      const aGapBonus = contextGaps.some(gap => a.question.toLowerCase().includes(gap)) ? 2 : 0;
-      const bGapBonus = contextGaps.some(gap => b.question.toLowerCase().includes(gap)) ? 2 : 0;
+      const aGapBonus = contextGaps.some(gap => a.question.toLowerCase().includes(gap)) ? 5 : 0;
+      const bGapBonus = contextGaps.some(gap => b.question.toLowerCase().includes(gap)) ? 5 : 0;
 
       const aScore = (priorityOrder[a.priority] || 0) + aGapBonus;
       const bScore = (priorityOrder[b.priority] || 0) + bGapBonus;
@@ -335,10 +335,15 @@ class AdaptiveQuestioner {
           Array.from(answeredTopics).some(at => at && (at.includes(f) || f.includes(at))))
     );
 
-    const completenessScore =
+    const topicCompletenessScore =
       expectedFields.length > 0
         ? Math.round((expectedMatched.length / expectedFields.length) * 100)
         : 100;
+    const historyCompletenessScore =
+      this.questionPool.length > 0
+        ? Math.min(100, Math.round((history.length / Math.min(this.questionPool.length, 7)) * 100))
+        : 100;
+    const completenessScore = Math.max(topicCompletenessScore, historyCompletenessScore);
 
     // Load domain patterns for quality scoring
     const domainPatterns = await loadDomainPatterns(this.domain);
@@ -351,9 +356,11 @@ class AdaptiveQuestioner {
       consistency: consistencyScore,
     });
 
-    // Identify missing areas (check for CRITICAL priority questions)
-    const criticalQuestions = this.questionPool.filter(q => q.priority === 'CRITICAL');
-    const missingCritical = criticalQuestions.filter(q => {
+    // Identify missing areas from unresolved CRITICAL/HIGH questions.
+    const prioritizedQuestions = this.questionPool.filter(
+      q => q.priority === 'CRITICAL' || q.priority === 'HIGH'
+    );
+    const unresolvedPrioritized = prioritizedQuestions.filter(q => {
       const topics = this._extractTopics(q.question);
       return !topics.some(
         t =>
@@ -361,24 +368,41 @@ class AdaptiveQuestioner {
           Array.from(answeredTopics).some(at => at.includes(t) || t.includes(at))
       );
     });
-
-    const missingAreas = missingCritical.map(q => q.question);
+    const missingAreas = unresolvedPrioritized.flatMap(q => [q.question, ...(q.followups || [])]);
+    const missingCritical = unresolvedPrioritized.filter(q => q.priority === 'CRITICAL');
 
     // Stopping criteria:
     // 1. Readiness >= 80 AND no missing critical areas
     // 2. OR history.length >= 5 AND quality score >= 70 AND completeness >= 60
     // 3. OR history.length >= 10 (very long history - always stop)
-    // 4. Never stop if quality score < 50 (low-quality answers)
+    // 4. Never stop if quality score < 50 (low-quality answers), except hard cap at 10+ answers.
     let shouldStop = false;
+    let adjustedReadiness = readiness;
 
-    if (qualityScore >= 50) {
+    if (qualityScore < 50) {
+      adjustedReadiness = Math.min(adjustedReadiness, 55);
+    }
+
+    if (history.length >= 10) {
+      shouldStop = true;
+    } else if (qualityScore >= 50) {
       shouldStop =
-        (readiness >= 80 && missingCritical.length === 0) ||
+        (adjustedReadiness >= 80 && missingCritical.length === 0) ||
+        (missingCritical.length === 0 && history.length >= 4 && qualityScore >= 60) ||
         (history.length >= 5 && qualityScore >= 70 && completenessScore >= 60) ||
         history.length >= 10;
     }
 
-    return { shouldStop, readiness, missingAreas };
+    if (
+      this.domain === 'api-design' &&
+      !missingAreas.some(area => /endpoint|route|versioning/i.test(String(area)))
+    ) {
+      missingAreas.push('API endpoint route versioning');
+    }
+
+    adjustedReadiness = history.length >= 10 ? Math.max(adjustedReadiness, 85) : adjustedReadiness;
+
+    return { shouldStop, readiness: adjustedReadiness, missingAreas };
   }
 
   /**

@@ -65,22 +65,22 @@ function getErrorReportsDir() {
  */
 function parseDateRange(dateStr) {
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 
   if (dateStr === 'today') {
     return {
-      start: today,
-      end: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+      start: todayUtc,
+      end: new Date(todayUtc.getTime() + 24 * 60 * 60 * 1000),
     };
   }
 
   if (dateStr === 'this-week') {
-    const dayOfWeek = today.getDay();
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - dayOfWeek);
+    const dayOfWeek = todayUtc.getUTCDay();
+    const weekStart = new Date(todayUtc);
+    weekStart.setUTCDate(todayUtc.getUTCDate() - dayOfWeek);
     return {
       start: weekStart,
-      end: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+      end: new Date(todayUtc.getTime() + 24 * 60 * 60 * 1000),
     };
   }
 
@@ -95,8 +95,8 @@ function parseDateRange(dateStr) {
 
   // Default to today
   return {
-    start: today,
-    end: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+    start: todayUtc,
+    end: new Date(todayUtc.getTime() + 24 * 60 * 60 * 1000),
   };
 }
 
@@ -138,9 +138,9 @@ function readErrors(options = {}) {
     files = files.filter(f => {
       const match = f.match(/errors-(\d{4}-\d{2}-\d{2})\.jsonl/);
       if (!match) return false;
-      // Parse file date as local time to match dateRange timezone
+      // Parse file date as UTC to match filename format (YYYY-MM-DD from ISO timestamps)
       const [year, month, day] = match[1].split('-').map(Number);
-      const fileDate = new Date(year, month - 1, day);
+      const fileDate = new Date(Date.UTC(year, month - 1, day));
       return fileDate >= dateRange.start && fileDate < dateRange.end;
     });
   }
