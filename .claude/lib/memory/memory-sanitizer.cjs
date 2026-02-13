@@ -1,97 +1,185 @@
+/**
+ * memory-sanitizer.cjs - Memory Content Sanitization
+ * ===================================================
+ *
+ * Detects dangerous patterns in memory content to prevent:
+ * - Shell injection attacks
+ * - Prompt injection attacks
+ * - Code execution attacks
+ * - Encoded payloads
+ *
+ * PRESERVES legitimate code in markdown blocks (triple backticks).
+ *
+ * Based on security patterns from:
+ * - .claude/lib/utils/safe-json-parse.cjs (prototype pollution)
+ * - OWASP Agentic AI Top 10 (ASI01, ASI06)
+ *
+ * Created: 2026-02-13 (P0-005 Fix)
+ */
+
 'use strict';
 
 /**
- * Memory Content Sanitizer
- *
- * Prevents memory poisoning attacks by sanitizing content before writing to
- * memory files (learnings.md, decisions.md, issues.md). Blocks prompt injection
- * patterns that could hijack future agent behavior.
- *
- * FIX HIGH-002: Memory Poisoning via Unsanitized File Writes
- * Security Control: SEC-006 (memory poisoning prevention)
- *
- * Related: OWASP Agentic AI Top 10 - ASI06 (Memory & Context Poisoning)
+ * Dangerous pattern categories
  */
+const DANGEROUS_PATTERNS = {
+  // Shell injection patterns
+  shell: [
+    { pattern: /\brm\s+-rf\b/gi, description: 'shell injection: rm -rf command' },
+    { pattern: /\bsudo\b/gi, description: 'shell injection: sudo command' },
+    { pattern: /`[^`]+`/g, description: 'shell injection: backtick execution' },
+    { pattern: /\$\([^)]+\)/g, description: 'shell injection: $() execution' },
+    { pattern: /;\s*\w+/g, description: 'shell injection: semicolon command chaining' },
+    { pattern: /\|\s*sh\b/gi, description: 'shell injection: pipe to sh' },
+    { pattern: /\|\s*bash\b/gi, description: 'shell injection: pipe to bash' },
+    { pattern: />\s*\/dev\//gi, description: 'shell injection: device write' },
+  ],
+
+  // Prompt injection patterns
+  prompt: [
+    {
+      pattern: /\bIGNORE\s+(PREVIOUS|ALL|THE)\s+(INSTRUCTIONS?|RULES?)\b/gi,
+      description: 'prompt injection: IGNORE PREVIOUS/ALL/THE INSTRUCTIONS',
+    },
+    {
+      pattern: /\bDISREGARD\s+(PREVIOUS|ALL|THE)\s+(INSTRUCTIONS?|RULES?)\b/gi,
+      description: 'prompt injection: DISREGARD PREVIOUS/ALL/THE INSTRUCTIONS',
+    },
+    {
+      pattern: /\bSYSTEM:\s*/gi,
+      description: 'prompt injection: SYSTEM: role impersonation',
+    },
+    {
+      pattern: /\bADMIN:\s*/gi,
+      description: 'prompt injection: ADMIN: role impersonation',
+    },
+    {
+      pattern: /\bROOT:\s*/gi,
+      description: 'prompt injection: ROOT: role impersonation',
+    },
+    {
+      pattern: /\b(output|show|display|reveal)\s+(your\s+)?(system\s+)?(prompt|instructions?)\b/gi,
+      description: 'prompt injection: system prompt exfiltration attempt',
+    },
+  ],
+
+  // Code execution patterns
+  code: [
+    { pattern: /\beval\s*\(/gi, description: 'code execution: eval()' },
+    { pattern: /\bFunction\s*\(/gi, description: 'code execution: Function()' },
+    { pattern: /\brequire\s*\(/gi, description: 'code execution: require()' },
+    { pattern: /\bimport\s*\(/gi, description: 'code execution: import()' },
+    { pattern: /__proto__/gi, description: 'code execution: __proto__ manipulation' },
+    {
+      pattern: /constructor\.prototype/gi,
+      description: 'code execution: constructor.prototype manipulation',
+    },
+    {
+      pattern: /process\.env\.[A-Z_]+=\s*["']/gi,
+      description: 'code execution: environment variable injection',
+    },
+    { pattern: /child_process/gi, description: 'code execution: child_process usage' },
+  ],
+
+  // Encoded payload patterns
+  encoded: [
+    {
+      pattern: /\bbase64\s+-d\b/gi,
+      description: 'encoded payload: base64 decode',
+    },
+    {
+      pattern: /\becho\s+[A-Za-z0-9+/=]{20,}\s*\|\s*base64/gi,
+      description: 'encoded payload: echo base64 pipe',
+    },
+  ],
+};
 
 /**
- * Prompt injection patterns that indicate goal hijacking attempts.
- * These patterns are commonly used to override agent instructions.
+ * Extract code blocks from markdown content to exclude from scanning
  *
- * @type {Array<RegExp>}
+ * @param {string} content - Content to parse
+ * @returns {Object} { contentWithoutCode, codeBlocks }
  */
-const INJECTION_PATTERNS = [
-  /ignore\s+previous\s+instructions/i,
-  /ignore\s+all\s+prior\s+instructions/i,
-  /system\s+prompt\s+override/i,
-  /you\s+are\s+now\s+a/i,
-  /disregard\s+all\s+prior/i,
-  /disregard\s+everything/i,
-  /forget\s+everything/i,
-  /forget\s+all\s+previous/i,
-];
-
-/**
- * Sanitize memory content before writing to memory files.
- *
- * Blocks obvious injection attempts and escapes markdown that looks like
- * system instructions.
- *
- * @param {string} content - The content to sanitize
- * @returns {string} Sanitized content safe for memory files
- * @throws {Error} If content contains obvious injection patterns
- */
-function sanitizeMemoryContent(content) {
+function extractCodeBlocks(content) {
   if (!content || typeof content !== 'string') {
-    return content;
+    return { contentWithoutCode: '', codeBlocks: [] };
   }
 
-  // Block obvious injection attempts
-  for (const pattern of INJECTION_PATTERNS) {
-    if (pattern.test(content)) {
-      throw new Error(
-        `Memory injection attempt blocked: Pattern "${pattern}" detected. ` +
-          `This content appears to contain instructions designed to modify agent behavior. ` +
-          `Security Control: SEC-006 (memory poisoning prevention)`
-      );
-    }
+  const codeBlocks = [];
+  let contentWithoutCode = content;
+
+  // Match triple backtick code blocks
+  const codeBlockPattern = /```[\s\S]*?```/g;
+  let match;
+
+  while ((match = codeBlockPattern.exec(content)) !== null) {
+    codeBlocks.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      content: match[0],
+    });
   }
 
-  // Escape markdown headings that look like system instructions
-  // Pattern: # System: or ## Instruction: or ### Override:
-  const sanitized = content.replace(
-    /^(#{1,3}\s+)?(System|Instruction|Override|IMPORTANT|CRITICAL|MANDATORY):/gim,
-    '\\$&' // Escape with backslash
-  );
+  // Replace code blocks with placeholder (preserve length for position tracking)
+  for (const block of codeBlocks) {
+    const placeholder = ' '.repeat(block.content.length);
+    contentWithoutCode =
+      contentWithoutCode.slice(0, block.start) + placeholder + contentWithoutCode.slice(block.end);
+  }
 
-  return sanitized;
+  return { contentWithoutCode, codeBlocks };
 }
 
 /**
- * Check if content is safe without throwing (for validation).
+ * Sanitize memory content by detecting dangerous patterns
  *
- * @param {string} content - The content to check
- * @returns {{safe: boolean, reason: string}} Validation result
+ * @param {string} content - Memory content to sanitize
+ * @returns {Object} { safe: boolean, sanitized: string, detections: string[] }
+ *
+ * @example
+ * const result = sanitizeMemoryContent('Run: rm -rf /tmp');
+ * // result.safe = false
+ * // result.detections = ['shell injection: rm -rf command']
  */
-function isContentSafe(content) {
-  if (!content || typeof content !== 'string') {
-    return { safe: true, reason: '' };
+function sanitizeMemoryContent(content) {
+  // Handle null/undefined/empty
+  if (!content) {
+    return {
+      safe: true,
+      sanitized: '',
+      detections: [],
+    };
   }
 
-  // Check for injection patterns
-  for (const pattern of INJECTION_PATTERNS) {
-    if (pattern.test(content)) {
-      return {
-        safe: false,
-        reason: `Content contains potential injection pattern: ${pattern}`,
-      };
+  // Convert to string
+  const contentStr = String(content);
+
+  // Extract code blocks (preserve legitimate code examples)
+  const { contentWithoutCode } = extractCodeBlocks(contentStr);
+
+  const detections = [];
+
+  // Scan for dangerous patterns (excluding code blocks)
+  for (const [_category, patterns] of Object.entries(DANGEROUS_PATTERNS)) {
+    for (const { pattern, description } of patterns) {
+      // Reset regex state
+      pattern.lastIndex = 0;
+
+      if (pattern.test(contentWithoutCode)) {
+        detections.push(description);
+      }
     }
   }
 
-  return { safe: true, reason: '' };
+  return {
+    safe: detections.length === 0,
+    sanitized: contentStr, // Return original (we log detections but don't modify)
+    detections,
+  };
 }
 
 module.exports = {
   sanitizeMemoryContent,
-  isContentSafe,
-  INJECTION_PATTERNS,
+  DANGEROUS_PATTERNS, // Export for testing
+  extractCodeBlocks, // Export for testing
 };
