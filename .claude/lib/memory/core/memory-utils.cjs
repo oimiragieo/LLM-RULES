@@ -28,9 +28,7 @@ function buildSemanticContext(entries, options = {}) {
     return '';
   }
 
-  const sorted = entries
-    .filter(e => e && e.content)
-    .slice(0, maxEntries);
+  const sorted = entries.filter(e => e && e.content).slice(0, maxEntries);
 
   const contextParts = sorted.map(entry => {
     const metadata = entry.metadata || {};
@@ -84,10 +82,10 @@ function calculateQualityScore(entry) {
   const length = (entry.content || '').length;
 
   const accessScore = Math.min(Math.log1p(accessCount) / Math.log1p(20), 1);
-  const recencyScore = Math.max(0, 1 - (ageInDays / 90));
+  const recencyScore = Math.max(0, 1 - ageInDays / 90);
   const lengthScore = Math.min(length / 2000, 1);
 
-  return (accessScore * 0.5) + (recencyScore * 0.3) + (lengthScore * 0.2);
+  return accessScore * 0.5 + recencyScore * 0.3 + lengthScore * 0.2;
 }
 
 module.exports = {

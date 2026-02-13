@@ -116,8 +116,11 @@ test('P0-006: concurrent withLock calls are serialized', async () => {
     const startLabel = order[i];
     const endLabel = order[i + 1];
     const prefix = startLabel.split('-')[0];
-    assert.strictEqual(endLabel, `${prefix}-end`,
-      `Expected ${prefix}-end after ${prefix}-start, got ${endLabel}. Full order: ${order.join(', ')}`);
+    assert.strictEqual(
+      endLabel,
+      `${prefix}-end`,
+      `Expected ${prefix}-end after ${prefix}-start, got ${endLabel}. Full order: ${order.join(', ')}`
+    );
   }
 
   fs.rmSync(tmpDir, { recursive: true, force: true });

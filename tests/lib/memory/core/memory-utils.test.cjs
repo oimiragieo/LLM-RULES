@@ -7,19 +7,29 @@ const assert = require('node:assert/strict');
 test('C-001: memory-utils module exports buildSemanticContext', () => {
   const memoryUtils = require('../../../../.claude/lib/memory/core/memory-utils.cjs');
 
-  assert.ok(typeof memoryUtils.buildSemanticContext === 'function',
-    'buildSemanticContext must be exported');
-  assert.ok(typeof memoryUtils.normalizeMemoryEntry === 'function',
-    'normalizeMemoryEntry must be exported');
-  assert.ok(typeof memoryUtils.calculateQualityScore === 'function',
-    'calculateQualityScore must be exported');
+  assert.ok(
+    typeof memoryUtils.buildSemanticContext === 'function',
+    'buildSemanticContext must be exported'
+  );
+  assert.ok(
+    typeof memoryUtils.normalizeMemoryEntry === 'function',
+    'normalizeMemoryEntry must be exported'
+  );
+  assert.ok(
+    typeof memoryUtils.calculateQualityScore === 'function',
+    'calculateQualityScore must be exported'
+  );
 });
 
 test('C-001: buildSemanticContext formats entries correctly', () => {
   const { buildSemanticContext } = require('../../../../.claude/lib/memory/core/memory-utils.cjs');
 
   const entries = [
-    { content: 'Pattern: Use memoization for performance', category: 'pattern', timestamp: '2026-01-01' },
+    {
+      content: 'Pattern: Use memoization for performance',
+      category: 'pattern',
+      timestamp: '2026-01-01',
+    },
     { content: 'Issue: Memory leak in loop', category: 'issue', timestamp: '2026-01-02' },
   ];
 
@@ -77,7 +87,11 @@ test('C-001: calculateQualityScore returns 0-1 range', () => {
   const { calculateQualityScore } = require('../../../../.claude/lib/memory/core/memory-utils.cjs');
 
   const score0 = calculateQualityScore({ accessCount: 0, ageInDays: 100, content: '' });
-  const score1 = calculateQualityScore({ accessCount: 20, ageInDays: 0, content: 'a'.repeat(2000) });
+  const score1 = calculateQualityScore({
+    accessCount: 20,
+    ageInDays: 0,
+    content: 'a'.repeat(2000),
+  });
 
   assert.ok(score0 >= 0 && score0 <= 1, `Score should be 0-1, got ${score0}`);
   assert.ok(score1 >= 0 && score1 <= 1, `Score should be 0-1, got ${score1}`);

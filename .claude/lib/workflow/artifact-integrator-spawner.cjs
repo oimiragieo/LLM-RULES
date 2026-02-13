@@ -26,31 +26,29 @@ const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
  * @returns {Promise<void>}
  */
 async function spawnArtifactIntegrator(options = {}) {
-  const {
-    mode = 'batch',
-    maxEntries = 10,
-    background = true,
-  } = options;
+  const { mode = 'batch', maxEntries = 10, background = true } = options;
 
   // Path to artifact-integrator skill executor
-  const skillPath = path.join(PROJECT_ROOT, '.claude', 'skills', 'artifact-integrator', 'executor.cjs');
+  const skillPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'skills',
+    'artifact-integrator',
+    'executor.cjs'
+  );
 
   // Build command arguments
-  const args = [
-    skillPath,
-    '--mode', mode,
-    '--max-entries', String(maxEntries),
-  ];
+  const args = [skillPath, '--mode', mode, '--max-entries', String(maxEntries)];
 
   if (background) {
     // Background spawn (non-blocking)
     const proc = spawn(process.execPath, args, {
       detached: true,
-      stdio: 'ignore',  // Don't capture output
-      windowsHide: true,  // SECURITY: Hide window on Windows
+      stdio: 'ignore', // Don't capture output
+      windowsHide: true, // SECURITY: Hide window on Windows
     });
 
-    proc.unref();  // Allow parent to exit
+    proc.unref(); // Allow parent to exit
 
     // Note: no logging to avoid dependency on logger.cjs for minimal implementation
     return;
@@ -62,7 +60,7 @@ async function spawnArtifactIntegrator(options = {}) {
         windowsHide: true,
       });
 
-      proc.on('close', (code) => {
+      proc.on('close', code => {
         if (code === 0) {
           resolve();
         } else {
@@ -70,7 +68,7 @@ async function spawnArtifactIntegrator(options = {}) {
         }
       });
 
-      proc.on('error', (err) => {
+      proc.on('error', err => {
         reject(err);
       });
     });
@@ -83,14 +81,19 @@ async function spawnArtifactIntegrator(options = {}) {
  * @returns {number} - Number of entries in queue
  */
 function getQueueSize(queuePath) {
-  const targetPath = queuePath || path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
+  const targetPath =
+    queuePath ||
+    path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
 
   if (!fs.existsSync(targetPath)) {
     return 0;
   }
 
   const content = fs.readFileSync(targetPath, 'utf8');
-  const lines = content.trim().split('\n').filter(line => line.trim());
+  const lines = content
+    .trim()
+    .split('\n')
+    .filter(line => line.trim());
   return lines.length;
 }
 

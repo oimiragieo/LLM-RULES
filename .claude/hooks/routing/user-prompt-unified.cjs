@@ -1891,7 +1891,8 @@ const INJECTION_PATTERNS = {
     category: 'instruction_override',
   },
   systemPromptLeak: {
-    pattern: /(output|print|show|display|reveal)\s+(me\s+)?(your\s+)?(system\s+)?(prompt|instructions|rules)/gi,
+    pattern:
+      /(output|print|show|display|reveal)\s+(me\s+)?(your\s+)?(system\s+)?(prompt|instructions|rules)/gi,
     severity: 'CRITICAL',
     category: 'information_disclosure',
   },
@@ -1908,7 +1909,8 @@ const INJECTION_PATTERNS = {
     category: 'jailbreak',
   },
   pretendRole: {
-    pattern: /(pretend|act\s+as|roleplay)\s+(you\s+are|as)\s+(not\s+)?(an?\s+)?(assistant|AI|language model)/gi,
+    pattern:
+      /(pretend|act\s+as|roleplay)\s+(you\s+are|as)\s+(not\s+)?(an?\s+)?(assistant|AI|language model)/gi,
     severity: 'HIGH',
     category: 'jailbreak',
   },
@@ -2052,7 +2054,8 @@ function sanitizePrompt(userInput) {
     sanitized,
     detections,
     blocked: false,
-    warnings: detections.length > 0 ? `Sanitized ${detections.length} injection patterns` : undefined,
+    warnings:
+      detections.length > 0 ? `Sanitized ${detections.length} injection patterns` : undefined,
   };
 }
 

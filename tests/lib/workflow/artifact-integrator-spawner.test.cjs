@@ -24,11 +24,14 @@ test('C-003: getQueueSize counts lines correctly', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'c003-'));
   const queueFile = path.join(tmpDir, 'test-queue.jsonl');
 
-  fs.writeFileSync(queueFile, [
-    '{"type":"skill","id":"test-1"}',
-    '{"type":"agent","id":"test-2"}',
-    '{"type":"hook","id":"test-3"}',
-  ].join('\n'));
+  fs.writeFileSync(
+    queueFile,
+    [
+      '{"type":"skill","id":"test-1"}',
+      '{"type":"agent","id":"test-2"}',
+      '{"type":"hook","id":"test-3"}',
+    ].join('\n')
+  );
 
   const size = spawner.getQueueSize(queueFile);
   assert.strictEqual(size, 3);
@@ -52,9 +55,18 @@ test('C-003: getQueueSize handles empty file', () => {
 test('C-003: post-creation-integration hook detects queue threshold', () => {
   // Verify the hook source contains the threshold logic after fix
   const hookPath = path.join(
-    __dirname, '..', '..', '..', '.claude', 'hooks', 'workflow', 'post-creation-integration.cjs'
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '.claude',
+    'hooks',
+    'workflow',
+    'post-creation-integration.cjs'
   );
   const source = fs.readFileSync(hookPath, 'utf8');
-  assert.ok(source.includes('INTEGRATION_BATCH_SIZE') || source.includes('getQueueSize'),
-    'Hook must contain queue threshold logic');
+  assert.ok(
+    source.includes('INTEGRATION_BATCH_SIZE') || source.includes('getQueueSize'),
+    'Hook must contain queue threshold logic'
+  );
 });
