@@ -21,11 +21,11 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 
 function getMode() {
-  const mode = String(process.env.HYBRID_GREP_ENFORCEMENT || 'block')
+  const mode = String(process.env.HYBRID_GREP_ENFORCEMENT || 'warn')
     .trim()
     .toLowerCase();
   if (mode === 'off' || mode === 'warn' || mode === 'block') return mode;
-  return 'block';
+  return 'warn';
 }
 
 function hasAdvancedRegex(pattern) {

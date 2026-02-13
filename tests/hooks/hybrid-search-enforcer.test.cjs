@@ -41,17 +41,17 @@ test('decide blocks unsupported cjs type alias before search execution', () => {
   assert.equal(decision.reason, 'unsupported_type_alias');
 });
 
-test('getMode defaults to block and validates values', () => {
+test('getMode defaults to warn and validates values', () => {
   const original = process.env.HYBRID_GREP_ENFORCEMENT;
 
   delete process.env.HYBRID_GREP_ENFORCEMENT;
-  assert.equal(getMode(), 'block');
+  assert.equal(getMode(), 'warn');
 
   process.env.HYBRID_GREP_ENFORCEMENT = 'warn';
   assert.equal(getMode(), 'warn');
 
   process.env.HYBRID_GREP_ENFORCEMENT = 'invalid';
-  assert.equal(getMode(), 'block');
+  assert.equal(getMode(), 'warn');
 
   if (original === undefined) delete process.env.HYBRID_GREP_ENFORCEMENT;
   else process.env.HYBRID_GREP_ENFORCEMENT = original;

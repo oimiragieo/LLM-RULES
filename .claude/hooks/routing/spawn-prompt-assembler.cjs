@@ -442,6 +442,19 @@ function hasTaskIdReference(prompt) {
   return TASK_ID_REFERENCE_REGEX.test(prompt);
 }
 
+function normalizeTaskIdReferences(prompt, taskId) {
+  if (!prompt || typeof prompt !== 'string') return prompt;
+  if (taskId == null) return prompt;
+  const normalizedTaskId = String(taskId);
+  if (!normalizedTaskId) return prompt;
+
+  return prompt
+    .replace(/(\*\*Task ID\*\*:\s*)([a-zA-Z0-9_-]{1,64})/gi, `$1${normalizedTaskId}`)
+    .replace(/(Task ID:\s*)([a-zA-Z0-9_-]{1,64})/gi, `$1${normalizedTaskId}`)
+    .replace(/(taskId\s*:\s*['"])([^'"]+)(['"])/gi, `$1${normalizedTaskId}$3`)
+    .replace(/(task_id\s*:\s*['"])([^'"]+)(['"])/gi, `$1${normalizedTaskId}$3`);
+}
+
 function hasExplicitTaskId(toolInput) {
   if (!toolInput || typeof toolInput !== 'object') return false;
   const taskId = toolInput.task_id || toolInput.id || null;
@@ -1248,6 +1261,7 @@ function prepareTaskSpawnContext(hookInput, sessionId) {
   basePrompt = sanitizeTaskPrompt(basePrompt);
 
   const explicitTaskId = toolInput.task_id || toolInput.id || null;
+  basePrompt = normalizeTaskIdReferences(basePrompt, explicitTaskId);
   const inputPromptLength = basePrompt.length;
 
   if (!hasRequiredWarningBox(basePrompt) || !hasTaskIdReference(basePrompt)) {
@@ -1666,6 +1680,7 @@ module.exports = {
   generateRequiredPrefixFragment,
   hasRequiredWarningBox,
   hasTaskIdReference,
+  normalizeTaskIdReferences,
   hasExplicitTaskId,
   generateFallbackTaskId,
   ensureTaskId,
