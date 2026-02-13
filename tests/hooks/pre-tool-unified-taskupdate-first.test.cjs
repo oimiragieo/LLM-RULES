@@ -3,6 +3,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
+const { atomicWriteJSONSync } = require('../../.claude/lib/utils/atomic-write.cjs');
 
 const {
   checkTaskUpdateFirst,
@@ -10,6 +11,32 @@ const {
 } = require('../../.claude/hooks/routing/pre-tool-unified.cjs');
 
 describe('pre-tool-unified taskupdate-first guard', () => {
+  const routerStatePath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '.claude',
+    'context',
+    'runtime',
+    'router-state.json'
+  );
+
+  function withRouterState(state, fn) {
+    const existed = fs.existsSync(routerStatePath);
+    const prior = existed ? fs.readFileSync(routerStatePath, 'utf8') : null;
+    try {
+      fs.mkdirSync(path.dirname(routerStatePath), { recursive: true });
+      atomicWriteJSONSync(routerStatePath, state);
+      fn();
+    } finally {
+      if (existed) {
+        fs.writeFileSync(routerStatePath, prior, 'utf8');
+      } else {
+        fs.rmSync(routerStatePath, { force: true });
+      }
+    }
+  }
+
   function withTempStateFile(fn) {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'taskupdate-first-'));
     const stateFile = path.join(tempDir, 'state.json');
@@ -80,13 +107,15 @@ describe('pre-tool-unified taskupdate-first guard', () => {
 
   test('skips enforcement for non-agent scoped sessions', () => {
     withTempStateFile(stateFile => {
-      const hookInput = {
-        session_id: 'session-4',
-        allowed_tools: ['Read', 'Bash'],
-      };
-      const result = checkTaskUpdateFirst(hookInput, 'Bash', { command: 'echo ok' }, stateFile);
-      assert.equal(result.checked, false);
-      assert.equal(result.reason, 'not_agent_session');
+      withRouterState({ mode: 'router', taskSpawned: false, sessionId: 'session-4' }, () => {
+        const hookInput = {
+          session_id: 'session-4',
+          allowed_tools: ['Read', 'Bash'],
+        };
+        const result = checkTaskUpdateFirst(hookInput, 'Bash', { command: 'echo ok' }, stateFile);
+        assert.equal(result.checked, false);
+        assert.equal(result.reason, 'not_agent_session');
+      });
     });
   });
 
@@ -119,6 +148,26 @@ describe('pre-tool-unified taskupdate-first guard', () => {
         } else {
           process.env.CLAUDE_AGENT_ID = priorAgentId;
         }
+      }
+    });
+  });
+
+  test('enforces when router state indicates spawned agent context', () => {
+    withTempStateFile(stateFile => {
+      const priorAgentId = process.env.CLAUDE_AGENT_ID;
+      delete process.env.CLAUDE_AGENT_ID;
+      withRouterState({ mode: 'agent', taskSpawned: true, sessionId: 'session-7' }, () => {
+        const hookInput = {
+          session_id: 'session-7',
+        };
+        const result = checkTaskUpdateFirst(hookInput, 'Bash', { command: 'echo ok' }, stateFile);
+        assert.equal(result.action, 'block');
+        assert.match(result.message, /TASKUPDATE-FIRST/);
+      });
+      if (priorAgentId == null) {
+        delete process.env.CLAUDE_AGENT_ID;
+      } else {
+        process.env.CLAUDE_AGENT_ID = priorAgentId;
       }
     });
   });

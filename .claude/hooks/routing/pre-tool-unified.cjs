@@ -38,6 +38,7 @@ const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
 const { appendJsonl } = libRequire(path.join('utils', 'jsonl-utils.cjs'));
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
+const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 
 // =============================================================================
 // Check 1: Session Cleanup (from session-cleanup.cjs)
@@ -674,6 +675,17 @@ function isAgentScopedSession(hookInput) {
     .trim()
     .toLowerCase();
   if (agentId && agentId !== 'router') return true;
+
+  // Final fallback: infer agent context from shared router state when
+  // hook payload/env are minimal (observed in some subagent runs).
+  try {
+    const state = routerState.getState();
+    if (state && (state.taskSpawned === true || state.mode === 'agent')) {
+      return true;
+    }
+  } catch (_err) {
+    // Best-effort only.
+  }
 
   return false;
 }
