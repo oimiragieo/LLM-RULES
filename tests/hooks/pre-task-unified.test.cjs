@@ -98,6 +98,9 @@ describe('pre-task-unified.cjs', () => {
       SECURITY_REVIEW_ENFORCEMENT: process.env.SECURITY_REVIEW_ENFORCEMENT,
       LOOP_PREVENTION_MODE: process.env.LOOP_PREVENTION_MODE,
       CLAUDE_SESSION_ID: process.env.CLAUDE_SESSION_ID,
+      TASK_RESUME_ENFORCEMENT: process.env.TASK_RESUME_ENFORCEMENT,
+      TASK_ALLOW_AGENT_RESUME: process.env.TASK_ALLOW_AGENT_RESUME,
+      TASK_SINGLE_PURPOSE_ENFORCEMENT: process.env.TASK_SINGLE_PURPOSE_ENFORCEMENT,
     };
 
     // Clean environment
@@ -106,6 +109,9 @@ describe('pre-task-unified.cjs', () => {
     delete process.env.SECURITY_REVIEW_ENFORCEMENT;
     delete process.env.LOOP_PREVENTION_MODE;
     delete process.env.CLAUDE_SESSION_ID;
+    delete process.env.TASK_RESUME_ENFORCEMENT;
+    delete process.env.TASK_ALLOW_AGENT_RESUME;
+    delete process.env.TASK_SINGLE_PURPOSE_ENFORCEMENT;
 
     // Invalidate all caches before each test
     preTaskUnified.invalidateCachedState();
@@ -575,6 +581,82 @@ describe('pre-task-unified.cjs', () => {
 
       const result = preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, true);
+    });
+
+    it('should block resume-style Task spawns by default', () => {
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: false,
+        requiresSecurityReview: false,
+        taskListCalledSincePrompt: true,
+      });
+      writeState(LOOP_STATE_FILE, {
+        spawnDepth: 0,
+        actionHistory: [],
+      });
+
+      const input = {
+        tool_name: 'Task',
+        tool_input: {
+          prompt: 'Resuming a1ae150 and continuing previous developer run.',
+          description: 'resume developer execution',
+        },
+      };
+
+      const result = preTaskUnified.runAllChecks(input);
+      assert.strictEqual(result.pass, false);
+      assert.ok(result.message.includes('Resume-style spawn detected'));
+    });
+
+    it('should allow resume-style spawn when override is explicitly enabled', () => {
+      process.env.TASK_ALLOW_AGENT_RESUME = 'true';
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: false,
+        requiresSecurityReview: false,
+        taskListCalledSincePrompt: true,
+      });
+      writeState(LOOP_STATE_FILE, {
+        spawnDepth: 0,
+        actionHistory: [],
+      });
+
+      const input = {
+        tool_name: 'Task',
+        tool_input: {
+          prompt: 'Resuming a1ae150 and continuing previous developer run.',
+          description: 'resume developer execution',
+        },
+      };
+
+      const result = preTaskUnified.runAllChecks(input);
+      assert.strictEqual(result.pass, true);
+    });
+
+    it('should block multi-wave spawn prompts in single-purpose block mode', () => {
+      process.env.TASK_SINGLE_PURPOSE_ENFORCEMENT = 'block';
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: false,
+        requiresSecurityReview: false,
+        taskListCalledSincePrompt: true,
+      });
+      writeState(LOOP_STATE_FILE, {
+        spawnDepth: 0,
+        actionHistory: [],
+      });
+
+      const input = {
+        tool_name: 'Task',
+        tool_input: {
+          prompt: 'Tier 1: patch hooks. Wave 2: run remediation pass.',
+          description: 'phase 1 then phase 2',
+        },
+      };
+
+      const result = preTaskUnified.runAllChecks(input);
+      assert.strictEqual(result.pass, false);
+      assert.ok(result.message.includes('Multi-wave task'));
     });
   });
 

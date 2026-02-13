@@ -136,9 +136,36 @@ function qualityFromAccess(accessCount) {
 }
 
 function syncJsonMemory(absPath, dbPath) {
+  // Safety: Check file exists and is not a directory
+  if (!fs.existsSync(absPath)) {
+    debugLog('sync-memory-index', `File does not exist: ${absPath}`);
+    return;
+  }
+
+  let stats;
+  try {
+    stats = fs.statSync(absPath);
+  } catch (err) {
+    debugLog('sync-memory-index', `Failed to stat file: ${absPath}`, err);
+    return;
+  }
+
+  if (stats.isDirectory()) {
+    debugLog('sync-memory-index', `Path is a directory, not a file: ${absPath}`);
+    return;
+  }
+
   const base = path.basename(absPath);
   const type = base === 'patterns.json' ? 'pattern' : 'issue';
-  const raw = fs.readFileSync(absPath, 'utf8');
+
+  let raw;
+  try {
+    raw = fs.readFileSync(absPath, 'utf8');
+  } catch (err) {
+    debugLog('sync-memory-index', `Failed to read file: ${absPath}`, err);
+    return;
+  }
+
   let items = [];
   try {
     const parsed = JSON.parse(raw);

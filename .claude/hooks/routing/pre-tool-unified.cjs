@@ -227,6 +227,13 @@ const TASKUPDATE_FIRST_STATE_FILE = path.join(
   'runtime',
   'taskupdate-first-state.json'
 );
+const AGENT_GUARDRAILS_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'agent-guardrails-state.json'
+);
 
 const LOCK_SUFFIX = '.lock';
 const MAX_LOCK_WAIT_MS = 2000;
@@ -779,6 +786,196 @@ function checkTaskUpdateFirst(
   return { checked: true, action: 'block', message };
 }
 
+function readAgentGuardrailsState(stateFile = AGENT_GUARDRAILS_STATE_FILE) {
+  try {
+    if (!fs.existsSync(stateFile)) return { sessions: {} };
+    const parsed = safeParseJSON(fs.readFileSync(stateFile, 'utf8'), null);
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      !parsed.sessions ||
+      typeof parsed.sessions !== 'object'
+    ) {
+      return { sessions: {} };
+    }
+    return parsed;
+  } catch (_err) {
+    return { sessions: {} };
+  }
+}
+
+function writeAgentGuardrailsState(state, stateFile = AGENT_GUARDRAILS_STATE_FILE) {
+  try {
+    ensureDir(path.dirname(stateFile));
+    atomicWriteJSONSync(stateFile, state);
+  } catch (_err) {
+    // Best-effort state tracking.
+  }
+}
+
+function getSessionGuardrailEntry(hookInput, state) {
+  const sessionId =
+    hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || null;
+  if (!sessionId || !state?.sessions || typeof state.sessions !== 'object') {
+    return { sessionId: null, entry: null };
+  }
+  return {
+    sessionId,
+    entry: state.sessions[sessionId] || null,
+  };
+}
+
+function getBashCommand(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return '';
+  if (typeof toolInput.command === 'string') return toolInput.command;
+  if (typeof toolInput.cmd === 'string') return toolInput.cmd;
+  return '';
+}
+
+function isGitCommitCommand(command) {
+  if (!command || typeof command !== 'string') return false;
+  return /\bgit\s+(?:commit|push|merge|rebase|cherry-pick)\b/i.test(command);
+}
+
+function isCheckpointCommand(command) {
+  if (!command || typeof command !== 'string') return false;
+  return (
+    /\bgit\s+diff\s+--name-only\b/i.test(command) ||
+    /\bgit\s+status\s+(?:--porcelain|--short)\b/i.test(command)
+  );
+}
+
+function normalizeToolPath(rawPath) {
+  if (!rawPath || typeof rawPath !== 'string') return null;
+  const resolved = path.isAbsolute(rawPath) ? rawPath : path.resolve(PROJECT_ROOT, rawPath);
+  const relative = path.relative(PROJECT_ROOT, resolved);
+  if (relative.startsWith('..')) return null;
+  return relative.replace(/\\/g, '/');
+}
+
+function getMutationPath(toolName, toolInput) {
+  if (!['Write', 'Edit', 'MultiEdit', 'NotebookEdit'].includes(toolName)) {
+    return null;
+  }
+  const filePath =
+    toolInput?.file_path || toolInput?.filePath || toolInput?.path || toolInput?.notebook_path;
+  return normalizeToolPath(filePath);
+}
+
+function isAllowedByFilePolicy(targetPath, allowlist) {
+  if (!targetPath || !Array.isArray(allowlist) || allowlist.length === 0) return true;
+  const normalizedTarget = targetPath.toLowerCase();
+  return allowlist.some(entry => {
+    const normalizedEntry = normalizeToolPath(entry);
+    if (!normalizedEntry) return false;
+    const candidate = normalizedEntry.toLowerCase();
+    return normalizedTarget === candidate || normalizedTarget.startsWith(`${candidate}/`);
+  });
+}
+
+function checkAgentGuardrails(
+  hookInput,
+  toolName,
+  toolInput,
+  stateFile = AGENT_GUARDRAILS_STATE_FILE
+) {
+  const mode = (process.env.AGENT_GUARDRAIL_ENFORCEMENT || 'block').toLowerCase();
+  if (mode === 'off') return { checked: false, reason: 'disabled' };
+  if (!isAgentScopedSession(hookInput)) return { checked: false, reason: 'not_agent_session' };
+
+  const state = readAgentGuardrailsState(stateFile);
+  const { sessionId, entry } = getSessionGuardrailEntry(hookInput, state);
+  if (!sessionId || !entry) return { checked: false, reason: 'missing_policy' };
+
+  if (toolName === 'Bash') {
+    const command = getBashCommand(toolInput);
+    if (isCheckpointCommand(command)) {
+      state.sessions[sessionId] = {
+        ...entry,
+        checkpointDone: true,
+        updatedAt: Date.now(),
+      };
+      writeAgentGuardrailsState(state, stateFile);
+      return { checked: true, action: 'allow' };
+    }
+
+    const commitMode = (process.env.AGENT_GIT_COMMIT_ENFORCEMENT || 'block').toLowerCase();
+    if (commitMode !== 'off' && isGitCommitCommand(command) && entry.allowGitCommit !== true) {
+      const message =
+        '[AGENT-GUARDRAIL] git commit/push/merge/rebase is blocked unless explicitly allowed in spawn policy.';
+      if (commitMode === 'warn') {
+        return { checked: true, action: 'allow', warning: message };
+      }
+      return { checked: true, action: 'block', message };
+    }
+  }
+
+  const mutationPath = getMutationPath(toolName, toolInput);
+  if (!mutationPath) {
+    return { checked: true, action: 'allow' };
+  }
+
+  const fileAllowlistMode = (process.env.AGENT_FILE_ALLOWLIST_ENFORCEMENT || 'block').toLowerCase();
+  const hasAllowlist = Array.isArray(entry.allowedFiles) && entry.allowedFiles.length > 0;
+  if (hasAllowlist && !isAllowedByFilePolicy(mutationPath, entry.allowedFiles)) {
+    const message = `[AGENT-GUARDRAIL] File "${mutationPath}" is outside the assigned allowlist.`;
+    if (fileAllowlistMode === 'warn') {
+      return { checked: true, action: 'allow', warning: message };
+    }
+    if (fileAllowlistMode === 'off') {
+      // continue
+    } else {
+      return { checked: true, action: 'block', message };
+    }
+  }
+
+  const checkpointMode = (process.env.AGENT_EDIT_CHECKPOINT_ENFORCEMENT || 'block').toLowerCase();
+  const touchedFiles = Array.isArray(entry.touchedFiles) ? entry.touchedFiles : [];
+  const nextTouched = touchedFiles.includes(mutationPath)
+    ? touchedFiles
+    : [...touchedFiles, mutationPath];
+
+  if (!entry.firstMutationSeen) {
+    state.sessions[sessionId] = {
+      ...entry,
+      firstMutationSeen: true,
+      checkpointDone: false,
+      touchedFiles: nextTouched,
+      updatedAt: Date.now(),
+    };
+    writeAgentGuardrailsState(state, stateFile);
+    return {
+      checked: true,
+      action: 'allow',
+      warning:
+        '[AGENT-GUARDRAIL] First mutation recorded. Run `git diff --name-only` before additional edits.',
+    };
+  }
+
+  if (!entry.checkpointDone && checkpointMode !== 'off') {
+    const message =
+      '[AGENT-GUARDRAIL] Missing checkpoint. Run `git diff --name-only` or `git status --porcelain` before additional edits.';
+    if (checkpointMode === 'warn') {
+      state.sessions[sessionId] = {
+        ...entry,
+        touchedFiles: nextTouched,
+        updatedAt: Date.now(),
+      };
+      writeAgentGuardrailsState(state, stateFile);
+      return { checked: true, action: 'allow', warning: message };
+    }
+    return { checked: true, action: 'block', message };
+  }
+
+  state.sessions[sessionId] = {
+    ...entry,
+    touchedFiles: nextTouched,
+    updatedAt: Date.now(),
+  };
+  writeAgentGuardrailsState(state, stateFile);
+  return { checked: true, action: 'allow' };
+}
+
 // =============================================================================
 // Check 5: Read Safety Guard (prevents EISDIR and large unchunked reads)
 // =============================================================================
@@ -1114,7 +1311,17 @@ async function main() {
       console.warn(`[pre-tool-unified:taskupdate-first] ${taskUpdateFirst.warning}`);
     }
 
-    // Check 5: Read Safety Guard
+    // Check 5: Agent execution guardrails
+    const guardrailResult = checkAgentGuardrails(hookInput, toolName, toolInput);
+    if (guardrailResult.action === 'block') {
+      console.log(formatResult('block', guardrailResult.message));
+      process.exit(2);
+    }
+    if (guardrailResult.warning) {
+      console.warn(`[pre-tool-unified:guardrail] ${guardrailResult.warning}`);
+    }
+
+    // Check 6: Read Safety Guard
     const readSafety = checkReadSafety(toolName, toolInput, hookInput);
     if (readSafety.action === 'block') {
       console.log(formatResult('block', readSafety.message));
@@ -1177,5 +1384,12 @@ module.exports = {
   ensureReportReadTarget,
   ensureTaskOutputReadTarget,
   createDirectoryListingFile,
+  readAgentGuardrailsState,
+  writeAgentGuardrailsState,
+  checkAgentGuardrails,
+  isGitCommitCommand,
+  isCheckpointCommand,
+  normalizeToolPath,
+  isAllowedByFilePolicy,
   main,
 };

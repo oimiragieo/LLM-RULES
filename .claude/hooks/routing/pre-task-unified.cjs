@@ -72,6 +72,13 @@ const TASKLIST_LOOP_STATE_FILE = path.join(
   'runtime',
   'tasklist-first-loop-state.json'
 );
+const AGENT_GUARDRAILS_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'agent-guardrails-state.json'
+);
 
 /**
  * Default loop prevention limits
@@ -206,6 +213,36 @@ function clearTaskListFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID |
   if (state.sessions[sessionId]) {
     delete state.sessions[sessionId];
     writeTaskListLoopState(state);
+  }
+}
+
+function readAgentGuardrailsState(stateFile = AGENT_GUARDRAILS_STATE_FILE) {
+  try {
+    if (!fs.existsSync(stateFile)) return { sessions: {} };
+    const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      !parsed.sessions ||
+      typeof parsed.sessions !== 'object'
+    ) {
+      return { sessions: {} };
+    }
+    return parsed;
+  } catch (_err) {
+    return { sessions: {} };
+  }
+}
+
+function writeAgentGuardrailsState(state, stateFile = AGENT_GUARDRAILS_STATE_FILE) {
+  try {
+    const dir = path.dirname(stateFile);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(stateFile, JSON.stringify(state, null, 2), 'utf8');
+  } catch (_err) {
+    // Best-effort.
   }
 }
 
@@ -721,6 +758,128 @@ function extractTaskIdFromTaskInput(toolInput) {
   return rawTaskId != null ? String(rawTaskId) : null;
 }
 
+function parseAllowedFilesFromPrompt(prompt) {
+  if (!prompt || typeof prompt !== 'string') return [];
+  const allowed = new Set();
+
+  const directLine = prompt.match(/^\s*ALLOWED_FILES\s*:\s*(.+)$/im);
+  if (directLine && directLine[1]) {
+    for (const token of directLine[1].split(/[,;]/)) {
+      const normalized = String(token || '')
+        .trim()
+        .replace(/^['"`]|['"`]$/g, '');
+      if (normalized) allowed.add(normalized);
+    }
+  }
+
+  const allowlistSection = prompt.match(
+    /##\s*FILE ALLOWLIST[\s\S]{0,2000}?(?=\n##\s+|\n\+={10,100}\+|$)/i
+  );
+  if (allowlistSection && allowlistSection[0]) {
+    const lines = allowlistSection[0].split(/\r?\n/);
+    for (const line of lines) {
+      const bullet = line.match(/^\s*[-*]\s+(.+)$/);
+      if (!bullet || !bullet[1]) continue;
+      const normalized = bullet[1].trim().replace(/^['"`]|['"`]$/g, '');
+      if (normalized) allowed.add(normalized);
+    }
+  }
+
+  return Array.from(allowed);
+}
+
+function parseBooleanDirective(prompt, key) {
+  if (!prompt || typeof prompt !== 'string') return null;
+  const re = new RegExp(`^\\s*${key}\\s*:\\s*(true|false)\\s*$`, 'im');
+  const match = prompt.match(re);
+  if (!match) return null;
+  return match[1].toLowerCase() === 'true';
+}
+
+function extractGuardrailPolicy(toolInput) {
+  const prompt = toolInput?.prompt || '';
+  const inlineAllowed = Array.isArray(toolInput?.allowed_files)
+    ? toolInput.allowed_files.map(v => String(v).trim()).filter(Boolean)
+    : [];
+  const promptAllowed = parseAllowedFilesFromPrompt(prompt);
+  const allowedFiles = Array.from(new Set([...inlineAllowed, ...promptAllowed]));
+
+  const explicitAllowGitCommit =
+    typeof toolInput?.allow_git_commit === 'boolean'
+      ? toolInput.allow_git_commit
+      : parseBooleanDirective(prompt, 'ALLOW_GIT_COMMIT');
+
+  return {
+    allowedFiles,
+    allowGitCommit: explicitAllowGitCommit === true,
+  };
+}
+
+function persistGuardrailPolicy(hookInput, toolInput) {
+  try {
+    const sessionId =
+      hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || null;
+    if (!sessionId) return;
+
+    const taskId = extractTaskIdFromTaskInput(toolInput);
+    const policy = extractGuardrailPolicy(toolInput);
+    const state = readAgentGuardrailsState();
+    state.sessions[sessionId] = {
+      taskId: taskId || state.sessions[sessionId]?.taskId || null,
+      allowGitCommit: Boolean(policy.allowGitCommit),
+      allowedFiles: policy.allowedFiles,
+      firstMutationSeen: false,
+      checkpointDone: false,
+      touchedFiles: [],
+      updatedAt: Date.now(),
+    };
+    writeAgentGuardrailsState(state);
+  } catch (err) {
+    auditLog('pre-task-unified', 'guardrail_policy_persist_failed', { error: err.message });
+  }
+}
+
+function hasResumeDirective(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return false;
+  if (toolInput.resume === true || toolInput.resumeId || toolInput.resume_id) return true;
+  const combined = `${toolInput.description || ''}\n${toolInput.prompt || ''}`.toLowerCase();
+  if (!combined) return false;
+  return /\bresum(?:e|ing)\b/.test(combined);
+}
+
+function hasMultiWaveDirective(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return false;
+  const combined = `${toolInput.description || ''}\n${toolInput.prompt || ''}`.toLowerCase();
+  if (!combined) return false;
+  const matches = combined.match(/\b(?:tier|phase|wave)\s*\d+\b/g) || [];
+  return new Set(matches).size >= 2;
+}
+
+function checkSpawnRoleGuardrails(toolInput) {
+  const resumeMode = getEnforcementMode('TASK_RESUME_ENFORCEMENT', 'block');
+  const allowResumeOverride = String(process.env.TASK_ALLOW_AGENT_RESUME || '').toLowerCase();
+  if (resumeMode !== 'off' && hasResumeDirective(toolInput) && allowResumeOverride !== 'true') {
+    const message =
+      '[SPAWN-GUARDRAIL] Resume-style spawn detected. Spawn a fresh agent instead of resume.';
+    if (resumeMode === 'block') {
+      return { pass: false, result: 'block', message };
+    }
+    return { pass: true, warnings: [message] };
+  }
+
+  const singlePurposeMode = getEnforcementMode('TASK_SINGLE_PURPOSE_ENFORCEMENT', 'warn');
+  if (singlePurposeMode !== 'off' && hasMultiWaveDirective(toolInput)) {
+    const message =
+      '[SPAWN-GUARDRAIL] Multi-wave task detected in one spawn prompt. Use one focused objective per agent task.';
+    if (singlePurposeMode === 'block') {
+      return { pass: false, result: 'block', message };
+    }
+    return { pass: true, warnings: [message] };
+  }
+
+  return { pass: true };
+}
+
 function updateTaskLifecycleStateAfterAllow(hookInput) {
   try {
     const toolInput = getToolInput(hookInput);
@@ -799,6 +958,21 @@ function runAllChecks(hookInput) {
     routerState.markSecuritySpawned();
   }
 
+  // Check 2c: Spawn role guardrails
+  const spawnGuardrailResult = checkSpawnRoleGuardrails(toolInput);
+  if (!spawnGuardrailResult.pass) {
+    return {
+      pass: false,
+      exitCode: spawnGuardrailResult.result === 'block' ? 2 : 0,
+      message: spawnGuardrailResult.message,
+    };
+  }
+  if (Array.isArray(spawnGuardrailResult.warnings)) {
+    for (const warning of spawnGuardrailResult.warnings) {
+      console.warn(warning);
+    }
+  }
+
   // Check 3: Loop Prevention
   const loopResult = checkLoopPrevention(hookInput);
   if (!loopResult.pass) {
@@ -812,6 +986,7 @@ function runAllChecks(hookInput) {
   // All checks passed
   updateLoopStateAfterAllow(hookInput);
   updateTaskLifecycleStateAfterAllow(hookInput);
+  persistGuardrailPolicy(hookInput, toolInput);
   return { pass: true, exitCode: 0 };
 }
 
@@ -945,6 +1120,14 @@ module.exports = {
   clearTaskListFirstViolation,
   invalidateCachedState,
   updateLoopStateAfterAllow,
+  checkSpawnRoleGuardrails,
+  hasResumeDirective,
+  hasMultiWaveDirective,
+  parseAllowedFilesFromPrompt,
+  extractGuardrailPolicy,
+  readAgentGuardrailsState,
+  writeAgentGuardrailsState,
+  persistGuardrailPolicy,
 
   // Constants
   PLANNER_PATTERNS,
@@ -953,4 +1136,5 @@ module.exports = {
   EVOLUTION_TRIGGERS,
   EVOLUTION_TYPES,
   LOOP_STATE_FILE,
+  AGENT_GUARDRAILS_STATE_FILE,
 };
