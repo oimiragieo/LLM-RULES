@@ -64,7 +64,12 @@ describe('pre-tool-unified agent guardrails', () => {
         session_id: 'session-1',
         allowed_tools: ['TaskUpdate', 'Bash', 'Edit'],
       };
-      const result = checkAgentGuardrails(hookInput, 'Bash', { command: 'git commit -m "x"' }, stateFile);
+      const result = checkAgentGuardrails(
+        hookInput,
+        'Bash',
+        { command: 'git commit -m "x"' },
+        stateFile
+      );
       assert.equal(result.action, 'block');
       assert.match(result.message, /blocked unless explicitly allowed/);
     });
@@ -77,7 +82,12 @@ describe('pre-tool-unified agent guardrails', () => {
         session_id: 'session-2',
         allowed_tools: ['TaskUpdate', 'Bash', 'Edit'],
       };
-      const result = checkAgentGuardrails(hookInput, 'Bash', { command: 'git commit -m "x"' }, stateFile);
+      const result = checkAgentGuardrails(
+        hookInput,
+        'Bash',
+        { command: 'git commit -m "x"' },
+        stateFile
+      );
       assert.equal(result.action, 'allow');
     });
   });

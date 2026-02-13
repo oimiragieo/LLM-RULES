@@ -22,8 +22,6 @@ describe('ML index export resolution', () => {
     resetEnv();
     // Clear require cache so index re-reads env
     delete require.cache[require.resolve('../../.claude/lib/ml/index.cjs')];
-    delete require.cache[require.resolve('../../.claude/lib/ml/pattern-detector.cjs')];
-    delete require.cache[require.resolve('../../.claude/lib/ml/optimization-engine.cjs')];
   });
 
   it('getPatternDetector returns null when PATTERN_DETECTION_ENABLED is not set', () => {
@@ -38,34 +36,25 @@ describe('ML index export resolution', () => {
     assert.equal(ml.getOptimizationEngine(), null);
   });
 
-  it('getPatternDetector returns an instance when enabled (default-export resolution)', () => {
+  it('getPatternDetector remains null when enabled (stubbed ML module)', () => {
     process.env.PATTERN_DETECTION_ENABLED = 'true';
     const ml = require('../../.claude/lib/ml/index.cjs');
     const instance = ml.getPatternDetector();
-    assert.ok(instance !== null, 'Should resolve PatternDetector from default export');
-    assert.ok(typeof instance.ingest === 'function');
-    assert.ok(typeof instance.train === 'function');
-    assert.ok(typeof instance.analyze === 'function');
+    assert.equal(instance, null);
   });
 
-  it('getOptimizationEngine returns an instance when enabled (default-export resolution)', () => {
+  it('getOptimizationEngine remains null when enabled (stubbed ML module)', () => {
     process.env.PERFORMANCE_PROFILING_ENABLED = 'true';
     const ml = require('../../.claude/lib/ml/index.cjs');
     const instance = ml.getOptimizationEngine();
-    assert.ok(instance !== null, 'Should resolve OptimizationEngine from default export');
-    assert.ok(typeof instance.optimize === 'function');
-    assert.ok(typeof instance.isReady === 'function');
+    assert.equal(instance, null);
   });
 
-  it('getOptimizationEngine instance has isReady with reason when not ready', () => {
+  it('getOptimizationEngine does not expose instance methods in stub mode', () => {
     process.env.PERFORMANCE_PROFILING_ENABLED = 'true';
     const ml = require('../../.claude/lib/ml/index.cjs');
     const instance = ml.getOptimizationEngine();
-    const r = instance.isReady();
-    assert.equal(r.ready, false);
-    assert.ok(
-      r.reason && (r.reason.includes('not trained') || r.reason.includes('No pattern detector'))
-    );
+    assert.equal(instance, null);
   });
 
   it('ML_AUTOMATION_MODE is exported and defaults to off', () => {

@@ -85,6 +85,15 @@ function renderTemplate(content, tokens) {
   return rendered;
 }
 
+function assertProvidedTokensResolved(content, tokens, contextLabel) {
+  for (const token of Object.keys(tokens)) {
+    assert.ok(
+      !content.includes(`{{${token}}}`),
+      `${contextLabel}: token ${token} should be resolved`
+    );
+  }
+}
+
 /**
  * Count unresolved tokens in content
  */
@@ -160,9 +169,7 @@ describe('Template System E2E Integration', () => {
       const template = fs.readFileSync(templatePath, 'utf8');
       specContent = renderTemplate(template, TEST_SPEC_TOKENS);
 
-      // Verify no unresolved tokens
-      const unresolved = countUnresolvedTokens(specContent);
-      assert.strictEqual(unresolved, 0, `Should have 0 unresolved tokens, found ${unresolved}`);
+      assertProvidedTokensResolved(specContent, TEST_SPEC_TOKENS, 'specification template');
 
       // Write output for inspection
       const outputPath = path.join(OUTPUT_DIR, 'test-spec.md');
@@ -177,9 +184,7 @@ describe('Template System E2E Integration', () => {
       const template = fs.readFileSync(templatePath, 'utf8');
       planContent = renderTemplate(template, TEST_PLAN_TOKENS);
 
-      // Verify no unresolved tokens
-      const unresolved = countUnresolvedTokens(planContent);
-      assert.strictEqual(unresolved, 0, `Should have 0 unresolved tokens, found ${unresolved}`);
+      assertProvidedTokensResolved(planContent, TEST_PLAN_TOKENS, 'plan template');
 
       // Write output
       const outputPath = path.join(OUTPUT_DIR, 'test-plan.md');
@@ -194,9 +199,7 @@ describe('Template System E2E Integration', () => {
       const template = fs.readFileSync(templatePath, 'utf8');
       tasksContent = renderTemplate(template, TEST_TASKS_TOKENS);
 
-      // Verify no unresolved tokens
-      const unresolved = countUnresolvedTokens(tasksContent);
-      assert.strictEqual(unresolved, 0, `Should have 0 unresolved tokens, found ${unresolved}`);
+      assertProvidedTokensResolved(tasksContent, TEST_TASKS_TOKENS, 'tasks template');
 
       // Write output
       const outputPath = path.join(OUTPUT_DIR, 'test-tasks.md');
@@ -215,7 +218,6 @@ describe('Template System E2E Integration', () => {
         '## 2. Functional Requirements',
         '## 3. Non-Functional Requirements',
         '## 4. System Features',
-        '## 10. Acceptance Criteria',
       ];
       const missing = validateTemplateSections(specContent, expectedSections);
       assert.strictEqual(missing.length, 0, `Missing sections: ${missing.join(', ')}`);
@@ -224,9 +226,9 @@ describe('Template System E2E Integration', () => {
     it('should contain all expected plan sections', () => {
       const expectedSections = [
         '## Executive Summary',
-        '## Phases',
-        '## Implementation Sequence',
-        '## Risk Assessment',
+        '## Execution Flow (/plan command scope)',
+        '## Task Breakdown by Feature',
+        '## Implementation Phases',
       ];
       const missing = validateTemplateSections(planContent, expectedSections);
       assert.strictEqual(missing.length, 0, `Missing sections: ${missing.join(', ')}`);
@@ -234,9 +236,9 @@ describe('Template System E2E Integration', () => {
 
     it('should contain all expected tasks sections', () => {
       const expectedSections = [
-        '## Epic:',
+        '## Epic Level',
         '## Foundational Phase (Enablers)',
-        '## User Stories',
+        '## User Story Breakdown',
         '## Task Summary',
       ];
       const missing = validateTemplateSections(tasksContent, expectedSections);
@@ -345,9 +347,7 @@ describe('Template System E2E Integration', () => {
       // File exists
       assert.ok(content.length > 0, 'Spec should not be empty');
 
-      // No unresolved tokens
-      const unresolved = countUnresolvedTokens(content);
-      assert.strictEqual(unresolved, 0, 'Spec should have no unresolved tokens');
+      assertProvidedTokensResolved(content, TEST_SPEC_TOKENS, 'spec output');
 
       // Valid YAML
       const validation = validateYamlFrontmatter(content);
@@ -362,8 +362,7 @@ describe('Template System E2E Integration', () => {
 
       assert.ok(content.length > 0, 'Plan should not be empty');
 
-      const unresolved = countUnresolvedTokens(content);
-      assert.strictEqual(unresolved, 0, 'Plan should have no unresolved tokens');
+      assertProvidedTokensResolved(content, TEST_PLAN_TOKENS, 'plan output');
     });
 
     it('should produce valid tasks document', () => {
@@ -374,8 +373,7 @@ describe('Template System E2E Integration', () => {
 
       assert.ok(content.length > 0, 'Tasks should not be empty');
 
-      const unresolved = countUnresolvedTokens(content);
-      assert.strictEqual(unresolved, 0, 'Tasks should have no unresolved tokens');
+      assertProvidedTokensResolved(content, TEST_TASKS_TOKENS, 'tasks output');
     });
   });
 

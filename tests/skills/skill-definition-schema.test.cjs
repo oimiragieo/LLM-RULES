@@ -29,11 +29,13 @@ test('valid skill frontmatter passes schema validation', () => {
   const { validateData } = require(SCHEMA_VALIDATOR_PATH);
 
   const validFrontmatter = {
-    name: 'test-skill',
-    description: 'A test skill used for validation testing purposes only',
-    version: '1.0',
-    model: 'sonnet',
-    tools: ['Read', 'Write'],
+    status: 'success',
+    output: {
+      name: 'test-skill',
+      description: 'A test skill used for validation testing purposes only',
+      model: 'sonnet',
+      tools: ['Read', 'Write'],
+    },
   };
 
   const result = validateData(validFrontmatter, SCHEMA_PATH);
@@ -44,9 +46,11 @@ test('missing required name field fails validation', () => {
   const { validateData } = require(SCHEMA_VALIDATOR_PATH);
 
   const invalidFrontmatter = {
-    // name missing
-    description: 'A test skill used for validation testing purposes only',
-    version: '1.0',
+    status: 'success',
+    output: {
+      // name missing
+      description: 'A test skill used for validation testing purposes only',
+    },
   };
 
   const result = validateData(invalidFrontmatter, SCHEMA_PATH);
@@ -57,8 +61,11 @@ test('invalid name pattern fails validation', () => {
   const { validateData } = require(SCHEMA_VALIDATOR_PATH);
 
   const invalidFrontmatter = {
-    name: 'InvalidCapitalizedName',
-    description: 'A test skill used for validation testing purposes only',
+    status: 'success',
+    output: {
+      name: 'InvalidCapitalizedName',
+      description: 'A test skill used for validation testing purposes only',
+    },
   };
 
   const result = validateData(invalidFrontmatter, SCHEMA_PATH);
@@ -69,8 +76,11 @@ test('short description fails validation (minLength)', () => {
   const { validateData } = require(SCHEMA_VALIDATOR_PATH);
 
   const invalidFrontmatter = {
-    name: 'test-skill',
-    description: 'Too short',
+    status: 'success',
+    output: {
+      name: 'test-skill',
+      description: 'Too short',
+    },
   };
 
   const result = validateData(invalidFrontmatter, SCHEMA_PATH);

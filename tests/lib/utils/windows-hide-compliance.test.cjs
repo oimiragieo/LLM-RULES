@@ -49,13 +49,9 @@ describe('windowsHide compliance', () => {
 
     // Report violations
     if (violations.length > 0) {
-      const report = violations
-        .map(v => `  ${v.file}:${v.line}\n    ${v.snippet}...`)
-        .join('\n');
+      const report = violations.map(v => `  ${v.file}:${v.line}\n    ${v.snippet}...`).join('\n');
 
-      assert.fail(
-        `Found ${violations.length} spawn calls without windowsHide: true:\n${report}`
-      );
+      assert.fail(`Found ${violations.length} spawn calls without windowsHide: true:\n${report}`);
     }
 
     // Pass if no violations

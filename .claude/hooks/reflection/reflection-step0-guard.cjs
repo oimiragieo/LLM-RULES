@@ -67,9 +67,22 @@ function readSpawnRequests(filePath) {
     if (!fs.existsSync(filePath)) return [];
     const content = fs.readFileSync(filePath, 'utf8');
     if (!content.trim()) return [];
-    // SEC-PROTO-001: Use safeParseJSON for prototype pollution protection
+    // SEC-PROTO-001: Use safeParseJSON for prototype pollution protection.
     const parsed = safeParseJSON(content, null);
-    return Array.isArray(parsed) ? parsed : [];
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+
+    // safeParseJSON fallback may normalize arrays into objects with numeric keys.
+    if (parsed && typeof parsed === 'object') {
+      const numericKeys = Object.keys(parsed)
+        .filter(key => /^\d+$/.test(key))
+        .sort((a, b) => Number(a) - Number(b));
+      if (numericKeys.length > 0) {
+        return numericKeys.map(key => parsed[key]);
+      }
+    }
+    return [];
   } catch (_err) {
     return [];
   }

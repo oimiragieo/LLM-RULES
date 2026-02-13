@@ -163,7 +163,7 @@ describe('Track Metadata Schema Validation', () => {
       assert.ok(valid, `Validation failed: ${JSON.stringify(validate.errors, null, 2)}`);
     });
 
-    it('should validate metadata with additional properties (extensibility)', () => {
+    it('should reject metadata with additional properties (strict schema)', () => {
       const metadata = {
         trackId: 'custom_20260129',
         type: 'feature',
@@ -176,7 +176,11 @@ describe('Track Metadata Schema Validation', () => {
       };
 
       const valid = validate(metadata);
-      assert.ok(valid, `Validation failed: ${JSON.stringify(validate.errors, null, 2)}`);
+      assert.strictEqual(valid, false, 'Schema should reject unknown top-level fields');
+      assert.ok(
+        validate.errors.some(err => err.keyword === 'additionalProperties'),
+        `Expected additionalProperties error, got: ${JSON.stringify(validate.errors, null, 2)}`
+      );
     });
 
     it('should validate cancelled status', () => {

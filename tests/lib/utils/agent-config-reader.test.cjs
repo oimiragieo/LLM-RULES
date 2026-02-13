@@ -133,10 +133,10 @@ describe('agent-config-reader', () => {
       assert.strictEqual(model, 'claude-opus-4-5-20251101');
     });
 
-    it('should return null for agent not in config.yaml', () => {
+    it('should return configured model for security-architect', () => {
       const model = getModelFromConfig('security-architect', PROJECT_ROOT);
-      // security-architect is not in config.yaml agents section
-      assert.strictEqual(model, null);
+      assert.ok(typeof model === 'string');
+      assert.ok(model.includes('claude-'));
     });
 
     it('should return null for invalid project root', () => {
@@ -194,13 +194,9 @@ describe('agent-config-reader', () => {
       assert.strictEqual(result.source, 'config.yaml');
     });
 
-    it('should fall back to frontmatter for unconfigured agent', () => {
+    it('should resolve security-architect from config.yaml when configured', () => {
       const result = resolveAgentModel('security-architect', PROJECT_ROOT);
-      // security-architect not in config.yaml, should use frontmatter
-      assert.ok(
-        result.source === 'frontmatter' || result.source === 'complexity-default',
-        `Expected frontmatter or complexity-default, got: ${result.source}`
-      );
+      assert.ok(result.source === 'config.yaml', `Expected config.yaml, got: ${result.source}`);
     });
 
     it('should fall back to complexity default for unknown agent', () => {

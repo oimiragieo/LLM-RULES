@@ -209,9 +209,11 @@ describe('queueCrossCreatorReview', () => {
 describe('validateSchema', () => {
   it('validates skill content against skill-definition schema', () => {
     const content = {
-      name: 'test-skill',
-      description: 'A test skill that does something useful for testing purposes',
-      version: '1.0',
+      status: 'success',
+      output: {
+        name: 'test-skill',
+        description: 'A test skill that does something useful for testing purposes',
+      },
     };
 
     const result = validateSchema('skill', content);
@@ -223,8 +225,8 @@ describe('validateSchema', () => {
 
   it('detects missing required field in skill schema', () => {
     const content = {
-      // missing 'name' field
-      description: 'A test skill that does something useful for testing purposes',
+      status: 'success',
+      // missing 'output' field
     };
 
     const result = validateSchema('skill', content);
@@ -232,8 +234,8 @@ describe('validateSchema', () => {
     assert.strictEqual(result.valid, false);
     assert.ok(result.errors.length > 0, 'should have at least one error');
     assert.ok(
-      result.errors.some(e => e.includes('name')),
-      'error should mention missing name field'
+      result.errors.some(e => e.includes('output')),
+      'error should mention missing output field from lightweight validator'
     );
   });
 

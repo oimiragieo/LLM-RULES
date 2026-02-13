@@ -11,6 +11,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 // Simple test framework
 const tests = [];
@@ -299,9 +300,27 @@ describe('validateSettingsJsonRegistration', () => {
 
 describe('validateSkillCatalogRegistration', () => {
   it('should pass when skill exists in catalog', () => {
-    // 'tdd' should be in the skill catalog
-    const result = validateSkillCatalogRegistration('tdd');
-    assertEqual(result.passed, true);
+    const catalogPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'context',
+      'artifacts',
+      'skill-catalog.md'
+    );
+    const existed = fs.existsSync(catalogPath);
+    const original = existed ? fs.readFileSync(catalogPath, 'utf8') : null;
+    fs.mkdirSync(path.dirname(catalogPath), { recursive: true });
+    fs.writeFileSync(catalogPath, '# Skill Catalog\n\n- tdd\n', 'utf8');
+    try {
+      const result = validateSkillCatalogRegistration('tdd');
+      assertEqual(result.passed, true);
+    } finally {
+      if (existed) {
+        fs.writeFileSync(catalogPath, original, 'utf8');
+      } else if (fs.existsSync(catalogPath)) {
+        fs.unlinkSync(catalogPath);
+      }
+    }
   });
 
   it('should fail when skill not in catalog', () => {

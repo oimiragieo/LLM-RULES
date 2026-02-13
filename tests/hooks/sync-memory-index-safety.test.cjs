@@ -66,11 +66,15 @@ describe('sync-memory-index file safety', () => {
   it('valid JSON file should sync successfully', () => {
     setup();
     try {
-      const { syncJsonMemory, ensureEntityDbInitialized } = require('../../.claude/hooks/memory/sync-memory-index.cjs');
+      const {
+        syncJsonMemory,
+        ensureEntityDbInitialized,
+      } = require('../../.claude/hooks/memory/sync-memory-index.cjs');
       const jsonFile = path.join(tempDir, 'patterns.json');
-      fs.writeFileSync(jsonFile, JSON.stringify([
-        { name: 'test-pattern', description: 'A test pattern' }
-      ]));
+      fs.writeFileSync(
+        jsonFile,
+        JSON.stringify([{ name: 'test-pattern', description: 'A test pattern' }])
+      );
       const dbPath = path.join(tempDir, 'memory.db');
 
       // Initialize DB first

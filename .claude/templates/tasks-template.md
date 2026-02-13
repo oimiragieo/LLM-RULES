@@ -1,36 +1,36 @@
 ---
 # [REQUIRED] Feature or Epic name - high-level feature description
-feature: { { FEATURE_NAME } }
+feature: '{{FEATURE_NAME}}'
 
 # [REQUIRED] Version of the feature being implemented
-version: { { VERSION } }
+version: '{{VERSION}}'
 
 # [REQUIRED] Author or team responsible for this feature
-author: { { AUTHOR } }
+author: '{{AUTHOR}}'
 
 # [REQUIRED] Date when tasks were created (YYYY-MM-DD format)
-date: { { DATE } }
+date: '{{DATE}}'
 
 # [OPTIONAL] Current status of the feature. Default: draft
 # Options: draft, in_progress, complete, on_hold
-status: { { STATUS:draft } }
+status: '{{STATUS:draft}}'
 
 # [OPTIONAL] Priority level for the feature. Default: medium
 # Options: low, medium, high, critical
-priority: { { PRIORITY:medium } }
+priority: '{{PRIORITY:medium}}'
 
 # [OPTIONAL] Estimated effort for entire feature (human-readable)
 # Format: "N hours|days|weeks|months"
 # Example: "2 weeks", "40 hours", "3 months"
-estimated_effort: { { ESTIMATED_EFFORT } }
+estimated_effort: '{{ESTIMATED_EFFORT}}'
 
 # [OPTIONAL] Related specifications or documentation
 # Example: ["spec-authentication.md", "api-design-doc.md"]
-related_specs: { { RELATED_SPECS } }
+related_specs: '{{RELATED_SPECS}}'
 
 # [OPTIONAL] External or internal dependencies
 # Example: ["OAuth2 provider setup", "Database migration completed"]
-dependencies: { { DEPENDENCIES } }
+dependencies: '{{DEPENDENCIES}}'
 ---
 
 # {{FEATURE_DISPLAY_NAME}} - Task Breakdown
