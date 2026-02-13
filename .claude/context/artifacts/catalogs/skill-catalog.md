@@ -381,6 +381,31 @@ Miscellaneous skills.
 
 ---
 
+## Restored Compatibility Skills
+
+Skills restored from archive for backward compatibility and agent reference continuity.
+
+| Skill                                | Description                                                      | Primary Agents |
+| ------------------------------------ | ---------------------------------------------------------------- | -------------- |
+| `build-tools-expert`                 | Build tooling patterns and optimization workflows                | developer      |
+| `composer-dependency-management`     | Composer dependency governance and update safety checks          | php-pro        |
+| `dto-conventions`                    | DTO design conventions and mapping consistency                   | developer      |
+| `form-and-actions-in-sveltekit`      | SvelteKit form/action patterns and validation flow               | svelte-pro     |
+| `form-validation-with-zod`           | Zod-based validation patterns for form input safety              | svelte-pro     |
+| `function-length-and-responsibility` | Function sizing and single-responsibility enforcement            | code-reviewer  |
+| `restcontroller-conventions`         | REST controller contract and endpoint structure conventions       | developer      |
+| `rule-auditor`                       | Rule quality audit and governance checks                         | architect      |
+| `rust-expert`                        | Rust implementation patterns and idiomatic architecture guidance | rust-pro       |
+| `seo-and-meta-tags-in-sveltekit`     | SEO metadata and head management patterns for SvelteKit          | svelte-pro     |
+| `service-class-conventions`          | Service-layer structure and responsibility boundaries             | developer      |
+| `tall-stack-general`                 | TALL stack conventions for Laravel/Alpine/Livewire workflows     | fullstack-pro  |
+| `tauri-security-rules`               | Tauri desktop security rules and hardening patterns              | tauri-pro      |
+| `tauri-svelte-typescript-general`    | Tauri + Svelte + TypeScript integration conventions              | tauri-pro      |
+| `tauri-svelte-ui-components`         | UI component architecture patterns for Tauri/Svelte projects     | tauri-pro      |
+| `tsconfig-json-rules`                | TypeScript compiler configuration conventions and guardrails      | typescript-pro |
+
+---
+
 ## Deprecated Skills
 
 | Deprecated Skill     | Replacement | Notes                           |

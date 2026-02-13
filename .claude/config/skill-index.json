@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-13T22:40:54.922Z",
+  "generatedAt": "2026-02-13T22:50:38.560Z",
   "metadata": {
-    "totalSkills": 199,
+    "totalSkills": 215,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-13T22:40:54.923Z",
+    "lastValidated": "2026-02-13T22:50:38.561Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md"
   },
   "skills": {
@@ -239,6 +239,195 @@
       ],
       "priority": 3
     },
+    "build-tools-expert": {
+      "name": "build-tools-expert",
+      "displayName": "Build Tools Expert",
+      "category": "Other",
+      "domain": "development",
+      "description": "Other - build-tools-expert",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "development",
+        "other",
+        "build-tools-expert"
+      ],
+      "priority": 3
+    },
+    "composer-dependency-management": {
+      "name": "composer-dependency-management",
+      "displayName": "Composer Dependency Management",
+      "category": "Other",
+      "domain": "development",
+      "description": "Other - composer-dependency-management",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "php-pro"
+      ],
+      "tags": [
+        "development",
+        "other",
+        "composer-dependency-management"
+      ],
+      "priority": 3
+    },
+    "dto-conventions": {
+      "name": "dto-conventions",
+      "displayName": "Dto Conventions",
+      "category": "Other",
+      "domain": "development",
+      "description": "Other - dto-conventions",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "java-pro"
+      ],
+      "tags": [
+        "development",
+        "other",
+        "dto-conventions"
+      ],
+      "priority": 3
+    },
+    "function-length-and-responsibility": {
+      "name": "function-length-and-responsibility",
+      "displayName": "Function Length And Responsibility",
+      "category": "Other",
+      "domain": "development",
+      "description": "Other - function-length-and-responsibility",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "development",
+        "other",
+        "function-length-and-responsibility"
+      ],
+      "priority": 3
+    },
+    "restcontroller-conventions": {
+      "name": "restcontroller-conventions",
+      "displayName": "Restcontroller Conventions",
+      "category": "Other",
+      "domain": "development",
+      "description": "Other - restcontroller-conventions",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "java-pro"
+      ],
+      "tags": [
+        "development",
+        "other",
+        "restcontroller-conventions"
+      ],
+      "priority": 3
+    },
+    "rule-auditor": {
+      "name": "rule-auditor",
+      "displayName": "Rule Auditor",
+      "category": "Other",
+      "domain": "development",
+      "description": "Other - rule-auditor",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "qa",
+        "code-reviewer",
+        "security-architect",
+        "conductor-validator"
+      ],
+      "tags": [
+        "development",
+        "other",
+        "rule-auditor"
+      ],
+      "priority": 3
+    },
+    "service-class-conventions": {
+      "name": "service-class-conventions",
+      "displayName": "Service Class Conventions",
+      "category": "Other",
+      "domain": "development",
+      "description": "Other - service-class-conventions",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "java-pro"
+      ],
+      "tags": [
+        "development",
+        "other",
+        "service-class-conventions"
+      ],
+      "priority": 3
+    },
+    "tsconfig-json-rules": {
+      "name": "tsconfig-json-rules",
+      "displayName": "Tsconfig Json Rules",
+      "category": "Other",
+      "domain": "development",
+      "description": "Other - tsconfig-json-rules",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "development",
+        "other",
+        "tsconfig-json-rules"
+      ],
+      "priority": 3
+    },
     "library-usage": {
       "name": "library-usage",
       "displayName": "Library Usage",
@@ -389,6 +578,30 @@
         "auth-security-expert"
       ],
       "priority": 1
+    },
+    "tauri-security-rules": {
+      "name": "tauri-security-rules",
+      "displayName": "Tauri Security Rules",
+      "category": "Other",
+      "domain": "security",
+      "description": "Other - tauri-security-rules",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "tauri-desktop-developer"
+      ],
+      "tags": [
+        "security",
+        "other",
+        "tauri-security-rules"
+      ],
+      "priority": 3
     },
     "memory-forensics": {
       "name": "memory-forensics",
@@ -2187,6 +2400,28 @@
       ],
       "priority": 1
     },
+    "rust-expert": {
+      "name": "rust-expert",
+      "displayName": "Rust Expert",
+      "category": "Other",
+      "domain": "languages",
+      "description": "Other - rust-expert",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "languages",
+        "other",
+        "rust-expert"
+      ],
+      "priority": 3
+    },
     "nodejs-expert": {
       "name": "nodejs-expert",
       "displayName": "Nodejs Expert",
@@ -2533,6 +2768,52 @@
       ],
       "priority": 1
     },
+    "form-and-actions-in-sveltekit": {
+      "name": "form-and-actions-in-sveltekit",
+      "displayName": "Form And Actions In Sveltekit",
+      "category": "Other",
+      "domain": "frameworks",
+      "description": "Other - form-and-actions-in-sveltekit",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "sveltekit-expert"
+      ],
+      "tags": [
+        "frameworks",
+        "other",
+        "form-and-actions-in-sveltekit"
+      ],
+      "priority": 3
+    },
+    "form-validation-with-zod": {
+      "name": "form-validation-with-zod",
+      "displayName": "Form Validation With Zod",
+      "category": "Other",
+      "domain": "frameworks",
+      "description": "Other - form-validation-with-zod",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "frameworks",
+        "other",
+        "form-validation-with-zod"
+      ],
+      "priority": 3
+    },
     "vue-expert": {
       "name": "vue-expert",
       "displayName": "Vue Expert",
@@ -2859,6 +3140,78 @@
         "frameworks",
         "other",
         "state-management-expert"
+      ],
+      "priority": 3
+    },
+    "tall-stack-general": {
+      "name": "tall-stack-general",
+      "displayName": "Tall Stack General",
+      "category": "Other",
+      "domain": "frameworks",
+      "description": "Other - tall-stack-general",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "php-pro"
+      ],
+      "tags": [
+        "frameworks",
+        "other",
+        "tall-stack-general"
+      ],
+      "priority": 3
+    },
+    "tauri-svelte-typescript-general": {
+      "name": "tauri-svelte-typescript-general",
+      "displayName": "Tauri Svelte Typescript General",
+      "category": "Other",
+      "domain": "frameworks",
+      "description": "Other - tauri-svelte-typescript-general",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "tauri-desktop-developer"
+      ],
+      "tags": [
+        "frameworks",
+        "other",
+        "tauri-svelte-typescript-general"
+      ],
+      "priority": 3
+    },
+    "tauri-svelte-ui-components": {
+      "name": "tauri-svelte-ui-components",
+      "displayName": "Tauri Svelte Ui Components",
+      "category": "Other",
+      "domain": "frameworks",
+      "description": "Other - tauri-svelte-ui-components",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "tauri-desktop-developer"
+      ],
+      "tags": [
+        "frameworks",
+        "other",
+        "tauri-svelte-ui-components"
       ],
       "priority": 3
     },
@@ -3400,6 +3753,31 @@
         "documentation",
         "documentation",
         "writing-skills"
+      ],
+      "priority": 3
+    },
+    "seo-and-meta-tags-in-sveltekit": {
+      "name": "seo-and-meta-tags-in-sveltekit",
+      "displayName": "Seo And Meta Tags In Sveltekit",
+      "category": "Other",
+      "domain": "documentation",
+      "description": "Other - seo-and-meta-tags-in-sveltekit",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "nextjs-pro",
+        "sveltekit-expert"
+      ],
+      "tags": [
+        "documentation",
+        "other",
+        "seo-and-meta-tags-in-sveltekit"
       ],
       "priority": 3
     },
@@ -4859,6 +5237,14 @@
         "code-style-validator",
         "async-operations",
         "logging-module-usage",
+        "build-tools-expert",
+        "composer-dependency-management",
+        "dto-conventions",
+        "function-length-and-responsibility",
+        "restcontroller-conventions",
+        "rule-auditor",
+        "service-class-conventions",
+        "tsconfig-json-rules",
         "library-usage",
         "comprehensive-unit-testing-with-pytest",
         "unit-testing-requirement",
@@ -4867,6 +5253,7 @@
       "security": [
         "security-architect",
         "auth-security-expert",
+        "tauri-security-rules",
         "memory-forensics",
         "binary-analysis-patterns",
         "protocol-reverse-engineering",
@@ -4959,6 +5346,7 @@
         "go-expert",
         "java-expert",
         "php-expert",
+        "rust-expert",
         "nodejs-expert",
         "elixir-expert",
         "cpp",
@@ -4976,6 +5364,8 @@
         "react-best-practices-vercel",
         "composition-patterns-vercel",
         "nextjs-expert",
+        "form-and-actions-in-sveltekit",
+        "form-validation-with-zod",
         "vue-expert",
         "angular-expert",
         "svelte-expert",
@@ -4989,7 +5379,10 @@
         "api-development-expert",
         "htmx-expert",
         "chrome-extension-expert",
-        "state-management-expert"
+        "state-management-expert",
+        "tall-stack-general",
+        "tauri-svelte-typescript-general",
+        "tauri-svelte-ui-components"
       ],
       "mobile": [
         "react-native-skills-vercel",
@@ -5020,6 +5413,7 @@
       "documentation": [
         "doc-generator",
         "writing-skills",
+        "seo-and-meta-tags-in-sveltekit",
         "readme",
         "detailed-docstrings",
         "technical-accuracy-and-usability-rules",
@@ -5110,10 +5504,19 @@
         "code-style-validator",
         "async-operations",
         "logging-module-usage",
+        "build-tools-expert",
+        "composer-dependency-management",
+        "dto-conventions",
+        "function-length-and-responsibility",
+        "restcontroller-conventions",
+        "rule-auditor",
+        "service-class-conventions",
+        "tsconfig-json-rules",
         "library-usage",
         "comprehensive-unit-testing-with-pytest",
         "unit-testing-requirement",
         "test-generator",
+        "tauri-security-rules",
         "memory-forensics",
         "binary-analysis-patterns",
         "protocol-reverse-engineering",
@@ -5166,6 +5569,7 @@
         "configuration-management",
         "java-expert",
         "php-expert",
+        "rust-expert",
         "nodejs-expert",
         "elixir-expert",
         "cpp",
@@ -5178,6 +5582,8 @@
         "latest-language-versions-and-best-practices",
         "jupyter-notebook-best-practices",
         "composition-patterns-vercel",
+        "form-and-actions-in-sveltekit",
+        "form-validation-with-zod",
         "vue-expert",
         "angular-expert",
         "svelte-expert",
@@ -5192,6 +5598,9 @@
         "htmx-expert",
         "chrome-extension-expert",
         "state-management-expert",
+        "tall-stack-general",
+        "tauri-svelte-typescript-general",
+        "tauri-svelte-ui-components",
         "expo-mobile-app-rule",
         "expo-framework-rule",
         "nativescript",
@@ -5206,6 +5615,7 @@
         "repository-class-conventions",
         "vercel-kv-database-rules",
         "experiment-configuration-with-hydra-yaml",
+        "seo-and-meta-tags-in-sveltekit",
         "readme",
         "detailed-docstrings",
         "technical-accuracy-and-usability-rules",
@@ -5354,12 +5764,21 @@
         "code-style-validator",
         "async-operations",
         "logging-module-usage",
+        "build-tools-expert",
+        "composer-dependency-management",
+        "dto-conventions",
+        "function-length-and-responsibility",
+        "restcontroller-conventions",
+        "rule-auditor",
+        "service-class-conventions",
+        "tsconfig-json-rules",
         "library-usage",
         "comprehensive-unit-testing-with-pytest",
         "unit-testing-requirement",
         "test-generator",
         "security-architect",
         "auth-security-expert",
+        "tauri-security-rules",
         "memory-forensics",
         "binary-analysis-patterns",
         "protocol-reverse-engineering",
@@ -5434,6 +5853,7 @@
         "go-expert",
         "java-expert",
         "php-expert",
+        "rust-expert",
         "nodejs-expert",
         "elixir-expert",
         "cpp",
@@ -5449,6 +5869,8 @@
         "react-best-practices-vercel",
         "composition-patterns-vercel",
         "nextjs-expert",
+        "form-and-actions-in-sveltekit",
+        "form-validation-with-zod",
         "vue-expert",
         "angular-expert",
         "svelte-expert",
@@ -5463,6 +5885,9 @@
         "htmx-expert",
         "chrome-extension-expert",
         "state-management-expert",
+        "tall-stack-general",
+        "tauri-svelte-typescript-general",
+        "tauri-svelte-ui-components",
         "react-native-skills-vercel",
         "ios-expert",
         "android-expert",
@@ -5485,6 +5910,7 @@
         "ai-ml-expert",
         "doc-generator",
         "writing-skills",
+        "seo-and-meta-tags-in-sveltekit",
         "readme",
         "detailed-docstrings",
         "technical-accuracy-and-usability-rules",
@@ -5552,12 +5978,21 @@
         "code-quality-expert",
         "async-operations",
         "logging-module-usage",
+        "build-tools-expert",
+        "composer-dependency-management",
+        "dto-conventions",
+        "function-length-and-responsibility",
+        "restcontroller-conventions",
+        "rule-auditor",
+        "service-class-conventions",
+        "tsconfig-json-rules",
         "library-usage",
         "comprehensive-unit-testing-with-pytest",
         "unit-testing-requirement",
         "test-generator",
         "security-architect",
         "auth-security-expert",
+        "tauri-security-rules",
         "memory-forensics",
         "binary-analysis-patterns",
         "protocol-reverse-engineering",
@@ -5625,6 +6060,7 @@
         "go-expert",
         "java-expert",
         "php-expert",
+        "rust-expert",
         "nodejs-expert",
         "elixir-expert",
         "cpp",
@@ -5640,6 +6076,8 @@
         "react-best-practices-vercel",
         "composition-patterns-vercel",
         "nextjs-expert",
+        "form-and-actions-in-sveltekit",
+        "form-validation-with-zod",
         "vue-expert",
         "angular-expert",
         "svelte-expert",
@@ -5654,6 +6092,9 @@
         "htmx-expert",
         "chrome-extension-expert",
         "state-management-expert",
+        "tall-stack-general",
+        "tauri-svelte-typescript-general",
+        "tauri-svelte-ui-components",
         "react-native-skills-vercel",
         "ios-expert",
         "android-expert",
@@ -5676,6 +6117,7 @@
         "ai-ml-expert",
         "doc-generator",
         "writing-skills",
+        "seo-and-meta-tags-in-sveltekit",
         "readme",
         "detailed-docstrings",
         "technical-accuracy-and-usability-rules",
@@ -5739,12 +6181,21 @@
         "code-quality-expert",
         "async-operations",
         "logging-module-usage",
+        "build-tools-expert",
+        "composer-dependency-management",
+        "dto-conventions",
+        "function-length-and-responsibility",
+        "restcontroller-conventions",
+        "rule-auditor",
+        "service-class-conventions",
+        "tsconfig-json-rules",
         "library-usage",
         "comprehensive-unit-testing-with-pytest",
         "unit-testing-requirement",
         "test-generator",
         "security-architect",
         "auth-security-expert",
+        "tauri-security-rules",
         "memory-forensics",
         "binary-analysis-patterns",
         "protocol-reverse-engineering",
@@ -5806,6 +6257,7 @@
         "go-expert",
         "java-expert",
         "php-expert",
+        "rust-expert",
         "nodejs-expert",
         "elixir-expert",
         "cpp",
@@ -5821,6 +6273,8 @@
         "react-best-practices-vercel",
         "composition-patterns-vercel",
         "nextjs-expert",
+        "form-and-actions-in-sveltekit",
+        "form-validation-with-zod",
         "vue-expert",
         "angular-expert",
         "svelte-expert",
@@ -5835,6 +6289,9 @@
         "htmx-expert",
         "chrome-extension-expert",
         "state-management-expert",
+        "tall-stack-general",
+        "tauri-svelte-typescript-general",
+        "tauri-svelte-ui-components",
         "react-native-skills-vercel",
         "ios-expert",
         "android-expert",
@@ -5857,6 +6314,7 @@
         "ai-ml-expert",
         "doc-generator",
         "writing-skills",
+        "seo-and-meta-tags-in-sveltekit",
         "readme",
         "detailed-docstrings",
         "technical-accuracy-and-usability-rules",
