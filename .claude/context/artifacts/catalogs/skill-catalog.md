@@ -406,6 +406,31 @@ Skills restored from archive for backward compatibility and agent reference cont
 
 ---
 
+## Additional Onboarded Skills
+
+Skills present on disk and now explicitly cataloged for index/discovery completeness.
+
+| Skill                               | Description                                                        | Primary Agents      |
+| ----------------------------------- | ------------------------------------------------------------------ | ------------------- |
+| `advanced-elicitation`              | Meta-cognitive elicitation patterns for requirement clarification  | planner             |
+| `artifact-integrator`               | Deep integration analysis and cross-artifact consistency checks    | developer           |
+| `best-practices-guidelines`         | Cross-cutting engineering best-practice baseline                   | developer           |
+| `code-semantic-search`              | Semantic code search over indexed repositories                     | developer           |
+| `code-structural-search`            | AST-structural pattern search for code analysis                    | developer           |
+| `differential-review`               | Security-focused differential review of code changes               | security-architect  |
+| `dry-principle`                     | DRY enforcement and duplication reduction patterns                 | code-reviewer       |
+| `insecure-defaults`                 | Detection of insecure defaults and fail-open configurations        | security-architect  |
+| `planning-with-files`               | File-based planning workflow for long-running implementation tasks | planner             |
+| `prd-generator`                     | Product requirements document generation workflow                  | pm                  |
+| `semgrep-rule-creator`              | Custom Semgrep rule authoring and validation                       | security-architect  |
+| `sparc-methodology`                 | SPARC methodology for structured delivery workflows                | architect           |
+| `spec-init`                         | Unified specification initialization and scaffolding               | planner             |
+| `static-analysis`                   | Static analysis execution and result triage                        | security-architect  |
+| `tauri-native-api-integration`      | Native API integration patterns for Tauri desktop applications     | tauri-pro           |
+| `variant-analysis`                  | Variant detection workflows for vulnerability classes              | security-architect  |
+
+---
+
 ## Deprecated Skills
 
 | Deprecated Skill     | Replacement | Notes                           |
