@@ -10,7 +10,7 @@
  * - All cross-references
  *
  * Usage:
- *   node scripts/validate-all-references.mjs [--verbose] [--fix]
+ *   node scripts/validation/validate-all-references.mjs [--verbose] [--fix]
  *
  * Exit codes:
  *   0: All validations passed
