@@ -18,7 +18,7 @@
  */
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { resolve, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 // Import js-yaml
@@ -89,6 +89,29 @@ function checkFile(path, description, required = true) {
 }
 
 /**
+ * Recursively list markdown files under a directory.
+ *
+ * @param {string} dir
+ * @returns {string[]}
+ */
+function listMarkdownFilesRecursive(dir) {
+  const files = [];
+  const entries = readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === '_archive') continue;
+      files.push(...listMarkdownFilesRecursive(fullPath));
+      continue;
+    }
+    if (entry.isFile() && entry.name.endsWith('.md')) {
+      files.push(fullPath);
+    }
+  }
+  return files;
+}
+
+/**
  * Extract template references from markdown content
  */
 function extractTemplateReferences(content, filePath) {
@@ -129,6 +152,50 @@ function extractSchemaReferences(content, filePath) {
 }
 
 /**
+ * Parse YAML frontmatter block from markdown content.
+ *
+ * @param {string} content
+ * @returns {string}
+ */
+function parseFrontmatterBlock(content) {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  return match ? match[1] : '';
+}
+
+/**
+ * Extract list values from a simple frontmatter list block (e.g. skills/context_files).
+ *
+ * @param {string} frontmatter
+ * @param {string} key
+ * @returns {string[]}
+ */
+function extractFrontmatterList(frontmatter, key) {
+  if (!frontmatter) return [];
+  const values = [];
+  const lines = frontmatter.split(/\r?\n/);
+  let inBlock = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine || '';
+    if (new RegExp(`^${key}:\\s*$`).test(line)) {
+      inBlock = true;
+      continue;
+    }
+    if (/^[A-Za-z_][A-Za-z0-9_]*:\s*/.test(line)) {
+      inBlock = false;
+    }
+    if (!inBlock) continue;
+
+    const listMatch = line.match(/^\s*-\s*(.+?)\s*$/);
+    if (!listMatch) continue;
+    const value = listMatch[1].replace(/^['"]|['"]$/g, '');
+    values.push(value);
+  }
+
+  return values;
+}
+
+/**
  * Validate config.yaml
  */
 function validateConfigYAML() {
@@ -150,18 +217,27 @@ function validateConfigYAML() {
 
   // Validate agent routing
   if (config.agent_routing) {
-    const _agentFiles = readdirSync(resolve(rootDir, '.claude/agents'))
-      .filter(f => f.endsWith('.md'))
-      .map(f => f.replace('.md', ''));
-
     Object.keys(config.agent_routing).forEach(agentName => {
       if (agentName === 'sdk') return; // Skip SDK directory
+      const configuredPath = config?.agents?.[agentName]?.path;
+      if (configuredPath) {
+        if (!existsSync(resolve(rootDir, configuredPath))) {
+          errors.push(
+            `Agent referenced in config.yaml but file missing: ${configuredPath} (agent: ${agentName})`
+          );
+        } else if (verbose) {
+          console.log(`  ✓ Agent ${agentName} exists at configured path`);
+        }
+        return;
+      }
 
-      const agentFile = resolve(rootDir, `.claude/agents/${agentName}.md`);
-      if (!existsSync(agentFile)) {
-        errors.push(`Agent referenced in config.yaml but file missing: ${agentName}.md`);
+      const fallbackPath = resolve(rootDir, `.claude/agents/${agentName}.md`);
+      if (!existsSync(fallbackPath)) {
+        errors.push(
+          `Agent referenced in config.yaml but file missing: ${agentName}.md (no config.agents path)`
+        );
       } else if (verbose) {
-        console.log(`  ✓ Agent ${agentName} exists`);
+        console.log(`  ✓ Agent ${agentName} exists (fallback path)`);
       }
     });
   }
@@ -194,7 +270,7 @@ function validateConfigYAML() {
           `Template missing: ${templateFile} (referenced in config.yaml templates.${key})`
         );
       } else if (verbose) {
-        console.log(`  ✓ Template ${key}: ${templateFile}`);
+        console.log('  ✓ Template reference validated');
       }
     });
   }
@@ -329,14 +405,15 @@ function validateAgents() {
     return;
   }
 
-  const agentFiles = readdirSync(agentsDir).filter(f => f.endsWith('.md'));
+  const agentFiles = listMarkdownFilesRecursive(agentsDir);
 
   const allTemplates = new Set();
 
-  agentFiles.forEach(file => {
-    const filePath = resolve(agentsDir, file);
+  agentFiles.forEach(filePath => {
+    const file = filePath.replace(`${agentsDir}\\`, '').replace(`${agentsDir}/`, '');
     try {
       const content = readFileSync(filePath, 'utf-8');
+      const frontmatter = parseFrontmatterBlock(content);
 
       // Extract template references
       const templateRefs = extractTemplateReferences(content, file);
@@ -344,6 +421,31 @@ function validateAgents() {
         allTemplates.add(ref.fullPath);
         if (!checkFile(ref.fullPath, `Template ${ref.template}`, true)) {
           errors.push(`Template missing: ${ref.template} (referenced in agent ${file})`);
+        }
+      });
+
+      // Validate skills referenced in frontmatter
+      const skills = extractFrontmatterList(frontmatter, 'skills');
+      skills.forEach(skill => {
+        const activeSkillPath = `.claude/skills/${skill}`;
+        const archivedSkillPath = `.claude/skills/_archive/dead/${skill}`;
+        if (existsSync(resolve(rootDir, activeSkillPath))) return;
+        if (existsSync(resolve(rootDir, archivedSkillPath))) {
+          errors.push(
+            `Archived skill referenced by agent: ${skill} (agent ${file}) - restore or update frontmatter`
+          );
+          return;
+        }
+        errors.push(`Missing skill referenced by agent: ${skill} (agent ${file})`);
+      });
+
+      // Validate context_files referenced in frontmatter when they point into .claude
+      const contextFiles = extractFrontmatterList(frontmatter, 'context_files');
+      contextFiles.forEach(contextFile => {
+        const normalized = contextFile.replace(/^@/, '');
+        if (!normalized.startsWith('.claude/')) return;
+        if (!existsSync(resolve(rootDir, normalized))) {
+          errors.push(`Missing context file referenced by agent: ${normalized} (agent ${file})`);
         }
       });
     } catch (error) {
